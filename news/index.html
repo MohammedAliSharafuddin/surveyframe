@@ -74,7 +74,7 @@
 <h4 id="architecture-0-1-0">Architecture<a class="anchor" aria-label="anchor" href="#architecture-0-1-0"></a></h4>
 <ul><li>The <code>sframe</code> S3 class with <code>print</code>, <code>summary</code>, and <code>format</code> methods.</li>
 <li>Custom condition classes: <code>sframe_validation_error</code>, <code>sframe_import_error</code>, <code>sframe_branching_error</code>, <code>sframe_quality_warning</code>, <code>sframe_missing_data_warning</code>, <code>sframe_scoring_warning</code>.</li>
-<li>92 tests covering all exported functions.</li>
+<li>Test coverage across the exported workflow, including report rendering.</li>
 </ul></div>
 <div class="section level4">
 <h4 id="phase-hardening-0-1-0">Phase 1 hardening<a class="anchor" aria-label="anchor" href="#phase-hardening-0-1-0"></a></h4>
@@ -84,6 +84,8 @@
 <code><a href="../reference/quality_report.html">quality_report()</a></code> now computes timing diagnostics when start and submit timestamps are available, including threshold-based speed checks.</li>
 <li>
 <code><a href="../reference/score_scales.html">score_scales()</a></code> now supports weighted mean and weighted sum composites.</li>
+<li>
+<code><a href="../reference/render_report.html">render_report()</a></code> now accepts ordinary output paths, renders a working Quarto report through the installed template, and includes the instrument SHA-256 hash in the reproducibility note.</li>
 </ul></div>
 </div>
 </div>

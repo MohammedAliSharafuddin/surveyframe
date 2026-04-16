@@ -62,7 +62,8 @@ surveyframe 0.1.0 introduces the complete v0.1 workflow.
   `sframe_import_error`, `sframe_branching_error`,
   `sframe_quality_warning`, `sframe_missing_data_warning`,
   `sframe_scoring_warning`.
-- 92 tests covering all exported functions.
+- Test coverage across the exported workflow, including report
+  rendering.
 
 #### Phase 1 hardening
 
@@ -75,3 +76,7 @@ surveyframe 0.1.0 introduces the complete v0.1 workflow.
   available, including threshold-based speed checks.
 - [`score_scales()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/score_scales.md)
   now supports weighted mean and weighted sum composites.
+- [`render_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_report.md)
+  now accepts ordinary output paths, renders a working Quarto report
+  through the installed template, and includes the instrument SHA-256
+  hash in the reproducibility note.
