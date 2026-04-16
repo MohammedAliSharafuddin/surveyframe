@@ -83,11 +83,11 @@ Relevant files:
 - [x] Run `devtools::document()` and confirm `NAMESPACE` and man pages stay in
       sync with the source.
 - [x] Run the local test suite and a no-vignette `devtools::check()` locally.
-- [ ] Review GitHub Actions output for:
+- [x] Review GitHub Actions output for:
       R CMD check, pkgdown, and test coverage.
-- [ ] Fix platform-specific issues on macOS, Windows, and Linux if they
+- [x] Fix platform-specific issues on macOS, Windows, and Linux if they
       appear in CI.
-- [ ] Confirm that the vignette and Quarto report template build cleanly in
+- [x] Confirm that the vignette and Quarto report template build cleanly in
       CI and locally.
 
 Relevant files:
@@ -106,15 +106,20 @@ Relevant files:
 
 Current blockers outside the local source tree:
 
-- [ ] Push the current branch and review fresh GitHub Actions runs.
+- [x] Push the current branch and review fresh GitHub Actions runs.
 - [x] Re-run the full local vignette build on a machine with Pandoc installed.
+
+Latest verification:
+
+- [x] Commit `2f94b5e` passed `pkgdown`, `R CMD check`, and `test-coverage`
+      on GitHub Actions on April 16, 2026 UTC.
 
 Definition of done for Phase 1:
 
 - [x] The public API matches the documented v0.1 scope.
 - [x] The remaining implementation gaps named in `roadmap.md` are closed.
 - [x] Local checks pass.
-- [ ] GitHub Actions are green.
+- [x] GitHub Actions are green.
 - [x] The package is ready for a serious CRAN submission pass.
 
 ## Phase 2: Package Adoption and Publication

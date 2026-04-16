@@ -46,7 +46,7 @@ core package.
 
 ## Current Status
 
-Current status below reflects the repository state reviewed on April 16, 2026.
+Current status below reflects the repository state reviewed on April 17, 2026.
 
 ### What is already present in the repo
 
@@ -65,20 +65,27 @@ Current status below reflects the repository state reviewed on April 16, 2026.
   codebook generation, and Quarto report rendering are all implemented.
 - The local test suite passes when run with the package loaded:
   `pkgload::load_all('.')` plus `testthat::test_dir('tests/testthat')`.
+- A full local `devtools::check()` pass completes with `0 errors`,
+  `0 warnings`, and `0 notes`.
+- GitHub Actions on `main` are green for `R CMD check`, `pkgdown`, and
+  `test-coverage` after the Quarto report fix shipped on April 16, 2026 UTC.
 
 ### What is stable enough to describe as delivered
 
 - The package has a coherent end-to-end object model.
 - The core v0.1 workflow is visible across code, tests, README, vignette, and
   pkgdown configuration.
+- The Quarto reporting path is covered by tests and verified in local and CI
+  package checks.
 - The scope is still disciplined. The repository stays focused on instrument
   definition and workflow.
 
-### What still needs hardening
+### Phase 1 closeout
 
-- The Phase 1 code gaps have been closed in the local repository.
-- Remaining release verification is external to the source edits:
-  a pushed branch needs fresh GitHub Actions results.
+- Phase 1 development is complete in the repository.
+- The release surface is stable enough for a serious CRAN submission pass.
+- The next active work belongs to Phase 2: adoption, publication, and
+  documentation polish.
 
 ## Development Roadmap
 
