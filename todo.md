@@ -141,6 +141,11 @@ Push the current branch and review fresh GitHub Actions runs.
 
 Re-run the full local vignette build on a machine with Pandoc installed.
 
+Latest verification:
+
+Commit `2f94b5e` passed `pkgdown`, `R CMD check`, and `test-coverage` on
+GitHub Actions on April 16, 2026 UTC.
+
 Definition of done for Phase 1:
 
 The public API matches the documented v0.1 scope.

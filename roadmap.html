@@ -65,7 +65,7 @@
 </div>
 <div class="section level2">
 <h2 id="current-status">Current Status<a class="anchor" aria-label="anchor" href="#current-status"></a></h2>
-<p>Current status below reflects the repository state reviewed on April 16, 2026.</p>
+<p>Current status below reflects the repository state reviewed on April 17, 2026.</p>
 <div class="section level3">
 <h3 id="what-is-already-present-in-the-repo">What is already present in the repo<a class="anchor" aria-label="anchor" href="#what-is-already-present-in-the-repo"></a></h3>
 <ul><li>Package metadata, documentation, and release scaffolding are in place: <code>DESCRIPTION</code>, <code>README.md</code>, <code>NEWS.md</code>, <code>inst/CITATION</code>, <code>_pkgdown.yml</code>, the vignette, and GitHub Actions workflows for R CMD check, pkgdown, and Codecov.</li>
@@ -75,17 +75,21 @@
 <li>The package includes a Shiny renderer and a six-screen SurveyStudio app in <code>inst/shiny/app.R</code>.</li>
 <li>Response loading, quality reporting, scale scoring, reliability reporting, item diagnostics, EFA readiness diagnostics, CFA syntax generation, codebook generation, and Quarto report rendering are all implemented.</li>
 <li>The local test suite passes when run with the package loaded: <code>pkgload::load_all('.')</code> plus <code>testthat::test_dir('tests/testthat')</code>.</li>
+<li>A full local <code>devtools::check()</code> pass completes with <code>0 errors</code>, <code>0 warnings</code>, and <code>0 notes</code>.</li>
+<li>GitHub Actions on <code>main</code> are green for <code>R CMD check</code>, <code>pkgdown</code>, and <code>test-coverage</code> after the Quarto report fix shipped on April 16, 2026 UTC.</li>
 </ul></div>
 <div class="section level3">
 <h3 id="what-is-stable-enough-to-describe-as-delivered">What is stable enough to describe as delivered<a class="anchor" aria-label="anchor" href="#what-is-stable-enough-to-describe-as-delivered"></a></h3>
 <ul><li>The package has a coherent end-to-end object model.</li>
 <li>The core v0.1 workflow is visible across code, tests, README, vignette, and pkgdown configuration.</li>
+<li>The Quarto reporting path is covered by tests and verified in local and CI package checks.</li>
 <li>The scope is still disciplined. The repository stays focused on instrument definition and workflow.</li>
 </ul></div>
 <div class="section level3">
-<h3 id="what-still-needs-hardening">What still needs hardening<a class="anchor" aria-label="anchor" href="#what-still-needs-hardening"></a></h3>
-<ul><li>The Phase 1 code gaps have been closed in the local repository.</li>
-<li>Remaining release verification is external to the source edits: a pushed branch needs fresh GitHub Actions results.</li>
+<h3 id="phase-1-closeout">Phase 1 closeout<a class="anchor" aria-label="anchor" href="#phase-1-closeout"></a></h3>
+<ul><li>Phase 1 development is complete in the repository.</li>
+<li>The release surface is stable enough for a serious CRAN submission pass.</li>
+<li>The next active work belongs to Phase 2: adoption, publication, and documentation polish.</li>
 </ul></div>
 </div>
 <div class="section level2">

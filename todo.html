@@ -85,9 +85,9 @@
 <h3 id="id_6-keep-package-checks-green">6. Keep package checks green<a class="anchor" aria-label="anchor" href="#id_6-keep-package-checks-green"></a></h3>
 <ul class="task-list"><li><label><input type="checkbox" checked>Run <code>devtools::document()</code> and confirm <code>NAMESPACE</code> and man pages stay in sync with the source.</label></li>
 <li><label><input type="checkbox" checked>Run the local test suite and a no-vignette <code>devtools::check()</code> locally.</label></li>
-<li><label><input type="checkbox">Review GitHub Actions output for: R CMD check, pkgdown, and test coverage.</label></li>
-<li><label><input type="checkbox">Fix platform-specific issues on macOS, Windows, and Linux if they appear in CI.</label></li>
-<li><label><input type="checkbox">Confirm that the vignette and Quarto report template build cleanly in CI and locally.</label></li>
+<li><label><input type="checkbox" checked>Review GitHub Actions output for: R CMD check, pkgdown, and test coverage.</label></li>
+<li><label><input type="checkbox" checked>Fix platform-specific issues on macOS, Windows, and Linux if they appear in CI.</label></li>
+<li><label><input type="checkbox" checked>Confirm that the vignette and Quarto report template build cleanly in CI and locally.</label></li>
 </ul><p>Relevant files: - <a href="/home/maxx/Documents/GitHub/surveyframe/.github/workflows/R-CMD-check.yaml">.github/workflows/R-CMD-check.yaml</a> - <a href="/home/maxx/Documents/GitHub/surveyframe/.github/workflows/pkgdown.yaml">.github/workflows/pkgdown.yaml</a> - <a href="/home/maxx/Documents/GitHub/surveyframe/.github/workflows/test-coverage.yaml">.github/workflows/test-coverage.yaml</a></p>
 </div>
 <div class="section level3">
@@ -98,13 +98,15 @@
 <li><label><input type="checkbox" checked>Make sure the package can be used without launching Shiny when the user only wants the non-interactive workflow.</label></li>
 <li><label><input type="checkbox" checked>Prepare a CRAN submission checklist with final blockers and decisions.</label></li>
 </ul><p>Current blockers outside the local source tree:</p>
-<ul class="task-list"><li><label><input type="checkbox">Push the current branch and review fresh GitHub Actions runs.</label></li>
+<ul class="task-list"><li><label><input type="checkbox" checked>Push the current branch and review fresh GitHub Actions runs.</label></li>
 <li><label><input type="checkbox" checked>Re-run the full local vignette build on a machine with Pandoc installed.</label></li>
+</ul><p>Latest verification:</p>
+<ul class="task-list"><li><label><input type="checkbox" checked>Commit <code>2f94b5e</code> passed <code>pkgdown</code>, <code>R CMD check</code>, and <code>test-coverage</code> on GitHub Actions on April 16, 2026 UTC.</label></li>
 </ul><p>Definition of done for Phase 1:</p>
 <ul class="task-list"><li><label><input type="checkbox" checked>The public API matches the documented v0.1 scope.</label></li>
 <li><label><input type="checkbox" checked>The remaining implementation gaps named in <code>roadmap.md</code> are closed.</label></li>
 <li><label><input type="checkbox" checked>Local checks pass.</label></li>
-<li><label><input type="checkbox">GitHub Actions are green.</label></li>
+<li><label><input type="checkbox" checked>GitHub Actions are green.</label></li>
 <li><label><input type="checkbox" checked>The package is ready for a serious CRAN submission pass.</label></li>
 </ul></div>
 </div>
