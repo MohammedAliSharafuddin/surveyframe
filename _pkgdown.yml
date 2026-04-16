@@ -102,6 +102,9 @@ reference:
   - title: "Package"
     contents:
       - surveyframe-package
+      - print.sframe
+      - format.sframe
+      - summary.sframe
 
 footer:
   structure:

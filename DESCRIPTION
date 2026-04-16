@@ -16,7 +16,8 @@ Description: Defines a survey instrument as a first-class R object and provides
     visual shell for the complete pipeline. Instruments are saved as
     human-readable JSON files with a SHA-256 integrity hash.
 License: MIT + file LICENSE
-URL: https://github.com/MohammedAliSharafuddin/surveyframe
+URL: https://github.com/MohammedAliSharafuddin/surveyframe,
+    https://mohammedalisharafuddin.github.io/surveyframe
 BugReports: https://github.com/MohammedAliSharafuddin/surveyframe/issues
 Encoding: UTF-8
 Language: en-US
