@@ -150,9 +150,25 @@ render_report <- function(
     output_file <- tempfile(fileext = ".html")
   }
 
+  output_file <- path.expand(output_file)
+  output_dir <- dirname(output_file)
+  if (!dir.exists(output_dir)) {
+    dir.create(output_dir, recursive = TRUE, showWarnings = FALSE)
+  }
+  output_dir <- normalizePath(output_dir, mustWork = FALSE)
+  output_name <- basename(output_file)
+
   template <- system.file("templates", "report.qmd", package = "surveyframe")
   if (!file.exists(template)) {
     rlang::abort("Report template not found. Please reinstall surveyframe.",
+                 class = "sframe_error")
+  }
+
+  render_dir <- tempfile("surveyframe-report-")
+  dir.create(render_dir, recursive = TRUE, showWarnings = FALSE)
+  render_input <- file.path(render_dir, "report.qmd")
+  if (!file.copy(template, render_input, overwrite = TRUE)) {
+    rlang::abort("Could not prepare the Quarto report template for rendering.",
                  class = "sframe_error")
   }
 
@@ -167,12 +183,15 @@ render_report <- function(
     data_path           = tmp_data,
     include_quality     = include_quality && !is.null(data),
     include_reliability = include_reliability && !is.null(data),
-    include_codebook    = include_codebook
+    include_codebook    = include_codebook,
+    instrument_hash     = sframe_hash_value(instrument)
   )
 
   quarto::quarto_render(
-    input         = template,
-    output_file   = output_file,
+    input         = render_input,
+    output_file   = output_name,
+    quarto_args   = c("--output-dir", output_dir),
+    execute_dir   = render_dir,
     execute_params = params
   )
 

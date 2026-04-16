@@ -1,6 +1,6 @@
 ---
 title: "Survey Instrument Report"
-subtitle: "`r params$instrument$meta$title` — v`r params$instrument$meta$version`"
+subtitle: "Instrument-centered workflow summary"
 date: "`r format(Sys.Date(), '%B %d, %Y')`"
 format:
   html:
@@ -18,6 +18,7 @@ params:
   include_codebook: true
   include_quality: true
   include_reliability: true
+  instrument_hash: ""
 execute:
   echo: false
   warning: false
@@ -28,6 +29,8 @@ execute:
 library(surveyframe)
 library(knitr)
 library(tibble)
+
+`%||%` <- function(x, y) if (is.null(x)) y else x
 
 instrument <- readRDS(params$instrument_path)
 
@@ -46,6 +49,8 @@ data files.*
 ```{r instrument-meta}
 #| output: asis
 meta <- instrument$meta
+cat(sprintf("**Instrument:** %s\n\n", meta$title %||% "Untitled survey"))
+cat(sprintf("**Version:** %s\n\n", meta$version %||% "Not provided"))
 cat(sprintf("**Description:** %s\n\n", meta$description %||% "Not provided"))
 cat(sprintf("**Authors:** %s\n\n", paste(meta$authors %||% "Not specified", collapse = ", ")))
 cat(sprintf("**Languages:** %s\n\n", paste(meta$languages, collapse = ", ")))
@@ -208,15 +213,12 @@ if (length(rr) == 0) {
 
 ```{r repro-note}
 #| output: asis
-cat(sprintf(
-  "Instrument hash: `%s`\n\n",
-  tryCatch(
-    jsonlite::fromJSON(
-      write(jsonlite::toJSON(list(h = ""), auto_unbox = TRUE), tempfile())
-    )$h,
-    error = function(e) "see .sframe file"
-  )
-))
+hash_value <- params$instrument_hash
+if (is.null(hash_value) || !nzchar(hash_value)) {
+  hash_value <- "Not available"
+}
+
+cat(sprintf("Instrument hash: `%s`\n\n", hash_value))
 
 cat(sprintf("Report generated: %s\n\n", format(Sys.time(), "%Y-%m-%d %H:%M %Z")))
 cat("To reproduce this report:\n\n")
