@@ -654,7 +654,36 @@ test_that("print.sframe_codebook() produces output without error", {
 })
 
 # ---------------------------------------------------------------------------
-# 12. studio builder helpers
+# 12. render_report()
+# ---------------------------------------------------------------------------
+
+test_that("render_report() writes an HTML report to the requested path", {
+  skip_if_not_installed("quarto")
+  skip_if_not(nzchar(Sys.which("quarto")), "Quarto CLI not installed")
+
+  instr <- validate_sframe(make_instrument())
+  resp <- suppressWarnings(
+    read_responses(
+      make_responses(8),
+      instr,
+      respondent_id = "id",
+      submitted_at = "submitted_at"
+    )
+  )
+
+  out_dir <- file.path(tempdir(), paste0("surveyframe-report-", Sys.getpid()))
+  out <- file.path(out_dir, "report.html")
+
+  expect_no_error(render_report(instr, data = resp, output_file = out))
+  expect_true(file.exists(out))
+
+  html <- paste(readLines(out, warn = FALSE, encoding = "UTF-8"), collapse = "\n")
+  expect_match(html, "Service Quality Survey", fixed = TRUE)
+  expect_match(html, "Instrument hash", fixed = TRUE)
+})
+
+# ---------------------------------------------------------------------------
+# 13. studio builder helpers
 # ---------------------------------------------------------------------------
 
 test_that("builder helpers compose a valid instrument from draft components", {
@@ -720,7 +749,7 @@ test_that("builder helpers reclassify components from a loaded sframe file", {
 })
 
 # ---------------------------------------------------------------------------
-# 13. render_survey() helpers
+# 14. render_survey() helpers
 # ---------------------------------------------------------------------------
 
 test_that("render_survey() returns a shiny app object", {
@@ -826,7 +855,7 @@ test_that("render_survey() blocks invalid submissions through the Shiny server",
 })
 
 # ---------------------------------------------------------------------------
-# 14. Integration workflow
+# 15. Integration workflow
 # ---------------------------------------------------------------------------
 
 test_that("full workflow runs from instrument to scored outputs", {

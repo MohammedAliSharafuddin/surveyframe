@@ -1,5 +1,34 @@
 # read_sframe.R and write_sframe.R
 
+sframe_strip_component_class <- function(component) {
+  class(component) <- NULL
+  component
+}
+
+sframe_serialization_payload <- function(instrument, hash_value = "") {
+  list(
+    hash = list(algo = "sha256", value = hash_value),
+    version = instrument$meta$version,
+    meta = instrument$meta,
+    items = lapply(instrument$items, sframe_strip_component_class),
+    choices = lapply(instrument$choices, sframe_strip_component_class),
+    scales = lapply(instrument$scales, sframe_strip_component_class),
+    branching = lapply(instrument$branching, sframe_strip_component_class),
+    checks = lapply(instrument$checks, sframe_strip_component_class),
+    render = instrument$render
+  )
+}
+
+sframe_hash_payload <- function(payload) {
+  payload$hash$value <- ""
+  json_for_hash <- jsonlite::toJSON(payload, auto_unbox = TRUE, pretty = FALSE)
+  as.character(openssl::sha256(chartr("", "", json_for_hash)))
+}
+
+sframe_hash_value <- function(instrument) {
+  sframe_hash_payload(sframe_serialization_payload(instrument))
+}
+
 #' Write an instrument to a .sframe file
 #'
 #' Serialises an `sframe` instrument object to a UTF-8 JSON file with a
@@ -26,11 +55,6 @@
 write_sframe <- function(instrument, path, pretty = TRUE, overwrite = FALSE) {
   stopifnot(inherits(instrument, "sframe"))
 
-  strip_component_class <- function(component) {
-    class(component) <- NULL
-    component
-  }
-
   if (!endsWith(path, ".sframe")) {
     path <- paste0(path, ".sframe")
   }
@@ -47,24 +71,10 @@ write_sframe <- function(instrument, path, pretty = TRUE, overwrite = FALSE) {
   validate_sframe(instrument, strict = TRUE)
 
   # Build the full JSON payload with an empty hash placeholder
-  payload <- list(
-    hash = list(algo = "sha256", value = ""),
-    version   = instrument$meta$version,
-    meta      = instrument$meta,
-    items     = lapply(instrument$items, strip_component_class),
-    choices   = lapply(instrument$choices, strip_component_class),
-    scales    = lapply(instrument$scales, strip_component_class),
-    branching = lapply(instrument$branching, strip_component_class),
-    checks    = lapply(instrument$checks, strip_component_class),
-    render    = instrument$render
-  )
-
-  # Compute hash over content with empty hash value
-  json_for_hash <- jsonlite::toJSON(payload, auto_unbox = TRUE, pretty = FALSE)
-  hash_value    <- as.character(openssl::sha256(chartr("", "", json_for_hash)))
+  payload <- sframe_serialization_payload(instrument)
 
   # Insert real hash
-  payload$hash$value <- hash_value
+  payload$hash$value <- sframe_hash_payload(payload)
 
   json_out <- jsonlite::toJSON(payload, auto_unbox = TRUE, pretty = pretty,
                                null = "null")
