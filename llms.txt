@@ -1,0 +1,244 @@
+# surveyframe
+
+**surveyframe** defines a survey instrument as a first-class R object
+and provides a complete workflow from instrument design through data
+collection, quality checking, scoring, psychometric diagnostics, and
+reproducible reporting. The **SurveyStudio** interface, launched with
+[`launch_studio()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/launch_studio.md),
+provides a visual shell for the full pipeline.
+
+## The problem it solves
+
+R has excellent tools for survey analysis (`psych`, `lavaan`,
+`semTools`) and for survey rendering (`shinysurveys`). What is missing
+is a package that connects instrument design to publishable output in
+one survey-native workflow, where the instrument itself carries its own
+structure, scoring rules, and quality checks through every stage.
+
+surveyframe closes that gap. One `.sframe` file drives everything.
+
+## Installation
+
+``` r
+# Install from CRAN (once available)
+install.packages("surveyframe")
+
+# Or install the development version from GitHub
+remotes::install_github("MohammedAliSharafuddin/surveyframe")
+```
+
+## A minimal example
+
+``` r
+library(surveyframe)
+
+# 1. Define
+agree5 <- sf_choices("agree5", 1:5,
+  c("Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"))
+
+items <- lapply(1:3, function(i)
+  sf_item(paste0("sat_", i), paste("Satisfaction item", i),
+          type = "likert", choice_set = "agree5", scale_id = "sat"))
+
+scale <- sf_scale("sat", "Satisfaction", items = paste0("sat_", 1:3))
+
+instr <- sf_instrument(
+  title      = "Customer Satisfaction Survey",
+  components = c(list(agree5), items, list(scale))
+)
+
+# 2. Validate and save
+instr <- validate_sframe(instr)
+write_sframe(instr, "my_survey.sframe")
+
+# 3. Deploy
+render_survey(
+  instr,
+  save_responses = "csv",
+  output_path = "responses.csv"
+)                                    # Shiny survey with CSV output
+launch_studio(instrument = instr)     # SurveyStudio interface
+
+# 4. Load and check responses
+responses <- read_responses(
+  "responses.csv",
+  instr,
+  submitted_at = "submitted_at",
+  meta_cols = "started_at"
+)
+qr <- quality_report(
+  responses,
+  instr,
+  submitted_at = "submitted_at",
+  started_at = "started_at"
+)
+
+# 5. Score and measure
+scored <- score_scales(responses, instr)
+rr     <- reliability_report(responses, instr)
+syntax <- cfa_syntax(instr)
+
+# 6. Report
+render_report(instr, data = responses, output_file = "report.html")
+```
+
+## The workflow
+
+| Stage             | Functions                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+|-------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Design            | [`sf_instrument()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_instrument.md), [`sf_item()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_item.md), [`sf_choices()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_choices.md), [`sf_scale()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_scale.md), [`sf_branch()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_branch.md), [`sf_check()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_check.md) |
+| Validate and save | [`validate_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/validate_sframe.md), [`write_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/write_sframe.md), [`read_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_sframe.md)                                                                                                                                                                                                                                                                       |
+| Deploy            | [`render_survey()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_survey.md), [`launch_studio()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/launch_studio.md)                                                                                                                                                                                                                                                                                                                                                                           |
+| Collect           | [`read_responses()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_responses.md)                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| Quality           | [`quality_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/quality_report.md)                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| Score             | [`score_scales()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/score_scales.md)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| Psychometrics     | [`reliability_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/reliability_report.md), [`item_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/item_report.md), [`efa_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/efa_report.md), [`cfa_syntax()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/cfa_syntax.md)                                                                                                                                                                     |
+| Report            | [`codebook_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/codebook_report.md), [`render_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_report.md)                                                                                                                                                                                                                                                                                                                                                                       |
+
+All validation, scoring, quality, psychometric, and reporting functions
+work in regular R scripts. Shiny is only required for survey deployment
+and the SurveyStudio interface.
+
+## The .sframe file
+
+Every instrument is saved as a UTF-8 JSON file with a SHA-256 integrity
+hash. The file is human-readable, version-control friendly, and portable
+across machines and R versions. The hash makes every fielded instrument
+auditable: researchers can report the exact instrument hash in their
+supplementary materials as a reproducibility record.
+
+## SurveyStudio
+
+[`render_survey()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_survey.md)
+can write submitted responses to CSV, including `started_at` and
+`submitted_at` metadata columns.
+[`launch_studio()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/launch_studio.md)
+opens the SurveyStudio interface, a six-screen Shiny application that
+wraps the full pipeline visually:
+
+1.  Open instrument
+2.  Preview survey
+3.  Upload responses
+4.  Quality dashboard
+5.  Reliability dashboard
+6.  Download report
+
+## Citation
+
+If you use surveyframe in published research, please cite the package. A
+formal publication is in preparation for the *Journal of Statistical
+Software*.
+
+``` r
+citation("surveyframe")
+```
+
+## License
+
+MIT. See `LICENSE` for details.
+
+## Author
+
+Mohammed Ali Sharafuddin Senior Lecturer, Qasim Ibrahim School of
+Business, Villa College, Maldives. Doctoral candidate, PIMSAT Tamil
+Nadu. <mas@flairmi.com>
+
+# Package index
+
+## Build an instrument
+
+Constructor functions for building the sframe instrument object. Start
+here.
+
+- [`sf_instrument()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_instrument.md)
+  : Create a survey instrument object
+- [`sf_item()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_item.md)
+  : Define a survey item
+- [`sf_choices()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_choices.md)
+  : Define a reusable choice set
+- [`sf_scale()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_scale.md)
+  : Define a scored scale
+- [`sf_branch()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_branch.md)
+  : Define a branching rule
+- [`sf_check()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_check.md)
+  : Define a design-time survey check
+
+## Save and load
+
+Read and write instruments as portable .sframe JSON files with SHA-256
+integrity hashing.
+
+- [`write_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/write_sframe.md)
+  : Write an instrument to a .sframe file
+- [`read_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_sframe.md)
+  : Read an instrument from a .sframe file
+- [`validate_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/validate_sframe.md)
+  : Validate an instrument object
+
+## Deploy
+
+Render the instrument as a Shiny survey or launch SurveyStudio.
+
+- [`render_survey()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_survey.md)
+  : Render a survey from an instrument object
+- [`launch_studio()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/launch_studio.md)
+  : Launch the SurveyStudio interface
+
+## Collect responses
+
+Load and validate response data against the instrument specification.
+
+- [`read_responses()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_responses.md)
+  : Read and validate survey responses
+
+## Quality checks
+
+Evaluate response data for attention check failures, straight-lining,
+missingness, and duplicate submissions.
+
+- [`quality_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/quality_report.md)
+  : Generate a data quality report for survey responses
+
+## Score and analyse
+
+Score composite scales, compute reliability statistics, and prepare
+psychometric diagnostics.
+
+- [`score_scales()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/score_scales.md)
+  : Score defined scales from survey responses
+- [`reliability_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/reliability_report.md)
+  : Compute reliability statistics for scored scales
+- [`item_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/item_report.md)
+  : Generate item-level diagnostics
+- [`efa_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/efa_report.md)
+  : Prepare a survey instrument for exploratory factor analysis
+- [`cfa_syntax()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/cfa_syntax.md)
+  : Generate lavaan CFA syntax from an instrument object
+
+## Report
+
+Generate codebooks, scale appendices, and reproducible HTML reports.
+
+- [`codebook_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/codebook_report.md)
+  : Generate a survey codebook from an instrument object
+- [`render_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_report.md)
+  : Render a reproducible survey report
+
+## Package
+
+- [`surveyframe`](https://mohammedalisharafuddin.github.io/surveyframe/reference/surveyframe-package.md)
+  [`surveyframe-package`](https://mohammedalisharafuddin.github.io/surveyframe/reference/surveyframe-package.md)
+  : surveyframe: A Survey Instrument Workflow for R
+- [`print(`*`<sframe>`*`)`](https://mohammedalisharafuddin.github.io/surveyframe/reference/print.sframe.md)
+  : Print an sframe instrument object
+- [`format(`*`<sframe>`*`)`](https://mohammedalisharafuddin.github.io/surveyframe/reference/format.sframe.md)
+  : Format an sframe instrument object as a string
+- [`summary(`*`<sframe>`*`)`](https://mohammedalisharafuddin.github.io/surveyframe/reference/summary.sframe.md)
+  : Summarise an sframe instrument object
+
+# Articles
+
+### All vignettes
+
+- [Getting started with
+  surveyframe](https://mohammedalisharafuddin.github.io/surveyframe/articles/surveyframe.md):
