@@ -4,7 +4,15 @@
 \alias{render_survey}
 \title{Render a survey from an instrument object}
 \usage{
-render_survey(instrument, mode = c("shiny"), title = NULL, theme = NULL)
+render_survey(
+  instrument,
+  mode = c("shiny"),
+  title = NULL,
+  theme = NULL,
+  save_responses = c("none", "csv"),
+  output_path = NULL,
+  on_submit = NULL
+)
 }
 \arguments{
 \item{instrument}{An \code{sframe} object.}
@@ -16,19 +24,40 @@ v0.1.}
 in the browser. When NULL, the instrument title is used.}
 
 \item{theme}{Character or NULL. A hex colour code for the survey theme.
-When NULL, the default theme is applied.}
+When NULL, the function uses \code{instrument$render$theme} when present and
+otherwise falls back to the default theme.}
+
+\item{save_responses}{Character. Persistence mode for submitted responses.
+Either \code{"none"} (default) or \code{"csv"}.}
+
+\item{output_path}{Character or NULL. Path to a CSV file used when
+\code{save_responses = "csv"}. Rows are appended if the file already exists.}
+
+\item{on_submit}{Function or NULL. Optional callback invoked with the
+submitted one-row tibble after validation and optional file persistence.}
 }
 \value{
-Launches a Shiny application. Does not return a value.
+A \code{shiny.appobj} object. When called interactively, printing the
+returned object launches the Shiny app.
 }
 \description{
 Launches a self-contained Shiny survey application derived from the
 instrument specification. In v0.1, only \code{mode = "shiny"} is supported.
 Static HTML and Quarto embed modes are planned for a future release.
 }
+\details{
+\code{render_survey()} can persist submitted responses to CSV for later import
+with \code{\link[=read_responses]{read_responses()}}. Saved files include \code{started_at} and
+\code{submitted_at} metadata columns before the instrument item columns.
+}
 \examples{
 \dontrun{
 render_survey(instr)
+render_survey(
+  instr,
+  save_responses = "csv",
+  output_path = "responses.csv"
+)
 }
 }
 \seealso{

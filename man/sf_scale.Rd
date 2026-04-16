@@ -37,8 +37,8 @@ reverse-coded. These can also be flagged at the item level with the
 \code{reverse} argument in \code{\link[=sf_item]{sf_item()}}. Both sources are respected.}
 
 \item{weights}{Numeric vector or NULL. Item weights for weighted scoring.
-Must have the same length as \code{items} if supplied. Only used when
-\code{method = "sum"}.}
+Must have the same length as \code{items} if supplied. \code{\link[=score_scales]{score_scales()}}
+applies the weights to either \code{method = "mean"} or \code{method = "sum"}.}
 }
 \value{
 An object of class \code{sf_scale} (a named list).

@@ -43,3 +43,12 @@ surveyframe 0.1.0 introduces the complete v0.1 workflow.
   `sframe_branching_error`, `sframe_quality_warning`,
   `sframe_missing_data_warning`, `sframe_scoring_warning`.
 * 92 tests covering all exported functions.
+
+### Phase 1 hardening
+
+* `render_survey()` now enforces required visible items, honours help text and
+  rendering hints, and can append submitted responses to CSV with
+  `started_at` and `submitted_at` metadata.
+* `quality_report()` now computes timing diagnostics when start and submit
+  timestamps are available, including threshold-based speed checks.
+* `score_scales()` now supports weighted mean and weighted sum composites.

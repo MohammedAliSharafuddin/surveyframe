@@ -73,6 +73,66 @@ write_sframe <- function(instrument, path, pretty = TRUE, overwrite = FALSE) {
   invisible(path)
 }
 
+sframe_as_vector <- function(x, mode = NULL) {
+  if (is.null(x)) {
+    return(NULL)
+  }
+
+  out <- unlist(x, recursive = TRUE, use.names = FALSE)
+  if (is.null(mode)) {
+    return(out)
+  }
+
+  switch(
+    mode,
+    character = as.character(out),
+    numeric = as.numeric(out),
+    logical = as.logical(out),
+    out
+  )
+}
+
+sframe_restore_item <- function(item) {
+  item$required <- isTRUE(item$required)
+  item$reverse <- isTRUE(item$reverse)
+  class(item) <- "sf_item"
+  item
+}
+
+sframe_restore_choices <- function(choice) {
+  choice$values <- sframe_as_vector(choice$values)
+  choice$labels <- sframe_as_vector(choice$labels, "character")
+  choice$allow_other <- isTRUE(choice$allow_other)
+  choice$randomise <- isTRUE(choice$randomise)
+  class(choice) <- "sf_choices"
+  choice
+}
+
+sframe_restore_scale <- function(scale) {
+  scale$items <- sframe_as_vector(scale$items, "character")
+  scale$reverse_items <- sframe_as_vector(scale$reverse_items, "character")
+  scale$weights <- sframe_as_vector(scale$weights, "numeric")
+  if (!is.null(scale$min_valid)) {
+    scale$min_valid <- as.integer(scale$min_valid)
+  }
+  class(scale) <- "sf_scale"
+  scale
+}
+
+sframe_restore_branch <- function(branch) {
+  if (is.list(branch$value) && length(branch$value) > 0) {
+    branch$value <- sframe_as_vector(branch$value)
+  }
+  class(branch) <- "sf_branch"
+  branch
+}
+
+sframe_restore_check <- function(check) {
+  check$pass_values <- sframe_as_vector(check$pass_values)
+  class(check) <- "sf_check"
+  check
+}
+
 #' Read an instrument from a .sframe file
 #'
 #' Reads a `.sframe` JSON file and reconstructs an `sframe` instrument object.
@@ -141,12 +201,15 @@ read_sframe <- function(path, validate = TRUE) {
   # Reconstruct the sframe object
   instrument <- structure(
     list(
-      meta      = parsed$meta,
-      items     = parsed$items,
-      choices   = parsed$choices,
-      scales    = parsed$scales,
-      branching = parsed$branching,
-      checks    = parsed$checks,
+      meta      = within(parsed$meta, {
+        authors <- sframe_as_vector(authors, "character")
+        languages <- sframe_as_vector(languages, "character")
+      }),
+      items     = lapply(parsed$items, sframe_restore_item),
+      choices   = lapply(parsed$choices, sframe_restore_choices),
+      scales    = lapply(parsed$scales, sframe_restore_scale),
+      branching = lapply(parsed$branching, sframe_restore_branch),
+      checks    = lapply(parsed$checks, sframe_restore_check),
       render    = parsed$render %||% list()
     ),
     class = "sframe"

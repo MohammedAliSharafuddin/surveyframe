@@ -75,10 +75,40 @@ sframe_numeric_scale_data <- function(data, item_ids, reverse_context = NULL) {
   scale_num
 }
 
+sframe_scale_weights <- function(scale, scale_item_ids) {
+  if (is.null(scale$weights)) {
+    return(rep(1, length(scale_item_ids)))
+  }
+
+  scale$weights[match(scale_item_ids, scale$items)]
+}
+
+sframe_composite_score <- function(scale_num, scale, scale_item_ids) {
+  weights <- sframe_scale_weights(scale, scale_item_ids)
+
+  if (!is.null(scale$weights) && any(is.na(weights))) {
+    sframe_warn_scoring(
+      paste0("Scale '", scale$id, "' has weights that do not align with its items."),
+      scale_id = scale$id
+    )
+    weights[is.na(weights)] <- 1
+  }
+
+  if (scale$method == "sum") {
+    return(rowSums(sweep(scale_num, 2, weights, `*`), na.rm = TRUE))
+  }
+
+  weighted_values <- sweep(scale_num, 2, weights, `*`)
+  denom <- rowSums(sweep(!is.na(scale_num), 2, weights, `*`), na.rm = TRUE)
+  scores <- rowSums(weighted_values, na.rm = TRUE) / denom
+  scores[denom == 0] <- NA_real_
+  scores
+}
+
 #' Score defined scales from survey responses
 #'
 #' Applies scale scoring rules from the instrument to response data. Handles
-#' reverse coding, composite score computation (mean or sum), and minimum
+#' reverse coding, optional weighted composite score computation, and minimum
 #' valid item thresholds. Returns a data frame with one scored column per
 #' scale.
 #'
@@ -123,11 +153,7 @@ score_scales <- function(data, instrument, keep_items = TRUE, keep_meta = TRUE) 
     valid_counts <- rowSums(!is.na(scale_num))
     min_valid    <- scale$min_valid %||% length(scale_item_ids)
 
-    composite <- switch(
-      scale$method,
-      mean = rowMeans(scale_num, na.rm = TRUE),
-      sum  = rowSums(scale_num, na.rm = TRUE)
-    )
+    composite <- sframe_composite_score(scale_num, scale, scale_item_ids)
     composite[valid_counts < min_valid] <- NA
 
     scored[[scale$id]] <- composite

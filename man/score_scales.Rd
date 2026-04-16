@@ -23,7 +23,7 @@ named using the scale \code{id}.
 }
 \description{
 Applies scale scoring rules from the instrument to response data. Handles
-reverse coding, composite score computation (mean or sum), and minimum
+reverse coding, optional weighted composite score computation, and minimum
 valid item thresholds. Returns a data frame with one scored column per
 scale.
 }

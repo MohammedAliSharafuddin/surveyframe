@@ -1,5 +1,10 @@
-^\\.github($|/)
-^surveyframe\\.Rcheck$
-^surveyframe_[0-9.]+\\.tar\\.gz$
-^surveyframe\\.zip$
-^.*\\.Rproj$
+^\.github($|/)
+^surveyframe\.Rcheck$
+^surveyframe_[0-9.]+\.tar\.gz$
+^surveyframe\.zip$
+^.*\.Rproj$
+^_pkgdown\.yml$
+^CONTRIBUTING\.md$
+^LICENSE\.md$
+^roadmap\.md$
+^todo\.md$
