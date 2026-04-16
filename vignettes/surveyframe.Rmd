@@ -176,10 +176,15 @@ cat("Problems:", length(result$problems), "\n")
 
 `render_survey()` turns the instrument into a running Shiny application. All
 item types, required-field logic, and single-condition branching rules are
-rendered automatically.
+rendered automatically. When `save_responses = "csv"`, submitted responses are
+written to a CSV file with `started_at` and `submitted_at` metadata columns.
 
 ```{r render, eval = FALSE}
-render_survey(instr)
+render_survey(
+  instr,
+  save_responses = "csv",
+  output_path = "responses.csv"
+)
 ```
 
 To launch the full SurveyStudio interface, which provides a visual shell for
@@ -189,12 +194,17 @@ the complete workflow, use `launch_studio()`:
 launch_studio(instrument = instr)
 ```
 
+All remaining workflow steps also work in regular R scripts. Shiny is only
+needed for interactive survey deployment and the SurveyStudio interface.
+
 ---
 
 ## 4. Load responses
 
 Once data are collected (as a CSV from the Shiny app or any external tool),
 load them with `read_responses()`. Column names must match instrument item IDs.
+Files written by `render_survey()` include `started_at` and `submitted_at`
+metadata columns, so load those through `meta_cols` and `submitted_at`.
 
 ```{r load-responses}
 # Simulate a response dataset for this vignette

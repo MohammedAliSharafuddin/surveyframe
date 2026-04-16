@@ -67,6 +67,37 @@ load_resp <- function(n = 50, seed = 42, reverse = FALSE) {
   )
 }
 
+make_timed_responses <- function(include_bad_row = FALSE) {
+  started_at <- c(
+    "2024-06-01 10:00:00",
+    "2024-06-01 10:00:00",
+    "2024-06-01 10:00:00",
+    "2024-06-01 10:00:50"
+  )
+
+  if (include_bad_row) {
+    started_at[4] <- "bad-start-time"
+  }
+
+  data.frame(
+    id = paste0("R", 1:4),
+    started_at = started_at,
+    submitted_at = c(
+      "2024-06-01 10:02:00",
+      "2024-06-01 10:00:20",
+      "2024-06-01 10:01:10",
+      "2024-06-01 10:02:00"
+    ),
+    sat_1 = c(4, 4, 5, 3),
+    sat_2 = c(4, 4, 4, 3),
+    sat_3 = c(4, 4, 4, 3),
+    age = c(30, 31, 32, 33),
+    gender = c("yes", "yes", "no", "yes"),
+    attn_q = c(4, 4, 4, 4),
+    stringsAsFactors = FALSE
+  )
+}
+
 # ---------------------------------------------------------------------------
 # 1. Constructors
 # ---------------------------------------------------------------------------
@@ -351,6 +382,32 @@ test_that("score_scales() keep_items = FALSE drops item columns", {
   expect_true("sat"    %in% colnames(out))
 })
 
+test_that("score_scales() applies weighted mean scoring", {
+  cs <- sf_choices("ag5", 1:5, c("SD", "D", "N", "A", "SA"))
+  i1 <- sf_item("q1", "Q1", type = "likert", choice_set = "ag5", scale_id = "sat")
+  i2 <- sf_item("q2", "Q2", type = "likert", choice_set = "ag5", scale_id = "sat")
+  scale <- sf_scale("sat", "Weighted", items = c("q1", "q2"),
+                    method = "mean", weights = c(1, 3))
+  instr <- sf_instrument("Weighted mean", components = list(cs, i1, i2, scale))
+  resp <- data.frame(q1 = 2, q2 = 4, stringsAsFactors = FALSE)
+
+  out <- score_scales(resp, instr, keep_meta = FALSE)
+  expect_equal(out$sat, 3.5, tolerance = 1e-10)
+})
+
+test_that("score_scales() applies weighted sum scoring", {
+  cs <- sf_choices("ag5", 1:5, c("SD", "D", "N", "A", "SA"))
+  i1 <- sf_item("q1", "Q1", type = "likert", choice_set = "ag5", scale_id = "sat")
+  i2 <- sf_item("q2", "Q2", type = "likert", choice_set = "ag5", scale_id = "sat")
+  scale <- sf_scale("sat", "Weighted", items = c("q1", "q2"),
+                    method = "sum", weights = c(2, 1))
+  instr <- sf_instrument("Weighted sum", components = list(cs, i1, i2, scale))
+  resp <- data.frame(q1 = 2, q2 = 4, stringsAsFactors = FALSE)
+
+  out <- score_scales(resp, instr, keep_meta = FALSE)
+  expect_equal(out$sat, 8, tolerance = 1e-10)
+})
+
 # ---------------------------------------------------------------------------
 # 7. quality_report()
 # ---------------------------------------------------------------------------
@@ -390,6 +447,100 @@ test_that("quality_report() detects duplicate respondent IDs", {
                    submitted_at = "submitted_at"))
   qr    <- quality_report(resp, instr, respondent_id = "id")
   expect_gt(qr$duplicates$n_duplicates, 0)
+})
+
+test_that("quality_report() computes timing diagnostics", {
+  instr <- make_instrument()
+  resp <- suppressWarnings(
+    read_responses(
+      make_timed_responses(),
+      instr,
+      respondent_id = "id",
+      submitted_at = "submitted_at",
+      meta_cols = "started_at",
+      strict = FALSE
+    )
+  )
+
+  qr <- quality_report(
+    resp,
+    instr,
+    respondent_id = "id",
+    submitted_at = "submitted_at",
+    started_at = "started_at",
+    time_min = 40
+  )
+
+  expect_true(qr$timing$available)
+  expect_equal(qr$timing$start_col, "started_at")
+  expect_equal(qr$timing$n_flagged, 1)
+  expect_equal(qr$timing$flagged_rows, 2)
+  expect_equal(qr$timing$median_sec, 70)
+})
+
+test_that("quality_report() auto-detects started_at column", {
+  instr <- make_instrument()
+  resp <- suppressWarnings(
+    read_responses(
+      make_timed_responses(),
+      instr,
+      respondent_id = "id",
+      submitted_at = "submitted_at",
+      meta_cols = "started_at",
+      strict = FALSE
+    )
+  )
+
+  qr <- quality_report(
+    resp,
+    instr,
+    respondent_id = "id",
+    submitted_at = "submitted_at",
+    time_min = 40
+  )
+
+  expect_true(qr$timing$available)
+  expect_equal(qr$timing$start_col, "started_at")
+})
+
+test_that("quality_report() reports unavailable timing without start column", {
+  d <- load_resp(10)
+  qr <- quality_report(
+    d$resp,
+    d$instr,
+    respondent_id = "id",
+    submitted_at = "submitted_at",
+    time_min = 40
+  )
+
+  expect_false(qr$timing$available)
+})
+
+test_that("quality_report() warns on malformed timing rows", {
+  instr <- make_instrument()
+  resp <- suppressWarnings(
+    read_responses(
+      make_timed_responses(include_bad_row = TRUE),
+      instr,
+      respondent_id = "id",
+      submitted_at = "submitted_at",
+      meta_cols = "started_at",
+      strict = FALSE
+    )
+  )
+
+  expect_warning(
+    qr <- quality_report(
+      resp,
+      instr,
+      respondent_id = "id",
+      submitted_at = "submitted_at",
+      started_at = "started_at",
+      time_min = 40
+    ),
+    class = "sframe_quality_warning"
+  )
+  expect_equal(qr$timing$parse_fail_rows, 4)
 })
 
 test_that("print.sframe_quality_report() produces output", {
@@ -566,4 +717,158 @@ test_that("builder helpers reclassify components from a loaded sframe file", {
   )
 
   expect_true(rebuilt$valid)
+})
+
+# ---------------------------------------------------------------------------
+# 13. render_survey() helpers
+# ---------------------------------------------------------------------------
+
+test_that("render_survey() returns a shiny app object", {
+  app <- render_survey(make_instrument())
+  expect_s3_class(app, "shiny.appobj")
+})
+
+test_that("render_survey() requires output_path for csv persistence", {
+  expect_error(
+    render_survey(make_instrument(), save_responses = "csv"),
+    class = "sframe_error"
+  )
+})
+
+test_that("render_survey() helpers identify visible required items", {
+  instr <- make_instrument()
+  branch_lookup <- surveyframe:::sframe_branch_lookup(instr)
+  input_values <- list(
+    gender = "yes",
+    sat_1 = 4,
+    sat_2 = NULL,
+    sat_3 = 5,
+    attn_q = NULL
+  )
+
+  missing <- surveyframe:::sframe_missing_required_items(
+    instr,
+    input_values,
+    branch_lookup
+  )
+
+  expect_equal(missing, "sat_2")
+  expect_true(surveyframe:::sframe_item_visible(instr$items[[6]], input_values, branch_lookup))
+})
+
+test_that("render_survey() response rows blank hidden items and append to csv", {
+  instr <- make_instrument()
+  branch_lookup <- surveyframe:::sframe_branch_lookup(instr)
+  input_values <- list(
+    sat_1 = 4,
+    sat_2 = 5,
+    sat_3 = 3,
+    age = 28,
+    gender = "no",
+    attn_q = 4
+  )
+
+  row <- surveyframe:::sframe_response_row(
+    instr,
+    input_values,
+    branch_lookup,
+    started_at = as.POSIXct("2024-06-01 10:00:00", tz = "UTC"),
+    submitted_at = as.POSIXct("2024-06-01 10:02:00", tz = "UTC")
+  )
+
+  expect_true(all(c("started_at", "submitted_at", "sat_1", "attn_q") %in% names(row)))
+  expect_true(is.na(row$attn_q))
+
+  path <- tempfile(fileext = ".csv")
+  surveyframe:::sframe_append_response_csv(path, row)
+  surveyframe:::sframe_append_response_csv(path, row)
+
+  saved <- read.csv(path, stringsAsFactors = FALSE)
+  expect_equal(nrow(saved), 2)
+  expect_true(all(c("started_at", "submitted_at", "sat_1") %in% names(saved)))
+})
+
+test_that("render_survey() persists submissions through the Shiny server", {
+  path <- tempfile(fileext = ".csv")
+  app <- render_survey(make_instrument(), save_responses = "csv", output_path = path)
+
+  shiny::testServer(app$serverFuncSource(), {
+    session$setInputs(
+      sat_1 = "4",
+      sat_2 = "5",
+      sat_3 = "3",
+      age = 29,
+      gender = "yes",
+      attn_q = "4",
+      submit_btn = 1
+    )
+  })
+
+  saved <- read.csv(path, stringsAsFactors = FALSE)
+  expect_equal(nrow(saved), 1)
+  expect_true(all(c("started_at", "submitted_at", "sat_1", "attn_q") %in% names(saved)))
+})
+
+test_that("render_survey() blocks invalid submissions through the Shiny server", {
+  path <- tempfile(fileext = ".csv")
+  app <- render_survey(make_instrument(), save_responses = "csv", output_path = path)
+
+  shiny::testServer(app$serverFuncSource(), {
+    session$setInputs(
+      sat_1 = "4",
+      sat_3 = "3",
+      gender = "yes",
+      submit_btn = 1
+    )
+  })
+
+  expect_false(file.exists(path))
+})
+
+# ---------------------------------------------------------------------------
+# 14. Integration workflow
+# ---------------------------------------------------------------------------
+
+test_that("full workflow runs from instrument to scored outputs", {
+  instr <- validate_sframe(make_instrument(reverse = TRUE))
+  path <- tempfile(fileext = ".sframe")
+  write_sframe(instr, path, overwrite = TRUE)
+
+  loaded <- read_sframe(path)
+  raw <- make_responses(20)
+  raw$started_at <- format(
+    as.POSIXct(raw$submitted_at, tz = "UTC") - 120,
+    "%Y-%m-%d %H:%M:%S",
+    tz = "UTC"
+  )
+
+  resp <- suppressWarnings(
+    read_responses(
+      raw,
+      loaded,
+      respondent_id = "id",
+      submitted_at = "submitted_at",
+      meta_cols = "started_at",
+      strict = FALSE
+    )
+  )
+
+  qr <- quality_report(
+    resp,
+    loaded,
+    respondent_id = "id",
+    submitted_at = "submitted_at",
+    started_at = "started_at",
+    time_min = 60
+  )
+  scored <- score_scales(resp, loaded)
+  rr <- reliability_report(resp, loaded, omega = FALSE)
+  cb <- codebook_report(loaded)
+  syntax <- cfa_syntax(loaded)
+
+  expect_true(qr$timing$available)
+  expect_true("sat" %in% names(scored))
+  expect_s3_class(rr, "sframe_reliability_report")
+  expect_s3_class(cb, "sframe_codebook")
+  expect_match(syntax, "sat =~")
 })

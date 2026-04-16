@@ -23,8 +23,8 @@
 #'   reverse-coded. These can also be flagged at the item level with the
 #'   `reverse` argument in [sf_item()]. Both sources are respected.
 #' @param weights Numeric vector or NULL. Item weights for weighted scoring.
-#'   Must have the same length as `items` if supplied. Only used when
-#'   `method = "sum"`.
+#'   Must have the same length as `items` if supplied. [score_scales()]
+#'   applies the weights to either `method = "mean"` or `method = "sum"`.
 #'
 #' @return An object of class `sf_scale` (a named list).
 #' @export

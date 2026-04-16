@@ -58,12 +58,26 @@ instr <- validate_sframe(instr)
 write_sframe(instr, "my_survey.sframe")
 
 # 3. Deploy
-render_survey(instr)                  # Shiny survey
+render_survey(
+  instr,
+  save_responses = "csv",
+  output_path = "responses.csv"
+)                                    # Shiny survey with CSV output
 launch_studio(instrument = instr)     # SurveyStudio interface
 
 # 4. Load and check responses
-responses <- read_responses("responses.csv", instr, respondent_id = "id")
-qr        <- quality_report(responses, instr, respondent_id = "id")
+responses <- read_responses(
+  "responses.csv",
+  instr,
+  submitted_at = "submitted_at",
+  meta_cols = "started_at"
+)
+qr <- quality_report(
+  responses,
+  instr,
+  submitted_at = "submitted_at",
+  started_at = "started_at"
+)
 
 # 5. Score and measure
 scored <- score_scales(responses, instr)
@@ -87,6 +101,10 @@ render_report(instr, data = responses, output_file = "report.html")
 | Psychometrics | `reliability_report()`, `item_report()`, `efa_report()`, `cfa_syntax()` |
 | Report | `codebook_report()`, `render_report()` |
 
+All validation, scoring, quality, psychometric, and reporting functions work
+in regular R scripts. Shiny is only required for survey deployment and the
+SurveyStudio interface.
+
 ## The .sframe file
 
 Every instrument is saved as a UTF-8 JSON file with a SHA-256 integrity hash.
@@ -97,8 +115,10 @@ materials as a reproducibility record.
 
 ## SurveyStudio
 
-`launch_studio()` opens the SurveyStudio interface, a six-screen Shiny
-application that wraps the full pipeline visually:
+`render_survey()` can write submitted responses to CSV, including `started_at`
+and `submitted_at` metadata columns. `launch_studio()` opens the SurveyStudio
+interface, a six-screen Shiny application that wraps the full pipeline
+visually:
 
 1. Open instrument
 2. Preview survey

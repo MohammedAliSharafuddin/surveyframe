@@ -9,6 +9,7 @@ quality_report(
   instrument,
   respondent_id = NULL,
   submitted_at = NULL,
+  started_at = NULL,
   time_min = NULL,
   straightline_scales = TRUE,
   missing_threshold = 0.2
@@ -26,10 +27,13 @@ respondent identifiers. Used for duplicate detection.}
 \item{submitted_at}{Character or NULL. The column name holding submission
 timestamps. Used for completion time analysis.}
 
+\item{started_at}{Character or NULL. The column name holding survey start
+timestamps. When \code{NULL}, \code{quality_report()} looks for a recognised
+start-time column automatically.}
+
 \item{time_min}{Numeric or NULL. Minimum acceptable completion time in
 seconds. Respondents with a submission time below this threshold are
-flagged as speeders. Only used when \code{submitted_at} is supplied and the
-data contain a start-time column.}
+flagged as speeders when timing data are available.}
 
 \item{straightline_scales}{Logical. Whether to check for straight-lining
 within each defined scale block. Defaults to \code{TRUE}.}
@@ -48,6 +52,11 @@ produces a structured quality report. The report covers attention check
 performance, completion time, straight-lining within scale blocks,
 item-level missingness, respondent-level missingness, and duplicate
 respondent IDs where supplied.
+}
+\details{
+Timing analysis is available when the data contain a submission timestamp
+column and either an explicit \code{started_at} column or one of the recognised
+defaults: \code{started_at}, \code{start_time}, \code{started}, or \code{.started_at}.
 }
 \examples{
 \dontrun{
