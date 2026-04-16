@@ -1,0 +1,42 @@
+Package: surveyframe
+Title: A Survey Instrument Workflow for Design, Deployment, Scoring, and Reporting
+Version: 0.1.0
+Authors@R: c(
+    person(
+      given = "Mohammed Ali",
+      family = "Sharafuddin",
+      email = "mas@flairmi.com",
+      role = c("aut", "cre")
+    )
+  )
+Description: Defines a survey instrument as a first-class R object and provides
+    a full workflow from instrument design through data collection, quality
+    checking, scoring, psychometric diagnostics, and reproducible reporting.
+    The SurveyStudio interface, launched with launch_studio(), provides a
+    visual shell for the complete pipeline. Instruments are saved as
+    human-readable JSON files with a SHA-256 integrity hash.
+License: MIT + file LICENSE
+URL: https://github.com/MohammedAliSharafuddin/surveyframe
+BugReports: https://github.com/MohammedAliSharafuddin/surveyframe/issues
+Encoding: UTF-8
+Language: en-US
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.3
+Depends:
+    R (>= 4.1.0)
+Imports:
+    jsonlite (>= 1.8.0),
+    rlang (>= 1.1.0),
+    tibble (>= 3.2.0),
+    dplyr (>= 1.1.0),
+    readr (>= 2.1.0),
+    shiny (>= 1.7.0),
+    psych (>= 2.3.0),
+    openssl (>= 2.1.0)
+Suggests:
+    quarto (>= 1.2),
+    testthat (>= 3.0.0),
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr
+Config/testthat/edition: 3

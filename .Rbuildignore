@@ -1,0 +1,5 @@
+^\\.github($|/)
+^surveyframe\\.Rcheck$
+^surveyframe_[0-9.]+\\.tar\\.gz$
+^surveyframe\\.zip$
+^.*\\.Rproj$

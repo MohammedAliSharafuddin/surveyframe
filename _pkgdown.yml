@@ -1,0 +1,113 @@
+url: https://mohammedalisharafuddin.github.io/surveyframe
+
+template:
+  bootstrap: 5
+  bootswatch: flatly
+  bslib:
+    primary: "#1a1a2e"
+    secondary: "#5b8dee"
+    base_font: {google: "Inter"}
+    heading_font: {google: "Inter"}
+    code_font: {google: "JetBrains Mono"}
+
+home:
+  title: "surveyframe"
+  description: >
+    A complete survey instrument workflow for R.
+    Define instruments, deploy surveys, check data quality,
+    score scales, run psychometric diagnostics, and generate
+    reproducible reports — all from one source object.
+  links:
+    - text: SurveyStudio interface
+      href: articles/surveyframe.html
+    - text: GitHub repository
+      href: https://github.com/MohammedAliSharafuddin/surveyframe
+    - text: Report a bug
+      href: https://github.com/MohammedAliSharafuddin/surveyframe/issues
+
+navbar:
+  title: "surveyframe"
+  left:
+    - text: "Get started"
+      href: articles/surveyframe.html
+    - text: "Reference"
+      href: reference/index.html
+    - text: "Changelog"
+      href: news/index.html
+  right:
+    - icon: fa-github
+      href: https://github.com/MohammedAliSharafuddin/surveyframe
+      aria-label: GitHub
+
+reference:
+  - title: "Build an instrument"
+    desc: >
+      Constructor functions for building the sframe instrument object.
+      Start here.
+    contents:
+      - sf_instrument
+      - sf_item
+      - sf_choices
+      - sf_scale
+      - sf_branch
+      - sf_check
+
+  - title: "Save and load"
+    desc: >
+      Read and write instruments as portable .sframe JSON files with
+      SHA-256 integrity hashing.
+    contents:
+      - write_sframe
+      - read_sframe
+      - validate_sframe
+
+  - title: "Deploy"
+    desc: >
+      Render the instrument as a Shiny survey or launch SurveyStudio.
+    contents:
+      - render_survey
+      - launch_studio
+
+  - title: "Collect responses"
+    desc: >
+      Load and validate response data against the instrument specification.
+    contents:
+      - read_responses
+
+  - title: "Quality checks"
+    desc: >
+      Evaluate response data for attention check failures, straight-lining,
+      missingness, and duplicate submissions.
+    contents:
+      - quality_report
+
+  - title: "Score and analyse"
+    desc: >
+      Score composite scales, compute reliability statistics, and prepare
+      psychometric diagnostics.
+    contents:
+      - score_scales
+      - reliability_report
+      - item_report
+      - efa_report
+      - cfa_syntax
+
+  - title: "Report"
+    desc: >
+      Generate codebooks, scale appendices, and reproducible HTML reports.
+    contents:
+      - codebook_report
+      - render_report
+
+  - title: "Package"
+    contents:
+      - surveyframe-package
+
+footer:
+  structure:
+    left: [developed_by, built_with]
+    right: [package]
+  components:
+    package: >
+      surveyframe is an open-source R package for survey research.
+      MIT License.
