@@ -7,45 +7,64 @@
 sf_item(
   id,
   label,
-  type = c("single_choice", "multiple_choice", "likert", "numeric", "text", "textarea",
-    "date"),
+  type = c("likert", "single_choice", "multiple_choice", "numeric", "text", "textarea",
+    "date", "matrix", "slider", "ranking", "rating", "section_break", "text_block"),
   required = FALSE,
   choice_set = NULL,
   scale_id = NULL,
   reverse = FALSE,
   help = NULL,
-  placeholder = NULL
+  placeholder = NULL,
+  matrix_items = NULL,
+  slider_min = NULL,
+  slider_max = NULL,
+  slider_step = NULL,
+  rating_max = NULL,
+  rating_icon = NULL,
+  section_intro = NULL,
+  page = NULL
 )
 }
 \arguments{
-\item{id}{Character. A unique identifier for this item. Must contain only
-letters, numbers, and underscores. Used as the column name in response
-data.}
+\item{id}{Character. A unique identifier for this item. Used as the column
+name in response data. Must contain only letters, numbers, and underscores.}
 
-\item{label}{Character. The question text displayed to the respondent.}
+\item{label}{Character. The question text or content displayed to the
+respondent.}
 
-\item{type}{Character. The response type. One of \code{"single_choice"},
-\code{"multiple_choice"}, \code{"likert"}, \code{"numeric"}, \code{"text"}, \code{"textarea"},
-or \code{"date"}.}
+\item{type}{Character. The response type. One of \code{"likert"},
+\code{"single_choice"}, \code{"multiple_choice"}, \code{"numeric"}, \code{"text"},
+\code{"textarea"}, \code{"date"}, \code{"matrix"}, \code{"slider"}, \code{"ranking"}, \code{"rating"},
+\code{"section_break"}, or \code{"text_block"}.}
 
-\item{required}{Logical. Whether the respondent must answer this item before
-proceeding. Defaults to \code{FALSE}.}
+\item{required}{Logical. Whether the respondent must answer this item.}
 
 \item{choice_set}{Character or NULL. The \code{id} of a choice set defined with
-\code{\link[=sf_choices]{sf_choices()}}. Required for \code{"single_choice"}, \code{"multiple_choice"}, and
-\code{"likert"} types.}
+\code{\link[=sf_choices]{sf_choices()}}.}
 
-\item{scale_id}{Character or NULL. The \code{id} of the scale this item belongs
-to, as defined with \code{\link[=sf_scale]{sf_scale()}}. Items may belong to at most one scale.}
+\item{scale_id}{Character or NULL. The \code{id} of the scale this item belongs to.}
 
-\item{reverse}{Logical. Whether this item is reverse-coded within its scale.
-Ignored if \code{scale_id} is \code{NULL}. Defaults to \code{FALSE}.}
+\item{reverse}{Logical. Whether this item is reverse-coded within its scale.}
 
-\item{help}{Character or NULL. Optional help text displayed beneath the
-question label.}
+\item{help}{Character or NULL. Help text displayed beneath the question.}
 
-\item{placeholder}{Character or NULL. Placeholder text for \code{"text"} and
-\code{"textarea"} types.}
+\item{placeholder}{Character or NULL. Placeholder text for text inputs.}
+
+\item{matrix_items}{Character vector or NULL. Row labels for \code{"matrix"} type.}
+
+\item{slider_min}{Numeric or NULL. Minimum value for \code{"slider"} type.}
+
+\item{slider_max}{Numeric or NULL. Maximum value for \code{"slider"} type.}
+
+\item{slider_step}{Numeric or NULL. Step size for \code{"slider"} type.}
+
+\item{rating_max}{Integer or NULL. Maximum rating for \code{"rating"} type.}
+
+\item{rating_icon}{Character or NULL. Icon type: \code{"star"} or \code{"heart"}.}
+
+\item{section_intro}{Character or NULL. Intro text for \code{"section_break"} type.}
+
+\item{page}{Integer or NULL. Page number for multi-page surveys.}
 }
 \value{
 An object of class \code{sf_item} (a named list).
@@ -56,18 +75,14 @@ Items are the atomic units of a survey instrument. Every item must have a
 unique \code{id} within the instrument it is added to.
 }
 \examples{
-# A required Likert item linked to a scale
 item <- sf_item(
-  id         = "sat_overall",
-  label      = "Overall, how satisfied are you with the service?",
-  type       = "likert",
-  required   = TRUE,
-  choice_set = "agree5",
-  scale_id   = "satisfaction"
+  id = "sat_overall", label = "Overall, how satisfied are you?",
+  type = "likert", required = TRUE, choice_set = "agree5",
+  scale_id = "satisfaction"
 )
 
-# A numeric item
-age <- sf_item("age", "What is your age?", type = "numeric", required = TRUE)
+sec <- sf_item("sec_1", "Demographic Information", type = "section_break",
+               section_intro = "Please answer the following questions.")
 }
 \seealso{
 \code{\link[=sf_instrument]{sf_instrument()}}, \code{\link[=sf_choices]{sf_choices()}}, \code{\link[=sf_scale]{sf_scale()}}

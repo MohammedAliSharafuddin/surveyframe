@@ -115,14 +115,18 @@ print.sframe_codebook <- function(x, ...) {
 #'   codebook-only report.
 #' @param output_file Character or NULL. The output file path. When NULL, a
 #'   temporary file is written and its path returned.
+#' @param output_path Character or NULL. Alias for `output_file`. If both are
+#'   supplied, `output_file` takes precedence.
 #' @param format Character. Output format. Only `"html"` is supported in
-#'   v0.1.
+#'   v0.2.
 #' @param include_quality Logical. Whether to include the data quality report.
 #'   Requires `data`. Defaults to `TRUE`.
 #' @param include_reliability Logical. Whether to include reliability
 #'   diagnostics. Requires `data`. Defaults to `TRUE`.
 #' @param include_codebook Logical. Whether to include the instrument codebook.
 #'   Defaults to `TRUE`.
+#' @param include_analysis Logical. Whether to include analysis-plan results
+#'   when `data` are supplied and the instrument has an `analysis_plan`.
 #'
 #' @return The output file path, invisibly.
 #' @export
@@ -136,19 +140,19 @@ render_report <- function(
     instrument,
     data              = NULL,
     output_file       = NULL,
+    output_path       = NULL,
     format            = c("html"),
     include_quality   = TRUE,
     include_reliability = TRUE,
-    include_codebook  = TRUE
+    include_codebook  = TRUE,
+    include_analysis  = TRUE
 ) {
   rlang::check_installed("quarto", reason = "to render survey reports")
   stopifnot(inherits(instrument, "sframe"))
 
   format <- rlang::arg_match(format)
 
-  if (is.null(output_file)) {
-    output_file <- tempfile(fileext = ".html")
-  }
+  output_file <- output_file %||% output_path %||% tempfile(fileext = ".html")
 
   output_file <- path.expand(output_file)
   output_dir <- dirname(output_file)
@@ -184,6 +188,7 @@ render_report <- function(
     include_quality     = include_quality && !is.null(data),
     include_reliability = include_reliability && !is.null(data),
     include_codebook    = include_codebook,
+    include_analysis    = include_analysis,
     instrument_hash     = sframe_hash_value(instrument)
   )
 

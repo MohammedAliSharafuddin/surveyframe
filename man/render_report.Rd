@@ -8,10 +8,12 @@ render_report(
   instrument,
   data = NULL,
   output_file = NULL,
+  output_path = NULL,
   format = c("html"),
   include_quality = TRUE,
   include_reliability = TRUE,
-  include_codebook = TRUE
+  include_codebook = TRUE,
+  include_analysis = TRUE
 )
 }
 \arguments{
@@ -23,8 +25,11 @@ codebook-only report.}
 \item{output_file}{Character or NULL. The output file path. When NULL, a
 temporary file is written and its path returned.}
 
+\item{output_path}{Character or NULL. Alias for \code{output_file}. If both are
+supplied, \code{output_file} takes precedence.}
+
 \item{format}{Character. Output format. Only \code{"html"} is supported in
-v0.1.}
+v0.2.}
 
 \item{include_quality}{Logical. Whether to include the data quality report.
 Requires \code{data}. Defaults to \code{TRUE}.}
@@ -34,6 +39,9 @@ diagnostics. Requires \code{data}. Defaults to \code{TRUE}.}
 
 \item{include_codebook}{Logical. Whether to include the instrument codebook.
 Defaults to \code{TRUE}.}
+
+\item{include_analysis}{Logical. Whether to include analysis-plan results
+when \code{data} are supplied and the instrument has an \code{analysis_plan}.}
 }
 \value{
 The output file path, invisibly.

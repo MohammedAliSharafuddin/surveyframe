@@ -11,7 +11,8 @@ sf_instrument(
   authors = NULL,
   languages = "en",
   components = list(),
-  render = NULL
+  render = NULL,
+  analysis_plan = list()
 )
 }
 \arguments{
@@ -35,10 +36,13 @@ automatically. Raw lists are not accepted.}
 
 \item{render}{List or NULL. Optional rendering hints passed to
 \code{\link[=render_survey]{render_survey()}}, such as theme colour or progress bar visibility.}
+
+\item{analysis_plan}{List. Optional pre-planned analysis blocks created in
+the HTML SurveyBuilder Analyse mode.}
 }
 \value{
 An object of class \code{sframe} with slots \code{meta}, \code{items}, \code{choices},
-\code{scales}, \code{branching}, \code{checks}, and \code{render}.
+\code{scales}, \code{branching}, \code{checks}, \code{analysis_plan}, and \code{render}.
 }
 \description{
 Assembles a complete survey instrument from its component objects. This is

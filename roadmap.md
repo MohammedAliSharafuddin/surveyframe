@@ -2,180 +2,159 @@
 
 ## Scope
 
-`surveyframe` is a workflow package for academic survey research in R. Its
-core contribution is the `sframe` instrument object: one structured source of
-truth that carries item definitions, reusable choice sets, scale structure,
-reverse-coding rules, branching logic, design-time checks, and rendering
-metadata through the full research pipeline.
+`surveyframe` is a workflow package for academic survey research in R. Its core
+object is the `sframe` instrument, which carries item definitions, reusable
+choice sets, scale structure, reverse-coding rules, branching logic,
+design-time checks, analysis-plan metadata, and rendering settings through the
+research workflow.
 
-The package serves as a connecting layer within the research workflow.
-Specialist analysis libraries and commercial survey platforms remain separate
-tools. In its intended shape, `surveyframe` defines the instrument, validates
-it, serialises it, deploys it, reads response data back in, checks data
-quality, scores scales, prepares psychometric diagnostics, and generates
-reproducible outputs. Packages such as `psych`, `lavaan`, and future
-method-specific extensions consume instrument-aware data downstream from the
-core package.
+The package defines the instrument, validates it, serializes it, renders it,
+reads response data back in, checks quality, scores scales, prepares
+psychometric diagnostics, runs pre-planned analyses, and generates
+reproducible outputs. Specialist analysis packages and external collection
+platforms remain downstream tools.
 
-### In-scope for v0.1
+### Included in the current v0.2 line
 
-- Typed constructors for items, choice sets, scales, branching rules, and
-  design-time checks
-- An `sframe` S3 object with print, format, and summary methods
-- Instrument validation and custom condition classes
-- `.sframe` JSON serialisation with SHA-256 integrity hashing
-- Shiny-based survey rendering
-- SurveyStudio, a Shiny interface for visual workflow orchestration
-- Response loading with column-contract validation
-- Quality reporting for attention checks, missingness, straight-lining, and
-  duplicate respondent IDs
-- Scale scoring, reverse coding, reliability diagnostics, item diagnostics,
-  EFA readiness diagnostics, and CFA syntax generation
-- Codebook generation and parameterised Quarto reporting
+- Typed constructors for items, choice sets, scales, branching rules, checks,
+  and the top-level `sframe` object
+- `.sframe` JSON serialization with SHA-256 integrity hashing
+- A browser-based HTML SurveyBuilder launched with `launch_builder()`
+- A Shiny survey generator launched through `render_survey()`
+- SurveyStudio as the Shiny workflow shell
+- Response loading from CSV/data frames and Google Sheets
+- Quality reporting, scale scoring, reliability diagnostics, item diagnostics,
+  EFA readiness checks, and CFA syntax generation
+- Analysis-plan execution with `run_analysis_plan()` and results rendering with
+  `render_results()`
+- Codebook generation and Quarto report rendering
 
-### Explicitly out of scope for v0.1
+### Outside the current v0.2 line
 
-- A conversational builder
-- Static HTML deployment
-- Quarto inline survey embedding
+- Static HTML survey deployment from the builder
+- Full parity between the SurveyBuilder preview and the Shiny survey renderer
+- Direct Google Sheets submission from `render_survey()`
+- SurveyStudio and SurveyBuilder as one unified authoring surface
 - External platform import/export such as Qualtrics or REDCap
-- Multilingual authoring workflows beyond basic language metadata
+- Multilingual authoring workflows beyond basic metadata
 - Multi-condition branching trees
 - IRT and decision-science method engines
-- An AI survey design assistant
+- AI-assisted survey authoring
 
 ## Current Status
 
-Current status below reflects the repository state reviewed on April 17, 2026.
+Status below reflects the repository state verified on April 21, 2026.
 
-### What is already present in the repo
+### Verified and working
 
-- Package metadata, documentation, and release scaffolding are in place:
-  `DESCRIPTION`, `README.md`, `NEWS.md`, `inst/CITATION`, `_pkgdown.yml`, the
-  vignette, and GitHub Actions workflows for R CMD check, pkgdown, and Codecov.
-- The public API is exported through `NAMESPACE`, including `sf_instrument`.
-- The constructor family is implemented: `sf_item()`, `sf_choices()`,
-  `sf_scale()`, `sf_branch()`, `sf_check()`, and `sf_instrument()`.
-- Instruments can be validated, written to `.sframe`, read back, and checked
-  against their integrity hash.
-- The package includes a Shiny renderer and a six-screen SurveyStudio app in
-  `inst/shiny/app.R`.
-- Response loading, quality reporting, scale scoring, reliability reporting,
-  item diagnostics, EFA readiness diagnostics, CFA syntax generation,
-  codebook generation, and Quarto report rendering are all implemented.
-- The local test suite passes when run with the package loaded:
-  `pkgload::load_all('.')` plus `testthat::test_dir('tests/testthat')`.
-- A full local `devtools::check()` pass completes with `0 errors`,
-  `0 warnings`, and `0 notes`.
-- GitHub Actions on `main` are green for `R CMD check`, `pkgdown`, and
-  `test-coverage` after the Quarto report fix shipped on April 16, 2026 UTC.
+- The main repository now contains the v0.2 package code. The nested
+  `surveyframe_v0.2/` folder was treated as source input and is ignored from
+  the package build.
+- `launch_builder()` is present in the root package and points to the bundled
+  HTML SurveyBuilder in `inst/builder/survey_builder.html`.
+- The bundled SurveyBuilder now computes a SHA-256 hash compatible with
+  `read_sframe()`. Builder-style `.sframe` payloads round-trip through the R
+  loader.
+- `sf_item()` supports the v0.2 item set: `matrix`, `slider`, `ranking`,
+  `rating`, `section_break`, and `text_block`.
+- `sf_instrument()` and `.sframe` serialization now preserve `analysis_plan`.
+- `render_survey()` has been upgraded to the richer v0.2 renderer with
+  welcome and thank-you flows, conversational mode, ranking, rating, matrix
+  inputs, CSV persistence, and required-field enforcement.
+- `render_report()` accepts `output_path`, includes analysis-plan sections,
+  and uses the stable Quarto rendering path already fixed on `main`.
+- The Quarto template now tolerates small datasets that cannot support
+  reliability estimation.
+- `run_analysis_plan()`, `render_results()`, `export_google_sheet()`, and
+  `read_sheet_responses()` are integrated into the root package.
 
-### What is stable enough to describe as delivered
+### Verification results
 
-- The package has a coherent end-to-end object model.
-- The core v0.1 workflow is visible across code, tests, README, vignette, and
-  pkgdown configuration.
-- The Quarto reporting path is covered by tests and verified in local and CI
-  package checks.
-- The scope is still disciplined. The repository stays focused on instrument
-  definition and workflow.
+- Local automated test suite: `235` passing, `0` failures, `0` warnings
+- Full local `devtools::check()`: `0 errors`, `0 warnings`, `0 notes`
+- Explicit roundtrip verified:
+  - builder-style `.sframe` payload
+  - `read_sframe()`
+  - `render_survey()`
+  - `render_report()`
 
-### Phase 1 closeout
+### Gaps that still define the remaining v0.2 work
 
-- Phase 1 development is complete in the repository.
-- The release surface is stable enough for a serious CRAN submission pass.
-- The next active work belongs to Phase 2: adoption, publication, and
-  documentation polish.
+- The SurveyBuilder preview is a browser-side approximation. It does not reuse
+  the Shiny renderer directly.
+- SurveyStudio and SurveyBuilder remain separate UIs with overlapping purpose.
+- The builder stores Google Sheets metadata, but `render_survey()` does not
+  post responses to a Google Apps Script endpoint.
+- The package still lacks browser-level automated tests for the HTML builder
+  and the rendered survey UX.
+- Static HTML survey deployment is still absent.
 
 ## Development Roadmap
 
-### Phase 1: Finish and stabilize v0.1
+### Phase 2A: Stabilize the integrated v0.2 baseline
 
 Priority: immediate.
 
-- Keep the package identity tight around the instrument object and the
-  end-to-end survey workflow.
-- Close the remaining implementation gaps between the documented API and the
-  current code, especially:
-  - response capture and persistence in the Shiny collection layer
-  - required-field enforcement and richer item rendering behavior
-  - timing checks in `quality_report()`
-  - weighted scoring support or explicit removal of the unused argument
-- Expand tests across shared workflow behavior and cross-function interactions.
-- Run full package checks regularly and keep GitHub Actions green across
-  supported platforms.
-- Treat CRAN readiness, documentation quality, and reproducibility as release
-  requirements.
+- Keep the root package green after the v0.2 merge.
+- Add regression tests for builder-generated `.sframe` files and new item
+  types.
+- Review any remaining edge cases in report rendering, especially with sparse
+  or malformed response data.
+- Keep the package metadata, docs, and exports aligned with the integrated
+  codebase.
 
-### Phase 2: Package adoption and publication
+### Phase 2B: Complete builder and generator parity
 
-Priority: before major scope expansion.
+Priority: next.
 
-- Make the vignette and pkgdown site clear enough that a researcher can start
-  a new study from the instrument object with a clear workflow.
-- Write the Journal of Statistical Software paper alongside release work, with
-  the instrument object and reproducibility model as the central contribution.
-- Frame the package as a methods contribution with a software implementation.
-- Build citation traction around four likely methods-section touchpoints:
-  survey deployment, data-quality checking, reliability analysis, and codebook
-  generation.
+- Decide whether the SurveyBuilder preview should become a thin wrapper around
+  the Shiny renderer or whether a separate browser renderer will be maintained
+  deliberately.
+- Make the builder preview and `render_survey()` agree on required behavior,
+  branching, paging, ranking, rating, matrix handling, and welcome/thank-you
+  flows.
+- Add browser-level UI tests for the SurveyBuilder and at least one end-to-end
+  survey completion path.
+- Review the UI density of the builder and simplify high-friction panels where
+  needed.
 
-### Phase 3: Extend the collection layer inside `surveyframe`
+### Phase 2C: Complete the collection integrations
 
-Priority: after v0.1 is stable and published.
+Priority: after parity work starts.
 
-These additions belong in the core package because they are collection formats
-that deepen the instrument model while keeping `surveyframe` within its
-workflow-focused scope.
+- Decide the Google Sheets collection contract clearly:
+  external collector helper only, or direct submission from the survey
+  generator.
+- If direct submission stays in scope, wire `render_survey()` or a static
+  deployment target to the Apps Script endpoint stored in render metadata.
+- Add validation and tests for the Google Sheets submission path.
+- Define the static HTML deployment path if it remains part of the v0.2 goal.
 
-- Pairwise comparison matrix items
-- Ranking items
-- Semantic differential items
-- Budget allocation items
-- Constant-sum or MaxDiff-style items
+### Phase 2D: Unify the user-facing workflow
 
-The goal in this phase is to make `surveyframe` a stronger survey-native
-collection layer while preserving the package's identity as a workflow system.
+Priority: before calling v0.2 complete.
 
-### Phase 4: Companion package for decision-science workflows
+- Decide the long-term relationship between SurveyStudio and SurveyBuilder.
+- Either integrate the HTML builder into SurveyStudio or narrow the purpose of
+  SurveyStudio so the package has one clear authoring story.
+- Update the package docs so a first-time user understands when to use:
+  `launch_builder()`, `launch_studio()`, and `render_survey()`.
 
-Priority: separate from the core package.
+### Phase 2E: Documentation and release finish
 
-Analytical methods that are tightly coupled to specialised elicitation formats
-should live in a companion package such as `sfMCDM`. The core `surveyframe`
-package should remain separate from that layer.
+Priority: before tagging a v0.2 release.
 
-Candidate workflows for the companion package:
-
-- AHP consistency checks, weights, and aggregation
-- DEMATEL pipelines
-- TOPSIS and VIKOR workflows
-- Best-Worst Method support
-- Fuzzy extensions where the methodological variant is explicit
-
-This separation protects the core package from scope creep, keeps the JSS paper
-focused, and creates room for a second citable output.
-
-### Phase 5: Later extensions
-
-Priority: only after the core and companion layers are stable.
-
-- Static HTML deployment
-- Quarto inline embedding
-- External platform import/export
-- Multilingual workflows
-- Multi-condition branching trees
-- AI-assisted survey authoring
-
-These are meaningful directions. They should follow package stability,
-documentation, release discipline, and a clear separation between collection
-workflows and specialised analytical engines.
+- Rewrite the README and vignette around the v0.2 workflow.
+- Update pkgdown navigation to surface the builder, analysis-plan functions,
+  and Google Sheets helpers clearly.
+- Add a v0.2 release checklist and release notes.
+- Re-run full local checks and GitHub Actions on the final release candidate.
 
 ## Guardrails
 
-- The `sframe` object remains the package's single source of truth.
-- The core package stays focused on survey workflow. General statistics and
-  decision-science features remain outside the core package.
-- New features must strengthen the instrument-centered workflow or stay out of
-  the core package.
-- Shipping a reliable, citable v0.1 matters more than chasing breadth.
+- The `sframe` object remains the single source of truth.
+- The package stays focused on survey workflow rather than becoming a general
+  statistics environment.
+- UI additions must strengthen the instrument-centered workflow.
+- Any feature that cannot be exercised and verified end to end should be
+  described narrowly and documented as incomplete until it is finished.
