@@ -4,21 +4,23 @@
 #' surveyframe defines a survey instrument as a first-class R object and
 #' provides a complete workflow from instrument design through data collection,
 #' quality checking, scoring, psychometric diagnostics, and reproducible
-#' reporting. The SurveyStudio interface, launched with [launch_studio()],
-#' provides a visual shell for the full pipeline.
+#' reporting. Version 0.2 adds the browser-based SurveyBuilder, launched with
+#' [launch_builder()], while SurveyStudio, launched with [launch_studio()],
+#' remains the Shiny workflow shell.
 #'
 #' ## Core workflow
 #'
-#' 1. **Define** an instrument with [sf_instrument()] and its component
-#'    constructors: [sf_item()], [sf_choices()], [sf_scale()], [sf_branch()],
-#'    [sf_check()].
+#' 1. **Design** an instrument with [launch_builder()] or [sf_instrument()] and
+#'    its component constructors: [sf_item()], [sf_choices()], [sf_scale()],
+#'    [sf_branch()], [sf_check()].
 #' 2. **Validate and save** with [validate_sframe()] and [write_sframe()].
 #' 3. **Deploy** a Shiny survey with [render_survey()].
-#' 4. **Load responses** with [read_responses()].
+#' 4. **Load responses** with [read_responses()] or [read_sheet_responses()].
 #' 5. **Check quality** with [quality_report()].
 #' 6. **Score and analyse** with [score_scales()], [reliability_report()],
-#'    [item_report()], [efa_report()], and [cfa_syntax()].
-#' 7. **Report** with [codebook_report()] and [render_report()].
+#'    [item_report()], [efa_report()], [cfa_syntax()], and [run_analysis_plan()].
+#' 7. **Report** with [codebook_report()], [render_report()], and
+#'    [render_results()].
 #'
 #' ## The instrument object
 #'
@@ -48,6 +50,7 @@
 #'   observeEvent showNotification showModal modalDialog actionButton
 #'   radioButtons checkboxGroupInput numericInput textInput textAreaInput
 #'   dateInput fileInput downloadButton downloadHandler tagList tags br
-#'   reactive req getShinyOption shinyOptions runApp
+#'   reactive req getShinyOption shinyOptions runApp HTML sliderInput
+#'   updateActionButton reactiveValuesToList isolate
 ## usethis namespace: end
 NULL

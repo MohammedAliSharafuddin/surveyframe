@@ -1,5 +1,33 @@
 # surveyframe (development version)
 
+# surveyframe 0.2.0
+
+## SurveyBuilder and analysis planning
+
+surveyframe 0.2.0 adds the first phase of the v0.2 workflow.
+
+### New features
+
+* `launch_builder()`: open the browser-based SurveyBuilder for instrument
+  authoring, preview, and analysis-plan setup.
+* New `sf_item()` types: `matrix`, `slider`, `ranking`, `rating`,
+  `section_break`, and `text_block`.
+* `run_analysis_plan()` and `render_results()`: execute and report
+  research-question-driven analyses stored on the instrument.
+* `export_google_sheet()` and `read_sheet_responses()`: generate a Google
+  Sheets Apps Script collector and read responses back into the package.
+* `render_report()` now accepts `output_path` and can include analysis-plan
+  results in the Quarto report.
+
+### Integration
+
+* `.sframe` serialization now preserves `analysis_plan`.
+* `render_survey()` now supports the richer v0.2 item set, welcome and
+  thank-you flows, conversational mode, ranking and rating widgets, and
+  CSV persistence.
+* The bundled SurveyBuilder now writes a SHA-256 hash compatible with
+  `read_sframe()`.
+
 # surveyframe 0.1.0
 
 ## First release

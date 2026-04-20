@@ -113,7 +113,7 @@ test_that("sf_item() constructs correctly", {
 })
 
 test_that("sf_item() rejects invalid type", {
-  expect_error(sf_item("q1", "Label", type = "slider"))
+  expect_error(sf_item("q1", "Label", type = "checkbox"))
 })
 
 test_that("sf_choices() constructs correctly", {

@@ -9,3 +9,5 @@ docs
 *.tar.gz
 *.zip
 *.Rcheck/
+.codex
+surveyframe_v0.2/

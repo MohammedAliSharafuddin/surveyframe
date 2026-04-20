@@ -17,47 +17,32 @@ render_survey(
 \arguments{
 \item{instrument}{An \code{sframe} object.}
 
-\item{mode}{Character. The deployment mode. Only \code{"shiny"} is supported in
-v0.1.}
+\item{mode}{Character. Deployment mode. Only \code{"shiny"} is supported in v0.2.}
 
-\item{title}{Character or NULL. An override for the survey title displayed
-in the browser. When NULL, the instrument title is used.}
+\item{title}{Character or NULL. Override for the survey title.}
 
-\item{theme}{Character or NULL. A hex colour code for the survey theme.
-When NULL, the function uses \code{instrument$render$theme} when present and
-otherwise falls back to the default theme.}
+\item{theme}{Character or NULL. Hex colour for the survey theme.}
 
-\item{save_responses}{Character. Persistence mode for submitted responses.
-Either \code{"none"} (default) or \code{"csv"}.}
+\item{save_responses}{Character. \code{"none"} (default) or \code{"csv"}.}
 
-\item{output_path}{Character or NULL. Path to a CSV file used when
-\code{save_responses = "csv"}. Rows are appended if the file already exists.}
+\item{output_path}{Character or NULL. CSV path when \code{save_responses = "csv"}.}
 
-\item{on_submit}{Function or NULL. Optional callback invoked with the
-submitted one-row tibble after validation and optional file persistence.}
+\item{on_submit}{Function or NULL. Callback receiving the submitted row.}
 }
 \value{
-A \code{shiny.appobj} object. When called interactively, printing the
-returned object launches the Shiny app.
+A \code{shiny.appobj}.
 }
 \description{
-Launches a self-contained Shiny survey application derived from the
-instrument specification. In v0.1, only \code{mode = "shiny"} is supported.
-Static HTML and Quarto embed modes are planned for a future release.
-}
-\details{
-\code{render_survey()} can persist submitted responses to CSV for later import
-with \code{\link[=read_responses]{read_responses()}}. Saved files include \code{started_at} and
-\code{submitted_at} metadata columns before the instrument item columns.
+Launches a Shiny survey with a welcome page, configurable header, all item
+types, branching logic, required-field enforcement, progress tracking,
+standard and conversational (one-question-at-a-time) display modes, and a
+customisable thank-you page. Responses can be persisted to CSV or passed to
+a callback.
 }
 \examples{
 \dontrun{
 render_survey(instr)
-render_survey(
-  instr,
-  save_responses = "csv",
-  output_path = "responses.csv"
-)
+render_survey(instr, save_responses = "csv", output_path = "responses.csv")
 }
 }
 \seealso{

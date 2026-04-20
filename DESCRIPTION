@@ -1,6 +1,6 @@
 Package: surveyframe
 Title: A Survey Instrument Workflow for Design, Deployment, Scoring, and Reporting
-Version: 0.1.0
+Version: 0.2.0
 Authors@R: c(
     person(
       given = "Mohammed Ali",
@@ -12,9 +12,11 @@ Authors@R: c(
 Description: Defines a survey instrument as a first-class R object and provides
     a full workflow from instrument design through data collection, quality
     checking, scoring, psychometric diagnostics, and reproducible reporting.
-    The SurveyStudio interface, launched with launch_studio(), provides a
-    visual shell for the complete pipeline. Instruments are saved as
-    human-readable JSON files with a SHA-256 integrity hash.
+    Version 0.2 adds the browser-based SurveyBuilder, launched with
+    launch_builder(), richer survey item types, analysis-plan helpers, and
+    Google Sheets collector utilities. SurveyStudio, launched with
+    launch_studio(), remains the Shiny workflow shell. Instruments are saved
+    as human-readable JSON files with a SHA-256 integrity hash.
 License: MIT + file LICENSE
 URL: https://github.com/MohammedAliSharafuddin/surveyframe,
     https://mohammedalisharafuddin.github.io/surveyframe
@@ -35,6 +37,7 @@ Imports:
     psych (>= 2.3.0),
     openssl (>= 2.1.0)
 Suggests:
+    googlesheets4 (>= 1.1.0),
     quarto (>= 1.2),
     testthat (>= 3.0.0),
     knitr,

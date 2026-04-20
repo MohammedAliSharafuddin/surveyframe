@@ -14,10 +14,12 @@ home:
   title: "surveyframe"
   description: >
     A complete survey instrument workflow for R.
-    Define instruments, deploy surveys, check data quality,
-    score scales, run psychometric diagnostics, and generate
-    reproducible reports — all from one source object.
+    Define instruments, design them visually, deploy surveys,
+    check data quality, score scales, run psychometric diagnostics,
+    and generate reproducible reports from one source object.
   links:
+    - text: SurveyBuilder
+      href: reference/launch_builder.html
     - text: SurveyStudio interface
       href: articles/surveyframe.html
     - text: GitHub repository
@@ -40,6 +42,12 @@ navbar:
       aria-label: GitHub
 
 reference:
+  - title: "Design"
+    desc: >
+      Start visually in the HTML SurveyBuilder or construct instruments in R.
+    contents:
+      - launch_builder
+
   - title: "Build an instrument"
     desc: >
       Constructor functions for building the sframe instrument object.
@@ -73,6 +81,8 @@ reference:
       Load and validate response data against the instrument specification.
     contents:
       - read_responses
+      - export_google_sheet
+      - read_sheet_responses
 
   - title: "Quality checks"
     desc: >
@@ -84,13 +94,14 @@ reference:
   - title: "Score and analyse"
     desc: >
       Score composite scales, compute reliability statistics, and prepare
-      psychometric diagnostics.
+      psychometric diagnostics and pre-planned analyses.
     contents:
       - score_scales
       - reliability_report
       - item_report
       - efa_report
       - cfa_syntax
+      - run_analysis_plan
 
   - title: "Report"
     desc: >
@@ -98,10 +109,14 @@ reference:
     contents:
       - codebook_report
       - render_report
+      - render_results
 
   - title: "Package"
     contents:
       - surveyframe-package
+      - print.sframe
+      - format.sframe
+      - summary.sframe
       - print.sframe
       - format.sframe
       - summary.sframe

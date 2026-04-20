@@ -21,9 +21,11 @@
 #'   automatically. Raw lists are not accepted.
 #' @param render List or NULL. Optional rendering hints passed to
 #'   [render_survey()], such as theme colour or progress bar visibility.
+#' @param analysis_plan List. Optional pre-planned analysis blocks created in
+#'   the HTML SurveyBuilder Analyse mode.
 #'
 #' @return An object of class `sframe` with slots `meta`, `items`, `choices`,
-#'   `scales`, `branching`, `checks`, and `render`.
+#'   `scales`, `branching`, `checks`, `analysis_plan`, and `render`.
 #' @export
 #' @seealso [sf_item()], [sf_choices()], [sf_scale()], [sf_branch()],
 #'   [sf_check()], [validate_sframe()], [write_sframe()]
@@ -54,7 +56,8 @@ sf_instrument <- function(
     authors     = NULL,
     languages   = "en",
     components  = list(),
-    render      = NULL
+    render      = NULL,
+    analysis_plan = list()
 ) {
   # Sort components by class into named slots
   items     <- Filter(function(x) inherits(x, "sf_item"),    components)
@@ -96,6 +99,7 @@ sf_instrument <- function(
       scales    = scales,
       branching = branching,
       checks    = checks,
+      analysis_plan = analysis_plan %||% list(),
       render    = render %||% list()
     ),
     class = "sframe"

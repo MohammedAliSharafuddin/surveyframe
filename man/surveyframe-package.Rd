@@ -9,20 +9,22 @@
 surveyframe defines a survey instrument as a first-class R object and
 provides a complete workflow from instrument design through data collection,
 quality checking, scoring, psychometric diagnostics, and reproducible
-reporting. The SurveyStudio interface, launched with \code{\link[=launch_studio]{launch_studio()}},
-provides a visual shell for the full pipeline.
+reporting. Version 0.2 adds the browser-based SurveyBuilder, launched with
+\code{\link[=launch_builder]{launch_builder()}}, while SurveyStudio, launched with \code{\link[=launch_studio]{launch_studio()}},
+remains the Shiny workflow shell.
 \subsection{Core workflow}{
 \enumerate{
-\item \strong{Define} an instrument with \code{\link[=sf_instrument]{sf_instrument()}} and its component
-constructors: \code{\link[=sf_item]{sf_item()}}, \code{\link[=sf_choices]{sf_choices()}}, \code{\link[=sf_scale]{sf_scale()}}, \code{\link[=sf_branch]{sf_branch()}},
-\code{\link[=sf_check]{sf_check()}}.
+\item \strong{Design} an instrument with \code{\link[=launch_builder]{launch_builder()}} or \code{\link[=sf_instrument]{sf_instrument()}} and
+its component constructors: \code{\link[=sf_item]{sf_item()}}, \code{\link[=sf_choices]{sf_choices()}}, \code{\link[=sf_scale]{sf_scale()}},
+\code{\link[=sf_branch]{sf_branch()}}, \code{\link[=sf_check]{sf_check()}}.
 \item \strong{Validate and save} with \code{\link[=validate_sframe]{validate_sframe()}} and \code{\link[=write_sframe]{write_sframe()}}.
 \item \strong{Deploy} a Shiny survey with \code{\link[=render_survey]{render_survey()}}.
-\item \strong{Load responses} with \code{\link[=read_responses]{read_responses()}}.
+\item \strong{Load responses} with \code{\link[=read_responses]{read_responses()}} or \code{\link[=read_sheet_responses]{read_sheet_responses()}}.
 \item \strong{Check quality} with \code{\link[=quality_report]{quality_report()}}.
 \item \strong{Score and analyse} with \code{\link[=score_scales]{score_scales()}}, \code{\link[=reliability_report]{reliability_report()}},
-\code{\link[=item_report]{item_report()}}, \code{\link[=efa_report]{efa_report()}}, and \code{\link[=cfa_syntax]{cfa_syntax()}}.
-\item \strong{Report} with \code{\link[=codebook_report]{codebook_report()}} and \code{\link[=render_report]{render_report()}}.
+\code{\link[=item_report]{item_report()}}, \code{\link[=efa_report]{efa_report()}}, \code{\link[=cfa_syntax]{cfa_syntax()}}, and \code{\link[=run_analysis_plan]{run_analysis_plan()}}.
+\item \strong{Report} with \code{\link[=codebook_report]{codebook_report()}}, \code{\link[=render_report]{render_report()}}, and
+\code{\link[=render_results]{render_results()}}.
 }
 }
 
@@ -43,6 +45,7 @@ Each file includes a SHA-256 integrity hash for reproducibility auditing.
 Useful links:
 \itemize{
   \item \url{https://github.com/MohammedAliSharafuddin/surveyframe}
+  \item \url{https://mohammedalisharafuddin.github.io/surveyframe}
   \item Report bugs at \url{https://github.com/MohammedAliSharafuddin/surveyframe/issues}
 }
 

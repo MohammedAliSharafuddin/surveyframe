@@ -9,3 +9,6 @@
 ^roadmap\.md$
 ^todo\.md$
 ^docs($|/)
+^\.codex$
+^\.codex($|/)
+^surveyframe_v0\.2($|/)

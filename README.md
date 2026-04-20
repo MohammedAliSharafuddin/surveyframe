@@ -10,8 +10,10 @@
 **surveyframe** defines a survey instrument as a first-class R object and
 provides a complete workflow from instrument design through data collection,
 quality checking, scoring, psychometric diagnostics, and reproducible
-reporting. The **SurveyStudio** interface, launched with `launch_studio()`,
-provides a visual shell for the full pipeline.
+reporting. The browser-based **SurveyBuilder**, launched with
+`launch_builder()`, provides visual instrument authoring, and
+**SurveyStudio**, launched with `launch_studio()`, provides the Shiny workflow
+shell.
 
 ## The problem it solves
 
@@ -37,6 +39,9 @@ remotes::install_github("MohammedAliSharafuddin/surveyframe")
 
 ```r
 library(surveyframe)
+
+# Optional visual entry point
+launch_builder()
 
 # 1. Define
 agree5 <- sf_choices("agree5", 1:5,
@@ -84,7 +89,11 @@ scored <- score_scales(responses, instr)
 rr     <- reliability_report(responses, instr)
 syntax <- cfa_syntax(instr)
 
-# 6. Report
+# 6. Run planned analyses if present
+results <- run_analysis_plan(responses, instr)
+render_results(results, instr, output_file = "results.html")
+
+# 7. Report
 render_report(instr, data = responses, output_file = "report.html")
 ```
 
@@ -92,13 +101,14 @@ render_report(instr, data = responses, output_file = "report.html")
 
 | Stage | Functions |
 |---|---|
-| Design | `sf_instrument()`, `sf_item()`, `sf_choices()`, `sf_scale()`, `sf_branch()`, `sf_check()` |
+| Design | `launch_builder()`, `sf_instrument()`, `sf_item()`, `sf_choices()`, `sf_scale()`, `sf_branch()`, `sf_check()` |
 | Validate and save | `validate_sframe()`, `write_sframe()`, `read_sframe()` |
 | Deploy | `render_survey()`, `launch_studio()` |
-| Collect | `read_responses()` |
+| Collect | `read_responses()`, `read_sheet_responses()` |
 | Quality | `quality_report()` |
 | Score | `score_scales()` |
 | Psychometrics | `reliability_report()`, `item_report()`, `efa_report()`, `cfa_syntax()` |
+| Analysis | `run_analysis_plan()`, `render_results()` |
 | Report | `codebook_report()`, `render_report()` |
 
 All validation, scoring, quality, psychometric, and reporting functions work
@@ -115,10 +125,11 @@ materials as a reproducibility record.
 
 ## SurveyStudio
 
-`render_survey()` can write submitted responses to CSV, including `started_at`
-and `submitted_at` metadata columns. `launch_studio()` opens the SurveyStudio
-interface, a six-screen Shiny application that wraps the full pipeline
-visually:
+`launch_builder()` opens the HTML SurveyBuilder for visual instrument design.
+`render_survey()` can write submitted responses to CSV, including
+`started_at` and `submitted_at` metadata columns. `launch_studio()` opens the
+SurveyStudio interface, a six-screen Shiny application that wraps the full
+pipeline visually:
 
 1. Open instrument
 2. Preview survey

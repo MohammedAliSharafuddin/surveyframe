@@ -15,6 +15,7 @@ sframe_serialization_payload <- function(instrument, hash_value = "") {
     scales = lapply(instrument$scales, sframe_strip_component_class),
     branching = lapply(instrument$branching, sframe_strip_component_class),
     checks = lapply(instrument$checks, sframe_strip_component_class),
+    analysis_plan = instrument$analysis_plan %||% list(),
     render = instrument$render
   )
 }
@@ -102,9 +103,56 @@ sframe_as_vector <- function(x, mode = NULL) {
   )
 }
 
+sframe_empty_to_null <- function(x) {
+  if (is.null(x)) {
+    return(NULL)
+  }
+
+  if (is.list(x) && length(x) == 0) {
+    return(NULL)
+  }
+
+  x
+}
+
 sframe_restore_item <- function(item) {
   item$required <- isTRUE(item$required)
   item$reverse <- isTRUE(item$reverse)
+  item$choice_set <- sframe_empty_to_null(item$choice_set)
+  item$scale_id <- sframe_empty_to_null(item$scale_id)
+  item$help <- sframe_empty_to_null(item$help)
+  item$placeholder <- sframe_empty_to_null(item$placeholder)
+  item$matrix_items <- sframe_as_vector(
+    sframe_empty_to_null(item$matrix_items),
+    "character"
+  )
+  item$slider_min <- if (!is.null(sframe_empty_to_null(item$slider_min))) {
+    as.numeric(item$slider_min)
+  } else {
+    NULL
+  }
+  item$slider_max <- if (!is.null(sframe_empty_to_null(item$slider_max))) {
+    as.numeric(item$slider_max)
+  } else {
+    NULL
+  }
+  item$slider_step <- if (!is.null(sframe_empty_to_null(item$slider_step))) {
+    as.numeric(item$slider_step)
+  } else {
+    NULL
+  }
+  item$rating_max <- if (!is.null(sframe_empty_to_null(item$rating_max))) {
+    as.integer(item$rating_max)
+  } else {
+    NULL
+  }
+  item$rating_icon <- sframe_empty_to_null(item$rating_icon)
+  item$section_intro <- sframe_empty_to_null(item$section_intro)
+  item$page <- if (!is.null(sframe_empty_to_null(item$page))) {
+    as.integer(item$page)
+  } else {
+    NULL
+  }
   class(item) <- "sf_item"
   item
 }
@@ -141,6 +189,28 @@ sframe_restore_check <- function(check) {
   check$pass_values <- sframe_as_vector(check$pass_values)
   class(check) <- "sf_check"
   check
+}
+
+sframe_restore_analysis_block <- function(block) {
+  block$id <- as.character(block$id %||% "")
+  block$research_question <- as.character(block$research_question %||% "")
+  block$variables <- sframe_as_vector(
+    sframe_empty_to_null(block$variables),
+    "character"
+  )
+  block$test <- as.character(block$test %||% "")
+  block$alpha <- if (!is.null(sframe_empty_to_null(block$alpha))) {
+    as.numeric(block$alpha)
+  } else {
+    0.05
+  }
+  block$interpretation <- as.character(block$interpretation %||% "")
+  block$citations <- sframe_as_vector(
+    sframe_empty_to_null(block$citations),
+    "character"
+  ) %||% character(0)
+  block$result <- sframe_empty_to_null(block$result)
+  block
 }
 
 #' Read an instrument from a .sframe file
@@ -220,6 +290,10 @@ read_sframe <- function(path, validate = TRUE) {
       scales    = lapply(parsed$scales, sframe_restore_scale),
       branching = lapply(parsed$branching, sframe_restore_branch),
       checks    = lapply(parsed$checks, sframe_restore_check),
+      analysis_plan = lapply(
+        parsed$analysis_plan %||% list(),
+        sframe_restore_analysis_block
+      ),
       render    = parsed$render %||% list()
     ),
     class = "sframe"
