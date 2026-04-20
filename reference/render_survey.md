@@ -1,8 +1,10 @@
 # Render a survey from an instrument object
 
-Launches a self-contained Shiny survey application derived from the
-instrument specification. In v0.1, only `mode = "shiny"` is supported.
-Static HTML and Quarto embed modes are planned for a future release.
+Launches a Shiny survey with a welcome page, configurable header, all
+item types, branching logic, required-field enforcement, progress
+tracking, standard and conversational (one-question-at-a-time) display
+modes, and a customisable thank-you page. Responses can be persisted to
+CSV or passed to a callback.
 
 ## Usage
 
@@ -26,47 +28,31 @@ render_survey(
 
 - mode:
 
-  Character. The deployment mode. Only `"shiny"` is supported in v0.1.
+  Character. Deployment mode. Only `"shiny"` is supported in v0.2.
 
 - title:
 
-  Character or NULL. An override for the survey title displayed in the
-  browser. When NULL, the instrument title is used.
+  Character or NULL. Override for the survey title.
 
 - theme:
 
-  Character or NULL. A hex colour code for the survey theme. When NULL,
-  the function uses `instrument$render$theme` when present and otherwise
-  falls back to the default theme.
+  Character or NULL. Hex colour for the survey theme.
 
 - save_responses:
 
-  Character. Persistence mode for submitted responses. Either `"none"`
-  (default) or `"csv"`.
+  Character. `"none"` (default) or `"csv"`.
 
 - output_path:
 
-  Character or NULL. Path to a CSV file used when
-  `save_responses = "csv"`. Rows are appended if the file already
-  exists.
+  Character or NULL. CSV path when `save_responses = "csv"`.
 
 - on_submit:
 
-  Function or NULL. Optional callback invoked with the submitted one-row
-  tibble after validation and optional file persistence.
+  Function or NULL. Callback receiving the submitted row.
 
 ## Value
 
-A `shiny.appobj` object. When called interactively, printing the
-returned object launches the Shiny app.
-
-## Details
-
-`render_survey()` can persist submitted responses to CSV for later
-import with
-[`read_responses()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_responses.md).
-Saved files include `started_at` and `submitted_at` metadata columns
-before the instrument item columns.
+A `shiny.appobj`.
 
 ## See also
 
@@ -78,10 +64,6 @@ before the instrument item columns.
 ``` r
 if (FALSE) { # \dontrun{
 render_survey(instr)
-render_survey(
-  instr,
-  save_responses = "csv",
-  output_path = "responses.csv"
-)
+render_survey(instr, save_responses = "csv", output_path = "responses.csv")
 } # }
 ```

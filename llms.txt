@@ -3,9 +3,13 @@
 **surveyframe** defines a survey instrument as a first-class R object
 and provides a complete workflow from instrument design through data
 collection, quality checking, scoring, psychometric diagnostics, and
-reproducible reporting. The **SurveyStudio** interface, launched with
+reproducible reporting. The browser-based **SurveyBuilder**, launched
+with
+[`launch_builder()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/launch_builder.md),
+provides visual instrument authoring, and **SurveyStudio**, launched
+with
 [`launch_studio()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/launch_studio.md),
-provides a visual shell for the full pipeline.
+provides the Shiny workflow shell.
 
 ## The problem it solves
 
@@ -31,6 +35,9 @@ remotes::install_github("MohammedAliSharafuddin/surveyframe")
 
 ``` r
 library(surveyframe)
+
+# Optional visual entry point
+launch_builder()
 
 # 1. Define
 agree5 <- sf_choices("agree5", 1:5,
@@ -78,22 +85,27 @@ scored <- score_scales(responses, instr)
 rr     <- reliability_report(responses, instr)
 syntax <- cfa_syntax(instr)
 
-# 6. Report
+# 6. Run planned analyses if present
+results <- run_analysis_plan(responses, instr)
+render_results(results, instr, output_file = "results.html")
+
+# 7. Report
 render_report(instr, data = responses, output_file = "report.html")
 ```
 
 ## The workflow
 
-| Stage             | Functions                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
-|-------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Design            | [`sf_instrument()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_instrument.md), [`sf_item()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_item.md), [`sf_choices()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_choices.md), [`sf_scale()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_scale.md), [`sf_branch()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_branch.md), [`sf_check()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_check.md) |
-| Validate and save | [`validate_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/validate_sframe.md), [`write_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/write_sframe.md), [`read_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_sframe.md)                                                                                                                                                                                                                                                                       |
-| Deploy            | [`render_survey()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_survey.md), [`launch_studio()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/launch_studio.md)                                                                                                                                                                                                                                                                                                                                                                           |
-| Collect           | [`read_responses()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_responses.md)                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
-| Quality           | [`quality_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/quality_report.md)                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
-| Score             | [`score_scales()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/score_scales.md)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
-| Psychometrics     | [`reliability_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/reliability_report.md), [`item_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/item_report.md), [`efa_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/efa_report.md), [`cfa_syntax()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/cfa_syntax.md)                                                                                                                                                                     |
-| Report            | [`codebook_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/codebook_report.md), [`render_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_report.md)                                                                                                                                                                                                                                                                                                                                                                       |
+| Stage             | Functions                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+|-------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Design            | [`launch_builder()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/launch_builder.md), [`sf_instrument()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_instrument.md), [`sf_item()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_item.md), [`sf_choices()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_choices.md), [`sf_scale()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_scale.md), [`sf_branch()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_branch.md), [`sf_check()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_check.md) |
+| Validate and save | [`validate_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/validate_sframe.md), [`write_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/write_sframe.md), [`read_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_sframe.md)                                                                                                                                                                                                                                                                                                                                                                               |
+| Deploy            | [`render_survey()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_survey.md), [`launch_studio()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/launch_studio.md)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| Collect           | [`read_responses()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_responses.md), [`read_sheet_responses()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_sheet_responses.md)                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| Quality           | [`quality_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/quality_report.md)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| Score             | [`score_scales()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/score_scales.md)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| Psychometrics     | [`reliability_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/reliability_report.md), [`item_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/item_report.md), [`efa_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/efa_report.md), [`cfa_syntax()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/cfa_syntax.md)                                                                                                                                                                                                                                                                             |
+| Analysis          | [`run_analysis_plan()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/run_analysis_plan.md), [`render_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_results.md)                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| Report            | [`codebook_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/codebook_report.md), [`render_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_report.md)                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
 
 All validation, scoring, quality, psychometric, and reporting functions
 work in regular R scripts. Shiny is only required for survey deployment
@@ -109,6 +121,8 @@ supplementary materials as a reproducibility record.
 
 ## SurveyStudio
 
+[`launch_builder()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/launch_builder.md)
+opens the HTML SurveyBuilder for visual instrument design.
 [`render_survey()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_survey.md)
 can write submitted responses to CSV, including `started_at` and
 `submitted_at` metadata columns.
@@ -144,6 +158,13 @@ Business, Villa College, Maldives. Doctoral candidate, PIMSAT Tamil
 Nadu. <mas@flairmi.com>
 
 # Package index
+
+## Design
+
+Start visually in the HTML SurveyBuilder or construct instruments in R.
+
+- [`launch_builder()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/launch_builder.md)
+  : Launch the surveyframe visual survey builder
 
 ## Build an instrument
 
@@ -190,6 +211,10 @@ Load and validate response data against the instrument specification.
 
 - [`read_responses()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_responses.md)
   : Read and validate survey responses
+- [`export_google_sheet()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/export_google_sheet.md)
+  : Export a survey instrument to Google Sheets collection format
+- [`read_sheet_responses()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_sheet_responses.md)
+  : Read survey responses from a Google Sheet
 
 ## Quality checks
 
@@ -202,7 +227,7 @@ missingness, and duplicate submissions.
 ## Score and analyse
 
 Score composite scales, compute reliability statistics, and prepare
-psychometric diagnostics.
+psychometric diagnostics and pre-planned analyses.
 
 - [`score_scales()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/score_scales.md)
   : Score defined scales from survey responses
@@ -214,6 +239,8 @@ psychometric diagnostics.
   : Prepare a survey instrument for exploratory factor analysis
 - [`cfa_syntax()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/cfa_syntax.md)
   : Generate lavaan CFA syntax from an instrument object
+- [`run_analysis_plan()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/run_analysis_plan.md)
+  : Run a pre-planned analysis from an instrument's analysis plan
 
 ## Report
 
@@ -223,6 +250,8 @@ Generate codebooks, scale appendices, and reproducible HTML reports.
   : Generate a survey codebook from an instrument object
 - [`render_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_report.md)
   : Render a reproducible survey report
+- [`render_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_results.md)
+  : Render analysis results to a formatted HTML report
 
 ## Package
 

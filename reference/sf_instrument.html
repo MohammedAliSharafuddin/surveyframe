@@ -13,7 +13,7 @@ produce components that are passed into this function via components."></head><b
 
     <a class="navbar-brand me-2" href="../index.html">surveyframe</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -54,7 +54,8 @@ produce components that are passed into this function via <code>components</code
 <span>  authors <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  languages <span class="op">=</span> <span class="st">"en"</span>,</span>
 <span>  components <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
-<span>  render <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  render <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  analysis_plan <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -96,11 +97,16 @@ automatically. Raw lists are not accepted.</p></dd>
 <dd><p>List or NULL. Optional rendering hints passed to
 <code><a href="render_survey.html">render_survey()</a></code>, such as theme colour or progress bar visibility.</p></dd>
 
+
+<dt id="arg-analysis-plan">analysis_plan<a class="anchor" aria-label="anchor" href="#arg-analysis-plan"></a></dt>
+<dd><p>List. Optional pre-planned analysis blocks created in
+the HTML SurveyBuilder Analyse mode.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>An object of class <code>sframe</code> with slots <code>meta</code>, <code>items</code>, <code>choices</code>,
-<code>scales</code>, <code>branching</code>, <code>checks</code>, and <code>render</code>.</p>
+<code>scales</code>, <code>branching</code>, <code>checks</code>, <code>analysis_plan</code>, and <code>render</code>.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>

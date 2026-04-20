@@ -10,14 +10,22 @@ item must have a unique `id` within the instrument it is added to.
 sf_item(
   id,
   label,
-  type = c("single_choice", "multiple_choice", "likert", "numeric", "text", "textarea",
-    "date"),
+  type = c("likert", "single_choice", "multiple_choice", "numeric", "text", "textarea",
+    "date", "matrix", "slider", "ranking", "rating", "section_break", "text_block"),
   required = FALSE,
   choice_set = NULL,
   scale_id = NULL,
   reverse = FALSE,
   help = NULL,
-  placeholder = NULL
+  placeholder = NULL,
+  matrix_items = NULL,
+  slider_min = NULL,
+  slider_max = NULL,
+  slider_step = NULL,
+  rating_max = NULL,
+  rating_icon = NULL,
+  section_intro = NULL,
+  page = NULL
 )
 ```
 
@@ -25,53 +33,76 @@ sf_item(
 
 - id:
 
-  Character. A unique identifier for this item. Must contain only
-  letters, numbers, and underscores. Used as the column name in response
-  data.
+  Character. A unique identifier for this item. Used as the column name
+  in response data. Must contain only letters, numbers, and underscores.
 
 - label:
 
-  Character. The question text displayed to the respondent.
+  Character. The question text or content displayed to the respondent.
 
 - type:
 
-  Character. The response type. One of `"single_choice"`,
-  `"multiple_choice"`, `"likert"`, `"numeric"`, `"text"`, `"textarea"`,
-  or `"date"`.
+  Character. The response type. One of `"likert"`, `"single_choice"`,
+  `"multiple_choice"`, `"numeric"`, `"text"`, `"textarea"`, `"date"`,
+  `"matrix"`, `"slider"`, `"ranking"`, `"rating"`, `"section_break"`, or
+  `"text_block"`.
 
 - required:
 
-  Logical. Whether the respondent must answer this item before
-  proceeding. Defaults to `FALSE`.
+  Logical. Whether the respondent must answer this item.
 
 - choice_set:
 
   Character or NULL. The `id` of a choice set defined with
   [`sf_choices()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_choices.md).
-  Required for `"single_choice"`, `"multiple_choice"`, and `"likert"`
-  types.
 
 - scale_id:
 
-  Character or NULL. The `id` of the scale this item belongs to, as
-  defined with
-  [`sf_scale()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_scale.md).
-  Items may belong to at most one scale.
+  Character or NULL. The `id` of the scale this item belongs to.
 
 - reverse:
 
-  Logical. Whether this item is reverse-coded within its scale. Ignored
-  if `scale_id` is `NULL`. Defaults to `FALSE`.
+  Logical. Whether this item is reverse-coded within its scale.
 
 - help:
 
-  Character or NULL. Optional help text displayed beneath the question
-  label.
+  Character or NULL. Help text displayed beneath the question.
 
 - placeholder:
 
-  Character or NULL. Placeholder text for `"text"` and `"textarea"`
-  types.
+  Character or NULL. Placeholder text for text inputs.
+
+- matrix_items:
+
+  Character vector or NULL. Row labels for `"matrix"` type.
+
+- slider_min:
+
+  Numeric or NULL. Minimum value for `"slider"` type.
+
+- slider_max:
+
+  Numeric or NULL. Maximum value for `"slider"` type.
+
+- slider_step:
+
+  Numeric or NULL. Step size for `"slider"` type.
+
+- rating_max:
+
+  Integer or NULL. Maximum rating for `"rating"` type.
+
+- rating_icon:
+
+  Character or NULL. Icon type: `"star"` or `"heart"`.
+
+- section_intro:
+
+  Character or NULL. Intro text for `"section_break"` type.
+
+- page:
+
+  Integer or NULL. Page number for multi-page surveys.
 
 ## Value
 
@@ -86,16 +117,12 @@ An object of class `sf_item` (a named list).
 ## Examples
 
 ``` r
-# A required Likert item linked to a scale
 item <- sf_item(
-  id         = "sat_overall",
-  label      = "Overall, how satisfied are you with the service?",
-  type       = "likert",
-  required   = TRUE,
-  choice_set = "agree5",
-  scale_id   = "satisfaction"
+  id = "sat_overall", label = "Overall, how satisfied are you?",
+  type = "likert", required = TRUE, choice_set = "agree5",
+  scale_id = "satisfaction"
 )
 
-# A numeric item
-age <- sf_item("age", "What is your age?", type = "numeric", required = TRUE)
+sec <- sf_item("sec_1", "Demographic Information", type = "section_break",
+               section_intro = "Please answer the following questions.")
 ```

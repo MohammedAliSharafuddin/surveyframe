@@ -2,6 +2,44 @@
 
 ## surveyframe (development version)
 
+## surveyframe 0.2.0
+
+### SurveyBuilder and analysis planning
+
+surveyframe 0.2.0 adds the first phase of the v0.2 workflow.
+
+#### New features
+
+- [`launch_builder()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/launch_builder.md):
+  open the browser-based SurveyBuilder for instrument authoring,
+  preview, and analysis-plan setup.
+- New
+  [`sf_item()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_item.md)
+  types: `matrix`, `slider`, `ranking`, `rating`, `section_break`, and
+  `text_block`.
+- [`run_analysis_plan()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/run_analysis_plan.md)
+  and
+  [`render_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_results.md):
+  execute and report research-question-driven analyses stored on the
+  instrument.
+- [`export_google_sheet()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/export_google_sheet.md)
+  and
+  [`read_sheet_responses()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_sheet_responses.md):
+  generate a Google Sheets Apps Script collector and read responses back
+  into the package.
+- [`render_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_report.md)
+  now accepts `output_path` and can include analysis-plan results in the
+  Quarto report.
+
+#### Integration
+
+- `.sframe` serialization now preserves `analysis_plan`.
+- [`render_survey()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_survey.md)
+  now supports the richer v0.2 item set, welcome and thank-you flows,
+  conversational mode, ranking and rating widgets, and CSV persistence.
+- The bundled SurveyBuilder now writes a SHA-256 hash compatible with
+  [`read_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_sframe.md).
+
 ## surveyframe 0.1.0
 
 ### First release

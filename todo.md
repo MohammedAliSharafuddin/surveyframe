@@ -1,256 +1,149 @@
-# surveyframe TODO
+# surveyframe v0.2 TODO
 
-This checklist is derived from Phase 1 and Phase 2 of
-[roadmap.md](https://mohammedalisharafuddin.github.io/home/maxx/Documents/GitHub/surveyframe/roadmap.md).
+This checklist reflects the repository state verified on April 21, 2026.
 
-## Phase 1: Finish and Stabilize v0.1
+## Completed in this pass
 
-### 1. Lock the v0.1 scope
+Move the v0.2 package code into the main repository root
 
-Review exported functions and confirm that every public feature belongs
-to the instrument-centered workflow.
+Add
+[`launch_builder()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/launch_builder.md)
+and bundle the HTML SurveyBuilder
 
-Remove or defer any public-facing feature that pulls the package outside
-the v0.1 boundary.
+Preserve `analysis_plan` in
+[`sf_instrument()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_instrument.md),
+`.sframe` writing, and `.sframe` reading
 
-Update `README.md`, `DESCRIPTION`, and `NEWS.md` so the scope statement
-matches the code exactly.
+Make the builder-generated SHA-256 hash compatible with
+[`read_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_sframe.md)
 
-### 2. Harden the Shiny collection layer
+Upgrade
+[`sf_item()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_item.md)
+to the v0.2 item set
 
-Add a clear response persistence path for
+Upgrade
 [`render_survey()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_survey.md)
-so submitted responses are actually saved or handed off in a defined
-way.
+to the richer v0.2 renderer
 
-Decide on the v0.1 persistence contract: local file, callback, returned
-object, or explicit “demo only” behavior.
+Add
+[`run_analysis_plan()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/run_analysis_plan.md),
+[`render_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_results.md),
+[`export_google_sheet()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/export_google_sheet.md),
+and
+[`read_sheet_responses()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_sheet_responses.md)
 
-Implement submission validation before the thank-you modal appears.
+Extend
+[`render_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_report.md)
+and the Quarto template for analysis-plan reporting
 
-Enforce `required = TRUE` across supported item types.
+Add v0.2 tests in the root package
 
-Use item metadata consistently in the renderer where already supported:
-`help`, `placeholder`, and render hints.
+Run the full local test suite: `235` passing, `0` failures, `0` warnings
 
-Verify branching behavior across all supported item types.
+Run full local `devtools::check()`: `0 errors`, `0 warnings`, `0 notes`
 
-Test the Shiny survey through server-side persistence and validation
-tests with branching and required items.
+Verify the roundtrip: builder-style `.sframe` -\>
+[`read_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_sframe.md)
+-\>
+[`render_survey()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_survey.md)
+-\>
+[`render_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_report.md)
 
-Relevant files: -
-[R/render_survey.R](https://mohammedalisharafuddin.github.io/home/maxx/Documents/GitHub/surveyframe/R/render_survey.R) -
-[inst/shiny/app.R](https://mohammedalisharafuddin.github.io/home/maxx/Documents/GitHub/surveyframe/inst/shiny/app.R)
+## Remaining work to complete v0.2
 
-### 3. Complete timing analysis in `quality_report()`
+### 1. Builder and renderer parity
 
-Define the timing input contract clearly: which columns are required,
-and how start and submit times are detected.
+Decide whether the builder preview should reuse the Shiny renderer or
+remain a separate browser renderer
 
-Implement completion-time calculation in
-[`quality_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/quality_report.md).
+Make preview behavior match
+[`render_survey()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_survey.md)
+for: required items, branching, matrix items, ranking, rating, and page
+flow
 
-Flag respondents below `time_min` when timing data are available.
+Add regression tests for any preview/generator differences found during
+manual review
 
-Return timing results in the report object instead of leaving
-`timing = list()`.
+Review the builder inspector and settings flow for UI friction and
+reduce the highest-friction interactions
 
-Update the print method if timing output should appear in summaries.
+### 2. Browser-level verification
 
-Add tests for: valid timing data, missing timing columns, malformed
-timestamps, and threshold-based flagging.
+Add browser automation for the HTML SurveyBuilder
 
-Relevant file: -
-[R/quality_report.R](https://mohammedalisharafuddin.github.io/home/maxx/Documents/GitHub/surveyframe/R/quality_report.R)
+Add at least one end-to-end browser test that: builds or loads an
+instrument, exports `.sframe`, loads it in R, and completes a rendered
+survey path
 
-### 4. Resolve weighted scoring behavior
+Capture screenshots for the builder and rendered survey at desktop and
+mobile widths
 
-Decide whether weighted scoring ships in v0.1 or whether `weights`
-should be removed from the public API for now.
+### 3. SurveyStudio relationship
 
-If weighted scoring stays: implement it in
-[`score_scales()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/score_scales.md)
-for supported methods and document the exact behavior with missing data
-and `min_valid`.
+Decide whether SurveyStudio remains a separate shell or becomes a host
+for the HTML SurveyBuilder
 
-Weighted scoring remains in v0.1, so the API removal path is not needed.
+Remove duplicated build paths or make their responsibilities explicit
 
-Add tests for the final chosen behavior.
+Align SurveyStudio wording and navigation with the v0.2 workflow
 
-Relevant files: -
-[R/sf_scale.R](https://mohammedalisharafuddin.github.io/home/maxx/Documents/GitHub/surveyframe/R/sf_scale.R) -
-[R/score_scales.R](https://mohammedalisharafuddin.github.io/home/maxx/Documents/GitHub/surveyframe/R/score_scales.R)
+### 4. Google Sheets collection path
 
-### 5. Expand test coverage across workflows
+Decide the supported contract: helper-only collector export, or direct
+survey submission to Apps Script
 
-Add integration-style tests that cover the full sequence: instrument -\>
-validation -\> write/read -\> responses -\> quality -\> scoring -\>
-reporting.
+If direct submission stays in scope, wire the survey generator to
+`render$google_sheets_endpoint`
 
-Add regression tests for reverse coding based on choice-set ranges.
+Add tests for the chosen Google Sheets path
 
-Add tests for Shiny renderer behavior where practical, or document the
-manual verification checklist if automated Shiny tests are deferred.
+Narrow the builder UI copy if direct submission is deferred
 
-Add tests for edge cases in branching, missing item columns, duplicate
-IDs, and incomplete scales.
+### 5. Static deployment decision
 
-Run the full suite through the package-loading path used in CI.
+Decide whether static HTML survey deployment remains a v0.2 deliverable
 
-Relevant files: -
-[tests/testthat/test-core.R](https://mohammedalisharafuddin.github.io/home/maxx/Documents/GitHub/surveyframe/tests/testthat/test-core.R) -
-[tests/testthat.R](https://mohammedalisharafuddin.github.io/home/maxx/Documents/GitHub/surveyframe/tests/testthat.R)
+If yes, define the generator/export format and implement it
 
-### 6. Keep package checks green
+If no, remove or defer the UI affordances and roadmap language that
+imply it is already available
 
-Run `devtools::document()` and confirm `NAMESPACE` and man pages stay in
-sync with the source.
+### 6. Documentation
 
-Run the local test suite and a no-vignette `devtools::check()` locally.
+Rewrite `README.md` around the v0.2 workflow
 
-Review GitHub Actions output for: R CMD check, pkgdown, and test
-coverage.
+Add the builder entry point to the vignette and pkgdown site
 
-Fix platform-specific issues on macOS, Windows, and Linux if they appear
-in CI.
+Document the difference between:
+[`launch_builder()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/launch_builder.md),
+[`launch_studio()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/launch_studio.md),
+and
+[`render_survey()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_survey.md)
 
-Confirm that the vignette and Quarto report template build cleanly in CI
-and locally.
+Document the analysis-plan workflow from design to report
 
-Relevant files: -
-[.github/workflows/R-CMD-check.yaml](https://mohammedalisharafuddin.github.io/home/maxx/Documents/GitHub/surveyframe/.github/workflows/R-CMD-check.yaml) -
-[.github/workflows/pkgdown.yaml](https://mohammedalisharafuddin.github.io/home/maxx/Documents/GitHub/surveyframe/.github/workflows/pkgdown.yaml) -
-[.github/workflows/test-coverage.yaml](https://mohammedalisharafuddin.github.io/home/maxx/Documents/GitHub/surveyframe/.github/workflows/test-coverage.yaml)
+Document the Google Sheets helper flow clearly
 
-### 7. Finish CRAN-readiness work
+### 7. Release finish
 
-Review `DESCRIPTION` for final dependency hygiene and metadata quality.
+Push the verified v0.2 baseline to `main`
 
-Confirm `LICENSE`, `inst/CITATION`, and author metadata are final.
+Review fresh GitHub Actions runs after the push
 
-Check examples, vignette, and documentation for CRAN-safe behavior.
+Fix any CI regressions that appear on macOS, Windows, or Linux
 
-Make sure the package can be used without launching Shiny when the user
-only wants the non-interactive workflow.
+Draft a v0.2 release note and release checklist
 
-Prepare a CRAN submission checklist with final blockers and decisions.
+## Definition of done for v0.2
 
-Current blockers outside the local source tree:
+The builder, `.sframe` loader, and survey generator work as one coherent
+workflow
 
-Push the current branch and review fresh GitHub Actions runs.
+The preview and generated survey behavior are aligned or intentionally
+separated and documented
 
-Re-run the full local vignette build on a machine with Pandoc installed.
+The Google Sheets path is either fully wired or clearly scoped down
 
-Latest verification:
+Browser-level UI verification exists
 
-Commit `2f94b5e` passed `pkgdown`, `R CMD check`, and `test-coverage` on
-GitHub Actions on April 16, 2026 UTC.
-
-Definition of done for Phase 1:
-
-The public API matches the documented v0.1 scope.
-
-The remaining implementation gaps named in `roadmap.md` are closed.
-
-Local checks pass.
-
-GitHub Actions are green.
-
-The package is ready for a serious CRAN submission pass.
-
-## Phase 2: Package Adoption and Publication
-
-### 1. Strengthen the getting-started path
-
-Review the vignette from the perspective of a first-time researcher.
-
-Make the vignette start with the instrument object and walk cleanly
-through the full workflow.
-
-Add a clear “new study from scratch” path to the README.
-
-Add a clear “script-only workflow” path to the README or vignette.
-
-Make sure SurveyStudio is presented as one workflow entry point, not the
-only useful way to use the package.
-
-Relevant files: -
-[README.md](https://mohammedalisharafuddin.github.io/home/maxx/Documents/GitHub/surveyframe/README.md) -
-[vignettes/surveyframe.Rmd](https://mohammedalisharafuddin.github.io/home/maxx/Documents/GitHub/surveyframe/vignettes/surveyframe.Rmd) -
-[\_pkgdown.yml](https://mohammedalisharafuddin.github.io/home/maxx/Documents/GitHub/surveyframe/_pkgdown.yml)
-
-### 2. Improve the pkgdown site
-
-Audit the navigation for the order a new researcher actually needs.
-
-Make sure the home page and reference index emphasize the instrument
-object and end-to-end workflow.
-
-Add links between the vignette, reference topics, and reporting tools.
-
-Confirm that badges, install instructions, and citation information are
-correct and current.
-
-Build the site locally and review it page by page.
-
-### 3. Prepare the JSS paper
-
-Write a paper outline centered on the `sframe` object as the primary
-contribution.
-
-Draft the core argument for the paper: one instrument object drives the
-full research lifecycle.
-
-Document the reproducibility case around `.sframe` files and SHA-256
-hashing.
-
-Build one complete worked example that can anchor both the paper and the
-package documentation.
-
-Decide which package features are core to the paper and which should
-stay as supporting details.
-
-Start a references list for competing or adjacent packages and explain
-the distinction clearly.
-
-### 4. Turn the package into a citable methods contribution
-
-Write method-section wording for the four intended citation points:
-deployment, data quality, reliability, and codebook generation.
-
-Make sure the citation metadata and package citation are publication
-ready.
-
-Add a short “How to cite surveyframe in a paper” section to the README
-or vignette if needed.
-
-Identify one or two example studies or demos that show the full workflow
-clearly enough to support citation adoption.
-
-Relevant file: -
-[inst/CITATION](https://mohammedalisharafuddin.github.io/home/maxx/Documents/GitHub/surveyframe/inst/CITATION)
-
-### 5. Publication support work
-
-Create a release checklist for the first public package release.
-
-Prepare a short release summary for GitHub and pkgdown.
-
-Prepare issue templates or contribution guidance for incoming user
-feedback once adoption starts.
-
-Decide how to track post-release bugs and documentation requests.
-
-Relevant file: -
-[CONTRIBUTING.md](https://mohammedalisharafuddin.github.io/home/maxx/Documents/GitHub/surveyframe/CONTRIBUTING.md)
-
-Definition of done for Phase 2:
-
-A new researcher can follow the docs and complete a full workflow.
-
-The pkgdown site clearly explains the package’s contribution.
-
-The JSS paper draft is underway with the instrument object as the
-center.
-
-Citation guidance is ready for real-world use.
+Local checks pass and GitHub Actions are green on the final branch

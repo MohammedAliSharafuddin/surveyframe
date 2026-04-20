@@ -12,10 +12,12 @@ render_report(
   instrument,
   data = NULL,
   output_file = NULL,
+  output_path = NULL,
   format = c("html"),
   include_quality = TRUE,
   include_reliability = TRUE,
-  include_codebook = TRUE
+  include_codebook = TRUE,
+  include_analysis = TRUE
 )
 ```
 
@@ -35,9 +37,14 @@ render_report(
   Character or NULL. The output file path. When NULL, a temporary file
   is written and its path returned.
 
+- output_path:
+
+  Character or NULL. Alias for `output_file`. If both are supplied,
+  `output_file` takes precedence.
+
 - format:
 
-  Character. Output format. Only `"html"` is supported in v0.1.
+  Character. Output format. Only `"html"` is supported in v0.2.
 
 - include_quality:
 
@@ -53,6 +60,11 @@ render_report(
 
   Logical. Whether to include the instrument codebook. Defaults to
   `TRUE`.
+
+- include_analysis:
+
+  Logical. Whether to include analysis-plan results when `data` are
+  supplied and the instrument has an `analysis_plan`.
 
 ## Value
 

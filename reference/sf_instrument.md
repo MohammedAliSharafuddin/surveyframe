@@ -20,7 +20,8 @@ sf_instrument(
   authors = NULL,
   languages = "en",
   components = list(),
-  render = NULL
+  render = NULL,
+  analysis_plan = list()
 )
 ```
 
@@ -66,10 +67,15 @@ sf_instrument(
   [`render_survey()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_survey.md),
   such as theme colour or progress bar visibility.
 
+- analysis_plan:
+
+  List. Optional pre-planned analysis blocks created in the HTML
+  SurveyBuilder Analyse mode.
+
 ## Value
 
 An object of class `sframe` with slots `meta`, `items`, `choices`,
-`scales`, `branching`, `checks`, and `render`.
+`scales`, `branching`, `checks`, `analysis_plan`, and `render`.
 
 ## See also
 

@@ -11,7 +11,7 @@ unique id within the instrument it is added to."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">surveyframe</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -47,14 +47,22 @@ unique <code>id</code> within the instrument it is added to.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">sf_item</span><span class="op">(</span></span>
 <span>  <span class="va">id</span>,</span>
 <span>  <span class="va">label</span>,</span>
-<span>  type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"single_choice"</span>, <span class="st">"multiple_choice"</span>, <span class="st">"likert"</span>, <span class="st">"numeric"</span>, <span class="st">"text"</span>, <span class="st">"textarea"</span>,</span>
-<span>    <span class="st">"date"</span><span class="op">)</span>,</span>
+<span>  type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"likert"</span>, <span class="st">"single_choice"</span>, <span class="st">"multiple_choice"</span>, <span class="st">"numeric"</span>, <span class="st">"text"</span>, <span class="st">"textarea"</span>,</span>
+<span>    <span class="st">"date"</span>, <span class="st">"matrix"</span>, <span class="st">"slider"</span>, <span class="st">"ranking"</span>, <span class="st">"rating"</span>, <span class="st">"section_break"</span>, <span class="st">"text_block"</span><span class="op">)</span>,</span>
 <span>  required <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  choice_set <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  scale_id <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  reverse <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  help <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  placeholder <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  placeholder <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  matrix_items <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  slider_min <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  slider_max <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  slider_step <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  rating_max <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  rating_icon <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  section_intro <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  page <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -63,50 +71,77 @@ unique <code>id</code> within the instrument it is added to.</p>
 
 
 <dl><dt id="arg-id">id<a class="anchor" aria-label="anchor" href="#arg-id"></a></dt>
-<dd><p>Character. A unique identifier for this item. Must contain only
-letters, numbers, and underscores. Used as the column name in response
-data.</p></dd>
+<dd><p>Character. A unique identifier for this item. Used as the column
+name in response data. Must contain only letters, numbers, and underscores.</p></dd>
 
 
 <dt id="arg-label">label<a class="anchor" aria-label="anchor" href="#arg-label"></a></dt>
-<dd><p>Character. The question text displayed to the respondent.</p></dd>
+<dd><p>Character. The question text or content displayed to the
+respondent.</p></dd>
 
 
 <dt id="arg-type">type<a class="anchor" aria-label="anchor" href="#arg-type"></a></dt>
-<dd><p>Character. The response type. One of <code>"single_choice"</code>,
-<code>"multiple_choice"</code>, <code>"likert"</code>, <code>"numeric"</code>, <code>"text"</code>, <code>"textarea"</code>,
-or <code>"date"</code>.</p></dd>
+<dd><p>Character. The response type. One of <code>"likert"</code>,
+<code>"single_choice"</code>, <code>"multiple_choice"</code>, <code>"numeric"</code>, <code>"text"</code>,
+<code>"textarea"</code>, <code>"date"</code>, <code>"matrix"</code>, <code>"slider"</code>, <code>"ranking"</code>, <code>"rating"</code>,
+<code>"section_break"</code>, or <code>"text_block"</code>.</p></dd>
 
 
 <dt id="arg-required">required<a class="anchor" aria-label="anchor" href="#arg-required"></a></dt>
-<dd><p>Logical. Whether the respondent must answer this item before
-proceeding. Defaults to <code>FALSE</code>.</p></dd>
+<dd><p>Logical. Whether the respondent must answer this item.</p></dd>
 
 
 <dt id="arg-choice-set">choice_set<a class="anchor" aria-label="anchor" href="#arg-choice-set"></a></dt>
 <dd><p>Character or NULL. The <code>id</code> of a choice set defined with
-<code><a href="sf_choices.html">sf_choices()</a></code>. Required for <code>"single_choice"</code>, <code>"multiple_choice"</code>, and
-<code>"likert"</code> types.</p></dd>
+<code><a href="sf_choices.html">sf_choices()</a></code>.</p></dd>
 
 
 <dt id="arg-scale-id">scale_id<a class="anchor" aria-label="anchor" href="#arg-scale-id"></a></dt>
-<dd><p>Character or NULL. The <code>id</code> of the scale this item belongs
-to, as defined with <code><a href="sf_scale.html">sf_scale()</a></code>. Items may belong to at most one scale.</p></dd>
+<dd><p>Character or NULL. The <code>id</code> of the scale this item belongs to.</p></dd>
 
 
 <dt id="arg-reverse">reverse<a class="anchor" aria-label="anchor" href="#arg-reverse"></a></dt>
-<dd><p>Logical. Whether this item is reverse-coded within its scale.
-Ignored if <code>scale_id</code> is <code>NULL</code>. Defaults to <code>FALSE</code>.</p></dd>
+<dd><p>Logical. Whether this item is reverse-coded within its scale.</p></dd>
 
 
 <dt id="arg-help">help<a class="anchor" aria-label="anchor" href="#arg-help"></a></dt>
-<dd><p>Character or NULL. Optional help text displayed beneath the
-question label.</p></dd>
+<dd><p>Character or NULL. Help text displayed beneath the question.</p></dd>
 
 
 <dt id="arg-placeholder">placeholder<a class="anchor" aria-label="anchor" href="#arg-placeholder"></a></dt>
-<dd><p>Character or NULL. Placeholder text for <code>"text"</code> and
-<code>"textarea"</code> types.</p></dd>
+<dd><p>Character or NULL. Placeholder text for text inputs.</p></dd>
+
+
+<dt id="arg-matrix-items">matrix_items<a class="anchor" aria-label="anchor" href="#arg-matrix-items"></a></dt>
+<dd><p>Character vector or NULL. Row labels for <code>"matrix"</code> type.</p></dd>
+
+
+<dt id="arg-slider-min">slider_min<a class="anchor" aria-label="anchor" href="#arg-slider-min"></a></dt>
+<dd><p>Numeric or NULL. Minimum value for <code>"slider"</code> type.</p></dd>
+
+
+<dt id="arg-slider-max">slider_max<a class="anchor" aria-label="anchor" href="#arg-slider-max"></a></dt>
+<dd><p>Numeric or NULL. Maximum value for <code>"slider"</code> type.</p></dd>
+
+
+<dt id="arg-slider-step">slider_step<a class="anchor" aria-label="anchor" href="#arg-slider-step"></a></dt>
+<dd><p>Numeric or NULL. Step size for <code>"slider"</code> type.</p></dd>
+
+
+<dt id="arg-rating-max">rating_max<a class="anchor" aria-label="anchor" href="#arg-rating-max"></a></dt>
+<dd><p>Integer or NULL. Maximum rating for <code>"rating"</code> type.</p></dd>
+
+
+<dt id="arg-rating-icon">rating_icon<a class="anchor" aria-label="anchor" href="#arg-rating-icon"></a></dt>
+<dd><p>Character or NULL. Icon type: <code>"star"</code> or <code>"heart"</code>.</p></dd>
+
+
+<dt id="arg-section-intro">section_intro<a class="anchor" aria-label="anchor" href="#arg-section-intro"></a></dt>
+<dd><p>Character or NULL. Intro text for <code>"section_break"</code> type.</p></dd>
+
+
+<dt id="arg-page">page<a class="anchor" aria-label="anchor" href="#arg-page"></a></dt>
+<dd><p>Integer or NULL. Page number for multi-page surveys.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -120,18 +155,14 @@ question label.</p></dd>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># A required Likert item linked to a scale</span></span></span>
-<span class="r-in"><span><span class="va">item</span> <span class="op">&lt;-</span> <span class="fu">sf_item</span><span class="op">(</span></span></span>
-<span class="r-in"><span>  id         <span class="op">=</span> <span class="st">"sat_overall"</span>,</span></span>
-<span class="r-in"><span>  label      <span class="op">=</span> <span class="st">"Overall, how satisfied are you with the service?"</span>,</span></span>
-<span class="r-in"><span>  type       <span class="op">=</span> <span class="st">"likert"</span>,</span></span>
-<span class="r-in"><span>  required   <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
-<span class="r-in"><span>  choice_set <span class="op">=</span> <span class="st">"agree5"</span>,</span></span>
-<span class="r-in"><span>  scale_id   <span class="op">=</span> <span class="st">"satisfaction"</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">item</span> <span class="op">&lt;-</span> <span class="fu">sf_item</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  id <span class="op">=</span> <span class="st">"sat_overall"</span>, label <span class="op">=</span> <span class="st">"Overall, how satisfied are you?"</span>,</span></span>
+<span class="r-in"><span>  type <span class="op">=</span> <span class="st">"likert"</span>, required <span class="op">=</span> <span class="cn">TRUE</span>, choice_set <span class="op">=</span> <span class="st">"agree5"</span>,</span></span>
+<span class="r-in"><span>  scale_id <span class="op">=</span> <span class="st">"satisfaction"</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># A numeric item</span></span></span>
-<span class="r-in"><span><span class="va">age</span> <span class="op">&lt;-</span> <span class="fu">sf_item</span><span class="op">(</span><span class="st">"age"</span>, <span class="st">"What is your age?"</span>, type <span class="op">=</span> <span class="st">"numeric"</span>, required <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">sec</span> <span class="op">&lt;-</span> <span class="fu">sf_item</span><span class="op">(</span><span class="st">"sec_1"</span>, <span class="st">"Demographic Information"</span>, type <span class="op">=</span> <span class="st">"section_break"</span>,</span></span>
+<span class="r-in"><span>               section_intro <span class="op">=</span> <span class="st">"Please answer the following questions."</span><span class="op">)</span></span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

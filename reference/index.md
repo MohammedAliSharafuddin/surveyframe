@@ -1,5 +1,12 @@
 # Package index
 
+## Design
+
+Start visually in the HTML SurveyBuilder or construct instruments in R.
+
+- [`launch_builder()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/launch_builder.md)
+  : Launch the surveyframe visual survey builder
+
 ## Build an instrument
 
 Constructor functions for building the sframe instrument object. Start
@@ -45,6 +52,10 @@ Load and validate response data against the instrument specification.
 
 - [`read_responses()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_responses.md)
   : Read and validate survey responses
+- [`export_google_sheet()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/export_google_sheet.md)
+  : Export a survey instrument to Google Sheets collection format
+- [`read_sheet_responses()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_sheet_responses.md)
+  : Read survey responses from a Google Sheet
 
 ## Quality checks
 
@@ -57,7 +68,7 @@ missingness, and duplicate submissions.
 ## Score and analyse
 
 Score composite scales, compute reliability statistics, and prepare
-psychometric diagnostics.
+psychometric diagnostics and pre-planned analyses.
 
 - [`score_scales()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/score_scales.md)
   : Score defined scales from survey responses
@@ -69,6 +80,8 @@ psychometric diagnostics.
   : Prepare a survey instrument for exploratory factor analysis
 - [`cfa_syntax()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/cfa_syntax.md)
   : Generate lavaan CFA syntax from an instrument object
+- [`run_analysis_plan()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/run_analysis_plan.md)
+  : Run a pre-planned analysis from an instrument's analysis plan
 
 ## Report
 
@@ -78,6 +91,8 @@ Generate codebooks, scale appendices, and reproducible HTML reports.
   : Generate a survey codebook from an instrument object
 - [`render_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_report.md)
   : Render a reproducible survey report
+- [`render_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_results.md)
+  : Render analysis results to a formatted HTML report
 
 ## Package
 

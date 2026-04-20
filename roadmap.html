@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="index.html">surveyframe</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -35,130 +35,128 @@
 
 <div class="section level2">
 <h2 id="scope">Scope<a class="anchor" aria-label="anchor" href="#scope"></a></h2>
-<p><code>surveyframe</code> is a workflow package for academic survey research in R. Its core contribution is the <code>sframe</code> instrument object: one structured source of truth that carries item definitions, reusable choice sets, scale structure, reverse-coding rules, branching logic, design-time checks, and rendering metadata through the full research pipeline.</p>
-<p>The package serves as a connecting layer within the research workflow. Specialist analysis libraries and commercial survey platforms remain separate tools. In its intended shape, <code>surveyframe</code> defines the instrument, validates it, serialises it, deploys it, reads response data back in, checks data quality, scores scales, prepares psychometric diagnostics, and generates reproducible outputs. Packages such as <code>psych</code>, <code>lavaan</code>, and future method-specific extensions consume instrument-aware data downstream from the core package.</p>
+<p><code>surveyframe</code> is a workflow package for academic survey research in R. Its core object is the <code>sframe</code> instrument, which carries item definitions, reusable choice sets, scale structure, reverse-coding rules, branching logic, design-time checks, analysis-plan metadata, and rendering settings through the research workflow.</p>
+<p>The package defines the instrument, validates it, serializes it, renders it, reads response data back in, checks quality, scores scales, prepares psychometric diagnostics, runs pre-planned analyses, and generates reproducible outputs. Specialist analysis packages and external collection platforms remain downstream tools.</p>
 <div class="section level3">
-<h3 id="in-scope-for-v01">In-scope for v0.1<a class="anchor" aria-label="anchor" href="#in-scope-for-v01"></a></h3>
-<ul><li>Typed constructors for items, choice sets, scales, branching rules, and design-time checks</li>
-<li>An <code>sframe</code> S3 object with print, format, and summary methods</li>
-<li>Instrument validation and custom condition classes</li>
+<h3 id="included-in-the-current-v02-line">Included in the current v0.2 line<a class="anchor" aria-label="anchor" href="#included-in-the-current-v02-line"></a></h3>
+<ul><li>Typed constructors for items, choice sets, scales, branching rules, checks, and the top-level <code>sframe</code> object</li>
 <li>
-<code>.sframe</code> JSON serialisation with SHA-256 integrity hashing</li>
-<li>Shiny-based survey rendering</li>
-<li>SurveyStudio, a Shiny interface for visual workflow orchestration</li>
-<li>Response loading with column-contract validation</li>
-<li>Quality reporting for attention checks, missingness, straight-lining, and duplicate respondent IDs</li>
-<li>Scale scoring, reverse coding, reliability diagnostics, item diagnostics, EFA readiness diagnostics, and CFA syntax generation</li>
-<li>Codebook generation and parameterised Quarto reporting</li>
+<code>.sframe</code> JSON serialization with SHA-256 integrity hashing</li>
+<li>A browser-based HTML SurveyBuilder launched with <code><a href="reference/launch_builder.html">launch_builder()</a></code>
+</li>
+<li>A Shiny survey generator launched through <code><a href="reference/render_survey.html">render_survey()</a></code>
+</li>
+<li>SurveyStudio as the Shiny workflow shell</li>
+<li>Response loading from CSV/data frames and Google Sheets</li>
+<li>Quality reporting, scale scoring, reliability diagnostics, item diagnostics, EFA readiness checks, and CFA syntax generation</li>
+<li>Analysis-plan execution with <code><a href="reference/run_analysis_plan.html">run_analysis_plan()</a></code> and results rendering with <code><a href="reference/render_results.html">render_results()</a></code>
+</li>
+<li>Codebook generation and Quarto report rendering</li>
 </ul></div>
 <div class="section level3">
-<h3 id="explicitly-out-of-scope-for-v01">Explicitly out of scope for v0.1<a class="anchor" aria-label="anchor" href="#explicitly-out-of-scope-for-v01"></a></h3>
-<ul><li>A conversational builder</li>
-<li>Static HTML deployment</li>
-<li>Quarto inline survey embedding</li>
+<h3 id="outside-the-current-v02-line">Outside the current v0.2 line<a class="anchor" aria-label="anchor" href="#outside-the-current-v02-line"></a></h3>
+<ul><li>Static HTML survey deployment from the builder</li>
+<li>Full parity between the SurveyBuilder preview and the Shiny survey renderer</li>
+<li>Direct Google Sheets submission from <code><a href="reference/render_survey.html">render_survey()</a></code>
+</li>
+<li>SurveyStudio and SurveyBuilder as one unified authoring surface</li>
 <li>External platform import/export such as Qualtrics or REDCap</li>
-<li>Multilingual authoring workflows beyond basic language metadata</li>
+<li>Multilingual authoring workflows beyond basic metadata</li>
 <li>Multi-condition branching trees</li>
 <li>IRT and decision-science method engines</li>
-<li>An AI survey design assistant</li>
+<li>AI-assisted survey authoring</li>
 </ul></div>
 </div>
 <div class="section level2">
 <h2 id="current-status">Current Status<a class="anchor" aria-label="anchor" href="#current-status"></a></h2>
-<p>Current status below reflects the repository state reviewed on April 17, 2026.</p>
+<p>Status below reflects the repository state verified on April 21, 2026.</p>
 <div class="section level3">
-<h3 id="what-is-already-present-in-the-repo">What is already present in the repo<a class="anchor" aria-label="anchor" href="#what-is-already-present-in-the-repo"></a></h3>
-<ul><li>Package metadata, documentation, and release scaffolding are in place: <code>DESCRIPTION</code>, <code>README.md</code>, <code>NEWS.md</code>, <code>inst/CITATION</code>, <code>_pkgdown.yml</code>, the vignette, and GitHub Actions workflows for R CMD check, pkgdown, and Codecov.</li>
-<li>The public API is exported through <code>NAMESPACE</code>, including <code>sf_instrument</code>.</li>
-<li>The constructor family is implemented: <code><a href="reference/sf_item.html">sf_item()</a></code>, <code><a href="reference/sf_choices.html">sf_choices()</a></code>, <code><a href="reference/sf_scale.html">sf_scale()</a></code>, <code><a href="reference/sf_branch.html">sf_branch()</a></code>, <code><a href="reference/sf_check.html">sf_check()</a></code>, and <code><a href="reference/sf_instrument.html">sf_instrument()</a></code>.</li>
-<li>Instruments can be validated, written to <code>.sframe</code>, read back, and checked against their integrity hash.</li>
-<li>The package includes a Shiny renderer and a six-screen SurveyStudio app in <code>inst/shiny/app.R</code>.</li>
-<li>Response loading, quality reporting, scale scoring, reliability reporting, item diagnostics, EFA readiness diagnostics, CFA syntax generation, codebook generation, and Quarto report rendering are all implemented.</li>
-<li>The local test suite passes when run with the package loaded: <code>pkgload::load_all('.')</code> plus <code>testthat::test_dir('tests/testthat')</code>.</li>
-<li>A full local <code>devtools::check()</code> pass completes with <code>0 errors</code>, <code>0 warnings</code>, and <code>0 notes</code>.</li>
-<li>GitHub Actions on <code>main</code> are green for <code>R CMD check</code>, <code>pkgdown</code>, and <code>test-coverage</code> after the Quarto report fix shipped on April 16, 2026 UTC.</li>
+<h3 id="verified-and-working">Verified and working<a class="anchor" aria-label="anchor" href="#verified-and-working"></a></h3>
+<ul><li>The main repository now contains the v0.2 package code. The nested <code>surveyframe_v0.2/</code> folder was treated as source input and is ignored from the package build.</li>
+<li>
+<code><a href="reference/launch_builder.html">launch_builder()</a></code> is present in the root package and points to the bundled HTML SurveyBuilder in <code>inst/builder/survey_builder.html</code>.</li>
+<li>The bundled SurveyBuilder now computes a SHA-256 hash compatible with <code><a href="reference/read_sframe.html">read_sframe()</a></code>. Builder-style <code>.sframe</code> payloads round-trip through the R loader.</li>
+<li>
+<code><a href="reference/sf_item.html">sf_item()</a></code> supports the v0.2 item set: <code>matrix</code>, <code>slider</code>, <code>ranking</code>, <code>rating</code>, <code>section_break</code>, and <code>text_block</code>.</li>
+<li>
+<code><a href="reference/sf_instrument.html">sf_instrument()</a></code> and <code>.sframe</code> serialization now preserve <code>analysis_plan</code>.</li>
+<li>
+<code><a href="reference/render_survey.html">render_survey()</a></code> has been upgraded to the richer v0.2 renderer with welcome and thank-you flows, conversational mode, ranking, rating, matrix inputs, CSV persistence, and required-field enforcement.</li>
+<li>
+<code><a href="reference/render_report.html">render_report()</a></code> accepts <code>output_path</code>, includes analysis-plan sections, and uses the stable Quarto rendering path already fixed on <code>main</code>.</li>
+<li>The Quarto template now tolerates small datasets that cannot support reliability estimation.</li>
+<li>
+<code><a href="reference/run_analysis_plan.html">run_analysis_plan()</a></code>, <code><a href="reference/render_results.html">render_results()</a></code>, <code><a href="reference/export_google_sheet.html">export_google_sheet()</a></code>, and <code><a href="reference/read_sheet_responses.html">read_sheet_responses()</a></code> are integrated into the root package.</li>
 </ul></div>
 <div class="section level3">
-<h3 id="what-is-stable-enough-to-describe-as-delivered">What is stable enough to describe as delivered<a class="anchor" aria-label="anchor" href="#what-is-stable-enough-to-describe-as-delivered"></a></h3>
-<ul><li>The package has a coherent end-to-end object model.</li>
-<li>The core v0.1 workflow is visible across code, tests, README, vignette, and pkgdown configuration.</li>
-<li>The Quarto reporting path is covered by tests and verified in local and CI package checks.</li>
-<li>The scope is still disciplined. The repository stays focused on instrument definition and workflow.</li>
+<h3 id="verification-results">Verification results<a class="anchor" aria-label="anchor" href="#verification-results"></a></h3>
+<ul><li>Local automated test suite: <code>235</code> passing, <code>0</code> failures, <code>0</code> warnings</li>
+<li>Full local <code>devtools::check()</code>: <code>0 errors</code>, <code>0 warnings</code>, <code>0 notes</code>
+</li>
+<li>Explicit roundtrip verified:
+<ul><li>builder-style <code>.sframe</code> payload</li>
+<li><code><a href="reference/read_sframe.html">read_sframe()</a></code></li>
+<li><code><a href="reference/render_survey.html">render_survey()</a></code></li>
+<li><code><a href="reference/render_report.html">render_report()</a></code></li>
+</ul></li>
 </ul></div>
 <div class="section level3">
-<h3 id="phase-1-closeout">Phase 1 closeout<a class="anchor" aria-label="anchor" href="#phase-1-closeout"></a></h3>
-<ul><li>Phase 1 development is complete in the repository.</li>
-<li>The release surface is stable enough for a serious CRAN submission pass.</li>
-<li>The next active work belongs to Phase 2: adoption, publication, and documentation polish.</li>
+<h3 id="gaps-that-still-define-the-remaining-v02-work">Gaps that still define the remaining v0.2 work<a class="anchor" aria-label="anchor" href="#gaps-that-still-define-the-remaining-v02-work"></a></h3>
+<ul><li>The SurveyBuilder preview is a browser-side approximation. It does not reuse the Shiny renderer directly.</li>
+<li>SurveyStudio and SurveyBuilder remain separate UIs with overlapping purpose.</li>
+<li>The builder stores Google Sheets metadata, but <code><a href="reference/render_survey.html">render_survey()</a></code> does not post responses to a Google Apps Script endpoint.</li>
+<li>The package still lacks browser-level automated tests for the HTML builder and the rendered survey UX.</li>
+<li>Static HTML survey deployment is still absent.</li>
 </ul></div>
 </div>
 <div class="section level2">
 <h2 id="development-roadmap">Development Roadmap<a class="anchor" aria-label="anchor" href="#development-roadmap"></a></h2>
 <div class="section level3">
-<h3 id="phase-1-finish-and-stabilize-v01">Phase 1: Finish and stabilize v0.1<a class="anchor" aria-label="anchor" href="#phase-1-finish-and-stabilize-v01"></a></h3>
+<h3 id="phase-2a-stabilize-the-integrated-v02-baseline">Phase 2A: Stabilize the integrated v0.2 baseline<a class="anchor" aria-label="anchor" href="#phase-2a-stabilize-the-integrated-v02-baseline"></a></h3>
 <p>Priority: immediate.</p>
-<ul><li>Keep the package identity tight around the instrument object and the end-to-end survey workflow.</li>
-<li>Close the remaining implementation gaps between the documented API and the current code, especially:
-<ul><li>response capture and persistence in the Shiny collection layer</li>
-<li>required-field enforcement and richer item rendering behavior</li>
-<li>timing checks in <code><a href="reference/quality_report.html">quality_report()</a></code>
-</li>
-<li>weighted scoring support or explicit removal of the unused argument</li>
-</ul></li>
-<li>Expand tests across shared workflow behavior and cross-function interactions.</li>
-<li>Run full package checks regularly and keep GitHub Actions green across supported platforms.</li>
-<li>Treat CRAN readiness, documentation quality, and reproducibility as release requirements.</li>
+<ul><li>Keep the root package green after the v0.2 merge.</li>
+<li>Add regression tests for builder-generated <code>.sframe</code> files and new item types.</li>
+<li>Review any remaining edge cases in report rendering, especially with sparse or malformed response data.</li>
+<li>Keep the package metadata, docs, and exports aligned with the integrated codebase.</li>
 </ul></div>
 <div class="section level3">
-<h3 id="phase-2-package-adoption-and-publication">Phase 2: Package adoption and publication<a class="anchor" aria-label="anchor" href="#phase-2-package-adoption-and-publication"></a></h3>
-<p>Priority: before major scope expansion.</p>
-<ul><li>Make the vignette and pkgdown site clear enough that a researcher can start a new study from the instrument object with a clear workflow.</li>
-<li>Write the Journal of Statistical Software paper alongside release work, with the instrument object and reproducibility model as the central contribution.</li>
-<li>Frame the package as a methods contribution with a software implementation.</li>
-<li>Build citation traction around four likely methods-section touchpoints: survey deployment, data-quality checking, reliability analysis, and codebook generation.</li>
+<h3 id="phase-2b-complete-builder-and-generator-parity">Phase 2B: Complete builder and generator parity<a class="anchor" aria-label="anchor" href="#phase-2b-complete-builder-and-generator-parity"></a></h3>
+<p>Priority: next.</p>
+<ul><li>Decide whether the SurveyBuilder preview should become a thin wrapper around the Shiny renderer or whether a separate browser renderer will be maintained deliberately.</li>
+<li>Make the builder preview and <code><a href="reference/render_survey.html">render_survey()</a></code> agree on required behavior, branching, paging, ranking, rating, matrix handling, and welcome/thank-you flows.</li>
+<li>Add browser-level UI tests for the SurveyBuilder and at least one end-to-end survey completion path.</li>
+<li>Review the UI density of the builder and simplify high-friction panels where needed.</li>
 </ul></div>
 <div class="section level3">
-<h3 id="phase-3-extend-the-collection-layer-inside-surveyframe">Phase 3: Extend the collection layer inside <code>surveyframe</code>
-<a class="anchor" aria-label="anchor" href="#phase-3-extend-the-collection-layer-inside-surveyframe"></a></h3>
-<p>Priority: after v0.1 is stable and published.</p>
-<p>These additions belong in the core package because they are collection formats that deepen the instrument model while keeping <code>surveyframe</code> within its workflow-focused scope.</p>
-<ul><li>Pairwise comparison matrix items</li>
-<li>Ranking items</li>
-<li>Semantic differential items</li>
-<li>Budget allocation items</li>
-<li>Constant-sum or MaxDiff-style items</li>
-</ul><p>The goal in this phase is to make <code>surveyframe</code> a stronger survey-native collection layer while preserving the package’s identity as a workflow system.</p>
-</div>
+<h3 id="phase-2c-complete-the-collection-integrations">Phase 2C: Complete the collection integrations<a class="anchor" aria-label="anchor" href="#phase-2c-complete-the-collection-integrations"></a></h3>
+<p>Priority: after parity work starts.</p>
+<ul><li>Decide the Google Sheets collection contract clearly: external collector helper only, or direct submission from the survey generator.</li>
+<li>If direct submission stays in scope, wire <code><a href="reference/render_survey.html">render_survey()</a></code> or a static deployment target to the Apps Script endpoint stored in render metadata.</li>
+<li>Add validation and tests for the Google Sheets submission path.</li>
+<li>Define the static HTML deployment path if it remains part of the v0.2 goal.</li>
+</ul></div>
 <div class="section level3">
-<h3 id="phase-4-companion-package-for-decision-science-workflows">Phase 4: Companion package for decision-science workflows<a class="anchor" aria-label="anchor" href="#phase-4-companion-package-for-decision-science-workflows"></a></h3>
-<p>Priority: separate from the core package.</p>
-<p>Analytical methods that are tightly coupled to specialised elicitation formats should live in a companion package such as <code>sfMCDM</code>. The core <code>surveyframe</code> package should remain separate from that layer.</p>
-<p>Candidate workflows for the companion package:</p>
-<ul><li>AHP consistency checks, weights, and aggregation</li>
-<li>DEMATEL pipelines</li>
-<li>TOPSIS and VIKOR workflows</li>
-<li>Best-Worst Method support</li>
-<li>Fuzzy extensions where the methodological variant is explicit</li>
-</ul><p>This separation protects the core package from scope creep, keeps the JSS paper focused, and creates room for a second citable output.</p>
-</div>
+<h3 id="phase-2d-unify-the-user-facing-workflow">Phase 2D: Unify the user-facing workflow<a class="anchor" aria-label="anchor" href="#phase-2d-unify-the-user-facing-workflow"></a></h3>
+<p>Priority: before calling v0.2 complete.</p>
+<ul><li>Decide the long-term relationship between SurveyStudio and SurveyBuilder.</li>
+<li>Either integrate the HTML builder into SurveyStudio or narrow the purpose of SurveyStudio so the package has one clear authoring story.</li>
+<li>Update the package docs so a first-time user understands when to use: <code><a href="reference/launch_builder.html">launch_builder()</a></code>, <code><a href="reference/launch_studio.html">launch_studio()</a></code>, and <code><a href="reference/render_survey.html">render_survey()</a></code>.</li>
+</ul></div>
 <div class="section level3">
-<h3 id="phase-5-later-extensions">Phase 5: Later extensions<a class="anchor" aria-label="anchor" href="#phase-5-later-extensions"></a></h3>
-<p>Priority: only after the core and companion layers are stable.</p>
-<ul><li>Static HTML deployment</li>
-<li>Quarto inline embedding</li>
-<li>External platform import/export</li>
-<li>Multilingual workflows</li>
-<li>Multi-condition branching trees</li>
-<li>AI-assisted survey authoring</li>
-</ul><p>These are meaningful directions. They should follow package stability, documentation, release discipline, and a clear separation between collection workflows and specialised analytical engines.</p>
-</div>
+<h3 id="phase-2e-documentation-and-release-finish">Phase 2E: Documentation and release finish<a class="anchor" aria-label="anchor" href="#phase-2e-documentation-and-release-finish"></a></h3>
+<p>Priority: before tagging a v0.2 release.</p>
+<ul><li>Rewrite the README and vignette around the v0.2 workflow.</li>
+<li>Update pkgdown navigation to surface the builder, analysis-plan functions, and Google Sheets helpers clearly.</li>
+<li>Add a v0.2 release checklist and release notes.</li>
+<li>Re-run full local checks and GitHub Actions on the final release candidate.</li>
+</ul></div>
 </div>
 <div class="section level2">
 <h2 id="guardrails">Guardrails<a class="anchor" aria-label="anchor" href="#guardrails"></a></h2>
-<ul><li>The <code>sframe</code> object remains the package’s single source of truth.</li>
-<li>The core package stays focused on survey workflow. General statistics and decision-science features remain outside the core package.</li>
-<li>New features must strengthen the instrument-centered workflow or stay out of the core package.</li>
-<li>Shipping a reliable, citable v0.1 matters more than chasing breadth.</li>
+<ul><li>The <code>sframe</code> object remains the single source of truth.</li>
+<li>The package stays focused on survey workflow rather than becoming a general statistics environment.</li>
+<li>UI additions must strengthen the instrument-centered workflow.</li>
+<li>Any feature that cannot be exercised and verified end to end should be described narrowly and documented as incomplete until it is finished.</li>
 </ul></div>
 </div>
 

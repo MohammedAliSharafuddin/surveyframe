@@ -3,13 +3,18 @@
 surveyframe defines a survey instrument as a first-class R object and
 provides a complete workflow from instrument design through data
 collection, quality checking, scoring, psychometric diagnostics, and
-reproducible reporting. The SurveyStudio interface, launched with
+reproducible reporting. Version 0.2 adds the browser-based
+SurveyBuilder, launched with
+[`launch_builder()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/launch_builder.md),
+while SurveyStudio, launched with
 [`launch_studio()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/launch_studio.md),
-provides a visual shell for the full pipeline.
+remains the Shiny workflow shell.
 
 ### Core workflow
 
-1.  **Define** an instrument with
+1.  **Design** an instrument with
+    [`launch_builder()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/launch_builder.md)
+    or
     [`sf_instrument()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_instrument.md)
     and its component constructors:
     [`sf_item()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_item.md),
@@ -27,7 +32,9 @@ provides a visual shell for the full pipeline.
     [`render_survey()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_survey.md).
 
 4.  **Load responses** with
-    [`read_responses()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_responses.md).
+    [`read_responses()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_responses.md)
+    or
+    [`read_sheet_responses()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_sheet_responses.md).
 
 5.  **Check quality** with
     [`quality_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/quality_report.md).
@@ -37,13 +44,15 @@ provides a visual shell for the full pipeline.
     [`reliability_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/reliability_report.md),
     [`item_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/item_report.md),
     [`efa_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/efa_report.md),
+    [`cfa_syntax()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/cfa_syntax.md),
     and
-    [`cfa_syntax()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/cfa_syntax.md).
+    [`run_analysis_plan()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/run_analysis_plan.md).
 
 7.  **Report** with
-    [`codebook_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/codebook_report.md)
+    [`codebook_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/codebook_report.md),
+    [`render_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_report.md),
     and
-    [`render_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_report.md).
+    [`render_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_results.md).
 
 ### The instrument object
 
@@ -62,6 +71,8 @@ auditing.
 Useful links:
 
 - <https://github.com/MohammedAliSharafuddin/surveyframe>
+
+- <https://mohammedalisharafuddin.github.io/surveyframe>
 
 - Report bugs at
   <https://github.com/MohammedAliSharafuddin/surveyframe/issues>
