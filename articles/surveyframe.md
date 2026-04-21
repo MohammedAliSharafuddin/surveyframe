@@ -341,14 +341,12 @@ descriptive statistics for every item within each scale.
 ``` r
 ir <- item_report(responses, instr)
 print(ir[[1]]$diagnostics)
-#> # A tibble: 5 × 7
-#>   item_id  mean    sd item_rest_r floor_pct ceiling_pct n_missing
-#>   <chr>   <dbl> <dbl>       <dbl>     <dbl>       <dbl>     <int>
-#> 1 sat_1    3.82  1.20      -0.919    0.0583      0.358          0
-#> 2 sat_2    3.85  1.00      -0.879    0.025       0.283          0
-#> 3 sat_3    2.44  1.21      -0.919    0.233       0.0833         0
-#> 4 sat_4    4.03  1.13      -0.907    0.0333      0.442          0
-#> 5 sat_5    3.82  1.11      -0.902    0.0417      0.317          0
+#>   item_id     mean       sd item_rest_r  floor_pct ceiling_pct n_missing
+#> 1   sat_1 3.816667 1.202122  -0.9185312 0.05833333  0.35833333         0
+#> 2   sat_2 3.850000 1.001260  -0.8787110 0.02500000  0.28333333         0
+#> 3   sat_3 2.441667 1.207789  -0.9185747 0.23333333  0.08333333         0
+#> 4   sat_4 4.025000 1.133615  -0.9068278 0.03333333  0.44166667         0
+#> 5   sat_5 3.816667 1.107525  -0.9021064 0.04166667  0.31666667         0
 ```
 
 ### EFA readiness
@@ -423,17 +421,24 @@ print(cb)
 #>   8 items  |  2 choice sets  |  1 scales
 #> 
 #> Items:
-#> # A tibble: 8 × 5
-#>   id     label                                            type  scale_id reverse
-#>   <chr>  <chr>                                            <chr> <chr>    <lgl>  
-#> 1 sat_1  The service was delivered on time.               like… "sat"    FALSE  
-#> 2 sat_2  Staff were knowledgeable and helpful.            like… "sat"    FALSE  
-#> 3 sat_3  The overall experience did not meet my expectat… like… "sat"    TRUE   
-#> 4 sat_4  I would use this service again.                  like… "sat"    FALSE  
-#> 5 sat_5  I would recommend this service to others.        like… "sat"    FALSE  
-#> 6 age    What is your age?                                nume… ""       FALSE  
-#> 7 gender What is your gender?                             sing… ""       FALSE  
-#> 8 attn_1 To confirm you are reading carefully, please se… like… ""       FALSE
+#>       id                                                      label
+#> 1  sat_1                         The service was delivered on time.
+#> 2  sat_2                      Staff were knowledgeable and helpful.
+#> 3  sat_3       The overall experience did not meet my expectations.
+#> 4  sat_4                            I would use this service again.
+#> 5  sat_5                  I would recommend this service to others.
+#> 6    age                                          What is your age?
+#> 7 gender                                       What is your gender?
+#> 8 attn_1 To confirm you are reading carefully, please select Agree.
+#>            type scale_id reverse
+#> 1        likert      sat   FALSE
+#> 2        likert      sat   FALSE
+#> 3        likert      sat    TRUE
+#> 4        likert      sat   FALSE
+#> 5        likert      sat   FALSE
+#> 6       numeric            FALSE
+#> 7 single_choice            FALSE
+#> 8        likert            FALSE
 ```
 
 ``` r

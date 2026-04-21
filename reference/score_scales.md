@@ -33,8 +33,8 @@ score_scales(data, instrument, keep_items = TRUE, keep_meta = TRUE)
 
 ## Value
 
-A `tibble` with scored scale columns appended. Scale columns are named
-using the scale `id`.
+A `data.frame` with scored scale columns appended. Scale columns are
+named using the scale `id`.
 
 ## See also
 

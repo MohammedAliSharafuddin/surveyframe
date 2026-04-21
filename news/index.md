@@ -1,44 +1,76 @@
 # Changelog
 
-## surveyframe (development version)
-
 ## surveyframe 0.2.0
 
-### SurveyBuilder and analysis planning
+### SurveyBuilder
 
-surveyframe 0.2.0 adds the first phase of the v0.2 workflow.
+- Added
+  [`launch_builder()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/launch_builder.md)
+  for browser-based instrument authoring, preview, and analysis-plan
+  setup.
+- Bundled the production SurveyBuilder HTML with autosave, undo/redo,
+  drag-to-reorder, inspector editing, and SHA-256 hashing for `.sframe`
+  exports.
 
-#### New features
+### Extended item types
 
-- [`launch_builder()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/launch_builder.md):
-  open the browser-based SurveyBuilder for instrument authoring,
-  preview, and analysis-plan setup.
-- New
-  [`sf_item()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_item.md)
-  types: `matrix`, `slider`, `ranking`, `rating`, `section_break`, and
-  `text_block`.
-- [`run_analysis_plan()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/run_analysis_plan.md)
-  and
-  [`render_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_results.md):
-  execute and report research-question-driven analyses stored on the
-  instrument.
-- [`export_google_sheet()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/export_google_sheet.md)
-  and
-  [`read_sheet_responses()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_sheet_responses.md):
-  generate a Google Sheets Apps Script collector and read responses back
-  into the package.
+- Added `matrix`, `slider`, `ranking`, `rating`, `section_break`, and
+  `text_block` item types to
+  [`sf_item()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_item.md).
+- Preserved v0.2 item fields through `.sframe` write and read
+  roundtrips.
+
+### Shiny renderer
+
+- Extended
+  [`render_survey()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_survey.md)
+  to support the richer v0.2 item set.
+- Added welcome and thank-you flows, conversational mode, ranking and
+  rating widgets, and CSV persistence hooks.
+
+### Analysis plan execution
+
+- Added
+  [`run_analysis_plan()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/run_analysis_plan.md)
+  to execute research-question-driven analyses stored on the instrument.
+- Added
+  [`render_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_results.md)
+  to generate HTML summaries of analysis-plan output.
+- Preserved `analysis_plan` in the instrument object and `.sframe`
+  serialisation.
+
+### Unified reporting
+
 - [`render_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_report.md)
-  now accepts `output_path` and can include analysis-plan results in the
-  Quarto report.
+  now accepts `output_path`, includes analysis-plan content, and falls
+  back to an internal HTML renderer when Quarto is unavailable.
+- Report rendering now handles sparse-data reliability failures more
+  cleanly.
 
-#### Integration
+### Google Sheets
 
-- `.sframe` serialization now preserves `analysis_plan`.
-- [`render_survey()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_survey.md)
-  now supports the richer v0.2 item set, welcome and thank-you flows,
-  conversational mode, ranking and rating widgets, and CSV persistence.
-- The bundled SurveyBuilder now writes a SHA-256 hash compatible with
-  [`read_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_sframe.md).
+- Added
+  [`export_google_sheet()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/export_google_sheet.md)
+  to generate an Apps Script collector.
+- Added
+  [`read_sheet_responses()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_sheet_responses.md)
+  to load collected responses back into surveyframe.
+
+### Documentation
+
+- Added and updated vignettes for the end-to-end workflow and studio
+  usage.
+- Refreshed README and pkgdown configuration for the v0.2 feature set.
+
+### Tests
+
+- Expanded automated coverage for SurveyBuilder, v0.2 item types,
+  analysis-plan execution, `.sframe` roundtrips, reporting, and Google
+  Sheets helpers.
+
+### Breaking changes
+
+- None.
 
 ## surveyframe 0.1.0
 

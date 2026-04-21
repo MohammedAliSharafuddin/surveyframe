@@ -27,7 +27,8 @@ launch_studio(instrument = NULL, responses = NULL)
 
 ## Value
 
-Launches a Shiny application. Does not return a value.
+Launches a Shiny application and blocks the current R session until the
+app exits. Does not return a value.
 
 ## Details
 

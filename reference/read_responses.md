@@ -53,8 +53,8 @@ read_responses(
 
 ## Value
 
-A `tibble` with columns ordered as: metadata columns first, then item
-columns in instrument order. Unrecognised columns are dropped when
+A `data.frame` with columns ordered as: metadata columns first, then
+item columns in instrument order. Unrecognised columns are dropped when
 `strict = TRUE` or appended with a warning when `strict = FALSE`.
 
 ## See also

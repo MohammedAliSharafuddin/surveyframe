@@ -43,7 +43,7 @@ read_sheet_responses(
 
 ## Value
 
-A `tibble` validated against the instrument, ready for
+A `data.frame` validated against the instrument, ready for
 [`quality_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/quality_report.md),
 [`score_scales()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/score_scales.md),
 and

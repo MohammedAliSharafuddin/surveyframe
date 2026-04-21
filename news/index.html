@@ -32,34 +32,52 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="development version" id="surveyframe-development-version">surveyframe (development version)<a class="anchor" aria-label="anchor" href="#surveyframe-development-version"></a></h2>
-</div>
-    <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.2.0" id="surveyframe-020">surveyframe 0.2.0<a class="anchor" aria-label="anchor" href="#surveyframe-020"></a></h2>
 <div class="section level3">
-<h3 id="surveybuilder-and-analysis-planning-0-2-0">SurveyBuilder and analysis planning<a class="anchor" aria-label="anchor" href="#surveybuilder-and-analysis-planning-0-2-0"></a></h3>
-<p>surveyframe 0.2.0 adds the first phase of the v0.2 workflow.</p>
-<div class="section level4">
-<h4 id="new-features-0-2-0">New features<a class="anchor" aria-label="anchor" href="#new-features-0-2-0"></a></h4>
-<ul><li>
-<code><a href="../reference/launch_builder.html">launch_builder()</a></code>: open the browser-based SurveyBuilder for instrument authoring, preview, and analysis-plan setup.</li>
-<li>New <code><a href="../reference/sf_item.html">sf_item()</a></code> types: <code>matrix</code>, <code>slider</code>, <code>ranking</code>, <code>rating</code>, <code>section_break</code>, and <code>text_block</code>.</li>
-<li>
-<code><a href="../reference/run_analysis_plan.html">run_analysis_plan()</a></code> and <code><a href="../reference/render_results.html">render_results()</a></code>: execute and report research-question-driven analyses stored on the instrument.</li>
-<li>
-<code><a href="../reference/export_google_sheet.html">export_google_sheet()</a></code> and <code><a href="../reference/read_sheet_responses.html">read_sheet_responses()</a></code>: generate a Google Sheets Apps Script collector and read responses back into the package.</li>
-<li>
-<code><a href="../reference/render_report.html">render_report()</a></code> now accepts <code>output_path</code> and can include analysis-plan results in the Quarto report.</li>
+<h3 id="surveybuilder-0-2-0">SurveyBuilder<a class="anchor" aria-label="anchor" href="#surveybuilder-0-2-0"></a></h3>
+<ul><li>Added <code><a href="../reference/launch_builder.html">launch_builder()</a></code> for browser-based instrument authoring, preview, and analysis-plan setup.</li>
+<li>Bundled the production SurveyBuilder HTML with autosave, undo/redo, drag-to-reorder, inspector editing, and SHA-256 hashing for <code>.sframe</code> exports.</li>
 </ul></div>
-<div class="section level4">
-<h4 id="integration-0-2-0">Integration<a class="anchor" aria-label="anchor" href="#integration-0-2-0"></a></h4>
-<ul><li>
-<code>.sframe</code> serialization now preserves <code>analysis_plan</code>.</li>
-<li>
-<code><a href="../reference/render_survey.html">render_survey()</a></code> now supports the richer v0.2 item set, welcome and thank-you flows, conversational mode, ranking and rating widgets, and CSV persistence.</li>
-<li>The bundled SurveyBuilder now writes a SHA-256 hash compatible with <code><a href="../reference/read_sframe.html">read_sframe()</a></code>.</li>
+<div class="section level3">
+<h3 id="extended-item-types-0-2-0">Extended item types<a class="anchor" aria-label="anchor" href="#extended-item-types-0-2-0"></a></h3>
+<ul><li>Added <code>matrix</code>, <code>slider</code>, <code>ranking</code>, <code>rating</code>, <code>section_break</code>, and <code>text_block</code> item types to <code><a href="../reference/sf_item.html">sf_item()</a></code>.</li>
+<li>Preserved v0.2 item fields through <code>.sframe</code> write and read roundtrips.</li>
 </ul></div>
-</div>
+<div class="section level3">
+<h3 id="shiny-renderer-0-2-0">Shiny renderer<a class="anchor" aria-label="anchor" href="#shiny-renderer-0-2-0"></a></h3>
+<ul><li>Extended <code><a href="../reference/render_survey.html">render_survey()</a></code> to support the richer v0.2 item set.</li>
+<li>Added welcome and thank-you flows, conversational mode, ranking and rating widgets, and CSV persistence hooks.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="analysis-plan-execution-0-2-0">Analysis plan execution<a class="anchor" aria-label="anchor" href="#analysis-plan-execution-0-2-0"></a></h3>
+<ul><li>Added <code><a href="../reference/run_analysis_plan.html">run_analysis_plan()</a></code> to execute research-question-driven analyses stored on the instrument.</li>
+<li>Added <code><a href="../reference/render_results.html">render_results()</a></code> to generate HTML summaries of analysis-plan output.</li>
+<li>Preserved <code>analysis_plan</code> in the instrument object and <code>.sframe</code> serialisation.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="unified-reporting-0-2-0">Unified reporting<a class="anchor" aria-label="anchor" href="#unified-reporting-0-2-0"></a></h3>
+<ul><li>
+<code><a href="../reference/render_report.html">render_report()</a></code> now accepts <code>output_path</code>, includes analysis-plan content, and falls back to an internal HTML renderer when Quarto is unavailable.</li>
+<li>Report rendering now handles sparse-data reliability failures more cleanly.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="google-sheets-0-2-0">Google Sheets<a class="anchor" aria-label="anchor" href="#google-sheets-0-2-0"></a></h3>
+<ul><li>Added <code><a href="../reference/export_google_sheet.html">export_google_sheet()</a></code> to generate an Apps Script collector.</li>
+<li>Added <code><a href="../reference/read_sheet_responses.html">read_sheet_responses()</a></code> to load collected responses back into surveyframe.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="documentation-0-2-0">Documentation<a class="anchor" aria-label="anchor" href="#documentation-0-2-0"></a></h3>
+<ul><li>Added and updated vignettes for the end-to-end workflow and studio usage.</li>
+<li>Refreshed README and pkgdown configuration for the v0.2 feature set.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="tests-0-2-0">Tests<a class="anchor" aria-label="anchor" href="#tests-0-2-0"></a></h3>
+<ul><li>Expanded automated coverage for SurveyBuilder, v0.2 item types, analysis-plan execution, <code>.sframe</code> roundtrips, reporting, and Google Sheets helpers.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="breaking-changes-0-2-0">Breaking changes<a class="anchor" aria-label="anchor" href="#breaking-changes-0-2-0"></a></h3>
+<ul><li>None.</li>
+</ul></div>
 </div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.1.0" id="surveyframe-010">surveyframe 0.1.0<a class="anchor" aria-label="anchor" href="#surveyframe-010"></a></h2>

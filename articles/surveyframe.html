@@ -371,14 +371,12 @@ within each scale.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ir</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/item_report.html">item_report</a></span><span class="op">(</span><span class="va">responses</span>, <span class="va">instr</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">ir</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">diagnostics</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 5 × 7</span></span></span>
-<span><span class="co">#&gt;   item_id  mean    sd item_rest_r floor_pct ceiling_pct n_missing</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> sat_1    3.82  1.20      -<span style="color: #BB0000;">0.919</span>    0.058<span style="text-decoration: underline;">3</span>      0.358          0</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> sat_2    3.85  1.00      -<span style="color: #BB0000;">0.879</span>    0.025       0.283          0</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> sat_3    2.44  1.21      -<span style="color: #BB0000;">0.919</span>    0.233       0.083<span style="text-decoration: underline;">3</span>         0</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> sat_4    4.03  1.13      -<span style="color: #BB0000;">0.907</span>    0.033<span style="text-decoration: underline;">3</span>      0.442          0</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> sat_5    3.82  1.11      -<span style="color: #BB0000;">0.902</span>    0.041<span style="text-decoration: underline;">7</span>      0.317          0</span></span></code></pre></div>
+<span><span class="co">#&gt;   item_id     mean       sd item_rest_r  floor_pct ceiling_pct n_missing</span></span>
+<span><span class="co">#&gt; 1   sat_1 3.816667 1.202122  -0.9185312 0.05833333  0.35833333         0</span></span>
+<span><span class="co">#&gt; 2   sat_2 3.850000 1.001260  -0.8787110 0.02500000  0.28333333         0</span></span>
+<span><span class="co">#&gt; 3   sat_3 2.441667 1.207789  -0.9185747 0.23333333  0.08333333         0</span></span>
+<span><span class="co">#&gt; 4   sat_4 4.025000 1.133615  -0.9068278 0.03333333  0.44166667         0</span></span>
+<span><span class="co">#&gt; 5   sat_5 3.816667 1.107525  -0.9021064 0.04166667  0.31666667         0</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="efa-readiness">EFA readiness<a class="anchor" aria-label="anchor" href="#efa-readiness"></a>
@@ -444,17 +442,24 @@ everything into a single reproducible HTML file.</p>
 <span><span class="co">#&gt;   8 items  |  2 choice sets  |  1 scales</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Items:</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 8 × 5</span></span></span>
-<span><span class="co">#&gt;   id     label                                            type  scale_id reverse</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                                            <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> sat_1  The service was delivered on time.               like… <span style="color: #949494;">"</span>sat<span style="color: #949494;">"</span>    FALSE  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> sat_2  Staff were knowledgeable and helpful.            like… <span style="color: #949494;">"</span>sat<span style="color: #949494;">"</span>    FALSE  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> sat_3  The overall experience did not meet my expectat… like… <span style="color: #949494;">"</span>sat<span style="color: #949494;">"</span>    TRUE   </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> sat_4  I would use this service again.                  like… <span style="color: #949494;">"</span>sat<span style="color: #949494;">"</span>    FALSE  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> sat_5  I would recommend this service to others.        like… <span style="color: #949494;">"</span>sat<span style="color: #949494;">"</span>    FALSE  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> age    What is your age?                                nume… <span style="color: #949494;">""</span>       FALSE  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">7</span> gender What is your gender?                             sing… <span style="color: #949494;">""</span>       FALSE  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">8</span> attn_1 To confirm you are reading carefully, please se… like… <span style="color: #949494;">""</span>       FALSE</span></span></code></pre></div>
+<span><span class="co">#&gt;       id                                                      label</span></span>
+<span><span class="co">#&gt; 1  sat_1                         The service was delivered on time.</span></span>
+<span><span class="co">#&gt; 2  sat_2                      Staff were knowledgeable and helpful.</span></span>
+<span><span class="co">#&gt; 3  sat_3       The overall experience did not meet my expectations.</span></span>
+<span><span class="co">#&gt; 4  sat_4                            I would use this service again.</span></span>
+<span><span class="co">#&gt; 5  sat_5                  I would recommend this service to others.</span></span>
+<span><span class="co">#&gt; 6    age                                          What is your age?</span></span>
+<span><span class="co">#&gt; 7 gender                                       What is your gender?</span></span>
+<span><span class="co">#&gt; 8 attn_1 To confirm you are reading carefully, please select Agree.</span></span>
+<span><span class="co">#&gt;            type scale_id reverse</span></span>
+<span><span class="co">#&gt; 1        likert      sat   FALSE</span></span>
+<span><span class="co">#&gt; 2        likert      sat   FALSE</span></span>
+<span><span class="co">#&gt; 3        likert      sat    TRUE</span></span>
+<span><span class="co">#&gt; 4        likert      sat   FALSE</span></span>
+<span><span class="co">#&gt; 5        likert      sat   FALSE</span></span>
+<span><span class="co">#&gt; 6       numeric            FALSE</span></span>
+<span><span class="co">#&gt; 7 single_choice            FALSE</span></span>
+<span><span class="co">#&gt; 8        likert            FALSE</span></span></code></pre></div>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Requires the quarto package</span></span>
 <span><span class="fu"><a href="../reference/render_report.html">render_report</a></span><span class="op">(</span></span>

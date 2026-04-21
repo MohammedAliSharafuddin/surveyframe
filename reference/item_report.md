@@ -26,7 +26,7 @@ item_report(data, instrument, scales = NULL)
 
 ## Value
 
-An object of class `sframe_item_report`, a list with one tibble per
+An object of class `sframe_item_report`, a list with one data.frame per
 scale.
 
 ## See also

@@ -1,9 +1,11 @@
 # Render a reproducible survey report
 
-Generates a self-contained Quarto HTML report that includes the
-instrument codebook, data quality summary, and reliability diagnostics.
-All outputs are derived from the instrument object and the response data
-supplied, making the report fully reproducible from those two inputs.
+Generates an HTML report that includes the instrument codebook, data
+quality summary, reliability diagnostics, and analysis-plan content.
+When Quarto and the bundled template are available, the report is
+rendered through Quarto. Otherwise, surveyframe writes an internal HTML
+fallback so the reporting workflow still runs on machines without
+Quarto.
 
 ## Usage
 
@@ -69,11 +71,6 @@ render_report(
 ## Value
 
 The output file path, invisibly.
-
-## Details
-
-Requires the `quarto` package. An error is raised if it is not
-installed.
 
 ## See also
 
