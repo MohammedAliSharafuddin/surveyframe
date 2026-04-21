@@ -35,6 +35,9 @@ reliability_report <- function(
 ) {
   stopifnot(inherits(instrument, "sframe"))
   stopifnot(is.data.frame(data))
+  if (isTRUE(alpha) || isTRUE(omega)) {
+    sframe_require_psych("to compute reliability statistics")
+  }
 
   target_scales <- instrument$scales
   if (!is.null(scales)) {
@@ -118,7 +121,7 @@ print.sframe_reliability_report <- function(x, ...) {
 #' @param scales Character vector or NULL. A subset of scale IDs to analyse.
 #'   When NULL (default), all scales are included.
 #'
-#' @return An object of class `sframe_item_report`, a list with one tibble
+#' @return An object of class `sframe_item_report`, a list with one data.frame
 #'   per scale.
 #' @export
 #' @seealso [reliability_report()], [sf_scale()]
@@ -164,7 +167,7 @@ item_report <- function(data, instrument, scales = NULL) {
     list(
       scale_id    = scale$id,
       label       = scale$label,
-      diagnostics = tibble::as_tibble(do.call(rbind, lapply(diagnostics, as.data.frame)))
+      diagnostics = sframe_as_data_frame(do.call(rbind, lapply(diagnostics, as.data.frame)))
     )
   })
 
@@ -221,6 +224,7 @@ efa_report <- function(
 ) {
   stopifnot(inherits(instrument, "sframe"))
   stopifnot(is.data.frame(data))
+  sframe_require_psych("to prepare exploratory factor analysis diagnostics")
 
   target_scales <- instrument$scales
   if (!is.null(scales)) {

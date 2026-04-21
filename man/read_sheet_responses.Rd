@@ -27,7 +27,7 @@ Defaults to \code{"respondent_id"}.}
 timestamps. Defaults to \code{"submitted_at"}.}
 }
 \value{
-A \code{tibble} validated against the instrument, ready for
+A \code{data.frame} validated against the instrument, ready for
 \code{\link[=quality_report]{quality_report()}}, \code{\link[=score_scales]{score_scales()}}, and \code{\link[=reliability_report]{reliability_report()}}.
 }
 \description{

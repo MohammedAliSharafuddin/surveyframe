@@ -17,7 +17,8 @@
 #'   When supplied alongside `instrument`, the studio opens with responses
 #'   pre-loaded and the quality dashboard available immediately.
 #'
-#' @return Launches a Shiny application. Does not return a value.
+#' @return Launches a Shiny application and blocks the current R session until
+#'   the app exits. Does not return a value.
 #' @export
 #' @seealso [render_survey()], [read_sframe()], [read_responses()]
 #'
@@ -34,6 +35,7 @@
 #' launch_studio(instrument = instr, responses = "data/responses.csv")
 #' }
 launch_studio <- function(instrument = NULL, responses = NULL) {
+  sframe_require_shiny("to launch SurveyStudio")
   if (!is.null(instrument)) {
     stopifnot(inherits(instrument, "sframe"))
   }

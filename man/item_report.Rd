@@ -15,7 +15,7 @@ item_report(data, instrument, scales = NULL)
 When NULL (default), all scales are included.}
 }
 \value{
-An object of class \code{sframe_item_report}, a list with one tibble
+An object of class \code{sframe_item_report}, a list with one data.frame
 per scale.
 }
 \description{

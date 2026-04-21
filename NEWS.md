@@ -1,32 +1,59 @@
-# surveyframe (development version)
-
 # surveyframe 0.2.0
 
-## SurveyBuilder and analysis planning
+## SurveyBuilder
 
-surveyframe 0.2.0 adds the first phase of the v0.2 workflow.
+* Added `launch_builder()` for browser-based instrument authoring, preview,
+  and analysis-plan setup.
+* Bundled the production SurveyBuilder HTML with autosave, undo/redo,
+  drag-to-reorder, inspector editing, and SHA-256 hashing for `.sframe`
+  exports.
 
-### New features
+## Extended item types
 
-* `launch_builder()`: open the browser-based SurveyBuilder for instrument
-  authoring, preview, and analysis-plan setup.
-* New `sf_item()` types: `matrix`, `slider`, `ranking`, `rating`,
-  `section_break`, and `text_block`.
-* `run_analysis_plan()` and `render_results()`: execute and report
-  research-question-driven analyses stored on the instrument.
-* `export_google_sheet()` and `read_sheet_responses()`: generate a Google
-  Sheets Apps Script collector and read responses back into the package.
-* `render_report()` now accepts `output_path` and can include analysis-plan
-  results in the Quarto report.
+* Added `matrix`, `slider`, `ranking`, `rating`, `section_break`, and
+  `text_block` item types to `sf_item()`.
+* Preserved v0.2 item fields through `.sframe` write and read roundtrips.
 
-### Integration
+## Shiny renderer
 
-* `.sframe` serialization now preserves `analysis_plan`.
-* `render_survey()` now supports the richer v0.2 item set, welcome and
-  thank-you flows, conversational mode, ranking and rating widgets, and
-  CSV persistence.
-* The bundled SurveyBuilder now writes a SHA-256 hash compatible with
-  `read_sframe()`.
+* Extended `render_survey()` to support the richer v0.2 item set.
+* Added welcome and thank-you flows, conversational mode, ranking and rating
+  widgets, and CSV persistence hooks.
+
+## Analysis plan execution
+
+* Added `run_analysis_plan()` to execute research-question-driven analyses
+  stored on the instrument.
+* Added `render_results()` to generate HTML summaries of analysis-plan output.
+* Preserved `analysis_plan` in the instrument object and `.sframe`
+  serialisation.
+
+## Unified reporting
+
+* `render_report()` now accepts `output_path`, includes analysis-plan content,
+  and falls back to an internal HTML renderer when Quarto is unavailable.
+* Report rendering now handles sparse-data reliability failures more cleanly.
+
+## Google Sheets
+
+* Added `export_google_sheet()` to generate an Apps Script collector.
+* Added `read_sheet_responses()` to load collected responses back into
+  surveyframe.
+
+## Documentation
+
+* Added and updated vignettes for the end-to-end workflow and studio usage.
+* Refreshed README and pkgdown configuration for the v0.2 feature set.
+
+## Tests
+
+* Expanded automated coverage for SurveyBuilder, v0.2 item types,
+  analysis-plan execution, `.sframe` roundtrips, reporting, and Google Sheets
+  helpers.
+
+## Breaking changes
+
+* None.
 
 # surveyframe 0.1.0
 

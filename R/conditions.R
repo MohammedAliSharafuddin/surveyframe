@@ -8,6 +8,32 @@
 # The local alias ensures availability when sourcing files directly.
 `%||%` <- function(x, y) if (is.null(x)) y else x
 
+# Minimal HTML escaping for internal report rendering.
+htmltools_escape <- function(x) {
+  if (length(x) == 0 || all(is.na(x))) {
+    return("")
+  }
+
+  x <- paste(as.character(x), collapse = " ")
+  x <- gsub("&", "&amp;", x, fixed = TRUE)
+  x <- gsub("<", "&lt;", x, fixed = TRUE)
+  x <- gsub(">", "&gt;", x, fixed = TRUE)
+  x <- gsub('"', "&quot;", x, fixed = TRUE)
+  x
+}
+
+sframe_as_data_frame <- function(x) {
+  data.frame(x, stringsAsFactors = FALSE, check.names = FALSE)
+}
+
+sframe_require_shiny <- function(reason) {
+  rlang::check_installed("shiny", reason = reason)
+}
+
+sframe_require_psych <- function(reason) {
+  rlang::check_installed("psych", reason = reason)
+}
+
 #' Abort with a validation error
 #'
 #' @param message Character. The error message.

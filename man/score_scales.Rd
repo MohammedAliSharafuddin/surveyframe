@@ -18,7 +18,7 @@ output. Defaults to \code{TRUE}.}
 the output. Defaults to \code{TRUE}.}
 }
 \value{
-A \code{tibble} with scored scale columns appended. Scale columns are
+A \code{data.frame} with scored scale columns appended. Scale columns are
 named using the scale \code{id}.
 }
 \description{

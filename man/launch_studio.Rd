@@ -15,7 +15,8 @@ When supplied alongside \code{instrument}, the studio opens with responses
 pre-loaded and the quality dashboard available immediately.}
 }
 \value{
-Launches a Shiny application. Does not return a value.
+Launches a Shiny application and blocks the current R session until
+the app exits. Does not return a value.
 }
 \description{
 Opens the SurveyStudio Shiny application, a visual shell for the full

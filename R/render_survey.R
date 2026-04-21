@@ -104,7 +104,7 @@ sframe_response_row <- function(instrument, input_values, branch_lookup,
     sframe_serialise_response_value(input_values[[item$id]])
   })
   names(item_values) <- vapply(instrument$items, function(i) i$id, character(1))
-  tibble::as_tibble(as.data.frame(c(
+  sframe_as_data_frame(as.data.frame(c(
     list(
       started_at   = format(as.POSIXct(started_at,   tz = "UTC"), "%Y-%m-%dT%H:%M:%SZ"),
       submitted_at = format(as.POSIXct(submitted_at, tz = "UTC"), "%Y-%m-%dT%H:%M:%SZ")
@@ -129,6 +129,7 @@ sframe_append_response_csv <- function(path, row) {
 # ---------------------------------------------------------------------------
 
 sframe_label_tag <- function(item) {
+  tags <- shiny::tags
   tags$div(
     class = "sf-label-block",
     tags$div(
@@ -142,6 +143,15 @@ sframe_label_tag <- function(item) {
 }
 
 sframe_render_input <- function(item, choices_lookup) {
+  tags <- shiny::tags
+  radioButtons <- shiny::radioButtons
+  checkboxGroupInput <- shiny::checkboxGroupInput
+  numericInput <- shiny::numericInput
+  textInput <- shiny::textInput
+  textAreaInput <- shiny::textAreaInput
+  dateInput <- shiny::dateInput
+  sliderInput <- shiny::sliderInput
+  actionButton <- shiny::actionButton
   cs  <- choices_lookup[[item$choice_set %||% ""]]
   lbl <- sframe_label_tag(item)
 
@@ -286,6 +296,7 @@ sframe_render_input <- function(item, choices_lookup) {
 # ---------------------------------------------------------------------------
 
 sframe_progress_ui <- function(answered, total, colour) {
+  tags <- shiny::tags
   pct <- if (total > 0) round(answered / total * 100) else 0
   tags$div(
     class = "sf-progress",
@@ -335,6 +346,7 @@ render_survey <- function(
     output_path    = NULL,
     on_submit      = NULL
 ) {
+  sframe_require_shiny("to deploy surveys with render_survey()")
   stopifnot(inherits(instrument, "sframe"))
   mode           <- rlang::arg_match(mode)
   save_responses <- rlang::arg_match(save_responses)
@@ -445,6 +457,7 @@ render_survey <- function(
     .sf-thankyou-title{font-size:24px;font-weight:700;margin-bottom:10px}
     .sf-thankyou-msg{color:#555;font-size:15px;line-height:1.6}
   ", colour, colour, colour, colour, colour, colour)
+  tags <- shiny::tags
 
   # -------------------------------------------------------------------------
   # UI

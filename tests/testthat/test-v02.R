@@ -27,14 +27,16 @@ make_instr <- function() {
 
 make_responses <- function(n = 30) {
   set.seed(42)
-  tibble::tibble(
+  data.frame(
     started_at   = rep("2025-01-01T10:00:00Z", n),
     submitted_at = rep("2025-01-01T10:05:00Z", n),
     sat1    = sample(1:5, n, replace = TRUE),
     sat2    = sample(1:5, n, replace = TRUE),
     gender  = sample(c("1","2","3"), n, replace = TRUE),
     age     = as.numeric(sample(18:65, n, replace = TRUE)),
-    comments = rep(NA_character_, n)
+    comments = rep(NA_character_, n),
+    stringsAsFactors = FALSE,
+    check.names = FALSE
   )
 }
 
@@ -212,14 +214,16 @@ test_that("mann_whitney test returns statistic and apa string", {
   instr <- add_rq(make_instr(), "r1", "Q", c("gender2","sat1"),
                   "mann_whitney")
   set.seed(7)
-  dat <- tibble::tibble(
+  dat <- data.frame(
     started_at = "2025-01-01T10:00:00Z", submitted_at = "2025-01-01T10:05:00Z",
     sat1 = sample(1:5, 30, replace = TRUE),
     sat2 = sample(1:5, 30, replace = TRUE),
     gender  = sample(c("1","2","3"), 30, replace = TRUE),
     gender2 = sample(c("male","female"), 30, replace = TRUE),
     age     = as.numeric(sample(18:65, 30, replace = TRUE)),
-    comments = rep(NA_character_, 30)
+    comments = rep(NA_character_, 30),
+    stringsAsFactors = FALSE,
+    check.names = FALSE
   )
   # Add gender2 item to instrument temporarily
   instr$items <- c(instr$items,
