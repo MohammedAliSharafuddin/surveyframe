@@ -3,158 +3,166 @@
 <!-- badges: start -->
 [![R-CMD-check](https://github.com/MohammedAliSharafuddin/surveyframe/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/MohammedAliSharafuddin/surveyframe/actions/workflows/R-CMD-check.yaml)
 [![Codecov test coverage](https://codecov.io/gh/MohammedAliSharafuddin/surveyframe/branch/main/graph/badge.svg)](https://app.codecov.io/gh/MohammedAliSharafuddin/surveyframe?branch=main)
-[![CRAN status](https://www.r-pkg.org/badges/version/surveyframe)](https://CRAN.R-project.org/package=surveyframe)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 <!-- badges: end -->
 
-**surveyframe** defines a survey instrument as a first-class R object and
-provides a complete workflow from instrument design through data collection,
-quality checking, scoring, psychometric diagnostics, and reproducible
-reporting. The browser-based **SurveyBuilder**, launched with
-`launch_builder()`, provides visual instrument authoring, and
-**SurveyStudio**, launched with `launch_studio()`, provides the Shiny workflow
-shell.
+**surveyframe** is an end-to-end survey research workflow package for R. The
+package is built around one typed object, the `sframe`, which carries the full
+survey definition from design through validation, deployment, collection,
+quality checks, scoring, psychometric diagnostics, analysis execution, and
+reproducible reporting.
 
-## The problem it solves
+## Scope
 
-R has excellent tools for survey analysis (`psych`, `lavaan`, `semTools`) and
-for survey rendering (`shinysurveys`). What is missing is a package that
-connects instrument design to publishable output in one survey-native
-workflow, where the instrument itself carries its own structure, scoring
-rules, and quality checks through every stage.
+surveyframe is designed to cover the full life of a survey study inside R:
 
-surveyframe closes that gap. One `.sframe` file drives everything.
+- typed instrument definition
+- validation and `.sframe` serialisation with SHA-256 hashing
+- browser-based builder
+- Shiny survey rendering
+- response loading and quality checks
+- scale scoring and psychometric diagnostics
+- pre-planned analysis execution
+- reproducible HTML reporting
+
+The package does not try to replace specialist modelling packages. `psych`,
+`lavaan`, and other downstream tools remain appropriate where the workflow
+needs them. surveyframe owns the instrument-centred pipeline.
+
+## Current status
+
+The current v0.2 line includes:
+
+- thirteen item types
+- reusable choice sets
+- composite scales with reverse coding and weighted scoring
+- single-condition branching and attention checks
+- Google Sheets helper utilities
+- SurveyBuilder and SurveyStudio
+- Cronbach alpha, McDonald omega, item diagnostics, EFA readiness, and CFA
+  syntax generation
+- analysis-plan execution across eight tests with APA-style output
+- HTML reporting with instrument hashing for reproducibility
+
+The immediate focus is CRAN hardening rather than adding more surface area.
+
+## Dependency model
+
+The package now keeps hard imports deliberately small:
+
+- `jsonlite`
+- `rlang`
+- `openssl`
+
+Optional feature packages are loaded only when needed:
+
+- `shiny` for `render_survey()` and `launch_studio()`
+- `psych` for `reliability_report()` and `efa_report()`
+- `googlesheets4` for `read_sheet_responses()`
+
+Quarto is no longer a hard dependency. If the `quarto` R package and the
+Quarto CLI are available locally, `render_report()` can use the bundled `.qmd`
+template. If they are not available, surveyframe writes an internal HTML
+fallback instead.
 
 ## Installation
 
-```r
-# Install from CRAN (once available)
-install.packages("surveyframe")
+The package is not yet on CRAN. Install the development version from GitHub:
 
-# Or install the development version from GitHub
+```r
 remotes::install_github("MohammedAliSharafuddin/surveyframe")
 ```
 
-## A minimal example
+Install optional packages only for the features you plan to use:
+
+```r
+install.packages(c("shiny", "psych", "googlesheets4"))
+
+# Optional for richer report rendering
+install.packages("quarto")
+```
+
+## Minimal workflow
 
 ```r
 library(surveyframe)
 
-# Optional visual entry point
-launch_builder()
+agree5 <- sf_choices(
+  "agree5",
+  values = 1:5,
+  labels = c("Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree")
+)
 
-# 1. Define
-agree5 <- sf_choices("agree5", 1:5,
-  c("Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"))
-
-items <- lapply(1:3, function(i)
-  sf_item(paste0("sat_", i), paste("Satisfaction item", i),
-          type = "likert", choice_set = "agree5", scale_id = "sat"))
+items <- lapply(
+  1:3,
+  function(i) {
+    sf_item(
+      paste0("sat_", i),
+      paste("Satisfaction item", i),
+      type = "likert",
+      choice_set = "agree5",
+      scale_id = "sat"
+    )
+  }
+)
 
 scale <- sf_scale("sat", "Satisfaction", items = paste0("sat_", 1:3))
 
 instr <- sf_instrument(
-  title      = "Customer Satisfaction Survey",
+  title = "Customer Satisfaction Survey",
   components = c(list(agree5), items, list(scale))
 )
 
-# 2. Validate and save
 instr <- validate_sframe(instr)
-write_sframe(instr, "my_survey.sframe")
+write_sframe(instr, "customer_satisfaction.sframe")
 
-# 3. Deploy
-render_survey(
-  instr,
-  save_responses = "csv",
-  output_path = "responses.csv"
-)                                    # Shiny survey with CSV output
-launch_studio(instrument = instr)     # SurveyStudio interface
-
-# 4. Load and check responses
-responses <- read_responses(
-  "responses.csv",
-  instr,
-  submitted_at = "submitted_at",
-  meta_cols = "started_at"
-)
-qr <- quality_report(
-  responses,
-  instr,
-  submitted_at = "submitted_at",
-  started_at = "started_at"
+responses <- data.frame(
+  id = c("r1", "r2", "r3"),
+  sat_1 = c(4, 5, 3),
+  sat_2 = c(5, 4, 3),
+  sat_3 = c(4, 5, 2),
+  stringsAsFactors = FALSE,
+  check.names = FALSE
 )
 
-# 5. Score and measure
-scored <- score_scales(responses, instr)
-rr     <- reliability_report(responses, instr)
-syntax <- cfa_syntax(instr)
-
-# 6. Run planned analyses if present
-results <- run_analysis_plan(responses, instr)
-render_results(results, instr, output_file = "results.html")
-
-# 7. Report
-render_report(instr, data = responses, output_file = "report.html")
+resp <- read_responses(responses, instr, respondent_id = "id", strict = FALSE)
+scored <- score_scales(resp, instr)
+render_report(instr, data = resp, output_file = "report.html")
 ```
 
-## The workflow
+## Optional entry points
 
-| Stage | Functions |
-|---|---|
-| Design | `launch_builder()`, `sf_instrument()`, `sf_item()`, `sf_choices()`, `sf_scale()`, `sf_branch()`, `sf_check()` |
-| Validate and save | `validate_sframe()`, `write_sframe()`, `read_sframe()` |
-| Deploy | `render_survey()`, `launch_studio()` |
-| Collect | `read_responses()`, `read_sheet_responses()` |
-| Quality | `quality_report()` |
-| Score | `score_scales()` |
-| Psychometrics | `reliability_report()`, `item_report()`, `efa_report()`, `cfa_syntax()` |
-| Analysis | `run_analysis_plan()`, `render_results()` |
-| Report | `codebook_report()`, `render_report()` |
+| Need | Entry point | Optional package |
+|---|---|---|
+| Visual instrument authoring | `launch_builder()` | none |
+| Interactive survey deployment | `render_survey()` | `shiny` |
+| Studio workflow shell | `launch_studio()` | `shiny` |
+| Reliability and EFA readiness | `reliability_report()`, `efa_report()` | `psych` |
+| Google Sheets response import | `read_sheet_responses()` | `googlesheets4` |
+| Rich Quarto rendering | `render_report()` with local Quarto install | Quarto CLI |
 
-All validation, scoring, quality, psychometric, and reporting functions work
-in regular R scripts. Shiny is only required for survey deployment and the
-SurveyStudio interface.
+## CRAN track
 
-## The .sframe file
+The package is being prepared for first submission. Current priorities are:
 
-Every instrument is saved as a UTF-8 JSON file with a SHA-256 integrity hash.
-The file is human-readable, version-control friendly, and portable across
-machines and R versions. The hash makes every fielded instrument auditable:
-researchers can report the exact instrument hash in their supplementary
-materials as a reproducibility record.
-
-## SurveyStudio
-
-`launch_builder()` opens the HTML SurveyBuilder for visual instrument design.
-`render_survey()` can write submitted responses to CSV, including
-`started_at` and `submitted_at` metadata columns. `launch_studio()` opens the
-SurveyStudio interface, a six-screen Shiny application that wraps the full
-pipeline visually:
-
-1. Open instrument
-2. Preview survey
-3. Upload responses
-4. Quality dashboard
-5. Reliability dashboard
-6. Download report
+- keep the hard dependency set minimal
+- run clean `R CMD check --as-cran` results across platforms
+- replace broad `\\dontrun{}` usage on pure constructor examples with runnable
+  examples
+- finish the CRAN submission notes and reviewer-facing explanation of the
+  bundled builder asset
 
 ## Citation
 
-If you use surveyframe in published research, please cite the package. A
-formal publication is in preparation for the *Journal of Statistical
-Software*.
+If you use surveyframe in published research, cite the package:
 
 ```r
 citation("surveyframe")
 ```
 
+A Journal of Statistical Software paper is planned as the primary methods
+citation.
+
 ## License
 
 MIT. See `LICENSE` for details.
-
-## Author
-
-Mohammed Ali Sharafuddin
-Senior Lecturer, Qasim Ibrahim School of Business, Villa College, Maldives.
-Doctoral candidate, PIMSAT Tamil Nadu.
-[mas@flairmi.com](mailto:mas@flairmi.com)

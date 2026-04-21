@@ -47,13 +47,11 @@ when \code{data} are supplied and the instrument has an \code{analysis_plan}.}
 The output file path, invisibly.
 }
 \description{
-Generates a self-contained Quarto HTML report that includes the instrument
-codebook, data quality summary, and reliability diagnostics. All outputs
-are derived from the instrument object and the response data supplied,
-making the report fully reproducible from those two inputs.
-}
-\details{
-Requires the \code{quarto} package. An error is raised if it is not installed.
+Generates an HTML report that includes the instrument codebook, data
+quality summary, reliability diagnostics, and analysis-plan content.
+When Quarto and the bundled template are available, the report is rendered
+through Quarto. Otherwise, surveyframe writes an internal HTML fallback so
+the reporting workflow still runs on machines without Quarto.
 }
 \examples{
 \dontrun{

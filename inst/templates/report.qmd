@@ -25,7 +25,6 @@ execute:
 ```{r setup}
 library(surveyframe)
 library(knitr)
-library(tibble)
 
 `%||%` <- function(x, y) if (is.null(x)) y else x
 

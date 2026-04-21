@@ -34,7 +34,7 @@ that are not declared as item IDs or metadata columns raise an error.
 When \code{FALSE}, undeclared columns are retained with a warning.}
 }
 \value{
-A \code{tibble} with columns ordered as: metadata columns first, then
+A \code{data.frame} with columns ordered as: metadata columns first, then
 item columns in instrument order. Unrecognised columns are dropped when
 \code{strict = TRUE} or appended with a warning when \code{strict = FALSE}.
 }

@@ -39,18 +39,8 @@
 ## usethis namespace: start
 #' @importFrom jsonlite toJSON fromJSON
 #' @importFrom rlang abort warn arg_match check_installed %||%
-#' @importFrom tibble as_tibble tibble
-#' @importFrom readr read_csv
-#' @importFrom dplyr filter
 #' @importFrom openssl sha256
-#' @importFrom psych alpha omega KMO cortest.bartlett fa.parallel
 #' @importFrom stats setNames cor sd var complete.cases
 #' @importFrom utils capture.output
-#' @importFrom shiny shinyApp fluidPage titlePanel uiOutput renderUI
-#'   observeEvent showNotification showModal modalDialog actionButton
-#'   radioButtons checkboxGroupInput numericInput textInput textAreaInput
-#'   dateInput fileInput downloadButton downloadHandler tagList tags br
-#'   reactive req getShinyOption shinyOptions runApp HTML sliderInput
-#'   updateActionButton reactiveValuesToList isolate
 ## usethis namespace: end
 NULL

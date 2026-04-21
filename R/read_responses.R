@@ -21,7 +21,7 @@
 #'   that are not declared as item IDs or metadata columns raise an error.
 #'   When `FALSE`, undeclared columns are retained with a warning.
 #'
-#' @return A `tibble` with columns ordered as: metadata columns first, then
+#' @return A `data.frame` with columns ordered as: metadata columns first, then
 #'   item columns in instrument order. Unrecognised columns are dropped when
 #'   `strict = TRUE` or appended with a warning when `strict = FALSE`.
 #' @export
@@ -54,9 +54,13 @@ read_responses <- function(
         path = x
       )
     }
-    data <- readr::read_csv(x, show_col_types = FALSE)
+    data <- utils::read.csv(
+      x,
+      stringsAsFactors = FALSE,
+      check.names = FALSE
+    )
   } else if (is.data.frame(x)) {
-    data <- tibble::as_tibble(x)
+    data <- sframe_as_data_frame(x)
   } else {
     rlang::abort(
       "`x` must be a file path, a data.frame, or a tibble.",
@@ -109,5 +113,5 @@ read_responses <- function(
     data_cols
   )
 
-  data[, ordered_cols, drop = FALSE]
+  sframe_as_data_frame(data[, ordered_cols, drop = FALSE])
 }

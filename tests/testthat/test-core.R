@@ -285,7 +285,7 @@ test_that("summary.sframe() prints and returns invisibly", {
 
 test_that("read_responses() accepts a matching data frame", {
   d <- load_resp()
-  expect_s3_class(d$resp, "tbl_df")
+  expect_s3_class(d$resp, "data.frame")
   expect_true("sat_1" %in% colnames(d$resp))
   expect_true("id"    %in% colnames(d$resp))
 })

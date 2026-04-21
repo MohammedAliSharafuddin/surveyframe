@@ -4,7 +4,7 @@ bibentry(
   author   = person("Mohammed Ali", "Sharafuddin",
                     email = "mas@flairmi.com",
                     role  = c("aut", "cre")),
-  year     = "2025",
-  note     = "R package version 0.1.0",
+  year     = "2026",
+  note     = "R package version 0.2.0",
   url      = "https://github.com/MohammedAliSharafuddin/surveyframe"
 )

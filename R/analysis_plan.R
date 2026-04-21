@@ -669,14 +669,3 @@ render_results <- function(
   writeLines(html, dest)
   invisible(dest)
 }
-
-# Simple HTML escaping without htmltools dependency
-htmltools_escape <- function(x) {
-  if (length(x) == 0) return("")
-  x <- as.character(x)
-  x <- gsub("&", "&amp;", x, fixed = TRUE)
-  x <- gsub("<", "&lt;", x, fixed = TRUE)
-  x <- gsub(">", "&gt;", x, fixed = TRUE)
-  x <- gsub('"', "&quot;", x, fixed = TRUE)
-  paste(x, collapse = " ")
-}

@@ -1,94 +1,66 @@
-# surveyframe v0.2 TODO
+# surveyframe TODO
 
-This checklist reflects the repository state verified on April 21, 2026.
+This checklist reflects the current CRAN-hardening and release plan.
+Checkpoint as of 2026-04-21: dependency reduction is complete, optional-package
+guards are in place, documentation was regenerated, and the standard clean
+source build plus `R CMD check` are passing.
 
-## Completed in this pass
+## Phase 0: CRAN hardening
 
-- [x] Move the v0.2 package code into the main repository root
-- [x] Add `launch_builder()` and bundle the HTML SurveyBuilder
-- [x] Preserve `analysis_plan` in `sf_instrument()`, `.sframe` writing, and
-      `.sframe` reading
-- [x] Make the builder-generated SHA-256 hash compatible with `read_sframe()`
-- [x] Upgrade `sf_item()` to the v0.2 item set
-- [x] Upgrade `render_survey()` to the richer v0.2 renderer
-- [x] Add `run_analysis_plan()`, `render_results()`,
-      `export_google_sheet()`, and `read_sheet_responses()`
-- [x] Extend `render_report()` and the Quarto template for analysis-plan
-      reporting
-- [x] Add v0.2 tests in the root package
-- [x] Run the full local test suite: `235` passing, `0` failures, `0` warnings
-- [x] Run full local `devtools::check()`: `0 errors`, `0 warnings`, `0 notes`
-- [x] Verify the roundtrip:
-      builder-style `.sframe` -> `read_sframe()` -> `render_survey()` ->
-      `render_report()`
+- [x] Reduce hard imports to the core file-format and condition stack
+- [x] Move `shiny` behind runtime guards
+- [x] Move `psych` behind runtime guards
+- [x] Remove `dplyr` from the package dependency surface
+- [x] Replace `readr` usage with base R CSV loading
+- [x] Replace `tibble` output paths with base `data.frame` output
+- [x] Remove the Quarto hard dependency and keep Quarto optional
+- [x] Add a non-Quarto HTML fallback in `render_report()`
+- [x] Add explicit `utils::type.convert()` calls in the bundled studio app
+- [x] Remove top-level `library()` calls from the bundled studio app
+- [x] Regenerate documentation and verify the dependency changes in `NAMESPACE`
+- [x] Run a clean source build and standard `R CMD check`
+- [ ] Run full local `R CMD check --as-cran`
+- [ ] Review every note, warning, and skip from the `--as-cran` run
+- [ ] Run win-builder before submission
+- [ ] Run rhub before submission
+- [ ] Replace broad `\\dontrun{}` constructor examples with runnable examples
+- [ ] Add `@details` text where exported functions intentionally raise custom
+      `sframe_*` conditions
+- [ ] Add a short reviewer note to the builder HTML explaining that the script
+      is authored package code, not bundled third-party minified code
 
-## Remaining work to complete v0.2
+## Phase 1: submission pack
 
-### 1. Builder and renderer parity
+- [ ] Write `cran-comments.md`
+- [ ] Describe the package purpose and lack of a direct CRAN equivalent
+- [ ] Explain the optional dependency strategy for `shiny`, `psych`,
+      `googlesheets4`, and Quarto
+- [ ] List every remaining `\\dontrun{}` example and justify it
+- [ ] Summarise the builder asset and why it is included in `inst/`
+- [ ] Freeze feature work while CRAN review is active
 
-- [ ] Decide whether the builder preview should reuse the Shiny renderer or
-      remain a separate browser renderer
-- [ ] Make preview behavior match `render_survey()` for:
-      required items, branching, matrix items, ranking, rating, and page flow
-- [ ] Add regression tests for any preview/generator differences found during
-      manual review
-- [ ] Review the builder inspector and settings flow for UI friction and reduce
-      the highest-friction interactions
+## Phase 2: documentation and adoption
 
-### 2. Browser-level verification
+- [ ] Publish a stronger pkgdown site with a gallery of example instruments
+- [ ] Add an RStudio add-in for `launch_builder()`
+- [ ] Document the optional-package model clearly in the main vignette
+- [ ] Prepare workshop material for a full surveyframe workflow demo
+- [ ] Enable Zenodo DOI generation for tagged releases
+- [ ] Draft the Journal of Statistical Software paper
 
-- [ ] Add browser automation for the HTML SurveyBuilder
-- [ ] Add at least one end-to-end browser test that:
-      builds or loads an instrument, exports `.sframe`, loads it in R, and
-      completes a rendered survey path
-- [ ] Capture screenshots for the builder and rendered survey at desktop and
-      mobile widths
+## Phase 3: workflow completion
 
-### 3. SurveyStudio relationship
+- [ ] Align SurveyBuilder preview and `render_survey()` behaviour
+- [ ] Add browser-level UI automation for the builder
+- [ ] Add at least one end-to-end browser test for survey completion
+- [ ] Decide whether SurveyStudio remains separate or hosts the builder
+- [ ] Decide whether direct Google Sheets submission belongs in core
+- [ ] Decide whether static HTML survey deployment remains in scope
+- [ ] Expose the survey renderer as a reusable Shiny module
 
-- [ ] Decide whether SurveyStudio remains a separate shell or becomes a host
-      for the HTML SurveyBuilder
-- [ ] Remove duplicated build paths or make their responsibilities explicit
-- [ ] Align SurveyStudio wording and navigation with the v0.2 workflow
+## Phase 4: companion packages
 
-### 4. Google Sheets collection path
-
-- [ ] Decide the supported contract:
-      helper-only collector export, or direct survey submission to Apps Script
-- [ ] If direct submission stays in scope, wire the survey generator to
-      `render$google_sheets_endpoint`
-- [ ] Add tests for the chosen Google Sheets path
-- [ ] Narrow the builder UI copy if direct submission is deferred
-
-### 5. Static deployment decision
-
-- [ ] Decide whether static HTML survey deployment remains a v0.2 deliverable
-- [ ] If yes, define the generator/export format and implement it
-- [ ] If no, remove or defer the UI affordances and roadmap language that imply
-      it is already available
-
-### 6. Documentation
-
-- [ ] Rewrite `README.md` around the v0.2 workflow
-- [ ] Add the builder entry point to the vignette and pkgdown site
-- [ ] Document the difference between:
-      `launch_builder()`, `launch_studio()`, and `render_survey()`
-- [ ] Document the analysis-plan workflow from design to report
-- [ ] Document the Google Sheets helper flow clearly
-
-### 7. Release finish
-
-- [ ] Push the verified v0.2 baseline to `main`
-- [ ] Review fresh GitHub Actions runs after the push
-- [ ] Fix any CI regressions that appear on macOS, Windows, or Linux
-- [ ] Draft a v0.2 release note and release checklist
-
-## Definition of done for v0.2
-
-- [ ] The builder, `.sframe` loader, and survey generator work as one coherent
-      workflow
-- [ ] The preview and generated survey behavior are aligned or intentionally
-      separated and documented
-- [ ] The Google Sheets path is either fully wired or clearly scoped down
-- [ ] Browser-level UI verification exists
-- [ ] Local checks pass and GitHub Actions are green on the final branch
+- [ ] Plan `sfMCDM`
+- [ ] Plan `sfSEM`
+- [ ] Plan `sfIRT`
+- [ ] Plan `sfReport`

@@ -119,7 +119,7 @@ sframe_composite_score <- function(scale_num, scale, scale_item_ids) {
 #' @param keep_meta Logical. Whether to retain non-item columns (metadata) in
 #'   the output. Defaults to `TRUE`.
 #'
-#' @return A `tibble` with scored scale columns appended. Scale columns are
+#' @return A `data.frame` with scored scale columns appended. Scale columns are
 #'   named using the scale `id`.
 #' @export
 #' @seealso [sf_scale()], [reliability_report()]
@@ -167,5 +167,5 @@ score_scales <- function(data, instrument, keep_items = TRUE, keep_meta = TRUE) 
   scale_cols <- vapply(instrument$scales, function(s) s$id, character(1))
   keep_cols  <- c(keep_cols, intersect(scale_cols, colnames(scored)))
 
-  tibble::as_tibble(scored[, unique(keep_cols), drop = FALSE])
+  sframe_as_data_frame(scored[, unique(keep_cols), drop = FALSE])
 }

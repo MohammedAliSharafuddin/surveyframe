@@ -1,16 +1,51 @@
 # inst/shiny/app.R
 # SurveyStudio - build, edit, preview, and analyse surveyframe instruments.
 
-library(shiny)
-library(surveyframe)
-
 `%||%` <- function(x, y) {
   if (is.null(x)) y else x
 }
 
+tags <- shiny::tags
+HTML <- shiny::HTML
+fluidPage <- shiny::fluidPage
+fluidRow <- shiny::fluidRow
+column <- shiny::column
+uiOutput <- shiny::uiOutput
+renderUI <- shiny::renderUI
+actionButton <- shiny::actionButton
+checkboxInput <- shiny::checkboxInput
+checkboxGroupInput <- shiny::checkboxGroupInput
+dateInput <- shiny::dateInput
+downloadButton <- shiny::downloadButton
+downloadHandler <- shiny::downloadHandler
+fileInput <- shiny::fileInput
+numericInput <- shiny::numericInput
+observe <- shiny::observe
+observeEvent <- shiny::observeEvent
+radioButtons <- shiny::radioButtons
+reactive <- shiny::reactive
+reactiveValues <- shiny::reactiveValues
+req <- shiny::req
+selectInput <- shiny::selectInput
+showNotification <- shiny::showNotification
+shinyApp <- shiny::shinyApp
+tagList <- shiny::tagList
+textAreaInput <- shiny::textAreaInput
+textInput <- shiny::textInput
+updateCheckboxGroupInput <- shiny::updateCheckboxGroupInput
+updateSelectInput <- shiny::updateSelectInput
+updateTextAreaInput <- shiny::updateTextAreaInput
+updateTextInput <- shiny::updateTextInput
+
 builder_empty_state <- surveyframe:::sframe_builder_empty_state
 builder_state_from_instrument <- surveyframe:::sframe_builder_state_from_instrument
 builder_validate_draft <- surveyframe:::sframe_builder_validate_draft
+sf_branch <- surveyframe::sf_branch
+sf_check <- surveyframe::sf_check
+sf_choices <- surveyframe::sf_choices
+sf_item <- surveyframe::sf_item
+sf_scale <- surveyframe::sf_scale
+write_sframe <- surveyframe::write_sframe
 
 status_badge <- function(ok, label_ok = "Ready", label_no = "Not ready") {
   if (ok) {
@@ -46,7 +81,7 @@ parse_choice_values <- function(text) {
   if (length(values) == 0) {
     return(values)
   }
-  type.convert(values, as.is = TRUE)
+  utils::type.convert(values, as.is = TRUE)
 }
 
 parse_branch_value <- function(text, operator) {
@@ -59,9 +94,9 @@ parse_branch_value <- function(text, operator) {
     if (length(values) == 0) {
       return(NULL)
     }
-    return(type.convert(values, as.is = TRUE))
+    return(utils::type.convert(values, as.is = TRUE))
   }
-  type.convert(raw, as.is = TRUE)
+  utils::type.convert(raw, as.is = TRUE)
 }
 
 parse_check_values <- function(text) {
@@ -69,7 +104,7 @@ parse_check_values <- function(text) {
   if (length(values) == 0) {
     return(NULL)
   }
-  type.convert(values, as.is = TRUE)
+  utils::type.convert(values, as.is = TRUE)
 }
 
 format_value <- function(x) {
@@ -508,7 +543,7 @@ ui <- fluidPage(
           tags$br(),
           downloadButton("download_report_btn", "Generate HTML report", class = "btn-primary"),
           tags$p(class = "hint",
-            "Requires the quarto package. The report is a self-contained HTML file.")
+            "Generates a self-contained HTML report. Quarto is optional; an internal HTML fallback is available.")
         )
       )
     )

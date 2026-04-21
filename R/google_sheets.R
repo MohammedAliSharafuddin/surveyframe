@@ -121,7 +121,7 @@ function doGet(e) {
 #' @param submitted_at Character or NULL. Column holding submission
 #'   timestamps. Defaults to `"submitted_at"`.
 #'
-#' @return A `tibble` validated against the instrument, ready for
+#' @return A `data.frame` validated against the instrument, ready for
 #'   [quality_report()], [score_scales()], and [reliability_report()].
 #' @export
 #' @seealso [export_google_sheet()], [read_responses()], [quality_report()]

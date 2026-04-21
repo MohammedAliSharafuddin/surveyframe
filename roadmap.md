@@ -2,159 +2,133 @@
 
 ## Scope
 
-`surveyframe` is a workflow package for academic survey research in R. Its core
-object is the `sframe` instrument, which carries item definitions, reusable
-choice sets, scale structure, reverse-coding rules, branching logic,
-design-time checks, analysis-plan metadata, and rendering settings through the
-research workflow.
+surveyframe is an end-to-end survey research workflow package for R. Its core
+object is the `sframe`, a typed survey instrument that carries item
+definitions, choice sets, scales, reverse-coding rules, branching logic,
+quality checks, analysis-plan metadata, and rendering settings through the
+entire workflow.
 
-The package defines the instrument, validates it, serializes it, renders it,
-reads response data back in, checks quality, scores scales, prepares
-psychometric diagnostics, runs pre-planned analyses, and generates
-reproducible outputs. Specialist analysis packages and external collection
-platforms remain downstream tools.
+The package is intended to cover:
 
-### Included in the current v0.2 line
+- instrument design
+- validation and serialisation
+- deployment and collection
+- response loading
+- data quality checks
+- scale scoring
+- psychometric diagnostics
+- planned analyses
+- reproducible reporting
 
-- Typed constructors for items, choice sets, scales, branching rules, checks,
-  and the top-level `sframe` object
-- `.sframe` JSON serialization with SHA-256 integrity hashing
-- A browser-based HTML SurveyBuilder launched with `launch_builder()`
-- A Shiny survey generator launched through `render_survey()`
-- SurveyStudio as the Shiny workflow shell
-- Response loading from CSV/data frames and Google Sheets
-- Quality reporting, scale scoring, reliability diagnostics, item diagnostics,
-  EFA readiness checks, and CFA syntax generation
-- Analysis-plan execution with `run_analysis_plan()` and results rendering with
-  `render_results()`
-- Codebook generation and Quarto report rendering
+The package is not intended to become a general statistics environment or a
+replacement for specialist modelling tools.
 
-### Outside the current v0.2 line
+## Current status
 
-- Static HTML survey deployment from the builder
-- Full parity between the SurveyBuilder preview and the Shiny survey renderer
-- Direct Google Sheets submission from `render_survey()`
-- SurveyStudio and SurveyBuilder as one unified authoring surface
-- External platform import/export such as Qualtrics or REDCap
-- Multilingual authoring workflows beyond basic metadata
-- Multi-condition branching trees
-- IRT and decision-science method engines
-- AI-assisted survey authoring
+Status below reflects the repository working tree after the current CRAN
+hardening pass.
 
-## Current Status
+### Integrated v0.2 capabilities
 
-Status below reflects the repository state verified on April 21, 2026.
+- typed constructors for instruments and all core components
+- `.sframe` JSON serialisation with SHA-256 integrity hashing
+- browser-based SurveyBuilder
+- Shiny survey generator through `render_survey()`
+- SurveyStudio as the workflow shell
+- CSV/data-frame response loading and Google Sheets import helper
+- quality reporting, scale scoring, reliability diagnostics, item diagnostics,
+  EFA readiness, and CFA syntax generation
+- analysis-plan execution and HTML result rendering
+- HTML report rendering with Quarto when available and an internal fallback
+  when it is not
 
-### Verified and working
+### Dependency posture
 
-- The main repository now contains the v0.2 package code. The nested
-  `surveyframe_v0.2/` folder was treated as source input and is ignored from
-  the package build.
-- `launch_builder()` is present in the root package and points to the bundled
-  HTML SurveyBuilder in `inst/builder/survey_builder.html`.
-- The bundled SurveyBuilder now computes a SHA-256 hash compatible with
-  `read_sframe()`. Builder-style `.sframe` payloads round-trip through the R
-  loader.
-- `sf_item()` supports the v0.2 item set: `matrix`, `slider`, `ranking`,
-  `rating`, `section_break`, and `text_block`.
-- `sf_instrument()` and `.sframe` serialization now preserve `analysis_plan`.
-- `render_survey()` has been upgraded to the richer v0.2 renderer with
-  welcome and thank-you flows, conversational mode, ranking, rating, matrix
-  inputs, CSV persistence, and required-field enforcement.
-- `render_report()` accepts `output_path`, includes analysis-plan sections,
-  and uses the stable Quarto rendering path already fixed on `main`.
-- The Quarto template now tolerates small datasets that cannot support
-  reliability estimation.
-- `run_analysis_plan()`, `render_results()`, `export_google_sheet()`, and
-  `read_sheet_responses()` are integrated into the root package.
+Hard imports are now intentionally minimal:
 
-### Verification results
+- `jsonlite`
+- `rlang`
+- `openssl`
 
-- Local automated test suite: `235` passing, `0` failures, `0` warnings
-- Full local `devtools::check()`: `0 errors`, `0 warnings`, `0 notes`
-- Explicit roundtrip verified:
-  - builder-style `.sframe` payload
-  - `read_sframe()`
-  - `render_survey()`
-  - `render_report()`
+Optional features are loaded at call time:
 
-### Gaps that still define the remaining v0.2 work
+- `shiny` for deployment and studio features
+- `psych` for reliability and EFA readiness
+- `googlesheets4` for Google Sheets input
+- Quarto CLI for richer report rendering
 
-- The SurveyBuilder preview is a browser-side approximation. It does not reuse
-  the Shiny renderer directly.
-- SurveyStudio and SurveyBuilder remain separate UIs with overlapping purpose.
-- The builder stores Google Sheets metadata, but `render_survey()` does not
-  post responses to a Google Apps Script endpoint.
-- The package still lacks browser-level automated tests for the HTML builder
-  and the rendered survey UX.
-- Static HTML survey deployment is still absent.
+### Verification snapshot
 
-## Development Roadmap
+- local targeted test run: `test-core.R` `PASS=135`, `FAIL=0`
+- local targeted test run: `test-v02.R` `PASS=100`, `FAIL=0`
+- local source build plus `R CMD check --no-vignettes --no-manual`: `Status: OK`
 
-### Phase 2A: Stabilize the integrated v0.2 baseline
+### What still blocks a clean CRAN submission
+
+- full `R CMD check --as-cran` needs to be run and reviewed across platforms
+- runnable examples need to replace broad `\\dontrun{}` usage on constructor
+  functions
+- the bundled builder asset needs a reviewer-facing note explaining that it is
+  authored package code, not third-party minified JavaScript
+- the submission pack still needs `cran-comments.md`, win-builder results, and
+  rhub results
+
+## Development roadmap
+
+### Phase 0: CRAN hardening
 
 Priority: immediate.
 
-- Keep the root package green after the v0.2 merge.
-- Add regression tests for builder-generated `.sframe` files and new item
-  types.
-- Review any remaining edge cases in report rendering, especially with sparse
-  or malformed response data.
-- Keep the package metadata, docs, and exports aligned with the integrated
-  codebase.
+- keep the hard dependency set minimal and stable
+- finish guard-at-call-time behaviour for optional packages
+- run `R CMD check --as-cran` locally and fix every actionable note or warning
+- verify Windows and cross-platform behaviour through win-builder and rhub
+- tighten examples and submission documentation for CRAN review
 
-### Phase 2B: Complete builder and generator parity
+### Phase 1: First CRAN submission
 
-Priority: next.
+Priority: after Phase 0 is clean.
 
-- Decide whether the SurveyBuilder preview should become a thin wrapper around
-  the Shiny renderer or whether a separate browser renderer will be maintained
-  deliberately.
-- Make the builder preview and `render_survey()` agree on required behavior,
-  branching, paging, ranking, rating, matrix handling, and welcome/thank-you
-  flows.
-- Add browser-level UI tests for the SurveyBuilder and at least one end-to-end
-  survey completion path.
-- Review the UI density of the builder and simplify high-friction panels where
-  needed.
+- prepare a clear `cran-comments.md`
+- document optional dependency behaviour explicitly
+- submit once with a reviewed, tested, cross-platform package
+- avoid feature churn during review
 
-### Phase 2C: Complete the collection integrations
+### Phase 2: Adoption surface
 
-Priority: after parity work starts.
+Priority: after CRAN acceptance.
 
-- Decide the Google Sheets collection contract clearly:
-  external collector helper only, or direct submission from the survey
-  generator.
-- If direct submission stays in scope, wire `render_survey()` or a static
-  deployment target to the Apps Script endpoint stored in render metadata.
-- Add validation and tests for the Google Sheets submission path.
-- Define the static HTML deployment path if it remains part of the v0.2 goal.
+- add an RStudio add-in for `launch_builder()`
+- ship a stronger pkgdown site with a gallery of complete example instruments
+- register Zenodo for release DOIs
+- prepare workshop materials for survey-methods and R audiences
+- draft and submit the Journal of Statistical Software paper
 
-### Phase 2D: Unify the user-facing workflow
+### Phase 3: Workflow completion inside v0.2/v0.3
 
-Priority: before calling v0.2 complete.
+Priority: after the package is easier to install and cite.
 
-- Decide the long-term relationship between SurveyStudio and SurveyBuilder.
-- Either integrate the HTML builder into SurveyStudio or narrow the purpose of
-  SurveyStudio so the package has one clear authoring story.
-- Update the package docs so a first-time user understands when to use:
-  `launch_builder()`, `launch_studio()`, and `render_survey()`.
+- align SurveyBuilder preview and `render_survey()` behaviour
+- decide the long-term relationship between SurveyBuilder and SurveyStudio
+- decide whether direct Google Sheets submission belongs in core v0.2 or later
+- add browser-level UI automation for the builder and rendered survey
+- decide whether static HTML survey deployment remains in scope
+- expose the survey renderer as a reusable Shiny module
 
-### Phase 2E: Documentation and release finish
+### Phase 4: Companion packages
 
-Priority: before tagging a v0.2 release.
+Priority: only after the core package is stable on CRAN.
 
-- Rewrite the README and vignette around the v0.2 workflow.
-- Update pkgdown navigation to surface the builder, analysis-plan functions,
-  and Google Sheets helpers clearly.
-- Add a v0.2 release checklist and release notes.
-- Re-run full local checks and GitHub Actions on the final release candidate.
+- `sfMCDM` for multi-criteria decision methods
+- `sfSEM` for SEM-oriented extensions around generated syntax
+- `sfIRT` for item response theory workflows
+- `sfReport` for additional journal-style report templates
 
 ## Guardrails
 
 - The `sframe` object remains the single source of truth.
-- The package stays focused on survey workflow rather than becoming a general
-  statistics environment.
-- UI additions must strengthen the instrument-centered workflow.
-- Any feature that cannot be exercised and verified end to end should be
-  described narrowly and documented as incomplete until it is finished.
+- CRAN acceptance is more important than adding one more feature to v0.2.
+- Optional dependencies stay optional unless a hard import is unavoidable.
+- External services remain downstream integrations rather than core
+  requirements.
+- New features should not blur the package identity.
