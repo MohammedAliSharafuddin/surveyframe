@@ -76,12 +76,14 @@ The package is not yet on CRAN. Install the development version from
 GitHub:
 
 ``` r
+
 remotes::install_github("MohammedAliSharafuddin/surveyframe")
 ```
 
 Install optional packages only for the features you plan to use:
 
 ``` r
+
 install.packages(c("shiny", "psych", "googlesheets4"))
 
 # Optional for richer report rendering
@@ -91,6 +93,7 @@ install.packages("quarto")
 ## Minimal workflow
 
 ``` r
+
 library(surveyframe)
 
 agree5 <- sf_choices(
@@ -138,14 +141,14 @@ render_report(instr, data = resp, output_file = "report.html")
 
 ## Optional entry points
 
-| Need                          | Entry point                                                                                                                                                                                                    | Optional package |
-|-------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------|
-| Visual instrument authoring   | [`launch_builder()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/launch_builder.md)                                                                                                         | none             |
-| Interactive survey deployment | [`render_survey()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_survey.md)                                                                                                           | `shiny`          |
-| Studio workflow shell         | [`launch_studio()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/launch_studio.md)                                                                                                           | `shiny`          |
-| Reliability and EFA readiness | [`reliability_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/reliability_report.md), [`efa_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/efa_report.md) | `psych`          |
-| Google Sheets response import | [`read_sheet_responses()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_sheet_responses.md)                                                                                             | `googlesheets4`  |
-| Rich Quarto rendering         | [`render_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_report.md) with local Quarto install                                                                                 | Quarto CLI       |
+| Need | Entry point | Optional package |
+|----|----|----|
+| Visual instrument authoring | [`launch_builder()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/launch_builder.md) | none |
+| Interactive survey deployment | [`render_survey()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_survey.md) | `shiny` |
+| Studio workflow shell | [`launch_studio()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/launch_studio.md) | `shiny` |
+| Reliability and EFA readiness | [`reliability_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/reliability_report.md), [`efa_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/efa_report.md) | `psych` |
+| Google Sheets response import | [`read_sheet_responses()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_sheet_responses.md) | `googlesheets4` |
+| Rich Quarto rendering | [`render_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_report.md) with local Quarto install | Quarto CLI |
 
 ## CRAN track
 
@@ -164,6 +167,7 @@ are:
 If you use surveyframe in published research, cite the package:
 
 ``` r
+
 citation("surveyframe")
 ```
 
