@@ -5,7 +5,7 @@
 \title{Launch the interactive response dashboard}
 \usage{
 launch_dashboard(
-  instrument,
+  instrument = NULL,
   responses = NULL,
   port = NULL,
   host = "127.0.0.1",
@@ -13,11 +13,14 @@ launch_dashboard(
 )
 }
 \arguments{
-\item{instrument}{An \code{sframe} object.}
+\item{instrument}{An \code{sframe} object. When \code{NULL}, the bundled tourism
+services demo instrument is loaded.}
 
 \item{responses}{A \code{data.frame} or \code{tibble} of survey responses, as
-produced by \code{\link[=read_responses]{read_responses()}} or \code{\link[=read_sheet_responses]{read_sheet_responses()}}. When NULL,
-the dashboard opens with instrument metadata and chart stubs only.}
+produced by \code{\link[=read_responses]{read_responses()}} or \code{\link[=read_sheet_responses]{read_sheet_responses()}}. When NULL
+and \code{instrument} is also NULL, the bundled simulated demo responses are
+loaded. When NULL with a user-supplied instrument, the dashboard opens
+with instrument metadata and chart stubs only.}
 
 \item{port}{Integer or NULL. TCP port for the Shiny server. When NULL,
 Shiny selects an available port automatically.}
@@ -53,6 +56,10 @@ running formal analysis via \code{\link[=run_analysis_plan]{run_analysis_plan()}
 }
 \examples{
 \dontrun{
+# Open the bundled tourism-services demo dashboard
+launch_dashboard()
+
+# Open the dashboard with your own instrument and responses
 instr <- read_sframe(
   system.file("extdata", "tourism_services_demo.sframe",
               package = "surveyframe")

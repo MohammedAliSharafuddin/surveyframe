@@ -87,6 +87,19 @@ install.packages(c("shiny", "psych", "googlesheets4", "digest"))
 install.packages("quarto")
 ```
 
+If RStudio reports that `surveyframe.rdb` is corrupt after installing from a
+local tarball, restart the R session and reinstall cleanly:
+
+```r
+remove.packages("surveyframe")
+unlink(file.path(.libPaths()[1], "surveyframe"), recursive = TRUE, force = TRUE)
+install.packages("surveyframe_0.3.0.tar.gz", repos = NULL, type = "source")
+```
+
+That error comes from the installed help database, usually after reinstalling
+over a package that is already loaded. It is not a separate CRAN submission
+file and it is regenerated during installation.
+
 ## Minimal workflow
 
 ```r
@@ -148,6 +161,13 @@ render_report(instr, data = resp, output_file = "report.html")
 | Reliability and EFA readiness | `reliability_report()`, `efa_report()` | `psych` |
 | Google Sheets response import | `read_sheet_responses()` | `googlesheets4` |
 | Rich Quarto rendering | `render_report()` with local Quarto install | Quarto CLI |
+
+The bundled demo can be run with:
+
+```r
+demo(survey)
+launch_dashboard()
+```
 
 ## CRAN track
 
