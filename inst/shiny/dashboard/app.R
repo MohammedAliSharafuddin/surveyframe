@@ -86,7 +86,16 @@ body{background:#f1f5f9;font-family:system-ui,-apple-system,'Segoe UI',sans-seri
 ui <- fluidPage(
   tags$head(
     tags$title(paste(TITLE, "— Dashboard")),
-    tags$style(HTML(dash_css))
+    tags$style(HTML(dash_css)),
+    tags$script(HTML(
+      "Shiny.addCustomMessageHandler('sfDashNav', function(msg){
+         document.querySelectorAll('.db-nav .btn').forEach(function(b){
+           b.classList.remove('active');
+         });
+         var t=document.getElementById('nav_' + msg.active);
+         if(t)t.classList.add('active');
+       });"
+    ))
   ),
   div(class = "db-hdr",
     div(class = "db-hdr-t", TITLE),
@@ -114,16 +123,6 @@ server <- function(input, output, session) {
       session$sendCustomMessage("sfDashNav", list(active = tab))
     }, ignoreInit = TRUE)
   })
-
-  tags$head(tags$script(HTML(
-    "Shiny.addCustomMessageHandler('sfDashNav', function(msg){
-       document.querySelectorAll('.db-nav .btn').forEach(function(b){
-         b.classList.remove('active');
-       });
-       var t=document.querySelector('.db-nav .btn[data-id=\"'+msg.active+'\"]');
-       if(t)t.classList.add('active');
-     });"
-  )))
 
   output$db_content <- renderUI({
     switch(active_tab(),

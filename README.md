@@ -174,6 +174,10 @@ responses, scoring scales, running the analysis plan, checking response
 quality, and rendering HTML outputs. It writes example tables and plots to a
 temporary `surveyframe-demo` folder and prints that folder path in the console.
 
+Use `launch_builder()` to design or edit a questionnaire. Use
+`launch_dashboard()` only after an instrument and response data exist; it is a
+read-only response exploration dashboard.
+
 ## CRAN track
 
 The package is being prepared for first CRAN submission as v0.3.0. Current
