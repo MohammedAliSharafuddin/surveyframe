@@ -5,7 +5,7 @@
 #' Specifies an attention, instructional, or trap check item at instrument
 #' design time. The check is stored in the instrument object and evaluated
 #' against collected response data by [quality_report()]. This function only
-#' defines the check; it does not evaluate it.
+#' defines the check. Evaluation happens later in [quality_report()].
 #'
 #' @param id Character. A unique identifier for this check.
 #' @param item_id Character. The `id` of the item used as the check. The item

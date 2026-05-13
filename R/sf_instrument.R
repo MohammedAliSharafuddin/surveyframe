@@ -18,7 +18,7 @@
 #' @param components List. A list of component objects created by the
 #'   constructor family: [sf_item()], [sf_choices()], [sf_scale()],
 #'   [sf_branch()], and [sf_check()]. Components are sorted by class
-#'   automatically. Raw lists are not accepted.
+#'   automatically. Supply components created by the surveyframe constructors.
 #' @param render List or NULL. Optional rendering hints passed to
 #'   [render_survey()], such as theme colour or progress bar visibility.
 #' @param analysis_plan List. Optional pre-planned analysis blocks created in
@@ -66,7 +66,7 @@ sf_instrument <- function(
   branching <- Filter(function(x) inherits(x, "sf_branch"),  components)
   checks    <- Filter(function(x) inherits(x, "sf_check"),   components)
 
-  # Reject any components that do not belong to a known class
+  # Keep the component list limited to known surveyframe classes.
   known_classes <- c("sf_item", "sf_choices", "sf_scale", "sf_branch", "sf_check")
   unknown <- Filter(
     function(x) !any(vapply(known_classes, function(cls) inherits(x, cls), logical(1))),

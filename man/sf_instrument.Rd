@@ -32,7 +32,7 @@ Defaults to \code{"en"}. Multi-language support is planned for a later release.}
 \item{components}{List. A list of component objects created by the
 constructor family: \code{\link[=sf_item]{sf_item()}}, \code{\link[=sf_choices]{sf_choices()}}, \code{\link[=sf_scale]{sf_scale()}},
 \code{\link[=sf_branch]{sf_branch()}}, and \code{\link[=sf_check]{sf_check()}}. Components are sorted by class
-automatically. Raw lists are not accepted.}
+automatically. Supply components created by the surveyframe constructors.}
 
 \item{render}{List or NULL. Optional rendering hints passed to
 \code{\link[=render_survey]{render_survey()}}, such as theme colour or progress bar visibility.}

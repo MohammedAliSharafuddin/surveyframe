@@ -30,7 +30,7 @@ not item IDs but should be retained (for example, condition assignment or
 source URL).}
 
 \item{strict}{Logical. When \code{TRUE} (default), columns in the response data
-that are not declared as item IDs or metadata columns raise an error.
+outside the declared item IDs and metadata columns raise an error.
 When \code{FALSE}, undeclared columns are retained with a warning.}
 }
 \value{

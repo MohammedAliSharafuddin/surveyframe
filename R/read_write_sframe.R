@@ -245,7 +245,7 @@ sframe_validate_parsed_payload <- function(parsed, path) {
       !is.list(parsed$choices) ||
       !is.list(parsed$scales)) {
     sframe_abort_import(
-      "Invalid .sframe file: payload structure is not recognised.",
+      "Invalid .sframe file: expected a recognised payload structure.",
       path = path
     )
   }

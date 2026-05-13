@@ -37,9 +37,9 @@ Called for its side effect. Returns nothing.
 }
 \description{
 Opens a Shiny dashboard for exploring collected response data alongside the
-instrument definition. This is an analysis and quality-control interface,
-not the survey-authoring builder. Use \code{\link[=launch_builder]{launch_builder()}} to design a new
-questionnaire. The dashboard provides five panels:
+instrument definition. Use this analysis and quality-control interface after
+response collection, and use \code{\link[=launch_builder]{launch_builder()}} to design a new questionnaire.
+The dashboard provides five panels:
 }
 \details{
 \describe{

@@ -1,7 +1,7 @@
 # conditions.R
 # Custom condition classes for surveyframe.
 # All validators and exported functions must use these classes.
-# Raw stop() calls are not permitted in exported code.
+# Use typed helpers for exported-code errors.
 
 # Null-coalescing operator available throughout the package.
 # Imported from rlang via @importFrom in surveyframe-package.R.

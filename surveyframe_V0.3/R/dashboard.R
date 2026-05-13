@@ -3,9 +3,9 @@
 #' Launch the interactive response dashboard
 #'
 #' Opens a Shiny dashboard for exploring collected response data alongside the
-#' instrument definition. This is an analysis and quality-control interface,
-#' not the survey-authoring builder. Use [launch_builder()] to design a new
-#' questionnaire. The dashboard provides five panels:
+#' instrument definition. Use this analysis and quality-control interface after
+#' response collection, and use [launch_builder()] to design a new questionnaire.
+#' The dashboard provides five panels:
 #'
 #' \describe{
 #'   \item{Overview}{Response count, date range, and instrument metadata.}
@@ -116,7 +116,7 @@ launch_dashboard <- function(
   }
 
   # Expose data to the app via an isolated environment, then build a standard
-  # shiny.appobj. Older Shiny releases do not support runApp(appEnvir = ...).
+  # shiny.appobj for compatibility with older Shiny releases.
   app_env <- new.env(parent = asNamespace("surveyframe"))
   app_env$SFRAME_INSTRUMENT <- instrument
   app_env$SFRAME_RESPONSES  <- responses

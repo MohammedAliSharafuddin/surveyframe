@@ -18,7 +18,7 @@
 #'   not item IDs but should be retained (for example, condition assignment or
 #'   source URL).
 #' @param strict Logical. When `TRUE` (default), columns in the response data
-#'   that are not declared as item IDs or metadata columns raise an error.
+#'   outside the declared item IDs and metadata columns raise an error.
 #'   When `FALSE`, undeclared columns are retained with a warning.
 #'
 #' @return A `data.frame` with columns ordered as: metadata columns first, then

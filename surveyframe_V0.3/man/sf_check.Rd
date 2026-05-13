@@ -53,7 +53,7 @@ An object of class \code{sf_check} (a named list).
 Specifies an attention, instructional, or trap check item at instrument
 design time. The check is stored in the instrument object and evaluated
 against collected response data by \code{\link[=quality_report]{quality_report()}}. This function only
-defines the check; it does not evaluate it.
+defines the check. Evaluation happens later in \code{\link[=quality_report]{quality_report()}}.
 }
 \examples{
 # An attention check: respondent must select 4

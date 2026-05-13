@@ -64,12 +64,12 @@
 `run_analysis_plan()` now implements four additional tests used by the
 SurveyBuilder's test dropdown:
 
-* `anova_one` — One-way ANOVA with eta-squared effect size. When the
+* `anova_one`: One-way ANOVA with eta-squared effect size. When the
   result is significant and there are more than two groups, Tukey HSD
   post-hoc output is included in the result object.
-* `t_test_pair` — Paired-samples t-test with Cohen's d_z.
-* `wilcoxon_pair` — Wilcoxon signed-rank test with r effect size.
-* `regression_logistic_binary` — Binary logistic regression with
+* `t_test_pair`: Paired-samples t-test with Cohen's d_z.
+* `wilcoxon_pair`: Wilcoxon signed-rank test with r effect size.
+* `regression_logistic_binary`: Binary logistic regression with
   McFadden R-squared and an overall model chi-square test. The full
   coefficient table is returned for interpretation.
 

@@ -88,7 +88,7 @@ sframe_composite_score <- function(scale_num, scale, scale_item_ids) {
 
   if (!is.null(scale$weights) && any(is.na(weights))) {
     sframe_warn_scoring(
-      paste0("Scale '", scale$id, "' has weights that do not align with its items."),
+      paste0("Scale '", scale$id, "' has weights that must align with its items."),
       scale_id = scale$id
     )
     weights[is.na(weights)] <- 1
