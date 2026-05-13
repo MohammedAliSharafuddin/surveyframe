@@ -674,11 +674,20 @@ sframe_run_one_block <- function(block, data) {
 #' @seealso [render_results()], [read_sheet_responses()]
 #'
 #' @examples
-#' \dontrun{
-#' responses <- read_sheet_responses("your-sheet-id", instr)
-#' results   <- run_analysis_plan(responses, instr)
-#' render_results(results, instr, output_file = "results.html")
-#' }
+#' instr <- read_sframe(
+#'   system.file("extdata", "tourism_services_demo.sframe",
+#'               package = "surveyframe")
+#' )
+#' responses <- read_responses(
+#'   system.file("extdata", "tourism_services_responses.csv",
+#'               package = "surveyframe"),
+#'   instr,
+#'   respondent_id = "respondent_id",
+#'   submitted_at = "submitted_at",
+#'   meta_cols = "started_at"
+#' )
+#' results <- run_analysis_plan(responses, instr)
+#' print(results)
 run_analysis_plan <- function(data, instrument, scored = TRUE) {
   stopifnot(inherits(instrument, "sframe"))
   stopifnot(is.data.frame(data))
@@ -744,10 +753,22 @@ print.sframe_analysis_results <- function(x, ...) {
 #' @seealso [run_analysis_plan()], [render_report()]
 #'
 #' @examples
-#' \dontrun{
+#' instr <- read_sframe(
+#'   system.file("extdata", "tourism_services_demo.sframe",
+#'               package = "surveyframe")
+#' )
+#' responses <- read_responses(
+#'   system.file("extdata", "tourism_services_responses.csv",
+#'               package = "surveyframe"),
+#'   instr,
+#'   respondent_id = "respondent_id",
+#'   submitted_at = "submitted_at",
+#'   meta_cols = "started_at"
+#' )
 #' results <- run_analysis_plan(responses, instr)
-#' render_results(results, instr, output_file = "results.html")
-#' }
+#' out <- render_results(results, instr,
+#'                       output_file = tempfile(fileext = ".html"))
+#' file.exists(out)
 render_results <- function(
     results         = NULL,
     instrument,

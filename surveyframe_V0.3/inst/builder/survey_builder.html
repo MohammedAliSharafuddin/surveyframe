@@ -82,6 +82,13 @@ input,textarea,select{font-family:inherit;font-size:13px}
 .sb-search input:focus{outline:none;background:rgba(255,255,255,.12)}
 .sb-si{position:absolute;left:8px;top:50%;transform:translateY(-50%);
   color:rgba(255,255,255,.3);font-size:11px;pointer-events:none}
+.setup-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:8px}
+.setup-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:3px;min-height:46px;border:1px solid rgba(255,255,255,.08);
+  border-radius:6px;background:rgba(255,255,255,.04);color:rgba(255,255,255,.72);
+  font-size:10px;font-weight:600;transition:all var(--d1)}
+.setup-btn:hover{background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.16)}
+.setup-btn span{font-size:15px;line-height:1}
 .sb-body{flex:1;overflow-y:auto;padding:6px}
 .sb-body::-webkit-scrollbar{width:3px}
 .sb-body::-webkit-scrollbar-thumb{background:rgba(255,255,255,.12);border-radius:3px}
@@ -471,6 +478,11 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
       <input type="search" id="itemSearch" placeholder="Search items…"
              aria-label="Search items" oninput="renderItemList()">
     </div>
+    <div class="setup-strip" aria-label="Survey page setup">
+      <button class="setup-btn" onclick="openSettings('welcome')" title="Edit welcome page"><span>&#128075;</span>Welcome</button>
+      <button class="setup-btn" onclick="openSettings('header')" title="Add logo and header"><span>&#128247;</span>Logo</button>
+      <button class="setup-btn" onclick="openSettings('thankyou')" title="Edit thank-you page"><span>&#10003;</span>Thank You</button>
+    </div>
   </div>
   <div class="sb-body" id="itemList" role="list" aria-label="Survey items"></div>
   <div class="sb-footer">
@@ -802,7 +814,7 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
 })();
 
 // ── State ──────────────────────────────────────────────────────────────────
-var S={meta:{title:'Untitled Survey',version:'1.0.0',description:'',authors:'',languages:'en'},choices:[],items:[],scales:[],branching:[],checks:[],analysis_plan:[],render:{mode:'standard',theme:'#2563eb',submit_label:'Submit',welcome:{title:'',intro_text:'',consent_text:'',consent_required:false,start_label:'Start Survey'},thankyou:{message:'Thank you for completing this survey.',redirect_url:'',show_download:false},header:{institution:'',logo_base64:'',show_progress:true},google_sheets_url:'',google_sheets_endpoint:''}};
+var S={meta:{title:'Untitled Survey',version:'1.0.0',description:'',authors:'',languages:'en'},choices:[],items:[],scales:[],branching:[],checks:[],analysis_plan:[],render:{mode:'standard',theme:'#2563eb',submit_label:'Submit',welcome:{title:'Welcome to this survey',intro_text:'Thank you for taking part. Your responses will be used for research and reporting purposes.',consent_text:'I understand the purpose of this survey and agree to participate.',consent_required:false,start_label:'Start Survey'},thankyou:{message:'Thank you for completing this survey.',redirect_url:'',show_download:false},header:{institution:'',logo_base64:'',show_progress:true},google_sheets_url:'',google_sheets_endpoint:''}};
 var hist=[],fut=[],selId=null,editRqId=null,pvTab='survey',dirty=false,lastSaved=null,dragSrc=null,_cRes=null;
 
 function snap(){hist.push(JSON.stringify(S));if(hist.length>60)hist.shift();fut=[];setDirty();updHistBtns();}
@@ -1028,12 +1040,47 @@ function updIdF(nid){
 }
 
 // ── Item CRUD ──────────────────────────────────────────────────────────────
+function ensureChoiceSet(kind){
+  var id=kind==='binary'?'yes_no':kind==='basic'?'options_3':'agree5';
+  if(S.choices.find(function(c){return c.id===id;}))return id;
+  var cs;
+  if(id==='yes_no')cs={id:id,values:['yes','no'],labels:['Yes','No'],allow_other:false,randomise:false};
+  else if(id==='options_3')cs={id:id,values:['option_1','option_2','option_3'],labels:['Option 1','Option 2','Option 3'],allow_other:false,randomise:false};
+  else cs={id:id,values:[1,2,3,4,5],labels:['Strongly disagree','Disagree','Neither agree nor disagree','Agree','Strongly agree'],allow_other:false,randomise:false};
+  S.choices.push(cs);
+  return id;
+}
+function defaultLabel(type,n){
+  var labels={
+    likert:'Agreement item '+n,
+    single_choice:'Select one option',
+    multiple_choice:'Select all options that apply',
+    matrix:'Rate each statement',
+    numeric:'Enter a number',
+    text:'Short answer',
+    textarea:'Long answer',
+    slider:'Move the slider',
+    ranking:'Rank these options',
+    rating:'Rate this item',
+    date:'Select a date',
+    section_break:'New section',
+    text_block:'Instruction text'
+  };
+  return labels[type]||('Question '+n);
+}
 function qAdd(type){
   var prefix={'section_break':'sec','text_block':'txt'}[type]||type.slice(0,3);
   var n=S.items.filter(function(i){return i.type===type;}).length+1;
   var nid=prefix+'_'+n;while(S.items.find(function(i){return i.id===nid;})){n++;nid=prefix+'_'+n;}
   snap();
-  S.items.push({id:nid,label:'',type:type,required:false,reverse:false,choice_set:null,scale_id:null,help:null,placeholder:null,matrix_items:null,slider_min:0,slider_max:100,slider_step:1,rating_max:5,rating_icon:'star',section_intro:null,page:null});
+  var choice=null;
+  if(['likert','matrix'].includes(type))choice=ensureChoiceSet('agree');
+  else if(['single_choice','multiple_choice','ranking'].includes(type))choice=ensureChoiceSet('basic');
+  var item={id:nid,label:defaultLabel(type,n),type:type,required:false,reverse:false,choice_set:choice,scale_id:null,help:null,placeholder:null,matrix_items:null,slider_min:0,slider_max:100,slider_step:1,rating_max:5,rating_icon:'star',section_intro:null,page:null};
+  if(type==='matrix')item.matrix_items=['Service quality','Sustainability','Overall experience'];
+  if(type==='section_break')item.section_intro='Use this section to introduce the next group of questions.';
+  if(type==='text_block')item.label='Add instructions or explanatory text here.';
+  S.items.push(item);
   selId=nid;renderItemList();openInsp(nid);
 }
 function dupItem(id){var item=S.items.find(function(i){return i.id===id;});if(!item)return;snap();var copy=JSON.parse(JSON.stringify(item));copy.id=id+'_copy';var idx=S.items.findIndex(function(i){return i.id===id;});S.items.splice(idx+1,0,copy);renderItemList();toast('Duplicated','ok');}

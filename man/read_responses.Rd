@@ -45,14 +45,18 @@ in the instrument. Non-item columns are allowed only when declared through
 \code{respondent_id}, \code{submitted_at}, or \code{meta_cols}.
 }
 \examples{
-\dontrun{
 responses <- read_responses(
-  x             = "data/responses.csv",
-  instrument    = instr,
-  respondent_id = "id",
-  submitted_at  = "timestamp"
+  x = system.file("extdata", "tourism_services_responses.csv",
+                  package = "surveyframe"),
+  instrument = read_sframe(
+    system.file("extdata", "tourism_services_demo.sframe",
+                package = "surveyframe")
+  ),
+  respondent_id = "respondent_id",
+  submitted_at = "submitted_at",
+  meta_cols = "started_at"
 )
-}
+head(responses[, c("respondent_id", "visit_type", "dm_1")])
 }
 \seealso{
 \code{\link[=quality_report]{quality_report()}}, \code{\link[=score_scales]{score_scales()}}

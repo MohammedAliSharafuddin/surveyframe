@@ -53,9 +53,28 @@ through Quarto. Otherwise, surveyframe writes an internal HTML fallback so
 the reporting workflow still runs on machines without Quarto.
 }
 \examples{
-\dontrun{
-render_report(instr, data = responses, output_file = "my_report.html")
-}
+instr <- read_sframe(
+  system.file("extdata", "tourism_services_demo.sframe",
+              package = "surveyframe")
+)
+responses <- read_responses(
+  system.file("extdata", "tourism_services_responses.csv",
+              package = "surveyframe"),
+  instr,
+  respondent_id = "respondent_id",
+  submitted_at = "submitted_at",
+  meta_cols = "started_at"
+)
+old <- options(surveyframe.use_quarto = FALSE)
+out <- render_report(
+  instr,
+  data = responses,
+  output_file = tempfile(fileext = ".html"),
+  include_reliability = FALSE,
+  include_analysis = FALSE
+)
+options(old)
+file.exists(out)
 }
 \seealso{
 \code{\link[=codebook_report]{codebook_report()}}, \code{\link[=quality_report]{quality_report()}}, \code{\link[=reliability_report]{reliability_report()}}

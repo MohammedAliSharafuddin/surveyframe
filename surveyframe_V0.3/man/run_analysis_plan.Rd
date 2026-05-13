@@ -29,11 +29,20 @@ Results include APA-formatted statistics, effect sizes, interpretation
 prompts, and pre-populated citations.
 }
 \examples{
-\dontrun{
-responses <- read_sheet_responses("your-sheet-id", instr)
-results   <- run_analysis_plan(responses, instr)
-render_results(results, instr, output_file = "results.html")
-}
+instr <- read_sframe(
+  system.file("extdata", "tourism_services_demo.sframe",
+              package = "surveyframe")
+)
+responses <- read_responses(
+  system.file("extdata", "tourism_services_responses.csv",
+              package = "surveyframe"),
+  instr,
+  respondent_id = "respondent_id",
+  submitted_at = "submitted_at",
+  meta_cols = "started_at"
+)
+results <- run_analysis_plan(responses, instr)
+print(results)
 }
 \seealso{
 \code{\link[=render_results]{render_results()}}, \code{\link[=read_sheet_responses]{read_sheet_responses()}}
