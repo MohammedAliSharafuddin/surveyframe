@@ -19,10 +19,13 @@
 #' The dashboard is read-only. It supports descriptive exploration before
 #' running formal analysis via [run_analysis_plan()].
 #'
-#' @param instrument An `sframe` object.
+#' @param instrument An `sframe` object. When `NULL`, the bundled tourism
+#'   services demo instrument is loaded.
 #' @param responses A `data.frame` or `tibble` of survey responses, as
-#'   produced by [read_responses()] or [read_sheet_responses()]. When NULL,
-#'   the dashboard opens with instrument metadata and chart stubs only.
+#'   produced by [read_responses()] or [read_sheet_responses()]. When NULL
+#'   and `instrument` is also NULL, the bundled simulated demo responses are
+#'   loaded. When NULL with a user-supplied instrument, the dashboard opens
+#'   with instrument metadata and chart stubs only.
 #' @param port Integer or NULL. TCP port for the Shiny server. When NULL,
 #'   Shiny selects an available port automatically.
 #' @param host Character. Host address passed to [shiny::runApp()]. Defaults
@@ -37,6 +40,10 @@
 #'
 #' @examples
 #' \dontrun{
+#' # Open the bundled tourism-services demo dashboard
+#' launch_dashboard()
+#'
+#' # Open the dashboard with your own instrument and responses
 #' instr <- read_sframe(
 #'   system.file("extdata", "tourism_services_demo.sframe",
 #'               package = "surveyframe")
@@ -52,13 +59,41 @@
 #' launch_dashboard(instr, responses)
 #' }
 launch_dashboard <- function(
-    instrument,
+    instrument      = NULL,
     responses      = NULL,
     port           = NULL,
     host           = "127.0.0.1",
     launch.browser = interactive()
 ) {
   rlang::check_installed("shiny", reason = "to launch the response dashboard.")
+
+  if (is.null(instrument)) {
+    demo_instr_path <- system.file(
+      "extdata", "tourism_services_demo.sframe",
+      package = "surveyframe"
+    )
+    demo_resp_path <- system.file(
+      "extdata", "tourism_services_responses.csv",
+      package = "surveyframe"
+    )
+    if (!nzchar(demo_instr_path) || !file.exists(demo_instr_path)) {
+      rlang::abort(
+        "Bundled dashboard demo instrument not found. Please reinstall surveyframe.",
+        class = "sframe_error"
+      )
+    }
+    instrument <- read_sframe(demo_instr_path)
+    if (is.null(responses) && nzchar(demo_resp_path) && file.exists(demo_resp_path)) {
+      responses <- read_responses(
+        demo_resp_path,
+        instrument,
+        respondent_id = "respondent_id",
+        submitted_at = "submitted_at",
+        meta_cols = "started_at"
+      )
+    }
+  }
+
   stopifnot(inherits(instrument, "sframe"))
 
   if (!is.null(responses) && !is.data.frame(responses)) {
