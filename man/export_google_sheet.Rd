@@ -26,9 +26,16 @@ can store the deployed Apps Script URL in survey metadata, and the same
 sheet can be read back with \code{\link[=read_sheet_responses]{read_sheet_responses()}}.
 }
 \examples{
-\dontrun{
-export_google_sheet(instr, sheet_url = "https://docs.google.com/spreadsheets/d/...")
-}
+instr <- read_sframe(
+  system.file("extdata", "tourism_services_demo.sframe",
+              package = "surveyframe")
+)
+script <- export_google_sheet(
+  instr,
+  sheet_url = "https://docs.google.com/spreadsheets/d/demo",
+  output_dir = tempdir()
+)
+file.exists(script)
 }
 \seealso{
 \code{\link[=read_sheet_responses]{read_sheet_responses()}}, \code{\link[=read_responses]{read_responses()}}, \code{\link[=write_sframe]{write_sframe()}}

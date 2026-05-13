@@ -59,12 +59,27 @@ column and either an explicit \code{started_at} column or one of the recognised
 defaults: \code{started_at}, \code{start_time}, \code{started}, or \code{.started_at}.
 }
 \examples{
-\dontrun{
-responses <- read_responses("data/responses.csv", instr,
-                            respondent_id = "id")
-qr <- quality_report(responses, instr, respondent_id = "id")
+instr <- read_sframe(
+  system.file("extdata", "tourism_services_demo.sframe",
+              package = "surveyframe")
+)
+responses <- read_responses(
+  system.file("extdata", "tourism_services_responses.csv",
+              package = "surveyframe"),
+  instr,
+  respondent_id = "respondent_id",
+  submitted_at = "submitted_at",
+  meta_cols = "started_at"
+)
+qr <- quality_report(
+  responses,
+  instr,
+  respondent_id = "respondent_id",
+  submitted_at = "submitted_at",
+  started_at = "started_at",
+  straightline_scales = FALSE
+)
 print(qr)
-}
 }
 \seealso{
 \code{\link[=sf_check]{sf_check()}}, \code{\link[=read_responses]{read_responses()}}, \code{\link[=score_scales]{score_scales()}}

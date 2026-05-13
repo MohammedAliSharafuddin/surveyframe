@@ -50,9 +50,12 @@ sframe_hash_value <- function(instrument) {
 #' @seealso [read_sframe()], [validate_sframe()]
 #'
 #' @examples
-#' \dontrun{
-#' write_sframe(instr, "my_instrument.sframe")
-#' }
+#' instr <- read_sframe(
+#'   system.file("extdata", "tourism_services_demo.sframe",
+#'               package = "surveyframe")
+#' )
+#' out <- write_sframe(instr, tempfile(fileext = ".sframe"))
+#' file.exists(out)
 write_sframe <- function(instrument, path, pretty = TRUE, overwrite = FALSE) {
   stopifnot(inherits(instrument, "sframe"))
 
@@ -262,9 +265,11 @@ sframe_validate_parsed_payload <- function(parsed, path) {
 #' @seealso [write_sframe()], [validate_sframe()]
 #'
 #' @examples
-#' \dontrun{
-#' instr <- read_sframe("my_instrument.sframe")
-#' }
+#' instr <- read_sframe(
+#'   system.file("extdata", "tourism_services_demo.sframe",
+#'               package = "surveyframe")
+#' )
+#' print(instr)
 read_sframe <- function(path, validate = TRUE) {
   if (!file.exists(path)) {
     sframe_abort_import(

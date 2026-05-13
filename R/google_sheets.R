@@ -19,9 +19,16 @@
 #' @seealso [read_sheet_responses()], [read_responses()], [write_sframe()]
 #'
 #' @examples
-#' \dontrun{
-#' export_google_sheet(instr, sheet_url = "https://docs.google.com/spreadsheets/d/...")
-#' }
+#' instr <- read_sframe(
+#'   system.file("extdata", "tourism_services_demo.sframe",
+#'               package = "surveyframe")
+#' )
+#' script <- export_google_sheet(
+#'   instr,
+#'   sheet_url = "https://docs.google.com/spreadsheets/d/demo",
+#'   output_dir = tempdir()
+#' )
+#' file.exists(script)
 export_google_sheet <- function(instrument, sheet_url, output_dir = ".") {
   stopifnot(inherits(instrument, "sframe"))
 

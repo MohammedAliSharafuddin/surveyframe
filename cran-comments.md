@@ -56,6 +56,11 @@ JavaScript. All CSS and JS is original package code written in-line to
 eliminate external network dependencies. The file is opened with
 `utils::browseURL()` by `launch_builder(open = TRUE)`.
 
+`inst/extdata/` contains one small simulated demo instrument and one simulated
+response CSV. These files support runnable examples for response loading,
+quality checks, scoring, analysis-plan execution, and report rendering. They
+contain no human-subject or private data.
+
 ## `\dontrun{}` usage
 
 All examples wrapped in `\dontrun{}` require one of:

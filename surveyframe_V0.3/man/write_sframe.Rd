@@ -28,9 +28,12 @@ the object already carries a valid status. The hash is computed over the
 full serialised content with the \code{hash.value} field set to an empty string.
 }
 \examples{
-\dontrun{
-write_sframe(instr, "my_instrument.sframe")
-}
+instr <- read_sframe(
+  system.file("extdata", "tourism_services_demo.sframe",
+              package = "surveyframe")
+)
+out <- write_sframe(instr, tempfile(fileext = ".sframe"))
+file.exists(out)
 }
 \seealso{
 \code{\link[=read_sframe]{read_sframe()}}, \code{\link[=validate_sframe]{validate_sframe()}}

@@ -159,9 +159,28 @@ print.sframe_codebook <- function(x, ...) {
 #' @seealso [codebook_report()], [quality_report()], [reliability_report()]
 #'
 #' @examples
-#' \dontrun{
-#' render_report(instr, data = responses, output_file = "my_report.html")
-#' }
+#' instr <- read_sframe(
+#'   system.file("extdata", "tourism_services_demo.sframe",
+#'               package = "surveyframe")
+#' )
+#' responses <- read_responses(
+#'   system.file("extdata", "tourism_services_responses.csv",
+#'               package = "surveyframe"),
+#'   instr,
+#'   respondent_id = "respondent_id",
+#'   submitted_at = "submitted_at",
+#'   meta_cols = "started_at"
+#' )
+#' old <- options(surveyframe.use_quarto = FALSE)
+#' out <- render_report(
+#'   instr,
+#'   data = responses,
+#'   output_file = tempfile(fileext = ".html"),
+#'   include_reliability = FALSE,
+#'   include_analysis = FALSE
+#' )
+#' options(old)
+#' file.exists(out)
 render_report <- function(
     instrument,
     data              = NULL,
@@ -186,7 +205,9 @@ render_report <- function(
   output_dir <- normalizePath(output_dir, mustWork = FALSE)
   output_name <- basename(dest)
 
-  has_quarto <- requireNamespace("quarto", quietly = TRUE) &&
+  use_quarto <- isTRUE(getOption("surveyframe.use_quarto", TRUE))
+  has_quarto <- use_quarto &&
+    requireNamespace("quarto", quietly = TRUE) &&
     nzchar(Sys.which("quarto"))
   template <- system.file("templates", "report.qmd", package = "surveyframe")
   if (has_quarto && file.exists(template)) {

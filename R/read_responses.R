@@ -28,14 +28,18 @@
 #' @seealso [quality_report()], [score_scales()]
 #'
 #' @examples
-#' \dontrun{
 #' responses <- read_responses(
-#'   x             = "data/responses.csv",
-#'   instrument    = instr,
-#'   respondent_id = "id",
-#'   submitted_at  = "timestamp"
+#'   x = system.file("extdata", "tourism_services_responses.csv",
+#'                   package = "surveyframe"),
+#'   instrument = read_sframe(
+#'     system.file("extdata", "tourism_services_demo.sframe",
+#'                 package = "surveyframe")
+#'   ),
+#'   respondent_id = "respondent_id",
+#'   submitted_at = "submitted_at",
+#'   meta_cols = "started_at"
 #' )
-#' }
+#' head(responses[, c("respondent_id", "visit_type", "dm_1")])
 read_responses <- function(
     x,
     instrument,

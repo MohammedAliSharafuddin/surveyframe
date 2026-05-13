@@ -20,9 +20,11 @@ Reads a \code{.sframe} JSON file and reconstructs an \code{sframe} instrument ob
 The SHA-256 integrity hash is verified on load unless \code{validate = FALSE}.
 }
 \examples{
-\dontrun{
-instr <- read_sframe("my_instrument.sframe")
-}
+instr <- read_sframe(
+  system.file("extdata", "tourism_services_demo.sframe",
+              package = "surveyframe")
+)
+print(instr)
 }
 \seealso{
 \code{\link[=write_sframe]{write_sframe()}}, \code{\link[=validate_sframe]{validate_sframe()}}

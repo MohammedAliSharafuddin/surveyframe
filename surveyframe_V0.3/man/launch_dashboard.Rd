@@ -53,12 +53,18 @@ running formal analysis via \code{\link[=run_analysis_plan]{run_analysis_plan()}
 }
 \examples{
 \dontrun{
-# Open the dashboard with instrument only (no response data)
-instr <- read_sframe("my_survey.sframe")
-launch_dashboard(instr)
-
-# Open with collected responses
-responses <- read_responses("data/responses.csv", instr)
+instr <- read_sframe(
+  system.file("extdata", "tourism_services_demo.sframe",
+              package = "surveyframe")
+)
+responses <- read_responses(
+  system.file("extdata", "tourism_services_responses.csv",
+              package = "surveyframe"),
+  instr,
+  respondent_id = "respondent_id",
+  submitted_at = "submitted_at",
+  meta_cols = "started_at"
+)
 launch_dashboard(instr, responses)
 }
 }
