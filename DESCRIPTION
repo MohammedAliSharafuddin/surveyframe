@@ -5,8 +5,9 @@ Authors@R: c(
     person(
       given = "Mohammed Ali",
       family = "Sharafuddin",
-      email = "mas@flairmi.com",
-      role = c("aut", "cre")
+      email = "mohammedali.page@gmail.com",
+      role = c("aut", "cre"),
+      comment = c(ORCID = "0000-0001-5247-2964")
     )
   )
 Description: Provides an end-to-end survey research workflow built around a

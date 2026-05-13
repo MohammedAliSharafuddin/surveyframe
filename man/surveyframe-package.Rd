@@ -50,11 +50,11 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: Mohammed Ali Sharafuddin \email{mas@flairmi.com}
+\strong{Maintainer}: Mohammed Ali Sharafuddin \email{mohammedali.page@gmail.com} (\href{https://orcid.org/0000-0001-5247-2964}{ORCID})
 
 Authors:
 \itemize{
-  \item Mohammed Ali Sharafuddin \email{mas@flairmi.com}
+  \item Mohammed Ali Sharafuddin \email{mohammedali.page@gmail.com} (\href{https://orcid.org/0000-0001-5247-2964}{ORCID})
 }
 
 }
