@@ -17,10 +17,20 @@
 #' @seealso [render_report()]
 #'
 #' @examples
-#' \dontrun{
-#' cb <- codebook_report(instr, format = "html")
+#' cs    <- sf_choices("ag5", 1:5,
+#'            c("Strongly disagree", "Disagree", "Neutral",
+#'              "Agree", "Strongly agree"))
+#' i1    <- sf_item("sat_1", "Item 1", type = "likert",
+#'                  choice_set = "ag5", scale_id = "sat")
+#' i2    <- sf_item("sat_2", "Item 2", type = "likert",
+#'                  choice_set = "ag5", scale_id = "sat")
+#' scale <- sf_scale("sat", "Satisfaction", items = c("sat_1", "sat_2"))
+#' instr <- sf_instrument("Demo Survey", components = list(cs, i1, i2, scale))
+#'
+#' cb <- codebook_report(instr)
 #' print(cb)
-#' }
+#' nrow(cb$items_table)
+#' nrow(cb$scales_table)
 codebook_report <- function(instrument, format = c("html", "md")) {
   stopifnot(inherits(instrument, "sframe"))
   format <- rlang::arg_match(format)
@@ -134,8 +144,7 @@ print.sframe_codebook <- function(x, ...) {
 #'   temporary file is written and its path returned.
 #' @param output_path Character or NULL. Alias for `output_file`. If both are
 #'   supplied, `output_file` takes precedence.
-#' @param format Character. Output format. Only `"html"` is supported in
-#'   v0.2.
+#' @param format Character. Output format. Currently `"html"`.
 #' @param include_quality Logical. Whether to include the data quality report.
 #'   Requires `data`. Defaults to `TRUE`.
 #' @param include_reliability Logical. Whether to include reliability
@@ -183,6 +192,7 @@ render_report <- function(
   if (has_quarto && file.exists(template)) {
     render_dir <- tempfile("surveyframe-report-")
     dir.create(render_dir, recursive = TRUE, showWarnings = FALSE)
+    on.exit(unlink(render_dir, recursive = TRUE, force = TRUE), add = TRUE)
     render_input <- file.path(render_dir, "report.qmd")
     if (!file.copy(template, render_input, overwrite = TRUE)) {
       rlang::abort(
@@ -194,8 +204,15 @@ render_report <- function(
     # Write instrument and data to temp RDS for the template to read
     tmp_instr <- tempfile(fileext = ".rds")
     tmp_data  <- tempfile(fileext = ".rds")
+    temp_rds <- tmp_instr
     saveRDS(instrument, tmp_instr)
-    if (!is.null(data)) saveRDS(data, tmp_data) else tmp_data <- ""
+    if (!is.null(data)) {
+      saveRDS(data, tmp_data)
+      temp_rds <- c(temp_rds, tmp_data)
+    } else {
+      tmp_data <- ""
+    }
+    on.exit(unlink(temp_rds, force = TRUE), add = TRUE)
 
     params <- list(
       instrument_path     = tmp_instr,

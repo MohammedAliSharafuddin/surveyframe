@@ -1,112 +1,131 @@
-# surveyframe 0.2.0
+# surveyframe 0.3.0
 
-## SurveyBuilder
+## New features
 
-* Added `launch_builder()` for browser-based instrument authoring, preview,
-  and analysis-plan setup.
-* Bundled the production SurveyBuilder HTML with autosave, undo/redo,
-  drag-to-reorder, inspector editing, and SHA-256 hashing for `.sframe`
-  exports.
+### Static HTML survey export
 
-## Extended item types
+* Added `export_static_survey()`. This produces a single, self-contained
+  HTML file that runs the survey in any modern browser without a Shiny
+  server or an internet connection. All thirteen item types are fully
+  rendered (Likert, single choice, multiple choice, matrix, numeric, text,
+  long text, date, slider, rating, ranking, section break, text block).
+  Branching logic, required-field validation, a progress bar, welcome and
+  thank-you pages are all handled in client-side JavaScript. On submission
+  the browser downloads a per-respondent CSV file. An optional
+  `endpoint_url` argument adds a parallel JSON POST to any serverless
+  endpoint (Google Apps Script, Netlify function, etc.).
 
-* Added `matrix`, `slider`, `ranking`, `rating`, `section_break`, and
-  `text_block` item types to `sf_item()`.
-* Preserved v0.2 item fields through `.sframe` write and read roundtrips.
+  The exported file is suitable for hosting on GitHub Pages, Netlify, or
+  any static file server, and can also be shared directly as an e-mail
+  attachment and opened from disk.
 
-## Shiny renderer
+  The SHA-256 hash written into `.sframe` files by `write_sframe()` and by
+  the SurveyBuilder HTML is computed using the same canonicalisation
+  algorithm, so instruments round-trip correctly between the browser and R.
 
-* Extended `render_survey()` to support the richer v0.2 item set.
-* Added welcome and thank-you flows, conversational mode, ranking and rating
-  widgets, and CSV persistence hooks.
+### Interactive response dashboard
 
-## Analysis plan execution
+* Added `launch_dashboard()`. Opens a five-panel Shiny dashboard for
+  exploring collected response data alongside the instrument definition,
+  without modifying either. The panels are:
 
-* Added `run_analysis_plan()` to execute research-question-driven analyses
-  stored on the instrument.
-* Added `render_results()` to generate HTML summaries of analysis-plan output.
-* Preserved `analysis_plan` in the instrument object and `.sframe`
-  serialisation.
+  | Panel | Content |
+  |---|---|
+  | Overview | Response count, date range, instrument metadata |
+  | Items | Per-item bar charts, histograms, and frequency tables |
+  | Scales | Scale score distributions with mean overlay |
+  | Quality | Attention-check pass rates |
+  | Raw data | Scrollable response table with CSV download |
 
-## Unified reporting
+  When called without a `responses` argument the dashboard opens in
+  metadata-only mode showing instrument structure.
 
-* `render_report()` now accepts `output_path`, includes analysis-plan content,
-  and falls back to an internal HTML renderer when Quarto is unavailable.
-* Report rendering now handles sparse-data reliability failures more cleanly.
+### Shiny survey module
 
-## Google Sheets
+* Added `survey_module_ui()` and `survey_module_server()`. These allow a
+  survey to be embedded inside a larger Shiny application as a first-class
+  module. `survey_module_server()` returns a `reactive` that holds `NULL`
+  until the form is submitted, then returns the response as a named list
+  keyed by item ID.
 
-* Added `export_google_sheet()` to generate an Apps Script collector.
-* Added `read_sheet_responses()` to load collected responses back into
-  surveyframe.
+  ```r
+  ui <- fluidPage(survey_module_ui("s1"))
+  server <- function(input, output, session) {
+    resp <- survey_module_server("s1", instrument = instr)
+    observeEvent(resp(), { saveRDS(resp(), "response.rds") })
+  }
+  ```
+
+  An optional `on_submit` callback fires immediately on submission, before
+  any `observeEvent()` elsewhere in the app.
+
+### Extended analysis plan tests
+
+`run_analysis_plan()` now implements four additional tests used by the
+SurveyBuilder's test dropdown:
+
+* `anova_one` — One-way ANOVA with eta-squared effect size. When the
+  result is significant and there are more than two groups, Tukey HSD
+  post-hoc output is included in the result object.
+* `t_test_pair` — Paired-samples t-test with Cohen's d_z.
+* `wilcoxon_pair` — Wilcoxon signed-rank test with r effect size.
+* `regression_logistic_binary` — Binary logistic regression with
+  McFadden R-squared and an overall model chi-square test. The full
+  coefficient table is returned for interpretation.
+
+All four runners produce an APA-formatted summary string and an
+interpretation `prompt` field to guide write-up.
+
+## Bug fixes
+
+* `launch_builder(open = TRUE)` opens the SurveyBuilder HTML in the system's
+  default browser via `utils::browseURL()`.
+* `R/studio_builder.R` contains three fully implemented internal
+  functions (`sframe_builder_empty_state`, `sframe_builder_state_from_instrument`,
+  `sframe_builder_validate_draft`) used by SurveyStudio startup and draft
+  validation.
+* SHA-256 hashing in the SurveyBuilder HTML includes a pure-JavaScript
+  fallback for environments where `crypto.subtle` is unavailable on
+  `file://` origins, including common Firefox `file://` configurations.
+  Saving a `.sframe` file from the builder now always succeeds.
+* The SurveyBuilder's `rqSuggest` box now appears with an icon and a
+  plain-language recommendation when two or more variables are selected in
+  the RQ modal.
+* The undo and redo buttons in the SurveyBuilder topbar are now correctly
+  disabled when their respective history stacks are empty.
+
+## Security hardening
+
+* `export_google_sheet()` now writes Google Apps Script using JSON-encoded
+  JavaScript literals instead of interpolating instrument metadata directly
+  into executable code. The generated endpoint also rejects missing,
+  over-large, and non-object JSON POST bodies.
+* SurveyStudio upload handlers now validate uploaded `.sframe` and `.csv`
+  files by extension, size, and text-content checks before passing them to
+  import functions.
+* `read_sframe()` now validates the top-level `.sframe` payload structure
+  before hash verification and object reconstruction.
+* Internal HTML report generation now applies escaping consistently to
+  report titles, instrument metadata, citations, and effect labels.
+* Quarto report rendering now cleans temporary render directories and RDS
+  files with `on.exit()` even when rendering fails.
 
 ## Documentation
 
-* Added and updated vignettes for the end-to-end workflow and studio usage.
-* Refreshed README and pkgdown configuration for the v0.2 feature set.
+* `validate_sframe()`, `score_scales()`, `codebook_report()`, `cfa_syntax()`,
+  and `launch_builder(open = FALSE)` have fully runnable examples.
+* Added `cran-comments.md` with platform list, dependency justification,
+  bundled-asset description, and a `\dontrun{}` use justification table.
 
-## Tests
-
-* Expanded automated coverage for SurveyBuilder, v0.2 item types,
-  analysis-plan execution, `.sframe` roundtrips, reporting, and Google Sheets
-  helpers.
-
-## Breaking changes
-
-* None.
+---
 
 # surveyframe 0.1.0
 
-## First release
-
-surveyframe 0.1.0 introduces the complete v0.1 workflow.
-
-### New features
-
-* `sf_instrument()`, `sf_item()`, `sf_choices()`, `sf_scale()`,
-  `sf_branch()`, `sf_check()`: constructor family for building typed
-  instrument objects.
-* `validate_sframe()`: full structural validation with eight distinct checks
-  and custom condition classes.
-* `write_sframe()` and `read_sframe()`: save and load instruments as UTF-8
-  JSON with SHA-256 integrity hashing.
-* `render_survey()`: deploy any instrument as a Shiny survey with branching
-  logic.
-* `launch_studio()`: open SurveyStudio, a six-screen Shiny interface for the
-  full pipeline.
-* `read_responses()`: load CSV or data frame responses with column contract
-  validation against the instrument.
-* `quality_report()`: attention check evaluation, straight-lining detection,
-  item and respondent missingness, and duplicate ID checking.
-* `score_scales()`: composite scoring with reverse coding, minimum valid
-  item thresholds, and mean or sum methods.
-* `reliability_report()`: Cronbach's alpha and McDonald's omega per scale.
-* `item_report()`: item-total correlations, floor and ceiling proportions,
-  and descriptive statistics per scale.
-* `efa_report()`: KMO adequacy, Bartlett's test, and parallel analysis
-  diagnostics. Does not fit an EFA solution.
-* `cfa_syntax()`: generate `lavaan` CFA model syntax from the instrument's
-  scale structure.
-* `codebook_report()`: structured codebook as a tibble-based object.
-* `render_report()`: parameterised Quarto HTML report covering codebook,
-  quality, and reliability sections.
-
-### Architecture
-
-* The `sframe` S3 class with `print`, `summary`, and `format` methods.
-* Custom condition classes: `sframe_validation_error`, `sframe_import_error`,
-  `sframe_branching_error`, `sframe_quality_warning`,
-  `sframe_missing_data_warning`, `sframe_scoring_warning`.
-* Test coverage across the exported workflow, including report rendering.
-
-### Phase 1 hardening
-
-* `render_survey()` now enforces required visible items, honours help text and
-  rendering hints, and can append submitted responses to CSV with
-  `started_at` and `submitted_at` metadata.
-* `quality_report()` now computes timing diagnostics when start and submit
-  timestamps are available, including threshold-based speed checks.
-* `score_scales()` now supports weighted mean and weighted sum composites.
-* `render_report()` now accepts ordinary output paths, renders a working
-  Quarto report through the installed template, and includes the instrument
-  SHA-256 hash in the reproducibility note.
+* Initial release.
+* Core S3 object system: `sf_instrument()`, `sf_item()`, `sf_choices()`,
+  `sf_scale()`.
+* Serialisation: `write_sframe()`, `read_sframe()` with SHA-256 integrity
+  checking.
+* Shiny survey renderer: `render_survey()`.
+* Static SurveyBuilder HTML: `launch_builder()`.
+* Response reader: `read_responses()`.

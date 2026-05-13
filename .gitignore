@@ -9,5 +9,8 @@ docs
 *.tar.gz
 *.zip
 *.Rcheck/
+.local-bin/
+.local-debs/
+.local-tidy/
 .codex
 surveyframe_v0.2/

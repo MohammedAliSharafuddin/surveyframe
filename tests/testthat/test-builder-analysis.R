@@ -1,4 +1,4 @@
-# test-v02.R -- v0.2 feature tests for surveyframe
+# test-builder-analysis.R -- builder and analysis feature tests for surveyframe
 # Covers: launch_builder, export_google_sheet, run_analysis_plan,
 #         render_results, render_report, updated sf_item types.
 
@@ -318,7 +318,7 @@ test_that("render_results accepts output_path alias", {
   unlink(tmp)
 })
 
-test_that("write_sframe/read_sframe preserve analysis plans and v0.2 item fields", {
+test_that("write_sframe/read_sframe preserve analysis plans and extended item fields", {
   instr <- make_instr()
   instr$items <- c(instr$items, list(
     sf_item("m1", "Rate aspects", type = "matrix", choice_set = "agree5",

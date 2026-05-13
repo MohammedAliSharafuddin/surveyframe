@@ -25,13 +25,13 @@ surveyframe is designed to cover the full life of a survey study inside R:
 - pre-planned analysis execution
 - reproducible HTML reporting
 
-The package does not try to replace specialist modelling packages. `psych`,
-`lavaan`, and other downstream tools remain appropriate where the workflow
-needs them. surveyframe owns the instrument-centred pipeline.
+Specialist modelling packages such as `psych` and `lavaan` remain available
+for downstream modelling. surveyframe owns the instrument-centred pipeline and
+hands off to those tools where deeper modelling is needed.
 
 ## Current status
 
-The current v0.2 line includes:
+The current v0.3 pre-submission candidate includes:
 
 - thirteen item types
 - reusable choice sets
@@ -39,12 +39,16 @@ The current v0.2 line includes:
 - single-condition branching and attention checks
 - Google Sheets helper utilities
 - SurveyBuilder and SurveyStudio
+- static HTML survey export with optional JSON POST endpoint
+- embeddable Shiny survey modules
+- interactive response dashboard
 - Cronbach alpha, McDonald omega, item diagnostics, EFA readiness, and CFA
   syntax generation
-- analysis-plan execution across eight tests with APA-style output
+- analysis-plan execution across fourteen tests with APA-style output
 - HTML reporting with instrument hashing for reproducibility
 
-The immediate focus is CRAN hardening rather than adding more surface area.
+The immediate focus is final CRAN submission validation rather than adding
+more surface area.
 
 ## Dependency model
 
@@ -59,6 +63,7 @@ Optional feature packages are loaded only when needed:
 - `shiny` for `render_survey()` and `launch_studio()`
 - `psych` for `reliability_report()` and `efa_report()`
 - `googlesheets4` for `read_sheet_responses()`
+- `digest` for response IDs in `survey_module_server()`
 
 Quarto is no longer a hard dependency. If the `quarto` R package and the
 Quarto CLI are available locally, `render_report()` can use the bundled `.qmd`
@@ -67,7 +72,7 @@ fallback instead.
 
 ## Installation
 
-The package is not yet on CRAN. Install the development version from GitHub:
+Install the development version from GitHub:
 
 ```r
 remotes::install_github("MohammedAliSharafuddin/surveyframe")
@@ -76,7 +81,7 @@ remotes::install_github("MohammedAliSharafuddin/surveyframe")
 Install optional packages only for the features you plan to use:
 
 ```r
-install.packages(c("shiny", "psych", "googlesheets4"))
+install.packages(c("shiny", "psych", "googlesheets4", "digest"))
 
 # Optional for richer report rendering
 install.packages("quarto")
@@ -135,22 +140,25 @@ render_report(instr, data = resp, output_file = "report.html")
 | Need | Entry point | Optional package |
 |---|---|---|
 | Visual instrument authoring | `launch_builder()` | none |
+| Static HTML survey export | `export_static_survey()` | none |
 | Interactive survey deployment | `render_survey()` | `shiny` |
 | Studio workflow shell | `launch_studio()` | `shiny` |
+| Embedded survey in a Shiny app | `survey_module_ui()`, `survey_module_server()` | `shiny`, `digest` |
+| Response exploration dashboard | `launch_dashboard()` | `shiny` |
 | Reliability and EFA readiness | `reliability_report()`, `efa_report()` | `psych` |
 | Google Sheets response import | `read_sheet_responses()` | `googlesheets4` |
 | Rich Quarto rendering | `render_report()` with local Quarto install | Quarto CLI |
 
 ## CRAN track
 
-The package is being prepared for first submission. Current priorities are:
+The package is being prepared for first CRAN submission as v0.3.0. Current
+priorities are:
 
 - keep the hard dependency set minimal
 - run clean `R CMD check --as-cran` results across platforms
-- replace broad `\\dontrun{}` usage on pure constructor examples with runnable
-  examples
-- finish the CRAN submission notes and reviewer-facing explanation of the
-  bundled builder asset
+- verify win-builder and rhub results for the final tarball
+- manually exercise the browser and Shiny interfaces before upload
+- keep `cran-comments.md` aligned with the actual final check results
 
 ## Citation
 

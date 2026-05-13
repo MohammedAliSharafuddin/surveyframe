@@ -213,6 +213,41 @@ sframe_restore_analysis_block <- function(block) {
   block
 }
 
+sframe_validate_parsed_payload <- function(parsed, path) {
+  required <- c("hash", "version", "meta", "items", "choices", "scales")
+  missing <- setdiff(required, names(parsed))
+  if (length(missing) > 0) {
+    sframe_abort_import(
+      paste0(
+        "Invalid .sframe file: missing required field(s): ",
+        paste(missing, collapse = ", "),
+        "."
+      ),
+      path = path
+    )
+  }
+
+  if (!is.list(parsed$hash) ||
+      !identical(parsed$hash$algo %||% "", "sha256") ||
+      is.null(parsed$hash$value)) {
+    sframe_abort_import(
+      "Invalid .sframe file: missing SHA-256 hash metadata.",
+      path = path
+    )
+  }
+
+  if (!is.list(parsed$meta) ||
+      is.null(parsed$meta$title) ||
+      !is.list(parsed$items) ||
+      !is.list(parsed$choices) ||
+      !is.list(parsed$scales)) {
+    sframe_abort_import(
+      "Invalid .sframe file: payload structure is not recognised.",
+      path = path
+    )
+  }
+}
+
 #' Read an instrument from a .sframe file
 #'
 #' Reads a `.sframe` JSON file and reconstructs an `sframe` instrument object.
@@ -259,6 +294,8 @@ read_sframe <- function(path, validate = TRUE) {
       )
     }
   )
+
+  sframe_validate_parsed_payload(parsed, path)
 
   # Verify hash
   stored_hash <- parsed$hash$value

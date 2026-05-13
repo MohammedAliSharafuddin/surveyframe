@@ -40,10 +40,23 @@ The following checks are performed:
 }
 }
 \examples{
-\dontrun{
-instr <- sf_instrument("My Survey", components = list(...))
-validate_sframe(instr)
-}
+# Build a minimal valid instrument and validate it
+cs    <- sf_choices("ag5", 1:5,
+           c("Strongly disagree", "Disagree", "Neutral",
+             "Agree", "Strongly agree"))
+item  <- sf_item("sat_1", "The service met my expectations.",
+                 type = "likert", choice_set = "ag5", scale_id = "sat")
+scale <- sf_scale("sat", "Satisfaction", items = "sat_1")
+instr <- sf_instrument("Demo Survey", components = list(cs, item, scale))
+
+# Non-strict: returns a list without stopping
+result <- validate_sframe(instr, strict = FALSE)
+result$valid
+result$problems
+
+# Strict: returns instrument invisibly when valid
+validated <- validate_sframe(instr, strict = TRUE)
+isTRUE(validated$meta$validated)
 }
 \seealso{
 \code{\link[=sf_instrument]{sf_instrument()}}, \code{\link[=write_sframe]{write_sframe()}}

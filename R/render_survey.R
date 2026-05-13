@@ -321,7 +321,7 @@ sframe_progress_ui <- function(answered, total, colour) {
 #' a callback.
 #'
 #' @param instrument An `sframe` object.
-#' @param mode Character. Deployment mode. Only `"shiny"` is supported in v0.2.
+#' @param mode Character. Deployment mode. Currently `"shiny"`.
 #' @param title Character or NULL. Override for the survey title.
 #' @param theme Character or NULL. Hex colour for the survey theme.
 #' @param save_responses Character. `"none"` (default) or `"csv"`.

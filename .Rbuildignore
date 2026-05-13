@@ -5,10 +5,15 @@
 ^.*\.Rproj$
 ^_pkgdown\.yml$
 ^CONTRIBUTING\.md$
+^cran-comments\.md$
 ^LICENSE\.md$
 ^roadmap\.md$
 ^todo\.md$
 ^docs($|/)
 ^\.codex$
 ^\.codex($|/)
+^\.local-bin($|/)
+^\.local-debs($|/)
+^\.local-tidy($|/)
 ^surveyframe_v0\.2($|/)
+^surveyframe_[Vv]0\.3($|/)

@@ -9,9 +9,9 @@
 surveyframe defines a survey instrument as a first-class R object and
 provides a complete workflow from instrument design through data collection,
 quality checking, scoring, psychometric diagnostics, and reproducible
-reporting. Version 0.2 adds the browser-based SurveyBuilder, launched with
-\code{\link[=launch_builder]{launch_builder()}}, while SurveyStudio, launched with \code{\link[=launch_studio]{launch_studio()}},
-remains the Shiny workflow shell.
+reporting. Version 0.3 adds static HTML survey export, an embeddable Shiny
+survey module, an interactive response dashboard, and additional
+analysis-plan tests.
 \subsection{Core workflow}{
 \enumerate{
 \item \strong{Design} an instrument with \code{\link[=launch_builder]{launch_builder()}} or \code{\link[=sf_instrument]{sf_instrument()}} and
@@ -45,13 +45,17 @@ Each file includes a SHA-256 integrity hash for reproducibility auditing.
 Useful links:
 \itemize{
   \item \url{https://github.com/MohammedAliSharafuddin/surveyframe}
-  \item \url{https://mohammedalisharafuddin.github.io/surveyframe}
   \item Report bugs at \url{https://github.com/MohammedAliSharafuddin/surveyframe/issues}
 }
 
 }
 \author{
 \strong{Maintainer}: Mohammed Ali Sharafuddin \email{mas@flairmi.com}
+
+Authors:
+\itemize{
+  \item Mohammed Ali Sharafuddin \email{mas@flairmi.com}
+}
 
 }
 \keyword{internal}

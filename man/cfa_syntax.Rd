@@ -26,10 +26,26 @@ transformed in the syntax; recoding should be applied to the data before
 fitting the model.
 }
 \examples{
-\dontrun{
+cs    <- sf_choices("ag5", 1:5,
+           c("Strongly disagree", "Disagree", "Neutral",
+             "Agree", "Strongly agree"))
+i1    <- sf_item("sat_1", "Item 1", type = "likert",
+                 choice_set = "ag5", scale_id = "sat")
+i2    <- sf_item("sat_2", "Item 2", type = "likert",
+                 choice_set = "ag5", scale_id = "sat")
+i3    <- sf_item("sat_3", "Item 3 (reverse)", type = "likert",
+                 choice_set = "ag5", scale_id = "sat", reverse = TRUE)
+scale <- sf_scale("sat", "Satisfaction",
+                  items = c("sat_1", "sat_2", "sat_3"))
+instr <- sf_instrument("Demo Survey", components = list(cs, i1, i2, i3, scale))
+
 syntax <- cfa_syntax(instr)
 cat(syntax)
+
+\dontrun{
+# Fit the generated syntax with lavaan
 fit <- lavaan::cfa(syntax, data = scored_data, std.lv = TRUE)
+summary(fit, fit.measures = TRUE)
 }
 }
 \seealso{

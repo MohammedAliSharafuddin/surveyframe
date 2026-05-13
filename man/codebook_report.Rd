@@ -23,10 +23,20 @@ scale membership, and reverse-coding status. The codebook can be rendered
 as HTML or Markdown.
 }
 \examples{
-\dontrun{
-cb <- codebook_report(instr, format = "html")
+cs    <- sf_choices("ag5", 1:5,
+           c("Strongly disagree", "Disagree", "Neutral",
+             "Agree", "Strongly agree"))
+i1    <- sf_item("sat_1", "Item 1", type = "likert",
+                 choice_set = "ag5", scale_id = "sat")
+i2    <- sf_item("sat_2", "Item 2", type = "likert",
+                 choice_set = "ag5", scale_id = "sat")
+scale <- sf_scale("sat", "Satisfaction", items = c("sat_1", "sat_2"))
+instr <- sf_instrument("Demo Survey", components = list(cs, i1, i2, scale))
+
+cb <- codebook_report(instr)
 print(cb)
-}
+nrow(cb$items_table)
+nrow(cb$scales_table)
 }
 \seealso{
 \code{\link[=render_report]{render_report()}}

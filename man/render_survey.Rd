@@ -17,7 +17,7 @@ render_survey(
 \arguments{
 \item{instrument}{An \code{sframe} object.}
 
-\item{mode}{Character. Deployment mode. Only \code{"shiny"} is supported in v0.2.}
+\item{mode}{Character. Deployment mode. Currently \code{"shiny"}.}
 
 \item{title}{Character or NULL. Override for the survey title.}
 

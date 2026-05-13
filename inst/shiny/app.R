@@ -107,6 +107,46 @@ parse_check_values <- function(text) {
   utils::type.convert(values, as.is = TRUE)
 }
 
+sframe_upload_ext <- function(upload) {
+  tolower(tools::file_ext(upload$name %||% ""))
+}
+
+sframe_validate_upload <- function(upload, extensions, max_size = 10 * 1024^2) {
+  if (is.null(upload) || is.null(upload$datapath) || !file.exists(upload$datapath)) {
+    stop("No uploaded file was found.", call. = FALSE)
+  }
+
+  ext <- sframe_upload_ext(upload)
+  if (!ext %in% extensions) {
+    stop(
+      paste0(
+        "Unsupported file type '.", ext, "'. Expected: .",
+        paste(extensions, collapse = ", ."), "."
+      ),
+      call. = FALSE
+    )
+  }
+
+  size <- file.info(upload$datapath)$size
+  if (is.na(size) || size <= 0 || size > max_size) {
+    stop("Uploaded file is empty or too large.", call. = FALSE)
+  }
+
+  con <- file(upload$datapath, open = "rb")
+  on.exit(close(con), add = TRUE)
+  bytes <- readBin(con, what = "raw", n = min(size, 512))
+  if (length(bytes) == 0 || any(bytes == as.raw(0))) {
+    stop("Uploaded file is not a supported text file.", call. = FALSE)
+  }
+
+  text_start <- sub("^\ufeff", "", rawToChar(bytes))
+  if (identical(ext, "sframe") && !startsWith(trimws(text_start), "{")) {
+    stop("Uploaded .sframe file does not look like JSON.", call. = FALSE)
+  }
+
+  normalizePath(upload$datapath, mustWork = TRUE)
+}
+
 format_value <- function(x) {
   if (is.null(x) || length(x) == 0) {
     return("")
@@ -940,7 +980,8 @@ server <- function(input, output, session) {
   observeEvent(input$instr_file, {
     req(input$instr_file)
     tryCatch({
-      loaded <- surveyframe::read_sframe(input$instr_file$datapath)
+      path <- sframe_validate_upload(input$instr_file, "sframe")
+      loaded <- surveyframe::read_sframe(path)
       rv$builder <- builder_state_from_instrument(loaded)
       rv$instrument <- loaded
       rv$responses <- NULL
@@ -957,8 +998,9 @@ server <- function(input, output, session) {
     id_col <- trim_or_null(input$resp_id_col)
     time_col <- trim_or_null(input$resp_time_col)
     tryCatch({
+      path <- sframe_validate_upload(input$resp_file, "csv")
       rv$responses <- surveyframe::read_responses(
-        x = input$resp_file$datapath,
+        x = path,
         instrument = rv$instrument,
         respondent_id = id_col,
         submitted_at = time_col,

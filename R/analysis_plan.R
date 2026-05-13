@@ -17,7 +17,18 @@
     key  = "cohen_1988",
     apa  = "Cohen, J. (1988). *Statistical power analysis for the behavioral sciences* (2nd ed.). Lawrence Erlbaum.",
     use  = c("chi_square", "t_test_ind", "mann_whitney", "anova_one",
-             "correlation_pearson", "correlation_spearman", "kruskal_wallis")
+             "t_test_pair", "correlation_pearson", "correlation_spearman",
+             "kruskal_wallis", "wilcoxon_pair")
+  ),
+  fisher_1925 = list(
+    key = "fisher_1925",
+    apa = "Fisher, R. A. (1925). *Statistical methods for research workers*. Oliver & Boyd.",
+    use = c("anova_one", "t_test_pair")
+  ),
+  shapiro_1965 = list(
+    key = "shapiro_1965",
+    apa = "Shapiro, S. S., & Wilk, M. B. (1965). An analysis of variance test for normality. *Biometrika*, *52*(3-4), 591-611.",
+    use = c("anova_one", "t_test_pair", "wilcoxon_pair")
   ),
   mann_1947 = list(
     key  = "mann_1947",
@@ -56,7 +67,7 @@
   ),
   surveyframe = list(
     key  = "surveyframe",
-    apa  = "Sharafuddin, M. A. (2026). *surveyframe: A survey instrument workflow for R* (Version 0.2.0) [Computer software]. https://github.com/MohammedAliSharafuddin/surveyframe",
+    apa  = "Sharafuddin, M. A. (2026). *surveyframe: A survey instrument workflow for R* (Version 0.3.0) [Computer software]. https://github.com/MohammedAliSharafuddin/surveyframe",
     use  = "all"
   )
 )
@@ -252,6 +263,176 @@ sframe_run_t_test <- function(data, vars) {
   )
 }
 
+sframe_run_anova_one <- function(data, vars) {
+  group_col <- vars[1]
+  outcome_col <- vars[2]
+  outcome <- suppressWarnings(as.numeric(data[[outcome_col]]))
+  group <- as.factor(data[[group_col]])
+  complete <- !is.na(outcome) & !is.na(group)
+  n <- sum(complete)
+  k <- length(levels(droplevels(group[complete])))
+
+  if (n < 3 || k < 2) {
+    return(list(test = "anova_one",
+                error = "One-way ANOVA requires at least two groups and three complete observations."))
+  }
+
+  fit <- tryCatch(
+    stats::aov(outcome[complete] ~ group[complete]),
+    error = function(e) NULL
+  )
+  if (is.null(fit)) return(list(test = "anova_one", error = "ANOVA failed."))
+
+  s <- summary(fit)[[1]]
+  F_stat <- s[["F value"]][1]
+  p_val <- s[["Pr(>F)"]][1]
+  ss_between <- s[["Sum Sq"]][1]
+  ss_total <- sum(s[["Sum Sq"]], na.rm = TRUE)
+  eta2 <- ss_between / ss_total
+
+  group_means <- tapply(outcome[complete], group[complete], mean, na.rm = TRUE)
+  group_means_str <- paste(
+    paste(names(group_means), sprintf("M=%.2f", group_means), sep = " "),
+    collapse = ", "
+  )
+
+  tukey <- if (!is.na(p_val) && p_val < 0.05 && k > 2) {
+    tryCatch(
+      utils::capture.output(stats::TukeyHSD(fit)),
+      error = function(e) NULL
+    )
+  } else NULL
+
+  list(
+    test = "anova_one",
+    vars = vars,
+    n = n,
+    k = k,
+    F_stat = F_stat,
+    df1 = k - 1,
+    df2 = n - k,
+    p = p_val,
+    eta2 = eta2,
+    group_means = as.list(group_means),
+    tukey = tukey,
+    effect_label = sframe_effect_label(eta2, "eta2"),
+    apa = sprintf(
+      "F(%d, %d) = %.2f, p %s, \u03b7\u00b2 = %.3f",
+      k - 1, n - k, F_stat, sframe_p_string(p_val), eta2
+    ),
+    prompt = sprintf(
+      "The one-way ANOVA %s a significant effect of %s on %s, F(%d, %d) = %.2f, p %s, \u03b7\u00b2 = %.3f (%s effect). Group means: %s. %s",
+      if (!is.na(p_val) && p_val < .05) "revealed" else "did not reveal",
+      vars[1], vars[2],
+      k - 1, n - k, F_stat, sframe_p_string(p_val),
+      eta2, sframe_effect_label(eta2, "eta2"),
+      group_means_str,
+      if (!is.null(tukey))
+        "Tukey HSD post-hoc comparisons are included in the result object."
+      else ""
+    )
+  )
+}
+
+sframe_run_t_test_pair <- function(data, vars) {
+  x <- suppressWarnings(as.numeric(data[[vars[1]]]))
+  y <- suppressWarnings(as.numeric(data[[vars[2]]]))
+
+  complete <- !is.na(x) & !is.na(y)
+  x <- x[complete]
+  y <- y[complete]
+  n <- length(x)
+
+  if (n < 2) {
+    return(list(test = "t_test_pair",
+                error = "Fewer than 2 complete pairs available."))
+  }
+
+  tt <- tryCatch(stats::t.test(x, y, paired = TRUE), error = function(e) NULL)
+  if (is.null(tt)) return(list(test = "t_test_pair", error = "Test failed."))
+
+  diff <- x - y
+  dz <- mean(diff, na.rm = TRUE) / stats::sd(diff, na.rm = TRUE)
+
+  list(
+    test = "t_test_pair",
+    vars = vars,
+    n = n,
+    mean_x = mean(x),
+    mean_y = mean(y),
+    mean_diff = mean(diff),
+    sd_diff = stats::sd(diff),
+    t = unname(tt$statistic),
+    df = unname(tt$parameter),
+    p = tt$p.value,
+    d_z = dz,
+    effect_label = sframe_effect_label(abs(dz), "d"),
+    apa = sprintf(
+      "t(%d) = %.2f, p %s, d_z = %.2f",
+      unname(tt$parameter), unname(tt$statistic),
+      sframe_p_string(tt$p.value), dz
+    ),
+    prompt = sprintf(
+      "The paired-samples t-test %s a significant mean difference between %s (M = %.2f) and %s (M = %.2f), t(%d) = %.2f, p %s, d_z = %.2f (%s effect). Interpret the direction and practical significance of the change.",
+      if (tt$p.value < .05) "revealed" else "did not reveal",
+      vars[1], mean(x), vars[2], mean(y),
+      unname(tt$parameter), unname(tt$statistic),
+      sframe_p_string(tt$p.value),
+      dz, sframe_effect_label(abs(dz), "d")
+    )
+  )
+}
+
+sframe_run_wilcoxon_pair <- function(data, vars) {
+  x <- suppressWarnings(as.numeric(data[[vars[1]]]))
+  y <- suppressWarnings(as.numeric(data[[vars[2]]]))
+
+  complete <- !is.na(x) & !is.na(y)
+  x <- x[complete]
+  y <- y[complete]
+  n <- length(x)
+
+  if (n < 2) {
+    return(list(test = "wilcoxon_pair",
+                error = "Fewer than 2 complete pairs available."))
+  }
+
+  wt <- tryCatch(
+    stats::wilcox.test(x, y, paired = TRUE, exact = FALSE),
+    error = function(e) NULL
+  )
+  if (is.null(wt)) return(list(test = "wilcoxon_pair", error = "Test failed."))
+
+  z <- stats::qnorm(wt$p.value / 2)
+  r <- abs(z) / sqrt(n)
+
+  list(
+    test = "wilcoxon_pair",
+    vars = vars,
+    n = n,
+    median_x = stats::median(x),
+    median_y = stats::median(y),
+    V = unname(wt$statistic),
+    z = z,
+    p = wt$p.value,
+    r = r,
+    effect_label = sframe_effect_label(r, "r"),
+    apa = sprintf(
+      "V = %.0f, z = %.2f, p %s, r = %.2f",
+      wt$statistic, z, sframe_p_string(wt$p.value), r
+    ),
+    prompt = sprintf(
+      "The Wilcoxon signed-rank test %s a significant difference between %s (Mdn = %.2f) and %s (Mdn = %.2f), V = %.0f, z = %.2f, p %s, r = %.2f (%s effect). Discuss the direction and practical significance.",
+      if (wt$p.value < .05) "revealed" else "did not reveal",
+      vars[1], stats::median(x),
+      vars[2], stats::median(y),
+      wt$statistic, z,
+      sframe_p_string(wt$p.value),
+      r, sframe_effect_label(r, "r")
+    )
+  )
+}
+
 sframe_run_kruskal <- function(data, vars) {
   group_col <- vars[1]
   outcome_col <- vars[2]
@@ -365,6 +546,76 @@ sframe_run_regression <- function(data, vars) {
   )
 }
 
+sframe_run_logistic_binary <- function(data, vars) {
+  outcome_col <- vars[length(vars)]
+  predictors <- vars[-length(vars)]
+
+  outcome_raw <- data[[outcome_col]]
+  outcome_fac <- as.factor(outcome_raw)
+
+  if (nlevels(droplevels(outcome_fac[!is.na(outcome_fac)])) != 2L) {
+    return(list(test = "regression_logistic_binary",
+                error = paste0("'", outcome_col,
+                               "' must have exactly two non-missing levels.")))
+  }
+
+  pred_data <- as.data.frame(lapply(data[predictors], function(x) {
+    suppressWarnings(as.numeric(x))
+  }))
+  pred_data[[outcome_col]] <- as.integer(outcome_fac) - 1L
+  complete <- stats::complete.cases(pred_data)
+  n <- sum(complete)
+
+  if (n < 3) {
+    return(list(test = "regression_logistic_binary",
+                error = "Fewer than 3 complete observations available."))
+  }
+
+  formula_str <- paste(outcome_col, "~", paste(predictors, collapse = " + "))
+
+  fit <- tryCatch(
+    stats::glm(
+      stats::as.formula(formula_str),
+      data = pred_data[complete, ],
+      family = stats::binomial(link = "logit")
+    ),
+    error = function(e) NULL
+  )
+  if (is.null(fit)) {
+    return(list(test = "regression_logistic_binary",
+                error = "Logistic regression failed."))
+  }
+
+  s <- summary(fit)
+  null_dev <- fit$null.deviance
+  resid_dev <- fit$deviance
+  df_null <- fit$df.null
+  mcfadden_r2 <- 1 - resid_dev / null_dev
+  chi_val <- null_dev - resid_dev
+  chi_df <- df_null - fit$df.residual
+  chi_p <- stats::pchisq(chi_val, df = chi_df, lower.tail = FALSE)
+
+  list(
+    test = "regression_logistic_binary",
+    vars = vars,
+    n = n,
+    mcFadden_r2 = mcfadden_r2,
+    chi_sq = chi_val,
+    chi_df = chi_df,
+    chi_p = chi_p,
+    coefficients = as.data.frame(s$coefficients),
+    apa = sprintf(
+      "\u03c7\u00b2(%d) = %.2f, p %s, McFadden R\u00b2 = %.3f",
+      chi_df, chi_val, sframe_p_string(chi_p), mcfadden_r2
+    ),
+    prompt = sprintf(
+      "The binary logistic regression model was %s overall, \u03c7\u00b2(%d) = %.2f, p %s, McFadden R\u00b2 = %.3f. Interpret the direction and odds ratio for each significant predictor.",
+      if (chi_p < .05) "statistically significant" else "not statistically significant",
+      chi_df, chi_val, sframe_p_string(chi_p), mcfadden_r2
+    )
+  )
+}
+
 # ---------------------------------------------------------------------------
 # Dispatcher
 # ---------------------------------------------------------------------------
@@ -380,11 +631,15 @@ sframe_run_one_block <- function(block, data) {
       chi_square         = sframe_run_crosstab(data, vars),
       mann_whitney       = sframe_run_mann_whitney(data, vars),
       t_test_ind         = sframe_run_t_test(data, vars),
+      t_test_pair        = sframe_run_t_test_pair(data, vars),
       kruskal_wallis     = sframe_run_kruskal(data, vars),
+      anova_one          = sframe_run_anova_one(data, vars),
+      wilcoxon_pair      = sframe_run_wilcoxon_pair(data, vars),
       correlation_pearson  = sframe_run_correlation(data, vars, "pearson"),
       correlation_spearman = sframe_run_correlation(data, vars, "spearman"),
       regression_linear    = sframe_run_regression(data, vars),
-      list(test = test, error = paste0("Test '", test, "' is not yet implemented."))
+      regression_logistic_binary = sframe_run_logistic_binary(data, vars),
+      list(test = test, error = paste0("Test '", test, "' is unavailable."))
     )
   }, error = function(e) {
     list(test = test, error = conditionMessage(e))
@@ -513,6 +768,9 @@ render_results <- function(
 
   stopifnot(inherits(results, "sframe_analysis_results"))
   report_title <- title %||% paste0(instrument$meta$title, " -- Results")
+  report_title_html <- htmltools_escape(report_title)
+  instrument_title_html <- htmltools_escape(instrument$meta$title)
+  instrument_version_html <- htmltools_escape(instrument$meta$version)
 
   # Collect all unique citations
   all_citations <- list()
@@ -529,7 +787,10 @@ render_results <- function(
     apa_str <- r$apa %||% ""
     prompt  <- r$interpretation_prompt %||% r$prompt %||% ""
     interp  <- r$interpretation %||% ""
-    cits    <- paste(unlist(r$citations), collapse = "<br>")
+    cits <- paste(
+      vapply(unlist(r$citations), htmltools_escape, character(1)),
+      collapse = "<br>"
+    )
 
     if (!is.null(r$error)) {
       return(sprintf(
@@ -557,9 +818,10 @@ render_results <- function(
 
     effect_badge <- ""
     if (!is.null(r$effect_label)) {
+      effect_class <- gsub("[^a-zA-Z0-9_-]", "", r$effect_label)
       effect_badge <- sprintf(
         '<span class="effect-badge effect-%s">%s effect</span>',
-        r$effect_label, r$effect_label
+        effect_class, htmltools_escape(r$effect_label)
       )
     }
 
@@ -593,7 +855,13 @@ render_results <- function(
   }, character(1)), collapse = "\n")
 
   references_html <- if (length(all_citations) > 0) {
-    items <- paste(sprintf('<li>%s</li>', unlist(all_citations)), collapse = "\n")
+    items <- paste(
+      sprintf(
+        '<li>%s</li>',
+        vapply(unlist(all_citations), htmltools_escape, character(1))
+      ),
+      collapse = "\n"
+    )
     sprintf('<section class="references"><h2>References</h2><ol>%s</ol></section>', items)
   } else ""
 
@@ -660,9 +928,9 @@ render_results <- function(
 %s
 </body>
 </html>',
-    report_title, report_title,
-    instrument$meta$title, instrument$meta$version,
-    format(Sys.Date(), "%B %d, %Y"),
+    report_title_html, report_title_html,
+    instrument_title_html, instrument_version_html,
+    htmltools_escape(format(Sys.Date(), "%B %d, %Y")),
     sections_html, references_html
   )
 

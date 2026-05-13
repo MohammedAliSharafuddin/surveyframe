@@ -4,9 +4,9 @@
 #' surveyframe defines a survey instrument as a first-class R object and
 #' provides a complete workflow from instrument design through data collection,
 #' quality checking, scoring, psychometric diagnostics, and reproducible
-#' reporting. Version 0.2 adds the browser-based SurveyBuilder, launched with
-#' [launch_builder()], while SurveyStudio, launched with [launch_studio()],
-#' remains the Shiny workflow shell.
+#' reporting. Version 0.3 adds static HTML survey export, an embeddable Shiny
+#' survey module, an interactive response dashboard, and additional
+#' analysis-plan tests.
 #'
 #' ## Core workflow
 #'

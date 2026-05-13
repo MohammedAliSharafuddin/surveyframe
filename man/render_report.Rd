@@ -28,8 +28,7 @@ temporary file is written and its path returned.}
 \item{output_path}{Character or NULL. Alias for \code{output_file}. If both are
 supplied, \code{output_file} takes precedence.}
 
-\item{format}{Character. Output format. Only \code{"html"} is supported in
-v0.2.}
+\item{format}{Character. Output format. Currently \code{"html"}.}
 
 \item{include_quality}{Logical. Whether to include the data quality report.
 Requires \code{data}. Defaults to \code{TRUE}.}

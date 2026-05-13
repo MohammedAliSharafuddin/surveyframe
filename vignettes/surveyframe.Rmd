@@ -316,9 +316,8 @@ print(ir[[1]]$diagnostics)
 ### EFA readiness
 
 `efa_report()` prepares a dataset for exploratory factor analysis by
-computing KMO adequacy and Bartlett's test. It does not estimate a factor
-solution. That step belongs to the researcher, using `psych::fa()` or a
-similar package.
+computing KMO adequacy and Bartlett's test. Researchers can then estimate the
+factor solution with `psych::fa()` or a similar modelling function.
 
 ```{r efa}
 er <- efa_report(responses, instr)

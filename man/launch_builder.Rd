@@ -7,33 +7,42 @@
 launch_builder(open = TRUE)
 }
 \arguments{
-\item{open}{Logical. If \code{TRUE} (the default), opens the builder in the
-default browser. Set to \code{FALSE} to return the file path without opening,
-which is useful for testing.}
+\item{open}{Logical. When \code{TRUE} (the default), the builder HTML file is
+opened in the system's default web browser with \code{\link[utils:browseURL]{utils::browseURL()}}.
+Set to \code{FALSE} to return the file path without opening it, which is
+useful for automated testing.}
 }
 \value{
-Returns the path to the builder HTML file invisibly.
+The path to the bundled builder HTML file, invisibly.
 }
 \description{
 Opens the SurveyBuilder, a self-contained HTML application for designing
-survey instruments visually. The builder runs entirely in the browser with
-no active R session or Shiny server required. Instruments are saved as
-\code{.sframe} files and loaded back into R with \code{\link[=read_sframe]{read_sframe()}}.
+survey instruments visually in the browser.  The builder runs entirely
+client-side: no active R session or Shiny server is required while you
+work.  Instruments are saved as \code{.sframe} files from the browser and
+loaded back into R with \code{\link[=read_sframe]{read_sframe()}}.
 }
 \details{
-The builder provides a three-mode interface: Build (item editor with
-persistent inspector panel), Preview (full survey render with welcome,
-body, and thank-you pages), and Analyse (research question planning with
-automatic test suggestion and citation lookup). All changes autosave to
-browser localStorage. The final instrument is exported as a \code{.sframe} file.
-}
-\examples{
-\dontrun{
-launch_builder()
+The builder provides a three-mode interface.
+
+\describe{
+\item{Build}{An item editor with a persistent inspector panel,
+drag-to-reorder, undo/redo, and autosave to browser localStorage.}
+\item{Preview}{A full live render of the survey showing welcome, body,
+and thank-you pages.}
+\item{Analyse}{A research-question planner with automatic test
+suggestion, citation lookup, and interpretation tracking.}
 }
 
-# Get path without opening (useful for testing)
+The builder includes a pure-JavaScript SHA-256 fallback for browsers or
+security policies where \code{crypto.subtle} is unavailable on \verb{file://}
+origins. Saved \code{.sframe} files can be loaded and validated with
+\code{\link[=read_sframe]{read_sframe()}}.
+}
+\examples{
+# Retrieve the builder path for inspection without opening the browser
 path <- launch_builder(open = FALSE)
+file.exists(path)
 }
 \seealso{
 \code{\link[=launch_studio]{launch_studio()}}, \code{\link[=read_sframe]{read_sframe()}}, \code{\link[=run_analysis_plan]{run_analysis_plan()}}

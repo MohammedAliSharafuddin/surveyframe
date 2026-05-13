@@ -31,10 +31,23 @@
 #' @seealso [sf_instrument()], [write_sframe()]
 #'
 #' @examples
-#' \dontrun{
-#' instr <- sf_instrument("My Survey", components = list(...))
-#' validate_sframe(instr)
-#' }
+#' # Build a minimal valid instrument and validate it
+#' cs    <- sf_choices("ag5", 1:5,
+#'            c("Strongly disagree", "Disagree", "Neutral",
+#'              "Agree", "Strongly agree"))
+#' item  <- sf_item("sat_1", "The service met my expectations.",
+#'                  type = "likert", choice_set = "ag5", scale_id = "sat")
+#' scale <- sf_scale("sat", "Satisfaction", items = "sat_1")
+#' instr <- sf_instrument("Demo Survey", components = list(cs, item, scale))
+#'
+#' # Non-strict: returns a list without stopping
+#' result <- validate_sframe(instr, strict = FALSE)
+#' result$valid
+#' result$problems
+#'
+#' # Strict: returns instrument invisibly when valid
+#' validated <- validate_sframe(instr, strict = TRUE)
+#' isTRUE(validated$meta$validated)
 validate_sframe <- function(instrument, strict = TRUE) {
   stopifnot(inherits(instrument, "sframe"))
 
@@ -72,7 +85,8 @@ validate_sframe <- function(instrument, strict = TRUE) {
     # Reverse coded without scale
     if (isTRUE(item$reverse) && is.null(item$scale_id)) {
       problems <- c(problems,
-        paste0("Item '", item$id, "' is reverse = TRUE but has no scale_id."))
+        paste0("Item '", item$id,
+               "' is reverse = TRUE but has no scale_id."))
     }
   }
 
@@ -94,12 +108,14 @@ validate_sframe <- function(instrument, strict = TRUE) {
     }
     if (!rule$depends_on %in% item_ids) {
       problems <- c(problems,
-        paste0("Branch rule depends_on unknown item '", rule$depends_on, "'."))
+        paste0("Branch rule depends_on unknown item '",
+               rule$depends_on, "'."))
     }
   }
 
   # Check item references
-  check_item_ids <- vapply(instrument$checks, function(x) x$item_id, character(1))
+  check_item_ids <- vapply(instrument$checks,
+                           function(x) x$item_id, character(1))
   missing_check_items <- setdiff(check_item_ids, item_ids)
   if (length(missing_check_items) > 0) {
     problems <- c(problems,
@@ -123,7 +139,7 @@ validate_sframe <- function(instrument, strict = TRUE) {
     return(list(valid = length(problems) == 0, problems = problems))
   }
 
-  # Mark as validated
+  # Mark as validated and return invisibly
   instrument$meta$validated <- TRUE
   invisible(instrument)
 }

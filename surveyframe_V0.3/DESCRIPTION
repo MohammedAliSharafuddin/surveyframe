@@ -1,0 +1,44 @@
+Package: surveyframe
+Title: A Complete Survey Research Pipeline for R
+Version: 0.3.0
+Authors@R: c(
+    person(
+      given = "Mohammed Ali",
+      family = "Sharafuddin",
+      email = "mas@flairmi.com",
+      role = c("aut", "cre")
+    )
+  )
+Description: Provides an end-to-end survey research workflow built around a
+    single typed instrument object (the 'sframe'). Capabilities include visual
+    instrument design via a browser-based builder or Shiny studio, export to a
+    self-contained static HTML survey, an embeddable Shiny module,
+    SHA-256 integrity-checked serialisation to the '.sframe' format,
+    multi-page survey rendering, branching logic, response quality checking,
+    scale scoring, psychometric diagnostics, analysis-plan execution,
+    an interactive response dashboard, codebook generation, and reproducible
+    HTML reporting.
+License: MIT + file LICENSE
+URL: https://github.com/MohammedAliSharafuddin/surveyframe
+BugReports: https://github.com/MohammedAliSharafuddin/surveyframe/issues
+Encoding: UTF-8
+Language: en-US
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.3
+Depends:
+    R (>= 4.1.0)
+Imports:
+    jsonlite (>= 1.8.0),
+    rlang (>= 1.1.0),
+    openssl (>= 2.1.0)
+Suggests:
+    googlesheets4 (>= 1.1.0),
+    shiny (>= 1.7.0),
+    psych (>= 2.3.0),
+    digest (>= 0.6.0),
+    quarto (>= 1.2),
+    testthat (>= 3.0.0),
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr
+Config/testthat/edition: 3
