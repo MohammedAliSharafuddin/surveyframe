@@ -30,7 +30,7 @@ Last updated: May 2026 - v0.3.0 pre-submission candidate
 
 ---
 
-## Phase 2: Adoption surface — IN PROGRESS
+## Phase 2: Adoption surface: IN PROGRESS
 
 - [ ] pkgdown site with gallery of complete example instruments
 - [ ] RStudio add-in: one-click `launch_builder()` from the Addins menu
@@ -61,7 +61,7 @@ Last updated: May 2026 - v0.3.0 pre-submission candidate
       `regression_logistic_binary`.
 
 - [ ] End-to-end browser test suite using shinytest2
-      (deferred to v0.3.1 — requires CI setup)
+      (deferred to v0.3.1: requires CI setup)
 
 - [ ] Google Sheets direct submission from `export_static_survey()`
       (Apps Script generator exists; direct R-side writer deferred)
@@ -71,7 +71,7 @@ Last updated: May 2026 - v0.3.0 pre-submission candidate
 
 ---
 
-## Phase 4: Companion packages — PLANNED
+## Phase 4: Companion packages: PLANNED
 
 Each companion is a separate CRAN package that imports surveyframe as a
 hard dependency and extends one slice of the pipeline.

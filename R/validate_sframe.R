@@ -10,8 +10,8 @@
 #' The following checks are performed:
 #' - Duplicate item IDs
 #' - Items with missing labels
-#' - Items referencing a `choice_set` that is not defined in the instrument
-#' - Items referencing a `scale_id` that is not defined in the instrument
+#' - Items referencing a missing `choice_set` in the instrument
+#' - Items referencing a missing `scale_id` in the instrument
 #' - Items marked `reverse = TRUE` without a `scale_id`
 #' - Choice sets referenced by items but not present in the instrument
 #' - Scale `items` vectors containing IDs not present in the instrument
@@ -74,13 +74,13 @@ validate_sframe <- function(instrument, strict = TRUE) {
     if (!is.null(item$choice_set) && !item$choice_set %in% choice_ids) {
       problems <- c(problems,
         paste0("Item '", item$id, "' references choice_set '",
-               item$choice_set, "' which is not defined."))
+               item$choice_set, "' which is missing from the instrument."))
     }
     # Orphan scale references
     if (!is.null(item$scale_id) && !item$scale_id %in% scale_ids) {
       problems <- c(problems,
         paste0("Item '", item$id, "' references scale_id '",
-               item$scale_id, "' which is not defined."))
+               item$scale_id, "' which is missing from the instrument."))
     }
     # Reverse coded without scale
     if (isTRUE(item$reverse) && is.null(item$scale_id)) {

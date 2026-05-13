@@ -30,8 +30,8 @@ The following checks are performed:
 \itemize{
 \item Duplicate item IDs
 \item Items with missing labels
-\item Items referencing a \code{choice_set} that is not defined in the instrument
-\item Items referencing a \code{scale_id} that is not defined in the instrument
+\item Items referencing a missing \code{choice_set} in the instrument
+\item Items referencing a missing \code{scale_id} in the instrument
 \item Items marked \code{reverse = TRUE} without a \code{scale_id}
 \item Choice sets referenced by items but not present in the instrument
 \item Scale \code{items} vectors containing IDs not present in the instrument

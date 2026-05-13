@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>SurveyBuilder — surveyframe</title>
+<title>SurveyBuilder: surveyframe</title>
 <style>
 /* ── Design tokens ─────────────────────────────────────────────────────── */
 :root{
@@ -235,6 +235,8 @@ input,textarea,select{font-family:inherit;font-size:13px}
 .ferr{font-size:10px;color:var(--cd);display:none;align-items:center;gap:3px}
 .ferr.show{display:flex}
 .frow{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.color-row{display:grid;grid-template-columns:44px 1fr;gap:8px;align-items:center}
+.color-row input[type=color]{height:32px;padding:2px;cursor:pointer}
 .fcheck{display:flex;align-items:center;gap:6px;font-size:12px;
   color:var(--t2);cursor:pointer}
 .fcheck input[type=checkbox]{accent-color:var(--cp);width:13px;height:13px}
@@ -349,6 +351,11 @@ input,textarea,select{font-family:inherit;font-size:13px}
 .pv-submit{margin-top:24px}
 .pv-submit button{width:100%;padding:11px;border-radius:10px;color:#fff;
   font-size:14px;font-weight:600;cursor:default;border:none}
+.pv-nav{display:flex;align-items:center;gap:8px;margin-top:22px}
+.pv-nav button{border:1.5px solid var(--cb);background:var(--cf);
+  border-radius:8px;padding:8px 12px;font-size:12px;font-weight:600;color:var(--t2)}
+.pv-nav button:disabled{opacity:.45;cursor:default}
+.pv-nav .pv-count{flex:1;text-align:center;font-size:11px;color:var(--t3)}
 .pv-ty{text-align:center;padding:40px 20px}
 .pv-ty-ic{font-size:48px;margin-bottom:12px}
 .pv-ty-t{font-size:20px;font-weight:700;margin-bottom:7px}
@@ -438,8 +445,8 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
 <!-- Recovery banner -->
 <div class="rec-ban" id="recBan" hidden>
   <span class="rec-msg">Autosaved session found from <strong id="recTime"></strong> ago.</span>
-  <button class="btn btn-s btn-sm" onclick="restoreAuto()">Restore</button>
-  <button class="btn btn-g btn-sm" onclick="dismissRec()">Dismiss</button>
+  <button type="button" class="btn btn-s btn-sm" onclick="restoreAuto()">Restore</button>
+  <button type="button" class="btn btn-g btn-sm" onclick="dismissRec()">Dismiss</button>
 </div>
 
 <div class="app">
@@ -448,19 +455,19 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
 <header class="topbar">
   <div class="tb-brand">Survey<span>Builder</span></div>
   <div class="tb-modes" role="group" aria-label="Builder mode">
-    <button class="m-btn" aria-pressed="true"  data-mode="build"   onclick="setMode('build')">Build</button>
-    <button class="m-btn" aria-pressed="false" data-mode="preview" onclick="setMode('preview')">Preview</button>
-    <button class="m-btn" aria-pressed="false" data-mode="analyse" onclick="setMode('analyse')">Analyse</button>
+    <button type="button" class="m-btn" aria-pressed="true"  data-mode="build"   onclick="setMode('build')">Build</button>
+    <button type="button" class="m-btn" aria-pressed="false" data-mode="preview" onclick="setMode('preview')">Preview</button>
+    <button type="button" class="m-btn" aria-pressed="false" data-mode="analyse" onclick="setMode('analyse')">Analyse</button>
   </div>
   <div class="tb-r">
     <div class="tb-hist">
-      <button id="undoBtn" title="Undo (Ctrl+Z)" onclick="undo()" disabled>&#8630;</button>
-      <button id="redoBtn" title="Redo (Ctrl+Y)" onclick="redo()" disabled>&#8631;</button>
+      <button type="button" id="undoBtn" title="Undo (Ctrl+Z)" onclick="undo()" disabled>&#8630;</button>
+      <button type="button" id="redoBtn" title="Redo (Ctrl+Y)" onclick="redo()" disabled>&#8631;</button>
     </div>
     <span class="save-st" id="saveSt">No changes</span>
-    <button class="btn btn-g btn-sm" onclick="openSettings('meta')" title="Survey settings">&#9881;</button>
-    <button class="btn btn-s btn-sm" onclick="openFile()">Open</button>
-    <button class="btn btn-p btn-sm" onclick="saveSframe()">Save .sframe</button>
+    <button type="button" class="btn btn-g btn-sm" onclick="openSettings('meta')" title="Survey settings">&#9881;</button>
+    <button type="button" class="btn btn-s btn-sm" onclick="openFile()">Open</button>
+    <button type="button" class="btn btn-p btn-sm" onclick="saveSframe()">Save .sframe</button>
   </div>
 </header>
 
@@ -469,7 +476,7 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
 <!-- Sidebar -->
 <aside class="sidebar" aria-label="Survey structure">
   <div class="sb-top">
-    <button class="sb-title-btn" onclick="openSettings('meta')" aria-label="Edit survey settings">
+    <button type="button" class="sb-title-btn" onclick="openSettings('meta')" aria-label="Edit survey settings">
       <span class="sb-title-txt" id="sbTitle">Untitled Survey</span>
       <span style="opacity:.4;font-size:10px">&#9881;</span>
     </button>
@@ -479,9 +486,9 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
              aria-label="Search items" oninput="renderItemList()">
     </div>
     <div class="setup-strip" aria-label="Survey page setup">
-      <button class="setup-btn" onclick="openSettings('welcome')" title="Edit welcome page"><span>&#128075;</span>Welcome</button>
-      <button class="setup-btn" onclick="openSettings('header')" title="Add logo and header"><span>&#128247;</span>Logo</button>
-      <button class="setup-btn" onclick="openSettings('thankyou')" title="Edit thank-you page"><span>&#10003;</span>Thank You</button>
+      <button type="button" class="setup-btn" onclick="openSettings('welcome')" title="Edit welcome page"><span>&#128075;</span>Welcome</button>
+      <button type="button" class="setup-btn" onclick="openSettings('header')" title="Add logo and header"><span>&#128247;</span>Logo</button>
+      <button type="button" class="setup-btn" onclick="openSettings('thankyou')" title="Edit thank-you page"><span>&#10003;</span>Thank You</button>
     </div>
   </div>
   <div class="sb-body" id="itemList" role="list" aria-label="Survey items"></div>
@@ -489,32 +496,32 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
     <!-- Collapsible add-item menu (shown above the button row) -->
     <div class="fab-menu" id="fabMenu">
       <div class="fg"><div class="fg-lbl">Questions</div>
-        <button class="fi" onclick="qAdd('likert');closeFabMenu()"><span class="fi-ic">&#9679;</span>Likert scale</button>
-        <button class="fi" onclick="qAdd('single_choice');closeFabMenu()"><span class="fi-ic">&#9900;</span>Single choice</button>
-        <button class="fi" onclick="qAdd('multiple_choice');closeFabMenu()"><span class="fi-ic">&#9745;</span>Multiple choice</button>
-        <button class="fi" onclick="qAdd('matrix');closeFabMenu()"><span class="fi-ic">&#9632;</span>Matrix / grid</button>
-        <button class="fi" onclick="qAdd('numeric');closeFabMenu()"><span class="fi-ic">#</span>Numeric</button>
-        <button class="fi" onclick="qAdd('text');closeFabMenu()"><span class="fi-ic">T</span>Short text</button>
-        <button class="fi" onclick="qAdd('textarea');closeFabMenu()"><span class="fi-ic">&#182;</span>Long text</button>
-        <button class="fi" onclick="qAdd('slider');closeFabMenu()"><span class="fi-ic">&#8212;</span>Slider</button>
-        <button class="fi" onclick="qAdd('ranking');closeFabMenu()"><span class="fi-ic">&#8597;</span>Ranking</button>
-        <button class="fi" onclick="qAdd('rating');closeFabMenu()"><span class="fi-ic">&#9733;</span>Rating</button>
-        <button class="fi" onclick="qAdd('date');closeFabMenu()"><span class="fi-ic">&#128197;</span>Date</button>
+        <button type="button" class="fi" onclick="qAdd('likert');closeFabMenu()"><span class="fi-ic">&#9679;</span>Likert scale</button>
+        <button type="button" class="fi" onclick="qAdd('single_choice');closeFabMenu()"><span class="fi-ic">&#9900;</span>Single choice</button>
+        <button type="button" class="fi" onclick="qAdd('multiple_choice');closeFabMenu()"><span class="fi-ic">&#9745;</span>Multiple choice</button>
+        <button type="button" class="fi" onclick="qAdd('matrix');closeFabMenu()"><span class="fi-ic">&#9632;</span>Matrix / grid</button>
+        <button type="button" class="fi" onclick="qAdd('numeric');closeFabMenu()"><span class="fi-ic">#</span>Numeric</button>
+        <button type="button" class="fi" onclick="qAdd('text');closeFabMenu()"><span class="fi-ic">T</span>Short text</button>
+        <button type="button" class="fi" onclick="qAdd('textarea');closeFabMenu()"><span class="fi-ic">&#182;</span>Long text</button>
+        <button type="button" class="fi" onclick="qAdd('slider');closeFabMenu()"><span class="fi-ic">&#8212;</span>Slider</button>
+        <button type="button" class="fi" onclick="qAdd('ranking');closeFabMenu()"><span class="fi-ic">&#8597;</span>Ranking</button>
+        <button type="button" class="fi" onclick="qAdd('rating');closeFabMenu()"><span class="fi-ic">&#9733;</span>Rating</button>
+        <button type="button" class="fi" onclick="qAdd('date');closeFabMenu()"><span class="fi-ic">&#128197;</span>Date</button>
       </div>
       <div class="fg"><div class="fg-lbl">Structure</div>
-        <button class="fi" onclick="qAdd('section_break');closeFabMenu()"><span class="fi-ic">&#8212;</span>Section break</button>
-        <button class="fi" onclick="qAdd('text_block');closeFabMenu()"><span class="fi-ic">&#128221;</span>Text block</button>
+        <button type="button" class="fi" onclick="qAdd('section_break');closeFabMenu()"><span class="fi-ic">&#8212;</span>Section break</button>
+        <button type="button" class="fi" onclick="qAdd('text_block');closeFabMenu()"><span class="fi-ic">&#128221;</span>Text block</button>
       </div>
       <div class="fg"><div class="fg-lbl">Configure</div>
-        <button class="fi" onclick="openChoiceModal();closeFabMenu()"><span class="fi-ic">&#9673;</span>Choice set</button>
-        <button class="fi" onclick="openScaleModal();closeFabMenu()"><span class="fi-ic">&#128208;</span>Scale</button>
-        <button class="fi" onclick="openBranchModal();closeFabMenu()"><span class="fi-ic">&#8627;</span>Branching rule</button>
-        <button class="fi" onclick="openCheckModal();closeFabMenu()"><span class="fi-ic">&#10003;</span>Attention check</button>
+        <button type="button" class="fi" onclick="openChoiceModal();closeFabMenu()"><span class="fi-ic">&#9673;</span>Choice set</button>
+        <button type="button" class="fi" onclick="openScaleModal();closeFabMenu()"><span class="fi-ic">&#128208;</span>Scale</button>
+        <button type="button" class="fi" onclick="openBranchModal();closeFabMenu()"><span class="fi-ic">&#8627;</span>Branching rule</button>
+        <button type="button" class="fi" onclick="openCheckModal();closeFabMenu()"><span class="fi-ic">&#10003;</span>Attention check</button>
       </div>
     </div>
     <div class="fab-row">
-      <button class="fab" onclick="qAdd('likert')" aria-label="Add Likert question">+ Add question</button>
-      <button class="fab-more" id="fabMoreBtn" title="More item types" onclick="toggleFabMenu()">&#8942;</button>
+      <button type="button" class="fab" onclick="qAdd('likert')" aria-label="Add Likert question">+ Add question</button>
+      <button type="button" class="fab-more" id="fabMoreBtn" title="More item types" onclick="toggleFabMenu()">&#8942;</button>
     </div>
   </div>
 </aside>
@@ -536,13 +543,13 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
         <div class="insp-hdr">
           <code class="insp-id" id="inspId"></code>
           <span class="insp-type-lbl" id="inspTypeLbl"></span>
-          <button class="insp-x" onclick="closeInsp()" aria-label="Close editor">&#215;</button>
+          <button type="button" class="insp-x" onclick="closeInsp()" aria-label="Close editor">&#215;</button>
         </div>
         <div class="insp-body" id="inspBody"></div>
         <div class="insp-foot">
-          <button class="btn btn-g btn-sm" onclick="dupSelItem()">Duplicate</button>
+          <button type="button" class="btn btn-g btn-sm" onclick="dupSelItem()">Duplicate</button>
           <div style="flex:1"></div>
-          <button class="btn btn-d btn-sm" onclick="delSelItem()">Delete</button>
+          <button type="button" class="btn btn-d btn-sm" onclick="delSelItem()">Delete</button>
         </div>
       </aside>
     </div>
@@ -571,7 +578,7 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
       <div class="an-rqs">
         <div class="pan-hdr">
           <span class="pan-hdr-t">Research Questions</span>
-          <button class="btn btn-p btn-sm" onclick="openRQModal()">+ Add RQ</button>
+          <button type="button" class="btn btn-p btn-sm" onclick="openRQModal()">+ Add RQ</button>
         </div>
         <div class="rqs-body" id="rqsBody"></div>
       </div>
@@ -587,7 +594,7 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
 <!-- Settings -->
 <div class="mov" id="m-settings" onclick="if(event.target===this)closeModal('m-settings')">
 <div class="modal wide" role="dialog" aria-labelledby="set-title">
-  <div class="mhdr"><span class="mtitle" id="set-title">Survey Settings</span><button class="mx" onclick="closeModal('m-settings')">&#215;</button></div>
+  <div class="mhdr"><span class="mtitle" id="set-title">Survey Settings</span><button type="button" class="mx" onclick="closeModal('m-settings')">&#215;</button></div>
   <div class="mbody">
     <div class="stabs">
       <div class="stab active" onclick="showST('meta')"     id="st-meta">General</div>
@@ -605,11 +612,11 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
       <div class="field"><label class="fl" for="s-authors">Authors</label><div class="fc"><input type="text" id="s-authors"></div></div>
       <div class="field"><label class="fl" for="s-desc">Description</label><div class="fc"><textarea id="s-desc" rows="3"></textarea></div></div>
       <div class="field"><label class="fl" for="s-mode">Presentation mode</label>
-        <div class="fc"><select id="s-mode"><option value="standard">Standard — all questions visible</option><option value="conversational">Conversational — one question at a time</option></select></div>
+        <div class="fc"><select id="s-mode"><option value="standard">Standard: all questions visible</option><option value="conversational">Conversational: one question at a time</option></select></div>
       </div>
       <div class="frow">
         <div class="field"><label class="fl" for="s-submit">Submit label</label><div class="fc"><input type="text" id="s-submit"></div></div>
-        <div class="field"><label class="fl" for="s-theme">Theme colour</label><div class="fc"><input type="text" id="s-theme" placeholder="#2563eb"></div></div>
+        <div class="field"><label class="fl" for="s-theme">Theme colour</label><div class="fc color-row"><input type="color" id="s-theme-picker" value="#2563eb" oninput="syncThemeFromPicker()"><input type="text" id="s-theme" placeholder="#2563eb" oninput="syncThemeFromText()"></div></div>
       </div>
     </div>
     <div class="stp" id="sp-welcome">
@@ -626,12 +633,12 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
       <label class="fcheck"><input type="checkbox" id="s-tydl"><span>Show "Download my response" button</span></label>
     </div>
     <div class="stp" id="sp-header">
-      <div class="field"><label class="fl" for="s-inst">Institution or study name</label><div class="fc"><input type="text" id="s-inst" placeholder="University — Department"></div></div>
+      <div class="field"><label class="fl" for="s-inst">Institution or study name</label><div class="fc"><input type="text" id="s-inst" placeholder="University: Department"></div></div>
       <div class="field"><label class="fl">Logo image</label>
         <div style="display:flex;align-items:center;gap:8px;margin-top:4px">
-          <button class="btn btn-s btn-sm" onclick="document.getElementById('logoInput').click()">Upload image</button>
+          <button type="button" class="btn btn-s btn-sm" onclick="document.getElementById('logoInput').click()">Upload image</button>
           <span id="logoName" style="font-size:11px;color:var(--t3)">No logo</span>
-          <button class="btn btn-g btn-sm" id="logoRmBtn" style="display:none;color:var(--cd)" onclick="removeLogo()">Remove</button>
+          <button type="button" class="btn btn-g btn-sm" id="logoRmBtn" style="display:none;color:var(--cd)" onclick="removeLogo()">Remove</button>
         </div>
         <img id="logoPrev" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" style="max-height:36px;margin-top:6px;display:none" alt="Logo preview">
       </div>
@@ -644,9 +651,9 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
     </div>
   </div>
   <div class="mfoot">
-    <button class="btn btn-s" onclick="closeModal('m-settings')">Cancel</button>
+    <button type="button" class="btn btn-s" onclick="closeModal('m-settings')">Cancel</button>
     <div class="sp"></div>
-    <button class="btn btn-p" onclick="saveSettings()">Save settings</button>
+    <button type="button" class="btn btn-p" onclick="saveSettings()">Save settings</button>
   </div>
 </div>
 </div>
@@ -654,18 +661,18 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
 <!-- Choice modal -->
 <div class="mov" id="m-choice" onclick="if(event.target===this)closeModal('m-choice')">
 <div class="modal" role="dialog">
-  <div class="mhdr"><span class="mtitle">Define Choice Set</span><button class="mx" onclick="closeModal('m-choice')">&#215;</button></div>
+  <div class="mhdr"><span class="mtitle">Define Choice Set</span><button type="button" class="mx" onclick="closeModal('m-choice')">&#215;</button></div>
   <div class="mbody">
     <div class="field"><label class="fl" for="c-id">Choice set ID <span class="fr">*</span></label><div class="fc"><input type="text" id="c-id" placeholder="agree5"></div></div>
     <div>
       <div class="crow-wrap" id="cRows"></div>
-      <div style="margin-bottom:6px"><button class="btn btn-g btn-sm" onclick="addCRow()">+ Add option</button></div>
+      <div style="margin-bottom:6px"><button type="button" class="btn btn-g btn-sm" onclick="addCRow()">+ Add option</button></div>
       <div class="cq">
-        <button onclick="fillL5()">5-pt agree</button>
-        <button onclick="fillL7()">7-pt agree</button>
-        <button onclick="fillYN()">Yes / No</button>
-        <button onclick="fillFr()">Frequency</button>
-        <button onclick="fillIm()">Importance</button>
+        <button type="button" onclick="fillL5()">5-pt agree</button>
+        <button type="button" onclick="fillL7()">7-pt agree</button>
+        <button type="button" onclick="fillYN()">Yes / No</button>
+        <button type="button" onclick="fillFr()">Frequency</button>
+        <button type="button" onclick="fillIm()">Importance</button>
       </div>
     </div>
     <div style="display:flex;gap:14px">
@@ -673,14 +680,14 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
       <label class="fcheck"><input type="checkbox" id="c-rand"><span>Randomise order</span></label>
     </div>
   </div>
-  <div class="mfoot"><button class="btn btn-s" onclick="closeModal('m-choice')">Cancel</button><div class="sp"></div><button class="btn btn-p" onclick="saveChoice()">Save choice set</button></div>
+  <div class="mfoot"><button type="button" class="btn btn-s" onclick="closeModal('m-choice')">Cancel</button><div class="sp"></div><button type="button" class="btn btn-p" onclick="saveChoice()">Save choice set</button></div>
 </div>
 </div>
 
 <!-- Scale modal -->
 <div class="mov" id="m-scale" onclick="if(event.target===this)closeModal('m-scale')">
 <div class="modal" role="dialog">
-  <div class="mhdr"><span class="mtitle">Define Scale</span><button class="mx" onclick="closeModal('m-scale')">&#215;</button></div>
+  <div class="mhdr"><span class="mtitle">Define Scale</span><button type="button" class="mx" onclick="closeModal('m-scale')">&#215;</button></div>
   <div class="mbody">
     <div class="frow">
       <div class="field"><label class="fl" for="sc-id">Scale ID <span class="fr">*</span></label><div class="fc"><input type="text" id="sc-id" placeholder="satisfaction"></div></div>
@@ -693,14 +700,14 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
     <div class="field"><label class="fl">Items to include</label><div class="vcbs" id="scItemCBs"></div></div>
     <div class="field"><label class="fl">Reverse-coded items within this scale</label><div class="vcbs" id="scRevCBs"><span style="font-size:11px;color:var(--t3)">Select items above first.</span></div></div>
   </div>
-  <div class="mfoot"><button class="btn btn-s" onclick="closeModal('m-scale')">Cancel</button><div class="sp"></div><button class="btn btn-p" onclick="saveScale()">Save scale</button></div>
+  <div class="mfoot"><button type="button" class="btn btn-s" onclick="closeModal('m-scale')">Cancel</button><div class="sp"></div><button type="button" class="btn btn-p" onclick="saveScale()">Save scale</button></div>
 </div>
 </div>
 
 <!-- Branch modal -->
 <div class="mov" id="m-branch" onclick="if(event.target===this)closeModal('m-branch')">
 <div class="modal" role="dialog">
-  <div class="mhdr"><span class="mtitle">Add Branching Rule</span><button class="mx" onclick="closeModal('m-branch')">&#215;</button></div>
+  <div class="mhdr"><span class="mtitle">Add Branching Rule</span><button type="button" class="mx" onclick="closeModal('m-branch')">&#215;</button></div>
   <div class="mbody">
     <div class="alert-i">Show or hide a question based on the answer to a preceding question.</div>
     <div class="field"><label class="fl" for="br-tgt">Target question (will be shown or hidden)</label><div class="fc"><select id="br-tgt"></select></div></div>
@@ -711,14 +718,14 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
     </div>
     <div class="field"><label class="fl" for="br-act">Action</label><div class="fc"><select id="br-act"><option value="show">Show target question</option><option value="hide">Hide target question</option></select></div></div>
   </div>
-  <div class="mfoot"><button class="btn btn-s" onclick="closeModal('m-branch')">Cancel</button><div class="sp"></div><button class="btn btn-p" onclick="saveBranch()">Save rule</button></div>
+  <div class="mfoot"><button type="button" class="btn btn-s" onclick="closeModal('m-branch')">Cancel</button><div class="sp"></div><button type="button" class="btn btn-p" onclick="saveBranch()">Save rule</button></div>
 </div>
 </div>
 
 <!-- Check modal -->
 <div class="mov" id="m-check" onclick="if(event.target===this)closeModal('m-check')">
 <div class="modal" role="dialog">
-  <div class="mhdr"><span class="mtitle">Add Attention Check</span><button class="mx" onclick="closeModal('m-check')">&#215;</button></div>
+  <div class="mhdr"><span class="mtitle">Add Attention Check</span><button type="button" class="mx" onclick="closeModal('m-check')">&#215;</button></div>
   <div class="mbody">
     <div class="frow">
       <div class="field"><label class="fl" for="ck-id">Check ID <span class="fr">*</span></label><div class="fc"><input type="text" id="ck-id" placeholder="attn_1"></div></div>
@@ -728,21 +735,21 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
       <div class="field"><label class="fl" for="ck-type">Type</label><div class="fc"><select id="ck-type"><option value="attention">Attention</option><option value="instructional">Instructional</option><option value="trap">Trap</option></select></div></div>
       <div class="field"><label class="fl" for="ck-fail">Fail action</label><div class="fc"><select id="ck-fail"><option value="flag">Flag respondent</option><option value="exclude">Exclude from analysis</option></select></div></div>
     </div>
-    <div class="field"><label class="fl" for="ck-pass">Correct answer(s) — comma-separated</label><div class="fc"><input type="text" id="ck-pass" placeholder="e.g. 4 or yes"></div></div>
+    <div class="field"><label class="fl" for="ck-pass">Correct answer(s), comma-separated</label><div class="fc"><input type="text" id="ck-pass" placeholder="e.g. 4 or yes"></div></div>
     <div class="field"><label class="fl" for="ck-lbl">Label</label><div class="fc"><input type="text" id="ck-lbl" placeholder="Attention check 1"></div></div>
   </div>
-  <div class="mfoot"><button class="btn btn-s" onclick="closeModal('m-check')">Cancel</button><div class="sp"></div><button class="btn btn-p" onclick="saveCheck()">Save check</button></div>
+  <div class="mfoot"><button type="button" class="btn btn-s" onclick="closeModal('m-check')">Cancel</button><div class="sp"></div><button type="button" class="btn btn-p" onclick="saveCheck()">Save check</button></div>
 </div>
 </div>
 
 <!-- RQ modal -->
 <div class="mov" id="m-rq" onclick="if(event.target===this)closeModal('m-rq')">
 <div class="modal wide" role="dialog">
-  <div class="mhdr"><span class="mtitle" id="rq-modal-title">Add Research Question</span><button class="mx" onclick="closeModal('m-rq')">&#215;</button></div>
+  <div class="mhdr"><span class="mtitle" id="rq-modal-title">Add Research Question</span><button type="button" class="mx" onclick="closeModal('m-rq')">&#215;</button></div>
   <div class="mbody">
     <div class="field"><label class="fl" for="rq-q">Research question <span class="fr">*</span></label><div class="fc"><textarea id="rq-q" rows="3" placeholder="Is there a significant difference in satisfaction between groups?"></textarea></div></div>
     <div class="field"><label class="fl">Variables involved</label><div class="vcbs" id="rqVarCBs"></div></div>
-    <!-- Suggestion box — populated and shown by JS when variables are selected -->
+    <!-- Suggestion box: populated and shown by JS when variables are selected -->
     <div id="rqSuggest" class="suggest-box" style="display:none">
       <span class="sb-ic">&#128161;</span>
       <span id="rqSuggestMsg"></span>
@@ -763,10 +770,10 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
     <div class="field"><label class="fl" for="rq-interp">Interpretation (complete after data collection)</label><div class="fc"><textarea id="rq-interp" rows="3" placeholder="Write your interpretation after running the analysis…"></textarea></div></div>
   </div>
   <div class="mfoot">
-    <button class="btn btn-d btn-sm" id="rqDelBtn" style="display:none" onclick="deleteRQ()">Delete</button>
+    <button type="button" class="btn btn-d btn-sm" id="rqDelBtn" style="display:none" onclick="deleteRQ()">Delete</button>
     <div class="sp"></div>
-    <button class="btn btn-s" onclick="closeModal('m-rq')">Cancel</button>
-    <button class="btn btn-p" onclick="saveRQ()">Save research question</button>
+    <button type="button" class="btn btn-s" onclick="closeModal('m-rq')">Cancel</button>
+    <button type="button" class="btn btn-p" onclick="saveRQ()">Save research question</button>
   </div>
 </div>
 </div>
@@ -777,8 +784,8 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
     <div class="conf-t" id="confT"></div>
     <div class="conf-m" id="confM"></div>
     <div class="conf-acts">
-      <button class="btn btn-s btn-sm" onclick="resConf(false)">Cancel</button>
-      <button class="btn btn-d btn-sm" id="confOkBtn" onclick="resConf(true)">Delete</button>
+      <button type="button" class="btn btn-s btn-sm" onclick="resConf(false)">Cancel</button>
+      <button type="button" class="btn btn-d btn-sm" id="confOkBtn" onclick="resConf(true)">Delete</button>
     </div>
   </div>
 </div>
@@ -815,7 +822,7 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
 
 // ── State ──────────────────────────────────────────────────────────────────
 var S={meta:{title:'Untitled Survey',version:'1.0.0',description:'',authors:'',languages:'en'},choices:[],items:[],scales:[],branching:[],checks:[],analysis_plan:[],render:{mode:'standard',theme:'#2563eb',submit_label:'Submit',welcome:{title:'Welcome to this survey',intro_text:'Thank you for taking part. Your responses will be used for research and reporting purposes.',consent_text:'I understand the purpose of this survey and agree to participate.',consent_required:false,start_label:'Start Survey'},thankyou:{message:'Thank you for completing this survey.',redirect_url:'',show_download:false},header:{institution:'',logo_base64:'',show_progress:true},google_sheets_url:'',google_sheets_endpoint:''}};
-var hist=[],fut=[],selId=null,editRqId=null,pvTab='survey',dirty=false,lastSaved=null,dragSrc=null,_cRes=null;
+var hist=[],fut=[],selId=null,editRqId=null,pvTab='survey',pvPage=0,dirty=false,lastSaved=null,dragSrc=null,_cRes=null;
 
 function snap(){hist.push(JSON.stringify(S));if(hist.length>60)hist.shift();fut=[];setDirty();updHistBtns();}
 function undo(){if(!hist.length)return;fut.push(JSON.stringify(S));S=JSON.parse(hist.pop());selId=null;ra();updHistBtns();}
@@ -867,10 +874,12 @@ document.addEventListener('keydown',function(e){
 // ── Settings ───────────────────────────────────────────────────────────────
 function openSettings(tab){
   var r=S.render||{},w=r.welcome||{},ty=r.thankyou||{},h=r.header||{};
+  var theme=normHex(r.theme||'#2563eb');
   sv('s-title',S.meta.title);sv('s-ver',S.meta.version||'1.0.0');
   sv('s-lang',S.meta.languages||'en');sv('s-authors',S.meta.authors);
   sv('s-desc',S.meta.description);sv('s-mode',r.mode||'standard');
-  sv('s-submit',r.submit_label||'Submit');sv('s-theme',r.theme||'#2563eb');
+  sv('s-submit',r.submit_label||'Submit');sv('s-theme',theme);
+  var tp=document.getElementById('s-theme-picker');if(tp)tp.value=theme;
   sv('s-wt',w.title||'');sv('s-wi',w.intro_text||'');sv('s-wc',w.consent_text||'');
   sv('s-wsl',w.start_label||'Start Survey');
   var wreq=document.getElementById('s-wreq');if(wreq)wreq.checked=!!w.consent_required;
@@ -883,12 +892,25 @@ function openSettings(tab){
   showST(tab||'meta');openModal('m-settings');
 }
 function showST(t){document.querySelectorAll('.stab').forEach(function(b){b.classList.remove('active');});document.querySelectorAll('.stp').forEach(function(p){p.classList.remove('active');});document.getElementById('st-'+t).classList.add('active');document.getElementById('sp-'+t).classList.add('active');}
+function normHex(v){
+  v=String(v||'').trim();
+  if(/^#[0-9a-fA-F]{6}$/.test(v))return v.toLowerCase();
+  if(/^#[0-9a-fA-F]{3}$/.test(v))return '#'+v[1]+v[1]+v[2]+v[2]+v[3]+v[3];
+  return '#2563eb';
+}
+function syncThemeFromPicker(){
+  var p=document.getElementById('s-theme-picker');if(p)sv('s-theme',p.value);
+}
+function syncThemeFromText(){
+  var v=gv('s-theme').trim();
+  if(/^#[0-9a-fA-F]{6}$/.test(v)){var p=document.getElementById('s-theme-picker');if(p)p.value=v;}
+}
 function saveSettings(){
   snap();
   S.meta.title=gv('s-title')||'Untitled Survey';S.meta.version=gv('s-ver')||'1.0.0';
   S.meta.languages=gv('s-lang')||'en';S.meta.authors=gv('s-authors');S.meta.description=gv('s-desc');
   if(!S.render)S.render={};
-  S.render.mode=gv('s-mode')||'standard';S.render.submit_label=gv('s-submit')||'Submit';S.render.theme=gv('s-theme')||'#2563eb';
+  S.render.mode=gv('s-mode')||'standard';S.render.submit_label=gv('s-submit')||'Submit';S.render.theme=normHex(gv('s-theme'));
   S.render.welcome={title:gv('s-wt'),intro_text:gv('s-wi'),consent_text:gv('s-wc'),consent_required:document.getElementById('s-wreq').checked,start_label:gv('s-wsl')||'Start Survey'};
   S.render.thankyou={message:gv('s-tym'),redirect_url:gv('s-tyu'),show_download:document.getElementById('s-tydl').checked};
   if(!S.render.header)S.render.header={};
@@ -962,7 +984,7 @@ function renderItemList(){
     if(sc)bgs.push('<span class="badge b-sc">'+esc(sc.id)+'</span>');
     if(item.reverse)bgs.push('<span class="badge b-rv">rev</span>');
     if(ck)bgs.push('<span class="badge b-ck">attn</span>');
-    return pd+'<div class="ic'+(selId===item.id?' sel':'')+'" role="listitem" draggable="true" data-idx="'+ri+'" data-id="'+esc(item.id)+'" onclick="selItem(\''+item.id+'\')" ondragstart="dStart(event,'+ri+')" ondragover="dOver(event,'+ri+',event)" ondrop="dDrop(event,'+ri+')" ondragleave="this.classList.remove(\'drag-t\',\'drag-b\')"><div class="ic-h" title="Drag to reorder">&#8942;</div><div class="ic-body"><div class="'+lc+'">'+esc(item.label||'(no label)')+'</div><div class="ic-meta">'+bgs.join('')+'</div></div><div class="ic-acts"><button class="ib" title="Duplicate" onclick="event.stopPropagation();dupItem(\''+item.id+'\')">&#10697;</button><button class="ib del" title="Delete" onclick="event.stopPropagation();delItem(\''+item.id+'\')">&#128465;</button></div></div>';
+    return pd+'<div class="ic'+(selId===item.id?' sel':'')+'" role="listitem" draggable="true" data-idx="'+ri+'" data-id="'+esc(item.id)+'" onclick="selItem(\''+item.id+'\')" ondragstart="dStart(event,'+ri+')" ondragover="dOver(event,'+ri+',event)" ondrop="dDrop(event,'+ri+')" ondragleave="this.classList.remove(\'drag-t\',\'drag-b\')"><div class="ic-h" title="Drag to reorder">&#8942;</div><div class="ic-body"><div class="'+lc+'">'+esc(item.label||'(no label)')+'</div><div class="ic-meta">'+bgs.join('')+'</div></div><div class="ic-acts"><button type="button" class="ib" title="Duplicate" onclick="event.stopPropagation();dupItem(\''+item.id+'\')">&#10697;</button><button type="button" class="ib del" title="Delete" onclick="event.stopPropagation();delItem(\''+item.id+'\')">&#128465;</button></div></div>';
   }).join('');
 }
 function selItem(id){selId=id;renderItemList();openInsp(id);}
@@ -984,10 +1006,44 @@ function openInsp(id){
 }
 function closeInsp(){document.getElementById('inspector').classList.remove('open');document.getElementById('cPrompt').style.display='flex';selId=null;renderItemList();}
 function fgs(title,body){return'<div class="fgs"><div class="fgs-hdr" onclick="this.parentElement.classList.toggle(\'col\')"><span class="fgs-t">'+title+'</span><span class="fgs-tog">&#9660;</span></div><div class="fgs-body">'+body+'</div></div>';}
+function safeId(s){return String(s||'choice').toLowerCase().replace(/[^a-z0-9_]+/g,'_').replace(/^_+|_+$/g,'')||'choice';}
+function itemChoiceLines(item){
+  var cs=S.choices.find(function(c){return c.id===(item.choice_set||'');});
+  if(!cs)return'';
+  return(cs.values||[]).map(function(v,i){return String(v)+' = '+String((cs.labels||[])[i]||v);}).join('\n');
+}
+function parseChoiceLines(txt){
+  var vals=[],lbls=[],used={};
+  String(txt||'').split('\n').map(function(x){return x.trim();}).filter(Boolean).forEach(function(line,i){
+    var m=line.match(/^([^=:]+)\s*[=:]\s*(.+)$/),v,l;
+    if(m){v=m[1].trim();l=m[2].trim();}
+    else{l=line;v=safeId(line);}
+    if(!l)return;
+    if(!v)v=String(i+1);
+    while(used[v])v=String(v)+'_'+(i+1);
+    used[v]=true;vals.push(isNaN(v)?v:Number(v));lbls.push(l);
+  });
+  return{values:vals,labels:lbls};
+}
+function saveItemChoices(){
+  if(!selId)return;
+  var idx=S.items.findIndex(function(i){return i.id===selId;});if(idx<0)return;
+  var parsed=parseChoiceLines(gv('fi-choice-lines'));
+  if(parsed.values.length<1){toast('Add at least one choice label','err');return;}
+  snap();
+  var item=S.items[idx],id=item.choice_set||safeId(item.id+'_choices');
+  item.choice_set=id;
+  var ex=S.choices.findIndex(function(c){return c.id===id;});
+  var prior=ex>=0?S.choices[ex]:{};
+  var cs={id:id,values:parsed.values,labels:parsed.labels,allow_other:!!prior.allow_other,randomise:!!prior.randomise};
+  if(ex>=0)S.choices[ex]=cs;else S.choices.push(cs);
+  renderItemList();renderInspBody(item);
+  toast('Choices updated','ok');
+}
 function renderInspBody(item){
   var isSec=item.type==='section_break',isTxt=item.type==='text_block';
-  var csO=[['','— select —'],...S.choices.map(function(c){return[c.id,c.id+' ('+c.values.length+' opts)'];})];
-  var scO=[['','— none —'],...S.scales.map(function(s){return[s.id,s.id+': '+s.label];})];
+  var csO=[['','select'],...S.choices.map(function(c){return[c.id,c.id+' ('+c.values.length+' opts)'];})];
+  var scO=[['','none'],...S.scales.map(function(s){return[s.id,s.id+': '+s.label];})];
   var tO=[['likert','Likert'],['single_choice','Single choice'],['multiple_choice','Multiple choice'],['numeric','Numeric'],['text','Short text'],['textarea','Long text'],['date','Date'],['matrix','Matrix'],['slider','Slider'],['ranking','Ranking'],['rating','Rating']];
   function fld(lbl,ctrl,hint,req){return'<div class="field"><label class="fl">'+lbl+(req?'<span class="fr">*</span>':'')+'</label><div class="fc">'+ctrl+'</div>'+(hint?'<span class="fhint">'+hint+'</span>':'')+'</div>';}
   function inp(fid,val,ph,type){type=type||'text';return'<input type="'+type+'" id="'+fid+'" value="'+esc(val)+'" placeholder="'+(ph||'')+'" onblur="updF(\''+fid+'\')">';}
@@ -1002,6 +1058,7 @@ function renderInspBody(item){
   var config=isSec||isTxt?'':fgs('Configuration',
     fld('Response type',sel('fi-type',tO,item.type))+
     (NCS.includes(item.type)?fld('Choice set',sel('fi-cs',csO,item.choice_set||'')):'') +
+    (NCS.includes(item.type)?fld('Choice labels','<textarea id="fi-choice-lines" rows="5" placeholder="One option per line, or value = Label" onblur="saveItemChoices()">'+esc(itemChoiceLines(item))+'</textarea>','For single choice, these are the respondent-facing category labels.'):'') +
     (item.type==='matrix'?fld('Matrix row labels',ta('fi-mrows',(item.matrix_items||[]).join('\n'),'One label per line…'),'One per line.'):'') +
     (item.type==='slider'?'<div class="frow">'+fld('Min',inp('fi-smin',item.slider_min||0,'','number'))+fld('Max',inp('fi-smax',item.slider_max||100,'','number'))+fld('Step',inp('fi-sstep',item.slider_step||1,'','number'))+'</div>':'') +
     (item.type==='rating'?'<div class="frow">'+fld('Max stars',inp('fi-rmax',item.rating_max||5,'','number'))+fld('Icon',sel('fi-ricon',[['star','Star ★'],['heart','Heart ♥']],item.rating_icon||'star'))+'</div>':'') +
@@ -1028,7 +1085,12 @@ function updF(id){
   else if(f==='choice_set'||f==='scale_id')v=v||null;
   else if(f==='help'||f==='placeholder')v=v||null;
   S.items[idx][f]=v;
-  if(f==='type'){document.getElementById('inspTypeLbl').textContent=TL[v]||v;renderInspBody(S.items[idx]);}
+  if(f==='type'){
+    if(NCS.includes(v)&&!S.items[idx].choice_set){
+      S.items[idx].choice_set=['likert','matrix'].includes(v)?ensureChoiceSet('agree'):ensureChoiceSet('basic');
+    }
+    document.getElementById('inspTypeLbl').textContent=TL[v]||v;renderInspBody(S.items[idx]);
+  }
   renderItemList();
 }
 function updIdF(nid){
@@ -1096,7 +1158,7 @@ function rmItem(id){
 
 // ── Choices ────────────────────────────────────────────────────────────────
 function openChoiceModal(){sv('c-id','');document.getElementById('cRows').innerHTML='';document.getElementById('c-other').checked=false;document.getElementById('c-rand').checked=false;openModal('m-choice');}
-function addCRow(v,l){v=v||'';l=l||'';var d=document.createElement('div');d.className='crow';d.innerHTML='<span class="crow-dh">&#8942;</span><div style="display:flex;gap:4px;flex:1"><input type="text" placeholder="Value" value="'+esc(String(v))+'" style="flex:.35;border:none;font-size:11px;padding:3px 4px"><input type="text" placeholder="Label" value="'+esc(String(l))+'" style="flex:.65;border:none;font-size:11px;padding:3px 4px"></div><button class="crow-rm" onclick="this.parentElement.remove()">&#215;</button>';document.getElementById('cRows').appendChild(d);}
+function addCRow(v,l){v=v||'';l=l||'';var d=document.createElement('div');d.className='crow';d.innerHTML='<span class="crow-dh">&#8942;</span><div style="display:flex;gap:4px;flex:1"><input type="text" placeholder="Value" value="'+esc(String(v))+'" style="flex:.35;border:none;font-size:11px;padding:3px 4px"><input type="text" placeholder="Label" value="'+esc(String(l))+'" style="flex:.65;border:none;font-size:11px;padding:3px 4px"></div><button type="button" class="crow-rm" onclick="this.parentElement.remove()">&#215;</button>';document.getElementById('cRows').appendChild(d);}
 function fillL5(){document.getElementById('cRows').innerHTML='';[[1,'Strongly disagree'],[2,'Disagree'],[3,'Neutral'],[4,'Agree'],[5,'Strongly agree']].forEach(function(p){addCRow(p[0],p[1]);});}
 function fillL7(){document.getElementById('cRows').innerHTML='';[[1,'Strongly disagree'],[2,'Disagree'],[3,'Somewhat disagree'],[4,'Neutral'],[5,'Somewhat agree'],[6,'Agree'],[7,'Strongly agree']].forEach(function(p){addCRow(p[0],p[1]);});}
 function fillYN(){document.getElementById('cRows').innerHTML='';[['yes','Yes'],['no','No']].forEach(function(p){addCRow(p[0],p[1]);});}
@@ -1148,7 +1210,7 @@ function openBranchModal(){
   document.getElementById('br-tgt').innerHTML=opts;document.getElementById('br-dep').innerHTML=opts;sv('br-val','');openModal('m-branch');
 }
 function saveBranch(){
-  var t=gv('br-tgt'),d=gv('br-dep');if(t===d){toast('Target and controlling item cannot be the same','err');return;}
+  var t=gv('br-tgt'),d=gv('br-dep');if(t===d){toast('Choose a different controlling item','err');return;}
   var v=gv('br-val').trim();if(!v){toast('Enter a match value','err');return;}
   snap();S.branching.push({id:uid(),item_id:t,depends_on:d,operator:gv('br-op'),value:v,action:gv('br-act')});
   closeModal('m-branch');toast('Branching rule added','ok');
@@ -1207,8 +1269,8 @@ function suggestTest(){
   var sug='';var lbl='';
   if(sel.length===2){
     var key=cats[0]+'+'+cats[1];sug=TEST_SUGGEST[key]||'correlation_pearson';
-    lbl={'crosstab':'Both variables are categorical — Chi-square is recommended.','mann_whitney':'One categorical, one continuous — Mann-Whitney U is recommended.','correlation_pearson':'Both variables are continuous — Pearson correlation is recommended.'}[sug]||'';
-  }else{sug='regression_linear';lbl='Multiple variables selected — linear regression is recommended.';}
+    lbl={'crosstab':'Both variables are categorical: Chi-square is recommended.','mann_whitney':'One categorical, one continuous: Mann-Whitney U is recommended.','correlation_pearson':'Both variables are continuous: Pearson correlation is recommended.'}[sug]||'';
+  }else{sug='regression_linear';lbl='Multiple variables selected: linear regression is recommended.';}
   if(sug){
     document.getElementById('rq-test').value=sug;onTestChg();
     msg.textContent=lbl;box.style.display='flex';
@@ -1230,37 +1292,48 @@ function deleteRQ(){
 }
 
 // ── Preview ────────────────────────────────────────────────────────────────
-function setPvTab(t){pvTab=t;document.querySelectorAll('.pvtab').forEach(function(b){b.classList.remove('active');});document.getElementById('pvt-'+t).classList.add('active');renderPreview();}
+function setPvTab(t){pvTab=t;pvPage=0;document.querySelectorAll('.pvtab').forEach(function(b){b.classList.remove('active');});document.getElementById('pvt-'+t).classList.add('active');renderPreview();}
+function prevPvPage(){pvPage=Math.max(0,pvPage-1);renderPreview();}
+function nextPvPage(){pvPage=pvPage+1;renderPreview();}
+function renderPreviewItem(item,cm,col){
+  var cs=cm[item.choice_set||''];
+  if(item.type==='section_break')return'<div class="pv-sec"><div class="pv-sec-t">'+esc(item.label)+'</div>'+(item.section_intro?'<div class="pv-sec-sub">'+esc(item.section_intro)+'</div>':'')+'</div>';
+  if(item.type==='text_block')return'<div class="pv-txtblk">'+esc(item.label).replace(/\n/g,'<br>')+'</div>';
+  var lbl='<div class="pv-ql">'+esc(item.label)+(item.required?'<span class="pv-req-mk">*</span>':'')+'</div>'+(item.help?'<div class="pv-help-t">'+esc(item.help)+'</div>':'');
+  var inp='';
+  if(['likert','single_choice'].includes(item.type))inp='<div class="pv-opts'+(item.type==='likert'?' inl':'')+'">'+((cs?cs.values:[]).map(function(v,i){return'<label class="pv-opt"><input type="radio" name="'+esc(item.id)+'" style="accent-color:'+esc(col)+'"> '+esc((cs.labels||[])[i]||v)+'</label>';})).join('')+'</div>';
+  else if(item.type==='multiple_choice')inp='<div class="pv-opts">'+((cs?cs.values:[]).map(function(v,i){return'<label class="pv-opt"><input type="checkbox" style="accent-color:'+esc(col)+'"> '+esc((cs.labels||[])[i]||v)+'</label>';})).join('')+'</div>';
+  else if(item.type==='numeric')inp='<input class="pv-inp" type="number" placeholder="Enter a number" style="max-width:200px">';
+  else if(item.type==='text')inp='<input class="pv-inp" type="text" placeholder="'+esc(item.placeholder||'')+'">';
+  else if(item.type==='textarea')inp='<textarea class="pv-inp" rows="3" placeholder="'+esc(item.placeholder||'')+'"></textarea>';
+  else if(item.type==='date')inp='<input class="pv-inp" type="date" style="max-width:200px">';
+  else if(item.type==='slider')inp='<div class="pv-slider-w"><input type="range" class="pv-slider" min="'+(item.slider_min||0)+'" max="'+(item.slider_max||100)+'" style="accent-color:'+esc(col)+'"><div class="pv-slider-r"><span>'+esc(item.slider_min||0)+'</span><span>'+esc(item.slider_max||100)+'</span></div></div>';
+  else if(item.type==='rating')inp='<div class="pv-stars">'+Array.from({length:item.rating_max||5},function(){return item.rating_icon==='heart'?'&#10084;':'&#9733;';}).join('')+'</div>';
+  else if(item.type==='matrix'&&item.matrix_items&&cs)inp='<div style="overflow-x:auto"><table class="pv-matrix"><thead><tr><th></th>'+cs.labels.map(function(l){return'<th>'+esc(l)+'</th>';}).join('')+'</tr></thead><tbody>'+item.matrix_items.map(function(row){return'<tr><td class="rl">'+esc(row)+'</td>'+cs.values.map(function(v){return'<td><input type="radio" name="'+esc(item.id)+'_'+esc(row)+'" style="accent-color:'+esc(col)+'"></td>';}).join('')+'</tr>';}).join('')+'</tbody></table></div>';
+  else if(item.type==='ranking'&&cs)inp='<div class="pv-ranklist">'+cs.labels.map(function(l){return'<div class="pv-rankitem"><span style="color:var(--t3)">&#8942;</span>'+esc(l)+'</div>';}).join('')+'</div>';
+  return'<div class="pv-item">'+lbl+inp+'</div>';
+}
 function renderPreview(){
-  var el=document.getElementById('pvFrame');var col=(S.render&&S.render.theme)||'#2563eb';
+  var el=document.getElementById('pvFrame');var col=normHex((S.render&&S.render.theme)||'#2563eb');
   var cm={};S.choices.forEach(function(cs){cm[cs.id]=cs;});
   if(pvTab==='welcome'){
     var w=S.render&&S.render.welcome?S.render.welcome:{};
     if(!w.intro_text&&!w.consent_text){el.innerHTML='<div style="max-width:620px;margin:0 auto"><div style="background:#fff;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.07);padding:40px;text-align:center;color:var(--t3)"><div style="font-size:32px;margin-bottom:12px">&#128196;</div><p style="font-size:13px">No welcome page configured. <a href="#" onclick="openSettings(\'welcome\');return false" style="color:'+esc(col)+'">Set up welcome page →</a></p></div></div>';return;}
-    el.innerHTML='<div style="max-width:620px;margin:0 auto"><div class="pv-card"><div class="pv-title">'+esc(w.title||S.meta.title)+'</div>'+(w.intro_text?'<div class="pv-intro">'+esc(w.intro_text).replace(/\n/g,'<br>')+'</div>':'')+(w.consent_text?'<div class="pv-consent">'+esc(w.consent_text)+'</div>':'')+'<button style="width:100%;padding:11px;border-radius:10px;background:'+esc(col)+';color:#fff;font-size:14px;font-weight:600;border:none;cursor:default">'+esc(w.start_label||'Start Survey')+'</button></div></div>';return;
+    el.innerHTML='<div style="max-width:620px;margin:0 auto"><div class="pv-card"><div class="pv-title">'+esc(w.title||S.meta.title)+'</div>'+(w.intro_text?'<div class="pv-intro">'+esc(w.intro_text).replace(/\n/g,'<br>')+'</div>':'')+(w.consent_text?'<div class="pv-consent">'+esc(w.consent_text)+'</div>':'')+'<button type="button" style="width:100%;padding:11px;border-radius:10px;background:'+esc(col)+';color:#fff;font-size:14px;font-weight:600;border:none;cursor:default">'+esc(w.start_label||'Start Survey')+'</button></div></div>';return;
   }
   if(pvTab==='thankyou'){var ty=S.render&&S.render.thankyou?S.render.thankyou:{};el.innerHTML='<div style="max-width:620px;margin:0 auto"><div class="pv-card"><div class="pv-ty"><div class="pv-ty-ic">&#10003;</div><div class="pv-ty-t">Submitted successfully</div><div class="pv-ty-m">'+esc(ty.message||'Thank you for completing this survey.')+'</div></div></div></div>';return;}
   if(!S.items.length){el.innerHTML='<div style="max-width:620px;margin:0 auto"><div class="pv-card" style="text-align:center;padding:60px"><p style="color:var(--t3);font-size:13px">Add questions to preview the survey.</p></div></div>';return;}
   var hdr='';if(S.render&&S.render.header){var h=S.render.header;if(h.institution||h.logo_base64)hdr='<div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;padding-bottom:14px;border-bottom:1px solid var(--cb)">'+(h.logo_base64?'<img src="data:image/png;base64,'+h.logo_base64+'" style="max-height:32px" alt="Logo">':'')+(h.institution?'<span style="font-size:12px;color:var(--t2)">'+esc(h.institution)+'</span>':'')+'</div>';}
-  var items=S.items.map(function(item){
-    var cs=cm[item.choice_set||''];
-    if(item.type==='section_break')return'<div class="pv-sec"><div class="pv-sec-t">'+esc(item.label)+'</div>'+(item.section_intro?'<div class="pv-sec-sub">'+esc(item.section_intro)+'</div>':'')+'</div>';
-    if(item.type==='text_block')return'<div class="pv-txtblk">'+esc(item.label).replace(/\n/g,'<br>')+'</div>';
-    var lbl='<div class="pv-ql">'+esc(item.label)+(item.required?'<span class="pv-req-mk">*</span>':'')+'</div>'+(item.help?'<div class="pv-help-t">'+esc(item.help)+'</div>':'');
-    var inp='';
-    if(['likert','single_choice'].includes(item.type))inp='<div class="pv-opts'+(item.type==='likert'?' inl':'')+'">'+((cs?cs.values:[]).map(function(v,i){return'<label class="pv-opt"><input type="radio" name="'+esc(item.id)+'" style="accent-color:'+esc(col)+'"> '+esc(cs.labels[i])+'</label>';})).join('')+'</div>';
-    else if(item.type==='multiple_choice')inp='<div class="pv-opts">'+((cs?cs.values:[]).map(function(v,i){return'<label class="pv-opt"><input type="checkbox" style="accent-color:'+esc(col)+'"> '+esc(cs.labels[i])+'</label>';})).join('')+'</div>';
-    else if(item.type==='numeric')inp='<input class="pv-inp" type="number" placeholder="Enter a number" style="max-width:200px">';
-    else if(item.type==='text')inp='<input class="pv-inp" type="text" placeholder="'+esc(item.placeholder||'')+'">';
-    else if(item.type==='textarea')inp='<textarea class="pv-inp" rows="3" placeholder="'+esc(item.placeholder||'')+'"></textarea>';
-    else if(item.type==='date')inp='<input class="pv-inp" type="date" style="max-width:200px">';
-    else if(item.type==='slider')inp='<div class="pv-slider-w"><input type="range" class="pv-slider" min="'+(item.slider_min||0)+'" max="'+(item.slider_max||100)+'" style="accent-color:'+esc(col)+'"><div class="pv-slider-r"><span>'+esc(item.slider_min||0)+'</span><span>'+esc(item.slider_max||100)+'</span></div></div>';
-    else if(item.type==='rating')inp='<div class="pv-stars">'+Array.from({length:item.rating_max||5},function(){return item.rating_icon==='heart'?'&#10084;':'&#9733;';}).join('')+'</div>';
-    else if(item.type==='matrix'&&item.matrix_items&&cs)inp='<div style="overflow-x:auto"><table class="pv-matrix"><thead><tr><th></th>'+cs.labels.map(function(l){return'<th>'+esc(l)+'</th>';}).join('')+'</tr></thead><tbody>'+item.matrix_items.map(function(row){return'<tr><td class="rl">'+esc(row)+'</td>'+cs.values.map(function(v){return'<td><input type="radio" name="'+esc(item.id)+'_'+esc(row)+'" style="accent-color:'+esc(col)+'"></td>';}).join('')+'</tr>';}).join('')+'</tbody></table></div>';
-    else if(item.type==='ranking'&&cs)inp='<div class="pv-ranklist">'+cs.labels.map(function(l){return'<div class="pv-rankitem"><span style="color:var(--t3)">&#8942;</span>'+esc(l)+'</div>';}).join('')+'</div>';
-    return'<div class="pv-item">'+lbl+inp+'</div>';
-  }).join('');
-  el.innerHTML='<div style="max-width:620px;margin:0 auto"><div class="pv-card">'+hdr+'<div class="pv-title">'+esc(S.meta.title)+'</div>'+(S.meta.description?'<div class="pv-desc">'+esc(S.meta.description)+'</div>':'')+items+'<div class="pv-submit"><button style="background:'+esc(col)+';width:100%;padding:11px;border-radius:10px;color:#fff;font-size:14px;font-weight:600;border:none;cursor:default">'+esc((S.render&&S.render.submit_label)||'Submit')+'</button></div></div></div>';
+  var mode=(S.render&&S.render.mode)||'standard';
+  var shown=S.items,nav='';
+  if(mode==='conversational'){
+    pvPage=Math.max(0,Math.min(pvPage,S.items.length-1));
+    shown=[S.items[pvPage]];
+    nav='<div class="pv-nav"><button type="button" onclick="prevPvPage()" '+(pvPage===0?'disabled':'')+'>Previous</button><span class="pv-count">Question '+(pvPage+1)+' of '+S.items.length+'</span><button type="button" onclick="nextPvPage()" '+(pvPage>=S.items.length-1?'disabled':'')+'>Next</button></div>';
+  }
+  var items=shown.map(function(item){return renderPreviewItem(item,cm,col);}).join('');
+  var submit=mode==='conversational'&&pvPage<S.items.length-1?'':'<div class="pv-submit"><button type="button" style="background:'+esc(col)+';width:100%;padding:11px;border-radius:10px;color:#fff;font-size:14px;font-weight:600;border:none;cursor:default">'+esc((S.render&&S.render.submit_label)||'Submit')+'</button></div>';
+  el.innerHTML='<div style="max-width:620px;margin:0 auto"><div class="pv-card">'+hdr+'<div class="pv-title">'+esc(S.meta.title)+'</div>'+(S.meta.description?'<div class="pv-desc">'+esc(S.meta.description)+'</div>':'')+items+nav+submit+'</div></div>';
 }
 
 // ── Analyse ────────────────────────────────────────────────────────────────

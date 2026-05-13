@@ -67,7 +67,7 @@ Optional feature packages are loaded only when needed:
 
 Quarto is no longer a hard dependency. If the `quarto` R package and the
 Quarto CLI are available locally, `render_report()` can use the bundled `.qmd`
-template. If they are not available, surveyframe writes an internal HTML
+template. When those tools are unavailable, surveyframe writes an internal HTML
 fallback instead.
 
 ## Installation
@@ -97,7 +97,7 @@ install.packages("surveyframe_0.3.0.tar.gz", repos = NULL, type = "source")
 ```
 
 That error comes from the installed help database, usually after reinstalling
-over a package that is already loaded. It is not a separate CRAN submission
+over a package that is already loaded. Use the source tarball for CRAN submission,
 file and it is regenerated during installation.
 
 ## Minimal workflow

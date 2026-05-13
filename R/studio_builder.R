@@ -195,7 +195,7 @@ sframe_builder_validate_draft <- function(
   problems <- validation$problems
 
   if (!nzchar(trimws(instrument$meta$title %||% ""))) {
-    problems <- c(problems, "Survey title cannot be empty.")
+    problems <- c(problems, "Survey title is required.")
   }
 
   if (length(instrument$items) == 0) {

@@ -21,10 +21,36 @@ section <- function(title) {
   cat(strrep("=", 72), "\n", sep = "")
 }
 
+browse_local <- function(path) {
+  if (interactive() && file.exists(path)) {
+    utils::browseURL(paste0("file://", normalizePath(path)))
+  }
+}
+
 demo_dir <- file.path(tempdir(), "surveyframe-demo")
 dir.create(demo_dir, recursive = TRUE, showWarnings = FALSE)
 
-section("1. Load a complete instrument and simulated response dataset")
+section("1. Walk through the SurveyBuilder GUI")
+
+cat("This first step opens the standalone browser builder.\n")
+cat("In the builder, follow these clicks:\n")
+cat("1. Click the gear icon, then review General, Welcome, Thank You, and Header.\n")
+cat("2. In General, change Theme colour with the colour picker.\n")
+cat("3. In Header, upload a logo if you want one in the survey header.\n")
+cat("4. Click + Add question, choose Single choice, and edit Choice labels.\n")
+cat("5. Switch to Preview, then use Welcome, Survey, and Thank You tabs.\n")
+cat("6. Set Presentation mode to Conversational and confirm the preview moves one question at a time.\n")
+cat("7. Click Save .sframe when you want to keep the instrument.\n\n")
+
+if (interactive()) {
+  pause_demo()
+  launch_builder(open = TRUE)
+  invisible(readline("Return here after trying the builder..."))
+} else {
+  cat("Non-interactive session: launch_builder(open = TRUE) skipped.\n")
+}
+
+section("2. Load a complete instrument and simulated response dataset")
 
 instrument_path <- system.file(
   "extdata", "tourism_services_demo.sframe",
@@ -49,7 +75,26 @@ cat("\nResponses loaded:", nrow(responses), "rows x", ncol(responses), "columns\
 cat("Demo output folder:\n", demo_dir, "\n", sep = "")
 pause_demo()
 
-section("2. Score multi-item constructs")
+section("3. Open a respondent-facing static survey")
+
+static_path <- export_static_survey(
+  instr,
+  output_path = file.path(demo_dir, "tourism_services_static_survey.html"),
+  open = FALSE,
+  overwrite = TRUE
+)
+
+cat("A complete offline HTML survey was written to:\n", static_path, "\n", sep = "")
+cat("In the browser, test the respondent flow:\n")
+cat("1. Read the welcome page and start the survey.\n")
+cat("2. Answer one page at a time.\n")
+cat("3. Leave a required item blank and confirm that validation blocks navigation.\n")
+cat("4. Submit and confirm that a CSV response file downloads.\n\n")
+
+browse_local(static_path)
+pause_demo()
+
+section("4. Score multi-item constructs")
 
 scored <- score_scales(responses, instr)
 scale_names <- vapply(instr$scales, function(s) s$id, character(1))
@@ -89,9 +134,10 @@ par(op)
 dev.off()
 
 cat("\nSaved table_scale_summary.csv and plot_scale_distributions.png\n")
+browse_local(file.path(demo_dir, "plot_scale_distributions.png"))
 pause_demo()
 
-section("3. Run the pre-planned analysis plan")
+section("5. Run the pre-planned analysis plan")
 
 results <- run_analysis_plan(responses, instr)
 
@@ -129,9 +175,10 @@ grid()
 dev.off()
 
 cat("\nSaved table_analysis_results.csv and plot_digital_marketing_satisfaction.png\n")
+browse_local(file.path(demo_dir, "plot_digital_marketing_satisfaction.png"))
 pause_demo()
 
-section("4. Check response quality")
+section("6. Check response quality")
 
 quality <- quality_report(
   responses,
@@ -182,9 +229,10 @@ barplot(
 dev.off()
 
 cat("\nSaved table_quality_summary.csv and plot_attention_check.png\n")
+browse_local(file.path(demo_dir, "plot_attention_check.png"))
 pause_demo()
 
-section("5. Render publication-ready HTML outputs")
+section("7. Render publication-ready HTML outputs")
 
 results_report <- render_results(
   results,
@@ -204,10 +252,27 @@ options(old)
 
 cat("Analysis results report:\n", results_report, "\n", sep = "")
 cat("Full survey report:\n", full_report, "\n", sep = "")
+browse_local(results_report)
+browse_local(full_report)
 
 cat("\nFiles created:\n")
 print(list.files(demo_dir, full.names = TRUE))
 
-cat("\nNext steps:\n")
-cat("- To build or edit a questionnaire, run: launch_builder()\n")
-cat("- To inspect collected responses, run: launch_dashboard()\n")
+section("8. Open the response dashboard")
+
+cat("The dashboard is for response exploration after data collection.\n")
+cat("It opens with the bundled demo data when called without arguments.\n")
+cat("Use the tabs in order: Overview, Items, Scales, Quality, Raw data.\n\n")
+
+if (interactive()) {
+  ans <- readline("Open the dashboard now? [y/N] ")
+  if (tolower(trimws(ans)) %in% c("y", "yes")) {
+    launch_dashboard()
+  }
+} else {
+  cat("Non-interactive session: launch_dashboard() skipped.\n")
+}
+
+cat("\nRepeatable commands after the demo:\n")
+cat("launch_builder()\n")
+cat("launch_dashboard()\n")

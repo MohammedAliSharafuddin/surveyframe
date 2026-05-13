@@ -14,9 +14,11 @@ The local Linux check reports one expected note:
 
 - New submission.
 
-HTML manual validation was run with HTML Tidy and passed. The bundled
-SurveyBuilder HTML and a generated static survey HTML export were also
-validated with HTML Tidy.
+The local check was run with HTML Tidy available, and both PDF and HTML
+manual checks passed. Bundled HTML files were also validated locally with
+`html-validate`. The SurveyBuilder source and static survey template pass
+validation with style-only rules relaxed for intentional inline preview
+styling. The SurveyBuilder GUI was smoke-tested in Google Chrome.
 
 win-builder and rhub checks are pending for the final v0.3.0 tarball.
 

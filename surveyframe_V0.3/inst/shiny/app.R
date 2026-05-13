@@ -136,12 +136,12 @@ sframe_validate_upload <- function(upload, extensions, max_size = 10 * 1024^2) {
   on.exit(close(con), add = TRUE)
   bytes <- readBin(con, what = "raw", n = min(size, 512))
   if (length(bytes) == 0 || any(bytes == as.raw(0))) {
-    stop("Uploaded file is not a supported text file.", call. = FALSE)
+    stop("Upload a .sframe or JSON text file.", call. = FALSE)
   }
 
   text_start <- sub("^\ufeff", "", rawToChar(bytes))
   if (identical(ext, "sframe") && !startsWith(trimws(text_start), "{")) {
-    stop("Uploaded .sframe file does not look like JSON.", call. = FALSE)
+    stop("Uploaded .sframe file must contain JSON.", call. = FALSE)
   }
 
   normalizePath(upload$datapath, mustWork = TRUE)
@@ -843,7 +843,7 @@ server <- function(input, output, session) {
       min_valid <- NULL
     }
     if (!is.null(min_valid) && min_valid > length(scale_items)) {
-      showNotification("Minimum valid items cannot exceed the number of scale items.", type = "error")
+      showNotification("Minimum valid items must be less than or equal to the number of scale items.", type = "error")
       return()
     }
 
@@ -884,7 +884,7 @@ server <- function(input, output, session) {
       return()
     }
     if (identical(target, depends_on)) {
-      showNotification("A branching rule cannot depend on the same item it targets.", type = "error")
+      showNotification("Choose a different controlling item for this branching rule.", type = "error")
       return()
     }
     if (is.null(value)) {
@@ -1257,7 +1257,7 @@ server <- function(input, output, session) {
 
     tagList(
       tags$p(class = "hint", style = "margin-bottom: 16px;",
-        "This is a read-only preview. Responses entered here are not saved."),
+        "Preview responses stay in this session and are discarded when you leave."),
       do.call(tagList, items_ui)
     )
   })

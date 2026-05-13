@@ -165,7 +165,7 @@ test_that("export_google_sheet writes a .gs file with correct structure", {
     }
   )
   if (identical(result, "skip"))
-    skip("googlesheets4 not available in this environment")
+    skip("googlesheets4 unavailable in this environment")
   expect_true(file.exists(result))
   gs <- paste(readLines(result, warn = FALSE), collapse = "\n")
   expect_true(grepl("doPost",         gs))
@@ -210,7 +210,7 @@ test_that("frequency test returns table and apa string", {
 })
 
 test_that("mann_whitney test returns statistic and apa string", {
-  # Mann-Whitney requires exactly 2 groups — use a binary gender variable
+  # Mann-Whitney requires exactly 2 groups: use a binary gender variable
   instr <- add_rq(make_instr(), "r1", "Q", c("gender2","sat1"),
                   "mann_whitney")
   set.seed(7)

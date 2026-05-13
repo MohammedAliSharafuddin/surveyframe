@@ -85,7 +85,7 @@ body{background:#f1f5f9;font-family:system-ui,-apple-system,'Segoe UI',sans-seri
 # ── UI ───────────────────────────────────────────────────────────────────────
 ui <- fluidPage(
   tags$head(
-    tags$title(paste(TITLE, "— Dashboard")),
+    tags$title(paste(TITLE, "Dashboard", sep = ": ")),
     tags$style(HTML(dash_css)),
     tags$script(HTML(
       "Shiny.addCustomMessageHandler('sfDashNav', function(msg){
@@ -166,7 +166,7 @@ server <- function(input, output, session) {
            ylab = "Count", cex.axis = .8, cex.lab = .85, las = 1)
     } else {
       plot.new()
-      text(.5,.5, paste0("Chart not available for type '", t, "'."),
+      text(.5,.5, paste0("Chart unavailable for type '", t, "'."),
            col = "#94a3b8", cex = .9)
     }
   }, bg = "white")
@@ -202,7 +202,7 @@ server <- function(input, output, session) {
     if (is.null(responses)) return(data.frame(Note = "No responses loaded."))
     head(responses, 200)
   }, striped = TRUE, hover = TRUE, bordered = FALSE, width = "100%",
-     na = "—")
+     na = "Not available")
 
   output$dl_csv <- downloadHandler(
     filename = function() {
@@ -222,9 +222,9 @@ db_overview_ui <- function() {
     dts <- as.POSIXct(responses$submitted_at, format = "%Y-%m-%dT%H:%M:%SZ", tz = "UTC")
     dts <- dts[!is.na(dts)]
     if (length(dts) > 1) {
-      paste0(format(min(dts), "%d %b"), " – ", format(max(dts), "%d %b %Y"))
-    } else "—"
-  } else "—"
+      paste0(format(min(dts), "%d %b"), " to ", format(max(dts), "%d %b %Y"))
+    } else "Not available"
+  } else "Not available"
 
   n_items  <- length(q_items)
   n_scales <- length(instr$scales)
@@ -253,8 +253,8 @@ db_overview_ui <- function() {
         )),
         tags$tbody(
           tags$tr(tags$td("Title"),   tags$td(TITLE)),
-          tags$tr(tags$td("Version"), tags$td(instr$meta$version %||% "—")),
-          tags$tr(tags$td("Authors"), tags$td(instr$meta$authors  %||% "—")),
+          tags$tr(tags$td("Version"), tags$td(instr$meta$version %||% "Not available")),
+          tags$tr(tags$td("Authors"), tags$td(instr$meta$authors  %||% "Not available")),
           tags$tr(tags$td("Mode"),    tags$td(instr$render$mode   %||% "standard")),
           tags$tr(tags$td("Validated"), tags$td(
             if (isTRUE(instr$meta$validated)) "Yes" else "No"
@@ -392,10 +392,10 @@ db_quality_ui <- function() {
       tags$td(tags$code(ck$id)),
       tags$td(ck$type %||% "attention"),
       tags$td(tags$code(ck$item_id)),
-      tags$td(paste(ck$pass_values %||% "—", collapse = ", ")),
+      tags$td(paste(ck$pass_values %||% "Not available", collapse = ", ")),
       tags$td(ck$fail_action %||% "flag"),
-      tags$td(if (is.na(n_pass)) "—" else n_pass),
-      tags$td(if (is.na(pct_pass)) "—" else paste0(pct_pass, "%"))
+      tags$td(if (is.na(n_pass)) "Not available" else n_pass),
+      tags$td(if (is.na(pct_pass)) "Not available" else paste0(pct_pass, "%"))
     )
   })
 
