@@ -169,6 +169,11 @@ demo(survey)
 launch_dashboard()
 ```
 
+`demo(survey)` walks through loading the demo instrument, reading simulated
+responses, scoring scales, running the analysis plan, checking response
+quality, and rendering HTML outputs. It writes example tables and plots to a
+temporary `surveyframe-demo` folder and prints that folder path in the console.
+
 ## CRAN track
 
 The package is being prepared for first CRAN submission as v0.3.0. Current

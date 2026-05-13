@@ -111,14 +111,15 @@ launch_dashboard <- function(
     )
   }
 
-  # Expose data to the app via environment
+  # Expose data to the app via an isolated environment, then build a standard
+  # shiny.appobj. Older Shiny releases do not support runApp(appEnvir = ...).
   app_env <- new.env(parent = asNamespace("surveyframe"))
   app_env$SFRAME_INSTRUMENT <- instrument
   app_env$SFRAME_RESPONSES  <- responses
+  sys.source(file.path(app_path, "app.R"), envir = app_env)
 
   shiny::runApp(
-    appDir        = app_path,
-    appEnvir      = app_env,
+    appDir        = shiny::shinyApp(ui = app_env$ui, server = app_env$server),
     port          = port,
     host          = host,
     launch.browser= launch.browser,
