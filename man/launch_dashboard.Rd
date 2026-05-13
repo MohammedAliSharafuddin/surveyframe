@@ -36,8 +36,10 @@ sessions.}
 Called for its side effect. Returns nothing.
 }
 \description{
-Opens a Shiny dashboard for exploring survey response data alongside the
-instrument definition. The dashboard provides five panels:
+Opens a Shiny dashboard for exploring collected response data alongside the
+instrument definition. This is an analysis and quality-control interface,
+not the survey-authoring builder. Use \code{\link[=launch_builder]{launch_builder()}} to design a new
+questionnaire. The dashboard provides five panels:
 }
 \details{
 \describe{
@@ -51,12 +53,14 @@ instrument.}
 \item{Raw data}{Scrollable response table with a CSV download button.}
 }
 
-The dashboard is read-only. It supports descriptive exploration before
-running formal analysis via \code{\link[=run_analysis_plan]{run_analysis_plan()}}.
+The dashboard is read-only. It supports descriptive exploration after
+collecting responses and before running formal analysis via
+\code{\link[=run_analysis_plan]{run_analysis_plan()}}.
 }
 \examples{
 \dontrun{
-# Open the bundled tourism-services demo dashboard
+# Open the bundled tourism-services response dashboard.
+# To build a questionnaire instead, use launch_builder().
 launch_dashboard()
 
 # Open the dashboard with your own instrument and responses

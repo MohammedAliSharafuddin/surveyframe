@@ -208,5 +208,6 @@ cat("Full survey report:\n", full_report, "\n", sep = "")
 cat("\nFiles created:\n")
 print(list.files(demo_dir, full.names = TRUE))
 
-cat("\nTo open the interactive response dashboard, run:\n")
-cat("launch_dashboard()\n")
+cat("\nNext steps:\n")
+cat("- To build or edit a questionnaire, run: launch_builder()\n")
+cat("- To inspect collected responses, run: launch_dashboard()\n")
