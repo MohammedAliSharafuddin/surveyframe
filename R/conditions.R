@@ -11,6 +11,14 @@ sframe_require_psych <- function(reason) {
   rlang::check_installed("psych", reason = reason)
 }
 
+sframe_require_MASS <- function(reason) {
+  rlang::check_installed("MASS", reason = reason)
+}
+
+sframe_require_nnet <- function(reason) {
+  rlang::check_installed("nnet", reason = reason)
+}
+
 #' Abort with a validation error
 #'
 #' @param message Character. The error message.

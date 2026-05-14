@@ -18,7 +18,7 @@ library(surveyframe)
 surveyframe treats a survey instrument as a first-class R object. One
 declarative source drives validation, deployment, quality checking, scoring,
 psychometric diagnostics, and report generation. This vignette walks through
-the complete workflow using a five-item customer satisfaction instrument.
+the main workflow using a five-item customer satisfaction instrument.
 
 ---
 
@@ -188,7 +188,7 @@ render_survey(
 ```
 
 To launch the full SurveyStudio interface, which provides a visual shell for
-the complete workflow, use `launch_studio()`:
+the visual workflow, use `launch_studio()`:
 
 ```{r studio, eval = FALSE}
 launch_studio(instrument = instr)
@@ -357,7 +357,7 @@ print(cb)
 ```
 
 ```{r report, eval = FALSE}
-# Requires the quarto package
+# Uses the internal HTML fallback unless the Quarto CLI is available
 render_report(
   instrument          = instr,
   data                = responses,
@@ -373,7 +373,7 @@ exact instrument version that produced it.
 
 ---
 
-## The complete pipeline in twelve lines
+## The main pipeline in twelve lines
 
 ```{r pipeline, eval = FALSE}
 library(surveyframe)

@@ -1,0 +1,31 @@
+---
+title: "SurveyBuilder GUI overview"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{SurveyBuilder GUI overview}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+library(surveyframe)
+```
+
+The SurveyBuilder is bundled as a self-contained HTML file. In automated
+examples and checks, use `open = FALSE` so no browser is launched.
+
+```{r builder-path}
+path <- launch_builder(open = FALSE)
+file.exists(path)
+```
+
+Analyse mode uses a three-panel workspace:
+
+- left: variables and constructs
+- middle: Plan, Run, and Report tabs with role-based analysis options
+- right: output preview, reporting references, and a table-based model builder
+
+The analysis registry controls method labels, required roles, compatible
+measurement levels, significance-level visibility, assumptions, planned
+outputs, and reporting references.

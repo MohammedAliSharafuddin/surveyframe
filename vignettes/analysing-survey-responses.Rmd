@@ -1,0 +1,46 @@
+---
+title: "Analysing survey responses"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Analysing survey responses}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+library(surveyframe)
+```
+
+```{r data}
+agree5 <- sf_choices("agree5", 1:5,
+  c("Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"))
+i1 <- sf_item("sat_1", "Reliable", type = "likert", choice_set = "agree5", scale_id = "sat")
+i2 <- sf_item("sat_2", "Responsive", type = "likert", choice_set = "agree5", scale_id = "sat")
+i3 <- sf_item("sat_3", "Recommend", type = "likert", choice_set = "agree5", scale_id = "sat")
+scale <- sf_scale("sat", "Satisfaction", c("sat_1", "sat_2", "sat_3"))
+instr <- sf_instrument("Service Survey", components = list(agree5, i1, i2, i3, scale))
+
+responses <- data.frame(
+  id = paste0("R", 1:6),
+  sat_1 = c(4, 5, 3, 4, NA, 2),
+  sat_2 = c(5, 4, 3, 4, 5, 2),
+  sat_3 = c(4, 5, 2, 4, 4, 1)
+)
+resp <- read_responses(responses, instr, respondent_id = "id", strict = FALSE)
+descriptives_report(resp, variables = c("sat_1", "sat_2", "sat_3"))
+missing_data_report(resp, instr)
+```
+
+```{r plan}
+instr$analysis_plan <- list(list(
+  id = "RQ1",
+  research_question = "Are the satisfaction items associated?",
+  method = "correlation_spearman",
+  roles = list(x = "sat_1", y = "sat_2"),
+  options = list(alpha = 0.05),
+  status = "valid_plan",
+  requires_data = TRUE
+))
+run_analysis_plan(resp, instr, scored = FALSE)
+```

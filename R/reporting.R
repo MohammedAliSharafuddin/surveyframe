@@ -151,8 +151,14 @@ print.sframe_codebook <- function(x, ...) {
 #'   diagnostics. Requires `data`. Defaults to `TRUE`.
 #' @param include_codebook Logical. Whether to include the instrument codebook.
 #'   Defaults to `TRUE`.
+#' @param include_missing Logical. Whether to include the missing-data report.
+#'   Requires `data`. Defaults to `TRUE`.
+#' @param include_descriptives Logical. Whether to include descriptive
+#'   statistics. Requires `data`. Defaults to `TRUE`.
 #' @param include_analysis Logical. Whether to include analysis-plan results
 #'   when `data` are supplied and the instrument has an `analysis_plan`.
+#' @param include_models Logical. Whether to include saved model JSON and
+#'   generated syntax blocks. Defaults to `TRUE`.
 #'
 #' @return The output file path, invisibly.
 #' @export
@@ -192,7 +198,10 @@ render_report <- function(
     include_quality   = TRUE,
     include_reliability = TRUE,
     include_codebook  = TRUE,
-    include_analysis  = TRUE
+    include_missing   = TRUE,
+    include_descriptives = TRUE,
+    include_analysis  = TRUE,
+    include_models    = TRUE
 ) {
   stopifnot(inherits(instrument, "sframe"))
 
@@ -208,9 +217,8 @@ render_report <- function(
   output_name <- basename(dest)
 
   use_quarto <- isTRUE(getOption("surveyframe.use_quarto", TRUE))
-  has_quarto <- use_quarto &&
-    requireNamespace("quarto", quietly = TRUE) &&
-    nzchar(Sys.which("quarto"))
+  quarto_bin <- Sys.which("quarto")
+  has_quarto <- use_quarto && nzchar(quarto_bin)
   template <- system.file("templates", "report.qmd", package = "surveyframe")
   if (has_quarto && file.exists(template)) {
     render_dir <- tempfile("surveyframe-report-")
@@ -243,19 +251,37 @@ render_report <- function(
       include_quality     = include_quality && !is.null(data),
       include_reliability = include_reliability && !is.null(data),
       include_codebook    = include_codebook,
+      include_missing     = include_missing && !is.null(data),
+      include_descriptives = include_descriptives && !is.null(data),
       include_analysis    = include_analysis,
+      include_models      = include_models,
       instrument_hash     = sframe_hash_value(instrument)
     )
 
+    param_args <- unlist(lapply(names(params), function(name) {
+      value <- params[[name]]
+      if (is.logical(value)) {
+        value <- tolower(as.character(value))
+      }
+      if (is.character(value)) {
+        value <- normalizePath(value, winslash = "/", mustWork = FALSE)
+      }
+      c("-P", paste0(name, ":", value))
+    }), use.names = FALSE)
     quarto_ok <- tryCatch({
-      quarto::quarto_render(
-        input          = render_input,
-        output_file    = output_name,
-        quarto_args    = c("--output-dir", output_dir),
-        execute_dir    = render_dir,
-        execute_params = params
+      status <- system2(
+        quarto_bin,
+        args = c(
+          "render", render_input,
+          "--output", output_name,
+          "--output-dir", output_dir,
+          "--execute-dir", render_dir,
+          param_args
+        ),
+        stdout = TRUE,
+        stderr = TRUE
       )
-      TRUE
+      is.null(attr(status, "status")) || identical(attr(status, "status"), 0L)
     }, error = function(e) FALSE)
 
     if (isTRUE(quarto_ok) && file.exists(dest)) {
@@ -270,7 +296,10 @@ render_report <- function(
     include_quality     = include_quality && !is.null(data),
     include_reliability = include_reliability && !is.null(data),
     include_codebook    = include_codebook,
-    include_analysis    = include_analysis
+    include_missing     = include_missing && !is.null(data),
+    include_descriptives = include_descriptives && !is.null(data),
+    include_analysis    = include_analysis,
+    include_models      = include_models
   )
 
   invisible(dest)
@@ -283,7 +312,10 @@ render_report <- function(
     include_quality = TRUE,
     include_reliability = TRUE,
     include_codebook = TRUE,
-    include_analysis = TRUE
+    include_missing = TRUE,
+    include_descriptives = TRUE,
+    include_analysis = TRUE,
+    include_models = TRUE
 ) {
   meta <- instrument$meta %||% list()
   sections <- character(0)
@@ -333,6 +365,40 @@ render_report <- function(
     sections <- c(sections, sprintf("<section>%s</section>", quality_html))
   }
 
+  if (isTRUE(include_missing)) {
+    mr <- tryCatch(missing_data_report(data, instrument), error = function(e) e)
+    missing_html <- if (inherits(mr, "error")) {
+      sprintf("<h2>Missing Data</h2><p>%s</p>", htmltools_escape(conditionMessage(mr)))
+    } else {
+      paste(
+        "<h2>Missing Data</h2>",
+        .render_report_table(mr$item_missing, "Item-wise missingness"),
+        .render_report_table(mr$respondent_missing, "Respondent-wise missingness"),
+        .render_report_table(mr$patterns, "Missing-data patterns"),
+        .render_report_table(mr$scale_missing_rules, "Scale missing rules"),
+        collapse = "\n"
+      )
+    }
+    sections <- c(sections, sprintf("<section>%s</section>", missing_html))
+  }
+
+  if (isTRUE(include_descriptives)) {
+    dr <- tryCatch(
+      descriptives_report(data, variables = intersect(vapply(instrument$items, function(i) i$id, character(1)), colnames(data))),
+      error = function(e) e
+    )
+    descriptives_html <- if (inherits(dr, "error")) {
+      sprintf("<h2>Descriptives</h2><p>%s</p>", htmltools_escape(conditionMessage(dr)))
+    } else {
+      paste(
+        "<h2>Descriptives</h2>",
+        .render_report_table(dr$table, "Descriptive statistics"),
+        collapse = "\n"
+      )
+    }
+    sections <- c(sections, sprintf("<section>%s</section>", descriptives_html))
+  }
+
   if (isTRUE(include_reliability)) {
     rr <- tryCatch(reliability_report(data, instrument), error = function(e) e)
     reliability_html <- if (inherits(rr, "error")) {
@@ -370,6 +436,13 @@ render_report <- function(
   if (isTRUE(include_analysis) && length(instrument$analysis_plan %||% list()) > 0) {
     analysis_html <- .render_report_analysis_section(instrument, data)
     sections <- c(sections, sprintf("<section>%s</section>", analysis_html))
+  }
+
+  if (isTRUE(include_models) && length(instrument$models %||% list()) > 0) {
+    sections <- c(
+      sections,
+      sprintf("<section>%s</section>", .render_report_model_section(instrument))
+    )
   }
 
   repro_tbl <- data.frame(
@@ -453,8 +526,8 @@ render_report <- function(
         ),
         i,
         htmltools_escape(rq$research_question %||% paste("Research Question", i)),
-        htmltools_escape(rq$test %||% ""),
-        htmltools_escape(paste(rq$variables %||% character(0), collapse = ", "))
+        htmltools_escape(sframe_analysis_method(rq)),
+        htmltools_escape(paste(sframe_analysis_vars(rq), collapse = ", "))
       )
     }, character(1))
   } else {
@@ -490,6 +563,42 @@ render_report <- function(
   }
 
   paste(c("<h2>Analysis Plan</h2>", blocks), collapse = "\n")
+}
+
+.render_report_model_section <- function(instrument) {
+  models <- instrument$models %||% list()
+  blocks <- vapply(models, function(model) {
+    json <- htmltools_escape(model_json(model, pretty = TRUE))
+    syntax <- tryCatch(
+      switch(
+        model$type,
+        cfa = cfa_lavaan_syntax(instrument = instrument, model = model),
+        cb_sem = sem_lavaan_syntax(model, instrument = instrument),
+        pls_sem = seminr_syntax(model),
+        efa = efa_syntax(unlist(lapply(sframe_model_constructs(model), function(con) con$items))),
+        ""
+      ),
+      error = function(e) paste0("Model syntax could not be generated: ", conditionMessage(e))
+    )
+    sprintf(
+      paste(
+        "<div class=\"rq-block\">",
+        "<h3>%s</h3>",
+        "<p><strong>Type:</strong> %s &nbsp; <strong>Engine:</strong> %s</p>",
+        "<h4>Syntax</h4><pre>%s</pre>",
+        "<h4>Model JSON</h4><pre>%s</pre>",
+        "</div>",
+        sep = "\n"
+      ),
+      htmltools_escape(model$label %||% model$id),
+      htmltools_escape(model$type %||% ""),
+      htmltools_escape(model$engine %||% ""),
+      htmltools_escape(syntax),
+      json
+    )
+  }, character(1))
+
+  paste(c("<h2>Model Appendix</h2>", blocks), collapse = "\n")
 }
 
 .render_report_table <- function(x, caption = NULL) {

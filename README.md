@@ -6,69 +6,14 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 <!-- badges: end -->
 
-**surveyframe** is an end-to-end survey research workflow package for R. The
-package is built around one typed object, the `sframe`, which carries the full
-survey definition from design through validation, deployment, collection,
-quality checks, scoring, psychometric diagnostics, analysis execution, and
-reproducible reporting.
+`surveyframe` provides survey instrument workflows for R. It centres a study on
+one typed object, the `sframe`, which stores item definitions, choice sets,
+scales, branching, checks, analysis plans, model specifications, rendering
+hints, and reproducibility metadata.
 
-## Scope
-
-surveyframe is designed to cover the full life of a survey study inside R:
-
-- typed instrument definition
-- validation and `.sframe` serialisation with SHA-256 hashing
-- browser-based builder
-- Shiny survey rendering
-- response loading and quality checks
-- scale scoring and psychometric diagnostics
-- pre-planned analysis execution
-- reproducible HTML reporting
-
-Specialist modelling packages such as `psych` and `lavaan` remain available
-for downstream modelling. surveyframe owns the instrument-centred pipeline and
-hands off to those tools where deeper modelling is needed.
-
-## Current status
-
-The current v0.3 pre-submission candidate includes:
-
-- thirteen item types
-- reusable choice sets
-- composite scales with reverse coding and weighted scoring
-- single-condition branching and attention checks
-- Google Sheets helper utilities
-- SurveyBuilder and SurveyStudio
-- static HTML survey export with optional JSON POST endpoint
-- embeddable Shiny survey modules
-- interactive response dashboard
-- Cronbach alpha, McDonald omega, item diagnostics, EFA readiness, and CFA
-  syntax generation
-- analysis-plan execution across fourteen tests with APA-style output
-- HTML reporting with instrument hashing for reproducibility
-
-The immediate focus is final CRAN submission validation rather than adding
-more surface area.
-
-## Dependency model
-
-The package now keeps hard imports deliberately small:
-
-- `jsonlite`
-- `rlang`
-- `openssl`
-
-Optional feature packages are loaded only when needed:
-
-- `shiny` for `render_survey()` and `launch_studio()`
-- `psych` for `reliability_report()` and `efa_report()`
-- `googlesheets4` for `read_sheet_responses()`
-- `digest` for response IDs in `survey_module_server()`
-
-Quarto is no longer a hard dependency. If the `quarto` R package and the
-Quarto CLI are available locally, `render_report()` can use the bundled `.qmd`
-template. When those tools are unavailable, surveyframe writes an internal HTML
-fallback instead.
+The package is designed to work offline during examples, tests, vignettes, and
+checks. Browser and Shiny entry points use `open = FALSE` or explicit launch
+functions so automated checks do not open a browser.
 
 ## Installation
 
@@ -78,29 +23,16 @@ Install the development version from GitHub:
 remotes::install_github("MohammedAliSharafuddin/surveyframe")
 ```
 
-Install optional packages only for the features you plan to use:
+Optional packages are only needed for selected features:
 
 ```r
-install.packages(c("shiny", "psych", "googlesheets4", "digest"))
-
-# Optional for richer report rendering
-install.packages("quarto")
+install.packages(c("shiny", "psych", "googlesheets4", "digest", "MASS", "nnet"))
 ```
 
-If RStudio reports that `surveyframe.rdb` is corrupt after installing from a
-local tarball, restart the R session and reinstall cleanly:
+`lavaan` and `seminr` are not required for syntax generation. They are only
+needed if you choose to fit generated CFA, CB-SEM, or PLS-SEM models yourself.
 
-```r
-remove.packages("surveyframe")
-unlink(file.path(.libPaths()[1], "surveyframe"), recursive = TRUE, force = TRUE)
-install.packages("surveyframe_0.3.0.tar.gz", repos = NULL, type = "source")
-```
-
-That error comes from the installed help database, usually after reinstalling
-over a package that is already loaded. Use the source tarball for CRAN submission,
-file and it is regenerated during installation.
-
-## Minimal workflow
+## Basic instrument
 
 ```r
 library(surveyframe)
@@ -111,95 +43,170 @@ agree5 <- sf_choices(
   labels = c("Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree")
 )
 
-items <- lapply(
-  1:3,
-  function(i) {
-    sf_item(
-      paste0("sat_", i),
-      paste("Satisfaction item", i),
-      type = "likert",
-      choice_set = "agree5",
-      scale_id = "sat"
-    )
-  }
-)
+sat_1 <- sf_item("sat_1", "The service was reliable.",
+  type = "likert", choice_set = "agree5", scale_id = "sat")
+sat_2 <- sf_item("sat_2", "The service was responsive.",
+  type = "likert", choice_set = "agree5", scale_id = "sat")
+sat_3 <- sf_item("sat_3", "I would recommend the service.",
+  type = "likert", choice_set = "agree5", scale_id = "sat")
 
-scale <- sf_scale("sat", "Satisfaction", items = paste0("sat_", 1:3))
+gender <- sf_item("gender", "Gender", type = "single_choice",
+  choice_set = "agree5")
+sat <- sf_scale("sat", "Satisfaction", items = c("sat_1", "sat_2", "sat_3"))
 
 instr <- sf_instrument(
-  title = "Customer Satisfaction Survey",
-  components = c(list(agree5), items, list(scale))
+  "Service Survey",
+  components = list(agree5, sat_1, sat_2, sat_3, gender, sat)
 )
 
 instr <- validate_sframe(instr)
-write_sframe(instr, "customer_satisfaction.sframe")
-
-responses <- data.frame(
-  id = c("r1", "r2", "r3"),
-  sat_1 = c(4, 5, 3),
-  sat_2 = c(5, 4, 3),
-  sat_3 = c(4, 5, 2),
-  stringsAsFactors = FALSE,
-  check.names = FALSE
-)
-
-resp <- read_responses(responses, instr, respondent_id = "id", strict = FALSE)
-scored <- score_scales(resp, instr)
-render_report(instr, data = resp, output_file = "report.html")
+write_sframe(instr, tempfile(fileext = ".sframe"))
 ```
 
-## Optional entry points
+`write_sframe()` validates the instrument and writes the validated object,
+including the validation flag and any saved model specifications.
 
-| Need | Entry point | Optional package |
-|---|---|---|
-| Visual instrument authoring | `launch_builder()` | none |
-| Static HTML survey export | `export_static_survey()` | none |
-| Interactive survey deployment | `render_survey()` | `shiny` |
-| Studio workflow shell | `launch_studio()` | `shiny` |
-| Embedded survey in a Shiny app | `survey_module_ui()`, `survey_module_server()` | `shiny`, `digest` |
-| Response exploration dashboard | `launch_dashboard()` | `shiny` |
-| Reliability and EFA readiness | `reliability_report()`, `efa_report()` | `psych` |
-| Google Sheets response import | `read_sheet_responses()` | `googlesheets4` |
-| Rich Quarto rendering | `render_report()` with local Quarto install | Quarto CLI |
-
-The bundled demo can be run with:
+## Response import and descriptives
 
 ```r
-demo(survey)
-launch_dashboard()
+responses <- data.frame(
+  respondent_id = paste0("R", 1:5),
+  sat_1 = c(4, 5, 3, 4, NA),
+  sat_2 = c(5, 4, 3, 4, 5),
+  sat_3 = c(4, 5, 2, 4, 4),
+  gender = c(1, 2, 1, 2, 1)
+)
+
+resp <- read_responses(
+  responses,
+  instr,
+  respondent_id = "respondent_id",
+  strict = FALSE
+)
+
+score_scales(resp, instr)
+descriptives_report(resp, variables = c("sat_1", "sat_2", "sat_3"))
+missing_data_report(resp, instr)
 ```
 
-`demo(survey)` walks through loading the demo instrument, reading simulated
-responses, scoring scales, running the analysis plan, checking response
-quality, and rendering HTML outputs. It writes example tables and plots to a
-temporary `surveyframe-demo` folder and prints that folder path in the console.
+## Role-based analysis plans
 
-Use `launch_builder()` to design or edit a questionnaire. Use
-`launch_dashboard()` only after an instrument and response data exist; it is a
-read-only response exploration dashboard.
+v0.3 analysis plans use method-specific variable roles rather than a flat
+checkbox list. Old `.sframe` files with `variables` and `test` fields still
+load and run.
 
-## CRAN track
+```r
+instr$analysis_plan <- list(
+  list(
+    id = "RQ1",
+    research_question = "Is satisfaction associated with gender?",
+    family = "association",
+    method = "correlation_spearman",
+    roles = list(x = "sat_1", y = "sat_2"),
+    options = list(alpha = 0.05),
+    status = "valid_plan",
+    requires_data = TRUE
+  )
+)
 
-The package is being prepared for first CRAN submission as v0.3.0. Current
-priorities are:
+run_analysis_plan(resp, instr)
+```
 
-- keep the hard dependency set minimal
-- run clean `R CMD check --as-cran` results across platforms
-- verify win-builder and rhub results for the final tarball
-- manually exercise the browser and Shiny interfaces before upload
-- keep `cran-comments.md` aligned with the actual final check results
+Supported method IDs include descriptives, missing data, quality checks,
+reliability, EFA readiness and solutions, CFA/CB-SEM/PLS-SEM syntax,
+chi-square, Fisher's exact test, McNemar, Cochran's Q, t-tests, Mann-Whitney,
+Wilcoxon, one- and two-way ANOVA, ANCOVA, repeated-measures ANOVA, Kruskal-
+Wallis, Friedman, Pearson/Spearman/Kendall correlations, partial correlations,
+linear and logistic regression, mediation, and moderation.
+
+## Reliability, EFA, and CFA
+
+```r
+if (requireNamespace("psych", quietly = TRUE)) {
+  reliability_report(resp, instr, omega = FALSE)
+  efa_report(resp, instr)
+}
+
+cfa_syntax(instr)
+cfa_lavaan_syntax(instr, ordered = TRUE)
+```
+
+## Model layer
+
+```r
+model <- sf_model(
+  "model_1",
+  "Satisfaction model",
+  type = "cb_sem",
+  constructs = list(
+    sf_construct("SAT", "Satisfaction", c("sat_1", "sat_2", "sat_3"))
+  )
+)
+
+instr <- add_model(instr, model)
+model_json(model)
+sem_lavaan_syntax(model, instr)
+```
+
+## PLS-SEM syntax
+
+```r
+pls_model <- sf_model(
+  "pls_1",
+  "Satisfaction PLS model",
+  type = "pls_sem",
+  constructs = list(
+    sf_construct("SAT", "Satisfaction", c("sat_1", "sat_2", "sat_3"),
+      mode = "composite")
+  )
+)
+
+seminr_syntax(pls_model)
+```
+
+## Reporting
+
+```r
+render_report(
+  instr,
+  data = resp,
+  output_file = tempfile(fileext = ".html"),
+  include_codebook = TRUE,
+  include_quality = TRUE,
+  include_missing = TRUE,
+  include_descriptives = TRUE,
+  include_analysis = TRUE,
+  include_models = TRUE
+)
+```
+
+The built-in HTML fallback does not require Quarto. If the Quarto CLI is
+available locally, `render_report()` can use the bundled template.
+
+## Visual tools
+
+```r
+launch_builder(open = FALSE)
+export_static_survey(instr, open = FALSE)
+```
+
+Interactive functions such as `launch_builder(open = TRUE)`,
+`launch_studio()`, `render_survey()`, and `launch_dashboard()` are available
+for manual use. Tests and examples avoid opening browsers.
+
+## v0.4 scope
+
+MCDM and DEMATEL are intentionally outside v0.3. They are planned for v0.4
+with AHP matrices, DEMATEL direct-influence matrices, TOPSIS/VIKOR/
+PROMETHEE/ELECTRE planning, MCDM validation, DEMATEL thresholding, and later
+diagram/export integrations.
 
 ## Citation
-
-If you use surveyframe in published research, cite the package:
 
 ```r
 citation("surveyframe")
 ```
 
-A Journal of Statistical Software paper is planned as the primary methods
-citation.
-
 ## License
 
-MIT. See `LICENSE` for details.
+MIT. See `LICENSE`.

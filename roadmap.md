@@ -4,6 +4,19 @@ Last updated: May 2026 - v0.3.0 pre-submission candidate
 
 ---
 
+## v0.4 future directions: PLANNED
+
+MCDM and DEMATEL are intentionally outside v0.3. Planned v0.4 work includes
+MCDM input fields, AHP pairwise-comparison matrices, DEMATEL direct-influence
+matrices, TOPSIS, VIKOR, PROMETHEE and ELECTRE planning support, MCDM data
+validation, DEMATEL thresholding and causal diagram export, advanced SEM and
+PLS-SEM execution, higher-order constructs, MICOM/invariance testing,
+multi-group SEM planning, a diagram-based model builder, complex survey-design
+weighting, JASP/jamovi-friendly exports, and later ASRDA/report writer
+integration once the data and model schema has stabilised.
+
+---
+
 ## Phase 0: CRAN hardening - IN FINAL REVIEW
 
 - [x] Local `R CMD check --as-cran` on source tarball with 0 errors and 0 warnings
@@ -32,7 +45,7 @@ Last updated: May 2026 - v0.3.0 pre-submission candidate
 
 ## Phase 2: Adoption surface: IN PROGRESS
 
-- [ ] pkgdown site with gallery of complete example instruments
+- [ ] pkgdown site with gallery of worked example instruments
 - [ ] RStudio add-in: one-click `launch_builder()` from the Addins menu
 - [ ] Zenodo DOI for the instrument schema
 - [ ] JSS methods paper draft

@@ -2,7 +2,7 @@
 
 #' Create a survey instrument object
 #'
-#' Assembles a complete survey instrument from its component objects. This is
+#' Assembles a survey instrument from its component objects. This is
 #' the top-level constructor for the `sframe` class. All other constructors
 #' ([sf_item()], [sf_choices()], [sf_scale()], [sf_branch()], [sf_check()])
 #' produce components that are passed into this function via `components`.
@@ -23,9 +23,11 @@
 #'   [render_survey()], such as theme colour or progress bar visibility.
 #' @param analysis_plan List. Optional pre-planned analysis blocks created in
 #'   the HTML SurveyBuilder Analyse mode.
+#' @param models List. Optional model specifications created with [sf_model()]
+#'   or imported from a `.sframe` file.
 #'
 #' @return An object of class `sframe` with slots `meta`, `items`, `choices`,
-#'   `scales`, `branching`, `checks`, `analysis_plan`, and `render`.
+#'   `scales`, `branching`, `checks`, `analysis_plan`, `models`, and `render`.
 #' @export
 #' @seealso [sf_item()], [sf_choices()], [sf_scale()], [sf_branch()],
 #'   [sf_check()], [validate_sframe()], [write_sframe()]
@@ -57,7 +59,8 @@ sf_instrument <- function(
     languages   = "en",
     components  = list(),
     render      = NULL,
-    analysis_plan = list()
+    analysis_plan = list(),
+    models = list()
 ) {
   # Sort components by class into named slots
   items     <- Filter(function(x) inherits(x, "sf_item"),    components)
@@ -100,6 +103,7 @@ sf_instrument <- function(
       branching = branching,
       checks    = checks,
       analysis_plan = analysis_plan %||% list(),
+      models    = models %||% list(),
       render    = render %||% list()
     ),
     class = "sframe"

@@ -1,4 +1,13 @@
+^\.git($|/)
+^\.gitattributes$
 ^\.github($|/)
+^\.Rproj\.user($|/)
+^screenshots($|/)
+^screenshot(s)?($|/)
+^tmp($|/)
+^temp($|/)
+^.*\.tmp$
+^.*\.log$
 ^surveyframe\.Rcheck$
 ^surveyframe_[0-9.]+\.tar\.gz$
 ^surveyframe\.zip$
