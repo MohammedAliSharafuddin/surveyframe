@@ -99,6 +99,24 @@ test_that("sf_item page number is stored", {
   expect_equal(item$page, 2L)
 })
 
+test_that("validate_sframe catches invalid item IDs and duplicate component IDs", {
+  cs1 <- sf_choices("agree5", 1:5, c("SD", "D", "N", "A", "SA"))
+  cs2 <- sf_choices("agree5", c("yes", "no"), c("Yes", "No"))
+  bad_item <- sf_item("bad-id", "Bad ID", type = "likert", choice_set = "agree5")
+  item <- sf_item("sat1", "Satisfaction", type = "likert",
+                  choice_set = "agree5", scale_id = "sat")
+  sc1 <- sf_scale("sat", "Satisfaction", items = "sat1")
+  sc2 <- sf_scale("sat", "Duplicate scale", items = "sat1")
+  instr <- sf_instrument("Bad Survey",
+                         components = list(cs1, cs2, bad_item, item, sc1, sc2))
+
+  result <- validate_sframe(instr, strict = FALSE)
+  expect_false(result$valid)
+  expect_true(any(grepl("Invalid item ID", result$problems)))
+  expect_true(any(grepl("Duplicate choice set IDs", result$problems)))
+  expect_true(any(grepl("Duplicate scale IDs", result$problems)))
+})
+
 # ---- launch_builder ---------------------------------------------------------
 test_that("launch_builder returns a path without opening browser", {
   path <- launch_builder(open = FALSE)
@@ -150,28 +168,51 @@ test_that("builder HTML has three mode buttons", {
   expect_true(grepl("data-mode=\"analyse\"", html))
 })
 
+# ---- export_static_survey ---------------------------------------------------
+test_that("export_static_survey writes a standalone HTML file", {
+  tmp <- tempfile(fileext = ".html")
+  out <- export_static_survey(make_instr(), output_path = tmp, open = FALSE)
+  expect_true(file.exists(out))
+  html <- paste(readLines(out, warn = FALSE, encoding = "UTF-8"), collapse = "\n")
+  expect_true(grepl("Test Survey", html, fixed = TRUE))
+  expect_true(grepl("application/json", html, fixed = TRUE))
+  expect_true(grepl("sat1", html, fixed = TRUE))
+  unlink(tmp)
+})
+
+test_that("export_static_survey defaults to tempdir when no path is supplied", {
+  out <- export_static_survey(make_instr(), open = FALSE, overwrite = TRUE)
+  expect_true(file.exists(out))
+  expect_true(startsWith(normalizePath(out), normalizePath(tempdir())))
+  unlink(out)
+})
+
 # ---- export_google_sheet ----------------------------------------------------
 test_that("export_google_sheet writes a .gs file with correct structure", {
   instr <- make_instr()
-  result <- tryCatch(
-    export_google_sheet(instr,
-      sheet_url  = "https://docs.google.com/spreadsheets/d/FAKEID",
-      output_dir = tempdir()),
-    error = function(e) {
-      if (grepl("googlesheets4|not installed", conditionMessage(e),
-                ignore.case = TRUE))
-        return("skip")
-      stop(e)
-    }
+  result <- export_google_sheet(
+    instr,
+    sheet_url  = "https://docs.google.com/spreadsheets/d/FAKEID",
+    output_dir = tempdir()
   )
-  if (identical(result, "skip"))
-    skip("googlesheets4 unavailable in this environment")
   expect_true(file.exists(result))
   gs <- paste(readLines(result, warn = FALSE), collapse = "\n")
   expect_true(grepl("doPost",         gs))
   expect_true(grepl("SpreadsheetApp", gs))
+  expect_true(grepl("TARGET_SHEET_URL", gs))
   expect_true(grepl("sat1",           gs))
   unlink(result)
+})
+
+test_that("export_google_sheet reports missing output directories", {
+  expect_error(
+    export_google_sheet(
+      make_instr(),
+      sheet_url = "https://docs.google.com/spreadsheets/d/FAKEID",
+      output_dir = tempfile()
+    ),
+    class = "sframe_error"
+  )
 })
 
 # ---- run_analysis_plan: structure -------------------------------------------

@@ -66,14 +66,16 @@ responses <- read_responses(
   meta_cols = "started_at"
 )
 old <- options(surveyframe.use_quarto = FALSE)
-out <- render_report(
-  instr,
-  data = responses,
-  output_file = tempfile(fileext = ".html"),
-  include_reliability = FALSE,
-  include_analysis = FALSE
+out <- tryCatch(
+  render_report(
+    instr,
+    data = responses,
+    output_file = tempfile(fileext = ".html"),
+    include_reliability = FALSE,
+    include_analysis = FALSE
+  ),
+  finally = options(old)
 )
-options(old)
 file.exists(out)
 }
 \seealso{

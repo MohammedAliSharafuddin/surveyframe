@@ -7,6 +7,9 @@
 #' thirteen item types, branching logic, required-field validation, and
 #' multi-page navigation are handled entirely in client-side JavaScript.
 #'
+#' When `output_path` is `NULL`, the file is written to [tempdir()]. Supply
+#' an explicit `output_path` for any production export that should be kept.
+#'
 #' When a respondent clicks the submit button, the browser downloads a
 #' one-row CSV file named `<survey_title>_response_<id>.csv`. If
 #' `endpoint_url` is supplied, the same payload is also sent as a JSON
@@ -19,8 +22,8 @@
 #' opening directly from disk.
 #'
 #' @param instrument An `sframe` object.
-#' @param output_path Character. File path for the output HTML. Defaults to
-#'   `<survey_title>.html` in the current working directory.
+#' @param output_path Character. File path for the output HTML. When `NULL`,
+#'   a `<survey_title>.html` file is written in [tempdir()].
 #' @param open Logical. If `TRUE` (default) and the session is interactive,
 #'   the file is opened in the default browser after writing.
 #' @param endpoint_url Character or NULL. A URL to which responses are
@@ -73,7 +76,7 @@ export_static_survey <- function(
   if (is.null(output_path)) {
     slug <- gsub("[^a-zA-Z0-9]", "_", instrument$meta$title %||% "survey")
     slug <- gsub("_+", "_", slug)
-    output_path <- file.path(getwd(), paste0(slug, ".html"))
+    output_path <- file.path(tempdir(), paste0(slug, ".html"))
   }
 
   if (file.exists(output_path) && !overwrite) {

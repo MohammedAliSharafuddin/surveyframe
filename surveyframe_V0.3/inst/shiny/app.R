@@ -37,9 +37,9 @@ updateSelectInput <- shiny::updateSelectInput
 updateTextAreaInput <- shiny::updateTextAreaInput
 updateTextInput <- shiny::updateTextInput
 
-builder_empty_state <- surveyframe:::sframe_builder_empty_state
-builder_state_from_instrument <- surveyframe:::sframe_builder_state_from_instrument
-builder_validate_draft <- surveyframe:::sframe_builder_validate_draft
+builder_empty_state <- surveyframe::sframe_builder_empty_state
+builder_state_from_instrument <- surveyframe::sframe_builder_state_from_instrument
+builder_validate_draft <- surveyframe::sframe_builder_validate_draft
 sf_branch <- surveyframe::sf_branch
 sf_check <- surveyframe::sf_check
 sf_choices <- surveyframe::sf_choices

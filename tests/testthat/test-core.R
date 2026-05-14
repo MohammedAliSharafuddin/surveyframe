@@ -657,10 +657,7 @@ test_that("print.sframe_codebook() produces output without error", {
 # 12. render_report()
 # ---------------------------------------------------------------------------
 
-test_that("render_report() writes an HTML report to the requested path", {
-  skip_if_not_installed("quarto")
-  skip_if_not(nzchar(Sys.which("quarto")), "Quarto CLI not installed")
-
+test_that("render_report() writes an HTML report with the fallback renderer", {
   instr <- validate_sframe(make_instrument())
   resp <- suppressWarnings(
     read_responses(
@@ -674,12 +671,31 @@ test_that("render_report() writes an HTML report to the requested path", {
   out_dir <- file.path(tempdir(), paste0("surveyframe-report-", Sys.getpid()))
   out <- file.path(out_dir, "report.html")
 
-  expect_no_error(render_report(instr, data = resp, output_file = out))
+  old <- options(surveyframe.use_quarto = FALSE)
+  on.exit(options(old), add = TRUE)
+
+  expect_no_error(render_report(
+    instr,
+    data = resp,
+    output_file = out,
+    include_reliability = FALSE
+  ))
   expect_true(file.exists(out))
 
   html <- paste(readLines(out, warn = FALSE, encoding = "UTF-8"), collapse = "\n")
   expect_match(html, "Service Quality Survey", fixed = TRUE)
   expect_match(html, "Instrument hash", fixed = TRUE)
+})
+
+test_that("render_report() writes an HTML report through Quarto when available", {
+  skip_if_not_installed("quarto")
+  skip_if_not(nzchar(Sys.which("quarto")), "Quarto CLI not installed")
+
+  instr <- validate_sframe(make_instrument())
+  out <- tempfile(fileext = ".html")
+
+  expect_no_error(render_report(instr, output_file = out))
+  expect_true(file.exists(out))
 })
 
 # ---------------------------------------------------------------------------
@@ -708,7 +724,7 @@ test_that("builder helpers compose a valid instrument from draft components", {
       items = c("sat_1", "sat_2"), reverse_items = "sat_2")
   )
 
-  draft <- surveyframe:::sframe_builder_validate_draft(
+  draft <- surveyframe::sframe_builder_validate_draft(
     meta = meta,
     choices = choices,
     items = items,
@@ -728,7 +744,7 @@ test_that("builder helpers reclassify components from a loaded sframe file", {
   write_sframe(instr, path, overwrite = TRUE)
 
   loaded <- read_sframe(path)
-  state <- surveyframe:::sframe_builder_state_from_instrument(loaded)
+  state <- surveyframe::sframe_builder_state_from_instrument(loaded)
 
   expect_true(all(vapply(state$choices, inherits, logical(1), "sf_choices")))
   expect_true(all(vapply(state$items, inherits, logical(1), "sf_item")))
@@ -736,7 +752,7 @@ test_that("builder helpers reclassify components from a loaded sframe file", {
   expect_true(all(vapply(state$branching, inherits, logical(1), "sf_branch")))
   expect_true(all(vapply(state$checks, inherits, logical(1), "sf_check")))
 
-  rebuilt <- surveyframe:::sframe_builder_validate_draft(
+  rebuilt <- surveyframe::sframe_builder_validate_draft(
     meta = state$meta,
     choices = state$choices,
     items = state$items,
@@ -821,7 +837,7 @@ test_that("render_survey() persists submissions through the Shiny server", {
   path <- tempfile(fileext = ".csv")
   app <- render_survey(make_instrument(), save_responses = "csv", output_path = path)
 
-  shiny::testServer(app$serverFuncSource(), {
+  shiny::testServer(app, {
     session$setInputs(
       sat_1 = "4",
       sat_2 = "5",
@@ -842,7 +858,7 @@ test_that("render_survey() blocks invalid submissions through the Shiny server",
   path <- tempfile(fileext = ".csv")
   app <- render_survey(make_instrument(), save_responses = "csv", output_path = path)
 
-  shiny::testServer(app$serverFuncSource(), {
+  shiny::testServer(app, {
     session$setInputs(
       sat_1 = "4",
       sat_3 = "3",

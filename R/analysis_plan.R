@@ -73,9 +73,14 @@
 )
 
 sframe_citations_for_test <- function(test) {
+  citations <- .sframe_citations
+  citations$r_core$apa <- sprintf(
+    "R Core Team. (%s). *R: A language and environment for statistical computing*. R Foundation for Statistical Computing.",
+    format(Sys.Date(), "%Y")
+  )
   matching <- Filter(function(cit) {
     "all" %in% cit$use || test %in% cit$use
-  }, .sframe_citations)
+  }, citations)
   lapply(matching, function(cit) cit$apa)
 }
 
@@ -160,7 +165,12 @@ sframe_run_crosstab <- function(data, vars) {
     return(list(test = "crosstab", error = "Chi-square could not be computed."))
   }
   n <- sum(tbl)
-  phi <- sqrt(ct$statistic / n)
+  r_dim <- nrow(tbl)
+  c_dim <- ncol(tbl)
+  denom <- n * min(r_dim - 1, c_dim - 1)
+  effect <- if (denom > 0) sqrt(unname(ct$statistic) / denom) else NA_real_
+  effect_name <- if (r_dim == 2 && c_dim == 2) "phi" else "Cramer's V"
+  effect_symbol <- if (identical(effect_name, "phi")) "\u03c6" else "V"
   list(
     test     = "crosstab",
     vars     = vars,
@@ -169,16 +179,20 @@ sframe_run_crosstab <- function(data, vars) {
     chi_sq   = unname(ct$statistic),
     df       = unname(ct$parameter),
     p        = ct$p.value,
-    phi      = unname(phi),
-    effect_label = sframe_effect_label(phi, "r"),
+    effect   = unname(effect),
+    effect_name = effect_name,
+    phi      = if (identical(effect_name, "phi")) unname(effect) else NA_real_,
+    cramer_v = if (!identical(effect_name, "phi")) unname(effect) else NA_real_,
+    effect_label = sframe_effect_label(effect, "r"),
     apa      = sprintf(
-      "\u03c7\u00b2(%d, N = %d) = %.2f, p %s, \u03c6 = %.2f",
-      ct$parameter, n, ct$statistic, sframe_p_string(ct$p.value), phi
+      "\u03c7\u00b2(%d, N = %d) = %.2f, p %s, %s = %.2f",
+      ct$parameter, n, ct$statistic, sframe_p_string(ct$p.value),
+      effect_symbol, effect
     ),
     prompt   = sprintf(
-      "The chi-square test %s a significant association between %s and %s (\u03c6 = %.2f, %s effect). Describe the pattern in the cross-tabulation.",
-      if (ct$p.value < .05) "revealed" else "did not reveal",
-      vars[1], vars[2], phi, sframe_effect_label(phi, "r")
+      "The chi-square test %s a significant association between %s and %s (%s = %.2f, %s effect). Describe the pattern in the cross-tabulation.",
+      if (ct$p.value < .05) "revealed" else "found no",
+      vars[1], vars[2], effect_name, effect, sframe_effect_label(effect, "r")
     )
   )
 }

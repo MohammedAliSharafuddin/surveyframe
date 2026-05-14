@@ -9,6 +9,9 @@
 #'
 #' The following checks are performed:
 #' - Duplicate item IDs
+#' - Invalid item IDs
+#' - Duplicate choice-set IDs
+#' - Duplicate scale IDs
 #' - Items with missing labels
 #' - Items referencing a missing `choice_set` in the instrument
 #' - Items referencing a missing `scale_id` in the instrument
@@ -56,12 +59,41 @@ validate_sframe <- function(instrument, strict = TRUE) {
   item_ids    <- vapply(instrument$items,    function(x) x$id, character(1))
   choice_ids  <- vapply(instrument$choices,  function(x) x$id, character(1))
   scale_ids   <- vapply(instrument$scales,   function(x) x$id, character(1))
+  valid_id <- function(x) grepl("^[A-Za-z][A-Za-z0-9_]*$", x)
 
   # Duplicate item IDs
   dupes <- item_ids[duplicated(item_ids)]
   if (length(dupes) > 0) {
     problems <- c(problems,
       paste0("Duplicate item IDs: ", paste(dupes, collapse = ", ")))
+  }
+
+  bad_item_ids <- item_ids[!valid_id(item_ids)]
+  if (length(bad_item_ids) > 0) {
+    problems <- c(
+      problems,
+      paste0(
+        "Invalid item ID(s): ",
+        paste(unique(bad_item_ids), collapse = ", "),
+        ". IDs must start with a letter and contain only letters, numbers, and underscores."
+      )
+    )
+  }
+
+  dup_choice_ids <- choice_ids[duplicated(choice_ids)]
+  if (length(dup_choice_ids) > 0) {
+    problems <- c(
+      problems,
+      paste0("Duplicate choice set IDs: ", paste(unique(dup_choice_ids), collapse = ", "))
+    )
+  }
+
+  dup_scale_ids <- scale_ids[duplicated(scale_ids)]
+  if (length(dup_scale_ids) > 0) {
+    problems <- c(
+      problems,
+      paste0("Duplicate scale IDs: ", paste(unique(dup_scale_ids), collapse = ", "))
+    )
   }
 
   for (item in instrument$items) {

@@ -87,6 +87,11 @@ sframe_builder_as_check <- function(check) {
   )
 }
 
+#' Create an empty SurveyStudio builder state
+#'
+#' @return A list containing empty metadata, choice, item, scale, branching,
+#'   and check collections suitable for SurveyStudio.
+#' @export
 sframe_builder_empty_state <- function() {
   list(
     meta = list(
@@ -104,6 +109,13 @@ sframe_builder_empty_state <- function() {
   )
 }
 
+#' Convert an instrument into a SurveyStudio builder state
+#'
+#' @param instrument An `sframe` object or `NULL`.
+#'
+#' @return A builder state list. Component classes are restored so the state
+#'   can be edited or validated by SurveyStudio.
+#' @export
 sframe_builder_state_from_instrument <- function(instrument = NULL) {
   if (is.null(instrument)) {
     return(sframe_builder_empty_state())
@@ -174,6 +186,13 @@ sframe_builder_compose_instrument <- function(
   )
 }
 
+#' Validate a SurveyStudio draft state
+#'
+#' @param meta List of instrument metadata.
+#' @param choices,items,scales,branching,checks Lists of draft components.
+#'
+#' @return A list with `valid`, `problems`, and `instrument`.
+#' @export
 sframe_builder_validate_draft <- function(
     meta,
     choices = list(),
