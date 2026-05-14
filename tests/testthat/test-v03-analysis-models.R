@@ -307,6 +307,26 @@ test_that("builder registry declares roles and conditional significance level", 
   expect_match(html, "seminr_syntax", fixed = TRUE)
 })
 
+test_that("Shiny workflow mirrors the role-based analysis planner", {
+  app_path <- system.file("shiny", "app.R", package = "surveyframe")
+  expect_true(file.exists(app_path))
+  expect_silent(parse(app_path))
+
+  app <- paste(readLines(app_path, warn = FALSE), collapse = "\n")
+  expect_match(app, "analysis_registry", fixed = TRUE)
+  expect_match(app, "Analysis method", fixed = TRUE)
+  expect_match(app, "Variables and constructs", fixed = TRUE)
+  expect_match(app, "analysis_role_fields", fixed = TRUE)
+  expect_match(app, "Significance level", fixed = TRUE)
+  expect_match(app, "show_alpha = FALSE", fixed = TRUE)
+  expect_match(app, "show_alpha = TRUE", fixed = TRUE)
+  expect_match(app, "Save analysis plan", fixed = TRUE)
+  expect_match(app, "Model Builder", fixed = TRUE)
+  expect_match(app, "Create constructs from scales", fixed = TRUE)
+  expect_match(app, "analysis_plan = rv$builder$analysis_plan", fixed = TRUE)
+  expect_match(app, "models = rv$builder$models", fixed = TRUE)
+})
+
 test_that("sample_size_plan and validity_report return structured outputs", {
   ss <- sample_size_plan("correlation", r = 0.3)
   expect_s3_class(ss, "sframe_sample_size_plan")
