@@ -1,0 +1,39 @@
+---
+title: "Building a survey instrument"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Building a survey instrument}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+library(surveyframe)
+```
+
+This vignette builds a small instrument using only local R objects.
+
+```{r instrument}
+agree5 <- sf_choices(
+  "agree5",
+  1:5,
+  c("Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree")
+)
+
+i1 <- sf_item("sat_1", "The service was reliable.",
+  type = "likert", choice_set = "agree5", scale_id = "sat")
+i2 <- sf_item("sat_2", "The service was responsive.",
+  type = "likert", choice_set = "agree5", scale_id = "sat")
+i3 <- sf_item("sat_3", "I would recommend the service.",
+  type = "likert", choice_set = "agree5", scale_id = "sat")
+scale <- sf_scale("sat", "Satisfaction", c("sat_1", "sat_2", "sat_3"))
+
+instr <- sf_instrument("Service Survey",
+  components = list(agree5, i1, i2, i3, scale))
+validate_sframe(instr, strict = FALSE)
+```
+
+```{r save, eval = FALSE}
+write_sframe(instr, "service-survey.sframe")
+```

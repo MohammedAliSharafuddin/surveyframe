@@ -10,13 +10,19 @@ sframe_builder_validate_draft(
   items = list(),
   scales = list(),
   branching = list(),
-  checks = list()
+  checks = list(),
+  analysis_plan = list(),
+  models = list()
 )
 }
 \arguments{
 \item{meta}{List of instrument metadata.}
 
 \item{choices, items, scales, branching, checks}{Lists of draft components.}
+
+\item{analysis_plan}{List of draft analysis-plan blocks.}
+
+\item{models}{List of draft model specifications.}
 }
 \value{
 A list with \code{valid}, \code{problems}, and \code{instrument}.

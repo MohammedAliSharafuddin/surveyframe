@@ -15,6 +15,9 @@ params:
   include_quality:     true
   include_reliability: true
   include_analysis:    true
+  include_missing:     true
+  include_descriptives: true
+  include_models:      true
   instrument_hash:     ""
 execute:
   echo:    false
@@ -129,6 +132,35 @@ kable(sl_df, align=c("l","c","r"))
 
 ---
 
+## Missing Data {#sec-missing .unnumbered}
+
+```{r missing-data, eval=params$include_missing && has_data}
+mr <- tryCatch(missing_data_report(responses, instrument), error = function(e) NULL)
+if (is.null(mr)) {
+  cat("Missing-data diagnostics could not be computed from the supplied data.\n\n")
+} else {
+  print(kable(mr$item_missing, caption = "Item-wise missingness"))
+  print(kable(mr$patterns, caption = "Missing-data patterns"))
+  if (!is.null(mr$scale_missing_rules) && nrow(mr$scale_missing_rules) > 0)
+    print(kable(mr$scale_missing_rules, caption = "Scale missing rules"))
+}
+```
+
+---
+
+## Descriptives {#sec-descriptives .unnumbered}
+
+```{r descriptives, eval=params$include_descriptives && has_data}
+dr <- tryCatch(descriptives_report(responses), error = function(e) NULL)
+if (is.null(dr)) {
+  cat("Descriptive statistics could not be computed from the supplied data.\n\n")
+} else {
+  print(kable(dr$table, caption = "Descriptive statistics"))
+}
+```
+
+---
+
 ## Reliability {#sec-reliability .unnumbered}
 
 ```{r reliability, eval=params$include_reliability && has_data}
@@ -194,6 +226,34 @@ if (!has_data) {
       }
     }
   }
+}
+```
+
+---
+
+## Model Appendix {#sec-models .unnumbered}
+
+```{r models, eval=params$include_models && length(instrument$models %||% list()) > 0}
+#| output: asis
+for (model in instrument$models) {
+  cat(sprintf("### %s\n\n", model$label %||% model$id))
+  cat(sprintf("**Type:** %s  \n**Engine:** %s\n\n", model$type %||% "", model$engine %||% ""))
+  syntax <- tryCatch(
+    switch(model$type,
+      cfa = cfa_lavaan_syntax(instrument = instrument, model = model),
+      cb_sem = sem_lavaan_syntax(model, instrument = instrument),
+      pls_sem = seminr_syntax(model),
+      efa = efa_syntax(unlist(lapply(model$measurement$constructs, function(con) con$items))),
+      ""
+    ),
+    error = function(e) paste("Model syntax could not be generated:", conditionMessage(e))
+  )
+  cat("```r\n")
+  cat(syntax)
+  cat("\n```\n\n")
+  cat("```json\n")
+  cat(model_json(model, pretty = TRUE))
+  cat("\n```\n\n")
 }
 ```
 

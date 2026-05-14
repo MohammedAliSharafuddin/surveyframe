@@ -1,7 +1,7 @@
 Tourism services demo data
 ==========================
 
-This folder contains a complete simulated surveyframe demo:
+This folder contains a worked simulated surveyframe demo:
 
 - `tourism_services_demo.sframe`: an instrument for tourism-services research.
 - `tourism_services_responses.csv`: 120 simulated respondent records.

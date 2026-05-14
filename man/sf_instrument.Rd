@@ -12,7 +12,8 @@ sf_instrument(
   languages = "en",
   components = list(),
   render = NULL,
-  analysis_plan = list()
+  analysis_plan = list(),
+  models = list()
 )
 }
 \arguments{
@@ -39,13 +40,16 @@ automatically. Supply components created by the surveyframe constructors.}
 
 \item{analysis_plan}{List. Optional pre-planned analysis blocks created in
 the HTML SurveyBuilder Analyse mode.}
+
+\item{models}{List. Optional model specifications created with \code{\link[=sf_model]{sf_model()}}
+or imported from a \code{.sframe} file.}
 }
 \value{
 An object of class \code{sframe} with slots \code{meta}, \code{items}, \code{choices},
-\code{scales}, \code{branching}, \code{checks}, \code{analysis_plan}, and \code{render}.
+\code{scales}, \code{branching}, \code{checks}, \code{analysis_plan}, \code{models}, and \code{render}.
 }
 \description{
-Assembles a complete survey instrument from its component objects. This is
+Assembles a survey instrument from its component objects. This is
 the top-level constructor for the \code{sframe} class. All other constructors
 (\code{\link[=sf_item]{sf_item()}}, \code{\link[=sf_choices]{sf_choices()}}, \code{\link[=sf_scale]{sf_scale()}}, \code{\link[=sf_branch]{sf_branch()}}, \code{\link[=sf_check]{sf_check()}})
 produce components that are passed into this function via \code{components}.

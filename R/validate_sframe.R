@@ -20,6 +20,8 @@
 #' - Scale `items` vectors containing IDs not present in the instrument
 #' - Branching rules referencing item IDs not present in the instrument
 #' - Attention checks referencing item IDs not present in the instrument
+#' - Analysis plan roles referencing missing variables or models
+#' - Model specifications referencing missing indicators or constructs
 #'
 #' @param instrument An `sframe` object created by [sf_instrument()].
 #' @param strict Logical. When `TRUE` (default), any detected problem raises
@@ -59,7 +61,9 @@ validate_sframe <- function(instrument, strict = TRUE) {
   item_ids    <- vapply(instrument$items,    function(x) x$id, character(1))
   choice_ids  <- vapply(instrument$choices,  function(x) x$id, character(1))
   scale_ids   <- vapply(instrument$scales,   function(x) x$id, character(1))
+  model_ids   <- vapply(instrument$models %||% list(), function(x) x$id %||% "", character(1))
   valid_id <- function(x) grepl("^[A-Za-z][A-Za-z0-9_]*$", x)
+  known_vars <- unique(c(item_ids, scale_ids))
 
   # Duplicate item IDs
   dupes <- item_ids[duplicated(item_ids)]
@@ -153,6 +157,87 @@ validate_sframe <- function(instrument, strict = TRUE) {
     problems <- c(problems,
       paste0("Check(s) reference unknown item(s): ",
              paste(missing_check_items, collapse = ", ")))
+  }
+
+  # Analysis plan references. Old plans use `variables`; v0.3 plans use
+  # role-based assignments, but both formats must remain valid.
+  for (block in instrument$analysis_plan %||% list()) {
+    block_id <- block$id %||% "(unnamed)"
+    block_method <- as.character(block$method %||% block$test %||% "")
+    refs <- character(0)
+    model_ref_values <- character(0)
+    if (!is.null(block$variables)) {
+      variable_refs <- as.character(unlist(block$variables, use.names = FALSE))
+      if (block_method %in% c("cfa_lavaan_syntax", "sem_lavaan_syntax", "seminr_syntax")) {
+        model_ref_values <- c(model_ref_values, variable_refs)
+      } else {
+        refs <- c(refs, variable_refs)
+      }
+    }
+    if (!is.null(block$roles) && is.list(block$roles)) {
+      role_refs <- unlist(block$roles, recursive = TRUE, use.names = FALSE)
+      role_refs <- as.character(role_refs[!is.na(role_refs)])
+      model_roles <- c("model", "models", "measurement_model", "structural_model")
+      role_names <- names(block$roles) %||% character(0)
+      model_ref_values <- c(model_ref_values, unlist(block$roles[intersect(role_names, model_roles)],
+                                                     recursive = TRUE, use.names = FALSE))
+      model_ref_values <- as.character(model_ref_values[!is.na(model_ref_values)])
+      data_refs <- setdiff(role_refs, model_ref_values)
+      refs <- c(refs, data_refs)
+    }
+    model_ref_values <- model_ref_values[nzchar(model_ref_values)]
+    missing_models <- setdiff(unique(model_ref_values), model_ids)
+    if (length(missing_models) > 0) {
+      problems <- c(
+        problems,
+        paste0(
+          "Analysis plan '", block_id, "' references missing model(s): ",
+          paste(unique(missing_models), collapse = ", ")
+        )
+      )
+    }
+    refs <- refs[nzchar(refs)]
+    missing_refs <- setdiff(unique(refs), known_vars)
+    if (length(missing_refs) > 0) {
+      problems <- c(
+        problems,
+        paste0(
+          "Analysis plan '", block_id, "' references unknown variable(s): ",
+          paste(missing_refs, collapse = ", ")
+        )
+      )
+    }
+  }
+
+  # Model layer integrity.
+  dup_model_ids <- model_ids[nzchar(model_ids) & duplicated(model_ids)]
+  if (length(dup_model_ids) > 0) {
+    problems <- c(
+      problems,
+      paste0("Duplicate model IDs: ", paste(unique(dup_model_ids), collapse = ", "))
+    )
+  }
+  bad_model_ids <- model_ids[nzchar(model_ids) & !valid_id(model_ids)]
+  if (length(bad_model_ids) > 0) {
+    problems <- c(
+      problems,
+      paste0("Invalid model ID(s): ", paste(unique(bad_model_ids), collapse = ", "))
+    )
+  }
+  for (model in instrument$models %||% list()) {
+    model_check <- tryCatch(
+      validate_model(model, instrument = instrument, strict = FALSE),
+      error = function(e) list(valid = FALSE, problems = conditionMessage(e))
+    )
+    if (!isTRUE(model_check$valid)) {
+      problems <- c(
+        problems,
+        paste0(
+          "Model '", model$id %||% "(unnamed)", "': ",
+          model_check$problems
+        )
+      )
+    }
   }
 
   if (strict && length(problems) > 0) {

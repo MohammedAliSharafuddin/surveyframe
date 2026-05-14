@@ -4,14 +4,15 @@
 \name{surveyframe-package}
 \alias{surveyframe}
 \alias{surveyframe-package}
-\title{surveyframe: Survey Instrument Design, Validation, and Response Workflows}
+\title{surveyframe: Survey Instrument Workflows for R}
 \description{
 surveyframe defines a survey instrument as a first-class R object and
-provides a complete workflow from instrument design through data collection,
+provides a workflow from instrument design through data collection,
 quality checking, scoring, psychometric diagnostics, and reproducible
 reporting. Version 0.3 adds static HTML survey export, an embeddable Shiny
-survey module, an interactive response dashboard, and additional
-analysis-plan tests.
+survey module, an interactive response dashboard, a role-based analysis
+planner, common survey statistics, and model syntax planning for EFA, CFA,
+CB-SEM, and PLS-SEM.
 \subsection{Core workflow}{
 \enumerate{
 \item \strong{Design} an instrument with \code{\link[=launch_builder]{launch_builder()}} or \code{\link[=sf_instrument]{sf_instrument()}} and
@@ -21,8 +22,9 @@ its component constructors: \code{\link[=sf_item]{sf_item()}}, \code{\link[=sf_c
 \item \strong{Deploy} a Shiny survey with \code{\link[=render_survey]{render_survey()}}.
 \item \strong{Load responses} with \code{\link[=read_responses]{read_responses()}} or \code{\link[=read_sheet_responses]{read_sheet_responses()}}.
 \item \strong{Check quality} with \code{\link[=quality_report]{quality_report()}}.
-\item \strong{Score and analyse} with \code{\link[=score_scales]{score_scales()}}, \code{\link[=reliability_report]{reliability_report()}},
-\code{\link[=item_report]{item_report()}}, \code{\link[=efa_report]{efa_report()}}, \code{\link[=cfa_syntax]{cfa_syntax()}}, and \code{\link[=run_analysis_plan]{run_analysis_plan()}}.
+\item \strong{Score and analyse} with \code{\link[=score_scales]{score_scales()}}, \code{\link[=descriptives_report]{descriptives_report()}},
+\code{\link[=missing_data_report]{missing_data_report()}}, \code{\link[=reliability_report]{reliability_report()}}, \code{\link[=item_report]{item_report()}},
+\code{\link[=efa_report]{efa_report()}}, \code{\link[=cfa_syntax]{cfa_syntax()}}, and \code{\link[=run_analysis_plan]{run_analysis_plan()}}.
 \item \strong{Report} with \code{\link[=codebook_report]{codebook_report()}}, \code{\link[=render_report]{render_report()}}, and
 \code{\link[=render_results]{render_results()}}.
 }
@@ -32,7 +34,8 @@ its component constructors: \code{\link[=sf_item]{sf_item()}}, \code{\link[=sf_c
 
 Every function in the package operates on an \code{sframe} object. The object
 is the single source of truth for item definitions, scale structure,
-reverse-coding keys, branching rules, and check specifications.
+reverse-coding keys, branching rules, check specifications, analysis plans,
+and optional model specifications.
 }
 
 \subsection{File format}{
@@ -51,11 +54,6 @@ Useful links:
 }
 \author{
 \strong{Maintainer}: Mohammed Ali Sharafuddin \email{mohammedali.page@gmail.com} (\href{https://orcid.org/0000-0001-5247-2964}{ORCID})
-
-Authors:
-\itemize{
-  \item Mohammed Ali Sharafuddin \email{mohammedali.page@gmail.com} (\href{https://orcid.org/0000-0001-5247-2964}{ORCID})
-}
 
 }
 \keyword{internal}

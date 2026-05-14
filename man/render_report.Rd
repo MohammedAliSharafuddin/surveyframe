@@ -13,7 +13,10 @@ render_report(
   include_quality = TRUE,
   include_reliability = TRUE,
   include_codebook = TRUE,
-  include_analysis = TRUE
+  include_missing = TRUE,
+  include_descriptives = TRUE,
+  include_analysis = TRUE,
+  include_models = TRUE
 )
 }
 \arguments{
@@ -39,8 +42,17 @@ diagnostics. Requires \code{data}. Defaults to \code{TRUE}.}
 \item{include_codebook}{Logical. Whether to include the instrument codebook.
 Defaults to \code{TRUE}.}
 
+\item{include_missing}{Logical. Whether to include the missing-data report.
+Requires \code{data}. Defaults to \code{TRUE}.}
+
+\item{include_descriptives}{Logical. Whether to include descriptive
+statistics. Requires \code{data}. Defaults to \code{TRUE}.}
+
 \item{include_analysis}{Logical. Whether to include analysis-plan results
 when \code{data} are supplied and the instrument has an \code{analysis_plan}.}
+
+\item{include_models}{Logical. Whether to include saved model JSON and
+generated syntax blocks. Defaults to \code{TRUE}.}
 }
 \value{
 The output file path, invisibly.
