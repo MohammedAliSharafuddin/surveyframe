@@ -96,8 +96,8 @@ items[[1]]
 
 ## EFA readiness
 
-`efa_report()` is a screening step. It does not replace substantive judgement
-about item wording, sample size, or theory.
+`efa_report()` is a screening step. Interpret it alongside item wording,
+sample size, theory, and the study context.
 
 ```{r efa, eval = requireNamespace("psych", quietly = TRUE)}
 efa_report(responses, instr)

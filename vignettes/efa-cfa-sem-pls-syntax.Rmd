@@ -12,10 +12,10 @@ knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 library(surveyframe)
 ```
 
-`surveyframe` generates model specifications and syntax for downstream
-statistical packages. It does not fit `lavaan` or `seminr` models in v0.3. The
-generated syntax should be reviewed, copied into the modelling package, and
-fitted with modelling choices appropriate to the study.
+In v0.3, `surveyframe` generates syntax for lavaan and seminr workflows. Model
+fitting remains in the researcher's analysis script. The generated syntax
+should be reviewed, copied into the modelling package, and fitted with
+modelling choices appropriate to the study.
 
 ```{r load}
 demo <- sframe_demo_data()

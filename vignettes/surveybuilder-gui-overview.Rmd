@@ -70,9 +70,9 @@ builder_file <- launch_builder(open = FALSE)
 builder_file
 ```
 
-Use the builder when the immediate task is questionnaire authoring. Because
-the builder is client-side, it is not the right place for the response
-dashboard.
+Use the builder when the immediate task is questionnaire authoring. The builder
+is client-side and is best kept for questionnaire authoring. Response
+exploration belongs in SurveyStudio or the dashboard.
 
 ## Studio workflow hub
 

@@ -29,8 +29,8 @@ Optional packages are only needed for selected features:
 install.packages(c("shiny", "psych", "googlesheets4", "digest", "MASS", "nnet"))
 ```
 
-`lavaan` and `seminr` are not required for syntax generation. They are only
-needed if you choose to fit generated CFA, CB-SEM, or PLS-SEM models yourself.
+Syntax generation works without installing `lavaan` or `seminr`. Install those
+packages when you want to fit the generated CFA, CB-SEM, or PLS-SEM models.
 
 ## Documentation workflow
 
@@ -172,12 +172,26 @@ sem_lavaan_syntax(model, instr)
 ```r
 pls_model <- sf_model(
   "pls_1",
-  "Satisfaction PLS model",
+  "Satisfaction and loyalty PLS model",
   type = "pls_sem",
   constructs = list(
-    sf_construct("SAT", "Satisfaction", c("sat_1", "sat_2", "sat_3"),
-      mode = "composite")
-  )
+    sf_construct(
+      "SAT",
+      "Satisfaction",
+      c("sat_1", "sat_2"),
+      mode = "composite"
+    ),
+    sf_construct(
+      "LOY",
+      "Loyalty",
+      "sat_3",
+      mode = "single_item"
+    )
+  ),
+  paths = list(
+    sf_path("SAT", "LOY")
+  ),
+  options = list(bootstrap = 5000)
 )
 
 seminr_syntax(pls_model)
