@@ -4,44 +4,70 @@
 \alias{launch_studio}
 \title{Launch the SurveyStudio interface}
 \usage{
-launch_studio(instrument = NULL, responses = NULL)
+launch_studio(
+  instrument = NULL,
+  responses = NULL,
+  respondent_id = NULL,
+  submitted_at = NULL,
+  meta_cols = NULL,
+  strict = TRUE,
+  screen = c("auto", "build", "preview", "data", "quality", "analysis", "dashboard"),
+  port = NULL,
+  host = "127.0.0.1",
+  launch.browser = interactive()
+)
 }
 \arguments{
-\item{instrument}{An \code{sframe} object or NULL. When supplied, the studio
-opens directly to the preview screen with this instrument loaded.}
+\item{instrument}{An \code{sframe} object or NULL.}
 
-\item{responses}{A \code{tibble}, \code{data.frame}, or file path to a CSV, or NULL.
-When supplied alongside \code{instrument}, the studio opens with responses
-pre-loaded and the quality dashboard available immediately.}
+\item{responses}{A data.frame, tibble, CSV file path, or NULL.}
+
+\item{respondent_id}{Character or NULL. Response ID column when \code{responses}
+is a CSV path.}
+
+\item{submitted_at}{Character or NULL. Submission time column when
+\code{responses} is a CSV path.}
+
+\item{meta_cols}{Character vector or NULL. Metadata columns when \code{responses}
+is a CSV path.}
+
+\item{strict}{Logical. Passed to \code{\link[=read_responses]{read_responses()}} when \code{responses} is a
+CSV path.}
+
+\item{screen}{Initial studio screen. One of \code{"auto"}, \code{"build"},
+\code{"preview"}, \code{"data"}, \code{"quality"}, \code{"analysis"}, or \code{"dashboard"}.}
+
+\item{port}{TCP port for the Shiny server.}
+
+\item{host}{Host address passed to \code{\link[shiny:runApp]{shiny::runApp()}}.}
+
+\item{launch.browser}{Whether to open the browser automatically.}
 }
 \value{
-Launches a Shiny application and blocks the current R session until
-the app exits. Does not return a value.
+Called for its side effect.
 }
 \description{
 Opens the SurveyStudio Shiny application, a visual shell for the full
 surveyframe workflow. The studio provides screens to build a survey draft,
 open an existing instrument, preview the survey, upload responses, review
-data quality, inspect reliability, and export the instrument or report.
-}
-\details{
-An instrument and response data can be pre-loaded at launch time. If
-neither is supplied, the studio opens at the build screen so the
-researcher can start authoring interactively.
+data quality, inspect reliability, plan analyses, and export outputs.
 }
 \examples{
 \dontrun{
-# Open the studio with no pre-loaded data
 launch_studio()
 
-# Open with an instrument pre-loaded
 instr <- read_sframe("my_instrument.sframe")
-launch_studio(instrument = instr)
+launch_studio(instrument = instr, launch.browser = FALSE)
 
-# Open with both instrument and responses ready
-launch_studio(instrument = instr, responses = "data/responses.csv")
+launch_studio(
+  instrument = instr,
+  responses = "data/responses.csv",
+  respondent_id = "respondent_id",
+  submitted_at = "submitted_at"
+)
 }
 }
 \seealso{
-\code{\link[=render_survey]{render_survey()}}, \code{\link[=read_sframe]{read_sframe()}}, \code{\link[=read_responses]{read_responses()}}
+\code{\link[=launch_builder]{launch_builder()}}, \code{\link[=launch_dashboard]{launch_dashboard()}}, \code{\link[=read_sframe]{read_sframe()}},
+\code{\link[=read_responses]{read_responses()}}
 }

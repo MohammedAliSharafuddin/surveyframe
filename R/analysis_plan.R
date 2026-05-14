@@ -872,7 +872,7 @@ sframe_run_one_block <- function(block, data, instrument) {
 #' slot against the supplied response data. Each block corresponds to one
 #' research question defined during instrument design in the SurveyBuilder.
 #' Results include APA-formatted statistics, effect sizes, interpretation
-#' prompts, and pre-populated citations.
+#' prompts, and reporting references.
 #'
 #' @param data A `tibble` or `data.frame` of responses, typically produced by
 #'   [read_responses()] or [read_sheet_responses()].
@@ -882,8 +882,8 @@ sframe_run_one_block <- function(block, data, instrument) {
 #'
 #' @return An object of class `sframe_analysis_results`, a list with one
 #'   element per analysis block. Each element contains the test result,
-#'   APA string, interpretation prompt, and citations. Pass to
-#'   [render_results()] to generate a formatted report.
+#'   APA string, interpretation prompt, and reporting-reference metadata. Pass
+#'   to [render_results()] to generate a formatted report.
 #' @export
 #' @seealso [render_results()], [read_sheet_responses()]
 #'
