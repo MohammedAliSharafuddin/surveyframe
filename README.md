@@ -32,6 +32,17 @@ install.packages(c("shiny", "psych", "googlesheets4", "digest", "MASS", "nnet"))
 `lavaan` and `seminr` are not required for syntax generation. They are only
 needed if you choose to fit generated CFA, CB-SEM, or PLS-SEM models yourself.
 
+## Documentation workflow
+
+Start with:
+
+1. A complete surveyframe workflow
+2. Building a survey instrument
+3. Analysing survey responses
+4. Scale reliability and validity
+5. EFA, CFA, CB-SEM, and PLS-SEM syntax generation
+6. SurveyBuilder GUI overview
+
 ## Basic instrument
 
 ```r
@@ -43,6 +54,12 @@ agree5 <- sf_choices(
   labels = c("Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree")
 )
 
+visitor_type_choices <- sf_choices(
+  "visitor_type",
+  values = c("first_time", "repeat"),
+  labels = c("First-time visitor", "Repeat visitor")
+)
+
 sat_1 <- sf_item("sat_1", "The service was reliable.",
   type = "likert", choice_set = "agree5", scale_id = "sat")
 sat_2 <- sf_item("sat_2", "The service was responsive.",
@@ -50,13 +67,15 @@ sat_2 <- sf_item("sat_2", "The service was responsive.",
 sat_3 <- sf_item("sat_3", "I would recommend the service.",
   type = "likert", choice_set = "agree5", scale_id = "sat")
 
-gender <- sf_item("gender", "Gender", type = "single_choice",
-  choice_set = "agree5")
+visitor_type <- sf_item("visitor_type", "Visitor type", type = "single_choice",
+  choice_set = "visitor_type")
 sat <- sf_scale("sat", "Satisfaction", items = c("sat_1", "sat_2", "sat_3"))
 
 instr <- sf_instrument(
   "Service Survey",
-  components = list(agree5, sat_1, sat_2, sat_3, gender, sat)
+  components = list(
+    agree5, visitor_type_choices, sat_1, sat_2, sat_3, visitor_type, sat
+  )
 )
 
 instr <- validate_sframe(instr)
@@ -74,7 +93,7 @@ responses <- data.frame(
   sat_1 = c(4, 5, 3, 4, NA),
   sat_2 = c(5, 4, 3, 4, 5),
   sat_3 = c(4, 5, 2, 4, 4),
-  gender = c(1, 2, 1, 2, 1)
+  visitor_type = c("first_time", "repeat", "first_time", "repeat", "first_time")
 )
 
 resp <- read_responses(
@@ -99,7 +118,7 @@ load and run.
 instr$analysis_plan <- list(
   list(
     id = "RQ1",
-    research_question = "Is satisfaction associated with gender?",
+    research_question = "Are the satisfaction items associated?",
     family = "association",
     method = "correlation_spearman",
     roles = list(x = "sat_1", y = "sat_2"),
@@ -188,6 +207,16 @@ available locally, `render_report()` can use the bundled template.
 ```r
 launch_builder(open = FALSE)
 export_static_survey(instr, open = FALSE)
+```
+
+Use `launch_builder()` as the standalone questionnaire builder,
+`launch_studio()` as the workflow hub, and `launch_dashboard()` as the
+read-only response explorer. Demo launchers are available for training:
+
+```r
+launch_builder_demo(open = FALSE)
+# launch_studio_demo()
+# launch_dashboard_demo()
 ```
 
 Interactive functions such as `launch_builder(open = TRUE)`,

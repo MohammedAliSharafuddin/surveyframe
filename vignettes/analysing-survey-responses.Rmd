@@ -12,35 +12,146 @@ knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 library(surveyframe)
 ```
 
-```{r data}
-agree5 <- sf_choices("agree5", 1:5,
-  c("Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"))
-i1 <- sf_item("sat_1", "Reliable", type = "likert", choice_set = "agree5", scale_id = "sat")
-i2 <- sf_item("sat_2", "Responsive", type = "likert", choice_set = "agree5", scale_id = "sat")
-i3 <- sf_item("sat_3", "Recommend", type = "likert", choice_set = "agree5", scale_id = "sat")
-scale <- sf_scale("sat", "Satisfaction", c("sat_1", "sat_2", "sat_3"))
-instr <- sf_instrument("Service Survey", components = list(agree5, i1, i2, i3, scale))
+This vignette covers response import, missing-data checks, quality checks,
+scale scoring, descriptives, and planned analyses.
 
-responses <- data.frame(
-  id = paste0("R", 1:6),
-  sat_1 = c(4, 5, 3, 4, NA, 2),
-  sat_2 = c(5, 4, 3, 4, 5, 2),
-  sat_3 = c(4, 5, 2, 4, 4, 1)
-)
-resp <- read_responses(responses, instr, respondent_id = "id", strict = FALSE)
-descriptives_report(resp, variables = c("sat_1", "sat_2", "sat_3"))
-missing_data_report(resp, instr)
+## Load the demo
+
+```{r load}
+demo <- sframe_demo_data()
+instr <- demo$instrument
+responses <- demo$responses
+
+dim(responses)
 ```
 
-```{r plan}
-instr$analysis_plan <- list(list(
-  id = "RQ1",
-  research_question = "Are the satisfaction items associated?",
-  method = "correlation_spearman",
-  roles = list(x = "sat_1", y = "sat_2"),
-  options = list(alpha = 0.05),
-  status = "valid_plan",
-  requires_data = TRUE
-))
-run_analysis_plan(resp, instr, scored = FALSE)
+## Expected response columns
+
+Response data should use instrument item IDs as column names. Metadata columns
+such as respondent ID, start time, and submission time should be declared
+explicitly.
+
+```{r expected}
+item_ids <- vapply(instr$items, function(x) x$id, character(1))
+head(item_ids)
+
+names(responses)[1:8]
+```
+
+## Import responses
+
+Use `strict = TRUE` when the response file should contain only known item and
+metadata columns. Use `strict = FALSE` when the file may contain additional
+survey platform columns that should be retained with a warning.
+
+```{r import}
+strict_responses <- read_responses(
+  demo$responses_path,
+  instr,
+  respondent_id = "respondent_id",
+  submitted_at = "submitted_at",
+  meta_cols = "started_at",
+  strict = TRUE
+)
+
+relaxed_responses <- read_responses(
+  demo$responses_path,
+  instr,
+  respondent_id = "respondent_id",
+  submitted_at = "submitted_at",
+  meta_cols = "started_at",
+  strict = FALSE
+)
+
+identical(names(strict_responses), names(relaxed_responses))
+```
+
+## Missing data
+
+```{r missing}
+missing <- missing_data_report(responses, instr)
+
+missing$item_missing
+head(missing$respondent_missing)
+```
+
+## Data quality
+
+```{r quality}
+quality <- quality_report(
+  responses,
+  instr,
+  respondent_id = "respondent_id",
+  submitted_at = "submitted_at",
+  started_at = "started_at"
+)
+
+quality
+```
+
+## Score scales
+
+`score_scales()` uses the scale definitions in the instrument. It applies
+reverse coding and minimum valid item rules.
+
+```{r score}
+scored <- score_scales(responses, instr, keep_items = TRUE, keep_meta = TRUE)
+
+scale_ids <- vapply(instr$scales, function(x) x$id, character(1))
+head(scored[, intersect(scale_ids, names(scored)), drop = FALSE])
+```
+
+## Descriptive statistics
+
+```{r descriptives}
+descriptives_report(
+  scored,
+  variables = intersect(scale_ids, names(scored))
+)
+```
+
+## Run an analysis plan
+
+Analysis plans can be stored in the instrument. The v0.3 structure uses
+method-specific roles. Older `variables` and `test` blocks are still supported.
+
+```{r analysis-plan}
+instr$analysis_plan <- list(
+  list(
+    id = "RQ1",
+    research_question = "Is digital marketing associated with satisfaction?",
+    family = "association",
+    method = "correlation_spearman",
+    roles = list(x = "digital_marketing", y = "satisfaction"),
+    options = list(alpha = 0.05),
+    status = "valid_plan",
+    requires_data = TRUE
+  ),
+  list(
+    id = "RQ2",
+    research_question = "Do visit types differ in satisfaction?",
+    family = "group_comparison",
+    method = "mann_whitney",
+    roles = list(group = "visit_type", outcome = "satisfaction"),
+    options = list(alpha = 0.05),
+    status = "valid_plan",
+    requires_data = TRUE
+  )
+)
+
+results <- run_analysis_plan(responses, instr)
+results
+```
+
+## GUI workflow
+
+SurveyStudio can preload both the instrument and responses.
+
+```{r gui, eval = FALSE}
+launch_studio(
+  instrument = instr,
+  responses = responses,
+  screen = "analysis",
+  launch.browser = FALSE
+)
 ```

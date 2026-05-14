@@ -72,7 +72,14 @@ read_responses <- function(
     )
   }
 
-  item_ids  <- vapply(instrument$items, function(i) i$id, character(1))
+  all_item_ids <- vapply(instrument$items, function(i) i$id, character(1))
+  display_only_types <- c("section_break", "text_block")
+  response_items <- Filter(
+    function(i) !identical(i$type %in% display_only_types, TRUE),
+    instrument$items
+  )
+  item_ids <- vapply(response_items, function(i) i$id, character(1))
+  display_item_ids <- setdiff(all_item_ids, item_ids)
   declared  <- c(respondent_id, submitted_at, meta_cols)
   data_cols <- colnames(data)
 
@@ -89,7 +96,7 @@ read_responses <- function(
   }
 
   # Handle undeclared columns
-  undeclared <- setdiff(data_cols, c(item_ids, declared))
+  undeclared <- setdiff(data_cols, c(item_ids, display_item_ids, declared))
   if (length(undeclared) > 0) {
     if (strict) {
       sframe_abort_import(
@@ -113,7 +120,7 @@ read_responses <- function(
 
   # Reorder: metadata first, then items in instrument order, then undeclared
   ordered_cols <- intersect(
-    c(declared, item_ids, undeclared),
+    c(declared, item_ids, display_item_ids, undeclared),
     data_cols
   )
 

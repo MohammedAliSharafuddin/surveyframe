@@ -5,42 +5,90 @@
 #' Opens the SurveyStudio Shiny application, a visual shell for the full
 #' surveyframe workflow. The studio provides screens to build a survey draft,
 #' open an existing instrument, preview the survey, upload responses, review
-#' data quality, inspect reliability, and export the instrument or report.
+#' data quality, inspect reliability, plan analyses, and export outputs.
 #'
-#' An instrument and response data can be pre-loaded at launch time. If
-#' neither is supplied, the studio opens at the build screen so the
-#' researcher can start authoring interactively.
+#' @param instrument An `sframe` object or NULL.
+#' @param responses A data.frame, tibble, CSV file path, or NULL.
+#' @param respondent_id Character or NULL. Response ID column when `responses`
+#'   is a CSV path.
+#' @param submitted_at Character or NULL. Submission time column when
+#'   `responses` is a CSV path.
+#' @param meta_cols Character vector or NULL. Metadata columns when `responses`
+#'   is a CSV path.
+#' @param strict Logical. Passed to [read_responses()] when `responses` is a
+#'   CSV path.
+#' @param screen Initial studio screen. One of `"auto"`, `"build"`,
+#'   `"preview"`, `"data"`, `"quality"`, `"analysis"`, or `"dashboard"`.
+#' @param port TCP port for the Shiny server.
+#' @param host Host address passed to [shiny::runApp()].
+#' @param launch.browser Whether to open the browser automatically.
 #'
-#' @param instrument An `sframe` object or NULL. When supplied, the studio
-#'   opens directly to the preview screen with this instrument loaded.
-#' @param responses A `tibble`, `data.frame`, or file path to a CSV, or NULL.
-#'   When supplied alongside `instrument`, the studio opens with responses
-#'   pre-loaded and the quality dashboard available immediately.
-#'
-#' @return Launches a Shiny application and blocks the current R session until
-#'   the app exits. Does not return a value.
+#' @return Called for its side effect.
 #' @export
-#' @seealso [render_survey()], [read_sframe()], [read_responses()]
+#' @seealso [launch_builder()], [launch_dashboard()], [read_sframe()],
+#'   [read_responses()]
 #'
 #' @examples
 #' \dontrun{
-#' # Open the studio with no pre-loaded data
 #' launch_studio()
 #'
-#' # Open with an instrument pre-loaded
 #' instr <- read_sframe("my_instrument.sframe")
-#' launch_studio(instrument = instr)
+#' launch_studio(instrument = instr, launch.browser = FALSE)
 #'
-#' # Open with both instrument and responses ready
-#' launch_studio(instrument = instr, responses = "data/responses.csv")
+#' launch_studio(
+#'   instrument = instr,
+#'   responses = "data/responses.csv",
+#'   respondent_id = "respondent_id",
+#'   submitted_at = "submitted_at"
+#' )
 #' }
-launch_studio <- function(instrument = NULL, responses = NULL) {
+launch_studio <- function(
+    instrument = NULL,
+    responses = NULL,
+    respondent_id = NULL,
+    submitted_at = NULL,
+    meta_cols = NULL,
+    strict = TRUE,
+    screen = c("auto", "build", "preview", "data", "quality", "analysis", "dashboard"),
+    port = NULL,
+    host = "127.0.0.1",
+    launch.browser = interactive()
+) {
   sframe_require_shiny("to launch SurveyStudio")
+
+  screen <- match.arg(screen)
+
   if (!is.null(instrument)) {
     stopifnot(inherits(instrument, "sframe"))
   }
 
+  if (!is.null(responses) && is.character(responses)) {
+    if (is.null(instrument)) {
+      rlang::abort(
+        "`instrument` must be supplied when `responses` is a file path.",
+        class = "sframe_error"
+      )
+    }
+
+    responses <- read_responses(
+      x = responses,
+      instrument = instrument,
+      respondent_id = respondent_id,
+      submitted_at = submitted_at,
+      meta_cols = meta_cols,
+      strict = strict
+    )
+  }
+
+  if (!is.null(responses) && !is.data.frame(responses)) {
+    rlang::abort(
+      "`responses` must be a data.frame, tibble, CSV file path, or NULL.",
+      class = "sframe_error"
+    )
+  }
+
   app_path <- system.file("shiny", package = "surveyframe")
+
   if (!nzchar(app_path) || !file.exists(file.path(app_path, "app.R"))) {
     rlang::abort(
       "SurveyStudio app not found. Please reinstall surveyframe.",
@@ -48,11 +96,26 @@ launch_studio <- function(instrument = NULL, responses = NULL) {
     )
   }
 
-  # Pass pre-loaded objects via shiny options
   shiny::shinyOptions(
     surveyframe_instrument = instrument,
-    surveyframe_responses  = responses
+    surveyframe_responses = responses,
+    surveyframe_initial_screen = screen
   )
 
-  shiny::runApp(app_path, launch.browser = TRUE)
+  on.exit(
+    shiny::shinyOptions(
+      surveyframe_instrument = NULL,
+      surveyframe_responses = NULL,
+      surveyframe_initial_screen = NULL
+    ),
+    add = TRUE
+  )
+
+  shiny::runApp(
+    appDir = app_path,
+    port = port,
+    host = host,
+    launch.browser = launch.browser,
+    quiet = TRUE
+  )
 }

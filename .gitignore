@@ -6,6 +6,7 @@
 inst/doc
 docs
 *.sframe
+!inst/extdata/*.sframe
 *.tar.gz
 *.zip
 *.Rcheck/

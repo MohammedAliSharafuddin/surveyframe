@@ -64,8 +64,23 @@
   | Quality | Attention-check pass rates |
   | Raw data | Scrollable response table with CSV download |
 
-  When called without a `responses` argument the dashboard opens in
-  metadata-only mode showing instrument structure.
+  When called without arguments the dashboard loads the bundled tourism
+  services demo. When called with a user-supplied instrument and no
+  `responses` argument, it opens in metadata-only mode showing instrument
+  structure.
+
+* Added `sframe_demo_data()`, `sframe_input_types_demo_data()`,
+  `launch_builder_demo()`, `launch_studio_demo()`, and
+  `launch_dashboard_demo()` for CRAN-safe examples, training, and local GUI
+  testing.
+
+* Added a bundled input-types demo instrument and simulated response dataset
+  for testing SurveyBuilder, SurveyStudio, the dashboard, and all supported
+  item controls.
+
+* `launch_studio()` now accepts preloaded instruments, response data frames,
+  CSV response paths, initial screen selection, host, port, and browser
+  control. SurveyStudio reads these preloaded values during startup.
 
 ### Shiny survey module
 
@@ -109,6 +124,8 @@ interpretation `prompt` field to guide write-up.
   preserving `meta$validated = TRUE` in the saved `.sframe` file.
 * `.sframe` serialisation now includes a `models` field and continues to read
   older `.sframe` files where `models` is absent.
+* `read_responses()` no longer requires display-only items such as
+  `section_break` and `text_block` to appear as response columns.
 * `validate_sframe()` now checks model references, analysis-plan roles,
   invalid model IDs, duplicate model IDs, and model indicator/path integrity.
 * The package title and description were tightened for CRAN submission and
@@ -150,6 +167,9 @@ interpretation `prompt` field to guide write-up.
 
 * `validate_sframe()`, `score_scales()`, `codebook_report()`, `cfa_syntax()`,
   and `launch_builder(open = FALSE)` have fully runnable examples.
+* Reworked the vignette set into a coherent workflow covering instrument
+  building, response analysis, reliability and validity, EFA/CFA/SEM/PLS
+  syntax generation, and GUI usage.
 * Added `cran-comments.md` with platform list, dependency justification,
   bundled-asset description, and a `\dontrun{}` use justification table.
 

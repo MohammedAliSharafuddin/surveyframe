@@ -779,16 +779,40 @@ studio_parse_indirect <- function(text) {
   }))
 }
 
-initial_instrument <- shiny::getShinyOption("surveyframe_instrument")
-initial_responses <- shiny::getShinyOption("surveyframe_responses")
-initial_builder <- builder_state_from_instrument(initial_instrument)
+INITIAL_INSTRUMENT <- shiny::getShinyOption("surveyframe_instrument", NULL)
+INITIAL_RESPONSES <- shiny::getShinyOption("surveyframe_responses", NULL)
+INITIAL_SCREEN <- shiny::getShinyOption("surveyframe_initial_screen", "auto")
 
-initial_tab <- if (!is.null(initial_responses) && !is.null(initial_instrument)) {
-  "quality"
-} else if (!is.null(initial_instrument)) {
-  "preview"
+if (is.null(INITIAL_SCREEN) || !nzchar(INITIAL_SCREEN)) {
+  INITIAL_SCREEN <- "auto"
+}
+
+initial_builder <- if (inherits(INITIAL_INSTRUMENT, "sframe")) {
+  builder_state_from_instrument(INITIAL_INSTRUMENT)
 } else {
-  "build"
+  builder_empty_state()
+}
+
+initial_tab <- INITIAL_SCREEN
+if (identical(initial_tab, "data")) {
+  initial_tab <- "responses"
+}
+if (identical(initial_tab, "auto")) {
+  initial_tab <- if (!is.null(INITIAL_RESPONSES)) {
+    "dashboard"
+  } else if (inherits(INITIAL_INSTRUMENT, "sframe")) {
+    "preview"
+  } else {
+    "build"
+  }
+}
+if (!initial_tab %in% c("build", "open", "preview", "responses", "quality",
+                       "reliability", "analysis", "dashboard", "export")) {
+  initial_tab <- if (inherits(INITIAL_INSTRUMENT, "sframe")) {
+    "preview"
+  } else {
+    "build"
+  }
 }
 
 tab_link_class <- function(tab) {
@@ -934,6 +958,9 @@ ui <- fluidPage(
         tags$li(class = "studio-nav-item",
           tags$a(href = "#", `data-tab` = "analysis",
                  class = tab_link_class("analysis"), "Analysis Plan")),
+        tags$li(class = "studio-nav-item",
+          tags$a(href = "#", `data-tab` = "dashboard",
+                 class = tab_link_class("dashboard"), "Dashboard")),
         tags$li(class = "studio-nav-item",
           tags$a(href = "#", `data-tab` = "export",
                  class = tab_link_class("export"), "Export"))
@@ -1162,6 +1189,24 @@ ui <- fluidPage(
         )
       ),
 
+      tags$div(id = "screen-dashboard", class = screen_class("dashboard"),
+        tags$h2(class = "screen-title", "Dashboard"),
+        uiOutput("dashboard_gate"),
+        tags$div(class = "card",
+          tags$div(class = "card-title", "Response dashboard"),
+          tags$p(class = "hint",
+            "The dashboard is kept as a separate read-only Shiny launcher in v0.3."),
+          actionButton(
+            "open_response_dashboard",
+            "Open response dashboard",
+            class = "btn-primary"
+          ),
+          tags$p(class = "hint",
+            "From the R console, call launch_dashboard(instrument, responses) for the full dashboard.")
+        ),
+        uiOutput("dashboard_summary_card")
+      ),
+
       tags$div(id = "screen-export", class = screen_class("export"),
         tags$h2(class = "screen-title", "Export"),
         uiOutput("export_gate"),
@@ -1193,8 +1238,9 @@ ui <- fluidPage(
 server <- function(input, output, session) {
   rv <- reactiveValues(
     builder = initial_builder,
-    instrument = initial_instrument,
-    responses = NULL
+    instrument = INITIAL_INSTRUMENT,
+    responses = INITIAL_RESPONSES,
+    active_screen = initial_tab
   )
 
   set_builder_state <- function(state) {
@@ -1202,15 +1248,20 @@ server <- function(input, output, session) {
     invisible(state)
   }
 
-  if (!is.null(initial_responses) && !is.null(rv$instrument)) {
+  if (!is.null(INITIAL_RESPONSES) && !is.data.frame(INITIAL_RESPONSES) &&
+      !is.null(rv$instrument)) {
     tryCatch({
-      rv$responses <- surveyframe::read_responses(initial_responses, rv$instrument)
+      rv$responses <- surveyframe::read_responses(INITIAL_RESPONSES, rv$instrument)
     }, error = function(e) NULL)
   }
 
   switch_tab <- function(tab) {
     session$sendCustomMessage("surveyframe-switch-tab", tab)
   }
+
+  observeEvent(input$current_tab, {
+    rv$active_screen <- input$current_tab
+  }, ignoreInit = TRUE)
 
   sync_builder_inputs <- function(state) {
     updateTextInput(session, "draft_title", value = state$meta$title %||% "Untitled Survey")
@@ -1312,14 +1363,7 @@ server <- function(input, output, session) {
   })
 
   session$onFlushed(function() {
-    target_tab <- if (!is.null(shiny::isolate(rv$responses))) {
-      "quality"
-    } else if (!is.null(shiny::isolate(rv$instrument))) {
-      "preview"
-    } else {
-      "build"
-    }
-    switch_tab(target_tab)
+    switch_tab(shiny::isolate(rv$active_screen %||% initial_tab))
   }, once = TRUE)
 
   observeEvent(input$new_survey_btn, {
@@ -2571,6 +2615,53 @@ server <- function(input, output, session) {
       )
     })
     do.call(tagList, cards)
+  })
+
+  output$dashboard_gate <- renderUI({
+    if (is.null(rv$instrument)) {
+      return(tags$div(class = "card",
+        "Load or build an instrument before opening the dashboard."))
+    }
+    if (is.null(rv$responses)) {
+      return(tags$div(class = "card",
+        "Load responses before opening a response dashboard."))
+    }
+    NULL
+  })
+
+  output$dashboard_summary_card <- renderUI({
+    req(rv$instrument)
+    tags$div(class = "card",
+      tags$div(class = "card-title", rv$instrument$meta$title %||% "Dashboard data"),
+      tags$div(class = "stat-row",
+        tags$div(class = "stat-box",
+          tags$div(class = "stat-val", length(rv$instrument$items %||% list())),
+          tags$div(class = "stat-lbl", "Items")),
+        tags$div(class = "stat-box",
+          tags$div(class = "stat-val", length(rv$instrument$scales %||% list())),
+          tags$div(class = "stat-lbl", "Scales")),
+        tags$div(class = "stat-box",
+          tags$div(class = "stat-val", if (is.null(rv$responses)) 0 else nrow(rv$responses)),
+          tags$div(class = "stat-lbl", "Responses")),
+        tags$div(class = "stat-box",
+          tags$div(class = "stat-val", if (is.null(rv$responses)) 0 else ncol(rv$responses)),
+          tags$div(class = "stat-lbl", "Columns"))
+      )
+    )
+  })
+
+  observeEvent(input$open_response_dashboard, {
+    if (is.null(rv$instrument)) {
+      showNotification(
+        "Load or build an instrument before opening the dashboard.",
+        type = "error"
+      )
+      return()
+    }
+    showNotification(
+      "Opening dashboard in a separate R/Shiny session is recommended. Use launch_dashboard(instrument, responses) from the R console.",
+      type = "message"
+    )
   })
 
   output$export_gate <- renderUI({

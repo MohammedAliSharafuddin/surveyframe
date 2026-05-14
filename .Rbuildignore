@@ -20,6 +20,7 @@
 ^revision_todo_0\.3\.md$
 ^todo\.md$
 ^docs($|/)
+^data-raw($|/)
 ^\.codex$
 ^\.codex($|/)
 ^\.local-bin($|/)
