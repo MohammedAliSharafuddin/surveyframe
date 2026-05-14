@@ -1,7 +1,7 @@
 {
   "hash": {
     "algo": "sha256",
-    "value": "9db8e5150c445df5ae68e0d6aa384f776cc02485c22a196656e5eaae68c051b8"
+    "value": "a58a3eff1b5e66dc4d95c3a87ae68cf71fa8cb8c7982cbe4616e0980a2e406bb"
   },
   "version": "0.3.0",
   "meta": {
@@ -10,7 +10,7 @@
     "description": "Simulated demo questionnaire inspired by tourism-services research on digital marketing, service quality, sustainability, satisfaction, and behavioural intention.",
     "authors": "Mohammed Ali Sharafuddin",
     "languages": "en",
-    "validated": false,
+    "validated": true,
     "created_at": "2026-05-13T18:16:19Z"
   },
   "items": [
@@ -20,18 +20,7 @@
       "type": "single_choice",
       "required": true,
       "choice_set": "visit_type",
-      "scale_id": null,
-      "reverse": false,
-      "help": null,
-      "placeholder": null,
-      "matrix_items": null,
-      "slider_min": null,
-      "slider_max": null,
-      "slider_step": null,
-      "rating_max": null,
-      "rating_icon": null,
-      "section_intro": null,
-      "page": null
+      "reverse": false
     },
     {
       "id": "dm_1",
@@ -40,17 +29,7 @@
       "required": true,
       "choice_set": "agree5",
       "scale_id": "digital_marketing",
-      "reverse": false,
-      "help": null,
-      "placeholder": null,
-      "matrix_items": null,
-      "slider_min": null,
-      "slider_max": null,
-      "slider_step": null,
-      "rating_max": null,
-      "rating_icon": null,
-      "section_intro": null,
-      "page": null
+      "reverse": false
     },
     {
       "id": "dm_2",
@@ -59,17 +38,7 @@
       "required": true,
       "choice_set": "agree5",
       "scale_id": "digital_marketing",
-      "reverse": false,
-      "help": null,
-      "placeholder": null,
-      "matrix_items": null,
-      "slider_min": null,
-      "slider_max": null,
-      "slider_step": null,
-      "rating_max": null,
-      "rating_icon": null,
-      "section_intro": null,
-      "page": null
+      "reverse": false
     },
     {
       "id": "dm_3",
@@ -78,17 +47,7 @@
       "required": true,
       "choice_set": "agree5",
       "scale_id": "digital_marketing",
-      "reverse": false,
-      "help": null,
-      "placeholder": null,
-      "matrix_items": null,
-      "slider_min": null,
-      "slider_max": null,
-      "slider_step": null,
-      "rating_max": null,
-      "rating_icon": null,
-      "section_intro": null,
-      "page": null
+      "reverse": false
     },
     {
       "id": "sq_1",
@@ -97,17 +56,7 @@
       "required": true,
       "choice_set": "agree5",
       "scale_id": "service_quality",
-      "reverse": false,
-      "help": null,
-      "placeholder": null,
-      "matrix_items": null,
-      "slider_min": null,
-      "slider_max": null,
-      "slider_step": null,
-      "rating_max": null,
-      "rating_icon": null,
-      "section_intro": null,
-      "page": null
+      "reverse": false
     },
     {
       "id": "sq_2",
@@ -116,17 +65,7 @@
       "required": true,
       "choice_set": "agree5",
       "scale_id": "service_quality",
-      "reverse": false,
-      "help": null,
-      "placeholder": null,
-      "matrix_items": null,
-      "slider_min": null,
-      "slider_max": null,
-      "slider_step": null,
-      "rating_max": null,
-      "rating_icon": null,
-      "section_intro": null,
-      "page": null
+      "reverse": false
     },
     {
       "id": "sq_3",
@@ -135,17 +74,7 @@
       "required": true,
       "choice_set": "agree5",
       "scale_id": "service_quality",
-      "reverse": false,
-      "help": null,
-      "placeholder": null,
-      "matrix_items": null,
-      "slider_min": null,
-      "slider_max": null,
-      "slider_step": null,
-      "rating_max": null,
-      "rating_icon": null,
-      "section_intro": null,
-      "page": null
+      "reverse": false
     },
     {
       "id": "sus_1",
@@ -154,17 +83,7 @@
       "required": true,
       "choice_set": "agree5",
       "scale_id": "sustainability",
-      "reverse": false,
-      "help": null,
-      "placeholder": null,
-      "matrix_items": null,
-      "slider_min": null,
-      "slider_max": null,
-      "slider_step": null,
-      "rating_max": null,
-      "rating_icon": null,
-      "section_intro": null,
-      "page": null
+      "reverse": false
     },
     {
       "id": "sus_2",
@@ -173,17 +92,7 @@
       "required": true,
       "choice_set": "agree5",
       "scale_id": "sustainability",
-      "reverse": false,
-      "help": null,
-      "placeholder": null,
-      "matrix_items": null,
-      "slider_min": null,
-      "slider_max": null,
-      "slider_step": null,
-      "rating_max": null,
-      "rating_icon": null,
-      "section_intro": null,
-      "page": null
+      "reverse": false
     },
     {
       "id": "sat_1",
@@ -192,17 +101,7 @@
       "required": true,
       "choice_set": "agree5",
       "scale_id": "satisfaction",
-      "reverse": false,
-      "help": null,
-      "placeholder": null,
-      "matrix_items": null,
-      "slider_min": null,
-      "slider_max": null,
-      "slider_step": null,
-      "rating_max": null,
-      "rating_icon": null,
-      "section_intro": null,
-      "page": null
+      "reverse": false
     },
     {
       "id": "sat_2",
@@ -211,17 +110,7 @@
       "required": true,
       "choice_set": "agree5",
       "scale_id": "satisfaction",
-      "reverse": false,
-      "help": null,
-      "placeholder": null,
-      "matrix_items": null,
-      "slider_min": null,
-      "slider_max": null,
-      "slider_step": null,
-      "rating_max": null,
-      "rating_icon": null,
-      "section_intro": null,
-      "page": null
+      "reverse": false
     },
     {
       "id": "bi_1",
@@ -230,17 +119,7 @@
       "required": true,
       "choice_set": "agree5",
       "scale_id": "behavioural_intention",
-      "reverse": false,
-      "help": null,
-      "placeholder": null,
-      "matrix_items": null,
-      "slider_min": null,
-      "slider_max": null,
-      "slider_step": null,
-      "rating_max": null,
-      "rating_icon": null,
-      "section_intro": null,
-      "page": null
+      "reverse": false
     },
     {
       "id": "bi_2",
@@ -249,17 +128,7 @@
       "required": true,
       "choice_set": "agree5",
       "scale_id": "behavioural_intention",
-      "reverse": false,
-      "help": null,
-      "placeholder": null,
-      "matrix_items": null,
-      "slider_min": null,
-      "slider_max": null,
-      "slider_step": null,
-      "rating_max": null,
-      "rating_icon": null,
-      "section_intro": null,
-      "page": null
+      "reverse": false
     },
     {
       "id": "attention",
@@ -267,37 +136,14 @@
       "type": "single_choice",
       "required": true,
       "choice_set": "agree5",
-      "scale_id": null,
-      "reverse": false,
-      "help": null,
-      "placeholder": null,
-      "matrix_items": null,
-      "slider_min": null,
-      "slider_max": null,
-      "slider_step": null,
-      "rating_max": null,
-      "rating_icon": null,
-      "section_intro": null,
-      "page": null
+      "reverse": false
     },
     {
       "id": "comments",
       "label": "Optional comments about the tourism experience.",
       "type": "textarea",
       "required": false,
-      "choice_set": null,
-      "scale_id": null,
-      "reverse": false,
-      "help": null,
-      "placeholder": null,
-      "matrix_items": null,
-      "slider_min": null,
-      "slider_max": null,
-      "slider_step": null,
-      "rating_max": null,
-      "rating_icon": null,
-      "section_intro": null,
-      "page": null
+      "reverse": false
     }
   ],
   "choices": [
@@ -329,45 +175,35 @@
       "label": "Digital marketing effectiveness",
       "items": ["dm_1", "dm_2", "dm_3"],
       "method": "mean",
-      "min_valid": null,
-      "reverse_items": null,
-      "weights": null
+      "min_valid": null
     },
     {
       "id": "service_quality",
       "label": "Service quality",
       "items": ["sq_1", "sq_2", "sq_3"],
       "method": "mean",
-      "min_valid": null,
-      "reverse_items": null,
-      "weights": null
+      "min_valid": null
     },
     {
       "id": "sustainability",
       "label": "Sustainability perception",
       "items": ["sus_1", "sus_2"],
       "method": "mean",
-      "min_valid": null,
-      "reverse_items": null,
-      "weights": null
+      "min_valid": null
     },
     {
       "id": "satisfaction",
       "label": "Tourist satisfaction",
       "items": ["sat_1", "sat_2"],
       "method": "mean",
-      "min_valid": null,
-      "reverse_items": null,
-      "weights": null
+      "min_valid": null
     },
     {
       "id": "behavioural_intention",
       "label": "Behavioural intention",
       "items": ["bi_1", "bi_2"],
       "method": "mean",
-      "min_valid": null,
-      "reverse_items": null,
-      "weights": null
+      "min_valid": null
     }
   ],
   "branching": [],
@@ -389,7 +225,8 @@
       "variables": ["digital_marketing", "satisfaction"],
       "test": "correlation_pearson",
       "alpha": 0.05,
-      "interpretation": "Use the direction and size of the correlation to describe the relationship."
+      "interpretation": "Use the direction and size of the correlation to describe the relationship.",
+      "citations": []
     },
     {
       "id": "rq_predict_sat",
@@ -397,7 +234,8 @@
       "variables": ["digital_marketing", "service_quality", "sustainability", "satisfaction"],
       "test": "regression_linear",
       "alpha": 0.05,
-      "interpretation": "Compare the regression coefficients to identify the strongest predictor."
+      "interpretation": "Compare the regression coefficients to identify the strongest predictor.",
+      "citations": []
     },
     {
       "id": "rq_visit_bi",
@@ -405,7 +243,8 @@
       "variables": ["visit_type", "behavioural_intention"],
       "test": "mann_whitney",
       "alpha": 0.05,
-      "interpretation": "Report whether behavioural intention differs by visitor type."
+      "interpretation": "Report whether behavioural intention differs by visitor type.",
+      "citations": []
     }
   ],
   "render": {

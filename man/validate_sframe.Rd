@@ -29,6 +29,9 @@ independently at any point during instrument construction.
 The following checks are performed:
 \itemize{
 \item Duplicate item IDs
+\item Invalid item IDs
+\item Duplicate choice-set IDs
+\item Duplicate scale IDs
 \item Items with missing labels
 \item Items referencing a missing \code{choice_set} in the instrument
 \item Items referencing a missing \code{scale_id} in the instrument

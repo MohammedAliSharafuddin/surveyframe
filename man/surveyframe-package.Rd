@@ -4,7 +4,7 @@
 \name{surveyframe-package}
 \alias{surveyframe}
 \alias{surveyframe-package}
-\title{surveyframe: A Survey Instrument Workflow for R}
+\title{surveyframe: Survey Instrument Design, Validation, and Response Workflows}
 \description{
 surveyframe defines a survey instrument as a first-class R object and
 provides a complete workflow from instrument design through data collection,

@@ -15,8 +15,8 @@ export_static_survey(
 \arguments{
 \item{instrument}{An \code{sframe} object.}
 
-\item{output_path}{Character. File path for the output HTML. Defaults to
-\verb{<survey_title>.html} in the current working directory.}
+\item{output_path}{Character. File path for the output HTML. When \code{NULL},
+a \verb{<survey_title>.html} file is written in \code{\link[=tempdir]{tempdir()}}.}
 
 \item{open}{Logical. If \code{TRUE} (default) and the session is interactive,
 the file is opened in the default browser after writing.}
@@ -38,6 +38,9 @@ thirteen item types, branching logic, required-field validation, and
 multi-page navigation are handled entirely in client-side JavaScript.
 }
 \details{
+When \code{output_path} is \code{NULL}, the file is written to \code{\link[=tempdir]{tempdir()}}. Supply
+an explicit \code{output_path} for any production export that should be kept.
+
 When a respondent clicks the submit button, the browser downloads a
 one-row CSV file named \verb{<survey_title>_response_<id>.csv}. If
 \code{endpoint_url} is supplied, the same payload is also sent as a JSON

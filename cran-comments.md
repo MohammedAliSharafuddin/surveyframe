@@ -3,14 +3,16 @@
 ## Test environments
 
 - Local: Ubuntu 24.04.4 LTS, R 4.6.0 (`R CMD check --as-cran`)
-- win-builder: R-devel, R-release
-- rhub: `ubuntu-latest` (R release), `windows-latest` (R release), `macos-latest` (R release)
 
 ## R CMD check results
 
-Local source-tarball check currently has 0 errors and 0 warnings.
+Local source-tarball check:
 
-The local Linux check reports one expected note:
+- 0 errors
+- 0 warnings
+- 1 note
+
+The note is expected for a first submission:
 
 - New submission.
 
@@ -20,7 +22,8 @@ manual checks passed. Bundled HTML files were also validated locally with
 validation with style-only rules relaxed for intentional inline preview
 styling. The SurveyBuilder GUI was smoke-tested in Google Chrome.
 
-win-builder and rhub checks are pending for the final v0.3.0 tarball.
+Pending external checks before submission: win-builder R-release,
+win-builder R-devel, and rhub.
 
 ## Resubmission notes
 

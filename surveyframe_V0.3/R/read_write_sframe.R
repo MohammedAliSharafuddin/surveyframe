@@ -20,10 +20,51 @@ sframe_serialization_payload <- function(instrument, hash_value = "") {
   )
 }
 
+sframe_json_object <- function() {
+  structure(list(), names = character())
+}
+
+sframe_canonical_payload <- function(x) {
+  if (is.null(x)) {
+    return(sframe_json_object())
+  }
+
+  if (is.list(x)) {
+    # Keep this in sync with the SurveyBuilder sframeCanon() implementation:
+    # recurse into arrays/objects and sort object keys alphabetically.
+    x <- lapply(x, sframe_canonical_payload)
+    nm <- names(x)
+    if (!is.null(nm)) {
+      x <- x[order(nm)]
+    }
+  }
+
+  x
+}
+
+sframe_hash_json <- function(payload, canonical = TRUE) {
+  if (isTRUE(canonical)) {
+    payload <- sframe_canonical_payload(payload)
+  }
+  jsonlite::toJSON(
+    payload,
+    auto_unbox = TRUE,
+    pretty = FALSE,
+    null = "null",
+    digits = NA
+  )
+}
+
 sframe_hash_payload <- function(payload) {
   payload$hash$value <- ""
+  json_for_hash <- sframe_hash_json(payload, canonical = TRUE)
+  as.character(openssl::sha256(json_for_hash))
+}
+
+sframe_legacy_hash_payload <- function(payload) {
+  payload$hash$value <- ""
   json_for_hash <- jsonlite::toJSON(payload, auto_unbox = TRUE, pretty = FALSE)
-  as.character(openssl::sha256(chartr("", "", json_for_hash)))
+  as.character(openssl::sha256(json_for_hash))
 }
 
 sframe_hash_value <- function(instrument) {
@@ -71,8 +112,8 @@ write_sframe <- function(instrument, path, pretty = TRUE, overwrite = FALSE) {
     )
   }
 
-  # Validate before writing
-  validate_sframe(instrument, strict = TRUE)
+  # Validate before writing and persist the validation flag.
+  instrument <- validate_sframe(instrument, strict = TRUE)
 
   # Build the full JSON payload with an empty hash placeholder
   payload <- sframe_serialization_payload(instrument)
@@ -305,10 +346,11 @@ read_sframe <- function(path, validate = TRUE) {
   # Verify hash
   stored_hash <- parsed$hash$value
   parsed$hash$value <- ""
-  json_for_check <- jsonlite::toJSON(parsed, auto_unbox = TRUE, pretty = FALSE)
-  computed_hash  <- as.character(openssl::sha256(chartr("", "", json_for_check)))
+  computed_hash  <- sframe_hash_payload(parsed)
+  legacy_hash    <- sframe_legacy_hash_payload(parsed)
 
-  if (!identical(stored_hash, computed_hash)) {
+  if (!identical(stored_hash, computed_hash) &&
+      !identical(stored_hash, legacy_hash)) {
     sframe_abort_import(
       paste0(
         "Integrity check failed for '", path, "'. ",

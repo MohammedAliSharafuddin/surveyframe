@@ -1,4 +1,4 @@
-#' surveyframe: A Survey Instrument Workflow for R
+#' surveyframe: Survey Instrument Design, Validation, and Response Workflows
 #'
 #' @description
 #' surveyframe defines a survey instrument as a first-class R object and
@@ -40,7 +40,7 @@
 #' @importFrom jsonlite toJSON fromJSON
 #' @importFrom rlang abort warn arg_match check_installed %||%
 #' @importFrom openssl sha256
-#' @importFrom stats setNames cor sd var complete.cases
+#' @importFrom stats cor sd var complete.cases
 #' @importFrom utils capture.output
 ## usethis namespace: end
 NULL

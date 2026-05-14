@@ -1,5 +1,5 @@
 Package: surveyframe
-Title: A Complete Survey Research Pipeline for R
+Title: Survey Instrument Design, Validation, and Response Workflows
 Version: 0.3.0
 Authors@R: c(
     person(
@@ -23,7 +23,7 @@ License: MIT + file LICENSE
 URL: https://github.com/MohammedAliSharafuddin/surveyframe
 BugReports: https://github.com/MohammedAliSharafuddin/surveyframe/issues
 Encoding: UTF-8
-Language: en-US
+Language: en-GB
 Roxygen: list(markdown = TRUE)
 Depends:
     R (>= 4.1.0)

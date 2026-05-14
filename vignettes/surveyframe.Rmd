@@ -298,7 +298,7 @@ cat("SD:", round(sd(scored$sat, na.rm = TRUE), 3), "\n")
 each scale. Both statistics are derived from the instrument's scale
 definitions, so item membership and reverse coding are already known.
 
-```{r reliability}
+```{r reliability, eval = requireNamespace("psych", quietly = TRUE)}
 rr <- reliability_report(responses, instr, omega = FALSE)
 print(rr)
 ```
@@ -319,7 +319,7 @@ print(ir[[1]]$diagnostics)
 computing KMO adequacy and Bartlett's test. Researchers can then estimate the
 factor solution with `psych::fa()` or a similar modelling function.
 
-```{r efa}
+```{r efa, eval = requireNamespace("psych", quietly = TRUE)}
 er <- efa_report(responses, instr)
 print(er)
 ```

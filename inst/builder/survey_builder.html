@@ -942,7 +942,7 @@ function loadFile(e){
 }
 
 // ── SHA-256 helper (async, with pure-JS fallback) ──────────────────────────
-function sframeCanon(x){if(x===null)return{};if(Array.isArray(x))return x.map(sframeCanon);if(x&&typeof x==='object'){var o={};Object.keys(x).forEach(function(k){o[k]=sframeCanon(x[k]);});return o;}return x;}
+function sframeCanon(x){if(x===null)return{};if(Array.isArray(x))return x.map(sframeCanon);if(x&&typeof x==='object'){var o={};Object.keys(x).sort().forEach(function(k){o[k]=sframeCanon(x[k]);});return o;}return x;}
 async function sframeHash(payload){
   var src=JSON.stringify(sframeCanon(payload));
   if(window.crypto&&window.crypto.subtle){
