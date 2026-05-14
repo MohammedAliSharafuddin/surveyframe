@@ -8,25 +8,24 @@
 
 Local direct `R CMD check --as-cran` on the built source tarball:
 
-- Package build, installation, examples, tests, vignettes, namespace checks,
-  Rd checks, and R code diagnostics passed.
-- Remaining local issues are toolchain/environment related:
-  - CRAN incoming URL/ORCID checks cannot run because this environment has no
-    internet access.
-  - PDF manual generation fails because the local LaTeX installation is
-    missing `inconsolata.sty`.
-  - `qpdf` and HTML Tidy are not available locally.
-  - The local clock check reports that the current time could not be verified.
+- Windows 11 x64
+- R 4.5.2 ucrt
+- Status: 0 ERRORs, 0 WARNINGs, 2 NOTEs
 
-Wrapper checks remain local-environment blocked:
+The remaining NOTEs are:
 
-- `devtools::check()` fails before build because `processx` cannot create a
-  pipe for `Rcmd.exe` under the current Windows permissions.
-- `rcmdcheck::rcmdcheck(args = "--as-cran")` reports missing Rtools before
-  invoking the package check.
+1. CRAN incoming feasibility NOTE:
+   - This is a new submission.
+   - Maintainer details were reported.
 
-Pending external checks before submission: win-builder R-release,
-win-builder R-devel, and rhub.
+2. Future file timestamps NOTE:
+   - The local environment was unable to verify the current time.
+
+Package build, installation, examples, tests, vignettes, namespace checks,
+Rd checks, HTML manual checks, PDF manual generation, and R code diagnostics
+passed locally.
+
+No local package-code ERROR or WARNING remains.
 
 ## Resubmission notes
 
@@ -66,10 +65,11 @@ JavaScript. All CSS and JS is original package code written in-line to
 eliminate external network dependencies. The file is opened with
 `utils::browseURL()` by `launch_builder(open = TRUE)`.
 
-`inst/extdata/` contains one small simulated demo instrument and one simulated
-response CSV. These files support runnable examples for response loading,
-quality checks, scoring, analysis-plan execution, and report rendering. They
-contain no human-subject or private data.
+`inst/extdata/` contains small simulated demo instruments and response CSVs.
+The tourism-services demo supports runnable examples for response loading,
+quality checks, scoring, analysis-plan execution, reporting, and syntax
+generation. The input-types demo supports GUI, builder, studio, dashboard, and
+item-control coverage. These files contain no human-subject or private data.
 
 ## `\dontrun{}` usage
 
