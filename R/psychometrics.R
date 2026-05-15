@@ -90,6 +90,7 @@ reliability_report <- function(
   })
 
   results <- Filter(Negate(is.null), results)
+  names(results) <- vapply(results, `[[`, character(1), "scale_id")
 
   structure(results, class = "sframe_reliability_report")
 }
@@ -171,7 +172,10 @@ item_report <- function(data, instrument, scales = NULL) {
     )
   })
 
-  structure(Filter(Negate(is.null), results), class = "sframe_item_report")
+  results <- Filter(Negate(is.null), results)
+  names(results) <- vapply(results, `[[`, character(1), "scale_id")
+
+  structure(results, class = "sframe_item_report")
 }
 
 #' @exportS3Method print sframe_item_report

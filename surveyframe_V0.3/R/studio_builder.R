@@ -105,7 +105,9 @@ sframe_builder_empty_state <- function() {
     items = list(),
     scales = list(),
     branching = list(),
-    checks = list()
+    checks = list(),
+    analysis_plan = list(),
+    models = list()
   )
 }
 
@@ -135,7 +137,9 @@ sframe_builder_state_from_instrument <- function(instrument = NULL) {
     items = lapply(instrument$items %||% list(), sframe_builder_as_item),
     scales = lapply(instrument$scales %||% list(), sframe_builder_as_scale),
     branching = lapply(instrument$branching %||% list(), sframe_builder_as_branch),
-    checks = lapply(instrument$checks %||% list(), sframe_builder_as_check)
+    checks = lapply(instrument$checks %||% list(), sframe_builder_as_check),
+    analysis_plan = instrument$analysis_plan %||% list(),
+    models = instrument$models %||% list()
   )
 }
 
@@ -145,7 +149,9 @@ sframe_builder_compose_instrument <- function(
     items = list(),
     scales = list(),
     branching = list(),
-    checks = list()
+    checks = list(),
+    analysis_plan = list(),
+    models = list()
 ) {
   choices <- lapply(choices, sframe_builder_as_choice)
   items <- lapply(items, sframe_builder_as_item)
@@ -182,7 +188,9 @@ sframe_builder_compose_instrument <- function(
     description = meta$description %||% NULL,
     authors = meta$authors %||% NULL,
     languages = meta$languages %||% "en",
-    components = c(choices, items, scales, branching, checks)
+    components = c(choices, items, scales, branching, checks),
+    analysis_plan = analysis_plan,
+    models = models
   )
 }
 
@@ -190,6 +198,8 @@ sframe_builder_compose_instrument <- function(
 #'
 #' @param meta List of instrument metadata.
 #' @param choices,items,scales,branching,checks Lists of draft components.
+#' @param analysis_plan List of draft analysis-plan blocks.
+#' @param models List of draft model specifications.
 #'
 #' @return A list with `valid`, `problems`, and `instrument`.
 #' @export
@@ -199,7 +209,9 @@ sframe_builder_validate_draft <- function(
     items = list(),
     scales = list(),
     branching = list(),
-    checks = list()
+    checks = list(),
+    analysis_plan = list(),
+    models = list()
 ) {
   instrument <- sframe_builder_compose_instrument(
     meta = meta,
@@ -207,7 +219,9 @@ sframe_builder_validate_draft <- function(
     items = items,
     scales = scales,
     branching = branching,
-    checks = checks
+    checks = checks,
+    analysis_plan = analysis_plan,
+    models = models
   )
 
   validation <- validate_sframe(instrument, strict = FALSE)

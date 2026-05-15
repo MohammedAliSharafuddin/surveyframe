@@ -68,6 +68,24 @@ test_that("missing_data_report returns item, respondent, pattern, and scale rule
   expect_true(nrow(mr$patterns) >= 1)
 })
 
+test_that("outlier_report flags univariate and multivariate outliers", {
+  dat <- data.frame(
+    x = c(rnorm(20), 99),
+    y = c(rnorm(20), 99)
+  )
+
+  zr <- outlier_report(dat, variables = c("x", "y"), method = "zscore")
+  expect_s3_class(zr, "sframe_outlier_report")
+  expect_true(21 %in% zr$flagged_rows)
+
+  iqr <- outlier_report(dat, variables = "x", method = "iqr")
+  expect_true(21 %in% iqr$flagged_rows)
+
+  mah <- outlier_report(dat, variables = c("x", "y"), method = "mahalanobis")
+  expect_s3_class(mah, "sframe_outlier_report")
+  expect_true("statistic" %in% names(mah$table))
+})
+
 test_that("assumption_report includes Shapiro and expected-count warnings", {
   dat <- data.frame(
     x = c(1, 2, 3, 4, 5, 6),
@@ -101,7 +119,9 @@ test_that("posthoc_report returns pairwise Wilcoxon and chi-square residuals", {
   expect_s3_class(ph, "sframe_posthoc_report")
   expect_true("pairwise_wilcox" %in% names(ph$tables))
 
-  chi <- posthoc_report(dat, method = "chi_square", table_vars = c("x", "z"))
+  chi <- suppressWarnings(
+    posthoc_report(dat, method = "chi_square", table_vars = c("x", "z"))
+  )
   expect_true("adjusted_residuals" %in% names(chi$tables))
 })
 
@@ -223,6 +243,21 @@ test_that("model layer constructs, validates, and generates syntax", {
     constructs = list(sf_construct("SAT", items = c("sat_1", "sat_2"), mode = "composite"))
   )
   expect_false(validate_model(pls_without_path, strict = FALSE)$valid)
+})
+
+test_that("model layer constructors reject invalid identifiers", {
+  expect_error(sf_construct("bad id", items = "sat_1"),
+               class = "sframe_validation_error")
+  expect_error(sf_construct("SAT", items = "bad item"),
+               class = "sframe_validation_error")
+  expect_error(sf_path("bad id", "SAT"),
+               class = "sframe_validation_error")
+  expect_error(sf_covariance("SAT", "bad-id"),
+               class = "sframe_validation_error")
+  expect_error(sf_indirect("SAT", c("MED", NA_character_), "LOY"),
+               class = "sframe_validation_error")
+  expect_error(sf_model("bad model", type = "cfa"),
+               class = "sframe_validation_error")
 })
 
 test_that("add_model and .sframe read/write preserve models and old files work", {

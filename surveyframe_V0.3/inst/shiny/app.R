@@ -219,16 +219,600 @@ table_card <- function(title, headers, rows, empty_label) {
   )
 }
 
-initial_instrument <- shiny::getShinyOption("surveyframe_instrument")
-initial_responses <- shiny::getShinyOption("surveyframe_responses")
-initial_builder <- builder_state_from_instrument(initial_instrument)
+analysis_role <- function(id, label, min = 1, max = 1, levels = "any") {
+  list(id = id, label = label, min = min, max = max, levels = levels)
+}
 
-initial_tab <- if (!is.null(initial_responses) && !is.null(initial_instrument)) {
-  "quality"
-} else if (!is.null(initial_instrument)) {
-  "preview"
+analysis_registry <- local({
+  role <- analysis_role
+  list(
+    frequency = list(
+      family = "descriptive", label = "Frequency table",
+      roles = list(role("variable", "Variable", levels = c("nominal", "ordinal", "likert"))),
+      show_alpha = FALSE, show_hypotheses = FALSE, show_effect_size = FALSE,
+      assumptions = character(0),
+      output = "Counts, percentages, valid percentages, and missing values.",
+      refs = character(0)
+    ),
+    descriptives = list(
+      family = "descriptive", label = "Descriptives",
+      roles = list(
+        role("variables", "Variables", max = 99, levels = c("continuous", "scale", "ordinal", "likert")),
+        role("split_by", "Split by", min = 0, max = 1, levels = c("nominal", "ordinal"))
+      ),
+      show_alpha = FALSE, show_hypotheses = FALSE, show_effect_size = FALSE,
+      assumptions = character(0),
+      output = "N, valid N, missing N, mean, SD, median, IQR, range, skewness, kurtosis, SE, and CI.",
+      refs = character(0)
+    ),
+    missing_data = list(
+      family = "data_quality", label = "Missing values",
+      roles = list(role("variables", "Variables", min = 0, max = 99, levels = "any")),
+      show_alpha = FALSE, show_hypotheses = FALSE, show_effect_size = FALSE,
+      assumptions = character(0),
+      output = "Item missingness, respondent missingness, missing patterns, and deletion summary.",
+      refs = character(0)
+    ),
+    quality = list(
+      family = "data_quality", label = "Quality report",
+      roles = list(role("variables", "Variables", min = 0, max = 99, levels = "any")),
+      show_alpha = FALSE, show_hypotheses = FALSE, show_effect_size = FALSE,
+      assumptions = character(0),
+      output = "Attention checks, response quality flags, and quality summary.",
+      refs = character(0)
+    ),
+    scale_descriptives = list(
+      family = "descriptive", label = "Scale descriptives",
+      roles = list(role("scales", "Scale scores", min = 0, max = 99, levels = "scale")),
+      show_alpha = FALSE, show_hypotheses = FALSE, show_effect_size = FALSE,
+      assumptions = character(0),
+      output = "Scale means, variability, missingness, and confidence intervals.",
+      refs = character(0)
+    ),
+    crosstab = list(
+      family = "categorical", label = "Cross-tab",
+      roles = list(
+        role("row", "Row variable", levels = c("nominal", "ordinal")),
+        role("column", "Column variable", levels = c("nominal", "ordinal"))
+      ),
+      show_alpha = FALSE, show_hypotheses = FALSE, show_effect_size = TRUE,
+      assumptions = "Expected cell counts",
+      output = "Cross-tabulation with association measures when run.",
+      refs = "field_2018"
+    ),
+    chi_square = list(
+      family = "categorical", label = "Chi-square",
+      roles = list(
+        role("row", "Variable X", levels = c("nominal", "ordinal")),
+        role("column", "Variable Y", levels = c("nominal", "ordinal"))
+      ),
+      show_alpha = TRUE, show_hypotheses = TRUE, show_effect_size = TRUE,
+      assumptions = "Expected-count check",
+      output = "Chi-square, p value, Cramer's V or phi.",
+      refs = c("field_2018", "cohen_1988")
+    ),
+    fisher_exact = list(
+      family = "categorical", label = "Fisher's exact",
+      roles = list(
+        role("row", "Variable X", levels = c("nominal", "ordinal")),
+        role("column", "Variable Y", levels = c("nominal", "ordinal"))
+      ),
+      show_alpha = TRUE, show_hypotheses = TRUE, show_effect_size = TRUE,
+      assumptions = "Sparse-table handling",
+      output = "Fisher's exact p value and odds ratio for 2 x 2 tables.",
+      refs = "field_2018"
+    ),
+    mcnemar = list(
+      family = "related_samples", label = "McNemar",
+      roles = list(
+        role("before", "Before or condition 1", levels = "nominal"),
+        role("after", "After or condition 2", levels = "nominal")
+      ),
+      show_alpha = TRUE, show_hypotheses = TRUE, show_effect_size = FALSE,
+      assumptions = "Paired binary categories",
+      output = "McNemar chi-square and p value.",
+      refs = "field_2018"
+    ),
+    cochran_q = list(
+      family = "related_samples", label = "Cochran's Q",
+      roles = list(role("measures", "Binary repeated measures", min = 2, max = 99, levels = "nominal")),
+      show_alpha = TRUE, show_hypotheses = TRUE, show_effect_size = FALSE,
+      assumptions = "Related binary measures",
+      output = "Cochran's Q and pairwise McNemar plan.",
+      refs = "field_2018"
+    ),
+    mann_whitney = list(
+      family = "group_comparison", label = "Mann-Whitney U",
+      roles = list(
+        role("group", "Grouping variable", levels = c("nominal", "ordinal")),
+        role("outcome", "Outcome variable", levels = c("ordinal", "continuous", "scale", "likert"))
+      ),
+      show_alpha = TRUE, show_hypotheses = TRUE, show_effect_size = TRUE,
+      assumptions = "Exactly two groups",
+      output = "U statistic, p value, and rank-biserial effect size.",
+      refs = c("mann_1947", "cohen_1988")
+    ),
+    t_test_ind = list(
+      family = "group_comparison", label = "Independent t-test",
+      roles = list(
+        role("group", "Grouping variable", levels = "nominal"),
+        role("outcome", "Outcome variable", levels = c("continuous", "scale"))
+      ),
+      show_alpha = TRUE, show_hypotheses = TRUE, show_effect_size = TRUE,
+      assumptions = c("Normality", "Equal variance"),
+      output = "t, df, p value, and Cohen's d.",
+      refs = c("field_2018", "cohen_1988")
+    ),
+    t_test_pair = list(
+      family = "related_samples", label = "Paired t-test",
+      roles = list(
+        role("before", "Measure 1", levels = c("continuous", "scale")),
+        role("after", "Measure 2", levels = c("continuous", "scale"))
+      ),
+      show_alpha = TRUE, show_hypotheses = TRUE, show_effect_size = TRUE,
+      assumptions = "Normality of differences",
+      output = "Paired t, df, p value, and dz.",
+      refs = "field_2018"
+    ),
+    wilcoxon_pair = list(
+      family = "related_samples", label = "Wilcoxon signed-rank",
+      roles = list(
+        role("before", "Measure 1", levels = c("ordinal", "continuous", "scale", "likert")),
+        role("after", "Measure 2", levels = c("ordinal", "continuous", "scale", "likert"))
+      ),
+      show_alpha = TRUE, show_hypotheses = TRUE, show_effect_size = TRUE,
+      assumptions = "Paired ordinal or continuous measures",
+      output = "V, p value, and r effect size.",
+      refs = "cohen_1988"
+    ),
+    kruskal_wallis = list(
+      family = "group_comparison", label = "Kruskal-Wallis",
+      roles = list(
+        role("group", "Grouping variable", levels = c("nominal", "ordinal")),
+        role("outcome", "Outcome variable", levels = c("ordinal", "continuous", "scale", "likert"))
+      ),
+      show_alpha = TRUE, show_hypotheses = TRUE, show_effect_size = TRUE,
+      assumptions = "Independent groups",
+      output = "H, p value, eta-squared, and pairwise plan.",
+      refs = c("kruskal_1952", "cohen_1988")
+    ),
+    anova_one = list(
+      family = "group_comparison", label = "One-way ANOVA",
+      roles = list(
+        role("group", "Grouping variable", levels = "nominal"),
+        role("outcome", "Outcome variable", levels = c("continuous", "scale"))
+      ),
+      show_alpha = TRUE, show_hypotheses = TRUE, show_effect_size = TRUE,
+      assumptions = c("Normality", "Homogeneity of variance"),
+      output = "F, p value, eta-squared, and post-hoc plan.",
+      refs = c("field_2018", "cohen_1988")
+    ),
+    anova_two = list(
+      family = "group_comparison", label = "Two-way ANOVA",
+      roles = list(
+        role("factor1", "Factor 1", levels = "nominal"),
+        role("factor2", "Factor 2", levels = "nominal"),
+        role("outcome", "Outcome", levels = c("continuous", "scale"))
+      ),
+      show_alpha = TRUE, show_hypotheses = TRUE, show_effect_size = TRUE,
+      assumptions = c("Interaction interpretation", "Homogeneity of variance"),
+      output = "Main effects, interaction, and partial eta-squared.",
+      refs = c("field_2018", "cohen_1988")
+    ),
+    ancova = list(
+      family = "group_comparison", label = "ANCOVA",
+      roles = list(
+        role("group", "Group", levels = "nominal"),
+        role("covariates", "Covariates", min = 1, max = 99, levels = c("continuous", "scale")),
+        role("outcome", "Outcome", levels = c("continuous", "scale"))
+      ),
+      show_alpha = TRUE, show_hypotheses = TRUE, show_effect_size = TRUE,
+      assumptions = "Homogeneity of regression slopes",
+      output = "Adjusted group effects and slope warning.",
+      refs = "field_2018"
+    ),
+    repeated_anova = list(
+      family = "related_samples", label = "Repeated-measures ANOVA",
+      roles = list(role("measures", "Repeated measures", min = 2, max = 99, levels = c("continuous", "scale"))),
+      show_alpha = TRUE, show_hypotheses = TRUE, show_effect_size = TRUE,
+      assumptions = "Within-subject design",
+      output = "Within-subject ANOVA summary.",
+      refs = "field_2018"
+    ),
+    friedman = list(
+      family = "related_samples", label = "Friedman",
+      roles = list(role("measures", "Repeated ordinal measures", min = 2, max = 99, levels = c("ordinal", "continuous", "scale", "likert"))),
+      show_alpha = TRUE, show_hypotheses = TRUE, show_effect_size = FALSE,
+      assumptions = "Related measures",
+      output = "Friedman chi-square and p value.",
+      refs = "field_2018"
+    ),
+    correlation_pearson = list(
+      family = "association", label = "Pearson correlation",
+      roles = list(
+        role("x", "Variable X", levels = c("continuous", "scale")),
+        role("y", "Variable Y", levels = c("continuous", "scale"))
+      ),
+      show_alpha = TRUE, show_hypotheses = TRUE, show_effect_size = TRUE,
+      assumptions = c("Linearity", "Bivariate normality"),
+      output = "r, p value, and confidence interval where feasible.",
+      refs = c("field_2018", "cohen_1988")
+    ),
+    correlation_spearman = list(
+      family = "association", label = "Spearman correlation",
+      roles = list(
+        role("x", "Variable X", levels = c("ordinal", "continuous", "scale", "likert")),
+        role("y", "Variable Y", levels = c("ordinal", "continuous", "scale", "likert"))
+      ),
+      show_alpha = TRUE, show_hypotheses = TRUE, show_effect_size = TRUE,
+      assumptions = "Monotonic association",
+      output = "rho and p value.",
+      refs = c("spearman_1904", "cohen_1988")
+    ),
+    correlation_kendall = list(
+      family = "association", label = "Kendall tau",
+      roles = list(
+        role("x", "Variable X", levels = c("ordinal", "likert")),
+        role("y", "Variable Y", levels = c("ordinal", "likert"))
+      ),
+      show_alpha = TRUE, show_hypotheses = TRUE, show_effect_size = TRUE,
+      assumptions = "Ordinal association",
+      output = "tau and p value.",
+      refs = "kendall_1938"
+    ),
+    partial_correlation = list(
+      family = "association", label = "Partial correlation",
+      roles = list(
+        role("x", "Variable X", levels = c("continuous", "scale")),
+        role("y", "Variable Y", levels = c("continuous", "scale")),
+        role("controls", "Control variables", min = 1, max = 99, levels = c("continuous", "scale"))
+      ),
+      show_alpha = TRUE, show_hypotheses = TRUE, show_effect_size = TRUE,
+      assumptions = "Linear control model",
+      output = "Partial r and p value.",
+      refs = "field_2018"
+    ),
+    regression_linear = list(
+      family = "regression", label = "Linear regression",
+      roles = list(
+        role("dependent", "Dependent variable", levels = c("continuous", "scale")),
+        role("predictors", "Predictors", min = 1, max = 99, levels = c("nominal", "ordinal", "continuous", "scale", "likert"))
+      ),
+      show_alpha = TRUE, show_hypotheses = TRUE, show_effect_size = TRUE,
+      assumptions = c("Residual normality", "VIF", "Cook distance"),
+      output = "Model fit, coefficients, and assumptions.",
+      refs = "field_2018"
+    ),
+    regression_logistic_binary = list(
+      family = "regression", label = "Binary logistic",
+      roles = list(
+        role("dependent", "Binary outcome", levels = "nominal"),
+        role("predictors", "Predictors", min = 1, max = 99, levels = c("nominal", "ordinal", "continuous", "scale"))
+      ),
+      show_alpha = TRUE, show_hypotheses = TRUE, show_effect_size = TRUE,
+      assumptions = c("Sparse cells", "Separation warning"),
+      output = "Odds ratios, pseudo R-squared, and classification table.",
+      refs = "hosmer_2013"
+    ),
+    regression_logistic_ordinal = list(
+      family = "regression", label = "Ordinal logistic",
+      roles = list(
+        role("dependent", "Ordinal outcome", levels = c("ordinal", "likert")),
+        role("predictors", "Predictors", min = 1, max = 99, levels = c("nominal", "ordinal", "continuous", "scale"))
+      ),
+      show_alpha = TRUE, show_hypotheses = TRUE, show_effect_size = TRUE,
+      assumptions = "Ordered outcome",
+      output = "MASS::polr model plan, odds ratios, and fit table.",
+      refs = "hosmer_2013"
+    ),
+    regression_logistic_multinomial = list(
+      family = "regression", label = "Multinomial logistic",
+      roles = list(
+        role("dependent", "Nominal outcome", levels = "nominal"),
+        role("predictors", "Predictors", min = 1, max = 99, levels = c("nominal", "ordinal", "continuous", "scale"))
+      ),
+      show_alpha = TRUE, show_hypotheses = TRUE, show_effect_size = TRUE,
+      assumptions = "Reference category",
+      output = "nnet::multinom plan, odds ratios, and classification table.",
+      refs = "hosmer_2013"
+    ),
+    mediation = list(
+      family = "regression", label = "Mediation",
+      roles = list(
+        role("predictor", "Predictor", levels = c("continuous", "scale", "nominal")),
+        role("mediator", "Mediator", levels = c("continuous", "scale")),
+        role("outcome", "Outcome", levels = c("continuous", "scale"))
+      ),
+      show_alpha = TRUE, show_hypotheses = TRUE, show_effect_size = TRUE,
+      assumptions = c("Regression assumptions", "Bootstrap CI"),
+      output = "Direct, indirect, total effects, and bootstrap CI.",
+      refs = "mackinnon_2008"
+    ),
+    moderation = list(
+      family = "regression", label = "Moderation",
+      roles = list(
+        role("predictor", "Predictor", levels = c("continuous", "scale")),
+        role("moderator", "Moderator", levels = c("continuous", "scale")),
+        role("outcome", "Outcome", levels = c("continuous", "scale"))
+      ),
+      show_alpha = TRUE, show_hypotheses = TRUE, show_effect_size = TRUE,
+      assumptions = "Interaction model",
+      output = "Interaction coefficient and conditional effects.",
+      refs = "aiken_1991"
+    ),
+    reliability_alpha = list(
+      family = "measurement", label = "Reliability alpha",
+      roles = list(role("items", "Scale items", min = 2, max = 99, levels = c("ordinal", "likert", "continuous"))),
+      show_alpha = FALSE, show_hypotheses = FALSE, show_effect_size = FALSE,
+      assumptions = character(0),
+      output = "Alpha, item-total correlations, and alpha if deleted.",
+      refs = "cronbach_1951"
+    ),
+    reliability_omega = list(
+      family = "measurement", label = "Reliability omega",
+      roles = list(role("items", "Scale items", min = 2, max = 99, levels = c("ordinal", "likert", "continuous"))),
+      show_alpha = FALSE, show_hypotheses = FALSE, show_effect_size = FALSE,
+      assumptions = character(0),
+      output = "Omega estimate when the optional psych package is available.",
+      refs = "cronbach_1951"
+    ),
+    item_diagnostics = list(
+      family = "measurement", label = "Item diagnostics",
+      roles = list(role("items", "Items", min = 1, max = 99, levels = c("ordinal", "likert", "continuous"))),
+      show_alpha = FALSE, show_hypotheses = FALSE, show_effect_size = FALSE,
+      assumptions = character(0),
+      output = "Item distributions, item-total correlations, and floor or ceiling checks.",
+      refs = "field_2018"
+    ),
+    efa_readiness = list(
+      family = "measurement", label = "EFA readiness",
+      roles = list(role("items", "Items", min = 3, max = 99, levels = c("ordinal", "likert", "continuous"))),
+      show_alpha = FALSE, show_hypotheses = FALSE, show_effect_size = FALSE,
+      assumptions = c("KMO", "Bartlett test"),
+      output = "KMO, Bartlett, and parallel-analysis planning.",
+      refs = "field_2018"
+    ),
+    efa_solution = list(
+      family = "measurement", label = "EFA solution",
+      roles = list(role("items", "Items", min = 3, max = 99, levels = c("ordinal", "likert", "continuous"))),
+      show_alpha = FALSE, show_hypotheses = FALSE, show_effect_size = FALSE,
+      assumptions = c("Factor retention", "Cross-loadings"),
+      output = "Loadings, communalities, uniqueness, and cross-loading flags.",
+      refs = "field_2018"
+    ),
+    cfa_lavaan_syntax = list(
+      family = "model", label = "CFA lavaan syntax",
+      roles = list(role("model", "Saved model", min = 0, max = 1, levels = "model")),
+      show_alpha = FALSE, show_hypotheses = FALSE, show_effect_size = FALSE,
+      assumptions = "Construct indicators",
+      output = "lavaan measurement model syntax.",
+      refs = "field_2018"
+    ),
+    sem_lavaan_syntax = list(
+      family = "model", label = "CB-SEM lavaan syntax",
+      roles = list(role("model", "Saved model", levels = "model")),
+      show_alpha = TRUE, show_hypotheses = TRUE, show_effect_size = TRUE,
+      assumptions = "Measurement and structural paths",
+      output = "lavaan measurement, structural, indirect, and total-effect syntax.",
+      refs = "field_2018"
+    ),
+    seminr_syntax = list(
+      family = "model", label = "PLS-SEM seminr syntax",
+      roles = list(role("model", "Saved model", levels = "model")),
+      show_alpha = TRUE, show_hypotheses = TRUE, show_effect_size = TRUE,
+      assumptions = "Construct modes and bootstrapping",
+      output = "seminr measurement, structural, bootstrap, reliability, AVE, and HTMT syntax.",
+      refs = "field_2018"
+    )
+  )
+})
+
+analysis_method_choices <- function() {
+  stats::setNames(names(analysis_registry), vapply(analysis_registry, function(x) x$label, character(1)))
+}
+
+studio_level_meta <- function(item = NULL, scale = NULL) {
+  if (!is.null(scale)) {
+    return(list(level = "scale", code = "SCL", type = "scale score"))
+  }
+  type <- item$type %||% "text"
+  if (identical(type, "likert")) {
+    return(list(level = "likert", code = "LIK", type = type))
+  }
+  if (type %in% c("single_choice", "multiple_choice")) {
+    return(list(level = "nominal", code = "NOM", type = type))
+  }
+  if (identical(type, "ranking")) {
+    return(list(level = "ordinal", code = "ORD", type = type))
+  }
+  if (type %in% c("numeric", "slider", "rating")) {
+    return(list(level = "continuous", code = "CON", type = type))
+  }
+  if (type %in% c("text", "textarea")) {
+    return(list(level = "text", code = "TXT", type = type))
+  }
+  list(level = "identifier", code = "ID", type = type)
+}
+
+studio_variable_catalog <- function(instrument) {
+  if (is.null(instrument)) {
+    return(list())
+  }
+  item_rows <- lapply(instrument$items %||% list(), function(item) {
+    meta <- studio_level_meta(item = item)
+    scale_membership <- item$scale_id %||% ""
+    if (!nzchar(scale_membership) && length(instrument$scales %||% list()) > 0) {
+      hits <- vapply(instrument$scales, function(scale) item$id %in% (scale$items %||% character(0)), logical(1))
+      scale_membership <- paste(vapply(instrument$scales[hits], function(scale) scale$id, character(1)), collapse = ", ")
+    }
+    list(
+      id = item$id,
+      label = item$label %||% item$id,
+      kind = "item",
+      level = meta$level,
+      code = meta$code,
+      type = meta$type,
+      choice_set = item$choice_set %||% "",
+      scale = scale_membership,
+      required = isTRUE(item$required)
+    )
+  })
+  scale_rows <- lapply(instrument$scales %||% list(), function(scale) {
+    meta <- studio_level_meta(scale = scale)
+    list(
+      id = scale$id,
+      label = scale$label %||% scale$id,
+      kind = "scale",
+      level = meta$level,
+      code = meta$code,
+      type = meta$type,
+      choice_set = "",
+      scale = scale$id,
+      required = FALSE
+    )
+  })
+  c(item_rows, scale_rows)
+}
+
+studio_role_choices <- function(role, catalog, models) {
+  if ("model" %in% (role$levels %||% character(0))) {
+    ids <- vapply(models %||% list(), function(model) model$id %||% "", character(1))
+    labels <- vapply(models %||% list(), function(model) {
+      paste0(model$id %||% "", " (", model$type %||% "model", ")")
+    }, character(1))
+    return(stats::setNames(ids[nzchar(ids)], labels[nzchar(ids)]))
+  }
+  keep <- vapply(catalog, function(v) {
+    "any" %in% role$levels || v$level %in% role$levels || v$kind %in% role$levels
+  }, logical(1))
+  vars <- catalog[keep]
+  ids <- vapply(vars, function(v) v$id, character(1))
+  labels <- vapply(vars, function(v) paste0(v$id, " - ", substr(v$label, 1, 48)), character(1))
+  stats::setNames(ids, labels)
+}
+
+studio_flatten_roles <- function(roles) {
+  vals <- unlist(roles, use.names = FALSE)
+  unique(vals[nzchar(vals)])
+}
+
+studio_validate_plan_roles <- function(method, roles) {
+  reg <- analysis_registry[[method]] %||% list(roles = list())
+  messages <- character(0)
+  for (role in reg$roles %||% list()) {
+    vals <- roles[[role$id]] %||% character(0)
+    vals <- vals[nzchar(vals)]
+    n <- length(vals)
+    if (n < role$min) {
+      messages <- c(messages, paste0("Select ", role$min, " ", tolower(role$label), "."))
+    }
+    if (!is.null(role$max) && n > role$max) {
+      messages <- c(messages, paste0(role$label, " allows at most ", role$max, " selection(s)."))
+    }
+  }
+  guidance <- switch(
+    method,
+    frequency = "Select one variable for the frequency table.",
+    mann_whitney = "Mann-Whitney U requires one grouping variable and one ordinal or continuous outcome.",
+    chi_square = "Chi-square requires categorical variables.",
+    fisher_exact = "Fisher's exact test is intended for sparse categorical tables.",
+    correlation_pearson = "Pearson correlation requires continuous or scale-score variables.",
+    correlation_spearman = "Spearman is safer for ordinal or Likert variables.",
+    correlation_kendall = "Kendall tau is safer for ordinal or Likert variables.",
+    regression_linear = "Regression requires one dependent variable and at least one predictor.",
+    reliability_alpha = "Reliability requires at least two items in a scale.",
+    efa_readiness = "EFA readiness usually requires at least three indicators.",
+    efa_solution = "EFA solution usually requires at least three indicators.",
+    cfa_lavaan_syntax = "CFA requires a saved model or construct plan; constructs with fewer than three indicators should be justified.",
+    sem_lavaan_syntax = "CB-SEM requires a saved model with measurement and structural paths.",
+    seminr_syntax = "PLS-SEM requires at least one construct and one structural path.",
+    "Review compatibility before saving."
+  )
+  list(valid = length(messages) == 0, messages = messages, guidance = guidance)
+}
+
+studio_next_plan_id <- function(plan) {
+  paste0("RQ", length(plan %||% list()) + 1L)
+}
+
+studio_safe_id <- function(x, prefix = "M") {
+  x <- gsub("[^A-Za-z0-9_]", "_", trimws(x %||% ""))
+  if (!nzchar(x)) {
+    x <- prefix
+  }
+  if (!grepl("^[A-Za-z]", x)) {
+    x <- paste0(prefix, "_", x)
+  }
+  x
+}
+
+studio_parse_paths <- function(text) {
+  lines <- parse_lines(text %||% "")
+  Filter(Negate(is.null), lapply(lines, function(line) {
+    parts <- trimws(strsplit(line, "->", fixed = TRUE)[[1]])
+    if (length(parts) != 2 || any(!nzchar(parts))) {
+      return(NULL)
+    }
+    surveyframe::sf_path(parts[1], parts[2])
+  }))
+}
+
+studio_parse_covariances <- function(text) {
+  lines <- parse_lines(text %||% "")
+  Filter(Negate(is.null), lapply(lines, function(line) {
+    parts <- trimws(strsplit(line, "~~", fixed = TRUE)[[1]])
+    if (length(parts) != 2 || any(!nzchar(parts))) {
+      return(NULL)
+    }
+    surveyframe::sf_covariance(parts[1], parts[2])
+  }))
+}
+
+studio_parse_indirect <- function(text) {
+  lines <- parse_lines(text %||% "")
+  Filter(Negate(is.null), lapply(lines, function(line) {
+    parts <- trimws(strsplit(line, "->", fixed = TRUE)[[1]])
+    if (length(parts) < 3 || any(!nzchar(parts))) {
+      return(NULL)
+    }
+    surveyframe::sf_indirect(parts[1], parts[2:(length(parts) - 1)], parts[length(parts)])
+  }))
+}
+
+INITIAL_INSTRUMENT <- shiny::getShinyOption("surveyframe_instrument", NULL)
+INITIAL_RESPONSES <- shiny::getShinyOption("surveyframe_responses", NULL)
+INITIAL_SCREEN <- shiny::getShinyOption("surveyframe_initial_screen", "auto")
+
+if (is.null(INITIAL_SCREEN) || !nzchar(INITIAL_SCREEN)) {
+  INITIAL_SCREEN <- "auto"
+}
+
+initial_builder <- if (inherits(INITIAL_INSTRUMENT, "sframe")) {
+  builder_state_from_instrument(INITIAL_INSTRUMENT)
 } else {
-  "build"
+  builder_empty_state()
+}
+
+initial_tab <- INITIAL_SCREEN
+if (identical(initial_tab, "data")) {
+  initial_tab <- "responses"
+}
+if (identical(initial_tab, "auto")) {
+  initial_tab <- if (!is.null(INITIAL_RESPONSES)) {
+    "dashboard"
+  } else if (inherits(INITIAL_INSTRUMENT, "sframe")) {
+    "preview"
+  } else {
+    "build"
+  }
+}
+if (!initial_tab %in% c("build", "open", "preview", "responses", "quality",
+                       "reliability", "analysis", "dashboard", "export")) {
+  initial_tab <- if (inherits(INITIAL_INSTRUMENT, "sframe")) {
+    "preview"
+  } else {
+    "build"
+  }
 }
 
 tab_link_class <- function(tab) {
@@ -327,6 +911,23 @@ ui <- fluidPage(
       .hint { font-size: 13px; color: #6b718e; margin-top: 6px; }
       .problem-list { margin: 0; padding-left: 18px; }
       .problem-list li { margin-bottom: 6px; }
+      .sf-code {
+        white-space: pre-wrap; background: #f7f8fa; border: 1px solid #e0e3ea;
+        border-radius: 6px; padding: 12px; overflow-x: auto;
+      }
+      .role-card { border: 1px solid #e0e3ea; border-radius: 8px; padding: 12px; margin-bottom: 12px; }
+      .role-card label { font-size: 13px; font-weight: 600; color: #1a1a2e; }
+      .vmeta { border-bottom: 1px solid #f0f1f4; padding: 10px 0; }
+      .vmeta:last-child { border-bottom: none; }
+      .vmeta-id { font-size: 13px; font-weight: 700; color: #1a1a2e; }
+      .vmeta-lbl { font-size: 12px; color: #4b5563; margin: 2px 0 5px; }
+      .vbadge {
+        display: inline-block; border: 1px solid #d9e2ec; border-radius: 999px;
+        padding: 2px 7px; margin: 2px 3px 2px 0; font-size: 11px;
+        color: #334155; background: #f8fafc;
+      }
+      .plan-msg { border-radius: 6px; padding: 10px; background: #fef3cd; color: #856404; }
+      .plan-msg.ok { background: #e6f4ea; color: #2e7d32; }
       #survey_preview_frame {
         border: 1px solid #e0e3ea; border-radius: 8px; padding: 24px; background: #fff;
       }
@@ -354,6 +955,12 @@ ui <- fluidPage(
         tags$li(class = "studio-nav-item",
           tags$a(href = "#", `data-tab` = "reliability",
                  class = tab_link_class("reliability"), "Reliability")),
+        tags$li(class = "studio-nav-item",
+          tags$a(href = "#", `data-tab` = "analysis",
+                 class = tab_link_class("analysis"), "Analysis Plan")),
+        tags$li(class = "studio-nav-item",
+          tags$a(href = "#", `data-tab` = "dashboard",
+                 class = tab_link_class("dashboard"), "Dashboard")),
         tags$li(class = "studio-nav-item",
           tags$a(href = "#", `data-tab` = "export",
                  class = tab_link_class("export"), "Export"))
@@ -566,6 +1173,40 @@ ui <- fluidPage(
         uiOutput("reliability_output")
       ),
 
+      tags$div(id = "screen-analysis", class = screen_class("analysis"),
+        tags$h2(class = "screen-title", "Analysis Plan"),
+        uiOutput("analysis_gate"),
+        radioButtons(
+          "analysis_stage", NULL,
+          choices = c("Plan", "Run", "Report"),
+          selected = "Plan",
+          inline = TRUE
+        ),
+        fluidRow(
+          column(4, uiOutput("analysis_left_panel")),
+          column(4, uiOutput("analysis_middle_panel")),
+          column(4, uiOutput("analysis_right_panel"))
+        )
+      ),
+
+      tags$div(id = "screen-dashboard", class = screen_class("dashboard"),
+        tags$h2(class = "screen-title", "Dashboard"),
+        uiOutput("dashboard_gate"),
+        tags$div(class = "card",
+          tags$div(class = "card-title", "Response dashboard"),
+          tags$p(class = "hint",
+            "The dashboard is kept as a separate read-only Shiny launcher in v0.3."),
+          actionButton(
+            "open_response_dashboard",
+            "Open response dashboard",
+            class = "btn-primary"
+          ),
+          tags$p(class = "hint",
+            "From the R console, call launch_dashboard(instrument, responses) for the full dashboard.")
+        ),
+        uiOutput("dashboard_summary_card")
+      ),
+
       tags$div(id = "screen-export", class = screen_class("export"),
         tags$h2(class = "screen-title", "Export"),
         uiOutput("export_gate"),
@@ -579,7 +1220,11 @@ ui <- fluidPage(
           tags$div(class = "card-title", "Report contents"),
           checkboxInput("rpt_codebook", "Include codebook", value = TRUE),
           checkboxInput("rpt_quality", "Include quality report", value = TRUE),
+          checkboxInput("rpt_missing", "Include missing-data report", value = TRUE),
+          checkboxInput("rpt_descriptives", "Include descriptives", value = TRUE),
           checkboxInput("rpt_reliability", "Include reliability", value = TRUE),
+          checkboxInput("rpt_analysis", "Include analysis-plan results", value = TRUE),
+          checkboxInput("rpt_models", "Include saved models and syntax", value = TRUE),
           tags$br(),
           downloadButton("download_report_btn", "Generate HTML report", class = "btn-primary"),
           tags$p(class = "hint",
@@ -593,8 +1238,9 @@ ui <- fluidPage(
 server <- function(input, output, session) {
   rv <- reactiveValues(
     builder = initial_builder,
-    instrument = initial_instrument,
-    responses = NULL
+    instrument = INITIAL_INSTRUMENT,
+    responses = INITIAL_RESPONSES,
+    active_screen = initial_tab
   )
 
   set_builder_state <- function(state) {
@@ -602,15 +1248,20 @@ server <- function(input, output, session) {
     invisible(state)
   }
 
-  if (!is.null(initial_responses) && !is.null(rv$instrument)) {
+  if (!is.null(INITIAL_RESPONSES) && !is.data.frame(INITIAL_RESPONSES) &&
+      !is.null(rv$instrument)) {
     tryCatch({
-      rv$responses <- surveyframe::read_responses(initial_responses, rv$instrument)
+      rv$responses <- surveyframe::read_responses(INITIAL_RESPONSES, rv$instrument)
     }, error = function(e) NULL)
   }
 
   switch_tab <- function(tab) {
     session$sendCustomMessage("surveyframe-switch-tab", tab)
   }
+
+  observeEvent(input$current_tab, {
+    rv$active_screen <- input$current_tab
+  }, ignoreInit = TRUE)
 
   sync_builder_inputs <- function(state) {
     updateTextInput(session, "draft_title", value = state$meta$title %||% "Untitled Survey")
@@ -641,7 +1292,9 @@ server <- function(input, output, session) {
       items = rv$builder$items,
       scales = rv$builder$scales,
       branching = rv$builder$branching,
-      checks = rv$builder$checks
+      checks = rv$builder$checks,
+      analysis_plan = rv$builder$analysis_plan %||% list(),
+      models = rv$builder$models %||% list()
     )
   })
 
@@ -710,14 +1363,7 @@ server <- function(input, output, session) {
   })
 
   session$onFlushed(function() {
-    target_tab <- if (!is.null(shiny::isolate(rv$responses))) {
-      "quality"
-    } else if (!is.null(shiny::isolate(rv$instrument))) {
-      "preview"
-    } else {
-      "build"
-    }
-    switch_tab(target_tab)
+    switch_tab(shiny::isolate(rv$active_screen %||% initial_tab))
   }, once = TRUE)
 
   observeEvent(input$new_survey_btn, {
@@ -1037,6 +1683,12 @@ server <- function(input, output, session) {
           tags$div(class = "stat-val", length(rv$builder$scales)),
           tags$div(class = "stat-lbl", "Scales")),
         tags$div(class = "stat-box",
+          tags$div(class = "stat-val", length(rv$builder$analysis_plan %||% list())),
+          tags$div(class = "stat-lbl", "Plans")),
+        tags$div(class = "stat-box",
+          tags$div(class = "stat-val", length(rv$builder$models %||% list())),
+          tags$div(class = "stat-lbl", "Models")),
+        tags$div(class = "stat-box",
           tags$div(class = "stat-val", if (draft$valid) "Ready" else "Fix"),
           tags$div(class = "stat-lbl", "Status"))
       )
@@ -1165,6 +1817,12 @@ server <- function(input, output, session) {
         tags$div(class = "stat-box",
           tags$div(class = "stat-val", length(instr$scales)),
           tags$div(class = "stat-lbl", "Scales")),
+        tags$div(class = "stat-box",
+          tags$div(class = "stat-val", length(instr$analysis_plan %||% list())),
+          tags$div(class = "stat-lbl", "Plans")),
+        tags$div(class = "stat-box",
+          tags$div(class = "stat-val", length(instr$models %||% list())),
+          tags$div(class = "stat-lbl", "Models")),
         tags$div(class = "stat-box",
           tags$div(class = "stat-val", instr$meta$version),
           tags$div(class = "stat-lbl", "Version")),
@@ -1390,6 +2048,622 @@ server <- function(input, output, session) {
     do.call(tagList, cards)
   })
 
+  output$analysis_gate <- renderUI({
+    if (is.null(rv$instrument)) {
+      return(tags$div(class = "card",
+        "Build or open a valid instrument before planning analyses."))
+    }
+    NULL
+  })
+
+  analysis_catalog <- reactive({
+    req(rv$instrument)
+    studio_variable_catalog(rv$instrument)
+  })
+
+  current_analysis_roles <- reactive({
+    method <- input$analysis_method %||% "descriptives"
+    reg <- analysis_registry[[method]] %||% analysis_registry$descriptives
+    roles <- list()
+    for (role in reg$roles %||% list()) {
+      id <- paste0("analysis_role_", role$id)
+      vals <- input[[id]] %||% character(0)
+      vals <- as.character(vals)
+      vals <- vals[nzchar(vals)]
+      roles[[role$id]] <- if ((role$max %||% 1) > 1) vals else vals[1] %||% ""
+    }
+    roles
+  })
+
+  plan_table_ui <- function(plan) {
+    plan <- rv$instrument$analysis_plan %||% list()
+    if (length(plan) == 0) {
+      return(tags$div(class = "card",
+        tags$div(class = "card-title", "Saved analysis plans"),
+        tags$p(class = "hint", "No saved analysis plans yet.")))
+    }
+
+    role_text <- function(block) {
+      roles <- block$roles %||% NULL
+      if (!is.null(roles) && length(roles) > 0) {
+        return(paste(
+          sprintf("%s: %s", names(roles), vapply(roles, format_value, character(1))),
+          collapse = "; "
+        ))
+      }
+      format_value(block$variables %||% character(0))
+    }
+
+    rows <- lapply(plan, function(block) {
+      method <- block$method %||% block$test %||% ""
+      reg <- analysis_registry[[method]] %||% list(label = method)
+      tags$tr(
+        tags$td(block$id %||% ""),
+        tags$td(block$family %||% ""),
+        tags$td(reg$label %||% method),
+        tags$td(role_text(block)),
+        tags$td(block$status %||% ""),
+        tags$td(if (isTRUE(block$requires_data %||% TRUE)) "Yes" else "No")
+      )
+    })
+    table_card("Saved analysis plans",
+      headers = c("ID", "Family", "Method", "Roles", "Status", "Needs data"),
+      rows = rows,
+      empty_label = "No saved analysis plans.")
+  }
+
+  output$analysis_left_panel <- renderUI({
+    req(rv$instrument)
+    catalog <- analysis_catalog()
+    variable_rows <- lapply(catalog, function(v) {
+      tags$div(class = "vmeta",
+        tags$div(class = "vmeta-id", v$id),
+        tags$div(class = "vmeta-lbl", v$label),
+        tags$div(
+          tags$span(class = "vbadge", v$code),
+          tags$span(class = "vbadge", v$type),
+          tags$span(class = "vbadge", v$kind),
+          if (nzchar(v$choice_set)) tags$span(class = "vbadge", paste("choice:", v$choice_set)),
+          if (nzchar(v$scale)) tags$span(class = "vbadge", paste("scale:", v$scale)),
+          tags$span(class = "vbadge", if (isTRUE(v$required)) "required" else "missing allowed")
+        )
+      )
+    })
+    models <- rv$instrument$models %||% list()
+    model_rows <- lapply(models, function(model) {
+      constructs <- model$measurement$constructs %||% list()
+      paths <- model$structural$paths %||% list()
+      tags$div(class = "vmeta",
+        tags$div(class = "vmeta-id", model$id %||% ""),
+        tags$div(class = "vmeta-lbl", model$label %||% ""),
+        tags$div(
+          tags$span(class = "vbadge", model$type %||% "model"),
+          tags$span(class = "vbadge", model$engine %||% ""),
+          tags$span(class = "vbadge", paste(length(constructs), "construct(s)")),
+          tags$span(class = "vbadge", paste(length(paths), "path(s)"))
+        )
+      )
+    })
+    tagList(
+      tags$div(class = "card",
+        tags$div(class = "card-title", "Variables and constructs"),
+        if (length(variable_rows) == 0) {
+          tags$p(class = "hint", "Define items and scales before assigning variable roles.")
+        } else {
+          do.call(tagList, variable_rows)
+        }
+      ),
+      tags$div(class = "card",
+        tags$div(class = "card-title", "Saved models"),
+        if (length(model_rows) == 0) {
+          tags$p(class = "hint", "No saved models yet.")
+        } else {
+          do.call(tagList, model_rows)
+        }
+      )
+    )
+  })
+
+  output$analysis_middle_panel <- renderUI({
+    req(rv$instrument)
+    stage <- input$analysis_stage %||% "Plan"
+    if (identical(stage, "Run")) {
+      return(tagList(
+        plan_table_ui(rv$instrument$analysis_plan %||% list()),
+        uiOutput("analysis_results_output")
+      ))
+    }
+    if (identical(stage, "Report")) {
+      return(tags$div(class = "card",
+        tags$div(class = "card-title", "Report outline"),
+        tags$p(class = "hint",
+          "Use Export to generate the HTML report with codebook, quality, missing data, descriptives, reliability, saved analysis results, and model appendices."),
+        tags$div(class = "stat-row",
+          tags$div(class = "stat-box",
+            tags$div(class = "stat-val", length(rv$instrument$analysis_plan %||% list())),
+            tags$div(class = "stat-lbl", "Plans")),
+          tags$div(class = "stat-box",
+            tags$div(class = "stat-val", length(rv$instrument$models %||% list())),
+            tags$div(class = "stat-lbl", "Models"))
+        )
+      ))
+    }
+
+    plan <- rv$instrument$analysis_plan %||% list()
+    tagList(
+      tags$div(class = "card",
+        tags$div(class = "card-title", "Analysis options"),
+        textInput(
+          "analysis_plan_id",
+          "Plan ID",
+          value = shiny::isolate(input$analysis_plan_id %||% studio_next_plan_id(plan))
+        ),
+        textAreaInput(
+          "analysis_question",
+          "Research question",
+          value = shiny::isolate(input$analysis_question %||% ""),
+          rows = 3
+        ),
+        selectInput(
+          "analysis_method",
+          "Analysis method",
+          choices = analysis_method_choices(),
+          selected = shiny::isolate(input$analysis_method %||% "descriptives")
+        ),
+        tags$div(class = "hint", "Variables are assigned below by methodological role."),
+        uiOutput("analysis_role_fields"),
+        uiOutput("analysis_alpha_field"),
+        textAreaInput(
+          "analysis_decision_rule",
+          "Planned decision rule",
+          value = shiny::isolate(input$analysis_decision_rule %||% ""),
+          rows = 3
+        ),
+        uiOutput("analysis_plan_validation"),
+        uiOutput("save_analysis_plan_control"),
+        tags$hr(),
+        selectInput(
+          "delete_analysis_plan_id",
+          "Delete saved plan",
+          choices = optional_choices(vapply(plan, function(block) block$id %||% "", character(1)), "(Select one)")
+        ),
+        actionButton("delete_analysis_plan_btn", "Delete plan", class = "btn-outline")
+      ),
+      uiOutput("model_builder_card")
+    )
+  })
+
+  output$analysis_right_panel <- renderUI({
+    req(rv$instrument)
+    stage <- input$analysis_stage %||% "Plan"
+    method <- input$analysis_method %||% "descriptives"
+    reg <- analysis_registry[[method]] %||% analysis_registry$descriptives
+    if (identical(stage, "Run")) {
+      return(tags$div(class = "card",
+        tags$div(class = "card-title", "Run preview"),
+        tags$p(class = "hint",
+          if (is.null(rv$responses)) {
+            "Upload response data before running saved plans."
+          } else {
+            "Saved plans are run against the uploaded response data."
+          })
+      ))
+    }
+    if (identical(stage, "Report")) {
+      return(tagList(
+        uiOutput("models_table"),
+        uiOutput("model_syntax_output")
+      ))
+    }
+    tagList(
+      tags$div(class = "card",
+        tags$div(class = "card-title", "Output preview and reporting card"),
+        tags$p(tags$strong(reg$label %||% method)),
+        tags$p(reg$output %||% "Structured result."),
+        if (length(reg$assumptions %||% character(0)) > 0) {
+          tags$p(tags$strong("Assumptions: "), paste(reg$assumptions, collapse = ", "))
+        },
+        if (isTRUE(reg$show_alpha)) {
+          tags$p(tags$strong("Significance level: "), input$analysis_alpha %||% 0.05)
+        },
+        if (length(reg$refs %||% character(0)) > 0) {
+          tags$p(tags$strong("Reporting references: "), paste(reg$refs, collapse = ", "))
+        }
+      ),
+      plan_table_ui(rv$instrument$analysis_plan %||% list())
+    )
+  })
+
+  output$analysis_role_fields <- renderUI({
+    req(rv$instrument)
+    method <- input$analysis_method %||% "descriptives"
+    reg <- analysis_registry[[method]] %||% analysis_registry$descriptives
+    catalog <- analysis_catalog()
+    models <- rv$instrument$models %||% list()
+    fields <- lapply(reg$roles %||% list(), function(role) {
+      choices <- studio_role_choices(role, catalog, models)
+      selected <- input[[paste0("analysis_role_", role$id)]] %||% character(0)
+      selected <- intersect(as.character(selected), unname(choices))
+      tags$div(class = "role-card",
+        selectInput(
+          paste0("analysis_role_", role$id),
+          paste0(role$label, if (role$min > 0) " *" else ""),
+          choices = choices,
+          selected = selected,
+          multiple = (role$max %||% 1) > 1
+        ),
+        tags$div(class = "hint",
+          paste0("Accepts: ", paste(role$levels, collapse = ", "),
+                 ". Required: ", role$min, "; max: ", role$max, "."))
+      )
+    })
+    do.call(tagList, fields)
+  })
+
+  output$analysis_alpha_field <- renderUI({
+    method <- input$analysis_method %||% "descriptives"
+    reg <- analysis_registry[[method]] %||% analysis_registry$descriptives
+    if (!isTRUE(reg$show_alpha)) {
+      return(NULL)
+    }
+    numericInput(
+      "analysis_alpha",
+      "Significance level",
+      value = shiny::isolate(input$analysis_alpha %||% 0.05),
+      min = 0.001,
+      max = 0.2,
+      step = 0.001
+    )
+  })
+
+  output$analysis_plan_validation <- renderUI({
+    method <- input$analysis_method %||% "descriptives"
+    status <- studio_validate_plan_roles(method, current_analysis_roles())
+    tags$div(class = paste("plan-msg", if (status$valid) "ok" else ""),
+      if (status$valid) {
+        paste("Required roles are complete.", status$guidance)
+      } else {
+        paste(status$messages, collapse = " ")
+      }
+    )
+  })
+
+  output$save_analysis_plan_control <- renderUI({
+    method <- input$analysis_method %||% "descriptives"
+    status <- studio_validate_plan_roles(method, current_analysis_roles())
+    if (isTRUE(status$valid)) {
+      actionButton("save_analysis_plan_btn", "Save analysis plan", class = "btn-primary")
+    } else {
+      tags$button(type = "button", class = "btn-primary", disabled = "disabled", "Save analysis plan")
+    }
+  })
+
+  observeEvent(input$save_analysis_plan_btn, {
+    req(rv$instrument)
+    method <- input$analysis_method %||% "descriptives"
+    reg <- analysis_registry[[method]] %||% analysis_registry$descriptives
+    roles <- current_analysis_roles()
+    status <- studio_validate_plan_roles(method, roles)
+    if (!isTRUE(status$valid)) {
+      showNotification(paste(status$messages, collapse = " "), type = "error")
+      return()
+    }
+    plan_id <- studio_safe_id(trim_or_null(input$analysis_plan_id) %||%
+                                studio_next_plan_id(rv$builder$analysis_plan), prefix = "RQ")
+    question <- trim_or_null(input$analysis_question) %||% paste(reg$label, "analysis")
+    options <- list()
+    if (isTRUE(reg$show_alpha)) {
+      options$alpha <- input$analysis_alpha %||% 0.05
+    }
+    block <- list(
+      id = plan_id,
+      research_question = question,
+      family = reg$family %||% "",
+      method = method,
+      test = method,
+      roles = roles,
+      variables = studio_flatten_roles(roles),
+      options = options,
+      hypotheses = if (isTRUE(reg$show_hypotheses)) {
+        list(null = "No effect or association is present.",
+             alternative = "An effect or association is present.")
+      } else {
+        NULL
+      },
+      decision_rule = trim_or_null(input$analysis_decision_rule) %||% "",
+      interpretation = trim_or_null(input$analysis_decision_rule) %||% "",
+      reporting_references = reg$refs %||% character(0),
+      citations = reg$refs %||% character(0),
+      status = "valid_plan",
+      requires_data = !method %in% c("cfa_lavaan_syntax", "sem_lavaan_syntax", "seminr_syntax")
+    )
+    state <- rv$builder
+    existing <- vapply(state$analysis_plan %||% list(), function(x) x$id %||% "", character(1))
+    idx <- match(plan_id, existing)
+    if (is.na(idx)) {
+      state$analysis_plan <- c(state$analysis_plan %||% list(), list(block))
+    } else {
+      state$analysis_plan[[idx]] <- block
+    }
+    set_builder_state(state)
+    draft <- draft_result()
+    if (draft$valid) {
+      rv$instrument <- draft$instrument
+    }
+    showNotification("Analysis plan saved.", type = "message")
+  })
+
+  output$analysis_results_output <- renderUI({
+    req(rv$instrument)
+    if (length(rv$instrument$analysis_plan %||% list()) == 0) {
+      return(NULL)
+    }
+    if (is.null(rv$responses)) {
+      return(tags$div(class = "card",
+        tags$div(class = "card-title", "Run results"),
+        tags$p(class = "hint", "Upload response data to run saved analysis plans.")))
+    }
+
+    results <- tryCatch(
+      surveyframe::run_analysis_plan(rv$responses, rv$instrument),
+      error = function(e) e
+    )
+    if (inherits(results, "error")) {
+      return(tags$div(class = "card",
+        tags$div(class = "card-title", "Run results"),
+        tags$p(conditionMessage(results))))
+    }
+
+    rows <- lapply(results, function(result) {
+      tags$tr(
+        tags$td(result$id %||% ""),
+        tags$td(result$test %||% result$method %||% ""),
+        tags$td(result$apa %||% result$error %||% "")
+      )
+    })
+    table_card("Run results",
+      headers = c("ID", "Method", "APA result"),
+      rows = rows,
+      empty_label = "No results were returned.")
+  })
+
+  observeEvent(input$delete_analysis_plan_btn, {
+    plan_id <- trim_or_null(input$delete_analysis_plan_id)
+    if (is.null(plan_id)) {
+      return()
+    }
+    state <- rv$builder
+    state$analysis_plan <- Filter(function(block) !identical(block$id, plan_id), state$analysis_plan %||% list())
+    set_builder_state(state)
+    draft <- draft_result()
+    if (draft$valid) {
+      rv$instrument <- draft$instrument
+    }
+    showNotification("Analysis plan deleted.", type = "message")
+  })
+
+  output$model_builder_card <- renderUI({
+    req(rv$instrument)
+    scale_ids <- vapply(rv$instrument$scales %||% list(), function(scale) scale$id, character(1))
+    model_count <- length(rv$instrument$models %||% list()) + 1L
+    tags$div(class = "card",
+      tags$div(class = "card-title", "Model Builder"),
+      textInput(
+        "model_id",
+        "Model ID",
+        value = shiny::isolate(input$model_id %||% paste0("model_", model_count))
+      ),
+      textInput(
+        "model_label",
+        "Model label",
+        value = shiny::isolate(input$model_label %||% paste(rv$instrument$meta$title %||% "Survey", "model"))
+      ),
+      selectInput(
+        "model_type",
+        "Output engine",
+        choices = c("lavaan CFA" = "cfa", "lavaan CB-SEM" = "cb_sem", "seminr PLS-SEM" = "pls_sem"),
+        selected = shiny::isolate(input$model_type %||% "cfa")
+      ),
+      radioButtons(
+        "model_mode",
+        "Measurement mode",
+        choices = c("Reflective" = "reflective", "Composite" = "composite", "Single item" = "single_item"),
+        selected = shiny::isolate(input$model_mode %||% "reflective"),
+        inline = TRUE
+      ),
+      checkboxGroupInput(
+        "model_scales",
+        "Create constructs from scales",
+        choices = stats::setNames(scale_ids, scale_ids),
+        selected = intersect(shiny::isolate(input$model_scales %||% character(0)), scale_ids)
+      ),
+      textAreaInput("model_paths", "Structural paths", value = shiny::isolate(input$model_paths %||% ""),
+                    rows = 3, placeholder = "SAT -> LOY"),
+      textAreaInput("model_covariances", "Covariances", value = shiny::isolate(input$model_covariances %||% ""),
+                    rows = 2, placeholder = "SAT ~~ LOY"),
+      textAreaInput("model_indirect", "Indirect effects", value = shiny::isolate(input$model_indirect %||% ""),
+                    rows = 2, placeholder = "SAT -> TRUST -> LOY"),
+      numericInput("model_bootstrap", "Bootstrap samples", value = shiny::isolate(input$model_bootstrap %||% 5000),
+                   min = 0, step = 100),
+      tags$div(class = "card-actions",
+        actionButton("save_model_btn", "Save model", class = "btn-primary")
+      ),
+      if (length(scale_ids) == 0) {
+        tags$p(class = "hint", "Create scales before saving CFA, CB-SEM, or PLS-SEM models.")
+      }
+    )
+  })
+
+  observeEvent(input$save_model_btn, {
+    req(rv$instrument)
+    scale_ids <- input$model_scales %||% character(0)
+    if (length(scale_ids) == 0) {
+      showNotification("Select at least one scale to create model constructs.", type = "error")
+      return()
+    }
+    scales <- Filter(function(scale) scale$id %in% scale_ids, rv$instrument$scales %||% list())
+    type <- input$model_type %||% "cfa"
+    mode <- if (identical(type, "pls_sem")) {
+      input$model_mode %||% "composite"
+    } else {
+      "reflective"
+    }
+    constructs <- lapply(scales, function(scale) {
+      surveyframe::sf_construct(
+        id = studio_safe_id(scale$id, prefix = "C"),
+        label = scale$label %||% scale$id,
+        items = scale$items %||% character(0),
+        mode = mode
+      )
+    })
+    paths <- studio_parse_paths(input$model_paths)
+    if (type %in% c("cb_sem", "pls_sem") && length(paths) == 0) {
+      showNotification("CB-SEM and PLS-SEM models require at least one structural path.", type = "error")
+      return()
+    }
+    model <- surveyframe::sf_model(
+      id = studio_safe_id(trim_or_null(input$model_id) %||% paste0("model_", length(rv$instrument$models %||% list()) + 1L), prefix = "model"),
+      label = trim_or_null(input$model_label),
+      type = type,
+      engine = if (identical(type, "pls_sem")) "seminr" else "lavaan",
+      constructs = constructs,
+      paths = paths,
+      covariances = studio_parse_covariances(input$model_covariances),
+      indirect = studio_parse_indirect(input$model_indirect),
+      options = list(
+        estimator = "MLR",
+        standardised = TRUE,
+        bootstrap = input$model_bootstrap %||% 5000,
+        missing = "fiml"
+      )
+    )
+    tryCatch({
+      surveyframe::validate_model(model, instrument = rv$instrument, strict = TRUE)
+      state <- rv$builder
+      existing <- vapply(state$models %||% list(), function(x) x$id %||% "", character(1))
+      idx <- match(model$id, existing)
+      if (is.na(idx)) {
+        state$models <- c(state$models %||% list(), list(model))
+      } else {
+        state$models[[idx]] <- model
+      }
+      set_builder_state(state)
+      draft <- draft_result()
+      if (draft$valid) {
+        rv$instrument <- draft$instrument
+      }
+      showNotification("Model saved into the .sframe draft.", type = "message")
+    }, error = function(e) {
+      showNotification(paste("Model error:", conditionMessage(e)), type = "error")
+    })
+  })
+
+  output$models_table <- renderUI({
+    req(rv$instrument)
+    models <- rv$instrument$models %||% list()
+    if (length(models) == 0) {
+      return(NULL)
+    }
+
+    rows <- lapply(models, function(model) {
+      constructs <- model$measurement$constructs %||% model$constructs %||% list()
+      paths <- model$structural$paths %||% model$paths %||% list()
+      tags$tr(
+        tags$td(model$id %||% ""),
+        tags$td(model$label %||% ""),
+        tags$td(model$type %||% ""),
+        tags$td(model$engine %||% ""),
+        tags$td(length(constructs)),
+        tags$td(length(paths))
+      )
+    })
+    table_card("Saved models",
+      headers = c("ID", "Label", "Type", "Engine", "Constructs", "Paths"),
+      rows = rows,
+      empty_label = "No saved models.")
+  })
+
+  output$model_syntax_output <- renderUI({
+    req(rv$instrument)
+    models <- rv$instrument$models %||% list()
+    if (length(models) == 0) {
+      return(NULL)
+    }
+
+    cards <- lapply(models, function(model) {
+      syntax <- tryCatch(
+        switch(model$type %||% "",
+          cfa = surveyframe::cfa_lavaan_syntax(instrument = rv$instrument, model = model),
+          cb_sem = surveyframe::sem_lavaan_syntax(model, instrument = rv$instrument),
+          sem = surveyframe::sem_lavaan_syntax(model, instrument = rv$instrument),
+          pls_sem = surveyframe::seminr_syntax(model),
+          "Syntax preview is not available for this model type."
+        ),
+        error = function(e) paste("Syntax preview could not be generated:", conditionMessage(e))
+      )
+      json <- tryCatch(
+        surveyframe::model_json(model, pretty = TRUE),
+        error = function(e) paste("Model JSON could not be generated:", conditionMessage(e))
+      )
+      tags$div(class = "card",
+        tags$div(class = "card-title", model$label %||% model$id %||% "Saved model"),
+        tags$p(class = "hint", paste("Type:", model$type %||% "", "| Engine:", model$engine %||% "")),
+        tags$h4("Syntax"),
+        tags$pre(class = "sf-code", syntax),
+        tags$h4("Model JSON"),
+        tags$pre(class = "sf-code", json)
+      )
+    })
+    do.call(tagList, cards)
+  })
+
+  output$dashboard_gate <- renderUI({
+    if (is.null(rv$instrument)) {
+      return(tags$div(class = "card",
+        "Load or build an instrument before opening the dashboard."))
+    }
+    if (is.null(rv$responses)) {
+      return(tags$div(class = "card",
+        "Load responses before opening a response dashboard."))
+    }
+    NULL
+  })
+
+  output$dashboard_summary_card <- renderUI({
+    req(rv$instrument)
+    tags$div(class = "card",
+      tags$div(class = "card-title", rv$instrument$meta$title %||% "Dashboard data"),
+      tags$div(class = "stat-row",
+        tags$div(class = "stat-box",
+          tags$div(class = "stat-val", length(rv$instrument$items %||% list())),
+          tags$div(class = "stat-lbl", "Items")),
+        tags$div(class = "stat-box",
+          tags$div(class = "stat-val", length(rv$instrument$scales %||% list())),
+          tags$div(class = "stat-lbl", "Scales")),
+        tags$div(class = "stat-box",
+          tags$div(class = "stat-val", if (is.null(rv$responses)) 0 else nrow(rv$responses)),
+          tags$div(class = "stat-lbl", "Responses")),
+        tags$div(class = "stat-box",
+          tags$div(class = "stat-val", if (is.null(rv$responses)) 0 else ncol(rv$responses)),
+          tags$div(class = "stat-lbl", "Columns"))
+      )
+    )
+  })
+
+  observeEvent(input$open_response_dashboard, {
+    if (is.null(rv$instrument)) {
+      showNotification(
+        "Load or build an instrument before opening the dashboard.",
+        type = "error"
+      )
+      return()
+    }
+    showNotification(
+      "Opening dashboard in a separate R/Shiny session is recommended. Use launch_dashboard(instrument, responses) from the R console.",
+      type = "message"
+    )
+  })
+
   output$export_gate <- renderUI({
     if (is.null(rv$instrument)) {
       tags$div(class = "card",
@@ -1428,7 +2702,11 @@ server <- function(input, output, session) {
           output_file = file,
           include_codebook = isTRUE(input$rpt_codebook),
           include_quality = isTRUE(input$rpt_quality),
-          include_reliability = isTRUE(input$rpt_reliability)
+          include_missing = isTRUE(input$rpt_missing),
+          include_descriptives = isTRUE(input$rpt_descriptives),
+          include_reliability = isTRUE(input$rpt_reliability),
+          include_analysis = isTRUE(input$rpt_analysis),
+          include_models = isTRUE(input$rpt_models)
         )
       }, error = function(e) {
         showNotification(paste("Report error:", conditionMessage(e)), type = "error")

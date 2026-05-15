@@ -18,15 +18,15 @@ the analysis. Defaults to \code{TRUE}.}
 \value{
 An object of class \code{sframe_analysis_results}, a list with one
 element per analysis block. Each element contains the test result,
-APA string, interpretation prompt, and citations. Pass to
-\code{\link[=render_results]{render_results()}} to generate a formatted report.
+APA string, interpretation prompt, and reporting-reference metadata. Pass
+to \code{\link[=render_results]{render_results()}} to generate a formatted report.
 }
 \description{
 Executes every analysis block defined in the instrument's \code{analysis_plan}
 slot against the supplied response data. Each block corresponds to one
 research question defined during instrument design in the SurveyBuilder.
 Results include APA-formatted statistics, effect sizes, interpretation
-prompts, and pre-populated citations.
+prompts, and reporting references.
 }
 \examples{
 instr <- read_sframe(

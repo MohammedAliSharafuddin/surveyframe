@@ -48,8 +48,8 @@ dim(responses)
 
 ## Demo launchers
 
-The demo launchers are not evaluated in this vignette because CRAN examples
-and vignettes should not open browsers.
+This vignette leaves the demo launchers unevaluated because CRAN examples and
+vignettes should avoid opening browsers.
 
 ```{r gui-demo, eval = FALSE}
 launch_builder_demo()
@@ -103,6 +103,17 @@ launch_dashboard(
 Use the dashboard after data collection for read-only exploration. In v0.4,
 the dashboard can be refactored into a native SurveyStudio tab after the v0.3
 CRAN release is stable.
+
+## Known limitations
+
+SurveyBuilder stores short autosave recovery data in browser `localStorage`.
+Browsers can clear that storage when site data are cleared, private browsing is
+used, or a storage quota is reached. Save a `.sframe` file before closing the
+browser when work matters.
+
+The builder first tries the browser `crypto.subtle` API for SHA-256 hashing and
+then uses the bundled JavaScript fallback. This supports browsers that restrict
+`crypto.subtle` on local `file://` pages.
 
 ## Moving files between tools
 

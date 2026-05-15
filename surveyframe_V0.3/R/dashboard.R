@@ -28,7 +28,7 @@
 #'   produced by [read_responses()] or [read_sheet_responses()]. When NULL
 #'   and `instrument` is also NULL, the bundled simulated demo responses are
 #'   loaded. When NULL with a user-supplied instrument, the dashboard opens
-#'   with instrument metadata and chart stubs only.
+#'   with instrument metadata and no response summaries.
 #' @param port Integer or NULL. TCP port for the Shiny server. When NULL,
 #'   Shiny selects an available port automatically.
 #' @param host Character. Host address passed to [shiny::runApp()]. Defaults

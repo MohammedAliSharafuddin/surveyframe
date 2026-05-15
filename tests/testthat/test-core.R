@@ -559,6 +559,7 @@ test_that("reliability_report() returns sframe_reliability_report", {
   rr <- reliability_report(d$resp, d$instr, omega = FALSE)
   expect_s3_class(rr, "sframe_reliability_report")
   expect_equal(length(rr), 1)
+  expect_equal(names(rr), "sat")
 })
 
 test_that("reliability_report() alpha is in [0, 1]", {
@@ -600,6 +601,7 @@ test_that("item_report() returns sframe_item_report with expected columns", {
   d  <- load_resp(40)
   ir <- item_report(d$resp, d$instr)
   expect_s3_class(ir, "sframe_item_report")
+  expect_equal(names(ir), "sat")
   diag_cols <- colnames(ir[[1]]$diagnostics)
   expect_true("item_rest_r"  %in% diag_cols)
   expect_true("floor_pct"    %in% diag_cols)
@@ -799,6 +801,26 @@ test_that("render_survey() helpers identify visible required items", {
 
   expect_equal(missing, "sat_2")
   expect_true(surveyframe:::sframe_item_visible(instr$items[[6]], input_values, branch_lookup))
+})
+
+test_that("render_survey() branching handles all operators and multi-value answers", {
+  rule <- function(operator, value, action = "show") {
+    sf_branch("q2", depends_on = "q1", operator = operator, value = value,
+              action = action)
+  }
+
+  expect_true(surveyframe:::.evaluate_branch(rule("==", "a"), c("a", "b")))
+  expect_false(surveyframe:::.evaluate_branch(rule("==", "c"), c("a", "b")))
+  expect_false(surveyframe:::.evaluate_branch(rule("!=", "a"), c("a", "b")))
+  expect_true(surveyframe:::.evaluate_branch(rule("!=", "c"), c("a", "b")))
+  expect_true(surveyframe:::.evaluate_branch(rule("%in%", c("b", "c")), c("a", "b")))
+  expect_true(surveyframe:::.evaluate_branch(rule(">", "3"), c("2", "4")))
+  expect_true(surveyframe:::.evaluate_branch(rule(">=", "4"), "4"))
+  expect_true(surveyframe:::.evaluate_branch(rule("<", "3"), "2"))
+  expect_true(surveyframe:::.evaluate_branch(rule("<=", "2"), "2"))
+  expect_false(surveyframe:::.evaluate_branch(rule(">", "3"), "x"))
+  expect_false(surveyframe:::.evaluate_branch(rule("==", "a"), NA_character_))
+  expect_true(surveyframe:::.evaluate_branch(rule("==", "a", action = "hide"), NA_character_))
 })
 
 test_that("render_survey() response rows blank hidden items and append to csv", {

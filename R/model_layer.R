@@ -2,8 +2,37 @@
 # Model specification objects and syntax generators for surveyframe.
 
 sframe_model_safe_id <- function(x) {
-  is.character(x) && length(x) == 1L && nzchar(x) &&
+  is.character(x) && length(x) == 1L && !is.na(x) && nzchar(x) &&
     grepl("^[A-Za-z][A-Za-z0-9_]*$", x)
+}
+
+sframe_model_abort_bad_id <- function(arg) {
+  rlang::abort(
+    paste0(
+      "`", arg, "` must start with a letter and contain only letters, ",
+      "numbers, and underscores."
+    ),
+    class = c("sframe_validation_error", "sframe_error")
+  )
+}
+
+sframe_model_check_id <- function(value, arg) {
+  if (!sframe_model_safe_id(value)) {
+    sframe_model_abort_bad_id(arg)
+  }
+  invisible(value)
+}
+
+sframe_model_check_ids <- function(value, arg, allow_empty = FALSE) {
+  if (is.null(value) && isTRUE(allow_empty)) {
+    return(invisible(character(0)))
+  }
+  if (!is.character(value) || anyNA(value) ||
+      (!allow_empty && length(value) == 0L) ||
+      any(!vapply(value, sframe_model_safe_id, logical(1)))) {
+    sframe_model_abort_bad_id(arg)
+  }
+  invisible(value)
 }
 
 sframe_model_as_list <- function(x) {
@@ -91,12 +120,15 @@ sf_construct <- function(
     weights = NULL
 ) {
   mode <- rlang::arg_match(mode)
+  sframe_model_check_id(id, "id")
+  items <- as.character(items %||% character(0))
+  sframe_model_check_ids(items, "items", allow_empty = TRUE)
   structure(
     list(
       id = id,
       label = label %||% id,
       mode = mode,
-      items = as.character(items %||% character(0)),
+      items = items,
       weights = weights
     ),
     class = "sf_construct"
@@ -112,6 +144,8 @@ sf_construct <- function(
 #' @return An object of class `sf_path`.
 #' @export
 sf_path <- function(from, to, label = NULL) {
+  sframe_model_check_id(from, "from")
+  sframe_model_check_id(to, "to")
   structure(
     list(from = from, to = to, label = label),
     class = "sf_path"
@@ -127,6 +161,8 @@ sf_path <- function(from, to, label = NULL) {
 #' @return An object of class `sf_covariance`.
 #' @export
 sf_covariance <- function(from, to, label = NULL) {
+  sframe_model_check_id(from, "from")
+  sframe_model_check_id(to, "to")
   structure(
     list(from = from, to = to, label = label),
     class = "sf_covariance"
@@ -143,8 +179,12 @@ sf_covariance <- function(from, to, label = NULL) {
 #' @return An object of class `sf_indirect`.
 #' @export
 sf_indirect <- function(from, through, to, label = NULL) {
+  sframe_model_check_id(from, "from")
+  through <- as.character(through)
+  sframe_model_check_ids(through, "through")
+  sframe_model_check_id(to, "to")
   structure(
-    list(from = from, through = as.character(through), to = to, label = label),
+    list(from = from, through = through, to = to, label = label),
     class = "sf_indirect"
   )
 }
@@ -178,6 +218,7 @@ sf_model <- function(
     options = list()
 ) {
   type <- rlang::arg_match(type)
+  sframe_model_check_id(id, "id")
   engine <- engine %||% switch(
     type,
     efa = "psych",
@@ -283,8 +324,9 @@ validate_model <- function(model, instrument = NULL, strict = TRUE) {
     }
     if ((model$type %||% "") %in% c("cfa", "cb_sem") && mode %in% c("formative", "composite")) {
       problems <- c(problems,
-        paste0("lavaan model '", model$id, "' cannot use construct '", con$id,
-               "' with mode '", mode, "' in v0.3 syntax generation."))
+        paste0("lavaan syntax generation for model '", model$id,
+               "' supports reflective or single-item construct modes. ",
+               "Construct '", con$id, "' uses mode '", mode, "'."))
     }
   }
 
@@ -296,11 +338,11 @@ validate_model <- function(model, instrument = NULL, strict = TRUE) {
   for (path in paths) {
     if (!path$from %in% construct_ids) {
       problems <- c(problems,
-        paste0("Path source '", path$from, "' is not a construct."))
+        paste0("Path source '", path$from, "' does not match any construct."))
     }
     if (!path$to %in% construct_ids) {
       problems <- c(problems,
-        paste0("Path target '", path$to, "' is not a construct."))
+        paste0("Path target '", path$to, "' does not match any construct."))
     }
     if (identical(path$from, path$to)) {
       problems <- c(problems,

@@ -326,6 +326,137 @@ missing_data_report <- function(data, instrument = NULL, variables = NULL) {
   )
 }
 
+#' Flag univariate and multivariate outliers
+#'
+#' Uses transparent screening rules for numeric survey response variables. The
+#' report supports data review before modelling, not automatic deletion.
+#'
+#' @param data A data.frame.
+#' @param variables Character vector of numeric variables to screen. When
+#'   `NULL`, all numeric columns are used.
+#' @param method Outlier rule. `"zscore"` flags absolute z scores above
+#'   `z_cut`; `"iqr"` flags values outside Tukey fences; `"mahalanobis"`
+#'   flags rows above the chi-square cutoff for the selected variables.
+#' @param z_cut Numeric cutoff for `"zscore"`. Defaults to `3`.
+#' @param iqr_multiplier Numeric multiplier for `"iqr"` fences. Defaults to
+#'   `1.5`.
+#' @param p_cut Probability cutoff for `"mahalanobis"`. Defaults to `0.975`.
+#'
+#' @return An object of class `sframe_outlier_report` with the method, screened
+#'   variables, a result table, flagged row numbers, and a reporting prompt.
+#' @export
+#'
+#' @examples
+#' demo <- sframe_demo_data()
+#' outliers <- outlier_report(
+#'   demo$responses,
+#'   variables = c("dm_1", "dm_2", "sat_1"),
+#'   method = "zscore"
+#' )
+#' outliers$flagged_rows
+outlier_report <- function(
+    data,
+    variables = NULL,
+    method = c("zscore", "iqr", "mahalanobis"),
+    z_cut = 3,
+    iqr_multiplier = 1.5,
+    p_cut = 0.975
+) {
+  stopifnot(is.data.frame(data))
+  method <- rlang::arg_match(method)
+  variables <- variables %||% names(data)[vapply(data, is.numeric, logical(1))]
+  variables <- intersect(variables, names(data))
+  if (length(variables) == 0L) {
+    rlang::abort(
+      "`variables` must include at least one column in `data`.",
+      class = c("sframe_validation_error", "sframe_error")
+    )
+  }
+
+  numeric_data <- as.data.frame(lapply(data[variables], function(x) {
+    suppressWarnings(as.numeric(x))
+  }))
+
+  if (method == "zscore") {
+    rows <- do.call(rbind, lapply(names(numeric_data), function(var) {
+      x <- numeric_data[[var]]
+      sx <- stats::sd(x, na.rm = TRUE)
+      z <- if (is.finite(sx) && sx > 0) {
+        (x - mean(x, na.rm = TRUE)) / sx
+      } else {
+        rep(NA_real_, length(x))
+      }
+      data.frame(
+        row = seq_along(x),
+        variable = var,
+        value = x,
+        statistic = z,
+        threshold = z_cut,
+        flagged = abs(z) > z_cut,
+        stringsAsFactors = FALSE
+      )
+    }))
+  } else if (method == "iqr") {
+    rows <- do.call(rbind, lapply(names(numeric_data), function(var) {
+      x <- numeric_data[[var]]
+      qs <- stats::quantile(x, c(0.25, 0.75), na.rm = TRUE, names = FALSE)
+      iqr <- qs[[2]] - qs[[1]]
+      low <- qs[[1]] - iqr_multiplier * iqr
+      high <- qs[[2]] + iqr_multiplier * iqr
+      data.frame(
+        row = seq_along(x),
+        variable = var,
+        value = x,
+        statistic = x,
+        threshold = paste0("[", signif(low, 4), ", ", signif(high, 4), "]"),
+        flagged = x < low | x > high,
+        stringsAsFactors = FALSE
+      )
+    }))
+  } else {
+    complete <- stats::complete.cases(numeric_data)
+    x <- numeric_data[complete, , drop = FALSE]
+    if (nrow(x) <= ncol(x)) {
+      rlang::abort(
+        "Mahalanobis screening needs more complete rows than variables.",
+        class = c("sframe_validation_error", "sframe_error")
+      )
+    }
+    cov_mat <- stats::cov(x)
+    inv <- tryCatch(solve(cov_mat), error = function(e) NULL)
+    if (is.null(inv)) {
+      rlang::abort(
+        "Mahalanobis screening needs a non-singular covariance matrix.",
+        class = c("sframe_validation_error", "sframe_error")
+      )
+    }
+    distances <- rep(NA_real_, nrow(data))
+    distances[complete] <- stats::mahalanobis(x, colMeans(x), cov_mat)
+    cutoff <- stats::qchisq(p_cut, df = ncol(x))
+    rows <- data.frame(
+      row = seq_len(nrow(data)),
+      variable = paste(variables, collapse = ", "),
+      value = NA_real_,
+      statistic = distances,
+      threshold = cutoff,
+      flagged = distances > cutoff,
+      stringsAsFactors = FALSE
+    )
+  }
+
+  flagged_rows <- sort(unique(rows$row[rows$flagged %in% TRUE]))
+  structure(
+    list(
+      method = method,
+      variables = variables,
+      table = rows,
+      flagged_rows = flagged_rows,
+      prompt = "Review flagged observations before modelling and document any exclusion rule."
+    ),
+    class = "sframe_outlier_report"
+  )
+}
+
 #' Assumption-check report
 #'
 #' Performs common assumption checks for survey analyses using base R where
@@ -519,7 +650,7 @@ posthoc_report <- function(
     tables$pairwise_wilcox <- stats::pairwise.wilcox.test(x[ok], g[ok],
                                                           p.adjust.method = correction)
     warnings <- c(warnings,
-      "Dunn tests require an optional package and are not run by default.")
+      "Dunn post-hoc tests require an optional package; surveyframe skips them by default.")
   }
   if (method == "chi_square" && length(table_vars %||% character(0)) >= 2) {
     tbl <- table(data[[table_vars[1]]], data[[table_vars[2]]])

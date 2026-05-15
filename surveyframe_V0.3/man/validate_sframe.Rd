@@ -40,6 +40,8 @@ The following checks are performed:
 \item Scale \code{items} vectors containing IDs not present in the instrument
 \item Branching rules referencing item IDs not present in the instrument
 \item Attention checks referencing item IDs not present in the instrument
+\item Analysis plan roles referencing missing variables or models
+\item Model specifications referencing missing indicators or constructs
 }
 }
 \examples{

@@ -1,5 +1,5 @@
 Package: surveyframe
-Title: Survey Instrument Design, Validation, and Response Workflows
+Title: Survey Instrument Workflows for R
 Version: 0.3.0
 Authors@R: c(
     person(
@@ -10,13 +10,13 @@ Authors@R: c(
       comment = c(ORCID = "0000-0001-5247-2964")
     )
   )
-Description: Provides an end-to-end survey research workflow built around a
-    single typed instrument object (the 'sframe'). Capabilities include visual
-    instrument design via a browser-based builder or Shiny studio, export to a
-    self-contained static HTML survey, an embeddable Shiny module,
-    SHA-256 integrity-checked serialisation to the '.sframe' format,
-    multi-page survey rendering, branching logic, response quality checking,
-    scale scoring, psychometric diagnostics, analysis-plan execution,
+Description: Provides survey research workflows built around a typed
+    instrument object (the 'sframe'). Capabilities include visual instrument
+    design via a browser-based builder or Shiny studio, export to a
+    self-contained static HTML survey, an embeddable Shiny module, SHA-256
+    integrity-checked serialisation to the '.sframe' format, multi-page survey
+    rendering, branching logic, response quality checking, scale scoring,
+    psychometric diagnostics, analysis-plan execution, model syntax planning,
     an interactive response dashboard, codebook generation, and reproducible
     HTML reporting.
 License: MIT + file LICENSE
@@ -35,11 +35,13 @@ Suggests:
     googlesheets4 (>= 1.1.0),
     shiny (>= 1.7.0),
     psych (>= 2.3.0),
+    MASS,
+    nnet,
     digest (>= 0.6.0),
-    quarto (>= 1.2),
     testthat (>= 3.0.0),
     knitr,
     rmarkdown
 VignetteBuilder: knitr
 Config/testthat/edition: 3
 Config/roxygen2/version: 8.0.0
+RoxygenNote: 7.3.3

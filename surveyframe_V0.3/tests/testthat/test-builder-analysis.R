@@ -419,8 +419,10 @@ test_that("render_report includes analysis plan questions", {
 
 test_that("render_report includes reliability when data supplied", {
   tmp  <- tempfile(fileext = ".html")
-  render_report(make_instr(), data = make_responses(), output_file = tmp,
-                include_reliability = TRUE)
+  suppressWarnings(render_report(
+    make_instr(), data = make_responses(), output_file = tmp,
+    include_reliability = TRUE
+  ))
   html <- paste(readLines(tmp, warn = FALSE), collapse = "\n")
   expect_true(grepl("Reliability|alpha|Cronbach", html, ignore.case = TRUE))
   unlink(tmp)

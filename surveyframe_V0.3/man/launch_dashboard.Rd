@@ -20,7 +20,7 @@ services demo instrument is loaded.}
 produced by \code{\link[=read_responses]{read_responses()}} or \code{\link[=read_sheet_responses]{read_sheet_responses()}}. When NULL
 and \code{instrument} is also NULL, the bundled simulated demo responses are
 loaded. When NULL with a user-supplied instrument, the dashboard opens
-with instrument metadata and chart stubs only.}
+with instrument metadata and no response summaries.}
 
 \item{port}{Integer or NULL. TCP port for the Shiny server. When NULL,
 Shiny selects an available port automatically.}

@@ -16,6 +16,7 @@ sframe_serialization_payload <- function(instrument, hash_value = "") {
     branching = lapply(instrument$branching, sframe_strip_component_class),
     checks = lapply(instrument$checks, sframe_strip_component_class),
     analysis_plan = instrument$analysis_plan %||% list(),
+    models = lapply(instrument$models %||% list(), sframe_model_plain),
     render = instrument$render
   )
 }
@@ -238,15 +239,27 @@ sframe_restore_check <- function(check) {
 sframe_restore_analysis_block <- function(block) {
   block$id <- as.character(block$id %||% "")
   block$research_question <- as.character(block$research_question %||% "")
+  block$family <- as.character(block$family %||% "")
+  block$method <- as.character(block$method %||% block$test %||% "")
+  block$roles <- sframe_empty_to_null(block$roles) %||% list()
+  block$options <- sframe_empty_to_null(block$options) %||% list()
+  block$hypotheses <- sframe_empty_to_null(block$hypotheses)
+  block$decision_rule <- as.character(block$decision_rule %||% block$interpretation %||% "")
+  block$reporting_references <- sframe_as_vector(
+    sframe_empty_to_null(block$reporting_references %||% block$citations),
+    "character"
+  ) %||% character(0)
+  block$status <- as.character(block$status %||% "draft")
+  block$requires_data <- if (is.null(block$requires_data)) TRUE else isTRUE(block$requires_data)
   block$variables <- sframe_as_vector(
     sframe_empty_to_null(block$variables),
     "character"
   )
-  block$test <- as.character(block$test %||% "")
+  block$test <- as.character(block$test %||% block$method %||% "")
   block$alpha <- if (!is.null(sframe_empty_to_null(block$alpha))) {
     as.numeric(block$alpha)
   } else {
-    0.05
+    sframe_empty_to_null(block$options$alpha)
   }
   block$interpretation <- as.character(block$interpretation %||% "")
   block$citations <- sframe_as_vector(
@@ -255,6 +268,52 @@ sframe_restore_analysis_block <- function(block) {
   ) %||% character(0)
   block$result <- sframe_empty_to_null(block$result)
   block
+}
+
+sframe_restore_model <- function(model) {
+  if (is.null(model$type)) model$type <- "cfa"
+  if (identical(model$type, "sem")) model$type <- "cb_sem"
+  if (is.null(model$engine)) {
+    model$engine <- switch(
+      model$type,
+      cfa = "lavaan",
+      cb_sem = "lavaan",
+      pls_sem = "seminr",
+      sem = "lavaan",
+      "lavaan"
+    )
+  }
+  if (is.null(model$measurement)) model$measurement <- list(constructs = list())
+  if (is.null(model$measurement$constructs)) model$measurement$constructs <- list()
+  if (is.null(model$structural)) {
+    model$structural <- list(paths = list(), covariances = list(), indirect = list())
+  }
+  if (is.null(model$structural$paths)) model$structural$paths <- list()
+  if (is.null(model$structural$covariances)) model$structural$covariances <- list()
+  if (is.null(model$structural$indirect)) model$structural$indirect <- list()
+  if (is.null(model$options)) model$options <- list()
+
+  model$measurement$constructs <- lapply(model$measurement$constructs, function(con) {
+    con$items <- sframe_as_vector(sframe_empty_to_null(con$items), "character") %||% character(0)
+    con$mode <- as.character(con$mode %||% "reflective")
+    class(con) <- "sf_construct"
+    con
+  })
+  model$structural$paths <- lapply(model$structural$paths, function(path) {
+    class(path) <- "sf_path"
+    path
+  })
+  model$structural$covariances <- lapply(model$structural$covariances, function(cov) {
+    class(cov) <- "sf_covariance"
+    cov
+  })
+  model$structural$indirect <- lapply(model$structural$indirect, function(ind) {
+    ind$through <- sframe_as_vector(sframe_empty_to_null(ind$through), "character") %||% character(0)
+    class(ind) <- "sf_indirect"
+    ind
+  })
+  class(model) <- "sf_model"
+  model
 }
 
 sframe_validate_parsed_payload <- function(parsed, path) {
@@ -378,6 +437,7 @@ read_sframe <- function(path, validate = TRUE) {
         parsed$analysis_plan %||% list(),
         sframe_restore_analysis_block
       ),
+      models    = lapply(parsed$models %||% list(), sframe_restore_model),
       render    = parsed$render %||% list()
     ),
     class = "sframe"

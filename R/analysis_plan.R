@@ -79,7 +79,7 @@
   ),
   r_core = list(
     key  = "r_core",
-    apa  = sprintf("R Core Team. (%s). *R: A language and environment for statistical computing*. R Foundation for Statistical Computing.", format(Sys.Date(), "%Y")),
+    apa  = "R Core Team. (2026). *R: A language and environment for statistical computing*. R Foundation for Statistical Computing.",
     use  = "all"
   ),
   surveyframe = list(
@@ -91,10 +91,6 @@
 
 sframe_citations_for_test <- function(test) {
   citations <- .sframe_citations
-  citations$r_core$apa <- sprintf(
-    "R Core Team. (%s). *R: A language and environment for statistical computing*. R Foundation for Statistical Computing.",
-    format(Sys.Date(), "%Y")
-  )
   matching <- Filter(function(cit) {
     "all" %in% cit$use || test %in% cit$use
   }, citations)
