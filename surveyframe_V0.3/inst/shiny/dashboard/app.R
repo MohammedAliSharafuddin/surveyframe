@@ -2,7 +2,32 @@
 # Launched by launch_dashboard(). Reads SFRAME_INSTRUMENT and
 # SFRAME_RESPONSES from the calling environment via app.R-level globals.
 
-library(shiny)
+if (!requireNamespace("shiny", quietly = TRUE)) {
+  stop("Package 'shiny' is required to launch the dashboard.", call. = FALSE)
+}
+
+tags <- shiny::tags
+HTML <- shiny::HTML
+fluidPage <- shiny::fluidPage
+div <- shiny::div
+p <- shiny::p
+tagList <- shiny::tagList
+actionButton <- shiny::actionButton
+selectInput <- shiny::selectInput
+dateRangeInput <- shiny::dateRangeInput
+downloadButton <- shiny::downloadButton
+downloadHandler <- shiny::downloadHandler
+uiOutput <- shiny::uiOutput
+plotOutput <- shiny::plotOutput
+tableOutput <- shiny::tableOutput
+renderUI <- shiny::renderUI
+renderPlot <- shiny::renderPlot
+renderTable <- shiny::renderTable
+reactive <- shiny::reactive
+reactiveVal <- shiny::reactiveVal
+observeEvent <- shiny::observeEvent
+req <- shiny::req
+shinyApp <- shiny::shinyApp
 
 `%||%` <- function(x, y) if (is.null(x)) y else x
 
