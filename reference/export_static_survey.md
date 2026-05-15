@@ -87,7 +87,7 @@ instr <- sf_instrument("Customer Satisfaction Survey",
 out <- export_static_survey(instr,
                              output_path = file.path(tempdir(), "sat.html"),
                              open = FALSE)
-#> Static survey written to '/tmp/RtmppxYJqe/sat.html' (28 KB).
+#> Static survey written to '/tmp/RtmpKmjVBS/sat.html' (28 KB).
 file.exists(out)
 #> [1] TRUE
 
