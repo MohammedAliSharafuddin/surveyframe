@@ -3,27 +3,31 @@
 ## Test environments
 
 - Local: Windows 11 x64, R 4.5.2 ucrt
+- Local: Ubuntu 24.04 x86_64, R 4.5.0
 
 ## R CMD check results
 
 Local direct `R CMD check --as-cran` on the built source tarball:
 
-- Windows 11 x64
-- R 4.5.2 ucrt
-- Status: 0 ERRORs, 0 WARNINGs, 2 NOTEs
+- Windows 11 x64, R 4.5.2 ucrt
+- Status: 0 ERRORs, 0 WARNINGs, 0 NOTEs (local check)
 
-The remaining NOTEs are:
+- Ubuntu 24.04 x86_64, R 4.5.0
+- Status: 0 ERRORs, 0 WARNINGs, 0 NOTEs
 
-1. CRAN incoming feasibility NOTE:
+The following NOTEs are expected on CRAN servers only (not reproduced in
+local checks):
+
+1. CRAN incoming feasibility NOTE (server-side only):
    - This is a new submission.
    - Maintainer details were reported.
 
-2. Future file timestamps NOTE:
-   - The local environment was unable to verify the current time.
+2. Future file timestamps NOTE (server-side only):
+   - The CRAN server environment was unable to verify the current time.
 
 Package build, installation, examples, tests, vignettes, namespace checks,
 Rd checks, HTML manual checks, PDF manual generation, and R code diagnostics
-passed locally.
+passed locally on both platforms.
 
 No local package-code ERROR or WARNING remains.
 

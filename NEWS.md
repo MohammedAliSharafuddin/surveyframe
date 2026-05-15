@@ -173,6 +173,41 @@ interpretation `prompt` field to guide write-up.
 * Added `cran-comments.md` with platform list, dependency justification,
   bundled-asset description, and a `\dontrun{}` use justification table.
 
+* `launch_builder_demo()` now injects the demo instrument JSON directly into
+  a temporary copy of `survey_builder.html`. The demo questions, scales, and
+  analysis plan are visible immediately on launch — no manual Load .sframe
+  step is needed.
+* `launch_studio_demo()` and `launch_dashboard_demo()` now pass
+  `launch.browser = TRUE` so the browser always opens automatically.
+* `inst/shiny/dashboard/app.R`: replaced `library(shiny)` with a
+  `requireNamespace` check and explicit `shiny::` namespace prefixes for CRAN
+  policy compliance.
+* `db_quality_ui()`: `class = flag_class` added to `tags$tr()` so quality
+  rows are colour-coded by flag status.
+* `db_data_ui()`: download-button background colour now uses
+  `sprintf("...%s...", THEME)` instead of `background:var(--cp,#2563eb)` so
+  the button respects the active dashboard theme.
+* `db_overview_ui()`: date parsing is now delegated to `dashboard_parse_date()`
+  for robust, error-free date display.
+* `render_report()` and `render_results()`: HTML report tables now use APA
+  formatting — horizontal rules only, no vertical borders, no row shading.
+  A significance footnote is appended automatically when a p-value column is
+  detected.
+* `demo/survey.R`: complete UX rewrite with section headers, contextual pause
+  prompts, "In the browser: ->" guidance, `ask_yn()` yes/no prompts, and a
+  conversational mode for static survey export. All output is ASCII-safe.
+* `dashboard_parse_date()` completely rewritten. No longer throws
+  `Error in as.POSIXlt.character: character string is not in a standard
+  unambiguous format`. Now tries six explicit format templates in priority
+  order (ISO 8601 Z-suffix, ISO 8601 no-tz, space datetime, date-only,
+  UK dd/mm/yyyy, US mm/dd/yyyy) with `tryCatch` on each, plus a wrapped
+  fallback. Non-matching strings return `NA` instead of an error.
+* Dashboard Items and Scales tabs: `outputOptions(output, "item_chart",
+  suspendWhenHidden = FALSE)` and `outputOptions(output, "scale_chart",
+  suspendWhenHidden = FALSE)` added. Response distribution and Scale score
+  distribution charts now render as soon as the user switches to those tabs
+  instead of appearing blank.
+
 ## Future direction: v0.4
 
 * MCDM and DEMATEL fall outside v0.3 scope. Planned v0.4 work includes

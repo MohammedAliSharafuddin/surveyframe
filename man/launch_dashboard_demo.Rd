@@ -4,23 +4,21 @@
 \alias{launch_dashboard_demo}
 \title{Launch the response dashboard with the bundled input-types demo}
 \usage{
-launch_dashboard_demo(
-  port = NULL,
-  host = "127.0.0.1",
-  launch.browser = interactive()
-)
+launch_dashboard_demo(port = NULL, host = "127.0.0.1", launch.browser = TRUE)
 }
 \arguments{
 \item{port}{TCP port for the Shiny server.}
 
 \item{host}{Host address for the Shiny server.}
 
-\item{launch.browser}{Whether to open the browser automatically.}
+\item{launch.browser}{Whether to open the browser automatically. Defaults
+to \code{TRUE} for this demo helper.}
 }
 \value{
 Called for its side effect.
 }
 \description{
-Opens the dashboard with the bundled input-types questionnaire and simulated
-responses.
+Opens the dashboard with the bundled input-types questionnaire and 120
+simulated responses already loaded. The browser is opened automatically by
+default.
 }

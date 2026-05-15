@@ -2,18 +2,21 @@
 % Please edit documentation in R/demo_helpers.R
 \name{launch_builder_demo}
 \alias{launch_builder_demo}
-\title{Launch SurveyBuilder with the bundled input-types demo}
+\title{Launch SurveyBuilder with the bundled input-types demo preloaded}
 \usage{
 launch_builder_demo(open = TRUE)
 }
 \arguments{
-\item{open}{Logical. Passed to \code{\link[=launch_builder]{launch_builder()}}.}
+\item{open}{Logical. When \code{TRUE} (the default), the pre-populated builder
+HTML is opened in the system's default web browser.}
 }
 \value{
-Invisibly returns paths to the builder and demo \code{.sframe} file.
+Invisibly returns a list with \code{builder_path}, \code{demo_file}, and
+\code{responses_path}.
 }
 \description{
-Opens the standalone browser builder and writes the bundled input-types
-\code{.sframe} file to a temporary folder so users can load it through the
-builder.
+Opens a temporary copy of the SurveyBuilder with the bundled input-types
+instrument already injected into the JavaScript state. The demo questions,
+scales, and analysis plan are visible immediately — no manual file-load
+step is required.
 }
