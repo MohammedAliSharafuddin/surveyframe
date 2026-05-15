@@ -12,9 +12,9 @@ knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 library(surveyframe)
 ```
 
-This vignette builds an `sframe` instrument from scratch. The aim is to show
-how choice sets, items, scales, reverse coding, attention checks, validation,
-and `.sframe` serialisation fit together.
+This vignette builds an `sframe` instrument from scratch and shows how choice
+sets, items, scales, reverse coding, attention checks, validation, and
+`.sframe` serialisation fit together.
 
 ## Choice sets
 
@@ -166,8 +166,8 @@ validation$valid
 validation$problems
 ```
 
-For production use, strict validation returns the validated instrument or stops
-with a structured error.
+In production workflows, strict validation returns the validated instrument or
+stops with a structured error.
 
 ```{r strict}
 instr <- validate_sframe(instr)

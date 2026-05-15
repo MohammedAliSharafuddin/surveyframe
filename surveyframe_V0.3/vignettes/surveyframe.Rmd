@@ -17,11 +17,10 @@ library(surveyframe)
 
 ## Purpose
 
-`surveyframe` provides an instrument-centred workflow for survey-based
-research. A survey is stored as a typed `sframe` object. The same object can be
-validated, saved, reused, linked with response data, scored, checked for data
-quality, used for reliability and item diagnostics, and passed into reporting
-or syntax-generation functions.
+`surveyframe` supports instrument-centred survey research. Each survey is
+stored as a typed `sframe` object that you can validate, save, reuse, link with
+response data, score, check for data quality, analyse for reliability and item
+diagnostics, and pass to reporting or syntax-generation functions.
 
 The usual workflow is:
 
@@ -34,10 +33,10 @@ The usual workflow is:
 7. Generate syntax for EFA, CFA, CB-SEM, or PLS-SEM workflows.
 8. Render a reproducible report.
 
-The package includes two bundled demonstration datasets. The tourism-services
-demo is used for scale scoring, reliability, reporting, and syntax generation.
-The input-types demo is used to test and demonstrate the main survey controls
-available in the builder, studio, and dashboard.
+Two demonstration datasets are bundled. The tourism-services demo supports
+examples for scale scoring, reliability, reporting, and syntax generation. The
+input-types demo illustrates the main survey controls in the builder, studio,
+and dashboard.
 
 The tourism-services responses are synthetic. They are shaped around a
 digital-marketing and tourism-services questionnaire so the examples feel like
@@ -237,8 +236,8 @@ cat(cfa_lavaan_syntax(instr, ordered = TRUE))
 ## CB-SEM and PLS-SEM syntax
 
 `surveyframe` can also store model definitions and generate syntax for
-downstream SEM software. The package provides syntax-generation support, while
-formal model estimation remains the responsibility of specialised packages.
+downstream SEM software. surveyframe generates model syntax. Specialised
+packages handle formal model estimation.
 
 ```{r sem-model}
 model <- sf_model(
@@ -293,7 +292,7 @@ codebook
 
 `render_report()` combines the instrument, response data, quality checks,
 descriptive summaries, codebook content, and other outputs into an HTML file.
-The output can be stored with the study files.
+Store the output with the study files.
 
 ```{r render-report, eval = FALSE}
 render_report(

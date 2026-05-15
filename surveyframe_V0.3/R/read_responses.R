@@ -54,7 +54,7 @@ read_responses <- function(
   if (is.character(x)) {
     if (!file.exists(x)) {
       sframe_abort_import(
-        paste0("Response file not found: '", x, "'."),
+        paste0("Response file not found: '", x, "'. Check the file path and ensure the file exists."),
         path = x
       )
     }
@@ -67,7 +67,7 @@ read_responses <- function(
     data <- sframe_as_data_frame(x)
   } else {
     rlang::abort(
-      "`x` must be a file path, a data.frame, or a tibble.",
+      "`x` must be a CSV file path, a data.frame, or a tibble.",
       class = c("sframe_import_error", "sframe_error")
     )
   }

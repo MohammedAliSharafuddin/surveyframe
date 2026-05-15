@@ -10,8 +10,8 @@ Authors@R: c(
       comment = c(ORCID = "0000-0001-5247-2964")
     )
   )
-Description: Provides survey research workflows built around a typed
-    instrument object (the 'sframe'). Capabilities include visual instrument
+Description: Supports survey research workflows built around a typed
+    instrument object (the 'sframe'). Features include visual instrument
     design via a browser-based builder or Shiny studio, export to a
     self-contained static HTML survey, an embeddable Shiny module, SHA-256
     integrity-checked serialisation to the '.sframe' format, multi-page survey

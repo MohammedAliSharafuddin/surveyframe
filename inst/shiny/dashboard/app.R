@@ -80,6 +80,10 @@ body{background:#f1f5f9;font-family:system-ui,-apple-system,'Segoe UI',sans-seri
 .sel-wrap{margin-bottom:14px;display:flex;align-items:center;gap:10px}
 .sel-wrap select{padding:7px 10px;border:1.5px solid #e2e8f0;border-radius:7px;font-size:13px;color:#0f172a;background:#fff}
 .sel-wrap label{font-size:12px;font-weight:600;color:#475569}
+.filter-bar{background:#fff;border-radius:10px;padding:14px 16px;box-shadow:0 1px 4px rgba(0,0,0,.07);margin-bottom:16px}
+.filter-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;align-items:end}
+.filter-grid label{font-size:12px;font-weight:600;color:#475569}
+.filter-note{font-size:11px;color:#94a3b8;margin-top:8px}
 ", THEME, THEME, THEME)
 
 # ── UI ───────────────────────────────────────────────────────────────────────
@@ -109,13 +113,84 @@ ui <- fluidPage(
     actionButton("nav_quality",  "Quality",   class = "btn"),
     actionButton("nav_data",     "Raw Data",  class = "btn")
   ),
-  div(class = "db-body", uiOutput("db_content"))
+  div(class = "db-body", uiOutput("filter_bar"), uiOutput("db_content"))
 )
 
 # ── Server ────────────────────────────────────────────────────────────────────
 server <- function(input, output, session) {
 
   active_tab <- reactiveVal("overview")
+  date_filter_column <- dashboard_date_column(responses)
+  categorical_filters <- dashboard_categorical_columns(responses)
+
+  output$filter_bar <- renderUI({
+    if (is.null(responses) || nrow(responses) == 0 ||
+        (!length(categorical_filters) && is.null(date_filter_column))) {
+      return(NULL)
+    }
+
+    cats <- lapply(categorical_filters, function(nm) {
+      vals <- sort(unique(as.character(responses[[nm]][!is.na(responses[[nm]])])))
+      if (!length(vals)) return(NULL)
+      div(
+        tags$label(nm),
+        selectInput(
+          paste0("filter_", nm),
+          NULL,
+          choices = vals,
+          selected = character(0),
+          multiple = TRUE,
+          width = "100%"
+        )
+      )
+    })
+    cats <- Filter(Negate(is.null), cats)
+
+    date_ui <- NULL
+    if (!is.null(date_filter_column)) {
+      d <- dashboard_parse_date(responses[[date_filter_column]])
+      d <- d[!is.na(d)]
+      if (length(d)) {
+        date_ui <- div(
+          tags$label(date_filter_column),
+          dateRangeInput(
+            "filter_date_range",
+            NULL,
+            start = min(d),
+            end = max(d),
+            min = min(d),
+            max = max(d),
+            width = "100%"
+          )
+        )
+      }
+    }
+
+    div(
+      class = "filter-bar",
+      div(class = "db-card-t", "Filters"),
+      div(class = "filter-grid", c(cats, list(date_ui))),
+      div(class = "filter-note", "Leave a filter blank to include all responses.")
+    )
+  })
+
+  filtered_responses <- reactive({
+    if (is.null(responses)) return(NULL)
+    out <- responses
+    for (nm in categorical_filters) {
+      selected <- input[[paste0("filter_", nm)]]
+      if (length(selected)) {
+        out <- out[as.character(out[[nm]]) %in% selected, , drop = FALSE]
+      }
+    }
+    if (!is.null(date_filter_column) && !is.null(input$filter_date_range)) {
+      d <- dashboard_parse_date(out[[date_filter_column]])
+      rng <- as.Date(input$filter_date_range)
+      keep <- is.na(d) | (d >= rng[1] & d <= rng[2])
+      out <- out[keep, , drop = FALSE]
+    }
+    out
+  })
 
   lapply(c("overview","items","scales","quality","data"), function(tab) {
     observeEvent(input[[paste0("nav_", tab)]], {
@@ -125,23 +200,25 @@ server <- function(input, output, session) {
   })
 
   output$db_content <- renderUI({
+    resp <- filtered_responses()
     switch(active_tab(),
-      overview = db_overview_ui(),
-      items    = db_items_ui(input),
-      scales   = db_scales_ui(input),
-      quality  = db_quality_ui(),
-      data     = db_data_ui()
+      overview = db_overview_ui(resp),
+      items    = db_items_ui(input, resp),
+      scales   = db_scales_ui(input, resp),
+      quality  = db_quality_ui(resp),
+      data     = db_data_ui(resp)
     )
   })
 
   # Item detail chart
   output$item_chart <- renderPlot({
-    req(input$item_sel, responses)
+    resp <- filtered_responses()
+    req(input$item_sel, resp)
     item <- item_by_id(input$item_sel)
-    if (is.null(item) || !input$item_sel %in% names(responses)) {
+    if (is.null(item) || !input$item_sel %in% names(resp)) {
       plot.new(); text(.5,.5,"No data for this item.",col="#94a3b8"); return()
     }
-    col_data <- responses[[input$item_sel]]
+    col_data <- resp[[input$item_sel]]
     t <- item$type
     old_par <- par(mar = c(4,5,2,1), bg = "white")
     on.exit(par(old_par))
@@ -173,14 +250,15 @@ server <- function(input, output, session) {
 
   # Scale distribution chart
   output$scale_chart <- renderPlot({
-    req(input$scale_sel, responses)
+    resp <- filtered_responses()
+    req(input$scale_sel, resp)
     sc <- scale_by_id(input$scale_sel)
     if (is.null(sc)) return()
-    score_cols <- intersect(sc$items, names(responses))
+    score_cols <- intersect(sc$items, names(resp))
     if (!length(score_cols)) {
       plot.new(); text(.5,.5,"Scale items not found in responses.",col="#94a3b8"); return()
     }
-    nums <- lapply(responses[score_cols], function(x) suppressWarnings(as.numeric(x)))
+    nums <- lapply(resp[score_cols], function(x) suppressWarnings(as.numeric(x)))
     scores <- rowMeans(do.call(cbind, nums), na.rm = TRUE)
     scores <- scores[!is.na(scores)]
     if (!length(scores)) {
@@ -199,8 +277,9 @@ server <- function(input, output, session) {
 
   # Raw data table
   output$raw_table <- renderTable({
-    if (is.null(responses)) return(data.frame(Note = "No responses loaded."))
-    head(responses, 200)
+    resp <- filtered_responses()
+    if (is.null(resp)) return(data.frame(Note = "No responses loaded."))
+    head(resp, 200)
   }, striped = TRUE, hover = TRUE, bordered = FALSE, width = "100%",
      na = "Not available")
 
@@ -210,16 +289,17 @@ server <- function(input, output, session) {
     },
     content = function(file) {
       if (!is.null(responses)) {
-        utils::write.csv(responses, file, row.names = FALSE, na = "")
+        utils::write.csv(filtered_responses(), file, row.names = FALSE, na = "")
       }
     }
   )
 }
 
 # ── Panel constructors ────────────────────────────────────────────────────────
-db_overview_ui <- function() {
-  date_range <- if (!is.null(responses) && "submitted_at" %in% names(responses)) {
-    dts <- as.POSIXct(responses$submitted_at, format = "%Y-%m-%dT%H:%M:%SZ", tz = "UTC")
+db_overview_ui <- function(resp = responses) {
+  n_current <- if (is.null(resp)) 0L else nrow(resp)
+  date_range <- if (!is.null(resp) && "submitted_at" %in% names(resp)) {
+    dts <- as.POSIXct(resp$submitted_at, format = "%Y-%m-%dT%H:%M:%SZ", tz = "UTC")
     dts <- dts[!is.na(dts)]
     if (length(dts) > 1) {
       paste0(format(min(dts), "%d %b"), " to ", format(max(dts), "%d %b %Y"))
@@ -239,7 +319,7 @@ db_overview_ui <- function() {
 
   tagList(
     div(class = "db-grid",
-      kpi(n_resp,   "Total responses"),
+      kpi(n_current, "Filtered responses"),
       kpi(n_items,  "Survey items"),
       kpi(n_scales, "Scales defined"),
       kpi(n_checks, "Attention checks"),
@@ -265,7 +345,7 @@ db_overview_ui <- function() {
   )
 }
 
-db_items_ui <- function(input) {
+db_items_ui <- function(input, resp = responses) {
   if (!length(q_items)) return(div(class="db-card","No question items defined."))
   choices_v <- stats::setNames(
     vapply(q_items, `[[`, character(1), "id"),
@@ -278,22 +358,22 @@ db_items_ui <- function(input) {
     ),
     div(class = "db-card",
       div(class = "db-card-t", "Response distribution"),
-      if (is.null(responses) || n_resp == 0) {
+      if (is.null(resp) || nrow(resp) == 0) {
         p(style = "color:#94a3b8;font-size:13px",
           "Load response data with launch_dashboard(instrument, responses) to see charts.")
       } else {
         plotOutput("item_chart", height = "280px")
       }
     ),
-    db_freq_table_ui(input)
+    db_freq_table_ui(input, resp)
   )
 }
 
-db_freq_table_ui <- function(input) {
-  if (is.null(responses) || n_resp == 0 || is.null(input$item_sel)) return(NULL)
+db_freq_table_ui <- function(input, resp = responses) {
+  if (is.null(resp) || nrow(resp) == 0 || is.null(input$item_sel)) return(NULL)
   item <- item_by_id(input$item_sel)
-  if (is.null(item) || !input$item_sel %in% names(responses)) return(NULL)
-  col_data <- responses[[input$item_sel]]
+  if (is.null(item) || !input$item_sel %in% names(resp)) return(NULL)
+  col_data <- resp[[input$item_sel]]
 
   if (!item$type %in% c("likert","single_choice","multiple_choice")) return(NULL)
 
@@ -326,7 +406,7 @@ db_freq_table_ui <- function(input) {
   )
 }
 
-db_scales_ui <- function(input) {
+db_scales_ui <- function(input, resp = responses) {
   if (!length(instr$scales)) {
     return(div(class="db-card","No scales defined in this instrument."))
   }
@@ -341,7 +421,7 @@ db_scales_ui <- function(input) {
     ),
     div(class = "db-card",
       div(class = "db-card-t", "Scale score distribution"),
-      if (is.null(responses) || n_resp == 0) {
+      if (is.null(resp) || nrow(resp) == 0) {
         p(style="color:#94a3b8;font-size:13px",
           "Load response data to see scale score distributions.")
       } else {
@@ -369,19 +449,20 @@ db_scales_ui <- function(input) {
   )
 }
 
-db_quality_ui <- function() {
+db_quality_ui <- function(resp = responses) {
+  n_current <- if (is.null(resp)) 0L else nrow(resp)
   if (!length(instr$checks)) {
     return(div(class="db-card","No attention checks defined in this instrument."))
   }
   rows <- lapply(instr$checks, function(ck) {
-    n_pass <- if (!is.null(responses) && ck$item_id %in% names(responses)) {
-      col_data <- as.character(responses[[ck$item_id]])
+    n_pass <- if (!is.null(resp) && ck$item_id %in% names(resp)) {
+      col_data <- as.character(resp[[ck$item_id]])
       pass_vals <- as.character(ck$pass_values %||% character(0))
       sum(col_data %in% pass_vals, na.rm = TRUE)
     } else NA_integer_
 
-    pct_pass <- if (!is.null(responses) && !is.na(n_pass) && n_resp > 0) {
-      round(n_pass / n_resp * 100, 1)
+    pct_pass <- if (!is.null(resp) && !is.na(n_pass) && n_current > 0) {
+      round(n_pass / n_current * 100, 1)
     } else NA_real_
 
     flag_class <- if (is.na(pct_pass)) ""
@@ -412,25 +493,58 @@ db_quality_ui <- function() {
   )
 }
 
-db_data_ui <- function() {
+db_data_ui <- function(resp = responses) {
+  n_current <- if (is.null(resp)) 0L else nrow(resp)
   tagList(
     div(class = "db-card",
       div(class = "db-card-t", "Raw responses",
         downloadButton("dl_csv", "Download CSV",
           style = "margin-left:auto;padding:5px 12px;font-size:12px;background:var(--cp,#2563eb);color:#fff;border:none;border-radius:6px;cursor:pointer")
       ),
-      if (is.null(responses) || n_resp == 0) {
+      if (is.null(resp) || n_current == 0) {
         p(style="color:#94a3b8;font-size:13px",
-          "No response data loaded. Pass a data frame to launch_dashboard().")
+            "No response data loaded. Pass a data frame to launch_dashboard().")
       } else {
         tagList(
           p(style="font-size:11px;color:#94a3b8;margin-bottom:10px",
-            paste0("Showing first 200 of ", n_resp, " rows.")),
+            paste0("Showing first 200 of ", n_current, " filtered rows.")),
           div(style="overflow-x:auto", tableOutput("raw_table"))
         )
       }
     )
   )
+}
+
+dashboard_categorical_columns <- function(data) {
+  if (is.null(data) || !is.data.frame(data)) return(character(0))
+  cols <- names(data)[vapply(data, function(x) {
+    if (!(is.character(x) || is.factor(x) || is.logical(x))) return(FALSE)
+    vals <- unique(x[!is.na(x)])
+    length(vals) > 1 && length(vals) <= 12
+  }, logical(1))]
+  setdiff(cols, grep("(^|_)id$", cols, value = TRUE))
+}
+
+dashboard_date_column <- function(data) {
+  if (is.null(data) || !is.data.frame(data)) return(NULL)
+  candidates <- names(data)[vapply(data, function(x) {
+    inherits(x, c("Date", "POSIXct", "POSIXlt")) ||
+      (is.character(x) && any(!is.na(dashboard_parse_date(x))))
+  }, logical(1))]
+  candidates <- intersect(c("submitted_at", "started_at", candidates), candidates)
+  if (length(candidates)) candidates[[1]] else NULL
+}
+
+dashboard_parse_date <- function(x) {
+  if (inherits(x, "Date")) return(x)
+  if (inherits(x, c("POSIXct", "POSIXlt"))) return(as.Date(x))
+  if (is.character(x)) {
+    out <- as.Date(suppressWarnings(as.POSIXct(x, tz = "UTC")))
+    bad <- is.na(out)
+    if (any(bad)) out[bad] <- suppressWarnings(as.Date(x[bad]))
+    return(out)
+  }
+  rep(as.Date(NA), length(x))
 }
 
 # ── Launch ────────────────────────────────────────────────────────────────────

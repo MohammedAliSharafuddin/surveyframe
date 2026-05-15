@@ -684,7 +684,7 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
     </div>
     <div class="stp" id="sp-thankyou">
       <div class="field"><label class="fl" for="s-tym">Thank-you message</label><div class="fc"><textarea id="s-tym" rows="4"></textarea></div></div>
-      <div class="field"><label class="fl" for="s-tyu">Redirect URL (optional)</label><div class="fc"><input type="url" id="s-tyu" placeholder="https://â€¦"></div><span class="fhint">Respondents are redirected here after submitting.</span></div>
+      <div class="field"><label class="fl" for="s-tyu">Redirect URL (optional)</label><div class="fc"><input type="url" id="s-tyu" placeholder="https://â€¦"></div><span class="fhint">After submission, respondents are redirected to this URL.</span></div>
       <label class="fcheck"><input type="checkbox" id="s-tydl"><span>Show "Download my response" button</span></label>
     </div>
     <div class="stp" id="sp-header">
@@ -1109,7 +1109,7 @@ function renderInspBody(item){
   function sel(fid,opts,val){return'<select id="'+fid+'" onchange="updF(\''+fid+'\')">'+opts.map(function(p){return'<option value="'+esc(p[0])+'"'+(p[0]===val?' selected':'')+'>'+esc(p[1])+'</option>';}).join('')+'</select>';}
   function chk(fid,checked,lbl){return'<label class="fcheck"><input type="checkbox" id="'+fid+'"'+(checked?' checked':'')+' onchange="updF(\''+fid+'\')"><span>'+lbl+'</span></label>';}
   var identity=fgs('Identity',
-    fld('Item ID','<input type="text" id="fi-id" value="'+esc(item.id)+'" onblur="updIdF(this.value)"><div class="ferr" id="fi-id-err">&#9888; Invalid or duplicate ID</div>','Letters, numbers, underscores only.',true)+
+    fld('Item ID','<input type="text" id="fi-id" value="'+esc(item.id)+'" onblur="updIdF(this.value)"><div class="ferr" id="fi-id-err">&#9888; Invalid or duplicate ID</div>','Letters, numbers, and _ characters only.',true)+
     fld('Question text',ta('fi-lbl',item.label||'','Question textâ€¦',2),'',true)+
     (isSec?fld('Introduction text',ta('fi-intro',item.section_intro||'','Optional intro paragraphâ€¦')):'')
   );

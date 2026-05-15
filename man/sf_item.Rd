@@ -27,7 +27,7 @@ sf_item(
 }
 \arguments{
 \item{id}{Character. A unique identifier for this item. Used as the column
-name in response data. Must contain only letters, numbers, and underscores.}
+name in response data. Must contain only letters, numbers, and \verb{_} characters.}
 
 \item{label}{Character. The question text or content displayed to the
 respondent.}

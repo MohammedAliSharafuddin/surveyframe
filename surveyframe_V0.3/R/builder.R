@@ -2,13 +2,12 @@
 
 #' Launch the surveyframe visual survey builder
 #'
-#' Opens the SurveyBuilder, a self-contained HTML application for designing
-#' survey instruments visually in the browser.  The builder runs entirely
-#' client-side: no active R session or Shiny server is required while you
-#' work.  Instruments are saved as `.sframe` files from the browser and
-#' loaded back into R with [read_sframe()].
+#' Opens the SurveyBuilder, a self-contained HTML application for visual survey
+#' design. The builder runs client-side without an R session or Shiny server.
+#' Save instruments as `.sframe` files from the browser and load them into R
+#' with [read_sframe()].
 #'
-#' The builder provides a three-mode interface.
+#' The builder includes a three-mode interface.
 #'
 #' \describe{
 #'   \item{Build}{An item editor with a persistent inspector panel,
