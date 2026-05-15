@@ -32,3 +32,4 @@
 ^\.local-tidy($|/)
 ^surveyframe_v0\.2($|/)
 ^surveyframe_[Vv]0\.3($|/)
+^Rplots\.pdf$

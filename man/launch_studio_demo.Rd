@@ -5,25 +5,28 @@
 \title{Launch SurveyStudio with the bundled input-types demo}
 \usage{
 launch_studio_demo(
-  screen = "auto",
+  screen = "preview",
   port = NULL,
   host = "127.0.0.1",
-  launch.browser = interactive()
+  launch.browser = TRUE
 )
 }
 \arguments{
-\item{screen}{Initial studio screen. Defaults to \code{"auto"}.}
+\item{screen}{Initial studio screen. Defaults to \code{"preview"} so the demo
+content is immediately visible.}
 
 \item{port}{TCP port for the Shiny server.}
 
 \item{host}{Host address for the Shiny server.}
 
-\item{launch.browser}{Whether to open the browser automatically.}
+\item{launch.browser}{Whether to open the browser automatically. Defaults
+to \code{TRUE} for this demo helper.}
 }
 \value{
 Called for its side effect.
 }
 \description{
 Opens SurveyStudio with the bundled input-types questionnaire and simulated
-response data.
+response data already loaded. The browser is opened automatically by
+default.
 }

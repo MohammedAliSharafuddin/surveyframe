@@ -2,7 +2,34 @@
 # Launched by launch_dashboard(). Reads SFRAME_INSTRUMENT and
 # SFRAME_RESPONSES from the calling environment via app.R-level globals.
 
-library(shiny)
+if (!requireNamespace("shiny", quietly = TRUE)) {
+  stop("Package 'shiny' is required. Install it with: install.packages('shiny')")
+}
+
+# shiny aliases — avoids library(shiny) which is not CRAN-safe in inst/ files
+fluidPage      <- shiny::fluidPage
+tagList        <- shiny::tagList
+tags           <- shiny::tags
+HTML           <- shiny::HTML
+actionButton   <- shiny::actionButton
+selectInput    <- shiny::selectInput
+dateRangeInput <- shiny::dateRangeInput
+uiOutput       <- shiny::uiOutput
+plotOutput     <- shiny::plotOutput
+tableOutput    <- shiny::tableOutput
+downloadButton <- shiny::downloadButton
+reactiveVal    <- shiny::reactiveVal
+reactive       <- shiny::reactive
+observeEvent   <- shiny::observeEvent
+renderUI        <- shiny::renderUI
+renderPlot      <- shiny::renderPlot
+renderTable     <- shiny::renderTable
+downloadHandler <- shiny::downloadHandler
+req             <- shiny::req
+outputOptions   <- shiny::outputOptions
+shinyApp        <- shiny::shinyApp
+div            <- shiny::tags$div
+p              <- shiny::tags$p
 
 `%||%` <- function(x, y) if (is.null(x)) y else x
 
@@ -247,6 +274,10 @@ server <- function(input, output, session) {
            col = "#94a3b8", cex = .9)
     }
   }, bg = "white")
+  # plotOutput("item_chart") lives inside renderUI, so Shiny would suspend this
+  # output by default. suspendWhenHidden=FALSE keeps it evaluated and sends
+  # the PNG as soon as the client-side plotOutput element appears in the DOM.
+  outputOptions(output, "item_chart", suspendWhenHidden = FALSE)
 
   # Scale distribution chart
   output$scale_chart <- renderPlot({
@@ -274,6 +305,7 @@ server <- function(input, output, session) {
     legend("topright", legend = sprintf("M = %.2f", mean(scores, na.rm=TRUE)),
            col = "#dc2626", lty = 2, lwd = 2, bty = "n", cex = .8)
   }, bg = "white")
+  outputOptions(output, "scale_chart", suspendWhenHidden = FALSE)
 
   # Raw data table
   output$raw_table <- renderTable({
@@ -299,7 +331,7 @@ server <- function(input, output, session) {
 db_overview_ui <- function(resp = responses) {
   n_current <- if (is.null(resp)) 0L else nrow(resp)
   date_range <- if (!is.null(resp) && "submitted_at" %in% names(resp)) {
-    dts <- as.POSIXct(resp$submitted_at, format = "%Y-%m-%dT%H:%M:%SZ", tz = "UTC")
+    dts <- dashboard_parse_date(resp$submitted_at)
     dts <- dts[!is.na(dts)]
     if (length(dts) > 1) {
       paste0(format(min(dts), "%d %b"), " to ", format(max(dts), "%d %b %Y"))
@@ -469,7 +501,7 @@ db_quality_ui <- function(resp = responses) {
                   else if (pct_pass >= 80) "quality-ok"
                   else "quality-flag"
 
-    tags$tr(
+    tags$tr(class = flag_class,
       tags$td(tags$code(ck$id)),
       tags$td(ck$type %||% "attention"),
       tags$td(tags$code(ck$item_id)),
@@ -499,7 +531,10 @@ db_data_ui <- function(resp = responses) {
     div(class = "db-card",
       div(class = "db-card-t", "Raw responses",
         downloadButton("dl_csv", "Download CSV",
-          style = "margin-left:auto;padding:5px 12px;font-size:12px;background:var(--cp,#2563eb);color:#fff;border:none;border-radius:6px;cursor:pointer")
+          style = sprintf(
+            "margin-left:auto;padding:5px 12px;font-size:12px;background:%s;color:#fff;border:none;border-radius:6px;cursor:pointer",
+            THEME
+          ))
       ),
       if (is.null(resp) || n_current == 0) {
         p(style="color:#94a3b8;font-size:13px",
@@ -536,15 +571,53 @@ dashboard_date_column <- function(data) {
 }
 
 dashboard_parse_date <- function(x) {
-  if (inherits(x, "Date")) return(x)
+  if (inherits(x, "Date"))                   return(as.Date(x))
   if (inherits(x, c("POSIXct", "POSIXlt"))) return(as.Date(x))
-  if (is.character(x)) {
-    out <- as.Date(suppressWarnings(as.POSIXct(x, tz = "UTC")))
-    bad <- is.na(out)
-    if (any(bad)) out[bad] <- suppressWarnings(as.Date(x[bad]))
-    return(out)
+  if (!is.character(x))                      return(rep(as.Date(NA), length(x)))
+
+  # Blanks and whitespace-only become NA before any format attempt.
+  x_clean <- trimws(x)
+  x_clean[!nzchar(x_clean)] <- NA_character_
+
+  out  <- rep(as.Date(NA_character_), length(x))
+  todo <- which(!is.na(x_clean))
+
+  # Explicit formats: when format= is given, as.POSIXct returns NA for
+  # non-matching strings instead of throwing an error. Try in priority order.
+  formats <- c(
+    "%Y-%m-%dT%H:%M:%SZ",  # ISO 8601 Z suffix  2024-01-15T10:30:00Z
+    "%Y-%m-%dT%H:%M:%S",   # ISO 8601 no tz     2024-01-15T10:30:00
+    "%Y-%m-%d %H:%M:%S",   # space datetime     2024-01-15 10:30:00
+    "%Y-%m-%d",            # date only          2024-01-15
+    "%d/%m/%Y",            # UK dd/mm/yyyy      15/01/2024
+    "%m/%d/%Y"             # US mm/dd/yyyy      01/15/2024
+  )
+
+  for (fmt in formats) {
+    if (!length(todo)) break
+    parsed <- tryCatch(
+      as.Date(as.POSIXct(x_clean[todo], format = fmt, tz = "UTC")),
+      error = function(e) rep(as.Date(NA), length(todo))
+    )
+    good <- !is.na(parsed)
+    if (any(good)) {
+      out[todo[good]] <- parsed[good]
+      todo <- todo[!good]
+    }
   }
-  rep(as.Date(NA), length(x))
+
+  # Last-resort auto-detection for any remaining unparsed strings, wrapped in
+  # tryCatch so it can never crash the dashboard.
+  if (length(todo)) {
+    fallback <- tryCatch(
+      as.Date(suppressWarnings(as.POSIXct(x_clean[todo], tz = "UTC"))),
+      error = function(e) rep(as.Date(NA), length(todo))
+    )
+    good <- !is.na(fallback)
+    if (any(good)) out[todo[good]] <- fallback[good]
+  }
+
+  out
 }
 
 # ── Launch ────────────────────────────────────────────────────────────────────

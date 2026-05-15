@@ -1031,7 +1031,7 @@ render_results <- function(
       ))
     }
 
-    # Build results table
+    # Build APA-style results table
     tbl_html <- ""
     if (!is.null(r$table) && is.data.frame(r$table)) {
       rows <- paste(apply(r$table, 1, function(row) {
@@ -1041,9 +1041,20 @@ render_results <- function(
       }), collapse = "")
       headers <- paste(sprintf("<th>%s</th>", htmltools_escape(colnames(r$table))),
                       collapse = "")
+      has_pval <- any(grepl(
+        "^p$|^p\\.value$|^p_value$|^Pr\\(>",
+        colnames(r$table), ignore.case = TRUE
+      ))
+      foot_html <- if (has_pval) {
+        paste0(
+          '<tfoot><tr><td colspan="', ncol(r$table), '">',
+          "* <em>p</em> &lt; .05, ** <em>p</em> &lt; .01, *** <em>p</em> &lt; .001",
+          "</td></tr></tfoot>"
+        )
+      } else ""
       tbl_html <- sprintf(
-        '<table class="results-table"><thead><tr>%s</tr></thead><tbody>%s</tbody></table>',
-        headers, rows
+        '<table class="results-table"><thead><tr>%s</tr></thead><tbody>%s</tbody>%s</table>',
+        headers, rows, foot_html
       )
     }
 
@@ -1135,11 +1146,14 @@ render_results <- function(
   .citations-section { border-top: 1px solid #eee; padding-top: 12px; }
   .citation-list { font-size: 13px; color: #555; line-height: 1.8; }
   .results-table { width: 100%%; border-collapse: collapse; font-size: 14px;
-                    margin: 12px 0; }
-  .results-table th { background: #1a1a2e; color: #fff; padding: 8px 12px;
-                       text-align: left; }
-  .results-table td { padding: 7px 12px; border-bottom: 1px solid #eee; }
-  .results-table tr:nth-child(even) td { background: #f7f8fa; }
+                    margin: 12px 0; font-family: Georgia, serif; }
+  .results-table thead tr { border-top: 2px solid #000; border-bottom: 1px solid #000; }
+  .results-table tbody tr:last-child td { border-bottom: 2px solid #000; }
+  .results-table th { background: none; color: #000; padding: 6px 12px;
+                       text-align: left; font-weight: 700; border: none; }
+  .results-table td { padding: 5px 12px; border: none; }
+  .results-table tfoot td { font-size: 12px; font-style: italic; color: #444;
+                              border: none; padding-top: 4px; }
   .error-box { background: #fde8e8; border-left: 4px solid #b91c1c;
                 padding: 10px 14px; border-radius: 0 6px 6px 0; color: #7f1d1d; }
   .references { margin-top: 40px; border-top: 2px solid #eee; padding-top: 20px; }

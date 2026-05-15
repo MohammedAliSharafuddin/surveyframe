@@ -479,10 +479,13 @@ render_report <- function(
       "body { font-family: Arial, sans-serif; max-width: 960px; margin: 0 auto; padding: 32px 20px; color: #1f2933; line-height: 1.6; }",
       "h1, h2, h3 { color: #102a43; }",
       "section { margin: 0 0 28px; padding-bottom: 12px; border-bottom: 1px solid #d9e2ec; }",
-      "table { width: 100%%; border-collapse: collapse; margin: 12px 0 0; }",
-      "caption { text-align: left; font-weight: 700; margin-bottom: 8px; }",
-      "th, td { border: 1px solid #bcccdc; padding: 8px 10px; text-align: left; vertical-align: top; }",
-      "th { background: #f0f4f8; }",
+      "table { width: 100%%; border-collapse: collapse; margin: 16px 0 2px; font-size: .93em; }",
+      "caption { text-align: left; font-style: italic; font-size: .95em; margin-bottom: 4px; }",
+      "thead tr { border-top: 2px solid #000; border-bottom: 1px solid #000; }",
+      "tbody tr:last-child td { border-bottom: 2px solid #000; }",
+      "th, td { border: none; padding: 5px 12px; text-align: left; vertical-align: top; }",
+      "th { font-weight: 700; background: none; }",
+      ".tbl-note { font-size: .85em; font-style: italic; color: #333; margin-top: 3px; margin-bottom: 16px; }",
       ".meta { color: #52606d; margin-bottom: 24px; }",
       ".rq-block { margin: 18px 0; padding: 14px; background: #f8fafc; border: 1px solid #d9e2ec; border-radius: 6px; }",
       ".apa { font-family: Georgia, serif; }",
@@ -601,10 +604,16 @@ render_report <- function(
   paste(c("<h2>Model Appendix</h2>", blocks), collapse = "\n")
 }
 
-.render_report_table <- function(x, caption = NULL) {
+.render_report_table <- function(x, caption = NULL, note = NULL) {
   if (!is.data.frame(x) || nrow(x) == 0) {
     return("")
   }
+
+  has_pval <- any(grepl(
+    "^p$|^p\\.value$|^p_value$|^Pr\\(>",
+    colnames(x),
+    ignore.case = TRUE
+  ))
 
   header <- paste(
     sprintf("<th>%s</th>", htmltools_escape(colnames(x))),
@@ -621,16 +630,23 @@ render_report <- function(
     collapse = "\n"
   )
 
-  if (!is.null(caption) && nzchar(caption)) {
-    caption <- sprintf("<caption>%s</caption>", htmltools_escape(caption))
-  } else {
-    caption <- ""
-  }
+  cap_html <- if (!is.null(caption) && nzchar(caption)) {
+    sprintf("<caption>%s</caption>", htmltools_escape(caption))
+  } else ""
 
-  sprintf(
+  tbl_html <- sprintf(
     "<table>%s<thead><tr>%s</tr></thead><tbody>%s</tbody></table>",
-    caption,
-    header,
-    rows
+    cap_html, header, rows
   )
+
+  note_text <- note %||% if (has_pval) {
+    "* p < .05, ** p < .01, *** p < .001"
+  } else NULL
+
+  note_html <- if (!is.null(note_text) && nzchar(note_text)) {
+    sprintf('<p class="tbl-note"><em>Note.</em> %s</p>',
+            htmltools_escape(note_text))
+  } else ""
+
+  paste0(tbl_html, note_html)
 }

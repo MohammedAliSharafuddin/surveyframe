@@ -57,11 +57,13 @@ launch_studio_demo()
 launch_dashboard_demo()
 ```
 
-`launch_builder_demo()` writes a demo `.sframe` file to a temporary folder and
-opens the builder. The user can then load the file in the browser builder.
-`launch_studio_demo()` opens the full workflow with an instrument and response
-data already loaded. `launch_dashboard_demo()` opens the response dashboard
-with the same demo data.
+`launch_builder_demo()` injects the demo instrument state directly into a
+temporary copy of `survey_builder.html` and opens it. The demo questions,
+scales, and analysis plan are visible immediately — no manual Load .sframe
+step is needed. `launch_studio_demo()` opens the full workflow with an
+instrument and response data already loaded, and always opens the browser
+automatically. `launch_dashboard_demo()` opens the response dashboard with
+the same demo data and also always opens the browser automatically.
 
 ## Standalone builder
 
