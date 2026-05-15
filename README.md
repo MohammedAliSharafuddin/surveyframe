@@ -6,14 +6,14 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 <!-- badges: end -->
 
-`surveyframe` provides survey instrument workflows for R. It centres a study on
-one typed object, the `sframe`, which stores item definitions, choice sets,
-scales, branching, checks, analysis plans, model specifications, rendering
-hints, and reproducibility metadata.
+`surveyframe` supports survey research workflows through a typed instrument
+object, the `sframe`. It stores item definitions, choice sets, scales,
+branching, checks, analysis plans, model specifications, rendering hints, and
+reproducibility metadata.
 
-The package is designed to work offline during examples, tests, vignettes, and
-checks. Browser and Shiny entry points use `open = FALSE` or explicit launch
-functions so automated checks do not open a browser.
+The package works offline during examples, tests, vignettes, and checks.
+Browser and Shiny entry points use `open = FALSE` or explicit launch functions
+so automated checks do not open a browser.
 
 ## Installation
 
@@ -110,9 +110,9 @@ missing_data_report(resp, instr)
 
 ## Role-based analysis plans
 
-v0.3 analysis plans use method-specific variable roles rather than a flat
-checkbox list. Old `.sframe` files with `variables` and `test` fields still
-load and run.
+Analysis plans in version 0.3 use role-based variable assignment, replacing
+the flat variable list from earlier versions. Old `.sframe` files with
+`variables` and `test` fields still load and run.
 
 ```r
 instr$analysis_plan <- list(
@@ -239,10 +239,10 @@ for manual use. Tests and examples avoid opening browsers.
 
 ## v0.4 scope
 
-MCDM and DEMATEL are intentionally outside v0.3. They are planned for v0.4
-with AHP matrices, DEMATEL direct-influence matrices, TOPSIS/VIKOR/
-PROMETHEE/ELECTRE planning, MCDM validation, DEMATEL thresholding, and later
-diagram/export integrations.
+MCDM and DEMATEL fall outside v0.3 scope. They are planned for v0.4 with AHP
+matrices, DEMATEL direct-influence matrices, TOPSIS/VIKOR/PROMETHEE/ELECTRE
+planning, MCDM validation, DEMATEL thresholding, and later diagram/export
+integrations.
 
 ## Citation
 

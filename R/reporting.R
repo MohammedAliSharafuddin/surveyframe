@@ -269,7 +269,7 @@ render_report <- function(
       c("-P", paste0(name, ":", value))
     }), use.names = FALSE)
     quarto_ok <- tryCatch({
-      status <- system2(
+      status <- suppressWarnings(system2(
         quarto_bin,
         args = c(
           "render", render_input,
@@ -280,7 +280,7 @@ render_report <- function(
         ),
         stdout = TRUE,
         stderr = TRUE
-      )
+      ))
       is.null(attr(status, "status")) || identical(attr(status, "status"), 0L)
     }, error = function(e) FALSE)
 

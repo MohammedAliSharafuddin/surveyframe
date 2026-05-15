@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>SurveyBuilder: surveyframe</title>
 <style>
-/* ── Design tokens ─────────────────────────────────────────────────────── */
+/* â”€â”€ Design tokens â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 :root{
   --cp:#2563eb;--cp-l:#dbeafe;--cp-d:#1d4ed8;
   --cd:#dc2626;--cd-l:#fee2e2;--cs:#16a34a;
@@ -24,11 +24,11 @@ body{font-family:var(--font);font-size:13px;color:var(--t1);background:var(--cg)
 button{font-family:inherit;cursor:pointer;border:none;background:none}
 input,textarea,select{font-family:inherit;font-size:13px}
 
-/* ── App shell ──────────────────────────────────────────────────────────── */
+/* â”€â”€ App shell â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .app{display:flex;flex-direction:column;height:100vh}
 .shell{display:flex;flex:1;overflow:hidden}
 
-/* ── Topbar ─────────────────────────────────────────────────────────────── */
+/* â”€â”€ Topbar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .topbar{display:flex;align-items:center;gap:10px;height:var(--th);
   padding:0 16px;background:var(--cf);border-bottom:1px solid var(--cb);
   flex-shrink:0;z-index:100;box-shadow:0 1px 0 var(--cb)}
@@ -50,7 +50,7 @@ input,textarea,select{font-family:inherit;font-size:13px}
 .save-st{font-size:11px;color:var(--t3)}
 .save-st.dirty{color:var(--cw)}.save-st.saved{color:var(--cs)}
 
-/* ── Buttons ────────────────────────────────────────────────────────────── */
+/* â”€â”€ Buttons â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:5px;
   padding:6px 14px;border-radius:6px;font-size:12px;font-weight:500;
   transition:all var(--d1);white-space:nowrap;border:1.5px solid transparent;cursor:pointer}
@@ -65,7 +65,7 @@ input,textarea,select{font-family:inherit;font-size:13px}
 .btn-g:hover:not(:disabled){background:var(--cg);color:var(--t1)}
 .btn-sm{padding:4px 10px;font-size:11px}
 
-/* ── Sidebar ────────────────────────────────────────────────────────────── */
+/* â”€â”€ Sidebar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .sidebar{width:var(--sw);flex-shrink:0;background:var(--sb);
   display:flex;flex-direction:column;overflow:hidden}
 .sb-top{padding:10px;border-bottom:1px solid rgba(255,255,255,.07)}
@@ -93,7 +93,7 @@ input,textarea,select{font-family:inherit;font-size:13px}
 .sb-body::-webkit-scrollbar{width:3px}
 .sb-body::-webkit-scrollbar-thumb{background:rgba(255,255,255,.12);border-radius:3px}
 
-/* ── Add-item footer ────────────────────────────────────────────────────── */
+/* â”€â”€ Add-item footer â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .sb-footer{padding:10px;border-top:1px solid rgba(255,255,255,.07)}
 .fab-row{display:flex;gap:6px}
 .fab{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;
@@ -117,7 +117,7 @@ input,textarea,select{font-family:inherit;font-size:13px}
 .fi:hover{background:rgba(255,255,255,.07);color:#fff}
 .fi-ic{width:14px;text-align:center;flex-shrink:0;opacity:.6;font-size:11px}
 
-/* ── Item cards ─────────────────────────────────────────────────────────── */
+/* â”€â”€ Item cards â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .pg-div{font-size:10px;font-weight:600;color:rgba(255,255,255,.25);
   text-transform:uppercase;letter-spacing:.05em;
   padding:8px 6px 2px;border-top:1px solid rgba(255,255,255,.05);margin-top:2px}
@@ -145,7 +145,7 @@ input,textarea,select{font-family:inherit;font-size:13px}
 .ib:hover{background:rgba(255,255,255,.1);color:#fff}
 .ib.del:hover{background:rgba(220,38,38,.25);color:#fca5a5}
 
-/* ── Badges ─────────────────────────────────────────────────────────────── */
+/* â”€â”€ Badges â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .badge{display:inline-flex;align-items:center;padding:1px 5px;
   border-radius:9999px;font-size:10px;font-weight:600;line-height:1.6}
 .b-li{background:rgba(37,99,235,.3);color:#93c5fd}
@@ -167,12 +167,12 @@ input,textarea,select{font-family:inherit;font-size:13px}
 .sb-empty-t{font-size:12px;font-weight:600;color:rgba(255,255,255,.35)}
 .sb-empty-b{font-size:11px;color:rgba(255,255,255,.22);line-height:1.5}
 
-/* ── Main panels ────────────────────────────────────────────────────────── */
+/* â”€â”€ Main panels â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .main{flex:1;display:flex;overflow:hidden}
 .mp{display:none;flex:1;overflow:hidden}
 .mp.active{display:flex}
 
-/* ── Build ──────────────────────────────────────────────────────────────── */
+/* â”€â”€ Build â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .build-shell{display:flex;flex:1;overflow:hidden}
 .canvas{flex:1;overflow-y:auto;padding:24px;display:flex;
   flex-direction:column;align-items:center}
@@ -185,7 +185,7 @@ input,textarea,select{font-family:inherit;font-size:13px}
 .c-prompt-t{font-size:14px;font-weight:600;color:var(--t2)}
 .c-prompt-b{font-size:13px;line-height:1.6}
 
-/* ── Inspector ──────────────────────────────────────────────────────────── */
+/* â”€â”€ Inspector â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .inspector{width:var(--iw);flex-shrink:0;background:var(--cf);
   border-left:1px solid var(--cb);display:flex;flex-direction:column;
   overflow:hidden;transform:translateX(var(--iw));
@@ -207,7 +207,7 @@ input,textarea,select{font-family:inherit;font-size:13px}
 .insp-foot{padding:10px 14px;border-top:1px solid var(--cb);
   display:flex;align-items:center;flex-shrink:0}
 
-/* ── Field groups ───────────────────────────────────────────────────────── */
+/* â”€â”€ Field groups â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .fgs{border-bottom:1px solid var(--cb)}
 .fgs-hdr{display:flex;align-items:center;justify-content:space-between;
   padding:7px 14px;cursor:pointer;background:#f8fafc;user-select:none}
@@ -219,7 +219,7 @@ input,textarea,select{font-family:inherit;font-size:13px}
 .fgs-body{padding:10px 14px;display:flex;flex-direction:column;gap:10px}
 .fgs.col .fgs-body{display:none}
 
-/* ── Form fields ────────────────────────────────────────────────────────── */
+/* â”€â”€ Form fields â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .field{display:flex;flex-direction:column;gap:3px}
 .fl{font-size:11px;font-weight:600;color:var(--t2);
   display:flex;align-items:center;gap:3px}
@@ -241,7 +241,7 @@ input,textarea,select{font-family:inherit;font-size:13px}
   color:var(--t2);cursor:pointer}
 .fcheck input[type=checkbox]{accent-color:var(--cp);width:13px;height:13px}
 
-/* ── Choice rows ────────────────────────────────────────────────────────── */
+/* â”€â”€ Choice rows â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .crow-wrap{border:1.5px solid var(--cb);border-radius:6px;
   overflow:hidden;margin-bottom:6px}
 .crow{display:flex;align-items:center;gap:4px;padding:4px 8px;
@@ -259,11 +259,11 @@ input,textarea,select{font-family:inherit;font-size:13px}
   font-size:10px;color:var(--t2);transition:all var(--d1)}
 .cq button:hover{border-color:var(--cp);color:var(--cp);background:var(--cp-l)}
 
-/* ── Variable checkboxes ────────────────────────────────────────────────── */
+/* â”€â”€ Variable checkboxes â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .vcbs{max-height:150px;overflow-y:auto;border:1.5px solid var(--cb);
   border-radius:6px;padding:7px;display:flex;flex-direction:column;gap:4px}
 
-/* ── Modals ─────────────────────────────────────────────────────────────── */
+/* â”€â”€ Modals â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .mov{display:none;position:fixed;inset:0;background:rgba(15,23,42,.45);z-index:200;
   align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(2px)}
 .mov.open{display:flex}
@@ -286,7 +286,7 @@ input,textarea,select{font-family:inherit;font-size:13px}
   display:flex;align-items:center;gap:8px;flex-shrink:0}
 .sp{flex:1}
 
-/* ── Settings tabs ──────────────────────────────────────────────────────── */
+/* â”€â”€ Settings tabs â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .stabs{display:flex;gap:2px;background:var(--cg);border-radius:10px;
   padding:3px;margin-bottom:12px;flex-wrap:wrap}
 .stab{padding:5px 10px;border-radius:6px;font-size:11px;font-weight:500;
@@ -300,7 +300,7 @@ input,textarea,select{font-family:inherit;font-size:13px}
 .alert-w{background:var(--cw-l);color:#78350f;border:1px solid #fde68a;
   padding:9px 12px;border-radius:6px;font-size:12px;line-height:1.5}
 
-/* ── Preview ────────────────────────────────────────────────────────────── */
+/* â”€â”€ Preview â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .pv-mode{flex-direction:column;background:var(--cg)}
 .pv-bar{padding:8px 20px;background:var(--cf);border-bottom:1px solid var(--cb);
   display:flex;align-items:center;gap:12px;flex-shrink:0}
@@ -361,12 +361,19 @@ input,textarea,select{font-family:inherit;font-size:13px}
 .pv-ty-t{font-size:20px;font-weight:700;margin-bottom:7px}
 .pv-ty-m{color:var(--t2);font-size:13px;line-height:1.6}
 
-/* ── Analyse ────────────────────────────────────────────────────────────── */
+/* â”€â”€ Analyse â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .an-mode{overflow:hidden}
-.an-split{display:grid;grid-template-columns:240px 1fr;height:100%;overflow:hidden}
+.an-tabs{display:flex;gap:4px;padding:8px 10px;border-bottom:1px solid var(--cb);
+  background:var(--cf);flex-shrink:0}
+.an-tab{border:1px solid var(--cb);background:var(--cg);border-radius:7px;
+  padding:6px 10px;font-size:11px;font-weight:600;color:var(--t2);cursor:pointer}
+.an-tab.active{background:var(--t1);color:#fff;border-color:var(--t1)}
+.an-split{display:grid;grid-template-columns:270px minmax(320px,1fr) 320px;height:calc(100% - 44px);overflow:hidden}
 .an-vars{background:var(--cf);border-right:1px solid var(--cb);
   display:flex;flex-direction:column;overflow:hidden}
 .an-rqs{display:flex;flex-direction:column;overflow:hidden;background:var(--cg)}
+.an-output{display:flex;flex-direction:column;overflow:hidden;background:var(--cf);
+  border-left:1px solid var(--cb)}
 .pan-hdr{padding:10px 14px;border-bottom:1px solid var(--cb);
   display:flex;align-items:center;justify-content:space-between;
   flex-shrink:0;background:var(--cf)}
@@ -376,6 +383,27 @@ input,textarea,select{font-family:inherit;font-size:13px}
   border-radius:9999px;background:var(--cg);border:1.5px solid var(--cb);
   font-size:10px;font-weight:500;color:var(--t2);margin:2px;cursor:default}
 .vchip.sc{background:var(--cp-l);border-color:#bfdbfe;color:#1e40af}
+.vmeta{display:block;border:1px solid var(--cb);border-radius:8px;background:var(--cg);
+  padding:8px;margin-bottom:7px}
+.vmeta-id{font-size:12px;font-weight:700;color:var(--t1)}
+.vmeta-lbl{font-size:11px;color:var(--t2);line-height:1.35;margin-top:3px}
+.vmeta-badges{display:flex;flex-wrap:wrap;gap:3px;margin-top:6px}
+.vbadge{font-size:9px;font-weight:700;border-radius:9999px;padding:2px 5px;
+  background:#e5e7eb;color:#374151}
+.vbadge.nom{background:#fee2e2;color:#991b1b}.vbadge.ord{background:#fef3c7;color:#92400e}
+.vbadge.con{background:#dbeafe;color:#1e40af}.vbadge.id{background:#ede9fe;color:#5b21b6}
+.vbadge.lik{background:#dcfce7;color:#166534}.vbadge.scl{background:#cffafe;color:#155e75}
+.vbadge.txt{background:#f3f4f6;color:#4b5563}
+.role-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.role-card{border:1px solid var(--cb);border-radius:8px;background:var(--cg);padding:9px}
+.role-card .fl{margin-bottom:5px}
+.plan-msg{font-size:11px;margin-top:8px;padding:7px 9px;border-radius:6px;background:#fff7ed;color:#9a3412;border:1px solid #fed7aa}
+.plan-msg.ok{background:#f0fdf4;color:#166534;border-color:#bbf7d0}
+.preview-card{border:1px solid var(--cb);border-radius:8px;background:var(--cg);padding:10px;font-size:12px;color:var(--t2);line-height:1.5}
+.model-list{font-size:11px;color:var(--t2);margin-top:8px;display:flex;flex-direction:column;gap:5px}
+.model-row{border:1px solid var(--cb);border-radius:7px;background:#fff;padding:7px}
+.model-paths{margin-top:4px;display:flex;gap:3px;flex-wrap:wrap}
+.syntax-box{width:100%;min-height:120px;border:1px solid var(--cb);border-radius:7px;background:#0f172a;color:#e2e8f0;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px;padding:8px}
 .rqs-body{flex:1;overflow-y:auto;padding:14px}
 .rq-card{background:var(--cf);border:1.5px solid var(--cb);border-radius:10px;
   padding:14px;margin-bottom:10px;cursor:pointer;transition:border-color var(--d1)}
@@ -406,7 +434,7 @@ input,textarea,select{font-family:inherit;font-size:13px}
   display:flex;align-items:center;gap:6px}
 .suggest-box .sb-ic{font-size:13px;flex-shrink:0}
 
-/* ── Toast ──────────────────────────────────────────────────────────────── */
+/* â”€â”€ Toast â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .toast-r{position:fixed;bottom:20px;right:20px;z-index:400;
   display:flex;flex-direction:column;gap:6px;pointer-events:none}
 .toast{display:flex;align-items:center;gap:8px;padding:8px 14px;
@@ -417,7 +445,7 @@ input,textarea,select{font-family:inherit;font-size:13px}
 .toast.ok{background:#14532d}.toast.err{background:#7f1d1d}
 .toast.inf{background:#1e3a8a}.toast.warn{background:#713f12}
 
-/* ── Confirm ────────────────────────────────────────────────────────────── */
+/* â”€â”€ Confirm â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .conf-ov{display:none;position:fixed;inset:0;z-index:300;
   background:rgba(15,23,42,.35);align-items:center;justify-content:center}
 .conf-ov.open{display:flex}
@@ -428,13 +456,13 @@ input,textarea,select{font-family:inherit;font-size:13px}
 .conf-m{font-size:12px;color:var(--t2);margin-bottom:14px;line-height:1.5}
 .conf-acts{display:flex;gap:7px;justify-content:flex-end}
 
-/* ── Recovery banner ────────────────────────────────────────────────────── */
+/* â”€â”€ Recovery banner â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .rec-ban{background:var(--cw-l);border-bottom:1px solid #fde68a;padding:7px 18px;
   display:flex;align-items:center;gap:10px;font-size:12px;color:#78350f;flex-shrink:0}
 .rec-ban[hidden]{display:none}
 .rec-msg{flex:1}
 
-/* ── Keyboard hint ──────────────────────────────────────────────────────── */
+/* â”€â”€ Keyboard hint â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
   border-radius:3px;font-size:10px;font-family:monospace;color:var(--t2);
   background:var(--cg)}
@@ -482,7 +510,7 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
     </button>
     <div class="sb-search">
       <span class="sb-si">&#128269;</span>
-      <input type="search" id="itemSearch" placeholder="Search items…"
+      <input type="search" id="itemSearch" placeholder="Search itemsâ€¦"
              aria-label="Search items" oninput="renderItemList()">
     </div>
     <div class="setup-strip" aria-label="Survey page setup">
@@ -570,17 +598,44 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
 
   <!-- ANALYSE mode -->
   <div class="mp an-mode" id="mp-analyse">
+    <div class="an-tabs">
+      <button type="button" class="an-tab active" data-an-tab="plan" onclick="setAnalyseTab('plan')">Plan</button>
+      <button type="button" class="an-tab" data-an-tab="run" onclick="setAnalyseTab('run')">Run</button>
+      <button type="button" class="an-tab" data-an-tab="report" onclick="setAnalyseTab('report')">Report</button>
+    </div>
     <div class="an-split">
       <div class="an-vars">
-        <div class="pan-hdr"><span class="pan-hdr-t">Variables</span></div>
+        <div class="pan-hdr"><span class="pan-hdr-t">Variables and constructs</span></div>
         <div class="an-vars-body" id="anVars"></div>
       </div>
       <div class="an-rqs">
         <div class="pan-hdr">
-          <span class="pan-hdr-t">Research Questions</span>
-          <button type="button" class="btn btn-p btn-sm" onclick="openRQModal()">+ Add RQ</button>
+          <span class="pan-hdr-t" id="anMidTitle">Analysis plans</span>
+          <button type="button" class="btn btn-p btn-sm" onclick="openRQModal()">+ Add plan</button>
         </div>
         <div class="rqs-body" id="rqsBody"></div>
+      </div>
+      <div class="an-output">
+        <div class="pan-hdr"><span class="pan-hdr-t">Output preview and model builder</span></div>
+        <div class="rqs-body">
+          <div class="preview-card" id="anOutputPreview">Choose an analysis method to preview planned tables, decision rules, and reporting references.</div>
+          <div style="height:12px"></div>
+          <div class="preview-card">
+            <strong>Model Builder</strong>
+            <p style="margin:6px 0 10px">Create constructs from scales, choose lavaan or seminr syntax, and save model JSON into the .sframe file.</p>
+            <div class="field"><label class="fl" for="mb-type">Output engine</label><div class="fc"><select id="mb-type"><option value="cfa">lavaan CFA</option><option value="cb_sem">lavaan CB-SEM</option><option value="pls_sem">seminr PLS-SEM</option></select></div></div>
+            <button type="button" class="btn btn-s btn-sm" onclick="modelFromScales()">Create model from scales</button>
+            <div class="field"><label class="fl" for="mb-model">Saved model</label><div class="fc"><select id="mb-model" onchange="renderAnalyse()"></select></div></div>
+            <div class="frow">
+              <div class="field"><label class="fl" for="mb-from">Path from</label><div class="fc"><select id="mb-from"></select></div></div>
+              <div class="field"><label class="fl" for="mb-to">Path to</label><div class="fc"><select id="mb-to"></select></div></div>
+            </div>
+            <button type="button" class="btn btn-g btn-sm" onclick="addModelPath()">Add path</button>
+            <button type="button" class="btn btn-p btn-sm" onclick="exportModelSyntax()">Export syntax</button>
+            <div id="modelList" class="model-list"></div>
+            <textarea id="modelSyntaxOut" class="syntax-box" readonly placeholder="Model syntax or JSON appears here."></textarea>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -589,7 +644,7 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
 </div><!-- .shell -->
 </div><!-- .app -->
 
-<!-- ── MODALS ────────────────────────────────────────────────────────────── -->
+<!-- â”€â”€ MODALS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
 
 <!-- Settings -->
 <div class="mov" id="m-settings" onclick="if(event.target===this)closeModal('m-settings')">
@@ -629,7 +684,7 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
     </div>
     <div class="stp" id="sp-thankyou">
       <div class="field"><label class="fl" for="s-tym">Thank-you message</label><div class="fc"><textarea id="s-tym" rows="4"></textarea></div></div>
-      <div class="field"><label class="fl" for="s-tyu">Redirect URL (optional)</label><div class="fc"><input type="url" id="s-tyu" placeholder="https://…"></div><span class="fhint">Respondents are redirected here after submitting.</span></div>
+      <div class="field"><label class="fl" for="s-tyu">Redirect URL (optional)</label><div class="fc"><input type="url" id="s-tyu" placeholder="https://â€¦"></div><span class="fhint">Respondents are redirected here after submitting.</span></div>
       <label class="fcheck"><input type="checkbox" id="s-tydl"><span>Show "Download my response" button</span></label>
     </div>
     <div class="stp" id="sp-header">
@@ -645,9 +700,9 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
       <label class="fcheck"><input type="checkbox" id="s-prog" checked><span>Show progress bar during survey</span></label>
     </div>
     <div class="stp" id="sp-gsheets">
-      <div class="alert-i">Connect to a Google Sheet for serverless response collection. After saving your .sframe file, run <code>export_google_sheet(instr, sheet_url="…")</code> in R to generate the Apps Script collector.</div>
-      <div class="field"><label class="fl" for="s-gsu">Google Sheet URL</label><div class="fc"><input type="url" id="s-gsu" placeholder="https://docs.google.com/spreadsheets/d/…"></div></div>
-      <div class="field"><label class="fl" for="s-gsep">Apps Script Web App URL</label><div class="fc"><input type="url" id="s-gsep" placeholder="https://script.google.com/macros/s/…/exec"></div><span class="fhint">Extensions › Apps Script › Deploy › Web app › Anyone</span></div>
+      <div class="alert-i">Connect to a Google Sheet for serverless response collection. After saving your .sframe file, run <code>export_google_sheet(instr, sheet_url="â€¦")</code> in R to generate the Apps Script collector.</div>
+      <div class="field"><label class="fl" for="s-gsu">Google Sheet URL</label><div class="fc"><input type="url" id="s-gsu" placeholder="https://docs.google.com/spreadsheets/d/â€¦"></div></div>
+      <div class="field"><label class="fl" for="s-gsep">Apps Script Web App URL</label><div class="fc"><input type="url" id="s-gsep" placeholder="https://script.google.com/macros/s/â€¦/exec"></div><span class="fhint">Extensions â€º Apps Script â€º Deploy â€º Web app â€º Anyone</span></div>
     </div>
   </div>
   <div class="mfoot">
@@ -748,32 +803,35 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
   <div class="mhdr"><span class="mtitle" id="rq-modal-title">Add Research Question</span><button type="button" class="mx" onclick="closeModal('m-rq')">&#215;</button></div>
   <div class="mbody">
     <div class="field"><label class="fl" for="rq-q">Research question <span class="fr">*</span></label><div class="fc"><textarea id="rq-q" rows="3" placeholder="Is there a significant difference in satisfaction between groups?"></textarea></div></div>
-    <div class="field"><label class="fl">Variables involved</label><div class="vcbs" id="rqVarCBs"></div></div>
+    <div class="field"><label class="fl">Variables and roles</label><div class="vcbs" id="rqVarCBs"></div><div class="role-grid" id="rqRoleFields"></div></div>
     <!-- Suggestion box: populated and shown by JS when variables are selected -->
     <div id="rqSuggest" class="suggest-box" style="display:none">
       <span class="sb-ic">&#128161;</span>
       <span id="rqSuggestMsg"></span>
     </div>
     <div class="frow">
-      <div class="field"><label class="fl" for="rq-test">Statistical test</label>
+      <div class="field"><label class="fl" for="rq-test">Analysis method</label>
         <div class="fc"><select id="rq-test" onchange="onTestChg()">
-          <optgroup label="Descriptive"><option value="frequency">Frequency table</option><option value="crosstab">Cross-tab + Chi-square</option></optgroup>
-          <optgroup label="Difference"><option value="mann_whitney">Mann-Whitney U</option><option value="t_test_ind">Independent t-test</option><option value="kruskal_wallis">Kruskal-Wallis</option><option value="anova_one">One-way ANOVA</option></optgroup>
-          <optgroup label="Association"><option value="correlation_pearson">Pearson correlation</option><option value="correlation_spearman">Spearman correlation</option></optgroup>
-          <optgroup label="Regression"><option value="regression_linear">Linear regression</option><option value="regression_logistic_binary">Binary logistic</option></optgroup>
-          <optgroup label="Measurement"><option value="reliability_alpha">Cronbach alpha</option><option value="efa">EFA</option><option value="cfa">CFA</option></optgroup>
+          <optgroup label="Descriptive"><option value="frequency">Frequency table</option><option value="descriptives">Descriptives</option><option value="missing_data">Missing values</option><option value="quality">Quality report</option><option value="scale_descriptives">Scale descriptives</option><option value="crosstab">Cross-tab</option></optgroup>
+          <optgroup label="Difference"><option value="mann_whitney">Mann-Whitney U</option><option value="t_test_ind">Independent t-test</option><option value="t_test_pair">Paired t-test</option><option value="wilcoxon_pair">Wilcoxon signed-rank</option><option value="kruskal_wallis">Kruskal-Wallis</option><option value="anova_one">One-way ANOVA</option><option value="anova_two">Two-way ANOVA</option><option value="ancova">ANCOVA</option><option value="repeated_anova">Repeated-measures ANOVA</option><option value="friedman">Friedman</option></optgroup>
+          <optgroup label="Categorical"><option value="chi_square">Chi-square</option><option value="fisher_exact">Fisher's exact</option><option value="mcnemar">McNemar</option><option value="cochran_q">Cochran's Q</option></optgroup>
+          <optgroup label="Association"><option value="correlation_pearson">Pearson correlation</option><option value="correlation_spearman">Spearman correlation</option><option value="correlation_kendall">Kendall tau</option><option value="partial_correlation">Partial correlation</option></optgroup>
+          <optgroup label="Regression"><option value="regression_linear">Linear regression</option><option value="regression_logistic_binary">Binary logistic</option><option value="regression_logistic_ordinal">Ordinal logistic</option><option value="regression_logistic_multinomial">Multinomial logistic</option><option value="mediation">Mediation</option><option value="moderation">Moderation</option></optgroup>
+          <optgroup label="Measurement and models"><option value="reliability_alpha">Cronbach alpha</option><option value="reliability_omega">McDonald omega</option><option value="item_diagnostics">Item diagnostics</option><option value="efa_readiness">EFA readiness</option><option value="efa_solution">EFA solution</option><option value="cfa_lavaan_syntax">CFA lavaan syntax</option><option value="sem_lavaan_syntax">CB-SEM lavaan syntax</option><option value="seminr_syntax">PLS-SEM seminr syntax</option></optgroup>
         </select></div>
       </div>
-      <div class="field"><label class="fl" for="rq-alpha">Alpha</label><div class="fc"><select id="rq-alpha"><option value="0.05">0.05</option><option value="0.01">0.01</option><option value="0.10">0.10</option></select></div></div>
+      <div class="field" id="rq-alpha-field"><label class="fl" for="rq-alpha">Significance level</label><div class="fc"><select id="rq-alpha"><option value="0.05">0.05</option><option value="0.01">0.01</option><option value="0.10">0.10</option></select></div></div>
     </div>
     <div class="field" id="rqCitDiv"></div>
-    <div class="field"><label class="fl" for="rq-interp">Interpretation (complete after data collection)</label><div class="fc"><textarea id="rq-interp" rows="3" placeholder="Write your interpretation after running the analysis…"></textarea></div></div>
+    <div id="rqPreview" class="preview-card"></div>
+    <div id="rqValidMsg" class="plan-msg"></div>
+    <div class="field"><label class="fl" for="rq-interp">Planned decision rule in Plan stage</label><div class="fc"><textarea id="rq-interp" rows="3" placeholder="State how the result will answer the research question."></textarea></div></div>
   </div>
   <div class="mfoot">
     <button type="button" class="btn btn-d btn-sm" id="rqDelBtn" style="display:none" onclick="deleteRQ()">Delete</button>
     <div class="sp"></div>
     <button type="button" class="btn btn-s" onclick="closeModal('m-rq')">Cancel</button>
-    <button type="button" class="btn btn-p" onclick="saveRQ()">Save research question</button>
+    <button type="button" class="btn btn-p" id="rqSaveBtn" onclick="saveRQ()">Save analysis plan</button>
   </div>
 </div>
 </div>
@@ -797,7 +855,7 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
 <script>
 'use strict';
 
-// ── Pure-JS SHA-256 (RFC 6234) ─────────────────────────────────────────────
+// â”€â”€ Pure-JS SHA-256 (RFC 6234) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Used as a fallback when crypto.subtle is unavailable (e.g. Firefox file://).
 (function(){
   function rr(n,d){return(n>>>d)|(n<<(32-d));}
@@ -820,9 +878,9 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
   };
 })();
 
-// ── State ──────────────────────────────────────────────────────────────────
-var S={meta:{title:'Untitled Survey',version:'1.0.0',description:'',authors:'',languages:'en'},choices:[],items:[],scales:[],branching:[],checks:[],analysis_plan:[],render:{mode:'standard',theme:'#2563eb',submit_label:'Submit',welcome:{title:'Welcome to this survey',intro_text:'Thank you for taking part. Your responses will be used for research and reporting purposes.',consent_text:'I understand the purpose of this survey and agree to participate.',consent_required:false,start_label:'Start Survey'},thankyou:{message:'Thank you for completing this survey.',redirect_url:'',show_download:false},header:{institution:'',logo_base64:'',show_progress:true},google_sheets_url:'',google_sheets_endpoint:''}};
-var hist=[],fut=[],selId=null,editRqId=null,pvTab='survey',pvPage=0,dirty=false,lastSaved=null,dragSrc=null,_cRes=null;
+// â”€â”€ State â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+var S={meta:{title:'Untitled Survey',version:'1.0.0',description:'',authors:'',languages:'en'},choices:[],items:[],scales:[],branching:[],checks:[],analysis_plan:[],models:[],render:{mode:'standard',theme:'#2563eb',submit_label:'Submit',welcome:{title:'Welcome to this survey',intro_text:'Thank you for taking part. Your responses will be used for research and reporting purposes.',consent_text:'I understand the purpose of this survey and agree to participate.',consent_required:false,start_label:'Start Survey'},thankyou:{message:'Thank you for completing this survey.',redirect_url:'',show_download:false},header:{institution:'',logo_base64:'',show_progress:true},google_sheets_url:'',google_sheets_endpoint:''}};
+var hist=[],fut=[],selId=null,editRqId=null,pvTab='survey',pvPage=0,dirty=false,lastSaved=null,dragSrc=null,_cRes=null,anTab='plan';
 
 function snap(){hist.push(JSON.stringify(S));if(hist.length>60)hist.shift();fut=[];setDirty();updHistBtns();}
 function undo(){if(!hist.length)return;fut.push(JSON.stringify(S));S=JSON.parse(hist.pop());selId=null;ra();updHistBtns();}
@@ -837,30 +895,30 @@ function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').
 function gv(id){return(document.getElementById(id)||{}).value||'';}
 function sv(id,v){var e=document.getElementById(id);if(e)e.value=v||'';}
 
-// ── Autosave ───────────────────────────────────────────────────────────────
+// â”€â”€ Autosave â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function autoSave(){if(!dirty)return;try{localStorage.setItem('sf_as',JSON.stringify({state:S,ts:Date.now()}));}catch(e){}}
 function chkAutoSave(){try{var d=localStorage.getItem('sf_as');if(!d)return;var p=JSON.parse(d),age=Math.round((Date.now()-p.ts)/60000);if(age>120)return;document.getElementById('recTime').textContent=age+'min';document.getElementById('recBan').hidden=false;window._as=p.state;}catch(e){}}
 function restoreAuto(){if(window._as){S=window._as;ra();setDirty();toast('Session restored','ok');}dismissRec();}
 function dismissRec(){document.getElementById('recBan').hidden=true;try{localStorage.removeItem('sf_as');}catch(e){}}
 setInterval(autoSave,30000);window.addEventListener('beforeunload',autoSave);
 
-// ── Toast ──────────────────────────────────────────────────────────────────
+// â”€â”€ Toast â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function toast(msg,type,dur){type=type||'inf';dur=dur||3200;var e=document.createElement('div');e.className='toast '+type;e.textContent=msg;var r=document.getElementById('toastR');r.appendChild(e);setTimeout(function(){e.style.opacity='0';e.style.transition='opacity .25s';setTimeout(function(){e.remove();},250);},dur);}
 
-// ── Confirm ────────────────────────────────────────────────────────────────
+// â”€â”€ Confirm â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function conf2(title,msg,okLbl){okLbl=okLbl||'Delete';document.getElementById('confT').textContent=title;document.getElementById('confM').textContent=msg;document.getElementById('confOkBtn').textContent=okLbl;document.getElementById('confOv').classList.add('open');return new Promise(function(res){_cRes=res;});}
 function resConf(v){document.getElementById('confOv').classList.remove('open');if(_cRes){_cRes(v);_cRes=null;}}
 
-// ── Fab menu toggle ────────────────────────────────────────────────────────
+// â”€â”€ Fab menu toggle â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function toggleFabMenu(){var m=document.getElementById('fabMenu'),b=document.getElementById('fabMoreBtn');m.classList.toggle('open');b.classList.toggle('active');}
 function closeFabMenu(){document.getElementById('fabMenu').classList.remove('open');document.getElementById('fabMoreBtn').classList.remove('active');}
 // Close menu when clicking outside
 document.addEventListener('click',function(e){var m=document.getElementById('fabMenu'),b=document.getElementById('fabMoreBtn');if(m&&m.classList.contains('open')&&!m.contains(e.target)&&!b.contains(e.target))closeFabMenu();});
 
-// ── Modes ──────────────────────────────────────────────────────────────────
+// â”€â”€ Modes â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function setMode(m){document.querySelectorAll('.m-btn').forEach(function(b){b.setAttribute('aria-pressed',b.dataset.mode===m?'true':'false');});document.querySelectorAll('.mp').forEach(function(p){p.classList.remove('active');});document.getElementById('mp-'+m).classList.add('active');if(m==='preview')renderPreview();if(m==='analyse')renderAnalyse();}
 
-// ── Modals ─────────────────────────────────────────────────────────────────
+// â”€â”€ Modals â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function openModal(id){document.getElementById(id).classList.add('open');}
 function closeModal(id){document.getElementById(id).classList.remove('open');}
 document.addEventListener('keydown',function(e){
@@ -871,7 +929,7 @@ document.addEventListener('keydown',function(e){
   if((e.ctrlKey||e.metaKey)&&e.key==='o'){e.preventDefault();openFile();}
 });
 
-// ── Settings ───────────────────────────────────────────────────────────────
+// â”€â”€ Settings â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function openSettings(tab){
   var r=S.render||{},w=r.welcome||{},ty=r.thankyou||{},h=r.header||{};
   var theme=normHex(r.theme||'#2563eb');
@@ -921,7 +979,7 @@ function saveSettings(){
 function loadLogo(e){var f=e.target.files[0];if(!f)return;var r=new FileReader();r.onload=function(ev){var b64=ev.target.result.split(',')[1];if(!S.render.header)S.render.header={};S.render.header.logo_base64=b64;var lp=document.getElementById('logoPrev');if(lp){lp.src='data:image/png;base64,'+b64;lp.style.display='block';}document.getElementById('logoName').textContent=f.name;var rb=document.getElementById('logoRmBtn');if(rb)rb.style.display='inline-flex';};r.readAsDataURL(f);e.target.value='';}
 function removeLogo(){if(S.render.header)S.render.header.logo_base64='';var lp=document.getElementById('logoPrev');if(lp)lp.style.display='none';document.getElementById('logoName').textContent='No logo';var rb=document.getElementById('logoRmBtn');if(rb)rb.style.display='none';}
 
-// ── File I/O ───────────────────────────────────────────────────────────────
+// â”€â”€ File I/O â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function openFile(){document.getElementById('fileInput').click();}
 function loadFile(e){
   var f=e.target.files[0];if(!f)return;
@@ -932,7 +990,7 @@ function loadFile(e){
       if(!src){toast('Invalid .sframe file','err');return;}
       S.meta=src.meta||S.meta;S.choices=src.choices||[];S.items=src.items||[];
       S.scales=src.scales||[];S.branching=src.branching||[];S.checks=src.checks||[];
-      S.analysis_plan=src.analysis_plan||[];S.render=src.render||S.render;
+      S.analysis_plan=src.analysis_plan||[];S.models=src.models||[];S.render=src.render||S.render;
       ['welcome','thankyou','header'].forEach(function(k){if(!S.render[k])S.render[k]={};});
       selId=null;ra();dirty=false;lastSaved=Date.now();updSave();
       toast('Loaded: '+S.meta.title,'ok');
@@ -941,7 +999,7 @@ function loadFile(e){
   r.readAsText(f);e.target.value='';
 }
 
-// ── SHA-256 helper (async, with pure-JS fallback) ──────────────────────────
+// â”€â”€ SHA-256 helper (async, with pure-JS fallback) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function sframeCanon(x){if(x===null)return{};if(Array.isArray(x))return x.map(sframeCanon);if(x&&typeof x==='object'){var o={};Object.keys(x).sort().forEach(function(k){o[k]=sframeCanon(x[k]);});return o;}return x;}
 async function sframeHash(payload){
   var src=JSON.stringify(sframeCanon(payload));
@@ -955,7 +1013,7 @@ async function sframeHash(payload){
   return window.sha256pure(src);
 }
 async function saveSframe(){
-  var payload={hash:{algo:'sha256',value:''},version:S.meta.version,meta:S.meta,items:S.items,choices:S.choices,scales:S.scales,branching:S.branching,checks:S.checks,analysis_plan:S.analysis_plan,render:S.render};
+  var payload={hash:{algo:'sha256',value:''},version:S.meta.version,meta:S.meta,items:S.items,choices:S.choices,scales:S.scales,branching:S.branching,checks:S.checks,analysis_plan:S.analysis_plan,models:S.models||[],render:S.render};
   payload.hash.value=await sframeHash(payload);
   var blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
   var a=document.createElement('a');a.href=URL.createObjectURL(blob);
@@ -963,7 +1021,7 @@ async function saveSframe(){
   dirty=false;lastSaved=Date.now();updSave();toast('Saved as '+a.download,'ok');
 }
 
-// ── Item list ──────────────────────────────────────────────────────────────
+// â”€â”€ Item list â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 var TL={likert:'Likert',single_choice:'Single',multiple_choice:'Multi',numeric:'Number',text:'Text',textarea:'Long text',date:'Date',matrix:'Matrix',slider:'Slider',ranking:'Ranking',rating:'Rating',section_break:'Section',text_block:'Block'};
 var TB={likert:'b-li',single_choice:'b-si',multiple_choice:'b-mu',numeric:'b-nu',text:'b-te',textarea:'b-te',date:'b-nu',matrix:'b-ma',slider:'b-sl',ranking:'b-ra',rating:'b-ra',section_break:'b-se',text_block:'b-se'};
 function renderItemList(){
@@ -989,12 +1047,12 @@ function renderItemList(){
 }
 function selItem(id){selId=id;renderItemList();openInsp(id);}
 
-// ── Drag reorder ───────────────────────────────────────────────────────────
+// â”€â”€ Drag reorder â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function dStart(e,idx){dragSrc=idx;e.currentTarget.classList.add('dragging');}
 function dOver(e,idx,ev){e.preventDefault();document.querySelectorAll('.ic').forEach(function(c){c.classList.remove('drag-t','drag-b','dragging');});var card=e.currentTarget,rect=card.getBoundingClientRect();card.classList.add(ev.clientY<rect.top+rect.height/2?'drag-t':'drag-b');}
 function dDrop(e,idx){e.preventDefault();document.querySelectorAll('.ic').forEach(function(c){c.classList.remove('drag-t','drag-b','dragging');});if(dragSrc===null||dragSrc===idx){dragSrc=null;return;}snap();var moved=S.items.splice(dragSrc,1)[0];var tgt=dragSrc<idx?idx-1:idx;S.items.splice(tgt,0,moved);dragSrc=null;renderItemList();}
 
-// ── Inspector ──────────────────────────────────────────────────────────────
+// â”€â”€ Inspector â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 var NCS=['likert','single_choice','multiple_choice','matrix','ranking'];
 function openInsp(id){
   var item=S.items.find(function(i){return i.id===id;});if(!item)return;
@@ -1052,16 +1110,16 @@ function renderInspBody(item){
   function chk(fid,checked,lbl){return'<label class="fcheck"><input type="checkbox" id="'+fid+'"'+(checked?' checked':'')+' onchange="updF(\''+fid+'\')"><span>'+lbl+'</span></label>';}
   var identity=fgs('Identity',
     fld('Item ID','<input type="text" id="fi-id" value="'+esc(item.id)+'" onblur="updIdF(this.value)"><div class="ferr" id="fi-id-err">&#9888; Invalid or duplicate ID</div>','Letters, numbers, underscores only.',true)+
-    fld('Question text',ta('fi-lbl',item.label||'','Question text…',2),'',true)+
-    (isSec?fld('Introduction text',ta('fi-intro',item.section_intro||'','Optional intro paragraph…')):'')
+    fld('Question text',ta('fi-lbl',item.label||'','Question textâ€¦',2),'',true)+
+    (isSec?fld('Introduction text',ta('fi-intro',item.section_intro||'','Optional intro paragraphâ€¦')):'')
   );
   var config=isSec||isTxt?'':fgs('Configuration',
     fld('Response type',sel('fi-type',tO,item.type))+
     (NCS.includes(item.type)?fld('Choice set',sel('fi-cs',csO,item.choice_set||'')):'') +
     (NCS.includes(item.type)?fld('Choice labels','<textarea id="fi-choice-lines" rows="5" placeholder="One option per line, or value = Label" onblur="saveItemChoices()">'+esc(itemChoiceLines(item))+'</textarea>','For single choice, these are the respondent-facing category labels.'):'') +
-    (item.type==='matrix'?fld('Matrix row labels',ta('fi-mrows',(item.matrix_items||[]).join('\n'),'One label per line…'),'One per line.'):'') +
+    (item.type==='matrix'?fld('Matrix row labels',ta('fi-mrows',(item.matrix_items||[]).join('\n'),'One label per lineâ€¦'),'One per line.'):'') +
     (item.type==='slider'?'<div class="frow">'+fld('Min',inp('fi-smin',item.slider_min||0,'','number'))+fld('Max',inp('fi-smax',item.slider_max||100,'','number'))+fld('Step',inp('fi-sstep',item.slider_step||1,'','number'))+'</div>':'') +
-    (item.type==='rating'?'<div class="frow">'+fld('Max stars',inp('fi-rmax',item.rating_max||5,'','number'))+fld('Icon',sel('fi-ricon',[['star','Star ★'],['heart','Heart ♥']],item.rating_icon||'star'))+'</div>':'') +
+    (item.type==='rating'?'<div class="frow">'+fld('Max stars',inp('fi-rmax',item.rating_max||5,'','number'))+fld('Icon',sel('fi-ricon',[['star','Star â˜…'],['heart','Heart â™¥']],item.rating_icon||'star'))+'</div>':'') +
     fld('Scale',sel('fi-scale',scO,item.scale_id||''))+
     fld('Page number',inp('fi-page',item.page||'','Leave blank','number'),'Group items across pages.')
   );
@@ -1101,7 +1159,7 @@ function updIdF(nid){
   document.getElementById('inspId').textContent=nid;renderItemList();
 }
 
-// ── Item CRUD ──────────────────────────────────────────────────────────────
+// â”€â”€ Item CRUD â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function ensureChoiceSet(kind){
   var id=kind==='binary'?'yes_no':kind==='basic'?'options_3':'agree5';
   if(S.choices.find(function(c){return c.id===id;}))return id;
@@ -1156,7 +1214,7 @@ function rmItem(id){
   S.checks=S.checks.filter(function(c){return c.item_id!==id;});
 }
 
-// ── Choices ────────────────────────────────────────────────────────────────
+// â”€â”€ Choices â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function openChoiceModal(){sv('c-id','');document.getElementById('cRows').innerHTML='';document.getElementById('c-other').checked=false;document.getElementById('c-rand').checked=false;openModal('m-choice');}
 function addCRow(v,l){v=v||'';l=l||'';var d=document.createElement('div');d.className='crow';d.innerHTML='<span class="crow-dh">&#8942;</span><div style="display:flex;gap:4px;flex:1"><input type="text" placeholder="Value" value="'+esc(String(v))+'" style="flex:.35;border:none;font-size:11px;padding:3px 4px"><input type="text" placeholder="Label" value="'+esc(String(l))+'" style="flex:.65;border:none;font-size:11px;padding:3px 4px"></div><button type="button" class="crow-rm" onclick="this.parentElement.remove()">&#215;</button>';document.getElementById('cRows').appendChild(d);}
 function fillL5(){document.getElementById('cRows').innerHTML='';[[1,'Strongly disagree'],[2,'Disagree'],[3,'Neutral'],[4,'Agree'],[5,'Strongly agree']].forEach(function(p){addCRow(p[0],p[1]);});}
@@ -1177,7 +1235,7 @@ function saveChoice(){
   closeModal('m-choice');toast('Choice set saved','ok');
 }
 
-// ── Scales ─────────────────────────────────────────────────────────────────
+// â”€â”€ Scales â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function openScaleModal(){
   sv('sc-id','');sv('sc-lbl','');document.getElementById('sc-meth').value='mean';sv('sc-minv','');
   var eli=S.items.filter(function(i){return['likert','numeric','slider','rating'].includes(i.type);});
@@ -1203,7 +1261,7 @@ function saveScale(){
   closeModal('m-scale');renderItemList();toast('Scale saved','ok');if(selId)openInsp(selId);
 }
 
-// ── Branching ──────────────────────────────────────────────────────────────
+// â”€â”€ Branching â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function openBranchModal(){
   var qItems=S.items.filter(function(i){return!['section_break','text_block'].includes(i.type);});
   var opts=qItems.map(function(i){return'<option value="'+esc(i.id)+'">'+esc(i.id)+': '+esc((i.label||'').slice(0,40))+'</option>';}).join('');
@@ -1216,7 +1274,7 @@ function saveBranch(){
   closeModal('m-branch');toast('Branching rule added','ok');
 }
 
-// ── Attention checks ───────────────────────────────────────────────────────
+// â”€â”€ Attention checks â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function openCheckModal(){
   var n=S.checks.length+1;sv('ck-id','attn_'+n);sv('ck-pass','');sv('ck-lbl','');
   var opts=S.items.filter(function(i){return!['section_break','text_block'].includes(i.type);}).map(function(i){return'<option value="'+esc(i.id)+'">'+esc(i.id)+': '+esc((i.label||'').slice(0,40))+'</option>';}).join('');
@@ -1229,69 +1287,130 @@ function saveCheck(){
   closeModal('m-check');toast('Attention check added','ok');
 }
 
-// ── Research questions ─────────────────────────────────────────────────────
-var TCITS={frequency:[],crosstab:['field_2018','cohen_1988'],mann_whitney:['mann_1947','cohen_1988'],t_test_ind:['field_2018','cohen_1988'],kruskal_wallis:['kruskal_1952','cohen_1988'],anova_one:['field_2018','cohen_1988'],correlation_pearson:['field_2018','cohen_1988'],correlation_spearman:['spearman_1904','cohen_1988'],regression_linear:['field_2018'],regression_logistic_binary:['hosmer_2013'],reliability_alpha:['cronbach_1951'],efa:['field_2018'],cfa:['field_2018']};
-var TLBLS={frequency:'Frequency',crosstab:'Chi-square',mann_whitney:'Mann-Whitney U',t_test_ind:'t-test',kruskal_wallis:'Kruskal-Wallis',anova_one:'ANOVA',correlation_pearson:'Pearson r',correlation_spearman:'Spearman rho',regression_linear:'Linear reg.',regression_logistic_binary:'Logistic reg.',reliability_alpha:'Cronbach alpha',efa:'EFA',cfa:'CFA'};
-var CSHORT={field_2018:'Field (2018)',cohen_1988:'Cohen (1988)',mann_1947:'Mann & Whitney (1947)',kruskal_1952:'Kruskal & Wallis (1952)',spearman_1904:'Spearman (1904)',cronbach_1951:'Cronbach (1951)',hosmer_2013:'Hosmer et al. (2013)'};
-// Test suggestion logic
-var TEST_SUGGEST={
-  'cat+cat':'crosstab',
-  'cat+cont':'mann_whitney',
-  'cont+cat':'mann_whitney',
-  'cont+cont':'correlation_pearson',
-  'many':'regression_linear'
+// Analyse registry and role-based plan editor
+var CSHORT={field_2018:'Field (2018)',cohen_1988:'Cohen (1988)',mann_1947:'Mann & Whitney (1947)',kruskal_1952:'Kruskal & Wallis (1952)',spearman_1904:'Spearman (1904)',kendall_1938:'Kendall (1938)',cronbach_1951:'Cronbach (1951)',hosmer_2013:'Hosmer et al. (2013)',mackinnon_2008:'MacKinnon (2008)',aiken_1991:'Aiken & West (1991)'};
+var ANALYSIS_REGISTRY={
+frequency:{family:'descriptive',label:'Frequency table',roles:[{id:'variable',label:'Variable',min:1,max:1,levels:['nominal','ordinal','likert']}],showAlpha:false,showHypotheses:false,showEffectSize:false,assumptions:[],output:'Counts, percentages, valid percentages, missing values.',refs:[]},
+descriptives:{family:'descriptive',label:'Descriptives',roles:[{id:'variables',label:'Variables',min:1,max:99,levels:['continuous','scale','ordinal','likert']},{id:'split_by',label:'Split by (optional)',min:0,max:1,levels:['nominal','ordinal']}],showAlpha:false,showHypotheses:false,showEffectSize:false,assumptions:[],output:'N, valid N, missing N, mean, SD, median, IQR, range, skewness, kurtosis, SE, CI.',refs:[]},
+missing_data:{family:'data_quality',label:'Missing values',roles:[{id:'variables',label:'Variables',min:0,max:99,levels:['any']}],showAlpha:false,showHypotheses:false,showEffectSize:false,assumptions:[],output:'Item missingness, respondent missingness, patterns, deletion summary.',refs:[]},
+quality:{family:'data_quality',label:'Quality report',roles:[{id:'variables',label:'Variables',min:0,max:99,levels:['any']}],showAlpha:false,showHypotheses:false,showEffectSize:false,assumptions:[],output:'Attention checks, response quality flags, and quality summary.',refs:[]},
+scale_descriptives:{family:'descriptive',label:'Scale descriptives',roles:[{id:'scales',label:'Scale scores',min:0,max:99,levels:['scale']}],showAlpha:false,showHypotheses:false,showEffectSize:false,assumptions:[],output:'Scale means, variability, missingness, and confidence intervals.',refs:[]},
+crosstab:{family:'categorical',label:'Cross-tab',roles:[{id:'row',label:'Row variable',min:1,max:1,levels:['nominal','ordinal']},{id:'column',label:'Column variable',min:1,max:1,levels:['nominal','ordinal']}],showAlpha:false,showHypotheses:false,showEffectSize:true,assumptions:['Expected cell counts'],output:'Cross-tabulation with association measures when run.',refs:['field_2018']},
+chi_square:{family:'categorical',label:'Chi-square',roles:[{id:'row',label:'Variable X',min:1,max:1,levels:['nominal','ordinal']},{id:'column',label:'Variable Y',min:1,max:1,levels:['nominal','ordinal']}],showAlpha:true,showHypotheses:true,showEffectSize:true,assumptions:['Expected-count check'],output:'Chi-square, p value, Cramer V or phi.',refs:['field_2018','cohen_1988']},
+fisher_exact:{family:'categorical',label:"Fisher's exact",roles:[{id:'row',label:'Variable X',min:1,max:1,levels:['nominal','ordinal']},{id:'column',label:'Variable Y',min:1,max:1,levels:['nominal','ordinal']}],showAlpha:true,showHypotheses:true,showEffectSize:true,assumptions:['Sparse-table handling'],output:"Fisher's exact p value and odds ratio for 2 x 2 tables.",refs:['field_2018']},
+mcnemar:{family:'related_samples',label:'McNemar',roles:[{id:'before',label:'Before/condition 1',min:1,max:1,levels:['nominal']},{id:'after',label:'After/condition 2',min:1,max:1,levels:['nominal']}],showAlpha:true,showHypotheses:true,showEffectSize:false,assumptions:['Paired binary categories'],output:'McNemar chi-square and p value.',refs:['field_2018']},
+cochran_q:{family:'related_samples',label:"Cochran's Q",roles:[{id:'measures',label:'Binary repeated measures',min:2,max:99,levels:['nominal']}],showAlpha:true,showHypotheses:true,showEffectSize:false,assumptions:['Related binary measures'],output:"Cochran's Q and pairwise McNemar plan.",refs:['field_2018']},
+mann_whitney:{family:'group_comparison',label:'Mann-Whitney U',roles:[{id:'group',label:'Grouping variable',min:1,max:1,levels:['nominal','ordinal']},{id:'outcome',label:'Outcome variable',min:1,max:1,levels:['ordinal','continuous','scale','likert']}],showAlpha:true,showHypotheses:true,showEffectSize:true,assumptions:['Exactly two groups'],output:'U statistic, p value, rank-biserial effect size.',refs:['mann_1947','cohen_1988']},
+t_test_ind:{family:'group_comparison',label:'Independent t-test',roles:[{id:'group',label:'Grouping variable',min:1,max:1,levels:['nominal']},{id:'outcome',label:'Outcome variable',min:1,max:1,levels:['continuous','scale']}],showAlpha:true,showHypotheses:true,showEffectSize:true,assumptions:['Normality','Equal variance'],output:'t, df, p value, Cohen d.',refs:['field_2018','cohen_1988']},
+t_test_pair:{family:'related_samples',label:'Paired t-test',roles:[{id:'before',label:'Measure 1',min:1,max:1,levels:['continuous','scale']},{id:'after',label:'Measure 2',min:1,max:1,levels:['continuous','scale']}],showAlpha:true,showHypotheses:true,showEffectSize:true,assumptions:['Normality of differences'],output:'Paired t, df, p value, dz.',refs:['field_2018']},
+wilcoxon_pair:{family:'related_samples',label:'Wilcoxon signed-rank',roles:[{id:'before',label:'Measure 1',min:1,max:1,levels:['ordinal','continuous','scale','likert']},{id:'after',label:'Measure 2',min:1,max:1,levels:['ordinal','continuous','scale','likert']}],showAlpha:true,showHypotheses:true,showEffectSize:true,assumptions:['Paired ordinal or continuous measures'],output:'V, p value, r effect size.',refs:['cohen_1988']},
+kruskal_wallis:{family:'group_comparison',label:'Kruskal-Wallis',roles:[{id:'group',label:'Grouping variable',min:1,max:1,levels:['nominal','ordinal']},{id:'outcome',label:'Outcome variable',min:1,max:1,levels:['ordinal','continuous','scale','likert']}],showAlpha:true,showHypotheses:true,showEffectSize:true,assumptions:['Independent groups'],output:'H, p value, eta-squared.',refs:['kruskal_1952','cohen_1988']},
+anova_one:{family:'group_comparison',label:'One-way ANOVA',roles:[{id:'group',label:'Grouping variable',min:1,max:1,levels:['nominal']},{id:'outcome',label:'Outcome variable',min:1,max:1,levels:['continuous','scale']}],showAlpha:true,showHypotheses:true,showEffectSize:true,assumptions:['Normality','Homogeneity of variance'],output:'F, p value, eta-squared, post-hoc plan.',refs:['field_2018','cohen_1988']},
+anova_two:{family:'group_comparison',label:'Two-way ANOVA',roles:[{id:'factor1',label:'Factor 1',min:1,max:1,levels:['nominal']},{id:'factor2',label:'Factor 2',min:1,max:1,levels:['nominal']},{id:'outcome',label:'Outcome',min:1,max:1,levels:['continuous','scale']}],showAlpha:true,showHypotheses:true,showEffectSize:true,assumptions:['Interaction interpretation','Homogeneity of variance'],output:'Main effects, interaction, partial eta-squared.',refs:['field_2018','cohen_1988']},
+ancova:{family:'group_comparison',label:'ANCOVA',roles:[{id:'group',label:'Group',min:1,max:1,levels:['nominal']},{id:'covariates',label:'Covariates',min:1,max:99,levels:['continuous','scale']},{id:'outcome',label:'Outcome',min:1,max:1,levels:['continuous','scale']}],showAlpha:true,showHypotheses:true,showEffectSize:true,assumptions:['Homogeneity of regression slopes'],output:'Adjusted group effects and slope warning.',refs:['field_2018']},
+repeated_anova:{family:'related_samples',label:'Repeated-measures ANOVA',roles:[{id:'measures',label:'Repeated measures',min:2,max:99,levels:['continuous','scale']}],showAlpha:true,showHypotheses:true,showEffectSize:true,assumptions:['Within-subject design'],output:'Within-subject ANOVA summary.',refs:['field_2018']},
+friedman:{family:'related_samples',label:'Friedman',roles:[{id:'measures',label:'Repeated ordinal measures',min:2,max:99,levels:['ordinal','continuous','scale','likert']}],showAlpha:true,showHypotheses:true,showEffectSize:false,assumptions:['Related measures'],output:'Friedman chi-square and p value.',refs:['field_2018']},
+correlation_pearson:{family:'association',label:'Pearson correlation',roles:[{id:'x',label:'Variable X',min:1,max:1,levels:['continuous','scale']},{id:'y',label:'Variable Y',min:1,max:1,levels:['continuous','scale']}],showAlpha:true,showHypotheses:true,showEffectSize:true,assumptions:['Linearity','Bivariate normality'],output:'r, p value, confidence interval where feasible.',refs:['field_2018','cohen_1988']},
+correlation_spearman:{family:'association',label:'Spearman correlation',roles:[{id:'x',label:'Variable X',min:1,max:1,levels:['ordinal','continuous','scale','likert']},{id:'y',label:'Variable Y',min:1,max:1,levels:['ordinal','continuous','scale','likert']}],showAlpha:true,showHypotheses:true,showEffectSize:true,assumptions:['Monotonic association'],output:'rho and p value.',refs:['spearman_1904','cohen_1988']},
+correlation_kendall:{family:'association',label:'Kendall tau',roles:[{id:'x',label:'Variable X',min:1,max:1,levels:['ordinal','likert']},{id:'y',label:'Variable Y',min:1,max:1,levels:['ordinal','likert']}],showAlpha:true,showHypotheses:true,showEffectSize:true,assumptions:['Ordinal association'],output:'tau and p value.',refs:['kendall_1938']},
+partial_correlation:{family:'association',label:'Partial correlation',roles:[{id:'x',label:'Variable X',min:1,max:1,levels:['continuous','scale']},{id:'y',label:'Variable Y',min:1,max:1,levels:['continuous','scale']},{id:'controls',label:'Control variables',min:1,max:99,levels:['continuous','scale']}],showAlpha:true,showHypotheses:true,showEffectSize:true,assumptions:['Linear control model'],output:'Partial r and p value.',refs:['field_2018']},
+regression_linear:{family:'regression',label:'Linear regression',roles:[{id:'dependent',label:'Dependent variable',min:1,max:1,levels:['continuous','scale']},{id:'predictors',label:'Predictors',min:1,max:99,levels:['nominal','ordinal','continuous','scale','likert']}],showAlpha:true,showHypotheses:true,showEffectSize:true,assumptions:['Residual normality','VIF','Cook distance'],output:'Model fit, coefficients, assumptions.',refs:['field_2018']},
+regression_logistic_binary:{family:'regression',label:'Binary logistic',roles:[{id:'dependent',label:'Binary outcome',min:1,max:1,levels:['nominal']},{id:'predictors',label:'Predictors',min:1,max:99,levels:['nominal','ordinal','continuous','scale']}],showAlpha:true,showHypotheses:true,showEffectSize:true,assumptions:['Sparse cells','Separation warning'],output:'Odds ratios, pseudo R-squared, classification table.',refs:['hosmer_2013']},
+regression_logistic_ordinal:{family:'regression',label:'Ordinal logistic',roles:[{id:'dependent',label:'Ordinal outcome',min:1,max:1,levels:['ordinal','likert']},{id:'predictors',label:'Predictors',min:1,max:99,levels:['nominal','ordinal','continuous','scale']}],showAlpha:true,showHypotheses:true,showEffectSize:true,assumptions:['Ordered outcome'],output:'MASS::polr model plan, odds ratios, fit table.',refs:['hosmer_2013']},
+regression_logistic_multinomial:{family:'regression',label:'Multinomial logistic',roles:[{id:'dependent',label:'Nominal outcome',min:1,max:1,levels:['nominal']},{id:'predictors',label:'Predictors',min:1,max:99,levels:['nominal','ordinal','continuous','scale']}],showAlpha:true,showHypotheses:true,showEffectSize:true,assumptions:['Reference category'],output:'nnet::multinom plan, odds ratios, classification table.',refs:['hosmer_2013']},
+mediation:{family:'regression',label:'Mediation',roles:[{id:'predictor',label:'Predictor',min:1,max:1,levels:['continuous','scale','nominal']},{id:'mediator',label:'Mediator',min:1,max:1,levels:['continuous','scale']},{id:'outcome',label:'Outcome',min:1,max:1,levels:['continuous','scale']}],showAlpha:true,showHypotheses:true,showEffectSize:true,assumptions:['Regression assumptions','Bootstrap CI'],output:'Direct, indirect, total effects, bootstrap CI.',refs:['mackinnon_2008']},
+moderation:{family:'regression',label:'Moderation',roles:[{id:'predictor',label:'Predictor',min:1,max:1,levels:['continuous','scale']},{id:'moderator',label:'Moderator',min:1,max:1,levels:['continuous','scale']},{id:'outcome',label:'Outcome',min:1,max:1,levels:['continuous','scale']}],showAlpha:true,showHypotheses:true,showEffectSize:true,assumptions:['Interaction model'],output:'Interaction coefficient and conditional effects.',refs:['aiken_1991']},
+reliability_alpha:{family:'measurement',label:'Reliability alpha',roles:[{id:'items',label:'Scale items',min:2,max:99,levels:['ordinal','likert','continuous']}],showAlpha:false,showHypotheses:false,showEffectSize:false,assumptions:[],output:'Alpha, item-total, alpha if deleted.',refs:['cronbach_1951']},
+reliability_omega:{family:'measurement',label:'Reliability omega',roles:[{id:'items',label:'Scale items',min:2,max:99,levels:['ordinal','likert','continuous']}],showAlpha:false,showHypotheses:false,showEffectSize:false,assumptions:[],output:'Omega estimate when the optional psych package is available.',refs:['cronbach_1951']},
+item_diagnostics:{family:'measurement',label:'Item diagnostics',roles:[{id:'items',label:'Items',min:1,max:99,levels:['ordinal','likert','continuous']}],showAlpha:false,showHypotheses:false,showEffectSize:false,assumptions:[],output:'Item distributions, item-total correlations, and floor or ceiling checks.',refs:['field_2018']},
+efa_readiness:{family:'measurement',label:'EFA readiness',roles:[{id:'items',label:'Items',min:3,max:99,levels:['ordinal','likert','continuous']}],showAlpha:false,showHypotheses:false,showEffectSize:false,assumptions:['KMO','Bartlett test'],output:'KMO, Bartlett, parallel-analysis planning.',refs:['field_2018']},
+efa_solution:{family:'measurement',label:'EFA solution',roles:[{id:'items',label:'Items',min:3,max:99,levels:['ordinal','likert','continuous']}],showAlpha:false,showHypotheses:false,showEffectSize:false,assumptions:['Factor retention','Cross-loadings'],output:'Loadings, communalities, uniqueness, cross-loading flags.',refs:['field_2018']},
+cfa_lavaan_syntax:{family:'model',label:'CFA lavaan syntax',roles:[{id:'model',label:'Saved model',min:0,max:1,levels:['model']}],showAlpha:false,showHypotheses:false,showEffectSize:false,assumptions:['Construct indicators'],output:'lavaan measurement model syntax.',refs:['field_2018']},
+sem_lavaan_syntax:{family:'model',label:'CB-SEM lavaan syntax',roles:[{id:'model',label:'Saved model',min:1,max:1,levels:['model']}],showAlpha:true,showHypotheses:true,showEffectSize:true,assumptions:['Measurement and structural paths'],output:'lavaan measurement, structural, indirect, and total-effect syntax.',refs:['field_2018']},
+seminr_syntax:{family:'model',label:'PLS-SEM seminr syntax',roles:[{id:'model',label:'Saved model',min:1,max:1,levels:['model']}],showAlpha:true,showHypotheses:true,showEffectSize:true,assumptions:['Construct modes and bootstrapping'],output:'seminr measurement, structural, bootstrap, reliability, AVE, and HTMT syntax.',refs:['field_2018']}
 };
-function getVarCat(id){var i=S.items.find(function(x){return x.id===id;});if(!i)return'cont';if(['single_choice','multiple_choice'].includes(i.type))return'cat';return'cont';}
+var TCITS={};var TLBLS={};Object.keys(ANALYSIS_REGISTRY).forEach(function(k){TCITS[k]=ANALYSIS_REGISTRY[k].refs||[];TLBLS[k]=ANALYSIS_REGISTRY[k].label;});
+var TEST_SUGGEST={'cat+cat':'chi_square','cat+cont':'mann_whitney','cont+cat':'mann_whitney','cont+cont':'correlation_pearson','many':'regression_linear'};
+function varLevel(id){var sc=S.scales.find(function(s){return s.id===id;});if(sc)return{level:'scale',code:'SCL',cls:'scl',type:'scale score'};var i=S.items.find(function(x){return x.id===id;});if(!i)return{level:'model',code:'MOD',cls:'id',type:'model'};if(i.type==='likert')return{level:'likert',code:'LIK',cls:'lik',type:i.type};if(['single_choice','multiple_choice','ranking'].includes(i.type))return{level:i.type==='ranking'?'ordinal':'nominal',code:i.type==='ranking'?'ORD':'NOM',cls:i.type==='ranking'?'ord':'nom',type:i.type};if(['numeric','slider','rating'].includes(i.type))return{level:'continuous',code:'CON',cls:'con',type:i.type};if(['text','textarea','date'].includes(i.type))return{level:i.type==='date'?'identifier':'text',code:i.type==='date'?'ID':'TXT',cls:i.type==='date'?'id':'txt',type:i.type};return{level:'identifier',code:'ID',cls:'id',type:i.type};}
+function roleOptions(role,selected){var useModels=role.levels&&role.levels.includes('model');var opts=useModels?(S.models||[]).map(function(m){return{id:m.id,label:m.id+' ('+(m.type||'model')+')'};}):getAllVars().filter(function(v){return role.levels.includes('any')||role.levels.includes(v.level)||role.levels.includes(v.kind);});return opts.map(function(v){return'<option value="'+esc(v.id)+'"'+(selected.includes(v.id)?' selected':'')+'>'+esc(v.label)+'</option>';}).join('');}
+function getAllVars(){var items=S.items.filter(function(i){return!['section_break','text_block'].includes(i.type);}).map(function(i){var m=varLevel(i.id);return{id:i.id,label:i.id+' - '+(i.label||'').slice(0,42),level:m.level,kind:'item',meta:m,item:i};});var scales=S.scales.map(function(s){var m=varLevel(s.id);return{id:s.id,label:s.id+' - '+(s.label||'scale score'),level:m.level,kind:'scale',meta:m,scale:s};});return items.concat(scales);}
+function getVarCat(id){var m=varLevel(id);return['nominal','ordinal','likert'].includes(m.level)?'cat':'cont';}
+function rolesFromLegacy(rq,method){if(rq&&rq.roles)return rq.roles;var v=(rq&&rq.variables)||[];if(!Array.isArray(v))v=[v];if(!method)return{};var r={},defs=(ANALYSIS_REGISTRY[method]||{}).roles||[];defs.forEach(function(role,idx){if(role.max===1)r[role.id]=v[idx]||'';else r[role.id]=v.slice(idx);});return r;}
 function openRQModal(id){
   editRqId=id||null;var rq=id?S.analysis_plan.find(function(r){return r.id===id;}):null;
-  document.getElementById('rq-modal-title').textContent=id?'Edit Research Question':'Add Research Question';
-  sv('rq-q',rq?rq.research_question||'':'');sv('rq-interp',rq?rq.interpretation||'':'');
-  document.getElementById('rq-test').value=rq?rq.test||'mann_whitney':'mann_whitney';
-  document.getElementById('rq-alpha').value=rq?String(rq.alpha||0.05):'0.05';
+  var method=rq?(rq.method||rq.test||'mann_whitney'):'mann_whitney';if(method==='efa')method='efa_readiness';if(method==='cfa')method='cfa_lavaan_syntax';
+  document.getElementById('rq-modal-title').textContent=id?'Edit Analysis Plan':'Add Analysis Plan';
+  sv('rq-q',rq?rq.research_question||'':'');sv('rq-interp',rq?rq.decision_rule||rq.interpretation||'':'');
+  document.getElementById('rq-test').value=method;
+  document.getElementById('rq-alpha').value=rq?String((rq.options&&rq.options.alpha)||rq.alpha||0.05):'0.05';
   document.getElementById('rqDelBtn').style.display=id?'inline-flex':'none';
-  popRQVars(rq?rq.variables||[]:[]);onTestChg();
+  popRQVars(rolesFromLegacy(rq,method));onTestChg(false);
   document.getElementById('rqSuggest').style.display='none';
   openModal('m-rq');
 }
-function popRQVars(sel){
-  var vars=[...S.items.filter(function(i){return!['section_break','text_block'].includes(i.type);}).map(function(i){return{id:i.id,lbl:i.id+' (item)'};}), ...S.scales.map(function(s){return{id:s.id,lbl:s.id+' (scale)'};})];
-  document.getElementById('rqVarCBs').innerHTML=vars.length?vars.map(function(v){return'<label class="fcheck"><input type="checkbox" value="'+esc(v.id)+'"'+(sel.includes(v.id)?' checked':'')+' onchange="suggestTest()"><span>'+esc(v.lbl)+'</span></label>';}).join(''):'<span style="font-size:11px;color:var(--t3)">Define items and scales first.</span>';
+function popRQVars(roleValues){
+  var vars=getAllVars();
+  document.getElementById('rqVarCBs').innerHTML=vars.length?'<span style="font-size:11px;color:var(--t3)">Assign variables below by methodological role. Variable checkboxes are no longer used for v0.3 plans.</span>':'<span style="font-size:11px;color:var(--t3)">Define items and scales first.</span>';
+  renderRoleFields(roleValues||{});
 }
-function onTestChg(){
-  var t=document.getElementById('rq-test').value,cits=TCITS[t]||[];
-  document.getElementById('rqCitDiv').innerHTML=cits.length?'<label class="fl">Suggested citations</label><div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:4px">'+cits.map(function(k){return'<span class="cc">'+esc(CSHORT[k]||k)+'</span>';}).join('')+'</div>':'';
+function renderRoleFields(roleValues){
+  var method=document.getElementById('rq-test').value,reg=ANALYSIS_REGISTRY[method]||ANALYSIS_REGISTRY.mann_whitney;
+  document.getElementById('rqRoleFields').innerHTML=(reg.roles||[]).map(function(role){var selected=roleValues[role.id]||[];if(!Array.isArray(selected))selected=selected?[selected]:[];var multi=role.max>1;return'<div class="role-card"><label class="fl" for="role_'+esc(role.id)+'">'+esc(role.label)+(role.min>0?' <span class="fr">*</span>':'')+'</label><select id="role_'+esc(role.id)+'" data-role-id="'+esc(role.id)+'" '+(multi?'multiple size="4"':'')+' onchange="validatePlanRoles()">'+roleOptions(role,selected)+'</select></div>';}).join('');
+  validatePlanRoles();
+}
+function collectRoles(){var roles={};document.querySelectorAll('[data-role-id]').forEach(function(sel){var id=sel.getAttribute('data-role-id');var vals=Array.from(sel.selectedOptions||[]).map(function(o){return o.value;}).filter(Boolean);roles[id]=sel.multiple?vals:(vals[0]||'');});return roles;}
+function flattenRoles(roles){var out=[];Object.keys(roles).forEach(function(k){var v=roles[k];if(Array.isArray(v))out=out.concat(v);else if(v)out.push(v);});return Array.from(new Set(out));}
+function validatePlanRoles(){
+  var method=document.getElementById('rq-test').value,reg=ANALYSIS_REGISTRY[method]||{},roles=collectRoles(),msgs=[];
+  (reg.roles||[]).forEach(function(role){var vals=roles[role.id];var n=Array.isArray(vals)?vals.filter(Boolean).length:(vals?1:0);if(n<role.min)msgs.push('Select '+role.min+' '+role.label.toLowerCase()+'.');if(role.max&&n>role.max)msgs.push(role.label+' allows at most '+role.max+' variable(s).');});
+  var guidance={
+    frequency:'Select one variable for the frequency table.',
+    mann_whitney:'Mann-Whitney U requires one grouping variable with exactly two groups and one ordinal or continuous outcome.',
+    chi_square:'Chi-square requires categorical variables.',
+    fisher_exact:'Fisher exact test requires categorical variables and is useful for sparse tables.',
+    correlation_pearson:'Pearson correlation requires continuous or scale-score variables.',
+    correlation_spearman:'Spearman or Kendall is safer for ordinal or Likert variables.',
+    correlation_kendall:'Spearman or Kendall is safer for ordinal or Likert variables.',
+    regression_linear:'Regression requires one dependent variable and at least one predictor.',
+    reliability_alpha:'Reliability requires at least two items in a scale.',
+    cfa_lavaan_syntax:'CFA requires at least one construct with two or more indicators; fewer than three indicators should be justified.',
+    seminr_syntax:'PLS-SEM requires at least one construct and one structural path.'
+  }[method]||'Review compatibility before saving.';
+  var complete=(reg.roles||[]).every(function(role){var vals=roles[role.id];var n=Array.isArray(vals)?vals.filter(Boolean).length:(vals?1:0);return n>=role.min;});
+  var msg=document.getElementById('rqValidMsg');if(msg){msg.className='plan-msg '+(complete?'ok':'');msg.textContent=complete?'Required roles are complete. '+guidance:msgs.join(' ');}
+  var btn=document.getElementById('rqSaveBtn');if(btn)btn.disabled=!complete;
+  var prev=document.getElementById('rqPreview');if(prev)prev.innerHTML='<strong>Planned output</strong><br>'+esc(reg.output||'Structured result')+(reg.assumptions&&reg.assumptions.length?'<br><strong>Assumptions</strong>: '+esc(reg.assumptions.join(', ')):'');
+}
+function onTestChg(renderRoles){
+  if(renderRoles!==false)renderRoleFields({});
+  var t=document.getElementById('rq-test').value,reg=ANALYSIS_REGISTRY[t]||{},cits=reg.refs||[];
+  var af=document.getElementById('rq-alpha-field');if(af)af.style.display=reg.showAlpha?'block':'none';
+  document.getElementById('rqCitDiv').innerHTML=cits.length?'<label class="fl">Reporting references</label><div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:4px">'+cits.map(function(k){return'<span class="cc">'+esc(CSHORT[k]||k)+'</span>';}).join('')+'</div>':'';
+  validatePlanRoles();
 }
 function suggestTest(){
-  var sel=Array.from(document.querySelectorAll('#rqVarCBs input:checked')).map(function(c){return c.value;});
-  var box=document.getElementById('rqSuggest'),msg=document.getElementById('rqSuggestMsg');
+  var sel=flattenRoles(collectRoles()),box=document.getElementById('rqSuggest'),msg=document.getElementById('rqSuggestMsg');
   if(sel.length<2){box.style.display='none';return;}
-  var cats=sel.map(getVarCat);
-  var sug='';var lbl='';
-  if(sel.length===2){
-    var key=cats[0]+'+'+cats[1];sug=TEST_SUGGEST[key]||'correlation_pearson';
-    lbl={'crosstab':'Both variables are categorical: Chi-square is recommended.','mann_whitney':'One categorical, one continuous: Mann-Whitney U is recommended.','correlation_pearson':'Both variables are continuous: Pearson correlation is recommended.'}[sug]||'';
-  }else{sug='regression_linear';lbl='Multiple variables selected: linear regression is recommended.';}
-  if(sug){
-    document.getElementById('rq-test').value=sug;onTestChg();
-    msg.textContent=lbl;box.style.display='flex';
-  }
+  var cats=sel.map(getVarCat),sug=sel.length===2?(TEST_SUGGEST[cats[0]+'+'+cats[1]]||'correlation_pearson'):'regression_linear';
+  document.getElementById('rq-test').value=sug;onTestChg();
+  msg.textContent=(ANALYSIS_REGISTRY[sug]||{}).label+' is suggested from the selected variable types.';box.style.display='flex';
 }
 function saveRQ(){
   var q=gv('rq-q').trim();if(!q){toast('Research question text required','err');return;}
-  var sel=Array.from(document.querySelectorAll('#rqVarCBs input:checked')).map(function(c){return c.value;});
-  var t=document.getElementById('rq-test').value;
-  var rq={id:editRqId||uid(),research_question:q,variables:sel,test:t,alpha:parseFloat(gv('rq-alpha'))||0.05,interpretation:gv('rq-interp').trim(),citations:TCITS[t]||[],result:null};
+  var t=document.getElementById('rq-test').value,reg=ANALYSIS_REGISTRY[t]||{},roles=collectRoles(),vars=flattenRoles(roles);
+  var opts={};if(reg.showAlpha)opts.alpha=parseFloat(gv('rq-alpha'))||0.05;
+  var rq={id:editRqId||uid(),research_question:q,family:reg.family||'',method:t,test:t,roles:roles,variables:vars,options:opts,hypotheses:reg.showHypotheses?{null:'No effect or association is present.',alternative:'An effect or association is present.'}:null,decision_rule:gv('rq-interp').trim(),interpretation:gv('rq-interp').trim(),reporting_references:reg.refs||[],citations:reg.refs||[],status:'valid_plan',requires_data:!['cfa_lavaan_syntax','sem_lavaan_syntax','seminr_syntax'].includes(t),result:null};
   snap();
   if(editRqId){var i=S.analysis_plan.findIndex(function(r){return r.id===editRqId;});if(i>=0)S.analysis_plan[i]=rq;}
   else S.analysis_plan.push(rq);
-  editRqId=null;closeModal('m-rq');renderAnalyse();toast('Research question saved','ok');
+  editRqId=null;closeModal('m-rq');renderAnalyse();toast('Analysis plan saved','ok');
 }
 function deleteRQ(){
   if(!editRqId)return;
   conf2('Delete research question','This permanently removes this research question.').then(function(ok){if(!ok)return;snap();S.analysis_plan=S.analysis_plan.filter(function(r){return r.id!==editRqId;});editRqId=null;closeModal('m-rq');renderAnalyse();toast('Research question deleted','inf');});
 }
 
-// ── Preview ────────────────────────────────────────────────────────────────
+// â”€â”€ Preview â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function setPvTab(t){pvTab=t;pvPage=0;document.querySelectorAll('.pvtab').forEach(function(b){b.classList.remove('active');});document.getElementById('pvt-'+t).classList.add('active');renderPreview();}
 function prevPvPage(){pvPage=Math.max(0,pvPage-1);renderPreview();}
 function nextPvPage(){pvPage=pvPage+1;renderPreview();}
@@ -1318,7 +1437,7 @@ function renderPreview(){
   var cm={};S.choices.forEach(function(cs){cm[cs.id]=cs;});
   if(pvTab==='welcome'){
     var w=S.render&&S.render.welcome?S.render.welcome:{};
-    if(!w.intro_text&&!w.consent_text){el.innerHTML='<div style="max-width:620px;margin:0 auto"><div style="background:#fff;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.07);padding:40px;text-align:center;color:var(--t3)"><div style="font-size:32px;margin-bottom:12px">&#128196;</div><p style="font-size:13px">No welcome page configured. <a href="#" onclick="openSettings(\'welcome\');return false" style="color:'+esc(col)+'">Set up welcome page →</a></p></div></div>';return;}
+    if(!w.intro_text&&!w.consent_text){el.innerHTML='<div style="max-width:620px;margin:0 auto"><div style="background:#fff;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.07);padding:40px;text-align:center;color:var(--t3)"><div style="font-size:32px;margin-bottom:12px">&#128196;</div><p style="font-size:13px">No welcome page configured. <a href="#" onclick="openSettings(\'welcome\');return false" style="color:'+esc(col)+'">Set up welcome page â†’</a></p></div></div>';return;}
     el.innerHTML='<div style="max-width:620px;margin:0 auto"><div class="pv-card"><div class="pv-title">'+esc(w.title||S.meta.title)+'</div>'+(w.intro_text?'<div class="pv-intro">'+esc(w.intro_text).replace(/\n/g,'<br>')+'</div>':'')+(w.consent_text?'<div class="pv-consent">'+esc(w.consent_text)+'</div>':'')+'<button type="button" style="width:100%;padding:11px;border-radius:10px;background:'+esc(col)+';color:#fff;font-size:14px;font-weight:600;border:none;cursor:default">'+esc(w.start_label||'Start Survey')+'</button></div></div>';return;
   }
   if(pvTab==='thankyou'){var ty=S.render&&S.render.thankyou?S.render.thankyou:{};el.innerHTML='<div style="max-width:620px;margin:0 auto"><div class="pv-card"><div class="pv-ty"><div class="pv-ty-ic">&#10003;</div><div class="pv-ty-t">Submitted successfully</div><div class="pv-ty-m">'+esc(ty.message||'Thank you for completing this survey.')+'</div></div></div></div>';return;}
@@ -1336,17 +1455,73 @@ function renderPreview(){
   el.innerHTML='<div style="max-width:620px;margin:0 auto"><div class="pv-card">'+hdr+'<div class="pv-title">'+esc(S.meta.title)+'</div>'+(S.meta.description?'<div class="pv-desc">'+esc(S.meta.description)+'</div>':'')+items+nav+submit+'</div></div>';
 }
 
-// ── Analyse ────────────────────────────────────────────────────────────────
+// â”€â”€ Analyse â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+function setAnalyseTab(tab){
+  anTab=tab;document.querySelectorAll('.an-tab').forEach(function(b){b.classList.toggle('active',b.dataset.anTab===tab);});renderAnalyse();
+}
+function currentModel(){
+  var sel=document.getElementById('mb-model'),models=S.models||[];
+  if(!models.length)return null;
+  var id=sel&&sel.value?sel.value:models[models.length-1].id;
+  return models.find(function(m){return m.id===id;})||models[models.length-1];
+}
+function renderModelBuilder(){
+  var models=S.models||[],sel=document.getElementById('mb-model'),from=document.getElementById('mb-from'),to=document.getElementById('mb-to'),list=document.getElementById('modelList');
+  if(!sel||!from||!to||!list)return;
+  var previous=sel.value;
+  sel.innerHTML=models.length?models.map(function(m){return'<option value="'+esc(m.id)+'">'+esc(m.id+' ('+(m.type||'model')+')')+'</option>';}).join(''):'<option value="">No saved models</option>';
+  if(previous&&models.some(function(m){return m.id===previous;}))sel.value=previous;
+  var model=currentModel(),constructs=model&&model.measurement?model.measurement.constructs||[]:[];
+  var opts=constructs.map(function(c){return'<option value="'+esc(c.id)+'">'+esc(c.id)+'</option>';}).join('');
+  from.innerHTML=opts;to.innerHTML=opts;
+  list.innerHTML=models.length?models.map(function(m){var paths=(m.structural&&m.structural.paths)||[];return'<div class="model-row"><strong>'+esc(m.id)+'</strong> <span class="vbadge">'+esc(m.type||'model')+'</span><div>'+esc((m.measurement&&m.measurement.constructs||[]).length)+' construct(s), '+esc(paths.length)+' path(s)</div><div class="model-paths">'+(paths.length?paths.map(function(p){return'<span class="vchip">'+esc(p.from+' -> '+p.to)+'</span>';}).join(''):'<span class="rq-no-int">No paths yet.</span>')+'</div></div>';}).join(''):'<div class="rq-no-int">No saved models yet.</div>';
+}
 function renderAnalyse(){
   var vl=document.getElementById('anVars');if(!vl)return;
-  var vars=[...S.items.filter(function(i){return!['section_break','text_block'].includes(i.type);}).map(function(i){return{id:i.id,label:i.id+': '+(i.label||'').slice(0,30),isScale:false};}), ...S.scales.map(function(s){return{id:s.id,label:s.id+' (scale)',isScale:true};})];
-  vl.innerHTML=vars.length?vars.map(function(v){return'<span class="vchip'+(v.isScale?' sc':'')+'" title="'+esc(v.label)+'">'+esc(v.label.slice(0,28))+'</span>';}).join(''):'<p style="font-size:11px;color:var(--t3);padding:8px">Define items and scales to see variables here.</p>';
+  renderModelBuilder();
+  var vars=getAllVars();
+  vl.innerHTML=vars.length?vars.map(function(v){var i=v.item||{},m=v.meta||varLevel(v.id),cs=i.choice_set||'',sc=i.scale_id||'';return'<div class="vmeta"><div class="vmeta-id">'+esc(v.id)+'</div><div class="vmeta-lbl">'+esc((i.label||v.label||'').slice(0,90))+'</div><div class="vmeta-badges"><span class="vbadge '+esc(m.cls)+'">'+esc(m.code)+'</span><span class="vbadge">'+esc(m.type||v.kind)+'</span>'+(cs?'<span class="vbadge">choice: '+esc(cs)+'</span>':'')+(sc?'<span class="vbadge">scale: '+esc(sc)+'</span>':'')+(i.required?'<span class="vbadge">required</span>':'<span class="vbadge">missing allowed</span>')+'</div></div>';}).join(''):'<p style="font-size:11px;color:var(--t3);padding:8px">Define items and scales to see variables here.</p>';
   var rb=document.getElementById('rqsBody');if(!rb)return;
-  if(!S.analysis_plan.length){rb.innerHTML='<div class="an-empty"><div class="an-empty-ic">&#128300;</div><div class="an-empty-t">No research questions yet</div><div class="an-empty-b">Click "+ Add RQ" to define what to test after data collection.</div></div>';return;}
-  rb.innerHTML=S.analysis_plan.map(function(rq,i){return'<div class="rq-card" onclick="openRQModal(\''+rq.id+'\')"><div style="display:flex;align-items:flex-start;gap:8px"><span class="rq-num">'+(i+1)+'</span><div style="flex:1"><div class="rq-q">'+esc(rq.research_question)+'</div><div class="rq-meta"><span class="tc">'+esc(TLBLS[rq.test]||rq.test)+'</span><span class="ac">alpha='+esc(rq.alpha)+'</span>'+(rq.citations||[]).map(function(k){return'<span class="cc">'+esc(CSHORT[k]||k)+'</span>';}).join('')+'</div>'+(rq.variables&&rq.variables.length?'<div style="margin-top:6px;display:flex;gap:3px;flex-wrap:wrap">'+rq.variables.map(function(v){return'<span class="vchip">'+esc(v)+'</span>';}).join('')+'</div>':'')+(rq.interpretation?'<div class="rq-interp">'+esc(rq.interpretation)+'</div>':'<div class="rq-no-int">Interpretation pending data collection.</div>')+'</div></div></div>';}).join('');
+  document.getElementById('anMidTitle').textContent=anTab==='plan'?'Analysis plans':anTab==='run'?'Run queue':'Report outline';
+  if(!S.analysis_plan.length){rb.innerHTML='<div class="an-empty"><div class="an-empty-ic">&#128300;</div><div class="an-empty-t">No analysis plans yet</div><div class="an-empty-b">Click "+ Add plan" to define method, roles, assumptions, and planned outputs.</div></div>';return;}
+  rb.innerHTML=S.analysis_plan.map(function(rq,i){var method=rq.method||rq.test,reg=ANALYSIS_REGISTRY[method]||{},alpha=(rq.options&&rq.options.alpha)||rq.alpha,vars=rq.variables||flattenRoles(rq.roles||{});return'<div class="rq-card" onclick="openRQModal(\''+rq.id+'\')"><div style="display:flex;align-items:flex-start;gap:8px"><span class="rq-num">'+(i+1)+'</span><div style="flex:1"><div class="rq-q">'+esc(rq.research_question)+'</div><div class="rq-meta"><span class="tc">'+esc(TLBLS[method]||method)+'</span>'+(reg.showAlpha?'<span class="ac">significance='+esc(alpha||0.05)+'</span>':'')+(rq.status?'<span class="ac">'+esc(rq.status)+'</span>':'')+(rq.reporting_references||rq.citations||[]).map(function(k){return'<span class="cc">'+esc(CSHORT[k]||k)+'</span>';}).join('')+'</div>'+(vars&&vars.length?'<div style="margin-top:6px;display:flex;gap:3px;flex-wrap:wrap">'+vars.map(function(v){return'<span class="vchip">'+esc(v)+'</span>';}).join('')+'</div>':'')+(rq.decision_rule||rq.interpretation?'<div class="rq-interp">'+esc(rq.decision_rule||rq.interpretation)+'</div>':'<div class="rq-no-int">Decision rule pending.</div>')+'</div></div></div>';}).join('');
+  var op=document.getElementById('anOutputPreview');if(op){var counts={plan:S.analysis_plan.length,run:S.analysis_plan.filter(function(r){return r.requires_data!==false;}).length,report:S.models?S.models.length:0};op.innerHTML='<strong>'+esc(anTab.charAt(0).toUpperCase()+anTab.slice(1))+'</strong><br>'+counts.plan+' analysis plan(s), '+counts.run+' data-dependent run item(s), '+counts.report+' saved model(s).';}
 }
 
-// ── Init ───────────────────────────────────────────────────────────────────
+function modelFromScales(){
+  if(!S.scales.length){toast('Define scales before creating a model','err');return;}
+  var type=gv('mb-type')||'cfa',engine=type==='pls_sem'?'seminr':'lavaan',id='model_'+((S.models||[]).length+1);
+  var constructs=S.scales.map(function(s){return{id:s.id,label:s.label,mode:type==='pls_sem'?'composite':'reflective',items:s.items||[]};});
+  var model={id:id,label:S.meta.title+' model',type:type,engine:engine,measurement:{constructs:constructs},structural:{paths:[],covariances:[],indirect:[]},options:{estimator:'MLR',standardised:true,bootstrap:5000,missing:'fiml'}};
+  if(!S.models)S.models=[];S.models.push(model);setDirty();renderAnalyse();document.getElementById('modelSyntaxOut').value=JSON.stringify(model,null,2);toast('Model saved into .sframe','ok');
+}
+function addModelPath(){
+  var model=currentModel();if(!model){toast('Create or load a model first','err');return;}
+  var from=gv('mb-from'),to=gv('mb-to');if(!from||!to||from===to){toast('Choose two different constructs','err');return;}
+  if(!model.structural)model.structural={paths:[],covariances:[],indirect:[]};
+  if(!model.structural.paths)model.structural.paths=[];
+  if(model.structural.paths.some(function(p){return p.from===from&&p.to===to;})){toast('Path already exists','err');return;}
+  snap();model.structural.paths.push({from:from,to:to});setDirty();renderAnalyse();toast('Path added','ok');
+}
+function exportModelSyntax(){
+  var model=currentModel();if(!model){toast('Create or load a model first','err');return;}
+  var lines=[];
+  if(model.type==='pls_sem'){
+    lines.push('measurement_model <- constructs(');
+    lines=lines.concat(model.measurement.constructs.map(function(c,i,arr){return'  composite("'+c.id+'", c('+c.items.map(function(it){return'"'+it+'"';}).join(', ')+'))'+(i<arr.length-1?',':'');}));
+    var groups={};(model.structural.paths||[]).forEach(function(p){if(!groups[p.from])groups[p.from]=[];groups[p.from].push(p.to);});
+    lines.push(')','','structural_model <- relationships(');
+    var keys=Object.keys(groups);
+    lines=lines.concat(keys.map(function(f,i){return'  paths(from = "'+f+'", to = c('+groups[f].map(function(t){return'"'+t+'"';}).join(', ')+'))'+(i<keys.length-1?',':'');}));
+    lines.push(')','','pls_model <- estimate_pls(data = data, measurement_model = measurement_model, structural_model = structural_model)');
+  }else{
+    model.measurement.constructs.forEach(function(c){lines.push(c.id+' =~ '+(c.items||[]).join(' + '));});
+    (model.structural.paths||[]).forEach(function(p){lines.push(p.to+' ~ '+p.from);});
+  }
+  document.getElementById('modelSyntaxOut').value=lines.join('\n')+'\n\n'+JSON.stringify(model,null,2);
+}
+
+// â”€â”€ Init â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 chkAutoSave();
 renderItemList();
 renderAnalyse();

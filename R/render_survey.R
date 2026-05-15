@@ -26,15 +26,21 @@ sframe_theme_colour <- function(instrument, theme = NULL) {
 }
 
 .evaluate_branch <- function(rule, dep_val) {
-  if (is.null(dep_val)) return(rule$action == "hide")
+  if (is.null(dep_val) || length(dep_val) == 0L || all(is.na(dep_val))) {
+    return(rule$action == "hide")
+  }
+  dep_chr <- as.character(dep_val[!is.na(dep_val)])
+  rule_chr <- as.character(rule$value)
+  dep_num <- suppressWarnings(as.numeric(dep_chr))
+  rule_num <- suppressWarnings(as.numeric(rule_chr[1]))
   result <- switch(rule$operator,
-    "=="   = isTRUE(dep_val == rule$value),
-    "!="   = isTRUE(dep_val != rule$value),
-    "%in%" = length(dep_val) > 0 && any(dep_val %in% rule$value),
-    ">"    = isTRUE(suppressWarnings(as.numeric(dep_val) > as.numeric(rule$value))),
-    ">="   = isTRUE(suppressWarnings(as.numeric(dep_val) >= as.numeric(rule$value))),
-    "<"    = isTRUE(suppressWarnings(as.numeric(dep_val) < as.numeric(rule$value))),
-    "<="   = isTRUE(suppressWarnings(as.numeric(dep_val) <= as.numeric(rule$value))),
+    "=="   = any(dep_chr %in% rule_chr),
+    "!="   = all(!dep_chr %in% rule_chr),
+    "%in%" = any(dep_chr %in% rule_chr),
+    ">"    = any(!is.na(dep_num) & !is.na(rule_num) & dep_num > rule_num),
+    ">="   = any(!is.na(dep_num) & !is.na(rule_num) & dep_num >= rule_num),
+    "<"    = any(!is.na(dep_num) & !is.na(rule_num) & dep_num < rule_num),
+    "<="   = any(!is.na(dep_num) & !is.na(rule_num) & dep_num <= rule_num),
     FALSE
   )
   if (rule$action == "show") result else !result

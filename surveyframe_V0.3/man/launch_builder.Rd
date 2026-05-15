@@ -30,8 +30,8 @@ The builder provides a three-mode interface.
 drag-to-reorder, undo/redo, and autosave to browser localStorage.}
 \item{Preview}{A full live render of the survey showing welcome, body,
 and thank-you pages.}
-\item{Analyse}{A research-question planner with automatic test
-suggestion, citation lookup, and interpretation tracking.}
+\item{Analyse}{A role-based analysis planner with method-specific
+options, planned outputs, reporting references, and decision rules.}
 }
 
 The builder includes a pure-JavaScript SHA-256 fallback for browsers or

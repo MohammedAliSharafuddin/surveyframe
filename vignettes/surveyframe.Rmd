@@ -39,6 +39,10 @@ demo is used for scale scoring, reliability, reporting, and syntax generation.
 The input-types demo is used to test and demonstrate the main survey controls
 available in the builder, studio, and dashboard.
 
+The tourism-services responses are synthetic. They are shaped around a
+digital-marketing and tourism-services questionnaire so the examples feel like
+a research workflow, while avoiding real respondent data and internet access.
+
 ## Load the bundled demo instrument
 
 ```{r load-demo}

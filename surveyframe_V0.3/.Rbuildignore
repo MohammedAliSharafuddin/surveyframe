@@ -1,4 +1,14 @@
+^\.git($|/)
+^\.gitattributes$
 ^\.github($|/)
+^\.Rproj\.user($|/)
+^screenshots($|/)
+^screenshot(s)?($|/)
+^tmp($|/)
+^temp($|/)
+^.*\.tmp$
+^.*\.log$
+^tests/testthat/file[[:alnum:]]+\.html$
 ^surveyframe\.Rcheck$
 ^surveyframe_[0-9.]+\.tar\.gz$
 ^surveyframe\.zip$
@@ -11,6 +21,7 @@
 ^revision_todo_0\.3\.md$
 ^todo\.md$
 ^docs($|/)
+^data-raw($|/)
 ^\.codex$
 ^\.codex($|/)
 ^\.local-bin($|/)
