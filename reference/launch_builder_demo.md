@@ -1,8 +1,9 @@
-# Launch SurveyBuilder with the bundled input-types demo
+# Launch SurveyBuilder with the bundled input-types demo preloaded
 
-Opens the standalone browser builder and writes the bundled input-types
-`.sframe` file to a temporary folder so users can load it through the
-builder.
+Opens a temporary copy of the SurveyBuilder with the bundled input-types
+instrument already injected into the JavaScript state. The demo
+questions, scales, and analysis plan are visible immediately — no manual
+file-load step is required.
 
 ## Usage
 
@@ -14,9 +15,10 @@ launch_builder_demo(open = TRUE)
 
 - open:
 
-  Logical. Passed to
-  [`launch_builder()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/launch_builder.md).
+  Logical. When `TRUE` (the default), the pre-populated builder HTML is
+  opened in the system's default web browser.
 
 ## Value
 
-Invisibly returns paths to the builder and demo `.sframe` file.
+Invisibly returns a list with `builder_path`, `demo_file`, and
+`responses_path`.

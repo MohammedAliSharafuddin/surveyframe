@@ -120,12 +120,15 @@ examples and vignettes should avoid opening browsers.</p>
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/launch_builder_demo.html">launch_builder_demo</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/launch_studio_demo.html">launch_studio_demo</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/launch_dashboard_demo.html">launch_dashboard_demo</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p><code><a href="../reference/launch_builder_demo.html">launch_builder_demo()</a></code> writes a demo <code>.sframe</code>
-file to a temporary folder and opens the builder. The user can then load
-the file in the browser builder. <code><a href="../reference/launch_studio_demo.html">launch_studio_demo()</a></code> opens
-the full workflow with an instrument and response data already loaded.
-<code><a href="../reference/launch_dashboard_demo.html">launch_dashboard_demo()</a></code> opens the response dashboard with
-the same demo data.</p>
+<p><code><a href="../reference/launch_builder_demo.html">launch_builder_demo()</a></code> injects the demo instrument state
+directly into a temporary copy of <code>survey_builder.html</code> and
+opens it. The demo questions, scales, and analysis plan are visible
+immediately — no manual Load .sframe step is needed.
+<code><a href="../reference/launch_studio_demo.html">launch_studio_demo()</a></code> opens the full workflow with an
+instrument and response data already loaded, and always opens the
+browser automatically. <code><a href="../reference/launch_dashboard_demo.html">launch_dashboard_demo()</a></code> opens the
+response dashboard with the same demo data and also always opens the
+browser automatically.</p>
 </div>
 <div class="section level2">
 <h2 id="standalone-builder">Standalone builder<a class="anchor" aria-label="anchor" href="#standalone-builder"></a>

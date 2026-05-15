@@ -127,10 +127,19 @@
 </ul></div>
 <div class="section level3">
 <h3 id="documentation-0-3-0">Documentation<a class="anchor" aria-label="anchor" href="#documentation-0-3-0"></a></h3>
-<ul><li>
-<code><a href="../reference/validate_sframe.html">validate_sframe()</a></code>, <code><a href="../reference/score_scales.html">score_scales()</a></code>, <code><a href="../reference/codebook_report.html">codebook_report()</a></code>, <code><a href="../reference/cfa_syntax.html">cfa_syntax()</a></code>, and <code>launch_builder(open = FALSE)</code> have fully runnable examples.</li>
-<li>Reworked the vignette set into a coherent workflow covering instrument building, response analysis, reliability and validity, EFA/CFA/SEM/PLS syntax generation, and GUI usage.</li>
-<li>Added <code>cran-comments.md</code> with platform list, dependency justification, bundled-asset description, and a <code>\dontrun{}</code> use justification table.</li>
+<ul><li><p><code><a href="../reference/validate_sframe.html">validate_sframe()</a></code>, <code><a href="../reference/score_scales.html">score_scales()</a></code>, <code><a href="../reference/codebook_report.html">codebook_report()</a></code>, <code><a href="../reference/cfa_syntax.html">cfa_syntax()</a></code>, and <code>launch_builder(open = FALSE)</code> have fully runnable examples.</p></li>
+<li><p>Reworked the vignette set into a coherent workflow covering instrument building, response analysis, reliability and validity, EFA/CFA/SEM/PLS syntax generation, and GUI usage.</p></li>
+<li><p>Added <code>cran-comments.md</code> with platform list, dependency justification, bundled-asset description, and a <code>\dontrun{}</code> use justification table.</p></li>
+<li><p><code><a href="../reference/launch_builder_demo.html">launch_builder_demo()</a></code> now injects the demo instrument JSON directly into a temporary copy of <code>survey_builder.html</code>. The demo questions, scales, and analysis plan are visible immediately on launch — no manual Load .sframe step is needed.</p></li>
+<li><p><code><a href="../reference/launch_studio_demo.html">launch_studio_demo()</a></code> and <code><a href="../reference/launch_dashboard_demo.html">launch_dashboard_demo()</a></code> now pass <code>launch.browser = TRUE</code> so the browser always opens automatically.</p></li>
+<li><p><code>inst/shiny/dashboard/app.R</code>: replaced <code><a href="https://shiny.posit.co/" class="external-link">library(shiny)</a></code> with a <code>requireNamespace</code> check and explicit <code>shiny::</code> namespace prefixes for CRAN policy compliance.</p></li>
+<li><p><code>db_quality_ui()</code>: <code>class = flag_class</code> added to <code>tags$tr()</code> so quality rows are colour-coded by flag status.</p></li>
+<li><p><code>db_data_ui()</code>: download-button background colour now uses <code>sprintf("...%s...", THEME)</code> instead of <code>background:var(--cp,#2563eb)</code> so the button respects the active dashboard theme.</p></li>
+<li><p><code>db_overview_ui()</code>: date parsing is now delegated to <code>dashboard_parse_date()</code> for robust, error-free date display.</p></li>
+<li><p><code><a href="../reference/render_report.html">render_report()</a></code> and <code><a href="../reference/render_results.html">render_results()</a></code>: HTML report tables now use APA formatting — horizontal rules only, no vertical borders, no row shading. A significance footnote is appended automatically when a p-value column is detected.</p></li>
+<li><p><code>demo/survey.R</code>: complete UX rewrite with section headers, contextual pause prompts, “In the browser: -&gt;” guidance, <code>ask_yn()</code> yes/no prompts, and a conversational mode for static survey export. All output is ASCII-safe.</p></li>
+<li><p><code>dashboard_parse_date()</code> completely rewritten. No longer throws <code>Error in as.POSIXlt.character: character string is not in a standard unambiguous format</code>. Now tries six explicit format templates in priority order (ISO 8601 Z-suffix, ISO 8601 no-tz, space datetime, date-only, UK dd/mm/yyyy, US mm/dd/yyyy) with <code>tryCatch</code> on each, plus a wrapped fallback. Non-matching strings return <code>NA</code> instead of an error.</p></li>
+<li><p>Dashboard Items and Scales tabs: <code>outputOptions(output, "item_chart", suspendWhenHidden = FALSE)</code> and <code>outputOptions(output, "scale_chart", suspendWhenHidden = FALSE)</code> added. Response distribution and Scale score distribution charts now render as soon as the user switches to those tabs instead of appearing blank.</p></li>
 </ul></div>
 <div class="section level3">
 <h3 id="future-direction-v04-0-3-0">Future direction: v0.4<a class="anchor" aria-label="anchor" href="#future-direction-v04-0-3-0"></a></h3>

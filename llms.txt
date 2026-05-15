@@ -279,7 +279,7 @@ Start visually in the HTML SurveyBuilder or construct instruments in R.
 - [`launch_builder()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/launch_builder.md)
   : Launch the surveyframe visual survey builder
 - [`launch_builder_demo()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/launch_builder_demo.md)
-  : Launch SurveyBuilder with the bundled input-types demo
+  : Launch SurveyBuilder with the bundled input-types demo preloaded
 - [`launch_studio_demo()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/launch_studio_demo.md)
   : Launch SurveyStudio with the bundled input-types demo
 - [`launch_dashboard_demo()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/launch_dashboard_demo.md)

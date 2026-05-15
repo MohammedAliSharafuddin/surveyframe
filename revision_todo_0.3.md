@@ -87,7 +87,8 @@ either computed explicitly or omitted.
 
 Review
 [`launch_dashboard()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/launch_dashboard.md)
-environment loading after CRAN submission.
+environment loading after CRAN submission. Confirmed: the
+`sys.source`/`app_env` pattern is correct and no change needed.
 
 Rebuild pkgdown docs after CRAN-facing files settle.
 
@@ -96,3 +97,43 @@ Run win-builder release and devel checks.
 Run rhub checks.
 
 Run URL and spelling checks when those packages are installed.
+
+## Fixed in latest session
+
+1.  [`launch_builder_demo()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/launch_builder_demo.md)
+    rewritten: injects demo instrument JSON directly into a temporary
+    copy of `survey_builder.html`. Demo questions, scales, and analysis
+    plan are visible immediately — no manual Load .sframe step needed.
+2.  [`launch_studio_demo()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/launch_studio_demo.md)
+    and
+    [`launch_dashboard_demo()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/launch_dashboard_demo.md):
+    `launch.browser = TRUE` so the browser always opens automatically.
+3.  `inst/shiny/dashboard/app.R`: replaced
+    [`library(shiny)`](https://shiny.posit.co/) with a
+    `requireNamespace` check and explicit `shiny::` prefixes for CRAN
+    policy compliance.
+4.  `db_quality_ui()`: `class = flag_class` added to `tags$tr()` so rows
+    are colour-coded by flag status.
+5.  `db_data_ui()`: download-button background colour now uses
+    `sprintf("...%s...", THEME)` instead of
+    `background:var(--cp,#2563eb)`.
+6.  `db_overview_ui()`: date parsing delegated to
+    `dashboard_parse_date()` for robust, error-free date display.
+7.  [`render_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_report.md)
+    and
+    [`render_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_results.md):
+    HTML report tables now use APA formatting — horizontal rules only,
+    no vertical borders, no row shading. Significance footnote appended
+    when p-value column detected.
+8.  `demo/survey.R`: complete UX rewrite — section headers, contextual
+    pause prompts, “In the browser: -\>” guidance, `ask_yn()` yes/no
+    prompts, conversational mode for static survey export. Fully
+    ASCII-safe.
+9.  `dashboard_parse_date()` completely rewritten: tries six explicit
+    format templates in priority order with `tryCatch` on each, plus a
+    wrapped fallback. Non-matching strings return `NA` instead of
+    throwing an error.
+10. Dashboard Items and Scales tabs:
+    `outputOptions(..., suspendWhenHidden = FALSE)` added for
+    `item_chart` and `scale_chart`. Charts now render on first tab visit
+    instead of appearing blank.

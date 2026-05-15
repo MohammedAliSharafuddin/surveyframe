@@ -68,12 +68,34 @@
 <li><label><input type="checkbox" checked>Validate bundled HTML files with HTML Tidy and <code>html-validate</code>.</label></li>
 <li><label><input type="checkbox">Add short return-shape comments for internal analysis runners.</label></li>
 <li><label><input type="checkbox">Review Wilcoxon and Mann-Whitney APA wording so approximate z values are either computed explicitly or omitted.</label></li>
-<li><label><input type="checkbox">Review <code><a href="reference/launch_dashboard.html">launch_dashboard()</a></code> environment loading after CRAN submission.</label></li>
+<li><label><input type="checkbox" checked>Review <code><a href="reference/launch_dashboard.html">launch_dashboard()</a></code> environment loading after CRAN submission. Confirmed: the <code>sys.source</code>/<code>app_env</code> pattern is correct and no change needed.</label></li>
 <li><label><input type="checkbox">Rebuild pkgdown docs after CRAN-facing files settle.</label></li>
 <li><label><input type="checkbox">Run win-builder release and devel checks.</label></li>
 <li><label><input type="checkbox">Run rhub checks.</label></li>
 <li><label><input type="checkbox">Run URL and spelling checks when those packages are installed.</label></li>
 </ul></div>
+<div class="section level2">
+<h2 id="fixed-in-latest-session">Fixed in latest session<a class="anchor" aria-label="anchor" href="#fixed-in-latest-session"></a></h2>
+<ol style="list-style-type: decimal"><li>
+<code><a href="reference/launch_builder_demo.html">launch_builder_demo()</a></code> rewritten: injects demo instrument JSON directly into a temporary copy of <code>survey_builder.html</code>. Demo questions, scales, and analysis plan are visible immediately — no manual Load .sframe step needed.</li>
+<li>
+<code><a href="reference/launch_studio_demo.html">launch_studio_demo()</a></code> and <code><a href="reference/launch_dashboard_demo.html">launch_dashboard_demo()</a></code>: <code>launch.browser = TRUE</code> so the browser always opens automatically.</li>
+<li>
+<code>inst/shiny/dashboard/app.R</code>: replaced <code><a href="https://shiny.posit.co/" class="external-link">library(shiny)</a></code> with a <code>requireNamespace</code> check and explicit <code>shiny::</code> prefixes for CRAN policy compliance.</li>
+<li>
+<code>db_quality_ui()</code>: <code>class = flag_class</code> added to <code>tags$tr()</code> so rows are colour-coded by flag status.</li>
+<li>
+<code>db_data_ui()</code>: download-button background colour now uses <code>sprintf("...%s...", THEME)</code> instead of <code>background:var(--cp,#2563eb)</code>.</li>
+<li>
+<code>db_overview_ui()</code>: date parsing delegated to <code>dashboard_parse_date()</code> for robust, error-free date display.</li>
+<li>
+<code><a href="reference/render_report.html">render_report()</a></code> and <code><a href="reference/render_results.html">render_results()</a></code>: HTML report tables now use APA formatting — horizontal rules only, no vertical borders, no row shading. Significance footnote appended when p-value column detected.</li>
+<li>
+<code>demo/survey.R</code>: complete UX rewrite — section headers, contextual pause prompts, “In the browser: -&gt;” guidance, <code>ask_yn()</code> yes/no prompts, conversational mode for static survey export. Fully ASCII-safe.</li>
+<li>
+<code>dashboard_parse_date()</code> completely rewritten: tries six explicit format templates in priority order with <code>tryCatch</code> on each, plus a wrapped fallback. Non-matching strings return <code>NA</code> instead of throwing an error.</li>
+<li>Dashboard Items and Scales tabs: <code>outputOptions(..., suspendWhenHidden = FALSE)</code> added for <code>item_chart</code> and <code>scale_chart</code>. Charts now render on first tab visit instead of appearing blank.</li>
+</ol></div>
 </div>
 
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

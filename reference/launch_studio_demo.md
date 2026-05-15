@@ -1,16 +1,17 @@
 # Launch SurveyStudio with the bundled input-types demo
 
 Opens SurveyStudio with the bundled input-types questionnaire and
-simulated response data.
+simulated response data already loaded. The browser is opened
+automatically by default.
 
 ## Usage
 
 ``` r
 launch_studio_demo(
-  screen = "auto",
+  screen = "preview",
   port = NULL,
   host = "127.0.0.1",
-  launch.browser = interactive()
+  launch.browser = TRUE
 )
 ```
 
@@ -18,7 +19,8 @@ launch_studio_demo(
 
 - screen:
 
-  Initial studio screen. Defaults to `"auto"`.
+  Initial studio screen. Defaults to `"preview"` so the demo content is
+  immediately visible.
 
 - port:
 
@@ -30,7 +32,8 @@ launch_studio_demo(
 
 - launch.browser:
 
-  Whether to open the browser automatically.
+  Whether to open the browser automatically. Defaults to `TRUE` for this
+  demo helper.
 
 ## Value
 
