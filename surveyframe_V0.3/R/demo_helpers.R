@@ -103,15 +103,18 @@ sframe_input_types_demo_data <- function() {
   )
 }
 
+# file: R/demo_helpers.R
+
 #' Launch SurveyBuilder with the bundled input-types demo
 #'
-#' Opens the standalone browser builder and writes the bundled input-types
-#' `.sframe` file to a temporary folder so users can load it through the
-#' builder.
+#' Opens a temporary copy of the standalone browser builder preloaded with the
+#' bundled input-types `.sframe` instrument.
 #'
-#' @param open Logical. Passed to [launch_builder()].
+#' @param open Logical. When `TRUE`, opens the preloaded builder in the system
+#'   browser. When `FALSE`, returns the temporary builder path without opening it.
 #'
-#' @return Invisibly returns paths to the builder and demo `.sframe` file.
+#' @return Invisibly returns paths to the temporary builder and demo `.sframe`
+#'   file.
 #' @export
 launch_builder_demo <- function(open = TRUE) {
   demo <- sframe_input_types_demo_data()
@@ -122,13 +125,70 @@ launch_builder_demo <- function(open = TRUE) {
   demo_file <- file.path(demo_dir, "surveyframe_input_types_demo.sframe")
   write_sframe(demo$instrument, demo_file, overwrite = TRUE)
 
-  builder_path <- launch_builder(open = open)
+  builder_path <- launch_builder(open = FALSE)
 
-  message("Input-types demo .sframe file written to: ", normalizePath(demo_file))
-  message("In SurveyBuilder, use Load .sframe and select this file.")
+  html <- paste(readLines(builder_path, warn = FALSE, encoding = "UTF-8"), collapse = "\n")
+  payload <- paste(readLines(demo_file, warn = FALSE, encoding = "UTF-8"), collapse = "\n")
+
+  injection <- paste0(
+    "\n",
+    "// surveyframe demo preload injected by launch_builder_demo()\n",
+    "(function(){\n",
+    "  try {\n",
+    "    var p = ", payload, ";\n",
+    "    var src = p && p.meta ? p : (p && p.items ? p : null);\n",
+    "    if (src) {\n",
+    "      S.meta = src.meta || S.meta;\n",
+    "      S.choices = src.choices || [];\n",
+    "      S.items = src.items || [];\n",
+    "      S.scales = src.scales || [];\n",
+    "      S.branching = src.branching || [];\n",
+    "      S.checks = src.checks || [];\n",
+    "      S.analysis_plan = src.analysis_plan || [];\n",
+    "      S.models = src.models || [];\n",
+    "      S.render = src.render || S.render;\n",
+    "      ['welcome', 'thankyou', 'header'].forEach(function(k) {\n",
+    "        if (!S.render[k]) S.render[k] = {};\n",
+    "      });\n",
+    "      selId = null;\n",
+    "      dirty = false;\n",
+    "      lastSaved = Date.now();\n",
+    "      window.__surveyframe_demo_loaded = true;\n",
+    "    }\n",
+    "  } catch(e) {\n",
+    "    console.error('Could not preload surveyframe demo state:', e);\n",
+    "  }\n",
+    "})();\n"
+  )
+
+  marker <- "chkAutoSave();\nrenderItemList();"
+
+  if (!grepl(marker, html, fixed = TRUE)) {
+    rlang::abort(
+      "Could not locate SurveyBuilder initialisation block for demo preload.",
+      class = "sframe_error"
+    )
+  }
+
+  html <- sub(
+    marker,
+    paste0(injection, "\n", marker),
+    html,
+    fixed = TRUE
+  )
+
+  demo_builder <- file.path(demo_dir, "survey_builder_demo.html")
+  writeLines(html, demo_builder, useBytes = TRUE)
+
+  if (isTRUE(open)) {
+    utils::browseURL(paste0("file://", normalizePath(demo_builder, winslash = "/")))
+  }
+
+  message("Preloaded SurveyBuilder demo opened from: ", normalizePath(demo_builder))
+  message("Demo .sframe file written to: ", normalizePath(demo_file))
 
   invisible(list(
-    builder_path = builder_path,
+    builder_path = demo_builder,
     demo_file = demo_file
   ))
 }
