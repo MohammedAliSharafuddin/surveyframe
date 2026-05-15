@@ -1,8 +1,7 @@
 # Create a survey instrument object
 
-Assembles a complete survey instrument from its component objects. This
-is the top-level constructor for the `sframe` class. All other
-constructors
+Assembles a survey instrument from its component objects. This is the
+top-level constructor for the `sframe` class. All other constructors
 ([`sf_item()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_item.md),
 [`sf_choices()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_choices.md),
 [`sf_scale()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_scale.md),
@@ -21,7 +20,8 @@ sf_instrument(
   languages = "en",
   components = list(),
   render = NULL,
-  analysis_plan = list()
+  analysis_plan = list(),
+  models = list()
 )
 ```
 
@@ -58,8 +58,8 @@ sf_instrument(
   [`sf_branch()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_branch.md),
   and
   [`sf_check()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_check.md).
-  Components are sorted by class automatically. Raw lists are not
-  accepted.
+  Components are sorted by class automatically. Supply components
+  created by the surveyframe constructors.
 
 - render:
 
@@ -72,10 +72,17 @@ sf_instrument(
   List. Optional pre-planned analysis blocks created in the HTML
   SurveyBuilder Analyse mode.
 
+- models:
+
+  List. Optional model specifications created with
+  [`sf_model()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_model.md)
+  or imported from a `.sframe` file.
+
 ## Value
 
 An object of class `sframe` with slots `meta`, `items`, `choices`,
-`scales`, `branching`, `checks`, `analysis_plan`, and `render`.
+`scales`, `branching`, `checks`, `analysis_plan`, `models`, and
+`render`.
 
 ## See also
 

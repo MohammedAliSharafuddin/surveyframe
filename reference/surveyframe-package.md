@@ -1,14 +1,12 @@
-# surveyframe: A Survey Instrument Workflow for R
+# surveyframe: Survey Instrument Workflows for R
 
 surveyframe defines a survey instrument as a first-class R object and
-provides a complete workflow from instrument design through data
-collection, quality checking, scoring, psychometric diagnostics, and
-reproducible reporting. Version 0.2 adds the browser-based
-SurveyBuilder, launched with
-[`launch_builder()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/launch_builder.md),
-while SurveyStudio, launched with
-[`launch_studio()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/launch_studio.md),
-remains the Shiny workflow shell.
+supports a workflow from instrument design through data collection,
+quality checking, scoring, psychometric diagnostics, and reproducible
+reporting. Version 0.3 adds static HTML survey export, an embeddable
+Shiny survey module, an interactive response dashboard, a role-based
+analysis planner, common survey statistics, and model syntax planning
+for EFA, CFA, CB-SEM, and PLS-SEM.
 
 ### Core workflow
 
@@ -41,6 +39,8 @@ remains the Shiny workflow shell.
 
 6.  **Score and analyse** with
     [`score_scales()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/score_scales.md),
+    [`descriptives_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/descriptives_report.md),
+    [`missing_data_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/missing_data_report.md),
     [`reliability_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/reliability_report.md),
     [`item_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/item_report.md),
     [`efa_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/efa_report.md),
@@ -58,7 +58,8 @@ remains the Shiny workflow shell.
 
 Every function in the package operates on an `sframe` object. The object
 is the single source of truth for item definitions, scale structure,
-reverse-coding keys, branching rules, and check specifications.
+reverse-coding keys, branching rules, check specifications, analysis
+plans, and optional model specifications.
 
 ### File format
 
@@ -72,11 +73,15 @@ Useful links:
 
 - <https://github.com/MohammedAliSharafuddin/surveyframe>
 
-- <https://mohammedalisharafuddin.github.io/surveyframe>
-
 - Report bugs at
   <https://github.com/MohammedAliSharafuddin/surveyframe/issues>
 
 ## Author
 
-**Maintainer**: Mohammed Ali Sharafuddin <mas@flairmi.com>
+**Maintainer**: Mohammed Ali Sharafuddin <mohammedali.page@gmail.com>
+([ORCID](https://orcid.org/0000-0001-5247-2964))
+
+Authors:
+
+- Mohammed Ali Sharafuddin <mohammedali.page@gmail.com>
+  ([ORCID](https://orcid.org/0000-0001-5247-2964))

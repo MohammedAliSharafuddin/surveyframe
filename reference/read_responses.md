@@ -47,8 +47,8 @@ read_responses(
 
 - strict:
 
-  Logical. When `TRUE` (default), columns in the response data that are
-  not declared as item IDs or metadata columns raise an error. When
+  Logical. When `TRUE` (default), columns in the response data outside
+  the declared item IDs and metadata columns raise an error. When
   `FALSE`, undeclared columns are retained with a warning.
 
 ## Value
@@ -65,12 +65,23 @@ item columns in instrument order. Unrecognised columns are dropped when
 ## Examples
 
 ``` r
-if (FALSE) { # \dontrun{
 responses <- read_responses(
-  x             = "data/responses.csv",
-  instrument    = instr,
-  respondent_id = "id",
-  submitted_at  = "timestamp"
+  x = system.file("extdata", "tourism_services_responses.csv",
+                  package = "surveyframe"),
+  instrument = read_sframe(
+    system.file("extdata", "tourism_services_demo.sframe",
+                package = "surveyframe")
+  ),
+  respondent_id = "respondent_id",
+  submitted_at = "submitted_at",
+  meta_cols = "started_at"
 )
-} # }
+head(responses[, c("respondent_id", "visit_type", "dm_1")])
+#>   respondent_id visit_type dm_1
+#> 1          R001 first_time    2
+#> 2          R002 first_time    3
+#> 3          R003 first_time    4
+#> 4          R004     repeat    5
+#> 5          R005 first_time    3
+#> 6          R006     repeat    5
 ```

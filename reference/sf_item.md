@@ -34,7 +34,8 @@ sf_item(
 - id:
 
   Character. A unique identifier for this item. Used as the column name
-  in response data. Must contain only letters, numbers, and underscores.
+  in response data. Must contain only letters, numbers, and `_`
+  characters.
 
 - label:
 

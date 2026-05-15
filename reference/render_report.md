@@ -19,7 +19,10 @@ render_report(
   include_quality = TRUE,
   include_reliability = TRUE,
   include_codebook = TRUE,
-  include_analysis = TRUE
+  include_missing = TRUE,
+  include_descriptives = TRUE,
+  include_analysis = TRUE,
+  include_models = TRUE
 )
 ```
 
@@ -46,7 +49,7 @@ render_report(
 
 - format:
 
-  Character. Output format. Only `"html"` is supported in v0.2.
+  Character. Output format. Currently `"html"`.
 
 - include_quality:
 
@@ -63,10 +66,25 @@ render_report(
   Logical. Whether to include the instrument codebook. Defaults to
   `TRUE`.
 
+- include_missing:
+
+  Logical. Whether to include the missing-data report. Requires `data`.
+  Defaults to `TRUE`.
+
+- include_descriptives:
+
+  Logical. Whether to include descriptive statistics. Requires `data`.
+  Defaults to `TRUE`.
+
 - include_analysis:
 
   Logical. Whether to include analysis-plan results when `data` are
   supplied and the instrument has an `analysis_plan`.
+
+- include_models:
+
+  Logical. Whether to include saved model JSON and generated syntax
+  blocks. Defaults to `TRUE`.
 
 ## Value
 
@@ -81,7 +99,29 @@ The output file path, invisibly.
 ## Examples
 
 ``` r
-if (FALSE) { # \dontrun{
-render_report(instr, data = responses, output_file = "my_report.html")
-} # }
+instr <- read_sframe(
+  system.file("extdata", "tourism_services_demo.sframe",
+              package = "surveyframe")
+)
+responses <- read_responses(
+  system.file("extdata", "tourism_services_responses.csv",
+              package = "surveyframe"),
+  instr,
+  respondent_id = "respondent_id",
+  submitted_at = "submitted_at",
+  meta_cols = "started_at"
+)
+old <- options(surveyframe.use_quarto = FALSE)
+out <- tryCatch(
+  render_report(
+    instr,
+    data = responses,
+    output_file = tempfile(fileext = ".html"),
+    include_reliability = FALSE,
+    include_analysis = FALSE
+  ),
+  finally = options(old)
+)
+file.exists(out)
+#> [1] TRUE
 ```

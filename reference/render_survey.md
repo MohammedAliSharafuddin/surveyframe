@@ -28,7 +28,7 @@ render_survey(
 
 - mode:
 
-  Character. Deployment mode. Only `"shiny"` is supported in v0.2.
+  Character. Deployment mode. Currently `"shiny"`.
 
 - title:
 

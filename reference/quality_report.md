@@ -88,10 +88,37 @@ the recognised defaults: `started_at`, `start_time`, `started`, or
 ## Examples
 
 ``` r
-if (FALSE) { # \dontrun{
-responses <- read_responses("data/responses.csv", instr,
-                            respondent_id = "id")
-qr <- quality_report(responses, instr, respondent_id = "id")
+instr <- read_sframe(
+  system.file("extdata", "tourism_services_demo.sframe",
+              package = "surveyframe")
+)
+responses <- read_responses(
+  system.file("extdata", "tourism_services_responses.csv",
+              package = "surveyframe"),
+  instr,
+  respondent_id = "respondent_id",
+  submitted_at = "submitted_at",
+  meta_cols = "started_at"
+)
+qr <- quality_report(
+  responses,
+  instr,
+  respondent_id = "respondent_id",
+  submitted_at = "submitted_at",
+  started_at = "started_at",
+  straightline_scales = FALSE
+)
 print(qr)
-} # }
+#> Survey Data Quality Report
+#>   Respondents:  120
+#>   Items:        15
+#>   Flagged:      6 (5.0%)
+#> 
+#> Attention checks:
+#>   attention_agree      pass 95%  fail 6
+#> 
+#> Timing:
+#>   Median completion time: 966.0 seconds
+#> 
+#> Missingness:  0.0% of respondents exceed 20% threshold
 ```

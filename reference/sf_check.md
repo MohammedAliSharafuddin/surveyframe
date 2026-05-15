@@ -4,7 +4,8 @@ Specifies an attention, instructional, or trap check item at instrument
 design time. The check is stored in the instrument object and evaluated
 against collected response data by
 [`quality_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/quality_report.md).
-This function only defines the check; it does not evaluate it.
+This function only defines the check. Evaluation happens later in
+[`quality_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/quality_report.md).
 
 ## Usage
 

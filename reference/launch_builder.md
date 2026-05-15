@@ -1,9 +1,9 @@
 # Launch the surveyframe visual survey builder
 
-Opens the SurveyBuilder, a self-contained HTML application for designing
-survey instruments visually. The builder runs entirely in the browser
-with no active R session or Shiny server required. Instruments are saved
-as `.sframe` files and loaded back into R with
+Opens the SurveyBuilder, a self-contained HTML application for visual
+survey design. The builder runs client-side without an R session or
+Shiny server. Save instruments as `.sframe` files from the browser and
+load them into R with
 [`read_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_sframe.md).
 
 ## Usage
@@ -16,22 +16,39 @@ launch_builder(open = TRUE)
 
 - open:
 
-  Logical. If `TRUE` (the default), opens the builder in the default
-  browser. Set to `FALSE` to return the file path without opening, which
-  is useful for testing.
+  Logical. When `TRUE` (the default), the builder HTML file is opened in
+  the system's default web browser with
+  [`utils::browseURL()`](https://rdrr.io/r/utils/browseURL.html). Set to
+  `FALSE` to return the file path without opening it, which is useful
+  for automated testing.
 
 ## Value
 
-Returns the path to the builder HTML file invisibly.
+The path to the bundled builder HTML file, invisibly.
 
 ## Details
 
-The builder provides a three-mode interface: Build (item editor with
-persistent inspector panel), Preview (full survey render with welcome,
-body, and thank-you pages), and Analyse (research question planning with
-automatic test suggestion and citation lookup). All changes autosave to
-browser localStorage. The final instrument is exported as a `.sframe`
-file.
+The builder includes a three-mode interface.
+
+- Build:
+
+  An item editor with a persistent inspector panel, drag-to-reorder,
+  undo/redo, and autosave to browser localStorage.
+
+- Preview:
+
+  A full live render of the survey showing welcome, body, and thank-you
+  pages.
+
+- Analyse:
+
+  A role-based analysis planner with method-specific options, planned
+  outputs, reporting references, and decision rules.
+
+The builder includes a pure-JavaScript SHA-256 fallback for browsers or
+security policies where `crypto.subtle` is unavailable on `file://`
+origins. Saved `.sframe` files can be loaded and validated with
+[`read_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_sframe.md).
 
 ## See also
 
@@ -42,10 +59,8 @@ file.
 ## Examples
 
 ``` r
-if (FALSE) { # \dontrun{
-launch_builder()
-} # }
-
-# Get path without opening (useful for testing)
+# Retrieve the builder path for inspection without opening the browser
 path <- launch_builder(open = FALSE)
+file.exists(path)
+#> [1] TRUE
 ```

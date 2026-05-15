@@ -1,44 +1,84 @@
 # Launch the SurveyStudio interface
 
-Opens the SurveyStudio Shiny application, a visual shell for the full
-surveyframe workflow. The studio provides screens to build a survey
-draft, open an existing instrument, preview the survey, upload
-responses, review data quality, inspect reliability, and export the
-instrument or report.
+Opens the SurveyStudio Shiny application, a visual interface for the
+complete surveyframe workflow. The studio includes screens to build a
+survey draft, open an existing instrument, preview the survey, upload
+responses, review data quality, inspect reliability, plan analyses, and
+export outputs.
 
 ## Usage
 
 ``` r
-launch_studio(instrument = NULL, responses = NULL)
+launch_studio(
+  instrument = NULL,
+  responses = NULL,
+  respondent_id = NULL,
+  submitted_at = NULL,
+  meta_cols = NULL,
+  strict = TRUE,
+  screen = c("auto", "build", "preview", "data", "quality", "analysis", "dashboard"),
+  port = NULL,
+  host = "127.0.0.1",
+  launch.browser = interactive()
+)
 ```
 
 ## Arguments
 
 - instrument:
 
-  An `sframe` object or NULL. When supplied, the studio opens directly
-  to the preview screen with this instrument loaded.
+  An `sframe` object or NULL.
 
 - responses:
 
-  A `tibble`, `data.frame`, or file path to a CSV, or NULL. When
-  supplied alongside `instrument`, the studio opens with responses
-  pre-loaded and the quality dashboard available immediately.
+  A data.frame, tibble, CSV file path, or NULL.
+
+- respondent_id:
+
+  Character or NULL. Response ID column when `responses` is a CSV path.
+
+- submitted_at:
+
+  Character or NULL. Submission time column when `responses` is a CSV
+  path.
+
+- meta_cols:
+
+  Character vector or NULL. Metadata columns when `responses` is a CSV
+  path.
+
+- strict:
+
+  Logical. Passed to
+  [`read_responses()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_responses.md)
+  when `responses` is a CSV path.
+
+- screen:
+
+  Initial studio screen. One of `"auto"`, `"build"`, `"preview"`,
+  `"data"`, `"quality"`, `"analysis"`, or `"dashboard"`.
+
+- port:
+
+  TCP port for the Shiny server.
+
+- host:
+
+  Host address passed to
+  [`shiny::runApp()`](https://rdrr.io/pkg/shiny/man/runApp.html).
+
+- launch.browser:
+
+  Whether to open the browser automatically.
 
 ## Value
 
-Launches a Shiny application and blocks the current R session until the
-app exits. Does not return a value.
-
-## Details
-
-An instrument and response data can be pre-loaded at launch time. If
-neither is supplied, the studio opens at the build screen so the
-researcher can start authoring interactively.
+Called for its side effect.
 
 ## See also
 
-[`render_survey()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_survey.md),
+[`launch_builder()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/launch_builder.md),
+[`launch_dashboard()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/launch_dashboard.md),
 [`read_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_sframe.md),
 [`read_responses()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_responses.md)
 
@@ -46,14 +86,16 @@ researcher can start authoring interactively.
 
 ``` r
 if (FALSE) { # \dontrun{
-# Open the studio with no pre-loaded data
 launch_studio()
 
-# Open with an instrument pre-loaded
 instr <- read_sframe("my_instrument.sframe")
-launch_studio(instrument = instr)
+launch_studio(instrument = instr, launch.browser = FALSE)
 
-# Open with both instrument and responses ready
-launch_studio(instrument = instr, responses = "data/responses.csv")
+launch_studio(
+  instrument = instr,
+  responses = "data/responses.csv",
+  respondent_id = "respondent_id",
+  submitted_at = "submitted_at"
+)
 } # }
 ```

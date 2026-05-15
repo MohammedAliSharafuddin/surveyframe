@@ -40,11 +40,17 @@ The following checks are performed:
 
 - Duplicate item IDs
 
+- Invalid item IDs
+
+- Duplicate choice-set IDs
+
+- Duplicate scale IDs
+
 - Items with missing labels
 
-- Items referencing a `choice_set` that is not defined in the instrument
+- Items referencing a missing `choice_set` in the instrument
 
-- Items referencing a `scale_id` that is not defined in the instrument
+- Items referencing a missing `scale_id` in the instrument
 
 - Items marked `reverse = TRUE` without a `scale_id`
 
@@ -56,6 +62,10 @@ The following checks are performed:
 
 - Attention checks referencing item IDs not present in the instrument
 
+- Analysis plan roles referencing missing variables or models
+
+- Model specifications referencing missing indicators or constructs
+
 ## See also
 
 [`sf_instrument()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_instrument.md),
@@ -64,8 +74,24 @@ The following checks are performed:
 ## Examples
 
 ``` r
-if (FALSE) { # \dontrun{
-instr <- sf_instrument("My Survey", components = list(...))
-validate_sframe(instr)
-} # }
+# Build a minimal valid instrument and validate it
+cs    <- sf_choices("ag5", 1:5,
+           c("Strongly disagree", "Disagree", "Neutral",
+             "Agree", "Strongly agree"))
+item  <- sf_item("sat_1", "The service met my expectations.",
+                 type = "likert", choice_set = "ag5", scale_id = "sat")
+scale <- sf_scale("sat", "Satisfaction", items = "sat_1")
+instr <- sf_instrument("Demo Survey", components = list(cs, item, scale))
+
+# Non-strict: returns a list without stopping
+result <- validate_sframe(instr, strict = FALSE)
+result$valid
+#> [1] TRUE
+result$problems
+#> character(0)
+
+# Strict: returns instrument invisibly when valid
+validated <- validate_sframe(instr, strict = TRUE)
+isTRUE(validated$meta$validated)
+#> [1] TRUE
 ```

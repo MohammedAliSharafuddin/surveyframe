@@ -34,7 +34,15 @@ An `sframe` object.
 ## Examples
 
 ``` r
-if (FALSE) { # \dontrun{
-instr <- read_sframe("my_instrument.sframe")
-} # }
+instr <- read_sframe(
+  system.file("extdata", "tourism_services_demo.sframe",
+              package = "surveyframe")
+)
+print(instr)
+#> <sframe>
+#>   Title:      Tourism Services Experience Demo
+#>   Version:    0.3.0
+#>   Items:      15
+#>   Scales:     5
+#>   Status:     valid
 ```

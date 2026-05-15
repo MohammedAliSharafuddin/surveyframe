@@ -1,96 +1,46 @@
 # surveyframe
 
-**surveyframe** is an end-to-end survey research workflow package for R.
-The package is built around one typed object, the `sframe`, which
-carries the full survey definition from design through validation,
-deployment, collection, quality checks, scoring, psychometric
-diagnostics, analysis execution, and reproducible reporting.
+`surveyframe` supports survey research workflows through a typed
+instrument object, the `sframe`. It stores item definitions, choice
+sets, scales, branching, checks, analysis plans, model specifications,
+rendering hints, and reproducibility metadata.
 
-## Scope
-
-surveyframe is designed to cover the full life of a survey study inside
-R:
-
-- typed instrument definition
-- validation and `.sframe` serialisation with SHA-256 hashing
-- browser-based builder
-- Shiny survey rendering
-- response loading and quality checks
-- scale scoring and psychometric diagnostics
-- pre-planned analysis execution
-- reproducible HTML reporting
-
-The package does not try to replace specialist modelling packages.
-`psych`, `lavaan`, and other downstream tools remain appropriate where
-the workflow needs them. surveyframe owns the instrument-centred
-pipeline.
-
-## Current status
-
-The current v0.2 line includes:
-
-- thirteen item types
-- reusable choice sets
-- composite scales with reverse coding and weighted scoring
-- single-condition branching and attention checks
-- Google Sheets helper utilities
-- SurveyBuilder and SurveyStudio
-- Cronbach alpha, McDonald omega, item diagnostics, EFA readiness, and
-  CFA syntax generation
-- analysis-plan execution across eight tests with APA-style output
-- HTML reporting with instrument hashing for reproducibility
-
-The immediate focus is CRAN hardening rather than adding more surface
-area.
-
-## Dependency model
-
-The package now keeps hard imports deliberately small:
-
-- `jsonlite`
-- `rlang`
-- `openssl`
-
-Optional feature packages are loaded only when needed:
-
-- `shiny` for
-  [`render_survey()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_survey.md)
-  and
-  [`launch_studio()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/launch_studio.md)
-- `psych` for
-  [`reliability_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/reliability_report.md)
-  and
-  [`efa_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/efa_report.md)
-- `googlesheets4` for
-  [`read_sheet_responses()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_sheet_responses.md)
-
-Quarto is no longer a hard dependency. If the `quarto` R package and the
-Quarto CLI are available locally,
-[`render_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_report.md)
-can use the bundled `.qmd` template. If they are not available,
-surveyframe writes an internal HTML fallback instead.
+The package works offline during examples, tests, vignettes, and checks.
+Browser and Shiny entry points use `open = FALSE` or explicit launch
+functions so automated checks do not open a browser.
 
 ## Installation
 
-The package is not yet on CRAN. Install the development version from
-GitHub:
+Install the development version from GitHub:
 
 ``` r
 
 remotes::install_github("MohammedAliSharafuddin/surveyframe")
 ```
 
-Install optional packages only for the features you plan to use:
+Optional packages are only needed for selected features:
 
 ``` r
 
-install.packages(c("shiny", "psych", "googlesheets4"))
-
-# Optional for richer report rendering
-install.packages("quarto")
+install.packages(c("shiny", "psych", "googlesheets4", "digest", "MASS", "nnet"))
 ```
 
-## Minimal workflow
+Syntax generation works without installing `lavaan` or `seminr`. Install
+those packages when you want to fit the generated CFA, CB-SEM, or
+PLS-SEM models.
+
+## Documentation workflow
+
+Start with:
+
+1.  A complete surveyframe workflow
+2.  Building a survey instrument
+3.  Analysing survey responses
+4.  Scale reliability and validity
+5.  EFA, CFA, CB-SEM, and PLS-SEM syntax generation
+6.  SurveyBuilder GUI overview
+
+## Basic instrument
 
 ``` r
 
@@ -102,81 +52,223 @@ agree5 <- sf_choices(
   labels = c("Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree")
 )
 
-items <- lapply(
-  1:3,
-  function(i) {
-    sf_item(
-      paste0("sat_", i),
-      paste("Satisfaction item", i),
-      type = "likert",
-      choice_set = "agree5",
-      scale_id = "sat"
-    )
-  }
+visitor_type_choices <- sf_choices(
+  "visitor_type",
+  values = c("first_time", "repeat"),
+  labels = c("First-time visitor", "Repeat visitor")
 )
 
-scale <- sf_scale("sat", "Satisfaction", items = paste0("sat_", 1:3))
+sat_1 <- sf_item("sat_1", "The service was reliable.",
+  type = "likert", choice_set = "agree5", scale_id = "sat")
+sat_2 <- sf_item("sat_2", "The service was responsive.",
+  type = "likert", choice_set = "agree5", scale_id = "sat")
+sat_3 <- sf_item("sat_3", "I would recommend the service.",
+  type = "likert", choice_set = "agree5", scale_id = "sat")
+
+visitor_type <- sf_item("visitor_type", "Visitor type", type = "single_choice",
+  choice_set = "visitor_type")
+sat <- sf_scale("sat", "Satisfaction", items = c("sat_1", "sat_2", "sat_3"))
 
 instr <- sf_instrument(
-  title = "Customer Satisfaction Survey",
-  components = c(list(agree5), items, list(scale))
+  "Service Survey",
+  components = list(
+    agree5, visitor_type_choices, sat_1, sat_2, sat_3, visitor_type, sat
+  )
 )
 
 instr <- validate_sframe(instr)
-write_sframe(instr, "customer_satisfaction.sframe")
-
-responses <- data.frame(
-  id = c("r1", "r2", "r3"),
-  sat_1 = c(4, 5, 3),
-  sat_2 = c(5, 4, 3),
-  sat_3 = c(4, 5, 2),
-  stringsAsFactors = FALSE,
-  check.names = FALSE
-)
-
-resp <- read_responses(responses, instr, respondent_id = "id", strict = FALSE)
-scored <- score_scales(resp, instr)
-render_report(instr, data = resp, output_file = "report.html")
+write_sframe(instr, tempfile(fileext = ".sframe"))
 ```
 
-## Optional entry points
+[`write_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/write_sframe.md)
+validates the instrument and writes the validated object, including the
+validation flag and any saved model specifications.
 
-| Need | Entry point | Optional package |
-|----|----|----|
-| Visual instrument authoring | [`launch_builder()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/launch_builder.md) | none |
-| Interactive survey deployment | [`render_survey()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_survey.md) | `shiny` |
-| Studio workflow shell | [`launch_studio()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/launch_studio.md) | `shiny` |
-| Reliability and EFA readiness | [`reliability_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/reliability_report.md), [`efa_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/efa_report.md) | `psych` |
-| Google Sheets response import | [`read_sheet_responses()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_sheet_responses.md) | `googlesheets4` |
-| Rich Quarto rendering | [`render_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_report.md) with local Quarto install | Quarto CLI |
+## Response import and descriptives
 
-## CRAN track
+``` r
 
-The package is being prepared for first submission. Current priorities
-are:
+responses <- data.frame(
+  respondent_id = paste0("R", 1:5),
+  sat_1 = c(4, 5, 3, 4, NA),
+  sat_2 = c(5, 4, 3, 4, 5),
+  sat_3 = c(4, 5, 2, 4, 4),
+  visitor_type = c("first_time", "repeat", "first_time", "repeat", "first_time")
+)
 
-- keep the hard dependency set minimal
-- run clean `R CMD check --as-cran` results across platforms
-- replace broad `\\dontrun{}` usage on pure constructor examples with
-  runnable examples
-- finish the CRAN submission notes and reviewer-facing explanation of
-  the bundled builder asset
+resp <- read_responses(
+  responses,
+  instr,
+  respondent_id = "respondent_id",
+  strict = FALSE
+)
+
+score_scales(resp, instr)
+descriptives_report(resp, variables = c("sat_1", "sat_2", "sat_3"))
+missing_data_report(resp, instr)
+```
+
+## Role-based analysis plans
+
+Analysis plans use role-based variable assignment. Earlier `.sframe`
+files using `variables` and `test` fields remain compatible.
+
+``` r
+
+instr$analysis_plan <- list(
+  list(
+    id = "RQ1",
+    research_question = "Are the satisfaction items associated?",
+    family = "association",
+    method = "correlation_spearman",
+    roles = list(x = "sat_1", y = "sat_2"),
+    options = list(alpha = 0.05),
+    status = "valid_plan",
+    requires_data = TRUE
+  )
+)
+
+run_analysis_plan(resp, instr)
+```
+
+Supported method IDs include descriptives, missing data, quality checks,
+reliability, EFA readiness and solutions, CFA/CB-SEM/PLS-SEM syntax,
+chi-square, Fisher’s exact test, McNemar, Cochran’s Q, t-tests,
+Mann-Whitney, Wilcoxon, one- and two-way ANOVA, ANCOVA,
+repeated-measures ANOVA, Kruskal- Wallis, Friedman,
+Pearson/Spearman/Kendall correlations, partial correlations, linear and
+logistic regression, mediation, and moderation.
+
+## Reliability, EFA, and CFA
+
+``` r
+
+if (requireNamespace("psych", quietly = TRUE)) {
+  reliability_report(resp, instr, omega = FALSE)
+  efa_report(resp, instr)
+}
+
+cfa_syntax(instr)
+cfa_lavaan_syntax(instr, ordered = TRUE)
+```
+
+## Model layer
+
+``` r
+
+model <- sf_model(
+  "model_1",
+  "Satisfaction model",
+  type = "cb_sem",
+  constructs = list(
+    sf_construct("SAT", "Satisfaction", c("sat_1", "sat_2", "sat_3"))
+  )
+)
+
+instr <- add_model(instr, model)
+model_json(model)
+sem_lavaan_syntax(model, instr)
+```
+
+## PLS-SEM syntax
+
+``` r
+
+pls_model <- sf_model(
+  "pls_1",
+  "Satisfaction and loyalty PLS model",
+  type = "pls_sem",
+  constructs = list(
+    sf_construct(
+      "SAT",
+      "Satisfaction",
+      c("sat_1", "sat_2"),
+      mode = "composite"
+    ),
+    sf_construct(
+      "LOY",
+      "Loyalty",
+      "sat_3",
+      mode = "single_item"
+    )
+  ),
+  paths = list(
+    sf_path("SAT", "LOY")
+  ),
+  options = list(bootstrap = 5000)
+)
+
+seminr_syntax(pls_model)
+```
+
+## Reporting
+
+``` r
+
+render_report(
+  instr,
+  data = resp,
+  output_file = tempfile(fileext = ".html"),
+  include_codebook = TRUE,
+  include_quality = TRUE,
+  include_missing = TRUE,
+  include_descriptives = TRUE,
+  include_analysis = TRUE,
+  include_models = TRUE
+)
+```
+
+The built-in HTML fallback does not require Quarto. If the Quarto CLI is
+available locally,
+[`render_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_report.md)
+can use the bundled template.
+
+## Visual tools
+
+``` r
+
+launch_builder(open = FALSE)
+export_static_survey(instr, open = FALSE)
+```
+
+Use
+[`launch_builder()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/launch_builder.md)
+as the standalone questionnaire builder,
+[`launch_studio()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/launch_studio.md)
+as the workflow hub, and
+[`launch_dashboard()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/launch_dashboard.md)
+as the read-only response explorer. Demo launchers are available for
+training:
+
+``` r
+
+launch_builder_demo(open = FALSE)
+# launch_studio_demo()
+# launch_dashboard_demo()
+```
+
+Interactive functions such as `launch_builder(open = TRUE)`,
+[`launch_studio()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/launch_studio.md),
+[`render_survey()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_survey.md),
+and
+[`launch_dashboard()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/launch_dashboard.md)
+are available for manual use. Tests and examples avoid opening browsers.
+
+## v0.4 scope
+
+MCDM and DEMATEL fall outside v0.3 scope. These methods are scheduled
+for v0.4.
 
 ## Citation
-
-If you use surveyframe in published research, cite the package:
 
 ``` r
 
 citation("surveyframe")
 ```
 
-A Journal of Statistical Software paper is planned as the primary
-methods citation.
-
 ## License
 
-MIT. See `LICENSE` for details.
+MIT. See `LICENSE`.
 
 # Package index
 
@@ -186,6 +278,12 @@ Start visually in the HTML SurveyBuilder or construct instruments in R.
 
 - [`launch_builder()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/launch_builder.md)
   : Launch the surveyframe visual survey builder
+- [`launch_builder_demo()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/launch_builder_demo.md)
+  : Launch SurveyBuilder with the bundled input-types demo
+- [`launch_studio_demo()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/launch_studio_demo.md)
+  : Launch SurveyStudio with the bundled input-types demo
+- [`launch_dashboard_demo()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/launch_dashboard_demo.md)
+  : Launch the response dashboard with the bundled input-types demo
 
 ## Build an instrument
 
@@ -204,6 +302,18 @@ here.
   : Define a branching rule
 - [`sf_check()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_check.md)
   : Define a design-time survey check
+- [`sf_model()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_model.md)
+  : Create a surveyframe model specification
+- [`sf_construct()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_construct.md)
+  : Define a latent or composite construct
+- [`sf_path()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_path.md)
+  : Define a structural path between constructs
+- [`sf_covariance()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_covariance.md)
+  : Define a covariance between constructs
+- [`sf_indirect()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_indirect.md)
+  : Define an indirect effect path
+- [`add_model()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/add_model.md)
+  : Add a model specification to an instrument
 
 ## Save and load
 
@@ -216,6 +326,10 @@ integrity hashing.
   : Read an instrument from a .sframe file
 - [`validate_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/validate_sframe.md)
   : Validate an instrument object
+- [`validate_model()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/validate_model.md)
+  : Validate a surveyframe model specification
+- [`model_json()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/model_json.md)
+  : Serialise a model specification to JSON
 
 ## Deploy
 
@@ -223,8 +337,16 @@ Render the instrument as a Shiny survey or launch SurveyStudio.
 
 - [`render_survey()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_survey.md)
   : Render a survey from an instrument object
+- [`export_static_survey()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/export_static_survey.md)
+  : Export a self-contained static HTML survey
 - [`launch_studio()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/launch_studio.md)
   : Launch the SurveyStudio interface
+- [`launch_dashboard()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/launch_dashboard.md)
+  : Launch the interactive response dashboard
+- [`survey_module_ui()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/survey_module_ui.md)
+  : Shiny module UI for an embedded survey
+- [`survey_module_server()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/survey_module_server.md)
+  : Shiny module server for an embedded survey
 
 ## Collect responses
 
@@ -244,6 +366,12 @@ missingness, and duplicate submissions.
 
 - [`quality_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/quality_report.md)
   : Generate a data quality report for survey responses
+- [`missing_data_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/missing_data_report.md)
+  : Missing-data report
+- [`outlier_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/outlier_report.md)
+  : Flag univariate and multivariate outliers
+- [`assumption_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/assumption_report.md)
+  : Assumption-check report
 
 ## Score and analyse
 
@@ -252,14 +380,32 @@ psychometric diagnostics and pre-planned analyses.
 
 - [`score_scales()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/score_scales.md)
   : Score defined scales from survey responses
+- [`descriptives_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/descriptives_report.md)
+  : Descriptive statistics report
 - [`reliability_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/reliability_report.md)
   : Compute reliability statistics for scored scales
 - [`item_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/item_report.md)
   : Generate item-level diagnostics
 - [`efa_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/efa_report.md)
   : Prepare a survey instrument for exploratory factor analysis
+- [`efa_solution()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/efa_solution.md)
+  : Estimate an exploratory factor solution
+- [`validity_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/validity_report.md)
+  : Validity report for construct models
 - [`cfa_syntax()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/cfa_syntax.md)
   : Generate lavaan CFA syntax from an instrument object
+- [`cfa_lavaan_syntax()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/cfa_lavaan_syntax.md)
+  : Generate lavaan CFA syntax
+- [`efa_syntax()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/efa_syntax.md)
+  : Generate EFA planning syntax
+- [`sem_lavaan_syntax()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sem_lavaan_syntax.md)
+  : Generate lavaan CB-SEM syntax
+- [`seminr_syntax()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/seminr_syntax.md)
+  : Generate seminr PLS-SEM syntax
+- [`posthoc_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/posthoc_report.md)
+  : Post-hoc and pairwise comparison report
+- [`sample_size_plan()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sample_size_plan.md)
+  : Sample-size and power planning helper
 - [`run_analysis_plan()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/run_analysis_plan.md)
   : Run a pre-planned analysis from an instrument's analysis plan
 
@@ -273,12 +419,24 @@ Generate codebooks, scale appendices, and reproducible HTML reports.
   : Render a reproducible survey report
 - [`render_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_results.md)
   : Render analysis results to a formatted HTML report
+- [`model_report_template()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/model_report_template.md)
+  : Create a model reporting template
 
 ## Package
 
 - [`surveyframe`](https://mohammedalisharafuddin.github.io/surveyframe/reference/surveyframe-package.md)
   [`surveyframe-package`](https://mohammedalisharafuddin.github.io/surveyframe/reference/surveyframe-package.md)
-  : surveyframe: A Survey Instrument Workflow for R
+  : surveyframe: Survey Instrument Workflows for R
+- [`sframe_demo_data()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_demo_data.md)
+  : Load bundled surveyframe demo data
+- [`sframe_input_types_demo_data()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_input_types_demo_data.md)
+  : Load bundled input-types demo data
+- [`sframe_builder_empty_state()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_builder_empty_state.md)
+  : Create an empty SurveyStudio builder state
+- [`sframe_builder_state_from_instrument()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_builder_state_from_instrument.md)
+  : Convert an instrument into a SurveyStudio builder state
+- [`sframe_builder_validate_draft()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_builder_validate_draft.md)
+  : Validate a SurveyStudio draft state
 - [`print(`*`<sframe>`*`)`](https://mohammedalisharafuddin.github.io/surveyframe/reference/print.sframe.md)
   : Print an sframe instrument object
 - [`format(`*`<sframe>`*`)`](https://mohammedalisharafuddin.github.io/surveyframe/reference/format.sframe.md)
@@ -290,5 +448,15 @@ Generate codebooks, scale appendices, and reproducible HTML reports.
 
 ### All vignettes
 
-- [Getting started with
-  surveyframe](https://mohammedalisharafuddin.github.io/surveyframe/articles/surveyframe.md):
+- [Analysing survey
+  responses](https://mohammedalisharafuddin.github.io/surveyframe/articles/analysing-survey-responses.md):
+- [Building a survey
+  instrument](https://mohammedalisharafuddin.github.io/surveyframe/articles/building-survey-instrument.md):
+- [EFA, CFA, CB-SEM, and PLS-SEM syntax
+  generation](https://mohammedalisharafuddin.github.io/surveyframe/articles/efa-cfa-sem-pls-syntax.md):
+- [Scale reliability and
+  validity](https://mohammedalisharafuddin.github.io/surveyframe/articles/scale-reliability-validity.md):
+- [SurveyBuilder GUI
+  overview](https://mohammedalisharafuddin.github.io/surveyframe/articles/surveybuilder-gui-overview.md):
+- [A complete surveyframe
+  workflow](https://mohammedalisharafuddin.github.io/surveyframe/articles/surveyframe.md):

@@ -42,7 +42,17 @@ The path to the generated `.gs` Apps Script file, invisibly.
 ## Examples
 
 ``` r
-if (FALSE) { # \dontrun{
-export_google_sheet(instr, sheet_url = "https://docs.google.com/spreadsheets/d/...")
-} # }
+instr <- read_sframe(
+  system.file("extdata", "tourism_services_demo.sframe",
+              package = "surveyframe")
+)
+script <- export_google_sheet(
+  instr,
+  sheet_url = "https://docs.google.com/spreadsheets/d/demo",
+  output_dir = tempdir()
+)
+#> Apps Script written to: /tmp/RtmpBmNfgC/surveyframe_collector.gs
+#> Follow the setup instructions inside the file to deploy it.
+file.exists(script)
+#> [1] TRUE
 ```

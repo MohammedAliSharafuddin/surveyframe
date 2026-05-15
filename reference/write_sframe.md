@@ -45,7 +45,11 @@ The file path, invisibly.
 ## Examples
 
 ``` r
-if (FALSE) { # \dontrun{
-write_sframe(instr, "my_instrument.sframe")
-} # }
+instr <- read_sframe(
+  system.file("extdata", "tourism_services_demo.sframe",
+              package = "surveyframe")
+)
+out <- write_sframe(instr, tempfile(fileext = ".sframe"))
+file.exists(out)
+#> [1] TRUE
 ```

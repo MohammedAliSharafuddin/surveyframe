@@ -1,10 +1,9 @@
 # Prepare a survey instrument for exploratory factor analysis
 
 Reports KMO sampling adequacy, Bartlett's test of sphericity, and a
-parallel analysis scree plot to inform factor number selection. This
-function does not estimate or return an EFA solution; it prepares the
-researcher to run one using a separate package such as `psych` or
-`lavaan`.
+parallel analysis scree plot to inform factor number selection. The
+report prepares the researcher to estimate an EFA solution with a
+separate package such as `psych` or `lavaan`.
 
 ## Usage
 
