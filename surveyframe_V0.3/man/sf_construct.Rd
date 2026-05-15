@@ -14,7 +14,7 @@ sf_construct(
 }
 \arguments{
 \item{id}{Construct identifier. Must start with a letter and contain only
-letters, numbers, and underscores.}
+letters, numbers, and \verb{_} characters.}
 
 \item{label}{Human-readable construct label.}
 

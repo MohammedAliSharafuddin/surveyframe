@@ -47,7 +47,7 @@ sf_item <- surveyframe::sf_item
 sf_scale <- surveyframe::sf_scale
 write_sframe <- surveyframe::write_sframe
 
-status_badge <- function(ok, label_ok = "Ready", label_no = "Not ready") {
+status_badge <- function(ok, label_ok = "Ready", label_no = "Pending") {
   if (ok) {
     tags$span(class = "badge badge-ok", label_ok)
   } else {
@@ -113,7 +113,7 @@ sframe_upload_ext <- function(upload) {
 
 sframe_validate_upload <- function(upload, extensions, max_size = 10 * 1024^2) {
   if (is.null(upload) || is.null(upload$datapath) || !file.exists(upload$datapath)) {
-    stop("No uploaded file was found.", call. = FALSE)
+    stop("No file was uploaded. Select a .sframe file and try again.", call. = FALSE)
   }
 
   ext <- sframe_upload_ext(upload)

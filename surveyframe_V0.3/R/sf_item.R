@@ -7,7 +7,7 @@
 #' unique `id` within the instrument it is added to.
 #'
 #' @param id Character. A unique identifier for this item. Used as the column
-#'   name in response data. Must contain only letters, numbers, and underscores.
+#'   name in response data. Must contain only letters, numbers, and `_` characters.
 #' @param label Character. The question text or content displayed to the
 #'   respondent.
 #' @param type Character. The response type. One of `"likert"`,

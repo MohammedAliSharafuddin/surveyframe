@@ -47,10 +47,10 @@ CSV path.}
 Called for its side effect.
 }
 \description{
-Opens the SurveyStudio Shiny application, a visual shell for the full
-surveyframe workflow. The studio provides screens to build a survey draft,
-open an existing instrument, preview the survey, upload responses, review
-data quality, inspect reliability, plan analyses, and export outputs.
+Opens the SurveyStudio Shiny application, a visual interface for the
+complete surveyframe workflow. The studio includes screens to build a survey
+draft, open an existing instrument, preview the survey, upload responses,
+review data quality, inspect reliability, plan analyses, and export outputs.
 }
 \examples{
 \dontrun{

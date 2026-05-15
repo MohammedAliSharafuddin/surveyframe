@@ -79,7 +79,7 @@ validate_sframe <- function(instrument, strict = TRUE) {
       paste0(
         "Invalid item ID(s): ",
         paste(unique(bad_item_ids), collapse = ", "),
-        ". IDs must start with a letter and contain only letters, numbers, and underscores."
+        ". IDs must start with a letter and contain only letters, numbers, and `_` characters."
       )
     )
   }

@@ -310,6 +310,22 @@ test_that("read_responses() non-strict warns on undeclared columns", {
   )
 })
 
+test_that("read_responses() reports missing files and unsupported inputs clearly", {
+  instr <- make_instrument()
+  missing_path <- tempfile(fileext = ".csv")
+
+  expect_error(
+    read_responses(missing_path, instr),
+    "Check the file path and ensure the file exists",
+    class = "sframe_import_error"
+  )
+  expect_error(
+    read_responses(list(a = 1), instr),
+    "CSV file path, a data.frame, or a tibble",
+    class = "sframe_import_error"
+  )
+})
+
 test_that("read_responses() warns when item columns are absent", {
   instr <- make_instrument()
   resp  <- make_responses(10)

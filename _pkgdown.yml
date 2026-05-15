@@ -13,7 +13,7 @@ template:
 home:
   title: "surveyframe"
   description: >
-    A complete survey instrument workflow for R.
+    Survey instrument workflows for R.
     Define instruments, design them visually, deploy surveys,
     check data quality, score scales, run psychometric diagnostics,
     and generate reproducible reports from one source object.
@@ -47,6 +47,9 @@ reference:
       Start visually in the HTML SurveyBuilder or construct instruments in R.
     contents:
       - launch_builder
+      - launch_builder_demo
+      - launch_studio_demo
+      - launch_dashboard_demo
 
   - title: "Build an instrument"
     desc: >
@@ -59,6 +62,12 @@ reference:
       - sf_scale
       - sf_branch
       - sf_check
+      - sf_model
+      - sf_construct
+      - sf_path
+      - sf_covariance
+      - sf_indirect
+      - add_model
 
   - title: "Save and load"
     desc: >
@@ -68,13 +77,19 @@ reference:
       - write_sframe
       - read_sframe
       - validate_sframe
+      - validate_model
+      - model_json
 
   - title: "Deploy"
     desc: >
       Render the instrument as a Shiny survey or launch SurveyStudio.
     contents:
       - render_survey
+      - export_static_survey
       - launch_studio
+      - launch_dashboard
+      - survey_module_ui
+      - survey_module_server
 
   - title: "Collect responses"
     desc: >
@@ -90,6 +105,9 @@ reference:
       missingness, and duplicate submissions.
     contents:
       - quality_report
+      - missing_data_report
+      - outlier_report
+      - assumption_report
 
   - title: "Score and analyse"
     desc: >
@@ -97,10 +115,19 @@ reference:
       psychometric diagnostics and pre-planned analyses.
     contents:
       - score_scales
+      - descriptives_report
       - reliability_report
       - item_report
       - efa_report
+      - efa_solution
+      - validity_report
       - cfa_syntax
+      - cfa_lavaan_syntax
+      - efa_syntax
+      - sem_lavaan_syntax
+      - seminr_syntax
+      - posthoc_report
+      - sample_size_plan
       - run_analysis_plan
 
   - title: "Report"
@@ -110,13 +137,16 @@ reference:
       - codebook_report
       - render_report
       - render_results
+      - model_report_template
 
   - title: "Package"
     contents:
       - surveyframe-package
-      - print.sframe
-      - format.sframe
-      - summary.sframe
+      - sframe_demo_data
+      - sframe_input_types_demo_data
+      - sframe_builder_empty_state
+      - sframe_builder_state_from_instrument
+      - sframe_builder_validate_draft
       - print.sframe
       - format.sframe
       - summary.sframe

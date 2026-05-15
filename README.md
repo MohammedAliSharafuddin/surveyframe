@@ -110,9 +110,8 @@ missing_data_report(resp, instr)
 
 ## Role-based analysis plans
 
-Analysis plans in version 0.3 use role-based variable assignment, replacing
-the flat variable list from earlier versions. Old `.sframe` files with
-`variables` and `test` fields still load and run.
+Analysis plans use role-based variable assignment. Earlier `.sframe` files
+using `variables` and `test` fields remain compatible.
 
 ```r
 instr$analysis_plan <- list(
@@ -239,10 +238,8 @@ for manual use. Tests and examples avoid opening browsers.
 
 ## v0.4 scope
 
-MCDM and DEMATEL fall outside v0.3 scope. They are planned for v0.4 with AHP
-matrices, DEMATEL direct-influence matrices, TOPSIS/VIKOR/PROMETHEE/ELECTRE
-planning, MCDM validation, DEMATEL thresholding, and later diagram/export
-integrations.
+MCDM and DEMATEL fall outside v0.3 scope. These methods are scheduled for
+v0.4.
 
 ## Citation
 

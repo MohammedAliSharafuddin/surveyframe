@@ -10,7 +10,7 @@ sframe_model_abort_bad_id <- function(arg) {
   rlang::abort(
     paste0(
       "`", arg, "` must start with a letter and contain only letters, ",
-      "numbers, and underscores."
+      "numbers, and `_` characters."
     ),
     class = c("sframe_validation_error", "sframe_error")
   )
@@ -103,7 +103,7 @@ sframe_lavaan_path_label <- function(from, through, to) {
 #' Define a latent or composite construct
 #'
 #' @param id Construct identifier. Must start with a letter and contain only
-#'   letters, numbers, and underscores.
+#'   letters, numbers, and `_` characters.
 #' @param label Human-readable construct label.
 #' @param items Character vector of indicator item IDs.
 #' @param mode Measurement mode. One of `"reflective"`, `"composite"`,
@@ -264,7 +264,7 @@ validate_model <- function(model, instrument = NULL, strict = TRUE) {
 
   if (!sframe_model_safe_id(model$id %||% "")) {
     problems <- c(problems,
-      "Model ID must start with a letter and contain only letters, numbers, and underscores.")
+      "Model ID must start with a letter and contain only letters, numbers, and `_` characters.")
   }
 
   valid_types <- c("efa", "cfa", "cb_sem", "pls_sem")

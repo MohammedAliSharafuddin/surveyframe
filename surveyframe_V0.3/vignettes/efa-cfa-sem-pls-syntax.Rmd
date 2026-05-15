@@ -136,7 +136,7 @@ cat(seminr_syntax(pls_model))
 
 ## Model JSON
 
-Model specifications can be stored in `.sframe` files and exported as JSON.
+Store model specifications in `.sframe` files and export them as JSON.
 
 ```{r model-json}
 model_json(sem_model)

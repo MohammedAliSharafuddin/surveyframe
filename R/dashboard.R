@@ -2,10 +2,10 @@
 
 #' Launch the interactive response dashboard
 #'
-#' Opens a Shiny dashboard for exploring collected response data alongside the
-#' instrument definition. Use this analysis and quality-control interface after
-#' response collection, and use [launch_builder()] to design a new questionnaire.
-#' The dashboard provides five panels:
+#' Opens a Shiny dashboard to explore collected response data alongside the
+#' instrument definition. Use this interface after response collection for
+#' analysis and quality control. Use [launch_builder()] to design new
+#' questionnaires. The dashboard includes five panels:
 #'
 #' \describe{
 #'   \item{Overview}{Response count, date range, and instrument metadata.}
@@ -18,8 +18,8 @@
 #'   \item{Raw data}{Scrollable response table with a CSV download button.}
 #' }
 #'
-#' The dashboard is read-only. It supports descriptive exploration after
-#' collecting responses and before running formal analysis via
+#' The dashboard is read-only. Use it for descriptive exploration after
+#' collecting responses and before running formal analysis with
 #' [run_analysis_plan()].
 #'
 #' @param instrument An `sframe` object. When `NULL`, the bundled tourism

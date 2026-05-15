@@ -36,10 +36,10 @@ sessions.}
 Called for its side effect. Returns nothing.
 }
 \description{
-Opens a Shiny dashboard for exploring collected response data alongside the
-instrument definition. Use this analysis and quality-control interface after
-response collection, and use \code{\link[=launch_builder]{launch_builder()}} to design a new questionnaire.
-The dashboard provides five panels:
+Opens a Shiny dashboard to explore collected response data alongside the
+instrument definition. Use this interface after response collection for
+analysis and quality control. Use \code{\link[=launch_builder]{launch_builder()}} to design new
+questionnaires. The dashboard includes five panels:
 }
 \details{
 \describe{
@@ -53,8 +53,8 @@ instrument.}
 \item{Raw data}{Scrollable response table with a CSV download button.}
 }
 
-The dashboard is read-only. It supports descriptive exploration after
-collecting responses and before running formal analysis via
+The dashboard is read-only. Use it for descriptive exploration after
+collecting responses and before running formal analysis with
 \code{\link[=run_analysis_plan]{run_analysis_plan()}}.
 }
 \examples{

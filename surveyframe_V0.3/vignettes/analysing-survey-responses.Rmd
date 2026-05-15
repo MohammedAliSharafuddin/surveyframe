@@ -12,8 +12,8 @@ knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 library(surveyframe)
 ```
 
-This vignette covers response import, missing-data checks, quality checks,
-scale scoring, descriptives, and planned analyses.
+This vignette walks through response import, missing-data checks, quality
+checks, scale scoring, descriptives, and planned analyses.
 
 ## Load the demo
 
@@ -112,8 +112,8 @@ descriptives_report(
 
 ## Run an analysis plan
 
-Analysis plans can be stored in the instrument. The v0.3 structure uses
-method-specific roles. Older `variables` and `test` blocks are still supported.
+Analysis plans are stored in the instrument. The current structure uses
+method-specific roles. Earlier `variables` and `test` blocks remain compatible.
 
 ```{r analysis-plan}
 instr$analysis_plan <- list(

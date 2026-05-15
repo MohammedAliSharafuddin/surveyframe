@@ -175,7 +175,7 @@ interpretation `prompt` field to guide write-up.
 
 ## Future direction: v0.4
 
-* MCDM and DEMATEL are deliberately outside v0.3. Planned v0.4 work includes
+* MCDM and DEMATEL fall outside v0.3 scope. Planned v0.4 work includes
   MCDM input fields, AHP pairwise-comparison matrices, DEMATEL direct
   influence matrices, TOPSIS/VIKOR/PROMETHEE/ELECTRE planning, MCDM data
   validation and consistency checks, DEMATEL thresholding and causal diagram
