@@ -1,5 +1,5 @@
 # tests/testthat/test-core.R
-# Full test suite for surveyframe v0.1.
+# # Core test suite for surveyframe.
 
 # ---------------------------------------------------------------------------
 # Shared helpers
@@ -41,9 +41,11 @@ make_instrument <- function(reverse = FALSE) {
 
 make_responses <- function(n = 50, seed = 42) {
   set.seed(seed)
+  base_time <- as.POSIXct("2025-01-01 10:00:00", tz = "UTC")
+
   data.frame(
     id           = paste0("R", seq_len(n)),
-    submitted_at = as.character(Sys.time() - sample(100:3600, n, replace = TRUE)),
+    submitted_at = as.character(base_time - sample(100:3600, n, replace = TRUE)),
     sat_1        = sample(1:5, n, replace = TRUE),
     sat_2        = sample(1:5, n, replace = TRUE),
     sat_3        = sample(1:5, n, replace = TRUE),
@@ -571,6 +573,7 @@ test_that("print.sframe_quality_report() produces output", {
 # ---------------------------------------------------------------------------
 
 test_that("reliability_report() returns sframe_reliability_report", {
+  skip_if_not_installed("psych")
   d  <- load_resp(80)
   rr <- reliability_report(d$resp, d$instr, omega = FALSE)
   expect_s3_class(rr, "sframe_reliability_report")
@@ -579,6 +582,7 @@ test_that("reliability_report() returns sframe_reliability_report", {
 })
 
 test_that("reliability_report() alpha is in [0, 1]", {
+  skip_if_not_installed("psych")
   d  <- load_resp(100)
   rr <- reliability_report(d$resp, d$instr, omega = FALSE)
   expect_gte(rr[[1]]$alpha, 0)
@@ -586,6 +590,7 @@ test_that("reliability_report() alpha is in [0, 1]", {
 })
 
 test_that("reliability_report() respects reverse-coded items", {
+  skip_if_not_installed("psych")
   instr <- make_instrument(reverse = TRUE)
   resp <- data.frame(
     id = paste0("R", 1:10),
@@ -614,6 +619,7 @@ test_that("reliability_report() respects reverse-coded items", {
 # ---------------------------------------------------------------------------
 
 test_that("item_report() returns sframe_item_report with expected columns", {
+  skip_if_not_installed("psych")
   d  <- load_resp(40)
   ir <- item_report(d$resp, d$instr)
   expect_s3_class(ir, "sframe_item_report")
@@ -787,11 +793,13 @@ test_that("builder helpers reclassify components from a loaded sframe file", {
 # ---------------------------------------------------------------------------
 
 test_that("render_survey() returns a shiny app object", {
+  skip_if_not_installed("shiny")
   app <- render_survey(make_instrument())
   expect_s3_class(app, "shiny.appobj")
 })
 
 test_that("render_survey() requires output_path for csv persistence", {
+  skip_if_not_installed("shiny")
   expect_error(
     render_survey(make_instrument(), save_responses = "csv"),
     class = "sframe_error"
@@ -799,6 +807,7 @@ test_that("render_survey() requires output_path for csv persistence", {
 })
 
 test_that("render_survey() helpers identify visible required items", {
+  skip_if_not_installed("shiny")
   instr <- make_instrument()
   branch_lookup <- surveyframe:::sframe_branch_lookup(instr)
   input_values <- list(
@@ -820,6 +829,7 @@ test_that("render_survey() helpers identify visible required items", {
 })
 
 test_that("render_survey() branching handles all operators and multi-value answers", {
+  skip_if_not_installed("shiny")
   rule <- function(operator, value, action = "show") {
     sf_branch("q2", depends_on = "q1", operator = operator, value = value,
               action = action)
@@ -840,6 +850,7 @@ test_that("render_survey() branching handles all operators and multi-value answe
 })
 
 test_that("render_survey() response rows blank hidden items and append to csv", {
+  skip_if_not_installed("shiny")
   instr <- make_instrument()
   branch_lookup <- surveyframe:::sframe_branch_lookup(instr)
   input_values <- list(
@@ -872,6 +883,7 @@ test_that("render_survey() response rows blank hidden items and append to csv", 
 })
 
 test_that("render_survey() persists submissions through the Shiny server", {
+  skip_if_not_installed("shiny")
   path <- tempfile(fileext = ".csv")
   app <- render_survey(make_instrument(), save_responses = "csv", output_path = path)
 
@@ -893,6 +905,7 @@ test_that("render_survey() persists submissions through the Shiny server", {
 })
 
 test_that("render_survey() blocks invalid submissions through the Shiny server", {
+  skip_if_not_installed("shiny")
   path <- tempfile(fileext = ".csv")
   app <- render_survey(make_instrument(), save_responses = "csv", output_path = path)
 
@@ -913,6 +926,7 @@ test_that("render_survey() blocks invalid submissions through the Shiny server",
 # ---------------------------------------------------------------------------
 
 test_that("full workflow runs from instrument to scored outputs", {
+  skip_if_not_installed("psych")
   instr <- validate_sframe(make_instrument(reverse = TRUE))
   path <- tempfile(fileext = ".sframe")
   write_sframe(instr, path, overwrite = TRUE)
