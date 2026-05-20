@@ -1,5 +1,5 @@
 Package: surveyframe
-Title: Survey Instrument Workflows for R
+Title: Survey Instrument Workflows
 Version: 0.3.0
 Authors@R: c(
     person(
@@ -11,9 +11,9 @@ Authors@R: c(
     )
   )
 Description: Supports survey research workflows built around a typed
-    instrument object (the 'sframe'). Features include visual instrument
-    design via a browser-based builder or Shiny studio, export to a
-    self-contained static HTML survey, an embeddable Shiny module, SHA-256
+    instrument object (the sframe). Features include visual instrument
+    design via a browser-based builder or 'Shiny' studio, export to a
+    self-contained static HTML survey, an embeddable 'Shiny' module, SHA-256
     integrity-checked serialisation to the '.sframe' format, multi-page survey
     rendering, branching logic, response quality checking, scale scoring,
     psychometric diagnostics, analysis-plan execution, model syntax planning,

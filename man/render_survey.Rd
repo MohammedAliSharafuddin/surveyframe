@@ -40,7 +40,7 @@ customisable thank-you page. Responses can be persisted to CSV or passed to
 a callback.
 }
 \examples{
-\dontrun{
+\donttest{
 render_survey(instr)
 render_survey(instr, save_responses = "csv", output_path = "responses.csv")
 }

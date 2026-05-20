@@ -23,7 +23,7 @@ renders the full instrument including welcome page, all item types,
 branching logic, required-field validation, and a thank-you screen.
 }
 \examples{
-\dontrun{
+\donttest{
 # Minimal embedding example:
 library(shiny)
 library(surveyframe)

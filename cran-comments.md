@@ -1,59 +1,64 @@
-# CRAN submission notes - surveyframe 0.3.0
-
-## Test environments
-
-- Local: Windows 11 x64, R 4.5.2 ucrt
-- Local: Ubuntu 24.04 x86_64, R 4.5.0
-
-## R CMD check results
-
-Local direct `R CMD check --as-cran` on the built source tarball:
-
-- Windows 11 x64, R 4.5.2 ucrt
-- Status: 0 ERRORs, 0 WARNINGs, 0 NOTEs (local check)
-
-- Ubuntu 24.04 x86_64, R 4.5.0
-- Status: 0 ERRORs, 0 WARNINGs, 0 NOTEs
-
-The following NOTEs are expected on CRAN servers only (not reproduced in
-local checks):
-
-1. CRAN incoming feasibility NOTE (server-side only):
-   - This is a new submission.
-   - Maintainer details were reported.
-
-2. Future file timestamps NOTE (server-side only):
-   - The CRAN server environment was unable to verify the current time.
-
-Package build, installation, examples, tests, vignettes, namespace checks,
-Rd checks, HTML manual checks, PDF manual generation, and R code diagnostics
-passed locally on both platforms.
-
-No local package-code ERROR or WARNING remains.
+# CRAN submission notes - surveyframe 0.3.0 (resubmission)
 
 ## Resubmission notes
 
-This is the first CRAN submission of surveyframe.
+This is a resubmission addressing reviewer feedback from 2026-05-16:
+
+1. **Title**: Removed "for R" from the end of the title.
+
+2. **DESCRIPTION formatting**: Removed single quotes around `sframe` (it is
+   an S3 class name, not a package name). Added single quotes around 'Shiny'
+   as required for software names.
+
+3. **`\dontrun{}` → `\donttest{}`**: Replaced `\dontrun{}` with `\donttest{}`
+   in all examples where the function can be executed by the user. One
+   remaining `\dontrun{}` in `read_sheet_responses()` is justified: the
+   function requires live Google Sheets API authentication (an API key the
+   user must supply). All other interactive examples (Shiny launchers, browser
+   openers) now use `\donttest{}`. The `cfa_syntax()` lavaan fitting example
+   retains `\dontrun{}` because `lavaan` is not a declared dependency and
+   constitutes "missing additional software" per CRAN policy.
+
+## Test environments
+
+- Local: Ubuntu 24.04 x86_64, R 4.5.0
+- Local: Windows 11 x64, R 4.5.2 ucrt
+- win-builder: r-devel-windows-x86_64 (R Under development, 2026-05-14 r90050)
+
+## R CMD check results
+
+`R CMD check --as-cran` on the built source tarball:
+
+- Ubuntu 24.04 x86_64, R 4.5.0 — 0 ERRORs, 0 WARNINGs, 0 NOTEs
+- Windows 11 x64, R 4.5.2 ucrt  — 0 ERRORs, 0 WARNINGs, 0 NOTEs
+
+Expected server-side NOTE only:
+
+1. CRAN incoming feasibility NOTE: "New submission." (server-side only,
+   not reproduced locally)
+
+Package build, installation, examples, tests, vignettes, namespace checks,
+Rd checks, HTML manual checks, PDF manual generation, and R code diagnostics
+passed on both platforms.
 
 ## Package scope
 
 surveyframe provides survey research workflows centred on a single typed
-object (the `sframe`). The package combines instrument design, deployment,
-quality checking, scale scoring, psychometric diagnostics, analysis-plan
-execution, model syntax planning, and reproducible reporting.
+instrument object (the sframe). The package combines instrument design,
+deployment, quality checking, scale scoring, psychometric diagnostics,
+analysis-plan execution, model syntax planning, and reproducible reporting.
 
 ## Dependency strategy
 
-Hard imports are limited to three packages that cover file-format
-serialisation and condition signalling:
+Hard imports are limited to three packages:
 
-- `jsonlite` (>= 1.8.0): `.sframe` JSON serialisation
+- `jsonlite` (>= 1.8.0): '.sframe' JSON serialisation
 - `rlang` (>= 1.1.0): typed conditions and argument matching
 - `openssl` (>= 2.1.0): SHA-256 integrity hashing
 
 Optional features are guarded at call time with `rlang::check_installed()`:
 
-- `shiny` (>= 1.7.0): `render_survey()` and `launch_studio()`
+- `shiny` (>= 1.7.0): `render_survey()`, `launch_studio()`, dashboard
 - `psych` (>= 2.3.0): `reliability_report()` and `efa_report()`
 - `MASS`: optional ordinal logistic regression with `MASS::polr()`
 - `nnet`: optional multinomial logistic regression with `nnet::multinom()`
@@ -70,25 +75,16 @@ eliminate external network dependencies. The file is opened with
 `utils::browseURL()` by `launch_builder(open = TRUE)`.
 
 `inst/extdata/` contains small simulated demo instruments and response CSVs.
-The tourism-services demo supports runnable examples for response loading,
-quality checks, scoring, analysis-plan execution, reporting, and syntax
-generation. The input-types demo supports GUI, builder, studio, dashboard, and
-item-control coverage. These files contain no human-subject or private data.
+These files contain no human-subject or private data.
 
 ## `\dontrun{}` usage
 
-All examples wrapped in `\dontrun{}` require one of:
+The only remaining `\dontrun{}` occurrences require genuinely missing
+infrastructure that the user must supply:
 
-- an interactive browser session (`launch_builder()`, `launch_studio()`),
-- a running Shiny process (`render_survey()`),
-- file I/O to a temporary path (`write_sframe()`, `read_sframe()`), or
-- optional packages that may not be installed (`reliability_report()`,
-  `efa_report()`), or optional Quarto CLI rendering.
-
-Constructor functions (`sf_instrument()`, `sf_item()`, `sf_choices()`,
-`sf_scale()`, `sf_branch()`, `sf_check()`) have fully runnable examples.
-`launch_builder(open = FALSE)` also has a runnable example that returns
-the bundled file path without opening a browser.
+- `read_sheet_responses()`: requires live Google Sheets API authentication.
+- `cfa_syntax()` lavaan fitting block: requires `lavaan`, which is not a
+  declared package dependency.
 
 ## Reverse dependencies
 

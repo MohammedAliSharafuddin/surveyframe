@@ -18,7 +18,7 @@
 #'   [export_static_survey()]
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' # Minimal embedding example:
 #' library(shiny)
 #' library(surveyframe)
@@ -87,7 +87,7 @@ survey_module_ui <- function(id, width = "100%") {
 #' @seealso [survey_module_ui()]
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' # See survey_module_ui() for a complete example.
 #' }
 survey_module_server <- function(id, instrument, on_submit = NULL) {

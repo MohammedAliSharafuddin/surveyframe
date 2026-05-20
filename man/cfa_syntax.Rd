@@ -43,8 +43,10 @@ syntax <- cfa_syntax(instr)
 cat(syntax)
 
 \dontrun{
-# Fit the generated syntax with lavaan
-fit <- lavaan::cfa(syntax, data = scored_data, std.lv = TRUE)
+# lavaan is not installed by default; install it before fitting.
+demo   <- sframe_demo_data()
+scored <- score_scales(demo$responses, demo$instrument)
+fit    <- lavaan::cfa(syntax, data = scored, std.lv = TRUE)
 summary(fit, fit.measures = TRUE)
 }
 }

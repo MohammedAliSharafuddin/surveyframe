@@ -31,9 +31,12 @@ Produces Cronbach's alpha and McDonald's omega for each scale defined in
 the instrument, along with the number of items and sample size.
 }
 \examples{
-\dontrun{
-rr <- reliability_report(responses, instr)
-print(rr)
+\donttest{
+if (requireNamespace("psych", quietly = TRUE)) {
+  demo <- sframe_demo_data()
+  rr <- reliability_report(demo$responses, demo$instrument, omega = FALSE)
+  print(rr)
+}
 }
 }
 \seealso{
