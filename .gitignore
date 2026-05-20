@@ -15,5 +15,11 @@ docs
 .local-tidy/
 .codex
 surveyframe_v0.2/
+surveyframe_V0.3/
+cran-comments.md
+data-raw/
+roadmap.md
+todo.md
+revision_todo_0.3.md
 Rplots.pdf
 tests/testthat/file*.html
