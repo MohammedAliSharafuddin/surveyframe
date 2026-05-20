@@ -23,8 +23,9 @@ Produces item-total correlations, floor and ceiling effect proportions,
 and item means and standard deviations for each item within each scale.
 }
 \examples{
-\dontrun{
-ir <- item_report(responses, instr)
+\donttest{
+demo <- sframe_demo_data()
+ir <- item_report(demo$responses, demo$instrument)
 print(ir)
 }
 }

@@ -22,9 +22,12 @@
 #' @seealso [sf_scale()], [item_report()]
 #'
 #' @examples
-#' \dontrun{
-#' rr <- reliability_report(responses, instr)
-#' print(rr)
+#' \donttest{
+#' if (requireNamespace("psych", quietly = TRUE)) {
+#'   demo <- sframe_demo_data()
+#'   rr <- reliability_report(demo$responses, demo$instrument, omega = FALSE)
+#'   print(rr)
+#' }
 #' }
 reliability_report <- function(
     data,
@@ -128,8 +131,9 @@ print.sframe_reliability_report <- function(x, ...) {
 #' @seealso [reliability_report()], [sf_scale()]
 #'
 #' @examples
-#' \dontrun{
-#' ir <- item_report(responses, instr)
+#' \donttest{
+#' demo <- sframe_demo_data()
+#' ir <- item_report(demo$responses, demo$instrument)
 #' print(ir)
 #' }
 item_report <- function(data, instrument, scales = NULL) {
@@ -215,9 +219,12 @@ print.sframe_item_report <- function(x, ...) {
 #' @seealso [reliability_report()], [cfa_syntax()]
 #'
 #' @examples
-#' \dontrun{
-#' er <- efa_report(responses, instr)
-#' print(er)
+#' \donttest{
+#' if (requireNamespace("psych", quietly = TRUE)) {
+#'   demo <- sframe_demo_data()
+#'   er <- efa_report(demo$responses, demo$instrument)
+#'   print(er)
+#' }
 #' }
 efa_report <- function(
     data,
@@ -316,8 +323,10 @@ print.sframe_efa_report <- function(x, ...) {
 #' cat(syntax)
 #'
 #' \dontrun{
-#' # Fit the generated syntax with lavaan
-#' fit <- lavaan::cfa(syntax, data = scored_data, std.lv = TRUE)
+#' # lavaan is not installed by default; install it before fitting.
+#' demo   <- sframe_demo_data()
+#' scored <- score_scales(demo$responses, demo$instrument)
+#' fit    <- lavaan::cfa(syntax, data = scored, std.lv = TRUE)
 #' summary(fit, fit.measures = TRUE)
 #' }
 cfa_syntax <- function(instrument, scales = NULL, std_lv = TRUE) {

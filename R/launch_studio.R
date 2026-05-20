@@ -29,17 +29,17 @@
 #'   [read_responses()]
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' launch_studio()
 #'
-#' instr <- read_sframe("my_instrument.sframe")
-#' launch_studio(instrument = instr, launch.browser = FALSE)
+#' demo <- sframe_demo_data()
+#' launch_studio(instrument = demo$instrument, launch.browser = FALSE)
 #'
 #' launch_studio(
-#'   instrument = instr,
-#'   responses = "data/responses.csv",
+#'   instrument    = demo$instrument,
+#'   responses     = demo$responses,
 #'   respondent_id = "respondent_id",
-#'   submitted_at = "submitted_at"
+#'   submitted_at  = "submitted_at"
 #' )
 #' }
 launch_studio <- function(

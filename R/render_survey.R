@@ -339,7 +339,7 @@ sframe_progress_ui <- function(answered, total, colour) {
 #' @seealso [launch_studio()], [read_responses()]
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' render_survey(instr)
 #' render_survey(instr, save_responses = "csv", output_path = "responses.csv")
 #' }

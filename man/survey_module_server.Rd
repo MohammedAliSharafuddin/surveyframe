@@ -28,7 +28,7 @@ Returns a \code{reactive} that holds \code{NULL} until the form is submitted, th
 returns the response as a named list (one element per visible item).
 }
 \examples{
-\dontrun{
+\donttest{
 # See survey_module_ui() for a complete example.
 }
 }

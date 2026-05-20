@@ -29,8 +29,6 @@ observeEvent <- shiny::observeEvent
 req <- shiny::req
 shinyApp <- shiny::shinyApp
 
-`%||%` <- function(x, y) if (is.null(x)) y else x
-
 instr     <- get("SFRAME_INSTRUMENT", inherits = TRUE)
 responses <- get("SFRAME_RESPONSES",  inherits = TRUE)
 
@@ -323,13 +321,21 @@ server <- function(input, output, session) {
 # ── Panel constructors ────────────────────────────────────────────────────────
 db_overview_ui <- function(resp = responses) {
   n_current <- if (is.null(resp)) 0L else nrow(resp)
+
   date_range <- if (!is.null(resp) && "submitted_at" %in% names(resp)) {
-    dts <- as.POSIXct(resp$submitted_at, format = "%Y-%m-%dT%H:%M:%SZ", tz = "UTC")
+    dts <- dashboard_parse_datetime(resp$submitted_at)
     dts <- dts[!is.na(dts)]
+
     if (length(dts) > 1) {
       paste0(format(min(dts), "%d %b"), " to ", format(max(dts), "%d %b %Y"))
-    } else "Not available"
-  } else "Not available"
+    } else if (length(dts) == 1) {
+      format(dts, "%d %b %Y")
+    } else {
+      "Not available"
+    }
+  } else {
+    "Not available"
+  }
 
   n_items  <- length(q_items)
   n_scales <- length(instr$scales)
@@ -560,16 +566,75 @@ dashboard_date_column <- function(data) {
   if (length(candidates)) candidates[[1]] else NULL
 }
 
-dashboard_parse_date <- function(x) {
-  if (inherits(x, "Date")) return(x)
-  if (inherits(x, c("POSIXct", "POSIXlt"))) return(as.Date(x))
-  if (is.character(x)) {
-    out <- as.Date(suppressWarnings(as.POSIXct(x, tz = "UTC")))
-    bad <- is.na(out)
-    if (any(bad)) out[bad] <- suppressWarnings(as.Date(x[bad]))
-    return(out)
+dashboard_parse_datetime <- function(x) {
+  na_time <- as.POSIXct(NA_real_, origin = "1970-01-01", tz = "UTC")
+
+  if (inherits(x, "Date")) {
+    return(as.POSIXct(x, tz = "UTC"))
   }
-  rep(as.Date(NA), length(x))
+
+  if (inherits(x, c("POSIXct", "POSIXlt"))) {
+    return(as.POSIXct(x, tz = "UTC"))
+  }
+
+  if (!is.character(x)) {
+    return(rep(na_time, length(x)))
+  }
+
+  formats <- c(
+    "%Y-%m-%dT%H:%M:%OS%z",
+    "%Y-%m-%dT%H:%M:%S%z",
+    "%Y-%m-%dT%H:%M:%OS",
+    "%Y-%m-%dT%H:%M:%S",
+    "%Y-%m-%d %H:%M:%OS %Z",
+    "%Y-%m-%d %H:%M:%OS",
+    "%Y-%m-%d %H:%M:%S",
+    "%Y-%m-%d",
+    "%d/%m/%Y %H:%M:%OS",
+    "%d/%m/%Y"
+  )
+
+  parse_one <- function(value) {
+    value <- trimws(as.character(value))
+
+    if (is.na(value) || !nzchar(value)) {
+      return(NA_real_)
+    }
+
+    value <- sub("Z$", "+0000", value)
+    value <- sub("([+-][0-9]{2}):([0-9]{2})$", "\\1\\2", value)
+
+    for (fmt in formats) {
+      parsed <- suppressWarnings(
+        as.POSIXct(strptime(value, format = fmt, tz = "UTC"))
+      )
+
+      if (!is.na(parsed)) {
+        return(as.numeric(parsed))
+      }
+    }
+
+    parsed <- suppressWarnings(tryCatch(
+      as.POSIXct(as.Date(value), tz = "UTC"),
+      error = function(e) na_time
+    ))
+
+    if (!is.na(parsed)) {
+      as.numeric(parsed)
+    } else {
+      NA_real_
+    }
+  }
+
+  as.POSIXct(
+    vapply(x, parse_one, numeric(1)),
+    origin = "1970-01-01",
+    tz = "UTC"
+  )
+}
+
+dashboard_parse_date <- function(x) {
+  as.Date(dashboard_parse_datetime(x))
 }
 
 # ── Launch ────────────────────────────────────────────────────────────────────

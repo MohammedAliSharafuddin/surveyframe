@@ -52,14 +52,19 @@
 #'                              open = FALSE)
 #' file.exists(out)
 #'
-#' \dontrun{
-#' # Write and open in the default browser
-#' export_static_survey(instr)
+#' \donttest{
+#' # Write to a temp file and open in the default browser
+#' export_static_survey(instr,
+#'                      output_path = file.path(tempdir(), "sat_browser.html"),
+#'                      overwrite = TRUE)
 #'
-#' # Connect to a Google Apps Script endpoint for server-side collection
+#' # Write with a Google Apps Script endpoint for server-side collection
 #' export_static_survey(
 #'   instr,
-#'   endpoint_url = "https://script.google.com/macros/s/XXXXX/exec"
+#'   output_path  = file.path(tempdir(), "sat_endpoint.html"),
+#'   endpoint_url = "https://script.google.com/macros/s/XXXXX/exec",
+#'   open         = FALSE,
+#'   overwrite    = TRUE
 #' )
 #' }
 export_static_survey <- function(

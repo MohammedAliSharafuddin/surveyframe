@@ -42,7 +42,7 @@
 #' @seealso [run_analysis_plan()], [quality_report()], [score_scales()]
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' # Open the bundled tourism-services response dashboard.
 #' # To build a questionnaire instead, use launch_builder().
 #' launch_dashboard()

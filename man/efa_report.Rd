@@ -39,9 +39,12 @@ prepares the researcher to estimate an EFA solution with a separate package
 such as \code{psych} or \code{lavaan}.
 }
 \examples{
-\dontrun{
-er <- efa_report(responses, instr)
-print(er)
+\donttest{
+if (requireNamespace("psych", quietly = TRUE)) {
+  demo <- sframe_demo_data()
+  er <- efa_report(demo$responses, demo$instrument)
+  print(er)
+}
 }
 }
 \seealso{
