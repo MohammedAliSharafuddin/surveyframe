@@ -31,7 +31,42 @@ Additional v0.4 candidates from the pre-submission review:
 
 ------------------------------------------------------------------------
 
-## Phase 0: CRAN hardening - IN FINAL REVIEW
+## JSS paper: SUBMIT TODAY — TOP PRIORITY
+
+*Journal of Statistical Software.* The paper is the primary academic credibility
+document for the surveyframe ecosystem. CRAN acceptance + JSS publication is the
+citation engine that drives all downstream adoption (Ethos, ASRDA textbook,
+co-authored manuscripts).
+
+**Target:** Submit today. Full manuscript at `jss-paper/surveyframe.Rnw`.
+
+### Manuscript checklist
+
+- [x] Paper drafted end-to-end (`jss-paper/surveyframe.Rnw`)
+- [x] All code examples run and produce reproducible output
+- [x] Figures generated from demo data
+- [x] BibTeX references complete (`jss-paper/surveyframe.bib`)
+- [x] Replication script included (`jss-paper/replicate.R`)
+- [ ] Final proofread and line edit
+- [ ] Compile PDF with `pdflatex surveyframe` — confirm zero LaTeX errors
+- [ ] Attach source code archive (surveyframe package tarball)
+- [ ] Submit at https://www.jstatsoft.org/ with three attachments: PDF, source code, replication materials
+- [ ] Add `inst/CITATION` file pointing to JSS paper after acceptance
+- [ ] Convert accepted manuscript into package vignette (`vignettes/surveyframe-jss.Rnw`)
+
+### Positioning for the paper
+
+surveyframe is a **proactive** survey workflow tool. The `sframe` object is a
+methodological contract declared before data collection: constructs, items,
+scales, branching logic, and analysis plan are all embedded in the instrument
+definition. Analysis is the execution of that pre-declared plan — not a
+post-hoc search for significance. This is the software equivalent of
+pre-registration, enforced by the data model. No existing tool (SmartPLS,
+SPSS, jamovi, lavaan) offers this architecture.
+
+------------------------------------------------------------------------
+
+## Phase 0: CRAN hardening - REVISED VERSION SUBMITTED
 
 Local `R CMD check --as-cran` on source tarball with 0 errors and 0
 warnings
@@ -60,11 +95,13 @@ analysis/report HTML, and Quarto temp-file cleanup
 
 ------------------------------------------------------------------------
 
-## Phase 1: First CRAN submission - PENDING
+## Phase 1: First CRAN submission - IN PROGRESS
 
-Submit surveyframe 0.3.0 to CRAN
+CRAN review received within 3 days of first submission
 
-Respond to CRAN reviewer comments, if any
+Revised version submitted
+
+Awaiting CRAN acceptance and indexing
 
 Tag the accepted CRAN release
 

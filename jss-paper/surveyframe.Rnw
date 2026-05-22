@@ -1,0 +1,821 @@
+%% JSS manuscript — surveyframe: A Proactive Survey Research Workflow for R
+%% Compile: pdflatex surveyframe && bibtex surveyframe && pdflatex surveyframe && pdflatex surveyframe
+
+\documentclass[article]{jss}
+
+%% -- Author information --------------------------------------------------
+
+\author{Mohammed Ali Sharafuddin\\Independent Researcher\\ORCID: 0000-0001-5247-2964}
+\Plainauthor{Mohammed Ali Sharafuddin}
+
+\title{\pkg{surveyframe}: A Proactive Survey Research Workflow for \proglang{R}}
+\Plaintitle{surveyframe: A Proactive Survey Research Workflow for R}
+\Shorttitle{\pkg{surveyframe}: A Proactive Survey Research Workflow}
+
+%% -- Abstract and keywords -----------------------------------------------
+
+\Abstract{
+Survey-based research in the social sciences, management, and health
+disciplines typically follows a reactive pattern: an instrument is
+built, data collected, and statistical techniques applied
+retrospectively. This approach leaves the analysis plan unspecified
+until after data collection, creating conditions for researcher degrees
+of freedom, post-hoc model fitting, and irreproducible findings.
+
+\pkg{surveyframe} introduces a \emph{proactive} workflow architecture
+built around the \code{sframe} class---a typed, validated \proglang{R}
+object that encodes the complete instrument specification, including
+item definitions, response choice sets, scale membership, branching
+logic, attention checks, and a pre-declared analysis plan, before a
+single response is collected. Analysis is the execution of a
+pre-declared methodological contract, not a search through analytical
+space.
+
+The package provides a constructor family for building \code{sframe}
+instruments, SHA-256-integrity-checked serialisation to the
+\code{.sframe} format, browser-based and \pkg{Shiny}-based survey
+rendering, CSV-based and Google Sheets response collection, a
+multi-stage quality-checking pipeline, scale scoring with reverse
+coding, Cronbach's $\alpha$ and McDonald's $\omega$ reliability
+statistics, EFA suitability diagnostics (KMO, Bartlett), lavaan CFA
+syntax generation, a pre-declared analysis plan executor producing
+APA-formatted results and interpretation prompts, and reproducible HTML
+report generation. All core functions are available without optional
+dependencies; statistical extensions activate gracefully when
+\pkg{psych} or \pkg{lavaan} are installed.
+
+This article describes the design philosophy, the package architecture,
+and demonstrates the complete workflow using a bundled tourism services
+survey instrument and response dataset.
+}
+
+\Keywords{survey research, psychometrics, instrument design, reproducible research,
+  \proglang{R}, pre-registration}
+\Plainkeywords{survey research, psychometrics, instrument design, reproducible
+  research, R, pre-registration}
+
+%% -- Metadata (filled in by JSS on acceptance) ----------------------------
+\Volume{VV}
+\Issue{II}
+\Month{MMMM}
+\Year{YYYY}
+\Submitdate{2026-05-22}
+\Acceptdate{yyyy-mm-dd}
+
+\Address{
+  Mohammed Ali Sharafuddin\\
+  Email: \email{mohammedali.page@gmail.com}\\
+  URL: \url{https://github.com/MohammedAliSharafuddin/surveyframe}
+}
+
+%% -------------------------------------------------------------------------
+
+\begin{document}
+
+%% -- Setup chunk (not shown in output) ------------------------------------
+
+<<setup, echo=FALSE, results='hide', message=FALSE, warning=FALSE>>=
+options(prompt = "R> ", continue = "+  ", width = 70,
+        useFancyQuotes = FALSE, digits = 4)
+library("surveyframe")
+@
+
+%% =========================================================================
+\section{Introduction}
+\label{sec:intro}
+%% =========================================================================
+
+Survey-based research is one of the most widely used methods across
+the social sciences, management, education, and health disciplines.
+A researcher designs an instrument, collects responses, and then
+applies statistical procedures to the resulting data. In the dominant
+tooling ecosystem---\proglang{SPSS} \citep{ibm2023}, SmartPLS
+\citep{ringleetal2022}, \pkg{lavaan} \citep{rosseel2012}---the
+statistical analysis is a distinct, post-hoc step performed after data
+are in hand. The instrument, the analysis method, and the interpretation
+criteria are often determined or refined only after examining the data.
+
+This reactive pattern creates conditions that are now well-documented
+in the reproducibility literature \citep{simmons2011, open2015}.
+Researchers may---intentionally or not---adjust their scale definitions,
+select among competing fit indices, or revise their theoretical model
+after observing the data. Even when no scientific misconduct is
+involved, the statistical consequences of such flexibility are severe:
+inflated Type~I error rates, overfit models, and findings that do not
+replicate \citep{gelman2014}.
+
+Pre-registration disciplines the analysis plan by requiring researchers
+to declare hypotheses, variables, and analysis procedures before data
+collection \citep{nosek2018}. A growing number of journals and funders
+now mandate or incentivise pre-registration. Yet most statistical
+software provides no mechanisms to enforce or even express such a plan.
+The analysis plan exists in a separate document, is manually followed,
+and is never checked against the actual analysis executed.
+
+\pkg{surveyframe} addresses this gap with a \emph{proactive workflow}
+architecture. The central abstraction is the \code{sframe} class: a
+typed \proglang{R} object that encodes the instrument definition
+\emph{and} the intended analysis plan in a single, validated, and
+integrity-checked object. The sframe is constructed before data
+collection. The analysis is the execution of the plan embedded in the
+instrument---not a new plan written after inspecting results. When a
+researcher serialises an \code{sframe} to disk with \code{write\_sframe()},
+an SHA-256 hash over the entire specification is stored alongside it.
+If the instrument is later modified after data collection, the stored
+hash provides an auditable record of the change.
+
+This design is not a policy mechanism---researchers can always construct
+new analysis objects to run additional tests. What it provides is
+\emph{visibility}: the pre-declared analysis is clearly separated from
+any post-hoc exploration, making the distinction legible in both the
+code and the final report.
+
+\pkg{surveyframe} covers the complete survey research lifecycle:
+instrument construction, validation, deployment as a self-contained
+static HTML file or \pkg{Shiny} application, response collection and
+import, data quality checking, scale scoring, reliability analysis,
+EFA suitability diagnostics, lavaan CFA syntax generation, pre-declared
+analysis plan execution, codebook generation, and HTML report rendering.
+The package has three hard dependencies (\pkg{jsonlite}, \pkg{rlang},
+\pkg{openssl}) and activates statistical extensions gracefully when
+\pkg{psych} or \pkg{lavaan} are present.
+
+The remainder of this article is organised as follows.
+Section~\ref{sec:design} describes the design philosophy and the
+\code{sframe} class.
+Section~\ref{sec:construction} demonstrates instrument construction.
+Section~\ref{sec:deployment} covers survey deployment and response
+collection.
+Section~\ref{sec:analysis} presents the analysis workflow.
+Section~\ref{sec:reporting} describes reporting.
+Section~\ref{sec:comparison} compares \pkg{surveyframe} with related
+software.
+Section~\ref{sec:summary} concludes.
+
+%% =========================================================================
+\section{Design philosophy and the \code{sframe} class}
+\label{sec:design}
+%% =========================================================================
+
+\subsection{The proactive workflow}
+
+The key architectural decision in \pkg{surveyframe} is that an
+\code{sframe} object is always constructed from scratch, without data.
+It describes an instrument and an intended analysis. Data are then
+collected, imported, and passed into analysis functions alongside the
+\code{sframe} as a second argument. The analysis functions read the
+declared structure---scale membership, reverse coding, item types,
+analysis plan---from the instrument, not from the data.
+
+This is in contrast to the typical \proglang{R} workflow in which a
+researcher begins with a data frame and then constructs variable sets,
+scale definitions, and model specifications interactively. In
+\pkg{surveyframe}, those decisions must be made and committed to the
+\code{sframe} before any data are in scope.
+
+The practical consequence is that an sframe file produced before data
+collection serves as a machine-readable proxy for a pre-registration.
+When submitted to a pre-registration registry (e.g., OSF) alongside a
+timestamp, or when used to derive the JSS replication file hash, the
+\code{.sframe} file constitutes evidence that the analysis plan was
+fixed before the results were observed.
+
+\subsection{The \code{sframe} class}
+
+An \code{sframe} object is a named list with eight typed slots:
+
+\begin{description}
+  \item[\code{meta}] Character fields: \code{title}, \code{version},
+    \code{description}, \code{authors}, \code{languages}, and
+    \code{validated}.
+  \item[\code{items}] A list of \code{sf\_item} objects, one per survey
+    item.
+  \item[\code{choices}] A list of \code{sf\_choices} objects, one per
+    response scale.
+  \item[\code{scales}] A list of \code{sf\_scale} objects defining
+    composite scoring rules and measurement structure.
+  \item[\code{branching}] A list of \code{sf\_branch} objects encoding
+    conditional display logic.
+  \item[\code{checks}] A list of \code{sf\_check} objects defining
+    attention-check criteria.
+  \item[\code{analysis\_plan}] A list of pre-declared analysis blocks,
+    each specifying a test type, variable roles, and decision rules.
+  \item[\code{models}] A list of \code{sf\_model} objects encoding
+    structural relationships between constructs for CFA/SEM syntax
+    generation.
+\end{description}
+
+The \code{sframe} is constructed via the \code{sf\_instrument()}
+function, which accepts a \code{components} list of objects produced
+by the \code{sf\_} constructor family. Components are sorted into their
+respective slots automatically; passing a non-constructor object raises
+a validation error.
+
+\subsection{Integrity and serialisation}
+
+\code{write\_sframe()} serialises an \code{sframe} to the
+\code{.sframe} format (a compressed JSON container) and computes an
+SHA-256 hash over the serialised content. The hash is stored in the
+file header alongside the package version. \code{read\_sframe()}
+recomputes the hash on load and warns if the stored and computed hashes
+differ, indicating that the file was modified after serialisation. This
+hash is the primary audit mechanism for detecting post-collection
+instrument editing.
+
+%% =========================================================================
+\section{Instrument construction}
+\label{sec:construction}
+%% =========================================================================
+
+\subsection{Constructor family}
+
+Five constructors produce the typed components assembled into an
+\code{sframe}:
+
+\begin{description}
+  \item[\code{sf\_choices()}] Defines a named response scale (choice
+    set) mapping numeric values to display labels. Choice sets are
+    referenced by \code{id} in item definitions and reused across items
+    sharing the same scale.
+  \item[\code{sf\_item()}] Defines a single survey item. Supports
+    thirteen item types: \code{"likert"}, \code{"single\_choice"},
+    \code{"multiple\_choice"}, \code{"numeric"}, \code{"text"},
+    \code{"textarea"}, \code{"date"}, \code{"matrix"}, \code{"slider"},
+    \code{"ranking"}, \code{"rating"}, \code{"section\_break"}, and
+    \code{"text\_block"}.
+  \item[\code{sf\_scale()}] Groups items into a composite scale and
+    specifies scoring rules: \code{method} (\code{"mean"} or
+    \code{"sum"}), \code{min\_valid} (minimum non-missing items for a
+    valid score), \code{reverse\_items}, and optional item
+    \code{weights}.
+  \item[\code{sf\_branch()}] Defines a conditional display rule: an
+    item is shown only when a specified condition on a prior item's
+    response is met.
+  \item[\code{sf\_check()}] Defines an attention-check criterion used
+    by \code{quality\_report()} to flag inattentive respondents.
+\end{description}
+
+\subsection{Building an instrument}
+
+The following code constructs a minimal tourism services survey with
+two constructs and five items, based on the instrument used throughout
+the worked example in this article.
+
+<<construction, echo=TRUE>>=
+library("surveyframe")
+
+## Define a shared 5-point agreement response scale
+agree5 <- sf_choices(
+  id     = "agree5",
+  values = 1:5,
+  labels = c("Strongly disagree", "Disagree", "Neutral",
+             "Agree", "Strongly agree")
+)
+
+## Define items — declare scale membership before any data exist
+dm_1 <- sf_item("dm_1",
+  "Social media content influences my travel decisions.",
+  type = "likert", choice_set = "agree5",
+  scale_id = "digital_marketing", required = TRUE)
+
+dm_2 <- sf_item("dm_2",
+  "Online reviews shape my destination choices.",
+  type = "likert", choice_set = "agree5",
+  scale_id = "digital_marketing", required = TRUE)
+
+dm_3 <- sf_item("dm_3",
+  "Digital promotions encourage me to visit new places.",
+  type = "likert", choice_set = "agree5",
+  scale_id = "digital_marketing", required = TRUE)
+
+sq_1 <- sf_item("sq_1",
+  "The hospitality staff were attentive and helpful.",
+  type = "likert", choice_set = "agree5",
+  scale_id = "service_quality", required = TRUE)
+
+sq_2 <- sf_item("sq_2",
+  "Facilities were clean and well maintained.",
+  type = "likert", choice_set = "agree5",
+  scale_id = "service_quality", required = TRUE)
+
+## Define scales — scoring rule committed before data collection
+dm_scale <- sf_scale(
+  id     = "digital_marketing",
+  label  = "Digital marketing effectiveness",
+  items  = c("dm_1", "dm_2", "dm_3"),
+  method = "mean"
+)
+
+sq_scale <- sf_scale(
+  id     = "service_quality",
+  label  = "Service quality",
+  items  = c("sq_1", "sq_2"),
+  method = "mean"
+)
+
+## Assemble the instrument
+instr <- sf_instrument(
+  title       = "Tourism Experience Survey",
+  version     = "1.0.0",
+  description = "Digital marketing and service quality perceptions.",
+  authors     = "J. Researcher",
+  components  = list(agree5, dm_1, dm_2, dm_3, sq_1, sq_2,
+                     dm_scale, sq_scale)
+)
+print(instr)
+@
+
+\subsection{Validation}
+
+\code{validate\_sframe()} checks the internal consistency of an
+\code{sframe} object and reports all problems. The function performs
+more than twenty checks, including duplicate item IDs, items
+referencing missing choice sets, scale items not present in the
+instrument, branching rules referencing unknown items, and analysis
+plan roles referencing missing variables. In \code{strict = TRUE} mode
+(the default), any problem raises a typed error of class
+\code{sframe\_validation\_error}. In \code{strict = FALSE} mode, all
+problems are returned as a character vector without stopping.
+
+<<validation, echo=TRUE>>=
+result <- validate_sframe(instr, strict = FALSE)
+result$valid
+result$problems
+@
+
+\subsection{Serialisation}
+
+\code{write\_sframe()} serialises a validated \code{sframe} to the
+\code{.sframe} format and records an SHA-256 hash of the instrument
+specification:
+
+\begin{Code}
+R> write_sframe(instr, "tourism_survey.sframe")
+R> instr2 <- read_sframe("tourism_survey.sframe")
+R> identical(instr$meta$title, instr2$meta$title)
+[1] TRUE
+\end{Code}
+
+The hash verification on \code{read\_sframe()} detects out-of-band
+modifications made after the file was created. Any change to the
+serialised JSON---including edits to item text, scale membership, or
+analysis plan---produces a hash mismatch, which is reported as a
+warning.
+
+\subsection{Declaring the analysis plan}
+
+An \code{sframe} optionally carries a pre-declared analysis plan as a
+list of analysis blocks in the \code{analysis\_plan} slot. Blocks
+specify the statistical test type, variable roles, options (e.g.,
+$\alpha$ level), and decision rules. The bundled demonstration
+instrument includes a full plan; the worked example in
+Section~\ref{sec:analysis} runs it.
+
+Analysis plans can be authored either programmatically or through the
+visual SurveyBuilder interface described in
+Section~\ref{sec:deployment}. When constructed through the interface,
+the plan is stored in the \code{.sframe} file and retrieved by
+\code{run\_analysis\_plan()} without any additional specification.
+
+%% =========================================================================
+\section{Survey deployment and response collection}
+\label{sec:deployment}
+%% =========================================================================
+
+\subsection{Static HTML export}
+
+\code{export\_static\_survey()} generates a self-contained single-file
+HTML survey that runs entirely in the browser without a server or
+internet connection. All thirteen item types, branching logic,
+required-field validation, multi-page navigation, and progress
+indication are implemented in client-side JavaScript. When a respondent
+submits the form, the browser downloads a one-row CSV file. If an
+\code{endpoint\_url} is supplied (a Google Apps Script web app or a
+serverless function), the response is also POSTed as JSON. The CSV
+download proceeds regardless of POST success, so no response is lost
+on network failure.
+
+\begin{Code}
+R> export_static_survey(instr,
++    output_path = "tourism_survey.html",
++    open = FALSE)
+\end{Code}
+
+The exported file can be hosted on any static file server, GitHub
+Pages, Netlify, or sent as an email attachment. No server or R
+installation is required on the respondent's machine.
+
+\subsection{Visual SurveyBuilder}
+
+\code{launch\_builder()} opens a browser-based visual instrument
+editor. Researchers who prefer a graphical interface can build the
+complete \code{sframe}---items, choice sets, scales, branching rules,
+and analysis plan---without writing \proglang{R} code. The builder
+exports the completed \code{.sframe} file; the file is imported into
+\proglang{R} with \code{read\_sframe()} for analysis.
+
+\subsection{Shiny survey module}
+
+\code{render\_survey()} launches an interactive \pkg{Shiny} survey.
+\code{survey\_module\_ui()} and \code{survey\_module\_server()}
+provide a reusable module that embeds a survey within a larger
+\pkg{Shiny} application, returning a reactive holding the response
+list when submitted.
+
+\subsection{Response import}
+
+\code{read\_responses()} reads a CSV file of responses, aligns item
+columns against the instrument definition, and adds metadata columns
+for respondent ID, submission timestamp, and any supplementary fields.
+The function validates that all declared item columns are present and
+warns if the column types are inconsistent with item definitions.
+
+<<read-responses, eval=FALSE, echo=TRUE>>=
+responses <- read_responses(
+  file       = "responses.csv",
+  instrument = instr,
+  respondent_id = "respondent_id",
+  submitted_at  = "submitted_at"
+)
+@
+
+For the worked example that follows, the bundled demonstration dataset
+is loaded directly:
+
+<<load-demo, echo=TRUE>>=
+demo  <- sframe_demo_data()
+instr <- demo$instrument
+resp  <- demo$responses
+
+## Five scales, 15 items, 120 respondents
+cat("Scales:", length(instr$scales), "\n")
+cat("Items:", length(instr$items), "\n")
+cat("Responses:", nrow(resp), "\n")
+@
+
+%% =========================================================================
+\section{The analysis workflow}
+\label{sec:analysis}
+%% =========================================================================
+
+\pkg{surveyframe} structures the analysis workflow as a sequence of
+discrete, composable steps. Each function accepts a data frame and an
+\code{sframe} instrument as its primary arguments and returns a typed
+object with a \code{print()} method. Steps can be executed
+independently or as a complete pre-declared analysis plan.
+
+\subsection{Data quality report}
+
+\code{quality\_report()} performs five classes of quality checks on
+the response data, using the instrument definition to determine what
+constitutes a valid response:
+
+\begin{enumerate}
+  \item \textbf{Attention checks.} Flags respondents who fail declared
+    \code{sf\_check()} criteria embedded in the instrument.
+  \item \textbf{Timing.} When a start-time column is present, flags
+    respondents who completed the survey faster than a declared
+    minimum duration.
+  \item \textbf{Straight-lining.} Flags respondents who gave the same
+    response to every Likert item.
+  \item \textbf{Missing data.} Reports per-item and per-respondent
+    missingness rates.
+  \item \textbf{Duplicates.} Detects duplicate respondent IDs.
+\end{enumerate}
+
+<<quality, echo=TRUE>>=
+qr <- quality_report(resp, instr)
+cat("Respondents:", qr$summary$n_respondents, "\n")
+cat("Items:      ", qr$summary$n_items, "\n")
+cat("Flagged:    ", qr$summary$n_flagged, "\n")
+@
+
+\subsection{Scale scoring}
+
+\code{score\_scales()} computes composite scale scores for every
+respondent according to the scoring rules declared in the
+\code{sframe}. Reverse coding is applied automatically using either
+the per-item \code{reverse} flag in \code{sf\_item()} or the
+\code{reverse\_items} vector in \code{sf\_scale()}---both sources are
+respected. The \code{min\_valid} argument controls missingness
+tolerance: respondents with fewer valid items than the declared
+threshold receive \code{NA} for that scale.
+
+<<scoring, echo=TRUE>>=
+scored <- score_scales(resp, instr)
+## Scale score columns appended to the response data frame
+scale_cols <- c("digital_marketing", "service_quality",
+                "sustainability", "satisfaction",
+                "behavioural_intention")
+summary(scored[, scale_cols])
+@
+
+\subsection{Reliability analysis}
+
+\code{reliability\_report()} computes Cronbach's $\alpha$
+\citep{cronbach1951} and McDonald's $\omega$ \citep{mcdonald1999} for
+each scale in the instrument, using \pkg{psych} \citep{revelle2024}
+when available. The function reads scale definitions directly from the
+\code{sframe}, requiring no manual specification of item vectors.
+
+<<reliability, echo=TRUE>>=
+if (requireNamespace("psych", quietly = TRUE)) {
+  rr <- reliability_report(resp, instr, omega = FALSE)
+  print(rr)
+}
+@
+
+All five scales exceed the conventional $\alpha \geq 0.70$ threshold
+\citep{nunnally1978}, supporting internal consistency.
+
+\subsection{EFA suitability}
+
+Before exploratory factor analysis, \pkg{surveyframe} evaluates
+dataset suitability through the Kaiser-Meyer-Olkin (KMO) measure
+and Bartlett's test of sphericity via \code{psychometrics()}:
+
+\begin{Code}
+R> if (requireNamespace("psych", quietly = TRUE)) {
++    pm <- psychometrics(resp, instr)
++    print(pm)
++  }
+\end{Code}
+
+The function constructs the correlation matrix from scored item
+columns identified in the instrument and passes it to
+\code{psych::KMO()} and \code{psych::cortest.bartlett()}, ensuring
+only the declared measurement items are included.
+
+\subsection{CFA syntax generation}
+
+\code{cfa\_syntax()} generates lavaan \citep{rosseel2012} CFA model
+syntax directly from the scale definitions in the \code{sframe}. Each
+scale becomes a reflective latent construct with its declared items as
+indicators. The output is ready to pass to \code{lavaan::cfa()} when
+\pkg{lavaan} is installed:
+
+<<cfa, echo=TRUE>>=
+syn <- cfa_syntax(instr)
+cat(syn)
+@
+
+The syntax encodes the measurement model declared before data
+collection. Because the construct--indicator relationships were
+specified in \code{sf\_scale()} at instrument construction time, the
+CFA tests a pre-declared structure rather than one selected after
+inspecting inter-item correlations.
+
+\subsection{Running the analysis plan}
+
+\code{run\_analysis\_plan()} executes all analysis blocks declared in
+the \code{sframe}'s \code{analysis\_plan} slot and returns an object
+of class \code{sframe\_analysis\_results}. Each result carries the
+test statistic, $p$~value, effect size, an APA-formatted summary
+string, and a \code{prompt} field---a plain-language interpretation
+template that the researcher completes:
+
+<<analysis-plan, echo=TRUE>>=
+results <- run_analysis_plan(resp, instr, scored = TRUE)
+
+## Correlation: digital marketing and satisfaction
+r1 <- results[[1]]
+cat("Test:  ", r1$test, "\n")
+cat("APA:   ", r1$apa, "\n")
+cat("Effect:", r1$effect_label, "\n")
+cat("Q:     ", r1$research_question, "\n")
+@
+
+The \code{prompt} field explicitly signals that the interpretation is
+the researcher's responsibility: \pkg{surveyframe} provides the
+statistic and its label; the researcher supplies the substantive
+interpretation. This design discourages the conflation of statistical
+and practical significance that is endemic in automated reporting tools.
+
+The second analysis block in the bundled plan is a multiple regression:
+
+<<analysis-plan-2, echo=TRUE>>=
+r2 <- results[[2]]
+cat("Test:", r2$test, "\n")
+cat("APA: ", r2$apa, "\n")
+@
+
+The third block tests whether first-time and repeat visitors differ in
+behavioural intention using a Mann-Whitney $U$ test, appropriate
+because \code{visit\_type} is a binary categorical predictor and
+\code{behavioural\_intention} has a restricted range:
+
+<<analysis-plan-3, echo=TRUE>>=
+r3 <- results[[3]]
+cat("Test:", r3$test, "\n")
+cat("APA: ", r3$apa, "\n")
+cat("Effect:", r3$effect_label, "\n")
+@
+
+Supported analysis types include Pearson and Spearman correlations,
+independent and paired $t$~tests, Mann-Whitney $U$, Kruskal-Wallis,
+one-way and two-way ANOVA with Tukey HSD, ANCOVA, repeated-measures
+ANOVA, simple linear regression, logistic regression (binary, ordinal,
+and multinomial), partial correlation, and mediation and moderation
+templates. Each test type carries a curated citation list sourced from
+the \code{.sframe\_citations} registry, providing the researcher with
+the primary methodological references for their methods section.
+
+%% =========================================================================
+\section{Reporting}
+\label{sec:reporting}
+%% =========================================================================
+
+\code{render\_report()} produces a self-contained HTML report
+from the analysis results, instrument metadata, and codebook. The
+report includes an executive summary, per-scale reliability statistics,
+analysis plan results with APA-formatted tables, the full codebook,
+and a citation block listing all packages and methodological references
+used in the analysis. All output is contained in a single HTML file
+that can be shared without external dependencies.
+
+\begin{Code}
+R> render_report(
++    data       = resp,
++    instrument = instr,
++    results    = results,
++    output     = "tourism_report.html"
++  )
+\end{Code}
+
+\code{codebook\_report()} generates a standalone codebook listing all
+items, their types, choice sets, scale membership, and reverse-coding
+status. The codebook can be exported as HTML or Markdown for inclusion
+in supplementary materials or ethics board submissions.
+
+<<codebook, echo=TRUE>>=
+cb <- codebook_report(instr)
+nrow(cb$items_table)
+head(cb$items_table[, c("id", "type", "scale_id", "reverse")], 6)
+@
+
+The citation block in \code{render\_report()} automatically includes
+citations for every test type run in the analysis plan, sourced from
+the internal \code{.sframe\_citations} registry. When the ASRDA
+textbook \citep{sharafuddin2026asrda} is published, \pkg{sfReport}
+(a planned Phase~4 companion package) will extend the citation block
+to reference the specific ASRDA chapter corresponding to each analysis
+step.
+
+%% =========================================================================
+\section{Comparison with existing software}
+\label{sec:comparison}
+%% =========================================================================
+
+Table~\ref{tab:comparison} summarises \pkg{surveyframe} alongside the
+principal existing tools for survey-based quantitative research.
+
+\begin{table}[t]
+\centering
+\caption{Comparison of \pkg{surveyframe} with related software.
+  \checkmark~= available; -- = not available; P = planned.}
+\label{tab:comparison}
+\vspace{0.5em}
+\small
+\begin{tabular}{lcccccc}
+\hline
+Feature &
+\pkg{survey\-frame} &
+\proglang{SPSS} &
+SmartPLS &
+\pkg{lavaan} &
+jamovi &
+Qualtrics \\
+\hline
+Instrument construction     & \checkmark & \checkmark & -- & -- & -- & \checkmark \\
+Pre-declared analysis plan  & \checkmark & --  & --  & -- & -- & -- \\
+SHA-256 instrument hash     & \checkmark & --  & --  & -- & -- & -- \\
+Static HTML survey export   & \checkmark & --  & --  & -- & -- & -- \\
+Shiny survey module         & \checkmark & --  & --  & -- & -- & -- \\
+Scale scoring (mean/sum)    & \checkmark & \checkmark & \checkmark & -- & \checkmark & -- \\
+Reliability ($\alpha$, $\omega$) & \checkmark & \checkmark & \checkmark & -- & \checkmark & -- \\
+EFA suitability (KMO, Bartlett) & \checkmark & \checkmark & -- & -- & \checkmark & -- \\
+CFA syntax generation       & \checkmark & -- & -- & \checkmark & \checkmark & -- \\
+CB-SEM execution            & P & \checkmark & -- & \checkmark & \checkmark & -- \\
+PLS-SEM execution           & P & -- & \checkmark & -- & -- & -- \\
+APA results with citations  & \checkmark & -- & -- & -- & -- & -- \\
+HTML report generation      & \checkmark & -- & -- & -- & \checkmark & \checkmark \\
+CRAN open source            & \checkmark & -- & -- & \checkmark & \checkmark & -- \\
+Self-hostable               & \checkmark & -- & -- & \checkmark & \checkmark & -- \\
+No external calls           & \checkmark & \checkmark & \checkmark & \checkmark & \checkmark & -- \\
+\hline
+\end{tabular}
+\end{table}
+
+\pkg{surveyframe}'s primary distinction is the \emph{proactive}
+architecture: instrument construction, analysis plan declaration, and
+data collection are strictly ordered. All other tools in
+Table~\ref{tab:comparison} operate on data that already exist; none
+require or provide mechanisms for encoding the analysis plan in the
+instrument before data collection. This is the feature that most
+directly addresses the reproducibility concerns outlined in
+Section~\ref{sec:intro}.
+
+\paragraph{SPSS.} IBM SPSS Statistics \citep{ibm2023} provides a
+comprehensive GUI-based analysis environment widely used in social
+science and management research. SPSS includes survey collection tools
+(through associated products), reliability analysis, factor analysis,
+and regression. It does not provide \proglang{R}-native scripting,
+open-source licensing, or an instrument-first workflow. Annual
+licensing costs are substantial, creating access barriers for
+individual researchers and lower-income institution contexts.
+
+\paragraph{SmartPLS.} SmartPLS \citep{ringleetal2022} specialises in
+partial least squares structural equation modelling (PLS-SEM). It is
+widely adopted in management research, particularly for formative
+constructs and small sample sizes. SmartPLS does not support instrument
+construction, pre-declared analysis plans, or open-source access. It
+has no \proglang{R} API; analyses are performed through its own
+proprietary interface. CB-SEM and lavaan CFA are outside its scope.
+\pkg{surveyframe} targets PLS-SEM through the planned \pkg{sfSEM}
+companion package.
+
+\paragraph{lavaan.} The \pkg{lavaan} package \citep{rosseel2012} is the
+standard \proglang{R} tool for structural equation modelling. It
+accepts model syntax defined by the researcher and operates on existing
+data frames. \pkg{surveyframe} complements rather than competes with
+\pkg{lavaan}: the \code{cfa\_syntax()} function generates lavaan syntax
+directly from the \code{sframe}'s scale definitions, providing the
+measurement model specification that the researcher then passes to
+\pkg{lavaan}. The critical difference is that \pkg{surveyframe}
+constrains the CFA to the constructs declared before data collection;
+\pkg{lavaan} itself imposes no such constraint.
+
+\paragraph{jamovi.} The jamovi project \citep{thejamoviproject2022}
+provides a free, open-source GUI for statistical analysis with an
+active \proglang{R} API through \pkg{jmv}. jamovi covers descriptives,
+reliability, EFA, and CFA (via \pkg{lavaan}). It does not provide
+instrument construction, a static HTML survey exporter, or a
+pre-declared analysis plan facility. It is a close analogue for the
+analysis and reporting portion of \pkg{surveyframe}'s workflow.
+
+%% =========================================================================
+\section{Summary}
+\label{sec:summary}
+%% =========================================================================
+
+\pkg{surveyframe} introduces a proactive architecture for survey-based
+research in \proglang{R}. The \code{sframe} class encodes the complete
+research instrument---items, response scales, composite scale
+definitions, branching logic, and analysis plan---in a single validated
+and integrity-checked object constructed before data collection. This
+design makes the distinction between a pre-declared analysis and
+post-hoc exploration explicit in the code and the final report,
+directly supporting the methodological standards demanded by
+reproducible-research initiatives and pre-registration mandates.
+
+The package covers the complete survey research lifecycle: instrument
+construction and validation, SHA-256-integrity-checked serialisation,
+browser-based and Shiny-based survey rendering, static HTML export for
+offline or server-free deployment, CSV and Google Sheets response
+collection, a multi-stage data quality pipeline, scale scoring with
+automatic reverse coding, Cronbach's $\alpha$ and McDonald's $\omega$
+reliability statistics, EFA suitability diagnostics, lavaan CFA syntax
+generation, a pre-declared analysis plan executor with APA-formatted
+results and interpretation prompts, codebook generation, and HTML
+report rendering.
+
+\pkg{surveyframe} v0.3.0 is available on CRAN. Planned extensions
+include \pkg{sfReport} (Quarto-native report generation with
+defensibility appendices referencing the ASRDA methodological
+textbook), \pkg{sfSEM} (PLS-SEM and CB-SEM execution via
+\pkg{lavaan} and \pkg{seminr}), \pkg{sfIRT} (item response theory via
+\pkg{mirt}), and \pkg{sfMCDM} (multi-criteria decision making). The
+development roadmap is maintained publicly at
+\url{https://github.com/MohammedAliSharafuddin/surveyframe-dev}.
+
+%% =========================================================================
+%% References
+%% =========================================================================
+
+\bibliography{surveyframe}
+
+%% =========================================================================
+%% Session information
+%% =========================================================================
+
+\begin{appendix}
+
+\section{Session information}
+\label{app:session}
+
+<<session, echo=TRUE>>=
+sessionInfo()
+@
+
+\section{Replication}
+
+All results in this manuscript are reproducible using the
+\code{replicate.R} script included with the submission. The script
+loads \pkg{surveyframe}, calls \code{sframe\_demo\_data()} to obtain
+the bundled instrument and response dataset, and executes every code
+example shown above in sequence. No additional data files or network
+access are required.
+
+\end{appendix}
+
+\end{document}
