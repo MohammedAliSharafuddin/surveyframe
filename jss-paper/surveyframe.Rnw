@@ -63,7 +63,7 @@ survey instrument and response dataset.
 \Submitdate{2026-05-22}
 \Acceptdate{yyyy-mm-dd}
 
-%% \Address{} omitted for blind peer review
+\Address{Withheld for blind peer review}
 
 %% -------------------------------------------------------------------------
 
@@ -803,8 +803,8 @@ development roadmap is maintained publicly at
 \section{Session information}
 \label{app:session}
 
-<<session, echo=TRUE>>=
-sessionInfo()
+<<session, echo=TRUE, results='asis'>>=
+toLatex(sessionInfo())
 @
 
 \section{Replication}
