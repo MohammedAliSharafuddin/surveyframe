@@ -4,10 +4,10 @@
 \documentclass[article]{jss}
 \usepackage{amssymb}
 
-%% -- Author information --------------------------------------------------
+%% -- Author information (anonymised for blind review) --------------------
 
-\author{Mohammed Ali Sharafuddin\\Independent Researcher\\ORCID: 0000-0001-5247-2964}
-\Plainauthor{Mohammed Ali Sharafuddin}
+\author{Anonymous}
+\Plainauthor{Anonymous}
 
 \title{\pkg{surveyframe}: A Proactive Survey Research Workflow for \proglang{R}}
 \Plaintitle{surveyframe: A Proactive Survey Research Workflow for R}
@@ -63,11 +63,7 @@ survey instrument and response dataset.
 \Submitdate{2026-05-22}
 \Acceptdate{yyyy-mm-dd}
 
-\Address{
-  Mohammed Ali Sharafuddin\\
-  Email: \email{mohammedali.page@gmail.com}\\
-  URL: \url{https://github.com/MohammedAliSharafuddin/surveyframe}
-}
+%% \Address{} omitted for blind peer review
 
 %% -------------------------------------------------------------------------
 
@@ -76,7 +72,7 @@ survey instrument and response dataset.
 %% -- Setup chunk (not shown in output) ------------------------------------
 
 <<setup, echo=FALSE, results='hide', message=FALSE, warning=FALSE>>=
-options(prompt = "R> ", continue = "+  ", width = 70,
+options(prompt = "R> ", continue = "+  ", width = 65,
         useFancyQuotes = FALSE, digits = 4)
 library("surveyframe")
 @
@@ -239,11 +235,12 @@ Five constructors produce the typed components assembled into an
     referenced by \code{id} in item definitions and reused across items
     sharing the same scale.
   \item[\code{sf\_item()}] Defines a single survey item. Supports
-    thirteen item types: \code{"likert"}, \code{"single\_choice"},
-    \code{"multiple\_choice"}, \code{"numeric"}, \code{"text"},
-    \code{"textarea"}, \code{"date"}, \code{"matrix"}, \code{"slider"},
-    \code{"ranking"}, \code{"rating"}, \code{"section\_break"}, and
-    \code{"text\_block"}.
+    thirteen item types: closed-response types
+    (\code{"likert"}, \code{"single\_choice"}, \code{"multiple\_choice"},
+    \code{"matrix"}, \code{"slider"}, \code{"ranking"}, \code{"rating"}),
+    open-response types (\code{"numeric"}, \code{"text"},
+    \code{"textarea"}, \code{"date"}), and layout elements
+    (\code{"section\_break"}, \code{"text\_block"}).
   \item[\code{sf\_scale()}] Groups items into a composite scale and
     specifies scoring rules: \code{method} (\code{"mean"} or
     \code{"sum"}), \code{min\_valid} (minimum non-missing items for a
@@ -583,7 +580,9 @@ r1 <- results[[1]]
 cat("Test:  ", r1$test, "\n")
 cat("APA:   ", r1$apa, "\n")
 cat("Effect:", r1$effect_label, "\n")
-cat("Q:     ", r1$research_question, "\n")
+cat("Q:", strwrap(r1$research_question, width = 58,
+                  exdent = 3), sep = "\n    ")
+cat("\n")
 @
 
 The \code{prompt} field explicitly signals that the interpretation is
