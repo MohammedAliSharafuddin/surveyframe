@@ -2,6 +2,7 @@
 %% Compile: pdflatex surveyframe && bibtex surveyframe && pdflatex surveyframe && pdflatex surveyframe
 
 \documentclass[article]{jss}
+\usepackage{amssymb}
 
 %% -- Author information --------------------------------------------------
 
@@ -153,7 +154,7 @@ software.
 Section~\ref{sec:summary} concludes.
 
 %% =========================================================================
-\section{Design philosophy and the \code{sframe} class}
+\section[Design philosophy and the sframe class]{Design philosophy and the \code{sframe} class}
 \label{sec:design}
 %% =========================================================================
 
@@ -180,7 +181,7 @@ timestamp, or when used to derive the JSS replication file hash, the
 \code{.sframe} file constitutes evidence that the analysis plan was
 fixed before the results were observed.
 
-\subsection{The \code{sframe} class}
+\subsection[The sframe class]{The \code{sframe} class}
 
 An \code{sframe} object is a named list with eight typed slots:
 
