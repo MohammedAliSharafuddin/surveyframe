@@ -1,6 +1,7 @@
 # surveyframe
 
 <!-- badges: start -->
+[![CRAN status](https://www.r-pkg.org/badges/version/surveyframe)](https://CRAN.R-project.org/package=surveyframe)
 [![R-CMD-check](https://github.com/MohammedAliSharafuddin/surveyframe/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/MohammedAliSharafuddin/surveyframe/actions/workflows/R-CMD-check.yaml)
 [![Codecov test coverage](https://codecov.io/gh/MohammedAliSharafuddin/surveyframe/branch/main/graph/badge.svg)](https://app.codecov.io/gh/MohammedAliSharafuddin/surveyframe?branch=main)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -17,7 +18,13 @@ so automated checks do not open a browser.
 
 ## Installation
 
-Install the development version from GitHub:
+Install from CRAN:
+
+```r
+install.packages("surveyframe")
+```
+
+Or install the development version from GitHub:
 
 ```r
 remotes::install_github("MohammedAliSharafuddin/surveyframe")
