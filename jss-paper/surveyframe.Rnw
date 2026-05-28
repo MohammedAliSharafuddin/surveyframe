@@ -4,10 +4,10 @@
 \documentclass[article]{jss}
 \usepackage{amssymb}
 
-%% -- Author information (anonymised for blind review) --------------------
+%% -- Author information -----------------------------------------------
 
-\author{Anonymous}
-\Plainauthor{Anonymous}
+\author{Mohammed Ali Sharafuddin}
+\Plainauthor{Mohammed Ali Sharafuddin}
 
 \title{\pkg{surveyframe}: A Proactive Survey Research Workflow for \proglang{R}}
 \Plaintitle{surveyframe: A Proactive Survey Research Workflow for R}
@@ -24,7 +24,7 @@ until after data collection, creating conditions for researcher degrees
 of freedom, post-hoc model fitting, and irreproducible findings.
 
 \pkg{surveyframe} introduces a \emph{proactive} workflow architecture
-built around the \code{sframe} class---a typed, validated \proglang{R}
+built around the \code{sframe} class, a typed, validated \proglang{R}
 object that encodes the complete instrument specification, including
 item definitions, response choice sets, scale membership, branching
 logic, attention checks, and a pre-declared analysis plan, before a
@@ -63,7 +63,12 @@ survey instrument and response dataset.
 \Submitdate{2026-05-22}
 \Acceptdate{yyyy-mm-dd}
 
-\Address{Withheld for blind peer review}
+\Address{
+  Mohammed Ali Sharafuddin\\
+  %% TODO: Add institutional affiliation and address before submission\\
+  E-mail: \email{mohammedali.page@gmail.com}\\
+  ORCID: \href{https://orcid.org/0000-0001-5247-2964}{0000-0001-5247-2964}
+}
 
 %% -------------------------------------------------------------------------
 
@@ -86,15 +91,15 @@ Survey-based research is one of the most widely used methods across
 the social sciences, management, education, and health disciplines.
 A researcher designs an instrument, collects responses, and then
 applies statistical procedures to the resulting data. In the dominant
-tooling ecosystem---\proglang{SPSS} \citep{ibm2023}, SmartPLS
-\citep{ringleetal2022}, \pkg{lavaan} \citep{rosseel2012}---the
+tooling ecosystem (\proglang{SPSS} \citep{ibm2023}, SmartPLS
+\citep{ringleetal2022}, \pkg{lavaan} \citep{rosseel2012}), the
 statistical analysis is a distinct, post-hoc step performed after data
 are in hand. The instrument, the analysis method, and the interpretation
 criteria are often determined or refined only after examining the data.
 
 This reactive pattern creates conditions that are now well-documented
 in the reproducibility literature \citep{simmons2011, open2015}.
-Researchers may---intentionally or not---adjust their scale definitions,
+Researchers may, intentionally or not, adjust their scale definitions,
 select among competing fit indices, or revise their theoretical model
 after observing the data. Even when no scientific misconduct is
 involved, the statistical consequences of such flexibility are severe:
@@ -115,13 +120,13 @@ typed \proglang{R} object that encodes the instrument definition
 \emph{and} the intended analysis plan in a single, validated, and
 integrity-checked object. The sframe is constructed before data
 collection. The analysis is the execution of the plan embedded in the
-instrument---not a new plan written after inspecting results. When a
+instrument, not a new plan written after inspecting results. When a
 researcher serialises an \code{sframe} to disk with \code{write\_sframe()},
 an SHA-256 hash over the entire specification is stored alongside it.
 If the instrument is later modified after data collection, the stored
 hash provides an auditable record of the change.
 
-This design is not a policy mechanism---researchers can always construct
+This design is not a policy mechanism; researchers can always construct
 new analysis objects to run additional tests. What it provides is
 \emph{visibility}: the pre-declared analysis is clearly separated from
 any post-hoc exploration, making the distinction legible in both the
@@ -161,8 +166,8 @@ The key architectural decision in \pkg{surveyframe} is that an
 It describes an instrument and an intended analysis. Data are then
 collected, imported, and passed into analysis functions alongside the
 \code{sframe} as a second argument. The analysis functions read the
-declared structure---scale membership, reverse coding, item types,
-analysis plan---from the instrument, not from the data.
+declared structure (scale membership, reverse coding, item types,
+and analysis plan) from the instrument, not from the data.
 
 This is in contrast to the typical \proglang{R} workflow in which a
 researcher begins with a data frame and then constructs variable sets,
@@ -270,7 +275,7 @@ agree5 <- sf_choices(
              "Agree", "Strongly agree")
 )
 
-## Define items — declare scale membership before any data exist
+## Define items: declare scale membership before any data exist
 dm_1 <- sf_item("dm_1",
   "Social media content influences my travel decisions.",
   type = "likert", choice_set = "agree5",
@@ -356,8 +361,8 @@ R> identical(instr$meta$title, instr2$meta$title)
 
 The hash verification on \code{read\_sframe()} detects out-of-band
 modifications made after the file was created. Any change to the
-serialised JSON---including edits to item text, scale membership, or
-analysis plan---produces a hash mismatch, which is reported as a
+serialised JSON, including edits to item text, scale membership, or
+the analysis plan, produces a hash mismatch, which is reported as a
 warning.
 
 \subsection{Declaring the analysis plan}
@@ -407,8 +412,8 @@ installation is required on the respondent's machine.
 
 \code{launch\_builder()} opens a browser-based visual instrument
 editor. Researchers who prefer a graphical interface can build the
-complete \code{sframe}---items, choice sets, scales, branching rules,
-and analysis plan---without writing \proglang{R} code. The builder
+complete \code{sframe} (items, choice sets, scales, branching rules,
+and analysis plan) without writing \proglang{R} code. The builder
 exports the completed \code{.sframe} file; the file is imported into
 \proglang{R} with \code{read\_sframe()} for analysis.
 
@@ -430,8 +435,8 @@ warns if the column types are inconsistent with item definitions.
 
 <<read-responses, eval=FALSE, echo=TRUE>>=
 responses <- read_responses(
-  file       = "responses.csv",
-  instrument = instr,
+  x             = "responses.csv",
+  instrument    = instr,
   respondent_id = "respondent_id",
   submitted_at  = "submitted_at"
 )
@@ -494,7 +499,7 @@ cat("Flagged:    ", qr$summary$n_flagged, "\n")
 respondent according to the scoring rules declared in the
 \code{sframe}. Reverse coding is applied automatically using either
 the per-item \code{reverse} flag in \code{sf\_item()} or the
-\code{reverse\_items} vector in \code{sf\_scale()}---both sources are
+\code{reverse\_items} vector in \code{sf\_scale()}; both sources are
 respected. The \code{min\_valid} argument controls missingness
 tolerance: respondents with fewer valid items than the declared
 threshold receive \code{NA} for that scale.
@@ -529,20 +534,21 @@ All five scales exceed the conventional $\alpha \geq 0.70$ threshold
 \subsection{EFA suitability}
 
 Before exploratory factor analysis, \pkg{surveyframe} evaluates
-dataset suitability through the Kaiser-Meyer-Olkin (KMO) measure
-and Bartlett's test of sphericity via \code{psychometrics()}:
+dataset suitability through the Kaiser-Meyer-Olkin (KMO) measure,
+Bartlett's test of sphericity, and parallel analysis via
+\code{efa\_report()}:
 
 \begin{Code}
 R> if (requireNamespace("psych", quietly = TRUE)) {
-+    pm <- psychometrics(resp, instr)
-+    print(pm)
++    er <- efa_report(resp, instr)
++    print(er)
 +  }
 \end{Code}
 
-The function constructs the correlation matrix from scored item
-columns identified in the instrument and passes it to
-\code{psych::KMO()} and \code{psych::cortest.bartlett()}, ensuring
-only the declared measurement items are included.
+The function constructs the item matrix from columns identified in the
+instrument, passes it to \code{psych::KMO()},
+\code{psych::cortest.bartlett()}, and \code{psych::fa.parallel()},
+ensuring only the declared measurement items are included.
 
 \subsection{CFA syntax generation}
 
@@ -569,7 +575,7 @@ inspecting inter-item correlations.
 the \code{sframe}'s \code{analysis\_plan} slot and returns an object
 of class \code{sframe\_analysis\_results}. Each result carries the
 test statistic, $p$~value, effect size, an APA-formatted summary
-string, and a \code{prompt} field---a plain-language interpretation
+string, and a \code{prompt} field containing a plain-language interpretation
 template that the researcher completes:
 
 <<analysis-plan, echo=TRUE>>=
@@ -635,10 +641,9 @@ that can be shared without external dependencies.
 
 \begin{Code}
 R> render_report(
-+    data       = resp,
-+    instrument = instr,
-+    results    = results,
-+    output     = "tourism_report.html"
++    instrument  = instr,
++    data        = resp,
++    output_file = "tourism_report.html"
 +  )
 \end{Code}
 
@@ -655,11 +660,7 @@ head(cb$items_table[, c("id", "type", "scale_id", "reverse")], 6)
 
 The citation block in \code{render\_report()} automatically includes
 citations for every test type run in the analysis plan, sourced from
-the internal \code{.sframe\_citations} registry. When the ASRDA
-textbook \citep{sharafuddin2026asrda} is published, \pkg{sfReport}
-(a planned Phase~4 companion package) will extend the citation block
-to reference the specific ASRDA chapter corresponding to each analysis
-step.
+the internal \code{.sframe\_citations} registry.
 
 %% =========================================================================
 \section{Comparison with existing software}
@@ -731,8 +732,8 @@ constructs and small sample sizes. SmartPLS does not support instrument
 construction, pre-declared analysis plans, or open-source access. It
 has no \proglang{R} API; analyses are performed through its own
 proprietary interface. CB-SEM and lavaan CFA are outside its scope.
-\pkg{surveyframe} targets PLS-SEM through the planned \pkg{sfSEM}
-companion package.
+PLS-SEM execution is on the \pkg{surveyframe} development roadmap,
+with syntax generation for \pkg{seminr} already available in v0.3.0.
 
 \paragraph{lavaan.} The \pkg{lavaan} package \citep{rosseel2012} is the
 standard \proglang{R} tool for structural equation modelling. It
@@ -760,8 +761,8 @@ analysis and reporting portion of \pkg{surveyframe}'s workflow.
 
 \pkg{surveyframe} introduces a proactive architecture for survey-based
 research in \proglang{R}. The \code{sframe} class encodes the complete
-research instrument---items, response scales, composite scale
-definitions, branching logic, and analysis plan---in a single validated
+research instrument (items, response scales, composite scale
+definitions, branching logic, and analysis plan) in a single validated
 and integrity-checked object constructed before data collection. This
 design makes the distinction between a pre-declared analysis and
 post-hoc exploration explicit in the code and the final report,
@@ -780,13 +781,11 @@ results and interpretation prompts, codebook generation, and HTML
 report rendering.
 
 \pkg{surveyframe} v0.3.0 is available on CRAN. Planned extensions
-include \pkg{sfReport} (Quarto-native report generation with
-defensibility appendices referencing the ASRDA methodological
-textbook), \pkg{sfSEM} (PLS-SEM and CB-SEM execution via
-\pkg{lavaan} and \pkg{seminr}), \pkg{sfIRT} (item response theory via
-\pkg{mirt}), and \pkg{sfMCDM} (multi-criteria decision making). The
-development roadmap is maintained publicly at
-\url{https://github.com/MohammedAliSharafuddin/surveyframe-dev}.
+include PLS-SEM and CB-SEM execution via \pkg{seminr} and \pkg{lavaan},
+item response theory workflows, multi-criteria decision making, and
+Quarto-native report generation. The package repository and issue
+tracker are available at
+\url{https://github.com/MohammedAliSharafuddin/surveyframe}.
 
 %% =========================================================================
 %% References
