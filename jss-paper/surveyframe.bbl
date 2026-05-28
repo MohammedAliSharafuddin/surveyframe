@@ -1,0 +1,80 @@
+\begin{thebibliography}{12}
+\newcommand{\enquote}[1]{``#1''}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\providecommand{\urlprefix}{URL }
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi:\discretionary{}{}{}#1}\else
+  \providecommand{\doi}{doi:\discretionary{}{}{}\begingroup \urlstyle{rm}\Url}\fi
+\providecommand{\eprint}[2][]{\url{#2}}
+
+\bibitem[{Cronbach(1951)}]{cronbach1951}
+Cronbach LJ (1951).
+\newblock \enquote{Coefficient Alpha and the Internal Structure of Tests.}
+\newblock \emph{Psychometrika}, \textbf{16}(3), 297--334.
+\newblock \doi{10.1007/BF02310555}.
+
+\bibitem[{Gelman and Loken(2014)}]{gelman2014}
+Gelman A, Loken E (2014).
+\newblock \enquote{The Statistical Crisis in Science.}
+\newblock \emph{American Scientist}, \textbf{102}(6), 460--465.
+\newblock \doi{10.1511/2014.111.460}.
+
+\bibitem[{{IBM Corp.}(2023)}]{ibm2023}
+{IBM Corp} (2023).
+\newblock \emph{{IBM SPSS Statistics} for {Windows}, Version 29.0}.
+\newblock IBM Corp., Armonk, NY.
+\newblock \urlprefix\url{https://www.ibm.com/products/spss-statistics}.
+
+\bibitem[{McDonald(1999)}]{mcdonald1999}
+McDonald RP (1999).
+\newblock \emph{Test Theory: A Unified Treatment}.
+\newblock Lawrence Erlbaum, Mahwah, NJ.
+
+\bibitem[{Nosek \emph{et~al.}(2018)Nosek, Ebersole, DeHaven, and Mellor}]{nosek2018}
+Nosek BA, Ebersole CR, DeHaven AC, Mellor DT (2018).
+\newblock \enquote{The Preregistration Revolution.}
+\newblock \emph{Proceedings of the National Academy of Sciences}, \textbf{115}(11), 2600--2606.
+\newblock \doi{10.1073/pnas.1708274114}.
+
+\bibitem[{Nunnally(1978)}]{nunnally1978}
+Nunnally JC (1978).
+\newblock \emph{Psychometric Theory}.
+\newblock 2nd edition. McGraw-Hill, New York.
+
+\bibitem[{{Open Science Collaboration}(2015)}]{open2015}
+{Open Science Collaboration} (2015).
+\newblock \enquote{Estimating the Reproducibility of Psychological Science.}
+\newblock \emph{Science}, \textbf{349}(6251), aac4716.
+\newblock \doi{10.1126/science.aac4716}.
+
+\bibitem[{Revelle(2024)}]{revelle2024}
+Revelle W (2024).
+\newblock \emph{{psych}: Procedures for Psychological, Psychometric, and Personality Research}.
+\newblock Northwestern University, Evanston, Illinois.
+\newblock {R} package version 2.4.3, \urlprefix\url{https://CRAN.R-project.org/package=psych}.
+
+\bibitem[{Ringle \emph{et~al.}(2022)Ringle, Wende, and Becker}]{ringleetal2022}
+Ringle CM, Wende S, Becker JM (2022).
+\newblock \emph{{SmartPLS 4}}.
+\newblock SmartPLS, Boenningstedt, Germany.
+\newblock \urlprefix\url{https://www.smartpls.com}.
+
+\bibitem[{Rosseel(2012)}]{rosseel2012}
+Rosseel Y (2012).
+\newblock \enquote{{lavaan}: An {R} Package for Structural Equation Modeling.}
+\newblock \emph{Journal of Statistical Software}, \textbf{48}(2), 1--36.
+\newblock \doi{10.18637/jss.v048.i02}.
+
+\bibitem[{Simmons \emph{et~al.}(2011)Simmons, Nelson, and Simonsohn}]{simmons2011}
+Simmons JP, Nelson LD, Simonsohn U (2011).
+\newblock \enquote{False-Positive Psychology: Undisclosed Flexibility in Data Collection and Analysis Allows Presenting Anything as Significant.}
+\newblock \emph{Psychological Science}, \textbf{22}(11), 1359--1366.
+\newblock \doi{10.1177/0956797611417632}.
+
+\bibitem[{{The jamovi project}(2022)}]{thejamoviproject2022}
+{The jamovi project} (2022).
+\newblock \emph{jamovi (Version 2.3) [Computer Software]}.
+\newblock \urlprefix\url{https://www.jamovi.org}.
+
+\end{thebibliography}
