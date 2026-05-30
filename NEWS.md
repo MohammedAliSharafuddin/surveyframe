@@ -1,3 +1,41 @@
+# surveyframe 0.3.1
+
+## Bug fixes
+
+* `export_static_survey()` now renders the header logo and institution name
+  from `render$header`, so exported surveys match the Shiny renderer and
+  the builder preview (#fix-a).
+* `export_static_survey()` now falls back to the instrument's
+  `render$google_sheets_endpoint` when `endpoint_url` is not supplied, so
+  a Google Sheets endpoint set in the builder is honoured on export (#fix-b).
+* The static survey now posts the respondent identifier under the column name
+  `respondent_id`, matching the Google Apps Script collector and
+  `read_responses()`. The collection round-trip now preserves the identifier
+  (#fix-c).
+* `export_google_sheet()` now includes matrix sub-item columns
+  (`item_id__sub`) in the Apps Script header row, so matrix answers are
+  stored in the Sheet (#fix-c2).
+* `read_sheet_responses()` now declares `started_at` as a meta column and
+  no longer raises a warning on every read (#fix-d).
+* Survey logos now keep their original MIME type (`image/png`, `image/jpeg`,
+  `image/gif`), so JPEG and GIF logos display correctly in the builder,
+  the Shiny renderer, and the static export (#fix-ef).
+
+## Documentation
+
+* Rewrote the main vignette (`surveyframe.Rmd`) as a four-stage worked study
+  following Sharafuddin, Madhavan, and Wangtueai (2024), covering digital
+  marketing effectiveness in Thailand's tourism services. The vignette covers
+  questionnaire design, an analysis plan with 13 hypotheses, sample-size
+  planning, reliability, validity, EFA readiness, and CFA/CB-SEM/PLS-SEM
+  syntax generation.
+* Updated the five supporting vignettes to reflect the research-design-first
+  workflow where the instrument holds the questions, the analysis plan, and
+  the measurement model.
+* Updated the README to reflect the CRAN release and the full workflow.
+
+---
+
 # surveyframe 0.3.0
 
 ## New features
