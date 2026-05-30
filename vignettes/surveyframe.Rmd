@@ -1,8 +1,11 @@
 ---
-title: "A complete surveyframe workflow"
-output: rmarkdown::html_vignette
+title: "A worked study: digital marketing effectiveness in Thailand's tourism"
+output:
+  rmarkdown::html_vignette:
+    toc: true
+    toc_depth: 2
 vignette: >
-  %\VignetteIndexEntry{A complete surveyframe workflow}
+  %\VignetteIndexEntry{A worked study: digital marketing effectiveness in Thailand's tourism}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -10,369 +13,510 @@ vignette: >
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment  = "#>"
 )
 library(surveyframe)
 ```
 
-## Purpose
+## About this vignette
 
-`surveyframe` supports instrument-centred survey research. Each survey is
-stored as a typed `sframe` object that you can validate, save, reuse, link with
-response data, score, check for data quality, analyse for reliability and item
-diagnostics, and pass to reporting or syntax-generation functions.
+This vignette rebuilds a published study inside surveyframe, from the research
+design through to the reported results. The study is Sharafuddin, Madhavan, and
+Wangtueai (2024), "Assessing the Effectiveness of Digital Marketing in Enhancing
+Tourist Experiences and Satisfaction: A Study of Thailand's Tourism Services",
+*Administrative Sciences*, 14(11), 273. It used partial least squares structural
+equation modelling on 195 international tourists in coastal Thailand.
 
-The usual workflow is:
+surveyframe holds the questionnaire, the analysis plan, and the measurement and
+structural models in one instrument, so the design and the analysis stay
+together. Everything below stays within the package as released at v0.3.0. No
+new features are introduced.
 
-1. Define or load an instrument.
-2. Validate the instrument.
-3. Collect or import response data.
-4. Check response quality.
-5. Score scales.
-6. Run descriptive, reliability, and item diagnostics.
-7. Generate syntax for EFA, CFA, CB-SEM, or PLS-SEM workflows.
-8. Render a reproducible report.
+The response data for the published study is not public, so the steps that need
+the raw data are shown as the code you would run, followed by the results the
+paper reported. The steps that do not need the raw data, which include the
+instrument, the models, the generated syntax, the sample-size guidance, the
+codebook, and the validity summary computed from the published loadings, run
+here as written.
 
-Two demonstration datasets are bundled. The tourism-services demo supports
-examples for scale scoring, reliability, reporting, and syntax generation. The
-input-types demo illustrates the main survey controls in the builder, studio,
-and dashboard.
+## Research design and objectives
 
-The tourism-services responses are synthetic. They are shaped around a
-digital-marketing and tourism-services questionnaire so the examples feel like
-a research workflow, while avoiding real respondent data and internet access.
+The study took a quantitative approach and used PLS-SEM with a two-stage
+treatment of two higher-order constructs. The population was international
+tourists above the age of 20 who had visited the Chonburi and Rayong provinces
+of Thailand and consumed at least one blue tourism service, such as a ferry or
+speed-boat transfer. Convenience sampling was used. The survey was distributed
+to 400 tourists and returned 195 complete responses, a response rate near 50
+per cent.
 
-## Load the bundled demo instrument
+The study set three objectives. The first was to develop a conceptual framework
+linking digital marketing effectiveness, destination service quality,
+destination sustainability quality, tourist satisfaction, and behavioural
+intention. The second was to measure digital marketing effectiveness and its
+impact on satisfaction and behavioural intention. The third was to analyse the
+mediating role of service quality and sustainability quality in the path from
+digital marketing effectiveness to behavioural intention.
 
-```{r load-demo}
-demo <- sframe_demo_data()
-instr <- demo$instrument
-responses <- demo$responses
+## Research questions and hypotheses
 
-instr
+The study addressed five research questions and tested thirteen hypotheses.
+
+```{r hypotheses}
+data.frame(
+  hypothesis = paste0("H", 1:13),
+  path = c(
+    "DME -> DSQ", "DME -> DSUQ", "DME -> TS", "DME -> BI",
+    "DSQ -> TS", "DSQ -> BI", "DSUQ -> TS", "DSUQ -> BI", "TS -> BI",
+    "DME -> DSQ -> TS", "DME -> DSUQ -> TS",
+    "DME -> DSQ -> TS -> BI", "DME -> DSUQ -> TS -> BI"
+  ),
+  type = c(rep("direct", 9), rep("indirect", 4)),
+  stringsAsFactors = FALSE
+)
 ```
 
-## Inspect the instrument
+Here DME is digital marketing effectiveness, DSQ is destination service
+quality, DSUQ is destination sustainability quality, TS is tourist
+satisfaction, and BI is behavioural intention.
 
-An `sframe` object stores the questionnaire title, version, items, choice
-sets, scales, checks, analysis plans, model specifications, and rendering
-hints. Item IDs are important because response data columns use the same names.
+## Sample-size guidance
 
-```{r inspect}
-names(instr)
+The published study set its minimum sample at 155 using the inverse square root
+method of Kock and Hadaya (2018), with a smallest path coefficient between 0.11
+and 0.20, 80 per cent power, and a 5 per cent significance level, then collected
+195. surveyframe's `sample_size_plan()` gives design-dependent guidance for an
+SEM study rather than that specific calculation.
 
-length(instr$items)
-length(instr$scales)
+```{r sample-size}
+sample_size_plan(type = "sem", power = 0.80, alpha = 0.05)
+```
 
-vapply(instr$items[1:5], function(x) x$id, character(1))
-vapply(instr$items[1:5], function(x) x$type, character(1))
+For a single bivariate question, the function returns a concrete figure.
+
+```{r sample-size-corr}
+sample_size_plan(type = "correlation", r = 0.20, power = 0.80, alpha = 0.05)
+```
+
+## The questionnaire
+
+The final questionnaire held 33 rated items across nine lower-order constructs.
+Digital marketing effectiveness was measured through relevance and engagement
+(DMRE, four items), accessibility and usefulness (DMAU, three items), ease of
+use (DMEU, three items), and perceived value (DMPV, four items). Destination
+service quality was measured through accommodation (DSQA, three items) and local
+transport (DSQT, five items). Destination sustainability quality (DSUQ) used
+five items, tourist satisfaction (TS) three, and behavioural intention (BI)
+three. All rated items used a Likert agreement scale.
+
+The instrument is built programmatically from the construct structure. Item IDs
+follow the construct name, so the link from item to construct stays visible.
+
+```{r build-items}
+likert5 <- sf_choices(
+  "likert5",
+  values = 1:5,
+  labels = c("Strongly disagree", "Disagree",
+             "Neither agree nor disagree", "Agree", "Strongly agree")
+)
+
+construct_labels <- c(
+  DMRE = "Digital marketing: relevance and engagement",
+  DMAU = "Digital marketing: accessibility and usefulness",
+  DMEU = "Digital marketing: ease of use",
+  DMPV = "Digital marketing: perceived value",
+  DSQA = "Destination service quality: accommodation",
+  DSQT = "Destination service quality: local transport",
+  DSUQ = "Destination sustainability quality",
+  TS   = "Tourist satisfaction",
+  BI   = "Behavioural intention"
+)
+item_counts <- c(DMRE = 4, DMAU = 3, DMEU = 3, DMPV = 4,
+                 DSQA = 3, DSQT = 5, DSUQ = 5, TS = 3, BI = 3)
+
+make_items <- function(construct) {
+  ids <- paste0(tolower(construct), "_", seq_len(item_counts[[construct]]))
+  Map(function(id, k) {
+    sf_item(
+      id, sprintf("%s (item %d)", construct_labels[[construct]], k),
+      type = "likert", required = TRUE, choice_set = "likert5",
+      scale_id = construct
+    )
+  }, ids, seq_along(ids))
+}
+
+rated_items <- unlist(lapply(names(item_counts), make_items), recursive = FALSE)
+
+make_scale <- function(construct) {
+  ids <- paste0(tolower(construct), "_", seq_len(item_counts[[construct]]))
+  sf_scale(construct, construct_labels[[construct]], items = ids, method = "mean")
+}
+scales <- lapply(names(item_counts), make_scale)
+```
+
+The form also collected the respondent profile. The items below follow the live
+form and keep its order. The form's nationality question lists individual
+countries grouped by region. It is summarised here to a representative set for
+brevity.
+
+```{r build-demographics}
+gender <- sf_choices("gender", c("male", "female", "transgender"),
+                     c("Male", "Female", "Transgender"))
+age_band <- sf_choices("age_band",
+  c("18_25", "26_40", "41_50", "51_60", "60_plus"),
+  c("18-25", "26-40", "41-50", "51-60", "60 and above"))
+visitor <- sf_choices("visitor", c("first_time", "repeat"),
+                      c("First-time visitor", "Repeat visitor"))
+frequency <- sf_choices("frequency",
+  c("lt_1_yr", "once_yr", "2_3_yr", "gt_3_yr"),
+  c("Less than once a year", "Once a year", "2 to 3 times a year",
+    "More than 3 times a year"))
+nationality <- sf_choices("nationality",
+  c("thai", "china", "japan", "korea", "india", "maldives", "bangladesh",
+    "australia", "uk", "germany", "france", "russia", "usa", "brazil",
+    "saudi_arabia", "uae", "south_africa", "other"),
+  c("Thai", "China", "Japan", "Korea (Republic of)", "India", "Maldives",
+    "Bangladesh", "Australia", "United Kingdom", "Germany", "France",
+    "Russian Federation", "United States of America", "Brazil",
+    "Saudi Arabia", "U.A.E.", "South Africa", "Other"))
+education <- sf_choices("education",
+  c("high_school", "diploma", "undergraduate", "post_graduate"),
+  c("High school", "Diploma", "Undergraduate", "Post graduate"))
+profession <- sf_choices("profession",
+  c("student", "business", "salaried", "freelancer", "not_working"),
+  c("Student", "Business", "Salaried and working", "Freelancer",
+    "Not working"))
+companion <- sf_choices("companion", c("friends", "family", "other"),
+                        c("Friends", "Family members", "Other"))
+group_size <- sf_choices("group_size", c("lt_3", "3_5", "gt_5"),
+                         c("Less than 3", "3 to 5", "More than 5"))
+
+demo_items <- list(
+  sf_item("gender", "Gender", type = "single_choice", required = TRUE, choice_set = "gender"),
+  sf_item("age_band", "Age", type = "single_choice", required = TRUE, choice_set = "age_band"),
+  sf_item("visitor_type", "I am a", type = "single_choice", required = TRUE, choice_set = "visitor"),
+  sf_item("frequency_of_visit", "Frequency of visit", type = "single_choice", required = TRUE, choice_set = "frequency"),
+  sf_item("nationality", "Nationality", type = "single_choice", required = TRUE, choice_set = "nationality"),
+  sf_item("education", "Education level", type = "single_choice", required = TRUE, choice_set = "education"),
+  sf_item("profession", "Profession", type = "single_choice", required = TRUE, choice_set = "profession"),
+  sf_item("travel_companion", "I visit with my", type = "single_choice", required = TRUE, choice_set = "companion"),
+  sf_item("group_size", "My travel group size is", type = "single_choice", required = TRUE, choice_set = "group_size")
+)
+```
+
+The instrument is assembled from the choice sets, the rated items, the
+demographic items, and the scales.
+
+```{r assemble}
+choice_sets <- list(likert5, gender, age_band, visitor, frequency, nationality,
+                    education, profession, companion, group_size)
+
+study <- sf_instrument(
+  title       = "Digital Marketing Effectiveness of Tourism Services in Thailand",
+  version     = "1.0.0",
+  description = "Reconstruction of the published PLS-SEM study for surveyframe.",
+  authors     = "Sharafuddin, Madhavan, and Wangtueai",
+  languages   = "en",
+  components  = c(choice_sets, rated_items, demo_items, scales)
+)
+
+study
 ```
 
 ## Validate the instrument
 
-`validate_sframe()` checks whether the instrument structure is internally
-consistent. This should be done before fieldwork, before response import, and
-before reports are generated.
-
 ```{r validate}
-validation <- validate_sframe(instr, strict = FALSE)
-
+validation <- validate_sframe(study, strict = FALSE)
 validation$valid
 length(validation$problems)
 ```
 
-For a strict workflow, use:
+## The analysis plan
 
-```{r validate-strict, eval = FALSE}
-instr <- validate_sframe(instr)
+The plan records each research step as a block that binds a technique to the
+variables that fill its roles. The plan below covers the screening, the
+measurement assessment, the descriptive comparisons that the demographic items
+make possible, and the model syntax. The role names are specific to each
+technique.
+
+```{r plan}
+study$analysis_plan <- list(
+  list(id = "D1", research_question = "What is the sample profile?",
+       family = "descriptive", method = "descriptives",
+       roles = list(variables = names(item_counts))),
+  list(id = "D2", research_question = "How complete are the responses?",
+       family = "data_quality", method = "missing_data",
+       roles = list(variables = names(item_counts))),
+  list(id = "M1", research_question = "Is each construct internally consistent?",
+       family = "measurement", method = "reliability_alpha",
+       roles = list(items = paste0("dmpv_", 1:4))),
+  list(id = "M2", research_question = "Do the digital marketing items form coherent factors?",
+       family = "measurement", method = "efa_readiness",
+       roles = list(items = c(paste0("dmre_", 1:4), paste0("dmau_", 1:3),
+                              paste0("dmeu_", 1:3), paste0("dmpv_", 1:4)))),
+  list(id = "RQ_assoc", research_question = "Is service quality associated with satisfaction?",
+       family = "association", method = "correlation_pearson",
+       roles = list(x = "DSQA", y = "TS"), options = list(alpha = 0.05)),
+  list(id = "RQ_reg", research_question = "Do service and sustainability quality predict satisfaction?",
+       family = "regression", method = "regression_linear",
+       roles = list(predictors = c("DSQA", "DSQT", "DSUQ"), dependent = "TS"),
+       options = list(alpha = 0.05)),
+  list(id = "RQ_group", research_question = "Do first-time and repeat visitors differ in satisfaction?",
+       family = "group_comparison", method = "mann_whitney",
+       roles = list(group = "visitor_type", outcome = "TS"),
+       options = list(alpha = 0.05)),
+  list(id = "RQ_cross", research_question = "Is visitor type associated with gender?",
+       family = "categorical", method = "chi_square",
+       roles = list(row = "gender", column = "visitor_type"),
+       options = list(alpha = 0.05))
+)
+
+length(study$analysis_plan)
 ```
 
-## Read responses
+## Descriptives and data screening
 
-The demo helper already imported the bundled responses. The equivalent manual
-call is:
+With the 195-row dataset in hand, the screening blocks run as below. The paper
+reported a sample of 195 tourists aged 18 to 65, 56 per cent female and 44 per
+cent male, with 48 per cent holding an undergraduate degree and 37 per cent a
+postgraduate degree. Working professionals made up 66 per cent of the sample.
 
-```{r read-responses}
+```{r screening, eval = FALSE}
 responses <- read_responses(
-  x = demo$responses_path,
-  instrument = instr,
+  "thailand_tourism_responses.csv",
+  study,
   respondent_id = "respondent_id",
-  submitted_at = "submitted_at",
-  meta_cols = "started_at"
+  submitted_at  = "submitted_at"
 )
 
-dim(responses)
-head(responses[, 1:6])
+descriptives_report(responses, variables = names(item_counts))
+missing_data_report(responses, study)
+quality_report(responses, study, respondent_id = "respondent_id")
 ```
 
-## Check missing data
+## Reliability and item diagnostics
 
-Missing-data checks are useful before scoring scales or running models.
+The reliability and item reports read the scale definitions from the
+instrument. The published lower-order constructs all exceeded the 0.7 threshold
+for composite reliability. At the higher-order level the study reported Cronbach
+alpha and composite reliability of 0.828 and 0.883 for DME, 0.792 and 0.906 for
+DSQ, 0.769 and 0.843 for DSUQ, 0.897 and 0.936 for TS, and 0.921 and 0.950 for
+BI.
 
-```{r missing}
-missing <- missing_data_report(responses, instr)
-
-missing
+```{r reliability, eval = FALSE}
+reliability_report(responses, study, omega = TRUE)
+item_report(responses, study)
 ```
 
-## Check response quality
+## Validity from the published loadings
 
-`quality_report()` evaluates data quality using the instrument definition.
-When attention checks are present, they are checked against the pass values
-stored in the instrument.
-
-```{r quality}
-quality <- quality_report(
-  data = responses,
-  instrument = instr,
-  respondent_id = "respondent_id",
-  submitted_at = "submitted_at",
-  started_at = "started_at"
-)
-
-quality
-```
-
-## Score scales
-
-`score_scales()` applies the scale definitions in the instrument. This includes
-item membership, reverse coding, minimum valid item rules, and the selected
-scoring method.
-
-```{r score}
-scored <- score_scales(
-  data = responses,
-  instrument = instr,
-  keep_items = TRUE,
-  keep_meta = TRUE
-)
-
-scale_names <- vapply(instr$scales, function(x) x$id, character(1))
-scale_names
-
-head(scored[, intersect(scale_names, names(scored)), drop = FALSE])
-```
-
-## Descriptive statistics
-
-Descriptive reports can be run on raw items or scored scale columns.
-
-```{r descriptives}
-descriptives_report(
-  scored,
-  variables = intersect(scale_names, names(scored))
-)
-```
-
-## Reliability diagnostics
-
-Reliability diagnostics use the scale definitions stored in the instrument.
-Cronbach's alpha and omega require the optional `psych` package, so this chunk
-is evaluated only when that package is available.
-
-```{r reliability, eval = requireNamespace("psych", quietly = TRUE)}
-reliability <- reliability_report(
-  data = responses,
-  instrument = instr,
-  omega = FALSE
-)
-
-reliability
-```
-
-## Item diagnostics
-
-`item_report()` gives item-level diagnostics for scale items. This is useful
-before retaining, removing, or rewriting items.
-
-```{r item-report}
-items <- item_report(responses, instr)
-
-names(items)
-items[[1]]
-```
-
-## Validity summary from standardised loadings
-
-When a researcher has standardised loadings from CFA or PLS-SEM, the loadings
-can be passed to `validity_report()` to prepare a compact construct-level
-validity summary.
+This step does not need the raw data. `validity_report()` computes composite
+reliability and average variance extracted from standardised loadings. Feeding
+the loadings reported in the paper reproduces the published reliability and
+convergent validity, which is a direct check of the measurement model.
 
 ```{r validity}
-example_loadings <- list(
-  digital_marketing = c(dm_1 = .72, dm_2 = .78, dm_3 = .81),
-  service_quality = c(sq_1 = .75, sq_2 = .80, sq_3 = .77)
+published_loadings <- list(
+  DMRE = c(dmre_1 = .815, dmre_2 = .899, dmre_3 = .668, dmre_4 = .838),
+  DMAU = c(dmau_1 = .843, dmau_2 = .915, dmau_3 = .920),
+  DMEU = c(dmeu_1 = .897, dmeu_2 = .929, dmeu_3 = .932),
+  DMPV = c(dmpv_1 = .818, dmpv_2 = .916, dmpv_3 = .900, dmpv_4 = .863),
+  DSQA = c(dsqa_1 = .904, dsqa_2 = .920, dsqa_3 = .869),
+  DSQT = c(dsqt_1 = .778, dsqt_2 = .883, dsqt_3 = .879, dsqt_4 = .811, dsqt_5 = .713),
+  DSUQ = c(dsuq_1 = .780, dsuq_2 = .855, dsuq_3 = .845, dsuq_4 = .551, dsuq_5 = .529),
+  TS   = c(ts_1 = .912, ts_2 = .950, ts_3 = .869),
+  BI   = c(bi_1 = .937, bi_2 = .911, bi_3 = .940)
 )
 
-validity_report(example_loadings)
+validity <- validity_report(published_loadings)
+validity$reliability
 ```
 
-## EFA readiness
+The composite reliability and AVE returned here match the values in the paper.
+The study also reported Fornell-Larcker results, where the square root of the
+AVE for each construct exceeded its correlations with the others, and HTMT
+ratios that were all below 0.90, the highest being 0.766 between DMEU and DMAU.
+Both confirm discriminant validity.
 
-`efa_report()` prepares EFA-readiness checks using the items stored in the
-instrument. It should be read as a screening step before estimating and
-interpreting factor solutions.
+## Exploratory factor analysis
 
-```{r efa, eval = requireNamespace("psych", quietly = TRUE)}
-efa <- efa_report(responses, instr)
+EFA is an exploratory step that screens whether the items group as intended
+before the confirmatory model. `efa_report()` reports the Kaiser-Meyer-Olkin
+measure and Bartlett's test, and `efa_solution()` returns loadings,
+communalities, and cross-loading flags. Both use the optional `psych` package.
 
-efa
+```{r efa, eval = FALSE}
+efa_report(responses, study)
+efa_solution(responses, study,
+             items = c(paste0("dmre_", 1:4), paste0("dmau_", 1:3),
+                       paste0("dmeu_", 1:3), paste0("dmpv_", 1:4)),
+             nfactors = 4)
 ```
 
-## CFA syntax
+## The measurement model: CFA syntax
 
-`cfa_syntax()` and `cfa_lavaan_syntax()` generate measurement-model syntax from
-the scale structure in the instrument. The package does not need `lavaan` to
-generate syntax.
+The confirmatory measurement model has the nine lower-order constructs as
+reflective factors. `cfa_lavaan_syntax()` writes the lavaan syntax without
+needing lavaan installed.
 
-```{r cfa-syntax}
-cat(cfa_syntax(instr))
+```{r cfa-model}
+lower_order <- lapply(names(item_counts), function(construct) {
+  ids <- paste0(tolower(construct), "_", seq_len(item_counts[[construct]]))
+  sf_construct(construct, construct_labels[[construct]], items = ids, mode = "reflective")
+})
+
+cfa_model <- sf_model(
+  id    = "dme_measurement",
+  label = "Lower-order measurement model",
+  type  = "cfa",
+  constructs = lower_order
+)
+
+study <- add_model(study, cfa_model)
+cat(cfa_lavaan_syntax(study, model = cfa_model))
 ```
 
-```{r cfa-lavaan}
-cat(cfa_lavaan_syntax(instr, ordered = TRUE))
-```
+## The structural model: CB-SEM syntax
 
-## CB-SEM and PLS-SEM syntax
+The structural model carries the nine direct paths and the four indirect
+effects from the hypotheses. This rendering treats the five constructs as
+first-order reflective factors over their full item sets, which is the
+covariance-based reading of the framework. `sem_lavaan_syntax()` writes the
+measurement, structural, and indirect-effect lines.
 
-`surveyframe` can also store model definitions and generate syntax for
-downstream SEM software. surveyframe generates model syntax. Specialised
-packages handle formal model estimation.
+```{r cbsem-model}
+dm_items  <- c(paste0("dmre_", 1:4), paste0("dmau_", 1:3),
+               paste0("dmeu_", 1:3), paste0("dmpv_", 1:4))
+dsq_items <- c(paste0("dsqa_", 1:3), paste0("dsqt_", 1:5))
 
-```{r sem-model}
-model <- sf_model(
-  id = "demo_model",
-  label = "Demo structural model",
-  type = "cb_sem",
+sem_model <- sf_model(
+  id    = "tourism_structural",
+  label = "Digital marketing structural model",
+  type  = "cb_sem",
   constructs = list(
-    sf_construct("DM", "Digital marketing", c("dm_1", "dm_2", "dm_3")),
-    sf_construct("SQ", "Service quality", c("sq_1", "sq_2", "sq_3"))
+    sf_construct("DME",  "Digital marketing effectiveness", dm_items),
+    sf_construct("DSQ",  "Destination service quality",     dsq_items),
+    sf_construct("DSUQ", "Destination sustainability quality", paste0("dsuq_", 1:5)),
+    sf_construct("TS",   "Tourist satisfaction",            paste0("ts_", 1:3)),
+    sf_construct("BI",   "Behavioural intention",           paste0("bi_", 1:3))
   ),
   paths = list(
-    sf_path("DM", "SQ")
-  )
+    sf_path("DME", "DSQ",  label = "h1"),
+    sf_path("DME", "DSUQ", label = "h2"),
+    sf_path("DME", "TS",   label = "h3"),
+    sf_path("DME", "BI",   label = "h4"),
+    sf_path("DSQ", "TS",   label = "h5"),
+    sf_path("DSQ", "BI",   label = "h6"),
+    sf_path("DSUQ", "TS",  label = "h7"),
+    sf_path("DSUQ", "BI",  label = "h8"),
+    sf_path("TS", "BI",    label = "h9")
+  ),
+  indirect = list(
+    sf_indirect("DME", "DSQ", "TS",  label = "h10"),
+    sf_indirect("DME", "DSUQ", "TS", label = "h11"),
+    sf_indirect("DME", c("DSQ", "TS"), "BI",  label = "h12"),
+    sf_indirect("DME", c("DSUQ", "TS"), "BI", label = "h13")
+  ),
+  options = list(estimator = "MLR", missing = "fiml", standardised = TRUE)
 )
 
-model_json(model)
+validate_model(sem_model, study)
+cat(sem_lavaan_syntax(sem_model, study))
 ```
 
-```{r sem-syntax}
-cat(sem_lavaan_syntax(model, instr))
-```
+## The two-stage PLS-SEM: seminr syntax
 
-```{r pls-syntax}
+The published study used PLS-SEM with a two-stage treatment of the higher-order
+constructs. The first stage assesses the lower-order measurement model, which
+is the CFA model above and the reliability and validity reports. The second
+stage models digital marketing effectiveness and service quality as composites
+of their lower-order construct scores, then estimates the structural paths.
+`seminr_syntax()` writes the seminr code.
+
+```{r pls-model}
 pls_model <- sf_model(
-  id = "demo_pls",
-  label = "Demo PLS model",
-  type = "pls_sem",
+  id    = "tourism_pls",
+  label = "Two-stage higher-order PLS model",
+  type  = "pls_sem",
   constructs = list(
-    sf_construct("DM", "Digital marketing", c("dm_1", "dm_2", "dm_3"), mode = "composite"),
-    sf_construct("SQ", "Service quality", c("sq_1", "sq_2", "sq_3"), mode = "composite")
+    sf_construct("DME",  "Digital marketing effectiveness",
+                 c("DMRE", "DMAU", "DMEU", "DMPV"), mode = "composite"),
+    sf_construct("DSQ",  "Destination service quality",
+                 c("DSQA", "DSQT"), mode = "composite"),
+    sf_construct("DSUQ", "Destination sustainability quality",
+                 paste0("dsuq_", 1:5), mode = "composite"),
+    sf_construct("TS",   "Tourist satisfaction", paste0("ts_", 1:3), mode = "composite"),
+    sf_construct("BI",   "Behavioural intention", paste0("bi_", 1:3), mode = "composite")
   ),
   paths = list(
-    sf_path("DM", "SQ")
-  )
+    sf_path("DME", "DSQ"), sf_path("DME", "DSUQ"),
+    sf_path("DME", "TS"),  sf_path("DME", "BI"),
+    sf_path("DSQ", "TS"),  sf_path("DSQ", "BI"),
+    sf_path("DSUQ", "TS"), sf_path("DSUQ", "BI"),
+    sf_path("TS", "BI")
+  ),
+  options = list(bootstrap = 1000)
 )
 
 cat(seminr_syntax(pls_model))
 ```
 
-## Generate a codebook
+When this model is fitted in seminr, the paper reported that digital marketing
+effectiveness influenced service quality (0.573) and sustainability quality
+(0.394), that both mediated the path to satisfaction (indirect effects of 0.155
+and 0.152), and that satisfaction drove behavioural intention (0.713). The
+direct paths from digital marketing effectiveness to satisfaction and
+behavioural intention were not significant, which is why the mediating
+constructs matter.
 
-The codebook comes from the instrument object, so it stays aligned with item
-IDs, item labels, choice sets, and scale membership.
+## Run the plan and render the report
 
-```{r codebook}
-codebook <- codebook_report(instr)
+With the dataset loaded, the plan runs in one pass and the report is rendered.
+`run_analysis_plan()` returns one result per block, and `render_results()` or
+`render_report()` writes the report.
 
-codebook
-```
+```{r run, eval = FALSE}
+results <- run_analysis_plan(responses, study)
+results
 
-## Render a reproducible report
-
-`render_report()` combines the instrument, response data, quality checks,
-descriptive summaries, codebook content, and other outputs into an HTML file.
-Store the output with the study files.
-
-```{r render-report, eval = FALSE}
-render_report(
-  instrument = instr,
-  data = responses,
-  output_file = "surveyframe-demo-report.html",
-  include_codebook = TRUE,
-  include_quality = TRUE,
-  include_missing = TRUE,
-  include_descriptives = TRUE,
-  include_reliability = TRUE,
-  include_models = TRUE
-)
-```
-
-## GUI workflow
-
-The package has three interactive entry points.
-
-```{r gui-path, eval = FALSE}
-launch_builder()
-launch_studio()
-launch_dashboard()
-```
-
-Use them as follows:
-
-* `launch_builder()` opens the standalone questionnaire builder. It is best for
-  creating or editing a `.sframe` file.
-* `launch_studio()` opens the full workflow interface. It is best for moving
-  from an instrument to data checking, scoring, analysis planning, and reports.
-* `launch_dashboard()` opens a read-only response dashboard. It is best after
-  responses have already been collected.
-
-For package examples and training, the demo launchers are clearer:
-
-```{r gui-demo, eval = FALSE}
-launch_builder_demo()
-launch_studio_demo()
-launch_dashboard_demo()
-```
-
-## A compact script for a complete study
-
-```{r compact-workflow, eval = FALSE}
-library(surveyframe)
-
-instr <- read_sframe("my_survey.sframe")
-instr <- validate_sframe(instr)
-
-responses <- read_responses(
-  "responses.csv",
-  instr,
-  respondent_id = "respondent_id",
-  submitted_at = "submitted_at",
-  meta_cols = "started_at"
-)
-
-quality <- quality_report(responses, instr, respondent_id = "respondent_id")
-scored <- score_scales(responses, instr)
-reliability <- reliability_report(responses, instr, omega = FALSE)
-codebook <- codebook_report(instr)
+render_results(results, study, output_file = "thailand-results.html")
 
 render_report(
-  instrument = instr,
-  data = responses,
-  output_file = "survey-report.html",
-  include_codebook = TRUE,
-  include_quality = TRUE,
-  include_missing = TRUE,
-  include_descriptives = TRUE,
-  include_reliability = TRUE
+  study, data = responses, output_file = "thailand-report.html",
+  include_codebook = TRUE, include_quality = TRUE, include_missing = TRUE,
+  include_descriptives = TRUE, include_reliability = TRUE,
+  include_analysis = TRUE, include_models = TRUE
 )
 ```
 
-## Citation and reproducibility
+## The visual route
 
-When reporting results, cite the package and keep the `.sframe` file with the
-analysis files. The `.sframe` file records the instrument definition used to
-read, score, and report the responses.
+The same study can be assembled and run through the two browser tools, which
+have separate jobs.
+
+SurveyBuilder, opened with `launch_builder()`, is a client-side authoring tool.
+Its Build mode edits the questionnaire, its Analyse mode writes the analysis
+plan and builds the model, and its model panel exports lavaan or seminr syntax
+and the model JSON into the `.sframe` file. The builder saves the instrument and
+configures a Google Sheet endpoint, but it computes no statistics.
+
+SurveyStudio, opened with `launch_studio()`, is the R-backed workflow. Its tabs
+run from Build Survey, Open Instrument, and Preview Survey through Upload
+Responses, Quality Dashboard, Reliability, and Analysis Plan, to Dashboard and
+Export. Once responses are uploaded, the Analysis Plan screen runs the saved
+plan and shows a table of each question with its method and APA result. The
+Export screen renders the full report.
+
+```{r gui, eval = FALSE}
+launch_builder()     # author the questionnaire, plan, and model
+launch_studio()      # upload responses, run the plan, export the report
+launch_dashboard()   # a read-only response view
+```
+
+## Reproducibility and citation
+
+Keep the `.sframe` file with the analysis files. It records the questionnaire,
+the analysis plan, and the three models used here, so the design and the
+analysis travel together.
 
 ```{r citation, eval = FALSE}
 citation("surveyframe")
