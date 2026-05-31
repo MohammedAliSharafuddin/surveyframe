@@ -364,12 +364,13 @@ v$valid
 length(v$problems)
 ```
 
-```{r write, eval = FALSE}
-# Save the instrument. Keep this file with your analysis files.
-write_sframe(study, "tourism_services_v1.sframe")
+```{r write}
+# Save the instrument. Keep this file alongside your analysis script.
+sframe_path <- write_sframe(study, file.path(tempdir(), "tourism_services_v1.sframe"))
 
-# Reload later with:
-# study <- read_sframe("tourism_services_v1.sframe")
+# Reload the instrument from disk at any time with:
+study2 <- read_sframe(sframe_path)
+identical(study$meta$title, study2$meta$title)
 ```
 
 ---
@@ -563,7 +564,8 @@ cat("Flagged:    ", qr$summary$n_flagged,      "\n")
 
 ```{r missing}
 mr <- missing_data_report(responses, study)
-# Items with any missingness
+# mr is a list; the item-level summary lives in $item_missing
+names(mr)
 items_miss <- mr$item_missing
 items_miss[items_miss$missing_pct > 0, c("variable", "missing_n", "missing_pct")]
 ```

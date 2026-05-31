@@ -899,7 +899,7 @@ sframe_run_one_block <- function(block, data, instrument) {
 #' results <- run_analysis_plan(responses, instr)
 #' print(results)
 run_analysis_plan <- function(data, instrument, scored = TRUE) {
-  stopifnot(inherits(instrument, "sframe"))
+  sframe_check_instrument(instrument)
   stopifnot(is.data.frame(data))
 
   plan <- instrument$analysis_plan
@@ -987,7 +987,7 @@ render_results <- function(
     citation_format = c("apa", "ama", "vancouver"),
     title           = NULL
 ) {
-  stopifnot(inherits(instrument, "sframe"))
+  sframe_check_instrument(instrument)
   citation_format <- rlang::arg_match(citation_format)
 
   dest <- output_file %||% output_path %||% tempfile(fileext = ".html")
