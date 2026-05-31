@@ -1,11 +1,11 @@
 ---
-title: "Survey design and live results: a Thailand tourism workflow"
+title: "Survey design and live results: a tourism services example"
 output:
   rmarkdown::html_vignette:
     toc: true
     toc_depth: 2
 vignette: >
-  %\VignetteIndexEntry{Survey design and live results: a Thailand tourism workflow}
+  %\VignetteIndexEntry{Survey design and live results: a tourism services example}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -25,9 +25,20 @@ the vignette builds offline. Replacing the simulated data with a call to
 `read_sheet_responses()` connects the same workflow to live responses that grow
 with each submission.
 
-The questionnaire is drawn from a published Thailand tourism survey covering
-digital marketing effectiveness, destination service quality, destination
-sustainability quality, tourist satisfaction, and behavioural intention.
+The questionnaire and concept are adopted from:
+
+> Sharafuddin, M. A., Madhavan, M., & Wangtueai, S. (2024). Assessing the
+> Effectiveness of Digital Marketing in Enhancing Tourist Experiences and
+> Satisfaction: A Study of Thailand's Tourism Services. *Administrative
+> Sciences*, *14*(11), 273. https://doi.org/10.3390/admsci14110273
+
+The instrument covers five research areas applicable to any tourism services
+context: digital marketing effectiveness (relevance, accessibility, ease of use,
+and perceived value), destination service quality (accommodation and local
+transport), destination sustainability quality, tourist satisfaction, and
+behavioural intention. The item wording is reproduced from the original
+questionnaire. Researchers studying other destinations can adapt the scales
+and analysis plan to their own context.
 
 ---
 
@@ -321,12 +332,15 @@ rated_items <- c(dmre_items, dmau_items, dmeu_items, dmpv_items,
                  dsqa_items, dsqt_items, dsuq_items, ts_items, bi_items)
 
 study <- sf_instrument(
-  title       = "Digital Marketing Effectiveness of Tourism Services in Thailand",
+  title       = "Digital Marketing Effectiveness of Tourism Services",
   version     = "1.0.0",
   description = paste(
     "Questionnaire covering digital marketing effectiveness,",
     "destination service quality, sustainability quality,",
-    "tourist satisfaction, and behavioural intention."
+    "tourist satisfaction, and behavioural intention.",
+    "Adopted from Sharafuddin, Madhavan & Wangtueai (2024),",
+    "Administrative Sciences, 14(11), 273.",
+    "https://doi.org/10.3390/admsci14110273"
   ),
   authors   = "Mohammed Ali Sharafuddin",
   languages = "en",
@@ -352,10 +366,10 @@ length(v$problems)
 
 ```{r write, eval = FALSE}
 # Save the instrument. Keep this file with your analysis files.
-write_sframe(study, "thailand_tourism_v1.sframe")
+write_sframe(study, "tourism_services_v1.sframe")
 
 # Reload later with:
-# study <- read_sframe("thailand_tourism_v1.sframe")
+# study <- read_sframe("tourism_services_v1.sframe")
 ```
 
 ---
@@ -385,7 +399,7 @@ disk.
 ```{r static-export}
 html_path <- export_static_survey(
   study,
-  output_path = file.path(tempdir(), "thailand_tourism_survey.html"),
+  output_path = file.path(tempdir(), "tourism_services_survey.html"),
   open        = FALSE
 )
 file.exists(html_path)
@@ -666,7 +680,7 @@ results.
 render_results(
   results,
   study,
-  output_file = file.path(tempdir(), "thailand_results.html")
+  output_file = file.path(tempdir(), "tourism_results.html")
 )
 ```
 
@@ -674,7 +688,7 @@ render_results(
 render_report(
   study,
   data             = scored,
-  output_file      = file.path(tempdir(), "thailand_report.html"),
+  output_file      = file.path(tempdir(), "tourism_report.html"),
   include_codebook = TRUE,
   include_quality  = TRUE,
   include_missing  = TRUE,
@@ -713,7 +727,7 @@ results <- run_analysis_plan(scored, study)
 render_report(
   study,
   data             = scored,
-  output_file      = "thailand_report_latest.html",
+  output_file      = "tourism_report_latest.html",
   include_codebook = TRUE,
   include_quality  = TRUE,
   include_missing  = TRUE,
