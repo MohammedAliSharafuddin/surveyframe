@@ -353,7 +353,7 @@ render_survey <- function(
     on_submit      = NULL
 ) {
   sframe_require_shiny("to deploy surveys with render_survey()")
-  stopifnot(inherits(instrument, "sframe"))
+  sframe_check_instrument(instrument)
   mode           <- rlang::arg_match(mode)
   save_responses <- rlang::arg_match(save_responses)
 

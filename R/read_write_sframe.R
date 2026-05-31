@@ -99,7 +99,7 @@ sframe_hash_value <- function(instrument) {
 #' out <- write_sframe(instr, tempfile(fileext = ".sframe"))
 #' file.exists(out)
 write_sframe <- function(instrument, path, pretty = TRUE, overwrite = FALSE) {
-  stopifnot(inherits(instrument, "sframe"))
+  sframe_check_instrument(instrument)
 
   if (!endsWith(path, ".sframe")) {
     path <- paste0(path, ".sframe")

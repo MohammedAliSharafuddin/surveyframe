@@ -74,7 +74,7 @@ export_static_survey <- function(
     endpoint_url = NULL,
     overwrite    = FALSE
 ) {
-  stopifnot(inherits(instrument, "sframe"))
+  sframe_check_instrument(instrument)
   rlang::check_installed("jsonlite", reason = "to serialise the instrument as JSON.")
 
   # Fix B: fall back to endpoint stored by the builder if no argument supplied

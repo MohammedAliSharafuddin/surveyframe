@@ -30,7 +30,7 @@
 #' )
 #' file.exists(script)
 export_google_sheet <- function(instrument, sheet_url, output_dir = ".") {
-  stopifnot(inherits(instrument, "sframe"))
+  sframe_check_instrument(instrument)
   if (!dir.exists(output_dir)) {
     rlang::abort(
       paste0("Output directory does not exist: '", output_dir, "'."),
@@ -174,7 +174,7 @@ read_sheet_responses <- function(
 ) {
   rlang::check_installed("googlesheets4",
     reason = "to read responses from Google Sheets")
-  stopifnot(inherits(instrument, "sframe"))
+  sframe_check_instrument(instrument)
 
   raw <- googlesheets4::read_sheet(sheet_id, sheet = sheet_name,
                                     col_types = "c")

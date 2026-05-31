@@ -42,7 +42,7 @@ Install from CRAN:
 install.packages("surveyframe")
 ```
 
-Or install the development version from GitHub:
+To get unreleased changes from the development version:
 
 ```r
 remotes::install_github("MohammedAliSharafuddin/surveyframe")
@@ -57,16 +57,47 @@ install.packages(c("shiny", "psych", "googlesheets4", "digest", "MASS", "nnet"))
 Syntax generation works without installing `lavaan` or `seminr`. Install those
 packages when you want to fit the generated CFA, CB-SEM, or PLS-SEM models.
 
+## Already have data?
+
+If you have collected responses in a CSV or Google Sheet and want to start
+from the analysis step, build a minimal instrument that matches your column
+names and load the data directly:
+
+```r
+library(surveyframe)
+
+# 1. Describe the items you already collected
+cs  <- sf_choices("agree5", 1:5,
+        c("Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"))
+i1  <- sf_item("q1", "Item 1", type = "likert", choice_set = "agree5", scale_id = "S")
+i2  <- sf_item("q2", "Item 2", type = "likert", choice_set = "agree5", scale_id = "S")
+sc  <- sf_scale("S", "My scale", items = c("q1", "q2"))
+instr <- sf_instrument("My study", components = list(cs, i1, i2, sc))
+
+# 2. Load your CSV
+responses <- read_responses("my_data.csv", instr, strict = FALSE)
+
+# 3. Score and analyse
+scored  <- score_scales(responses, instr)
+results <- run_analysis_plan(scored, instr)
+```
+
 ## Documentation workflow
 
 Start with:
 
-1. A worked study: digital marketing effectiveness in Thailand's tourism
+1. A worked study: digital marketing and tourism services
 2. Building a survey instrument: questions, plan, and model
 3. Analysing survey responses: running the plan
 4. Scale reliability and validity
 5. EFA, CFA, CB-SEM, and PLS-SEM syntax generation
 6. The visual workflow: SurveyBuilder, SurveyStudio, and the dashboard
+
+Read all six vignettes inside R with:
+
+```r
+browseVignettes("surveyframe")
+```
 
 ## An instrument is the research design
 
