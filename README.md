@@ -1,3 +1,5 @@
+<img src="man/figures/readme-logo.png" align="right" width="220" alt="surveyframe" />
+
 # surveyframe
 
 <!-- badges: start -->

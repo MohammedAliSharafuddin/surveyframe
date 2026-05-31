@@ -4,11 +4,14 @@ template:
   bootstrap: 5
   bootswatch: flatly
   bslib:
-    primary: "#1a1a2e"
-    secondary: "#5b8dee"
+    primary: "#0B3A78"
+    secondary: "#16B3B1"
     base_font: {google: "Inter"}
     heading_font: {google: "Inter"}
     code_font: {google: "JetBrains Mono"}
+
+# man/figures/logo.png is picked up automatically by pkgdown.
+# Favicons are in pkgdown/favicons/ and picked up by pkgdown >= 2.0.
 
 home:
   title: "surveyframe"
