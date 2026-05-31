@@ -34,3 +34,6 @@
 ^surveyframe_[Vv]0\.3($|/)
 ^surveyframe_v_0\.3\.1($|/)
 ^Rplots\.pdf$
+^jss-paper($|/)
+^pkgdown($|/)
+^man/figures/brand-preview\.png$
