@@ -1,522 +1,742 @@
 ---
-title: "A worked study: digital marketing effectiveness in Thailand's tourism"
+title: "Survey design and live results: a Thailand tourism workflow"
 output:
   rmarkdown::html_vignette:
     toc: true
     toc_depth: 2
 vignette: >
-  %\VignetteIndexEntry{A worked study: digital marketing effectiveness in Thailand's tourism}
+  %\VignetteIndexEntry{Survey design and live results: a Thailand tourism workflow}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
 
 ```{r setup, include = FALSE}
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment  = "#>"
-)
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 library(surveyframe)
 ```
 
 ## About this vignette
 
-This vignette rebuilds a published study inside surveyframe, from the research
-design through to the reported results. The study is Sharafuddin, Madhavan, and
-Wangtueai (2024), "Assessing the Effectiveness of Digital Marketing in Enhancing
-Tourist Experiences and Satisfaction: A Study of Thailand's Tourism Services",
-*Administrative Sciences*, 14(11), 273. It used partial least squares structural
-equation modelling on 195 international tourists in coastal Thailand.
+This vignette follows a single instrument through the complete surveyframe
+workflow: design the questionnaire, export it as a hosted survey with a Google
+Sheets backend, collect responses, clean and score them, run the analysis plan,
+and render a results report. The results section uses 60 simulated responses so
+the vignette builds offline. Replacing the simulated data with a call to
+`read_sheet_responses()` connects the same workflow to live responses that grow
+with each submission.
 
-surveyframe holds the questionnaire, the analysis plan, and the measurement and
-structural models in one instrument, so the design and the analysis stay
-together. Everything below stays within the package as released at v0.3.0. No
-new features are introduced.
+The questionnaire is drawn from a published Thailand tourism survey covering
+digital marketing effectiveness, destination service quality, destination
+sustainability quality, tourist satisfaction, and behavioural intention.
 
-The response data for the published study is not public, so the steps that need
-the raw data are shown as the code you would run, followed by the results the
-paper reported. The steps that do not need the raw data, which include the
-instrument, the models, the generated syntax, the sample-size guidance, the
-codebook, and the validity summary computed from the published loadings, run
-here as written.
-
-## Research design and objectives
-
-The study took a quantitative approach and used PLS-SEM with a two-stage
-treatment of two higher-order constructs. The population was international
-tourists above the age of 20 who had visited the Chonburi and Rayong provinces
-of Thailand and consumed at least one blue tourism service, such as a ferry or
-speed-boat transfer. Convenience sampling was used. The survey was distributed
-to 400 tourists and returned 195 complete responses, a response rate near 50
-per cent.
-
-The study set three objectives. The first was to develop a conceptual framework
-linking digital marketing effectiveness, destination service quality,
-destination sustainability quality, tourist satisfaction, and behavioural
-intention. The second was to measure digital marketing effectiveness and its
-impact on satisfaction and behavioural intention. The third was to analyse the
-mediating role of service quality and sustainability quality in the path from
-digital marketing effectiveness to behavioural intention.
-
-## Research questions and hypotheses
-
-The study addressed five research questions and tested thirteen hypotheses.
-
-```{r hypotheses}
-data.frame(
-  hypothesis = paste0("H", 1:13),
-  path = c(
-    "DME -> DSQ", "DME -> DSUQ", "DME -> TS", "DME -> BI",
-    "DSQ -> TS", "DSQ -> BI", "DSUQ -> TS", "DSUQ -> BI", "TS -> BI",
-    "DME -> DSQ -> TS", "DME -> DSUQ -> TS",
-    "DME -> DSQ -> TS -> BI", "DME -> DSUQ -> TS -> BI"
-  ),
-  type = c(rep("direct", 9), rep("indirect", 4)),
-  stringsAsFactors = FALSE
-)
-```
-
-Here DME is digital marketing effectiveness, DSQ is destination service
-quality, DSUQ is destination sustainability quality, TS is tourist
-satisfaction, and BI is behavioural intention.
-
-## Sample-size guidance
-
-The published study set its minimum sample at 155 using the inverse square root
-method of Kock and Hadaya (2018), with a smallest path coefficient between 0.11
-and 0.20, 80 per cent power, and a 5 per cent significance level, then collected
-195. surveyframe's `sample_size_plan()` gives design-dependent guidance for an
-SEM study rather than that specific calculation.
-
-```{r sample-size}
-sample_size_plan(type = "sem", power = 0.80, alpha = 0.05)
-```
-
-For a single bivariate question, the function returns a concrete figure.
-
-```{r sample-size-corr}
-sample_size_plan(type = "correlation", r = 0.20, power = 0.80, alpha = 0.05)
-```
+---
 
 ## The questionnaire
 
-The final questionnaire held 33 rated items across nine lower-order constructs.
-Digital marketing effectiveness was measured through relevance and engagement
-(DMRE, four items), accessibility and usefulness (DMAU, three items), ease of
-use (DMEU, three items), and perceived value (DMPV, four items). Destination
-service quality was measured through accommodation (DSQA, three items) and local
-transport (DSQT, five items). Destination sustainability quality (DSUQ) used
-five items, tourist satisfaction (TS) three, and behavioural intention (BI)
-three. All rated items used a Likert agreement scale.
+### Shared Likert scale
 
-The instrument is built programmatically from the construct structure. Item IDs
-follow the construct name, so the link from item to construct stays visible.
+All rated items use a five-point agreement scale.
 
-```{r build-items}
+```{r choices}
 likert5 <- sf_choices(
   "likert5",
   values = 1:5,
   labels = c("Strongly disagree", "Disagree",
              "Neither agree nor disagree", "Agree", "Strongly agree")
 )
-
-construct_labels <- c(
-  DMRE = "Digital marketing: relevance and engagement",
-  DMAU = "Digital marketing: accessibility and usefulness",
-  DMEU = "Digital marketing: ease of use",
-  DMPV = "Digital marketing: perceived value",
-  DSQA = "Destination service quality: accommodation",
-  DSQT = "Destination service quality: local transport",
-  DSUQ = "Destination sustainability quality",
-  TS   = "Tourist satisfaction",
-  BI   = "Behavioural intention"
-)
-item_counts <- c(DMRE = 4, DMAU = 3, DMEU = 3, DMPV = 4,
-                 DSQA = 3, DSQT = 5, DSUQ = 5, TS = 3, BI = 3)
-
-make_items <- function(construct) {
-  ids <- paste0(tolower(construct), "_", seq_len(item_counts[[construct]]))
-  Map(function(id, k) {
-    sf_item(
-      id, sprintf("%s (item %d)", construct_labels[[construct]], k),
-      type = "likert", required = TRUE, choice_set = "likert5",
-      scale_id = construct
-    )
-  }, ids, seq_along(ids))
-}
-
-rated_items <- unlist(lapply(names(item_counts), make_items), recursive = FALSE)
-
-make_scale <- function(construct) {
-  ids <- paste0(tolower(construct), "_", seq_len(item_counts[[construct]]))
-  sf_scale(construct, construct_labels[[construct]], items = ids, method = "mean")
-}
-scales <- lapply(names(item_counts), make_scale)
 ```
 
-The form also collected the respondent profile. The items below follow the live
-form and keep its order. The form's nationality question lists individual
-countries grouped by region. It is summarised here to a representative set for
-brevity.
+### Helper functions
 
-```{r build-demographics}
-gender <- sf_choices("gender", c("male", "female", "transgender"),
-                     c("Male", "Female", "Transgender"))
-age_band <- sf_choices("age_band",
+`stem_items()` builds items that share a common sentence stem. Each item is the
+stem followed by a unique completion. `solo_items()` builds standalone items.
+Neither function is exported; both use only `sf_item()`.
+
+```{r helpers}
+stem_items <- function(ids, stem, completions, scale_id) {
+  Map(
+    function(id, comp)
+      sf_item(id, paste(stem, comp),
+              type = "likert", required = TRUE,
+              choice_set = "likert5", scale_id = scale_id),
+    ids, completions
+  )
+}
+
+solo_items <- function(ids, labels, scale_id) {
+  Map(
+    function(id, lab)
+      sf_item(id, lab,
+              type = "likert", required = TRUE,
+              choice_set = "likert5", scale_id = scale_id),
+    ids, labels
+  )
+}
+```
+
+### Digital marketing items
+
+**Relevance and engagement (DMRE, 5 items)**
+
+```{r dmre}
+dmre_stem <- paste(
+  "The digital marketing contents I encountered during my",
+  "trip planning and booking phases were"
+)
+dmre_completions <- c(
+  "relevant to my interests.",
+  "engaging.",
+  "customisable.",
+  "flexible and I was able to make real-time adjustments for my demand.",
+  "able to cater to my specific needs and preferences."
+)
+dmre_items <- stem_items(
+  paste0("dmre_", 1:5), dmre_stem, dmre_completions, "DMRE"
+)
+```
+
+**Accessibility and usefulness (DMAU, 5 items)**
+
+```{r dmau}
+dmau_stem <- "The contents, communication, and booking services were"
+dmau_completions <- c(
+  "easy to find so I could contact service providers and book my trip directly.",
+  "fast.",
+  "efficient.",
+  "of good quality.",
+  "user friendly."
+)
+dmau_items <- stem_items(
+  paste0("dmau_", 1:5), dmau_stem, dmau_completions, "DMAU"
+)
+```
+
+**Ease of use (DMEU, 5 items)**
+
+```{r dmeu}
+dmeu_stem <- paste(
+  "The digital marketing contents and procedures regarding",
+  "trip planning and booking were"
+)
+dmeu_completions <- c(
+  "easy to learn.",
+  "understandable and required little mental effort.",
+  "neat and simple.",
+  "easy to follow.",
+  "mobile friendly."
+)
+dmeu_items <- stem_items(
+  paste0("dmeu_", 1:5), dmeu_stem, dmeu_completions, "DMEU"
+)
+```
+
+**Perceived value (DMPV, 5 items)**
+
+```{r dmpv}
+dmpv_stem <- paste(
+  "In terms of value, both the commercial and",
+  "user-generated contents are"
+)
+dmpv_completions <- c(
+  "sufficient to support eco-friendly practices.",
+  "appropriate.",
+  "trustworthy and credible.",
+  "consistent across all digital platforms.",
+  "value for money."
+)
+dmpv_items <- stem_items(
+  paste0("dmpv_", 1:5), dmpv_stem, dmpv_completions, "DMPV"
+)
+```
+
+### Destination service quality items
+
+**Accommodation (DSQA, 4 items)**
+
+```{r dsqa}
+dsqa_stem <- "The accommodation related services met my expectations for"
+dsqa_completions <- c(
+  "check-in and check-out services.",
+  "room cleanliness.",
+  "staff attitude.",
+  "safety and security."
+)
+dsqa_items <- stem_items(
+  paste0("dsqa_", 1:4), dsqa_stem, dsqa_completions, "DSQA"
+)
+```
+
+**Local transport (DSQT, 5 items)**
+
+```{r dsqt}
+dsqt_stem <- "The local transport related services met my expectations for"
+dsqt_completions <- c(
+  "frequency.",
+  "connectivity.",
+  "comfort.",
+  "staff attitude.",
+  "ride safety."
+)
+dsqt_items <- stem_items(
+  paste0("dsqt_", 1:5), dsqt_stem, dsqt_completions, "DSQT"
+)
+```
+
+### Destination sustainability quality (DSUQ, 11 items)
+
+```{r dsuq}
+dsuq_labels <- c(
+  "I can easily find and purchase locally-made handicrafts and souvenir products.",
+  "The livelihoods of local vendors and artisans are respected, and fair prices are paid for their products.",
+  "The size of food portions sold is adequate, reducing waste and leftovers.",
+  "Awareness programmes are adequate in encouraging me to reduce water consumption.",
+  "There are enough local guides with in-depth knowledge to enhance my travel experience.",
+  "Sustainable transport options such as bikes, walking routes, and public transport are adequate.",
+  "Reusable bags are adequately available for purchase.",
+  "Digital infrastructure is adequate so that I can avoid printing and use digital copies.",
+  "There are adequate choices of sustainable seafood in the destination.",
+  "There are enough litter bins throughout the destination.",
+  "There are adequate awareness signs about endangered marine species, plants, and animals."
+)
+dsuq_items <- solo_items(paste0("dsuq_", 1:11), dsuq_labels, "DSUQ")
+```
+
+### Tourist satisfaction (TS, 3 items) and behavioural intention (BI, 3 items)
+
+```{r ts-bi}
+ts_items <- solo_items(
+  paste0("ts_", 1:3),
+  c(
+    "The destination met or exceeded my expectations.",
+    "Overall, my travel experience with the destination was good.",
+    "Overall, I felt comfortable in the destination."
+  ),
+  "TS"
+)
+
+bi_items <- solo_items(
+  paste0("bi_", 1:3),
+  c(
+    "I will recommend others to use online platforms for planning and booking their trips.",
+    "I will share my experience online.",
+    "I intend to revisit the destination."
+  ),
+  "BI"
+)
+```
+
+### Demographic items
+
+```{r demographics}
+gender_cs    <- sf_choices("gender",
+  c("male", "female", "transgender"), c("Male", "Female", "Transgender"))
+
+age_cs       <- sf_choices("age",
   c("18_25", "26_40", "41_50", "51_60", "60_plus"),
   c("18-25", "26-40", "41-50", "51-60", "60 and above"))
-visitor <- sf_choices("visitor", c("first_time", "repeat"),
-                      c("First-time visitor", "Repeat visitor"))
-frequency <- sf_choices("frequency",
-  c("lt_1_yr", "once_yr", "2_3_yr", "gt_3_yr"),
-  c("Less than once a year", "Once a year", "2 to 3 times a year",
-    "More than 3 times a year"))
-nationality <- sf_choices("nationality",
-  c("thai", "china", "japan", "korea", "india", "maldives", "bangladesh",
-    "australia", "uk", "germany", "france", "russia", "usa", "brazil",
-    "saudi_arabia", "uae", "south_africa", "other"),
-  c("Thai", "China", "Japan", "Korea (Republic of)", "India", "Maldives",
-    "Bangladesh", "Australia", "United Kingdom", "Germany", "France",
-    "Russian Federation", "United States of America", "Brazil",
-    "Saudi Arabia", "U.A.E.", "South Africa", "Other"))
-education <- sf_choices("education",
+
+visitor_cs   <- sf_choices("visitor",
+  c("first_time", "repeat"),
+  c("First-time visitor", "Repeated visitor"))
+
+freq_cs      <- sf_choices("freq_visit",
+  c("lt_1", "once", "2_3", "gt_3"),
+  c("Less than 1 time in a year", "Once in a year",
+    "2-3 times in a year", "More than 3 times in a year"))
+
+nationality_cs <- sf_choices("nationality",
+  c("thai", "chinese", "japanese", "korean", "indian", "australian",
+    "british", "german", "american", "other"),
+  c("Thai", "Chinese", "Japanese", "Korean", "Indian", "Australian",
+    "British", "German", "American", "Other"))
+
+education_cs <- sf_choices("education",
   c("high_school", "diploma", "undergraduate", "post_graduate"),
   c("High school", "Diploma", "Undergraduate", "Post graduate"))
-profession <- sf_choices("profession",
+
+profession_cs <- sf_choices("profession",
   c("student", "business", "salaried", "freelancer", "not_working"),
   c("Student", "Business", "Salaried and working", "Freelancer",
-    "Not working"))
-companion <- sf_choices("companion", c("friends", "family", "other"),
-                        c("Friends", "Family members", "Other"))
-group_size <- sf_choices("group_size", c("lt_3", "3_5", "gt_5"),
-                         c("Less than 3", "3 to 5", "More than 5"))
+    "Not working (housewife or retired)"))
+
+companion_cs <- sf_choices("companion",
+  c("friends", "family", "other"),
+  c("Friends", "Family members", "Other"))
+
+group_cs     <- sf_choices("group_size",
+  c("lt_3", "3_5", "gt_5"),
+  c("Less than 3", "3-5", "More than 5"))
 
 demo_items <- list(
-  sf_item("gender", "Gender", type = "single_choice", required = TRUE, choice_set = "gender"),
-  sf_item("age_band", "Age", type = "single_choice", required = TRUE, choice_set = "age_band"),
-  sf_item("visitor_type", "I am a", type = "single_choice", required = TRUE, choice_set = "visitor"),
-  sf_item("frequency_of_visit", "Frequency of visit", type = "single_choice", required = TRUE, choice_set = "frequency"),
-  sf_item("nationality", "Nationality", type = "single_choice", required = TRUE, choice_set = "nationality"),
-  sf_item("education", "Education level", type = "single_choice", required = TRUE, choice_set = "education"),
-  sf_item("profession", "Profession", type = "single_choice", required = TRUE, choice_set = "profession"),
-  sf_item("travel_companion", "I visit with my", type = "single_choice", required = TRUE, choice_set = "companion"),
-  sf_item("group_size", "My travel group size is", type = "single_choice", required = TRUE, choice_set = "group_size")
+  sf_item("gender",        "Gender",                type = "single_choice",
+          required = TRUE, choice_set = "gender"),
+  sf_item("age_band",      "Age",                   type = "single_choice",
+          required = TRUE, choice_set = "age"),
+  sf_item("visitor_type",  "I am",                  type = "single_choice",
+          required = TRUE, choice_set = "visitor"),
+  sf_item("freq_visit",    "Frequency of visit",    type = "single_choice",
+          required = TRUE, choice_set = "freq_visit"),
+  sf_item("nationality",   "Nationality",           type = "single_choice",
+          required = TRUE, choice_set = "nationality"),
+  sf_item("education",     "Education level",       type = "single_choice",
+          required = TRUE, choice_set = "education"),
+  sf_item("profession",    "Profession",            type = "single_choice",
+          required = TRUE, choice_set = "profession"),
+  sf_item("companion",     "I visit with my",       type = "single_choice",
+          required = TRUE, choice_set = "companion"),
+  sf_item("group_size",    "My travel group size is", type = "single_choice",
+          required = TRUE, choice_set = "group_size")
 )
 ```
 
-The instrument is assembled from the choice sets, the rated items, the
-demographic items, and the scales.
+### Scales
+
+```{r scales}
+make_scale <- function(id, label, ids) {
+  sf_scale(id, label, items = ids, method = "mean")
+}
+
+scales <- list(
+  make_scale("DMRE", "Digital marketing: relevance and engagement",  paste0("dmre_", 1:5)),
+  make_scale("DMAU", "Digital marketing: accessibility and usefulness", paste0("dmau_", 1:5)),
+  make_scale("DMEU", "Digital marketing: ease of use",               paste0("dmeu_", 1:5)),
+  make_scale("DMPV", "Digital marketing: perceived value",           paste0("dmpv_", 1:5)),
+  make_scale("DSQA", "Destination service quality: accommodation",   paste0("dsqa_", 1:4)),
+  make_scale("DSQT", "Destination service quality: transport",       paste0("dsqt_", 1:5)),
+  make_scale("DSUQ", "Destination sustainability quality",           paste0("dsuq_", 1:11)),
+  make_scale("TS",   "Tourist satisfaction",                         paste0("ts_",   1:3)),
+  make_scale("BI",   "Behavioural intention",                        paste0("bi_",   1:3))
+)
+```
+
+### Assemble the instrument
 
 ```{r assemble}
-choice_sets <- list(likert5, gender, age_band, visitor, frequency, nationality,
-                    education, profession, companion, group_size)
+choice_sets <- list(
+  likert5, gender_cs, age_cs, visitor_cs, freq_cs, nationality_cs,
+  education_cs, profession_cs, companion_cs, group_cs
+)
+
+rated_items <- c(dmre_items, dmau_items, dmeu_items, dmpv_items,
+                 dsqa_items, dsqt_items, dsuq_items, ts_items, bi_items)
 
 study <- sf_instrument(
   title       = "Digital Marketing Effectiveness of Tourism Services in Thailand",
   version     = "1.0.0",
-  description = "Reconstruction of the published PLS-SEM study for surveyframe.",
-  authors     = "Sharafuddin, Madhavan, and Wangtueai",
-  languages   = "en",
-  components  = c(choice_sets, rated_items, demo_items, scales)
+  description = paste(
+    "Questionnaire covering digital marketing effectiveness,",
+    "destination service quality, sustainability quality,",
+    "tourist satisfaction, and behavioural intention."
+  ),
+  authors   = "Mohammed Ali Sharafuddin",
+  languages = "en",
+  components = c(choice_sets, rated_items, demo_items, scales)
 )
 
 study
 ```
 
-## Validate the instrument
+---
+
+## Validate and serialise
+
+`validate_sframe()` checks every item ID, choice set reference, and scale
+membership before any data is collected. `write_sframe()` saves the validated
+instrument with a SHA-256 hash so any post-collection edits are detectable.
 
 ```{r validate}
-validation <- validate_sframe(study, strict = FALSE)
-validation$valid
-length(validation$problems)
+v <- validate_sframe(study, strict = FALSE)
+v$valid
+length(v$problems)
 ```
 
-## The analysis plan
+```{r write, eval = FALSE}
+# Save the instrument. Keep this file with your analysis files.
+write_sframe(study, "thailand_tourism_v1.sframe")
 
-The plan records each research step as a block that binds a technique to the
-variables that fill its roles. The plan below covers the screening, the
-measurement assessment, the descriptive comparisons that the demographic items
-make possible, and the model syntax. The role names are specific to each
-technique.
+# Reload later with:
+# study <- read_sframe("thailand_tourism_v1.sframe")
+```
+
+---
+
+## Set up data collection
+
+### Store the Google Sheets endpoint in the instrument
+
+When an endpoint URL is set on the instrument, `export_static_survey()` reads it
+automatically. Set the URL once, export as many times as needed without
+repeating the argument.
+
+```{r endpoint, eval = FALSE}
+# Replace with your deployed Apps Script URL after the setup steps below.
+study$render$google_sheets_endpoint <-
+  "https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec"
+```
+
+### Export the static HTML survey
+
+`export_static_survey()` produces a single self-contained HTML file. Respondents
+open it in any browser, fill it in, and their submission is downloaded as a CSV
+and, if an endpoint is configured, posted to the Google Sheet at the same time.
+The file can be hosted on GitHub Pages, shared by email, or opened directly from
+disk.
+
+```{r static-export}
+html_path <- export_static_survey(
+  study,
+  output_path = file.path(tempdir(), "thailand_tourism_survey.html"),
+  open        = FALSE
+)
+file.exists(html_path)
+```
+
+### Generate the Google Sheets collector script
+
+`export_google_sheet()` writes a Google Apps Script file. Deploy it in a Google
+Sheet and it creates a response tab with the correct column headers, including
+one column per matrix sub-item.
+
+```{r gs-export}
+script_path <- export_google_sheet(
+  study,
+  sheet_url  = "https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID",
+  output_dir = tempdir()
+)
+file.exists(script_path)
+```
+
+**To deploy the script:**
+
+1. Open or create a Google Sheet.
+2. Click Extensions, then Apps Script.
+3. Paste the contents of the generated `.gs` file, replacing any existing code.
+4. Click Deploy, then New deployment. Set type to Web app.
+5. Set "Who has access" to Anyone.
+6. Copy the Web App URL.
+7. Paste the URL into `study$render$google_sheets_endpoint` above and
+   re-export the survey.
+
+### Pull live responses
+
+Once the survey is live, read the growing response set with one call. Re-run
+this line and everything below it to refresh all results.
+
+```{r live-read, eval = FALSE}
+responses <- read_sheet_responses(
+  sheet_id   = "YOUR_SHEET_ID",
+  instrument = study
+)
+```
+
+---
+
+## Simulated responses for offline demonstration
+
+The code block below generates 60 plausible responses so the remainder of this
+vignette runs without a network connection. Replace `responses` with the output
+of `read_sheet_responses()` and re-run from the quality section onward to use
+real data.
+
+```{r simulate}
+set.seed(2024)
+n <- 60
+
+# Each construct is driven by a latent score plus item-level noise.
+# Correlations between constructs are introduced by sharing variance.
+lat <- function(mu, sigma) pmax(1, pmin(5, round(rnorm(n, mu, sigma))))
+add_noise <- function(x, sigma = 0.45) {
+  pmax(1L, pmin(5L, as.integer(round(x + rnorm(n, 0, sigma)))))
+}
+
+# Higher service quality and sustainability lift satisfaction.
+lat_dsqa <- lat(3.7, 0.6)
+lat_dsqt <- lat(3.6, 0.6)
+lat_dsuq <- lat(3.5, 0.6)
+lat_ts   <- pmax(1, pmin(5, round(
+  0.4 * lat_dsqa + 0.3 * lat_dsqt + 0.2 * lat_dsuq + rnorm(n, 0.6, 0.3)
+)))
+lat_bi   <- pmax(1, pmin(5, round(0.7 * lat_ts + rnorm(n, 0.5, 0.4))))
+
+# Digital marketing constructs are loosely correlated with each other.
+lat_dmre <- lat(3.8, 0.6)
+lat_dmau <- pmax(1, pmin(5, round(0.5 * lat_dmre + rnorm(n, 1.9, 0.4))))
+lat_dmeu <- pmax(1, pmin(5, round(0.4 * lat_dmre + rnorm(n, 2.2, 0.4))))
+lat_dmpv <- pmax(1, pmin(5, round(0.3 * lat_dmre + rnorm(n, 2.5, 0.4))))
+
+# Repeat visitors score slightly higher on satisfaction and intention.
+visitor_type <- sample(c("first_time", "repeat"), n,
+                       replace = TRUE, prob = c(0.45, 0.55))
+lat_ts[visitor_type == "repeat"] <- pmin(5L, lat_ts[visitor_type == "repeat"] + 1L)
+lat_bi[visitor_type == "repeat"] <- pmin(5L, lat_bi[visitor_type == "repeat"] + 1L)
+
+# Build item columns from latent scores.
+make_cols <- function(lat, k, prefix) {
+  setNames(
+    as.data.frame(
+      vapply(seq_len(k), function(i) add_noise(lat), integer(n))
+    ),
+    paste0(prefix, seq_len(k))
+  )
+}
+
+sim_df <- cbind(
+  data.frame(
+    respondent_id = sprintf("R%03d", seq_len(n)),
+    submitted_at  = format(
+      seq(as.POSIXct("2025-01-10 09:00", tz = "UTC"),
+          by = "1 hour", length.out = n),
+      "%Y-%m-%dT%H:%M:%SZ"
+    ),
+    started_at = format(
+      seq(as.POSIXct("2025-01-10 08:50", tz = "UTC"),
+          by = "1 hour", length.out = n),
+      "%Y-%m-%dT%H:%M:%SZ"
+    ),
+    gender = sample(c("male", "female", "transgender"),
+                    n, TRUE, c(0.44, 0.55, 0.01)),
+    age_band = sample(c("18_25", "26_40", "41_50", "51_60", "60_plus"),
+                      n, TRUE, c(0.15, 0.40, 0.25, 0.15, 0.05)),
+    visitor_type = visitor_type,
+    freq_visit = sample(c("lt_1", "once", "2_3", "gt_3"),
+                        n, TRUE, c(0.15, 0.25, 0.35, 0.25)),
+    nationality = sample(
+      c("thai", "chinese", "japanese", "korean", "indian",
+        "australian", "british", "german", "american", "other"),
+      n, TRUE),
+    education = sample(c("high_school", "diploma", "undergraduate", "post_graduate"),
+                       n, TRUE, c(0.05, 0.10, 0.48, 0.37)),
+    profession = sample(c("student", "business", "salaried", "freelancer", "not_working"),
+                        n, TRUE, c(0.15, 0.20, 0.45, 0.12, 0.08)),
+    companion = sample(c("friends", "family", "other"),
+                       n, TRUE, c(0.35, 0.55, 0.10)),
+    group_size = sample(c("lt_3", "3_5", "gt_5"),
+                        n, TRUE, c(0.30, 0.50, 0.20)),
+    stringsAsFactors = FALSE
+  ),
+  make_cols(lat_dmre, 5, "dmre_"),
+  make_cols(lat_dmau, 5, "dmau_"),
+  make_cols(lat_dmeu, 5, "dmeu_"),
+  make_cols(lat_dmpv, 5, "dmpv_"),
+  make_cols(lat_dsqa, 4, "dsqa_"),
+  make_cols(lat_dsqt, 5, "dsqt_"),
+  make_cols(lat_dsuq, 11, "dsuq_"),
+  make_cols(lat_ts,   3, "ts_"),
+  make_cols(lat_bi,   3, "bi_")
+)
+
+# Align the data frame to the instrument.
+responses <- read_responses(sim_df, study,
+                             respondent_id = "respondent_id",
+                             submitted_at  = "submitted_at",
+                             meta_cols     = "started_at",
+                             strict        = FALSE)
+
+cat("Respondents:", nrow(responses), "\n")
+cat("Columns:    ", ncol(responses), "\n")
+```
+
+---
+
+## Quality checks
+
+```{r quality}
+qr <- quality_report(responses, study, respondent_id = "respondent_id")
+cat("Respondents:", qr$summary$n_respondents, "\n")
+cat("Items:      ", qr$summary$n_items,       "\n")
+cat("Flagged:    ", qr$summary$n_flagged,      "\n")
+```
+
+```{r missing}
+mr <- missing_data_report(responses, study)
+# Items with any missingness
+items_miss <- mr$item_missing
+items_miss[items_miss$missing_pct > 0, c("variable", "missing_n", "missing_pct")]
+```
+
+---
+
+## Score and describe
+
+`score_scales()` appends one column per scale to the data frame, using the
+scoring rules stored in the instrument.
+
+```{r score}
+scored <- score_scales(responses, study)
+
+scale_cols <- c("DMRE", "DMAU", "DMEU", "DMPV",
+                "DSQA", "DSQT", "DSUQ", "TS", "BI")
+round(colMeans(scored[, scale_cols], na.rm = TRUE), 2)
+```
+
+---
+
+## Reliability
+
+```{r reliability}
+if (requireNamespace("psych", quietly = TRUE)) {
+  rr <- reliability_report(scored, study, omega = FALSE)
+  print(rr)
+}
+```
+
+---
+
+## Analysis plan
+
+The plan binds each research question to a statistical technique and the
+variable roles it needs. `run_analysis_plan()` executes every block and returns
+one result per question.
 
 ```{r plan}
 study$analysis_plan <- list(
-  list(id = "D1", research_question = "What is the sample profile?",
-       family = "descriptive", method = "descriptives",
-       roles = list(variables = names(item_counts))),
-  list(id = "D2", research_question = "How complete are the responses?",
-       family = "data_quality", method = "missing_data",
-       roles = list(variables = names(item_counts))),
-  list(id = "M1", research_question = "Is each construct internally consistent?",
-       family = "measurement", method = "reliability_alpha",
-       roles = list(items = paste0("dmpv_", 1:4))),
-  list(id = "M2", research_question = "Do the digital marketing items form coherent factors?",
-       family = "measurement", method = "efa_readiness",
-       roles = list(items = c(paste0("dmre_", 1:4), paste0("dmau_", 1:3),
-                              paste0("dmeu_", 1:3), paste0("dmpv_", 1:4)))),
-  list(id = "RQ_assoc", research_question = "Is service quality associated with satisfaction?",
-       family = "association", method = "correlation_pearson",
-       roles = list(x = "DSQA", y = "TS"), options = list(alpha = 0.05)),
-  list(id = "RQ_reg", research_question = "Do service and sustainability quality predict satisfaction?",
-       family = "regression", method = "regression_linear",
-       roles = list(predictors = c("DSQA", "DSQT", "DSUQ"), dependent = "TS"),
-       options = list(alpha = 0.05)),
-  list(id = "RQ_group", research_question = "Do first-time and repeat visitors differ in satisfaction?",
-       family = "group_comparison", method = "mann_whitney",
-       roles = list(group = "visitor_type", outcome = "TS"),
-       options = list(alpha = 0.05)),
-  list(id = "RQ_cross", research_question = "Is visitor type associated with gender?",
-       family = "categorical", method = "chi_square",
-       roles = list(row = "gender", column = "visitor_type"),
-       options = list(alpha = 0.05))
+  list(
+    id               = "RQ1",
+    research_question = "Are digital marketing perceptions associated with tourist satisfaction?",
+    family           = "association",
+    method           = "correlation_pearson",
+    roles            = list(x = "DMRE", y = "TS"),
+    options          = list(alpha = 0.05)
+  ),
+  list(
+    id               = "RQ2",
+    research_question = "Is service quality associated with tourist satisfaction?",
+    family           = "association",
+    method           = "correlation_pearson",
+    roles            = list(x = "DSQT", y = "TS"),
+    options          = list(alpha = 0.05)
+  ),
+  list(
+    id               = "RQ3",
+    research_question = "Do service quality and sustainability quality predict satisfaction?",
+    family           = "regression",
+    method           = "regression_linear",
+    roles            = list(predictors = c("DSQA", "DSQT", "DSUQ"),
+                            dependent  = "TS"),
+    options          = list(alpha = 0.05)
+  ),
+  list(
+    id               = "RQ4",
+    research_question = "Do first-time and repeat visitors differ in satisfaction?",
+    family           = "group_comparison",
+    method           = "mann_whitney",
+    roles            = list(group = "visitor_type", outcome = "TS"),
+    options          = list(alpha = 0.05)
+  ),
+  list(
+    id               = "RQ5",
+    research_question = "Does satisfaction predict behavioural intention?",
+    family           = "regression",
+    method           = "regression_linear",
+    roles            = list(predictors = "TS", dependent = "BI"),
+    options          = list(alpha = 0.05)
+  )
 )
 
 length(study$analysis_plan)
 ```
 
-## Descriptives and data screening
+---
 
-With the 195-row dataset in hand, the screening blocks run as below. The paper
-reported a sample of 195 tourists aged 18 to 65, 56 per cent female and 44 per
-cent male, with 48 per cent holding an undergraduate degree and 37 per cent a
-postgraduate degree. Working professionals made up 66 per cent of the sample.
+## Run the analysis plan
 
-```{r screening, eval = FALSE}
-responses <- read_responses(
-  "thailand_tourism_responses.csv",
+```{r run-plan}
+results <- run_analysis_plan(scored, study)
+```
+
+Each result carries an APA-formatted statistic, an effect size, and a writing
+prompt.
+
+```{r show-results}
+for (r in results) {
+  cat(sprintf("[%s] %s\n  APA: %s\n  Effect: %s\n\n",
+              r$id, r$research_question, r$apa, r$effect_label))
+}
+```
+
+---
+
+## Results report
+
+`render_results()` writes one section per research question. `render_report()`
+adds a codebook, quality summary, and descriptives alongside the analysis
+results.
+
+```{r render-results}
+render_results(
+  results,
   study,
-  respondent_id = "respondent_id",
-  submitted_at  = "submitted_at"
+  output_file = file.path(tempdir(), "thailand_results.html")
 )
-
-descriptives_report(responses, variables = names(item_counts))
-missing_data_report(responses, study)
-quality_report(responses, study, respondent_id = "respondent_id")
 ```
 
-## Reliability and item diagnostics
-
-The reliability and item reports read the scale definitions from the
-instrument. The published lower-order constructs all exceeded the 0.7 threshold
-for composite reliability. At the higher-order level the study reported Cronbach
-alpha and composite reliability of 0.828 and 0.883 for DME, 0.792 and 0.906 for
-DSQ, 0.769 and 0.843 for DSUQ, 0.897 and 0.936 for TS, and 0.921 and 0.950 for
-BI.
-
-```{r reliability, eval = FALSE}
-reliability_report(responses, study, omega = TRUE)
-item_report(responses, study)
-```
-
-## Validity from the published loadings
-
-This step does not need the raw data. `validity_report()` computes composite
-reliability and average variance extracted from standardised loadings. Feeding
-the loadings reported in the paper reproduces the published reliability and
-convergent validity, which is a direct check of the measurement model.
-
-```{r validity}
-published_loadings <- list(
-  DMRE = c(dmre_1 = .815, dmre_2 = .899, dmre_3 = .668, dmre_4 = .838),
-  DMAU = c(dmau_1 = .843, dmau_2 = .915, dmau_3 = .920),
-  DMEU = c(dmeu_1 = .897, dmeu_2 = .929, dmeu_3 = .932),
-  DMPV = c(dmpv_1 = .818, dmpv_2 = .916, dmpv_3 = .900, dmpv_4 = .863),
-  DSQA = c(dsqa_1 = .904, dsqa_2 = .920, dsqa_3 = .869),
-  DSQT = c(dsqt_1 = .778, dsqt_2 = .883, dsqt_3 = .879, dsqt_4 = .811, dsqt_5 = .713),
-  DSUQ = c(dsuq_1 = .780, dsuq_2 = .855, dsuq_3 = .845, dsuq_4 = .551, dsuq_5 = .529),
-  TS   = c(ts_1 = .912, ts_2 = .950, ts_3 = .869),
-  BI   = c(bi_1 = .937, bi_2 = .911, bi_3 = .940)
-)
-
-validity <- validity_report(published_loadings)
-validity$reliability
-```
-
-The composite reliability and AVE returned here match the values in the paper.
-The study also reported Fornell-Larcker results, where the square root of the
-AVE for each construct exceeded its correlations with the others, and HTMT
-ratios that were all below 0.90, the highest being 0.766 between DMEU and DMAU.
-Both confirm discriminant validity.
-
-## Exploratory factor analysis
-
-EFA is an exploratory step that screens whether the items group as intended
-before the confirmatory model. `efa_report()` reports the Kaiser-Meyer-Olkin
-measure and Bartlett's test, and `efa_solution()` returns loadings,
-communalities, and cross-loading flags. Both use the optional `psych` package.
-
-```{r efa, eval = FALSE}
-efa_report(responses, study)
-efa_solution(responses, study,
-             items = c(paste0("dmre_", 1:4), paste0("dmau_", 1:3),
-                       paste0("dmeu_", 1:3), paste0("dmpv_", 1:4)),
-             nfactors = 4)
-```
-
-## The measurement model: CFA syntax
-
-The confirmatory measurement model has the nine lower-order constructs as
-reflective factors. `cfa_lavaan_syntax()` writes the lavaan syntax without
-needing lavaan installed.
-
-```{r cfa-model}
-lower_order <- lapply(names(item_counts), function(construct) {
-  ids <- paste0(tolower(construct), "_", seq_len(item_counts[[construct]]))
-  sf_construct(construct, construct_labels[[construct]], items = ids, mode = "reflective")
-})
-
-cfa_model <- sf_model(
-  id    = "dme_measurement",
-  label = "Lower-order measurement model",
-  type  = "cfa",
-  constructs = lower_order
-)
-
-study <- add_model(study, cfa_model)
-cat(cfa_lavaan_syntax(study, model = cfa_model))
-```
-
-## The structural model: CB-SEM syntax
-
-The structural model carries the nine direct paths and the four indirect
-effects from the hypotheses. This rendering treats the five constructs as
-first-order reflective factors over their full item sets, which is the
-covariance-based reading of the framework. `sem_lavaan_syntax()` writes the
-measurement, structural, and indirect-effect lines.
-
-```{r cbsem-model}
-dm_items  <- c(paste0("dmre_", 1:4), paste0("dmau_", 1:3),
-               paste0("dmeu_", 1:3), paste0("dmpv_", 1:4))
-dsq_items <- c(paste0("dsqa_", 1:3), paste0("dsqt_", 1:5))
-
-sem_model <- sf_model(
-  id    = "tourism_structural",
-  label = "Digital marketing structural model",
-  type  = "cb_sem",
-  constructs = list(
-    sf_construct("DME",  "Digital marketing effectiveness", dm_items),
-    sf_construct("DSQ",  "Destination service quality",     dsq_items),
-    sf_construct("DSUQ", "Destination sustainability quality", paste0("dsuq_", 1:5)),
-    sf_construct("TS",   "Tourist satisfaction",            paste0("ts_", 1:3)),
-    sf_construct("BI",   "Behavioural intention",           paste0("bi_", 1:3))
-  ),
-  paths = list(
-    sf_path("DME", "DSQ",  label = "h1"),
-    sf_path("DME", "DSUQ", label = "h2"),
-    sf_path("DME", "TS",   label = "h3"),
-    sf_path("DME", "BI",   label = "h4"),
-    sf_path("DSQ", "TS",   label = "h5"),
-    sf_path("DSQ", "BI",   label = "h6"),
-    sf_path("DSUQ", "TS",  label = "h7"),
-    sf_path("DSUQ", "BI",  label = "h8"),
-    sf_path("TS", "BI",    label = "h9")
-  ),
-  indirect = list(
-    sf_indirect("DME", "DSQ", "TS",  label = "h10"),
-    sf_indirect("DME", "DSUQ", "TS", label = "h11"),
-    sf_indirect("DME", c("DSQ", "TS"), "BI",  label = "h12"),
-    sf_indirect("DME", c("DSUQ", "TS"), "BI", label = "h13")
-  ),
-  options = list(estimator = "MLR", missing = "fiml", standardised = TRUE)
-)
-
-validate_model(sem_model, study)
-cat(sem_lavaan_syntax(sem_model, study))
-```
-
-## The two-stage PLS-SEM: seminr syntax
-
-The published study used PLS-SEM with a two-stage treatment of the higher-order
-constructs. The first stage assesses the lower-order measurement model, which
-is the CFA model above and the reliability and validity reports. The second
-stage models digital marketing effectiveness and service quality as composites
-of their lower-order construct scores, then estimates the structural paths.
-`seminr_syntax()` writes the seminr code.
-
-```{r pls-model}
-pls_model <- sf_model(
-  id    = "tourism_pls",
-  label = "Two-stage higher-order PLS model",
-  type  = "pls_sem",
-  constructs = list(
-    sf_construct("DME",  "Digital marketing effectiveness",
-                 c("DMRE", "DMAU", "DMEU", "DMPV"), mode = "composite"),
-    sf_construct("DSQ",  "Destination service quality",
-                 c("DSQA", "DSQT"), mode = "composite"),
-    sf_construct("DSUQ", "Destination sustainability quality",
-                 paste0("dsuq_", 1:5), mode = "composite"),
-    sf_construct("TS",   "Tourist satisfaction", paste0("ts_", 1:3), mode = "composite"),
-    sf_construct("BI",   "Behavioural intention", paste0("bi_", 1:3), mode = "composite")
-  ),
-  paths = list(
-    sf_path("DME", "DSQ"), sf_path("DME", "DSUQ"),
-    sf_path("DME", "TS"),  sf_path("DME", "BI"),
-    sf_path("DSQ", "TS"),  sf_path("DSQ", "BI"),
-    sf_path("DSUQ", "TS"), sf_path("DSUQ", "BI"),
-    sf_path("TS", "BI")
-  ),
-  options = list(bootstrap = 1000)
-)
-
-cat(seminr_syntax(pls_model))
-```
-
-When this model is fitted in seminr, the paper reported that digital marketing
-effectiveness influenced service quality (0.573) and sustainability quality
-(0.394), that both mediated the path to satisfaction (indirect effects of 0.155
-and 0.152), and that satisfaction drove behavioural intention (0.713). The
-direct paths from digital marketing effectiveness to satisfaction and
-behavioural intention were not significant, which is why the mediating
-constructs matter.
-
-## Run the plan and render the report
-
-With the dataset loaded, the plan runs in one pass and the report is rendered.
-`run_analysis_plan()` returns one result per block, and `render_results()` or
-`render_report()` writes the report.
-
-```{r run, eval = FALSE}
-results <- run_analysis_plan(responses, study)
-results
-
-render_results(results, study, output_file = "thailand-results.html")
-
+```{r render-report}
 render_report(
-  study, data = responses, output_file = "thailand-report.html",
-  include_codebook = TRUE, include_quality = TRUE, include_missing = TRUE,
-  include_descriptives = TRUE, include_reliability = TRUE,
-  include_analysis = TRUE, include_models = TRUE
+  study,
+  data             = scored,
+  output_file      = file.path(tempdir(), "thailand_report.html"),
+  include_codebook = TRUE,
+  include_quality  = TRUE,
+  include_missing  = TRUE,
+  include_descriptives = TRUE,
+  include_reliability  = TRUE,
+  include_analysis = TRUE,
+  include_models   = FALSE
 )
 ```
 
-## The visual route
+---
 
-The same study can be assembled and run through the two browser tools, which
-have separate jobs.
+## The live workflow
 
-SurveyBuilder, opened with `launch_builder()`, is a client-side authoring tool.
-Its Build mode edits the questionnaire, its Analyse mode writes the analysis
-plan and builds the model, and its model panel exports lavaan or seminr syntax
-and the model JSON into the `.sframe` file. The builder saves the instrument and
-configures a Google Sheet endpoint, but it computes no statistics.
+The section below shows the full sequence from a live Google Sheet. Every step
+from `read_sheet_responses()` onward is identical to the simulated workflow.
+Re-run this block each time you want updated results.
 
-SurveyStudio, opened with `launch_studio()`, is the R-backed workflow. Its tabs
-run from Build Survey, Open Instrument, and Preview Survey through Upload
-Responses, Quality Dashboard, Reliability, and Analysis Plan, to Dashboard and
-Export. Once responses are uploaded, the Analysis Plan screen runs the saved
-plan and shows a table of each question with its method and APA result. The
-Export screen renders the full report.
+```{r live-workflow, eval = FALSE}
+# 1. Pull the latest responses from the Google Sheet.
+responses <- read_sheet_responses(
+  sheet_id   = "YOUR_SHEET_ID",
+  instrument = study
+)
 
-```{r gui, eval = FALSE}
-launch_builder()     # author the questionnaire, plan, and model
-launch_studio()      # upload responses, run the plan, export the report
-launch_dashboard()   # a read-only response view
+# 2. Run quality checks on the new data.
+quality_report(responses, study, respondent_id = "respondent_id")
+
+# 3. Score the scales.
+scored <- score_scales(responses, study)
+
+# 4. Run the pre-declared analysis plan.
+results <- run_analysis_plan(scored, study)
+
+# 5. Render the updated report.
+render_report(
+  study,
+  data             = scored,
+  output_file      = "thailand_report_latest.html",
+  include_codebook = TRUE,
+  include_quality  = TRUE,
+  include_missing  = TRUE,
+  include_descriptives = TRUE,
+  include_reliability  = TRUE,
+  include_analysis = TRUE,
+  include_models   = FALSE
+)
 ```
 
-## Reproducibility and citation
+As more respondents complete the survey, re-running from the
+`read_sheet_responses()` call above refreshes every result, table, and figure
+in the report without changing any analysis code.
 
-Keep the `.sframe` file with the analysis files. It records the questionnaire,
-the analysis plan, and the three models used here, so the design and the
-analysis travel together.
+---
+
+## Summary
+
+The instrument built in this vignette can be loaded into SurveyBuilder for
+visual editing or distributed directly as the exported HTML file. The Google
+Sheets script connects online submissions to R through a single function call.
+Because the questionnaire, the scales, and the analysis plan are stored together
+in the sframe, the design and the analysis travel as one object.
 
 ```{r citation, eval = FALSE}
 citation("surveyframe")
