@@ -211,7 +211,9 @@ print.sframe_item_report <- function(x, ...) {
 #' Prepare a survey instrument for exploratory factor analysis
 #'
 #' Reports KMO sampling adequacy, Bartlett's test of sphericity, and a
-#' parallel analysis scree plot to inform factor number selection. The report
+#' parallel analysis scree plot to inform factor number selection. The
+#' suggested number of factors from parallel analysis is returned in
+#' `$suggested_nfactors`. The report
 #' prepares the researcher to estimate an EFA solution with a separate package
 #' such as `psych` or `lavaan`.
 #'

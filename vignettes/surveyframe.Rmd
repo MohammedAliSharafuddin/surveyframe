@@ -366,7 +366,8 @@ length(v$problems)
 
 ```{r write}
 # Save the instrument. Keep this file alongside your analysis script.
-sframe_path <- write_sframe(study, file.path(tempdir(), "tourism_services_v1.sframe"))
+sframe_path <- write_sframe(study, file.path(tempdir(), "tourism_services_v1.sframe"),
+                             overwrite = TRUE)
 
 # Reload the instrument from disk at any time with:
 study2 <- read_sframe(sframe_path)
@@ -562,12 +563,20 @@ cat("Items:      ", qr$summary$n_items,       "\n")
 cat("Flagged:    ", qr$summary$n_flagged,      "\n")
 ```
 
+The flagged count reflects straight-lining detection on simulated data, where
+random responses often repeat values. With real survey responses the flagging
+rate is typically much lower. The flag marks respondents for researcher review,
+not automatic exclusion.
+
 ```{r missing}
 mr <- missing_data_report(responses, study)
-# mr is a list; the item-level summary lives in $item_missing
+# mr is a list; $item_missing, $respondent_missing, $mcar, and $apa are the
+# main slots. Check names(mr) to see all available components.
 names(mr)
 items_miss <- mr$item_missing
 items_miss[items_miss$missing_pct > 0, c("variable", "missing_n", "missing_pct")]
+# $apa provides a plain-language summary suitable for a methods section.
+cat(mr$apa, "\n")
 ```
 
 ---
@@ -595,6 +604,11 @@ if (requireNamespace("psych", quietly = TRUE)) {
   print(rr)
 }
 ```
+
+A Cronbach's alpha of 0.70 or above is conventionally accepted as adequate
+internal consistency (Nunnally, 1978). For scales with three or more items,
+McDonald's omega is a more accurate estimate; pass `omega = TRUE` to include
+it. See `?reliability_report` for details.
 
 ---
 
@@ -660,15 +674,24 @@ length(study$analysis_plan)
 results <- run_analysis_plan(scored, study)
 ```
 
-Each result carries an APA-formatted statistic, an effect size, and a writing
-prompt.
+Each result carries an APA-formatted statistic, an effect size, a writing
+prompt, and the methodological reference that supports the chosen test.
 
 ```{r show-results}
 for (r in results) {
-  cat(sprintf("[%s] %s\n  APA: %s\n  Effect: %s\n\n",
-              r$id, r$research_question, r$apa, r$effect_label))
+  cat(sprintf("[%s] %s\n  APA:    %s\n  Effect: %s\n  Prompt: %s\n\n",
+              r$id,
+              r$research_question,
+              r$apa,
+              r$effect_label,
+              r$prompt))
 }
 ```
+
+The `prompt` field is a sentence template for the methods or results section.
+The researcher fills in the substantive interpretation; the package supplies
+the statistic and the label. This separation is intentional: statistical
+significance and practical significance are distinct judgements.
 
 ---
 
@@ -679,12 +702,17 @@ adds a codebook, quality summary, and descriptives alongside the analysis
 results.
 
 ```{r render-results}
-render_results(
+results_path <- render_results(
   results,
   study,
   output_file = file.path(tempdir(), "tourism_results.html")
 )
+cat("Results report written:", results_path, "\n")
+cat("Size:", round(file.size(results_path) / 1024, 1), "KB\n")
 ```
+
+The results report contains one section per research question, with the APA
+statistic, effect size, writing prompt, and the reference for the chosen method.
 
 ```{r render-report}
 render_report(

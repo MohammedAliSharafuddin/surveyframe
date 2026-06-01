@@ -905,7 +905,7 @@ run_analysis_plan <- function(data, instrument, scored = TRUE) {
   plan <- instrument$analysis_plan
   if (is.null(plan) || length(plan) == 0) {
     rlang::abort(
-      "No analysis plan found in this instrument. Define research questions in the SurveyBuilder Analyse menu before running.",
+      "No analysis plan found in this instrument. Add research questions to instrument$analysis_plan, or use the SurveyBuilder Analyse menu to build the plan visually.",
       class = "sframe_error"
     )
   }
