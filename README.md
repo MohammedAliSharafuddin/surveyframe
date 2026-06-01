@@ -299,6 +299,15 @@ MCDM and DEMATEL fall outside v0.3 scope. These methods are scheduled for v0.4.
 citation("surveyframe")
 ```
 
+## Related resources
+
+- Quantitative Analysis with Small Samples, a companion textbook on statistical
+  inference when sample sizes are small:
+  <https://flairmi.com/textbooks/smallsamplelab.html>
+- Small-sample inference helpers, validated by a simulation study of survey
+  methods, are planned for a future surveyframe version. The textbook above
+  describes the methods that surveyframe will add and when to prefer each one.
+
 ## License
 
 MIT. See `LICENSE`.
