@@ -3,11 +3,13 @@
 
 \documentclass[article]{jss}
 \usepackage{amssymb}
+\usepackage{orcidlink}
 
 %% -- Author information -----------------------------------------------
 
-\author{Mohammed Ali Sharafuddin}
-\Plainauthor{Mohammed Ali Sharafuddin}
+\author{Mohammed Ali Sharafuddin~\orcidlink{0000-0001-5247-2964}\\Villa College, Maldives
+   \And Meena Madhavan~\orcidlink{0000-0003-1244-5392}\\International Maritime College Oman}
+\Plainauthor{Mohammed Ali Sharafuddin, Meena Madhavan}
 
 \title{\pkg{surveyframe}: A Proactive Survey Research Workflow for \proglang{R}}
 \Plaintitle{surveyframe: A Proactive Survey Research Workflow for R}
@@ -65,9 +67,16 @@ survey instrument and response dataset.
 
 \Address{
   Mohammed Ali Sharafuddin\\
-  %% TODO: Add institutional affiliation and address before submission\\
-  E-mail: \email{mohammedali.page@gmail.com}\\
-  ORCID: \href{https://orcid.org/0000-0001-5247-2964}{0000-0001-5247-2964}
+  Qasim Ibrahim School of Business\\
+  Villa College, Mal\'{e} 20373, Maldives\\
+  E-mail: \email{mohammed.ali@villacollege.edu.mv}\\
+  ORCID: \href{https://orcid.org/0000-0001-5247-2964}{0000-0001-5247-2964}\\[1.5ex]
+  Meena Madhavan\\
+  Department of Logistics Management\\
+  International Maritime College Oman (IMCO)\\
+  National University of Science \& Technology\\
+  Falaj Al Qabail, Sohar 322, Oman\\
+  ORCID: \href{https://orcid.org/0000-0003-1244-5392}{0000-0003-1244-5392}
 }
 
 %% -------------------------------------------------------------------------
@@ -716,43 +725,33 @@ instrument before data collection. This is the feature that most
 directly addresses the reproducibility concerns outlined in
 Section~\ref{sec:intro}.
 
-\paragraph{SPSS.} IBM SPSS Statistics \citep{ibm2023} provides a
-comprehensive GUI-based analysis environment widely used in social
-science and management research. SPSS includes survey collection tools
-(through associated products), reliability analysis, factor analysis,
-and regression. It does not provide \proglang{R}-native scripting,
-open-source licensing, or an instrument-first workflow. Annual
-licensing costs are substantial, creating access barriers for
-individual researchers and lower-income institution contexts.
+\paragraph{SPSS.} SPSS \citep{ibm2023} is the GUI workhorse of much
+social science and management research, with reliability analysis,
+factor analysis, and regression long built in. It offers no
+\proglang{R}-native scripting and no instrument-first workflow, and its
+licence fees keep it out of reach for many individual researchers and
+lower-income institutions.
 
-\paragraph{SmartPLS.} SmartPLS \citep{ringleetal2022} specialises in
-partial least squares structural equation modelling (PLS-SEM). It is
-widely adopted in management research, particularly for formative
-constructs and small sample sizes. SmartPLS does not support instrument
-construction, pre-declared analysis plans, or open-source access. It
-has no \proglang{R} API. Analyses are performed through its own
-proprietary interface. CB-SEM and lavaan CFA are outside its scope.
-PLS-SEM execution is on the \pkg{surveyframe} development roadmap,
-with syntax generation for \pkg{seminr} already available in v0.3.0.
+\paragraph{SmartPLS.} SmartPLS \citep{ringleetal2022} is the popular
+proprietary home of PLS-SEM, favoured in management research for
+formative constructs and small samples. Everything happens inside its
+own interface, with no \proglang{R} API and no way to declare the
+instrument or the analysis plan up front. \pkg{surveyframe} already
+writes \pkg{seminr} syntax for PLS-SEM, and fitting is on its roadmap.
 
-\paragraph{lavaan.} The \pkg{lavaan} package \citep{rosseel2012} is the
-standard \proglang{R} tool for structural equation modelling. It
-accepts model syntax defined by the researcher and operates on existing
-data frames. \pkg{surveyframe} complements rather than competes with
-\pkg{lavaan}: the \code{cfa\_syntax()} function generates lavaan syntax
-directly from the \code{sframe}'s scale definitions, providing the
-measurement model specification that the researcher then passes to
-\pkg{lavaan}. The critical difference is that \pkg{surveyframe}
-constrains the CFA to the constructs declared before data collection.
-\pkg{lavaan} itself imposes no such constraint.
+\paragraph{lavaan.} \pkg{lavaan} \citep{rosseel2012} is the standard
+\proglang{R} package for structural equation modelling, taking
+researcher-written syntax and fitting it to a data frame.
+\pkg{surveyframe} sits one step upstream: \code{cfa\_syntax()} writes
+the lavaan measurement model straight from the \code{sframe} scales, so
+the model that gets fitted is the one declared before any data arrived.
 
-\paragraph{jamovi.} The jamovi project \citep{thejamoviproject2022}
-provides a free, open-source GUI for statistical analysis with an
-active \proglang{R} API through \pkg{jmv}. jamovi covers descriptives,
-reliability, EFA, and CFA (via \pkg{lavaan}). It does not provide
-instrument construction, a static HTML survey exporter, or a
-pre-declared analysis plan facility. It is a close analogue for the
-analysis and reporting portion of \pkg{surveyframe}'s workflow.
+\paragraph{jamovi.} jamovi \citep{thejamoviproject2022} is a free,
+open-source statistics GUI with an \proglang{R} API through \pkg{jmv},
+covering descriptives, reliability, EFA, and CFA. It is the closest
+match to the analysis and reporting end of \pkg{surveyframe}, though it
+has no instrument design, static HTML export, or pre-declared analysis
+plan.
 
 %% =========================================================================
 \section{Summary}

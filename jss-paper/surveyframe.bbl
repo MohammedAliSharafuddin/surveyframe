@@ -5,8 +5,7 @@
 \providecommand{\urlprefix}{URL }
 \expandafter\ifx\csname urlstyle\endcsname\relax
   \providecommand{\doi}[1]{doi:\discretionary{}{}{}#1}\else
-  \providecommand{\doi}{doi:\discretionary{}{}{}\begingroup
-  \urlstyle{rm}\Url}\fi
+  \providecommand{\doi}{doi:\discretionary{}{}{}\begingroup \urlstyle{rm}\Url}\fi
 \providecommand{\eprint}[2][]{\url{#2}}
 
 \bibitem[{Cronbach(1951)}]{cronbach1951}
@@ -32,12 +31,10 @@ McDonald RP (1999).
 \newblock \emph{Test Theory: A Unified Treatment}.
 \newblock Lawrence Erlbaum, Mahwah, NJ.
 
-\bibitem[{Nosek \emph{et~al.}(2018)Nosek, Ebersole, DeHaven, and
-  Mellor}]{nosek2018}
+\bibitem[{Nosek \emph{et~al.}(2018)Nosek, Ebersole, DeHaven, and Mellor}]{nosek2018}
 Nosek BA, Ebersole CR, DeHaven AC, Mellor DT (2018).
 \newblock \enquote{The Preregistration Revolution.}
-\newblock \emph{Proceedings of the National Academy of Sciences},
-  \textbf{115}(11), 2600--2606.
+\newblock \emph{Proceedings of the National Academy of Sciences}, \textbf{115}(11), 2600--2606.
 \newblock \doi{10.1073/pnas.1708274114}.
 
 \bibitem[{Nunnally(1978)}]{nunnally1978}
@@ -53,11 +50,9 @@ Nunnally JC (1978).
 
 \bibitem[{Revelle(2024)}]{revelle2024}
 Revelle W (2024).
-\newblock \emph{{psych}: Procedures for Psychological, Psychometric, and
-  Personality Research}.
+\newblock \emph{{psych}: Procedures for Psychological, Psychometric, and Personality Research}.
 \newblock Northwestern University, Evanston, Illinois.
-\newblock {R} package version 2.4.3,
-  \urlprefix\url{https://CRAN.R-project.org/package=psych}.
+\newblock {R} package version 2.4.3, \urlprefix\url{https://CRAN.R-project.org/package=psych}.
 
 \bibitem[{Ringle \emph{et~al.}(2022)Ringle, Wende, and Becker}]{ringleetal2022}
 Ringle CM, Wende S, Becker JM (2022).
@@ -71,11 +66,9 @@ Rosseel Y (2012).
 \newblock \emph{Journal of Statistical Software}, \textbf{48}(2), 1--36.
 \newblock \doi{10.18637/jss.v048.i02}.
 
-\bibitem[{Simmons \emph{et~al.}(2011)Simmons, Nelson, and
-  Simonsohn}]{simmons2011}
+\bibitem[{Simmons \emph{et~al.}(2011)Simmons, Nelson, and Simonsohn}]{simmons2011}
 Simmons JP, Nelson LD, Simonsohn U (2011).
-\newblock \enquote{False-Positive Psychology: Undisclosed Flexibility in Data
-  Collection and Analysis Allows Presenting Anything as Significant.}
+\newblock \enquote{False-Positive Psychology: Undisclosed Flexibility in Data Collection and Analysis Allows Presenting Anything as Significant.}
 \newblock \emph{Psychological Science}, \textbf{22}(11), 1359--1366.
 \newblock \doi{10.1177/0956797611417632}.
 

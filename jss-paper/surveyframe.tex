@@ -16,10 +16,10 @@
 
 \definecolor{fgcolor}{rgb}{0.345, 0.345, 0.345}
 \newcommand{\hlnum}[1]{\textcolor[rgb]{0.686,0.059,0.569}{#1}}%
-\newcommand{\hlstr}[1]{\textcolor[rgb]{0.192,0.494,0.8}{#1}}%
+\newcommand{\hlsng}[1]{\textcolor[rgb]{0.192,0.494,0.8}{#1}}%
 \newcommand{\hlcom}[1]{\textcolor[rgb]{0.678,0.584,0.686}{\textit{#1}}}%
 \newcommand{\hlopt}[1]{\textcolor[rgb]{0,0,0}{#1}}%
-\newcommand{\hlstd}[1]{\textcolor[rgb]{0.345,0.345,0.345}{#1}}%
+\newcommand{\hldef}[1]{\textcolor[rgb]{0.345,0.345,0.345}{#1}}%
 \newcommand{\hlkwa}[1]{\textcolor[rgb]{0.161,0.373,0.58}{\textbf{#1}}}%
 \newcommand{\hlkwb}[1]{\textcolor[rgb]{0.69,0.353,0.396}{#1}}%
 \newcommand{\hlkwc}[1]{\textcolor[rgb]{0.333,0.667,0.333}{#1}}%
@@ -53,11 +53,13 @@
 
 \usepackage{alltt}
 \usepackage{amssymb}
+\usepackage{orcidlink}
 
 %% -- Author information -----------------------------------------------
 
-\author{Mohammed Ali Sharafuddin}
-\Plainauthor{Mohammed Ali Sharafuddin}
+\author{Mohammed Ali Sharafuddin~\orcidlink{0000-0001-5247-2964}\\Villa College, Maldives
+   \And Meena Madhavan~\orcidlink{0000-0003-1244-5392}\\International Maritime College Oman}
+\Plainauthor{Mohammed Ali Sharafuddin, Meena Madhavan}
 
 \title{\pkg{surveyframe}: A Proactive Survey Research Workflow for \proglang{R}}
 \Plaintitle{surveyframe: A Proactive Survey Research Workflow for R}
@@ -115,9 +117,16 @@ survey instrument and response dataset.
 
 \Address{
   Mohammed Ali Sharafuddin\\
-  %% TODO: Add institutional affiliation and address before submission\\
-  E-mail: \email{mohammedali.page@gmail.com}\\
-  ORCID: \href{https://orcid.org/0000-0001-5247-2964}{0000-0001-5247-2964}
+  Qasim Ibrahim School of Business\\
+  Villa College, Mal\'{e} 20373, Maldives\\
+  E-mail: \email{mohammed.ali@villacollege.edu.mv}\\
+  ORCID: \href{https://orcid.org/0000-0001-5247-2964}{0000-0001-5247-2964}\\[1.5ex]
+  Meena Madhavan\\
+  Department of Logistics Management\\
+  International Maritime College Oman (IMCO)\\
+  National University of Science \& Technology\\
+  Falaj Al Qabail, Sohar 322, Oman\\
+  ORCID: \href{https://orcid.org/0000-0003-1244-5392}{0000-0003-1244-5392}
 }
 
 %% -------------------------------------------------------------------------
@@ -313,67 +322,67 @@ the worked example in this article.
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{alltt}
-\hlkwd{library}\hlstd{(}\hlstr{"surveyframe"}\hlstd{)}
+\hlkwd{library}\hldef{(}\hlsng{"surveyframe"}\hldef{)}
 
 \hlcom{## Define a shared 5-point agreement response scale}
-\hlstd{agree5} \hlkwb{<-} \hlkwd{sf_choices}\hlstd{(}
-  \hlkwc{id}     \hlstd{=} \hlstr{"agree5"}\hlstd{,}
-  \hlkwc{values} \hlstd{=} \hlnum{1}\hlopt{:}\hlnum{5}\hlstd{,}
-  \hlkwc{labels} \hlstd{=} \hlkwd{c}\hlstd{(}\hlstr{"Strongly disagree"}\hlstd{,} \hlstr{"Disagree"}\hlstd{,} \hlstr{"Neutral"}\hlstd{,}
-             \hlstr{"Agree"}\hlstd{,} \hlstr{"Strongly agree"}\hlstd{)}
-\hlstd{)}
+\hldef{agree5} \hlkwb{<-} \hlkwd{sf_choices}\hldef{(}
+  \hlkwc{id}     \hldef{=} \hlsng{"agree5"}\hldef{,}
+  \hlkwc{values} \hldef{=} \hlnum{1}\hlopt{:}\hlnum{5}\hldef{,}
+  \hlkwc{labels} \hldef{=} \hlkwd{c}\hldef{(}\hlsng{"Strongly disagree"}\hldef{,} \hlsng{"Disagree"}\hldef{,} \hlsng{"Neutral"}\hldef{,}
+             \hlsng{"Agree"}\hldef{,} \hlsng{"Strongly agree"}\hldef{)}
+\hldef{)}
 
 \hlcom{## Define items: declare scale membership before any data exist}
-\hlstd{dm_1} \hlkwb{<-} \hlkwd{sf_item}\hlstd{(}\hlstr{"dm_1"}\hlstd{,}
-  \hlstr{"Social media content influences my travel decisions."}\hlstd{,}
-  \hlkwc{type} \hlstd{=} \hlstr{"likert"}\hlstd{,} \hlkwc{choice_set} \hlstd{=} \hlstr{"agree5"}\hlstd{,}
-  \hlkwc{scale_id} \hlstd{=} \hlstr{"digital_marketing"}\hlstd{,} \hlkwc{required} \hlstd{=} \hlnum{TRUE}\hlstd{)}
+\hldef{dm_1} \hlkwb{<-} \hlkwd{sf_item}\hldef{(}\hlsng{"dm_1"}\hldef{,}
+  \hlsng{"Social media content influences my travel decisions."}\hldef{,}
+  \hlkwc{type} \hldef{=} \hlsng{"likert"}\hldef{,} \hlkwc{choice_set} \hldef{=} \hlsng{"agree5"}\hldef{,}
+  \hlkwc{scale_id} \hldef{=} \hlsng{"digital_marketing"}\hldef{,} \hlkwc{required} \hldef{=} \hlnum{TRUE}\hldef{)}
 
-\hlstd{dm_2} \hlkwb{<-} \hlkwd{sf_item}\hlstd{(}\hlstr{"dm_2"}\hlstd{,}
-  \hlstr{"Online reviews shape my destination choices."}\hlstd{,}
-  \hlkwc{type} \hlstd{=} \hlstr{"likert"}\hlstd{,} \hlkwc{choice_set} \hlstd{=} \hlstr{"agree5"}\hlstd{,}
-  \hlkwc{scale_id} \hlstd{=} \hlstr{"digital_marketing"}\hlstd{,} \hlkwc{required} \hlstd{=} \hlnum{TRUE}\hlstd{)}
+\hldef{dm_2} \hlkwb{<-} \hlkwd{sf_item}\hldef{(}\hlsng{"dm_2"}\hldef{,}
+  \hlsng{"Online reviews shape my destination choices."}\hldef{,}
+  \hlkwc{type} \hldef{=} \hlsng{"likert"}\hldef{,} \hlkwc{choice_set} \hldef{=} \hlsng{"agree5"}\hldef{,}
+  \hlkwc{scale_id} \hldef{=} \hlsng{"digital_marketing"}\hldef{,} \hlkwc{required} \hldef{=} \hlnum{TRUE}\hldef{)}
 
-\hlstd{dm_3} \hlkwb{<-} \hlkwd{sf_item}\hlstd{(}\hlstr{"dm_3"}\hlstd{,}
-  \hlstr{"Digital promotions encourage me to visit new places."}\hlstd{,}
-  \hlkwc{type} \hlstd{=} \hlstr{"likert"}\hlstd{,} \hlkwc{choice_set} \hlstd{=} \hlstr{"agree5"}\hlstd{,}
-  \hlkwc{scale_id} \hlstd{=} \hlstr{"digital_marketing"}\hlstd{,} \hlkwc{required} \hlstd{=} \hlnum{TRUE}\hlstd{)}
+\hldef{dm_3} \hlkwb{<-} \hlkwd{sf_item}\hldef{(}\hlsng{"dm_3"}\hldef{,}
+  \hlsng{"Digital promotions encourage me to visit new places."}\hldef{,}
+  \hlkwc{type} \hldef{=} \hlsng{"likert"}\hldef{,} \hlkwc{choice_set} \hldef{=} \hlsng{"agree5"}\hldef{,}
+  \hlkwc{scale_id} \hldef{=} \hlsng{"digital_marketing"}\hldef{,} \hlkwc{required} \hldef{=} \hlnum{TRUE}\hldef{)}
 
-\hlstd{sq_1} \hlkwb{<-} \hlkwd{sf_item}\hlstd{(}\hlstr{"sq_1"}\hlstd{,}
-  \hlstr{"The hospitality staff were attentive and helpful."}\hlstd{,}
-  \hlkwc{type} \hlstd{=} \hlstr{"likert"}\hlstd{,} \hlkwc{choice_set} \hlstd{=} \hlstr{"agree5"}\hlstd{,}
-  \hlkwc{scale_id} \hlstd{=} \hlstr{"service_quality"}\hlstd{,} \hlkwc{required} \hlstd{=} \hlnum{TRUE}\hlstd{)}
+\hldef{sq_1} \hlkwb{<-} \hlkwd{sf_item}\hldef{(}\hlsng{"sq_1"}\hldef{,}
+  \hlsng{"The hospitality staff were attentive and helpful."}\hldef{,}
+  \hlkwc{type} \hldef{=} \hlsng{"likert"}\hldef{,} \hlkwc{choice_set} \hldef{=} \hlsng{"agree5"}\hldef{,}
+  \hlkwc{scale_id} \hldef{=} \hlsng{"service_quality"}\hldef{,} \hlkwc{required} \hldef{=} \hlnum{TRUE}\hldef{)}
 
-\hlstd{sq_2} \hlkwb{<-} \hlkwd{sf_item}\hlstd{(}\hlstr{"sq_2"}\hlstd{,}
-  \hlstr{"Facilities were clean and well maintained."}\hlstd{,}
-  \hlkwc{type} \hlstd{=} \hlstr{"likert"}\hlstd{,} \hlkwc{choice_set} \hlstd{=} \hlstr{"agree5"}\hlstd{,}
-  \hlkwc{scale_id} \hlstd{=} \hlstr{"service_quality"}\hlstd{,} \hlkwc{required} \hlstd{=} \hlnum{TRUE}\hlstd{)}
+\hldef{sq_2} \hlkwb{<-} \hlkwd{sf_item}\hldef{(}\hlsng{"sq_2"}\hldef{,}
+  \hlsng{"Facilities were clean and well maintained."}\hldef{,}
+  \hlkwc{type} \hldef{=} \hlsng{"likert"}\hldef{,} \hlkwc{choice_set} \hldef{=} \hlsng{"agree5"}\hldef{,}
+  \hlkwc{scale_id} \hldef{=} \hlsng{"service_quality"}\hldef{,} \hlkwc{required} \hldef{=} \hlnum{TRUE}\hldef{)}
 
-\hlcom{## Define scales <U+2014> scoring rule committed before data collection}
-\hlstd{dm_scale} \hlkwb{<-} \hlkwd{sf_scale}\hlstd{(}
-  \hlkwc{id}     \hlstd{=} \hlstr{"digital_marketing"}\hlstd{,}
-  \hlkwc{label}  \hlstd{=} \hlstr{"Digital marketing effectiveness"}\hlstd{,}
-  \hlkwc{items}  \hlstd{=} \hlkwd{c}\hlstd{(}\hlstr{"dm_1"}\hlstd{,} \hlstr{"dm_2"}\hlstd{,} \hlstr{"dm_3"}\hlstd{),}
-  \hlkwc{method} \hlstd{=} \hlstr{"mean"}
-\hlstd{)}
+\hlcom{## Define scales — scoring rule committed before data collection}
+\hldef{dm_scale} \hlkwb{<-} \hlkwd{sf_scale}\hldef{(}
+  \hlkwc{id}     \hldef{=} \hlsng{"digital_marketing"}\hldef{,}
+  \hlkwc{label}  \hldef{=} \hlsng{"Digital marketing effectiveness"}\hldef{,}
+  \hlkwc{items}  \hldef{=} \hlkwd{c}\hldef{(}\hlsng{"dm_1"}\hldef{,} \hlsng{"dm_2"}\hldef{,} \hlsng{"dm_3"}\hldef{),}
+  \hlkwc{method} \hldef{=} \hlsng{"mean"}
+\hldef{)}
 
-\hlstd{sq_scale} \hlkwb{<-} \hlkwd{sf_scale}\hlstd{(}
-  \hlkwc{id}     \hlstd{=} \hlstr{"service_quality"}\hlstd{,}
-  \hlkwc{label}  \hlstd{=} \hlstr{"Service quality"}\hlstd{,}
-  \hlkwc{items}  \hlstd{=} \hlkwd{c}\hlstd{(}\hlstr{"sq_1"}\hlstd{,} \hlstr{"sq_2"}\hlstd{),}
-  \hlkwc{method} \hlstd{=} \hlstr{"mean"}
-\hlstd{)}
+\hldef{sq_scale} \hlkwb{<-} \hlkwd{sf_scale}\hldef{(}
+  \hlkwc{id}     \hldef{=} \hlsng{"service_quality"}\hldef{,}
+  \hlkwc{label}  \hldef{=} \hlsng{"Service quality"}\hldef{,}
+  \hlkwc{items}  \hldef{=} \hlkwd{c}\hldef{(}\hlsng{"sq_1"}\hldef{,} \hlsng{"sq_2"}\hldef{),}
+  \hlkwc{method} \hldef{=} \hlsng{"mean"}
+\hldef{)}
 
 \hlcom{## Assemble the instrument}
-\hlstd{instr} \hlkwb{<-} \hlkwd{sf_instrument}\hlstd{(}
-  \hlkwc{title}       \hlstd{=} \hlstr{"Tourism Experience Survey"}\hlstd{,}
-  \hlkwc{version}     \hlstd{=} \hlstr{"1.0.0"}\hlstd{,}
-  \hlkwc{description} \hlstd{=} \hlstr{"Digital marketing and service quality perceptions."}\hlstd{,}
-  \hlkwc{authors}     \hlstd{=} \hlstr{"J. Researcher"}\hlstd{,}
-  \hlkwc{components}  \hlstd{=} \hlkwd{list}\hlstd{(agree5, dm_1, dm_2, dm_3, sq_1, sq_2,}
-                     \hlstd{dm_scale, sq_scale)}
-\hlstd{)}
-\hlkwd{print}\hlstd{(instr)}
+\hldef{instr} \hlkwb{<-} \hlkwd{sf_instrument}\hldef{(}
+  \hlkwc{title}       \hldef{=} \hlsng{"Tourism Experience Survey"}\hldef{,}
+  \hlkwc{version}     \hldef{=} \hlsng{"1.0.0"}\hldef{,}
+  \hlkwc{description} \hldef{=} \hlsng{"Digital marketing and service quality perceptions."}\hldef{,}
+  \hlkwc{authors}     \hldef{=} \hlsng{"J. Researcher"}\hldef{,}
+  \hlkwc{components}  \hldef{=} \hlkwd{list}\hldef{(agree5, dm_1, dm_2, dm_3, sq_1, sq_2,}
+                     \hldef{dm_scale, sq_scale)}
+\hldef{)}
+\hlkwd{print}\hldef{(instr)}
 \end{alltt}
 \begin{verbatim}
 ## <sframe>
@@ -401,14 +410,14 @@ problems are returned as a character vector without stopping.
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{alltt}
-\hlstd{result} \hlkwb{<-} \hlkwd{validate_sframe}\hlstd{(instr,} \hlkwc{strict} \hlstd{=} \hlnum{FALSE}\hlstd{)}
-\hlstd{result}\hlopt{$}\hlstd{valid}
+\hldef{result} \hlkwb{<-} \hlkwd{validate_sframe}\hldef{(instr,} \hlkwc{strict} \hldef{=} \hlnum{FALSE}\hldef{)}
+\hldef{result}\hlopt{$}\hldef{valid}
 \end{alltt}
 \begin{verbatim}
 ## [1] TRUE
 \end{verbatim}
 \begin{alltt}
-\hlstd{result}\hlopt{$}\hlstd{problems}
+\hldef{result}\hlopt{$}\hldef{problems}
 \end{alltt}
 \begin{verbatim}
 ## character(0)
@@ -506,12 +515,12 @@ warns if the column types are inconsistent with item definitions.
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{alltt}
-\hlstd{responses} \hlkwb{<-} \hlkwd{read_responses}\hlstd{(}
-  \hlkwc{x}             \hlstd{=} \hlstr{"responses.csv"}\hlstd{,}
-  \hlkwc{instrument}    \hlstd{= instr,}
-  \hlkwc{respondent_id} \hlstd{=} \hlstr{"respondent_id"}\hlstd{,}
-  \hlkwc{submitted_at}  \hlstd{=} \hlstr{"submitted_at"}
-\hlstd{)}
+\hldef{responses} \hlkwb{<-} \hlkwd{read_responses}\hldef{(}
+  \hlkwc{x}             \hldef{=} \hlsng{"responses.csv"}\hldef{,}
+  \hlkwc{instrument}    \hldef{= instr,}
+  \hlkwc{respondent_id} \hldef{=} \hlsng{"respondent_id"}\hldef{,}
+  \hlkwc{submitted_at}  \hldef{=} \hlsng{"submitted_at"}
+\hldef{)}
 \end{alltt}
 \end{kframe}
 \end{knitrout}
@@ -522,24 +531,24 @@ is loaded directly:
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{alltt}
-\hlstd{demo}  \hlkwb{<-} \hlkwd{sframe_demo_data}\hlstd{()}
-\hlstd{instr} \hlkwb{<-} \hlstd{demo}\hlopt{$}\hlstd{instrument}
-\hlstd{resp}  \hlkwb{<-} \hlstd{demo}\hlopt{$}\hlstd{responses}
+\hldef{demo}  \hlkwb{<-} \hlkwd{sframe_demo_data}\hldef{()}
+\hldef{instr} \hlkwb{<-} \hldef{demo}\hlopt{$}\hldef{instrument}
+\hldef{resp}  \hlkwb{<-} \hldef{demo}\hlopt{$}\hldef{responses}
 
 \hlcom{## Five scales, 15 items, 120 respondents}
-\hlkwd{cat}\hlstd{(}\hlstr{"Scales:"}\hlstd{,} \hlkwd{length}\hlstd{(instr}\hlopt{$}\hlstd{scales),} \hlstr{"\textbackslash{}n"}\hlstd{)}
+\hlkwd{cat}\hldef{(}\hlsng{"Scales:"}\hldef{,} \hlkwd{length}\hldef{(instr}\hlopt{$}\hldef{scales),} \hlsng{"\textbackslash{}n"}\hldef{)}
 \end{alltt}
 \begin{verbatim}
 ## Scales: 5
 \end{verbatim}
 \begin{alltt}
-\hlkwd{cat}\hlstd{(}\hlstr{"Items:"}\hlstd{,} \hlkwd{length}\hlstd{(instr}\hlopt{$}\hlstd{items),} \hlstr{"\textbackslash{}n"}\hlstd{)}
+\hlkwd{cat}\hldef{(}\hlsng{"Items:"}\hldef{,} \hlkwd{length}\hldef{(instr}\hlopt{$}\hldef{items),} \hlsng{"\textbackslash{}n"}\hldef{)}
 \end{alltt}
 \begin{verbatim}
 ## Items: 15
 \end{verbatim}
 \begin{alltt}
-\hlkwd{cat}\hlstd{(}\hlstr{"Responses:"}\hlstd{,} \hlkwd{nrow}\hlstd{(resp),} \hlstr{"\textbackslash{}n"}\hlstd{)}
+\hlkwd{cat}\hldef{(}\hlsng{"Responses:"}\hldef{,} \hlkwd{nrow}\hldef{(resp),} \hlsng{"\textbackslash{}n"}\hldef{)}
 \end{alltt}
 \begin{verbatim}
 ## Responses: 120
@@ -580,20 +589,20 @@ constitutes a valid response:
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{alltt}
-\hlstd{qr} \hlkwb{<-} \hlkwd{quality_report}\hlstd{(resp, instr)}
-\hlkwd{cat}\hlstd{(}\hlstr{"Respondents:"}\hlstd{, qr}\hlopt{$}\hlstd{summary}\hlopt{$}\hlstd{n_respondents,} \hlstr{"\textbackslash{}n"}\hlstd{)}
+\hldef{qr} \hlkwb{<-} \hlkwd{quality_report}\hldef{(resp, instr)}
+\hlkwd{cat}\hldef{(}\hlsng{"Respondents:"}\hldef{, qr}\hlopt{$}\hldef{summary}\hlopt{$}\hldef{n_respondents,} \hlsng{"\textbackslash{}n"}\hldef{)}
 \end{alltt}
 \begin{verbatim}
 ## Respondents: 120
 \end{verbatim}
 \begin{alltt}
-\hlkwd{cat}\hlstd{(}\hlstr{"Items:      "}\hlstd{, qr}\hlopt{$}\hlstd{summary}\hlopt{$}\hlstd{n_items,} \hlstr{"\textbackslash{}n"}\hlstd{)}
+\hlkwd{cat}\hldef{(}\hlsng{"Items:      "}\hldef{, qr}\hlopt{$}\hldef{summary}\hlopt{$}\hldef{n_items,} \hlsng{"\textbackslash{}n"}\hldef{)}
 \end{alltt}
 \begin{verbatim}
 ## Items:       15
 \end{verbatim}
 \begin{alltt}
-\hlkwd{cat}\hlstd{(}\hlstr{"Flagged:    "}\hlstd{, qr}\hlopt{$}\hlstd{summary}\hlopt{$}\hlstd{n_flagged,} \hlstr{"\textbackslash{}n"}\hlstd{)}
+\hlkwd{cat}\hldef{(}\hlsng{"Flagged:    "}\hldef{, qr}\hlopt{$}\hldef{summary}\hlopt{$}\hldef{n_flagged,} \hlsng{"\textbackslash{}n"}\hldef{)}
 \end{alltt}
 \begin{verbatim}
 ## Flagged:     109
@@ -615,12 +624,12 @@ threshold receive \code{NA} for that scale.
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{alltt}
-\hlstd{scored} \hlkwb{<-} \hlkwd{score_scales}\hlstd{(resp, instr)}
+\hldef{scored} \hlkwb{<-} \hlkwd{score_scales}\hldef{(resp, instr)}
 \hlcom{## Scale score columns appended to the response data frame}
-\hlstd{scale_cols} \hlkwb{<-} \hlkwd{c}\hlstd{(}\hlstr{"digital_marketing"}\hlstd{,} \hlstr{"service_quality"}\hlstd{,}
-                \hlstr{"sustainability"}\hlstd{,} \hlstr{"satisfaction"}\hlstd{,}
-                \hlstr{"behavioural_intention"}\hlstd{)}
-\hlkwd{summary}\hlstd{(scored[, scale_cols])}
+\hldef{scale_cols} \hlkwb{<-} \hlkwd{c}\hldef{(}\hlsng{"digital_marketing"}\hldef{,} \hlsng{"service_quality"}\hldef{,}
+                \hlsng{"sustainability"}\hldef{,} \hlsng{"satisfaction"}\hldef{,}
+                \hlsng{"behavioural_intention"}\hldef{)}
+\hlkwd{summary}\hldef{(scored[, scale_cols])}
 \end{alltt}
 \begin{verbatim}
 ##  digital_marketing service_quality sustainability  satisfaction 
@@ -652,10 +661,10 @@ when available. The function reads scale definitions directly from the
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{alltt}
-\hlkwa{if} \hlstd{(}\hlkwd{requireNamespace}\hlstd{(}\hlstr{"psych"}\hlstd{,} \hlkwc{quietly} \hlstd{=} \hlnum{TRUE}\hlstd{)) \{}
-  \hlstd{rr} \hlkwb{<-} \hlkwd{reliability_report}\hlstd{(resp, instr,} \hlkwc{omega} \hlstd{=} \hlnum{FALSE}\hlstd{)}
-  \hlkwd{print}\hlstd{(rr)}
-\hlstd{\}}
+\hlkwa{if} \hldef{(}\hlkwd{requireNamespace}\hldef{(}\hlsng{"psych"}\hldef{,} \hlkwc{quietly} \hldef{=} \hlnum{TRUE}\hldef{)) \{}
+  \hldef{rr} \hlkwb{<-} \hlkwd{reliability_report}\hldef{(resp, instr,} \hlkwc{omega} \hldef{=} \hlnum{FALSE}\hldef{)}
+  \hlkwd{print}\hldef{(rr)}
+\hldef{\}}
 \end{alltt}
 \begin{verbatim}
 ## Reliability Report
@@ -716,8 +725,8 @@ indicators. The output is ready to pass to \code{lavaan::cfa()} when
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{alltt}
-\hlstd{syn} \hlkwb{<-} \hlkwd{cfa_syntax}\hlstd{(instr)}
-\hlkwd{cat}\hlstd{(syn)}
+\hldef{syn} \hlkwb{<-} \hlkwd{cfa_syntax}\hldef{(instr)}
+\hlkwd{cat}\hldef{(syn)}
 \end{alltt}
 \begin{verbatim}
 ## # lavaan CFA syntax generated by surveyframe
@@ -761,30 +770,30 @@ template that the researcher completes:
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{alltt}
-\hlstd{results} \hlkwb{<-} \hlkwd{run_analysis_plan}\hlstd{(resp, instr,} \hlkwc{scored} \hlstd{=} \hlnum{TRUE}\hlstd{)}
+\hldef{results} \hlkwb{<-} \hlkwd{run_analysis_plan}\hldef{(resp, instr,} \hlkwc{scored} \hldef{=} \hlnum{TRUE}\hldef{)}
 
 \hlcom{## Correlation: digital marketing and satisfaction}
-\hlstd{r1} \hlkwb{<-} \hlstd{results[[}\hlnum{1}\hlstd{]]}
-\hlkwd{cat}\hlstd{(}\hlstr{"Test:  "}\hlstd{, r1}\hlopt{$}\hlstd{test,} \hlstr{"\textbackslash{}n"}\hlstd{)}
+\hldef{r1} \hlkwb{<-} \hldef{results[[}\hlnum{1}\hldef{]]}
+\hlkwd{cat}\hldef{(}\hlsng{"Test:  "}\hldef{, r1}\hlopt{$}\hldef{test,} \hlsng{"\textbackslash{}n"}\hldef{)}
 \end{alltt}
 \begin{verbatim}
 ## Test:   correlation_pearson
 \end{verbatim}
 \begin{alltt}
-\hlkwd{cat}\hlstd{(}\hlstr{"APA:   "}\hlstd{, r1}\hlopt{$}\hlstd{apa,} \hlstr{"\textbackslash{}n"}\hlstd{)}
+\hlkwd{cat}\hldef{(}\hlsng{"APA:   "}\hldef{, r1}\hlopt{$}\hldef{apa,} \hlsng{"\textbackslash{}n"}\hldef{)}
 \end{alltt}
 \begin{verbatim}
 ## APA:    r(118) = 0.54, p < .001
 \end{verbatim}
 \begin{alltt}
-\hlkwd{cat}\hlstd{(}\hlstr{"Effect:"}\hlstd{, r1}\hlopt{$}\hlstd{effect_label,} \hlstr{"\textbackslash{}n"}\hlstd{)}
+\hlkwd{cat}\hldef{(}\hlsng{"Effect:"}\hldef{, r1}\hlopt{$}\hldef{effect_label,} \hlsng{"\textbackslash{}n"}\hldef{)}
 \end{alltt}
 \begin{verbatim}
 ## Effect: large
 \end{verbatim}
 \begin{alltt}
-\hlkwd{cat}\hlstd{(}\hlstr{"Q:"}\hlstd{,} \hlkwd{strwrap}\hlstd{(r1}\hlopt{$}\hlstd{research_question,} \hlkwc{width} \hlstd{=} \hlnum{58}\hlstd{,}
-                  \hlkwc{exdent} \hlstd{=} \hlnum{3}\hlstd{),} \hlkwc{sep} \hlstd{=} \hlstr{"\textbackslash{}n    "}\hlstd{)}
+\hlkwd{cat}\hldef{(}\hlsng{"Q:"}\hldef{,} \hlkwd{strwrap}\hldef{(r1}\hlopt{$}\hldef{research_question,} \hlkwc{width} \hldef{=} \hlnum{58}\hldef{,}
+                  \hlkwc{exdent} \hldef{=} \hlnum{3}\hldef{),} \hlkwc{sep} \hldef{=} \hlsng{"\textbackslash{}n    "}\hldef{)}
 \end{alltt}
 \begin{verbatim}
 ## Q:
@@ -792,7 +801,7 @@ template that the researcher completes:
 ##        with tourist satisfaction?
 \end{verbatim}
 \begin{alltt}
-\hlkwd{cat}\hlstd{(}\hlstr{"\textbackslash{}n"}\hlstd{)}
+\hlkwd{cat}\hldef{(}\hlsng{"\textbackslash{}n"}\hldef{)}
 \end{alltt}
 \end{kframe}
 \end{knitrout}
@@ -808,17 +817,17 @@ The second analysis block in the bundled plan is a multiple regression:
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{alltt}
-\hlstd{r2} \hlkwb{<-} \hlstd{results[[}\hlnum{2}\hlstd{]]}
-\hlkwd{cat}\hlstd{(}\hlstr{"Test:"}\hlstd{, r2}\hlopt{$}\hlstd{test,} \hlstr{"\textbackslash{}n"}\hlstd{)}
+\hldef{r2} \hlkwb{<-} \hldef{results[[}\hlnum{2}\hldef{]]}
+\hlkwd{cat}\hldef{(}\hlsng{"Test:"}\hldef{, r2}\hlopt{$}\hldef{test,} \hlsng{"\textbackslash{}n"}\hldef{)}
 \end{alltt}
 \begin{verbatim}
 ## Test: regression_linear
 \end{verbatim}
 \begin{alltt}
-\hlkwd{cat}\hlstd{(}\hlstr{"APA: "}\hlstd{, r2}\hlopt{$}\hlstd{apa,} \hlstr{"\textbackslash{}n"}\hlstd{)}
+\hlkwd{cat}\hldef{(}\hlsng{"APA: "}\hldef{, r2}\hlopt{$}\hldef{apa,} \hlsng{"\textbackslash{}n"}\hldef{)}
 \end{alltt}
 \begin{verbatim}
-## APA:  R<U+00B2> = 0.383, F(3, 116) = 23.95, p < .001
+## APA:  R² = 0.383, F(3, 116) = 23.95, p < .001
 \end{verbatim}
 \end{kframe}
 \end{knitrout}
@@ -831,20 +840,20 @@ because \code{visit\_type} is a binary categorical predictor and
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{alltt}
-\hlstd{r3} \hlkwb{<-} \hlstd{results[[}\hlnum{3}\hlstd{]]}
-\hlkwd{cat}\hlstd{(}\hlstr{"Test:"}\hlstd{, r3}\hlopt{$}\hlstd{test,} \hlstr{"\textbackslash{}n"}\hlstd{)}
+\hldef{r3} \hlkwb{<-} \hldef{results[[}\hlnum{3}\hldef{]]}
+\hlkwd{cat}\hldef{(}\hlsng{"Test:"}\hldef{, r3}\hlopt{$}\hldef{test,} \hlsng{"\textbackslash{}n"}\hldef{)}
 \end{alltt}
 \begin{verbatim}
 ## Test: mann_whitney
 \end{verbatim}
 \begin{alltt}
-\hlkwd{cat}\hlstd{(}\hlstr{"APA: "}\hlstd{, r3}\hlopt{$}\hlstd{apa,} \hlstr{"\textbackslash{}n"}\hlstd{)}
+\hlkwd{cat}\hldef{(}\hlsng{"APA: "}\hldef{, r3}\hlopt{$}\hldef{apa,} \hlsng{"\textbackslash{}n"}\hldef{)}
 \end{alltt}
 \begin{verbatim}
 ## APA:  U = 1576, z = -0.98, p = 0.327, r = 0.09
 \end{verbatim}
 \begin{alltt}
-\hlkwd{cat}\hlstd{(}\hlstr{"Effect:"}\hlstd{, r3}\hlopt{$}\hlstd{effect_label,} \hlstr{"\textbackslash{}n"}\hlstd{)}
+\hlkwd{cat}\hldef{(}\hlsng{"Effect:"}\hldef{, r3}\hlopt{$}\hldef{effect_label,} \hlsng{"\textbackslash{}n"}\hldef{)}
 \end{alltt}
 \begin{verbatim}
 ## Effect: negligible
@@ -890,14 +899,14 @@ in supplementary materials or ethics board submissions.
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{alltt}
-\hlstd{cb} \hlkwb{<-} \hlkwd{codebook_report}\hlstd{(instr)}
-\hlkwd{nrow}\hlstd{(cb}\hlopt{$}\hlstd{items_table)}
+\hldef{cb} \hlkwb{<-} \hlkwd{codebook_report}\hldef{(instr)}
+\hlkwd{nrow}\hldef{(cb}\hlopt{$}\hldef{items_table)}
 \end{alltt}
 \begin{verbatim}
 ## [1] 15
 \end{verbatim}
 \begin{alltt}
-\hlkwd{head}\hlstd{(cb}\hlopt{$}\hlstd{items_table[,} \hlkwd{c}\hlstd{(}\hlstr{"id"}\hlstd{,} \hlstr{"type"}\hlstd{,} \hlstr{"scale_id"}\hlstd{,} \hlstr{"reverse"}\hlstd{)],} \hlnum{6}\hlstd{)}
+\hlkwd{head}\hldef{(cb}\hlopt{$}\hldef{items_table[,} \hlkwd{c}\hldef{(}\hlsng{"id"}\hldef{,} \hlsng{"type"}\hldef{,} \hlsng{"scale_id"}\hldef{,} \hlsng{"reverse"}\hldef{)],} \hlnum{6}\hldef{)}
 \end{alltt}
 \begin{verbatim}
 ##           id          type          scale_id reverse
@@ -969,43 +978,33 @@ instrument before data collection. This is the feature that most
 directly addresses the reproducibility concerns outlined in
 Section~\ref{sec:intro}.
 
-\paragraph{SPSS.} IBM SPSS Statistics \citep{ibm2023} provides a
-comprehensive GUI-based analysis environment widely used in social
-science and management research. SPSS includes survey collection tools
-(through associated products), reliability analysis, factor analysis,
-and regression. It does not provide \proglang{R}-native scripting,
-open-source licensing, or an instrument-first workflow. Annual
-licensing costs are substantial, creating access barriers for
-individual researchers and lower-income institution contexts.
+\paragraph{SPSS.} SPSS \citep{ibm2023} is the GUI workhorse of much
+social science and management research, with reliability analysis,
+factor analysis, and regression long built in. It offers no
+\proglang{R}-native scripting and no instrument-first workflow, and its
+licence fees keep it out of reach for many individual researchers and
+lower-income institutions.
 
-\paragraph{SmartPLS.} SmartPLS \citep{ringleetal2022} specialises in
-partial least squares structural equation modelling (PLS-SEM). It is
-widely adopted in management research, particularly for formative
-constructs and small sample sizes. SmartPLS does not support instrument
-construction, pre-declared analysis plans, or open-source access. It
-has no \proglang{R} API. Analyses are performed through its own
-proprietary interface. CB-SEM and lavaan CFA are outside its scope.
-PLS-SEM execution is on the \pkg{surveyframe} development roadmap,
-with syntax generation for \pkg{seminr} already available in v0.3.0.
+\paragraph{SmartPLS.} SmartPLS \citep{ringleetal2022} is the popular
+proprietary home of PLS-SEM, favoured in management research for
+formative constructs and small samples. Everything happens inside its
+own interface, with no \proglang{R} API and no way to declare the
+instrument or the analysis plan up front. \pkg{surveyframe} already
+writes \pkg{seminr} syntax for PLS-SEM, and fitting is on its roadmap.
 
-\paragraph{lavaan.} The \pkg{lavaan} package \citep{rosseel2012} is the
-standard \proglang{R} tool for structural equation modelling. It
-accepts model syntax defined by the researcher and operates on existing
-data frames. \pkg{surveyframe} complements rather than competes with
-\pkg{lavaan}: the \code{cfa\_syntax()} function generates lavaan syntax
-directly from the \code{sframe}'s scale definitions, providing the
-measurement model specification that the researcher then passes to
-\pkg{lavaan}. The critical difference is that \pkg{surveyframe}
-constrains the CFA to the constructs declared before data collection.
-\pkg{lavaan} itself imposes no such constraint.
+\paragraph{lavaan.} \pkg{lavaan} \citep{rosseel2012} is the standard
+\proglang{R} package for structural equation modelling, taking
+researcher-written syntax and fitting it to a data frame.
+\pkg{surveyframe} sits one step upstream: \code{cfa\_syntax()} writes
+the lavaan measurement model straight from the \code{sframe} scales, so
+the model that gets fitted is the one declared before any data arrived.
 
-\paragraph{jamovi.} The jamovi project \citep{thejamoviproject2022}
-provides a free, open-source GUI for statistical analysis with an
-active \proglang{R} API through \pkg{jmv}. jamovi covers descriptives,
-reliability, EFA, and CFA (via \pkg{lavaan}). It does not provide
-instrument construction, a static HTML survey exporter, or a
-pre-declared analysis plan facility. It is a close analogue for the
-analysis and reporting portion of \pkg{surveyframe}'s workflow.
+\paragraph{jamovi.} jamovi \citep{thejamoviproject2022} is a free,
+open-source statistics GUI with an \proglang{R} API through \pkg{jmv},
+covering descriptives, reliability, EFA, and CFA. It is the closest
+match to the analysis and reporting end of \pkg{surveyframe}, though it
+has no instrument design, static HTML export, or pre-declared analysis
+plan.
 
 %% =========================================================================
 \section{Summary}
@@ -1057,26 +1056,27 @@ tracker are available at
 
 \begin{kframe}
 \begin{alltt}
-\hlkwd{toLatex}\hlstd{(}\hlkwd{sessionInfo}\hlstd{())}
+\hlkwd{toLatex}\hldef{(}\hlkwd{sessionInfo}\hldef{())}
 \end{alltt}
 \end{kframe}\begin{itemize}\raggedright
-  \item R version 4.3.3 (2024-02-29), \verb|x86_64-pc-linux-gnu|
-  \item Locale: \verb|C|
-  \item Time zone: \verb|Etc/UTC|
+  \item R version 4.6.0 (2026-04-24), \verb|x86_64-pc-linux-gnu|
+  \item Locale: \verb|LC_CTYPE=en_GB.UTF-8|, \verb|LC_NUMERIC=C|, \verb|LC_TIME=en_IN.UTF-8|, \verb|LC_COLLATE=en_GB.UTF-8|, \verb|LC_MONETARY=en_IN.UTF-8|, \verb|LC_MESSAGES=en_GB.UTF-8|, \verb|LC_PAPER=en_IN.UTF-8|, \verb|LC_NAME=C|, \verb|LC_ADDRESS=C|, \verb|LC_TELEPHONE=C|, \verb|LC_MEASUREMENT=en_IN.UTF-8|, \verb|LC_IDENTIFICATION=C|
+  \item Time zone: \verb|Asia/Kolkata|
   \item TZcode source: \verb|system (glibc)|
   \item Running under: \verb|Ubuntu 24.04.4 LTS|
   \item Matrix products: default
   \item BLAS:   \verb|/usr/lib/x86_64-linux-gnu/blas/libblas.so.3.12.0|
   \item LAPACK: \verb|/usr/lib/x86_64-linux-gnu/lapack/liblapack.so.3.12.0|
-  \item Base packages: base, datasets, grDevices,
-    graphics, methods, stats, utils
-  \item Other packages: knitr~1.45, surveyframe~0.3.1
+  \item Base packages: base, datasets, graphics,
+    grDevices, methods, stats, utils
+  \item Other packages: knitr~1.51, surveyframe~0.3.1
   \item Loaded via a namespace (and not attached):
-    askpass~1.2.0, cli~3.6.2, compiler~4.3.3,
-    evaluate~0.23, grid~4.3.3, highr~0.10,
-    jsonlite~1.8.8, lattice~0.22-5, mnormt~2.1.1,
-    nlme~3.1-164, openssl~2.1.1, parallel~4.3.3,
-    psych~2.4.1, rlang~1.1.3, tools~4.3.3, xfun~0.41
+    askpass~1.2.1, cli~3.6.6, compiler~4.6.0,
+    evaluate~1.0.5, grid~4.6.0, highr~0.12,
+    jsonlite~2.0.0, lattice~0.22-9, mnormt~2.1.2,
+    nlme~3.1-169, openssl~2.4.0, otel~0.2.0,
+    parallel~4.6.0, psych~2.6.3, rlang~1.2.0,
+    tools~4.6.0, xfun~0.57
 \end{itemize}
 
 
