@@ -42,7 +42,7 @@ statistics, EFA suitability diagnostics (KMO, Bartlett), lavaan CFA
 syntax generation, a pre-declared analysis plan executor producing
 APA-formatted results and interpretation prompts, and reproducible HTML
 report generation. All core functions are available without optional
-dependencies; statistical extensions activate gracefully when
+dependencies. Statistical extensions activate gracefully when
 \pkg{psych} or \pkg{lavaan} are installed.
 
 This article describes the design philosophy, the package architecture,
@@ -126,7 +126,7 @@ an SHA-256 hash over the entire specification is stored alongside it.
 If the instrument is later modified after data collection, the stored
 hash provides an auditable record of the change.
 
-This design is not a policy mechanism; researchers can always construct
+This design is not a policy mechanism. Researchers can always construct
 new analysis objects to run additional tests. What it provides is
 \emph{visibility}: the pre-declared analysis is clearly separated from
 any post-hoc exploration, making the distinction legible in both the
@@ -210,7 +210,7 @@ An \code{sframe} object is a named list with eight typed slots:
 The \code{sframe} is constructed via the \code{sf\_instrument()}
 function, which accepts a \code{components} list of objects produced
 by the \code{sf\_} constructor family. Components are sorted into their
-respective slots automatically; passing a non-constructor object raises
+respective slots automatically. Passing a non-constructor object raises
 a validation error.
 
 \subsection{Integrity and serialisation}
@@ -371,7 +371,7 @@ An \code{sframe} optionally carries a pre-declared analysis plan as a
 list of analysis blocks in the \code{analysis\_plan} slot. Blocks
 specify the statistical test type, variable roles, options (e.g.,
 $\alpha$ level), and decision rules. The bundled demonstration
-instrument includes a full plan; the worked example in
+instrument includes a full plan. The worked example in
 Section~\ref{sec:analysis} runs it.
 
 Analysis plans can be authored either programmatically or through the
@@ -414,7 +414,7 @@ installation is required on the respondent's machine.
 editor. Researchers who prefer a graphical interface can build the
 complete \code{sframe} (items, choice sets, scales, branching rules,
 and analysis plan) without writing \proglang{R} code. The builder
-exports the completed \code{.sframe} file; the file is imported into
+exports the completed \code{.sframe} file. The file is imported into
 \proglang{R} with \code{read\_sframe()} for analysis.
 
 \subsection{Shiny survey module}
@@ -499,7 +499,7 @@ cat("Flagged:    ", qr$summary$n_flagged, "\n")
 respondent according to the scoring rules declared in the
 \code{sframe}. Reverse coding is applied automatically using either
 the per-item \code{reverse} flag in \code{sf\_item()} or the
-\code{reverse\_items} vector in \code{sf\_scale()}; both sources are
+\code{reverse\_items} vector in \code{sf\_scale()}. Both sources are
 respected. The \code{min\_valid} argument controls missingness
 tolerance: respondents with fewer valid items than the declared
 threshold receive \code{NA} for that scale.
@@ -564,7 +564,7 @@ cat(syn)
 @
 
 The syntax encodes the measurement model declared before data
-collection. Because the construct--indicator relationships were
+collection. Because the construct-indicator relationships were
 specified in \code{sf\_scale()} at instrument construction time, the
 CFA tests a pre-declared structure rather than one selected after
 inspecting inter-item correlations.
@@ -593,7 +593,7 @@ cat("\n")
 
 The \code{prompt} field explicitly signals that the interpretation is
 the researcher's responsibility: \pkg{surveyframe} provides the
-statistic and its label; the researcher supplies the substantive
+statistic and its label. The researcher supplies the substantive
 interpretation. This design discourages the conflation of statistical
 and practical significance that is endemic in automated reporting tools.
 
@@ -673,7 +673,7 @@ principal existing tools for survey-based quantitative research.
 \begin{table}[t]
 \centering
 \caption{Comparison of \pkg{surveyframe} with related software.
-  \checkmark~= available; -- = not available; P = planned.}
+  \checkmark~= available, $\times$~= not available, P = planned.}
 \label{tab:comparison}
 \vspace{0.5em}
 \footnotesize
@@ -687,22 +687,22 @@ SmartPLS &
 jamovi &
 Qualtrics \\
 \hline
-Instrument construction     & \checkmark & \checkmark & -- & -- & -- & \checkmark \\
-Pre-declared analysis plan  & \checkmark & --  & --  & -- & -- & -- \\
-SHA-256 instrument hash     & \checkmark & --  & --  & -- & -- & -- \\
-Static HTML survey export   & \checkmark & --  & --  & -- & -- & -- \\
-Shiny survey module         & \checkmark & --  & --  & -- & -- & -- \\
-Scale scoring (mean/sum)    & \checkmark & \checkmark & \checkmark & -- & \checkmark & -- \\
-Reliability ($\alpha$, $\omega$) & \checkmark & \checkmark & \checkmark & -- & \checkmark & -- \\
-EFA suitability (KMO, Bartlett) & \checkmark & \checkmark & -- & -- & \checkmark & -- \\
-CFA syntax generation       & \checkmark & -- & -- & \checkmark & \checkmark & -- \\
-CB-SEM execution            & P & \checkmark & -- & \checkmark & \checkmark & -- \\
-PLS-SEM execution           & P & -- & \checkmark & -- & -- & -- \\
-APA results with citations  & \checkmark & -- & -- & -- & -- & -- \\
-HTML report generation      & \checkmark & -- & -- & -- & \checkmark & \checkmark \\
-CRAN open source            & \checkmark & -- & -- & \checkmark & \checkmark & -- \\
-Self-hostable               & \checkmark & -- & -- & \checkmark & \checkmark & -- \\
-No external calls           & \checkmark & \checkmark & \checkmark & \checkmark & \checkmark & -- \\
+Instrument construction     & \checkmark & \checkmark & $\times$ & $\times$ & $\times$ & \checkmark \\
+Pre-declared analysis plan  & \checkmark & $\times$ & $\times$ & $\times$ & $\times$ & $\times$ \\
+SHA-256 instrument hash     & \checkmark & $\times$ & $\times$ & $\times$ & $\times$ & $\times$ \\
+Static HTML survey export   & \checkmark & $\times$ & $\times$ & $\times$ & $\times$ & $\times$ \\
+Shiny survey module         & \checkmark & $\times$ & $\times$ & $\times$ & $\times$ & $\times$ \\
+Scale scoring (mean/sum)    & \checkmark & \checkmark & \checkmark & $\times$ & \checkmark & $\times$ \\
+Reliability ($\alpha$, $\omega$) & \checkmark & \checkmark & \checkmark & $\times$ & \checkmark & $\times$ \\
+EFA suitability (KMO, Bartlett) & \checkmark & \checkmark & $\times$ & $\times$ & \checkmark & $\times$ \\
+CFA syntax generation       & \checkmark & $\times$ & $\times$ & \checkmark & \checkmark & $\times$ \\
+CB-SEM execution            & P & \checkmark & $\times$ & \checkmark & \checkmark & $\times$ \\
+PLS-SEM execution           & P & $\times$ & \checkmark & $\times$ & $\times$ & $\times$ \\
+APA results with citations  & \checkmark & $\times$ & $\times$ & $\times$ & $\times$ & $\times$ \\
+HTML report generation      & \checkmark & $\times$ & $\times$ & $\times$ & \checkmark & \checkmark \\
+CRAN open source            & \checkmark & $\times$ & $\times$ & \checkmark & \checkmark & $\times$ \\
+Self-hostable               & \checkmark & $\times$ & $\times$ & \checkmark & \checkmark & $\times$ \\
+No external calls           & \checkmark & \checkmark & \checkmark & \checkmark & \checkmark & $\times$ \\
 \hline
 \end{tabular}
 \end{table}
@@ -710,7 +710,7 @@ No external calls           & \checkmark & \checkmark & \checkmark & \checkmark 
 \pkg{surveyframe}'s primary distinction is the \emph{proactive}
 architecture: instrument construction, analysis plan declaration, and
 data collection are strictly ordered. All other tools in
-Table~\ref{tab:comparison} operate on data that already exist; none
+Table~\ref{tab:comparison} operate on data that already exist. None
 require or provide mechanisms for encoding the analysis plan in the
 instrument before data collection. This is the feature that most
 directly addresses the reproducibility concerns outlined in
@@ -730,7 +730,7 @@ partial least squares structural equation modelling (PLS-SEM). It is
 widely adopted in management research, particularly for formative
 constructs and small sample sizes. SmartPLS does not support instrument
 construction, pre-declared analysis plans, or open-source access. It
-has no \proglang{R} API; analyses are performed through its own
+has no \proglang{R} API. Analyses are performed through its own
 proprietary interface. CB-SEM and lavaan CFA are outside its scope.
 PLS-SEM execution is on the \pkg{surveyframe} development roadmap,
 with syntax generation for \pkg{seminr} already available in v0.3.0.
@@ -743,7 +743,7 @@ data frames. \pkg{surveyframe} complements rather than competes with
 directly from the \code{sframe}'s scale definitions, providing the
 measurement model specification that the researcher then passes to
 \pkg{lavaan}. The critical difference is that \pkg{surveyframe}
-constrains the CFA to the constructs declared before data collection;
+constrains the CFA to the constructs declared before data collection.
 \pkg{lavaan} itself imposes no such constraint.
 
 \paragraph{jamovi.} The jamovi project \citep{thejamoviproject2022}
