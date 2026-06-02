@@ -153,9 +153,11 @@ software prose humanised, compiled to 17 pages, checked against the JSS author
 and style guides. It lives in `jss-paper/` on this dev branch. The submission
 package is the PDF, the surveyframe_0.3.1 tarball, and `replicate.R`.
 
+The JSS paper was submitted on 2026-06-02 (OJS submission 6454). Awaiting the
+editorial decision.
+
 Open items:
 
-- Upload the JSS paper to jstatsoft.org (author action).
 - Confirm or remove the Codecov badge in the README.
 - After CRAN accepts 0.3.1, trigger the pkgdown build.
 - Future patch, not 0.3.1: guard the launcher `\donttest` examples
