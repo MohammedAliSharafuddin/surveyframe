@@ -240,34 +240,34 @@ Deferred to a later 0.3.x doc pass (not yet applied, low effort, no code risk):
 Test suite: 368 tests passing (was 354 at 0.3.0; the 14 new tests are in
 tests/testthat/test-0.3.1-fixes.R covering fixes A through F).
 
-## Before submitting 0.3.1 to CRAN
+## 0.3.1 SUBMITTED to CRAN on 2026-06-02
 
-The following must be completed before running R CMD check --as-cran and
-uploading to https://cran.r-project.org/submit.html.
+Submitted. Awaiting CRAN's decision email. Status of the pre-submission checks:
 
-#### Blocking
+#### Blocking (all cleared)
 
-- [ ] **Run R CMD check --as-cran on surveyframe_0.3.1.tar.gz** and confirm
-      0 errors, 0 warnings. A fresh check is required because the serialisation
-      fix and the onboarding fixes landed after the last full check attempt
-      (which was interrupted). devtools::test() passes 368/368 and all six
-      vignettes knit cleanly against the reinstalled package. Expected from the
-      full check: 1 NOTE only (CRAN incoming feasibility, "Days since last
-      update").
-- [ ] **Win-builder test**: upload surveyframe_0.3.1.tar.gz to
-      https://win-builder.r-project.org/ and confirm 0 errors, 0 warnings.
-- [ ] **Update cran-comments.md** with actual check results from both
-      platforms before uploading. File is at the repo root (gitignored).
-- [ ] **Codecov badge**: confirm the repository is connected at
-      https://app.codecov.io/gh/MohammedAliSharafuddin/surveyframe.
-      If not active, remove the Codecov badge from README.md to avoid a
-      broken badge on CRAN.
+- [x] **R CMD check --as-cran on surveyframe_0.3.1.tar.gz**: 0 errors, 0
+      warnings, 1 NOTE on local Ubuntu (R 4.6.0). The NOTE is the incoming
+      feasibility short-update-interval note. 368 tests pass, all vignettes
+      knit. One local quirk: a full check that runs donttest examples hangs on
+      the launch_dashboard() Shiny launcher, so the clean local check was run
+      with _R_CHECK_DONTTEST_EXAMPLES_=FALSE, matching win-builder and CRAN
+      incoming. The launcher donttest examples are a future-patch cleanup, not a
+      blocker (0.3.0 shipped them identically).
+- [x] **Win-builder**: R-release and R-devel, both 0 errors, 0 warnings, 1 NOTE.
+- [x] **cran-comments.md** updated with the verified results and the
+      update-interval justification. Pasted a focused version into the CRAN
+      comment field.
+- [ ] **Codecov badge**: still to confirm or remove. Not a submission blocker.
 
 #### Non-blocking but recommended before submission
 
-- [ ] **JSS paper institutional address**: fill in the \Address{} block
-      in jss-paper/surveyframe.Rnw (marked with %% TODO) before submitting
-      to the Journal of Statistical Software.
+- [x] **JSS paper ready**: \Address{} filled with both authors (Sharafuddin and
+      Madhavan), affiliations, and ORCID. orcidlink icons in the author block.
+      Software-comparison prose humanised. Compiled to 17 pages, 0 LaTeX errors,
+      checked against the JSS author and style guides. Submission package is the
+      PDF, the surveyframe_0.3.1 tarball, and replicate.R. Pending the author's
+      upload to jstatsoft.org.
 - [ ] **GitHub social preview**: manually upload
       .github/surveyframe-github-social.png via GitHub Settings >
       Social preview on the repository page.

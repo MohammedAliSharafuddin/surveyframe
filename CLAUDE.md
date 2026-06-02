@@ -144,16 +144,25 @@ feasibility). The vignette builds offline because the data-collection step uses
 
 ## Current status and immediate next steps
 
-0.3.1 is feature-complete in the working tree. Before submission:
+0.3.1 was submitted to CRAN on 2026-06-02. R CMD check is clean (0 errors, 0
+warnings, 1 NOTE) on local Ubuntu and win-builder R-release and R-devel. Awaiting
+CRAN's decision email.
 
-- Run a full `R CMD check --as-cran` on the final tarball and confirm 0 errors
-  and 0 warnings.
-- Test on win-builder and one more platform.
-- Confirm the Codecov badge resolves or remove it from the README.
-- Update `cran-comments.md` with the actual check results, then submit.
+The JSS paper is ready for submission: two authors with affiliations and ORCID,
+software prose humanised, compiled to 17 pages, checked against the JSS author
+and style guides. It lives in `jss-paper/` on this dev branch. The submission
+package is the PDF, the surveyframe_0.3.1 tarball, and `replicate.R`.
 
-The full task list is in `revision_todo_0.3.md`. The version and growth plan is
-in `roadmap.md`.
+Open items:
+
+- Upload the JSS paper to jstatsoft.org (author action).
+- Confirm or remove the Codecov badge in the README.
+- After CRAN accepts 0.3.1, trigger the pkgdown build.
+- Future patch, not 0.3.1: guard the launcher `\donttest` examples
+  (launch_dashboard and similar) so a check that runs donttest does not hang.
+
+Commit messages no longer use a co-author trailer. The full task list is in
+`revision_todo_0.3.md`. The version and growth plan is in `roadmap.md`.
 
 ---
 
