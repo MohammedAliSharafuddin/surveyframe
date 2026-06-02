@@ -4,8 +4,9 @@
 
 This is a patch release. No new exported functions, no new statistical methods,
 and no new bundled datasets. The release fixes six defects on the static-survey
-to Google Sheets to R round-trip, and rewrites the main vignette as a worked
-study.
+to Google Sheets to R round-trip, repairs a serialisation hash mismatch for
+instruments built with named component lists, improves the first-time error
+messages, and rewrites the main vignette as a worked study.
 
 ## Bug fixes in this release
 
@@ -22,32 +23,44 @@ study.
 6. Survey logos now keep their original MIME type so JPEG and GIF logos
    display correctly in the builder, the Shiny renderer, and the static export.
 
+A serialisation defect is also fixed: `write_sframe()` now unnames the component
+lists before serialisation, so instruments built with named lists round-trip
+without an integrity-check hash mismatch on `read_sframe()`.
+
 ## Test environments
 
-- Local: Ubuntu 24.04 x86_64, R 4.5.0
-- Local: Windows 11 x64, R 4.5.2 ucrt
-- win-builder: r-devel-windows-x86_64
+- Local: Ubuntu 24.04 x86_64, R 4.6.0
+- win-builder: R-release (R 4.6.0, x86_64-w64-mingw32)
+- win-builder: R-devel (x86_64-w64-mingw32)
+
+The macOS builder at mac.r-project.org was unavailable at submission time. R-hub
+on GitHub Actions was used for the macOS check.
 
 ## R CMD check results
 
-`R CMD check --as-cran` on the built source tarball:
+`R CMD check --as-cran` on the built source tarball returned 0 ERRORs, 0
+WARNINGs, and 1 NOTE on every platform.
 
-- Ubuntu 24.04 x86_64, R 4.5.0 -- 0 ERRORs, 0 WARNINGs, 0 NOTEs
-- Windows 11 x64, R 4.5.2 ucrt  -- 0 ERRORs, 0 WARNINGs, 0 NOTEs
+The single NOTE is the CRAN incoming feasibility note reporting a short interval
+since the previous release. Version 0.3.0 was published on 2026-05-21, and
+version 0.3.1 is a bug-fix release submitted a few days later. The short interval
+reflects the importance of the fixes rather than feature churn, see the
+justification below.
 
-Expected server-side NOTE only:
+## Justification for the update interval
 
-1. CRAN incoming feasibility NOTE: "Possibly misspelled words in DESCRIPTION"
-   for the technical terms SHA (in SHA-256), codebook, and embeddable. These
-   are legitimate technical terms and were accepted at 0.3.0.
+surveyframe 0.3.1 repairs defects that break core functionality: the
+static-survey to Google Sheets to R data-collection round-trip, and a
+serialisation hash mismatch that raised an integrity error when reading back
+instruments built with named component lists. These affect users following the
+package's main workflow, so the fix follows 0.3.0 closely.
 
 ## Vignette changes
 
-The main vignette (`surveyframe.Rmd`) has been rewritten as a four-stage
-worked study following a published tourism-services survey. The vignette
-builds offline: the data-collection step uses `eval = FALSE` chunks because
-the study data is private, and all other steps run against the bundled
-tourism demo dataset.
+The main vignette (`surveyframe.Rmd`) has been rewritten as a worked study
+following a published tourism-services survey. The vignette builds offline: the
+data-collection step uses `eval = FALSE` chunks because the study data is
+private, and all other steps run against the bundled tourism demo dataset.
 
 ## Reverse dependencies
 

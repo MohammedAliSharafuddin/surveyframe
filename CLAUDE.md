@@ -115,8 +115,6 @@ version-archive directories so the CRAN build never sees them.
 
 - Commit or push only when asked. Branch first if on the default branch is not
   the intended target.
-- End commit messages with the co-author trailer:
-  `Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>`
 - Push package changes on `main` to both `origin` and `private`. Push planning
   changes on `dev` to `private` only.
 
