@@ -1,21 +1,22 @@
 ## replicate.R
-## Replication script for:
+## Replication script for
 ##   "surveyframe: A Proactive Survey Research Workflow for R"
 ##   Journal of Statistical Software submission
 ##
-## Requirements: surveyframe >= 0.3.0, psych >= 2.3.0 (optional)
+## Requirements: surveyframe (>= 0.3.0), psych (>= 2.3.0)
 ## Run with: Rscript replicate.R
-## Or from R: source("replicate.R")
+## Or from R: source("replicate.R", echo = TRUE)
 ##
-## All outputs reproduce the results shown in the manuscript.
+## All results below reproduce the output shown in the manuscript.
 ## No external data files or network access are required.
 
 options(prompt = "R> ", continue = "+  ", width = 70,
         useFancyQuotes = FALSE, digits = 4)
 
 library("surveyframe")
+library("psych")
 
-cat("\n=== Section 3: Instrument construction ===\n\n")
+## Section 3: Instrument construction
 
 agree5 <- sf_choices(
   id     = "agree5",
@@ -73,87 +74,60 @@ instr_simple <- sf_instrument(
 )
 
 print(instr_simple)
-cat("\n")
+
+## Validation
 
 result <- validate_sframe(instr_simple, strict = FALSE)
-cat("Valid:", result$valid, "\n")
-cat("Problems:", length(result$problems), "\n\n")
+print(result$valid)
+print(result$problems)
 
-
-cat("=== Section 4: Load demo data ===\n\n")
+## Section 4: Load demo data
 
 demo  <- sframe_demo_data()
 instr <- demo$instrument
 resp  <- demo$responses
 
-cat("Instrument:", instr$meta$title, "\n")
-cat("Scales:", length(instr$scales), "\n")
-cat("Items:", length(instr$items), "\n")
-cat("Responses:", nrow(resp), "\n\n")
+print(instr$meta$title)
+print(c(scales    = length(instr$scales),
+        items     = length(instr$items),
+        responses = nrow(resp)))
 
-
-cat("=== Section 5.1: Data quality report ===\n\n")
+## Section 5.1: Data quality report
 
 qr <- quality_report(resp, instr)
-cat("Respondents:", qr$summary$n_respondents, "\n")
-cat("Items:      ", qr$summary$n_items, "\n")
-cat("Flagged:    ", qr$summary$n_flagged, "\n\n")
+print(c(respondents = qr$summary$n_respondents,
+        items       = qr$summary$n_items,
+        flagged     = qr$summary$n_flagged))
 
-
-cat("=== Section 5.2: Scale scoring ===\n\n")
+## Section 5.2: Scale scoring
 
 scored <- score_scales(resp, instr)
 scale_cols <- c("digital_marketing", "service_quality",
                 "sustainability", "satisfaction",
                 "behavioural_intention")
 print(summary(scored[, scale_cols]))
-cat("\n")
 
+## Section 5.3: Reliability
 
-cat("=== Section 5.3: Reliability ===\n\n")
+rr <- reliability_report(resp, instr, omega = FALSE)
+print(rr)
 
-if (requireNamespace("psych", quietly = TRUE)) {
-  rr <- reliability_report(resp, instr, omega = FALSE)
-  print(rr)
-} else {
-  message("psych not installed; skipping reliability report.")
-}
-cat("\n")
-
-
-cat("=== Section 5.5: CFA syntax ===\n\n")
+## Section 5.5: CFA syntax
 
 syn <- cfa_syntax(instr)
-cat(syn, "\n\n")
+cat(syn)
 
-
-cat("=== Section 5.6: Analysis plan ===\n\n")
+## Section 5.6: Analysis plan
 
 results <- run_analysis_plan(resp, instr, scored = TRUE)
+print(results)
 
-r1 <- results[[1]]
-cat("--- Test 1:", r1$test, "---\n")
-cat("APA:   ", r1$apa, "\n")
-cat("Effect:", r1$effect_label, "\n")
-cat("Q:     ", r1$research_question, "\n\n")
-
-r2 <- results[[2]]
-cat("--- Test 2:", r2$test, "---\n")
-cat("APA:", r2$apa, "\n\n")
-
-r3 <- results[[3]]
-cat("--- Test 3:", r3$test, "---\n")
-cat("APA:   ", r3$apa, "\n")
-cat("Effect:", r3$effect_label, "\n\n")
-
-
-cat("=== Section 6: Codebook ===\n\n")
+## Section 6: Codebook
 
 cb <- codebook_report(instr)
-cat("Items in codebook:", nrow(cb$items_table), "\n")
+print(nrow(cb$items_table))
 print(head(cb$items_table[, c("id", "type", "scale_id", "reverse")], 6))
-cat("\n")
 
+## Session information
 
-cat("=== Session info ===\n\n")
-sessionInfo()
+print(sessionInfo())
