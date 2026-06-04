@@ -1,6 +1,6 @@
 # surveyframe roadmap (0.3 through 1.0)
 
-Last updated: 2026-06-01.
+Last updated: 2026-06-04.
 
 This roadmap stages surveyframe from the current CRAN release to v1.0.0, the
 version that anchors the launch of Ethos, Ethos Pro, and the ASRDA textbook.
@@ -8,7 +8,17 @@ version that anchors the launch of Ethos, Ethos Pro, and the ASRDA textbook.
 Principles:
 
 - One coherent capability theme per minor version. Each minor has a single
-  headline so releases are easy to message and NEWS stays clean.
+  headline so releases are easy to message and NEWS stays clean. No minor
+  carries two unrelated headlines.
+- Integrity and provenance are a single contiguous track, not a feature
+  sprinkled across releases. Layer 1 (the instrument hash) shipped at v0.3. The
+  rest of the chain (response hashing, versioning, review, pilot, bundle,
+  verify, manifest, and the report) lands as one block at v0.7 and v0.8, the
+  capstone before the v0.9 API freeze. Nothing integrity-related lands in v0.4,
+  v0.5, or v0.6. See "Integrity and provenance: one track" below.
+- Analytical capability ships first (v0.4 to v0.6) to drive the applied papers
+  and adoption. Provenance is the capstone (v0.7 to v0.8) so the v0.9 integration
+  contract can freeze a complete provenance surface.
 - New methods land in surveyframe core, not in companion packages. The hard
   dependency footprint stays small; heavy or optional engines are guarded with
   `rlang::check_installed()` and live in Suggests.
@@ -58,33 +68,29 @@ Patch release. No new features.
 Open before submission: full `R CMD check --as-cran`, win-builder, second
 platform, Codecov badge decision, cran-comments update.
 
-### v0.4.0 — Decision methods (MCDM and DEMATEL)
+### v0.3.2 — Maintenance (patch)
 
-Headline: bring multi-criteria decision making into the survey workflow.
+Headline: correct metadata and finish the deferred documentation pass. No new
+features and no new exports.
 
-Source: port the registry and method implementations from the existing `mcdm`
-repository (TOPSIS, VIKOR, AHP, ANP, MOORA, PROMETHEE, ELECTRE, SMART, WASPAS,
-DEMATEL), adapted to the sframe analysis-plan contract.
+- Fix `inst/CITATION`: title to "surveyframe: Survey Instrument Workflows" (drop
+  the redundant "for R"), and read the version from `meta$Version` so it never
+  goes stale again. Detail in `revision_todo_0.3.md` (v0.3.2 section). This is
+  the trigger for cutting 0.3.2, because the CRAN page citation only refreshes on
+  a new release.
+- Apply the deferred professor-review documentation items (Prof-1 to Prof-5,
+  Prof-9, Prof-10): vignette additions only, no code risk.
+- Optional: guard the launcher `\donttest` examples so a check that runs
+  donttest does not hang.
 
-Deliverables:
+Exit criteria: clean `R CMD check`, the CRAN package-page citation is correct,
+and the version note in the citation is self-updating.
 
-- New item types for pairwise comparison and criteria-weight input, rendered by
-  the builder, the Shiny renderer, and the static export.
-- MCDM method runners registered in `run_analysis_plan()` under a `decision`
-  family, each returning a ranking, the method's diagnostic, an APA-style
-  summary, a writing prompt, and the method citation.
-- AHP consistency-ratio checks and DEMATEL thresholding with a cause-effect
-  classification table.
-- Weight-sensitivity analysis as an optional reporting block.
-- Vignette: a decision-analysis worked example.
+### v0.4.0 — Small-sample inference
 
-Exit criteria: an instrument can declare an MCDM research question, collect the
-matrix data, and run the plan to a ranked result with a defensible report
-section. No new hard dependencies.
-
-### v0.5.0 — Small-sample inference
-
-Headline: trustworthy analysis when n is below thirty.
+Headline: trustworthy analysis when n is below thirty. Ships first among the
+analytical themes because it supports the small-sample methods paper and any
+near-term low-n applied study, and adds no new hard dependency.
 
 Source: the practical method-selection logic and test helpers validated in the
 `small-sample-survey-framework`. The simulation engine that justifies them stays
@@ -114,6 +120,30 @@ Part C chapter mapping.
 
 Exit criteria: a study with n < 30 can run the plan and receive method-choice
 guidance plus a small-sample-appropriate result with interval coverage notes.
+
+### v0.5.0 — Decision methods (MCDM and DEMATEL)
+
+Headline: bring multi-criteria decision making into the survey workflow.
+
+Source: port the registry and method implementations from the existing `mcdm`
+repository (TOPSIS, VIKOR, AHP, ANP, MOORA, PROMETHEE, ELECTRE, SMART, WASPAS,
+DEMATEL), adapted to the sframe analysis-plan contract.
+
+Deliverables:
+
+- New item types for pairwise comparison and criteria-weight input, rendered by
+  the builder, the Shiny renderer, and the static export.
+- MCDM method runners registered in `run_analysis_plan()` under a `decision`
+  family, each returning a ranking, the method's diagnostic, an APA-style
+  summary, a writing prompt, and the method citation.
+- AHP consistency-ratio checks and DEMATEL thresholding with a cause-effect
+  classification table.
+- Weight-sensitivity analysis as an optional reporting block.
+- Vignette: a decision-analysis worked example.
+
+Exit criteria: an instrument can declare an MCDM research question, collect the
+matrix data, and run the plan to a ranked result with a defensible report
+section. No new hard dependencies.
 
 ### v0.6.0 — Structural model execution
 
@@ -152,11 +182,19 @@ Deliverables:
   flags, resolution notes, status).
 - `sf_pilot()`: create and attach a pilot-study artefact (n, completion notes,
   per-item flags, quality and reliability summaries).
+- Response-level hashing in `read_responses()`: a per-row hash computed from the
+  row contents and the instrument hash, plus an aggregate response hash, so any
+  row modification, addition, or deletion is detectable.
 - Validation extended to check version chains and artefact integrity.
 - Vignette: instrument lifecycle and review.
 
+Delivers the integrity track: SSR 6.0 Layer 2 (pre-registration and version) and
+Layer 3 (response). Source modules already exist in `asrda-r`
+(`instrument_versioning.R`, `expert_review.R`, `pilot_summary.R`).
+
 Exit criteria: an instrument can carry a versioned history with review and pilot
-evidence that survives save and reload.
+evidence that survives save and reload, and a response file is bound to the
+instrument version by an aggregate hash.
 
 ### v0.8.0 — Provenance layer, part two, and reporting
 
@@ -166,7 +204,8 @@ Deliverables:
 
 - `sf_bundle()` and `verify_bundle()`: wrap a versioned instrument, its review
   and pilot artefacts, and the response data into a single bundle with SHA-256
-  verification across all components.
+  verification across all components. The bundle emits a verification manifest
+  that records every component hash, timestamps, and a manifest root hash.
 - sfReport companion package (separate CRAN package importing surveyframe):
   `sf_report()` produces a full Quarto document with analysis results, charts,
   codebook, and bibliography, plus a defensibility appendix that reproduces the
@@ -176,6 +215,12 @@ Deliverables:
   and emits a machine-readable citation block (instrument version hash, software
   version, textbook references) in the report metadata and a BibTeX appendix.
 - Vignette: defensible reporting for ethics submission and secondary analysis.
+
+Delivers the integrity track: SSR 6.0 Layer 4 (analysis and reporting) and Layer
+5 (verification manifest). The five-layer chain is complete at this point. Source
+modules already exist in `asrda-r` (`response_bundle.R`, `citation_block.R`,
+`report_render.R`). This is the release the SSR 6.0 paper should cite for Layers
+2 to 5, not v0.4 to v0.5.
 
 Exit criteria: a study can produce a single verifiable bundle and a Quarto
 report that cites the instrument version and the textbook chapter behind each
@@ -213,6 +258,51 @@ Headline: the version that the products and the textbook are built on.
 
 Exit criteria: a researcher, an institution, and a textbook reader can each rely
 on surveyframe 1.0 as a stable foundation.
+
+---
+
+## Integrity and provenance: one track
+
+This is the table that keeps the integrity story consistent. The five-layer
+chain from the SSR 6.0 paper maps onto exactly two releases (plus the Layer 1
+foundation already on CRAN). It is not spread across v0.4 to v0.6.
+
+| SSR 6.0 layer | What ships | surveyframe version |
+|---|---|---|
+| 1 Instrument | SHA-256 over the `.sframe` payload; `write_sframe()`, `read_sframe()`, `validate_sframe()` | 0.3.0 (shipped) |
+| 2 Pre-registration and version | `sf_version()` content-hash version chain and lifecycle states | 0.7.0 |
+| 3 Response | per-row and aggregate response hash in `read_responses()` | 0.7.0 |
+| 4 Analysis and reporting | analysis and report hashing, `sf_report()` provenance appendix | 0.8.0 |
+| 5 Verification manifest | `sf_bundle()` and `verify_bundle()` cross-component manifest | 0.8.0 |
+
+Implications for consistency:
+
+- The SSR 6.0 manuscript must cite v0.7 to v0.8 for Layers 2 to 5, not v0.4 to
+  v0.5. The paper is unpublished, so this is a one-line correction in its
+  Section 3 and Section 10.
+- The portfolio `master_roadmap.md` must not tag v0.4 or v0.5 with SHA layers.
+  Those releases are small-sample and MCDM respectively, with no integrity work.
+
+## Textbook chapter to version map
+
+The ASRDA textbook ("From Constructs to Conclusions Using R", 14 parts, 41
+chapters) is released in stages pinned to the surveyframe version that makes the
+tooling real. Each stage is written only once its surveyframe capability exists.
+
+| Stage | surveyframe | Textbook chapters made real |
+|---|---|---|
+| 1 | 0.3 to 0.4 | Parts I to III (foundations, instrument design, sampling, data capture and quality), Part IV ch 9 (reliability), Part V (descriptives, assumptions), Part VI ch 13 to 16 (correlation, parametric and non-parametric comparisons, agreement). Part VI non-parametric and Part XIII ch 37 resampling draw on the v0.4 small-sample helpers. |
+| 2 | 0.5 to 0.6 | Part XII ch 34 to 35 (MCDM, fuzzy and hybrid) on v0.5; Part IV ch 10 (validity and invariance) and Part IX ch 26 to 27 (factor, confirmatory and structural models) on v0.6. |
+| 3 | 0.7 to 0.8 | Part VII ch 18 (automated reporting), Part XIV ch 39 to 40 (workflow automation and open science, data management and DOI registration). These are the provenance and defensible-reporting chapters. |
+| 4 | 0.9 to 1.0 | Part XI ch 33 (survey weighting and variance estimation) on v0.9. Complete edition published at v1.0 with the JSS-paper citation. |
+
+Parked beyond v1.0 (the book has chapters but surveyframe will not cover them by
+1.0; they use base R or other packages, or become post-1.0 companions): Part VIII
+ch 21 to 25 (multilevel, causal and longitudinal, survival, time series), Part X
+(spatial, network, conjoint and choice), Part XI ch 32 (machine learning), Part
+XIII ch 36 (IRT) and ch 38 (meta-analysis). Part III ch 8 (text and open-ended
+responses) is not in the surveyframe roadmap; treat a light text-quality helper
+as a v1.x candidate, not a v1.0 commitment.
 
 ---
 
