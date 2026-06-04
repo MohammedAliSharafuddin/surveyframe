@@ -247,17 +247,23 @@ API. No open defects on the core workflow.
 
 ### v1.0.0 — Launch
 
-Headline: the version that the products and the textbook are built on.
+Headline: the version that the products and the textbook are built on, at
+commercial-SaaS feature parity.
 
 - Provenance layer complete and documented.
+- Merkle-root extension and DOI-linked archival deposit added on top of the v0.8
+  manifest. These are the v1.0 additions that bring the provenance surface to
+  parity with commercial SaaS offerings, so the Ethos, Ethos Pro, and textbook
+  launch is competitive.
 - API declared stable; semantic-versioning guarantees begin.
 - `inst/CITATION` points to the published JSS paper.
 - Coincides with: Ethos public launch, Ethos Pro institutional launch, and the
-  ASRDA textbook at the staged release that matches v1.0 capability.
+  ASRDA textbook complete edition.
 - A migration and stability guide for downstream users.
 
 Exit criteria: a researcher, an institution, and a textbook reader can each rely
-on surveyframe 1.0 as a stable foundation.
+on surveyframe 1.0 as a stable foundation, and the provenance surface matches
+the commercial SaaS bar that the products are sold against.
 
 ---
 
@@ -277,9 +283,13 @@ foundation already on CRAN). It is not spread across v0.4 to v0.6.
 
 Implications for consistency:
 
-- The SSR 6.0 manuscript must cite v0.7 to v0.8 for Layers 2 to 5, not v0.4 to
-  v0.5. The paper is unpublished, so this is a one-line correction in its
-  Section 3 and Section 10.
+- The SSR 6.0 manuscript cites v0.7 to v0.8 for Layers 2 to 5. Its submission is
+  moved to after the v0.9 CRAN release (the WIN 6.0 2026 route is dropped), so at
+  submission the five-layer framework is implemented and released rather than
+  proposed, with the Merkle-root and DOI-archival work (v1.0) as the future
+  direction. The manuscript is rewritten at submission time, not now.
+- The Merkle-root extension and DOI-linked archival deposit are v1.0 features
+  (SaaS parity), not v0.8.
 - The portfolio `master_roadmap.md` must not tag v0.4 or v0.5 with SHA layers.
   Those releases are small-sample and MCDM respectively, with no integrity work.
 
