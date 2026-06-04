@@ -5,6 +5,60 @@ Excluded from the CRAN build (via .Rbuildignore) and from the public repo
 
 ---
 
+## v0.3.2 — Planning (not yet started)
+
+A maintenance release to carry the citation fix. Do not edit package files for
+this until 0.3.2 is formally planned.
+
+### Blocking fix: stale `inst/CITATION`
+
+The CITATION file was never updated when the title was corrected and the version
+was bumped. As shipped in 0.3.0 and 0.3.1 it reads:
+
+```
+title = surveyframe: A Survey Instrument Workflow for R
+note  = R package version 0.3.0
+```
+
+Two problems:
+
+1. The title still carries the redundant "for R" the CRAN reviewer (Konstanze
+   Lauseker) asked to drop during the 0.3.0 review. The DESCRIPTION Title was
+   fixed to "Survey Instrument Workflows" at that time, but the CITATION was not
+   brought into line.
+2. The version note is hard-coded to 0.3.0, so it is already two releases stale.
+
+`R CMD check` does not compare the CITATION title to the DESCRIPTION Title and
+does not check the version note, so this passed silently through both 0.3.0 and
+0.3.1. The CRAN package page citation is regenerated from the published tarball,
+so the corrected citation only appears once a new version is on CRAN. It ships
+with 0.3.2.
+
+Planned change to `inst/CITATION` (apply during 0.3.2, then verify with
+`utils::readCitationFile("inst/CITATION", meta = packageDescription("surveyframe"))`):
+
+- title to "surveyframe: Survey Instrument Workflows" (drop "for R", match the
+  corrected DESCRIPTION Title).
+- Read the version from `meta$Version` (with a `utils::packageVersion()` fallback
+  when `meta` is unavailable) so the note never goes stale on a future bump.
+- Keep author, year (2026), and url.
+
+### Not a fix: the two remaining `\dontrun` blocks
+
+The reviewer also asked to replace `\dontrun` with `\donttest`. This was already
+addressed at 0.3.0: seven of nine examples were converted. The two that remain
+(`read_sheet_responses` requires Google auth; the `cfa_syntax` block calls
+`lavaan`, which is not a declared dependency) are the documented legitimate
+exceptions (missing API keys / missing additional software). Converting them to
+`\donttest` would make CRAN run them and fail. They stay `\dontrun`. No action.
+
+### Other 0.3.2 candidates (low effort, no code risk)
+
+- The deferred professor-review doc items (Prof-1 to Prof-5, Prof-9, Prof-10)
+  listed under v0.3.1 below can fold into this doc pass if 0.3.2 goes ahead.
+
+---
+
 ## v0.3.0 — Published on CRAN (accepted 2026-05-21)
 
 All work below this line is part of a separate v0.3.0 lifecycle and is

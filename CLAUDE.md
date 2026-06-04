@@ -20,7 +20,8 @@ contract declared before data collection. Analysis is the execution of that
 pre-declared plan rather than a post-hoc search. This is the package's main
 differentiator and the thesis of the JSS paper.
 
-Current version: 0.3.1 in development. 0.3.0 was accepted on CRAN on 2026-05-21.
+Current version: 0.3.1 published on CRAN (2026-06-02). 0.3.2 in planning. 0.3.0
+was accepted on CRAN on 2026-05-21.
 
 ---
 
@@ -144,17 +145,35 @@ feasibility). The vignette builds offline because the data-collection step uses
 
 ## Current status and immediate next steps
 
-0.3.1 was submitted to CRAN on 2026-06-02. R CMD check is clean (0 errors, 0
-warnings, 1 NOTE) on local Ubuntu and win-builder R-release and R-devel. Awaiting
-CRAN's decision email.
+0.3.1 is published on CRAN (2026-06-02). R CMD check was clean (0 errors, 0
+warnings, 1 NOTE) on local Ubuntu and win-builder R-release and R-devel. The
+next release is 0.3.2.
 
-The JSS paper is ready for submission: two authors with affiliations and ORCID,
-software prose humanised, compiled to 17 pages, checked against the JSS author
-and style guides. It lives in `jss-paper/` on this dev branch. The submission
-package is the PDF, the surveyframe_0.3.1 tarball, and `replicate.R`.
+The JSS paper was submitted on 2026-06-02 (OJS submission 6454): two authors
+with affiliations and ORCID, software prose humanised, compiled to 17 pages,
+checked against the JSS author and style guides. It lives in `jss-paper/` on
+this dev branch. The submission package was the PDF, the surveyframe_0.3.1
+tarball, and `replicate.R`. Awaiting the editorial decision.
 
-The JSS paper was submitted on 2026-06-02 (OJS submission 6454). Awaiting the
-editorial decision.
+Known issue to ship with 0.3.2: `inst/CITATION` was never updated when the
+package title was corrected and the version was bumped. It still reads
+"surveyframe: A Survey Instrument Workflow for R" (the redundant "for R" the
+CRAN reviewer asked to drop) and hard-codes "R package version 0.3.0". The
+DESCRIPTION title was fixed during the 0.3.0 review but the CITATION was not
+brought into line, and `R CMD check` does not compare the two, so it passed
+silently through 0.3.0 and 0.3.1. The CRAN package page citation only refreshes
+when a new version is published, so the corrected citation ships with 0.3.2.
+
+Fix for 0.3.2 (do not apply until 0.3.2 is planned):
+
+- `inst/CITATION` title to "surveyframe: Survey Instrument Workflows" (drop
+  "for R", match the corrected DESCRIPTION Title).
+- Read the version dynamically from `meta$Version` (with a `packageVersion()`
+  fallback) so the citation never goes stale on a future bump.
+- No `\dontrun` change is needed. Seven of nine examples were converted to
+  `\donttest` at 0.3.0; the two remaining `\dontrun` blocks (`read_sheet_responses`
+  needs Google auth, `cfa_syntax` calls undeclared `lavaan`) are the documented
+  legitimate exceptions and must stay `\dontrun`.
 
 Open items:
 
