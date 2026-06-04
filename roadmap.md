@@ -13,11 +13,11 @@ Principles:
 - Integrity and provenance are a single contiguous track, not a feature
   sprinkled across releases. Layer 1 (the instrument hash) shipped at v0.3. The
   rest of the chain (response hashing, versioning, review, pilot, bundle,
-  verify, manifest, and the report) lands as one block at v0.7 and v0.8, the
-  capstone before the v0.9 API freeze. Nothing integrity-related lands in v0.4,
-  v0.5, or v0.6. See "Integrity and provenance: one track" below.
-- Analytical capability ships first (v0.4 to v0.6) to drive the applied papers
-  and adoption. Provenance is the capstone (v0.7 to v0.8) so the v0.9 integration
+  verify, manifest, and the report) lands as one block at v0.8 and v0.9, the
+  capstone before the v0.10 API freeze. Nothing integrity-related lands in v0.4
+  through v0.7. See "Integrity and provenance: one track" below.
+- Analytical capability ships first (v0.4 to v0.7) to drive the applied papers
+  and adoption. Provenance is the capstone (v0.8 to v0.9) so the v0.10 integration
   contract can freeze a complete provenance surface.
 - New methods land in surveyframe core, not in companion packages. The hard
   dependency footprint stays small; heavy or optional engines are guarded with
@@ -166,7 +166,39 @@ Deliverables:
 Exit criteria: an sframe measurement model can be screened, fitted, and reported
 end to end, with invariance results, using optional packages.
 
-### v0.7.0 — Provenance layer, part one
+### v0.7.0 — Text and open-ended response analysis
+
+Headline: structured analysis of open-ended and free-text survey responses.
+
+Capture already exists: the `text` and `textarea` item types ship from v0.3.
+This version adds the analysis side. It is the last analytical theme before the
+provenance capstone.
+
+Source: the thematic-analysis approach used in the Omani gateways manuscript
+(tidytext, quanteda, stm), packaged behind the analysis-plan contract.
+
+Deliverables:
+
+- Text cleaning and normalisation for open-ended responses (tokenisation,
+  stop-word handling, stemming or lemmatisation), with a base path and optional
+  engines.
+- A `text` analysis family in `run_analysis_plan()`: term and keyword frequency,
+  co-occurrence, and optional dictionary-based sentiment.
+- Thematic and topic support: term-frequency themes and optional structural topic
+  models, with representative quote extraction for qualitative reporting.
+- Optional tidytext, quanteda, and stm backends guarded behind Suggests; a base
+  frequency path with no new hard dependency.
+- A reporting block that turns themes, topics, and quotes into a report section.
+- Vignette: analysing open-ended responses end to end.
+
+Book tie: Part III ch 8 (text data processing and open-ended responses); it also
+feeds Part VII ch 17 (visualisation) for text.
+
+Exit criteria: an instrument with open-ended items can declare a text research
+question, run the plan, and receive term frequencies, themes or topics,
+representative quotes, and a defensible report section. No new hard dependency.
+
+### v0.8.0 — Provenance layer, part one
 
 Headline: give the instrument a lifecycle and a review trail.
 
@@ -196,7 +228,7 @@ Exit criteria: an instrument can carry a versioned history with review and pilot
 evidence that survives save and reload, and a response file is bound to the
 instrument version by an aggregate hash.
 
-### v0.8.0 — Provenance layer, part two, and reporting
+### v0.9.0 — Provenance layer, part two, and reporting
 
 Headline: tamper-evident bundles and a Quarto-native report.
 
@@ -219,14 +251,13 @@ Deliverables:
 Delivers the integrity track: SSR 6.0 Layer 4 (analysis and reporting) and Layer
 5 (verification manifest). The five-layer chain is complete at this point. Source
 modules already exist in `asrda-r` (`response_bundle.R`, `citation_block.R`,
-`report_render.R`). This is the release the SSR 6.0 paper should cite for Layers
-2 to 5, not v0.4 to v0.5.
+`report_render.R`). The SSR 6.0 paper cites v0.8 to v0.9 for Layers 2 to 5.
 
 Exit criteria: a study can produce a single verifiable bundle and a Quarto
 report that cites the instrument version and the textbook chapter behind each
 method.
 
-### v0.9.0 — Integration and release candidate
+### v0.10.0 — Integration and release candidate
 
 Headline: the surfaces Ethos and Ethos Pro depend on, hardened.
 
@@ -271,25 +302,25 @@ the commercial SaaS bar that the products are sold against.
 
 This is the table that keeps the integrity story consistent. The five-layer
 chain from the SSR 6.0 paper maps onto exactly two releases (plus the Layer 1
-foundation already on CRAN). It is not spread across v0.4 to v0.6.
+foundation already on CRAN). It is not spread across v0.4 to v0.7.
 
 | SSR 6.0 layer | What ships | surveyframe version |
 |---|---|---|
 | 1 Instrument | SHA-256 over the `.sframe` payload; `write_sframe()`, `read_sframe()`, `validate_sframe()` | 0.3.0 (shipped) |
-| 2 Pre-registration and version | `sf_version()` content-hash version chain and lifecycle states | 0.7.0 |
-| 3 Response | per-row and aggregate response hash in `read_responses()` | 0.7.0 |
-| 4 Analysis and reporting | analysis and report hashing, `sf_report()` provenance appendix | 0.8.0 |
-| 5 Verification manifest | `sf_bundle()` and `verify_bundle()` cross-component manifest | 0.8.0 |
+| 2 Pre-registration and version | `sf_version()` content-hash version chain and lifecycle states | 0.8.0 |
+| 3 Response | per-row and aggregate response hash in `read_responses()` | 0.8.0 |
+| 4 Analysis and reporting | analysis and report hashing, `sf_report()` provenance appendix | 0.9.0 |
+| 5 Verification manifest | `sf_bundle()` and `verify_bundle()` cross-component manifest | 0.9.0 |
 
 Implications for consistency:
 
-- The SSR 6.0 manuscript cites v0.7 to v0.8 for Layers 2 to 5. Its submission is
+- The SSR 6.0 manuscript cites v0.8 to v0.9 for Layers 2 to 5. Its submission is
   moved to after the v0.9 CRAN release (the WIN 6.0 2026 route is dropped), so at
   submission the five-layer framework is implemented and released rather than
   proposed, with the Merkle-root and DOI-archival work (v1.0) as the future
   direction. The manuscript is rewritten at submission time, not now.
 - The Merkle-root extension and DOI-linked archival deposit are v1.0 features
-  (SaaS parity), not v0.8.
+  (SaaS parity), not v0.9.
 - The portfolio `master_roadmap.md` must not tag v0.4 or v0.5 with SHA layers.
   Those releases are small-sample and MCDM respectively, with no integrity work.
 
@@ -302,17 +333,20 @@ tooling real. Each stage is written only once its surveyframe capability exists.
 | Stage | surveyframe | Textbook chapters made real |
 |---|---|---|
 | 1 | 0.3 to 0.4 | Parts I to III (foundations, instrument design, sampling, data capture and quality), Part IV ch 9 (reliability), Part V (descriptives, assumptions), Part VI ch 13 to 16 (correlation, parametric and non-parametric comparisons, agreement). Part VI non-parametric and Part XIII ch 37 resampling draw on the v0.4 small-sample helpers. |
-| 2 | 0.5 to 0.6 | Part XII ch 34 to 35 (MCDM, fuzzy and hybrid) on v0.5; Part IV ch 10 (validity and invariance) and Part IX ch 26 to 27 (factor, confirmatory and structural models) on v0.6. |
-| 3 | 0.7 to 0.8 | Part VII ch 18 (automated reporting), Part XIV ch 39 to 40 (workflow automation and open science, data management and DOI registration). These are the provenance and defensible-reporting chapters. |
-| 4 | 0.9 to 1.0 | Part XI ch 33 (survey weighting and variance estimation) on v0.9. Complete edition published at v1.0 with the JSS-paper citation. |
+| 2 | 0.5 to 0.7 | Part XII ch 34 to 35 (MCDM, fuzzy and hybrid) on v0.5; Part IV ch 10 (validity and invariance) and Part IX ch 26 to 27 (factor, confirmatory and structural models) on v0.6; Part III ch 8 (text data processing and open-ended responses) and Part VII ch 17 (text visualisation) on v0.7. |
+| 3 | 0.8 to 0.9 | Part VII ch 18 (automated reporting), Part XIV ch 39 to 40 (workflow automation and open science, data management and DOI registration). These are the provenance and defensible-reporting chapters. |
+| 4 | 0.10 to 1.0 | Part XI ch 33 (survey weighting and variance estimation) on v0.10. Complete edition published at v1.0 with the JSS-paper citation. |
+
+Note: Part III ch 8 (text) sits early in the book but its surveyframe tooling
+lands at v0.7, so the chapter is written in Stage 2 even though its part is in
+the Stage 1 range. This is the one place the part order and the version order
+diverge.
 
 Parked beyond v1.0 (the book has chapters but surveyframe will not cover them by
 1.0; they use base R or other packages, or become post-1.0 companions): Part VIII
 ch 21 to 25 (multilevel, causal and longitudinal, survival, time series), Part X
 (spatial, network, conjoint and choice), Part XI ch 32 (machine learning), Part
-XIII ch 36 (IRT) and ch 38 (meta-analysis). Part III ch 8 (text and open-ended
-responses) is not in the surveyframe roadmap; treat a light text-quality helper
-as a v1.x candidate, not a v1.0 commitment.
+XIII ch 36 (IRT) and ch 38 (meta-analysis).
 
 ---
 
@@ -395,7 +429,7 @@ land harder.
   to v0.8. They launch on v1.0.
 - **ASRDA textbook** is the methodological companion. Its complete edition
   matches v1.0 capability and cites the JSS paper.
-- The provenance work (v0.7 to v0.8) is the concrete engineering that makes the
+- The provenance work (v0.8 to v0.9) is the concrete engineering that makes the
   textbook citable from reports and gives institutions the audit trail Ethos Pro
   sells.
 
