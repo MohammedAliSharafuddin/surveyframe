@@ -39,7 +39,7 @@ surveyframe is the source of truth for a wider product and publication set.
   of Ethos. Also depends on surveyframe.
 - **asrda-r** (private, R): a prototype provenance package. Deferred. Its
   versioning, review, pilot, and bundle modules are absorbed into surveyframe
-  core at v0.7 and v0.8. It will not ship as a CRAN dependency.
+  core at v0.8 and v0.9. It will not ship as a CRAN dependency.
 - **ASRDA** (private, Quarto book): the methodological textbook, "From Constructs
   to Conclusions Using R." Released in stages that track surveyframe capability.
 - **semScreenR** (private, R): a rule-based SEM data-screening package. The
@@ -47,10 +47,10 @@ surveyframe is the source of truth for a wider product and publication set.
   before a lavaan fit. surveyframe gains a bridge to it at v0.6.
 - **mcdm** (private, R): a Shiny app with all 10 MCDM methods on a registry
   architecture. The source to port from when MCDM lands in surveyframe core at
-  v0.4.
+  v0.5.
 - **small-sample-survey-framework** (public, R) and **smallsamplelab** (private):
   the simulation-validated decision framework for n below 30. The source for the
-  small-sample helpers that land in surveyframe core at v0.5.
+  small-sample helpers that land in surveyframe core at v0.4.
 - **flairmi / flairmi-site**: the commercial umbrella at flairmi.com.
 
 v1.0 of surveyframe is the gate for the public launch of Ethos, Ethos Pro, and
@@ -217,20 +217,20 @@ fix anything that is not 0 errors and 0 warnings, update cran-comments.md with
 the result, and tell me what remains before I submit to CRAN.
 ```
 
-### Start the v0.4 MCDM work
+### Start the v0.5 MCDM work
 
 ```
-Read CLAUDE.md and roadmap.md. Begin surveyframe v0.4: bring MCDM and DEMATEL
+Read CLAUDE.md and roadmap.md. Begin surveyframe v0.5: bring MCDM and DEMATEL
 into core. Port the method registry from the mcdm repo, register the runners in
 run_analysis_plan() under a decision family, and add the pairwise-comparison and
 criteria-weight item types. Stay within the analysis-plan contract. No new hard
 dependencies. Propose the plan before writing code.
 ```
 
-### Start the v0.5 small-sample work
+### Start the v0.4 small-sample work
 
 ```
-Read CLAUDE.md and roadmap.md. Begin surveyframe v0.5: small-sample inference.
+Read CLAUDE.md and roadmap.md. Begin surveyframe v0.4: small-sample inference.
 Add exact, permutation, and bootstrap variants for the existing two-group and
 association tests, plus effect-size confidence intervals, drawing on the
 small-sample-survey-framework. Add a small-sample advisory to sample_size_plan()

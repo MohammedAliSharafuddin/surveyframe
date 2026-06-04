@@ -2,6 +2,12 @@
 
 Last updated: May 2026 - v0.3.0 pre-submission candidate
 
+> Note (2026-06-05): the canonical cross-project version schedule now lives in
+> the portfolio-planner repository (master_roadmap.md). The version track below
+> predates the 2026-06-04 replan and the 1.0 merge, so the theme order and the
+> tail numbering here are out of date. The release after 0.9 is 1.0, there is no
+> 0.10. Treat the portfolio-planner master_roadmap.md as authoritative.
+
 ------------------------------------------------------------------------
 
 ## v0.4 future directions: PLANNED
