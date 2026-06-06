@@ -70,21 +70,34 @@ platform, Codecov badge decision, cran-comments update.
 
 ### v0.3.2 — Maintenance (patch)
 
-Headline: correct metadata and finish the deferred documentation pass. No new
-features and no new exports.
+Headline: correct metadata, add JSS-required package changes, and finish the
+deferred documentation pass. No new features and no new exports.
+
+The JSS editor returned the submission without full review (2026-06) and
+identified specific package defects. These ship with 0.3.2 so the manuscript
+can be resubmitted against a corrected package. Full checklist in
+`revision_todo_0.3.md` (v0.3.2 section) and in `jss-paper/CLAUDE.md` (public repo).
 
 - Fix `inst/CITATION`: title to "surveyframe: Survey Instrument Workflows" (drop
   the redundant "for R"), and read the version from `meta$Version` so it never
-  goes stale again. Detail in `revision_todo_0.3.md` (v0.3.2 section). This is
-  the trigger for cutting 0.3.2, because the CRAN page citation only refreshes on
-  a new release.
+  goes stale again. This is the trigger for cutting 0.3.2, because the CRAN page
+  citation only refreshes on a new release.
+- Add S3 methods (`print`, `format`, `summary`) for all sub-classes: `sf_choices`,
+  `sf_item`, `sf_scale`, `sf_branch`, `sf_check`, `sf_model`. The editor ran
+  `methods(class = "sf_choices")` and received no output.
+- Add `lavaan` to `Suggests` and guard all lavaan-dependent code with
+  `requireNamespace("lavaan", quietly = TRUE)`.
+- Fix `replicate.R`: add the missing `export_static_survey()` call wrapped in
+  `if (interactive()) { }`; remove any `str()` calls that expose internal structure.
+- Fix attention check item rendering: match the choice set setup for `sf_check`
+  items to regular `sf_item` rendering in the static HTML export.
 - Apply the deferred professor-review documentation items (Prof-1 to Prof-5,
   Prof-9, Prof-10): vignette additions only, no code risk.
 - Optional: guard the launcher `\donttest` examples so a check that runs
   donttest does not hang.
 
 Exit criteria: clean `R CMD check`, the CRAN package-page citation is correct,
-and the version note in the citation is self-updating.
+the version note is self-updating, and all JSS editor package items are resolved.
 
 ### v0.4.0 — Small-sample inference
 
@@ -362,8 +375,15 @@ land harder.
   methodological contract declared before data collection, so analysis is the
   execution of a pre-declared plan rather than a post-hoc search. No existing
   tool offers this architecture.
-- Open task: fill the institutional address, final proofread, submit. After
-  acceptance, add `inst/CITATION` and convert the manuscript into a vignette.
+- Submitted 2026-06-02 (OJS 6454). Editor returned without full review 2026-06;
+  invited to revise and resubmit.
+- Revision requires: (a) package changes shipping with 0.3.2 (S3 methods on
+  sub-classes, lavaan in Suggests, replicate.R fixes, attention check rendering);
+  (b) manuscript restructure (stronger JSS venue-fit argument, sframe design and
+  extensibility section, functionality table, worked example opening with the
+  research scenario, shorter code chunks). Full checklist in `jss-paper/CLAUDE.md`.
+- After acceptance: add `inst/CITATION` pointing to the JSS DOI and convert the
+  manuscript into a vignette.
 - This is the anchor citation for the whole ecosystem.
 
 ### 2. Methodological paper based on v0.3
