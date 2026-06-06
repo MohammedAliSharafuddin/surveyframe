@@ -23,6 +23,14 @@ differentiator and the thesis of the JSS paper.
 Current version: 0.3.1 published on CRAN (2026-06-02). 0.3.2 in planning. 0.3.0
 was accepted on CRAN on 2026-05-21.
 
+After 0.3.2 comes 0.3.3, a faculty-demo proofing release: run a demo session to
+college faculty, then ship their feedback, expected to be mostly UI, UX, and qmd
+report-file fixes. Its date is pending the demo and it shifts 0.4 and the tail.
+0.4 then ships small-sample inference plus the RStudio add-in (an adoption
+add-on: inst/rstudio addins registry plus a small R file, rstudioapi in Suggests,
+on the dev branch now and on CRAN with 0.4). The canonical schedule is the
+portfolio-planner master_roadmap.md.
+
 ---
 
 ## Ecosystem and how the pieces fit
@@ -227,6 +235,16 @@ criteria-weight item types. Stay within the analysis-plan contract. No new hard
 dependencies. Propose the plan before writing code.
 ```
 
+### Start the 0.3.3 faculty demo proofing
+
+```
+Read CLAUDE.md and roadmap.md. Prepare the 0.3.3 faculty demo proofing release.
+Run a demo session to college faculty, collect feedback, then ship the fixes.
+Expect mostly UI and UX changes and qmd report-file improvements (logical and
+aesthetic). Do not add analytical features here. Propose the change list before
+editing.
+```
+
 ### Start the v0.4 small-sample work
 
 ```
@@ -234,7 +252,10 @@ Read CLAUDE.md and roadmap.md. Begin surveyframe v0.4: small-sample inference.
 Add exact, permutation, and bootstrap variants for the existing two-group and
 association tests, plus effect-size confidence intervals, drawing on the
 small-sample-survey-framework. Add a small-sample advisory to sample_size_plan()
-and assumption_report(). Propose the plan before writing code.
+and assumption_report(). Also add the RStudio add-in as an adoption add-on (a
+thin wrapper over the launchers plus an insert-sframe-skeleton helper, rstudioapi
+in Suggests). Do not write the dcf until the plan is agreed. Propose the plan
+before writing code.
 ```
 
 ### Work on the JSS paper
