@@ -7,8 +7,9 @@ Excluded from the CRAN build (via .Rbuildignore) and from the public repo
 
 ## v0.3.2 — Planning (not yet started)
 
-A maintenance release to carry the citation fix. Do not edit package files for
-this until 0.3.2 is formally planned.
+Scope expanded in 2026-06. The CITATION fix is still the trigger for cutting
+this release, but the JSS editor review (received 2026-06) adds package changes
+that must ship with 0.3.2 before resubmission. No new features and no new exports.
 
 ### Blocking fix: stale `inst/CITATION`
 
@@ -43,6 +44,54 @@ Planned change to `inst/CITATION` (apply during 0.3.2, then verify with
   when `meta` is unavailable) so the note never goes stale on a future bump.
 - Keep author, year (2026), and url.
 
+### JSS editor review items (received 2026-06)
+
+The JSS editor returned the submission without sending it to full review. The
+invitation to revise and resubmit identified specific package defects that must
+be corrected before resubmission. These ship with 0.3.2.
+
+Full revision checklist is in `jss-paper/CLAUDE.md` (public repo). Package items:
+
+#### S3 methods on sub-classes
+
+The editor ran `methods(class = "sf_choices")` and received no output. All
+sub-classes must have `print`, `format`, and `summary` methods. The `sframe`
+class already has these in `R/sframe_methods.R`. The sub-classes have none.
+
+File to create: `R/sf_component_methods.R`. Classes to cover:
+
+- [ ] `sf_choices`
+- [ ] `sf_item`
+- [ ] `sf_scale`
+- [ ] `sf_branch`
+- [ ] `sf_check`
+- [ ] `sf_model`
+
+#### lavaan in Suggests
+
+- [ ] Add `lavaan` to `Suggests` in `DESCRIPTION`.
+- [ ] Wrap all lavaan-dependent code in `requireNamespace("lavaan", quietly = TRUE)` guards.
+- [ ] Confirm `psych` guards are already consistent (they are in the current `replicate.R`).
+
+#### Replication script (`replicate.R`)
+
+- [ ] Add `export_static_survey()` call, wrapped in `if (interactive()) { }`.
+  The manuscript shows this call but it is absent from `replicate.R`.
+- [ ] Audit every other interactive-only call and wrap accordingly.
+- [ ] Remove any `str()` calls that expose internal object structure.
+
+#### Static survey rendering
+
+- [ ] Attention check items render with a different answer layout than regular
+  Likert items in the exported HTML survey. Match the choice set setup for
+  `sf_check` items to regular `sf_item` rendering in `R/export_static_survey.R`.
+
+#### Response collection demo
+
+- [ ] The end-to-end path (static survey submission to CSV download to
+  `read_responses()`) must be demonstrable without interactive mode. Add a
+  bundled one-row example CSV or show the path clearly in the replication script.
+
 ### Not a fix: the two remaining `\dontrun` blocks
 
 The reviewer also asked to replace `\dontrun` with `\donttest`. This was already
@@ -51,6 +100,9 @@ addressed at 0.3.0: seven of nine examples were converted. The two that remain
 `lavaan`, which is not a declared dependency) are the documented legitimate
 exceptions (missing API keys / missing additional software). Converting them to
 `\donttest` would make CRAN run them and fail. They stay `\dontrun`. No action.
+
+Note: once `lavaan` is added to `Suggests` (JSS item above), the `cfa_syntax`
+block can move to `\donttest`. Assess at that time.
 
 ### Other 0.3.2 candidates (low effort, no code risk)
 
@@ -403,7 +455,9 @@ No new features in 0.3.x. All of the following wait for v0.4.
   asrda-r is deferred indefinitely.
 - ASRDA textbook: early draft. Will be written after the JSS paper is
   accepted so the book can cite a published reference.
-- JSS paper: manuscript is in jss-paper/surveyframe.Rnw. Needs institutional
-  address filled in before submission.
+- JSS paper: submitted 2026-06-02 (OJS 6454). Editor returned without full
+  review 2026-06; invited to revise and resubmit. Manuscript and package changes
+  required. See jss-paper/CLAUDE.md (public repo) for the full revision checklist.
+  The package changes ship with 0.3.2 (v0.3.2 section above).
 - semScreenR: companion package for SEM data screening. Natural pipeline:
-  cfa_syntax() output feeds into semScreenR before lavaan::cfa().
+  cfa_syntax() output feeds into semScreenR before lavaan::cfa()
