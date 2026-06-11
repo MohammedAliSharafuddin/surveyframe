@@ -1,3 +1,21 @@
+# surveyframe 0.3.2
+
+This is a maintenance patch. It corrects the package citation and completes the
+S3 method surface for the instrument component classes. There are no new
+exported functions, no new statistical methods, and no new bundled datasets.
+
+## Changes
+
+* `inst/CITATION` now reports the correct package title and reads the version
+  dynamically from the package metadata, so the citation no longer pins an old
+  version or an outdated title.
+* Added `print()`, `format()`, and `summary()` methods for the component
+  classes `sf_choices`, `sf_item`, `sf_scale`, `sf_branch`, `sf_check`, and
+  `sf_model`, so each class now has a visible, documented S3 surface.
+* `lavaan` is declared in `Suggests`. It is used only to fit the syntax produced
+  by `cfa_syntax()`; the package itself generates syntax and never requires
+  `lavaan` to be installed.
+
 # surveyframe 0.3.1
 
 This is a patch release. It fixes the static-survey to Google Sheets to R
