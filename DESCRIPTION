@@ -1,6 +1,6 @@
 Package: surveyframe
 Title: Survey Instrument Workflows
-Version: 0.3.1
+Version: 0.3.2
 Authors@R: c(
     person(
       given = "Mohammed Ali",
@@ -38,6 +38,7 @@ Suggests:
     MASS,
     nnet,
     digest (>= 0.6.0),
+    lavaan (>= 0.6-0),
     testthat (>= 3.0.0),
     knitr,
     rmarkdown
