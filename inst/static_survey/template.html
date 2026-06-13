@@ -192,6 +192,11 @@ const choiceMap={};
 const branchMap={};
 (SF.branching||[]).forEach(function(rule){branchMap[rule.item_id]=rule;});
 
+// Items designated as quality checks render as Likert (inline radio) so
+// their choice layout matches regular scale items visually.
+const checkItemIds=new Set();
+(SF.checks||[]).forEach(function(ck){if(ck.item_id)checkItemIds.add(ck.item_id);});
+
 // ── Response state ─────────────────────────────────────────────────────────
 const responses={};
 const startedAt=new Date().toISOString();
@@ -260,6 +265,10 @@ function renderItem(item){
   var cs=choiceMap[item.choice_set||'']||{values:[],labels:[]};
   if(t==='section_break') return renderSection(item);
   if(t==='text_block')    return renderTextBlock(item);
+  // Quality check items (attention / trap / instructional) that have a choice
+  // set render as Likert (inline radios) so their layout matches regular scale
+  // items. A check item with type single_choice would otherwise render stacked.
+  if(checkItemIds.has(item.id)&&item.choice_set)return wrapItem(item,renderLikert(item,cs));
   if(t==='likert')        return wrapItem(item,renderLikert(item,cs));
   if(t==='single_choice') return wrapItem(item,renderSingle(item,cs));
   if(t==='multiple_choice')return wrapItem(item,renderMulti(item,cs));
