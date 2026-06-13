@@ -20,16 +20,16 @@ contract declared before data collection. Analysis is the execution of that
 pre-declared plan rather than a post-hoc search. This is the package's main
 differentiator and the thesis of the JSS paper.
 
-Current version: 0.3.1 published on CRAN (2026-06-02). 0.3.2 in planning. 0.3.0
-was accepted on CRAN on 2026-05-21.
+Current version: 0.3.1 on CRAN (2026-06-02). 0.3.2 implemented locally — all 7
+changes committed and pushed to both remotes, 407/407 tests pass. Awaiting
+MAS co-review (see mas_review_032.md in this folder) then R CMD check --as-cran,
+win-builder, and CRAN submission.
 
-After 0.3.2 comes 0.3.3, a faculty-demo proofing release: run a demo session to
-college faculty, then ship their feedback, expected to be mostly UI, UX, and qmd
-report-file fixes. Its date is pending the demo and it shifts 0.4 and the tail.
-0.4 then ships small-sample inference plus the RStudio add-in (an adoption
-add-on: inst/rstudio addins registry plus a small R file, rstudioapi in Suggests,
-on the dev branch now and on CRAN with 0.4). The canonical schedule is the
-portfolio-planner master_roadmap.md.
+After 0.3.2 comes 0.3.3 (real-world embedding and conference feedback from the
+AIC-RSAM room-service study and the ICSRI 2026 presentation), then a
+visualisation patch arc 0.3.4-0.3.9 (six ~21-day releases), then 0.4
+(small-sample inference). 0.4.1 is the faculty demo proofing release. The
+canonical schedule is portfolio-planner master_roadmap.md.
 
 ---
 
@@ -135,14 +135,14 @@ Run from the repository root.
 
 ```r
 devtools::document()          # regenerate man/ and NAMESPACE
-devtools::test()              # run the test suite (expect 368 passing at 0.3.1)
+devtools::test()              # run the test suite (expect 407 passing at 0.3.2)
 devtools::load_all()          # load for interactive work
 rmarkdown::render("vignettes/surveyframe.Rmd", output_dir = tempdir())
 ```
 
 ```bash
 R CMD build .                                   # build the source tarball
-R CMD check --as-cran surveyframe_0.3.1.tar.gz  # full CRAN check
+R CMD check --as-cran surveyframe_0.3.2.tar.gz  # full CRAN check
 ```
 
 A clean CRAN check is 0 errors, 0 warnings, and at most 1 NOTE (incoming
@@ -153,45 +153,36 @@ feasibility). The vignette builds offline because the data-collection step uses
 
 ## Current status and immediate next steps
 
-0.3.1 is published on CRAN (2026-06-02). R CMD check was clean (0 errors, 0
-warnings, 1 NOTE) on local Ubuntu and win-builder R-release and R-devel. The
-next release is 0.3.2.
+0.3.1 is published on CRAN (2026-06-02). 0.3.2 is fully implemented (all 7
+changes done, 407/407 tests pass, vignette knits, both remotes up to date).
 
-The JSS paper was submitted on 2026-06-02 (OJS submission 6454): two authors
-with affiliations and ORCID, software prose humanised, compiled to 17 pages,
-checked against the JSS author and style guides. It lives in `jss-paper/` on
-this dev branch. The submission package was the PDF, the surveyframe_0.3.1
-tarball, and `replicate.R`. Awaiting the editorial decision.
+**The immediate gate is the MAS co-review.** Read `mas_review_032.md` in this
+folder and work through it step by step in RStudio before proceeding to R CMD
+check. The review covers all code changes, the static survey UI in a browser,
+the vignette output, and the replicate.R script.
 
-Known issue to ship with 0.3.2: `inst/CITATION` was never updated when the
-package title was corrected and the version was bumped. It still reads
-"surveyframe: A Survey Instrument Workflow for R" (the redundant "for R" the
-CRAN reviewer asked to drop) and hard-codes "R package version 0.3.0". The
-DESCRIPTION title was fixed during the 0.3.0 review but the CITATION was not
-brought into line, and `R CMD check` does not compare the two, so it passed
-silently through 0.3.0 and 0.3.1. The CRAN package page citation only refreshes
-when a new version is published, so the corrected citation ships with 0.3.2.
+After co-review sign-off:
 
-Fix for 0.3.2 (do not apply until 0.3.2 is planned):
+1. `R CMD build .` on the 0.3.2 source.
+2. `R CMD check --as-cran surveyframe_0.3.2.tar.gz` — must be 0 errors, 0 warnings.
+3. Win-builder R-release and R-devel — both clean.
+4. Update `cran-comments.md` with the verified results.
+5. Submit to CRAN.
 
-- `inst/CITATION` title to "surveyframe: Survey Instrument Workflows" (drop
-  "for R", match the corrected DESCRIPTION Title).
-- Read the version dynamically from `meta$Version` (with a `packageVersion()`
-  fallback) so the citation never goes stale on a future bump.
-- No `\dontrun` change is needed. Seven of nine examples were converted to
-  `\donttest` at 0.3.0; the two remaining `\dontrun` blocks (`read_sheet_responses`
-  needs Google auth, `cfa_syntax` calls undeclared `lavaan`) are the documented
-  legitimate exceptions and must stay `\dontrun`.
+The JSS paper (OJS 6454, submitted 2026-06-02) was returned without full review.
+Revised and resubmit invitation. The replicate.R and package changes it required
+are now in 0.3.2. The manuscript revision (surveyframe.Rnw) has not yet been
+started. That is the next step after 0.3.2 ships.
 
-Open items:
+Open items (non-blocking for CRAN submission):
 
-- Confirm or remove the Codecov badge in the README.
-- After CRAN accepts 0.3.1, trigger the pkgdown build.
-- Future patch, not 0.3.1: guard the launcher `\donttest` examples
-  (launch_dashboard and similar) so a check that runs donttest does not hang.
+- Confirm or remove the Codecov badge in README.
+- Trigger pkgdown build after 0.3.2 is accepted.
+- Guard `launch_dashboard()` and similar Shiny launcher `\donttest` examples so a
+  full check does not hang; this is a future patch, not a 0.3.2 blocker.
 
-Commit messages no longer use a co-author trailer. The full task list is in
-`revision_todo_0.3.md`. The version and growth plan is in `roadmap.md`.
+The full task list is in `revision_todo_0.3.md`. The version and growth plan is
+in `roadmap.md`.
 
 ---
 
@@ -216,13 +207,14 @@ Commit messages no longer use a co-author trailer. The full task list is in
 
 ## Continuation prompts (paste to resume a thread of work)
 
-### Continue 0.3.1 to submission
+### Submit 0.3.2 to CRAN (after MAS co-review sign-off)
 
 ```
-Read CLAUDE.md and revision_todo_0.3.md. We are finishing surveyframe 0.3.1.
-Run devtools::test() and a full R CMD check --as-cran on the current tarball,
-fix anything that is not 0 errors and 0 warnings, update cran-comments.md with
-the result, and tell me what remains before I submit to CRAN.
+Read CLAUDE.md and mas_review_032.md. The MAS co-review is complete. Run
+R CMD build . to produce surveyframe_0.3.2.tar.gz, then R CMD check --as-cran
+on the tarball. The target is 0 errors, 0 warnings, at most 1 NOTE. If clean,
+update cran-comments.md with the results and tell me what to paste on the CRAN
+submission form.
 ```
 
 ### Start the v0.5 MCDM work
@@ -235,14 +227,15 @@ criteria-weight item types. Stay within the analysis-plan contract. No new hard
 dependencies. Propose the plan before writing code.
 ```
 
-### Start the 0.3.3 faculty demo proofing
+### Start the 0.3.3 real-world feedback release
 
 ```
-Read CLAUDE.md and roadmap.md. Prepare the 0.3.3 faculty demo proofing release.
-Run a demo session to college faculty, collect feedback, then ship the fixes.
-Expect mostly UI and UX changes and qmd report-file improvements (logical and
-aesthetic). Do not add analytical features here. Propose the change list before
-editing.
+Read CLAUDE.md and portfolio-planner/development_instructions/04_v032_v033_implementation.md.
+We are preparing surveyframe 0.3.3: real-world embedding and conference feedback.
+The two evidence sources are ai-room-service-prototype (local: AI_Room_service/)
+and the ICSRI 2026 presentation. Read both repos, reproduce the AIC-RSAM instrument
+as a dev-branch regression fixture, and triage the fixes needed. Strict patch scope:
+no new analytical features.
 ```
 
 ### Start the v0.4 small-sample work

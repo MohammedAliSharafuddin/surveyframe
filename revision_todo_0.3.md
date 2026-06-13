@@ -5,11 +5,15 @@ Excluded from the CRAN build (via .Rbuildignore) and from the public repo
 
 ---
 
-## v0.3.2 — Planning (not yet started)
+## v0.3.2 — Implemented (awaiting MAS co-review, then CRAN)
 
-Scope expanded in 2026-06. The CITATION fix is still the trigger for cutting
-this release, but the JSS editor review (received 2026-06) adds package changes
-that must ship with 0.3.2 before resubmission. No new features and no new exports.
+All 7 changes committed. 407/407 tests pass. Vignette knits clean. Both remotes
+(origin/main and private/main) up to date. Commits: 80e4040 (changes 1-4),
+be2ed94 (changes 5-6), 519454b (replicate.R on dev). MAS co-review checklist is
+in mas_review_032.md. Do not run R CMD check until co-review is signed off.
+
+Scope: the CITATION fix is still the trigger. The JSS editor review adds the
+package changes below. No new features, no new exports.
 
 ### Blocking fix: stale `inst/CITATION`
 
@@ -58,33 +62,35 @@ The editor ran `methods(class = "sf_choices")` and received no output. All
 sub-classes must have `print`, `format`, and `summary` methods. The `sframe`
 class already has these in `R/sframe_methods.R`. The sub-classes have none.
 
-File to create: `R/sf_component_methods.R`. Classes to cover:
+File created: `R/sf_component_methods.R` (commit 80e4040). Classes covered:
 
-- [ ] `sf_choices`
-- [ ] `sf_item`
-- [ ] `sf_scale`
-- [ ] `sf_branch`
-- [ ] `sf_check`
-- [ ] `sf_model`
+- [x] `sf_choices`
+- [x] `sf_item`
+- [x] `sf_scale`
+- [x] `sf_branch`
+- [x] `sf_check`
+- [x] `sf_model`
 
 #### lavaan in Suggests
 
-- [ ] Add `lavaan` to `Suggests` in `DESCRIPTION`.
-- [ ] Wrap all lavaan-dependent code in `requireNamespace("lavaan", quietly = TRUE)` guards.
-- [ ] Confirm `psych` guards are already consistent (they are in the current `replicate.R`).
+- [x] Add `lavaan` to `Suggests` in `DESCRIPTION`. Done (commit 80e4040).
+- [x] Wrap all lavaan-dependent code in `requireNamespace()` guards. No executable
+  `lavaan::` calls exist in `R/`; only string literals and `\dontrun` examples.
+- [x] Confirm `psych` guards are already consistent. Confirmed.
 
 #### Replication script (`replicate.R`)
 
-- [ ] Add `export_static_survey()` call, wrapped in `if (interactive()) { }`.
-  The manuscript shows this call but it is absent from `replicate.R`.
-- [ ] Audit every other interactive-only call and wrap accordingly.
-- [ ] Remove any `str()` calls that expose internal object structure.
+- [x] Add `export_static_survey()` call, wrapped in `if (interactive()) { }`. Done
+  (commit 519454b on dev branch). `render_results()` also added and guarded.
+- [x] Audit every other interactive-only call and wrap accordingly. Done.
+- [x] Remove any `str()` calls. No `str()` calls were present.
 
 #### Static survey rendering
 
-- [ ] Attention check items render with a different answer layout than regular
-  Likert items in the exported HTML survey. Match the choice set setup for
-  `sf_check` items to regular `sf_item` rendering in `R/export_static_survey.R`.
+- [x] Attention check items render with a different answer layout than regular
+  Likert items. Fixed in `inst/static_survey/template.html` (commit be2ed94):
+  `checkItemIds` set from `SF.checks`; `renderItem()` forces Likert layout for
+  any check item that has a choice set.
 
 #### Response collection demo
 

@@ -1,0 +1,878 @@
+# MAS Review — surveyframe 0.3.2 Complete Package Review
+
+**Reviewer:** Mohammed Ali Sharafuddin  
+**Date:** 2026-06-13  
+**Version under review:** 0.3.2 (implemented locally, not yet on CRAN)  
+**Purpose:** Full A-Z review of every feature, UI screen, UX flow, and logical
+path before R CMD check and CRAN submission. Sign off after completing every
+checklist item.
+
+Work through this document sequentially in a fresh RStudio session.
+
+---
+
+## Prerequisites
+
+- [ ] RStudio is open with a clean R session (restart R before starting).
+- [ ] A modern browser is available (Chrome or Firefox).
+- [ ] `devtools`, `remotes`, `psych`, `rmarkdown`, `shiny`, and `googlesheets4`
+  are installed (the last two can be absent — they are Suggests only).
+- [ ] Internet access is available for the GitHub install step.
+
+---
+
+## Part A — Installation
+
+### Step A1 — Install the development version from GitHub
+
+This is the exact path a developer or collaborator would use to get the latest
+code before it lands on CRAN.
+
+```r
+if (!requireNamespace("remotes", quietly = TRUE)) install.packages("remotes")
+remotes::install_github("MohammedAliSharafuddin/surveyframe", force = TRUE)
+```
+
+- [ ] Installation completes with no errors.
+- [ ] No warning about missing Imports packages (jsonlite, rlang, openssl must
+  all install or already be present).
+
+### Step A2 — Confirm version
+
+```r
+packageVersion("surveyframe")
+# Expected: '0.3.2'
+```
+
+- [ ] Version reads `0.3.2`.
+
+### Step A3 — Confirm available functions
+
+```r
+ls("package:surveyframe")
+```
+
+- [ ] The function list is non-empty and includes `sf_instrument`, `sf_item`,
+  `sf_choices`, `sf_scale`, `sf_branch`, `sf_check`, `sf_model`,
+  `export_static_survey`, `launch_builder`, `launch_studio`, `launch_dashboard`,
+  `run_analysis_plan`, `render_report`, `render_results`.
+
+---
+
+## Part B — Package loading and citation
+
+### Step B1 — Load silently
+
+```r
+library(surveyframe)
+```
+
+- [ ] No startup messages or warnings.
+
+### Step B2 — Citation (Change 1 of 0.3.2)
+
+```r
+citation("surveyframe")
+```
+
+- [ ] Title reads: `surveyframe: Survey Instrument Workflows` (no "for R").
+- [ ] The note field shows `R package version 0.3.2`, not the old hard-coded `0.3.0`.
+- [ ] Author, ORCID, and URL are correct.
+
+### Step B3 — Help pages load
+
+```r
+?sf_instrument
+?sf_item
+?export_static_survey
+?run_analysis_plan
+?render_report
+```
+
+- [ ] Each help page opens without error.
+- [ ] Examples in each page are present and readable.
+
+---
+
+## Part C — S3 methods for component classes (Change 2 of 0.3.2)
+
+### Step C1 — Methods are registered
+
+```r
+methods(class = "sf_choices")
+methods(class = "sf_item")
+methods(class = "sf_scale")
+methods(class = "sf_branch")
+methods(class = "sf_check")
+methods(class = "sf_model")
+```
+
+- [ ] Each call returns at least `format.<class>`, `print.<class>`, `summary.<class>`.
+
+### Step C2 — sf_choices display
+
+```r
+cs <- sf_choices("agree5", 1:5,
+                 c("Strongly disagree", "Disagree", "Neutral",
+                   "Agree", "Strongly agree"))
+cs               # calls print.sf_choices
+format(cs)
+summary(cs)
+```
+
+- [ ] `print(cs)` shows a header line and a two-column value/label table.
+- [ ] `format(cs)` returns a compact single character string.
+- [ ] `summary(cs)` shows `allow_other` and `randomise` flags.
+
+### Step C3 — sf_item display
+
+```r
+it <- sf_item("q1", "How satisfied are you?",
+              type = "likert", choice_set = "agree5", required = TRUE)
+it
+format(it)
+summary(it)
+```
+
+- [ ] `print(it)` shows id, type, label, choice set.
+- [ ] `summary(it)` shows required and reverse flags.
+
+### Step C4 — sf_scale display
+
+```r
+sc <- sf_scale("sat", "Satisfaction", items = c("q1", "q2", "q3"))
+sc
+format(sc)
+summary(sc)
+```
+
+- [ ] `print(sc)` shows id, item count, items list, and scoring method.
+- [ ] `format(sc)` says "3 item(s)".
+
+### Step C5 — sf_branch display (real field names: item_id, depends_on)
+
+```r
+br <- sf_branch("q2", depends_on = "q1", operator = "==",
+                value = "yes", action = "show")
+br
+format(br)
+summary(br)
+```
+
+- [ ] `print(br)` shows the rule in readable English: "show when q1 == yes".
+- [ ] No error about missing or wrong field names.
+
+### Step C6 — sf_check display
+
+```r
+ck <- sf_check("attn1", item_id = "q5", type = "attention",
+               pass_values = 3, fail_action = "flag")
+ck
+format(ck)
+summary(ck)
+```
+
+- [ ] `print(ck)` shows id, type, item_id, and pass values.
+- [ ] `summary(ck)` shows `fail_action`.
+
+### Step C7 — sf_model display
+
+```r
+mdl <- sf_model("m1", label = "Measurement model", type = "cfa")
+mdl
+format(mdl)
+summary(mdl)
+```
+
+- [ ] `print(mdl)` shows id, type, 0 construct(s), label, and engine.
+- [ ] `summary(mdl)` shows engine and structural path count.
+
+---
+
+## Part D — Instrument construction
+
+### Step D1 — Build a minimal instrument in code
+
+```r
+agree5 <- sf_choices("agree5", 1:5,
+                     c("Strongly disagree", "Disagree", "Neutral",
+                       "Agree", "Strongly agree"))
+
+q1 <- sf_item("q1", "The service met my expectations.",
+              type = "likert", choice_set = "agree5",
+              scale_id = "sat", required = TRUE)
+q2 <- sf_item("q2", "I would recommend this service.",
+              type = "likert", choice_set = "agree5",
+              scale_id = "sat", required = TRUE)
+q3 <- sf_item("attn_q", "Please select 'Agree' for this item.",
+              type = "single_choice", choice_set = "agree5", required = TRUE)
+
+sat <- sf_scale("sat", "Satisfaction", items = c("q1", "q2"), method = "mean")
+chk <- sf_check("attn1", item_id = "attn_q", type = "attention",
+                pass_values = 4, fail_action = "flag")
+
+instr <- sf_instrument(
+  title       = "MAS Review Test Survey",
+  version     = "1.0.0",
+  description = "Minimal instrument for the 0.3.2 review.",
+  authors     = "Mohammed Ali Sharafuddin",
+  components  = list(agree5, q1, q2, q3, sat, chk)
+)
+
+print(instr)
+```
+
+- [ ] `print(instr)` shows a tidy summary: title, item count, scale count,
+  check count, and validation status.
+- [ ] No error during construction.
+
+### Step D2 — Validation
+
+```r
+v <- validate_sframe(instr)
+v$valid
+v$problems
+```
+
+- [ ] `v$valid` is `TRUE`.
+- [ ] `v$problems` is empty (length 0) or contains only expected informational notes.
+
+---
+
+## Part E — Serialisation (write and read round-trip)
+
+### Step E1 — Write and read back
+
+```r
+tmp <- tempfile(fileext = ".sframe")
+write_sframe(instr, tmp)
+instr2 <- read_sframe(tmp)
+
+identical(instr$meta$title, instr2$meta$title)
+identical(length(instr$items), length(instr2$items))
+```
+
+- [ ] Both `identical()` calls return `TRUE`.
+- [ ] No hash mismatch error on `read_sframe()`.
+
+### Step E2 — Hash integrity check
+
+```r
+# Tamper with the file to confirm the check fires
+raw <- readLines(tmp)
+raw[2] <- gsub("a", "b", raw[2], fixed = TRUE)
+tmp2 <- tempfile(fileext = ".sframe")
+writeLines(raw, tmp2)
+tryCatch(read_sframe(tmp2), error = function(e) message("Caught: ", conditionMessage(e)))
+```
+
+- [ ] An error is caught mentioning hash or integrity.
+
+---
+
+## Part F — SurveyBuilder HTML
+
+### Step F1 — Launch and explore
+
+```r
+launch_builder(open = TRUE)
+```
+
+A browser tab opens with the SurveyBuilder HTML. Work through the UI:
+
+- [ ] The builder loads without a blank screen or JavaScript errors (open the
+  browser console — no red errors).
+- [ ] You can add a new question using the Add Item button.
+- [ ] The item type dropdown includes all 13 types: Likert, Single choice,
+  Multiple choice, Matrix, Numeric, Text, Long text, Date, Slider, Rating,
+  Ranking, Section break, Text block.
+- [ ] You can add a choice set and assign it to a Likert item.
+- [ ] You can add a scale and assign items to it.
+- [ ] The Save .sframe button downloads a `.sframe` file.
+- [ ] The Load .sframe button accepts the saved file and restores the instrument.
+- [ ] The Analyse tab is accessible and shows the three-panel Plan/Run/Report layout.
+- [ ] No broken images or garbled text anywhere in the UI.
+
+### Step F2 — Demo mode
+
+```r
+launch_builder_demo()
+```
+
+- [ ] The builder opens pre-loaded with the demo instrument.
+- [ ] Items, choice sets, and scales are all visible without a manual load step.
+
+---
+
+## Part G — SurveyStudio Shiny app
+
+### Step G1 — Launch studio
+
+```r
+launch_studio(open = TRUE)
+```
+
+- [ ] Shiny app launches in the browser.
+- [ ] The sidebar shows navigation options: Build, Analyse, Report.
+- [ ] The logo and brand colours display correctly.
+- [ ] No R console error during launch.
+
+### Step G2 — Load the demo instrument in studio
+
+```r
+launch_studio_demo()
+```
+
+- [ ] The studio opens with the demo instrument pre-loaded.
+- [ ] Items are visible in the Build panel.
+- [ ] The Analyse panel shows the declared research questions.
+- [ ] The Report panel is accessible.
+
+---
+
+## Part H — Static HTML survey export and browser review
+
+### Step H1 — Export a survey
+
+```r
+out <- export_static_survey(
+  instr,
+  output_path = file.path(tempdir(), "mas_review_survey.html"),
+  open        = TRUE,
+  overwrite   = TRUE
+)
+cat("Written to:", out, "\n")
+cat("Size:", round(file.size(out) / 1024, 1), "KB\n")
+```
+
+- [ ] File is written without error.
+- [ ] A message confirms the path and size in KB.
+- [ ] The browser opens automatically.
+
+### Step H2 — Welcome screen
+
+In the browser:
+
+- [ ] A welcome screen appears before any questions.
+- [ ] The survey title "MAS Review Test Survey" is visible.
+- [ ] A Start button is present.
+
+### Step H3 — Question rendering
+
+Click Start and review the question pages:
+
+- [ ] The Likert item (`q1`) renders with options in a horizontal row (one
+  column per option, label below each radio button).
+- [ ] The second Likert item (`q2`) renders in the same horizontal layout.
+- [ ] The attention check item (`attn_q`) — declared as `single_choice` but
+  designated as a check — also renders in the horizontal Likert layout, not
+  as a vertical stacked list. (This is Change 5 of 0.3.2.)
+- [ ] The required marker (`*`) appears next to all required items.
+- [ ] Progress bar updates as you move through the survey.
+
+### Step H4 — Validation and submission
+
+- [ ] Clicking Next without answering a required item shows an inline error
+  message below the item, not a page-level alert.
+- [ ] Answering the items and clicking Submit downloads a CSV file.
+- [ ] Open the downloaded CSV: it has a `respondent_id` column and one column
+  per item.
+
+### Step H5 — Mobile layout
+
+Open the exported HTML file on a phone (share the file via QR code, AirDrop,
+or email), or use Chrome DevTools > Toggle device toolbar to simulate a phone:
+
+- [ ] All items are readable on a narrow screen without horizontal scrolling.
+- [ ] The Likert row wraps gracefully on very small screens (360px wide).
+- [ ] Buttons are large enough to tap.
+
+---
+
+## Part I — Shiny survey module
+
+### Step I1 — Embed the module in a minimal app
+
+```r
+library(shiny)
+
+ui <- fluidPage(
+  titlePanel("Module test"),
+  survey_module_ui("test_survey")
+)
+
+server <- function(input, output, session) {
+  resp <- survey_module_server("test_survey", instrument = instr)
+  observeEvent(resp(), {
+    showNotification(paste("Submitted:", length(resp()), "responses"))
+  })
+}
+
+shinyApp(ui, server)
+```
+
+- [ ] The app launches and the survey renders inside the page.
+- [ ] Completing and submitting the survey fires the `observeEvent` notification.
+- [ ] No console errors.
+
+---
+
+## Part J — Demo data and response pipeline
+
+### Step J1 — Load demo data
+
+```r
+demo  <- sframe_demo_data()
+instr_d <- demo$instrument
+resp    <- demo$responses
+
+cat("Items:", length(instr_d$items), "\n")
+cat("Scales:", length(instr_d$scales), "\n")
+cat("Responses:", nrow(resp), "\n")
+```
+
+- [ ] Counts are non-zero and match expectations (46 items, 9 scales, 60 responses).
+
+### Step J2 — read_responses with a bundled CSV
+
+```r
+# Export a one-row CSV from the static survey, then read it back
+resp_csv <- file.path(tempdir(), "test_response.csv")
+
+# Simulate what the browser download produces
+fake_row <- as.list(setNames(
+  rep(3, length(instr$items)),
+  sapply(instr$items, function(i) i$id)
+))
+fake_row$respondent_id <- "R001"
+fake_row$started_at    <- as.character(Sys.time())
+
+write.csv(as.data.frame(fake_row), resp_csv, row.names = FALSE)
+
+read_resp <- read_responses(resp_csv, instr)
+nrow(read_resp)
+```
+
+- [ ] Returns a one-row data frame.
+- [ ] No error about unknown columns.
+
+---
+
+## Part K — Quality report
+
+```r
+qr <- quality_report(resp, instr_d)
+
+cat("Respondents:", qr$summary$n_respondents, "\n")
+cat("Flagged:",     qr$summary$n_flagged, "\n")
+print(qr)
+```
+
+- [ ] `$n_respondents` matches the number of rows in `resp`.
+- [ ] `print(qr)` shows a readable summary — no raw list output.
+- [ ] No error about attention check items.
+
+---
+
+## Part L — Scale scoring
+
+```r
+scored <- score_scales(resp, instr_d)
+
+scale_cols <- c("DMRE", "DMAU", "DMEU", "DMPV",
+                "DSQA", "DSQT", "DSUQ", "TS", "BI")
+
+# Prof-10: should display as a labelled data frame with Mean and SD
+scale_summary <- data.frame(
+  Scale = scale_cols,
+  Mean  = round(colMeans(scored[, scale_cols], na.rm = TRUE), 2),
+  SD    = round(apply(scored[, scale_cols], 2, sd, na.rm = TRUE), 2),
+  row.names = NULL
+)
+print(scale_summary)
+```
+
+- [ ] `scored` has all original columns plus one per scale.
+- [ ] Scale means are between 1 and 5 (Likert range).
+- [ ] The data frame prints with Scale, Mean, and SD columns.
+
+---
+
+## Part M — Psychometric reports
+
+### Step M1 — Missing data report
+
+```r
+mr <- missing_data_report(resp, instr_d)
+print(mr)
+```
+
+- [ ] Prints a summary of missing values per item.
+- [ ] `mcar` slot returns `available = FALSE` (Little's MCAR is not implemented
+  in 0.3.2; this is documented behaviour, not a bug).
+
+### Step M2 — Reliability report
+
+```r
+if (requireNamespace("psych", quietly = TRUE)) {
+  rr <- reliability_report(scored, instr_d, omega = FALSE)
+  print(rr)
+}
+```
+
+- [ ] One reliability row per scale.
+- [ ] Alpha values are between 0 and 1.
+- [ ] No psych internal warnings printed to the console.
+
+### Step M3 — Item report
+
+```r
+ir <- item_report(resp, instr_d)
+print(ir)
+```
+
+- [ ] Returns item-level statistics (mean, SD, skewness for each item).
+
+### Step M4 — EFA readiness report
+
+```r
+if (requireNamespace("psych", quietly = TRUE)) {
+  er <- efa_report(scored, instr_d)
+  print(er)
+}
+```
+
+- [ ] KMO overall value is printed.
+- [ ] Bartlett's test chi-square and p-value are printed.
+- [ ] Suggested number of factors is printed.
+- [ ] No errors.
+
+### Step M5 — Validity report
+
+```r
+loadings_list <- list(
+  DMRE = c(dm_1 = 0.78, dm_2 = 0.82, dm_3 = 0.75, dm_4 = 0.80, dm_5 = 0.77),
+  TS   = c(ts_1 = 0.84, ts_2 = 0.80, ts_3 = 0.88)
+)
+vr <- validity_report(loadings_list)
+print(vr$reliability)
+```
+
+- [ ] CR and AVE are computed for each construct.
+- [ ] AVE is between 0 and 1.
+- [ ] No error.
+
+### Step M6 — Assumption report
+
+```r
+if (requireNamespace("psych", quietly = TRUE)) {
+  ar <- assumption_report(scored, instr_d)
+  print(ar)
+}
+```
+
+- [ ] Normality results are shown per scale variable.
+- [ ] No error.
+
+---
+
+## Part N — CFA and SEM syntax generation
+
+```r
+syn_cfa <- cfa_lavaan_syntax(instr_d)
+cat(syn_cfa)
+
+syn_sem <- sem_lavaan_syntax(instr_d)
+cat(syn_sem)
+
+syn_pls <- seminr_syntax(instr_d)
+cat(syn_pls)
+```
+
+- [ ] `cfa_lavaan_syntax()` returns a multi-line lavaan model string
+  (e.g., `DMRE =~ dm_1 + dm_2 + ...`).
+- [ ] `sem_lavaan_syntax()` includes the measurement model and any declared paths.
+- [ ] `seminr_syntax()` returns the seminr measurement model syntax.
+- [ ] None of these calls require lavaan to be loaded.
+
+---
+
+## Part O — Analysis plan
+
+### Step O1 — Declare and run the plan
+
+```r
+results <- run_analysis_plan(scored, instr_d)
+length(results)
+```
+
+- [ ] Returns a list with one element per research question.
+- [ ] No error.
+
+### Step O2 — Inspect a result
+
+```r
+r1 <- results[[1]]
+cat("APA:    ", r1$apa,    "\n")
+cat("Prompt: ", r1$prompt, "\n")
+cat("Test:   ", r1$test,   "\n")
+```
+
+- [ ] `$apa` is a formatted string (e.g., `r(60) = 0.43, p = .002`).
+- [ ] `$prompt` is a complete sentence template.
+- [ ] `$test` names the statistical method used.
+- [ ] No `$table`, `$plot`, or `$reference` field is present at the runner level
+  (these do not exist yet in 0.3.2).
+
+---
+
+## Part P — Codebook report
+
+```r
+cb <- codebook_report(instr_d)
+nrow(cb$items_table)
+head(cb$items_table[, c("id", "type", "scale_id", "reverse")], 6)
+```
+
+- [ ] `nrow(cb$items_table)` equals the number of items.
+- [ ] The first 6 rows show correct ids and types.
+- [ ] No error. Note: `codebook_report()` has no `path` argument — it returns
+  an object, not a file.
+
+---
+
+## Part Q — HTML reporting
+
+### Step Q1 — render_results
+
+```r
+results_path <- render_results(
+  results,
+  instr_d,
+  output_file     = file.path(tempdir(), "mas_results.html"),
+  citation_format = "apa"
+)
+cat("Path:", results_path, "\n")
+cat("Size:", round(file.size(results_path) / 1024, 1), "KB\n")
+```
+
+- [ ] File is written without error.
+- [ ] `file.size()` returns a positive number.
+- [ ] Open the HTML: each research question has its own section with the APA
+  statistic, effect size, and writing prompt.
+
+### Step Q2 — render_report (full report)
+
+```r
+report_path <- render_report(
+  instr_d,
+  data                 = scored,
+  output_file          = file.path(tempdir(), "mas_full_report.html"),
+  include_codebook     = TRUE,
+  include_quality      = TRUE,
+  include_missing      = TRUE,
+  include_descriptives = TRUE,
+  include_reliability  = TRUE,
+  include_analysis     = TRUE,
+  include_models       = FALSE
+)
+```
+
+- [ ] File is written without error. (`render_report()` is HTML only — no PDF,
+  no Quarto, no WeasyPrint in 0.3.2.)
+- [ ] Open the HTML: sections appear in order (codebook, quality, missing data,
+  descriptives, reliability, analysis results).
+- [ ] No raw R output leaks into the report (all content is formatted).
+- [ ] APA table style: horizontal rules only, no vertical borders, no row shading.
+
+---
+
+## Part R — Response dashboard
+
+```r
+launch_dashboard_demo()
+```
+
+- [ ] Dashboard opens in the browser automatically.
+- [ ] Five tabs are visible: Overview, Items, Scales, Quality, Raw data.
+- [ ] Overview shows response count, date range, and instrument metadata.
+- [ ] Items tab shows per-item charts. Charts appear when you click the tab
+  (they do not stay blank).
+- [ ] Scales tab shows scale score distributions. Charts appear when you click.
+- [ ] Quality tab shows attention-check pass rates.
+- [ ] Raw data tab shows a scrollable table with a CSV download button.
+- [ ] No JavaScript errors in the browser console.
+
+---
+
+## Part S — lavaan in Suggests (Change 3 of 0.3.2)
+
+```r
+# Confirm lavaan is listed in Suggests, not Imports
+desc <- read.dcf(system.file("DESCRIPTION", package = "surveyframe"))
+cat("Imports:", desc[, "Imports"], "\n\n")
+cat("Suggests:", desc[, "Suggests"], "\n")
+```
+
+- [ ] `lavaan` appears in Suggests.
+- [ ] `lavaan` does NOT appear in Imports.
+- [ ] The three hard Imports are exactly: `jsonlite`, `rlang`, `openssl`.
+
+---
+
+## Part T — replicate.R review (surveyframe-dev, Change 4 of 0.3.2)
+
+Open `~/Documents/GitHub/surveyframe-dev/jss-paper/replicate.R` in RStudio.
+
+Read through the full script:
+
+- [ ] No `str()` calls anywhere in the file.
+- [ ] `export_static_survey()` call is present and inside `if (interactive()) { }`.
+- [ ] `render_results()` call is present and inside `if (interactive()) { }`.
+- [ ] Every other browser-opening or Shiny call (if any) is also guarded.
+
+Run the script from the RStudio console (interactive mode, so the guarded
+sections execute):
+
+```r
+source("~/Documents/GitHub/surveyframe-dev/jss-paper/replicate.R", echo = TRUE)
+```
+
+- [ ] Script runs end to end without error.
+- [ ] The `export_static_survey()` guard fires and prints "Static survey written to: ..."
+  plus the file size.
+- [ ] The `render_results()` guard fires and prints "Report written to: ..." plus
+  the file size.
+- [ ] `sessionInfo()` prints at the end.
+
+---
+
+## Part U — Vignette review (Change 6 of 0.3.2)
+
+Knit the main vignette:
+
+```r
+rmarkdown::render(
+  "~/Documents/GitHub/surveyframe/vignettes/surveyframe.Rmd",
+  output_dir = tempdir(),
+  quiet      = FALSE
+)
+```
+
+- [ ] Knit completes with no errors. Warnings from psych internals are expected
+  and acceptable.
+- [ ] Open the output HTML in a browser.
+
+Work through the vignette output from top to bottom:
+
+#### Score and describe section
+
+- [ ] A note below `score_scales()` explains that pre-scored columns are skipped.
+- [ ] Scale means display as a labelled data frame with Scale, Mean, and SD
+  columns — not as a raw named numeric vector.
+
+#### Reliability section
+
+- [ ] The interpretation note explains when to prefer omega over alpha:
+  specifically when items within a scale differ in their factor loadings. The
+  reason is stated, not just the recommendation.
+
+#### EFA readiness section
+
+- [ ] This section exists between Reliability and Analysis Plan.
+- [ ] `efa_report()` is called inside a `psych` availability check.
+- [ ] KMO threshold (0.60) and Bartlett's test are mentioned in plain language.
+
+#### Construct validity section
+
+- [ ] This section follows EFA readiness.
+- [ ] `validity_report()` is called with a named loadings list.
+- [ ] CR and AVE thresholds are stated (AVE above 0.50, CR above 0.70).
+- [ ] The Fornell-Larcker criterion is explained in one sentence.
+
+#### Assumption checks section
+
+- [ ] This section appears between the Analysis Plan and Run the Analysis Plan.
+- [ ] `assumption_report()` is called and its output is printed.
+- [ ] A note explains how to use normality and homogeneity results to choose
+  between parametric and non-parametric tests.
+
+#### Results report section
+
+- [ ] After `render_results()`, the code shows both the file path and the file
+  size in KB via `file.size()`.
+
+#### Other vignettes
+
+Open each supporting vignette and skim for obvious errors:
+
+```r
+rmarkdown::render(
+  "~/Documents/GitHub/surveyframe/vignettes/building-survey-instrument.Rmd",
+  output_dir = tempdir(), quiet = TRUE)
+
+rmarkdown::render(
+  "~/Documents/GitHub/surveyframe/vignettes/analysing-survey-responses.Rmd",
+  output_dir = tempdir(), quiet = TRUE)
+
+rmarkdown::render(
+  "~/Documents/GitHub/surveyframe/vignettes/scale-reliability-validity.Rmd",
+  output_dir = tempdir(), quiet = TRUE)
+
+rmarkdown::render(
+  "~/Documents/GitHub/surveyframe/vignettes/efa-cfa-sem-pls-syntax.Rmd",
+  output_dir = tempdir(), quiet = TRUE)
+```
+
+- [ ] All four vignettes knit without errors.
+
+---
+
+## Part V — Full test suite
+
+```r
+devtools::test()
+```
+
+- [ ] All 407 tests pass (FAIL 0, WARN 0, SKIP 0, PASS 407).
+- [ ] No new unexpected warnings in the test output.
+
+---
+
+## Part W — Final logic and UX checks
+
+Answer each question based on your review above:
+
+- [ ] Every exported function that receives a non-sframe object returns a clear,
+  actionable error message pointing the user to `sf_instrument()` or
+  `read_sframe()`. No raw `inherits()` assertion failures.
+- [ ] No output from any function goes to the console unintentionally (psych
+  suppressions are in place, run_analysis_plan is silent on assignment).
+- [ ] The static survey works on a phone-sized screen (Step H5).
+- [ ] The dashboard charts actually render when their tab is clicked, not blank.
+- [ ] The S3 methods for all 6 sub-classes produce readable, professional output
+  that you would be comfortable showing in a JSS article.
+- [ ] The CITATION is correct and will display correctly on the CRAN page after
+  the 0.3.2 tarball is accepted.
+
+---
+
+## Sign-off
+
+After all checkboxes above are ticked, record your sign-off here and inform the
+Claude Code session to proceed to `R CMD check`.
+
+**Reviewed by:** Mohammed Ali Sharafuddin  
+**Date signed off:**  
+**All steps complete:** Yes / No  
+**Notes for the developer (if any):**
+
+Once signed off, paste the following prompt into Claude Code to proceed:
+
+```text
+Read CLAUDE.md and mas_review_032.md. The MAS co-review is complete and signed
+off. Run R CMD build . to produce surveyframe_0.3.2.tar.gz, then run
+R CMD check --as-cran on the tarball. The target is 0 errors, 0 warnings, at
+most 1 NOTE. Update cran-comments.md with the verified results and give me the
+text to paste on the CRAN submission form.
+```
