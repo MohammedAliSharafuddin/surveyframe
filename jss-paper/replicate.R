@@ -122,11 +122,30 @@ cat(syn)
 results <- run_analysis_plan(resp, instr, scored = TRUE)
 print(results)
 
+## Section 5.7: Static survey export
+
+if (interactive()) {
+  tmp_html <- tempfile(fileext = ".html")
+  export_static_survey(instr, path = tmp_html, open = FALSE)
+  message("Static survey written to: ", tmp_html)
+  message("File size (bytes): ", file.size(tmp_html))
+}
+
 ## Section 6: Codebook
 
 cb <- codebook_report(instr)
 print(nrow(cb$items_table))
 print(head(cb$items_table[, c("id", "type", "scale_id", "reverse")], 6))
+
+## Section 7: HTML report
+
+if (interactive()) {
+  output_file <- tempfile(fileext = ".html")
+  render_results(results, instr, output_file = output_file,
+                 citation_format = "apa")
+  message("Report written to: ", output_file)
+  message("File size (bytes): ", file.size(output_file))
+}
 
 ## Session information
 
