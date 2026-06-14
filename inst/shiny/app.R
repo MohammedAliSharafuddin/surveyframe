@@ -2172,8 +2172,14 @@ server <- function(input, output, session) {
     req(rv$instrument)
     stage <- input$analysis_stage %||% "Plan"
     if (identical(stage, "Run")) {
+      full_plan  <- rv$instrument$analysis_plan %||% list()
+      run_plan   <- Filter(function(b) !isFALSE(b$requires_data), full_plan)
+      syntax_n   <- length(full_plan) - length(run_plan)
       return(tagList(
-        plan_table_ui(rv$instrument$analysis_plan %||% list()),
+        plan_table_ui(run_plan),
+        if (syntax_n > 0) tags$p(class = "hint", paste0(
+          syntax_n, " syntax-only method(s) excluded from the run queue ",
+          "(generate lavaan or seminr strings without response data).")),
         uiOutput("analysis_results_output")
       ))
     }
