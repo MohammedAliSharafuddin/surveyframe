@@ -58,7 +58,7 @@ collecting responses and before running formal analysis with
 \code{\link[=run_analysis_plan]{run_analysis_plan()}}.
 }
 \examples{
-\donttest{
+\dontrun{
 # Open the bundled tourism-services response dashboard.
 # To build a questionnaire instead, use launch_builder().
 launch_dashboard()

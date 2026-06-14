@@ -39,3 +39,11 @@
 ^man/figures/brand-preview\.png$
 ^CLAUDE\.md$
 ^todo\.md$
+^\.Rproj\.user$
+^\.positai$
+^\.claude$
+^[^/]+\.pdf$
+^[^/]+\.docx$
+^\.\~lock\..*$
+^review_032_functions\.R$
+^vignettes/[^/]+\.html$

@@ -18,7 +18,7 @@
 #'   [export_static_survey()]
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' # Minimal embedding example:
 #' library(shiny)
 #' library(surveyframe)
