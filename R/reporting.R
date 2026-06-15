@@ -268,24 +268,35 @@ render_report <- function(
       }
       c("-P", paste0(name, ":", value))
     }), use.names = FALSE)
+    # Render with the working directory set to the render dir so Quarto creates
+    # its intermediate `*_files/libs` there and can inline them for
+    # embed-resources. Output next to the input, then copy to the destination.
+    # Using --output-dir elsewhere makes the self-contained bundling fail to
+    # find quarto.js (it is created relative to the working directory).
+    rendered <- file.path(render_dir, "report.html")
     quarto_ok <- tryCatch({
+      old_wd <- getwd()
+      on.exit(setwd(old_wd), add = TRUE)
+      setwd(render_dir)
       status <- suppressWarnings(system2(
         quarto_bin,
         args = c(
-          "render", render_input,
-          "--output", output_name,
-          "--output-dir", output_dir,
-          "--execute-dir", render_dir,
+          "render", "report.qmd",
+          "--output", "report.html",
           param_args
         ),
         stdout = TRUE,
         stderr = TRUE
       ))
-      is.null(attr(status, "status")) || identical(attr(status, "status"), 0L)
+      setwd(old_wd)
+      (is.null(attr(status, "status")) || identical(attr(status, "status"), 0L)) &&
+        file.exists(rendered)
     }, error = function(e) FALSE)
 
-    if (isTRUE(quarto_ok) && file.exists(dest)) {
-      return(invisible(dest))
+    if (isTRUE(quarto_ok)) {
+      if (file.copy(rendered, dest, overwrite = TRUE)) {
+        return(invisible(dest))
+      }
     }
   }
 
@@ -397,6 +408,10 @@ render_report <- function(
       )
     }
     sections <- c(sections, sprintf("<section>%s</section>", descriptives_html))
+
+    dist_html <- tryCatch(.render_report_distributions(instrument, data),
+                          error = function(e) "")
+    if (nzchar(dist_html)) sections <- c(sections, dist_html)
   }
 
   if (isTRUE(include_reliability)) {
@@ -479,7 +494,7 @@ render_report <- function(
       "body { font-family: Arial, sans-serif; max-width: 960px; margin: 0 auto; padding: 32px 20px; color: #1f2933; line-height: 1.6; }",
       "h1, h2, h3 { color: #102a43; }",
       "section { margin: 0 0 28px; padding-bottom: 12px; border-bottom: 1px solid #d9e2ec; }",
-      "table { width: 100%%; border-collapse: collapse; margin: 16px 0 2px; font-size: .93em; }",
+      "table { display: block; overflow-x: auto; max-width: 100%%; border-collapse: collapse; margin: 16px 0 2px; font-size: .93em; }",
       "caption { text-align: left; font-style: italic; font-size: .95em; margin-bottom: 4px; }",
       "thead tr { border-top: 2px solid #000; border-bottom: 1px solid #000; }",
       "tbody tr:last-child td { border-bottom: 2px solid #000; }",
@@ -604,9 +619,105 @@ render_report <- function(
   paste(c("<h2>Model Appendix</h2>", blocks), collapse = "\n")
 }
 
+# Render a base-R plot to a base64-embedded PNG <img> for the HTML fallback.
+.render_report_plot_png <- function(draw) {
+  tmp <- tempfile(fileext = ".png")
+  grDevices::png(tmp, width = 720, height = 320, res = 96, bg = "white")
+  ok <- tryCatch({ draw(); TRUE }, error = function(e) FALSE)
+  grDevices::dev.off()
+  if (!isTRUE(ok) || !file.exists(tmp)) return(NULL)
+  raw <- readBin(tmp, "raw", file.info(tmp)$size)
+  unlink(tmp)
+  sprintf(
+    "<img alt=\"distribution\" style=\"max-width:100%%;height:auto\" src=\"data:image/png;base64,%s\">",
+    openssl::base64_encode(raw)
+  )
+}
+
+# Distribution plots (item bar charts, scale histograms) for the HTML fallback,
+# matching the dashboard. Used only when Quarto is unavailable.
+.render_report_distributions <- function(instrument, data) {
+  if (is.null(data)) return("")
+  theme <- instrument$render$theme %||% "#16B3B1"
+  if (!grepl("^#[0-9A-Fa-f]{3,6}$", theme)) theme <- "#16B3B1"
+  choice_by <- function(id) {
+    for (c in instrument$choices %||% list()) if (identical(c$id, id)) return(c)
+    NULL
+  }
+  q_items <- Filter(
+    function(i) !(i$type %in% c("section_break", "text_block")),
+    instrument$items %||% list()
+  )
+  blocks <- character(0)
+
+  for (item in q_items) {
+    if (!item$id %in% names(data)) next
+    col <- data[[item$id]]
+    t <- item$type
+    img <- NULL
+    if (t %in% c("likert", "single_choice", "multiple_choice")) {
+      cs <- choice_by(item$choice_set %||% "")
+      freq <- if (!is.null(cs)) {
+        f <- table(factor(col, levels = as.character(cs$values)))
+        names(f) <- cs$labels
+        f
+      } else {
+        table(col)
+      }
+      if (!sum(freq)) next
+      img <- .render_report_plot_png(function() {
+        op <- graphics::par(mar = c(4, 11, 1, 1)); on.exit(graphics::par(op))
+        graphics::barplot(freq, horiz = TRUE, las = 1, col = theme,
+                          border = NA, xlab = "Frequency", cex.names = .8)
+      })
+    } else if (t %in% c("numeric", "slider", "rating")) {
+      num <- suppressWarnings(as.numeric(col)); num <- num[!is.na(num)]
+      if (!length(num)) next
+      img <- .render_report_plot_png(function() {
+        op <- graphics::par(mar = c(4, 4, 1, 1)); on.exit(graphics::par(op))
+        graphics::hist(num, col = theme, border = "white", main = NULL,
+                       xlab = item$label, ylab = "Count", las = 1)
+      })
+    }
+    if (!is.null(img)) {
+      blocks <- c(blocks, sprintf("<h3>%s</h3>%s",
+        htmltools_escape(item$label %||% item$id), img))
+    }
+  }
+
+  for (sc in instrument$scales %||% list()) {
+    cols <- intersect(sc$items, names(data))
+    if (!length(cols)) next
+    nums <- lapply(data[cols], function(x) suppressWarnings(as.numeric(x)))
+    scores <- rowMeans(do.call(cbind, nums), na.rm = TRUE)
+    scores <- scores[!is.na(scores)]
+    if (!length(scores)) next
+    img <- .render_report_plot_png(function() {
+      op <- graphics::par(mar = c(4, 4, 1, 1)); on.exit(graphics::par(op))
+      graphics::hist(scores, col = theme, border = "white", main = NULL,
+        xlab = paste0(sc$label %||% sc$id, " score"), ylab = "Count", las = 1)
+      graphics::abline(v = mean(scores), col = "#dc2626", lwd = 2, lty = 2)
+    })
+    if (!is.null(img)) {
+      blocks <- c(blocks, sprintf("<h3>%s (scale score)</h3>%s",
+        htmltools_escape(sc$label %||% sc$id), img))
+    }
+  }
+
+  if (!length(blocks)) return("")
+  sprintf("<section><h2>Response distributions</h2>%s</section>",
+          paste(blocks, collapse = "\n"))
+}
+
 .render_report_table <- function(x, caption = NULL, note = NULL) {
   if (!is.data.frame(x) || nrow(x) == 0) {
     return("")
+  }
+
+  # Round numeric columns to two decimal places for readability.
+  num_cols <- vapply(x, is.numeric, logical(1))
+  if (any(num_cols)) {
+    x[num_cols] <- lapply(x[num_cols], function(col) round(col, 2))
   }
 
   has_pval <- any(grepl(
