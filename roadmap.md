@@ -1,9 +1,13 @@
 # surveyframe roadmap (0.3 through 1.0)
 
-Last updated: 2026-06-04.
+Last updated: 2026-06-13.
 
-This roadmap stages surveyframe from the current CRAN release to v1.0.0, the
+This roadmap stages surveyframe from the current CRAN release to v1.0, the
 version that anchors the launch of Ethos, Ethos Pro, and the ASRDA textbook.
+The canonical schedule and full developer-level detail live in
+`portfolio-planner/master_roadmap.md` and its `development_instructions/`
+folder. When this file and the portfolio planner disagree, the portfolio planner
+is authoritative. Update it first, then this file.
 
 Principles:
 
@@ -12,13 +16,19 @@ Principles:
   carries two unrelated headlines.
 - Integrity and provenance are a single contiguous track, not a feature
   sprinkled across releases. Layer 1 (the instrument hash) shipped at v0.3. The
-  rest of the chain (response hashing, versioning, review, pilot, bundle,
-  verify, manifest, and the report) lands as one block at v0.8 and v0.9, the
-  capstone before the v0.10 API freeze. Nothing integrity-related lands in v0.4
-  through v0.7. See "Integrity and provenance: one track" below.
+  rest of the chain lands as one block at v0.8 and v0.9, the capstone before
+  the v1.0 API freeze. Nothing integrity-related lands in v0.4 through v0.7.
+  See "Integrity and provenance: one track" below.
+- The 0.3.4 to 0.3.9 visualisation arc runs on a strict ~21-day patch cadence
+  between 0.3.3 and 0.4. Hard Imports stay unchanged; new packages are
+  Suggests-only and guarded; every new capability is opt-in; the existing test
+  suite is not modified.
 - Analytical capability ships first (v0.4 to v0.7) to drive the applied papers
-  and adoption. Provenance is the capstone (v0.8 to v0.9) so the v0.10 integration
-  contract can freeze a complete provenance surface.
+  and adoption. Provenance is the capstone (v0.8 to v0.9) so the v1.0
+  integration contract can freeze a complete provenance surface.
+- There is no v0.10. The release after v0.9 is v1.0, which merges the former
+  integration-and-release-candidate milestone with the AI and agentic layer and
+  the launch. v1.0 spans two 45-day cycles.
 - New methods land in surveyframe core, not in companion packages. The hard
   dependency footprint stays small; heavy or optional engines are guarded with
   `rlang::check_installed()` and live in Suggests.
@@ -31,6 +41,36 @@ Principles:
 This file is a development working note. It is tracked in the private
 surveyframe-dev repository and excluded from the public CRAN repository and the
 package build.
+
+---
+
+## Release schedule (45-day cycles)
+
+Minors run on a 45-day cadence. The 0.3.3 to 0.3.9 patches run on a ~21-day
+cadence. Dates are targets, not contracts, anchored to the 0.3.2 ship date
+(2026-07-04). If a release slips, shift the rest by the slip and record why in
+`portfolio-planner/decisions.md`.
+
+| Version | Theme | Target |
+|---|---|---|
+| 0.3.0 | Foundation on CRAN | done 2026-05-21 |
+| 0.3.1 | Stability and onboarding | done 2026-06-02 |
+| 0.3.2 | Maintenance: CITATION fix, JSS-required package changes, doc pass | 2026-07-04 |
+| 0.3.3 | Real-world embedding and conference feedback (AIC-RSAM, ICSRI 2026) | 2026-07-25 |
+| 0.3.4 | Visualisation foundation: ggplot2 in Suggests, brand theme, `plots = TRUE`, first family plots, `$table` on inferential runners | 2026-08-15 |
+| 0.3.5 | Visualisation breadth: regression, EFA, reliability, categorical, correlation-matrix plots; `plot()` S3 on report objects | 2026-09-05 |
+| 0.3.6 | Plots into the surfaces: `render_report()`, dashboard charts, studio plot area | 2026-09-26 |
+| 0.3.7 | Effect-size confidence intervals: base-R bootstrap (`bootstrap_ci`, `cohens_d_ci`, `cramers_v_ci`, `eta_sq_ci`) | 2026-10-17 |
+| 0.3.8 | Psychometric depth: Henseler HTMT, real Little's MCAR via naniar, omega and EFA polish | 2026-11-07 |
+| 0.3.9 | Report polish and PDF: `render_report(format = "pdf")` via pagedown, theming, accessibility, codebook upgrades | 2026-11-28 |
+| 0.4 | Small-sample inference plus the RStudio add-in | 2027-01-12 |
+| 0.4.1 | Faculty demo proofing: demo session to college faculty, then UI/UX and doc fixes | 2027-02-02 |
+| 0.5 | MCDM and DEMATEL | 2027-03-19 |
+| 0.6 | SEM and PLS execution, invariance | 2027-05-03 |
+| 0.7 | Text and open-ended response analysis | 2027-06-17 |
+| 0.8 | Provenance part 1: `sf_version`, `sf_review`, `sf_pilot`, response hashing (SHA Layers 2-3) | 2027-08-01 |
+| 0.9 | Provenance part 2: `sf_bundle`, `verify_bundle`, manifest, sfReport (SHA Layers 4-5) | 2027-09-15 |
+| 1.0 | Integration contract, AI and agentic layer, JASP/jamovi export, API freeze, Merkle root and DOI archival, launch at SaaS parity | 2027-12-14 |
 
 ---
 
@@ -53,7 +93,7 @@ The typed instrument object and the full design-to-report workflow.
 
 Status: complete and stable.
 
-### v0.3.1 — Stability and onboarding (in progress)
+### v0.3.1 — Stability and onboarding (done 2026-06-02)
 
 Patch release. No new features.
 
@@ -61,96 +101,179 @@ Patch release. No new features.
 - Serialisation fix for instruments built with named component lists.
 - Friendly instrument type-check messages, quieter reliability output, clearer
   empty-plan message.
-- Main vignette rewritten as a generic tourism-services worked example adopting
-  the questionnaire from Sharafuddin, Madhavan & Wangtueai (2024).
+- Main vignette rewritten as a generic tourism-services worked example.
 - Brand system applied.
 
-Open before submission: full `R CMD check --as-cran`, win-builder, second
-platform, Codecov badge decision, cran-comments update.
+Status: complete and stable. On CRAN.
 
-### v0.3.2 — Maintenance (patch)
+### v0.3.2 — Maintenance (target 2026-07-04)
 
 Headline: correct metadata, add JSS-required package changes, and finish the
 deferred documentation pass. No new features and no new exports.
 
-The JSS editor returned the submission without full review (2026-06) and
-identified specific package defects. These ship with 0.3.2 so the manuscript
-can be resubmitted against a corrected package. Full checklist in
-`revision_todo_0.3.md` (v0.3.2 section) and in `jss-paper/CLAUDE.md` (public repo).
-
 - Fix `inst/CITATION`: title to "surveyframe: Survey Instrument Workflows" (drop
   the redundant "for R"), and read the version from `meta$Version` so it never
-  goes stale again. This is the trigger for cutting 0.3.2, because the CRAN page
-  citation only refreshes on a new release.
+  goes stale again.
 - Add S3 methods (`print`, `format`, `summary`) for all sub-classes: `sf_choices`,
-  `sf_item`, `sf_scale`, `sf_branch`, `sf_check`, `sf_model`. The editor ran
-  `methods(class = "sf_choices")` and received no output.
-- Add `lavaan` to `Suggests` and guard all lavaan-dependent code with
+  `sf_item`, `sf_scale`, `sf_branch`, `sf_check`, `sf_model`.
+- Move `lavaan` from Imports to Suggests and guard all lavaan-dependent code with
   `requireNamespace("lavaan", quietly = TRUE)`.
-- Fix `replicate.R`: add the missing `export_static_survey()` call wrapped in
-  `if (interactive()) { }`; remove any `str()` calls that expose internal structure.
-- Fix attention check item rendering: match the choice set setup for `sf_check`
-  items to regular `sf_item` rendering in the static HTML export.
+- Fix `replicate.R`: add `export_static_survey()` and `render_results()` calls
+  wrapped in `if (interactive()) { }`; remove `str()` calls.
+- Fix attention check item rendering in the static HTML export.
 - Apply the deferred professor-review documentation items (Prof-1 to Prof-5,
   Prof-9, Prof-10): vignette additions only, no code risk.
-- Optional: guard the launcher `\donttest` examples so a check that runs
-  donttest does not hang.
 
-Exit criteria: clean `R CMD check`, the CRAN package-page citation is correct,
-the version note is self-updating, and all JSS editor package items are resolved.
+Status: fully implemented locally (all 7 changes done, 407/407 tests pass).
+Awaiting MAS co-review, then R CMD check and CRAN submission.
 
-### v0.4.0 — Small-sample inference
+### v0.3.3 — Real-world embedding and conference feedback (target 2026-07-25)
 
-Headline: trustworthy analysis when n is below thirty. Ships first among the
-analytical themes because it supports the small-sample methods paper and any
-near-term low-n applied study, and adds no new hard dependency.
+Headline: harden the package against its first real deployment and conference
+presentation feedback.
+
+Evidence sources: the AIC-RSAM room-service AI prototype (a QR-accessed mobile
+static HTML survey with eligibility skip logic and a six-construct, nine-path
+model) and the ICSRI 2026 presentation at Villa College, 8-9 August 2026. This
+prototype is also the dogfooding source for 0.3.3: the real embedding and the
+conference feedback drive the fixes. Strict patch scope: no new analytical
+features.
+
+Deliverables:
+- Mobile static survey hardening: layout, touch targets, progress bar on narrow
+  screens.
+- Branching and skip-logic fixes surfaced by the room-service embedding.
+- Six-construct model syntax correctness checks.
+- Report legibility fixes surfaced by the conference presentation.
+- UI/UX fixes from the ICSRI presentation audience.
+
+Exit criteria: the room-service instrument deploys and collects responses on a
+phone without layout or logic errors. The rendered report is readable at
+conference presentation size.
+
+### v0.3.4 — Visualisation foundation (target 2026-08-15)
+
+Headline: the first plotting layer — opt-in, brand-styled, ggplot2-based.
+
+Patch scope rules apply. Hard Imports unchanged. ggplot2 in Suggests, guarded.
+
+Deliverables:
+- Brand theme (`theme_surveyframe()`) built on ggplot2.
+- `plots = TRUE` argument on the main analysis runners.
+- First family of plots: bar charts for categorical runners, scatter/regression
+  overlays for correlation and regression runners.
+- `$table` slot added to inferential runners (returns a formatted data frame
+  suitable for `knitr::kable()`).
+
+### v0.3.5 — Visualisation breadth (target 2026-09-05)
+
+Headline: coverage across all analysis families and S3 `plot()` on report objects.
+
+Deliverables:
+- Regression diagnostic plots (residuals, Q-Q, scale-location, leverage).
+- EFA scree plot and loadings heatmap.
+- Reliability plot (alpha and omega by scale).
+- Categorical plots: grouped bar, mosaic.
+- Correlation matrix heatmap.
+- `plot.quality_report()`, `plot.reliability_report()`, `plot.efa_report()` S3
+  methods that dispatch to the family-specific plots.
+
+### v0.3.6 — Plots into the surfaces (target 2026-09-26)
+
+Headline: plots appear automatically in all rendering surfaces.
+
+Deliverables:
+- `render_report()` embeds family plots for each section when ggplot2 is present.
+- Dashboard chart panels replaced with ggplot2 equivalents.
+- SurveyStudio plot area wired to the new S3 methods.
+
+### v0.3.7 — Effect-size confidence intervals (target 2026-10-17)
+
+Headline: every effect-size statistic ships with an interval, base R only.
+
+Deliverables:
+- `bootstrap_ci()`: percentile bootstrap CI for the median, no new hard dependency.
+- `cohens_d_ci()`: Cohen's d interval from the noncentral t distribution.
+- `cramers_v_ci()`: Cramer's V interval via bootstrap.
+- `eta_sq_ci()`: eta-squared interval from the noncentral F distribution.
+- Each inferential runner that returns an effect size now populates a `$ci`
+  slot in its result.
+
+### v0.3.8 — Psychometric depth (target 2026-11-07)
+
+Headline: HTMT, real MCAR testing, and omega polish.
+
+Deliverables:
+- Henseler HTMT discriminant validity index added to `validity_report()`.
+- Real Little's MCAR test via naniar (in Suggests, guarded).
+- Omega polish: `reliability_report(omega = TRUE)` is more robust and prints
+  a clearer comparison of alpha and omega.
+- EFA polish: parallel analysis displayed alongside VSS in `efa_report()`.
+
+### v0.3.9 — Report polish and PDF (target 2026-11-28)
+
+Headline: the last patch before the analytical themes. The report surface is
+complete and PDF output is available.
+
+Deliverables:
+- `render_report(format = "pdf")` via pagedown (in Suggests, guarded).
+- APA table theming: consistent horizontal rules, caption placement, and font
+  sizing across all report sections.
+- Accessibility: colour-blind-safe palette for all ggplot2 outputs.
+- Codebook upgrades: item-level descriptives and choice-set frequency tables
+  in the codebook section.
+
+### v0.4 — Small-sample inference plus the RStudio add-in (target 2027-01-12)
+
+Headline: trustworthy analysis when n is below thirty, plus an IDE surface.
 
 Source: the practical method-selection logic and test helpers validated in the
-`small-sample-survey-framework`. The simulation engine that justifies them stays
-in that repository behind its own methods paper; surveyframe ships the helpers.
+`small-sample-survey-framework`. The simulation engine stays in that repository
+behind its own methods paper; surveyframe ships the helpers.
 
-Deliverables (tools confirmed from the smallsamplelab book, R/smalln_recipes.R):
+Deliverables (analysis):
+- Hodges-Lehmann location-shift estimate and CI on the Mann-Whitney runner.
+- Pseudomedian CI on the paired Wilcoxon runner.
+- Exact path and odds-ratio CI on the 2x2 Fisher runner.
+- Firth-penalised logistic regression runner (logistf in Suggests, guarded).
+- A small-sample advisory in `sample_size_plan()` and `assumption_report()`.
+- Vignette: small-sample survey analysis.
 
-- Hodges-Lehmann location-shift estimate and confidence interval added to the
-  Mann-Whitney runner (from `mw_test`).
-- Pseudomedian (Hodges-Lehmann) confidence interval added to the paired
-  Wilcoxon runner (from `wilcoxon_paired_ci`).
-- Exact path and odds-ratio confidence interval surfaced on the 2x2 Fisher
-  runner (from `exact_2x2`).
-- Percentile bootstrap confidence interval helper for the median, base R, no
-  new hard dependency (from `boot_median_ci`).
-- Firth-penalised logistic regression runner for separation and very small n,
-  guarded behind logistf in Suggests (from `firth_logit_fit`).
-- Effect-size confidence intervals for the standard hypothesis tests.
-- A small-sample advisory in `sample_size_plan()` and in `assumption_report()`
-  that flags when asymptotic methods are unsafe and points to the alternative.
-- Vignette: small-sample survey analysis, mirroring the decision framework.
-
-The simulation engine that validates these choices stays in the
-small-sample-survey-framework repository, behind the small-sample methods paper.
-The smallsamplelab book CLAUDE.md carries the full integration plan and the
-Part C chapter mapping.
+Deliverables (RStudio add-in):
+- Thin wrapper over the launchers plus an insert-sframe-skeleton helper.
+- `rstudioapi` in Suggests (already guarded in code, exempt from the
+  one-theme-per-minor rule and off the critical path).
+- Released to GitHub from the dev branch immediately; released to CRAN with 0.4.
+- `inst/rstudio/addins.dcf` and a small R file.
 
 Exit criteria: a study with n < 30 can run the plan and receive method-choice
 guidance plus a small-sample-appropriate result with interval coverage notes.
+The RStudio add-in installs and registers correctly on CRAN.
 
-### v0.5.0 — Decision methods (MCDM and DEMATEL)
+### v0.4.1 — Faculty demo proofing (target 2027-02-02)
+
+Headline: a live demo session to college faculty, then UI/UX and documentation
+fixes based on that session's feedback.
+
+This patch applies real-world adoption feedback from faculty who are not
+package authors. Strict patch scope: no new analytical features or exports.
+The faculty demo is the proofing mechanism, not a deliverable.
+
+### v0.5 — MCDM and DEMATEL (target 2027-03-19)
 
 Headline: bring multi-criteria decision making into the survey workflow.
 
-Source: port the registry and method implementations from the existing `mcdm`
-repository (TOPSIS, VIKOR, AHP, ANP, MOORA, PROMETHEE, ELECTRE, SMART, WASPAS,
-DEMATEL), adapted to the sframe analysis-plan contract.
+Source: port the registry and method implementations from the `mcdm` repository
+(TOPSIS, VIKOR, AHP, ANP, MOORA, PROMETHEE, ELECTRE, SMART, WASPAS, DEMATEL),
+adapted to the sframe analysis-plan contract.
 
 Deliverables:
-
-- New item types for pairwise comparison and criteria-weight input, rendered by
-  the builder, the Shiny renderer, and the static export.
+- New item types for pairwise comparison and criteria-weight input.
 - MCDM method runners registered in `run_analysis_plan()` under a `decision`
-  family, each returning a ranking, the method's diagnostic, an APA-style
-  summary, a writing prompt, and the method citation.
-- AHP consistency-ratio checks and DEMATEL thresholding with a cause-effect
-  classification table.
+  family, each returning a ranking, a diagnostic, an APA-style summary, a
+  writing prompt, and the method citation.
+- AHP consistency-ratio checks and DEMATEL thresholding with cause-effect
+  classification.
 - Weight-sensitivity analysis as an optional reporting block.
 - Vignette: a decision-analysis worked example.
 
@@ -158,152 +281,125 @@ Exit criteria: an instrument can declare an MCDM research question, collect the
 matrix data, and run the plan to a ranked result with a defensible report
 section. No new hard dependencies.
 
-### v0.6.0 — Structural model execution
+### v0.6 — Structural model execution (target 2027-05-03)
 
 Headline: move from syntax generation to fitted models, and connect screening.
 
 Deliverables:
-
 - Optional execution backends for CFA and CB-SEM via lavaan, and PLS-SEM via
   seminr, all guarded behind Suggests. Syntax generation remains the default
   zero-dependency path.
-- Measurement-invariance planning and testing across groups (configural,
-  metric, scalar).
+- Measurement-invariance planning and testing across groups.
 - Higher-order constructs in the model layer.
-- A bridge to `semScreenR`: `run_analysis_plan()` can route CFA/SEM data through
-  semScreenR screening before fitting, preserving the audit trail. semScreenR
-  stays a separate package; surveyframe calls it when present.
+- A bridge to `semScreenR`: `run_analysis_plan()` routes CFA/SEM data through
+  semScreenR screening before fitting. semScreenR stays a separate package.
 - Common-method-variance diagnostics.
 - Vignette: a full measurement-model workflow from instrument to fitted model.
 
 Exit criteria: an sframe measurement model can be screened, fitted, and reported
 end to end, with invariance results, using optional packages.
 
-### v0.7.0 — Text and open-ended response analysis
+### v0.7 — Text and open-ended response analysis (target 2027-06-17)
 
 Headline: structured analysis of open-ended and free-text survey responses.
 
-Capture already exists: the `text` and `textarea` item types ship from v0.3.
-This version adds the analysis side. It is the last analytical theme before the
-provenance capstone.
-
-Source: the thematic-analysis approach used in the Omani gateways manuscript
-(tidytext, quanteda, stm), packaged behind the analysis-plan contract.
+Source: the thematic-analysis approach from the Omani gateways manuscript
+(tidytext, quanteda, stm). The `text` and `textarea` item types ship from v0.3;
+this version adds the analysis side.
 
 Deliverables:
-
-- Text cleaning and normalisation for open-ended responses (tokenisation,
-  stop-word handling, stemming or lemmatisation), with a base path and optional
-  engines.
-- A `text` analysis family in `run_analysis_plan()`: term and keyword frequency,
-  co-occurrence, and optional dictionary-based sentiment.
+- Text cleaning and normalisation for open-ended responses.
+- A `text` family in `run_analysis_plan()`: term frequency, co-occurrence, and
+  optional dictionary-based sentiment.
 - Thematic and topic support: term-frequency themes and optional structural topic
-  models, with representative quote extraction for qualitative reporting.
-- Optional tidytext, quanteda, and stm backends guarded behind Suggests; a base
-  frequency path with no new hard dependency.
-- A reporting block that turns themes, topics, and quotes into a report section.
+  models, with representative quote extraction.
+- Optional tidytext, quanteda, and stm backends (Suggests, guarded).
 - Vignette: analysing open-ended responses end to end.
 
-Book tie: Part III ch 8 (text data processing and open-ended responses); it also
-feeds Part VII ch 17 (visualisation) for text.
-
 Exit criteria: an instrument with open-ended items can declare a text research
-question, run the plan, and receive term frequencies, themes or topics,
-representative quotes, and a defensible report section. No new hard dependency.
+question, run the plan, and receive term frequencies, themes, representative
+quotes, and a defensible report section. No new hard dependency.
 
-### v0.8.0 — Provenance layer, part one
+### v0.8 — Provenance layer, part one (target 2027-08-01)
 
 Headline: give the instrument a lifecycle and a review trail.
 
 Source: absorb the versioning, review, and pilot modules from the `asrda-r`
-prototype directly into surveyframe. `asrda-r` does not ship as a dependency.
+prototype. `asrda-r` does not ship as a dependency.
+
+Delivers SHA integrity Layers 2 and 3 (see table below).
 
 Deliverables:
-
-- `sf_version()`: attach a content-hash version identifier and record lifecycle
-  transitions (draft, reviewed, pilot, published, archived). Store the version
-  chain as an attribute on the sframe.
-- `sf_review()`: create and attach a peer-review artefact (reviewers, item-level
-  flags, resolution notes, status).
-- `sf_pilot()`: create and attach a pilot-study artefact (n, completion notes,
-  per-item flags, quality and reliability summaries).
-- Response-level hashing in `read_responses()`: a per-row hash computed from the
-  row contents and the instrument hash, plus an aggregate response hash, so any
-  row modification, addition, or deletion is detectable.
-- Validation extended to check version chains and artefact integrity.
+- `sf_version()`: content-hash version identifier and lifecycle transitions
+  (draft, reviewed, pilot, published, archived).
+- `sf_review()`: peer-review artefact (reviewers, item-level flags, resolution
+  notes, status).
+- `sf_pilot()`: pilot-study artefact (n, completion notes, per-item flags,
+  quality and reliability summaries).
+- Response-level hashing in `read_responses()`: per-row and aggregate hash.
 - Vignette: instrument lifecycle and review.
-
-Delivers the integrity track: SSR 6.0 Layer 2 (pre-registration and version) and
-Layer 3 (response). Source modules already exist in `asrda-r`
-(`instrument_versioning.R`, `expert_review.R`, `pilot_summary.R`).
 
 Exit criteria: an instrument can carry a versioned history with review and pilot
 evidence that survives save and reload, and a response file is bound to the
 instrument version by an aggregate hash.
 
-### v0.9.0 — Provenance layer, part two, and reporting
+### v0.9 — Provenance layer, part two, and reporting (target 2027-09-15)
 
 Headline: tamper-evident bundles and a Quarto-native report.
 
-Deliverables:
+Delivers SHA integrity Layers 4 and 5. The five-layer chain is complete.
 
+Deliverables:
 - `sf_bundle()` and `verify_bundle()`: wrap a versioned instrument, its review
   and pilot artefacts, and the response data into a single bundle with SHA-256
-  verification across all components. The bundle emits a verification manifest
-  that records every component hash, timestamps, and a manifest root hash.
-- sfReport companion package (separate CRAN package importing surveyframe):
-  `sf_report()` produces a full Quarto document with analysis results, charts,
-  codebook, and bibliography, plus a defensibility appendix that reproduces the
-  review and pilot evidence and the lifecycle history.
+  verification across all components.
+- sfReport companion package: `sf_report()` produces a full Quarto document with
+  results, charts, codebook, bibliography, and a defensibility appendix.
 - ASRDA textbook citation linkage: `sf_report()` accepts an `asrda_chapters`
-  argument that inserts formatted references to the relevant textbook chapters,
-  and emits a machine-readable citation block (instrument version hash, software
-  version, textbook references) in the report metadata and a BibTeX appendix.
+  argument and emits a machine-readable citation block.
 - Vignette: defensible reporting for ethics submission and secondary analysis.
-
-Delivers the integrity track: SSR 6.0 Layer 4 (analysis and reporting) and Layer
-5 (verification manifest). The five-layer chain is complete at this point. Source
-modules already exist in `asrda-r` (`response_bundle.R`, `citation_block.R`,
-`report_render.R`). The SSR 6.0 paper cites v0.8 to v0.9 for Layers 2 to 5.
 
 Exit criteria: a study can produce a single verifiable bundle and a Quarto
 report that cites the instrument version and the textbook chapter behind each
 method.
 
-### v0.10.0 — Integration and release candidate
+### v1.0 — Integration, AI layer, and launch (target 2027-12-14)
 
-Headline: the surfaces Ethos and Ethos Pro depend on, hardened.
+Headline: the version that the products and textbook are built on, at
+commercial-SaaS feature parity. This release merges the former
+integration-and-release-candidate milestone with the AI and agentic layer and
+the launch. It spans two 45-day cycles.
 
-Deliverables:
-
-- Stable, documented integration contract for Ethos and Ethos Pro to call
-  surveyframe as the analysis and provenance engine. Locked argument and return
-  shapes for the functions those products use.
-- Complex survey-design weighting (design weights, calibration). If delivered,
-  re-approach the OfficialStatistics CRAN task view with a clear use case.
+Deliverables (integration and surfaces):
+- Stable, documented integration contract for Ethos and Ethos Pro.
+- Complex survey-design weighting (design weights, calibration).
 - JASP and jamovi friendly exports.
 - Visual branching preview, dashboard filters, interactive assumption plots.
 - Full documentation pass, pkgdown hero, SurveyBuilder topbar branding.
 - Release-candidate checks across Windows, macOS, and two Linux builds.
 
-Exit criteria: Ethos and Ethos Pro can be built against a frozen surveyframe
-API. No open defects on the core workflow.
+Deliverables (AI and agentic layer):
+- sframe JSON Schema and a surveyframe MCP server exposing the safe verbs
+  (`create_instrument`, `validate_sframe`, `score_scales`, `run_analysis_plan`,
+  `render_report`, `verify_bundle`).
+- AI-assisted instrument authoring: an agent drafts constructs, items, scales,
+  and an analysis plan that surveyframe validates against the schema before a
+  human approves.
+- AI narrative generation: writes interpretation only for the tests the
+  pre-declared plan contains (no p-hacking by design).
+- AI-disclosure provenance ledger inside `sf_bundle`: records what was
+  AI-generated versus human-authored, the model and version, and a prompt hash.
+- A governed agentic execution loop through the Ethos approval gates.
+- Model layer standardises on Claude through tool use and MCP.
 
-### v1.0.0 — Launch
-
-Headline: the version that the products and the textbook are built on, at
-commercial-SaaS feature parity.
-
-- Provenance layer complete and documented.
-- Merkle-root extension and DOI-linked archival deposit added on top of the v0.8
-  manifest. These are the v1.0 additions that bring the provenance surface to
-  parity with commercial SaaS offerings, so the Ethos, Ethos Pro, and textbook
-  launch is competitive.
+Deliverables (provenance parity):
+- Merkle-root extension on top of the v0.9 manifest.
+- DOI-linked archival deposit.
 - API declared stable; semantic-versioning guarantees begin.
-- `inst/CITATION` points to the published JSS paper.
-- Coincides with: Ethos public launch, Ethos Pro institutional launch, and the
-  ASRDA textbook complete edition.
-- A migration and stability guide for downstream users.
+- `inst/CITATION` updated to point to the published JSS paper.
+
+Coincides with: Ethos public launch, Ethos Pro institutional launch, and the
+ASRDA textbook complete edition.
 
 Exit criteria: a researcher, an institution, and a textbook reader can each rely
 on surveyframe 1.0 as a stable foundation, and the provenance surface matches
@@ -313,128 +409,107 @@ the commercial SaaS bar that the products are sold against.
 
 ## Integrity and provenance: one track
 
-This is the table that keeps the integrity story consistent. The five-layer
-chain from the SSR 6.0 paper maps onto exactly two releases (plus the Layer 1
-foundation already on CRAN). It is not spread across v0.4 to v0.7.
+No integrity work ships in v0.3.4 through v0.7. Layers 2 to 5 land together at
+v0.8 and v0.9. The SSR 6.0 paper is submitted after the v0.9 CRAN release
+(around 2027 Q1 to Q2) so it describes a shipped five-layer framework rather
+than a proposal.
 
 | SSR 6.0 layer | What ships | surveyframe version |
 |---|---|---|
 | 1 Instrument | SHA-256 over the `.sframe` payload; `write_sframe()`, `read_sframe()`, `validate_sframe()` | 0.3.0 (shipped) |
-| 2 Pre-registration and version | `sf_version()` content-hash version chain and lifecycle states | 0.8.0 |
-| 3 Response | per-row and aggregate response hash in `read_responses()` | 0.8.0 |
-| 4 Analysis and reporting | analysis and report hashing, `sf_report()` provenance appendix | 0.9.0 |
-| 5 Verification manifest | `sf_bundle()` and `verify_bundle()` cross-component manifest | 0.9.0 |
+| 2 Pre-registration and version | `sf_version()` content-hash version chain and lifecycle states | 0.8 |
+| 3 Response | per-row and aggregate response hash in `read_responses()` | 0.8 |
+| 4 Analysis and reporting | analysis and report hashing, `sf_report()` provenance appendix | 0.9 |
+| 5 Verification manifest | `sf_bundle()` and `verify_bundle()` cross-component manifest | 0.9 |
 
-Implications for consistency:
-
-- The SSR 6.0 manuscript cites v0.8 to v0.9 for Layers 2 to 5. Its submission is
-  moved to after the v0.9 CRAN release (the WIN 6.0 2026 route is dropped), so at
-  submission the five-layer framework is implemented and released rather than
-  proposed, with the Merkle-root and DOI-archival work (v1.0) as the future
-  direction. The manuscript is rewritten at submission time, not now.
-- The Merkle-root extension and DOI-linked archival deposit are v1.0 features
-  (SaaS parity), not v0.9.
-- The portfolio `master_roadmap.md` must not tag v0.4 or v0.5 with SHA layers.
-  Those releases are small-sample and MCDM respectively, with no integrity work.
+---
 
 ## Textbook chapter to version map
 
-The ASRDA textbook ("From Constructs to Conclusions Using R", 14 parts, 41
-chapters) is released in stages pinned to the surveyframe version that makes the
-tooling real. Each stage is written only once its surveyframe capability exists.
+The ASRDA textbook is released in stages pinned to the surveyframe version that
+makes the tooling real.
 
 | Stage | surveyframe | Textbook chapters made real |
 |---|---|---|
 | 1 | 0.3 to 0.4 | Parts I to III (foundations, instrument design, sampling, data capture and quality), Part IV ch 9 (reliability), Part V (descriptives, assumptions), Part VI ch 13 to 16 (correlation, parametric and non-parametric comparisons, agreement). Part VI non-parametric and Part XIII ch 37 resampling draw on the v0.4 small-sample helpers. |
 | 2 | 0.5 to 0.7 | Part XII ch 34 to 35 (MCDM, fuzzy and hybrid) on v0.5; Part IV ch 10 (validity and invariance) and Part IX ch 26 to 27 (factor, confirmatory and structural models) on v0.6; Part III ch 8 (text data processing and open-ended responses) and Part VII ch 17 (text visualisation) on v0.7. |
-| 3 | 0.8 to 0.9 | Part VII ch 18 (automated reporting), Part XIV ch 39 to 40 (workflow automation and open science, data management and DOI registration). These are the provenance and defensible-reporting chapters. |
-| 4 | 0.10 to 1.0 | Part XI ch 33 (survey weighting and variance estimation) on v0.10. Complete edition published at v1.0 with the JSS-paper citation. |
+| 3 | 0.8 to 0.9 | Part VII ch 18 (automated reporting), Part XIV ch 39 to 40 (workflow automation and open science, data management and DOI registration). |
+| 4 | 1.0 | Part XI ch 33 (survey weighting and variance estimation). Complete edition published at v1.0 with the JSS-paper citation. |
 
 Note: Part III ch 8 (text) sits early in the book but its surveyframe tooling
 lands at v0.7, so the chapter is written in Stage 2 even though its part is in
-the Stage 1 range. This is the one place the part order and the version order
-diverge.
+the Stage 1 range.
 
-Parked beyond v1.0 (the book has chapters but surveyframe will not cover them by
-1.0; they use base R or other packages, or become post-1.0 companions): Part VIII
-ch 21 to 25 (multilevel, causal and longitudinal, survival, time series), Part X
-(spatial, network, conjoint and choice), Part XI ch 32 (machine learning), Part
-XIII ch 36 (IRT) and ch 38 (meta-analysis).
+Parked beyond v1.0: Part VIII ch 21 to 25 (multilevel, causal and longitudinal,
+survival, time series), Part X (spatial, network, conjoint and choice), Part XI
+ch 32 (machine learning), Part XIII ch 36 (IRT) and ch 38 (meta-analysis).
+
+---
+
+## Methodology paper per release
+
+| surveyframe | Methodology paper |
+|---|---|
+| 0.3 | JSS software paper (OJS 6454, submitted 2026-06-02; returned without full review 2026-06; revise and resubmit). Plus the v0.3 design paper (not yet started). |
+| 0.3.4 to 0.3.9 | No separate paper. The visualisation arc is patch work. Plots feed figures in every later methodology paper and in ASRDA ch 17. |
+| 0.4 | Small-sample survey inference paper (smallsamplelab), draft exists. |
+| 0.5 | MCDM and DEMATEL methodology paper, not started. |
+| 0.6 | semScreenR package and SEM-screening methodology paper, not started. |
+| 0.7 | Text and open-ended analysis methodology paper, not started. |
+| 0.8 and 0.9 | Covered by the SSR 6.0 proof-of-integrity paper (submitted post-0.9). |
+| 1.0 | AI and agentic layer methodology paper, not started. |
 
 ---
 
 ## Growth and citation track (parallel)
-
-The credibility engine. Sequenced to compound: each output makes the next one
-land harder.
 
 ### 1. JSS paper — surveyframe (highest priority)
 
 - Journal of Statistical Software. Manuscript at `jss-paper/surveyframe.Rnw`.
 - Positions surveyframe as a proactive workflow: the instrument is a
   methodological contract declared before data collection, so analysis is the
-  execution of a pre-declared plan rather than a post-hoc search. No existing
-  tool offers this architecture.
-- Submitted 2026-06-02 (OJS 6454). Editor returned without full review 2026-06;
+  execution of a pre-declared plan rather than a post-hoc search.
+- Submitted 2026-06-02 (OJS 6454). Returned without full review 2026-06;
   invited to revise and resubmit.
-- Revision requires: (a) package changes shipping with 0.3.2 (S3 methods on
-  sub-classes, lavaan in Suggests, replicate.R fixes, attention check rendering);
-  (b) manuscript restructure (stronger JSS venue-fit argument, sframe design and
-  extensibility section, functionality table, worked example opening with the
-  research scenario, shorter code chunks). Full checklist in `jss-paper/CLAUDE.md`.
-- After acceptance: add `inst/CITATION` pointing to the JSS DOI and convert the
-  manuscript into a vignette.
+- Package changes required by the editor ship with 0.3.2. Manuscript revision
+  (stronger JSS venue-fit argument, sframe design and extensibility section,
+  functionality table, worked example opening, shorter code chunks) follows.
+- After acceptance: add `inst/CITATION` pointing to the JSS DOI.
 - This is the anchor citation for the whole ecosystem.
 
 ### 2. Methodological paper based on v0.3
 
-- One focused methods paper built on the v0.3 feature set, distinct from the
-  JSS software paper. Subject: the analysis-plan-in-the-instrument design as
-  software-enforced pre-registration for survey research, with the worked
-  tourism-services example as the demonstration.
-- Target a quantitative-methods or research-methods outlet.
-- Gives a second citable artefact and a methods-section reference that applied
-  papers can cite when they use surveyframe.
+- Subject: the analysis-plan-in-the-instrument design as software-enforced
+  pre-registration for survey research.
+- Target: a quantitative-methods or research-methods outlet.
+- Draft and preprint by 0.4.
 
 ### 3. semScreenR — CRAN release and methods paper
 
-- Ship `semScreenR` to CRAN. It is the natural pipeline partner: surveyframe
-  `cfa_syntax()` output feeds semScreenR screening before a lavaan fit.
-- A methods paper on rule-based, cross-validated SEM data screening with audit
-  trails and preregistered caps. Target a methods journal.
-- Cross-reference surveyframe and semScreenR in each other's documentation so
-  the two packages form a visible toolchain.
+- Ship `semScreenR` to CRAN close to the 0.6 release. Fix the `triage_apply`
+  defect first (returns neither the screened model nor pruned data).
+- A methods paper on rule-based, cross-validated SEM data screening.
 
 ### 4. Small-sample methods paper
 
-- Based on the `small-sample-survey-framework` simulation study (n < 30,
-  parametric vs nonparametric vs bootstrap vs Bayesian across a factorial
-  design). Manuscript-focused already.
-- The published decision framework justifies the helpers shipped in surveyframe
-  v0.5, so the paper and the release reinforce each other.
+- Based on the `small-sample-survey-framework` simulation study.
+- The published paper justifies the helpers shipped in v0.4.
+- Proofread, post a preprint DOI, then submit. Preprint DOI must land by 0.4.
 
 ### 5. ASRDA textbook — staged with surveyframe progress
 
 - "From Constructs to Conclusions Using R." Quarto book.
-- Released in stages that track surveyframe capability rather than as a single
-  v1.0 drop: design and reliability chapters with v0.3 to v0.4, structural
-  modelling with v0.5 to v0.6, provenance and defensible reporting with v0.7 to
-  v0.8, complete edition at v1.0.
-- Each chapter cites the surveyframe functions and the JSS paper. The sfReport
-  citation linkage at v0.8 makes the textbook citable from inside generated
-  reports.
-- The textbook is the long-term reputation asset. It must be written to a high
-  standard and is gated on the JSS paper being accepted first so it can cite a
-  peer-reviewed reference.
+- Released in stages that track surveyframe capability.
+- Gated on the JSS paper being accepted so it can cite a peer-reviewed reference.
+- At v1.0 the textbook is retitled to reflect SSR 6.0, agentic AI, and the
+  surveyframe unique selling point.
 
 ### Adoption surface (continuous)
 
-- Applied papers that use surveyframe become citation drivers: the maritime
-  research set (`JMR`), the Maldives cross-border e-commerce PLS-SEM study
-  (`cbec-maldives-smes`), and the logistics-trade island-economies study
-  (`ILPTFIE`). Each should cite surveyframe and, once published, the JSS paper.
-- pkgdown gallery of worked instruments across domains (marketing, health,
-  education, HR, social science).
+- Applied papers: maritime research set (JMR), Maldives cross-border e-commerce
+  PLS-SEM (cbec-maldives-smes), and the logistics-trade island-economies study
+  (ILPTFIE). Each cites surveyframe and, once published, the JSS paper.
+- pkgdown gallery of worked instruments across domains.
 - CRAN task views: listed in Psychometrics. Re-approach OfficialStatistics if
   v0.9 ships complex-survey weighting.
 - Short course and workshop materials under CC BY.
@@ -443,21 +518,17 @@ land harder.
 
 ## Product launch dependency (why 1.0 is the gate)
 
-- **Ethos** (research workflow product) and **Ethos Pro** (institutional
-  governance) both treat surveyframe as the source-of-truth engine. They need
-  the frozen integration contract from v0.9 and the provenance layer from v0.7
-  to v0.8. They launch on v1.0.
-- **ASRDA textbook** is the methodological companion. Its complete edition
-  matches v1.0 capability and cites the JSS paper.
-- The provenance work (v0.8 to v0.9) is the concrete engineering that makes the
-  textbook citable from reports and gives institutions the audit trail Ethos Pro
-  sells.
+- **Ethos** and **Ethos Pro** treat surveyframe as the source-of-truth engine.
+  They need the frozen integration contract and the provenance layer. They launch
+  at surveyframe 1.0 (2027-12-14).
+- **ASRDA textbook** complete edition matches v1.0 capability and cites the JSS
+  paper.
+- The Ethos build train runs one cycle behind surveyframe. Each Ethos milestone
+  depends on the matching surveyframe release landing first.
 
 ---
 
 ## Out of scope through v1.0 (parked)
-
-Recorded so they are not mistaken for planned work before 1.0.
 
 - Longitudinal panel support across waves.
 - Adaptive testing with IRT-driven item selection.

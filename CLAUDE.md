@@ -156,18 +156,41 @@ feasibility). The vignette builds offline because the data-collection step uses
 0.3.1 is published on CRAN (2026-06-02). 0.3.2 is fully implemented (all 7
 changes done, 407/407 tests pass, vignette knits, both remotes up to date).
 
-**The immediate gate is the MAS co-review.** Read `mas_review_032.md` in this
-folder and work through it step by step in RStudio before proceeding to R CMD
-check. The review covers all code changes, the static survey UI in a browser,
-the vignette output, and the replicate.R script.
+**A GUI UI/UX co-review is in progress (started 2026-06-14).** 0.3.2 ships with
+the JSS manuscript, so every graphical entry point is being checked so a reviewer
+does not hit a broken or misleading GUI. Row-by-row tracker:
+`demo/slides_review_table.md`. Full notes: the "v0.3.2 GUI co-review" section in
+`revision_todo_0.3.md`.
 
-After co-review sign-off:
+DONE and signed off: **SurveyBuilder** (HTML), **static survey** template,
+**SurveyStudio** (`inst/shiny/app.R`), and the **HTML report**
+(`R/reporting.R` + `inst/templates/report.qmd`). Full per-GUI detail is in the
+"v0.3.2 GUI co-review" section of `revision_todo_0.3.md`. Highlights: builder has
+client-side Export survey + Generate collector (single-sourced and inlined via
+`data-raw/inline_static_template.R`, gitignored on main); studio dropped its
+Build screen, previews the real survey in an iframe, integrated the dashboard
+inline, and got the suspendWhenHidden fix; the report's Quarto render was fixed
+(was silently falling back), tables formatted, distribution plots added, 2
+decimals, left TOC, wide-table scroll. Mojibake is clean across inst/ and R/.
+All 407 tests pass.
 
-1. `R CMD build .` on the 0.3.2 source.
-2. `R CMD check --as-cran surveyframe_0.3.2.tar.gz` — must be 0 errors, 0 warnings.
-3. Win-builder R-release and R-devel — both clean.
-4. Update `cran-comments.md` with the verified results.
-5. Submit to CRAN.
+Builder work committed on `main` as 07d0608 (not pushed). The static survey,
+studio, and report changes are NOT yet committed.
+
+Still pending before the CRAN check:
+
+1. **Standalone dashboard** `inst/shiny/dashboard/app.R`: its views are now inline
+   in the studio (overlap). Clean of mojibake, unchanged this arc. Keep for
+   0.3.2 (exported since 0.3.1; removing breaks compat); candidate for soft
+   deprecation later. A light sanity check is worthwhile. The Shiny survey module
+   (`R/survey_module.R`) had a code guard only, no interactive pass (low priority).
+2. Commit the uncommitted package changes on `main`; push when asked.
+3. Add a NEWS.md 0.3.2 entry covering the GUI and report work. No new hard or
+   Suggests deps were added. `devtools::document()` is current.
+4. MAS co-review (`mas_review_032.md`).
+5. `R CMD build .`, then `R CMD check --as-cran` (must be 0/0/<=1 NOTE; re-run
+   because files changed after the last clean check).
+6. Win-builder R-release and R-devel. Update `cran-comments.md`. Submit.
 
 The JSS paper (OJS 6454, submitted 2026-06-02) was returned without full review.
 Revised and resubmit invitation. The replicate.R and package changes it required

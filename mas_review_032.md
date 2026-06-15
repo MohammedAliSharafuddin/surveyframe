@@ -7,6 +7,13 @@
 path before R CMD check and CRAN submission. Sign off after completing every
 checklist item.
 
+**Revised 2026-06-15** to match the GUI and report co-review: the builder gained
+in-browser Export survey and Generate collector buttons and three distinct
+Analyse stages (Part F); SurveyStudio dropped the Build screen, previews the real
+survey in a frame, and now contains the response dashboard (Part G); the static
+survey gained a footer and a multi-page progress bar (Part H); the HTML report
+renders through Quarto with distribution plots and formatted tables (Part Q).
+
 Work through this document sequentially in a fresh RStudio session.
 
 ---
@@ -237,6 +244,27 @@ v$problems
 - [ ] `v$valid` is `TRUE`.
 - [ ] `v$problems` is empty (length 0) or contains only expected informational notes.
 
+### Step D3 — Declare the methodological contract (model and analysis plan)
+
+The instrument is a pre-declared contract, so the measurement model and the
+analysis plan are part of design, not an afterthought. A measurement model is
+attached in code with `add_model()`. The analysis plan is authored in the
+builder's Analyse tab (Part F) and saved into the `.sframe`, so a plan declared
+there travels with the instrument and is executed later in Part O.
+
+```r
+m <- sf_model("sat_cfa", type = "cfa",
+  constructs = list(list(id = "sat", items = c("q1", "q2"))))
+instr <- add_model(instr, m)
+length(instr$models)        # 1
+length(instr$analysis_plan) # plans authored in the builder appear here
+```
+
+- [ ] `length(instr$models)` is 1 after `add_model()`.
+- [ ] You understand that the analysis plan is declared in the builder Analyse
+  tab (Part F) or loaded from a designed `.sframe`, and executed on data in
+  Part O. There is no separate code constructor for plan blocks in 0.3.2.
+
 ---
 
 ## Part E — Serialisation (write and read round-trip)
@@ -289,9 +317,22 @@ A browser tab opens with the SurveyBuilder HTML. Work through the UI:
 - [ ] You can add a choice set and assign it to a Likert item.
 - [ ] You can add a scale and assign items to it.
 - [ ] The Save .sframe button downloads a `.sframe` file.
-- [ ] The Load .sframe button accepts the saved file and restores the instrument.
-- [ ] The Analyse tab is accessible and shows the three-panel Plan/Run/Report layout.
-- [ ] No broken images or garbled text anywhere in the UI.
+- [ ] The Open button accepts the saved file and restores the instrument.
+- [ ] The Analyse tab shows three distinct stages with captions: Plan, Run
+  preview (drops syntax-only methods), and Report outline (adds the models
+  section). They do not show identical content.
+- [ ] You can declare an analysis plan and drag plan cards to reorder them on
+  the Plan tab. This is where the analysis plan is authored as part of design.
+- [ ] The Export survey button downloads a deployable HTML survey.
+- [ ] Survey settings > Google Sheets has a Generate collector (.gs) button and
+  numbered deploy steps. The settings gear button is clearly visible.
+- [ ] No broken images, garbled text, or mojibake anywhere in the UI.
+
+### Step F3 — Exported output from the builder
+
+- [ ] Open the survey HTML exported in Step F1 (Export survey). It opens as a
+  working survey with the welcome screen, sections, and a "Built with
+  surveyframe" footer, identical to `export_static_survey()` output.
 
 ### Step F2 — Demo mode
 
@@ -306,27 +347,51 @@ launch_builder_demo()
 
 ## Part G — SurveyStudio Shiny app
 
+SurveyStudio is the analysis hub. Survey design (questions, welcome, logo,
+thank-you, analysis plan, model) lives in the builder; the studio opens a
+designed `.sframe`, previews it, and analyses responses.
+
 ### Step G1 — Launch studio
-
-```r
-launch_studio(open = TRUE)
-```
-
-- [ ] Shiny app launches in the browser.
-- [ ] The sidebar shows navigation options: Build, Analyse, Report.
-- [ ] The logo and brand colours display correctly.
-- [ ] No R console error during launch.
-
-### Step G2 — Load the demo instrument in studio
 
 ```r
 launch_studio_demo()
 ```
 
-- [ ] The studio opens with the demo instrument pre-loaded.
-- [ ] Items are visible in the Build panel.
-- [ ] The Analyse panel shows the declared research questions.
-- [ ] The Report panel is accessible.
+- [ ] Shiny app launches in the browser with the demo instrument and 120
+  responses already loaded.
+- [ ] The left navigation shows eight screens, in order: Open Instrument,
+  Preview Survey, Upload Responses, Quality Dashboard, Reliability, Analysis
+  Plan, Dashboard, Export. There is NO "Build Survey" screen (design is done in
+  the builder).
+- [ ] The logo and brand colours display correctly. No R console error.
+
+### Step G2 — Open and preview
+
+- [ ] Open Instrument loads a `.sframe` (or the demo is already loaded). The hint
+  says design happens in the SurveyBuilder.
+- [ ] Preview Survey shows the EXACT deployable survey inside a frame, with the
+  welcome screen, sections, progress, and "Built with surveyframe" footer. It
+  matches the static export, not a set of native widgets.
+
+### Step G3 — Sample data and analysis
+
+- [ ] Upload Responses has a "Load sample survey and responses" button and a
+  "Download sample CSV" link.
+- [ ] Quality Dashboard, Reliability, and Analysis Plan all render content (not
+  blank) once data is loaded.
+- [ ] Analysis Plan shows three stages: Plan, Run preview, Report outline. The
+  variables panel excludes section breaks and text blocks. The 36 demo plans
+  appear in the saved-plans table.
+- [ ] Run preview executes the data-driven plans and excludes the syntax-only
+  methods with a note.
+
+### Step G4 — Integrated dashboard and export
+
+- [ ] The Dashboard screen shows Overview, Items, Scales, and Data inline (KPIs,
+  item bar charts, scale histograms, a raw-data table). Charts render, not blank.
+- [ ] The Export screen offers Download .sframe and Generate HTML report only,
+  with a note that the deployable survey HTML and the Sheets collector are
+  produced in the builder.
 
 ---
 
@@ -368,12 +433,16 @@ Click Start and review the question pages:
   designated as a check — also renders in the horizontal Likert layout, not
   as a vertical stacked list. (This is Change 5 of 0.3.2.)
 - [ ] The required marker (`*`) appears next to all required items.
-- [ ] Progress bar updates as you move through the survey.
+- [ ] This minimal instrument is a single page, so NO progress bar shows (the
+  bar appears only on multi-page surveys). Confirm with the multi-page input-types
+  demo (`export_static_survey(sframe_input_types_demo_data()$instrument, ...)`):
+  the bar reads "Page X of Y" and advances.
+- [ ] A "Built with surveyframe" footer appears at the foot of the survey.
 
 ### Step H4 — Validation and submission
 
 - [ ] Clicking Next without answering a required item shows an inline error
-  message below the item, not a page-level alert.
+  below the item AND a page-level banner at the top of the card.
 - [ ] Answering the items and clicking Submit downloads a CSV file.
 - [ ] Open the downloaded CSV: it has a `respondent_id` column and one column
   per item.
@@ -678,16 +747,26 @@ report_path <- render_report(
 )
 ```
 
-- [ ] File is written without error. (`render_report()` is HTML only — no PDF,
-  no Quarto, no WeasyPrint in 0.3.2.)
+- [ ] File is written without error. `render_report()` renders through Quarto
+  when it is installed (themed HTML with a left table of contents) and falls back
+  to a built-in self-contained HTML when Quarto is absent. There is no PDF path.
 - [ ] Open the HTML: sections appear in order (codebook, quality, missing data,
-  descriptives, reliability, analysis results).
-- [ ] No raw R output leaks into the report (all content is formatted).
-- [ ] APA table style: horizontal rules only, no vertical borders, no row shading.
+  descriptives, response distributions, reliability, analysis results).
+- [ ] A "Response distributions" section shows one chart per item (bar chart for
+  categorical, histogram for numeric) and one histogram per scale.
+- [ ] No raw markdown or raw R output leaks in (all tables render as HTML tables,
+  none show pipe characters).
+- [ ] Tables are padded and readable; wide tables scroll within the column rather
+  than overflowing; numeric values are rounded to two decimal places.
 
 ---
 
 ## Part R — Response dashboard
+
+This standalone read-only dashboard still ships. Its core views (Overview, Items,
+Scales, Data) are now also built into SurveyStudio (Part G, Step G4), so the
+standalone launcher overlaps the studio. It is kept for the lightweight
+view-only use case and is a candidate for soft-deprecation in a later release.
 
 ```r
 launch_dashboard_demo()
@@ -822,9 +901,21 @@ rmarkdown::render(
 rmarkdown::render(
   "~/Documents/GitHub/surveyframe/vignettes/efa-cfa-sem-pls-syntax.Rmd",
   output_dir = tempdir(), quiet = TRUE)
+
+rmarkdown::render(
+  "~/Documents/GitHub/surveyframe/vignettes/surveybuilder-gui-overview.Rmd",
+  output_dir = tempdir(), quiet = TRUE)
+
+rmarkdown::render(
+  "~/Documents/GitHub/surveyframe/vignettes/deploying-and-collecting.Rmd",
+  output_dir = tempdir(), quiet = TRUE)
 ```
 
-- [ ] All four vignettes knit without errors.
+- [ ] All six supporting vignettes knit without errors.
+- [ ] `surveybuilder-gui-overview.Rmd` describes eight studio screens (no Build
+  Survey screen) and the builder export buttons.
+- [ ] `deploying-and-collecting.Rmd` (new) covers the Apps Script collector,
+  GitHub Pages and Blogger hosting, and reading responses back.
 
 ---
 

@@ -117,6 +117,112 @@ block can move to `\donttest`. Assess at that time.
 
 ---
 
+## v0.3.2 GUI co-review (in progress, 2026-06-14)
+
+A UI and UX co-review of every graphical entry point, because 0.3.2 ships with
+the JSS manuscript and a reviewer must not hit a broken or misleading GUI. The
+row-by-row tracker is `demo/slides_review_table.md` (Status and Code/UI/UX
+columns). Package changes are committed on `main` as 07d0608 (not yet pushed).
+All 407 tests pass.
+
+### SurveyBuilder — DONE (`inst/builder/survey_builder.html`)
+
+- Plan/Run/Report tabs now differ: Run preview drops syntax-only methods, Report
+  outline adds the models section, each tab carries a caption naming its R
+  function. Tabs relabelled "Run preview" and "Report outline".
+- Fixed a cardHtml crash on single-variable plans (jsonlite auto_unbox produced a
+  scalar; added asArr() and trim guards).
+- Added drag-reorder of plan cards on the Plan tab.
+- Added two client-side exports that match the R functions byte for byte:
+  "Export survey" (mirrors export_static_survey) and "Generate collector (.gs)"
+  (mirrors export_google_sheet). Both templates are single-sourced from
+  inst/static_survey/{template.html,collector_template.gs} and inlined by
+  data-raw/inline_static_template.R. NOTE: data-raw is gitignored on main, so
+  that dev script lives only in the local working tree. Re-run it after editing
+  either template or the builder.
+- Logo resize fixed across builder previews and the static survey header
+  (height + width:auto + object-fit, not paired max-height/max-width).
+- Embedded a brand logo in the input-types demo; added 36 analysis plans + 2
+  models to the input-types demo and 34 plans + 2 models to the tourism demo.
+- Enlarged the settings button, rewrote the Google Sheets steps for first-time
+  users, and removed all mojibake from the file.
+- Added vignettes/deploying-and-collecting.Rmd (GitHub Pages / Blogger + Sheets).
+
+### Static survey — DONE (`inst/static_survey/template.html`)
+
+- Logo resize fix; progress bar now shows "Page X of Y", respects show_progress,
+  hidden on single-page surveys (was stuck at 100%).
+- Demo split into 3 pages with Section 1/2/3 breaks aligned to pages;
+  conversational mode still one item per screen.
+- Wired the page-level required-error banner; added a mobile @media block.
+- Added a "Built with surveyframe" footer (branding). Relabelled the demo header
+  / title / progress so each architectural slot is distinct.
+
+### SurveyStudio — DONE (`inst/shiny/app.R`)
+
+- Removed the "Build Survey" screen (design lives in the builder); studio lands
+  on Open Instrument, opening a .sframe goes to Preview. builder_meta() falls
+  back to rv$builder$meta so opened instruments keep description/authors.
+- render block now threads through the draft pipeline (state_from_instrument →
+  compose → validate_draft → sf_instrument), so welcome/logo/thank-you survive.
+- Preview screen renders the REAL static survey in an iframe via
+  export_static_survey() (identical to the deployed/exported HTML).
+- Export tab cleaned to .sframe + HTML report only (survey HTML / .gs / deploy
+  belong to the builder).
+- Dashboard tab integrated INLINE (Overview / Items / Scales / Data, base-R
+  charts) wired to rv$instrument + rv$responses, ported from launch_dashboard().
+- "Load sample survey and responses" button + "Download sample CSV" on Upload.
+- Fixed empty Reliability / Analysis Plan / Export: custom-JS tab switching
+  suspended hidden outputs; added suspendWhenHidden=FALSE to the screen content
+  outputs. Quality Dashboard elaborated (clarified Flagged, added Clean,
+  straight-lining, completion time, duplicates). Variable catalog excludes
+  section_break/text_block. Stage labels aligned ("Run preview"/"Report outline").
+
+### HTML report — DONE (`R/reporting.R`, `inst/templates/report.qmd`)
+
+- Fixed the Quarto render: it was failing (output-dir vs report_files/libs
+  mismatch broke embed-resources) and silently falling back to the plain
+  internal HTML. Now renders with wd set to the render dir, then copies out.
+- Tables formatted; added Response distributions plots (item bar charts, scale
+  histograms) to both report.qmd and the no-Quarto fallback (base64 PNGs, base
+  graphics + openssl, no new deps).
+- TOC moved left; table cell padding; wide tables scroll (table display:block
+  overflow-x). All numerics rounded to 2 decimals. Fixed chunks that emitted raw
+  markdown (added #| output: asis to missing/descriptives/reliability).
+
+### Still pending before CRAN check
+
+- **Standalone dashboard** `inst/shiny/dashboard/app.R`: its views are now inline
+  in the studio (overlap, see "Obsolete?" below). It is clean of mojibake and
+  unchanged this arc. Decide keep-as-is vs deprecate; for 0.3.2 keep (exported
+  API, removing breaks compat). A light sanity check is still worthwhile.
+- **Shiny survey module** `R/survey_module.R`: code guard done, no interactive
+  pass. Low priority (narrow surface).
+- Commit the uncommitted package changes (reporting.R, studio_builder.R, app.R,
+  template.html, report.qmd, survey_builder.html, input_types demo, the man page,
+  the gui-overview vignette) on main; push when asked.
+- `devtools::document()` is current (sframe_builder_validate_draft gained a
+  render param). NEWS.md needs a 0.3.2 entry covering all the GUI/report work.
+- Rebuild tarball, `R CMD check --as-cran` (0/0/<=1 NOTE), update cran-comments,
+  win-builder. No new hard or Suggests deps were added.
+
+### Done cross-cutting
+
+- Mojibake sweep: clean across all of inst/ and R/ (grep "â" returns nothing).
+- Code-only guards (earlier): launch_studio.R, dashboard.R, survey_module.R
+  blocking examples to `\dontrun{}`; render_survey.R donttest assigned;
+  sf_branch.R version pin removed.
+
+### Obsolete / redundant after changes
+
+- The studio's old "Build Survey" screen: REMOVED.
+- `launch_dashboard()` / `inst/shiny/dashboard/app.R` now overlaps the studio's
+  integrated Dashboard tab. Not removed (exported since 0.3.1; removing is a
+  breaking change). Candidate for soft-deprecation in a later release, or keep as
+  the lightweight standalone read-only explorer. No action for 0.3.2.
+
+---
+
 ## v0.3.0 — Published on CRAN (accepted 2026-05-21)
 
 All work below this line is part of a separate v0.3.0 lifecycle and is
