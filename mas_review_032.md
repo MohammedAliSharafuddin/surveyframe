@@ -589,14 +589,15 @@ print(qr)
 ```r
 scored <- score_scales(resp, instr_d)
 
-scale_cols <- c("DMRE", "DMAU", "DMEU", "DMPV",
-                "DSQA", "DSQT", "DSUQ", "TS", "BI")
+# Derive the scored columns from the instrument's scales (score_scales adds one
+# column per scale, named by the scale id). Do not hard-code names.
+scale_cols <- vapply(instr_d$scales, function(s) s$id, character(1))
 
 # Prof-10: should display as a labelled data frame with Mean and SD
 scale_summary <- data.frame(
   Scale = scale_cols,
-  Mean  = round(colMeans(scored[, scale_cols], na.rm = TRUE), 2),
-  SD    = round(apply(scored[, scale_cols], 2, sd, na.rm = TRUE), 2),
+  Mean  = round(colMeans(scored[, scale_cols, drop = FALSE], na.rm = TRUE), 2),
+  SD    = round(apply(scored[, scale_cols, drop = FALSE], 2, sd, na.rm = TRUE), 2),
   row.names = NULL
 )
 print(scale_summary)
