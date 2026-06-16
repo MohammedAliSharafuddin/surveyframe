@@ -780,6 +780,11 @@ cat("Size:", round(file.size(results_path) / 1024, 1), "KB\n")
 - [ ] `file.size()` returns a positive number.
 - [ ] Open the HTML: each research question has its own section with the APA
   statistic, effect size, and writing prompt.
+- [ ] The results table is academic style (horizontal rules only) and the
+  accent and footer are on-brand (teal, "Built with surveyframe").
+- [ ] The References section cites surveyframe with the current title
+  ("surveyframe: Survey Instrument Workflows", no "for R") and the live version
+  (0.3.2, not 0.3.0).
 
 ### Step Q2 — render_report (full report)
 
