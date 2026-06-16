@@ -1,4 +1,22 @@
-# MAS Review — surveyframe 0.3.2 Complete Package Review
+---
+title: "MAS Review - surveyframe 0.3.2"
+format:
+  html:
+    toc: true
+    toc-depth: 2
+    embed-resources: true
+    code-fold: false
+execute:
+  echo: true
+  warning: true
+  error: true
+  eval: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = '#>')
+```
+
 
 **Reviewer:** Mohammed Ali Sharafuddin  
 **Date:** 2026-06-13  
@@ -35,7 +53,7 @@ Work through this document sequentially in a fresh RStudio session.
 This is the exact path a developer or collaborator would use to get the latest
 code before it lands on CRAN.
 
-```r
+```{r chunk-01, eval=FALSE}
 if (!requireNamespace("remotes", quietly = TRUE)) install.packages("remotes")
 remotes::install_github("MohammedAliSharafuddin/surveyframe", force = TRUE)
 ```
@@ -46,7 +64,7 @@ remotes::install_github("MohammedAliSharafuddin/surveyframe", force = TRUE)
 
 ### Step A2 — Confirm version
 
-```r
+```{r chunk-02}
 packageVersion("surveyframe")
 # Expected: '0.3.2'
 ```
@@ -55,7 +73,7 @@ packageVersion("surveyframe")
 
 ### Step A3 — Confirm available functions
 
-```r
+```{r chunk-03}
 ls("package:surveyframe")
 ```
 
@@ -70,7 +88,7 @@ ls("package:surveyframe")
 
 ### Step B1 — Load silently
 
-```r
+```{r chunk-04}
 library(surveyframe)
 ```
 
@@ -78,7 +96,7 @@ library(surveyframe)
 
 ### Step B2 — Citation (Change 1 of 0.3.2)
 
-```r
+```{r chunk-05}
 citation("surveyframe")
 ```
 
@@ -88,7 +106,7 @@ citation("surveyframe")
 
 ### Step B3 — Help pages load
 
-```r
+```{r chunk-06, eval=FALSE}
 ?sf_instrument
 ?sf_item
 ?export_static_survey
@@ -105,7 +123,7 @@ citation("surveyframe")
 
 ### Step C1 — Methods are registered
 
-```r
+```{r chunk-07}
 methods(class = "sf_choices")
 methods(class = "sf_item")
 methods(class = "sf_scale")
@@ -118,7 +136,7 @@ methods(class = "sf_model")
 
 ### Step C2 — sf_choices display
 
-```r
+```{r chunk-08}
 cs <- sf_choices("agree5", 1:5,
                  c("Strongly disagree", "Disagree", "Neutral",
                    "Agree", "Strongly agree"))
@@ -133,7 +151,7 @@ summary(cs)
 
 ### Step C3 — sf_item display
 
-```r
+```{r chunk-09}
 it <- sf_item("q1", "How satisfied are you?",
               type = "likert", choice_set = "agree5", required = TRUE)
 it
@@ -146,7 +164,7 @@ summary(it)
 
 ### Step C4 — sf_scale display
 
-```r
+```{r chunk-10}
 sc <- sf_scale("sat", "Satisfaction", items = c("q1", "q2", "q3"))
 sc
 format(sc)
@@ -158,7 +176,7 @@ summary(sc)
 
 ### Step C5 — sf_branch display (real field names: item_id, depends_on)
 
-```r
+```{r chunk-11}
 br <- sf_branch("q2", depends_on = "q1", operator = "==",
                 value = "yes", action = "show")
 br
@@ -171,7 +189,7 @@ summary(br)
 
 ### Step C6 — sf_check display
 
-```r
+```{r chunk-12}
 ck <- sf_check("attn1", item_id = "q5", type = "attention",
                pass_values = 3, fail_action = "flag")
 ck
@@ -184,7 +202,7 @@ summary(ck)
 
 ### Step C7 — sf_model display
 
-```r
+```{r chunk-13}
 mdl <- sf_model("m1", label = "Measurement model", type = "cfa")
 mdl
 format(mdl)
@@ -200,7 +218,7 @@ summary(mdl)
 
 ### Step D1 — Build a minimal instrument in code
 
-```r
+```{r chunk-14}
 agree5 <- sf_choices("agree5", 1:5,
                      c("Strongly disagree", "Disagree", "Neutral",
                        "Agree", "Strongly agree"))
@@ -239,7 +257,7 @@ print(instr)
 (and errors if it is invalid). Pass `strict = FALSE` to get a result list with
 `valid` and `problems`.
 
-```r
+```{r chunk-15}
 v <- validate_sframe(instr, strict = FALSE)
 v$valid
 v$problems
@@ -256,7 +274,7 @@ attached in code with `add_model()`. The analysis plan is authored in the
 builder's Analyse tab (Part F) and saved into the `.sframe`, so a plan declared
 there travels with the instrument and is executed later in Part O.
 
-```r
+```{r chunk-16}
 m <- sf_model("sat_cfa", type = "cfa",
   constructs = list(list(id = "sat", items = c("q1", "q2"))))
 instr <- add_model(instr, m)
@@ -275,7 +293,7 @@ length(instr$analysis_plan) # plans authored in the builder appear here
 
 ### Step E1 — Write and read back
 
-```r
+```{r chunk-17}
 tmp <- tempfile(fileext = ".sframe")
 write_sframe(instr, tmp)
 instr2 <- read_sframe(tmp)
@@ -289,7 +307,7 @@ identical(length(instr$items), length(instr2$items))
 
 ### Step E2 — Hash integrity check
 
-```r
+```{r chunk-18}
 # Tamper with the file to confirm the check fires
 raw <- readLines(tmp)
 raw[2] <- gsub("a", "b", raw[2], fixed = TRUE)
@@ -306,7 +324,7 @@ tryCatch(read_sframe(tmp2), error = function(e) message("Caught: ", conditionMes
 
 ### Step F1 — Launch and explore
 
-```r
+```{r chunk-19, eval=FALSE}
 launch_builder(open = TRUE)
 ```
 
@@ -340,7 +358,7 @@ A browser tab opens with the SurveyBuilder HTML. Work through the UI:
 
 ### Step F2 — Demo mode
 
-```r
+```{r chunk-20, eval=FALSE}
 launch_builder_demo()
 ```
 
@@ -357,7 +375,7 @@ designed `.sframe`, previews it, and analyses responses.
 
 ### Step G1 — Launch studio
 
-```r
+```{r chunk-21, eval=FALSE}
 launch_studio_demo()
 ```
 
@@ -403,7 +421,7 @@ launch_studio_demo()
 
 ### Step H1 — Export a survey
 
-```r
+```{r chunk-22, eval=FALSE}
 out <- export_static_survey(
   instr,
   output_path = file.path(tempdir(), "mas_review_survey.html"),
@@ -466,7 +484,7 @@ or email), or use Chrome DevTools > Toggle device toolbar to simulate a phone:
 
 ### Step I1 — Embed the module in a minimal app
 
-```r
+```{r chunk-23, eval=FALSE}
 library(shiny)
 
 ui <- fluidPage(
@@ -486,10 +504,7 @@ shinyApp(ui, server)
 
 - [ ] The app launches and the survey renders inside the page.
 - [ ] Completing and submitting the survey fires the `observeEvent` notification.
-- [x] No console warnings. A `sprintf` "one argument not used by format" warning
-  (the module CSS passed `theme` twice but the format has a single `%s`, the
-  second reference uses the CSS variable `var(--cp)`) was found during this
-  review and fixed in `R/survey_module.R`.
+- [ ] No console errors.
 
 ---
 
@@ -497,7 +512,7 @@ shinyApp(ui, server)
 
 ### Step J1 — Load demo data
 
-```r
+```{r chunk-24}
 demo  <- sframe_demo_data()
 instr_d <- demo$instrument
 resp    <- demo$responses
@@ -513,7 +528,7 @@ cat("Responses:", nrow(resp), "\n")
 
 ### Step J2 — read_responses with a bundled CSV
 
-```r
+```{r chunk-25}
 # Export a one-row CSV from the static survey, then read it back
 resp_csv <- file.path(tempdir(), "test_response.csv")
 
@@ -538,7 +553,7 @@ nrow(read_resp)
 
 ## Part K — Quality report
 
-```r
+```{r chunk-26}
 qr <- quality_report(resp, instr_d)
 
 cat("Respondents:", qr$summary$n_respondents, "\n")
@@ -554,7 +569,7 @@ print(qr)
 
 ## Part L — Scale scoring
 
-```r
+```{r chunk-27}
 scored <- score_scales(resp, instr_d)
 
 scale_cols <- c("DMRE", "DMAU", "DMEU", "DMPV",
@@ -580,7 +595,7 @@ print(scale_summary)
 
 ### Step M1 — Missing data report
 
-```r
+```{r chunk-28}
 mr <- missing_data_report(resp, instr_d)
 print(mr)
 ```
@@ -591,7 +606,7 @@ print(mr)
 
 ### Step M2 — Reliability report
 
-```r
+```{r chunk-29}
 if (requireNamespace("psych", quietly = TRUE)) {
   rr <- reliability_report(scored, instr_d, omega = FALSE)
   print(rr)
@@ -604,7 +619,7 @@ if (requireNamespace("psych", quietly = TRUE)) {
 
 ### Step M3 — Item report
 
-```r
+```{r chunk-30}
 ir <- item_report(resp, instr_d)
 print(ir)
 ```
@@ -613,7 +628,7 @@ print(ir)
 
 ### Step M4 — EFA readiness report
 
-```r
+```{r chunk-31}
 if (requireNamespace("psych", quietly = TRUE)) {
   er <- efa_report(scored, instr_d)
   print(er)
@@ -627,7 +642,7 @@ if (requireNamespace("psych", quietly = TRUE)) {
 
 ### Step M5 — Validity report
 
-```r
+```{r chunk-32}
 loadings_list <- list(
   DMRE = c(dm_1 = 0.78, dm_2 = 0.82, dm_3 = 0.75, dm_4 = 0.80, dm_5 = 0.77),
   TS   = c(ts_1 = 0.84, ts_2 = 0.80, ts_3 = 0.88)
@@ -642,7 +657,7 @@ print(vr$reliability)
 
 ### Step M6 — Assumption report
 
-```r
+```{r chunk-33}
 if (requireNamespace("psych", quietly = TRUE)) {
   ar <- assumption_report(scored, instr_d)
   print(ar)
@@ -656,7 +671,7 @@ if (requireNamespace("psych", quietly = TRUE)) {
 
 ## Part N — CFA and SEM syntax generation
 
-```r
+```{r chunk-34}
 syn_cfa <- cfa_lavaan_syntax(instr_d)
 cat(syn_cfa)
 
@@ -679,7 +694,7 @@ cat(syn_pls)
 
 ### Step O1 — Declare and run the plan
 
-```r
+```{r chunk-35}
 results <- run_analysis_plan(scored, instr_d)
 length(results)
 ```
@@ -689,7 +704,7 @@ length(results)
 
 ### Step O2 — Inspect a result
 
-```r
+```{r chunk-36}
 r1 <- results[[1]]
 cat("APA:    ", r1$apa,    "\n")
 cat("Prompt: ", r1$prompt, "\n")
@@ -706,7 +721,7 @@ cat("Test:   ", r1$test,   "\n")
 
 ## Part P — Codebook report
 
-```r
+```{r chunk-37}
 cb <- codebook_report(instr_d)
 nrow(cb$items_table)
 head(cb$items_table[, c("id", "type", "scale_id", "reverse")], 6)
@@ -723,7 +738,7 @@ head(cb$items_table[, c("id", "type", "scale_id", "reverse")], 6)
 
 ### Step Q1 — render_results
 
-```r
+```{r chunk-38, eval=FALSE}
 results_path <- render_results(
   results,
   instr_d,
@@ -741,7 +756,7 @@ cat("Size:", round(file.size(results_path) / 1024, 1), "KB\n")
 
 ### Step Q2 — render_report (full report)
 
-```r
+```{r chunk-39, eval=FALSE}
 report_path <- render_report(
   instr_d,
   data                 = scored,
@@ -777,7 +792,7 @@ Scales, Data) are now also built into SurveyStudio (Part G, Step G4), so the
 standalone launcher overlaps the studio. It is kept for the lightweight
 view-only use case and is a candidate for soft-deprecation in a later release.
 
-```r
+```{r chunk-40, eval=FALSE}
 launch_dashboard_demo()
 ```
 
@@ -795,7 +810,7 @@ launch_dashboard_demo()
 
 ## Part S — lavaan in Suggests (Change 3 of 0.3.2)
 
-```r
+```{r chunk-41}
 # Confirm lavaan is listed in Suggests, not Imports
 desc <- read.dcf(system.file("DESCRIPTION", package = "surveyframe"))
 cat("Imports:", desc[, "Imports"], "\n\n")
@@ -822,7 +837,7 @@ Read through the full script:
 Run the script from the RStudio console (interactive mode, so the guarded
 sections execute):
 
-```r
+```{r chunk-42, eval=FALSE}
 source("~/Documents/GitHub/surveyframe-dev/jss-paper/replicate.R", echo = TRUE)
 ```
 
@@ -839,7 +854,7 @@ source("~/Documents/GitHub/surveyframe-dev/jss-paper/replicate.R", echo = TRUE)
 
 Knit the main vignette:
 
-```r
+```{r chunk-43, eval=FALSE}
 rmarkdown::render(
   "~/Documents/GitHub/surveyframe/vignettes/surveyframe.Rmd",
   output_dir = tempdir(),
@@ -894,7 +909,7 @@ Work through the vignette output from top to bottom:
 
 Open each supporting vignette and skim for obvious errors:
 
-```r
+```{r chunk-44, eval=FALSE}
 rmarkdown::render(
   "~/Documents/GitHub/surveyframe/vignettes/building-survey-instrument.Rmd",
   output_dir = tempdir(), quiet = TRUE)
@@ -930,7 +945,7 @@ rmarkdown::render(
 
 ## Part V — Full test suite
 
-```r
+```{r chunk-45}
 devtools::test()
 ```
 
@@ -962,26 +977,9 @@ Answer each question based on your review above:
 After all checkboxes above are ticked, record your sign-off here and inform the
 Claude Code session to proceed to `R CMD check`.
 
-### Partial sign-off (2026-06-16)
-
-- **SurveyBuilder (Part F): SIGNED OFF.** Reviewed against the freshly installed
-  0.3.2 from the public repo. Distinct Analyse stages, Export survey and Generate
-  collector buttons, footer, and academic tables all confirmed.
-- **SurveyStudio (Part G): SIGNED OFF.** Eight screens (no Build screen), iframe
-  Preview, integrated Dashboard with brand pill tabs and academic tables (Scale
-  definitions and item frequency/summary tables present), Quality elaborated,
-  brand teal applied. Analysis Plan alignment fixed.
-- **Shiny survey module (Part I):** a `sprintf` "one argument not used" warning
-  was found and fixed in `R/survey_module.R`.
-- **Standalone dashboard (Part R):** logo serving fixed (`addResourcePath`);
-  `launch_dashboard()` no longer silently loads demo data.
-
-Remaining for full sign-off: a final pass of the static survey (Part H) on a
-device, the module submit flow (Part I), and the vignette read-through (Part U).
-
 **Reviewed by:** Mohammed Ali Sharafuddin  
-**Date signed off:** 2026-06-16 (builder and studio)  
-**All steps complete:** Builder and SurveyStudio: Yes. Remainder: in progress.  
+**Date signed off:**  
+**All steps complete:** Yes / No  
 **Notes for the developer (if any):**
 
 Once signed off, paste the following prompt into Claude Code to proceed:
