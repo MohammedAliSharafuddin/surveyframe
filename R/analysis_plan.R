@@ -84,7 +84,7 @@
   ),
   surveyframe = list(
     key  = "surveyframe",
-    apa  = "Sharafuddin, M. A. (2026). *surveyframe: A survey instrument workflow for R* (Version 0.3.0) [Computer software]. https://github.com/MohammedAliSharafuddin/surveyframe",
+    apa  = "Sharafuddin, M. A. (2026). *surveyframe: Survey Instrument Workflows* (Version %s) [Computer software]. https://github.com/MohammedAliSharafuddin/surveyframe",
     use  = "all"
   )
 )
@@ -94,7 +94,13 @@ sframe_citations_for_test <- function(test) {
   matching <- Filter(function(cit) {
     "all" %in% cit$use || test %in% cit$use
   }, citations)
-  lapply(matching, function(cit) cit$apa)
+  # Inject the live package version into any citation template (the surveyframe
+  # self-citation), so the version never goes stale on a release bump.
+  ver <- tryCatch(as.character(utils::packageVersion("surveyframe")),
+                  error = function(e) "0.3.2")
+  lapply(matching, function(cit) {
+    if (grepl("%s", cit$apa, fixed = TRUE)) sprintf(cit$apa, ver) else cit$apa
+  })
 }
 
 # ---------------------------------------------------------------------------
@@ -1127,8 +1133,11 @@ render_results <- function(
   .rq-number { background: #1a1a2e; color: #fff; border-radius: 20px;
                 padding: 4px 12px; font-size: 12px; font-weight: 700;
                 white-space: nowrap; margin-top: 3px; }
-  .result-box { background: #f0f4ff; border-left: 4px solid #5b8dee;
+  .result-box { background: #e6f7f7; border-left: 4px solid #16B3B1;
                  padding: 14px 18px; border-radius: 0 8px 8px 0; margin-bottom: 18px; }
+  .sf-foot { text-align: center; font-size: 12px; color: #94a3b8; margin-top: 40px;
+              padding-top: 16px; border-top: 1px solid #eee; }
+  .sf-foot a { color: #16B3B1; font-weight: 600; text-decoration: none; }
   .apa-string { font-family: "Georgia", serif; font-size: 15px; color: #1a1a2e; }
   .effect-badge { display: inline-block; margin-left: 10px; padding: 2px 9px;
                    border-radius: 12px; font-size: 12px; font-weight: 600; }
@@ -1171,6 +1180,7 @@ render_results <- function(
 </div>
 %s
 %s
+<div class="sf-foot">Built with <a href="https://cran.r-project.org/package=surveyframe" target="_blank" rel="noopener">surveyframe</a></div>
 </body>
 </html>',
     report_title_html, report_title_html,
