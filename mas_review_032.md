@@ -227,11 +227,31 @@ instr <- sf_instrument(
 )
 
 print(instr)
+
+# Header and branding (shown on the exported survey in Part H).
+# The logo is pulled from the public GitHub repo for this test. Internet is
+# needed for this one step. openssl is a hard dependency, so base64_encode is
+# always available.
+logo_url <- paste0("https://raw.githubusercontent.com/MohammedAliSharafuddin/",
+                   "surveyframe/main/man/figures/readme-logo.png")
+logo_png <- tempfile(fileext = ".png")
+download.file(logo_url, logo_png, mode = "wb", quiet = TRUE)
+
+instr$render$theme                  <- "#16B3B1"
+instr$render$header$institution     <- "surveyframe demo"
+instr$render$header$logo_base64     <- openssl::base64_encode(
+  readBin(logo_png, "raw", file.info(logo_png)$size))
+instr$render$header$logo_media_type <- "image/png"
+instr$render$header$show_progress   <- TRUE
 ```
 
 - [ ] `print(instr)` shows a tidy summary: title, item count, scale count,
   check count, and validation status.
 - [ ] No error during construction.
+- [ ] The logo downloads without error and
+  `nchar(instr$render$header$logo_base64)` is a few thousand characters.
+- [ ] The institution, logo, and `#16B3B1` theme appear on the exported survey
+  header in Part H. (If offline, skip the download lines; the rest still runs.)
 
 ### Step D2 — Validation
 
@@ -418,10 +438,13 @@ cat("Size:", round(file.size(out) / 1024, 1), "KB\n")
 - [ ] A message confirms the path and size in KB.
 - [ ] The browser opens automatically.
 
-### Step H2 — Welcome screen
+### Step H2 — Header and welcome screen
 
 In the browser:
 
+- [ ] The header band shows the GitHub logo set in Step D1 and the institution
+  name "surveyframe demo". The logo is sized consistently (not stretched).
+- [ ] The brand theme colour (`#16B3B1`) is applied to the accent and buttons.
 - [ ] A welcome screen appears before any questions.
 - [ ] The survey title "MAS Review Test Survey" is visible.
 - [ ] A Start button is present.
@@ -964,24 +987,26 @@ Claude Code session to proceed to `R CMD check`.
 
 ### Partial sign-off (2026-06-16)
 
-- **SurveyBuilder (Part F): SIGNED OFF.** Reviewed against the freshly installed
-  0.3.2 from the public repo. Distinct Analyse stages, Export survey and Generate
-  collector buttons, footer, and academic tables all confirmed.
-- **SurveyStudio (Part G): SIGNED OFF.** Eight screens (no Build screen), iframe
-  Preview, integrated Dashboard with brand pill tabs and academic tables (Scale
-  definitions and item frequency/summary tables present), Quality elaborated,
-  brand teal applied. Analysis Plan alignment fixed.
-- **Shiny survey module (Part I):** a `sprintf` "one argument not used" warning
-  was found and fixed in `R/survey_module.R`.
+- **Parts A through H: SIGNED OFF.** Reviewed against the freshly installed
+  0.3.2 from the public repo. Covers installation, citation, the six S3 methods,
+  instrument construction (now with a header, logo, and brand theme in Step D1),
+  serialisation and hash integrity, the SurveyBuilder (distinct Analyse stages,
+  Export survey and Generate collector buttons, footer, academic tables), the
+  SurveyStudio (eight screens, no Build screen, iframe Preview, integrated
+  Dashboard with brand pill tabs and academic tables, Quality elaborated, brand
+  teal, alignment fix), and the static survey export with its header logo.
+- **Shiny survey module (Part I): IN REVIEW.** A `sprintf` "one argument not
+  used" warning was found and fixed in `R/survey_module.R`.
 - **Standalone dashboard (Part R):** logo serving fixed (`addResourcePath`);
   `launch_dashboard()` no longer silently loads demo data.
 
-Remaining for full sign-off: a final pass of the static survey (Part H) on a
-device, the module submit flow (Part I), and the vignette read-through (Part U).
+Remaining for full sign-off: the module submit flow (Part I, in progress), the
+analysis/reporting/dashboard parts (J onward), and the vignette read-through
+(Part U).
 
 **Reviewed by:** Mohammed Ali Sharafuddin  
-**Date signed off:** 2026-06-16 (builder and studio)  
-**All steps complete:** Builder and SurveyStudio: Yes. Remainder: in progress.  
+**Date signed off:** 2026-06-16 (Parts A through H)  
+**All steps complete:** Parts A-H: Yes. Part I onward: in progress.  
 **Notes for the developer (if any):**
 
 Once signed off, paste the following prompt into Claude Code to proceed:
