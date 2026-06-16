@@ -550,12 +550,21 @@ fake_row$started_at    <- as.character(Sys.time())
 
 write.csv(as.data.frame(fake_row), resp_csv, row.names = FALSE)
 
-read_resp <- read_responses(resp_csv, instr)
+# Declare the meta columns. read_responses() is strict by default and rejects
+# columns that are neither survey items nor declared meta columns. The
+# respondent id has its own argument; other meta columns go in meta_cols.
+read_resp <- read_responses(
+  resp_csv, instr,
+  respondent_id = "respondent_id",
+  meta_cols     = "started_at"
+)
 nrow(read_resp)
 ```
 
 - [ ] Returns a one-row data frame.
-- [ ] No error about unknown columns.
+- [ ] No error. (Without declaring `respondent_id` and `started_at`, strict mode
+  errors with "undeclared column(s)" — pass them as shown, or use
+  `strict = FALSE`.)
 
 ---
 
