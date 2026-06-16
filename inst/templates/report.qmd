@@ -43,12 +43,17 @@ responses  <- if (has_data) readRDS(params$data_path) else NULL
 
 ```{=html}
 <style>
-/* Comfortable padding; make every table its own horizontal-scroll container
-   so wide tables stay within the content column instead of overflowing. */
+/* Academic (APA) tables: horizontal rules only, no shading, no vertical lines.
+   Each table is its own horizontal-scroll container so wide tables stay within
+   the content column. Overrides the theme's default table styling. */
 table { display: block; overflow-x: auto; max-width: 100%;
-        border-collapse: collapse; margin: 12px 0; }
-th, td { padding: 7px 14px; vertical-align: top; }
-thead th { border-bottom: 2px solid #adb5bd; }
+        border-collapse: collapse; margin: 14px 0; }
+th, td { padding: 7px 14px; vertical-align: top;
+         border: none !important; background: none !important; }
+thead th { border-top: 2px solid #1a1a2e !important;
+           border-bottom: 1px solid #1a1a2e !important; font-weight: 700; }
+tbody tr { background: none !important; }
+tbody tr:last-child td { border-bottom: 2px solid #1a1a2e !important; }
 .cell-output-display, .cell-output { overflow-x: auto; max-width: 100%; }
 </style>
 ```
