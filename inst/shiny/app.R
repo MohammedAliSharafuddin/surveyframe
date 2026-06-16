@@ -856,7 +856,7 @@ ui <- fluidPage(
       }
       .studio-nav-item a:hover,
       .studio-nav-item a.active {
-        background: #22274a; color: #ffffff; border-left-color: #5b8dee;
+        background: #22274a; color: #ffffff; border-left-color: #16B3B1;
       }
       .studio-status {
         padding: 16px 20px; font-size: 12px;
@@ -865,6 +865,7 @@ ui <- fluidPage(
       .studio-main {
         margin-left: 240px; flex: 1; padding: 32px;
         min-height: 100vh; box-sizing: border-box;
+        min-width: 0;
       }
       .screen { display: none; }
       .screen.active { display: block; }
@@ -894,24 +895,48 @@ ui <- fluidPage(
       }
       .stat-box .stat-val { font-size: 28px; font-weight: 700; color: #1a1a2e; }
       .stat-box .stat-lbl { font-size: 12px; color: #6b718e; margin-top: 4px; }
-      table.sf-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+      table.sf-table { width: 100%; border-collapse: collapse; font-size: 14px;
+        display: block; overflow-x: auto; max-width: 100%; }
+      /* Academic (APA) tables: horizontal rules only, no shading, no vertical lines */
       .sf-table th {
-        background: #f7f8fa; text-align: left; padding: 8px 12px;
-        font-weight: 600; color: #444; border-bottom: 2px solid #e0e3ea;
+        background: none; text-align: left; padding: 8px 12px;
+        font-weight: 700; color: #1a1a2e;
+        border-top: 2px solid #1a1a2e; border-bottom: 1px solid #1a1a2e;
       }
-      .sf-table td { padding: 8px 12px; border-bottom: 1px solid #f0f1f4; vertical-align: top; }
-      .sf-table tr:last-child td { border-bottom: none; }
+      .sf-table td { padding: 8px 12px; border: none; vertical-align: top; overflow-wrap: anywhere; }
+      .sf-table tbody tr:last-child td { border-bottom: 2px solid #1a1a2e; }
       .btn-primary {
-        background: #5b8dee; color: #fff; border: none; border-radius: 6px;
+        background: #16B3B1; color: #fff; border: none; border-radius: 6px;
         padding: 9px 20px; font-size: 14px; cursor: pointer; font-weight: 600;
       }
-      .btn-primary:hover { background: #4a7de0; }
+      .btn-primary:hover { background: #129a98; }
       .btn-outline {
-        background: transparent; color: #5b8dee; border: 1.5px solid #5b8dee;
+        background: transparent; color: #16B3B1; border: 1.5px solid #16B3B1;
         border-radius: 6px; padding: 8px 18px; font-size: 14px;
         cursor: pointer; font-weight: 600;
       }
-      .btn-outline:hover { background: #eef3fd; }
+      .btn-outline:hover { background: #e6f7f7; }
+      /* Brand pill tabs (match the dashboard nav), used for the studio sub-tabs */
+      .studio-tabs .shiny-options-group {
+        display: flex; gap: 2px; flex-wrap: wrap; background: #1e293b;
+        padding: 6px; border-radius: 8px; margin: 4px 0 18px;
+      }
+      .studio-tabs .control-label { display: none; }
+      .studio-tabs .radio-inline { margin: 0; padding: 0; }
+      .studio-tabs .radio-inline input[type=radio] {
+        position: absolute; opacity: 0; pointer-events: none;
+      }
+      .studio-tabs .radio-inline span {
+        display: inline-block; padding: 7px 16px; border-radius: 6px;
+        font-size: 12px; font-weight: 600; color: rgba(255,255,255,.6);
+        cursor: pointer; transition: all .15s;
+      }
+      .studio-tabs .radio-inline:hover span {
+        background: rgba(255,255,255,.06); color: rgba(255,255,255,.85);
+      }
+      .studio-tabs .radio-inline input[type=radio]:checked + span {
+        background: #16B3B1; color: #fff;
+      }
       h2.screen-title {
         font-size: 22px; font-weight: 700; margin: 0 0 24px; color: #1a1a2e;
       }
@@ -1059,11 +1084,13 @@ ui <- fluidPage(
       tags$div(id = "screen-analysis", class = screen_class("analysis"),
         tags$h2(class = "screen-title", "Analysis Plan"),
         uiOutput("analysis_gate"),
-        radioButtons(
-          "analysis_stage", NULL,
-          choices = c("Plan" = "Plan", "Run preview" = "Run", "Report outline" = "Report"),
-          selected = "Plan",
-          inline = TRUE
+        tags$div(class = "studio-tabs",
+          radioButtons(
+            "analysis_stage", NULL,
+            choices = c("Plan" = "Plan", "Run preview" = "Run", "Report outline" = "Report"),
+            selected = "Plan",
+            inline = TRUE
+          )
         ),
         fluidRow(
           column(4, uiOutput("analysis_left_panel")),
@@ -1075,11 +1102,13 @@ ui <- fluidPage(
       tags$div(id = "screen-dashboard", class = screen_class("dashboard"),
         tags$h2(class = "screen-title", "Dashboard"),
         uiOutput("dashboard_gate"),
-        radioButtons(
-          "dashboard_view", NULL,
-          choices = c("Overview", "Items", "Scales", "Data"),
-          selected = "Overview",
-          inline = TRUE
+        tags$div(class = "studio-tabs",
+          radioButtons(
+            "dashboard_view", NULL,
+            choices = c("Overview", "Items", "Scales", "Data"),
+            selected = "Overview",
+            inline = TRUE
+          )
         ),
         uiOutput("studio_dashboard_content")
       ),
@@ -2600,7 +2629,8 @@ server <- function(input, output, session) {
         selectInput("dash_item_sel", "Select item", choices = ch, width = "420px"),
         tags$div(class = "card",
           tags$div(class = "card-title", "Response distribution"),
-          shiny::plotOutput("studio_item_chart", height = "300px"))
+          shiny::plotOutput("studio_item_chart", height = "300px")),
+        uiOutput("studio_item_table")
       ))
     }
 
@@ -2610,11 +2640,23 @@ server <- function(input, output, session) {
       ch <- stats::setNames(
         vapply(scs, `[[`, character(1), "id"),
         vapply(scs, function(s) paste0(s$id, ": ", s$label), character(1)))
+      def_rows <- lapply(scs, function(s) {
+        tags$tr(
+          tags$td(s$id),
+          tags$td(s$label %||% ""),
+          tags$td(s$method %||% s$scoring %||% "mean"),
+          tags$td(paste(s$items, collapse = ", ")),
+          tags$td(paste(s$reverse %||% character(0), collapse = ", "))
+        )
+      })
       return(tagList(
         selectInput("dash_scale_sel", "Select scale", choices = ch, width = "380px"),
         tags$div(class = "card",
           tags$div(class = "card-title", "Scale score distribution"),
-          shiny::plotOutput("studio_scale_chart", height = "280px"))
+          shiny::plotOutput("studio_scale_chart", height = "280px")),
+        table_card("Scale definitions",
+          headers = c("ID", "Label", "Method", "Items", "Reverse items"),
+          rows = def_rows, empty_label = "No scales defined.")
       ))
     }
 
@@ -2657,6 +2699,45 @@ server <- function(input, output, session) {
     }
   }, bg = "white")
   shiny::outputOptions(output, "studio_item_chart", suspendWhenHidden = FALSE)
+
+  output$studio_item_table <- renderUI({
+    req(rv$instrument, rv$responses, input$dash_item_sel)
+    resp <- rv$responses
+    item <- dash_find(rv$instrument$items, input$dash_item_sel)
+    if (is.null(item) || !input$dash_item_sel %in% names(resp)) return(NULL)
+    col_data <- resp[[input$dash_item_sel]]
+    if (item$type %in% c("likert", "single_choice", "multiple_choice")) {
+      cs <- dash_find(rv$instrument$choices, item$choice_set %||% "")
+      if (!is.null(cs)) {
+        freq <- table(factor(col_data, levels = as.character(cs$values)))
+        labs <- cs$labels
+        vals <- as.character(cs$values)
+      } else {
+        freq <- table(col_data); labs <- names(freq); vals <- names(freq)
+      }
+      tot <- sum(freq)
+      rows <- lapply(seq_along(freq), function(i) tags$tr(
+        tags$td(vals[i]), tags$td(labs[i]), tags$td(as.integer(freq[i])),
+        tags$td(if (tot > 0) sprintf("%.1f%%", 100 * freq[i] / tot) else "0%")
+      ))
+      table_card("Frequency counts",
+        headers = c("Value", "Label", "Count", "Percent"),
+        rows = rows, empty_label = "No responses.")
+    } else if (item$type %in% c("numeric", "slider", "rating")) {
+      num <- suppressWarnings(as.numeric(col_data)); num <- num[!is.na(num)]
+      if (!length(num)) return(NULL)
+      rows <- list(tags$tr(
+        tags$td(length(num)), tags$td(round(mean(num), 2)), tags$td(round(stats::sd(num), 2)),
+        tags$td(round(min(num), 2)), tags$td(round(stats::median(num), 2)), tags$td(round(max(num), 2))
+      ))
+      table_card("Summary statistics",
+        headers = c("N", "Mean", "SD", "Min", "Median", "Max"),
+        rows = rows, empty_label = "No numeric data.")
+    } else {
+      NULL
+    }
+  })
+  shiny::outputOptions(output, "studio_item_table", suspendWhenHidden = FALSE)
 
   output$studio_scale_chart <- shiny::renderPlot({
     req(rv$instrument, rv$responses, input$dash_scale_sel)
