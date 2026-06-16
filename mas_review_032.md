@@ -801,6 +801,8 @@ report_path <- render_report(
   include_analysis     = TRUE,
   include_models       = FALSE
 )
+cat("Path:", report_path, "\n")
+cat("Size:", round(file.size(report_path) / 1024, 1), "KB\n")
 ```
 
 - [ ] File is written without error. `render_report()` renders through Quarto
@@ -814,6 +816,9 @@ report_path <- render_report(
   none show pipe characters).
 - [ ] Tables are padded and readable; wide tables scroll within the column rather
   than overflowing; numeric values are rounded to two decimal places.
+- [ ] Reference titles render in italics, not as literal `*asterisks*`, and the
+  surveyframe reference shows the current title and version.
+- [ ] `cat()` prints the report path and size in KB (as in Step Q1).
 
 ---
 
