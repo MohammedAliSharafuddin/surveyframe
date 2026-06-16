@@ -985,6 +985,13 @@ print.sframe_analysis_results <- function(x, ...) {
 #' out <- render_results(results, instr,
 #'                       output_file = tempfile(fileext = ".html"))
 #' file.exists(out)
+# Escape HTML and render the limited markdown used in citations (*italic*) so
+# references show as italics rather than literal asterisks.
+sframe_md_em <- function(x) {
+  x <- htmltools_escape(x)
+  gsub("\\*([^*]+)\\*", "<em>\\1</em>", x)
+}
+
 render_results <- function(
     results         = NULL,
     instrument,
@@ -1025,7 +1032,7 @@ render_results <- function(
     prompt  <- r$interpretation_prompt %||% r$prompt %||% ""
     interp  <- r$interpretation %||% ""
     cits <- paste(
-      vapply(unlist(r$citations), htmltools_escape, character(1)),
+      vapply(unlist(r$citations), sframe_md_em, character(1)),
       collapse = "<br>"
     )
 
@@ -1106,7 +1113,7 @@ render_results <- function(
     items <- paste(
       sprintf(
         '<li>%s</li>',
-        vapply(unlist(all_citations), htmltools_escape, character(1))
+        vapply(unlist(all_citations), sframe_md_em, character(1))
       ),
       collapse = "\n"
     )
