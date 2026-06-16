@@ -707,22 +707,31 @@ if (requireNamespace("psych", quietly = TRUE)) {
 
 ## Part N — CFA and SEM syntax generation
 
+`cfa_lavaan_syntax()` is instrument-first and builds a CFA from the
+instrument's scales. `sem_lavaan_syntax()` and `seminr_syntax()` are model-first,
+so pass a model. The tourism demo defines a `cfa` model and a `cb_sem` model;
+use the CB-SEM model for the structural syntax.
+
 ```{r chunk-34}
+# CFA syntax from the instrument's scales (instrument-first)
 syn_cfa <- cfa_lavaan_syntax(instr_d)
 cat(syn_cfa)
 
-syn_sem <- sem_lavaan_syntax(instr_d)
+# The CB-SEM model carries the structural paths
+sem_model <- Filter(function(m) m$type == "cb_sem", instr_d$models)[[1]]
+
+syn_sem <- sem_lavaan_syntax(sem_model, instr_d)
 cat(syn_sem)
 
-syn_pls <- seminr_syntax(instr_d)
+syn_pls <- seminr_syntax(sem_model)
 cat(syn_pls)
 ```
 
 - [ ] `cfa_lavaan_syntax()` returns a multi-line lavaan model string
-  (e.g., `DMRE =~ dm_1 + dm_2 + ...`).
-- [ ] `sem_lavaan_syntax()` includes the measurement model and any declared paths.
-- [ ] `seminr_syntax()` returns the seminr measurement model syntax.
-- [ ] None of these calls require lavaan to be loaded.
+  (e.g., `digital_marketing =~ dm_1 + dm_2 + ...`).
+- [ ] `sem_lavaan_syntax()` includes the measurement model and the declared paths.
+- [ ] `seminr_syntax()` returns the seminr measurement and structural model syntax.
+- [ ] None of these calls require lavaan or seminr to be loaded.
 
 ---
 
