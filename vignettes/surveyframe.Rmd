@@ -61,7 +61,7 @@ likert5 <- sf_choices(
 
 `stem_items()` builds items that share a common sentence stem. Each item is the
 stem followed by a unique completion. `solo_items()` builds standalone items.
-Neither function is exported; both use only `sf_item()`.
+Neither function is exported, and both use only `sf_item()`.
 
 ```{r helpers}
 stem_items <- function(ids, stem, completions, scale_id) {
@@ -618,7 +618,7 @@ if (requireNamespace("psych", quietly = TRUE)) {
 A Cronbach's alpha of 0.70 or above is conventionally accepted as adequate
 internal consistency (Nunnally, 1978). For scales with three or more items,
 McDonald's omega is a more accurate estimate because it accounts for unequal
-factor loadings across items; alpha assumes all items load equally on the
+factor loadings across items. Alpha assumes all items load equally on the
 factor. Pass `omega = TRUE` when items within a scale differ substantially in
 their contribution. See `?reliability_report` for details.
 
@@ -638,7 +638,7 @@ if (requireNamespace("psych", quietly = TRUE)) {
 
 A KMO value of 0.60 or above and a significant Bartlett test confirm that the
 correlation structure supports factor analysis. The suggested factor count from
-parallel analysis is a guide; theory should take precedence.
+parallel analysis is a guide. Theory should take precedence.
 
 ## Construct validity
 
@@ -761,7 +761,7 @@ for (r in results) {
 ```
 
 The `prompt` field is a sentence template for the methods or results section.
-The researcher fills in the substantive interpretation; the package supplies
+The researcher fills in the substantive interpretation. The package supplies
 the statistic and the label. This separation is intentional: statistical
 significance and practical significance are distinct judgements.
 
