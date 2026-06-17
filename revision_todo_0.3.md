@@ -213,6 +213,19 @@ All 407 tests pass.
   blocking examples to `\dontrun{}`; render_survey.R donttest assigned;
   sf_branch.R version pin removed.
 
+### Deferred to v0.3.4+ (not 0.3.2)
+
+- **Reference/citation system to a .bib file.** The APA citations are hardcoded
+  in `.sframe_citations` (R/analysis_plan.R). Move them to a `.bib` pulled at
+  render time so references update centrally. Clean path: Quarto-native
+  (`bibliography:` + `@key` + an APA CSL) for `render_report` (the runners
+  already carry citation keys); `render_results` and the HTML fallback need an
+  R-side formatter (base `bibentry()`/`format(style = "text")`, or a guarded
+  RefManageR). No native bib reader without a new dependency, so this is not a
+  0.3.2 change. For 0.3.2 the citations are correct (current title, live version)
+  and render as italics. Tracked in portfolio-planner
+  `19_v034_v039_implementation.md`.
+
 ### Obsolete / redundant after changes
 
 - The studio's old "Build Survey" screen: REMOVED.
