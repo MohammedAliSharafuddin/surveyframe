@@ -73,7 +73,7 @@ collector.
 SurveyStudio is a Shiny application, so it can run R. Its left navigation lists
 eight screens in this order: Open Instrument, Preview Survey, Upload Responses,
 Quality Dashboard, Reliability, Analysis Plan, Dashboard, and Export. Survey
-design is done in the SurveyBuilder; the studio opens the resulting `.sframe`.
+design is done in the SurveyBuilder, and the studio opens the resulting `.sframe`.
 The Preview Survey screen renders the exact deployable survey, identical to the
 exported HTML.
 
