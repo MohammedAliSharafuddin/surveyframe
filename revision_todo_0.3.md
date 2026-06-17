@@ -5,12 +5,15 @@ Excluded from the CRAN build (via .Rbuildignore) and from the public repo
 
 ---
 
-## v0.3.2 — Implemented (awaiting MAS co-review, then CRAN)
+## v0.3.2 — Implemented and signed off (next: CRAN check and submission)
 
-All 7 changes committed. 368/368 tests pass. Vignette knits clean. Both remotes
-(origin/main and private/main) up to date. Commits: 80e4040 (changes 1-4),
-be2ed94 (changes 5-6), 519454b (replicate.R on dev). MAS co-review checklist is
-in mas_review_032.md. Do not run R CMD check until co-review is signed off.
+All changes committed. 368/368 tests pass. Vignettes knit clean. Both remotes
+(public surveyframe and private surveyframe-dev) up to date. The MAS co-review
+is complete and signed off (2026-06-17, all 184 checklist items, Parts A to U,
+in mas_review_032.md). Late additions this arc: SurveyStudio disables its Export
+buttons until an instrument is valid and reads responses from a deployed Google
+Sheet on the Upload screen, and the vignettes present analysis output as branded
+tables and plots. R CMD check --as-cran is now cleared to run.
 
 Scope: the CITATION fix is still the trigger. The JSS editor review adds the
 package changes below. No new features, no new exports.

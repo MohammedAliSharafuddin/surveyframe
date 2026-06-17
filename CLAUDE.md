@@ -20,10 +20,11 @@ contract declared before data collection. Analysis is the execution of that
 pre-declared plan rather than a post-hoc search. This is the package's main
 differentiator and the thesis of the JSS paper.
 
-Current version: 0.3.1 on CRAN (2026-06-02). 0.3.2 implemented locally — all 7
-changes committed and pushed to both remotes, 368/368 tests pass. Awaiting
-MAS co-review (see mas_review_032.md in this folder) then R CMD check --as-cran,
-win-builder, and CRAN submission.
+Current version: 0.3.1 on CRAN (2026-06-02). 0.3.2 implemented locally, all 7
+changes committed and pushed to both remotes, 368/368 tests pass. MAS co-review
+is complete and signed off (2026-06-17, all 184 checklist items, see
+mas_review_032.md in this folder). Next: R CMD check --as-cran, win-builder,
+and CRAN submission.
 
 After 0.3.2 comes 0.3.3 (real-world embedding and conference feedback from the
 AIC-RSAM room-service study and the ICSRI 2026 presentation), then a
@@ -156,41 +157,34 @@ feasibility). The vignette builds offline because the data-collection step uses
 0.3.1 is published on CRAN (2026-06-02). 0.3.2 is fully implemented (all 7
 changes done, 368/368 tests pass, vignette knits, both remotes up to date).
 
-**A GUI UI/UX co-review is in progress (started 2026-06-14).** 0.3.2 ships with
-the JSS manuscript, so every graphical entry point is being checked so a reviewer
-does not hit a broken or misleading GUI. Row-by-row tracker:
+**The GUI UI/UX co-review and the MAS co-review are complete and signed off
+(2026-06-17).** Every graphical entry point was checked so a reviewer of the JSS
+manuscript does not hit a broken or misleading GUI. Row-by-row tracker:
 `demo/slides_review_table.md`. Full notes: the "v0.3.2 GUI co-review" section in
-`revision_todo_0.3.md`.
+`revision_todo_0.3.md`. The MAS sign-off (all 184 checklist items, Parts A to U)
+is in `mas_review_032.md`.
 
 DONE and signed off: **SurveyBuilder** (HTML), **static survey** template,
 **SurveyStudio** (`inst/shiny/app.R`), and the **HTML report**
-(`R/reporting.R` + `inst/templates/report.qmd`). Full per-GUI detail is in the
-"v0.3.2 GUI co-review" section of `revision_todo_0.3.md`. Highlights: builder has
+(`R/reporting.R` + `inst/templates/report.qmd`). Highlights: builder has
 client-side Export survey + Generate collector (single-sourced and inlined via
 `data-raw/inline_static_template.R`, gitignored on main); studio dropped its
 Build screen, previews the real survey in an iframe, integrated the dashboard
-inline, and got the suspendWhenHidden fix; the report's Quarto render was fixed
-(was silently falling back), tables formatted, distribution plots added, 2
-decimals, left TOC, wide-table scroll. Mojibake is clean across inst/ and R/.
-All 368 tests pass.
+inline, got the suspendWhenHidden fix, disables its Export buttons until an
+instrument is valid, and reads responses from a deployed Google Sheet on the
+Upload screen; the report's Quarto render was fixed, tables formatted,
+distribution plots added, 2 decimals, left TOC, wide-table scroll. The vignettes
+now show analysis output as branded tables and plots. Mojibake is clean across
+inst/ and R/. All 368 tests pass and both remotes are up to date.
 
-Builder work committed on `main` as 07d0608 (not pushed). The static survey,
-studio, and report changes are NOT yet committed.
+Still pending before CRAN submission:
 
-Still pending before the CRAN check:
-
-1. **Standalone dashboard** `inst/shiny/dashboard/app.R`: its views are now inline
-   in the studio (overlap). Clean of mojibake, unchanged this arc. Keep for
-   0.3.2 (exported since 0.3.1; removing breaks compat); candidate for soft
-   deprecation later. A light sanity check is worthwhile. The Shiny survey module
-   (`R/survey_module.R`) had a code guard only, no interactive pass (low priority).
-2. Commit the uncommitted package changes on `main`; push when asked.
-3. Add a NEWS.md 0.3.2 entry covering the GUI and report work. No new hard or
-   Suggests deps were added. `devtools::document()` is current.
-4. MAS co-review (`mas_review_032.md`).
-5. `R CMD build .`, then `R CMD check --as-cran` (must be 0/0/<=1 NOTE; re-run
+1. `R CMD build .`, then `R CMD check --as-cran` (must be 0/0/<=1 NOTE; re-run
    because files changed after the last clean check).
-6. Win-builder R-release and R-devel. Update `cran-comments.md`. Submit.
+2. Win-builder R-release and R-devel. Update `cran-comments.md`. Submit.
+3. Optional: add a NEWS.md 0.3.2 entry covering the GUI, report, and vignette
+   work. No new hard or Suggests deps were added. `devtools::document()` is
+   current.
 
 The JSS paper (OJS 6454, submitted 2026-06-02) was returned without full review.
 Revised and resubmit invitation. The replicate.R and package changes it required
