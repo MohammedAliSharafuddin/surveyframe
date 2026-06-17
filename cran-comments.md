@@ -20,13 +20,16 @@ datasets, and no new hard or suggested dependencies.
 4. The exported survey gained a branding footer, consistent logo sizing, a page
    progress indicator for multi-page surveys, and a mobile layout.
 5. SurveyStudio opens an instrument, previews the exact deployable survey, and
-   analyses responses, with the response dashboard built in.
-6. `render_report()` renders reliably through Quarto when it is installed,
-   includes response-distribution plots, formats tables, and rounds numeric
-   values to two decimal places. Quarto remains optional, with a built-in HTML
-   fallback.
+   analyses responses, with the response dashboard built in. Its Export buttons
+   stay disabled until a valid instrument is loaded, and the Upload screen can
+   read responses from a deployed Google Sheets collector.
+6. `render_report()` and `render_results()` share one branded template, render
+   reliably through Quarto when it is installed, include response-distribution
+   plots, format tables, and round numeric values to two decimal places. Quarto
+   remains optional, with a built-in HTML fallback.
 7. Added the "Deploying a survey and collecting responses on free hosting"
-   vignette.
+   vignette, and the analysis, reliability, and validity vignettes now present
+   their output as formatted tables and plots.
 
 ## Test environments
 
@@ -35,7 +38,8 @@ datasets, and no new hard or suggested dependencies.
 
 ## R CMD check results
 
-`R CMD check --as-cran` on the local environment returned:
+`R CMD check --as-cran` was run on the local environment on 2026-06-17 against a
+clean checkout of the release commit. It returned:
 
     Status: OK
     0 errors | 0 warnings | 0 notes
