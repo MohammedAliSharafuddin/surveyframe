@@ -389,6 +389,12 @@ launch_studio_demo()
   the builder).
 - [ ] The logo and brand colours display correctly. No R console error.
 
+> Note: at launch you may see `Registered S3 methods overwritten by 'htmltools'`.
+> This is a benign load-order message from htmltools reclaiming print methods
+> first registered by RStudio's `tools:rstudio` environment. It is not a
+> surveyframe fault and does not affect the app. It does not appear in a plain R
+> session outside RStudio.
+
 ### Step G2 — Open and preview
 
 - [ ] Open Instrument loads a `.sframe` (or the demo is already loaded). The hint
@@ -726,7 +732,11 @@ results <- run_analysis_plan(scored, instr_d)
 length(results)
 ```
 
-- [ ] Returns a list with one element per research question.
+- [ ] Returns a list with one element per declared analysis plan (the tourism
+  demo has 34 plans, so `length(results)` is 34). One plan corresponds to one
+  research question, so the count equals the number of plans declared.
+- [ ] No `Error:` line appears for any plan (all runners now resolve their role
+  aliases, so partial correlation, mediation, and moderation all complete).
 - [ ] No error.
 
 ### Step O2 — Inspect a result

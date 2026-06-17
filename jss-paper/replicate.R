@@ -126,7 +126,7 @@ print(results)
 
 if (interactive()) {
   tmp_html <- tempfile(fileext = ".html")
-  export_static_survey(instr, path = tmp_html, open = FALSE)
+  export_static_survey(instr, output_path = tmp_html, open = FALSE)
   message("Static survey written to: ", tmp_html)
   message("File size (bytes): ", file.size(tmp_html))
 }
