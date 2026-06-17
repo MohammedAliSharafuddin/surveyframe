@@ -13,6 +13,36 @@ vignette: >
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 library(surveyframe)
+library(knitr)
+
+# Tabulate analysis-plan results the same way the report template does.
+results_table <- function(results) {
+  g <- function(r, f) { v <- r[[f]]; if (is.null(v) || !length(v)) "" else as.character(v)[1] }
+  df <- data.frame(
+    RQ       = vapply(results, g, "", "block_id"),
+    Question = vapply(results, g, "", "research_question"),
+    Method   = vapply(results, g, "", "method"),
+    Result   = vapply(results, g, "", "apa"),
+    Effect   = vapply(results, g, "", "effect_label"),
+    check.names = FALSE, stringsAsFactors = FALSE
+  )
+  kable(df, row.names = FALSE,
+        col.names = c("RQ", "Research question", "Method", "Result (APA)", "Effect"),
+        align = c("l", "l", "l", "r", "l"))
+}
+```
+
+```{=html}
+<style>
+body { color: #1a1a2e; }
+h1, h2, h3 { color: #1a1a2e; }
+a { color: #16B3B1; }
+table { border-collapse: collapse; margin: 1em 0; }
+table caption { caption-side: top; font-style: italic; color: #444; padding-bottom: .3em; }
+th { border-top: 2px solid #1a1a2e; border-bottom: 1px solid #1a1a2e; padding: 6px 12px; }
+td { padding: 5px 12px; border: none; }
+tbody tr:last-child td { border-bottom: 2px solid #1a1a2e; }
+</style>
 ```
 
 ## About this vignette
@@ -594,14 +624,23 @@ scored <- score_scales(responses, study)
 scale_cols <- c("DMRE", "DMAU", "DMEU", "DMPV",
                 "DSQA", "DSQT", "DSUQ", "TS", "BI")
 
-# Display scale means and standard deviations as a data frame
+# Display scale means and standard deviations as a table
 scale_summary <- data.frame(
   Scale = scale_cols,
   Mean  = round(colMeans(scored[, scale_cols], na.rm = TRUE), 2),
   SD    = round(apply(scored[, scale_cols], 2, sd, na.rm = TRUE), 2),
   row.names = NULL
 )
-scale_summary
+kable(scale_summary, digits = 2, caption = "Scale score summary")
+```
+
+```{r score-distributions, fig.width = 7, fig.height = 4, fig.align = "left"}
+op <- par(mfrow = c(3, 3), mar = c(4, 3, 2, 1))
+for (s in scale_cols) {
+  v <- scored[[s]]; v <- v[is.finite(v)]
+  hist(v, col = "#16B3B1", border = "white", main = s, xlab = "Score", ylab = "")
+}
+par(op)
 ```
 
 ---
@@ -611,7 +650,14 @@ scale_summary
 ```{r reliability}
 if (requireNamespace("psych", quietly = TRUE)) {
   rr <- reliability_report(scored, study, omega = FALSE)
-  print(rr)
+  rel_df <- do.call(rbind, lapply(rr, function(s) data.frame(
+    Scale   = paste0(s$label, " (", s$scale_id, ")"),
+    Items   = s$n_items,
+    N       = s$n,
+    Alpha   = if (!is.null(s$alpha)) sprintf("%.2f", s$alpha) else "n/a",
+    stringsAsFactors = FALSE)))
+  kable(rel_df, row.names = FALSE, align = c("l", "c", "c", "r"),
+        caption = "Scale reliability")
 }
 ```
 
@@ -750,14 +796,14 @@ Each result carries an APA-formatted statistic, an effect size, a writing
 prompt, and the methodological reference that supports the chosen test.
 
 ```{r show-results}
-for (r in results) {
-  cat(sprintf("[%s] %s\n  APA:    %s\n  Effect: %s\n  Prompt: %s\n\n",
-              r$id,
-              r$research_question,
-              r$apa,
-              r$effect_label,
-              r$prompt))
-}
+results_table(results)
+```
+
+The full writing prompt for each result is available in `r$prompt`. The first
+one reads:
+
+```{r show-prompt}
+cat(results[[1]]$prompt)
 ```
 
 The `prompt` field is a sentence template for the methods or results section.
