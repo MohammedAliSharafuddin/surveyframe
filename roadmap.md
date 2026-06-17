@@ -146,10 +146,16 @@ Deliverables:
 - Six-construct model syntax correctness checks.
 - Report legibility fixes surfaced by the conference presentation.
 - UI/UX fixes from the ICSRI presentation audience.
+- Google Sheets collection verified end to end. The 0.3.2 SurveyStudio added a
+  Google Sheet response-import card and `read_sheet_responses()`, but the live
+  round trip (deploy the Apps Script collector, submit responses, read them back
+  in the studio and in R) has never been exercised. Deploy the AIC-RSAM survey
+  with the collector and confirm it, fixing anything in the Google Sheets path.
 
 Exit criteria: the room-service instrument deploys and collects responses on a
-phone without layout or logic errors. The rendered report is readable at
-conference presentation size.
+phone without layout or logic errors, including the Google Sheets collector read
+back through SurveyStudio and `read_sheet_responses()`. The rendered report is
+readable at conference presentation size.
 
 ### v0.3.4 — Visualisation foundation (target 2026-08-15)
 

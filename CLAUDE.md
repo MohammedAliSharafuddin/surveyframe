@@ -27,8 +27,11 @@ mas_review_032.md in this folder). Next: R CMD check --as-cran, win-builder,
 and CRAN submission.
 
 After 0.3.2 comes 0.3.3 (real-world embedding and conference feedback from the
-AIC-RSAM room-service study and the ICSRI 2026 presentation), then a
-visualisation patch arc 0.3.4-0.3.9 (six ~21-day releases), then 0.4
+AIC-RSAM room-service study and the ICSRI 2026 presentation, and the first
+end-to-end verification of the Google Sheets collector since the 0.3.2
+SurveyStudio import card and `read_sheet_responses()` have not yet been run
+against a live sheet), then a visualisation patch arc 0.3.4-0.3.9 (six ~21-day
+releases), then 0.4
 (small-sample inference). 0.4.1 is the faculty demo proofing release. The
 canonical schedule is portfolio-planner master_roadmap.md.
 
