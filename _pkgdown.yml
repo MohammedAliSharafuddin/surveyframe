@@ -44,6 +44,21 @@ navbar:
       href: https://github.com/MohammedAliSharafuddin/surveyframe
       aria-label: GitHub
 
+articles:
+  - title: "Survey research workflow"
+    desc: >
+      Read these in order. Start with the worked example, then build the
+      instrument, analyse responses, check reliability and validity, generate
+      model syntax, and finish with the visual tools.
+    navbar: ~
+    contents:
+      - surveyframe
+      - building-survey-instrument
+      - analysing-survey-responses
+      - scale-reliability-validity
+      - efa-cfa-sem-pls-syntax
+      - surveybuilder-gui-overview
+
 reference:
   - title: "Design"
     desc: >
