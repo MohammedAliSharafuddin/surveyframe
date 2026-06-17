@@ -1071,6 +1071,19 @@ ui <- fluidPage(
           downloadButton("download_sample_csv", "Download sample CSV format", class = "btn-outline"),
           actionButton("load_sample_btn", "Or load the bundled demo", class = "btn-outline")
         ),
+        tags$div(class = "card",
+          tags$div(class = "card-title", "Read responses from a deployed Google Sheet"),
+          tags$p(class = "hint",
+            "If the survey was deployed with the surveyframe Google Sheets collector, read the live responses straight from the sheet. This needs the googlesheets4 package and access to the sheet."),
+          textInput("sheet_url", "Google Sheet ID or URL",
+                    placeholder = "https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID"),
+          fluidRow(
+            column(4, textInput("sheet_tab", "Sheet tab", value = "Responses")),
+            column(4, textInput("sheet_id_col", "Respondent ID column", value = "respondent_id")),
+            column(4, textInput("sheet_time_col", "Submitted-at column", value = "submitted_at"))
+          ),
+          actionButton("load_sheet_btn", "Read from Google Sheet", class = "btn-primary")
+        ),
         uiOutput("responses_summary_card")
       ),
 
@@ -1574,6 +1587,35 @@ server <- function(input, output, session) {
       switch_tab("quality")
     }, error = function(e) {
       showNotification(paste("Error:", conditionMessage(e)), type = "error")
+    })
+  })
+
+  observeEvent(input$load_sheet_btn, {
+    req(rv$instrument)
+    sheet <- trim_or_null(input$sheet_url)
+    if (is.null(sheet)) {
+      showNotification("Enter the Google Sheet ID or URL first.", type = "warning")
+      return(invisible(NULL))
+    }
+    if (!requireNamespace("googlesheets4", quietly = TRUE)) {
+      showNotification(
+        "Reading from Google Sheets needs the googlesheets4 package. Install it, then try again.",
+        type = "error", duration = NULL)
+      return(invisible(NULL))
+    }
+    tryCatch({
+      rv$responses <- surveyframe::read_sheet_responses(
+        sheet_id      = sheet,
+        instrument    = rv$instrument,
+        sheet_name    = trim_or_null(input$sheet_tab) %||% "Responses",
+        respondent_id = trim_or_null(input$sheet_id_col),
+        submitted_at  = trim_or_null(input$sheet_time_col)
+      )
+      showNotification(paste(nrow(rv$responses), "responses read from the Google Sheet."),
+                       type = "message")
+      switch_tab("quality")
+    }, error = function(e) {
+      showNotification(paste("Google Sheet error:", conditionMessage(e)), type = "error")
     })
   })
 
