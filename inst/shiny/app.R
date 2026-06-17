@@ -1060,11 +1060,16 @@ ui <- fluidPage(
           actionButton("load_responses_btn", "Load responses", class = "btn-primary")
         ),
         tags$div(class = "card",
-          tags$div(class = "card-title", "No data yet? Try the sample"),
+          tags$div(class = "card-title", "Loading responses collected elsewhere"),
           tags$p(class = "hint",
-            "Load the bundled input-types demo survey with 120 simulated responses to explore every screen, or download the CSV to inspect the expected format."),
-          actionButton("load_sample_btn", "Load sample survey and responses", class = "btn-primary"),
-          downloadButton("download_sample_csv", "Download sample CSV", class = "btn-outline")
+            "Responses can come from the exported surveyframe survey or from another tool (Microsoft Forms, Qualtrics, Google Forms, and similar). Export them to CSV, then:"),
+          tags$ol(class = "hint", style = "margin: 0 0 12px; padding-left: 18px; line-height: 1.7",
+            tags$li("Open the matching instrument on the Open Instrument screen. The .sframe carries the analysis plan, so it is still required."),
+            tags$li("Make sure the CSV column names match the item IDs in that instrument (download the sample CSV below for the expected format)."),
+            tags$li("Browse the CSV above, set the respondent-ID and submitted-at columns if present, then click Load responses.")
+          ),
+          downloadButton("download_sample_csv", "Download sample CSV format", class = "btn-outline"),
+          actionButton("load_sample_btn", "Or load the bundled demo", class = "btn-outline")
         ),
         uiOutput("responses_summary_card")
       ),
