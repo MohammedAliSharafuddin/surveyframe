@@ -588,9 +588,13 @@ cat("Columns:    ", ncol(responses), "\n")
 
 ```{r quality}
 qr <- quality_report(responses, study, respondent_id = "respondent_id")
-cat("Respondents:", qr$summary$n_respondents, "\n")
-cat("Items:      ", qr$summary$n_items,       "\n")
-cat("Flagged:    ", qr$summary$n_flagged,      "\n")
+quality_summary <- data.frame(
+  Metric = c("Respondents", "Items", "Flagged for review", "Flag rate"),
+  Value  = c(qr$summary$n_respondents, qr$summary$n_items, qr$summary$n_flagged,
+             sprintf("%.1f%%", 100 * qr$summary$flag_rate)),
+  stringsAsFactors = FALSE
+)
+kable(quality_summary, align = c("l", "r"), caption = "Quality screening summary")
 ```
 
 The flagged count reflects straight-lining detection on simulated data, where
@@ -600,11 +604,10 @@ not automatic exclusion.
 
 ```{r missing}
 mr <- missing_data_report(responses, study)
-# mr is a list; $item_missing, $respondent_missing, $mcar, and $apa are the
-# main slots. Check names(mr) to see all available components.
-names(mr)
-items_miss <- mr$item_missing
-items_miss[items_miss$missing_pct > 0, c("variable", "missing_n", "missing_pct")]
+# mr holds $item_missing, $respondent_missing, $patterns, $mcar, and $apa.
+kable(mr$item_missing, digits = 2,
+      col.names = c("Variable", "Missing (n)", "Missing (%)", "Valid (n)"),
+      caption = "Item-level missingness")
 # $apa provides a plain-language summary suitable for a methods section.
 cat(mr$apa, "\n")
 ```
