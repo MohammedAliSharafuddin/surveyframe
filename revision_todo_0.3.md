@@ -7,7 +7,7 @@ Excluded from the CRAN build (via .Rbuildignore) and from the public repo
 
 ## v0.3.2 — Implemented (awaiting MAS co-review, then CRAN)
 
-All 7 changes committed. 407/407 tests pass. Vignette knits clean. Both remotes
+All 7 changes committed. 368/368 tests pass. Vignette knits clean. Both remotes
 (origin/main and private/main) up to date. Commits: 80e4040 (changes 1-4),
 be2ed94 (changes 5-6), 519454b (replicate.R on dev). MAS co-review checklist is
 in mas_review_032.md. Do not run R CMD check until co-review is signed off.
@@ -123,7 +123,7 @@ A UI and UX co-review of every graphical entry point, because 0.3.2 ships with
 the JSS manuscript and a reviewer must not hit a broken or misleading GUI. The
 row-by-row tracker is `demo/slides_review_table.md` (Status and Code/UI/UX
 columns). Package changes are committed on `main` as 07d0608 (not yet pushed).
-All 407 tests pass.
+All 368 tests pass.
 
 ### SurveyBuilder — DONE (`inst/builder/survey_builder.html`)
 

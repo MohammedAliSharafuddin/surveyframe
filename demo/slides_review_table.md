@@ -205,7 +205,7 @@ inst/ assets, vignettes, and tests last.
 
 | # | File | What to check | Code / UI / UX | Status |
 |---|------|---------------|----------------|--------|
-| 53 | `tests/testthat/test-core.R` | Core constructors and round-trip tests; all 407 tests pass; no skipped blocks that mask failures | Code | PASS |
+| 53 | `tests/testthat/test-core.R` | Core constructors and round-trip tests; all 368 tests pass; no skipped blocks that mask failures | Code | PASS |
 | 54 | `tests/testthat/test-component-methods.R` | `print`, `format`, `summary` output verified for all 6 component classes and `sframe`; Change 2 of 0.3.2 | Code | PASS |
 | 55 | `tests/testthat/test-input-types-demo.R` | All 11 item types load and score correctly from bundled demo instrument | Code | PASS |
 | 56 | `tests/testthat/test-v03-analysis-models.R` | All 22 analysis methods return correct structure; effect sizes present | Code | PASS |
@@ -232,7 +232,7 @@ inst/ assets, vignettes, and tests last.
 - **Done and signed off:** SurveyBuilder (row 28), static survey
   `template.html` (24), SurveyStudio `app.R` (29), and the HTML report
   (`reporting.R` 40, `report.qmd` 41). Plus the R functions they touch
-  (22, 23, 25, 27, 34, 42, 43, 45). All 407 tests pass. Mojibake clean across
+  (22, 23, 25, 27, 34, 42, 43, 45). All 368 tests pass. Mojibake clean across
   inst/ and R/.
 - **Pending before CRAN check:** light sanity check of the standalone dashboard
   app (32) — its views are now inline in the studio Dashboard, so it overlaps;

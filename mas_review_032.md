@@ -996,7 +996,7 @@ rmarkdown::render(
 devtools::test()
 ```
 
-- [ ] All 407 tests pass (FAIL 0, WARN 0, SKIP 0, PASS 407).
+- [ ] All 368 tests pass (FAIL 0, WARN 0, SKIP 0, PASS 368).
 - [ ] No new unexpected warnings in the test output.
 
 ---

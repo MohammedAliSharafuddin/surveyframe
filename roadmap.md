@@ -124,7 +124,7 @@ deferred documentation pass. No new features and no new exports.
 - Apply the deferred professor-review documentation items (Prof-1 to Prof-5,
   Prof-9, Prof-10): vignette additions only, no code risk.
 
-Status: fully implemented locally (all 7 changes done, 407/407 tests pass).
+Status: fully implemented locally (all 7 changes done, 368/368 tests pass).
 Awaiting MAS co-review, then R CMD check and CRAN submission.
 
 ### v0.3.3 — Real-world embedding and conference feedback (target 2026-07-25)

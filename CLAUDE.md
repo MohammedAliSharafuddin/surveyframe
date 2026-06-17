@@ -21,7 +21,7 @@ pre-declared plan rather than a post-hoc search. This is the package's main
 differentiator and the thesis of the JSS paper.
 
 Current version: 0.3.1 on CRAN (2026-06-02). 0.3.2 implemented locally — all 7
-changes committed and pushed to both remotes, 407/407 tests pass. Awaiting
+changes committed and pushed to both remotes, 368/368 tests pass. Awaiting
 MAS co-review (see mas_review_032.md in this folder) then R CMD check --as-cran,
 win-builder, and CRAN submission.
 
@@ -135,7 +135,7 @@ Run from the repository root.
 
 ```r
 devtools::document()          # regenerate man/ and NAMESPACE
-devtools::test()              # run the test suite (expect 407 passing at 0.3.2)
+devtools::test()              # run the test suite (expect 368 passing at 0.3.2)
 devtools::load_all()          # load for interactive work
 rmarkdown::render("vignettes/surveyframe.Rmd", output_dir = tempdir())
 ```
@@ -154,7 +154,7 @@ feasibility). The vignette builds offline because the data-collection step uses
 ## Current status and immediate next steps
 
 0.3.1 is published on CRAN (2026-06-02). 0.3.2 is fully implemented (all 7
-changes done, 407/407 tests pass, vignette knits, both remotes up to date).
+changes done, 368/368 tests pass, vignette knits, both remotes up to date).
 
 **A GUI UI/UX co-review is in progress (started 2026-06-14).** 0.3.2 ships with
 the JSS manuscript, so every graphical entry point is being checked so a reviewer
@@ -172,7 +172,7 @@ Build screen, previews the real survey in an iframe, integrated the dashboard
 inline, and got the suspendWhenHidden fix; the report's Quarto render was fixed
 (was silently falling back), tables formatted, distribution plots added, 2
 decimals, left TOC, wide-table scroll. Mojibake is clean across inst/ and R/.
-All 407 tests pass.
+All 368 tests pass.
 
 Builder work committed on `main` as 07d0608 (not pushed). The static survey,
 studio, and report changes are NOT yet committed.
