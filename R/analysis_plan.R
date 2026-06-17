@@ -1047,20 +1047,23 @@ render_results <- function(
     # Build APA-style results table
     tbl_html <- ""
     if (!is.null(r$table) && is.data.frame(r$table)) {
-      rows <- paste(apply(r$table, 1, function(row) {
+      tbl <- r$table
+      num_cols <- vapply(tbl, is.numeric, logical(1))
+      if (any(num_cols)) tbl[num_cols] <- lapply(tbl[num_cols], function(col) round(col, 2))
+      rows <- paste(apply(tbl, 1, function(row) {
         cells <- paste(sprintf("<td>%s</td>", htmltools_escape(as.character(row))),
                       collapse = "")
         sprintf("<tr>%s</tr>", cells)
       }), collapse = "")
-      headers <- paste(sprintf("<th>%s</th>", htmltools_escape(colnames(r$table))),
+      headers <- paste(sprintf("<th>%s</th>", htmltools_escape(colnames(tbl))),
                       collapse = "")
       has_pval <- any(grepl(
         "^p$|^p\\.value$|^p_value$|^Pr\\(>",
-        colnames(r$table), ignore.case = TRUE
+        colnames(tbl), ignore.case = TRUE
       ))
       foot_html <- if (has_pval) {
         paste0(
-          '<tfoot><tr><td colspan="', ncol(r$table), '">',
+          '<tfoot><tr><td colspan="', ncol(tbl), '">',
           "* <em>p</em> &lt; .05, ** <em>p</em> &lt; .01, *** <em>p</em> &lt; .001",
           "</td></tr></tfoot>"
         )
@@ -1162,6 +1165,7 @@ render_results <- function(
   .citations-section { border-top: 1px solid #eee; padding-top: 12px; }
   .citation-list { font-size: 13px; color: #555; line-height: 1.8; }
   .results-table { width: 100%%; border-collapse: collapse; font-size: 14px;
+                    display: block; overflow-x: auto; max-width: 100%%;
                     margin: 12px 0; }
   .results-table thead tr { border-top: 2px solid #000; border-bottom: 1px solid #000; }
   .results-table tbody tr:last-child td { border-bottom: 2px solid #000; }
