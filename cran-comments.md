@@ -34,17 +34,17 @@ datasets, and no new hard or suggested dependencies.
 ## Test environments
 
 - Local: Ubuntu, R 4.6.0 (2026-04-24), x86_64-pc-linux-gnu
-- win-builder: R-release and R-devel (pending at the time of writing)
+- win-builder: R 4.6.0 (release, 2026-04-24 ucrt)
+- win-builder: R-devel (unstable, 2026-06-16 r90166 ucrt)
 
 ## R CMD check results
 
-`R CMD check --as-cran` was run on the local environment on 2026-06-17 against a
-clean checkout of the release commit. It returned:
+`R CMD check --as-cran` returned Status: OK with 0 errors, 0 warnings, and 0
+notes on every environment:
 
-    Status: OK
-    0 errors | 0 warnings | 0 notes
-
-win-builder results will be added before submission.
+- Local (2026-06-17, clean checkout of the release commit): Status: OK.
+- win-builder R-release: Status: OK.
+- win-builder R-devel: Status: OK.
 
 ## Reverse dependencies
 
