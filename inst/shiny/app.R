@@ -1125,7 +1125,7 @@ ui <- fluidPage(
           tags$div(class = "card-title", "Instrument file"),
           tags$p(class = "hint",
             "Download the current validated draft as a .sframe file."),
-          downloadButton("download_sframe_btn", "Download .sframe", class = "btn-primary")
+          uiOutput("export_sframe_ui")
         ),
         tags$div(class = "card",
           tags$div(class = "card-title", "Report contents"),
@@ -1137,7 +1137,7 @@ ui <- fluidPage(
           checkboxInput("rpt_analysis", "Include analysis-plan results", value = TRUE),
           checkboxInput("rpt_models", "Include saved models and syntax", value = TRUE),
           tags$br(),
-          downloadButton("download_report_btn", "Generate HTML report", class = "btn-primary"),
+          uiOutput("export_report_ui"),
           tags$p(class = "hint",
             "Generates a self-contained HTML report. Quarto is optional; an internal HTML fallback is available."),
           tags$p(class = "hint",
@@ -2787,6 +2787,37 @@ server <- function(input, output, session) {
     }
   })
 
+  # A non-clickable placeholder shown when an export is not yet possible, so the
+  # user cannot trigger a download that would error.
+  export_disabled_btn <- function(label, hint) {
+    tagList(
+      tags$button(type = "button", class = "btn btn-primary", disabled = NA,
+        style = "opacity: .5; cursor: not-allowed;",
+        shiny::icon("download"), " ", label),
+      tags$p(class = "hint", hint)
+    )
+  }
+
+  output$export_sframe_ui <- renderUI({
+    if (isTRUE(draft_result()$valid)) {
+      downloadButton("download_sframe_btn", "Download .sframe", class = "btn-primary")
+    } else {
+      export_disabled_btn(
+        "Download .sframe",
+        "Open or build a valid instrument before downloading the .sframe file.")
+    }
+  })
+
+  output$export_report_ui <- renderUI({
+    if (!is.null(rv$instrument)) {
+      downloadButton("download_report_btn", "Generate HTML report", class = "btn-primary")
+    } else {
+      export_disabled_btn(
+        "Generate HTML report",
+        "Open or build a valid instrument before generating the report.")
+    }
+  })
+
   output$download_sframe_btn <- downloadHandler(
     filename = function() {
       title <- draft_result()$instrument$meta$title %||% "survey"
@@ -2838,6 +2869,7 @@ server <- function(input, output, session) {
     "quality_output", "reliability_output",
     "analysis_left_panel", "analysis_middle_panel", "analysis_right_panel",
     "analysis_results_output", "studio_dashboard_content",
+    "export_sframe_ui", "export_report_ui",
     "download_sframe_btn", "download_report_btn"
   )) {
     shiny::outputOptions(output, .oid, suspendWhenHidden = FALSE)
