@@ -1127,7 +1127,7 @@ render_results <- function(
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>%s</title>
 <style>
-  body { font-family: "Helvetica Neue", Arial, sans-serif; max-width: 860px;
+  body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; max-width: 900px;
          margin: 0 auto; padding: 32px 24px; color: #1a1a2e; line-height: 1.6; }
   h1 { font-size: 26px; border-bottom: 3px solid #1a1a2e; padding-bottom: 12px; }
   h2 { font-size: 19px; color: #1a1a2e; margin-top: 0; }
@@ -1145,7 +1145,7 @@ render_results <- function(
   .sf-foot { text-align: center; font-size: 12px; color: #94a3b8; margin-top: 40px;
               padding-top: 16px; border-top: 1px solid #eee; }
   .sf-foot a { color: #16B3B1; font-weight: 600; text-decoration: none; }
-  .apa-string { font-family: "Georgia", serif; font-size: 15px; color: #1a1a2e; }
+  .apa-string { font-size: 15px; color: #1a1a2e; }
   .effect-badge { display: inline-block; margin-left: 10px; padding: 2px 9px;
                    border-radius: 12px; font-size: 12px; font-weight: 600; }
   .effect-negligible { background: #f5f5f5; color: #666; }
@@ -1162,7 +1162,7 @@ render_results <- function(
   .citations-section { border-top: 1px solid #eee; padding-top: 12px; }
   .citation-list { font-size: 13px; color: #555; line-height: 1.8; }
   .results-table { width: 100%%; border-collapse: collapse; font-size: 14px;
-                    margin: 12px 0; font-family: Georgia, serif; }
+                    margin: 12px 0; }
   .results-table thead tr { border-top: 2px solid #000; border-bottom: 1px solid #000; }
   .results-table tbody tr:last-child td { border-bottom: 2px solid #000; }
   .results-table th { background: none; color: #000; padding: 6px 12px;

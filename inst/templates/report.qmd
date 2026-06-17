@@ -43,6 +43,14 @@ responses  <- if (has_data) readRDS(params$data_path) else NULL
 
 ```{=html}
 <style>
+/* Brand look shared with render_results() and the static survey: system font,
+   navy headings, teal accent. */
+body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+       color: #1a1a2e; }
+h1, h2, h3, h4, h5, #title-block-header .title { color: #1a1a2e; }
+a { color: #16B3B1; }
+#TOC .active, .sidebar-item .active { color: #16B3B1; }
+
 /* Academic (APA) tables: horizontal rules only, no shading, no vertical lines.
    Each table is its own horizontal-scroll container so wide tables stay within
    the content column. Overrides the theme's default table styling. */
@@ -55,6 +63,11 @@ thead th { border-top: 2px solid #1a1a2e !important;
 tbody tr { background: none !important; }
 tbody tr:last-child td { border-bottom: 2px solid #1a1a2e !important; }
 .cell-output-display, .cell-output { overflow-x: auto; max-width: 100%; }
+
+/* Shared footer */
+.sf-foot { text-align: center; font-size: 12px; color: #94a3b8;
+           margin-top: 48px; padding-top: 16px; border-top: 1px solid #eee; }
+.sf-foot a { color: #16B3B1; font-weight: 600; text-decoration: none; }
 </style>
 ```
 
@@ -354,4 +367,8 @@ cat("```r\nlibrary(surveyframe)\n")
 cat("instr     <- read_sframe(\"your_instrument.sframe\")\n")
 cat("responses <- read_responses(\"your_responses.csv\", instr)\n")
 cat("render_report(instr, data = responses, output_file = \"report.html\")\n```\n\n")
+```
+
+```{=html}
+<div class="sf-foot">Built with <a href="https://cran.r-project.org/package=surveyframe" target="_blank" rel="noopener">surveyframe</a></div>
 ```
