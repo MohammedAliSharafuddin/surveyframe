@@ -584,14 +584,24 @@ cat(mr$apa, "\n")
 ## Score and describe
 
 `score_scales()` appends one column per scale to the data frame, using the
-scoring rules stored in the instrument.
+scoring rules stored in the instrument. If a column with the same name as a
+scale already exists in the data frame, `score_scales()` skips that scale so
+pre-scored data is never overwritten.
 
 ```{r score}
 scored <- score_scales(responses, study)
 
 scale_cols <- c("DMRE", "DMAU", "DMEU", "DMPV",
                 "DSQA", "DSQT", "DSUQ", "TS", "BI")
-round(colMeans(scored[, scale_cols], na.rm = TRUE), 2)
+
+# Display scale means and standard deviations as a data frame
+scale_summary <- data.frame(
+  Scale = scale_cols,
+  Mean  = round(colMeans(scored[, scale_cols], na.rm = TRUE), 2),
+  SD    = round(apply(scored[, scale_cols], 2, sd, na.rm = TRUE), 2),
+  row.names = NULL
+)
+scale_summary
 ```
 
 ---
@@ -607,8 +617,50 @@ if (requireNamespace("psych", quietly = TRUE)) {
 
 A Cronbach's alpha of 0.70 or above is conventionally accepted as adequate
 internal consistency (Nunnally, 1978). For scales with three or more items,
-McDonald's omega is a more accurate estimate; pass `omega = TRUE` to include
-it. See `?reliability_report` for details.
+McDonald's omega is a more accurate estimate because it accounts for unequal
+factor loadings across items; alpha assumes all items load equally on the
+factor. Pass `omega = TRUE` when items within a scale differ substantially in
+their contribution. See `?reliability_report` for details.
+
+## EFA readiness
+
+Before a confirmatory factor analysis, it is good practice to confirm that the
+item correlations are strong enough to support factoring. `efa_report()` runs
+the KMO measure of sampling adequacy and Bartlett's test of sphericity, and
+uses parallel analysis to suggest the number of factors.
+
+```{r efa, eval=FALSE}
+if (requireNamespace("psych", quietly = TRUE)) {
+  er <- efa_report(scored, study)
+  print(er)
+}
+```
+
+A KMO value of 0.60 or above and a significant Bartlett test confirm that the
+correlation structure supports factor analysis. The suggested factor count from
+parallel analysis is a guide; theory should take precedence.
+
+## Construct validity
+
+`validity_report()` computes composite reliability (CR) and average variance
+extracted (AVE) from supplied factor loadings. Discriminant validity is
+assessed via the Fornell-Larcker criterion and HTMT when construct scores are
+supplied.
+
+```{r validity, eval=FALSE}
+# Supply a named list of loadings (construct -> item loadings vector)
+loadings_list <- list(
+  DMRE = c(dm_1 = 0.78, dm_2 = 0.82, dm_3 = 0.75),
+  TS   = c(ts_1 = 0.84, ts_2 = 0.80)
+)
+vr <- validity_report(loadings_list)
+print(vr$reliability)
+```
+
+AVE above 0.50 and CR above 0.70 are the conventional thresholds for
+convergent validity. The Fornell-Larcker criterion requires that the square
+root of each construct's AVE exceeds its highest correlation with any other
+construct.
 
 ---
 
@@ -665,6 +717,26 @@ study$analysis_plan <- list(
 
 length(study$analysis_plan)
 ```
+
+---
+
+## Assumption checks
+
+Before running the analysis plan, check statistical assumptions for the
+variables involved. `assumption_report()` tests normality (Shapiro-Wilk for
+samples below 5,000), homogeneity of variance (Levene) for grouped tests, and
+linearity for regression pairs.
+
+```{r assumptions}
+if (requireNamespace("psych", quietly = TRUE)) {
+  ar <- assumption_report(scored, study)
+  print(ar)
+}
+```
+
+Review the `$normality` and `$homogeneity` slots to decide whether parametric
+or non-parametric alternatives are appropriate. The analysis plan can override
+the test method per block if the default is not suitable.
 
 ---
 
