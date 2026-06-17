@@ -112,7 +112,7 @@ survey instrument and response dataset.
 \Issue{II}
 \Month{MMMM}
 \Year{YYYY}
-\Submitdate{2026-05-22}
+\Submitdate{2026-06-17}
 \Acceptdate{yyyy-mm-dd}
 
 \Address{
@@ -395,6 +395,24 @@ the worked example in this article.
 \end{kframe}
 \end{knitrout}
 
+Each component class carries a small \proglang{S3} method surface, so the
+constructor objects print and summarise cleanly at the console and inside
+reports. The six component classes (\code{sf\_choices}, \code{sf\_item},
+\code{sf\_scale}, \code{sf\_branch}, \code{sf\_check}, and \code{sf\_model})
+each provide \code{print()}, \code{format()}, and \code{summary()} methods:
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlkwd{methods}\hldef{(}\hlkwc{class} \hldef{=} \hlsng{"sf_choices"}\hldef{)}
+\end{alltt}
+\begin{verbatim}
+## [1] format  print   summary
+## see '?methods' for accessing help and source code
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
 \subsection{Validation}
 
 \code{validate\_sframe()} checks the internal consistency of an
@@ -429,14 +447,34 @@ problems are returned as a character vector without stopping.
 
 \code{write\_sframe()} serialises a validated \code{sframe} to the
 \code{.sframe} format and records an SHA-256 hash of the instrument
-specification:
+specification. The hash is computed over the canonical JSON
+serialisation with the hash field itself set to an empty string, then
+written into the file header. \code{read\_sframe()} recomputes the hash
+on load and verifies it against the stored value:
 
-\begin{Code}
-R> write_sframe(instr, "tourism_survey.sframe")
-R> instr2 <- read_sframe("tourism_survey.sframe")
-R> identical(instr$meta$title, instr2$meta$title)
-[1] TRUE
-\end{Code}
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hldef{path} \hlkwb{<-} \hlkwd{tempfile}\hldef{(}\hlkwc{fileext} \hldef{=} \hlsng{".sframe"}\hldef{)}
+\hlkwd{write_sframe}\hldef{(instr, path)}
+
+\hlcom{## The SHA-256 hash stored in the file header}
+\hldef{stored_hash} \hlkwb{<-} \hldef{jsonlite}\hlopt{::}\hlkwd{fromJSON}\hldef{(path)}\hlopt{$}\hldef{hash}\hlopt{$}\hldef{value}
+\hlkwd{substr}\hldef{(stored_hash,} \hlnum{1}\hldef{,} \hlnum{32}\hldef{)}
+\end{alltt}
+\begin{verbatim}
+## [1] "a7e3dc036538e381381133ae444dc7c2"
+\end{verbatim}
+\begin{alltt}
+\hlcom{## read_sframe() recomputes and verifies the hash on load}
+\hldef{instr2} \hlkwb{<-} \hlkwd{read_sframe}\hldef{(path)}
+\hlkwd{identical}\hldef{(instr}\hlopt{$}\hldef{meta}\hlopt{$}\hldef{title, instr2}\hlopt{$}\hldef{meta}\hlopt{$}\hldef{title)}
+\end{alltt}
+\begin{verbatim}
+## [1] TRUE
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
 
 The hash verification on \code{read\_sframe()} detects out-of-band
 modifications made after the file was created. Any change to the
@@ -477,6 +515,10 @@ serverless function), the response is also POSTed as JSON. The CSV
 download proceeds regardless of POST success, so no response is lost
 on network failure.
 
+A single call writes the deployable file. The instrument carries every
+item, choice set, branching rule, and the page layout, so the export needs
+no further arguments beyond the output path:
+
 \begin{Code}
 R> export_static_survey(instr,
 +    output_path = "tourism_survey.html",
@@ -486,6 +528,55 @@ R> export_static_survey(instr,
 The exported file can be hosted on any static file server, GitHub
 Pages, Netlify, or sent as an email attachment. No server or R
 installation is required on the respondent's machine.
+Figures~\ref{fig:survey-welcome} to~\ref{fig:survey-mobile} show the
+rendered survey from the bundled tourism instrument: the welcome screen,
+a Likert item, the required-field validation message, and the mobile
+layout. The same single HTML file produces all of these views.
+
+%% Alt-text: A survey welcome page with the study title, a short
+%% description, an estimated completion time, and a Start button.
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.62\textwidth]{figures/fig-survey-welcome.png}
+\caption{The exported survey's welcome screen. It shows the instrument
+  title, the description, an estimated completion time, and a Start
+  button, rendered entirely in the browser from a single HTML file with
+  no server.}
+\label{fig:survey-welcome}
+\end{figure}
+
+%% Alt-text: A Likert survey question with a five-point agreement scale
+%% and a progress bar near the top.
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.62\textwidth]{figures/fig-survey-likert.png}
+\caption{A five-point Likert item as rendered in the exported survey,
+  with the page progress indicator above the question and the response
+  options laid out for single selection.}
+\label{fig:survey-likert}
+\end{figure}
+
+%% Alt-text: The same survey question showing a red inline validation
+%% message because a required item was left unanswered.
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.62\textwidth]{figures/fig-survey-validation.png}
+\caption{Client-side required-field validation. When a respondent tries
+  to advance past a required item without answering, the survey blocks
+  the move and shows an inline message, with no server round trip.}
+\label{fig:survey-validation}
+\end{figure}
+
+%% Alt-text: The survey welcome screen rendered on a narrow phone-width
+%% viewport, with the layout reflowed to a single column.
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.32\textwidth]{figures/fig-survey-mobile.png}
+\caption{The exported survey on a narrow, phone-width viewport. The
+  layout reflows to a single column with touch-sized controls, so the
+  same file serves desktop and mobile respondents.}
+\label{fig:survey-mobile}
+\end{figure}
 
 \subsection{Visual SurveyBuilder}
 
@@ -494,7 +585,35 @@ editor. Researchers who prefer a graphical interface can build the
 complete \code{sframe} (items, choice sets, scales, branching rules,
 and analysis plan) without writing \proglang{R} code. The builder
 exports the completed \code{.sframe} file. The file is imported into
-\proglang{R} with \code{read\_sframe()} for analysis.
+\proglang{R} with \code{read\_sframe()} for analysis. The builder has
+two modes: a Build mode for authoring items and scales
+(Figure~\ref{fig:builder-build}) and an Analyse mode for declaring the
+analysis plan and the measurement model (Figure~\ref{fig:builder-analyse}).
+
+%% Alt-text: The SurveyBuilder Build mode, with an item list on the left,
+%% an item editor in the centre, and instrument settings on the right.
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.9\textwidth]{figures/fig-builder-build.png}
+\caption{SurveyBuilder Build mode. The left panel lists the items and
+  scales, the centre edits the selected item and its response choices,
+  and the right panel holds instrument settings. The builder runs in the
+  browser and saves a \code{.sframe} file.}
+\label{fig:builder-build}
+\end{figure}
+
+%% Alt-text: The SurveyBuilder Analyse mode, showing the analysis-plan
+%% editor with research questions, methods, and variable roles.
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.9\textwidth]{figures/fig-builder-analyse.png}
+\caption{SurveyBuilder Analyse mode. Each analysis block binds a research
+  question to a statistical method and the variables that fill each role,
+  and the measurement model is assembled alongside. The plan is stored in
+  the \code{.sframe} file and executed later by
+  \code{run\_analysis\_plan()}.}
+\label{fig:builder-analyse}
+\end{figure}
 
 \subsection{Shiny survey module}
 
@@ -1032,7 +1151,7 @@ generation, a pre-declared analysis plan executor with APA-formatted
 results and interpretation prompts, codebook generation, and HTML
 report rendering.
 
-\pkg{surveyframe} v0.3.0 is available on CRAN. Planned extensions
+\pkg{surveyframe} v0.3.2 is available on CRAN. Planned extensions
 include PLS-SEM and CB-SEM execution via \pkg{seminr} and \pkg{lavaan},
 item response theory workflows, multi-criteria decision making, and
 Quarto-native report generation. The package repository and issue
@@ -1061,22 +1180,24 @@ tracker are available at
 \end{kframe}\begin{itemize}\raggedright
   \item R version 4.6.0 (2026-04-24), \verb|x86_64-pc-linux-gnu|
   \item Locale: \verb|LC_CTYPE=en_GB.UTF-8|, \verb|LC_NUMERIC=C|, \verb|LC_TIME=en_IN.UTF-8|, \verb|LC_COLLATE=en_GB.UTF-8|, \verb|LC_MONETARY=en_IN.UTF-8|, \verb|LC_MESSAGES=en_GB.UTF-8|, \verb|LC_PAPER=en_IN.UTF-8|, \verb|LC_NAME=C|, \verb|LC_ADDRESS=C|, \verb|LC_TELEPHONE=C|, \verb|LC_MEASUREMENT=en_IN.UTF-8|, \verb|LC_IDENTIFICATION=C|
-  \item Time zone: \verb|Asia/Kolkata|
+  \item Time zone: \verb|Indian/Maldives|
   \item TZcode source: \verb|system (glibc)|
-  \item Running under: \verb|Ubuntu 24.04.4 LTS|
+  \item Running under: \verb|Ubuntu 26.04 LTS|
   \item Matrix products: default
-  \item BLAS:   \verb|/usr/lib/x86_64-linux-gnu/blas/libblas.so.3.12.0|
-  \item LAPACK: \verb|/usr/lib/x86_64-linux-gnu/lapack/liblapack.so.3.12.0|
+  \item BLAS:   \verb|/usr/lib/x86_64-linux-gnu/blas/libblas.so.3.12.1|
+  \item LAPACK: \verb|/usr/lib/x86_64-linux-gnu/lapack/liblapack.so.3.12.1|
+; \quad\ LAPACK version3.12.0
   \item Base packages: base, datasets, graphics,
     grDevices, methods, stats, utils
-  \item Other packages: knitr~1.51, surveyframe~0.3.1
+  \item Other packages: surveyframe~0.3.2
   \item Loaded via a namespace (and not attached):
     askpass~1.2.1, cli~3.6.6, compiler~4.6.0,
-    evaluate~1.0.5, grid~4.6.0, highr~0.12,
-    jsonlite~2.0.0, lattice~0.22-9, mnormt~2.1.2,
-    nlme~3.1-169, openssl~2.4.0, otel~0.2.0,
-    parallel~4.6.0, psych~2.6.3, rlang~1.2.0,
-    tools~4.6.0, xfun~0.57
+    evaluate~1.0.5, GPArotation~2026.4-1, grid~4.6.0,
+    highr~0.12, jsonlite~2.0.0, knitr~1.51,
+    lattice~0.22-9, MASS~7.3-65, mnormt~2.1.2,
+    nlme~3.1-169, openssl~2.4.2, otel~0.2.0,
+    parallel~4.6.0, psych~2.6.5, rlang~1.2.0,
+    stats4~4.6.0, tools~4.6.0, xfun~0.58
 \end{itemize}
 
 
