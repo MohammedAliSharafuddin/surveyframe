@@ -1,7 +1,7 @@
 {
   "hash": {
     "algo": "sha256",
-    "value": "2895a44967120893faa6f129a355efd96375064272c118492738641ffa5f2ec0"
+    "value": "a9b18b41964725f62d44a4e270a89c5f5328026e65d7c200718aba8d9d86d326"
   },
   "version": "0.3.0",
   "meta": {
@@ -969,7 +969,7 @@
           "digital_experience"
         ],
         "moderator": [
-          "visit_type"
+          "behavioural_intention"
         ],
         "outcome": [
           "overall_rating"

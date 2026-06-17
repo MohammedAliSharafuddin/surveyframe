@@ -1,7 +1,7 @@
 {
   "hash": {
     "algo": "sha256",
-    "value": "f256aadaa226c3979c1454a3667b80bcf6d03ba76293bd8d5e3c7a5c55cdb97e"
+    "value": "b6221976cb88be70a3c57df1b8e1034d10f6f20cc3995d47fea67b5dc11b9d3f"
   },
   "version": "0.3.0",
   "meta": {
@@ -324,7 +324,6 @@
     {
       "id": "rq_quality",
       "research_question": "Do respondents meet attention check and data quality thresholds?",
-      "variables": [],
       "test": "quality",
       "method": "quality",
       "alpha": 0.05,
@@ -341,7 +340,6 @@
     {
       "id": "rq_scale_desc",
       "research_question": "What are the mean, SD, and range of each composite scale?",
-      "variables": [],
       "test": "scale_descriptives",
       "method": "scale_descriptives",
       "alpha": 0.05,
@@ -358,7 +356,6 @@
     {
       "id": "rq_alpha",
       "research_question": "What is the Cronbach alpha internal consistency of each scale?",
-      "variables": [],
       "test": "reliability_alpha",
       "method": "reliability_alpha",
       "alpha": 0.05,
@@ -375,7 +372,6 @@
     {
       "id": "rq_omega",
       "research_question": "What is the McDonald omega reliability of each scale?",
-      "variables": [],
       "test": "reliability_omega",
       "method": "reliability_omega",
       "alpha": 0.05,
@@ -392,7 +388,6 @@
     {
       "id": "rq_item_diag",
       "research_question": "Which items show low item-total correlations or reduce alpha on removal?",
-      "variables": [],
       "test": "item_diagnostics",
       "method": "item_diagnostics",
       "alpha": 0.05,
@@ -445,7 +440,6 @@
     {
       "id": "rq_cfa_syntax",
       "research_question": "What is the lavaan CFA syntax for the five-factor measurement model?",
-      "variables": [],
       "test": "cfa_lavaan_syntax",
       "method": "cfa_lavaan_syntax",
       "alpha": 0.05,
@@ -466,7 +460,6 @@
     {
       "id": "rq_sem_syntax",
       "research_question": "What is the CB-SEM lavaan syntax for digital marketing predicting satisfaction and behavioural intention via service quality?",
-      "variables": [],
       "test": "sem_lavaan_syntax",
       "method": "sem_lavaan_syntax",
       "alpha": 0.05,
@@ -487,7 +480,6 @@
     {
       "id": "rq_pls_syntax",
       "research_question": "What is the PLS-SEM seminr syntax for the full structural model?",
-      "variables": [],
       "test": "seminr_syntax",
       "method": "seminr_syntax",
       "alpha": 0.05,
@@ -644,7 +636,6 @@
     {
       "id": "rq_ancova",
       "research_question": "Do visitor types differ in satisfaction after controlling for service quality?",
-      "variables": [],
       "test": "ancova",
       "method": "ancova",
       "alpha": 0.05,
@@ -739,7 +730,6 @@
     {
       "id": "rq_partial",
       "research_question": "Is digital marketing associated with behavioural intention after controlling for satisfaction?",
-      "variables": [],
       "test": "partial_correlation",
       "method": "partial_correlation",
       "alpha": 0.05,
@@ -808,7 +798,6 @@
     {
       "id": "rq_moderation",
       "research_question": "Does visitor type moderate the relationship between digital marketing and satisfaction?",
-      "variables": [],
       "test": "moderation",
       "method": "moderation",
       "alpha": 0.05,
@@ -818,7 +807,7 @@
           "digital_marketing"
         ],
         "moderator": [
-          "visit_type"
+          "service_quality"
         ],
         "outcome": [
           "satisfaction"
@@ -835,7 +824,6 @@
     {
       "id": "rq_mediation",
       "research_question": "Does satisfaction mediate the path from digital marketing to behavioural intention?",
-      "variables": [],
       "test": "mediation",
       "method": "mediation",
       "alpha": 0.05,
@@ -870,23 +858,28 @@
         "constructs": [
           {
             "id": "digital_marketing",
-            "items": ["dm_1", "dm_2", "dm_3"]
+            "items": ["dm_1", "dm_2", "dm_3"],
+            "mode": "reflective"
           },
           {
             "id": "service_quality",
-            "items": ["sq_1", "sq_2", "sq_3"]
+            "items": ["sq_1", "sq_2", "sq_3"],
+            "mode": "reflective"
           },
           {
             "id": "sustainability",
-            "items": ["sus_1", "sus_2"]
+            "items": ["sus_1", "sus_2"],
+            "mode": "reflective"
           },
           {
             "id": "satisfaction",
-            "items": ["sat_1", "sat_2"]
+            "items": ["sat_1", "sat_2"],
+            "mode": "reflective"
           },
           {
             "id": "behavioural_intention",
-            "items": ["bi_1", "bi_2"]
+            "items": ["bi_1", "bi_2"],
+            "mode": "reflective"
           }
         ]
       },
@@ -906,23 +899,28 @@
         "constructs": [
           {
             "id": "digital_marketing",
-            "items": ["dm_1", "dm_2", "dm_3"]
+            "items": ["dm_1", "dm_2", "dm_3"],
+            "mode": "reflective"
           },
           {
             "id": "service_quality",
-            "items": ["sq_1", "sq_2", "sq_3"]
+            "items": ["sq_1", "sq_2", "sq_3"],
+            "mode": "reflective"
           },
           {
             "id": "sustainability",
-            "items": ["sus_1", "sus_2"]
+            "items": ["sus_1", "sus_2"],
+            "mode": "reflective"
           },
           {
             "id": "satisfaction",
-            "items": ["sat_1", "sat_2"]
+            "items": ["sat_1", "sat_2"],
+            "mode": "reflective"
           },
           {
             "id": "behavioural_intention",
-            "items": ["bi_1", "bi_2"]
+            "items": ["bi_1", "bi_2"],
+            "mode": "reflective"
           }
         ]
       },
