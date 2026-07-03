@@ -225,13 +225,17 @@ a validation error.
 \subsection{Integrity and serialisation}
 
 \code{write\_sframe()} serialises an \code{sframe} to the
-\code{.sframe} format (a compressed JSON container) and computes an
+\code{.sframe} format (a UTF-8 JSON container) and computes an
 SHA-256 hash over the serialised content. The hash is stored in the
 file header alongside the package version. \code{read\_sframe()}
-recomputes the hash on load and warns if the stored and computed hashes
-differ, indicating that the file was modified after serialisation. This
+recomputes the hash on load and aborts with a typed error of class
+\code{sframe\_import\_error} if the stored and computed hashes differ,
+indicating that the file was modified after serialisation. This
 hash is the primary audit mechanism for detecting post-collection
-instrument editing.
+instrument editing. The instrument hash is the first layer of a wider
+proof-of-integrity framework for tamper-evident survey workflows
+\citep{sharafuddin2026ssr}; later package versions extend hashing to
+response data, analysis outputs, and a portable verification manifest.
 
 %% =========================================================================
 \section{Instrument construction}
@@ -240,7 +244,7 @@ instrument editing.
 
 \subsection{Constructor family}
 
-Five constructors produce the typed components assembled into an
+Six constructors produce the typed components assembled into an
 \code{sframe}:
 
 \begin{description}
@@ -265,6 +269,12 @@ Five constructors produce the typed components assembled into an
     response is met.
   \item[\code{sf\_check()}] Defines an attention-check criterion used
     by \code{quality\_report()} to flag inattentive respondents.
+  \item[\code{sf\_model()}] Defines a measurement or structural model
+    (\code{"efa"}, \code{"cfa"}, \code{"cb\_sem"}, or \code{"pls\_sem"})
+    assembled from \code{sf\_construct()}, \code{sf\_path()},
+    \code{sf\_covariance()}, and \code{sf\_indirect()} specifications.
+    Declared models drive the CFA and SEM syntax generation described
+    in Section~\ref{sec:analysis}.
 \end{description}
 
 \subsection{Building an instrument}
@@ -351,7 +361,7 @@ methods(class = "sf_choices")
 
 \code{validate\_sframe()} checks the internal consistency of an
 \code{sframe} object and reports all problems. The function performs
-more than twenty checks, including duplicate item IDs, items
+a battery of consistency checks, including duplicate item IDs, items
 referencing missing choice sets, scale items not present in the
 instrument, branching rules referencing unknown items, and analysis
 plan roles referencing missing variables. In \code{strict = TRUE} mode
@@ -390,8 +400,9 @@ identical(instr$meta$title, instr2$meta$title)
 The hash verification on \code{read\_sframe()} detects out-of-band
 modifications made after the file was created. Any change to the
 serialised JSON, including edits to item text, scale membership, or
-the analysis plan, produces a hash mismatch, which is reported as a
-warning.
+the analysis plan, produces a hash mismatch, and \code{read\_sframe()}
+refuses to load the file, reporting both the expected and the stored
+hash in the error message.
 
 \subsection{Declaring the analysis plan}
 
@@ -726,12 +737,15 @@ cat("APA: ", r3$apa, "\n")
 cat("Effect:", r3$effect_label, "\n")
 @
 
-Supported analysis types include Pearson and Spearman correlations,
-independent and paired $t$~tests, Mann-Whitney $U$, Kruskal-Wallis,
-one-way and two-way ANOVA with Tukey HSD, ANCOVA, repeated-measures
-ANOVA, simple linear regression, logistic regression (binary, ordinal,
-and multinomial), partial correlation, and mediation and moderation
-templates. Each test type carries a curated citation list sourced from
+Supported analysis types include Pearson, Spearman, and Kendall
+correlations, partial correlation, chi-square and Fisher's exact tests
+of association, McNemar's test, Cochran's $Q$, independent and paired
+$t$~tests, Mann-Whitney $U$, the Wilcoxon signed-rank test,
+Kruskal-Wallis, Friedman's test, one-way and two-way ANOVA with Tukey
+HSD, ANCOVA, repeated-measures ANOVA, linear regression, logistic
+regression (binary, ordinal, and multinomial), mediation and moderation
+templates, and descriptive, frequency, and missing-data blocks. Each
+test type carries a curated citation list sourced from
 the \code{.sframe\_citations} registry, providing the researcher with
 the primary methodological references for their methods section.
 
@@ -881,8 +895,11 @@ report rendering.
 
 \pkg{surveyframe} v0.3.2 is available on CRAN. Planned extensions
 include PLS-SEM and CB-SEM execution via \pkg{seminr} and \pkg{lavaan},
-item response theory workflows, multi-criteria decision making, and
-Quarto-native report generation. The package repository and issue
+item response theory workflows, multi-criteria decision making,
+Quarto-native report generation, and the remaining layers of the
+proof-of-integrity framework \citep{sharafuddin2026ssr}, which extend
+the instrument hash to response data, analysis outputs, and a portable
+verification manifest. The package repository and issue
 tracker are available at
 \url{https://github.com/MohammedAliSharafuddin/surveyframe}.
 
