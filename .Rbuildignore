@@ -24,6 +24,7 @@
 ^todo\.md$
 ^TODO\.md$
 ^revision_todo_0\.3\.md$
+^dogfeed\.todo\.md$
 ^docs($|/)
 ^data-raw($|/)
 ^\.codex($|/)
