@@ -92,6 +92,7 @@ Dev-only files (gitignored on `main`, tracked on `dev`):
 - `revision_todo_0.3.md`
 - `cran-comments.md`
 - `todo.md`
+- `dogfeed.todo.md`
 
 Routine work happens on `main`. When the planning files change, switch to `dev`,
 merge `main`, update the files, and push `dev` to `private`. To resume planning
@@ -204,6 +205,20 @@ Open items (non-blocking for CRAN submission):
 The full task list is in `revision_todo_0.3.md`. The version and growth plan is
 in `roadmap.md`.
 
+### Dogfeed log
+
+`dogfeed.todo.md` is the running log of feedback from using surveyframe as a
+real user (dogfeeding): bugs, rough edges, confusing copy, missing
+affordances. Each item is logged with a status (`open`, `planned`, `fixed`,
+`wontfix`) and, once triaged, a version target against `roadmap.md`. Check it
+at the start of a dogfeed session and append new items as they come in rather
+than losing them to conversation history.
+
+**While a dogfeed session is open, do not edit any source file** (`R/`,
+`inst/`, tests, vignettes, or any other package file). Log the feedback only.
+Wait for an explicit "dogfeed is complete" (or equivalent) before triaging or
+fixing anything.
+
 ---
 
 ## Key file map
@@ -294,6 +309,15 @@ Read CLAUDE.md. Install the current tarball as a first-time user with limited
 coding skills. Work through the README, the help files, and the main vignette.
 Identify anything that weakens onboarding or adoption, within 0.3.x scope and
 with no new features, then apply the fixes.
+```
+
+### Resume a dogfeed session
+
+```
+Read CLAUDE.md and dogfeed.todo.md. Open a fresh dogfeed session: log every
+piece of feedback I give as I use surveyframe as a real user, one item per
+entry, status "open". Do not triage or fix anything unless I ask; just capture
+it accurately so nothing is lost.
 ```
 
 ---
