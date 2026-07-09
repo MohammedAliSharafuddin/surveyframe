@@ -159,3 +159,42 @@ test_that("fix-ef: static export falls back to image/png when media type absent"
     info = "absent media type must not produce image/jpeg in the output"
   )
 })
+
+test_that("0.3.3: item page assignments survive assembly, round trip, and export", {
+  cs <- sf_choices("pg5", 1:5, c("SD", "D", "N", "A", "SA"))
+  i1 <- sf_item("pq_1", "Q1", type = "likert", choice_set = "pg5", page = 1L)
+  i2 <- sf_item("pq_2", "Q2", type = "likert", choice_set = "pg5", page = 2L)
+  instr <- sf_instrument("Page regression", components = list(cs, i1, i2))
+  instr$items[[2]]$page <- 3L
+
+  expect_identical(instr$items[[1]]$page, 1L)
+  expect_identical(instr$items[[2]]$page, 3L)
+
+  p <- tempfile(fileext = ".sframe")
+  on.exit(unlink(p), add = TRUE)
+  write_sframe(instr, p, overwrite = TRUE)
+  x <- read_sframe(p)
+  expect_identical(x$items[[1]]$page, 1L)
+  expect_identical(x$items[[2]]$page, 3L)
+
+  h <- tempfile(fileext = ".html")
+  on.exit(unlink(h), add = TRUE)
+  export_static_survey(instr, output_path = h, open = FALSE, overwrite = TRUE)
+  html <- paste(readLines(h, warn = FALSE), collapse = "")
+  expect_match(html, "\"page\":1", fixed = TRUE)
+  expect_match(html, "\"page\":3", fixed = TRUE)
+})
+
+test_that("0.3.3: exported survey posts to Apps Script without a CORS preflight", {
+  cs <- sf_choices("cg5", 1:5, c("SD", "D", "N", "A", "SA"))
+  i1 <- sf_item("cq_1", "Q1", type = "likert", choice_set = "cg5")
+  instr <- sf_instrument("CORS regression", components = list(cs, i1))
+  h <- tempfile(fileext = ".html")
+  on.exit(unlink(h), add = TRUE)
+  export_static_survey(instr, output_path = h, open = FALSE, overwrite = TRUE,
+                       endpoint_url = "https://script.google.com/macros/s/X/exec")
+  html <- paste(readLines(h, warn = FALSE), collapse = "")
+  expect_match(html, "mode:'no-cors'", fixed = TRUE)
+  expect_match(html, "'Content-Type':'text/plain'", fixed = TRUE)
+  expect_false(grepl("'Content-Type':'application/json'", html, fixed = TRUE))
+})
