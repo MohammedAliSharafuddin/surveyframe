@@ -116,6 +116,15 @@ version-archive directories so the CRAN build never sees them.
 - Replace "several" with a specific number.
 - Plain, editorial, professional tone.
 
+### Session efficiency
+
+- Minimise token use automatically wherever possible, without being asked
+  each time. Keep responses concise, avoid restating context already
+  established in the conversation or in this file, don't re-read a file
+  that was already read and hasn't changed, and prefer targeted reads/edits
+  over dumping full-file contents when a smaller slice will do. This applies
+  to every session working in this repository, not just one-off requests.
+
 ### Code
 
 - Use R, not Python, for any scripting or data checks.

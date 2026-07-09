@@ -157,6 +157,14 @@ phone without layout or logic errors, including the Google Sheets collector read
 back through SurveyStudio and `read_sheet_responses()`. The rendered report is
 readable at conference presentation size.
 
+Status: implemented 2026-07-09, tag and release pending. All exit criteria
+verified against the live AIC-RSAM deployment (8 real responses read back
+through both paths, phone-viewport hardening confirmed by screenshot,
+report reviewed at 1280 by 720). The ICSRI audience-feedback deliverable is
+excluded from this release by explicit decision (conference is 8-9 August
+2026); it lands as a follow-up patch once real feedback exists. Full detail
+in dogfeed.todo.md. 500/500 tests pass, R CMD check --as-cran clean.
+
 ### v0.3.4 — Visualisation foundation (target 2026-08-15)
 
 Headline: the first plotting layer — opt-in, brand-styled, ggplot2-based.
