@@ -819,6 +819,9 @@ sframe_run_one_block <- function(block, data, instrument) {
         if (is.null(model)) list(test = test, error = "SEM syntax requires a saved model role.")
         else list(test = test, syntax = sem_lavaan_syntax(model, instrument), apa = "CB-SEM lavaan syntax generated.", prompt = "Inspect measurement and structural syntax before fitting.")
       },
+      # pls_sem is accepted as an alias: real instruments declare the method
+      # by the model type, so both ids resolve to the seminr syntax runner
+      pls_sem            = ,
       seminr_syntax      = {
         model_id <- sframe_role_values(roles, "model", "")[1]
         model <- sframe_model_by_id(instrument, model_id)
@@ -947,6 +950,13 @@ print.sframe_analysis_results <- function(x, ...) {
   invisible(x)
 }
 
+# Escape HTML and render the limited markdown used in citations (*italic*) so
+# references show as italics rather than literal asterisks.
+sframe_md_em <- function(x) {
+  x <- htmltools_escape(x)
+  gsub("\\*([^*]+)\\*", "<em>\\1</em>", x)
+}
+
 #' Render analysis results to a formatted HTML report
 #'
 #' Generates a self-contained HTML report from the output of
@@ -985,13 +995,6 @@ print.sframe_analysis_results <- function(x, ...) {
 #' out <- render_results(results, instr,
 #'                       output_file = tempfile(fileext = ".html"))
 #' file.exists(out)
-# Escape HTML and render the limited markdown used in citations (*italic*) so
-# references show as italics rather than literal asterisks.
-sframe_md_em <- function(x) {
-  x <- htmltools_escape(x)
-  gsub("\\*([^*]+)\\*", "<em>\\1</em>", x)
-}
-
 render_results <- function(
     results         = NULL,
     instrument,

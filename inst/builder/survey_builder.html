@@ -888,7 +888,7 @@ input,textarea,select{font-family:inherit;font-size:14px}
 
 /* Header (Fix A) */
 .sf-hdr{display:flex;align-items:center;gap:14px;max-width:var(--card-w);margin:20px auto 0;padding:0 16px 16px;border-bottom:1px solid var(--cb)}
-.sf-hdr-logo{height:48px;width:auto;max-width:240px;object-fit:contain}
+.sf-hdr-logo{height:48px;width:auto;min-width:48px;max-width:200px;object-fit:contain;object-position:left center}
 .sf-hdr-inst{font-size:15px;font-weight:600;color:var(--t1)}
 
 /* Progress */
@@ -915,7 +915,7 @@ input,textarea,select{font-family:inherit;font-size:14px}
 
 /* Buttons */
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;
-  padding:10px 24px;border-radius:8px;font-size:14px;font-weight:600;
+  padding:10px 24px;min-height:44px;border-radius:8px;font-size:14px;font-weight:600;
   transition:all .15s;border:2px solid transparent;cursor:pointer}
 .btn:disabled{opacity:.4;cursor:not-allowed}
 .btn-p{background:var(--cp);color:#fff;border-color:var(--cp)}
@@ -951,7 +951,7 @@ input,textarea,select{font-family:inherit;font-size:14px}
 .likert-lbl{font-size:11px;color:var(--t2);line-height:1.3;max-width:72px}
 
 /* Choice (stacked) */
-.choice-opt{display:flex;align-items:flex-start;gap:8px;padding:8px 10px;
+.choice-opt{display:flex;align-items:flex-start;gap:8px;padding:12px 10px;min-height:44px;
   border-radius:6px;cursor:pointer;transition:background .12s;font-size:13px}
 .choice-opt:hover{background:var(--cg)}
 .choice-opt input{margin-top:2px;accent-color:var(--cp);flex-shrink:0}
@@ -1074,7 +1074,9 @@ const choiceMap={};
 (SF.choices||[]).forEach(function(cs){choiceMap[cs.id]=cs;});
 
 const branchMap={};
-(SF.branching||[]).forEach(function(rule){branchMap[rule.item_id]=rule;});
+(SF.branching||[]).forEach(function(rule){
+  (branchMap[rule.item_id]=branchMap[rule.item_id]||[]).push(rule);
+});
 
 // Items designated as quality checks render as Likert (inline radio) so
 // their choice layout matches regular scale items visually.
@@ -1123,12 +1125,23 @@ function evaluate(op,actual,value){
     default:return false;
   }
 }
-function isVisible(itemId){
-  var rule=branchMap[itemId];
-  if(!rule)return true;
-  var actual=responses[rule.depends_on];
-  var cond=evaluate(rule.operator,actual,rule.value);
-  return rule.action==='show'?cond:!cond;
+function isVisible(itemId,seen){
+  var rules=branchMap[itemId];
+  if(!rules||!rules.length)return true;
+  // Guard against rule cycles: a repeated item is treated as visible so the
+  // walk terminates instead of recursing forever.
+  seen=seen||{};
+  if(seen[itemId])return true;
+  seen[itemId]=true;
+  // Several rules on one item combine with AND. A hidden controlling item
+  // counts as unanswered so visibility cascades down the chain.
+  for(var k=0;k<rules.length;k++){
+    var rule=rules[k];
+    var actual=isVisible(rule.depends_on,seen)?responses[rule.depends_on]:'';
+    var cond=evaluate(rule.operator,actual,rule.value);
+    if(!(rule.action==='show'?cond:!cond))return false;
+  }
+  return true;
 }
 
 // ── Helpers ────────────────────────────────────────────────────────────────
@@ -1301,6 +1314,7 @@ function setRating(id,val,max){
   if(err)err.classList.remove('show');
   var btns=document.querySelectorAll('.star-btn[data-id="'+id+'"]');
   btns.forEach(function(b){b.classList.toggle('active',parseInt(b.dataset.v)<=val);});
+  updateProgress();
 }
 function updateBranching(){
   SF.items.forEach(function(item){
@@ -1308,6 +1322,7 @@ function updateBranching(){
     if(!el)return;
     el.classList.toggle('hidden',!isVisible(item.id));
   });
+  updateProgress();
 }
 
 // ── Ranking drag-and-drop ─────────────────────────────────────────────────
@@ -1411,6 +1426,7 @@ function doSubmit(){
   // Fix C: use respondent_id to match Apps Script header and read_responses()
   var row={respondent_id:respId,started_at:startedAt,submitted_at:submittedAt};
   SF.items.forEach(function(item){
+    if(item.type==='section_break'||item.type==='text_block')return;
     if(!isVisible(item.id))return;
     if(item.type==='matrix'){
       (item.matrix_items||[]).forEach(function(r){
@@ -1424,7 +1440,11 @@ function doSubmit(){
   var csvStr=toCsv([row]);
   downloadCsv(csvStr,(SF.meta.title||'survey')+'_response_'+respId+'.csv');
   if(ENDPOINT){
-    fetch(ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(row)})
+    // no-cors with a text/plain body: an application/json header triggers a
+    // CORS preflight that Google Apps Script never answers, so the POST is
+    // silently blocked in real deployments. Apps Script parses the body
+    // regardless of content type.
+    fetch(ENDPOINT,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:JSON.stringify(row)})
       .catch(function(){});
   }
   screen='thankyou';
@@ -1463,15 +1483,41 @@ function updateProgress(){
   var pct=document.getElementById('progPct');
   var title=document.getElementById('progTitle');
   if(!wrap)return;
-  // Honour the show-progress toggle and hide on single-page surveys, where a
-  // progress bar is meaningless.
+  // Honour the show-progress toggle. Multi-page surveys report page
+  // position; single-page surveys report answered visible questions so a
+  // long mobile survey still gives progress feedback.
   var showProg=!(R.header&&R.header.show_progress===false);
-  if(screen!=='survey'||!showProg||maxPage<=1){wrap.hidden=true;return;}
+  if(screen!=='survey'||!showProg){wrap.hidden=true;return;}
+  var p,label;
+  if(maxPage>1){
+    p=Math.round((currentPage/maxPage)*100);
+    label='Page '+currentPage+' of '+maxPage;
+  }else{
+    var total=0,done=0;
+    SF.items.forEach(function(item){
+      if(item.type==='section_break'||item.type==='text_block')return;
+      if(!isVisible(item.id))return;
+      total++;
+      if(item.type==='matrix'){
+        var rows=item.matrix_items||[];
+        var complete=rows.length>0&&rows.every(function(r){
+          var v=responses[item.id+'__'+r];
+          return v!=null&&v!=='';
+        });
+        if(complete)done++;
+      }else{
+        var v=responses[item.id];
+        if(v!=null&&v!=='')done++;
+      }
+    });
+    if(total===0){wrap.hidden=true;return;}
+    p=Math.round((done/total)*100);
+    label=done+' of '+total+' answered';
+  }
   wrap.hidden=false;
-  var p=Math.round((currentPage/maxPage)*100);
   if(bar)bar.style.width=p+'%';
   if(pct)pct.textContent=p+'%';
-  if(title)title.textContent='Page '+currentPage+' of '+maxPage;
+  if(title)title.textContent=label;
 }
 function renderWelcome(){
   var el=document.getElementById('app');
@@ -1742,7 +1788,20 @@ function loadFile(e){
       S.analysis_plan=src.analysis_plan||[];S.models=src.models||[];S.render=src.render||S.render;
       ['welcome','thankyou','header'].forEach(function(k){if(!S.render[k])S.render[k]={};});
       selId=null;ra();dirty=false;lastSaved=Date.now();updSave();
-      toast('Loaded: '+S.meta.title,'ok');
+      // Surface the SHA-256 integrity status instead of loading silently.
+      // The hash is recomputed over the file's own payload, which matches
+      // both saveSframe() here and write_sframe() in R.
+      var fileHash=(p.hash&&p.hash.value)||'';
+      if(fileHash){
+        var vp=JSON.parse(ev.target.result);
+        vp.hash.value='';
+        sframeHash(vp).then(function(h){
+          if(h===fileHash)toast('Loaded: '+S.meta.title+' — integrity verified (sha256 '+fileHash.slice(0,8)+')','ok');
+          else toast('Loaded: '+S.meta.title+' — integrity hash mismatch; the file was changed outside surveyframe','err');
+        });
+      }else{
+        toast('Loaded: '+S.meta.title+' (no integrity hash in this file)','inf');
+      }
     }catch(err){toast('Could not parse: '+err.message,'err');}
   };
   r.readAsText(f);e.target.value='';
@@ -1803,6 +1862,7 @@ function exportSheetsCollector(){
   var tpl=tplEl.textContent.trim().split('<\\/script>').join('<\/script>');
   var cols=['respondent_id','started_at','submitted_at'];
   S.items.forEach(function(i){
+    if(i.type==='section_break'||i.type==='text_block')return;
     if(i.type==='matrix'&&i.matrix_items&&i.matrix_items.length){
       i.matrix_items.forEach(function(sub){cols.push(i.id+'__'+sub);});
     }else{cols.push(i.id);}
@@ -1824,7 +1884,7 @@ var TB={likert:'b-li',single_choice:'b-si',multiple_choice:'b-mu',numeric:'b-nu'
 function renderItemList(){
   var el=document.getElementById('itemList'),q=(gv('itemSearch')||'').toLowerCase();
   var items=S.items.filter(function(i){return!q||(i.label||'').toLowerCase().includes(q)||(i.id||'').toLowerCase().includes(q);});
-  if(!items.length){el.innerHTML='<div class="sb-empty"><div class="sb-empty-ic">&#128196;</div><div class="sb-empty-t">No questions yet</div><div class="sb-empty-b">Click "+ Add question" to get started, or use the &#8942; button for more item types.</div></div>';return;}
+  if(!items.length){el.innerHTML='<div class="sb-empty"><div class="sb-empty-ic">&#128196;</div><div class="sb-empty-t">No questions yet</div><div class="sb-empty-b">Click "+ Add question" to get started, or use the &#8942; button for more item types.</div><div class="sb-empty-b" style="margin-top:10px"><a href="#" onclick="openFile();return false">Open an existing .sframe</a> &#183; <a href="#" onclick="openSettings();return false">Set up survey settings first</a></div></div>';return;}
   var cp=null;
   el.innerHTML=items.map(function(item){
     var ri=S.items.indexOf(item);
@@ -1893,6 +1953,12 @@ function saveItemChoices(){
   if(parsed.values.length<1){toast('Add at least one choice label','err');return;}
   snap();
   var item=S.items[idx],id=item.choice_set||safeId(item.id+'_choices');
+  // Choice-based questions fork a shared set before editing, so changing
+  // this question's options cannot silently rewrite other questions.
+  if(['single_choice','multiple_choice','ranking'].includes(item.type)){
+    var shared=S.items.some(function(i){return i.id!==item.id&&i.choice_set===id;});
+    if(shared)id=safeId(item.id+'_choices');
+  }
   item.choice_set=id;
   var ex=S.choices.findIndex(function(c){return c.id===id;});
   var prior=ex>=0?S.choices[ex]:{};
@@ -1913,7 +1979,7 @@ function renderInspBody(item){
   function chk(fid,checked,lbl){return'<label class="fcheck"><input type="checkbox" id="'+fid+'"'+(checked?' checked':'')+' onchange="updF(\''+fid+'\')"><span>'+lbl+'</span></label>';}
   var identity=fgs('Identity',
     fld('Item ID','<input type="text" id="fi-id" value="'+esc(item.id)+'" onblur="updIdF(this.value)"><div class="ferr" id="fi-id-err">&#9888; Invalid or duplicate ID</div>','Letters, numbers, and _ characters only.',true)+
-    fld('Question text',ta('fi-lbl',item.label||'','Enter the question text',2),'',true)+
+    fld(isSec?'Section header':isTxt?'Block text':'Question text',ta('fi-lbl',item.label||'',isSec?'Enter the section header':isTxt?'Enter the block text':'Enter the question text',2),'',true)+
     (isSec?fld('Introduction text',ta('fi-intro',item.section_intro||'','Optional intro paragraph')):'')
   );
   var config=isSec||isTxt?'':fgs('Configuration',
@@ -1998,7 +2064,14 @@ function qAdd(type){
   snap();
   var choice=null;
   if(['likert','matrix'].includes(type))choice=ensureChoiceSet('agree');
-  else if(['single_choice','multiple_choice','ranking'].includes(type))choice=ensureChoiceSet('basic');
+  else if(['single_choice','multiple_choice','ranking'].includes(type)){
+    // Each choice-based question starts with its own sample set so editing
+    // one question's options never leaks into the next question added.
+    choice=safeId(nid+'_choices');
+    if(!S.choices.find(function(c){return c.id===choice;})){
+      S.choices.push({id:choice,values:['option_1','option_2','option_3'],labels:['Option 1','Option 2','Option 3'],allow_other:false,randomise:false});
+    }
+  }
   var item={id:nid,label:defaultLabel(type,n),type:type,required:false,reverse:false,choice_set:choice,scale_id:null,help:null,placeholder:null,matrix_items:null,slider_min:0,slider_max:100,slider_step:1,rating_max:5,rating_icon:'star',section_intro:null,page:null};
   if(type==='matrix')item.matrix_items=['Service quality','Sustainability','Overall experience'];
   if(type==='section_break')item.section_intro='Use this section to introduce the next group of questions.';
@@ -2133,11 +2206,15 @@ sem_lavaan_syntax:{family:'model',label:'CB-SEM lavaan syntax',roles:[{id:'model
 seminr_syntax:{family:'model',label:'PLS-SEM seminr syntax',roles:[{id:'model',label:'Saved model',min:1,max:1,levels:['model']}],showAlpha:true,showHypotheses:true,showEffectSize:true,assumptions:['Construct modes and bootstrapping'],output:'seminr measurement, structural, bootstrap, reliability, AVE, and HTMT syntax.',refs:['field_2018']}
 };
 var TCITS={};var TLBLS={};Object.keys(ANALYSIS_REGISTRY).forEach(function(k){TCITS[k]=ANALYSIS_REGISTRY[k].refs||[];TLBLS[k]=ANALYSIS_REGISTRY[k].label;});
-var TEST_SUGGEST={'cat+cat':'chi_square','cat+cont':'mann_whitney','cont+cat':'mann_whitney','cont+cont':'correlation_pearson','many':'regression_linear'};
+// Likert items are ordinal scores: pairing them with continuous or other
+// Likert variables suggests Spearman, never a two-group test. A nominal
+// grouping variable with more than two categories suggests Kruskal-Wallis.
+var TEST_SUGGEST={'cat+cat':'chi_square','cat+cont':'mann_whitney','cont+cat':'mann_whitney','cont+cont':'correlation_pearson','lik+lik':'correlation_spearman','lik+cont':'correlation_spearman','cont+lik':'correlation_spearman','cat+lik':'mann_whitney','lik+cat':'mann_whitney','many':'regression_linear'};
+function groupLevels(id){var i=S.items.find(function(x){return x.id===id;});if(!i||!i.choice_set)return null;var cs=S.choices.find(function(c){return c.id===i.choice_set;});return cs?(cs.values||[]).length:null;}
 function varLevel(id){var sc=S.scales.find(function(s){return s.id===id;});if(sc)return{level:'scale',code:'SCL',cls:'scl',type:'scale score'};var i=S.items.find(function(x){return x.id===id;});if(!i)return{level:'model',code:'MOD',cls:'id',type:'model'};if(i.type==='likert')return{level:'likert',code:'LIK',cls:'lik',type:i.type};if(['single_choice','multiple_choice','ranking'].includes(i.type))return{level:i.type==='ranking'?'ordinal':'nominal',code:i.type==='ranking'?'ORD':'NOM',cls:i.type==='ranking'?'ord':'nom',type:i.type};if(['numeric','slider','rating'].includes(i.type))return{level:'continuous',code:'CON',cls:'con',type:i.type};if(['text','textarea','date'].includes(i.type))return{level:i.type==='date'?'identifier':'text',code:i.type==='date'?'ID':'TXT',cls:i.type==='date'?'id':'txt',type:i.type};return{level:'identifier',code:'ID',cls:'id',type:i.type};}
 function roleOptions(role,selected){var useModels=role.levels&&role.levels.includes('model');var opts=useModels?(S.models||[]).map(function(m){return{id:m.id,label:m.id+' ('+(m.type||'model')+')'};}):getAllVars().filter(function(v){return role.levels.includes('any')||role.levels.includes(v.level)||role.levels.includes(v.kind);});return opts.map(function(v){return'<option value="'+esc(v.id)+'"'+(selected.includes(v.id)?' selected':'')+'>'+esc(v.label)+'</option>';}).join('');}
 function getAllVars(){var items=S.items.filter(function(i){return!['section_break','text_block'].includes(i.type);}).map(function(i){var m=varLevel(i.id);return{id:i.id,label:i.id+' - '+(i.label||'').slice(0,42),level:m.level,kind:'item',meta:m,item:i};});var scales=S.scales.map(function(s){var m=varLevel(s.id);return{id:s.id,label:s.id+' - '+(s.label||'scale score'),level:m.level,kind:'scale',meta:m,scale:s};});return items.concat(scales);}
-function getVarCat(id){var m=varLevel(id);return['nominal','ordinal','likert'].includes(m.level)?'cat':'cont';}
+function getVarCat(id){var m=varLevel(id);if(m.level==='likert')return'lik';return['nominal','ordinal'].includes(m.level)?'cat':'cont';}
 function rolesFromLegacy(rq,method){if(rq&&rq.roles)return rq.roles;var v=(rq&&rq.variables)||[];if(!Array.isArray(v))v=[v];if(!method)return{};var r={},defs=(ANALYSIS_REGISTRY[method]||{}).roles||[];defs.forEach(function(role,idx){if(role.max===1)r[role.id]=v[idx]||'';else r[role.id]=v.slice(idx);});return r;}
 function openRQModal(id){
   editRqId=id||null;var rq=id?S.analysis_plan.find(function(r){return r.id===id;}):null;
@@ -2167,6 +2244,13 @@ function flattenRoles(roles){if(roles&&!Array.isArray(roles)&&typeof roles==='ob
 function validatePlanRoles(){
   var method=document.getElementById('rq-test').value,reg=ANALYSIS_REGISTRY[method]||{},roles=collectRoles(),msgs=[];
   (reg.roles||[]).forEach(function(role){var vals=roles[role.id];var n=Array.isArray(vals)?vals.filter(Boolean).length:(vals?1:0);if(n<role.min)msgs.push('Select '+role.min+' '+role.label.toLowerCase()+'.');if(role.max&&n>role.max)msgs.push(role.label+' allows at most '+role.max+' variable(s).');});
+  // A variable may fill only one role per plan: X = Y correlations, a
+  // dependent variable reused as predictor, or grouping = outcome are all
+  // meaningless analyses and are blocked here.
+  var roleOfVar={};
+  Object.keys(roles).forEach(function(rid){asArr(roles[rid]).filter(Boolean).forEach(function(v){(roleOfVar[v]=roleOfVar[v]||[]).push(rid);});});
+  var dupVars=Object.keys(roleOfVar).filter(function(v){return roleOfVar[v].length>1;});
+  if(dupVars.length)msgs.push('The same variable cannot fill more than one role: '+dupVars.join(', ')+'.');
   var guidance={
     frequency:'Select one variable for the frequency table.',
     mann_whitney:'Mann-Whitney U requires one grouping variable with exactly two groups and one ordinal or continuous outcome.',
@@ -2180,7 +2264,7 @@ function validatePlanRoles(){
     cfa_lavaan_syntax:'CFA requires at least one construct with two or more indicators; fewer than three indicators should be justified.',
     seminr_syntax:'PLS-SEM requires at least one construct and one structural path.'
   }[method]||'Review compatibility before saving.';
-  var complete=(reg.roles||[]).every(function(role){var vals=roles[role.id];var n=Array.isArray(vals)?vals.filter(Boolean).length:(vals?1:0);return n>=role.min;});
+  var complete=(reg.roles||[]).every(function(role){var vals=roles[role.id];var n=Array.isArray(vals)?vals.filter(Boolean).length:(vals?1:0);return n>=role.min;})&&dupVars.length===0;
   var msg=document.getElementById('rqValidMsg');if(msg){msg.className='plan-msg '+(complete?'ok':'');msg.textContent=complete?'Required roles are complete. '+guidance:msgs.join(' ');}
   var btn=document.getElementById('rqSaveBtn');if(btn)btn.disabled=!complete;
   var prev=document.getElementById('rqPreview');if(prev)prev.innerHTML='<strong>Planned output</strong><br>'+esc(reg.output||'Structured result')+(reg.assumptions&&reg.assumptions.length?'<br><strong>Assumptions</strong>: '+esc(reg.assumptions.join(', ')):'');
@@ -2196,6 +2280,10 @@ function suggestTest(){
   var sel=flattenRoles(collectRoles()),box=document.getElementById('rqSuggest'),msg=document.getElementById('rqSuggestMsg');
   if(sel.length<2){box.style.display='none';return;}
   var cats=sel.map(getVarCat),sug=sel.length===2?(TEST_SUGGEST[cats[0]+'+'+cats[1]]||'correlation_pearson'):'regression_linear';
+  if(sug==='mann_whitney'){
+    var gid=sel[cats[0]==='cat'?0:1],n=groupLevels(gid);
+    if(n!==null&&n>2)sug='kruskal_wallis';
+  }
   document.getElementById('rq-test').value=sug;onTestChg();
   msg.textContent=(ANALYSIS_REGISTRY[sug]||{}).label+' is suggested from the selected variable types.';box.style.display='flex';
 }
@@ -2239,14 +2327,16 @@ function renderPreviewItem(item,cm,col){
 function renderPreview(){
   var el=document.getElementById('pvFrame');var col=normHex((S.render&&S.render.theme)||'#2563eb');
   var cm={};S.choices.forEach(function(cs){cm[cs.id]=cs;});
+  // Branded header on every preview screen (Welcome, Survey, Thank You),
+  // with a stable logo box so the title does not shift with aspect ratio.
+  var hdr='';if(S.render&&S.render.header){var h=S.render.header;if(h.institution||h.logo_base64){var hMtype=h.logo_media_type||'image/png';hdr='<div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;padding-bottom:14px;border-bottom:1px solid var(--cb)">'+(h.logo_base64?'<img src="data:'+hMtype+';base64,'+h.logo_base64+'" style="height:36px;width:auto;min-width:36px;max-width:200px;object-fit:contain;object-position:left center" alt="Logo">':'')+(h.institution?'<span style="font-size:15px;font-weight:600;color:var(--t1)">'+esc(h.institution)+'</span>':'')+'</div>';}}
   if(pvTab==='welcome'){
     var w=S.render&&S.render.welcome?S.render.welcome:{};
     if(!w.intro_text&&!w.consent_text){el.innerHTML='<div style="max-width:620px;margin:0 auto"><div style="background:#fff;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.07);padding:40px;text-align:center;color:var(--t3)"><div style="font-size:32px;margin-bottom:12px">&#128196;</div><p style="font-size:13px">No welcome page configured. <a href="#" onclick="openSettings(\'welcome\');return false" style="color:'+esc(col)+'">Set up welcome page &#8594;</a></p></div></div>';return;}
-    el.innerHTML='<div style="max-width:620px;margin:0 auto"><div class="pv-card"><div class="pv-title">'+esc(w.title||S.meta.title)+'</div>'+(w.intro_text?'<div class="pv-intro">'+esc(w.intro_text).replace(/\n/g,'<br>')+'</div>':'')+(w.consent_text?'<div class="pv-consent">'+esc(w.consent_text)+'</div>':'')+'<button type="button" style="width:100%;padding:11px;border-radius:10px;background:'+esc(col)+';color:#fff;font-size:14px;font-weight:600;border:none;cursor:default">'+esc(w.start_label||'Start Survey')+'</button></div></div>';return;
+    el.innerHTML='<div style="max-width:620px;margin:0 auto"><div class="pv-card">'+hdr+'<div class="pv-title">'+esc(w.title||S.meta.title)+'</div>'+(w.intro_text?'<div class="pv-intro">'+esc(w.intro_text).replace(/\n/g,'<br>')+'</div>':'')+(w.consent_text?'<div class="pv-consent">'+esc(w.consent_text)+'</div>':'')+'<button type="button" style="width:100%;padding:11px;border-radius:10px;background:'+esc(col)+';color:#fff;font-size:14px;font-weight:600;border:none;cursor:default">'+esc(w.start_label||'Start Survey')+'</button></div></div>';return;
   }
-  if(pvTab==='thankyou'){var ty=S.render&&S.render.thankyou?S.render.thankyou:{};el.innerHTML='<div style="max-width:620px;margin:0 auto"><div class="pv-card"><div class="pv-ty"><div class="pv-ty-ic">&#10003;</div><div class="pv-ty-t">Submitted successfully</div><div class="pv-ty-m">'+esc(ty.message||'Thank you for completing this survey.')+'</div></div></div></div>';return;}
+  if(pvTab==='thankyou'){var ty=S.render&&S.render.thankyou?S.render.thankyou:{};el.innerHTML='<div style="max-width:620px;margin:0 auto"><div class="pv-card">'+hdr+'<div class="pv-ty"><div class="pv-ty-ic">&#10003;</div><div class="pv-ty-t">Submitted successfully</div><div class="pv-ty-m">'+esc(ty.message||'Thank you for completing this survey.')+'</div></div></div></div>';return;}
   if(!S.items.length){el.innerHTML='<div style="max-width:620px;margin:0 auto"><div class="pv-card" style="text-align:center;padding:60px"><p style="color:var(--t3);font-size:13px">Add questions to preview the survey.</p></div></div>';return;}
-  var hdr='';if(S.render&&S.render.header){var h=S.render.header;if(h.institution||h.logo_base64){var hMtype=h.logo_media_type||'image/png';hdr='<div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;padding-bottom:14px;border-bottom:1px solid var(--cb)">'+(h.logo_base64?'<img src="data:'+hMtype+';base64,'+h.logo_base64+'" style="height:36px;width:auto;max-width:200px;object-fit:contain" alt="Logo">':'')+(h.institution?'<span style="font-size:15px;font-weight:600;color:var(--t1)">'+esc(h.institution)+'</span>':'')+'</div>';}}
   var mode=(S.render&&S.render.mode)||'standard';
   var shown=S.items,nav='';
   if(mode==='conversational'){

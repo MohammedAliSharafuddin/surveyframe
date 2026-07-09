@@ -27,3 +27,7 @@ tests/testthat/file*.html
 CLAUDE.md
 jss-paper/
 .positai
+tests/testthat/fixtures/aic_rsam_pilot.sframe
+tests/testthat/test-aic-rsam-fixture.R
+tests/testthat/test-aic-rsam-branching.R
+.vscode/
