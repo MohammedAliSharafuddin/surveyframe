@@ -43,8 +43,11 @@ surveyframe is the source of truth for a wider product and publication set.
 
 - **surveyframe** (public, CRAN): the package itself.
 - **surveyframe-dev** (private): the full working repository. Tracks everything,
-  including this file, the roadmap, the to-do notes, the JSS paper, and the
-  brand sources. Open this repository when working across devices.
+  including this file, the roadmap, the to-do notes, and the brand sources.
+  Open this repository when working across devices.
+- **surveyframe-jss-paper** (private): the JSS manuscript, moved out of
+  surveyframe-dev on 2026-07-10. Clone it beside this repository when working
+  on the paper.
 - **ethos** (private, JavaScript): a research-workflow product built on
   surveyframe. Calls surveyframe as the engine.
 - **ethos-pro** (private, TypeScript): the institutional governance layer on top
@@ -245,7 +248,8 @@ fixing anything.
 - `inst/shiny/app.R` is SurveyStudio. `inst/shiny/dashboard/app.R` is the
   dashboard.
 - `tests/testthat/test-0.3.1-fixes.R` covers the 0.3.1 collection fixes.
-- `jss-paper/surveyframe.Rnw` is the JSS manuscript.
+- The JSS manuscript lives in the separate surveyframe-jss-paper repository
+  (`../surveyframe-jss-paper/surveyframe.Rnw` when cloned beside this one).
 
 ---
 
@@ -298,7 +302,8 @@ before writing code.
 ### Work on the JSS paper
 
 ```
-Read CLAUDE.md. Open jss-paper/surveyframe.Rnw. Proofread it against the current
+Read CLAUDE.md. Open ../surveyframe-jss-paper/surveyframe.Rnw (its own private
+repo since 2026-07-10). Proofread it against the current
 CRAN package, confirm every code chunk runs, compile the PDF, and list what I
 still need to provide before submitting to the Journal of Statistical Software.
 ```
