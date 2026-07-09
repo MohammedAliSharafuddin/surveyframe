@@ -273,7 +273,7 @@ if (is.null(rr)) {
       Omega_t = if (!is.null(s$omega_t)) sprintf("%.2f", s$omega_t) else "n/a",
       stringsAsFactors=FALSE)))
   print(kable(rel_df,
-    col.names=c("Scale","Items","N","Alpha","Omega h","Omega total"),
+    col.names=c("Scale","Items","N","Alpha","Omega h","Omega total"),
     align=c("l","c","c","r","r","r"),
     caption="Scale reliability statistics"))
 }
@@ -306,7 +306,27 @@ if (!has_data) {
       if (!is.null(r$error)) {
         cat(sprintf("> **Error:** %s\n\n", r$error))
       } else {
-        cat(sprintf("**Result:** %s\n\n", r$apa %||% ""))
+        scale_entries <- Filter(function(e) is.list(e) && !is.null(e$scale_id), r)
+        if (!is.null(r$apa)) {
+          cat(sprintf("**Result:** %s\n\n", r$apa))
+        } else if (length(scale_entries) == 0) {
+          cat("**Result:** see the matching section of this report above.\n\n")
+        }
+        if (!is.null(r$syntax)) {
+          cat("````\n")
+          cat(r$syntax)
+          cat("\n````\n\n")
+        }
+        if (is.null(r$apa) && length(scale_entries) > 0) {
+          rel_tab <- do.call(rbind, lapply(scale_entries, function(s)
+            data.frame(
+              Scale = paste0(s$label %||% s$scale_id, " (", s$scale_id, ")"),
+              Items = s$n_items %||% NA,
+              Alpha = if (!is.null(s$alpha)) sprintf("%.2f", s$alpha) else "n/a",
+              stringsAsFactors = FALSE)))
+          print(kable(rel_tab, align = c("l", "c", "r"), row.names = FALSE))
+          cat("\n")
+        }
         if (!is.null(r$effect_label))
           cat(sprintf("**Effect size:** %s\n\n", r$effect_label))
         if (!is.null(r$table) && is.data.frame(r$table))
