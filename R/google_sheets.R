@@ -39,7 +39,12 @@ export_google_sheet <- function(instrument, sheet_url, output_dir = ".") {
   }
 
   # Fix C2: matrix items post one column per sub-item (item_id__sub); expand headers
-  item_headers <- unlist(lapply(instrument$items, function(i) {
+  # 0.3.3: display-only items collect no data, so they get no sheet column
+  response_items <- Filter(
+    function(i) !identical(i$type %in% c("section_break", "text_block"), TRUE),
+    instrument$items
+  )
+  item_headers <- unlist(lapply(response_items, function(i) {
     if (identical(i$type, "matrix") && length(i$matrix_items) > 0L) {
       paste0(i$id, "__", i$matrix_items)
     } else {
@@ -96,6 +101,10 @@ export_google_sheet <- function(instrument, sheet_url, output_dir = ".") {
 #'   Defaults to `"respondent_id"`.
 #' @param submitted_at Character or NULL. Column holding submission
 #'   timestamps. Defaults to `"submitted_at"`.
+#' @param meta_cols Character vector or NULL. Additional sheet columns to
+#'   accept as metadata without a warning, for example bridge fields a host
+#'   application appends to each submission. `"started_at"` is always
+#'   included.
 #'
 #' @return A `data.frame` validated against the instrument, ready for
 #'   [quality_report()], [score_scales()], and [reliability_report()].
@@ -115,7 +124,8 @@ read_sheet_responses <- function(
     instrument,
     sheet_name    = "Responses",
     respondent_id = "respondent_id",
-    submitted_at  = "submitted_at"
+    submitted_at  = "submitted_at",
+    meta_cols     = NULL
 ) {
   rlang::check_installed("googlesheets4",
     reason = "to read responses from Google Sheets")
@@ -130,7 +140,7 @@ read_sheet_responses <- function(
     instrument    = instrument,
     respondent_id = respondent_id,
     submitted_at  = submitted_at,
-    meta_cols     = "started_at",
+    meta_cols     = unique(c("started_at", meta_cols)),
     strict        = FALSE
   )
 }

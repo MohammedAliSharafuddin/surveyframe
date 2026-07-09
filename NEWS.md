@@ -1,3 +1,84 @@
+# surveyframe 0.3.3
+
+This release hardens the package against its first real deployment, the
+AIC-RSAM room-service study: a QR-accessed mobile static survey with
+eligibility skip logic and a six-construct, nine-path structural model. Every
+fix was surfaced by reproducing that instrument end to end on a phone-width
+viewport, through the model-syntax generators, and through the rendered
+report at presentation size. It adds no new exported functions, no new hard
+dependencies, and no new statistical methods.
+
+## Static survey and branching
+
+* The branching evaluator now combines several rules on one item with AND
+  instead of silently keeping only the last rule, so an item gated on two
+  conditions (for example a follow-up shown only when eligibility passes and
+  a prior answer is yes) behaves as declared.
+* Visibility now cascades: when a controlling question is itself hidden, its
+  stale answer no longer keeps downstream questions visible. Changing an
+  early screening answer correctly hides the whole dependent chain.
+* Touch targets on phone screens meet a 44 pixel minimum for choice options
+  and buttons, and the branded header keeps a stable logo box for any logo
+  aspect ratio.
+* Single-page surveys now show answered-questions progress (for example
+  "12 of 44 answered") instead of hiding the progress bar, honouring the
+  existing show-progress toggle.
+
+## Model syntax
+
+* `sem_lavaan_syntax()` sanitises free-text path labels into valid lavaan
+  parameter names, so a hypothesis label like "H1: AIA positively influences
+  PEOU" becomes the parameter `H1` instead of invalid syntax.
+* `seminr_syntax()` output now loads seminr and uses the real seminr summary
+  accessors (`summary(pls_model)$reliability`, `$validity$htmt`, and
+  bootstrapped paths) in place of functions seminr does not export.
+* `run_analysis_plan()` accepts `pls_sem` as an alias for the
+  `seminr_syntax` method, matching how instruments declare the model type.
+
+## Google Sheets collection
+
+* The exported survey now POSTs to the Apps Script endpoint with
+  `mode: no-cors` and a `text/plain` body. The previous `application/json`
+  header triggered a CORS preflight that Apps Script never answers, so
+  submissions from hosted deployments were silently blocked. This fix was
+  proven in the field by the live AIC-RSAM deployment, which had to patch
+  the exported file by hand.
+* The Apps Script collector, the SurveyBuilder collector export, and the
+  static survey submission payload no longer emit columns for section breaks
+  and text blocks, so collected sheets hold only response data.
+* `read_sheet_responses()` gains a `meta_cols` argument for declaring extra
+  sheet columns (for example bridge fields a host application appends to
+  each submission) so they are accepted as metadata without a warning.
+* The full round trip was verified against the live AIC-RSAM deployment:
+  real responses submitted through the hosted survey were read back through
+  both `read_sheet_responses()` and SurveyStudio's Google Sheet import card.
+* SurveyStudio's Quality Dashboard now passes the standard `started_at` and
+  `submitted_at` columns through to `quality_report()`, so completion-time
+  analysis works for imported sheet responses instead of always reporting
+  that no timestamp column is available.
+
+## Report
+
+* Analysis-plan sections print the generated model syntax in a code block,
+  reliability-style results render as a compact table instead of an empty
+  result line, and the Omega column headers no longer wrap mid-word.
+
+## SurveyBuilder
+
+* Opening a `.sframe` file verifies and reports its SHA-256 integrity status
+  instead of loading silently, and the empty canvas offers an open-existing
+  path alongside new-survey setup.
+* A newly added choice question starts with its own sample choice set, and
+  editing a shared choice set on a choice question forks it first, so one
+  question's options can no longer leak into another.
+* The analysis-plan modal blocks assigning the same variable to two roles,
+  for example X and Y of one correlation.
+* The test suggester treats Likert items as ordinal (suggesting Spearman
+  with continuous or Likert pairs) and suggests Kruskal-Wallis when the
+  grouping variable has more than two categories.
+* The preview shows the branded header on the Welcome and Thank You screens,
+  and the Section item inspector labels its text field "Section header".
+
 # surveyframe 0.3.2
 
 This release corrects the package citation, completes the S3 method surface for

@@ -21,7 +21,7 @@ input,textarea,select{font-family:inherit;font-size:14px}
 
 /* Header (Fix A) */
 .sf-hdr{display:flex;align-items:center;gap:14px;max-width:var(--card-w);margin:20px auto 0;padding:0 16px 16px;border-bottom:1px solid var(--cb)}
-.sf-hdr-logo{height:48px;width:auto;max-width:240px;object-fit:contain}
+.sf-hdr-logo{height:48px;width:auto;min-width:48px;max-width:200px;object-fit:contain;object-position:left center}
 .sf-hdr-inst{font-size:15px;font-weight:600;color:var(--t1)}
 
 /* Progress */
@@ -48,7 +48,7 @@ input,textarea,select{font-family:inherit;font-size:14px}
 
 /* Buttons */
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;
-  padding:10px 24px;border-radius:8px;font-size:14px;font-weight:600;
+  padding:10px 24px;min-height:44px;border-radius:8px;font-size:14px;font-weight:600;
   transition:all .15s;border:2px solid transparent;cursor:pointer}
 .btn:disabled{opacity:.4;cursor:not-allowed}
 .btn-p{background:var(--cp);color:#fff;border-color:var(--cp)}
@@ -84,7 +84,7 @@ input,textarea,select{font-family:inherit;font-size:14px}
 .likert-lbl{font-size:11px;color:var(--t2);line-height:1.3;max-width:72px}
 
 /* Choice (stacked) */
-.choice-opt{display:flex;align-items:flex-start;gap:8px;padding:8px 10px;
+.choice-opt{display:flex;align-items:flex-start;gap:8px;padding:12px 10px;min-height:44px;
   border-radius:6px;cursor:pointer;transition:background .12s;font-size:13px}
 .choice-opt:hover{background:var(--cg)}
 .choice-opt input{margin-top:2px;accent-color:var(--cp);flex-shrink:0}
@@ -207,7 +207,9 @@ const choiceMap={};
 (SF.choices||[]).forEach(function(cs){choiceMap[cs.id]=cs;});
 
 const branchMap={};
-(SF.branching||[]).forEach(function(rule){branchMap[rule.item_id]=rule;});
+(SF.branching||[]).forEach(function(rule){
+  (branchMap[rule.item_id]=branchMap[rule.item_id]||[]).push(rule);
+});
 
 // Items designated as quality checks render as Likert (inline radio) so
 // their choice layout matches regular scale items visually.
@@ -256,12 +258,23 @@ function evaluate(op,actual,value){
     default:return false;
   }
 }
-function isVisible(itemId){
-  var rule=branchMap[itemId];
-  if(!rule)return true;
-  var actual=responses[rule.depends_on];
-  var cond=evaluate(rule.operator,actual,rule.value);
-  return rule.action==='show'?cond:!cond;
+function isVisible(itemId,seen){
+  var rules=branchMap[itemId];
+  if(!rules||!rules.length)return true;
+  // Guard against rule cycles: a repeated item is treated as visible so the
+  // walk terminates instead of recursing forever.
+  seen=seen||{};
+  if(seen[itemId])return true;
+  seen[itemId]=true;
+  // Several rules on one item combine with AND. A hidden controlling item
+  // counts as unanswered so visibility cascades down the chain.
+  for(var k=0;k<rules.length;k++){
+    var rule=rules[k];
+    var actual=isVisible(rule.depends_on,seen)?responses[rule.depends_on]:'';
+    var cond=evaluate(rule.operator,actual,rule.value);
+    if(!(rule.action==='show'?cond:!cond))return false;
+  }
+  return true;
 }
 
 // ── Helpers ────────────────────────────────────────────────────────────────
@@ -434,6 +447,7 @@ function setRating(id,val,max){
   if(err)err.classList.remove('show');
   var btns=document.querySelectorAll('.star-btn[data-id="'+id+'"]');
   btns.forEach(function(b){b.classList.toggle('active',parseInt(b.dataset.v)<=val);});
+  updateProgress();
 }
 function updateBranching(){
   SF.items.forEach(function(item){
@@ -441,6 +455,7 @@ function updateBranching(){
     if(!el)return;
     el.classList.toggle('hidden',!isVisible(item.id));
   });
+  updateProgress();
 }
 
 // ── Ranking drag-and-drop ─────────────────────────────────────────────────
@@ -544,6 +559,7 @@ function doSubmit(){
   // Fix C: use respondent_id to match Apps Script header and read_responses()
   var row={respondent_id:respId,started_at:startedAt,submitted_at:submittedAt};
   SF.items.forEach(function(item){
+    if(item.type==='section_break'||item.type==='text_block')return;
     if(!isVisible(item.id))return;
     if(item.type==='matrix'){
       (item.matrix_items||[]).forEach(function(r){
@@ -557,7 +573,11 @@ function doSubmit(){
   var csvStr=toCsv([row]);
   downloadCsv(csvStr,(SF.meta.title||'survey')+'_response_'+respId+'.csv');
   if(ENDPOINT){
-    fetch(ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(row)})
+    // no-cors with a text/plain body: an application/json header triggers a
+    // CORS preflight that Google Apps Script never answers, so the POST is
+    // silently blocked in real deployments. Apps Script parses the body
+    // regardless of content type.
+    fetch(ENDPOINT,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:JSON.stringify(row)})
       .catch(function(){});
   }
   screen='thankyou';
@@ -596,15 +616,41 @@ function updateProgress(){
   var pct=document.getElementById('progPct');
   var title=document.getElementById('progTitle');
   if(!wrap)return;
-  // Honour the show-progress toggle and hide on single-page surveys, where a
-  // progress bar is meaningless.
+  // Honour the show-progress toggle. Multi-page surveys report page
+  // position; single-page surveys report answered visible questions so a
+  // long mobile survey still gives progress feedback.
   var showProg=!(R.header&&R.header.show_progress===false);
-  if(screen!=='survey'||!showProg||maxPage<=1){wrap.hidden=true;return;}
+  if(screen!=='survey'||!showProg){wrap.hidden=true;return;}
+  var p,label;
+  if(maxPage>1){
+    p=Math.round((currentPage/maxPage)*100);
+    label='Page '+currentPage+' of '+maxPage;
+  }else{
+    var total=0,done=0;
+    SF.items.forEach(function(item){
+      if(item.type==='section_break'||item.type==='text_block')return;
+      if(!isVisible(item.id))return;
+      total++;
+      if(item.type==='matrix'){
+        var rows=item.matrix_items||[];
+        var complete=rows.length>0&&rows.every(function(r){
+          var v=responses[item.id+'__'+r];
+          return v!=null&&v!=='';
+        });
+        if(complete)done++;
+      }else{
+        var v=responses[item.id];
+        if(v!=null&&v!=='')done++;
+      }
+    });
+    if(total===0){wrap.hidden=true;return;}
+    p=Math.round((done/total)*100);
+    label=done+' of '+total+' answered';
+  }
   wrap.hidden=false;
-  var p=Math.round((currentPage/maxPage)*100);
   if(bar)bar.style.width=p+'%';
   if(pct)pct.textContent=p+'%';
-  if(title)title.textContent='Page '+currentPage+' of '+maxPage;
+  if(title)title.textContent=label;
 }
 function renderWelcome(){
   var el=document.getElementById('app');

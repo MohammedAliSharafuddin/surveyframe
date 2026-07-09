@@ -47,3 +47,9 @@
 ^\.\~lock\..*$
 ^review_032_functions\.R$
 ^vignettes/[^/]+\.html$
+^tests/testthat/fixtures/aic_rsam_pilot\.sframe$
+^tests/testthat/test-aic-rsam-fixture\.R$
+^tests/testthat/test-aic-rsam-branching\.R$
+^mas_review_032\.(md|qmd)$
+^mas_full_report\.html$
+^\.vscode($|/)
