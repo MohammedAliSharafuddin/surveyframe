@@ -565,9 +565,91 @@ Thirty minutes as a first-time user, no checklist in hand.
 
 ---
 
+## Part K — Vignettes (6 items)
+
+Added 2026-07-10: the 0.3.2 review's Part U (vignettes) was not revisited
+for 0.3.3, and this release changed the survey design, the report, and the
+collection path that the vignettes describe.
+
+```r
+browseVignettes("surveyframe")   # restart R first if this shows nothing
+```
+
+- [ ] K1 All vignettes list and open from `browseVignettes()` after a fresh
+  install (restart R if the list is empty; known session-staleness effect).
+- [ ] K2 The lead vignette (`surveyframe.Rmd`) knits cleanly from source
+  with the installed 0.3.3.
+- [ ] K3 Read the lead vignette end to end: no prose or screenshot
+  contradicts the Theme B survey design, and analysis output claims match
+  what 0.3.3 actually prints (including the new `$table` output).
+- [ ] K4 The deployment vignette's Google Sheets instructions match the
+  0.3.3 collector: no manual CORS patching mentioned or needed, and no
+  reference to section-break columns.
+- [ ] K5 Decide and record: should the lead vignette gain a short
+  `plots = TRUE` example now, or in the 0.3.4 breadth patch? Either way,
+  log the decision in dogfeed.todo.md.
+- [ ] K6 No vignette prose violates the writing rules (em-dashes,
+  semicolons, banned words).
+
+---
+
+## Part L — Shiny renderer and dashboard (4 items)
+
+Added 2026-07-10: Theme B restyled the static HTML export only. The Shiny
+survey module (`render_survey()` / `survey_module_ui()`) has its own
+renderer, and the dashboard has its own charts; neither was touched in
+0.3.3.
+
+```r
+demo <- sframe_demo_data()
+render_survey(demo$instrument)       # Shiny renderer
+launch_dashboard()                   # bundled demo dashboard
+```
+
+- [ ] L1 The Shiny renderer still works for every item type (it predates
+  Theme B; confirm nothing broke even though it looks different).
+- [ ] L2 Record the known divergence: the Shiny renderer does not carry the
+  Theme B design. Confirm it is logged (dogfeed.todo.md / roadmap builder
+  rework track) with a decision on when it converges.
+- [ ] L3 `launch_dashboard()` panels all render with the bundled demo, and
+  the Items panel copes with a ranking item's data.
+- [ ] L4 SurveyStudio end to end with the bundled sample (load sample
+  button): preview, upload, quality, reliability, analysis plan, export
+  screens all function after the 0.3.3 changes.
+
+---
+
+## Part M — Response pipeline round trip (4 items)
+
+Added 2026-07-10: the ranking export change altered the data shape, and the
+0.3.2 review's pipeline parts (J to M) assumed the old single-column form.
+
+```r
+demo <- sframe_input_types_demo_data()
+resp <- read_responses(demo$responses_path, demo$instrument,
+                       respondent_id = "respondent_id",
+                       submitted_at  = "submitted_at",
+                       meta_cols     = "started_at")
+```
+
+- [ ] M1 The bundled demo responses (legacy single ranking column) still
+  read without errors: backwards compatibility holds.
+- [ ] M2 A fresh CSV downloaded from the 0.3.3 exported survey (with
+  `item__option` ranking columns) reads back through `read_responses()`
+  with no missing-column or undeclared-column warnings.
+- [ ] M3 `quality_report()`, `score_scales()`, and `reliability_report()`
+  all run on the fresh CSV; ranking columns pass through untouched (they
+  belong to no scale).
+- [ ] M4 The codebook and full report render from the fresh data; ranking
+  columns appear sensibly (one row per option column).
+
+---
+
 ## Sign-off
 
-Counts: Parts A-J, 88 checklist items.
+Counts: Parts A-M, 104 checklist items (88 original, B9-B10 added with the
+Part B rework, K1-K6, L1-L4, and M1-M4 added 2026-07-10 from the 0.3.2
+review's uncovered areas).
 
 **Reviewed by:**  
 **Date signed off:**  

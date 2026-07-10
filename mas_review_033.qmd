@@ -1,0 +1,669 @@
+---
+title: "MAS Review - surveyframe 0.3.3"
+format:
+  html:
+    toc: true
+    toc-depth: 2
+    embed-resources: true
+    code-fold: false
+execute:
+  echo: true
+  warning: true
+  error: true
+  eval: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = '#>')
+```
+
+**Reviewer:** Mohammed Ali Sharafuddin\
+**Date created:** 2026-07-10\
+**Version under review:** 0.3.3 (tagged v0.3.3, pushed to both remotes, not yet on CRAN)\
+**Purpose:** Human verification of everything that changed in 0.3.3 before win-builder and CRAN submission, plus the 0.3.2 review areas this release touched again (vignettes, the Shiny surfaces, and the response pipeline). Machine verification (519 automated tests, headless browser drives, R CMD check clean) is done; this checklist is the human pass the machine cannot do.
+
+This is the runnable companion to `mas_review_033.md`. Every chunk is
+self-contained: work top to bottom in a fresh RStudio session and run each
+chunk with Ctrl+Shift+Enter. Chunks that launch an app, open a browser, or
+need your Google account are marked in their text. Rendering the whole file
+executes nothing (`eval: false` globally); execution is chunk-by-chunk on
+purpose.
+
+------------------------------------------------------------------------
+
+## Prerequisites
+
+- [ ] RStudio open with a clean R session (restart R first).
+- [ ] Chrome or Firefox available.
+- [ ] `devtools`, `remotes`, `ggplot2`, `psych`, `lavaan`, `seminr`, `googlesheets4`, `shiny`, and `quarto` are installed.
+- [ ] Internet access (GitHub install, Google Sheets read-back).
+- [ ] Optional but recommended: a physical phone on the same network for Part C.
+
+```{r chunk-00}
+for (p in c("devtools", "remotes", "ggplot2", "psych", "lavaan",
+            "seminr", "googlesheets4", "shiny")) {
+  cat(sprintf("%-14s %s\n", p, requireNamespace(p, quietly = TRUE)))
+}
+```
+
+------------------------------------------------------------------------
+
+## Part A — Installation and metadata (6 items)
+
+### Step A1 — Install the tagged release from GitHub
+
+```{r chunk-01, eval=FALSE}
+if (!requireNamespace("remotes", quietly = TRUE)) install.packages("remotes")
+remotes::install_github("MohammedAliSharafuddin/surveyframe@v0.3.3",
+                        force = TRUE)
+```
+
+Restart R after the install, then confirm:
+
+```{r chunk-02}
+packageVersion("surveyframe")
+# Expected: '0.3.3'
+```
+
+- [ ] A1.1 Installation completes with no errors or warnings.
+- [ ] A1.2 `packageVersion()` reports 0.3.3.
+
+### Step A2 — Release metadata reads correctly
+
+```{r chunk-03}
+news(package = "surveyframe")
+citation("surveyframe")
+```
+
+- [ ] A2.1 The 0.3.3 NEWS entry leads and reads as ONE release covering the plotting layer, the field-deployment fixes, and the survey redesign. No separate 0.3.4 heading, no raw markdown table anywhere in the file, and the analysis content comes first.
+- [ ] A2.2 The prose contains no em-dashes, semicolons, "not X but Y" constructions, or banned words, and uses UK spellings.
+- [ ] A2.3 `citation("surveyframe")` shows version 0.3.3.
+- [ ] A2.4 The LICENSE file at the public repo root is the two-line CRAN template (`YEAR:` / `COPYRIGHT HOLDER:`), with the full MIT text in LICENSE.md only.
+
+------------------------------------------------------------------------
+
+## Part B — Branching engine fixes (10 items)
+
+### Step B1 — Two-rule cascade instrument
+
+The instrument mirrors the eligibility cascade that drove the fixes. The
+export opens in your browser; click through it there.
+
+```{r chunk-04}
+library(surveyframe)
+yn  <- sf_choices("yn", c("yes","no"), c("Yes","No"))
+q1  <- sf_item("q1", "Are you 18 or older?", type = "single_choice",
+               choice_set = "yn", required = TRUE)
+q2  <- sf_item("q2", "Did you order room service?", type = "single_choice",
+               choice_set = "yn", required = TRUE)
+q3  <- sf_item("q3", "How many times?", type = "single_choice",
+               choice_set = "yn", required = FALSE)
+b1  <- sf_branch("q2", depends_on = "q1", operator = "==", value = "yes",
+                 action = "show")
+b2  <- sf_branch("q3", depends_on = "q1", operator = "==", value = "yes",
+                 action = "show")
+b3  <- sf_branch("q3", depends_on = "q2", operator = "==", value = "yes",
+                 action = "show")
+instr_b <- sf_instrument("Branch check",
+                         components = list(yn, q1, q2, q3, b1, b2, b3))
+export_static_survey(instr_b,
+                     output_path = file.path(tempdir(), "branch.html"),
+                     open = TRUE, overwrite = TRUE)
+```
+
+- [ ] B1 On load, only q1 is visible.
+- [ ] B2 Answer q1 = Yes: q2 appears; q3 stays hidden (its second rule is unmet). This is the multi-rule AND fix; 0.3.2 would have shown q3 here.
+- [ ] B3 Answer q2 = Yes: q3 appears.
+- [ ] B4 Change q1 to No: q2 AND q3 both disappear, even though q2 still holds a stale Yes. This is the cascade fix; 0.3.2 kept q3 visible.
+- [ ] B5 Change q1 back to Yes: q2 and q3 return with their earlier answers still selected.
+- [ ] B6 With q1 = No, submit: no required-field error blocks the hidden questions, and the thank-you screen appears.
+- [ ] B7 The downloaded CSV contains columns only for q1/q2/q3 plus the metadata columns, and no section-break columns.
+- [ ] B8 Nothing in the flow feels laggy or flickers when visibility changes.
+
+### Step B2 — Complex walkthrough: numeric coding and a screen-out message
+
+From the review feedback: numeric-coded choice values (so the CSV needs no
+recoding in R) and a screen-out message shown when the gate fails, built
+from a branched `text_block`.
+
+```{r chunk-05}
+library(surveyframe)
+yn2  <- sf_choices("yn2", 1:2, c("Yes","No"))       # numeric values, text labels
+freq <- sf_choices("freq", 1:4,
+                   c("Never","Once","Two or three times","Weekly"))
+g1 <- sf_item("g1", "Are you 18 or older?", type = "single_choice",
+              choice_set = "yn2", required = TRUE)
+so <- sf_item("screen_out",
+              "Sorry. You should be above 18 to participate in this survey.",
+              type = "text_block")
+g2 <- sf_item("g2", "Did you order room service?", type = "single_choice",
+              choice_set = "yn2", required = TRUE)
+g3 <- sf_item("g3", "How often did you order?", type = "single_choice",
+              choice_set = "freq", required = FALSE)
+r_so <- sf_branch("screen_out", depends_on = "g1", operator = "==",
+                  value = "2", action = "show")     # value 2 = "No"
+r_g2 <- sf_branch("g2", depends_on = "g1", operator = "==", value = "1",
+                  action = "show")
+r_g3a <- sf_branch("g3", depends_on = "g1", operator = "==", value = "1",
+                   action = "show")
+r_g3b <- sf_branch("g3", depends_on = "g2", operator = "==", value = "1",
+                   action = "show")
+instr_b2 <- sf_instrument("Branch check 2",
+  components = list(yn2, freq, g1, so, g2, g3, r_so, r_g2, r_g3a, r_g3b))
+export_static_survey(instr_b2,
+                     output_path = file.path(tempdir(), "branch2.html"),
+                     open = TRUE, overwrite = TRUE)
+```
+
+- [ ] B9 Answering g1 = No shows the screen-out message block and hides g2/g3; answering Yes hides the message and reveals the chain.
+- [ ] B10 The downloaded CSV stores numeric codes (1/2 for g1 and g2, 1 to 4 for g3), analysable in R without recoding.
+
+------------------------------------------------------------------------
+
+## Part C — Theme B survey design (18 items)
+
+### Step C1 — Desktop pass
+
+```{r chunk-06}
+library(surveyframe)
+demo <- sframe_input_types_demo_data()
+export_static_survey(demo$instrument,
+                     output_path = file.path(tempdir(), "themeb.html"),
+                     open = TRUE, overwrite = TRUE)
+```
+
+- [ ] C1 Welcome screen: serif title, intro text, tinted consent box, and a full-width start button in the theme colour. The branded header (logo or study name, no decorative dot) shows above.
+- [ ] C2 Question text is serif and clearly larger than body text; help text is italic; the required marker is a small theme-coloured asterisk.
+- [ ] C3 Single-choice options are bordered cards with A/B/C key chips; the selected card shows a tinted background, a theme border, a filled chip, and a right-side tick.
+- [ ] C4 Multiple-choice cards behave the same and allow several selections.
+- [ ] C5 Likert items are numbered squares with small labels underneath; the selected square fills with the theme colour and its number turns white.
+- [ ] C6 Short text/number/date inputs are underline style; the underline turns the theme colour on focus. The textarea keeps a boxed style. The numeric nights question refuses values below 0 and above 365 (typed values clamp).
+- [ ] C7 Star rating: large stars, theme colour when active, subtle grow on hover.
+- [ ] C8 Matrix (tinted header row, horizontal rules, hover highlight), slider (card container, large serif value, both end labels visible including 0), and ranking (option-card rows with theme rank badges) all carry the Theme B design.
+- [ ] C9 Section breaks show the short theme-coloured rule above a serif heading with italic intro.
+- [ ] C10 The sticky top bar shows the progress line, a label, and the percentage, with no dash or duplicated page counter. On a single-page survey the label counts answered questions and updates as you answer.
+
+### Step C2 — Theme colour selector
+
+```{r chunk-07}
+demo2 <- sframe_input_types_demo_data()
+demo2$instrument$render$theme <- "#7c3aed"   # any colour you like
+export_static_survey(demo2$instrument,
+                     output_path = file.path(tempdir(), "themeb2.html"),
+                     open = TRUE, overwrite = TRUE)
+```
+
+- [ ] C11 Every accent re-tints from the one colour: progress bar, chips, selected cards, Likert fills, rank badges, stars, buttons, focus states. No element kept the old colour.
+- [ ] C12 Repeat once from the SurveyBuilder's Settings colour picker (launch_builder, change the theme colour, Export survey) and confirm the exported file matches the picked colour.
+
+### Step C3 — Phone pass (real device if possible)
+
+Serve the exported file and open it on the phone, or use browser device
+mode at 390 x 844:
+
+```{r chunk-08, eval=FALSE}
+# In a terminal, from the folder holding themeb.html:
+#   python3 -m http.server 8000
+# then open http://<your-ip>:8000/themeb.html on the phone.
+tempdir()    # the folder holding the exports from the chunks above
+```
+
+- [ ] C13 No horizontal scrolling anywhere.
+- [ ] C14 Option cards and Likert squares are comfortably tappable with a thumb; no mis-taps on adjacent options.
+- [ ] C15 The on-screen keyboard does not permanently cover a focused text input.
+- [ ] C16 A logo set in the header keeps a stable box: try one wide and one tall logo and confirm the study name does not jump horizontally.
+- [ ] C17 Conversational mode (chunk below): one question per page, a "Question X of Y" eyebrow with no dash line, the study title in the sticky bar, and working Back/Next.
+- [ ] C18 Overall judgement: the survey looks like the approved Theme B mock, and you would be happy sending this to a respondent today.
+
+```{r chunk-09}
+demo3 <- sframe_input_types_demo_data()
+demo3$instrument$render$mode <- "conversational"
+export_static_survey(demo3$instrument,
+                     output_path = file.path(tempdir(), "themeb_conv.html"),
+                     open = TRUE, overwrite = TRUE)
+```
+
+------------------------------------------------------------------------
+
+## Part D — SurveyBuilder fixes (10 items)
+
+This part is manual clicking; the chunk only launches the builder.
+
+```{r chunk-10, eval=FALSE}
+surveyframe::launch_builder()
+```
+
+- [ ] D1 Empty canvas shows accessible CTA buttons at 44px minimum: a filled "+ Add your first question" and outlined "Open an existing .sframe" / "Set up survey settings", all clearly readable against the dark sidebar.
+- [ ] D2 Open a `.sframe` saved by R or by the builder: the toast reports "integrity verified (sha256 ...)". A file edited by hand in a text editor reports an integrity mismatch instead. (Known: the Preview tab still shows the old simplified design; Export survey and SurveyStudio carry Theme B. The Preview restyle is scheduled in the 0.3.4 builder rework.)
+- [ ] D3 Select a Section item: the inspector labels its text field "Section header" (a Text block reads "Block text"); ordinary questions still read "Question text".
+- [ ] D4 Add a Multiple choice question, edit its choices to something distinctive, then add another Multiple choice question: the new one gets a fresh Option 1/2/3 set.
+- [ ] D5 Edit the choices of a choice question that shares its set with another question: the other question's choices are untouched (the set forks).
+- [ ] D6 Analyse tab, Add Analysis Plan, Pearson correlation: pick the same variable for X and Y. The modal blocks it and Save stays disabled until fixed.
+- [ ] D7 Suggestion box with one Likert item and one numeric item suggests Spearman correlation (never Mann-Whitney).
+- [ ] D8 A single-choice item with more than two categories plus a numeric outcome suggests Kruskal-Wallis; a two-category grouping stays Mann-Whitney.
+- [ ] D9 Known and accepted: the Preview tab lags Theme B until the 0.3.4 builder rework. Confirm it is logged and does not block submission.
+- [ ] D10 Export survey and Generate collector still download files without errors after all the above.
+
+------------------------------------------------------------------------
+
+## Part E — Model syntax fixes (7 items)
+
+### Step E1 — Label sanitisation
+
+```{r chunk-11}
+library(surveyframe)
+con1 <- sf_construct("SAT", "Satisfaction", paste0("sat_", 1:3))
+con2 <- sf_construct("LOY", "Loyalty", paste0("loy_", 1:3))
+m <- sf_model("m1", "Labelled", type = "cb_sem",
+              constructs = list(con1, con2),
+              paths = list(sf_path("SAT", "LOY",
+                                   "H1: SAT positively influences LOY")))
+cat(sem_lavaan_syntax(m))
+```
+
+- [ ] E1 The structural line reads `LOY ~ H1*SAT`. The free-text label was reduced to the `H1` tag; no spaces or colons appear in the parameter.
+
+```{r chunk-12}
+# lavaanify() takes the generated syntax STRING, never the model object
+pt <- lavaan::lavaanify(sem_lavaan_syntax(m))
+head(pt[, c("lhs", "op", "rhs", "label")], 10)
+```
+
+- [ ] E2 The call parses with no warnings about identifiers with spaces, and the `label` column shows `H1` on the structural row.
+
+### Step E2 — seminr syntax runs as generated
+
+```{r chunk-13}
+pls <- sf_model("p1", type = "pls_sem",
+  constructs = list(
+    sf_construct("SAT", "Satisfaction", paste0("sat_", 1:3),
+                 mode = "composite"),
+    sf_construct("LOY", "Loyalty", "loy_1", mode = "single_item")),
+  paths = list(sf_path("SAT", "LOY")))
+cat(seminr_syntax(pls, nboot = 50))
+```
+
+- [ ] E3 The generated code includes `library(seminr)` after the check_installed line.
+- [ ] E4 The assessment tail uses `summary(pls_model)` accessors (`$reliability`, `$validity$htmt`, bootstrapped paths). No `reliability()`/`ave()`/`htmt()` calls.
+
+```{r chunk-14}
+# E5: run the generated block exactly as produced, against simulated data
+# named `data` (the generated code's default data name)
+set.seed(42)
+data <- as.data.frame(matrix(sample(1:5, 120 * 4, replace = TRUE),
+                             nrow = 120,
+                             dimnames = list(NULL, c("sat_1", "sat_2",
+                                                     "sat_3", "loy_1"))))
+eval(parse(text = seminr_syntax(pls, nboot = 50)))
+summary(pls_model)$reliability
+```
+
+- [ ] E5 The generated block runs end to end with no "could not find function".
+
+```{r chunk-15}
+# E6: an analysis plan declaring method = "pls_sem" (the model-type
+# spelling) resolves to the seminr syntax runner
+cs  <- sf_choices("ag5", 1:5,
+                  c("Strongly disagree", "Disagree", "Neutral",
+                    "Agree", "Strongly agree"))
+its <- lapply(c("sat_1", "sat_2", "sat_3", "loy_1"), function(id)
+  sf_item(id, paste("Item", id), type = "likert", choice_set = "ag5"))
+instr_e <- sf_instrument("PLS alias check",
+                         components = c(list(cs), its))
+instr_e <- add_model(instr_e, pls)
+instr_e$analysis_plan <- list(list(
+  id = "RQ_pls", research_question = "Does satisfaction predict loyalty?",
+  family = "measurement", method = "pls_sem",
+  roles = list(model = "p1"), options = list(alpha = 0.05)))
+res_e <- run_analysis_plan(cbind(respondent_id = paste0("R", 1:120),
+                                 submitted_at = as.character(Sys.time()),
+                                 data),
+                           instr_e, scored = FALSE)
+cat("error:", res_e[[1]]$error %||% "none", "\n")
+cat(substr(res_e[[1]]$syntax, 1, 120), "...\n")
+```
+
+- [ ] E6 `method = "pls_sem"` returns the seminr syntax rather than "Test 'pls_sem' is unavailable".
+- [ ] E7 The Model Builder panel in the builder exports the same syntax through its Export syntax button (manual, with the builder open from Part D).
+
+------------------------------------------------------------------------
+
+## Part F — Google Sheets collection (9 items)
+
+### Step F1 — Static checks on the export and collector
+
+```{r chunk-16}
+library(surveyframe)
+demo_f <- sframe_input_types_demo_data()
+f_html <- file.path(tempdir(), "cors_check.html")
+export_static_survey(demo_f$instrument, output_path = f_html, open = FALSE,
+                     overwrite = TRUE,
+                     endpoint_url = "https://script.google.com/macros/s/X/exec")
+html <- paste(readLines(f_html, warn = FALSE), collapse = "\n")
+cat("no-cors present:      ", grepl("mode:'no-cors'", html, fixed = TRUE), "\n")
+cat("text/plain present:   ", grepl("'Content-Type':'text/plain'", html,
+                                    fixed = TRUE), "\n")
+cat("application/json gone:", !grepl("'Content-Type':'application/json'",
+                                     html, fixed = TRUE), "\n")
+
+gs <- export_google_sheet(demo_f$instrument,
+                          sheet_url = "https://docs.google.com/spreadsheets/d/demo",
+                          output_dir = tempdir())
+cols_line <- grep("EXPECTED_COLUMNS", readLines(gs), value = TRUE)[1]
+cat("sec_ columns gone:    ", !grepl("sec_", cols_line), "\n")
+cat("ranking expanded:     ", grepl("__", cols_line), "\n")
+```
+
+- [ ] F1 All five printed checks are TRUE.
+- [ ] F2 `EXPECTED_COLUMNS` contains no `sec_*` columns and expands ranking/matrix items to `item__` columns.
+
+### Step F2 — Live round trip (needs your Google account)
+
+- [ ] F3 Deploy the fresh collector to a scratch Google Sheet, host the exported survey over HTTP (not file://), submit one response, and confirm the row lands in the sheet. This proves the CORS fix in the field.
+
+```{r chunk-17, eval=FALSE}
+# Fill in your scratch sheet URL after deploying the collector
+sheet_url <- "PASTE-SHEET-URL"
+resp_f <- read_sheet_responses(sheet_url, demo_f$instrument)
+head(resp_f)
+resp_f2 <- read_sheet_responses(sheet_url, demo_f$instrument,
+                                meta_cols = c("extra1"))
+```
+
+- [ ] F4 `read_sheet_responses()` returns the submitted row with correct values.
+- [ ] F5 The `meta_cols` variant accepts an extra sheet column without the undeclared-column warning.
+- [ ] F6 SurveyStudio, Upload screen, Google Sheet card: the same sheet imports, and the completion time card shows a median.
+- [ ] F7 Live AIC-RSAM read-back (read-only, own account): `read_sheet_responses()` on the live sheet returns the real responses cleanly. Do NOT submit test data to the live endpoint.
+- [ ] F8 Decision recorded: re-export and republish the live AIC-RSAM survey mid-collection (CORS fix + Theme B), or leave the hand-patched deployment until collection ends.
+- [ ] F9 The deploy kit lives in AI_Room_service/surveyframe_Integration/deploy_kit and its README says so.
+
+------------------------------------------------------------------------
+
+## Part G — Visualisation foundation (12 items)
+
+### Step G1 — Plots on the bundled demo
+
+```{r chunk-18}
+library(surveyframe)
+library(ggplot2)
+demo_g <- sframe_demo_data()
+resp_g <- read_responses(demo_g$responses_path, demo_g$instrument,
+                         respondent_id = "respondent_id",
+                         submitted_at  = "submitted_at",
+                         meta_cols     = "started_at")
+res_g <- run_analysis_plan(resp_g, demo_g$instrument, plots = TRUE)
+ggplot(mtcars, aes(wt, mpg)) + geom_point() + theme_surveyframe()
+```
+
+```{r chunk-19}
+# Show every plot the plan produced, one after another
+for (r in res_g) {
+  if (!is.null(r$plot)) {
+    cat("\n---", r$block_id %||% "", "-", r$test %||% "", "---\n")
+    print(r$plot)
+  }
+}
+```
+
+- [ ] G1 `theme_surveyframe()` renders branded: ink text, quiet grids, bottom legend.
+- [ ] G2 A frequency block's plot is a horizontal teal bar chart with no bar for missing values.
+- [ ] G3 A chi-square/cross-tab plot is a dodged bar chart in the fixed series order (teal, amber, blue, pink, violet) with white gaps and a bottom legend.
+- [ ] G4 A correlation plot is a scatter with an ink regression line, a shaded band, and the APA string as subtitle.
+- [ ] G5 A regression plot shows predictor vs outcome (one predictor) or observed vs fitted with a dashed identity line (several predictors).
+
+```{r chunk-20}
+# G6/G7/G8: nulls, defaults, and tables
+sapply(res_g, function(r) c(test = r$test %||% "",
+                            has_plot = !is.null(r$plot),
+                            has_table = !is.null(r$table)))
+res_off <- run_analysis_plan(resp_g, demo_g$instrument)   # plots = FALSE
+cat("plots when off:", sum(!sapply(res_off, function(r) is.null(r$plot))),
+    "(expect 0)\n")
+for (r in res_off) {
+  if (is.data.frame(r$table)) {
+    cat("\n---", r$block_id %||% "", "---\n")
+    print(knitr::kable(r$table))
+  }
+}
+```
+
+- [ ] G6 Block types outside the family have `$plot = NULL` and no error.
+- [ ] G7 With the default `plots = FALSE` no block carries a plot.
+- [ ] G8 Correlation tables are one statistic row; regression tables are coefficient tables; t-test tables are two-row group summaries. All print through `kable()`.
+
+```{r chunk-21}
+# G9: the report picks the tables up automatically
+out_g <- file.path(tempdir(), "report_g.html")
+render_report(demo_g$instrument, resp_g, output_file = out_g)
+utils::browseURL(out_g)
+```
+
+```{r chunk-22}
+# G10: empty strings count as missing, never as a category
+df <- data.frame(respondent_id = paste0("R", 1:10),
+                 submitted_at  = as.character(Sys.time()),
+                 gender = c("m", "f", "", "m", "", "f", "m", "f", "m", ""),
+                 member = c("yes", "", "no", "yes", "no",
+                            "yes", "", "no", "yes", "no"),
+                 stringsAsFactors = FALSE)
+cs_g  <- sf_choices("mf", c("m", "f"), c("Male", "Female"))
+yn_g  <- sf_choices("yn", c("yes", "no"), c("Yes", "No"))
+i1_g  <- sf_item("gender", "Gender?", type = "single_choice", choice_set = "mf")
+i2_g  <- sf_item("member", "Member?", type = "single_choice", choice_set = "yn")
+instr_g <- sf_instrument("Empty strings",
+                         components = list(cs_g, yn_g, i1_g, i2_g),
+                         analysis_plan = list(
+  list(id = "Q1", research_question = "Distribution of gender",
+       family = "descriptive", method = "frequency",
+       roles = list(variable = "gender")),
+  list(id = "Q2", research_question = "Gender by membership",
+       family = "categorical", method = "chi_square",
+       roles = list(row = "gender", column = "member"))))
+res_es <- run_analysis_plan(df, instr_g, scored = FALSE)
+print(res_es[[1]]$table)     # frequency: NA counted, no "" row
+print(res_es[[2]]$table)     # crosstab: no unnamed category
+```
+
+- [ ] G9 The rendered report shows the result tables in the analysis sections.
+- [ ] G10 Neither table shows a blank or unnamed category for the empty strings.
+- [ ] G11 Eyeball the plots at 150 percent zoom: fonts legible, no clipped labels.
+- [ ] G12 Optional: without ggplot2 installed, `plots = TRUE` fails with the friendly check_installed prompt and everything else works.
+
+------------------------------------------------------------------------
+
+## Part H — Report checks (6 items)
+
+```{r chunk-23}
+# A small instrument with a reliability block and a CFA syntax block, so
+# the report exercises both new analysis-section renderings
+library(surveyframe)
+cs_h <- sf_choices("ag5", 1:5,
+                   c("Strongly disagree", "Disagree", "Neutral",
+                     "Agree", "Strongly agree"))
+items_h <- lapply(paste0("sat_", 1:4), function(id)
+  sf_item(id, paste("Satisfaction item", id), type = "likert",
+          choice_set = "ag5", scale_id = "sat", required = TRUE))
+scale_h <- sf_scale("sat", "Satisfaction", paste0("sat_", 1:4),
+                    method = "mean")
+model_h <- sf_model("cfa1", "Satisfaction CFA", type = "cfa",
+                    constructs = list(
+                      sf_construct("sat", "Satisfaction",
+                                   paste0("sat_", 1:4))))
+instr_h <- sf_instrument("Report check",
+  components = c(list(cs_h), items_h, list(scale_h)),
+  models = list(model_h),
+  analysis_plan = list(
+    list(id = "RQ1", research_question = "Is the scale reliable?",
+         family = "measurement", method = "reliability_alpha",
+         roles = list(items = paste0("sat_", 1:4))),
+    list(id = "RQ2", research_question = "Does the CFA syntax generate?",
+         family = "measurement", method = "cfa_lavaan_syntax",
+         roles = list(model = "cfa1"))))
+set.seed(7)
+dat_h <- as.data.frame(matrix(sample(1:5, 60 * 4, replace = TRUE), 60,
+                              dimnames = list(NULL, paste0("sat_", 1:4))))
+dat_h <- cbind(respondent_id = paste0("R", 1:60),
+               submitted_at = as.character(Sys.time()), dat_h)
+out_h <- file.path(tempdir(), "report_h.html")
+render_report(instr_h, dat_h, output_file = out_h)
+utils::browseURL(out_h)
+```
+
+- [ ] H1 The RQ2 section prints the full CFA syntax in a monospaced code block.
+- [ ] H2 The RQ1 section renders a compact per-scale alpha table instead of an empty "Result:" line.
+- [ ] H3 The reliability section's "Omega h" and "Omega total" headers do not wrap mid-word.
+- [ ] H4 View the report at 1280 x 720: headings, tables, and plots readable from presentation distance.
+- [ ] H5 The references show italic journal names (no literal asterisks).
+- [ ] H6 The TOC navigates correctly to every section.
+
+------------------------------------------------------------------------
+
+## Part I — Release safety (8 items)
+
+Run these from the surveyframe-dev checkout in a terminal, not from this
+document:
+
+```{r chunk-24, eval=FALSE}
+# devtools::test()                    # expect 519 in the dev checkout
+# system("R CMD build .")
+# system("R CMD check --as-cran surveyframe_0.3.3.tar.gz")
+# system("tar -tzf surveyframe_0.3.3.tar.gz | grep -E 'mas_|dogfeed|roadmap|aic_rsam|CODE_OF|SECURITY'")  # expect empty
+# system("git describe --tags")       # v0.3.3
+# system("git ls-remote origin refs/heads/main refs/tags/v0.3.3")
+# system("git ls-remote public refs/heads/main refs/tags/v0.3.3")
+```
+
+- [ ] I1 Full suite passes (519 in the dev checkout).
+- [ ] I2 `R CMD check --as-cran` on the fresh tarball: 0 errors, 0 warnings, at most the incoming-feasibility NOTE.
+- [ ] I3 The tarball contains no dev files (the grep above returns nothing).
+- [ ] I4 The vignette builds offline.
+- [ ] I5 `git describe --tags` on main says v0.3.3 and the tag includes the review fixes.
+- [ ] I6 Public and private remotes agree on main and the tag.
+- [ ] I7 Win-builder R-release and R-devel both return Status OK.
+- [ ] I8 `cran-comments.md` carries the local and win-builder results and notes ggplot2 in Suggests only.
+
+------------------------------------------------------------------------
+
+## Part J — Fresh-eyes UX pass (4 items)
+
+Thirty minutes as a first-time user, no checklist in hand.
+
+- [ ] J1 Take a survey end to end on your phone as a respondent. Note anything off in dogfeed.todo.md rather than fixing on the spot.
+- [ ] J2 Build a five-question instrument in the builder from scratch, export, open the export. Anything confusing goes to dogfeed.todo.md.
+- [ ] J3 Read the 0.3.3 NEWS entry once more as a stranger: is it clear what changed and why it matters?
+- [ ] J4 Confirm dogfeed.todo.md's "After this session" and deferred items still reflect reality.
+
+------------------------------------------------------------------------
+
+## Part K — Vignettes (6 items)
+
+Added 2026-07-10: the 0.3.2 review's Part U (vignettes) was not revisited
+for 0.3.3, and this release changed the survey design, the report, and the
+collection path the vignettes describe.
+
+```{r chunk-25}
+browseVignettes("surveyframe")   # restart R first if this shows nothing
+```
+
+```{r chunk-26, eval=FALSE}
+# Knit the lead vignette from the dev checkout
+rmarkdown::render("vignettes/surveyframe.Rmd", output_dir = tempdir())
+```
+
+- [ ] K1 All vignettes list and open from `browseVignettes()` after a fresh install.
+- [ ] K2 The lead vignette knits cleanly with the installed 0.3.3.
+- [ ] K3 No vignette prose or screenshot contradicts the Theme B design, and analysis output claims match what 0.3.3 prints (including `$table`).
+- [ ] K4 The deployment vignette's Google Sheets instructions match the 0.3.3 collector: no CORS patching, no section-break columns.
+- [ ] K5 Decide and record (dogfeed.todo.md): a `plots = TRUE` example in the lead vignette now, or in the 0.3.4 breadth patch?
+- [ ] K6 No vignette prose violates the writing rules.
+
+------------------------------------------------------------------------
+
+## Part L — Shiny renderer and dashboard (4 items)
+
+Added 2026-07-10: Theme B restyled the static HTML export only. The Shiny
+survey module has its own renderer and the dashboard its own charts;
+neither was touched in 0.3.3.
+
+```{r chunk-27, eval=FALSE}
+demo_l <- sframe_demo_data()
+render_survey(demo_l$instrument)       # Shiny renderer; Ctrl+C / Stop to end
+```
+
+```{r chunk-28, eval=FALSE}
+launch_dashboard()                     # bundled demo dashboard
+```
+
+- [ ] L1 The Shiny renderer still works for every item type (it predates Theme B; confirm nothing broke).
+- [ ] L2 The divergence is recorded: the Shiny renderer does not carry Theme B; convergence is scheduled with the 0.3.4 builder rework.
+- [ ] L3 `launch_dashboard()` panels all render with the bundled demo, including the ranking item's data.
+- [ ] L4 SurveyStudio end to end with the bundled sample: preview, upload, quality, reliability, analysis plan, and export screens all function.
+
+------------------------------------------------------------------------
+
+## Part M — Response pipeline round trip (4 items)
+
+Added 2026-07-10: the ranking export change altered the data shape; the
+0.3.2 review's pipeline parts assumed the old single-column form.
+
+```{r chunk-29}
+library(surveyframe)
+demo_m <- sframe_input_types_demo_data()
+# M1: the bundled CSV still uses the legacy single ranking column
+resp_m <- read_responses(demo_m$responses_path, demo_m$instrument,
+                         respondent_id = "respondent_id",
+                         submitted_at  = "submitted_at",
+                         meta_cols     = "started_at")
+str(resp_m[, grep("ranking", colnames(resp_m)), drop = FALSE])
+```
+
+```{r chunk-30}
+# M2/M3: a fresh CSV downloaded from the Theme B export (Part C) with
+# item__option ranking columns. Point csv_path at the downloaded file.
+csv_path <- file.path(path.expand("~"), "Downloads",
+                      list.files(file.path(path.expand("~"), "Downloads"),
+                                 pattern = "_response_.*\\.csv$")[1])
+csv_path
+resp_new <- read_responses(csv_path, demo_m$instrument,
+                           respondent_id = "respondent_id",
+                           meta_cols     = "started_at")
+colnames(resp_new)[grep("__", colnames(resp_new))]
+qr_m <- quality_report(resp_new, demo_m$instrument,
+                       respondent_id = "respondent_id")
+sc_m <- score_scales(resp_new, demo_m$instrument)
+rr_m <- reliability_report(resp_new, demo_m$instrument)
+```
+
+- [ ] M1 The bundled legacy responses read without errors: backwards compatibility holds.
+- [ ] M2 The fresh CSV (with `item__option` ranking columns) reads back with no missing-column or undeclared-column warnings.
+- [ ] M3 `quality_report()`, `score_scales()`, and `reliability_report()` all run on the fresh CSV.
+- [ ] M4 The codebook and full report render from the fresh data; ranking columns appear sensibly.
+
+```{r chunk-31}
+out_m <- file.path(tempdir(), "report_m.html")
+render_report(demo_m$instrument, resp_new, output_file = out_m)
+utils::browseURL(out_m)
+```
+
+------------------------------------------------------------------------
+
+## Sign-off
+
+Counts: Parts A-M, 104 checklist items (88 original, B9-B10 added with the
+Part B rework, K1-K6, L1-L4, and M1-M4 added 2026-07-10 from the 0.3.2
+review's uncovered areas).
+
+**Reviewed by:**\
+**Date signed off:**\
+**All steps complete:**\
+**Notes for the developer (if any):**
+
+Once signed off, paste the following prompt into Claude Code to proceed:
+
+```
+Read CLAUDE.md and mas_review_033.md. The MAS review of 0.3.3 is complete
+and signed off. Rebuild the tarball if anything changed, confirm
+R CMD check --as-cran is 0 errors, 0 warnings, at most 1 NOTE, update
+cran-comments.md with the local and win-builder results, and give me the
+text to paste on the CRAN submission form.
+```
