@@ -64,6 +64,15 @@ news(package = "surveyframe")
   regressed once from a GitHub-web edit; confirm it stayed fixed.
 Feedback: 
 A2.1 The NEWS is way too comprehensive than what is actually needed. A first time reader wont know what is AIC-RSAM room-service study. So, proofread the NEWS in the package. Keep only the release related information which will be needed for readers for this release. There is also a raw markdown table that is not readable when opened in Rstudio. The extended analysis plan should be moved a bit earlier. Anyway, all the progress information should be recorded in the dev repo in either a separate markedown file or in the progress.  
+
+> **Response (Fable 5, 2026-07-10):** Done. The 0.3.3 NEWS entry is rewritten
+> reader-first: AIC-RSAM is now just "the package's first field deployment",
+> the verification narrative is removed, and the analysis-and-plotting
+> section leads the entry. The raw markdown table (it was in the old 0.3.0
+> dashboard entry) is now prose, and the two em-dashes in older entries are
+> gone. The full progress record stays in the dev repo (dogfeed.todo.md and
+> roadmap.md hold the detailed 0.3.3 story). Re-verify A2.1 after
+> reinstalling.
 ---
 
 ## Part B — Branching engine fixes (8 items)
@@ -111,6 +120,46 @@ export_static_survey(instr, output_path=file.path(tempdir(),"branch.html"),
 Feedback: the branching should have text to show the reason for example: Are you 18 or older?
 and when the answer is no should show a text message "Sorry. You should be above 18 to participate in this survey". The current sf_choices and sf_item exports the results as raw text. which may further need cleaning / renumbering to numerical values when moving forward with analysis in R. So, rewrite the instrument and exercise with the more complex walk through. 
 
+> **Response (Fable 5, 2026-07-10):** Both capabilities already exist by
+> composition; the walkthrough below demonstrates them. (1) Screen-out
+> messages: a `text_block` item with a branch rule shown when the gate
+> fails. (2) Numeric coding: `sf_choices` values can be numeric (`1:2`)
+> while labels stay human-readable, so the exported CSV holds numbers and
+> needs no recoding. Re-run Part B with this instrument instead:
+
+```r
+library(surveyframe)
+yn   <- sf_choices("yn", 1:2, c("Yes","No"))       # numeric values, text labels
+freq <- sf_choices("freq", 1:4,
+                   c("Never","Once","Two or three times","Weekly"))
+q1 <- sf_item("q1", "Are you 18 or older?", type="single_choice",
+              choice_set="yn", required=TRUE)
+so <- sf_item("screen_out",
+              "Sorry. You should be above 18 to participate in this survey.",
+              type="text_block")
+q2 <- sf_item("q2", "Did you order room service?", type="single_choice",
+              choice_set="yn", required=TRUE)
+q3 <- sf_item("q3", "How often did you order?", type="single_choice",
+              choice_set="freq", required=FALSE)
+b_so <- sf_branch("screen_out", depends_on="q1", operator="==", value="2",
+                  action="show")          # value 2 = "No"
+b_q2 <- sf_branch("q2", depends_on="q1", operator="==", value="1",
+                  action="show")
+b_q3a <- sf_branch("q3", depends_on="q1", operator="==", value="1",
+                   action="show")
+b_q3b <- sf_branch("q3", depends_on="q2", operator="==", value="1",
+                   action="show")
+instr <- sf_instrument("Branch check 2",
+  components=list(yn,freq,q1,so,q2,q3,b_so,b_q2,b_q3a,b_q3b))
+export_static_survey(instr, output_path=file.path(tempdir(),"branch2.html"),
+                     open=TRUE, overwrite=TRUE)
+```
+
+- [ ] B9 Answering q1 = No shows the screen-out message block and hides
+  q2/q3; answering Yes hides the message and reveals the chain.
+- [ ] B10 The downloaded CSV stores numeric codes (1/2 for q1 and q2, 1 to 4
+  for q3), analysable in R without recoding.
+
 Feedback and Feature Request: Enhancing sf_choices to address structural, dynamic, and non-linear limitations in choice sets
 Description: As the surveyframe ecosystem matures as a design-first, immutable framework for psychometric and survey modeling, the current schema for sf_choices presents several critical architecture bottlenecks. While a rigid key-value pairing enforces strict type integrity for upstream structural models, it restricts the package from handling complex, modern survey logic natively. Below is a breakdown of four primary limitations in the current choice set design, along with actionable architectural recommendations for the package development roadmap. Support for Nested and Hierarchical Structures (Cascading Choices)Current Limitation: sf_choices only accepts flat, one-dimensional vectors. It cannot handle relational or nested data structures natively. 
 The Issue: Implementing common patterns like cascading lookups (such as selecting a Country that dynamically filters a child choice set for State or Province) requires splitting logic into multiple disjointed items or handling it externally.Development Recommendation: Introduce a hierarchical mapping parameter, such as nested_choices() or an option to pass a relational data.frame into sf_choices(), allowing child items to automatically subscribe to parent item mutations.Implementation of Dynamic Text Evaluation and Value Piping
@@ -121,6 +170,32 @@ The Issue: Researchers building fractional factorial matrices or trade-off attri
 Current Limitation: Strict type alignment between choice sets and latent construct mappings causes analytical execution failures if non-interval values are present.The Issue: Mixing data types, such as using an arbitrary numeric flag like 99 for Prefer not to say or Don't Know inside a standard 1-to-5 integer Likert scale, corrupts automatic psychometric aggregation like Cronbach's alpha or CFA scoring unless stripped out manually.
 Development Recommendation: Introduce an explicit missing_codes argument directly within sf_choices() or add_item(). This would allow developers to designate specific labels as metadata bypasses, instructing upstream statistical models to automatically handle or drop these inputs during analysis pipeline execution.
 Read these recommendations carefully and decide whether to apply them in this release or note them down in future release. Check whether they are logical as per surverframe core idea and then decide carefully.
+
+> **Response (Fable 5, 2026-07-10):** Assessed against the core idea (a
+> pre-declared, immutable, integrity-hashed methodological contract) and
+> recorded in roadmap.md; none lands in 0.3.3 because all four are new
+> capability and this release is already feature-complete.
+>
+> 1. **`missing_codes` on `sf_choices()` — strongest fit, scheduled for
+>    v0.4.** Declaring "99 = prefer not to say" inside the contract is
+>    exactly what pre-declared analysis needs; today those codes silently
+>    corrupt alpha/CFA scoring. Fits v0.4's small-sample and inference
+>    theme.
+> 2. **DCE / conjoint (`sf_conjoint_design()`) — good fit, scheduled for
+>    v0.5.** A pre-declared design matrix feeding a pre-declared multinomial
+>    model is squarely inside the contract philosophy, and v0.5 is already
+>    the decision-methods release (MCDM and DEMATEL).
+> 3. **Cascading choice sets — partial fit, design note for v0.6+.**
+>    Hierarchies can be declared statically (a relational data frame is
+>    still a fixed contract), so this is admissible, but it touches the
+>    renderer, serialisation, hashing, and the builder at once and needs its
+>    own design document first.
+> 4. **Runtime piping/glue in labels — tension with the core idea.**
+>    Reactive label evaluation makes the rendered instrument depend on
+>    respondent state, which weakens the "one hashed instrument, one
+>    experience" guarantee. Recorded as a research question (a restricted,
+>    declarable token set like `{q_brand_name}` may be acceptable), not a
+>    commitment.
 ---
 
 ## Part C — Theme B survey design (18 items)
@@ -167,6 +242,28 @@ The How many nights did you stay?* Enter the number of nights. numerical selecti
 c8 - Needs improvement in design and theme. Apply the new design principles to it.
 c10 - There is a em dash in the sticky top bar. Remove it.
 The data export from feature_ranking should go in separate columns with numbering for further statistical analysis.
+
+> **Response (Fable 5, 2026-07-10):** All five applied.
+>
+> * C1: the header dot is removed entirely.
+> * Numeric bounds: numeric questions now honour `slider_min`/`slider_max`
+>   as hard minimum and maximum (typed values are clamped), and the bundled
+>   demo's nights question is bounded 0 to 365. Date questions have no
+>   bound mechanism yet; that is recorded for the builder rework patch.
+>   Numeric and date questions do not use `sf_choices` at all, which is why
+>   no choice set appeared for them.
+> * C8: matrix (horizontal rules, tinted header, hover rows), slider
+>   (card container, large serif value), and ranking (option-card rows with
+>   theme rank badges) are restyled to Theme B.
+> * C10: the decorative dash line was the eyebrow's underline element; it is
+>   removed, and standard mode no longer duplicates the page counter under
+>   the sticky bar at all.
+> * Ranking export: one column per option holding its rank
+>   (`item__option = 1` is the top choice), across the survey payload, the
+>   CSV, both collector generators, and `read_responses()`.
+>
+> Re-verify C1, C8, and C10 after reinstalling; ranking export is item B11
+> below in spirit and covered by G-part table checks.
 ### Theme colour selector
 
 ```r
@@ -245,6 +342,22 @@ D1: The empty canvas is not up to the WCAG 2.2 standards in terms of size, posit
 D2: I tried to load a older version of the surveyframe. The old design template appeared. Tried to build a fresh one. Still the old template is there. The new design principles are not available. 
 The Add Question button adds Agreement item 1 by default. The three dot drop down acts separately. Split them into four buttons. One dropdown for question selection. Another for branching, another for adding section break, and another for configuration. Read / review the popular survey builder saas like limesurvey, formbricks, and so on and then rework the dashboard to fit surveyframe
 The surveyframe::launch_builder() needs a complete fable 5 review and proofing as UI and UX emgineer to revise it. 
+
+> **Response (Fable 5, 2026-07-10):** Split per your decision: quick wins
+> now, the rework as the next patch's headline.
+>
+> * D1 (done now): the empty canvas has real buttons at 44px minimum, a
+>   filled primary CTA ("+ Add your first question") and two outlined
+>   secondary CTAs (Open an existing .sframe / Set up survey settings),
+>   with text contrast raised well past the old 22 to 35 percent white.
+> * D2 (clarified as the Preview tab): known limitation D9. The Preview tab
+>   still uses the builder's internal simplified renderer, so it shows the
+>   old look regardless of the loaded file; Export survey and SurveyStudio
+>   carry Theme B. The Preview restyle is part of the rework below.
+> * The four-control split of Add Question, the LimeSurvey/Formbricks
+>   benchmark pass, and the full launch_builder() UI/UX review are recorded
+>   in roadmap.md as the builder-rework track of the next patch, alongside
+>   the existing Design improvement arc items in dogfeed.todo.md.
 ---
 
 ## Part E — Model syntax fixes (7 items)
@@ -262,7 +375,12 @@ cat(sem_lavaan_syntax(m))
 - [x] E1 The structural line reads `LOY ~ H1*SAT`. The free-text label was
   reduced to the `H1` tag; no spaces or colons appear in the parameter.
 - [ ] E2 `lavaan::lavaanify()` on the string parses without warnings about
-  identifiers with spaces.
+  identifiers with spaces. Run it on the generated syntax string, never on
+  the model object itself:
+
+```r
+lavaan::lavaanify(sem_lavaan_syntax(m))
+```
 
 Feedback: con1 <- sf_construct("SAT", "Satisfaction", paste0("sat_", 1:3))
 con2 <- sf_construct("LOY", "Loyalty", paste0("loy_", 1:3))
@@ -277,6 +395,13 @@ Error: lavaan->lav_parse_tokens_formulas():
    at line 1, pos 1
 m1 
 ^
+
+> **Response (Fable 5, 2026-07-10):** That error is expected: `lavaanify()`
+> was given the `sf_model` object (`m`), so lavaan tried to parse the model
+> id "m1" as syntax. The function takes the generated string:
+> `lavaan::lavaanify(sem_lavaan_syntax(m))`. The checklist step above now
+> shows the exact call. No package change needed; please re-run E2 with the
+> corrected call.
 
 ```r
 pls <- sf_model("p1", type="pls_sem",

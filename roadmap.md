@@ -190,7 +190,18 @@ correlation, regression, t-test, Mann-Whitney, ANOVA, and Kruskal-Wallis
 runners. Plots verified visually against the AIC-RSAM simulated data.
 519/519 tests pass.
 
-### v0.3.4 — Visualisation breadth (target 2026-08-15)
+### v0.3.4 — Visualisation breadth and the builder rework (target 2026-08-15)
+
+Second track added 2026-07-10 from the 0.3.3 MAS review (owner decision:
+quick wins shipped in 0.3.3, the rework lands here): a complete
+launch_builder() UI and UX pass benchmarked against LimeSurvey and
+Formbricks. Scope: split the Add Question control into four (question-type
+dropdown, branching, section break, configuration), restyle the Preview tab
+to the Theme B renderer so it matches the exported survey, a WCAG 2.2 pass
+across the builder chrome, date-question minimum and maximum bounds, and
+the Design improvement arc items already logged in dogfeed.todo.md
+(settings entry-point consolidation, Analyse sub-tab rework, header nav
+balance).
 
 Headline: coverage across all analysis families and S3 `plot()` on report objects.
 
@@ -247,6 +258,20 @@ Deliverables:
 - Accessibility: colour-blind-safe palette for all ggplot2 outputs.
 - Codebook upgrades: item-level descriptives and choice-set frequency tables
   in the codebook section.
+
+### Feature requests from the 0.3.3 MAS review (recorded 2026-07-10)
+
+Four sf_choices proposals, assessed against the pre-declared-contract core
+idea (full assessment in mas_review_033.md):
+
+- `missing_codes` on `sf_choices()` (declare 99 = prefer not to say so
+  scoring and reliability skip it): strongest fit, lands in v0.4.
+- `sf_conjoint_design()` for discrete choice experiments: good fit, lands
+  in v0.5 with the decision methods.
+- Cascading/hierarchical choice sets: admissible if declared statically;
+  needs a design document first, v0.6 or later.
+- Runtime label piping (glue-style tokens): in tension with the immutable
+  hashed-instrument guarantee; recorded as a research question only.
 
 ### v0.4 — Small-sample inference plus the RStudio add-in (target 2027-01-12)
 
