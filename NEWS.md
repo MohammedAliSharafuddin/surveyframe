@@ -1,12 +1,51 @@
 # surveyframe 0.3.3
 
-This release hardens the package against its first real deployment, the
-AIC-RSAM room-service study: a QR-accessed mobile static survey with
-eligibility skip logic and a six-construct, nine-path structural model. Every
-fix was surfaced by reproducing that instrument end to end on a phone-width
-viewport, through the model-syntax generators, and through the rendered
-report at presentation size. It adds no new exported functions, no new hard
-dependencies, and no new statistical methods.
+This release hardens the package against its first real deployment, adds
+the first plotting layer, and redesigns the survey-taking experience. The
+hardening was driven by the AIC-RSAM room-service study, a QR-accessed
+mobile static survey with eligibility skip logic and a six-construct,
+nine-path structural model, reproduced end to end on a phone-width
+viewport, through the model-syntax generators, through the rendered report
+at presentation size, and against the live Google Sheets deployment. The
+plotting layer is opt-in and built on ggplot2, which joins Suggests with
+every plotting entry point guarded by `rlang::check_installed()`. Hard
+dependencies are unchanged.
+
+## Visualisation foundation
+
+* New exported `theme_surveyframe()`: a publication-oriented ggplot2 theme
+  matching the report brand, with dark ink typography, a teal accent, and
+  quiet grid lines. The categorical series colours are a fixed-order set
+  validated for lightness, chroma, colour-vision-deficiency separation, and
+  contrast against a white chart surface.
+* `run_analysis_plan()` gains a `plots` argument (default `FALSE`). When
+  `TRUE`, supported blocks carry a `$plot` ggplot object: horizontal bar
+  charts for frequency blocks, dodged bar charts for chi-square and
+  cross-tab blocks, and scatter plots with a regression overlay for
+  correlation and linear-regression blocks (observed-against-fitted when
+  the model has several predictors). Unsupported block types are skipped
+  quietly.
+* Inferential runners now return a `$table` element, a formatted data frame
+  suitable for `knitr::kable()`: a statistic row for correlations, ANOVA,
+  and Kruskal-Wallis, a coefficient table for linear regression, and group
+  summaries for the t-test and Mann-Whitney runners. The HTML report's
+  analysis sections pick these up automatically.
+
+## Analysis runners
+
+* The frequency and cross-tab runners treat empty strings as missing
+  values, so partially completed responses from a collected sheet no longer
+  appear as a phantom unnamed category.
+
+## Survey redesign
+
+* The survey-taking experience has a new editorial design: serif question
+  typography, bordered option cards with key chips and selection ticks,
+  numbered Likert squares, underline text inputs, a top progress bar with
+  the study name, and a per-question eyebrow in conversational mode. Every
+  tint and shade derives from the instrument's single theme colour, so the
+  builder's one colour selector re-skins the whole survey. Touch targets
+  meet the 44 pixel minimum throughout.
 
 ## Static survey and branching
 
