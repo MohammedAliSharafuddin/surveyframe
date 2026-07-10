@@ -19,8 +19,8 @@ Principles:
   rest of the chain lands as one block at v0.8 and v0.9, the capstone before
   the v1.0 API freeze. Nothing integrity-related lands in v0.4 through v0.7.
   See "Integrity and provenance: one track" below.
-- The 0.3.4 to 0.3.9 visualisation arc runs on a strict ~21-day patch cadence
-  between 0.3.3 and 0.4. Hard Imports stay unchanged; new packages are
+- The 0.3.4 to 0.3.8 visualisation arc runs on a strict ~21-day patch cadence
+  between 0.3.3 and 0.4 (the foundation patch merged into 0.3.3 on 2026-07-10). Hard Imports stay unchanged; new packages are
   Suggests-only and guarded; every new capability is opt-in; the existing test
   suite is not modified.
 - Analytical capability ships first (v0.4 to v0.7) to drive the applied papers
@@ -46,7 +46,7 @@ package build.
 
 ## Release schedule (45-day cycles)
 
-Minors run on a 45-day cadence. The 0.3.3 to 0.3.9 patches run on a ~21-day
+Minors run on a 45-day cadence. The 0.3.3 to 0.3.8 patches run on a ~21-day
 cadence. Dates are targets, not contracts, anchored to the 0.3.2 ship date
 (2026-07-04). If a release slips, shift the rest by the slip and record why in
 `portfolio-planner/decisions.md`.
@@ -56,13 +56,12 @@ cadence. Dates are targets, not contracts, anchored to the 0.3.2 ship date
 | 0.3.0 | Foundation on CRAN | done 2026-05-21 |
 | 0.3.1 | Stability and onboarding | done 2026-06-02 |
 | 0.3.2 | Maintenance: CITATION fix, JSS-required package changes, doc pass | 2026-07-04 |
-| 0.3.3 | Real-world embedding and conference feedback (AIC-RSAM, ICSRI 2026) | 2026-07-25 |
-| 0.3.4 | Visualisation foundation: ggplot2 in Suggests, brand theme, `plots = TRUE`, first family plots, `$table` on inferential runners | 2026-08-15 |
-| 0.3.5 | Visualisation breadth: regression, EFA, reliability, categorical, correlation-matrix plots; `plot()` S3 on report objects | 2026-09-05 |
-| 0.3.6 | Plots into the surfaces: `render_report()`, dashboard charts, studio plot area | 2026-09-26 |
-| 0.3.7 | Effect-size confidence intervals: base-R bootstrap (`bootstrap_ci`, `cohens_d_ci`, `cramers_v_ci`, `eta_sq_ci`) | 2026-10-17 |
-| 0.3.8 | Psychometric depth: Henseler HTMT, real Little's MCAR via naniar, omega and EFA polish | 2026-11-07 |
-| 0.3.9 | Report polish and PDF: `render_report(format = "pdf")` via pagedown, theming, accessibility, codebook upgrades | 2026-11-28 |
+| 0.3.3 | Real-world embedding and conference feedback (AIC-RSAM, ICSRI 2026) plus the visualisation foundation (ggplot2 in Suggests, brand theme, `plots = TRUE`, first family plots, `$table` on inferential runners) and the Theme B survey redesign. Merged from the planned 0.3.3 and 0.3.4 on 2026-07-10 | implemented 2026-07-09, release pending |
+| 0.3.4 | Visualisation breadth: regression, EFA, reliability, categorical, correlation-matrix plots; `plot()` S3 on report objects | 2026-08-15 |
+| 0.3.5 | Plots into the surfaces: `render_report()`, dashboard charts, studio plot area | 2026-09-05 |
+| 0.3.6 | Effect-size confidence intervals: base-R bootstrap (`bootstrap_ci`, `cohens_d_ci`, `cramers_v_ci`, `eta_sq_ci`) | 2026-09-26 |
+| 0.3.7 | Psychometric depth: Henseler HTMT, real Little's MCAR via naniar, omega and EFA polish | 2026-10-17 |
+| 0.3.8 | Report polish and PDF: `render_report(format = "pdf")` via pagedown, theming, accessibility, codebook upgrades | 2026-11-07 |
 | 0.4 | Small-sample inference plus the RStudio add-in | 2027-01-12 |
 | 0.4.1 | Faculty demo proofing: demo session to college faculty, then UI/UX and doc fixes | 2027-02-02 |
 | 0.5 | MCDM and DEMATEL | 2027-03-19 |
@@ -162,10 +161,13 @@ verified against the live AIC-RSAM deployment (8 real responses read back
 through both paths, phone-viewport hardening confirmed by screenshot,
 report reviewed at 1280 by 720). The ICSRI audience-feedback deliverable is
 excluded from this release by explicit decision (conference is 8-9 August
-2026); it lands as a follow-up patch once real feedback exists. Full detail
-in dogfeed.todo.md. 500/500 tests pass, R CMD check --as-cran clean.
+2026); it lands as a follow-up patch once real feedback exists. On
+2026-07-10 the planned 0.3.4 visualisation foundation (see the subsection
+below) and the Theme B survey redesign were merged into this release, so
+0.3.3 ships all three bodies of work as one version. Full detail in
+dogfeed.todo.md. 519/519 tests pass, R CMD check --as-cran clean.
 
-### v0.3.4 — Visualisation foundation (target 2026-08-15)
+#### Visualisation foundation (merged into v0.3.3 on 2026-07-10, originally the 0.3.4 patch)
 
 Headline: the first plotting layer — opt-in, brand-styled, ggplot2-based.
 
@@ -179,7 +181,16 @@ Deliverables:
 - `$table` slot added to inferential runners (returns a formatted data frame
   suitable for `knitr::kable()`).
 
-### v0.3.5 — Visualisation breadth (target 2026-09-05)
+Status: implemented 2026-07-09 and merged into v0.3.3 on 2026-07-10. All four
+deliverables done: ggplot2 (>= 3.4.0) in Suggests, `theme_surveyframe()`
+exported with a validated fixed-order series palette, `plots = TRUE` on
+`run_analysis_plan()`, the first plot family (frequency and chi-square
+bars, correlation and regression scatters), and `$table` on the
+correlation, regression, t-test, Mann-Whitney, ANOVA, and Kruskal-Wallis
+runners. Plots verified visually against the AIC-RSAM simulated data.
+519/519 tests pass.
+
+### v0.3.4 — Visualisation breadth (target 2026-08-15)
 
 Headline: coverage across all analysis families and S3 `plot()` on report objects.
 
@@ -192,7 +203,7 @@ Deliverables:
 - `plot.quality_report()`, `plot.reliability_report()`, `plot.efa_report()` S3
   methods that dispatch to the family-specific plots.
 
-### v0.3.6 — Plots into the surfaces (target 2026-09-26)
+### v0.3.5 — Plots into the surfaces (target 2026-09-05)
 
 Headline: plots appear automatically in all rendering surfaces.
 
@@ -201,7 +212,7 @@ Deliverables:
 - Dashboard chart panels replaced with ggplot2 equivalents.
 - SurveyStudio plot area wired to the new S3 methods.
 
-### v0.3.7 — Effect-size confidence intervals (target 2026-10-17)
+### v0.3.6 — Effect-size confidence intervals (target 2026-09-26)
 
 Headline: every effect-size statistic ships with an interval, base R only.
 
@@ -213,7 +224,7 @@ Deliverables:
 - Each inferential runner that returns an effect size now populates a `$ci`
   slot in its result.
 
-### v0.3.8 — Psychometric depth (target 2026-11-07)
+### v0.3.7 — Psychometric depth (target 2026-10-17)
 
 Headline: HTMT, real MCAR testing, and omega polish.
 
@@ -224,7 +235,7 @@ Deliverables:
   a clearer comparison of alpha and omega.
 - EFA polish: parallel analysis displayed alongside VSS in `efa_report()`.
 
-### v0.3.9 — Report polish and PDF (target 2026-11-28)
+### v0.3.8 — Report polish and PDF (target 2026-11-07)
 
 Headline: the last patch before the analytical themes. The report surface is
 complete and PDF output is available.

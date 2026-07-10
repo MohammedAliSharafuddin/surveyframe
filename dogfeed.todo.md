@@ -167,6 +167,29 @@ and never reach the sheet. Import against the post-use instrument (the one
 actually deployed) and the missingness numbers are meaningful. Worth a
 mention in the Google Sheets vignette section in a future patch.
 
+### 2026-07-10 — releases merged: 0.3.4 folded into 0.3.3
+
+Owner decision: since neither version had been pushed or submitted, the
+planned 0.3.4 (visualisation foundation) and the Theme B survey redesign
+merge into 0.3.3 as one release. Version stays 0.3.3, the NEWS entries are
+combined, the v0.3.3 tag moves to the final commit, and the remaining
+visualisation arc renumbers 0.3.4 to 0.3.8 (breadth, surfaces, effect-size
+CIs, psychometric depth, PDF report). The runbook's original "two separate
+tags" instruction is superseded by this decision.
+
+### 2026-07-09 — Phase C (v0.3.4) executed after 0.3.3 tagged
+
+v0.3.3 was tagged locally (v0.3.3 on main; pushes pending the project
+owner). Phase C then ran to completion in the same session: C1 to C5 all
+implemented, tested (519/519), and the plots verified visually against the
+AIC-RSAM simulated data. One extra fix rode along, surfaced by looking at
+the rendered charts: the frequency and cross-tab runners counted empty
+strings as a real category, so partially completed sheet responses showed
+as a phantom unnamed bar. They now count as missing. The categorical series
+palette was validated programmatically for colour-vision-deficiency
+separation and surface contrast rather than picked by eye; the validated
+order is documented in `R/plots.R`.
+
 ---
 
 ## Phase A — v0.3.3: real-world embedding and conference feedback (target 2026-07-25)
@@ -373,7 +396,23 @@ Fixed in 0.3.3 (see NEWS.md): new choice questions start with their own sample s
 - **Expected:** "+ Add question" should open the question-type dropdown directly rather than defaulting to Likert. Configuration options should live in their own dedicated panel/button, separate from the type-picker dropdown. Choice-set entry should surface the existing quick-fill templates at add-question time.
 - **Why deferred:** the "+ Add question opens the type picker directly" change and moving configuration into its own panel is an interaction redesign. It's bundled with the Design improvement arc.
 
-### [open] `lane: defer` — Question-block designs need a standard design system, benchmarked against Formbricks
+### [fixed] `lane: defer`, re-scoped by owner 2026-07-09 — Question-block designs need a standard design system, benchmarked against Formbricks
+
+Resolved 2026-07-09 on the owner's instruction. Three mock directions were
+built (Formbricks option cards, Typeform conversational, branded
+editorial); the owner chose the conversational direction ("Theme B") and
+asked for it to derive entirely from the builder's single theme-colour
+selector. Applied to `inst/static_survey/template.html` (and re-inlined
+into the builder): serif question typography, bordered option cards with
+key chips and ticks, numbered Likert squares, underline text inputs,
+topbar progress with a theme dot, per-question eyebrow in conversational
+mode. All tints and shades derive from `--cp` via `color-mix()`, so any
+picker colour re-skins the whole survey. Verified through the real export
+path at phone width (teal, blue, violet variants), through SurveyStudio's
+preview iframe, and by the headless branching suite (519/519). Touch
+targets stay at 44px or better. The builder's own Preview tab still uses
+its simplified renderer and will lag the new design; restyling it is the
+remaining piece of this arc.
 
 - **Where:** All rendered question types across the survey-taking surfaces (static survey template, SurveyStudio preview, builder preview) — multi-select checkboxes, single-select radios, rating/star scales, numeric scales.
 - **What happened:** Reference screenshots supplied from formbricks.com/survey-templates (Employee Satisfaction and User Persona templates) show a consistent design language across block types: full-width selectable option rows/cards with visible borders and hover state, a top progress bar, consistent Back/Next button placement, a 1-5 button-style numeric scale, and a 5-star rating control. surveyframe's current blocks do not share one consistent visual system across types.
