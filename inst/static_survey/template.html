@@ -27,7 +27,6 @@ input,textarea,select{font-family:inherit;font-size:15px}
 
 /* Header (Fix A) */
 .sf-hdr{display:flex;align-items:center;gap:12px;max-width:var(--card-w);margin:18px auto 0;padding:0 18px 14px;border-bottom:1px solid var(--cb)}
-.sf-hdr::before{content:"";width:10px;height:10px;border-radius:50%;background:var(--cp);flex-shrink:0}
 .sf-hdr-logo{height:44px;width:auto;min-width:44px;max-width:200px;object-fit:contain;object-position:left center}
 .sf-hdr-inst{font-size:13px;font-weight:650;color:var(--t2);letter-spacing:.5px;text-transform:uppercase}
 
@@ -84,8 +83,7 @@ input,textarea,select{font-family:inherit;font-size:15px}
 .item-help{font-size:14px;color:var(--t2);margin-bottom:10px;margin-top:-2px;font-style:italic}
 .item-err{font-size:13px;color:var(--cd);margin-top:6px;display:none}
 .item-err.show{display:block}
-.q-eyebrow{font-size:13px;color:var(--cp);margin-bottom:10px;display:flex;align-items:center;gap:8px;font-weight:600}
-.q-eyebrow::after{content:"";width:26px;height:1px;background:var(--cp)}
+.q-eyebrow{font-size:13px;color:var(--cp);margin-bottom:10px;font-weight:600}
 
 /* Likert: numbered square buttons with tiny labels, single-colour theme */
 .likert-row{display:flex;gap:9px;overflow-x:auto;padding-bottom:2px}
@@ -129,10 +127,12 @@ textarea.inp-std:focus{border-color:var(--cp);box-shadow:0 0 0 3px color-mix(in 
 .inp-narrow{max-width:220px}
 
 /* Slider */
-.slider-wrap{display:flex;flex-direction:column;gap:6px}
+.slider-wrap{display:flex;flex-direction:column;gap:8px;border:1px solid var(--cb);
+  border-radius:6px;background:var(--cf);padding:16px 18px;
+  box-shadow:0 1px 0 rgba(18,33,43,.03)}
 .slider-inp{width:100%;accent-color:var(--cp);height:6px;cursor:pointer}
-.slider-lbls{display:flex;justify-content:space-between;font-size:11px;color:var(--t3)}
-.slider-val{font-size:13px;font-weight:600;color:var(--cp);text-align:center}
+.slider-lbls{display:flex;justify-content:space-between;font-size:12.5px;color:var(--t3)}
+.slider-val{font-size:22px;font-weight:600;font-family:var(--serif);color:var(--cp);text-align:center}
 
 /* Rating */
 .star-row{display:flex;gap:10px}
@@ -141,29 +141,32 @@ textarea.inp-std:focus{border-color:var(--cp);box-shadow:0 0 0 3px color-mix(in 
 .star-btn:hover{transform:scale(1.1)}
 .star-btn.active{color:var(--cp)}
 
-/* Matrix */
-.matrix-wrap{overflow-x:auto;margin-top:6px}
-.matrix-tbl{width:100%;border-collapse:collapse;font-size:12px}
-.matrix-tbl th{background:var(--cg);padding:7px 10px;text-align:center;
-  border:1px solid var(--cb);font-weight:600;vertical-align:bottom}
-.matrix-tbl td{padding:7px 10px;border:1px solid var(--cb);text-align:center;vertical-align:middle}
-.matrix-tbl .rl{text-align:left;font-weight:500}
-.matrix-tbl input{accent-color:var(--cp)}
-.matrix-tbl tr:nth-child(even) td{background:#fafbfd}
+/* Matrix: horizontal rules only, theme accents, no vertical grid */
+.matrix-wrap{overflow-x:auto;margin-top:8px;border:1px solid var(--cb);
+  border-radius:6px;background:var(--cf);box-shadow:0 1px 0 rgba(18,33,43,.03)}
+.matrix-tbl{width:100%;border-collapse:collapse;font-size:13px}
+.matrix-tbl th{background:var(--tint);padding:10px 12px;text-align:center;
+  border-bottom:1.5px solid var(--tint-bd);font-weight:650;color:var(--t2);
+  vertical-align:bottom;font-size:12px}
+.matrix-tbl td{padding:11px 12px;border-bottom:1px solid var(--cb);
+  text-align:center;vertical-align:middle}
+.matrix-tbl tr:last-child td{border-bottom:none}
+.matrix-tbl .rl{text-align:left;font-weight:500;color:var(--t1)}
+.matrix-tbl input{accent-color:var(--cp);width:17px;height:17px}
+.matrix-tbl tbody tr:hover td{background:var(--tint)}
 
-/* Ranking */
-.rank-list{border:1.5px solid var(--cb);border-radius:8px;overflow:hidden}
-.rank-item{display:flex;align-items:center;gap:10px;padding:10px 14px;
-  background:var(--cf);border-bottom:1px solid var(--cb);cursor:grab;
-  user-select:none;transition:background .12s}
-.rank-item:last-child{border-bottom:none}
-.rank-item:hover{background:var(--cg)}
+/* Ranking: option-card rows matching the choice cards */
+.rank-list{display:flex;flex-direction:column;gap:9px}
+.rank-item{display:flex;align-items:center;gap:12px;padding:12px 15px;min-height:50px;
+  background:var(--cf);border:1px solid var(--cb);border-radius:6px;cursor:grab;
+  user-select:none;transition:all .12s;box-shadow:0 1px 0 rgba(18,33,43,.03)}
+.rank-item:hover{border-color:var(--cp);background:var(--tint)}
 .rank-item.drag-over{border-top:2px solid var(--cp)}
 .rank-item.dragging{opacity:.4}
-.rank-num{width:20px;height:20px;border-radius:9999px;background:var(--cp);
-  color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.rank-handle{color:var(--t3);font-size:13px;flex-shrink:0}
-.rank-lbl{flex:1;font-size:13px}
+.rank-num{width:26px;height:26px;border-radius:6px;background:var(--cp);
+  color:#fff;font-size:12.5px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.rank-handle{color:var(--t3);font-size:14px;flex-shrink:0;cursor:grab}
+.rank-lbl{flex:1;font-size:15px}
 
 /* Error banner */
 .err-banner{background:#fef2f2;border:1.5px solid #fecaca;border-radius:8px;
@@ -404,8 +407,15 @@ function renderMatrix(item,cs){
 }
 function renderNumeric(item){
   var saved=responses[item.id]||'';
-  return'<input type="number" class="inp-std inp-narrow" id="inp_'+esc(item.id)+'" value="'+esc(saved)+'"'
-    +' onchange="setResp(\''+esc(item.id)+'\',this.value)">';
+  // slider_min/slider_max double as hard bounds for numeric entry; values
+  // typed outside the range are clamped on change.
+  // Numbers bypass esc(): esc(0) would collapse to an empty string
+  var mn=item.slider_min!=null?' min="'+(+item.slider_min)+'"':'';
+  var mx=item.slider_max!=null?' max="'+(+item.slider_max)+'"':'';
+  return'<input type="number" class="inp-std inp-narrow" id="inp_'+esc(item.id)+'" value="'+esc(saved)+'"'+mn+mx
+    +' onchange="if(this.min!==\'\'&&+this.value<+this.min)this.value=this.min;'
+    +'if(this.max!==\'\'&&+this.value>+this.max)this.value=this.max;'
+    +'setResp(\''+esc(item.id)+'\',this.value)">';
 }
 function renderText(item){
   var saved=responses[item.id]||'';
@@ -432,7 +442,7 @@ function renderSlider(item){
     +'<div class="slider-val" id="slv_'+esc(item.id)+'">'+saved+'</div>'
     +'<input type="range" class="slider-inp" min="'+mn+'" max="'+mx+'" step="'+st+'" value="'+saved+'"'
     +' oninput="setResp(\''+esc(item.id)+'\',this.value);document.getElementById(\'slv_'+esc(item.id)+'\').textContent=this.value">'
-    +'<div class="slider-lbls"><span>'+esc(mn)+'</span><span>'+esc(mx)+'</span></div>'
+    +'<div class="slider-lbls"><span>'+(+mn)+'</span><span>'+(+mx)+'</span></div>'
     +'</div>';
 }
 function renderRating(item){
@@ -603,6 +613,18 @@ function doSubmit(){
         var key=item.id+'__'+r;
         row[key]=responses[key]||'';
       });
+    } else if(item.type==='ranking'){
+      // One column per option holding its rank (1 = top), so the data is
+      // directly analysable without reshaping.
+      var cs=choiceMap[item.choice_set]||{values:[]};
+      var order=(responses[item.id]||'').split(',').filter(Boolean);
+      if(!order.length&&rankOrders[item.id]){
+        order=rankOrders[item.id].map(function(o){return o.v;});
+      }
+      (cs.values||[]).forEach(function(v){
+        var pos=order.indexOf(String(v));
+        row[item.id+'__'+String(v)]=pos>=0?String(pos+1):'';
+      });
     } else {
       row[item.id]=responses[item.id]!=null?responses[item.id]:'';
     }
@@ -715,9 +737,11 @@ function renderSurvey(){
       ?'<button type="button" class="btn btn-p" onclick="nextPage()">Next &#8594;</button>'
       :'<button type="button" class="btn btn-p" onclick="nextPage()">'+esc(R.submit_label||'Submit')+'</button>')
     +'</div>';
+  // The sticky bar already reports page position in standard mode, so the
+  // in-card eyebrow appears only in conversational mode.
   var paginationInfo=MODE==='conversational'
     ?'<div class="q-eyebrow">Question '+currentPage+' of '+maxPage+'</div>'
-    :(maxPage>1?'<div class="q-eyebrow">Page '+currentPage+' of '+maxPage+'</div>':'');
+    :'';
   el.innerHTML='<div class="card"><div class="card-body">'
     +(currentPage===1?'<div class="wl-title" style="margin-bottom:6px">'+esc(SF.meta.title)+'</div>'+(SF.meta.description?'<div style="color:var(--t2);font-size:14px;line-height:1.55;margin-bottom:22px">'+esc(SF.meta.description)+'</div>':''):'')
     +paginationInfo

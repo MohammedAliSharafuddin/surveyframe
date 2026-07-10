@@ -44,9 +44,19 @@ export_google_sheet <- function(instrument, sheet_url, output_dir = ".") {
     function(i) !identical(i$type %in% c("section_break", "text_block"), TRUE),
     instrument$items
   )
+  choice_values <- function(instrument, id) {
+    for (cs in instrument$choices) {
+      if (identical(cs$id, id)) return(as.character(cs$values))
+    }
+    character(0)
+  }
   item_headers <- unlist(lapply(response_items, function(i) {
     if (identical(i$type, "matrix") && length(i$matrix_items) > 0L) {
       paste0(i$id, "__", i$matrix_items)
+    } else if (identical(i$type, "ranking") && !is.null(i$choice_set)) {
+      # 0.3.3: ranking posts one rank column per option
+      vals <- choice_values(instrument, i$choice_set)
+      if (length(vals) > 0L) paste0(i$id, "__", vals) else i$id
     } else {
       i$id
     }
