@@ -53,3 +53,5 @@
 ^mas_review_032\.(md|qmd)$
 ^mas_full_report\.html$
 ^\.vscode($|/)
+^CODE_OF_CONDUCT\.md$
+^SECURITY\.md$
