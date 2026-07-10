@@ -1,122 +1,68 @@
 # surveyframe 0.3.3
 
-This release hardens the package against its first real deployment, adds
-the first plotting layer, and redesigns the survey-taking experience. The
-hardening was driven by the AIC-RSAM room-service study, a QR-accessed
-mobile static survey with eligibility skip logic and a six-construct,
-nine-path structural model, reproduced end to end on a phone-width
-viewport, through the model-syntax generators, through the rendered report
-at presentation size, and against the live Google Sheets deployment. The
-plotting layer is opt-in and built on ggplot2, which joins Suggests with
-every plotting entry point guarded by `rlang::check_installed()`. Hard
-dependencies are unchanged.
+This release adds an opt-in plotting layer, fixes bugs surfaced by the
+package's first field deployment, and redesigns the survey-taking
+experience. ggplot2 joins Suggests; hard dependencies are unchanged.
 
-## Visualisation foundation
+## Analysis and plotting
 
-* New exported `theme_surveyframe()`: a publication-oriented ggplot2 theme
-  matching the report brand, with dark ink typography, a teal accent, and
-  quiet grid lines. The categorical series colours are a fixed-order set
-  validated for lightness, chroma, colour-vision-deficiency separation, and
-  contrast against a white chart surface.
-* `run_analysis_plan()` gains a `plots` argument (default `FALSE`). When
-  `TRUE`, supported blocks carry a `$plot` ggplot object: horizontal bar
-  charts for frequency blocks, dodged bar charts for chi-square and
-  cross-tab blocks, and scatter plots with a regression overlay for
-  correlation and linear-regression blocks (observed-against-fitted when
-  the model has several predictors). Unsupported block types are skipped
-  quietly.
-* Inferential runners now return a `$table` element, a formatted data frame
-  suitable for `knitr::kable()`: a statistic row for correlations, ANOVA,
-  and Kruskal-Wallis, a coefficient table for linear regression, and group
-  summaries for the t-test and Mann-Whitney runners. The HTML report's
-  analysis sections pick these up automatically.
+* New `plots` argument on `run_analysis_plan()` (default `FALSE`). When
+  `TRUE`, supported analysis blocks return a ggplot object in `$plot`: bar
+  charts for frequency and chi-square blocks, and scatter plots with a
+  regression overlay for correlation and regression blocks.
+* New exported `theme_surveyframe()`, a publication-oriented ggplot2 theme
+  with an accessible fixed-order series palette. All plots use it.
+* Inferential runners return a `$table` data frame ready for
+  `knitr::kable()`; the HTML report shows these tables automatically.
+* Frequency and cross-tab runners treat empty strings as missing values, so
+  partially completed responses no longer form a blank category.
+* Ranking items now export one column per option holding its rank
+  (`item__option = 1` for the top choice), so ranks are directly analysable.
+  `read_responses()` accepts the expanded columns for ranking and matrix
+  items without warnings.
 
-## Analysis runners
+## Survey experience
 
-* The frequency and cross-tab runners treat empty strings as missing
-  values, so partially completed responses from a collected sheet no longer
-  appear as a phantom unnamed category.
+* A full redesign of the exported survey: larger serif question typography,
+  bordered option cards with selection ticks, numbered Likert squares,
+  restyled matrix, slider, and ranking blocks, and a slim top progress bar.
+  Every colour derives from the instrument's single theme colour, so one
+  colour choice re-skins the whole survey. Touch targets meet a 44 pixel
+  minimum on phones.
+* Branching rules on one question now combine with AND, and hiding a
+  controlling question also hides everything that depends on it, so
+  screening logic behaves as declared even when answers change.
+* Single-page surveys show answered-questions progress (for example
+  "12 of 44 answered"); numeric questions respect declared minimum and
+  maximum bounds.
 
-## Survey redesign
+## Data collection
 
-* The survey-taking experience has a new editorial design: serif question
-  typography, bordered option cards with key chips and selection ticks,
-  numbered Likert squares, underline text inputs, a top progress bar with
-  the study name, and a per-question eyebrow in conversational mode. Every
-  tint and shade derives from the instrument's single theme colour, so the
-  builder's one colour selector re-skins the whole survey. Touch targets
-  meet the 44 pixel minimum throughout.
-
-## Static survey and branching
-
-* The branching evaluator now combines several rules on one item with AND
-  instead of silently keeping only the last rule, so an item gated on two
-  conditions (for example a follow-up shown only when eligibility passes and
-  a prior answer is yes) behaves as declared.
-* Visibility now cascades: when a controlling question is itself hidden, its
-  stale answer no longer keeps downstream questions visible. Changing an
-  early screening answer correctly hides the whole dependent chain.
-* Touch targets on phone screens meet a 44 pixel minimum for choice options
-  and buttons, and the branded header keeps a stable logo box for any logo
-  aspect ratio.
-* Single-page surveys now show answered-questions progress (for example
-  "12 of 44 answered") instead of hiding the progress bar, honouring the
-  existing show-progress toggle.
+* Fixed a bug that silently blocked submissions from hosted surveys: the
+  Google Apps Script POST now avoids the CORS preflight that Apps Script
+  never answers. Collectors no longer emit columns for section breaks or
+  text blocks.
+* `read_sheet_responses()` gains a `meta_cols` argument for extra sheet
+  columns a host application appends, and SurveyStudio's dashboard now
+  computes completion times from imported sheet responses.
 
 ## Model syntax
 
-* `sem_lavaan_syntax()` sanitises free-text path labels into valid lavaan
-  parameter names, so a hypothesis label like "H1: AIA positively influences
-  PEOU" becomes the parameter `H1` instead of invalid syntax.
-* `seminr_syntax()` output now loads seminr and uses the real seminr summary
-  accessors (`summary(pls_model)$reliability`, `$validity$htmt`, and
-  bootstrapped paths) in place of functions seminr does not export.
-* `run_analysis_plan()` accepts `pls_sem` as an alias for the
-  `seminr_syntax` method, matching how instruments declare the model type.
+* `sem_lavaan_syntax()` turns free-text path labels into valid lavaan
+  parameter names (a label starting "H1:" becomes the parameter `H1`).
+* `seminr_syntax()` output loads seminr and uses `summary()` accessors, so
+  the generated code runs as pasted.
+* `run_analysis_plan()` accepts `pls_sem` as an alias for `seminr_syntax`.
 
-## Google Sheets collection
+## SurveyBuilder and report
 
-* The exported survey now POSTs to the Apps Script endpoint with
-  `mode: no-cors` and a `text/plain` body. The previous `application/json`
-  header triggered a CORS preflight that Apps Script never answers, so
-  submissions from hosted deployments were silently blocked. This fix was
-  proven in the field by the live AIC-RSAM deployment, which had to patch
-  the exported file by hand.
-* The Apps Script collector, the SurveyBuilder collector export, and the
-  static survey submission payload no longer emit columns for section breaks
-  and text blocks, so collected sheets hold only response data.
-* `read_sheet_responses()` gains a `meta_cols` argument for declaring extra
-  sheet columns (for example bridge fields a host application appends to
-  each submission) so they are accepted as metadata without a warning.
-* The full round trip was verified against the live AIC-RSAM deployment:
-  real responses submitted through the hosted survey were read back through
-  both `read_sheet_responses()` and SurveyStudio's Google Sheet import card.
-* SurveyStudio's Quality Dashboard now passes the standard `started_at` and
-  `submitted_at` columns through to `quality_report()`, so completion-time
-  analysis works for imported sheet responses instead of always reporting
-  that no timestamp column is available.
-
-## Report
-
-* Analysis-plan sections print the generated model syntax in a code block,
-  reliability-style results render as a compact table instead of an empty
-  result line, and the Omega column headers no longer wrap mid-word.
-
-## SurveyBuilder
-
-* Opening a `.sframe` file verifies and reports its SHA-256 integrity status
-  instead of loading silently, and the empty canvas offers an open-existing
-  path alongside new-survey setup.
-* A newly added choice question starts with its own sample choice set, and
-  editing a shared choice set on a choice question forks it first, so one
-  question's options can no longer leak into another.
-* The analysis-plan modal blocks assigning the same variable to two roles,
-  for example X and Y of one correlation.
-* The test suggester treats Likert items as ordinal (suggesting Spearman
-  with continuous or Likert pairs) and suggests Kruskal-Wallis when the
-  grouping variable has more than two categories.
-* The preview shows the branded header on the Welcome and Thank You screens,
-  and the Section item inspector labels its text field "Section header".
+* Opening a `.sframe` verifies and reports its SHA-256 integrity status.
+* New choice questions start with a fresh option set, and editing shared
+  options forks the set first, so options never leak between questions.
+* The analysis-plan modal blocks using one variable in two roles, and the
+  test suggester handles Likert items and multi-group comparisons sensibly.
+* Reports print generated model syntax in code blocks and show reliability
+  results as a table.
 
 # surveyframe 0.3.2
 
@@ -302,15 +248,11 @@ methods, and no new bundled datasets.
 
 * Added `launch_dashboard()`. Opens a five-panel Shiny dashboard for
   exploring collected response data alongside the instrument definition,
-  without modifying either. The panels are:
-
-  | Panel | Content |
-  |---|---|
-  | Overview | Response count, date range, instrument metadata |
-  | Items | Per-item bar charts, histograms, and frequency tables |
-  | Scales | Scale score distributions with mean overlay |
-  | Quality | Attention-check pass rates |
-  | Raw data | Scrollable response table with CSV download |
+  without modifying either. The panels are: Overview (response count, date
+  range, instrument metadata), Items (per-item bar charts, histograms, and
+  frequency tables), Scales (scale score distributions with mean overlay),
+  Quality (attention-check pass rates), and Raw data (a scrollable response
+  table with CSV download).
 
   When called without arguments the dashboard loads the bundled tourism
   services demo. When called with a user-supplied instrument and no
@@ -423,7 +365,7 @@ interpretation `prompt` field to guide write-up.
 
 * `launch_builder_demo()` now injects the demo instrument JSON directly into
   a temporary copy of `survey_builder.html`. The demo questions, scales, and
-  analysis plan are visible immediately on launch — no manual Load .sframe
+  analysis plan are visible immediately on launch, with no manual Load .sframe
   step is needed.
 * `launch_studio_demo()` and `launch_dashboard_demo()` now pass
   `launch.browser = TRUE` so the browser always opens automatically.
@@ -438,7 +380,7 @@ interpretation `prompt` field to guide write-up.
 * `db_overview_ui()`: date parsing is now delegated to `dashboard_parse_date()`
   for robust, error-free date display.
 * `render_report()` and `render_results()`: HTML report tables now use APA
-  formatting — horizontal rules only, no vertical borders, no row shading.
+  formatting: horizontal rules only, no vertical borders, no row shading.
   A significance footnote is appended automatically when a p-value column is
   detected.
 * `demo/survey.R`: complete UX rewrite with section headers, contextual pause
