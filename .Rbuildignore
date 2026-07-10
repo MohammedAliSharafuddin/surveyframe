@@ -56,3 +56,4 @@
 ^CODE_OF_CONDUCT\.md$
 ^SECURITY\.md$
 ^mas_review_033\.md$
+^mas_review_033\.(qmd|html)$
