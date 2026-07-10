@@ -520,17 +520,50 @@ utils::browseURL(out_h)
 
 ## Part I — Release safety (8 items)
 
-Run these from the surveyframe-dev checkout in a terminal, not from this
-document:
+Everything here runs from RStudio. The first chunk swaps the web-installed
+package for the local development checkout so the remaining chunks test
+exactly what will be submitted.
 
-```{r chunk-24, eval=FALSE}
-# devtools::test()                    # expect 519 in the dev checkout
-# system("R CMD build .")
-# system("R CMD check --as-cran surveyframe_0.3.3.tar.gz")
-# system("tar -tzf surveyframe_0.3.3.tar.gz | grep -E 'mas_|dogfeed|roadmap|aic_rsam|CODE_OF|SECURITY'")  # expect empty
-# system("git describe --tags")       # v0.3.3
-# system("git ls-remote origin refs/heads/main refs/tags/v0.3.3")
-# system("git ls-remote public refs/heads/main refs/tags/v0.3.3")
+```{r chunk-24}
+# Path to the local development checkout; adjust if yours differs
+pkg <- path.expand("~/Documents/GitHub/surveyframe-dev")
+file.exists(file.path(pkg, "DESCRIPTION"))
+
+# Drop the GitHub-installed copy and install the local tree in its place
+try(detach("package:surveyframe", unload = TRUE), silent = TRUE)
+try(remove.packages("surveyframe"), silent = TRUE)
+devtools::install(pkg, upgrade = "never", quick = TRUE)
+library(surveyframe)
+packageVersion("surveyframe")   # expect 0.3.3, now from the local tree
+```
+
+```{r chunk-24b}
+# I1: full suite from the local checkout (expect 519; the CRAN tarball
+# runs fewer because the AIC-RSAM fixture tests are dev-only)
+devtools::test(pkg)
+```
+
+```{r chunk-24c}
+# I2: build the tarball and run the CRAN check on it (several minutes)
+tarball <- devtools::build(pkg)
+tarball
+devtools::check_built(tarball, cran = TRUE)
+```
+
+```{r chunk-24d}
+# I3: the tarball must contain no dev files (expect character(0))
+files <- utils::untar(tarball, list = TRUE)
+grep("mas_|dogfeed|roadmap|aic_rsam|CODE_OF|SECURITY",
+     files, value = TRUE)
+```
+
+```{r chunk-24e}
+# I5/I6: tag position and remote agreement
+system2("git", c("-C", pkg, "describe", "--tags"), stdout = TRUE)
+system2("git", c("-C", pkg, "ls-remote", "origin",
+                 "refs/heads/main", "refs/tags/v0.3.3"), stdout = TRUE)
+system2("git", c("-C", pkg, "ls-remote", "public",
+                 "refs/heads/main", "refs/tags/v0.3.3"), stdout = TRUE)
 ```
 
 - [ ] I1 Full suite passes (519 in the dev checkout).

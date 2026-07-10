@@ -524,8 +524,23 @@ model-syntax block and a reliability block.
 
 ## Part I — Release safety (8 items)
 
+Runs entirely from RStudio. The first block swaps the web-installed package
+for the local development checkout so the rest tests exactly what will be
+submitted (the full chunk sequence is in mas_review_033.qmd, Part I):
+
 ```r
-devtools::test()          # in the surveyframe-dev checkout
+pkg <- path.expand("~/Documents/GitHub/surveyframe-dev")
+try(detach("package:surveyframe", unload = TRUE), silent = TRUE)
+try(remove.packages("surveyframe"), silent = TRUE)
+devtools::install(pkg, upgrade = "never", quick = TRUE)
+library(surveyframe); packageVersion("surveyframe")
+
+devtools::test(pkg)                          # I1: expect 519
+tarball <- devtools::build(pkg)              # I2
+devtools::check_built(tarball, cran = TRUE)  # I2
+grep("mas_|dogfeed|roadmap|aic_rsam|CODE_OF|SECURITY",
+     utils::untar(tarball, list = TRUE), value = TRUE)   # I3: character(0)
+system2("git", c("-C", pkg, "describe", "--tags"), stdout = TRUE)  # I5
 ```
 
 - [ ] I1 Full suite passes; expect 519 in the dev checkout (the AIC-RSAM
