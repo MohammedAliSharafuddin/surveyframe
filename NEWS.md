@@ -18,8 +18,16 @@ experience. ggplot2 joins Suggests; hard dependencies are unchanged.
   partially completed responses no longer form a blank category.
 * Ranking items now export one column per option holding its rank
   (`item__option = 1` for the top choice), so ranks are directly analysable.
-  `read_responses()` accepts the expanded columns for ranking and matrix
-  items without warnings.
+  Multiple-choice items likewise export one 0/1 column per option instead
+  of a single comma-joined column. `read_responses()` accepts the expanded
+  columns for ranking, matrix, and multiple-choice items without warnings.
+* `render_report()` now attaches each analysis block's chart directly under
+  its result table, in both the Quarto and internal HTML report paths,
+  instead of tables and plots appearing in separate places.
+* Likert items in the report's response-distributions section get a
+  diverging stacked bar chart (darkest at each pole, lightest next to
+  neutral) instead of a plain frequency bar, so the direction and strength
+  of opinion is visible at a glance.
 
 ## Survey experience
 
@@ -38,6 +46,8 @@ experience. ggplot2 joins Suggests; hard dependencies are unchanged.
 * Branching rules can now show and hide section breaks and text blocks, so
   a branched text block works as a screen-out message ("Sorry, you are not
   eligible") and section headings disappear with their questions.
+* A matrix question reflows into stacked, labelled row-cards below 600
+  pixels instead of a table that needs horizontal scrolling to complete.
 * The exported survey meets WCAG 2.2 AA on an instrumented audit: every
   input carries an accessible name, keyboard focus is visible on option
   cards, errors are announced to assistive technology, required questions
@@ -72,6 +82,10 @@ experience. ggplot2 joins Suggests; hard dependencies are unchanged.
   test suggester handles Likert items and multi-group comparisons sensibly.
 * Reports print generated model syntax in code blocks and show reliability
   results as a table.
+* "+ Add question" now opens the question-type picker instead of silently
+  adding a Likert item, and the redundant icon-only button next to it is
+  gone. Survey settings live only in the sidebar; the top bar no longer
+  duplicates that entry point.
 
 # surveyframe 0.3.2
 
