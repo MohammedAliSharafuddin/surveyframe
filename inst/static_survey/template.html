@@ -34,8 +34,8 @@ input,textarea,select{font-family:inherit;font-size:15px}
 .prog-bar-wrap{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--cg) 92%,transparent);backdrop-filter:blur(4px);border-bottom:1px solid var(--cb);padding:0}
 .prog-bar-inner{height:3px;background:var(--cp);transition:width .3s ease;min-width:0}
 .prog-hdr{display:flex;align-items:center;gap:10px;padding:9px 20px}
-.prog-title{font-size:12.5px;font-weight:600;color:var(--t2);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.prog-pct{font-size:12px;color:var(--t3);flex-shrink:0}
+.prog-title{font-size:13px;font-weight:600;color:var(--t1);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.prog-pct{font-size:12.5px;color:var(--t2);flex-shrink:0}
 
 /* Layout */
 .frame{max-width:var(--card-w);margin:0 auto;padding:30px 18px 60px}
@@ -76,6 +76,7 @@ input,textarea,select{font-family:inherit;font-size:15px}
 /* Items */
 .item{margin-bottom:32px}
 .item.hidden{display:none}
+.blk.hidden{display:none}
 .item-q{font-family:var(--serif);font-weight:500;margin-bottom:8px;display:flex;gap:7px;
   font-size:19px;line-height:1.45;letter-spacing:-.1px}
 .mode-conversational .item-q{font-size:25px}
@@ -84,6 +85,14 @@ input,textarea,select{font-family:inherit;font-size:15px}
 .item-err{font-size:13px;color:var(--cd);margin-top:6px;display:none}
 .item-err.show{display:block}
 .q-eyebrow{font-size:13px;color:var(--cp);margin-bottom:10px;font-weight:600}
+
+/* Focus visibility: hidden native inputs surface focus on their card */
+.choice-opt:has(input:focus-visible),
+.likert-opt:has(input:focus-visible){outline:3px solid var(--deep);outline-offset:2px}
+.btn:focus-visible,.star-btn:focus-visible,.rank-mv:focus-visible,
+.inp-std:focus-visible,.slider-inp:focus-visible,
+.matrix-tbl input:focus-visible,.consent-chk input:focus-visible{
+  outline:3px solid var(--deep);outline-offset:2px}
 
 /* Likert: numbered square buttons with tiny labels, single-colour theme */
 .likert-row{display:flex;gap:9px;overflow-x:auto;padding-bottom:2px}
@@ -96,7 +105,7 @@ input,textarea,select{font-family:inherit;font-size:15px}
 .likert-opt input{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
 .likert-num{font-size:18px;font-weight:600;color:var(--t2);line-height:1.2}
 .likert-opt:has(input:checked) .likert-num{color:#fff}
-.likert-lbl{font-size:10.5px;color:var(--t3);line-height:1.25;max-width:76px}
+.likert-lbl{font-size:11px;color:var(--t2);line-height:1.25;max-width:76px}
 .likert-opt:has(input:checked) .likert-lbl{color:color-mix(in srgb,#ffffff 82%,var(--cp))}
 
 /* Choice: bordered option cards with key chips and a tick */
@@ -130,8 +139,10 @@ textarea.inp-std:focus{border-color:var(--cp);box-shadow:0 0 0 3px color-mix(in 
 .slider-wrap{display:flex;flex-direction:column;gap:8px;border:1px solid var(--cb);
   border-radius:6px;background:var(--cf);padding:16px 18px;
   box-shadow:0 1px 0 rgba(18,33,43,.03)}
-.slider-inp{width:100%;accent-color:var(--cp);height:6px;cursor:pointer}
-.slider-lbls{display:flex;justify-content:space-between;font-size:12.5px;color:var(--t3)}
+.slider-inp{width:100%;accent-color:var(--cp);height:24px;cursor:pointer}
+.slider-inp::-webkit-slider-thumb{width:24px;height:24px}
+.slider-inp::-moz-range-thumb{width:22px;height:22px}
+.slider-lbls{display:flex;justify-content:space-between;font-size:12.5px;color:var(--t2)}
 .slider-val{font-size:22px;font-weight:600;font-family:var(--serif);color:var(--cp);text-align:center}
 
 /* Rating */
@@ -152,7 +163,7 @@ textarea.inp-std:focus{border-color:var(--cp);box-shadow:0 0 0 3px color-mix(in 
   text-align:center;vertical-align:middle}
 .matrix-tbl tr:last-child td{border-bottom:none}
 .matrix-tbl .rl{text-align:left;font-weight:500;color:var(--t1)}
-.matrix-tbl input{accent-color:var(--cp);width:17px;height:17px}
+.matrix-tbl input{accent-color:var(--cp);width:24px;height:24px}
 .matrix-tbl tbody tr:hover td{background:var(--tint)}
 
 /* Ranking: option-card rows matching the choice cards */
@@ -167,6 +178,11 @@ textarea.inp-std:focus{border-color:var(--cp);box-shadow:0 0 0 3px color-mix(in 
   color:#fff;font-size:12.5px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .rank-handle{color:var(--t3);font-size:14px;flex-shrink:0;cursor:grab}
 .rank-lbl{flex:1;font-size:15px}
+.rank-kbd{display:flex;gap:4px;flex-shrink:0}
+.rank-mv{width:30px;height:30px;border-radius:6px;border:1px solid var(--cb);
+  background:var(--cf);color:var(--t2);font-size:11px;display:flex;
+  align-items:center;justify-content:center;cursor:pointer}
+.rank-mv:hover{border-color:var(--cp);color:var(--cp);background:var(--tint)}
 
 /* Error banner */
 .err-banner{background:#fef2f2;border:1.5px solid #fecaca;border-radius:8px;
@@ -174,8 +190,8 @@ textarea.inp-std:focus{border-color:var(--cp);box-shadow:0 0 0 3px color-mix(in 
 .err-banner.show{display:block}
 
 /* Footer */
-.sf-footer{text-align:center;font-size:11px;color:var(--t3);padding:8px 16px 36px}
-.sf-footer a{color:var(--t3);font-weight:600;text-decoration:none}
+.sf-footer{text-align:center;font-size:12px;color:var(--t2);padding:8px 16px 36px}
+.sf-footer a{color:var(--t2);font-weight:600;text-decoration:underline}
 .sf-footer a:hover{text-decoration:underline}
 
 /* Mobile */
@@ -321,11 +337,19 @@ function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').
 function h(tag,attrs,inner){return'<'+tag+' '+(attrs||'')+'>'+inner+'</'+tag+'>';}
 function wrapItem(item,inner){
   return'<div class="item'+(isVisible(item.id)?'':' hidden')+'" id="item_'+esc(item.id)+'" data-id="'+esc(item.id)+'">'
-    +'<div class="item-q">'+esc(item.label)+(item.required?'<span class="req-mk" aria-hidden="true">*</span>':'')+'</div>'
-    +(item.help?'<div class="item-help">'+esc(item.help)+'</div>':'')
+    +'<div class="item-q" id="q_'+esc(item.id)+'">'+esc(item.label)
+    +(item.required?'<span class="req-mk" aria-hidden="true">*</span><span class="sr">(required)</span>':'')+'</div>'
+    +(item.help?'<div class="item-help" id="help_'+esc(item.id)+'">'+esc(item.help)+'</div>':'')
     +inner
-    +'<div class="item-err" id="err_'+esc(item.id)+'">This question is required.</div>'
+    +'<div class="item-err" id="err_'+esc(item.id)+'" role="alert">This question is required.</div>'
     +'</div>';
+}
+// Accessible-name attributes for inputs that sit outside a label element:
+// the question text div carries id q_<item>, referenced from the control.
+function ariaFor(item){
+  return' aria-labelledby="q_'+esc(item.id)+'"'
+    +(item.help?' aria-describedby="help_'+esc(item.id)+'"':'')
+    +(item.required?' aria-required="true"':'');
 }
 
 // ── Renderers ──────────────────────────────────────────────────────────────
@@ -353,16 +377,22 @@ function renderItem(item){
 }
 
 function renderSection(item){
-  return'<div class="sec-div"><div class="sec-title">'+esc(item.label)+'</div>'+(item.section_intro?'<div class="sec-sub">'+esc(item.section_intro)+'</div>':'')+'</div>';
+  // The item_<id> wrapper lets branching rules show and hide section breaks
+  return'<div class="blk'+(isVisible(item.id)?'':' hidden')+'" id="item_'+esc(item.id)+'">'
+    +'<div class="sec-div"><h2 class="sec-title">'+esc(item.label)+'</h2>'
+    +(item.section_intro?'<div class="sec-sub">'+esc(item.section_intro)+'</div>':'')+'</div></div>';
 }
 function renderTextBlock(item){
-  return'<div class="txt-blk">'+esc(item.label)+'</div>';
+  // Branchable, so a text block can act as a screen-out or context message
+  return'<div class="blk'+(isVisible(item.id)?'':' hidden')+'" id="item_'+esc(item.id)+'">'
+    +'<div class="txt-blk">'+esc(item.label)+'</div></div>';
 }
 function renderLikert(item,cs){
   var saved=responses[item.id];
-  return'<div class="likert-row" role="radiogroup">'+cs.values.map(function(v,i){
+  return'<div class="likert-row" role="radiogroup" aria-labelledby="q_'+esc(item.id)+'">'+cs.values.map(function(v,i){
     var checked=String(saved)===String(v);
     return'<label class="likert-opt"><input type="radio" name="'+esc(item.id)+'" value="'+esc(v)+'"'+(checked?' checked':'')
+      +(item.required?' aria-required="true"':'')
       +' onchange="setResp(\''+esc(item.id)+'\',this.value)">'
       +'<span class="likert-num">'+esc(v)+'</span>'
       +'<span class="likert-lbl">'+esc(cs.labels[i]||v)+'</span></label>';
@@ -373,7 +403,7 @@ function renderSingle(item,cs){
   return'<div class="choice-list">'+cs.values.map(function(v,i){
     var checked=String(saved)===String(v);
     return'<label class="choice-opt"><input type="radio" name="'+esc(item.id)+'" value="'+esc(v)+'"'
-      +(checked?' checked':'')
+      +(checked?' checked':'')+(item.required?' aria-required="true"':'')
       +' onchange="setResp(\''+esc(item.id)+'\',this.value)">'
       +'<span class="opt-txt">'+esc(cs.labels[i]||v)+'</span></label>';
   }).join('')+'</div>';
@@ -383,7 +413,7 @@ function renderMulti(item,cs){
   return'<div class="choice-list">'+cs.values.map(function(v,i){
     var chk=saved.includes(String(v));
     return'<label class="choice-opt"><input type="checkbox" name="'+esc(item.id)+'" value="'+esc(v)+'"'
-      +(chk?' checked':'')
+      +(chk?' checked':'')+(item.required?' aria-required="true"':'')
       +' onchange="toggleMulti(\''+esc(item.id)+'\',this)">'
       +'<span class="opt-txt">'+esc(cs.labels[i]||v)+'</span></label>';
   }).join('')+'</div>';
@@ -397,8 +427,10 @@ function renderMatrix(item,cs){
     return'<tr>'
       +'<td class="rl">'+esc(row)+'</td>'
       +cs.values.map(function(v){
+        var colLbl=cs.labels[cs.values.indexOf(v)]||v;
         return'<td><input type="radio" name="'+esc(rowKey)+'" value="'+esc(v)+'"'
           +(String(saved)===String(v)?' checked':'')
+          +' aria-label="'+esc(row)+': '+esc(colLbl)+'"'
           +' onchange="setResp(\''+esc(rowKey)+'\',this.value)"></td>';
       }).join('')
       +'</tr>';
@@ -412,25 +444,25 @@ function renderNumeric(item){
   // Numbers bypass esc(): esc(0) would collapse to an empty string
   var mn=item.slider_min!=null?' min="'+(+item.slider_min)+'"':'';
   var mx=item.slider_max!=null?' max="'+(+item.slider_max)+'"':'';
-  return'<input type="number" class="inp-std inp-narrow" id="inp_'+esc(item.id)+'" value="'+esc(saved)+'"'+mn+mx
+  return'<input type="number" class="inp-std inp-narrow" id="inp_'+esc(item.id)+'" value="'+esc(saved)+'"'+mn+mx+ariaFor(item)
     +' onchange="if(this.min!==\'\'&&+this.value<+this.min)this.value=this.min;'
     +'if(this.max!==\'\'&&+this.value>+this.max)this.value=this.max;'
     +'setResp(\''+esc(item.id)+'\',this.value)">';
 }
 function renderText(item){
   var saved=responses[item.id]||'';
-  return'<input type="text" class="inp-std" id="inp_'+esc(item.id)+'" value="'+esc(saved)+'"'
+  return'<input type="text" class="inp-std" id="inp_'+esc(item.id)+'" value="'+esc(saved)+'"'+ariaFor(item)
     +' placeholder="'+esc(item.placeholder||'')+'"'
     +' oninput="setResp(\''+esc(item.id)+'\',this.value)">';
 }
 function renderTextarea(item){
   var saved=responses[item.id]||'';
-  return'<textarea class="inp-std" id="inp_'+esc(item.id)+'" placeholder="'+esc(item.placeholder||'')+'"'
+  return'<textarea class="inp-std" id="inp_'+esc(item.id)+'"'+ariaFor(item)+' placeholder="'+esc(item.placeholder||'')+'"'
     +' oninput="setResp(\''+esc(item.id)+'\',this.value)">'+esc(saved)+'</textarea>';
 }
 function renderDate(item){
   var saved=responses[item.id]||'';
-  return'<input type="date" class="inp-std inp-narrow" id="inp_'+esc(item.id)+'" value="'+esc(saved)+'"'
+  return'<input type="date" class="inp-std inp-narrow" id="inp_'+esc(item.id)+'" value="'+esc(saved)+'"'+ariaFor(item)
     +' onchange="setResp(\''+esc(item.id)+'\',this.value)">';
 }
 function renderSlider(item){
@@ -440,7 +472,7 @@ function renderSlider(item){
   var saved=responses[item.id]!=null?responses[item.id]:Math.round((mn+mx)/2);
   return'<div class="slider-wrap">'
     +'<div class="slider-val" id="slv_'+esc(item.id)+'">'+saved+'</div>'
-    +'<input type="range" class="slider-inp" min="'+mn+'" max="'+mx+'" step="'+st+'" value="'+saved+'"'
+    +'<input type="range" class="slider-inp"'+ariaFor(item)+' min="'+mn+'" max="'+mx+'" step="'+st+'" value="'+saved+'"'
     +' oninput="setResp(\''+esc(item.id)+'\',this.value);document.getElementById(\'slv_'+esc(item.id)+'\').textContent=this.value">'
     +'<div class="slider-lbls"><span>'+(+mn)+'</span><span>'+(+mx)+'</span></div>'
     +'</div>';
@@ -466,8 +498,14 @@ function renderRanking(item,cs){
     return'<div class="rank-item" draggable="true" data-id="'+esc(item.id)+'" data-v="'+esc(opt.v)+'"'
       +' ondragstart="rankDragStart(event)" ondragover="rankDragOver(event)" ondrop="rankDrop(event,\''+esc(item.id)+'\')" ondragleave="this.classList.remove(\'drag-over\')">'
       +'<span class="rank-num">'+(i+1)+'</span>'
-      +'<span class="rank-handle">&#8942;</span>'
+      +'<span class="rank-handle" aria-hidden="true">&#8942;</span>'
       +'<span class="rank-lbl">'+esc(opt.l)+'</span>'
+      +'<span class="rank-kbd">'
+      +'<button type="button" class="rank-mv" aria-label="Move '+esc(opt.l)+' up"'
+      +' onclick="rankMove(\''+esc(item.id)+'\',\''+esc(opt.v)+'\',-1)">&#9650;</button>'
+      +'<button type="button" class="rank-mv" aria-label="Move '+esc(opt.l)+' down"'
+      +' onclick="rankMove(\''+esc(item.id)+'\',\''+esc(opt.v)+'\',1)">&#9660;</button>'
+      +'</span>'
       +'</div>';
   }).join('')+'</div>';
 }
@@ -535,6 +573,18 @@ function rankDrop(e,itemId){
   var newOrder=[].slice.call(list.querySelectorAll('.rank-item')).map(function(el){return el.dataset.v;});
   responses[itemId]=newOrder.join(',');
   dragSrc=null;
+}
+// Keyboard alternative to drag: move an option one position up or down
+function rankMove(itemId,v,dir){
+  var order=rankOrders[itemId]; if(!order)return;
+  var i=order.findIndex(function(o){return o.v===String(v);});
+  var j=i+dir;
+  if(i<0||j<0||j>=order.length)return;
+  var tmp=order[i];order[i]=order[j];order[j]=tmp;
+  responses[itemId]=order.map(function(o){return o.v;}).join(',');
+  renderScreen();
+  var btn=document.querySelector('#rank_'+itemId+' .rank-item[data-v="'+v+'"] .rank-mv'+(dir<0?'':' + .rank-mv'));
+  if(btn)btn.focus();
 }
 
 // ── Validation ─────────────────────────────────────────────────────────────
@@ -719,7 +769,7 @@ function renderWelcome(){
     startSurvey();return;
   }
   el.innerHTML='<div class="card"><div class="card-body">'
-    +'<div class="wl-title">'+esc(WL.title||SF.meta.title)+'</div>'
+    +'<h1 class="wl-title">'+esc(WL.title||SF.meta.title)+'</h1>'
     +(WL.intro_text?'<div class="wl-intro">'+esc(WL.intro_text)+'</div>':'')
     +(WL.consent_text?'<div class="consent-box">'+esc(WL.consent_text)+'</div>':'')
     +(WL.consent_required?'<label class="consent-chk"><input type="checkbox" id="consent-chk" style="accent-color:var(--cp)"><span>I have read and consent to participate.</span></label>':'')
@@ -743,7 +793,7 @@ function renderSurvey(){
     ?'<div class="q-eyebrow">Question '+currentPage+' of '+maxPage+'</div>'
     :'';
   el.innerHTML='<div class="card"><div class="card-body">'
-    +(currentPage===1?'<div class="wl-title" style="margin-bottom:6px">'+esc(SF.meta.title)+'</div>'+(SF.meta.description?'<div style="color:var(--t2);font-size:14px;line-height:1.55;margin-bottom:22px">'+esc(SF.meta.description)+'</div>':''):'')
+    +(currentPage===1?'<h1 class="wl-title" style="margin-bottom:6px">'+esc(SF.meta.title)+'</h1>'+(SF.meta.description?'<div style="color:var(--t2);font-size:14px;line-height:1.55;margin-bottom:22px">'+esc(SF.meta.description)+'</div>':''):'')
     +paginationInfo
     +'<div id="survey-err" class="err-banner">Please answer all required questions before continuing.</div>'
     +items.map(renderItem).join('')

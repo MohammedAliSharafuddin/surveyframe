@@ -35,6 +35,15 @@ experience. ggplot2 joins Suggests; hard dependencies are unchanged.
 * Single-page surveys show answered-questions progress (for example
   "12 of 44 answered"); numeric questions respect declared minimum and
   maximum bounds.
+* Branching rules can now show and hide section breaks and text blocks, so
+  a branched text block works as a screen-out message ("Sorry, you are not
+  eligible") and section headings disappear with their questions.
+* The exported survey meets WCAG 2.2 AA on an instrumented audit: every
+  input carries an accessible name, keyboard focus is visible on option
+  cards, errors are announced to assistive technology, required questions
+  are marked beyond colour, ranking items gain keyboard reorder buttons,
+  headings are real headings, and all touch targets and text contrast meet
+  the standard.
 
 ## Data collection
 
