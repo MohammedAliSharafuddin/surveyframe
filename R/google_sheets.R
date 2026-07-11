@@ -57,6 +57,10 @@ export_google_sheet <- function(instrument, sheet_url, output_dir = ".") {
       # 0.3.3: ranking posts one rank column per option
       vals <- choice_values(instrument, i$choice_set)
       if (length(vals) > 0L) paste0(i$id, "__", vals) else i$id
+    } else if (identical(i$type, "multiple_choice") && !is.null(i$choice_set)) {
+      # 0.3.3: multi-select posts one 0/1 column per option
+      vals <- choice_values(instrument, i$choice_set)
+      if (length(vals) > 0L) paste0(i$id, "__", vals) else i$id
     } else {
       i$id
     }

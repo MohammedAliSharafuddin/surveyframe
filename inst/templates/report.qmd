@@ -225,8 +225,15 @@ for (item in q_items) {
     } else freq <- table(col)
     if (!sum(freq)) next
     cat(sprintf("\n**%s**\n\n", item$label %||% item$id))
-    op <- par(mar = c(4, 11, 1, 1)); barplot(freq, horiz = TRUE, las = 1,
-      col = THEME, border = NA, xlab = "Frequency", cex.names = .8); par(op)
+    if (identical(t, "likert") && length(freq) >= 2) {
+      # A Likert item is an ordered agree/disagree scale: a diverging bar
+      # shows which way opinion leans in one glance, unlike a plain
+      # frequency bar that does not distinguish "agree" from "disagree".
+      sframe_draw_likert_diverging(freq, THEME)
+    } else {
+      op <- par(mar = c(4, 11, 1, 1)); barplot(freq, horiz = TRUE, las = 1,
+        col = THEME, border = NA, xlab = "Frequency", cex.names = .8); par(op)
+    }
     cat("\n\n")
   } else if (t %in% c("numeric", "slider", "rating")) {
     num <- suppressWarnings(as.numeric(col)); num <- num[!is.na(num)]
@@ -296,7 +303,10 @@ if (!has_data) {
       cat(sprintf("**Interpretation prompt:** %s\n\n", rq$interpretation))
   }
 } else {
-  results <- tryCatch(run_analysis_plan(responses, instrument), error=function(e) NULL)
+  results <- tryCatch(
+    run_analysis_plan(responses, instrument,
+                      plots = requireNamespace("ggplot2", quietly = TRUE)),
+    error=function(e) NULL)
   if (is.null(results)) {
     cat("Analysis plan could not be executed. Check that variable names match response columns.\n\n")
   } else {
@@ -331,6 +341,13 @@ if (!has_data) {
           cat(sprintf("**Effect size:** %s\n\n", r$effect_label))
         if (!is.null(r$table) && is.data.frame(r$table))
           print(kable(r$table, digits = 2))
+        # The chart for this result sits directly under its table, as one
+        # unit per research question, rather than in a separate section.
+        if (!is.null(r$plot)) {
+          cat("\n")
+          print(r$plot)
+          cat("\n")
+        }
         if (nzchar(r$interpretation %||% ""))
           cat(sprintf("\n**Interpretation:** %s\n\n", r$interpretation))
         if (length(r$citations) > 0) {
