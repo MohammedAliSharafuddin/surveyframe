@@ -203,6 +203,18 @@ the Design improvement arc items already logged in dogfeed.todo.md
 (settings entry-point consolidation, Analyse sub-tab rework, header nav
 balance).
 
+**New, 2026-07-12**: a WCAG 2.2 AA pass on the vignettes themselves, not
+just the exported survey and the builder chrome. The default knitr HTML
+vignette output (no pkgdown wrapper) reads as visually flat: a single
+black-on-white type scale, no colour or spacing to guide scanning, and
+default table/code-block contrast that has not been checked against AA
+thresholds. Scope for 0.3.4: a shared vignette CSS include (heading scale,
+accent colour tied to the package theme, contrast-checked code block and
+table styling) applied via `rmarkdown::html_vignette`'s CSS argument or a
+package-wide vignette template, so vignettes read as a designed document
+rather than default Pandoc output, and pass the same AA contrast and
+heading-structure checks already applied to the survey and builder.
+
 Settings-entry-point direction confirmed 2026-07-11: the sidebar's
 existing title button, the Welcome/Logo/Thank You setup strip, and any
 other survey-settings entry points become ONE obviously-primary sidebar
