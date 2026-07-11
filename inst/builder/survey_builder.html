@@ -99,12 +99,9 @@ input,textarea,select{font-family:inherit;font-size:13px}
 .sb-footer{padding:10px;border-top:1px solid rgba(255,255,255,.07)}
 .fab-row{display:flex;gap:6px}
 .fab{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;
-  padding:9px;border-radius:6px;background:var(--cp);color:#fff;
+  padding:9px;min-height:38px;border-radius:6px;background:var(--cp);color:#fff;
   font-size:12px;font-weight:600;transition:background var(--d1)}
-.fab:hover{background:var(--cp-d)}
-.fab-more{padding:9px 11px;border-radius:6px;background:rgba(255,255,255,.1);
-  color:var(--st);font-size:14px;transition:background var(--d1)}
-.fab-more:hover,.fab-more.active{background:rgba(255,255,255,.18);color:#fff}
+.fab:hover,.fab.active{background:var(--cp-d)}
 .fab-menu{display:none;background:var(--sh);border-radius:6px;overflow:hidden;
   border:1px solid rgba(255,255,255,.08);max-height:260px;overflow-y:auto;
   margin-bottom:6px}
@@ -509,7 +506,9 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
       <button type="button" id="redoBtn" title="Redo (Ctrl+Y)" onclick="redo()" disabled>&#8631;</button>
     </div>
     <span class="save-st" id="saveSt">No changes</span>
-    <button type="button" class="btn btn-s btn-sm btn-gear" onclick="openSettings('meta')" title="Survey settings" aria-label="Survey settings"><span class="gear-ic">&#9881;</span> Settings</button>
+    <!-- Survey settings lives only in the sidebar title button (below) to
+         avoid a duplicate entry point; the top bar is reserved for
+         document actions (Open, Export, Save). -->
     <button type="button" class="btn btn-s btn-sm" onclick="openFile()">Open</button>
     <button type="button" class="btn btn-s btn-sm" onclick="exportSurveyHtml()" title="Export a deployable, self-contained survey HTML">Export survey</button>
     <button type="button" class="btn btn-p btn-sm" onclick="saveSframe()">Save .sframe</button>
@@ -565,8 +564,8 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
       </div>
     </div>
     <div class="fab-row">
-      <button type="button" class="fab" onclick="qAdd('likert')" aria-label="Add Likert question">+ Add question</button>
-      <button type="button" class="fab-more" id="fabMoreBtn" title="More item types" onclick="toggleFabMenu()">&#8942;</button>
+      <button type="button" class="fab" id="fabMoreBtn" aria-haspopup="true" aria-controls="fabMenu"
+              title="Choose a question type" onclick="toggleFabMenu()">+ Add question</button>
     </div>
   </div>
 </aside>
@@ -1081,6 +1080,25 @@ textarea.inp-std:focus{border-color:var(--cp);box-shadow:0 0 0 3px color-mix(in 
   .prog-hdr{padding:9px 14px}
   .btn{padding:10px 20px}
   .likert-opt{min-width:50px}
+
+  /* Matrix reflows into stacked row-cards below 600px: each matrix row
+     becomes its own card and each column becomes a labelled tap target
+     inside it, so completing a matrix never needs horizontal scrolling.
+     Accessible names already come from the per-radio aria-label set in
+     renderMatrix(), so hiding the visual header loses no information. */
+  .matrix-wrap{overflow-x:visible;border:none;background:transparent;box-shadow:none}
+  .matrix-tbl,.matrix-tbl tbody,.matrix-tbl tr{display:block;width:100%}
+  .matrix-tbl thead{display:none}
+  .matrix-tbl tr{margin-bottom:12px;border:1px solid var(--cb);border-radius:6px;
+    background:var(--cf);overflow:hidden;box-shadow:0 1px 0 rgba(18,33,43,.03)}
+  .matrix-tbl tr:last-child{margin-bottom:0}
+  .matrix-tbl td{display:flex;align-items:center;justify-content:space-between;
+    gap:12px;padding:12px 14px;min-height:44px;border-bottom:1px solid var(--cb);
+    text-align:left}
+  .matrix-tbl td:last-child{border-bottom:none}
+  .matrix-tbl td.rl{font-weight:600;background:var(--tint);border-bottom:1.5px solid var(--tint-bd)}
+  .matrix-tbl td:not(.rl)::before{content:attr(data-col);color:var(--t2);font-size:14px;flex:1}
+  .matrix-tbl td:not(.rl) input{margin:0;flex-shrink:0;width:22px;height:22px}
 }
 </style>
 </head>
@@ -1303,7 +1321,10 @@ function renderMatrix(item,cs){
       +'<td class="rl">'+esc(row)+'</td>'
       +cs.values.map(function(v){
         var colLbl=cs.labels[cs.values.indexOf(v)]||v;
-        return'<td><input type="radio" name="'+esc(rowKey)+'" value="'+esc(v)+'"'
+        // data-col drives the CSS reflow below 600px: the table becomes a
+        // stack of row-cards with the column label printed beside each
+        // radio, so a matrix never needs horizontal scrolling on a phone.
+        return'<td data-col="'+esc(colLbl)+'"><input type="radio" name="'+esc(rowKey)+'" value="'+esc(v)+'"'
           +(String(saved)===String(v)?' checked':'')
           +' aria-label="'+esc(row)+': '+esc(colLbl)+'"'
           +' onchange="setResp(\''+esc(rowKey)+'\',this.value)"></td>';
@@ -1549,6 +1570,14 @@ function doSubmit(){
       (cs.values||[]).forEach(function(v){
         var pos=order.indexOf(String(v));
         row[item.id+'__'+String(v)]=pos>=0?String(pos+1):'';
+      });
+    } else if(item.type==='multiple_choice'){
+      // One 0/1 column per option, so multi-select analysis needs no
+      // string-splitting: item__option = 1 when selected, 0 otherwise.
+      var csM=choiceMap[item.choice_set]||{values:[]};
+      var sel=(responses[item.id]||'').split(',').filter(Boolean);
+      (csM.values||[]).forEach(function(v){
+        row[item.id+'__'+String(v)]=sel.includes(String(v))?'1':'0';
       });
     } else {
       row[item.id]=responses[item.id]!=null?responses[item.id]:'';
@@ -1988,7 +2017,7 @@ function exportSheetsCollector(){
     if(i.type==='section_break'||i.type==='text_block')return;
     if(i.type==='matrix'&&i.matrix_items&&i.matrix_items.length){
       i.matrix_items.forEach(function(sub){cols.push(i.id+'__'+sub);});
-    }else if(i.type==='ranking'&&i.choice_set){
+    }else if((i.type==='ranking'||i.type==='multiple_choice')&&i.choice_set){
       var rcs=S.choices.find(function(c){return c.id===i.choice_set;});
       if(rcs&&rcs.values&&rcs.values.length){
         rcs.values.forEach(function(v){cols.push(i.id+'__'+String(v));});
@@ -2012,7 +2041,7 @@ var TB={likert:'b-li',single_choice:'b-si',multiple_choice:'b-mu',numeric:'b-nu'
 function renderItemList(){
   var el=document.getElementById('itemList'),q=(gv('itemSearch')||'').toLowerCase();
   var items=S.items.filter(function(i){return!q||(i.label||'').toLowerCase().includes(q)||(i.id||'').toLowerCase().includes(q);});
-  if(!items.length){el.innerHTML='<div class="sb-empty"><div class="sb-empty-ic">&#128196;</div><div class="sb-empty-t">No questions yet</div><div class="sb-empty-b">Add your first question below, or start from an existing file.</div><div class="sb-empty-cta"><button type="button" class="sb-cta-p" onclick="qAdd(\'likert\')">+ Add your first question</button><button type="button" class="sb-cta-s" onclick="openFile()">Open an existing .sframe</button><button type="button" class="sb-cta-s" onclick="openSettings()">Set up survey settings</button></div></div>';return;}
+  if(!items.length){el.innerHTML='<div class="sb-empty"><div class="sb-empty-ic">&#128196;</div><div class="sb-empty-t">No questions yet</div><div class="sb-empty-b">Use "+ Add question" below to choose a question type, or start from an existing file.</div><div class="sb-empty-cta"><button type="button" class="sb-cta-s" onclick="openFile()">Open an existing .sframe</button><button type="button" class="sb-cta-s" onclick="openSettings()">Set up survey settings</button></div></div>';return;}
   var cp=null;
   el.innerHTML=items.map(function(item){
     var ri=S.items.indexOf(item);

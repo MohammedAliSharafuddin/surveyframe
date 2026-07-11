@@ -100,13 +100,17 @@ read_responses <- function(
     } else if (identical(i$type, "ranking") && !is.null(i$choice_set)) {
       vals <- choice_values_for(i$choice_set)
       if (length(vals) > 0L) paste0(i$id, "__", vals) else character(0)
+    } else if (identical(i$type, "multiple_choice") && !is.null(i$choice_set)) {
+      vals <- choice_values_for(i$choice_set)
+      if (length(vals) > 0L) paste0(i$id, "__", vals) else character(0)
     } else {
       character(0)
     }
   }), use.names = FALSE)
   multi_ids <- vapply(
     Filter(function(i) identical(i$type, "matrix") ||
-             identical(i$type, "ranking"), response_items),
+             identical(i$type, "ranking") ||
+             identical(i$type, "multiple_choice"), response_items),
     function(i) i$id, character(1)
   )
   covered_by_expansion <- multi_ids[vapply(multi_ids, function(id) {

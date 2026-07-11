@@ -109,3 +109,61 @@ test_that("inferential runners gain a kable-ready $table", {
   expect_true(all(c("Value", "Frequency", "Percent") %in%
                     colnames(by_id("RQF")$table)))
 })
+
+test_that("sframe_draw_likert_diverging renders without ggplot2", {
+  counts5 <- c("Strongly disagree" = 8, "Disagree" = 12, "Neutral" = 15,
+              "Agree" = 40, "Strongly agree" = 25)
+  tmp <- tempfile(fileext = ".png")
+  on.exit(unlink(tmp), add = TRUE)
+  grDevices::png(tmp, width = 400, height = 200)
+  expect_no_error(sframe_draw_likert_diverging(counts5, "#16B3B1"))
+  grDevices::dev.off()
+  expect_true(file.exists(tmp))
+  expect_gt(file.size(tmp), 0)
+
+  # Even scale, no neutral category
+  counts4 <- c("Strongly disagree" = 30, "Disagree" = 25,
+              "Agree" = 20, "Strongly agree" = 15)
+  grDevices::png(tmp, width = 400, height = 200)
+  expect_no_error(sframe_draw_likert_diverging(counts4, "#7c3aed"))
+  grDevices::dev.off()
+
+  # Degenerate input does not error
+  grDevices::png(tmp, width = 400, height = 200)
+  expect_no_error(sframe_draw_likert_diverging(c(a = 0, b = 0), "#000"))
+  grDevices::dev.off()
+})
+
+test_that("report distributions and analysis sections attach a plot beside its table", {
+  skip_if_not_installed("ggplot2")
+  cs <- sf_choices("ag5", 1:5,
+    c("Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"))
+  i1 <- sf_item("sat_1", "The service was fast.", type = "likert",
+                choice_set = "ag5", required = TRUE)
+  instr <- sf_instrument("Report combined check",
+    components = list(cs, i1),
+    analysis_plan = list(list(
+      id = "RQ1", research_question = "Distribution of sat_1",
+      family = "descriptive", method = "frequency",
+      roles = list(variable = "sat_1")
+    )))
+  set.seed(1)
+  dat <- data.frame(
+    respondent_id = paste0("R", 1:40),
+    submitted_at = as.character(Sys.time()),
+    sat_1 = sample(1:5, 40, replace = TRUE),
+    stringsAsFactors = FALSE
+  )
+  withr::local_options(surveyframe.use_quarto = FALSE)
+  out <- tempfile(fileext = ".html")
+  on.exit(unlink(out), add = TRUE)
+  render_report(instr, dat, output_file = out)
+  html <- paste(readLines(out, warn = FALSE), collapse = "\n")
+  expect_match(html, "Response distributions")
+  expect_match(html, "data:image/png;base64")
+  # The RQ1 block's table and its chart appear as one contiguous unit
+  rq_start <- regexpr("RQ 1", html)
+  rq_chunk <- substr(html, rq_start, rq_start + 1200)
+  expect_match(rq_chunk, "Results table")
+  expect_match(rq_chunk, "data:image/png;base64")
+})
