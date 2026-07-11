@@ -199,9 +199,11 @@ methods, and no new bundled datasets.
   path for users who already have a response CSV, and points to
   `browseVignettes("surveyframe")`.
 
----
-
 # surveyframe 0.3.0
+
+The first CRAN release of the full workflow: a typed instrument object
+carrying the questions, the analysis plan, and the measurement model, with
+deployment, collection, analysis, and reporting built around it.
 
 ## New features
 
@@ -327,8 +329,6 @@ interpretation `prompt` field to guide write-up.
   `section_break` and `text_block` to appear as response columns.
 * `validate_sframe()` now checks model references, analysis-plan roles,
   invalid model IDs, duplicate model IDs, and model indicator/path integrity.
-* The package title and description were tightened for CRAN submission and
-  avoid overclaiming.
 
 * `launch_builder(open = TRUE)` opens the SurveyBuilder HTML in the system's
   default browser via `utils::browseURL()`.
@@ -369,56 +369,22 @@ interpretation `prompt` field to guide write-up.
 * Reworked the vignette set into a coherent workflow covering instrument
   building, response analysis, reliability and validity, EFA/CFA/SEM/PLS
   syntax generation, and GUI usage.
-* Added `cran-comments.md` with platform list, dependency justification,
-  bundled-asset description, and a `\dontrun{}` use justification table.
+* The demo launchers (`launch_builder_demo()`, `launch_studio_demo()`, and
+  `launch_dashboard_demo()`) open in the browser with the demo instrument,
+  scales, and analysis plan preloaded, so no manual file loading is needed.
+* The interactive package demo (`demo("survey")`) walks through the whole
+  workflow with step-by-step prompts.
 
-* `launch_builder_demo()` now injects the demo instrument JSON directly into
-  a temporary copy of `survey_builder.html`. The demo questions, scales, and
-  analysis plan are visible immediately on launch, with no manual Load .sframe
-  step is needed.
-* `launch_studio_demo()` and `launch_dashboard_demo()` now pass
-  `launch.browser = TRUE` so the browser always opens automatically.
-* `inst/shiny/dashboard/app.R`: replaced `library(shiny)` with a
-  `requireNamespace` check and explicit `shiny::` namespace prefixes for CRAN
-  policy compliance.
-* `db_quality_ui()`: `class = flag_class` added to `tags$tr()` so quality
-  rows are colour-coded by flag status.
-* `db_data_ui()`: download-button background colour now uses
-  `sprintf("...%s...", THEME)` instead of `background:var(--cp,#2563eb)` so
-  the button respects the active dashboard theme.
-* `db_overview_ui()`: date parsing is now delegated to `dashboard_parse_date()`
-  for robust, error-free date display.
-* `render_report()` and `render_results()`: HTML report tables now use APA
-  formatting: horizontal rules only, no vertical borders, no row shading.
-  A significance footnote is appended automatically when a p-value column is
-  detected.
-* `demo/survey.R`: complete UX rewrite with section headers, contextual pause
-  prompts, "In the browser: ->" guidance, `ask_yn()` yes/no prompts, and a
-  conversational mode for static survey export. All output is ASCII-safe.
-* `dashboard_parse_date()` completely rewritten. No longer throws
-  `Error in as.POSIXlt.character: character string is not in a standard
-  unambiguous format`. Now tries six explicit format templates in priority
-  order (ISO 8601 Z-suffix, ISO 8601 no-tz, space datetime, date-only,
-  UK dd/mm/yyyy, US mm/dd/yyyy) with `tryCatch` on each, plus a wrapped
-  fallback. Non-matching strings return `NA` instead of an error.
-* Dashboard Items and Scales tabs: `outputOptions(output, "item_chart",
-  suspendWhenHidden = FALSE)` and `outputOptions(output, "scale_chart",
-  suspendWhenHidden = FALSE)` added. Response distribution and Scale score
-  distribution charts now render as soon as the user switches to those tabs
-  instead of appearing blank.
+## Dashboard and report polish
 
-## Future direction: v0.4
-
-* MCDM and DEMATEL fall outside v0.3 scope. Planned v0.4 work includes
-  MCDM input fields, AHP pairwise-comparison matrices, DEMATEL direct
-  influence matrices, TOPSIS/VIKOR/PROMETHEE/ELECTRE planning, MCDM data
-  validation and consistency checks, DEMATEL thresholding and causal diagram
-  export, advanced SEM and PLS-SEM execution, higher-order constructs,
-  multi-group SEM planning, a diagram-based model builder, complex survey
-  design weighting, JASP/jamovi-friendly exports, and report-writer
-  integration after the data and model schemas stabilise.
-
----
+* The dashboard parses response dates in the common formats (ISO 8601,
+  date-only, UK and US day orders) instead of erroring on non-standard
+  strings, colour-codes quality rows by flag status, matches the download
+  button to the active theme, and draws the Items and Scales charts as soon
+  as their tabs open.
+* HTML report tables use APA formatting, with horizontal rules only and a
+  significance footnote added automatically when a p-value column is
+  present.
 
 # surveyframe 0.1.0
 
