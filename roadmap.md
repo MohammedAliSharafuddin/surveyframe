@@ -203,6 +203,15 @@ the Design improvement arc items already logged in dogfeed.todo.md
 (settings entry-point consolidation, Analyse sub-tab rework, header nav
 balance).
 
+Settings-entry-point direction confirmed 2026-07-11: the sidebar's
+existing title button, the Welcome/Logo/Thank You setup strip, and any
+other survey-settings entry points become ONE obviously-primary sidebar
+location. The top bar carries no settings entry points; it is reserved
+for future enterprise/academic administrative controls (a separate,
+not-yet-scoped feature area). The 0.3.3 quick win already removed the
+top-bar Settings button that duplicated the sidebar's; this task is the
+full consolidation, not just deduplication.
+
 Headline: coverage across all analysis families and S3 `plot()` on report objects.
 
 Deliverables:

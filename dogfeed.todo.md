@@ -167,6 +167,76 @@ and never reach the sheet. Import against the post-use instrument (the one
 actually deployed) and the missingness numbers are meaningful. Worth a
 mention in the Google Sheets vignette section in a future patch.
 
+### 2026-07-11 — second round of reviewer feedback, applied
+
+Six items raised while running mas_review_033.qmd chunk by chunk, all
+fixed and regression-tested:
+
+- **Multi-select export** was a single comma-joined column. Now exports
+  one 0/1 column per option (`item__option`), matching the ranking
+  pattern from the first review round: the exported survey payload, both
+  Apps Script collector generators (R and the builder's own), and
+  `read_responses()`'s column expansion all updated.
+- **Mobile responsiveness**: stress-tested at 320px with long labels.
+  Choice cards and Likert wrapped fine (no real bug there), but the
+  matrix grid genuinely needed horizontal scrolling to complete, which is
+  poor mobile UX. Below 600px a matrix now reflows into stacked row-cards
+  (one card per row, each column becomes a labelled tap target), reusing
+  the aria-labels the WCAG pass already added so no accessible name is
+  lost. Desktop table layout is unchanged (verified explicitly).
+- **Builder "+Add question"**: previously called `qAdd('likert')`
+  directly with no type picker, exactly as flagged. It now opens the
+  existing, already-WCAG-passing `fabMenu` type picker; the separate "⋮"
+  icon button (which did the same job) was removed as redundant. The
+  empty canvas's duplicate "+Add your first question" CTA was also
+  removed (the sidebar's own button now covers that job), which
+  incidentally addresses the "pushed off screen" complaint by shrinking
+  the empty-state block — flexbox scroll containment was verified correct
+  at down to 450px in isolation, so the push-down was more likely a very
+  short RStudio Viewer pane than a CSS bug, but the fix resolves it
+  regardless of cause.
+- **Settings duplication**: the top-bar gear "Settings" button was a pure
+  duplicate of the sidebar title button (both called
+  `openSettings('meta')`). Removed per the owner's explicit instruction
+  to keep all settings in the sidebar and reserve the top bar for future
+  enterprise/academic admin controls. Sidebar entry point verified still
+  works.
+- **Report table+plot separation**: `run_analysis_plan(plots = TRUE)`
+  plots were never wired into `render_report()` at all (neither the
+  Quarto template nor the internal HTML fallback referenced `$plot`).
+  Both paths now call `plots = requireNamespace("ggplot2", quietly =
+  TRUE)` and print each block's chart directly under its table, as one
+  unit per research question. New `.render_report_ggplot_png()` embeds
+  the ggplot as a base64 PNG for the fallback path, mirroring the
+  existing `.render_report_plot_png()` pattern.
+- **Likert plots**: the report's "Response distributions" section used
+  the same plain horizontal frequency bar for Likert, single-choice, and
+  multiple-choice items. Likert items now get a proper diverging stacked
+  bar (`sframe_draw_likert_diverging()` in R/plots.R, base graphics only,
+  no ggplot2 dependency): darkest colour at each pole, lightest next to
+  neutral, the middle category of an odd-length scale split across the
+  zero line, verified visually at 4, 5, and 7 points and wired into both
+  the Quarto and fallback report paths.
+
+**New issue discovered, not fixed this session (out of scope):**
+rendering `combined_quarto.html` from a from-scratch test instrument
+showed every `kable()` table in the Quarto-rendered report (codebook,
+analysis-plan results, and reliability tables alike) with all columns
+collapsed into a single `<td>` per row instead of one cell per column,
+under this machine's Quarto 1.8.24 / pandoc 3.9.0.2. Confirmed
+pre-existing (the codebook table, untouched this session, shows the same
+symptom) and NOT caused by anything in this round's changes. Two
+isolated minimal reproductions (a bare kable() in an asis chunk, and one
+copying report.qmd's exact YAML header) both rendered correctly, so the
+cause is narrower than "asis mode" or "the YAML" alone; the embedded
+plot images in the same document render correctly, so this is a
+table-specific pandoc/kable interaction, not a document-wide rendering
+failure. Needs a fresh investigation with report.qmd's actual
+`codebook_report()` data shape as the next lead. Flagged here rather
+than in mas_review_033.qmd since it was found through ad hoc testing,
+not a checklist step; add it as an H-part item next time the checklist
+is revised.
+
 ### 2026-07-11 — owner decisions from the review
 
 The live AIC-RSAM deployment stays on the hand-patched 0.3.2 export until

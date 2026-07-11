@@ -56,7 +56,7 @@ for (p in c("devtools", "remotes", "ggplot2", "psych", "lavaan",
 # if (!requireNamespace("remotes", quietly = TRUE)) install.packages("remotes")
 # remotes::install_github("MohammedAliSharafuddin/surveyframe@v0.3.3",
 #                         force = TRUE)
-install.packages("~/Documents/GitHub/surveyframe-dev/surveyframe_0.3.3.tar.gz", repos = NULL, type = "source")
+install.packages("~/Documents/GitHub/surveyframe-dev/surveyframe_0.3.3.tar.gz", repos = NULL, type = "source", build_vignettes = TRUE)
 ```
 
 Restart R after the install, then confirm:
@@ -184,7 +184,18 @@ export_static_survey(demo$instrument,
 - [c] C9 Section breaks show the short theme-coloured rule above a serif heading with italic intro.
 - [x] C10 The sticky top bar shows the progress line, a label, and the percentage, with no dash or duplicated page counter. On a single-page survey the label counts answered questions and updates as you answer.
 
-Feedback: The data for multi select is saved as comma separated in a single column. Which may need further cleaning editing later. Each variable should have a separate column entry with 0 and 1 logic for calculations. 
+Feedback: The data for multi select is saved as comma separated in a single column. Which may need further cleaning editing later. Each variable should have a separate column entry with 0 and 1 logic for calculations.
+
+> **Response (Sonnet 5, 2026-07-11):** Fixed, following the same pattern
+> already used for ranking items. A multiple-choice item now exports one
+> column per option (`item__option`), value `1` when selected and `0`
+> otherwise, with no string-splitting needed for analysis. Applied to the
+> exported survey's submission payload, both Apps Script collector
+> generators (R's `export_google_sheet()` and the builder's own), and
+> `read_responses()`'s column expansion. Verified end to end: a headless
+> submission's downloaded CSV, read back through `read_responses()`,
+> through `quality_report()`/`score_scales()`, into a rendered report.
+
 ### Step C2 — Theme colour selector
 
 ```{r chunk-07}
@@ -224,7 +235,23 @@ export_static_survey(demo3$instrument,
                      output_path = file.path(tempdir(), "themeb_conv.html"),
                      open = TRUE, overwrite = TRUE)
 ```
-Feedback: The design is not mobile friendly. The option cards and text are not resizing to the mobile screen. Leading to text overflow. the matrix grid need scrolling to read and complete. 
+Feedback: The design is not mobile friendly. The option cards and text are not resizing to the mobile screen. Leading to text overflow. the matrix grid need scrolling to read and complete.
+
+> **Response (Sonnet 5, 2026-07-11):** Stress-tested at 320px with
+> deliberately long question/option text (a purpose-built instrument, not
+> the bundled demo). Option cards and Likert squares wrapped correctly
+> with no overflow (`document.documentElement.scrollWidth` stayed at the
+> viewport width throughout) — that half of the report did not reproduce
+> as a bug. The matrix grid did: it genuinely needed horizontal scrolling
+> to complete on a narrow screen, confirmed by screenshot. Fixed: below
+> 600px a matrix now reflows into stacked row-cards, one per row, each
+> column becoming its own labelled tap target, so no matrix ever needs
+> horizontal scrolling on a phone. Desktop keeps the normal table layout
+> (explicitly verified unchanged). The existing per-cell `aria-label`s
+> from the WCAG pass carry over, so no accessible name is lost by hiding
+> the visual header. Re-verify C.mobile with your own device if you'd
+> like a second confirmation beyond the emulated 320px test.
+
 ------------------------------------------------------------------------
 
 ## Part D — SurveyBuilder fixes (10 items)
@@ -250,7 +277,46 @@ Feedback: There are two CTA buttons for Add question. (1) +Add your first questi
 (2) Add questions
 But none has a drop down for the items to choose from. They simply add a likert type question.
 The newly added buttons pushed the currently available button in the left panel to the bottom. Not visible on screen.
-All the icons and settings for the survey 
+All the icons and settings for the survey settings need more emphasis. Because it is the first place where a first time visitor will start. The separate button for setup survey settings, Title settings (Untitled survey), and another settings icon in the top nav bar. All these need a unified place in the side bar. 
+So, avoid duplicate entries between the top bar and side bar. Let all the buttons stay in the side bar. The top bar i will use later for enterprise / academic administrative settings.
+
+> **Response (Sonnet 5, 2026-07-11):** Three separate things here, handled
+> per your "quick wins now, full rework in the 0.3.4 builder-rework track"
+> pattern from the first review round.
+>
+> * **No dropdown, silently adds Likert (fixed now):** "+ Add question"
+>   previously called `qAdd('likert')` directly. It now opens the
+>   existing, already-built, already-WCAG-verified `fabMenu` type picker
+>   (the same panel the old "⋮" icon opened) — the separate "⋮" button was
+>   removed as redundant since the main button now does its job. Verified
+>   headlessly: clicking "+ Add question" opens the menu; choosing e.g.
+>   Matrix from it adds a matrix item, not a Likert item.
+> * **Button pushed off-screen (fixed now, likely cause identified):**
+>   your own D1 fix from the first round added a duplicate "+ Add your
+>   first question" CTA to the empty canvas; that block plus the always-
+>   present sidebar footer button is what you saw as "two CTA buttons for
+>   Add question." Removed the duplicate (the sidebar's real button
+>   already covers new-survey-with-no-questions-yet). I tested the
+>   footer's visibility in isolation at 700, 600, 500, and 450px viewport
+>   heights and the flexbox scroll containment (`.sb-body{flex:1;
+>   overflow-y:auto}`) held correctly at every size, so I could not
+>   reproduce a genuine CSS overflow bug; my best guess is a short RStudio
+>   Viewer pane rather than a layout defect, but removing the duplicate
+>   button shrinks the empty-state content regardless and should resolve
+>   it either way. Let me know if it still happens after reinstalling.
+> * **Settings duplication (fixed now, the full redesign stays deferred):**
+>   the top-bar gear "⚙ Settings" button was a pure duplicate of the
+>   sidebar's title button (both called `openSettings('meta')`), so it is
+>   removed per your explicit instruction; the sidebar entry point is
+>   confirmed still functional. The broader unification you're describing
+>   (Title settings, Welcome/Logo/Thank You setup strip, and this button
+>   all becoming one obviously-primary sidebar entry point, with the top
+>   bar reserved for future enterprise/academic admin controls) is real
+>   redesign work, not a bug fix, and stays in the 0.3.4 builder-rework
+>   track alongside the four-way Add-question split and the LimeSurvey/
+>   Formbricks benchmark pass already logged there. Recorded your top-bar
+>   direction in roadmap.md so it isn't lost before that patch starts.
+
 ------------------------------------------------------------------------
 
 ## Part E — Model syntax fixes (7 items)
@@ -333,6 +399,11 @@ cat(substr(res_e[[1]]$syntax, 1, 120), "...\n")
 - [x] E6 `method = "pls_sem"` returns the seminr syntax rather than "Test 'pls_sem' is unavailable".
 - [ ] E7 The Model Builder panel in the builder exports the same syntax through its Export syntax button (manual, with the builder open from Part D).
 
+Feedback: 
+error: none 
+# seminr PLS-SEM syntax generated by surveyframe
+rlang::check_installed("seminr", reason = "to fit PLS-SEM models")
+libr ...
 ------------------------------------------------------------------------
 
 ## Part F — Google Sheets collection (9 items)
@@ -476,6 +547,20 @@ print(res_es[[2]]$table)     # crosstab: no unnamed category
 - [x] G10 Neither table shows a blank or unnamed category for the empty strings.
 - [x] G11 Eyeball the plots at 150 percent zoom: fonts legible, no clipped labels.
 - [ ] G12 Optional: without ggplot2 installed, `plots = TRUE` fails with the friendly check_installed prompt and everything else works.
+Feedback: The current output prints the tables and plots separately. Each table and plot should go together.
+
+> **Response (Sonnet 5, 2026-07-11):** Correct, and the gap was more basic
+> than ordering: `render_report()` never referenced `result$plot` at all
+> in either the Quarto template or the internal HTML fallback, so the
+> chart never appeared in the report regardless of `plots = TRUE`. Fixed
+> in both paths: each analysis-plan block now prints its chart directly
+> under its result table, as one unit per research question. The internal
+> fallback gained `.render_report_ggplot_png()` (mirrors the existing
+> `.render_report_plot_png()` embedding pattern) since it has no knitr
+> device to auto-capture a ggplot. Verified in both paths: a from-scratch
+> test instrument's RQ2 (correlation) block shows the results table
+> immediately followed by the scatter plot as one contiguous block, in
+> both `surveyframe.use_quarto = FALSE` and the real Quarto render.
 
 ------------------------------------------------------------------------
 
@@ -523,6 +608,26 @@ utils::browseURL(out_h)
 - [x] H4 View the report at 1280 x 720: headings, tables, and plots readable from presentation distance.
 - [x] H5 The references show italic journal names (no literal asterisks).
 - [x] H6 The TOC navigates correctly to every section.
+Feedback: Likert outputs need Likert plot. Not the standard barplot.
+
+> **Response (Sonnet 5, 2026-07-11):** Agreed and fixed. The report's
+> "Response distributions" section used the same plain horizontal
+> frequency bar for Likert, single-choice, and multiple-choice items,
+> which loses the ordered, bipolar nature of a Likert scale. Added
+> `sframe_draw_likert_diverging()` (base graphics only, no ggplot2
+> dependency, so it works in the distributions section regardless of
+> whether ggplot2 is installed): a diverging stacked bar, darkest colour
+> at each pole (Strongly disagree / Strongly agree), lightest next to
+> neutral, the middle category of an odd-length scale split evenly across
+> the zero line. Wired into both the Quarto and fallback report paths for
+> `type == "likert"` items specifically (single/multiple choice keep the
+> plain bar, since they aren't inherently ordered). Verified visually at
+> 4, 5, and 7-point scales, including the legend reading order (fixed a
+> bug where a naive multi-column legend layout scrambled the scale order)
+> and colour-to-category mapping (fixed a bug where the darkest colour
+> was initially assigned to the wrong end of the scale). Confirmed
+> rendering correctly inside the actual Quarto-built report, not just in
+> isolation.
 
 ------------------------------------------------------------------------
 

@@ -275,6 +275,22 @@ The data export from feature_ranking should go in separate columns with numberin
 >
 > Re-verify C1, C8, and C10 after reinstalling; ranking export is item B11
 > below in spirit and covered by G-part table checks.
+
+Feedback (second round, 2026-07-11): The data for multi select is saved as comma separated in a single column. Which may need further cleaning editing later. Each variable should have a separate column entry with 0 and 1 logic for calculations.
+
+The design is not mobile friendly. The option cards and text are not resizing to the mobile screen. Leading to text overflow. the matrix grid need scrolling to read and complete.
+
+> **Response (Sonnet 5, 2026-07-11):** Multi-select export fixed, same
+> pattern as ranking: one 0/1 column per option (`item__option`), applied
+> to the survey payload, both collector generators, and
+> `read_responses()`. Mobile: stress-tested at 320px with deliberately
+> long text; option cards and Likert wrapped correctly with no overflow
+> (that half did not reproduce), but the matrix grid genuinely needed
+> horizontal scrolling, confirmed by screenshot. Fixed: below 600px a
+> matrix reflows into stacked, labelled row-cards instead of a scrolling
+> table. Desktop layout confirmed unchanged. Full detail in
+> mas_review_033.qmd's Part C annotations.
+
 ### Theme colour selector
 
 ```r
@@ -369,6 +385,26 @@ The surveyframe::launch_builder() needs a complete fable 5 review and proofing a
 >   benchmark pass, and the full launch_builder() UI/UX review are recorded
 >   in roadmap.md as the builder-rework track of the next patch, alongside
 >   the existing Design improvement arc items in dogfeed.todo.md.
+
+Feedback (second round, 2026-07-11): There are two CTA buttons for Add question. (1) +Add your first question (2) Add questions. But none has a dropdown for the items to choose from. They simply add a likert type question. The newly added buttons pushed the currently available button in the left panel to the bottom. Not visible on screen. All the icons and settings for the survey settings need more emphasis, because it is the first place where a first time visitor will start. The separate button for setup survey settings, Title settings (Untitled survey), and another settings icon in the top nav bar all need a unified place in the sidebar. Avoid duplicate entries between the top bar and side bar; let all the buttons stay in the side bar. The top bar will be used later for enterprise / academic administrative settings.
+
+> **Response (Sonnet 5, 2026-07-11):** Three fixes. "+ Add question" now
+> opens the existing type-picker menu instead of silently adding Likert
+> (the redundant "⋮" icon button, which did the same job, is removed).
+> The empty canvas's duplicate "+Add your first question" CTA (added in
+> the first round's D1 fix) is removed, which both resolves the "two CTA
+> buttons" complaint directly and shrinks the empty-state block; the
+> sidebar footer's real Add button was confirmed visible via isolated
+> testing at 700 down to 450px viewport heights, so the push-down was not
+> reproducible as a CSS bug in isolation, but the fix removes the extra
+> content regardless of the exact cause. The duplicate top-bar Settings
+> button is removed entirely (the sidebar title button already covers
+> it), per your explicit instruction. The full sidebar unification and
+> top-bar repurposing you're describing is real redesign work and stays
+> in the 0.3.4 builder-rework track; your direction is recorded in
+> roadmap.md so it carries forward. Full detail in mas_review_033.qmd's
+> Part D annotation.
+
 ---
 
 ## Part E — Model syntax fixes (7 items)
@@ -513,6 +549,17 @@ res  <- run_analysis_plan(demo$responses, demo$instrument, plots = TRUE)
   ggplot2, `run_analysis_plan(..., plots = TRUE)` fails with the friendly
   check_installed prompt, and everything else works without ggplot2.
 
+Feedback (second round, 2026-07-11): The current output prints the tables and plots separately. Each table and plot should go together.
+
+> **Response (Sonnet 5, 2026-07-11):** `render_report()` never referenced
+> `result$plot` at all in either the Quarto template or the internal HTML
+> fallback, so the chart never appeared in the report regardless of
+> `plots = TRUE`. Fixed in both paths: each analysis block now prints its
+> chart directly under its result table, as one unit per research
+> question. Verified in a from-scratch test instrument's rendered report,
+> both with Quarto and with `options(surveyframe.use_quarto = FALSE)`.
+> Full detail in mas_review_033.qmd's Part G annotation.
+
 ---
 
 ## Part H — Report checks (6 items)
@@ -531,6 +578,20 @@ model-syntax block and a reliability block.
 - [x] H5 The report references section still shows italic journal names
   (the citation markdown renders, no literal asterisks).
 - [x] H6 The TOC navigates correctly to every section.
+
+Feedback (second round, 2026-07-11): Likert outputs need Likert plot. Not the standard barplot.
+
+> **Response (Sonnet 5, 2026-07-11):** Agreed. The report's response-
+> distributions section used the same plain horizontal frequency bar for
+> Likert, single-choice, and multiple-choice items, losing the ordered,
+> bipolar nature of a Likert scale. Added a diverging stacked bar chart
+> (`sframe_draw_likert_diverging()`, base graphics only so it needs no
+> ggplot2): darkest colour at each pole, lightest next to neutral, the
+> middle category of an odd-length scale split across the zero line.
+> Wired into both report paths for Likert items specifically. Verified
+> visually at 4, 5, and 7-point scales and inside the actual Quarto-built
+> report output, not just in isolation. Full detail in
+> mas_review_033.qmd's Part H annotation.
 
 ---
 
