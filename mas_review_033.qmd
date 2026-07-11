@@ -374,7 +374,8 @@ resp_f2 <- read_sheet_responses(sheet_url, demo_f$instrument,
 - [ ] F5 The `meta_cols` variant accepts an extra sheet column without the undeclared-column warning.
 - [ ] F6 SurveyStudio, Upload screen, Google Sheet card: the same sheet imports, and the completion time card shows a median.
 - [x] F7 Live AIC-RSAM read-back (read-only, own account): `read_sheet_responses()` on the live sheet returns the real responses cleanly. Do NOT submit test data to the live endpoint.
-- [ ] F8 Decision recorded: re-export and republish the live AIC-RSAM survey mid-collection (CORS fix + Theme B), or leave the hand-patched deployment until collection ends.
+- [x] F8 Decision recorded (owner, 2026-07-11: leave the hand-patched live deployment until collection ends; republish with 0.3.3 afterwards).
+  Original item: re-export and republish the live AIC-RSAM survey mid-collection (CORS fix + Theme B), or leave the hand-patched deployment until collection ends.
 - [x] F9 The deploy kit lives in AI_Room_service/surveyframe_Integration/deploy_kit and its README says so.
 
 ------------------------------------------------------------------------
@@ -607,7 +608,7 @@ rmarkdown::render("vignettes/surveyframe.Rmd", output_dir = tempdir())
 - [x] K2 The lead vignette knits cleanly with the installed 0.3.3.
 - [ ] K3 No vignette prose or screenshot contradicts the Theme B design, and analysis output claims match what 0.3.3 prints (including `$table`).
 - [x] K4 The deployment vignette's Google Sheets instructions match the 0.3.3 collector: no CORS patching, no section-break columns.
-- [ ] K5 Decide and record (dogfeed.todo.md): a `plots = TRUE` example in the lead vignette now, or in the 0.3.4 breadth patch?
+- [x] K5 Decided (owner, 2026-07-11): the plots = TRUE example is in the lead vignette now, in this release. Original item: decide and record (dogfeed.todo.md): a `plots = TRUE` example in the lead vignette now, or in the 0.3.4 breadth patch?
 - [x] K6 No vignette prose violates the writing rules.
 
 ------------------------------------------------------------------------

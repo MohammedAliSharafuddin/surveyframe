@@ -167,6 +167,13 @@ and never reach the sheet. Import against the post-use instrument (the one
 actually deployed) and the missingness numbers are meaningful. Worth a
 mention in the Google Sheets vignette section in a future patch.
 
+### 2026-07-11 — owner decisions from the review
+
+The live AIC-RSAM deployment stays on the hand-patched 0.3.2 export until
+collection ends; it is republished with 0.3.3 afterwards. The lead
+vignette gains the plots = TRUE example in this release (added and
+knit-verified). Win-builder submission is manual by the owner.
+
 ### 2026-07-11 — instrumented review execution and WCAG 2.2 pass
 
 All runnable mas_review_033.qmd chunks executed headlessly; results ticked

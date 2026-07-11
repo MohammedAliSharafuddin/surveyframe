@@ -463,7 +463,8 @@ survey silently failed to POST from any hosted page.
 - [x] F7 Live AIC-RSAM read-back (read-only): `read_sheet_responses()` on
   the live sheet returns the real responses cleanly. Do NOT submit test
   data to the live endpoint.
-- [ ] F8 Decision recorded: whether to re-export and republish the live
+- [x] F8 Decision recorded (owner, 2026-07-11: leave the hand-patched live deployment until collection ends; republish with 0.3.3 afterwards).
+  Original item: whether to re-export and republish the live
   AIC-RSAM survey mid-collection to pick up the CORS fix and Theme B, or
   leave the hand-patched deployment as is until collection ends. Either
   answer is fine; it must be a decision, not an accident.
@@ -611,7 +612,7 @@ browseVignettes("surveyframe")   # restart R first if this shows nothing
 - [x] K4 The deployment vignette's Google Sheets instructions match the
   0.3.3 collector: no manual CORS patching mentioned or needed, and no
   reference to section-break columns.
-- [ ] K5 Decide and record: should the lead vignette gain a short
+- [x] K5 Decided (owner, 2026-07-11): the plots = TRUE example is in the lead vignette now, in this release. Original item: decide and record: should the lead vignette gain a short
   `plots = TRUE` example now, or in the 0.3.4 breadth patch? Either way,
   log the decision in dogfeed.todo.md.
 - [x] K6 No vignette prose violates the writing rules (em-dashes,
