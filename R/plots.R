@@ -181,6 +181,98 @@ sframe_plot_regression <- function(result, data) {
   p + theme_surveyframe()
 }
 
+# Diverging stacked bar for a single Likert item, base graphics only (no
+# ggplot2 dependency), so it works in the report's distributions section
+# regardless of whether ggplot2 is installed. `counts` is a named numeric
+# vector in scale order (names are the response labels, e.g. "Strongly
+# disagree" .. "Strongly agree"), not sorted alphabetically or by frequency.
+# The middle category of an odd-length scale is treated as neutral and
+# split evenly across the zero line; an even-length scale has no neutral
+# category. This is the standard survey-report convention (Pew Research,
+# SurveyMonkey) for visualising an ordered agree/disagree scale, and reads
+# in one glance which way opinion leans, unlike a plain frequency bar.
+sframe_draw_likert_diverging <- function(counts, theme_color = "#16B3B1") {
+  counts <- counts[!is.na(counts)]
+  n <- length(counts)
+  if (n < 2 || sum(counts) == 0) {
+    graphics::plot.new()
+    graphics::text(0.5, 0.5, "Not enough data to plot.", col = "#94a3b8")
+    return(invisible(NULL))
+  }
+  pct <- 100 * as.numeric(counts) / sum(counts)
+  labels <- names(counts) %||% paste0("Level ", seq_len(n))
+
+  half <- n %/% 2
+  neg_idx <- seq_len(half)
+  pos_idx <- seq.int(n - half + 1L, n)
+  has_neutral <- (n %% 2L) == 1L
+  neu_idx <- if (has_neutral) half + 1L else integer(0)
+
+  # Darkest at the pole (Strongly disagree / Strongly agree), lightest next
+  # to neutral, so saturation itself signals intensity of opinion.
+  neg_ramp <- grDevices::colorRampPalette(c("#b3261e", "#f2b6ae"))(max(1L, half))
+  pos_ramp <- grDevices::colorRampPalette(c("#a6ded9", theme_color))(max(1L, half))
+  neu_col  <- "#c7cdd6"
+
+  # Reserve enough bottom margin for the legend before plotting: one row
+  # when the scale is short enough to fit across, one row per category
+  # (in a single column) otherwise.
+  op <- graphics::par(mar = c(if (n <= 5L) 4 else 1 + 1.15 * n, 2, 1, 2))
+  on.exit(graphics::par(op), add = TRUE)
+
+  # Both blocks are drawn starting from their outer edge moving toward
+  # zero, so the most extreme category (index 1 on the left, index n on
+  # the right) always sits at the far edge and the neutral-adjacent
+  # category always sits next to the zero line.
+  left_widths  <- pct[neg_idx]
+  left_colors  <- neg_ramp
+  right_widths <- pct[pos_idx]
+  right_colors <- pos_ramp
+  neu_half <- if (has_neutral) pct[neu_idx] / 2 else 0
+
+  left_total  <- sum(left_widths) + neu_half
+  right_total <- sum(right_widths) + neu_half
+  xmax <- max(left_total, right_total) * 1.08 + 1
+
+  graphics::plot.new()
+  graphics::plot.window(xlim = c(-xmax, xmax), ylim = c(0, 1))
+  x <- -left_total
+  for (i in seq_along(left_widths)) {
+    graphics::rect(x, 0.28, x + left_widths[i], 0.72, col = left_colors[i], border = "white")
+    x <- x + left_widths[i]
+  }
+  if (has_neutral) {
+    graphics::rect(-neu_half, 0.28, neu_half, 0.72, col = neu_col, border = "white")
+    x <- neu_half
+  }
+  for (i in seq_along(right_widths)) {
+    graphics::rect(x, 0.28, x + right_widths[i], 0.72, col = right_colors[i], border = "white")
+    x <- x + right_widths[i]
+  }
+  graphics::segments(0, 0.15, 0, 0.85, col = "#1a1a2e", lwd = 1.2)
+  # Each segment already carries its own percentage in the legend below, so
+  # a numeric axis would only repeat that; the zero line alone shows where
+  # opinion divides, which is what a diverging chart is for.
+
+  # A single row keeps the legend in the same left-to-right scale order as
+  # the bar; base graphics' legend() fills multi-column layouts column-major,
+  # which would scramble that order, so five or fewer categories (the
+  # common case) get one row and longer scales fall back to one column
+  # (top-to-bottom, still in scale order) rather than a misleading grid.
+  ord_colors <- c(neg_ramp, if (has_neutral) neu_col else NULL, pos_ramp)
+  leg_labels <- sprintf("%s (%.0f%%)", labels, pct)
+  usr <- graphics::par("usr")
+  if (n <= 5L) {
+    graphics::legend(x = mean(usr[1:2]), y = usr[3], xjust = 0.5, yjust = 1,
+                     legend = leg_labels, fill = ord_colors, border = NA,
+                     bty = "n", cex = 0.72, ncol = n, xpd = NA, x.intersp = 0.6)
+  } else {
+    graphics::legend(x = mean(usr[1:2]), y = usr[3], xjust = 0.5, yjust = 1,
+                     legend = leg_labels, fill = ord_colors, border = NA,
+                     bty = "n", cex = 0.68, ncol = 1, xpd = NA, x.intersp = 0.6)
+  }
+}
+
 # Dispatch a runner result to its plot builder. Returns NULL for runner
 # types outside the v0.3.4 plot family so callers can attach conditionally.
 sframe_plot_for_result <- function(result, data) {
