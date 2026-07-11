@@ -154,7 +154,8 @@ test_that("report distributions and analysis sections attach a plot beside its t
     sat_1 = sample(1:5, 40, replace = TRUE),
     stringsAsFactors = FALSE
   )
-  withr::local_options(surveyframe.use_quarto = FALSE)
+  old_opt <- options(surveyframe.use_quarto = FALSE)
+  on.exit(options(old_opt), add = TRUE)
   out <- tempfile(fileext = ".html")
   on.exit(unlink(out), add = TRUE)
   render_report(instr, dat, output_file = out)
