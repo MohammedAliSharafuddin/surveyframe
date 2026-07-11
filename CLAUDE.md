@@ -20,18 +20,24 @@ contract declared before data collection. Analysis is the execution of that
 pre-declared plan rather than a post-hoc search. This is the package's main
 differentiator and the thesis of the JSS paper.
 
-Current version: 0.3.1 on CRAN (2026-06-02). 0.3.2 implemented locally, all 7
-changes committed and pushed to both remotes, 368/368 tests pass. MAS co-review
-is complete and signed off (2026-06-17, all 184 checklist items, see
-mas_review_032.md in this folder). Next: R CMD check --as-cran, win-builder,
-and CRAN submission.
+Current version: 0.3.1 on CRAN (2026-06-02). 0.3.3 is fully implemented
+locally and merges what was originally planned as two releases: the real-world
+AIC-RSAM hardening (0.3.3) and the ggplot2 visualisation foundation (0.3.4),
+shipped together as a single 0.3.3 since neither had reached CRAN yet.
+543/543 tests pass. The MAS co-review (`mas_review_033.md`/`.qmd`, modelled on
+the 0.3.2 review) is complete, including a second live-feedback round covering
+multi-select export, mobile matrix scrolling, SurveyBuilder control
+duplication, and the report table/plot pairing, all resolved. The lead
+vignette and two supporting vignettes were rewritten to describe the
+redesigned survey, the expanded export columns, and `plots = TRUE`.
+`surveyframe_0.3.3.tar.gz` is built, `R CMD check --as-cran` is clean (0/0/0)
+on Local, win-builder R-release (4.6.1), and win-builder R-devel, all
+confirmed 2026-07-11. Submitted to CRAN 2026-07-11. Next: await the CRAN
+maintainer's response.
 
-After 0.3.2 comes 0.3.3 (real-world embedding and conference feedback from the
-AIC-RSAM room-service study and the ICSRI 2026 presentation, and the first
-end-to-end verification of the Google Sheets collector since the 0.3.2
-SurveyStudio import card and `read_sheet_responses()` have not yet been run
-against a live sheet), then a visualisation patch arc 0.3.4-0.3.9 (six ~21-day
-releases), then 0.4
+After 0.3.3 comes the remaining visualisation patch arc 0.3.5-0.3.9 (the
+foundation shipped early inside 0.3.3, so five ~21-day releases remain: effect-size
+confidence intervals, psychometric depth, PDF reporting), then 0.4
 (small-sample inference). 0.4.1 is the faculty demo proofing release. The
 canonical schedule is portfolio-planner master_roadmap.md.
 
@@ -152,14 +158,14 @@ Run from the repository root.
 
 ```r
 devtools::document()          # regenerate man/ and NAMESPACE
-devtools::test()              # run the test suite (expect 368 passing at 0.3.2)
+devtools::test()              # run the test suite (expect 543 passing at 0.3.3)
 devtools::load_all()          # load for interactive work
 rmarkdown::render("vignettes/surveyframe.Rmd", output_dir = tempdir())
 ```
 
 ```bash
 R CMD build .                                   # build the source tarball
-R CMD check --as-cran surveyframe_0.3.2.tar.gz  # full CRAN check
+R CMD check --as-cran surveyframe_0.3.3.tar.gz  # full CRAN check
 ```
 
 A clean CRAN check is 0 errors, 0 warnings, and at most 1 NOTE (incoming
@@ -170,49 +176,66 @@ feasibility). The vignette builds offline because the data-collection step uses
 
 ## Current status and immediate next steps
 
-0.3.1 is published on CRAN (2026-06-02). 0.3.2 is fully implemented (all 7
-changes done, 368/368 tests pass, vignette knits, both remotes up to date).
+0.3.1 is published on CRAN (2026-06-02). 0.3.3 is fully implemented (543/543
+tests pass, three vignettes rewritten and knit clean, tarball built, local
+`R CMD check --as-cran` clean at 0/0/0).
 
-**The GUI UI/UX co-review and the MAS co-review are complete and signed off
-(2026-06-17).** Every graphical entry point was checked so a reviewer of the JSS
-manuscript does not hit a broken or misleading GUI. Row-by-row tracker:
-`demo/slides_review_table.md`. Full notes: the "v0.3.2 GUI co-review" section in
-`revision_todo_0.3.md`. The MAS sign-off (all 184 checklist items, Parts A to U)
-is in `mas_review_032.md`.
+**0.3.3 merges two originally separate releases.** It hardens the package
+against its first real deployment (the AIC-RSAM room-service study and the
+Google Sheets collector's CORS submission bug, found and fixed against the
+live prototype) and ships the ggplot2 visualisation foundation originally
+planned as 0.3.4 (`plots = TRUE` on `run_analysis_plan()`, `theme_surveyframe()`,
+the Likert diverging chart, table+plot pairing in the report). Both were
+merged into a single 0.3.3 since neither had reached CRAN when the decision
+was made.
 
-DONE and signed off: **SurveyBuilder** (HTML), **static survey** template,
-**SurveyStudio** (`inst/shiny/app.R`), and the **HTML report**
-(`R/reporting.R` + `inst/templates/report.qmd`). Highlights: builder has
-client-side Export survey + Generate collector (single-sourced and inlined via
-`data-raw/inline_static_template.R`, gitignored on main); studio dropped its
-Build screen, previews the real survey in an iframe, integrated the dashboard
-inline, got the suspendWhenHidden fix, disables its Export buttons until an
-instrument is valid, and reads responses from a deployed Google Sheet on the
-Upload screen; the report's Quarto render was fixed, tables formatted,
-distribution plots added, 2 decimals, left TOC, wide-table scroll. The vignettes
-now show analysis output as branded tables and plots. Mojibake is clean across
-inst/ and R/. All 368 tests pass and both remotes are up to date.
+**The MAS co-review is complete (`mas_review_033.md`/`.qmd`, modelled on the
+0.3.2 review), including a second live-feedback round** covering: multi-select
+export as one 0/1 column per option, mobile-friendly matrix reflow below 600px,
+SurveyBuilder's duplicate Add-question and Settings entry points (now single
+entry points each), the report's table+plot pairing, and the Likert-specific
+diverging chart. All six items resolved and verified headlessly via
+`chromote`. The survey export also passed a full WCAG 2.2 AA pass (accessible
+names, visible focus, announced errors, keyboard-operable ranking, 44px touch
+targets).
 
-Still pending before CRAN submission:
+DONE and signed off: **SurveyBuilder** (HTML), **static survey** template
+(Theme B redesign, mobile reflow, WCAG 2.2 AA), **SurveyStudio**
+(`inst/shiny/app.R`), and the **HTML/Quarto report**
+(`R/reporting.R` + `inst/templates/report.qmd`, now pairing every result table
+with its chart). The lead vignette (`surveyframe.Rmd`) and
+`deploying-and-collecting.Rmd`/`analysing-survey-responses.Rmd` were rewritten
+to describe the redesigned survey, the expanded ranking/multiple-choice/matrix
+export columns, and `plots = TRUE`.
 
-1. `R CMD build .`, then `R CMD check --as-cran` (must be 0/0/<=1 NOTE; re-run
-   because files changed after the last clean check).
-2. Win-builder R-release and R-devel. Update `cran-comments.md`. Submit.
-3. Optional: add a NEWS.md 0.3.2 entry covering the GUI, report, and vignette
-   work. No new hard or Suggests deps were added. `devtools::document()` is
-   current.
+Status as of 2026-07-11:
+
+1. `surveyframe_0.3.3.tar.gz` built. Local `R CMD check --as-cran`: Status OK,
+   0 errors, 0 warnings, 0 notes.
+2. Win-builder R-release (4.6.1) and R-devel both returned Status: OK.
+   **Submitted to CRAN 2026-07-11.** Awaiting the CRAN maintainer's response.
+3. NEWS.md proofread and corrected to read as a clean per-release changelog,
+   with future-direction and internal-note content removed.
 
 The JSS paper (OJS 6454, submitted 2026-06-02) was returned without full review.
 Revised and resubmit invitation. The replicate.R and package changes it required
-are now in 0.3.2. The manuscript revision (surveyframe.Rnw) has not yet been
-started. That is the next step after 0.3.2 ships.
+shipped in 0.3.2/0.3.3. The manuscript itself now lives in its own repository,
+surveyframe-jss-paper (see that repo's own CLAUDE.md), and was updated
+2026-07-11 for 0.3.3: version references bumped, the live SSR 6.0 DOI cited,
+all six figures retaken against the redesigned survey and current
+SurveyBuilder UI, and a previously unaddressed editor checklist item (a
+non-interactive response-collection demonstration) finally closed. It is
+ready to resubmit once surveyframe 0.3.3 is accepted on CRAN.
 
 Open items (non-blocking for CRAN submission):
 
 - Confirm or remove the Codecov badge in README.
-- Trigger pkgdown build after 0.3.2 is accepted.
+- Trigger pkgdown build after 0.3.3 is accepted.
 - Guard `launch_dashboard()` and similar Shiny launcher `\donttest` examples so a
-  full check does not hang; this is a future patch, not a 0.3.2 blocker.
+  full check does not hang; this is a future patch, not a 0.3.3 blocker.
+- The pre-existing Quarto/pandoc `kable()` table-collapsing bug found during
+  the 0.3.3 review (confirmed unrelated to this release's changes, not
+  reproducible in isolated minimal tests) remains open for a future session.
 
 The full task list is in `revision_todo_0.3.md`. The version and growth plan is
 in `roadmap.md`.
@@ -255,14 +278,16 @@ fixing anything.
 
 ## Continuation prompts (paste to resume a thread of work)
 
-### Submit 0.3.2 to CRAN (after MAS co-review sign-off)
+### 0.3.3 is submitted to CRAN, awaiting the maintainer's response
 
 ```
-Read CLAUDE.md and mas_review_032.md. The MAS co-review is complete. Run
-R CMD build . to produce surveyframe_0.3.2.tar.gz, then R CMD check --as-cran
-on the tarball. The target is 0 errors, 0 warnings, at most 1 NOTE. If clean,
-update cran-comments.md with the results and tell me what to paste on the CRAN
-submission form.
+Read CLAUDE.md. surveyframe 0.3.3 was submitted to CRAN on 2026-07-11, after
+a clean local check and clean win-builder R-release/R-devel runs. Check
+whether the CRAN maintainer has responded (accepted, or with further
+comments) and act on whatever they say: if accepted, update CLAUDE.md's
+current-version line and NEWS.md and tell me the JSS manuscript in
+surveyframe-jss-paper is now ready to resubmit; if there are comments, fix
+them and restart the win-builder and check cycle.
 ```
 
 ### Start the v0.5 MCDM work
