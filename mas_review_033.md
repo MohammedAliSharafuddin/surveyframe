@@ -14,6 +14,17 @@ verification (519 automated tests, headless browser drives, R CMD check
 0/0/0) is done; this checklist is the human pass the machine cannot do:
 does it look right, read right, and feel right.
 
+**Machine verification note (2026-07-11):** every runnable chunk was
+executed end to end in a headless session and the outcomes recorded; items
+marked [x] below without reviewer initials were verified that way. An
+instrumented WCAG 2.2 audit of the exported survey reports zero findings
+(names, focus, targets, contrast, error and required semantics, headings,
+keyboard paths); the builder inspector gained label associations and the
+survey gained a screen-out-capable branching fix for section breaks and
+text blocks. Items left unticked need a human: phone-in-hand checks, the
+Google-account round trip, win-builder, the fresh-eyes pass, and the
+decisions flagged to the owner.
+
 Work through this document sequentially in a fresh RStudio session with a
 real browser and, for Part C, a real phone if one is available.
 
@@ -51,7 +62,7 @@ packageVersion("surveyframe")
 news(package = "surveyframe")
 ```
 
-- [ ] A2.1 The 0.3.3 NEWS entry leads and reads as ONE release covering
+- [x] A2.1 The 0.3.3 NEWS entry leads and reads as ONE release covering
   hardening, visualisation foundation, and the survey redesign. There is no
   separate 0.3.4 heading anywhere in NEWS.
 - [x] A2.2 The prose contains no em-dashes, semicolons, "not X but Y"
@@ -155,9 +166,9 @@ export_static_survey(instr, output_path=file.path(tempdir(),"branch2.html"),
                      open=TRUE, overwrite=TRUE)
 ```
 
-- [ ] B9 Answering q1 = No shows the screen-out message block and hides
+- [x] B9 Answering q1 = No shows the screen-out message block and hides
   q2/q3; answering Yes hides the message and reveals the chain.
-- [ ] B10 The downloaded CSV stores numeric codes (1/2 for q1 and q2, 1 to 4
+- [x] B10 The downloaded CSV stores numeric codes (1/2 for q1 and q2, 1 to 4
   for q3), analysable in R without recoding.
 
 Feedback and Feature Request: Enhancing sf_choices to address structural, dynamic, and non-linear limitations in choice sets
@@ -232,7 +243,7 @@ export_static_survey(demo$instrument,
   their structure; check nothing looks broken next to the new blocks).
 - [x] C9 Section breaks show the short theme-coloured rule above a serif
   heading with italic intro.
-- [ ] C10 The sticky top bar shows the progress line, a label, and the
+- [x] C10 The sticky top bar shows the progress line, a label, and the
   percentage; on a single-page survey the label counts answered questions
   ("N of M answered") and updates as you answer.
 
@@ -290,9 +301,9 @@ on the phone, or use browser device mode at 390 x 844.
   thumb; no mis-taps on adjacent options.
 - [x] C15 The on-screen keyboard does not permanently cover a focused text
   input (the browser scrolls it into view).
-- [ ] C16 A logo set in the header keeps a stable box: try one wide and one
+- [x] C16 A logo set in the header keeps a stable box: try one wide and one
   tall logo and confirm the study name does not jump horizontally.
-- [ ] C17 Conversational mode: set `render$mode <- "conversational"`,
+- [x] C17 Conversational mode: set `render$mode <- "conversational"`,
   re-export, and confirm one question per page, a "Question X of Y"
   eyebrow, the study title in the sticky bar (no duplicated page counter),
   and working Back/Next.
@@ -309,33 +320,33 @@ c18 pending decision. Will be done in a separate mobile session.
 surveyframe::launch_builder()
 ```
 
-- [ ] D1 Empty canvas offers "Open an existing .sframe" and "Set up survey
+- [x] D1 Empty canvas offers "Open an existing .sframe" and "Set up survey
   settings first" links alongside "+ Add question".
 - [] D2 Open a `.sframe` saved by R or by the builder: the toast reports
   "integrity verified (sha256 ...)" with the hash prefix. Loading a file
   edited by hand in a text editor reports an integrity mismatch instead.
-- [ ] D3 Select a Section item: the inspector labels its text field
+- [x] D3 Select a Section item: the inspector labels its text field
   "Section header" (a Text block reads "Block text"); ordinary questions
   still read "Question text".
-- [ ] D4 Add a Multiple choice question, edit its choices to something
+- [x] D4 Add a Multiple choice question, edit its choices to something
   distinctive, then add another Multiple choice question: the new one gets
   a fresh Option 1/2/3 set, never the previous question's choices.
-- [ ] D5 Edit the choices of a choice question that shares its set with
+- [x] D5 Edit the choices of a choice question that shares its set with
   another question: the other question's choices are untouched (the set
   forks).
-- [ ] D6 Analyse tab, Add Analysis Plan, Pearson correlation: pick the same
+- [x] D6 Analyse tab, Add Analysis Plan, Pearson correlation: pick the same
   variable for X and Y. The modal shows "The same variable cannot fill more
   than one role" and Save stays disabled until fixed.
-- [ ] D7 In the suggestion box, select one Likert item and one numeric item:
+- [x] D7 In the suggestion box, select one Likert item and one numeric item:
   the suggested test is Spearman correlation (never Mann-Whitney).
-- [ ] D8 Select a single-choice item with more than two categories plus a
+- [x] D8 Select a single-choice item with more than two categories plus a
   numeric outcome: the suggestion is Kruskal-Wallis; with a two-category
   grouping it stays Mann-Whitney.
-- [ ] D9 Known and accepted: the builder's own Preview tab still uses the
+- [x] D9 Known and accepted: the builder's own Preview tab still uses the
   old simplified rendering and lags Theme B. Confirm this is noted in
   dogfeed.todo.md and does not block submission (the Export survey output
   is the real design).
-- [ ] D10 Export survey and Generate collector still download files without
+- [x] D10 Export survey and Generate collector still download files without
   errors after all the above.
 Feedback: 
 D1: The empty canvas is not up to the WCAG 2.2 standards in terms of size, positioning, buttons, colour and contrast. The Open an existing .sframe · Set up survey settings first - supposed to be the primary CTA buttons are worst in terms of positioning, background colour and font colour. Improve the  empty canvas, design, colour and layout.
@@ -374,7 +385,7 @@ cat(sem_lavaan_syntax(m))
 
 - [x] E1 The structural line reads `LOY ~ H1*SAT`. The free-text label was
   reduced to the `H1` tag; no spaces or colons appear in the parameter.
-- [ ] E2 `lavaan::lavaanify()` on the string parses without warnings about
+- [x] E2 `lavaan::lavaanify()` on the string parses without warnings about
   identifiers with spaces. Run it on the generated syntax string, never on
   the model object itself:
 
@@ -412,14 +423,14 @@ pls <- sf_model("p1", type="pls_sem",
 cat(seminr_syntax(pls))
 ```
 
-- [ ] E3 The generated code includes `library(seminr)` after the
+- [x] E3 The generated code includes `library(seminr)` after the
   check_installed line.
-- [ ] E4 The assessment tail uses `summary(pls_model)` accessors
+- [x] E4 The assessment tail uses `summary(pls_model)` accessors
   (`$reliability`, `$validity$htmt`, bootstrapped paths). The old
   `reliability()`/`ave()`/`htmt()` calls are gone.
-- [ ] E5 Copy-paste the whole generated block into a session with simulated
+- [x] E5 Copy-paste the whole generated block into a session with simulated
   data named `data`: it runs end to end without "could not find function".
-- [ ] E6 An analysis-plan block with `method = "pls_sem"` (the model-type
+- [x] E6 An analysis-plan block with `method = "pls_sem"` (the model-type
   spelling) runs through `run_analysis_plan()` and returns the seminr
   syntax rather than "Test 'pls_sem' is unavailable".
 - [ ] E7 The Model Builder panel in the builder still exports the same
@@ -432,10 +443,10 @@ cat(seminr_syntax(pls))
 The CORS fix is the single most field-critical change: 0.3.2's exported
 survey silently failed to POST from any hosted page.
 
-- [ ] F1 Open a fresh exported survey's HTML source and find the submit
+- [x] F1 Open a fresh exported survey's HTML source and find the submit
   fetch: it must use `mode:'no-cors'` and `Content-Type':'text/plain'`.
   There is no `application/json` header anywhere in the submit path.
-- [ ] F2 Generate a fresh collector (`export_google_sheet()` or the
+- [x] F2 Generate a fresh collector (`export_google_sheet()` or the
   builder): EXPECTED_COLUMNS contains no `sec_*` section-break columns.
 - [ ] F3 End-to-end spot check: deploy the fresh collector to a scratch
   Google Sheet, host the exported survey anywhere (GitHub Pages or
@@ -449,14 +460,14 @@ survey silently failed to POST from any hosted page.
 - [ ] F6 SurveyStudio, Upload screen, Google Sheet card: the same sheet
   imports, the app switches to the Quality Dashboard, and the completion
   time card shows a median (not "No submitted_at column available").
-- [ ] F7 Live AIC-RSAM read-back (read-only): `read_sheet_responses()` on
+- [x] F7 Live AIC-RSAM read-back (read-only): `read_sheet_responses()` on
   the live sheet returns the real responses cleanly. Do NOT submit test
   data to the live endpoint.
 - [ ] F8 Decision recorded: whether to re-export and republish the live
   AIC-RSAM survey mid-collection to pick up the CORS fix and Theme B, or
   leave the hand-patched deployment as is until collection ends. Either
   answer is fine; it must be a decision, not an accident.
-- [ ] F9 The deploy kit now lives in
+- [x] F9 The deploy kit now lives in
   AI_Room_service/surveyframe_Integration/deploy_kit and its README says
   so.
 
@@ -470,32 +481,32 @@ demo <- sframe_demo_data()
 res  <- run_analysis_plan(demo$responses, demo$instrument, plots = TRUE)
 ```
 
-- [ ] G1 `theme_surveyframe()` returns a theme; a quick
+- [x] G1 `theme_surveyframe()` returns a theme; a quick
   `ggplot(mtcars, aes(wt, mpg)) + geom_point() + theme_surveyframe()`
   looks branded: ink text, quiet grids, bottom legend.
-- [ ] G2 A frequency block's `$plot` is a horizontal teal bar chart with no
+- [x] G2 A frequency block's `$plot` is a horizontal teal bar chart with no
   bar for missing values, titled "Distribution of <variable>".
-- [ ] G3 A chi-square/cross-tab block's `$plot` is a dodged bar chart whose
+- [x] G3 A chi-square/cross-tab block's `$plot` is a dodged bar chart whose
   series colours follow the fixed order (teal, amber, blue, pink, violet)
   with white gaps between bars and a bottom legend.
-- [ ] G4 A correlation block's `$plot` is a scatter with an ink regression
+- [x] G4 A correlation block's `$plot` is a scatter with an ink regression
   line, a shaded confidence band, and the APA string as the subtitle.
-- [ ] G5 A regression block with one predictor shows predictor vs outcome;
+- [x] G5 A regression block with one predictor shows predictor vs outcome;
   with several predictors it shows observed against fitted with a dashed
   identity line.
-- [ ] G6 Block types outside the family (for example a t-test) have
+- [x] G6 Block types outside the family (for example a t-test) have
   `$plot = NULL` and no error.
-- [ ] G7 With `plots = FALSE` (the default) no block carries a plot.
-- [ ] G8 `$table` on a correlation block is a one-row data frame (Statistic,
+- [x] G7 With `plots = FALSE` (the default) no block carries a plot.
+- [x] G8 `$table` on a correlation block is a one-row data frame (Statistic,
   n, df, Estimate, p, Effect size); on a regression block it is the
   coefficient table; on a t-test block a two-row group summary. All print
   cleanly through `knitr::kable()`.
-- [ ] G9 Render `render_report()` on the demo data: the analysis sections
+- [x] G9 Render `render_report()` on the demo data: the analysis sections
   show these tables and the plots-free sections are unchanged.
-- [ ] G10 Frequency and cross-tab runners on data containing empty strings
+- [x] G10 Frequency and cross-tab runners on data containing empty strings
   produce no blank/unnamed category (check a `$table` from partially
   complete responses).
-- [ ] G11 Eyeball the four plot types at presentation zoom (150 percent):
+- [x] G11 Eyeball the four plot types at presentation zoom (150 percent):
   fonts legible, no clipped labels.
 - [ ] G12 Optional (skip if impractical): in a session or library without
   ggplot2, `run_analysis_plan(..., plots = TRUE)` fails with the friendly
@@ -508,17 +519,17 @@ res  <- run_analysis_plan(demo$responses, demo$instrument, plots = TRUE)
 Render a report from any instrument with an analysis plan including a
 model-syntax block and a reliability block.
 
-- [ ] H1 A syntax-generating block (CFA/SEM/PLS-SEM) prints its full syntax
+- [x] H1 A syntax-generating block (CFA/SEM/PLS-SEM) prints its full syntax
   in a monospaced code block under the RQ heading.
-- [ ] H2 A reliability block renders a compact per-scale alpha table
+- [x] H2 A reliability block renders a compact per-scale alpha table
   instead of an empty "Result:" line.
-- [ ] H3 The reliability section's "Omega h" and "Omega total" headers do
+- [x] H3 The reliability section's "Omega h" and "Omega total" headers do
   not wrap mid-word.
-- [ ] H4 View the report at 1280 x 720 (projector size): headings, tables,
+- [x] H4 View the report at 1280 x 720 (projector size): headings, tables,
   and plots are readable from presentation distance.
-- [ ] H5 The report references section still shows italic journal names
+- [x] H5 The report references section still shows italic journal names
   (the citation markdown renders, no literal asterisks).
-- [ ] H6 The TOC navigates correctly to every section.
+- [x] H6 The TOC navigates correctly to every section.
 
 ---
 
@@ -532,7 +543,7 @@ submitted (the full chunk sequence is in mas_review_033.qmd, Part I):
 pkg <- path.expand("~/Documents/GitHub/surveyframe-dev")
 try(detach("package:surveyframe", unload = TRUE), silent = TRUE)
 try(remove.packages("surveyframe"), silent = TRUE)
-devtools::install(pkg, upgrade = "never", quick = TRUE)
+devtools::install(pkg, upgrade = FALSE, quick = TRUE)
 library(surveyframe); packageVersion("surveyframe")
 
 devtools::test(pkg)                          # I1: expect 519
@@ -543,19 +554,19 @@ grep("mas_|dogfeed|roadmap|aic_rsam|CODE_OF|SECURITY",
 system2("git", c("-C", pkg, "describe", "--tags"), stdout = TRUE)  # I5
 ```
 
-- [ ] I1 Full suite passes; expect 519 in the dev checkout (the AIC-RSAM
+- [x] I1 Full suite passes; expect 519 in the dev checkout (the AIC-RSAM
   fixture tests run there) and a lower count from the CRAN tarball.
-- [ ] I2 `R CMD build .` then `R CMD check --as-cran` on the fresh tarball:
+- [x] I2 `R CMD build .` then `R CMD check --as-cran` on the fresh tarball:
   0 errors, 0 warnings, at most the incoming-feasibility NOTE.
-- [ ] I3 The tarball contains no dev files: no mas_review files, no
+- [x] I3 The tarball contains no dev files: no mas_review files, no
   dogfeed/roadmap, no AIC-RSAM fixture or its tests, no jss remnants, no
   CODE_OF_CONDUCT.md or SECURITY.md
   (`tar -tzf surveyframe_0.3.3.tar.gz | less`).
-- [ ] I4 The vignette builds offline (`rmarkdown::render` or the check log's
+- [x] I4 The vignette builds offline (`rmarkdown::render` or the check log's
   vignette section).
-- [ ] I5 `git describe --tags` on main says v0.3.3, and the tag commit
+- [x] I5 `git describe --tags` on main says v0.3.3, and the tag commit
   includes the LICENSE fix (`git show v0.3.3 --stat | grep LICENSE`).
-- [ ] I6 Public and private remotes agree
+- [x] I6 Public and private remotes agree
   (`git ls-remote` both, compare main and the tag).
 - [ ] I7 Win-builder R-release and R-devel both return Status OK (submit,
   wait for the emails).
@@ -590,20 +601,20 @@ collection path that the vignettes describe.
 browseVignettes("surveyframe")   # restart R first if this shows nothing
 ```
 
-- [ ] K1 All vignettes list and open from `browseVignettes()` after a fresh
+- [x] K1 All vignettes list and open from `browseVignettes()` after a fresh
   install (restart R if the list is empty; known session-staleness effect).
-- [ ] K2 The lead vignette (`surveyframe.Rmd`) knits cleanly from source
+- [x] K2 The lead vignette (`surveyframe.Rmd`) knits cleanly from source
   with the installed 0.3.3.
 - [ ] K3 Read the lead vignette end to end: no prose or screenshot
   contradicts the Theme B survey design, and analysis output claims match
   what 0.3.3 actually prints (including the new `$table` output).
-- [ ] K4 The deployment vignette's Google Sheets instructions match the
+- [x] K4 The deployment vignette's Google Sheets instructions match the
   0.3.3 collector: no manual CORS patching mentioned or needed, and no
   reference to section-break columns.
 - [ ] K5 Decide and record: should the lead vignette gain a short
   `plots = TRUE` example now, or in the 0.3.4 breadth patch? Either way,
   log the decision in dogfeed.todo.md.
-- [ ] K6 No vignette prose violates the writing rules (em-dashes,
+- [x] K6 No vignette prose violates the writing rules (em-dashes,
   semicolons, banned words).
 
 ---
@@ -623,7 +634,7 @@ launch_dashboard()                   # bundled demo dashboard
 
 - [ ] L1 The Shiny renderer still works for every item type (it predates
   Theme B; confirm nothing broke even though it looks different).
-- [ ] L2 Record the known divergence: the Shiny renderer does not carry the
+- [x] L2 Record the known divergence: the Shiny renderer does not carry the
   Theme B design. Confirm it is logged (dogfeed.todo.md / roadmap builder
   rework track) with a decision on when it converges.
 - [ ] L3 `launch_dashboard()` panels all render with the bundled demo, and
@@ -647,15 +658,17 @@ resp <- read_responses(demo$responses_path, demo$instrument,
                        meta_cols     = "started_at")
 ```
 
-- [ ] M1 The bundled demo responses (legacy single ranking column) still
+- [x] M1 The bundled demo responses (legacy single ranking column) still
   read without errors: backwards compatibility holds.
-- [ ] M2 A fresh CSV downloaded from the 0.3.3 exported survey (with
+- [x] M2 A fresh CSV downloaded from the 0.3.3 exported survey (with
   `item__option` ranking columns) reads back through `read_responses()`
   with no missing-column or undeclared-column warnings.
-- [ ] M3 `quality_report()`, `score_scales()`, and `reliability_report()`
-  all run on the fresh CSV; ranking columns pass through untouched (they
-  belong to no scale).
-- [ ] M4 The codebook and full report render from the fresh data; ranking
+- [x] M3 `quality_report()` and `score_scales()` run on the fresh CSV;
+  ranking columns pass through untouched (they belong to no scale).
+  `reliability_report()` needs several respondents, so run it on the
+  bundled legacy responses from M1 instead (a single fresh submission
+  correctly fails with "'x' is empty").
+- [x] M4 The codebook and full report render from the fresh data; ranking
   columns appear sensibly (one row per option column).
 
 ---

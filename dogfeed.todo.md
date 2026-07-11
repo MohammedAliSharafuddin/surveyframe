@@ -167,6 +167,21 @@ and never reach the sheet. Import against the post-use instrument (the one
 actually deployed) and the missingness numbers are meaningful. Worth a
 mention in the Google Sheets vignette section in a future patch.
 
+### 2026-07-11 — instrumented review execution and WCAG 2.2 pass
+
+All runnable mas_review_033.qmd chunks executed headlessly; results ticked
+in the checklist. An instrumented WCAG 2.2 audit of the exported survey now
+reports zero findings across all pages (accessible names, focus visibility,
+target sizes, contrast, error and required semantics, headings, keyboard
+reordering for ranking). Builder quick wins applied: inspector labels are
+programmatically associated and field hints meet contrast. Two real bugs
+found and fixed: branching rules had no effect on section breaks and text
+blocks (screen-out messages and branched section headings now work), and
+`esc(0)` blanking zero-valued attributes. Known divergence recorded: the
+Shiny survey renderer (`render_survey()`/`survey_module_ui()`) does not
+carry Theme B or the accessibility pass; it converges in the 0.3.4 builder
+rework.
+
 ### 2026-07-10 — releases merged: 0.3.4 folded into 0.3.3
 
 Owner decision: since neither version had been pushed or submitted, the

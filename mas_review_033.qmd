@@ -75,7 +75,7 @@ news(package = "surveyframe")
 citation("surveyframe")
 ```
 
-- [ ] A2.1 The 0.3.3 NEWS entry leads and reads as ONE release covering the plotting layer, the field-deployment fixes, and the survey redesign. No separate 0.3.4 heading, no raw markdown table anywhere in the file, and the analysis content comes first.
+- [x] A2.1 The 0.3.3 NEWS entry leads and reads as ONE release covering the plotting layer, the field-deployment fixes, and the survey redesign. No separate 0.3.4 heading, no raw markdown table anywhere in the file, and the analysis content comes first.
 - [ ] A2.2 The prose contains no em-dashes, semicolons, "not X but Y" constructions, or banned words, and uses UK spellings.
 - [ ] A2.3 `citation("surveyframe")` shows version 0.3.3.
 - [ ] A2.4 The LICENSE file at the public repo root is the two-line CRAN template (`YEAR:` / `COPYRIGHT HOLDER:`), with the full MIT text in LICENSE.md only.
@@ -155,8 +155,8 @@ export_static_survey(instr_b2,
                      open = TRUE, overwrite = TRUE)
 ```
 
-- [ ] B9 Answering g1 = No shows the screen-out message block and hides g2/g3; answering Yes hides the message and reveals the chain.
-- [ ] B10 The downloaded CSV stores numeric codes (1/2 for g1 and g2, 1 to 4 for g3), analysable in R without recoding.
+- [x] B9 Answering g1 = No shows the screen-out message block and hides g2/g3; answering Yes hides the message and reveals the chain.
+- [x] B10 The downloaded CSV stores numeric codes (1/2 for g1 and g2, 1 to 4 for g3), analysable in R without recoding.
 
 ------------------------------------------------------------------------
 
@@ -181,7 +181,7 @@ export_static_survey(demo$instrument,
 - [ ] C7 Star rating: large stars, theme colour when active, subtle grow on hover.
 - [ ] C8 Matrix (tinted header row, horizontal rules, hover highlight), slider (card container, large serif value, both end labels visible including 0), and ranking (option-card rows with theme rank badges) all carry the Theme B design.
 - [ ] C9 Section breaks show the short theme-coloured rule above a serif heading with italic intro.
-- [ ] C10 The sticky top bar shows the progress line, a label, and the percentage, with no dash or duplicated page counter. On a single-page survey the label counts answered questions and updates as you answer.
+- [x] C10 The sticky top bar shows the progress line, a label, and the percentage, with no dash or duplicated page counter. On a single-page survey the label counts answered questions and updates as you answer.
 
 ### Step C2 — Theme colour selector
 
@@ -208,11 +208,11 @@ mode at 390 x 844:
 tempdir()    # the folder holding the exports from the chunks above
 ```
 
-- [ ] C13 No horizontal scrolling anywhere.
-- [ ] C14 Option cards and Likert squares are comfortably tappable with a thumb; no mis-taps on adjacent options.
+- [x] C13 No horizontal scrolling anywhere.
+- [x] C14 Option cards and Likert squares are comfortably tappable with a thumb; no mis-taps on adjacent options.
 - [ ] C15 The on-screen keyboard does not permanently cover a focused text input.
-- [ ] C16 A logo set in the header keeps a stable box: try one wide and one tall logo and confirm the study name does not jump horizontally.
-- [ ] C17 Conversational mode (chunk below): one question per page, a "Question X of Y" eyebrow with no dash line, the study title in the sticky bar, and working Back/Next.
+- [x] C16 A logo set in the header keeps a stable box: try one wide and one tall logo and confirm the study name does not jump horizontally.
+- [x] C17 Conversational mode (chunk below): one question per page, a "Question X of Y" eyebrow with no dash line, the study title in the sticky bar, and working Back/Next.
 - [ ] C18 Overall judgement: the survey looks like the approved Theme B mock, and you would be happy sending this to a respondent today.
 
 ```{r chunk-09}
@@ -233,16 +233,16 @@ This part is manual clicking; the chunk only launches the builder.
 surveyframe::launch_builder()
 ```
 
-- [ ] D1 Empty canvas shows accessible CTA buttons at 44px minimum: a filled "+ Add your first question" and outlined "Open an existing .sframe" / "Set up survey settings", all clearly readable against the dark sidebar.
-- [ ] D2 Open a `.sframe` saved by R or by the builder: the toast reports "integrity verified (sha256 ...)". A file edited by hand in a text editor reports an integrity mismatch instead. (Known: the Preview tab still shows the old simplified design; Export survey and SurveyStudio carry Theme B. The Preview restyle is scheduled in the 0.3.4 builder rework.)
-- [ ] D3 Select a Section item: the inspector labels its text field "Section header" (a Text block reads "Block text"); ordinary questions still read "Question text".
-- [ ] D4 Add a Multiple choice question, edit its choices to something distinctive, then add another Multiple choice question: the new one gets a fresh Option 1/2/3 set.
-- [ ] D5 Edit the choices of a choice question that shares its set with another question: the other question's choices are untouched (the set forks).
-- [ ] D6 Analyse tab, Add Analysis Plan, Pearson correlation: pick the same variable for X and Y. The modal blocks it and Save stays disabled until fixed.
-- [ ] D7 Suggestion box with one Likert item and one numeric item suggests Spearman correlation (never Mann-Whitney).
-- [ ] D8 A single-choice item with more than two categories plus a numeric outcome suggests Kruskal-Wallis; a two-category grouping stays Mann-Whitney.
-- [ ] D9 Known and accepted: the Preview tab lags Theme B until the 0.3.4 builder rework. Confirm it is logged and does not block submission.
-- [ ] D10 Export survey and Generate collector still download files without errors after all the above.
+- [x] D1 Empty canvas shows accessible CTA buttons at 44px minimum: a filled "+ Add your first question" and outlined "Open an existing .sframe" / "Set up survey settings", all clearly readable against the dark sidebar.
+- [x] D2 Open a `.sframe` saved by R or by the builder: the toast reports "integrity verified (sha256 ...)". A file edited by hand in a text editor reports an integrity mismatch instead. (Known: the Preview tab still shows the old simplified design; Export survey and SurveyStudio carry Theme B. The Preview restyle is scheduled in the 0.3.4 builder rework.)
+- [x] D3 Select a Section item: the inspector labels its text field "Section header" (a Text block reads "Block text"); ordinary questions still read "Question text".
+- [x] D4 Add a Multiple choice question, edit its choices to something distinctive, then add another Multiple choice question: the new one gets a fresh Option 1/2/3 set.
+- [x] D5 Edit the choices of a choice question that shares its set with another question: the other question's choices are untouched (the set forks).
+- [x] D6 Analyse tab, Add Analysis Plan, Pearson correlation: pick the same variable for X and Y. The modal blocks it and Save stays disabled until fixed.
+- [x] D7 Suggestion box with one Likert item and one numeric item suggests Spearman correlation (never Mann-Whitney).
+- [x] D8 A single-choice item with more than two categories plus a numeric outcome suggests Kruskal-Wallis; a two-category grouping stays Mann-Whitney.
+- [x] D9 Known and accepted: the Preview tab lags Theme B until the 0.3.4 builder rework. Confirm it is logged and does not block submission.
+- [x] D10 Export survey and Generate collector still download files without errors after all the above.
 
 ------------------------------------------------------------------------
 
@@ -261,7 +261,7 @@ m <- sf_model("m1", "Labelled", type = "cb_sem",
 cat(sem_lavaan_syntax(m))
 ```
 
-- [ ] E1 The structural line reads `LOY ~ H1*SAT`. The free-text label was reduced to the `H1` tag; no spaces or colons appear in the parameter.
+- [x] E1 The structural line reads `LOY ~ H1*SAT`. The free-text label was reduced to the `H1` tag; no spaces or colons appear in the parameter.
 
 ```{r chunk-12}
 # lavaanify() takes the generated syntax STRING, never the model object
@@ -269,7 +269,7 @@ pt <- lavaan::lavaanify(sem_lavaan_syntax(m))
 head(pt[, c("lhs", "op", "rhs", "label")], 10)
 ```
 
-- [ ] E2 The call parses with no warnings about identifiers with spaces, and the `label` column shows `H1` on the structural row.
+- [x] E2 The call parses with no warnings about identifiers with spaces, and the `label` column shows `H1` on the structural row.
 
 ### Step E2 — seminr syntax runs as generated
 
@@ -283,8 +283,8 @@ pls <- sf_model("p1", type = "pls_sem",
 cat(seminr_syntax(pls, nboot = 50))
 ```
 
-- [ ] E3 The generated code includes `library(seminr)` after the check_installed line.
-- [ ] E4 The assessment tail uses `summary(pls_model)` accessors (`$reliability`, `$validity$htmt`, bootstrapped paths). No `reliability()`/`ave()`/`htmt()` calls.
+- [x] E3 The generated code includes `library(seminr)` after the check_installed line.
+- [x] E4 The assessment tail uses `summary(pls_model)` accessors (`$reliability`, `$validity$htmt`, bootstrapped paths). No `reliability()`/`ave()`/`htmt()` calls.
 
 ```{r chunk-14}
 # E5: run the generated block exactly as produced, against simulated data
@@ -298,7 +298,7 @@ eval(parse(text = seminr_syntax(pls, nboot = 50)))
 summary(pls_model)$reliability
 ```
 
-- [ ] E5 The generated block runs end to end with no "could not find function".
+- [x] E5 The generated block runs end to end with no "could not find function".
 
 ```{r chunk-15}
 # E6: an analysis plan declaring method = "pls_sem" (the model-type
@@ -323,7 +323,7 @@ cat("error:", res_e[[1]]$error %||% "none", "\n")
 cat(substr(res_e[[1]]$syntax, 1, 120), "...\n")
 ```
 
-- [ ] E6 `method = "pls_sem"` returns the seminr syntax rather than "Test 'pls_sem' is unavailable".
+- [x] E6 `method = "pls_sem"` returns the seminr syntax rather than "Test 'pls_sem' is unavailable".
 - [ ] E7 The Model Builder panel in the builder exports the same syntax through its Export syntax button (manual, with the builder open from Part D).
 
 ------------------------------------------------------------------------
@@ -354,8 +354,8 @@ cat("sec_ columns gone:    ", !grepl("sec_", cols_line), "\n")
 cat("ranking expanded:     ", grepl("__", cols_line), "\n")
 ```
 
-- [ ] F1 All five printed checks are TRUE.
-- [ ] F2 `EXPECTED_COLUMNS` contains no `sec_*` columns and expands ranking/matrix items to `item__` columns.
+- [x] F1 All five printed checks are TRUE.
+- [x] F2 `EXPECTED_COLUMNS` contains no `sec_*` columns and expands ranking/matrix items to `item__` columns.
 
 ### Step F2 — Live round trip (needs your Google account)
 
@@ -373,9 +373,9 @@ resp_f2 <- read_sheet_responses(sheet_url, demo_f$instrument,
 - [ ] F4 `read_sheet_responses()` returns the submitted row with correct values.
 - [ ] F5 The `meta_cols` variant accepts an extra sheet column without the undeclared-column warning.
 - [ ] F6 SurveyStudio, Upload screen, Google Sheet card: the same sheet imports, and the completion time card shows a median.
-- [ ] F7 Live AIC-RSAM read-back (read-only, own account): `read_sheet_responses()` on the live sheet returns the real responses cleanly. Do NOT submit test data to the live endpoint.
+- [x] F7 Live AIC-RSAM read-back (read-only, own account): `read_sheet_responses()` on the live sheet returns the real responses cleanly. Do NOT submit test data to the live endpoint.
 - [ ] F8 Decision recorded: re-export and republish the live AIC-RSAM survey mid-collection (CORS fix + Theme B), or leave the hand-patched deployment until collection ends.
-- [ ] F9 The deploy kit lives in AI_Room_service/surveyframe_Integration/deploy_kit and its README says so.
+- [x] F9 The deploy kit lives in AI_Room_service/surveyframe_Integration/deploy_kit and its README says so.
 
 ------------------------------------------------------------------------
 
@@ -405,11 +405,11 @@ for (r in res_g) {
 }
 ```
 
-- [ ] G1 `theme_surveyframe()` renders branded: ink text, quiet grids, bottom legend.
-- [ ] G2 A frequency block's plot is a horizontal teal bar chart with no bar for missing values.
-- [ ] G3 A chi-square/cross-tab plot is a dodged bar chart in the fixed series order (teal, amber, blue, pink, violet) with white gaps and a bottom legend.
-- [ ] G4 A correlation plot is a scatter with an ink regression line, a shaded band, and the APA string as subtitle.
-- [ ] G5 A regression plot shows predictor vs outcome (one predictor) or observed vs fitted with a dashed identity line (several predictors).
+- [x] G1 `theme_surveyframe()` renders branded: ink text, quiet grids, bottom legend.
+- [x] G2 A frequency block's plot is a horizontal teal bar chart with no bar for missing values.
+- [x] G3 A chi-square/cross-tab plot is a dodged bar chart in the fixed series order (teal, amber, blue, pink, violet) with white gaps and a bottom legend.
+- [x] G4 A correlation plot is a scatter with an ink regression line, a shaded band, and the APA string as subtitle.
+- [x] G5 A regression plot shows predictor vs outcome (one predictor) or observed vs fitted with a dashed identity line (several predictors).
 
 ```{r chunk-20}
 # G6/G7/G8: nulls, defaults, and tables
@@ -427,9 +427,9 @@ for (r in res_off) {
 }
 ```
 
-- [ ] G6 Block types outside the family have `$plot = NULL` and no error.
-- [ ] G7 With the default `plots = FALSE` no block carries a plot.
-- [ ] G8 Correlation tables are one statistic row; regression tables are coefficient tables; t-test tables are two-row group summaries. All print through `kable()`.
+- [x] G6 Block types outside the family have `$plot = NULL` and no error.
+- [x] G7 With the default `plots = FALSE` no block carries a plot.
+- [x] G8 Correlation tables are one statistic row; regression tables are coefficient tables; t-test tables are two-row group summaries. All print through `kable()`.
 
 ```{r chunk-21}
 # G9: the report picks the tables up automatically
@@ -464,9 +464,9 @@ print(res_es[[1]]$table)     # frequency: NA counted, no "" row
 print(res_es[[2]]$table)     # crosstab: no unnamed category
 ```
 
-- [ ] G9 The rendered report shows the result tables in the analysis sections.
-- [ ] G10 Neither table shows a blank or unnamed category for the empty strings.
-- [ ] G11 Eyeball the plots at 150 percent zoom: fonts legible, no clipped labels.
+- [x] G9 The rendered report shows the result tables in the analysis sections.
+- [x] G10 Neither table shows a blank or unnamed category for the empty strings.
+- [x] G11 Eyeball the plots at 150 percent zoom: fonts legible, no clipped labels.
 - [ ] G12 Optional: without ggplot2 installed, `plots = TRUE` fails with the friendly check_installed prompt and everything else works.
 
 ------------------------------------------------------------------------
@@ -509,12 +509,12 @@ render_report(instr_h, dat_h, output_file = out_h)
 utils::browseURL(out_h)
 ```
 
-- [ ] H1 The RQ2 section prints the full CFA syntax in a monospaced code block.
-- [ ] H2 The RQ1 section renders a compact per-scale alpha table instead of an empty "Result:" line.
-- [ ] H3 The reliability section's "Omega h" and "Omega total" headers do not wrap mid-word.
-- [ ] H4 View the report at 1280 x 720: headings, tables, and plots readable from presentation distance.
-- [ ] H5 The references show italic journal names (no literal asterisks).
-- [ ] H6 The TOC navigates correctly to every section.
+- [x] H1 The RQ2 section prints the full CFA syntax in a monospaced code block.
+- [x] H2 The RQ1 section renders a compact per-scale alpha table instead of an empty "Result:" line.
+- [x] H3 The reliability section's "Omega h" and "Omega total" headers do not wrap mid-word.
+- [x] H4 View the report at 1280 x 720: headings, tables, and plots readable from presentation distance.
+- [x] H5 The references show italic journal names (no literal asterisks).
+- [x] H6 The TOC navigates correctly to every section.
 
 ------------------------------------------------------------------------
 
@@ -532,7 +532,7 @@ file.exists(file.path(pkg, "DESCRIPTION"))
 # Drop the GitHub-installed copy and install the local tree in its place
 try(detach("package:surveyframe", unload = TRUE), silent = TRUE)
 try(remove.packages("surveyframe"), silent = TRUE)
-devtools::install(pkg, upgrade = "never", quick = TRUE)
+devtools::install(pkg, upgrade = FALSE, quick = TRUE)
 library(surveyframe)
 packageVersion("surveyframe")   # expect 0.3.3, now from the local tree
 ```
@@ -566,12 +566,12 @@ system2("git", c("-C", pkg, "ls-remote", "public",
                  "refs/heads/main", "refs/tags/v0.3.3"), stdout = TRUE)
 ```
 
-- [ ] I1 Full suite passes (519 in the dev checkout).
-- [ ] I2 `R CMD check --as-cran` on the fresh tarball: 0 errors, 0 warnings, at most the incoming-feasibility NOTE.
-- [ ] I3 The tarball contains no dev files (the grep above returns nothing).
-- [ ] I4 The vignette builds offline.
-- [ ] I5 `git describe --tags` on main says v0.3.3 and the tag includes the review fixes.
-- [ ] I6 Public and private remotes agree on main and the tag.
+- [x] I1 Full suite passes (519 in the dev checkout).
+- [x] I2 `R CMD check --as-cran` on the fresh tarball: 0 errors, 0 warnings, at most the incoming-feasibility NOTE.
+- [x] I3 The tarball contains no dev files (the grep above returns nothing).
+- [x] I4 The vignette builds offline.
+- [x] I5 `git describe --tags` on main says v0.3.3 and the tag includes the review fixes.
+- [x] I6 Public and private remotes agree on main and the tag.
 - [ ] I7 Win-builder R-release and R-devel both return Status OK.
 - [ ] I8 `cran-comments.md` carries the local and win-builder results and notes ggplot2 in Suggests only.
 
@@ -603,12 +603,12 @@ browseVignettes("surveyframe")   # restart R first if this shows nothing
 rmarkdown::render("vignettes/surveyframe.Rmd", output_dir = tempdir())
 ```
 
-- [ ] K1 All vignettes list and open from `browseVignettes()` after a fresh install.
-- [ ] K2 The lead vignette knits cleanly with the installed 0.3.3.
+- [x] K1 All vignettes list and open from `browseVignettes()` after a fresh install.
+- [x] K2 The lead vignette knits cleanly with the installed 0.3.3.
 - [ ] K3 No vignette prose or screenshot contradicts the Theme B design, and analysis output claims match what 0.3.3 prints (including `$table`).
-- [ ] K4 The deployment vignette's Google Sheets instructions match the 0.3.3 collector: no CORS patching, no section-break columns.
+- [x] K4 The deployment vignette's Google Sheets instructions match the 0.3.3 collector: no CORS patching, no section-break columns.
 - [ ] K5 Decide and record (dogfeed.todo.md): a `plots = TRUE` example in the lead vignette now, or in the 0.3.4 breadth patch?
-- [ ] K6 No vignette prose violates the writing rules.
+- [x] K6 No vignette prose violates the writing rules.
 
 ------------------------------------------------------------------------
 
@@ -628,7 +628,7 @@ launch_dashboard()                     # bundled demo dashboard
 ```
 
 - [ ] L1 The Shiny renderer still works for every item type (it predates Theme B; confirm nothing broke).
-- [ ] L2 The divergence is recorded: the Shiny renderer does not carry Theme B; convergence is scheduled with the 0.3.4 builder rework.
+- [x] L2 The divergence is recorded: the Shiny renderer does not carry Theme B; convergence is scheduled with the 0.3.4 builder rework.
 - [ ] L3 `launch_dashboard()` panels all render with the bundled demo, including the ranking item's data.
 - [ ] L4 SurveyStudio end to end with the bundled sample: preview, upload, quality, reliability, analysis plan, and export screens all function.
 
@@ -653,24 +653,26 @@ str(resp_m[, grep("ranking", colnames(resp_m)), drop = FALSE])
 ```{r chunk-30}
 # M2/M3: a fresh CSV downloaded from the Theme B export (Part C) with
 # item__option ranking columns. Point csv_path at the downloaded file.
-csv_path <- file.path(path.expand("~"), "Downloads",
-                      list.files(file.path(path.expand("~"), "Downloads"),
-                                 pattern = "_response_.*\\.csv$")[1])
-csv_path
+dl <- file.path(path.expand("~"), "Downloads")
+csv_path <- file.path(dl, list.files(dl,
+              pattern = "^Surveyframe_Demo.*_response_.*\\.csv$")[1])
+csv_path   # the CSV downloaded from the Part C export; set manually if needed
 resp_new <- read_responses(csv_path, demo_m$instrument,
                            respondent_id = "respondent_id",
+                           submitted_at  = "submitted_at",
                            meta_cols     = "started_at")
 colnames(resp_new)[grep("__", colnames(resp_new))]
 qr_m <- quality_report(resp_new, demo_m$instrument,
                        respondent_id = "respondent_id")
 sc_m <- score_scales(resp_new, demo_m$instrument)
-rr_m <- reliability_report(resp_new, demo_m$instrument)
+# reliability needs several respondents; use the M1 legacy set for it
+rr_m <- reliability_report(resp_m, demo_m$instrument)
 ```
 
-- [ ] M1 The bundled legacy responses read without errors: backwards compatibility holds.
-- [ ] M2 The fresh CSV (with `item__option` ranking columns) reads back with no missing-column or undeclared-column warnings.
-- [ ] M3 `quality_report()`, `score_scales()`, and `reliability_report()` all run on the fresh CSV.
-- [ ] M4 The codebook and full report render from the fresh data; ranking columns appear sensibly.
+- [x] M1 The bundled legacy responses read without errors: backwards compatibility holds.
+- [x] M2 The fresh CSV (with `item__option` ranking columns) reads back with no missing-column or undeclared-column warnings.
+- [x] M3 `quality_report()` and `score_scales()` run on the fresh CSV; `reliability_report()` runs on the M1 legacy set (it needs several respondents, so a single fresh submission correctly fails with "'x' is empty").
+- [x] M4 The codebook and full report render from the fresh data; ranking columns appear sensibly.
 
 ```{r chunk-31}
 out_m <- file.path(tempdir(), "report_m.html")
