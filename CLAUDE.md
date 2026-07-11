@@ -20,20 +20,23 @@ contract declared before data collection. Analysis is the execution of that
 pre-declared plan rather than a post-hoc search. This is the package's main
 differentiator and the thesis of the JSS paper.
 
-Current version: 0.3.1 on CRAN (2026-06-02). 0.3.3 is fully implemented
-locally and merges what was originally planned as two releases: the real-world
-AIC-RSAM hardening (0.3.3) and the ggplot2 visualisation foundation (0.3.4),
-shipped together as a single 0.3.3 since neither had reached CRAN yet.
-543/543 tests pass. The MAS co-review (`mas_review_033.md`/`.qmd`, modelled on
-the 0.3.2 review) is complete, including a second live-feedback round covering
-multi-select export, mobile matrix scrolling, SurveyBuilder control
-duplication, and the report table/plot pairing, all resolved. The lead
-vignette and two supporting vignettes were rewritten to describe the
-redesigned survey, the expanded export columns, and `plots = TRUE`.
-`surveyframe_0.3.3.tar.gz` is built, `R CMD check --as-cran` is clean (0/0/0)
-on Local, win-builder R-release (4.6.1), and win-builder R-devel, all
-confirmed 2026-07-11. Submitted to CRAN 2026-07-11. Next: await the CRAN
-maintainer's response.
+Current version: 0.3.3, accepted by CRAN 2026-07-11 (auto-check confirmation
+received same day the tarball was submitted: "package is on its way to
+CRAN", Result: OK on r-devel-linux-x86_64-debian-gcc and
+r-devel-windows-x86_64). 0.3.3 merges what was originally planned as two
+releases: the real-world AIC-RSAM hardening (0.3.3) and the ggplot2
+visualisation foundation (0.3.4), shipped together as a single 0.3.3 since
+neither had reached CRAN yet. 543/543 tests pass. The MAS co-review
+(`mas_review_033.md`/`.qmd`, modelled on the 0.3.2 review) is complete,
+including a second live-feedback round covering multi-select export, mobile
+matrix scrolling, SurveyBuilder control duplication, and the report
+table/plot pairing, all resolved. The lead vignette and two supporting
+vignettes were rewritten to describe the redesigned survey, the expanded
+export columns, and `plots = TRUE`. Local `R CMD check --as-cran`,
+win-builder R-release (4.6.1), and win-builder R-devel were all clean
+(0/0/0) before submission. Next: confirm the package page shows 0.3.3, then
+tell the JSS manuscript work in surveyframe-jss-paper it is clear to
+resubmit.
 
 After 0.3.3 comes the remaining visualisation patch arc 0.3.5-0.3.9 (the
 foundation shipped early inside 0.3.3, so five ~21-day releases remain: effect-size
@@ -213,9 +216,15 @@ Status as of 2026-07-11:
 1. `surveyframe_0.3.3.tar.gz` built. Local `R CMD check --as-cran`: Status OK,
    0 errors, 0 warnings, 0 notes.
 2. Win-builder R-release (4.6.1) and R-devel both returned Status: OK.
-   **Submitted to CRAN 2026-07-11.** Awaiting the CRAN maintainer's response.
+   Submitted to CRAN 2026-07-11. **Accepted the same day**: CRAN's
+   auto-check service confirmed "package is on its way to CRAN", Result: OK
+   on r-devel-linux-x86_64-debian-gcc and r-devel-windows-x86_64.
 3. NEWS.md proofread and corrected to read as a clean per-release changelog,
    with future-direction and internal-note content removed.
+4. `main` pushed to both `origin` (private) and `public` (the CRAN-facing
+   surveyframe repository) after the tarball verification confirmed the
+   submitted tarball is byte-identical to the repo state for every source
+   file it carries.
 
 The JSS paper (OJS 6454, submitted 2026-06-02) was returned without full review.
 Revised and resubmit invitation. The replicate.R and package changes it required
@@ -224,13 +233,14 @@ surveyframe-jss-paper (see that repo's own CLAUDE.md), and was updated
 2026-07-11 for 0.3.3: version references bumped, the live SSR 6.0 DOI cited,
 all six figures retaken against the redesigned survey and current
 SurveyBuilder UI, and a previously unaddressed editor checklist item (a
-non-interactive response-collection demonstration) finally closed. It is
-ready to resubmit once surveyframe 0.3.3 is accepted on CRAN.
+non-interactive response-collection demonstration) finally closed. **0.3.3 is
+now accepted on CRAN, so the manuscript is clear to resubmit** once the
+package page shows the new version live.
 
 Open items (non-blocking for CRAN submission):
 
 - Confirm or remove the Codecov badge in README.
-- Trigger pkgdown build after 0.3.3 is accepted.
+- Trigger pkgdown build now that 0.3.3 is accepted.
 - Guard `launch_dashboard()` and similar Shiny launcher `\donttest` examples so a
   full check does not hang; this is a future patch, not a 0.3.3 blocker.
 - The pre-existing Quarto/pandoc `kable()` table-collapsing bug found during
@@ -278,16 +288,15 @@ fixing anything.
 
 ## Continuation prompts (paste to resume a thread of work)
 
-### 0.3.3 is submitted to CRAN, awaiting the maintainer's response
+### 0.3.3 is accepted on CRAN; resume the JSS resubmission
 
 ```
-Read CLAUDE.md. surveyframe 0.3.3 was submitted to CRAN on 2026-07-11, after
-a clean local check and clean win-builder R-release/R-devel runs. Check
-whether the CRAN maintainer has responded (accepted, or with further
-comments) and act on whatever they say: if accepted, update CLAUDE.md's
-current-version line and NEWS.md and tell me the JSS manuscript in
-surveyframe-jss-paper is now ready to resubmit; if there are comments, fix
-them and restart the win-builder and check cycle.
+Read CLAUDE.md. surveyframe 0.3.3 was accepted by CRAN on 2026-07-11 (the
+auto-check confirmation arrived the same day it was submitted). Confirm the
+CRAN package page (https://CRAN.R-project.org/package=surveyframe) shows
+0.3.3 live, then move to ../surveyframe-jss-paper: read that repo's own
+CLAUDE.md and run its "Final pre-submission check" continuation prompt
+before resubmitting to JSS.
 ```
 
 ### Start the v0.5 MCDM work

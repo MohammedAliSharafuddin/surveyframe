@@ -56,3 +56,9 @@ notes on every environment:
 ## Reverse dependencies
 
 surveyframe has no reverse dependencies on CRAN.
+
+## Submission outcome
+
+Submitted 2026-07-11. Accepted the same day: CRAN's auto-check service
+confirmed the package was on its way to CRAN, with Result: OK on
+r-devel-linux-x86_64-debian-gcc and r-devel-windows-x86_64.
