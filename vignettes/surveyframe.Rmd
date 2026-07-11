@@ -814,6 +814,23 @@ The researcher fills in the substantive interpretation. The package supplies
 the statistic and the label. This separation is intentional: statistical
 significance and practical significance are distinct judgements.
 
+### Plots on demand
+
+When ggplot2 is installed, `plots = TRUE` attaches a brand-styled chart to
+every supported block: bar charts for frequency and chi-square blocks, and
+scatter plots with a regression overlay for correlation and regression
+blocks. Plotting stays opt-in, so nothing changes for installations without
+ggplot2.
+
+```{r run-plan-plots, eval=requireNamespace("ggplot2", quietly = TRUE), fig.width=7, fig.height=4.5}
+results_p <- run_analysis_plan(scored, study, plots = TRUE)
+first_plot <- Filter(function(r) !is.null(r$plot), results_p)[[1]]
+first_plot$plot
+```
+
+Inferential blocks also return a `$table` data frame ready for
+`knitr::kable()`, and the HTML report picks both up automatically.
+
 ---
 
 ## Results report
