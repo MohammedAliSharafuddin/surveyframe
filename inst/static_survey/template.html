@@ -206,6 +206,25 @@ textarea.inp-std:focus{border-color:var(--cp);box-shadow:0 0 0 3px color-mix(in 
   .prog-hdr{padding:9px 14px}
   .btn{padding:10px 20px}
   .likert-opt{min-width:50px}
+
+  /* Matrix reflows into stacked row-cards below 600px: each matrix row
+     becomes its own card and each column becomes a labelled tap target
+     inside it, so completing a matrix never needs horizontal scrolling.
+     Accessible names already come from the per-radio aria-label set in
+     renderMatrix(), so hiding the visual header loses no information. */
+  .matrix-wrap{overflow-x:visible;border:none;background:transparent;box-shadow:none}
+  .matrix-tbl,.matrix-tbl tbody,.matrix-tbl tr{display:block;width:100%}
+  .matrix-tbl thead{display:none}
+  .matrix-tbl tr{margin-bottom:12px;border:1px solid var(--cb);border-radius:6px;
+    background:var(--cf);overflow:hidden;box-shadow:0 1px 0 rgba(18,33,43,.03)}
+  .matrix-tbl tr:last-child{margin-bottom:0}
+  .matrix-tbl td{display:flex;align-items:center;justify-content:space-between;
+    gap:12px;padding:12px 14px;min-height:44px;border-bottom:1px solid var(--cb);
+    text-align:left}
+  .matrix-tbl td:last-child{border-bottom:none}
+  .matrix-tbl td.rl{font-weight:600;background:var(--tint);border-bottom:1.5px solid var(--tint-bd)}
+  .matrix-tbl td:not(.rl)::before{content:attr(data-col);color:var(--t2);font-size:14px;flex:1}
+  .matrix-tbl td:not(.rl) input{margin:0;flex-shrink:0;width:22px;height:22px}
 }
 </style>
 </head>
@@ -428,7 +447,10 @@ function renderMatrix(item,cs){
       +'<td class="rl">'+esc(row)+'</td>'
       +cs.values.map(function(v){
         var colLbl=cs.labels[cs.values.indexOf(v)]||v;
-        return'<td><input type="radio" name="'+esc(rowKey)+'" value="'+esc(v)+'"'
+        // data-col drives the CSS reflow below 600px: the table becomes a
+        // stack of row-cards with the column label printed beside each
+        // radio, so a matrix never needs horizontal scrolling on a phone.
+        return'<td data-col="'+esc(colLbl)+'"><input type="radio" name="'+esc(rowKey)+'" value="'+esc(v)+'"'
           +(String(saved)===String(v)?' checked':'')
           +' aria-label="'+esc(row)+': '+esc(colLbl)+'"'
           +' onchange="setResp(\''+esc(rowKey)+'\',this.value)"></td>';
@@ -674,6 +696,14 @@ function doSubmit(){
       (cs.values||[]).forEach(function(v){
         var pos=order.indexOf(String(v));
         row[item.id+'__'+String(v)]=pos>=0?String(pos+1):'';
+      });
+    } else if(item.type==='multiple_choice'){
+      // One 0/1 column per option, so multi-select analysis needs no
+      // string-splitting: item__option = 1 when selected, 0 otherwise.
+      var csM=choiceMap[item.choice_set]||{values:[]};
+      var sel=(responses[item.id]||'').split(',').filter(Boolean);
+      (csM.values||[]).forEach(function(v){
+        row[item.id+'__'+String(v)]=sel.includes(String(v))?'1':'0';
       });
     } else {
       row[item.id]=responses[item.id]!=null?responses[item.id]:'';
