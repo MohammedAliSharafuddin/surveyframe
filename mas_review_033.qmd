@@ -53,9 +53,10 @@ for (p in c("devtools", "remotes", "ggplot2", "psych", "lavaan",
 ### Step A1 — Install the tagged release from GitHub
 
 ```{r chunk-01, eval=FALSE}
-if (!requireNamespace("remotes", quietly = TRUE)) install.packages("remotes")
-remotes::install_github("MohammedAliSharafuddin/surveyframe@v0.3.3",
-                        force = TRUE)
+# if (!requireNamespace("remotes", quietly = TRUE)) install.packages("remotes")
+# remotes::install_github("MohammedAliSharafuddin/surveyframe@v0.3.3",
+#                         force = TRUE)
+install.packages("~/Documents/GitHub/surveyframe-dev/surveyframe_0.3.3.tar.gz", repos = NULL, type = "source")
 ```
 
 Restart R after the install, then confirm:
@@ -111,14 +112,14 @@ export_static_survey(instr_b,
                      open = TRUE, overwrite = TRUE)
 ```
 
-- [ ] B1 On load, only q1 is visible.
-- [ ] B2 Answer q1 = Yes: q2 appears; q3 stays hidden (its second rule is unmet). This is the multi-rule AND fix; 0.3.2 would have shown q3 here.
-- [ ] B3 Answer q2 = Yes: q3 appears.
-- [ ] B4 Change q1 to No: q2 AND q3 both disappear, even though q2 still holds a stale Yes. This is the cascade fix; 0.3.2 kept q3 visible.
-- [ ] B5 Change q1 back to Yes: q2 and q3 return with their earlier answers still selected.
-- [ ] B6 With q1 = No, submit: no required-field error blocks the hidden questions, and the thank-you screen appears.
-- [ ] B7 The downloaded CSV contains columns only for q1/q2/q3 plus the metadata columns, and no section-break columns.
-- [ ] B8 Nothing in the flow feels laggy or flickers when visibility changes.
+- [x] B1 On load, only q1 is visible.
+- [x] B2 Answer q1 = Yes: q2 appears; q3 stays hidden (its second rule is unmet). This is the multi-rule AND fix; 0.3.2 would have shown q3 here.
+- [x] B3 Answer q2 = Yes: q3 appears.
+- [x] B4 Change q1 to No: q2 AND q3 both disappear, even though q2 still holds a stale Yes. This is the cascade fix; 0.3.2 kept q3 visible.
+- [x] B5 Change q1 back to Yes: q2 and q3 return with their earlier answers still selected.
+- [x] B6 With q1 = No, submit: no required-field error blocks the hidden questions, and the thank-you screen appears.
+- [x] B7 The downloaded CSV contains columns only for q1/q2/q3 plus the metadata columns, and no section-break columns.
+- [x] B8 Nothing in the flow feels laggy or flickers when visibility changes.
 
 ### Step B2 — Complex walkthrough: numeric coding and a screen-out message
 
@@ -172,22 +173,23 @@ export_static_survey(demo$instrument,
                      open = TRUE, overwrite = TRUE)
 ```
 
-- [ ] C1 Welcome screen: serif title, intro text, tinted consent box, and a full-width start button in the theme colour. The branded header (logo or study name, no decorative dot) shows above.
-- [ ] C2 Question text is serif and clearly larger than body text; help text is italic; the required marker is a small theme-coloured asterisk.
-- [ ] C3 Single-choice options are bordered cards with A/B/C key chips; the selected card shows a tinted background, a theme border, a filled chip, and a right-side tick.
-- [ ] C4 Multiple-choice cards behave the same and allow several selections.
-- [ ] C5 Likert items are numbered squares with small labels underneath; the selected square fills with the theme colour and its number turns white.
-- [ ] C6 Short text/number/date inputs are underline style; the underline turns the theme colour on focus. The textarea keeps a boxed style. The numeric nights question refuses values below 0 and above 365 (typed values clamp).
-- [ ] C7 Star rating: large stars, theme colour when active, subtle grow on hover.
-- [ ] C8 Matrix (tinted header row, horizontal rules, hover highlight), slider (card container, large serif value, both end labels visible including 0), and ranking (option-card rows with theme rank badges) all carry the Theme B design.
-- [ ] C9 Section breaks show the short theme-coloured rule above a serif heading with italic intro.
+- [x] C1 Welcome screen: serif title, intro text, tinted consent box, and a full-width start button in the theme colour. The branded header (logo or study name, no decorative dot) shows above.
+- [x] C2 Question text is serif and clearly larger than body text; help text is italic; the required marker is a small theme-coloured asterisk.
+- [x] C3 Single-choice options are bordered cards with A/B/C key chips; the selected card shows a tinted background, a theme border, a filled chip, and a right-side tick.
+- [x] C4 Multiple-choice cards behave the same and allow several selections.
+- [x] C5 Likert items are numbered squares with small labels underneath; the selected square fills with the theme colour and its number turns white.
+- [x] C6 Short text/number/date inputs are underline style; the underline turns the theme colour on focus. The textarea keeps a boxed style. The numeric nights question refuses values below 0 and above 365 (typed values clamp).
+- [x] C7 Star rating: large stars, theme colour when active, subtle grow on hover.
+- [x] C8 Matrix (tinted header row, horizontal rules, hover highlight), slider (card container, large serif value, both end labels visible including 0), and ranking (option-card rows with theme rank badges) all carry the Theme B design.
+- [c] C9 Section breaks show the short theme-coloured rule above a serif heading with italic intro.
 - [x] C10 The sticky top bar shows the progress line, a label, and the percentage, with no dash or duplicated page counter. On a single-page survey the label counts answered questions and updates as you answer.
 
+Feedback: The data for multi select is saved as comma separated in a single column. Which may need further cleaning editing later. Each variable should have a separate column entry with 0 and 1 logic for calculations. 
 ### Step C2 — Theme colour selector
 
 ```{r chunk-07}
 demo2 <- sframe_input_types_demo_data()
-demo2$instrument$render$theme <- "#7c3aed"   # any colour you like
+demo2$instrument$render$theme <- "#03fc98"   # any colour you like
 export_static_survey(demo2$instrument,
                      output_path = file.path(tempdir(), "themeb2.html"),
                      open = TRUE, overwrite = TRUE)
@@ -210,7 +212,7 @@ tempdir()    # the folder holding the exports from the chunks above
 
 - [x] C13 No horizontal scrolling anywhere.
 - [x] C14 Option cards and Likert squares are comfortably tappable with a thumb; no mis-taps on adjacent options.
-- [ ] C15 The on-screen keyboard does not permanently cover a focused text input.
+- [x] C15 The on-screen keyboard does not permanently cover a focused text input.
 - [x] C16 A logo set in the header keeps a stable box: try one wide and one tall logo and confirm the study name does not jump horizontally.
 - [x] C17 Conversational mode (chunk below): one question per page, a "Question X of Y" eyebrow with no dash line, the study title in the sticky bar, and working Back/Next.
 - [ ] C18 Overall judgement: the survey looks like the approved Theme B mock, and you would be happy sending this to a respondent today.
@@ -222,7 +224,7 @@ export_static_survey(demo3$instrument,
                      output_path = file.path(tempdir(), "themeb_conv.html"),
                      open = TRUE, overwrite = TRUE)
 ```
-
+Feedback: The design is not mobile friendly. The option cards and text are not resizing to the mobile screen. Leading to text overflow. the matrix grid need scrolling to read and complete. 
 ------------------------------------------------------------------------
 
 ## Part D — SurveyBuilder fixes (10 items)
@@ -244,6 +246,11 @@ surveyframe::launch_builder()
 - [x] D9 Known and accepted: the Preview tab lags Theme B until the 0.3.4 builder rework. Confirm it is logged and does not block submission.
 - [x] D10 Export survey and Generate collector still download files without errors after all the above.
 
+Feedback: There are two CTA buttons for Add question. (1) +Add your first question
+(2) Add questions
+But none has a drop down for the items to choose from. They simply add a likert type question.
+The newly added buttons pushed the currently available button in the left panel to the bottom. Not visible on screen.
+All the icons and settings for the survey 
 ------------------------------------------------------------------------
 
 ## Part E — Model syntax fixes (7 items)
