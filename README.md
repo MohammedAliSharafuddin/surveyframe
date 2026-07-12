@@ -289,9 +289,11 @@ Interactive functions such as `launch_builder(open = TRUE)`, `launch_studio()`,
 `render_survey()`, and `launch_dashboard()` are available for manual use. Tests
 and examples avoid opening browsers.
 
-## v0.4 scope
+## Roadmap
 
-MCDM and DEMATEL fall outside v0.3 scope. These methods are scheduled for v0.4.
+Small-sample inference helpers, validated by a simulation study of survey
+methods, are planned for v0.4. Multi-criteria decision-making methods
+(MCDM) and DEMATEL are planned for v0.5.
 
 ## Citation
 
@@ -303,10 +305,9 @@ citation("surveyframe")
 
 - Quantitative Analysis with Small Samples, a companion textbook on statistical
   inference when sample sizes are small:
-  <https://flairmi.com/textbooks/smallsamplelab.html>
-- Small-sample inference helpers, validated by a simulation study of survey
-  methods, are planned for a future surveyframe version. The textbook above
-  describes the methods that surveyframe will add and when to prefer each one.
+  <https://flairmi.com/textbooks/smallsamplelab.html>. It describes the
+  small-sample methods that surveyframe will add in v0.4 and when to prefer
+  each one.
 
 ## License
 
