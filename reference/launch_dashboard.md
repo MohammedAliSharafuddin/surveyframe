@@ -22,8 +22,12 @@ launch_dashboard(
 
 - instrument:
 
-  An `sframe` object. When `NULL`, the bundled tourism services demo
-  instrument is loaded.
+  An `sframe` object. Required. Calling `launch_dashboard()` with no
+  instrument errors with guidance; use
+  [`launch_dashboard_demo()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/launch_dashboard_demo.md)
+  for the bundled demo or
+  [`launch_studio()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/launch_studio.md)
+  to upload interactively.
 
 - responses:
 
@@ -31,9 +35,8 @@ launch_dashboard(
   [`read_responses()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_responses.md)
   or
   [`read_sheet_responses()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_sheet_responses.md).
-  When NULL and `instrument` is also NULL, the bundled simulated demo
-  responses are loaded. When NULL with a user-supplied instrument, the
-  dashboard opens with instrument metadata and no response summaries.
+  When NULL the dashboard opens with instrument metadata and no response
+  summaries.
 
 - port:
 
@@ -79,9 +82,13 @@ Called for its side effect. Returns nothing.
 
   Scrollable response table with a CSV download button.
 
-The dashboard is read-only. Use it for descriptive exploration after
-collecting responses and before running formal analysis with
-[`run_analysis_plan()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/run_analysis_plan.md).
+The dashboard is read-only and takes its data from R. It has no upload
+screen, so pass `instrument` and `responses` directly. To open and
+upload data interactively, use
+[`launch_studio()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/launch_studio.md),
+which includes this same dashboard as its Dashboard tab. For a quick
+look at bundled demo data, use
+[`launch_dashboard_demo()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/launch_dashboard_demo.md).
 
 ## See also
 
@@ -93,9 +100,8 @@ collecting responses and before running formal analysis with
 
 ``` r
 if (FALSE) { # \dontrun{
-# Open the bundled tourism-services response dashboard.
-# To build a questionnaire instead, use launch_builder().
-launch_dashboard()
+# For the bundled demo, use launch_dashboard_demo().
+# To upload data interactively, use launch_studio().
 
 # Open the dashboard with your own instrument and responses
 instr <- read_sframe(

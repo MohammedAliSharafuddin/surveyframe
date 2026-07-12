@@ -7,8 +7,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>Scale reliability and validity • surveyframe</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/Inter-0.4.10/font.css" rel="stylesheet">
+<link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/Inter-0.4.10/font.css" rel="stylesheet">
 <link href="../deps/JetBrains_Mono-0.4.10/font.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
@@ -22,7 +22,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">surveyframe</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -49,8 +49,7 @@
 
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
-
-      <h1>Scale reliability and validity</h1>
+      <img src="../logo.svg" class="logo" alt=""><h1>Scale reliability and validity</h1>
             
       
       <small class="dont-index">Source: <a href="https://github.com/MohammedAliSharafuddin/surveyframe/blob/main/vignettes/scale-reliability-validity.Rmd" class="external-link"><code>vignettes/scale-reliability-validity.Rmd</code></a></small>
@@ -59,287 +58,180 @@
 
     
     
-<p>This vignette focuses on measurement-quality checks. The examples use
-the tourism-services demo because it has coherent Likert constructs.</p>
+<style>
+body { color: #1a1a2e; }
+h1, h2, h3 { color: #1a1a2e; }
+a { color: #16B3B1; }
+table { border-collapse: collapse; margin: 1em 0; }
+table caption { caption-side: top; font-style: italic; color: #444; padding-bottom: .3em; }
+th { border-top: 2px solid #1a1a2e; border-bottom: 1px solid #1a1a2e; padding: 6px 12px; }
+td { padding: 5px 12px; border: none; }
+tbody tr:last-child td { border-bottom: 2px solid #1a1a2e; }
+</style>
+<p>Measurement quality is part of the research design. This vignette
+works through the reliability and validity evidence from the published
+Thailand digital marketing study (Sharafuddin, Madhavan, and Wangtueai
+2024). The reliability and item reports read scale definitions from an
+instrument, so they are shown on the bundled tourism demo, a synthetic
+companion to the study. The validity summary runs on the loadings the
+paper reported, which needs no raw data.</p>
+<div class="section level2">
+<h2 id="reliability-from-the-instrument">Reliability from the instrument<a class="anchor" aria-label="anchor" href="#reliability-from-the-instrument"></a>
+</h2>
+<p><code><a href="../reference/reliability_report.html">reliability_report()</a></code> reads the scale definitions and
+reports Cronbach’s alpha and, with the optional <code>psych</code>
+package, McDonald’s omega. The published study reported strong
+reliability for every construct. At the higher-order level the alpha and
+composite reliability were 0.828 and 0.883 for digital marketing
+effectiveness, 0.792 and 0.906 for service quality, 0.769 and 0.843 for
+sustainability quality, 0.897 and 0.936 for satisfaction, and 0.921 and
+0.950 for behavioural intention.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">demo</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sframe_demo_data.html">sframe_demo_data</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="va">instr</span> <span class="op">&lt;-</span> <span class="va">demo</span><span class="op">$</span><span class="va">instrument</span></span>
-<span><span class="va">responses</span> <span class="op">&lt;-</span> <span class="va">demo</span><span class="op">$</span><span class="va">responses</span></span></code></pre></div>
-<div class="section level2">
-<h2 id="construct-to-item-mapping">Construct-to-item mapping<a class="anchor" aria-label="anchor" href="#construct-to-item-mapping"></a>
-</h2>
-<p>Scale definitions are stored in the instrument. They define which
-items form each construct and how scores should be computed.</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">instr</span><span class="op">$</span><span class="va">scales</span>, <span class="kw">function</span><span class="op">(</span><span class="va">scale</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>    id <span class="op">=</span> <span class="va">scale</span><span class="op">$</span><span class="va">id</span>,</span>
-<span>    label <span class="op">=</span> <span class="va">scale</span><span class="op">$</span><span class="va">label</span>,</span>
-<span>    items <span class="op">=</span> <span class="va">scale</span><span class="op">$</span><span class="va">items</span>,</span>
-<span>    method <span class="op">=</span> <span class="va">scale</span><span class="op">$</span><span class="va">method</span>,</span>
-<span>    min_valid <span class="op">=</span> <span class="va">scale</span><span class="op">$</span><span class="va">min_valid</span>,</span>
-<span>    reverse_items <span class="op">=</span> <span class="va">scale</span><span class="op">$</span><span class="va">reverse_items</span></span>
-<span>  <span class="op">)</span></span>
-<span><span class="op">}</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [[1]]</span></span>
-<span><span class="co">#&gt; [[1]]$id</span></span>
-<span><span class="co">#&gt; [1] "digital_marketing"</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; [[1]]$label</span></span>
-<span><span class="co">#&gt; [1] "Digital marketing effectiveness"</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; [[1]]$items</span></span>
-<span><span class="co">#&gt; [1] "dm_1" "dm_2" "dm_3"</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; [[1]]$method</span></span>
-<span><span class="co">#&gt; [1] "mean"</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; [[1]]$min_valid</span></span>
-<span><span class="co">#&gt; NULL</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; [[1]]$reverse_items</span></span>
-<span><span class="co">#&gt; NULL</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; [[2]]</span></span>
-<span><span class="co">#&gt; [[2]]$id</span></span>
-<span><span class="co">#&gt; [1] "service_quality"</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; [[2]]$label</span></span>
-<span><span class="co">#&gt; [1] "Service quality"</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; [[2]]$items</span></span>
-<span><span class="co">#&gt; [1] "sq_1" "sq_2" "sq_3"</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; [[2]]$method</span></span>
-<span><span class="co">#&gt; [1] "mean"</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; [[2]]$min_valid</span></span>
-<span><span class="co">#&gt; NULL</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; [[2]]$reverse_items</span></span>
-<span><span class="co">#&gt; NULL</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; [[3]]</span></span>
-<span><span class="co">#&gt; [[3]]$id</span></span>
-<span><span class="co">#&gt; [1] "sustainability"</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; [[3]]$label</span></span>
-<span><span class="co">#&gt; [1] "Sustainability perception"</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; [[3]]$items</span></span>
-<span><span class="co">#&gt; [1] "sus_1" "sus_2"</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; [[3]]$method</span></span>
-<span><span class="co">#&gt; [1] "mean"</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; [[3]]$min_valid</span></span>
-<span><span class="co">#&gt; NULL</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; [[3]]$reverse_items</span></span>
-<span><span class="co">#&gt; NULL</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; [[4]]</span></span>
-<span><span class="co">#&gt; [[4]]$id</span></span>
-<span><span class="co">#&gt; [1] "satisfaction"</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; [[4]]$label</span></span>
-<span><span class="co">#&gt; [1] "Tourist satisfaction"</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; [[4]]$items</span></span>
-<span><span class="co">#&gt; [1] "sat_1" "sat_2"</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; [[4]]$method</span></span>
-<span><span class="co">#&gt; [1] "mean"</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; [[4]]$min_valid</span></span>
-<span><span class="co">#&gt; NULL</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; [[4]]$reverse_items</span></span>
-<span><span class="co">#&gt; NULL</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; [[5]]</span></span>
-<span><span class="co">#&gt; [[5]]$id</span></span>
-<span><span class="co">#&gt; [1] "behavioural_intention"</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; [[5]]$label</span></span>
-<span><span class="co">#&gt; [1] "Behavioural intention"</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; [[5]]$items</span></span>
-<span><span class="co">#&gt; [1] "bi_1" "bi_2"</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; [[5]]$method</span></span>
-<span><span class="co">#&gt; [1] "mean"</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; [[5]]$min_valid</span></span>
-<span><span class="co">#&gt; NULL</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; [[5]]$reverse_items</span></span>
-<span><span class="co">#&gt; NULL</span></span></code></pre></div>
-</div>
-<div class="section level2">
-<h2 id="reverse-coding-and-minimum-valid-item-rules">Reverse coding and minimum valid item rules<a class="anchor" aria-label="anchor" href="#reverse-coding-and-minimum-valid-item-rules"></a>
-</h2>
-<p><code><a href="../reference/score_scales.html">score_scales()</a></code> applies reverse coding and minimum valid
-item rules before returning scale scores.</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">scored</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/score_scales.html">score_scales</a></span><span class="op">(</span></span>
-<span>  <span class="va">responses</span>,</span>
-<span>  <span class="va">instr</span>,</span>
-<span>  keep_items <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  keep_meta <span class="op">=</span> <span class="cn">TRUE</span></span>
-<span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">demo</span>      <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sframe_demo_data.html">sframe_demo_data</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">instr</span>     <span class="op">&lt;-</span> <span class="va">demo</span><span class="op">$</span><span class="va">instrument</span></span>
+<span><span class="va">responses</span> <span class="op">&lt;-</span> <span class="va">demo</span><span class="op">$</span><span class="va">responses</span></span>
 <span></span>
-<span><span class="va">scale_ids</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">vapply</a></span><span class="op">(</span><span class="va">instr</span><span class="op">$</span><span class="va">scales</span>, <span class="kw">function</span><span class="op">(</span><span class="va">scale</span><span class="op">)</span> <span class="va">scale</span><span class="op">$</span><span class="va">id</span>, <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">character</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">scored</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/sets.html" class="external-link">intersect</a></span><span class="op">(</span><span class="va">scale_ids</span>, <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">scored</span><span class="op">)</span><span class="op">)</span>, drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span><span class="op">)</span></span>
-<span><span class="co">#&gt;   digital_marketing service_quality sustainability satisfaction</span></span>
-<span><span class="co">#&gt; 1          2.666667        3.666667            5.0          3.5</span></span>
-<span><span class="co">#&gt; 2          3.000000        2.666667            3.0          1.5</span></span>
-<span><span class="co">#&gt; 3          4.666667        3.333333            3.5          4.5</span></span>
-<span><span class="co">#&gt; 4          4.333333        4.000000            5.0          4.5</span></span>
-<span><span class="co">#&gt; 5          3.000000        3.666667            4.0          3.0</span></span>
-<span><span class="co">#&gt; 6          3.666667        3.666667            2.5          3.5</span></span>
-<span><span class="co">#&gt;   behavioural_intention</span></span>
-<span><span class="co">#&gt; 1                   4.5</span></span>
-<span><span class="co">#&gt; 2                   2.5</span></span>
-<span><span class="co">#&gt; 3                   2.5</span></span>
-<span><span class="co">#&gt; 4                   5.0</span></span>
-<span><span class="co">#&gt; 5                   3.5</span></span>
-<span><span class="co">#&gt; 6                   3.0</span></span></code></pre></div>
-</div>
-<div class="section level2">
-<h2 id="reliability">Reliability<a class="anchor" aria-label="anchor" href="#reliability"></a>
-</h2>
-<p>Cronbach’s alpha and omega use the optional <code>psych</code>
-package. Interpret these statistics together with item wording,
-dimensionality, and study design.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">alpha_only</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/reliability_report.html">reliability_report</a></span><span class="op">(</span></span>
-<span>  <span class="va">responses</span>,</span>
-<span>  <span class="va">instr</span>,</span>
-<span>  omega <span class="op">=</span> <span class="cn">FALSE</span></span>
-<span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">alpha_only</span></span>
-<span><span class="co">#&gt; Reliability Report</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Scale: digital_marketing (Digital marketing effectiveness)</span></span>
-<span><span class="co">#&gt;   Items: 3   N: 120</span></span>
-<span><span class="co">#&gt;   Alpha:   0.837</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Scale: service_quality (Service quality)</span></span>
-<span><span class="co">#&gt;   Items: 3   N: 120</span></span>
-<span><span class="co">#&gt;   Alpha:   0.844</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Scale: sustainability (Sustainability perception)</span></span>
-<span><span class="co">#&gt;   Items: 2   N: 120</span></span>
-<span><span class="co">#&gt;   Alpha:   0.772</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Scale: satisfaction (Tourist satisfaction)</span></span>
-<span><span class="co">#&gt;   Items: 2   N: 120</span></span>
-<span><span class="co">#&gt;   Alpha:   0.816</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Scale: behavioural_intention (Behavioural intention)</span></span>
-<span><span class="co">#&gt;   Items: 2   N: 120</span></span>
-<span><span class="co">#&gt;   Alpha:   0.844</span></span></code></pre></div>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">omega_report</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/reliability_report.html">reliability_report</a></span><span class="op">(</span></span>
-<span>  <span class="va">responses</span>,</span>
-<span>  <span class="va">instr</span>,</span>
-<span>  alpha <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  omega <span class="op">=</span> <span class="cn">TRUE</span></span>
-<span><span class="op">)</span></span>
-<span><span class="co">#&gt; Loading required namespace: GPArotation</span></span>
-<span><span class="co">#&gt; Omega_h for 1 factor is not meaningful, just omega_t</span></span>
-<span><span class="co">#&gt; Warning in schmid(m, nfactors, fm, digits, rotate = rotate, n.obs = n.obs, :</span></span>
-<span><span class="co">#&gt; Omega_h and Omega_asymptotic are not meaningful with one factor</span></span>
-<span><span class="co">#&gt; Warning in cov2cor(t(w) %*% r %*% w): diag(V) had non-positive or NA entries;</span></span>
-<span><span class="co">#&gt; the non-finite result may be dubious</span></span>
-<span><span class="co">#&gt; Omega_h for 1 factor is not meaningful, just omega_t</span></span>
-<span><span class="co">#&gt; Warning in schmid(m, nfactors, fm, digits, rotate = rotate, n.obs = n.obs, :</span></span>
-<span><span class="co">#&gt; Omega_h and Omega_asymptotic are not meaningful with one factor</span></span>
-<span><span class="co">#&gt; Warning in schmid(m, nfactors, fm, digits, rotate = rotate, n.obs = n.obs, :</span></span>
-<span><span class="co">#&gt; diag(V) had non-positive or NA entries; the non-finite result may be dubious</span></span>
-<span><span class="co">#&gt; Omega_h for 1 factor is not meaningful, just omega_t</span></span>
-<span><span class="co">#&gt; Warning in schmid(m, nfactors, fm, digits, rotate = rotate, n.obs = n.obs, :</span></span>
-<span><span class="co">#&gt; Omega_h and Omega_asymptotic are not meaningful with one factor</span></span>
-<span><span class="co">#&gt; Warning in schmid(m, nfactors, fm, digits, rotate = rotate, n.obs = n.obs, :</span></span>
-<span><span class="co">#&gt; diag(V) had non-positive or NA entries; the non-finite result may be dubious</span></span>
-<span><span class="co">#&gt; Omega_h for 1 factor is not meaningful, just omega_t</span></span>
-<span><span class="co">#&gt; Warning in schmid(m, nfactors, fm, digits, rotate = rotate, n.obs = n.obs, :</span></span>
-<span><span class="co">#&gt; Omega_h and Omega_asymptotic are not meaningful with one factor</span></span>
-<span><span class="co">#&gt; Warning in schmid(m, nfactors, fm, digits, rotate = rotate, n.obs = n.obs, :</span></span>
-<span><span class="co">#&gt; diag(V) had non-positive or NA entries; the non-finite result may be dubious</span></span>
-<span><span class="co">#&gt; Omega_h for 1 factor is not meaningful, just omega_t</span></span>
-<span><span class="co">#&gt; Warning in schmid(m, nfactors, fm, digits, rotate = rotate, n.obs = n.obs, :</span></span>
-<span><span class="co">#&gt; Omega_h and Omega_asymptotic are not meaningful with one factor</span></span>
-<span><span class="co">#&gt; Warning in schmid(m, nfactors, fm, digits, rotate = rotate, n.obs = n.obs, :</span></span>
-<span><span class="co">#&gt; diag(V) had non-positive or NA entries; the non-finite result may be dubious</span></span>
-<span></span>
-<span><span class="va">omega_report</span></span>
-<span><span class="co">#&gt; Reliability Report</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Scale: digital_marketing (Digital marketing effectiveness)</span></span>
-<span><span class="co">#&gt;   Items: 3   N: 120</span></span>
-<span><span class="co">#&gt;   Omega h: 0.837</span></span>
-<span><span class="co">#&gt;   Omega t: 0.837</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Scale: service_quality (Service quality)</span></span>
-<span><span class="co">#&gt;   Items: 3   N: 120</span></span>
-<span><span class="co">#&gt;   Omega h: 0.845</span></span>
-<span><span class="co">#&gt;   Omega t: 0.845</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Scale: sustainability (Sustainability perception)</span></span>
-<span><span class="co">#&gt;   Items: 2   N: 120</span></span>
-<span><span class="co">#&gt;   Omega h: 0.773</span></span>
-<span><span class="co">#&gt;   Omega t: 0.773</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Scale: satisfaction (Tourist satisfaction)</span></span>
-<span><span class="co">#&gt;   Items: 2   N: 120</span></span>
-<span><span class="co">#&gt;   Omega h: 0.817</span></span>
-<span><span class="co">#&gt;   Omega t: 0.817</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Scale: behavioural_intention (Behavioural intention)</span></span>
-<span><span class="co">#&gt;   Items: 2   N: 120</span></span>
-<span><span class="co">#&gt;   Omega h: 0.844</span></span>
-<span><span class="co">#&gt;   Omega t: 0.844</span></span></code></pre></div>
+<span><span class="va">rr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/reliability_report.html">reliability_report</a></span><span class="op">(</span><span class="va">responses</span>, <span class="va">instr</span>, omega <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="va">rel_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">rbind</span>, <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">rr</span>, <span class="kw">function</span><span class="op">(</span><span class="va">s</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>  Scale   <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">s</span><span class="op">$</span><span class="va">label</span>, <span class="st">" ("</span>, <span class="va">s</span><span class="op">$</span><span class="va">scale_id</span>, <span class="st">")"</span><span class="op">)</span>,</span>
+<span>  Items   <span class="op">=</span> <span class="va">s</span><span class="op">$</span><span class="va">n_items</span>,</span>
+<span>  N       <span class="op">=</span> <span class="va">s</span><span class="op">$</span><span class="va">n</span>,</span>
+<span>  Alpha   <span class="op">=</span> <span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">s</span><span class="op">$</span><span class="va">alpha</span><span class="op">)</span><span class="op">)</span>   <span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="st">"%.2f"</span>, <span class="va">s</span><span class="op">$</span><span class="va">alpha</span><span class="op">)</span>   <span class="kw">else</span> <span class="st">"n/a"</span>,</span>
+<span>  Omega_h <span class="op">=</span> <span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">s</span><span class="op">$</span><span class="va">omega_h</span><span class="op">)</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="st">"%.2f"</span>, <span class="va">s</span><span class="op">$</span><span class="va">omega_h</span><span class="op">)</span> <span class="kw">else</span> <span class="st">"n/a"</span>,</span>
+<span>  Omega_t <span class="op">=</span> <span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">s</span><span class="op">$</span><span class="va">omega_t</span><span class="op">)</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="st">"%.2f"</span>, <span class="va">s</span><span class="op">$</span><span class="va">omega_t</span><span class="op">)</span> <span class="kw">else</span> <span class="st">"n/a"</span>,</span>
+<span>  stringsAsFactors <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu">kable</span><span class="op">(</span><span class="va">rel_df</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>      col.names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Scale"</span>, <span class="st">"Items"</span>, <span class="st">"N"</span>, <span class="st">"Alpha"</span>, <span class="st">"Omega h"</span>, <span class="st">"Omega total"</span><span class="op">)</span>,</span>
+<span>      align <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"l"</span>, <span class="st">"c"</span>, <span class="st">"c"</span>, <span class="st">"r"</span>, <span class="st">"r"</span>, <span class="st">"r"</span><span class="op">)</span>,</span>
+<span>      caption <span class="op">=</span> <span class="st">"Scale reliability statistics"</span><span class="op">)</span></span></code></pre></div>
+<table style="width:100%;" class="table">
+<caption>Scale reliability statistics</caption>
+<colgroup>
+<col width="57%">
+<col width="7%">
+<col width="5%">
+<col width="6%">
+<col width="8%">
+<col width="13%">
+</colgroup>
+<thead><tr class="header">
+<th align="left">Scale</th>
+<th align="center">Items</th>
+<th align="center">N</th>
+<th align="right">Alpha</th>
+<th align="right">Omega h</th>
+<th align="right">Omega total</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left">Digital marketing effectiveness
+(digital_marketing)</td>
+<td align="center">3</td>
+<td align="center">120</td>
+<td align="right">0.84</td>
+<td align="right">0.84</td>
+<td align="right">0.84</td>
+</tr>
+<tr class="even">
+<td align="left">Service quality (service_quality)</td>
+<td align="center">3</td>
+<td align="center">120</td>
+<td align="right">0.84</td>
+<td align="right">0.84</td>
+<td align="right">0.84</td>
+</tr>
+<tr class="odd">
+<td align="left">Sustainability perception (sustainability)</td>
+<td align="center">2</td>
+<td align="center">120</td>
+<td align="right">0.77</td>
+<td align="right">n/a</td>
+<td align="right">n/a</td>
+</tr>
+<tr class="even">
+<td align="left">Tourist satisfaction (satisfaction)</td>
+<td align="center">2</td>
+<td align="center">120</td>
+<td align="right">0.82</td>
+<td align="right">n/a</td>
+<td align="right">n/a</td>
+</tr>
+<tr class="odd">
+<td align="left">Behavioural intention (behavioural_intention)</td>
+<td align="center">2</td>
+<td align="center">120</td>
+<td align="right">0.84</td>
+<td align="right">n/a</td>
+<td align="right">n/a</td>
+</tr>
+</tbody>
+</table>
 </div>
 <div class="section level2">
 <h2 id="item-diagnostics">Item diagnostics<a class="anchor" aria-label="anchor" href="#item-diagnostics"></a>
 </h2>
-<p>Item diagnostics help identify sparse items, poor item-total
-relationships, and floor or ceiling issues.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">items</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/item_report.html">item_report</a></span><span class="op">(</span><span class="va">responses</span>, <span class="va">instr</span><span class="op">)</span></span>
+<p>Item diagnostics identify sparse items, weak item-total
+relationships, and floor or ceiling effects. These are the item-level
+facts behind a retention decision.</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">demo</span>      <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sframe_demo_data.html">sframe_demo_data</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">instr</span>     <span class="op">&lt;-</span> <span class="va">demo</span><span class="op">$</span><span class="va">instrument</span></span>
+<span><span class="va">responses</span> <span class="op">&lt;-</span> <span class="va">demo</span><span class="op">$</span><span class="va">responses</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">items</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "digital_marketing"     "service_quality"       "sustainability"       </span></span>
-<span><span class="co">#&gt; [4] "satisfaction"          "behavioural_intention"</span></span>
-<span><span class="va">items</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span></span>
-<span><span class="co">#&gt; $scale_id</span></span>
-<span><span class="co">#&gt; [1] "digital_marketing"</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $label</span></span>
-<span><span class="co">#&gt; [1] "Digital marketing effectiveness"</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $diagnostics</span></span>
-<span><span class="co">#&gt;   item_id     mean        sd item_rest_r  floor_pct ceiling_pct n_missing</span></span>
-<span><span class="co">#&gt; 1    dm_1 3.141667 0.9982828  -0.5118417 0.05000000  0.10000000         0</span></span>
-<span><span class="co">#&gt; 2    dm_2 3.125000 0.9663455  -0.4619588 0.05000000  0.07500000         0</span></span>
-<span><span class="co">#&gt; 3    dm_3 3.191667 0.9982828  -0.5122414 0.05833333  0.08333333         0</span></span></code></pre></div>
+<span><span class="va">items</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/item_report.html">item_report</a></span><span class="op">(</span><span class="va">responses</span>, <span class="va">instr</span><span class="op">)</span></span>
+<span><span class="va">first</span>  <span class="op">&lt;-</span> <span class="va">items</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span></span>
+<span><span class="fu">kable</span><span class="op">(</span><span class="va">first</span><span class="op">$</span><span class="va">diagnostics</span>, digits <span class="op">=</span> <span class="fl">2</span>,</span>
+<span>      caption <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"Item diagnostics: "</span>, <span class="va">first</span><span class="op">$</span><span class="va">label</span>, <span class="st">" ("</span>, <span class="va">first</span><span class="op">$</span><span class="va">scale_id</span>, <span class="st">")"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<table class="table">
+<caption>Item diagnostics: Digital marketing effectiveness
+(digital_marketing)</caption>
+<thead><tr class="header">
+<th align="left">item_id</th>
+<th align="right">mean</th>
+<th align="right">sd</th>
+<th align="right">item_rest_r</th>
+<th align="right">floor_pct</th>
+<th align="right">ceiling_pct</th>
+<th align="right">n_missing</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left">dm_1</td>
+<td align="right">3.14</td>
+<td align="right">1.00</td>
+<td align="right">-0.51</td>
+<td align="right">0.05</td>
+<td align="right">0.10</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">dm_2</td>
+<td align="right">3.12</td>
+<td align="right">0.97</td>
+<td align="right">-0.46</td>
+<td align="right">0.05</td>
+<td align="right">0.07</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">dm_3</td>
+<td align="right">3.19</td>
+<td align="right">1.00</td>
+<td align="right">-0.51</td>
+<td align="right">0.06</td>
+<td align="right">0.08</td>
+<td align="right">0</td>
+</tr>
+</tbody>
+</table>
 </div>
 <div class="section level2">
 <h2 id="efa-readiness">EFA readiness<a class="anchor" aria-label="anchor" href="#efa-readiness"></a>
 </h2>
-<p><code><a href="../reference/efa_report.html">efa_report()</a></code> is a screening step. Interpret it alongside
-item wording, sample size, theory, and the study context.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<p><code><a href="../reference/efa_report.html">efa_report()</a></code> reports the Kaiser-Meyer-Olkin measure and
+Bartlett’s test as a screening step before a confirmatory model.</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/efa_report.html">efa_report</a></span><span class="op">(</span><span class="va">responses</span>, <span class="va">instr</span><span class="op">)</span></span>
-<span><span class="co">#&gt; R was not square, finding R from data</span></span>
-<span><span class="co">#&gt; Parallel analysis suggests that the number of factors =  4  and the number of components =  4</span></span>
 <span><span class="co">#&gt; EFA Readiness Diagnostics</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;   Items:          12</span></span>
@@ -352,66 +244,142 @@ item wording, sample size, theory, and the study context.</p>
 <span><span class="co">#&gt; Note: estimate the EFA solution with a dedicated modelling package.</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="validity-summary-from-supplied-loadings">Validity summary from supplied loadings<a class="anchor" aria-label="anchor" href="#validity-summary-from-supplied-loadings"></a>
+<h2 id="convergent-validity-from-the-published-loadings">Convergent validity from the published loadings<a class="anchor" aria-label="anchor" href="#convergent-validity-from-the-published-loadings"></a>
 </h2>
-<p>When standardised loadings are available from a CFA or PLS-SEM
-workflow, they can be summarised with
-<code><a href="../reference/validity_report.html">validity_report()</a></code>.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">loadings</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>  digital_marketing <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>dm_1 <span class="op">=</span> <span class="fl">.72</span>, dm_2 <span class="op">=</span> <span class="fl">.78</span>, dm_3 <span class="op">=</span> <span class="fl">.81</span><span class="op">)</span>,</span>
-<span>  service_quality <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>sq_1 <span class="op">=</span> <span class="fl">.75</span>, sq_2 <span class="op">=</span> <span class="fl">.80</span>, sq_3 <span class="op">=</span> <span class="fl">.77</span><span class="op">)</span>,</span>
-<span>  satisfaction <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>sat_1 <span class="op">=</span> <span class="fl">.76</span>, sat_2 <span class="op">=</span> <span class="fl">.82</span><span class="op">)</span></span>
+<p>This step needs no raw data. <code><a href="../reference/validity_report.html">validity_report()</a></code> computes
+composite reliability and average variance extracted from standardised
+loadings. Feeding the outer loadings reported in the paper reproduces
+its convergent validity, which is a direct check of the measurement
+model.</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">published_loadings</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>  DMRE <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>dmre_1 <span class="op">=</span> <span class="fl">.815</span>, dmre_2 <span class="op">=</span> <span class="fl">.899</span>, dmre_3 <span class="op">=</span> <span class="fl">.668</span>, dmre_4 <span class="op">=</span> <span class="fl">.838</span><span class="op">)</span>,</span>
+<span>  DMAU <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>dmau_1 <span class="op">=</span> <span class="fl">.843</span>, dmau_2 <span class="op">=</span> <span class="fl">.915</span>, dmau_3 <span class="op">=</span> <span class="fl">.920</span><span class="op">)</span>,</span>
+<span>  DMEU <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>dmeu_1 <span class="op">=</span> <span class="fl">.897</span>, dmeu_2 <span class="op">=</span> <span class="fl">.929</span>, dmeu_3 <span class="op">=</span> <span class="fl">.932</span><span class="op">)</span>,</span>
+<span>  DMPV <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>dmpv_1 <span class="op">=</span> <span class="fl">.818</span>, dmpv_2 <span class="op">=</span> <span class="fl">.916</span>, dmpv_3 <span class="op">=</span> <span class="fl">.900</span>, dmpv_4 <span class="op">=</span> <span class="fl">.863</span><span class="op">)</span>,</span>
+<span>  DSQA <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>dsqa_1 <span class="op">=</span> <span class="fl">.904</span>, dsqa_2 <span class="op">=</span> <span class="fl">.920</span>, dsqa_3 <span class="op">=</span> <span class="fl">.869</span><span class="op">)</span>,</span>
+<span>  DSQT <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>dsqt_1 <span class="op">=</span> <span class="fl">.778</span>, dsqt_2 <span class="op">=</span> <span class="fl">.883</span>, dsqt_3 <span class="op">=</span> <span class="fl">.879</span>, dsqt_4 <span class="op">=</span> <span class="fl">.811</span>, dsqt_5 <span class="op">=</span> <span class="fl">.713</span><span class="op">)</span>,</span>
+<span>  DSUQ <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>dsuq_1 <span class="op">=</span> <span class="fl">.780</span>, dsuq_2 <span class="op">=</span> <span class="fl">.855</span>, dsuq_3 <span class="op">=</span> <span class="fl">.845</span>, dsuq_4 <span class="op">=</span> <span class="fl">.551</span>, dsuq_5 <span class="op">=</span> <span class="fl">.529</span><span class="op">)</span>,</span>
+<span>  TS   <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>ts_1 <span class="op">=</span> <span class="fl">.912</span>, ts_2 <span class="op">=</span> <span class="fl">.950</span>, ts_3 <span class="op">=</span> <span class="fl">.869</span><span class="op">)</span>,</span>
+<span>  BI   <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>bi_1 <span class="op">=</span> <span class="fl">.937</span>, bi_2 <span class="op">=</span> <span class="fl">.911</span>, bi_3 <span class="op">=</span> <span class="fl">.940</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">validity</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/validity_report.html">validity_report</a></span><span class="op">(</span><span class="va">loadings</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">validity</span></span>
-<span><span class="co">#&gt; $method</span></span>
-<span><span class="co">#&gt; [1] "validity"</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $loading_summary</span></span>
-<span><span class="co">#&gt;           construct  item loading</span></span>
-<span><span class="co">#&gt; 1 digital_marketing  dm_1    0.72</span></span>
-<span><span class="co">#&gt; 2 digital_marketing  dm_2    0.78</span></span>
-<span><span class="co">#&gt; 3 digital_marketing  dm_3    0.81</span></span>
-<span><span class="co">#&gt; 4   service_quality  sq_1    0.75</span></span>
-<span><span class="co">#&gt; 5   service_quality  sq_2    0.80</span></span>
-<span><span class="co">#&gt; 6   service_quality  sq_3    0.77</span></span>
-<span><span class="co">#&gt; 7      satisfaction sat_1    0.76</span></span>
-<span><span class="co">#&gt; 8      satisfaction sat_2    0.82</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $reliability</span></span>
-<span><span class="co">#&gt;                           construct composite_reliability       AVE n_items</span></span>
-<span><span class="co">#&gt; digital_marketing digital_marketing             0.8142739 0.5943000       3</span></span>
-<span><span class="co">#&gt; satisfaction           satisfaction             0.7689749 0.6250000       2</span></span>
-<span><span class="co">#&gt; service_quality     service_quality             0.8171246 0.5984667       3</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $fornell_larcker</span></span>
-<span><span class="co">#&gt; NULL</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $htmt</span></span>
-<span><span class="co">#&gt; NULL</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $inter_construct_correlations</span></span>
-<span><span class="co">#&gt; NULL</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $apa</span></span>
-<span><span class="co">#&gt; [1] "Construct validity summaries were computed from supplied loadings."</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $prompt</span></span>
-<span><span class="co">#&gt; [1] "Report composite reliability, AVE, Fornell-Larcker, HTMT, and the inter-construct correlation matrix."</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; attr(,"class")</span></span>
-<span><span class="co">#&gt; [1] "sframe_validity_report"</span></span></code></pre></div>
+<span><span class="va">validity</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/validity_report.html">validity_report</a></span><span class="op">(</span><span class="va">published_loadings</span><span class="op">)</span></span>
+<span><span class="fu">kable</span><span class="op">(</span><span class="va">validity</span><span class="op">$</span><span class="va">reliability</span>, digits <span class="op">=</span> <span class="fl">2</span>,</span>
+<span>      caption <span class="op">=</span> <span class="st">"Composite reliability and average variance extracted"</span><span class="op">)</span></span></code></pre></div>
+<table class="table">
+<caption>Composite reliability and average variance extracted</caption>
+<thead><tr class="header">
+<th align="left"></th>
+<th align="left">construct</th>
+<th align="right">composite_reliability</th>
+<th align="right">AVE</th>
+<th align="right">n_items</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left">BI</td>
+<td align="left">BI</td>
+<td align="right">0.95</td>
+<td align="right">0.86</td>
+<td align="right">3</td>
+</tr>
+<tr class="even">
+<td align="left">DMAU</td>
+<td align="left">DMAU</td>
+<td align="right">0.92</td>
+<td align="right">0.80</td>
+<td align="right">3</td>
+</tr>
+<tr class="odd">
+<td align="left">DMEU</td>
+<td align="left">DMEU</td>
+<td align="right">0.94</td>
+<td align="right">0.85</td>
+<td align="right">3</td>
+</tr>
+<tr class="even">
+<td align="left">DMPV</td>
+<td align="left">DMPV</td>
+<td align="right">0.93</td>
+<td align="right">0.77</td>
+<td align="right">4</td>
+</tr>
+<tr class="odd">
+<td align="left">DMRE</td>
+<td align="left">DMRE</td>
+<td align="right">0.88</td>
+<td align="right">0.66</td>
+<td align="right">4</td>
+</tr>
+<tr class="even">
+<td align="left">DSQA</td>
+<td align="left">DSQA</td>
+<td align="right">0.93</td>
+<td align="right">0.81</td>
+<td align="right">3</td>
+</tr>
+<tr class="odd">
+<td align="left">DSQT</td>
+<td align="left">DSQT</td>
+<td align="right">0.91</td>
+<td align="right">0.66</td>
+<td align="right">5</td>
+</tr>
+<tr class="even">
+<td align="left">DSUQ</td>
+<td align="left">DSUQ</td>
+<td align="right">0.84</td>
+<td align="right">0.53</td>
+<td align="right">5</td>
+</tr>
+<tr class="odd">
+<td align="left">TS</td>
+<td align="left">TS</td>
+<td align="right">0.94</td>
+<td align="right">0.83</td>
+<td align="right">3</td>
+</tr>
+</tbody>
+</table>
+<p>The average variance extracted exceeds 0.5 for every construct, and
+the composite reliability exceeds 0.7, so each construct explains more
+than half the variance in its items. The sustainability construct sits
+lowest, in line with the two weaker items the paper flagged (DSUQ4 and
+DSUQ5).</p>
+</div>
+<div class="section level2">
+<h2 id="discriminant-validity">Discriminant validity<a class="anchor" aria-label="anchor" href="#discriminant-validity"></a>
+</h2>
+<p>The study assessed discriminant validity in two ways. The
+Fornell-Larcker criterion compares the square root of a construct’s AVE
+with its correlations with the others. The square roots, 0.810 for
+digital marketing effectiveness, 0.910 for service quality, 0.726 for
+sustainability quality, 0.911 for satisfaction, and 0.930 for
+behavioural intention, each exceeded the off-diagonal correlations. The
+Heterotrait-Monotrait ratios were all below the 0.90 threshold, the
+highest being 0.766 between ease of use and accessibility. Both results
+support discriminant validity.</p>
+<p>When construct scores are available, <code><a href="../reference/validity_report.html">validity_report()</a></code>
+returns the Fornell-Larcker matrix and the HTMT matrix directly.</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/validity_report.html">validity_report</a></span><span class="op">(</span><span class="va">published_loadings</span>, construct_scores <span class="op">=</span> <span class="va">scored_constructs</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="collinearity">Collinearity<a class="anchor" aria-label="anchor" href="#collinearity"></a>
+</h2>
+<p>The study reported variance inflation factors below 5 for every
+indicator, which indicates no severe multicollinearity.
+<code><a href="../reference/assumption_report.html">assumption_report()</a></code> returns variance inflation factors when
+a regression is specified, which is shown in the analysing-responses
+vignette.</p>
 </div>
 <div class="section level2">
 <h2 id="cautious-interpretation">Cautious interpretation<a class="anchor" aria-label="anchor" href="#cautious-interpretation"></a>
 </h2>
 <p>Reliability and validity summaries are diagnostics, not automatic
-decisions. They should be interpreted with the questionnaire wording,
-sampling context, construct definitions, and planned statistical
-model.</p>
+decisions. Read them with the questionnaire wording, the sampling
+context, the construct definitions, and the planned model in view.</p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
@@ -420,7 +388,7 @@ model.</p>
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Mohammed Ali Sharafuddin. Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Developed by Mohammed Ali Sharafuddin. Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
 <div class="pkgdown-footer-right">

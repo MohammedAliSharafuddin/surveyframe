@@ -2,8 +2,9 @@
 
 Reports KMO sampling adequacy, Bartlett's test of sphericity, and a
 parallel analysis scree plot to inform factor number selection. The
-report prepares the researcher to estimate an EFA solution with a
-separate package such as `psych` or `lavaan`.
+suggested number of factors from parallel analysis is returned in
+`$suggested_nfactors`. The report prepares the researcher to estimate an
+EFA solution with a separate package such as `psych` or `lavaan`.
 
 ## Usage
 
@@ -55,8 +56,21 @@ An object of class `sframe_efa_report` with elements `kmo`, `bartlett`,
 ## Examples
 
 ``` r
-if (FALSE) { # \dontrun{
-er <- efa_report(responses, instr)
-print(er)
-} # }
+# \donttest{
+if (requireNamespace("psych", quietly = TRUE)) {
+  demo <- sframe_demo_data()
+  er <- efa_report(demo$responses, demo$instrument)
+  print(er)
+}
+#> EFA Readiness Diagnostics
+#> 
+#>   Items:          12
+#>   Complete cases: 120
+#>   KMO overall:    0.761
+#>   Bartlett chi-sq: 665.84  df: 66  p: 0.0000
+#>   Suggested factors (parallel analysis): 4
+#>   Planned rotation: oblimin
+#> 
+#> Note: estimate the EFA solution with a dedicated modelling package.
+# }
 ```

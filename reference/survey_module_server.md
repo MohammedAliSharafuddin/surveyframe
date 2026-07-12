@@ -42,7 +42,7 @@ after.
 ## Examples
 
 ``` r
-if (FALSE) { # \dontrun{
+# \donttest{
 # See survey_module_ui() for a complete example.
-} # }
+# }
 ```

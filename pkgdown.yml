@@ -1,14 +1,15 @@
 pandoc: 3.8.3
-pkgdown: 2.2.0
+pkgdown: 2.2.1
 pkgdown_sha: ~
 articles:
   analysing-survey-responses: analysing-survey-responses.html
   building-survey-instrument: building-survey-instrument.html
+  deploying-and-collecting: deploying-and-collecting.html
   efa-cfa-sem-pls-syntax: efa-cfa-sem-pls-syntax.html
   scale-reliability-validity: scale-reliability-validity.html
   surveybuilder-gui-overview: surveybuilder-gui-overview.html
   surveyframe: surveyframe.html
-last_built: 2026-05-15T21:29Z
+last_built: 2026-07-12T05:26Z
 urls:
   reference: https://mohammedalisharafuddin.github.io/surveyframe/reference
   article: https://mohammedalisharafuddin.github.io/surveyframe/articles

@@ -12,7 +12,8 @@ read_sheet_responses(
   instrument,
   sheet_name = "Responses",
   respondent_id = "respondent_id",
-  submitted_at = "submitted_at"
+  submitted_at = "submitted_at",
+  meta_cols = NULL
 )
 ```
 
@@ -40,6 +41,13 @@ read_sheet_responses(
 
   Character or NULL. Column holding submission timestamps. Defaults to
   `"submitted_at"`.
+
+- meta_cols:
+
+  Character vector or NULL. Additional sheet columns to accept as
+  metadata without a warning, for example bridge fields a host
+  application appends to each submission. `"started_at"` is always
+  included.
 
 ## Value
 

@@ -150,6 +150,61 @@ Generate codebooks, scale appendices, and reproducible HTML reports.
 - [`model_report_template()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/model_report_template.md)
   : Create a model reporting template
 
+## Plotting
+
+Opt-in ggplot2 charts for analysis results, and the package theme.
+
+- [`theme_surveyframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/theme_surveyframe.md)
+  : surveyframe brand theme for ggplot2
+
+## Print, format, and summary methods
+
+S3 methods so every component object prints and summarises cleanly at
+the console and inside reports.
+
+- [`print(`*`<sframe>`*`)`](https://mohammedalisharafuddin.github.io/surveyframe/reference/print.sframe.md)
+  : Print an sframe instrument object
+- [`format(`*`<sframe>`*`)`](https://mohammedalisharafuddin.github.io/surveyframe/reference/format.sframe.md)
+  : Format an sframe instrument object as a string
+- [`summary(`*`<sframe>`*`)`](https://mohammedalisharafuddin.github.io/surveyframe/reference/summary.sframe.md)
+  : Summarise an sframe instrument object
+- [`print(`*`<sf_choices>`*`)`](https://mohammedalisharafuddin.github.io/surveyframe/reference/print.sf_choices.md)
+  : Print an sf_choices object
+- [`format(`*`<sf_choices>`*`)`](https://mohammedalisharafuddin.github.io/surveyframe/reference/format.sf_choices.md)
+  : Format an sf_choices object as a string
+- [`summary(`*`<sf_choices>`*`)`](https://mohammedalisharafuddin.github.io/surveyframe/reference/summary.sf_choices.md)
+  : Summarise an sf_choices object
+- [`print(`*`<sf_item>`*`)`](https://mohammedalisharafuddin.github.io/surveyframe/reference/print.sf_item.md)
+  : Print an sf_item object
+- [`format(`*`<sf_item>`*`)`](https://mohammedalisharafuddin.github.io/surveyframe/reference/format.sf_item.md)
+  : Format an sf_item object as a string
+- [`summary(`*`<sf_item>`*`)`](https://mohammedalisharafuddin.github.io/surveyframe/reference/summary.sf_item.md)
+  : Summarise an sf_item object
+- [`print(`*`<sf_scale>`*`)`](https://mohammedalisharafuddin.github.io/surveyframe/reference/print.sf_scale.md)
+  : Print an sf_scale object
+- [`format(`*`<sf_scale>`*`)`](https://mohammedalisharafuddin.github.io/surveyframe/reference/format.sf_scale.md)
+  : Format an sf_scale object as a string
+- [`summary(`*`<sf_scale>`*`)`](https://mohammedalisharafuddin.github.io/surveyframe/reference/summary.sf_scale.md)
+  : Summarise an sf_scale object
+- [`print(`*`<sf_branch>`*`)`](https://mohammedalisharafuddin.github.io/surveyframe/reference/print.sf_branch.md)
+  : Print an sf_branch object
+- [`format(`*`<sf_branch>`*`)`](https://mohammedalisharafuddin.github.io/surveyframe/reference/format.sf_branch.md)
+  : Format an sf_branch object as a string
+- [`summary(`*`<sf_branch>`*`)`](https://mohammedalisharafuddin.github.io/surveyframe/reference/summary.sf_branch.md)
+  : Summarise an sf_branch object
+- [`print(`*`<sf_check>`*`)`](https://mohammedalisharafuddin.github.io/surveyframe/reference/print.sf_check.md)
+  : Print an sf_check object
+- [`format(`*`<sf_check>`*`)`](https://mohammedalisharafuddin.github.io/surveyframe/reference/format.sf_check.md)
+  : Format an sf_check object as a string
+- [`summary(`*`<sf_check>`*`)`](https://mohammedalisharafuddin.github.io/surveyframe/reference/summary.sf_check.md)
+  : Summarise an sf_check object
+- [`print(`*`<sf_model>`*`)`](https://mohammedalisharafuddin.github.io/surveyframe/reference/print.sf_model.md)
+  : Print an sf_model object
+- [`format(`*`<sf_model>`*`)`](https://mohammedalisharafuddin.github.io/surveyframe/reference/format.sf_model.md)
+  : Format an sf_model object as a string
+- [`summary(`*`<sf_model>`*`)`](https://mohammedalisharafuddin.github.io/surveyframe/reference/summary.sf_model.md)
+  : Summarise an sf_model object
+
 ## Package
 
 - [`surveyframe`](https://mohammedalisharafuddin.github.io/surveyframe/reference/surveyframe-package.md)
@@ -165,9 +220,3 @@ Generate codebooks, scale appendices, and reproducible HTML reports.
   : Convert an instrument into a SurveyStudio builder state
 - [`sframe_builder_validate_draft()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_builder_validate_draft.md)
   : Validate a SurveyStudio draft state
-- [`print(`*`<sframe>`*`)`](https://mohammedalisharafuddin.github.io/surveyframe/reference/print.sframe.md)
-  : Print an sframe instrument object
-- [`format(`*`<sframe>`*`)`](https://mohammedalisharafuddin.github.io/surveyframe/reference/format.sframe.md)
-  : Format an sframe instrument object as a string
-- [`summary(`*`<sframe>`*`)`](https://mohammedalisharafuddin.github.io/surveyframe/reference/summary.sframe.md)
-  : Summarise an sframe instrument object

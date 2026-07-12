@@ -13,7 +13,8 @@ sframe_builder_validate_draft(
   branching = list(),
   checks = list(),
   analysis_plan = list(),
-  models = list()
+  models = list(),
+  render = list()
 )
 ```
 
@@ -34,6 +35,11 @@ sframe_builder_validate_draft(
 - models:
 
   List of draft model specifications.
+
+- render:
+
+  List of rendering settings (welcome, header/logo, thankyou, theme)
+  carried from the loaded instrument so previews and exports match.
 
 ## Value
 

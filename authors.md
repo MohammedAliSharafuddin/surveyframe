@@ -10,14 +10,14 @@
 Source:
 [`inst/CITATION`](https://github.com/MohammedAliSharafuddin/surveyframe/blob/main/inst/CITATION)
 
-Sharafuddin M (2026). *surveyframe: A Survey Instrument Workflow for R*.
-R package version 0.3.0,
+Sharafuddin M (2026). *surveyframe: Survey Instrument Workflows*. R
+package version 0.3.3,
 <https://github.com/MohammedAliSharafuddin/surveyframe>.
 
     @Manual{,
-      title = {surveyframe: A Survey Instrument Workflow for R},
+      title = {surveyframe: Survey Instrument Workflows},
       author = {Mohammed Ali Sharafuddin},
       year = {2026},
-      note = {R package version 0.3.0},
+      note = {R package version 0.3.3},
       url = {https://github.com/MohammedAliSharafuddin/surveyframe},
     }

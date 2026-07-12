@@ -1,9 +1,9 @@
 # Define a branching rule
 
 Creates a single-condition branching rule that shows or hides a survey
-item depending on the value of a preceding item. In v0.1, only
-single-condition rules are supported. Multi-condition AND/OR logic is
-planned for a later release.
+item depending on the value of a preceding item. Only single-condition
+rules are supported. Multi-condition AND/OR logic is planned for a later
+release.
 
 ## Usage
 

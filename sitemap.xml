@@ -1,10 +1,13 @@
 <urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
 <url><loc>https://mohammedalisharafuddin.github.io/surveyframe/404.html</loc></url>
+<url><loc>https://mohammedalisharafuddin.github.io/surveyframe/CODE_OF_CONDUCT.html</loc></url>
 <url><loc>https://mohammedalisharafuddin.github.io/surveyframe/CONTRIBUTING.html</loc></url>
 <url><loc>https://mohammedalisharafuddin.github.io/surveyframe/LICENSE-text.html</loc></url>
 <url><loc>https://mohammedalisharafuddin.github.io/surveyframe/LICENSE.html</loc></url>
+<url><loc>https://mohammedalisharafuddin.github.io/surveyframe/SECURITY.html</loc></url>
 <url><loc>https://mohammedalisharafuddin.github.io/surveyframe/articles/analysing-survey-responses.html</loc></url>
 <url><loc>https://mohammedalisharafuddin.github.io/surveyframe/articles/building-survey-instrument.html</loc></url>
+<url><loc>https://mohammedalisharafuddin.github.io/surveyframe/articles/deploying-and-collecting.html</loc></url>
 <url><loc>https://mohammedalisharafuddin.github.io/surveyframe/articles/efa-cfa-sem-pls-syntax.html</loc></url>
 <url><loc>https://mohammedalisharafuddin.github.io/surveyframe/articles/index.html</loc></url>
 <url><loc>https://mohammedalisharafuddin.github.io/surveyframe/articles/scale-reliability-validity.html</loc></url>
@@ -24,6 +27,12 @@
 <url><loc>https://mohammedalisharafuddin.github.io/surveyframe/reference/efa_syntax.html</loc></url>
 <url><loc>https://mohammedalisharafuddin.github.io/surveyframe/reference/export_google_sheet.html</loc></url>
 <url><loc>https://mohammedalisharafuddin.github.io/surveyframe/reference/export_static_survey.html</loc></url>
+<url><loc>https://mohammedalisharafuddin.github.io/surveyframe/reference/format.sf_branch.html</loc></url>
+<url><loc>https://mohammedalisharafuddin.github.io/surveyframe/reference/format.sf_check.html</loc></url>
+<url><loc>https://mohammedalisharafuddin.github.io/surveyframe/reference/format.sf_choices.html</loc></url>
+<url><loc>https://mohammedalisharafuddin.github.io/surveyframe/reference/format.sf_item.html</loc></url>
+<url><loc>https://mohammedalisharafuddin.github.io/surveyframe/reference/format.sf_model.html</loc></url>
+<url><loc>https://mohammedalisharafuddin.github.io/surveyframe/reference/format.sf_scale.html</loc></url>
 <url><loc>https://mohammedalisharafuddin.github.io/surveyframe/reference/format.sframe.html</loc></url>
 <url><loc>https://mohammedalisharafuddin.github.io/surveyframe/reference/index.html</loc></url>
 <url><loc>https://mohammedalisharafuddin.github.io/surveyframe/reference/item_report.html</loc></url>
@@ -38,6 +47,12 @@
 <url><loc>https://mohammedalisharafuddin.github.io/surveyframe/reference/model_report_template.html</loc></url>
 <url><loc>https://mohammedalisharafuddin.github.io/surveyframe/reference/outlier_report.html</loc></url>
 <url><loc>https://mohammedalisharafuddin.github.io/surveyframe/reference/posthoc_report.html</loc></url>
+<url><loc>https://mohammedalisharafuddin.github.io/surveyframe/reference/print.sf_branch.html</loc></url>
+<url><loc>https://mohammedalisharafuddin.github.io/surveyframe/reference/print.sf_check.html</loc></url>
+<url><loc>https://mohammedalisharafuddin.github.io/surveyframe/reference/print.sf_choices.html</loc></url>
+<url><loc>https://mohammedalisharafuddin.github.io/surveyframe/reference/print.sf_item.html</loc></url>
+<url><loc>https://mohammedalisharafuddin.github.io/surveyframe/reference/print.sf_model.html</loc></url>
+<url><loc>https://mohammedalisharafuddin.github.io/surveyframe/reference/print.sf_scale.html</loc></url>
 <url><loc>https://mohammedalisharafuddin.github.io/surveyframe/reference/print.sframe.html</loc></url>
 <url><loc>https://mohammedalisharafuddin.github.io/surveyframe/reference/quality_report.html</loc></url>
 <url><loc>https://mohammedalisharafuddin.github.io/surveyframe/reference/read_responses.html</loc></url>
@@ -74,16 +89,20 @@
 <url><loc>https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_warn_missing.html</loc></url>
 <url><loc>https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_warn_quality.html</loc></url>
 <url><loc>https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_warn_scoring.html</loc></url>
+<url><loc>https://mohammedalisharafuddin.github.io/surveyframe/reference/summary.sf_branch.html</loc></url>
+<url><loc>https://mohammedalisharafuddin.github.io/surveyframe/reference/summary.sf_check.html</loc></url>
+<url><loc>https://mohammedalisharafuddin.github.io/surveyframe/reference/summary.sf_choices.html</loc></url>
+<url><loc>https://mohammedalisharafuddin.github.io/surveyframe/reference/summary.sf_item.html</loc></url>
+<url><loc>https://mohammedalisharafuddin.github.io/surveyframe/reference/summary.sf_model.html</loc></url>
+<url><loc>https://mohammedalisharafuddin.github.io/surveyframe/reference/summary.sf_scale.html</loc></url>
 <url><loc>https://mohammedalisharafuddin.github.io/surveyframe/reference/summary.sframe.html</loc></url>
 <url><loc>https://mohammedalisharafuddin.github.io/surveyframe/reference/survey_module_server.html</loc></url>
 <url><loc>https://mohammedalisharafuddin.github.io/surveyframe/reference/survey_module_ui.html</loc></url>
 <url><loc>https://mohammedalisharafuddin.github.io/surveyframe/reference/surveyframe-package.html</loc></url>
+<url><loc>https://mohammedalisharafuddin.github.io/surveyframe/reference/theme_surveyframe.html</loc></url>
 <url><loc>https://mohammedalisharafuddin.github.io/surveyframe/reference/validate_model.html</loc></url>
 <url><loc>https://mohammedalisharafuddin.github.io/surveyframe/reference/validate_sframe.html</loc></url>
 <url><loc>https://mohammedalisharafuddin.github.io/surveyframe/reference/validity_report.html</loc></url>
 <url><loc>https://mohammedalisharafuddin.github.io/surveyframe/reference/write_sframe.html</loc></url>
-<url><loc>https://mohammedalisharafuddin.github.io/surveyframe/revision_todo_0.3.html</loc></url>
-<url><loc>https://mohammedalisharafuddin.github.io/surveyframe/roadmap.html</loc></url>
-<url><loc>https://mohammedalisharafuddin.github.io/surveyframe/todo.html</loc></url>
 </urlset>
 

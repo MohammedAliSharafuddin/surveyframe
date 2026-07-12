@@ -7,8 +7,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>EFA, CFA, CB-SEM, and PLS-SEM syntax generation • surveyframe</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/Inter-0.4.10/font.css" rel="stylesheet">
+<link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/Inter-0.4.10/font.css" rel="stylesheet">
 <link href="../deps/JetBrains_Mono-0.4.10/font.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
@@ -22,7 +22,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">surveyframe</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -49,8 +49,7 @@
 
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
-
-      <h1>EFA, CFA, CB-SEM, and PLS-SEM syntax generation</h1>
+      <img src="../logo.svg" class="logo" alt=""><h1>EFA, CFA, CB-SEM, and PLS-SEM syntax generation</h1>
             
       
       <small class="dont-index">Source: <a href="https://github.com/MohammedAliSharafuddin/surveyframe/blob/main/vignettes/efa-cfa-sem-pls-syntax.Rmd" class="external-link"><code>vignettes/efa-cfa-sem-pls-syntax.Rmd</code></a></small>
@@ -59,194 +58,210 @@
 
     
     
-<p>In v0.3, <code>surveyframe</code> generates syntax for lavaan and
-seminr workflows. Model fitting remains in the researcher’s analysis
-script. The generated syntax should be reviewed, copied into the
-modelling package, and fitted with modelling choices appropriate to the
-study.</p>
+<p>The model is the third part of the research design. surveyframe
+stores the measurement and structural specification and writes the
+syntax for the modelling stage. It does not fit the models. This
+vignette builds the three models from the published Thailand study
+(Sharafuddin, Madhavan, and Wangtueai 2024). The syntax steps need no
+raw data, so every chunk below runs as written.</p>
+<p>There are five constructs. Digital marketing effectiveness (DME) is
+built from relevance and engagement (DMRE), accessibility and usefulness
+(DMAU), ease of use (DMEU), and perceived value (DMPV). Destination
+service quality (DSQ) is built from accommodation (DSQA) and local
+transport (DSQT). The remaining three are destination sustainability
+quality (DSUQ), tourist satisfaction (TS), and behavioural intention
+(BI).</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">demo</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sframe_demo_data.html">sframe_demo_data</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="va">instr</span> <span class="op">&lt;-</span> <span class="va">demo</span><span class="op">$</span><span class="va">instrument</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">dmre</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"dmre_"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">4</span><span class="op">)</span>; <span class="va">dmau</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"dmau_"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">)</span></span>
+<span><span class="va">dmeu</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"dmeu_"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">)</span>; <span class="va">dmpv</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"dmpv_"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">4</span><span class="op">)</span></span>
+<span><span class="va">dsqa</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"dsqa_"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">)</span>; <span class="va">dsqt</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"dsqt_"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">)</span></span>
+<span><span class="va">dsuq</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"dsuq_"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">)</span>; <span class="va">ts</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"ts_"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">)</span>; <span class="va">bi</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"bi_"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">)</span></span></code></pre></div>
 <div class="section level2">
 <h2 id="efa-planning-syntax">EFA planning syntax<a class="anchor" aria-label="anchor" href="#efa-planning-syntax"></a>
 </h2>
-<p><code><a href="../reference/efa_syntax.html">efa_syntax()</a></code> creates a small R code block for estimating
-an exploratory factor solution with the optional <code>psych</code>
-package.</p>
+<p><code><a href="../reference/efa_syntax.html">efa_syntax()</a></code> writes a short R block that estimates an
+exploratory factor solution with the optional <code>psych</code>
+package. This screens the digital marketing items before the
+confirmatory model.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="../reference/efa_syntax.html">efa_syntax</a></span><span class="op">(</span></span>
-<span>  items <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"dm_1"</span>, <span class="st">"dm_2"</span>, <span class="st">"dm_3"</span>, <span class="st">"sq_1"</span>, <span class="st">"sq_2"</span>, <span class="st">"sq_3"</span><span class="op">)</span>,</span>
-<span>  nfactors <span class="op">=</span> <span class="fl">2</span>,</span>
-<span>  extraction <span class="op">=</span> <span class="st">"minres"</span>,</span>
-<span>  rotation <span class="op">=</span> <span class="st">"oblimin"</span></span>
-<span><span class="op">)</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="../reference/efa_syntax.html">efa_syntax</a></span><span class="op">(</span>items <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">dmre</span>, <span class="va">dmau</span>, <span class="va">dmeu</span>, <span class="va">dmpv</span><span class="op">)</span>, nfactors <span class="op">=</span> <span class="fl">4</span>,</span>
+<span>               extraction <span class="op">=</span> <span class="st">"minres"</span>, rotation <span class="op">=</span> <span class="st">"oblimin"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; # EFA syntax generated by surveyframe</span></span>
 <span><span class="co">#&gt; rlang::check_installed("psych", reason = "to estimate an EFA solution")</span></span>
-<span><span class="co">#&gt; efa_items &lt;- data[, c("dm_1", "dm_2", "dm_3", "sq_1", "sq_2", "sq_3")]</span></span>
-<span><span class="co">#&gt; psych::fa(efa_items, nfactors = 2, fm = "minres", rotate = "oblimin")</span></span></code></pre></div>
+<span><span class="co">#&gt; efa_items &lt;- data[, c("dmre_1", "dmre_2", "dmre_3", "dmre_4", "dmau_1", "dmau_2", "dmau_3", "dmeu_1", "dmeu_2", "dmeu_3", "dmpv_1", "dmpv_2", "dmpv_3", "dmpv_4")]</span></span>
+<span><span class="co">#&gt; psych::fa(efa_items, nfactors = 4, fm = "minres", rotate = "oblimin")</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="cfa-syntax-from-scale-definitions">CFA syntax from scale definitions<a class="anchor" aria-label="anchor" href="#cfa-syntax-from-scale-definitions"></a>
+<h2 id="cfa-syntax-the-lower-order-measurement-model">CFA syntax: the lower-order measurement model<a class="anchor" aria-label="anchor" href="#cfa-syntax-the-lower-order-measurement-model"></a>
 </h2>
-<p>The simplest CFA workflow uses scales already defined in the
-instrument.</p>
+<p>The confirmatory measurement model has the nine lower-order
+constructs as reflective factors. <code><a href="../reference/cfa_lavaan_syntax.html">cfa_lavaan_syntax()</a></code>
+writes lavaan syntax from a model object, with no need for lavaan at
+this stage.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="../reference/cfa_lavaan_syntax.html">cfa_lavaan_syntax</a></span><span class="op">(</span><span class="va">instr</span>, ordered <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">construct_def</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>  DMRE <span class="op">=</span> <span class="va">dmre</span>, DMAU <span class="op">=</span> <span class="va">dmau</span>, DMEU <span class="op">=</span> <span class="va">dmeu</span>, DMPV <span class="op">=</span> <span class="va">dmpv</span>,</span>
+<span>  DSQA <span class="op">=</span> <span class="va">dsqa</span>, DSQT <span class="op">=</span> <span class="va">dsqt</span>, DSUQ <span class="op">=</span> <span class="va">dsuq</span>, TS <span class="op">=</span> <span class="va">ts</span>, BI <span class="op">=</span> <span class="va">bi</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">cfa_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sf_model.html">sf_model</a></span><span class="op">(</span></span>
+<span>  id    <span class="op">=</span> <span class="st">"lower_order_cfa"</span>,</span>
+<span>  label <span class="op">=</span> <span class="st">"Lower-order measurement model"</span>,</span>
+<span>  type  <span class="op">=</span> <span class="st">"cfa"</span>,</span>
+<span>  constructs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/funprog.html" class="external-link">Map</a></span><span class="op">(</span><span class="kw">function</span><span class="op">(</span><span class="va">id</span>, <span class="va">items</span><span class="op">)</span> <span class="fu"><a href="../reference/sf_construct.html">sf_construct</a></span><span class="op">(</span><span class="va">id</span>, <span class="va">id</span>, <span class="va">items</span><span class="op">)</span>,</span>
+<span>                   <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">construct_def</span><span class="op">)</span>, <span class="va">construct_def</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="../reference/cfa_lavaan_syntax.html">cfa_lavaan_syntax</a></span><span class="op">(</span>model <span class="op">=</span> <span class="va">cfa_model</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; # lavaan CFA syntax generated by surveyframe</span></span>
-<span><span class="co">#&gt; # Model: Tourism Services Experience Demo CFA</span></span>
+<span><span class="co">#&gt; # Model: Lower-order measurement model</span></span>
 <span><span class="co">#&gt; # Recommended fitting option: std.lv = TRUE</span></span>
-<span><span class="co">#&gt; # Ordered-item option: pass ordered = c(...) to lavaan::cfa()</span></span>
 <span><span class="co">#&gt; # Fit with lavaan only when lavaan is installed.</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; # Digital marketing effectiveness (reflective)</span></span>
-<span><span class="co">#&gt; digital_marketing =~ dm_1 + dm_2 + dm_3</span></span>
+<span><span class="co">#&gt; # DMRE (reflective)</span></span>
+<span><span class="co">#&gt; DMRE =~ dmre_1 + dmre_2 + dmre_3 + dmre_4</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; # Service quality (reflective)</span></span>
-<span><span class="co">#&gt; service_quality =~ sq_1 + sq_2 + sq_3</span></span>
+<span><span class="co">#&gt; # DMAU (reflective)</span></span>
+<span><span class="co">#&gt; DMAU =~ dmau_1 + dmau_2 + dmau_3</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; # Sustainability perception (reflective)</span></span>
-<span><span class="co">#&gt; sustainability =~ sus_1 + sus_2</span></span>
+<span><span class="co">#&gt; # DMEU (reflective)</span></span>
+<span><span class="co">#&gt; DMEU =~ dmeu_1 + dmeu_2 + dmeu_3</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; # Tourist satisfaction (reflective)</span></span>
-<span><span class="co">#&gt; satisfaction =~ sat_1 + sat_2</span></span>
+<span><span class="co">#&gt; # DMPV (reflective)</span></span>
+<span><span class="co">#&gt; DMPV =~ dmpv_1 + dmpv_2 + dmpv_3 + dmpv_4</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; # Behavioural intention (reflective)</span></span>
-<span><span class="co">#&gt; behavioural_intention =~ bi_1 + bi_2</span></span></code></pre></div>
-<p><code><a href="../reference/cfa_syntax.html">cfa_syntax()</a></code> remains available as a backward-compatible
-wrapper.</p>
+<span><span class="co">#&gt; # DSQA (reflective)</span></span>
+<span><span class="co">#&gt; DSQA =~ dsqa_1 + dsqa_2 + dsqa_3</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; # DSQT (reflective)</span></span>
+<span><span class="co">#&gt; DSQT =~ dsqt_1 + dsqt_2 + dsqt_3 + dsqt_4 + dsqt_5</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; # DSUQ (reflective)</span></span>
+<span><span class="co">#&gt; DSUQ =~ dsuq_1 + dsuq_2 + dsuq_3 + dsuq_4 + dsuq_5</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; # TS (reflective)</span></span>
+<span><span class="co">#&gt; TS =~ ts_1 + ts_2 + ts_3</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; # BI (reflective)</span></span>
+<span><span class="co">#&gt; BI =~ bi_1 + bi_2 + bi_3</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="cb-sem-syntax-the-structural-model">CB-SEM syntax: the structural model<a class="anchor" aria-label="anchor" href="#cb-sem-syntax-the-structural-model"></a>
+</h2>
+<p>The covariance-based reading treats the five constructs as
+first-order reflective factors over their full item sets, with the nine
+direct paths and the four indirect effects from the hypotheses.
+<code><a href="../reference/sem_lavaan_syntax.html">sem_lavaan_syntax()</a></code> writes the measurement, structural, and
+indirect-effect lines.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="../reference/cfa_syntax.html">cfa_syntax</a></span><span class="op">(</span><span class="va">instr</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; # lavaan CFA syntax generated by surveyframe</span></span>
-<span><span class="co">#&gt; # Model: Tourism Services Experience Demo CFA</span></span>
-<span><span class="co">#&gt; # Recommended fitting option: std.lv = TRUE</span></span>
-<span><span class="co">#&gt; # Fit with lavaan only when lavaan is installed.</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; # Digital marketing effectiveness (reflective)</span></span>
-<span><span class="co">#&gt; digital_marketing =~ dm_1 + dm_2 + dm_3</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; # Service quality (reflective)</span></span>
-<span><span class="co">#&gt; service_quality =~ sq_1 + sq_2 + sq_3</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; # Sustainability perception (reflective)</span></span>
-<span><span class="co">#&gt; sustainability =~ sus_1 + sus_2</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; # Tourist satisfaction (reflective)</span></span>
-<span><span class="co">#&gt; satisfaction =~ sat_1 + sat_2</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; # Behavioural intention (reflective)</span></span>
-<span><span class="co">#&gt; behavioural_intention =~ bi_1 + bi_2</span></span></code></pre></div>
-</div>
-<div class="section level2">
-<h2 id="construct-objects">Construct objects<a class="anchor" aria-label="anchor" href="#construct-objects"></a>
-</h2>
-<p>Construct objects record the construct ID, label, measurement mode,
-and indicator items.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">dm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sf_construct.html">sf_construct</a></span><span class="op">(</span></span>
-<span>  id <span class="op">=</span> <span class="st">"DM"</span>,</span>
-<span>  label <span class="op">=</span> <span class="st">"Digital marketing"</span>,</span>
-<span>  items <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"dm_1"</span>, <span class="st">"dm_2"</span>, <span class="st">"dm_3"</span><span class="op">)</span>,</span>
-<span>  mode <span class="op">=</span> <span class="st">"reflective"</span></span>
-<span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">sq</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sf_construct.html">sf_construct</a></span><span class="op">(</span></span>
-<span>  id <span class="op">=</span> <span class="st">"SQ"</span>,</span>
-<span>  label <span class="op">=</span> <span class="st">"Service quality"</span>,</span>
-<span>  items <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"sq_1"</span>, <span class="st">"sq_2"</span>, <span class="st">"sq_3"</span><span class="op">)</span>,</span>
-<span>  mode <span class="op">=</span> <span class="st">"reflective"</span></span>
-<span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">sat</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sf_construct.html">sf_construct</a></span><span class="op">(</span></span>
-<span>  id <span class="op">=</span> <span class="st">"SAT"</span>,</span>
-<span>  label <span class="op">=</span> <span class="st">"Satisfaction"</span>,</span>
-<span>  items <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"sat_1"</span>, <span class="st">"sat_2"</span><span class="op">)</span>,</span>
-<span>  mode <span class="op">=</span> <span class="st">"reflective"</span></span>
-<span><span class="op">)</span></span></code></pre></div>
-<p>Construct modes include <code>reflective</code>,
-<code>composite</code>, <code>formative</code>, and
-<code>single_item</code>. Lavaan syntax generation in v0.3 is intended
-for reflective measurement models. PLS-SEM syntax can use
-composite-style constructs.</p>
-</div>
-<div class="section level2">
-<h2 id="cb-sem-lavaan-syntax">CB-SEM lavaan syntax<a class="anchor" aria-label="anchor" href="#cb-sem-lavaan-syntax"></a>
-</h2>
-<p><code><a href="../reference/sf_model.html">sf_model()</a></code> stores measurement and structural paths.
-<code><a href="../reference/sem_lavaan_syntax.html">sem_lavaan_syntax()</a></code> then generates lavaan syntax without
-requiring <code>lavaan</code> to be installed.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">sem_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sf_model.html">sf_model</a></span><span class="op">(</span></span>
-<span>  id <span class="op">=</span> <span class="st">"tourism_sem"</span>,</span>
-<span>  label <span class="op">=</span> <span class="st">"Tourism structural model"</span>,</span>
-<span>  type <span class="op">=</span> <span class="st">"cb_sem"</span>,</span>
-<span>  constructs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">dm</span>, <span class="va">sq</span>, <span class="va">sat</span><span class="op">)</span>,</span>
+<span>  id    <span class="op">=</span> <span class="st">"tourism_structural"</span>,</span>
+<span>  label <span class="op">=</span> <span class="st">"Digital marketing structural model"</span>,</span>
+<span>  type  <span class="op">=</span> <span class="st">"cb_sem"</span>,</span>
+<span>  constructs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>    <span class="fu"><a href="../reference/sf_construct.html">sf_construct</a></span><span class="op">(</span><span class="st">"DME"</span>,  <span class="st">"Digital marketing effectiveness"</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">dmre</span>, <span class="va">dmau</span>, <span class="va">dmeu</span>, <span class="va">dmpv</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>    <span class="fu"><a href="../reference/sf_construct.html">sf_construct</a></span><span class="op">(</span><span class="st">"DSQ"</span>,  <span class="st">"Destination service quality"</span>,     <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">dsqa</span>, <span class="va">dsqt</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>    <span class="fu"><a href="../reference/sf_construct.html">sf_construct</a></span><span class="op">(</span><span class="st">"DSUQ"</span>, <span class="st">"Destination sustainability quality"</span>, <span class="va">dsuq</span><span class="op">)</span>,</span>
+<span>    <span class="fu"><a href="../reference/sf_construct.html">sf_construct</a></span><span class="op">(</span><span class="st">"TS"</span>,   <span class="st">"Tourist satisfaction"</span>, <span class="va">ts</span><span class="op">)</span>,</span>
+<span>    <span class="fu"><a href="../reference/sf_construct.html">sf_construct</a></span><span class="op">(</span><span class="st">"BI"</span>,   <span class="st">"Behavioural intention"</span>, <span class="va">bi</span><span class="op">)</span></span>
+<span>  <span class="op">)</span>,</span>
 <span>  paths <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>    <span class="fu"><a href="../reference/sf_path.html">sf_path</a></span><span class="op">(</span><span class="st">"DM"</span>, <span class="st">"SQ"</span>, label <span class="op">=</span> <span class="st">"a"</span><span class="op">)</span>,</span>
-<span>    <span class="fu"><a href="../reference/sf_path.html">sf_path</a></span><span class="op">(</span><span class="st">"SQ"</span>, <span class="st">"SAT"</span>, label <span class="op">=</span> <span class="st">"b"</span><span class="op">)</span>,</span>
-<span>    <span class="fu"><a href="../reference/sf_path.html">sf_path</a></span><span class="op">(</span><span class="st">"DM"</span>, <span class="st">"SAT"</span>, label <span class="op">=</span> <span class="st">"c_prime"</span><span class="op">)</span></span>
+<span>    <span class="fu"><a href="../reference/sf_path.html">sf_path</a></span><span class="op">(</span><span class="st">"DME"</span>, <span class="st">"DSQ"</span>, label <span class="op">=</span> <span class="st">"h1"</span><span class="op">)</span>,  <span class="fu"><a href="../reference/sf_path.html">sf_path</a></span><span class="op">(</span><span class="st">"DME"</span>, <span class="st">"DSUQ"</span>, label <span class="op">=</span> <span class="st">"h2"</span><span class="op">)</span>,</span>
+<span>    <span class="fu"><a href="../reference/sf_path.html">sf_path</a></span><span class="op">(</span><span class="st">"DME"</span>, <span class="st">"TS"</span>,  label <span class="op">=</span> <span class="st">"h3"</span><span class="op">)</span>,  <span class="fu"><a href="../reference/sf_path.html">sf_path</a></span><span class="op">(</span><span class="st">"DME"</span>, <span class="st">"BI"</span>,   label <span class="op">=</span> <span class="st">"h4"</span><span class="op">)</span>,</span>
+<span>    <span class="fu"><a href="../reference/sf_path.html">sf_path</a></span><span class="op">(</span><span class="st">"DSQ"</span>, <span class="st">"TS"</span>,  label <span class="op">=</span> <span class="st">"h5"</span><span class="op">)</span>,  <span class="fu"><a href="../reference/sf_path.html">sf_path</a></span><span class="op">(</span><span class="st">"DSQ"</span>, <span class="st">"BI"</span>,   label <span class="op">=</span> <span class="st">"h6"</span><span class="op">)</span>,</span>
+<span>    <span class="fu"><a href="../reference/sf_path.html">sf_path</a></span><span class="op">(</span><span class="st">"DSUQ"</span>, <span class="st">"TS"</span>, label <span class="op">=</span> <span class="st">"h7"</span><span class="op">)</span>,  <span class="fu"><a href="../reference/sf_path.html">sf_path</a></span><span class="op">(</span><span class="st">"DSUQ"</span>, <span class="st">"BI"</span>,  label <span class="op">=</span> <span class="st">"h8"</span><span class="op">)</span>,</span>
+<span>    <span class="fu"><a href="../reference/sf_path.html">sf_path</a></span><span class="op">(</span><span class="st">"TS"</span>, <span class="st">"BI"</span>,   label <span class="op">=</span> <span class="st">"h9"</span><span class="op">)</span></span>
 <span>  <span class="op">)</span>,</span>
 <span>  indirect <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>    <span class="fu"><a href="../reference/sf_indirect.html">sf_indirect</a></span><span class="op">(</span><span class="st">"DM"</span>, <span class="st">"SQ"</span>, <span class="st">"SAT"</span>, label <span class="op">=</span> <span class="st">"indirect_DM_SQ_SAT"</span><span class="op">)</span></span>
+<span>    <span class="fu"><a href="../reference/sf_indirect.html">sf_indirect</a></span><span class="op">(</span><span class="st">"DME"</span>, <span class="st">"DSQ"</span>, <span class="st">"TS"</span>,  label <span class="op">=</span> <span class="st">"h10"</span><span class="op">)</span>,</span>
+<span>    <span class="fu"><a href="../reference/sf_indirect.html">sf_indirect</a></span><span class="op">(</span><span class="st">"DME"</span>, <span class="st">"DSUQ"</span>, <span class="st">"TS"</span>, label <span class="op">=</span> <span class="st">"h11"</span><span class="op">)</span>,</span>
+<span>    <span class="fu"><a href="../reference/sf_indirect.html">sf_indirect</a></span><span class="op">(</span><span class="st">"DME"</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"DSQ"</span>, <span class="st">"TS"</span><span class="op">)</span>, <span class="st">"BI"</span>,  label <span class="op">=</span> <span class="st">"h12"</span><span class="op">)</span>,</span>
+<span>    <span class="fu"><a href="../reference/sf_indirect.html">sf_indirect</a></span><span class="op">(</span><span class="st">"DME"</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"DSUQ"</span>, <span class="st">"TS"</span><span class="op">)</span>, <span class="st">"BI"</span>, label <span class="op">=</span> <span class="st">"h13"</span><span class="op">)</span></span>
 <span>  <span class="op">)</span>,</span>
 <span>  options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>estimator <span class="op">=</span> <span class="st">"MLR"</span>, missing <span class="op">=</span> <span class="st">"fiml"</span>, standardised <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="../reference/validate_model.html">validate_model</a></span><span class="op">(</span><span class="va">sem_model</span>, <span class="va">instr</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="../reference/sem_lavaan_syntax.html">sem_lavaan_syntax</a></span><span class="op">(</span><span class="va">sem_model</span>, <span class="va">instr</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/validate_model.html">validate_model</a></span><span class="op">(</span><span class="va">sem_model</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="../reference/sem_lavaan_syntax.html">sem_lavaan_syntax</a></span><span class="op">(</span><span class="va">sem_model</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; # lavaan CB-SEM syntax generated by surveyframe</span></span>
-<span><span class="co">#&gt; # Model: Tourism structural model</span></span>
+<span><span class="co">#&gt; # Model: Digital marketing structural model</span></span>
 <span><span class="co">#&gt; # Recommended summary option: standardized = TRUE</span></span>
 <span><span class="co">#&gt; # Estimator: MLR</span></span>
 <span><span class="co">#&gt; # Missing data method: fiml</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; DM =~ dm_1 + dm_2 + dm_3</span></span>
-<span><span class="co">#&gt; SQ =~ sq_1 + sq_2 + sq_3</span></span>
-<span><span class="co">#&gt; SAT =~ sat_1 + sat_2</span></span>
+<span><span class="co">#&gt; DME =~ dmre_1 + dmre_2 + dmre_3 + dmre_4 + dmau_1 + dmau_2 + dmau_3 + dmeu_1 + dmeu_2 + dmeu_3 + dmpv_1 + dmpv_2 + dmpv_3 + dmpv_4</span></span>
+<span><span class="co">#&gt; DSQ =~ dsqa_1 + dsqa_2 + dsqa_3 + dsqt_1 + dsqt_2 + dsqt_3 + dsqt_4 + dsqt_5</span></span>
+<span><span class="co">#&gt; DSUQ =~ dsuq_1 + dsuq_2 + dsuq_3 + dsuq_4 + dsuq_5</span></span>
+<span><span class="co">#&gt; TS =~ ts_1 + ts_2 + ts_3</span></span>
+<span><span class="co">#&gt; BI =~ bi_1 + bi_2 + bi_3</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; # Structural paths</span></span>
-<span><span class="co">#&gt; SAT ~ b*SQ + c_prime*DM</span></span>
-<span><span class="co">#&gt; SQ ~ a*DM</span></span>
+<span><span class="co">#&gt; BI ~ h4*DME + h6*DSQ + h8*DSUQ + h9*TS</span></span>
+<span><span class="co">#&gt; DSQ ~ h1*DME</span></span>
+<span><span class="co">#&gt; DSUQ ~ h2*DME</span></span>
+<span><span class="co">#&gt; TS ~ h3*DME + h5*DSQ + h7*DSUQ</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; # Indirect and total effects</span></span>
-<span><span class="co">#&gt; indirect_DM_SQ_SAT := a*b</span></span>
-<span><span class="co">#&gt; total_DM_SAT := c_prime + indirect_DM_SQ_SAT</span></span></code></pre></div>
+<span><span class="co">#&gt; h10 := h1*h5</span></span>
+<span><span class="co">#&gt; total_DME_TS := h3 + h10</span></span>
+<span><span class="co">#&gt; h11 := h2*h7</span></span>
+<span><span class="co">#&gt; total_DME_TS := h3 + h11</span></span>
+<span><span class="co">#&gt; h12 := h1*h5*h9</span></span>
+<span><span class="co">#&gt; total_DME_BI := h4 + h12</span></span>
+<span><span class="co">#&gt; h13 := h2*h7*h9</span></span>
+<span><span class="co">#&gt; total_DME_BI := h4 + h13</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="pls-sem-seminr-syntax">PLS-SEM seminr syntax<a class="anchor" aria-label="anchor" href="#pls-sem-seminr-syntax"></a>
+<h2 id="pls-sem-syntax-the-two-stage-higher-order-model">PLS-SEM syntax: the two-stage higher-order model<a class="anchor" aria-label="anchor" href="#pls-sem-syntax-the-two-stage-higher-order-model"></a>
 </h2>
-<p>For PLS-SEM planning, use composite constructs and
-<code><a href="../reference/seminr_syntax.html">seminr_syntax()</a></code>.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<p>The published study used PLS-SEM with a two-stage treatment of the
+higher-order constructs. The second stage models digital marketing
+effectiveness and service quality as composites of their lower-order
+construct scores, then estimates the structural paths.
+<code><a href="../reference/seminr_syntax.html">seminr_syntax()</a></code> writes the seminr code, including the
+bootstrap, reliability, AVE, and HTMT calls.</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pls_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sf_model.html">sf_model</a></span><span class="op">(</span></span>
-<span>  id <span class="op">=</span> <span class="st">"tourism_pls"</span>,</span>
-<span>  label <span class="op">=</span> <span class="st">"Tourism PLS model"</span>,</span>
-<span>  type <span class="op">=</span> <span class="st">"pls_sem"</span>,</span>
+<span>  id    <span class="op">=</span> <span class="st">"tourism_pls"</span>,</span>
+<span>  label <span class="op">=</span> <span class="st">"Two-stage higher-order PLS model"</span>,</span>
+<span>  type  <span class="op">=</span> <span class="st">"pls_sem"</span>,</span>
 <span>  constructs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>    <span class="fu"><a href="../reference/sf_construct.html">sf_construct</a></span><span class="op">(</span><span class="st">"DM"</span>, <span class="st">"Digital marketing"</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"dm_1"</span>, <span class="st">"dm_2"</span>, <span class="st">"dm_3"</span><span class="op">)</span>, mode <span class="op">=</span> <span class="st">"composite"</span><span class="op">)</span>,</span>
-<span>    <span class="fu"><a href="../reference/sf_construct.html">sf_construct</a></span><span class="op">(</span><span class="st">"SQ"</span>, <span class="st">"Service quality"</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"sq_1"</span>, <span class="st">"sq_2"</span>, <span class="st">"sq_3"</span><span class="op">)</span>, mode <span class="op">=</span> <span class="st">"composite"</span><span class="op">)</span>,</span>
-<span>    <span class="fu"><a href="../reference/sf_construct.html">sf_construct</a></span><span class="op">(</span><span class="st">"SAT"</span>, <span class="st">"Satisfaction"</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"sat_1"</span>, <span class="st">"sat_2"</span><span class="op">)</span>, mode <span class="op">=</span> <span class="st">"composite"</span><span class="op">)</span></span>
+<span>    <span class="fu"><a href="../reference/sf_construct.html">sf_construct</a></span><span class="op">(</span><span class="st">"DME"</span>,  <span class="st">"Digital marketing effectiveness"</span>,</span>
+<span>                 <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"DMRE"</span>, <span class="st">"DMAU"</span>, <span class="st">"DMEU"</span>, <span class="st">"DMPV"</span><span class="op">)</span>, mode <span class="op">=</span> <span class="st">"composite"</span><span class="op">)</span>,</span>
+<span>    <span class="fu"><a href="../reference/sf_construct.html">sf_construct</a></span><span class="op">(</span><span class="st">"DSQ"</span>,  <span class="st">"Destination service quality"</span>,</span>
+<span>                 <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"DSQA"</span>, <span class="st">"DSQT"</span><span class="op">)</span>, mode <span class="op">=</span> <span class="st">"composite"</span><span class="op">)</span>,</span>
+<span>    <span class="fu"><a href="../reference/sf_construct.html">sf_construct</a></span><span class="op">(</span><span class="st">"DSUQ"</span>, <span class="st">"Destination sustainability quality"</span>, <span class="va">dsuq</span>, mode <span class="op">=</span> <span class="st">"composite"</span><span class="op">)</span>,</span>
+<span>    <span class="fu"><a href="../reference/sf_construct.html">sf_construct</a></span><span class="op">(</span><span class="st">"TS"</span>,   <span class="st">"Tourist satisfaction"</span>, <span class="va">ts</span>, mode <span class="op">=</span> <span class="st">"composite"</span><span class="op">)</span>,</span>
+<span>    <span class="fu"><a href="../reference/sf_construct.html">sf_construct</a></span><span class="op">(</span><span class="st">"BI"</span>,   <span class="st">"Behavioural intention"</span>, <span class="va">bi</span>, mode <span class="op">=</span> <span class="st">"composite"</span><span class="op">)</span></span>
 <span>  <span class="op">)</span>,</span>
 <span>  paths <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>    <span class="fu"><a href="../reference/sf_path.html">sf_path</a></span><span class="op">(</span><span class="st">"DM"</span>, <span class="st">"SQ"</span><span class="op">)</span>,</span>
-<span>    <span class="fu"><a href="../reference/sf_path.html">sf_path</a></span><span class="op">(</span><span class="st">"SQ"</span>, <span class="st">"SAT"</span><span class="op">)</span>,</span>
-<span>    <span class="fu"><a href="../reference/sf_path.html">sf_path</a></span><span class="op">(</span><span class="st">"DM"</span>, <span class="st">"SAT"</span><span class="op">)</span></span>
+<span>    <span class="fu"><a href="../reference/sf_path.html">sf_path</a></span><span class="op">(</span><span class="st">"DME"</span>, <span class="st">"DSQ"</span><span class="op">)</span>, <span class="fu"><a href="../reference/sf_path.html">sf_path</a></span><span class="op">(</span><span class="st">"DME"</span>, <span class="st">"DSUQ"</span><span class="op">)</span>,</span>
+<span>    <span class="fu"><a href="../reference/sf_path.html">sf_path</a></span><span class="op">(</span><span class="st">"DME"</span>, <span class="st">"TS"</span><span class="op">)</span>,  <span class="fu"><a href="../reference/sf_path.html">sf_path</a></span><span class="op">(</span><span class="st">"DME"</span>, <span class="st">"BI"</span><span class="op">)</span>,</span>
+<span>    <span class="fu"><a href="../reference/sf_path.html">sf_path</a></span><span class="op">(</span><span class="st">"DSQ"</span>, <span class="st">"TS"</span><span class="op">)</span>,  <span class="fu"><a href="../reference/sf_path.html">sf_path</a></span><span class="op">(</span><span class="st">"DSQ"</span>, <span class="st">"BI"</span><span class="op">)</span>,</span>
+<span>    <span class="fu"><a href="../reference/sf_path.html">sf_path</a></span><span class="op">(</span><span class="st">"DSUQ"</span>, <span class="st">"TS"</span><span class="op">)</span>, <span class="fu"><a href="../reference/sf_path.html">sf_path</a></span><span class="op">(</span><span class="st">"DSUQ"</span>, <span class="st">"BI"</span><span class="op">)</span>,</span>
+<span>    <span class="fu"><a href="../reference/sf_path.html">sf_path</a></span><span class="op">(</span><span class="st">"TS"</span>, <span class="st">"BI"</span><span class="op">)</span></span>
 <span>  <span class="op">)</span>,</span>
-<span>  options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>bootstrap <span class="op">=</span> <span class="fl">5000</span><span class="op">)</span></span>
+<span>  options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>bootstrap <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="../reference/seminr_syntax.html">seminr_syntax</a></span><span class="op">(</span><span class="va">pls_model</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; # seminr PLS-SEM syntax generated by surveyframe</span></span>
 <span><span class="co">#&gt; rlang::check_installed("seminr", reason = "to fit PLS-SEM models")</span></span>
+<span><span class="co">#&gt; library(seminr)</span></span>
+<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; measurement_model &lt;- constructs(</span></span>
-<span><span class="co">#&gt;   composite("DM", multi_items("dm_", 1:3)),</span></span>
-<span><span class="co">#&gt;   composite("SQ", multi_items("sq_", 1:3)),</span></span>
-<span><span class="co">#&gt;   composite("SAT", multi_items("sat_", 1:2))</span></span>
+<span><span class="co">#&gt;   composite("DME", c("DMRE", "DMAU", "DMEU", "DMPV")),</span></span>
+<span><span class="co">#&gt;   composite("DSQ", c("DSQA", "DSQT")),</span></span>
+<span><span class="co">#&gt;   composite("DSUQ", multi_items("dsuq_", 1:5)),</span></span>
+<span><span class="co">#&gt;   composite("TS", multi_items("ts_", 1:3)),</span></span>
+<span><span class="co">#&gt;   composite("BI", multi_items("bi_", 1:3))</span></span>
 <span><span class="co">#&gt; )</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; structural_model &lt;- relationships(</span></span>
-<span><span class="co">#&gt;   paths(from = "DM", to = c("SQ", "SAT")),</span></span>
-<span><span class="co">#&gt;   paths(from = "SQ", to = c("SAT"))</span></span>
+<span><span class="co">#&gt;   paths(from = "DME", to = c("DSQ", "DSUQ", "TS", "BI")),</span></span>
+<span><span class="co">#&gt;   paths(from = "DSQ", to = c("TS", "BI")),</span></span>
+<span><span class="co">#&gt;   paths(from = "DSUQ", to = c("TS", "BI")),</span></span>
+<span><span class="co">#&gt;   paths(from = "TS", to = c("BI"))</span></span>
 <span><span class="co">#&gt; )</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; pls_model &lt;- estimate_pls(</span></span>
@@ -257,96 +272,73 @@ requiring <code>lavaan</code> to be installed.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; boot_model &lt;- bootstrap_model(</span></span>
 <span><span class="co">#&gt;   seminr_model = pls_model,</span></span>
-<span><span class="co">#&gt;   nboot = 5000,</span></span>
+<span><span class="co">#&gt;   nboot = 1000,</span></span>
 <span><span class="co">#&gt;   cores = 1,</span></span>
 <span><span class="co">#&gt;   seed = 123</span></span>
 <span><span class="co">#&gt; )</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; reliability(pls_model)</span></span>
-<span><span class="co">#&gt; ave(pls_model)</span></span>
-<span><span class="co">#&gt; htmt(pls_model)</span></span></code></pre></div>
+<span><span class="co">#&gt; # Measurement assessment: reliability, AVE, and HTMT discriminant validity</span></span>
+<span><span class="co">#&gt; model_summary &lt;- summary(pls_model)</span></span>
+<span><span class="co">#&gt; model_summary$reliability</span></span>
+<span><span class="co">#&gt; model_summary$validity$htmt</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; # Bootstrapped structural paths</span></span>
+<span><span class="co">#&gt; boot_summary &lt;- summary(boot_model)</span></span>
+<span><span class="co">#&gt; boot_summary$bootstrapped_paths</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="model-json">Model JSON<a class="anchor" aria-label="anchor" href="#model-json"></a>
+<h2 id="construct-modes">Construct modes<a class="anchor" aria-label="anchor" href="#construct-modes"></a>
 </h2>
-<p>Store model specifications in <code>.sframe</code> files and export
-them as JSON.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/model_json.html">model_json</a></span><span class="op">(</span><span class="va">sem_model</span><span class="op">)</span></span>
-<span><span class="co">#&gt; {</span></span>
-<span><span class="co">#&gt;   "id": "tourism_sem",</span></span>
-<span><span class="co">#&gt;   "label": "Tourism structural model",</span></span>
-<span><span class="co">#&gt;   "type": "cb_sem",</span></span>
-<span><span class="co">#&gt;   "engine": "lavaan",</span></span>
-<span><span class="co">#&gt;   "measurement": {</span></span>
-<span><span class="co">#&gt;     "constructs": [</span></span>
-<span><span class="co">#&gt;       {</span></span>
-<span><span class="co">#&gt;         "id": "DM",</span></span>
-<span><span class="co">#&gt;         "label": "Digital marketing",</span></span>
-<span><span class="co">#&gt;         "mode": "reflective",</span></span>
-<span><span class="co">#&gt;         "items": ["dm_1", "dm_2", "dm_3"],</span></span>
-<span><span class="co">#&gt;         "weights": null</span></span>
-<span><span class="co">#&gt;       },</span></span>
-<span><span class="co">#&gt;       {</span></span>
-<span><span class="co">#&gt;         "id": "SQ",</span></span>
-<span><span class="co">#&gt;         "label": "Service quality",</span></span>
-<span><span class="co">#&gt;         "mode": "reflective",</span></span>
-<span><span class="co">#&gt;         "items": ["sq_1", "sq_2", "sq_3"],</span></span>
-<span><span class="co">#&gt;         "weights": null</span></span>
-<span><span class="co">#&gt;       },</span></span>
-<span><span class="co">#&gt;       {</span></span>
-<span><span class="co">#&gt;         "id": "SAT",</span></span>
-<span><span class="co">#&gt;         "label": "Satisfaction",</span></span>
-<span><span class="co">#&gt;         "mode": "reflective",</span></span>
-<span><span class="co">#&gt;         "items": ["sat_1", "sat_2"],</span></span>
-<span><span class="co">#&gt;         "weights": null</span></span>
-<span><span class="co">#&gt;       }</span></span>
-<span><span class="co">#&gt;     ]</span></span>
-<span><span class="co">#&gt;   },</span></span>
-<span><span class="co">#&gt;   "structural": {</span></span>
-<span><span class="co">#&gt;     "paths": [</span></span>
-<span><span class="co">#&gt;       {</span></span>
-<span><span class="co">#&gt;         "from": "DM",</span></span>
-<span><span class="co">#&gt;         "to": "SQ",</span></span>
-<span><span class="co">#&gt;         "label": "a"</span></span>
-<span><span class="co">#&gt;       },</span></span>
-<span><span class="co">#&gt;       {</span></span>
-<span><span class="co">#&gt;         "from": "SQ",</span></span>
-<span><span class="co">#&gt;         "to": "SAT",</span></span>
-<span><span class="co">#&gt;         "label": "b"</span></span>
-<span><span class="co">#&gt;       },</span></span>
-<span><span class="co">#&gt;       {</span></span>
-<span><span class="co">#&gt;         "from": "DM",</span></span>
-<span><span class="co">#&gt;         "to": "SAT",</span></span>
-<span><span class="co">#&gt;         "label": "c_prime"</span></span>
-<span><span class="co">#&gt;       }</span></span>
-<span><span class="co">#&gt;     ],</span></span>
-<span><span class="co">#&gt;     "covariances": [],</span></span>
-<span><span class="co">#&gt;     "indirect": [</span></span>
-<span><span class="co">#&gt;       {</span></span>
-<span><span class="co">#&gt;         "from": "DM",</span></span>
-<span><span class="co">#&gt;         "through": "SQ",</span></span>
-<span><span class="co">#&gt;         "to": "SAT",</span></span>
-<span><span class="co">#&gt;         "label": "indirect_DM_SQ_SAT"</span></span>
-<span><span class="co">#&gt;       }</span></span>
-<span><span class="co">#&gt;     ]</span></span>
-<span><span class="co">#&gt;   },</span></span>
-<span><span class="co">#&gt;   "options": {</span></span>
-<span><span class="co">#&gt;     "estimator": "MLR",</span></span>
-<span><span class="co">#&gt;     "missing": "fiml",</span></span>
-<span><span class="co">#&gt;     "standardised": true</span></span>
-<span><span class="co">#&gt;   }</span></span>
-<span><span class="co">#&gt; }</span></span></code></pre></div>
+<p>A construct’s mode is <code>reflective</code>,
+<code>composite</code>, <code>formative</code>, or
+<code>single_item</code>. lavaan syntax generation in v0.3 is intended
+for reflective measurement models, which is why the CFA and CB-SEM
+models use the default reflective mode. PLS-SEM syntax uses composite
+constructs, as above.</p>
 </div>
 <div class="section level2">
-<h2 id="where-syntax-goes-next">Where syntax goes next<a class="anchor" aria-label="anchor" href="#where-syntax-goes-next"></a>
+<h2 id="model-json-and-a-reporting-template">Model JSON and a reporting template<a class="anchor" aria-label="anchor" href="#model-json-and-a-reporting-template"></a>
 </h2>
-<p>The generated lavaan syntax should be copied into
-<code>lavaan::cfa()</code> or <code>lavaan::sem()</code> after selecting
-estimators, ordered item handling, missing-data treatment, and reporting
-options. The generated seminr syntax should be copied into an analysis
-script where <code>seminr</code> is installed and the researcher has
-chosen bootstrapping settings and construct modes.</p>
+<p>A model serialises to JSON for storage in a <code>.sframe</code>
+file, and <code><a href="../reference/model_report_template.html">model_report_template()</a></code> writes a short reporting
+outline.</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="../reference/model_report_template.html">model_report_template</a></span><span class="op">(</span><span class="va">sem_model</span>, include_json <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; # Model: Digital marketing structural model</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Type: cb_sem</span></span>
+<span><span class="co">#&gt; Engine: lavaan</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; ## Constructs</span></span>
+<span><span class="co">#&gt; - DME (reflective): dmre_1, dmre_2, dmre_3, dmre_4, dmau_1, dmau_2, dmau_3, dmeu_1, dmeu_2, dmeu_3, dmpv_1, dmpv_2, dmpv_3, dmpv_4</span></span>
+<span><span class="co">#&gt; - DSQ (reflective): dsqa_1, dsqa_2, dsqa_3, dsqt_1, dsqt_2, dsqt_3, dsqt_4, dsqt_5</span></span>
+<span><span class="co">#&gt; - DSUQ (reflective): dsuq_1, dsuq_2, dsuq_3, dsuq_4, dsuq_5</span></span>
+<span><span class="co">#&gt; - TS (reflective): ts_1, ts_2, ts_3</span></span>
+<span><span class="co">#&gt; - BI (reflective): bi_1, bi_2, bi_3</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; ## Structural Paths</span></span>
+<span><span class="co">#&gt; - DME -&gt; DSQ</span></span>
+<span><span class="co">#&gt; - DME -&gt; DSUQ</span></span>
+<span><span class="co">#&gt; - DME -&gt; TS</span></span>
+<span><span class="co">#&gt; - DME -&gt; BI</span></span>
+<span><span class="co">#&gt; - DSQ -&gt; TS</span></span>
+<span><span class="co">#&gt; - DSQ -&gt; BI</span></span>
+<span><span class="co">#&gt; - DSUQ -&gt; TS</span></span>
+<span><span class="co">#&gt; - DSUQ -&gt; BI</span></span>
+<span><span class="co">#&gt; - TS -&gt; BI</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; ## Reporting Notes</span></span>
+<span><span class="co">#&gt; Report estimator, missing-data handling, fit indices, standardised path estimates, indirect effects, reliability, validity, and any item-retention decisions.</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="where-the-syntax-goes-next">Where the syntax goes next<a class="anchor" aria-label="anchor" href="#where-the-syntax-goes-next"></a>
+</h2>
+<p>The generated lavaan syntax is copied into <code><a href="https://rdrr.io/pkg/lavaan/man/cfa.html" class="external-link">lavaan::cfa()</a></code>
+or <code><a href="https://rdrr.io/pkg/lavaan/man/sem.html" class="external-link">lavaan::sem()</a></code> after choosing the estimator, ordered-item
+handling, and missing-data treatment. The generated seminr syntax is
+copied into a script where seminr is installed and the bootstrap
+settings and construct modes are set. The published study fitted the
+two-stage PLS model in seminr with 1000 bootstrap resamples.</p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
@@ -355,7 +347,7 @@ chosen bootstrapping settings and construct modes.</p>
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Mohammed Ali Sharafuddin. Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Developed by Mohammed Ali Sharafuddin. Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
 <div class="pkgdown-footer-right">
