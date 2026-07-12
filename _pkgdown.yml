@@ -54,6 +54,7 @@ articles:
     contents:
       - surveyframe
       - building-survey-instrument
+      - deploying-and-collecting
       - analysing-survey-responses
       - scale-reliability-validity
       - efa-cfa-sem-pls-syntax
@@ -157,6 +158,39 @@ reference:
       - render_results
       - model_report_template
 
+  - title: "Plotting"
+    desc: >
+      Opt-in ggplot2 charts for analysis results, and the package theme.
+    contents:
+      - theme_surveyframe
+
+  - title: "Print, format, and summary methods"
+    desc: >
+      S3 methods so every component object prints and summarises cleanly at
+      the console and inside reports.
+    contents:
+      - print.sframe
+      - format.sframe
+      - summary.sframe
+      - print.sf_choices
+      - format.sf_choices
+      - summary.sf_choices
+      - print.sf_item
+      - format.sf_item
+      - summary.sf_item
+      - print.sf_scale
+      - format.sf_scale
+      - summary.sf_scale
+      - print.sf_branch
+      - format.sf_branch
+      - summary.sf_branch
+      - print.sf_check
+      - format.sf_check
+      - summary.sf_check
+      - print.sf_model
+      - format.sf_model
+      - summary.sf_model
+
   - title: "Package"
     contents:
       - surveyframe-package
@@ -165,9 +199,6 @@ reference:
       - sframe_builder_empty_state
       - sframe_builder_state_from_instrument
       - sframe_builder_validate_draft
-      - print.sframe
-      - format.sframe
-      - summary.sframe
 
 footer:
   structure:
