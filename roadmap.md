@@ -203,17 +203,27 @@ the Design improvement arc items already logged in dogfeed.todo.md
 (settings entry-point consolidation, Analyse sub-tab rework, header nav
 balance).
 
-**New, 2026-07-12**: a WCAG 2.2 AA pass on the vignettes themselves, not
-just the exported survey and the builder chrome. The default knitr HTML
+**2026-07-12**: a WCAG 2.2 AA pass on the vignettes themselves, not just
+the exported survey and the builder chrome. The default knitr HTML
 vignette output (no pkgdown wrapper) reads as visually flat: a single
 black-on-white type scale, no colour or spacing to guide scanning, and
 default table/code-block contrast that has not been checked against AA
-thresholds. Scope for 0.3.4: a shared vignette CSS include (heading scale,
-accent colour tied to the package theme, contrast-checked code block and
-table styling) applied via `rmarkdown::html_vignette`'s CSS argument or a
-package-wide vignette template, so vignettes read as a designed document
-rather than default Pandoc output, and pass the same AA contrast and
-heading-structure checks already applied to the survey and builder.
+thresholds. **Partially addressed same day**: the pkgdown site went live
+(https://mohammedalisharafuddin.github.io/surveyframe/), so anyone reading
+vignettes through the site already gets the branded bslib theme instead of
+flat Pandoc output. That build also surfaced and fixed two real bugs (not
+cosmetic): building pkgdown from `dev` renders dev-only planning files into
+public HTML (pkgdown ignores `.Rbuildignore`; must always build from
+`main`), and the deploy workflow's `clean: false` had let
+`revision_todo_0.3.md`/`.html`, `roadmap.md`/`.html`, and `todo.md` sit
+live on the public `gh-pages` branch since an earlier deploy, surviving
+every rebuild since; both fixed. Still open for 0.3.4, scoped as before: a
+shared vignette CSS pass checking AA contrast on code blocks, tables, and
+body text (not just "on brand"), and heading-structure verification, since
+the pkgdown theme fixes the look but was never checked against AA
+thresholds specifically. Also raw, non-pkgdown vignette viewing (e.g.
+`browseVignettes()` from a local install) still gets the flat default, so
+this is not fully closed by the site alone.
 
 Settings-entry-point direction confirmed 2026-07-11: the sidebar's
 existing title button, the Welcome/Logo/Thank You setup strip, and any

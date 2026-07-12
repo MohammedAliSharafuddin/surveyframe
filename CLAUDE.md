@@ -34,9 +34,28 @@ table/plot pairing, all resolved. The lead vignette and two supporting
 vignettes were rewritten to describe the redesigned survey, the expanded
 export columns, and `plots = TRUE`. Local `R CMD check --as-cran`,
 win-builder R-release (4.6.1), and win-builder R-devel were all clean
-(0/0/0) before submission. Next: confirm the package page shows 0.3.3, then
-tell the JSS manuscript work in surveyframe-jss-paper it is clear to
-resubmit.
+(0/0/0) before submission. The CRAN package page confirmed 0.3.3 live, and
+the JSS manuscript work in surveyframe-jss-paper was told it is clear to
+resubmit (resubmitted 2026-07-12).
+
+The pkgdown site is live at https://mohammedalisharafuddin.github.io/surveyframe/
+(published 2026-07-12, built and deployed automatically by
+`.github/workflows/pkgdown.yaml` on every push to `main`). Building it
+surfaced and fixed two real problems, not just cosmetic ones: building
+pkgdown from the `dev` branch renders dev-only planning files (CLAUDE.md,
+dogfeed.todo.md, mas_review_03x.md, revision_todo_0.3.md) into public HTML,
+since `.Rbuildignore` has no effect on pkgdown (only `R CMD build` respects
+it) — pkgdown must always be built from `main`. Separately, a genuine live
+leak was found and fixed: `revision_todo_0.3.md`/`.html`, `roadmap.md`/`.html`,
+and `todo.md` had been sitting on the public `gh-pages` branch since some
+earlier deploy, surviving every subsequent rebuild because the deploy
+action used `clean: false` (only adds/updates files, never removes ones no
+longer produced). Switched to `clean: true`; verified the live branch now
+matches the build output exactly. A follow-up SEO/GEO pass also fixed a
+duplicated browser-tab title, switched `og:image` from SVG (most social
+crawlers do not render SVG previews) to PNG, added JSON-LD structured data,
+added `robots.txt`, and gave the small-sample textbook reference in README a
+full citation with its Zenodo DOI.
 
 After 0.3.3 comes the remaining visualisation patch arc 0.3.5-0.3.9 (the
 foundation shipped early inside 0.3.3, so five ~21-day releases remain: effect-size
@@ -233,19 +252,21 @@ surveyframe-jss-paper (see that repo's own CLAUDE.md), and was updated
 2026-07-11 for 0.3.3: version references bumped, the live SSR 6.0 DOI cited,
 all six figures retaken against the redesigned survey and current
 SurveyBuilder UI, and a previously unaddressed editor checklist item (a
-non-interactive response-collection demonstration) finally closed. **0.3.3 is
-now accepted on CRAN, so the manuscript is clear to resubmit** once the
-package page shows the new version live.
+non-interactive response-collection demonstration) finally closed.
+**Resubmitted to JSS 2026-07-12** once the CRAN package page confirmed
+0.3.3 live.
 
 Open items (non-blocking for CRAN submission):
 
 - Confirm or remove the Codecov badge in README.
-- Trigger pkgdown build now that 0.3.3 is accepted.
 - Guard `launch_dashboard()` and similar Shiny launcher `\donttest` examples so a
   full check does not hang; this is a future patch, not a 0.3.3 blocker.
 - The pre-existing Quarto/pandoc `kable()` table-collapsing bug found during
   the 0.3.3 review (confirmed unrelated to this release's changes, not
   reproducible in isolated minimal tests) remains open for a future session.
+- A vignette-specific WCAG 2.2 AA CSS pass is logged in roadmap.md under
+  v0.3.4 (the pkgdown theme fixed the "dull" look, but contrast/heading
+  structure has not been separately checked).
 
 The full task list is in `revision_todo_0.3.md`. The version and growth plan is
 in `roadmap.md`.
@@ -288,15 +309,31 @@ fixing anything.
 
 ## Continuation prompts (paste to resume a thread of work)
 
-### 0.3.3 is accepted on CRAN; resume the JSS resubmission
+### Vignette WCAG 2.2 AA CSS pass (logged for v0.3.4)
 
 ```
-Read CLAUDE.md. surveyframe 0.3.3 was accepted by CRAN on 2026-07-11 (the
-auto-check confirmation arrived the same day it was submitted). Confirm the
-CRAN package page (https://CRAN.R-project.org/package=surveyframe) shows
-0.3.3 live, then move to ../surveyframe-jss-paper: read that repo's own
-CLAUDE.md and run its "Final pre-submission check" continuation prompt
-before resubmitting to JSS.
+Read CLAUDE.md and roadmap.md's v0.3.4 section. The pkgdown site (live at
+https://mohammedalisharafuddin.github.io/surveyframe/) already fixed the
+"dull default vignette" look by wrapping vignettes in the branded pkgdown
+theme. What has not been checked is AA contrast and heading structure on
+the vignette content itself. Do that pass: check contrast ratios on code
+blocks, tables, and body text against the bslib theme colours, verify
+heading order, and fix anything that fails, on main since docs/ and the
+pkgdown build are unaffected.
+```
+
+### Trigger the pkgdown workflow after any future dev-only file addition
+
+```
+Read CLAUDE.md. Before adding any new dev-only planning file (following the
+pattern of CLAUDE.md, roadmap.md, dogfeed.todo.md, mas_review_03x.md,
+revision_todo_0.3.md, cran-comments.md), confirm it is excluded on main
+(gitignored there) so a pkgdown build never has it in its working tree.
+pkgdown must only ever be built from main, never dev: .Rbuildignore
+protects the CRAN tarball but has no effect on pkgdown, which reads
+straight off the working tree. If in doubt, rebuild locally on main first
+(pkgdown::build_site(preview = FALSE)) and grep docs/ for the new file's
+name before pushing.
 ```
 
 ### Start the v0.5 MCDM work
