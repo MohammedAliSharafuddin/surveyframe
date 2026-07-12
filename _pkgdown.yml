@@ -9,12 +9,36 @@ template:
     base_font: {google: "Inter"}
     heading_font: {google: "Inter"}
     code_font: {google: "JetBrains Mono"}
+  opengraph:
+    image:
+      src: man/figures/pkgdown-wordmark-tagline.png
+      alt: "surveyframe: From research design to reporting"
+  includes:
+    in_header: |
+      <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "SoftwareSourceCode",
+        "name": "surveyframe",
+        "description": "Survey instrument workflows for R. Define instruments, design them visually, deploy surveys, check data quality, score scales, run psychometric diagnostics, and generate reproducible reports from one source object.",
+        "codeRepository": "https://github.com/MohammedAliSharafuddin/surveyframe",
+        "programmingLanguage": "R",
+        "license": "https://opensource.org/licenses/MIT",
+        "softwareVersion": "0.3.3",
+        "downloadUrl": "https://CRAN.R-project.org/package=surveyframe",
+        "author": {
+          "@type": "Person",
+          "name": "Mohammed Ali Sharafuddin",
+          "@id": "https://orcid.org/0000-0001-5247-2964"
+        }
+      }
+      </script>
 
 # man/figures/logo.png is picked up automatically by pkgdown.
 # Favicons are in pkgdown/favicons/ and picked up by pkgdown >= 2.0.
 
 home:
-  title: "surveyframe"
+  title: "Proactive Survey Research Workflows for R"
   description: >
     Survey instrument workflows for R.
     Define instruments, design them visually, deploy surveys,
