@@ -327,11 +327,14 @@ citation("surveyframe")
 
 ## Related resources
 
-- Quantitative Analysis with Small Samples, a companion textbook on
-  statistical inference when sample sizes are small:
-  <https://flairmi.com/textbooks/smallsamplelab.html>. It describes the
-  small-sample methods that surveyframe will add in v0.4 and when to
-  prefer each one.
+- Sharafuddin, M. A., Jaleel, A. A., and Madhavan, M. (2026).
+  *Quantitative Analysis with Small Samples: A Practical Guide for
+  Students and Early-Career Researchers* (Version 0.1.0) \[Book\].
+  Zenodo. <https://doi.org/10.5281/zenodo.20221929>. A companion
+  textbook on statistical inference when sample sizes are small, also
+  available at <https://flairmi.com/textbooks/smallsamplelab.html>. It
+  describes the small-sample methods that surveyframe will add in v0.4
+  and when to prefer each one.
 
 ## License
 
