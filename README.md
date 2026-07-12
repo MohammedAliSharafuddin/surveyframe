@@ -1,4 +1,4 @@
-<img src="man/figures/readme-logo.png" align="right" width="220" alt="surveyframe" />
+<img src="man/figures/readme-logo.png" align="right" width="220" alt="surveyframe" style="margin-top: 2rem;" />
 
 # surveyframe
 
