@@ -1,6 +1,6 @@
 # surveyframe roadmap (0.3 through 1.0)
 
-Last updated: 2026-06-13.
+Last updated: 2026-07-14.
 
 This roadmap stages surveyframe from the current CRAN release to v1.0, the
 version that anchors the launch of Ethos, Ethos Pro, and the ASRDA textbook.
@@ -19,8 +19,10 @@ Principles:
   rest of the chain lands as one block at v0.8 and v0.9, the capstone before
   the v1.0 API freeze. Nothing integrity-related lands in v0.4 through v0.7.
   See "Integrity and provenance: one track" below.
-- The 0.3.4 to 0.3.8 visualisation arc runs on a strict ~21-day patch cadence
-  between 0.3.3 and 0.4 (the foundation patch merged into 0.3.3 on 2026-07-10). Hard Imports stay unchanged; new packages are
+- The 0.3.4 to 0.3.5 visualisation arc runs as two ~30-day patch releases
+  between 0.3.3 and 0.4 (the foundation patch merged into 0.3.3 on 2026-07-10,
+  and the five remaining patches were consolidated into two releases on
+  2026-07-14). Hard Imports stay unchanged; new packages are
   Suggests-only and guarded; every new capability is opt-in; the existing test
   suite is not modified.
 - Analytical capability ships first (v0.4 to v0.7) to drive the applied papers
@@ -46,10 +48,11 @@ package build.
 
 ## Release schedule (45-day cycles)
 
-Minors run on a 45-day cadence. The 0.3.3 to 0.3.8 patches run on a ~21-day
-cadence. Dates are targets, not contracts, anchored to the 0.3.2 ship date
-(2026-07-04). If a release slips, shift the rest by the slip and record why in
-`portfolio-planner/decisions.md`.
+Minors run on a 45-day cadence. The 0.3.4 and 0.3.5 patches run on a ~30-day
+cadence, consolidated on 2026-07-14 from the five remaining ~21-day patches so
+the arc ends 53 days sooner and every later release pulls earlier by the same
+amount. Dates are targets, not contracts. If a release slips, shift the rest by
+the slip and record why in `portfolio-planner/decisions.md`.
 
 | Version | Theme | Target |
 |---|---|---|
@@ -57,19 +60,16 @@ cadence. Dates are targets, not contracts, anchored to the 0.3.2 ship date
 | 0.3.1 | Stability and onboarding | done 2026-06-02 |
 | 0.3.2 | Maintenance: CITATION fix, JSS-required package changes, doc pass | 2026-07-04 |
 | 0.3.3 | Real-world embedding and conference feedback (AIC-RSAM, ICSRI 2026) plus the visualisation foundation (ggplot2 in Suggests, brand theme, `plots = TRUE`, first family plots, `$table` on inferential runners) and the Theme B survey redesign. Merged from the planned 0.3.3 and 0.3.4 on 2026-07-10 | implemented 2026-07-09, release pending |
-| 0.3.4 | Visualisation breadth: regression, EFA, reliability, categorical, correlation-matrix plots; `plot()` S3 on report objects | 2026-08-15 |
-| 0.3.5 | Plots into the surfaces: `render_report()`, dashboard charts, studio plot area | 2026-09-05 |
-| 0.3.6 | Effect-size confidence intervals: base-R bootstrap (`bootstrap_ci`, `cohens_d_ci`, `cramers_v_ci`, `eta_sq_ci`) | 2026-09-26 |
-| 0.3.7 | Psychometric depth: Henseler HTMT, real Little's MCAR via naniar, omega and EFA polish | 2026-10-17 |
-| 0.3.8 | Report polish and PDF: `render_report(format = "pdf")` via pagedown, theming, accessibility, codebook upgrades | 2026-11-07 |
-| 0.4 | Small-sample inference plus the RStudio add-in | 2027-01-12 |
-| 0.4.1 | Faculty demo proofing: demo session to college faculty, then UI/UX and doc fixes | 2027-02-02 |
-| 0.5 | MCDM and DEMATEL | 2027-03-19 |
-| 0.6 | SEM and PLS execution, invariance | 2027-05-03 |
-| 0.7 | Text and open-ended response analysis | 2027-06-17 |
-| 0.8 | Provenance part 1: `sf_version`, `sf_review`, `sf_pilot`, response hashing (SHA Layers 2-3) | 2027-08-01 |
-| 0.9 | Provenance part 2: `sf_bundle`, `verify_bundle`, manifest, sfReport (SHA Layers 4-5) | 2027-09-15 |
-| 1.0 | Integration contract, AI and agentic layer, JASP/jamovi export, API freeze, Merkle root and DOI archival, launch at SaaS parity | 2027-12-14 |
+| 0.3.4 | All plotting and UI work: visualisation breadth (regression, EFA, reliability, categorical, correlation-matrix plots, `plot()` S3 on report objects), plots into the surfaces (`render_report()`, dashboard charts, studio plot area), the builder rework, the vignette WCAG 2.2 AA pass. Merged from the former 0.3.4 and 0.3.5 on 2026-07-14 | 2026-08-15 |
+| 0.3.5 | All statistics and reporting: effect-size confidence intervals (base-R bootstrap `bootstrap_ci`, `cohens_d_ci`, `cramers_v_ci`, `eta_sq_ci`), psychometric depth (Henseler HTMT, real Little's MCAR via naniar, omega and EFA polish), report polish and PDF (`render_report(format = "pdf")` via pagedown, theming, accessibility, codebook upgrades). Merged from the former 0.3.6 to 0.3.8 on 2026-07-14 | 2026-09-15 |
+| 0.4 | Small-sample inference plus the RStudio add-in | 2026-11-20 |
+| 0.4.1 | Faculty demo proofing: demo session to college faculty, then UI/UX and doc fixes | 2026-12-11 |
+| 0.5 | MCDM and DEMATEL | 2027-01-25 |
+| 0.6 | SEM and PLS execution, invariance | 2027-03-11 |
+| 0.7 | Text and open-ended response analysis | 2027-04-25 |
+| 0.8 | Provenance part 1: `sf_version`, `sf_review`, `sf_pilot`, response hashing (SHA Layers 2-3) | 2027-06-09 |
+| 0.9 | Provenance part 2: `sf_bundle`, `verify_bundle`, manifest, sfReport (SHA Layers 4-5) | 2027-07-24 |
+| 1.0 | Integration contract, AI and agentic layer, JASP/jamovi export, API freeze, Merkle root and DOI archival, launch at SaaS parity | 2027-10-22 |
 
 ---
 
@@ -190,7 +190,11 @@ correlation, regression, t-test, Mann-Whitney, ANOVA, and Kruskal-Wallis
 runners. Plots verified visually against the AIC-RSAM simulated data.
 519/519 tests pass.
 
-### v0.3.4 — Visualisation breadth and the builder rework (target 2026-08-15)
+### v0.3.4 — All plotting and UI work (target 2026-08-15)
+
+Consolidated 2026-07-14: this release merges the former 0.3.4 (visualisation
+breadth and the builder rework) with the former 0.3.5 (plots into the
+surfaces), so all remaining plotting and UI work ships as one ~30-day patch.
 
 Second track added 2026-07-10 from the 0.3.3 MAS review (owner decision:
 quick wins shipped in 0.3.3, the rework lands here): a complete
@@ -234,9 +238,10 @@ not-yet-scoped feature area). The 0.3.3 quick win already removed the
 top-bar Settings button that duplicated the sidebar's; this task is the
 full consolidation, not just deduplication.
 
-Headline: coverage across all analysis families and S3 `plot()` on report objects.
+Headline: coverage across all analysis families, S3 `plot()` on report
+objects, plots in every rendering surface, and the builder rework.
 
-Deliverables:
+Deliverables (visualisation breadth):
 - Regression diagnostic plots (residuals, Q-Q, scale-location, leverage).
 - EFA scree plot and loadings heatmap.
 - Reliability plot (alpha and omega by scale).
@@ -245,20 +250,23 @@ Deliverables:
 - `plot.quality_report()`, `plot.reliability_report()`, `plot.efa_report()` S3
   methods that dispatch to the family-specific plots.
 
-### v0.3.5 — Plots into the surfaces (target 2026-09-05)
-
-Headline: plots appear automatically in all rendering surfaces.
-
-Deliverables:
+Deliverables (plots into the surfaces):
 - `render_report()` embeds family plots for each section when ggplot2 is present.
 - Dashboard chart panels replaced with ggplot2 equivalents.
 - SurveyStudio plot area wired to the new S3 methods.
 
-### v0.3.6 — Effect-size confidence intervals (target 2026-09-26)
+### v0.3.5 — Statistics and reporting (target 2026-09-15)
 
-Headline: every effect-size statistic ships with an interval, base R only.
+Consolidated 2026-07-14: this release merges the former 0.3.6 (effect-size
+confidence intervals), 0.3.7 (psychometric depth), and 0.3.8 (report polish
+and PDF) into one ~30-day patch. It is the last patch before the analytical
+themes. ICSRI 2026 audience feedback (conference 8-9 August 2026) folds in
+here if it needs package fixes, so it no longer needs its own follow-up patch.
 
-Deliverables:
+Headline: every effect-size statistic ships with an interval, the known
+psychometric gaps close, and the report surface is complete with PDF output.
+
+Deliverables (effect-size confidence intervals, base R only):
 - `bootstrap_ci()`: percentile bootstrap CI for the median, no new hard dependency.
 - `cohens_d_ci()`: Cohen's d interval from the noncentral t distribution.
 - `cramers_v_ci()`: Cramer's V interval via bootstrap.
@@ -266,23 +274,14 @@ Deliverables:
 - Each inferential runner that returns an effect size now populates a `$ci`
   slot in its result.
 
-### v0.3.7 — Psychometric depth (target 2026-10-17)
-
-Headline: HTMT, real MCAR testing, and omega polish.
-
-Deliverables:
+Deliverables (psychometric depth):
 - Henseler HTMT discriminant validity index added to `validity_report()`.
 - Real Little's MCAR test via naniar (in Suggests, guarded).
 - Omega polish: `reliability_report(omega = TRUE)` is more robust and prints
   a clearer comparison of alpha and omega.
 - EFA polish: parallel analysis displayed alongside VSS in `efa_report()`.
 
-### v0.3.8 — Report polish and PDF (target 2026-11-07)
-
-Headline: the last patch before the analytical themes. The report surface is
-complete and PDF output is available.
-
-Deliverables:
+Deliverables (report polish and PDF):
 - `render_report(format = "pdf")` via pagedown (in Suggests, guarded).
 - APA table theming: consistent horizontal rules, caption placement, and font
   sizing across all report sections.
@@ -304,7 +303,7 @@ idea (full assessment in mas_review_033.md):
 - Runtime label piping (glue-style tokens): in tension with the immutable
   hashed-instrument guarantee; recorded as a research question only.
 
-### v0.4 — Small-sample inference plus the RStudio add-in (target 2027-01-12)
+### v0.4 — Small-sample inference plus the RStudio add-in (target 2026-11-20)
 
 Headline: trustworthy analysis when n is below thirty, plus an IDE surface.
 
@@ -331,7 +330,7 @@ Exit criteria: a study with n < 30 can run the plan and receive method-choice
 guidance plus a small-sample-appropriate result with interval coverage notes.
 The RStudio add-in installs and registers correctly on CRAN.
 
-### v0.4.1 — Faculty demo proofing (target 2027-02-02)
+### v0.4.1 — Faculty demo proofing (target 2026-12-11)
 
 Headline: a live demo session to college faculty, then UI/UX and documentation
 fixes based on that session's feedback.
@@ -340,7 +339,7 @@ This patch applies real-world adoption feedback from faculty who are not
 package authors. Strict patch scope: no new analytical features or exports.
 The faculty demo is the proofing mechanism, not a deliverable.
 
-### v0.5 — MCDM and DEMATEL (target 2027-03-19)
+### v0.5 — MCDM and DEMATEL (target 2027-01-25)
 
 Headline: bring multi-criteria decision making into the survey workflow.
 
@@ -362,7 +361,7 @@ Exit criteria: an instrument can declare an MCDM research question, collect the
 matrix data, and run the plan to a ranked result with a defensible report
 section. No new hard dependencies.
 
-### v0.6 — Structural model execution (target 2027-05-03)
+### v0.6 — Structural model execution (target 2027-03-11)
 
 Headline: move from syntax generation to fitted models, and connect screening.
 
@@ -380,7 +379,7 @@ Deliverables:
 Exit criteria: an sframe measurement model can be screened, fitted, and reported
 end to end, with invariance results, using optional packages.
 
-### v0.7 — Text and open-ended response analysis (target 2027-06-17)
+### v0.7 — Text and open-ended response analysis (target 2027-04-25)
 
 Headline: structured analysis of open-ended and free-text survey responses.
 
@@ -401,7 +400,7 @@ Exit criteria: an instrument with open-ended items can declare a text research
 question, run the plan, and receive term frequencies, themes, representative
 quotes, and a defensible report section. No new hard dependency.
 
-### v0.8 — Provenance layer, part one (target 2027-08-01)
+### v0.8 — Provenance layer, part one (target 2027-06-09)
 
 Headline: give the instrument a lifecycle and a review trail.
 
@@ -424,7 +423,7 @@ Exit criteria: an instrument can carry a versioned history with review and pilot
 evidence that survives save and reload, and a response file is bound to the
 instrument version by an aggregate hash.
 
-### v0.9 — Provenance layer, part two, and reporting (target 2027-09-15)
+### v0.9 — Provenance layer, part two, and reporting (target 2027-07-24)
 
 Headline: tamper-evident bundles and a Quarto-native report.
 
@@ -444,7 +443,7 @@ Exit criteria: a study can produce a single verifiable bundle and a Quarto
 report that cites the instrument version and the textbook chapter behind each
 method.
 
-### v1.0 — Integration, AI layer, and launch (target 2027-12-14)
+### v1.0 — Integration, AI layer, and launch (target 2027-10-22)
 
 Headline: the version that the products and textbook are built on, at
 commercial-SaaS feature parity. This release merges the former
@@ -492,8 +491,8 @@ the commercial SaaS bar that the products are sold against.
 
 No integrity work ships in v0.3.4 through v0.7. Layers 2 to 5 land together at
 v0.8 and v0.9. The SSR 6.0 paper is submitted after the v0.9 CRAN release
-(around 2027 Q1 to Q2) so it describes a shipped five-layer framework rather
-than a proposal.
+(now 2027-07-24, so around 2027 Q3) so it describes a shipped five-layer
+framework rather than a proposal.
 
 | SSR 6.0 layer | What ships | surveyframe version |
 |---|---|---|
@@ -532,7 +531,7 @@ ch 32 (machine learning), Part XIII ch 36 (IRT) and ch 38 (meta-analysis).
 | surveyframe | Methodology paper |
 |---|---|
 | 0.3 | JSS software paper (OJS 6454, submitted 2026-06-02; returned without full review 2026-06; revise and resubmit). Plus the v0.3 design paper (not yet started). |
-| 0.3.4 to 0.3.9 | No separate paper. The visualisation arc is patch work. Plots feed figures in every later methodology paper and in ASRDA ch 17. |
+| 0.3.4 to 0.3.5 | No separate paper. The visualisation arc is patch work. Plots feed figures in every later methodology paper and in ASRDA ch 17. |
 | 0.4 | Small-sample survey inference paper (smallsamplelab), draft exists. |
 | 0.5 | MCDM and DEMATEL methodology paper, not started. |
 | 0.6 | semScreenR package and SEM-screening methodology paper, not started. |
@@ -601,7 +600,7 @@ ch 32 (machine learning), Part XIII ch 36 (IRT) and ch 38 (meta-analysis).
 
 - **Ethos** and **Ethos Pro** treat surveyframe as the source-of-truth engine.
   They need the frozen integration contract and the provenance layer. They launch
-  at surveyframe 1.0 (2027-12-14).
+  at surveyframe 1.0 (2027-10-22).
 - **ASRDA textbook** complete edition matches v1.0 capability and cites the JSS
   paper.
 - The Ethos build train runs one cycle behind surveyframe. Each Ethos milestone
