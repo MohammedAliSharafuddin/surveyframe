@@ -57,10 +57,13 @@ crawlers do not render SVG previews) to PNG, added JSON-LD structured data,
 added `robots.txt`, and gave the small-sample textbook reference in README a
 full citation with its Zenodo DOI.
 
-After 0.3.3 comes the remaining visualisation patch arc 0.3.5-0.3.9 (the
-foundation shipped early inside 0.3.3, so five ~21-day releases remain: effect-size
-confidence intervals, psychometric depth, PDF reporting), then 0.4
-(small-sample inference). 0.4.1 is the faculty demo proofing release. The
+After 0.3.3 comes the remaining visualisation patch arc, consolidated on
+2026-07-14 into two ~30-day releases: 0.3.4 (target 2026-08-15) ships all
+plotting and UI work (visualisation breadth, plots into the report, dashboard,
+and studio, the builder rework, the vignette WCAG pass), and 0.3.5 (target
+2026-09-15) ships effect-size confidence intervals, psychometric depth, and
+PDF reporting. Then 0.4 (small-sample inference, target 2026-11-20). 0.4.1 is
+the faculty demo proofing release. The
 canonical schedule is portfolio-planner master_roadmap.md.
 
 ---
