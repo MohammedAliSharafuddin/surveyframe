@@ -500,7 +500,7 @@ framework rather than a proposal.
 | 2 Pre-registration and version | `sf_version()` content-hash version chain and lifecycle states | 0.8 |
 | 3 Response | per-row and aggregate response hash in `read_responses()` | 0.8 |
 | 4 Analysis and reporting | analysis and report hashing, `sf_report()` provenance appendix | 0.9 |
-| 5 Verification manifest | `sf_bundle()` and `verify_bundle()` cross-component manifest | 0.9 |
+| 5 Verification manifest | `sf_bundle()` and `verify_bundle()` chained cross-component manifest (Merkle-style, not sorted-then-concatenated as of 2026-07-14; see portfolio-planner `07_v08_v09_implementation.md`) | 0.9 |
 
 ---
 
@@ -536,7 +536,7 @@ ch 32 (machine learning), Part XIII ch 36 (IRT) and ch 38 (meta-analysis).
 | 0.5 | MCDM and DEMATEL methodology paper, not started. |
 | 0.6 | semScreenR package and SEM-screening methodology paper, not started. |
 | 0.7 | Text and open-ended analysis methodology paper, not started. |
-| 0.8 and 0.9 | Covered by the SSR 6.0 proof-of-integrity paper (submitted post-0.9). |
+| 0.8 and 0.9 | Covered by three papers, in submission order: SSR 6.0 (proof-of-integrity, submitted post-0.9, unchanged as of the 2026-07-14 scope decision), then MethodsX (sframe-schema standard, standalone repo `sframe-schema`), then JOI (informetrics framing of the Derivative Citation Model). MethodsX and JOI added 2026-07-14; both cite SSR 6.0 rather than duplicating it. |
 | 1.0 | AI and agentic layer methodology paper, not started. |
 
 ---
