@@ -23,6 +23,7 @@ params:
   include_missing:     true
   include_descriptives: true
   include_models:      true
+  plot_palette:        "web"
   instrument_hash:     ""
 execute:
   echo:    false
@@ -305,7 +306,8 @@ if (!has_data) {
 } else {
   results <- tryCatch(
     run_analysis_plan(responses, instrument,
-                      plots = requireNamespace("ggplot2", quietly = TRUE)),
+                      plots = requireNamespace("ggplot2", quietly = TRUE),
+                      plot_palette = params$plot_palette %||% "web"),
     error=function(e) NULL)
   if (is.null(results)) {
     cat("Analysis plan could not be executed. Check that variable names match response columns.\n\n")

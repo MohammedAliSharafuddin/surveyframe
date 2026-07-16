@@ -744,7 +744,10 @@ sframe_run_descriptives_result <- function(data, roles, options = list()) {
     conf_level = options$conf_level %||% 0.95,
     weights = weights
   )
-  c(unclass(out), list(test = "descriptives"))
+  # report_obj keeps the classed object for sframe_plot_for_result() to
+  # dispatch plot() on, same pattern as sframe_result_from_report() elsewhere:
+  # the unclassed, merged result list is not safe to treat as report-shaped.
+  c(unclass(out), list(test = "descriptives", report_obj = out))
 }
 
 sframe_run_missing_result <- function(data, instrument, roles) {
