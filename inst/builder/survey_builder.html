@@ -11,7 +11,9 @@
   --cd:#dc2626;--cd-l:#fee2e2;--cs:#16a34a;
   --cw:#d97706;--cw-l:#fef3c7;
   --cf:#fff;--cg:#f1f5f9;--cb:#e2e8f0;
-  --t1:#0f172a;--t2:#475569;--t3:#94a3b8;
+  /* --t3 sits on white and #f1f5f9 surfaces only (the dark sidebar has its
+     own --st tokens); #5b6b80 keeps >=4.5:1 on both (WCAG 2.2 AA). */
+  --t1:#0f172a;--t2:#475569;--t3:#5b6b80;
   --sb:#1e293b;--st:#cbd5e1;--sh:#2d3f57;--sa:#3b82f6;
   --font:"Segoe UI",system-ui,-apple-system,sans-serif;
   --th:48px;--sw:224px;--iw:320px;
@@ -54,7 +56,9 @@ input,textarea,select{font-family:inherit;font-size:13px}
 .tb-hist button:hover:not(:disabled){background:var(--cg);color:var(--t1)}
 .tb-hist button:disabled{opacity:.3;cursor:not-allowed}
 .save-st{font-size:11px;color:var(--t3)}
-.save-st.dirty{color:var(--cw)}.save-st.saved{color:var(--cs)}
+/* Darker than the shared --cw/--cs tokens: this is 11px text on white,
+   which needs >=4.5:1 (WCAG 2.2 AA). */
+.save-st.dirty{color:#b45309}.save-st.saved{color:#15803d}
 
 /* -- Buttons -------------------------------------------------------------- */
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:5px;
@@ -496,7 +500,7 @@ textarea.pv-inp:focus{border-color:var(--pvc);
 .rqs-body{flex:1;overflow-y:auto;padding:14px}
 .an-mid-caption{padding:8px 14px;font-size:11px;line-height:1.5;color:var(--t3);background:var(--cg);border-bottom:1px solid var(--cb)}
 .an-mid-caption:empty{display:none}
-.an-mid-caption code{font-size:10px;background:var(--cb);padding:1px 4px;border-radius:4px}
+.an-mid-caption code{font-size:10px;background:var(--cb);color:var(--t2);padding:1px 4px;border-radius:4px}
 .rq-card{background:var(--cf);border:1.5px solid var(--cb);border-radius:10px;
   padding:14px;margin-bottom:10px;cursor:pointer;transition:border-color var(--d1)}
 .rq-card.rq-drag .rq-num{cursor:grab}
@@ -547,6 +551,16 @@ textarea.pv-inp:focus{border-color:var(--pvc);
 .rs-fig-ic{font-size:20px;opacity:.5}
 .rs-fig-cap{font-size:10px;font-style:italic}
 .rs-refs{font-size:11px;color:var(--t2);line-height:1.7}
+/* Inline decision-rule editing in the outline: writes back to the plan
+   block, same field the RQ modal edits. */
+.rs-interp{margin-bottom:10px}
+.rs-interp-lbl{display:block;font-size:10px;text-transform:uppercase;
+  letter-spacing:.04em;color:var(--t3);font-weight:600;margin-bottom:3px}
+.rs-interp textarea{width:100%;font-size:11px;color:var(--t2);
+  background:var(--cf);border:1px solid var(--cb);border-radius:6px;
+  padding:7px 9px;resize:vertical;min-height:40px;font-family:inherit;
+  line-height:1.5}
+.rs-interp textarea:focus{outline:2px solid var(--cp);outline-offset:1px}
 /* suggestion box */
 .suggest-box{background:#eff6ff;border:1px solid #bfdbfe;border-radius:6px;
   padding:8px 12px;font-size:12px;color:#1e40af;margin-top:4px;
@@ -809,7 +823,7 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
       </div>
       <div class="frow">
         <div class="field"><label class="fl" for="s-submit">Submit label</label><div class="fc"><input type="text" id="s-submit"></div></div>
-        <div class="field"><label class="fl" for="s-theme">Theme colour</label><div class="fc color-row"><input type="color" id="s-theme-picker" value="#2563eb" oninput="syncThemeFromPicker()"><input type="text" id="s-theme" placeholder="#2563eb" oninput="syncThemeFromText()"></div></div>
+        <div class="field"><label class="fl" for="s-theme">Theme colour</label><div class="fc color-row"><input type="color" id="s-theme-picker" value="#2563eb" aria-label="Theme colour picker" oninput="syncThemeFromPicker()"><input type="text" id="s-theme" placeholder="#2563eb" oninput="syncThemeFromText()"></div></div>
       </div>
     </div>
     <div class="stp" id="sp-welcome">
@@ -1482,7 +1496,11 @@ function renderTextarea(item){
 }
 function renderDate(item){
   var saved=responses[item.id]||'';
-  return'<input type="date" class="inp-std inp-narrow" id="inp_'+esc(item.id)+'" value="'+esc(saved)+'"'+ariaFor(item)
+  // date_min/date_max limit the native picker; typed dates are re-checked
+  // in validatePage since the picker bounds do not block manual entry.
+  var mn=item.date_min?' min="'+esc(item.date_min)+'"':'';
+  var mx=item.date_max?' max="'+esc(item.date_max)+'"':'';
+  return'<input type="date" class="inp-std inp-narrow" id="inp_'+esc(item.id)+'" value="'+esc(saved)+'"'+mn+mx+ariaFor(item)
     +' onchange="setResp(\''+esc(item.id)+'\',this.value)">';
 }
 function renderSlider(item){
@@ -1610,6 +1628,25 @@ function rankMove(itemId,v,dir){
 // ── Validation ─────────────────────────────────────────────────────────────
 function validatePage(items){
   var ok=true;
+  // An answered date outside its declared bounds is an error even on a
+  // non-required item, because manual typing bypasses the picker limits.
+  items.forEach(function(item){
+    if(item.type!=='date'||!isVisible(item.id))return;
+    var v=responses[item.id];
+    if(!v)return;
+    var msg='';
+    if(item.date_min&&v<item.date_min)msg='Please pick a date on or after '+item.date_min+'.';
+    if(item.date_max&&v>item.date_max)msg='Please pick a date on or before '+item.date_max+'.';
+    if(msg){
+      var err=document.getElementById('err_'+item.id);
+      if(err){err.textContent=msg;err.classList.add('show');}
+      if(ok){
+        var el=document.getElementById('item_'+item.id);
+        if(el)el.scrollIntoView({behavior:'smooth',block:'center'});
+      }
+      ok=false;
+    }
+  });
   items.forEach(function(item){
     if(!item.required||!isVisible(item.id))return;
     var t=item.type;
@@ -2391,6 +2428,7 @@ function renderInspBody(item){
     (item.type==='matrix'?fld('Matrix row labels',ta('fi-mrows',(item.matrix_items||[]).join('\n'),'One label per line'),'One per line.'):'') +
     (item.type==='slider'?'<div class="frow">'+fld('Min',inp('fi-smin',item.slider_min||0,'','number'))+fld('Max',inp('fi-smax',item.slider_max||100,'','number'))+fld('Step',inp('fi-sstep',item.slider_step||1,'','number'))+'</div>':'') +
     (item.type==='rating'?'<div class="frow">'+fld('Max stars',inp('fi-rmax',item.rating_max||5,'','number'))+fld('Icon',sel('fi-ricon',[['star','Star ★'],['heart','Heart ♥']],item.rating_icon||'star'))+'</div>':'') +
+    (item.type==='date'?'<div class="frow">'+fld('Earliest date',inp('fi-dmin',item.date_min||'','','date'))+fld('Latest date',inp('fi-dmax',item.date_max||'','','date'))+'</div>':'') +
     fld('Scale',sel('fi-scale',scO,item.scale_id||''))+
     fld('Page number',inp('fi-page',item.page||'','Leave blank','number'),'Group items across pages.')
   );
@@ -2402,7 +2440,7 @@ function renderInspBody(item){
   );
   document.getElementById('inspBody').innerHTML=identity+config+options;
 }
-var FMAP={'fi-lbl':'label','fi-intro':'section_intro','fi-type':'type','fi-cs':'choice_set','fi-scale':'scale_id','fi-help':'help','fi-ph':'placeholder','fi-req':'required','fi-rev':'reverse','fi-smin':'slider_min','fi-smax':'slider_max','fi-sstep':'slider_step','fi-rmax':'rating_max','fi-ricon':'rating_icon','fi-page':'page','fi-mrows':'matrix_items'};
+var FMAP={'fi-lbl':'label','fi-intro':'section_intro','fi-type':'type','fi-cs':'choice_set','fi-scale':'scale_id','fi-help':'help','fi-ph':'placeholder','fi-req':'required','fi-rev':'reverse','fi-smin':'slider_min','fi-smax':'slider_max','fi-sstep':'slider_step','fi-rmax':'rating_max','fi-ricon':'rating_icon','fi-dmin':'date_min','fi-dmax':'date_max','fi-page':'page','fi-mrows':'matrix_items'};
 function updF(id){
   if(!selId)return;var idx=S.items.findIndex(function(i){return i.id===selId;});if(idx<0)return;
   var el=document.getElementById(id);if(!el)return;
@@ -2411,6 +2449,14 @@ function updF(id){
   if(f==='matrix_items')v=v.split('\n').map(function(s){return s.trim();}).filter(Boolean);
   else if(['slider_min','slider_max','slider_step','rating_max'].includes(f))v=parseFloat(v)||0;
   else if(f==='page')v=v?parseInt(v):null;
+  else if(f==='date_min'||f==='date_max'){
+    v=v||null;
+    // ISO date strings compare correctly as strings.
+    var other=f==='date_min'?S.items[idx].date_max:S.items[idx].date_min;
+    if(v&&other&&(f==='date_min'?v>other:v<other)){
+      toast('Earliest date must not be after the latest date.','err');
+    }
+  }
   else if(f==='choice_set'){
     // A "preset:key" selection materialises the preset into S.choices first.
     if(v&&v.indexOf('preset:')===0)v=ensurePresetChoiceSet(v.slice(7));
@@ -2537,7 +2583,7 @@ function qAdd(type){
       S.choices.push({id:choice,values:['option_1','option_2','option_3'],labels:['Option 1','Option 2','Option 3'],allow_other:false,randomise:false});
     }
   }
-  var item={id:nid,label:defaultLabel(type,n),type:type,required:false,reverse:false,choice_set:choice,scale_id:null,help:null,placeholder:null,matrix_items:null,slider_min:0,slider_max:100,slider_step:1,rating_max:5,rating_icon:'star',section_intro:null,page:null};
+  var item={id:nid,label:defaultLabel(type,n),type:type,required:false,reverse:false,choice_set:choice,scale_id:null,help:null,placeholder:null,matrix_items:null,slider_min:0,slider_max:100,slider_step:1,rating_max:5,rating_icon:'star',date_min:null,date_max:null,section_intro:null,page:null};
   if(type==='matrix')item.matrix_items=['Service quality','Sustainability','Overall experience'];
   if(type==='section_break')item.section_intro='Use this section to introduce the next group of questions.';
   if(type==='text_block')item.label='Add instructions or explanatory text here.';
@@ -2855,11 +2901,11 @@ function renderPreviewItem(item,cm,col){
   if(item.type==='likert')inp='<div class="pv-lik-row">'+((cs?cs.values:[]).map(function(v,i){return'<label class="pv-lik-opt"><input type="radio" name="'+esc(item.id)+'"><span class="pv-lik-num">'+esc(v)+'</span><span class="pv-lik-lbl">'+esc((cs.labels||[])[i]||v)+'</span></label>';})).join('')+'</div>';
   else if(item.type==='single_choice')inp='<div class="pv-opts">'+((cs?cs.values:[]).map(function(v,i){return'<label class="pv-opt"><input type="radio" name="'+esc(item.id)+'"><span>'+esc((cs.labels||[])[i]||v)+'</span></label>';})).join('')+'</div>';
   else if(item.type==='multiple_choice')inp='<div class="pv-opts">'+((cs?cs.values:[]).map(function(v,i){return'<label class="pv-opt"><input type="checkbox"><span>'+esc((cs.labels||[])[i]||v)+'</span></label>';})).join('')+'</div>';
-  else if(item.type==='numeric')inp='<input class="pv-inp" type="number" placeholder="Enter a number" style="max-width:200px">';
-  else if(item.type==='text')inp='<input class="pv-inp" type="text" placeholder="'+esc(item.placeholder||'')+'">';
-  else if(item.type==='textarea')inp='<textarea class="pv-inp" rows="3" placeholder="'+esc(item.placeholder||'')+'"></textarea>';
-  else if(item.type==='date')inp='<input class="pv-inp" type="date" style="max-width:200px">';
-  else if(item.type==='slider')inp='<div class="pv-slider-w"><input type="range" class="pv-slider" min="'+(item.slider_min||0)+'" max="'+(item.slider_max||100)+'"><div class="pv-slider-r"><span>'+esc(item.slider_min||0)+'</span><span>'+esc(item.slider_max||100)+'</span></div></div>';
+  else if(item.type==='numeric')inp='<input class="pv-inp" type="number" placeholder="Enter a number" aria-label="'+esc(item.label)+'" style="max-width:200px">';
+  else if(item.type==='text')inp='<input class="pv-inp" type="text" placeholder="'+esc(item.placeholder||'')+'" aria-label="'+esc(item.label)+'">';
+  else if(item.type==='textarea')inp='<textarea class="pv-inp" rows="3" placeholder="'+esc(item.placeholder||'')+'" aria-label="'+esc(item.label)+'"></textarea>';
+  else if(item.type==='date')inp='<input class="pv-inp" type="date" aria-label="'+esc(item.label)+'" style="max-width:200px"'+(item.date_min?' min="'+esc(item.date_min)+'"':'')+(item.date_max?' max="'+esc(item.date_max)+'"':'')+'>';
+  else if(item.type==='slider')inp='<div class="pv-slider-w"><input type="range" class="pv-slider" min="'+(item.slider_min||0)+'" max="'+(item.slider_max||100)+'" aria-label="'+esc(item.label)+'"><div class="pv-slider-r"><span>'+esc(item.slider_min||0)+'</span><span>'+esc(item.slider_max||100)+'</span></div></div>';
   else if(item.type==='rating')inp='<div class="pv-stars">'+Array.from({length:item.rating_max||5},function(){return item.rating_icon==='heart'?'&#10084;':'★';}).join('')+'</div>';
   else if(item.type==='matrix'&&item.matrix_items&&cs)inp='<div style="overflow-x:auto"><table class="pv-matrix"><thead><tr><th></th>'+cs.labels.map(function(l){return'<th>'+esc(l)+'</th>';}).join('')+'</tr></thead><tbody>'+item.matrix_items.map(function(row){return'<tr><td class="rl">'+esc(row)+'</td>'+cs.values.map(function(v){return'<td><input type="radio" name="'+esc(item.id)+'_'+esc(row)+'"></td>';}).join('')+'</tr>';}).join('')+'</tbody></table></div>';
   else if(item.type==='ranking'&&cs)inp='<div class="pv-ranklist">'+cs.labels.map(function(l){return'<div class="pv-rankitem">'+esc(l)+'<span style="margin-left:auto;color:var(--t3)">&#8942;</span></div>';}).join('')+'</div>';
@@ -2919,6 +2965,17 @@ function renderModelBuilder(){
   from.innerHTML=opts;to.innerHTML=opts;
   list.innerHTML=models.length?models.map(function(m){var paths=(m.structural&&m.structural.paths)||[];return'<div class="model-row"><strong>'+esc(m.id)+'</strong> <span class="vbadge">'+esc(m.type||'model')+'</span><div>'+esc((m.measurement&&m.measurement.constructs||[]).length)+' construct(s), '+esc(paths.length)+' path(s)</div><div class="model-paths">'+(paths.length?paths.map(function(p){return'<span class="vchip">'+esc(p.from+' -> '+p.to)+'</span>';}).join(''):'<span class="rq-no-int">No paths yet.</span>')+'</div></div>';}).join(''):'<div class="rq-no-int">No saved models yet.</div>';
 }
+// Inline decision-rule editing in the Report outline. Writes to the same
+// plan-block fields the RQ modal edits (both names, matching saveRQ), so
+// the modal, the plan cards, and the outline stay one source of truth. No
+// re-render here: the textarea already shows the value, and re-rendering
+// mid-typing would drop focus.
+function updatePlanInterp(id,val){
+  var rq=S.analysis_plan.find(function(r){return r.id===id;});
+  if(!rq)return;
+  rq.decision_rule=val.trim();rq.interpretation=val.trim();
+  setDirty();
+}
 // Report outline tab: a skeleton of the eventual render_report() document —
 // study header, quality and descriptives stubs, then one section per plan
 // with an empty results table and a figure placeholder (the table+plot
@@ -2935,6 +2992,7 @@ function reportSkeletonHtml(plans){
     var method=rq.method||rq.test;
     out+='<div class="rs-h3">3.'+(i+1)+' '+esc(rq.research_question||('Research question '+(i+1)))+'</div>';
     out+='<div class="rs-method">Method: '+esc(TLBLS[method]||method)+(rq.requires_data===false?' (syntax generation only — no result table)':'')+'</div>';
+    out+='<div class="rs-interp"><label class="rs-interp-lbl" for="rsInterp_'+i+'">Planned decision rule (editable)</label><textarea id="rsInterp_'+i+'" rows="2" placeholder="State how the result will answer the research question." oninput="updatePlanInterp(\''+rq.id+'\',this.value)">'+esc(rq.decision_rule||rq.interpretation||'')+'</textarea></div>';
     if(rq.requires_data!==false){
       out+='<table class="rs-tbl"><thead><tr><th>Statistic</th><th>Value</th><th>Interpretation</th></tr></thead><tbody>'+phRow+phRow+'</tbody></table>';
       out+='<div class="rs-fig"><span class="rs-fig-ic">&#128200;</span><span class="rs-fig-cap">Figure 3.'+(i+1)+' — '+esc(TLBLS[method]||method)+' chart, paired with the table above</span></div>';

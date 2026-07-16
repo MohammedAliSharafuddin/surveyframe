@@ -251,3 +251,76 @@ test_that("render_report embeds regression diagnostic panels beside the main cha
   n_images <- lengths(regmatches(html, gregexpr("data:image/png;base64", html)))
   expect_gt(n_images, 30) # item distributions + family plots + 4 diagnostic panels
 })
+
+test_that("plot.sframe_validity_report builds CR and AVE bars by construct", {
+  skip_if_not_installed("ggplot2")
+  vr <- validity_report(list(
+    SAT = c(sat_1 = 0.82, sat_2 = 0.78, sat_3 = 0.74),
+    LOY = c(loy_1 = 0.69, loy_2 = 0.71)
+  ))
+  gg <- plot(vr)
+  expect_s3_class(gg, "ggplot")
+  built <- ggplot2::ggplot_build(gg)
+  # 2 constructs x 2 statistics = 4 bars
+  expect_identical(nrow(built$data[[3]]), 4L)
+  gg_print <- plot(vr, palette = "print")
+  expect_s3_class(gg_print, "ggplot")
+})
+
+test_that("plot.sframe_analysis_results draws attached charts and selects by which", {
+  skip_if_not_installed("ggplot2")
+  demo <- sframe_demo_data()
+  results <- run_analysis_plan(demo$responses, demo$instrument, plots = TRUE)
+
+  # which by RQ number: the first block with a plot returns that ggplot
+  with_plot <- which(vapply(results, function(r) !is.null(r$plot), logical(1)))
+  expect_gt(length(with_plot), 0)
+  gg <- plot(results, which = with_plot[[1]])
+  expect_s3_class(gg, "ggplot")
+
+  # which by block id
+  bid <- results[[with_plot[[1]]]]$block_id
+  expect_s3_class(plot(results, which = bid), "ggplot")
+
+  # default: all charts print and return invisibly, keyed by block id
+  tmp <- tempfile(fileext = ".png")
+  on.exit(unlink(tmp), add = TRUE)
+  grDevices::png(tmp, width = 600, height = 400)
+  all_plots <- plot(results)
+  grDevices::dev.off()
+  expect_identical(length(all_plots), length(with_plot))
+  expect_true(bid %in% names(all_plots))
+
+  # errors: unknown id, out-of-range number, chartless block
+  expect_error(plot(results, which = "no_such_block"), class = "sframe_error")
+  expect_error(plot(results, which = 999), class = "sframe_error")
+  without_plot <- which(vapply(results, function(r) is.null(r$plot), logical(1)))
+  if (length(without_plot) > 0) {
+    expect_error(plot(results, which = without_plot[[1]]), class = "sframe_error")
+  }
+})
+
+test_that("plot.sframe_analysis_results aborts when no charts were requested", {
+  demo <- sframe_demo_data()
+  results <- run_analysis_plan(demo$responses, demo$instrument)
+  expect_error(plot(results), class = "sframe_error")
+})
+
+test_that("plot.sframe_missing_data_report builds a missingness bar chart", {
+  skip_if_not_installed("ggplot2")
+  demo <- sframe_demo_data()
+  resp <- demo$responses
+  item_cols <- vapply(demo$instrument$items, `[[`, character(1), "id")
+  item_cols <- intersect(item_cols, names(resp))
+  resp[[item_cols[1]]][1:5] <- NA
+  mr <- missing_data_report(resp, demo$instrument)
+  gg <- plot(mr)
+  expect_s3_class(gg, "ggplot")
+  expect_s3_class(sframe_plot_missingness(mr, palette = "print"), "ggplot")
+
+  # Nothing missing: the helper declines quietly instead of drawing an
+  # empty chart.
+  mr_clean <- missing_data_report(demo$responses, demo$instrument)
+  none_missing <- all(mr_clean$item_missing$missing_pct == 0)
+  if (none_missing) expect_null(plot(mr_clean))
+})

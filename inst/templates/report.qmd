@@ -24,6 +24,7 @@ params:
   include_descriptives: true
   include_models:      true
   plot_palette:        "web"
+  interpretations_path: ""
   instrument_hash:     ""
 execute:
   echo:    false
@@ -40,6 +41,14 @@ library(knitr)
 instrument <- readRDS(params$instrument_path)
 has_data   <- nzchar(params$data_path) && file.exists(params$data_path)
 responses  <- if (has_data) readRDS(params$data_path) else NULL
+# Written interpretations keyed by analysis-plan block id, supplied by
+# render_report(interpretations = ...). Empty when none were given.
+interps    <- if (nzchar(params$interpretations_path %||% "") &&
+                  file.exists(params$interpretations_path)) {
+  readRDS(params$interpretations_path)
+} else {
+  list()
+}
 ```
 
 ```{=html}
@@ -302,6 +311,9 @@ if (!has_data) {
       cat(sprintf("**Variables:** %s\n\n", paste(rq$variables, collapse = ", ")))
     if (nzchar(rq$interpretation %||% ""))
       cat(sprintf("**Interpretation prompt:** %s\n\n", rq$interpretation))
+    override <- interps[[rq$id %||% ""]] %||% ""
+    if (nzchar(override))
+      cat(sprintf("**Interpretation:** %s\n\n", override))
   }
 } else {
   results <- tryCatch(
@@ -350,8 +362,16 @@ if (!has_data) {
           print(r$plot)
           cat("\n")
         }
-        if (nzchar(r$interpretation %||% ""))
+        override <- interps[[r$block_id %||% r$id %||% ""]] %||% ""
+        if (nzchar(override)) {
+          # A written interpretation renders alongside the pre-declared
+          # decision rule, so the prospective contract stays visible.
+          if (nzchar(r$decision_rule %||% ""))
+            cat(sprintf("\n**Planned decision rule:** %s\n\n", r$decision_rule))
+          cat(sprintf("\n**Interpretation:** %s\n\n", override))
+        } else if (nzchar(r$interpretation %||% "")) {
           cat(sprintf("\n**Interpretation:** %s\n\n", r$interpretation))
+        }
         if (length(r$citations) > 0) {
           cat("**References:**\n\n")
           lapply(r$citations, function(cit) cat(sprintf("- %s\n", cit)))
