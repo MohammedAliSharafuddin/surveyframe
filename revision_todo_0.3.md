@@ -5,6 +5,85 @@ Excluded from the CRAN build (via .Rbuildignore) and from the public repo
 
 ---
 
+## v0.3.4 — In progress (target 2026-08-15, status as of 2026-07-16)
+
+The consolidated all-plotting-and-UI release (former 0.3.4 plus 0.3.5,
+merged 2026-07-14; the statistics and reporting patch is now 0.3.5). The
+canonical scope is portfolio-planner
+`development_instructions/19_v034_v035_implementation.md`. All work below
+sits UNCOMMITTED in the working tree. 562/562 tests pass.
+
+### Done (2026-07-15 and 2026-07-16 sessions)
+
+- Visualisation breadth in `R/plots.R`: regression diagnostics (2x2),
+  EFA scree and loadings heatmap, reliability alpha/omega bars, mosaic
+  and crosstab, correlation-matrix heatmap, quality flag-rate bars, plus
+  beyond-scope additions: skewness/kurtosis chart, group-comparison
+  boxplot (t-test, Mann-Whitney, Kruskal-Wallis, ANOVA), paired slope
+  plot, raw-variable distribution triple (histogram, boxplot, Q-Q).
+- Two colour systems, WCAG-checked: `web` (brand) and `print` (black,
+  grey, white with light fills after the printer-friendliness review).
+  `theme_surveyframe()` now builds on `theme_classic()`.
+- Five `plot()` S3 methods exported: descriptives, efa_report,
+  efa_solution, quality, reliability.
+- `render_report()` embeds plots and the diagnostics grid (base64 PNGs).
+- **Report chart-theme switcher (added 2026-07-16)**: `plot_palette`
+  argument on `run_analysis_plan()` and `render_report()` (both render
+  paths, Quarto param and HTML fallback), surfaced in SurveyStudio's
+  Export screen as a "Chart theme" radio (Colour / Black and white) so
+  the user picks the plot theme when downloading the final report.
+- Builder rework, all four MAS items: Add-question split into four
+  controls, Theme B preview (with `--pvc` theme derivation,
+  conversational eyebrow and progress strip), settings consolidated to
+  one sidebar CTA, Analyse sub-tabs reworked (Run preview is a
+  drag-reorderable queue, Report outline is a document skeleton) with
+  the header nav rebalanced. Fixed a pre-existing `.an-mode`
+  flex-direction layout bug.
+- Live-test fixes (2026-07-16): 14-preset choice-set library
+  (dropdown plus inspector chips), auto-ID regeneration on response-type
+  change with full reference propagation (also fixed `updIdF` orphaning
+  references on manual renames), Analyse two-pane layout with the Model
+  Builder in the left column, animated sample placeholders in the Add
+  Analysis Plan modal (reduced-motion fallback), recovery banner as a
+  floating overlay, matrix/ranking/multiple-choice expansion into
+  `item__sub` variables matching `read_responses()` columns (the parent
+  ids were never real data columns), and the thank-you flow: no forced
+  CSV download, a real "Download my response" button, working
+  `redirect_url`.
+- Test suites: 562/562 R tests; three headless builder suites (27, 25,
+  17 checks) plus a 17-check template submit-flow suite.
+
+### Pending for 0.3.4
+
+- **Editable interpretation in the report flow (owner request
+  2026-07-16)**: the report in SurveyStudio and the HTML builder shows
+  decision rules and interpretation prompts read-only. Wanted: an edit
+  step before export, per research question, in both surfaces. Related
+  to the deferred SurveyStudio results page (plan-driven results view
+  with an editable interpretation field, logged in the 0.3.2 co-review
+  carry-in of `19_v034_v035_implementation.md`); implementing the
+  results page would deliver this for the studio.
+- Two S3 methods from the exit checklist: `plot.sframe_validity_report()`
+  and `plot.sframe_analysis_results()`.
+- SurveyStudio Analyse panel: result cards gain a plot area fed by
+  `run_analysis_plan(plots = TRUE)`.
+- Dashboard chart coverage beyond item/scale charts (quality or
+  missingness panel, correlation heatmap), and the explicit base-R
+  versus ggplot2 reconciliation decision.
+- Date-question minimum and maximum bounds (builder plus template).
+- Deliberate WCAG 2.2 pass across the builder chrome (piecemeal ARIA and
+  focus states landed with the rework, the systematic audit has not).
+- Vignette WCAG 2.2 AA CSS pass: contrast on code blocks, tables, body
+  text, heading-structure verification, `browseVignettes()` flat output.
+- Owner decision: slot in the SurveyStudio results page (on-demand
+  `render_report()` iframe plus quartopad integration) or defer past the
+  arc.
+- Release process: commit the working tree, version bump, NEWS.md,
+  MAS co-review, tarball, `R CMD check --as-cran`, win-builder x2,
+  CRAN submission.
+
+---
+
 ## v0.3.2 — Implemented and signed off (next: CRAN check and submission)
 
 All changes committed. 368/368 tests pass. Vignettes knit clean. Both remotes

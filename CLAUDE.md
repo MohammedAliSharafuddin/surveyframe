@@ -201,6 +201,25 @@ feasibility). The vignette builds offline because the data-collection step uses
 
 ## Current status and immediate next steps
 
+**0.3.4 is in progress (target 2026-08-15, status 2026-07-16).** The work
+sits UNCOMMITTED on the working tree, 562/562 tests pass. Done: the full
+visualisation breadth in `R/plots.R` (all planned family plots plus
+skewness/kurtosis, group-comparison, paired, and variable-distribution
+charts), 2 WCAG-checked colour systems (web brand and print
+black/grey/white) with a `plot_palette` chart-theme switcher threaded
+through `run_analysis_plan()`, `render_report()` (both render paths), and
+a SurveyStudio Export radio, `render_report()` plot embedding, 5 `plot()`
+S3 methods, the complete builder rework (Add-question split, Theme B
+preview, settings consolidation, Analyse sub-tab rework plus two-pane
+layout), the preset choice-set library, the ID-regeneration and
+`item__sub` variable-expansion fixes, and the thank-you download/redirect
+repair. The full done/pending breakdown lives in the v0.3.4 section of
+`revision_todo_0.3.md`. Largest pending blocks: the editable
+interpretation step in the report flow (owner request 2026-07-16), the
+studio Analyse plot area, date bounds, the vignette and builder WCAG
+passes, and the whole release process (commit, version bump, NEWS, MAS
+co-review, CRAN checks).
+
 0.3.1 is published on CRAN (2026-06-02). 0.3.3 is fully implemented (543/543
 tests pass, three vignettes rewritten and knit clean, tarball built, local
 `R CMD check --as-cran` clean at 0/0/0).
