@@ -11,7 +11,9 @@ The consolidated all-plotting-and-UI release (former 0.3.4 plus 0.3.5,
 merged 2026-07-14; the statistics and reporting patch is now 0.3.5). The
 canonical scope is portfolio-planner
 `development_instructions/19_v034_v035_implementation.md`. All work below
-sits UNCOMMITTED in the working tree. 562/562 tests pass.
+is committed: main 221f612 (pushed to origin and public) carries the
+package work, dev 3d8269f (pushed to origin only) carries the planning
+files. 562/562 tests pass.
 
 ### Done (2026-07-15 and 2026-07-16 sessions)
 
@@ -52,35 +54,120 @@ sits UNCOMMITTED in the working tree. 562/562 tests pass.
   `redirect_url`.
 - Test suites: 562/562 R tests; three headless builder suites (27, 25,
   17 checks) plus a 17-check template submit-flow suite.
+- **Editable interpretation step (owner request 2026-07-16, designed
+  and implemented same day, uncommitted)**. As designed: optional
+  `interpretations` argument (named list keyed by plan block id) on
+  `render_report()` and `render_results()`, threaded through the
+  Quarto path as an `interpretations_path` RDS param and through the
+  HTML fallback directly, rendering "Planned decision rule" plus
+  "Interpretation" per overridden block and byte-identical output when
+  NULL. Interpretations never persist into the .sframe. SurveyStudio
+  Export screen gained an Interpretations card (per plan block:
+  question, method, planned rule, live APA result, textarea, values
+  collected at download time via deterministic input ids). The builder
+  Report outline gained an inline decision-rule textarea per RQ,
+  writing back to `decision_rule` and `interpretation` in sync with
+  the RQ modal (`updatePlanInterp()`), builder-only so no template
+  re-inline. Verified: 29-expectation testthat file
+  (`test-v034-interpretations.R`, includes the Quarto round-trip),
+  8-check chromote builder suite, and a full end-to-end studio run
+  (typed an interpretation on the Export screen, clicked Generate,
+  confirmed the text and the rule label in the downloaded Quarto
+  report). Suite now 622 passing, 0 failed.
+- **SurveyStudio Analyse plot area (2026-07-16, uncommitted)**: the Run
+  stage's flat results table is now one card per research question
+  (block id, question, method and effect-size badges, APA string or
+  error) with the chart from `run_analysis_plan(plots = TRUE)` embedded
+  beneath, and the four regression diagnostic panels stacked under the
+  fit chart. Charts embed as base64 PNGs via a new
+  `studio_ggplot_img()` helper (same sizing as the report fallback), so
+  no dynamic plot outputs are registered per block. The plan now
+  executes once in a shared `analysis_results_r` reactive reused by the
+  Run cards and the Export screen's Interpretations card, where it
+  previously ran once per consumer. Verified headlessly: 24 of the demo
+  instrument's 34 blocks render charts (the rest are syntax-only or
+  chartless methods), diagnostics stack correctly, screenshot
+  inspected. Suite 622 passing, 0 failed.
+- **The 2 missing S3 methods (2026-07-16, uncommitted)**:
+  `plot.sframe_validity_report()` draws CR and AVE bars by construct
+  with the 0.70 and 0.50 threshold lines, via a new exported
+  `sframe_plot_validity()` helper following the reliability-plot
+  idiom. `plot.sframe_analysis_results()` draws the charts attached by
+  `run_analysis_plan(plots = TRUE)`: `which` (RQ number or block id)
+  returns one ggplot, no `which` prints all and returns the named list
+  invisibly, and a results object without charts aborts with a typed
+  error pointing at `plots = TRUE`. 12 new test expectations in
+  `test-v034-family-plots.R`. Suite 634 passing, 0 failed.
+- **Dashboard chart coverage and the base-R reconciliation decision
+  (2026-07-16, uncommitted)**. Decision: keep the hybrid established
+  at 0.3.2. Shared exported ggplot2 helpers in `R/plots.R` are the
+  primary renderer, every dashboard chart keeps a base-R fallback so
+  `launch_dashboard()` and SurveyStudio run with the 3 hard imports
+  only, and no existing base-R fallback was ported or dropped. New
+  charts, all helper-first with fallback: the standalone dashboard's
+  Quality tab gained a straight-lining flag-rate chart and an item
+  missingness chart (new `sframe_plot_missingness()` helper plus
+  `plot.sframe_missing_data_report()` S3 method, base-R barplot
+  fallbacks), and its Scales tab gained a scale-score correlation
+  heatmap (`sframe_plot_correlation_matrix()` on local row-mean
+  scores, base-R `image()` fallback with printed r values). The studio
+  mirrors: a missingness chart on the Quality Dashboard screen and the
+  correlation heatmap on the Dashboard tab's Scales view. Verified
+  headlessly on both surfaces with injected missing values, dashboard
+  screenshots inspected. Suite 637 passing, 0 failed.
+- **Date-question bounds (2026-07-17, uncommitted)**: `date_min` and
+  `date_max` on `sf_item()` (accepting Date or "YYYY-MM-DD" strings,
+  normalised to strings, typed validation errors for unparseable
+  values and min later than max), carried through the sframe
+  read/write normalisation, both Shiny render paths
+  (`render_survey()`, the survey module), the static template (native
+  picker min/max attributes plus a `validatePage()` bounds check with
+  an on-screen message, since typed dates bypass picker limits, ISO
+  strings comparing lexicographically), and the builder (Earliest and
+  Latest date inspector fields for date items, write-back through
+  `updF`, an error toast when min is set after max, preview min/max,
+  null defaults on new items). `inline_static_template.R` re-run so
+  the builder's embedded template matches. Verified: 12 testthat
+  expectations (`test-v034-date-bounds.R`), a 6-check chromote run
+  against a real exported survey (attributes present, out-of-range
+  typed dates blocked with the right message in both directions,
+  in-range passes), and a 5-check builder run. Suite 649 passing,
+  0 failed.
+- **The 2 WCAG 2.2 passes (2026-07-17, uncommitted)**, audited with
+  axe-core 4.10.2 (wcag2a, wcag2aa, wcag22aa rule sets) driven
+  headlessly through chromote.
+  - Builder chrome: audited in 6 states (build with inspector,
+    preview, analyse plan tab, report outline, settings modal, RQ
+    modal). Fixes: `--t3` darkened `#94a3b8` to `#5b6b80` (it only
+    ever sits on white and `#f1f5f9` surfaces, the dark sidebar has
+    its own `--st` tokens), the save-status dirty/saved states
+    darkened to `#b45309`/`#15803d` (11px text on white), the Analyse
+    caption code chip given `--t2` text on its `--cb` background, the
+    5 preview inputs (numeric, text, textarea, date, slider) given
+    aria-labels from the item label, and the settings colour picker
+    given an aria-label. All 6 states now report zero violations.
+  - Vignettes, all 7: `lang: en-GB` added to every YAML header, links
+    darkened `#16B3B1` to `#0e7c7a`, the 3 failing pandoc
+    syntax-token colours darkened (`.at` `#576419`, `.dv/.fl/.bn`
+    `#276245`, `.co` `#396a80`, all at least 4.95:1 on the `#f7f7f7`
+    code background), code blocks wrap instead of forming
+    keyboard-inaccessible scroll regions, the empty per-line source
+    anchors are removed from the accessibility tree, TOC links get
+    24px targets, and the 4 plot chunks without `fig.alt` gained
+    alt text. All 7 rendered vignettes now report zero violations
+    with zero heading-order skips. Layout visually checked. Suite 649
+    passing, 0 failed.
 
 ### Pending for 0.3.4
 
-- **Editable interpretation in the report flow (owner request
-  2026-07-16)**: the report in SurveyStudio and the HTML builder shows
-  decision rules and interpretation prompts read-only. Wanted: an edit
-  step before export, per research question, in both surfaces. Related
-  to the deferred SurveyStudio results page (plan-driven results view
-  with an editable interpretation field, logged in the 0.3.2 co-review
-  carry-in of `19_v034_v035_implementation.md`); implementing the
-  results page would deliver this for the studio.
-- Two S3 methods from the exit checklist: `plot.sframe_validity_report()`
-  and `plot.sframe_analysis_results()`.
-- SurveyStudio Analyse panel: result cards gain a plot area fed by
-  `run_analysis_plan(plots = TRUE)`.
-- Dashboard chart coverage beyond item/scale charts (quality or
-  missingness panel, correlation heatmap), and the explicit base-R
-  versus ggplot2 reconciliation decision.
-- Date-question minimum and maximum bounds (builder plus template).
-- Deliberate WCAG 2.2 pass across the builder chrome (piecemeal ARIA and
-  focus states landed with the rework, the systematic audit has not).
-- Vignette WCAG 2.2 AA CSS pass: contrast on code blocks, tables, body
-  text, heading-structure verification, `browseVignettes()` flat output.
-- Owner decision: slot in the SurveyStudio results page (on-demand
-  `render_report()` iframe plus quartopad integration) or defer past the
-  arc.
-- Release process: commit the working tree, version bump, NEWS.md,
-  MAS co-review, tarball, `R CMD check --as-cran`, win-builder x2,
-  CRAN submission.
+- **Owner decision resolved 2026-07-16: the SurveyStudio results page
+  (on-demand `render_report()` iframe plus quartopad integration) is
+  deferred past the 0.3.4 arc.** The Export-screen edit step delivers
+  the owner request on its own, and the `rv$interpretations` store plus
+  the `interpretations` API are the plumbing the results page needs, so
+  it becomes pure UI work when it lands.
+- Release process: version bump, NEWS.md, MAS co-review, tarball,
+  `R CMD check --as-cran`, win-builder x2, CRAN submission.
 
 ---
 

@@ -202,7 +202,9 @@ feasibility). The vignette builds offline because the data-collection step uses
 ## Current status and immediate next steps
 
 **0.3.4 is in progress (target 2026-08-15, status 2026-07-16).** The work
-sits UNCOMMITTED on the working tree, 562/562 tests pass. Done: the full
+so far is committed: main 221f612 (pushed to origin and public) carries
+the package work, dev 3d8269f (pushed to origin only) carries the
+planning files. 562/562 tests pass. Done: the full
 visualisation breadth in `R/plots.R` (all planned family plots plus
 skewness/kurtosis, group-comparison, paired, and variable-distribution
 charts), 2 WCAG-checked colour systems (web brand and print
@@ -214,11 +216,33 @@ preview, settings consolidation, Analyse sub-tab rework plus two-pane
 layout), the preset choice-set library, the ID-regeneration and
 `item__sub` variable-expansion fixes, and the thank-you download/redirect
 repair. The full done/pending breakdown lives in the v0.3.4 section of
-`revision_todo_0.3.md`. Largest pending blocks: the editable
-interpretation step in the report flow (owner request 2026-07-16), the
-studio Analyse plot area, date bounds, the vignette and builder WCAG
-passes, and the whole release process (commit, version bump, NEWS, MAS
-co-review, CRAN checks).
+`revision_todo_0.3.md`. The editable interpretation step (owner
+request 2026-07-16) is implemented and verified but uncommitted: an
+`interpretations` argument on `render_report()` and `render_results()`
+keyed by plan block id, an Interpretations card on the SurveyStudio
+Export screen, and inline decision-rule editing in the builder Report
+outline. The SurveyStudio results page stays deferred past the arc by
+owner decision. The studio Analyse plot area is also implemented and
+verified (result cards with embedded charts, one shared
+`analysis_results_r` reactive), as are the 2 remaining S3 methods,
+`plot.sframe_validity_report()` and `plot.sframe_analysis_results()`,
+plus a new exported `sframe_plot_validity()` helper, and the dashboard
+chart coverage (quality flag-rate, item missingness via a new
+`sframe_plot_missingness()` helper, and scale-correlation heatmaps on
+both dashboard surfaces, with the base-R versus ggplot2 question
+settled as keep-the-hybrid: ggplot helper first, base-R fallback
+retained), and the date-question bounds (2026-07-17: `date_min` and
+`date_max` on `sf_item()`, threaded through the sframe round-trip,
+both Shiny render paths, the static template with a `validatePage()`
+bounds check, and the builder inspector, with
+`inline_static_template.R` re-run), and the 2 WCAG 2.2 passes
+(2026-07-17, axe-core through chromote: builder chrome zero
+violations in 6 states after a `--t3` darkening and 6 targeted fixes,
+all 7 vignettes zero violations after the shared style block,
+`lang: en-GB`, and `fig.alt` additions). All uncommitted. Suite now
+649 passing. All feature work for 0.3.4 is done. Remaining: the
+release process (version bump, NEWS, MAS co-review, tarball, CRAN
+checks, win-builder, submission).
 
 0.3.1 is published on CRAN (2026-06-02). 0.3.3 is fully implemented (543/543
 tests pass, three vignettes rewritten and knit clean, tarball built, local
@@ -286,9 +310,9 @@ Open items (non-blocking for CRAN submission):
 - The pre-existing Quarto/pandoc `kable()` table-collapsing bug found during
   the 0.3.3 review (confirmed unrelated to this release's changes, not
   reproducible in isolated minimal tests) remains open for a future session.
-- A vignette-specific WCAG 2.2 AA CSS pass is logged in roadmap.md under
-  v0.3.4 (the pkgdown theme fixed the "dull" look, but contrast/heading
-  structure has not been separately checked).
+- The vignette-specific WCAG 2.2 AA CSS pass logged here for v0.3.4 was
+  completed on 2026-07-17 (see the v0.3.4 section of
+  revision_todo_0.3.md).
 
 The full task list is in `revision_todo_0.3.md`. The version and growth plan is
 in `roadmap.md`.
