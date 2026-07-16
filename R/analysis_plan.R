@@ -604,6 +604,17 @@ sframe_run_regression <- function(data, vars) {
   s <- summary(fit)
   f_stat <- s$fstatistic
   p_val  <- stats::pf(f_stat[1], f_stat[2], f_stat[3], lower.tail = FALSE)
+  # Plain data frame, not the lm object itself: keeps the result
+  # JSON-serialisable (jsonlite::toJSON on an lm object is unstable across
+  # sessions) while still carrying what sframe_plot_regression_diagnostics()
+  # needs for the four standard diagnostic panels.
+  diagnostics <- data.frame(
+    fitted    = unname(stats::fitted(fit)),
+    resid     = unname(stats::residuals(fit)),
+    std_resid = unname(stats::rstandard(fit)),
+    hat       = unname(stats::hatvalues(fit)),
+    cooksd    = unname(stats::cooks.distance(fit))
+  )
   list(
     test     = "regression_linear",
     vars     = vars,
@@ -615,6 +626,7 @@ sframe_run_regression <- function(data, vars) {
     df2      = unname(f_stat[3]),
     p        = p_val,
     coefficients = as.data.frame(s$coefficients),
+    diagnostics  = diagnostics,
     apa      = sprintf(
       "R\u00b2 = %.3f, F(%d, %d) = %.2f, p %s",
       s$r.squared, f_stat[2], f_stat[3], f_stat[1], sframe_p_string(p_val)
@@ -785,6 +797,11 @@ sframe_vars_for_method <- function(method, roles, block) {
 sframe_result_from_report <- function(report, test = report$method %||% "") {
   out <- unclass(report)
   out$test <- test
+  # Keep the original classed object too: sframe_plot_for_result() dispatches
+  # plot.sframe_quality_report()/plot.sframe_reliability_report()/etc. on
+  # this, since the unclassed, analysis-plan-field-merged `out` above is not
+  # safe to iterate as if every element were still a per-scale/report entry.
+  out$report_obj <- report
   out
 }
 
@@ -860,7 +877,8 @@ sframe_result_table <- function(result) {
   )
 }
 
-sframe_run_one_block <- function(block, data, instrument, plots = FALSE) {
+sframe_run_one_block <- function(block, data, instrument, plots = FALSE,
+                                 plot_palette = "web") {
   test <- sframe_analysis_method(block)
   roles <- sframe_analysis_roles(block)
   vars <- sframe_vars_for_method(test, roles, block)
@@ -950,7 +968,12 @@ sframe_run_one_block <- function(block, data, instrument, plots = FALSE) {
     result$table <- tryCatch(sframe_result_table(result), error = function(e) NULL)
   }
   if (isTRUE(plots) && is.null(result$plot)) {
-    result$plot <- sframe_plot_for_result(result, data)
+    result$plot <- sframe_plot_for_result(result, data, palette = plot_palette)
+  }
+  if (isTRUE(plots) && identical(result$test, "regression_linear") &&
+      is.data.frame(result$diagnostics) && is.null(result$diagnostic_plots)) {
+    result$diagnostic_plots <-
+      sframe_plot_regression_diagnostics(result, palette = plot_palette)
   }
   result
 }
@@ -973,6 +996,9 @@ sframe_run_one_block <- function(block, data, instrument, plots = FALSE) {
 #'   bar charts for frequency and chi-square blocks, scatter plots with a
 #'   regression overlay for correlation and linear-regression blocks.
 #'   Defaults to `FALSE`.
+#' @param plot_palette One of `"web"` (brand colours, for on-screen use) or
+#'   `"print"` (black, grey, and white, for journal-ready print figures).
+#'   Applied to every plot attached when `plots = TRUE`. See [sframe_brand()].
 #'
 #' @return An object of class `sframe_analysis_results`, a list with one
 #'   element per analysis block. Each element contains the test result,
@@ -998,7 +1024,9 @@ sframe_run_one_block <- function(block, data, instrument, plots = FALSE) {
 #' )
 #' results <- run_analysis_plan(responses, instr)
 #' print(results)
-run_analysis_plan <- function(data, instrument, scored = TRUE, plots = FALSE) {
+run_analysis_plan <- function(data, instrument, scored = TRUE, plots = FALSE,
+                              plot_palette = c("web", "print")) {
+  plot_palette <- match.arg(plot_palette)
   sframe_check_instrument(instrument)
   stopifnot(is.data.frame(data))
   if (isTRUE(plots)) {
@@ -1026,6 +1054,7 @@ run_analysis_plan <- function(data, instrument, scored = TRUE, plots = FALSE) {
   }
 
   results <- lapply(plan, sframe_run_one_block, data = data,
+                    plot_palette = plot_palette,
                     instrument = instrument, plots = plots)
   structure(results, class = "sframe_analysis_results")
 }

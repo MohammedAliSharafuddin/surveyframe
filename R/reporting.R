@@ -159,6 +159,10 @@ print.sframe_codebook <- function(x, ...) {
 #'   when `data` are supplied and the instrument has an `analysis_plan`.
 #' @param include_models Logical. Whether to include saved model JSON and
 #'   generated syntax blocks. Defaults to `TRUE`.
+#' @param plot_palette One of `"web"` (brand colours, for on-screen reading)
+#'   or `"print"` (black, grey, and white, for a journal-ready or
+#'   print-friendly report). Applied to every chart the report embeds.
+#'   See [sframe_brand()].
 #'
 #' @return The output file path, invisibly.
 #' @export
@@ -201,9 +205,11 @@ render_report <- function(
     include_missing   = TRUE,
     include_descriptives = TRUE,
     include_analysis  = TRUE,
-    include_models    = TRUE
+    include_models    = TRUE,
+    plot_palette      = c("web", "print")
 ) {
   sframe_check_instrument(instrument)
+  plot_palette <- rlang::arg_match(plot_palette)
 
   format <- rlang::arg_match(format)
   dest <- output_file %||% output_path %||% tempfile(fileext = ".html")
@@ -255,6 +261,7 @@ render_report <- function(
       include_descriptives = include_descriptives && !is.null(data),
       include_analysis    = include_analysis,
       include_models      = include_models,
+      plot_palette        = plot_palette,
       instrument_hash     = sframe_hash_value(instrument)
     )
 
@@ -310,7 +317,8 @@ render_report <- function(
     include_missing     = include_missing && !is.null(data),
     include_descriptives = include_descriptives && !is.null(data),
     include_analysis    = include_analysis,
-    include_models      = include_models
+    include_models      = include_models,
+    plot_palette        = plot_palette
   )
 
   invisible(dest)
@@ -326,7 +334,8 @@ render_report <- function(
     include_missing = TRUE,
     include_descriptives = TRUE,
     include_analysis = TRUE,
-    include_models = TRUE
+    include_models = TRUE,
+    plot_palette = "web"
 ) {
   meta <- instrument$meta %||% list()
   sections <- character(0)
@@ -449,7 +458,8 @@ render_report <- function(
   }
 
   if (isTRUE(include_analysis) && length(instrument$analysis_plan %||% list()) > 0) {
-    analysis_html <- .render_report_analysis_section(instrument, data)
+    analysis_html <- .render_report_analysis_section(instrument, data,
+                                                     plot_palette = plot_palette)
     sections <- c(sections, sprintf("<section>%s</section>", analysis_html))
   }
 
@@ -528,7 +538,8 @@ render_report <- function(
   invisible(output_path)
 }
 
-.render_report_analysis_section <- function(instrument, data = NULL) {
+.render_report_analysis_section <- function(instrument, data = NULL,
+                                            plot_palette = "web") {
   plan <- instrument$analysis_plan %||% list()
   if (length(plan) == 0) {
     return("")
@@ -555,7 +566,8 @@ render_report <- function(
   } else {
     results <- tryCatch(
       run_analysis_plan(data, instrument,
-                        plots = requireNamespace("ggplot2", quietly = TRUE)),
+                        plots = requireNamespace("ggplot2", quietly = TRUE),
+                        plot_palette = plot_palette),
       error = function(e) e
     )
     if (inherits(results, "error")) {
@@ -577,6 +589,16 @@ render_report <- function(
       if (!is.null(result$plot)) {
         img <- tryCatch(.render_report_ggplot_png(result$plot), error = function(e) NULL)
         if (!is.null(img)) plot_html <- img
+      }
+      # Regression diagnostics are four separate panels, not one plot, so
+      # they render as four stacked images beneath the main chart rather
+      # than forcing a combined-grob dependency just to arrange them.
+      if (is.list(result$diagnostic_plots)) {
+        diag_imgs <- vapply(result$diagnostic_plots, function(p) {
+          img <- tryCatch(.render_report_ggplot_png(p), error = function(e) NULL)
+          img %||% ""
+        }, character(1))
+        plot_html <- paste(c(plot_html, diag_imgs[diag_imgs != ""]), collapse = "\n")
       }
       sprintf(
         paste(

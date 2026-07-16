@@ -16,7 +16,8 @@ render_report(
   include_missing = TRUE,
   include_descriptives = TRUE,
   include_analysis = TRUE,
-  include_models = TRUE
+  include_models = TRUE,
+  plot_palette = c("web", "print")
 )
 }
 \arguments{
@@ -53,6 +54,11 @@ when \code{data} are supplied and the instrument has an \code{analysis_plan}.}
 
 \item{include_models}{Logical. Whether to include saved model JSON and
 generated syntax blocks. Defaults to \code{TRUE}.}
+
+\item{plot_palette}{One of \code{"web"} (brand colours, for on-screen reading)
+or \code{"print"} (black, grey, and white, for a journal-ready or
+print-friendly report). Applied to every chart the report embeds.
+See \code{\link[=sframe_brand]{sframe_brand()}}.}
 }
 \value{
 The output file path, invisibly.
