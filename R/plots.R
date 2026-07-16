@@ -741,6 +741,128 @@ plot.sframe_efa_solution <- function(x, ..., palette = c("web", "print")) {
   sframe_plot_efa_loadings(x, palette = match.arg(palette))
 }
 
+#' Validity report plot: composite reliability and AVE by construct
+#'
+#' @param x An `sframe_validity_report` object from [validity_report()].
+#' @param palette One of `"web"` or `"print"`. See [sframe_brand()].
+#' @return A ggplot2 object.
+#' @export
+#' @seealso [validity_report()]
+sframe_plot_validity <- function(x, palette = c("web", "print")) {
+  rlang::check_installed("ggplot2", reason = "to plot a validity report.")
+  palette <- match.arg(palette)
+  stopifnot(inherits(x, "sframe_validity_report"))
+  brand <- sframe_brand(palette)
+  df <- x$reliability
+  long <- stats::reshape(
+    df[, c("construct", "composite_reliability", "AVE")],
+    direction = "long", varying = c("composite_reliability", "AVE"),
+    v.names = "value", timevar = "statistic",
+    times = c("CR", "AVE"), idvar = "construct"
+  )
+  long <- long[!is.na(long$value), , drop = FALSE]
+  ggplot2::ggplot(long, ggplot2::aes(x = .data$construct, y = .data$value,
+                                     fill = .data$statistic)) +
+    ggplot2::geom_hline(yintercept = 0.70, colour = brand$muted, linetype = "dashed") +
+    ggplot2::geom_hline(yintercept = 0.50, colour = brand$muted, linetype = "dotted") +
+    ggplot2::geom_col(position = ggplot2::position_dodge(width = 0.75), width = 0.65,
+                      colour = brand$ink, linewidth = 0.3) +
+    ggplot2::scale_fill_manual(values = c(CR = brand$fill_duo[1], AVE = brand$fill_duo[2])) +
+    ggplot2::labs(title = "Construct validity",
+                  subtitle = "Dashed line: 0.70 CR threshold. Dotted line: 0.50 AVE threshold.",
+                  x = NULL, y = NULL, fill = NULL) +
+    theme_surveyframe(palette = palette) + sframe_theme_angled_x()
+}
+
+#' @export
+plot.sframe_validity_report <- function(x, ..., palette = c("web", "print")) {
+  sframe_plot_validity(x, palette = match.arg(palette))
+}
+
+#' Missing-data report plot: missingness rate by item
+#'
+#' @param x An `sframe_missing_data_report` object from
+#'   [missing_data_report()].
+#' @param palette One of `"web"` or `"print"`. See [sframe_brand()].
+#' @return A ggplot2 object, or `NULL` when no item has missing values.
+#' @export
+#' @seealso [missing_data_report()]
+sframe_plot_missingness <- function(x, palette = c("web", "print")) {
+  rlang::check_installed("ggplot2", reason = "to plot a missing-data report.")
+  palette <- match.arg(palette)
+  stopifnot(inherits(x, "sframe_missing_data_report"))
+  brand <- sframe_brand(palette)
+  df <- x$item_missing
+  df <- df[!is.na(df$missing_pct) & df$missing_pct > 0, , drop = FALSE]
+  if (nrow(df) == 0) return(NULL)
+  bar_fill <- if (palette == "web") brand$teal else brand$fill
+  ggplot2::ggplot(df, ggplot2::aes(x = stats::reorder(.data$variable, -.data$missing_pct),
+                                   y = .data$missing_pct)) +
+    ggplot2::geom_col(fill = bar_fill, colour = brand$ink, linewidth = 0.3, width = 0.65) +
+    ggplot2::scale_y_continuous(labels = scales_percent_fallback) +
+    ggplot2::labs(title = "Missing responses by item", x = NULL, y = "Missing") +
+    theme_surveyframe(palette = palette) + sframe_theme_angled_x()
+}
+
+#' @export
+plot.sframe_missing_data_report <- function(x, ..., palette = c("web", "print")) {
+  sframe_plot_missingness(x, palette = match.arg(palette))
+}
+
+#' Plot analysis-plan results
+#'
+#' Draws the charts that [run_analysis_plan()] attaches when called with
+#' `plots = TRUE`. With `which` supplied, returns that single chart. With
+#' `which` omitted, prints every attached chart in queue order and returns
+#' the list invisibly. Regression diagnostic panels stay on the result's
+#' `diagnostic_plots` element and are not drawn here.
+#'
+#' @param x An `sframe_analysis_results` object from [run_analysis_plan()].
+#' @param ... Ignored.
+#' @param which A research-question number or a plan block id selecting one
+#'   chart, or NULL for all.
+#' @return A ggplot2 object when `which` is supplied, otherwise an invisible
+#'   named list of ggplot2 objects keyed by plan block id.
+#' @export
+plot.sframe_analysis_results <- function(x, ..., which = NULL) {
+  plots <- list()
+  for (i in seq_along(x)) {
+    r <- x[[i]]
+    if (is.null(r$plot)) next
+    key <- r$block_id %||% ""
+    if (!nzchar(key)) key <- paste0("rq_", i)
+    plots[[key]] <- r$plot
+  }
+  if (length(plots) == 0) {
+    rlang::abort(
+      "No charts are attached to these results. Re-run run_analysis_plan() with plots = TRUE (requires ggplot2).",
+      class = "sframe_error"
+    )
+  }
+  if (!is.null(which)) {
+    if (is.numeric(which)) {
+      if (length(which) != 1 || which < 1 || which > length(x)) {
+        rlang::abort("`which` must select one research question by number or block id.",
+                     class = "sframe_error")
+      }
+      r <- x[[which]]
+      if (is.null(r$plot)) {
+        rlang::abort(sprintf("Research question %d has no chart attached.", which),
+                     class = "sframe_error")
+      }
+      return(r$plot)
+    }
+    key <- as.character(which)[[1]]
+    if (is.null(plots[[key]])) {
+      rlang::abort(sprintf("No chart is attached for block id '%s'.", key),
+                   class = "sframe_error")
+    }
+    return(plots[[key]])
+  }
+  for (p in plots) print(p)
+  invisible(plots)
+}
+
 #' Item distribution chart, ggplot2 equivalent of the dashboard/studio panel
 #'
 #' Shared by `launch_dashboard()` (`inst/shiny/dashboard/app.R`) and the
