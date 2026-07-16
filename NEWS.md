@@ -1,3 +1,70 @@
+# surveyframe 0.3.4
+
+This release completes the plotting and interface work started in 0.3.3.
+Every analysis family now has a chart, reports accept written
+interpretations, both dashboards gain quality and correlation panels, date
+questions gain bounds, and the builder and vignettes pass a WCAG 2.2 AA
+accessibility audit. Hard dependencies are unchanged.
+
+## Written interpretations in reports
+
+* New `interpretations` argument on `render_report()` and
+  `render_results()`. Pass a named list keyed by analysis-plan block id to
+  add a written interpretation to each research question after the results
+  are known. The report shows it beside the pre-declared decision rule, so
+  the prospective plan stays visible next to the post-hoc narrative.
+  Interpretations are report content only and are never written into the
+  instrument file.
+* SurveyStudio's Export screen gains an Interpretations card: one field per
+  research question, shown with the planned decision rule and the live
+  result once responses are loaded. The generated report includes whatever
+  you write there.
+* The SurveyBuilder Report outline now edits the planned decision rule
+  inline, in sync with the research-question dialogue.
+
+## Charts
+
+* `run_analysis_plan(plots = TRUE)` now attaches a chart to every
+  supported family: regression diagnostics (4 panels), EFA scree and
+  loadings heatmap, reliability bars, mosaic and crosstab, correlation
+  heatmap, quality flag rates, skewness and kurtosis, group-comparison
+  boxplots, paired slope charts, and raw-variable distributions.
+* New `plot()` methods for descriptives, EFA, quality, reliability,
+  validity, missing-data, and analysis-results objects. `plot(results)`
+  draws every attached chart, and `plot(results, which = "rq_id")` returns
+  one.
+* New `plot_palette` argument on `run_analysis_plan()` and
+  `render_report()`: `"web"` for brand colour on screen, `"print"` for
+  black and white suitable for print and journal submission. SurveyStudio
+  exposes the choice as a Chart theme option on the Export screen.
+* SurveyStudio's Analyse screen shows one result card per research
+  question with its chart beneath the statistic.
+* Both dashboards (the standalone response dashboard and the SurveyStudio
+  Dashboard tab) gain a straight-lining flag-rate chart, a missing-data
+  chart, and a scale-score correlation heatmap. All dashboard charts keep
+  a base-graphics fallback, so ggplot2 remains optional.
+
+## Survey design
+
+* Date questions accept `date_min` and `date_max` bounds in `sf_item()`,
+  the SurveyBuilder, and the exported survey. The date picker enforces the
+  bounds and typed dates outside them show a clear message.
+* The SurveyBuilder ships a library of 14 preset choice sets, regenerates
+  item ids safely when the response type changes, and expands matrix,
+  ranking, and multiple-choice items into the same per-option variables
+  that `read_responses()` produces.
+* The survey thank-you page no longer forces a CSV download. It offers a
+  "Download my response" button and honours a configured redirect.
+
+## Accessibility
+
+* The SurveyBuilder interface passes an instrumented WCAG 2.2 AA audit
+  with zero findings across its build, preview, and analyse screens and
+  dialogues.
+* All 7 vignettes pass the same audit: language metadata, AA contrast for
+  links and code highlighting, wrapped code blocks, keyboard-reachable
+  content, and alternative text on every chart.
+
 # surveyframe 0.3.3
 
 This release adds an opt-in plotting layer, fixes bugs surfaced by the

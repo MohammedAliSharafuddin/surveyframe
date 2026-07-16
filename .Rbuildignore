@@ -58,3 +58,5 @@
 ^SECURITY\.md$
 ^mas_review_033\.md$
 ^mas_review_033\.(qmd|html)$
+^mas_review_034\.(md|qmd|html)$
+^demo($|/)
