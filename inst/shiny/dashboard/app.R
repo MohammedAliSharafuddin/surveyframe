@@ -250,10 +250,12 @@ server <- function(input, output, session) {
     }
     col_data <- resp[[input$item_sel]]
     t <- item$type
+    cs <- choice_by_id(item$choice_set %||% "")
+    gg <- tryCatch(sframe_plot_item_chart(item, col_data, cs), error = function(e) NULL)
+    if (!is.null(gg)) { print(gg); return() }
     old_par <- par(mar = c(4,5,2,1), bg = "white")
     on.exit(par(old_par))
     if (t %in% c("likert","single_choice","multiple_choice")) {
-      cs <- choice_by_id(item$choice_set %||% "")
       if (!is.null(cs)) {
         freq <- table(factor(col_data, levels = as.character(cs$values)))
         names(freq) <- cs$labels
@@ -298,6 +300,8 @@ server <- function(input, output, session) {
     if (!length(scores)) {
       plot.new(); text(.5,.5,"No valid scale scores.",col="#94a3b8"); return()
     }
+    gg <- tryCatch(sframe_plot_scale_chart(scores, sc$label), error = function(e) NULL)
+    if (!is.null(gg)) { print(gg); return() }
     old_par <- par(mar = c(4,4,2,1), bg = "white")
     on.exit(par(old_par))
     hist(scores, col = THEME, border = "white",
