@@ -163,6 +163,13 @@ print.sframe_codebook <- function(x, ...) {
 #'   or `"print"` (black, grey, and white, for a journal-ready or
 #'   print-friendly report). Applied to every chart the report embeds.
 #'   See [sframe_brand()].
+#' @param interpretations Named list or NULL. Written interpretations keyed
+#'   by analysis-plan block id, added after the results are known. When a
+#'   block has an entry, its report section shows the pre-declared decision
+#'   rule under a "Planned decision rule" label followed by the written
+#'   text under an "Interpretation" label. Blocks without an entry render
+#'   exactly as they do when this argument is NULL. Interpretations are
+#'   report content only and are never written into the instrument.
 #'
 #' @return The output file path, invisibly.
 #' @export
@@ -206,10 +213,12 @@ render_report <- function(
     include_descriptives = TRUE,
     include_analysis  = TRUE,
     include_models    = TRUE,
-    plot_palette      = c("web", "print")
+    plot_palette      = c("web", "print"),
+    interpretations   = NULL
 ) {
   sframe_check_instrument(instrument)
   plot_palette <- rlang::arg_match(plot_palette)
+  interpretations <- sframe_clean_interpretations(interpretations)
 
   format <- rlang::arg_match(format)
   dest <- output_file %||% output_path %||% tempfile(fileext = ".html")
@@ -241,6 +250,7 @@ render_report <- function(
     # Write instrument and data to temp RDS for the template to read
     tmp_instr <- tempfile(fileext = ".rds")
     tmp_data  <- tempfile(fileext = ".rds")
+    tmp_interp <- tempfile(fileext = ".rds")
     temp_rds <- tmp_instr
     saveRDS(instrument, tmp_instr)
     if (!is.null(data)) {
@@ -249,11 +259,18 @@ render_report <- function(
     } else {
       tmp_data <- ""
     }
+    if (length(interpretations) > 0) {
+      saveRDS(interpretations, tmp_interp)
+      temp_rds <- c(temp_rds, tmp_interp)
+    } else {
+      tmp_interp <- ""
+    }
     on.exit(unlink(temp_rds, force = TRUE), add = TRUE)
 
     params <- list(
       instrument_path     = tmp_instr,
       data_path           = tmp_data,
+      interpretations_path = tmp_interp,
       include_quality     = include_quality && !is.null(data),
       include_reliability = include_reliability && !is.null(data),
       include_codebook    = include_codebook,
@@ -318,10 +335,37 @@ render_report <- function(
     include_descriptives = include_descriptives && !is.null(data),
     include_analysis    = include_analysis,
     include_models      = include_models,
-    plot_palette        = plot_palette
+    plot_palette        = plot_palette,
+    interpretations     = interpretations
   )
 
   invisible(dest)
+}
+
+# Drop entries that cannot be rendered: unnamed values, non-character
+# values, and empty strings. Returns a named list of single strings, or an
+# empty list, so downstream code can index it without further checks.
+sframe_clean_interpretations <- function(interpretations) {
+  if (is.null(interpretations)) return(list())
+  if (!is.list(interpretations) && !is.character(interpretations)) {
+    rlang::abort(
+      "`interpretations` must be a named list or named character vector keyed by analysis-plan block id.",
+      class = "sframe_error"
+    )
+  }
+  interpretations <- as.list(interpretations)
+  keys <- names(interpretations) %||% character(0)
+  out <- list()
+  for (i in seq_along(interpretations)) {
+    key <- if (i <= length(keys)) keys[[i]] else ""
+    value <- interpretations[[i]]
+    if (!nzchar(key %||% "")) next
+    if (!is.character(value) || length(value) != 1 || is.na(value)) next
+    value <- trimws(value)
+    if (!nzchar(value)) next
+    out[[key]] <- value
+  }
+  out
 }
 
 .render_report_html <- function(
@@ -335,7 +379,8 @@ render_report <- function(
     include_descriptives = TRUE,
     include_analysis = TRUE,
     include_models = TRUE,
-    plot_palette = "web"
+    plot_palette = "web",
+    interpretations = list()
 ) {
   meta <- instrument$meta %||% list()
   sections <- character(0)
@@ -459,7 +504,8 @@ render_report <- function(
 
   if (isTRUE(include_analysis) && length(instrument$analysis_plan %||% list()) > 0) {
     analysis_html <- .render_report_analysis_section(instrument, data,
-                                                     plot_palette = plot_palette)
+                                                     plot_palette = plot_palette,
+                                                     interpretations = interpretations)
     sections <- c(sections, sprintf("<section>%s</section>", analysis_html))
   }
 
@@ -539,28 +585,45 @@ render_report <- function(
 }
 
 .render_report_analysis_section <- function(instrument, data = NULL,
-                                            plot_palette = "web") {
+                                            plot_palette = "web",
+                                            interpretations = list()) {
   plan <- instrument$analysis_plan %||% list()
   if (length(plan) == 0) {
     return("")
   }
 
+  # The written interpretation and the pre-declared decision rule render as
+  # a pair, so the post-hoc narrative never displaces the prospective
+  # contract. Without an override, output is unchanged.
+  interp_html <- function(block_id, decision_rule) {
+    override <- interpretations[[block_id %||% ""]] %||% ""
+    if (!nzchar(override)) return("")
+    rule_html <- if (nzchar(decision_rule %||% "")) {
+      sprintf("<p><strong>Planned decision rule:</strong> %s</p>",
+              htmltools_escape(decision_rule))
+    } else ""
+    paste0(rule_html,
+           sprintf("<p><strong>Interpretation:</strong> %s</p>",
+                   htmltools_escape(override)))
+  }
+
   blocks <- if (is.null(data)) {
     vapply(seq_along(plan), function(i) {
       rq <- plan[[i]]
-      sprintf(
-        paste(
+      extra <- interp_html(rq$id, rq$decision_rule %||% rq$interpretation)
+      paste(
+        c(
           "<div class=\"rq-block\">",
-          "<h3>RQ %d: %s</h3>",
-          "<p><strong>Planned test:</strong> %s</p>",
-          "<p><strong>Variables:</strong> %s</p>",
-          "</div>",
-          sep = "\n"
+          sprintf("<h3>RQ %d: %s</h3>", i,
+                  htmltools_escape(rq$research_question %||% paste("Research Question", i))),
+          sprintf("<p><strong>Planned test:</strong> %s</p>",
+                  htmltools_escape(sframe_analysis_method(rq))),
+          sprintf("<p><strong>Variables:</strong> %s</p>",
+                  htmltools_escape(paste(sframe_analysis_vars(rq), collapse = ", "))),
+          if (nzchar(extra)) extra,
+          "</div>"
         ),
-        i,
-        htmltools_escape(rq$research_question %||% paste("Research Question", i)),
-        htmltools_escape(sframe_analysis_method(rq)),
-        htmltools_escape(paste(sframe_analysis_vars(rq), collapse = ", "))
+        collapse = "\n"
       )
     }, character(1))
   } else {
@@ -600,21 +663,20 @@ render_report <- function(
         }, character(1))
         plot_html <- paste(c(plot_html, diag_imgs[diag_imgs != ""]), collapse = "\n")
       }
-      sprintf(
-        paste(
+      extra <- interp_html(result$block_id %||% result$id, result$decision_rule)
+      paste(
+        c(
           "<div class=\"rq-block\">",
-          "<h3>RQ %d: %s</h3>",
-          "<p class=\"apa\"><strong>Result:</strong> %s</p>",
-          "%s",
-          "%s",
-          "</div>",
-          sep = "\n"
+          sprintf("<h3>RQ %d: %s</h3>", i,
+                  htmltools_escape(result$research_question %||% paste("Research Question", i))),
+          sprintf("<p class=\"apa\"><strong>Result:</strong> %s</p>",
+                  htmltools_escape(result$apa %||% result$error %||% "")),
+          table_html,
+          plot_html,
+          if (nzchar(extra)) extra,
+          "</div>"
         ),
-        i,
-        htmltools_escape(result$research_question %||% paste("Research Question", i)),
-        htmltools_escape(result$apa %||% result$error %||% ""),
-        table_html,
-        plot_html
+        collapse = "\n"
       )
     }, character(1))
   }
