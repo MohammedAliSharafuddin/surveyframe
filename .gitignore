@@ -22,6 +22,7 @@ data-raw/
 roadmap.md
 todo.md
 revision_todo_0.3.md
+dogfeed.todo.md
 Rplots.pdf
 tests/testthat/file*.html
 CLAUDE.md
@@ -32,3 +33,4 @@ tests/testthat/test-aic-rsam-fixture.R
 tests/testthat/test-aic-rsam-branching.R
 .vscode/
 mas_review_033.html
+mas_review_034.html

@@ -24,6 +24,7 @@
 ^todo\.md$
 ^TODO\.md$
 ^revision_todo_0\.3\.md$
+^dogfeed\.todo\.md$
 ^docs($|/)
 ^data-raw($|/)
 ^\.codex($|/)
@@ -57,3 +58,5 @@
 ^SECURITY\.md$
 ^mas_review_033\.md$
 ^mas_review_033\.(qmd|html)$
+^mas_review_034\.(md|qmd|html)$
+^demo($|/)
