@@ -1090,13 +1090,15 @@ ui <- fluidPage(
       tags$div(id = "screen-quality", class = screen_class("quality"),
         tags$h2(class = "screen-title", "Quality Dashboard"),
         uiOutput("quality_gate"),
-        uiOutput("quality_output")
+        uiOutput("quality_output"),
+        plotOutput("studio_quality_chart", height = "260px")
       ),
 
       tags$div(id = "screen-reliability", class = screen_class("reliability"),
         tags$h2(class = "screen-title", "Reliability"),
         uiOutput("reliability_gate"),
-        uiOutput("reliability_output")
+        uiOutput("reliability_output"),
+        plotOutput("studio_reliability_chart", height = "300px")
       ),
 
       tags$div(id = "screen-analysis", class = screen_class("analysis"),
@@ -1149,6 +1151,14 @@ ui <- fluidPage(
           checkboxInput("rpt_reliability", "Include reliability", value = TRUE),
           checkboxInput("rpt_analysis", "Include analysis-plan results", value = TRUE),
           checkboxInput("rpt_models", "Include saved models and syntax", value = TRUE),
+          shiny::radioButtons(
+            "rpt_palette", "Chart theme",
+            choices = c(
+              "Colour (on-screen reading)" = "web",
+              "Black and white (print and journal submission)" = "print"
+            ),
+            selected = "web"
+          ),
           tags$br(),
           uiOutput("export_report_ui"),
           tags$p(class = "hint",
@@ -2001,6 +2011,24 @@ server <- function(input, output, session) {
     )
   })
 
+  # plot() dispatches to plot.sframe_quality_report()/plot.sframe_reliability_report()
+  # (ggplot2, guarded); returns NULL and draws nothing when ggplot2 is absent
+  # or the report has no plottable rows, so these panels degrade quietly
+  # rather than erroring.
+  output$studio_quality_chart <- shiny::renderPlot({
+    req(rv$instrument, rv$responses)
+    gg <- tryCatch(graphics::plot(quality_result()), error = function(e) NULL)
+    if (!is.null(gg)) print(gg)
+  }, bg = "white")
+
+  output$studio_reliability_chart <- shiny::renderPlot({
+    req(rv$instrument, rv$responses)
+    rr <- reliability_result()
+    if (is.null(rr) || length(rr) == 0) return()
+    gg <- tryCatch(graphics::plot(rr), error = function(e) NULL)
+    if (!is.null(gg)) print(gg)
+  }, bg = "white")
+
   output$reliability_output <- renderUI({
     req(rv$instrument, rv$responses)
     rr <- reliability_result()
@@ -2731,9 +2759,11 @@ server <- function(input, output, session) {
     }
     col_data <- resp[[input$dash_item_sel]]
     t <- item$type
+    cs <- dash_find(rv$instrument$choices, item$choice_set %||% "")
+    gg <- tryCatch(sframe_plot_item_chart(item, col_data, cs), error = function(e) NULL)
+    if (!is.null(gg)) { print(gg); return() }
     op <- par(mar = c(4, 9, 2, 1), bg = "white"); on.exit(par(op))
     if (t %in% c("likert", "single_choice", "multiple_choice")) {
-      cs <- dash_find(rv$instrument$choices, item$choice_set %||% "")
       if (!is.null(cs)) {
         freq <- table(factor(col_data, levels = as.character(cs$values)))
         names(freq) <- cs$labels
@@ -2807,6 +2837,8 @@ server <- function(input, output, session) {
     if (!length(scores)) {
       plot.new(); text(.5, .5, "No valid scale scores.", col = "#94a3b8"); return()
     }
+    gg <- tryCatch(sframe_plot_scale_chart(scores, sc$label), error = function(e) NULL)
+    if (!is.null(gg)) { print(gg); return() }
     op <- par(mar = c(4, 4, 2, 1), bg = "white"); on.exit(par(op))
     hist(scores, col = dash_theme, border = "white", main = NULL,
          xlab = paste0(sc$label, " score"), ylab = "Count", las = 1, cex.axis = .8)
@@ -2902,7 +2934,8 @@ server <- function(input, output, session) {
           include_descriptives = isTRUE(input$rpt_descriptives),
           include_reliability = isTRUE(input$rpt_reliability),
           include_analysis = isTRUE(input$rpt_analysis),
-          include_models = isTRUE(input$rpt_models)
+          include_models = isTRUE(input$rpt_models),
+          plot_palette = input$rpt_palette %||% "web"
         )
       }, error = function(e) {
         showNotification(paste("Report error:", conditionMessage(e)), type = "error")
@@ -2916,6 +2949,7 @@ server <- function(input, output, session) {
   for (.oid in c(
     "instrument_summary_card", "survey_preview_items", "responses_summary_card",
     "quality_output", "reliability_output",
+    "studio_quality_chart", "studio_reliability_chart",
     "analysis_left_panel", "analysis_middle_panel", "analysis_right_panel",
     "analysis_results_output", "studio_dashboard_content",
     "export_sframe_ui", "export_report_ui",

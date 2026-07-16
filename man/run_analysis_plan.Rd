@@ -4,7 +4,13 @@
 \alias{run_analysis_plan}
 \title{Run a pre-planned analysis from an instrument's analysis plan}
 \usage{
-run_analysis_plan(data, instrument, scored = TRUE, plots = FALSE)
+run_analysis_plan(
+  data,
+  instrument,
+  scored = TRUE,
+  plots = FALSE,
+  plot_palette = c("web", "print")
+)
 }
 \arguments{
 \item{data}{A \code{tibble} or \code{data.frame} of responses, typically produced by
@@ -20,6 +26,10 @@ blocks gain a \verb{$plot} element holding a brand-styled ggplot object:
 bar charts for frequency and chi-square blocks, scatter plots with a
 regression overlay for correlation and linear-regression blocks.
 Defaults to \code{FALSE}.}
+
+\item{plot_palette}{One of \code{"web"} (brand colours, for on-screen use) or
+\code{"print"} (black, grey, and white, for journal-ready print figures).
+Applied to every plot attached when \code{plots = TRUE}. See \code{\link[=sframe_brand]{sframe_brand()}}.}
 }
 \value{
 An object of class \code{sframe_analysis_results}, a list with one
