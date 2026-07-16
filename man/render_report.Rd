@@ -17,7 +17,8 @@ render_report(
   include_descriptives = TRUE,
   include_analysis = TRUE,
   include_models = TRUE,
-  plot_palette = c("web", "print")
+  plot_palette = c("web", "print"),
+  interpretations = NULL
 )
 }
 \arguments{
@@ -59,6 +60,14 @@ generated syntax blocks. Defaults to \code{TRUE}.}
 or \code{"print"} (black, grey, and white, for a journal-ready or
 print-friendly report). Applied to every chart the report embeds.
 See \code{\link[=sframe_brand]{sframe_brand()}}.}
+
+\item{interpretations}{Named list or NULL. Written interpretations keyed
+by analysis-plan block id, added after the results are known. When a
+block has an entry, its report section shows the pre-declared decision
+rule under a "Planned decision rule" label followed by the written
+text under an "Interpretation" label. Blocks without an entry render
+exactly as they do when this argument is NULL. Interpretations are
+report content only and are never written into the instrument.}
 }
 \value{
 The output file path, invisibly.

@@ -1098,6 +1098,12 @@ sframe_md_em <- function(x) {
 #'   `"ama"`, or `"vancouver"`. Defaults to `"apa"`.
 #' @param title Character or NULL. Report title. Defaults to the instrument
 #'   title with " -- Results" appended.
+#' @param interpretations Named list or NULL. Written interpretations keyed
+#'   by analysis-plan block id, added after the results are known. A block
+#'   with an entry shows that text in its Interpretation section in place
+#'   of the pre-declared prompt fallback. Blocks without an entry render
+#'   exactly as they do when this argument is NULL. Interpretations are
+#'   report content only and are never written into the instrument.
 #'
 #' @return The output file path, invisibly.
 #' @export
@@ -1126,16 +1132,19 @@ render_results <- function(
     output_file     = NULL,
     output_path     = NULL,
     citation_format = c("apa", "ama", "vancouver"),
-    title           = NULL
+    title           = NULL,
+    interpretations = NULL
 ) {
   sframe_check_instrument(instrument)
   citation_format <- rlang::arg_match(citation_format)
+  interpretations <- sframe_clean_interpretations(interpretations)
 
   dest <- output_file %||% output_path %||% tempfile(fileext = ".html")
 
   # If called with instrument only (no pre-computed results), delegate
   if (is.null(results)) {
-    return(render_report(instrument, output_file = dest))
+    return(render_report(instrument, output_file = dest,
+                         interpretations = interpretations))
   }
 
   stopifnot(inherits(results, "sframe_analysis_results"))
@@ -1158,7 +1167,7 @@ render_results <- function(
     rq <- htmltools_escape(r$research_question %||% paste("Research Question", i))
     apa_str <- r$apa %||% ""
     prompt  <- r$interpretation_prompt %||% r$prompt %||% ""
-    interp  <- r$interpretation %||% ""
+    interp  <- interpretations[[r$block_id %||% r$id %||% ""]] %||% r$interpretation %||% ""
     cits <- paste(
       vapply(unlist(r$citations), sframe_md_em, character(1)),
       collapse = "<br>"
