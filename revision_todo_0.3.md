@@ -7,9 +7,11 @@ Excluded from the CRAN build (via .Rbuildignore) and from the public repo
 
 ## v0.3.4 — In progress (target 2026-08-15, status as of 2026-07-16)
 
-The consolidated all-plotting-and-UI release (former 0.3.4 plus 0.3.5,
-merged 2026-07-14; the statistics and reporting patch is now 0.3.5). The
-canonical scope is portfolio-planner
+The consolidated release. Merged 2026-07-14 from the former 0.3.4 plus
+0.3.5 (all plotting and UI work), then expanded 2026-07-17 by owner
+decision to absorb the statistics and reporting scope that was 0.3.5,
+since nothing had been submitted. 0.3.5 is now the field-validation
+release. The canonical scope is portfolio-planner
 `development_instructions/19_v034_v035_implementation.md`. All work below
 is committed: main 221f612 (pushed to origin and public) carries the
 package work, dev 3d8269f (pushed to origin only) carries the planning
@@ -160,14 +162,48 @@ files. 562/562 tests pass.
 
 ### Pending for 0.3.4
 
+**Scope expanded 2026-07-17 (owner decision): the statistics and reporting
+work, previously the whole of 0.3.5, moves into this release since 0.3.4
+had not been submitted. 0.3.5 is redefined as the field-validation release
+(ICSRI 2026 feedback plus human testing with several short real surveys).
+The 2026-07-17 tarball is superseded; the version bump stands; NEWS.md and
+mas_review_034.md gain sections when the statistics work lands. Canonical
+detail: the v0.3.5 section of portfolio-planner
+`19_v034_v035_implementation.md` (now describing 0.3.4 work).**
+
+- Effect-size confidence intervals: new `R/bootstrap_ci.R` with
+  `bootstrap_ci()`, `cohens_d_ci()`, `cramers_v_ci()`, `eta_sq_ci()`, all
+  base R, all exported. CI keys added to the runners as additive keys
+  (`d_ci`, `r_ci`, `eta_ci`, `ci`, `v_ci`) with the `apa` string carrying
+  the interval.
+- Psychometric depth: true Henseler HTMT in `validity_report()` via an
+  `items_by_construct` argument (documented fallback otherwise), Little's
+  MCAR via naniar (guarded, unchanged when absent), `omega_note` in
+  `reliability_report()` with omega surfaced in the reliability plot, and
+  tidy data frames from `efa_solution()`.
+- PDF output: `render_report(format = "pdf")` via pagedown (guarded,
+  Chrome requirement documented), HTML path byte-identical.
+- Report theming: brand CSS variables in the HTML fallback, print
+  stylesheet, APA table consistency, alt text and captions checked with
+  the 0.3.4 axe-core tooling.
+- Codebook upgrades: analysis-plan and measurement-model summaries in
+  `codebook_report()`.
+- Owner decision: the `.bib` reference carry-in (citations out of
+  `.sframe_citations` into a bibliography) is in or out of this release.
+- naniar (>= 1.0.0) and pagedown (>= 0.20) join Suggests, guarded.
+- Tests: CI helpers plus one runner per family,
+  `skip_if_not_installed("naniar")`, existing tests unchanged except the
+  affected runners' expected `apa` strings.
 - **Owner decision resolved 2026-07-16: the SurveyStudio results page
   (on-demand `render_report()` iframe plus quartopad integration) is
   deferred past the 0.3.4 arc.** The Export-screen edit step delivers
   the owner request on its own, and the `rv$interpretations` store plus
   the `interpretations` API are the plumbing the results page needs, so
   it becomes pure UI work when it lands.
-- Release process: version bump, NEWS.md, MAS co-review, tarball,
-  `R CMD check --as-cran`, win-builder x2, CRAN submission.
+- Release process: NEWS.md statistics sections, mas_review_034.md
+  statistics parts plus the human review rounds, rebuild the tarball
+  (the version bump to 0.3.4 is already made), `R CMD check --as-cran`,
+  win-builder x2, CRAN submission.
 
 ---
 

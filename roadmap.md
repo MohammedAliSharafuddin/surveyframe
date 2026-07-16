@@ -60,8 +60,8 @@ the slip and record why in `portfolio-planner/decisions.md`.
 | 0.3.1 | Stability and onboarding | done 2026-06-02 |
 | 0.3.2 | Maintenance: CITATION fix, JSS-required package changes, doc pass | 2026-07-04 |
 | 0.3.3 | Real-world embedding and conference feedback (AIC-RSAM, ICSRI 2026) plus the visualisation foundation (ggplot2 in Suggests, brand theme, `plots = TRUE`, first family plots, `$table` on inferential runners) and the Theme B survey redesign. Merged from the planned 0.3.3 and 0.3.4 on 2026-07-10 | implemented 2026-07-09, release pending |
-| 0.3.4 | All plotting and UI work: visualisation breadth (regression, EFA, reliability, categorical, correlation-matrix plots, `plot()` S3 on report objects), plots into the surfaces (`render_report()`, dashboard charts, studio plot area), the builder rework, the vignette WCAG 2.2 AA pass. Merged from the former 0.3.4 and 0.3.5 on 2026-07-14 | 2026-08-15 |
-| 0.3.5 | All statistics and reporting: effect-size confidence intervals (base-R bootstrap `bootstrap_ci`, `cohens_d_ci`, `cramers_v_ci`, `eta_sq_ci`), psychometric depth (Henseler HTMT, real Little's MCAR via naniar, omega and EFA polish), report polish and PDF (`render_report(format = "pdf")` via pagedown, theming, accessibility, codebook upgrades). Merged from the former 0.3.6 to 0.3.8 on 2026-07-14 | 2026-09-15 |
+| 0.3.4 | All plotting, UI, statistics, and reporting work. The plotting and UI half (visualisation breadth, `plot()` S3 methods, plots into every surface, the builder rework, date bounds, the 2 WCAG 2.2 AA passes) is implemented and committed. The statistics and reporting half joins it by owner decision on 2026-07-17, since 0.3.4 had not been submitted: effect-size confidence intervals (base-R bootstrap `bootstrap_ci`, `cohens_d_ci`, `cramers_v_ci`, `eta_sq_ci`), psychometric depth (Henseler HTMT, real Little's MCAR via naniar, omega and EFA polish), report polish and PDF (`render_report(format = "pdf")` via pagedown, theming, accessibility, codebook upgrades) | 2026-08-15 |
+| 0.3.5 | Field validation: ICSRI 2026 audience feedback (conference 8-9 August 2026), additional rounds of human testing with several short real surveys, and the fixes both surface. Strict patch scope, no planned new features. Redefined 2026-07-17 when the former statistics scope moved into 0.3.4 | 2026-09-15 |
 | 0.4 | Small-sample inference plus the RStudio add-in | 2026-11-20 |
 | 0.4.1 | Faculty demo proofing: demo session to college faculty, then UI/UX and doc fixes | 2026-12-11 |
 | 0.5 | MCDM and DEMATEL | 2027-01-25 |
@@ -190,11 +190,21 @@ correlation, regression, t-test, Mann-Whitney, ANOVA, and Kruskal-Wallis
 runners. Plots verified visually against the AIC-RSAM simulated data.
 519/519 tests pass.
 
-### v0.3.4 — All plotting and UI work (target 2026-08-15)
+### v0.3.4 — All plotting, UI, statistics, and reporting work (target 2026-08-15)
 
 Consolidated 2026-07-14: this release merges the former 0.3.4 (visualisation
 breadth and the builder rework) with the former 0.3.5 (plots into the
 surfaces), so all remaining plotting and UI work ships as one ~30-day patch.
+
+**Consolidated again 2026-07-17 (owner decision):** the statistics and
+reporting scope below, previously the whole of 0.3.5, moves into this
+release, since the plotting and UI half was feature-complete and committed
+(main 0ca5d24) with the 0.3.4 CRAN submission not yet made. The tarball
+built on 2026-07-17 is superseded and will be rebuilt when the statistics
+half lands. 0.3.5 is redefined as the field-validation release. The
+plotting and UI deliverables below are all DONE; the statistics and
+reporting deliverables (moved in from the old 0.3.5 section) are the
+remaining work.
 
 Second track added 2026-07-10 from the 0.3.3 MAS review (owner decision:
 quick wins shipped in 0.3.3, the rework lands here): a complete
@@ -255,13 +265,8 @@ Deliverables (plots into the surfaces):
 - Dashboard chart panels replaced with ggplot2 equivalents.
 - SurveyStudio plot area wired to the new S3 methods.
 
-### v0.3.5 — Statistics and reporting (target 2026-09-15)
-
-Consolidated 2026-07-14: this release merges the former 0.3.6 (effect-size
-confidence intervals), 0.3.7 (psychometric depth), and 0.3.8 (report polish
-and PDF) into one ~30-day patch. It is the last patch before the analytical
-themes. ICSRI 2026 audience feedback (conference 8-9 August 2026) folds in
-here if it needs package fixes, so it no longer needs its own follow-up patch.
+Deliverables (statistics and reporting, moved in from the old 0.3.5 on
+2026-07-17; originally the former 0.3.6 to 0.3.8, consolidated 2026-07-14):
 
 Headline: every effect-size statistic ships with an interval, the known
 psychometric gaps close, and the report surface is complete with PDF output.
@@ -289,7 +294,21 @@ Deliverables (report polish and PDF):
 - Codebook upgrades: item-level descriptives and choice-set frequency tables
   in the codebook section.
 
-### Feature requests from the 0.3.3 MAS review (recorded 2026-07-10)
+### v0.3.5 — Field validation (target 2026-09-15)
+
+Redefined 2026-07-17 (owner decision) when the statistics and reporting
+scope moved into 0.3.4. This release validates the merged 0.3.4 against
+real use. Strict patch scope, no planned new features: fixes and polish
+only, driven by what the field surfaces.
+
+Deliverables:
+- ICSRI 2026 audience feedback (conference 8-9 August 2026): triage every
+  item, fix what is in patch scope, log the rest against roadmap versions.
+- Additional rounds of human testing: design, deploy, answer, and analyse
+  several short real surveys end to end (owner plus recruited testers),
+  logging findings in dogfeed.todo.md as they come in.
+- Fixes for everything the two feedback streams surface that fits patch
+  scope.
 
 Four sf_choices proposals, assessed against the pre-declared-contract core
 idea (full assessment in mas_review_033.md):

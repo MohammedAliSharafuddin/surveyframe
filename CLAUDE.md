@@ -239,10 +239,23 @@ bounds check, and the builder inspector, with
 (2026-07-17, axe-core through chromote: builder chrome zero
 violations in 6 states after a `--t3` darkening and 6 targeted fixes,
 all 7 vignettes zero violations after the shared style block,
-`lang: en-GB`, and `fig.alt` additions). All uncommitted. Suite now
-649 passing. All feature work for 0.3.4 is done. Remaining: the
-release process (version bump, NEWS, MAS co-review, tarball, CRAN
-checks, win-builder, submission).
+`lang: en-GB`, and `fig.alt` additions). All committed at main
+0ca5d24. Suite now 649 passing.
+
+**Scope expanded 2026-07-17 (owner decision): 0.3.4 absorbs the
+statistics and reporting work that was 0.3.5** (effect-size CIs,
+Henseler HTMT, Little's MCAR via naniar, omega and EFA polish, PDF
+via pagedown, report theming, codebook upgrades), since nothing had
+been submitted. **0.3.5 is redefined as the field-validation
+release**: ICSRI 2026 audience feedback (conference 8-9 August 2026)
+plus additional human testing rounds with several short real surveys.
+Targets unchanged: 0.3.4 on 2026-08-15, 0.3.5 on 2026-09-15, 0.4 on
+2026-11-20. The version bump to 0.3.4, the NEWS entry for the UI
+half, and mas_review_034.md exist (uncommitted); the 2026-07-17
+tarball is superseded and gets rebuilt when the statistics half
+lands. Remaining for 0.3.4: the statistics and reporting scope (see
+revision_todo_0.3.md), then NEWS additions, the expanded MAS
+co-review, tarball, CRAN checks, win-builder, submission.
 
 0.3.1 is published on CRAN (2026-06-02). 0.3.3 is fully implemented (543/543
 tests pass, three vignettes rewritten and knit clean, tarball built, local
