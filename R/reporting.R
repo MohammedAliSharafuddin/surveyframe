@@ -480,30 +480,37 @@ sframe_clean_interpretations <- function(interpretations) {
     cb <- codebook_report(instrument)
     codebook_parts <- c(
       "<h2>Codebook</h2>",
-      .render_report_table(cb$items_table, "Survey items")
+      .render_report_table(cb$items_table, "Survey items",
+        col.names = c("ID", "Label", "Type", "Choice set", "Scale",
+                      "Reverse", "Required"))
     )
     if (nrow(cb$choices_table) > 0) {
       codebook_parts <- c(
         codebook_parts,
-        .render_report_table(cb$choices_table, "Choice sets")
+        .render_report_table(cb$choices_table, "Choice sets",
+          col.names = c("Choice set", "Value", "Label"))
       )
     }
     if (nrow(cb$scales_table) > 0) {
       codebook_parts <- c(
         codebook_parts,
-        .render_report_table(cb$scales_table, "Scale definitions")
+        .render_report_table(cb$scales_table, "Scale definitions",
+          col.names = c("ID", "Label", "Method", "Items (n)", "Item IDs"))
       )
     }
     if (!is.null(cb$plan_table) && nrow(cb$plan_table) > 0) {
       codebook_parts <- c(
         codebook_parts,
-        .render_report_table(cb$plan_table, "Pre-declared analysis plan")
+        .render_report_table(cb$plan_table, "Pre-declared analysis plan",
+          col.names = c("ID", "Research question", "Method", "Variables",
+                        "Decision rule"))
       )
     }
     if (!is.null(cb$models_table) && nrow(cb$models_table) > 0) {
       codebook_parts <- c(
         codebook_parts,
-        .render_report_table(cb$models_table, "Measurement and structural models")
+        .render_report_table(cb$models_table, "Measurement and structural models",
+          col.names = c("ID", "Label", "Type", "Engine", "Constructs", "Paths"))
       )
     }
     sections <- c(sections, sprintf("<section>%s</section>", paste(codebook_parts, collapse = "\n")))
@@ -566,8 +573,10 @@ sframe_clean_interpretations <- function(interpretations) {
     }
     sections <- c(sections, sprintf("<section>%s</section>", descriptives_html))
 
-    dist_html <- tryCatch(.render_report_distributions(instrument, data),
-                          error = function(e) "")
+    dist_html <- tryCatch(
+      .render_report_distributions(instrument, data, plot_palette = plot_palette),
+      error = function(e) ""
+    )
     if (nzchar(dist_html)) sections <- c(sections, dist_html)
   }
 
@@ -892,10 +901,11 @@ sframe_clean_interpretations <- function(interpretations) {
 
 # Distribution plots (item bar charts, scale histograms) for the HTML fallback,
 # matching the dashboard. Used only when Quarto is unavailable.
-.render_report_distributions <- function(instrument, data) {
+.render_report_distributions <- function(instrument, data, plot_palette = "web") {
   if (is.null(data)) return("")
   theme <- instrument$render$theme %||% "#16B3B1"
   if (!grepl("^#[0-9A-Fa-f]{3,6}$", theme)) theme <- "#16B3B1"
+  has_ggplot <- requireNamespace("ggplot2", quietly = TRUE)
   choice_by <- function(id) {
     for (c in instrument$choices %||% list()) if (identical(c$id, id)) return(c)
     NULL
@@ -928,6 +938,12 @@ sframe_clean_interpretations <- function(interpretations) {
           function() sframe_draw_likert_diverging(freq, theme),
           height = if (length(freq) <= 5) 320 else 320 + 22 * length(freq)
         )
+      } else if (has_ggplot) {
+        # Shares theme_surveyframe() (theme_classic()-based) with every
+        # other chart in the report instead of a differently styled base-R
+        # bar chart.
+        gg <- sframe_plot_item_chart(item, col, cs, palette = plot_palette)
+        img <- .render_report_ggplot_png(gg, alt = paste("Distribution of", item$label %||% item$id))
       } else {
         img <- .render_report_plot_png(function() {
           op <- graphics::par(mar = c(4, 11, 1, 1)); on.exit(graphics::par(op))
@@ -938,11 +954,16 @@ sframe_clean_interpretations <- function(interpretations) {
     } else if (t %in% c("numeric", "slider", "rating")) {
       num <- suppressWarnings(as.numeric(col)); num <- num[!is.na(num)]
       if (!length(num)) next
-      img <- .render_report_plot_png(function() {
-        op <- graphics::par(mar = c(4, 4, 1, 1)); on.exit(graphics::par(op))
-        graphics::hist(num, col = theme, border = "white", main = NULL,
-                       xlab = item$label, ylab = "Count", las = 1)
-      })
+      if (has_ggplot) {
+        gg <- sframe_plot_item_chart(item, col, NULL, palette = plot_palette)
+        img <- .render_report_ggplot_png(gg, alt = paste("Distribution of", item$label %||% item$id))
+      } else {
+        img <- .render_report_plot_png(function() {
+          op <- graphics::par(mar = c(4, 4, 1, 1)); on.exit(graphics::par(op))
+          graphics::hist(num, col = theme, border = "white", main = NULL,
+                         xlab = item$label, ylab = "Count", las = 1)
+        })
+      }
     }
     if (!is.null(img)) {
       blocks <- c(blocks, sprintf("<h3>%s</h3>%s",
@@ -957,12 +978,17 @@ sframe_clean_interpretations <- function(interpretations) {
     scores <- rowMeans(do.call(cbind, nums), na.rm = TRUE)
     scores <- scores[!is.na(scores)]
     if (!length(scores)) next
-    img <- .render_report_plot_png(function() {
-      op <- graphics::par(mar = c(4, 4, 1, 1)); on.exit(graphics::par(op))
-      graphics::hist(scores, col = theme, border = "white", main = NULL,
-        xlab = paste0(sc$label %||% sc$id, " score"), ylab = "Count", las = 1)
-      graphics::abline(v = mean(scores), col = "#dc2626", lwd = 2, lty = 2)
-    })
+    if (has_ggplot) {
+      gg <- sframe_plot_scale_chart(scores, sc$label %||% sc$id, palette = plot_palette)
+      img <- .render_report_ggplot_png(gg, alt = paste((sc$label %||% sc$id), "scale score distribution"))
+    } else {
+      img <- .render_report_plot_png(function() {
+        op <- graphics::par(mar = c(4, 4, 1, 1)); on.exit(graphics::par(op))
+        graphics::hist(scores, col = theme, border = "white", main = NULL,
+          xlab = paste0(sc$label %||% sc$id, " score"), ylab = "Count", las = 1)
+        graphics::abline(v = mean(scores), col = "#dc2626", lwd = 2, lty = 2)
+      })
+    }
     if (!is.null(img)) {
       blocks <- c(blocks, sprintf("<h3>%s (scale score)</h3>%s",
         htmltools_escape(sc$label %||% sc$id), img))
@@ -974,7 +1000,18 @@ sframe_clean_interpretations <- function(interpretations) {
           paste(blocks, collapse = "\n"))
 }
 
-.render_report_table <- function(x, caption = NULL, note = NULL) {
+# Turn snake_case data-frame names into "Title Case" table headings, e.g.
+# "research_question" -> "Research question", "n_items" -> "N items".
+.sframe_title_case_names <- function(names) {
+  vapply(names, function(nm) {
+    words <- strsplit(gsub("_", " ", nm), " ")[[1]]
+    if (!length(words)) return(nm)
+    words[1] <- paste0(toupper(substring(words[1], 1, 1)), substring(words[1], 2))
+    paste(words, collapse = " ")
+  }, character(1), USE.NAMES = FALSE)
+}
+
+.render_report_table <- function(x, caption = NULL, note = NULL, col.names = NULL) {
   if (!is.data.frame(x) || nrow(x) == 0) {
     return("")
   }
@@ -991,8 +1028,13 @@ sframe_clean_interpretations <- function(interpretations) {
     ignore.case = TRUE
   ))
 
+  # Raw data frame names (e.g. "research_question", "n_items") are internal
+  # identifiers, not reader-facing labels: title-case them with spaces unless
+  # the caller supplies its own headings.
+  display_names <- col.names %||% .sframe_title_case_names(colnames(x))
+
   header <- paste(
-    sprintf("<th scope=\"col\">%s</th>", htmltools_escape(colnames(x))),
+    sprintf("<th scope=\"col\">%s</th>", htmltools_escape(display_names)),
     collapse = ""
   )
   rows <- paste(
