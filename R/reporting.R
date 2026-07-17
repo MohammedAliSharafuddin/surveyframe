@@ -1034,13 +1034,13 @@ sframe_clean_interpretations <- function(interpretations) {
   display_names <- col.names %||% .sframe_title_case_names(colnames(x))
 
   header <- paste(
-    sprintf("<th scope=\"col\">%s</th>", htmltools_escape(display_names)),
+    sprintf("<th scope=\"col\">%s</th>", htmltools_escape_each(display_names)),
     collapse = ""
   )
   rows <- paste(
     apply(x, 1, function(row) {
       cells <- paste(
-        sprintf("<td>%s</td>", htmltools_escape(as.character(row))),
+        sprintf("<td>%s</td>", htmltools_escape_each(as.character(row))),
         collapse = ""
       )
       sprintf("<tr>%s</tr>", cells)
