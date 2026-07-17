@@ -117,7 +117,9 @@ browseURL(out)
 
 -   The plot still uses theme_minimal() rather than theme_classic()
 
-**Fixed 2026-07-17:** the table split was `kable()` falling back to a plain-text format because `render_report()`'s Quarto template never pinned one. Every `kable()` call in `inst/templates/report.qmd` now forces `format = "html"`. The response-distribution and descriptive charts were also drawing with base-R `barplot()`/`hist()`, not `theme_surveyframe()`, in both the Quarto and HTML-fallback report paths. Both now use the same ggplot2 family-plot helpers (`sframe_plot_item_chart()`, `sframe_plot_scale_chart()`) as the rest of the report, so the look is consistent. Re-check at N1.2 and N1.3.
+**Fixed 2026-07-17, first pass:** every `kable()` call in `inst/templates/report.qmd` now forces `format = "html"`. The response-distribution and descriptive charts were also drawing with base-R `barplot()`/`hist()`, not `theme_surveyframe()`, in both the Quarto and HTML-fallback report paths. Both now use the same ggplot2 family-plot helpers (`sframe_plot_item_chart()`, `sframe_plot_scale_chart()`) as the rest of the report, so the look is consistent.
+
+**Fixed 2026-07-17, root cause found on re-check:** the first pass above did not actually fix the table split, because it was never a `kable()` formatting problem. Two real bugs, both pre-existing: (1) `render_report()`'s Quarto path was silently failing on every render (`sframe_draw_likert_diverging()` is called bare in `report.qmd` but was never exported, so Quarto's own `library(surveyframe)` session cannot see it, unlike an interactive `load_all()` session) and falling back to the HTML path without any warning, so the Quarto fix above was never actually exercised. (2) The HTML fallback's own `.render_report_table()` called `htmltools_escape()` on a whole vector of header names or row values at once. That helper collapses a vector into one space-joined string before escaping, which is correct for a caption or a message but merges an entire header row or an entire data row into a single cell, exactly matching the raw space-separated text in the screenshot. Fixed by exporting `sframe_draw_likert_diverging()` (so the Quarto path renders instead of crashing) and adding `htmltools_escape_each()` for per-cell escaping. Verified live: `render_report()` now produces a working Quarto report end to end, and both paths split table columns correctly. Re-check at N1.2 and N1.3.
 
 ### Step B2 — SurveyStudio Interpretations card
 
@@ -309,7 +311,7 @@ results[["rq_ttest_ind"]]$apa
 
 Feedback (captured console output, 2026-07-17):
 
-```
+```         
 > bootstrap_ci(mtcars$mpg, seed = 42)
 estimate    lower    upper
    19.20    16.85    21.40
