@@ -128,6 +128,20 @@ kable(cb$scales_table,
   align = c("l","l","l","c","l"))
 ```
 
+```{r codebook-plan, eval=params$include_codebook && !is.null(cb$plan_table) && nrow(cb$plan_table) > 0}
+#| tbl-cap: "Pre-declared analysis plan"
+kable(cb$plan_table,
+  col.names = c("ID","Research question","Method","Variables","Decision rule"),
+  align = c("l","l","l","l","l"))
+```
+
+```{r codebook-models, eval=params$include_codebook && !is.null(cb$models_table) && nrow(cb$models_table) > 0}
+#| tbl-cap: "Measurement and structural models"
+kable(cb$models_table,
+  col.names = c("ID","Label","Type","Engine","Constructs","Paths"),
+  align = c("l","l","l","l","c","c"))
+```
+
 ---
 
 ## Data Quality {#sec-quality .unnumbered}

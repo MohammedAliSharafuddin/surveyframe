@@ -1,10 +1,54 @@
 # surveyframe 0.3.4
 
-This release completes the plotting and interface work started in 0.3.3.
-Every analysis family now has a chart, reports accept written
-interpretations, both dashboards gain quality and correlation panels, date
-questions gain bounds, and the builder and vignettes pass a WCAG 2.2 AA
-accessibility audit. Hard dependencies are unchanged.
+This release completes the plotting, interface, statistics, and reporting
+work started in 0.3.3. Every analysis family now has a chart, every effect
+size ships with a confidence interval, reports accept written
+interpretations and print to PDF, both dashboards gain quality and
+correlation panels, date questions gain bounds, and the builder and
+vignettes pass a WCAG 2.2 AA accessibility audit. Hard dependencies are
+unchanged. naniar and pagedown join Suggests.
+
+## Effect sizes and intervals
+
+* Four new exported helpers, all base R: `bootstrap_ci()` (percentile
+  bootstrap for any statistic), `cohens_d_ci()`, `cramers_v_ci()`, and
+  `eta_sq_ci()`.
+* Analysis-plan runners attach a confidence interval to their effect size
+  as a new result key: `d_ci` on the t-tests, `r_ci` on Mann-Whitney and
+  Wilcoxon, `eta_ci` on ANOVA and Kruskal-Wallis, `ci` on the correlations
+  (analytic Fisher z for Pearson, bootstrap for the rank methods), and
+  `v_ci` on chi-square and cross-tabulation.
+* APA strings and writing prompts now carry the interval, for example
+  `d = 0.62 [0.18, 1.05]`. Data too small for an interval keeps the
+  previous string.
+
+## Psychometrics
+
+* `validity_report()` computes the Henseler heterotrait-monotrait ratio
+  when item-level data is supplied through the new `items_by_construct`
+  argument. Without it, the previous correlation-based fallback applies
+  and the `htmt_method` element records which was used.
+* `missing_data_report()` runs Little's MCAR test when naniar is
+  installed. Without naniar the result is unchanged.
+* `reliability_report()` records why omega is unavailable for a scale in
+  an `omega_note`, and the reliability chart names those scales in its
+  subtitle.
+* `efa_solution()` adds three tidy data frames ready for plotting and
+  reporting: `loadings_long`, `communalities_table`, and
+  `variance_table`.
+
+## Reports and codebook
+
+* `render_report(format = "pdf")` prints the HTML report to PDF through
+  pagedown, which requires a local Chrome or Chromium. HTML output is
+  unchanged and remains the default.
+* The report's built-in styling now uses a small set of CSS variables, so
+  a re-theme is a one-line change, and a print stylesheet paginates the
+  report cleanly. Tables carry captions and header scopes, and every
+  embedded chart has descriptive alternative text.
+* The codebook now includes the pre-declared analysis plan and the saved
+  measurement and structural models, so one document fully records the
+  instrument a study used.
 
 ## Written interpretations in reports
 

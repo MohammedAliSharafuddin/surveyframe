@@ -9,7 +9,7 @@ render_report(
   data = NULL,
   output_file = NULL,
   output_path = NULL,
-  format = c("html"),
+  format = c("html", "pdf"),
   include_quality = TRUE,
   include_reliability = TRUE,
   include_codebook = TRUE,
@@ -33,7 +33,11 @@ temporary file is written and its path returned.}
 \item{output_path}{Character or NULL. Alias for \code{output_file}. If both are
 supplied, \code{output_file} takes precedence.}
 
-\item{format}{Character. Output format. Currently \code{"html"}.}
+\item{format}{Character. Output format: \code{"html"} (default) or \code{"pdf"}.
+PDF output renders the HTML report and prints it through
+\code{\link[pagedown:chrome_print]{pagedown::chrome_print()}}, which requires the pagedown package (in
+Suggests) and a local Chrome or Chromium installation. The HTML path
+is unchanged.}
 
 \item{include_quality}{Logical. Whether to include the data quality report.
 Requires \code{data}. Defaults to \code{TRUE}.}

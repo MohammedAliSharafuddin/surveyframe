@@ -102,12 +102,61 @@ codebook_report <- function(instrument, format = c("html", "md")) {
     )
   }
 
+  # The pre-declared analysis plan and the measurement models belong in the
+  # codebook, so one document fully records the instrument a study used.
+  plan_table <- if (length(instrument$analysis_plan %||% list()) > 0) {
+    data.frame(
+      id = vapply(instrument$analysis_plan, function(b) b$id %||% "", character(1)),
+      research_question = vapply(instrument$analysis_plan,
+        function(b) b$research_question %||% "", character(1)),
+      method = vapply(instrument$analysis_plan, sframe_analysis_method, character(1)),
+      variables = vapply(instrument$analysis_plan,
+        function(b) paste(sframe_analysis_vars(b), collapse = ", "), character(1)),
+      decision_rule = vapply(instrument$analysis_plan,
+        function(b) b$decision_rule %||% b$interpretation %||% "", character(1)),
+      stringsAsFactors = FALSE,
+      check.names = FALSE
+    )
+  } else {
+    data.frame(
+      id = character(0), research_question = character(0),
+      method = character(0), variables = character(0),
+      decision_rule = character(0),
+      stringsAsFactors = FALSE, check.names = FALSE
+    )
+  }
+
+  models_table <- if (length(instrument$models %||% list()) > 0) {
+    data.frame(
+      id = vapply(instrument$models, function(m) m$id %||% "", character(1)),
+      label = vapply(instrument$models, function(m) m$label %||% "", character(1)),
+      type = vapply(instrument$models, function(m) m$type %||% "", character(1)),
+      engine = vapply(instrument$models, function(m) m$engine %||% "", character(1)),
+      n_constructs = vapply(instrument$models, function(m) {
+        length(sframe_model_constructs(m))
+      }, integer(1)),
+      n_paths = vapply(instrument$models, function(m) {
+        length(m$structural$paths %||% list())
+      }, integer(1)),
+      stringsAsFactors = FALSE,
+      check.names = FALSE
+    )
+  } else {
+    data.frame(
+      id = character(0), label = character(0), type = character(0),
+      engine = character(0), n_constructs = integer(0), n_paths = integer(0),
+      stringsAsFactors = FALSE, check.names = FALSE
+    )
+  }
+
   structure(
     list(
       instrument_meta = instrument$meta,
       items_table     = items_table,
       choices_table   = choices_table,
       scales_table    = scales_table,
+      plan_table      = plan_table,
+      models_table    = models_table,
       format          = format
     ),
     class = "sframe_codebook"
@@ -144,7 +193,11 @@ print.sframe_codebook <- function(x, ...) {
 #'   temporary file is written and its path returned.
 #' @param output_path Character or NULL. Alias for `output_file`. If both are
 #'   supplied, `output_file` takes precedence.
-#' @param format Character. Output format. Currently `"html"`.
+#' @param format Character. Output format: `"html"` (default) or `"pdf"`.
+#'   PDF output renders the HTML report and prints it through
+#'   [pagedown::chrome_print()], which requires the pagedown package (in
+#'   Suggests) and a local Chrome or Chromium installation. The HTML path
+#'   is unchanged.
 #' @param include_quality Logical. Whether to include the data quality report.
 #'   Requires `data`. Defaults to `TRUE`.
 #' @param include_reliability Logical. Whether to include reliability
@@ -205,7 +258,7 @@ render_report <- function(
     data              = NULL,
     output_file       = NULL,
     output_path       = NULL,
-    format            = c("html"),
+    format            = c("html", "pdf"),
     include_quality   = TRUE,
     include_reliability = TRUE,
     include_codebook  = TRUE,
@@ -221,8 +274,46 @@ render_report <- function(
   interpretations <- sframe_clean_interpretations(interpretations)
 
   format <- rlang::arg_match(format)
-  dest <- output_file %||% output_path %||% tempfile(fileext = ".html")
+  dest <- output_file %||% output_path %||%
+    tempfile(fileext = paste0(".", format))
   dest <- path.expand(dest)
+
+  # PDF is strictly additive: build the HTML report exactly as the html
+  # path does, then print it through Chrome. Requires pagedown (Suggests)
+  # and a local Chrome or Chromium.
+  if (identical(format, "pdf")) {
+    if (!requireNamespace("pagedown", quietly = TRUE)) {
+      rlang::abort(
+        "Package 'pagedown' is needed for PDF output. Install it, or use format = 'html'.",
+        class = c("sframe_missing_package", "sframe_error")
+      )
+    }
+    html_tmp <- tempfile(fileext = ".html")
+    on.exit(unlink(html_tmp, force = TRUE), add = TRUE)
+    render_report(
+      instrument, data = data, output_file = html_tmp, format = "html",
+      include_quality = include_quality,
+      include_reliability = include_reliability,
+      include_codebook = include_codebook,
+      include_missing = include_missing,
+      include_descriptives = include_descriptives,
+      include_analysis = include_analysis,
+      include_models = include_models,
+      plot_palette = plot_palette,
+      interpretations = interpretations
+    )
+    printed <- tryCatch(
+      pagedown::chrome_print(input = html_tmp, output = dest),
+      error = function(e) {
+        rlang::abort(
+          paste0("PDF printing failed: ", conditionMessage(e),
+                 ". pagedown::chrome_print() needs a local Chrome or Chromium; use format = 'html' if none is available."),
+          class = "sframe_error"
+        )
+      }
+    )
+    return(invisible(dest))
+  }
 
   output_dir <- dirname(dest)
   if (!dir.exists(output_dir)) {
@@ -403,6 +494,18 @@ sframe_clean_interpretations <- function(interpretations) {
         .render_report_table(cb$scales_table, "Scale definitions")
       )
     }
+    if (!is.null(cb$plan_table) && nrow(cb$plan_table) > 0) {
+      codebook_parts <- c(
+        codebook_parts,
+        .render_report_table(cb$plan_table, "Pre-declared analysis plan")
+      )
+    }
+    if (!is.null(cb$models_table) && nrow(cb$models_table) > 0) {
+      codebook_parts <- c(
+        codebook_parts,
+        .render_report_table(cb$models_table, "Measurement and structural models")
+      )
+    }
     sections <- c(sections, sprintf("<section>%s</section>", paste(codebook_parts, collapse = "\n")))
   }
 
@@ -547,22 +650,45 @@ sframe_clean_interpretations <- function(interpretations) {
       "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">",
       "<title>%s</title>",
       "<style>",
-      "body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; max-width: 900px; margin: 0 auto; padding: 32px 20px; color: #1a1a2e; line-height: 1.6; }",
-      "h1, h2, h3 { color: #1a1a2e; }",
-      "a { color: #16B3B1; }",
-      "section { margin: 0 0 28px; padding-bottom: 12px; border-bottom: 1px solid #d9e2ec; }",
+      "/* Brand palette as CSS variables: a theme is a one-line change here.",
+      "   --sf-accent is the AA-safe teal (>= 4.5:1 on white). */",
+      ":root {",
+      "  --sf-ink: #1a1a2e;",
+      "  --sf-accent: #0e7c7a;",
+      "  --sf-muted: #52606d;",
+      "  --sf-faint: #5b6b80;",
+      "  --sf-line: #d9e2ec;",
+      "  --sf-panel: #f8fafc;",
+      "  --sf-rule: #000;",
+      "}",
+      "body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; max-width: 900px; margin: 0 auto; padding: 32px 20px; color: var(--sf-ink); line-height: 1.6; }",
+      "h1, h2, h3 { color: var(--sf-ink); }",
+      "a { color: var(--sf-accent); }",
+      "section { margin: 0 0 28px; padding-bottom: 12px; border-bottom: 1px solid var(--sf-line); }",
       "table { display: block; overflow-x: auto; max-width: 100%%; border-collapse: collapse; margin: 16px 0 2px; font-size: .93em; }",
       "caption { text-align: left; font-style: italic; font-size: .95em; margin-bottom: 4px; }",
-      "thead tr { border-top: 2px solid #000; border-bottom: 1px solid #000; }",
-      "tbody tr:last-child td { border-bottom: 2px solid #000; }",
+      "thead tr { border-top: 2px solid var(--sf-rule); border-bottom: 1px solid var(--sf-rule); }",
+      "tbody tr:last-child td { border-bottom: 2px solid var(--sf-rule); }",
       "th, td { border: none; padding: 5px 12px; text-align: left; vertical-align: top; }",
       "th { font-weight: 700; background: none; }",
       ".tbl-note { font-size: .85em; font-style: italic; color: #333; margin-top: 3px; margin-bottom: 16px; }",
-      ".meta { color: #52606d; margin-bottom: 24px; }",
-      ".rq-block { margin: 18px 0; padding: 14px; background: #f8fafc; border: 1px solid #d9e2ec; border-radius: 6px; }",
-      ".apa { color: #1a1a2e; }",
-      ".sf-foot { text-align: center; font-size: 12px; color: #94a3b8; margin-top: 48px; padding-top: 16px; border-top: 1px solid #eee; }",
-      ".sf-foot a { color: #16B3B1; font-weight: 600; text-decoration: none; }",
+      ".meta { color: var(--sf-muted); margin-bottom: 24px; }",
+      ".rq-block { margin: 18px 0; padding: 14px; background: var(--sf-panel); border: 1px solid var(--sf-line); border-radius: 6px; }",
+      ".apa { color: var(--sf-ink); }",
+      ".sf-foot { text-align: center; font-size: 12px; color: var(--sf-faint); margin-top: 48px; padding-top: 16px; border-top: 1px solid #eee; }",
+      ".sf-foot a { color: var(--sf-accent); font-weight: 600; text-decoration: none; }",
+      "/* Print (and PDF via pagedown): paginate cleanly, keep a result",
+      "   block and a table's header with its rows, drop the panel tint. */",
+      "@media print {",
+      "  body { max-width: none; padding: 0; }",
+      "  section { border-bottom: none; }",
+      "  .rq-block { break-inside: avoid; background: none; border: 1px solid var(--sf-line); }",
+      "  table { display: table; overflow-x: visible; }",
+      "  thead { display: table-header-group; }",
+      "  tr, img { break-inside: avoid; }",
+      "  h2, h3 { break-after: avoid; }",
+      "  a { color: var(--sf-ink); text-decoration: none; }",
+      "}",
       "</style>",
       "</head>",
       "<body>",
@@ -648,17 +774,27 @@ sframe_clean_interpretations <- function(interpretations) {
       }
       # The chart for this result renders directly under its table, as one
       # unit per research question, rather than in a separate section.
+      rq_label <- result$research_question %||% paste("research question", i)
       plot_html <- ""
       if (!is.null(result$plot)) {
-        img <- tryCatch(.render_report_ggplot_png(result$plot), error = function(e) NULL)
+        img <- tryCatch(
+          .render_report_ggplot_png(result$plot,
+                                    alt = paste("Chart for", rq_label)),
+          error = function(e) NULL
+        )
         if (!is.null(img)) plot_html <- img
       }
       # Regression diagnostics are four separate panels, not one plot, so
       # they render as four stacked images beneath the main chart rather
       # than forcing a combined-grob dependency just to arrange them.
       if (is.list(result$diagnostic_plots)) {
-        diag_imgs <- vapply(result$diagnostic_plots, function(p) {
-          img <- tryCatch(.render_report_ggplot_png(p), error = function(e) NULL)
+        diag_imgs <- vapply(seq_along(result$diagnostic_plots), function(di) {
+          img <- tryCatch(
+            .render_report_ggplot_png(
+              result$diagnostic_plots[[di]],
+              alt = sprintf("Regression diagnostic panel %d for %s", di, rq_label)),
+            error = function(e) NULL
+          )
           img %||% ""
         }, character(1))
         plot_html <- paste(c(plot_html, diag_imgs[diag_imgs != ""]), collapse = "\n")
@@ -738,7 +874,7 @@ sframe_clean_interpretations <- function(interpretations) {
 # Render a ggplot object to a base64-embedded PNG <img> for the HTML
 # fallback, same embedding pattern as .render_report_plot_png() above but
 # for the ggplot2 objects run_analysis_plan(plots = TRUE) attaches.
-.render_report_ggplot_png <- function(gg) {
+.render_report_ggplot_png <- function(gg, alt = "result chart") {
   if (!requireNamespace("ggplot2", quietly = TRUE)) return(NULL)
   tmp <- tempfile(fileext = ".png")
   ok <- tryCatch({
@@ -749,8 +885,8 @@ sframe_clean_interpretations <- function(interpretations) {
   raw <- readBin(tmp, "raw", file.info(tmp)$size)
   unlink(tmp)
   sprintf(
-    "<img alt=\"result chart\" style=\"max-width:100%%;height:auto\" src=\"data:image/png;base64,%s\">",
-    openssl::base64_encode(raw)
+    "<img alt=\"%s\" style=\"max-width:100%%;height:auto\" src=\"data:image/png;base64,%s\">",
+    htmltools_escape(alt), openssl::base64_encode(raw)
   )
 }
 
@@ -856,7 +992,7 @@ sframe_clean_interpretations <- function(interpretations) {
   ))
 
   header <- paste(
-    sprintf("<th>%s</th>", htmltools_escape(colnames(x))),
+    sprintf("<th scope=\"col\">%s</th>", htmltools_escape(colnames(x))),
     collapse = ""
   )
   rows <- paste(

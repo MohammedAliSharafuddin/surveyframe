@@ -225,6 +225,7 @@ sframe_run_crosstab <- function(data, vars, options = list()) {
   effect <- if (denom > 0) sqrt(unname(ct$statistic) / denom) else NA_real_
   effect_name <- if (r_dim == 2 && c_dim == 2) "phi" else "Cramer's V"
   effect_symbol <- if (identical(effect_name, "phi")) "\u03c6" else "V"
+  v_ci <- cramers_v_ci(tbl)
   weighted_table <- NULL
   if (!is.null(weights) && nzchar(weights) && weights %in% colnames(data)) {
     w <- suppressWarnings(as.numeric(data[[weights]][complete]))
@@ -246,16 +247,18 @@ sframe_run_crosstab <- function(data, vars, options = list()) {
     effect_name = effect_name,
     phi      = if (identical(effect_name, "phi")) unname(effect) else NA_real_,
     cramer_v = if (!identical(effect_name, "phi")) unname(effect) else NA_real_,
+    v_ci     = v_ci,
     effect_label = sframe_effect_label(effect, "r"),
     apa      = sprintf(
-      "\u03c7\u00b2(%d, N = %d) = %.2f, p %s, %s = %.2f",
+      "\u03c7\u00b2(%d, N = %d) = %.2f, p %s, %s = %.2f%s",
       ct$parameter, n, ct$statistic, sframe_p_string(ct$p.value),
-      effect_symbol, effect
+      effect_symbol, effect, sframe_ci_string(v_ci)
     ),
     prompt   = sprintf(
-      "The chi-square test %s a significant association between %s and %s (%s = %.2f, %s effect). Describe the pattern in the cross-tabulation.",
+      "The chi-square test %s a significant association between %s and %s (%s = %.2f%s, %s effect). Describe the pattern in the cross-tabulation.",
       if (ct$p.value < .05) "revealed" else "found no",
-      vars[1], vars[2], effect_name, effect, sframe_effect_label(effect, "r")
+      vars[1], vars[2], effect_name, effect, sframe_ci_string(v_ci),
+      sframe_effect_label(effect, "r")
     ),
     p_method = if (isTRUE(options$simulate_p_value) && any(ct$expected < 5)) "simulated" else "asymptotic",
     warnings = if (any(ct$expected < 5)) {
@@ -280,6 +283,7 @@ sframe_run_mann_whitney <- function(data, vars) {
   n <- length(g1) + length(g2)
   z <- stats::qnorm(wt$p.value / 2)
   r <- abs(z) / sqrt(n)
+  r_ci <- sframe_rank_r_ci(g1, g2)
   list(
     test     = "mann_whitney",
     vars     = vars,
@@ -288,18 +292,20 @@ sframe_run_mann_whitney <- function(data, vars) {
     median1  = stats::median(g1), median2 = stats::median(g2),
     U        = unname(wt$statistic),
     z        = z, p = wt$p.value, r = r,
+    r_ci     = r_ci,
     effect_label = sframe_effect_label(r, "r"),
     apa      = sprintf(
-      "U = %.0f, z = %.2f, p %s, r = %.2f",
-      wt$statistic, z, sframe_p_string(wt$p.value), r
+      "U = %.0f, z = %.2f, p %s, r = %.2f%s",
+      wt$statistic, z, sframe_p_string(wt$p.value), r,
+      sframe_ci_string(r_ci)
     ),
     prompt   = sprintf(
-      "The Mann-Whitney test %s a significant difference between %s (Mdn = %.2f) and %s (Mdn = %.2f), U = %.0f, p %s, r = %.2f (%s effect). Interpret the direction and practical significance.",
+      "The Mann-Whitney test %s a significant difference between %s (Mdn = %.2f) and %s (Mdn = %.2f), U = %.0f, p %s, r = %.2f%s (%s effect). Interpret the direction and practical significance.",
       if (wt$p.value < .05) "revealed" else "did not reveal",
       groups[1], stats::median(g1),
       groups[2], stats::median(g2),
       wt$statistic, sframe_p_string(wt$p.value),
-      r, sframe_effect_label(r, "r")
+      r, sframe_ci_string(r_ci), sframe_effect_label(r, "r")
     )
   )
 }
@@ -318,6 +324,7 @@ sframe_run_t_test <- function(data, vars) {
   tt <- tryCatch(stats::t.test(g1, g2), error = function(e) NULL)
   if (is.null(tt)) return(list(test = "t_test_ind", error = "Test failed."))
   d <- sframe_cohens_d(g1, g2)
+  d_ci <- cohens_d_ci(g1, g2)
   list(
     test     = "t_test_ind",
     vars     = vars,
@@ -328,18 +335,21 @@ sframe_run_t_test <- function(data, vars) {
     t        = unname(tt$statistic),
     df       = unname(tt$parameter),
     p        = tt$p.value, d = d,
+    d_ci     = d_ci,
     effect_label = sframe_effect_label(d, "d"),
     apa      = sprintf(
-      "t(%.2f) = %.2f, p %s, d = %.2f",
-      tt$parameter, tt$statistic, sframe_p_string(tt$p.value), d
+      "t(%.2f) = %.2f, p %s, d = %.2f%s",
+      tt$parameter, tt$statistic, sframe_p_string(tt$p.value), d,
+      sframe_ci_string(d_ci)
     ),
     prompt   = sprintf(
-      "The independent-samples t-test %s a significant difference between %s (M = %.2f, SD = %.2f) and %s (M = %.2f, SD = %.2f), t(%.2f) = %.2f, p %s, d = %.2f (%s effect). Discuss the direction and magnitude.",
+      "The independent-samples t-test %s a significant difference between %s (M = %.2f, SD = %.2f) and %s (M = %.2f, SD = %.2f), t(%.2f) = %.2f, p %s, d = %.2f%s (%s effect). Discuss the direction and magnitude.",
       if (tt$p.value < .05) "revealed" else "did not reveal",
       groups[1], mean(g1), stats::sd(g1),
       groups[2], mean(g2), stats::sd(g2),
       tt$parameter, tt$statistic,
-      sframe_p_string(tt$p.value), d, sframe_effect_label(d, "d")
+      sframe_p_string(tt$p.value), d, sframe_ci_string(d_ci),
+      sframe_effect_label(d, "d")
     )
   )
 }
@@ -384,6 +394,8 @@ sframe_run_anova_one <- function(data, vars) {
     )
   } else NULL
 
+  eta_ci <- eta_sq_ci(outcome[complete], group[complete])
+
   list(
     test = "anova_one",
     vars = vars,
@@ -394,19 +406,21 @@ sframe_run_anova_one <- function(data, vars) {
     df2 = n - k,
     p = p_val,
     eta2 = eta2,
+    eta_ci = eta_ci,
     group_means = as.list(group_means),
     tukey = tukey,
     effect_label = sframe_effect_label(eta2, "eta2"),
     apa = sprintf(
-      "F(%d, %d) = %.2f, p %s, \u03b7\u00b2 = %.3f",
-      k - 1, n - k, F_stat, sframe_p_string(p_val), eta2
+      "F(%d, %d) = %.2f, p %s, \u03b7\u00b2 = %.3f%s",
+      k - 1, n - k, F_stat, sframe_p_string(p_val), eta2,
+      sframe_ci_string(eta_ci)
     ),
     prompt = sprintf(
-      "The one-way ANOVA %s a significant effect of %s on %s, F(%d, %d) = %.2f, p %s, \u03b7\u00b2 = %.3f (%s effect). Group means: %s. %s",
+      "The one-way ANOVA %s a significant effect of %s on %s, F(%d, %d) = %.2f, p %s, \u03b7\u00b2 = %.3f%s (%s effect). Group means: %s. %s",
       if (!is.na(p_val) && p_val < .05) "revealed" else "did not reveal",
       vars[1], vars[2],
       k - 1, n - k, F_stat, sframe_p_string(p_val),
-      eta2, sframe_effect_label(eta2, "eta2"),
+      eta2, sframe_ci_string(eta_ci), sframe_effect_label(eta2, "eta2"),
       group_means_str,
       if (!is.null(tukey))
         "Tukey HSD post-hoc comparisons are included in the result object."
@@ -434,6 +448,10 @@ sframe_run_t_test_pair <- function(data, vars) {
 
   diff <- x - y
   dz <- mean(diff, na.rm = TRUE) / stats::sd(diff, na.rm = TRUE)
+  d_ci <- bootstrap_ci(diff, FUN = function(v) {
+    s <- stats::sd(v)
+    if (is.na(s) || s == 0) NA_real_ else mean(v) / s
+  })
 
   list(
     test = "t_test_pair",
@@ -447,19 +465,20 @@ sframe_run_t_test_pair <- function(data, vars) {
     df = unname(tt$parameter),
     p = tt$p.value,
     d_z = dz,
+    d_ci = d_ci,
     effect_label = sframe_effect_label(abs(dz), "d"),
     apa = sprintf(
-      "t(%d) = %.2f, p %s, d_z = %.2f",
+      "t(%d) = %.2f, p %s, d_z = %.2f%s",
       unname(tt$parameter), unname(tt$statistic),
-      sframe_p_string(tt$p.value), dz
+      sframe_p_string(tt$p.value), dz, sframe_ci_string(d_ci)
     ),
     prompt = sprintf(
-      "The paired-samples t-test %s a significant mean difference between %s (M = %.2f) and %s (M = %.2f), t(%d) = %.2f, p %s, d_z = %.2f (%s effect). Interpret the direction and practical significance of the change.",
+      "The paired-samples t-test %s a significant mean difference between %s (M = %.2f) and %s (M = %.2f), t(%d) = %.2f, p %s, d_z = %.2f%s (%s effect). Interpret the direction and practical significance of the change.",
       if (tt$p.value < .05) "revealed" else "did not reveal",
       vars[1], mean(x), vars[2], mean(y),
       unname(tt$parameter), unname(tt$statistic),
       sframe_p_string(tt$p.value),
-      dz, sframe_effect_label(abs(dz), "d")
+      dz, sframe_ci_string(d_ci), sframe_effect_label(abs(dz), "d")
     )
   )
 }
@@ -486,6 +505,7 @@ sframe_run_wilcoxon_pair <- function(data, vars) {
 
   z <- stats::qnorm(wt$p.value / 2)
   r <- abs(z) / sqrt(n)
+  r_ci <- sframe_signed_rank_r_ci(x - y)
 
   list(
     test = "wilcoxon_pair",
@@ -497,19 +517,21 @@ sframe_run_wilcoxon_pair <- function(data, vars) {
     z = z,
     p = wt$p.value,
     r = r,
+    r_ci = r_ci,
     effect_label = sframe_effect_label(r, "r"),
     apa = sprintf(
-      "V = %.0f, z = %.2f, p %s, r = %.2f",
-      wt$statistic, z, sframe_p_string(wt$p.value), r
+      "V = %.0f, z = %.2f, p %s, r = %.2f%s",
+      wt$statistic, z, sframe_p_string(wt$p.value), r,
+      sframe_ci_string(r_ci)
     ),
     prompt = sprintf(
-      "The Wilcoxon signed-rank test %s a significant difference between %s (Mdn = %.2f) and %s (Mdn = %.2f), V = %.0f, z = %.2f, p %s, r = %.2f (%s effect). Discuss the direction and practical significance.",
+      "The Wilcoxon signed-rank test %s a significant difference between %s (Mdn = %.2f) and %s (Mdn = %.2f), V = %.0f, z = %.2f, p %s, r = %.2f%s (%s effect). Discuss the direction and practical significance.",
       if (wt$p.value < .05) "revealed" else "did not reveal",
       vars[1], stats::median(x),
       vars[2], stats::median(y),
       wt$statistic, z,
       sframe_p_string(wt$p.value),
-      r, sframe_effect_label(r, "r")
+      r, sframe_ci_string(r_ci), sframe_effect_label(r, "r")
     )
   )
 }
@@ -528,6 +550,7 @@ sframe_run_kruskal <- function(data, vars) {
   n <- sum(complete)
   eta2 <- (kt$statistic - length(unique(group[complete])) + 1) / (n - length(unique(group[complete])))
   eta2 <- max(0, unname(eta2))
+  eta_ci <- sframe_kw_eta_sq_ci(outcome[complete], group[complete])
   list(
     test     = "kruskal_wallis",
     vars     = vars,
@@ -535,16 +558,19 @@ sframe_run_kruskal <- function(data, vars) {
     df       = unname(kt$parameter),
     p        = kt$p.value,
     eta2     = eta2,
+    eta_ci   = eta_ci,
     effect_label = sframe_effect_label(eta2, "eta2"),
     apa      = sprintf(
-      "H(%d) = %.2f, p %s, \u03b7\u00b2 = %.3f",
-      kt$parameter, kt$statistic, sframe_p_string(kt$p.value), eta2
+      "H(%d) = %.2f, p %s, \u03b7\u00b2 = %.3f%s",
+      kt$parameter, kt$statistic, sframe_p_string(kt$p.value), eta2,
+      sframe_ci_string(eta_ci)
     ),
     prompt   = sprintf(
-      "The Kruskal-Wallis test %s a significant difference across groups, H(%d) = %.2f, p %s, \u03b7\u00b2 = %.3f (%s effect). If significant, describe which groups differed and in what direction.",
+      "The Kruskal-Wallis test %s a significant difference across groups, H(%d) = %.2f, p %s, \u03b7\u00b2 = %.3f%s (%s effect). If significant, describe which groups differed and in what direction.",
       if (kt$p.value < .05) "revealed" else "did not reveal",
       kt$parameter, kt$statistic,
-      sframe_p_string(kt$p.value), eta2, sframe_effect_label(eta2, "eta2")
+      sframe_p_string(kt$p.value), eta2, sframe_ci_string(eta_ci),
+      sframe_effect_label(eta2, "eta2")
     )
   )
 }
@@ -561,6 +587,12 @@ sframe_run_correlation <- function(data, vars, method = "pearson") {
   if (is.null(ct)) return(list(test = paste0("correlation_", method), error = "Test failed."))
   r <- unname(ct$estimate)
   sym <- switch(method, pearson = "r", spearman = "r_s", kendall = "tau", "r")
+  # Fisher z is analytic for Pearson; the rank correlations bootstrap.
+  ci <- if (identical(method, "pearson")) {
+    sframe_fisher_z_ci(r, n)
+  } else {
+    sframe_cor_boot_ci(x[complete], y[complete], method)
+  }
   list(
     test     = paste0("correlation_", method),
     vars     = vars,
@@ -569,18 +601,19 @@ sframe_run_correlation <- function(data, vars, method = "pearson") {
     r        = r,
     df       = n - 2,
     p        = ct$p.value,
+    ci       = ci,
     effect_label = sframe_effect_label(abs(r), "r"),
     apa      = sprintf(
-      "%s(%d) = %.2f, p %s",
-      sym, n - 2, r, sframe_p_string(ct$p.value)
+      "%s(%d) = %.2f%s, p %s",
+      sym, n - 2, r, sframe_ci_string(ci), sframe_p_string(ct$p.value)
     ),
     prompt   = sprintf(
-      "There was a %s, %s %s correlation between %s and %s, %s(%d) = %.2f, p %s. Explain what this means for your research question.",
+      "There was a %s, %s %s correlation between %s and %s, %s(%d) = %.2f%s, p %s. Explain what this means for your research question.",
       if (r > 0) "positive" else "negative",
       sframe_effect_label(abs(r), "r"),
       if (ct$p.value < .05) "significant" else "non-significant",
       vars[1], vars[2],
-      sym, n - 2, r, sframe_p_string(ct$p.value)
+      sym, n - 2, r, sframe_ci_string(ci), sframe_p_string(ct$p.value)
     )
   )
 }

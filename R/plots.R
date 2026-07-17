@@ -545,14 +545,19 @@ sframe_plot_efa_loadings <- function(x, palette = c("web", "print")) {
   palette <- match.arg(palette)
   stopifnot(inherits(x, "sframe_efa_solution"))
   brand <- sframe_brand(palette)
-  loadings <- x$loadings
-  factor_cols <- setdiff(names(loadings), "item_id")
-  long <- stats::reshape(
-    loadings, direction = "long", varying = factor_cols,
-    v.names = "loading", timevar = "factor", times = factor_cols,
-    idvar = "item_id"
-  )
-  long$item_id <- factor(long$item_id, levels = rev(loadings$item_id))
+  # The solution's tidy long frame (added 0.3.4); reshape only for
+  # solutions serialised before it existed.
+  long <- x$loadings_long
+  if (is.null(long)) {
+    loadings <- x$loadings
+    factor_cols <- setdiff(names(loadings), "item_id")
+    long <- stats::reshape(
+      loadings, direction = "long", varying = factor_cols,
+      v.names = "loading", timevar = "factor", times = factor_cols,
+      idvar = "item_id"
+    )
+  }
+  long$item_id <- factor(long$item_id, levels = rev(x$loadings$item_id))
   long$label_colour <- sframe_heatmap_label_colour(long$loading, brand$ink)
   p <- ggplot2::ggplot(long, ggplot2::aes(x = .data$factor, y = .data$item_id)) +
     ggplot2::geom_tile(ggplot2::aes(fill = .data$loading), colour = brand$ink, linewidth = 0.3) +
@@ -597,13 +602,24 @@ sframe_plot_reliability <- function(x, palette = c("web", "print")) {
                          v.names = "value", timevar = "statistic",
                          times = c("Alpha", "Omega"), idvar = "scale")
   long <- long[!is.na(long$value), , drop = FALSE]
+  # Scales whose omega could not be computed carry an omega_note; name them
+  # in the subtitle so a missing bar reads as a known limitation.
+  noted <- vapply(x, function(s) {
+    if (is.null(s$omega_note)) "" else s$label %||% s$scale_id
+  }, character(1))
+  noted <- noted[nzchar(noted)]
+  subtitle <- "Dashed line: 0.70 threshold"
+  if (length(noted) > 0) {
+    subtitle <- paste0(subtitle, ". Omega unavailable for: ",
+                       paste(noted, collapse = ", "))
+  }
   ggplot2::ggplot(long, ggplot2::aes(x = .data$scale, y = .data$value,
                                      fill = .data$statistic)) +
     ggplot2::geom_hline(yintercept = 0.70, colour = brand$muted, linetype = "dashed") +
     ggplot2::geom_col(position = ggplot2::position_dodge(width = 0.75), width = 0.65,
                       colour = brand$ink, linewidth = 0.3) +
     ggplot2::scale_fill_manual(values = c(Alpha = brand$fill_duo[1], Omega = brand$fill_duo[2])) +
-    ggplot2::labs(title = "Reliability by scale", subtitle = "Dashed line: 0.70 threshold",
+    ggplot2::labs(title = "Reliability by scale", subtitle = subtitle,
                  x = NULL, y = NULL, fill = NULL) +
     theme_surveyframe(palette = palette) + sframe_theme_angled_x()
 }
