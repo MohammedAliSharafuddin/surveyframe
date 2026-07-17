@@ -217,9 +217,10 @@ sframe_plot_correlation <- function(result, data, palette = c("web", "print")) {
                          colour = brand$ink, fill = brand$grid,
                          linewidth = 0.7) +
     ggplot2::labs(
-      title    = paste("Relationship between", vars[1], "and", vars[2]),
+      title    = paste("Relationship between", .sframe_title_case_names(vars[1]),
+                       "and", .sframe_title_case_names(vars[2])),
       subtitle = result$apa %||% NULL,
-      x = vars[1], y = vars[2]
+      x = .sframe_title_case_names(vars[1]), y = .sframe_title_case_names(vars[2])
     ) +
     theme_surveyframe(palette = palette)
 }
@@ -244,9 +245,10 @@ sframe_plot_regression <- function(result, data, palette = c("web", "print")) {
                            colour = brand$ink, fill = brand$grid,
                            linewidth = 0.7) +
       ggplot2::labs(
-        title    = paste(outcome, "predicted by", predictors),
+        title    = paste(.sframe_title_case_names(outcome), "predicted by",
+                         .sframe_title_case_names(predictors)),
         subtitle = result$apa %||% NULL,
-        x = predictors, y = outcome
+        x = .sframe_title_case_names(predictors), y = .sframe_title_case_names(outcome)
       )
   } else {
     fit <- stats::lm(
@@ -258,7 +260,7 @@ sframe_plot_regression <- function(result, data, palette = c("web", "print")) {
       ggplot2::geom_point(colour = brand$teal, alpha = 0.75, size = 2) +
       ggplot2::geom_abline(colour = brand$ink, linetype = "dashed") +
       ggplot2::labs(
-        title    = paste("Observed against fitted values for", outcome),
+        title    = paste("Observed against fitted values for", .sframe_title_case_names(outcome)),
         subtitle = result$apa %||% NULL,
         x = "Fitted values", y = "Observed values"
       )
@@ -565,6 +567,7 @@ sframe_plot_efa_loadings <- function(x, palette = c("web", "print")) {
                                     colour = .data$label_colour), size = 3) +
     ggplot2::scale_colour_identity() +
     ggplot2::labs(title = "EFA loadings", x = "Factor", y = NULL, fill = "Loading") +
+    ggplot2::scale_y_discrete(labels = .sframe_title_case_names) +
     theme_surveyframe(palette = palette)
   if (palette == "web") {
     p + ggplot2::scale_fill_gradient2(low = "#b91c1c", mid = "white", high = brand$teal,
@@ -693,6 +696,8 @@ sframe_plot_correlation_matrix <- function(data, vars, method = "pearson",
     ggplot2::labs(title = sprintf("%s correlation matrix",
                                   tools::toTitleCase(method)),
                  x = NULL, y = NULL, fill = "r") +
+    ggplot2::scale_x_discrete(labels = .sframe_title_case_names) +
+    ggplot2::scale_y_discrete(labels = .sframe_title_case_names) +
     theme_surveyframe(palette = palette)
   if (palette == "web") {
     p + ggplot2::scale_fill_gradient2(low = "#b91c1c", mid = "white", high = brand$teal,
@@ -728,6 +733,7 @@ sframe_plot_quality <- function(x, palette = c("web", "print")) {
   ggplot2::ggplot(df, ggplot2::aes(x = stats::reorder(.data$scale, -.data$flag_rate),
                                    y = .data$flag_rate)) +
     ggplot2::geom_col(fill = bar_fill, colour = brand$ink, linewidth = 0.3, width = 0.65) +
+    ggplot2::scale_x_discrete(labels = .sframe_title_case_names) +
     ggplot2::scale_y_continuous(labels = scales_percent_fallback) +
     ggplot2::labs(title = "Straight-lining flag rate by scale", x = NULL, y = "Flag rate") +
     theme_surveyframe(palette = palette) + sframe_theme_angled_x()
@@ -787,6 +793,7 @@ sframe_plot_validity <- function(x, palette = c("web", "print")) {
     ggplot2::labs(title = "Construct validity",
                   subtitle = "Dashed line: 0.70 CR threshold. Dotted line: 0.50 AVE threshold.",
                   x = NULL, y = NULL, fill = NULL) +
+    ggplot2::scale_x_discrete(labels = .sframe_title_case_names) +
     theme_surveyframe(palette = palette) + sframe_theme_angled_x()
 }
 
@@ -800,7 +807,8 @@ plot.sframe_validity_report <- function(x, ..., palette = c("web", "print")) {
 #' @param x An `sframe_missing_data_report` object from
 #'   [missing_data_report()].
 #' @param palette One of `"web"` or `"print"`. See [sframe_brand()].
-#' @return A ggplot2 object, or `NULL` when no item has missing values.
+#' @return A ggplot2 object. When no item has missing values, this is a
+#'   short "no missing responses" message rather than an empty bar chart.
 #' @export
 #' @seealso [missing_data_report()]
 sframe_plot_missingness <- function(x, palette = c("web", "print")) {
@@ -810,11 +818,29 @@ sframe_plot_missingness <- function(x, palette = c("web", "print")) {
   brand <- sframe_brand(palette)
   df <- x$item_missing
   df <- df[!is.na(df$missing_pct) & df$missing_pct > 0, , drop = FALSE]
-  if (nrow(df) == 0) return(NULL)
+  if (nrow(df) == 0) {
+    # An empty bar chart with no bars reads as a rendering failure, not a
+    # result, so a completely clean dataset gets its own reassuring chart
+    # rather than a silent NULL.
+    return(
+      ggplot2::ggplot(data.frame(x = 0, y = 0, label = "No missing responses in any item")) +
+        ggplot2::geom_text(ggplot2::aes(x = .data$x, y = .data$y, label = .data$label),
+                           size = 4.2, colour = brand$ink) +
+        ggplot2::labs(title = "Missing responses by item", x = NULL, y = NULL) +
+        theme_surveyframe(palette = palette) +
+        ggplot2::theme(
+          axis.text = ggplot2::element_blank(),
+          axis.ticks = ggplot2::element_blank(),
+          panel.grid = ggplot2::element_blank(),
+          axis.line = ggplot2::element_blank()
+        )
+    )
+  }
   bar_fill <- if (palette == "web") brand$teal else brand$fill
   ggplot2::ggplot(df, ggplot2::aes(x = stats::reorder(.data$variable, -.data$missing_pct),
                                    y = .data$missing_pct)) +
     ggplot2::geom_col(fill = bar_fill, colour = brand$ink, linewidth = 0.3, width = 0.65) +
+    ggplot2::scale_x_discrete(labels = .sframe_title_case_names) +
     ggplot2::scale_y_continuous(labels = scales_percent_fallback) +
     ggplot2::labs(title = "Missing responses by item", x = NULL, y = "Missing") +
     theme_surveyframe(palette = palette) + sframe_theme_angled_x()
@@ -995,6 +1021,7 @@ sframe_plot_descriptives <- function(x, palette = c("web", "print")) {
     ggplot2::labs(title = "Skewness and kurtosis by variable",
                  subtitle = "Dashed lines: commonly used ±1 normality guideline",
                  x = NULL, y = NULL, fill = NULL) +
+    ggplot2::scale_x_discrete(labels = .sframe_title_case_names) +
     theme_surveyframe(palette = palette) + sframe_theme_angled_x()
   if (length(unique(long$group)) > 1) {
     p <- p + ggplot2::facet_wrap(~group)
@@ -1046,8 +1073,11 @@ sframe_plot_group_comparison <- function(result, data, palette = c("web", "print
                          colour = brand$ink) +
     ggplot2::scale_fill_manual(values = sframe_series_fill_colours(length(unique(df$group)), palette),
                                guide = "none") +
-    ggplot2::labs(title = sprintf("%s by %s", outcome_col, group_col),
-                 subtitle = result$apa %||% NULL, x = group_col, y = outcome_col) +
+    ggplot2::labs(title = sprintf("%s by %s", .sframe_title_case_names(outcome_col),
+                                  .sframe_title_case_names(group_col)),
+                 subtitle = result$apa %||% NULL,
+                 x = .sframe_title_case_names(group_col),
+                 y = .sframe_title_case_names(outcome_col)) +
     theme_surveyframe(palette = palette)
 }
 
@@ -1078,9 +1108,10 @@ sframe_plot_paired_comparison <- function(result, data, palette = c("web", "prin
   x <- x[complete]; y <- y[complete]
   if (length(x) < 2) return(NULL)
   brand <- sframe_brand(palette)
+  labels <- .sframe_title_case_names(vars[1:2])
   long <- data.frame(
     id        = rep(seq_along(x), 2),
-    condition = factor(rep(vars[1:2], each = length(x)), levels = vars[1:2]),
+    condition = factor(rep(labels, each = length(x)), levels = labels),
     value     = c(x, y)
   )
   ggplot2::ggplot(long, ggplot2::aes(x = .data$condition, y = .data$value,
@@ -1088,7 +1119,7 @@ sframe_plot_paired_comparison <- function(result, data, palette = c("web", "prin
     ggplot2::geom_line(colour = brand$muted, alpha = 0.55) +
     ggplot2::geom_point(ggplot2::aes(colour = .data$condition), size = 2) +
     ggplot2::scale_colour_manual(values = sframe_series_colours(2, palette), guide = "none") +
-    ggplot2::labs(title = sprintf("%s vs %s (paired)", vars[1], vars[2]),
+    ggplot2::labs(title = sprintf("%s vs %s (paired)", labels[1], labels[2]),
                  subtitle = result$apa %||% NULL, x = NULL, y = "Value") +
     theme_surveyframe(palette = palette)
 }
@@ -1117,19 +1148,20 @@ sframe_plot_variable_distribution <- function(data, variable, palette = c("web",
   x <- x[!is.na(x)]
   if (length(x) < 2) return(NULL)
   brand <- sframe_brand(palette)
+  var_label <- .sframe_title_case_names(variable)
 
   histogram <- ggplot2::ggplot(data.frame(x = x), ggplot2::aes(x = .data$x)) +
     ggplot2::geom_histogram(ggplot2::aes(y = ggplot2::after_stat(density)),
                             fill = brand$fill, colour = brand$ink, linewidth = 0.3,
                             bins = min(30, max(5, length(unique(x))))) +
     ggplot2::geom_density(colour = brand$ink, linewidth = 0.7) +
-    ggplot2::labs(title = paste("Distribution of", variable), x = variable, y = "Density") +
+    ggplot2::labs(title = paste("Distribution of", var_label), x = var_label, y = "Density") +
     theme_surveyframe(palette = palette)
 
   boxplot <- ggplot2::ggplot(data.frame(x = x), ggplot2::aes(x = "", y = .data$x)) +
     ggplot2::geom_boxplot(fill = brand$fill, colour = brand$ink, linewidth = 0.35,
                           width = 0.35, alpha = 0.85, outlier.colour = brand$accent) +
-    ggplot2::labs(title = paste("Boxplot of", variable), x = NULL, y = variable) +
+    ggplot2::labs(title = paste("Boxplot of", var_label), x = NULL, y = var_label) +
     theme_surveyframe(palette = palette)
 
   qq_theoretical <- stats::qqnorm(x, plot.it = FALSE)
@@ -1138,7 +1170,7 @@ sframe_plot_variable_distribution <- function(data, variable, palette = c("web",
       ggplot2::aes(x = .data$theoretical, y = .data$sample)) +
     ggplot2::geom_abline(colour = brand$muted, linetype = "dashed") +
     ggplot2::geom_point(colour = brand$teal, alpha = 0.75, size = 2) +
-    ggplot2::labs(title = paste("Normal Q-Q of", variable),
+    ggplot2::labs(title = paste("Normal Q-Q of", var_label),
                  x = "Theoretical quantiles", y = "Sample quantiles") +
     theme_surveyframe(palette = palette)
 

@@ -2992,11 +2992,14 @@ function reportSkeletonHtml(plans){
     var method=rq.method||rq.test;
     out+='<div class="rs-h3">3.'+(i+1)+' '+esc(rq.research_question||('Research question '+(i+1)))+'</div>';
     out+='<div class="rs-method">Method: '+esc(TLBLS[method]||method)+(rq.requires_data===false?' (syntax generation only — no result table)':'')+'</div>';
-    out+='<div class="rs-interp"><label class="rs-interp-lbl" for="rsInterp_'+i+'">Planned decision rule (editable)</label><textarea id="rsInterp_'+i+'" rows="2" placeholder="State how the result will answer the research question." oninput="updatePlanInterp(\''+rq.id+'\',this.value)">'+esc(rq.decision_rule||rq.interpretation||'')+'</textarea></div>';
     if(rq.requires_data!==false){
       out+='<table class="rs-tbl"><thead><tr><th>Statistic</th><th>Value</th><th>Interpretation</th></tr></thead><tbody>'+phRow+phRow+'</tbody></table>';
       out+='<div class="rs-fig"><span class="rs-fig-ic">&#128200;</span><span class="rs-fig-cap">Figure 3.'+(i+1)+' — '+esc(TLBLS[method]||method)+' chart, paired with the table above</span></div>';
     }
+    // The editable field sits below the table and chart, matching where
+    // render_report() prints the paired "Planned decision rule" and
+    // "Interpretation" lines under each result, not up in the question header.
+    out+='<div class="rs-interp"><label class="rs-interp-lbl" for="rsInterp_'+i+'">Planned decision rule (editable)</label><textarea id="rsInterp_'+i+'" rows="2" placeholder="State how the result will answer the research question." oninput="updatePlanInterp(\''+rq.id+'\',this.value)">'+esc(rq.decision_rule||rq.interpretation||'')+'</textarea></div>';
   });
   out+='<div class="rs-h2">4. Measurement models</div>';
   if(S.models&&S.models.length){S.models.forEach(function(m){out+='<div class="rs-p"><strong>'+esc(m.id||m.label||'Model')+'</strong> ('+esc(m.type||'model')+', '+((m.measurement&&m.measurement.constructs)?m.measurement.constructs.length:0)+' construct(s)): generated lavaan/seminr syntax is printed in this section.</div>';});}
