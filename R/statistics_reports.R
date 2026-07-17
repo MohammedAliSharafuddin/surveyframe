@@ -315,10 +315,7 @@ missing_data_report <- function(data, instrument = NULL, variables = NULL) {
         pairwise_n = pairwise
       ),
       scale_missing_rules = scale_rules,
-      mcar = list(
-        available = FALSE,
-        warning = "Little's MCAR test requires an optional package and was not run."
-      ),
+      mcar = sframe_mcar_test(item_data),
       apa = sprintf("Missing-data diagnostics were computed for %d variable(s).", length(variables)),
       prompt = "Report item and respondent missingness, the missing-data pattern, and the deletion rule used for each analysis."
     ),
@@ -1224,11 +1221,22 @@ sframe_run_mediation <- function(data, roles, options = list()) {
 #' @param loadings A data.frame with columns `construct`, `item`, and
 #'   `loading`, or a named list of loading vectors by construct.
 #' @param construct_scores Optional data.frame of construct scores for
-#'   Fornell-Larcker, HTMT, and inter-construct correlations.
+#'   Fornell-Larcker and inter-construct correlations.
+#' @param items_by_construct Optional named list, one element per construct,
+#'   each a data.frame of that construct's item-level responses. When
+#'   supplied, `htmt` is the Henseler heterotrait-monotrait ratio: the mean
+#'   absolute heterotrait-heteromethod correlation over the geometric mean
+#'   of the two constructs' mean absolute monotrait-heteromethod
+#'   correlations. Constructs with a single item have no monotrait
+#'   correlations, so their HTMT entries are `NA`. Without this argument,
+#'   `htmt` falls back to the absolute inter-construct correlation matrix
+#'   from `construct_scores` (the pre-0.3.4 behaviour); the `htmt_method`
+#'   element records which was computed.
 #'
 #' @return An object of class `sframe_validity_report`.
 #' @export
-validity_report <- function(loadings, construct_scores = NULL) {
+validity_report <- function(loadings, construct_scores = NULL,
+                            items_by_construct = NULL) {
   if (is.list(loadings) && !is.data.frame(loadings)) {
     loadings <- do.call(rbind, lapply(names(loadings), function(con) {
       data.frame(
@@ -1272,7 +1280,17 @@ validity_report <- function(loadings, construct_scores = NULL) {
       fornell[nm, nm] <- ave_lookup[[nm]]
     }
   }
-  htmt <- if (!is.null(cor_mat)) abs(cor_mat) else NULL
+  htmt <- NULL
+  htmt_method <- "none"
+  if (!is.null(items_by_construct)) {
+    htmt <- sframe_henseler_htmt(items_by_construct)
+    htmt_method <- "henseler"
+  } else if (!is.null(cor_mat)) {
+    # Documented fallback: the absolute inter-construct correlation matrix,
+    # the pre-0.3.4 behaviour when only construct scores are available.
+    htmt <- abs(cor_mat)
+    htmt_method <- "correlation_fallback"
+  }
   structure(
     list(
       method = "validity",
@@ -1280,12 +1298,84 @@ validity_report <- function(loadings, construct_scores = NULL) {
       reliability = reliability,
       fornell_larcker = fornell,
       htmt = htmt,
+      htmt_method = htmt_method,
       inter_construct_correlations = cor_mat,
       apa = "Construct validity summaries were computed from supplied loadings.",
       prompt = "Report composite reliability, AVE, Fornell-Larcker, HTMT, and the inter-construct correlation matrix."
     ),
     class = "sframe_validity_report"
   )
+}
+
+# Little's MCAR test when naniar is installed; the pre-0.3.4
+# available = FALSE result verbatim when it is not, so behaviour without
+# the optional package is unchanged. The test needs numeric columns with
+# some missingness and can fail on degenerate patterns, so any error also
+# falls back to the unavailable result.
+sframe_mcar_test <- function(item_data) {
+  unavailable <- list(
+    available = FALSE,
+    warning = "Little's MCAR test requires an optional package and was not run."
+  )
+  if (!requireNamespace("naniar", quietly = TRUE)) {
+    return(unavailable)
+  }
+  num <- as.data.frame(lapply(item_data, function(x) {
+    suppressWarnings(as.numeric(x))
+  }))
+  num <- num[, vapply(num, function(x) any(is.finite(x)), logical(1)),
+             drop = FALSE]
+  if (ncol(num) < 2 || !anyNA(num)) {
+    return(unavailable)
+  }
+  mt <- tryCatch(naniar::mcar_test(num), error = function(e) NULL)
+  if (is.null(mt)) {
+    return(unavailable)
+  }
+  list(
+    available = TRUE,
+    statistic = mt$statistic,
+    df = mt$df,
+    p_value = mt$p.value,
+    interpretation = if (mt$p.value < .05) {
+      "Data are unlikely to be missing completely at random."
+    } else {
+      "No evidence against missing completely at random."
+    }
+  )
+}
+
+# Henseler heterotrait-monotrait ratio from item-level data. Takes a named
+# list of per-construct item data.frames; returns a symmetric matrix with 1
+# on the diagonal. Single-item constructs have no monotrait correlations,
+# so their off-diagonal entries are NA.
+sframe_henseler_htmt <- function(items_by_construct) {
+  stopifnot(is.list(items_by_construct), !is.null(names(items_by_construct)))
+  cons <- names(items_by_construct)
+  mats <- lapply(items_by_construct, function(df) {
+    as.data.frame(lapply(as.data.frame(df), sframe_num))
+  })
+  mono <- vapply(mats, function(df) {
+    if (ncol(df) < 2) return(NA_real_)
+    m <- abs(stats::cor(df, use = "pairwise.complete.obs"))
+    mean(m[lower.tri(m)], na.rm = TRUE)
+  }, numeric(1))
+  k <- length(cons)
+  htmt <- matrix(NA_real_, k, k, dimnames = list(cons, cons))
+  diag(htmt) <- 1
+  if (k < 2) return(htmt)
+  for (i in seq_len(k - 1)) {
+    for (j in seq((i + 1), k)) {
+      if (is.na(mono[[i]]) || is.na(mono[[j]]) ||
+          mono[[i]] <= 0 || mono[[j]] <= 0) next
+      hetero <- abs(stats::cor(mats[[i]], mats[[j]],
+                               use = "pairwise.complete.obs"))
+      ratio <- mean(hetero, na.rm = TRUE) / sqrt(mono[[i]] * mono[[j]])
+      htmt[i, j] <- ratio
+      htmt[j, i] <- ratio
+    }
+  }
+  htmt
 }
 
 #' Sample-size and power planning helper
