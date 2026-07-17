@@ -196,6 +196,43 @@ Canonical detail: the v0.3.5 section of portfolio-planner
   failed, 1 expected skip), full suite 721 passed / 0 failed / 1 skipped,
   and a fresh axe-core run against the re-themed report reporting zero
   WCAG 2.2 AA violations.
+- **First-round MAS review feedback (`mas_review_034.md`/`.qmd`) triaged and
+  fixed 2026-07-17.** Bugs found during the human pass and their fixes. The
+  MIT `LICENSE`/`LICENSE.md` year was still 2025. Now 2026. `render_report()`'s
+  Quarto tables lost their column split (raw pipe/tab text instead of an HTML
+  table) because `kable()` never pinned `format = "html"`. Now forced on
+  every call. The HTML-fallback codebook tables (`plan_table`, `models_table`,
+  and the rest) printed raw snake_case column names. Now title-cased via a
+  shared `.sframe_title_case_names()` helper. The "Response distributions"
+  section (both report paths) drew base-R `barplot()`/`hist()` instead of the
+  `theme_surveyframe()` family-plot helpers used everywhere else. Now
+  switched to `sframe_plot_item_chart()`/`sframe_plot_scale_chart()`. Several
+  family plots (correlation, regression, group/paired comparison, variable
+  distribution, correlation matrix, EFA loadings, quality, validity,
+  missingness) showed raw variable/construct ids (`digital_marketing`) on
+  axes instead of humanised labels. Now consistent everywhere.
+  `plot(missing_data_report(...))` returned `NULL` when nothing was missing.
+  Now returns a "no missing responses" chart. `run_analysis_plan()`'s result
+  list was never named by block id, so `results[["rq_id"]]$apa`-style access
+  silently returned `NULL`. Now named. The builder Report outline's editable
+  decision-rule field also moved to sit below each result's table and chart
+  (matching where it pairs in the rendered report) instead of in the RQ
+  header, per the B3 feedback. All fixes verified. Full suite still 721
+  passed, 0 failed, 1 skipped. `devtools::document()` clean.
+- **B2 feedback (jasp/jamovi-style output canvas) partially actioned
+  2026-07-17.** The SurveyStudio Export screen's Interpretations card is
+  rebuilt as a single results canvas. Each research question is now one
+  block, in reading order: badges, APA line, results table, chart, a
+  "Copy result" clipboard button, the planned decision rule, then the
+  editable interpretation box. Previously this card showed a text-only
+  APA line with no table or chart. A shared `analysis_result_plot_tags_r()`
+  reactive caches each chart's PNG encoding once for reuse between the Run
+  stage and this canvas (verified: cold render of the 34-block demo plan
+  about 27 seconds, cached revisit about 0.2 seconds). Not actioned: the
+  broader ask to adopt the full JASP/JAMOVI workflow app-wide, and the
+  separate note that the shiny app needs rework from top to bottom. Both
+  are larger redesigns to scope as their own piece of work, kept separate
+  from this patch.
 - **Owner decision, still open: the `.bib` reference carry-in** (citations
   out of `.sframe_citations` into a bibliography) is deferred past 0.3.4,
   pending final confirmation, since it pairs naturally with a future

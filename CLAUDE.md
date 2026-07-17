@@ -270,8 +270,27 @@ installed locally), full suite 721 passed / 0 failed / 1 skipped, all
 report at zero violations. Still open: the `.bib` reference carry-in
 (owner decision, leaning defer to a future report-format patch), then
 the release process (tarball rebuild, your mas_review_034.md rounds,
-`R CMD check --as-cran`, win-builder, CRAN submission). All of the
-above is uncommitted.
+`R CMD check --as-cran`, win-builder, CRAN submission).
+
+**First-round mas_review_034 feedback triaged and fixed (2026-07-17).**
+A batch of bugs surfaced by the human review pass: the LICENSE year
+still read 2025, the Quarto report's tables lost their column split
+because `kable()` never pinned `format = "html"`, the HTML-fallback
+codebook tables printed raw snake_case column names, the response
+distribution charts used base-R plots instead of the shared
+`theme_surveyframe()` family-plot helpers, several family plots showed
+raw variable and construct ids on their axes instead of humanised
+labels, `plot(missing_data_report())` returned `NULL` on clean data
+instead of a chart, and `run_analysis_plan()`'s result list was never
+named by block id so named lookup silently returned `NULL`. All fixed,
+full suite still 721 passed and `devtools::document()` clean. Full
+detail in the v0.3.4 section of `revision_todo_0.3.md`. Separately, the
+B2 review feedback (adopt a JASP or JAMOVI style output canvas) was
+partially actioned: the SurveyStudio Export screen's Interpretations
+card is rebuilt so each research question shows its table, chart, and
+a copy button alongside the editable interpretation box, with chart
+rendering cached once and shared with the Run stage. The broader ask
+to redesign the whole shiny app is not in scope for this patch.
 
 0.3.1 is published on CRAN (2026-06-02). 0.3.3 is fully implemented (543/543
 tests pass, three vignettes rewritten and knit clean, tarball built, local

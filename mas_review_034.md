@@ -1,4 +1,4 @@
-# MAS Review — surveyframe 0.3.4 Pre-Submission Review
+# MAS Review: surveyframe 0.3.4 Pre-Submission Review
 
 **Reviewer:** Mohammed Ali Sharafuddin
 **Date created:** 2026-07-17
@@ -45,11 +45,11 @@ real browser.
 
 ## Prerequisites
 
-- [ ] RStudio open with a clean R session (restart R first).
-- [ ] Chrome or Firefox available.
-- [ ] `devtools`, `remotes`, `ggplot2`, `psych`, `lavaan`, `seminr`,
+- [x] RStudio open with a clean R session (restart R first).
+- [x] Chrome or Firefox available.
+- [x] `devtools`, `remotes`, `ggplot2`, `psych`, `lavaan`, `seminr`,
   `shiny`, and `quarto` are installed.
-- [ ] Internet access (GitHub install).
+- [x] Internet access (GitHub install).
 
 ---
 
@@ -64,8 +64,8 @@ packageVersion("surveyframe")
 # Expected: '0.3.4'
 ```
 
-- [ ] A1.1 Installation completes with no errors or warnings.
-- [ ] A1.2 `packageVersion()` reports 0.3.4.
+- [x] A1.1 Installation completes with no errors or warnings.
+- [x] A1.2 `packageVersion()` reports 0.3.4.
 
 ### Step A2 — Release metadata reads correctly
 
@@ -73,16 +73,17 @@ packageVersion("surveyframe")
 news(package = "surveyframe")
 ```
 
-- [ ] A2.1 The 0.3.4 NEWS entry leads and reads as one release for a
+- [x] A2.1 The 0.3.4 NEWS entry leads and reads as one release for a
   first-time reader: interpretations, charts, survey design, and
   accessibility, with no internal project names or planning content.
-- [ ] A2.2 The prose contains no em-dashes, semicolons, "not X but Y"
+- [x] A2.2 The prose contains no em-dashes, semicolons, "not X but Y"
   constructions, or banned words, and uses UK spellings.
 - [x] A2.3 `citation("surveyframe")` shows version 0.3.4 (the version is
   read dynamically from DESCRIPTION).
 - [ ] A2.4 The LICENSE file at the public repo root is still the two-line
   CRAN template, with the full MIT text in LICENSE.md only.
 
+MIT license shows 2025. Should it be 2026? Check and confirm.
 ---
 
 ## Part B — Editable interpretations (12 items)
@@ -118,6 +119,11 @@ browseURL(out)
 - [x] B1.6 The interpretation text never appears in the .sframe file:
   `write_sframe()` then `read_sframe()` round-trips with no interpretation
   content and no hash change.
+
+  Feedbak:
+  - browseURL(out) needs rework. The column splits are not available in the tables. Each row is the raw space or tab separated data.  
+  - The Response distributions and descriptive plots need a revisit.
+- The plot still uese theme_minimal()  than the theme_classic()
 
 ### Step B2 — SurveyStudio Interpretations card
 

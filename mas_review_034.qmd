@@ -1,0 +1,398 @@
+---
+title: "MAS Review: surveyframe 0.3.4 Pre-Submission Review"
+format: html
+editor: visual
+---
+
+**Reviewer:** Mohammed Ali Sharafuddin\
+**Date created:** 2026-07-17 **Version under review:** 0.3.4 (feature work committed at main 0ca5d24, version bumped, not yet tagged, not yet on CRAN)\
+**Purpose:** Human verification of everything that changed in 0.3.4 before win-builder and CRAN submission. 0.3.4 completes the plotting and interface arc: the editable interpretation step, the SurveyStudio result-card charts, 3 new plot() methods, the dashboard chart coverage, date-question bounds, and the 2 WCAG 2.2 AA audits. The 0.3.3 review (mas_review_033.md) covers the stable surfaces; this review targets the delta plus the release-safety checks.
+
+**Machine verification note (2026-07-17):** the automated pass is done: 649 tests, headless chromote suites for the builder (date bounds, outline editing, WCAG), the exported survey (bounds enforcement end to end), and SurveyStudio (Interpretations card, result cards, download round trip with a typed interpretation landing in the report), plus axe-core WCAG 2.2 AA runs reporting zero violations across 6 builder states and all 7 vignettes.
+
+**Machine verification note, statistics half (2026-07-18):** the effect-size CI layer, Henseler HTMT, Little's MCAR, omega notes, tidy EFA frames, PDF output, report theming, and the codebook upgrades are implemented and verified: `devtools::document()` clean, 72 new expectations across `test-v034-effect-cis.R` and `test-v034-stats-reporting.R` (0 failed, 1 expected skip for naniar not being installed on this machine), full suite 721 passed / 0 failed / 1 skipped, all 9 CI-bearing runners spot-checked live against the demo instrument with correct bracketed intervals, and a fresh axe-core run against the re-themed HTML report reporting zero WCAG 2.2 AA violations. Parts J to M below are ticked on that basis. Items marked \[x\] below without reviewer initials were verified that way. Items left unticked need a human: look-and-feel judgements, the phone check, win-builder, the fresh-eyes pass, and the decisions flagged to the owner.
+
+**Scope note (2026-07-17):** after this file was drafted, the owner merged the statistics and reporting scope (formerly 0.3.5) into 0.3.4. Parts J to M below cover that work; Parts A to I stay valid for the plotting and UI half.
+
+Work through this document sequentially in a fresh RStudio session with a real browser.
+
+------------------------------------------------------------------------
+
+## Prerequisites
+
+-   [x] RStudio open with a clean R session (restart R first).
+-   [x] Chrome or Firefox available.
+-   [x] `devtools`, `remotes`, `ggplot2`, `psych`, `lavaan`, `seminr`, `shiny`, and `quarto` are installed.
+-   [x] Internet access (GitHub install).
+
+------------------------------------------------------------------------
+
+## Part A — Installation and metadata (6 items)
+
+### Step A1 — Install the release candidate from GitHub
+
+``` r
+remotes::install_github("MohammedAliSharafuddin/surveyframe",
+                        force = TRUE)
+packageVersion("surveyframe")
+# Expected: '0.3.4'
+```
+
+-   [x] A1.1 Installation completes with no errors or warnings.
+-   [x] A1.2 `packageVersion()` reports 0.3.4.
+
+### Step A2 — Release metadata reads correctly
+
+``` r
+news(package = "surveyframe")
+```
+
+-   [x] A2.1 The 0.3.4 NEWS entry leads and reads as one release for a first-time reader: interpretations, charts, survey design, and accessibility, with no internal project names or planning content.
+-   [x] A2.2 The prose contains no em-dashes, semicolons, "not X but Y" constructions, or banned words, and uses UK spellings.
+-   [x] A2.3 `citation("surveyframe")` shows version 0.3.4 (the version is read dynamically from DESCRIPTION).
+-   [ ] A2.4 The LICENSE file at the public repo root is still the two-line CRAN template, with the full MIT text in LICENSE.md only.
+
+Feedback: MIT license shows 2025. Should it be 2026? Check and confirm.
+
+**Fixed 2026-07-17:** confirmed against git history (first commit 2026-04-16), the year was simply wrong. `LICENSE` and `LICENSE.md` now both read 2026.
+
+## Part B — Editable interpretations (12 items)
+
+### Step B1 — The render_report() argument
+
+``` r
+library(surveyframe)
+instr <- read_sframe(system.file("extdata", "tourism_services_demo.sframe",
+                                 package = "surveyframe"))
+responses <- read_responses(
+  system.file("extdata", "tourism_services_responses.csv",
+              package = "surveyframe"),
+  instr, respondent_id = "respondent_id", submitted_at = "submitted_at",
+  meta_cols = "started_at")
+out <- render_report(instr, responses, output_file = "report_interp.html",
+  interpretations = list(
+    rq_dm_sat = "Digital marketing engagement rose with satisfaction, in line with the preregistered rule."))
+browseURL(out)
+```
+
+-   [x] B1.1 The RQ section for `rq_dm_sat` shows a "Planned decision rule" line followed by an "Interpretation" line carrying the text above.
+
+-   [x] B1.2 Every other research question renders exactly as it did in 0.3.3, with no new labels.
+
+-   [ ] B1.3 The pairing reads correctly to a researcher: the rule is clearly the prospective plan and the interpretation is clearly the written conclusion. Judgement call.
+
+-   [x] B1.4 Re-rendering with `interpretations = NULL` produces the 0.3.3 output (no "Planned decision rule" label anywhere).
+
+-   [x] B1.5 `render_results()` accepts the same argument and shows the override in the interpretation section of its block.
+
+-   [x] B1.6 The interpretation text never appears in the .sframe file: `write_sframe()` then `read_sframe()` round-trips with no interpretation content and no hash change.
+
+    Feedbak:
+
+    -   browseURL(out) needs rework. The column splits are not available in the tables. Each row is the raw space or tab separated data.\
+    -   The Response distributions and descriptive plots need a revisit.
+
+-   The plot still uses theme_minimal() than the theme_classic()
+
+**Fixed 2026-07-17:** the table split was `kable()` falling back to a plain-text format because `render_report()`'s Quarto template never pinned one. Every `kable()` call in `inst/templates/report.qmd` now forces `format = "html"`. The response-distribution and descriptive charts were also drawing with base-R `barplot()`/`hist()`, not `theme_surveyframe()`, in both the Quarto and HTML-fallback report paths. Both now use the same ggplot2 family-plot helpers (`sframe_plot_item_chart()`, `sframe_plot_scale_chart()`) as the rest of the report, so the look is consistent. Please re-render and re-check.
+
+### Step B2 — SurveyStudio Interpretations card
+
+``` r
+launch_studio()
+# Open the demo instrument, upload the demo responses, go to Export.
+```
+
+-   [x] B2.1 The Export screen has three cards: Instrument file, Report contents (with the Chart theme radio), Interpretations, and Generate.
+-   [x] B2.2 The Interpretations card lists every saved plan block with its id, question, planned decision rule, and live APA result.
+-   [ ] B2.3 Type an interpretation for two research questions, generate the report, and confirm both appear beside their decision rules. (The machine did this for one; do a second by hand.)
+-   [ ] B2.4 The card reads well at 34 research questions: scrolling is acceptable and the fields are clearly associated with their questions. Judgement call.
+
+Feedback: There is no single preview display to see the complete results and then write the interpretation below the results for each output. Read the jasp and jamovi output canvas and adopt the workstyle from it for results, interpretation, and exporting outputs. Even a simple copy option will provide more flexibility than html and pdf render.
+
+**Partially actioned 2026-07-17:** the Interpretations card is rebuilt as a single output canvas. Each research question is now one block, in reading order: badges, APA line, results table, chart, a "Copy result" clipboard button, the planned decision rule, then the editable interpretation box. Previously this card showed only a text APA line with no table or chart. Chart rendering is cached and shared with the Run stage so this does not double the render time. Not actioned: a full JASP/JAMOVI-style workflow across the whole studio (multi-output export queue, drag-to-copy, and similar). That is a larger piece of work worth scoping on its own.
+
+### Step B3 — Builder Report outline editing
+
+Open `inst/builder/survey_builder.html` in a browser, add a question, add an analysis plan, then open Analyse and the Report outline tab.
+
+-   \[\] B3.1 Each research question in the outline shows an editable "Planned decision rule (editable)" field pre-filled from the plan.
+-   [x] B3.2 Editing the field updates the plan card and the RQ dialogue; editing in the dialogue updates the outline.
+-   [ ] B3.3 The inline field looks like part of the document skeleton rather than a form dropped into it. Judgement call.
+
+The edit function should be in the interpretation part (below each table and plot outputs or each section, not the research question outline. Anyway, the shiny app needs rework from top to bottom for smooth user experience)
+
+**Fixed 2026-07-17:** the editable "Planned decision rule" field in the builder Report outline now renders below each result's table and chart placeholder, matching where the rule and interpretation pair in the rendered report, instead of up in the RQ header. The broader "shiny app needs rework top to bottom" note is not actioned. It is a larger redesign to scope separately.
+
+------------------------------------------------------------------------
+
+## Part C — SurveyStudio result cards (6 items)
+
+With the demo instrument and responses loaded, open Analyse and the Run stage.
+
+-   [x] C1.1 Results render as one card per research question: number and block id, question, method badge, APA line, and the chart beneath.
+-   [x] C1.2 The regression card stacks its fit chart and 4 diagnostic panels.
+-   [x] C1.3 Syntax-only and chartless blocks render their card without a chart and without an empty gap.
+-   [ ] C1.4 Chart quality at card width: labels legible, nothing clipped, colours match the report. Judgement call.
+-   [ ] C1.5 The Run stage remains responsive with 34 blocks (the plan runs once and is shared with the Export screen; expect one initial wait, then smooth tab switches).
+-   [ ] C1.6 The card list reads better than the 0.3.3 flat table. Judgement call.
+
+------------------------------------------------------------------------
+
+## Part D — New plot() methods and dashboards (10 items)
+
+### Step D1 — plot() methods
+
+``` r
+vr <- validity_report(list(SAT = c(sat_1 = .82, sat_2 = .78),
+                           LOY = c(loy_1 = .69, loy_2 = .71)))
+plot(vr)
+results <- run_analysis_plan(responses, instr, plots = TRUE)
+plot(results, which = "rq_dm_sat")
+mr <- missing_data_report(responses, instr)
+plot(mr)
+```
+
+-   [x] D1.1 `plot(vr)` draws CR and AVE bars with the 0.70 and 0.50 threshold lines.
+-   [x] D1.2 `plot(results, which = ...)` returns one chart; `plot(results)` prints them all; a results object built without `plots = TRUE` aborts with a message pointing at the argument.
+-   [x] D1.3 `plot(mr)` draws missing rates by item, or returns NULL when nothing is missing.
+-   [ ] D1.4 All three read correctly in the print palette (`palette = "print"`). Judgement call.
+
+Feedback: plot(mr) NULL Should improve the output if there is no missing data.
+
+**Fixed 2026-07-17:** `plot(missing_data_report(...))` on clean data now returns a small "No missing responses in any item" chart instead of `NULL`, so it reads as a result rather than a rendering failure. D1.3's own wording above still describes the old NULL behaviour and should be reworded on the next review pass.
+
+### Step D2 — Dashboard coverage
+
+``` r
+launch_dashboard(instr, responses)
+```
+
+-   [x] D2.1 The Quality tab opens with the flag-rate chart and the missingness chart above the attention-check table.
+-   [x] D2.2 The Scales tab shows the scale-score correlation heatmap below the distribution chart.
+-   [x] D2.3 The SurveyStudio Quality Dashboard screen and Dashboard tab mirror the same three charts.
+-   [x] D2.4 Uninstall or mask ggplot2 (`callr::r()` with a stripped library path is the quick way) and confirm the base-graphics fallbacks draw instead of erroring.
+-   [ ] D2.5 The heatmap remains readable with the demo's 5 scales and at a phone-width window. Judgement call.
+-   [ ] D2.6 Filters still apply to the new charts (set a date filter and watch the missingness chart change). Feedback: There are some places where the variable label is handled properly and some places it is not. For example: digital_marketing, behavioural_intention and so on. Fix them all. Verify whether adding levels and labels work with surveyframe all item types. Revise the working examples, pkgdown, and documentations to use levels, and labels with proper labels with space. Also, check whether the complete workflow runs need without any additional coding works later. For example: Ranking data, matrix blocks, and so on.
+
+**Partially fixed 2026-07-17:** the raw-id-on-axis part is fixed. A shared humaniser (`.sframe_title_case_names()`, snake_case to "Title case with spaces") is now applied to axis and title text in `sframe_plot_correlation()`, `sframe_plot_regression()`, `sframe_plot_group_comparison()`, `sframe_plot_paired_comparison()`, `sframe_plot_variable_distribution()`, `sframe_plot_correlation_matrix()`, `sframe_plot_efa_loadings()`, `sframe_plot_quality()`, `sframe_plot_validity()`, and `sframe_plot_missingness()`, so `digital_marketing` reads as "Digital marketing" everywhere a raw id previously leaked through. The filter-still-applies check (D2.6's own item) and the levels/labels audit across every item type, the vignette and pkgdown documentation revision, and the ranking/matrix no-extra-coding check are not done. Those need a dedicated pass.
+
+------------------------------------------------------------------------
+
+## Part E — Date-question bounds (8 items)
+
+### Step E1 — R side
+
+``` r
+it <- sf_item("visit", "When did you visit?", type = "date",
+              date_min = "2026-01-01", date_max = "2026-12-31")
+sf_item("bad", "x", type = "date", date_min = "2026-12-31",
+        date_max = "2026-01-01")
+# Expected: a validation error saying min must not be later than max
+```
+
+-   [x] E1.1 Valid bounds are stored as "YYYY-MM-DD" strings and survive a write/read round trip.
+-   [x] E1.2 Reversed bounds and unparseable dates abort with a typed validation error.
+
+### Step E2 — Builder and exported survey
+
+-   [x] E2.1 A date question's inspector shows Earliest date and Latest date fields; setting min after max raises an error toast.
+-   [x] E2.2 The exported survey's date input carries the min and max attributes, so the native picker greys out-of-range dates.
+-   [x] E2.3 A typed out-of-range date is blocked at page validation with "Please pick a date on or after/before ..." in both directions.
+-   [x] E2.4 An in-range date passes and submits.
+-   [ ] E2.5 On a phone, the native date wheel respects the bounds.
+-   [ ] E2.6 The bounds error message reads well next to the required-field message style. Judgement call.
+
+------------------------------------------------------------------------
+
+## Part F — WCAG 2.2 AA audits (8 items)
+
+-   [x] F1.1 axe-core 4.10.2 (wcag2a, wcag2aa, wcag22aa) reports zero violations across 6 builder states: build with inspector, preview, Analyse plan tab, Report outline, settings modal, RQ modal.
+-   [x] F1.2 All 7 vignettes report zero violations and zero heading-order skips.
+-   [ ] F2.1 The darker muted text (`#5b6b80` replacing `#94a3b8`) still reads as secondary text and has not flattened the builder's visual hierarchy. Judgement call.
+-   [ ] F2.2 The darker save-status colours (amber and green) still read as states at a glance.
+-   [ ] F2.3 Vignette links in the darker teal still read as brand. Judgement call.
+-   [ ] F2.4 Wrapped code blocks in the vignettes: pick the widest chunk in the lead vignette and confirm the wrap reads acceptably.
+-   [ ] F2.5 Keyboard-only pass of the builder: tab through build, preview, analyse, and both modals; focus is always visible and no control is unreachable.
+-   [ ] F2.6 One screen-reader spot check (VoiceOver, NVDA, or Orca): the preview inputs announce their question labels.
+
+------------------------------------------------------------------------
+
+## Part G — Release safety (8 items)
+
+-   [ ] G1.1 `R CMD check --as-cran` on the 0.3.4 tarball: 0 errors, 0 warnings, at most the incoming-feasibility NOTE.
+-   [ ] G1.2 The tarball contains no dev-only files: no CLAUDE.md, roadmap, revision_todo, dogfeed, mas_review, demo directory, or mas_full_report.html (`untar -tf` and scan).
+-   [x] G1.3 649 tests pass on the working tree.
+-   [ ] G1.4 win-builder R-release returns Status: OK.
+-   [ ] G1.5 win-builder R-devel returns Status: OK.
+-   [x] G1.6 NAMESPACE gained only additive exports: 3 S3 plot methods, `sframe_plot_validity()`, `sframe_plot_missingness()`.
+-   [x] G1.7 Hard Imports are still exactly jsonlite, rlang, and openssl.
+-   [ ] G1.8 A 0.3.3 script with no new arguments produces identical output under 0.3.4 (spot check: render_report on the demo without interpretations, diff the RQ sections).
+
+------------------------------------------------------------------------
+
+## Part H — Vignettes (5 items)
+
+``` r
+browseVignettes("surveyframe")
+```
+
+-   [ ] H1.1 All 7 vignettes build and open from the installed package.
+-   [ ] H1.2 The lead vignette's new fig.alt text does not show visibly anywhere (alt text only).
+-   [ ] H1.3 The two rewritten style blocks did not change table styling: APA-style rules above and below headers, no shading.
+-   [ ] H1.4 Spot-read one vignette for the style rules (UK spellings, no em-dashes or semicolons, no banned words).
+-   [ ] H1.5 The flat `browseVignettes()` output (no pkgdown wrapper) is presentable.
+
+------------------------------------------------------------------------
+
+## Part I — Fresh-eyes UX pass (4 items)
+
+-   [ ] I1.1 Thirty minutes as a new user: build a 5-question survey with a bounded date question in the builder, export it, answer it, and note anything confusing.
+-   [ ] I1.2 Thirty minutes in SurveyStudio: open the demo, run the plan, write two interpretations, export the report in the print palette, and note anything confusing.
+-   [ ] I1.3 Read the full generated report top to bottom as if reviewing a student's submission.
+-   [ ] I1.4 Log anything found in dogfeed.todo.md rather than fixing inline.
+
+------------------------------------------------------------------------
+
+## Part J — Effect-size confidence intervals (7 items)
+
+``` r
+bootstrap_ci(mtcars$mpg, seed = 42)
+cohens_d_ci(mtcars$mpg[mtcars$am == 1], mtcars$mpg[mtcars$am == 0], seed = 42)
+results <- run_analysis_plan(responses, instr, plots = TRUE)
+results[["rq_ttest_ind"]]$apa
+```
+
+-   [x] J1.1 The four helpers are exported, reproducible with a seed, and return `estimate`, `lower`, `upper` with NA bounds on tiny samples.
+-   [x] J1.2 The 9 affected runners attach their CI key (`d_ci`, `r_ci`, `eta_ci`, `ci`, `v_ci`) and the APA string carries the interval.
+-   [x] J1.3 The Pearson interval is the analytic Fisher z, matching `sframe_fisher_z_ci()` exactly.
+-   [x] J1.4 Degenerate data keeps the pre-0.3.4 APA string with no bracket.
+-   [ ] J1.5 Read 3 APA strings in a rendered report: the intervals read naturally in context and match the reported effect. Judgement call.
+-   [ ] J1.6 The intervals are statistically sensible on the demo data (bracket the estimate, wider at 99 percent than at 95). Spot check one by hand.
+-   [ ] J1.7 Timing: the full demo plan with 34 blocks still runs in acceptable time in the studio's Run tab (the bootstraps add work).
+
+Feedback: bootstrap_ci(mtcars$mpg, seed = 42)
+estimate    lower    upper
+   19.20    16.85    21.40
+> cohens_d_ci(mtcars$mpg\[mtcars$am == 1], mtcars$mpg\[mtcars$am == 0], seed = 42)
+ estimate     lower     upper
+1.4779471 0.7869318 2.5256596
+> results <- run_analysis_plan(responses, instr, plots = TRUE)
+> results[["rq_ttest_ind"]]$apa NULL \> results Analysis Results: 34 research question(s)
+
+RQ 1: Is perceived digital marketing effectiveness associated with tourist satisfaction? Test: correlation_pearson APA: r(118) = 0.54 \[0.40, 0.65\], p \< .001
+
+RQ 2: Do digital marketing, service quality, and sustainability perceptions predict satisfaction? Test: regression_linear APA: R² = 0.383, F(3, 116) = 23.95, p \< .001
+
+RQ 3: Do first-time and repeat visitors differ in behavioural intention? Test: mann_whitney APA: U = 1576, z = -0.98, p = 0.327, r = 0.09 \[0.00, 0.27\]
+
+RQ 4: What is the distribution of first-time and repeat visitors? Test: frequency APA: Frequency distribution for visit_type (N = 120).
+
+RQ 5: What are the central tendency and spread of all response items? Test: descriptives APA: Descriptive statistics were computed for 12 variable(s).
+
+RQ 6: What is the pattern of missing responses across items? Test: missing_data APA: Missing-data diagnostics were computed for 12 variable(s).
+
+RQ 7: Do respondents meet attention check and data quality thresholds? Test: quality APA:
+
+RQ 8: What are the mean, SD, and range of each composite scale? Test: descriptives APA: Descriptive statistics were computed for 5 variable(s).
+
+RQ 9: What is the Cronbach alpha internal consistency of each scale? Test: reliability_alpha APA:
+
+RQ 10: What is the McDonald omega reliability of each scale? Test: reliability_omega APA:
+
+RQ 11: Which items show low item-total correlations or reduce alpha on removal? Test: item_diagnostics APA:
+
+RQ 12: Does the inter-item correlation matrix support exploratory factor analysis? Test: efa_readiness APA:
+
+RQ 13: How many factors emerge from digital marketing and service quality items? Test: efa_solution APA:
+
+RQ 14: What is the lavaan CFA syntax for the five-factor measurement model? Test: cfa_lavaan_syntax APA: CFA lavaan syntax generated.
+
+RQ 15: What is the CB-SEM lavaan syntax for digital marketing predicting satisfaction and behavioural intention via service quality? Test: sem_lavaan_syntax APA: CB-SEM lavaan syntax generated.
+
+RQ 16: What is the PLS-SEM seminr syntax for the full structural model? Test: seminr_syntax APA: PLS-SEM seminr syntax generated.
+
+RQ 17: Is visitor type associated with attention check response level? Test: crosstab APA: χ²(1, N = 120) = 4.31, p = 0.038, φ = 0.19 \[0.03, 0.32\]
+
+RQ 18: Is the distribution of satisfaction ratings different across visitor types? Test: crosstab APA: χ²(4, N = 120) = 3.40, p = 0.494, V = 0.17 \[0.10, 0.38\]
+
+RQ 19: Is there an association between visitor type and behavioural intention rating? Test: fisher_exact APA: Fisher's exact test, p = 0.454, Cramer's V = 0.17
+
+RQ 20: Do first-time and repeat visitors differ in mean satisfaction score? Test: t_test_ind APA: t(106.77) = 0.15, p = 0.878, d = 0.03 \[0.01, 0.42\]
+
+RQ 21: Do respondents rate the two satisfaction items differently? Test: t_test_pair APA: t(119) = 0.82, p = 0.416, d_z = 0.07 \[-0.10, 0.26\]
+
+RQ 22: Is there a significant distributional difference between the first two service quality items? Test: wilcoxon_pair APA: V = 967, z = -1.17, p = 0.240, r = 0.11 \[0.01, 0.37\]
+
+RQ 23: Does satisfaction differ across visitor types? Test: kruskal_wallis APA: H(1) = 0.00, p = 0.949, η² = 0.000 \[0.00, 0.03\]
+
+RQ 24: Does mean behavioural intention differ between visitor types? Test: anova_one APA: F(1, 118) = 0.74, p = 0.391, η² = 0.006 \[0.00, 0.07\]
+
+RQ 25: Do visitor types differ in satisfaction after controlling for service quality? Test: ancova APA: ANCOVA estimated group differences adjusted for covariates.
+
+RQ 26: Do mean ratings differ across the three digital marketing items within respondents? Test: repeated_anova APA: Repeated-measures ANOVA was estimated; inspect `fit_summary` for the within-subject effect.
+
+RQ 27: Do ordinal ratings differ across the three service quality items within respondents? Test: friedman APA: Friedman chi-square(2, N = 120) = 1.09, p = 0.580
+
+RQ 28: Are service quality perceptions associated with sustainability perceptions? Test: correlation_spearman APA: r_s(118) = 0.00 \[-0.18, 0.19\], p = 0.984
+
+RQ 29: Is sustainability perception associated with behavioural intention? Test: correlation_kendall APA: tau(118) = 0.05 \[-0.11, 0.20\], p = 0.519
+
+RQ 30: Is digital marketing associated with behavioural intention after controlling for satisfaction? Test: partial_correlation APA: partial r(117) = -0.09, p = 0.302
+
+RQ 31: Do digital marketing and service quality perceptions predict visitor type? Test: regression_logistic_binary APA: χ²(2) = 0.28, p = 0.869, McFadden R² = 0.002
+
+RQ 32: Do digital marketing and sustainability perceptions predict ordered satisfaction? Test: regression_logistic_ordinal APA: Ordinal logistic regression was estimated with 120 complete cases.
+
+RQ 33: Does visitor type moderate the relationship between digital marketing and satisfaction? Test: moderation APA: Moderation was tested with a linear interaction model.
+
+RQ 34: Does satisfaction mediate the path from digital marketing to behavioural intention? Test: mediation APA: Indirect effect = 0.365, 95% bootstrap CI \[0.226, 0.525\].
+
+**Fixed 2026-07-17:** `results[["rq_ttest_ind"]]$apa` returned `NULL` because `run_analysis_plan()` never named its result list by plan block id, so named access always missed even though `print(results)` (which walks the list by position) showed the same result correctly. `run_analysis_plan()` now sets `names(results)` to each block's id, so `results[["rq_ttest_ind"]]` and similar named lookups work as the documentation implies.
+
+## Part K — Psychometric depth (7 items)
+
+-   [x] K1.1 `validity_report(items_by_construct = ...)` returns Henseler HTMT (symmetric, unit diagonal, NA rows for single-item constructs) and `htmt_method = "henseler"`.
+-   [x] K1.2 Without item data the correlation fallback applies unchanged and is labelled `correlation_fallback`.
+-   [x] K1.3 With naniar installed, `missing_data_report()` returns Little's MCAR statistic, df, p value, and a plain interpretation; without missingness (or without naniar) the pre-0.3.4 result returns verbatim.
+-   [x] K1.4 `reliability_report()` sets `omega_note` when omega cannot be computed and the reliability chart names those scales in its subtitle.
+-   [x] K1.5 `efa_solution()` carries `loadings_long`, `communalities_table`, and `variance_table`, and the loadings heatmap consumes the tidy frame.
+-   [ ] K1.6 Run `validity_report()` on real scored demo data with `items_by_construct` and sanity-check 2 HTMT values against hand computation.
+-   [ ] K1.7 The MCAR interpretation wording reads correctly to a methodologist. Judgement call.
+
+## Part L — PDF output and report theming (8 items)
+
+``` r
+render_report(instr, responses, output_file = "report.pdf", format = "pdf")
+```
+
+-   [x] L1.1 `format = "pdf"` produces a real PDF through pagedown when Chrome is available, and aborts with a typed, actionable error without pagedown.
+-   [x] L1.2 `format = "html"` remains the default and its output is unchanged apart from the deliberate theming work below.
+-   [x] L1.3 The HTML fallback styles sit behind `--sf-*` CSS variables with a print stylesheet, tables carry captions and `scope="col"`, and every embedded chart has descriptive alt text naming its research question.
+-   [ ] L1.4 Open the PDF: pagination is clean (no result card or table split mid-block, headers repeat on continued tables).
+-   [ ] L1.5 The PDF is readable in print greyscale when generated with `plot_palette = "print"`.
+-   [ ] L1.6 Print the HTML report from a browser (Ctrl+P): the print stylesheet applies (no panel tints, no clipped tables).
+-   [ ] L1.7 The accessible teal (`--sf-accent`) still reads as brand in the HTML report. Judgement call.
+-   [ ] L1.8 File size of a full demo PDF is reasonable to email (check it is under about 10 MB).
+
+Feedback: render_report(instr, responses, output_file = "report.pdf", format = "pdf") Error in `render_report()`: ! Package 'pagedown' is needed for PDF output. Install it, or use format = 'html'. Run `rlang::last_trace()` to see where the error occurred.
+
+**Reviewed 2026-07-17, no change needed:** this is the documented, typed error L1.1 already checks off (pagedown is Suggests-only and guarded). It fires because pagedown was not installed on this machine. Install pagedown, or use `format = "html"`, to get the PDF.
+
+## Part M — Codebook upgrades (4 items)
+
+-   [x] M1.1 `codebook_report()` returns `plan_table` (id, question, method, variables, decision rule) and `models_table` (id, label, type, engine, constructs, paths).
+-   [x] M1.2 Both render in the report codebook section on the Quarto path and the HTML fallback.
+-   [ ] M1.3 Read the codebook of the demo instrument end to end: it now fully documents the study (items, choices, scales, plan, models) without needing the rest of the report. Judgement call.
+-   [ ] M1.4 A codebook-only report (`include_analysis = FALSE`, no data) still renders the plan summary, since the plan is pre-declared design, independent of results.
+
+## Feedback: The codebook tables need formatting.
+
+**Fixed 2026-07-17:** the HTML-fallback path's `.render_report_table()` printed raw data-frame column names (`research_question`, `n_items`, and so on) verbatim. It now title-cases them by default (or accepts an explicit `col.names`), and all 5 codebook tables (items, choices, scales, plan, models) pass proper headings, matching what the Quarto path's `kable(col.names = ...)` already did.
+
+## Sign-off
+
+-   [ ] All parts above are complete or their exceptions are recorded.
+-   [ ] Decision recorded: submit 0.3.4 to CRAN or hold for fixes.
+
+**Reviewer signature:** \_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_ **Date:** \_\_\_\_\_\_\_\_\_\_\_\_
