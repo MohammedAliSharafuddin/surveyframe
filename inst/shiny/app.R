@@ -769,6 +769,74 @@ studio_ggplot_img <- function(gg, alt = "result chart") {
            src = paste0("data:image/png;base64,", openssl::base64_encode(raw)))
 }
 
+# Render a result's $table data frame as the same APA-styled table used
+# elsewhere in the studio, so the results canvas shows the actual numbers
+# instead of just the prose APA string.
+studio_result_table_tag <- function(tbl) {
+  if (!is.data.frame(tbl) || nrow(tbl) == 0) {
+    return(NULL)
+  }
+  num_cols <- vapply(tbl, is.numeric, logical(1))
+  if (any(num_cols)) {
+    tbl[num_cols] <- lapply(tbl[num_cols], function(col) round(col, 3))
+  }
+  header <- tags$tr(do.call(tagList, lapply(colnames(tbl), tags$th)))
+  body_rows <- lapply(seq_len(nrow(tbl)), function(r) {
+    tags$tr(do.call(tagList, lapply(tbl[r, , drop = TRUE], function(cell) {
+      tags$td(as.character(cell))
+    })))
+  })
+  tags$table(class = "sf-table", tags$thead(header), tags$tbody(do.call(tagList, body_rows)))
+}
+
+# The chart(s) attached to one analysis-plan result: the main chart, plus a
+# regression's four diagnostic panels stacked beneath it, matching the
+# report's table-plus-plot pairing.
+studio_result_plot_tags <- function(result) {
+  plot_tags <- list(studio_ggplot_img(result$plot))
+  if (is.list(result$diagnostic_plots)) {
+    plot_tags <- c(plot_tags,
+      lapply(result$diagnostic_plots, studio_ggplot_img, alt = "regression diagnostic"))
+  }
+  Filter(Negate(is.null), plot_tags)
+}
+
+# Plain-text summary of a result for the canvas's "Copy result" button: a
+# JASP/JAMOVI output canvas lets you copy one output block without
+# generating a whole report, so the same affordance belongs here. Built
+# server-side and copied client-side via navigator.clipboard, no JS
+# dependency beyond what browsers ship.
+studio_result_copy_text <- function(i, block_id, question, decision_rule, result) {
+  lines <- c(sprintf("RQ %d: %s", i, question %||% ""))
+  if (nzchar(block_id %||% "")) lines <- c(lines, sprintf("Block: %s", block_id))
+  if (nzchar(decision_rule %||% "")) lines <- c(lines, sprintf("Planned decision rule: %s", decision_rule))
+  if (!is.null(result)) {
+    if (!is.null(result$error)) {
+      lines <- c(lines, sprintf("Error: %s", result$error))
+    } else if (!is.null(result$apa)) {
+      lines <- c(lines, sprintf("Result: %s", result$apa))
+    }
+    tbl <- result$table
+    if (is.data.frame(tbl) && nrow(tbl) > 0) {
+      num_cols <- vapply(tbl, is.numeric, logical(1))
+      if (any(num_cols)) tbl[num_cols] <- lapply(tbl[num_cols], function(col) round(col, 3))
+      lines <- c(lines, "",
+        paste(colnames(tbl), collapse = "\t"),
+        apply(tbl, 1, paste, collapse = "\t"))
+    }
+  }
+  paste(lines, collapse = "\n")
+}
+
+studio_copy_result_btn <- function(text) {
+  tags$button(
+    type = "button", class = "btn-outline studio-copy-btn",
+    "data-copytext" = text,
+    onclick = "navigator.clipboard.writeText(this.getAttribute('data-copytext'));var btn=this,t=btn.textContent;btn.textContent='Copied';setTimeout(function(){btn.textContent=t;},1400);",
+    "Copy result"
+  )
+}
+
 studio_safe_id <- function(x, prefix = "M") {
   x <- gsub("[^A-Za-z0-9_]", "_", trimws(x %||% ""))
   if (!nzchar(x)) {
@@ -980,7 +1048,10 @@ ui <- fluidPage(
       .vmeta { border-bottom: 1px solid #f0f1f4; padding: 10px 0; }
       .vmeta:last-child { border-bottom: none; }
       .vmeta-id { font-size: 13px; font-weight: 700; color: #1a1a2e; }
-      .vmeta-lbl { font-size: 12px; color: #4b5563; margin: 2px 0 5px; }
+      .vmeta-lbl { font-size: 12px; color: #4b5563; margin: 2px 0 5px; display: block; }
+      .result-canvas-block .sf-table { margin: 10px 0; }
+      .result-canvas-block img { margin: 8px 0; border: 1px solid #f0f1f4; border-radius: 6px; }
+      .studio-copy-btn { margin: 10px 0; padding: 5px 14px; font-size: 12px; }
       .vbadge {
         display: inline-block; border: 1px solid #d9e2ec; border-radius: 999px;
         padding: 2px 7px; margin: 2px 3px 2px 0; font-size: 11px;
@@ -2505,6 +2576,19 @@ server <- function(input, output, session) {
     )
   })
 
+  # Rendering a chart to an embeddable base64 PNG (studio_ggplot_img()) is
+  # the expensive part of a results canvas with 30+ blocks, so it happens
+  # once per result here and both the Run stage cards and the Export
+  # screen's Interpretations canvas reuse the same tags instead of each
+  # re-encoding every chart.
+  analysis_result_plot_tags_r <- reactive({
+    results <- analysis_results_r()
+    if (is.null(results) || inherits(results, "error")) {
+      return(list())
+    }
+    lapply(results, studio_result_plot_tags)
+  })
+
   output$analysis_results_output <- renderUI({
     req(rv$instrument)
     if (length(rv$instrument$analysis_plan %||% list()) == 0) {
@@ -2523,18 +2607,13 @@ server <- function(input, output, session) {
         tags$p(conditionMessage(results))))
     }
 
+    all_plot_tags <- analysis_result_plot_tags_r()
     cards <- lapply(seq_along(results), function(i) {
       result <- results[[i]]
       # The chart sits inside its result card, directly under the APA
       # string, matching the report's table-plus-plot pairing. Regression
       # adds its four diagnostic panels beneath the main chart.
-      plot_tags <- list(studio_ggplot_img(result$plot))
-      if (is.list(result$diagnostic_plots)) {
-        plot_tags <- c(plot_tags,
-          lapply(result$diagnostic_plots, studio_ggplot_img,
-                 alt = "regression diagnostic"))
-      }
-      plot_tags <- Filter(Negate(is.null), plot_tags)
+      plot_tags <- all_plot_tags[[i]] %||% list()
       tags$div(class = "card",
         tags$div(class = "card-title",
           sprintf("RQ %d: %s", i, result$block_id %||% "")),
@@ -3028,6 +3107,14 @@ server <- function(input, output, session) {
     }
   )
 
+  # The Interpretations card is a JASP/JAMOVI-style output canvas: every
+  # research question is one self-contained block in reading order (badges,
+  # the APA line, the numbers table, the chart), the planned decision rule
+  # sits directly above the box where you write the interpretation that
+  # answers it, and a "Copy result" button gets one output out without
+  # generating a whole report. This is the single place to read a result and
+  # write about it, rather than switching between the Run stage (which has
+  # the chart but no writing box) and a text-only interpretation list.
   output$export_interpretations_ui <- renderUI({
     req(rv$instrument)
     plan <- rv$instrument$analysis_plan %||% list()
@@ -3036,36 +3123,60 @@ server <- function(input, output, session) {
         "Save analysis plans on the Analyse screen to add interpretations."))
     }
     results <- NULL
+    all_plot_tags <- list()
     if (!is.null(rv$responses)) {
       results <- analysis_results_r()
       if (inherits(results, "error")) {
         results <- NULL
+      } else {
+        all_plot_tags <- analysis_result_plot_tags_r()
       }
+    }
+    result_block_ids <- if (!is.null(results)) {
+      vapply(results, function(r) r$block_id %||% "", character(1))
+    } else {
+      character(0)
     }
     fields <- lapply(seq_along(plan), function(i) {
       block <- plan[[i]]
       block_id <- block$id %||% ""
       fld <- studio_interp_input_id(i, block_id)
-      apa <- NULL
-      if (!is.null(results)) {
-        hit <- Filter(function(r) identical(r$block_id, block_id), results)
-        if (length(hit) > 0) {
-          apa <- hit[[1]]$apa %||% hit[[1]]$error
-        }
+      result <- NULL
+      plot_tags <- list()
+      hit_idx <- match(block_id, result_block_ids)
+      if (!is.na(hit_idx)) {
+        result <- results[[hit_idx]]
+        plot_tags <- all_plot_tags[[hit_idx]] %||% list()
       }
-      tags$div(class = "vmeta",
-        tags$div(class = "vmeta-id", sprintf("RQ %d: %s", i, block_id)),
-        tags$div(class = "vmeta-lbl", block$research_question %||% ""),
+      copy_text <- studio_result_copy_text(i, block_id, block$research_question,
+                                           block$decision_rule, result)
+      tags$div(class = "card result-canvas-block",
+        tags$div(class = "card-title", sprintf("RQ %d: %s", i, block_id)),
+        tags$p(block$research_question %||% ""),
+        tags$div(
+          tags$span(class = "vbadge", block$method %||% block$test %||% ""),
+          if (!is.null(result) && !is.null(result$effect_label)) {
+            tags$span(class = "vbadge", paste(result$effect_label, "effect"))
+          }
+        ),
+        if (is.null(result)) {
+          tags$p(class = "hint",
+            "Upload response data to see the result while you write.")
+        } else if (!is.null(result$error)) {
+          tags$p(class = "hint", paste("Error:", result$error))
+        } else {
+          tagList(
+            tags$p(tags$strong("Result: "), result$apa %||% ""),
+            studio_result_table_tag(result$table),
+            do.call(tagList, plot_tags)
+          )
+        },
+        studio_copy_result_btn(copy_text),
         if (nzchar(block$decision_rule %||% "")) {
           tags$p(class = "hint",
             paste("Planned decision rule:", block$decision_rule))
         },
-        if (!is.null(apa)) {
-          tags$p(class = "hint", paste("Result:", apa))
-        } else {
-          tags$p(class = "hint",
-            "Upload response data to see the result while you write.")
-        },
+        tags$label(class = "vmeta-lbl", "Interpretation"),
         textAreaInput(fld, NULL,
           value = shiny::isolate(input[[fld]] %||% ""),
           rows = 3,

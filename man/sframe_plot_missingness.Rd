@@ -13,7 +13,8 @@ sframe_plot_missingness(x, palette = c("web", "print"))
 \item{palette}{One of \code{"web"} or \code{"print"}. See \code{\link[=sframe_brand]{sframe_brand()}}.}
 }
 \value{
-A ggplot2 object, or \code{NULL} when no item has missing values.
+A ggplot2 object. When no item has missing values, this is a
+short "no missing responses" message rather than an empty bar chart.
 }
 \description{
 Missing-data report plot: missingness rate by item

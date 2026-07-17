@@ -1089,6 +1089,7 @@ run_analysis_plan <- function(data, instrument, scored = TRUE, plots = FALSE,
   results <- lapply(plan, sframe_run_one_block, data = data,
                     plot_palette = plot_palette,
                     instrument = instrument, plots = plots)
+  names(results) <- vapply(plan, function(b) b$id %||% "", character(1))
   structure(results, class = "sframe_analysis_results")
 }
 
