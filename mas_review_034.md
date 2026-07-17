@@ -18,17 +18,25 @@ editing, WCAG), the exported survey (bounds enforcement end to end), and
 SurveyStudio (Interpretations card, result cards, download round trip with a
 typed interpretation landing in the report), plus axe-core WCAG 2.2 AA runs
 reporting zero violations across 6 builder states and all 7 vignettes.
+
+**Machine verification note, statistics half (2026-07-18):** the effect-size
+CI layer, Henseler HTMT, Little's MCAR, omega notes, tidy EFA frames, PDF
+output, report theming, and the codebook upgrades are implemented and
+verified: `devtools::document()` clean, 72 new expectations across
+`test-v034-effect-cis.R` and `test-v034-stats-reporting.R` (0 failed, 1
+expected skip for naniar not being installed on this machine), full suite
+721 passed / 0 failed / 1 skipped, all 9 CI-bearing runners spot-checked
+live against the demo instrument with correct bracketed intervals, and a
+fresh axe-core run against the re-themed HTML report reporting zero WCAG
+2.2 AA violations. Parts J to M below are ticked on that basis.
 Items marked [x] below without reviewer initials were verified that way.
 Items left unticked need a human: look-and-feel judgements, the phone check,
 win-builder, the fresh-eyes pass, and the decisions flagged to the owner.
 
 **Scope note (2026-07-17):** after this file was drafted, the owner merged
-the statistics and reporting scope (formerly 0.3.5: effect-size CIs,
-Henseler HTMT, Little's MCAR, omega and EFA polish, PDF output, report
-theming, codebook upgrades) into 0.3.4. This review gains new parts for
-that work once it is implemented; Parts A to I below stay valid for the
-plotting and UI half. Do not sign off Part G or the final sign-off until
-the statistics parts exist.
+the statistics and reporting scope (formerly 0.3.5) into 0.3.4. Parts J to
+M below cover that work; Parts A to I stay valid for the plotting and UI
+half.
 
 Work through this document sequentially in a fresh RStudio session with a
 real browser.
@@ -315,6 +323,92 @@ browseVignettes("surveyframe")
   student's submission.
 - [ ] I1.4 Log anything found in dogfeed.todo.md rather than fixing
   inline.
+
+---
+
+## Part J — Effect-size confidence intervals (7 items)
+
+```r
+bootstrap_ci(mtcars$mpg, seed = 42)
+cohens_d_ci(mtcars$mpg[mtcars$am == 1], mtcars$mpg[mtcars$am == 0], seed = 42)
+results <- run_analysis_plan(responses, instr, plots = TRUE)
+results[["rq_ttest_ind"]]$apa
+```
+
+- [x] J1.1 The four helpers are exported, reproducible with a seed, and
+  return `estimate`, `lower`, `upper` with NA bounds on tiny samples.
+- [x] J1.2 The 9 affected runners attach their CI key (`d_ci`, `r_ci`,
+  `eta_ci`, `ci`, `v_ci`) and the APA string carries the interval.
+- [x] J1.3 The Pearson interval is the analytic Fisher z, matching
+  `sframe_fisher_z_ci()` exactly.
+- [x] J1.4 Degenerate data keeps the pre-0.3.4 APA string with no bracket.
+- [ ] J1.5 Read 3 APA strings in a rendered report: the intervals read
+  naturally in context and match the reported effect. Judgement call.
+- [ ] J1.6 The intervals are statistically sensible on the demo data
+  (bracket the estimate, wider at 99 percent than at 95). Spot check one
+  by hand.
+- [ ] J1.7 Timing: the full demo plan with 34 blocks still runs in
+  acceptable time in the studio's Run tab (the bootstraps add work).
+
+## Part K — Psychometric depth (7 items)
+
+- [x] K1.1 `validity_report(items_by_construct = ...)` returns Henseler
+  HTMT (symmetric, unit diagonal, NA rows for single-item constructs) and
+  `htmt_method = "henseler"`.
+- [x] K1.2 Without item data the correlation fallback applies unchanged
+  and is labelled `correlation_fallback`.
+- [x] K1.3 With naniar installed, `missing_data_report()` returns Little's
+  MCAR statistic, df, p value, and a plain interpretation; without
+  missingness (or without naniar) the pre-0.3.4 result returns verbatim.
+- [x] K1.4 `reliability_report()` sets `omega_note` when omega cannot be
+  computed and the reliability chart names those scales in its subtitle.
+- [x] K1.5 `efa_solution()` carries `loadings_long`,
+  `communalities_table`, and `variance_table`, and the loadings heatmap
+  consumes the tidy frame.
+- [ ] K1.6 Run `validity_report()` on real scored demo data with
+  `items_by_construct` and sanity-check 2 HTMT values against hand
+  computation.
+- [ ] K1.7 The MCAR interpretation wording reads correctly to a
+  methodologist. Judgement call.
+
+## Part L — PDF output and report theming (8 items)
+
+```r
+render_report(instr, responses, output_file = "report.pdf", format = "pdf")
+```
+
+- [x] L1.1 `format = "pdf"` produces a real PDF through pagedown when
+  Chrome is available, and aborts with a typed, actionable error without
+  pagedown.
+- [x] L1.2 `format = "html"` remains the default and its output is
+  unchanged apart from the deliberate theming work below.
+- [x] L1.3 The HTML fallback styles sit behind `--sf-*` CSS variables with
+  a print stylesheet, tables carry captions and `scope="col"`, and every
+  embedded chart has descriptive alt text naming its research question.
+- [ ] L1.4 Open the PDF: pagination is clean (no result card or table
+  split mid-block, headers repeat on continued tables).
+- [ ] L1.5 The PDF is readable in print greyscale when generated with
+  `plot_palette = "print"`.
+- [ ] L1.6 Print the HTML report from a browser (Ctrl+P): the print
+  stylesheet applies (no panel tints, no clipped tables).
+- [ ] L1.7 The accessible teal (`--sf-accent`) still reads as brand in the
+  HTML report. Judgement call.
+- [ ] L1.8 File size of a full demo PDF is reasonable to email (check it
+  is under about 10 MB).
+
+## Part M — Codebook upgrades (4 items)
+
+- [x] M1.1 `codebook_report()` returns `plan_table` (id, question, method,
+  variables, decision rule) and `models_table` (id, label, type, engine,
+  constructs, paths).
+- [x] M1.2 Both render in the report codebook section on the Quarto path
+  and the HTML fallback.
+- [ ] M1.3 Read the codebook of the demo instrument end to end: it now
+  fully documents the study (items, choices, scales, plan, models) without
+  needing the rest of the report. Judgement call.
+- [ ] M1.4 A codebook-only report (`include_analysis = FALSE`, no data)
+  still renders the plan summary, since the plan is pre-declared design,
+  independent of results.
 
 ---
 

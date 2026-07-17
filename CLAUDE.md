@@ -250,12 +250,28 @@ been submitted. **0.3.5 is redefined as the field-validation
 release**: ICSRI 2026 audience feedback (conference 8-9 August 2026)
 plus additional human testing rounds with several short real surveys.
 Targets unchanged: 0.3.4 on 2026-08-15, 0.3.5 on 2026-09-15, 0.4 on
-2026-11-20. The version bump to 0.3.4, the NEWS entry for the UI
-half, and mas_review_034.md exist (uncommitted); the 2026-07-17
-tarball is superseded and gets rebuilt when the statistics half
-lands. Remaining for 0.3.4: the statistics and reporting scope (see
-revision_todo_0.3.md), then NEWS additions, the expanded MAS
-co-review, tarball, CRAN checks, win-builder, submission.
+2026-11-20.
+
+**The statistics and reporting half is implemented and verified
+(2026-07-18), so all planned feature work for 0.3.4 is now done.**
+`R/bootstrap_ci.R` exports the 4 CI helpers; all 9 affected runners
+carry an additive CI key with the interval in their `apa` string;
+`validity_report()` computes true Henseler HTMT with a documented
+correlation fallback; `missing_data_report()` runs Little's MCAR via
+naniar when installed; `reliability_report()` and `efa_solution()`
+gained the omega-failure note and 3 tidy data frames; `render_report()`
+gained `format = "pdf"` via pagedown; the HTML fallback's styling
+moved to `--sf-*` CSS variables with a print stylesheet and chart alt
+text; `codebook_report()` gained plan and model summary tables. naniar
+and pagedown are in Suggests, guarded. Verified: `devtools::document()`
+clean, 72 new expectations (0 failed, 1 expected skip for naniar not
+installed locally), full suite 721 passed / 0 failed / 1 skipped, all
+9 runners spot-checked live, and a fresh axe-core run on the re-themed
+report at zero violations. Still open: the `.bib` reference carry-in
+(owner decision, leaning defer to a future report-format patch), then
+the release process (tarball rebuild, your mas_review_034.md rounds,
+`R CMD check --as-cran`, win-builder, CRAN submission). All of the
+above is uncommitted.
 
 0.3.1 is published on CRAN (2026-06-02). 0.3.3 is fully implemented (543/543
 tests pass, three vignettes rewritten and knit clean, tarball built, local
