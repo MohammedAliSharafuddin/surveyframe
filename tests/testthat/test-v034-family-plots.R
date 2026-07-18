@@ -418,3 +418,74 @@ test_that("plot.sframe_missing_data_report builds a missingness bar chart", {
   none_missing <- all(mr_clean$item_missing$missing_pct == 0)
   if (none_missing) expect_s3_class(plot(mr_clean), "ggplot")
 })
+
+test_that("every block in the demo analysis plan gets a table, a plot, or generated syntax", {
+  skip_if_not_installed("ggplot2")
+  demo <- sframe_demo_data()
+  res <- run_analysis_plan(demo$responses, demo$instrument, plots = TRUE)
+  has_output <- vapply(res, function(r) {
+    !is.null(r$table) || !is.null(r$plot) || !is.null(r$syntax)
+  }, logical(1))
+  missing <- vapply(res[!has_output], function(r) r$block_id %||% r$test, character(1))
+  expect_true(all(has_output),
+             info = paste("blocks with no table, plot, or syntax:", paste(missing, collapse = ", ")))
+})
+
+test_that("repeated_anova computes a real F/p table instead of only fit_summary text", {
+  demo <- sframe_demo_data()
+  res <- run_analysis_plan(demo$responses, demo$instrument)
+  ra <- Filter(function(r) identical(r$test, "repeated_anova"), res)
+  skip_if(length(ra) == 0, "demo plan has no repeated_anova block")
+  r <- ra[[1]]
+  expect_s3_class(r$table, "data.frame")
+  expect_true(all(c("df1", "df2", "Estimate", "p") %in% colnames(r$table)))
+  expect_match(r$apa, "^F\\(")
+})
+
+test_that("friedman, partial_correlation, and mediation tables are populated", {
+  demo <- sframe_demo_data()
+  # partial_correlation and mediation reference scale-score variables, which
+  # only exist when scoring runs (the default); scored = FALSE was fine for
+  # the item-level tests above but breaks these two with a missing-column
+  # error, not a real "no table" gap.
+  res <- run_analysis_plan(demo$responses, demo$instrument)
+  by_test <- function(t) Filter(function(r) identical(r$test, t), res)
+
+  fr <- by_test("friedman")
+  skip_if(length(fr) == 0, "demo plan has no friedman block")
+  expect_true("Kendall's W" %in% colnames(fr[[1]]$table))
+
+  pc <- by_test("partial_correlation")
+  skip_if(length(pc) == 0, "demo plan has no partial_correlation block")
+  expect_true(all(c("Estimate", "Controls") %in% colnames(pc[[1]]$table)))
+
+  med <- by_test("mediation")
+  skip_if(length(med) == 0, "demo plan has no mediation block")
+  expect_identical(med[[1]]$table$Effect,
+                   c("Direct (c')", "Indirect (a×b)", "Total (c)"))
+})
+
+test_that("moderation, logistic, and repeated-measures plots draw", {
+  skip_if_not_installed("ggplot2")
+  demo <- sframe_demo_data()
+  res <- run_analysis_plan(demo$responses, demo$instrument, plots = TRUE)
+  by_test <- function(t) Filter(function(r) identical(r$test, t), res)
+
+  for (t in c("moderation", "mediation", "regression_logistic_binary",
+              "regression_logistic_ordinal", "repeated_anova", "friedman",
+              "partial_correlation", "ancova", "fisher_exact", "item_diagnostics")) {
+    blocks <- by_test(t)
+    skip_if(length(blocks) == 0, paste("demo plan has no", t, "block"))
+    expect_s3_class(blocks[[1]]$plot, "ggplot")
+  }
+})
+
+test_that("syntax-only blocks (CFA/SEM/PLS-SEM) carry generated syntax text", {
+  demo <- sframe_demo_data()
+  res <- run_analysis_plan(demo$responses, demo$instrument, scored = FALSE)
+  for (t in c("cfa_lavaan_syntax", "sem_lavaan_syntax", "seminr_syntax")) {
+    blocks <- Filter(function(r) identical(r$test, t), res)
+    skip_if(length(blocks) == 0, paste("demo plan has no", t, "block"))
+    expect_true(nzchar(blocks[[1]]$syntax %||% ""))
+  }
+})
