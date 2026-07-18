@@ -49,6 +49,14 @@ unchanged. naniar and pagedown join Suggests.
 * The codebook now includes the pre-declared analysis plan and the saved
   measurement and structural models, so one document fully records the
   instrument a study used.
+* The codebook's items table shows each item's actual response options and
+  scale label directly, instead of an id that needed a separate choice-sets
+  table to decode.
+* Analysis-result tables (frequency, cross-tabulation, group comparisons,
+  regression coefficients, and the rest) show item, scale, and
+  response-option labels instead of the underlying ids and coded values.
+* Report tables render as properly split HTML tables in both the Quarto and
+  internal HTML report paths.
 
 ## Written interpretations in reports
 
@@ -59,10 +67,14 @@ unchanged. naniar and pagedown join Suggests.
   the prospective plan stays visible next to the post-hoc narrative.
   Interpretations are report content only and are never written into the
   instrument file.
-* SurveyStudio's Export screen gains an Interpretations card: one field per
-  research question, shown with the planned decision rule and the live
-  result once responses are loaded. The generated report includes whatever
-  you write there.
+* SurveyStudio's Export screen gains an Interpretations card: one block per
+  research question, in reading order (result table, chart, planned
+  decision rule, then the interpretation), shown with the live result once
+  responses are loaded. The generated report includes whatever you write
+  there.
+* A "Copy result" button on each Interpretations block copies the whole
+  result, table, chart, and the interpretation as written, as one block,
+  for pasting into a document.
 * The SurveyBuilder Report outline now edits the planned decision rule
   inline, in sync with the research-question dialogue.
 
@@ -71,8 +83,16 @@ unchanged. naniar and pagedown join Suggests.
 * `run_analysis_plan(plots = TRUE)` now attaches a chart to every
   supported family: regression diagnostics (4 panels), EFA scree and
   loadings heatmap, reliability bars, mosaic and crosstab, correlation
-  heatmap, quality flag rates, skewness and kurtosis, group-comparison
-  boxplots, paired slope charts, and raw-variable distributions.
+  heatmap, quality flag rates, group-comparison boxplots, paired slope
+  charts, raw-variable distributions, repeated-measures profiles, a
+  partial-correlation residual scatter, logistic-regression odds-ratio
+  forest plots, a moderation interaction plot, and a mediation effect
+  chart. Every analysis-plan block now returns a table, a chart, or
+  generated syntax.
+* Distribution shape by variable draws as a violin per variable, instead
+  of a bar chart of the skewness and kurtosis summary statistics.
+* A scale's separate Likert items, and a matrix question's rows, draw as
+  one grouped diverging chart, instead of one chart per item.
 * New `plot()` methods for descriptives, EFA, quality, reliability,
   validity, missing-data, and analysis-results objects. `plot(results)`
   draws every attached chart, and `plot(results, which = "rq_id")` returns
@@ -108,6 +128,16 @@ unchanged. naniar and pagedown join Suggests.
 * All 7 vignettes pass the same audit: language metadata, AA contrast for
   links and code highlighting, wrapped code blocks, keyboard-reachable
   content, and alternative text on every chart.
+
+## Bug fixes
+
+* `sf_item()`'s `date_min` and `date_max` no longer accept an ambiguous
+  date string (for example `"01/02/2024"`); only `"YYYY-MM-DD"` or a
+  `Date` object is accepted, and anything else is a validation error
+  rather than a silently misparsed date.
+* `bootstrap_ci()`, `cohens_d_ci()`, `cramers_v_ci()`, and `eta_sq_ci()`
+  no longer alter the random-number seed for code that runs after a
+  reproducible, seeded call.
 
 # surveyframe 0.3.3
 
