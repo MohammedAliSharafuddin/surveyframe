@@ -18,6 +18,18 @@ test_that("bootstrap_ci is reproducible with a seed and guards small n", {
   expect_true(is.na(tiny["lower"]) && is.na(tiny["upper"]))
 })
 
+test_that("a seeded bootstrap call does not disturb the caller's RNG stream", {
+  set.seed(123)
+  before <- runif(5)
+
+  set.seed(123)
+  bootstrap_ci(mtcars$mpg, seed = 999)
+  cohens_d_ci(mtcars$mpg[mtcars$am == 1], mtcars$mpg[mtcars$am == 0], seed = 999)
+  after <- runif(5)
+
+  expect_identical(before, after)
+})
+
 test_that("cohens_d_ci brackets the point estimate and guards small groups", {
   set.seed(1)
   x <- rnorm(40, 3.5); y <- rnorm(40, 3.0)
