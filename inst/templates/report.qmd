@@ -235,12 +235,36 @@ q_items <- Filter(function(i) !(i$type %in% c("section_break", "text_block")),
 has_ggplot <- requireNamespace("ggplot2", quietly = TRUE)
 plot_palette <- params$plot_palette %||% "web"
 
+# A scale's separate Likert items get one grouped diverging chart, the same
+# way a matrix question's rows do, instead of scattering a related batch of
+# items across several single-item charts.
+scale_groups <- sframe_likert_scale_groups(instrument)
+group_of <- character(0)
+for (g in scale_groups) {
+  ids <- vapply(g$items, function(i) i$id, character(1))
+  group_of[ids] <- g$scale_id
+}
+rendered_groups <- character(0)
+
 # One bar chart per categorical item, one histogram per numeric item. Every
 # chart here shares the ggplot2 theme_surveyframe() (theme_classic()-based)
 # look used everywhere else in the report, so this section reads as one
 # consistent chart family rather than a mix of base-R and ggplot styling.
 for (item in q_items) {
   t <- item$type
+  if (item$id %in% names(group_of)) {
+    gid <- group_of[[item$id]]
+    if (gid %in% rendered_groups || !has_ggplot) next
+    rendered_groups <- c(rendered_groups, gid)
+    g <- scale_groups[[gid]]
+    gg <- sframe_plot_likert_scale(g$items, responses, g$choice_set, g$title,
+                                   palette = plot_palette)
+    if (is.null(gg)) next
+    cat(sprintf("\n**%s**\n\n", g$title))
+    print(gg)
+    cat("\n\n")
+    next
+  }
   if (identical(t, "matrix")) {
     # A matrix question has no base response column of its own, only one
     # expanded <id>__<row> column per row, so it needs its own existence
