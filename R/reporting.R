@@ -163,6 +163,41 @@ codebook_report <- function(instrument, format = c("html", "md")) {
   )
 }
 
+#' Enrich a codebook's items table for display
+#'
+#' Replaces `items_table`'s `choice_set` id with the choice set's actual
+#' response options ("1 = Strongly disagree; 2 = Disagree; ...") and its
+#' `scale_id` with the scale's label, so each row of the printed codebook is
+#' self-contained. [codebook_report()] itself keeps the raw ids (for joining
+#' `items_table` to `choices_table`/`scales_table` programmatically); this
+#' is for the rendered document, where a reader should not need to
+#' cross-reference a separate table just to see what "1" means on a scale
+#' shared by many items.
+#'
+#' @param cb An `sframe_codebook` object from [codebook_report()].
+#' @return A data.frame, `cb$items_table` with `choice_set` and `scale_id`
+#'   replaced by display text.
+#' @export
+#' @seealso [codebook_report()]
+sframe_codebook_items_display <- function(cb) {
+  stopifnot(inherits(cb, "sframe_codebook"))
+  items_d <- cb$items_table
+  scale_label_of <- function(id) {
+    if (is.null(id) || !nzchar(id)) return("")
+    hit <- cb$scales_table$label[cb$scales_table$id == id]
+    if (length(hit)) hit[1] else id
+  }
+  options_of <- function(cs_id) {
+    if (is.null(cs_id) || !nzchar(cs_id)) return("")
+    rows <- cb$choices_table[cb$choices_table$choice_set_id == cs_id, , drop = FALSE]
+    if (nrow(rows) == 0) return(cs_id)
+    paste(sprintf("%s = %s", rows$value, rows$label), collapse = "; ")
+  }
+  items_d$scale_id <- vapply(items_d$scale_id, scale_label_of, character(1))
+  items_d$choice_set <- vapply(items_d$choice_set, options_of, character(1))
+  items_d
+}
+
 #' @exportS3Method print sframe_codebook
 print.sframe_codebook <- function(x, ...) {
   cat(sprintf("Codebook: %s v%s\n", x$instrument_meta$title,
@@ -480,17 +515,10 @@ sframe_clean_interpretations <- function(interpretations) {
     cb <- codebook_report(instrument)
     codebook_parts <- c(
       "<h2>Codebook</h2>",
-      .render_report_table(cb$items_table, "Survey items",
-        col.names = c("ID", "Label", "Type", "Choice set", "Scale",
+      .render_report_table(sframe_codebook_items_display(cb), "Survey items",
+        col.names = c("ID", "Label", "Type", "Response options", "Scale",
                       "Reverse", "Required"))
     )
-    if (nrow(cb$choices_table) > 0) {
-      codebook_parts <- c(
-        codebook_parts,
-        .render_report_table(cb$choices_table, "Choice sets",
-          col.names = c("Choice set", "Value", "Label"))
-      )
-    }
     if (nrow(cb$scales_table) > 0) {
       codebook_parts <- c(
         codebook_parts,
@@ -545,11 +573,13 @@ sframe_clean_interpretations <- function(interpretations) {
     missing_html <- if (inherits(mr, "error")) {
       sprintf("<h2>Missing Data</h2><p>%s</p>", htmltools_escape(conditionMessage(mr)))
     } else {
+      patterns_display <- mr$patterns[, intersect(c("description", "n", "percent"), names(mr$patterns)), drop = FALSE]
       paste(
         "<h2>Missing Data</h2>",
         .render_report_table(mr$item_missing, "Item-wise missingness"),
         .render_report_table(mr$respondent_missing, "Respondent-wise missingness"),
-        .render_report_table(mr$patterns, "Missing-data patterns"),
+        .render_report_table(patterns_display, "Missing-data patterns",
+                             col.names = c("Pattern", "n", "Percent")),
         .render_report_table(mr$scale_missing_rules, "Scale missing rules"),
         collapse = "\n"
       )
