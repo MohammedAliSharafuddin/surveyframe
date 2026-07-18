@@ -269,6 +269,27 @@ missing_data_report <- function(data, instrument = NULL, variables = NULL) {
   pattern_table <- as.data.frame(table(pattern = pattern_key), stringsAsFactors = FALSE)
   pattern_table$percent <- if (n == 0) numeric(0) else pattern_table$Freq / n
   names(pattern_table)[names(pattern_table) == "Freq"] <- "n"
+  # The bit string itself ("000000000000000") is meaningless to read, so
+  # decode each pattern into which variables are missing, in reader
+  # language: "Complete case" for no missing items, otherwise the missing
+  # variables' labels (falling back to their id when no instrument is
+  # available), capped so one respondent missing everything does not turn
+  # into an unreadable wall of text.
+  if (nrow(pattern_table) > 0 && length(variables) > 0) {
+    lookup <- sframe_label_lookup(instrument)
+    label_for <- function(id) if (id %in% names(lookup)) lookup[[id]] else id
+    pattern_table$description <- vapply(pattern_table$pattern, function(p) {
+      missing_idx <- which(strsplit(p, "")[[1]] == "1")
+      if (length(missing_idx) == 0) return("Complete case (no missing items)")
+      labels <- vapply(variables[missing_idx], label_for, character(1))
+      if (length(labels) > 5) {
+        labels <- c(labels[1:5], sprintf("and %d more", length(labels) - 5))
+      }
+      paste0("Missing: ", paste(labels, collapse = ", "))
+    }, character(1))
+  } else {
+    pattern_table$description <- character(0)
+  }
 
   pairwise <- if (length(variables) > 0) {
     stats::setNames(

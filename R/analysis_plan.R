@@ -1000,6 +1000,14 @@ sframe_run_one_block <- function(block, data, instrument, plots = FALSE,
   if (is.null(result$table)) {
     result$table <- tryCatch(sframe_result_table(result), error = function(e) NULL)
   }
+  # The runners above compute on the raw response codes (item ids, coded
+  # choice values), so the table they build carries those, not what a
+  # reader sees. Substitute labels here, once, for every test type, rather
+  # than teaching each runner about the instrument's labels.
+  result$table <- tryCatch(
+    sframe_humanize_table(result$table, sframe_label_lookup(instrument)),
+    error = function(e) result$table
+  )
   if (isTRUE(plots) && is.null(result$plot)) {
     result$plot <- sframe_plot_for_result(result, data, palette = plot_palette)
   }
