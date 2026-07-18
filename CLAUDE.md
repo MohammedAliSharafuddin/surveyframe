@@ -292,6 +292,47 @@ a copy button alongside the editable interpretation box, with chart
 rendering cached once and shared with the Run stage. The broader ask
 to redesign the whole shiny app is not in scope for this patch.
 
+**Second round, 2026-07-18: `mas_review_034.qmd` made executable and
+actually re-rendered, which surfaced the real cause of two bugs the
+first round had only patched around the edges of.** The table-splitting
+bug was not the `kable()` fix: `report.qmd` calls
+`sframe_draw_likert_diverging()` directly, and it was never exported,
+so Quarto's own `library(surveyframe)` session couldn't see it and
+silently fell back to the HTML path on every render with a Likert item.
+The HTML path's own splitting bug was `htmltools_escape()` collapsing a
+whole table header or row vector into one space-joined string (correct
+for a scalar caption, wrong called on a vector). Both fixed
+(`sframe_draw_likert_diverging()` exported, new
+`htmltools_escape_each()` for the vectorised case); `theme_surveyframe()`'s
+leftover panel gridlines (inconsistent with its `theme_classic()` base)
+also removed. Further MAS feedback actioned the same session: skewness
+and kurtosis now draw as a violin per variable instead of a bar of the
+summary statistics; a matrix question's rows and a scale's separate
+Likert items that share one choice set now draw as one grouped
+diverging chart instead of one chart per row or item
+(`sframe_plot_likert_matrix()`, `sframe_plot_likert_scale()`); the
+codebook's items table shows response options and scale label inline
+instead of a separate choice-sets table (5 rendered tables to 4), and
+every analysis-result table now shows labels instead of raw ids and
+coded values (`sframe_label_lookup()`/`sframe_humanize_table()`); and
+every one of the demo plan's 34 blocks now returns a table, a chart, or
+generated syntax, closing 13 test types that previously rendered with
+nothing beneath the result line (repeated-measures ANOVA additionally
+gained a real F/df/p/partial eta-squared table instead of only captured
+text). The Interpretations canvas's writing box was enlarged and "Copy
+result" rewritten to copy the whole block (table, chart image, and the
+interpretation as typed) as rich HTML instead of a plain-text summary
+that could never include the chart. Two independent AI code reviews
+(`kimi_review_034.md`, `qwen_review_034.md`, dev branch only) were then
+fact-checked claim by claim against the real source; nearly all of the
+first review's "critical bugs" did not match the actual code, but 2 real
+smaller issues did surface and were fixed: `sf_item()`'s
+`date_min`/`date_max` silently misparsing an ambiguous date string
+instead of rejecting it, and the 4 bootstrap CI helpers leaking their
+seed into the caller's global RNG state. Both review files carry a
+verification appendix. All committed to `main` and merged to `dev`;
+review-file commits and their appendices are `dev`-only.
+
 0.3.1 is published on CRAN (2026-06-02). 0.3.3 is fully implemented (543/543
 tests pass, three vignettes rewritten and knit clean, tarball built, local
 `R CMD check --as-cran` clean at 0/0/0).
@@ -355,9 +396,11 @@ Open items (non-blocking for CRAN submission):
 - Confirm or remove the Codecov badge in README.
 - Guard `launch_dashboard()` and similar Shiny launcher `\donttest` examples so a
   full check does not hang; this is a future patch, not a 0.3.3 blocker.
-- The pre-existing Quarto/pandoc `kable()` table-collapsing bug found during
-  the 0.3.3 review (confirmed unrelated to this release's changes, not
-  reproducible in isolated minimal tests) remains open for a future session.
+- The Quarto/pandoc `kable()` table-collapsing bug found during the 0.3.3
+  review: root cause found and fixed 2026-07-18 (see the v0.3.4 second-round
+  entry above). It was never a pandoc/kable issue; `report.qmd`'s Quarto
+  path was silently failing on an unexported function and falling back to
+  an HTML path with its own vector-escaping bug.
 - The vignette-specific WCAG 2.2 AA CSS pass logged here for v0.3.4 was
   completed on 2026-07-17 (see the v0.3.4 section of
   revision_todo_0.3.md).

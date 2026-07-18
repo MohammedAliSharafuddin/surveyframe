@@ -238,20 +238,108 @@ Canonical detail: the v0.3.5 section of portfolio-planner
   pending final confirmation, since it pairs naturally with a future
   editable-report-format patch (see the `render_report(format = "odt")`
   discussion, 2026-07-18) rather than this release.
-- Release process still pending: rebuild the tarball (the 2026-07-17 one
-  is superseded), your review rounds on mas_review_034.md (Parts J to M
-  now machine-verified, judgement-call items still open), `R CMD check
-  --as-cran`, win-builder x2, CRAN submission.
 - **Owner decision resolved 2026-07-16: the SurveyStudio results page
   (on-demand `render_report()` iframe plus quartopad integration) is
   deferred past the 0.3.4 arc.** The Export-screen edit step delivers
   the owner request on its own, and the `rv$interpretations` store plus
   the `interpretations` API are the plumbing the results page needs, so
   it becomes pure UI work when it lands.
-- Release process: NEWS.md statistics sections, mas_review_034.md
-  statistics parts plus the human review rounds, rebuild the tarball
-  (the version bump to 0.3.4 is already made), `R CMD check --as-cran`,
-  win-builder x2, CRAN submission.
+
+### Done (2026-07-18 session, after the statistics half)
+
+Real fixes to bugs found the second `mas_review_034.qmd` was made executable
+and actually rendered against a freshly reinstalled package (the first-round
+fixes had been verified against the description of the bug, not always a
+live re-render):
+
+- **The table-splitting bug's real cause.** The first-round fix
+  (`kable(format = "html")`) only ever exercised the Quarto path. The Quarto
+  path was silently failing on every render with a Likert item, because
+  `report.qmd` calls `sframe_draw_likert_diverging()` directly and it was
+  never exported, so Quarto's own `library(surveyframe)` session (unlike
+  `load_all()`) could not see it, and errored into the HTML fallback every
+  time. The actual splitting bug was in that fallback:
+  `htmltools_escape()` collapses a vector into one space-joined string,
+  correct for a scalar caption but wrong when called on a whole table
+  header or row vector at once. Exported `sframe_draw_likert_diverging()`
+  and added `htmltools_escape_each()` for the vectorised case.
+- `theme_surveyframe()`'s panel gridlines removed to match `theme_classic()`
+  properly (a `theme_classic()`-based theme with visible panel gridlines
+  was an inconsistency the earlier B1 fix note missed).
+- `mas_review_034.qmd` converted to an executable Quarto document (data
+  chunks run at render against the installed package; install/browser/Shiny
+  chunks stay `eval: false`), proofread, and given an 11-item Part N of
+  fix re-checks.
+- **Skewness and kurtosis**: replaced the bar chart of summary statistics
+  with a violin per variable (standardised so different original scales
+  are comparable), per MAS feedback asking for a histogram or violin
+  instead of "another bar plot."
+- **Grouped Likert charts**, per MAS feedback asking for the matrix/scale
+  grouping seen in typical multi-item satisfaction survey reports: a
+  matrix question's rows draw as one grouped diverging chart
+  (`sframe_plot_likert_matrix()`), and a scale's separate Likert items
+  that all share one choice set do the same
+  (`sframe_plot_likert_scale()`/`sframe_likert_scale_groups()`), instead
+  of one chart per row or per item. Both report paths wired in.
+- **Codebook consolidated from 5 rendered tables to 4** and every
+  analysis-result table humanised: a new `sframe_label_lookup()`/
+  `sframe_humanize_table()` pair (built from the instrument's item ids,
+  scale ids, and choice values) substitutes labels for raw ids and coded
+  values across every result table centrally, and
+  `sframe_codebook_items_display()` folds the choice-sets table into the
+  items table (response options and scale label shown inline) instead of
+  a separate table a reader has to cross-reference. Missing-data patterns
+  gained a `description` column ("Complete case", "Missing: ...") instead
+  of an unreadable bit string.
+- **Every one of the 34 demo blocks now returns a table, a chart, or
+  generated syntax.** 13 test types were previously silent (quality,
+  reliability alpha/omega, item diagnostics, EFA readiness/solution,
+  paired t-test/Wilcoxon, repeated-measures ANOVA, Friedman, partial
+  correlation, both logistic regressions, moderation, mediation).
+  Repeated-measures ANOVA additionally now computes a real F/df/p/partial
+  eta-squared from the `Error()`-stratified fit instead of only a captured
+  text summary. The 3 syntax-only blocks (CFA/SEM/PLS-SEM) now render
+  their generated syntax in the HTML fallback report and both SurveyStudio
+  card surfaces (Run stage, Export canvas), matching the Quarto path.
+- **Interpretations canvas**: the writing box enlarged (3 rows to 8), and
+  "Copy result" rewritten as a client-side handler that copies the whole
+  block (table, chart image, and the interpretation as currently typed)
+  as rich HTML plus a plain-text fallback, instead of a server-rendered
+  plain-text summary that could never include the chart or the live
+  textarea content.
+- **Two independent AI code reviews (`kimi_review_034.md`,
+  `qwen_review_034.md`) fact-checked claim by claim against the actual
+  source.** Nearly all of the first review's "critical bugs" did not
+  match the real code; two real, smaller issues did surface and were
+  fixed: `sf_item()`'s `date_min`/`date_max` silently misparsing an
+  ambiguous date string instead of rejecting it, and
+  `bootstrap_ci()`/`cohens_d_ci()`/`cramers_v_ci()`/`eta_sq_ci()` leaking
+  their seed into the caller's global RNG state. Both review files carry
+  a verification appendix recording the verdict on every claim.
+
+Suite currently passing throughout (spot-checked per change, not re-run as
+one full pass since the last count).
+
+### Release process still pending
+
+- Rebuild the tarball (every prior build is superseded by the work above).
+- `R CMD check --as-cran` on the rebuilt tarball.
+- win-builder R-release and R-devel.
+- `urlchecker::url_check()` and `spelling::spell_check_package()`.
+- NEWS.md statistics and reporting sections: **written 2026-07-18**, folded
+  into the existing 0.3.4 entry along with everything in the "Done" block
+  above (codebook/table labels, grouped Likert charts, the violin chart,
+  RQ table/plot/syntax completeness, the Interpretations canvas rework,
+  and the 2 bug fixes) rather than a separate changelog pass.
+- Your review rounds on `mas_review_034.qmd`: Parts A to M are machine-
+  verified where checkable; the "Judgement call" and phone/screen-reader
+  items (roughly 30 across Parts B, C, D, E, F, H, I, J, L, M), plus the
+  fresh-eyes UX pass in Part I, still need a human in a browser. Re-run
+  Part N's 11 fix re-checks against a freshly reinstalled package first.
+- Confirm the pkgdown workflow is green and the live site carries no
+  dev-only files after the next push to `main` (pkgdown builds from `main`
+  only; `.Rbuildignore` does not protect it).
+- CRAN submission.
 
 ---
 
