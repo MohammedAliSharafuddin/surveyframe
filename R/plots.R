@@ -401,6 +401,123 @@ sframe_draw_likert_diverging <- function(counts, theme_color = "#16B3B1",
   }
 }
 
+#' Grouped diverging chart for a Likert matrix question
+#'
+#' A matrix question asks several rows against one shared response scale
+#' (a "grid" of Likert items). Plotting each row as its own separate
+#' [sframe_draw_likert_diverging()] chart loses the grouping the question
+#' was designed with, so this draws every row as one diverging bar inside a
+#' single chart, sharing one x scale and one legend, the standard way a
+#' Likert matrix is reported (compare a typical multi-item satisfaction
+#' grid). Same diverging-stack convention as the single-item chart: the
+#' middle category of an odd-length scale is neutral and split evenly
+#' across the zero line, and colour saturation increases toward each pole.
+#'
+#' @param item A `"matrix"` sframe item, with `matrix_items` (the row
+#'   labels) and a `choice_set` naming the shared response scale.
+#' @param data The response data.frame, with one expanded
+#'   `<item id>__<row label>` column per matrix row, as produced by
+#'   [read_responses()].
+#' @param choice_set The item's choice set object (`values`, `labels`),
+#'   typically looked up from `instrument$choices` by `item$choice_set`.
+#' @param palette One of `"web"` or `"print"`. See [sframe_brand()].
+#' @return A ggplot2 object, or `NULL` if no row has response data.
+#' @export
+#' @seealso [sframe_draw_likert_diverging()]
+sframe_plot_likert_matrix <- function(item, data, choice_set, palette = c("web", "print")) {
+  rlang::check_installed("ggplot2", reason = "to plot a Likert matrix.")
+  palette <- match.arg(palette)
+  brand <- sframe_brand(palette)
+  rows <- item$matrix_items %||% character(0)
+  if (!length(rows) || is.null(choice_set)) return(NULL)
+
+  scale_values <- as.character(choice_set$values)
+  scale_labels <- choice_set$labels %||% scale_values
+  n <- length(scale_values)
+  if (n < 2) return(NULL)
+  half <- n %/% 2
+  neg_idx <- seq_len(half)
+  pos_idx <- seq.int(n - half + 1L, n)
+  has_neutral <- (n %% 2L) == 1L
+  neu_idx <- if (has_neutral) half + 1L else integer(0)
+
+  # Each row's segments are computed independently, exactly like the
+  # single-item chart's own maths, then stacked outward from zero so every
+  # row shares the same zero line regardless of how lopsided its own
+  # distribution is.
+  segs <- list()
+  for (row in rows) {
+    col <- paste0(item$id, "__", row)
+    if (!col %in% colnames(data)) next
+    counts <- table(factor(data[[col]], levels = scale_values))
+    if (sum(counts) == 0) next
+    pct <- 100 * as.numeric(counts) / sum(counts)
+
+    x <- 0
+    for (i in rev(neg_idx)) {
+      w <- pct[i]
+      segs[[length(segs) + 1]] <- data.frame(
+        row = row, category = scale_labels[i],
+        xmin = -(x + w), xmax = -x, stringsAsFactors = FALSE
+      )
+      x <- x + w
+    }
+    if (has_neutral) {
+      w <- pct[neu_idx] / 2
+      segs[[length(segs) + 1]] <- data.frame(
+        row = row, category = scale_labels[neu_idx],
+        xmin = -w, xmax = w, stringsAsFactors = FALSE
+      )
+    }
+    x <- if (has_neutral) pct[neu_idx] / 2 else 0
+    for (i in pos_idx) {
+      w <- pct[i]
+      segs[[length(segs) + 1]] <- data.frame(
+        row = row, category = scale_labels[i],
+        xmin = x, xmax = x + w, stringsAsFactors = FALSE
+      )
+      x <- x + w
+    }
+  }
+  if (!length(segs)) return(NULL)
+  df <- do.call(rbind, segs)
+  drawn_rows <- rows[rows %in% df$row]
+  df$row <- factor(df$row, levels = rev(drawn_rows))
+  df$category <- factor(df$category, levels = scale_labels)
+  df$ypos <- as.numeric(df$row)
+
+  if (palette == "web") {
+    neg_ramp <- grDevices::colorRampPalette(c("#b3261e", "#f2b6ae"))(max(1L, half))
+    pos_ramp <- grDevices::colorRampPalette(c("#a6ded9", brand$teal))(max(1L, half))
+    neu_col  <- "#c7cdd6"
+  } else {
+    neg_ramp <- grDevices::colorRampPalette(c("#595959", "#d9d9d9"))(max(1L, half))
+    pos_ramp <- grDevices::colorRampPalette(c("#e8e8e8", "#8c8c8c"))(max(1L, half))
+    neu_col  <- "#ececec"
+  }
+  fill_values <- stats::setNames(
+    c(neg_ramp, if (has_neutral) neu_col else NULL, pos_ramp),
+    scale_labels
+  )
+
+  ggplot2::ggplot(df) +
+    ggplot2::geom_rect(
+      ggplot2::aes(xmin = .data$xmin, xmax = .data$xmax,
+                   ymin = .data$ypos - 0.4, ymax = .data$ypos + 0.4,
+                   fill = .data$category),
+      colour = brand$ink, linewidth = 0.3
+    ) +
+    ggplot2::geom_vline(xintercept = 0, colour = brand$ink, linewidth = 0.5) +
+    ggplot2::scale_y_continuous(
+      breaks = seq_along(levels(df$row)), labels = levels(df$row),
+      limits = c(0.5, length(levels(df$row)) + 0.5), expand = c(0, 0)
+    ) +
+    ggplot2::scale_fill_manual(values = fill_values, breaks = scale_labels) +
+    ggplot2::labs(title = item$label %||% item$id, x = "Percent", y = NULL, fill = NULL) +
+    theme_surveyframe(palette = palette) +
+    ggplot2::theme(legend.position = "bottom", panel.grid = ggplot2::element_blank())
+}
+
 # Dispatch a runner result to its plot builder. Returns NULL for runner
 # types outside the v0.3.4 plot family so callers can attach conditionally.
 sframe_plot_for_result <- function(result, data, palette = c("web", "print")) {
@@ -433,7 +550,7 @@ sframe_plot_for_result <- function(result, data, palette = c("web", "print")) {
     efa_solution        = ,
     descriptives        = function() {
       if (is.null(result$report_obj)) return(NULL)
-      graphics::plot(result$report_obj, palette = palette)
+      graphics::plot(result$report_obj, data = data, palette = palette)
     },
     NULL
   )
@@ -995,56 +1112,96 @@ sframe_plot_scale_chart <- function(scores, label, palette = c("web", "print")) 
     theme_surveyframe(palette = palette)
 }
 
-#' Skewness and kurtosis by variable
+#' Distribution shape by variable, standardised
 #'
-#' Dodged bar chart of skewness and kurtosis for every variable in a
-#' [descriptives_report()] table, with a dashed reference band at plus/minus
-#' 1 (a commonly used, not universally agreed, rule-of-thumb boundary for
-#' approximate normality). Grouped `descriptives_report()` output (one row
-#' per variable per `split_by` group) is faceted by group.
+#' One violin per variable in a [descriptives_report()] table, built from
+#' the underlying response data rather than from the summary skewness and
+#' kurtosis numbers, so the reader sees the actual shape (asymmetry,
+#' multimodality, tails) instead of reading it off a bar height. Each
+#' variable is standardised (z-scored) before plotting so variables on
+#' different original scales (a 5-point Likert item next to a 0-100 slider)
+#' share one comparable y-axis; standardising is a linear transform and does
+#' not change skewness. Each violin's subtitle-free panel keeps the
+#' variable's skewness value in its axis label. Grouped `descriptives_report()`
+#' output (one row per variable per `split_by` group) is faceted by group.
 #'
 #' @param x An `sframe_descriptives_report` object from [descriptives_report()].
+#' @param data The same data.frame passed to [descriptives_report()]. Required:
+#'   `x` only carries the summary table, not the raw values the violins need.
 #' @param palette One of `"web"` or `"print"`. See [sframe_brand()].
-#' @return A ggplot2 object, or `NULL` if the report's table is empty.
+#' @return A ggplot2 object, or `NULL` if none of the report's variables have
+#'   enough data to draw.
 #' @export
 #' @seealso [descriptives_report()]
-sframe_plot_descriptives <- function(x, palette = c("web", "print")) {
-  rlang::check_installed("ggplot2", reason = "to plot skewness and kurtosis.")
+sframe_plot_descriptives <- function(x, data, palette = c("web", "print")) {
+  rlang::check_installed("ggplot2", reason = "to plot distribution shape by variable.")
   palette <- match.arg(palette)
   stopifnot(inherits(x, "sframe_descriptives_report"))
   tbl <- x$table
   if (!is.data.frame(tbl) || nrow(tbl) == 0) return(NULL)
+  if (!is.data.frame(data)) {
+    rlang::abort(
+      "sframe_plot_descriptives() needs `data` (the data.frame passed to descriptives_report()) to draw the distribution shape.",
+      class = "sframe_error"
+    )
+  }
   brand <- sframe_brand(palette)
-  long <- stats::reshape(
-    tbl[, c("variable", "group", "skewness", "kurtosis")],
-    direction = "long", varying = c("skewness", "kurtosis"),
-    v.names = "value", timevar = "statistic",
-    times = c("skewness", "kurtosis"), idvar = c("variable", "group")
-  )
-  long <- long[!is.na(long$value), , drop = FALSE]
-  if (nrow(long) == 0) return(NULL)
-  long$statistic <- factor(long$statistic, levels = c("skewness", "kurtosis"),
-                           labels = c("Skewness", "Kurtosis"))
-  p <- ggplot2::ggplot(long, ggplot2::aes(x = .data$variable, y = .data$value,
-                                          fill = .data$statistic)) +
-    ggplot2::geom_hline(yintercept = c(-1, 1), colour = brand$muted, linetype = "dashed") +
-    ggplot2::geom_col(position = ggplot2::position_dodge(width = 0.75), width = 0.65,
-                      colour = brand$ink, linewidth = 0.3) +
-    ggplot2::scale_fill_manual(values = c(Skewness = brand$fill_duo[1], Kurtosis = brand$fill_duo[2])) +
-    ggplot2::labs(title = "Skewness and kurtosis by variable",
-                 subtitle = "Dashed lines: commonly used ±1 normality guideline",
-                 x = NULL, y = NULL, fill = NULL) +
+  split_by <- x$split_by
+  has_groups <- !is.null(split_by) && split_by %in% colnames(data)
+
+  rows <- lapply(seq_len(nrow(tbl)), function(i) {
+    var <- tbl$variable[i]
+    if (!var %in% colnames(data)) return(NULL)
+    vals <- suppressWarnings(as.numeric(data[[var]]))
+    if (has_groups) {
+      idx <- as.character(data[[split_by]]) == tbl$group[i]
+      idx[is.na(idx)] <- FALSE
+      vals <- vals[idx]
+    }
+    vals <- vals[!is.na(vals)]
+    if (length(vals) < 2 || stats::sd(vals) == 0) return(NULL)
+    data.frame(
+      variable = var, group = tbl$group[i],
+      value = as.numeric(scale(vals)),
+      stringsAsFactors = FALSE
+    )
+  })
+  long <- do.call(rbind, Filter(Negate(is.null), rows))
+  if (is.null(long) || nrow(long) == 0) return(NULL)
+  long$variable <- factor(long$variable, levels = unique(tbl$variable))
+
+  # One skewness label per variable (per group, when grouped), placed above
+  # its violin: a per-panel annotation reads unambiguously in a faceted plot,
+  # unlike folding the number into a shared x-axis label.
+  skew_tbl <- tbl[!is.na(tbl$skewness), c("variable", "group", "skewness"), drop = FALSE]
+  skew_tbl$variable <- factor(skew_tbl$variable, levels = levels(long$variable))
+  skew_tbl$label <- sprintf("skew %.2f", skew_tbl$skewness)
+  ymax <- stats::aggregate(value ~ variable + group, long, max)
+  skew_tbl <- merge(skew_tbl, ymax, by = c("variable", "group"), all.x = TRUE)
+
+  p <- ggplot2::ggplot(long, ggplot2::aes(x = .data$variable, y = .data$value)) +
+    ggplot2::geom_violin(fill = brand$fill, colour = brand$ink, linewidth = 0.3,
+                         trim = TRUE) +
+    ggplot2::geom_boxplot(width = 0.12, outlier.shape = NA, fill = "white",
+                          colour = brand$ink, linewidth = 0.3) +
+    ggplot2::geom_text(data = skew_tbl,
+                       ggplot2::aes(x = .data$variable, y = .data$value, label = .data$label),
+                       vjust = -0.6, size = 3, colour = brand$muted, inherit.aes = FALSE) +
+    ggplot2::labs(title = "Distribution shape by variable (standardised)",
+                 subtitle = "Skewness shown above each violin",
+                 x = NULL, y = "Standardised value") +
     ggplot2::scale_x_discrete(labels = .sframe_title_case_names) +
+    ggplot2::scale_y_continuous(expand = ggplot2::expansion(mult = c(0.05, 0.15))) +
     theme_surveyframe(palette = palette) + sframe_theme_angled_x()
-  if (length(unique(long$group)) > 1) {
+  if (has_groups && length(unique(long$group)) > 1) {
     p <- p + ggplot2::facet_wrap(~group)
   }
   p
 }
 
 #' @export
-plot.sframe_descriptives_report <- function(x, ..., palette = c("web", "print")) {
-  sframe_plot_descriptives(x, palette = match.arg(palette))
+plot.sframe_descriptives_report <- function(x, data, ..., palette = c("web", "print")) {
+  sframe_plot_descriptives(x, data = data, palette = match.arg(palette))
 }
 
 #' Group-comparison boxplot
