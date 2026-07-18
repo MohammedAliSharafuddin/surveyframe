@@ -27,7 +27,21 @@
 #' bootstrap_ci(mtcars$mpg, FUN = mean, conf.level = 0.90, seed = 42)
 bootstrap_ci <- function(x, FUN = stats::median, R = 2000,
                          conf.level = 0.95, seed = NULL) {
-  if (!is.null(seed)) set.seed(seed)
+  if (!is.null(seed)) {
+    # set.seed() mutates the global RNG stream; restore whatever state the
+    # caller had on exit so an opt-in, reproducible seed here does not
+    # silently reset randomness for unrelated code that runs afterwards.
+    has_state <- exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)
+    old_state <- if (has_state) get(".Random.seed", envir = .GlobalEnv) else NULL
+    on.exit({
+      if (has_state) {
+        assign(".Random.seed", old_state, envir = .GlobalEnv)
+      } else if (exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) {
+        rm(".Random.seed", envir = .GlobalEnv)
+      }
+    }, add = TRUE)
+    set.seed(seed)
+  }
   x <- x[is.finite(x)]
   obs <- if (length(x) > 0) FUN(x) else NA_real_
   if (length(x) < 3) {
@@ -59,7 +73,21 @@ bootstrap_ci <- function(x, FUN = stats::median, R = 2000,
 #' cohens_d_ci(mtcars$mpg[mtcars$am == 1], mtcars$mpg[mtcars$am == 0],
 #'             seed = 42)
 cohens_d_ci <- function(x, y, R = 2000, conf.level = 0.95, seed = NULL) {
-  if (!is.null(seed)) set.seed(seed)
+  if (!is.null(seed)) {
+    # set.seed() mutates the global RNG stream; restore whatever state the
+    # caller had on exit so an opt-in, reproducible seed here does not
+    # silently reset randomness for unrelated code that runs afterwards.
+    has_state <- exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)
+    old_state <- if (has_state) get(".Random.seed", envir = .GlobalEnv) else NULL
+    on.exit({
+      if (has_state) {
+        assign(".Random.seed", old_state, envir = .GlobalEnv)
+      } else if (exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) {
+        rm(".Random.seed", envir = .GlobalEnv)
+      }
+    }, add = TRUE)
+    set.seed(seed)
+  }
   x <- x[is.finite(x)]
   y <- y[is.finite(y)]
   obs <- sframe_cohens_d(x, y)
@@ -92,7 +120,21 @@ cohens_d_ci <- function(x, y, R = 2000, conf.level = 0.95, seed = NULL) {
 #' @examples
 #' cramers_v_ci(table(mtcars$am, mtcars$cyl), seed = 42)
 cramers_v_ci <- function(tab, R = 2000, conf.level = 0.95, seed = NULL) {
-  if (!is.null(seed)) set.seed(seed)
+  if (!is.null(seed)) {
+    # set.seed() mutates the global RNG stream; restore whatever state the
+    # caller had on exit so an opt-in, reproducible seed here does not
+    # silently reset randomness for unrelated code that runs afterwards.
+    has_state <- exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)
+    old_state <- if (has_state) get(".Random.seed", envir = .GlobalEnv) else NULL
+    on.exit({
+      if (has_state) {
+        assign(".Random.seed", old_state, envir = .GlobalEnv)
+      } else if (exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) {
+        rm(".Random.seed", envir = .GlobalEnv)
+      }
+    }, add = TRUE)
+    set.seed(seed)
+  }
   tab <- as.table(as.matrix(tab))
   cases <- as.data.frame(tab, stringsAsFactors = TRUE)
   cases <- cases[rep(seq_len(nrow(cases)), cases$Freq), 1:2, drop = FALSE]
@@ -144,7 +186,21 @@ sframe_cramers_v <- function(tbl) {
 #' eta_sq_ci(mtcars$mpg, mtcars$cyl, seed = 42)
 eta_sq_ci <- function(outcome, group, R = 2000, conf.level = 0.95,
                       seed = NULL) {
-  if (!is.null(seed)) set.seed(seed)
+  if (!is.null(seed)) {
+    # set.seed() mutates the global RNG stream; restore whatever state the
+    # caller had on exit so an opt-in, reproducible seed here does not
+    # silently reset randomness for unrelated code that runs afterwards.
+    has_state <- exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)
+    old_state <- if (has_state) get(".Random.seed", envir = .GlobalEnv) else NULL
+    on.exit({
+      if (has_state) {
+        assign(".Random.seed", old_state, envir = .GlobalEnv)
+      } else if (exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) {
+        rm(".Random.seed", envir = .GlobalEnv)
+      }
+    }, add = TRUE)
+    set.seed(seed)
+  }
   keep <- is.finite(suppressWarnings(as.numeric(outcome))) & !is.na(group)
   outcome <- as.numeric(outcome)[keep]
   group <- as.factor(as.vector(group)[keep])

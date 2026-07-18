@@ -29,6 +29,14 @@ test_that("sf_item validates and normalises date bounds", {
   expect_null(no_bounds$date_max)
 })
 
+test_that("sf_item rejects an ambiguous date bound rather than silently misparsing it", {
+  # A bare as.Date() without a format guesses at "01/02/2024" and returns
+  # the nonsense date "1-02-20" instead of erroring, so date_min/date_max
+  # must be parsed against an explicit "%Y-%m-%d" format.
+  expect_error(sf_item("d5", "Date", type = "date", date_min = "01/02/2024"),
+               class = "sframe_validation_error")
+})
+
 test_that("date bounds survive a write/read round-trip", {
   instr <- date_bound_instrument()
   tmp <- tempfile(fileext = ".sframe")
