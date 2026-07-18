@@ -125,12 +125,20 @@ test_that("sframe_plot_scale_chart draws a histogram with a mean line and handle
   expect_null(sframe_plot_scale_chart(c(NA_real_, NA_real_), "Empty"))
 })
 
-test_that("plot.sframe_descriptives_report builds a skewness/kurtosis bar chart", {
+test_that("plot.sframe_descriptives_report builds a distribution-shape violin plot", {
   skip_if_not_installed("ggplot2")
   demo <- sframe_demo_data()
   dr <- descriptives_report(demo$responses)
-  gg <- plot(dr)
+  gg <- plot(dr, data = demo$responses)
   expect_s3_class(gg, "ggplot")
+  expect_true(any(vapply(gg$layers, function(l) inherits(l$geom, "GeomViolin"), logical(1))))
+})
+
+test_that("sframe_plot_descriptives requires data and errors clearly without it", {
+  skip_if_not_installed("ggplot2")
+  demo <- sframe_demo_data()
+  dr <- descriptives_report(demo$responses)
+  expect_error(sframe_plot_descriptives(dr, data = list()), class = "sframe_error")
 })
 
 test_that("sframe_plot_descriptives facets by group when split_by is used", {
@@ -138,7 +146,7 @@ test_that("sframe_plot_descriptives facets by group when split_by is used", {
   demo <- sframe_demo_data()
   skip_if_not("visit_type" %in% names(demo$responses), "demo data has no visit_type column")
   dr <- descriptives_report(demo$responses, split_by = "visit_type")
-  gg <- sframe_plot_descriptives(dr)
+  gg <- sframe_plot_descriptives(dr, data = demo$responses)
   expect_s3_class(gg, "ggplot")
   expect_true("FacetWrap" %in% class(gg$facet))
 })
@@ -146,7 +154,23 @@ test_that("sframe_plot_descriptives facets by group when split_by is used", {
 test_that("sframe_plot_descriptives returns NULL on an empty table", {
   skip_if_not_installed("ggplot2")
   empty <- structure(list(table = data.frame()), class = "sframe_descriptives_report")
-  expect_null(sframe_plot_descriptives(empty))
+  expect_null(sframe_plot_descriptives(empty, data = data.frame()))
+})
+
+test_that("sframe_plot_likert_matrix draws a grouped diverging chart for a matrix item", {
+  skip_if_not_installed("ggplot2")
+  cs <- sf_choices("ag5", 1:5, c("Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"))
+  item <- sf_item("mx1", "Rate these", type = "matrix", choice_set = "ag5",
+                  matrix_items = c("Row A", "Row B", "Row C"))
+  set.seed(1)
+  resp <- data.frame(check.names = FALSE,
+    "mx1__Row A" = sample(1:5, 60, replace = TRUE),
+    "mx1__Row B" = sample(1:5, 60, replace = TRUE),
+    "mx1__Row C" = sample(1:5, 60, replace = TRUE)
+  )
+  gg <- sframe_plot_likert_matrix(item, resp, cs)
+  expect_s3_class(gg, "ggplot")
+  expect_null(sframe_plot_likert_matrix(item, data.frame(x = 1), cs))
 })
 
 test_that("descriptives results gain a plot via run_analysis_plan", {
