@@ -110,7 +110,12 @@ sf_item <- function(
 # validation error when the value cannot be read as a date.
 sframe_check_date_bound <- function(value, arg) {
   if (is.null(value)) return(NULL)
-  parsed <- tryCatch(as.Date(value), error = function(e) NA)
+  # A bare as.Date(value) guesses the format and silently misparses an
+  # ambiguous or wrong-order string (e.g. "01/02/2024" becomes the year-1
+  # date "1-02-20" rather than an error), so the bound is only ever accepted
+  # if it matches "YYYY-MM-DD" exactly.
+  parsed <- tryCatch(as.Date(as.character(value), format = "%Y-%m-%d"),
+                     error = function(e) NA)
   if (length(parsed) != 1 || is.na(parsed)) {
     rlang::abort(
       sprintf("`%s` must be a single date in YYYY-MM-DD form.", arg),
