@@ -244,9 +244,23 @@ plot_palette <- params$plot_palette %||% "web"
 # look used everywhere else in the report, so this section reads as one
 # consistent chart family rather than a mix of base-R and ggplot styling.
 for (item in q_items) {
+  t <- item$type
+  if (identical(t, "matrix")) {
+    # A matrix question has no base response column of its own, only one
+    # expanded <id>__<row> column per row, so it needs its own existence
+    # check and its own chart: every row plotted together, grouped, rather
+    # than as separate single-item charts that lose the question's grouping.
+    if (!has_ggplot) next
+    cs <- choice_by(item$choice_set %||% "")
+    gg <- sframe_plot_likert_matrix(item, responses, cs, palette = plot_palette)
+    if (is.null(gg)) next
+    cat(sprintf("\n**%s**\n\n", item$label %||% item$id))
+    print(gg)
+    cat("\n\n")
+    next
+  }
   if (!item$id %in% names(responses)) next
   col <- responses[[item$id]]
-  t <- item$type
   if (t %in% c("likert", "single_choice", "multiple_choice")) {
     cs <- choice_by(item$choice_set %||% "")
     if (!is.null(cs)) {
