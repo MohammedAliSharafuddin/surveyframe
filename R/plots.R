@@ -652,10 +652,24 @@ sframe_plot_for_result <- function(result, data, palette = c("web", "print")) {
     anova_one           = function() sframe_plot_group_comparison(result, data, palette),
     t_test_pair         = ,
     wilcoxon_pair       = function() sframe_plot_paired_comparison(result, data, palette),
-    # quality/reliability_*/efa_* results come from sframe_result_from_report(),
-    # which keeps the original classed report object in $report_obj so plot()
-    # can dispatch normally instead of re-iterating the analysis-plan-field-
-    # merged result list as if it were still report-shaped.
+    ancova              = function() sframe_plot_group_comparison(result, data, palette),
+    fisher_exact        = function() sframe_plot_crosstab(result, palette),
+    repeated_anova      = ,
+    friedman            = function() sframe_plot_repeated_measures(result, data, palette),
+    partial_correlation = function() sframe_plot_partial_correlation(result, data, palette),
+    regression_logistic_binary  = ,
+    regression_logistic_ordinal = function() sframe_plot_logistic_coefficients(result, palette),
+    moderation          = function() sframe_plot_moderation(result, data, palette),
+    mediation           = function() sframe_plot_mediation(result, palette),
+    missing_data        = function() {
+      if (is.null(result$report_obj)) return(NULL)
+      graphics::plot(result$report_obj, palette = palette)
+    },
+    # quality/reliability_*/efa_*/item_diagnostics results come from
+    # sframe_result_from_report(), which keeps the original classed report
+    # object in $report_obj so plot() can dispatch normally instead of
+    # re-iterating the analysis-plan-field-merged result list as if it were
+    # still report-shaped.
     quality             = ,
     reliability_alpha   = ,
     reliability_omega   = ,
@@ -665,6 +679,7 @@ sframe_plot_for_result <- function(result, data, palette = c("web", "print")) {
       if (is.null(result$report_obj)) return(NULL)
       graphics::plot(result$report_obj, data = data, palette = palette)
     },
+    item_diagnostics    = function() sframe_plot_item_diagnostics(result, palette),
     NULL
   )
   if (is.null(builder)) return(NULL)
@@ -1404,6 +1419,225 @@ sframe_plot_paired_comparison <- function(result, data, palette = c("web", "prin
     ggplot2::scale_colour_manual(values = sframe_series_colours(2, palette), guide = "none") +
     ggplot2::labs(title = sprintf("%s vs %s (paired)", labels[1], labels[2]),
                  subtitle = result$apa %||% NULL, x = NULL, y = "Value") +
+    theme_surveyframe(palette = palette)
+}
+
+# Mean (± SE) or median profile across 3+ repeated conditions, shared by
+# repeated_anova and friedman: their vars are the same shape (2+ measure
+# columns on the same respondents) and both are asking "does the rating
+# move across conditions", which a line-and-point profile answers directly.
+# Friedman is a rank test, so it uses the median rather than the mean.
+sframe_plot_repeated_measures <- function(result, data, palette = c("web", "print")) {
+  rlang::check_installed("ggplot2", reason = "to plot ratings across repeated conditions.")
+  palette <- match.arg(palette)
+  vars <- result$vars
+  if (length(vars) < 2 || !all(vars %in% colnames(data))) return(NULL)
+  use_median <- identical(result$test, "friedman")
+  rows <- lapply(vars, function(v) {
+    x <- suppressWarnings(as.numeric(data[[v]]))
+    x <- x[!is.na(x)]
+    if (!length(x)) return(NULL)
+    if (use_median) {
+      data.frame(condition = v, value = stats::median(x), ymin = NA_real_, ymax = NA_real_)
+    } else {
+      se <- if (length(x) > 1) stats::sd(x) / sqrt(length(x)) else NA_real_
+      m <- mean(x)
+      data.frame(condition = v, value = m, ymin = m - se, ymax = m + se)
+    }
+  })
+  df <- do.call(rbind, Filter(Negate(is.null), rows))
+  if (is.null(df) || nrow(df) < 2) return(NULL)
+  df$condition <- factor(df$condition, levels = vars)
+  brand <- sframe_brand(palette)
+  p <- ggplot2::ggplot(df, ggplot2::aes(x = .data$condition, y = .data$value, group = 1)) +
+    ggplot2::geom_line(colour = brand$teal, linewidth = 0.6) +
+    ggplot2::geom_point(colour = brand$teal, size = 2.6)
+  if (!use_median) {
+    p <- p + ggplot2::geom_errorbar(
+      ggplot2::aes(ymin = .data$ymin, ymax = .data$ymax),
+      width = 0.12, colour = brand$ink
+    )
+  }
+  p +
+    ggplot2::scale_x_discrete(labels = .sframe_title_case_names) +
+    ggplot2::labs(
+      title = "Ratings across conditions", subtitle = result$apa %||% NULL,
+      x = NULL, y = if (use_median) "Median" else "Mean (± SE)"
+    ) +
+    theme_surveyframe(palette = palette)
+}
+
+# Scatter of the residualised x/y values a partial correlation actually
+# tests (x and y each with the control variable(s)' effect removed), rather
+# than the raw, unadjusted pair. Recomputed from `data` rather than stored
+# on the result, matching every other data-driven plot in this file.
+sframe_plot_partial_correlation <- function(result, data, palette = c("web", "print")) {
+  rlang::check_installed("ggplot2", reason = "to plot a partial correlation.")
+  palette <- match.arg(palette)
+  vars <- result$vars
+  if (length(vars) < 2 || !all(vars %in% colnames(data))) return(NULL)
+  x_col <- vars[1]; y_col <- vars[2]
+  controls <- result$controls %||% character(0)
+  df <- as.data.frame(lapply(data[, vars, drop = FALSE], function(v) suppressWarnings(as.numeric(v))))
+  df <- df[stats::complete.cases(df), , drop = FALSE]
+  if (nrow(df) < 4) return(NULL)
+  if (length(controls) > 0) {
+    rx <- stats::residuals(stats::lm(
+      stats::as.formula(paste(x_col, "~", paste(controls, collapse = " + "))), data = df))
+    ry <- stats::residuals(stats::lm(
+      stats::as.formula(paste(y_col, "~", paste(controls, collapse = " + "))), data = df))
+  } else {
+    rx <- df[[x_col]]; ry <- df[[y_col]]
+  }
+  brand <- sframe_brand(palette)
+  ggplot2::ggplot(data.frame(x = rx, y = ry), ggplot2::aes(x = .data$x, y = .data$y)) +
+    ggplot2::geom_point(colour = brand$teal, alpha = 0.65, size = 2) +
+    ggplot2::geom_smooth(method = "lm", formula = y ~ x, colour = brand$ink,
+                         fill = brand$grid, linewidth = 0.8) +
+    ggplot2::labs(
+      title = sprintf("Partial relationship between %s and %s",
+                      .sframe_title_case_names(x_col), .sframe_title_case_names(y_col)),
+      subtitle = result$apa %||% NULL,
+      x = sprintf("%s (residualised)", .sframe_title_case_names(x_col)),
+      y = sprintf("%s (residualised)", .sframe_title_case_names(y_col))
+    ) +
+    theme_surveyframe(palette = palette)
+}
+
+# Odds-ratio forest plot shared by regression_logistic_binary and
+# regression_logistic_ordinal: both carry a $coefficients data.frame with
+# odds_ratio/or_ci_low/or_ci_high columns (see sframe_logistic_fit_table()
+# and sframe_run_ordinal_logistic()). The intercept and, for the ordinal
+# model, the "1|2"-style threshold terms are cut points rather than
+# predictor effects, so both are left off the effect plot.
+sframe_plot_logistic_coefficients <- function(result, palette = c("web", "print")) {
+  rlang::check_installed("ggplot2", reason = "to plot odds ratios.")
+  palette <- match.arg(palette)
+  co <- result$coefficients
+  if (!is.data.frame(co) || !all(c("odds_ratio", "or_ci_low", "or_ci_high") %in% colnames(co))) {
+    return(NULL)
+  }
+  terms <- rownames(co)
+  keep <- terms != "(Intercept)" & !grepl("\\|", terms)
+  if (!any(keep)) return(NULL)
+  df <- data.frame(
+    term = terms[keep], or = co$odds_ratio[keep],
+    lo = co$or_ci_low[keep], hi = co$or_ci_high[keep],
+    stringsAsFactors = FALSE
+  )
+  df$term <- factor(df$term, levels = rev(df$term))
+  brand <- sframe_brand(palette)
+  ggplot2::ggplot(df, ggplot2::aes(x = .data$or, y = .data$term)) +
+    ggplot2::geom_vline(xintercept = 1, colour = brand$muted, linetype = "dashed") +
+    ggplot2::geom_errorbarh(ggplot2::aes(xmin = .data$lo, xmax = .data$hi), height = 0.18, colour = brand$ink) +
+    ggplot2::geom_point(colour = brand$teal, size = 2.6) +
+    ggplot2::scale_y_discrete(labels = .sframe_title_case_names) +
+    ggplot2::labs(
+      title = "Odds ratios with 95% confidence intervals",
+      subtitle = result$apa %||% NULL, x = "Odds ratio", y = NULL
+    ) +
+    theme_surveyframe(palette = palette)
+}
+
+# Simple-slopes interaction plot: predicted outcome across the predictor's
+# range at 3 moderator levels (-1 SD, mean, +1 SD), the standard way to
+# show a moderated relationship. Refits the interaction model from `data`
+# rather than reusing result$coefficients directly, since predict() needs
+# the fitted model object, not just its coefficient table.
+sframe_plot_moderation <- function(result, data, palette = c("web", "print")) {
+  rlang::check_installed("ggplot2", reason = "to plot a moderation interaction.")
+  palette <- match.arg(palette)
+  vars <- result$vars
+  if (length(vars) < 3 || !all(vars %in% colnames(data))) return(NULL)
+  outcome <- vars[1]; predictor <- vars[2]; moderator <- vars[3]
+  df <- as.data.frame(lapply(data[, vars, drop = FALSE], function(v) suppressWarnings(as.numeric(v))))
+  df <- df[stats::complete.cases(df), , drop = FALSE]
+  if (nrow(df) < 4) return(NULL)
+  fit <- tryCatch(
+    stats::lm(stats::as.formula(paste(outcome, "~", predictor, "*", moderator)), data = df),
+    error = function(e) NULL
+  )
+  if (is.null(fit)) return(NULL)
+  mod_mean <- mean(df[[moderator]]); mod_sd <- stats::sd(df[[moderator]])
+  levels_df <- data.frame(
+    level = factor(c("-1 SD", "Mean", "+1 SD"), levels = c("-1 SD", "Mean", "+1 SD")),
+    value = c(mod_mean - mod_sd, mod_mean, mod_mean + mod_sd)
+  )
+  pred_range <- range(df[[predictor]], na.rm = TRUE)
+  pred_seq <- seq(pred_range[1], pred_range[2], length.out = 25)
+  grid <- do.call(rbind, lapply(seq_len(nrow(levels_df)), function(i) {
+    nd <- data.frame(v1 = pred_seq)
+    names(nd) <- predictor
+    nd[[moderator]] <- levels_df$value[i]
+    nd$fitted <- stats::predict(fit, newdata = nd)
+    nd$level <- levels_df$level[i]
+    nd
+  }))
+  brand <- sframe_brand(palette)
+  ggplot2::ggplot(grid, ggplot2::aes(x = .data[[predictor]], y = .data$fitted, colour = .data$level)) +
+    ggplot2::geom_line(linewidth = 0.9) +
+    ggplot2::scale_colour_manual(values = sframe_series_colours(3, palette)) +
+    ggplot2::labs(
+      title = sprintf("%s moderates the effect of %s on %s",
+                      .sframe_title_case_names(moderator), .sframe_title_case_names(predictor),
+                      .sframe_title_case_names(outcome)),
+      subtitle = result$apa %||% NULL,
+      x = .sframe_title_case_names(predictor), y = .sframe_title_case_names(outcome),
+      colour = .sframe_title_case_names(moderator)
+    ) +
+    theme_surveyframe(palette = palette)
+}
+
+# Direct, indirect, and total effect sizes as one bar chart, with the
+# bootstrap CI shown on the indirect effect (the only one mediation
+# analysis usually bootstraps).
+sframe_plot_mediation <- function(result, palette = c("web", "print")) {
+  rlang::check_installed("ggplot2", reason = "to plot mediation effects.")
+  palette <- match.arg(palette)
+  if (is.null(result$direct) || is.null(result$indirect) || is.null(result$total)) return(NULL)
+  ci <- result$indirect_ci
+  df <- data.frame(
+    effect = factor(c("Direct (c′)", "Indirect (a×b)", "Total (c)"),
+                    levels = c("Total (c)", "Indirect (a×b)", "Direct (c′)")),
+    estimate = c(result$direct, result$indirect, result$total),
+    lo = c(NA_real_, ci[[1]], NA_real_),
+    hi = c(NA_real_, ci[[2]], NA_real_)
+  )
+  brand <- sframe_brand(palette)
+  ggplot2::ggplot(df, ggplot2::aes(x = .data$estimate, y = .data$effect)) +
+    ggplot2::geom_vline(xintercept = 0, colour = brand$muted, linetype = "dashed") +
+    ggplot2::geom_col(fill = brand$fill, colour = brand$ink, width = 0.55, linewidth = 0.3) +
+    ggplot2::geom_errorbarh(ggplot2::aes(xmin = .data$lo, xmax = .data$hi), height = 0.15,
+                            colour = brand$ink, na.rm = TRUE) +
+    ggplot2::labs(
+      title = "Direct, indirect, and total effects", subtitle = result$apa %||% NULL,
+      x = "Estimate", y = NULL
+    ) +
+    theme_surveyframe(palette = palette)
+}
+
+# Item-rest correlation by scale, from item_report()'s per-scale
+# diagnostics: the standard way to spot a weak or miskeyed item (commonly
+# flagged below 0.30) at a glance, across every scale at once.
+sframe_plot_item_diagnostics <- function(result, palette = c("web", "print")) {
+  rlang::check_installed("ggplot2", reason = "to plot item-rest correlations.")
+  palette <- match.arg(palette)
+  ir <- result$report_obj
+  if (is.null(ir)) return(NULL)
+  tbl <- sframe_item_diagnostics_table(ir)
+  if (is.null(tbl) || !"item_rest_r" %in% colnames(tbl)) return(NULL)
+  tbl$item_id <- factor(tbl$item_id, levels = rev(tbl$item_id))
+  brand <- sframe_brand(palette)
+  ggplot2::ggplot(tbl, ggplot2::aes(x = .data$item_rest_r, y = .data$item_id, fill = .data$Scale)) +
+    ggplot2::geom_vline(xintercept = 0.3, colour = brand$muted, linetype = "dashed") +
+    ggplot2::geom_col(colour = brand$ink, linewidth = 0.3, width = 0.6) +
+    ggplot2::scale_fill_manual(values = sframe_series_fill_colours(length(unique(tbl$Scale)), palette)) +
+    ggplot2::scale_y_discrete(labels = .sframe_title_case_names) +
+    ggplot2::labs(
+      title = "Item-rest correlation by scale",
+      subtitle = "Dashed line: commonly used 0.30 acceptability guideline",
+      x = "Item-rest correlation", y = NULL, fill = "Scale"
+    ) +
     theme_surveyframe(palette = palette)
 }
 

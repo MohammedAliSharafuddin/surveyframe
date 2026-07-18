@@ -839,6 +839,12 @@ sframe_clean_interpretations <- function(interpretations) {
         plot_html <- paste(c(plot_html, diag_imgs[diag_imgs != ""]), collapse = "\n")
       }
       extra <- interp_html(result$block_id %||% result$id, result$decision_rule)
+      # A CFA/SEM/PLS-SEM syntax block has no table or chart to show: its
+      # entire output is the generated syntax text, so that goes where a
+      # table or chart normally would rather than leaving the block blank.
+      syntax_html <- if (!is.null(result$syntax)) {
+        sprintf("<pre><code>%s</code></pre>", htmltools_escape(result$syntax))
+      } else ""
       paste(
         c(
           "<div class=\"rq-block\">",
@@ -848,6 +854,7 @@ sframe_clean_interpretations <- function(interpretations) {
                   htmltools_escape(result$apa %||% result$error %||% "")),
           table_html,
           plot_html,
+          syntax_html,
           if (nzchar(extra)) extra,
           "</div>"
         ),
