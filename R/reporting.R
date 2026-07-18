@@ -946,9 +946,37 @@ sframe_clean_interpretations <- function(interpretations) {
   )
   blocks <- character(0)
 
+  # A scale's separate Likert items get one grouped diverging chart, the
+  # same way a matrix question's rows do, instead of scattering a related
+  # batch of items across several single-item charts. group_of[[item_id]]
+  # points back to which scale's group it belongs to; rendered tracks which
+  # groups have already produced their one chart, so only the first member
+  # item encountered triggers it.
+  scale_groups <- sframe_likert_scale_groups(instrument)
+  group_of <- character(0)
+  for (g in scale_groups) {
+    ids <- vapply(g$items, function(i) i$id, character(1))
+    group_of[ids] <- g$scale_id
+  }
+  rendered_groups <- character(0)
+
   for (item in q_items) {
     t <- item$type
     img <- NULL
+    if (item$id %in% names(group_of)) {
+      gid <- group_of[[item$id]]
+      if (!gid %in% rendered_groups && has_ggplot) {
+        rendered_groups <- c(rendered_groups, gid)
+        g <- scale_groups[[gid]]
+        gg <- sframe_plot_likert_scale(g$items, data, g$choice_set, g$title,
+                                       palette = plot_palette)
+        img <- .render_report_ggplot_png(gg, alt = paste("Distribution of", g$title))
+        if (!is.null(img)) {
+          blocks <- c(blocks, sprintf("<h3>%s</h3>%s", htmltools_escape(g$title), img))
+        }
+      }
+      next
+    }
     if (identical(t, "matrix")) {
       # A matrix question has no base response column, only one expanded
       # <id>__<row> column per row, so it needs its own existence check and
