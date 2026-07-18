@@ -107,18 +107,12 @@ cat(sprintf("**Validation status:** %s\n\n",
 ```{r codebook, eval=params$include_codebook}
 #| tbl-cap: "Survey items"
 cb <- codebook_report(instrument)
-items_d <- cb$items_table
+items_d <- sframe_codebook_items_display(cb)
 items_d$reverse  <- ifelse(items_d$reverse,  "Yes", "")
 items_d$required <- ifelse(items_d$required, "Yes", "")
 kable(format = "html", items_d,
-  col.names = c("ID","Label","Type","Choice set","Scale","Reverse","Required"),
+  col.names = c("ID","Label","Type","Response options","Scale","Reverse","Required"),
   align = c("l","l","l","l","l","c","c"))
-```
-
-```{r codebook-choices, eval=params$include_codebook && nrow(cb$choices_table) > 0}
-#| tbl-cap: "Choice sets"
-kable(format = "html", cb$choices_table,
-  col.names = c("Choice set","Value","Label"), align = c("l","l","l"))
 ```
 
 ```{r codebook-scales, eval=params$include_codebook && nrow(cb$scales_table) > 0}
@@ -200,7 +194,9 @@ if (is.null(mr)) {
   cat("Missing-data diagnostics could not be computed from the supplied data.\n\n")
 } else {
   print(kable(format = "html", mr$item_missing, digits = 2, caption = "Item-wise missingness"))
-  print(kable(format = "html", mr$patterns, digits = 2, caption = "Missing-data patterns"))
+  patterns_display <- mr$patterns[, intersect(c("description", "n", "percent"), names(mr$patterns)), drop = FALSE]
+  print(kable(format = "html", patterns_display, digits = 2, caption = "Missing-data patterns",
+              col.names = c("Pattern", "n", "Percent")))
   if (!is.null(mr$scale_missing_rules) && nrow(mr$scale_missing_rules) > 0)
     print(kable(format = "html", mr$scale_missing_rules, digits = 2, caption = "Scale missing rules"))
 }
