@@ -801,38 +801,17 @@ studio_result_plot_tags <- function(result) {
   Filter(Negate(is.null), plot_tags)
 }
 
-# Plain-text summary of a result for the canvas's "Copy result" button: a
-# JASP/JAMOVI output canvas lets you copy one output block without
-# generating a whole report, so the same affordance belongs here. Built
-# server-side and copied client-side via navigator.clipboard, no JS
-# dependency beyond what browsers ship.
-studio_result_copy_text <- function(i, block_id, question, decision_rule, result) {
-  lines <- c(sprintf("RQ %d: %s", i, question %||% ""))
-  if (nzchar(block_id %||% "")) lines <- c(lines, sprintf("Block: %s", block_id))
-  if (nzchar(decision_rule %||% "")) lines <- c(lines, sprintf("Planned decision rule: %s", decision_rule))
-  if (!is.null(result)) {
-    if (!is.null(result$error)) {
-      lines <- c(lines, sprintf("Error: %s", result$error))
-    } else if (!is.null(result$apa)) {
-      lines <- c(lines, sprintf("Result: %s", result$apa))
-    }
-    tbl <- result$table
-    if (is.data.frame(tbl) && nrow(tbl) > 0) {
-      num_cols <- vapply(tbl, is.numeric, logical(1))
-      if (any(num_cols)) tbl[num_cols] <- lapply(tbl[num_cols], function(col) round(col, 3))
-      lines <- c(lines, "",
-        paste(colnames(tbl), collapse = "\t"),
-        apply(tbl, 1, paste, collapse = "\t"))
-    }
-  }
-  paste(lines, collapse = "\n")
-}
-
-studio_copy_result_btn <- function(text) {
+# The canvas's "Copy result" button: a JASP/jamovi output canvas lets you
+# copy one output block without generating a whole report, so the same
+# affordance belongs here. The click handler (window.studioCopyResultBlock,
+# defined once in the page's <script> block) builds the clipboard content
+# client-side from the block's live DOM, including the current
+# interpretation text, the table, and the chart image, not just an APA
+# string, so it survives a paste into Word or LibreOffice as a rich block.
+studio_copy_result_btn <- function() {
   tags$button(
     type = "button", class = "btn-outline studio-copy-btn",
-    "data-copytext" = text,
-    onclick = "navigator.clipboard.writeText(this.getAttribute('data-copytext'));var btn=this,t=btn.textContent;btn.textContent='Copied';setTimeout(function(){btn.textContent=t;},1400);",
+    onclick = "studioCopyResultBlock(this)",
     "Copy result"
   )
 }
@@ -1051,6 +1030,9 @@ ui <- fluidPage(
       .vmeta-lbl { font-size: 12px; color: #4b5563; margin: 2px 0 5px; display: block; }
       .result-canvas-block .sf-table { margin: 10px 0; }
       .result-canvas-block img { margin: 8px 0; border: 1px solid #f0f1f4; border-radius: 6px; }
+      .result-canvas-block textarea {
+        min-height: 160px; resize: vertical; font-size: 14px; line-height: 1.5;
+      }
       .studio-copy-btn { margin: 10px 0; padding: 5px 14px; font-size: 12px; }
       .vbadge {
         display: inline-block; border: 1px solid #d9e2ec; border-radius: 999px;
@@ -1119,6 +1101,48 @@ ui <- fluidPage(
           $('#screen-' + tab).addClass('active');
           Shiny.setInputValue('current_tab', tab, {priority: 'event'});
         });
+
+        // Copies a whole result-canvas block (title, badges, APA line,
+        // table, chart, decision rule, and the interpretation as currently
+        // typed) as one rich-text unit, so pasting into Word/LibreOffice/
+        // Google Docs brings the table and chart image over instead of a
+        // flat text dump. Built client-side from the live DOM (not from a
+        // string baked in at render time) so the interpretation textarea's
+        // current value is included even though it was typed after the
+        // page loaded.
+        window.studioCopyResultBlock = function(btn) {
+          var block = btn.closest('.result-canvas-block');
+          if (!block) return;
+          var clone = block.cloneNode(true);
+          var cloneBtn = clone.querySelector('.studio-copy-btn');
+          if (cloneBtn) cloneBtn.remove();
+          var ta = block.querySelector('textarea');
+          var taClone = clone.querySelector('textarea');
+          if (ta && taClone) {
+            var div = document.createElement('div');
+            div.style.whiteSpace = 'pre-wrap';
+            div.textContent = ta.value || '';
+            taClone.parentNode.replaceChild(div, taClone);
+          }
+          var html = '<div>' + clone.innerHTML + '</div>';
+          var text = clone.textContent || '';
+          var restore = function() {
+            var t = btn.textContent;
+            btn.textContent = 'Copied';
+            setTimeout(function() { btn.textContent = t; }, 1400);
+          };
+          if (window.ClipboardItem && navigator.clipboard && navigator.clipboard.write) {
+            var item = new ClipboardItem({
+              'text/html': new Blob([html], {type: 'text/html'}),
+              'text/plain': new Blob([text], {type: 'text/plain'})
+            });
+            navigator.clipboard.write([item]).then(restore, function() {
+              navigator.clipboard.writeText(text).then(restore);
+            });
+          } else {
+            navigator.clipboard.writeText(text).then(restore);
+          }
+        };
       ")),
 
       tags$div(id = "screen-open", class = screen_class("open"),
@@ -3148,8 +3172,6 @@ server <- function(input, output, session) {
         result <- results[[hit_idx]]
         plot_tags <- all_plot_tags[[hit_idx]] %||% list()
       }
-      copy_text <- studio_result_copy_text(i, block_id, block$research_question,
-                                           block$decision_rule, result)
       tags$div(class = "card result-canvas-block",
         tags$div(class = "card-title", sprintf("RQ %d: %s", i, block_id)),
         tags$p(block$research_question %||% ""),
@@ -3171,7 +3193,7 @@ server <- function(input, output, session) {
             do.call(tagList, plot_tags)
           )
         },
-        studio_copy_result_btn(copy_text),
+        studio_copy_result_btn(),
         if (nzchar(block$decision_rule %||% "")) {
           tags$p(class = "hint",
             paste("Planned decision rule:", block$decision_rule))
@@ -3179,7 +3201,7 @@ server <- function(input, output, session) {
         tags$label(class = "vmeta-lbl", "Interpretation"),
         textAreaInput(fld, NULL,
           value = shiny::isolate(input[[fld]] %||% ""),
-          rows = 3,
+          rows = 8, width = "100%",
           placeholder = "State what this result means for the research question.")
       )
     })
