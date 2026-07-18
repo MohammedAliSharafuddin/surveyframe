@@ -173,6 +173,76 @@ test_that("sframe_plot_likert_matrix draws a grouped diverging chart for a matri
   expect_null(sframe_plot_likert_matrix(item, data.frame(x = 1), cs))
 })
 
+test_that("sframe_likert_scale_groups finds scales whose items share a choice set", {
+  cs <- sf_choices("ag5", 1:5, c("Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"))
+  i1 <- sf_item("a_1", "Item A1", type = "likert", choice_set = "ag5", scale_id = "sa")
+  i2 <- sf_item("a_2", "Item A2", type = "likert", choice_set = "ag5", scale_id = "sa")
+  # A lone item on its own scale should not be grouped (nothing to group with).
+  i3 <- sf_item("b_1", "Item B1", type = "likert", choice_set = "ag5", scale_id = "sb")
+  scale_a <- sf_scale("sa", "Scale A", items = c("a_1", "a_2"))
+  scale_b <- sf_scale("sb", "Scale B", items = c("b_1"))
+  instr <- sf_instrument("Group test", components = list(cs, i1, i2, i3, scale_a, scale_b))
+
+  groups <- sframe_likert_scale_groups(instr)
+  expect_named(groups, "sa")
+  expect_length(groups$sa$items, 2)
+  expect_identical(groups$sa$title, "Scale A")
+})
+
+test_that("sframe_likert_scale_groups excludes a scale whose items use different choice sets", {
+  ag5 <- sf_choices("ag5", 1:5, c("Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"))
+  yn <- sf_choices("yn", c("yes", "no"), c("Yes", "No"))
+  i1 <- sf_item("a_1", "Item A1", type = "likert", choice_set = "ag5", scale_id = "sa")
+  i2 <- sf_item("a_2", "Item A2", type = "single_choice", choice_set = "yn", scale_id = "sa")
+  scale_a <- sf_scale("sa", "Scale A", items = c("a_1", "a_2"))
+  instr <- sf_instrument("Mixed scale", components = list(ag5, yn, i1, i2, scale_a))
+  expect_length(sframe_likert_scale_groups(instr), 0)
+})
+
+test_that("sframe_plot_likert_scale draws a grouped diverging chart for a scale", {
+  skip_if_not_installed("ggplot2")
+  cs <- sf_choices("ag5", 1:5, c("Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"))
+  i1 <- sf_item("a_1", "Item A1", type = "likert", choice_set = "ag5", scale_id = "sa")
+  i2 <- sf_item("a_2", "Item A2", type = "likert", choice_set = "ag5", scale_id = "sa")
+  set.seed(1)
+  resp <- data.frame(a_1 = sample(1:5, 60, replace = TRUE), a_2 = sample(1:5, 60, replace = TRUE))
+  gg <- sframe_plot_likert_scale(list(i1, i2), resp, cs, title = "Scale A")
+  expect_s3_class(gg, "ggplot")
+  expect_null(sframe_plot_likert_scale(list(i1, i2), data.frame(x = 1), cs, title = "Scale A"))
+})
+
+test_that("render_report groups a scale's Likert items into one chart, not one per item", {
+  skip_if_not_installed("ggplot2")
+  cs <- sf_choices("ag5", 1:5, c("Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"))
+  i1 <- sf_item("a_1", "First scale item.", type = "likert", choice_set = "ag5", scale_id = "sa")
+  i2 <- sf_item("a_2", "Second scale item.", type = "likert", choice_set = "ag5", scale_id = "sa")
+  scale_a <- sf_scale("sa", "Scale A", items = c("a_1", "a_2"))
+  instr <- sf_instrument("Grouped report test", components = list(cs, i1, i2, scale_a))
+  set.seed(1)
+  dat <- data.frame(
+    respondent_id = paste0("R", 1:40),
+    submitted_at = as.character(Sys.time()),
+    a_1 = sample(1:5, 40, replace = TRUE),
+    a_2 = sample(1:5, 40, replace = TRUE),
+    stringsAsFactors = FALSE
+  )
+  old_opt <- options(surveyframe.use_quarto = FALSE)
+  on.exit(options(old_opt), add = TRUE)
+  out <- tempfile(fileext = ".html")
+  on.exit(unlink(out), add = TRUE)
+  render_report(instr, dat, output_file = out)
+  html <- paste(readLines(out, warn = FALSE), collapse = "\n")
+  # Item labels legitimately appear elsewhere (the codebook's Survey items
+  # table lists every item regardless of charting), so scope the check to
+  # the Response distributions section itself.
+  start <- regexpr("<h2>Response distributions</h2>", html, fixed = TRUE)
+  expect_gt(start, 0)
+  dist_section <- substr(html, start, start + 20000)
+  expect_match(dist_section, "Scale A", fixed = TRUE)
+  expect_false(grepl("First scale item.", dist_section, fixed = TRUE))
+  expect_false(grepl("Second scale item.", dist_section, fixed = TRUE))
+})
+
 test_that("descriptives results gain a plot via run_analysis_plan", {
   skip_if_not_installed("ggplot2")
   demo <- sframe_demo_data()
