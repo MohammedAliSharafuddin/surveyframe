@@ -401,40 +401,18 @@ sframe_draw_likert_diverging <- function(counts, theme_color = "#16B3B1",
   }
 }
 
-#' Grouped diverging chart for a Likert matrix question
-#'
-#' A matrix question asks several rows against one shared response scale
-#' (a "grid" of Likert items). Plotting each row as its own separate
-#' [sframe_draw_likert_diverging()] chart loses the grouping the question
-#' was designed with, so this draws every row as one diverging bar inside a
-#' single chart, sharing one x scale and one legend, the standard way a
-#' Likert matrix is reported (compare a typical multi-item satisfaction
-#' grid). Same diverging-stack convention as the single-item chart: the
-#' middle category of an odd-length scale is neutral and split evenly
-#' across the zero line, and colour saturation increases toward each pole.
-#'
-#' @param item A `"matrix"` sframe item, with `matrix_items` (the row
-#'   labels) and a `choice_set` naming the shared response scale.
-#' @param data The response data.frame, with one expanded
-#'   `<item id>__<row label>` column per matrix row, as produced by
-#'   [read_responses()].
-#' @param choice_set The item's choice set object (`values`, `labels`),
-#'   typically looked up from `instrument$choices` by `item$choice_set`.
-#' @param palette One of `"web"` or `"print"`. See [sframe_brand()].
-#' @return A ggplot2 object, or `NULL` if no row has response data.
-#' @export
-#' @seealso [sframe_draw_likert_diverging()]
-sframe_plot_likert_matrix <- function(item, data, choice_set, palette = c("web", "print")) {
-  rlang::check_installed("ggplot2", reason = "to plot a Likert matrix.")
-  palette <- match.arg(palette)
+# Shared core for both grouped-Likert chart builders below: draws one
+# diverging bar per row inside a single chart, sharing one x scale and one
+# legend. `counts_by_row` is a named list (name = the row's display label,
+# in the desired top-to-bottom-reversed drawing order; value = a table()/
+# named-vector of raw response counts over `scale_values`). Splitting this
+# out means a matrix question's rows and a scale's separate items can share
+# exactly the same diverging-stack maths and styling.
+.sframe_likert_grouped_plot <- function(counts_by_row, scale_values, scale_labels,
+                                        title, palette) {
   brand <- sframe_brand(palette)
-  rows <- item$matrix_items %||% character(0)
-  if (!length(rows) || is.null(choice_set)) return(NULL)
-
-  scale_values <- as.character(choice_set$values)
-  scale_labels <- choice_set$labels %||% scale_values
   n <- length(scale_values)
-  if (n < 2) return(NULL)
+  if (n < 2 || length(counts_by_row) == 0) return(NULL)
   half <- n %/% 2
   neg_idx <- seq_len(half)
   pos_idx <- seq.int(n - half + 1L, n)
@@ -446,10 +424,8 @@ sframe_plot_likert_matrix <- function(item, data, choice_set, palette = c("web",
   # row shares the same zero line regardless of how lopsided its own
   # distribution is.
   segs <- list()
-  for (row in rows) {
-    col <- paste0(item$id, "__", row)
-    if (!col %in% colnames(data)) next
-    counts <- table(factor(data[[col]], levels = scale_values))
+  for (row in names(counts_by_row)) {
+    counts <- counts_by_row[[row]]
     if (sum(counts) == 0) next
     pct <- 100 * as.numeric(counts) / sum(counts)
 
@@ -481,7 +457,7 @@ sframe_plot_likert_matrix <- function(item, data, choice_set, palette = c("web",
   }
   if (!length(segs)) return(NULL)
   df <- do.call(rbind, segs)
-  drawn_rows <- rows[rows %in% df$row]
+  drawn_rows <- names(counts_by_row)[names(counts_by_row) %in% df$row]
   df$row <- factor(df$row, levels = rev(drawn_rows))
   df$category <- factor(df$category, levels = scale_labels)
   df$ypos <- as.numeric(df$row)
@@ -512,10 +488,147 @@ sframe_plot_likert_matrix <- function(item, data, choice_set, palette = c("web",
       breaks = seq_along(levels(df$row)), labels = levels(df$row),
       limits = c(0.5, length(levels(df$row)) + 0.5), expand = c(0, 0)
     ) +
-    ggplot2::scale_fill_manual(values = fill_values, breaks = scale_labels) +
-    ggplot2::labs(title = item$label %||% item$id, x = "Percent", y = NULL, fill = NULL) +
+    ggplot2::scale_fill_manual(
+      values = fill_values, breaks = scale_labels,
+      # A long category label ("Neither agree nor disagree") wrapped onto
+      # 2 lines takes less horizontal space per legend key than one long
+      # line, which matters at a fixed report width.
+      labels = function(l) vapply(l, function(s) paste(strwrap(s, width = 14), collapse = "\n"), character(1))
+    ) +
+    # Wrapped into 2 rows once there are more than 3 categories: a single
+    # row of 4-5 category labels plus their percentages routinely overflows
+    # a report-width chart, and ggplot2 does not reflow a bottom legend on
+    # its own at a fixed export width.
+    ggplot2::guides(fill = ggplot2::guide_legend(nrow = if (n > 3) 2 else 1, byrow = TRUE)) +
+    ggplot2::labs(title = title, x = "Percent", y = NULL, fill = NULL) +
     theme_surveyframe(palette = palette) +
-    ggplot2::theme(legend.position = "bottom", panel.grid = ggplot2::element_blank())
+    ggplot2::theme(legend.position = "bottom", panel.grid = ggplot2::element_blank(),
+                   legend.text = ggplot2::element_text(size = 9))
+}
+
+#' Grouped diverging chart for a Likert matrix question
+#'
+#' A matrix question asks several rows against one shared response scale
+#' (a "grid" of Likert items). Plotting each row as its own separate
+#' [sframe_draw_likert_diverging()] chart loses the grouping the question
+#' was designed with, so this draws every row as one diverging bar inside a
+#' single chart, sharing one x scale and one legend, the standard way a
+#' Likert matrix is reported (compare a typical multi-item satisfaction
+#' grid). Same diverging-stack convention as the single-item chart: the
+#' middle category of an odd-length scale is neutral and split evenly
+#' across the zero line, and colour saturation increases toward each pole.
+#'
+#' @param item A `"matrix"` sframe item, with `matrix_items` (the row
+#'   labels) and a `choice_set` naming the shared response scale.
+#' @param data The response data.frame, with one expanded
+#'   `<item id>__<row label>` column per matrix row, as produced by
+#'   [read_responses()].
+#' @param choice_set The item's choice set object (`values`, `labels`),
+#'   typically looked up from `instrument$choices` by `item$choice_set`.
+#' @param palette One of `"web"` or `"print"`. See [sframe_brand()].
+#' @return A ggplot2 object, or `NULL` if no row has response data.
+#' @export
+#' @seealso [sframe_draw_likert_diverging()]
+sframe_plot_likert_matrix <- function(item, data, choice_set, palette = c("web", "print")) {
+  rlang::check_installed("ggplot2", reason = "to plot a Likert matrix.")
+  palette <- match.arg(palette)
+  rows <- item$matrix_items %||% character(0)
+  if (!length(rows) || is.null(choice_set)) return(NULL)
+  scale_values <- as.character(choice_set$values)
+  scale_labels <- choice_set$labels %||% scale_values
+
+  counts_by_row <- stats::setNames(lapply(rows, function(row) {
+    col <- paste0(item$id, "__", row)
+    if (!col %in% colnames(data)) return(NULL)
+    table(factor(data[[col]], levels = scale_values))
+  }), rows)
+  counts_by_row <- Filter(Negate(is.null), counts_by_row)
+
+  .sframe_likert_grouped_plot(counts_by_row, scale_values, scale_labels,
+                              title = item$label %||% item$id, palette = palette)
+}
+
+#' Grouped diverging chart for a scale's Likert items
+#'
+#' Several *separate* Likert items that make up one [sf_scale()] (unlike a
+#' `"matrix"` item's rows, which are one question) are, by default, each
+#' reported as their own single-item diverging chart. That scatters a
+#' related batch of items (a satisfaction scale's 2-3 items, say) across
+#' several charts instead of showing them the way a Likert matrix or a
+#' typical multi-item satisfaction grid is reported: one grouped chart, one
+#' diverging bar per item, sharing an x scale and a legend. Applies only
+#' when every item in the scale shares the same choice set; scales that mix
+#' response scales fall back to one chart per item.
+#'
+#' @param items A list of `"likert"` sframe items belonging to one scale, in
+#'   display order.
+#' @param data The response data.frame, with one column per item id.
+#' @param choice_set The shared choice set object (`values`, `labels`).
+#' @param title Chart title, typically the scale's label.
+#' @param palette One of `"web"` or `"print"`. See [sframe_brand()].
+#' @return A ggplot2 object, or `NULL` if no item has response data.
+#' @export
+#' @seealso [sframe_plot_likert_matrix()], [sf_scale()]
+sframe_plot_likert_scale <- function(items, data, choice_set, title, palette = c("web", "print")) {
+  rlang::check_installed("ggplot2", reason = "to plot a scale's Likert items.")
+  palette <- match.arg(palette)
+  if (!length(items) || is.null(choice_set)) return(NULL)
+  scale_values <- as.character(choice_set$values)
+  scale_labels <- choice_set$labels %||% scale_values
+
+  row_labels <- vapply(items, function(i) i$label %||% i$id, character(1))
+  counts_by_row <- stats::setNames(lapply(items, function(i) {
+    if (!i$id %in% colnames(data)) return(NULL)
+    table(factor(data[[i$id]], levels = scale_values))
+  }), row_labels)
+  counts_by_row <- Filter(Negate(is.null), counts_by_row)
+
+  .sframe_likert_grouped_plot(counts_by_row, scale_values, scale_labels,
+                              title = title, palette = palette)
+}
+
+#' Group a scale's Likert items for a combined diverging chart
+#'
+#' Identifies which of an instrument's scales are eligible for one grouped
+#' diverging chart across their member items ([sframe_plot_likert_scale()]),
+#' the same way a `"matrix"` question's rows are grouped
+#' ([sframe_plot_likert_matrix()]): every member item is `"likert"` type and
+#' all share one choice set. Scales that mix response scales, that resolve
+#' to fewer than 2 qualifying items, or whose choice set cannot be found are
+#' left out and fall back to one chart per item in the report's Response
+#' distributions section.
+#'
+#' @param instrument An `sframe` object.
+#' @return A named list, one entry per eligible scale (named by scale id),
+#'   each a list with `scale_id`, `title` (the scale's label), `items` (the
+#'   member item objects, in scale order), and `choice_set` (the shared
+#'   choice set object). Empty list if no scale qualifies.
+#' @export
+#' @seealso [sframe_plot_likert_scale()], [sf_scale()]
+sframe_likert_scale_groups <- function(instrument) {
+  choice_by <- function(id) {
+    for (cs in instrument$choices %||% list()) if (identical(cs$id, id)) return(cs)
+    NULL
+  }
+  item_by <- function(id) {
+    for (i in instrument$items %||% list()) if (identical(i$id, id)) return(i)
+    NULL
+  }
+  groups <- list()
+  for (scale in instrument$scales %||% list()) {
+    items <- Filter(Negate(is.null), lapply(scale$items %||% character(0), item_by))
+    items <- Filter(function(i) identical(i$type, "likert"), items)
+    if (length(items) < 2) next
+    cs_ids <- unique(vapply(items, function(i) i$choice_set %||% "", character(1)))
+    if (length(cs_ids) != 1 || !nzchar(cs_ids)) next
+    cs <- choice_by(cs_ids)
+    if (is.null(cs)) next
+    groups[[scale$id]] <- list(
+      scale_id = scale$id, title = scale$label %||% scale$id,
+      items = items, choice_set = cs
+    )
+  }
+  groups
 }
 
 # Dispatch a runner result to its plot builder. Returns NULL for runner
