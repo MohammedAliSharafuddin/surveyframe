@@ -917,10 +917,25 @@ sframe_clean_interpretations <- function(interpretations) {
   blocks <- character(0)
 
   for (item in q_items) {
-    if (!item$id %in% names(data)) next
-    col <- data[[item$id]]
     t <- item$type
     img <- NULL
+    if (identical(t, "matrix")) {
+      # A matrix question has no base response column, only one expanded
+      # <id>__<row> column per row, so it needs its own existence check and
+      # its own chart: every row grouped together, not one chart per row.
+      if (has_ggplot) {
+        cs <- choice_by(item$choice_set %||% "")
+        gg <- sframe_plot_likert_matrix(item, data, cs, palette = plot_palette)
+        img <- .render_report_ggplot_png(gg, alt = paste("Distribution of", item$label %||% item$id))
+      }
+      if (!is.null(img)) {
+        blocks <- c(blocks, sprintf("<h3>%s</h3>%s",
+          htmltools_escape(item$label %||% item$id), img))
+      }
+      next
+    }
+    if (!item$id %in% names(data)) next
+    col <- data[[item$id]]
     if (t %in% c("likert", "single_choice", "multiple_choice")) {
       cs <- choice_by(item$choice_set %||% "")
       freq <- if (!is.null(cs)) {
