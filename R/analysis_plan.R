@@ -906,8 +906,181 @@ sframe_result_table <- function(result) {
       `Eta squared` = fmt(result$eta2, 3),
       check.names = FALSE, stringsAsFactors = FALSE
     ),
+    t_test_pair = data.frame(
+      Variable = result$vars,
+      n = result$n,
+      Mean = fmt(c(result$mean_x, result$mean_y)),
+      stringsAsFactors = FALSE
+    ),
+    wilcoxon_pair = data.frame(
+      Variable = result$vars,
+      n = result$n,
+      Median = fmt(c(result$median_x, result$median_y)),
+      stringsAsFactors = FALSE
+    ),
+    friedman = data.frame(
+      Statistic = "Friedman chi-square",
+      df = result$df, n = result$n,
+      Estimate = fmt(result$statistic),
+      p = sframe_p_string(result$p),
+      `Kendall's W` = fmt(result$statistic / (result$n * (length(result$vars) - 1)), 3),
+      check.names = FALSE, stringsAsFactors = FALSE
+    ),
+    partial_correlation = data.frame(
+      Statistic = "Partial r",
+      n = result$n,
+      Estimate = fmt(result$r),
+      p = sframe_p_string(result$p),
+      Controls = paste(result$controls, collapse = ", "),
+      stringsAsFactors = FALSE
+    ),
+    regression_logistic_binary = {
+      co <- result$coefficients
+      if (!is.data.frame(co)) return(NULL)
+      data.frame(
+        Term = rownames(co),
+        Estimate = fmt(co[["Estimate"]]),
+        `Odds ratio` = fmt(co[["odds_ratio"]]),
+        p = vapply(co[["Pr(>|z|)"]], sframe_p_string, character(1)),
+        check.names = FALSE, stringsAsFactors = FALSE, row.names = NULL
+      )
+    },
+    regression_logistic_ordinal = {
+      co <- result$coefficients
+      if (!is.data.frame(co)) return(NULL)
+      data.frame(
+        Term = rownames(co),
+        Estimate = fmt(co[["Value"]]),
+        `Odds ratio` = fmt(co[["odds_ratio"]]),
+        check.names = FALSE, stringsAsFactors = FALSE, row.names = NULL
+      )
+    },
+    moderation = {
+      co <- result$coefficients
+      if (!is.data.frame(co)) return(NULL)
+      data.frame(
+        Term = rownames(co),
+        Estimate = fmt(co[[1]]),
+        `Std. error` = fmt(co[[2]]),
+        t = fmt(co[[3]]),
+        p = vapply(co[[4]], sframe_p_string, character(1)),
+        check.names = FALSE, stringsAsFactors = FALSE, row.names = NULL
+      )
+    },
+    mediation = data.frame(
+      Effect = c("Direct (c')", "Indirect (a×b)", "Total (c)"),
+      Estimate = fmt(c(result$direct, result$indirect, result$total)),
+      `95% CI` = c("", sprintf("[%.3f, %.3f]", result$indirect_ci[[1]], result$indirect_ci[[2]]), ""),
+      check.names = FALSE, stringsAsFactors = FALSE
+    ),
+    quality = {
+      qr <- result$report_obj
+      if (is.null(qr)) NULL else sframe_quality_checks_table(qr)
+    },
+    reliability_alpha = {
+      rr <- result$report_obj
+      if (is.null(rr)) NULL else sframe_reliability_table(rr, c(alpha = "Alpha", alpha_std = "Alpha (std.)"))
+    },
+    reliability_omega = {
+      rr <- result$report_obj
+      if (is.null(rr)) NULL else sframe_reliability_table(rr, c(omega_h = "Omega (h)", omega_t = "Omega (t)"))
+    },
+    item_diagnostics = {
+      ir <- result$report_obj
+      if (is.null(ir)) NULL else sframe_item_diagnostics_table(ir)
+    },
+    efa_readiness = {
+      er <- result$report_obj
+      if (is.null(er)) NULL else data.frame(
+        Statistic = c("KMO (MSA)", "Bartlett chi-square", "Bartlett df",
+                      "Bartlett p", "Suggested factors"),
+        Value = c(
+          fmt(er$kmo$MSA), fmt(er$bartlett$chisq), er$bartlett$df,
+          sframe_p_string(er$bartlett$p.value), er$suggested_nfactors
+        ),
+        stringsAsFactors = FALSE
+      )
+    },
+    efa_solution = {
+      es <- result$report_obj
+      if (is.null(es) || !is.data.frame(es$loadings_long)) NULL else {
+        wide <- stats::reshape(es$loadings_long, direction = "wide",
+                               idvar = "item_id", timevar = "factor")
+        names(wide) <- sub("^loading\\.", "", names(wide))
+        num_cols <- vapply(wide, is.numeric, logical(1))
+        wide[num_cols] <- lapply(wide[num_cols], function(col) round(col, 3))
+        wide
+      }
+    },
     NULL
   )
+}
+
+# One row per scale, flattening reliability_report()'s per-scale summaries
+# into a kable-ready table. `columns` is a named vector mapping the report's
+# field name to the column heading to use, since reliability_alpha and
+# reliability_omega only ever populate one coefficient or the other.
+sframe_reliability_table <- function(rr, columns) {
+  rows <- lapply(rr, function(s) {
+    if (!is.list(s) || is.null(s$scale_id)) return(NULL)
+    row <- data.frame(
+      Scale = s$label %||% s$scale_id, `N items` = s$n_items, N = s$n,
+      check.names = FALSE, stringsAsFactors = FALSE
+    )
+    for (field in names(columns)) {
+      row[[columns[[field]]]] <- round(s[[field]] %||% NA_real_, 3)
+    }
+    row
+  })
+  rows <- Filter(Negate(is.null), rows)
+  if (!length(rows)) return(NULL)
+  do.call(rbind, rows)
+}
+
+# item_report() is keyed by scale id, each holding its own item-level
+# diagnostics data.frame; stack them into one table with a Scale column so
+# every item across every scale shows in one place.
+sframe_item_diagnostics_table <- function(ir) {
+  rows <- lapply(ir, function(s) {
+    if (!is.list(s) || !is.data.frame(s$diagnostics)) return(NULL)
+    d <- s$diagnostics
+    d$Scale <- s$label %||% s$scale_id
+    d
+  })
+  rows <- Filter(Negate(is.null), rows)
+  if (!length(rows)) return(NULL)
+  out <- do.call(rbind, rows)
+  out <- out[, c("Scale", setdiff(colnames(out), "Scale")), drop = FALSE]
+  rownames(out) <- NULL
+  out
+}
+
+# quality_report() covers several distinct checks (attention, straight-
+# lining, duplicates) in separate nested sections; flatten them into one
+# table, one row per check, so the "Do respondents meet quality
+# thresholds?" research question has a single table to point at.
+sframe_quality_checks_table <- function(qr) {
+  rows <- list()
+  for (a in qr$attention %||% list()) {
+    rows[[length(rows) + 1]] <- data.frame(
+      Check = a$check_id %||% "", Type = "Attention check",
+      Result = sprintf("%.1f%% pass (%d fail)", (a$pass_rate %||% NA_real_) * 100, a$n_fail %||% NA_integer_),
+      stringsAsFactors = FALSE
+    )
+  }
+  for (s in qr$straightline %||% list()) {
+    rows[[length(rows) + 1]] <- data.frame(
+      Check = s$scale_id %||% "", Type = "Straight-lining",
+      Result = sprintf("%.1f%% flagged", (s$flag_rate %||% NA_real_) * 100),
+      stringsAsFactors = FALSE
+    )
+  }
+  rows[[length(rows) + 1]] <- data.frame(
+    Check = "duplicates", Type = "Duplicate rows",
+    Result = sprintf("%d flagged", qr$duplicates$n_duplicates %||% 0L),
+    stringsAsFactors = FALSE
+  )
+  do.call(rbind, rows)
 }
 
 sframe_run_one_block <- function(block, data, instrument, plots = FALSE,
