@@ -771,7 +771,10 @@ sframe_run_descriptives_result <- function(data, roles, options = list()) {
 sframe_run_missing_result <- function(data, instrument, roles) {
   vars <- sframe_role_values(roles, c("variables", "items"))
   out <- missing_data_report(data, instrument = instrument, variables = if (length(vars)) vars else NULL)
-  c(unclass(out), list(test = "missing_data", table = out$item_missing))
+  # report_obj keeps the original classed object so sframe_plot_for_result()
+  # can dispatch plot.sframe_missing_data_report() on it, the same pattern
+  # sframe_result_from_report() uses for quality/reliability/EFA.
+  c(unclass(out), list(test = "missing_data", table = out$item_missing, report_obj = out))
 }
 
 sframe_run_fisher <- function(data, roles, options = list()) {
@@ -879,13 +882,46 @@ sframe_run_repeated_anova <- function(data, roles) {
   fit <- tryCatch(stats::aov(value ~ condition + Error(.subject / condition), data = long),
                   error = function(e) NULL)
   if (is.null(fit)) return(list(test = "repeated_anova", error = "Repeated-measures ANOVA failed."))
+  fit_summary <- utils::capture.output(summary(fit))
+  # The within-subject F test for `condition` sits in the "Error: Within"
+  # stratum of an Error()-stratified aov fit; the between-subject stratum
+  # above it has no F/p (a single term, .subject, with no residual to test
+  # against). Pull the numbers out programmatically instead of asking the
+  # reader to parse fit_summary's printed text.
+  smry <- summary(fit)
+  within <- smry[["Error: Within"]][[1]]
+  cond_row <- which(trimws(rownames(within)) == "condition")
+  stat_row <- if (length(cond_row)) within[cond_row, , drop = FALSE] else NULL
+  if (is.null(stat_row)) {
+    return(list(
+      test = "repeated_anova", vars = vars, n = length(unique(long$.subject)),
+      fit_summary = fit_summary,
+      apa = "Repeated-measures ANOVA was estimated; inspect `fit_summary` for the within-subject effect.",
+      prompt = "Report the within-subject effect, degrees of freedom, p value, effect size where available, and sphericity limitations."
+    ))
+  }
+  ss_condition <- stat_row[["Sum Sq"]]
+  ss_resid <- within[["Sum Sq"]][nrow(within)]
+  df1 <- stat_row[["Df"]]
+  df2 <- within[["Df"]][nrow(within)]
+  F_stat <- stat_row[["F value"]]
+  p <- stat_row[["Pr(>F)"]]
+  partial_eta2 <- ss_condition / (ss_condition + ss_resid)
   list(
     test = "repeated_anova",
     vars = vars,
     n = length(unique(long$.subject)),
-    fit_summary = utils::capture.output(summary(fit)),
-    apa = "Repeated-measures ANOVA was estimated; inspect `fit_summary` for the within-subject effect.",
-    prompt = "Report the within-subject effect, degrees of freedom, p value, effect size where available, and sphericity limitations."
+    df1 = df1, df2 = df2, F_stat = F_stat, p = p, eta2 = partial_eta2,
+    table = data.frame(
+      Statistic = "F", df1 = df1, df2 = df2,
+      Estimate = sprintf("%.2f", F_stat), p = sframe_p_string(p),
+      `Partial eta squared` = sprintf("%.3f", partial_eta2),
+      check.names = FALSE, stringsAsFactors = FALSE
+    ),
+    fit_summary = fit_summary,
+    apa = sprintf("F(%d, %d) = %.2f, p %s, partial η² = %.3f",
+                  df1, df2, F_stat, sframe_p_string(p), partial_eta2),
+    prompt = "Report the within-subject F, degrees of freedom, p value, and partial eta-squared."
   )
 }
 
