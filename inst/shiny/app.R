@@ -2651,8 +2651,14 @@ server <- function(input, output, session) {
         if (!is.null(result$error)) {
           tags$p(class = "hint", paste("Error:", result$error))
         } else {
-          tags$p(tags$strong("Result: "),
-                 result$apa %||% "See the matching section of the report.")
+          tagList(
+            tags$p(tags$strong("Result: "),
+                   result$apa %||% "See the matching section of the report."),
+            studio_result_table_tag(result$table),
+            # A CFA/SEM/PLS-SEM syntax block has no table or chart: its
+            # whole output is the generated syntax text.
+            if (!is.null(result$syntax)) tags$pre(class = "sf-code", result$syntax)
+          )
         },
         if (length(plot_tags) > 0) do.call(tagList, plot_tags)
       )
@@ -3190,6 +3196,7 @@ server <- function(input, output, session) {
           tagList(
             tags$p(tags$strong("Result: "), result$apa %||% ""),
             studio_result_table_tag(result$table),
+            if (!is.null(result$syntax)) tags$pre(class = "sf-code", result$syntax),
             do.call(tagList, plot_tags)
           )
         },
