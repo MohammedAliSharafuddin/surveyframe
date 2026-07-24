@@ -277,8 +277,8 @@ sf_item("bad", "x", type = "date", date_min = "2026-12-31",
 
 ## Part G — Release safety (11 items)
 
--   [ ] G1.1 `R CMD check --as-cran` on the 0.3.4 tarball: 0 errors, 0 warnings, at most the incoming-feasibility NOTE.
--   [ ] G1.2 The tarball contains no dev-only files: no CLAUDE.md, roadmap, revision_todo, dogfeed, mas_review, demo directory, or mas_full_report.html (`untar -tf` and scan).
+-   [x] G1.1 `R CMD check --as-cran` on the 0.3.4 tarball: 0 errors, 0 warnings, at most the incoming-feasibility NOTE.
+-   [x] G1.2 The tarball contains no dev-only files: no CLAUDE.md, roadmap, revision_todo, dogfeed, mas_review, demo directory, or mas_full_report.html (`untar -tf` and scan).
 -   [x] G1.3 649 tests pass on the working tree.
 -   [ ] G1.4 win-builder R-release returns Status: OK.
 -   [ ] G1.5 win-builder R-devel returns Status: OK.
@@ -290,6 +290,17 @@ sf_item("bad", "x", type = "date", date_min = "2026-12-31",
 -   [x] G1.11 NEWS.md still reads correctly after the first-round fix batch: the fixes fold into the existing 0.3.4 entries and no entry contradicts the fixed behaviour.
 
 **Verified 2026-07-25.** G1.8: checked out the `v0.3.3` tag into a worktree, rendered the demo report on both 0.3.3 and 0.3.4, and diffed every RQ block's question text, test statistic, and APA line. All 34 questions, methods, and point estimates (U, z, t, χ², H, rho, tau, indirect effect) are byte-identical. The only differences are +/-0.01 to 0.02 wobble in 8 bootstrap-derived confidence-interval bounds (Mann-Whitney r, Cramer's V/phi, Cohen's d, Kruskal-Wallis eta-squared, Spearman, Kendall, mediation indirect effect) — `sframe_rank_r_ci()` and its siblings in `R/bootstrap_ci.R` were never given a seed argument in the first place (unlike `bootstrap_ci()`/`cohens_d_ci()`/`cramers_v_ci()`/`eta_sq_ci()`, which are seed-safe since the 2026-07-18 fix), so neither version's unseeded `render_report()` call is reproducible run-to-run on these particular intervals. This is ordinary Monte Carlo noise present in both versions, not a 0.3.4 regression. G1.10: `urlchecker::url_check()` found one real issue (DESCRIPTION's pkgdown URL missing a trailing slash, redirecting) — fixed; re-run reports all URLs correct. `spelling::spell_check_package()` flagged 85 words, all reviewed: proper nouns, author surnames, package names, statistical abbreviations, and correctly-spelled UK `-ise` forms — nothing actionable. G1.9: see the pkgdown fix note above; the reference-index bug is fixed and a full local `pkgdown::build_site()` run is clean. Live confirmation: the pkgdown GitHub Actions run for the fix commit completed with `success` (run 30128039999), the live site's `sitemap.xml` lists 130 URLs with none matching any dev-only filename, and the new `bootstrap_ci` reference page returns HTTP 200. G1.11: NEWS.md structure checked programmatically (one version heading, no leaked internal/planning language beyond an innocuous "Analysis planning" section title) and its prose read against the actual current behaviour verified elsewhere in this pass (table splitting, moderation plot, etc.) — consistent.
+
+**G1.1/G1.2 — real `R CMD check --as-cran` run against the release-candidate tarball (2026-07-25).** The first full run was not clean: 1 ERROR, 2 WARNINGs, 3 NOTEs, all genuine and previously unnoticed (none of them related to the second-round feedback fixes committed earlier the same day). Every one was fixed and a second, final run returned **`Status: OK` — 0 errors, 0 warnings, 0 notes** (not even the incoming-feasibility NOTE fired). Findings and fixes:
+
+- **ERROR** — `test-v034-stats-reporting.R`'s naniar-gated MCAR test, only ever exercised on a machine with naniar installed (never before this session, hence never caught): `d[sample(320, 30)] <- NA` on a data frame indexes *columns*, not cells, and errored trying to create up to 320 columns on a 4-column frame. Fixed by NA-ing cells through `as.matrix()`.
+- **WARNING** — non-ASCII characters in `R/analysis_plan.R`, `R/plots.R`, `R/statistics_reports.R` (×, ±, ′, η, ² in mediation and repeated-measures APA strings). Replaced with `\u` escapes; runtime output confirmed byte-identical.
+- **WARNING** — Rd cross-reference: 24 roxygen `[fn()]` links across `R/analysis_plan.R`, `R/plots.R`, `R/reporting.R` pointed at `sframe_brand()`, `sframe_plot_crosstab()`, and `sframe_plot_correlation()` — all three real functions, none documented (internal helpers with no Rd page), so the links never resolved. De-linked to plain code text.
+- **NOTE** — `sframe_plot_variable_distribution()` uses `ggplot2::after_stat(density)`, which R CMD check's static analysis reads as an unbound global variable named `density`. Added `density` to the package's `@importFrom stats` list, the standard fix for this common ggplot2 pattern.
+- **NOTE** — `run_analysis_plan()` and `render_results()`'s examples each ran the full 34-block demo plan unconditionally (~8s each). Wrapped in `\donttest{}`; still exercised and confirmed OK under `--run-donttest`.
+- **NOTE** — `fresh_eyes_check.sframe`, a stray file left at the repository root from testing the Part I code chunk earlier in this review cycle, was picked up as a non-standard top-level file. Deleted, and added to `.Rbuildignore` as a safety net. Also added `report_interp.html` to `.Rbuildignore` (a 5.7 MB test-render artefact that had no exclusion rule and would otherwise have been bundled into the tarball).
+
+Final tarball: `surveyframe_0.3.4.tar.gz` (829 KB). Confirmed installable (`R CMD INSTALL`), `packageVersion()` reports 0.3.4, and all 7 vignettes are present via `tools::getVignetteInfo()` on the real installed package (completing H1.1).
 
 ------------------------------------------------------------------------
 
@@ -583,7 +594,9 @@ field-validation pass rather than left silently unticked here.
 
 ## Sign-off
 
--   [ ] All parts above are complete or their exceptions are recorded.
+-   [x] All parts above are complete or their exceptions are recorded. Every item checkable without a human is verified above (2026-07-25); every remaining item is a real "needs a human/device" case, explicitly recorded and moved to `dogfeed.todo.md` for 0.3.5, except **G1.4/G1.5 (win-builder)**, which are the immediate next release-process step, not a dogfeed deferral.
 -   [ ] Decision recorded: submit 0.3.4 to CRAN or hold for fixes.
+
+**Release-candidate status as of 2026-07-25:** `surveyframe_0.3.4.tar.gz` built from `main` at commit `6556f91`. `R CMD check --as-cran`: **Status OK, 0 errors, 0 warnings, 0 notes.** Full test suite: all tests pass (0 failed), naniar and pagedown both installed and exercised. Remaining before submission: win-builder R-release and R-devel (G1.4/G1.5), then this sign-off.
 
 **Reviewer signature:** \_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_ **Date:** \_\_\_\_\_\_\_\_\_\_\_\_
