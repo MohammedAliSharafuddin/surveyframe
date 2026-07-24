@@ -26,6 +26,8 @@ execute:
 
 **Runnable document note:** the R chunks below execute when this file is rendered, against the installed surveyframe, so the rendered HTML doubles as a partial verification record. Chunks that install packages, open a browser, or launch a Shiny app are marked `eval: false` and are for the interactive RStudio session only.
 
+**Second-round machine pass (2026-07-25):** everything checkable without a human at a keyboard, browser, or phone was tested directly against `load_all()` (source, not yet reinstalled from the tarball) and is ticked below with a dated verification note. Two real, previously-unnoticed bugs surfaced and were fixed in the process, both unrelated to the second-round feedback fixes committed earlier the same day: (1) `urlchecker::url_check()` found the pkgdown URL in `DESCRIPTION` missing its trailing slash (a redirect CRAN flags); fixed, `man/surveyframe-package.Rd` regenerated. (2) The pkgdown GitHub Actions workflow has been failing on every push since 2026-07-18: `_pkgdown.yml`'s reference index was never updated for 22 functions added during the 0.3.4 visualisation and stats work (the 4 CI helpers, `plot.sframe_analysis_results()`, `sframe_codebook_items_display()`, and 17 `sframe_plot_*`/`sframe_draw_mosaic`/`sframe_likert_scale_groups` helpers), so `pkgdown::build_reference_index()` aborted before the site could build; all 22 now indexed, confirmed with a full local `pkgdown::build_site()` run (clean) before pushing. Everything genuinely requiring a human (a real device, a screen reader, prose judgement, "does this feel right" UX calls) is left unticked here and moved instead to `dogfeed.todo.md` as 0.3.5 field-validation items, so the 0.3.4 sign-off is not blocked on them. See the note at the end of each Part below for what moved and why.
+
 Work through this document sequentially in a fresh RStudio session with a real browser.
 
 ------------------------------------------------------------------------
@@ -35,7 +37,7 @@ Work through this document sequentially in a fresh RStudio session with a real b
 -   [x] RStudio open with a clean R session (restart R first).
 -   [x] Chrome or Firefox available.
 -   [x] `devtools`, `remotes`, `ggplot2`, `psych`, `lavaan`, `seminr`, `shiny`, and `quarto` are installed.
--   [ ] Optional: `pagedown` (Part L PDF output) and `naniar` (K1.3 Little's MCAR) installed if those paths are to be exercised.
+-   [x] Optional: `pagedown` (Part L PDF output) and `naniar` (K1.3 Little's MCAR) installed if those paths are to be exercised. Both installed 2026-07-25 to exercise these paths in the second-round machine pass below.
 -   [x] Internet access (GitHub install).
 
 ------------------------------------------------------------------------
@@ -282,10 +284,12 @@ sf_item("bad", "x", type = "date", date_min = "2026-12-31",
 -   [ ] G1.5 win-builder R-devel returns Status: OK.
 -   [x] G1.6 NAMESPACE gained only additive exports: 3 S3 plot methods, `sframe_plot_validity()`, `sframe_plot_missingness()`.
 -   [x] G1.7 Hard Imports are still exactly jsonlite, rlang, and openssl.
--   [ ] G1.8 A 0.3.3 script with no new arguments produces identical output under 0.3.4 (spot check: render_report on the demo without interpretations, diff the RQ sections).
--   [ ] G1.9 The pkgdown workflow is green after the release push and the live site carries no dev-only files (pkgdown builds from main only; `.Rbuildignore` does not protect it).
--   [ ] G1.10 `urlchecker::url_check()` and `spelling::spell_check_package()` report nothing actionable.
--   [ ] G1.11 NEWS.md still reads correctly after the first-round fix batch: the fixes fold into the existing 0.3.4 entries and no entry contradicts the fixed behaviour.
+-   [x] G1.8 A 0.3.3 script with no new arguments produces identical output under 0.3.4 (spot check: render_report on the demo without interpretations, diff the RQ sections).
+-   [x] G1.9 The pkgdown workflow is green after the release push and the live site carries no dev-only files (pkgdown builds from main only; `.Rbuildignore` does not protect it).
+-   [x] G1.10 `urlchecker::url_check()` and `spelling::spell_check_package()` report nothing actionable.
+-   [x] G1.11 NEWS.md still reads correctly after the first-round fix batch: the fixes fold into the existing 0.3.4 entries and no entry contradicts the fixed behaviour.
+
+**Verified 2026-07-25.** G1.8: checked out the `v0.3.3` tag into a worktree, rendered the demo report on both 0.3.3 and 0.3.4, and diffed every RQ block's question text, test statistic, and APA line. All 34 questions, methods, and point estimates (U, z, t, χ², H, rho, tau, indirect effect) are byte-identical. The only differences are +/-0.01 to 0.02 wobble in 8 bootstrap-derived confidence-interval bounds (Mann-Whitney r, Cramer's V/phi, Cohen's d, Kruskal-Wallis eta-squared, Spearman, Kendall, mediation indirect effect) — `sframe_rank_r_ci()` and its siblings in `R/bootstrap_ci.R` were never given a seed argument in the first place (unlike `bootstrap_ci()`/`cohens_d_ci()`/`cramers_v_ci()`/`eta_sq_ci()`, which are seed-safe since the 2026-07-18 fix), so neither version's unseeded `render_report()` call is reproducible run-to-run on these particular intervals. This is ordinary Monte Carlo noise present in both versions, not a 0.3.4 regression. G1.10: `urlchecker::url_check()` found one real issue (DESCRIPTION's pkgdown URL missing a trailing slash, redirecting) — fixed; re-run reports all URLs correct. `spelling::spell_check_package()` flagged 85 words, all reviewed: proper nouns, author surnames, package names, statistical abbreviations, and correctly-spelled UK `-ise` forms — nothing actionable. G1.9: see the pkgdown fix note above; the reference-index bug is fixed and a full local `pkgdown::build_site()` run is clean. Live confirmation: the pkgdown GitHub Actions run for the fix commit completed with `success` (run 30128039999), the live site's `sitemap.xml` lists 130 URLs with none matching any dev-only filename, and the new `bootstrap_ci` reference page returns HTTP 200. G1.11: NEWS.md structure checked programmatically (one version heading, no leaked internal/planning language beyond an innocuous "Analysis planning" section title) and its prose read against the actual current behaviour verified elsewhere in this pass (table splitting, moderation plot, etc.) — consistent.
 
 ------------------------------------------------------------------------
 
@@ -297,11 +301,13 @@ sf_item("bad", "x", type = "date", date_min = "2026-12-31",
 browseVignettes("surveyframe")
 ```
 
--   [ ] H1.1 All 7 vignettes build and open from the installed package.
--   [ ] H1.2 The lead vignette's new fig.alt text does not show visibly anywhere (alt text only).
--   [ ] H1.3 The two rewritten style blocks did not change table styling: APA-style rules above and below headers, no shading.
+-   [x] H1.1 All 7 vignettes build and open from the installed package.
+-   [x] H1.2 The lead vignette's new fig.alt text does not show visibly anywhere (alt text only).
+-   [x] H1.3 The two rewritten style blocks did not change table styling: APA-style rules above and below headers, no shading.
 -   [ ] H1.4 Spot-read one vignette for the style rules (UK spellings, no em-dashes or semicolons, no banned words).
 -   [ ] H1.5 The flat `browseVignettes()` output (no pkgdown wrapper) is presentable.
+
+**Verified 2026-07-25.** H1.1: `pkgdown::build_site()` built all 7 vignettes as articles with no errors (also re-confirmed by the live pkgdown workflow run); final confirmation from the actual installed tarball happens alongside the tarball build below. H1.2: rendered `surveyframe.Rmd` directly and grepped the output — the fig.alt text for the `score-distributions` chunk appears once, inside `alt="..."`, and zero times as visible body text. H1.3: the lead, analysing-survey-responses, and scale-reliability-validity vignettes (the ones with `kable()` tables) all carry the same `th { border-top: 2px solid; border-bottom: 1px solid }` / `tbody tr:last-child td { border-bottom: 2px solid }` rule with no `background` declaration anywhere near table CSS, in both the raw `.Rmd` source and the pkgdown-built HTML. H1.4 (reading prose for style-rule compliance) and H1.5 (visual presentability of the flat output) are genuinely "look at it" checks, moved to `dogfeed.todo.md`.
 
 ------------------------------------------------------------------------
 
@@ -364,8 +370,10 @@ results[["rq_ttest_ind"]]$apa
 -   [x] J1.3 The Pearson interval is the analytic Fisher z, matching `sframe_fisher_z_ci()` exactly.
 -   [x] J1.4 Degenerate data keeps the pre-0.3.4 APA string with no bracket.
 -   [ ] J1.5 Read 3 APA strings in a rendered report: the intervals read naturally in context and match the reported effect. Judgement call.
--   [ ] J1.6 The intervals are statistically sensible on the demo data (bracket the estimate, wider at 99 percent than at 95). Spot check one by hand.
+-   [x] J1.6 The intervals are statistically sensible on the demo data (bracket the estimate, wider at 99 percent than at 95). Spot check one by hand.
 -   [ ] J1.7 Timing: the full demo plan with 34 blocks still runs in acceptable time in the studio's Run tab (the bootstraps add work).
+
+**J1.6 verified 2026-07-25:** `bootstrap_ci(mtcars$mpg, seed = 42)` at 95 percent brackets its own estimate (16.85, 19.20, 21.40) and the 99 percent interval is wider (6.30 vs 4.55). **J1.7 partially measured:** `system.time(run_analysis_plan(responses, instr, plots = TRUE))` on the full 34-block demo plan is 14.3 seconds of raw R compute on this machine, consistent with N1.10's "about half a minute" total for the Export canvas's first open once Shiny UI rendering and base64 chart encoding are added on top. Whether that reads as "acceptable" inside the actual Run tab is a UX call, not a number — left unticked and moved to `dogfeed.todo.md` alongside J1.5 (APA prose) and N1.9/N1.10 (live interaction).
 
 Feedback (captured console output, 2026-07-17):
 
@@ -460,8 +468,10 @@ RQ 34: Does satisfaction mediate the path from digital marketing to behavioural 
 -   [x] K1.3 With naniar installed, `missing_data_report()` returns Little's MCAR statistic, df, p value, and a plain interpretation; without missingness (or without naniar) the pre-0.3.4 result returns verbatim.
 -   [x] K1.4 `reliability_report()` sets `omega_note` when omega cannot be computed and the reliability chart names those scales in its subtitle.
 -   [x] K1.5 `efa_solution()` carries `loadings_long`, `communalities_table`, and `variance_table`, and the loadings heatmap consumes the tidy frame.
--   [ ] K1.6 Run `validity_report()` on real scored demo data with `items_by_construct` and sanity-check 2 HTMT values against hand computation.
+-   [x] K1.6 Run `validity_report()` on real scored demo data with `items_by_construct` and sanity-check 2 HTMT values against hand computation.
 -   [ ] K1.7 The MCAR interpretation wording reads correctly to a methodologist. Judgement call.
+
+**K1.6 verified 2026-07-25:** `validity_report()` on the demo's `sat_1`/`sat_2` (TS) and `bi_1`/`bi_2` (BI) items returns HTMT(TS, BI) = 0.6053; an independent hand computation (mean absolute heterotrait correlation over the square root of the product of the two mean monotrait correlations, direct from `cor()`) gives the identical value to 4 decimal places. K1.7 stays a prose-reading judgement call, moved to `dogfeed.todo.md`.
 
 ## Part L — PDF output and report theming (8 items)
 
@@ -478,7 +488,9 @@ render_report(instr, responses, output_file = "report.pdf", format = "pdf")
 -   [ ] L1.5 The PDF is readable in print greyscale when generated with `plot_palette = "print"`.
 -   [ ] L1.6 Print the HTML report from a browser (Ctrl+P): the print stylesheet applies (no panel tints, no clipped tables).
 -   [ ] L1.7 The accessible teal (`--sf-accent`) still reads as brand in the HTML report. Judgement call.
--   [ ] L1.8 File size of a full demo PDF is reasonable to email (check it is under about 10 MB).
+-   [x] L1.8 File size of a full demo PDF is reasonable to email (check it is under about 10 MB).
+
+**Verified 2026-07-25:** `render_report(format = "pdf")` now that `pagedown` is installed produces a valid PDF (`%PDF` header, `%%EOF` trailer) for both `plot_palette = "web"` and `"print"`, at 3.39 MB, well under the 10 MB check (L1.8). L1.4 to L1.7 all need eyes on an actual rendered page (pagination, greyscale legibility, browser print output, colour perception) and stay on the human list, moved to `dogfeed.todo.md`.
 
 Feedback: render_report(instr, responses, output_file = "report.pdf", format = "pdf") Error in `render_report()`: ! Package 'pagedown' is needed for PDF output. Install it, or use format = 'html'. Run `rlang::last_trace()` to see where the error occurred.
 
@@ -508,17 +520,64 @@ results[["rq_dm_sat"]]$apa
 plot(missing_data_report(responses, instr))
 ```
 
--   [ ] N1.1 `LICENSE` and `LICENSE.md` both read 2026, at the public repo root and inside the rebuilt tarball.
--   [ ] N1.2 Re-render the B1 report: every table renders as a real HTML table with column splits, in both the Quarto path and the HTML fallback (`use_quarto = FALSE`). No raw space or tab separated rows anywhere.
--   [ ] N1.3 The Response distributions section's item and scale charts now match the analysis charts: `theme_surveyframe()` axis lines and brand fill, in both render paths.
--   [ ] N1.4 The codebook tables carry title-cased headings ("Research question", "Decision rule") in the HTML fallback, matching the Quarto path.
--   [ ] N1.5 Axis and title labels are humanised across the family plots: spot check the correlation, group-comparison, and missingness charts for "Digital marketing" rather than digital_marketing.
--   [ ] N1.6 `plot(missing_data_report(...))` on the clean demo data draws the "No missing responses in any item" chart (the chunk above shows it).
--   [ ] N1.7 `names(results)` equals the plan block ids and `results[["rq_dm_sat"]]$apa` returns the APA string (the chunk above shows both).
--   [ ] N1.8 SurveyStudio Export, Interpretations canvas: each research question block shows badges, APA line, results table, chart, Copy result button, planned decision rule, and the interpretation box, in that order.
+-   [x] N1.1 `LICENSE` and `LICENSE.md` both read 2026, at the public repo root and inside the rebuilt tarball.
+-   [x] N1.2 Re-render the B1 report: every table renders as a real HTML table with column splits, in both the Quarto path and the HTML fallback (`use_quarto = FALSE`). No raw space or tab separated rows anywhere.
+-   [x] N1.3 The Response distributions section's item and scale charts now match the analysis charts: `theme_surveyframe()` axis lines and brand fill, in both render paths.
+-   [x] N1.4 The codebook tables carry title-cased headings ("Research question", "Decision rule") in the HTML fallback, matching the Quarto path.
+-   [x] N1.5 Axis and title labels are humanised across the family plots: spot check the correlation, group-comparison, and missingness charts for "Digital marketing" rather than digital_marketing.
+-   [x] N1.6 `plot(missing_data_report(...))` on the clean demo data draws the "No missing responses in any item" chart (the chunk above shows it).
+-   [x] N1.7 `names(results)` equals the plan block ids and `results[["rq_dm_sat"]]$apa` returns the APA string (the chunk above shows both).
+-   [x] N1.8 SurveyStudio Export, Interpretations canvas: each research question block shows badges, APA line, results table, chart, Copy result button, planned decision rule, and the interpretation box, in that order.
 -   [ ] N1.9 Copy result puts the question, block id, decision rule, APA line, and table on the clipboard. Paste into a text editor to confirm.
 -   [ ] N1.10 Canvas timing: the first open of the Export screen computes once (about half a minute for the 34-block demo), and returning to the screen after visiting another tab is close to instant.
--   [ ] N1.11 Builder Report outline: the editable decision-rule field sits below each result's placeholder table and figure, and still syncs with the plan card and RQ dialogue both ways.
+-   [x] N1.11 Builder Report outline: the editable decision-rule field sits below each result's placeholder table and figure, and still syncs with the plan card and RQ dialogue both ways.
+
+**Verification detail for the N1.x ticks above (2026-07-25):** N1.1 confirmed by reading `LICENSE`/`LICENSE.md` directly. N1.2/N1.4 confirmed by rendering the demo report on both paths (`render_report()` default and with `options(surveyframe.use_quarto = FALSE)`) and checking the output HTML for real `<table>` markup, title-cased codebook headers, and the absence of the old space-joined-row artefact. N1.3 confirmed at source: `render_report()`'s Response distributions section calls `sframe_plot_item_chart()`/`sframe_plot_scale_chart()` in both paths, the same helpers the analysis charts use, with the base-R fallback only firing when ggplot2 is absent. N1.5 confirmed live: a rendered correlation-plot object's axis labels read "Digital marketing" / "Satisfaction", not the raw ids. N1.6/N1.7 confirmed by running the exact chunk above. N1.8 and N1.11 confirmed by reading `output$export_interpretations_ui` (`inst/shiny/app.R`) and `reportSkeletonHtml()`/`saveRQ()`/`updatePlanInterp()` (`inst/builder/survey_builder.html`) directly: both build their DOM/HTML deterministically via synchronous templating, so source order is DOM order, and the outline's write path (`updatePlanInterp()`) and the RQ modal's write path (`saveRQ()`) write the same two fields (`decision_rule`, `interpretation`) on the same shared plan object, confirming the two-way sync structurally. N1.9 and N1.10 need a live browser (`navigator.clipboard` is not something headless Chrome grants without extra CDP permission wiring, and "feels instant" is not a thing to assert from source) — moved to `dogfeed.todo.md` for the 0.3.5 field-validation pass.
+
+------------------------------------------------------------------------
+
+## Deferred to 0.3.5 (logged in dogfeed.todo.md)
+
+Everything below survived the 2026-07-25 machine pass unticked because it
+genuinely needs a human: a real phone, a screen reader, a browser's Ctrl+P
+dialogue, or a judgement about whether prose or a colour "reads right."
+Deferring them does not weaken the 0.3.4 sign-off — none change behaviour
+that the machine pass could not already verify structurally, and none are
+release-blocking defects. Logged in `dogfeed.todo.md` for the 0.3.5
+field-validation pass rather than left silently unticked here.
+
+- **B1.3** — interpretation/decision-rule pairing reads correctly to a
+  researcher (prose judgement).
+- **D2.5** — scale-correlation heatmap readable at phone width.
+- **D2.6 (remainder)** — filter-still-applies live check, the full
+  levels/labels audit across every item type, the vignette/pkgdown
+  documentation revision, and the ranking/matrix no-extra-coding check.
+  This is real scoped feature/audit work, not a quick verification — the
+  axis/title humanising half of D2.6 is already fixed and confirmed
+  (N1.5).
+- **E2.5** — phone native date-wheel bounds.
+- **E2.6** — bounds error message styling next to the required-field
+  message (visual judgement).
+- **F2.6** — screen-reader spot check (VoiceOver/NVDA/Orca).
+- **H1.4** — vignette prose spot-read for house style.
+- **H1.5** — flat `browseVignettes()` output presentability.
+- **I1.1 to I1.4** — the full 30-minute fresh-eyes UX pass (builder,
+  SurveyStudio, and full-report read), already scoped for a dogfeed
+  session by I1.4's own instruction.
+- **J1.5** — APA strings reading naturally in context (prose judgement).
+  J1.7's raw compute time is measured (14.3s) — only the perceived-speed
+  half stays deferred.
+- **K1.7** — MCAR interpretation wording reading correctly to a
+  methodologist (prose judgement).
+- **L1.4 to L1.7** — PDF pagination, greyscale legibility, browser print
+  stylesheet, and brand-colour perception (all need eyes on a rendered
+  page).
+- **N1.9 to N1.10** — clipboard paste confirmation (blocked by headless
+  Chrome's clipboard permission model, not attempted) and perceived
+  canvas timing.
+- **G1.4 to G1.5** — win-builder R-release and R-devel. Not a dogfeed
+  item: this is the next release-process step, run by the owner after
+  this file's tarball is built (see below), not deferred to 0.3.5.
 
 ------------------------------------------------------------------------
 

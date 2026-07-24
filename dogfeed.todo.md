@@ -718,3 +718,95 @@ scoped entry (a v0.3.4.x addendum, or a slot in the 0.3.5-0.3.9 arc) and
 picked up in a future session, rather than live only in this dogfeed file
 indefinitely or get started here. That's a decision for the project owner,
 not something to self-assign mid-session.
+
+---
+
+## 2026-07-25 — 0.3.5 field-validation items carried from mas_review_034's second-round machine pass
+
+Everything a machine could verify in `mas_review_034.qmd`'s pending list was
+tested directly (source reads, live `load_all()` runs, hand computations,
+`urlchecker`/`spelling`, a real pkgdown build) on 2026-07-25 — see that
+file's "Second-round machine pass" note and the "Deferred to 0.3.5" section
+for the full detail and verification notes. Two real bugs surfaced and were
+fixed in that pass (unrelated to this list): the pkgdown GitHub Actions
+workflow had been failing since 2026-07-18 (`_pkgdown.yml` missing 22
+reference-index topics), and DESCRIPTION's pkgdown URL was missing a
+trailing slash. Both fixed and confirmed live.
+
+Everything below is `lane: 0.3.5` — genuinely needs a human, a real device,
+or a live interactive session, so it carries forward to the 0.3.5
+field-validation release (ICSRI 2026 feedback plus additional human testing
+rounds) rather than blocking the 0.3.4 sign-off.
+
+### [open] `lane: 0.3.5` — B1.3: interpretation/decision-rule pairing reads correctly to a researcher
+Prose judgement call on the rendered report's "Planned decision rule" /
+"Interpretation" pairing under each result. mas_review_034.qmd Part B1.
+
+### [open] `lane: 0.3.5` — D2.5: scale-correlation heatmap readable at phone width
+Visual/device check, dashboard Scales tab. mas_review_034.qmd Part D2.
+
+### [open] `lane: 0.3.5` — D2.6: filter-live-check, full levels/labels audit, doc revision, ranking/matrix workflow check
+The axis/title humanising half of the original feedback is already fixed
+and confirmed (N1.5 in mas_review_034.qmd). What's left is real scoped
+work, not quick verification: (1) confirm the dashboard's date/categorical
+filters actually re-render the missingness chart live in a real browser
+session; (2) audit that `levels`/`labels` work correctly for every `sf_item()`
+type, not just the ones exercised by the demo instrument; (3) revise the
+working examples, pkgdown reference, and vignettes to consistently use
+labelled levels with proper spacing; (4) confirm ranking and matrix question
+types produce a working end-to-end analysis without any extra hand-coding.
+Scope this as its own task before 0.3.5, it is bigger than a spot check.
+
+### [open] `lane: 0.3.5` — E2.5: phone native date-wheel bounds
+Device check: does a phone's native date picker actually respect
+`date_min`/`date_max` on the exported survey. mas_review_034.qmd Part E2.
+
+### [open] `lane: 0.3.5` — E2.6: bounds error message styling next to required-field message
+Visual judgement call. mas_review_034.qmd Part E2.
+
+### [open] `lane: 0.3.5` — F2.6: screen-reader spot check (VoiceOver/NVDA/Orca)
+The builder's preview inputs need a real screen-reader pass to confirm
+question labels are announced correctly; axe-core (already run, zero
+violations) checks the accessibility tree's structure, not what a screen
+reader actually says. mas_review_034.qmd Part F2.
+
+### [open] `lane: 0.3.5` — H1.4/H1.5: vignette prose spot-read and flat browseVignettes() presentability
+H1.4 is a house-style prose read (UK spellings, no em-dashes/semicolons,
+banned words); H1.5 is whether the un-pkgdown-wrapped `browseVignettes()`
+output looks presentable. mas_review_034.qmd Part H.
+
+### [open] `lane: 0.3.5` — I1.1 to I1.4: full 30-minute fresh-eyes UX pass
+Build a 5-question survey with a bounded date question in the builder,
+export and answer it; separately spend 30 minutes in SurveyStudio running
+the demo plan, writing two interpretations, and exporting the print-palette
+report; read the full generated report top to bottom as a reviewer would.
+A runnable setup chunk for the first half already exists in
+mas_review_034.qmd's Part I (`fresh_eyes_check.sframe`). Log findings here
+per I1.4's own instruction, do not fix inline until the session is
+explicitly closed.
+
+### [open] `lane: 0.3.5` — J1.5/J1.7: APA interval prose and perceived Run-tab timing
+J1.5 is whether 3 read APA strings with confidence intervals read naturally
+in context. J1.7's raw compute time is now measured (14.3s for the full
+34-block demo plan with `plots = TRUE`, matching N1.10's "about half a
+minute" total once Shiny rendering and chart encoding are added) — what's
+left is whether that reads as acceptable inside the live Run tab, a UX call
+the number alone doesn't answer. mas_review_034.qmd Part J.
+
+### [open] `lane: 0.3.5` — K1.7: MCAR interpretation wording, methodologist read
+Prose judgement call on `missing_data_report()`'s Little's MCAR
+interpretation text. mas_review_034.qmd Part K.
+
+### [open] `lane: 0.3.5` — L1.4 to L1.7: PDF pagination, greyscale legibility, browser print, brand colour
+All four need eyes on an actual rendered page: pagination cleanliness
+(no card/table split mid-block), greyscale legibility with
+`plot_palette = "print"`, the browser's own Ctrl+P output, and whether the
+accessible teal accent still reads as brand. PDF generation itself is
+confirmed working (L1.1 to L1.3, L1.8 — 3.39 MB for the full demo,
+comfortably under the 10 MB check). mas_review_034.qmd Part L.
+
+### [open] `lane: 0.3.5` — N1.9/N1.10: SurveyStudio Copy-result clipboard and canvas timing feel
+N1.9 needs a real browser paste to confirm the clipboard payload (headless
+Chrome doesn't grant `navigator.clipboard` permissions without extra CDP
+wiring, not attempted). N1.10 is a perceived-speed judgement, not something
+a raw timing number settles alone. mas_review_034.qmd Part N.
