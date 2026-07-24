@@ -2586,6 +2586,9 @@ server <- function(input, output, session) {
   # One shared execution of the analysis plan (with charts when ggplot2 is
   # installed), reused by the Run result cards and the Export screen's
   # Interpretations card, so the plan does not run once per consumer.
+  # Depends on input$rpt_palette so switching the Export screen's Chart
+  # theme radio re-renders the preview charts in the chosen palette instead
+  # of leaving them fixed at whatever palette was active on first run.
   analysis_results_r <- reactive({
     req(rv$instrument)
     if (is.null(rv$responses)) {
@@ -2594,7 +2597,8 @@ server <- function(input, output, session) {
     tryCatch(
       surveyframe::run_analysis_plan(
         rv$responses, rv$instrument,
-        plots = requireNamespace("ggplot2", quietly = TRUE)
+        plots = requireNamespace("ggplot2", quietly = TRUE),
+        plot_palette = input$rpt_palette %||% "web"
       ),
       error = function(e) e
     )
