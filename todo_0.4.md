@@ -7,7 +7,16 @@ this is ever merged to `main`. Companion to `CLAUDE.md` and to
 (the original implementation guide) and `19_v034_v035_implementation.md`
 (the CI-helper scope reconciliation).
 
-Last updated: 2026-07-24. Target CRAN submission: 2026-11-20
+**Decision gate 2026-10-15 (recorded 2026-07-25 in
+`../portfolio-planner/decisions.md`):** whether this ships as 0.4 on
+2026-11-20 depends on the small-sample preprint DOI being live by
+2026-10-15. DOI live: ship as planned. DOI not live: this release
+merges into 0.5 (2027-01-25) as its small-sample track, this file folds
+into `todo_0.5.md`, and 0.4.1 renumbers to 0.5.1 — see the decisions.md
+entry for the full consequence list. Until the gate fires, work from
+this file as written; the engineering content is identical either way.
+
+Last updated: 2026-07-25. Target CRAN submission: 2026-11-20
 (`../portfolio-planner/master_roadmap.md`). Current package version: 0.3.4
 (0.3.5 is a field-validation patch with no planned code changes, per the
 2026-07-17 decision — see CLAUDE.md and
@@ -193,16 +202,29 @@ Follow whatever `%||%` / null-coalescing helper already exists in the
 package (`rlang::%||%` is already an import; use that rather than defining
 a new one).
 
-**Registration in `run_analysis_plan()`:** find the method registry (search
-`R/analysis_plan.R` for the existing family-keyed list structure used by
-`mann_whitney`, `fisher_exact`, etc. — match that exact structure, not the
-guide's `list(id=, fn=, required_n=, small_sample=)` sketch, unless that is
-in fact the real structure; verify before writing).
+**Registration in `run_analysis_plan()` (verified 2026-07-25):** there is
+no registry table. Dispatch is a plain `switch(test, ...)` inside
+`sframe_run_one_block()` at `R/analysis_plan.R:1101`. A new method id
+(`firth_logistic`) needs: a `switch()` case there; a role-extraction entry
+in `sframe_vars_for_method()` (`R/analysis_plan.R:770`, copy the
+`regression_logistic_binary` line); a default-roles fallback in
+`sframe_analysis_roles()` (`R/statistics_reports.R:57`); citation entries
+in `.sframe_citations` (`R/analysis_plan.R:9`, `use` vector keyed by
+method id); a `$table` (return it from the runner, or a case in
+`sframe_result_table()`, `R/analysis_plan.R:845`); a plot case in
+`sframe_plot_for_result()` (`R/plots.R:636`, the logistic-coefficients
+helper already exists); entries in the builder `ANALYSIS_REGISTRY`
+(`inst/builder/survey_builder.html` ~line 2690) and method dropdown
+(~line 969), and in the studio registry (`inst/shiny/app.R` ~line 324)
+with its requirements string (~line 722). Line numbers drift — re-grep
+before editing. The full checklist lives in `todo_0.5.md` ("Integration
+checklist"); it applies to this item too.
 
-**Error class:** use the package's existing typed-condition pattern from
-`R/conditions.R` (`sframe_check_instrument()` neighbours) rather than a new
-ad hoc `rlang::abort()` call — check what condition classes already exist
-for "missing suggested package" before inventing `sframe_missing_package`.
+**Error class (verified):** the house pattern for a missing suggested
+package is a `sframe_require_<pkg>()` helper in `R/conditions.R` wrapping
+`rlang::check_installed()` (see `sframe_require_psych`, R/conditions.R:26).
+Add `sframe_require_logistf()` there; do not invent
+`sframe_missing_package` or guard inline.
 
 **Test:** fixture with a binary outcome, n < 30, at least one covariate.
 Also test the missing-package path with `skip_if(requireNamespace("logistf", quietly = TRUE))`.
@@ -320,11 +342,12 @@ rather than duplicating its plan here.
 
 ## 10. Registration and exit checklist
 
-- Register `firth_logistic` (and confirm `mann_whitney`,
-  `paired_wilcoxon`/`wilcoxon_pair`, `fisher_exact` already are, since
-  they're extensions of existing runners, not new registrations) in
-  whatever method registry `run_analysis_plan()` actually uses — verify
-  its real structure before editing, per the signature note above.
+- Wire `firth_logistic` through every integration point listed in
+  section 5 (switch case, vars_for_method, analysis_roles fallback,
+  citations, table, plot, builder ANALYSIS_REGISTRY + dropdown, studio
+  registry + requirements string). `mann_whitney`, `wilcoxon_pair`, and
+  `fisher_exact` are extensions of existing wired runners and need no
+  new registration, only their new fields.
 - `devtools::document()` clean; `bootstrap_ci`, `cohens_d_ci`,
   `cramers_v_ci`, `eta_sq_ci` already exported (0.3.4); newly exported in
   0.4: `sframe_run_firth_logistic` (or whatever the real public/internal
@@ -363,6 +386,69 @@ rather than duplicating its plan here.
 - Anything in `R/plots.R`, the builder, SurveyStudio, or the dashboard —
   all of that is 0.3.4/0.3.5 scope and is done or in field-validation,
   not touched here.
+
+---
+
+## Delegation, model tiering, and token budget
+
+This release is built with multiple agents in parallel where the work
+allows it, and with the cheapest model that can do each job reliably.
+The same policy applies to `todo_0.5.md` and `todo_0.6.md`.
+
+### Model tiering (pick the cheapest tier that fits)
+
+- **Haiku** (mechanical, zero-judgement work): grep sweeps to confirm
+  line numbers and registry structure, running `devtools::test()` and
+  reporting output, `devtools::document()` runs, checking that a
+  vignette knits, verifying exports in NAMESPACE, formatting fixes.
+- **Sonnet** (well-specified implementation): items #1, #2, and #3 in
+  this file. Each is a 2-line change to an existing runner plus a small
+  test, with the exact code given above. Also the vignette draft (#7),
+  since the section list and house style are fully specified.
+- **Opus or Fable** (judgement needed): item #5 (Firth logistic, which
+  needs the registry lookup and condition-class decisions done
+  correctly), item #6 (advisory, which touches two functions whose
+  return shapes must be read and respected), the final review of all
+  delegated work, and anything that changes `run_analysis_plan()`
+  dispatch.
+
+### Agent assignment for this release
+
+Spawn agents only when a track is genuinely independent, and give each
+one a narrow brief with the relevant section of this file pasted in, so
+it does not re-derive context.
+
+- **Agent 1 (Sonnet):** items #1, #2, #3 in sequence. Same editing
+  pattern three times. Deliverable: the three runner edits plus their
+  tests, with `testthat::test_file()` passing on each affected file.
+- **Agent 2 (Opus):** items #5 and #6. Starts with the registry and
+  condition-class reads listed in those sections.
+- **Agent 3 (Sonnet, worktree isolation):** the RStudio add-in from
+  `todo_rstudio_addin.md`. Fully independent, own branch, never merges
+  until 0.3.4 is accepted by CRAN.
+- **Lead (this session):** integration, the vignette review, CITATION,
+  and the exit checklist. Do not delegate the exit checklist.
+
+Agents must not run the full test suite repeatedly. Each agent runs
+only the test file it touched via `testthat::test_file()`. The lead
+runs `devtools::test()` once at integration and once before the
+tarball build.
+
+### Token-saving rules (binding for every agent on this release)
+
+- Grep for the target function first, then read only that function's
+  range with an offset and limit. Never read a 1500-line file end to
+  end to edit 10 lines of it.
+- Never re-read a file already read in the same session unless it was
+  edited by someone else.
+- Do not paste whole files or whole test outputs back in reports. A
+  report is: what changed, file and line, test result line, anything
+  surprising. Under 15 lines unless something failed.
+- Batch independent tool calls in one message.
+- Use an Explore agent for any search expected to touch more than 5
+  files, so the file contents stay out of the lead's context.
+- Verification is one targeted test run per change, then one full
+  suite at the end. Not a full suite per edit.
 
 ---
 
