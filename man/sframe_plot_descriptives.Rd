@@ -12,7 +12,7 @@ sframe_plot_descriptives(x, data, palette = c("web", "print"))
 \item{data}{The same data.frame passed to \code{\link[=descriptives_report]{descriptives_report()}}. Required:
 \code{x} only carries the summary table, not the raw values the violins need.}
 
-\item{palette}{One of \code{"web"} or \code{"print"}. See \code{\link[=sframe_brand]{sframe_brand()}}.}
+\item{palette}{One of \code{"web"} or \code{"print"}. See \code{sframe_brand()}.}
 }
 \value{
 A ggplot2 object, or \code{NULL} if none of the report's variables have

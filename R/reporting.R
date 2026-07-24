@@ -250,7 +250,7 @@ print.sframe_codebook <- function(x, ...) {
 #' @param plot_palette One of `"web"` (brand colours, for on-screen reading)
 #'   or `"print"` (black, grey, and white, for a journal-ready or
 #'   print-friendly report). Applied to every chart the report embeds.
-#'   See [sframe_brand()].
+#'   See `sframe_brand()`.
 #' @param interpretations Named list or NULL. Written interpretations keyed
 #'   by analysis-plan block id, added after the results are known. When a
 #'   block has an entry, its report section shows the pre-declared decision

@@ -11,7 +11,7 @@ sframe_plot_scale_chart(scores, label, palette = c("web", "print"))
 
 \item{label}{Character. Scale label, used as the x-axis title.}
 
-\item{palette}{One of \code{"web"} or \code{"print"}. See \code{\link[=sframe_brand]{sframe_brand()}}.}
+\item{palette}{One of \code{"web"} or \code{"print"}. See \code{sframe_brand()}.}
 }
 \value{
 A ggplot2 object, or \code{NULL} if ggplot2 is unavailable or \code{scores}

@@ -9,7 +9,7 @@ sframe_plot_quality(x, palette = c("web", "print"))
 \arguments{
 \item{x}{An \code{sframe_quality_report} object from \code{\link[=quality_report]{quality_report()}}.}
 
-\item{palette}{One of \code{"web"} or \code{"print"}. See \code{\link[=sframe_brand]{sframe_brand()}}.}
+\item{palette}{One of \code{"web"} or \code{"print"}. See \code{sframe_brand()}.}
 }
 \value{
 A ggplot2 object.

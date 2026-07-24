@@ -29,7 +29,7 @@ Defaults to \code{FALSE}.}
 
 \item{plot_palette}{One of \code{"web"} (brand colours, for on-screen use) or
 \code{"print"} (black, grey, and white, for journal-ready print figures).
-Applied to every plot attached when \code{plots = TRUE}. See \code{\link[=sframe_brand]{sframe_brand()}}.}
+Applied to every plot attached when \code{plots = TRUE}. See \code{sframe_brand()}.}
 }
 \value{
 An object of class \code{sframe_analysis_results}, a list with one
@@ -59,8 +59,10 @@ responses <- read_responses(
   submitted_at = "submitted_at",
   meta_cols = "started_at"
 )
+\donttest{
 results <- run_analysis_plan(responses, instr)
 print(results)
+}
 }
 \seealso{
 \code{\link[=render_results]{render_results()}}, \code{\link[=read_sheet_responses]{read_sheet_responses()}}
