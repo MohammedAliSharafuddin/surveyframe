@@ -968,7 +968,7 @@ sframe_result_table <- function(result) {
       )
     },
     mediation = data.frame(
-      Effect = c("Direct (c')", "Indirect (a×b)", "Total (c)"),
+      Effect = c("Direct (c')", "Indirect (a\u00D7b)", "Total (c)"),
       Estimate = fmt(c(result$direct, result$indirect, result$total)),
       `95% CI` = c("", sprintf("[%.3f, %.3f]", result$indirect_ci[[1]], result$indirect_ci[[2]]), ""),
       check.names = FALSE, stringsAsFactors = FALSE
@@ -1212,7 +1212,7 @@ sframe_run_one_block <- function(block, data, instrument, plots = FALSE,
 #'   Defaults to `FALSE`.
 #' @param plot_palette One of `"web"` (brand colours, for on-screen use) or
 #'   `"print"` (black, grey, and white, for journal-ready print figures).
-#'   Applied to every plot attached when `plots = TRUE`. See [sframe_brand()].
+#'   Applied to every plot attached when `plots = TRUE`. See `sframe_brand()`.
 #'
 #' @return An object of class `sframe_analysis_results`, a list with one
 #'   element per analysis block. Each element contains the test result,
@@ -1236,8 +1236,10 @@ sframe_run_one_block <- function(block, data, instrument, plots = FALSE,
 #'   submitted_at = "submitted_at",
 #'   meta_cols = "started_at"
 #' )
+#' \donttest{
 #' results <- run_analysis_plan(responses, instr)
 #' print(results)
+#' }
 run_analysis_plan <- function(data, instrument, scored = TRUE, plots = FALSE,
                               plot_palette = c("web", "print")) {
   plot_palette <- match.arg(plot_palette)
@@ -1337,10 +1339,12 @@ sframe_md_em <- function(x) {
 #'   submitted_at = "submitted_at",
 #'   meta_cols = "started_at"
 #' )
+#' \donttest{
 #' results <- run_analysis_plan(responses, instr)
 #' out <- render_results(results, instr,
 #'                       output_file = tempfile(fileext = ".html"))
 #' file.exists(out)
+#' }
 render_results <- function(
     results         = NULL,
     instrument,

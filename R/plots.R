@@ -102,7 +102,7 @@ sframe_series_fill_colours <- function(k, palette = c("web", "print")) {
 #'   device default).
 #' @param palette One of `"web"` (brand colours, for on-screen use) or
 #'   `"print"` (black/grey/white only, for journal-ready figures). See
-#'   [sframe_brand()] for the verified contrast ratios behind each.
+#'   `sframe_brand()` for the verified contrast ratios behind each.
 #'
 #' @return A ggplot2 theme object.
 #' @export
@@ -295,7 +295,7 @@ sframe_plot_regression <- function(result, data, palette = c("web", "print")) {
 #'
 #' @param counts Named numeric vector of response counts, in scale order.
 #' @param theme_color Character. Hex colour for the "agree" pole.
-#' @param palette One of `"web"` or `"print"`. See [sframe_brand()].
+#' @param palette One of `"web"` or `"print"`. See `sframe_brand()`.
 #' @return Invisibly `NULL`; called for its plotting side effect on the
 #'   current graphics device.
 #' @export
@@ -525,7 +525,7 @@ sframe_draw_likert_diverging <- function(counts, theme_color = "#16B3B1",
 #'   [read_responses()].
 #' @param choice_set The item's choice set object (`values`, `labels`),
 #'   typically looked up from `instrument$choices` by `item$choice_set`.
-#' @param palette One of `"web"` or `"print"`. See [sframe_brand()].
+#' @param palette One of `"web"` or `"print"`. See `sframe_brand()`.
 #' @return A ggplot2 object, or `NULL` if no row has response data.
 #' @export
 #' @seealso [sframe_draw_likert_diverging()]
@@ -565,7 +565,7 @@ sframe_plot_likert_matrix <- function(item, data, choice_set, palette = c("web",
 #' @param data The response data.frame, with one column per item id.
 #' @param choice_set The shared choice set object (`values`, `labels`).
 #' @param title Chart title, typically the scale's label.
-#' @param palette One of `"web"` or `"print"`. See [sframe_brand()].
+#' @param palette One of `"web"` or `"print"`. See `sframe_brand()`.
 #' @return A ggplot2 object, or `NULL` if no item has response data.
 #' @export
 #' @seealso [sframe_plot_likert_matrix()], [sf_scale()]
@@ -701,7 +701,7 @@ sframe_plot_for_result <- function(result, data, palette = c("web", "print")) {
 #'
 #' @param result A `regression_linear` result list containing a `diagnostics`
 #'   data frame (as produced internally by [run_analysis_plan()]).
-#' @param palette One of `"web"` or `"print"`. See [sframe_brand()].
+#' @param palette One of `"web"` or `"print"`. See `sframe_brand()`.
 #' @return A named list of four ggplot2 objects (`residuals_fitted`, `qq`,
 #'   `scale_location`, `leverage`), or `NULL` if diagnostics are unavailable.
 #' @export
@@ -758,7 +758,7 @@ sframe_plot_regression_diagnostics <- function(result, palette = c("web", "print
 #' with the suggested factor count marked.
 #'
 #' @param x An `sframe_efa_report` object from [efa_report()].
-#' @param palette One of `"web"` or `"print"`. See [sframe_brand()].
+#' @param palette One of `"web"` or `"print"`. See `sframe_brand()`.
 #' @return A ggplot2 object.
 #' @export
 #' @seealso [efa_report()]
@@ -796,7 +796,7 @@ sframe_plot_efa_scree <- function(x, palette = c("web", "print")) {
 #' @param palette One of `"web"` (diverging red/teal gradient) or `"print"`
 #'   (white-to-black gradient by magnitude; sign is conveyed by the printed
 #'   label, not colour, so it stays legible in monochrome). See
-#'   [sframe_brand()].
+#'   `sframe_brand()`.
 #' @return A ggplot2 object.
 #' @export
 #' @seealso [efa_solution()]
@@ -842,7 +842,7 @@ sframe_plot_efa_loadings <- function(x, palette = c("web", "print")) {
 #' Reliability plot: alpha and omega by scale
 #'
 #' @param x An `sframe_reliability_report` object from [reliability_report()].
-#' @param palette One of `"web"` or `"print"`. See [sframe_brand()].
+#' @param palette One of `"web"` or `"print"`. See `sframe_brand()`.
 #' @return A ggplot2 object.
 #' @export
 #' @seealso [reliability_report()]
@@ -891,17 +891,17 @@ sframe_plot_reliability <- function(x, palette = c("web", "print")) {
 #' existing base-graphics precedent in this file
 #' ([sframe_draw_likert_diverging()]) so it renders without ggplot2. An
 #' alternative view of the same crosstab data
-#' [sframe_plot_crosstab()] renders as a grouped bar; use whichever reads
+#' `sframe_plot_crosstab()` renders as a grouped bar; use whichever reads
 #' better for the table's shape (mosaic scales better to unbalanced group
 #' sizes).
 #'
 #' @param result A `crosstab`/`chi_square` result list with a contingency
 #'   `table`.
-#' @param palette One of `"web"` or `"print"`. See [sframe_brand()].
+#' @param palette One of `"web"` or `"print"`. See `sframe_brand()`.
 #' @return Invisibly `NULL`; called for its plotting side effect on the
 #'   current graphics device.
 #' @export
-#' @seealso [sframe_plot_crosstab()]
+#' @seealso `sframe_plot_crosstab()`
 sframe_draw_mosaic <- function(result, palette = c("web", "print")) {
   palette <- match.arg(palette)
   tbl <- result$table
@@ -921,7 +921,7 @@ sframe_draw_mosaic <- function(result, palette = c("web", "print")) {
 #' Computes and plots a full pairwise correlation matrix, independent of
 #' [run_analysis_plan()]'s pairwise `correlation_pearson`/`_spearman`/
 #' `_kendall` runners (which plot one variable pair at a time via
-#' [sframe_plot_correlation()]). Useful directly, and as the visual
+#' `sframe_plot_correlation()`). Useful directly, and as the visual
 #' companion to [validity_report()]'s discriminant-validity checks.
 #'
 #' @param data A data frame of survey responses.
@@ -929,7 +929,7 @@ sframe_draw_mosaic <- function(result, palette = c("web", "print")) {
 #' @param method One of `"pearson"`, `"spearman"`, `"kendall"`.
 #' @param palette One of `"web"` (diverging red/teal gradient) or `"print"`
 #'   (white-to-black gradient by magnitude, signed label). See
-#'   [sframe_brand()].
+#'   `sframe_brand()`.
 #' @return A ggplot2 object.
 #' @export
 #' @seealso [validity_report()]
@@ -969,7 +969,7 @@ sframe_plot_correlation_matrix <- function(data, vars, method = "pearson",
 #' Quality report plot: straight-lining flag rate by scale
 #'
 #' @param x An `sframe_quality_report` object from [quality_report()].
-#' @param palette One of `"web"` or `"print"`. See [sframe_brand()].
+#' @param palette One of `"web"` or `"print"`. See `sframe_brand()`.
 #' @return A ggplot2 object.
 #' @export
 #' @seealso [quality_report()]
@@ -1024,7 +1024,7 @@ plot.sframe_efa_solution <- function(x, ..., palette = c("web", "print")) {
 #' Validity report plot: composite reliability and AVE by construct
 #'
 #' @param x An `sframe_validity_report` object from [validity_report()].
-#' @param palette One of `"web"` or `"print"`. See [sframe_brand()].
+#' @param palette One of `"web"` or `"print"`. See `sframe_brand()`.
 #' @return A ggplot2 object.
 #' @export
 #' @seealso [validity_report()]
@@ -1064,7 +1064,7 @@ plot.sframe_validity_report <- function(x, ..., palette = c("web", "print")) {
 #'
 #' @param x An `sframe_missing_data_report` object from
 #'   [missing_data_report()].
-#' @param palette One of `"web"` or `"print"`. See [sframe_brand()].
+#' @param palette One of `"web"` or `"print"`. See `sframe_brand()`.
 #' @return A ggplot2 object. When no item has missing values, this is a
 #'   short "no missing responses" message rather than an empty bar chart.
 #' @export
@@ -1175,7 +1175,7 @@ plot.sframe_analysis_results <- function(x, ..., which = NULL) {
 #' @param col_data The response column for this item.
 #' @param choice_set A list with `values` and `labels` (an sframe choice
 #'   set), or `NULL` if the item has none.
-#' @param palette One of `"web"` or `"print"`. See [sframe_brand()].
+#' @param palette One of `"web"` or `"print"`. See `sframe_brand()`.
 #' @return A ggplot2 object, or `NULL` if this item type/data is unsupported.
 #' @keywords internal
 #' @export
@@ -1218,7 +1218,7 @@ sframe_plot_item_chart <- function(item, col_data, choice_set = NULL,
 #'
 #' @param scores Numeric vector of scale scores (already averaged/summed).
 #' @param label Character. Scale label, used as the x-axis title.
-#' @param palette One of `"web"` or `"print"`. See [sframe_brand()].
+#' @param palette One of `"web"` or `"print"`. See `sframe_brand()`.
 #' @return A ggplot2 object, or `NULL` if ggplot2 is unavailable or `scores`
 #'   is empty.
 #' @keywords internal
@@ -1256,7 +1256,7 @@ sframe_plot_scale_chart <- function(scores, label, palette = c("web", "print")) 
 #' @param x An `sframe_descriptives_report` object from [descriptives_report()].
 #' @param data The same data.frame passed to [descriptives_report()]. Required:
 #'   `x` only carries the summary table, not the raw values the violins need.
-#' @param palette One of `"web"` or `"print"`. See [sframe_brand()].
+#' @param palette One of `"web"` or `"print"`. See `sframe_brand()`.
 #' @return A ggplot2 object, or `NULL` if none of the report's variables have
 #'   enough data to draw.
 #' @export
@@ -1344,7 +1344,7 @@ plot.sframe_descriptives_report <- function(x, data, ..., palette = c("web", "pr
 #' @param result A result list from one of the four runners above, with
 #'   `vars = c(group_column, outcome_column)`.
 #' @param data The response data frame the result was computed from.
-#' @param palette One of `"web"` or `"print"`. See [sframe_brand()].
+#' @param palette One of `"web"` or `"print"`. See `sframe_brand()`.
 #' @return A ggplot2 object, or `NULL` if the columns are missing, fewer
 #'   than two groups remain after removing missing values, or ggplot2 is
 #'   unavailable.
@@ -1390,7 +1390,7 @@ sframe_plot_group_comparison <- function(result, data, palette = c("web", "print
 #' @param result A result list from `t_test_pair`/`wilcoxon_pair`, with
 #'   `vars = c(x_column, y_column)`.
 #' @param data The response data frame the result was computed from.
-#' @param palette One of `"web"` or `"print"`. See [sframe_brand()].
+#' @param palette One of `"web"` or `"print"`. See `sframe_brand()`.
 #' @return A ggplot2 object, or `NULL` if fewer than two complete pairs
 #'   remain, or ggplot2 is unavailable.
 #' @export
@@ -1422,7 +1422,7 @@ sframe_plot_paired_comparison <- function(result, data, palette = c("web", "prin
     theme_surveyframe(palette = palette)
 }
 
-# Mean (± SE) or median profile across 3+ repeated conditions, shared by
+# Mean (+/- SE) or median profile across 3+ repeated conditions, shared by
 # repeated_anova and friedman: their vars are the same shape (2+ measure
 # columns on the same respondents) and both are asking "does the rating
 # move across conditions", which a line-and-point profile answers directly.
@@ -1462,7 +1462,7 @@ sframe_plot_repeated_measures <- function(result, data, palette = c("web", "prin
     ggplot2::scale_x_discrete(labels = .sframe_title_case_names) +
     ggplot2::labs(
       title = "Ratings across conditions", subtitle = result$apa %||% NULL,
-      x = NULL, y = if (use_median) "Median" else "Mean (± SE)"
+      x = NULL, y = if (use_median) "Median" else "Mean (\u00B1 SE)"
     ) +
     theme_surveyframe(palette = palette)
 }
@@ -1632,8 +1632,8 @@ sframe_plot_mediation <- function(result, palette = c("web", "print")) {
   if (is.null(result$direct) || is.null(result$indirect) || is.null(result$total)) return(NULL)
   ci <- result$indirect_ci
   df <- data.frame(
-    effect = factor(c("Direct (c′)", "Indirect (a×b)", "Total (c)"),
-                    levels = c("Total (c)", "Indirect (a×b)", "Direct (c′)")),
+    effect = factor(c("Direct (c\u2032)", "Indirect (a\u00D7b)", "Total (c)"),
+                    levels = c("Total (c)", "Indirect (a\u00D7b)", "Direct (c\u2032)")),
     estimate = c(result$direct, result$indirect, result$total),
     lo = c(NA_real_, ci[[1]], NA_real_),
     hi = c(NA_real_, ci[[2]], NA_real_)
@@ -1687,7 +1687,7 @@ sframe_plot_item_diagnostics <- function(result, palette = c("web", "print")) {
 #'
 #' @param data A data frame of survey responses.
 #' @param variable Character. Column name of the variable to plot.
-#' @param palette One of `"web"` or `"print"`. See [sframe_brand()].
+#' @param palette One of `"web"` or `"print"`. See `sframe_brand()`.
 #' @return A named list of three ggplot2 objects (`histogram`, `boxplot`,
 #'   `qq`), or `NULL` if fewer than two complete values remain.
 #' @export

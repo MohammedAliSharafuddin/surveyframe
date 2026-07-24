@@ -18,7 +18,7 @@ device default).}
 
 \item{palette}{One of \code{"web"} (brand colours, for on-screen use) or
 \code{"print"} (black/grey/white only, for journal-ready figures). See
-\code{\link[=sframe_brand]{sframe_brand()}} for the verified contrast ratios behind each.}
+\code{sframe_brand()} for the verified contrast ratios behind each.}
 }
 \value{
 A ggplot2 theme object.

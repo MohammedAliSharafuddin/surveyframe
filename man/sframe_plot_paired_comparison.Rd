@@ -12,7 +12,7 @@ sframe_plot_paired_comparison(result, data, palette = c("web", "print"))
 
 \item{data}{The response data frame the result was computed from.}
 
-\item{palette}{One of \code{"web"} or \code{"print"}. See \code{\link[=sframe_brand]{sframe_brand()}}.}
+\item{palette}{One of \code{"web"} or \code{"print"}. See \code{sframe_brand()}.}
 }
 \value{
 A ggplot2 object, or \code{NULL} if fewer than two complete pairs

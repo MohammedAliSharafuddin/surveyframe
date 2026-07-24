@@ -53,6 +53,8 @@
 ^tests/testthat/test-aic-rsam-branching\.R$
 ^mas_review_032\.(md|qmd)$
 ^mas_full_report\.html$
+^report_interp\.html$
+^fresh_eyes_check\.sframe$
 ^\.vscode($|/)
 ^CODE_OF_CONDUCT\.md$
 ^SECURITY\.md$

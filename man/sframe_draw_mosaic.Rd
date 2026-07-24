@@ -10,7 +10,7 @@ sframe_draw_mosaic(result, palette = c("web", "print"))
 \item{result}{A \code{crosstab}/\code{chi_square} result list with a contingency
 \code{table}.}
 
-\item{palette}{One of \code{"web"} or \code{"print"}. See \code{\link[=sframe_brand]{sframe_brand()}}.}
+\item{palette}{One of \code{"web"} or \code{"print"}. See \code{sframe_brand()}.}
 }
 \value{
 Invisibly \code{NULL}; called for its plotting side effect on the
@@ -21,10 +21,10 @@ Base-graphics mosaic plot (via \code{\link[graphics:mosaicplot]{graphics::mosaic
 existing base-graphics precedent in this file
 (\code{\link[=sframe_draw_likert_diverging]{sframe_draw_likert_diverging()}}) so it renders without ggplot2. An
 alternative view of the same crosstab data
-\code{\link[=sframe_plot_crosstab]{sframe_plot_crosstab()}} renders as a grouped bar; use whichever reads
+\code{sframe_plot_crosstab()} renders as a grouped bar; use whichever reads
 better for the table's shape (mosaic scales better to unbalanced group
 sizes).
 }
 \seealso{
-\code{\link[=sframe_plot_crosstab]{sframe_plot_crosstab()}}
+\code{sframe_plot_crosstab()}
 }

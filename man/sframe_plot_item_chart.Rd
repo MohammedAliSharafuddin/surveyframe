@@ -19,7 +19,7 @@ sframe_plot_item_chart(
 \item{choice_set}{A list with \code{values} and \code{labels} (an sframe choice
 set), or \code{NULL} if the item has none.}
 
-\item{palette}{One of \code{"web"} or \code{"print"}. See \code{\link[=sframe_brand]{sframe_brand()}}.}
+\item{palette}{One of \code{"web"} or \code{"print"}. See \code{sframe_brand()}.}
 }
 \value{
 A ggplot2 object, or \code{NULL} if this item type/data is unsupported.

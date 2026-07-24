@@ -10,7 +10,7 @@ sframe_plot_missingness(x, palette = c("web", "print"))
 \item{x}{An \code{sframe_missing_data_report} object from
 \code{\link[=missing_data_report]{missing_data_report()}}.}
 
-\item{palette}{One of \code{"web"} or \code{"print"}. See \code{\link[=sframe_brand]{sframe_brand()}}.}
+\item{palette}{One of \code{"web"} or \code{"print"}. See \code{sframe_brand()}.}
 }
 \value{
 A ggplot2 object. When no item has missing values, this is a

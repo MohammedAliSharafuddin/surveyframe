@@ -17,7 +17,7 @@ labels) and a \code{choice_set} naming the shared response scale.}
 \item{choice_set}{The item's choice set object (\code{values}, \code{labels}),
 typically looked up from \code{instrument$choices} by \code{item$choice_set}.}
 
-\item{palette}{One of \code{"web"} or \code{"print"}. See \code{\link[=sframe_brand]{sframe_brand()}}.}
+\item{palette}{One of \code{"web"} or \code{"print"}. See \code{sframe_brand()}.}
 }
 \value{
 A ggplot2 object, or \code{NULL} if no row has response data.
