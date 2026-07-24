@@ -1,0 +1,2119 @@
+---
+format:
+  revealjs:
+    theme: default
+    title-slide: false
+    smaller: true
+    slide-number: false
+    progress: true
+    embed-resources: true
+    width: 1280
+    height: 720
+    margin: 0.06
+    code-line-numbers: false
+    highlight-style: github
+    transition: fade
+    background-transition: fade
+    css: slides_user.css
+execute:
+  echo: true
+  eval: false
+---
+
+## {background-color="#1f6f78"}
+
+::: {style="text-align:center; padding-top:2.5em;"}
+
+<p class="chap-hero" style="font-size:3em; margin-bottom:0.15em;">surveyframe</p>
+
+<p class="chap-sub" style="font-size:1.2em; margin-bottom:0.6em;">Design · Deploy · Collect · Analyse · Report</p>
+
+<p style="color:rgba(255,255,255,0.75); font-size:0.95em; margin-bottom:1.2em;">The complete survey workflow — entirely in R</p>
+
+<code style="background:rgba(255,255,255,0.15); color:white; padding:0.3em 0.9em; border-radius:4px; font-size:0.85em;">install.packages("surveyframe")</code>
+
+:::
+
+---
+
+## The researcher's workflow problem
+
+Most survey studies lose time and rigour at every handoff point.
+
+::: {.cols}
+::: {.col}
+**The typical path today**
+
+1. Design questions in Word or a web form
+2. Deploy to a third-party platform
+3. Export a spreadsheet
+4. Decide which tests to run *after seeing the data*
+5. Write up results manually
+:::
+::: {.col}
+**What goes wrong**
+
+- The link between questions and constructs exists only in the researcher's head
+- Analysis decisions made after viewing data introduce bias
+- Reproducing the study means re-reading a PDF, not re-running code
+- Quality checks are manual — or skipped
+:::
+:::
+
+::: {.callout-amber}
+**The core problem:** there is no machine-readable contract between the instrument, the analysis plan, and the data.
+:::
+
+---
+
+## surveyframe solves this in five steps
+
+::: {.workflow}
+::: {.wf-step}
+Design
+:::
+::: {.wf-arrow}
+→
+:::
+::: {.wf-step}
+Deploy
+:::
+::: {.wf-arrow}
+→
+:::
+::: {.wf-step}
+Collect
+:::
+::: {.wf-arrow}
+→
+:::
+::: {.wf-step}
+Analyse
+:::
+::: {.wf-arrow}
+→
+:::
+::: {.wf-step}
+Report
+:::
+:::
+
+Each step is one R function call. The instrument is a typed R object that carries the analysis plan, the measurement model, and the quality rules — declared before any data is collected.
+
+::: {.callout}
+**The key idea:** analysis is the *execution* of a pre-declared plan, not a post-hoc search. The instrument is a methodological contract.
+:::
+
+---
+
+## What you can do with surveyframe
+
+::: {.feature-grid}
+::: {.feature-card}
+**🏗️ Build**
+
+Design in R code or the visual GUI. 11 item types, skip logic, attention checks, measurement models.
+:::
+::: {.feature-card}
+**🚀 Deploy**
+
+Export a self-contained offline HTML survey. No server. Standard or conversational presentation mode.
+:::
+::: {.feature-card}
+**📊 Analyse**
+
+Pre-declared analysis plan with one call. 20+ statistical methods. APA-formatted results and writing prompts.
+:::
+::: {.feature-card}
+**🔒 Integrity**
+
+Every `.sframe` file carries a SHA-256 hash. Tampering is caught immediately on `read_sframe()`.
+:::
+::: {.feature-card}
+**📋 Report**
+
+APA-formatted HTML reports: codebook, quality summary, descriptives, reliability, analysis results.
+:::
+::: {.feature-card}
+**📦 Reproduce**
+
+The full workflow is R code. Any collaborator re-runs it from scratch — no clicks to remember.
+:::
+:::
+
+---
+
+## {background-color="#1f6f78"}
+
+::: {style="text-align:center; padding-top:2.8em;"}
+<p class="chap-hero">Part 1 — Design your instrument</p>
+<p class="chap-sub">Components, item types, scales, logic, and models</p>
+:::
+
+---
+
+## The five building blocks
+
+Every surveyframe instrument is assembled from five component types.
+
+| Component | Function | What it defines |
+|---|---|---|
+| Choice set | `sf_choices()` | The labelled response options |
+| Item | `sf_item()` | One question and its response type |
+| Scale | `sf_scale()` | A group of items scored together |
+| Branch rule | `sf_branch()` | Skip logic — show or hide based on response |
+| Quality check | `sf_check()` | Attention, timing, or pattern rules |
+
+```r
+# Assemble all components into one validated object
+instr <- sf_instrument(
+  title      = "Tourism Services Survey",
+  version    = "1.0.0",
+  authors    = "Mohammed Ali Sharafuddin",
+  components = list(agree5, sat_1, sat_2, sat_scale, branch_1, attn_check)
+)
+```
+
+---
+
+## {background-color="#1f6f78"}
+
+::: {style="text-align:center; padding-top:2.8em;"}
+<p class="chap-hero">Item types</p>
+<p class="chap-sub">11 response formats — one slide each</p>
+:::
+
+---
+
+## Item type 1 — Likert
+
+Horizontal radio buttons. One column per option, label centred below.
+Use a choice set with a defined number of points.
+
+```r
+agree5 <- sf_choices(
+  id     = "agree5",
+  values = 1:5,
+  labels = c("Strongly disagree", "Disagree", "Neutral",
+             "Agree", "Strongly agree")
+)
+
+sat_1 <- sf_item(
+  id         = "sat_1",
+  label      = "The service met my expectations.",
+  type       = "likert",
+  choice_set = "agree5",
+  scale_id   = "satisfaction",
+  required   = TRUE
+)
+```
+
+::: {.callout}
+Likert items store numeric values (1–5 or 1–7). The labels are display-only. Reverse scoring is declared with `reverse = TRUE` in `sf_item()`.
+:::
+
+<!-- SCREENSHOT: 5-point Likert rendered in the survey -->
+
+---
+
+## Item type 1 continued — 7-point Likert
+
+The same `type = "likert"` — change the choice set to 7 points.
+
+```r
+agree7 <- sf_choices(
+  id     = "agree7",
+  values = 1:7,
+  labels = c("Strongly disagree", "Disagree",
+             "Somewhat disagree", "Neutral",
+             "Somewhat agree", "Agree", "Strongly agree")
+)
+
+sq_1 <- sf_item(
+  id         = "sq_1",
+  label      = "Staff were helpful and professional.",
+  type       = "likert",
+  choice_set = "agree7",
+  scale_id   = "service_quality",
+  required   = TRUE
+)
+```
+
+::: {.callout}
+Any number of points is supported. Common scales: 5-point, 7-point, 4-point (no neutral), 6-point (no neutral + more granularity).
+:::
+
+<!-- SCREENSHOT: 7-point Likert rendered in the survey -->
+
+---
+
+## Item type 2 — Single choice
+
+Vertical radio buttons. One option can be selected.
+Use when the response options are not a numeric continuum.
+
+```r
+visit_purpose <- sf_choices(
+  id     = "purpose",
+  values = c("leisure", "business", "education", "family"),
+  labels = c("Leisure", "Business", "Education", "Family visit")
+)
+
+q_purpose <- sf_item(
+  id         = "q_purpose",
+  label      = "What was the primary purpose of your visit?",
+  type       = "single_choice",
+  choice_set = "purpose",
+  required   = TRUE
+)
+```
+
+::: {.callout}
+`single_choice` stores the chosen value string. `likert` stores an integer. Use `single_choice` for categorical questions; use `likert` for ordered scales.
+:::
+
+<!-- SCREENSHOT: single_choice rendered in the survey -->
+
+---
+
+## Item type 3 — Multiple choice
+
+Checkboxes. Any number of options can be selected.
+Stored as a comma-separated string of chosen values.
+
+```r
+channels <- sf_choices(
+  id     = "channels",
+  values = c("instagram", "facebook", "tiktok", "word_of_mouth", "travel_agent"),
+  labels = c("Instagram", "Facebook", "TikTok",
+             "Word of mouth", "Travel agent")
+)
+
+q_channels <- sf_item(
+  id         = "q_channels",
+  label      = "Which channels influenced your booking decision? (select all that apply)",
+  type       = "multiple_choice",
+  choice_set = "channels",
+  required   = FALSE
+)
+```
+
+::: {.callout}
+`multiple_choice` supports a `min_selections` and `max_selections` argument in `sf_item()` to constrain the number of selections.
+:::
+
+<!-- SCREENSHOT: multiple_choice (checkboxes) rendered in the survey -->
+
+---
+
+## Item type 4 — Numeric input
+
+A validated number entry field. Accepts integer or decimal values.
+Use for age, count, spending, or any continuous numeric response.
+
+```r
+q_age <- sf_item(
+  id       = "q_age",
+  label    = "What is your age?",
+  type     = "numeric",
+  required = TRUE
+)
+
+q_spend <- sf_item(
+  id          = "q_spend",
+  label       = "Approximately how much did you spend (USD)?",
+  type        = "numeric",
+  required    = FALSE,
+  placeholder = "Enter amount"
+)
+```
+
+::: {.callout}
+Non-numeric characters are rejected in the browser. The value is stored as a number. Use `slider` instead when you want to constrain the range visually.
+:::
+
+<!-- SCREENSHOT: numeric input rendered in the survey -->
+
+---
+
+## Item type 5 — Short text
+
+A single-line free-text field.
+Use for names, brief labels, or any open short-form answer.
+
+```r
+q_name <- sf_item(
+  id          = "q_name",
+  label       = "What is your first name? (optional)",
+  type        = "text",
+  required    = FALSE,
+  placeholder = "Your name"
+)
+
+q_country <- sf_item(
+  id          = "q_country",
+  label       = "Which country are you from?",
+  type        = "text",
+  required    = TRUE,
+  placeholder = "Country of residence"
+)
+```
+
+::: {.callout}
+`text` renders as `<input type="text">`. For longer answers (multiple sentences), use `textarea` instead.
+:::
+
+<!-- SCREENSHOT: short text input rendered in the survey -->
+
+---
+
+## Item type 6 — Long text (textarea)
+
+A multi-line free-text area.
+Use for open-ended feedback, comments, or any qualitative response.
+
+```r
+q_feedback <- sf_item(
+  id          = "q_feedback",
+  label       = "Please share any additional comments or suggestions.",
+  type        = "textarea",
+  required    = FALSE,
+  placeholder = "Write your response here…"
+)
+
+q_improve <- sf_item(
+  id       = "q_improve",
+  label    = "What could we improve about your experience?",
+  type     = "textarea",
+  required = FALSE
+)
+```
+
+::: {.callout}
+Textarea responses are stored as plain character strings. They are excluded from scale scoring and psychometric analysis automatically.
+:::
+
+<!-- SCREENSHOT: textarea rendered in the survey -->
+
+---
+
+## Item type 7 — Date
+
+A date picker field. Stored as YYYY-MM-DD.
+Use for visit dates, event dates, or date-of-birth.
+
+```r
+q_visit_date <- sf_item(
+  id       = "q_visit_date",
+  label    = "When did your visit take place?",
+  type     = "date",
+  required = TRUE
+)
+
+q_dob <- sf_item(
+  id       = "q_dob",
+  label    = "Date of birth (optional)",
+  type     = "date",
+  required = FALSE
+)
+```
+
+::: {.callout}
+The browser renders a native date picker. The value is validated as a real date before the respondent can proceed. Stored in the CSV as `YYYY-MM-DD`.
+:::
+
+<!-- SCREENSHOT: date picker rendered in the survey -->
+
+---
+
+## Item type 8 — Slider
+
+A horizontal draggable slider. Define min, max, and step.
+Use for willingness-to-pay, percentage confidence, or any bounded continuous scale.
+
+```r
+q_wtp <- sf_item(
+  id         = "q_wtp",
+  label      = "How much would you be willing to pay for this experience? (USD)",
+  type       = "slider",
+  slider_min = 0,
+  slider_max = 500,
+  slider_step = 10,
+  required   = TRUE
+)
+
+q_conf <- sf_item(
+  id         = "q_conf",
+  label      = "How confident are you in your answer? (0 = not at all, 100 = completely)",
+  type       = "slider",
+  slider_min = 0,
+  slider_max = 100,
+  slider_step = 1,
+  required   = TRUE
+)
+```
+
+<!-- SCREENSHOT: slider rendered in the survey -->
+
+---
+
+## Item type 9 — Star rating
+
+A clickable star or numeric rating.
+Use for overall satisfaction, recommendation likelihood, or product scores.
+
+```r
+q_overall <- sf_item(
+  id         = "q_overall",
+  label      = "Overall, how would you rate your experience?",
+  type       = "rating",
+  rating_max = 5,
+  required   = TRUE
+)
+
+q_recommend <- sf_item(
+  id         = "q_recommend",
+  label      = "How likely are you to recommend this destination?",
+  type       = "rating",
+  rating_max = 10,
+  required   = TRUE
+)
+```
+
+::: {.callout}
+`rating_max` sets the number of stars or points. Values are stored as integers (1 to `rating_max`). Compatible with scale scoring and reliability analysis.
+:::
+
+<!-- SCREENSHOT: star rating rendered in the survey -->
+
+---
+
+## Item type 10 — Matrix / rating grid
+
+A grid of Likert rows sharing the same column headers.
+Use for attribute evaluation, service quality batteries, or importance-performance grids.
+
+```r
+# Column headers defined in the choice set
+perf_choices <- sf_choices(
+  id     = "perf5",
+  values = 1:5,
+  labels = c("Very poor", "Poor", "Fair", "Good", "Excellent")
+)
+
+q_matrix <- sf_item(
+  id           = "q_hotel",
+  label        = "Rate the following aspects of your hotel stay:",
+  type         = "matrix",
+  choice_set   = "perf5",
+  matrix_items = c("Room cleanliness", "Staff friendliness",
+                   "Value for money", "Location", "Breakfast quality"),
+  required     = TRUE
+)
+```
+
+::: {.callout}
+Each matrix row becomes a separate variable in the data (e.g., `q_hotel_1`, `q_hotel_2`, …). Assign them to a scale for composite scoring.
+:::
+
+<!-- SCREENSHOT: matrix grid rendered in the survey -->
+
+---
+
+## Item type 11 — Rank order
+
+Drag-and-drop ranking. Respondents sort options from most to least preferred.
+Use for priority-setting, feature preference, or destination ranking.
+
+```r
+rank_choices <- sf_choices(
+  id     = "destinations",
+  values = c("bali", "dubai", "paris", "singapore", "tokyo"),
+  labels = c("Bali", "Dubai", "Paris", "Singapore", "Tokyo")
+)
+
+q_rank <- sf_item(
+  id         = "q_rank",
+  label      = "Rank these destinations from most preferred (1) to least preferred (5).",
+  type       = "ranking",
+  choice_set = "destinations",
+  required   = TRUE
+)
+```
+
+::: {.callout}
+Stored as rank integers in the data (1 = most preferred). Use `kruskal_wallis` or `friedman` in your analysis plan when comparing ranked responses across groups.
+:::
+
+<!-- SCREENSHOT: ranking drag-and-drop rendered in the survey -->
+
+---
+
+## {background-color="#1f6f78"}
+
+::: {style="text-align:center; padding-top:2.8em;"}
+<p class="chap-hero">Choice sets</p>
+<p class="chap-sub">Define once, reuse across all items</p>
+:::
+
+---
+
+## Choice sets — 5-point agree-disagree
+
+The most common choice set in survey research.
+Define once with `sf_choices()`, reference by id in every item that uses it.
+
+```r
+agree5 <- sf_choices(
+  id     = "agree5",
+  values = 1:5,
+  labels = c("Strongly disagree", "Disagree", "Neutral",
+             "Agree", "Strongly agree")
+)
+```
+
+::: {.cols}
+::: {.col}
+**Used for:** satisfaction, service quality, attitude, agreement, importance, perception scales.
+
+**Scoring:** values 1–5 are numeric. `score_scales()` averages them (or sums with `method = "sum"`).
+:::
+::: {.col}
+**With reverse scoring:**
+```r
+# Item scored from highest to lowest
+sat_neg <- sf_item(
+  id         = "sat_neg",
+  label      = "I was disappointed overall.",
+  type       = "likert",
+  choice_set = "agree5",
+  reverse    = TRUE,
+  scale_id   = "satisfaction"
+)
+```
+:::
+:::
+
+---
+
+## Choice sets — 7-point agree-disagree
+
+More granularity. Reduces ceiling and floor effects.
+Recommended for attitude measurement when sample size allows it.
+
+```r
+agree7 <- sf_choices(
+  id     = "agree7",
+  values = 1:7,
+  labels = c("Strongly disagree", "Disagree",
+             "Somewhat disagree", "Neutral",
+             "Somewhat agree", "Agree", "Strongly agree")
+)
+
+# Or: a 7-point importance scale
+import7 <- sf_choices(
+  id     = "import7",
+  values = 1:7,
+  labels = c("Not at all important", "Slightly important",
+             "Somewhat important", "Moderately important",
+             "Important", "Very important", "Extremely important")
+)
+```
+
+::: {.callout}
+A 7-point scale tends to produce distributions closer to normal than a 5-point scale, which can improve the fit of CFA models. Use it when constructs require fine-grained discrimination.
+:::
+
+---
+
+## Choice sets — frequency, satisfaction, quality
+
+Built-in named scales for common constructs.
+
+```r
+# Frequency
+freq5 <- sf_choices(
+  id     = "freq5",
+  values = 1:5,
+  labels = c("Never", "Rarely", "Sometimes", "Often", "Always")
+)
+
+# Satisfaction
+sat5 <- sf_choices(
+  id     = "sat5",
+  values = 1:5,
+  labels = c("Very dissatisfied", "Dissatisfied", "Neutral",
+             "Satisfied", "Very satisfied")
+)
+
+# Quality
+qual5 <- sf_choices(
+  id     = "qual5",
+  values = 1:5,
+  labels = c("Very poor", "Poor", "Fair", "Good", "Excellent")
+)
+```
+
+::: {.callout}
+Define choice sets once in your instrument and share them across items. All items referencing `"agree5"` show identical options — ensuring consistency and reducing object count.
+:::
+
+---
+
+## {background-color="#1f6f78"}
+
+::: {style="text-align:center; padding-top:2.8em;"}
+<p class="chap-hero">Scales</p>
+<p class="chap-sub">Group items, declare scoring, enable psychometrics</p>
+:::
+
+---
+
+## Scales — mean scoring
+
+A scale groups a set of items and scores them together.
+`method = "mean"` (the default) averages the item values.
+
+```r
+sat_scale <- sf_scale(
+  id     = "satisfaction",
+  label  = "Tourist Satisfaction",
+  items  = c("sat_1", "sat_2", "sat_3"),
+  method = "mean"
+)
+
+# After scoring: one column per scale in your data frame
+scored <- score_scales(responses, instr)
+# scored$satisfaction = mean of sat_1, sat_2, sat_3 (per respondent)
+```
+
+::: {.callout}
+Mean-scored scales are the standard for composite constructs in tourism, hospitality, and social science. The scale score becomes the input to `run_analysis_plan()` — no manual column creation needed.
+:::
+
+---
+
+## Scales — sum scoring and reverse coding
+
+`method = "sum"` adds item values instead of averaging.
+Reverse-scored items are flipped automatically before scoring.
+
+```r
+# Sum-scored scale (e.g., symptom counts)
+symptom_scale <- sf_scale(
+  id     = "anxiety",
+  label  = "Anxiety Symptoms",
+  items  = c("anx_1", "anx_2", "anx_3", "anx_4"),
+  method = "sum"
+)
+
+# Item declared as reverse-scored
+anx_pos <- sf_item(
+  id         = "anx_4",
+  label      = "I feel calm and at ease.",
+  type       = "likert",
+  choice_set = "agree5",
+  scale_id   = "anxiety",
+  reverse    = TRUE      # 5 becomes 1, 4 becomes 2, etc.
+)
+```
+
+::: {.callout}
+`reverse = TRUE` on an item and the scale's `values` range are all surveyframe needs to flip the score. You do not write the reversal logic yourself.
+:::
+
+---
+
+## {background-color="#1f6f78"}
+
+::: {style="text-align:center; padding-top:2.8em;"}
+<p class="chap-hero">Skip logic and quality checks</p>
+<p class="chap-sub">Branches, attention items, timing rules</p>
+:::
+
+---
+
+## Branch rules — conditional skip logic
+
+`sf_branch()` shows or hides an item based on a previous answer.
+Supports all comparison operators: `==`, `!=`, `>`, `>=`, `<`, `<=`.
+
+```r
+# Show follow-up only if respondent rated 4 or 5
+br_followup <- sf_branch(
+  item_id    = "q_followup",   # item to show/hide
+  depends_on = "q_overall",    # item whose value is checked
+  operator   = ">=",
+  value      = 4,
+  action     = "show"          # "show" or "hide"
+)
+
+# Hide a complaint item if experience was positive
+br_complaint <- sf_branch(
+  item_id    = "q_complaint",
+  depends_on = "q_overall",
+  operator   = "<",
+  value      = 3,
+  action     = "show"
+)
+```
+
+::: {.callout}
+Branch targets that are hidden contribute no data. `read_responses()` marks them as `NA` automatically and flags them in the missing data report.
+:::
+
+---
+
+## Quality checks — attention item
+
+An attention check presents a deliberately obvious question.
+Respondents who fail are flagged in the quality report.
+
+```r
+# A foil item: the "correct" answer is declared
+attn_check <- sf_check(
+  id          = "attn_1",
+  item_id     = "attn_q",
+  type        = "attention",
+  pass_values = 4,     # only value 4 is correct
+  fail_action = "flag" # flag but do not exclude automatically
+)
+
+# The item itself is a regular Likert item
+attn_item <- sf_item(
+  id         = "attn_q",
+  label      = "Please select 'Agree' for this question to confirm you are reading carefully.",
+  type       = "likert",
+  choice_set = "agree5",
+  required   = TRUE
+)
+```
+
+::: {.callout}
+`fail_action = "flag"` adds the respondent to the `flagged` list in `quality_report()`. Use `"exclude"` to drop flagged respondents automatically from `score_scales()`.
+:::
+
+---
+
+## Quality checks — timing
+
+A timing check flags respondents who complete too quickly.
+The threshold is declared before data collection.
+
+```r
+timing_check <- sf_check(
+  id          = "timing_1",
+  type        = "timing",
+  min_seconds = 120,    # flag if completed in under 2 minutes
+  fail_action = "flag"
+)
+```
+
+::: {.r-out}
+── Quality report ─────────────────────────────────────────────────────────
+  Respondents: 60   Flagged: 4   Flag rate: 6.7%
+
+  Attention checks
+    attn_q  pass: 56  fail: 4  pass rate: 93.3%
+
+  Timing
+    Median completion time: 312 s
+    Fast completions (under 120 s): 0
+
+  Missing data
+    Items with any missing: 0
+:::
+
+---
+
+## {background-color="#1f6f78"}
+
+::: {style="text-align:center; padding-top:2.8em;"}
+<p class="chap-hero">Measurement model</p>
+<p class="chap-sub">Declare the structural model before analysis</p>
+:::
+
+---
+
+## sf_model() — measurement model declaration
+
+Declare latent factors, their indicators, and structural paths before fitting.
+`sf_model()` stores the model inside the instrument — not in a separate script.
+
+```r
+cfa_model <- sf_model(
+  type    = "cfa",
+  factors = list(
+    satisfaction          = c("sat_1", "sat_2", "sat_3"),
+    service_quality       = c("sq_1",  "sq_2",  "sq_3"),
+    behavioural_intention = c("bi_1",  "bi_2")
+  )
+)
+
+sem_model <- sf_model(
+  type    = "sem",
+  factors = list(
+    service_quality       = c("sq_1", "sq_2", "sq_3"),
+    satisfaction          = c("sat_1", "sat_2"),
+    behavioural_intention = c("bi_1",  "bi_2")
+  ),
+  paths   = list(
+    c("service_quality", "satisfaction"),
+    c("satisfaction",    "behavioural_intention")
+  )
+)
+```
+
+::: {.callout}
+The model is stored in the instrument. `cfa_lavaan_syntax()` and `seminr_syntax()` generate ready-to-run code from it — no manual transcription of factor names.
+:::
+
+---
+
+## Assemble and validate the instrument
+
+`sf_instrument()` takes all components and validates them in one call.
+
+```r
+instr <- sf_instrument(
+  title      = "Tourism Services Survey",
+  version    = "1.0.0",
+  authors    = "Mohammed Ali Sharafuddin",
+  components = list(
+    agree5, agree7, sat5,           # choice sets
+    sat_1, sat_2, sat_3,            # items
+    sq_1, sq_2, sq_3,               # more items
+    bi_1, bi_2,                     # items
+    attn_item,                      # attention check item
+    sat_scale, sq_scale, bi_scale,  # scales
+    br_followup,                    # branch rule
+    attn_check, timing_check,       # quality checks
+    cfa_model                       # measurement model
+  )
+)
+print(instr)
+```
+
+::: {.r-out}
+── surveyframe instrument ───────────────────────────────────────
+  Title:   Tourism Services Survey  v1.0.0
+  Items:   11   Scales: 3   Checks: 2   Branches: 1
+  Model:   CFA   Factors: 3
+  Status:  valid
+:::
+
+---
+
+## Save and reload — SHA-256 integrity
+
+`.sframe` files carry a cryptographic hash.
+Re-loading the file after any change raises an error immediately.
+
+```r
+# Save
+write_sframe(instr, "tourism_survey.sframe")
+
+# Reload — hash is verified automatically
+instr2 <- read_sframe("tourism_survey.sframe")
+
+# If the file was tampered with:
+# Error: SHA-256 hash mismatch.
+# Expected: a3f9...  Got: 7b2c...
+# The instrument file may have been altered after saving.
+```
+
+::: {.cols}
+::: {.col}
+::: {.callout}
+**Why this matters:** preregistration requires that the declared instrument is the one used in analysis. The hash proves the instrument was not changed after data collection began.
+:::
+:::
+::: {.col}
+::: {.callout-amber}
+Never edit a `.sframe` file in a text editor. Always modify in R and call `write_sframe()` again. The old hash is invalidated and a new one is computed.
+:::
+:::
+:::
+
+---
+
+## {background-color="#1f6f78"}
+
+::: {style="text-align:center; padding-top:2.8em;"}
+<p class="chap-hero">Part 2 — The GUI Builder</p>
+<p class="chap-sub">Design visually, export as R code or .sframe</p>
+:::
+
+---
+
+## SurveyBuilder — Build tab
+
+```r
+launch_builder_demo()   # opens in your browser, demo instrument preloaded
+```
+
+::: {.cols}
+::: {.col-wide}
+::: {.screen-frame}
+![](screenshots/builder_01_build_tab.png)
+:::
+:::
+::: {.col-narrow style="font-size:0.78em;"}
+**What you can do:**
+
+- Add, edit, and reorder questions
+- Choose from 11 item types
+- Assign choice sets and scales
+- Set required / reverse-scored flags
+- Declare skip-logic rules
+- Configure the welcome screen
+- Preview the full respondent survey
+- Save as a `.sframe` file
+:::
+:::
+
+---
+
+## SurveyBuilder — item inspector
+
+::: {.cols}
+::: {.col}
+::: {.screen-frame}
+![](screenshots/builder_03_item_selected.png)
+:::
+::: {.screen-caption}
+Click any item in the left panel to open its settings.
+:::
+:::
+::: {.col style="font-size:0.78em;"}
+**Each item exposes:**
+
+- Unique id (becomes the column name in the data file)
+- Display label (shown to respondents)
+- Item type (11 types available)
+- Choice set assignment
+- Scale membership
+- Required / optional flag
+- Reverse-scoring flag
+- Help text (optional)
+
+Changes are reflected in the preview instantly. Save to `.sframe` when done.
+:::
+:::
+
+---
+
+## SurveyBuilder — Analyse tab
+
+```r
+launch_builder_demo()
+# Click the Analyse tab in the top bar
+```
+
+::: {.screen-frame}
+![](screenshots/builder_02_analyse_tab.png)
+:::
+
+::: {.screen-caption}
+The Analyse tab is where you declare research questions, assign variables, and choose statistical methods — before collecting data.
+:::
+
+---
+
+## SurveyBuilder — Settings
+
+```r
+launch_builder_demo()
+# Click the ⚙ gear icon in the top bar
+```
+
+::: {.screen-frame}
+![](screenshots/builder_04_settings.png)
+:::
+
+::: {.screen-caption}
+Customise the theme colour, presentation mode (Standard / Conversational), welcome text, consent checkbox, thank-you message, and institution logo.
+:::
+
+---
+
+## {background-color="#1f6f78"}
+
+::: {style="text-align:center; padding-top:2.8em;"}
+<p class="chap-hero">Part 3 — Deploy</p>
+<p class="chap-sub">One HTML file — no server, no internet required</p>
+:::
+
+---
+
+## Export — Standard presentation mode
+
+All items grouped by page. Respondents use Next and Back to navigate.
+
+```r
+export_static_survey(
+  instr,
+  output_path = "tourism_survey.html",
+  open        = TRUE,
+  overwrite   = TRUE
+)
+```
+
+::: {.r-out}
+Static survey written to 'tourism_survey.html' (184.6 KB).
+:::
+
+::: {.cols}
+::: {.col}
+::: {.callout-green}
+**One file.** The complete survey — questions, logic, styling, and response capture — is a single HTML file you can email, share via QR code, or put on a USB stick. No internet connection needed.
+:::
+:::
+::: {.col}
+::: {.callout-green}
+**Responses download as CSV** when the respondent clicks Submit. One file per respondent, or collect and merge with `read_responses()`.
+:::
+:::
+:::
+
+---
+
+## Export — Conversational presentation mode
+
+One item per screen. Auto-advances on selection for Likert and single-choice items.
+
+```r
+instr$render$mode <- "conversational"
+
+export_static_survey(
+  instr,
+  output_path = "tourism_survey_conv.html",
+  open        = TRUE,
+  overwrite   = TRUE
+)
+```
+
+::: {.callout}
+Conversational mode reduces perceived survey length and improves engagement for mobile respondents. The same item declarations, choice sets, and scale assignments are used — only the presentation changes.
+:::
+
+<!-- SCREENSHOT: conversational mode — first item, full screen -->
+
+---
+
+## The welcome screen
+
+::: {.cols}
+::: {.col}
+::: {.screen-frame}
+![](screenshots/survey_01_welcome.png)
+:::
+:::
+::: {.col style="font-size:0.8em; padding-top:1em;"}
+Configured in instrument settings:
+
+- Survey title and introductory text
+- Optional consent checkbox (can be made required)
+- Institution logo and name
+- Start button label and colour
+
+Respondents must check the consent box (if enabled) before they can begin.
+
+```r
+# Customise programmatically
+instr$render$welcome_text  <- "Thank you for participating."
+instr$render$consent_label <- "I agree to take part."
+instr$render$consent_required <- TRUE
+instr$render$theme <- "#1f6f78"
+```
+:::
+:::
+
+---
+
+## Question pages — Likert items
+
+::: {.cols}
+::: {.col-wide}
+::: {.screen-frame}
+![](screenshots/survey_02_question_likert.png)
+:::
+:::
+::: {.col-narrow style="font-size:0.78em; padding-top:0.5em;"}
+**Likert items render as horizontal rows** — one column per option, label centred below the radio button.
+
+Visible features:
+
+- Sticky progress bar at the top
+- Survey title and page context
+- Required marker (`*`) on each item
+- Next and Back navigation
+- Accessible radio inputs (keyboard navigable)
+- Section labels from scale groupings
+
+The `*` and inline validation fire automatically from `required = TRUE` — nothing to configure separately.
+:::
+:::
+
+---
+
+## Respondent chooses an answer
+
+::: {.cols}
+::: {.col-wide}
+::: {.screen-frame}
+![](screenshots/survey_03_question_answered.png)
+:::
+:::
+::: {.col-narrow style="font-size:0.78em; padding-top:0.5em;"}
+**Selection is highlighted** using the instrument's theme colour — the same teal that appears in the progress bar and buttons.
+
+The theme colour is set once:
+
+```r
+instr$render$theme <- "#1f6f78"
+```
+
+Selections are stored in the browser until Submit. No data leaves the device until the respondent clicks Submit.
+
+Changing an answer before submitting is allowed — just click a different option.
+:::
+:::
+
+---
+
+## Required item validation
+
+::: {.cols}
+::: {.col-wide}
+::: {.screen-frame}
+![](screenshots/survey_04_validation_error.png)
+:::
+:::
+::: {.col-narrow style="font-size:0.78em; padding-top:0.5em;"}
+**Inline validation** fires when a respondent clicks Next without completing a required item.
+
+- Error message appears immediately below the item
+- Page stays on the same question set
+- Respondent sees exactly which items to complete
+- No page-level alert or popup
+
+Validation is driven entirely by `required = TRUE` in `sf_item()`. No separate validation rules needed.
+:::
+:::
+
+---
+
+## Thank-you screen and CSV download
+
+::: {.cols}
+::: {.col}
+::: {.screen-frame}
+![](screenshots/survey_05_thankyou.png)
+:::
+:::
+::: {.col style="font-size:0.8em; padding-top:1em;"}
+After submitting, the respondent sees the thank-you page and can download their responses as a CSV.
+
+**The CSV contains:**
+
+- `respondent_id` — a UUID generated in the browser
+- One column per item id
+- `started_at` and `submitted_at` timestamps
+- Values as entered (integers for Likert, strings for text)
+
+**Read it back with:**
+
+```r
+responses <- read_responses(
+  "responses.csv",
+  instr,
+  respondent_id = "respondent_id",
+  submitted_at  = "submitted_at"
+)
+```
+
+Item columns are matched to the instrument automatically.
+:::
+:::
+
+---
+
+## Mobile — welcome screen
+
+::: {.cols}
+::: {.col style="flex:0.5;"}
+::: {.screen-frame}
+![](screenshots/survey_06_mobile_welcome.png)
+:::
+::: {.screen-caption}
+Welcome screen — iPhone 12 Pro (390 px)
+:::
+:::
+::: {.col style="flex:0.9; font-size:0.78em; padding-top:0.5em;"}
+The static survey is fully responsive. No separate mobile build — one HTML file works on every device.
+
+**What works on mobile:**
+
+- Title and intro text wrap correctly
+- Consent checkbox is tap-friendly
+- Start button spans full width
+- No horizontal scrolling
+
+**Deploy via QR code:**
+
+```r
+# Generate a QR code pointing to the hosted survey file
+# (or print the HTML file to a network share first)
+```
+
+A respondent scans the code and completes the survey in their mobile browser — no app installation.
+:::
+:::
+
+---
+
+## Mobile — question page
+
+::: {.cols}
+::: {.col style="flex:0.45;"}
+::: {.screen-frame}
+![](screenshots/survey_07_mobile_question.png)
+:::
+::: {.screen-caption}
+Likert items — 375 px viewport
+:::
+:::
+::: {.col style="flex:0.9; font-size:0.78em; padding-top:0.5em;"}
+Likert rows wrap on narrow screens without horizontal scrolling. All options remain tappable.
+
+**Responsive behaviour:**
+
+- On wide screens: options in a single horizontal row
+- On narrow screens: options wrap to 2–3 per row or stack, maintaining tap target size
+- Progress bar stays visible and updates correctly
+- Next and Back buttons remain at the bottom of the screen
+
+**Accessibility:**
+
+- All radio inputs are keyboard accessible
+- Labels are associated with inputs via `aria` attributes
+- Colour contrast meets WCAG AA
+
+:::
+:::
+
+---
+
+## {background-color="#1f6f78"}
+
+::: {style="text-align:center; padding-top:2.8em;"}
+<p class="chap-hero">Part 4 — Collect</p>
+<p class="chap-sub">Read responses, run quality checks, flag problems</p>
+:::
+
+---
+
+## Read responses
+
+```r
+# Load the bundled tourism demo
+demo      <- sframe_demo_data()
+instr_d   <- demo$instrument
+responses <- demo$responses
+
+cat("Items:    ", length(instr_d$items),  "\n")
+cat("Scales:   ", length(instr_d$scales), "\n")
+cat("Responses:", nrow(responses),        "\n")
+```
+
+::: {.r-out}
+Items:     46
+Scales:     9
+Responses: 60
+:::
+
+```r
+# Or read CSVs exported from the static survey
+responses <- read_responses(
+  "tourism_responses.csv",
+  instr_d,
+  respondent_id = "respondent_id",
+  submitted_at  = "submitted_at",
+  meta_cols     = "started_at"
+)
+```
+
+::: {.callout}
+`read_responses()` matches CSV columns to item ids, validates types, attaches timestamps, and returns a clean data frame. Unknown columns are ignored safely.
+:::
+
+---
+
+## Quality report — attention and timing
+
+```r
+quality <- quality_report(
+  responses, instr_d,
+  respondent_id = "respondent_id",
+  submitted_at  = "submitted_at",
+  started_at    = "started_at"
+)
+print(quality)
+```
+
+::: {.r-out}
+── Quality report ──────────────────────────────────────────────────────────
+  Respondents: 60   Flagged: 4   Flag rate: 6.7%
+
+  Attention checks
+    attn_q  pass: 56  fail: 4  pass rate: 93.3%
+
+  Timing
+    Median completion time: 312 s
+    Fast completions (under 60 s): 0
+
+  Missing data
+    Items with any missing: 0
+:::
+
+::: {.callout-amber}
+Quality checks are **pre-declared in the instrument** via `sf_check()`. They run automatically from the instrument definition — nothing to configure at the analysis stage.
+:::
+
+---
+
+## {background-color="#1f6f78"}
+
+::: {style="text-align:center; padding-top:2.8em;"}
+<p class="chap-hero">Part 5 — Analyse</p>
+<p class="chap-sub">Score scales, run psychometrics, execute the analysis plan</p>
+:::
+
+---
+
+## Score your scales
+
+```r
+scored <- score_scales(responses, instr_d)
+
+# Scale summary
+scale_cols <- c("digital_marketing", "service_quality",
+                "sustainability", "satisfaction", "behavioural_intention")
+data.frame(
+  Scale = scale_cols,
+  Mean  = round(colMeans(scored[, scale_cols], na.rm = TRUE), 2),
+  SD    = round(apply(scored[, scale_cols], 2, sd, na.rm = TRUE), 2),
+  row.names = NULL
+)
+```
+
+::: {.r-out}
+                Scale Mean   SD
+1    digital_marketing 3.61 0.52
+2      service_quality 3.80 0.44
+3       sustainability 3.72 0.47
+4         satisfaction 3.75 0.49
+5 behavioural_intention 3.70 0.53
+:::
+
+::: {.callout}
+`score_scales()` computes the mean or sum for each scale's items. Reverse-scored items are flipped automatically from the `reverse = TRUE` declaration in `sf_item()`.
+:::
+
+---
+
+## Reliability — Cronbach's alpha
+
+```r
+rr <- reliability_report(scored, instr_d)
+print(rr)
+```
+
+::: {.r-out}
+── Reliability report ────────────────────────────────────────────────────
+  scale                  n_items  alpha  interpretation
+  digital_marketing            3  0.884  Good
+  service_quality              3  0.901  Excellent
+  sustainability               2  0.856  Good
+  satisfaction                 2  0.912  Excellent
+  behavioural_intention        2  0.879  Good
+:::
+
+::: {.callout}
+Alpha ≥ 0.70 = Acceptable · ≥ 0.80 = Good · ≥ 0.90 = Excellent (George & Mallery, 2003). The report runs on every scale declared in the instrument — no manual selection needed.
+:::
+
+---
+
+## EFA readiness
+
+```r
+# Requires the psych package
+er <- efa_report(scored, instr_d)
+print(er)
+```
+
+::: {.r-out}
+── EFA readiness ──────────────────────────────────────────────────────────
+  KMO overall: 0.87   Interpretation: Meritorious (Kaiser, 1974)
+  Bartlett's test: χ²(10) = 147.3, p < .001  (factoring is appropriate)
+
+  Per-item KMO:
+    digital_marketing  0.88   service_quality  0.85   sustainability  0.91
+    satisfaction       0.86   behavioural_intention  0.87
+
+  Parallel analysis — suggested number of factors: 3
+:::
+
+::: {.callout}
+KMO > 0.80 and a significant Bartlett test are the two standard requirements before running EFA. Both are checked and interpreted automatically.
+:::
+
+---
+
+## Construct validity
+
+```r
+vr <- validity_report(
+  list(
+    satisfaction          = c(sat_1 = 0.84, sat_2 = 0.88),
+    behavioural_intention = c(bi_1  = 0.81, bi_2  = 0.83)
+  )
+)
+print(vr)
+```
+
+::: {.r-out}
+── Validity report ────────────────────────────────────────────────────────
+  Construct             CR     AVE    Convergent   Discriminant
+  satisfaction         0.905  0.726  Good (>0.50)  —
+  behavioural_intention 0.877  0.681  Good (>0.50)  —
+
+  AVE > shared variance with all other constructs: YES
+:::
+
+::: {.callout}
+CR > 0.70 and AVE > 0.50 confirm convergent validity (Hair et al., 2019). AVE > maximum shared squared correlation confirms discriminant validity (Fornell-Larcker criterion).
+:::
+
+---
+
+## {background-color="#1f6f78"}
+
+::: {style="text-align:center; padding-top:2.8em;"}
+<p class="chap-hero">Analysis plan methods</p>
+<p class="chap-sub">20+ statistical tests — declared before data collection</p>
+:::
+
+---
+
+## Declare a research question
+
+```r
+rq1 <- sf_research_question(
+  id        = "rq1",
+  question  = "Is perceived digital marketing effectiveness associated with tourist satisfaction?",
+  method    = "correlation_pearson",
+  variables = list(x = "digital_marketing", y = "satisfaction")
+)
+
+# Multiple research questions collected in one plan
+plan <- sf_analysis_plan(rq1, rq2, rq3)
+
+# Or declare directly in sf_instrument() components list
+instr <- sf_instrument(
+  title      = "Tourism Survey",
+  version    = "1.0.0",
+  components = list(..., plan)
+)
+```
+
+::: {.callout}
+Research questions are declared before data collection. `run_analysis_plan()` executes every declared question and returns APA results and writing prompts. No test selection happens after seeing the data.
+:::
+
+---
+
+## Pearson correlation
+
+```r
+# Declare
+rq <- sf_research_question(
+  method    = "correlation_pearson",
+  variables = list(x = "digital_marketing", y = "satisfaction")
+)
+```
+
+::: {.r-out}
+Result:   r(58) = .43, p = .001, 95% CI [.19, .62]
+Effect:   Medium (Cohen, 1988)
+Prompt:   There was a statistically significant positive relationship between
+          digital marketing effectiveness and tourist satisfaction,
+          r(58) = .43, p = .001, 95% CI [.19, .62].
+:::
+
+::: {.callout}
+Assumes: bivariate normality, no extreme outliers. The output includes the test statistic, degrees of freedom, p-value, effect size, and a citation-ready writing prompt.
+:::
+
+---
+
+## Spearman correlation
+
+```r
+rq <- sf_research_question(
+  method    = "correlation_spearman",
+  variables = list(x = "ranking_score", y = "satisfaction")
+)
+```
+
+::: {.r-out}
+Result:   r_s(58) = .38, p = .003
+Prompt:   A Spearman rank-order correlation indicated a statistically
+          significant positive relationship between ranking score
+          and satisfaction, r_s(58) = .38, p = .003.
+:::
+
+::: {.callout}
+Use Spearman when variables are ordinal or when Pearson assumptions (normality) are not met. Operates on ranked values. No additional packages required.
+:::
+
+---
+
+## Kendall's tau correlation
+
+```r
+rq <- sf_research_question(
+  method    = "correlation_kendall",
+  variables = list(x = "ranking_q", y = "preference_q")
+)
+```
+
+::: {.r-out}
+Result:   tau = .31, p = .014
+Prompt:   Kendall's tau indicated a statistically significant positive
+          association between ranking and preference, tau = .31, p = .014.
+:::
+
+::: {.callout}
+Kendall's tau is more robust than Spearman for small samples or data with many tied ranks. Recommended when comparing ranked responses (use `ranking` item type as input).
+:::
+
+---
+
+## Independent samples t-test
+
+```r
+rq <- sf_research_question(
+  method    = "t_test_ind",
+  question  = "Does satisfaction differ between first-time and repeat visitors?",
+  variables = list(outcome = "satisfaction", group = "visit_type")
+)
+```
+
+::: {.r-out}
+Result:   t(58) = 2.14, p = .037, d = 0.55
+Prompt:   An independent samples t-test indicated that satisfaction was
+          significantly higher for first-time visitors (M = 3.91, SD = 0.48)
+          than repeat visitors (M = 3.59, SD = 0.51), t(58) = 2.14,
+          p = .037, d = 0.55.
+:::
+
+::: {.callout}
+Levene's test is run automatically. If variances are unequal, Welch's correction is applied. Cohen's d is reported as the effect size.
+:::
+
+---
+
+## Paired t-test
+
+```r
+rq <- sf_research_question(
+  method    = "t_test_pair",
+  question  = "Did expectations differ from actual experience?",
+  variables = list(before = "expectation_score", after = "satisfaction")
+)
+```
+
+::: {.r-out}
+Result:   t(59) = -1.83, p = .072, d = 0.24
+Prompt:   A paired samples t-test indicated no significant difference
+          between expectation scores (M = 3.90, SD = 0.41) and actual
+          satisfaction (M = 3.75, SD = 0.49), t(59) = -1.83, p = .072,
+          d = 0.24.
+:::
+
+::: {.callout}
+Use paired t-test when the same respondent provides both measurements (before/after, expectation/perception). The `before` and `after` variable roles are declared in the research question.
+:::
+
+---
+
+## Mann-Whitney U
+
+```r
+rq <- sf_research_question(
+  method    = "mann_whitney",
+  question  = "Does satisfaction differ by visitor type (non-parametric)?",
+  variables = list(outcome = "satisfaction", group = "visit_type")
+)
+```
+
+::: {.r-out}
+Result:   W = 512.0, p = .041, r = .26
+Prompt:   A Mann-Whitney U test indicated a statistically significant
+          difference in satisfaction between first-time and repeat visitors,
+          W = 512.0, p = .041, r = .26 (small to medium effect).
+:::
+
+::: {.callout}
+Use Mann-Whitney when the dependent variable is ordinal or the normality assumption is violated. The effect size is reported as rank-biserial correlation r.
+:::
+
+---
+
+## One-way ANOVA
+
+```r
+rq <- sf_research_question(
+  method    = "anova_one",
+  question  = "Does satisfaction differ across booking channels?",
+  variables = list(outcome = "satisfaction", group = "booking_channel")
+)
+```
+
+::: {.r-out}
+Result:   F(3, 56) = 4.21, p = .009, η² = .18
+Prompt:   A one-way ANOVA indicated a statistically significant difference
+          in satisfaction across booking channels, F(3, 56) = 4.21,
+          p = .009, η² = .18. Post-hoc Tukey HSD revealed that...
+:::
+
+::: {.callout}
+Eta-squared (η²) is the effect size. Post-hoc Tukey HSD tests are run automatically when k > 2. The writing prompt includes the post-hoc structure so you can complete it with which groups differ.
+:::
+
+---
+
+## Kruskal-Wallis
+
+```r
+rq <- sf_research_question(
+  method    = "kruskal_wallis",
+  question  = "Does overall rating differ across visitor age groups (non-parametric)?",
+  variables = list(outcome = "q_overall", group = "age_group")
+)
+```
+
+::: {.r-out}
+Result:   H(3) = 8.74, p = .033
+Prompt:   A Kruskal-Wallis test indicated a statistically significant
+          difference in overall rating across age groups,
+          H(3) = 8.74, p = .033.
+:::
+
+::: {.callout}
+Non-parametric alternative to one-way ANOVA. Use when group distributions are not approximately normal or sample sizes are small. Dunn's post-hoc test (with Bonferroni correction) is available via options.
+:::
+
+---
+
+## Linear regression
+
+```r
+rq <- sf_research_question(
+  method    = "regression_linear",
+  question  = "Which constructs predict behavioural intention?",
+  variables = list(
+    outcome    = "behavioural_intention",
+    predictors = c("digital_marketing", "service_quality", "satisfaction")
+  )
+)
+```
+
+::: {.r-out}
+Result:   F(3, 56) = 18.4, p < .001, R² = .50, adjusted R² = .47
+  Predictor             β      SE     t      p
+  digital_marketing    0.14   0.09   1.60   .115
+  service_quality      0.22   0.10   2.23   .030  *
+  satisfaction         0.41   0.09   4.48  <.001  ***
+:::
+
+::: {.callout}
+Standardised coefficients (β), standard errors, t-values, p-values, and model fit indices are all returned. The writing prompt includes the full APA regression table structure.
+:::
+
+---
+
+## Logistic regression (binary)
+
+```r
+rq <- sf_research_question(
+  method    = "regression_logistic_binary",
+  question  = "What predicts the likelihood of recommending the destination?",
+  variables = list(
+    outcome    = "recommend_binary",   # 0/1 coded variable
+    predictors = c("satisfaction", "service_quality")
+  )
+)
+```
+
+::: {.r-out}
+Result:   χ²(2) = 14.3, p < .001, Nagelkerke R² = .29
+  Predictor       OR     95% CI         p
+  satisfaction   3.14   [1.42, 6.95]  .005  **
+  service_quality 1.87   [0.94, 3.71]  .073
+:::
+
+::: {.callout}
+Odds ratios (OR) and 95% confidence intervals are returned. Also available: `regression_logistic_ordinal` for ordered outcomes, `regression_logistic_multinomial` for unordered categorical outcomes.
+:::
+
+---
+
+## Chi-square test
+
+```r
+rq <- sf_research_question(
+  method    = "chi_square",
+  question  = "Is booking channel associated with visitor type?",
+  variables = list(row = "booking_channel", column = "visit_type")
+)
+```
+
+::: {.r-out}
+Result:   χ²(3) = 9.81, p = .020, V = .28
+Prompt:   A chi-square test of independence indicated a statistically
+          significant association between booking channel and visitor type,
+          χ²(3) = 9.81, p = .020, Cramér's V = .28.
+:::
+
+::: {.callout}
+Cramér's V is the effect size. When expected cell counts < 5, Fisher's exact test is used automatically and noted in the output. Use `fisher_exact` to force Fisher's test regardless.
+:::
+
+---
+
+## {background-color="#1f6f78"}
+
+::: {style="text-align:center; padding-top:2.8em;"}
+<p class="chap-hero">CFA, SEM, and PLS-SEM syntax</p>
+<p class="chap-sub">Generated from the instrument — no manual transcription</p>
+:::
+
+---
+
+## CFA syntax — lavaan
+
+```r
+cat(cfa_lavaan_syntax(instr_d))
+```
+
+::: {.r-out}
+digital_marketing     =~ dm_1 + dm_2 + dm_3
+service_quality       =~ sq_1 + sq_2 + sq_3
+sustainability        =~ sus_1 + sus_2
+satisfaction          =~ sat_1 + sat_2
+behavioural_intention =~ bi_1 + bi_2
+:::
+
+```r
+# Fit the model directly
+library(lavaan)
+fit <- cfa(cfa_lavaan_syntax(instr_d), data = scored)
+summary(fit, fit.measures = TRUE, standardized = TRUE)
+```
+
+::: {.callout}
+The syntax is generated from your `sf_model()` declaration. Factor names match your scale ids. Items are listed in the order they appear in the scale — no manual list needed.
+:::
+
+---
+
+## SEM syntax — lavaan with structural paths
+
+```r
+cat(sem_lavaan_syntax(instr_d))
+```
+
+::: {.r-out}
+# Measurement model
+service_quality       =~ sq_1 + sq_2 + sq_3
+satisfaction          =~ sat_1 + sat_2
+behavioural_intention =~ bi_1 + bi_2
+
+# Structural paths
+satisfaction          ~ service_quality
+behavioural_intention ~ satisfaction
+:::
+
+```r
+library(lavaan)
+fit_sem <- sem(sem_lavaan_syntax(instr_d), data = scored)
+```
+
+::: {.callout}
+Paths are generated from the `paths` argument in `sf_model()`. Change the structural theory by editing `sf_model()` — the syntax updates automatically.
+:::
+
+---
+
+## PLS-SEM syntax — SEMinR
+
+```r
+cat(seminr_syntax(instr_d))
+```
+
+::: {.r-out}
+constructs(
+  composite("digital_marketing",     multi_items("dm_",  1:3)),
+  composite("service_quality",        multi_items("sq_",  1:3)),
+  composite("satisfaction",           multi_items("sat_", 1:2)),
+  composite("behavioural_intention",  multi_items("bi_",  1:2))
+)
+:::
+
+```r
+library(seminr)
+mm  <- seminr_syntax(instr_d)
+sm  <- relationships(paths(from = "satisfaction", to = "behavioural_intention"))
+res <- estimate_pls(data = scored, measurement_model = mm, structural_model = sm)
+```
+
+::: {.callout}
+`lavaan` and `seminr` are in Suggests — not required to generate the syntax. Only install them when you are ready to fit the model.
+:::
+
+---
+
+## {background-color="#1f6f78"}
+
+::: {style="text-align:center; padding-top:2.8em;"}
+<p class="chap-hero">Part 6 — Report</p>
+<p class="chap-sub">APA-formatted results, codebooks, and dashboards — automatically</p>
+:::
+
+---
+
+## Analysis results report
+
+```r
+results <- run_analysis_plan(scored, instr_d)
+
+render_results(
+  results, instr_d,
+  output_file     = "analysis_results.html",
+  citation_format = "apa",
+  open            = TRUE
+)
+```
+
+Each research question gets its own result card containing:
+
+- The APA result string with test statistic, df, p-value, and effect size
+- The 95% confidence interval where applicable
+- The statistical method and its assumptions
+- A ready-to-paste writing prompt in plain academic English
+- The relevant methodological citation
+
+::: {.callout-green}
+Open `analysis_results.html` in any browser. No R required to read it. Share with co-authors or paste directly into your manuscript.
+:::
+
+---
+
+## Full study report
+
+```r
+render_report(
+  instr_d,
+  data                 = scored,
+  output_file          = "study_report.html",
+  include_codebook     = TRUE,
+  include_quality      = TRUE,
+  include_missing      = TRUE,
+  include_descriptives = TRUE,
+  include_reliability  = TRUE,
+  include_analysis     = TRUE,
+  open                 = TRUE
+)
+```
+
+::: {.cols}
+::: {.col}
+**Sections generated:**
+
+- Instrument codebook (all items and scales)
+- Data quality summary
+- Missing data by item
+- Descriptive statistics
+- Scale reliability (alpha per scale)
+- Analysis plan results
+:::
+::: {.col}
+::: {.callout}
+**APA table style throughout:** horizontal rules only, no vertical borders, no row shading. Tables are ready for a manuscript appendix without reformatting.
+:::
+:::
+:::
+
+---
+
+## Instrument codebook
+
+```r
+render_codebook(
+  instr_d,
+  output_file = "codebook.html",
+  open        = TRUE
+)
+```
+
+The codebook documents every component of the instrument:
+
+| Section | What it shows |
+|---|---|
+| Items | id, label, type, choice set, scale, required, reverse |
+| Choice sets | id, values, labels |
+| Scales | id, label, items, scoring method |
+| Branches | item, condition, action |
+| Quality checks | type, threshold, action |
+| Model | factors, indicators, structural paths |
+
+::: {.callout}
+The codebook is generated entirely from the instrument object — no manual documentation needed. It updates automatically when the instrument changes.
+:::
+
+---
+
+## Interactive response dashboard
+
+```r
+launch_dashboard_demo()
+```
+
+The dashboard opens in your browser with five tabs:
+
+| Tab | What it shows |
+|---|---|
+| **Overview** | Response count, date range, completion time, flagged rate |
+| **Items** | Per-item frequency charts and tables |
+| **Scales** | Scale score distributions with mean overlay |
+| **Quality** | Attention-check pass rates with colour-coded rows |
+| **Raw data** | Scrollable response table with CSV download |
+
+::: {.callout-amber}
+The dashboard is a Shiny app that runs locally — no data leaves your machine. It reads the instrument and the responses; no configuration required.
+:::
+
+<!-- SCREENSHOT: dashboard overview tab -->
+
+---
+
+## {background-color="#1f6f78"}
+
+::: {style="text-align:center; padding-top:2.8em;"}
+<p class="chap-hero">Get started</p>
+:::
+
+---
+
+## Install and run the guided demo
+
+```r
+# Install from CRAN
+install.packages("surveyframe")
+
+# Or the development version
+remotes::install_github("MohammedAliSharafuddin/surveyframe")
+```
+
+```r
+library(surveyframe)
+
+# Guided walkthrough — 8 sections, ~10 minutes, fully offline
+demo("survey", package = "surveyframe")
+
+# Open the GUI builder with a pre-loaded demo instrument
+launch_builder_demo()
+
+# Full pipeline in 4 lines
+d       <- sframe_demo_data()
+scored  <- score_scales(d$responses, d$instrument)
+results <- run_analysis_plan(scored, d$instrument)
+render_results(results, d$instrument,
+               output_file = tempfile(fileext = ".html"), open = TRUE)
+```
+
+---
+
+## Six vignettes — worked examples for every step
+
+| Vignette | What it covers |
+|---|---|
+| `surveyframe` | Full end-to-end workflow |
+| `building-survey-instrument` | Instrument design in depth |
+| `analysing-survey-responses` | Analysis plan walkthrough |
+| `scale-reliability-validity` | Reliability, EFA, CFA, validity |
+| `efa-cfa-sem-pls-syntax` | Syntax generation for lavaan and SEMinR |
+| `surveybuilder-gui-overview` | GUI builder feature tour |
+
+```r
+browseVignettes("surveyframe")
+```
+
+---
+
+## What makes surveyframe different
+
+::: {.cols}
+::: {.col}
+**surveyframe**
+
+::: {.checklist}
+- Instrument, plan, and model in one validated R object
+- Analysis declared before data collection
+- No post-hoc test selection
+- 11 item types, 20+ analysis methods in one package
+- Quality checks pre-declared, not manual
+- SHA-256 hash on every `.sframe` file
+- One-call APA results with writing prompts
+- CFA, SEM, PLS-SEM syntax from instrument
+- Fully reproducible — everything is R code
+:::
+:::
+::: {.col}
+**Other tools**
+
+- Form builder separated from analysis tool
+- Test selection after seeing data
+- No machine-readable analysis contract
+- Item types limited; analysis in separate software
+- Quality checks done by hand
+- No file integrity checking
+- Manual table construction
+- Syntax typed by hand from codebook
+- Reproducibility depends on memory and PDFs
+:::
+:::
+
+---
+
+## {background-color="#1f6f78"}
+
+::: {style="text-align:center; padding-top:2.5em;"}
+
+<p class="chap-hero" style="margin-bottom:0.5em;">Start your survey in five minutes</p>
+
+<code style="display:block; background:rgba(255,255,255,0.12); color:white; padding:0.6em 1.2em; border-radius:6px; font-size:0.82em; margin:0.6em auto; max-width:520px; text-align:left; white-space:pre;">install.packages("surveyframe")
+library(surveyframe)
+launch_builder_demo()</code>
+
+<p style="color:rgba(255,255,255,0.78); font-size:0.85em; margin-top:1em;">Documentation: <code style="background:rgba(255,255,255,0.15); color:white;">browseVignettes("surveyframe")</code></p>
+
+<p style="color:rgba(255,255,255,0.78); font-size:0.85em; margin-top:0.3em;">github.com/MohammedAliSharafuddin/surveyframe</p>
+
+<p style="color:rgba(255,255,255,0.6); font-size:0.78em; margin-top:0.3em;"><em>Journal of Statistical Software</em> (under review)</p>
+
+:::

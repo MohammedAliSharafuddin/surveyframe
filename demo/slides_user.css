@@ -1,0 +1,192 @@
+/* surveyframe user demo slides */
+
+/* ── Brand tokens ─────────────────────────────────────────────────── */
+:root {
+  --teal:       #1f6f78;
+  --teal-light: #d1eaed;
+  --teal-dark:  #155962;
+  --amber:      #d97706;
+  --amber-light:#fef3c7;
+  --ink:        #0f172a;
+  --muted:      #475569;
+  --surface:    #f8fafc;
+  --border:     #e2e8f0;
+  --green:      #16a34a;
+  --red:        #dc2626;
+}
+
+/* ── Base ─────────────────────────────────────────────────────────── */
+.reveal {
+  font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+  font-size: 20px;
+  color: var(--ink);
+}
+.reveal h1 { font-size: 2.1em;  color: var(--teal); font-weight: 800; letter-spacing: -0.02em; }
+.reveal h2 { font-size: 1.35em; color: var(--teal); font-weight: 700; }
+.reveal h3 { font-size: 1.05em; color: var(--ink);  font-weight: 600; }
+.reveal p, .reveal li { line-height: 1.6; color: var(--muted); }
+.reveal strong { color: var(--ink); }
+
+/* ── Code ─────────────────────────────────────────────────────────── */
+.reveal pre {
+  border: none;
+  border-radius: 8px;
+  box-shadow: 0 2px 12px rgba(0,0,0,.08);
+  font-size: 0.72em;
+}
+.reveal pre code { line-height: 1.55; max-height: 320px; }
+.reveal code {
+  font-family: "Fira Code", "Cascadia Code", monospace;
+  font-size: 0.82em;
+  background: var(--teal-light);
+  color: var(--teal-dark);
+  padding: 0.1em 0.4em;
+  border-radius: 3px;
+}
+
+/* ── Chapter divider text ─────────────────────────────────────────── */
+.chap-hero {
+  font-size: 2.6em;
+  font-weight: 800;
+  color: #ffffff;
+  line-height: 1.1;
+  margin: 0 0 0.25em;
+  letter-spacing: -0.02em;
+}
+.chap-sub {
+  font-size: 1.15em;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.82);
+  margin: 0;
+}
+/* Teal slide — override revealjs default element colours */
+section[data-background-color="#1f6f78"] h1,
+section[data-background-color="#1f6f78"] h2,
+section[data-background-color="#1f6f78"] h3,
+section[data-background-color="#1f6f78"] p,
+section[data-background-color="#1f6f78"] li,
+section[data-background-color="#1f6f78"] code { color: rgba(255,255,255,.88) !important; }
+
+/* ── Step badges ──────────────────────────────────────────────────── */
+.step {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2em; height: 2em;
+  border-radius: 50%;
+  background: var(--teal);
+  color: white;
+  font-weight: 800;
+  font-size: 1em;
+  margin-right: 0.4em;
+  flex-shrink: 0;
+}
+
+/* ── Workflow diagram ─────────────────────────────────────────────── */
+.workflow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  margin: 1.2em 0;
+}
+.wf-step {
+  background: var(--teal);
+  color: white;
+  border-radius: 8px;
+  padding: 0.6em 1.1em;
+  font-weight: 700;
+  font-size: 0.8em;
+  text-align: center;
+  min-width: 100px;
+}
+.wf-step.active { background: var(--amber); }
+.wf-arrow {
+  color: var(--border);
+  font-size: 1.4em;
+  padding: 0 0.3em;
+  font-weight: 300;
+}
+
+/* ── Two-col layout ───────────────────────────────────────────────── */
+.cols { display: flex; gap: 1.8em; align-items: flex-start; }
+.col  { flex: 1; min-width: 0; }
+.col-wide  { flex: 1.6; }
+.col-narrow{ flex: 0.85; }
+
+/* ── Screenshot frames ────────────────────────────────────────────── */
+.screen-frame {
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 24px rgba(0,0,0,.18);
+  border: 1px solid var(--border);
+  line-height: 0;
+}
+.screen-frame img { width: 100%; display: block; }
+.screen-caption {
+  font-size: 0.65em;
+  color: var(--muted);
+  text-align: center;
+  margin-top: 0.5em;
+  font-style: italic;
+}
+
+/* ── Callout boxes ────────────────────────────────────────────────── */
+.callout {
+  border-left: 4px solid var(--teal);
+  background: var(--teal-light);
+  border-radius: 0 6px 6px 0;
+  padding: 0.7em 1em;
+  font-size: 0.82em;
+  color: var(--ink);
+  margin: 0.8em 0;
+}
+.callout-amber {
+  border-left-color: var(--amber);
+  background: var(--amber-light);
+}
+.callout-green {
+  border-left-color: var(--green);
+  background: #f0fdf4;
+}
+
+/* ── Output block ─────────────────────────────────────────────────── */
+.r-out {
+  background: #f1f5f9;
+  border-left: 4px solid var(--teal);
+  border-radius: 4px;
+  padding: 0.65em 1em;
+  font-family: "Fira Code", monospace;
+  font-size: 0.68em;
+  color: var(--ink);
+  white-space: pre;
+  overflow-x: auto;
+  line-height: 1.55;
+  margin-top: 0.5em;
+}
+
+/* ── Checklist ────────────────────────────────────────────────────── */
+.checklist { padding-left: 0; list-style: none; }
+.checklist li { padding-left: 1.6em; position: relative; margin-bottom: 0.4em; }
+.checklist li::before { content: "✓"; position: absolute; left: 0; color: var(--teal); font-weight: 800; }
+
+/* ── Feature grid ─────────────────────────────────────────────────── */
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.9em;
+  margin-top: 0.8em;
+}
+.feature-card {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.9em 1em;
+  font-size: 0.78em;
+}
+.feature-card .icon { font-size: 1.5em; margin-bottom: 0.3em; }
+.feature-card h4 { color: var(--teal); font-size: 0.95em; margin-bottom: 0.2em; }
+.feature-card p  { color: var(--muted); font-size: 0.9em; margin: 0; }
+
+/* ── Footer ───────────────────────────────────────────────────────── */
+.reveal .footer { color: var(--border); font-size: 0.6em; }

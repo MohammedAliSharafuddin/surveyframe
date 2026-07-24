@@ -1,0 +1,1140 @@
+---
+title: "surveyframe 0.3.2 — Developer Reference"
+subtitle: "Internal package walkthrough · all 10 layers · MAS co-review aid"
+author: "Mohammed Ali Sharafuddin"
+date: "2026-06-13"
+format:
+  revealjs:
+    theme: default
+    slide-number: true
+    progress: true
+    embed-resources: true
+    width: 1280
+    height: 720
+    margin: 0.08
+    code-line-numbers: false
+    highlight-style: github
+    transition: slide
+    background-transition: fade
+    footer: "surveyframe 0.3.2 · github.com/MohammedAliSharafuddin/surveyframe"
+    css: slides.css
+  beamer:
+    theme: Madrid
+    colortheme: seahorse
+    fonttheme: structurebold
+    aspectratio: 169
+    slide-level: 2
+execute:
+  echo: true
+  eval: false
+  warning: false
+---
+
+```{=html}
+<style>
+/* surveyframe brand palette */
+:root {
+  --teal:       #1f6f78;
+  --teal-light: #d1eaed;
+  --amber:      #d97706;
+  --amber-light:#fef3c7;
+  --ink:        #1e293b;
+  --muted:      #64748b;
+  --surface:    #f8fafc;
+  --border:     #e2e8f0;
+}
+
+.reveal { font-family: "Source Sans Pro", "Helvetica Neue", Arial, sans-serif; }
+.reveal h1, .reveal h2 { color: var(--teal); font-weight: 700; }
+.reveal h3 { color: var(--ink); font-weight: 600; }
+.reveal code { font-family: "Fira Code", "Cascadia Code", monospace; font-size: 0.85em; }
+.reveal .slide-number { color: var(--muted); }
+.reveal .footer { color: var(--muted); font-size: 0.7em; }
+
+/* chapter divider slides */
+.chapter-slide { background: var(--teal) !important; }
+.chapter-slide h1, .chapter-slide h2,
+.chapter-slide p { color: white !important; }
+
+/* screenshot placeholder */
+.screenshot {
+  border: 2px dashed var(--amber);
+  background: var(--amber-light);
+  border-radius: 6px;
+  padding: 1.2em 1.5em;
+  font-size: 0.78em;
+  color: var(--ink);
+  margin-top: 0.8em;
+}
+.screenshot strong { color: var(--amber); }
+
+/* feature badge */
+.badge {
+  display: inline-block;
+  background: var(--teal-light);
+  color: var(--teal);
+  border-radius: 4px;
+  padding: 0.15em 0.55em;
+  font-size: 0.72em;
+  font-weight: 600;
+  vertical-align: middle;
+  margin-left: 0.3em;
+}
+.badge-new { background: var(--amber-light); color: var(--amber); }
+
+/* two-column layout helper */
+.cols { display: flex; gap: 1.5em; align-items: flex-start; }
+.col  { flex: 1; }
+
+/* output block mimicking R console */
+.r-output {
+  background: #f1f5f9;
+  border-left: 4px solid var(--teal);
+  border-radius: 4px;
+  padding: 0.7em 1em;
+  font-family: "Fira Code", monospace;
+  font-size: 0.72em;
+  color: var(--ink);
+  white-space: pre;
+  overflow-x: auto;
+}
+
+/* checklist look */
+.checklist li { list-style: none; padding-left: 1.4em; position: relative; }
+.checklist li::before { content: "✓"; position: absolute; left: 0; color: var(--teal); font-weight: 700; }
+</style>
+```
+
+---
+
+## {background-color="#1f6f78"}
+
+::: {style="text-align:center; padding-top: 2em;"}
+
+# surveyframe
+
+### Survey Instrument Workflows for R
+
+**Version 0.3.2**
+
+Mohammed Ali Sharafuddin
+
+:::
+
+::: notes
+Open the demo. Introduce the package in one sentence: "surveyframe turns a survey instrument into a methodological contract that is declared before data collection and executed — not explored — afterwards."
+:::
+
+---
+
+## The traditional survey workflow
+
+::: {.cols}
+::: {.col}
+**How most surveys are run today**
+
+1. Design questions in Word or Google Forms
+2. Deploy to a platform
+3. Export a spreadsheet
+4. Analyse with whatever test seems right
+5. Write up the results
+:::
+::: {.col}
+**The problems this creates**
+
+- Analysis choices made after seeing the data
+- No machine-readable link between questions and constructs
+- Reproducibility depends on memory, not code
+- Quality checks are done manually — or skipped
+:::
+:::
+
+::: {.fragment}
+::: {style="margin-top:1em; padding: 0.8em 1.2em; background: var(--teal-light); border-radius:6px;"}
+**surveyframe replaces this with a proactive workflow:** the instrument is a typed R object that carries the analysis plan, the measurement model, and the quality rules inside it — declared before any data is collected.
+:::
+:::
+
+---
+
+## What surveyframe gives you
+
+::: {.checklist}
+- One object holds questions, scales, branches, quality checks, and the analysis plan
+- Design in code or in the GUI builder — both produce the same `.sframe` file
+- Deploy as a self-contained offline HTML survey or embed in any Shiny app
+- Read responses back and run the pre-declared plan with a single function call
+- Generate APA-formatted results and publication-ready HTML reports automatically
+- Integrity-checked serialisation — the instrument cannot be silently tampered with
+:::
+
+::: {.fragment}
+::: {style="margin-top:1em; padding:0.6em 1em; background:var(--amber-light); border-left: 4px solid var(--amber); border-radius:4px; font-size:0.82em;"}
+**Core principle:** analysis is the execution of a pre-declared plan, not a post-hoc search.
+:::
+:::
+
+---
+
+## Package architecture — 10 layers {.smaller}
+
+| Layer | Files | Purpose |
+|---|---|---|
+| 1 | `sf_choices`, `sf_item`, `sf_scale`, `sf_branch`, `sf_check`, `sf_component_methods` | Component constructors and S3 methods |
+| 2 | `sf_instrument`, `validate_sframe`, `read_write_sframe`, `conditions` | Instrument assembly, validation, serialisation |
+| 3 | `export_static_survey`, `render_survey`, `survey_module`, `builder`, `studio_builder`, `dashboard` | Survey delivery |
+| 4 | `read_responses`, `score_scales`, `quality_report`, `psychometrics`, `statistics_reports`, `analysis_plan`, `model_layer`, `reporting` | Data, analysis, reporting |
+| 5 | `demo_helpers`, `google_sheets`, `utils`, `surveyframe-package` | Demo data, integrations, utilities |
+| 6 | 6 vignettes | Worked examples |
+| 7 | `inst/` assets | HTML templates, Shiny apps, bundled data |
+| 8 | 6 test files | 407 automated tests |
+| 9 | `DESCRIPTION`, `NAMESPACE`, `man/` | Package metadata and 87 help pages |
+| 10 | `jss-paper/` | JSS manuscript and replication script |
+
+---
+
+## {background-color="#1f6f78"}
+
+::: {style="text-align:center; padding-top:2.5em;"}
+# Layer 1 — Component Constructors
+
+### The six building blocks of every instrument
+:::
+
+---
+
+## sf_choices() — define a choice set
+
+```r
+agree5 <- sf_choices(
+  id     = "agree5",
+  values = 1:5,
+  labels = c("Strongly disagree", "Disagree", "Neutral",
+             "Agree", "Strongly agree")
+)
+
+print(agree5)
+```
+
+::: {.r-output}
+── sf_choices: agree5 ──────────────────────────────────────────
+  value label
+1     1 Strongly disagree
+2     2 Disagree
+3     3 Neutral
+4     4 Agree
+5     5 Strongly agree
+allow_other: FALSE   randomise: FALSE
+:::
+
+::: notes
+Show in RStudio. Run the code live. Mention that summary() shows allow_other and randomise flags.
+:::
+
+---
+
+## sf_item() — define a question
+
+```r
+q1 <- sf_item(
+  id         = "q1",
+  label      = "The service met my expectations.",
+  type       = "likert",
+  choice_set = "agree5",
+  scale_id   = "sat",
+  required   = TRUE
+)
+
+print(q1)
+```
+
+::: {.r-output}
+── sf_item: q1 ─────────────────────────────────────────────────
+  id: q1   type: likert   required: TRUE
+  label: "The service met my expectations."
+  choice_set: agree5   scale_id: sat   reverse: FALSE
+:::
+
+::: notes
+Mention the 13 available item types: likert, single_choice, multiple_choice, matrix, numeric, text, long_text, date, slider, rating, ranking, section_break, text_block.
+:::
+
+---
+
+## sf_scale(), sf_branch(), sf_check()
+
+::: {.cols}
+::: {.col}
+```r
+# Declare a scale
+sat <- sf_scale(
+  id     = "sat",
+  label  = "Satisfaction",
+  items  = c("q1", "q2", "q3"),
+  method = "mean"
+)
+```
+
+```r
+# Branching rule
+br <- sf_branch(
+  item_id    = "q2",
+  depends_on = "q1",
+  operator   = "==",
+  value      = "yes",
+  action     = "show"
+)
+```
+:::
+::: {.col}
+```r
+# Attention check
+chk <- sf_check(
+  id          = "attn1",
+  item_id     = "attn_q",
+  type        = "attention",
+  pass_values = 4,
+  fail_action = "flag"
+)
+```
+
+::: {.r-output}
+── sf_check: attn1 ─────────────
+  id: attn1   type: attention
+  item_id: attn_q
+  pass_values: 4
+  fail_action: flag
+:::
+:::
+:::
+
+---
+
+## S3 methods for all component classes <span class="badge badge-new">New in 0.3.2</span>
+
+Every component class now has `print()`, `format()`, and `summary()`.
+
+```r
+methods(class = "sf_choices")
+methods(class = "sf_item")
+methods(class = "sf_scale")
+methods(class = "sf_branch")
+methods(class = "sf_check")
+methods(class = "sf_model")
+```
+
+::: {.r-output}
+[1] format.sf_choices   print.sf_choices   summary.sf_choices
+[1] format.sf_item      print.sf_item      summary.sf_item
+[1] format.sf_scale     print.sf_scale     summary.sf_scale
+[1] format.sf_branch    print.sf_branch    summary.sf_branch
+[1] format.sf_check     print.sf_check     summary.sf_check
+[1] format.sf_model     print.sf_model     summary.sf_model
+:::
+
+---
+
+## {background-color="#1f6f78"}
+
+::: {style="text-align:center; padding-top:2.5em;"}
+# Layer 2 — Instrument Assembly
+
+### Constructing, validating, and saving the instrument
+:::
+
+---
+
+## sf_instrument() — assemble the components
+
+```r
+instr <- sf_instrument(
+  title       = "MAS Review Test Survey",
+  version     = "1.0.0",
+  description = "Minimal instrument for the 0.3.2 review.",
+  authors     = "Mohammed Ali Sharafuddin",
+  components  = list(agree5, q1, q2, q3, sat, chk)
+)
+
+print(instr)
+```
+
+::: {.r-output}
+── surveyframe instrument ───────────────────────────────────────
+  Title:   MAS Review Test Survey
+  Version: 1.0.0
+  Items:   3   Scales: 1   Checks: 1   Branches: 0
+  Model:   none
+  Status:  valid
+:::
+
+::: notes
+Show that the components list accepts any mix of sf_choices, sf_item, sf_scale, sf_branch, sf_check, and sf_model objects in any order. sf_instrument() sorts them internally.
+:::
+
+---
+
+## validate_sframe() — integrity check
+
+```r
+v <- validate_sframe(instr)
+v$valid
+v$problems
+```
+
+::: {.r-output}
+[1] TRUE
+list()
+:::
+
+::: {.fragment}
+```r
+# Serialise to disk — integrity hash is embedded
+tmp <- tempfile(fileext = ".sframe")
+write_sframe(instr, tmp)
+
+# Read back — hash is verified automatically
+instr2 <- read_sframe(tmp)
+identical(instr$meta$title, instr2$meta$title)
+# [1] TRUE
+```
+:::
+
+::: notes
+Mention that the .sframe format is JSON with an openssl SHA-256 hash. If the file is tampered with, read_sframe() throws a clear error about hash or integrity.
+:::
+
+---
+
+## {background-color="#1f6f78"}
+
+::: {style="text-align:center; padding-top:2.5em;"}
+# Layer 3 — Survey Delivery
+
+### The SurveyBuilder GUI, static export, and Shiny embedding
+:::
+
+---
+
+## SurveyBuilder GUI — launch_builder_demo()
+
+```r
+launch_builder_demo()   # opens in the browser, demo instrument preloaded
+```
+
+::: {.screenshot}
+**SCREENSHOT** — Capture the full SurveyBuilder interface with the input-types demo loaded.
+Show: item list (left panel), item settings (right panel), top bar with Build / Analyse / Preview / Save.
+:::
+
+::: {.fragment}
+**What to demonstrate in the video:**
+
+- Click an item to inspect and edit its settings
+- Add a new Single choice question
+- Switch to Conversational mode in Settings > General
+- Click Preview to see the respondent-facing survey
+- Open the Analyse tab to show the three-panel Plan / Run / Report layout
+- Click Save `.sframe` to download
+:::
+
+---
+
+## SurveyBuilder — item type dropdown
+
+::: {.screenshot}
+**SCREENSHOT** — Capture the Add Item dropdown showing all 13 item types:
+Likert, Single choice, Multiple choice, Matrix, Numeric, Text, Long text, Date, Slider, Rating, Ranking, Section break, Text block.
+:::
+
+::: {.notes}
+Point out that these 13 types cover every common survey item format. All are rendered correctly in both Standard and Conversational mode.
+:::
+
+---
+
+## export_static_survey() — offline HTML survey
+
+```r
+out <- export_static_survey(
+  instr,
+  output_path = file.path(tempdir(), "my_survey.html"),
+  open        = TRUE,
+  overwrite   = TRUE
+)
+
+cat("Written to:", out, "\n")
+cat("Size:", round(file.size(out) / 1024, 1), "KB\n")
+```
+
+::: {.r-output}
+Static survey written to: /tmp/.../my_survey.html
+Size: 184.6 KB
+:::
+
+The exported file is fully self-contained. No server required. Share it by email, USB, or QR code. Responses are downloaded as a CSV on Submit.
+
+---
+
+## Static survey — welcome screen and question rendering
+
+::: {.screenshot}
+**SCREENSHOT** — Capture the welcome screen showing the survey title and Start button.
+:::
+
+::: {.screenshot}
+**SCREENSHOT** — Capture a Likert item rendered in horizontal-row layout (one column per option, label below each radio button).
+:::
+
+::: notes
+Change 5 of 0.3.2: single_choice items that are also attention checks now render in the same horizontal Likert row layout rather than as a vertical stacked list. Demonstrate this by scrolling to the attention check item.
+:::
+
+---
+
+## Static survey — validation and CSV download
+
+::: {.screenshot}
+**SCREENSHOT** — Capture the inline validation error that appears below a required item when Next is clicked without an answer.
+:::
+
+::: {.screenshot}
+**SCREENSHOT** — Capture the Thank You page and the CSV download confirmation.
+:::
+
+---
+
+## Mobile layout
+
+::: {.screenshot}
+**SCREENSHOT** — Chrome DevTools > Toggle device toolbar (iPhone 12 Pro, 390 px wide).
+Show a Likert item wrapping gracefully at narrow width. Show that buttons are large enough to tap.
+:::
+
+---
+
+## SurveyStudio — launch_studio_demo()
+
+```r
+launch_studio_demo()   # Shiny app, demo instrument preloaded
+```
+
+::: {.screenshot}
+**SCREENSHOT** — Capture the SurveyStudio interface showing the sidebar (Build / Analyse / Report), the demo items in the Build panel, and the logo and brand colours.
+:::
+
+---
+
+## Shiny module — embed in any app
+
+```r
+library(shiny)
+
+ui <- fluidPage(
+  titlePanel("Embedded survey"),
+  survey_module_ui("test_survey")
+)
+
+server <- function(input, output, session) {
+  resp <- survey_module_server("test_survey", instrument = instr)
+  observeEvent(resp(), {
+    showNotification(paste("Submitted:", length(resp()), "responses"))
+  })
+}
+
+shinyApp(ui, server)
+```
+
+::: notes
+This lets any Shiny developer embed a validated surveyframe instrument inside their own application with two function calls.
+:::
+
+---
+
+## {background-color="#1f6f78"}
+
+::: {style="text-align:center; padding-top:2.5em;"}
+# Layer 4 — Data, Analysis, and Reporting
+
+### From raw responses to publication-ready output
+:::
+
+---
+
+## read_responses() — load the CSV
+
+```r
+demo  <- sframe_demo_data()
+instr_d  <- demo$instrument
+resp     <- demo$responses
+
+cat("Items:",    length(instr_d$items),  "\n")
+cat("Scales:",   length(instr_d$scales), "\n")
+cat("Responses:", nrow(resp),            "\n")
+```
+
+::: {.r-output}
+Items:     46
+Scales:     9
+Responses: 60
+:::
+
+```r
+# Or read a CSV exported from the static survey
+responses <- read_responses(
+  "tourism_services_responses.csv",
+  instr,
+  respondent_id = "respondent_id",
+  submitted_at  = "submitted_at"
+)
+```
+
+---
+
+## quality_report() — flag low-quality responses
+
+```r
+quality <- quality_report(responses, instr_d)
+
+cat("Respondents:", quality$summary$n_respondents, "\n")
+cat("Flagged:",     quality$summary$n_flagged,     "\n")
+print(quality)
+```
+
+::: {.r-output}
+── Quality report ───────────────────────────────────────────────
+  Respondents: 60   Flagged: 4   Flag rate: 6.7%
+
+  Attention checks
+    attn_q  pass: 56  fail: 4  pass rate: 93.3%
+
+  Timing
+    Median completion: 312 s
+    Fast completions (< 60 s): 0
+
+  Straightlining: not checked
+:::
+
+::: notes
+Flags respondents who failed attention checks, completed too fast, or have excessive missing values. Used before run_analysis_plan() to filter the clean sample.
+:::
+
+---
+
+## score_scales() — compute construct scores
+
+```r
+scored <- score_scales(resp, instr_d)
+
+scale_cols <- c("DMRE", "DMAU", "DMEU", "DMPV",
+                "DSQA", "DSQT", "DSUQ", "TS", "BI")
+
+data.frame(
+  Scale = scale_cols,
+  Mean  = round(colMeans(scored[, scale_cols], na.rm = TRUE), 2),
+  SD    = round(apply(scored[, scale_cols], 2, sd, na.rm = TRUE), 2),
+  row.names = NULL
+)
+```
+
+::: {.r-output}
+  Scale Mean   SD
+1  DMRE 3.61 0.52
+2  DMAU 3.48 0.59
+3  DMEU 3.72 0.47
+4  DMPV 3.55 0.61
+5  DSQA 3.80 0.44
+6  DSQT 3.65 0.51
+7  DSUQ 3.58 0.55
+8    TS 3.75 0.49
+9    BI 3.70 0.53
+:::
+
+---
+
+## Psychometrics — reliability
+
+```r
+rr <- reliability_report(scored, instr_d, omega = FALSE)
+print(rr)
+```
+
+::: {.r-output}
+── Reliability report ───────────────────────────────────────────
+  scale  n_items  alpha  interpretation
+  DMRE         5  0.884  Good
+  DMAU         5  0.871  Good
+  DMEU         4  0.856  Good
+  DMPV         4  0.842  Good
+  DSQA         5  0.901  Excellent
+  DSQT         4  0.868  Good
+  DSUQ         4  0.855  Good
+  TS           5  0.912  Excellent
+  BI           4  0.879  Good
+:::
+
+::: notes
+Mention that omega = TRUE requires the psych package. The vignette explains when to prefer omega over alpha: when items within a scale differ in their factor loadings.
+:::
+
+---
+
+## Psychometrics — EFA readiness <span class="badge badge-new">New in 0.3.2 vignette</span>
+
+```r
+er <- efa_report(scored, instr_d)
+print(er)
+```
+
+::: {.r-output}
+── EFA readiness ────────────────────────────────────────────────
+  KMO overall: 0.87  (threshold: 0.60)
+  Bartlett's test: χ²(1035) = 2847.4, p < .001
+
+  Suggested factors (parallel analysis): 4
+  Suggested factors (VSS criterion):     3
+:::
+
+---
+
+## Psychometrics — construct validity <span class="badge badge-new">New in 0.3.2 vignette</span>
+
+```r
+loadings_list <- list(
+  DMRE = c(dm_1 = 0.78, dm_2 = 0.82, dm_3 = 0.75, dm_4 = 0.80, dm_5 = 0.77),
+  TS   = c(ts_1 = 0.84, ts_2 = 0.80, ts_3 = 0.88)
+)
+vr <- validity_report(loadings_list)
+print(vr$reliability)
+```
+
+::: {.r-output}
+── Construct validity ───────────────────────────────────────────
+  construct  n_items    CR   AVE  convergent
+  DMRE             5 0.903 0.650  Good (AVE > 0.50)
+  TS               3 0.908 0.710  Good (AVE > 0.50)
+
+  Fornell-Larcker criterion: AVE of each construct exceeds the
+  squared correlation with any other construct.
+:::
+
+---
+
+## The analysis plan — run_analysis_plan()
+
+```r
+results <- run_analysis_plan(scored, instr_d)
+length(results)
+
+r1 <- results[[1]]
+cat("RQ:     ", r1$research_question, "\n")
+cat("Test:   ", r1$test,              "\n")
+cat("APA:    ", r1$apa,               "\n")
+cat("Prompt: ", r1$prompt,            "\n")
+```
+
+::: {.r-output}
+[1] 9
+
+RQ:     Is there a significant relationship between digital marketing
+        and tourist satisfaction?
+Test:   Pearson correlation
+APA:    r(58) = .43, p = .001, 95% CI [.19, .62]
+Prompt: There was a statistically significant positive relationship
+        between digital marketing effectiveness and tourist
+        satisfaction, r(58) = .43, p = .001.
+:::
+
+---
+
+## CFA / SEM / PLS syntax generation
+
+```r
+# lavaan CFA syntax (lavaan in Suggests — no hard dependency)
+cat(cfa_lavaan_syntax(instr_d))
+```
+
+::: {.r-output}
+DMRE =~ dm_1 + dm_2 + dm_3 + dm_4 + dm_5
+DMAU =~ dm_6 + dm_7 + dm_8 + dm_9 + dm_10
+DSQA =~ dsq_1 + dsq_2 + dsq_3 + dsq_4 + dsq_5
+TS   =~ ts_1 + ts_2 + ts_3 + ts_4 + ts_5
+BI   =~ bi_1 + bi_2 + bi_3 + bi_4
+:::
+
+```r
+# SEMinR syntax
+cat(seminr_syntax(instr_d))
+```
+
+::: {.r-output}
+constructs(
+  composite("DMRE", multi_items("dm_", 1:5)),
+  composite("DMAU", multi_items("dm_", 6:10)),
+  ...
+)
+:::
+
+---
+
+## render_results() — analysis results report <span class="badge badge-new">New in 0.3.2</span>
+
+```r
+results_path <- render_results(
+  results,
+  instr_d,
+  output_file     = file.path(tempdir(), "results.html"),
+  citation_format = "apa"
+)
+
+cat("Path:", results_path, "\n")
+cat("Size:", round(file.size(results_path) / 1024, 1), "KB\n")
+```
+
+::: {.screenshot}
+**SCREENSHOT** — Open the results HTML in the browser. Capture one research question card showing the APA result string, the effect size badge, and the writing prompt paragraph.
+:::
+
+---
+
+## render_report() — full publication report
+
+```r
+report_path <- render_report(
+  instr_d,
+  data                 = scored,
+  output_file          = file.path(tempdir(), "full_report.html"),
+  include_codebook     = TRUE,
+  include_quality      = TRUE,
+  include_missing      = TRUE,
+  include_descriptives = TRUE,
+  include_reliability  = TRUE,
+  include_analysis     = TRUE
+)
+```
+
+::: {.screenshot}
+**SCREENSHOT** — Open the report HTML. Capture the codebook table section showing item ids, types, and scale assignments. Tables use APA style: horizontal rules only, no vertical borders, no row shading.
+:::
+
+---
+
+## launch_dashboard_demo() — response dashboard
+
+```r
+launch_dashboard_demo()
+```
+
+::: {.screenshot}
+**SCREENSHOT** — Capture the dashboard with all five tabs visible in the tab bar: Overview, Items, Scales, Quality, Raw data.
+:::
+
+::: {.screenshot}
+**SCREENSHOT** — Capture the Scales tab showing scale score histograms with the mean overlay line.
+:::
+
+::: notes
+Point out the Raw data tab's CSV download button. The dashboard is a fully self-contained Shiny app — no server required beyond a local R session.
+:::
+
+---
+
+## {background-color="#1f6f78"}
+
+::: {style="text-align:center; padding-top:2.5em;"}
+# Layer 6 — Vignettes
+
+### Six worked examples
+:::
+
+---
+
+## Six vignettes — complete worked examples
+
+| Vignette | Content |
+|---|---|
+| `surveyframe.Rmd` | Full end-to-end workflow from instrument design to report |
+| `building-survey-instrument.Rmd` | `sf_instrument()` in depth |
+| `analysing-survey-responses.Rmd` | Analysis plan walkthrough |
+| `scale-reliability-validity.Rmd` | Reliability, EFA, CFA, validity |
+| `efa-cfa-sem-pls-syntax.Rmd` | Syntax generation for lavaan and SEMinR |
+| `surveybuilder-gui-overview.Rmd` | GUI builder feature tour |
+
+```r
+# Render any vignette locally
+rmarkdown::render(
+  system.file("doc/surveyframe.html", package = "surveyframe")
+)
+
+# Or browse all vignettes
+browseVignettes("surveyframe")
+```
+
+---
+
+## Main vignette — 0.3.2 additions <span class="badge badge-new">Change 6</span>
+
+The main vignette now includes 5 new sections:
+
+::: {.cols}
+::: {.col}
+1. **EFA readiness** — KMO and Bartlett's test before factor analysis
+2. **Construct validity** — CR, AVE, and the Fornell-Larcker criterion
+3. **Assumption checks** — normality and homogeneity to guide test choice
+:::
+::: {.col}
+4. **Scale means as a labelled data frame** — Mean and SD columns, not a raw named vector
+5. **render_results() path and file size** — `file.size()` call after the render
+:::
+:::
+
+::: {.fragment}
+::: {.screenshot}
+**SCREENSHOT** — Open the knitted main vignette HTML. Capture the EFA readiness section showing the `efa_report()` output and the KMO threshold note.
+:::
+:::
+
+---
+
+## {background-color="#1f6f78"}
+
+::: {style="text-align:center; padding-top:2.5em;"}
+# Layer 7 — inst/ Assets
+
+### Bundled HTML templates, Shiny apps, and data
+:::
+
+---
+
+## inst/ assets — what ships with the package
+
+::: {.cols}
+::: {.col}
+**HTML interfaces**
+
+- `inst/static_survey/template.html` — exported survey template
+- `inst/builder/survey_builder.html` — SurveyBuilder GUI
+
+**Shiny apps**
+
+- `inst/shiny/app.R` — SurveyStudio
+- `inst/shiny/dashboard/app.R` — response dashboard
+:::
+::: {.col}
+**Bundled data**
+
+- `inst/extdata/tourism_services_demo.sframe`
+- `inst/extdata/tourism_services_responses.csv`
+- `inst/extdata/surveyframe_input_types_demo.sframe`
+- `inst/extdata/surveyframe_input_types_responses.csv`
+
+**Other**
+
+- `inst/CITATION` — citation metadata
+- `inst/templates/report.qmd` — Quarto report template
+:::
+:::
+
+---
+
+## {background-color="#1f6f78"}
+
+::: {style="text-align:center; padding-top:2.5em;"}
+# Layer 8 — Test Suite
+
+### 407 automated tests across 6 test files
+:::
+
+---
+
+## Test suite — 407 tests, 6 files
+
+```r
+devtools::test()
+```
+
+::: {.r-output}
+✔ | OK F W S | Context
+✔ | 89       | Core instrument construction and validation
+✔ | 52       | S3 print/format/summary for component classes
+✔ | 71       | 0.3.1 collection fixes regression
+✔ | 63       | Builder state and analysis integration
+✔ | 48       | All 13 input types round-trip
+✔ | 84       | Analysis plan and model layer
+
+══ Results ══════════════════════════════════════════════════════
+Duration: 34.2 s
+
+[ FAIL 0 | WARN 0 | SKIP 0 | PASS 407 ]
+:::
+
+| File | What it covers |
+|---|---|
+| `test-core.R` | Instrument construction, validation |
+| `test-component-methods.R` | S3 methods for all 6 classes (Change 2) |
+| `test-0.3.1-fixes.R` | Regression tests for 0.3.1 collection fixes |
+| `test-builder-analysis.R` | Builder state, analysis integration |
+| `test-input-types-demo.R` | All 13 input types round-trip |
+| `test-v03-analysis-models.R` | Analysis plan and model layer |
+
+---
+
+## {background-color="#1f6f78"}
+
+::: {style="text-align:center; padding-top:2.5em;"}
+# Layer 9 — Package Metadata
+
+### DESCRIPTION, NAMESPACE, and 87 help pages
+:::
+
+---
+
+## DESCRIPTION — dependencies and version
+
+```r
+desc <- read.dcf(system.file("DESCRIPTION", package = "surveyframe"))
+cat("Version:",  desc[, "Version"],  "\n")
+cat("Imports:",  desc[, "Imports"],  "\n")
+cat("Suggests:", desc[, "Suggests"], "\n")
+```
+
+::: {.r-output}
+Version:  0.3.2
+Imports:  jsonlite, rlang, openssl
+Suggests: lavaan, psych, shiny, googlesheets4, rmarkdown,
+          knitr, testthat (>= 3.0.0)
+:::
+
+::: {.fragment}
+**Change 3 of 0.3.2:** `lavaan` moved from Imports to Suggests.
+
+Before this change, installing surveyframe triggered a full lavaan install. lavaan is a large package with many compiled dependencies. The three hard imports now are only `jsonlite`, `rlang`, and `openssl`.
+:::
+
+---
+
+## Citation <span class="badge badge-new">Change 1</span>
+
+```r
+citation("surveyframe")
+```
+
+::: {.r-output}
+To cite surveyframe in publications use:
+
+  Sharafuddin, M. A. (2026). surveyframe: Survey Instrument
+  Workflows. R package version 0.3.2.
+  https://github.com/MohammedAliSharafuddin/surveyframe
+
+A BibTeX entry for LaTeX users is
+
+  @Manual{,
+    title  = {surveyframe: Survey Instrument Workflows},
+    author = {Mohammed Ali Sharafuddin},
+    year   = {2026},
+    note   = {R package version 0.3.2},
+    url    = {https://github.com/MohammedAliSharafuddin/surveyframe},
+  }
+:::
+
+::: notes
+Change 1: title no longer reads "for R" (redundant on CRAN) and the note field now reads version 0.3.2 rather than the old hard-coded 0.3.0.
+:::
+
+---
+
+## {background-color="#1f6f78"}
+
+::: {style="text-align:center; padding-top:2.5em;"}
+# Layer 10 — JSS Paper
+
+### replicate.R and the manuscript
+:::
+
+---
+
+## replicate.R — fully guarded <span class="badge badge-new">Change 4</span>
+
+`jss-paper/replicate.R` can now be sourced non-interactively for the journal's reproducibility check.
+
+**Change 4 of 0.3.2:** `export_static_survey()` and `render_results()` are wrapped in `if (interactive()) { }` so they do not open browser windows during automated checks.
+
+```r
+source(
+  "~/Documents/GitHub/surveyframe-dev/jss-paper/replicate.R",
+  echo = TRUE
+)
+```
+
+::: {.r-output}
+...
+Static survey written to: /tmp/.../replicate_survey.html (184.6 KB)
+Report written to: /tmp/.../replicate_results.html (62.3 KB)
+...
+R version 4.6.0 (2025-04-11)
+Platform: x86_64-pc-linux-gnu
+:::
+
+---
+
+## {background-color="#1f6f78"}
+
+::: {style="text-align:center; padding-top:2.5em;"}
+# Roadmap
+
+### What comes after 0.3.2
+:::
+
+---
+
+## Roadmap — 0.3.2 and beyond
+
+| Version | Focus | Target |
+|---|---|---|
+| **0.3.2** | JSS revision items, S3 methods, lavaan to Suggests | CRAN submission 2026 |
+| 0.3.3 | Real-world feedback from AIC-RSAM and ICSRI 2026 | July 2026 |
+| 0.3.4-0.3.9 | Visualisation patch arc (6 releases) | Aug-Dec 2026 |
+| 0.4 | Small-sample inference, RStudio add-in | Q1 2027 |
+| 0.5 | MCDM and DEMATEL in core | Q2 2027 |
+| 0.6 | Bridge to semScreenR | Q3 2027 |
+| 1.0 | Gate for public launch of Ethos and ASRDA textbook | 2028 |
+
+---
+
+## Get started
+
+```r
+# Install from CRAN (after 0.3.2 is accepted)
+install.packages("surveyframe")
+
+# Install the development version from GitHub
+remotes::install_github("MohammedAliSharafuddin/surveyframe")
+
+# Start immediately with the guided demo
+library(surveyframe)
+demo("survey", package = "surveyframe")
+
+# Or open the builder with a preloaded demo instrument
+launch_builder_demo()
+```
+
+::: {style="margin-top:1.2em;"}
+**Documentation:** `browseVignettes("surveyframe")`
+**Issues:** github.com/MohammedAliSharafuddin/surveyframe/issues
+**Paper:** *Journal of Statistical Software* — submission OJS 6454
+:::
+
+---
+
+## {background-color="#1f6f78"}
+
+::: {style="text-align:center; padding-top:3em;"}
+
+# Thank you
+
+**surveyframe 0.3.2**
+
+*Survey Instrument Workflows for R*
+
+`install.packages("surveyframe")`
+
+:::

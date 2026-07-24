@@ -1,0 +1,175 @@
+/* surveyframe 0.3.2 demo slides — companion stylesheet */
+
+:root {
+  --teal:       #1f6f78;
+  --teal-light: #d1eaed;
+  --amber:      #d97706;
+  --amber-light:#fef3c7;
+  --ink:        #1e293b;
+  --muted:      #64748b;
+  --surface:    #f8fafc;
+  --border:     #e2e8f0;
+}
+
+/* Base typography */
+.reveal {
+  font-family: "Source Sans Pro", "Helvetica Neue", Arial, sans-serif;
+  font-size: 28px;
+  color: var(--ink);
+}
+
+.reveal h1 { font-size: 1.9em; color: var(--teal); font-weight: 700; }
+.reveal h2 { font-size: 1.3em; color: var(--teal); font-weight: 700; }
+.reveal h3 { font-size: 1.05em; color: var(--ink); font-weight: 600; }
+
+.reveal p, .reveal li { line-height: 1.55; }
+
+/* Code blocks */
+.reveal code {
+  font-family: "Fira Code", "Cascadia Code", "Consolas", monospace;
+  font-size: 0.82em;
+  background: #f1f5f9;
+  padding: 0.1em 0.35em;
+  border-radius: 3px;
+}
+
+.reveal pre {
+  box-shadow: none;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: #f8fafc;
+}
+
+.reveal pre code {
+  background: transparent;
+  padding: 0;
+  font-size: 0.78em;
+  line-height: 1.5;
+  max-height: 340px;
+}
+
+/* Tables */
+.reveal table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 0.82em;
+}
+
+.reveal table th {
+  border-top: 2px solid var(--ink);
+  border-bottom: 1px solid var(--ink);
+  padding: 0.45em 0.7em;
+  text-align: left;
+  font-weight: 600;
+}
+
+.reveal table td {
+  padding: 0.4em 0.7em;
+  border: none;
+}
+
+.reveal table tbody tr:last-child td {
+  border-bottom: 1px solid var(--ink);
+}
+
+.reveal table tbody tr:hover td {
+  background: var(--teal-light);
+}
+
+/* Footer and slide number */
+.reveal .slide-number {
+  color: var(--muted);
+  font-size: 0.65em;
+  background: transparent;
+}
+
+.reveal .footer {
+  color: var(--muted);
+  font-size: 0.62em;
+}
+
+/* Progress bar */
+.reveal .progress span {
+  background: var(--teal);
+}
+
+/* Screenshot placeholder */
+.screenshot {
+  border: 2px dashed var(--amber);
+  background: var(--amber-light);
+  border-radius: 6px;
+  padding: 0.9em 1.2em;
+  font-size: 0.73em;
+  color: var(--ink);
+  margin-top: 0.7em;
+  line-height: 1.5;
+}
+
+.screenshot strong { color: var(--amber); font-weight: 700; }
+
+/* Inline badges */
+.badge {
+  display: inline-block;
+  background: var(--teal-light);
+  color: var(--teal);
+  border-radius: 4px;
+  padding: 0.12em 0.5em;
+  font-size: 0.62em;
+  font-weight: 600;
+  vertical-align: middle;
+  margin-left: 0.3em;
+  letter-spacing: 0.01em;
+}
+
+.badge-new {
+  background: var(--amber-light);
+  color: var(--amber);
+}
+
+/* Two-column helper */
+.cols {
+  display: flex;
+  gap: 1.4em;
+  align-items: flex-start;
+}
+
+.col { flex: 1; min-width: 0; }
+
+/* R output block */
+.r-output {
+  background: #f1f5f9;
+  border-left: 4px solid var(--teal);
+  border-radius: 4px;
+  padding: 0.65em 1em;
+  font-family: "Fira Code", "Cascadia Code", monospace;
+  font-size: 0.68em;
+  color: var(--ink);
+  white-space: pre;
+  overflow-x: auto;
+  margin-top: 0.5em;
+  line-height: 1.55;
+}
+
+/* Checklist */
+.checklist { padding-left: 0; }
+.checklist li {
+  list-style: none;
+  padding-left: 1.6em;
+  position: relative;
+  margin-bottom: 0.35em;
+}
+.checklist li::before {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  color: var(--teal);
+  font-weight: 700;
+}
+
+/* Chapter divider (background set per-slide via background-color attribute) */
+section[data-background-color="#1f6f78"] h1,
+section[data-background-color="#1f6f78"] h2,
+section[data-background-color="#1f6f78"] p,
+section[data-background-color="#1f6f78"] code {
+  color: white;
+}
