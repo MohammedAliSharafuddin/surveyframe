@@ -45,7 +45,9 @@ test_that("missing_data_report runs Little's MCAR test when naniar is present", 
   set.seed(13)
   d <- as.data.frame(replicate(4, rnorm(80)))
   names(d) <- paste0("v", 1:4)
-  d[sample(320, 30)] <- NA
+  m <- as.matrix(d)
+  m[sample(length(m), 30)] <- NA
+  d <- as.data.frame(m)
   mr <- missing_data_report(d)
   expect_true(mr$mcar$available)
   expect_true(is.numeric(mr$mcar$p_value))

@@ -9,7 +9,7 @@ sframe_plot_efa_scree(x, palette = c("web", "print"))
 \arguments{
 \item{x}{An \code{sframe_efa_report} object from \code{\link[=efa_report]{efa_report()}}.}
 
-\item{palette}{One of \code{"web"} or \code{"print"}. See \code{\link[=sframe_brand]{sframe_brand()}}.}
+\item{palette}{One of \code{"web"} or \code{"print"}. See \code{sframe_brand()}.}
 }
 \value{
 A ggplot2 object.

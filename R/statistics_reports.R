@@ -919,7 +919,7 @@ sframe_run_repeated_anova <- function(data, roles) {
       check.names = FALSE, stringsAsFactors = FALSE
     ),
     fit_summary = fit_summary,
-    apa = sprintf("F(%d, %d) = %.2f, p %s, partial η² = %.3f",
+    apa = sprintf("F(%d, %d) = %.2f, p %s, partial \u03B7\u00B2 = %.3f",
                   df1, df2, F_stat, sframe_p_string(p), partial_eta2),
     prompt = "Report the within-subject F, degrees of freedom, p value, and partial eta-squared."
   )
