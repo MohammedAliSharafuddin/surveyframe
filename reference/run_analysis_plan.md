@@ -80,6 +80,7 @@ responses <- read_responses(
   submitted_at = "submitted_at",
   meta_cols = "started_at"
 )
+# \donttest{
 results <- run_analysis_plan(responses, instr)
 print(results)
 #> Analysis Results: 34 research question(s)
@@ -220,4 +221,5 @@ print(results)
 #>   Test: mediation
 #>   APA:  Indirect effect = 0.365, 95% bootstrap CI [0.231, 0.529].
 #> 
+# }
 ```

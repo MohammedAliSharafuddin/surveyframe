@@ -83,9 +83,11 @@ responses <- read_responses(
   submitted_at = "submitted_at",
   meta_cols = "started_at"
 )
+# \donttest{
 results <- run_analysis_plan(responses, instr)
 out <- render_results(results, instr,
                       output_file = tempfile(fileext = ".html"))
 file.exists(out)
 #> [1] TRUE
+# }
 ```

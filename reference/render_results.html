@@ -137,11 +137,13 @@ report content only and are never written into the instrument.</p></dd>
 <span class="r-in"><span>  submitted_at <span class="op">=</span> <span class="st">"submitted_at"</span>,</span></span>
 <span class="r-in"><span>  meta_cols <span class="op">=</span> <span class="st">"started_at"</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="run_analysis_plan.html">run_analysis_plan</a></span><span class="op">(</span><span class="va">responses</span>, <span class="va">instr</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">out</span> <span class="op">&lt;-</span> <span class="fu">render_results</span><span class="op">(</span><span class="va">results</span>, <span class="va">instr</span>,</span></span>
 <span class="r-in"><span>                      output_file <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>fileext <span class="op">=</span> <span class="st">".html"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/files.html" class="external-link">file.exists</a></span><span class="op">(</span><span class="va">out</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] TRUE</span>
+<span class="r-in"><span><span class="co"># }</span></span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
