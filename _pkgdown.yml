@@ -173,11 +173,22 @@ reference:
       - sample_size_plan
       - run_analysis_plan
 
+  - title: "Confidence intervals"
+    desc: >
+      Base-R bootstrap and effect-size confidence interval helpers, reused
+      across the inferential runners.
+    contents:
+      - bootstrap_ci
+      - cohens_d_ci
+      - cramers_v_ci
+      - eta_sq_ci
+
   - title: "Report"
     desc: >
       Generate codebooks, scale appendices, and reproducible HTML reports.
     contents:
       - codebook_report
+      - sframe_codebook_items_display
       - render_report
       - render_results
       - model_report_template
@@ -187,6 +198,23 @@ reference:
       Opt-in ggplot2 charts for analysis results, and the package theme.
     contents:
       - theme_surveyframe
+      - plot.sframe_analysis_results
+      - sframe_plot_correlation_matrix
+      - sframe_plot_descriptives
+      - sframe_plot_efa_loadings
+      - sframe_plot_efa_scree
+      - sframe_plot_group_comparison
+      - sframe_plot_likert_matrix
+      - sframe_plot_likert_scale
+      - sframe_plot_missingness
+      - sframe_plot_paired_comparison
+      - sframe_plot_quality
+      - sframe_plot_regression_diagnostics
+      - sframe_plot_reliability
+      - sframe_plot_validity
+      - sframe_plot_variable_distribution
+      - sframe_draw_mosaic
+      - sframe_likert_scale_groups
 
   - title: "Print, format, and summary methods"
     desc: >
