@@ -15,7 +15,8 @@ render_results(
   output_file = NULL,
   output_path = NULL,
   citation_format = c("apa", "ama", "vancouver"),
-  title = NULL
+  title = NULL,
+  interpretations = NULL
 )
 ```
 
@@ -48,6 +49,15 @@ render_results(
 
   Character or NULL. Report title. Defaults to the instrument title with
   " – Results" appended.
+
+- interpretations:
+
+  Named list or NULL. Written interpretations keyed by analysis-plan
+  block id, added after the results are known. A block with an entry
+  shows that text in its Interpretation section in place of the
+  pre-declared prompt fallback. Blocks without an entry render exactly
+  as they do when this argument is NULL. Interpretations are report
+  content only and are never written into the instrument.
 
 ## Value
 

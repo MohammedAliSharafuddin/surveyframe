@@ -45,7 +45,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">surveyframe</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.4</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -84,12 +84,23 @@
 <style>
 body { color: #1a1a2e; }
 h1, h2, h3 { color: #1a1a2e; }
-a { color: #16B3B1; }
+a { color: #0e7c7a; }
 table { border-collapse: collapse; margin: 1em 0; }
 table caption { caption-side: top; font-style: italic; color: #444; padding-bottom: .3em; }
 th { border-top: 2px solid #1a1a2e; border-bottom: 1px solid #1a1a2e; padding: 6px 12px; }
 td { padding: 5px 12px; border: none; }
 tbody tr:last-child td { border-bottom: 2px solid #1a1a2e; }
+/* WCAG 2.2 AA pass: darker link and syntax-token colours (at least
+   4.5:1 on the #f7f7f7 code background), wrapped code lines instead of a
+   keyboard-inaccessible scroll region, empty per-line anchors removed from
+   the accessibility tree, and 24px minimum TOC link targets. */
+code span.at { color: #576419; }
+code span.dv, code span.fl, code span.bn { color: #276245; }
+code span.co { color: #396a80; }
+pre, pre code { white-space: pre-wrap; word-break: break-word; }
+div.sourceCode { overflow: visible; }
+pre.sourceCode a:empty { display: none; }
+#TOC a { display: inline-block; min-height: 24px; }
 </style>
 <p>The analysis in surveyframe is driven by the plan stored in the
 instrument. Once responses are imported, scored, and checked,
@@ -379,7 +390,7 @@ the plan runs.</p>
 <span>  <span class="fu"><a href="https://rdrr.io/r/graphics/hist.html" class="external-link">hist</a></span><span class="op">(</span><span class="va">v</span>, col <span class="op">=</span> <span class="st">"#16B3B1"</span>, border <span class="op">=</span> <span class="st">"white"</span>, main <span class="op">=</span> <span class="va">s</span>,</span>
 <span>       xlab <span class="op">=</span> <span class="st">"Score"</span>, ylab <span class="op">=</span> <span class="st">""</span><span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
-<p><img src="analysing-survey-responses_files/figure-html/score-distributions-1.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"></p>
+<p><img src="analysing-survey-responses_files/figure-html/score-distributions-1.png" class="r-plt" alt="Histograms of the scored scale distributions, one panel per scale" width="672" style="display: block; margin: auto auto auto 0;"></p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span><span class="va">op</span><span class="op">)</span></span></code></pre></div>
 </div>
@@ -551,11 +562,11 @@ variables that fill each role. A correlation expects <code>x</code> and
 <span><span class="fu">results_table</span><span class="op">(</span><span class="va">results</span><span class="op">)</span></span></code></pre></div>
 <table class="table">
 <colgroup>
-<col width="3%">
-<col width="51%">
-<col width="6%">
-<col width="31%">
-<col width="8%">
+<col width="2%">
+<col width="46%">
+<col width="5%">
+<col width="37%">
+<col width="7%">
 </colgroup>
 <thead><tr class="header">
 <th align="left">RQ</th>
@@ -570,7 +581,7 @@ variables that fill each role. A correlation expects <code>x</code> and
 <td align="left">Is digital marketing perception associated with
 satisfaction?</td>
 <td align="left">pearson</td>
-<td align="right">r(118) = 0.54, p &lt; .001</td>
+<td align="right">r(118) = 0.54 [0.40, 0.65], p &lt; .001</td>
 <td align="left">large</td>
 </tr>
 <tr class="even">
@@ -586,7 +597,8 @@ satisfaction?</td>
 <td align="left">Do first-time and repeat visitors differ in behavioural
 intention?</td>
 <td align="left"></td>
-<td align="right">U = 1576, z = -0.98, p = 0.327, r = 0.09</td>
+<td align="right">U = 1576, z = -0.98, p = 0.327, r = 0.09 [0.01,
+0.27]</td>
 <td align="left">negligible</td>
 </tr>
 </tbody>
@@ -599,7 +611,7 @@ and <code>$apa</code> elements.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">results_plots</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/run_analysis_plan.html">run_analysis_plan</a></span><span class="op">(</span><span class="va">responses</span>, <span class="va">instr</span>, plots <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="va">results_plots</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">plot</span></span></code></pre></div>
-<p><img src="analysing-survey-responses_files/figure-html/run-plots-1.png" class="r-plt" alt="" width="700"></p>
+<p><img src="analysing-survey-responses_files/figure-html/run-plots-1.png" class="r-plt" alt="Chart attached to the first analysis-plan result by run_analysis_plan with plots enabled" width="700"></p>
 </div>
 <div class="section level2">
 <h2 id="read-a-single-result">Read a single result<a class="anchor" aria-label="anchor" href="#read-a-single-result"></a>
@@ -611,11 +623,11 @@ writing prompt, and the references that support the technique.</p>
 <code class="sourceCode R"><span><span class="va">rq1</span> <span class="op">&lt;-</span> <span class="va">results</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span></span>
 <span></span>
 <span><span class="va">rq1</span><span class="op">$</span><span class="va">apa</span></span>
-<span><span class="co">#&gt; [1] "r(118) = 0.54, p &lt; .001"</span></span>
+<span><span class="co">#&gt; [1] "r(118) = 0.54 [0.40, 0.65], p &lt; .001"</span></span>
 <span><span class="va">rq1</span><span class="op">$</span><span class="va">effect_label</span></span>
 <span><span class="co">#&gt; [1] "large"</span></span>
 <span><span class="va">rq1</span><span class="op">$</span><span class="va">prompt</span></span>
-<span><span class="co">#&gt; [1] "There was a positive, large significant correlation between digital_marketing and satisfaction, r(118) = 0.54, p &lt; .001. Explain what this means for your research question."</span></span>
+<span><span class="co">#&gt; [1] "There was a positive, large significant correlation between digital_marketing and satisfaction, r(118) = 0.54 [0.40, 0.65], p &lt; .001. Explain what this means for your research question."</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/unlist.html" class="external-link">unlist</a></span><span class="op">(</span><span class="va">rq1</span><span class="op">$</span><span class="va">citations</span><span class="op">)</span></span>
 <span><span class="co">#&gt;                                                                                                                                                         field_2018 </span></span>
 <span><span class="co">#&gt;                                                                            "Field, A. (2018). *Discovering statistics using IBM SPSS statistics* (5th ed.). SAGE." </span></span>
@@ -624,7 +636,7 @@ writing prompt, and the references that support the technique.</p>
 <span><span class="co">#&gt;                                                                                                                                                             r_core </span></span>
 <span><span class="co">#&gt;                                          "R Core Team. (2026). *R: A language and environment for statistical computing*. R Foundation for Statistical Computing." </span></span>
 <span><span class="co">#&gt;                                                                                                                                                        surveyframe </span></span>
-<span><span class="co">#&gt; "Sharafuddin, M. A. (2026). *surveyframe: Survey Instrument Workflows* (Version 0.3.3) [Computer software]. https://github.com/MohammedAliSharafuddin/surveyframe"</span></span></code></pre></div>
+<span><span class="co">#&gt; "Sharafuddin, M. A. (2026). *surveyframe: Survey Instrument Workflows* (Version 0.3.4) [Computer software]. https://github.com/MohammedAliSharafuddin/surveyframe"</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="render-the-results-report">Render the results report<a class="anchor" aria-label="anchor" href="#render-the-results-report"></a>

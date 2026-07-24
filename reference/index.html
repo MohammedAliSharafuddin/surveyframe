@@ -24,7 +24,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">surveyframe</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.4</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -453,6 +453,43 @@
         </dt>
         <dd>Run a pre-planned analysis from an instrument's analysis plan</dd>
       </dl></div><div class="section level2">
+      <h2 id="confidence-intervals">Confidence intervals<a class="anchor" aria-label="anchor" href="#confidence-intervals"></a></h2>
+
+      <div class="section-desc"><p>Base-R bootstrap and effect-size confidence interval helpers, reused across the inferential runners.</p></div>
+
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="bootstrap_ci.html">bootstrap_ci()</a></code>
+
+        </dt>
+        <dd>Percentile bootstrap confidence interval for a statistic</dd>
+
+        <dt>
+
+          <code><a href="cohens_d_ci.html">cohens_d_ci()</a></code>
+
+        </dt>
+        <dd>Bootstrap confidence interval for Cohen's d</dd>
+
+        <dt>
+
+          <code><a href="cramers_v_ci.html">cramers_v_ci()</a></code>
+
+        </dt>
+        <dd>Bootstrap confidence interval for Cramer's V</dd>
+
+        <dt>
+
+          <code><a href="eta_sq_ci.html">eta_sq_ci()</a></code>
+
+        </dt>
+        <dd>Bootstrap confidence interval for eta squared</dd>
+      </dl></div><div class="section level2">
       <h2 id="report">Report<a class="anchor" aria-label="anchor" href="#report"></a></h2>
 
       <div class="section-desc"><p>Generate codebooks, scale appendices, and reproducible HTML reports.</p></div>
@@ -468,6 +505,13 @@
 
         </dt>
         <dd>Generate a survey codebook from an instrument object</dd>
+
+        <dt>
+
+          <code><a href="sframe_codebook_items_display.html">sframe_codebook_items_display()</a></code>
+
+        </dt>
+        <dd>Enrich a codebook's items table for display</dd>
 
         <dt>
 
@@ -505,6 +549,125 @@
 
         </dt>
         <dd>surveyframe brand theme for ggplot2</dd>
+
+        <dt>
+
+          <code><a href="plot.sframe_analysis_results.html">plot(<i>&lt;sframe_analysis_results&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Plot analysis-plan results</dd>
+
+        <dt>
+
+          <code><a href="sframe_plot_correlation_matrix.html">sframe_plot_correlation_matrix()</a></code>
+
+        </dt>
+        <dd>Correlation matrix heatmap</dd>
+
+        <dt>
+
+          <code><a href="sframe_plot_descriptives.html">sframe_plot_descriptives()</a></code>
+
+        </dt>
+        <dd>Distribution shape by variable, standardised</dd>
+
+        <dt>
+
+          <code><a href="sframe_plot_efa_loadings.html">sframe_plot_efa_loadings()</a></code>
+
+        </dt>
+        <dd>Loadings heatmap from a fitted EFA solution</dd>
+
+        <dt>
+
+          <code><a href="sframe_plot_efa_scree.html">sframe_plot_efa_scree()</a></code>
+
+        </dt>
+        <dd>Scree plot from an EFA readiness report</dd>
+
+        <dt>
+
+          <code><a href="sframe_plot_group_comparison.html">sframe_plot_group_comparison()</a></code>
+
+        </dt>
+        <dd>Group-comparison boxplot</dd>
+
+        <dt>
+
+          <code><a href="sframe_plot_likert_matrix.html">sframe_plot_likert_matrix()</a></code>
+
+        </dt>
+        <dd>Grouped diverging chart for a Likert matrix question</dd>
+
+        <dt>
+
+          <code><a href="sframe_plot_likert_scale.html">sframe_plot_likert_scale()</a></code>
+
+        </dt>
+        <dd>Grouped diverging chart for a scale's Likert items</dd>
+
+        <dt>
+
+          <code><a href="sframe_plot_missingness.html">sframe_plot_missingness()</a></code>
+
+        </dt>
+        <dd>Missing-data report plot: missingness rate by item</dd>
+
+        <dt>
+
+          <code><a href="sframe_plot_paired_comparison.html">sframe_plot_paired_comparison()</a></code>
+
+        </dt>
+        <dd>Paired-comparison slope plot</dd>
+
+        <dt>
+
+          <code><a href="sframe_plot_quality.html">sframe_plot_quality()</a></code>
+
+        </dt>
+        <dd>Quality report plot: straight-lining flag rate by scale</dd>
+
+        <dt>
+
+          <code><a href="sframe_plot_regression_diagnostics.html">sframe_plot_regression_diagnostics()</a></code>
+
+        </dt>
+        <dd>Regression diagnostic plots for a regression_linear result</dd>
+
+        <dt>
+
+          <code><a href="sframe_plot_reliability.html">sframe_plot_reliability()</a></code>
+
+        </dt>
+        <dd>Reliability plot: alpha and omega by scale</dd>
+
+        <dt>
+
+          <code><a href="sframe_plot_validity.html">sframe_plot_validity()</a></code>
+
+        </dt>
+        <dd>Validity report plot: composite reliability and AVE by construct</dd>
+
+        <dt>
+
+          <code><a href="sframe_plot_variable_distribution.html">sframe_plot_variable_distribution()</a></code>
+
+        </dt>
+        <dd>Raw-variable distribution panels: histogram, boxplot, and Q-Q</dd>
+
+        <dt>
+
+          <code><a href="sframe_draw_mosaic.html">sframe_draw_mosaic()</a></code>
+
+        </dt>
+        <dd>Mosaic plot for a two-way categorical result</dd>
+
+        <dt>
+
+          <code><a href="sframe_likert_scale_groups.html">sframe_likert_scale_groups()</a></code>
+
+        </dt>
+        <dd>Group a scale's Likert items for a combined diverging chart</dd>
       </dl></div><div class="section level2">
       <h2 id="print-format-and-summary-methods">Print, format, and summary methods<a class="anchor" aria-label="anchor" href="#print-format-and-summary-methods"></a></h2>
 

@@ -15,14 +15,16 @@ render_report(
   data = NULL,
   output_file = NULL,
   output_path = NULL,
-  format = c("html"),
+  format = c("html", "pdf"),
   include_quality = TRUE,
   include_reliability = TRUE,
   include_codebook = TRUE,
   include_missing = TRUE,
   include_descriptives = TRUE,
   include_analysis = TRUE,
-  include_models = TRUE
+  include_models = TRUE,
+  plot_palette = c("web", "print"),
+  interpretations = NULL
 )
 ```
 
@@ -49,7 +51,11 @@ render_report(
 
 - format:
 
-  Character. Output format. Currently `"html"`.
+  Character. Output format: `"html"` (default) or `"pdf"`. PDF output
+  renders the HTML report and prints it through
+  [`pagedown::chrome_print()`](https://rdrr.io/pkg/pagedown/man/chrome_print.html),
+  which requires the pagedown package (in Suggests) and a local Chrome
+  or Chromium installation. The HTML path is unchanged.
 
 - include_quality:
 
@@ -85,6 +91,23 @@ render_report(
 
   Logical. Whether to include saved model JSON and generated syntax
   blocks. Defaults to `TRUE`.
+
+- plot_palette:
+
+  One of `"web"` (brand colours, for on-screen reading) or `"print"`
+  (black, grey, and white, for a journal-ready or print-friendly
+  report). Applied to every chart the report embeds. See
+  `sframe_brand()`.
+
+- interpretations:
+
+  Named list or NULL. Written interpretations keyed by analysis-plan
+  block id, added after the results are known. When a block has an
+  entry, its report section shows the pre-declared decision rule under a
+  "Planned decision rule" label followed by the written text under an
+  "Interpretation" label. Blocks without an entry render exactly as they
+  do when this argument is NULL. Interpretations are report content only
+  and are never written into the instrument.
 
 ## Value
 

@@ -425,7 +425,7 @@ html_path <- export_static_survey(
   output_path = file.path(tempdir(), "tourism_services_survey.html"),
   open        = FALSE
 )
-#> Static survey written to '/tmp/RtmpFVvRAK/tourism_services_survey.html' (65.3
+#> Static survey written to '/tmp/Rtmpw4T0Yc/tourism_services_survey.html' (69.6
 #> KB).
 file.exists(html_path)
 #> [1] TRUE
@@ -478,7 +478,7 @@ script_path <- export_google_sheet(
   sheet_url  = "https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID",
   output_dir = tempdir()
 )
-#> Apps Script written to: /tmp/RtmpFVvRAK/surveyframe_collector.gs
+#> Apps Script written to: /tmp/Rtmpw4T0Yc/surveyframe_collector.gs
 #> Follow the setup instructions inside the file to deploy it.
 file.exists(script_path)
 #> [1] TRUE
@@ -777,7 +777,8 @@ for (s in scale_cols) {
 }
 ```
 
-![](surveyframe_files/figure-html/score-distributions-1.png)
+![Histograms of the scored scale distributions, one panel per
+scale](surveyframe_files/figure-html/score-distributions-1.png)
 
 ``` r
 
@@ -995,10 +996,10 @@ results_table(results)
 
 | RQ | Research question | Method | Result (APA) | Effect |
 |:---|:---|:---|---:|:---|
-| RQ1 | Are digital marketing perceptions associated with tourist satisfaction? | pearson | r(58) = 0.19, p = 0.153 | small |
-| RQ2 | Is service quality associated with tourist satisfaction? | pearson | r(58) = -0.04, p = 0.778 | negligible |
+| RQ1 | Are digital marketing perceptions associated with tourist satisfaction? | pearson | r(58) = 0.19 \[-0.07, 0.42\], p = 0.153 | small |
+| RQ2 | Is service quality associated with tourist satisfaction? | pearson | r(58) = -0.04 \[-0.29, 0.22\], p = 0.778 | negligible |
 | RQ3 | Do service quality and sustainability quality predict satisfaction? |  | R² = 0.210, F(3, 56) = 4.97, p = 0.004 |  |
-| RQ4 | Do first-time and repeat visitors differ in satisfaction? |  | U = 744, z = -4.62, p \< .001, r = 0.60 | large |
+| RQ4 | Do first-time and repeat visitors differ in satisfaction? |  | U = 744, z = -4.62, p \< .001, r = 0.60 \[0.41, 0.76\] | large |
 | RQ5 | Does satisfaction predict behavioural intention? |  | R² = 0.291, F(1, 58) = 23.83, p \< .001 |  |
 
 The full writing prompt for each result is available in `r$prompt`. The
@@ -1007,7 +1008,7 @@ first one reads:
 ``` r
 
 cat(results[[1]]$prompt)
-#> There was a positive, small non-significant correlation between DMRE and TS, r(58) = 0.19, p = 0.153. Explain what this means for your research question.
+#> There was a positive, small non-significant correlation between DMRE and TS, r(58) = 0.19 [-0.07, 0.42], p = 0.153. Explain what this means for your research question.
 ```
 
 The `prompt` field is a sentence template for the methods or results
@@ -1031,7 +1032,8 @@ first_plot <- Filter(function(r) !is.null(r$plot), results_p)[[1]]
 first_plot$plot
 ```
 
-![](surveyframe_files/figure-html/run-plan-plots-1.png)
+![Chart attached to the first analysis-plan result by run_analysis_plan
+with plots enabled](surveyframe_files/figure-html/run-plan-plots-1.png)
 
 Inferential blocks also return a `$table` data frame ready for
 [`knitr::kable()`](https://rdrr.io/pkg/knitr/man/kable.html), and the
@@ -1055,9 +1057,9 @@ results_path <- render_results(
   output_file = file.path(tempdir(), "tourism_results.html")
 )
 cat("Results report written:", results_path, "\n")
-#> Results report written: /tmp/RtmpFVvRAK/tourism_results.html
+#> Results report written: /tmp/Rtmpw4T0Yc/tourism_results.html
 cat("Size:", round(file.size(results_path) / 1024, 1), "KB\n")
-#> Size: 13.2 KB
+#> Size: 13.4 KB
 ```
 
 The results report contains one section per research question, with the

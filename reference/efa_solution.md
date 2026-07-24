@@ -63,4 +63,8 @@ efa_solution(
 
 ## Value
 
-An object of class `sframe_efa_solution`.
+An object of class `sframe_efa_solution`. Alongside the psych objects it
+carries three tidy data frames ready for plotting and reporting:
+`loadings_long` (item_id, factor, loading), `communalities_table`
+(item_id, communality, uniqueness), and `variance_table` (factor,
+ss_loadings, proportion_var, cumulative_var).

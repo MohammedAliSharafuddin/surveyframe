@@ -140,7 +140,8 @@ for (s in score_cols) {
 }
 ```
 
-![](analysing-survey-responses_files/figure-html/score-distributions-1.png)
+![Histograms of the scored scale distributions, one panel per
+scale](analysing-survey-responses_files/figure-html/score-distributions-1.png)
 
 ``` r
 
@@ -320,9 +321,9 @@ results_table(results)
 
 | RQ | Research question | Method | Result (APA) | Effect |
 |:---|:---|:---|---:|:---|
-| RQ1 | Is digital marketing perception associated with satisfaction? | pearson | r(118) = 0.54, p \< .001 | large |
+| RQ1 | Is digital marketing perception associated with satisfaction? | pearson | r(118) = 0.54 \[0.40, 0.65\], p \< .001 | large |
 | RQ2 | Do the three perception scales predict satisfaction? |  | R² = 0.383, F(3, 116) = 23.95, p \< .001 |  |
-| RQ3 | Do first-time and repeat visitors differ in behavioural intention? |  | U = 1576, z = -0.98, p = 0.327, r = 0.09 | negligible |
+| RQ3 | Do first-time and repeat visitors differ in behavioural intention? |  | U = 1576, z = -0.98, p = 0.327, r = 0.09 \[0.01, 0.27\] | negligible |
 
 Pass `plots = TRUE` to attach a brand-styled `ggplot2` chart to each
 result that supports one (descriptive, correlation, chi-square, and
@@ -335,7 +336,9 @@ results_plots <- run_analysis_plan(responses, instr, plots = TRUE)
 results_plots[[1]]$plot
 ```
 
-![](analysing-survey-responses_files/figure-html/run-plots-1.png)
+![Chart attached to the first analysis-plan result by run_analysis_plan
+with plots
+enabled](analysing-survey-responses_files/figure-html/run-plots-1.png)
 
 ## Read a single result
 
@@ -348,11 +351,11 @@ writing prompt, and the references that support the technique.
 rq1 <- results[[1]]
 
 rq1$apa
-#> [1] "r(118) = 0.54, p < .001"
+#> [1] "r(118) = 0.54 [0.40, 0.65], p < .001"
 rq1$effect_label
 #> [1] "large"
 rq1$prompt
-#> [1] "There was a positive, large significant correlation between digital_marketing and satisfaction, r(118) = 0.54, p < .001. Explain what this means for your research question."
+#> [1] "There was a positive, large significant correlation between digital_marketing and satisfaction, r(118) = 0.54 [0.40, 0.65], p < .001. Explain what this means for your research question."
 unlist(rq1$citations)
 #>                                                                                                                                                         field_2018 
 #>                                                                            "Field, A. (2018). *Discovering statistics using IBM SPSS statistics* (5th ed.). SAGE." 
@@ -361,7 +364,7 @@ unlist(rq1$citations)
 #>                                                                                                                                                             r_core 
 #>                                          "R Core Team. (2026). *R: A language and environment for statistical computing*. R Foundation for Statistical Computing." 
 #>                                                                                                                                                        surveyframe 
-#> "Sharafuddin, M. A. (2026). *surveyframe: Survey Instrument Workflows* (Version 0.3.3) [Computer software]. https://github.com/MohammedAliSharafuddin/surveyframe"
+#> "Sharafuddin, M. A. (2026). *surveyframe: Survey Instrument Workflows* (Version 0.3.4) [Computer software]. https://github.com/MohammedAliSharafuddin/surveyframe"
 ```
 
 ## Render the results report

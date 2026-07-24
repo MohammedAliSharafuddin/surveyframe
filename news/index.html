@@ -24,7 +24,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">surveyframe</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.4</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -47,6 +47,73 @@
       <small>Source: <a href="https://github.com/MohammedAliSharafuddin/surveyframe/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.3.4" id="surveyframe-034">surveyframe 0.3.4<a class="anchor" aria-label="anchor" href="#surveyframe-034"></a></h2>
+<p>This release completes the plotting, interface, statistics, and reporting work started in 0.3.3. Every analysis family now has a chart, every effect size ships with a confidence interval, reports accept written interpretations and print to PDF, both dashboards gain quality and correlation panels, date questions gain bounds, and the builder and vignettes pass a WCAG 2.2 AA accessibility audit. Hard dependencies are unchanged. naniar and pagedown join Suggests.</p>
+<div class="section level3">
+<h3 id="effect-sizes-and-intervals-0-3-4">Effect sizes and intervals<a class="anchor" aria-label="anchor" href="#effect-sizes-and-intervals-0-3-4"></a></h3>
+<ul><li>Four new exported helpers, all base R: <code><a href="../reference/bootstrap_ci.html">bootstrap_ci()</a></code> (percentile bootstrap for any statistic), <code><a href="../reference/cohens_d_ci.html">cohens_d_ci()</a></code>, <code><a href="../reference/cramers_v_ci.html">cramers_v_ci()</a></code>, and <code><a href="../reference/eta_sq_ci.html">eta_sq_ci()</a></code>.</li>
+<li>Analysis-plan runners attach a confidence interval to their effect size as a new result key: <code>d_ci</code> on the t-tests, <code>r_ci</code> on Mann-Whitney and Wilcoxon, <code>eta_ci</code> on ANOVA and Kruskal-Wallis, <code>ci</code> on the correlations (analytic Fisher z for Pearson, bootstrap for the rank methods), and <code>v_ci</code> on chi-square and cross-tabulation.</li>
+<li>APA strings and writing prompts now carry the interval, for example <code>d = 0.62 [0.18, 1.05]</code>. Data too small for an interval keeps the previous string.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="psychometrics-0-3-4">Psychometrics<a class="anchor" aria-label="anchor" href="#psychometrics-0-3-4"></a></h3>
+<ul><li>
+<code><a href="../reference/validity_report.html">validity_report()</a></code> computes the Henseler heterotrait-monotrait ratio when item-level data is supplied through the new <code>items_by_construct</code> argument. Without it, the previous correlation-based fallback applies and the <code>htmt_method</code> element records which was used.</li>
+<li>
+<code><a href="../reference/missing_data_report.html">missing_data_report()</a></code> runs Little’s MCAR test when naniar is installed. Without naniar the result is unchanged.</li>
+<li>
+<code><a href="../reference/reliability_report.html">reliability_report()</a></code> records why omega is unavailable for a scale in an <code>omega_note</code>, and the reliability chart names those scales in its subtitle.</li>
+<li>
+<code><a href="../reference/efa_solution.html">efa_solution()</a></code> adds three tidy data frames ready for plotting and reporting: <code>loadings_long</code>, <code>communalities_table</code>, and <code>variance_table</code>.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="reports-and-codebook-0-3-4">Reports and codebook<a class="anchor" aria-label="anchor" href="#reports-and-codebook-0-3-4"></a></h3>
+<ul><li>
+<code>render_report(format = "pdf")</code> prints the HTML report to PDF through pagedown, which requires a local Chrome or Chromium. HTML output is unchanged and remains the default.</li>
+<li>The report’s built-in styling now uses a small set of CSS variables, so a re-theme is a one-line change, and a print stylesheet paginates the report cleanly. Tables carry captions and header scopes, and every embedded chart has descriptive alternative text.</li>
+<li>The codebook now includes the pre-declared analysis plan and the saved measurement and structural models, so one document fully records the instrument a study used.</li>
+<li>The codebook’s items table shows each item’s actual response options and scale label directly, instead of an id that needed a separate choice-sets table to decode.</li>
+<li>Analysis-result tables (frequency, cross-tabulation, group comparisons, regression coefficients, and the rest) show item, scale, and response-option labels instead of the underlying ids and coded values.</li>
+<li>Report tables render as properly split HTML tables in both the Quarto and internal HTML report paths.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="written-interpretations-in-reports-0-3-4">Written interpretations in reports<a class="anchor" aria-label="anchor" href="#written-interpretations-in-reports-0-3-4"></a></h3>
+<ul><li>New <code>interpretations</code> argument on <code><a href="../reference/render_report.html">render_report()</a></code> and <code><a href="../reference/render_results.html">render_results()</a></code>. Pass a named list keyed by analysis-plan block id to add a written interpretation to each research question after the results are known. The report shows it beside the pre-declared decision rule, so the prospective plan stays visible next to the post-hoc narrative. Interpretations are report content only and are never written into the instrument file.</li>
+<li>SurveyStudio’s Export screen gains an Interpretations card: one block per research question, in reading order (result table, chart, planned decision rule, then the interpretation), shown with the live result once responses are loaded. The generated report includes whatever you write there.</li>
+<li>A “Copy result” button on each Interpretations block copies the whole result, table, chart, and the interpretation as written, as one block, for pasting into a document.</li>
+<li>The SurveyBuilder Report outline now edits the planned decision rule inline, in sync with the research-question dialogue.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="charts-0-3-4">Charts<a class="anchor" aria-label="anchor" href="#charts-0-3-4"></a></h3>
+<ul><li>
+<code>run_analysis_plan(plots = TRUE)</code> now attaches a chart to every supported family: regression diagnostics (4 panels), EFA scree and loadings heatmap, reliability bars, mosaic and crosstab, correlation heatmap, quality flag rates, group-comparison boxplots, paired slope charts, raw-variable distributions, repeated-measures profiles, a partial-correlation residual scatter, logistic-regression odds-ratio forest plots, a moderation interaction plot, and a mediation effect chart. Every analysis-plan block now returns a table, a chart, or generated syntax.</li>
+<li>Distribution shape by variable draws as a violin per variable, instead of a bar chart of the skewness and kurtosis summary statistics.</li>
+<li>A scale’s separate Likert items, and a matrix question’s rows, draw as one grouped diverging chart, instead of one chart per item.</li>
+<li>New <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> methods for descriptives, EFA, quality, reliability, validity, missing-data, and analysis-results objects. <code>plot(results)</code> draws every attached chart, and <code>plot(results, which = "rq_id")</code> returns one.</li>
+<li>New <code>plot_palette</code> argument on <code><a href="../reference/run_analysis_plan.html">run_analysis_plan()</a></code> and <code><a href="../reference/render_report.html">render_report()</a></code>: <code>"web"</code> for brand colour on screen, <code>"print"</code> for black and white suitable for print and journal submission. SurveyStudio exposes the choice as a Chart theme option on the Export screen.</li>
+<li>SurveyStudio’s Analyse screen shows one result card per research question with its chart beneath the statistic.</li>
+<li>Both dashboards (the standalone response dashboard and the SurveyStudio Dashboard tab) gain a straight-lining flag-rate chart, a missing-data chart, and a scale-score correlation heatmap. All dashboard charts keep a base-graphics fallback, so ggplot2 remains optional.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="survey-design-0-3-4">Survey design<a class="anchor" aria-label="anchor" href="#survey-design-0-3-4"></a></h3>
+<ul><li>Date questions accept <code>date_min</code> and <code>date_max</code> bounds in <code><a href="../reference/sf_item.html">sf_item()</a></code>, the SurveyBuilder, and the exported survey. The date picker enforces the bounds and typed dates outside them show a clear message.</li>
+<li>The SurveyBuilder ships a library of 14 preset choice sets, regenerates item ids safely when the response type changes, and expands matrix, ranking, and multiple-choice items into the same per-option variables that <code><a href="../reference/read_responses.html">read_responses()</a></code> produces.</li>
+<li>The survey thank-you page no longer forces a CSV download. It offers a “Download my response” button and honours a configured redirect.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="accessibility-0-3-4">Accessibility<a class="anchor" aria-label="anchor" href="#accessibility-0-3-4"></a></h3>
+<ul><li>The SurveyBuilder interface passes an instrumented WCAG 2.2 AA audit with zero findings across its build, preview, and analyse screens and dialogues.</li>
+<li>All 7 vignettes pass the same audit: language metadata, AA contrast for links and code highlighting, wrapped code blocks, keyboard-reachable content, and alternative text on every chart.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="bug-fixes-0-3-4">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-3-4"></a></h3>
+<ul><li>
+<code><a href="../reference/sf_item.html">sf_item()</a></code>’s <code>date_min</code> and <code>date_max</code> no longer accept an ambiguous date string (for example <code>"01/02/2024"</code>); only <code>"YYYY-MM-DD"</code> or a <code>Date</code> object is accepted, and anything else is a validation error rather than a silently misparsed date.</li>
+<li>
+<code><a href="../reference/bootstrap_ci.html">bootstrap_ci()</a></code>, <code><a href="../reference/cohens_d_ci.html">cohens_d_ci()</a></code>, <code><a href="../reference/cramers_v_ci.html">cramers_v_ci()</a></code>, and <code><a href="../reference/eta_sq_ci.html">eta_sq_ci()</a></code> no longer alter the random-number seed for code that runs after a reproducible, seeded call.</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.3.3" id="surveyframe-033">surveyframe 0.3.3<a class="anchor" aria-label="anchor" href="#surveyframe-033"></a></h2><p class="text-muted">CRAN release: 2026-07-11</p>
 <p>This release adds an opt-in plotting layer, fixes bugs surfaced by the package’s first field deployment, and redesigns the survey-taking experience. ggplot2 joins Suggests; hard dependencies are unchanged.</p>

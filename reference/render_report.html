@@ -32,7 +32,7 @@ the reporting workflow still runs on machines without Quarto."><meta property="o
 
     <a class="navbar-brand me-2" href="../index.html">surveyframe</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.4</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -71,14 +71,16 @@ the reporting workflow still runs on machines without Quarto.</p>
 <span>  data <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  output_file <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  output_path <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  format <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"html"</span><span class="op">)</span>,</span>
+<span>  format <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"html"</span>, <span class="st">"pdf"</span><span class="op">)</span>,</span>
 <span>  include_quality <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  include_reliability <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  include_codebook <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  include_missing <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  include_descriptives <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  include_analysis <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  include_models <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>  include_models <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  plot_palette <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"web"</span>, <span class="st">"print"</span><span class="op">)</span>,</span>
+<span>  interpretations <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -106,7 +108,11 @@ supplied, <code>output_file</code> takes precedence.</p></dd>
 
 
 <dt id="arg-format">format<a class="anchor" aria-label="anchor" href="#arg-format"></a></dt>
-<dd><p>Character. Output format. Currently <code>"html"</code>.</p></dd>
+<dd><p>Character. Output format: <code>"html"</code> (default) or <code>"pdf"</code>.
+PDF output renders the HTML report and prints it through
+<code><a href="https://rdrr.io/pkg/pagedown/man/chrome_print.html" class="external-link">pagedown::chrome_print()</a></code>, which requires the pagedown package (in
+Suggests) and a local Chrome or Chromium installation. The HTML path
+is unchanged.</p></dd>
 
 
 <dt id="arg-include-quality">include_quality<a class="anchor" aria-label="anchor" href="#arg-include-quality"></a></dt>
@@ -142,6 +148,23 @@ when <code>data</code> are supplied and the instrument has an <code>analysis_pla
 <dt id="arg-include-models">include_models<a class="anchor" aria-label="anchor" href="#arg-include-models"></a></dt>
 <dd><p>Logical. Whether to include saved model JSON and
 generated syntax blocks. Defaults to <code>TRUE</code>.</p></dd>
+
+
+<dt id="arg-plot-palette">plot_palette<a class="anchor" aria-label="anchor" href="#arg-plot-palette"></a></dt>
+<dd><p>One of <code>"web"</code> (brand colours, for on-screen reading)
+or <code>"print"</code> (black, grey, and white, for a journal-ready or
+print-friendly report). Applied to every chart the report embeds.
+See <code>sframe_brand()</code>.</p></dd>
+
+
+<dt id="arg-interpretations">interpretations<a class="anchor" aria-label="anchor" href="#arg-interpretations"></a></dt>
+<dd><p>Named list or NULL. Written interpretations keyed
+by analysis-plan block id, added after the results are known. When a
+block has an entry, its report section shows the pre-declared decision
+rule under a "Planned decision rule" label followed by the written
+text under an "Interpretation" label. Blocks without an entry render
+exactly as they do when this argument is NULL. Interpretations are
+report content only and are never written into the instrument.</p></dd>
 
 </dl></div>
     <div class="section level2">

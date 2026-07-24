@@ -137,12 +137,28 @@ psychometric diagnostics and pre-planned analyses.
 - [`run_analysis_plan()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/run_analysis_plan.md)
   : Run a pre-planned analysis from an instrument's analysis plan
 
+## Confidence intervals
+
+Base-R bootstrap and effect-size confidence interval helpers, reused
+across the inferential runners.
+
+- [`bootstrap_ci()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/bootstrap_ci.md)
+  : Percentile bootstrap confidence interval for a statistic
+- [`cohens_d_ci()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/cohens_d_ci.md)
+  : Bootstrap confidence interval for Cohen's d
+- [`cramers_v_ci()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/cramers_v_ci.md)
+  : Bootstrap confidence interval for Cramer's V
+- [`eta_sq_ci()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/eta_sq_ci.md)
+  : Bootstrap confidence interval for eta squared
+
 ## Report
 
 Generate codebooks, scale appendices, and reproducible HTML reports.
 
 - [`codebook_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/codebook_report.md)
   : Generate a survey codebook from an instrument object
+- [`sframe_codebook_items_display()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_codebook_items_display.md)
+  : Enrich a codebook's items table for display
 - [`render_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_report.md)
   : Render a reproducible survey report
 - [`render_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_results.md)
@@ -156,6 +172,40 @@ Opt-in ggplot2 charts for analysis results, and the package theme.
 
 - [`theme_surveyframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/theme_surveyframe.md)
   : surveyframe brand theme for ggplot2
+- [`plot(`*`<sframe_analysis_results>`*`)`](https://mohammedalisharafuddin.github.io/surveyframe/reference/plot.sframe_analysis_results.md)
+  : Plot analysis-plan results
+- [`sframe_plot_correlation_matrix()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_plot_correlation_matrix.md)
+  : Correlation matrix heatmap
+- [`sframe_plot_descriptives()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_plot_descriptives.md)
+  : Distribution shape by variable, standardised
+- [`sframe_plot_efa_loadings()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_plot_efa_loadings.md)
+  : Loadings heatmap from a fitted EFA solution
+- [`sframe_plot_efa_scree()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_plot_efa_scree.md)
+  : Scree plot from an EFA readiness report
+- [`sframe_plot_group_comparison()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_plot_group_comparison.md)
+  : Group-comparison boxplot
+- [`sframe_plot_likert_matrix()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_plot_likert_matrix.md)
+  : Grouped diverging chart for a Likert matrix question
+- [`sframe_plot_likert_scale()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_plot_likert_scale.md)
+  : Grouped diverging chart for a scale's Likert items
+- [`sframe_plot_missingness()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_plot_missingness.md)
+  : Missing-data report plot: missingness rate by item
+- [`sframe_plot_paired_comparison()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_plot_paired_comparison.md)
+  : Paired-comparison slope plot
+- [`sframe_plot_quality()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_plot_quality.md)
+  : Quality report plot: straight-lining flag rate by scale
+- [`sframe_plot_regression_diagnostics()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_plot_regression_diagnostics.md)
+  : Regression diagnostic plots for a regression_linear result
+- [`sframe_plot_reliability()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_plot_reliability.md)
+  : Reliability plot: alpha and omega by scale
+- [`sframe_plot_validity()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_plot_validity.md)
+  : Validity report plot: composite reliability and AVE by construct
+- [`sframe_plot_variable_distribution()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_plot_variable_distribution.md)
+  : Raw-variable distribution panels: histogram, boxplot, and Q-Q
+- [`sframe_draw_mosaic()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_draw_mosaic.md)
+  : Mosaic plot for a two-way categorical result
+- [`sframe_likert_scale_groups()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_likert_scale_groups.md)
+  : Group a scale's Likert items for a combined diverging chart
 
 ## Print, format, and summary methods
 

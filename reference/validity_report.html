@@ -24,7 +24,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">surveyframe</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.4</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -54,7 +54,7 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">validity_report</span><span class="op">(</span><span class="va">loadings</span>, construct_scores <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">validity_report</span><span class="op">(</span><span class="va">loadings</span>, construct_scores <span class="op">=</span> <span class="cn">NULL</span>, items_by_construct <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -68,7 +68,20 @@
 
 <dt id="arg-construct-scores">construct_scores<a class="anchor" aria-label="anchor" href="#arg-construct-scores"></a></dt>
 <dd><p>Optional data.frame of construct scores for
-Fornell-Larcker, HTMT, and inter-construct correlations.</p></dd>
+Fornell-Larcker and inter-construct correlations.</p></dd>
+
+
+<dt id="arg-items-by-construct">items_by_construct<a class="anchor" aria-label="anchor" href="#arg-items-by-construct"></a></dt>
+<dd><p>Optional named list, one element per construct,
+each a data.frame of that construct's item-level responses. When
+supplied, <code>htmt</code> is the Henseler heterotrait-monotrait ratio: the mean
+absolute heterotrait-heteromethod correlation over the geometric mean
+of the two constructs' mean absolute monotrait-heteromethod
+correlations. Constructs with a single item have no monotrait
+correlations, so their HTMT entries are <code>NA</code>. Without this argument,
+<code>htmt</code> falls back to the absolute inter-construct correlation matrix
+from <code>construct_scores</code> (the pre-0.3.4 behaviour); the <code>htmt_method</code>
+element records which was computed.</p></dd>
 
 </dl></div>
     <div class="section level2">

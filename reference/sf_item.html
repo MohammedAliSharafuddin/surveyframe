@@ -28,7 +28,7 @@ unique id within the instrument it is added to."><meta property="og:image" conte
 
     <a class="navbar-brand me-2" href="../index.html">surveyframe</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.4</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -77,6 +77,8 @@ unique <code>id</code> within the instrument it is added to.</p>
 <span>  slider_step <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  rating_max <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  rating_icon <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  date_min <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  date_max <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  section_intro <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  page <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -150,6 +152,16 @@ respondent.</p></dd>
 
 <dt id="arg-rating-icon">rating_icon<a class="anchor" aria-label="anchor" href="#arg-rating-icon"></a></dt>
 <dd><p>Character or NULL. Icon type: <code>"star"</code> or <code>"heart"</code>.</p></dd>
+
+
+<dt id="arg-date-min">date_min<a class="anchor" aria-label="anchor" href="#arg-date-min"></a></dt>
+<dd><p>Character or Date or NULL. Earliest selectable date for
+<code>"date"</code> type, as <code>"YYYY-MM-DD"</code>.</p></dd>
+
+
+<dt id="arg-date-max">date_max<a class="anchor" aria-label="anchor" href="#arg-date-max"></a></dt>
+<dd><p>Character or Date or NULL. Latest selectable date for
+<code>"date"</code> type, as <code>"YYYY-MM-DD"</code>.</p></dd>
 
 
 <dt id="arg-section-intro">section_intro<a class="anchor" aria-label="anchor" href="#arg-section-intro"></a></dt>

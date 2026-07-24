@@ -24,6 +24,8 @@ sf_item(
   slider_step = NULL,
   rating_max = NULL,
   rating_icon = NULL,
+  date_min = NULL,
+  date_max = NULL,
   section_intro = NULL,
   page = NULL
 )
@@ -96,6 +98,16 @@ sf_item(
 - rating_icon:
 
   Character or NULL. Icon type: `"star"` or `"heart"`.
+
+- date_min:
+
+  Character or Date or NULL. Earliest selectable date for `"date"` type,
+  as `"YYYY-MM-DD"`.
+
+- date_max:
+
+  Character or Date or NULL. Latest selectable date for `"date"` type,
+  as `"YYYY-MM-DD"`.
 
 - section_intro:
 

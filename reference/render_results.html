@@ -30,7 +30,7 @@ and a reference list."><meta property="og:image" content="https://mohammedalisha
 
     <a class="navbar-brand me-2" href="../index.html">surveyframe</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.4</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -69,7 +69,8 @@ and a reference list.</p>
 <span>  output_file <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  output_path <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  citation_format <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"apa"</span>, <span class="st">"ama"</span>, <span class="st">"vancouver"</span><span class="op">)</span>,</span>
-<span>  title <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  title <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  interpretations <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -102,6 +103,15 @@ NULL, a temporary file is written and its path returned.</p></dd>
 <dt id="arg-title">title<a class="anchor" aria-label="anchor" href="#arg-title"></a></dt>
 <dd><p>Character or NULL. Report title. Defaults to the instrument
 title with " – Results" appended.</p></dd>
+
+
+<dt id="arg-interpretations">interpretations<a class="anchor" aria-label="anchor" href="#arg-interpretations"></a></dt>
+<dd><p>Named list or NULL. Written interpretations keyed
+by analysis-plan block id, added after the results are known. A block
+with an entry shows that text in its Interpretation section in place
+of the pre-declared prompt fallback. Blocks without an entry render
+exactly as they do when this argument is NULL. Interpretations are
+report content only and are never written into the instrument.</p></dd>
 
 </dl></div>
     <div class="section level2">

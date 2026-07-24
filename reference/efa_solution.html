@@ -30,7 +30,7 @@ function is called."><meta property="og:image" content="https://mohammedalishara
 
     <a class="navbar-brand me-2" href="../index.html">surveyframe</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.4</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -118,7 +118,12 @@ function is called.</p>
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>An object of class <code>sframe_efa_solution</code>.</p>
+    <p>An object of class <code>sframe_efa_solution</code>. Alongside the psych
+objects it carries three tidy data frames ready for plotting and
+reporting: <code>loadings_long</code> (item_id, factor, loading),
+<code>communalities_table</code> (item_id, communality, uniqueness), and
+<code>variance_table</code> (factor, ss_loadings, proportion_var,
+cumulative_var).</p>
     </div>
 
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

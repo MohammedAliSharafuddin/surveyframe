@@ -45,7 +45,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">surveyframe</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.4</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -84,12 +84,23 @@
 <style>
 body { color: #1a1a2e; }
 h1, h2, h3 { color: #1a1a2e; }
-a { color: #16B3B1; }
+a { color: #0e7c7a; }
 table { border-collapse: collapse; margin: 1em 0; }
 table caption { caption-side: top; font-style: italic; color: #444; padding-bottom: .3em; }
 th { border-top: 2px solid #1a1a2e; border-bottom: 1px solid #1a1a2e; padding: 6px 12px; }
 td { padding: 5px 12px; border: none; }
 tbody tr:last-child td { border-bottom: 2px solid #1a1a2e; }
+/* WCAG 2.2 AA pass: darker link and syntax-token colours (at least
+   4.5:1 on the #f7f7f7 code background), wrapped code lines instead of a
+   keyboard-inaccessible scroll region, empty per-line anchors removed from
+   the accessibility tree, and 24px minimum TOC link targets. */
+code span.at { color: #576419; }
+code span.dv, code span.fl, code span.bn { color: #276245; }
+code span.co { color: #396a80; }
+pre, pre code { white-space: pre-wrap; word-break: break-word; }
+div.sourceCode { overflow: visible; }
+pre.sourceCode a:empty { display: none; }
+#TOC a { display: inline-block; min-height: 24px; }
 </style>
 <div class="section level2">
 <h2 id="about-this-vignette">About this vignette<a class="anchor" aria-label="anchor" href="#about-this-vignette"></a>
@@ -474,7 +485,7 @@ GitHub Pages, shared by email, or opened directly from disk.</p>
 <span>  output_path <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"tourism_services_survey.html"</span><span class="op">)</span>,</span>
 <span>  open        <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; Static survey written to '/tmp/RtmpFVvRAK/tourism_services_survey.html' (65.3</span></span>
+<span><span class="co">#&gt; Static survey written to '/tmp/Rtmpw4T0Yc/tourism_services_survey.html' (69.6</span></span>
 <span><span class="co">#&gt; KB).</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/files.html" class="external-link">file.exists</a></span><span class="op">(</span><span class="va">html_path</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
@@ -527,7 +538,7 @@ no string-splitting step.</p>
 <span>  sheet_url  <span class="op">=</span> <span class="st">"https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID"</span>,</span>
 <span>  output_dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; Apps Script written to: /tmp/RtmpFVvRAK/surveyframe_collector.gs</span></span>
+<span><span class="co">#&gt; Apps Script written to: /tmp/Rtmpw4T0Yc/surveyframe_collector.gs</span></span>
 <span><span class="co">#&gt; Follow the setup instructions inside the file to deploy it.</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/files.html" class="external-link">file.exists</a></span><span class="op">(</span><span class="va">script_path</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
@@ -1198,7 +1209,7 @@ overwritten.</p>
 <span>  <span class="va">v</span> <span class="op">&lt;-</span> <span class="va">scored</span><span class="op">[[</span><span class="va">s</span><span class="op">]</span><span class="op">]</span>; <span class="va">v</span> <span class="op">&lt;-</span> <span class="va">v</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/is.finite.html" class="external-link">is.finite</a></span><span class="op">(</span><span class="va">v</span><span class="op">)</span><span class="op">]</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/graphics/hist.html" class="external-link">hist</a></span><span class="op">(</span><span class="va">v</span>, col <span class="op">=</span> <span class="st">"#16B3B1"</span>, border <span class="op">=</span> <span class="st">"white"</span>, main <span class="op">=</span> <span class="va">s</span>, xlab <span class="op">=</span> <span class="st">"Score"</span>, ylab <span class="op">=</span> <span class="st">""</span><span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
-<p><img src="surveyframe_files/figure-html/score-distributions-1.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"></p>
+<p><img src="surveyframe_files/figure-html/score-distributions-1.png" class="r-plt" alt="Histograms of the scored scale distributions, one panel per scale" width="672" style="display: block; margin: auto auto auto 0;"></p>
 <div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span><span class="va">op</span><span class="op">)</span></span></code></pre></div>
 <hr>
@@ -1446,10 +1457,10 @@ chosen test.</p>
 <table style="width:100%;" class="table">
 <colgroup>
 <col width="2%">
-<col width="53%">
+<col width="48%">
 <col width="5%">
-<col width="29%">
-<col width="8%">
+<col width="35%">
+<col width="7%">
 </colgroup>
 <thead><tr class="header">
 <th align="left">RQ</th>
@@ -1464,7 +1475,7 @@ chosen test.</p>
 <td align="left">Are digital marketing perceptions associated with
 tourist satisfaction?</td>
 <td align="left">pearson</td>
-<td align="right">r(58) = 0.19, p = 0.153</td>
+<td align="right">r(58) = 0.19 [-0.07, 0.42], p = 0.153</td>
 <td align="left">small</td>
 </tr>
 <tr class="even">
@@ -1472,7 +1483,7 @@ tourist satisfaction?</td>
 <td align="left">Is service quality associated with tourist
 satisfaction?</td>
 <td align="left">pearson</td>
-<td align="right">r(58) = -0.04, p = 0.778</td>
+<td align="right">r(58) = -0.04 [-0.29, 0.22], p = 0.778</td>
 <td align="left">negligible</td>
 </tr>
 <tr class="odd">
@@ -1488,7 +1499,8 @@ satisfaction?</td>
 <td align="left">Do first-time and repeat visitors differ in
 satisfaction?</td>
 <td align="left"></td>
-<td align="right">U = 744, z = -4.62, p &lt; .001, r = 0.60</td>
+<td align="right">U = 744, z = -4.62, p &lt; .001, r = 0.60 [0.41,
+0.76]</td>
 <td align="left">large</td>
 </tr>
 <tr class="odd">
@@ -1504,7 +1516,7 @@ satisfaction?</td>
 <code>r$prompt</code>. The first one reads:</p>
 <div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="va">results</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">prompt</span><span class="op">)</span></span>
-<span><span class="co">#&gt; There was a positive, small non-significant correlation between DMRE and TS, r(58) = 0.19, p = 0.153. Explain what this means for your research question.</span></span></code></pre></div>
+<span><span class="co">#&gt; There was a positive, small non-significant correlation between DMRE and TS, r(58) = 0.19 [-0.07, 0.42], p = 0.153. Explain what this means for your research question.</span></span></code></pre></div>
 <p>The <code>prompt</code> field is a sentence template for the methods
 or results section. The researcher fills in the substantive
 interpretation. The package supplies the statistic and the label. This
@@ -1522,7 +1534,7 @@ changes for installations without ggplot2.</p>
 <code class="sourceCode R"><span><span class="va">results_p</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/run_analysis_plan.html">run_analysis_plan</a></span><span class="op">(</span><span class="va">scored</span>, <span class="va">study</span>, plots <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="va">first_plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/funprog.html" class="external-link">Filter</a></span><span class="op">(</span><span class="kw">function</span><span class="op">(</span><span class="va">r</span><span class="op">)</span> <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">r</span><span class="op">$</span><span class="va">plot</span><span class="op">)</span>, <span class="va">results_p</span><span class="op">)</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span></span>
 <span><span class="va">first_plot</span><span class="op">$</span><span class="va">plot</span></span></code></pre></div>
-<p><img src="surveyframe_files/figure-html/run-plan-plots-1.png" class="r-plt" alt="" width="672"></p>
+<p><img src="surveyframe_files/figure-html/run-plan-plots-1.png" class="r-plt" alt="Chart attached to the first analysis-plan result by run_analysis_plan with plots enabled" width="672"></p>
 <p>Inferential blocks also return a <code>$table</code> data frame ready
 for <code><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">knitr::kable()</a></code>, and the HTML report picks both up
 automatically.</p>
@@ -1542,9 +1554,9 @@ and descriptives alongside the analysis results.</p>
 <span>  output_file <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"tourism_results.html"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Results report written:"</span>, <span class="va">results_path</span>, <span class="st">"\n"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Results report written: /tmp/RtmpFVvRAK/tourism_results.html</span></span>
+<span><span class="co">#&gt; Results report written: /tmp/Rtmpw4T0Yc/tourism_results.html</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Size:"</span>, <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.info.html" class="external-link">file.size</a></span><span class="op">(</span><span class="va">results_path</span><span class="op">)</span> <span class="op">/</span> <span class="fl">1024</span>, <span class="fl">1</span><span class="op">)</span>, <span class="st">"KB\n"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Size: 13.2 KB</span></span></code></pre></div>
+<span><span class="co">#&gt; Size: 13.4 KB</span></span></code></pre></div>
 <p>The results report contains one section per research question, with
 the APA statistic, effect size, writing prompt, and the reference for
 the chosen method, each paired with its own chart drawn directly beneath
