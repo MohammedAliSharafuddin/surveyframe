@@ -34,3 +34,10 @@ tests/testthat/test-aic-rsam-branching.R
 .vscode/
 mas_review_033.html
 mas_review_034.html
+demo/_report_review.html
+demo/survey_builder_demo.html
+demo/surveyframe_032_slides_dev.html
+demo/surveyframe_user_demo.html
+demo/screenshots/
+mas_full_report.html
+report_interp.html
