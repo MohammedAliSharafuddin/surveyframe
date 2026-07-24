@@ -43,8 +43,8 @@ both optional and guarded with `requireNamespace()`.
 ## Test environments
 
 - Local: Ubuntu, R 4.6.0 (2026-04-24), x86_64-pc-linux-gnu
-- win-builder: R (release)
-- win-builder: R-devel
+- win-builder: R 4.6.1 (release, 2026-06-24 ucrt)
+- win-builder: R-devel (unstable, 2026-07-23 r90295 ucrt)
 
 ## R CMD check results
 
@@ -52,9 +52,13 @@ both optional and guarded with `requireNamespace()`.
 0 notes on every environment:
 
 - Local (2026-07-25, release-candidate tarball): Status: OK.
-- win-builder R-release: Status: OK.
-- win-builder R-devel: Status: OK.
+- win-builder R-release (2026-07-25): Status: OK.
+- win-builder R-devel (2026-07-25): Status: OK.
 
 ## Reverse dependencies
 
 surveyframe has no reverse dependencies on CRAN.
+
+## Submission outcome
+
+Submitted 2026-07-25.

@@ -280,8 +280,10 @@ sf_item("bad", "x", type = "date", date_min = "2026-12-31",
 -   [x] G1.1 `R CMD check --as-cran` on the 0.3.4 tarball: 0 errors, 0 warnings, at most the incoming-feasibility NOTE.
 -   [x] G1.2 The tarball contains no dev-only files: no CLAUDE.md, roadmap, revision_todo, dogfeed, mas_review, demo directory, or mas_full_report.html (`untar -tf` and scan).
 -   [x] G1.3 649 tests pass on the working tree.
--   [ ] G1.4 win-builder R-release returns Status: OK.
--   [ ] G1.5 win-builder R-devel returns Status: OK.
+-   [x] G1.4 win-builder R-release returns Status: OK.
+-   [x] G1.5 win-builder R-devel returns Status: OK.
+
+**Verified 2026-07-25.** win-builder R-release (R 4.6.1, 2026-06-24 ucrt): Status: OK. win-builder R-devel (R Under development, 2026-07-23 r90295 ucrt): Status: OK. Both automated notifications received from Uwe Ligges' win-builder service.
 -   [x] G1.6 NAMESPACE gained only additive exports: 3 S3 plot methods, `sframe_plot_validity()`, `sframe_plot_missingness()`.
 -   [x] G1.7 Hard Imports are still exactly jsonlite, rlang, and openssl.
 -   [x] G1.8 A 0.3.3 script with no new arguments produces identical output under 0.3.4 (spot check: render_report on the demo without interpretations, diff the RQ sections).
@@ -586,17 +588,17 @@ field-validation pass rather than left silently unticked here.
 - **N1.9 to N1.10** — clipboard paste confirmation (blocked by headless
   Chrome's clipboard permission model, not attempted) and perceived
   canvas timing.
-- **G1.4 to G1.5** — win-builder R-release and R-devel. Not a dogfeed
-  item: this is the next release-process step, run by the owner after
-  this file's tarball is built (see below), not deferred to 0.3.5.
+- ~~**G1.4 to G1.5** — win-builder R-release and R-devel.~~ Done
+  2026-07-25, both Status: OK. Never a dogfeed item, just listed here
+  for completeness while it was still open.
 
 ------------------------------------------------------------------------
 
 ## Sign-off
 
--   [x] All parts above are complete or their exceptions are recorded. Every item checkable without a human is verified above (2026-07-25); every remaining item is a real "needs a human/device" case, explicitly recorded and moved to `dogfeed.todo.md` for 0.3.5, except **G1.4/G1.5 (win-builder)**, which are the immediate next release-process step, not a dogfeed deferral.
--   [ ] Decision recorded: submit 0.3.4 to CRAN or hold for fixes.
+-   [x] All parts above are complete or their exceptions are recorded. Every item checkable without a human is verified above (2026-07-25); every remaining item is a real "needs a human/device" case, explicitly recorded and moved to `dogfeed.todo.md` for 0.3.5.
+-   [x] Decision recorded: **submit 0.3.4 to CRAN.**
 
-**Release-candidate status as of 2026-07-25:** `surveyframe_0.3.4.tar.gz` built from `main` at commit `6556f91`. `R CMD check --as-cran`: **Status OK, 0 errors, 0 warnings, 0 notes.** Full test suite: all tests pass (0 failed), naniar and pagedown both installed and exercised. Remaining before submission: win-builder R-release and R-devel (G1.4/G1.5), then this sign-off.
+**Release-candidate status as of 2026-07-25:** `surveyframe_0.3.4.tar.gz` built from `main` at commit `6556f91`. `R CMD check --as-cran`: **Status OK, 0 errors, 0 warnings, 0 notes** on local Ubuntu, win-builder R-release (4.6.1), and win-builder R-devel (r90295). Full test suite: all tests pass (0 failed), naniar and pagedown both installed and exercised. `cran-comments.md` updated with both win-builder results. Nothing left blocking submission.
 
 **Reviewer signature:** \_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_ **Date:** \_\_\_\_\_\_\_\_\_\_\_\_
