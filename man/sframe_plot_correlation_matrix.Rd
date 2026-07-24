@@ -20,7 +20,7 @@ sframe_plot_correlation_matrix(
 
 \item{palette}{One of \code{"web"} (diverging red/teal gradient) or \code{"print"}
 (white-to-black gradient by magnitude, signed label). See
-\code{\link[=sframe_brand]{sframe_brand()}}.}
+\code{sframe_brand()}.}
 }
 \value{
 A ggplot2 object.
@@ -29,7 +29,7 @@ A ggplot2 object.
 Computes and plots a full pairwise correlation matrix, independent of
 \code{\link[=run_analysis_plan]{run_analysis_plan()}}'s pairwise \code{correlation_pearson}/\verb{_spearman}/
 \verb{_kendall} runners (which plot one variable pair at a time via
-\code{\link[=sframe_plot_correlation]{sframe_plot_correlation()}}). Useful directly, and as the visual
+\code{sframe_plot_correlation()}). Useful directly, and as the visual
 companion to \code{\link[=validity_report]{validity_report()}}'s discriminant-validity checks.
 }
 \seealso{

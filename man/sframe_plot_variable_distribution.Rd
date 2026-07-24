@@ -11,7 +11,7 @@ sframe_plot_variable_distribution(data, variable, palette = c("web", "print"))
 
 \item{variable}{Character. Column name of the variable to plot.}
 
-\item{palette}{One of \code{"web"} or \code{"print"}. See \code{\link[=sframe_brand]{sframe_brand()}}.}
+\item{palette}{One of \code{"web"} or \code{"print"}. See \code{sframe_brand()}.}
 }
 \value{
 A named list of three ggplot2 objects (\code{histogram}, \code{boxplot},

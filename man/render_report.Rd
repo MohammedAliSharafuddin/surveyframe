@@ -63,7 +63,7 @@ generated syntax blocks. Defaults to \code{TRUE}.}
 \item{plot_palette}{One of \code{"web"} (brand colours, for on-screen reading)
 or \code{"print"} (black, grey, and white, for a journal-ready or
 print-friendly report). Applied to every chart the report embeds.
-See \code{\link[=sframe_brand]{sframe_brand()}}.}
+See \code{sframe_brand()}.}
 
 \item{interpretations}{Named list or NULL. Written interpretations keyed
 by analysis-plan block id, added after the results are known. When a

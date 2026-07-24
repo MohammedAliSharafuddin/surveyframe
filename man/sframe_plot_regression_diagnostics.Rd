@@ -10,7 +10,7 @@ sframe_plot_regression_diagnostics(result, palette = c("web", "print"))
 \item{result}{A \code{regression_linear} result list containing a \code{diagnostics}
 data frame (as produced internally by \code{\link[=run_analysis_plan]{run_analysis_plan()}}).}
 
-\item{palette}{One of \code{"web"} or \code{"print"}. See \code{\link[=sframe_brand]{sframe_brand()}}.}
+\item{palette}{One of \code{"web"} or \code{"print"}. See \code{sframe_brand()}.}
 }
 \value{
 A named list of four ggplot2 objects (\code{residuals_fitted}, \code{qq},

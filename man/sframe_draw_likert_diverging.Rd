@@ -15,7 +15,7 @@ sframe_draw_likert_diverging(
 
 \item{theme_color}{Character. Hex colour for the "agree" pole.}
 
-\item{palette}{One of \code{"web"} or \code{"print"}. See \code{\link[=sframe_brand]{sframe_brand()}}.}
+\item{palette}{One of \code{"web"} or \code{"print"}. See \code{sframe_brand()}.}
 }
 \value{
 Invisibly \code{NULL}; called for its plotting side effect on the
