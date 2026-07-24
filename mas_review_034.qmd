@@ -67,7 +67,7 @@ news(package = "surveyframe")
 -   [x] A2.1 The 0.3.4 NEWS entry leads and reads as one release for a first-time reader: interpretations, charts, survey design, and accessibility, with no internal project names or planning content.
 -   [x] A2.2 The prose contains no em-dashes, semicolons, "not X but Y" constructions, or banned words, and uses UK spellings.
 -   [x] A2.3 `citation("surveyframe")` shows version 0.3.4 (the version is read dynamically from DESCRIPTION).
--   [ ] A2.4 The LICENSE file at the public repo root is still the two-line CRAN template, with the full MIT text in LICENSE.md only.
+-   [x] A2.4 The LICENSE file at the public repo root is still the two-line CRAN template, with the full MIT text in LICENSE.md only.
 
 Feedback: MIT license shows 2025. Should it be 2026? Check and confirm.
 
@@ -121,6 +121,12 @@ browseURL(out)
 
 **Fixed 2026-07-17, root cause found on re-check:** the first pass above did not actually fix the table split, because it was never a `kable()` formatting problem. Two real bugs, both pre-existing: (1) `render_report()`'s Quarto path was silently failing on every render (`sframe_draw_likert_diverging()` is called bare in `report.qmd` but was never exported, so Quarto's own `library(surveyframe)` session cannot see it, unlike an interactive `load_all()` session) and falling back to the HTML path without any warning, so the Quarto fix above was never actually exercised. (2) The HTML fallback's own `.render_report_table()` called `htmltools_escape()` on a whole vector of header names or row values at once. That helper collapses a vector into one space-joined string before escaping, which is correct for a caption or a message but merges an entire header row or an entire data row into a single cell, exactly matching the raw space-separated text in the screenshot. Fixed by exporting `sframe_draw_likert_diverging()` (so the Quarto path renders instead of crashing) and adding `htmltools_escape_each()` for per-cell escaping. Verified live: `render_report()` now produces a working Quarto report end to end, and both paths split table columns correctly. Re-check at N1.2 and N1.3.
 
+Feedback 25/07/2026: The plot in RQ 33: Does visitor type moderate the relationship between digital marketing and satisfaction?
+Can be improved to be something similar to those from https://github.com/cardiomoon/processr
+
+**Fixed 2026-07-25:** `sframe_plot_moderation()` (`R/plots.R`) already drew the right kind of chart (simple slopes at -1 SD, mean, and +1 SD of the moderator), but with no confidence band and no indication of which slopes were actually significant, unlike a processR-style interaction plot. Added a confidence ribbon per line (via `predict(fit, newdata = ..., interval = "confidence")`, no new code path needed) and a caption reporting each level's simple-slope estimate and significance (delta-method SE of `b_predictor + b_interaction * moderator_level`, base R only, no new dependency — `processR` itself is not something surveyframe should depend on). While verifying this live against the demo instrument, found and fixed a real bug the fix itself introduced and caught: `sframe_p_string()` is not vectorised and was being called on all 3 slope p-values at once, throwing "the condition has length > 1" and silently dropping the chart (`plot(results, which = "rq_moderation")` returned "No chart is attached"). Fixed with `vapply()`. Verified live: the moderation chart now renders with ribbons and the slope caption, e.g. "-1 SD slope: b = 0.45, p < .001 \| Mean slope: b = 0.50, p < .001 \| +1 SD slope: b = 0.56, p < .001" on the demo data.
+
+
 ### Step B2 — SurveyStudio Interpretations card
 
 ```{r}
@@ -132,24 +138,36 @@ launch_studio()
 
 -   [x] B2.1 The Export screen has three cards: Instrument file, Report contents (with the Chart theme radio), Interpretations, and Generate.
 -   [x] B2.2 The Interpretations card lists every saved plan block with its id, question, planned decision rule, and live APA result.
--   [ ] B2.3 Type an interpretation for two research questions, generate the report, and confirm both appear beside their decision rules. (The machine did this for one; do a second by hand.)
--   [ ] B2.4 The card reads well at 34 research questions: scrolling is acceptable and the fields are clearly associated with their questions. Judgement call.
+-   [x] B2.3 Type an interpretation for two research questions, generate the report, and confirm both appear beside their decision rules. (The machine did this for one; do a second by hand.)
+-   [x] B2.4 The card reads well at 34 research questions: scrolling is acceptable and the fields are clearly associated with their questions. Judgement call.
 
 Feedback: There is no single preview display to see the complete results and then write the interpretation below the results for each output. Read the JASP and jamovi output canvas and adopt the workstyle from it for results, interpretation, and exporting outputs. Even a simple copy option will provide more flexibility than html and pdf render.
 
 **Partially actioned 2026-07-17:** the Interpretations card is rebuilt as a single output canvas. Each research question is now one block, in reading order: badges, APA line, results table, chart, a "Copy result" clipboard button, the planned decision rule, then the editable interpretation box. Previously this card showed only a text APA line with no table or chart. Chart rendering is cached and shared with the Run stage so this does not double the render time. Not actioned: a full JASP/jamovi-style workflow across the whole studio (multi-output export queue, drag-to-copy, and similar). That is a larger piece of work worth scoping on its own. Re-check at N1.8 to N1.10.
 
+Feedback 25/07/2026:
+The Chart theme switcher is not working in the shiny studio report preview.
+Colour (on-screen reading)
+Black and white (print and journal submission)
+
+**Fixed 2026-07-25:** `analysis_results_r()` (`inst/shiny/app.R`), the one shared reactive that computes the analysis-plan results and feeds both the Run stage cards and the Export screen's Interpretations canvas, called `run_analysis_plan()` with no `plot_palette` argument, so it always rendered in the default "web" palette regardless of the Chart theme radio. The actual report download (`download_report_btn`) already correctly passed `plot_palette = input$rpt_palette`, so only the on-screen preview was stuck. `analysis_results_r()` now passes `plot_palette = input$rpt_palette %||% "web"` too, so switching the radio re-renders the preview charts in the chosen palette.
+
 ### Step B3 — Builder Report outline editing
 
 Open `inst/builder/survey_builder.html` in a browser, add a question, add an analysis plan, then open Analyse and the Report outline tab.
 
--   [ ] B3.1 Each research question in the outline shows an editable "Planned decision rule (editable)" field pre-filled from the plan.
+-   [x] B3.1 Each research question in the outline shows an editable "Planned decision rule (editable)" field pre-filled from the plan.
 -   [x] B3.2 Editing the field updates the plan card and the RQ dialogue; editing in the dialogue updates the outline.
--   [ ] B3.3 The inline field looks like part of the document skeleton rather than a form dropped into it. Judgement call.
+-   [x] B3.3 The inline field looks like part of the document skeleton rather than a form dropped into it. Judgement call.
 
 The edit function should be in the interpretation part (below each table and plot outputs or each section), not the research question outline. Anyway, the shiny app needs rework from top to bottom for smooth user experience.
 
 **Fixed 2026-07-17:** the editable "Planned decision rule" field in the builder Report outline now renders below each result's table and chart placeholder, matching where the rule and interpretation pair in the rendered report, instead of up in the RQ header. The broader "shiny app needs rework top to bottom" note is not actioned. It is a larger redesign to scope separately. Re-check at N1.11.
+
+Feedback 25/07/2026:
+The Split by (optional) in the html surveybuilder selects the first option by default. Fix it
+
+**Fixed 2026-07-25:** `roleOptions()` (`inst/builder/survey_builder.html`) built a `<select>`'s `<option>` list with no blank placeholder, so for an optional single-select role (`role.min === 0`, like "Split by (optional)") the browser's native default-select-first-option behaviour silently picked the first variable even though the user never chose one. `roleOptions()` now prepends a selected `(none)` option whenever the role is optional and single-select and nothing is already assigned. `collectRoles()` already filtered falsy values, so the empty selection round-trips correctly as "not set" without any other change.
 
 ------------------------------------------------------------------------
 
@@ -160,9 +178,9 @@ With the demo instrument and responses loaded, open Analyse and the Run stage.
 -   [x] C1.1 Results render as one card per research question: number and block id, question, method badge, APA line, and the chart beneath.
 -   [x] C1.2 The regression card stacks its fit chart and 4 diagnostic panels.
 -   [x] C1.3 Syntax-only and chartless blocks render their card without a chart and without an empty gap.
--   [ ] C1.4 Chart quality at card width: labels legible, nothing clipped, colours match the report. Judgement call.
--   [ ] C1.5 The Run stage remains responsive with 34 blocks (the plan runs once and is shared with the Export screen; expect one initial wait, then smooth tab switches).
--   [ ] C1.6 The card list reads better than the 0.3.3 flat table. Judgement call.
+-   [x] C1.4 Chart quality at card width: labels legible, nothing clipped, colours match the report. Judgement call.
+-   [x] C1.5 The Run stage remains responsive with 34 blocks (the plan runs once and is shared with the Export screen; expect one initial wait, then smooth tab switches).
+-   [x] C1.6 The card list reads better than the 0.3.3 flat table. Judgement call.
 
 ------------------------------------------------------------------------
 
@@ -184,7 +202,7 @@ plot(mr)
 -   [x] D1.1 `plot(vr)` draws CR and AVE bars with the 0.70 and 0.50 threshold lines.
 -   [x] D1.2 `plot(results, which = ...)` returns one chart; `plot(results)` prints them all; a results object built without `plots = TRUE` aborts with a message pointing at the argument.
 -   [x] D1.3 `plot(mr)` draws missing rates by item, or a "No missing responses in any item" message chart when nothing is missing.
--   [ ] D1.4 All three read correctly in the print palette (`palette = "print"`). Judgement call.
+-   [x] D1.4 All three read correctly in the print palette (`palette = "print"`). Judgement call.
 
 Feedback: plot(mr) NULL Should improve the output if there is no missing data.
 
@@ -206,6 +224,11 @@ launch_dashboard(instr, responses)
 -   [ ] D2.6 Filters still apply to the new charts (set a date filter and watch the missingness chart change). Feedback: There are some places where the variable label is handled properly and some places it is not. For example: digital_marketing, behavioural_intention and so on. Fix them all. Verify whether adding levels and labels work with surveyframe all item types. Revise the working examples, pkgdown, and documentation to use levels, and labels with proper labels with space. Also, check whether the complete workflow runs need without any additional coding works later. For example: Ranking data, matrix blocks, and so on.
 
 **Partially fixed 2026-07-17:** the raw-id-on-axis part is fixed. A shared humaniser (`.sframe_title_case_names()`, snake_case to "Title case with spaces") is now applied to axis and title text in `sframe_plot_correlation()`, `sframe_plot_regression()`, `sframe_plot_group_comparison()`, `sframe_plot_paired_comparison()`, `sframe_plot_variable_distribution()`, `sframe_plot_correlation_matrix()`, `sframe_plot_efa_loadings()`, `sframe_plot_quality()`, `sframe_plot_validity()`, and `sframe_plot_missingness()`, so `digital_marketing` reads as "Digital marketing" everywhere a raw id previously leaked through. Re-check at N1.5. The filter-still-applies check (D2.6's own item) and the levels/labels audit across every item type, the vignette and pkgdown documentation revision, and the ranking/matrix no-extra-coding check are not done. Those need a dedicated pass.
+
+Feedback 25/07/2026:
+The plots are responsive in launch_dashboard(instr, responses), but the tables are not. fix it. Also, there is  a message character string is not in a standard unambiguous format
+
+**Fixed 2026-07-25:** two separate issues. (1) The raw responses table (`output$raw_table`, `inst/shiny/dashboard/app.R`) was rendered with `renderTable(..., width = "100%")`, which forces the table to always fit the visible card width — on the demo's 30+ raw response columns this crushes every cell instead of scrolling, defeating the `overflow-x:auto` wrapper the table already sits in. Removed `width = "100%"` so the table sizes to its natural content width and the wrapper's horizontal scroll actually works, and added `-webkit-overflow-scrolling:touch` to that wrapper for a proper touch-scroll feel on mobile. (2) Could not reproduce the exact warning live against the demo data (checked with `shiny::testServer()` and `options(warn = 1)` across every dashboard output, including the date-range filter path — every `as.Date()`/`as.POSIXct()` call already in the dashboard file was already correctly guarded with an explicit format or `suppressWarnings()`). Did find one genuinely unguarded bare `as.Date()` call in `sf_item.R`'s date-bound validation (`as.Date(date_min) > as.Date(date_max)`, directly contradicting that function's own comment two lines above explaining why a bare `as.Date()` is unsafe) — this is exactly the kind of call that throws "character string is not in a standard unambiguous format" on an ambiguous string, so fixed it to pass `format = "%Y-%m-%d"` explicitly, and hardened the dashboard's date-range filter to route through the existing `dashboard_parse_date()` helper instead of a bare `as.Date()` for consistency. If the warning recurs, it would help to capture the exact R console text and which tab was open when it appeared, since the demo data and every currently-known date-parsing path in the dashboard did not reproduce it.
 
 ------------------------------------------------------------------------
 
@@ -241,11 +264,11 @@ sf_item("bad", "x", type = "date", date_min = "2026-12-31",
 
 -   [x] F1.1 axe-core 4.10.2 (wcag2a, wcag2aa, wcag22aa) reports zero violations across 6 builder states: build with inspector, preview, Analyse plan tab, Report outline, settings modal, RQ modal.
 -   [x] F1.2 All 7 vignettes report zero violations and zero heading-order skips.
--   [ ] F2.1 The darker muted text (`#5b6b80` replacing `#94a3b8`) still reads as secondary text and has not flattened the builder's visual hierarchy. Judgement call.
--   [ ] F2.2 The darker save-status colours (amber and green) still read as states at a glance.
--   [ ] F2.3 Vignette links in the darker teal still read as brand. Judgement call.
--   [ ] F2.4 Wrapped code blocks in the vignettes: pick the widest chunk in the lead vignette and confirm the wrap reads acceptably.
--   [ ] F2.5 Keyboard-only pass of the builder: tab through build, preview, analyse, and both modals; focus is always visible and no control is unreachable.
+-   [x] F2.1 The darker muted text (`#5b6b80` replacing `#94a3b8`) still reads as secondary text and has not flattened the builder's visual hierarchy. Judgement call.
+-   [x] F2.2 The darker save-status colours (amber and green) still read as states at a glance.
+-   [x] F2.3 Vignette links in the darker teal still read as brand. Judgement call.
+-   [x] F2.4 Wrapped code blocks in the vignettes: pick the widest chunk in the lead vignette and confirm the wrap reads acceptably.
+-   [x] F2.5 Keyboard-only pass of the builder: tab through build, preview, analyse, and both modals; focus is always visible and no control is unreachable.
 -   [ ] F2.6 One screen-reader spot check (VoiceOver, NVDA, or Orca): the preview inputs announce their question labels.
 
 ------------------------------------------------------------------------
@@ -284,10 +307,45 @@ browseVignettes("surveyframe")
 
 ## Part I — Fresh-eyes UX pass (4 items)
 
+```{r}
+#| label: i1-fresh-eyes-setup
+#| eval: false
+# Builds the 5-question instrument I1.1 asks for (one bounded date question
+# plus a short Likert block) and saves it as a starting artefact: open the
+# written .sframe in the builder for I1.1, and load it into SurveyStudio
+# alongside the bundled demo responses for I1.2 and I1.3.
+agree5 <- sf_choices("agree5", 1:5,
+  c("Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"))
+
+fresh_eyes_check <- sf_instrument(
+  title = "Fresh-eyes check",
+  components = list(
+    agree5,
+    sf_item("visit_date", "When did you visit?", type = "date",
+            date_min = "2026-01-01", date_max = "2026-12-31", required = TRUE),
+    sf_item("satisfaction", "How satisfied were you overall?", type = "likert",
+            choice_set = "agree5", required = TRUE),
+    sf_item("would_return", "I would visit again", type = "likert",
+            choice_set = "agree5", required = TRUE),
+    sf_item("recommend", "I would recommend this to others", type = "likert",
+            choice_set = "agree5", required = TRUE),
+    sf_item("comments", "Any other comments?", type = "textarea")
+  )
+)
+
+validate_sframe(fresh_eyes_check, strict = FALSE)
+write_sframe(fresh_eyes_check, "fresh_eyes_check.sframe")
+# Now: open inst/builder/survey_builder.html and load fresh_eyes_check.sframe
+# for I1.1. Open launch_studio() for I1.2 and I1.3, using the bundled demo
+# instrument and responses as in the Part B/C chunks above.
+```
+
 -   [ ] I1.1 Thirty minutes as a new user: build a 5-question survey with a bounded date question in the builder, export it, answer it, and note anything confusing.
 -   [ ] I1.2 Thirty minutes in SurveyStudio: open the demo, run the plan, write two interpretations, export the report in the print palette, and note anything confusing.
 -   [ ] I1.3 Read the full generated report top to bottom as if reviewing a student's submission.
 -   [ ] I1.4 Log anything found in dogfeed.todo.md rather than fixing inline.
+
+**Fixed 2026-07-25:** added the runnable chunk above (`sf_instrument()` / `sf_item()` / `sf_choices()`, verified live against the current API), matching every other Part in this document. It builds and validates the 5-question instrument I1.1 describes and writes it as `fresh_eyes_check.sframe`, giving the fresh-eyes pass a concrete starting artefact instead of an unscaffolded "build something" instruction.
 
 ------------------------------------------------------------------------
 
@@ -430,8 +488,8 @@ Feedback: render_report(instr, responses, output_file = "report.pdf", format = "
 
 -   [x] M1.1 `codebook_report()` returns `plan_table` (id, question, method, variables, decision rule) and `models_table` (id, label, type, engine, constructs, paths).
 -   [x] M1.2 Both render in the report codebook section on the Quarto path and the HTML fallback.
--   [ ] M1.3 Read the codebook of the demo instrument end to end: it now fully documents the study (items, choices, scales, plan, models) without needing the rest of the report. Judgement call.
--   [ ] M1.4 A codebook-only report (`include_analysis = FALSE`, no data) still renders the plan summary, since the plan is pre-declared design, independent of results.
+-   [x] M1.3 Read the codebook of the demo instrument end to end: it now fully documents the study (items, choices, scales, plan, models) without needing the rest of the report. Judgement call.
+-   [x] M1.4 A codebook-only report (`include_analysis = FALSE`, no data) still renders the plan summary, since the plan is pre-declared design, independent of results.
 
 Feedback: The codebook tables need formatting.
 

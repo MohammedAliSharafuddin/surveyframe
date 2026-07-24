@@ -1565,23 +1565,58 @@ sframe_plot_moderation <- function(result, data, palette = c("web", "print")) {
   )
   pred_range <- range(df[[predictor]], na.rm = TRUE)
   pred_seq <- seq(pred_range[1], pred_range[2], length.out = 25)
+  # predict(..., interval = "confidence") gives the ribbon band for free, no
+  # separate se.fit arithmetic needed.
   grid <- do.call(rbind, lapply(seq_len(nrow(levels_df)), function(i) {
     nd <- data.frame(v1 = pred_seq)
     names(nd) <- predictor
     nd[[moderator]] <- levels_df$value[i]
-    nd$fitted <- stats::predict(fit, newdata = nd)
+    pr <- as.data.frame(stats::predict(fit, newdata = nd, interval = "confidence"))
+    nd$fitted <- pr$fit
+    nd$lo <- pr$lwr
+    nd$hi <- pr$upr
     nd$level <- levels_df$level[i]
     nd
   }))
+
+  # Simple-slope significance at each moderator level (the delta-method SE
+  # of b1 + b12 * level), the same conditional-effects test processR-style
+  # interaction plots annotate alongside the lines.
+  b <- stats::coef(fit)
+  vc <- stats::vcov(fit)
+  b12_name <- paste0(predictor, ":", moderator)
+  b1  <- b[[predictor]]
+  b12 <- if (b12_name %in% names(b)) b[[b12_name]] else 0
+  var1  <- vc[predictor, predictor]
+  var12 <- if (b12_name %in% rownames(vc)) vc[b12_name, b12_name] else 0
+  cov112 <- if (b12_name %in% rownames(vc)) vc[predictor, b12_name] else 0
+  slopes <- vapply(levels_df$value, function(lv) b1 + b12 * lv, numeric(1))
+  slope_se <- vapply(levels_df$value, function(lv) {
+    sqrt(var1 + (lv^2) * var12 + 2 * lv * cov112)
+  }, numeric(1))
+  slope_t <- slopes / slope_se
+  slope_p <- 2 * stats::pt(-abs(slope_t), fit$df.residual)
+  caption <- paste(
+    sprintf("%s slope: b = %.2f, p %s", levels_df$level, slopes,
+            vapply(slope_p, sframe_p_string, character(1))),
+    collapse = "   |   "
+  )
+
   brand <- sframe_brand(palette)
+  series <- sframe_series_colours(3, palette)
   ggplot2::ggplot(grid, ggplot2::aes(x = .data[[predictor]], y = .data$fitted, colour = .data$level)) +
+    ggplot2::geom_ribbon(ggplot2::aes(ymin = .data$lo, ymax = .data$hi, fill = .data$level),
+                         alpha = 0.15, colour = NA) +
     ggplot2::geom_line(linewidth = 0.9) +
-    ggplot2::scale_colour_manual(values = sframe_series_colours(3, palette)) +
+    ggplot2::scale_colour_manual(values = series) +
+    ggplot2::scale_fill_manual(values = series) +
+    ggplot2::guides(fill = "none") +
     ggplot2::labs(
       title = sprintf("%s moderates the effect of %s on %s",
                       .sframe_title_case_names(moderator), .sframe_title_case_names(predictor),
                       .sframe_title_case_names(outcome)),
       subtitle = result$apa %||% NULL,
+      caption = caption,
       x = .sframe_title_case_names(predictor), y = .sframe_title_case_names(outcome),
       colour = .sframe_title_case_names(moderator)
     ) +

@@ -75,7 +75,8 @@ sf_item <- function(
   date_min <- sframe_check_date_bound(date_min, "date_min")
   date_max <- sframe_check_date_bound(date_max, "date_max")
   if (!is.null(date_min) && !is.null(date_max) &&
-      as.Date(date_min) > as.Date(date_max)) {
+      as.Date(date_min, format = "%Y-%m-%d") >
+      as.Date(date_max, format = "%Y-%m-%d")) {
     rlang::abort("`date_min` must not be later than `date_max`.",
                  class = c("sframe_validation_error", "sframe_error"))
   }
