@@ -20,7 +20,7 @@ Description: Supports survey research workflows built around a typed
     an interactive response dashboard, codebook generation, and reproducible
     HTML reporting.
 License: MIT + file LICENSE
-URL: https://mohammedalisharafuddin.github.io/surveyframe,
+URL: https://mohammedalisharafuddin.github.io/surveyframe/,
     https://github.com/MohammedAliSharafuddin/surveyframe
 BugReports: https://github.com/MohammedAliSharafuddin/surveyframe/issues
 Encoding: UTF-8
