@@ -215,7 +215,7 @@ server <- function(input, output, session) {
     }
     if (!is.null(date_filter_column) && !is.null(input$filter_date_range)) {
       d <- dashboard_parse_date(out[[date_filter_column]])
-      rng <- as.Date(input$filter_date_range)
+      rng <- dashboard_parse_date(input$filter_date_range)
       keep <- is.na(d) | (d >= rng[1] & d <= rng[2])
       out <- out[keep, , drop = FALSE]
     }
@@ -393,12 +393,15 @@ server <- function(input, output, session) {
   }, bg = "white")
   outputOptions(output, "missing_chart", suspendWhenHidden = FALSE)
 
-  # Raw data table
+  # Raw data table. No `width = "100%"` here: a wide response table (30+
+  # columns) forced to the card's width crushes every cell instead of
+  # scrolling, defeating the overflow-x:auto wrapper in db_data_ui(). Sized
+  # to its natural content width, it scrolls horizontally as intended.
   output$raw_table <- renderTable({
     resp <- filtered_responses()
     if (is.null(resp)) return(data.frame(Note = "No responses loaded."))
     head(resp, 200)
-  }, striped = TRUE, hover = TRUE, bordered = FALSE, width = "100%",
+  }, striped = TRUE, hover = TRUE, bordered = FALSE,
      na = "Not available")
 
   output$dl_csv <- downloadHandler(
@@ -651,7 +654,8 @@ db_data_ui <- function(resp = responses) {
         tagList(
           p(style="font-size:11px;color:#94a3b8;margin-bottom:10px",
             paste0("Showing first 200 of ", n_current, " filtered rows.")),
-          div(style="overflow-x:auto", tableOutput("raw_table"))
+          div(style="overflow-x:auto;-webkit-overflow-scrolling:touch;max-width:100%",
+              tableOutput("raw_table"))
         )
       }
     )
