@@ -19,3 +19,21 @@ bibentry(
   note     = paste("R package version", meta$Version),
   url      = "https://github.com/MohammedAliSharafuddin/surveyframe"
 )
+
+bibentry(
+  bibtype  = "Book",
+  title    = paste("Quantitative Analysis with Small Samples:",
+                    "A Practical Guide for Students and Early-Career Researchers"),
+  author   = c(
+    person("Mohammed Ali", "Sharafuddin"),
+    person("A. A.", "Jaleel"),
+    person("M.", "Madhavan")
+  ),
+  year     = "2026",
+  publisher = "Zenodo",
+  version  = "0.1.0",
+  doi      = "10.5281/zenodo.20221929",
+  url      = "https://doi.org/10.5281/zenodo.20221929",
+  note     = paste("Companion textbook describing the small-sample methods",
+                    "surveyframe adds in v0.4 and when to prefer each one.")
+)

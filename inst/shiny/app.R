@@ -516,6 +516,17 @@ analysis_registry <- local({
       output = "nnet::multinom plan, odds ratios, and classification table.",
       refs = "hosmer_2013"
     ),
+    firth_logistic = list(
+      family = "regression", label = "Firth penalised logistic",
+      roles = list(
+        role("dependent", "Binary outcome", levels = "nominal"),
+        role("predictors", "Predictors", min = 1, max = 99, levels = c("nominal", "ordinal", "continuous", "scale"))
+      ),
+      show_alpha = TRUE, show_hypotheses = TRUE, show_effect_size = TRUE,
+      assumptions = c("Small sample", "Separation warning"),
+      output = "Penalised odds ratios with profile-likelihood confidence intervals. Requires the logistf package.",
+      refs = c("firth_1993", "heinze_2002")
+    ),
     mediation = list(
       family = "regression", label = "Mediation",
       roles = list(

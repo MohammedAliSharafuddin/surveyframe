@@ -39,6 +39,7 @@ Suggests:
     psych (>= 2.3.0),
     MASS,
     nnet,
+    logistf (>= 1.24.0),
     digest (>= 0.6.0),
     lavaan (>= 0.6-0),
     testthat (>= 3.0.0),
