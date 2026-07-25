@@ -107,6 +107,15 @@ sframe_analysis_roles <- function(block) {
     # to come from options, since nothing in a bare variable list says which
     # item holds them.
     topsis = list(performance_items = vars),
+    vikor = list(performance_items = vars),
+    moora = list(performance_items = vars),
+    smart = list(performance_items = vars),
+    waspas = list(performance_items = vars),
+    promethee = list(performance_items = vars),
+    electre = list(performance_items = vars),
+    ahp = list(pairwise = vars[1]),
+    anp = list(pairwise = vars[1]),
+    dematel = list(pairwise = vars[1]),
     list(variables = vars)
   )
 }

@@ -46,7 +46,8 @@ Suggests:
     knitr,
     rmarkdown,
     naniar (>= 1.0.0),
-    pagedown (>= 0.20)
+    pagedown (>= 0.20),
+    RMCDA (>= 0.3.1)
 VignetteBuilder: knitr
 Config/testthat/edition: 3
 Config/roxygen2/version: 8.0.0

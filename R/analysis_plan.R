@@ -82,6 +82,17 @@
     apa  = "Hwang, C.-L., & Yoon, K. (1981). *Multiple attribute decision making: Methods and applications*. Springer.",
     use  = "topsis"
   ),
+  saaty_1980 = list(
+    key  = "saaty_1980",
+    apa  = "Saaty, T. L. (1980). *The analytic hierarchy process*. McGraw-Hill.",
+    use  = "ahp"
+  ),
+  # anp, dematel, vikor, moora, smart, waspas, promethee, and electre have no
+  # citation entry yet. Their originating references are recorded in
+  # todo_0.5.md's harvest audit but flagged there as unverified (page/volume/
+  # journal-name detail not checked against the actual publication) or, for
+  # dematel, unresolved between two candidate grey-literature reports. Do not
+  # add an entry here until each is individually verified.
   macKinnon_2008 = list(
     key = "mackinnon_2008",
     apa = "MacKinnon, D. P. (2008). *Introduction to statistical mediation analysis*. Lawrence Erlbaum.",
@@ -1202,6 +1213,15 @@ sframe_run_one_block <- function(block, data, instrument, plots = FALSE,
       regression_logistic_multinomial = sframe_run_multinomial_logistic(data, roles, options),
       firth_logistic     = sframe_run_firth_logistic(data, roles, options),
       topsis             = sframe_run_topsis(data, roles, options, instrument),
+      ahp                = sframe_run_ahp(data, roles, options, instrument),
+      anp                = sframe_run_anp(data, roles, options, instrument),
+      dematel            = sframe_run_dematel(data, roles, options, instrument),
+      vikor              = sframe_run_vikor(data, roles, options, instrument),
+      moora              = sframe_run_moora(data, roles, options, instrument),
+      smart              = sframe_run_smart(data, roles, options, instrument),
+      waspas             = sframe_run_waspas(data, roles, options, instrument),
+      promethee          = sframe_run_promethee(data, roles, options, instrument),
+      electre            = sframe_run_electre(data, roles, options, instrument),
       moderation = sframe_run_moderation(data, roles),
       mediation = sframe_run_mediation(data, roles, options),
       list(test = test, error = paste0("Test '", test, "' is unavailable."))
