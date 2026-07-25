@@ -1,6 +1,18 @@
 # surveyframe roadmap (0.3 through 1.0)
 
-Last updated: 2026-07-14.
+Last updated: 2026-07-25.
+
+**2026-07-25: 0.4 merged into 0.5 by owner decision**, fired early,
+ahead of the original 2026-10-15 DOI-live gate (`decisions.md` in
+portfolio-planner). No standalone 0.4 version ships; 0.3.5 is followed
+directly by 0.5, which now carries both the small-sample track (former
+0.4 scope — already implemented and tested on branch `v0.4-dev`,
+committed, then branched into `v0.5-dev`) and the MCDM/DEMATEL track
+(0.5's original scope, Phase 1 in progress on `v0.5-dev`: harvest
+audit, item types, `R/decision_data.R`, TOPSIS reference runner). The
+former 0.4.1 faculty-demo patch renumbers to 0.5.1
+(`todo_0.5.1.md`). See `todo_0.4.md` and `todo_0.5.md` for full
+engineering status.
 
 This roadmap stages surveyframe from the current CRAN release to v1.0, the
 version that anchors the launch of Ethos, Ethos Pro, and the ASRDA textbook.
@@ -62,9 +74,9 @@ the slip and record why in `portfolio-planner/decisions.md`.
 | 0.3.3 | Real-world embedding and conference feedback (AIC-RSAM, ICSRI 2026) plus the visualisation foundation (ggplot2 in Suggests, brand theme, `plots = TRUE`, first family plots, `$table` on inferential runners) and the Theme B survey redesign. Merged from the planned 0.3.3 and 0.3.4 on 2026-07-10 | implemented 2026-07-09, release pending |
 | 0.3.4 | All plotting, UI, statistics, and reporting work. The plotting and UI half (visualisation breadth, `plot()` S3 methods, plots into every surface, the builder rework, date bounds, the 2 WCAG 2.2 AA passes) is implemented and committed. The statistics and reporting half joins it by owner decision on 2026-07-17, since 0.3.4 had not been submitted: effect-size confidence intervals (base-R bootstrap `bootstrap_ci`, `cohens_d_ci`, `cramers_v_ci`, `eta_sq_ci`), psychometric depth (Henseler HTMT, real Little's MCAR via naniar, omega and EFA polish), report polish and PDF (`render_report(format = "pdf")` via pagedown, theming, accessibility, codebook upgrades) | 2026-08-15 |
 | 0.3.5 | Field validation: ICSRI 2026 audience feedback (conference 8-9 August 2026), additional rounds of human testing with several short real surveys, and the fixes both surface. Strict patch scope, no planned new features. Redefined 2026-07-17 when the former statistics scope moved into 0.3.4 | 2026-09-15 |
-| 0.4 | Small-sample inference plus the RStudio add-in | 2026-11-20 |
-| 0.4.1 | Faculty demo proofing: demo session to college faculty, then UI/UX and doc fixes | 2026-12-11 |
-| 0.5 | MCDM and DEMATEL | 2027-01-25 |
+| ~~0.4~~ | **Merged into 0.5, 2026-07-25** (fired early, ahead of the original 2026-10-15 gate). Small-sample inference engineering already implemented and tested on `v0.5-dev`. The RStudio add-in is unaffected, reaches GitHub from `dev` and CRAN with whichever release ships first | superseded, see 0.5 |
+| 0.5 | Small-sample inference (merged in, see above) plus MCDM and DEMATEL. Data-contract Phase 1 (item types, `R/decision_data.R`, TOPSIS reference runner) implemented and tested on `v0.5-dev`; remaining 9 MCDM computations, 3 rendering surfaces, and both JS registries not yet built | TBC, was 2027-01-25 pre-merge for MCDM alone |
+| 0.5.1 | Faculty demo proofing on the merged 0.5: demo session to college faculty, then UI/UX and doc fixes. Renumbered from 0.4.1, 2026-07-25 | TBC, ~2027-02 pre-merge estimate |
 | 0.6 | SEM and PLS execution, invariance | 2027-03-11 |
 | 0.7 | Text and open-ended response analysis | 2027-04-25 |
 | 0.8 | Provenance part 1: `sf_version`, `sf_review`, `sf_pilot`, response hashing (SHA Layers 2-3) | 2027-06-09 |
@@ -322,7 +334,7 @@ idea (full assessment in mas_review_033.md):
 - Runtime label piping (glue-style tokens): in tension with the immutable
   hashed-instrument guarantee; recorded as a research question only.
 
-### v0.4 — Small-sample inference plus the RStudio add-in (target 2026-11-20)
+### v0.4 — Small-sample inference plus the RStudio add-in (merged into v0.5, 2026-07-25 — see status note at top of file)
 
 Headline: trustworthy analysis when n is below thirty, plus an IDE surface.
 
@@ -349,7 +361,7 @@ Exit criteria: a study with n < 30 can run the plan and receive method-choice
 guidance plus a small-sample-appropriate result with interval coverage notes.
 The RStudio add-in installs and registers correctly on CRAN.
 
-### v0.4.1 — Faculty demo proofing (target 2026-12-11)
+### v0.4.1 — Faculty demo proofing (renumbered to v0.5.1, 2026-07-25 — see `todo_0.5.1.md`)
 
 Headline: a live demo session to college faculty, then UI/UX and documentation
 fixes based on that session's feedback.
@@ -358,7 +370,7 @@ This patch applies real-world adoption feedback from faculty who are not
 package authors. Strict patch scope: no new analytical features or exports.
 The faculty demo is the proofing mechanism, not a deliverable.
 
-### v0.5 — MCDM and DEMATEL (target 2027-01-25)
+### v0.5 — MCDM and DEMATEL, now also carrying the merged small-sample track (target TBC, was 2027-01-25 pre-merge for MCDM alone)
 
 Headline: bring multi-criteria decision making into the survey workflow.
 
@@ -551,8 +563,7 @@ ch 32 (machine learning), Part XIII ch 36 (IRT) and ch 38 (meta-analysis).
 |---|---|
 | 0.3 | JSS software paper (OJS 6454, submitted 2026-06-02; returned without full review 2026-06; revise and resubmit). Plus the v0.3 design paper (not yet started). |
 | 0.3.4 to 0.3.5 | No separate paper. The visualisation arc is patch work. Plots feed figures in every later methodology paper and in ASRDA ch 17. |
-| 0.4 | Small-sample survey inference paper (smallsamplelab), draft exists. |
-| 0.5 | MCDM and DEMATEL methodology paper, not started. |
+| 0.5 | Small-sample survey inference paper (smallsamplelab, draft exists) **and** MCDM and DEMATEL methodology paper (not started) — both cite 0.5, since 0.4 merged into 0.5 on 2026-07-25. |
 | 0.6 | semScreenR package and SEM-screening methodology paper, not started. |
 | 0.7 | Text and open-ended analysis methodology paper, not started. |
 | 0.8 and 0.9 | Covered by three papers, in submission order: SSR 6.0 (proof-of-integrity, submitted post-0.9, unchanged as of the 2026-07-14 scope decision), then MethodsX (sframe-schema standard, standalone repo `sframe-schema`), then JOI (informetrics framing of the Derivative Citation Model). MethodsX and JOI added 2026-07-14; both cite SSR 6.0 rather than duplicating it. |

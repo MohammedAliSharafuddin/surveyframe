@@ -6,19 +6,61 @@ and `.Rbuildignore`. Companion to `CLAUDE.md`, `todo_0.4.md`, and
 (the original guide, v0.5 section — treat it as intent, this file as the
 verified plan).
 
-Last updated: 2026-07-25. Target CRAN submission: 2027-01-25
-(`../portfolio-planner/master_roadmap.md`). Do not start before 0.4 ships
-and 0.4.1 (2026-12-11) is done or explicitly waived by the owner.
+Last updated: 2026-07-26. Target CRAN submission: TBC (was 2027-01-25
+pre-merge, `../portfolio-planner/master_roadmap.md`). **0.4 merged into
+0.5 on 2026-07-25** (owner decision, fired early — see decisions.md);
+the small-sample track from `todo_0.4.md` is already implemented and
+tested on `v0.5-dev` (branched from the committed `v0.4-dev`), so this
+release now carries both tracks. Superseded: the "do not start before
+0.4 ships" condition and the 2026-10-15 decision gate below, both from
+the pre-merge plan.
 
-**Decision gate 2026-10-15 (recorded 2026-07-25 in
-`../portfolio-planner/decisions.md`):** if the small-sample preprint DOI
-is not live by 2026-10-15, 0.4 merges into this release as an added
-small-sample track (`todo_0.4.md` folds in here, 0.4.1 renumbers to
-0.5.1, same 2027-01-25 target). If the DOI is live, 0.4 ships separately
-on schedule and the start-condition paragraph above stands. Either way,
-the 0.5 data-contract work (section 1) may start early on a branch
-during the 0.4 cycle — that is the sanctioned way to buy MCDM more time,
-merge or no merge.
+**2026-07-26 update (recorded in `../portfolio-planner/decisions.md`):
+RMCDA (CRAN) discovered as much broader prior art (~51 methods vs the
+10 planned here). Owner decisions**: 0.5's shipped scope stays the
+original 10 methods below; the RMCDA-sourced extras ship as follow-up
+patches starting at **0.5.2** (0.5.1 stays the faculty-demo patch,
+`todo_0.5.1.md`); RMCDA is added as a Suggests-only, guarded, test-time
+dependency to cross-check surveyframe's own computations (never a
+runtime Import); and the small-sample paper is being rewritten to
+include MCDM content, deliberately held back from posting its preprint
+until **this file's original 10 methods** (not the 0.5.2+ expansion)
+are complete — this is now what gates `inst/CITATION`'s preprint
+bibentry, not a dated external checkpoint.
+
+~~**Decision gate 2026-10-15**~~ — superseded, the merge already fired.
+
+**2026-07-26: all 10 methods implemented and wired, committed on
+`v0.5-dev`.** Phase 1 (data contract, item types at the R level,
+`R/decision_data.R`, TOPSIS as the reference runner) and Phase 2 (the
+remaining 9 methods — AHP, ANP, DEMATEL, VIKOR, MOORA, SMART, WASPAS,
+PROMETHEE, ELECTRE — built in 4 parallel agents, each in its own file
+to avoid concurrent-edit conflicts) are both done and consolidated:
+every method dispatches through `sframe_run_one_block()`'s switch,
+`sframe_analysis_roles()`'s fallback, and `sframe_plot_for_result()`;
+both UI registries (builder `ANALYSIS_REGISTRY` + dropdown, studio
+registry + requirements strings) list all 10; full test suite green
+(all `test-decision-*.R` files plus the pre-existing suite);
+`devtools::document()` clean; all 10 methods smoke-tested end to end
+through `run_analysis_plan()` including plot attachment.
+`R CMD check --as-cran` run in progress as of this update.
+
+RMCDA (CRAN, ~51 methods) added as a Suggests-only, guarded, test-time
+dependency and used as a cross-check oracle in the new test files —
+this caught one real bug (WASPAS's normalisation was wrong, borrowed
+from SMART instead of using its own ratio-to-best convention; fixed
+and verified against RMCDA's published worked example).
+
+**Still open, not done in this pass**: citations for 8 of the 10
+methods (only AHP's Saaty 1980 is added to `.sframe_citations`; the
+other 8 are recorded in the harvest audit below but flagged as
+needing page/volume/journal-name verification before they can be
+added, or — for DEMATEL — genuinely unresolved between two candidate
+sources); `sensitivity_analysis()` (section 5); `sf_conjoint_design()`
+(section 6); the vignette (section 7); the three rendering surfaces
+for `pairwise_comparison`/`criteria_weight` on the static template and
+Shiny renderer (the builder inspector editor status needs checking —
+not confirmed done or not in this pass); win-builder; `cran-comments.md`.
 
 All file/line anchors below were verified against `main` on 2026-07-25
 (0.3.4 feature-complete). Line numbers will drift: **re-grep every anchor
@@ -65,6 +107,113 @@ exists in R.** The real architecture:
   `R/conditions.R` wrapping `rlang::check_installed()` (pattern:
   `sframe_require_psych`, `R/conditions.R:26`).
 
+## Harvest audit (completed 2026-07-25)
+
+Source: `../mcdm` (cloned 2026-07-25). Every method lives in
+`R/methods/<id>.R` and registers itself with `register_method(name,
+description, func, category, requires_pairwise)` from `R/registry.R`
+into an environment-backed `MCDM_REGISTRY`. Each computation function
+has the fixed signature `<id>_method(X, w, cb)` where `X` is a numeric
+matrix, `w` a numeric weight vector, and `cb` a **logical** vector
+(TRUE = benefit). surveyframe uses `criteria_types = c("benefit",
+"cost")`, so every port converts once at the boundary.
+
+**All 10 are pure R with zero Shiny entanglement.** A grep for
+`shiny|reactive|req(|input$|output$|showNotification` across
+`R/methods/`, `R/utils_normalise.R`, `R/utils_weights.R` and
+`R/utils_validate.R` returns nothing. The Shiny layer sits entirely
+above the registry. The only non-pure behaviour inside the method files
+is two `cat()` calls (ahp.R:39, dematel.R:28) printing to the console
+from inside a computation, which must not survive the port.
+
+**No citations exist anywhere in the mcdm repo.** No `references`
+field, no DOI, no author-year string, in any of the 10 method files or
+the registry. The "citation keys used" column below is therefore
+*not* harvested from the source — it is the standard originating
+reference for each method, supplied here from general knowledge and
+marked with a confidence flag. **Nothing in the flagged rows may be
+added to `.sframe_citations` until it is checked against the actual
+publication.** Only the rows marked `verified` are cleared for use.
+
+| Method | Source file | Computation fn | Pure R | Rework | Originating reference (confidence) |
+|---|---|---|---|---|---|
+| TOPSIS | `R/methods/topsis.R` (81) | `topsis_method(X, w, cb)` | yes | trivial | Hwang, C.-L., & Yoon, K. (1981). *Multiple attribute decision making: Methods and applications*. Springer. — **verified**, standard |
+| AHP | `R/methods/ahp.R` (84) | `ahp_method(X, w = NULL, cb = NULL)` | yes (one `cat()`) | moderate | Saaty, T. L. (1980). *The analytic hierarchy process*. McGraw-Hill. — **verified**, standard. AIJ geometric-mean aggregation: Aczél & Saaty (1983), *Journal of Mathematical Psychology*, 27(1), 93-102 — *flagged, check volume/pages*. Forman & Peniwati (1998), *EJOR*, 108(1), 165-169 — *flagged* |
+| ANP | `R/methods/anp.R` (72) | `anp_method(X, w = NULL, cb = NULL)` | yes | significant | Saaty, T. L. (1996). *Decision making with dependence and feedback: The analytic network process*. RWS Publications. — *flagged, check edition/year* |
+| DEMATEL | `R/methods/dematel.R` (113) | `dematel_method(X, w = NULL, cb = NULL)` | yes (one `cat()`) | moderate | Gabus, A., & Fontela, E. (1972). *World problems, an invitation to further thought within the framework of DEMATEL*. Battelle Geneva Research Centre. — **corrected**: the brief's "Fontela & Gabus 1976" is a different report (*The DEMATEL observer*, 1976). Web-checked 2026-07-25; both are grey-literature Battelle reports, so *flagged* until a copy is sighted |
+| ELECTRE | `R/methods/electre.R` (154) | `electre_method(X, w, cb, thresholds = NULL)` | yes | significant | Roy, B. (1968). Classement et choix en présence de points de vue multiples (la méthode ELECTRE). *RIRO*, 2(8), 57-75. — *flagged, check journal name and pages* |
+| MOORA | `R/methods/moora.R` (88) | `moora_method(X, w, cb)` | yes | trivial | Brauers, W. K. M., & Zavadskas, E. K. (2006). The MOORA method and its application to privatization in a transition economy. *Control and Cybernetics*, 35(2), 445-469. — *flagged, check pages* |
+| PROMETHEE | `R/methods/promethee.R` (119) | `promethee_method(X, w, cb, preference_function = "linear", thresholds = NULL)` | yes | moderate | Brans, J. P., & Vincke, P. (1985). A preference ranking organisation method. *Management Science*, 31(6), 647-656. — *flagged, check pages* |
+| SMART | `R/methods/smart.R` (49) | `smart_method(X, w, cb)` | yes | trivial | Edwards, W. (1977). How to use multiattribute utility measurement for social decisionmaking. *IEEE Transactions on Systems, Man, and Cybernetics*, 7(5), 326-340. — *flagged, check pages* |
+| VIKOR | `R/methods/vikor.R` (90) | `vikor_method(X, w, cb, v = 0.5)` | yes | moderate | Opricovic, S., & Tzeng, G.-H. (2004). Compromise solution by MCDM methods: A comparative analysis of VIKOR and TOPSIS. *European Journal of Operational Research*, 156(2), 445-455. — *flagged, check pages*. The true origin is Opricovic's 1998 Belgrade thesis, in Serbian, which we cannot sight |
+| WASPAS | `R/methods/waspas.R` (64) | `waspas_method(X, w, cb, lambda = 0.5)` | yes | trivial | Zavadskas, E. K., Turskis, Z., Antucheviciene, J., & Zakarevicius, A. (2012). Optimization of weighted aggregated sum product assessment. *Elektronika ir Elektrotechnika*, 122(6), 3-6. — *flagged, check issue/pages* |
+
+Shared helpers worth porting or deliberately not porting:
+
+- `R/utils_normalise.R` (132): `normalise_vector`, `normalise_minmax`,
+  `normalise_vector_norm`, `normalise_sum`, `normalise_max`,
+  `normalise_matrix(method=)`. All pure, all trivial to port. Each
+  method needs only one of them, so port per method rather than
+  wholesale.
+- `R/utils_weights.R` (287): entropy, standard-deviation, variance and
+  CRITIC objective weighting. **Out of 0.5 scope** — surveyframe's
+  weights come from respondents (section 1d) or the researcher. Note
+  as a candidate for a later release, do not port now.
+- `R/utils_validate.R` (298): `validate_mcdm_inputs`,
+  `validate_method_requirements`, `clean_and_validate`,
+  `check_data_quality`, `validate_decision_matrix`. Superseded by
+  `sframe_check_decision_input()` (section 3) plus
+  `sframe_decision_options()` (1e). Do not port; read for edge cases
+  only.
+- `R/utils_plots.R` (692) and `R/registry.R` (112): not ported. The
+  plot layer is `theme_surveyframe()`-based here, and there is no R
+  registry in surveyframe (see Architecture ground truth).
+
+Defects in the source that must **not** be carried across (found while
+auditing, each one is a correctness issue, not a style preference):
+
+1. **TOPSIS double-inverts cost criteria.**
+   `normalise_vector_norm()` (utils_normalise.R:55-58) takes the
+   complement `1 - x/||x||` for cost columns, and then
+   `topsis_method()` (topsis.R:22-30) *also* swaps the ideal and
+   anti-ideal for cost columns. The two inversions cancel, so a cost
+   criterion is scored as a benefit. Standard TOPSIS applies vector
+   normalisation with no complement and handles direction once, at the
+   ideal/anti-ideal step. The port does it once.
+2. **AHP and DEMATEL silently fabricate their input matrix.** Both
+   detect a non-square `X` and invent a square one — AHP from ratios of
+   column means (ahp.R:16-40), DEMATEL from the criteria correlation
+   matrix scaled to 0-4 (dematel.R:12-29), each announcing itself with
+   `cat()`. Drop both branches. In surveyframe the square matrix comes
+   from `sframe_assemble_pairwise()` or `options$matrix`, and a
+   non-square input is a typed error.
+3. **AHP clamps RI beyond n = 10** (`else 1.49`, ahp.R:62) rather than
+   refusing. Section 3 requires an `error` beyond n = 10.
+4. **VIKOR omits both acceptance conditions.** vikor.R computes S, R, Q
+   and stops. Acceptable advantage and acceptable stability must be
+   evaluated (section 3). Also note `scores <- 1 - Q` (vikor.R:67) is
+   a display convention invented for the app's shared score column;
+   report Q itself and rank ascending.
+5. **ELECTRE's veto check is a no-op loop.** electre.R:111-116 loops
+   over `j` while testing a `j`-independent condition, so the loop body
+   either breaks on the first iteration or never fires. The file is
+   also labelled "ELECTRE III" while section 3 specifies ELECTRE I.
+   Treat as a rewrite against the published definition, not a port.
+6. **PROMETHEE defaults to the linear (V-shape) preference function
+   with thresholds derived from the data range** (promethee.R:12,
+   19-25). Section 3 specifies the usual criterion (type 1) as the
+   default. Data-derived thresholds are a hidden researcher degree of
+   freedom and must be explicit in `options` if offered at all.
+7. **DEMATEL's threshold is `mean(T) + sd(T)`** (dematel.R:102).
+   Section 3 specifies the arithmetic mean of T. Keep the mean; the
+   mean+sd variant may be offered through `options$threshold_rule`.
+8. **ANP is not ANP.** anp.R is a column-normalised power iteration
+   over whatever square matrix it is handed, capped at 100 iterations,
+   with no cluster/supermatrix construction and no unweighted-to-
+   weighted supermatrix step. Section 3's 1000-iteration convergence
+   guard is a floor, not the whole gap. Budget ANP as the largest
+   single computation task in phase 2.
+
 ## Integration checklist for every new method (all 10 MCDM runners)
 
 1. Runner `sframe_run_<id>(data, roles, options)` in `R/decision_methods.R`.
@@ -97,15 +246,67 @@ exists in R.** The real architecture:
 
 ## 0. Pre-work (lead, before any agent is spawned)
 
-1. **Clone the source repo — it is not local as of 2026-07-25:**
-   `gh repo clone MohammedAliSharafuddin/mcdm ../mcdm`
-2. Harvest audit: for each of the 10 methods, record in a table appended
-   to this file: source file, computation function name, pure-R yes/no,
-   Shiny entanglement, rework estimate, citation keys used. The audit
-   table becomes the only thing later agents read from mcdm — no agent
-   re-reads the mcdm app afterwards.
-3. Decide the two design questions in section 1 and 2 with the owner
-   before implementation starts.
+1. [x] **Clone the source repo — it is not local as of 2026-07-25:**
+   `gh repo clone MohammedAliSharafuddin/mcdm ../mcdm` — done, cloned to
+   `/home/maxx/Documents/GitHub/mcdm`.
+2. [x] Harvest audit — see "Harvest audit" section above.
+3. [ ] Decide the two design questions in section 1 and 2 with the
+   owner before implementation starts — **not done**. Phase 1 below
+   proceeded directly against this file's already-detailed spec, on
+   owner instruction to start building rather than pause for review.
+   Flagged as a standing gap: if the owner wants to revisit the data
+   contract's design (matrix encoding, aggregation defaults, column
+   conventions), everything built in Phase 1 that depends on it may
+   need rework.
+
+**Phase 1 status (2026-07-25, committed to `v0.5-dev` at 77070b6, which
+itself sits on top of the committed 0.4 work — 0.4 and 0.5 are now one
+branch/release per owner decision, invoking the 2026-10-15 gate's merge
+consequence early):**
+
+- [x] Item types (#2): `pairwise_comparison` and `criteria_weight` added
+  to `sf_item()`, `read_write_sframe.R`, `validate_sframe.R`, and the
+  `read_responses.R` expansion whitelist (the three column patterns
+  from 1c). Size-limit advisories (warn > 7 saaty / > 6 influence,
+  error > 10) implemented via a new `sframe_warn_design()` in
+  `R/conditions.R`. Round-trip and export-column tests pass
+  (`tests/testthat/test-decision-item-types.R`).
+  **Not done: all three rendering surfaces** (static template, Shiny
+  renderer, builder inspector) — the R-level plumbing only. An
+  instrument with either new item type will validate, round-trip, and
+  export correctly, but will not yet render a usable question on any
+  survey surface.
+- [x] `R/decision_data.R` (#1d/#1e): `sframe_assemble_pairwise()`,
+  `sframe_aggregate_judgements()`, `sframe_collected_weights()`,
+  `sframe_rated_matrix()`, `sframe_decision_options()`, AHP consistency
+  screening. Full test file, 93 assertions, 0 failures
+  (`tests/testthat/test-decision-data.R`).
+- [x] TOPSIS end to end (#3/#4, the reference diff): `R/decision_methods.R`
+  with `sframe_run_topsis()`, wired into `sframe_run_one_block()`,
+  `sframe_analysis_roles()`, `.sframe_citations` (Hwang & Yoon 1981,
+  verified), `sframe_result_table()`, and a new generic
+  `sframe_plot_decision_ranking()` in `R/plots.R` meant for reuse by
+  the other 6 ranking methods. 62 assertions, 0 failures
+  (`tests/testthat/test-decision-topsis.R`).
+  **Not done: the two JS UI registries.** Exact spots for the next
+  pass: `inst/builder/survey_builder.html:969` (method dropdown
+  `<optgroup>`), `:2690` (`ANALYSIS_REGISTRY`); `inst/shiny/app.R:324`
+  (studio registry), `:733` (requirements string) — copy the
+  `mann_whitney` entry shape at each.
+- [ ] **Not started: the remaining 9 computations** (AHP, ANP, DEMATEL,
+  ELECTRE, MOORA, PROMETHEE, SMART, VIKOR, WASPAS) — sections 3/4 for
+  each, per the Phase 2 agent assignments below. AHP and DEMATEL are
+  the two named in the section 1g sample sframe and should come next.
+- [ ] Not started: `sensitivity_analysis()` (#5), `sf_conjoint_design()`
+  (#6), the vignette (#7), the section 1g sample sframe as an actual
+  built/tested fixture, the full exit checklist (#8).
+
+`devtools::document()` clean (after a second pass — first pass showed
+`@seealso` resolution warnings between the new decision_data.R
+functions, a normal same-batch roxygen2 ordering artifact, not a real
+problem). Full `devtools::test()` on the merged branch: 0 failures, 1
+expected skip (logistf), only pre-existing ggplot2 deprecation warnings
+unrelated to this work.
 
 ## 1. The MCDM data contract: input structure, storage, assembly
 

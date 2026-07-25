@@ -44,17 +44,30 @@ into 0.3.4. All of the following shipped already and v0.4 simply reuses them:
 **Confirmed against current source (2026-07-24) — none of the following
 exist yet, so this is the real v0.4 scope:**
 
+**Status update 2026-07-25: items 1-3, 5, 6, 7, and the smallsamplelab
+half of 8 are implemented and verified on branch `v0.4-dev`
+(worktree `../surveyframe-v0.4-dev`, based on main post-0.3.4), not yet
+committed. Full `devtools::test()` green (0 failures, 1 expected skip
+for `logistf` being installed locally), `devtools::document()` clean,
+`R CMD check --as-cran` 0 errors / 0 real warnings (the 3 WARNINGs
+shown in that run are checkpoint-run artifacts: unbumped version and a
+`--no-build-vignettes` build flag, not real problems — R CMD check's
+own vignette-rebuild step confirms all 8 vignettes including the new
+one build clean). See the merge note below: this branch is now folding
+into `v0.5-dev` per the 2026-10-15 decision gate, invoked early by
+owner decision on 2026-07-25.**
+
 | Item | Where it will live | Status |
 |---|---|---|
-| Hodges-Lehmann estimate on Mann-Whitney | `R/analysis_plan.R`, `sframe_run_mann_whitney()` (line ~270) | not started |
-| Pseudomedian CI on paired Wilcoxon | `R/analysis_plan.R`, `sframe_run_wilcoxon_pair()` (line ~486) | not started |
-| Exact odds-ratio CI on Fisher | `R/statistics_reports.R`, `sframe_run_fisher()` (line ~779) | not started |
-| Firth-penalised logistic regression | new, `R/regression.R` or similar | not started |
-| Small-sample advisory | `assumption_report()` and `sample_size_plan()`, both in `R/statistics_reports.R` (lines ~495, ~1453) | not started |
-| RStudio add-in | new `inst/rstudio/addins.dcf`, new `R/rstudio_addins.R` | not started |
-| `vignettes/small-sample.Rmd` | new | not started |
-| CITATION: smallsamplelab + preprint DOIs | `inst/CITATION` | not started, blocked on DOIs |
-| Ethos R bridge repoint (asrda-r → surveyframe) | Ethos repo, not this one | not confirmed |
+| Hodges-Lehmann estimate on Mann-Whitney | `R/analysis_plan.R`, `sframe_run_mann_whitney()` (line ~270) | **done** — `hl_shift`, `hl_conf_int` added, tested |
+| Pseudomedian CI on paired Wilcoxon | `R/analysis_plan.R`, `sframe_run_wilcoxon_pair()` (line ~486) | **done** — `pseudomedian`, `pseudomedian_conf_int` added, tested |
+| Exact odds-ratio CI on Fisher | `R/statistics_reports.R`, `sframe_run_fisher()` (line ~779) | **done** — `odds_ratio_conf_int`, guarded against `simulate_p_value`, tested |
+| Firth-penalised logistic regression | `R/statistics_reports.R`, `sframe_run_firth_logistic()` | **done** — full registration (switch, roles, citations `.sframe_citations`, table, plot, builder + studio registries), `logistf` in Suggests, `sframe_require_logistf()` added, tested incl. missing-package skip path |
+| Small-sample advisory | `assumption_report()` and `sample_size_plan()`, both in `R/statistics_reports.R` (lines ~495, ~1453) | **done** — `sframe_small_sample_advisory()`, wired into both return objects and their S3 print methods, tested at n=15/n=50 |
+| RStudio add-in | new `inst/rstudio/addins.dcf`, new `R/rstudio_addins.R` | not started — stays off `v0.4-dev`/`v0.5-dev` regardless, per standing instruction; build separately per `todo_rstudio_addin.md` |
+| `vignettes/small-sample.Rmd` | new | **done** — renders clean to HTML, WCAG house style, all 8 sections plus citation block |
+| CITATION: smallsamplelab + preprint DOIs | `inst/CITATION` | **partial** — smallsamplelab Zenodo DOI bibentry added and verified parseable; preprint DOI still blocked, see hard-blockers list |
+| Ethos R bridge repoint (asrda-r → surveyframe) | Ethos repo, not this one | not confirmed — separate repo, not checked this session |
 
 ---
 
@@ -342,35 +355,49 @@ rather than duplicating its plan here.
 
 ## 10. Registration and exit checklist
 
-- Wire `firth_logistic` through every integration point listed in
+- [x] Wire `firth_logistic` through every integration point listed in
   section 5 (switch case, vars_for_method, analysis_roles fallback,
   citations, table, plot, builder ANALYSIS_REGISTRY + dropdown, studio
   registry + requirements string). `mann_whitney`, `wilcoxon_pair`, and
   `fisher_exact` are extensions of existing wired runners and need no
   new registration, only their new fields.
-- `devtools::document()` clean; `bootstrap_ci`, `cohens_d_ci`,
+- [x] `devtools::document()` clean; `bootstrap_ci`, `cohens_d_ci`,
   `cramers_v_ci`, `eta_sq_ci` already exported (0.3.4); newly exported in
-  0.4: `sframe_run_firth_logistic` (or whatever the real public/internal
-  naming convention turns out to be — most `sframe_run_*` functions are
-  internal, not exported; check before assuming this one should be).
-- `devtools::test()` — full suite passes, plus every new test listed
-  above (Mann-Whitney HL, paired Wilcoxon pseudomedian, Fisher CI, Firth
-  logistic incl. missing-package path, small-sample advisory on both
-  `assumption_report()` and `sample_size_plan()`).
-- `R CMD check --as-cran` — 0 errors, 0 warnings, ≤1 NOTE.
-- Win-builder R-release and R-devel — clean.
-- `inst/rstudio/addins.dcf` present, add-ins manually verified inside a
+  0.4: `sframe_run_firth_logistic` stayed internal (not exported), matching
+  the house convention that `sframe_run_*` runners are internal.
+- [x] `devtools::test()` — full suite passes (0 failures, 1 expected
+  skip for the logistf-missing-package path since logistf is installed
+  locally), plus every new test listed above (Mann-Whitney HL, paired
+  Wilcoxon pseudomedian, Fisher CI, Firth logistic incl. missing-package
+  path, small-sample advisory on both `assumption_report()` and
+  `sample_size_plan()`).
+- [x] `R CMD check --as-cran` — 0 errors, 0 real warnings (checkpoint
+  run showed 3 WARNINGs, all artifacts of the checkpoint build itself —
+  unbumped version, `--no-build-vignettes` flag — not real problems;
+  needs a clean re-run with a bumped version and full vignette build
+  before actual submission).
+- [ ] Win-builder R-release and R-devel — not run this session.
+- [ ] `inst/rstudio/addins.dcf` present, add-ins manually verified inside a
   real RStudio session (this cannot be automated — schedule it as a
-  manual step, not a test).
-- `logistf` and `rstudioapi` in `Suggests`.
-- `vignettes/small-sample.Rmd` knits clean, WCAG-pass CSS applied.
-- CITATION: smallsamplelab DOI added (should be a copy from README, low
-  risk); preprint DOI added (**blocked on the preprint being posted** —
-  do not submit to CRAN without it).
-- Ethos R bridge repointed from asrda-r to surveyframe — confirm in the
+  manual step, not a test). Deferred: RStudio add-in stays off
+  `v0.4-dev`/`v0.5-dev` per standing instruction, built separately.
+- [x] `logistf` in `Suggests`. `rstudioapi` deferred with the add-in.
+- [x] `vignettes/small-sample.Rmd` knits clean, WCAG-pass CSS applied.
+- [ ] CITATION: smallsamplelab DOI added (done, copied from README);
+  preprint DOI **blocked on the preprint being posted** — do not submit
+  to CRAN without it. See hard-blockers list, 2026-07-25 status update.
+- [ ] Ethos R bridge repointed from asrda-r to surveyframe — confirm in the
   Ethos repo, not here; this is listed as a hard exit-checklist item in
   the original guide even though it's not surveyframe engineering work.
-- `cran-comments.md` updated with the 0.4 diff summary before submission.
+- [ ] `cran-comments.md` updated with the 0.4 diff summary before submission.
+
+**2026-07-25: this file's remaining scope folds into `todo_0.5.md` by
+owner decision, invoking the 2026-10-15 decision-gate consequence early
+rather than waiting for the gate date.** `v0.4-dev` is being merged into
+`v0.5-dev`; 0.4.1 renumbers to 0.5.1 per the gate's consequence list.
+The unchecked items above (win-builder, RStudio add-in verification,
+CITATION preprint DOI, Ethos bridge, cran-comments.md) carry forward as
+open items on the combined release rather than being re-litigated here.
 
 ---
 

@@ -1,21 +1,27 @@
-# todo_0.4.1.md — surveyframe v0.4.1: Faculty demo proofing
+# todo_0.5.1.md — surveyframe v0.5.1: Faculty demo proofing
 
 Dev-only planning file, tracked on `dev` only. Its name is in `.gitignore`
-and `.Rbuildignore`. Companion to `CLAUDE.md` and `todo_0.4.md`.
+and `.Rbuildignore`. Companion to `CLAUDE.md` and `todo_0.5.md`.
+Renamed from `todo_0.4.1.md` 2026-07-25.
 
-**Decision gate 2026-10-15 (recorded 2026-07-25 in
-`../portfolio-planner/decisions.md`):** if the small-sample preprint DOI
-is not live by 2026-10-15 and 0.4 merges into 0.5, this patch renumbers
-to **0.5.1** (~2027-02): the faculty demo moves to the start of the new
-semester and adds the MCDM material to the demo script. Content below is
-unchanged in either case, only the number, date, and demo scope line.
+**Decision gate fired early, 2026-07-25 (owner decision, recorded in
+`../portfolio-planner/decisions.md`, superseding the "wait for
+2026-10-15" entry).** 0.4 has merged into 0.5 ahead of the scheduled
+gate date rather than waiting to see whether the small-sample preprint
+DOI landed by 2026-10-15. This patch is confirmed as **0.5.1**
+(~2027-02, exact date depends on the merged 0.5's own schedule): the
+faculty demo moves to the start of the new semester and adds the MCDM
+material to the demo script. Content below is otherwise unchanged from
+the original 0.4.1 draft, only the number, date, and demo scope line.
 
-Last updated: 2026-07-25. Target CRAN submission: 2026-12-11
-(`../portfolio-planner/master_roadmap.md`). The proofing mechanism is a
-live demo session to college faculty after 0.4 ships; the deliverable
-is the fixes that session surfaces. **Strict patch scope: no new
-analytical features, no new exports.** UI/UX and documentation fixes
-only (moved here from the original 0.3.3 plan).
+Last updated: 2026-07-25. Target CRAN submission: TBC, follows the
+merged 0.5 release date in `../portfolio-planner/master_roadmap.md`
+(update once that file's schedule is finalised post-merge). The
+proofing mechanism is a live demo session to college faculty after the
+merged release ships; the deliverable is the fixes that session
+surfaces. **Strict patch scope: no new analytical features, no new
+exports.** UI/UX and documentation fixes only (moved here from the
+original 0.3.3 plan).
 
 ---
 
