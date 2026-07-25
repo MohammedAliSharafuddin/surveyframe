@@ -103,6 +103,10 @@ read_responses <- function(
     } else if (identical(i$type, "multiple_choice") && !is.null(i$choice_set)) {
       vals <- choice_values_for(i$choice_set)
       if (length(vals) > 0L) paste0(i$id, "__", vals) else character(0)
+    } else if (i$type %in% sframe_expanded_comparison_types) {
+      # v0.5 decision items: one column per comparison pair
+      # (item__a__vs__b, item__a__to__b) or per criterion (item__crit).
+      sframe_comparison_columns(i)
     } else {
       character(0)
     }
@@ -110,7 +114,8 @@ read_responses <- function(
   multi_ids <- vapply(
     Filter(function(i) identical(i$type, "matrix") ||
              identical(i$type, "ranking") ||
-             identical(i$type, "multiple_choice"), response_items),
+             identical(i$type, "multiple_choice") ||
+             i$type %in% sframe_expanded_comparison_types, response_items),
     function(i) i$id, character(1)
   )
   covered_by_expansion <- multi_ids[vapply(multi_ids, function(id) {

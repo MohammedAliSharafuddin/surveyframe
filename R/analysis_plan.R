@@ -77,6 +77,11 @@
     apa  = "Heinze, G., & Schemper, M. (2002). A solution to the problem of separation in logistic regression. *Statistics in Medicine*, *21*(16), 2409-2419.",
     use  = "firth_logistic"
   ),
+  hwang_1981 = list(
+    key  = "hwang_1981",
+    apa  = "Hwang, C.-L., & Yoon, K. (1981). *Multiple attribute decision making: Methods and applications*. Springer.",
+    use  = "topsis"
+  ),
   macKinnon_2008 = list(
     key = "mackinnon_2008",
     apa = "MacKinnon, D. P. (2008). *Introduction to statistical mediation analysis*. Lawrence Erlbaum.",
@@ -1128,6 +1133,10 @@ sframe_run_one_block <- function(block, data, instrument, plots = FALSE,
   vars <- sframe_vars_for_method(test, roles, block)
   options <- block$options %||% list()
   weights <- sframe_role_values(roles, c("weights", "weight"))
+  # Decision methods take their criterion weights through `weights_item` or
+  # `options$weights` (a numeric vector), so the frequency-weighting variable
+  # role must never be folded into their options.
+  if (test %in% sframe_decision_methods) weights <- character(0)
   if (length(weights) > 0 && is.null(options$weights)) {
     options$weights <- weights[1]
   }
@@ -1192,6 +1201,7 @@ sframe_run_one_block <- function(block, data, instrument, plots = FALSE,
       regression_logistic_ordinal = sframe_run_ordinal_logistic(data, roles, options),
       regression_logistic_multinomial = sframe_run_multinomial_logistic(data, roles, options),
       firth_logistic     = sframe_run_firth_logistic(data, roles, options),
+      topsis             = sframe_run_topsis(data, roles, options, instrument),
       moderation = sframe_run_moderation(data, roles),
       mediation = sframe_run_mediation(data, roles, options),
       list(test = test, error = paste0("Test '", test, "' is unavailable."))

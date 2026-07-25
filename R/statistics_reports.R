@@ -102,6 +102,11 @@ sframe_analysis_roles <- function(block) {
     firth_logistic = list(predictors = utils::head(vars, -1), dependent = utils::tail(vars, 1)),
     moderation = list(predictor = vars[1], moderator = vars[2], outcome = vars[3]),
     mediation = list(predictor = vars[1], mediator = vars[2], outcome = vars[3]),
+    # Decision family. A block declared with plain `variables` names the
+    # matrix items that carry the rated performance matrix; weights then have
+    # to come from options, since nothing in a bare variable list says which
+    # item holds them.
+    topsis = list(performance_items = vars),
     list(variables = vars)
   )
 }
