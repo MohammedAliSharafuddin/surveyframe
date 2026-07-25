@@ -660,6 +660,7 @@ sframe_plot_for_result <- function(result, data, palette = c("web", "print")) {
     regression_logistic_binary  = ,
     firth_logistic              = ,
     regression_logistic_ordinal = function() sframe_plot_logistic_coefficients(result, palette),
+    topsis              = function() sframe_plot_decision_ranking(result, palette),
     moderation          = function() sframe_plot_moderation(result, data, palette),
     mediation           = function() sframe_plot_mediation(result, palette),
     missing_data        = function() {
@@ -685,6 +686,66 @@ sframe_plot_for_result <- function(result, data, palette = c("web", "print")) {
   )
   if (is.null(builder)) return(NULL)
   tryCatch(builder(), error = function(e) NULL)
+}
+
+#' Ranked-score bar chart for a decision-family result
+#'
+#' The shared chart for every MCDM ranking method: one horizontal bar per
+#' alternative, ordered best first, with the leading alternative picked out.
+#' It is generic over the method rather than tied to one, so AHP criterion
+#' weights and any ranking method's scores all draw through it. The score
+#' column is whatever the method reports as its headline quantity (a
+#' closeness coefficient, a net flow, a priority weight), so the axis is
+#' labelled from the result rather than hard-coded.
+#'
+#' @param result A decision-family result list from [run_analysis_plan()],
+#'   carrying either `scores` and `alternatives` or a ranking `table`.
+#' @param palette One of `"web"` or `"print"`. See `sframe_brand()`.
+#' @return A ggplot2 object, or `NULL` when the result carries no ranking.
+#' @export
+#' @seealso [run_analysis_plan()]
+sframe_plot_decision_ranking <- function(result, palette = c("web", "print")) {
+  rlang::check_installed("ggplot2", reason = "to plot a decision ranking.")
+  palette <- match.arg(palette)
+  brand <- sframe_brand(palette)
+
+  unit <- "Alternative"
+  if (!is.null(result$scores) && !is.null(result$alternatives) &&
+      length(result$scores) == length(result$alternatives)) {
+    df <- data.frame(
+      label = as.character(result$alternatives),
+      score = as.numeric(result$scores),
+      stringsAsFactors = FALSE
+    )
+  } else {
+    tbl <- result$table
+    if (!is.data.frame(tbl) || nrow(tbl) == 0 || ncol(tbl) < 2) return(NULL)
+    unit <- names(tbl)[1]
+    df <- data.frame(
+      label = as.character(tbl[[1]]),
+      score = suppressWarnings(as.numeric(tbl[[2]])),
+      stringsAsFactors = FALSE
+    )
+  }
+  df <- df[!is.na(df$score), , drop = FALSE]
+  if (nrow(df) == 0) return(NULL)
+
+  df <- df[order(df$score, decreasing = TRUE), , drop = FALSE]
+  # Ordering carries the ranking, so the bars stay one colour: a second
+  # encoding for "best" would add a colour-only distinction for no gain.
+  df$label <- factor(df$label, levels = rev(df$label))
+  score_label <- result$score_label %||% "Score"
+  method_label <- toupper(result$test %||% "decision")
+
+  ggplot2::ggplot(df, ggplot2::aes(x = .data$label, y = .data$score)) +
+    ggplot2::geom_col(fill = brand$fill, colour = brand$ink,
+                      linewidth = 0.3, width = 0.72) +
+    ggplot2::coord_flip() +
+    ggplot2::labs(
+      title = paste(method_label, "ranking"),
+      x = unit, y = score_label
+    ) +
+    theme_surveyframe(palette = palette)
 }
 
 # ---------------------------------------------------------------------------

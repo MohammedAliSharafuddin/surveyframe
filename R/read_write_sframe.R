@@ -176,6 +176,14 @@ sframe_restore_item <- function(item) {
     sframe_empty_to_null(item$matrix_items),
     "character"
   )
+  item$comparison_items <- sframe_as_vector(
+    sframe_empty_to_null(item$comparison_items),
+    "character"
+  )
+  item$comparison_scale <- sframe_empty_to_null(item$comparison_scale)
+  if (!is.null(item$comparison_scale)) {
+    item$comparison_scale <- as.character(item$comparison_scale)[1]
+  }
   item$slider_min <- if (!is.null(sframe_empty_to_null(item$slider_min))) {
     as.numeric(item$slider_min)
   } else {

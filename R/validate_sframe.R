@@ -124,6 +124,44 @@ validate_sframe <- function(instrument, strict = TRUE) {
         paste0("Item '", item$id,
                "' is reverse = TRUE but has no scale_id."))
     }
+    # Decision item types (v0.5). These carry their response options in
+    # comparison_items rather than a choice set, so a choice_set here means
+    # the item was built from the wrong template.
+    if (item$type %in% c("pairwise_comparison", "criteria_weight")) {
+      n_comparison <- length(item$comparison_items %||% character(0))
+      if (n_comparison < 2) {
+        problems <- c(problems,
+          paste0("Item '", item$id, "' of type '", item$type,
+                 "' needs at least 2 comparison_items."))
+      }
+      if (n_comparison > 10) {
+        problems <- c(problems,
+          paste0("Item '", item$id, "' declares ", n_comparison,
+                 " comparison_items. The maximum is 10."))
+      }
+      if (anyDuplicated(item$comparison_items %||% character(0)) > 0) {
+        problems <- c(problems,
+          paste0("Item '", item$id, "' has duplicated comparison_items."))
+      }
+      if (!is.null(item$choice_set)) {
+        problems <- c(problems,
+          paste0("Item '", item$id, "' of type '", item$type,
+                 "' must not reference a choice_set."))
+      }
+    }
+    if (identical(item$type, "pairwise_comparison") &&
+        !(item$comparison_scale %||% "saaty") %in% c("saaty", "influence")) {
+      problems <- c(problems,
+        paste0("Item '", item$id, "' has comparison_scale '",
+               item$comparison_scale,
+               "'. It must be either 'saaty' or 'influence'."))
+    }
+    if (!item$type %in% c("pairwise_comparison", "criteria_weight") &&
+        length(item$comparison_items %||% character(0)) > 0) {
+      problems <- c(problems,
+        paste0("Item '", item$id, "' of type '", item$type,
+               "' must not declare comparison_items."))
+    }
   }
 
   # Scale item membership
