@@ -35,6 +35,10 @@ sframe_require_nnet <- function(reason) {
   rlang::check_installed("nnet", reason = reason)
 }
 
+sframe_require_logistf <- function(reason) {
+  rlang::check_installed("logistf", reason = reason)
+}
+
 #' Abort with a validation error
 #'
 #' @param message Character. The error message.

@@ -65,7 +65,17 @@
     key  = "hosmer_2013",
     apa  = "Hosmer, D. W., Lemeshow, S., & Sturdivant, R. X. (2013). *Applied logistic regression* (3rd ed.). Wiley.",
     use  = c("regression_logistic_binary", "regression_logistic_ordinal",
-             "regression_logistic_multinomial")
+             "regression_logistic_multinomial", "firth_logistic")
+  ),
+  firth_1993 = list(
+    key  = "firth_1993",
+    apa  = "Firth, D. (1993). Bias reduction of maximum likelihood estimates. *Biometrika*, *80*(1), 27-38.",
+    use  = "firth_logistic"
+  ),
+  heinze_2002 = list(
+    key  = "heinze_2002",
+    apa  = "Heinze, G., & Schemper, M. (2002). A solution to the problem of separation in logistic regression. *Statistics in Medicine*, *21*(16), 2409-2419.",
+    use  = "firth_logistic"
   ),
   macKinnon_2008 = list(
     key = "mackinnon_2008",
@@ -278,12 +288,18 @@ sframe_run_mann_whitney <- function(data, vars) {
   g1 <- suppressWarnings(as.numeric(data[[outcome_col]][data[[group_col]] == groups[1]]))
   g2 <- suppressWarnings(as.numeric(data[[outcome_col]][data[[group_col]] == groups[2]]))
   g1 <- g1[!is.na(g1)]; g2 <- g2[!is.na(g2)]
-  wt <- tryCatch(stats::wilcox.test(g1, g2, exact = FALSE), error = function(e) NULL)
+  wt <- tryCatch(
+    stats::wilcox.test(g1, g2, exact = FALSE, conf.int = TRUE),
+    error = function(e) NULL
+  )
   if (is.null(wt)) return(list(test = "mann_whitney", error = "Test failed."))
   n <- length(g1) + length(g2)
   z <- stats::qnorm(wt$p.value / 2)
   r <- abs(z) / sqrt(n)
   r_ci <- sframe_rank_r_ci(g1, g2)
+  hl_shift <- unname(wt$estimate)
+  hl_conf_int <- as.numeric(wt$conf.int)
+  hl_ci_named <- c(lower = hl_conf_int[1], upper = hl_conf_int[2])
   list(
     test     = "mann_whitney",
     vars     = vars,
@@ -293,11 +309,13 @@ sframe_run_mann_whitney <- function(data, vars) {
     U        = unname(wt$statistic),
     z        = z, p = wt$p.value, r = r,
     r_ci     = r_ci,
+    hl_shift = hl_shift,
+    hl_conf_int = hl_conf_int,
     effect_label = sframe_effect_label(r, "r"),
     apa      = sprintf(
-      "U = %.0f, z = %.2f, p %s, r = %.2f%s",
+      "U = %.0f, z = %.2f, p %s, r = %.2f%s, Hodges-Lehmann shift = %.2f%s",
       wt$statistic, z, sframe_p_string(wt$p.value), r,
-      sframe_ci_string(r_ci)
+      sframe_ci_string(r_ci), hl_shift, sframe_ci_string(hl_ci_named)
     ),
     prompt   = sprintf(
       "The Mann-Whitney test %s a significant difference between %s (Mdn = %.2f) and %s (Mdn = %.2f), U = %.0f, p %s, r = %.2f%s (%s effect). Interpret the direction and practical significance.",
@@ -498,7 +516,7 @@ sframe_run_wilcoxon_pair <- function(data, vars) {
   }
 
   wt <- tryCatch(
-    stats::wilcox.test(x, y, paired = TRUE, exact = FALSE),
+    stats::wilcox.test(x, y, paired = TRUE, exact = FALSE, conf.int = TRUE),
     error = function(e) NULL
   )
   if (is.null(wt)) return(list(test = "wilcoxon_pair", error = "Test failed."))
@@ -506,6 +524,9 @@ sframe_run_wilcoxon_pair <- function(data, vars) {
   z <- stats::qnorm(wt$p.value / 2)
   r <- abs(z) / sqrt(n)
   r_ci <- sframe_signed_rank_r_ci(x - y)
+  pseudomedian <- unname(wt$estimate)
+  pseudomedian_conf_int <- as.numeric(wt$conf.int)
+  pm_ci_named <- c(lower = pseudomedian_conf_int[1], upper = pseudomedian_conf_int[2])
 
   list(
     test = "wilcoxon_pair",
@@ -518,11 +539,13 @@ sframe_run_wilcoxon_pair <- function(data, vars) {
     p = wt$p.value,
     r = r,
     r_ci = r_ci,
+    pseudomedian = pseudomedian,
+    pseudomedian_conf_int = pseudomedian_conf_int,
     effect_label = sframe_effect_label(r, "r"),
     apa = sprintf(
-      "V = %.0f, z = %.2f, p %s, r = %.2f%s",
+      "V = %.0f, z = %.2f, p %s, r = %.2f%s, pseudomedian = %.2f%s",
       wt$statistic, z, sframe_p_string(wt$p.value), r,
-      sframe_ci_string(r_ci)
+      sframe_ci_string(r_ci), pseudomedian, sframe_ci_string(pm_ci_named)
     ),
     prompt = sprintf(
       "The Wilcoxon signed-rank test %s a significant difference between %s (Mdn = %.2f) and %s (Mdn = %.2f), V = %.0f, z = %.2f, p %s, r = %.2f%s (%s effect). Discuss the direction and practical significance.",
@@ -817,6 +840,8 @@ sframe_vars_for_method <- function(method, roles, block) {
                                     sframe_role_values(roles, c("dependent", "outcome"))),
     regression_logistic_multinomial = c(sframe_role_values(roles, c("predictors", "covariates")),
                                         sframe_role_values(roles, c("dependent", "outcome"))),
+    firth_logistic = c(sframe_role_values(roles, c("predictors", "covariates")),
+                       sframe_role_values(roles, c("dependent", "outcome"))),
     moderation = c(sframe_role_values(roles, "predictor"),
                    sframe_role_values(roles, "moderator"),
                    sframe_role_values(roles, c("outcome", "dependent"))),
@@ -942,6 +967,19 @@ sframe_result_table <- function(result) {
         Estimate = fmt(co[["Estimate"]]),
         `Odds ratio` = fmt(co[["odds_ratio"]]),
         p = vapply(co[["Pr(>|z|)"]], sframe_p_string, character(1)),
+        check.names = FALSE, stringsAsFactors = FALSE, row.names = NULL
+      )
+    },
+    firth_logistic = {
+      co <- result$coefficients
+      if (!is.data.frame(co)) return(NULL)
+      data.frame(
+        Term = rownames(co),
+        Estimate = fmt(co[["Estimate"]]),
+        `Odds ratio` = fmt(co[["odds_ratio"]]),
+        `CI low` = fmt(co[["or_ci_low"]]),
+        `CI high` = fmt(co[["or_ci_high"]]),
+        p = vapply(co[["p"]], sframe_p_string, character(1)),
         check.names = FALSE, stringsAsFactors = FALSE, row.names = NULL
       )
     },
@@ -1153,6 +1191,7 @@ sframe_run_one_block <- function(block, data, instrument, plots = FALSE,
       regression_logistic_binary = sframe_run_logistic_binary(data, vars),
       regression_logistic_ordinal = sframe_run_ordinal_logistic(data, roles, options),
       regression_logistic_multinomial = sframe_run_multinomial_logistic(data, roles, options),
+      firth_logistic     = sframe_run_firth_logistic(data, roles, options),
       moderation = sframe_run_moderation(data, roles),
       mediation = sframe_run_mediation(data, roles, options),
       list(test = test, error = paste0("Test '", test, "' is unavailable."))

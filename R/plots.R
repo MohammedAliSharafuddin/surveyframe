@@ -658,6 +658,7 @@ sframe_plot_for_result <- function(result, data, palette = c("web", "print")) {
     friedman            = function() sframe_plot_repeated_measures(result, data, palette),
     partial_correlation = function() sframe_plot_partial_correlation(result, data, palette),
     regression_logistic_binary  = ,
+    firth_logistic              = ,
     regression_logistic_ordinal = function() sframe_plot_logistic_coefficients(result, palette),
     moderation          = function() sframe_plot_moderation(result, data, palette),
     mediation           = function() sframe_plot_mediation(result, palette),
