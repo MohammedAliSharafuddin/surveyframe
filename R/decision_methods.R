@@ -10,7 +10,9 @@
 # package dispatches on `test`, never on `family`, so this vector is what the
 # engine uses to recognise a decision block. Ids are added here as each
 # method lands.
-sframe_decision_methods <- c("topsis")
+sframe_decision_methods <- c("topsis", "ahp", "anp", "dematel", "vikor",
+                             "moora", "smart", "waspas", "promethee",
+                             "electre")
 
 # ---------------------------------------------------------------------------
 # Shared input validation
@@ -252,5 +254,351 @@ sframe_run_topsis <- function(data, roles, options, instrument) {
     anti_ideal     = fit$anti_ideal,
     consistency    = resolved$collected_weights$consistency,
     notes          = notes[!vapply(notes, is.null, logical(1))]
+  )
+}
+
+# ---------------------------------------------------------------------------
+# AHP: consistency ratio and computation
+# ---------------------------------------------------------------------------
+
+# Saaty's consistency ratio for a single square reciprocal judgement matrix,
+# named after the 06 guide's `.ahp_cr()` but kept on the file's `sframe_`
+# prefix convention rather than a leading dot. Builds on the principal
+# eigenvector and CR machinery already unit-tested in R/decision_data.R
+# (`sframe_principal_eigen()`, `sframe_consistency_ratio()`) rather than
+# duplicating them; the only new behaviour is turning the silent `NA` that
+# `sframe_consistency_ratio()` returns past n = 10 into a typed error, since
+# Saaty's random index table simply stops there and a runner must say so
+# rather than carry on with an undefined ratio.
+sframe_ahp_cr <- function(m) {
+  n <- nrow(m)
+  if (n > length(sframe_saaty_ri)) {
+    return(list(error = sprintf(
+      paste0("AHP's consistency ratio is only defined for up to %d ",
+             "criteria (Saaty's random index table stops there). This ",
+             "matrix compares %d."),
+      length(sframe_saaty_ri), n
+    )))
+  }
+  list(cr = sframe_consistency_ratio(m), error = NULL)
+}
+
+# The AHP priority-vector computation: the principal eigenvector of a square
+# reciprocal judgement matrix, normalised to sum 1, plus its consistency
+# ratio. `m` must already be square and reciprocal (the output of
+# `sframe_assemble_pairwise()` + `sframe_aggregate_judgements()`, or a
+# researcher-supplied matrix). Returns `error` instead of computing when the
+# matrix is too large for Saaty's RI table; never aborts on inconsistency,
+# only flags it, since a poorly-judged matrix is still informative and the
+# researcher should see the weights to judge for themselves.
+sframe_ahp_compute <- function(m) {
+  if (!is.matrix(m) || !is.numeric(m)) {
+    return(list(error = "The AHP judgement matrix must be a numeric matrix."))
+  }
+  if (nrow(m) != ncol(m)) {
+    return(list(error = "The AHP judgement matrix must be square."))
+  }
+  if (nrow(m) < 2) {
+    return(list(error = "AHP needs at least 2 criteria to compare."))
+  }
+  if (anyNA(m)) {
+    return(list(error = "The AHP judgement matrix contains missing values."))
+  }
+  cr_result <- sframe_ahp_cr(m)
+  if (!is.null(cr_result$error)) {
+    return(list(error = cr_result$error))
+  }
+  eig <- sframe_principal_eigen(m)
+  list(
+    weights             = eig$weights,
+    lambda_max          = eig$lambda_max,
+    cr                  = cr_result$cr,
+    consistency_warning = !is.na(cr_result$cr) && cr_result$cr >= 0.10
+  )
+}
+
+# ---------------------------------------------------------------------------
+# AHP: matrix resolution shared with ANP
+# ---------------------------------------------------------------------------
+
+# AHP and ANP both start from a square judgement matrix rather than TOPSIS's
+# performance-matrix-plus-weights shape, so they resolve their input outside
+# `sframe_resolve_decision_inputs()` (that helper's `options$matrix` path
+# assumes an alternatives x criteria rectangle and would auto-label a square
+# reciprocal matrix's rows and columns independently, losing the fact that
+# both dimensions name the same criteria). The order matches every other
+# decision method: researcher-supplied `options$matrix` first, a collected
+# `pairwise` role second, a typed error naming what to supply third.
+sframe_resolve_pairwise_matrix <- function(data, roles, options, instrument,
+                                           method = "this method") {
+  options <- options %||% list()
+  out <- list(notes = character(0))
+
+  if (!is.null(options[["matrix"]])) {
+    raw <- options[["matrix"]]
+    if (is.list(raw)) {
+      widths <- vapply(raw, length, integer(1))
+      if (length(unique(widths)) > 1) {
+        return(list(error = sprintf(
+          paste0("%s's `options$matrix` rows have differing lengths (%s). A ",
+                 "pairwise judgement matrix must be square."),
+          method, paste(widths, collapse = ", ")
+        )))
+      }
+      raw <- matrix(suppressWarnings(as.numeric(unlist(raw, use.names = FALSE))),
+                    nrow = length(raw), byrow = TRUE)
+    } else {
+      raw <- as.matrix(raw)
+      storage.mode(raw) <- "double"
+    }
+    if (nrow(raw) != ncol(raw)) {
+      return(list(error = sprintf(
+        paste0("%s needs a square pairwise judgement matrix, but ",
+               "`options$matrix` has %d row(s) and %d column(s)."),
+        method, nrow(raw), ncol(raw)
+      )))
+    }
+    if (anyNA(raw)) {
+      return(list(error = sprintf(
+        "%s's `options$matrix` contains values that are not numeric.", method
+      )))
+    }
+    criteria <- as.character(options[["criteria"]] %||% colnames(raw) %||%
+                             paste0("C", seq_len(nrow(raw))))
+    if (length(criteria) != nrow(raw)) {
+      return(list(error = sprintf(
+        paste0("`options$criteria` names %d criterion/criteria but ",
+               "`options$matrix` has %d row(s)."),
+        length(criteria), nrow(raw)
+      )))
+    }
+    dimnames(raw) <- list(criteria, criteria)
+    out$matrix <- raw
+    out$matrix_source <- "supplied"
+    return(out)
+  }
+
+  pairwise_item <- sframe_role_values(roles, "pairwise")
+  if (length(pairwise_item) == 0) {
+    return(list(error = sprintf(
+      paste0("%s needs a pairwise judgement matrix. Supply `options$matrix` ",
+             "as a square reciprocal matrix, or declare a `pairwise` role ",
+             "naming a pairwise_comparison item."),
+      method
+    )))
+  }
+  assembly <- sframe_assemble_pairwise(data, instrument, pairwise_item[1])
+  if (assembly$n_respondents == 0) {
+    return(list(error = sprintf(
+      paste0("Item '%s' produced no usable comparison matrices: every ",
+             "respondent left a pair blank or answered out of range."),
+      pairwise_item[1]
+    )))
+  }
+  agg <- sframe_aggregate_judgements(assembly, method = "geometric",
+                                     cr_filter = isTRUE(options[["cr_filter"]]))
+  out$matrix <- agg$matrix
+  out$matrix_source <- "collected"
+  out$aggregate <- agg
+  out$notes <- c(out$notes, sprintf(
+    "Weights come from %d respondent judgement matrice(s) via item '%s'%s.",
+    agg$n_respondents, pairwise_item[1],
+    if (agg$n_dropped_consistency > 0) {
+      sprintf(", with %d dropped for a consistency ratio at or above 0.10",
+              agg$n_dropped_consistency)
+    } else ""
+  ))
+  out
+}
+
+# ---------------------------------------------------------------------------
+# AHP runner
+# ---------------------------------------------------------------------------
+
+sframe_run_ahp <- function(data, roles, options, instrument) {
+  resolved <- sframe_resolve_pairwise_matrix(data, roles, options, instrument,
+                                             method = "AHP")
+  if (!is.null(resolved$error)) {
+    return(list(test = "ahp", error = resolved$error))
+  }
+  fit <- sframe_ahp_compute(resolved$matrix)
+  if (!is.null(fit$error)) {
+    return(list(test = "ahp", error = fit$error))
+  }
+
+  criteria <- names(fit$weights)
+  order_by_weight <- order(fit$weights, decreasing = TRUE)
+  table <- data.frame(
+    Criterion = criteria[order_by_weight],
+    Weight    = round(as.numeric(fit$weights)[order_by_weight], 4),
+    Rank      = seq_along(criteria),
+    stringsAsFactors = FALSE
+  )
+  best <- criteria[which.max(fit$weights)]
+
+  notes <- resolved$notes
+  if (isTRUE(fit$consistency_warning)) {
+    notes <- c(notes, sprintf(
+      paste0("The pairwise judgements are inconsistent (CR = %.3f, at or ",
+             "above the 0.10 threshold Saaty recommends). Treat these ",
+             "weights cautiously and consider revisiting the comparisons."),
+      fit$cr
+    ))
+  }
+
+  list(
+    test                = "ahp",
+    apa                 = sprintf(
+      paste0("AHP derived priority weights for %d criteria from a pairwise ",
+             "judgement matrix. '%s' carried the highest weight (%.3f)%s."),
+      length(criteria), best, max(fit$weights),
+      if (isTRUE(fit$consistency_warning)) {
+        sprintf(", though the judgements' consistency ratio (%.3f) is at or ",
+                fit$cr)
+      } else ""
+    ),
+    prompt              = paste0(
+      "Report the full weight vector, not the top criterion alone, and ",
+      "state the consistency ratio: a CR at or above 0.10 means the ",
+      "judgements contradict each other enough that the weights should be ",
+      "read cautiously or the comparisons revisited before they feed a ",
+      "downstream ranking method."
+    ),
+    table               = table,
+    score_label         = "Priority weight",
+    weights             = fit$weights,
+    criteria            = criteria,
+    matrix_source       = resolved$matrix_source,
+    cr                  = fit$cr,
+    lambda_max          = fit$lambda_max,
+    consistency_warning = fit$consistency_warning,
+    notes               = notes[!vapply(notes, is.null, logical(1))]
+  )
+}
+
+# ---------------------------------------------------------------------------
+# ANP: limiting supermatrix computation
+# ---------------------------------------------------------------------------
+
+# ANP generalises AHP's single hierarchy to a network of interdependent
+# comparisons, resolved here as the limiting priority vector of a column-
+# stochastic supermatrix under power iteration (Saaty 1996's limit
+# supermatrix, W^k as k -> infinity, is the matrix every column of which
+# equals this same limiting vector once the chain is primitive, so iterating
+# the vector form is equivalent and far cheaper than iterating the matrix
+# itself). `m` is any square non-negative matrix of relative influence
+# between network nodes; it need not already be reciprocal (unlike AHP's
+# input, ANP's supermatrix blocks are not required to be symmetric-
+# reciprocal). Columns that sum to zero are treated as uninformative and
+# spread evenly, matching the convention `mcdm::anp_method()` used for the
+# same edge case. Guards at `max_iter` (a floor of 1000 per the harvest
+# audit, not a target) and returns an `error` rather than a partial result
+# if the vector has not settled within `tol`, so a badly conditioned network
+# never hangs the caller.
+sframe_anp_compute <- function(m, max_iter = 1000, tol = 1e-8) {
+  if (!is.matrix(m) || !is.numeric(m)) {
+    return(list(error = "The ANP supermatrix must be a numeric matrix."))
+  }
+  if (nrow(m) != ncol(m)) {
+    return(list(error = "The ANP supermatrix must be square."))
+  }
+  n <- nrow(m)
+  if (n < 2) {
+    return(list(error = "ANP needs at least 2 network nodes to compare."))
+  }
+  if (anyNA(m)) {
+    return(list(error = "The ANP supermatrix contains missing values."))
+  }
+  if (any(m < 0)) {
+    return(list(error = "The ANP supermatrix must not contain negative values."))
+  }
+
+  col_sums <- colSums(m)
+  normalised <- m
+  for (j in seq_len(n)) {
+    normalised[, j] <- if (col_sums[j] > 0) m[, j] / col_sums[j] else 1 / n
+  }
+
+  priorities <- rep(1 / n, n)
+  converged <- FALSE
+  iterations <- 0L
+  for (iter in seq_len(max_iter)) {
+    iterations <- iter
+    updated <- as.numeric(normalised %*% priorities)
+    total <- sum(updated)
+    updated <- if (total > 0) updated / total else rep(1 / n, n)
+    if (max(abs(updated - priorities)) < tol) {
+      priorities <- updated
+      converged <- TRUE
+      break
+    }
+    priorities <- updated
+  }
+  if (!converged) {
+    return(list(error = sprintf(
+      paste0("ANP's limiting supermatrix did not converge within %d ",
+             "iterations. The network of comparisons may be cyclical in a ",
+             "way that never settles; check the supplied matrix."),
+      max_iter
+    )))
+  }
+  names(priorities) <- rownames(m) %||% colnames(m)
+
+  list(
+    weights    = priorities,
+    normalised = normalised,
+    iterations = iterations,
+    converged  = converged
+  )
+}
+
+# ---------------------------------------------------------------------------
+# ANP runner
+# ---------------------------------------------------------------------------
+
+sframe_run_anp <- function(data, roles, options, instrument) {
+  resolved <- sframe_resolve_pairwise_matrix(data, roles, options, instrument,
+                                             method = "ANP")
+  if (!is.null(resolved$error)) {
+    return(list(test = "anp", error = resolved$error))
+  }
+  max_iter <- options[["max_iter"]] %||% 1000
+  fit <- sframe_anp_compute(resolved$matrix, max_iter = max_iter)
+  if (!is.null(fit$error)) {
+    return(list(test = "anp", error = fit$error))
+  }
+
+  criteria <- names(fit$weights)
+  order_by_weight <- order(fit$weights, decreasing = TRUE)
+  table <- data.frame(
+    Node   = criteria[order_by_weight],
+    Weight = round(as.numeric(fit$weights)[order_by_weight], 4),
+    Rank   = seq_along(criteria),
+    stringsAsFactors = FALSE
+  )
+  best <- criteria[which.max(fit$weights)]
+
+  list(
+    test          = "anp",
+    apa           = sprintf(
+      paste0("ANP resolved the limiting priorities of a %d-node comparison ",
+             "network after %d power-iteration step(s). '%s' carried the ",
+             "highest limiting weight (%.3f)."),
+      length(criteria), fit$iterations, best, max(fit$weights)
+    ),
+    prompt        = paste0(
+      "Report the full limiting-priority vector, not the top node alone, ",
+      "and note that ANP weights reflect feedback between nodes rather ",
+      "than a one-way hierarchy, so a small change anywhere in the network ",
+      "can move every weight."
+    ),
+    table         = table,
+    score_label   = "Limiting priority weight",
+    weights       = fit$weights,
+    criteria      = criteria,
+    matrix_source = resolved$matrix_source,
+    iterations    = fit$iterations,
+    converged     = fit$converged,
+    notes         = resolved$notes[!vapply(resolved$notes, is.null, logical(1))]
   )
 }
