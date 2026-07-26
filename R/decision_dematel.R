@@ -118,7 +118,14 @@ sframe_resolve_dematel_matrix <- function(data, roles, options, instrument) {
 
   if (!is.null(options[["matrix"]])) {
     m <- options[["matrix"]]
-    if (is.list(m)) {
+    if (is.data.frame(m)) {
+      # A data.frame is also is.list()==TRUE, but its list elements are
+      # columns, not rows: unlist()-ing it the way a genuine list-of-rows is
+      # unlisted below would silently transpose the matrix (same failure
+      # mode fixed in sframe_decision_options(), R/decision_data.R).
+      m <- as.matrix(m)
+      storage.mode(m) <- "double"
+    } else if (is.list(m)) {
       widths <- vapply(m, length, integer(1))
       if (length(unique(widths)) > 1) {
         return(list(error = sprintf(

@@ -403,6 +403,21 @@ test_that("labels are generated when none are declared", {
   expect_equal(colnames(opts$matrix), c("C1", "C2"))
 })
 
+test_that("a data.frame `options$matrix` is not transposed", {
+  # A data.frame is also is.list()==TRUE, but its list elements are columns,
+  # not rows. Treating it as a list-of-row-vectors (the shape a real list
+  # uses) silently transposes the matrix: caught in real use when 5
+  # alternatives x 4 criteria came back as a 4 x 5 matrix.
+  df <- data.frame(service = c(4.1, 3.6, 4.8), price = c(210, 180, 260))
+  opts <- sframe_decision_options(list(
+    matrix = df, alternatives = c("Alpha", "Basilica", "Coral"),
+    criteria = c("service", "price")
+  ))
+  expect_equal(dim(opts$matrix), c(3, 2))
+  expect_equal(opts$matrix["Coral", "price"], 260)
+  expect_equal(opts$matrix["Alpha", "service"], 4.1)
+})
+
 test_that("every dimension mismatch is named exactly", {
   m <- list(c(1, 2), c(3, 4), c(5, 6))
   expect_error(
