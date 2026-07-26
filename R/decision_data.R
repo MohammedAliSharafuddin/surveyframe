@@ -547,7 +547,15 @@ sframe_decision_options <- function(options) {
 
   m <- options[["matrix"]]
   if (!is.null(m)) {
-    if (is.list(m)) {
+    if (is.data.frame(m)) {
+      # A data.frame is also is.list()==TRUE, but its list elements are
+      # columns, not rows: unlist()-ing it the way a genuine list-of-rows is
+      # unlisted below would silently transpose the matrix (each data.frame
+      # column read out in full before moving to the next). as.matrix()
+      # preserves the row/column orientation the caller actually wrote.
+      m <- as.matrix(m)
+      storage.mode(m) <- "double"
+    } else if (is.list(m)) {
       widths <- vapply(m, length, integer(1))
       if (length(unique(widths)) > 1) {
         sframe_abort_validation(sprintf(
