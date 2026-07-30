@@ -1,18 +1,27 @@
 # surveyframe roadmap (0.3 through 1.0)
 
-Last updated: 2026-07-25.
+Last updated: 2026-07-30.
+
+**2026-07-30, owner decision: the CRAN numbering is renumbered and the
+local labels stay as they are.** CRAN runs **0.3.4 to 0.4.0 to 0.4.1 to
+0.4.2**. There is no 0.3.5 and no 0.5.x on CRAN. The merged small-sample
+plus MCDM release, built on branch `v0.5-dev` and specified in
+`todo_0.5.md`, publishes as **0.4.0**. The faculty-demo patch
+(`todo_0.5.1.md`) publishes as **0.4.1**. The RMCDA method expansion
+publishes from **0.4.2** onward. The cancelled 0.3.5's field-validation
+scope is absorbed into 0.4.0 and 0.4.1, so its strict patch scope no
+longer binds. Branches, worktrees, and planning-file names are
+deliberately not renamed, so DESCRIPTION reads `0.4.0` while the branch
+is still called `v0.5-dev`. Full task list, priority order, and model
+tiers: `todo_master_0.4.md`.
 
 **2026-07-25: 0.4 merged into 0.5 by owner decision**, fired early,
 ahead of the original 2026-10-15 DOI-live gate (`decisions.md` in
-portfolio-planner). No standalone 0.4 version ships; 0.3.5 is followed
-directly by 0.5, which now carries both the small-sample track (former
-0.4 scope — already implemented and tested on branch `v0.4-dev`,
-committed, then branched into `v0.5-dev`) and the MCDM/DEMATEL track
-(0.5's original scope, Phase 1 in progress on `v0.5-dev`: harvest
-audit, item types, `R/decision_data.R`, TOPSIS reference runner). The
-former 0.4.1 faculty-demo patch renumbers to 0.5.1
-(`todo_0.5.1.md`). See `todo_0.4.md` and `todo_0.5.md` for full
-engineering status.
+portfolio-planner). The small-sample track (implemented and tested on
+`v0.4-dev`, committed, then branched into `v0.5-dev`) and the
+MCDM/DEMATEL track became one release. The 2026-07-30 renumbering above
+then gave that merged release the number 0.4.0, so the version number
+came back round while the branch kept the 0.5 label.
 
 This roadmap stages surveyframe from the current CRAN release to v1.0, the
 version that anchors the launch of Ethos, Ethos Pro, and the ASRDA textbook.
@@ -31,7 +40,8 @@ Principles:
   rest of the chain lands as one block at v0.8 and v0.9, the capstone before
   the v1.0 API freeze. Nothing integrity-related lands in v0.4 through v0.7.
   See "Integrity and provenance: one track" below.
-- The 0.3.4 to 0.3.5 visualisation arc runs as two ~30-day patch releases
+- Superseded 2026-07-30, kept as history: the 0.3.4 to 0.3.5 visualisation
+  arc was planned as two ~30-day patch releases
   between 0.3.3 and 0.4 (the foundation patch merged into 0.3.3 on 2026-07-10,
   and the five remaining patches were consolidated into two releases on
   2026-07-14). Hard Imports stay unchanged; new packages are
@@ -72,11 +82,13 @@ the slip and record why in `portfolio-planner/decisions.md`.
 | 0.3.1 | Stability and onboarding | done 2026-06-02 |
 | 0.3.2 | Maintenance: CITATION fix, JSS-required package changes, doc pass | 2026-07-04 |
 | 0.3.3 | Real-world embedding and conference feedback (AIC-RSAM, ICSRI 2026) plus the visualisation foundation (ggplot2 in Suggests, brand theme, `plots = TRUE`, first family plots, `$table` on inferential runners) and the Theme B survey redesign. Merged from the planned 0.3.3 and 0.3.4 on 2026-07-10 | implemented 2026-07-09, release pending |
-| 0.3.4 | All plotting, UI, statistics, and reporting work. The plotting and UI half (visualisation breadth, `plot()` S3 methods, plots into every surface, the builder rework, date bounds, the 2 WCAG 2.2 AA passes) is implemented and committed. The statistics and reporting half joins it by owner decision on 2026-07-17, since 0.3.4 had not been submitted: effect-size confidence intervals (base-R bootstrap `bootstrap_ci`, `cohens_d_ci`, `cramers_v_ci`, `eta_sq_ci`), psychometric depth (Henseler HTMT, real Little's MCAR via naniar, omega and EFA polish), report polish and PDF (`render_report(format = "pdf")` via pagedown, theming, accessibility, codebook upgrades) | 2026-08-15 |
-| 0.3.5 | Field validation: ICSRI 2026 audience feedback (conference 8-9 August 2026), additional rounds of human testing with several short real surveys, and the fixes both surface. Strict patch scope, no planned new features. Redefined 2026-07-17 when the former statistics scope moved into 0.3.4 | 2026-09-15 |
-| ~~0.4~~ | **Merged into 0.5, 2026-07-25** (fired early, ahead of the original 2026-10-15 gate). Small-sample inference engineering already implemented and tested on `v0.5-dev`. The RStudio add-in is unaffected, reaches GitHub from `dev` and CRAN with whichever release ships first | superseded, see 0.5 |
-| 0.5 | Small-sample inference (merged in, see above) plus MCDM and DEMATEL. Data-contract Phase 1 (item types, `R/decision_data.R`, TOPSIS reference runner) implemented and tested on `v0.5-dev`; remaining 9 MCDM computations, 3 rendering surfaces, and both JS registries not yet built | TBC, was 2027-01-25 pre-merge for MCDM alone |
-| 0.5.1 | Faculty demo proofing on the merged 0.5: demo session to college faculty, then UI/UX and doc fixes. Renumbered from 0.4.1, 2026-07-25 | TBC, ~2027-02 pre-merge estimate |
+| 0.3.4 | **Live on CRAN, published 2026-07-24, all 13 check flavours OK with no notes.** All plotting, UI, statistics, and reporting work. The plotting and UI half (visualisation breadth, `plot()` S3 methods, plots into every surface, the builder rework, date bounds, the 2 WCAG 2.2 AA passes) is implemented and committed. The statistics and reporting half joins it by owner decision on 2026-07-17, since 0.3.4 had not been submitted: effect-size confidence intervals (base-R bootstrap `bootstrap_ci`, `cohens_d_ci`, `cramers_v_ci`, `eta_sq_ci`), psychometric depth (Henseler HTMT, real Little's MCAR via naniar, omega and EFA polish), report polish and PDF (`render_report(format = "pdf")` via pagedown, theming, accessibility, codebook upgrades) | done, CRAN 2026-07-24 |
+| ~~0.3.5~~ | **Cancelled as a release, 2026-07-30.** Its field-validation scope (ICSRI 2026 audience feedback from the 8-9 August 2026 conference, 3 to 5 human testing rounds, and the fixes both surface) is absorbed into 0.4.0 for the 8 machine-fixable items and into 0.4.1 for the 4 device-dependent ones. Strict patch scope no longer applies | superseded, see 0.4.0 |
+| ~~0.4 (old)~~ | **Merged into the release now numbered 0.4.0, 2026-07-25.** Small-sample inference engineering implemented and tested, committed on `v0.4-dev`, then branched into `v0.5-dev` | superseded |
+| ~~0.5~~ | **Renumbered to 0.4.0, 2026-07-30.** The branch `v0.5-dev`, the worktree, and `todo_0.5.md` keep the 0.5 label deliberately. Only the published number changed | superseded, see 0.4.0 |
+| **0.4.0** | The next CRAN release. Small-sample inference plus MCDM and DEMATEL (all 10 methods) plus the 5 bugs found by independent validation plus the absorbed field validation. Built on `v0.5-dev`, specified in `todo_0.5.md`, tracked in `todo_master_0.4.md`. Still open: `sensitivity_analysis()`, `sf_conjoint_design()`, the Shiny renderer and builder inspector for the 2 decision item types, 8 method citations, the vignette, and the preprint DOI for `inst/CITATION` | TBC, gated on the manuscript DOI and on ICSRI feedback, so not before September 2026 |
+| 0.4.1 | Faculty demo proofing on 0.4.0: demo session to college faculty, then UI/UX and documentation fixes, plus the 4 device-dependent field items. Renumbered from 0.4.1 to 0.5.1 on 2026-07-25 and back to 0.4.1 on 2026-07-30. Open decision: whether the first RMCDA method batch rides here or waits for 0.4.2 | TBC, follows 0.4.0 |
+| 0.4.2 onward | The RMCDA method expansion: the roughly 41 MCDM methods beyond the 10 shipping in 0.4.0, ported in batches, each cross-checked against RMCDA as a Suggests-only test-time oracle. Method-per-patch grouping not yet decided | TBC |
 | 0.6 | SEM and PLS execution, invariance | 2027-03-11 |
 | 0.7 | Text and open-ended response analysis | 2027-04-25 |
 | 0.8 | Provenance part 1: `sf_version`, `sf_review`, `sf_pilot`, response hashing (SHA Layers 2-3) | 2027-06-09 |

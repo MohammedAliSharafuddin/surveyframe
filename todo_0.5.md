@@ -1,5 +1,13 @@
 # todo_0.5.md — surveyframe v0.5: MCDM and DEMATEL
 
+> **SHIPS AS CRAN 0.4.0 (owner decision 2026-07-30).** The local labels
+> stay as they are: branch `v0.5-dev`, worktree
+> `../surveyframe-v0.5-dev`, this file's name. Only the published version
+> number changes, so DESCRIPTION reads `0.4.0` at submission. There is no
+> 0.5.x on CRAN. This file remains the engineering spec for the release.
+> The canonical task list, priority order, and model tiers are in
+> `todo_master_0.4.md`.
+
 Dev-only planning file, tracked on `dev` only. Its name is in `.gitignore`
 and `.Rbuildignore`. Companion to `CLAUDE.md`, `todo_0.4.md`, and
 `../portfolio-planner/development_instructions/06_v05_v07_implementation.md`

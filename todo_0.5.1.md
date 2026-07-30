@@ -1,5 +1,13 @@
 # todo_0.5.1.md — surveyframe v0.5.1: Faculty demo proofing
 
+> **SHIPS AS CRAN 0.4.1 (owner decision 2026-07-30).** This file's name
+> stays as it is. It follows CRAN 0.4.0 (the release specified in
+> `todo_0.5.md`). It also carries the 4 device-dependent field-validation
+> items absorbed from the cancelled 0.3.5. Open decision: whether the
+> first RMCDA method batch rides here, which would end this patch's
+> strict scope, or waits for 0.4.2. Canonical task list:
+> `todo_master_0.4.md`, block F.
+
 Dev-only planning file, tracked on `dev` only. Its name is in `.gitignore`
 and `.Rbuildignore`. Companion to `CLAUDE.md` and `todo_0.5.md`.
 Renamed from `todo_0.4.1.md` 2026-07-25.

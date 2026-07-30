@@ -1,5 +1,13 @@
 # todo_0.4.md — surveyframe v0.4: Small-Sample Inference + RStudio Add-in
 
+> **ALREADY BUILT, SHIPS INSIDE CRAN 0.4.0 (status 2026-07-30).** Every
+> engineering item in this file is implemented, tested, and committed on
+> `v0.5-dev`. Confusing history worth stating once: this file was written
+> for a standalone 0.4 release that merged into 0.5 on 2026-07-25, and the
+> merged release is now numbered **0.4.0** on CRAN, so the version number
+> came back round while the branch kept the 0.5 label. Canonical task
+> list: `todo_master_0.4.md`.
+
 Dev-only planning file. Not tracked on `main`; add its name to `.gitignore`
 there alongside `revision_todo_0.3.md` and the other dev-only files before
 this is ever merged to `main`. Companion to `CLAUDE.md` and to

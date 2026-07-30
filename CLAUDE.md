@@ -20,23 +20,23 @@ contract declared before data collection. Analysis is the execution of that
 pre-declared plan rather than a post-hoc search. This is the package's main
 differentiator and the thesis of the JSS paper.
 
-Current version: 0.3.3, accepted by CRAN 2026-07-11 (auto-check confirmation
-received same day the tarball was submitted: "package is on its way to
-CRAN", Result: OK on r-devel-linux-x86_64-debian-gcc and
-r-devel-windows-x86_64). 0.3.3 merges what was originally planned as two
-releases: the real-world AIC-RSAM hardening (0.3.3) and the ggplot2
-visualisation foundation (0.3.4), shipped together as a single 0.3.3 since
-neither had reached CRAN yet. 543/543 tests pass. The MAS co-review
-(`mas_review_033.md`/`.qmd`, modelled on the 0.3.2 review) is complete,
-including a second live-feedback round covering multi-select export, mobile
-matrix scrolling, SurveyBuilder control duplication, and the report
-table/plot pairing, all resolved. The lead vignette and two supporting
-vignettes were rewritten to describe the redesigned survey, the expanded
-export columns, and `plots = TRUE`. Local `R CMD check --as-cran`,
-win-builder R-release (4.6.1), and win-builder R-devel were all clean
-(0/0/0) before submission. The CRAN package page confirmed 0.3.3 live, and
-the JSS manuscript work in surveyframe-jss-paper was told it is clear to
-resubmit (resubmitted 2026-07-12).
+Current version: **0.3.4, live on CRAN, published 2026-07-24** (submitted
+2026-07-25 local time, `main` at 6556f91). Verified on the CRAN package
+page and the check-results page on 2026-07-30: all 13 flavours Status OK,
+no notes, no warnings. `main` is pushed to both `origin` and `public` and
+matches the public repository exactly. The pkgdown site shows 0.3.4 and
+carries no dev-only files. 0.3.4 shipped all plotting, interface,
+statistics, and reporting work: visualisation breadth, 5 `plot()` S3
+methods, 2 WCAG-checked palettes, the builder rework, date bounds, the 4
+bootstrap CI helpers, Henseler HTMT, Little's MCAR via naniar, PDF
+reporting via pagedown, the Interpretations canvas, and 2 WCAG 2.2 AA
+passes. naniar and pagedown joined Suggests. The full history of that
+release is in the v0.3.4 section of `revision_todo_0.3.md` and in
+`mas_review_034.md`/`.qmd`, whose sign-off is complete.
+
+0.3.3 (CRAN 2026-07-11) merged what was originally planned as 2 releases,
+the real-world AIC-RSAM hardening and the ggplot2 visualisation
+foundation. The JSS manuscript was resubmitted 2026-07-12 against it.
 
 The pkgdown site is live at https://mohammedalisharafuddin.github.io/surveyframe/
 (published 2026-07-12, built and deployed automatically by
@@ -57,14 +57,34 @@ crawlers do not render SVG previews) to PNG, added JSON-LD structured data,
 added `robots.txt`, and gave the small-sample textbook reference in README a
 full citation with its Zenodo DOI.
 
-After 0.3.3 comes the remaining visualisation patch arc, consolidated on
-2026-07-14 into two ~30-day releases: 0.3.4 (target 2026-08-15) ships all
-plotting and UI work (visualisation breadth, plots into the report, dashboard,
-and studio, the builder rework, the vignette WCAG pass), and 0.3.5 (target
-2026-09-15) ships effect-size confidence intervals, psychometric depth, and
-PDF reporting. Then 0.4 (small-sample inference, target 2026-11-20). 0.4.1 is
-the faculty demo proofing release. The
-canonical schedule is portfolio-planner master_roadmap.md.
+## Version numbering: local labels versus CRAN versions (read before any release work)
+
+**Owner decision 2026-07-30: the local development labels and the CRAN
+version numbers deliberately differ. Do not rename branches, worktrees, or
+planning files to match CRAN.**
+
+| Local label (keep as is) | CRAN version | Content |
+|---|---|---|
+| branch `v0.5-dev`, worktree `../surveyframe-v0.5-dev`, `todo_0.5.md` | **0.4.0** | MCDM plus small-sample plus the 5 bug fixes plus absorbed field validation |
+| `todo_0.5.1.md` | **0.4.1** | Faculty demo proofing plus the device-dependent field items |
+| the RMCDA method expansion | **0.4.2** onward | The roughly 41 extra MCDM methods |
+| `todo_0.3.5.md` | never published | Absorbed into 0.4.0 and 0.4.1 |
+| branch `v0.4-dev` | never published | Small-sample track, already merged into `v0.5-dev` |
+
+**CRAN numbering runs 0.3.4 to 0.4.0 to 0.4.1 to 0.4.2.** There is no 0.3.5
+and no 0.5.x on CRAN, and no 0.4 in the old small-sample-only sense either,
+since that release merged into this one on 2026-07-25. Practical
+consequences: DESCRIPTION must read `0.4.0` at submission even though the
+branch is called `v0.5-dev`, NEWS.md must state plainly that 0.3.5 and 0.5
+were planned and never released, and the strict patch-scope rule that
+governed 0.3.5 no longer binds, because that work now rides a minor
+release.
+
+**`todo_master_0.4.md` is the single entry point for release work**, with
+all 64 open tasks in 9 blocks, a model tier per task, and the priority
+order. The per-release files hold the detail. The canonical schedule is
+portfolio-planner `master_roadmap.md`, whose 0.4.0 date is TBC pending the
+manuscript timeline and ICSRI feedback.
 
 ---
 
@@ -96,7 +116,8 @@ surveyframe is the source of truth for a wider product and publication set.
   v0.5.
 - **small-sample-survey-framework** (public, R) and **smallsamplelab** (private):
   the simulation-validated decision framework for n below 30. The source for the
-  small-sample helpers that land in surveyframe core at v0.4.
+  small-sample helpers, which land in surveyframe core at v0.5 (originally
+  planned as v0.4, merged 2026-07-25).
 - **flairmi / flairmi-site**: the commercial umbrella at flairmi.com.
 
 v1.0 of surveyframe is the gate for the public launch of Ethos, Ethos Pro, and
@@ -119,7 +140,7 @@ the planning files.
 - `dev`: the planning superset. Pushed to `private` only. It force-adds the
   dev-only files on top of `main`.
 
-Dev-only files (gitignored on `main`, tracked on `dev`):
+Dev-only files (tracked on `dev` only):
 
 - `CLAUDE.md` (this file)
 - `roadmap.md`
@@ -127,6 +148,19 @@ Dev-only files (gitignored on `main`, tracked on `dev`):
 - `cran-comments.md`
 - `todo.md`
 - `dogfeed.todo.md`
+- `todo_0.3.5.md`, `todo_0.4.md`, `todo_0.5.md`, `todo_0.5.1.md`,
+  `todo_0.6.md` through `todo_1.0.md`, `todo_rstudio_addin.md`
+- `mas_review_032.md` through `mas_review_034.md` and their `.qmd`/`.html`
+  renders, `kimi_review_034.md`, `qwen_review_034.md`
+- `data-raw/` (holds `inline_static_template.R`, which regenerates the
+  builder's inlined copy of the static survey template)
+
+**2 hygiene gaps, open as of 2026-07-30.** `main`'s `.gitignore` names only
+the original 6 files, so the newer planning files are not gitignored there.
+`.Rbuildignore` still names `todo_0.4.1.md` (renamed to `todo_0.5.1.md` on
+2026-07-25) and omits `kimi_review_034.md` and `qwen_review_034.md`. Close
+both before the next tarball is built from a branch that carries these
+files.
 
 Routine work happens on `main`. When the planning files change, switch to `dev`,
 merge `main`, update the files, and push `dev` to `private`. To resume planning
@@ -183,14 +217,16 @@ Run from the repository root.
 
 ```r
 devtools::document()          # regenerate man/ and NAMESPACE
-devtools::test()              # run the test suite (expect 543 passing at 0.3.3)
+devtools::test()              # run the test suite (721 passing at the 0.3.4
+                              # release; v0.5-dev adds the decision and
+                              # small-sample files on top, all green)
 devtools::load_all()          # load for interactive work
 rmarkdown::render("vignettes/surveyframe.Rmd", output_dir = tempdir())
 ```
 
 ```bash
 R CMD build .                                   # build the source tarball
-R CMD check --as-cran surveyframe_0.3.3.tar.gz  # full CRAN check
+R CMD check --as-cran surveyframe_0.3.4.tar.gz  # full CRAN check
 ```
 
 A clean CRAN check is 0 errors, 0 warnings, and at most 1 NOTE (incoming
@@ -201,209 +237,121 @@ feasibility). The vignette builds offline because the data-collection step uses
 
 ## Current status and immediate next steps
 
-**0.3.4 is in progress (target 2026-08-15, status 2026-07-16).** The work
-so far is committed: main 221f612 (pushed to origin and public) carries
-the package work, dev 3d8269f (pushed to origin only) carries the
-planning files. 562/562 tests pass. Done: the full
-visualisation breadth in `R/plots.R` (all planned family plots plus
-skewness/kurtosis, group-comparison, paired, and variable-distribution
-charts), 2 WCAG-checked colour systems (web brand and print
-black/grey/white) with a `plot_palette` chart-theme switcher threaded
-through `run_analysis_plan()`, `render_report()` (both render paths), and
-a SurveyStudio Export radio, `render_report()` plot embedding, 5 `plot()`
-S3 methods, the complete builder rework (Add-question split, Theme B
-preview, settings consolidation, Analyse sub-tab rework plus two-pane
-layout), the preset choice-set library, the ID-regeneration and
-`item__sub` variable-expansion fixes, and the thank-you download/redirect
-repair. The full done/pending breakdown lives in the v0.3.4 section of
-`revision_todo_0.3.md`. The editable interpretation step (owner
-request 2026-07-16) is implemented and verified but uncommitted: an
-`interpretations` argument on `render_report()` and `render_results()`
-keyed by plan block id, an Interpretations card on the SurveyStudio
-Export screen, and inline decision-rule editing in the builder Report
-outline. The SurveyStudio results page stays deferred past the arc by
-owner decision. The studio Analyse plot area is also implemented and
-verified (result cards with embedded charts, one shared
-`analysis_results_r` reactive), as are the 2 remaining S3 methods,
-`plot.sframe_validity_report()` and `plot.sframe_analysis_results()`,
-plus a new exported `sframe_plot_validity()` helper, and the dashboard
-chart coverage (quality flag-rate, item missingness via a new
-`sframe_plot_missingness()` helper, and scale-correlation heatmaps on
-both dashboard surfaces, with the base-R versus ggplot2 question
-settled as keep-the-hybrid: ggplot helper first, base-R fallback
-retained), and the date-question bounds (2026-07-17: `date_min` and
-`date_max` on `sf_item()`, threaded through the sframe round-trip,
-both Shiny render paths, the static template with a `validatePage()`
-bounds check, and the builder inspector, with
-`inline_static_template.R` re-run), and the 2 WCAG 2.2 passes
-(2026-07-17, axe-core through chromote: builder chrome zero
-violations in 6 states after a `--t3` darkening and 6 targeted fixes,
-all 7 vignettes zero violations after the shared style block,
-`lang: en-GB`, and `fig.alt` additions). All committed at main
-0ca5d24. Suite now 649 passing.
+Status verified against the code, the branches, and CRAN on 2026-07-30.
 
-**Scope expanded 2026-07-17 (owner decision): 0.3.4 absorbs the
-statistics and reporting work that was 0.3.5** (effect-size CIs,
-Henseler HTMT, Little's MCAR via naniar, omega and EFA polish, PDF
-via pagedown, report theming, codebook upgrades), since nothing had
-been submitted. **0.3.5 is redefined as the field-validation
-release**: ICSRI 2026 audience feedback (conference 8-9 August 2026)
-plus additional human testing rounds with several short real surveys.
-Targets unchanged: 0.3.4 on 2026-08-15, 0.3.5 on 2026-09-15, 0.4 on
-2026-11-20.
+### Shipped
 
-**The statistics and reporting half is implemented and verified
-(2026-07-18), so all planned feature work for 0.3.4 is now done.**
-`R/bootstrap_ci.R` exports the 4 CI helpers; all 9 affected runners
-carry an additive CI key with the interval in their `apa` string;
-`validity_report()` computes true Henseler HTMT with a documented
-correlation fallback; `missing_data_report()` runs Little's MCAR via
-naniar when installed; `reliability_report()` and `efa_solution()`
-gained the omega-failure note and 3 tidy data frames; `render_report()`
-gained `format = "pdf"` via pagedown; the HTML fallback's styling
-moved to `--sf-*` CSS variables with a print stylesheet and chart alt
-text; `codebook_report()` gained plan and model summary tables. naniar
-and pagedown are in Suggests, guarded. Verified: `devtools::document()`
-clean, 72 new expectations (0 failed, 1 expected skip for naniar not
-installed locally), full suite 721 passed / 0 failed / 1 skipped, all
-9 runners spot-checked live, and a fresh axe-core run on the re-themed
-report at zero violations. Still open: the `.bib` reference carry-in
-(owner decision, leaning defer to a future report-format patch), then
-the release process (tarball rebuild, your mas_review_034.md rounds,
-`R CMD check --as-cran`, win-builder, CRAN submission).
+**0.3.4 is live on CRAN (published 2026-07-24), all 13 check flavours OK,
+no notes.** Nothing about that release is outstanding. `main` at 6556f91 is
+pushed to `origin` and `public`, the pkgdown site shows 0.3.4 with no
+dev-only files, and `mas_review_034` is signed off with every
+human-judgement item explicitly moved to `dogfeed.todo.md` for the
+field-validation round, which was labelled 0.3.5 at the time and is now
+absorbed into 0.4.0 and 0.4.1, rather than left open. Earlier drafts of this file described 0.3.4 as
+"in progress". That text was stale and has been removed.
 
-**First-round mas_review_034 feedback triaged and fixed (2026-07-17).**
-A batch of bugs surfaced by the human review pass: the LICENSE year
-still read 2025, the Quarto report's tables lost their column split
-because `kable()` never pinned `format = "html"`, the HTML-fallback
-codebook tables printed raw snake_case column names, the response
-distribution charts used base-R plots instead of the shared
-`theme_surveyframe()` family-plot helpers, several family plots showed
-raw variable and construct ids on their axes instead of humanised
-labels, `plot(missing_data_report())` returned `NULL` on clean data
-instead of a chart, and `run_analysis_plan()`'s result list was never
-named by block id so named lookup silently returned `NULL`. All fixed,
-full suite still 721 passed and `devtools::document()` clean. Full
-detail in the v0.3.4 section of `revision_todo_0.3.md`. Separately, the
-B2 review feedback (adopt a JASP or JAMOVI style output canvas) was
-partially actioned: the SurveyStudio Export screen's Interpretations
-card is rebuilt so each research question shows its table, chart, and
-a copy button alongside the editable interpretation box, with chart
-rendering cached once and shared with the Run stage. The broader ask
-to redesign the whole shiny app is not in scope for this patch.
+### In flight
 
-**Second round, 2026-07-18: `mas_review_034.qmd` made executable and
-actually re-rendered, which surfaced the real cause of two bugs the
-first round had only patched around the edges of.** The table-splitting
-bug was not the `kable()` fix: `report.qmd` calls
-`sframe_draw_likert_diverging()` directly, and it was never exported,
-so Quarto's own `library(surveyframe)` session couldn't see it and
-silently fell back to the HTML path on every render with a Likert item.
-The HTML path's own splitting bug was `htmltools_escape()` collapsing a
-whole table header or row vector into one space-joined string (correct
-for a scalar caption, wrong called on a vector). Both fixed
-(`sframe_draw_likert_diverging()` exported, new
-`htmltools_escape_each()` for the vectorised case); `theme_surveyframe()`'s
-leftover panel gridlines (inconsistent with its `theme_classic()` base)
-also removed. Further MAS feedback actioned the same session: skewness
-and kurtosis now draw as a violin per variable instead of a bar of the
-summary statistics; a matrix question's rows and a scale's separate
-Likert items that share one choice set now draw as one grouped
-diverging chart instead of one chart per row or item
-(`sframe_plot_likert_matrix()`, `sframe_plot_likert_scale()`); the
-codebook's items table shows response options and scale label inline
-instead of a separate choice-sets table (5 rendered tables to 4), and
-every analysis-result table now shows labels instead of raw ids and
-coded values (`sframe_label_lookup()`/`sframe_humanize_table()`); and
-every one of the demo plan's 34 blocks now returns a table, a chart, or
-generated syntax, closing 13 test types that previously rendered with
-nothing beneath the result line (repeated-measures ANOVA additionally
-gained a real F/df/p/partial eta-squared table instead of only captured
-text). The Interpretations canvas's writing box was enlarged and "Copy
-result" rewritten to copy the whole block (table, chart image, and the
-interpretation as typed) as rich HTML instead of a plain-text summary
-that could never include the chart. Two independent AI code reviews
-(`kimi_review_034.md`, `qwen_review_034.md`, dev branch only) were then
-fact-checked claim by claim against the real source; nearly all of the
-first review's "critical bugs" did not match the actual code, but 2 real
-smaller issues did surface and were fixed: `sf_item()`'s
-`date_min`/`date_max` silently misparsing an ambiguous date string
-instead of rejecting it, and the 4 bootstrap CI helpers leaking their
-seed into the caller's global RNG state. Both review files carry a
-verification appendix. All committed to `main` and merged to `dev`;
-review-file commits and their appendices are `dev`-only.
+**0.5 is the merged small-sample plus MCDM release, on branch `v0.5-dev`
+(worktree `../surveyframe-v0.5-dev`, clean tree, 6 commits ahead of
+`main`).** 0.4 merged into it on 2026-07-25, so no 0.4 ships. What is
+built and committed there:
 
-0.3.1 is published on CRAN (2026-06-02). 0.3.3 is fully implemented (543/543
-tests pass, three vignettes rewritten and knit clean, tarball built, local
-`R CMD check --as-cran` clean at 0/0/0).
+- The whole small-sample track: Hodges-Lehmann on Mann-Whitney,
+  pseudomedian CI on paired Wilcoxon, exact odds-ratio CI on Fisher,
+  Firth logistic regression with `logistf` in Suggests, the small-sample
+  advisory on `assumption_report()` and `sample_size_plan()`, and
+  `vignettes/small-sample.Rmd`.
+- All 10 MCDM methods (TOPSIS, AHP, ANP, DEMATEL, VIKOR, MOORA, SMART,
+  WASPAS, PROMETHEE, ELECTRE), each dispatching through
+  `sframe_run_one_block()`, `sframe_analysis_roles()`, and
+  `sframe_plot_for_result()`, with both JS UI registries listing all 10.
+- `R/decision_data.R` (assembly, aggregation, collected weights, rated
+  matrices, AHP consistency screening) and the 2 new item types at the R
+  level, with 7 `test-decision-*.R` files.
+- Static-survey rendering for `pairwise_comparison` and
+  `criteria_weight`, including the `validatePage()` constant-sum check,
+  the mobile `<select>` reflow, and the submit serialiser (commit
+  d218786, verified through headless Chrome).
+- RMCDA in Suggests as a test-time cross-check oracle. It caught a real
+  bug: WASPAS was using SMART's normalisation.
 
-**0.3.3 merges two originally separate releases.** It hardens the package
-against its first real deployment (the AIC-RSAM room-service study and the
-Google Sheets collector's CORS submission bug, found and fixed against the
-live prototype) and ships the ggplot2 visualisation foundation originally
-planned as 0.3.4 (`plots = TRUE` on `run_analysis_plan()`, `theme_surveyframe()`,
-the Likert diverging chart, table+plot pairing in the report). Both were
-merged into a single 0.3.3 since neither had reached CRAN when the decision
-was made.
+**The field-validation work has no release of its own.** By owner decision
+2026-07-30 it is absorbed into CRAN 0.4.0 and 0.4.1, so `todo_0.3.5.md` is
+superseded. It is driven by ICSRI 2026 feedback (8 to 9 August 2026) and 3
+to 5 short real surveys, and 12 items are already logged against it in
+`dogfeed.todo.md`. Absorbing it puts the conference on 0.4.0's critical
+path rather than beside it.
 
-**The MAS co-review is complete (`mas_review_033.md`/`.qmd`, modelled on the
-0.3.2 review), including a second live-feedback round** covering: multi-select
-export as one 0/1 column per option, mobile-friendly matrix reflow below 600px,
-SurveyBuilder's duplicate Add-question and Settings entry points (now single
-entry points each), the report's table+plot pairing, and the Likert-specific
-diverging chart. All six items resolved and verified headlessly via
-`chromote`. The survey export also passed a full WCAG 2.2 AA pass (accessible
-names, visible focus, announced errors, keyboard-operable ranking, 44px touch
-targets).
+### The 5 confirmed bugs from independent validation
 
-DONE and signed off: **SurveyBuilder** (HTML), **static survey** template
-(Theme B redesign, mobile reflow, WCAG 2.2 AA), **SurveyStudio**
-(`inst/shiny/app.R`), and the **HTML/Quarto report**
-(`R/reporting.R` + `inst/templates/report.qmd`, now pairing every result table
-with its chart). The lead vignette (`surveyframe.Rmd`) and
-`deploying-and-collecting.Rmd`/`analysing-survey-responses.Rmd` were rewritten
-to describe the redesigned survey, the expanded ranking/multiple-choice/matrix
-export columns, and `plots = TRUE`.
+Found 2026-07-26 by the sibling repo `surveyframe-statistical-validation`
+and a headless chromote pass over the builder. All 5 re-verified as still
+present on `v0.5-dev` on 2026-07-30. Each produces plausible output with
+no error, so none of them would surface without cross-validation.
 
-Status as of 2026-07-11:
+1. `item_report()` item-rest correlation uses `rowMeans()` where the
+   standard needs the sum of the other items
+   (`R/psychometrics.R:179`). Gives negative values on a scale with
+   alpha 0.88.
+2. `sframe_run_repeated_anova()` never coerces `.subject` to a factor
+   (`R/statistics_reports.R:956`), so `aov()` uses the wrong error
+   stratum. F comes out 0.94 where `jmv::anovaRM()` gives 22.64.
+3. The builder cannot create either new decision item type: `qAdd()`'s
+   fab menu has no button and `varLevel()` has no branch, so
+   `roleOptions()` returns nothing even for an imported instrument. All
+   10 MCDM methods are unbuildable in the GUI until this is fixed.
+4. `known_vars` in `R/validate_sframe.R` lacks the `item__sub` and
+   `item__option` expansion the builder and `read_responses()` already
+   use, so a real builder export fails R-side validation.
+5. Model-role dropdowns and `seminr_syntax()`/`sem_lavaan_syntax()` do
+   not check `model$type`, so a CB-SEM model generates PLS-SEM syntax
+   without complaint.
 
-1. `surveyframe_0.3.3.tar.gz` built. Local `R CMD check --as-cran`: Status OK,
-   0 errors, 0 warnings, 0 notes.
-2. Win-builder R-release (4.6.1) and R-devel both returned Status: OK.
-   Submitted to CRAN 2026-07-11. **Accepted the same day**: CRAN's
-   auto-check service confirmed "package is on its way to CRAN", Result: OK
-   on r-devel-linux-x86_64-debian-gcc and r-devel-windows-x86_64.
-3. NEWS.md proofread and corrected to read as a clean per-release changelog,
-   with future-direction and internal-note content removed.
-4. `main` pushed to both `origin` (private) and `public` (the CRAN-facing
-   surveyframe repository) after the tarball verification confirmed the
-   submitted tarball is byte-identical to the repo state for every source
-   file it carries.
+All 5 fixes land in CRAN 0.4.0 by owner decision 2026-07-30. 4 of them
+shipped inside 0.3.4, so they are live on CRAN now.
 
-The JSS paper (OJS 6454, submitted 2026-06-02) was returned without full review.
-Revised and resubmit invitation. The replicate.R and package changes it required
-shipped in 0.3.2/0.3.3. The manuscript itself now lives in its own repository,
-surveyframe-jss-paper (see that repo's own CLAUDE.md), and was updated
-2026-07-11 for 0.3.3: version references bumped, the live SSR 6.0 DOI cited,
-all six figures retaken against the redesigned survey and current
-SurveyBuilder UI, and a previously unaddressed editor checklist item (a
-non-interactive response-collection demonstration) finally closed.
-**Resubmitted to JSS 2026-07-12** once the CRAN package page confirmed
-0.3.3 live.
+### Open engineering work on 0.5
 
-Open items (non-blocking for CRAN submission):
+Not built: `sensitivity_analysis()`, `sf_conjoint_design()`, the
+`vignettes/mcdm-analysis.Rmd` vignette, the Shiny renderer for the 2 new
+item types (`R/render_survey.R` has no reference to either), the builder
+inspector editor for `comparison_items`/`comparison_scale`, and the
+section 1g sample sframe as a real fixture. The builder's inlined copy of
+the static template is stale: `data-raw/inline_static_template.R` must be
+re-run, and it is tracked on `dev` only, so it is absent from the
+`v0.5-dev` worktree. Citations exist for 2 of the 10 methods only, and
+DEMATEL's source is unresolved between 2 Battelle reports. The
+`../mcdm` harvest audit's owner sign-off on the section 1 data contract
+was never taken, which is the release's standing rework risk.
 
-- Confirm or remove the Codecov badge in README.
-- Guard `launch_dashboard()` and similar Shiny launcher `\donttest` examples so a
-  full check does not hang; this is a future patch, not a 0.3.3 blocker.
-- The Quarto/pandoc `kable()` table-collapsing bug found during the 0.3.3
-  review: root cause found and fixed 2026-07-18 (see the v0.3.4 second-round
-  entry above). It was never a pandoc/kable issue; `report.qmd`'s Quarto
-  path was silently failing on an unexported function and falling back to
-  an HTML path with its own vector-escaping bug.
-- The vignette-specific WCAG 2.2 AA CSS pass logged here for v0.3.4 was
-  completed on 2026-07-17 (see the v0.3.4 section of
-  revision_todo_0.3.md).
+### Hard blocker
+
+`inst/CITATION` needs the combined small-sample and MCDM paper's preprint
+DOI, and CRAN will not accept a placeholder. By the 2026-07-26 decision
+the paper deliberately waits until 0.5's original 10 methods are
+complete, so this is sequenced behind the engineering rather than chased
+on a date. The 2026-10-15 gate has no remaining bearing on anything.
+
+### Also open, unrelated to a single release
+
+The RStudio add-in exists only as a plan (`todo_rstudio_addin.md`). No
+files, no branch, no `rstudioapi` in Suggests. Its "do not merge until
+0.3.4 is accepted" condition is now satisfied, so it can be built and
+merged at any time. Smaller carried items: the `.bib` reference carry-in
+decision (leaning defer), the Codecov badge, guarding the Shiny launcher
+`\donttest` examples, the keep-versus-deprecate call on the standalone
+dashboard, an interactive pass over `R/survey_module.R`, and README's
+Roadmap section, which still promises small-sample at 0.4 and MCDM at
+0.5 on a public page.
+
+**`todo_master_0.4.md` holds all 64 open tasks** in 9 blocks with a model
+tier and a priority tier per task, plus the 3 open decisions. Read it
+first for release work. Per-release detail stays in `todo_0.5.md` (the
+0.4.0 engineering spec), `todo_0.5.1.md` (0.4.1), `todo_rstudio_addin.md`,
+and `todo_0.6.md` through `todo_1.0.md`. `todo_0.4.md` is the small-sample
+record, already built. `todo_0.3.5.md` is superseded, absorbed into 0.4.0
+and 0.4.1.
 
 The full task list is in `revision_todo_0.3.md`. The version and growth plan is
 in `roadmap.md`.
@@ -446,19 +394,6 @@ fixing anything.
 
 ## Continuation prompts (paste to resume a thread of work)
 
-### Vignette WCAG 2.2 AA CSS pass (logged for v0.3.4)
-
-```
-Read CLAUDE.md and roadmap.md's v0.3.4 section. The pkgdown site (live at
-https://mohammedalisharafuddin.github.io/surveyframe/) already fixed the
-"dull default vignette" look by wrapping vignettes in the branded pkgdown
-theme. What has not been checked is AA contrast and heading structure on
-the vignette content itself. Do that pass: check contrast ratios on code
-blocks, tables, and body text against the bslib theme colours, verify
-heading order, and fix anything that fails, on main since docs/ and the
-pkgdown build are unaffected.
-```
-
 ### Trigger the pkgdown workflow after any future dev-only file addition
 
 ```
@@ -473,38 +408,39 @@ straight off the working tree. If in doubt, rebuild locally on main first
 name before pushing.
 ```
 
-### Start the v0.5 MCDM work
+### Resume release work (CRAN 0.4.0, local 0.5.0)
 
 ```
-Read CLAUDE.md and roadmap.md. Begin surveyframe v0.5: bring MCDM and DEMATEL
-into core. Port the method registry from the mcdm repo, register the runners in
-run_analysis_plan() under a decision family, and add the pairwise-comparison and
-criteria-weight item types. Stay within the analysis-plan contract. No new hard
-dependencies. Propose the plan before writing code.
+Read CLAUDE.md's version-numbering section and todo_master_0.4.md, then
+todo_0.5.md for the engineering detail. Work on branch v0.5-dev in the
+worktree ../surveyframe-v0.5-dev. The small-sample track and all 10 MCDM
+computations are already built and committed there. This ships to CRAN as
+0.4.0, not 0.5.0: keep the local branch and file names, set DESCRIPTION to
+0.4.0 only at release time. Re-verify every file and line anchor before
+editing, they drift. Start at the first unchecked task in priority order,
+P0 first. Model tiers per the 2026-07-27 decision: Opus leads, no Fable.
 ```
 
-### Start the 0.3.3 real-world feedback release
+### Run the field-validation work (absorbed into 0.4.0 and 0.4.1)
 
 ```
-Read CLAUDE.md and portfolio-planner/development_instructions/04_v032_v033_implementation.md.
-We are preparing surveyframe 0.3.3: real-world embedding and conference feedback.
-The two evidence sources are ai-room-service-prototype (local: AI_Room_service/)
-and the ICSRI 2026 presentation. Read both repos, reproduce the AIC-RSAM instrument
-as a dev-branch regression fixture, and triage the fixes needed. Strict patch scope:
-no new analytical features.
+Read CLAUDE.md, todo_master_0.4.md block C, and dogfeed.todo.md. There is
+no 0.3.5 release: this work is absorbed into CRAN 0.4.0 and 0.4.1, so
+patch-scope limits no longer bind. Start from the 8 machine-fixable items
+already logged in the 0.3.5 lane of dogfeed.todo.md, then take the ICSRI
+2026 and human-testing feedback as it arrives. Dogfeed protocol applies:
+log first, fix only after an explicit "dogfeed is complete".
 ```
 
-### Start the v0.4 small-sample work
+### Build the RStudio add-in
 
 ```
-Read CLAUDE.md and roadmap.md. Begin surveyframe v0.4: small-sample inference.
-Add exact, permutation, and bootstrap variants for the existing two-group and
-association tests, plus effect-size confidence intervals, drawing on the
-small-sample-survey-framework. Add a small-sample advisory to sample_size_plan()
-and assumption_report(). Also add the RStudio add-in as an adoption add-on (a
-thin wrapper over the launchers plus an insert-sframe-skeleton helper, rstudioapi
-in Suggests). Do not write the dcf until the plan is agreed. Propose the plan
-before writing code.
+Read CLAUDE.md and todo_rstudio_addin.md. Nothing has been built yet: no
+inst/rstudio/addins.dcf, no R/rstudio_addins.R, no branch, no rstudioapi
+in Suggests. The "do not merge until 0.3.4 is accepted" condition is now
+satisfied, since 0.3.4 is on CRAN. Cut feature/rstudio-addin from dev in
+its own worktree, build the 4 agreed menu items and nothing more, and
+keep the diff to new files plus one DESCRIPTION line.
 ```
 
 ### Work on the JSS paper

@@ -1,5 +1,14 @@
 # todo_0.3.5.md — surveyframe v0.3.5: Field validation
 
+> **SUPERSEDED 2026-07-30 (owner decision).** There is no 0.3.5 CRAN
+> release. This file's field-validation scope is absorbed into **CRAN
+> 0.4.0** (the 8 machine-fixable dogfeed items, the ICSRI 2026 capture, the
+> testing rounds, the triage, and the review rounds, now
+> `mas_review_040.md`) and **CRAN 0.4.1** (the 4 device-dependent items).
+> The strict patch-scope rule below no longer binds, because the work now
+> rides a minor release. Canonical task list: `todo_master_0.4.md`, block C
+> and block F. Content below is kept as the record of what was planned.
+
 Dev-only planning file, tracked on `dev` only. Its name is in `.gitignore`
 and `.Rbuildignore`. Companion to `CLAUDE.md`, `dogfeed.todo.md`, and
 `../portfolio-planner/development_instructions/19_v034_v035_implementation.md`.
