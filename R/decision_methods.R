@@ -387,6 +387,25 @@ sframe_resolve_pairwise_matrix <- function(data, roles, options, instrument,
       method
     )))
   }
+  # The 2 comparison scales are not interchangeable. AHP and ANP need
+  # reciprocal relative importance on the Saaty ratio scale. An influence item
+  # collects directed 0-4 influence with a zero diagonal and no reciprocity,
+  # which would hand the eigenvector step a matrix it cannot interpret and
+  # return plausible but meaningless weights. DEMATEL enforces the mirror of
+  # this check on its own role.
+  scale_item <- sframe_decision_item(instrument, pairwise_item[1],
+                                     "pairwise_comparison")
+  item_scale <- scale_item$comparison_scale %||% "saaty"
+  if (!identical(item_scale, "saaty")) {
+    return(list(error = sprintf(
+      paste0("Item '%s' uses the '%s' comparison scale. %s needs relative ",
+             "importance on the Saaty ratio scale, so its `pairwise` role ",
+             "needs a pairwise_comparison item declared with ",
+             "`comparison_scale = \"saaty\"`. An influence item belongs to a ",
+             "DEMATEL block."),
+      pairwise_item[1], item_scale, method
+    )))
+  }
   assembly <- sframe_assemble_pairwise(data, instrument, pairwise_item[1])
   if (assembly$n_respondents == 0) {
     return(list(error = sprintf(
