@@ -681,6 +681,16 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
         <button type="button" class="fi" onclick="qAdd('date');closeFabMenu()"><span class="fi-ic">&#128197;</span>Date</button>
         <button type="button" class="fi" onclick="qAdd('text_block');closeFabMenu()"><span class="fi-ic">&#128221;</span>Text block</button>
       </div>
+      <!-- Decision-family question types (v0.5 MCDM work, shipping as CRAN
+           0.4.0). Three entries for two item types: pairwise_comparison
+           carries both the AHP/ANP Saaty scale and the DEMATEL influence
+           scale, chosen by comparison_scale, so each gets its own entry
+           rather than making the researcher find a hidden switch. -->
+      <div class="fg"><div class="fg-lbl">Decision (MCDM)</div>
+        <button type="button" class="fi" onclick="qAdd('pairwise_comparison','saaty');closeFabMenu()"><span class="fi-ic">&#8646;</span>Pairwise comparison (AHP)</button>
+        <button type="button" class="fi" onclick="qAdd('pairwise_comparison','influence');closeFabMenu()"><span class="fi-ic">&#8594;</span>Influence matrix (DEMATEL)</button>
+        <button type="button" class="fi" onclick="qAdd('criteria_weight');closeFabMenu()"><span class="fi-ic">%</span>Criteria weights</button>
+      </div>
     </div>
     <div class="fab-menu" id="cfgMenu" aria-label="Configuration">
       <div class="fg"><div class="fg-lbl">Configure</div>
@@ -2410,7 +2420,7 @@ function renderInspBody(item){
   var csO=[['','select'],...S.choices.map(function(c){return[c.id,c.id+' ('+c.values.length+' opts)'];}),
     ...Object.keys(PRESET_CHOICE_SETS).filter(function(k){return !S.choices.find(function(c){return c.id===k;});}).map(function(k){return['preset:'+k,'Preset: '+PRESET_CHOICE_SETS[k].label];})];
   var scO=[['','none'],...S.scales.map(function(s){return[s.id,s.id+': '+s.label];})];
-  var tO=[['likert','Likert'],['single_choice','Single choice'],['multiple_choice','Multiple choice'],['numeric','Numeric'],['text','Short text'],['textarea','Long text'],['date','Date'],['matrix','Matrix'],['slider','Slider'],['ranking','Ranking'],['rating','Rating']];
+  var tO=[['likert','Likert'],['single_choice','Single choice'],['multiple_choice','Multiple choice'],['numeric','Numeric'],['text','Short text'],['textarea','Long text'],['date','Date'],['matrix','Matrix'],['slider','Slider'],['ranking','Ranking'],['rating','Rating'],['pairwise_comparison','Pairwise comparison'],['criteria_weight','Criteria weights']];
   function fld(lbl,ctrl,hint,req){var m=ctrl.match(/id="([^"]+)"/);var forA=m?' for="'+m[1]+'"':'';return'<div class="field"><label class="fl"'+forA+'>'+lbl+(req?'<span class="fr">*</span>':'')+'</label><div class="fc">'+ctrl+'</div>'+(hint?'<span class="fhint">'+hint+'</span>':'')+'</div>';}
   function inp(fid,val,ph,type){type=type||'text';return'<input type="'+type+'" id="'+fid+'" value="'+esc(val)+'" placeholder="'+(ph||'')+'" onblur="updF(\''+fid+'\')">';}
   function ta(fid,val,ph,rows){rows=rows||3;return'<textarea id="'+fid+'" rows="'+rows+'" placeholder="'+(ph||'')+'" onblur="updF(\''+fid+'\')">'+esc(val)+'</textarea>';}
@@ -2488,7 +2498,7 @@ function updF(id){
   renderItemList();
 }
 // Auto-id helpers shared by qAdd() and the type-change rename above.
-function typePrefix(type){return {'section_break':'sec','text_block':'txt'}[type]||type.slice(0,3);}
+function typePrefix(type){return {'section_break':'sec','text_block':'txt','pairwise_comparison':'pair','criteria_weight':'crit'}[type]||type.slice(0,3);}
 function nextItemId(type,excludeId){
   var prefix=typePrefix(type);
   // excludeId: when renaming after a type change, the item already carries
@@ -2567,11 +2577,16 @@ function defaultLabel(type,n){
     rating:'Rate this item',
     date:'Select a date',
     section_break:'New section',
-    text_block:'Instruction text'
+    text_block:'Instruction text',
+    pairwise_comparison:'Compare the importance of each pair of criteria',
+    criteria_weight:'Divide 100 points across the criteria'
   };
   return labels[type]||('Question '+n);
 }
-function qAdd(type){
+// variant: only meaningful for pairwise_comparison, where it selects
+// comparison_scale ("saaty" for AHP/ANP ratios, "influence" for DEMATEL's
+// directed 0-4 matrix). Every other caller passes one argument, as before.
+function qAdd(type,variant){
   var nid=nextItemId(type),n=parseInt(nid.split('_').pop(),10);
   snap();
   var choice=null;
@@ -2584,8 +2599,21 @@ function qAdd(type){
       S.choices.push({id:choice,values:['option_1','option_2','option_3'],labels:['Option 1','Option 2','Option 3'],allow_other:false,randomise:false});
     }
   }
-  var item={id:nid,label:defaultLabel(type,n),type:type,required:false,reverse:false,choice_set:choice,scale_id:null,help:null,placeholder:null,matrix_items:null,slider_min:0,slider_max:100,slider_step:1,rating_max:5,rating_icon:'star',date_min:null,date_max:null,section_intro:null,page:null};
+  var item={id:nid,label:defaultLabel(type,n),type:type,required:false,reverse:false,choice_set:choice,scale_id:null,help:null,placeholder:null,matrix_items:null,comparison_items:null,comparison_scale:null,slider_min:0,slider_max:100,slider_step:1,rating_max:5,rating_icon:'star',date_min:null,date_max:null,section_intro:null,page:null};
   if(type==='matrix')item.matrix_items=['Service quality','Sustainability','Overall experience'];
+  if(type==='pairwise_comparison'||type==='criteria_weight'){
+    // A decision item is unusable without the things being compared, and
+    // both R-side validators require comparison_items, so ship a working
+    // 3-criterion default rather than an item that fails validation on
+    // export. 3 criteria give 3 Saaty pairs or 6 influence pairs, which is
+    // small enough to preview comfortably.
+    item.comparison_items=['Service quality','Price','Delivery time'];
+    item.required=true;
+    if(type==='pairwise_comparison'){
+      item.comparison_scale=variant==='influence'?'influence':'saaty';
+      if(item.comparison_scale==='influence')item.label='How strongly does each factor influence the others?';
+    }
+  }
   if(type==='section_break')item.section_intro='Use this section to introduce the next group of questions.';
   if(type==='text_block')item.label='Add instructions or explanatory text here.';
   S.items.push(item);
@@ -2773,6 +2801,15 @@ function varLevel(id){
   // their own; their analysable variables are the expanded sub-columns
   // built in getAllVars(). The parent id is kept out of role dropdowns.
   if(['multiple_choice','ranking','matrix'].includes(i.type))return{level:'expanded',code:'SET',cls:'id',type:i.type};
+  // Decision-family items are the one case where a role wants the parent id
+  // rather than the expanded sub-columns: sframe_assemble_pairwise() and
+  // sframe_collected_weights() take the item id and read every pair or
+  // criterion column themselves. The level strings match the `levels`
+  // vectors the decision entries in ANALYSIS_REGISTRY declare, so
+  // roleOptions() offers these items for the pairwise and weights_item
+  // roles of all 10 MCDM methods.
+  if(i.type==='pairwise_comparison')return{level:'pairwise_comparison',code:'PWC',cls:'ord',type:(i.comparison_scale==='influence'?'influence matrix':'pairwise comparison')};
+  if(i.type==='criteria_weight')return{level:'criteria_weight',code:'WGT',cls:'con',type:'criteria weights'};
   if(['numeric','slider','rating'].includes(i.type))return{level:'continuous',code:'CON',cls:'con',type:i.type};
   if(['text','textarea','date'].includes(i.type))return{level:i.type==='date'?'identifier':'text',code:i.type==='date'?'ID':'TXT',cls:i.type==='date'?'id':'txt',type:i.type};
   return{level:'identifier',code:'ID',cls:'id',type:i.type};
