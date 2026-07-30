@@ -100,11 +100,20 @@ All 5 come from the 2026-07-26 independent validation. 4 of them shipped
 inside 0.3.4. Detail and evidence: `../surveyframe-statistical-validation`
 and the Claude memory `stat-validation-bugs-found`.
 
-- [ ] **A1 [Opus]** Builder `qAdd()` fab menu and `varLevel()` switch gain
+- [x] **A1 [Opus]** Builder `qAdd()` fab menu and `varLevel()` switch gain
   `pairwise_comparison` and `criteria_weight`
-  (`inst/builder/survey_builder.html`). Until this lands, `roleOptions()`
-  returns nothing and all 10 MCDM methods are unbuildable in the GUI, even
-  from an imported instrument. Shared file, lead only. **Do first.**
+  (`inst/builder/survey_builder.html`). **Done 2026-07-30, `v0.5-dev` at
+  19083e4.** New "Decision (MCDM)" fab group with 3 entries for the 2 types
+  (Saaty and influence variants of `pairwise_comparison` get one each, via a
+  new optional second argument to `qAdd()`), 3 default `comparison_items`
+  and `required = TRUE` so a new item validates and exports, `varLevel()`
+  returning the 2 levels the decision `ANALYSIS_REGISTRY` entries already
+  declare, readable id prefixes (`pair_1`, `crit_1`), and both types added
+  to the inspector's Response type dropdown. Verified in headless Chrome,
+  10 of 10 checks: all 10 decision methods now return a non-empty role
+  dropdown, and the exported `.sframe` with ahp, dematel, and topsis blocks
+  round-trips through `read_sframe()` with its hash intact at 0 validation
+  errors and 0 warnings. B11 and B13 are unblocked.
 - [ ] **A2 [Sonnet, Opus review]** `item_report()` item-rest correlation
   (`R/psychometrics.R:179`). `cor(vals, total_score - vals)` uses
   `rowMeans()` where the standard needs the sum of the other items. Verify
