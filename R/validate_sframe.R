@@ -65,6 +65,18 @@ validate_sframe <- function(instrument, strict = TRUE) {
   valid_id <- function(x) grepl("^[A-Za-z][A-Za-z0-9_]*$", x)
   known_vars <- unique(c(item_ids, scale_ids))
 
+  # Comparison scale per decision item, keyed by item id. Used by the
+  # analysis-plan checks below to reject a method-scale mismatch before data
+  # collection rather than at analysis time.
+  item_scales <- list()
+  for (it in instrument$items) {
+    if (identical(it$type, "pairwise_comparison")) {
+      item_scales[[it$id]] <- as.character(it$comparison_scale %||% "saaty")[1]
+    } else if (identical(it$type, "criteria_weight")) {
+      item_scales[[it$id]] <- "criteria_weight"
+    }
+  }
+
   # Duplicate item IDs
   dupes <- item_ids[duplicated(item_ids)]
   if (length(dupes) > 0) {
@@ -244,6 +256,44 @@ validate_sframe <- function(instrument, strict = TRUE) {
           paste(missing_refs, collapse = ", ")
         )
       )
+    }
+    # Decision-family scale compatibility, checked at design time rather than
+    # left to the runner. The 2 comparison scales are not interchangeable:
+    # AHP and ANP read reciprocal relative importance on the Saaty ratio
+    # scale, DEMATEL reads a directed 0-4 influence matrix, and a
+    # criteria-weight source must express importance rather than influence.
+    # Pairing them the wrong way round produces plausible numbers from
+    # meaningless input, so it belongs in the pre-collection contract.
+    method_id <- block_method[1]
+    roles <- if (is.list(block$roles)) block$roles else list()
+    if (nzchar(method_id) && length(item_scales) > 0) {
+      needed <- switch(
+        method_id,
+        ahp = "saaty", anp = "saaty", dematel = "influence", NULL
+      )
+      role_pairwise <- as.character(unlist(roles[["pairwise"]] %||% character(0)))
+      for (ref in role_pairwise[nzchar(role_pairwise)]) {
+        got <- item_scales[[ref]]
+        if (!is.null(needed) && !is.null(got) && !identical(got, needed)) {
+          problems <- c(problems, paste0(
+            "Analysis plan '", block_id, "' runs ", toupper(method_id),
+            " on item '", ref, "', which uses the '", got,
+            "' comparison scale. ", toupper(method_id), " needs '", needed,
+            "'."
+          ))
+        }
+      }
+      role_weights <- as.character(unlist(roles[["weights_item"]] %||% character(0)))
+      for (ref in role_weights[nzchar(role_weights)]) {
+        if (identical(item_scales[[ref]], "influence")) {
+          problems <- c(problems, paste0(
+            "Analysis plan '", block_id, "' takes criterion weights from item '",
+            ref, "', which uses the 'influence' comparison scale. Influence ",
+            "measures directed effect rather than relative importance, so it ",
+            "cannot supply weights."
+          ))
+        }
+      }
     }
   }
 

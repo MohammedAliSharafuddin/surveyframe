@@ -619,7 +619,7 @@ analysis_registry <- local({
       family = "decision", label = "TOPSIS",
       roles = list(
         role("performance_items", "Performance matrix items (one per criterion)", min = 1, max = 99, levels = "matrix"),
-        role("weights_item", "Weights item", levels = c("pairwise_comparison", "criteria_weight"))
+        role("weights_item", "Weights item", levels = c("pairwise_saaty", "criteria_weight"))
       ),
       show_alpha = FALSE, show_hypotheses = FALSE, show_effect_size = FALSE,
       assumptions = c("Weights sum to 1 (renormalised if not)", "Criteria labelled benefit or cost"),
@@ -630,7 +630,7 @@ analysis_registry <- local({
       family = "decision", label = "VIKOR",
       roles = list(
         role("performance_items", "Performance matrix items (one per criterion)", min = 1, max = 99, levels = "matrix"),
-        role("weights_item", "Weights item", levels = c("pairwise_comparison", "criteria_weight"))
+        role("weights_item", "Weights item", levels = c("pairwise_saaty", "criteria_weight"))
       ),
       show_alpha = FALSE, show_hypotheses = FALSE, show_effect_size = FALSE,
       assumptions = c("Weights sum to 1 (renormalised if not)", "Criteria labelled benefit or cost"),
@@ -641,7 +641,7 @@ analysis_registry <- local({
       family = "decision", label = "MOORA",
       roles = list(
         role("performance_items", "Performance matrix items (one per criterion)", min = 1, max = 99, levels = "matrix"),
-        role("weights_item", "Weights item", levels = c("pairwise_comparison", "criteria_weight"))
+        role("weights_item", "Weights item", levels = c("pairwise_saaty", "criteria_weight"))
       ),
       show_alpha = FALSE, show_hypotheses = FALSE, show_effect_size = FALSE,
       assumptions = c("Weights sum to 1 (renormalised if not)", "Criteria labelled benefit or cost"),
@@ -652,7 +652,7 @@ analysis_registry <- local({
       family = "decision", label = "SMART",
       roles = list(
         role("performance_items", "Performance matrix items (one per criterion)", min = 1, max = 99, levels = "matrix"),
-        role("weights_item", "Weights item", levels = c("pairwise_comparison", "criteria_weight"))
+        role("weights_item", "Weights item", levels = c("pairwise_saaty", "criteria_weight"))
       ),
       show_alpha = FALSE, show_hypotheses = FALSE, show_effect_size = FALSE,
       assumptions = c("Weights sum to 1 (renormalised if not)", "Criteria labelled benefit or cost"),
@@ -663,7 +663,7 @@ analysis_registry <- local({
       family = "decision", label = "WASPAS",
       roles = list(
         role("performance_items", "Performance matrix items (one per criterion)", min = 1, max = 99, levels = "matrix"),
-        role("weights_item", "Weights item", levels = c("pairwise_comparison", "criteria_weight"))
+        role("weights_item", "Weights item", levels = c("pairwise_saaty", "criteria_weight"))
       ),
       show_alpha = FALSE, show_hypotheses = FALSE, show_effect_size = FALSE,
       assumptions = c("Weights sum to 1 (renormalised if not)", "Criteria labelled benefit or cost"),
@@ -674,7 +674,7 @@ analysis_registry <- local({
       family = "decision", label = "PROMETHEE II",
       roles = list(
         role("performance_items", "Performance matrix items (one per criterion)", min = 1, max = 99, levels = "matrix"),
-        role("weights_item", "Weights item", levels = c("pairwise_comparison", "criteria_weight"))
+        role("weights_item", "Weights item", levels = c("pairwise_saaty", "criteria_weight"))
       ),
       show_alpha = FALSE, show_hypotheses = FALSE, show_effect_size = FALSE,
       assumptions = c("Weights sum to 1 (renormalised if not)", "Criteria labelled benefit or cost"),
@@ -685,7 +685,7 @@ analysis_registry <- local({
       family = "decision", label = "ELECTRE I",
       roles = list(
         role("performance_items", "Performance matrix items (one per criterion)", min = 1, max = 99, levels = "matrix"),
-        role("weights_item", "Weights item", levels = c("pairwise_comparison", "criteria_weight"))
+        role("weights_item", "Weights item", levels = c("pairwise_saaty", "criteria_weight"))
       ),
       show_alpha = FALSE, show_hypotheses = FALSE, show_effect_size = FALSE,
       assumptions = c("Weights sum to 1 (renormalised if not)", "Criteria labelled benefit or cost"),
@@ -694,7 +694,7 @@ analysis_registry <- local({
     ),
     ahp = list(
       family = "decision", label = "AHP",
-      roles = list(role("pairwise", "Pairwise comparison item", levels = "pairwise_comparison")),
+      roles = list(role("pairwise", "Pairwise comparison item", levels = "pairwise_saaty")),
       show_alpha = FALSE, show_hypotheses = FALSE, show_effect_size = FALSE,
       assumptions = c("Reciprocal pairwise matrix", "Consistency ratio below 0.10 recommended"),
       output = "Criterion weights and consistency ratio.",
@@ -702,7 +702,7 @@ analysis_registry <- local({
     ),
     anp = list(
       family = "decision", label = "ANP",
-      roles = list(role("pairwise", "Pairwise comparison item", levels = "pairwise_comparison")),
+      roles = list(role("pairwise", "Pairwise comparison item", levels = "pairwise_saaty")),
       show_alpha = FALSE, show_hypotheses = FALSE, show_effect_size = FALSE,
       assumptions = c("Reciprocal pairwise matrix", "Supermatrix must converge"),
       output = "Limiting priority weights from the supermatrix.",
@@ -710,7 +710,7 @@ analysis_registry <- local({
     ),
     dematel = list(
       family = "decision", label = "DEMATEL",
-      roles = list(role("pairwise", "Influence comparison item", levels = "pairwise_comparison")),
+      roles = list(role("pairwise", "Influence comparison item", levels = "pairwise_influence")),
       show_alpha = FALSE, show_hypotheses = FALSE, show_effect_size = FALSE,
       assumptions = "Directed 0-4 influence matrix",
       output = "Cause-effect table (prominence, relation, role) and influence map.",
@@ -742,6 +742,22 @@ studio_level_meta <- function(item = NULL, scale = NULL) {
   }
   if (type %in% c("text", "textarea")) {
     return(list(level = "text", code = "TXT", type = type))
+  }
+  # Decision-family items. The 2 comparison scales get separate levels because
+  # they are not interchangeable: AHP and ANP read reciprocal Saaty importance,
+  # DEMATEL reads a directed 0-4 influence matrix, and a weights source must
+  # express importance rather than influence. The builder's varLevel() and
+  # validate_sframe() enforce the same split.
+  if (identical(type, "pairwise_comparison")) {
+    influence <- identical(item$comparison_scale %||% "saaty", "influence")
+    return(list(
+      level = if (influence) "pairwise_influence" else "pairwise_saaty",
+      code  = "PWC",
+      type  = if (influence) "influence matrix" else "pairwise comparison"
+    ))
+  }
+  if (identical(type, "criteria_weight")) {
+    return(list(level = "criteria_weight", code = "WGT", type = "criteria weights"))
   }
   list(level = "identifier", code = "ID", type = type)
 }

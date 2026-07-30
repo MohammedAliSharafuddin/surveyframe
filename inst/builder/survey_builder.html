@@ -426,6 +426,13 @@ textarea.pv-inp:focus{border-color:var(--pvc);
 .pv-pwc-vs{color:var(--t3);text-transform:uppercase;font-size:10px}
 .pv-pwc-q{color:var(--t1)}
 .pv-pwc-more{font-size:11px;color:var(--t3)}
+/* Placeholder cue: an amber chip on the inspector label and a matching note
+   in the preview, so sample labels cannot be mistaken for real ones. */
+.fsample{display:inline-block;margin-left:6px;padding:1px 6px;border-radius:9px;
+  background:#fef3c7;color:#92400e;font-size:9px;font-weight:700;
+  text-transform:uppercase;letter-spacing:.04em;vertical-align:middle}
+.pv-sample{margin-top:6px;padding:6px 9px;border-radius:5px;
+  background:#fef3c7;color:#92400e;font-size:11px;font-weight:500}
 .pv-cw{display:flex;flex-direction:column;gap:6px;margin-top:8px}
 .pv-cw-row{display:flex;align-items:center;gap:10px}
 .pv-cw-lbl{flex:1;font-size:12px;color:var(--t1)}
@@ -2541,6 +2548,25 @@ function exportSheetsCollector(){
 }
 
 // -- Item list --------------------------------------------------------------
+// Placeholder detection. New questions ship with sample labels so they render
+// at once, but nothing in the UI said so, and a sample label shipped to
+// respondents is a real methodological error. The check is stateless: it
+// compares the current labels against the exact defaults qAdd() writes, so
+// nothing extra is stored in the .sframe and the cue disappears the moment a
+// label is edited.
+var SAMPLE_LISTS={
+  matrix:['Service quality','Sustainability','Overall experience'],
+  pairwise_comparison:['Service quality','Price','Delivery time'],
+  criteria_weight:['Service quality','Price','Delivery time']
+};
+var SAMPLE_TAG=' <span class="fsample">sample</span>';
+var SAMPLE_HINT='These labels are placeholders so the question renders. Replace them with your own before collecting data. ';
+function isSampleList(item){
+  var want=SAMPLE_LISTS[item&&item.type];if(!want)return false;
+  var have=(item.type==='matrix'?item.matrix_items:item.comparison_items)||[];
+  if(have.length!==want.length)return false;
+  return have.every(function(v,i){return String(v)===want[i];});
+}
 var TL={likert:'Likert',single_choice:'Single',multiple_choice:'Multi',numeric:'Number',text:'Text',textarea:'Long text',date:'Date',matrix:'Matrix',slider:'Slider',ranking:'Ranking',rating:'Rating',section_break:'Section',text_block:'Block',pairwise_comparison:'Pairwise',criteria_weight:'Weights'};
 var TB={likert:'b-li',single_choice:'b-si',multiple_choice:'b-mu',numeric:'b-nu',text:'b-te',textarea:'b-te',date:'b-nu',matrix:'b-ma',slider:'b-sl',ranking:'b-ra',rating:'b-ra',section_break:'b-se',text_block:'b-se'};
 function renderItemList(){
@@ -2703,13 +2729,14 @@ function renderInspBody(item){
     (NCS.includes(item.type)?fld('Choice set',sel('fi-cs',csO,item.choice_set||'')):'') +
     (NCS.includes(item.type)?fld('Choice labels','<textarea id="fi-choice-lines" rows="5" placeholder="One option per line, or value = Label" onblur="saveItemChoices()">'+esc(itemChoiceLines(item))+'</textarea>','For single choice, these are the respondent-facing category labels.')+
       '<div class="fc tpl-chips" role="group" aria-label="Quick-fill choice templates"><button type="button" onclick="applyCsTemplate(\'agree5\')">5-pt agree</button><button type="button" onclick="applyCsTemplate(\'agree7\')">7-pt agree</button><button type="button" onclick="applyCsTemplate(\'yesno\')">Yes / No</button><button type="button" onclick="applyCsTemplate(\'freq\')">Frequency</button><button type="button" onclick="applyCsTemplate(\'importance\')">Importance</button></div>':'') +
-    (item.type==='matrix'?fld('Matrix row labels',ta('fi-mrows',(item.matrix_items||[]).join('\n'),'One label per line'),'One per line.'):'') +
+    (item.type==='matrix'?fld('Matrix row labels'+(isSampleList(item)?SAMPLE_TAG:''),ta('fi-mrows',(item.matrix_items||[]).join('\n'),'One label per line'),(isSampleList(item)?SAMPLE_HINT:'')+'One per line.'):'') +
     (['pairwise_comparison','criteria_weight'].includes(item.type)?
-      fld(item.type==='criteria_weight'?'Criteria':'Items to compare',
+      fld((item.type==='criteria_weight'?'Criteria':'Items to compare')+(isSampleList(item)?SAMPLE_TAG:''),
           ta('fi-cmpitems',(item.comparison_items||[]).join('\n'),'One label per line'),
-          item.type==='criteria_weight'
+          (isSampleList(item)?SAMPLE_HINT:'')+
+          (item.type==='criteria_weight'
             ? 'One per line. Respondents divide 100 points across these.'
-            : 'One per line. n items produce n(n-1)/2 Saaty pairs or n(n-1) influence pairs, so 7 items is the practical ceiling and 10 is the hard limit.')
+            : 'One per line. n items produce n(n-1)/2 Saaty pairs or n(n-1) influence pairs, so 7 items is the practical ceiling and 10 is the hard limit.'))
       :'') +
     (item.type==='pairwise_comparison'?fld('Comparison scale',
       sel('fi-cmpscale',[['saaty','Saaty 1-9 ratio (AHP, ANP)'],['influence','Influence 0-4 directed (DEMATEL)']],item.comparison_scale||'saaty'),
@@ -3030,16 +3057,16 @@ efa_solution:{family:'measurement',label:'EFA solution',roles:[{id:'items',label
 cfa_lavaan_syntax:{family:'model',label:'CFA lavaan syntax',roles:[{id:'model',label:'Saved model',min:0,max:1,levels:['model']}],showAlpha:false,showHypotheses:false,showEffectSize:false,assumptions:['Construct indicators'],output:'lavaan measurement model syntax.',refs:['field_2018']},
 sem_lavaan_syntax:{family:'model',label:'CB-SEM lavaan syntax',roles:[{id:'model',label:'Saved model',min:1,max:1,levels:['model']}],showAlpha:true,showHypotheses:true,showEffectSize:true,assumptions:['Measurement and structural paths'],output:'lavaan measurement, structural, indirect, and total-effect syntax.',refs:['field_2018']},
 seminr_syntax:{family:'model',label:'PLS-SEM seminr syntax',roles:[{id:'model',label:'Saved model',min:1,max:1,levels:['model']}],showAlpha:true,showHypotheses:true,showEffectSize:true,assumptions:['Construct modes and bootstrapping'],output:'seminr measurement, structural, bootstrap, reliability, AVE, and HTMT syntax.',refs:['field_2018']},
-topsis:{family:'decision',label:'TOPSIS',roles:[{id:'performance_items',label:'Performance matrix items (one per criterion)',min:1,max:99,levels:['matrix']},{id:'weights_item',label:'Weights item',min:1,max:1,levels:['pairwise_comparison','criteria_weight']}],showAlpha:false,showHypotheses:false,showEffectSize:false,assumptions:['Weights sum to 1 (renormalised if not)','Criteria labelled benefit or cost'],output:'Ranking table (alternative, score, rank) by closeness to the ideal solution.',refs:['hwang_1981']},
-vikor:{family:'decision',label:'VIKOR',roles:[{id:'performance_items',label:'Performance matrix items (one per criterion)',min:1,max:99,levels:['matrix']},{id:'weights_item',label:'Weights item',min:1,max:1,levels:['pairwise_comparison','criteria_weight']}],showAlpha:false,showHypotheses:false,showEffectSize:false,assumptions:['Weights sum to 1 (renormalised if not)','Criteria labelled benefit or cost'],output:'Compromise ranking (S, R, Q) with acceptable-advantage and acceptable-stability checks.',refs:[]},
-moora:{family:'decision',label:'MOORA',roles:[{id:'performance_items',label:'Performance matrix items (one per criterion)',min:1,max:99,levels:['matrix']},{id:'weights_item',label:'Weights item',min:1,max:1,levels:['pairwise_comparison','criteria_weight']}],showAlpha:false,showHypotheses:false,showEffectSize:false,assumptions:['Weights sum to 1 (renormalised if not)','Criteria labelled benefit or cost'],output:'Ranking table (alternative, score, rank) by the ratio system.',refs:[]},
-smart:{family:'decision',label:'SMART',roles:[{id:'performance_items',label:'Performance matrix items (one per criterion)',min:1,max:99,levels:['matrix']},{id:'weights_item',label:'Weights item',min:1,max:1,levels:['pairwise_comparison','criteria_weight']}],showAlpha:false,showHypotheses:false,showEffectSize:false,assumptions:['Weights sum to 1 (renormalised if not)','Criteria labelled benefit or cost'],output:'Ranking table (alternative, score, rank) by normalised weighted value.',refs:[]},
-waspas:{family:'decision',label:'WASPAS',roles:[{id:'performance_items',label:'Performance matrix items (one per criterion)',min:1,max:99,levels:['matrix']},{id:'weights_item',label:'Weights item',min:1,max:1,levels:['pairwise_comparison','criteria_weight']}],showAlpha:false,showHypotheses:false,showEffectSize:false,assumptions:['Weights sum to 1 (renormalised if not)','Criteria labelled benefit or cost'],output:'Ranking table (alternative, score, rank) by the WSM/WPM blend.',refs:[]},
-promethee:{family:'decision',label:'PROMETHEE II',roles:[{id:'performance_items',label:'Performance matrix items (one per criterion)',min:1,max:99,levels:['matrix']},{id:'weights_item',label:'Weights item',min:1,max:1,levels:['pairwise_comparison','criteria_weight']}],showAlpha:false,showHypotheses:false,showEffectSize:false,assumptions:['Weights sum to 1 (renormalised if not)','Criteria labelled benefit or cost'],output:'Ranking table (alternative, score, rank) by net preference flow.',refs:[]},
-electre:{family:'decision',label:'ELECTRE I',roles:[{id:'performance_items',label:'Performance matrix items (one per criterion)',min:1,max:99,levels:['matrix']},{id:'weights_item',label:'Weights item',min:1,max:1,levels:['pairwise_comparison','criteria_weight']}],showAlpha:false,showHypotheses:false,showEffectSize:false,assumptions:['Weights sum to 1 (renormalised if not)','Criteria labelled benefit or cost'],output:'Outranking relation and best-effort ranking (ELECTRE I does not always produce a total order).',refs:[]},
-ahp:{family:'decision',label:'AHP',roles:[{id:'pairwise',label:'Pairwise comparison item',min:1,max:1,levels:['pairwise_comparison']}],showAlpha:false,showHypotheses:false,showEffectSize:false,assumptions:['Reciprocal pairwise matrix','Consistency ratio below 0.10 recommended'],output:'Criterion weights and consistency ratio.',refs:['saaty_1980']},
-anp:{family:'decision',label:'ANP',roles:[{id:'pairwise',label:'Pairwise comparison item',min:1,max:1,levels:['pairwise_comparison']}],showAlpha:false,showHypotheses:false,showEffectSize:false,assumptions:['Reciprocal pairwise matrix','Supermatrix must converge'],output:'Limiting priority weights from the supermatrix.',refs:[]},
-dematel:{family:'decision',label:'DEMATEL',roles:[{id:'pairwise',label:'Influence comparison item',min:1,max:1,levels:['pairwise_comparison']}],showAlpha:false,showHypotheses:false,showEffectSize:false,assumptions:['Directed 0-4 influence matrix'],output:'Cause-effect table (prominence, relation, role) and influence map.',refs:[]}
+topsis:{family:'decision',label:'TOPSIS',roles:[{id:'performance_items',label:'Performance matrix items (one per criterion)',min:1,max:99,levels:['matrix']},{id:'weights_item',label:'Weights item',min:1,max:1,levels:['pairwise_saaty','criteria_weight']}],showAlpha:false,showHypotheses:false,showEffectSize:false,assumptions:['Weights sum to 1 (renormalised if not)','Criteria labelled benefit or cost'],output:'Ranking table (alternative, score, rank) by closeness to the ideal solution.',refs:['hwang_1981']},
+vikor:{family:'decision',label:'VIKOR',roles:[{id:'performance_items',label:'Performance matrix items (one per criterion)',min:1,max:99,levels:['matrix']},{id:'weights_item',label:'Weights item',min:1,max:1,levels:['pairwise_saaty','criteria_weight']}],showAlpha:false,showHypotheses:false,showEffectSize:false,assumptions:['Weights sum to 1 (renormalised if not)','Criteria labelled benefit or cost'],output:'Compromise ranking (S, R, Q) with acceptable-advantage and acceptable-stability checks.',refs:[]},
+moora:{family:'decision',label:'MOORA',roles:[{id:'performance_items',label:'Performance matrix items (one per criterion)',min:1,max:99,levels:['matrix']},{id:'weights_item',label:'Weights item',min:1,max:1,levels:['pairwise_saaty','criteria_weight']}],showAlpha:false,showHypotheses:false,showEffectSize:false,assumptions:['Weights sum to 1 (renormalised if not)','Criteria labelled benefit or cost'],output:'Ranking table (alternative, score, rank) by the ratio system.',refs:[]},
+smart:{family:'decision',label:'SMART',roles:[{id:'performance_items',label:'Performance matrix items (one per criterion)',min:1,max:99,levels:['matrix']},{id:'weights_item',label:'Weights item',min:1,max:1,levels:['pairwise_saaty','criteria_weight']}],showAlpha:false,showHypotheses:false,showEffectSize:false,assumptions:['Weights sum to 1 (renormalised if not)','Criteria labelled benefit or cost'],output:'Ranking table (alternative, score, rank) by normalised weighted value.',refs:[]},
+waspas:{family:'decision',label:'WASPAS',roles:[{id:'performance_items',label:'Performance matrix items (one per criterion)',min:1,max:99,levels:['matrix']},{id:'weights_item',label:'Weights item',min:1,max:1,levels:['pairwise_saaty','criteria_weight']}],showAlpha:false,showHypotheses:false,showEffectSize:false,assumptions:['Weights sum to 1 (renormalised if not)','Criteria labelled benefit or cost'],output:'Ranking table (alternative, score, rank) by the WSM/WPM blend.',refs:[]},
+promethee:{family:'decision',label:'PROMETHEE II',roles:[{id:'performance_items',label:'Performance matrix items (one per criterion)',min:1,max:99,levels:['matrix']},{id:'weights_item',label:'Weights item',min:1,max:1,levels:['pairwise_saaty','criteria_weight']}],showAlpha:false,showHypotheses:false,showEffectSize:false,assumptions:['Weights sum to 1 (renormalised if not)','Criteria labelled benefit or cost'],output:'Ranking table (alternative, score, rank) by net preference flow.',refs:[]},
+electre:{family:'decision',label:'ELECTRE I',roles:[{id:'performance_items',label:'Performance matrix items (one per criterion)',min:1,max:99,levels:['matrix']},{id:'weights_item',label:'Weights item',min:1,max:1,levels:['pairwise_saaty','criteria_weight']}],showAlpha:false,showHypotheses:false,showEffectSize:false,assumptions:['Weights sum to 1 (renormalised if not)','Criteria labelled benefit or cost'],output:'Outranking relation and best-effort ranking (ELECTRE I does not always produce a total order).',refs:[]},
+ahp:{family:'decision',label:'AHP',roles:[{id:'pairwise',label:'Pairwise comparison item',min:1,max:1,levels:['pairwise_saaty']}],showAlpha:false,showHypotheses:false,showEffectSize:false,assumptions:['Reciprocal pairwise matrix','Consistency ratio below 0.10 recommended'],output:'Criterion weights and consistency ratio.',refs:['saaty_1980']},
+anp:{family:'decision',label:'ANP',roles:[{id:'pairwise',label:'Pairwise comparison item',min:1,max:1,levels:['pairwise_saaty']}],showAlpha:false,showHypotheses:false,showEffectSize:false,assumptions:['Reciprocal pairwise matrix','Supermatrix must converge'],output:'Limiting priority weights from the supermatrix.',refs:[]},
+dematel:{family:'decision',label:'DEMATEL',roles:[{id:'pairwise',label:'Influence comparison item',min:1,max:1,levels:['pairwise_influence']}],showAlpha:false,showHypotheses:false,showEffectSize:false,assumptions:['Directed 0-4 influence matrix'],output:'Cause-effect table (prominence, relation, role) and influence map.',refs:[]}
 };
 var TCITS={};var TLBLS={};Object.keys(ANALYSIS_REGISTRY).forEach(function(k){TCITS[k]=ANALYSIS_REGISTRY[k].refs||[];TLBLS[k]=ANALYSIS_REGISTRY[k].label;});
 // Likert items are ordinal scores: pairing them with continuous or other
@@ -3093,7 +3120,13 @@ function varLevel(id){
   // vectors the decision entries in ANALYSIS_REGISTRY declare, so
   // roleOptions() offers these items for the pairwise and weights_item
   // roles of all 10 MCDM methods.
-  if(i.type==='pairwise_comparison')return{level:'pairwise_comparison',code:'PWC',cls:'ord',type:(i.comparison_scale==='influence'?'influence matrix':'pairwise comparison')};
+  // The 2 comparison scales get their own levels, because they are not
+  // interchangeable: AHP and ANP read reciprocal Saaty importance, DEMATEL
+  // reads a directed 0-4 influence matrix. Offering either item to the other
+  // method would let the builder produce a plan that returns plausible
+  // numbers from meaningless input. R enforces the same rule in
+  // validate_sframe() and in the runners.
+  if(i.type==='pairwise_comparison')return{level:(i.comparison_scale==='influence'?'pairwise_influence':'pairwise_saaty'),code:'PWC',cls:'ord',type:(i.comparison_scale==='influence'?'influence matrix':'pairwise comparison')};
   if(i.type==='criteria_weight')return{level:'criteria_weight',code:'WGT',cls:'con',type:'criteria weights'};
   if(['numeric','slider','rating'].includes(i.type))return{level:'continuous',code:'CON',cls:'con',type:i.type};
   if(['text','textarea','date'].includes(i.type))return{level:i.type==='date'?'identifier':'text',code:i.type==='date'?'ID':'TXT',cls:i.type==='date'?'id':'txt',type:i.type};
@@ -3283,7 +3316,11 @@ function renderPreviewItem(item,cm,col){
       (cw.length<2?'<div class="pv-pwc-more">Add at least 2 criteria in the inspector.</div>':'')+
     '</div>';
   }
-  return'<div class="pv-item">'+lbl+inp+'</div>';
+  // Preview-only cue, never exported: the sample labels are still in place.
+  var sampleNote=(typeof isSampleList==='function'&&isSampleList(item))
+    ?'<div class="pv-sample">Sample labels. Edit "'+(item.type==='matrix'?'Matrix row labels':(item.type==='criteria_weight'?'Criteria':'Items to compare'))+'" in the inspector before collecting data.</div>'
+    :'';
+  return'<div class="pv-item">'+lbl+inp+sampleNote+'</div>';
 }
 function renderPreview(){
   var el=document.getElementById('pvFrame');var col=normHex((S.render&&S.render.theme)||'#2563eb');
