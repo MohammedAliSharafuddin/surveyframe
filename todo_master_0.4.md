@@ -114,6 +114,21 @@ and the Claude memory `stat-validation-bugs-found`.
   dropdown, and the exported `.sframe` with ahp, dematel, and topsis blocks
   round-trips through `read_sframe()` with its hash intact at 0 validation
   errors and 0 warnings. B11 and B13 are unblocked.
+  **Second round, 9fdeb0e, after the first was reported as not fixed.** The
+  first pass verified the JS functions in isolation, which passed, and missed
+  what a researcher sees on adding the question. `renderPreviewItem()` had no
+  branch for either type, so the Preview tab drew an empty question body, and
+  the builder's inlined static template was stale, so exporting a survey
+  emitted "Unsupported item type" for every decision question. Both fixed,
+  which also closes B8. The inspector editor (B7) came forward in the same
+  commit, since a question type nobody can configure is not usable. Verified
+  through real clicks, 18 of 18 checks, plus a full suite at 1124 passed and
+  0 failed. Screenshots of the Preview tab and the exported survey were taken
+  and read, not just asserted on.
+  **Lesson for the rest of this release: a check that only calls the
+  function is not a check that the feature works.** Every remaining UI task
+  (B6, B7's leftovers, B11, B13) gets a click-path pass and a screenshot
+  read back before it is called done.
 - [ ] **A2 [Sonnet, Opus review]** `item_report()` item-rest correlation
   (`R/psychometrics.R:179`). `cor(vals, total_score - vals)` uses
   `rowMeans()` where the standard needs the sum of the other items. Verify
@@ -151,12 +166,22 @@ before editing.
 - [ ] **B6 [Sonnet]** Shiny renderer for both new item types in
   `R/render_survey.R` and `R/survey_module.R`. Neither file references
   either type today.
-- [ ] **B7 [Sonnet]** Builder inspector editor for `comparison_items` and
-  `comparison_scale`, plus Theme B preview parity.
-- [ ] **B8 [Haiku]** Re-run `data-raw/inline_static_template.R` to
-  regenerate the builder's inlined copy of the static template. The script
-  is tracked on `dev` only, so copy it into the worktree first. The
-  inlined copy currently has none of the pairwise rendering.
+- [x] **B7 [Sonnet]** Builder inspector editor for `comparison_items` and
+  `comparison_scale`, plus Theme B preview parity. **Done 2026-07-30,
+  `v0.5-dev` at 9fdeb0e**, brought forward from its own slot because A1's
+  item types are unusable without it. Items-to-compare textarea and
+  comparison-scale selector wired through `FMAP` and `updF()`, carrying the
+  same size limits the R side enforces (a note above 7 Saaty or 6 influence
+  items, a rejection message above 10). Preview parity done in the same
+  commit: `renderPreviewItem()` draws the Saaty strip, the directed DEMATEL
+  rows, and the constant-sum boxes with a running total.
+- [x] **B8 [Haiku]** Re-run `data-raw/inline_static_template.R` to
+  regenerate the builder's inlined copy of the static template. **Done
+  2026-07-30, `v0.5-dev` at 9fdeb0e.** This was not cosmetic: until it ran,
+  exporting a survey from the builder emitted "Unsupported item type" for
+  every decision question, because the inlined renderer predated d218786.
+  The script is tracked on `dev` only, so it was copied into the worktree to
+  run, and `data-raw/` stays gitignored there.
 - [ ] **B9 [Sonnet]** Google Sheets Apps Script generator
   (`R/google_sheets.R`) emits the 3 new column patterns, plus the round
   trip from static survey to collector CSV to `read_responses()` to
@@ -341,7 +366,8 @@ RMCDA (CRAN 0.3.1) carries roughly 51 methods against the 10 shipping in
 
 ## Totals
 
-64 tasks. Sonnet 26, Haiku 15, Owner or human 12, Opus lead 11.
+61 tasks open of the 64 first listed. A1, B7, and B8 are done (2026-07-30).
+Remaining split: Sonnet 24, Haiku 14, Owner or human 12, Opus lead 11.
 
 By release: 0.4.0 carries 42 (blocks A to E), 0.4.1 carries 6, the
 expansion carries 4, and 12 sit outside a single release (blocks H and I).
