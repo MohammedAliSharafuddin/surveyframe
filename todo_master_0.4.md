@@ -67,8 +67,8 @@ small-sample track, all 10 MCDM computations with both UI registries,
 
 Work top down. Anything in the same tier can run in parallel.
 
-- **P0, start now:** A1, B1, D1, D2, D3, I1, I2, I3.
-- **P1, core engineering:** A2 to A5, B2 to B10, B12, B14.
+- **P0, start now:** B1, D1, D2, D3. (A1, A6, C8, I1, I2, and I3 are done.)
+- **P1, core engineering:** A2 to A5, B2 to B6, B9, B10, B12, B14.
 - **P2, verification and docs:** B11, B13, B15, B16, C6, C7.
 - **P3, calendar-bound field validation:** C1 to C5. ICSRI is 8 to 9 August
   2026, which now sits on the release's critical path.
@@ -76,7 +76,8 @@ Work top down. Anything in the same tier can run in parallel.
 - **P5, after 0.4.0 ships:** F1 to F6, then G1 to G4.
 - **Parallel at any time:** H1 to H3, I4 to I9.
 
-Critical path: A1 unblocks B11 and B13. Block B completes the engineering,
+Critical path: A1 is done, so B11 and B13 are open. Block B completes the
+engineering,
 which releases block D, whose DOI is the only hard CRAN blocker, which
 releases block E. Block C is on the path too, because the release cannot
 be submitted before ICSRI feedback is captured and triaged. B1 is the one
@@ -96,9 +97,11 @@ lines.
 
 ## Block A. 0.4.0 bug fixes
 
-All 5 come from the 2026-07-26 independent validation. 4 of them shipped
-inside 0.3.4. Detail and evidence: `../surveyframe-statistical-validation`
-and the Claude memory `stat-validation-bugs-found`.
+A1 to A5 come from the 2026-07-26 independent validation, and 4 of those
+shipped inside 0.3.4. A6 was found later, on 2026-07-30, in a live builder
+session rather than by any suite. Detail and evidence:
+`../surveyframe-statistical-validation` and the Claude memory
+`stat-validation-bugs-found`.
 
 - [x] **A1 [Opus]** Builder `qAdd()` fab menu and `varLevel()` switch gain
   `pairwise_comparison` and `criteria_weight`
@@ -112,8 +115,10 @@ and the Claude memory `stat-validation-bugs-found`.
   to the inspector's Response type dropdown. Verified in headless Chrome,
   10 of 10 checks: all 10 decision methods now return a non-empty role
   dropdown, and the exported `.sframe` with ahp, dematel, and topsis blocks
-  round-trips through `read_sframe()` with its hash intact at 0 validation
-  errors and 0 warnings. B11 and B13 are unblocked.
+  round-trips through `read_sframe()` with its hash intact. (The
+  "0 validation errors" claim first recorded here was vacuous, see the lesson
+  below. Re-checked properly against `$problems` on 2026-07-30: valid, 0
+  problems, hash stable.) B11 and B13 are unblocked.
   **Second round, 9fdeb0e, after the first was reported as not fixed.** The
   first pass verified the JS functions in isolation, which passed, and missed
   what a researcher sees on adding the question. `renderPreviewItem()` had no
@@ -125,10 +130,21 @@ and the Claude memory `stat-validation-bugs-found`.
   through real clicks, 18 of 18 checks, plus a full suite at 1124 passed and
   0 failed. Screenshots of the Preview tab and the exported survey were taken
   and read, not just asserted on.
+  **Third round, 266f2a1 and 83ce595, from a live builder session.** The fab
+  menu's 260px cap clipped Date, Text block, and the whole new Decision group
+  out of view behind a scrollbar with no visual hint, so the types looked
+  absent even in the fixed file. Cap is now `min(460px,58vh)`, measured at
+  458px with no scrolling at 1000px viewport height. The same session found
+  A6 and C8 below.
   **Lesson for the rest of this release: a check that only calls the
-  function is not a check that the feature works.** Every remaining UI task
-  (B6, B7's leftovers, B11, B13) gets a click-path pass and a screenshot
-  read back before it is called done.
+  function is not a check that the feature works, and a check that cannot
+  fail is not a check.** Three of my verification scripts in this task were
+  themselves wrong (a wrong export placeholder, `openInsp()` where the UI
+  calls `selItem()`, and reading a `$errors` field that `validate_sframe()`
+  does not return, which made 2 rounds of "0 validation errors" vacuous).
+  Every remaining UI task (B6, B11, B13) gets a click-path pass with a
+  screenshot read back, and every new rule gets a mutation check: revert the
+  guard, confirm the test fails, restore it.
 - [ ] **A2 [Sonnet, Opus review]** `item_report()` item-rest correlation
   (`R/psychometrics.R:179`). `cor(vals, total_score - vals)` uses
   `rowMeans()` where the standard needs the sum of the other items. Verify
@@ -139,6 +155,20 @@ and the Claude memory `stat-validation-bugs-found`.
 - [ ] **A4 [Sonnet, Opus review]** `known_vars`
   (`R/validate_sframe.R:66`) needs the `item__sub` and `item__option`
   expansion the builder and `read_responses()` already use.
+- [x] **A6 [Opus]** Bug 6, found 2026-07-30 in a live builder session, not by
+  the validation suite. **Fixed, `v0.5-dev` at 83ce595.** A decision plan
+  could be built the wrong way round: AHP's `pairwise` role offered every
+  `pairwise_comparison` item, including a DEMATEL influence item. The 2 scales
+  are not interchangeable, so that returns plausible weights from meaningless
+  input with no error, the same failure shape as A5's unfiltered model roles.
+  Guarded on 4 surfaces: `validate_sframe()` at design time (the plan is a
+  contract, so this belongs before collection), `sframe_resolve_pairwise_matrix()`
+  so the AHP and ANP runners error rather than compute, the builder via a
+  `pairwise_saaty`/`pairwise_influence` level split with all 10 decision roles
+  retargeted, and `studio_level_meta()` in SurveyStudio, which had no branch
+  for either item type at all and so showed empty MCDM role dropdowns. New
+  `tests/testthat/test-decision-scale-guards.R`, 19 expectations over 8 tests,
+  mutation-checked: reverting the 2 R guards fails 11 of 19.
 - [ ] **A5 [Sonnet, Opus review]** Model-role filtering by `model$type` in
   builder `roleOptions()` and in `seminr_syntax()` and
   `sem_lavaan_syntax()` (`R/model_layer.R`).
@@ -197,7 +227,11 @@ before editing.
   linear preference function as a documented difference, or implement the
   standard step function.
 - [ ] **B13 [Haiku]** Verify SurveyStudio MCDM support live against fixed
-  builder output.
+  builder output. **Partly unblocked 2026-07-30**: `studio_level_meta()` had
+  no branch for either decision item type, so every MCDM role dropdown in the
+  studio was empty. Fixed with the scale-aware split in 83ce595 (see A6). The
+  live click-through in a running app is still open, and it is where the rest
+  of the studio's decision handling gets checked.
 - [ ] **B14 [Sonnet, Opus review]** Build the section 1g sample sframe as a
   real fixture. Release gate: builds with shipped constructors, validates,
   round-trips with a stable hash, renders on all 3 survey surfaces, exports
@@ -237,6 +271,15 @@ while a feedback session is open, log only and edit no source file.
 - [ ] **C6 [Haiku]** Fix README's Roadmap section, which still promises
   small-sample inference at v0.4 and MCDM at v0.5. It is live on CRAN and
   on the pkgdown site.
+- [x] **C8 [Opus]** Placeholder labels announced as placeholders. **Done
+  2026-07-30, `v0.5-dev` at 83ce595**, raised in the same live session as A6.
+  New decision and matrix questions ship with sample labels so they render at
+  once, and nothing said so, which risks a placeholder reaching respondents.
+  The inspector now shows an amber "sample" chip on the field label and the
+  preview shows a matching note. Stateless: it compares the current labels
+  against the exact defaults `qAdd()` writes, so nothing extra reaches the
+  `.sframe` and both cues clear on the first edit. Applies to matrix rows too,
+  which had the same silent defaults.
 - [ ] **C7 [Haiku]** Close the ignore-file gaps. `.Rbuildignore` still
   names `todo_0.4.1.md` (renamed to `todo_0.5.1.md` on 2026-07-25) and
   omits `todo_0.5.1.md`, `kimi_review_034.md`, `qwen_review_034.md`, and
@@ -366,8 +409,11 @@ RMCDA (CRAN 0.3.1) carries roughly 51 methods against the 10 shipping in
 
 ## Totals
 
-61 tasks open of the 64 first listed. A1, B7, and B8 are done (2026-07-30).
-Remaining split: Sonnet 24, Haiku 14, Owner or human 12, Opus lead 11.
+60 tasks open. The list started at 64; A1, B7, and B8 are done, and 2
+further items were found in a live builder session on 2026-07-30 and
+fixed the same day (A6, the MCDM comparison-scale mismatch, and C8, the
+unannounced sample labels), so the total is now 66 with 6 done.
+Remaining split: Sonnet 24, Haiku 14, Owner or human 12, Opus lead 10.
 
 By release: 0.4.0 carries 42 (blocks A to E), 0.4.1 carries 6, the
 expansion carries 4, and 12 sit outside a single release (blocks H and I).

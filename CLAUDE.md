@@ -283,6 +283,46 @@ to 5 short real surveys, and 12 items are already logged against it in
 `dogfeed.todo.md`. Absorbing it puts the conference on 0.4.0's critical
 path rather than beside it.
 
+### Progress on 2026-07-30 (branch `v0.5-dev`, 4 commits)
+
+The builder can now build MCDM surveys end to end, which it could not before.
+19083e4 added the 2 decision item types to the Add-question menu and to
+`varLevel()`, so all 10 methods offer role options instead of empty
+dropdowns. 9fdeb0e fixed what the first pass missed: the Preview tab drew an
+empty question body, and exporting a survey emitted "Unsupported item type"
+because the builder's inlined copy of the static template predated the
+renderers, which also closes the inline-template task. The inspector editor
+for `comparison_items` and `comparison_scale` came with it. 266f2a1 raised
+the Add-question menu's height cap, which had clipped the whole Decision
+group out of view. 83ce595 added the scale-mismatch guards described below
+and the sample-label cue.
+
+Suite after all 4: 1124 passed, 0 failed, 3 skipped.
+
+**Bug 6, found in a live builder session rather than by any suite.** A
+decision plan could be built the wrong way round, because AHP's `pairwise`
+role offered every `pairwise_comparison` item including a DEMATEL influence
+item. The 2 comparison scales are not interchangeable: AHP and ANP read
+reciprocal relative importance on the Saaty 1 to 9 ratio scale, while an
+influence item collects directed 0 to 4 influence with a zero diagonal and no
+reciprocity, so the pairing returns plausible weights from meaningless input
+with no error. Guarded on 4 surfaces: `validate_sframe()` at design time,
+`sframe_resolve_pairwise_matrix()` so the AHP and ANP runners error rather
+than compute, the builder via a `pairwise_saaty`/`pairwise_influence` level
+split, and `studio_level_meta()` in SurveyStudio, which had no branch for
+either item type and so showed empty MCDM dropdowns.
+
+**Verification discipline, learnt the hard way this session.** 3 of the
+verification scripts written for this work were themselves wrong: a wrong
+export placeholder, `openInsp()` where the UI calls `selItem()`, and reading
+an `$errors` field that `validate_sframe()` does not return, which made 2
+rounds of "0 validation errors" vacuous. `validate_sframe()` returns
+`$problems`. Two rules now apply to this release: any UI claim needs a
+click-path run with the screenshot read back, and any new rule needs a
+mutation check, meaning revert the guard, confirm the test fails, restore it.
+The scale guards were checked that way, 11 of 19 expectations failing with
+them reverted.
+
 ### The 5 confirmed bugs from independent validation
 
 Found 2026-07-26 by the sibling repo `surveyframe-statistical-validation`
@@ -314,16 +354,15 @@ shipped inside 0.3.4, so they are live on CRAN now.
 ### Open engineering work on 0.5
 
 Not built: `sensitivity_analysis()`, `sf_conjoint_design()`, the
-`vignettes/mcdm-analysis.Rmd` vignette, the Shiny renderer for the 2 new
-item types (`R/render_survey.R` has no reference to either), the builder
-inspector editor for `comparison_items`/`comparison_scale`, and the
-section 1g sample sframe as a real fixture. The builder's inlined copy of
-the static template is stale: `data-raw/inline_static_template.R` must be
-re-run, and it is tracked on `dev` only, so it is absent from the
-`v0.5-dev` worktree. Citations exist for 2 of the 10 methods only, and
-DEMATEL's source is unresolved between 2 Battelle reports. The
-`../mcdm` harvest audit's owner sign-off on the section 1 data contract
-was never taken, which is the release's standing rework risk.
+`vignettes/mcdm-analysis.Rmd` vignette, the Shiny renderer for the 2 new item
+types (`R/render_survey.R` still has no reference to either, so a decision
+question renders on the static survey and in the builder but not in the Shiny
+survey path), and the section 1g sample sframe as a real fixture. Citations
+exist for 2 of the 10 methods only, and DEMATEL's source is unresolved
+between 2 Battelle reports. The `../mcdm` harvest audit's owner sign-off on
+the section 1 data contract was never taken, which is the release's standing
+rework risk. Closed on 2026-07-30: the builder inspector editor, and the
+stale inlined static template.
 
 ### Hard blocker
 
