@@ -63,7 +63,12 @@ validate_sframe <- function(instrument, strict = TRUE) {
   scale_ids   <- vapply(instrument$scales,   function(x) x$id, character(1))
   model_ids   <- vapply(instrument$models %||% list(), function(x) x$id %||% "", character(1))
   valid_id <- function(x) grepl("^[A-Za-z][A-Za-z0-9_]*$", x)
-  known_vars <- unique(c(item_ids, scale_ids))
+  # Analysis-plan roles may name an expansion column (item__sub, item__option,
+  # item__a__vs__b, item__crit) rather than the base item id, exactly as the
+  # builder exports them and read_responses() already accepts them. Without
+  # these a real builder export fails validation for variables that do exist.
+  known_vars <- unique(c(item_ids, scale_ids,
+                         sframe_item_expansion_columns(instrument)))
 
   # Comparison scale per decision item, keyed by item id. Used by the
   # analysis-plan checks below to reject a method-scale mismatch before data

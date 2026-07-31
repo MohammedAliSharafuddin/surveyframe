@@ -51,6 +51,41 @@ sframe_comparison_columns <- function(item) {
   paste0(item$id, "__", pairs$a, sep, pairs$b)
 }
 
+# Every expansion column an instrument's items produce in collected data,
+# following the item__sub convention: matrix sub-items, ranking and
+# multiple-choice options, and decision pairs and criteria.
+#
+# read_responses() and validate_sframe() both need this. They used to derive
+# it separately, and validate_sframe()'s copy was never extended past the base
+# item ids, so a real builder export failed design-time validation with
+# "references unknown variable(s)" for columns the reader accepted happily.
+# One definition, used by both, so they cannot drift apart again.
+sframe_item_expansion_columns <- function(instrument, items = NULL) {
+  items <- items %||% (instrument$items %||% list())
+  choice_values_for <- function(id) {
+    for (cs in instrument$choices %||% list()) {
+      if (identical(cs$id, id)) return(as.character(cs$values))
+    }
+    character(0)
+  }
+  out <- lapply(items, function(i) {
+    if (identical(i$type, "matrix") && length(i$matrix_items) > 0L) {
+      paste0(i$id, "__", i$matrix_items)
+    } else if (identical(i$type, "ranking") && !is.null(i$choice_set)) {
+      vals <- choice_values_for(i$choice_set)
+      if (length(vals) > 0L) paste0(i$id, "__", vals) else character(0)
+    } else if (identical(i$type, "multiple_choice") && !is.null(i$choice_set)) {
+      vals <- choice_values_for(i$choice_set)
+      if (length(vals) > 0L) paste0(i$id, "__", vals) else character(0)
+    } else if (i$type %in% sframe_expanded_comparison_types) {
+      sframe_comparison_columns(i)
+    } else {
+      character(0)
+    }
+  })
+  as.character(unlist(out, use.names = FALSE))
+}
+
 sframe_decision_item <- function(instrument, item_id, types) {
   items <- instrument$items %||% list()
   for (item in items) {
