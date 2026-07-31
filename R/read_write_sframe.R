@@ -11,7 +11,7 @@ sframe_serialization_payload <- function(instrument, hash_value = "") {
   # instruments built with Map() (which attaches item IDs as list names) produce
   # a JSON object keyed by item ID, while the round-tripped structure produces
   # integer-keyed or differently keyed objects, causing a hash mismatch on read.
-  list(
+  payload <- list(
     hash = list(algo = "sha256", value = hash_value),
     version = instrument$meta$version,
     meta = instrument$meta,
@@ -24,6 +24,36 @@ sframe_serialization_payload <- function(instrument, hash_value = "") {
     models = unname(lapply(instrument$models %||% list(), sframe_model_plain)),
     render = instrument$render
   )
+
+  # `designs` is added only when the instrument actually declares one.
+  #
+  # The hash covers the payload's key set, so writing an empty
+  # `designs` array would change the hash of every instrument that
+  # does not use the feature. Reading an old file would still
+  # succeed, because read_sframe() hashes the parsed payload and
+  # that payload has no `designs` key either, so it stays
+  # self-consistent. The damage is subtler: an instrument read from
+  # an existing file and written back would come out with a
+  # different hash from the one it went in with, so the same content
+  # would silently change identity. It would also desync from the
+  # builder's JS sframeCanon(). Measured on the tourism demo:
+  # c3df10ec before, febd07c5 after.
+  designs <- instrument$designs %||% list()
+  if (length(designs) > 0) {
+    payload$designs <- unname(lapply(designs, sframe_conjoint_plain))
+  }
+
+  payload
+}
+
+# Conjoint designs carry data frames, which jsonlite would restore as a list
+# of rows with the column types guessed. Stored as plain column lists and
+# rebuilt on read, so a design round-trips with its hash intact.
+sframe_conjoint_plain <- function(design) {
+  out <- unclass(design)
+  out$profiles <- as.list(design$profiles)
+  out$tasks    <- as.list(design$tasks)
+  out
 }
 
 sframe_json_object <- function() {
@@ -253,6 +283,25 @@ sframe_restore_branch <- function(branch) {
   branch
 }
 
+sframe_restore_conjoint <- function(design) {
+  design$attributes <- lapply(design$attributes %||% list(),
+                              function(x) sframe_as_vector(x, "character"))
+  rebuild <- function(cols) {
+    if (is.null(cols) || length(cols) == 0) return(NULL)
+    cols <- lapply(cols, function(col) sframe_as_vector(col))
+    as.data.frame(cols, stringsAsFactors = FALSE)
+  }
+  design$profiles <- rebuild(design$profiles)
+  design$tasks    <- rebuild(design$tasks)
+  # Round-tripping through JSON turns a length-1 integer into a double, and
+  # the print method and the schedule arithmetic both expect integers.
+  for (f in c("seed", "blocks", "n_alternatives", "n_tasks")) {
+    if (!is.null(design[[f]])) design[[f]] <- as.integer(design[[f]])
+  }
+  class(design) <- "sf_conjoint_design"
+  design
+}
+
 sframe_restore_check <- function(check) {
   check$pass_values <- sframe_as_vector(check$pass_values)
   class(check) <- "sf_check"
@@ -456,6 +505,9 @@ read_sframe <- function(path, validate = TRUE) {
       scales    = lapply(parsed$scales, sframe_restore_scale),
       branching = lapply(parsed$branching, sframe_restore_branch),
       checks    = lapply(parsed$checks, sframe_restore_check),
+      # Absent in every file written before conjoint designs existed, so this
+      # stays an empty list rather than failing on an older instrument.
+      designs   = lapply(parsed$designs %||% list(), sframe_restore_conjoint),
       analysis_plan = lapply(
         parsed$analysis_plan %||% list(),
         sframe_restore_analysis_block
