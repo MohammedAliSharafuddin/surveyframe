@@ -37,6 +37,19 @@ with an earlier version should be re-run rather than trusted.
   never declared. All 3 now refuse a mismatched estimation family, and the
   builder filters each model role to the types its generator can produce.
 
+## Data quality
+
+* `quality_report()` counted only columns matching a bare item id, and
+  multi-column items never post under those, so every expansion column was
+  invisible to the missingness check. A respondent who skipped an entire
+  pairwise battery was reported at 0 percent missing. Expansion columns now
+  count as item data, which brings matrix, ranking, multi-select, and the 2
+  decision item types into the missingness figures for the first time.
+  **Reported missingness rates will change for any instrument using those
+  item types**, because columns that were silently excluded are now counted.
+  Straight-lining and timing are unaffected: straight-lining runs over
+  declared scales, and timing is measured on the clock.
+
 ## Bundled demo data
 
 * Both bundled demo instruments wired their seminr block to a `cb_sem`
