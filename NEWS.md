@@ -1,3 +1,61 @@
+# surveyframe 0.4.0 (in development)
+
+This release is in progress. Entries are added as the work lands rather
+than reconstructed at submission time.
+
+## Corrected results (read before comparing against earlier output)
+
+Four defects found by independent cross-validation are fixed. Each
+produced plausible numbers with no error or warning, so results computed
+with an earlier version should be re-run rather than trusted.
+
+* `item_report()` returned the wrong item-rest correlation. It subtracted
+  each item from a `rowMeans()` total, which leaves roughly noise carrying
+  the item negatively, so a highly reliable scale reported strong negative
+  values. On simulated data with alpha 0.947 every item came back at about
+  -0.46. The statistic is now the item against the sum of the other items
+  in its scale, and matches `psych::alpha()`'s `item.stats$r.drop` to
+  1e-10.
+* Repeated-measures ANOVA tested the condition effect against the wrong
+  error term, because the subject identifier was left as an integer and
+  `aov()` treated it as a continuous covariate. On a fixture where
+  `jmv::anovaRM()` gives F(2, 78) = 86.93, surveyframe reported F = 1.45,
+  p = 0.24. Correcting the identifier alone was not sufficient: the
+  corrected design produces no `Error: Within` stratum, so the effect is
+  now located by searching the strata rather than by a fixed name.
+* `validate_sframe()` rejected valid instruments. Its known-variable list
+  held only base item and scale ids, so an analysis plan naming an
+  expansion column (`item__sub`, `item__option`, `item__a__vs__b`,
+  `item__crit`) failed validation for variables that do exist, including
+  real exports from the visual builder. `read_responses()` already
+  accepted those columns. Both now derive the list from one shared helper.
+* The SEM syntax generators ignored the model type. `seminr_syntax()`,
+  `sem_lavaan_syntax()`, and `cfa_lavaan_syntax()` never checked
+  `model$type`, and the builder offered every saved model to all 3
+  generators, so a covariance-based model produced PLS-SEM syntax with no
+  complaint. That is a runnable script estimating a model the researcher
+  never declared. All 3 now refuse a mismatched estimation family, and the
+  builder filters each model role to the types its generator can produce.
+
+## Bundled demo data
+
+* Both bundled demo instruments wired their seminr block to a `cb_sem`
+  model, so `sframe_demo_data()` generated PLS-SEM syntax from a
+  covariance-based model, and every vignette and example loading it
+  inherited the same mismatch. Each demo now carries a real `pls_sem`
+  model with composite constructs. The instrument hashes changed with it.
+
+## Decision analysis
+
+* All 10 MCDM methods now return a citation. Previously only TOPSIS and
+  AHP had one. Every reference was checked against the publication record.
+* `sframe_decision_options()` documents PROMETHEE's preference functions
+  and records why the default is `"usual"`, Brans and Vincke's type I step
+  function, rather than the linear function that several other
+  implementations default to. The difference is material: net flows always
+  differ between the 2 functions, and the ranking itself changed in 226 of
+  400 randomly drawn 4-alternative by 3-criterion matrices.
+
 # surveyframe 0.3.4
 
 This release completes the plotting, interface, statistics, and reporting
