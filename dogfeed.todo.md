@@ -810,3 +810,27 @@ N1.9 needs a real browser paste to confirm the clipboard payload (headless
 Chrome doesn't grant `navigator.clipboard` permissions without extra CDP
 wiring, not attempted). N1.10 is a perceived-speed judgement, not something
 a raw timing number settles alone. mas_review_034.qmd Part N.
+
+### [open] `lane: 0.4.0` — Matrix responses collected through Shiny do not match the export contract
+Found 2026-07-31 while building B6, not by any suite. `sframe_response_row()`
+pipe-joins a matrix item's cells into a single column, so a matrix question
+answered in the Shiny survey arrives as `mx = "4|5"` where
+`read_responses()` and the whole analysis layer expect the `mx__r1`,
+`mx__r2` expansion columns the static template and the Google Sheets
+collector both emit. Verified directly: `read_responses()` does not accept
+the row.
+
+Consequence: a matrix-based survey run through `render_survey()` produces
+data the package's own readers cannot parse, silently, with no error at
+collection time. Ranking and multiple-choice items look likely to have the
+same shape problem and were not checked.
+
+B6 deliberately did not copy this precedent for the 2 decision item types,
+which emit real expansion columns, so MCDM surveys are unaffected. Matrix
+was left alone because fixing it changes the output shape for anyone
+already collecting through Shiny, and that is a call to make rather than
+slip into a decision-methods commit.
+
+Needs a triage decision at C3: fix in 0.4.0 (breaking for existing Shiny
+collectors), fix behind an option, or document the Shiny path as
+static-survey-only for multi-column item types.
