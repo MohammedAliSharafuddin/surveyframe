@@ -87,12 +87,63 @@
     apa  = "Saaty, T. L. (1980). *The analytic hierarchy process*. McGraw-Hill.",
     use  = "ahp"
   ),
-  # anp, dematel, vikor, moora, smart, waspas, promethee, and electre have no
-  # citation entry yet. Their originating references are recorded in
-  # todo_0.5.md's harvest audit but flagged there as unverified (page/volume/
-  # journal-name detail not checked against the actual publication) or, for
-  # dematel, unresolved between two candidate grey-literature reports. Do not
-  # add an entry here until each is individually verified.
+  # The 8 remaining decision methods. Every entry below was checked against
+  # the publication record on 2026-07-31 rather than carried over from the
+  # harvest audit's draft strings. That check produced one correction: ELECTRE
+  # is volume 2 issue 1, not the "2(8)" the audit recorded. Numdam's scan of
+  # the original journal is RO_1968__2_1_57_0.
+  saaty_1996 = list(
+    key  = "saaty_1996",
+    apa  = "Saaty, T. L. (1996). *Decision making with dependence and feedback: The analytic network process*. RWS Publications.",
+    use  = "anp"
+  ),
+  # DEMATEL has no single canonical publication. It was developed as a
+  # programme at the Battelle Geneva Research Centre between 1972 and 1976
+  # across at least 4 grey-literature reports, and secondary sources disagree
+  # over which to cite and even over the author order. None can be sighted,
+  # and an unverified reference must not be cited as though it were checked,
+  # so the originating report is given for provenance and paired with a
+  # peer-reviewed review a reader can actually obtain.
+  gabus_1972 = list(
+    key  = "gabus_1972",
+    apa  = "Gabus, A., & Fontela, E. (1972). *World problems, an invitation to further thought within the framework of DEMATEL*. Battelle Geneva Research Centre.",
+    use  = "dematel"
+  ),
+  si_2018 = list(
+    key  = "si_2018",
+    apa  = "Si, S.-L., You, X.-Y., Liu, H.-C., & Zhang, P. (2018). DEMATEL technique: A systematic review of the state-of-the-art literature on methodologies and applications. *Mathematical Problems in Engineering*, *2018*, 3696457. https://doi.org/10.1155/2018/3696457",
+    use  = "dematel"
+  ),
+  opricovic_2004 = list(
+    key  = "opricovic_2004",
+    apa  = "Opricovic, S., & Tzeng, G.-H. (2004). Compromise solution by MCDM methods: A comparative analysis of VIKOR and TOPSIS. *European Journal of Operational Research*, *156*(2), 445-455. https://doi.org/10.1016/S0377-2217(03)00020-1",
+    use  = "vikor"
+  ),
+  brauers_2006 = list(
+    key  = "brauers_2006",
+    apa  = "Brauers, W. K. M., & Zavadskas, E. K. (2006). The MOORA method and its application to privatization in a transition economy. *Control and Cybernetics*, *35*(2), 445-469.",
+    use  = "moora"
+  ),
+  edwards_1977 = list(
+    key  = "edwards_1977",
+    apa  = "Edwards, W. (1977). How to use multiattribute utility measurement for social decisionmaking. *IEEE Transactions on Systems, Man, and Cybernetics*, *7*(5), 326-340. https://doi.org/10.1109/TSMC.1977.4309720",
+    use  = "smart"
+  ),
+  zavadskas_2012 = list(
+    key  = "zavadskas_2012",
+    apa  = "Zavadskas, E. K., Turskis, Z., Antucheviciene, J., & Zakarevicius, A. (2012). Optimization of weighted aggregated sum product assessment. *Elektronika ir Elektrotechnika*, *122*(6), 3-6. https://doi.org/10.5755/j01.eee.122.6.1810",
+    use  = "waspas"
+  ),
+  brans_1985 = list(
+    key  = "brans_1985",
+    apa  = "Brans, J. P., & Vincke, P. (1985). A preference ranking organisation method: The PROMETHEE method for multiple criteria decision-making. *Management Science*, *31*(6), 647-656. https://doi.org/10.1287/mnsc.31.6.647",
+    use  = "promethee"
+  ),
+  roy_1968 = list(
+    key  = "roy_1968",
+    apa  = "Roy, B. (1968). Classement et choix en presence de points de vue multiples (la methode ELECTRE). *Revue Francaise d'Informatique et de Recherche Operationnelle*, *2*(1), 57-75.",
+    use  = "electre"
+  ),
   macKinnon_2008 = list(
     key = "mackinnon_2008",
     apa = "MacKinnon, D. P. (2008). *Introduction to statistical mediation analysis*. Lawrence Erlbaum.",
