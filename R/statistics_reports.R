@@ -953,7 +953,12 @@ sframe_run_repeated_anova <- function(data, roles) {
   err <- sframe_require_columns(data, vars, "Repeated-measures ANOVA")
   if (!is.null(err)) return(list(test = "repeated_anova", error = err))
   mat <- as.data.frame(lapply(data[, vars, drop = FALSE], sframe_num))
-  mat$.subject <- seq_len(nrow(mat))
+  # .subject must be a factor. Left as an integer, aov() treats it as a
+  # continuous covariate, the Error(.subject / condition) stratification
+  # collapses to a single residual df, and the condition effect is tested
+  # against the wrong error term (F came out around 1.45 where
+  # jmv::anovaRM() gives 86.93 on the same data).
+  mat$.subject <- factor(seq_len(nrow(mat)))
   long <- stats::reshape(
     mat,
     varying = vars,
@@ -967,15 +972,24 @@ sframe_run_repeated_anova <- function(data, roles) {
                   error = function(e) NULL)
   if (is.null(fit)) return(list(test = "repeated_anova", error = "Repeated-measures ANOVA failed."))
   fit_summary <- utils::capture.output(summary(fit))
-  # The within-subject F test for `condition` sits in the "Error: Within"
-  # stratum of an Error()-stratified aov fit; the between-subject stratum
-  # above it has no F/p (a single term, .subject, with no residual to test
-  # against). Pull the numbers out programmatically instead of asking the
-  # reader to parse fit_summary's printed text.
+  # With .subject a factor, the within-subject F for `condition` sits in the
+  # "Error: .subject:condition" stratum and there is no "Error: Within"
+  # stratum at all, so looking the effect up by a fixed stratum name silently
+  # finds nothing. Search the strata for the `condition` row that actually
+  # carries an F instead, which holds whichever way aov() splits the design.
   smry <- summary(fit)
-  within <- smry[["Error: Within"]][[1]]
-  cond_row <- which(trimws(rownames(within)) == "condition")
-  stat_row <- if (length(cond_row)) within[cond_row, , drop = FALSE] else NULL
+  stat_row <- NULL
+  within   <- NULL
+  for (stratum in smry) {
+    tab <- stratum[[1]]
+    if (is.null(tab) || !"F value" %in% colnames(tab)) next
+    cond_row <- which(trimws(rownames(tab)) == "condition")
+    if (length(cond_row) && !is.na(tab[cond_row, "F value"])) {
+      within   <- tab
+      stat_row <- tab[cond_row, , drop = FALSE]
+      break
+    }
+  }
   if (is.null(stat_row)) {
     return(list(
       test = "repeated_anova", vars = vars, n = length(unique(long$.subject)),

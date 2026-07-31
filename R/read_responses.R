@@ -88,29 +88,10 @@ read_responses <- function(
   # alongside the base id: an expanded multi-column item is not "missing"
   # when its base column is absent, and its expansion columns are never
   # "undeclared".
-  choice_values_for <- function(id) {
-    for (cs in instrument$choices) {
-      if (identical(cs$id, id)) return(as.character(cs$values))
-    }
-    character(0)
-  }
-  expanded_ids <- unlist(lapply(response_items, function(i) {
-    if (identical(i$type, "matrix") && length(i$matrix_items) > 0L) {
-      paste0(i$id, "__", i$matrix_items)
-    } else if (identical(i$type, "ranking") && !is.null(i$choice_set)) {
-      vals <- choice_values_for(i$choice_set)
-      if (length(vals) > 0L) paste0(i$id, "__", vals) else character(0)
-    } else if (identical(i$type, "multiple_choice") && !is.null(i$choice_set)) {
-      vals <- choice_values_for(i$choice_set)
-      if (length(vals) > 0L) paste0(i$id, "__", vals) else character(0)
-    } else if (i$type %in% sframe_expanded_comparison_types) {
-      # v0.5 decision items: one column per comparison pair
-      # (item__a__vs__b, item__a__to__b) or per criterion (item__crit).
-      sframe_comparison_columns(i)
-    } else {
-      character(0)
-    }
-  }), use.names = FALSE)
+  # Shared with validate_sframe() so the accepted expansion columns cannot
+  # drift between what the reader accepts and what design-time validation
+  # recognises. See sframe_item_expansion_columns() in R/decision_data.R.
+  expanded_ids <- sframe_item_expansion_columns(instrument, response_items)
   multi_ids <- vapply(
     Filter(function(i) identical(i$type, "matrix") ||
              identical(i$type, "ranking") ||
