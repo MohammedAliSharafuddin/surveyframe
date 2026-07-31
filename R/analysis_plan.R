@@ -1281,6 +1281,14 @@ sframe_run_one_block <- function(block, data, instrument, plots = FALSE,
     list(test = test, error = conditionMessage(e))
   })
 
+  # Weight sensitivity is opt-in per block via options$sensitivity = TRUE.
+  # Attached here, once, rather than inside each of the 7 ranking runners,
+  # for the same reason label substitution below is handled centrally.
+  result <- tryCatch(
+    sframe_attach_sensitivity(result, data, roles, options, instrument),
+    error = function(e) result
+  )
+
   result$research_question <- block$research_question
   result$block_id          <- block$id
   result$family            <- block$family %||% ""

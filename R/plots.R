@@ -757,6 +757,42 @@ sframe_plot_decision_ranking <- function(result, palette = c("web", "print")) {
     theme_surveyframe(palette = palette)
 }
 
+# Weight-sensitivity plot. One bar per criterion and direction, showing the
+# Spearman correlation between the base ranking and the ranking after that
+# weight is nudged. A short bar marks a criterion the result leans on. The
+# dashed reference at rho = 1 is where the ranking did not move at all, so
+# the visible gap from that line is the whole message.
+sframe_plot_sensitivity <- function(result, palette = c("web", "print")) {
+  rlang::check_installed("ggplot2", reason = "to plot a sensitivity analysis.")
+  palette <- match.arg(palette)
+  brand <- sframe_brand(palette)
+
+  tbl <- result$table
+  if (!is.data.frame(tbl) || nrow(tbl) == 0) return(NULL)
+  df <- tbl[!is.na(tbl$rho), , drop = FALSE]
+  if (nrow(df) == 0) return(NULL)
+
+  df$label <- paste0(df$criterion, " (", df$direction, ")")
+  df <- df[order(df$rho, df$label), , drop = FALSE]
+  df$label <- factor(df$label, levels = rev(unique(df$label)))
+
+  ggplot2::ggplot(df, ggplot2::aes(x = .data$label, y = .data$rho)) +
+    ggplot2::geom_col(fill = brand$fill, colour = brand$ink,
+                      linewidth = 0.3, width = 0.72) +
+    ggplot2::geom_hline(yintercept = 1, colour = brand$ink,
+                        linetype = "dashed", linewidth = 0.4) +
+    ggplot2::coord_flip() +
+    ggplot2::labs(
+      title = sprintf("%s ranking stability under a %.0f%% weight change",
+                      toupper(result$method %||% "decision"),
+                      (result$delta %||% 0.05) * 100),
+      subtitle = paste0("Spearman correlation with the base ranking. The ",
+                        "dashed line is an unchanged ranking."),
+      x = "Criterion perturbed", y = "Rank correlation"
+    ) +
+    theme_surveyframe(palette = palette)
+}
+
 # ---------------------------------------------------------------------------
 # v0.3.4 visualisation breadth: regression diagnostics, EFA, reliability,
 # mosaic, and correlation-matrix plots, plus the plot() S3 methods that
@@ -1075,6 +1111,11 @@ scales_percent_fallback <- function(x) sprintf("%.0f%%", x * 100)
 #' @export
 plot.sframe_quality_report <- function(x, ..., palette = c("web", "print")) {
   sframe_plot_quality(x, palette = match.arg(palette))
+}
+
+#' @export
+plot.sframe_sensitivity <- function(x, ..., palette = c("web", "print")) {
+  sframe_plot_sensitivity(x, palette = match.arg(palette))
 }
 
 #' @export
