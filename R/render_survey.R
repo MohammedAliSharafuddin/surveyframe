@@ -115,47 +115,94 @@ sframe_serialise_response_value <- function(value) {
   paste(as.character(value), collapse = "|")
 }
 
+# The expansion values a multi-column item contributes to a response row,
+# named by their export columns. Matrix cells carry the chosen value, ranking
+# options carry their rank position, and multi-select options carry 0 or 1,
+# which is the contract the static template and the Google Sheets collector
+# already emit and read_responses() already expects.
+sframe_expansion_values <- function(item, instrument, input_values) {
+  cols <- sframe_item_expansion_columns(instrument, list(item))
+  if (length(cols) == 0) return(NULL)
+
+  if (identical(item$type, "matrix")) {
+    # The rendered inputs are positional (item__1, item__2), while the export
+    # columns carry the sub-item label, so the 2 are matched by position.
+    vals <- lapply(seq_along(item$matrix_items), function(r) {
+      sframe_serialise_response_value(input_values[[paste0(item$id, "__", r)]])
+    })
+    return(stats::setNames(vals[seq_along(cols)], cols))
+  }
+
+  if (item$type %in% sframe_expanded_comparison_types) {
+    return(stats::setNames(
+      lapply(cols, function(col) {
+        sframe_serialise_response_value(input_values[[col]])
+      }),
+      cols
+    ))
+  }
+
+  # ranking and multiple_choice both post a single input holding every
+  # selection, so the options are derived from the column names.
+  opts <- sub(paste0("^", item$id, "__"), "", cols)
+  chosen <- as.character(input_values[[item$id]] %||% character(0))
+
+  if (identical(item$type, "ranking")) {
+    # The ranking input holds the order as a pipe-joined string.
+    order <- unlist(strsplit(paste(chosen, collapse = "|"), "|", fixed = TRUE))
+    order <- order[nzchar(order)]
+    return(stats::setNames(lapply(opts, function(o) {
+      pos <- match(o, order)
+      if (is.na(pos)) NA_character_ else as.character(pos)
+    }), cols))
+  }
+
+  stats::setNames(lapply(opts, function(o) {
+    if (o %in% chosen) "1" else "0"
+  }), cols)
+}
+
 sframe_response_row <- function(instrument, input_values, branch_lookup,
                                  started_at, submitted_at = Sys.time()) {
-  # Decision items expand to one column per pair or criterion rather than one
-  # column per item, matching the static template and the Google Sheets
-  # collector. Without that, sframe_assemble_pairwise() and
-  # sframe_collected_weights() cannot read a Shiny-collected response, and an
-  # MCDM survey run through this path would produce data the package's own
-  # runners could not analyse.
-  decision_items <- Filter(
-    function(i) i$type %in% sframe_expanded_comparison_types,
-    instrument$items
-  )
-  plain_items <- Filter(
-    function(i) !i$type %in% sframe_expanded_comparison_types,
-    instrument$items
-  )
+  # Multi-column items expand to one column per sub-item, option, pair, or
+  # criterion rather than to a single joined column, matching the static
+  # template and the Google Sheets collector. Before 0.4.0 the Shiny path
+  # pipe-joined matrix cells into one column, so a matrix question answered
+  # here arrived as mx = "4|5" where read_responses() and the whole analysis
+  # layer expect mx__r1 and mx__r2. That data could not be read back by the
+  # package at all. Ranking and multi-select had the same shape problem.
+  expanded_types <- c("matrix", "ranking", "multiple_choice",
+                      sframe_expanded_comparison_types)
+  expanded_items <- Filter(function(i) i$type %in% expanded_types,
+                           instrument$items)
+  plain_items <- Filter(function(i) !i$type %in% expanded_types,
+                        instrument$items)
 
   item_values <- lapply(plain_items, function(item) {
     if (!sframe_item_visible(item, input_values, branch_lookup))
       return(NA_character_)
-    if (item$type == "matrix" && !is.null(item$matrix_items)) {
-      vals <- lapply(seq_along(item$matrix_items), function(r) {
-        sframe_serialise_response_value(input_values[[paste0(item$id, "__", r)]])
-      })
-      return(paste(vals, collapse = "|"))
-    }
     sframe_serialise_response_value(input_values[[item$id]])
   })
   names(item_values) <- vapply(plain_items, function(i) i$id, character(1))
 
-  for (item in decision_items) {
-    cols <- sframe_comparison_columns(item)
+  for (item in expanded_items) {
     visible <- sframe_item_visible(item, input_values, branch_lookup)
-    for (col in cols) {
-      item_values[[col]] <- if (!visible) {
+    vals <- sframe_expansion_values(item, instrument, input_values)
+    # An item with nothing to expand (no matrix rows, no choice set) still
+    # needs its own column rather than vanishing from the row.
+    if (is.null(vals)) {
+      item_values[[item$id]] <- if (!visible) {
         NA_character_
       } else {
-        sframe_serialise_response_value(input_values[[col]])
+        sframe_serialise_response_value(input_values[[item$id]])
       }
+      next
+    }
+    for (col in names(vals)) {
+      item_values[[col]] <- if (!visible) NA_character_ else vals[[col]]
     }
   }
+
   sframe_as_data_frame(as.data.frame(c(
     list(
       started_at   = format(as.POSIXct(started_at,   tz = "UTC"), "%Y-%m-%dT%H:%M:%SZ"),

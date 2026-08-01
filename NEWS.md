@@ -37,6 +37,25 @@ with an earlier version should be re-run rather than trusted.
   never declared. All 3 now refuse a mismatched estimation family, and the
   builder filters each model role to the types its generator can produce.
 
+## Breaking: the Shiny collector now emits expansion columns
+
+* `render_survey()` pipe-joined a matrix item's cells into a single column,
+  so a matrix question answered in the Shiny survey arrived as
+  `mx = "4|5"` where `read_responses()` and the whole analysis layer expect
+  `mx__r1` and `mx__r2`. Data collected that way could not be read back by
+  the package at all, and nothing said so at collection time. Ranking and
+  multiple-choice items had the same shape problem.
+* All 3 now emit the expansion columns that the static template and the
+  Google Sheets collector already emitted: one column per matrix sub-item
+  carrying its value, one per ranking option carrying its rank position, and
+  one per multi-select option carrying 0 or 1.
+* **This changes the output shape of the Shiny collector.** A study
+  mid-collection through `render_survey()` will see its matrix, ranking, and
+  multi-select columns change name and layout between versions. Responses
+  already gathered under the old shape need re-shaping before they can be
+  read, and the decision item types are unaffected because they emitted the
+  correct columns from the start.
+
 ## The rated performance matrix can now be wired in both GUIs
 
 * SurveyStudio and the visual builder both offered an empty "Performance
