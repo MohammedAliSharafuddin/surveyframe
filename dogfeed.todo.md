@@ -733,10 +733,15 @@ workflow had been failing since 2026-07-18 (`_pkgdown.yml` missing 22
 reference-index topics), and DESCRIPTION's pkgdown URL was missing a
 trailing slash. Both fixed and confirmed live.
 
-Everything below is `lane: 0.3.5` — genuinely needs a human, a real device,
-or a live interactive session, so it carries forward to the 0.3.5
-field-validation release (ICSRI 2026 feedback plus additional human testing
-rounds) rather than blocking the 0.3.4 sign-off.
+Everything below genuinely needs a human, a real device, or a live
+interactive session, so it carries forward rather than blocking a sign-off.
+
+**Re-laned 2026-08-02.** These were logged against a 0.3.5 release that was
+cancelled and absorbed. The owner moved them to **0.4.1**, alongside the
+ICSRI 2026 capture and the faculty demo, which are the human-judgement
+rounds that collect exactly this kind of feedback. Keeping them in 0.4.0
+would have put work only a person can do on the critical path of a release
+whose other human gate was deliberately moved off it.
 
 ## C3 triage, 2026-08-02
 
@@ -760,11 +765,18 @@ A 7th, D2.6, says "Scope this as its own task before 0.3.5, it is bigger
 than a spot check" and carries 4 sub-tasks, one of which is a full audit of
 `levels`/`labels` across every `sf_item()` type.
 
-That leaves E2.6 (bounds error-message styling) as the only entry that is
-straightforwardly machine-fixable end to end, plus the audit and
-end-to-end-check halves of D2.6, plus D2.5, which can be rendered at phone
-width and screenshotted by machine while the "readable?" verdict stays
-human.
+**Correction, same day.** The line above originally named E2.6 as the one
+entry that was machine-fixable end to end. Its own text says "Visual
+judgement call", so that was wrong, and wrong in exactly the way this
+triage was written to catch: it trusted the summary label instead of the
+entry. E2.6 belongs with the judgement items.
+
+So of the 8, **7 are judgement calls** (B1.3, D2.5, E2.6, H1.4/H1.5, J1.5,
+K1.7, L1.4 to L1.7, N1.9) and **none is machine-fixable end to end**. The
+only machine-actionable work in the group is inside D2.6: auditing
+`levels`/`labels` across every `sf_item()` type, and confirming ranking and
+matrix items analyse end to end. D2.5 can be rendered at phone width by
+machine, but the "readable?" verdict stays human.
 
 **Consequence for the plan.** C4 as written, "clear the 8 machine-fixable
 open items", is not achievable, because 6 of the 8 were never
@@ -779,14 +791,14 @@ judgement items to 0.4.1 beside F0, F0a and F3, keep E2.6 and the machine
 halves of D2.6 in 0.4.0, and treat D2.5 as machine-render plus human
 verdict wherever its verdict lands.
 
-### [open] `lane: 0.3.5` — B1.3: interpretation/decision-rule pairing reads correctly to a researcher
+### [open] `lane: 0.4.1` — B1.3: interpretation/decision-rule pairing reads correctly to a researcher
 Prose judgement call on the rendered report's "Planned decision rule" /
 "Interpretation" pairing under each result. mas_review_034.qmd Part B1.
 
-### [open] `lane: 0.3.5` — D2.5: scale-correlation heatmap readable at phone width
+### [open] `lane: 0.4.1` — D2.5: scale-correlation heatmap readable at phone width
 Visual/device check, dashboard Scales tab. mas_review_034.qmd Part D2.
 
-### [open] `lane: 0.3.5` — D2.6: filter-live-check, full levels/labels audit, doc revision, ranking/matrix workflow check
+### [open] `lane: 0.4.1` — D2.6: filter live-check and doc revision (audit and workflow halves done 2026-08-02)
 The axis/title humanising half of the original feedback is already fixed
 and confirmed (N1.5 in mas_review_034.qmd). What's left is real scoped
 work, not quick verification: (1) confirm the dashboard's date/categorical
@@ -796,27 +808,46 @@ type, not just the ones exercised by the demo instrument; (3) revise the
 working examples, pkgdown reference, and vignettes to consistently use
 labelled levels with proper spacing; (4) confirm ranking and matrix question
 types produce a working end-to-end analysis without any extra hand-coding.
-Scope this as its own task before 0.3.5, it is bigger than a spot check.
+Scope this as its own task, it is bigger than a spot check.
 
-### [open] `lane: 0.3.5` — E2.5: phone native date-wheel bounds
+**Sub-tasks (2) and (4) closed 2026-08-02.** The `levels`/`labels` audit ran
+across all 11 `sf_item()` types: declared labels reach the analysis table for
+every one of the 8 that carries a choice set, and text, textarea, and date
+correctly show raw values because they have none. Ranking and matrix both
+analyse end to end with no hand-coding.
+
+That audit found one real defect, now fixed. A matrix row label containing a
+space produces an expansion column containing a space, which the collectors
+write correctly, but `read.csv()` rewrites it (`check.names` defaults to
+`TRUE`), so `q1__Row one` arrives as `q1__Row.one` and `read_responses()`
+rejected it as undeclared with nothing to say the header had been rewritten.
+The error now names the cause and the fix, and stays quiet for a genuinely
+stray column.
+
+**Still open, and human:** (1) confirming the dashboard's date and categorical
+filters re-render the missingness chart live in a real browser session, and
+(3) revising the examples, pkgdown reference, and vignettes to use labelled
+levels consistently.
+
+### [open] `lane: 0.4.1` — E2.5: phone native date-wheel bounds
 Device check: does a phone's native date picker actually respect
 `date_min`/`date_max` on the exported survey. mas_review_034.qmd Part E2.
 
-### [open] `lane: 0.3.5` — E2.6: bounds error message styling next to required-field message
+### [open] `lane: 0.4.1` — E2.6: bounds error message styling next to required-field message
 Visual judgement call. mas_review_034.qmd Part E2.
 
-### [open] `lane: 0.3.5` — F2.6: screen-reader spot check (VoiceOver/NVDA/Orca)
+### [open] `lane: 0.4.1` — F2.6: screen-reader spot check (VoiceOver/NVDA/Orca)
 The builder's preview inputs need a real screen-reader pass to confirm
 question labels are announced correctly; axe-core (already run, zero
 violations) checks the accessibility tree's structure, not what a screen
 reader actually says. mas_review_034.qmd Part F2.
 
-### [open] `lane: 0.3.5` — H1.4/H1.5: vignette prose spot-read and flat browseVignettes() presentability
+### [open] `lane: 0.4.1` — H1.4/H1.5: vignette prose spot-read and flat browseVignettes() presentability
 H1.4 is a house-style prose read (UK spellings, no em-dashes/semicolons,
 banned words); H1.5 is whether the un-pkgdown-wrapped `browseVignettes()`
 output looks presentable. mas_review_034.qmd Part H.
 
-### [open] `lane: 0.3.5` — I1.1 to I1.4: full 30-minute fresh-eyes UX pass
+### [open] `lane: 0.4.1` — I1.1 to I1.4: full 30-minute fresh-eyes UX pass
 Build a 5-question survey with a bounded date question in the builder,
 export and answer it; separately spend 30 minutes in SurveyStudio running
 the demo plan, writing two interpretations, and exporting the print-palette
@@ -826,7 +857,7 @@ mas_review_034.qmd's Part I (`fresh_eyes_check.sframe`). Log findings here
 per I1.4's own instruction, do not fix inline until the session is
 explicitly closed.
 
-### [open] `lane: 0.3.5` — J1.5/J1.7: APA interval prose and perceived Run-tab timing
+### [open] `lane: 0.4.1` — J1.5/J1.7: APA interval prose and perceived Run-tab timing
 J1.5 is whether 3 read APA strings with confidence intervals read naturally
 in context. J1.7's raw compute time is now measured (14.3s for the full
 34-block demo plan with `plots = TRUE`, matching N1.10's "about half a
@@ -834,11 +865,11 @@ minute" total once Shiny rendering and chart encoding are added) — what's
 left is whether that reads as acceptable inside the live Run tab, a UX call
 the number alone doesn't answer. mas_review_034.qmd Part J.
 
-### [open] `lane: 0.3.5` — K1.7: MCAR interpretation wording, methodologist read
+### [open] `lane: 0.4.1` — K1.7: MCAR interpretation wording, methodologist read
 Prose judgement call on `missing_data_report()`'s Little's MCAR
 interpretation text. mas_review_034.qmd Part K.
 
-### [open] `lane: 0.3.5` — L1.4 to L1.7: PDF pagination, greyscale legibility, browser print, brand colour
+### [open] `lane: 0.4.1` — L1.4 to L1.7: PDF pagination, greyscale legibility, browser print, brand colour
 All four need eyes on an actual rendered page: pagination cleanliness
 (no card/table split mid-block), greyscale legibility with
 `plot_palette = "print"`, the browser's own Ctrl+P output, and whether the
@@ -846,7 +877,7 @@ accessible teal accent still reads as brand. PDF generation itself is
 confirmed working (L1.1 to L1.3, L1.8 — 3.39 MB for the full demo,
 comfortably under the 10 MB check). mas_review_034.qmd Part L.
 
-### [open] `lane: 0.3.5` — N1.9/N1.10: SurveyStudio Copy-result clipboard and canvas timing feel
+### [open] `lane: 0.4.1` — N1.9/N1.10: SurveyStudio Copy-result clipboard and canvas timing feel
 N1.9 needs a real browser paste to confirm the clipboard payload (headless
 Chrome doesn't grant `navigator.clipboard` permissions without extra CDP
 wiring, not attempted). N1.10 is a perceived-speed judgement, not something
