@@ -206,3 +206,49 @@ test_that("both runners surface the shared validator's typed errors", {
   expect_match(res_p$error, "non-negative")
   expect_match(res_e$error, "non-negative")
 })
+
+test_that("ELECTRE says so when it establishes no outranking at all", {
+  # A 9-criterion problem at the default 0.70/0.30 thresholds leaves every
+  # score at 0 and every alternative at rank 1. Without a note the table
+  # reads as "all 9 alternatives are jointly best" and the APA sentence
+  # reports a kernel containing everything, both of which sound like
+  # findings rather than the non-result they are.
+  set.seed(2026)
+  x <- matrix(round(runif(81, 1, 100), 1), nrow = 9)
+  w <- rep(1 / 9, 9)
+  ct <- rep(c("benefit", "cost"), length.out = 9)
+  skip_if(any(sframe_electre_compute(x, w, ct)$outrank_count != 0),
+          "this fixture is no longer degenerate")
+
+  inst <- sf_instrument(
+    title = "Degenerate ELECTRE", version = "1.0.0",
+    components = list(sf_item("q1", "Q", type = "text")),
+    analysis_plan = list(list(
+      id = "RQ1", research_question = "Which?", family = "decision",
+      method = "electre", roles = list(),
+      options = list(
+        matrix = lapply(seq_len(9), function(i) as.numeric(x[i, ])),
+        alternatives = paste0("alt", 1:9), criteria = paste0("c", 1:9),
+        weights = w, criteria_types = ct
+      )
+    ))
+  )
+
+  res <- run_analysis_plan(data.frame(q1 = c("a", "b")), inst)[[1]]
+
+  expect_null(res$error)
+  expect_gte(length(res$notes), 1)
+  expect_true(any(grepl("did not separate these alternatives", res$notes)))
+  expect_true(any(grepl("absence of evidence", res$notes)))
+})
+
+test_that("ELECTRE stays quiet when it does establish an outranking", {
+  x <- matrix(c(4.1, 3.0, 210, 36,
+                3.6, 4.5, 180, 48,
+                4.8, 2.5, 260, 24,
+                3.9, 4.0, 150, 72,
+                4.4, 3.8, 230, 30), nrow = 5, byrow = TRUE)
+  fit <- sframe_electre_compute(x, c(.4, .3, .2, .1),
+                                c("benefit", "benefit", "cost", "cost"))
+  expect_true(any(fit$outrank_count > 0))
+})

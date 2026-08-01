@@ -297,6 +297,26 @@ sframe_run_electre <- function(data, roles, options, instrument) {
   kernel_members <- alternatives[fit$kernel]
   notes <- c(resolved$notes, checked$note)
 
+  # An empty outranking relation is a non-result, not a tie for first place.
+  # It happens when no alternative clears the concordance threshold against
+  # any other, which gets more likely as the criterion count rises: on a 9
+  # by 9 problem at the default 0.70 and 0.30 every score comes back 0 and
+  # every alternative ranks 1. Left unsaid, the table reads as "all 9
+  # alternatives are jointly best" and the APA sentence reports a kernel
+  # containing everything, both of which sound like findings.
+  if (all(fit$outrank_count == 0) && all(fit$outranked_count == 0)) {
+    notes <- c(notes, paste0(
+      "No alternative outranked any other at concordance ",
+      sprintf("%.2f", concordance_threshold), " and discordance ",
+      sprintf("%.2f", discordance_threshold),
+      ", so ELECTRE I did not separate these alternatives at all. The equal ",
+      "ranks below are an absence of evidence rather than a tie for first ",
+      "place. Report it as a non-result, or re-run with thresholds declared ",
+      "for this problem: a concordance cutoff that suits 4 criteria is often ",
+      "unreachable with 9."
+    ))
+  }
+
   list(
     test           = "electre",
     apa            = sprintf(

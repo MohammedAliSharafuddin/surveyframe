@@ -212,3 +212,36 @@ test_that("a plan block attaches sensitivity only when it asks for it", {
   expect_s3_class(on[[1]]$sensitivity, "sframe_sensitivity")
   expect_equal(nrow(on[[1]]$sensitivity$table), 6)
 })
+
+test_that("a base ranking with no discrimination is flagged, not called stable", {
+  # ELECTRE I on a 9 by 9 problem at the default thresholds establishes no
+  # outranking at all: every score is 0 and every alternative ranks 1. A
+  # ranking that never separated anything cannot be moved by perturbing a
+  # weight, so every check passes and `stable` is TRUE. That is the strongest
+  # robustness signal this function has, produced by the weakest possible
+  # result, so `degenerate` marks it and print() leads with the warning.
+  set.seed(2026)
+  x <- matrix(round(runif(81, 1, 100), 1), nrow = 9)
+  w <- rep(1 / 9, 9)
+  ct <- rep(c("benefit", "cost"), length.out = 9)
+
+  base <- sframe_electre_compute(x, w, ct)
+  skip_if(length(unique(as.integer(base$ranks))) > 1,
+          "this fixture is no longer degenerate")
+
+  sa <- sensitivity_analysis(x, w, ct, method = "electre")
+
+  expect_true(sa$degenerate)
+  expect_true(sa$stable)          # factually nothing changed
+  expect_equal(sa$n_changed, 0)
+
+  out <- paste(utils::capture.output(print(sa)), collapse = "\n")
+  expect_match(out, "No result to test")
+  expect_no_match(out, "^Stable\\.")
+})
+
+test_that("a discriminating ranking is not flagged as degenerate", {
+  sa <- do.call(sensitivity_analysis, sens_args())
+  expect_false(sa$degenerate)
+  expect_gt(length(unique(sa$base_ranks)), 1)
+})
