@@ -5,6 +5,17 @@ sframe_strip_component_class <- function(component) {
   component
 }
 
+# Put a component through the reader's own restore function before writing it,
+# then drop the class. A component built by an sf_* constructor carries every
+# optional field as NULL, and the restore functions drop those, so a fresh
+# component serialised more keys than the same component after a round trip.
+# That is one half of why write, read, write used to change an instrument's
+# hash. The restore functions are idempotent on content, checked against both
+# fresh and shipped components, so this leaves settled files byte-identical.
+sframe_normalise_component <- function(component, restore) {
+  sframe_strip_component_class(restore(sframe_strip_component_class(component)))
+}
+
 sframe_serialization_payload <- function(instrument, hash_value = "") {
   # Strip list-level names before serialisation so items, choices, scales,
   # branching, and checks are always written as JSON arrays. Without unname(),
@@ -15,12 +26,37 @@ sframe_serialization_payload <- function(instrument, hash_value = "") {
     hash = list(algo = "sha256", value = hash_value),
     version = instrument$meta$version,
     meta = instrument$meta,
-    items    = unname(lapply(instrument$items,    sframe_strip_component_class)),
-    choices  = unname(lapply(instrument$choices,  sframe_strip_component_class)),
-    scales   = unname(lapply(instrument$scales,   sframe_strip_component_class)),
-    branching = unname(lapply(instrument$branching, sframe_strip_component_class)),
-    checks   = unname(lapply(instrument$checks,   sframe_strip_component_class)),
-    analysis_plan = instrument$analysis_plan %||% list(),
+    items    = unname(lapply(instrument$items,
+                             sframe_normalise_component, sframe_restore_item)),
+    choices  = unname(lapply(instrument$choices,
+                             sframe_normalise_component, sframe_restore_choices)),
+    scales   = unname(lapply(instrument$scales,
+                             sframe_normalise_component, sframe_restore_scale)),
+    branching = unname(lapply(instrument$branching,
+                              sframe_normalise_component, sframe_restore_branch)),
+    checks   = unname(lapply(instrument$checks,
+                             sframe_normalise_component, sframe_restore_check)),
+    # Normalised through the same restore path the reader uses, so that
+    # writing an instrument and writing it again after a read produce the
+    # same bytes and therefore the same hash.
+    #
+    # Without this, serialisation was not a fixed point. A plan block built
+    # by sf_instrument() carries only what the caller supplied, while
+    # sframe_restore_analysis_block() fills in 8 fields on read (options,
+    # decision_rule, reporting_references, status, requires_data, test,
+    # interpretation, citations). So write, read, write changed the hash of
+    # identical content: measured ec822fff then 3fa36502 on a plain 2-item
+    # Likert instrument. An instrument could carry 2 different hashes
+    # depending on whether it had been through a read, which is a poor
+    # property for a value that is meant to be the instrument's identity.
+    #
+    # The function is idempotent, verified on both a fresh block and a
+    # shipped one, so applying it here leaves already-settled files
+    # untouched and only pulls fresh ones up to the same form.
+    analysis_plan = unname(lapply(
+      instrument$analysis_plan %||% list(),
+      sframe_restore_analysis_block
+    )),
     models = unname(lapply(instrument$models %||% list(), sframe_model_plain)),
     render = instrument$render
   )
