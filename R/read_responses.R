@@ -119,13 +119,36 @@ read_responses <- function(
   undeclared <- setdiff(data_cols,
                         c(item_ids, expanded_ids, display_item_ids, declared))
   if (length(undeclared) > 0) {
+    # A matrix row or choice label containing a space produces an expansion
+    # column with a space, which the collectors write correctly. read.csv()
+    # then rewrites it: "q1__Row one" arrives as "q1__Row.one", because
+    # check.names defaults to TRUE. The columns are then undeclared through no
+    # fault of the researcher, and the plain message sends them looking for a
+    # declaration problem that does not exist. Name the real cause instead.
+    known <- c(item_ids, expanded_ids, display_item_ids, declared)
+    mangled <- undeclared[make.names(undeclared) == undeclared &
+                            undeclared %in% make.names(known)]
+    hint <- if (length(mangled) > 0) {
+      originals <- known[make.names(known) %in% mangled]
+      paste0(
+        " ", length(mangled), " of these match a declared column after R's",
+        " name repair (for example '", originals[1], "' became '",
+        mangled[1], "'), so the header was most likely rewritten on import.",
+        " Re-read the file with check.names = FALSE, as in",
+        " read.csv(path, check.names = FALSE)."
+      )
+    } else {
+      ""
+    }
+
     if (strict) {
       sframe_abort_import(
         paste0(
           length(undeclared),
           " undeclared column(s) found in response data: ",
           paste(undeclared, collapse = ", "),
-          ". Declare them in meta_cols or set strict = FALSE."
+          ". Declare them in meta_cols or set strict = FALSE.",
+          hint
         )
       )
     } else {
