@@ -834,3 +834,31 @@ slip into a decision-methods commit.
 Needs a triage decision at C3: fix in 0.4.0 (breaking for existing Shiny
 collectors), fix behind an option, or document the Shiny path as
 static-survey-only for multi-column item types.
+
+### [open] `lane: 0.4.0` — A freshly built instrument is not a serialisation fixed point
+Found 2026-08-01 while checking B14's hash-stability gate. An instrument
+constructed with `sf_instrument()` and written straight out does not hash to
+the same value after a read and rewrite. `read_sframe()` drops the NULL
+fields that `write_sframe()` emitted as `{}` (`choice_set`, `help`,
+`date_min`, `date_max`), and `sframe_restore_analysis_block()` fills in
+defaults that were never written (`citations`, `decision_rule`,
+`interpretation`, `reporting_references`, `requires_data`). The payload after
+one read therefore differs from the payload that was written, so the hash
+differs too.
+
+Confirmed on a plain 2-item Likert instrument with no decision items, so this
+is not specific to the new types. Measured: written `ec822fff`, after read
+`3fa36502`. It settles after one round trip and is stable from then on.
+
+Consequence: the same instrument content can carry 2 different hashes
+depending on whether it has been through a read, which weakens the claim that
+the hash is the instrument's identity. Anyone building in R, writing, then
+later reading and rewriting gets a hash change with no content change.
+
+B14's fixture is shipped in its settled form (write, read, write) so its gate
+passes honestly, and the generator says why. That is a workaround for one
+file, not a fix.
+
+Needs a triage decision at C3. Making serialise/restore a true fixed point is
+the real fix, but it changes the hash of any file currently written the fresh
+way, so it is an owner call rather than a quiet correction.
