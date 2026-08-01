@@ -83,6 +83,15 @@ articles:
       - scale-reliability-validity
       - efa-cfa-sem-pls-syntax
       - surveybuilder-gui-overview
+  - title: "Specialised analyses"
+    desc: >
+      Read these when a study calls for them. Small-sample inference covers
+      studies below the n = 30 threshold, and multi-criteria decision analysis
+      covers ranking alternatives against criteria that compete.
+    navbar: ~
+    contents:
+      - small-sample
+      - mcdm-analysis
 
 reference:
   - title: "Design"
