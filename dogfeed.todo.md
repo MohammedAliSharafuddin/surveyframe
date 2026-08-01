@@ -738,6 +738,47 @@ or a live interactive session, so it carries forward to the 0.3.5
 field-validation release (ICSRI 2026 feedback plus additional human testing
 rounds) rather than blocking the 0.3.4 sign-off.
 
+## C3 triage, 2026-08-02
+
+Every open item was re-read against its own text rather than against the
+summary label. That changed the picture, so the result is recorded here
+before any of it is acted on.
+
+**The "8 machine-fixable" grouping does not hold.** 6 of the 8 say in their
+own entry that they need human eyes, and they were logged that way:
+
+| Item | What its own entry says |
+|---|---|
+| B1.3 | "Prose judgement call" |
+| H1.4/H1.5 | prose spot-read and presentability |
+| J1.5 | APA interval prose |
+| K1.7 | "Prose judgement call... methodologist read" |
+| L1.4 to L1.7 | "All four need eyes on an actual rendered page" |
+| N1.9 | "needs a real browser paste", headless Chrome cannot grant clipboard permission |
+
+A 7th, D2.6, says "Scope this as its own task before 0.3.5, it is bigger
+than a spot check" and carries 4 sub-tasks, one of which is a full audit of
+`levels`/`labels` across every `sf_item()` type.
+
+That leaves E2.6 (bounds error-message styling) as the only entry that is
+straightforwardly machine-fixable end to end, plus the audit and
+end-to-end-check halves of D2.6, plus D2.5, which can be rendered at phone
+width and screenshotted by machine while the "readable?" verdict stays
+human.
+
+**Consequence for the plan.** C4 as written, "clear the 8 machine-fixable
+open items", is not achievable, because 6 of the 8 were never
+machine-fixable. They are the same kind of judgement the ICSRI capture and
+the faculty demo rounds exist to collect, and those moved to 0.4.1 on
+2026-07-31. Leaving these 6 in 0.4.0 puts human-judgement work on the
+critical path of a release whose other human gate was deliberately moved
+off it.
+
+Recommendation, for the owner rather than assumed: move the 6
+judgement items to 0.4.1 beside F0, F0a and F3, keep E2.6 and the machine
+halves of D2.6 in 0.4.0, and treat D2.5 as machine-render plus human
+verdict wherever its verdict lands.
+
 ### [open] `lane: 0.3.5` — B1.3: interpretation/decision-rule pairing reads correctly to a researcher
 Prose judgement call on the rendered report's "Planned decision rule" /
 "Interpretation" pairing under each result. mas_review_034.qmd Part B1.
