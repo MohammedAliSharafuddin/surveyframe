@@ -37,6 +37,23 @@ with an earlier version should be re-run rather than trusted.
   never declared. All 3 now refuse a mismatched estimation family, and the
   builder filters each model role to the types its generator can produce.
 
+## Decision analysis: non-results now say so
+
+* ELECTRE I reports when it establishes no outranking relation at all. On a
+  9-criterion problem at the default 0.70 and 0.30 thresholds no alternative
+  clears concordance against any other, so every score is 0 and every
+  alternative ranks 1. That is legitimate behaviour for the method, but the
+  results table read as "all 9 alternatives are jointly best" and the APA
+  sentence reported a kernel containing every alternative. A note now states
+  that the equal ranks are an absence of evidence rather than a tie for first
+  place.
+* `sensitivity_analysis()` gains a `degenerate` flag for the same reason. A
+  ranking that never separated the alternatives cannot be changed by
+  perturbing a weight, so every check passed and `stable` came back `TRUE`:
+  the strongest robustness signal the function can give, produced by the
+  weakest result it can be handed. `print()` now leads with "No result to
+  test" instead of "Stable" in that case.
+
 ## Data quality
 
 * `quality_report()` counted only columns matching a bare item id, and

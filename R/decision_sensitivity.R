@@ -181,6 +181,15 @@ sensitivity_analysis <- function(x,
   }
   rownames(table) <- NULL
 
+  # A base ranking that never separated the alternatives cannot be moved by
+  # perturbing a weight, so nothing changes and `stable` comes out TRUE. That
+  # is the strongest robustness signal this function can give, produced by
+  # the weakest result it can be handed. ELECTRE I reaches it whenever no
+  # alternative outranks any other, which a 9-criterion problem does at the
+  # default thresholds. Flagged separately so a non-result is not read as a
+  # robust one.
+  degenerate <- length(unique(base_ranks)) <= 1L
+
   structure(
     list(
       table        = table,
@@ -190,6 +199,7 @@ sensitivity_analysis <- function(x,
       alternatives = alternatives,
       criteria     = criteria,
       stable       = nrow(table) > 0 && !any(table$rank_changed),
+      degenerate   = degenerate,
       n_changed    = sum(table$rank_changed),
       n_top_changed = sum(table$top_changed)
     ),
@@ -273,7 +283,14 @@ print.sframe_sensitivity <- function(x, ...) {
               paste(names(sort(x$base_ranks)), collapse = " > ")))
   print(x$table)
   cat("\n")
-  if (x$stable) {
+  if (isTRUE(x$degenerate)) {
+    cat(paste0(
+      "No result to test. The base ranking placed every alternative at the\n",
+      "same rank, so nothing could move and every check passed vacuously.\n",
+      "This is an absence of discrimination, not a robust ranking. Check the\n",
+      "method's own output before reading anything into the table above.\n"
+    ))
+  } else if (x$stable) {
     cat(sprintf(
       paste0("Stable. No %.0f%% perturbation of any single weight changed ",
              "the ranking.\n"),
