@@ -37,6 +37,19 @@ with an earlier version should be re-run rather than trusted.
   never declared. All 3 now refuse a mismatched estimation family, and the
   builder filters each model role to the types its generator can produce.
 
+## The rated performance matrix can now be wired in both GUIs
+
+* SurveyStudio and the visual builder both offered an empty "Performance
+  matrix items" dropdown for all 7 ranking methods (TOPSIS, VIKOR, MOORA,
+  SMART, WASPAS, PROMETHEE, ELECTRE). That role matches on a `"matrix"`
+  level, and neither surface gave matrix items one: the studio classified
+  them as `"identifier"` and the builder grouped them under `"expanded"`,
+  which no role accepts. The effect was that the rated-matrix path, where
+  respondents rate every alternative on every criterion, could only be built
+  by writing R directly, even though it is one of the 3 declared ways to
+  supply a decision matrix. Matrix items now carry their own `"matrix"`
+  level in both surfaces.
+
 ## Decision analysis: non-results now say so
 
 * ELECTRE I reports when it establishes no outranking relation at all. On a

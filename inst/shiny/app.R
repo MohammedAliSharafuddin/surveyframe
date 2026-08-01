@@ -759,6 +759,16 @@ studio_level_meta <- function(item = NULL, scale = NULL) {
   if (identical(type, "criteria_weight")) {
     return(list(level = "criteria_weight", code = "WGT", type = "criteria weights"))
   }
+  # A matrix item is how the rated performance matrix gets collected: one
+  # matrix item per criterion, rows are the alternatives. That is what the 7
+  # ranking methods read through their performance_items role, which declares
+  # levels = "matrix". Without this branch a matrix item fell through to
+  # "identifier", so nothing ever carried the level the role wanted and the
+  # dropdown was empty for all 7 methods, leaving the whole rated-matrix path
+  # unwirable here. Same failure shape as the decision item types before A6.
+  if (identical(type, "matrix")) {
+    return(list(level = "matrix", code = "MTX", type = type))
+  }
   list(level = "identifier", code = "ID", type = type)
 }
 
