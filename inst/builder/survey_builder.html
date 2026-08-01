@@ -3112,7 +3112,14 @@ function varLevel(id){
   // multiple_choice, ranking, and matrix have no single response column of
   // their own; their analysable variables are the expanded sub-columns
   // built in getAllVars(). The parent id is kept out of role dropdowns.
-  if(['multiple_choice','ranking','matrix'].includes(i.type))return{level:'expanded',code:'SET',cls:'id',type:i.type};
+  // A matrix item is how the rated performance matrix is collected (one
+  // matrix item per criterion, rows = alternatives), and the 7 ranking
+  // methods read it through performance_items, which declares
+  // levels:['matrix']. Grouped under 'expanded' it matched no role at all,
+  // so that dropdown was empty and the rated-matrix path could not be built
+  // here. No role accepts 'expanded', so splitting matrix out costs nothing.
+  if(i.type==='matrix')return{level:'matrix',code:'MTX',cls:'id',type:i.type};
+  if(['multiple_choice','ranking'].includes(i.type))return{level:'expanded',code:'SET',cls:'id',type:i.type};
   // Decision-family items are the one case where a role wants the parent id
   // rather than the expanded sub-columns: sframe_assemble_pairwise() and
   // sframe_collected_weights() take the item id and read every pair or
