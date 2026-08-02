@@ -64,6 +64,30 @@ sframe_constructs_from_scales <- function(instrument, scales = NULL) {
   })
 }
 
+# A syntax generator is specific to an estimation family. Generating PLS-SEM
+# syntax from a covariance-based model (or the reverse) produces a runnable
+# script that silently estimates something the researcher never declared, so
+# the mismatch is refused rather than written out.
+sframe_check_model_type <- function(model, allowed, fn_label, family_label) {
+  type <- (sframe_model_as_list(model)$type %||% "")[1]
+  if (!nzchar(type)) {
+    sframe_abort_validation(sprintf(
+      "%s needs a model with a declared type. Set type in sf_model() to one of %s.",
+      fn_label, paste0("'", allowed, "'", collapse = " or ")
+    ))
+  }
+  if (!type %in% allowed) {
+    sframe_abort_validation(sprintf(
+      paste0("%s generates %s syntax and needs a model of type %s, ",
+             "but this model is of type '%s'. Generating it anyway would ",
+             "estimate a different model from the one declared."),
+      fn_label, family_label,
+      paste0("'", allowed, "'", collapse = " or "), type
+    ))
+  }
+  invisible(TRUE)
+}
+
 sframe_model_constructs <- function(model) {
   model <- sframe_model_as_list(model)
   model$measurement$constructs %||% list()
@@ -687,6 +711,12 @@ cfa_lavaan_syntax <- function(
     residual_covariances = NULL,
     latent_covariances = TRUE
 ) {
+  # Only when a model is supplied. With model = NULL the measurement model is
+  # derived from the instrument's scales below, so there is no type to check.
+  if (!is.null(model)) {
+    sframe_check_model_type(model, c("cfa", "cb_sem"), "cfa_lavaan_syntax()",
+                            "covariance-based measurement")
+  }
   if (is.null(model)) {
     if (is.null(instrument) || !inherits(instrument, "sframe")) {
       rlang::abort("Provide either `model` or an `sframe` instrument.",
@@ -755,6 +785,8 @@ cfa_lavaan_syntax <- function(
 #' @return A lavaan syntax string.
 #' @export
 sem_lavaan_syntax <- function(model, instrument = NULL, standardised = TRUE) {
+  sframe_check_model_type(model, c("cfa", "cb_sem"), "sem_lavaan_syntax()",
+                          "covariance-based")
   if (!is.null(instrument)) {
     validate_model(model, instrument = instrument, strict = TRUE)
   } else {
@@ -843,6 +875,8 @@ sem_lavaan_syntax <- function(model, instrument = NULL, standardised = TRUE) {
 #' @return An R syntax string for `seminr`.
 #' @export
 seminr_syntax <- function(model, data_name = "data", nboot = NULL, seed = 123) {
+  sframe_check_model_type(model, "pls_sem", "seminr_syntax()",
+                          "partial-least-squares")
   validate_model(model, strict = TRUE)
   constructs <- sframe_model_constructs(model)
   paths <- sframe_model_paths(model)

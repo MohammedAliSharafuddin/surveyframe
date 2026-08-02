@@ -35,6 +35,10 @@ sframe_require_nnet <- function(reason) {
   rlang::check_installed("nnet", reason = reason)
 }
 
+sframe_require_logistf <- function(reason) {
+  rlang::check_installed("logistf", reason = reason)
+}
+
 #' Abort with a validation error
 #'
 #' @param message Character. The error message.
@@ -109,6 +113,25 @@ sframe_warn_missing <- function(message, item_id = NULL, rate = NULL, ...) {
     class   = c("sframe_missing_data_warning", "sframe_warning"),
     item_id = item_id,
     rate    = rate,
+    ...
+  )
+}
+
+#' Warn about an instrument design issue
+#'
+#' Advisory only. Used where a declaration is legal but likely to cost the
+#' researcher data quality, such as a pairwise comparison item large enough to
+#' fatigue respondents.
+#'
+#' @param message Character. The warning message.
+#' @param item_id Character or NULL. The item ID affected.
+#' @param ... Additional named fields passed to `rlang::warn()`.
+#' @keywords internal
+sframe_warn_design <- function(message, item_id = NULL, ...) {
+  rlang::warn(
+    message = message,
+    class   = c("sframe_design_warning", "sframe_warning"),
+    item_id = item_id,
     ...
   )
 }

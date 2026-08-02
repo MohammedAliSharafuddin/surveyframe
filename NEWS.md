@@ -1,3 +1,123 @@
+# surveyframe 0.4.0 (in development)
+
+This release is in progress. Entries are added as the work lands rather
+than reconstructed at submission time.
+
+## Corrected results (read before comparing against earlier output)
+
+Four defects found by independent cross-validation are fixed. Each
+produced plausible numbers with no error or warning, so results computed
+with an earlier version should be re-run rather than trusted.
+
+* `item_report()` returned the wrong item-rest correlation. It subtracted
+  each item from a `rowMeans()` total, which leaves roughly noise carrying
+  the item negatively, so a highly reliable scale reported strong negative
+  values. On simulated data with alpha 0.947 every item came back at about
+  -0.46. The statistic is now the item against the sum of the other items
+  in its scale, and matches `psych::alpha()`'s `item.stats$r.drop` to
+  1e-10.
+* Repeated-measures ANOVA tested the condition effect against the wrong
+  error term, because the subject identifier was left as an integer and
+  `aov()` treated it as a continuous covariate. On a fixture where
+  `jmv::anovaRM()` gives F(2, 78) = 86.93, surveyframe reported F = 1.45,
+  p = 0.24. Correcting the identifier alone was not sufficient: the
+  corrected design produces no `Error: Within` stratum, so the effect is
+  now located by searching the strata rather than by a fixed name.
+* `validate_sframe()` rejected valid instruments. Its known-variable list
+  held only base item and scale ids, so an analysis plan naming an
+  expansion column (`item__sub`, `item__option`, `item__a__vs__b`,
+  `item__crit`) failed validation for variables that do exist, including
+  real exports from the visual builder. `read_responses()` already
+  accepted those columns. Both now derive the list from one shared helper.
+* The SEM syntax generators ignored the model type. `seminr_syntax()`,
+  `sem_lavaan_syntax()`, and `cfa_lavaan_syntax()` never checked
+  `model$type`, and the builder offered every saved model to all 3
+  generators, so a covariance-based model produced PLS-SEM syntax with no
+  complaint. That is a runnable script estimating a model the researcher
+  never declared. All 3 now refuse a mismatched estimation family, and the
+  builder filters each model role to the types its generator can produce.
+
+## Breaking: the Shiny collector now emits expansion columns
+
+* `render_survey()` pipe-joined a matrix item's cells into a single column,
+  so a matrix question answered in the Shiny survey arrived as
+  `mx = "4|5"` where `read_responses()` and the whole analysis layer expect
+  `mx__r1` and `mx__r2`. Data collected that way could not be read back by
+  the package at all, and nothing said so at collection time. Ranking and
+  multiple-choice items had the same shape problem.
+* All 3 now emit the expansion columns that the static template and the
+  Google Sheets collector already emitted: one column per matrix sub-item
+  carrying its value, one per ranking option carrying its rank position, and
+  one per multi-select option carrying 0 or 1.
+* **This changes the output shape of the Shiny collector.** A study
+  mid-collection through `render_survey()` will see its matrix, ranking, and
+  multi-select columns change name and layout between versions. Responses
+  already gathered under the old shape need re-shaping before they can be
+  read, and the decision item types are unaffected because they emitted the
+  correct columns from the start.
+
+## The rated performance matrix can now be wired in both GUIs
+
+* SurveyStudio and the visual builder both offered an empty "Performance
+  matrix items" dropdown for all 7 ranking methods (TOPSIS, VIKOR, MOORA,
+  SMART, WASPAS, PROMETHEE, ELECTRE). That role matches on a `"matrix"`
+  level, and neither surface gave matrix items one: the studio classified
+  them as `"identifier"` and the builder grouped them under `"expanded"`,
+  which no role accepts. The effect was that the rated-matrix path, where
+  respondents rate every alternative on every criterion, could only be built
+  by writing R directly, even though it is one of the 3 declared ways to
+  supply a decision matrix. Matrix items now carry their own `"matrix"`
+  level in both surfaces.
+
+## Decision analysis: non-results now say so
+
+* ELECTRE I reports when it establishes no outranking relation at all. On a
+  9-criterion problem at the default 0.70 and 0.30 thresholds no alternative
+  clears concordance against any other, so every score is 0 and every
+  alternative ranks 1. That is legitimate behaviour for the method, but the
+  results table read as "all 9 alternatives are jointly best" and the APA
+  sentence reported a kernel containing every alternative. A note now states
+  that the equal ranks are an absence of evidence rather than a tie for first
+  place.
+* `sensitivity_analysis()` gains a `degenerate` flag for the same reason. A
+  ranking that never separated the alternatives cannot be changed by
+  perturbing a weight, so every check passed and `stable` came back `TRUE`:
+  the strongest robustness signal the function can give, produced by the
+  weakest result it can be handed. `print()` now leads with "No result to
+  test" instead of "Stable" in that case.
+
+## Data quality
+
+* `quality_report()` counted only columns matching a bare item id, and
+  multi-column items never post under those, so every expansion column was
+  invisible to the missingness check. A respondent who skipped an entire
+  pairwise battery was reported at 0 percent missing. Expansion columns now
+  count as item data, which brings matrix, ranking, multi-select, and the 2
+  decision item types into the missingness figures for the first time.
+  **Reported missingness rates will change for any instrument using those
+  item types**, because columns that were silently excluded are now counted.
+  Straight-lining and timing are unaffected: straight-lining runs over
+  declared scales, and timing is measured on the clock.
+
+## Bundled demo data
+
+* Both bundled demo instruments wired their seminr block to a `cb_sem`
+  model, so `sframe_demo_data()` generated PLS-SEM syntax from a
+  covariance-based model, and every vignette and example loading it
+  inherited the same mismatch. Each demo now carries a real `pls_sem`
+  model with composite constructs. The instrument hashes changed with it.
+
+## Decision analysis
+
+* All 10 MCDM methods now return a citation. Previously only TOPSIS and
+  AHP had one. Every reference was checked against the publication record.
+* `sframe_decision_options()` documents PROMETHEE's preference functions
+  and records why the default is `"usual"`, Brans and Vincke's type I step
+  function, rather than the linear function that several other
+  implementations default to. The difference is material: net flows always
+  differ between the 2 functions, and the ranking itself changed in 226 of
+  400 randomly drawn 4-alternative by 3-criterion matrices.
+
 # surveyframe 0.3.4
 
 This release completes the plotting, interface, statistics, and reporting
