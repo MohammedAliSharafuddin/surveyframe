@@ -54,15 +54,43 @@ data.frame(
 Every bundled instrument must still hash to what it stores. If this fails,
 every stored `.sframe` file moved with it, and the hash stops being the
 instrument's identity.
+
+There is **no `$integrity` element** on an `sframe` object. The hash lives
+inside the `.sframe` file's JSON, and `read_sframe()` verifies it on the way
+in. An earlier draft of this chunk compared `hotel$integrity$hash` against
+itself, which is `identical(NULL, NULL)`, reads `match` whatever the package
+does, and proves nothing. File `16` section 6 covers the round trip in full.
 :::
 
 ```{r}
 #| label: hash
+stored_hash <- function(path)
+  jsonlite::fromJSON(paste(readLines(path, warn = FALSE), collapse = "\n"),
+                     simplifyVector = FALSE)$hash$value
+
+src <- sf_fixture("hotel_supplier_mcdm.sframe")
+rewritten <- tempfile(fileext = ".sframe")
+write_sframe(hotel, rewritten, overwrite = TRUE)
+
+tampered <- sub("Hotel supplier selection", "Hotel supplier choice",
+                paste(readLines(src, warn = FALSE), collapse = "\n"))
+p_bad <- tempfile(fileext = ".sframe")
+writeLines(tampered, p_bad)
+
 tab <- compare_table(
-  compare_row("bundled instrument hashes to its stored value",
-              identical(hotel$integrity$hash,
-                        read_sframe(sf_fixture("hotel_supplier_mcdm.sframe"))$integrity$hash),
-              1, "read_sframe() twice", tol = 0)
+  compare_row("the bundled file verifies on read",
+              as.numeric(!inherits(tryCatch(read_sframe(src),
+                                            error = function(e) e), "error")),
+              1, "read_sframe()", tol = 0),
+  compare_row("rewriting it reproduces the hash it already carried",
+              as.numeric(stored_hash(src) == stored_hash(rewritten)), 1,
+              "the shipped file's own stored value", tol = 0),
+  # The mutation check. Without it the 2 rows above only show a constant
+  # equals itself.
+  compare_row("an edited copy is rejected",
+              as.numeric(!inherits(tryCatch(read_sframe(p_bad),
+                                            error = function(e) e), "error")),
+              0, "the integrity check fires", tol = 0)
 )
 compare_report(tab, caption = "Hash gate")
 sf_log(tab)

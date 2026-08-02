@@ -1073,12 +1073,19 @@ Three consequences.
    furniture crosses it on structure alone, and `quality_report()` flags
    respondents who answered everything. A user acting on that drops good
    cases.
-3. **The 2 collection routes disagree on the shape of a response file.**
-   The static template's serialiser skips display-only items
-   (`inst/static_survey/template.html:1053`), so the same instrument
-   collected 2 ways produces 2 different column sets. That is the same class
-   of route mismatch 0.4.0 already fixed once for matrix, ranking, and
-   multi-select.
+3. **The Shiny route is the odd one out of 3.** Checked while writing review
+   file 16, on 1 heading plus 2 numeric items:
+
+       Google Sheets EXPECTED_COLUMNS : respondent_id started_at
+                                        submitted_at q1 q2
+       static HTML serialiser         : skips display-only items
+       Shiny collector columns        : started_at submitted_at h1 q1 q2
+
+   So 2 of the 3 collection routes already agree that a heading is not a
+   column, and the Apps Script the package generates would drop `h1` on
+   arrival because it is not in its expected set. Only the Shiny collector
+   writes it. That is the same class of route mismatch 0.4.0 already fixed
+   once for matrix, ranking, and multi-select.
 
 `read_responses()` already knows the distinction: it carries
 `display_only_types` at `R/read_responses.R:76`. `render_survey.R:56`

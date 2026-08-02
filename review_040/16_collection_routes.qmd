@@ -1,0 +1,649 @@
+---
+title: "16. Collection routes and branching"
+subtitle: "Static HTML, Shiny, Google Sheets, conditional logic, and the serialisation round trip"
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    embed-resources: true
+editor: visual
+execute:
+  warning: false
+  message: false
+  error: true
+---
+
+```{r}
+#| label: setup
+#| include: false
+source("_setup.R")
+```
+
+Every other file in this suite runs `sf_both_routes()` and moves on. This one
+stops and looks at the routes themselves.
+
+surveyframe can collect responses 3 ways: a self-contained HTML file you host
+anywhere, a Shiny app, and a Google Sheet with a generated Apps Script
+endpoint. All 3 must produce a response file the package can read back, with
+the same columns, or an instrument means something different depending on how
+it was fielded. 0.4.0 fixed one such mismatch already, and this file checks
+whether any remain.
+
+## 1. Questionnaire, with conditional logic
+
+```{r}
+#| label: build
+travel <- sf_instrument(
+  title = "Commuting survey", version = "1.0.0",
+  components = list(
+    sf_choices("yn", c("yes", "no"), c("Yes", "No")),
+    sf_choices("modes", c("car", "bus", "train", "bike", "walk"),
+               c("Car", "Bus", "Train", "Bicycle", "On foot")),
+
+    sf_item("intro", "About your journey to work", type = "section_break",
+            section_intro = "Six questions, about 2 minutes."),
+
+    sf_item("drives", "Do you drive to work?", type = "single_choice",
+            choice_set = "yn", required = TRUE),
+    sf_item("miles",  "Roughly how many miles do you drive each week?",
+            type = "numeric"),
+    sf_item("why",    "What stops you driving?", type = "text"),
+    sf_item("age",    "How old are you?", type = "numeric"),
+    sf_item("young",  "Do you hold a provisional licence?",
+            type = "single_choice", choice_set = "yn"),
+    sf_item("used",   "Which of these have you used this month?",
+            type = "multiple_choice", choice_set = "modes"),
+
+    # Four branch rules, covering 4 of the 7 operators.
+    sf_branch("miles", depends_on = "drives", operator = "==",
+              value = "yes", action = "show"),
+    sf_branch("why",   depends_on = "drives", operator = "==",
+              value = "no",  action = "show"),
+    sf_branch("young", depends_on = "age", operator = "<",
+              value = 25, action = "show")
+  ),
+  analysis_plan = list(
+    list(id = "RQ1", research_question = "How many people drive to work?",
+         family = "descriptive", method = "frequency",
+         roles = list(variable = "drives")),
+    list(id = "RQ2", research_question =
+           "Among drivers, how far do they drive?",
+         family = "descriptive", method = "descriptives",
+         roles = list(variables = "miles"))
+  )
+)
+travel
+```
+
+```{r}
+#| label: build-branches
+data.frame(
+  item       = vapply(travel$branching, function(b) b$item_id, character(1)),
+  depends_on = vapply(travel$branching, function(b) b$depends_on, character(1)),
+  operator   = vapply(travel$branching, function(b) b$operator, character(1)),
+  value      = vapply(travel$branching, function(b) as.character(b$value),
+                      character(1)),
+  action     = vapply(travel$branching, function(b) b$action, character(1)),
+  row.names = NULL
+)
+```
+
+::: callout-note
+## Branches live in `$branching`, not `$branches`
+
+Worth knowing before you go looking. The slot is `$branching`, and
+`sframe_branch_lookup()` is the accessor the collectors use.
+:::
+
+## 2. The column contract, and whether the 3 routes agree on it
+
+```{r}
+#| label: contract
+sf_columns(travel)
+```
+
+```{r}
+#| label: contract-static
+f_static <- tempfile(fileext = ".html")
+suppressMessages(export_static_survey(travel, output_path = f_static,
+                                      open = FALSE, overwrite = TRUE))
+html <- paste(readLines(f_static, warn = FALSE), collapse = "\n")
+c(file = f_static, kb = round(file.size(f_static) / 1024, 1))
+```
+
+```{r}
+#| label: contract-sheets
+gdir <- tempfile(); dir.create(gdir)
+suppressMessages(export_google_sheet(
+  travel, sheet_url = "https://docs.google.com/spreadsheets/d/EXAMPLE/edit",
+  output_dir = gdir))
+gs <- readLines(file.path(gdir, "surveyframe_collector.gs"))
+expected_line <- grep("^const EXPECTED_COLUMNS", gs, value = TRUE)
+sheet_cols <- strsplit(gsub('.*\\[|\\].*|"', "", expected_line), ",")[[1]]
+sheet_cols
+```
+
+```{r}
+#| label: contract-shiny
+rt <- sf_shiny_roundtrip(travel, list(
+  drives = "yes", miles = 140, why = "", age = 41, young = "no",
+  used = c("car", "train")), n = 1)
+shiny_cols <- names(rt$collected)
+shiny_cols
+```
+
+```{r}
+#| label: contract-cmp
+declared <- sf_columns(travel)$column
+meta     <- c("respondent_id", "started_at", "submitted_at")
+sheet_items <- setdiff(sheet_cols, meta)
+shiny_items <- setdiff(shiny_cols, meta)
+
+tab <- compare_table(
+  compare_row("Google Sheets writes every declared column",
+              sum(!declared %in% sheet_items), 0,
+              "the generated Apps Script"),
+  compare_row("Shiny writes every declared column",
+              sum(!declared %in% shiny_items), 0,
+              "sframe_response_row()"),
+  compare_row("static HTML carries every declared item id",
+              sum(!vapply(sf_collecting_items(travel), function(i)
+                grepl(i$id, html, fixed = TRUE), logical(1))), 0,
+              "the exported page"),
+  compare_row("Google Sheets writes nothing extra",
+              length(setdiff(sheet_items, declared)), 0,
+              "the generated Apps Script")
+)
+compare_report(tab, caption = "Do the 3 routes cover the contract?")
+sf_log(tab)
+```
+
+```{r}
+#| label: contract-extra
+# The other direction: does any route write a column the instrument never
+# promised? This is where the routes stop agreeing.
+data.frame(
+  route = c("Google Sheets", "Shiny"),
+  extra_columns = c(
+    paste(setdiff(sheet_items, declared), collapse = ", ") %||% "",
+    paste(setdiff(shiny_items, declared), collapse = ", ")),
+  row.names = NULL
+)
+```
+
+```{r}
+#| label: contract-extra-cmp
+# These rows record the fourth finding as it stands, so they read `match`
+# while the defect is present and would flip to DIFFERS once it is fixed.
+display_only <- vapply(
+  Filter(function(i) i$type %in% c("section_break", "text_block"),
+         travel$items), function(i) i$id, character(1))
+
+tab <- compare_table(
+  compare_row("Shiny writes a column for the section break",
+              sum(display_only %in% shiny_items), length(display_only),
+              "DEFECT, sframe_response_row()"),
+  compare_row("Google Sheets does not",
+              sum(display_only %in% sheet_items), 0,
+              "the generated Apps Script excludes it"),
+  compare_row("the static serialiser does not either",
+              as.numeric(grepl(
+                "item.type==='section_break'||item.type==='text_block')return",
+                html, fixed = TRUE)), 1,
+              "inst/static_survey/template.html"),
+  compare_row("so 2 of the 3 routes agree and 1 does not",
+              length(setdiff(shiny_items, sheet_items)), length(display_only),
+              "DEFECT, the disagreement measured")
+)
+compare_report(tab, caption = "Where the 3 routes disagree")
+sf_log(tab)
+```
+
+::: callout-important
+## Fourth finding, logged in `dogfeed.todo.md`
+
+A `section_break` collects nothing, and 2 of the 3 routes already treat it
+that way. The Apps Script generated by `export_google_sheet()` does not list
+it in `EXPECTED_COLUMNS`, so a Shiny-collected row posted to that endpoint
+would have the column dropped on arrival. `quality_report()` meanwhile counts
+the Shiny column as item data, so every respondent carries a missing rate
+having skipped nothing. File `02`, section 11 measures that half of it.
+
+Needs an owner decision. The rows above are written so they will flip to
+`DIFFERS` when it is fixed, which is the signal to rewrite this section.
+:::
+
+## 3. Branching, on both live routes
+
+```{r}
+#| label: branch-shiny
+# The same instrument, 3 respondents whose answers send them down different
+# paths. Every input is supplied every time, so anything that comes back NA
+# came back NA because the branch hid it.
+paths <- list(
+  driver     = list(drives = "yes", miles = 140, why = "no reason",
+                    age = 41, young = "no", used = c("car")),
+  non_driver = list(drives = "no",  miles = 999, why = "no car",
+                    age = 38, young = "no", used = c("bus", "train")),
+  young_one  = list(drives = "no",  miles = 999, why = "learning",
+                    age = 19, young = "yes", used = c("bike"))
+)
+collected <- do.call(rbind, lapply(names(paths), function(nm) {
+  row <- sf_shiny_roundtrip(travel, paths[[nm]], n = 1)$collected
+  cbind(path = nm, row[, c("drives", "miles", "why", "age", "young")])
+}))
+collected
+```
+
+```{r}
+#| label: branch-cmp
+g <- function(path, col) collected[[col]][collected$path == path]
+
+tab <- compare_table(
+  compare_row("driver: miles kept", as.numeric(g("driver", "miles")), 140,
+              "drives == yes shows miles"),
+  compare_row("driver: why hidden",
+              as.numeric(is.na(g("driver", "why"))), 1,
+              "drives == yes hides why"),
+  compare_row("non-driver: miles hidden",
+              as.numeric(is.na(g("non_driver", "miles"))), 1,
+              "drives == no hides miles"),
+  compare_row("non-driver: why kept",
+              as.numeric(!is.na(g("non_driver", "why"))), 1,
+              "drives == no shows why"),
+  compare_row("age 41: young hidden",
+              as.numeric(is.na(g("driver", "young"))), 1,
+              "age < 25 is false"),
+  compare_row("age 19: young kept",
+              as.numeric(!is.na(g("young_one", "young"))), 1,
+              "age < 25 is true"),
+  compare_row("the unconditional item is never hidden",
+              sum(is.na(collected$age)), 0,
+              "age has no branch rule")
+)
+compare_report(tab, caption = "Branching on the Shiny route")
+sf_log(tab)
+```
+
+-   [ ] An answer supplied for a hidden item is **discarded**, not stored.
+    That is the behaviour you want: a respondent who never saw the question
+    must not have an answer to it in the file.
+-   [ ] The numeric `<` operator works on a numeric answer. Branch values
+    are stored as declared, so a string comparison here would silently show
+    the item to everybody.
+
+```{r}
+#| label: branch-static
+# The static page evaluates the same rules in the browser. The rules have to
+# reach the file for that to happen.
+tab <- compare_table(
+  compare_row("branch rules reach the exported page",
+              sum(vapply(travel$branching, function(b)
+                grepl(sprintf('"item_id":"%s"', b$item_id), html,
+                      fixed = TRUE), logical(1))), length(travel$branching),
+              "one check per rule"),
+  compare_row("the depends_on item is named in the page",
+              as.numeric(grepl('"depends_on":"drives"', html, fixed = TRUE)),
+              1, "the exported page"),
+  # The `<` operator is JSON-escaped to < on the way out, which is
+  # correct and is what stops it being read as the start of a tag when the
+  # JSON sits inside a <script> block. Grepping for a literal "<" here
+  # returns nothing and looks like the operator was dropped.
+  compare_row("the numeric operator survives the export",
+              as.numeric(grepl('"operator":"\\\\u003c"', html)), 1,
+              "the exported page, JSON-escaped"),
+  compare_row("and its value is still a number, not a string",
+              as.numeric(grepl('"value":25', html, fixed = TRUE)), 1,
+              "the exported page")
+)
+compare_report(tab, caption = "Branching reaches the static route")
+sf_log(tab)
+```
+
+-   [ ] **Open the exported page** and check by hand. Answer "No" to the
+    driving question and confirm the mileage question disappears and the
+    "what stops you" question appears. Then enter an age under 25 and
+    confirm the licence question appears. Reading the JSON is not the same
+    as watching it work.
+
+```{r}
+#| label: branch-path
+f_static
+```
+
+## 4. The Google Sheets route
+
+```{r}
+#| label: sheets-script
+cat(paste(head(gs, 22), collapse = "\n"))
+```
+
+```{r}
+#| label: sheets-cmp
+tab <- compare_table(
+  compare_row("the target sheet URL is written into the script",
+              as.numeric(any(grepl("EXAMPLE", gs))), 1,
+              "the sheet_url argument"),
+  compare_row("the script has a doPost handler",
+              as.numeric(any(grepl("function doPost", gs))), 1,
+              "an Apps Script web app needs one"),
+  compare_row("it caps the POST body size",
+              as.numeric(any(grepl("MAX_BODY_CHARS", gs))), 1,
+              "a public endpoint needs a limit"),
+  compare_row("it writes a header row from the expected columns",
+              as.numeric(any(grepl("appendRow\\(EXPECTED_COLUMNS\\)", gs))),
+              1, "the generated script"),
+  compare_row("expected columns include the meta columns",
+              sum(meta %in% sheet_cols), 3,
+              "respondent_id, started_at, submitted_at"),
+  compare_row("multi-select expands in the sheet contract too",
+              sum(grepl("^used__", sheet_cols)), 5,
+              "5 travel modes offered")
+)
+compare_report(tab, caption = "The generated Apps Script")
+sf_log(tab)
+```
+
+-   [ ] The expansion columns are in the sheet contract. A collector that
+    wrote `used = "car|train"` into one cell would produce a file
+    `read_responses()` cannot read, which is the defect 0.4.0 fixed on the
+    Shiny side.
+-   [ ] **This route cannot be tested end to end here**, because it needs a
+    real Google account and a deployed web app. The generated script is
+    checked; the deployment is not. If you are fielding by this route, deploy
+    it once and post a test response before you send the link to anybody.
+
+## 5. Reading a response file back
+
+```{r}
+#| label: read-strict
+set.seed(16)
+n <- 150
+raw <- do.call(rbind, lapply(seq_len(n), function(i) {
+  drives <- sample(c("yes", "no"), 1, prob = c(0.55, 0.45))
+  age    <- sample(18:64, 1)
+  sf_shiny_roundtrip(travel, list(
+    drives = drives, miles = sample(20:300, 1), why = "prefer the train",
+    age = age, young = sample(c("yes", "no"), 1),
+    used = sample(c("car", "bus", "train", "bike", "walk"),
+                  sample(1:3, 1))), n = 1)$collected
+}))
+dim(raw)
+```
+
+```{r}
+#| label: read-back
+dat <- read_responses(raw, travel,
+                      meta_cols = c("started_at", "submitted_at"))
+res <- run_analysis_plan(dat, travel)
+res
+```
+
+```{r}
+#| label: read-cmp
+tab <- compare_table(
+  compare_row("every row read back", nrow(dat), n, "150 were collected"),
+  compare_row("branch-hidden mileage is missing for non-drivers",
+              sum(is.na(dat$miles[dat$drives == "no"])),
+              sum(dat$drives == "no"), "every non-driver"),
+  compare_row("and present for every driver",
+              sum(is.na(dat$miles[dat$drives == "yes"])), 0,
+              "every driver saw the question"),
+  compare_row("the frequency block counts the same drivers",
+              res[["RQ1"]]$table$Frequency[res[["RQ1"]]$table$Value == "Yes"],
+              sum(dat$drives == "yes"), "base R sum()"),
+  compare_row("the descriptives block used only drivers",
+              res[["RQ2"]]$table$valid_n, sum(dat$drives == "yes"),
+              "branch-hidden rows are missing, not zero")
+)
+compare_report(tab, caption = "Reading the collected file back")
+sf_log(tab)
+```
+
+::: callout-important
+## The last row is the one that matters for analysis
+
+A branch-hidden answer is `NA`, not `0` and not an empty string. Every
+descriptive and every test treats it as missing, so the mileage mean is the
+mean among drivers rather than a mean diluted by people who do not drive. A
+collector that wrote `0` for a hidden numeric would give a plausible, wrong
+answer with no error anywhere.
+:::
+
+```{r}
+#| label: read-rejects
+# What read_responses() refuses. Strict import is the default, and it is what
+# stops a mis-shaped file being analysed as though it were fine.
+attempt <- function(x, ...) {
+  out <- tryCatch(read_responses(x, travel, ...), error = function(e) e)
+  if (inherits(out, "error")) substr(conditionMessage(out), 1, 90)
+  else sprintf("accepted, %d rows", nrow(out))
+}
+
+bad_extra <- raw; bad_extra$stray_column <- 1
+# What a rewritten header looks like: the double underscore in an expansion
+# column turned into a single one. read.csv() does this to any name
+# make.names() dislikes, and a matrix or multi-select whose option labels
+# contain spaces is the usual casualty.
+bad_names <- raw
+names(bad_names) <- sub("used__", "used_", names(bad_names))
+
+data.frame(
+  scenario = c("collector timestamps not declared as meta",
+               "an undeclared extra column",
+               "expansion columns renamed on import",
+               "the same file with strict = FALSE"),
+  result = c(
+    attempt(raw),
+    attempt(bad_extra, meta_cols = c("started_at", "submitted_at")),
+    attempt(bad_names, meta_cols = c("started_at", "submitted_at")),
+    attempt(bad_extra, meta_cols = c("started_at", "submitted_at"),
+            strict = FALSE)),
+  row.names = NULL
+)
+```
+
+```{r}
+#| label: read-rejects-cmp
+msgs <- c(attempt(raw),
+          attempt(bad_extra, meta_cols = c("started_at", "submitted_at")),
+          attempt(bad_names, meta_cols = c("started_at", "submitted_at")))
+ok <- attempt(bad_extra, meta_cols = c("started_at", "submitted_at"),
+              strict = FALSE)
+
+tab <- compare_table(
+  compare_row("all 3 mis-shaped files are rejected",
+              sum(!grepl("^accepted", msgs)), 3,
+              "strict import is the default"),
+  compare_row("strict = FALSE accepts the extra column",
+              as.numeric(grepl("^accepted", ok)), 1,
+              "the escape hatch exists"),
+  # The mutation check: a correct file must still be accepted.
+  compare_row("a correct file is still accepted",
+              as.numeric(grepl("^accepted", attempt(
+                raw, meta_cols = c("started_at", "submitted_at")))), 1,
+              "the working case")
+)
+compare_report(tab, caption = "Strict import, both directions")
+sf_log(tab)
+```
+
+-   [ ] Read the third message. `read.csv()` rewrites headers by default, so
+    `used__car` survives but a column with a character `make.names()`
+    dislikes does not. The fix is `check.names = FALSE`, and it is worth
+    knowing before you spend an afternoon on it.
+-   [ ] `strict = FALSE` is available and is not the default. That is the
+    right way round.
+
+## 6. The instrument itself round-trips
+
+0.4.0 fixed a defect where a freshly built instrument was not a
+serialisation fixed point: identical content carried 2 different hashes
+depending on whether it had been through a read. If the hash is not stable,
+it is not an identity, and the whole integrity claim goes with it.
+
+::: callout-important
+## Where the hash actually lives, and a trap that cost this review a round
+
+There is **no `$integrity` element** on an `sframe` object. A freshly built
+instrument does not carry a hash, and neither does one returned by
+`read_sframe()`. The hash exists only inside the `.sframe` file's JSON, and
+`read_sframe()` verifies it on the way in.
+
+That matters because `instrument$integrity$hash` returns `NULL` and
+`identical(NULL, NULL)` is `TRUE`. A comparison written that way reads
+`match` no matter what the package does, and proves nothing at all. The
+stored value is read out of the JSON here instead.
+:::
+
+```{r}
+#| label: hash-where
+stored_hash <- function(path)
+  jsonlite::fromJSON(paste(readLines(path, warn = FALSE), collapse = "\n"),
+                     simplifyVector = FALSE)$hash$value
+
+p1 <- tempfile(fileext = ".sframe")
+write_sframe(travel, p1, overwrite = TRUE)
+back <- read_sframe(p1)
+
+p2 <- tempfile(fileext = ".sframe")
+write_sframe(back, p2, overwrite = TRUE)
+back2 <- read_sframe(p2)
+
+p3 <- tempfile(fileext = ".sframe")
+write_sframe(back2, p3, overwrite = TRUE)
+
+c(is.null(travel$integrity), stored = substr(stored_hash(p1), 1, 16))
+```
+
+```{r}
+#| label: hash-cmp
+tab <- compare_table(
+  compare_row("write, read, write gives the same hash",
+              as.numeric(stored_hash(p1) == stored_hash(p2)), 1,
+              "the 0.4.0 fixed-point fix", tol = 0),
+  compare_row("and a third pass does not move it either",
+              as.numeric(stored_hash(p2) == stored_hash(p3)), 1,
+              "write, read, write, read, write", tol = 0),
+  compare_row("the file is byte-identical, not merely equal in hash",
+              as.numeric(identical(readLines(p1, warn = FALSE),
+                                   readLines(p2, warn = FALSE))), 1,
+              "base R readLines()", tol = 0),
+  compare_row("the items survive intact",
+              length(back$items), length(travel$items), "same instrument"),
+  compare_row("the branch rules survive intact",
+              length(back$branching), length(travel$branching),
+              "same instrument"),
+  compare_row("the analysis plan survives intact",
+              length(back$analysis_plan), length(travel$analysis_plan),
+              "same instrument"),
+  compare_row("and the conjoint and model slots are preserved",
+              length(back$designs) + length(back$models),
+              length(travel$designs) + length(travel$models),
+              "same instrument")
+)
+compare_report(tab, caption = "Serialisation is a fixed point")
+sf_log(tab)
+```
+
+::: callout-note
+## Why this was a defect worth fixing
+
+Before 0.4.0 a plan block built by `sf_instrument()` carried only what the
+caller supplied, while the reader filled in 8 further fields. So write, read,
+write changed the hash of identical content, and an instrument could carry 2
+different hashes depending on whether it had been through a read. That is a
+poor property for a value that is meant to be the instrument's identity.
+:::
+
+```{r}
+#| label: hash-mutation
+# The mutation check, in the only form that means anything here: change the
+# stored file and confirm the reader refuses it. Without this the rows above
+# only show that a constant equals itself.
+tampered <- sub('"Do you drive to work\\?"',
+                '"Do you drive to your place of work?"',
+                paste(readLines(p1, warn = FALSE), collapse = "\n"))
+p_bad <- tempfile(fileext = ".sframe")
+writeLines(tampered, p_bad)
+
+reads <- function(path, ...) as.numeric(!inherits(
+  tryCatch(read_sframe(path, ...), error = function(e) e), "error"))
+
+tab <- compare_table(
+  compare_row("the edit did change the file",
+              as.numeric(!identical(readLines(p1, warn = FALSE),
+                                    readLines(p_bad, warn = FALSE))), 1,
+              "one question reworded by hand", tol = 0),
+  compare_row("the untouched file reads",
+              reads(p1), 1, "the working case"),
+  compare_row("the edited file is rejected",
+              reads(p_bad), 0, "the integrity check fires"),
+  compare_row("and validate = FALSE does not bypass it",
+              reads(p_bad, validate = FALSE), 0,
+              "integrity is checked before validation")
+)
+compare_report(tab, caption = "The integrity check, both directions")
+sf_log(tab)
+tryCatch(read_sframe(p_bad), error = function(e) substr(conditionMessage(e), 1, 160))
+```
+
+-   [ ] Rewording one question in the stored file makes it unreadable, and
+    the message says the file may have been modified. That is the integrity
+    claim working.
+-   [ ] `validate = FALSE` does **not** turn the integrity check off. It
+    relaxes schema validation only. Worth knowing before anyone reaches for
+    it to open a file that will not load.
+
+```{r}
+#| label: hash-bundled
+# The 3 bundled instruments. If any of these stopped verifying, every stored
+# .sframe file moved with it, so this is a release gate rather than a nice
+# to have.
+fixtures <- c("hotel_supplier_mcdm.sframe",
+              "surveyframe_input_types_demo.sframe",
+              "tourism_services_demo.sframe")
+check_fixture <- function(f) {
+  src <- sf_fixture(f)
+  a <- read_sframe(src)                       # verifies the stored hash
+  q <- tempfile(fileext = ".sframe")
+  write_sframe(a, q, overwrite = TRUE)
+  c(reads = TRUE, stable = stored_hash(src) == stored_hash(q))
+}
+res_fx <- t(vapply(fixtures, check_fixture, logical(2)))
+res_fx
+```
+
+```{r}
+#| label: hash-bundled-cmp
+tab <- compare_table(
+  compare_row("all 3 bundled instruments verify on read",
+              sum(res_fx[, "reads"]), 3, "read_sframe()", tol = 0),
+  compare_row("and rewriting each one reproduces its stored hash",
+              sum(res_fx[, "stable"]), 3,
+              "the hash the file already carried", tol = 0)
+)
+compare_report(tab, caption = "The bundled-instrument hash gate")
+sf_log(tab)
+```
+
+-   [ ] The second row is the real gate. It compares each rewritten file
+    against **the hash the shipped file already carried**, so a change in the
+    serialisation format would show up here rather than being hidden by
+    rewriting both sides.
+
+## Verdict for this file
+
+```{r}
+#| label: verdict
+sf_verdict()
+```
+
+-   [ ] `0 DIFFERS, 0 CHECK`.
+-   [ ] The 3 routes cover the declared contract, and the one place they
+    disagree is the section-break column, logged as the fourth finding.
+-   [ ] Branching hides an item on both live routes and discards the answer
+    rather than storing it.
+-   [ ] Serialisation is a fixed point, for the instrument built here and
+    for all 3 bundled ones, and the hash still moves when the instrument
+    does.
