@@ -1,0 +1,522 @@
+---
+title: "11. Mediation and moderation"
+subtitle: "Indirect effects with a bootstrap interval, and interactions with simple slopes"
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    embed-resources: true
+editor: visual
+execute:
+  warning: false
+  message: false
+  error: true
+---
+
+```{r}
+#| label: setup
+#| include: false
+source("_setup.R")
+```
+
+Two questions that look similar and are not. Mediation asks **how** an effect
+travels: does workload reach burnout by way of sleep? Moderation asks **when**
+an effect holds: is the workload effect stronger for people with less
+support?
+
+Both are declared in the instrument before data exists, which matters more
+here than almost anywhere else in the package. Mediation and moderation are
+where a post-hoc search does the most damage, because with 3 numeric items
+there are 6 mediation models and 6 moderation models available and any of
+them can be reported as though it were the plan.
+
+## 1. Questionnaire and plan
+
+```{r}
+#| label: build
+work <- sf_instrument(
+  title = "Workload, sleep, and burnout", version = "1.0.0",
+  components = list(
+    sf_item("hours",   "Hours worked in a typical week", type = "numeric"),
+    sf_item("sleep",   "Hours of sleep on a typical night", type = "numeric"),
+    sf_item("support", "How supported do you feel at work? (0 to 100)",
+            type = "slider", slider_min = 0, slider_max = 100),
+    sf_item("burnout", "How burnt out do you feel? (0 to 100)",
+            type = "slider", slider_min = 0, slider_max = 100)
+  ),
+  analysis_plan = list(
+    list(id = "RQ1", research_question =
+           "Does long-hours working reach burnout by way of lost sleep?",
+         family = "model", method = "mediation",
+         roles = list(predictor = "hours", mediator = "sleep",
+                      outcome = "burnout"),
+         options = list(bootstrap = 2000)),
+    list(id = "RQ2", research_question =
+           "Is the effect of hours on burnout weaker for well-supported staff?",
+         family = "model", method = "moderation",
+         roles = list(predictor = "hours", moderator = "support",
+                      outcome = "burnout"))
+  )
+)
+work
+```
+
+```{r}
+#| label: build-check
+v <- tryCatch(validate_sframe(work), error = function(e) e)
+if (inherits(v, "error")) conditionMessage(v) else
+  list(problems = v$problems %||% "none")
+```
+
+::: callout-tip
+## The field-to-method map this file demonstrates
+
+| You have | You want | Method |
+|-------------------------|--------------------|-----------------------|
+| 3 numeric items, one on the path between the others | how the effect travels | `mediation` |
+| 3 numeric items, one changing the strength of another | when the effect holds | `moderation` |
+
+Both take 3 roles and no more. Mediation wants `predictor`, `mediator`,
+`outcome`. Moderation wants `predictor`, `moderator`, `outcome`. Swapping
+`mediator` for `moderator` in the roles list changes the question entirely
+and nothing will warn you, which is why the plan is declared up front.
+:::
+
+## 2. Both collection routes
+
+```{r}
+#| label: routes
+set.seed(11)
+sf_both_routes(work, function(i) list(
+  hours = sample(30:70, 1), sleep = round(runif(1, 4, 9), 1),
+  support = sample(0:100, 1), burnout = sample(0:100, 1)
+), n = 4)
+```
+
+-   [ ] Both routes report 4 items and the Shiny row reads back.
+
+## 3. Dummy data with a real indirect effect
+
+```{r}
+#| label: data
+set.seed(1111)
+n <- 300
+
+hours   <- round(rnorm(n, 45, 8))
+# a path: more hours, less sleep.
+sleep   <- 8.4 - 0.045 * hours + rnorm(n, 0, 0.8)
+support <- round(pmin(100, pmax(0, rnorm(n, 55, 18))))
+# b path: less sleep, more burnout. c' path: a direct effect on top.
+# And a real interaction: support blunts the hours effect.
+burnout <- 20 - 5.0 * sleep + 0.55 * hours -
+  0.012 * (hours - mean(hours)) * (support - mean(support)) +
+  rnorm(n, 0, 9)
+burnout <- round(pmin(100, pmax(0, burnout)))
+
+responses <- data.frame(hours = hours, sleep = round(sleep, 1),
+                        support = support, burnout = burnout)
+dat <- read_responses(responses, work)
+
+# The bootstrap inside sframe_run_mediation() draws from the ambient RNG, so
+# the seed is set immediately before the plan runs and again before the
+# reference bootstrap below. Without that the 2 intervals differ by sampling
+# noise and the comparison reads DIFFERS for no reason.
+set.seed(2024)
+res <- run_analysis_plan(dat, work)
+res
+```
+
+```{r}
+#| label: data-numeric
+num <- as.data.frame(lapply(dat[, c("hours", "sleep", "support", "burnout")],
+                            as.numeric))
+summary(num)
+```
+
+## 4. RQ1: mediation
+
+```{r}
+#| label: med
+r <- res[["RQ1"]]
+data.frame(
+  quantity = c("a path, hours to sleep", "b path, sleep to burnout",
+               "direct effect c prime", "indirect effect a times b",
+               "total effect c", "complete cases", "bootstrap draws"),
+  value = c(r$a_path, r$b_path, r$direct, r$indirect, r$total, r$n,
+            r$bootstrap),
+  row.names = NULL
+)
+r$apa
+```
+
+```{r}
+#| label: acc-med
+# The 3 regressions surveyframe fits internally, fitted here by hand. This
+# is the whole of the point estimate, so if any of these 4 rows disagrees
+# the mediation decomposition is wrong.
+fit_a <- lm(sleep ~ hours, data = num)
+fit_b <- lm(burnout ~ hours + sleep, data = num)
+fit_c <- lm(burnout ~ hours, data = num)
+
+a  <- coef(fit_a)[["hours"]]
+b  <- coef(fit_b)[["sleep"]]
+cp <- coef(fit_b)[["hours"]]
+ct <- coef(fit_c)[["hours"]]
+
+tab <- compare_table(
+  compare_row("a path", r$a_path, a, "base R lm(sleep ~ hours)"),
+  compare_row("b path", r$b_path, b,
+              "base R lm(burnout ~ hours + sleep)"),
+  compare_row("direct effect", r$direct, cp,
+              "base R lm(burnout ~ hours + sleep)"),
+  compare_row("total effect", r$total, ct, "base R lm(burnout ~ hours)"),
+  compare_row("indirect effect", r$indirect, a * b, "hand-multiplied"),
+  compare_row("complete cases used", r$n, sum(complete.cases(num[, c(
+    "burnout", "hours", "sleep")])), "base R complete.cases()")
+)
+compare_report(tab, caption = "RQ1 point estimates vs base R")
+sf_log(tab)
+```
+
+```{r}
+#| label: acc-med-identity
+# The decomposition identity. In ordinary least squares with no missing
+# data, total = direct + indirect exactly, not approximately. A gap here
+# would mean the 3 models were fitted on different rows, which is the
+# classic way a mediation table stops adding up.
+tab <- compare_table(
+  compare_row("total equals direct plus indirect",
+              r$total, r$direct + r$indirect, "the OLS identity"),
+  compare_row("proportion mediated", r$indirect / r$total,
+              (ct - cp) / ct, "hand-computed 2 ways"),
+  compare_row("the 3 models used the same rows",
+              nobs(fit_a), nobs(fit_b), "base R nobs()"),
+  compare_row("and the same rows as the total model",
+              nobs(fit_b), nobs(fit_c), "base R nobs()")
+)
+compare_report(tab, caption = "The decomposition adds up")
+sf_log(tab)
+```
+
+::: callout-note
+## Why the identity is checked rather than assumed
+
+`total = direct + indirect` holds in OLS only when all 3 models are fitted on
+the same rows. surveyframe drops incomplete cases once, before fitting, which
+is what makes it hold here. A package that dropped rows per model would give
+a mediation table where the parts do not sum to the whole, and it would look
+like rounding.
+:::
+
+```{r}
+#| label: acc-med-boot
+# The bootstrap interval, reproduced by a hand-written percentile bootstrap
+# using the same algorithm and the same seed. Matching to the last decimal
+# confirms the resampling is a plain non-parametric percentile bootstrap on
+# complete cases and nothing more elaborate.
+set.seed(2024)
+df <- num[complete.cases(num[, c("burnout", "hours", "sleep")]),
+          c("burnout", "hours", "sleep")]
+nb <- r$bootstrap
+reps <- numeric(nb)
+for (i in seq_len(nb)) {
+  idx <- sample.int(nrow(df), nrow(df), replace = TRUE)
+  bd  <- df[idx, , drop = FALSE]
+  reps[i] <- coef(lm(sleep ~ hours, data = bd))[["hours"]] *
+    coef(lm(burnout ~ hours + sleep, data = bd))[["sleep"]]
+}
+ref_ci <- quantile(reps, c(.025, .975))
+
+tab <- compare_table(
+  compare_row("bootstrap CI lower", r$indirect_ci[[1]], ref_ci[[1]],
+              "hand-written percentile bootstrap, same seed"),
+  compare_row("bootstrap CI upper", r$indirect_ci[[2]], ref_ci[[2]],
+              "hand-written percentile bootstrap, same seed"),
+  compare_row("draws taken", nb, 2000,
+              "options = list(bootstrap = 2000) was declared")
+)
+compare_report(tab, caption = "The bootstrap interval, reproduced")
+sf_log(tab)
+```
+
+-   [ ] The declared `bootstrap = 2000` reached the runner. If it reads
+    1000, the option was ignored and the interval is not what the plan asked
+    for.
+
+```{r}
+#| label: acc-med-sobel
+# An independent significance check that does not use the bootstrap at all.
+# Sobel's delta-method standard error is more conservative than a percentile
+# bootstrap and rests on a normality assumption the bootstrap avoids, so the
+# 2 should agree on the verdict without agreeing on the number.
+se_a <- summary(fit_a)$coefficients["hours", "Std. Error"]
+se_b <- summary(fit_b)$coefficients["sleep", "Std. Error"]
+sobel_se <- sqrt(b^2 * se_a^2 + a^2 * se_b^2)
+sobel_z  <- (a * b) / sobel_se
+sobel_p  <- 2 * pnorm(-abs(sobel_z))
+
+tab <- compare_table(
+  compare_row("bootstrap interval excludes zero",
+              as.numeric(r$indirect_ci[[1]] * r$indirect_ci[[2]] > 0), 1,
+              "both bounds on the same side of 0"),
+  compare_row("Sobel test agrees the indirect effect is non-zero",
+              as.numeric(sobel_p < 0.05), 1, "Sobel delta method"),
+  # Two negative paths multiply to a positive indirect effect: more hours
+  # costs sleep, and less sleep raises burnout, so the route through sleep
+  # adds to burnout. Reading either path's sign as the indirect effect's
+  # sign is a common slip and this row is here to catch it.
+  compare_row("the indirect effect is positive, as 2 negative paths imply",
+              as.numeric(r$indirect > 0), 1,
+              "a below 0 times b below 0"),
+  compare_row("and both paths are individually negative",
+              as.numeric(r$a_path < 0 && r$b_path < 0), 1,
+              "more hours costs sleep, less sleep raises burnout"),
+  compare_row("bootstrap interval contains the point estimate",
+              as.numeric(r$indirect > r$indirect_ci[[1]] &&
+                           r$indirect < r$indirect_ci[[2]]), 1,
+              "by construction of a percentile interval")
+)
+compare_report(tab, caption = "Two independent readings of the same effect")
+sf_log(tab)
+data.frame(sobel_z = sobel_z, sobel_p = sobel_p,
+           boot_lower = r$indirect_ci[[1]], boot_upper = r$indirect_ci[[2]],
+           row.names = NULL)
+```
+
+```{r}
+#| label: acc-med-plot
+op <- par(mfrow = c(1, 2), mar = c(4, 4, 3, 1))
+hist(reps, breaks = 40, col = "#deebf7", border = "white",
+     xlab = "Indirect effect, a times b",
+     main = sprintf("%d bootstrap draws", nb))
+abline(v = r$indirect, col = "#b2182b", lwd = 2)
+abline(v = r$indirect_ci, col = "#2166ac", lty = 2)
+abline(v = 0, col = "#404040", lty = 3)
+
+barplot(c(direct = r$direct, indirect = r$indirect, total = r$total),
+        col = c("#9ecae1", "#fdae61", "#4393c3"), border = NA,
+        ylab = "Effect on burnout per extra hour",
+        main = "The decomposition")
+abline(h = 0)
+par(op)
+```
+
+-   [ ] Every mediation number matches, including both bootstrap bounds.
+-   [ ] The dotted zero line sits outside the dashed interval. If it sits
+    inside, the APA sentence must not claim mediation.
+-   [ ] The direct and indirect bars stack to the total bar.
+
+## 5. RQ2: moderation
+
+```{r}
+#| label: mod
+r <- res[["RQ2"]]
+r$coefficients
+r$conditional_effects
+r$apa
+```
+
+```{r}
+#| label: acc-mod
+# surveyframe fits burnout ~ hours * support on the raw, uncentred
+# variables. The reference must do the same. Centring first is the more
+# common advice and gives different lower-order coefficients, so a centred
+# reference would show 2 false DIFFERS and one true match on the
+# interaction, which is a confusing way to discover the convention.
+fit_m <- lm(burnout ~ hours * support, data = num)
+cm <- summary(fit_m)$coefficients
+sc <- r$coefficients
+
+tab <- compare_table(
+  compare_row("intercept", sc["(Intercept)", "Estimate"],
+              cm["(Intercept)", "Estimate"], "base R lm(y ~ x * z)"),
+  compare_row("hours coefficient", sc["hours", "Estimate"],
+              cm["hours", "Estimate"], "base R lm(y ~ x * z)"),
+  compare_row("support coefficient", sc["support", "Estimate"],
+              cm["support", "Estimate"], "base R lm(y ~ x * z)"),
+  compare_row("interaction coefficient", sc["hours:support", "Estimate"],
+              cm["hours:support", "Estimate"], "base R lm(y ~ x * z)"),
+  compare_row("interaction standard error",
+              sc["hours:support", "Std. Error"],
+              cm["hours:support", "Std. Error"], "base R lm(y ~ x * z)"),
+  compare_row("interaction p value",
+              sc["hours:support", "Pr(>|t|)"],
+              cm["hours:support", "Pr(>|t|)"], "base R lm(y ~ x * z)"),
+  compare_row("complete cases used", r$n, nobs(fit_m), "base R nobs()")
+)
+compare_report(tab, caption = "RQ2 vs base R")
+sf_log(tab)
+```
+
+```{r}
+#| label: acc-mod-slopes
+# The conditional effects are simple slopes at the moderator's mean and one
+# standard deviation either side. Each is b_x + b_xz * z, evaluated at that
+# z. They are hand-computed here from the base R fit, so the check is on
+# surveyframe's arithmetic and on its choice of the 3 evaluation points.
+mz  <- mean(num$support)
+sdz <- sd(num$support)
+bx  <- cm["hours", "Estimate"]
+bxz <- cm["hours:support", "Estimate"]
+ce  <- r$conditional_effects
+slope_at <- function(lvl) ce$simple_slope[ce$moderator_level == lvl]
+value_at <- function(lvl) ce$moderator_value[ce$moderator_level == lvl]
+
+tab <- compare_table(
+  compare_row("low moderator value", value_at("low"), mz - sdz,
+              "mean minus 1 sd"),
+  compare_row("mean moderator value", value_at("mean"), mz, "base R mean()"),
+  compare_row("high moderator value", value_at("high"), mz + sdz,
+              "mean plus 1 sd"),
+  compare_row("simple slope at low support", slope_at("low"),
+              bx + bxz * (mz - sdz), "hand-computed from lm()"),
+  compare_row("simple slope at mean support", slope_at("mean"),
+              bx + bxz * mz, "hand-computed from lm()"),
+  compare_row("simple slope at high support", slope_at("high"),
+              bx + bxz * (mz + sdz), "hand-computed from lm()"),
+  compare_row("the slope at the mean equals the centred main effect",
+              slope_at("mean"),
+              coef(lm(burnout ~ scale(hours, scale = FALSE) *
+                        scale(support, scale = FALSE),
+                      data = num))[[2]],
+              "base R lm() on mean-centred predictors")
+)
+compare_report(tab, caption = "Simple slopes vs hand-computed")
+sf_log(tab)
+```
+
+::: callout-note
+## The last row is the one worth understanding
+
+Centring the predictors changes the lower-order coefficients but not the
+interaction. The slope reported at the moderator's mean is exactly the
+`hours` coefficient a centred model would print. That is why the 2 agree,
+and it is the quickest way to satisfy yourself that surveyframe's uncentred
+fit and the centred advice you have probably read are the same model.
+:::
+
+```{r}
+#| label: acc-mod-recovery
+# Did the interaction the simulation built in come back out? The data were
+# generated with a coefficient of -0.012 on the centred product. Centred and
+# uncentred models share the interaction term, so this is a fair comparison
+# and a loose tolerance is right for a recovery check on n = 300.
+tab <- compare_table(
+  compare_row("interaction recovered from the simulation",
+              cm["hours:support", "Estimate"], -0.012,
+              "the value the data were built with", tol = 0.01),
+  compare_row("and it is negative, as designed",
+              as.numeric(cm["hours:support", "Estimate"] < 0), 1,
+              "support blunts the hours effect"),
+  compare_row("the slope is steeper at low support than at high",
+              as.numeric(slope_at("low") > slope_at("high")), 1,
+              "what a blunting moderator means")
+)
+compare_report(tab, caption = "Recovering the simulated interaction")
+sf_log(tab)
+```
+
+-   [ ] The tolerance on the first row is loosened to 0.01, and the reason
+    is stated: it is a sampling-recovery check on 300 rows, not an
+    arithmetic check. Every other row in this file runs at 1e-6.
+
+```{r}
+#| label: acc-mod-plot
+xs <- seq(min(num$hours), max(num$hours), length.out = 50)
+cols <- c(low = "#b2182b", mean = "#404040", high = "#2166ac")
+plot(num$hours, num$burnout, pch = 16, col = "#bdbdbd66",
+     xlab = "Hours worked per week", ylab = "Burnout",
+     main = "RQ2: the hours effect at 3 levels of support")
+for (lvl in c("low", "mean", "high")) {
+  z  <- value_at(lvl)
+  b0 <- cm["(Intercept)", "Estimate"] + cm["support", "Estimate"] * z
+  lines(xs, b0 + slope_at(lvl) * xs, col = cols[[lvl]], lwd = 2)
+}
+legend("topleft", lwd = 2, col = cols, bty = "n",
+       legend = sprintf("%s support (%.0f)", names(cols),
+                        vapply(names(cols), value_at, numeric(1))))
+```
+
+-   [ ] The 3 lines fan out rather than sitting parallel. Parallel lines
+    mean no interaction, whatever the coefficient table says.
+-   [ ] The red line, low support, is the steepest.
+
+## 6. What happens when the roles are wrong
+
+A role list that names a column that is not there, or a role the method does
+not use, is the most common way one of these blocks fails. Both should say so
+rather than returning something.
+
+```{r}
+#| label: roles
+try_block <- function(roles, method) {
+  b <- list(id = "X", research_question = "Q", family = "model",
+            method = method, roles = roles)
+  out <- sframe_run_one_block(b, dat, work)
+  if (!is.null(out$error)) out$error else "returned a result"
+}
+
+data.frame(
+  scenario = c("mediation, mediator column does not exist",
+               "mediation, mediator role missing entirely",
+               "moderation, moderator column does not exist",
+               "moderation, predictor and outcome swapped"),
+  outcome = c(
+    try_block(list(predictor = "hours", mediator = "nosuch",
+                   outcome = "burnout"), "mediation"),
+    try_block(list(predictor = "hours", outcome = "burnout"), "mediation"),
+    try_block(list(predictor = "hours", moderator = "nosuch",
+                   outcome = "burnout"), "moderation"),
+    try_block(list(predictor = "burnout", moderator = "support",
+                   outcome = "hours"), "moderation")
+  ),
+  row.names = NULL
+)
+```
+
+```{r}
+#| label: roles-cmp
+msgs <- c(
+  try_block(list(predictor = "hours", mediator = "nosuch",
+                 outcome = "burnout"), "mediation"),
+  try_block(list(predictor = "hours", outcome = "burnout"), "mediation"),
+  try_block(list(predictor = "hours", moderator = "nosuch",
+                 outcome = "burnout"), "moderation")
+)
+
+tab <- compare_table(
+  compare_row("all 3 bad role lists produce an error message",
+              sum(msgs != "returned a result"), 3,
+              "none should return a result"),
+  compare_row("the messages name the missing column",
+              sum(grepl("nosuch", msgs)), 2,
+              "the 2 cases where a name was given"),
+  # The mutation check: the correct role list must still work.
+  compare_row("the correct role list still returns a result",
+              as.numeric(try_block(list(predictor = "hours",
+                                        mediator = "sleep",
+                                        outcome = "burnout"),
+                                   "mediation") == "returned a result"), 1,
+              "the working case")
+)
+compare_report(tab, caption = "Bad role lists fail loudly")
+sf_log(tab)
+```
+
+-   [ ] Read the 4 messages above. The last scenario, predictor and outcome
+    swapped, is the one that **cannot** be caught: both columns exist, so it
+    returns a perfectly good answer to a question nobody asked. That is what
+    the pre-declared plan is for, and it is worth noticing that no amount of
+    validation replaces it.
+
+## Verdict for this file
+
+```{r}
+#| label: verdict
+sf_verdict()
+```
+
+-   [ ] `0 DIFFERS, 0 CHECK`.
+-   [ ] The mediation decomposition adds up, the bootstrap interval
+    reproduces exactly, and the simple slopes match a hand-computed model.
+-   [ ] Both APA sentences are usable in a write-up without editing.
