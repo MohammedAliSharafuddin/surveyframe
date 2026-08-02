@@ -279,6 +279,30 @@ test_that("summary.sframe() prints and returns invisibly", {
   expect_true(any(grepl("Scales", out)))
 })
 
+test_that("print/format/summary.sframe() surface an attached analysis plan", {
+  # A plan attached after construction (instr$analysis_plan <- list(...)) is
+  # real data (it round-trips through write_sframe()/read_sframe() and drives
+  # run_analysis_plan() correctly), but none of the three display methods
+  # mentioned it at all, making a correctly-attached plan look silently
+  # dropped. Guards against that regressing.
+  instr <- make_instrument()
+  instr$analysis_plan <- list(list(id = "RQ1", research_question = "Q?",
+                                   family = "association",
+                                   method = "correlation_pearson",
+                                   roles = list(x = "a", y = "b")))
+
+  print_out <- capture.output(print(instr))
+  expect_true(any(grepl("1 block", print_out)))
+
+  fmt <- format(instr)
+  expect_true(grepl("1 analysis block", fmt))
+
+  summary_out <- capture.output(summary(instr))
+  expect_true(any(grepl("Analysis plan: 1 block", summary_out)))
+  expect_true(any(grepl("RQ1", summary_out)))
+  expect_true(any(grepl("correlation_pearson", summary_out)))
+})
+
 # ---------------------------------------------------------------------------
 # 5. read_responses()
 # ---------------------------------------------------------------------------

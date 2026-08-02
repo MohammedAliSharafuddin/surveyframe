@@ -172,11 +172,16 @@ item_report <- function(data, instrument, scales = NULL) {
 
     scale_data <- as.data.frame(lapply(data[, cols, drop = FALSE],
                                        function(x) suppressWarnings(as.numeric(x))))
-    total_score <- rowMeans(scale_data, na.rm = TRUE)
 
     diagnostics <- lapply(cols, function(col) {
       vals      <- scale_data[[col]]
-      item_rest <- stats::cor(vals, total_score - vals, use = "complete.obs")
+      # Item-rest correlation is the item against the SUM of the other items.
+      # Subtracting the item from a rowMeans() total instead leaves roughly
+      # noise carrying the item negatively, which returns strong negative
+      # values on a highly reliable scale. Matches psych::alpha()$item.stats$r.drop.
+      rest      <- rowSums(scale_data[, setdiff(cols, col), drop = FALSE],
+                           na.rm = TRUE)
+      item_rest <- stats::cor(vals, rest, use = "complete.obs")
       col_min   <- min(vals, na.rm = TRUE)
       col_max   <- max(vals, na.rm = TRUE)
       list(

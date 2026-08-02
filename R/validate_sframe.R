@@ -63,7 +63,24 @@ validate_sframe <- function(instrument, strict = TRUE) {
   scale_ids   <- vapply(instrument$scales,   function(x) x$id, character(1))
   model_ids   <- vapply(instrument$models %||% list(), function(x) x$id %||% "", character(1))
   valid_id <- function(x) grepl("^[A-Za-z][A-Za-z0-9_]*$", x)
-  known_vars <- unique(c(item_ids, scale_ids))
+  # Analysis-plan roles may name an expansion column (item__sub, item__option,
+  # item__a__vs__b, item__crit) rather than the base item id, exactly as the
+  # builder exports them and read_responses() already accepts them. Without
+  # these a real builder export fails validation for variables that do exist.
+  known_vars <- unique(c(item_ids, scale_ids,
+                         sframe_item_expansion_columns(instrument)))
+
+  # Comparison scale per decision item, keyed by item id. Used by the
+  # analysis-plan checks below to reject a method-scale mismatch before data
+  # collection rather than at analysis time.
+  item_scales <- list()
+  for (it in instrument$items) {
+    if (identical(it$type, "pairwise_comparison")) {
+      item_scales[[it$id]] <- as.character(it$comparison_scale %||% "saaty")[1]
+    } else if (identical(it$type, "criteria_weight")) {
+      item_scales[[it$id]] <- "criteria_weight"
+    }
+  }
 
   # Duplicate item IDs
   dupes <- item_ids[duplicated(item_ids)]
@@ -123,6 +140,44 @@ validate_sframe <- function(instrument, strict = TRUE) {
       problems <- c(problems,
         paste0("Item '", item$id,
                "' is reverse = TRUE but has no scale_id."))
+    }
+    # Decision item types (v0.5). These carry their response options in
+    # comparison_items rather than a choice set, so a choice_set here means
+    # the item was built from the wrong template.
+    if (item$type %in% c("pairwise_comparison", "criteria_weight")) {
+      n_comparison <- length(item$comparison_items %||% character(0))
+      if (n_comparison < 2) {
+        problems <- c(problems,
+          paste0("Item '", item$id, "' of type '", item$type,
+                 "' needs at least 2 comparison_items."))
+      }
+      if (n_comparison > 10) {
+        problems <- c(problems,
+          paste0("Item '", item$id, "' declares ", n_comparison,
+                 " comparison_items. The maximum is 10."))
+      }
+      if (anyDuplicated(item$comparison_items %||% character(0)) > 0) {
+        problems <- c(problems,
+          paste0("Item '", item$id, "' has duplicated comparison_items."))
+      }
+      if (!is.null(item$choice_set)) {
+        problems <- c(problems,
+          paste0("Item '", item$id, "' of type '", item$type,
+                 "' must not reference a choice_set."))
+      }
+    }
+    if (identical(item$type, "pairwise_comparison") &&
+        !(item$comparison_scale %||% "saaty") %in% c("saaty", "influence")) {
+      problems <- c(problems,
+        paste0("Item '", item$id, "' has comparison_scale '",
+               item$comparison_scale,
+               "'. It must be either 'saaty' or 'influence'."))
+    }
+    if (!item$type %in% c("pairwise_comparison", "criteria_weight") &&
+        length(item$comparison_items %||% character(0)) > 0) {
+      problems <- c(problems,
+        paste0("Item '", item$id, "' of type '", item$type,
+               "' must not declare comparison_items."))
     }
   }
 
@@ -206,6 +261,44 @@ validate_sframe <- function(instrument, strict = TRUE) {
           paste(missing_refs, collapse = ", ")
         )
       )
+    }
+    # Decision-family scale compatibility, checked at design time rather than
+    # left to the runner. The 2 comparison scales are not interchangeable:
+    # AHP and ANP read reciprocal relative importance on the Saaty ratio
+    # scale, DEMATEL reads a directed 0-4 influence matrix, and a
+    # criteria-weight source must express importance rather than influence.
+    # Pairing them the wrong way round produces plausible numbers from
+    # meaningless input, so it belongs in the pre-collection contract.
+    method_id <- block_method[1]
+    roles <- if (is.list(block$roles)) block$roles else list()
+    if (nzchar(method_id) && length(item_scales) > 0) {
+      needed <- switch(
+        method_id,
+        ahp = "saaty", anp = "saaty", dematel = "influence", NULL
+      )
+      role_pairwise <- as.character(unlist(roles[["pairwise"]] %||% character(0)))
+      for (ref in role_pairwise[nzchar(role_pairwise)]) {
+        got <- item_scales[[ref]]
+        if (!is.null(needed) && !is.null(got) && !identical(got, needed)) {
+          problems <- c(problems, paste0(
+            "Analysis plan '", block_id, "' runs ", toupper(method_id),
+            " on item '", ref, "', which uses the '", got,
+            "' comparison scale. ", toupper(method_id), " needs '", needed,
+            "'."
+          ))
+        }
+      }
+      role_weights <- as.character(unlist(roles[["weights_item"]] %||% character(0)))
+      for (ref in role_weights[nzchar(role_weights)]) {
+        if (identical(item_scales[[ref]], "influence")) {
+          problems <- c(problems, paste0(
+            "Analysis plan '", block_id, "' takes criterion weights from item '",
+            ref, "', which uses the 'influence' comparison scale. Influence ",
+            "measures directed effect rather than relative importance, so it ",
+            "cannot supply weights."
+          ))
+        }
+      }
     }
   }
 

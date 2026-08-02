@@ -516,6 +516,17 @@ analysis_registry <- local({
       output = "nnet::multinom plan, odds ratios, and classification table.",
       refs = "hosmer_2013"
     ),
+    firth_logistic = list(
+      family = "regression", label = "Firth penalised logistic",
+      roles = list(
+        role("dependent", "Binary outcome", levels = "nominal"),
+        role("predictors", "Predictors", min = 1, max = 99, levels = c("nominal", "ordinal", "continuous", "scale"))
+      ),
+      show_alpha = TRUE, show_hypotheses = TRUE, show_effect_size = TRUE,
+      assumptions = c("Small sample", "Separation warning"),
+      output = "Penalised odds ratios with profile-likelihood confidence intervals. Requires the logistf package.",
+      refs = c("firth_1993", "heinze_2002")
+    ),
     mediation = list(
       family = "regression", label = "Mediation",
       roles = list(
@@ -603,6 +614,107 @@ analysis_registry <- local({
       assumptions = "Construct modes and bootstrapping",
       output = "seminr measurement, structural, bootstrap, reliability, AVE, and HTMT syntax.",
       refs = "field_2018"
+    ),
+    topsis = list(
+      family = "decision", label = "TOPSIS",
+      roles = list(
+        role("performance_items", "Performance matrix items (one per criterion)", min = 1, max = 99, levels = "matrix"),
+        role("weights_item", "Weights item", levels = c("pairwise_saaty", "criteria_weight"))
+      ),
+      show_alpha = FALSE, show_hypotheses = FALSE, show_effect_size = FALSE,
+      assumptions = c("Weights sum to 1 (renormalised if not)", "Criteria labelled benefit or cost"),
+      output = "Ranking table (alternative, score, rank) by closeness to the ideal solution.",
+      refs = "hwang_1981"
+    ),
+    vikor = list(
+      family = "decision", label = "VIKOR",
+      roles = list(
+        role("performance_items", "Performance matrix items (one per criterion)", min = 1, max = 99, levels = "matrix"),
+        role("weights_item", "Weights item", levels = c("pairwise_saaty", "criteria_weight"))
+      ),
+      show_alpha = FALSE, show_hypotheses = FALSE, show_effect_size = FALSE,
+      assumptions = c("Weights sum to 1 (renormalised if not)", "Criteria labelled benefit or cost"),
+      output = "Compromise ranking (S, R, Q) with acceptable-advantage and acceptable-stability checks.",
+      refs = character(0)
+    ),
+    moora = list(
+      family = "decision", label = "MOORA",
+      roles = list(
+        role("performance_items", "Performance matrix items (one per criterion)", min = 1, max = 99, levels = "matrix"),
+        role("weights_item", "Weights item", levels = c("pairwise_saaty", "criteria_weight"))
+      ),
+      show_alpha = FALSE, show_hypotheses = FALSE, show_effect_size = FALSE,
+      assumptions = c("Weights sum to 1 (renormalised if not)", "Criteria labelled benefit or cost"),
+      output = "Ranking table (alternative, score, rank) by the ratio system.",
+      refs = character(0)
+    ),
+    smart = list(
+      family = "decision", label = "SMART",
+      roles = list(
+        role("performance_items", "Performance matrix items (one per criterion)", min = 1, max = 99, levels = "matrix"),
+        role("weights_item", "Weights item", levels = c("pairwise_saaty", "criteria_weight"))
+      ),
+      show_alpha = FALSE, show_hypotheses = FALSE, show_effect_size = FALSE,
+      assumptions = c("Weights sum to 1 (renormalised if not)", "Criteria labelled benefit or cost"),
+      output = "Ranking table (alternative, score, rank) by normalised weighted value.",
+      refs = character(0)
+    ),
+    waspas = list(
+      family = "decision", label = "WASPAS",
+      roles = list(
+        role("performance_items", "Performance matrix items (one per criterion)", min = 1, max = 99, levels = "matrix"),
+        role("weights_item", "Weights item", levels = c("pairwise_saaty", "criteria_weight"))
+      ),
+      show_alpha = FALSE, show_hypotheses = FALSE, show_effect_size = FALSE,
+      assumptions = c("Weights sum to 1 (renormalised if not)", "Criteria labelled benefit or cost"),
+      output = "Ranking table (alternative, score, rank) by the WSM/WPM blend.",
+      refs = character(0)
+    ),
+    promethee = list(
+      family = "decision", label = "PROMETHEE II",
+      roles = list(
+        role("performance_items", "Performance matrix items (one per criterion)", min = 1, max = 99, levels = "matrix"),
+        role("weights_item", "Weights item", levels = c("pairwise_saaty", "criteria_weight"))
+      ),
+      show_alpha = FALSE, show_hypotheses = FALSE, show_effect_size = FALSE,
+      assumptions = c("Weights sum to 1 (renormalised if not)", "Criteria labelled benefit or cost"),
+      output = "Ranking table (alternative, score, rank) by net preference flow.",
+      refs = character(0)
+    ),
+    electre = list(
+      family = "decision", label = "ELECTRE I",
+      roles = list(
+        role("performance_items", "Performance matrix items (one per criterion)", min = 1, max = 99, levels = "matrix"),
+        role("weights_item", "Weights item", levels = c("pairwise_saaty", "criteria_weight"))
+      ),
+      show_alpha = FALSE, show_hypotheses = FALSE, show_effect_size = FALSE,
+      assumptions = c("Weights sum to 1 (renormalised if not)", "Criteria labelled benefit or cost"),
+      output = "Outranking relation and best-effort ranking (ELECTRE I does not always produce a total order).",
+      refs = character(0)
+    ),
+    ahp = list(
+      family = "decision", label = "AHP",
+      roles = list(role("pairwise", "Pairwise comparison item", levels = "pairwise_saaty")),
+      show_alpha = FALSE, show_hypotheses = FALSE, show_effect_size = FALSE,
+      assumptions = c("Reciprocal pairwise matrix", "Consistency ratio below 0.10 recommended"),
+      output = "Criterion weights and consistency ratio.",
+      refs = "saaty_1980"
+    ),
+    anp = list(
+      family = "decision", label = "ANP",
+      roles = list(role("pairwise", "Pairwise comparison item", levels = "pairwise_saaty")),
+      show_alpha = FALSE, show_hypotheses = FALSE, show_effect_size = FALSE,
+      assumptions = c("Reciprocal pairwise matrix", "Supermatrix must converge"),
+      output = "Limiting priority weights from the supermatrix.",
+      refs = character(0)
+    ),
+    dematel = list(
+      family = "decision", label = "DEMATEL",
+      roles = list(role("pairwise", "Influence comparison item", levels = "pairwise_influence")),
+      show_alpha = FALSE, show_hypotheses = FALSE, show_effect_size = FALSE,
+      assumptions = "Directed 0-4 influence matrix",
+      output = "Cause-effect table (prominence, relation, role) and influence map.",
+      refs = character(0)
     )
   )
 })
@@ -630,6 +742,32 @@ studio_level_meta <- function(item = NULL, scale = NULL) {
   }
   if (type %in% c("text", "textarea")) {
     return(list(level = "text", code = "TXT", type = type))
+  }
+  # Decision-family items. The 2 comparison scales get separate levels because
+  # they are not interchangeable: AHP and ANP read reciprocal Saaty importance,
+  # DEMATEL reads a directed 0-4 influence matrix, and a weights source must
+  # express importance rather than influence. The builder's varLevel() and
+  # validate_sframe() enforce the same split.
+  if (identical(type, "pairwise_comparison")) {
+    influence <- identical(item$comparison_scale %||% "saaty", "influence")
+    return(list(
+      level = if (influence) "pairwise_influence" else "pairwise_saaty",
+      code  = "PWC",
+      type  = if (influence) "influence matrix" else "pairwise comparison"
+    ))
+  }
+  if (identical(type, "criteria_weight")) {
+    return(list(level = "criteria_weight", code = "WGT", type = "criteria weights"))
+  }
+  # A matrix item is how the rated performance matrix gets collected: one
+  # matrix item per criterion, rows are the alternatives. That is what the 7
+  # ranking methods read through their performance_items role, which declares
+  # levels = "matrix". Without this branch a matrix item fell through to
+  # "identifier", so nothing ever carried the level the role wanted and the
+  # dropdown was empty for all 7 methods, leaving the whole rated-matrix path
+  # unwirable here. Same failure shape as the decision item types before A6.
+  if (identical(type, "matrix")) {
+    return(list(level = "matrix", code = "MTX", type = type))
   }
   list(level = "identifier", code = "ID", type = type)
 }
@@ -732,6 +870,16 @@ studio_validate_plan_roles <- function(method, roles) {
     cfa_lavaan_syntax = "CFA requires a saved model or construct plan; constructs with fewer than three indicators should be justified.",
     sem_lavaan_syntax = "CB-SEM requires a saved model with measurement and structural paths.",
     seminr_syntax = "PLS-SEM requires at least one construct and one structural path.",
+    topsis = ,
+    vikor = ,
+    moora = ,
+    smart = ,
+    waspas = ,
+    promethee = ,
+    electre = "Needs a performance matrix (either supplied directly or one matrix item per criterion) and a weights item or supplied weights.",
+    ahp = ,
+    anp = "Needs a pairwise comparison item (Saaty 1-9 scale) or a supplied reciprocal matrix.",
+    dematel = "Needs a pairwise comparison item using the influence (0-4) scale, or a supplied directed matrix.",
     "Review compatibility before saving."
   )
   list(valid = length(messages) == 0, messages = messages, guidance = guidance)
