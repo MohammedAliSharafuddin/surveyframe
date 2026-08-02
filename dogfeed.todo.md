@@ -1042,3 +1042,58 @@ changes numbers `item_report()` currently reports, which is the point.
 Needs an owner decision. It is a wrong-number defect in a headline
 psychometrics function, so the case for 0.4.0 is strong, but it does change
 published output and belongs in NEWS as breaking if taken.
+
+### [open] `lane: 0.4.0` — Display-only items get a response column from the Shiny collector, and it counts as missing data
+Found 2026-08-03 while writing review file 02. `section_break` and
+`text_block` collect nothing, but `sframe_response_row()`
+(`R/render_survey.R:178`) builds `plain_items` as everything that is not an
+expanding type, so both types land in `item_values` and the collector writes
+a column for each, `NA` on every row.
+
+`quality_report()` (`R/quality_report.R:265`) then counts those columns as
+item data, because `item_cols` is the union of all item ids and all
+expansion columns intersected with the data. Minimal case, 1 heading and 2
+numeric items, every respondent answering both:
+
+    Shiny collector columns : started_at submitted_at h1 q1 q2
+    h1 all NA               : TRUE
+    n_items counted         : 3   (2 items actually collect)
+    respondent miss rates   : 0.3333 0.3333 0.3333 0.3333 0.3333
+
+Mutation check: drop the `h1` column and the same 5 respondents read
+`0 0 0 0 0`. So the whole of the reported missingness is the heading.
+
+Three consequences.
+
+1. **Every respondent carries a missing rate having skipped nothing.** In
+   the 15-item instrument in review file 02 it is 8.3 percent, 2 columns of
+   24. The number is small enough to look like ordinary item non-response,
+   which is what makes it expensive.
+2. **The default flag threshold is 0.2.** An instrument with enough page
+   furniture crosses it on structure alone, and `quality_report()` flags
+   respondents who answered everything. A user acting on that drops good
+   cases.
+3. **The 2 collection routes disagree on the shape of a response file.**
+   The static template's serialiser skips display-only items
+   (`inst/static_survey/template.html:1053`), so the same instrument
+   collected 2 ways produces 2 different column sets. That is the same class
+   of route mismatch 0.4.0 already fixed once for matrix, ranking, and
+   multi-select.
+
+`read_responses()` already knows the distinction: it carries
+`display_only_types` at `R/read_responses.R:76`. `render_survey.R:56`
+knows it too, returning `FALSE` from the answerable check for both types.
+The collector and the quality report are the 2 places that do not.
+
+Suggested fix, and it looks small: exclude display-only items from
+`plain_items` in `sframe_response_row()` so the Shiny route matches the
+static route, and exclude them from `item_cols` in `quality_report()` so
+older files already carrying the columns are handled too. Both halves are
+needed, since data collected before the fix keeps its extra columns.
+
+Needs an owner decision. It changes the column set the Shiny collector
+writes, so it is breaking in the same narrow sense the matrix fix was, and
+it changes every missingness figure `quality_report()` has ever printed for
+an instrument with a heading in it. Same shape as B11, B13, and the
+assumption-report entry above: software returning something plausible
+instead of saying it has nothing to report.

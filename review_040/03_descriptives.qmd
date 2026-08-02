@@ -1,0 +1,648 @@
+---
+title: "03. Descriptives, missingness, and data quality"
+subtitle: "frequency, descriptives, scale_descriptives, missing_data, quality, outliers"
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    embed-resources: true
+editor: visual
+execute:
+  warning: false
+  message: false
+  error: true
+---
+
+```{r}
+#| label: setup
+#| include: false
+source("_setup.R")
+```
+
+Everything in this file runs before a single inferential test. It is the work
+a careful analyst does first: count the categories, describe the numbers,
+find out what is missing and whether the missingness has a pattern, and
+decide which respondents to trust.
+
+Five of the 50 analysis methods are covered here, plus 2 report functions
+that sit outside the plan. Every number is checked against base R, and the
+MCAR test is checked against `naniar` directly.
+
+## 1. Questionnaire and plan
+
+```{r}
+#| label: build
+cx <- sf_instrument(
+  title = "Customer experience survey", version = "1.0.0",
+  components = list(
+    sf_choices("region", c("north", "south", "west"),
+               c("North", "South", "West")),
+    sf_choices("agree5", as.character(1:5),
+               c("Strongly disagree", "Disagree", "Neutral", "Agree",
+                 "Strongly agree")),
+    sf_scale("sat", "Satisfaction", items = c("s1", "s2", "s3", "s4"),
+             method = "mean", min_valid = 3),
+
+    sf_item("region", "Which region do you live in?",
+            type = "single_choice", choice_set = "region", required = TRUE),
+    sf_item("spend", "Roughly how much did you spend last month, in pounds?",
+            type = "numeric"),
+    sf_item("wait",  "How many minutes did you wait to be served?",
+            type = "numeric"),
+    sf_item("s1", "The service met my expectations.", type = "likert",
+            choice_set = "agree5", scale_id = "sat"),
+    sf_item("s2", "Staff dealt with my request efficiently.", type = "likert",
+            choice_set = "agree5", scale_id = "sat"),
+    sf_item("s3", "I would use this service again.", type = "likert",
+            choice_set = "agree5", scale_id = "sat"),
+    sf_item("s4", "I would recommend it to a friend.", type = "likert",
+            choice_set = "agree5", scale_id = "sat"),
+    sf_item("attn", "For quality control, please select Disagree here.",
+            type = "likert", choice_set = "agree5"),
+
+    sf_check("attn_1", item_id = "attn", type = "attention",
+             pass_values = "2", fail_action = "flag",
+             label = "Instructed-response check")
+  ),
+  analysis_plan = list(
+    list(id = "RQ1", research_question =
+           "How are respondents distributed across the 3 regions?",
+         family = "descriptive", method = "frequency",
+         roles = list(variable = "region")),
+    list(id = "RQ2", research_question =
+           "What does spending and waiting look like?",
+         family = "descriptive", method = "descriptives",
+         roles = list(variables = c("spend", "wait"))),
+    list(id = "RQ3", research_question =
+           "What does the satisfaction scale score look like overall?",
+         family = "descriptive", method = "scale_descriptives",
+         roles = list(variables = "sat")),
+    list(id = "RQ4", research_question =
+           "What is missing, and is it missing at random?",
+         family = "descriptive", method = "missing_data",
+         roles = list(variables = c("spend", "wait", "s1", "s2", "s3",
+                                    "s4"))),
+    list(id = "RQ5", research_question =
+           "Which responses should not be trusted?",
+         family = "descriptive", method = "quality",
+         roles = list())
+  )
+)
+cx
+```
+
+```{r}
+#| label: build-check
+v <- tryCatch(validate_sframe(cx), error = function(e) e)
+if (inherits(v, "error")) conditionMessage(v) else
+  list(problems = v$problems %||% "none")
+```
+
+::: callout-tip
+## The field-to-method map this file demonstrates
+
+| You have | You want | Method |
+|-----------------------|--------------------|-------------------------|
+| any categorical item | counts and percentages | `frequency` |
+| any numeric or slider item | centre, spread, shape | `descriptives` |
+| a declared scale | the same for its score | `scale_descriptives` |
+| anything at all | what is missing and why | `missing_data` |
+| a whole response file | who to exclude | `quality` |
+
+`quality` is the only one that takes no roles. It reads the instrument.
+:::
+
+## 2. Both collection routes
+
+```{r}
+#| label: routes
+set.seed(3)
+sf_both_routes(cx, function(i) list(
+  region = sample(c("north", "south", "west"), 1),
+  spend = sample(10:200, 1), wait = sample(1:30, 1),
+  s1 = "4", s2 = "4", s3 = "5", s4 = "4", attn = "2"
+), n = 4)
+```
+
+-   [ ] Both routes report 8 data-collecting items and all 8 read back.
+
+## 3. Dummy data, built with something to find
+
+```{r}
+#| label: data
+set.seed(303)
+n <- 200
+region <- sample(c("north", "south", "west"), n, TRUE,
+                 prob = c(0.5, 0.3, 0.2))
+# Spending differs by region, so split_by has a real difference to show.
+spend <- round(rnorm(n, ifelse(region == "north", 120, 90), 30))
+# Waiting is right-skewed with a few long tails, so the outlier report and
+# the skewness figure both have something real in them.
+wait  <- round(rexp(n, 1 / 8) + 1)
+
+true_sat <- rnorm(n, 3.6, 0.7)
+lik <- function(shift) pmin(5, pmax(1, round(true_sat + shift +
+                                               rnorm(n, 0, 0.6))))
+s1 <- lik(0); s2 <- lik(0.1); s3 <- lik(-0.1); s4 <- lik(0)
+attn <- ifelse(runif(n) < 0.06, sample(c(1, 3, 4, 5), n, TRUE), 2)
+
+responses <- data.frame(
+  region = region, spend = spend, wait = wait,
+  s1 = s1, s2 = s2, s3 = s3, s4 = s4, attn = attn,
+  stringsAsFactors = FALSE
+)
+
+# 12 people skip the spending question and 6 skip a satisfaction item.
+responses$spend[seq(4, 48, by = 4)] <- NA
+responses$s2[c(7, 21, 33, 44, 55, 66)]  <- NA
+
+# 5 people straight-line the whole satisfaction block, which the quality
+# report should catch and the reliability of the scale should not.
+straight <- 101:105
+responses[straight, c("s1", "s2", "s3", "s4")] <- 4
+
+dat <- score_scales(read_responses(responses, cx), cx)
+res <- run_analysis_plan(dat, cx)
+res
+```
+
+-   [ ] All 5 blocks return a result rather than an error line.
+
+## 4. RQ1: frequency
+
+```{r}
+#| label: acc-freq
+r <- res[["RQ1"]]
+r$table
+```
+
+```{r}
+#| label: acc-freq-cmp
+# The Value column carries the choice LABEL, not the stored code, so the
+# lookup goes through the label. Indexing by code returns an empty vector
+# and every row reads CHECK.
+tb <- table(dat$region)
+f <- function(lab) r$table$Frequency[r$table$Value == lab]
+p <- function(lab) r$table$Percent[r$table$Value == lab]
+
+tab <- compare_table(
+  compare_row("count, North", f("North"), unname(tb[["north"]]),
+              "base R table()"),
+  compare_row("count, South", f("South"), unname(tb[["south"]]),
+              "base R table()"),
+  compare_row("count, West",  f("West"),  unname(tb[["west"]]),
+              "base R table()"),
+  compare_row("percent, North", p("North"),
+              round(100 * tb[["north"]] / sum(tb), 1),
+              "base R prop.table()", tol = 0.05),
+  compare_row("percentages sum to 100", sum(r$table$Percent), 100,
+              "by definition", tol = 0.1),
+  compare_row("rows counted", r$n, nrow(dat), "base R nrow()")
+)
+compare_report(tab, caption = "RQ1 vs base R")
+sf_log(tab)
+```
+
+```{r}
+#| label: acc-freq-plot
+barplot(setNames(r$table$Frequency, r$table$Value), border = NA,
+        col = c("#3182bd", "#6baed6", "#bdd7e7"),
+        ylab = "Respondents", main = "RQ1: respondents by region")
+```
+
+-   [ ] Counts and percentages match `table()`, and the percentages sum to
+    100.
+
+## 5. RQ2: descriptives
+
+```{r}
+#| label: acc-desc
+r  <- res[["RQ2"]]
+tt <- r$table
+label_of <- function(id) Filter(function(i) i$id == id, cx$items)[[1]]$label
+row_for  <- function(id) tt[tt$variable == label_of(id), ]
+sp <- dat$spend[!is.na(dat$spend)]
+wt <- dat$wait[!is.na(dat$wait)]
+
+tab <- compare_table(
+  compare_row("spend mean",    row_for("spend")$mean,   mean(sp),
+              "base R mean()"),
+  compare_row("spend sd",      row_for("spend")$sd,     sd(sp),
+              "base R sd()"),
+  compare_row("spend median",  row_for("spend")$median, median(sp),
+              "base R median()"),
+  compare_row("spend IQR",     row_for("spend")$iqr,    IQR(sp),
+              "base R IQR()"),
+  compare_row("spend min",     row_for("spend")$min,    min(sp),
+              "base R min()"),
+  compare_row("spend max",     row_for("spend")$max,    max(sp),
+              "base R max()"),
+  compare_row("spend valid n", row_for("spend")$valid_n, length(sp),
+              "base R length()"),
+  compare_row("spend missing n", row_for("spend")$missing_n,
+              sum(is.na(dat$spend)), "base R sum(is.na())"),
+  compare_row("spend standard error", row_for("spend")$se,
+              sd(sp) / sqrt(length(sp)), "hand-computed"),
+  compare_row("spend CI lower", row_for("spend")$ci_low,
+              t.test(sp)$conf.int[1], "base R t.test()"),
+  compare_row("spend CI upper", row_for("spend")$ci_high,
+              t.test(sp)$conf.int[2], "base R t.test()")
+)
+compare_report(tab, caption = "RQ2 vs base R, the spending item")
+sf_log(tab)
+```
+
+```{r}
+#| label: acc-desc-shape
+# surveyframe reports the b1 and b2 estimators, which is psych's default and
+# e1071's type 3. Passing type = 1 looks like the obvious choice and gives a
+# difference of exactly ((n-1)/n)^1.5, which is a mismatched reference and
+# not a defect. Leave the type argument off.
+tab <- compare_table(
+  compare_row("wait skewness", row_for("wait")$skewness, psych::skew(wt),
+              "psych::skew(), default type 3"),
+  compare_row("wait kurtosis", row_for("wait")$kurtosis, psych::kurtosi(wt),
+              "psych::kurtosi(), default type 3"),
+  compare_row("wait skewness, second opinion", row_for("wait")$skewness,
+              e1071::skewness(wt, type = 3), "e1071::skewness(type = 3)"),
+  compare_row("wait kurtosis, second opinion", row_for("wait")$kurtosis,
+              e1071::kurtosis(wt, type = 3), "e1071::kurtosis(type = 3)")
+)
+compare_report(tab, caption = "Shape of the waiting-time distribution")
+sf_log(tab)
+```
+
+```{r}
+#| label: acc-desc-plot
+op <- par(mfrow = c(1, 2))
+hist(sp, breaks = 20, col = "#deebf7", border = "white",
+     xlab = "Monthly spend", main = "Roughly symmetric")
+abline(v = mean(sp), col = "#b2182b", lwd = 2)
+hist(wt, breaks = 20, col = "#fee0d2", border = "white",
+     xlab = "Minutes waited", main = sprintf("Right-skewed, skew = %.2f",
+                                             row_for("wait")$skewness))
+abline(v = c(mean(wt), median(wt)), col = c("#b2182b", "#2166ac"), lwd = 2)
+par(op)
+```
+
+-   [ ] All 15 numbers match.
+-   [ ] The waiting-time histogram is visibly right-skewed and the reported
+    skewness is positive. A positive skewness on a left-leaning histogram
+    would mean the sign convention is wrong.
+
+### Split by a grouping item
+
+```{r}
+#| label: acc-desc-split
+sp_by <- descriptives_report(dat, variables = "spend", split_by = "region")
+sp_by$table[, c("variable", "group", "valid_n", "mean", "sd", "median")]
+```
+
+```{r}
+#| label: acc-desc-split-cmp
+gm <- tapply(dat$spend, dat$region, mean, na.rm = TRUE)
+gs <- tapply(dat$spend, dat$region, sd,   na.rm = TRUE)
+gt <- sp_by$table
+grp <- function(g, col) gt[[col]][gt$group == g]
+
+tab <- compare_table(
+  compare_row("north mean", grp("north", "mean"), gm[["north"]],
+              "base R tapply(mean)"),
+  compare_row("south mean", grp("south", "mean"), gm[["south"]],
+              "base R tapply(mean)"),
+  compare_row("west mean",  grp("west",  "mean"), gm[["west"]],
+              "base R tapply(mean)"),
+  compare_row("north sd",   grp("north", "sd"),   gs[["north"]],
+              "base R tapply(sd)"),
+  compare_row("group valid n sums to the ungrouped valid n",
+              sum(gt$valid_n), sum(!is.na(dat$spend)),
+              "base R sum(!is.na())")
+)
+compare_report(tab, caption = "Split-by descriptives vs tapply()")
+sf_log(tab)
+```
+
+-   [ ] Group means match `tapply()`, and the groups partition the sample
+    with nothing lost.
+-   [ ] `split_by` reports raw column names here, because it is called
+    directly rather than through the plan.
+
+### Weighted descriptives
+
+```{r}
+#| label: acc-desc-weight
+# Weights are a plain numeric column. Here they are post-stratification
+# weights that upweight the smaller regions back to an even split.
+set.seed(31)
+target <- 1 / 3
+wts <- target / prop.table(table(dat$region))[dat$region]
+dw  <- data.frame(spend = dat$spend, w = as.numeric(wts))
+dwr <- descriptives_report(dw, variables = "spend", weights = "w")
+
+ok  <- !is.na(dw$spend) & !is.na(dw$w) & dw$w >= 0
+tab <- compare_table(
+  compare_row("weighted mean", dwr$table$weighted_mean,
+              sum(dw$spend[ok] * dw$w[ok]) / sum(dw$w[ok]),
+              "hand-computed weighted mean"),
+  compare_row("weighted mean via stats::weighted.mean",
+              dwr$table$weighted_mean,
+              weighted.mean(dw$spend[ok], dw$w[ok]),
+              "stats::weighted.mean()"),
+  compare_row("the unweighted mean is unchanged", dwr$table$mean,
+              mean(dw$spend, na.rm = TRUE), "base R mean()")
+)
+compare_report(tab, caption = "Weighted mean vs its 2 references")
+sf_log(tab)
+```
+
+-   [ ] The weighted mean differs from the unweighted one, and matches both
+    references. If the 2 are identical the weights were silently dropped.
+
+## 6. RQ3: scale descriptives
+
+```{r}
+#| label: acc-scale
+r <- res[["RQ3"]]
+r$table
+```
+
+```{r}
+#| label: acc-scale-cmp
+# score_scales() computed the sat column before the plan ran. The scale
+# declares method = "mean" and min_valid = 3, so a respondent with 2 or
+# fewer answered items scores NA rather than a mean of what is left.
+items  <- dat[, c("s1", "s2", "s3", "s4")]
+valid  <- rowSums(!is.na(items))
+manual <- ifelse(valid >= 3, rowMeans(items, na.rm = TRUE), NA_real_)
+
+tab <- compare_table(
+  compare_row("scale score matches a hand-computed row mean",
+              sum(abs(dat$sat - manual), na.rm = TRUE), 0,
+              "hand-computed, honouring min_valid"),
+  compare_row("scale mean",   r$table$mean,   mean(manual, na.rm = TRUE),
+              "base R mean()"),
+  compare_row("scale sd",     r$table$sd,     sd(manual, na.rm = TRUE),
+              "base R sd()"),
+  compare_row("scale median", r$table$median, median(manual, na.rm = TRUE),
+              "base R median()"),
+  compare_row("scale valid n", r$table$valid_n, sum(!is.na(manual)),
+              "base R sum(!is.na())"),
+  compare_row("min_valid was honoured, not ignored",
+              sum(is.na(dat$sat)), sum(valid < 3),
+              "rows with fewer than 3 answered items")
+)
+compare_report(tab, caption = "RQ3 vs a hand-computed scale score")
+sf_log(tab)
+```
+
+::: callout-note
+## Why `min_valid` is checked separately
+
+Averaging whatever is present is the default in a lot of tools, and it turns
+a respondent who answered 1 of 4 items into a scale score that looks exactly
+like one who answered all 4. `min_valid = 3` is a declaration in the
+instrument, made before data existed, and the last row above is what confirms
+it survived to the score.
+:::
+
+-   [ ] The scale score is a row mean, not a row sum, matching the declared
+    `method = "mean"`.
+
+## 7. RQ4: missing data
+
+```{r}
+#| label: acc-miss
+r <- res[["RQ4"]]
+r$item_missing
+r$patterns
+```
+
+```{r}
+#| label: acc-miss-cmp
+vars <- c("spend", "wait", "s1", "s2", "s3", "s4")
+im <- r$item_missing
+g  <- function(v, col) im[[col]][im$variable == v]
+item_data <- dat[, vars, drop = FALSE]
+
+tab <- compare_table(
+  compare_row("spend missing count", g("spend", "missing_n"),
+              sum(is.na(dat$spend)), "base R sum(is.na())"),
+  compare_row("spend missing rate",  g("spend", "missing_pct"),
+              mean(is.na(dat$spend)), "base R mean(is.na())"),
+  compare_row("s2 missing count",    g("s2", "missing_n"),
+              sum(is.na(dat$s2)), "base R sum(is.na())"),
+  compare_row("wait missing count",  g("wait", "missing_n"),
+              sum(is.na(dat$wait)), "base R sum(is.na())"),
+  compare_row("listwise n", r$deletion$listwise_n,
+              sum(complete.cases(item_data)), "base R complete.cases()"),
+  compare_row("pairwise n, spend with s2",
+              r$deletion$pairwise_n$spend[["s2"]],
+              sum(!is.na(dat$spend) & !is.na(dat$s2)),
+              "hand-computed pairwise count"),
+  compare_row("complete-case pattern count",
+              r$patterns$n[r$patterns$description ==
+                             "Complete case (no missing items)"],
+              sum(complete.cases(item_data)), "base R complete.cases()"),
+  compare_row("patterns account for every row", sum(r$patterns$n), nrow(dat),
+              "base R nrow()")
+)
+compare_report(tab, caption = "RQ4 vs base R")
+sf_log(tab)
+```
+
+```{r}
+#| label: acc-miss-mcar
+# Little's MCAR test is a thin wrapper on naniar, so this row checks the
+# wiring rather than the arithmetic: that surveyframe passes the right
+# columns and reports the number it gets back unchanged.
+num <- as.data.frame(lapply(item_data, function(z)
+  suppressWarnings(as.numeric(z))))
+nt <- naniar::mcar_test(num)
+
+tab <- compare_table(
+  compare_row("MCAR chi-square", r$mcar$statistic, nt$statistic,
+              "naniar::mcar_test()"),
+  compare_row("MCAR df",         r$mcar$df,        nt$df,
+              "naniar::mcar_test()"),
+  compare_row("MCAR p",          r$mcar$p_value,   nt$p.value,
+              "naniar::mcar_test()")
+)
+compare_report(tab, caption = "Little's MCAR test vs naniar")
+sf_log(tab)
+r$mcar$interpretation
+```
+
+```{r}
+#| label: acc-miss-plot
+mp <- r$patterns[order(-r$patterns$n), ]
+op <- par(mar = c(4, 18, 3, 1))
+barplot(rev(head(mp$n, 6)), horiz = TRUE, las = 1, border = NA,
+        names.arg = rev(substr(head(mp$description, 6), 1, 34)),
+        col = "#9ecae1", xlab = "Respondents",
+        main = "RQ4: the 6 most common missingness patterns",
+        cex.names = 0.8)
+par(op)
+```
+
+-   [ ] All 11 missingness numbers match.
+-   [ ] The MCAR interpretation sentence agrees with the p value beside it.
+-   [ ] The pattern descriptions name items rather than printing a bit
+    string.
+
+## 8. RQ5: data quality
+
+```{r}
+#| label: acc-quality
+res[["RQ5"]]
+```
+
+```{r}
+#| label: quality-direct
+# The plan calls quality_report() with the instrument only. Called directly
+# it also takes timing and duplicate-detection columns, which a real
+# collection file has and a simulated frame has to be given.
+set.seed(9)
+q_dat <- dat
+q_dat$respondent <- sprintf("R%03d", seq_len(nrow(q_dat)))
+q_dat$respondent[c(150, 151)] <- "R001"          # 2 duplicates of row 1
+started <- Sys.time() - runif(nrow(q_dat), 200, 900)
+q_dat$started_at   <- format(started, "%Y-%m-%dT%H:%M:%SZ", tz = "UTC")
+# 4 people finish implausibly fast.
+dur <- c(rep(NA, nrow(q_dat)))
+dur <- runif(nrow(q_dat), 180, 800)
+dur[c(2, 12, 22, 32)] <- 20
+q_dat$submitted_at <- format(started + dur, "%Y-%m-%dT%H:%M:%SZ", tz = "UTC")
+
+q <- quality_report(q_dat, cx, respondent_id = "respondent",
+                    started_at = "started_at",
+                    submitted_at = "submitted_at",
+                    time_min = 60, straightline_scales = TRUE)
+q
+```
+
+```{r}
+#| label: acc-quality-cmp
+sl_rows <- which(apply(dat[, c("s1", "s2", "s3", "s4")], 1, function(row) {
+  v <- suppressWarnings(as.numeric(row))
+  sum(!is.na(v)) >= 2 && var(v, na.rm = TRUE) == 0
+}))
+attn_pass <- dat$attn == "2"
+
+tab <- compare_table(
+  compare_row("attention check, passes", q$attention$attn_1$n_pass,
+              sum(attn_pass, na.rm = TRUE), "base R sum()"),
+  compare_row("attention check, failures", q$attention$attn_1$n_fail,
+              sum(!attn_pass, na.rm = TRUE), "base R sum()"),
+  compare_row("attention pass rate", q$attention$attn_1$pass_rate,
+              mean(attn_pass, na.rm = TRUE), "base R mean()"),
+  compare_row("straight-liners on the satisfaction scale",
+              length(q$straightline$sat$flagged_rows), length(sl_rows),
+              "hand-computed row variance of 0"),
+  compare_row("straight-lining flag rate", q$straightline$sat$flag_rate,
+              length(sl_rows) / nrow(dat), "hand-computed"),
+  compare_row("duplicate respondent ids", q$duplicates$n_duplicates,
+              sum(duplicated(q_dat$respondent)), "base R duplicated()"),
+  compare_row("rows flagged as duplicates",
+              length(q$duplicates$flagged_rows),
+              sum(duplicated(q_dat$respondent) |
+                    duplicated(q_dat$respondent, fromLast = TRUE)),
+              "base R duplicated() both ways"),
+  compare_row("responses faster than 60 seconds", q$timing$n_flagged, 4,
+              "4 were planted at 20 seconds"),
+  compare_row("median completion time", q$timing$median_sec,
+              median(dur), "base R median()", tol = 1),
+  compare_row("respondents in the report", q$summary$n_respondents,
+              nrow(q_dat), "base R nrow()")
+)
+compare_report(tab, caption = "RQ5 vs hand-computed quality checks")
+sf_log(tab)
+```
+
+```{r}
+#| label: acc-quality-plot
+counts <- c(
+  attention = q$attention$attn_1$n_fail,
+  straightline = length(q$straightline$sat$flagged_rows),
+  duplicate = length(q$duplicates$flagged_rows),
+  `too fast` = q$timing$n_flagged,
+  `total flagged` = q$summary$n_flagged
+)
+op <- par(mar = c(4, 9, 3, 1))
+barplot(rev(counts), horiz = TRUE, las = 1, border = NA,
+        col = c("#b2182b", rep("#9ecae1", 4)),
+        xlab = "Respondents", main = "RQ5: why responses were flagged")
+par(op)
+```
+
+-   [ ] All 10 quality numbers match.
+-   [ ] The total flagged is **not** the sum of the categories, because one
+    respondent can fail several checks. If it is the sum, the deduplication
+    has broken.
+-   [ ] The 5 planted straight-liners were all found.
+
+::: callout-important
+## Fourth finding, logged in `dogfeed.todo.md`
+
+This instrument has no `section_break` or `text_block` item, deliberately.
+Add one and every respondent picks up a non-zero missing rate having skipped
+nothing, because the Shiny collector writes a column for display-only items
+and `quality_report()` counts it as item data. File `02`, section 11 shows
+it. Needs an owner decision.
+:::
+
+## 9. Outliers
+
+```{r}
+#| label: outliers
+o <- outlier_report(dat, variables = c("spend", "wait"))
+o$method
+head(o$table[!is.na(o$table$flagged) & o$table$flagged, ], 10)
+```
+
+```{r}
+#| label: acc-outliers
+ot <- o$table
+w_rows <- ot[ot$variable == "wait" & !is.na(ot$statistic), ]
+z_wait <- as.numeric(scale(dat$wait))
+z_wait <- z_wait[!is.na(z_wait)]
+
+tab <- compare_table(
+  compare_row("wait z-scores match scale()",
+              max(abs(sort(w_rows$statistic) - sort(z_wait))), 0,
+              "base R scale()"),
+  compare_row("wait outliers flagged at |z| > 3",
+              sum(w_rows$flagged), sum(abs(z_wait) > 3),
+              "hand-computed threshold"),
+  compare_row("threshold reported", w_rows$threshold[1], 3,
+              "the default"),
+  compare_row("one row per variable per respondent", nrow(ot),
+              2 * nrow(dat), "2 variables times the sample")
+)
+compare_report(tab, caption = "Outlier report vs base R")
+sf_log(tab)
+```
+
+```{r}
+#| label: acc-outliers-plot
+plot(dat$wait, z_wait <- as.numeric(scale(dat$wait)),
+     pch = 16, col = ifelse(abs(z_wait) > 3, "#b2182b", "#9ecae166"),
+     xlab = "Minutes waited", ylab = "z-score",
+     main = "Waiting time, flagged points in red")
+abline(h = c(-3, 3), lty = 2)
+```
+
+-   [ ] The z-scores match `scale()` exactly and the flagged points are the
+    ones above the dashed lines.
+-   [ ] `NA` rows carry `NA` in `flagged`, not `FALSE`. A missing value is
+    not evidence of a non-outlier.
+
+## Verdict for this file
+
+```{r}
+#| label: verdict
+sf_verdict()
+```
+
+-   [ ] `0 DIFFERS, 0 CHECK`.
+-   [ ] The 5 plan blocks and the 2 standalone reports all produced usable
+    output, and the APA sentences read as finished prose.

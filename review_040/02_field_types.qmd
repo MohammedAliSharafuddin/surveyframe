@@ -1,0 +1,641 @@
+---
+title: "02. Every field type"
+subtitle: "One demo of each of the 13 collecting item types, end to end"
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    embed-resources: true
+editor: visual
+execute:
+  warning: false
+  message: false
+  error: true
+---
+
+```{r}
+#| label: setup
+#| include: false
+source("_setup.R")
+```
+
+surveyframe offers 15 item types. Two of them, `section_break` and
+`text_block`, collect nothing and exist to structure the page. The other 13
+collect data, and this file builds one of each in a single instrument, sends
+it down both collection routes, and checks that what a respondent typed is
+what the package reads back.
+
+The interesting part is the **column contract**. Eight of the 13 types write
+one column under their own id. The other 5 expand into several columns, and
+the expansion name is not always the name of the Shiny input that produced
+it. That mismatch is where 0.4.0 fixed a real defect, so it is checked here
+item by item.
+
+## 1. Questionnaire
+
+```{r}
+#| label: build
+types <- sf_instrument(
+  title = "Every field type", version = "1.0.0",
+  components = list(
+    sf_choices("yn", c("yes", "no"), c("Yes", "No")),
+    sf_choices("agree5", as.character(1:5),
+               c("Strongly disagree", "Disagree", "Neutral", "Agree",
+                 "Strongly agree")),
+    sf_choices("langs", c("r", "py", "sql"), c("R", "Python", "SQL")),
+    sf_choices("region", c("north", "south", "east"),
+               c("North", "South", "East")),
+
+    # The 2 non-collecting types, included so the file covers all 15.
+    sf_item("sec1", "About your work", type = "section_break",
+            section_intro = "A few background questions first."),
+    sf_item("blurb", "Every answer below is optional.", type = "text_block"),
+
+    # The 8 single-column types.
+    sf_item("lik1", "I feel supported at work.", type = "likert",
+            choice_set = "agree5"),
+    sf_item("sc1",  "Do you work remotely?", type = "single_choice",
+            choice_set = "yn"),
+    sf_item("num1", "Years of professional experience", type = "numeric"),
+    sf_item("txt1", "Job title", type = "text",
+            placeholder = "e.g. Research Analyst"),
+    sf_item("ta1",  "Anything else you want to tell us?", type = "textarea"),
+    sf_item("dt1",  "When did you start this role?", type = "date",
+            date_min = "2015-01-01", date_max = "2026-12-31"),
+    sf_item("sl1",  "Confidence in your own data skills (0 to 100)",
+            type = "slider", slider_min = 0, slider_max = 100,
+            slider_step = 1),
+    sf_item("rt1",  "Overall rating of the training", type = "rating",
+            rating_max = 5),
+
+    # The 5 expanding types.
+    sf_item("mc1", "Which languages do you use?", type = "multiple_choice",
+            choice_set = "langs"),
+    sf_item("mx1", "Rate each service", type = "matrix",
+            choice_set = "agree5",
+            matrix_items = c("Support", "Training")),
+    sf_item("rk1", "Rank these regions, best first", type = "ranking",
+            choice_set = "region"),
+    sf_item("pw1", "Which criterion matters more, and by how much?",
+            type = "pairwise_comparison",
+            comparison_items = c("Cost", "Speed", "Quality"),
+            comparison_scale = "saaty"),
+    sf_item("cw1", "Split 100 points across the criteria",
+            type = "criteria_weight",
+            comparison_items = c("Cost", "Speed", "Quality"))
+  ),
+  analysis_plan = list(
+    list(id = "RQ1", research_question =
+           "How many people work remotely?",
+         family = "descriptive", method = "frequency",
+         roles = list(variable = "sc1")),
+    list(id = "RQ2", research_question =
+           "What do experience and confidence look like?",
+         family = "descriptive", method = "descriptives",
+         roles = list(variables = c("num1", "sl1"))),
+    list(id = "RQ3", research_question =
+           "Where are the gaps in the data?",
+         family = "descriptive", method = "missing_data",
+         roles = list(variables = c("num1", "sl1", "lik1")))
+  )
+)
+types
+```
+
+```{r}
+#| label: build-check
+# validate_sframe() aborts rather than returning when the instrument is
+# unusable, so it is wrapped. $problems is the field to read, not $errors.
+v <- tryCatch(validate_sframe(types), error = function(e) e)
+if (inherits(v, "error")) conditionMessage(v) else
+  list(problems = v$problems %||% "none")
+```
+
+-   [ ] The instrument prints 15 items and validates with no problems.
+
+## 2. What each type promises to write
+
+```{r}
+#| label: contract
+sf_columns(types)
+```
+
+```{r}
+#| label: template
+# The Shiny input name is not always the output column name. A matrix posts
+# positional inputs and writes labelled columns. Ranking and multi-select
+# post one string or vector and expand on write. Read this table before
+# writing any collection script.
+sf_answer_template(types)
+```
+
+::: callout-important
+## The trap this table exists to prevent
+
+`mx1` posts `mx1__1` and `mx1__2` but writes `mx1__Support` and
+`mx1__Training`. Guessing the input name from the column name gives a clean
+round trip full of `NA`, which looks exactly like a package bug and is not
+one.
+:::
+
+## 3. Both collection routes
+
+```{r}
+#| label: routes
+answer_one <- function(i) list(
+  lik1 = "4", sc1 = "yes", num1 = 7, txt1 = "Research Analyst",
+  ta1 = "The room was cold.", dt1 = "2021-03-15", sl1 = 62, rt1 = 4,
+  mc1 = c("r", "sql"),
+  mx1__1 = "5", mx1__2 = "3",
+  rk1 = "south|north|east",
+  pw1__Cost__vs__Speed = 3, pw1__Cost__vs__Quality = 5,
+  pw1__Speed__vs__Quality = 2,
+  cw1__Cost = 50, cw1__Speed = 30, cw1__Quality = 20
+)
+routes <- sf_both_routes(types, answer_one, n = 3)
+routes
+```
+
+```{r}
+#| label: routes-path
+# Open this in a browser and fill it in by hand. Every one of the 13 types is
+# on the page, so it is the quickest way to see the whole widget set.
+attr(routes, "path")
+```
+
+-   [ ] Both routes report 13 data-collecting items and all 13 present.
+-   [ ] `read_responses() accepted it` reads `TRUE`, and 3 rows read back.
+-   [ ] Opening the exported file shows a working widget for every type, and
+    the slider, date, and rating respect the bounds declared above.
+
+## 4. Type-specific attributes reach the exported page
+
+```{r}
+#| label: attrs
+html <- paste(readLines(attr(routes, "path"), warn = FALSE), collapse = "\n")
+has <- function(x) as.numeric(grepl(x, html, fixed = TRUE))
+
+tab <- compare_table(
+  compare_row("slider minimum 0 in the page",  has('"slider_min":0'), 1,
+              "declared slider_min"),
+  compare_row("slider maximum 100 in the page", has('"slider_max":100'), 1,
+              "declared slider_max"),
+  compare_row("rating maximum 5 in the page",  has('"rating_max":5'), 1,
+              "declared rating_max"),
+  compare_row("date lower bound in the page",  has("2015-01-01"), 1,
+              "declared date_min"),
+  compare_row("date upper bound in the page",  has("2026-12-31"), 1,
+              "declared date_max"),
+  compare_row("placeholder text in the page",
+              has("Research Analyst"), 1, "declared placeholder"),
+  compare_row("section intro in the page",
+              has("A few background questions first."), 1,
+              "declared section_intro"),
+  compare_row("matrix row labels in the page",
+              has("Support") * has("Training"), 1, "declared matrix_items"),
+  compare_row("comparison items in the page",
+              has("Cost") * has("Speed") * has("Quality"), 1,
+              "declared comparison_items")
+)
+compare_report(tab, caption = "Declared attributes vs the exported HTML")
+sf_log(tab)
+```
+
+-   [ ] Every declared attribute survives the export. A `DIFFERS` here means
+    the renderer dropped something the instrument promised.
+
+## 5. Every widget builds on the Shiny side
+
+```{r}
+#| label: widgets
+sf_shiny_widgets(types)
+```
+
+-   [ ] All 15 rows read `built`, and no row reads `ERROR`.
+-   [ ] `html_bytes` is non-trivial for every collecting item. A widget that
+    builds but is nearly empty is still a defect.
+
+::: callout-note
+## Why this is checked in R and not in a browser
+
+selectize.js replaces the real `<select>` element, so a headless browser
+reads a working dropdown as empty. That happened twice during this release
+and cost 2 rounds of investigation. The widget is inspected as an R object
+here, and the browser is only ever used to corroborate.
+:::
+
+## 6. Expansion: how many columns each type writes
+
+```{r}
+#| label: expansion
+cols <- sframe_item_expansion_columns(types)
+n_for <- function(prefix) sum(startsWith(cols, paste0(prefix, "__")))
+
+tab <- compare_table(
+  compare_row("mc1, one column per choice", n_for("mc1"), 3,
+              "3 languages offered"),
+  compare_row("mx1, one column per row",    n_for("mx1"), 2,
+              "2 matrix rows"),
+  compare_row("rk1, one column per option", n_for("rk1"), 3,
+              "3 regions to rank"),
+  compare_row("pw1, one column per pair",   n_for("pw1"), choose(3, 2),
+              "3 criteria, so 3 pairs"),
+  compare_row("cw1, one column per criterion", n_for("cw1"), 3,
+              "3 criteria"),
+  compare_row("total columns the instrument promises",
+              nrow(sf_columns(types)), 8 + 3 + 2 + 3 + 3 + 3,
+              "8 single-column items plus the 5 expansions")
+)
+compare_report(tab, caption = "Expansion column counts")
+sf_log(tab)
+```
+
+-   [ ] Each expanding type writes exactly as many columns as its
+    declaration implies.
+
+## 7. Round trip: is what was answered what is read back?
+
+```{r}
+#| label: readback
+rb <- attr(routes, "read_back")
+one <- rb[1, ]
+num <- function(col) suppressWarnings(as.numeric(one[[col]]))
+same <- function(col, expected) as.numeric(identical(as.character(one[[col]]),
+                                                     expected))
+
+tab <- compare_table(
+  compare_row("lik1, likert",        num("lik1"), 4, "posted 4"),
+  compare_row("sc1, single choice",  same("sc1", "yes"), 1, "posted yes"),
+  compare_row("num1, numeric",       num("num1"), 7, "posted 7"),
+  compare_row("txt1, text",          same("txt1", "Research Analyst"), 1,
+              "posted a job title"),
+  compare_row("ta1, textarea",       same("ta1", "The room was cold."), 1,
+              "posted free text"),
+  compare_row("dt1, date",           as.numeric(as.Date(one[["dt1"]])),
+              as.numeric(as.Date("2021-03-15")), "posted 2021-03-15"),
+  compare_row("sl1, slider",         num("sl1"), 62, "posted 62"),
+  compare_row("rt1, rating",         num("rt1"), 4,  "posted 4")
+)
+compare_report(tab, caption = "The 8 single-column types, posted vs read back")
+sf_log(tab)
+```
+
+```{r}
+#| label: readback-expanded
+tab <- compare_table(
+  # Multi-select writes a 0/1 indicator per option, not the joined string.
+  compare_row("mc1__r chosen",     num("mc1__r"),   1, "posted r"),
+  compare_row("mc1__py not chosen", num("mc1__py"), 0, "py not posted"),
+  compare_row("mc1__sql chosen",   num("mc1__sql"), 1, "posted sql"),
+  # Matrix: positional input in, labelled column out.
+  compare_row("mx1__Support from mx1__1", num("mx1__Support"), 5, "posted 5"),
+  compare_row("mx1__Training from mx1__2", num("mx1__Training"), 3,
+              "posted 3"),
+  # Ranking writes the rank position each option was given, 1 being best.
+  compare_row("rk1__south ranked first",  num("rk1__south"), 1,
+              "posted south|north|east"),
+  compare_row("rk1__north ranked second", num("rk1__north"), 2,
+              "posted south|north|east"),
+  compare_row("rk1__east ranked third",   num("rk1__east"),  3,
+              "posted south|north|east"),
+  # The 2 decision types write one column per pair or per criterion.
+  compare_row("pw1 Cost vs Speed",   num("pw1__Cost__vs__Speed"),   3,
+              "posted 3"),
+  compare_row("pw1 Cost vs Quality", num("pw1__Cost__vs__Quality"), 5,
+              "posted 5"),
+  compare_row("pw1 Speed vs Quality", num("pw1__Speed__vs__Quality"), 2,
+              "posted 2"),
+  compare_row("cw1 weights sum to 100",
+              num("cw1__Cost") + num("cw1__Speed") + num("cw1__Quality"),
+              100, "constant-sum constraint")
+)
+compare_report(tab, caption = "The 5 expanding types, posted vs read back")
+sf_log(tab)
+```
+
+-   [ ] All 20 round-trip values match. This is the 0.4.0 fix. Before this
+    release the Shiny collector pipe-joined the matrix, ranking, and
+    multi-select answers into one column and the reader could not read them
+    back at all, silently.
+-   [ ] The ranking columns hold positions, not option codes.
+
+## 8. Dummy data and the plan
+
+```{r}
+#| label: data
+set.seed(202)
+n <- 120
+langs <- c("r", "py", "sql")
+sim <- sf_shiny_roundtrip(types, function(i) {
+  order_i <- sample(c("north", "south", "east"))
+  w <- round(100 * prop.table(runif(3)))
+  list(
+    lik1 = as.character(sample(1:5, 1)),
+    sc1  = sample(c("yes", "no"), 1, prob = c(0.4, 0.6)),
+    # 8 respondents in 120 skip the experience question, so the missingness
+    # report has something real to find.
+    num1 = if (i %% 15 == 0) NA else sample(1:30, 1),
+    txt1 = sample(c("Analyst", "Manager", "Researcher"), 1),
+    ta1  = "",
+    dt1  = "2021-03-15",
+    sl1  = round(rnorm(1, 60, 15)),
+    rt1  = sample(1:5, 1),
+    mc1  = langs[runif(3) < 0.5],
+    mx1__1 = as.character(sample(1:5, 1)),
+    mx1__2 = as.character(sample(1:5, 1)),
+    rk1  = paste(order_i, collapse = "|"),
+    pw1__Cost__vs__Speed = sample(1:9, 1),
+    pw1__Cost__vs__Quality = sample(1:9, 1),
+    pw1__Speed__vs__Quality = sample(1:9, 1),
+    cw1__Cost = w[1], cw1__Speed = w[2], cw1__Quality = w[3]
+  )
+}, n = n)
+
+dat <- sim$read_back
+res <- run_analysis_plan(dat, types)
+res
+```
+
+::: callout-tip
+## This is 120 real collector rows, not a hand-made data frame
+
+The simulation drives `sframe_response_row()`, the same function the live
+Shiny collector calls, and then reads the result with `read_responses()`.
+Anything below is computed on data that took the real route.
+:::
+
+## 9. RQ1: frequency on a single-choice item
+
+```{r}
+#| label: acc-freq
+r  <- res[["RQ1"]]
+r$table
+```
+
+::: callout-note
+## The result table speaks labels, not codes
+
+`Value` holds the choice **label** (`Yes`, `No`), not the stored code
+(`yes`, `no`), and `variable` in the descriptives table below holds the item
+label rather than its id. That is the right call for a table a reader will
+paste into a write-up, and it is worth knowing before you try to index a
+result by id and get `NA`.
+:::
+
+```{r}
+#| label: acc-freq-cmp
+tb <- table(dat$sc1)
+freq_for <- function(label) r$table$Frequency[r$table$Value == label]
+pct_for  <- function(label) r$table$Percent[r$table$Value == label]
+
+tab <- compare_table(
+  compare_row("count, Yes", freq_for("Yes"), unname(tb[["yes"]]),
+              "base R table()"),
+  compare_row("count, No",  freq_for("No"),  unname(tb[["no"]]),
+              "base R table()"),
+  compare_row("percent, Yes", pct_for("Yes"),
+              round(100 * tb[["yes"]] / sum(tb), 1),
+              "base R prop.table()", tol = 0.05),
+  compare_row("percent, No", pct_for("No"),
+              round(100 * tb[["no"]] / sum(tb), 1),
+              "base R prop.table()", tol = 0.05),
+  compare_row("rows counted", r$n, nrow(dat), "base R nrow()"),
+  compare_row("counts sum to n", sum(r$table$Frequency), sum(tb),
+              "base R sum(table())")
+)
+compare_report(tab, caption = "RQ1 vs base R")
+sf_log(tab)
+```
+
+```{r}
+#| label: acc-freq-plot
+barplot(setNames(r$table$Frequency, r$table$Value),
+        col = c("#9ecae1", "#deebf7"), border = NA,
+        ylab = "Respondents", main = "RQ1: remote working")
+```
+
+-   [ ] Counts and percentages match `table()`.
+
+## 10. RQ2: descriptives on numeric and slider items
+
+```{r}
+#| label: acc-desc
+r  <- res[["RQ2"]]
+tt <- r$table
+# Rows are keyed by the item label, so look the label up rather than
+# hard-coding it. Indexing by id here returns an empty row and every
+# comparison reads CHECK.
+label_of <- function(id) {
+  it <- Filter(function(i) i$id == id, types$items)[[1]]
+  it$label
+}
+row_for <- function(id) tt[tt$variable == label_of(id), ]
+x <- suppressWarnings(as.numeric(dat$num1))
+y <- suppressWarnings(as.numeric(dat$sl1))
+
+tab <- compare_table(
+  compare_row("num1 mean",   row_for("num1")$mean,   mean(x, na.rm = TRUE),
+              "base R mean()"),
+  compare_row("num1 sd",     row_for("num1")$sd,     sd(x, na.rm = TRUE),
+              "base R sd()"),
+  compare_row("num1 median", row_for("num1")$median, median(x, na.rm = TRUE),
+              "base R median()"),
+  compare_row("num1 valid n", row_for("num1")$valid_n, sum(!is.na(x)),
+              "base R sum(!is.na())"),
+  compare_row("num1 missing n", row_for("num1")$missing_n, sum(is.na(x)),
+              "base R sum(is.na())"),
+  compare_row("sl1 mean",    row_for("sl1")$mean,    mean(y, na.rm = TRUE),
+              "base R mean()"),
+  compare_row("sl1 IQR",     row_for("sl1")$iqr,     IQR(y, na.rm = TRUE),
+              "base R IQR()")
+)
+compare_report(tab, caption = "RQ2 vs base R")
+sf_log(tab)
+```
+
+```{r}
+#| label: acc-desc-shape
+# surveyframe uses the b1 and b2 estimators, which is psych's DEFAULT and
+# e1071's type 3. Passing type = 1 here, which looks like the obvious choice
+# because it is the plain moment ratio, produces a difference of exactly
+# ((n-1)/n)^1.5 and reads as a defect. It is not one. Leave the type
+# argument off, or pass 3.
+xs <- x[!is.na(x)]
+ys <- y[!is.na(y)]
+
+tab <- compare_table(
+  compare_row("num1 skewness", row_for("num1")$skewness,
+              psych::skew(xs), "psych::skew(), default type 3"),
+  compare_row("num1 kurtosis", row_for("num1")$kurtosis,
+              psych::kurtosi(xs), "psych::kurtosi(), default type 3"),
+  compare_row("sl1 skewness",  row_for("sl1")$skewness,
+              psych::skew(ys), "psych::skew(), default type 3"),
+  compare_row("sl1 kurtosis",  row_for("sl1")$kurtosis,
+              psych::kurtosi(ys), "psych::kurtosi(), default type 3"),
+  compare_row("num1 skewness, second opinion", row_for("num1")$skewness,
+              e1071::skewness(xs, type = 3), "e1071::skewness(type = 3)"),
+  compare_row("num1 kurtosis, second opinion", row_for("num1")$kurtosis,
+              e1071::kurtosis(xs, type = 3), "e1071::kurtosis(type = 3)"),
+  compare_row("sl1 mean CI lower", row_for("sl1")$ci_low,
+              t.test(ys)$conf.int[1], "base R t.test()"),
+  compare_row("sl1 mean CI upper", row_for("sl1")$ci_high,
+              t.test(ys)$conf.int[2], "base R t.test()")
+)
+compare_report(tab, caption = "Shape and interval against psych and e1071")
+sf_log(tab)
+```
+
+```{r}
+#| label: acc-desc-types
+# The 3 conventions side by side, so the choice is visible rather than
+# implied. SPSS and SAS report type 2, so a reader reconciling surveyframe
+# against SPSS output will find a difference here and it will not be a bug.
+data.frame(
+  convention = c("type 1, plain moment ratio", "type 2, SPSS and SAS G1",
+                 "type 3, b1 (surveyframe, psych default)"),
+  num1_skewness = c(psych::skew(xs, type = 1), psych::skew(xs, type = 2),
+                    psych::skew(xs, type = 3)),
+  num1_kurtosis = c(psych::kurtosi(xs, type = 1),
+                    psych::kurtosi(xs, type = 2),
+                    psych::kurtosi(xs, type = 3)),
+  row.names = NULL
+)
+```
+
+-   [ ] All 8 rows match.
+-   [ ] **Worth knowing.** The 3 conventions differ by roughly 7 percent at
+    n = 20 and under 1 percent at n = 500. surveyframe reports type 3. The
+    help file names skewness and kurtosis without naming the estimator, so a
+    reader reconciling against SPSS will find a small gap and no way to
+    explain it from the documentation. That is a docs gap rather than a
+    wrong number.
+
+## 11. RQ3: missingness across expanding items
+
+```{r}
+#| label: acc-miss
+r <- res[["RQ3"]]
+r$item_missing
+```
+
+```{r}
+#| label: acc-miss-cmp
+im <- r$item_missing
+get <- function(v, col) im[[col]][im$variable == v]
+
+tab <- compare_table(
+  compare_row("num1 missing count", get("num1", "missing_n"),
+              sum(is.na(dat$num1)), "base R sum(is.na())"),
+  compare_row("num1 missing rate",  get("num1", "missing_pct"),
+              mean(is.na(dat$num1)), "base R mean(is.na())"),
+  compare_row("num1 valid count",   get("num1", "valid_n"),
+              sum(!is.na(dat$num1)), "base R sum(!is.na())"),
+  compare_row("lik1 missing count", get("lik1", "missing_n"),
+              sum(is.na(dat$lik1)), "base R sum(is.na())")
+)
+compare_report(tab, caption = "RQ3 vs base R")
+sf_log(tab)
+```
+
+::: callout-note
+## Fixed in 0.4.0
+
+Missingness used to count only bare item ids, so a respondent who skipped an
+entire pairwise battery or a whole matrix was reported at 0 percent missing.
+Expansion columns now count as item data, which brings matrix, ranking,
+multi-select, and both decision types into the figures for the first time.
+The check below is the one that would catch a regression.
+:::
+
+```{r}
+#| label: acc-miss-expansion
+# Blank out one whole matrix battery for one respondent, then confirm the
+# quality report sees it. Under the old behaviour this respondent's missing
+# rate did not move at all, because expansion columns were not counted.
+holed <- dat
+holed[1, c("mx1__Support", "mx1__Training")] <- NA
+q_before <- quality_report(dat,   types)
+q_after  <- quality_report(holed, types)
+n_counted <- q_after$summary$n_items
+
+tab <- compare_table(
+  compare_row("skipping a 2-row matrix raises the rate by 2 columns",
+              q_after$missing$respondent_miss[1] -
+                q_before$missing$respondent_miss[1],
+              2 / n_counted, "2 of the counted columns became NA"),
+  compare_row("the matrix columns are counted at all",
+              as.numeric("mx1__Support" %in%
+                           names(q_after$missing$item_miss_rate)), 1,
+              "expansion columns count as item data"),
+  compare_row("mx1__Support missing rate after the hole",
+              q_after$missing$item_miss_rate[["mx1__Support"]],
+              1 / nrow(dat), "1 respondent of 120"),
+  compare_row("all 5 expanding items are counted",
+              sum(vapply(c("mc1", "mx1", "rk1", "pw1", "cw1"),
+                         function(p) any(startsWith(
+                           names(q_after$missing$item_miss_rate),
+                           paste0(p, "__"))), logical(1))),
+              5, "one check per expanding type")
+)
+compare_report(tab, caption = "Skipped batteries are visible in missingness")
+sf_log(tab)
+```
+
+-   [ ] The skipped matrix moves the rate by exactly 2 columns' worth. A `0`
+    in the first row means the 0.4.0 fix has regressed.
+
+```{r}
+#| label: acc-miss-displayonly
+# Fourth finding. The counted-column set is 24, but the instrument only
+# promises 22. The 2 extras are the section break and the text block, which
+# collect nothing and are NA for everyone.
+setdiff(names(q_before$missing$item_miss_rate), sf_columns(types)$column)
+data.frame(
+  quantity = c("columns the instrument promises",
+               "columns quality_report() counts",
+               "missing rate every respondent carries before skipping anything"),
+  value = c(nrow(sf_columns(types)), q_before$summary$n_items,
+            round(min(q_before$missing$respondent_miss), 4)),
+  row.names = NULL
+)
+```
+
+::: callout-important
+## Fourth finding, logged in `dogfeed.todo.md`
+
+The Shiny collector writes a column for `section_break` and `text_block`
+items, always `NA`, and `quality_report()` then counts those columns as item
+data. Every respondent above carries a non-zero missing rate having skipped
+nothing at all. The static HTML route does not write those columns, so the 2
+routes disagree on the shape of a response file, and the default flag
+threshold of 0.2 could be crossed by page furniture alone in an instrument
+with enough headings.
+
+Nothing errors, and a missing rate of 8 percent on a real survey is entirely
+believable, which is why an owner decision is needed rather than a quiet fix.
+:::
+
+-   [ ] The 2 extra columns are `sec1` and `blurb`, and neither collects
+    anything. Confirm you agree they should not count before signing off.
+
+## 12. Quality report over the full type set
+
+```{r}
+#| label: quality
+quality_report(dat, types)
+```
+
+-   [ ] The item count matches the column contract, not the item count.
+-   [ ] Nothing is flagged that should not be, given the data was simulated
+    without straight-lining or duplicates.
+
+## Verdict for this file
+
+```{r}
+#| label: verdict
+sf_verdict()
+```
+
+-   [ ] `0 DIFFERS, 0 CHECK`.
+-   [ ] Every one of the 13 collecting types built a widget, reached the
+    exported page, and read back the value that was posted.
