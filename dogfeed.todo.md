@@ -1234,3 +1234,53 @@ either way, since that is what makes the report worth reading.
 Needs an owner decision on scope only. This changes every design any
 existing call produced, so anything already fielded from a `"balanced"`
 design should be checked for an unseen level before the fix lands.
+
+### [open] `lane: 0.4.0` — `render_results(citation_format = )` is validated and then never used
+Found 2026-08-03 while writing review file 17. The argument is documented
+with 3 values and accepted with `rlang::arg_match()`
+(`R/analysis_plan.R:1486`), and after that line it never appears again in the
+function. The 3 formats produce byte-identical documents:
+
+    apa       10449 bytes
+    ama       10449 bytes
+    vancouver 10449 bytes
+    unique documents: 1
+
+Citations do render, so the section is not empty. They come from
+`.sframe_citations` (`R/analysis_plan.R:9`), which stores one pre-formatted
+APA string per method, and there is no second form to switch to.
+
+A user who asks for Vancouver gets APA and is told nothing. `arg_match()`
+makes it worse rather than better: rejecting `"harvard"` with a helpful
+message is a strong signal that the 3 accepted values do something.
+
+Same shape as the entries above, and the reason it belongs in 0.4.0 rather
+than later: the report is the artefact that leaves the researcher's machine.
+A methods section reading "references formatted in Vancouver style" on the
+strength of this argument is a false statement in a manuscript.
+
+Two ways out, and the owner decision is which:
+
+1. **Implement the 2 other formats.** The citation store would need a
+   structured form (authors, year, title, journal) rather than a
+   pre-formatted string, so this is real work and probably 0.4.1.
+2. **Remove the argument for 0.4.0**, or reduce it to `"apa"` only, and say
+   in NEWS that the other 2 were never implemented. Cheap, honest, and
+   reversible when the structured store exists.
+
+Leaving it as is, documented and inert, is the one option that should not
+survive review.
+
+### [open] `lane: 0.4.1` — `codebook_report()` omits the item help text
+Found 2026-08-03 while writing review file 17. An item declared with
+`help = "Your best estimate is fine."` reaches the exported survey and the
+Shiny widget, and does not appear anywhere in the codebook. The codebook's
+item table carries `id`, `label`, `type`, `choice_set`, and `scale_id`.
+
+Help text is part of the question as administered. Two respondents given
+different guidance did not answer the same question, so a codebook that
+omits it is not a complete record of the instrument, and a second analyst
+working from it cannot see what respondents were told.
+
+Small and low risk: add the column, blank where no help was declared.
+Laned to 0.4.1 because nothing is wrong with what the codebook does print.

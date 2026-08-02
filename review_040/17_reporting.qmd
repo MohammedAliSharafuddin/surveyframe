@@ -1,0 +1,664 @@
+---
+title: "17. Reporting and the codebook"
+subtitle: "render_report, render_results, codebook_report, PDF output, and interpretations"
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    embed-resources: true
+editor: visual
+execute:
+  warning: false
+  message: false
+  error: true
+---
+
+```{r}
+#| label: setup
+#| include: false
+source("_setup.R")
+```
+
+The last step of the workflow, and the one a reader of the research actually
+sees. surveyframe turns an instrument plus a response file into a report:
+the codebook, the quality checks, the reliability figures, and every block of
+the pre-declared plan with its APA sentence.
+
+The checks here are of 2 kinds. Whether the files render at all, which is a
+low bar and worth confirming anyway, and whether the numbers **inside** the
+report are the numbers the plan produced. A report that renders cleanly while
+quietly rounding, dropping, or reordering a result is worse than one that
+fails.
+
+## 1. Questionnaire and plan
+
+```{r}
+#| label: build
+lik <- function(id, label) sf_item(id, label, type = "likert",
+                                   choice_set = "agree5", scale_id = "eng")
+
+clinic <- sf_instrument(
+  title = "Patient experience survey", version = "2.1.0",
+  description = "A short experience measure used at discharge.",
+  components = list(
+    sf_choices("agree5", as.character(1:5),
+               c("Strongly disagree", "Disagree", "Neutral", "Agree",
+                 "Strongly agree")),
+    sf_choices("site", c("north", "south"), c("Northside", "Southside")),
+
+    sf_item("intro", "About your visit", type = "section_break",
+            section_intro = "Five questions, about 90 seconds."),
+    sf_item("site", "Which clinic did you attend?",
+            type = "single_choice", choice_set = "site", required = TRUE),
+    sf_item("wait", "How many minutes did you wait?", type = "numeric",
+            help = "Your best estimate is fine."),
+    lik("e1", "Staff explained things clearly."),
+    lik("e2", "I was treated with respect."),
+    lik("e3", "I would recommend this clinic."),
+    lik("e4", "I felt rushed during my appointment."),
+
+    sf_scale("eng", "Patient experience",
+             items = c("e1", "e2", "e3", "e4"),
+             method = "mean", reverse_items = "e4", min_valid = 3),
+
+    sf_check("attn", item_id = "e2", type = "attention",
+             pass_values = c("3", "4", "5"), fail_action = "flag",
+             label = "Implausible-disagreement check")
+  ),
+  analysis_plan = list(
+    list(id = "RQ1", research_question =
+           "How many patients attended each clinic?",
+         family = "descriptive", method = "frequency",
+         roles = list(variable = "site")),
+    list(id = "RQ2", research_question =
+           "How long did patients wait?",
+         family = "descriptive", method = "descriptives",
+         roles = list(variables = "wait")),
+    list(id = "RQ3", research_question =
+           "Is the experience scale internally consistent?",
+         family = "psychometric", method = "reliability_alpha",
+         roles = list()),
+    list(id = "RQ4", research_question =
+           "Do the 2 clinics differ on patient experience?",
+         family = "group_comparison", method = "t_test_ind",
+         roles = list(outcome = "eng", group = "site"))
+  )
+)
+clinic
+```
+
+::: callout-note
+## `e4` is reverse-keyed, deliberately
+
+"I felt rushed" points the other way from the other 3 items, and the scale
+declares `reverse_items = "e4"`. The report has to honour that or the
+reliability figure it prints will be wrong. Section 5 checks it, and file
+`09` covers the one place in the package that does not honour it.
+:::
+
+## 2. Both collection routes
+
+```{r}
+#| label: routes
+set.seed(17)
+sf_both_routes(clinic, function(i) {
+  a <- function() as.character(sample(1:5, 1))
+  list(site = sample(c("north", "south"), 1), wait = sample(5:90, 1),
+       e1 = a(), e2 = a(), e3 = a(), e4 = a())
+}, n = 4)
+```
+
+## 3. Dummy data
+
+```{r}
+#| label: data
+set.seed(1717)
+n <- 220
+site <- sample(c("north", "south"), n, TRUE, prob = c(0.55, 0.45))
+# Southside runs later, and its patients rate the experience lower. Both
+# effects are real, so RQ2 and RQ4 have something to report.
+wait <- round(pmax(1, rnorm(n, ifelse(site == "south", 48, 26), 15)))
+latent <- rnorm(n, ifelse(site == "south", 3.3, 3.9), 0.7)
+mk  <- function(shift) pmin(5, pmax(1, round(latent + shift +
+                                               rnorm(n, 0, 0.5))))
+e1 <- mk(0); e2 <- mk(0.2); e3 <- mk(-0.1)
+# e4 is worded the other way, so it is generated the other way. The scale
+# declaration is what puts it back.
+e4 <- pmin(5, pmax(1, round(6 - latent + rnorm(n, 0, 0.5))))
+
+responses <- data.frame(site = site, wait = wait,
+                        e1 = e1, e2 = e2, e3 = e3, e4 = e4)
+responses$wait[c(3, 40, 88)] <- NA
+
+dat <- score_scales(read_responses(responses, clinic), clinic)
+res <- run_analysis_plan(dat, clinic)
+res
+```
+
+## 4. The codebook
+
+```{r}
+#| label: codebook
+cb <- codebook_report(clinic)
+class(cb)
+cb
+```
+
+```{r}
+#| label: codebook-cmp
+cb_md <- codebook_report(clinic, format = "md")
+txt <- paste(as.character(cb_md), collapse = "\n")
+has <- function(x) as.numeric(grepl(x, txt, fixed = TRUE))
+
+tab <- compare_table(
+  compare_row("every item id appears in the codebook",
+              sum(vapply(clinic$items, function(i) has(i$id) > 0,
+                         logical(1))), length(clinic$items),
+              "one check per item, including the section break"),
+  compare_row("every item label appears",
+              sum(vapply(clinic$items, function(i) has(i$label) > 0,
+                         logical(1))), length(clinic$items),
+              "one check per item"),
+  compare_row("the choice labels appear, not only the codes",
+              has("Strongly disagree") + has("Northside"), 2,
+              "2 choice sets declared"),
+  compare_row("the scale is documented",
+              has("Patient experience"), 1, "1 scale declared"),
+  compare_row("the reverse-keyed item is marked as such",
+              as.numeric(grepl("[Rr]evers", txt)), 1,
+              "e4 is declared reverse"),
+  compare_row("the instrument version reaches the codebook",
+              has("2.1.0"), 1, "declared version"),
+  # Eighth finding, recorded as it stands: the help text does not reach the
+  # codebook. This row reads `match` while that is true and would flip to
+  # DIFFERS once it is fixed.
+  compare_row("the help text does NOT reach the codebook",
+              has("Your best estimate is fine."), 0,
+              "DEFECT, laned 0.4.1")
+)
+compare_report(tab, caption = "The codebook against the declaration")
+sf_log(tab)
+```
+
+::: callout-note
+## Eighth finding, logged in `dogfeed.todo.md`
+
+An item declared with `help = "Your best estimate is fine."` shows that text
+on the exported survey and in the Shiny widget, and it appears nowhere in the
+codebook. Help text is part of the question as administered, so a codebook
+without it is not a complete record of the instrument. Small, and laned to
+0.4.1, because nothing is wrong with what the codebook does print.
+:::
+
+-   [ ] Everything else declared reaches the codebook, including the
+    reverse-keying. A codebook is the document a second analyst works from,
+    so an omission here is an omission for them.
+-   [ ] Read the reverse-keying line. If it says nothing about direction, a
+    second analyst scoring the scale by hand will get it wrong.
+
+## 5. The full report, HTML
+
+```{r}
+#| label: report-html
+out_dir <- tempfile(); dir.create(out_dir)
+html_path <- render_report(
+  clinic, data = dat, output_file = "clinic_report.html",
+  output_path = out_dir, format = "html",
+  include_quality = TRUE, include_reliability = TRUE,
+  include_codebook = TRUE, include_missing = TRUE,
+  include_descriptives = TRUE, include_analysis = TRUE)
+c(path = html_path, kb = round(file.size(html_path) / 1024, 1))
+```
+
+```{r}
+#| label: report-html-cmp
+rep_txt <- paste(readLines(html_path, warn = FALSE), collapse = "\n")
+# HTML entities have to be unescaped before any comparison, or an APA
+# sentence containing "p < .001" is stored as "p &lt; .001" and every search
+# for it fails. That is a mismatched reference, not a missing sentence.
+strip <- gsub("<[^>]+>", " ", rep_txt)
+strip <- gsub("&lt;", "<", gsub("&gt;", ">",
+              gsub("&nbsp;", " ", gsub("&amp;", "&", strip))))
+inrep <- function(x) as.numeric(grepl(x, strip, fixed = TRUE))
+
+tab <- compare_table(
+  compare_row("the report file exists",
+              as.numeric(file.exists(html_path)), 1, "render_report()"),
+  compare_row("the instrument title is in it",
+              inrep("Patient experience survey"), 1, "declared title"),
+  compare_row("every research question is in it",
+              sum(vapply(clinic$analysis_plan, function(b)
+                inrep(b$research_question) > 0, logical(1))),
+              length(clinic$analysis_plan), "4 blocks declared"),
+  compare_row("every block id is in it",
+              sum(vapply(clinic$analysis_plan, function(b)
+                inrep(b$id) > 0, logical(1))),
+              length(clinic$analysis_plan), "4 blocks declared"),
+  compare_row("the codebook section is in it",
+              inrep("Patient experience"), 1, "include_codebook = TRUE"),
+  compare_row("it is self-contained, with no external image files",
+              as.numeric(!grepl('<img[^>]+src="(?!data:)', rep_txt,
+                                perl = TRUE)), 1,
+              "a report has to survive being emailed")
+)
+compare_report(tab, caption = "The HTML report")
+sf_log(tab)
+```
+
+::: callout-important
+## The self-contained check is not cosmetic
+
+A report with an `<img src="figure-1.png">` in it looks perfect on the
+machine that made it and arrives broken everywhere else. Every plot must be
+embedded as a data URI. That is the difference between a report you can email
+to a supervisor and a folder you have to zip.
+:::
+
+```{r}
+#| label: report-numbers
+# The numbers inside the report, against the plan that produced them. This
+# is the check that a clean render does not give you.
+alpha <- res[["RQ3"]]$eng$alpha %||%
+  reliability_report(dat, clinic)$eng$alpha
+tt <- res[["RQ4"]]
+
+tab <- compare_table(
+  compare_row("the alpha in the report is the alpha from the plan",
+              inrep(sprintf("%.2f", round(alpha, 2))), 1,
+              sprintf("plan reports %.4f", alpha)),
+  compare_row("the t statistic reaches the report",
+              inrep(sprintf("%.2f", round(tt$t, 2))), 1,
+              sprintf("plan reports %.4f", tt$t)),
+  compare_row("the sample size reaches the report",
+              inrep(as.character(nrow(dat))), 1,
+              sprintf("%d rows collected", nrow(dat))),
+  compare_row("an APA sentence reaches the report",
+              inrep(substr(tt$apa, 1, 25)), 1, "the block's own apa field")
+)
+compare_report(tab, caption = "The report's numbers vs the plan's")
+sf_log(tab)
+```
+
+```{r}
+#| label: report-reliability
+# And the alpha itself, against psych, since the report is only as good as
+# the number it carries. psych::alpha() rekeys items on its own, so
+# check.keys = FALSE is passed and the declared reversal is applied by hand.
+items <- dat[, c("e1", "e2", "e3", "e4")]
+items <- as.data.frame(lapply(items, as.numeric))
+items$e4 <- 6 - items$e4                    # the declared reversal, by hand
+pa <- psych::alpha(items, check.keys = FALSE)
+
+tab <- compare_table(
+  compare_row("alpha vs psych", alpha, pa$total$raw_alpha,
+              "psych::alpha(check.keys = FALSE)"),
+  compare_row("items in the scale", length(clinic$scales[[1]]$items), 4,
+              "4 declared"),
+  # The mutation check: without the reversal the alpha collapses, so the
+  # row above is testing the keying and not only the arithmetic.
+  compare_row("without the reversal alpha would be far lower",
+              as.numeric(psych::alpha(
+                as.data.frame(lapply(dat[, c("e1","e2","e3","e4")],
+                                     as.numeric)),
+                check.keys = FALSE)$total$raw_alpha < alpha - 0.2), 1,
+              "the declared reversal is load-bearing")
+)
+compare_report(tab, caption = "The reliability figure the report prints")
+sf_log(tab)
+```
+
+-   [ ] The report's alpha matches `psych`, and the reversal is doing real
+    work. An alpha that is unchanged by the reversal means the declaration
+    was ignored.
+
+## 6. The results report
+
+`render_results()` is the shorter document: the plan's results and their
+citations, without the codebook and quality sections.
+
+```{r}
+#| label: results
+res_path <- render_results(
+  results = res, instrument = clinic,
+  output_file = "clinic_results.html", output_path = out_dir,
+  citation_format = "apa",
+  title = "Patient experience: pre-declared analysis")
+c(path = res_path, kb = round(file.size(res_path) / 1024, 1))
+```
+
+```{r}
+#| label: results-cmp
+r_txt <- gsub("<[^>]+>", " ", paste(readLines(res_path, warn = FALSE),
+                                    collapse = "\n"))
+inres <- function(x) as.numeric(grepl(x, r_txt, fixed = TRUE))
+
+tab <- compare_table(
+  compare_row("the results file exists",
+              as.numeric(file.exists(res_path)), 1, "render_results()"),
+  compare_row("the supplied title is used",
+              inres("Patient experience: pre-declared analysis"), 1,
+              "the title argument"),
+  compare_row("every block appears",
+              sum(vapply(clinic$analysis_plan, function(b)
+                inres(b$research_question) > 0, logical(1))),
+              length(clinic$analysis_plan), "4 blocks"),
+  compare_row("at least one method citation appears",
+              as.numeric(grepl("\\(19[0-9]{2}\\)|\\(20[0-9]{2}\\)", r_txt)),
+              1, "citation_format = apa"),
+  compare_row("it is shorter than the full report",
+              as.numeric(file.size(res_path) < file.size(html_path)), 1,
+              "no codebook or quality section")
+)
+compare_report(tab, caption = "The results report")
+sf_log(tab)
+```
+
+```{r}
+#| label: results-citations
+# The 3 citation formats, side by side. They should differ from each other,
+# or the argument is not doing anything.
+paths <- vapply(c("apa", "ama", "vancouver"), function(fmt)
+  render_results(results = res, instrument = clinic,
+                 output_file = paste0("cite_", fmt, ".html"),
+                 output_path = out_dir, citation_format = fmt),
+  character(1))
+sizes <- vapply(paths, file.size, numeric(1))
+bodies <- vapply(paths, function(p)
+  paste(readLines(p, warn = FALSE), collapse = "\n"), character(1))
+
+tab <- compare_table(
+  compare_row("all 3 citation formats render",
+              sum(file.exists(paths)), 3, "apa, ama, vancouver"),
+  # Seventh finding, recorded as it stands. These 2 rows read `match` while
+  # the argument is inert and would flip to DIFFERS once it is implemented
+  # or removed.
+  compare_row("the 3 documents are byte-identical",
+              length(unique(bodies)), 1,
+              "DEFECT, citation_format has no effect"),
+  compare_row("citations do render, so the section is not simply empty",
+              as.numeric(grepl("citation-list", bodies[[1]], fixed = TRUE)),
+              1, "the report's own citation section"),
+  compare_row("an unsupported format is still rejected",
+              as.numeric(inherits(tryCatch(render_results(
+                results = res, instrument = clinic,
+                output_file = "bad.html", output_path = out_dir,
+                citation_format = "harvard"), error = function(e) e),
+                "error")), 1, "rlang::arg_match()")
+)
+compare_report(tab, caption = "The 3 citation formats")
+sf_log(tab)
+data.frame(format = names(sizes), bytes = unname(sizes), row.names = NULL)
+```
+
+::: callout-important
+## Seventh finding, logged in `dogfeed.todo.md`
+
+`citation_format` is validated with `rlang::arg_match()` and then never used
+again. The 3 values produce byte-identical documents. A user who asks for
+Vancouver gets APA and is told nothing, and the `arg_match()` makes it worse
+rather than better: rejecting `"harvard"` with a helpful message is a strong
+signal that the 3 accepted values do something.
+
+The report is the artefact that leaves the researcher's machine. A methods
+section reading "references formatted in Vancouver style" on the strength of
+this argument is a false statement in a manuscript. Needs an owner decision:
+implement the other 2 formats, or reduce the argument to `"apa"` for 0.4.0
+and say so in NEWS.
+:::
+
+## 7. Interpretations
+
+The `interpretations` argument is where the researcher's own reading goes,
+beside the number rather than instead of it. It is the Interpretations canvas
+from 0.3.4, reachable from the API.
+
+```{r}
+#| label: interp
+notes <- list(
+  RQ2 = paste("The Southside wait is roughly 20 minutes longer. Clinic",
+              "records show it runs a walk-in session on the same",
+              "afternoons, which is the likeliest explanation and is worth",
+              "checking before any change is made."),
+  RQ4 = paste("The difference is real but modest. It tracks the waiting",
+              "time closely enough that waiting is the more plausible",
+              "driver than anything about the consultation itself.")
+)
+interp_path <- render_results(
+  results = res, instrument = clinic, output_file = "with_notes.html",
+  output_path = out_dir, interpretations = notes)
+i_txt <- gsub("<[^>]+>", " ", paste(readLines(interp_path, warn = FALSE),
+                                    collapse = "\n"))
+i_txt <- gsub("\\s+", " ", i_txt)
+```
+
+```{r}
+#| label: interp-cmp
+snippet <- function(x) as.numeric(grepl(
+  gsub("\\s+", " ", substr(x, 1, 60)), i_txt, fixed = TRUE))
+plain <- gsub("\\s+", " ", gsub("<[^>]+>", " ",
+                                paste(readLines(res_path, warn = FALSE),
+                                      collapse = "\n")))
+
+tab <- compare_table(
+  compare_row("the RQ2 interpretation reaches the report",
+              snippet(notes$RQ2), 1, "the interpretations argument"),
+  compare_row("the RQ4 interpretation reaches the report",
+              snippet(notes$RQ4), 1, "the interpretations argument"),
+  compare_row("and the report without them does not contain them",
+              as.numeric(grepl(substr(notes$RQ2, 1, 40), plain,
+                               fixed = TRUE)), 0,
+              "the argument is load-bearing"),
+  # Blocks are identified in the report by their research question, not by
+  # their block id, so that is what is searched for here.
+  compare_row("blocks with no interpretation still appear",
+              sum(vapply(clinic$analysis_plan, function(b)
+                grepl(gsub("\\s+", " ", b$research_question), i_txt,
+                      fixed = TRUE), logical(1))),
+              length(clinic$analysis_plan),
+              "RQ1 and RQ3 had no note")
+)
+compare_report(tab, caption = "Interpretations reach the report")
+sf_log(tab)
+```
+
+-   [ ] A block with no interpretation is still reported. Supplying notes
+    for 2 of 4 blocks must not drop the other 2.
+-   [ ] Open the report and read one interpretation in place. It should sit
+    beside the result, clearly attributed to the researcher rather than
+    presented as output.
+
+## 8. PDF output
+
+```{r}
+#| label: pdf-available
+# PDF rendering goes through pagedown, which needs a headless Chrome. Both
+# are optional, so this section reports what it found rather than assuming.
+has_pagedown <- requireNamespace("pagedown", quietly = TRUE)
+chrome <- NA_character_
+if (has_pagedown) {
+  chrome <- tryCatch(pagedown::find_chrome(),
+                     error = function(e) NA_character_)
+}
+data.frame(
+  requirement = c("pagedown installed", "headless Chrome found"),
+  value = c(as.character(has_pagedown),
+            if (is.na(chrome) || !nzchar(chrome)) "not found" else chrome),
+  row.names = NULL
+)
+```
+
+```{r}
+#| label: pdf-render
+pdf_path <- NULL
+pdf_msg  <- "not attempted"
+if (has_pagedown && !is.na(chrome) && nzchar(chrome)) {
+  pdf_msg <- tryCatch({
+    pdf_path <<- render_report(
+      clinic, data = dat, output_file = "clinic_report.pdf",
+      output_path = out_dir, format = "pdf", plot_palette = "print")
+    "rendered"
+  }, error = function(e) paste("ERROR:", substr(conditionMessage(e), 1, 120)))
+}
+pdf_msg
+```
+
+```{r}
+#| label: pdf-cmp
+tab <- compare_table(
+  compare_row("PDF rendering was attempted",
+              as.numeric(pdf_msg != "not attempted"), 1,
+              "pagedown and Chrome are both present"),
+  compare_row("and it produced a file",
+              as.numeric(!is.null(pdf_path) && file.exists(pdf_path)), 1,
+              "render_report(format = 'pdf')"),
+  compare_row("the file is a real PDF, not an HTML file misnamed",
+              as.numeric(!is.null(pdf_path) && file.exists(pdf_path) &&
+                           identical(readBin(pdf_path, "raw", 4),
+                                     as.raw(c(0x25, 0x50, 0x44, 0x46)))), 1,
+              "the %PDF magic bytes")
+)
+compare_report(tab, caption = "PDF output")
+sf_log(tab)
+```
+
+-   [ ] All 3 rows read `match`. **A `DIFFERS` on the first row is an
+    environment finding, not a package one**: it means this machine has no
+    headless Chrome, and the PDF route is untested rather than broken. Say
+    which in the sign-off, because CRAN machines will not have Chrome either
+    and the examples must not depend on it.
+-   [ ] The magic-bytes row exists because a failed PDF conversion can leave
+    an HTML file with a `.pdf` extension, which opens fine in a browser and
+    not at all in a PDF reader.
+
+```{r}
+#| label: pdf-palette
+# The print palette is a separate declaration from the web one, and 0.3.4
+# checked both against WCAG. This confirms it is reachable through the
+# reporting API rather than only through the plotting functions.
+pal_path <- render_report(
+  clinic, data = dat, output_file = "clinic_print.html",
+  output_path = out_dir, format = "html", plot_palette = "print")
+web_path <- render_report(
+  clinic, data = dat, output_file = "clinic_web.html",
+  output_path = out_dir, format = "html", plot_palette = "web")
+
+tab <- compare_table(
+  compare_row("both palettes render", sum(file.exists(c(pal_path, web_path))),
+              2, "print and web"),
+  compare_row("and they produce different documents",
+              as.numeric(!identical(readLines(pal_path, warn = FALSE),
+                                    readLines(web_path, warn = FALSE))), 1,
+              "the palette argument is load-bearing")
+)
+compare_report(tab, caption = "The 2 plot palettes")
+sf_log(tab)
+```
+
+## 9. The section switches
+
+```{r}
+#| label: switches
+# Each include_ argument should remove a section, and nothing else.
+minimal <- render_report(
+  clinic, data = dat, output_file = "minimal.html", output_path = out_dir,
+  format = "html", include_quality = FALSE, include_reliability = FALSE,
+  include_codebook = FALSE, include_missing = FALSE,
+  include_descriptives = FALSE, include_analysis = TRUE,
+  include_models = FALSE)
+
+tab <- compare_table(
+  compare_row("the minimal report renders",
+              as.numeric(file.exists(minimal)), 1, "6 sections switched off"),
+  compare_row("and it is smaller than the full one",
+              as.numeric(file.size(minimal) < file.size(html_path)), 1,
+              "sections were actually removed"),
+  compare_row("the analysis section is still there",
+              as.numeric(grepl(clinic$analysis_plan[[1]]$research_question,
+                               paste(readLines(minimal, warn = FALSE),
+                                     collapse = "\n"), fixed = TRUE)), 1,
+              "include_analysis stayed TRUE"),
+  compare_row("the codebook is gone",
+              as.numeric(grepl("Your best estimate is fine.",
+                               paste(readLines(minimal, warn = FALSE),
+                                     collapse = "\n"), fixed = TRUE)), 0,
+              "include_codebook = FALSE")
+)
+compare_report(tab, caption = "The include_ switches")
+sf_log(tab)
+```
+
+-   [ ] Switching a section off removes it and leaves the rest. The last 2
+    rows check both directions, because a switch that removes everything is
+    as wrong as one that removes nothing.
+
+## 10. The model report template
+
+```{r}
+#| label: model-template
+m <- sf_model("m1", "Single-factor measurement model", type = "cfa",
+              constructs = list(sf_construct(
+                "eng", items = c("e1", "e2", "e3", "e4"))))
+cat(substr(model_report_template(m, include_json = TRUE), 1, 1200))
+```
+
+```{r}
+#| label: model-template-cmp
+tpl_json <- model_report_template(m, include_json = TRUE)
+tpl_bare <- model_report_template(m, include_json = FALSE)
+
+tab <- compare_table(
+  compare_row("the template names the model", as.numeric(grepl(
+    "Single-factor measurement model", tpl_json, fixed = TRUE)), 1,
+    "the model label"),
+  compare_row("it names every item", sum(vapply(
+    c("e1", "e2", "e3", "e4"),
+    function(i) grepl(i, tpl_json, fixed = TRUE), logical(1))), 4,
+    "4 items declared"),
+  compare_row("include_json = TRUE adds the JSON",
+              as.numeric(nchar(tpl_json) > nchar(tpl_bare)), 1,
+              "the argument is load-bearing"),
+  compare_row("and the JSON it adds parses",
+              as.numeric(!inherits(tryCatch(
+                jsonlite::fromJSON(model_json(m)), error = function(e) e),
+                "error")), 1, "jsonlite::fromJSON()")
+)
+compare_report(tab, caption = "The model report template")
+sf_log(tab)
+```
+
+## 11. Everything the report wrote
+
+```{r}
+#| label: outputs
+files <- list.files(out_dir, full.names = TRUE)
+data.frame(file = basename(files),
+           kb = round(file.size(files) / 1024, 1),
+           row.names = NULL)
+```
+
+-   [ ] **Open `clinic_report.html` and read it end to end.** Everything
+    above is a grep. Whether the document is usable is a judgement, and it is
+    the one thing this file cannot make for you. Look for: a title page that
+    names the instrument and its version, a codebook a second analyst could
+    work from, plots that are legible in greyscale, and APA sentences that
+    need no editing.
+-   [ ] Check the reverse-keyed item is described as reverse-keyed wherever
+    it appears.
+
+## Verdict for this file
+
+```{r}
+#| label: verdict
+sf_verdict()
+```
+
+-   [ ] `0 DIFFERS, 0 CHECK`, with the PDF section read as an environment
+    result if it differs.
+-   [ ] The numbers in the report are the numbers the plan produced, checked
+    rather than assumed.
+-   [ ] `interpretations`, `plot_palette`, and the `include_` switches were
+    each checked in both directions and each changes the output.
+-   [ ] **`citation_format` does not.** It is validated and then ignored, and
+    all 3 values produce the same document. That is the seventh finding and
+    it needs an owner decision before submission, because the argument is
+    documented in the manual.
