@@ -1097,3 +1097,67 @@ it changes every missingness figure `quality_report()` has ever printed for
 an instrument with a heading in it. Same shape as B11, B13, and the
 assumption-report entry above: software returning something plausible
 instead of saying it has nothing to report.
+
+### [open] `lane: 0.4.0` — `sem_lavaan_syntax()` emits an indirect effect that references labels it never wrote, and lavaan refuses to parse it
+Found 2026-08-03 while writing review file 10. A `cb_sem` model with a
+declared `sf_indirect()` and unlabelled paths generates syntax that does not
+run:
+
+    # Structural paths
+    loy ~ val + qual
+    val ~ qual
+
+    # Indirect and total effects
+    indirect_qual_val_loy := qual__val*val__loy
+
+    lavaan->lav_pt_con_def(): unknown label(s) in variable
+    definition(s): "qual__val", "val__loy"
+
+The 2 halves of `sem_lavaan_syntax()` (`R/model_layer.R:816` and
+`R/model_layer.R:836`) disagree about labels. The path block writes a label
+only when `path$label` is set, and otherwise writes the bare construct name.
+The indirect block, given no label, invents one with
+`gsub("[^A-Za-z0-9_]", "_", edge)`, which yields `qual__val`. Nothing has ever
+been called that.
+
+`sf_path(from, to, label = NULL)` makes the label optional, so the plain
+2-argument call every example uses is exactly the one that breaks.
+
+Isolated by 3 runs on the same instrument and data:
+
+| model | generated syntax |
+|---|---|
+| paths unlabelled, no indirect effect | fits |
+| paths unlabelled, 1 indirect effect | **lavaan parse error** |
+| paths labelled `a`, `b`, `c`, 1 indirect effect | fits |
+
+Labelling also changes the output in a second way. With labels the generator
+adds the total-effect line:
+
+    indirect_qual_val_loy := a*b
+    total_qual_loy := c + indirect_qual_val_loy
+
+Without them the total effect is omitted silently, because that branch is
+guarded on the direct path carrying a label. So a user who never labels
+anything loses the total effect and never learns it was available.
+
+Two consequences, and the first is a release-quality one.
+
+1. **The generated syntax does not run**, in the one case a structural model
+   is usually declared for. Declaring an indirect effect is the reason to
+   build a `cb_sem` model rather than a `cfa` one. This is not the
+   plausible-but-wrong shape of the other entries in this log: it is a hard
+   error, which at least surfaces immediately.
+2. **The mediation vignette route is affected wherever paths are
+   unlabelled.** Worth grepping the vignettes and the 2 GUIs, since the
+   builder and SurveyStudio both let a user add a path without a label.
+
+Suggested fix, and there is a clean one: give every path a generated label
+when none is supplied, so the path block and the indirect block agree by
+construction, rather than each deciding separately. That also makes the
+total-effect line appear for everyone instead of only for users who happened
+to label their paths.
+
+Needs an owner decision on scope only, since the fix changes generated
+syntax for every `cb_sem` model, labelled or not. The defect itself is not
+in doubt.

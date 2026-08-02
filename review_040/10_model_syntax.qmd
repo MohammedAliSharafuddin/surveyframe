@@ -1,0 +1,754 @@
+---
+title: "10. Measurement and structural model syntax"
+subtitle: "cfa_lavaan_syntax, sem_lavaan_syntax, seminr_syntax, and the model-type guard"
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    embed-resources: true
+editor: visual
+execute:
+  warning: false
+  message: false
+  error: true
+---
+
+```{r}
+#| label: setup
+#| include: false
+source("_setup.R")
+```
+
+surveyframe does not fit structural equation models. It generates the syntax
+for the package that does, from a model declared inside the instrument before
+any data existed. That is the whole claim of this layer, and it is only worth
+anything if the generated syntax estimates **the model that was declared**
+rather than something close to it.
+
+So the accuracy check in this file is not "does a number match a number". It
+is: fit the generated syntax, fit a hand-written syntax for the same declared
+model, and confirm the 2 fits are the same model to the last decimal. If they
+are not, the generator has quietly changed the analysis.
+
+## 1. Questionnaire
+
+```{r}
+#| label: build-items
+lik <- function(id, scale) sf_item(
+  id, sprintf("Item %s", id), type = "likert",
+  choice_set = "agree5", scale_id = scale)
+
+loyalty <- sf_instrument(
+  title = "Service quality and loyalty", version = "1.0.0",
+  components = c(
+    list(sf_choices("agree5", as.character(1:5),
+                    c("Strongly disagree", "Disagree", "Neutral", "Agree",
+                      "Strongly agree"))),
+    lapply(c("q1", "q2", "q3"), lik, scale = "qual"),
+    lapply(c("v1", "v2", "v3"), lik, scale = "val"),
+    lapply(c("l1", "l2", "l3"), lik, scale = "loy"),
+    list(
+      sf_scale("qual", "Perceived quality", items = c("q1", "q2", "q3")),
+      sf_scale("val",  "Perceived value",   items = c("v1", "v2", "v3")),
+      sf_scale("loy",  "Loyalty",           items = c("l1", "l2", "l3"))
+    )
+  )
+)
+loyalty
+```
+
+## 2. Three declared models
+
+The same 9 items support 3 different models, and the point of declaring them
+is that the package will refuse to generate the wrong syntax for any of them.
+
+```{r}
+#| label: build-models
+constructs_reflective <- function() list(
+  sf_construct("qual", label = "Perceived quality",
+               items = c("q1", "q2", "q3"), mode = "reflective"),
+  sf_construct("val",  label = "Perceived value",
+               items = c("v1", "v2", "v3"), mode = "reflective"),
+  sf_construct("loy",  label = "Loyalty",
+               items = c("l1", "l2", "l3"), mode = "reflective")
+)
+
+m_cfa <- sf_model(
+  "m_cfa", "Measurement model", type = "cfa",
+  constructs = constructs_reflective()
+)
+
+m_cb <- sf_model(
+  "m_cb", "Structural model, covariance-based", type = "cb_sem",
+  constructs = constructs_reflective(),
+  # Every path carries a label. That is not decoration, and section 7
+  # explains why: without labels this model generates syntax lavaan cannot
+  # parse. The unlabelled version is built there too, so you can see it.
+  paths = list(
+    sf_path("qual", "val", label = "a"),
+    sf_path("val",  "loy", label = "b"),
+    sf_path("qual", "loy", label = "c")
+  ),
+  indirect = list(sf_indirect("qual", through = "val", to = "loy"))
+)
+
+# The same model with the label argument left off, which is what the
+# 2-argument call in every example produces.
+m_cb_unlabelled <- sf_model(
+  "m_cb_plain", "Structural model, paths unlabelled", type = "cb_sem",
+  constructs = constructs_reflective(),
+  paths = list(
+    sf_path("qual", "val"),
+    sf_path("val",  "loy"),
+    sf_path("qual", "loy")
+  ),
+  indirect = list(sf_indirect("qual", through = "val", to = "loy"))
+)
+
+m_pls <- sf_model(
+  "m_pls", "Structural model, partial least squares", type = "pls_sem",
+  constructs = list(
+    sf_construct("qual", items = c("q1", "q2", "q3"), mode = "composite"),
+    sf_construct("val",  items = c("v1", "v2", "v3"), mode = "composite"),
+    sf_construct("loy",  items = c("l1", "l2", "l3"), mode = "reflective")
+  ),
+  paths = list(sf_path("qual", "val"), sf_path("val", "loy"))
+)
+
+loyalty <- add_model(loyalty, m_cfa)
+loyalty <- add_model(loyalty, m_cb)
+loyalty <- add_model(loyalty, m_pls)
+
+data.frame(
+  id     = vapply(loyalty$models, function(m) m$id, character(1)),
+  type   = vapply(loyalty$models, function(m) m$type, character(1)),
+  engine = vapply(loyalty$models, function(m) m$engine %||% "", character(1)),
+  row.names = NULL
+)
+```
+
+-   [ ] Each model picked up the right engine from its type without being
+    told: `lavaan` for CFA and CB-SEM, `seminr` for PLS-SEM.
+
+```{r}
+#| label: validate-models
+data.frame(
+  model = c("m_cfa", "m_cb", "m_pls"),
+  validates = vapply(list(m_cfa, m_cb, m_pls), function(m)
+    isTRUE(tryCatch({ validate_model(m, loyalty); TRUE },
+                    error = function(e) FALSE)), logical(1)),
+  row.names = NULL
+)
+```
+
+## 3. Analysis plan
+
+```{r}
+#| label: build-plan
+loyalty$analysis_plan <- list(
+  list(id = "RQ1", research_question =
+         "Do the 9 items measure the 3 constructs they claim to?",
+       family = "model", method = "cfa_lavaan_syntax",
+       roles = list(model = "m_cfa")),
+  list(id = "RQ2", research_question =
+         "Does quality raise loyalty, and does value carry part of it?",
+       family = "model", method = "sem_lavaan_syntax",
+       roles = list(model = "m_cb")),
+  list(id = "RQ3", research_question =
+         "The same structural question, estimated by partial least squares.",
+       family = "model", method = "seminr_syntax",
+       roles = list(model = "m_pls"))
+)
+v <- tryCatch(validate_sframe(loyalty), error = function(e) e)
+if (inherits(v, "error")) conditionMessage(v) else
+  list(problems = v$problems %||% "none")
+```
+
+::: callout-tip
+## The field-to-method map this file demonstrates
+
+| You have | You want | Method |
+|-------------------------|---------------------|-----------------------|
+| a declared `cfa` model | measurement syntax | `cfa_lavaan_syntax` |
+| a declared `cb_sem` model | structural syntax for lavaan | `sem_lavaan_syntax` |
+| a declared `pls_sem` model | syntax for seminr | `seminr_syntax` |
+| declared scales, no model | quick measurement syntax | `cfa_syntax()` |
+| no model at all | an exploratory starting point | `efa_syntax()` |
+:::
+
+## 4. Both collection routes
+
+```{r}
+#| label: routes
+set.seed(10)
+sf_both_routes(loyalty, function(i) {
+  a <- function() as.character(sample(1:5, 1))
+  list(q1 = a(), q2 = a(), q3 = a(), v1 = a(), v2 = a(), v3 = a(),
+       l1 = a(), l2 = a(), l3 = a())
+}, n = 4)
+```
+
+-   [ ] Both routes report 9 items and the Shiny row reads back.
+
+## 5. Dummy data with a real factor structure
+
+```{r}
+#| label: data
+set.seed(1010)
+n <- 400
+# A real path model is simulated, so the fits below have something to
+# recover: quality drives value, value drives loyalty, and quality also
+# reaches loyalty directly.
+f_qual <- rnorm(n)
+f_val  <- 0.60 * f_qual + rnorm(n, 0, sqrt(1 - 0.60^2))
+f_loy  <- 0.45 * f_val + 0.30 * f_qual + rnorm(n, 0, 0.7)
+
+ind <- function(f, loading) {
+  z <- loading * f + rnorm(n, 0, sqrt(1 - loading^2))
+  pmin(5, pmax(1, round(3 + z)))
+}
+responses <- data.frame(
+  q1 = ind(f_qual, .80), q2 = ind(f_qual, .75), q3 = ind(f_qual, .70),
+  v1 = ind(f_val,  .82), v2 = ind(f_val,  .78), v3 = ind(f_val,  .72),
+  l1 = ind(f_loy,  .80), l2 = ind(f_loy,  .76), l3 = ind(f_loy,  .70)
+)
+dat <- read_responses(responses, loyalty)
+res <- run_analysis_plan(dat, loyalty)
+names(res)
+```
+
+```{r}
+#| label: data-numeric
+# lavaan and seminr both want numeric columns. read_responses() keeps the
+# stored codes as character, which is right for a response file and wrong
+# for a fitting function, so the coercion is explicit here rather than left
+# to whichever package coerces first.
+items <- c("q1", "q2", "q3", "v1", "v2", "v3", "l1", "l2", "l3")
+num <- as.data.frame(lapply(dat[, items], as.numeric))
+str(num, give.attr = FALSE)
+```
+
+## 6. RQ1: the measurement model
+
+```{r}
+#| label: cfa-syntax
+syn_cfa <- res[["RQ1"]]$syntax
+cat(syn_cfa)
+```
+
+```{r}
+#| label: cfa-fit
+# The test that matters: fit what surveyframe wrote, fit what a lavaan user
+# would have written by hand for the same declared model, and compare.
+hand_cfa <- '
+qual =~ q1 + q2 + q3
+val  =~ v1 + v2 + v3
+loy  =~ l1 + l2 + l3
+'
+fit_gen  <- lavaan::cfa(syn_cfa,  data = num, std.lv = TRUE)
+fit_hand <- lavaan::cfa(hand_cfa, data = num, std.lv = TRUE)
+
+fm <- function(f, what) unname(lavaan::fitMeasures(f, what))
+tab <- compare_table(
+  compare_row("chi-square", fm(fit_gen, "chisq"), fm(fit_hand, "chisq"),
+              "hand-written lavaan syntax"),
+  compare_row("degrees of freedom", fm(fit_gen, "df"), fm(fit_hand, "df"),
+              "hand-written lavaan syntax"),
+  compare_row("CFI",   fm(fit_gen, "cfi"),   fm(fit_hand, "cfi"),
+              "hand-written lavaan syntax"),
+  compare_row("TLI",   fm(fit_gen, "tli"),   fm(fit_hand, "tli"),
+              "hand-written lavaan syntax"),
+  compare_row("RMSEA", fm(fit_gen, "rmsea"), fm(fit_hand, "rmsea"),
+              "hand-written lavaan syntax"),
+  compare_row("SRMR",  fm(fit_gen, "srmr"),  fm(fit_hand, "srmr"),
+              "hand-written lavaan syntax"),
+  compare_row("number of free parameters", fm(fit_gen, "npar"),
+              fm(fit_hand, "npar"), "hand-written lavaan syntax")
+)
+compare_report(tab, caption = "Generated CFA syntax vs hand-written")
+sf_log(tab)
+```
+
+```{r}
+#| label: cfa-loadings
+pe_gen  <- lavaan::parameterEstimates(fit_gen,  standardized = TRUE)
+pe_hand <- lavaan::parameterEstimates(fit_hand, standardized = TRUE)
+load_of <- function(pe, lhs, rhs)
+  pe$std.all[pe$op == "=~" & pe$lhs == lhs & pe$rhs == rhs]
+
+tab <- compare_table(
+  compare_row("loading, qual on q1", load_of(pe_gen, "qual", "q1"),
+              load_of(pe_hand, "qual", "q1"), "hand-written lavaan syntax"),
+  compare_row("loading, val on v2",  load_of(pe_gen, "val", "v2"),
+              load_of(pe_hand, "val", "v2"),  "hand-written lavaan syntax"),
+  compare_row("loading, loy on l3",  load_of(pe_gen, "loy", "l3"),
+              load_of(pe_hand, "loy", "l3"),  "hand-written lavaan syntax"),
+  compare_row("every loading agrees",
+              max(abs(pe_gen$std.all[pe_gen$op == "=~"] -
+                        pe_hand$std.all[pe_hand$op == "=~"])), 0,
+              "all 9 loadings, largest gap"),
+  compare_row("latent covariances estimated, not fixed",
+              sum(pe_gen$op == "~~" & pe_gen$lhs %in%
+                    c("qual", "val", "loy") &
+                    pe_gen$rhs %in% c("qual", "val", "loy") &
+                    pe_gen$lhs != pe_gen$rhs), 3,
+              "3 pairs of 3 constructs")
+)
+compare_report(tab, caption = "Loadings from the generated syntax")
+sf_log(tab)
+```
+
+```{r}
+#| label: cfa-plot
+ld <- pe_gen[pe_gen$op == "=~", ]
+op <- par(mar = c(4, 7, 3, 1))
+barplot(rev(ld$std.all), horiz = TRUE, las = 1, border = NA,
+        names.arg = rev(paste(ld$lhs, "->", ld$rhs)),
+        col = ifelse(rev(ld$std.all) >= 0.7, "#1b7837", "#f4a582"),
+        xlim = c(0, 1), xlab = "Standardised loading",
+        main = "RQ1: measurement model from the generated syntax")
+abline(v = 0.7, lty = 2)
+par(op)
+```
+
+-   [ ] Every generated-vs-hand-written verdict reads `match`. Anything else
+    means the generator wrote a different model from the declared one.
+-   [ ] The declared constructs recovered loadings near the values the
+    simulation built in, roughly 0.70 to 0.82.
+-   [ ] The 3 latent covariances are estimated. surveyframe defaults
+    `latent_covariances = TRUE`, which is what a measurement model normally
+    wants. Set it to `FALSE` only deliberately.
+
+## 7. RQ2: the structural model, covariance-based
+
+```{r}
+#| label: sem-syntax
+syn_sem <- res[["RQ2"]]$syntax
+cat(syn_sem)
+```
+
+::: callout-important
+## Fifth finding, logged in `dogfeed.todo.md`
+
+The syntax above works because **every path was given a label**. Leave the
+labels off, which is what the plain 2-argument `sf_path()` call does, and the
+generated syntax does not run at all. The next chunk shows it.
+:::
+
+```{r}
+#| label: sem-unlabelled
+syn_plain <- sem_lavaan_syntax(m_cb_unlabelled, loyalty)
+cat(syn_plain)
+```
+
+```{r}
+#| label: sem-unlabelled-fit
+# lavaan is asked to fit it. This chunk is expected to error, and the error
+# is the finding rather than a mistake in the review.
+plain_msg <- tryCatch({
+  lavaan::sem(syn_plain, data = num, std.lv = TRUE); NA_character_
+}, error = function(e) conditionMessage(e))
+plain_msg
+```
+
+```{r}
+#| label: sem-unlabelled-cmp
+# Isolating the trigger: the same model without the indirect effect fits,
+# so it is the indirect line and nothing else.
+m_no_ind <- sf_model(
+  "m_cb_noind", "No indirect effect", type = "cb_sem",
+  constructs = constructs_reflective(),
+  paths = list(sf_path("qual", "val"), sf_path("val", "loy"),
+               sf_path("qual", "loy"))
+)
+fits <- function(m) as.numeric(is.na(tryCatch({
+  lavaan::sem(sem_lavaan_syntax(m, loyalty), data = num, std.lv = TRUE)
+  NA_character_
+}, error = function(e) conditionMessage(e))))
+
+tab <- compare_table(
+  compare_row("paths unlabelled, no indirect effect: fits",
+              fits(m_no_ind), 1, "the control case"),
+  compare_row("paths unlabelled, 1 indirect effect: fits",
+              fits(m_cb_unlabelled), 0,
+              "DEFECT, expected to fail until an owner decision"),
+  compare_row("paths labelled, 1 indirect effect: fits",
+              fits(m_cb), 1, "the workaround"),
+  compare_row("the syntax invents a label nothing carries",
+              as.numeric(grepl("qual__val", syn_plain) &&
+                           !grepl("qual__val\\s*\\*\\s*qual", syn_plain)), 1,
+              "gsub() on the edge name, R/model_layer.R:836")
+)
+compare_report(tab, caption = "Isolating the unlabelled-path defect")
+sf_log(tab)
+```
+
+-   [ ] The second row reads `match` with a surveyframe value of **0**. That
+    is the defect being confirmed, not a pass. If it reads `1`, the defect
+    has been fixed and this section should be rewritten.
+-   [ ] Labelling every path is the workaround, and it is what `m_cb` does.
+-   [ ] **Worth knowing.** Labels also unlock the total-effect line. Without
+    them the generator omits `total_qual_loy` silently, so a user who never
+    labels a path loses the total effect and never learns it was on offer.
+
+### The labelled model, fitted
+
+```{r}
+#| label: sem-fit
+hand_sem <- '
+qual =~ q1 + q2 + q3
+val  =~ v1 + v2 + v3
+loy  =~ l1 + l2 + l3
+val ~ a*qual
+loy ~ b*val + c*qual
+indirect_qual_val_loy := a*b
+total_qual_loy := c + indirect_qual_val_loy
+'
+fit_sem  <- lavaan::sem(syn_sem,  data = num, std.lv = TRUE)
+fit_shan <- lavaan::sem(hand_sem, data = num, std.lv = TRUE)
+
+pe_s <- lavaan::parameterEstimates(fit_sem,  standardized = TRUE)
+pe_h <- lavaan::parameterEstimates(fit_shan, standardized = TRUE)
+path_of <- function(pe, from, to)
+  pe$std.all[pe$op == "~" & pe$lhs == to & pe$rhs == from]
+
+tab <- compare_table(
+  compare_row("chi-square", fm(fit_sem, "chisq"), fm(fit_shan, "chisq"),
+              "hand-written lavaan syntax"),
+  compare_row("degrees of freedom", fm(fit_sem, "df"), fm(fit_shan, "df"),
+              "hand-written lavaan syntax"),
+  compare_row("CFI",   fm(fit_sem, "cfi"),   fm(fit_shan, "cfi"),
+              "hand-written lavaan syntax"),
+  compare_row("RMSEA", fm(fit_sem, "rmsea"), fm(fit_shan, "rmsea"),
+              "hand-written lavaan syntax"),
+  compare_row("path qual to val", path_of(pe_s, "qual", "val"),
+              path_of(pe_h, "qual", "val"), "hand-written lavaan syntax"),
+  compare_row("path val to loy",  path_of(pe_s, "val", "loy"),
+              path_of(pe_h, "val", "loy"),  "hand-written lavaan syntax"),
+  compare_row("path qual to loy", path_of(pe_s, "qual", "loy"),
+              path_of(pe_h, "qual", "loy"), "hand-written lavaan syntax")
+)
+compare_report(tab, caption = "Generated CB-SEM syntax vs hand-written")
+sf_log(tab)
+```
+
+```{r}
+#| label: sem-indirect
+# The declared indirect effect is the reason for the := line in the
+# generated syntax. If the generator dropped it, this row would be empty and
+# the verdict would read CHECK rather than DIFFERS, which is why CHECK is
+# never a pass.
+def_of <- function(pe, label) pe$est[pe$op == ":=" & pe$label == label]
+ind_gen  <- def_of(pe_s, "indirect_qual_val_loy")
+ind_hand <- def_of(pe_h, "indirect_qual_val_loy")
+a <- pe_h$est[pe_h$op == "~" & pe_h$lhs == "val" & pe_h$rhs == "qual"]
+b <- pe_h$est[pe_h$op == "~" & pe_h$lhs == "loy" & pe_h$rhs == "val"]
+cc <- pe_h$est[pe_h$op == "~" & pe_h$lhs == "loy" & pe_h$rhs == "qual"]
+
+tab <- compare_table(
+  compare_row("defined parameters generated", sum(pe_s$op == ":="), 2,
+              "1 indirect effect plus its total"),
+  compare_row("indirect effect value", ind_gen, ind_hand,
+              "hand-written lavaan syntax"),
+  compare_row("indirect effect is a times b", ind_gen, a * b,
+              "hand-multiplied path estimates"),
+  compare_row("total effect value", def_of(pe_s, "total_qual_loy"),
+              def_of(pe_h, "total_qual_loy"), "hand-written lavaan syntax"),
+  compare_row("total effect is c plus a times b",
+              def_of(pe_s, "total_qual_loy"), cc + a * b,
+              "hand-computed from the path estimates"),
+  compare_row("standard errors are estimated too",
+              sum(is.finite(pe_s$se[pe_s$op == ":="])), 2,
+              "delta method, from lavaan")
+)
+compare_report(tab, caption = "The declared indirect effect")
+sf_log(tab)
+pe_s[pe_s$op == ":=", c("label", "est", "se", "pvalue")]
+```
+
+```{r}
+#| label: sem-plot
+paths <- pe_s[pe_s$op == "~", ]
+op <- par(mar = c(4, 10, 3, 1))
+barplot(rev(paths$std.all), horiz = TRUE, las = 1, border = NA,
+        names.arg = rev(paste(paths$rhs, "->", paths$lhs)),
+        col = "#4393c3", xlab = "Standardised path coefficient",
+        main = "RQ2: structural paths")
+abline(v = 0, lty = 2)
+par(op)
+```
+
+-   [ ] Every fit index, path, and defined parameter matches the
+    hand-written model.
+-   [ ] The recovered paths are in the neighbourhood of the simulated 0.60,
+    0.45, and 0.30. Attenuation from the 5-point rounding is expected.
+
+## 8. RQ3: the same structure, partial least squares
+
+```{r}
+#| label: pls-syntax
+syn_pls <- res[["RQ3"]]$syntax
+cat(syn_pls)
+```
+
+::: callout-important
+## The `multi_items()` shorthand is worth reading before you trust it
+
+The generated measurement model writes `multi_items("q", 1:3)`, which seminr
+expands to `q1`, `q2`, `q3`. That is correct here only because the items were
+named with a common stem and consecutive numbers. The next chunk checks the
+expansion against the declared item ids rather than assuming it.
+:::
+
+```{r}
+#| label: pls-expansion
+declared <- list(qual = c("q1", "q2", "q3"), val = c("v1", "v2", "v3"),
+                 loy = c("l1", "l2", "l3"))
+expanded <- list(qual = seminr::multi_items("q", 1:3),
+                 val  = seminr::multi_items("v", 1:3),
+                 loy  = seminr::multi_items("l", 1:3))
+
+tab <- compare_table(
+  compare_row("qual items expand to the declared ids",
+              as.numeric(identical(expanded$qual, declared$qual)), 1,
+              "seminr::multi_items()"),
+  compare_row("val items expand to the declared ids",
+              as.numeric(identical(expanded$val, declared$val)), 1,
+              "seminr::multi_items()"),
+  compare_row("loy items expand to the declared ids",
+              as.numeric(identical(expanded$loy, declared$loy)), 1,
+              "seminr::multi_items()"),
+  compare_row("no declared item is left out",
+              length(unlist(expanded)), length(unlist(declared)),
+              "9 items were declared")
+)
+compare_report(tab, caption = "Does the shorthand name the right columns?")
+sf_log(tab)
+```
+
+```{r}
+#| label: pls-fit
+# The generated script is executed as written, in its own environment, with
+# `data` bound to the response frame. Executing it rather than reading it is
+# the point: a script that looks right and does not run is not usable output.
+env <- new.env(parent = globalenv())
+env$data <- num
+gen_script <- seminr_syntax(m_pls, data_name = "data", nboot = 100,
+                            seed = 123)
+ok <- tryCatch({ eval(parse(text = gen_script), envir = env); TRUE },
+               error = function(e) { message(conditionMessage(e)); FALSE })
+ok
+```
+
+```{r}
+#| label: pls-cmp
+# The same model built by hand with seminr, for comparison.
+hand_mm <- seminr::constructs(
+  seminr::composite("qual", seminr::multi_items("q", 1:3)),
+  seminr::composite("val",  seminr::multi_items("v", 1:3)),
+  seminr::composite("loy",  seminr::multi_items("l", 1:3))
+)
+hand_sm <- seminr::relationships(
+  seminr::paths(from = "qual", to = c("val")),
+  seminr::paths(from = "val",  to = c("loy"))
+)
+fit_hand_pls <- seminr::estimate_pls(data = num,
+                                     measurement_model = hand_mm,
+                                     structural_model = hand_sm)
+gen_paths  <- env$pls_model$path_coef
+hand_paths <- fit_hand_pls$path_coef
+
+tab <- compare_table(
+  compare_row("path qual to val", gen_paths["qual", "val"],
+              hand_paths["qual", "val"], "hand-built seminr model"),
+  compare_row("path val to loy",  gen_paths["val", "loy"],
+              hand_paths["val", "loy"],  "hand-built seminr model"),
+  compare_row("every path agrees", max(abs(gen_paths - hand_paths)), 0,
+              "the whole path matrix, largest gap"),
+  compare_row("R2 for val", summary(env$pls_model)$paths["R^2", "val"],
+              summary(fit_hand_pls)$paths["R^2", "val"],
+              "hand-built seminr model"),
+  compare_row("R2 for loy", summary(env$pls_model)$paths["R^2", "loy"],
+              summary(fit_hand_pls)$paths["R^2", "loy"],
+              "hand-built seminr model"),
+  compare_row("bootstrap ran as the script asked",
+              as.numeric(inherits(env$boot_model, "boot_seminr_model")), 1,
+              "the generated script's own bootstrap_model() call")
+)
+compare_report(tab, caption = "Generated seminr script vs hand-built model")
+sf_log(tab)
+```
+
+```{r}
+#| label: pls-summary
+s <- summary(env$pls_model)
+s$reliability
+s$paths
+```
+
+```{r}
+#| label: pls-plot
+pm <- gen_paths[c("qual", "val"), c("val", "loy")]
+vals <- c(`qual -> val` = pm["qual", "val"], `val -> loy` = pm["val", "loy"])
+op <- par(mar = c(4, 9, 3, 1))
+barplot(rev(vals), horiz = TRUE, las = 1, border = NA, col = "#4393c3",
+        xlab = "PLS path coefficient",
+        main = "RQ3: the same structure by partial least squares")
+par(op)
+```
+
+-   [ ] The generated script **ran**, and its results equal the hand-built
+    model exactly.
+-   [ ] Composite reliability and AVE are printed, so the measurement
+    assessment a PLS write-up needs is in the generated output rather than
+    left to the reader.
+
+## 9. The model-type guard
+
+This is defect 5 from the independent validation round, fixed in 0.4.0.
+Before the fix, a CB-SEM model handed to `seminr_syntax()` produced PLS-SEM
+syntax without complaint, so a declared covariance-based model could be
+estimated by a completely different estimator and nothing anywhere would say
+so.
+
+```{r}
+#| label: guards
+fires <- function(expr) {
+  msg <- tryCatch({ force(expr); NA_character_ },
+                  error = function(e) conditionMessage(e))
+  msg
+}
+guard_msgs <- c(
+  `seminr_syntax() on a cb_sem model` =
+    fires(seminr_syntax(m_cb)),
+  `sem_lavaan_syntax() on a pls_sem model` =
+    fires(sem_lavaan_syntax(m_pls, loyalty)),
+  `cfa_lavaan_syntax() on a pls_sem model` =
+    fires(cfa_lavaan_syntax(instrument = loyalty, model = m_pls)),
+  `seminr_syntax() on a cfa model` =
+    fires(seminr_syntax(m_cfa))
+)
+data.frame(call = names(guard_msgs), message = unname(guard_msgs),
+           row.names = NULL)
+```
+
+```{r}
+#| label: guards-cmp
+# A guard that does not fire returns NA here, so counting the non-NA
+# messages counts the guards that did their job.
+tab <- compare_table(
+  compare_row("guards that fired", sum(!is.na(guard_msgs)), 4,
+              "4 deliberate mismatches"),
+  compare_row("messages name the type that was found",
+              sum(grepl("is of type", guard_msgs)), 4,
+              "every message says what it got"),
+  compare_row("messages say why it matters",
+              sum(grepl("estimate a different model", guard_msgs)), 4,
+              "every message says the consequence"),
+  # The mutation check: the same calls with the RIGHT model must not error.
+  compare_row("correct pairings still work",
+              sum(is.na(c(fires(seminr_syntax(m_pls)),
+                          fires(sem_lavaan_syntax(m_cb, loyalty)),
+                          fires(cfa_lavaan_syntax(instrument = loyalty,
+                                                  model = m_cfa))))), 3,
+              "3 correct pairings, none should error")
+)
+compare_report(tab, caption = "The model-type guard, both directions")
+sf_log(tab)
+```
+
+-   [ ] All 4 mismatches error, and all 3 correct pairings do not. A guard
+    that blocks everything is as broken as one that blocks nothing, which is
+    why the last row is there.
+-   [ ] Each message names the type it found and says what would have gone
+    wrong. Read one and check you would understand it without this file open.
+
+## 10. The 2 shortcuts that need no model
+
+```{r}
+#| label: shortcuts
+# cfa_syntax() works straight off the declared scales, for anyone who has
+# not built a model object yet.
+cat(cfa_syntax(loyalty))
+```
+
+```{r}
+#| label: shortcuts-efa
+cat(efa_syntax(items = c("q1", "q2", "q3", "v1", "v2", "v3",
+                         "l1", "l2", "l3"),
+               nfactors = 3, extraction = "ml", rotation = "oblimin"))
+```
+
+```{r}
+#| label: shortcuts-cmp
+syn_scales <- cfa_syntax(loyalty)
+fit_scales <- lavaan::cfa(syn_scales, data = num, std.lv = TRUE)
+
+tab <- compare_table(
+  compare_row("scale-based CFA has the same df as the model-based one",
+              fm(fit_scales, "df"), fm(fit_gen, "df"),
+              "the same 3 constructs either way"),
+  compare_row("and the same chi-square", fm(fit_scales, "chisq"),
+              fm(fit_gen, "chisq"), "the same 3 constructs either way"),
+  compare_row("efa_syntax() names all 9 items",
+              lengths(regmatches(efa_syntax(items = c("q1","q2","q3","v1",
+                                                      "v2","v3","l1","l2",
+                                                      "l3")),
+                                 gregexpr('"[qvl][123]"',
+                                          efa_syntax(items = c("q1","q2","q3",
+                                                               "v1","v2","v3",
+                                                               "l1","l2",
+                                                               "l3"))))),
+              9, "9 items were passed")
+)
+compare_report(tab, caption = "The shortcuts against the model route")
+sf_log(tab)
+```
+
+-   [ ] Declaring 3 scales and declaring 3 reflective constructs produce the
+    same measurement model. If they do not, one of the 2 routes is dropping
+    an item.
+
+## 11. The model as data
+
+```{r}
+#| label: model-json
+cat(substr(model_json(m_cb), 1, 900))
+```
+
+```{r}
+#| label: model-json-cmp
+j <- jsonlite::fromJSON(model_json(m_cb), simplifyVector = FALSE)
+
+tab <- compare_table(
+  compare_row("constructs serialised",
+              length(j$measurement$constructs), 3, "3 were declared"),
+  compare_row("paths serialised",
+              length(j$structural$paths), 3, "3 were declared"),
+  compare_row("indirect effects serialised",
+              length(j$structural$indirect), 1, "1 was declared"),
+  compare_row("items serialised across all constructs",
+              sum(vapply(j$measurement$constructs,
+                         function(cn) length(cn$items), integer(1))), 9,
+              "9 items were declared")
+)
+compare_report(tab, caption = "model_json() round trip")
+sf_log(tab)
+```
+
+-   [ ] The JSON carries the whole declaration, including the indirect
+    effect. This is what the builder and SurveyStudio read, so anything
+    missing here is missing from both GUIs.
+
+## Verdict for this file
+
+```{r}
+#| label: verdict
+sf_verdict()
+```
+
+-   [ ] `0 DIFFERS, 0 CHECK`.
+-   [ ] Every generated script was **executed**, not only inspected, and
+    reproduced the hand-written model exactly.
+-   [ ] The model-type guard blocks all 4 wrong pairings and none of the 3
+    right ones.
