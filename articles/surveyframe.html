@@ -45,7 +45,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">surveyframe</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.4</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.4.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -429,6 +429,7 @@ items)<a class="anchor" aria-label="anchor" href="#tourist-satisfaction-ts-3-ite
 <span><span class="co">#&gt;   Version:    1.0.0</span></span>
 <span><span class="co">#&gt;   Items:      55</span></span>
 <span><span class="co">#&gt;   Scales:     9</span></span>
+<span><span class="co">#&gt;   Analysis:   0 block(s)</span></span>
 <span><span class="co">#&gt;   Status:     not validated</span></span></code></pre></div>
 <hr>
 </div>
@@ -485,7 +486,7 @@ GitHub Pages, shared by email, or opened directly from disk.</p>
 <span>  output_path <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"tourism_services_survey.html"</span><span class="op">)</span>,</span>
 <span>  open        <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; Static survey written to '/tmp/RtmpWrqKyY/tourism_services_survey.html' (69.6</span></span>
+<span><span class="co">#&gt; Static survey written to '/tmp/RtmpozAcaR/tourism_services_survey.html' (85.2</span></span>
 <span><span class="co">#&gt; KB).</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/files.html" class="external-link">file.exists</a></span><span class="op">(</span><span class="va">html_path</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
@@ -538,7 +539,7 @@ no string-splitting step.</p>
 <span>  sheet_url  <span class="op">=</span> <span class="st">"https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID"</span>,</span>
 <span>  output_dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; Apps Script written to: /tmp/RtmpWrqKyY/surveyframe_collector.gs</span></span>
+<span><span class="co">#&gt; Apps Script written to: /tmp/RtmpozAcaR/surveyframe_collector.gs</span></span>
 <span><span class="co">#&gt; Follow the setup instructions inside the file to deploy it.</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/files.html" class="external-link">file.exists</a></span><span class="op">(</span><span class="va">script_path</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
@@ -1415,29 +1416,7 @@ for grouped tests, and linearity for regression pairs.</p>
 <span>  <span class="va">ar</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/assumption_report.html">assumption_report</a></span><span class="op">(</span><span class="va">scored</span>, <span class="va">study</span><span class="op">)</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">ar</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
-<span><span class="co">#&gt; $method</span></span>
-<span><span class="co">#&gt; [1] "assumptions"</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $normality</span></span>
-<span><span class="co">#&gt; data frame with 0 columns and 0 rows</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $homogeneity</span></span>
-<span><span class="co">#&gt; data frame with 0 columns and 0 rows</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $regression</span></span>
-<span><span class="co">#&gt; NULL</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $expected_counts</span></span>
-<span><span class="co">#&gt; NULL</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $apa</span></span>
-<span><span class="co">#&gt; [1] "Assumption checks were computed."</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $prompt</span></span>
-<span><span class="co">#&gt; [1] "Report assumption checks before interpreting inferential models, especially sparse cells, non-normal residuals, and high VIF values."</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; attr(,"class")</span></span>
-<span><span class="co">#&gt; [1] "sframe_assumption_report"</span></span></code></pre></div>
+<span><span class="co">#&gt; Assumption Report</span></span></code></pre></div>
 <p>Review the <code>$normality</code> and <code>$homogeneity</code>
 slots to decide whether parametric or non-parametric alternatives are
 appropriate. The analysis plan can override the test method per block if
@@ -1454,13 +1433,13 @@ writing prompt, and the methodological reference that supports the
 chosen test.</p>
 <div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">results_table</span><span class="op">(</span><span class="va">results</span><span class="op">)</span></span></code></pre></div>
-<table style="width:100%;" class="table">
+<table class="table">
 <colgroup>
 <col width="2%">
-<col width="48%">
+<col width="38%">
+<col width="4%">
+<col width="49%">
 <col width="5%">
-<col width="35%">
-<col width="7%">
 </colgroup>
 <thead><tr class="header">
 <th align="left">RQ</th>
@@ -1500,7 +1479,7 @@ satisfaction?</td>
 satisfaction?</td>
 <td align="left"></td>
 <td align="right">U = 744, z = -4.62, p &lt; .001, r = 0.60 [0.41,
-0.76]</td>
+0.76], Hodges-Lehmann shift = 0.67 [0.67, 1.00]</td>
 <td align="left">large</td>
 </tr>
 <tr class="odd">
@@ -1554,9 +1533,9 @@ and descriptives alongside the analysis results.</p>
 <span>  output_file <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"tourism_results.html"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Results report written:"</span>, <span class="va">results_path</span>, <span class="st">"\n"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Results report written: /tmp/RtmpWrqKyY/tourism_results.html</span></span>
+<span><span class="co">#&gt; Results report written: /tmp/RtmpozAcaR/tourism_results.html</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Size:"</span>, <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.info.html" class="external-link">file.size</a></span><span class="op">(</span><span class="va">results_path</span><span class="op">)</span> <span class="op">/</span> <span class="fl">1024</span>, <span class="fl">1</span><span class="op">)</span>, <span class="st">"KB\n"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Size: 13.4 KB</span></span></code></pre></div>
+<span><span class="co">#&gt; Size: 13.5 KB</span></span></code></pre></div>
 <p>The results report contains one section per research question, with
 the APA statistic, effect size, writing prompt, and the reference for
 the chosen method, each paired with its own chart drawn directly beneath

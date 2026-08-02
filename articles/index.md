@@ -20,3 +20,14 @@ model syntax, and finish with the visual tools.
   generation](https://mohammedalisharafuddin.github.io/surveyframe/articles/efa-cfa-sem-pls-syntax.md):
 - [The visual workflow: SurveyBuilder, SurveyStudio, and the
   dashboard](https://mohammedalisharafuddin.github.io/surveyframe/articles/surveybuilder-gui-overview.md):
+
+### Specialised analyses
+
+Read these when a study calls for them. Small-sample inference covers
+studies below the n = 30 threshold, and multi-criteria decision analysis
+covers ranking alternatives against criteria that compete.
+
+- [Small-sample
+  inference](https://mohammedalisharafuddin.github.io/surveyframe/articles/small-sample.md):
+- [Multi-criteria decision
+  analysis](https://mohammedalisharafuddin.github.io/surveyframe/articles/mcdm-analysis.md):

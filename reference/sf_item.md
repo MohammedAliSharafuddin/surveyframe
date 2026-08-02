@@ -11,7 +11,8 @@ sf_item(
   id,
   label,
   type = c("likert", "single_choice", "multiple_choice", "numeric", "text", "textarea",
-    "date", "matrix", "slider", "ranking", "rating", "section_break", "text_block"),
+    "date", "matrix", "slider", "ranking", "rating", "pairwise_comparison",
+    "criteria_weight", "section_break", "text_block"),
   required = FALSE,
   choice_set = NULL,
   scale_id = NULL,
@@ -19,6 +20,8 @@ sf_item(
   help = NULL,
   placeholder = NULL,
   matrix_items = NULL,
+  comparison_items = NULL,
+  comparison_scale = NULL,
   slider_min = NULL,
   slider_max = NULL,
   slider_step = NULL,
@@ -47,7 +50,8 @@ sf_item(
 
   Character. The response type. One of `"likert"`, `"single_choice"`,
   `"multiple_choice"`, `"numeric"`, `"text"`, `"textarea"`, `"date"`,
-  `"matrix"`, `"slider"`, `"ranking"`, `"rating"`, `"section_break"`, or
+  `"matrix"`, `"slider"`, `"ranking"`, `"rating"`,
+  `"pairwise_comparison"`, `"criteria_weight"`, `"section_break"`, or
   `"text_block"`.
 
 - required:
@@ -78,6 +82,23 @@ sf_item(
 - matrix_items:
 
   Character vector or NULL. Row labels for `"matrix"` type.
+
+- comparison_items:
+
+  Character vector or NULL. The things being compared or weighted, for
+  `"pairwise_comparison"` and `"criteria_weight"` types. At least 2
+  entries, all distinct. A `"saaty"` pairwise item renders `n(n-1)/2`
+  unordered pair rows, an `"influence"` item renders `n(n-1)` ordered
+  rows, and a `"criteria_weight"` item renders one numeric input per
+  entry. An advisory warning is raised above 7 items (`"saaty"`) or 6
+  (`"influence"`); above 10 the item is rejected.
+
+- comparison_scale:
+
+  Character or NULL. For `"pairwise_comparison"` only. `"saaty"` (the
+  default) gives the bipolar 1-9 importance scale used by AHP and ANP;
+  `"influence"` gives the unipolar 0-4 directed influence scale used by
+  DEMATEL.
 
 - slider_min:
 

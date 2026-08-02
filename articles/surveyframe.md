@@ -356,6 +356,7 @@ study
 #>   Version:    1.0.0
 #>   Items:      55
 #>   Scales:     9
+#>   Analysis:   0 block(s)
 #>   Status:     not validated
 ```
 
@@ -425,7 +426,7 @@ html_path <- export_static_survey(
   output_path = file.path(tempdir(), "tourism_services_survey.html"),
   open        = FALSE
 )
-#> Static survey written to '/tmp/RtmpWrqKyY/tourism_services_survey.html' (69.6
+#> Static survey written to '/tmp/RtmpozAcaR/tourism_services_survey.html' (85.2
 #> KB).
 file.exists(html_path)
 #> [1] TRUE
@@ -478,7 +479,7 @@ script_path <- export_google_sheet(
   sheet_url  = "https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID",
   output_dir = tempdir()
 )
-#> Apps Script written to: /tmp/RtmpWrqKyY/surveyframe_collector.gs
+#> Apps Script written to: /tmp/RtmpozAcaR/surveyframe_collector.gs
 #> Follow the setup instructions inside the file to deploy it.
 file.exists(script_path)
 #> [1] TRUE
@@ -946,29 +947,7 @@ if (requireNamespace("psych", quietly = TRUE)) {
   ar <- assumption_report(scored, study)
   print(ar)
 }
-#> $method
-#> [1] "assumptions"
-#> 
-#> $normality
-#> data frame with 0 columns and 0 rows
-#> 
-#> $homogeneity
-#> data frame with 0 columns and 0 rows
-#> 
-#> $regression
-#> NULL
-#> 
-#> $expected_counts
-#> NULL
-#> 
-#> $apa
-#> [1] "Assumption checks were computed."
-#> 
-#> $prompt
-#> [1] "Report assumption checks before interpreting inferential models, especially sparse cells, non-normal residuals, and high VIF values."
-#> 
-#> attr(,"class")
-#> [1] "sframe_assumption_report"
+#> Assumption Report
 ```
 
 Review the `$normality` and `$homogeneity` slots to decide whether
@@ -999,7 +978,7 @@ results_table(results)
 | RQ1 | Are digital marketing perceptions associated with tourist satisfaction? | pearson | r(58) = 0.19 \[-0.07, 0.42\], p = 0.153 | small |
 | RQ2 | Is service quality associated with tourist satisfaction? | pearson | r(58) = -0.04 \[-0.29, 0.22\], p = 0.778 | negligible |
 | RQ3 | Do service quality and sustainability quality predict satisfaction? |  | R² = 0.210, F(3, 56) = 4.97, p = 0.004 |  |
-| RQ4 | Do first-time and repeat visitors differ in satisfaction? |  | U = 744, z = -4.62, p \< .001, r = 0.60 \[0.41, 0.76\] | large |
+| RQ4 | Do first-time and repeat visitors differ in satisfaction? |  | U = 744, z = -4.62, p \< .001, r = 0.60 \[0.41, 0.76\], Hodges-Lehmann shift = 0.67 \[0.67, 1.00\] | large |
 | RQ5 | Does satisfaction predict behavioural intention? |  | R² = 0.291, F(1, 58) = 23.83, p \< .001 |  |
 
 The full writing prompt for each result is available in `r$prompt`. The
@@ -1057,9 +1036,9 @@ results_path <- render_results(
   output_file = file.path(tempdir(), "tourism_results.html")
 )
 cat("Results report written:", results_path, "\n")
-#> Results report written: /tmp/RtmpWrqKyY/tourism_results.html
+#> Results report written: /tmp/RtmpozAcaR/tourism_results.html
 cat("Size:", round(file.size(results_path) / 1024, 1), "KB\n")
-#> Size: 13.4 KB
+#> Size: 13.5 KB
 ```
 
 The results report contains one section per research question, with the

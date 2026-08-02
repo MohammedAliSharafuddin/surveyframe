@@ -24,7 +24,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">surveyframe</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.4</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.4.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -47,6 +47,53 @@
       <small>Source: <a href="https://github.com/MohammedAliSharafuddin/surveyframe/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.4.0" id="surveyframe-040-in-development">surveyframe 0.4.0 (in development)<a class="anchor" aria-label="anchor" href="#surveyframe-040-in-development"></a></h2>
+<p>This release is in progress. Entries are added as the work lands rather than reconstructed at submission time.</p>
+<div class="section level3">
+<h3 id="corrected-results-read-before-comparing-against-earlier-output-0-4-0">Corrected results (read before comparing against earlier output)<a class="anchor" aria-label="anchor" href="#corrected-results-read-before-comparing-against-earlier-output-0-4-0"></a></h3>
+<p>Four defects found by independent cross-validation are fixed. Each produced plausible numbers with no error or warning, so results computed with an earlier version should be re-run rather than trusted.</p>
+<ul><li>
+<code><a href="../reference/item_report.html">item_report()</a></code> returned the wrong item-rest correlation. It subtracted each item from a <code><a href="https://rdrr.io/r/base/colSums.html" class="external-link">rowMeans()</a></code> total, which leaves roughly noise carrying the item negatively, so a highly reliable scale reported strong negative values. On simulated data with alpha 0.947 every item came back at about -0.46. The statistic is now the item against the sum of the other items in its scale, and matches <code><a href="https://rdrr.io/pkg/psych/man/alpha.html" class="external-link">psych::alpha()</a></code>’s <code>item.stats$r.drop</code> to 1e-10.</li>
+<li>Repeated-measures ANOVA tested the condition effect against the wrong error term, because the subject identifier was left as an integer and <code><a href="https://rdrr.io/r/stats/aov.html" class="external-link">aov()</a></code> treated it as a continuous covariate. On a fixture where <code>jmv::anovaRM()</code> gives F(2, 78) = 86.93, surveyframe reported F = 1.45, p = 0.24. Correcting the identifier alone was not sufficient: the corrected design produces no <code>Error: Within</code> stratum, so the effect is now located by searching the strata rather than by a fixed name.</li>
+<li>
+<code><a href="../reference/validate_sframe.html">validate_sframe()</a></code> rejected valid instruments. Its known-variable list held only base item and scale ids, so an analysis plan naming an expansion column (<code>item__sub</code>, <code>item__option</code>, <code>item__a__vs__b</code>, <code>item__crit</code>) failed validation for variables that do exist, including real exports from the visual builder. <code><a href="../reference/read_responses.html">read_responses()</a></code> already accepted those columns. Both now derive the list from one shared helper.</li>
+<li>The SEM syntax generators ignored the model type. <code><a href="../reference/seminr_syntax.html">seminr_syntax()</a></code>, <code><a href="../reference/sem_lavaan_syntax.html">sem_lavaan_syntax()</a></code>, and <code><a href="../reference/cfa_lavaan_syntax.html">cfa_lavaan_syntax()</a></code> never checked <code>model$type</code>, and the builder offered every saved model to all 3 generators, so a covariance-based model produced PLS-SEM syntax with no complaint. That is a runnable script estimating a model the researcher never declared. All 3 now refuse a mismatched estimation family, and the builder filters each model role to the types its generator can produce.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="breaking-the-shiny-collector-now-emits-expansion-columns-0-4-0">Breaking: the Shiny collector now emits expansion columns<a class="anchor" aria-label="anchor" href="#breaking-the-shiny-collector-now-emits-expansion-columns-0-4-0"></a></h3>
+<ul><li>
+<code><a href="../reference/render_survey.html">render_survey()</a></code> pipe-joined a matrix item’s cells into a single column, so a matrix question answered in the Shiny survey arrived as <code>mx = "4|5"</code> where <code><a href="../reference/read_responses.html">read_responses()</a></code> and the whole analysis layer expect <code>mx__r1</code> and <code>mx__r2</code>. Data collected that way could not be read back by the package at all, and nothing said so at collection time. Ranking and multiple-choice items had the same shape problem.</li>
+<li>All 3 now emit the expansion columns that the static template and the Google Sheets collector already emitted: one column per matrix sub-item carrying its value, one per ranking option carrying its rank position, and one per multi-select option carrying 0 or 1.</li>
+<li>
+<strong>This changes the output shape of the Shiny collector.</strong> A study mid-collection through <code><a href="../reference/render_survey.html">render_survey()</a></code> will see its matrix, ranking, and multi-select columns change name and layout between versions. Responses already gathered under the old shape need re-shaping before they can be read, and the decision item types are unaffected because they emitted the correct columns from the start.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="the-rated-performance-matrix-can-now-be-wired-in-both-guis-0-4-0">The rated performance matrix can now be wired in both GUIs<a class="anchor" aria-label="anchor" href="#the-rated-performance-matrix-can-now-be-wired-in-both-guis-0-4-0"></a></h3>
+<ul><li>SurveyStudio and the visual builder both offered an empty “Performance matrix items” dropdown for all 7 ranking methods (TOPSIS, VIKOR, MOORA, SMART, WASPAS, PROMETHEE, ELECTRE). That role matches on a <code>"matrix"</code> level, and neither surface gave matrix items one: the studio classified them as <code>"identifier"</code> and the builder grouped them under <code>"expanded"</code>, which no role accepts. The effect was that the rated-matrix path, where respondents rate every alternative on every criterion, could only be built by writing R directly, even though it is one of the 3 declared ways to supply a decision matrix. Matrix items now carry their own <code>"matrix"</code> level in both surfaces.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="decision-analysis-non-results-now-say-so-0-4-0">Decision analysis: non-results now say so<a class="anchor" aria-label="anchor" href="#decision-analysis-non-results-now-say-so-0-4-0"></a></h3>
+<ul><li>ELECTRE I reports when it establishes no outranking relation at all. On a 9-criterion problem at the default 0.70 and 0.30 thresholds no alternative clears concordance against any other, so every score is 0 and every alternative ranks 1. That is legitimate behaviour for the method, but the results table read as “all 9 alternatives are jointly best” and the APA sentence reported a kernel containing every alternative. A note now states that the equal ranks are an absence of evidence rather than a tie for first place.</li>
+<li>
+<code><a href="../reference/sensitivity_analysis.html">sensitivity_analysis()</a></code> gains a <code>degenerate</code> flag for the same reason. A ranking that never separated the alternatives cannot be changed by perturbing a weight, so every check passed and <code>stable</code> came back <code>TRUE</code>: the strongest robustness signal the function can give, produced by the weakest result it can be handed. <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code> now leads with “No result to test” instead of “Stable” in that case.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="data-quality-0-4-0">Data quality<a class="anchor" aria-label="anchor" href="#data-quality-0-4-0"></a></h3>
+<ul><li>
+<code><a href="../reference/quality_report.html">quality_report()</a></code> counted only columns matching a bare item id, and multi-column items never post under those, so every expansion column was invisible to the missingness check. A respondent who skipped an entire pairwise battery was reported at 0 percent missing. Expansion columns now count as item data, which brings matrix, ranking, multi-select, and the 2 decision item types into the missingness figures for the first time. <strong>Reported missingness rates will change for any instrument using those item types</strong>, because columns that were silently excluded are now counted. Straight-lining and timing are unaffected: straight-lining runs over declared scales, and timing is measured on the clock.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="bundled-demo-data-0-4-0">Bundled demo data<a class="anchor" aria-label="anchor" href="#bundled-demo-data-0-4-0"></a></h3>
+<ul><li>Both bundled demo instruments wired their seminr block to a <code>cb_sem</code> model, so <code><a href="../reference/sframe_demo_data.html">sframe_demo_data()</a></code> generated PLS-SEM syntax from a covariance-based model, and every vignette and example loading it inherited the same mismatch. Each demo now carries a real <code>pls_sem</code> model with composite constructs. The instrument hashes changed with it.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="decision-analysis-0-4-0">Decision analysis<a class="anchor" aria-label="anchor" href="#decision-analysis-0-4-0"></a></h3>
+<ul><li>All 10 MCDM methods now return a citation. Previously only TOPSIS and AHP had one. Every reference was checked against the publication record.</li>
+<li>
+<code><a href="../reference/sframe_decision_options.html">sframe_decision_options()</a></code> documents PROMETHEE’s preference functions and records why the default is <code>"usual"</code>, Brans and Vincke’s type I step function, rather than the linear function that several other implementations default to. The difference is material: net flows always differ between the 2 functions, and the ranking itself changed in 226 of 400 randomly drawn 4-alternative by 3-criterion matrices.</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.3.4" id="surveyframe-034">surveyframe 0.3.4<a class="anchor" aria-label="anchor" href="#surveyframe-034"></a></h2><p class="text-muted">CRAN release: 2026-07-24</p>
 <p>This release completes the plotting, interface, statistics, and reporting work started in 0.3.3. Every analysis family now has a chart, every effect size ships with a confidence interval, reports accept written interpretations and print to PDF, both dashboards gain quality and correlation panels, date questions gain bounds, and the builder and vignettes pass a WCAG 2.2 AA accessibility audit. Hard dependencies are unchanged. naniar and pagedown join Suggests.</p>

@@ -36,5 +36,6 @@ print(instr)
 #>   Version:    0.1.0
 #>   Items:      1
 #>   Scales:     0
+#>   Analysis:   0 block(s)
 #>   Status:     not validated
 ```

@@ -70,9 +70,9 @@ kable(first$diagnostics, digits = 2,
 
 | item_id | mean |   sd | item_rest_r | floor_pct | ceiling_pct | n_missing |
 |:--------|-----:|-----:|------------:|----------:|------------:|----------:|
-| dm_1    | 3.14 | 1.00 |       -0.51 |      0.05 |        0.10 |         0 |
-| dm_2    | 3.12 | 0.97 |       -0.46 |      0.05 |        0.07 |         0 |
-| dm_3    | 3.19 | 1.00 |       -0.51 |      0.06 |        0.08 |         0 |
+| dm_1    | 3.14 | 1.00 |        0.69 |      0.05 |        0.10 |         0 |
+| dm_2    | 3.12 | 0.97 |        0.71 |      0.05 |        0.07 |         0 |
+| dm_3    | 3.19 | 1.00 |        0.70 |      0.06 |        0.08 |         0 |
 
 Item diagnostics: Digital marketing effectiveness (digital_marketing)
 {.table}

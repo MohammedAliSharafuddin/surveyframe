@@ -28,7 +28,7 @@ unique id within the instrument it is added to."><meta property="og:image" conte
 
     <a class="navbar-brand me-2" href="../index.html">surveyframe</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.4</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.4.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -64,7 +64,8 @@ unique <code>id</code> within the instrument it is added to.</p>
 <span>  <span class="va">id</span>,</span>
 <span>  <span class="va">label</span>,</span>
 <span>  type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"likert"</span>, <span class="st">"single_choice"</span>, <span class="st">"multiple_choice"</span>, <span class="st">"numeric"</span>, <span class="st">"text"</span>, <span class="st">"textarea"</span>,</span>
-<span>    <span class="st">"date"</span>, <span class="st">"matrix"</span>, <span class="st">"slider"</span>, <span class="st">"ranking"</span>, <span class="st">"rating"</span>, <span class="st">"section_break"</span>, <span class="st">"text_block"</span><span class="op">)</span>,</span>
+<span>    <span class="st">"date"</span>, <span class="st">"matrix"</span>, <span class="st">"slider"</span>, <span class="st">"ranking"</span>, <span class="st">"rating"</span>, <span class="st">"pairwise_comparison"</span>,</span>
+<span>    <span class="st">"criteria_weight"</span>, <span class="st">"section_break"</span>, <span class="st">"text_block"</span><span class="op">)</span>,</span>
 <span>  required <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  choice_set <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  scale_id <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -72,6 +73,8 @@ unique <code>id</code> within the instrument it is added to.</p>
 <span>  help <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  placeholder <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  matrix_items <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  comparison_items <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  comparison_scale <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  slider_min <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  slider_max <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  slider_step <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -102,7 +105,8 @@ respondent.</p></dd>
 <dd><p>Character. The response type. One of <code>"likert"</code>,
 <code>"single_choice"</code>, <code>"multiple_choice"</code>, <code>"numeric"</code>, <code>"text"</code>,
 <code>"textarea"</code>, <code>"date"</code>, <code>"matrix"</code>, <code>"slider"</code>, <code>"ranking"</code>, <code>"rating"</code>,
-<code>"section_break"</code>, or <code>"text_block"</code>.</p></dd>
+<code>"pairwise_comparison"</code>, <code>"criteria_weight"</code>, <code>"section_break"</code>, or
+<code>"text_block"</code>.</p></dd>
 
 
 <dt id="arg-required">required<a class="anchor" aria-label="anchor" href="#arg-required"></a></dt>
@@ -132,6 +136,23 @@ respondent.</p></dd>
 
 <dt id="arg-matrix-items">matrix_items<a class="anchor" aria-label="anchor" href="#arg-matrix-items"></a></dt>
 <dd><p>Character vector or NULL. Row labels for <code>"matrix"</code> type.</p></dd>
+
+
+<dt id="arg-comparison-items">comparison_items<a class="anchor" aria-label="anchor" href="#arg-comparison-items"></a></dt>
+<dd><p>Character vector or NULL. The things being compared
+or weighted, for <code>"pairwise_comparison"</code> and <code>"criteria_weight"</code> types.
+At least 2 entries, all distinct. A <code>"saaty"</code> pairwise item renders
+<code>n(n-1)/2</code> unordered pair rows, an <code>"influence"</code> item renders <code>n(n-1)</code>
+ordered rows, and a <code>"criteria_weight"</code> item renders one numeric input
+per entry. An advisory warning is raised above 7 items (<code>"saaty"</code>) or 6
+(<code>"influence"</code>); above 10 the item is rejected.</p></dd>
+
+
+<dt id="arg-comparison-scale">comparison_scale<a class="anchor" aria-label="anchor" href="#arg-comparison-scale"></a></dt>
+<dd><p>Character or NULL. For <code>"pairwise_comparison"</code>
+only. <code>"saaty"</code> (the default) gives the bipolar 1-9 importance scale used
+by AHP and ANP; <code>"influence"</code> gives the unipolar 0-4 directed influence
+scale used by DEMATEL.</p></dd>
 
 
 <dt id="arg-slider-min">slider_min<a class="anchor" aria-label="anchor" href="#arg-slider-min"></a></dt>

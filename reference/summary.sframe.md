@@ -43,5 +43,8 @@ summary(instr)
 #> Scales:    0
 #> Branches:  0
 #> Checks:    0
+#> 
+#> Analysis plan: 0 block(s)
+#> 
 #> Status:    not validated
 ```

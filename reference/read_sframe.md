@@ -44,5 +44,6 @@ print(instr)
 #>   Version:    0.3.0
 #>   Items:      15
 #>   Scales:     5
+#>   Analysis:   34 block(s)
 #>   Status:     valid
 ```

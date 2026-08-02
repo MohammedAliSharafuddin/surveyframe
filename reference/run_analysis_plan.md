@@ -95,7 +95,7 @@ print(results)
 #> 
 #> RQ 3: Do first-time and repeat visitors differ in behavioural intention?
 #>   Test: mann_whitney
-#>   APA:  U = 1576, z = -0.98, p = 0.327, r = 0.09 [0.00, 0.27]
+#>   APA:  U = 1576, z = -0.98, p = 0.327, r = 0.09 [0.00, 0.27], Hodges-Lehmann shift = -0.00 [-0.50, 0.00]
 #> 
 #> RQ 4: What is the distribution of first-time and repeat visitors?
 #>   Test: frequency
@@ -171,7 +171,7 @@ print(results)
 #> 
 #> RQ 22: Is there a significant distributional difference between the first two service quality items?
 #>   Test: wilcoxon_pair
-#>   APA:  V = 967, z = -1.17, p = 0.240, r = 0.11 [0.01, 0.38]
+#>   APA:  V = 967, z = -1.17, p = 0.240, r = 0.11 [0.01, 0.38], pseudomedian = -0.00 [-0.00, 0.00]
 #> 
 #> RQ 23: Does satisfaction differ across visitor types?
 #>   Test: kruskal_wallis
@@ -187,7 +187,7 @@ print(results)
 #> 
 #> RQ 26: Do mean ratings differ across the three digital marketing items within respondents?
 #>   Test: repeated_anova
-#>   APA:  F(2, 354) = 0.21, p = 0.808, partial η² = 0.001
+#>   APA:  F(2, 238) = 0.40, p = 0.670, partial η² = 0.003
 #> 
 #> RQ 27: Do ordinal ratings differ across the three service quality items within respondents?
 #>   Test: friedman

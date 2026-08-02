@@ -24,7 +24,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">surveyframe</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.4</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.4.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -453,6 +453,71 @@
         </dt>
         <dd>Run a pre-planned analysis from an instrument's analysis plan</dd>
       </dl></div><div class="section level2">
+      <h2 id="decision-analysis">Decision analysis<a class="anchor" aria-label="anchor" href="#decision-analysis"></a></h2>
+
+      <div class="section-desc"><p>Multi-criteria decision analysis, new in 0.4.0. The 10 methods run through the analysis plan like any other, so the functions here are the ones that assemble their input, test how stable a ranking is, and build choice designs.</p></div>
+
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="sensitivity_analysis.html">sensitivity_analysis()</a></code>
+
+        </dt>
+        <dd>Test how far a decision ranking moves when the weights are perturbed</dd>
+
+        <dt>
+
+          <code><a href="sf_conjoint_design.html">sf_conjoint_design()</a></code>
+
+        </dt>
+        <dd>Declare a choice-experiment (conjoint) design</dd>
+
+        <dt>
+
+          <code><a href="sframe_assemble_pairwise.html">sframe_assemble_pairwise()</a></code>
+
+        </dt>
+        <dd>Assemble per-respondent comparison matrices</dd>
+
+        <dt>
+
+          <code><a href="sframe_aggregate_judgements.html">sframe_aggregate_judgements()</a></code>
+
+        </dt>
+        <dd>Aggregate individual judgement matrices</dd>
+
+        <dt>
+
+          <code><a href="sframe_collected_weights.html">sframe_collected_weights()</a></code>
+
+        </dt>
+        <dd>Criterion weights collected from respondents</dd>
+
+        <dt>
+
+          <code><a href="sframe_rated_matrix.html">sframe_rated_matrix()</a></code>
+
+        </dt>
+        <dd>Build a performance matrix from rated matrix items</dd>
+
+        <dt>
+
+          <code><a href="sframe_decision_options.html">sframe_decision_options()</a></code>
+
+        </dt>
+        <dd>Normalise the decision options of an analysis-plan block</dd>
+
+        <dt>
+
+          <code><a href="sframe_dematel_compute.html">sframe_dematel_compute()</a></code>
+
+        </dt>
+        <dd>The DEMATEL total-relation classification</dd>
+      </dl></div><div class="section level2">
       <h2 id="confidence-intervals">Confidence intervals<a class="anchor" aria-label="anchor" href="#confidence-intervals"></a></h2>
 
       <div class="section-desc"><p>Base-R bootstrap and effect-size confidence interval helpers, reused across the inferential runners.</p></div>
@@ -563,6 +628,20 @@
 
         </dt>
         <dd>Correlation matrix heatmap</dd>
+
+        <dt>
+
+          <code><a href="sframe_plot_decision_ranking.html">sframe_plot_decision_ranking()</a></code>
+
+        </dt>
+        <dd>Ranked-score bar chart for a decision-family result</dd>
+
+        <dt>
+
+          <code><a href="sframe_plot_dematel_influence.html">sframe_plot_dematel_influence()</a></code>
+
+        </dt>
+        <dd>Prominence-relation scatter for a DEMATEL result</dd>
 
         <dt>
 

@@ -314,9 +314,20 @@ are available for manual use. Tests and examples avoid opening browsers.
 
 ## Roadmap
 
-Small-sample inference helpers, validated by a simulation study of
-survey methods, are planned for v0.4. Multi-criteria decision-making
-methods (MCDM) and DEMATEL are planned for v0.5.
+Small-sample inference and multi-criteria decision analysis both arrive
+in 0.4.0. They were once planned as two releases, v0.4 and v0.5, and
+were merged into one. There is no 0.3.5 and no 0.5.x.
+
+0.4.0 adds small-sample helpers validated by a simulation study
+(Hodges-Lehmann, paired-Wilcoxon pseudomedian, exact Fisher odds-ratio
+intervals, Firth logistic regression), 10 MCDM methods (TOPSIS, AHP,
+ANP, DEMATEL, VIKOR, MOORA, SMART, WASPAS, PROMETHEE, ELECTRE) with 2
+new question types for collecting judgements, weight-sensitivity
+analysis, and declared conjoint designs.
+
+After that, 0.4.1 is a demo-proofing patch, and 0.4.2 onward ports
+further MCDM methods in batches. See `NEWS.md` for what each release
+contains.
 
 ## Citation
 

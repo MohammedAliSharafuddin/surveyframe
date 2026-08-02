@@ -137,6 +137,30 @@ psychometric diagnostics and pre-planned analyses.
 - [`run_analysis_plan()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/run_analysis_plan.md)
   : Run a pre-planned analysis from an instrument's analysis plan
 
+## Decision analysis
+
+Multi-criteria decision analysis, new in 0.4.0. The 10 methods run
+through the analysis plan like any other, so the functions here are the
+ones that assemble their input, test how stable a ranking is, and build
+choice designs.
+
+- [`sensitivity_analysis()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sensitivity_analysis.md)
+  : Test how far a decision ranking moves when the weights are perturbed
+- [`sf_conjoint_design()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_conjoint_design.md)
+  : Declare a choice-experiment (conjoint) design
+- [`sframe_assemble_pairwise()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_assemble_pairwise.md)
+  : Assemble per-respondent comparison matrices
+- [`sframe_aggregate_judgements()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_aggregate_judgements.md)
+  : Aggregate individual judgement matrices
+- [`sframe_collected_weights()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_collected_weights.md)
+  : Criterion weights collected from respondents
+- [`sframe_rated_matrix()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_rated_matrix.md)
+  : Build a performance matrix from rated matrix items
+- [`sframe_decision_options()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_decision_options.md)
+  : Normalise the decision options of an analysis-plan block
+- [`sframe_dematel_compute()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_dematel_compute.md)
+  : The DEMATEL total-relation classification
+
 ## Confidence intervals
 
 Base-R bootstrap and effect-size confidence interval helpers, reused
@@ -176,6 +200,10 @@ Opt-in ggplot2 charts for analysis results, and the package theme.
   : Plot analysis-plan results
 - [`sframe_plot_correlation_matrix()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_plot_correlation_matrix.md)
   : Correlation matrix heatmap
+- [`sframe_plot_decision_ranking()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_plot_decision_ranking.md)
+  : Ranked-score bar chart for a decision-family result
+- [`sframe_plot_dematel_influence()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_plot_dematel_influence.md)
+  : Prominence-relation scatter for a DEMATEL result
 - [`sframe_plot_descriptives()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_plot_descriptives.md)
   : Distribution shape by variable, standardised
 - [`sframe_plot_efa_loadings()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_plot_efa_loadings.md)
