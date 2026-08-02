@@ -1,0 +1,396 @@
+---
+title: "09. Psychometrics and factor analysis"
+subtitle: "Alpha, omega, item diagnostics, EFA readiness, EFA solution, validity"
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    embed-resources: true
+editor: visual
+execute:
+  warning: false
+  message: false
+  error: true
+---
+
+```{r}
+#| label: setup
+#| include: false
+source("_setup.R")
+```
+
+Everything here takes the same field combination: **a battery of Likert or
+rating items grouped into one or more scales**. Section 5 proves a fix for a
+bug that is live on CRAN right now.
+
+## 1. Questionnaire and plan
+
+Two constructs, 5 items each, so discriminant validity has something to
+separate.
+
+```{r}
+#| label: build
+lik <- function(id, label, scale, rev = FALSE)
+  sf_item(id, label, type = "likert", choice_set = "a5",
+          scale_id = scale, reverse = rev)
+
+psy <- sf_instrument(
+  title = "Learner motivation and anxiety", version = "1.0.0",
+  components = c(
+    list(sf_choices("a5", 1:5,
+                    c("Strongly disagree", "Disagree", "Neutral",
+                      "Agree", "Strongly agree"))),
+    list(
+      lik("mot1", "I enjoy the challenge of this subject.", "motivation"),
+      lik("mot2", "I want to understand this topic deeply.", "motivation"),
+      lik("mot3", "I put effort into this module.", "motivation"),
+      lik("mot4", "I look forward to the classes.", "motivation"),
+      lik("mot5", "I find this module a chore.", "motivation", rev = TRUE),
+      lik("anx1", "I feel tense before assessments.", "anxiety"),
+      lik("anx2", "I worry about failing this module.", "anxiety"),
+      lik("anx3", "I feel calm during tests.", "anxiety", rev = TRUE),
+      lik("anx4", "My mind goes blank under pressure.", "anxiety"),
+      lik("anx5", "I dread the exam period.", "anxiety")
+    ),
+    list(
+      sf_scale("motivation", "Motivation",
+               items = paste0("mot", 1:5)),
+      sf_scale("anxiety", "Test anxiety", items = paste0("anx", 1:5))
+    )
+  ),
+  analysis_plan = list(
+    list(id = "RQ1", research_question = "Are the 2 scales reliable?",
+         family = "psychometrics", method = "reliability_alpha"),
+    list(id = "RQ2", research_question = "And by omega?",
+         family = "psychometrics", method = "reliability_omega"),
+    list(id = "RQ3", research_question = "Does any item weaken its scale?",
+         family = "psychometrics", method = "item_diagnostics"),
+    list(id = "RQ4", research_question = "Is this data suitable for EFA?",
+         family = "psychometrics", method = "efa_readiness"),
+    list(id = "RQ5", research_question = "Do 2 factors emerge as designed?",
+         family = "psychometrics", method = "efa_solution",
+         roles = list(items = c(paste0("mot", 1:5), paste0("anx", 1:5))),
+         options = list(nfactors = 2))
+  )
+)
+psy
+```
+
+## 2. Both collection routes
+
+```{r}
+#| label: routes
+set.seed(12)
+ids <- c(paste0("mot", 1:5), paste0("anx", 1:5))
+sf_both_routes(psy, function(i)
+  stats::setNames(as.list(sample(1:5, 10, TRUE)), ids), n = 4)
+```
+
+## 3. Dummy data with 2 real factors
+
+```{r}
+#| label: data
+set.seed(2468)
+n   <- 300
+mot <- rnorm(n)
+anx <- -0.3 * mot + rnorm(n, 0, 0.95)   # mildly negatively related
+
+mk <- function(latent, load, reverse = FALSE) {
+  v <- 3 + load * latent + rnorm(n, 0, 0.75)
+  v <- pmin(5, pmax(1, round(v)))
+  if (reverse) 6 - v else v
+}
+
+responses <- data.frame(
+  mot1 = mk(mot, 0.9), mot2 = mk(mot, 0.85), mot3 = mk(mot, 0.8),
+  mot4 = mk(mot, 0.75), mot5 = mk(mot, 0.8, reverse = TRUE),
+  anx1 = mk(anx, 0.85), anx2 = mk(anx, 0.9), anx3 = mk(anx, 0.7, reverse = TRUE),
+  anx4 = mk(anx, 0.8), anx5 = mk(anx, 0.75)
+)
+dat <- read_responses(responses, psy)
+res <- run_analysis_plan(dat, psy)
+res
+```
+
+## 4. RQ1 and RQ2: alpha and omega against `psych`
+
+```{r}
+#| label: acc-alpha
+r1 <- res[["RQ1"]]
+r2 <- res[["RQ2"]]
+
+# The instrument declares mot5 and anx3 reversed, so the reference must
+# reverse them too. check.keys = FALSE stops psych choosing its own keying
+# and quietly making the 2 incomparable.
+rev6 <- function(x) 6 - x
+mot_d <- data.frame(dat[, paste0("mot", 1:4)], mot5 = rev6(dat$mot5))
+anx_d <- data.frame(dat[, c("anx1", "anx2")], anx3 = rev6(dat$anx3),
+                    dat[, c("anx4", "anx5")])
+
+pa_m <- psych::alpha(mot_d, check.keys = FALSE, warnings = FALSE)
+pa_a <- psych::alpha(anx_d, check.keys = FALSE, warnings = FALSE)
+
+tab <- compare_table(
+  compare_row("alpha, motivation", r1$motivation$alpha,
+              pa_m$total$raw_alpha, "psych::alpha()"),
+  compare_row("alpha, anxiety", r1$anxiety$alpha,
+              pa_a$total$raw_alpha, "psych::alpha()"),
+  compare_row("standardised alpha, motivation", r1$motivation$alpha_std,
+              pa_m$total$std.alpha, "psych::alpha()")
+)
+compare_report(tab, caption = "RQ1 alpha vs psych")
+sf_log(tab)
+```
+
+```{r}
+#| label: acc-omega
+om_m <- psych::omega(mot_d, nfactors = 1, plot = FALSE, warnings = FALSE)
+
+tab <- compare_table(
+  compare_row("omega total, motivation", r2$motivation$omega_t,
+              om_m$omega.tot, "psych::omega()", tol = 1e-3)
+)
+compare_report(tab, caption = "RQ2 omega vs psych")
+sf_log(tab)
+```
+
+```{r}
+#| label: acc-alpha-plot
+plot(reliability_report(dat, psy))
+```
+
+-   [ ] All 3 alpha verdicts read `match`.
+-   [ ] Omega matches to `1e-3`. The tolerance is loosened here because
+    `psych::omega()` fits a factor model and its optimiser is not bit-stable
+    across versions. That is the stated reason, so the loosening is
+    accountable rather than convenient.
+-   [ ] Both scales clear 0.7, which they should, because the data was built
+    with a single strong factor each.
+
+## 5. RQ3: item diagnostics, and the bug this fixes
+
+::: callout-important
+## Live on CRAN right now
+
+In 0.3.4 `item_report()` computed the item-rest correlation with
+`rowMeans()` where the standard needs the **sum** of the other items
+(`R/psychometrics.R:179`). On a scale with alpha 0.88 it returned
+**negative** item-rest correlations, which would tell a researcher to delete
+good items.
+
+`psych::alpha()$item.stats$r.drop` is the independent oracle. If these
+verdicts read `match`, the fix is real.
+:::
+
+```{r}
+#| label: acc-itemrest
+r3 <- res[["RQ3"]]
+dg <- r3$motivation$diagnostics
+
+# psych, run twice: once on the raw columns and once with mot5 reversed as
+# the instrument declares. Only one of these should be the right reference.
+ps_raw <- psych::alpha(dat[, paste0("mot", 1:5)],
+                       check.keys = FALSE, warnings = FALSE)$item.stats
+ps_rev <- pa_m$item.stats
+
+data.frame(
+  item                      = dg$item_id,
+  surveyframe               = round(dg$item_rest_r, 4),
+  psych_raw                 = round(ps_raw$r.drop, 4),
+  psych_reverse_as_declared = round(ps_rev$r.drop, 4)
+)
+```
+
+::: callout-warning
+## Defect found while writing this file, 2026-08-02
+
+surveyframe matches the **raw** column exactly and the **reversed** column
+not at all. `item_report()` never applies `reverse = TRUE`, although
+`score_scales()` and `reliability_report()` both do. So this scale reports
+alpha 0.84 and, at the same time, a strongly negative item-rest correlation
+for `mot5`.
+
+Two things follow. The reverse-keyed item looks like a deletion candidate
+and is not. And every other item in the scale is depressed as well, because
+the unreversed item sits inside the rest-sum pulling against them, so an
+item near a 0.3 retention threshold can be dropped on a keying error.
+
+This is the same symptom A2 fixed in this release, reached by a different
+route. A2 corrected the formula. The keying was never in scope. Logged in
+`dogfeed.todo.md`, and it needs an owner decision before release.
+:::
+
+```{r}
+#| label: acc-itemrest-cmp
+# Against the raw reference, which is what surveyframe currently computes.
+# This confirms the A2 formula fix is correct and intact: the sum of the
+# other items, not rowMeans().
+tab <- do.call(compare_table, lapply(seq_len(nrow(dg)), function(i) {
+  compare_row(paste("item-rest r,", dg$item_id[i]),
+              dg$item_rest_r[i], ps_raw$r.drop[i],
+              "psych r.drop, raw columns")
+}))
+compare_report(tab, caption = "RQ3: the A2 formula fix, checked on raw columns")
+sf_log(tab)
+```
+
+```{r}
+#| label: acc-itemrest-plot
+op <- par(mfrow = c(1, 2), mar = c(4, 4, 3, 1))
+barplot(dg$item_rest_r, names.arg = dg$item_id, col = "#4292c6", border = NA,
+        ylim = c(-1, 1), ylab = "item-rest correlation",
+        main = "As surveyframe reports it")
+abline(h = c(0, 0.3), lty = c(1, 2), col = c("#404040", "#b2182b"))
+barplot(ps_rev$r.drop, names.arg = dg$item_id, col = "#1b7837", border = NA,
+        ylim = c(-1, 1), ylab = "item-rest correlation",
+        main = "With the declared reversal applied")
+abline(h = c(0, 0.3), lty = c(1, 2), col = c("#404040", "#b2182b"))
+par(op)
+```
+
+-   [ ] Every verdict reads `match` against the raw reference. That is the
+    A2 formula fix confirmed: the sum of the other items rather than
+    `rowMeans()`.
+-   [ ] **The left plot has one bar below zero and the right plot has none.**
+    That gap is the keying defect, not the A2 bug. Confirm you can see it
+    before recording a decision.
+-   [ ] **Owner decision.** Fix the keying in 0.4.0, which changes numbers
+    `item_report()` currently reports and so belongs in NEWS as breaking, or
+    lane it to 0.4.1 and document the limitation.
+-   [ ] The floor and ceiling percentages in `dg` are plausible for a
+    5-point scale.
+
+## 6. RQ4: EFA readiness against `psych`
+
+```{r}
+#| label: acc-efa-ready
+r4  <- res[["RQ4"]]
+all_items <- c(paste0("mot", 1:5), paste0("anx", 1:5))
+km  <- psych::KMO(dat[, all_items])
+bt  <- psych::cortest.bartlett(cor(dat[, all_items]), n = nrow(dat))
+
+tab <- compare_table(
+  compare_row("KMO overall MSA", r4$kmo$MSA, km$MSA, "psych::KMO()"),
+  compare_row("Bartlett chi-square", r4$bartlett$chisq, bt$chisq,
+              "psych::cortest.bartlett()"),
+  compare_row("Bartlett df", r4$bartlett$df, bt$df,
+              "psych::cortest.bartlett()"),
+  compare_row("Bartlett p", r4$bartlett$p.value, bt$p.value,
+              "psych::cortest.bartlett()", tol = 1e-10)
+)
+compare_report(tab, caption = "RQ4 EFA readiness vs psych")
+sf_log(tab)
+```
+
+```{r}
+#| label: acc-efa-ready-plot
+barplot(r4$kmo$MSAi, las = 2, col = "#66c2a5", border = NA, ylim = c(0, 1),
+        ylab = "MSA", main = "RQ4: per-item sampling adequacy")
+abline(h = 0.5, lty = 2, col = "#b2182b")
+```
+
+-   [ ] All 4 verdicts read `match`.
+-   [ ] Every per-item MSA clears the 0.5 line.
+-   [ ] `r4$suggested_nfactors` says 2, which is how the data was built. If
+    it says something else, say so, because the parallel analysis is the
+    part a user will trust without checking.
+
+## 7. RQ5: the EFA solution
+
+```{r}
+#| label: acc-efa
+r5 <- res[["RQ5"]]
+# loadings carries an item_id column alongside the numeric factor columns.
+r5$loadings
+```
+
+```{r}
+#| label: acc-efa-cmp
+pf <- psych::fa(dat[, all_items], nfactors = 2, rotate = r5$rotation,
+                fm = "minres")
+# Factor order and sign are arbitrary in any EFA, so the comparable quantity
+# is the communality of each item, which is invariant to both.
+tab <- do.call(compare_table, lapply(all_items, function(id) {
+  compare_row(paste("communality,", id),
+              r5$communalities[[id]],
+              unname(pf$communality[[id]]),
+              "psych::fa()", tol = 1e-3)
+}))
+compare_report(tab, caption = "RQ5 communalities vs psych::fa()")
+sf_log(tab)
+```
+
+```{r}
+#| label: acc-efa-plot
+# The first column is item_id, so the factor columns are everything after it.
+fac <- setdiff(names(r5$loadings), "item_id")
+L   <- as.matrix(r5$loadings[, fac])
+rownames(L) <- r5$loadings$item_id
+
+plot(L[, 1], L[, 2], type = "n", xlim = c(-1, 1), ylim = c(-1, 1),
+     xlab = fac[1], ylab = fac[2],
+     main = "RQ5: do the 2 designed constructs separate?")
+abline(h = 0, v = 0, col = "#cccccc")
+text(L[, 1], L[, 2], labels = rownames(L),
+     col = ifelse(grepl("^mot", rownames(L)), "#1b7837", "#b2182b"))
+```
+
+-   [ ] Every communality matches `psych::fa()` to `1e-3`.
+-   [ ] **The plot is the real check.** The green `mot` labels cluster on one
+    axis and the red `anx` labels on the other. If they mix, either the data
+    or the rotation is not doing what the section claims.
+-   [ ] `r5$variance_table` and `r5$item_flags` both print and are readable.
+
+## 8. Validity
+
+```{r}
+#| label: validity
+# validity_report() wants a long frame with `construct` and `loading`.
+# Each item is assigned to the factor it loads most strongly on, and only
+# that loading is used, which is what average variance extracted and
+# composite reliability are defined on.
+long <- r5$loadings_long
+best <- do.call(rbind, lapply(split(long, long$item_id), function(g)
+  g[which.max(abs(g$loading)), ]))
+best$construct <- best$factor
+
+vr <- validity_report(
+  loadings = best[, c("item_id", "construct", "loading")],
+  construct_scores = score_scales(dat, psy)[, c("motivation", "anxiety")],
+  items_by_construct = list(motivation = paste0("mot", 1:5),
+                            anxiety = paste0("anx", 1:5))
+)
+vr
+```
+
+```{r}
+#| label: validity-assignment
+# Which extracted factor each declared construct landed on. If the mot
+# items and the anx items do not separate cleanly here, the numbers above
+# are describing something other than the 2 designed constructs.
+table(declared = ifelse(grepl("^mot", best$item_id), "motivation", "anxiety"),
+      loaded_on = best$construct)
+```
+
+```{r}
+#| label: validity-plot
+plot(vr)
+```
+
+-   [ ] Average variance extracted and composite reliability print for both
+    constructs.
+-   [ ] The heterotrait-monotrait ratio is below the usual 0.85 threshold,
+    which it should be, because the 2 constructs were built to be distinct.
+-   [ ] **Owner judgement.** Would a first-time user know what to do with a
+    failing HTMT from what is printed?
+
+## Verdict for this file
+
+```{r}
+#| label: verdict
+sf_verdict()
+```
+
+-   [ ] `0 DIFFERS, 0 CHECK`.
+-   [ ] Section 5 in particular is clean, since that fix is the reason 0.4.0
+    changes numbers earlier versions reported.

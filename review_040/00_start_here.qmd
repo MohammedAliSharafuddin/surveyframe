@@ -106,22 +106,32 @@ comparison was.
 
 ## Order to work through
 
+**Written and passing.** Each renders with 0 errors and every comparison
+reads `match`.
+
+| File | Covers | Comparisons |
+|------------------|--------------------------------------|--------|
+| `01_first_workflow` | The whole package in one sitting | 17 |
+| `04_categorical` | Chi-square, Fisher, McNemar, Cochran Q | 23 |
+| `05_two_group` | t, Mann-Whitney, paired t, Wilcoxon | 28 |
+| `06_multi_group` | ANOVA, Kruskal, two-way, ANCOVA, repeated, Friedman | 30 |
+| `07_correlation` | Pearson, Spearman, Kendall, partial | 16 |
+| `08_regression` | Linear, logistic, ordinal, multinomial, Firth | 32 |
+| `09_psychometrics` | Alpha, omega, item diagnostics, EFA, validity | 23 |
+| `12_small_sample` | The whole small-sample track | 19 |
+| `13_mcdm` | All 10 MCDM methods | 15 |
+
+That is 203 checked numbers across 43 of the 50 analysis methods.
+
+**Still to write.** The pattern is settled, so these are mechanical rather
+than exploratory.
+
 | File | Covers | Needs a keyboard? |
-|------------------|-------------------------------|------------------|
-| `01` | First complete workflow, end to end | no |
+|------------------|--------------------------------------|------------------|
 | `02` | Every item type, one demo each | no |
 | `03` | Descriptives, frequencies, quality, missingness | no |
-| `04` | Categorical tests | no |
-| `05` | Two-group comparisons | no |
-| `06` | Multi-group and factorial designs | no |
-| `07` | Correlation | no |
-| `08` | Regression | no |
-| `09` | Psychometrics and factor analysis | no |
 | `10` | Model syntax: CFA, CB-SEM, PLS-SEM | no |
 | `11` | Mediation and moderation | no |
-| `12` | The small-sample track | no |
-| `13` | MCDM, methods 1 to 5 | no |
-| `14` | MCDM, methods 6 to 10 | no |
 | `15` | Sensitivity analysis and conjoint designs | no |
 | `16` | Collection routes and branching | no |
 | `17` | Reporting and the codebook | no |
@@ -129,7 +139,22 @@ comparison was.
 | `19` | The RStudio add-in | **yes, release blocker** |
 | `20` | Release safety and owner decisions | partly |
 
-Files `01` to `17` run without you. Files `18` to `20` need a human.
+## What this suite has already found
+
+Three defects, all logged in `dogfeed.todo.md`, none of which any test suite
+had caught.
+
+1. **`item_report()` ignores `reverse = TRUE`** while `score_scales()` and
+   `reliability_report()` honour it. A reverse-keyed item reports a strongly
+   negative item-rest correlation on a scale whose alpha reads 0.84, and it
+   depresses every other item in the scale as well. Needs an owner decision
+   for 0.4.0. See file `09`, section 5.
+2. **`roles = list(variables = ...)`** works for `correlation_kendall`,
+   fails with `Test failed.` for Pearson and Spearman, and leaks
+   `undefined columns selected` for partial correlation, while 9 other
+   methods accept it. See file `07`.
+3. **`assumption_report()` prints "Assumption checks were computed."** when
+   no check ran. Laned to 0.4.1. See file `05`, section 8.
 
 ## Environment this ran on
 

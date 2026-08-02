@@ -1000,3 +1000,45 @@ with the correlation-roles entry above, since both are the plan vocabulary
 failing quietly rather than a wrong number.
 
 Not a wrong-number defect, so it does not block 0.4.0 on its own.
+
+### [open] `lane: 0.4.0` — `item_report()` ignores `reverse = TRUE` while `reliability_report()` and `score_scales()` honour it
+Found 2026-08-02 while writing review file 09. Same instrument, same data,
+1 scale of 4 Likert items with `a4` declared `reverse = TRUE`:
+
+| function | applies the declared reversal? |
+|---|---|
+| `score_scales()` | yes |
+| `reliability_report()` | yes, alpha 0.8387 |
+| `item_report()` | **no** |
+
+`item_report()` (`R/psychometrics.R:160`) builds `scale_data` straight from
+`data[, cols]` and never consults `item$reverse`. Measured item-rest
+correlations:
+
+    surveyframe item_report : 0.478  0.462  0.407  -0.669
+    psych r.drop, raw       : 0.478  0.462  0.407  -0.669   <- exact match
+    psych r.drop, reversed  : 0.697  0.660  0.660   0.669
+
+Two consequences, and the second is the one that costs a user real data:
+
+1. The reverse-keyed item reports a **strong negative** item-rest
+   correlation on a scale whose own alpha reads 0.84. The obvious reading
+   is "delete this item", and deleting it is wrong.
+2. Every other item in the scale is **depressed too**, here 0.48 where the
+   correct value is 0.70, because the unreversed item sits in the rest-sum
+   and pulls against it. Items near a 0.3 retention threshold can be
+   dropped on the strength of a keying error.
+
+This is the same symptom A2 fixed in this release, a strong negative
+item-rest on a reliable scale, arrived at by a different route. A2 corrected
+the formula (`rowMeans()` where the standard needs the sum of the other
+items). The keying was never in scope and is still wrong. Anyone who reads
+the A2 fix note and sees a negative bar will conclude the fix did not ship.
+
+The fix looks small: reverse `scale_data` before computing, using the same
+declaration `score_scales()` already reads, so all 3 functions agree. It
+changes numbers `item_report()` currently reports, which is the point.
+
+Needs an owner decision. It is a wrong-number defect in a headline
+psychometrics function, so the case for 0.4.0 is strong, but it does change
+published output and belongs in NEWS as breaking if taken.

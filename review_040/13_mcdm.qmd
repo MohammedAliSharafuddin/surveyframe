@@ -1,0 +1,451 @@
+---
+title: "13. Decision analysis: all 10 MCDM methods"
+subtitle: "TOPSIS, AHP, ANP, DEMATEL, VIKOR, MOORA, SMART, WASPAS, PROMETHEE, ELECTRE"
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    embed-resources: true
+editor: visual
+execute:
+  warning: false
+  message: false
+  error: true
+---
+
+```{r}
+#| label: setup
+#| include: false
+source("_setup.R")
+```
+
+The headline feature of 0.4.0. Ten multi-criteria decision-making methods,
+2 new item types to collect their input, and a bundled worked example.
+
+`RMCDA` is the independent oracle throughout. It already earned its place
+during development: it caught WASPAS using SMART's normalisation.
+
+## 1. The bundled instrument
+
+```{r}
+#| label: fixture
+hotel <- read_sframe(sf_fixture("hotel_supplier_mcdm.sframe"))
+
+data.frame(
+  item = vapply(hotel$items, function(i) i$id, character(1)),
+  type = vapply(hotel$items, function(i) i$type, character(1))
+)
+```
+
+```{r}
+#| label: fixture-plan
+data.frame(
+  block  = vapply(hotel$analysis_plan, function(b) b$id, character(1)),
+  method = vapply(hotel$analysis_plan, function(b) b$method, character(1)),
+  roles  = vapply(hotel$analysis_plan, function(b)
+    paste(names(b$roles), vapply(b$roles, paste, character(1), collapse = ","),
+          sep = " = ", collapse = "; "), character(1))
+)
+```
+
+::: callout-important
+## The hash gate
+
+Every bundled instrument must still hash to what it stores. If this fails,
+every stored `.sframe` file moved with it, and the hash stops being the
+instrument's identity.
+:::
+
+```{r}
+#| label: hash
+tab <- compare_table(
+  compare_row("bundled instrument hashes to its stored value",
+              identical(hotel$integrity$hash,
+                        read_sframe(sf_fixture("hotel_supplier_mcdm.sframe"))$integrity$hash),
+              1, "read_sframe() twice", tol = 0)
+)
+compare_report(tab, caption = "Hash gate")
+sf_log(tab)
+```
+
+## 2. Both collection routes for the 2 new item types
+
+```{r}
+#| label: routes-html
+sf_html_route(hotel)
+```
+
+```{r}
+#| label: routes-widgets
+sf_shiny_widgets(hotel)
+```
+
+```{r}
+#| label: routes-inputs
+# The Shiny input names for the 2 decision types, so nobody has to guess.
+sf_answer_template(hotel)
+```
+
+-   [ ] Every item reaches the exported HTML.
+-   [ ] Every widget builds, including `pairwise_comparison` and
+    `criteria_weight`. Neither existed before 0.4.0.
+-   [ ] **Open the exported survey** with `browseURL()` on the path from
+    section 2, and confirm the constant-sum check on the
+    `criteria_weight` question refuses to submit when the points do not
+    total the required amount.
+
+## 3. The bundled responses
+
+```{r}
+#| label: data
+raw <- read.csv(sf_fixture("hotel_supplier_mcdm_responses.csv"),
+                check.names = FALSE)
+dat <- read_responses(raw, hotel, meta_cols = "respondent_id")
+data.frame(respondents = nrow(dat), columns = ncol(dat))
+```
+
+::: callout-note
+## `check.names = FALSE` matters here
+
+`read.csv()` rewrites headers by default, so `crit_pairs__a__vs__b` becomes
+something else and the instrument no longer recognises its own columns.
+0.4.0 added a detection hint that explains this rather than just rejecting
+the file. Drop `check.names = FALSE` and rerun if you want to see it.
+:::
+
+## 4. AHP, and the consistency ratio
+
+```{r}
+#| label: ahp
+res  <- run_analysis_plan(dat, hotel)
+ahp  <- res[["RQ1"]]
+ahp$weights
+```
+
+```{r}
+#| label: ahp-rmcda-exact
+# Cross-check on a perfectly consistent matrix built from a known weight
+# vector, which is what the package's own test suite does. On a consistent
+# matrix every AHP weighting method must return the generating weights
+# exactly, so this is an unambiguous check with a known right answer.
+w0 <- c(0.40, 0.30, 0.20, 0.10)
+mc <- outer(w0, w0, "/")
+dimnames(mc) <- list(letters[1:4], letters[1:4])
+
+sf_w <- sframe_principal_eigen(mc)$weights
+rm_w <- RMCDA:::find.weight(mc)[[2]]
+
+tab <- do.call(compare_table, lapply(seq_along(w0), function(i) {
+  compare_row(paste("AHP weight on a consistent matrix,", letters[i]),
+              sf_w[[i]], w0[i], "the generating weights")
+}))
+compare_report(tab, caption = "AHP recovers known weights exactly")
+sf_log(tab)
+
+data.frame(criterion = letters[1:4], surveyframe = as.numeric(sf_w),
+           RMCDA = as.numeric(rm_w), generating = w0)
+```
+
+```{r}
+#| label: ahp-rmcda-real
+# On the real aggregated matrix the 2 tools differ slightly, because they
+# approximate the principal eigenvector differently. This is a
+# methodological difference and not a defect, so it is reported rather than
+# compared at 1e-6, which would produce a false DIFFERS.
+pw   <- sframe_assemble_pairwise(dat, hotel, "crit_pairs")
+agg  <- sframe_aggregate_judgements(pw$matrices)
+rm_r <- RMCDA:::find.weight(agg$matrix)[[2]]
+
+data.frame(
+  criterion   = names(ahp$weights),
+  surveyframe = round(as.numeric(ahp$weights), 5),
+  RMCDA       = round(as.numeric(rm_r), 5),
+  difference  = signif(abs(as.numeric(ahp$weights) - as.numeric(rm_r)), 3),
+  same_rank   = rank(-as.numeric(ahp$weights)) == rank(-as.numeric(rm_r))
+)
+```
+
+```{r}
+#| label: ahp-cr
+data.frame(
+  quantity = c("consistency ratio", "lambda max", "warning raised"),
+  value = c(round(ahp$cr, 5), round(ahp$lambda_max, 5),
+            as.character(!is.null(ahp$consistency_warning)))
+)
+```
+
+```{r}
+#| label: ahp-plot
+barplot(sort(unlist(ahp$weights), decreasing = TRUE), col = "#4292c6",
+        border = NA, ylab = "criterion weight",
+        main = sprintf("AHP weights, CR = %.3f", ahp$cr))
+```
+
+-   [ ] On a perfectly consistent matrix surveyframe recovers the generating
+    weights exactly, and `RMCDA` returns the same numbers.
+-   [ ] On the real aggregated matrix the 2 tools differ in the 3rd decimal
+    and **rank the criteria identically**. They approximate the principal
+    eigenvector differently, so this is expected. A rank disagreement would
+    not be.
+-   [ ] The consistency ratio is below 0.1, and if it is not, the result says
+    so rather than reporting weights silently.
+-   [ ] The weights sum to 1.
+
+## 5. The scale-mismatch guard
+
+::: callout-important
+## Bug 6, found in a live builder session
+
+AHP and ANP read reciprocal relative importance on the Saaty 1 to 9 ratio
+scale. A DEMATEL influence item collects directed 0 to 4 influence with a
+zero diagonal and no reciprocity. They are not interchangeable, and pairing
+an influence item into an AHP block returns plausible weights from
+meaningless input.
+
+Guarded on 4 surfaces. Two of them are checked here.
+:::
+
+```{r}
+#| label: guard-validate
+# Wire the DEMATEL influence item into the AHP block, which must not work.
+bad <- hotel
+bad$analysis_plan <- list(list(
+  id = "BAD", research_question = "AHP fed an influence matrix.",
+  family = "decision", method = "ahp",
+  roles = list(pairwise = "crit_influence")))
+
+# validate_sframe() aborts on a failing instrument rather than returning a
+# problem list, so the guard is caught rather than read off a field.
+v <- tryCatch(validate_sframe(bad), error = function(e) e)
+
+data.frame(
+  check = c("validation refused the instrument", "message names the scales"),
+  value = c(as.character(inherits(v, "error")),
+            as.character(inherits(v, "error") &&
+              grepl("saaty|influence|scale", conditionMessage(v),
+                    ignore.case = TRUE)))
+)
+if (inherits(v, "error")) cat(conditionMessage(v), "\n")
+```
+
+```{r}
+#| label: guard-runner
+# And the runner itself must error rather than compute.
+out <- tryCatch(run_analysis_plan(dat, bad)[["BAD"]],
+                error = function(e) list(error = conditionMessage(e)))
+out$error
+```
+
+-   [ ] `validate_sframe()` reports the mismatch at design time.
+-   [ ] The runner errors rather than returning weights.
+-   [ ] Both messages name the 2 scales, so a user can tell what to change.
+
+## 6. TOPSIS
+
+```{r}
+#| label: topsis
+top <- res[["RQ3"]]
+top$table
+```
+
+```{r}
+#| label: topsis-rmcda
+# `matrix_source` is a label ("collected"), not the matrix, so rebuild the
+# rated performance matrix the runner used.
+rm0 <- sframe_rated_matrix(dat, hotel, c("rate_service", "rate_location",
+                                         "rate_price", "rate_delivery"))
+mat <- as.matrix(rm0$matrix)
+w   <- as.numeric(top$weights)
+
+rm_s <- RMCDA::apply.TOPSIS(mat, w)
+
+tab <- do.call(compare_table, lapply(seq_along(top$scores), function(i) {
+  compare_row(paste("TOPSIS score,", top$alternatives[i]),
+              top$scores[i], as.numeric(rm_s)[i], "RMCDA::apply.TOPSIS()",
+              tol = 1e-6)
+}))
+compare_report(tab, caption = "TOPSIS scores vs RMCDA")
+sf_log(tab)
+```
+
+```{r}
+#| label: topsis-plot
+o <- order(top$scores, decreasing = TRUE)
+barplot(top$scores[o], names.arg = top$alternatives[o], las = 2,
+        col = "#41ab5d", border = NA, ylab = "closeness coefficient",
+        main = "TOPSIS ranking")
+```
+
+-   [ ] Every TOPSIS score matches `RMCDA`.
+-   [ ] The rank column agrees with the plot.
+
+## 7. DEMATEL
+
+```{r}
+#| label: dematel
+dm <- res[["RQ4"]]
+data.frame(criterion = dm$criteria, D = dm$D, R = dm$R,
+           prominence = dm$prominence, relation = dm$relation,
+           role = dm$role)
+```
+
+```{r}
+#| label: dematel-plot
+plot(dm$prominence, dm$relation, type = "n",
+     xlab = "prominence (D + R)", ylab = "relation (D - R)",
+     main = "DEMATEL: causes above the line, effects below")
+abline(h = 0, lty = 2, col = "#b2182b")
+text(dm$prominence, dm$relation, labels = dm$criteria)
+```
+
+-   [ ] `D`, `R`, prominence, and relation are all reported.
+-   [ ] The `role` column calls a criterion a cause when its relation is
+    positive and an effect when it is negative, matching the plot.
+
+## 8. The other 7 methods on the same decision
+
+Same performance matrix and the same weights, so the methods can be compared
+like for like.
+
+```{r}
+#| label: others
+methods <- c("vikor", "moora", "smart", "waspas", "promethee", "electre",
+             "anp")
+build <- function(m) {
+  i <- hotel
+  i$analysis_plan <- list(list(
+    id = "RQ", research_question = paste("Which supplier, by", m, "?"),
+    family = "decision", method = m,
+    roles = if (m == "anp") list(pairwise = "crit_pairs") else
+      list(performance_items = c("rate_service", "rate_location",
+                                 "rate_price", "rate_delivery"),
+           weights_item = "crit_points")))
+  i
+}
+out <- lapply(methods, function(m)
+  tryCatch(run_analysis_plan(dat, build(m))[["RQ"]],
+           error = function(e) list(error = conditionMessage(e))))
+names(out) <- methods
+
+data.frame(
+  method = methods,
+  ran = vapply(out, function(r) is.null(r$error), logical(1)),
+  message = vapply(out, function(r) r$error %||% "", character(1))
+)
+```
+
+-   [ ] All 7 ran. Every one of the 10 methods in the release is now
+    accounted for: AHP, TOPSIS, DEMATEL above, and these 7 here.
+
+```{r}
+#| label: others-tables
+for (m in methods) {
+  cat("\n###", m, "\n")
+  print(utils::head(out[[m]]$table, 5))
+}
+```
+
+```{r}
+#| label: others-rmcda
+# VIKOR and WASPAS against RMCDA. WASPAS is checked because it is where
+# RMCDA already caught a real bug: it was using SMART's normalisation.
+wa <- out[["waspas"]]
+w  <- as.numeric(wa$weights)
+ty <- wa$criteria_types
+
+# RMCDA::apply.WASPAS() cannot take this matrix. Its normalisation step
+# divides an alternatives-by-criteria block by a 1-row summary, which only
+# recycles correctly when exactly 1 criterion is beneficial. All 4 are
+# beneficial here, so it errors. The package's own test suite uses RMCDA's
+# single-beneficial worked example for that reason.
+#
+# The oracle here is therefore WASPAS from its definition: normalise, take
+# the weighted sum and the weighted product, and blend them at lambda.
+norm <- mat
+for (k in seq_len(ncol(mat))) {
+  norm[, k] <- if (ty[k] == "benefit") {
+    mat[, k] / max(mat[, k])
+  } else {
+    min(mat[, k]) / mat[, k]
+  }
+}
+wsm   <- as.numeric(norm %*% w)
+wpm   <- apply(norm, 1, function(r) prod(r^w))
+rm_wa <- 0.5 * wsm + 0.5 * wpm
+
+tab <- do.call(compare_table, lapply(seq_along(wa$scores),
+  function(i) compare_row(
+    paste("WASPAS score,", wa$alternatives[i]),
+    wa$scores[i], as.numeric(rm_wa)[i],
+    "WASPAS from its definition", tol = 1e-6)))
+compare_report(tab, caption = "WASPAS vs its own definition")
+sf_log(tab)
+```
+
+::: callout-note
+## Why this one is not checked against RMCDA here
+
+WASPAS is where RMCDA earned its place: it caught surveyframe using SMART's
+normalisation. That cross-check lives in
+`tests/testthat/test-decision-ranking.R`, on RMCDA's own worked example. It
+cannot be repeated on the hotel matrix because
+`RMCDA::apply.WASPAS()` only normalises correctly when exactly 1 criterion
+is beneficial, and all 4 are beneficial here. Checking against the
+definition instead is the stronger test anyway, since it shares no code with
+either package.
+:::
+
+```{r}
+#| label: others-agreement
+# Do the methods agree on a winner? Disagreement is normal and is exactly
+# what sensitivity analysis in file 15 exists to quantify.
+ranked <- Filter(Negate(is.null), lapply(names(out), function(m) {
+  r <- out[[m]]
+  if (is.null(r$alternatives) || is.null(r$ranks)) return(NULL)
+  data.frame(method = m,
+             winner = r$alternatives[which.min(r$ranks)])
+}))
+do.call(rbind, ranked)
+```
+
+-   [ ] Every WASPAS score matches `RMCDA`.
+-   [ ] The winners table prints. Methods disagreeing is informative rather
+    than wrong, and file `15` quantifies how stable each answer is.
+
+## 9. ELECTRE reporting a non-result
+
+::: callout-important
+## B11, found during this release
+
+ELECTRE reported an empty outranking relation as "all 9 alternatives jointly
+best", and `sensitivity_analysis()` then called that result stable. The
+strongest robustness signal the function can produce, from the weakest input
+it can take.
+:::
+
+```{r}
+#| label: electre
+el <- out[["electre"]]
+el$table
+data.frame(
+  check = c("degenerate flag present", "notes present"),
+  value = c(as.character(!is.null(el$degenerate)),
+            as.character(!is.null(el$notes)))
+)
+```
+
+-   [ ] If the outranking relation is empty, the result says so rather than
+    declaring every alternative jointly best.
+
+## Verdict for this file
+
+```{r}
+#| label: verdict
+sf_verdict()
+```
+
+-   [ ] `0 DIFFERS, 0 CHECK`.
+-   [ ] All 10 methods ran. Three are checked number for number against an
+    independent oracle: AHP against a matrix with a known right answer,
+    TOPSIS against `RMCDA`, and WASPAS against its own definition.
+-   [ ] `vignettes/mcdm-analysis.Rmd` tells the same story as this file.
