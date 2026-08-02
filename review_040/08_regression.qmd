@@ -1,0 +1,358 @@
+---
+title: "08. Regression"
+subtitle: "Linear, binary logistic, ordinal, multinomial, Firth"
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    embed-resources: true
+editor: visual
+execute:
+  warning: false
+  message: false
+  error: true
+---
+
+```{r}
+#| label: setup
+#| include: false
+source("_setup.R")
+```
+
+Five models, each defined by what the outcome item is.
+
+| Outcome item | Method | Reference used here |
+|-------------------|--------------------|--------------------------------|
+| numeric or slider | `regression_linear` | base R `lm()`, `jmv::linReg()` |
+| 2-level single choice | `regression_logistic_binary` | base R `glm()` |
+| ordered single choice | `regression_logistic_ordinal` | `MASS::polr()` |
+| 3+ level single choice | `regression_logistic_multinomial` | `nnet::multinom()` |
+| rare-event binary | `firth_logistic` | `logistf::logistf()` |
+
+## 1. Questionnaire and plan
+
+```{r}
+#| label: build
+emp <- sf_instrument(
+  title = "Graduate outcomes survey", version = "1.0.0",
+  components = list(
+    sf_choices("yn",  c("0", "1"), c("No", "Yes")),
+    sf_choices("sat3", c("1", "2", "3"),
+               c("Dissatisfied", "Neutral", "Satisfied")),
+    sf_choices("dest", c("study", "work", "other"),
+               c("Further study", "Employment", "Other")),
+    sf_item("gpa",    "Final grade point average (0 to 4)", type = "numeric"),
+    sf_item("intern", "Months of internship experience", type = "numeric"),
+    sf_item("salary", "Starting salary in thousands", type = "numeric"),
+    sf_item("hired",  "Did you receive an offer within 3 months?",
+            type = "single_choice", choice_set = "yn"),
+    sf_item("sat",    "How satisfied are you with your outcome?",
+            type = "single_choice", choice_set = "sat3"),
+    sf_item("dest",   "What is your main activity now?",
+            type = "single_choice", choice_set = "dest"),
+    sf_item("visa",   "Did you need a visa sponsorship?",
+            type = "single_choice", choice_set = "yn")
+  ),
+  analysis_plan = list(
+    list(id = "RQ1", research_question =
+           "Do GPA and internship months predict starting salary?",
+         family = "prediction", method = "regression_linear",
+         roles = list(outcome = "salary", predictors = c("gpa", "intern"))),
+    list(id = "RQ2", research_question =
+           "Do they predict receiving an offer?",
+         family = "prediction", method = "regression_logistic_binary",
+         roles = list(outcome = "hired", predictors = c("gpa", "intern"))),
+    list(id = "RQ3", research_question =
+           "Do they predict satisfaction on an ordered scale?",
+         family = "prediction", method = "regression_logistic_ordinal",
+         roles = list(outcome = "sat", predictors = c("gpa", "intern"))),
+    list(id = "RQ4", research_question =
+           "Do they predict which destination a graduate reaches?",
+         family = "prediction", method = "regression_logistic_multinomial",
+         roles = list(outcome = "dest", predictors = c("gpa", "intern"))),
+    list(id = "RQ5", research_question =
+           "Does GPA predict needing a visa, a rare outcome?",
+         family = "prediction", method = "firth_logistic",
+         roles = list(outcome = "visa", predictors = "gpa"))
+  )
+)
+emp
+```
+
+## 2. Both collection routes
+
+```{r}
+#| label: routes
+set.seed(44)
+sf_both_routes(emp, function(i) list(
+  gpa = round(runif(1, 2, 4), 2), intern = sample(0:12, 1),
+  salary = sample(20:60, 1), hired = sample(c("0", "1"), 1),
+  sat = sample(c("1", "2", "3"), 1),
+  dest = sample(c("study", "work", "other"), 1),
+  visa = sample(c("0", "1"), 1)
+), n = 4)
+```
+
+## 3. Dummy data
+
+```{r}
+#| label: data
+set.seed(717)
+n      <- 260
+gpa    <- round(pmin(4, pmax(1.5, rnorm(n, 3.1, 0.45))), 2)
+intern <- rpois(n, 4)
+
+salary <- round(18 + 5.5 * gpa + 0.9 * intern + rnorm(n, 0, 4), 1)
+lp     <- -6 + 1.4 * gpa + 0.25 * intern
+hired  <- rbinom(n, 1, plogis(lp))
+sat    <- cut(0.9 * gpa + 0.1 * intern + rnorm(n, 0, 0.6),
+              breaks = c(-Inf, 3.1, 3.9, Inf), labels = c("1", "2", "3"))
+dest   <- sample(c("study", "work", "other"), n, TRUE, prob = c(.3, .55, .15))
+# A deliberately rare outcome, which is what Firth regression exists for.
+visa   <- rbinom(n, 1, plogis(-5.5 + 0.8 * gpa))
+
+dat <- read_responses(data.frame(
+  gpa = gpa, intern = intern, salary = salary,
+  hired = as.character(hired), sat = as.character(sat),
+  dest = dest, visa = as.character(visa), stringsAsFactors = FALSE), emp)
+
+table(visa = dat$visa)
+res <- run_analysis_plan(dat, emp)
+res
+```
+
+-   [ ] `visa` really is rare. That is what makes RQ5 worth running.
+
+## 4. RQ1: linear regression
+
+```{r}
+#| label: acc-lm
+r  <- res[["RQ1"]]
+m  <- lm(salary ~ gpa + intern, data = dat)
+sm <- summary(m)
+co <- r$coefficients
+
+tab <- compare_table(
+  compare_row("R squared",     r$r2,     sm$r.squared,     "base R lm()"),
+  compare_row("adjusted R sq", r$adj_r2, sm$adj.r.squared, "base R lm()"),
+  compare_row("F",             r$F,      unname(sm$fstatistic[1]), "base R lm()"),
+  compare_row("df1",           r$df1,    unname(sm$fstatistic[2]), "base R lm()"),
+  compare_row("df2",           r$df2,    unname(sm$fstatistic[3]), "base R lm()"),
+  compare_row("b, gpa",        co["gpa", "Estimate"],
+              unname(coef(m)["gpa"]), "base R lm()"),
+  compare_row("SE, gpa",       co["gpa", "Std. Error"],
+              sm$coefficients["gpa", "Std. Error"], "base R lm()"),
+  compare_row("p, gpa",        co["gpa", "Pr(>|t|)"],
+              sm$coefficients["gpa", "Pr(>|t|)"], "base R lm()"),
+  compare_row("b, intern",     co["intern", "Estimate"],
+              unname(coef(m)["intern"]), "base R lm()")
+)
+compare_report(tab, caption = "RQ1 vs base R")
+sf_log(tab)
+```
+
+```{r}
+#| label: acc-lm-jmv
+j  <- jmv::linReg(data = dat[, c("salary", "gpa", "intern")],
+                  dep = "salary", covs = c("gpa", "intern"),
+                  blocks = list(list("gpa", "intern")),
+                  modelTest = TRUE, stdEst = TRUE)
+jf <- as.data.frame(j$modelFit)
+tab <- compare_table(
+  compare_row("R squared", r$r2, jf$r2[1], "jmv::linReg()", tol = 1e-6)
+)
+compare_report(tab, caption = "RQ1 against a third opinion")
+sf_log(tab)
+```
+
+```{r}
+#| label: acc-lm-plot
+op <- par(mfrow = c(1, 2), mar = c(4, 4, 3, 1))
+plot(fitted(m), resid(m), pch = 19, col = "#31699680",
+     xlab = "fitted", ylab = "residual", main = "Residuals against fitted")
+abline(h = 0, lty = 2, col = "#b2182b")
+qqnorm(resid(m), pch = 19, col = "#31699680", main = "Normal Q-Q")
+qqline(resid(m), col = "#b2182b")
+par(op)
+```
+
+-   [ ] All 9 base R verdicts and the `jmv` verdict read `match`.
+-   [ ] The residual plot has no funnel and the Q-Q line is roughly straight.
+-   [ ] `r$diagnostics` reports something usable about the same 2 plots.
+
+## 5. RQ2: binary logistic regression
+
+```{r}
+#| label: acc-glm
+r  <- res[["RQ2"]]
+g  <- glm(as.numeric(hired) ~ gpa + intern, data = dat, family = binomial())
+sg <- summary(g)
+co <- r$coefficients
+
+# McFadden pseudo R squared from its definition.
+g0  <- glm(as.numeric(hired) ~ 1, data = dat, family = binomial())
+mcf <- 1 - as.numeric(logLik(g)) / as.numeric(logLik(g0))
+
+tab <- compare_table(
+  compare_row("b, gpa",     co["gpa", "Estimate"],
+              unname(coef(g)["gpa"]), "base R glm()"),
+  compare_row("SE, gpa",    co["gpa", "Std. Error"],
+              sg$coefficients["gpa", "Std. Error"], "base R glm()"),
+  compare_row("z, gpa",     co["gpa", "z value"],
+              sg$coefficients["gpa", "z value"], "base R glm()"),
+  compare_row("p, gpa",     co["gpa", "Pr(>|z|)"],
+              sg$coefficients["gpa", "Pr(>|z|)"], "base R glm()"),
+  compare_row("odds ratio, gpa", co["gpa", "odds_ratio"],
+              exp(unname(coef(g)["gpa"])), "exp(coef(glm))"),
+  compare_row("McFadden R sq", r$mcFadden_r2, mcf, "hand-computed"),
+  compare_row("model chi-square", r$chi_sq,
+              g$null.deviance - g$deviance, "base R glm() deviances"),
+  compare_row("model df", r$chi_df, g$df.null - g$df.residual, "base R glm()")
+)
+compare_report(tab, caption = "RQ2 vs base R")
+sf_log(tab)
+```
+
+```{r}
+#| label: acc-glm-plot
+o <- order(dat$gpa)
+plot(dat$gpa, as.numeric(dat$hired), pch = 19, col = "#00000030",
+     xlab = "GPA", ylab = "offer received", yaxt = "n",
+     main = "RQ2: fitted probability against GPA")
+axis(2, at = c(0, 1), labels = c("no", "yes"))
+lines(dat$gpa[o], fitted(g)[o], col = "#b2182b", lwd = 2)
+```
+
+-   [ ] All 8 verdicts read `match`.
+-   [ ] The fitted curve rises with GPA, matching the sign of the reported
+    odds ratio.
+-   [ ] `r$classification_table` reports sensible hit rates.
+
+## 6. RQ3: ordinal logistic regression
+
+```{r}
+#| label: acc-polr
+r  <- res[["RQ3"]]
+po <- MASS::polr(factor(sat, ordered = TRUE) ~ gpa + intern, data = dat,
+                 Hess = TRUE)
+sp <- summary(po)
+co <- r$coefficients
+
+tab <- compare_table(
+  compare_row("b, gpa",    co["gpa", "Value"],
+              unname(coef(po)["gpa"]), "MASS::polr()"),
+  compare_row("SE, gpa",   co["gpa", "Std. Error"],
+              sp$coefficients["gpa", "Std. Error"], "MASS::polr()"),
+  compare_row("t, gpa",    co["gpa", "t value"],
+              sp$coefficients["gpa", "t value"], "MASS::polr()"),
+  compare_row("odds ratio, gpa", co["gpa", "odds_ratio"],
+              exp(unname(coef(po)["gpa"])), "exp(coef(polr))"),
+  compare_row("AIC",       r$AIC, AIC(po), "MASS::polr()"),
+  compare_row("threshold 1|2", co["1|2", "Value"],
+              unname(po$zeta[1]), "MASS::polr()")
+)
+compare_report(tab, caption = "RQ3 vs MASS::polr()")
+sf_log(tab)
+```
+
+```{r}
+#| label: acc-polr-plot
+barplot(prop.table(table(cut(dat$gpa, 3), dat$sat), 1),
+        beside = TRUE, col = c("#fee6ce", "#fdae6b", "#e6550d"),
+        ylab = "proportion", xlab = "satisfaction category",
+        main = "RQ3: satisfaction shifting with GPA band",
+        legend.text = levels(cut(dat$gpa, 3)),
+        args.legend = list(bty = "n", cex = 0.75, title = "GPA band"))
+```
+
+-   [ ] All 6 verdicts read `match`, including the threshold.
+-   [ ] The proportion in the highest satisfaction category rises with the
+    GPA band, matching the sign of the reported odds ratio.
+
+## 7. RQ4: multinomial logistic regression
+
+```{r}
+#| label: acc-multinom
+r  <- res[["RQ4"]]
+mn <- nnet::multinom(factor(dest) ~ gpa + intern, data = dat, trace = FALSE)
+cm <- coef(mn)
+co <- r$coefficients
+
+# The reference level is whichever level nnet dropped, so read the row names
+# rather than assuming an order.
+lv <- rownames(cm)[1]
+tab <- compare_table(
+  compare_row(paste0("b, gpa, ", lv), co[lv, "gpa"], cm[lv, "gpa"],
+              "nnet::multinom()", tol = 1e-4),
+  compare_row(paste0("intercept, ", lv), co[lv, "(Intercept)"],
+              cm[lv, "(Intercept)"], "nnet::multinom()", tol = 1e-4),
+  compare_row("AIC", r$AIC, AIC(mn), "nnet::multinom()", tol = 1e-4)
+)
+compare_report(tab, caption = "RQ4 vs nnet::multinom()")
+sf_log(tab)
+```
+
+-   [ ] All 3 verdicts read `match`.
+-   [ ] `r$odds_ratios` and `r$classification_table` both print, and the
+    reference category is named somewhere a reader can find it.
+
+## 8. RQ5: Firth logistic regression
+
+::: callout-important
+## New in 0.4.0, and this is what it is for
+
+`visa` is a rare outcome. Ordinary logistic regression is biased away from
+zero when events are rare, and separates entirely when a predictor perfectly
+splits the outcome. Firth's penalised likelihood corrects that bias and
+always returns finite estimates. `logistf` is in Suggests.
+:::
+
+```{r}
+#| label: acc-firth
+r  <- res[["RQ5"]]
+fl <- logistf::logistf(as.numeric(visa) ~ gpa, data = dat)
+co <- r$coefficients
+
+tab <- compare_table(
+  compare_row("b, gpa",  co["gpa", "Estimate"], unname(coef(fl)["gpa"]),
+              "logistf::logistf()", tol = 1e-5),
+  compare_row("CI lower, gpa", co["gpa", "ci_low"], fl$ci.lower[["gpa"]],
+              "logistf::logistf()", tol = 1e-4),
+  compare_row("CI upper, gpa", co["gpa", "ci_high"], fl$ci.upper[["gpa"]],
+              "logistf::logistf()", tol = 1e-4),
+  compare_row("p, gpa", co["gpa", "p"], fl$prob[["gpa"]],
+              "logistf::logistf()", tol = 1e-5),
+  compare_row("odds ratio, gpa", co["gpa", "odds_ratio"],
+              exp(unname(coef(fl)["gpa"])), "exp(coef(logistf))", tol = 1e-5)
+)
+compare_report(tab, caption = "RQ5 vs logistf")
+sf_log(tab)
+```
+
+```{r}
+#| label: acc-firth-vs-glm
+# Side by side with ordinary logistic regression, so the correction is
+# visible rather than asserted.
+gv <- glm(as.numeric(visa) ~ gpa, data = dat, family = binomial())
+data.frame(
+  quantity = c("b, gpa", "SE-free interval width"),
+  firth = c(coef(fl)[["gpa"]], fl$ci.upper[["gpa"]] - fl$ci.lower[["gpa"]]),
+  ordinary_glm = c(coef(gv)[["gpa"]],
+                   diff(suppressMessages(confint(gv))["gpa", ]))
+)
+```
+
+-   [ ] All 5 verdicts read `match`.
+-   [ ] The Firth estimate is pulled towards zero relative to ordinary
+    logistic regression, which is the correction working.
+-   [ ] `r$likelihood_ratio` prints and `r$conf_level` says what level the
+    interval is.
+
+## Verdict for this file
+
+```{r}
+#| label: verdict
+sf_verdict()
+```
+
+-   [ ] `0 DIFFERS, 0 CHECK`.

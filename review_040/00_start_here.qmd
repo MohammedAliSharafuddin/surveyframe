@@ -1,0 +1,172 @@
+---
+title: "0.4.0 review suite: start here"
+subtitle: "Read this file first, then work through the numbered files in order"
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    embed-resources: true
+    code-fold: false
+editor: visual
+execute:
+  warning: false
+  message: false
+  error: true
+---
+
+```{r}
+#| label: setup
+#| include: false
+source("_setup.R")
+```
+
+## What this suite is for
+
+surveyframe 0.4.0 is a major release. It adds the whole small-sample track,
+all 10 MCDM methods, 2 new item types, conjoint designs, an RStudio add-in,
+and it makes 2 breaking changes to how responses are collected and hashed.
+
+The goal of this suite is narrow and absolute: **confirm that every route
+from questionnaire to result works, and that every number surveyframe
+reports is the number an independent tool reports**, before the tarball goes
+to CRAN.
+
+It replaces the single long `mas_review_040.qmd`, which was one document of
+roughly 120 chunks. That shape suited neither a reviewer working in sittings
+nor a first-time user, so it is deferred rather than deleted. This suite is
+written for someone meeting surveyframe for the first time, and each file
+stands alone.
+
+## How each file is built
+
+Every file follows the same shape, so once you have run one you know how to
+run all of them.
+
+1.  **Questionnaire.** Build a small instrument from scratch. Nothing is
+    loaded from a fixture unless the point of the file is the fixture.
+2.  **Analysis plan.** Declare the research question before any data exists.
+    This is the package's central claim, so every file exercises it.
+3.  **HTML route.** Export the static survey and confirm every item reaches
+    the file. The path is printed so you can open and click through it.
+4.  **Shiny route.** Build every widget and drive the real collector, then
+    read the row back. Both routes run in every file, because 0.4.0 fixed a
+    defect where the Shiny collector wrote a shape the reader could not read.
+5.  **Dummy data and statistical accuracy.** Simulate responses, run the
+    plan, and compare each number against base R and against a reference
+    package. Every comparison prints a table and a plot.
+
+## Reading a comparison
+
+Every accuracy chunk ends with a table and a plot from the same helper.
+
+```{r}
+#| label: demo-comparison
+set.seed(1)
+x <- rnorm(40, 100, 15)
+
+tab <- compare_table(
+  compare_row("mean", mean(x), 100.98, "hand-computed"),
+  compare_row("sd",   sd(x),   sd(x),  "base R sd()"),
+  compare_row("n",    length(x), 40L,  "by construction")
+)
+compare_report(tab, caption = "How to read a comparison table")
+```
+
+Scan the `verdict` column. Three words can appear.
+
+-   `match`. The difference is at or below the stated tolerance.
+-   `DIFFERS`. The difference is above tolerance. **Stop and investigate.**
+    Do not tick the box.
+-   `CHECK`. One side is `NA`. Usually the reference call failed, but treat
+    it as unresolved until you know which.
+
+The plot shows the size of each difference on a log scale, with the
+tolerance drawn as a dashed line. It exists so a difference of 1e-16 and a
+difference of 0.2 do not look alike in a table of rounded numbers. The first
+row above is deliberately wrong, so you can see what `DIFFERS` looks like
+before you meet a real one.
+
+::: callout-important
+## Tolerance is not a dial to turn
+
+The default tolerance is `1e-6`. If a chunk loosens it, the chunk says why in
+a comment. A tolerance loosened without a stated reason is how a real
+difference hides, so if you see one, treat the missing reason as the finding.
+:::
+
+## A trap worth knowing before you start
+
+Reference calls must match surveyframe's own options, or you will be
+comparing 2 different estimators and reading the gap as a bug.
+
+The clearest case is in file `12`. surveyframe fixes `exact = FALSE` on
+`wilcox.test()`. Left on its own default, base R switches to the exact method
+at small n, and the 2 disagree in the 5th decimal. Nothing is wrong. The
+comparison was.
+
+## Order to work through
+
+| File | Covers | Needs a keyboard? |
+|------------------|-------------------------------|------------------|
+| `01` | First complete workflow, end to end | no |
+| `02` | Every item type, one demo each | no |
+| `03` | Descriptives, frequencies, quality, missingness | no |
+| `04` | Categorical tests | no |
+| `05` | Two-group comparisons | no |
+| `06` | Multi-group and factorial designs | no |
+| `07` | Correlation | no |
+| `08` | Regression | no |
+| `09` | Psychometrics and factor analysis | no |
+| `10` | Model syntax: CFA, CB-SEM, PLS-SEM | no |
+| `11` | Mediation and moderation | no |
+| `12` | The small-sample track | no |
+| `13` | MCDM, methods 1 to 5 | no |
+| `14` | MCDM, methods 6 to 10 | no |
+| `15` | Sensitivity analysis and conjoint designs | no |
+| `16` | Collection routes and branching | no |
+| `17` | Reporting and the codebook | no |
+| `18` | The 3 GUIs | **yes** |
+| `19` | The RStudio add-in | **yes, release blocker** |
+| `20` | Release safety and owner decisions | partly |
+
+Files `01` to `17` run without you. Files `18` to `20` need a human.
+
+## Environment this ran on
+
+```{r}
+#| label: env
+data.frame(
+  item = c("R", "platform", "surveyframe loaded from",
+           "0.4.0 feature present"),
+  value = c(R.version.string, R.version$platform,
+            dirname(dirname(getNamespaceInfo("surveyframe", "path"))),
+            as.character(sf_is_040())),
+  stringsAsFactors = FALSE
+)
+```
+
+```{r}
+#| label: refs
+pk <- c("jmv", "psych", "DescTools", "MASS", "nnet", "logistf", "naniar",
+        "lavaan", "seminr", "RMCDA", "car")
+data.frame(
+  package = pk,
+  version = vapply(pk, function(p)
+    if (requireNamespace(p, quietly = TRUE))
+      as.character(utils::packageVersion(p)) else "MISSING", character(1)),
+  row.names = NULL
+)
+```
+
+-   [ ] Every reference package above reports a version rather than
+    `MISSING`. A `MISSING` package turns its comparisons into `CHECK`, which
+    is not a pass.
+-   [ ] `0.4.0 feature present` reads `TRUE`. If it reads `FALSE` you are
+    reviewing the CRAN 0.3.4 build by mistake, and nothing below means
+    anything.
+
+## Where to record what you find
+
+Log findings in `dogfeed.todo.md`, one entry each, status `open`. Do not fix
+anything while reviewing. That is the dogfeed protocol, and it exists because
+a fix made mid-review loses the observation that prompted it.

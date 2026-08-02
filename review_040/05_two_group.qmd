@@ -1,0 +1,349 @@
+---
+title: "05. Two-group comparisons"
+subtitle: "t-test, Mann-Whitney, paired t-test, Wilcoxon signed-rank"
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    embed-resources: true
+editor: visual
+execute:
+  warning: false
+  message: false
+  error: true
+---
+
+```{r}
+#| label: setup
+#| include: false
+source("_setup.R")
+```
+
+Four methods, each a complete workflow. The field combination is the same
+throughout: **one numeric outcome and one 2-level categorical grouping
+item** for the independent tests, and **2 numeric items measured on the same
+people** for the paired tests.
+
+Every number is checked against base R and against `jmv`.
+
+## 1. Questionnaire and plan
+
+```{r}
+#| label: build
+trial <- sf_instrument(
+  title = "Training evaluation", version = "1.0.0",
+  components = list(
+    sf_choices("arm", c("control", "training"),
+               c("Control group", "Training group")),
+    sf_item("arm",  "Which group were you assigned to?",
+            type = "single_choice", choice_set = "arm", required = TRUE),
+    sf_item("pre",  "Confidence score before the course (0 to 100)",
+            type = "slider", slider_min = 0, slider_max = 100),
+    sf_item("post", "Confidence score after the course (0 to 100)",
+            type = "slider", slider_min = 0, slider_max = 100)
+  ),
+  analysis_plan = list(
+    list(id = "RQ1", research_question =
+           "Do the 2 groups differ on post-course confidence?",
+         family = "group_comparison", method = "t_test_ind",
+         roles = list(outcome = "post", group = "arm")),
+    list(id = "RQ2", research_question =
+           "Same question without assuming normality.",
+         family = "group_comparison", method = "mann_whitney",
+         roles = list(outcome = "post", group = "arm")),
+    list(id = "RQ3", research_question =
+           "Did confidence change from before to after?",
+         family = "group_comparison", method = "t_test_pair",
+         roles = list(before = "pre", after = "post")),
+    list(id = "RQ4", research_question =
+           "Same paired question without assuming normality.",
+         family = "group_comparison", method = "wilcoxon_pair",
+         roles = list(before = "pre", after = "post"))
+  )
+)
+trial
+```
+
+::: callout-tip
+## The field-to-method map this file demonstrates
+
+| You have | You want | Method |
+|-----------------------|-------------------|---------------------------|
+| numeric or slider outcome, 2-level single choice | means differ | `t_test_ind` |
+| the same, outcome skewed or ordinal | distributions differ | `mann_whitney` |
+| 2 numeric items on the same people | change over time | `t_test_pair` |
+| the same, not normal | change over time | `wilcoxon_pair` |
+
+Swapping `method` is the only edit. The instrument does not change.
+:::
+
+## 2. Both collection routes
+
+```{r}
+#| label: routes
+set.seed(4)
+sf_both_routes(trial, function(i) list(
+  arm  = sample(c("control", "training"), 1),
+  pre  = sample(20:80, 1), post = sample(30:95, 1)
+), n = 4)
+```
+
+-   [ ] Both routes report every item, and the Shiny row reads back.
+
+## 3. Dummy data
+
+```{r}
+#| label: data
+set.seed(101)
+n   <- 140
+arm <- rep(c("control", "training"), each = n / 2)
+pre <- round(rnorm(n, 55, 12))
+# The training arm gains more, so all 4 tests have something real to find.
+post <- round(pre + ifelse(arm == "training", 12, 3) + rnorm(n, 0, 8))
+
+responses <- data.frame(arm = arm,
+                        pre  = pmin(100, pmax(0, pre)),
+                        post = pmin(100, pmax(0, post)),
+                        stringsAsFactors = FALSE)
+dat <- read_responses(responses, trial)
+res <- run_analysis_plan(dat, trial)
+res
+```
+
+## 4. RQ1: independent-samples t-test
+
+```{r}
+#| label: acc-t
+r  <- res[["RQ1"]]
+br <- t.test(post ~ arm, data = dat, var.equal = FALSE)
+
+tab <- compare_table(
+  compare_row("t",  r$t,  br$statistic, "base R t.test()"),
+  compare_row("df", r$df, br$parameter, "base R t.test()"),
+  compare_row("p",  r$p,  br$p.value,   "base R t.test()"),
+  compare_row("mean, control",  r$mean1, mean(dat$post[dat$arm == "control"]),
+              "base R mean()"),
+  compare_row("mean, training", r$mean2, mean(dat$post[dat$arm == "training"]),
+              "base R mean()")
+)
+compare_report(tab, caption = "RQ1 vs base R")
+sf_log(tab)
+```
+
+::: callout-note
+## Sign is a convention, not a disagreement
+
+surveyframe and `t.test()` agree on magnitude, df, and p, and they order the
+groups the same way here. If you ever see a t that matches except for its
+sign, check the group order before recording a finding. It cost this project
+a round of investigation.
+:::
+
+```{r}
+#| label: acc-t-jmv
+j <- jmv::ttestIS(data = data.frame(post = dat$post, arm = factor(dat$arm)),
+                  vars = "post", group = "arm",
+                  welchs = TRUE, students = FALSE,
+                  effectSize = TRUE, desc = TRUE)
+jt <- as.data.frame(j$ttest)
+jt
+```
+
+```{r}
+#| label: acc-t-jmv-cmp
+# jmv suffixes its columns [welc], and it orders the 2 groups the other way
+# round, so its t and d carry the opposite sign. Magnitudes are compared
+# here and the sign is checked separately just below, rather than hidden.
+tab <- compare_table(
+  compare_row("t, magnitude", abs(r$t), abs(jt[["stat[welc]"]][1]),
+              "jmv::ttestIS()", tol = 1e-5),
+  compare_row("df", r$df, jt[["df[welc]"]][1], "jmv::ttestIS()", tol = 1e-5),
+  compare_row("p",  r$p,  jt[["p[welc]"]][1],  "jmv::ttestIS()", tol = 1e-5),
+  compare_row("Cohen d, magnitude", abs(r$d), abs(jt[["es[welc]"]][1]),
+              "jmv::ttestIS()", tol = 1e-4)
+)
+compare_report(tab, caption = "RQ1 against a third opinion")
+sf_log(tab)
+
+# The signs must be opposite, because the 2 tools order the groups
+# differently. Same sign would mean one of them has the direction wrong.
+data.frame(
+  quantity = c("t", "Cohen d"),
+  surveyframe = c(r$t, r$d),
+  jmv = c(jt[["stat[welc]"]][1], jt[["es[welc]"]][1]),
+  opposite_signs = c(sign(r$t) != sign(jt[["stat[welc]"]][1]),
+                     sign(r$d) != sign(jt[["es[welc]"]][1]))
+)
+```
+
+```{r}
+#| label: acc-t-plot
+boxplot(post ~ arm, data = dat, col = c("#deebf7", "#9ecae1"),
+        border = "#3182bd", ylab = "Post-course confidence",
+        main = sprintf("RQ1: t(%.1f) = %.2f", r$df, r$t))
+points(c(1, 2), c(r$mean1, r$mean2), pch = 18, cex = 2, col = "#b2182b")
+legend("topleft", pch = 18, col = "#b2182b", bty = "n",
+       legend = "means as surveyframe reports them")
+```
+
+-   [ ] Every verdict reads `match`, including Cohen's d against `jmv`.
+-   [ ] The red diamonds sit where the boxes say they should. If a reported
+    mean lands outside its own box, the grouping is reversed somewhere.
+
+## 5. RQ2: Mann-Whitney
+
+```{r}
+#| label: acc-mw
+r  <- res[["RQ2"]]
+a  <- dat$post[dat$arm == "control"]
+b  <- dat$post[dat$arm == "training"]
+# surveyframe fixes exact = FALSE, so the reference must too. See file 12.
+w  <- wilcox.test(a, b, conf.int = TRUE, exact = FALSE)
+
+tab <- compare_table(
+  compare_row("U",  r$U, unname(w$statistic), "base R wilcox.test()"),
+  compare_row("p",  r$p, w$p.value,           "base R wilcox.test()"),
+  compare_row("Hodges-Lehmann shift", r$hl_shift, unname(w$estimate),
+              "base R wilcox.test()"),
+  compare_row("HL lower", r$hl_conf_int[1], w$conf.int[1],
+              "base R wilcox.test()"),
+  compare_row("HL upper", r$hl_conf_int[2], w$conf.int[2],
+              "base R wilcox.test()")
+)
+compare_report(tab, caption = "RQ2 vs base R")
+sf_log(tab)
+```
+
+```{r}
+#| label: acc-mw-plot
+plot(density(a), col = "#3182bd", lwd = 2, xlim = range(c(a, b)),
+     main = "RQ2: the 2 distributions being compared",
+     xlab = "Post-course confidence")
+lines(density(b), col = "#b2182b", lwd = 2)
+abline(v = c(median(a), median(b)), col = c("#3182bd", "#b2182b"), lty = 2)
+legend("topright", lwd = 2, col = c("#3182bd", "#b2182b"), bty = "n",
+       legend = c("control", "training"))
+```
+
+-   [ ] U, p, and all 3 Hodges-Lehmann numbers match.
+-   [ ] The 2 curves are shifted in the direction the APA sentence claims.
+
+## 6. RQ3: paired t-test
+
+```{r}
+#| label: acc-tp
+r  <- res[["RQ3"]]
+bp <- t.test(dat$pre, dat$post, paired = TRUE)
+
+tab <- compare_table(
+  compare_row("t",  r$t,  bp$statistic, "base R t.test(paired)"),
+  compare_row("df", r$df, bp$parameter, "base R t.test(paired)"),
+  compare_row("p",  r$p,  bp$p.value,   "base R t.test(paired)"),
+  compare_row("mean difference", r$mean_diff, unname(bp$estimate),
+              "base R t.test(paired)"),
+  compare_row("Cohen dz", r$d_z,
+              unname(bp$statistic) / sqrt(nrow(dat)), "hand-computed")
+)
+compare_report(tab, caption = "RQ3 vs base R")
+sf_log(tab)
+```
+
+```{r}
+#| label: acc-tp-plot
+d <- dat$post - dat$pre
+hist(d, breaks = 20, col = "#c7e9c0", border = "white",
+     xlab = "post minus pre", main = "RQ3: the differences being tested")
+abline(v = 0, lty = 2)
+abline(v = mean(d), col = "#b2182b", lwd = 2)
+```
+
+-   [ ] All 5 verdicts read `match`.
+-   [ ] The red line is the mean difference the table reports, and 0 is
+    where the null sits.
+
+## 7. RQ4: Wilcoxon signed-rank
+
+```{r}
+#| label: acc-wp
+r  <- res[["RQ4"]]
+ws <- wilcox.test(dat$pre, dat$post, paired = TRUE, conf.int = TRUE,
+                  exact = FALSE)
+
+tab <- compare_table(
+  compare_row("V", r$V, unname(ws$statistic), "base R wilcox.test(paired)"),
+  compare_row("p", r$p, ws$p.value,           "base R wilcox.test(paired)"),
+  compare_row("pseudomedian", r$pseudomedian, unname(ws$estimate),
+              "base R wilcox.test(paired)"),
+  compare_row("pseudomedian lower", r$pseudomedian_conf_int[1],
+              ws$conf.int[1], "base R wilcox.test(paired)"),
+  compare_row("pseudomedian upper", r$pseudomedian_conf_int[2],
+              ws$conf.int[2], "base R wilcox.test(paired)")
+)
+compare_report(tab, caption = "RQ4 vs base R")
+sf_log(tab)
+```
+
+::: callout-note
+## New in 0.4.0
+
+The pseudomedian and its interval are part of the small-sample track and did
+not exist before this release. No earlier review file covers them. File `12`
+takes the track as a whole.
+:::
+
+-   [ ] All 5 verdicts read `match`.
+
+## 8. Assumption checking
+
+```{r}
+#| label: assumptions
+# Every check is driven by `variables`. Passing only `outcome` and `group`
+# returns empty tables and still prints "Assumption checks were computed.",
+# which is logged in dogfeed.todo.md. Pass `variables`.
+ar <- assumption_report(dat, variables = "post", group = "arm")
+ar
+```
+
+```{r}
+#| label: assumptions-acc
+sw <- shapiro.test(dat$post)
+# car::leveneTest() centres on the median by default, which is the
+# Brown-Forsythe test. surveyframe reports both, and its row labelled
+# "Levene" is the mean-centred classic. Matching the wrong row here would
+# look like a defect and would only be a mismatched reference.
+lv_med  <- car::leveneTest(post ~ factor(arm), data = dat)
+lv_mean <- car::leveneTest(post ~ factor(arm), data = dat, center = mean)
+hg <- ar$homogeneity
+
+tab <- compare_table(
+  compare_row("Shapiro-Wilk W", ar$normality$shapiro_w, sw$statistic,
+              "base R shapiro.test()"),
+  compare_row("Shapiro-Wilk p", ar$normality$shapiro_p, sw$p.value,
+              "base R shapiro.test()"),
+  compare_row("Levene p (mean-centred)",
+              hg$p[hg$test == "Levene"], lv_mean[["Pr(>F)"]][1],
+              "car::leveneTest(center = mean)", tol = 1e-6),
+  compare_row("Brown-Forsythe p (median-centred)",
+              hg$p[hg$test == "Brown-Forsythe"], lv_med[["Pr(>F)"]][1],
+              "car::leveneTest() default", tol = 1e-6)
+)
+compare_report(tab, caption = "Assumption tests vs their reference")
+sf_log(tab)
+```
+
+-   [ ] All 4 assumption numbers match their reference.
+-   [ ] **Worth knowing.** surveyframe reports Levene and Brown-Forsythe as
+    2 rows. `car::leveneTest()` centres on the median by default, so its
+    default output is the Brown-Forsythe row, not the Levene row. Comparing
+    it to the Levene row would show a false `DIFFERS`.
+-   [ ] The advisory, if one fired, points at the right alternative method.
+
+## Verdict for this file
+
+```{r}
+#| label: verdict
+sf_verdict()
+```
+
+-   [ ] `0 DIFFERS, 0 CHECK`.
+-   [ ] The 4 APA sentences are usable in a write-up without editing.

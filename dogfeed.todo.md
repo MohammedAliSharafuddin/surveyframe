@@ -934,3 +934,69 @@ file, not a fix.
 Needs a triage decision at C3. Making serialise/restore a true fixed point is
 the real fix, but it changes the hash of any file currently written the fresh
 way, so it is an owner call rather than a quiet correction.
+
+### [open] `lane: 0.4.0` — `variables` works for Kendall correlation and fails for Pearson and Spearman
+Found 2026-08-02 while writing the 0.4.0 review suite. A plan block written
+as `roles = list(variables = c("support", "wellbeing"))` behaves 3 different
+ways inside 1 family:
+
+| method | with `roles$variables` | with `roles$x` and `roles$y` |
+|---|---|---|
+| `correlation_kendall` | works, tau = -0.1020 | works, tau = -0.1020 |
+| `correlation_pearson` | `Error: Test failed.` | works, r = -0.1387 |
+| `correlation_spearman` | `Error: Test failed.` | works, r = -0.1382 |
+| `partial_correlation` | `Error: undefined columns selected` | works, r = -0.1387 |
+
+The cause is in `sframe_vars_for_method()` (`R/analysis_plan.R:860`). The 3
+correlation entries read only the `x` and `y` roles, while 9 other methods
+(`descriptives`, `missing_data`, `crosstab`, `chi_square`, `fisher_exact`,
+`mcnemar`, `cochran_q`, `repeated_anova`, `friedman`) all list `variables` as
+an accepted role. `correlation_kendall` only appears to work because it
+dispatches to `sframe_run_kendall(data, roles)`, which reads `roles`
+directly and never consults `sframe_vars_for_method()`.
+
+Two separate problems, and the second is the worse one:
+
+1. **Inconsistent role vocabulary.** `variables` is the natural name for a
+   symmetric 2-variable test, it is accepted across most of the plan
+   vocabulary, and it is accepted by 1 of the 3 correlations. A user who
+   learns it from `descriptives` and applies it to `correlation_pearson`
+   gets a failure with nothing pointing at the cause.
+2. **The error names nothing.** When the roles resolve to no columns, the
+   result is the string `Test failed.`, which does not say which roles were
+   expected, which were supplied, or that roles were the problem at all.
+   `partial_correlation` is worse again, leaking the raw R message
+   `undefined columns selected`. This is the same shape as the 2 defects
+   B11 and B13 found in this release: software returning something
+   uninformative instead of saying what it needs.
+
+Both halves look cheap to fix. Adding `variables` to the 3 correlation
+entries is a 3-line change, and erroring through
+`sframe_check_instrument()` with the expected role names when `vars` comes
+back empty is contained to `sframe_run_one_block()`. Neither changes any
+number the package currently reports.
+
+Needs an owner decision: fix in 0.4.0, or document the correlation roles as
+`x`/`y` only and lane the consistency work to 0.4.1.
+
+### [open] `lane: 0.4.1` — `assumption_report()` says checks were computed when none were
+Found 2026-08-02 while writing the 0.4.0 review suite. Every check in
+`assumption_report()` is driven by the `variables` argument
+(`R/statistics_reports.R:537`). Called with `outcome` and `group` but no
+`variables`, which reads as a natural call for a 2-group comparison, it
+returns empty normality and homogeneity frames, a NULL advisory, and this
+APA sentence:
+
+    Assumption checks were computed.
+
+No check was computed. The sentence is drop-in text for a manuscript, so the
+failure mode is a user reporting assumption checks they never ran. The same
+class as B11 and B13: software returning something plausible instead of
+saying it has no answer.
+
+Suggested fix: when `variables` resolves to nothing, say so, either as a
+typed condition or as an APA line that names what was missing. Worth pairing
+with the correlation-roles entry above, since both are the plan vocabulary
+failing quietly rather than a wrong number.
+
+Not a wrong-number defect, so it does not block 0.4.0 on its own.

@@ -1,0 +1,338 @@
+---
+title: "04. Categorical tests"
+subtitle: "Crosstab, chi-square, Fisher exact, McNemar, Cochran Q"
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    embed-resources: true
+editor: visual
+execute:
+  warning: false
+  message: false
+  error: true
+---
+
+```{r}
+#| label: setup
+#| include: false
+source("_setup.R")
+```
+
+Five methods whose fields are all categorical. Chi-square and Fisher take
+**2 single-choice items**. McNemar takes **2 binary items on the same
+people**. Cochran Q takes **3 or more binary items on the same people**.
+
+## 1. Questionnaire and plan
+
+```{r}
+#| label: build
+svc <- sf_instrument(
+  title = "Service uptake survey", version = "1.0.0",
+  components = list(
+    sf_choices("site", c("north", "south", "east"),
+               c("North campus", "South campus", "East campus")),
+    sf_choices("yn", c("0", "1"), c("No", "Yes")),
+    sf_item("site", "Which campus do you use most?",
+            type = "single_choice", choice_set = "site", required = TRUE),
+    sf_item("member", "Are you a member of the sports centre?",
+            type = "single_choice", choice_set = "yn"),
+    sf_item("used_q1", "Did you use the library in term 1?",
+            type = "single_choice", choice_set = "yn"),
+    sf_item("used_q2", "Did you use the library in term 2?",
+            type = "single_choice", choice_set = "yn"),
+    sf_item("used_q3", "Did you use the library in term 3?",
+            type = "single_choice", choice_set = "yn")
+  ),
+  analysis_plan = list(
+    list(id = "RQ1", research_question =
+           "Does membership vary by campus?",
+         family = "association", method = "chi_square",
+         roles = list(row = "site", column = "member")),
+    list(id = "RQ2", research_question =
+           "The same question with an exact test.",
+         family = "association", method = "fisher_exact",
+         roles = list(row = "site", column = "member")),
+    list(id = "RQ3", research_question =
+           "Did library use change between term 1 and term 2?",
+         family = "group_comparison", method = "mcnemar",
+         roles = list(before = "used_q1", after = "used_q2")),
+    list(id = "RQ4", research_question =
+           "Did library use change across all 3 terms?",
+         family = "group_comparison", method = "cochran_q",
+         roles = list(measures = c("used_q1", "used_q2", "used_q3")))
+  )
+)
+svc
+```
+
+## 2. Both collection routes
+
+```{r}
+#| label: routes
+set.seed(7)
+sf_both_routes(svc, function(i) list(
+  site = sample(c("north", "south", "east"), 1),
+  member  = sample(c("0", "1"), 1),
+  used_q1 = sample(c("0", "1"), 1),
+  used_q2 = sample(c("0", "1"), 1),
+  used_q3 = sample(c("0", "1"), 1)
+), n = 4)
+```
+
+-   [ ] Both routes carry all 5 items.
+
+## 3. Dummy data
+
+```{r}
+#| label: data
+set.seed(303)
+n    <- 240
+site <- sample(c("north", "south", "east"), n, TRUE, prob = c(.45, .35, .20))
+# Membership really does vary by campus, so RQ1 and RQ2 have an effect to find.
+p_mem  <- c(north = .55, south = .35, east = .30)[site]
+member <- rbinom(n, 1, p_mem)
+# Library use rises term on term, so RQ3 and RQ4 have a change to find.
+u1 <- rbinom(n, 1, .40)
+u2 <- pmin(1, u1 + rbinom(n, 1, .25))
+u3 <- pmin(1, u2 + rbinom(n, 1, .20))
+
+responses <- data.frame(
+  site = site, member = as.character(member),
+  used_q1 = as.character(u1), used_q2 = as.character(u2),
+  used_q3 = as.character(u3), stringsAsFactors = FALSE
+)
+dat <- read_responses(responses, svc)
+res <- run_analysis_plan(dat, svc)
+res
+```
+
+## 4. RQ1: chi-square
+
+```{r}
+#| label: acc-chisq
+r  <- res[["RQ1"]]
+tb <- table(dat$site, dat$member)
+cs <- chisq.test(tb, correct = FALSE)
+# Cramer's V by hand, so the effect size has an independent check too.
+v  <- sqrt(unname(cs$statistic) / (sum(tb) * (min(dim(tb)) - 1)))
+
+tab <- compare_table(
+  compare_row("chi-square", r$chi_sq, unname(cs$statistic), "base R chisq.test()"),
+  compare_row("df",         r$df,     unname(cs$parameter), "base R chisq.test()"),
+  compare_row("p",          r$p,      cs$p.value,           "base R chisq.test()"),
+  compare_row("Cramer V",   r$cramer_v, v,                  "hand-computed"),
+  compare_row("N",          r$n,      sum(tb),              "base R table()")
+)
+compare_report(tab, caption = "RQ1 vs base R")
+sf_log(tab)
+```
+
+```{r}
+#| label: acc-chisq-jmv
+j  <- jmv::contTables(data = data.frame(site = factor(dat$site),
+                                        member = factor(dat$member)),
+                      rows = "site", cols = "member", phiCra = TRUE)
+jt <- as.data.frame(j$chiSq)
+jn <- as.data.frame(j$nom)
+list(chisq = jt, effect = jn)
+```
+
+```{r}
+#| label: acc-chisq-jmv-cmp
+tab <- compare_table(
+  compare_row("chi-square", r$chi_sq, jt[["value[chiSq]"]][1],
+              "jmv::contTables()", tol = 1e-5),
+  compare_row("p",          r$p,      jt[["p[chiSq]"]][1],
+              "jmv::contTables()", tol = 1e-6),
+  compare_row("Cramer V",   r$cramer_v, jn[["v[cra]"]][1],
+              "jmv::contTables()", tol = 1e-5)
+)
+compare_report(tab, caption = "RQ1 against a third opinion")
+sf_log(tab)
+```
+
+```{r}
+#| label: acc-chisq-plot
+op <- par(mfrow = c(1, 2), mar = c(4, 4, 3, 1))
+barplot(prop.table(tb, 1) * 100, beside = TRUE,
+        col = c("#a6cee3", "#1f78b4", "#b2df8a"),
+        ylab = "percent within campus", xlab = "member",
+        main = "Observed pattern", legend.text = rownames(tb),
+        args.legend = list(bty = "n", cex = 0.8))
+resid <- (tb - cs$expected) / sqrt(cs$expected)
+barplot(t(resid), beside = TRUE, col = c("#fdbf6f", "#ff7f00"),
+        ylab = "standardised residual", main = "Where the difference sits")
+abline(h = c(-2, 2), lty = 2, col = "#b2182b")
+par(op)
+```
+
+-   [ ] All 5 base R verdicts and all 3 `jmv` verdicts read `match`.
+-   [ ] The residual plot points at the cells the write-up talks about.
+    Anything past the dashed lines is contributing most of the statistic.
+
+## 5. RQ2: Fisher exact
+
+```{r}
+#| label: acc-fisher
+r  <- res[["RQ2"]]
+ft <- fisher.test(tb)
+
+tab <- compare_table(
+  compare_row("p", r$p, ft$p.value, "base R fisher.test()"),
+  compare_row("N", r$n, sum(tb),    "base R table()")
+)
+compare_report(tab, caption = "RQ2 vs base R")
+sf_log(tab)
+```
+
+```{r}
+#| label: acc-fisher-2x2
+# The odds ratio and its exact interval only exist for a 2 by 2 table, so
+# here is that case on its own: membership by 1 campus contrast.
+sub <- dat[dat$site %in% c("north", "south"), ]
+t22 <- table(sub$site, sub$member)
+f22 <- fisher.test(t22)
+sub_inst <- svc
+sub_inst$analysis_plan <- list(list(
+  id = "RQ2b", research_question = "North against south only.",
+  family = "association", method = "fisher_exact",
+  roles = list(row = "site", column = "member")))
+r22 <- run_analysis_plan(sub, sub_inst)[["RQ2b"]]
+
+tab <- compare_table(
+  compare_row("p", r22$p, f22$p.value, "base R fisher.test()"),
+  compare_row("odds ratio", r22$odds_ratio, unname(f22$estimate),
+              "base R fisher.test()"),
+  compare_row("OR lower", r22$odds_ratio_conf_int[1], f22$conf.int[1],
+              "base R fisher.test()"),
+  compare_row("OR upper", r22$odds_ratio_conf_int[2], f22$conf.int[2],
+              "base R fisher.test()")
+)
+compare_report(tab, caption = "RQ2 on a 2 by 2 table, with the exact interval")
+sf_log(tab)
+```
+
+::: callout-note
+## New in 0.4.0
+
+The exact odds-ratio interval is part of the small-sample track. Note that
+`fisher.test()` reports the **conditional** maximum-likelihood odds ratio,
+which is not the sample odds ratio `(a*d)/(b*c)`. If you check it by hand and
+get a different number, that is why.
+:::
+
+-   [ ] All 4 verdicts on the 2 by 2 table read `match`.
+
+## 6. RQ3: McNemar
+
+```{r}
+#| label: acc-mcnemar
+r  <- res[["RQ3"]]
+mt <- table(dat$used_q1, dat$used_q2)
+# surveyframe applies the continuity correction by default, so the reference
+# is mcnemar.test() on its own default too.
+mc <- mcnemar.test(mt)
+
+tab <- compare_table(
+  compare_row("chi-square", r$statistic, unname(mc$statistic),
+              "base R mcnemar.test()"),
+  compare_row("df", r$df, unname(mc$parameter), "base R mcnemar.test()"),
+  compare_row("p",  r$p,  mc$p.value,           "base R mcnemar.test()")
+)
+compare_report(tab, caption = "RQ3 vs base R, both continuity-corrected")
+sf_log(tab)
+```
+
+```{r}
+#| label: acc-mcnemar-uncorrected
+# The correction is switchable through the block's options, so check that
+# the switch reaches the test rather than being accepted and ignored.
+unc_inst <- svc
+unc_inst$analysis_plan <- list(list(
+  id = "RQ3b", research_question = "Uncorrected McNemar.",
+  family = "group_comparison", method = "mcnemar",
+  roles = list(before = "used_q1", after = "used_q2"),
+  options = list(correct = FALSE)))
+r3b <- run_analysis_plan(dat, unc_inst)[["RQ3b"]]
+mcu <- mcnemar.test(mt, correct = FALSE)
+
+tab <- compare_table(
+  compare_row("chi-square, uncorrected", r3b$statistic, unname(mcu$statistic),
+              "base R mcnemar.test(correct = FALSE)"),
+  compare_row("p, uncorrected", r3b$p, mcu$p.value,
+              "base R mcnemar.test(correct = FALSE)"),
+  compare_row("the switch changed the answer",
+              as.numeric(r3b$statistic != r$statistic), 1,
+              "corrected against uncorrected", tol = 0)
+)
+compare_report(tab, caption = "RQ3 with the correction switched off")
+sf_log(tab)
+```
+
+```{r}
+#| label: acc-mcnemar-plot
+barplot(c("no to yes" = mt[1, 2], "yes to no" = mt[2, 1]),
+        col = c("#74c476", "#fb6a4a"), border = NA,
+        ylab = "respondents", main = "RQ3: only the discordant cells matter")
+```
+
+-   [ ] All 3 verdicts read `match`.
+-   [ ] The plot shows the 2 cells McNemar actually uses. If they look
+    balanced but p is small, something is wrong.
+
+::: callout-warning
+## Continuity correction
+
+surveyframe applies the continuity correction by default, matching
+`mcnemar.test()`. Passing `correct = FALSE` to the reference while
+surveyframe corrects produces a false `DIFFERS`, which is exactly what the
+first draft of this file did: 45.02 against 47. The 2 numbers were both
+right and were answering different questions. The chunk above checks that
+`options = list(correct = FALSE)` genuinely reaches the test, since an
+option that is accepted and then ignored is worse than one that errors.
+:::
+
+## 7. RQ4: Cochran Q
+
+```{r}
+#| label: acc-cochran
+r  <- res[["RQ4"]]
+m  <- as.matrix(data.frame(q1 = as.numeric(dat$used_q1),
+                           q2 = as.numeric(dat$used_q2),
+                           q3 = as.numeric(dat$used_q3)))
+
+# Cochran Q by hand from its definition, so the reference is independent of
+# any package that might share surveyframe's implementation.
+k  <- ncol(m); Cj <- colSums(m); Ri <- rowSums(m)
+Q  <- (k - 1) * (k * sum(Cj^2) - sum(Cj)^2) / (k * sum(Ri) - sum(Ri^2))
+pQ <- pchisq(Q, df = k - 1, lower.tail = FALSE)
+
+tab <- compare_table(
+  compare_row("Q",  r$Q,  Q,     "hand-computed from the definition"),
+  compare_row("df", r$df, k - 1, "hand-computed from the definition"),
+  compare_row("p",  r$p,  pQ,    "hand-computed from the definition")
+)
+compare_report(tab, caption = "RQ4 vs a hand-computed Cochran Q")
+sf_log(tab)
+```
+
+```{r}
+#| label: acc-cochran-plot
+barplot(colMeans(m) * 100, col = "#9e9ac8", border = NA,
+        names.arg = c("term 1", "term 2", "term 3"),
+        ylab = "percent who used the library",
+        main = sprintf("RQ4: Q(%d) = %.2f", r$df, r$Q))
+```
+
+-   [ ] All 3 verdicts read `match`.
+-   [ ] The bars rise across terms, which is what the test is reporting.
+
+## Verdict for this file
+
+```{r}
+#| label: verdict
+sf_verdict()
+```
+
+-   [ ] `0 DIFFERS, 0 CHECK`.

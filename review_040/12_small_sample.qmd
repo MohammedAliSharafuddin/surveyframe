@@ -1,0 +1,401 @@
+---
+title: "12. The small-sample track"
+subtitle: "Hodges-Lehmann, pseudomedian, exact odds ratio, Firth, the advisory"
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    embed-resources: true
+editor: visual
+execute:
+  warning: false
+  message: false
+  error: true
+---
+
+```{r}
+#| label: setup
+#| include: false
+source("_setup.R")
+```
+
+::: callout-important
+## No previous review covers any of this
+
+`mas_review_032`, `033`, and `034` contain no mention of Hodges-Lehmann, the
+pseudomedian interval, the exact odds-ratio interval, Firth regression, or
+the small-sample advisory. For a release whose headline is small-sample
+inference, this file closes the largest gap in the review history.
+:::
+
+The track exists for one situation: **n below 30**, where asymptotic p-values
+and normal-theory intervals stop being trustworthy. Every method below
+answers the same question its large-sample counterpart does, but with an
+estimator that behaves at small n.
+
+## 1. Questionnaire and plan
+
+A small pilot study. Eighteen people, 2 arms.
+
+```{r}
+#| label: build
+pilot <- sf_instrument(
+  title = "Reading intervention pilot", version = "1.0.0",
+  components = list(
+    sf_choices("arm", c("usual", "new"), c("Usual practice", "New method")),
+    sf_choices("yn", c("0", "1"), c("No", "Yes")),
+    sf_item("arm",   "Which method were you taught with?",
+            type = "single_choice", choice_set = "arm", required = TRUE),
+    sf_item("pre",   "Reading score before", type = "numeric"),
+    sf_item("post",  "Reading score after",  type = "numeric"),
+    sf_item("passed", "Did you pass the end-of-term check?",
+            type = "single_choice", choice_set = "yn")
+  ),
+  analysis_plan = list(
+    list(id = "RQ1", research_question =
+           "Do the 2 arms differ on the post score?",
+         family = "group_comparison", method = "mann_whitney",
+         roles = list(outcome = "post", group = "arm")),
+    list(id = "RQ2", research_question =
+           "Did scores change from before to after?",
+         family = "group_comparison", method = "wilcoxon_pair",
+         roles = list(before = "pre", after = "post")),
+    list(id = "RQ3", research_question =
+           "Does the pass rate differ by arm?",
+         family = "association", method = "fisher_exact",
+         roles = list(row = "arm", column = "passed"))
+  )
+)
+pilot
+```
+
+## 2. Both collection routes
+
+```{r}
+#| label: routes
+set.seed(6)
+sf_both_routes(pilot, function(i) list(
+  arm = sample(c("usual", "new"), 1), pre = sample(30:70, 1),
+  post = sample(35:80, 1), passed = sample(c("0", "1"), 1)
+), n = 3)
+```
+
+## 3. Dummy data, deliberately small
+
+```{r}
+#| label: data
+set.seed(5)
+n   <- 18
+arm <- rep(c("usual", "new"), each = n / 2)
+pre  <- round(rnorm(n, 50, 8))
+post <- round(pre + ifelse(arm == "new", 9, 2) + rnorm(n, 0, 5))
+# A rare failure, so the exact odds-ratio interval has something to do.
+passed <- c(rbinom(9, 1, 0.55), rbinom(9, 1, 0.90))
+
+dat <- read_responses(data.frame(
+  arm = arm, pre = pre, post = post,
+  passed = as.character(passed), stringsAsFactors = FALSE), pilot)
+
+data.frame(n = nrow(dat), per_arm = n / 2, passes = sum(passed))
+res <- run_analysis_plan(dat, pilot)
+res
+```
+
+-   [ ] n is 18, which is below the threshold the advisory watches for.
+
+## 4. The advisory
+
+```{r}
+#| label: advisory
+ar <- assumption_report(dat, variables = "post", group = "arm")
+ar$advisory
+```
+
+```{r}
+#| label: advisory-large
+# The same call on a large sample, to confirm the advisory is conditional
+# rather than always on. An advisory that never switches off is noise.
+set.seed(5)
+big <- data.frame(arm = rep(c("usual", "new"), each = 100),
+                  post = c(rnorm(100, 52, 8), rnorm(100, 60, 8)))
+ab <- assumption_report(big, variables = "post", group = "arm")
+
+data.frame(
+  sample = c("n = 18", "n = 200"),
+  advisory_fired = c(!is.null(ar$advisory), !is.null(ab$advisory))
+)
+```
+
+-   [ ] The advisory fires at n = 18 and stays silent at n = 200.
+-   [ ] **Owner judgement.** Read the advisory text. Does it change what a
+    researcher would actually do, or does it only say the sample is small?
+    It names non-parametric alternatives and exact intervals, so the test is
+    whether a reader knows which one to reach for next.
+
+## 5. RQ1: Hodges-Lehmann shift and its interval
+
+::: callout-warning
+## Match the reference call, or you will report a bug that is not there
+
+surveyframe fixes `exact = FALSE` on `wilcox.test()`
+(`R/analysis_plan.R:359`). Left on its own default, base R switches to the
+**exact** method at this n and no ties, and the 2 disagree in the 5th
+decimal. Writing this suite produced exactly that false alarm. Both are
+computed below so the difference is visible rather than hidden.
+:::
+
+```{r}
+#| label: acc-hl
+r <- res[["RQ1"]]
+a <- dat$post[dat$arm == "usual"]
+b <- dat$post[dat$arm == "new"]
+
+w <- wilcox.test(a, b, conf.int = TRUE, exact = FALSE)
+
+tab <- compare_table(
+  compare_row("U", r$U, unname(w$statistic), "wilcox.test(exact = FALSE)"),
+  compare_row("p", r$p, w$p.value,           "wilcox.test(exact = FALSE)"),
+  compare_row("Hodges-Lehmann shift", r$hl_shift, unname(w$estimate),
+              "wilcox.test(exact = FALSE)"),
+  compare_row("HL lower", r$hl_conf_int[1], w$conf.int[1],
+              "wilcox.test(exact = FALSE)"),
+  compare_row("HL upper", r$hl_conf_int[2], w$conf.int[2],
+              "wilcox.test(exact = FALSE)")
+)
+compare_report(tab, caption = "RQ1 like for like")
+sf_log(tab)
+```
+
+```{r}
+#| label: acc-hl-exact
+# What base R gives a researcher on its own default at this n.
+we <- wilcox.test(a, b, conf.int = TRUE)
+data.frame(
+  quantity = c("HL shift", "HL lower", "HL upper"),
+  surveyframe_normal_approx = signif(c(r$hl_shift, r$hl_conf_int), 8),
+  base_R_exact_default      = signif(c(unname(we$estimate), we$conf.int), 8),
+  difference = signif(abs(c(r$hl_shift, r$hl_conf_int) -
+                            c(unname(we$estimate), we$conf.int)), 3)
+)
+```
+
+```{r}
+#| label: acc-hl-plot
+stripchart(list(usual = a, new = b), method = "jitter", pch = 19,
+           col = c("#3182bd", "#b2182b"), vertical = TRUE,
+           ylab = "post score",
+           main = sprintf("RQ1: HL shift = %.2f [%.2f, %.2f]",
+                          r$hl_shift, r$hl_conf_int[1], r$hl_conf_int[2]))
+segments(1, median(a), 2, median(b), lty = 2, col = "#404040")
+points(c(1, 2), c(median(a), median(b)), pch = 18, cex = 2)
+```
+
+-   [ ] All 5 like-for-like verdicts read `match`.
+-   [ ] **Owner decision.** Compare the 2 tables. surveyframe reports the
+    normal-approximation interval on a sample of 18, where base R's own
+    default would give the exact one. Nothing is numerically wrong. The
+    question is whether the release built for small samples should switch to
+    the exact method precisely when n is small, or expose it as an option the
+    way McNemar's correction is exposed in file `04`.
+-   [ ] With only 9 per arm, every point is visible in the plot. Confirm the
+    reported shift is plausible against what you can see.
+
+## 6. RQ2: pseudomedian and its interval
+
+The paired counterpart. The pseudomedian is the median of the Walsh averages
+rather than the median of the differences, so it is not the same number as
+`median(post - pre)` and should not be expected to be.
+
+```{r}
+#| label: acc-pm
+r  <- res[["RQ2"]]
+ws <- wilcox.test(dat$pre, dat$post, paired = TRUE, conf.int = TRUE,
+                  exact = FALSE)
+
+tab <- compare_table(
+  compare_row("V", r$V, unname(ws$statistic), "wilcox.test(paired)"),
+  compare_row("p", r$p, ws$p.value,           "wilcox.test(paired)"),
+  compare_row("pseudomedian", r$pseudomedian, unname(ws$estimate),
+              "wilcox.test(paired)"),
+  compare_row("lower", r$pseudomedian_conf_int[1], ws$conf.int[1],
+              "wilcox.test(paired)"),
+  compare_row("upper", r$pseudomedian_conf_int[2], ws$conf.int[2],
+              "wilcox.test(paired)")
+)
+compare_report(tab, caption = "RQ2 vs base R")
+sf_log(tab)
+```
+
+```{r}
+#| label: acc-pm-walsh
+# The pseudomedian from its own definition, as a second independent check.
+d     <- dat$pre - dat$post
+walsh <- outer(d, d, "+") / 2
+tab <- compare_table(
+  compare_row("pseudomedian from Walsh averages", r$pseudomedian,
+              median(walsh[upper.tri(walsh, diag = TRUE)]),
+              "median of Walsh averages", tol = 1e-3)
+)
+compare_report(tab, caption = "RQ2 against the definition")
+sf_log(tab)
+
+data.frame(pseudomedian = r$pseudomedian,
+           median_of_differences = median(d),
+           note = "these are different estimators and need not agree")
+```
+
+-   [ ] All 5 base R verdicts read `match`.
+-   [ ] The Walsh-average check matches to `1e-3`. It uses a slightly
+    different tie handling, so exact agreement is not expected here, and the
+    tolerance says so rather than being quietly widened.
+
+## 7. RQ3: exact odds-ratio interval
+
+```{r}
+#| label: acc-or
+r  <- res[["RQ3"]]
+tb <- table(dat$arm, dat$passed)
+ft <- fisher.test(tb)
+tb
+```
+
+```{r}
+#| label: acc-or-cmp
+tab <- compare_table(
+  compare_row("p", r$p, ft$p.value, "base R fisher.test()"),
+  compare_row("odds ratio", r$odds_ratio, unname(ft$estimate),
+              "base R fisher.test()"),
+  compare_row("OR lower", r$odds_ratio_conf_int[1], ft$conf.int[1],
+              "base R fisher.test()"),
+  compare_row("OR upper", r$odds_ratio_conf_int[2], ft$conf.int[2],
+              "base R fisher.test()")
+)
+compare_report(tab, caption = "RQ3 vs base R")
+sf_log(tab)
+```
+
+```{r}
+#| label: acc-or-vs-sample
+# The conditional MLE odds ratio Fisher reports is not the sample odds ratio.
+# Showing both stops a reviewer recording a false finding.
+sample_or <- (tb[1, 1] * tb[2, 2]) / (tb[1, 2] * tb[2, 1])
+data.frame(
+  quantity = c("conditional MLE odds ratio (reported)",
+               "sample odds ratio (a*d)/(b*c)"),
+  value = c(r$odds_ratio, sample_or)
+)
+```
+
+-   [ ] All 4 verdicts read `match`.
+-   [ ] The interval is wide, as it should be on 18 people. A narrow interval
+    here would be the finding.
+-   [ ] The 2 odds ratios above differ, and that is expected rather than a
+    defect.
+
+## 8. Firth logistic regression at small n
+
+Firth's penalised likelihood is the small-sample answer to logistic
+regression. File `08` checks it against `logistf` on a rare outcome at n =
+260. Here is the case it was really built for: **complete separation**, where
+ordinary logistic regression has no finite estimate at all.
+
+```{r}
+#| label: separation
+sep <- data.frame(x = c(1, 2, 3, 4, 5, 6, 7, 8),
+                  y = c(0, 0, 0, 0, 1, 1, 1, 1))
+
+g  <- suppressWarnings(glm(y ~ x, data = sep, family = binomial()))
+fl <- logistf::logistf(y ~ x, data = sep)
+
+data.frame(
+  method = c("ordinary glm()", "Firth logistf()"),
+  slope  = c(coef(g)[["x"]], coef(fl)[["x"]]),
+  finite = c(is.finite(coef(g)[["x"]]) && abs(coef(g)[["x"]]) < 100,
+             is.finite(coef(fl)[["x"]]))
+)
+```
+
+```{r}
+#| label: separation-sf
+sep_inst <- sf_instrument(
+  title = "Separation demo", version = "1.0.0",
+  components = list(
+    sf_choices("yn", c("0", "1"), c("No", "Yes")),
+    sf_item("x", "Predictor", type = "numeric"),
+    sf_item("y", "Outcome", type = "single_choice", choice_set = "yn")),
+  analysis_plan = list(list(
+    id = "RQ1", research_question = "Does x predict y under separation?",
+    family = "prediction", method = "firth_logistic",
+    roles = list(outcome = "y", predictors = "x"))))
+
+sep_dat <- read_responses(
+  data.frame(x = sep$x, y = as.character(sep$y), stringsAsFactors = FALSE),
+  sep_inst)
+rs <- run_analysis_plan(sep_dat, sep_inst)[["RQ1"]]
+
+tab <- compare_table(
+  compare_row("slope", rs$coefficients["x", "Estimate"], coef(fl)[["x"]],
+              "logistf::logistf()", tol = 1e-5),
+  compare_row("CI lower", rs$coefficients["x", "ci_low"], fl$ci.lower[["x"]],
+              "logistf::logistf()", tol = 1e-4),
+  compare_row("CI upper", rs$coefficients["x", "ci_high"], fl$ci.upper[["x"]],
+              "logistf::logistf()", tol = 1e-4),
+  compare_row("p", rs$coefficients["x", "p"], fl$prob[["x"]],
+              "logistf::logistf()", tol = 1e-5)
+)
+compare_report(tab, caption = "Firth under complete separation")
+sf_log(tab)
+```
+
+-   [ ] Ordinary `glm()` produces an absurd slope and a warning. Firth
+    produces a finite one.
+-   [ ] All 4 verdicts read `match`.
+-   [ ] **This is the strongest argument for the track.** A user with 8
+    observations and perfect separation gets a usable answer instead of a
+    number that only looks like one.
+
+## 9. Sample-size planning
+
+```{r}
+#| label: ssp
+plans <- list(
+  t_test     = sample_size_plan("t_test", sd = 10, margin_error = 5),
+  proportion = sample_size_plan("proportion", margin_error = 0.05, p = 0.5),
+  correlation = sample_size_plan("correlation", r = 0.3)
+)
+plans
+```
+
+-   [ ] Each plan returns a number and says what assumptions produced it.
+-   [ ] **Owner judgement.** Would a first-time user know which `type` to
+    pick from the argument names alone?
+
+## 10. The whole track on one page
+
+```{r}
+#| label: summary
+data.frame(
+  feature = c("small-sample advisory", "Hodges-Lehmann shift and CI",
+              "pseudomedian and CI", "exact odds-ratio CI",
+              "Firth logistic regression", "sample-size planning"),
+  where = c("assumption_report()", "mann_whitney", "wilcoxon_pair",
+            "fisher_exact", "firth_logistic", "sample_size_plan()"),
+  new_in_040 = c(TRUE, TRUE, TRUE, TRUE, TRUE, FALSE),
+  reviewed_before = FALSE
+)
+```
+
+-   [ ] Every row above ran somewhere in this file.
+-   [ ] `vignettes/small-sample.Rmd` tells the same story as this file, and
+    does not contradict it.
+
+## Verdict for this file
+
+```{r}
+#| label: verdict
+sf_verdict()
+```
+
+-   [ ] `0 DIFFERS, 0 CHECK`.
+-   [ ] The 2 owner decisions in sections 4 and 5 are recorded in
+    `dogfeed.todo.md` before this file is closed.

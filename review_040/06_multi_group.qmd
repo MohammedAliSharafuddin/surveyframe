@@ -1,0 +1,367 @@
+---
+title: "06. Multi-group and factorial designs"
+subtitle: "One-way ANOVA, Kruskal-Wallis, two-way ANOVA, ANCOVA, repeated ANOVA, Friedman"
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    embed-resources: true
+editor: visual
+execute:
+  warning: false
+  message: false
+  error: true
+---
+
+```{r}
+#| label: setup
+#| include: false
+source("_setup.R")
+```
+
+Six methods for 3 or more groups or 3 or more measurements. One of them,
+`repeated_anova`, carried a confirmed bug into CRAN 0.3.4 and is fixed here,
+so section 7 is the single most important check in this file.
+
+## 1. Questionnaire and plan
+
+```{r}
+#| label: build
+crs <- sf_instrument(
+  title = "Course experience survey", version = "1.0.0",
+  components = list(
+    sf_choices("mode", c("online", "blended", "campus"),
+               c("Fully online", "Blended", "On campus")),
+    sf_choices("stage", c("ug", "pg"), c("Undergraduate", "Postgraduate")),
+    sf_item("mode",  "How was your course delivered?",
+            type = "single_choice", choice_set = "mode", required = TRUE),
+    sf_item("stage", "What level are you studying at?",
+            type = "single_choice", choice_set = "stage"),
+    sf_item("prior", "Prior attainment score on entry (0 to 100)",
+            type = "numeric"),
+    sf_item("sat",   "Overall satisfaction (0 to 100)",
+            type = "slider", slider_min = 0, slider_max = 100),
+    sf_item("wk4",   "Engagement in week 4 (0 to 100)",
+            type = "slider", slider_min = 0, slider_max = 100),
+    sf_item("wk8",   "Engagement in week 8 (0 to 100)",
+            type = "slider", slider_min = 0, slider_max = 100),
+    sf_item("wk12",  "Engagement in week 12 (0 to 100)",
+            type = "slider", slider_min = 0, slider_max = 100)
+  ),
+  analysis_plan = list(
+    list(id = "RQ1", research_question =
+           "Does satisfaction differ across the 3 delivery modes?",
+         family = "group_comparison", method = "anova_one",
+         roles = list(outcome = "sat", group = "mode")),
+    list(id = "RQ2", research_question =
+           "The same question without assuming normality.",
+         family = "group_comparison", method = "kruskal_wallis",
+         roles = list(outcome = "sat", group = "mode")),
+    list(id = "RQ3", research_question =
+           "Do mode and stage interact on satisfaction?",
+         family = "group_comparison", method = "anova_two",
+         roles = list(factor1 = "mode", factor2 = "stage", outcome = "sat")),
+    list(id = "RQ4", research_question =
+           "Does mode still matter once prior attainment is controlled?",
+         family = "group_comparison", method = "ancova",
+         roles = list(group = "mode", covariates = "prior", outcome = "sat")),
+    list(id = "RQ5", research_question =
+           "Does engagement change across the 3 measurement weeks?",
+         family = "group_comparison", method = "repeated_anova",
+         roles = list(measures = c("wk4", "wk8", "wk12"))),
+    list(id = "RQ6", research_question =
+           "The same question without assuming normality.",
+         family = "group_comparison", method = "friedman",
+         roles = list(measures = c("wk4", "wk8", "wk12")))
+  )
+)
+crs
+```
+
+## 2. Both collection routes
+
+```{r}
+#| label: routes
+set.seed(21)
+sf_both_routes(crs, function(i) list(
+  mode = sample(c("online", "blended", "campus"), 1),
+  stage = sample(c("ug", "pg"), 1),
+  prior = sample(40:90, 1), sat = sample(20:95, 1),
+  wk4 = sample(20:90, 1), wk8 = sample(20:90, 1), wk12 = sample(20:90, 1)
+), n = 4)
+```
+
+## 3. Dummy data
+
+```{r}
+#| label: data
+set.seed(808)
+n     <- 210
+mode  <- sample(c("online", "blended", "campus"), n, TRUE)
+stage <- sample(c("ug", "pg"), n, TRUE)
+prior <- round(rnorm(n, 62, 11))
+
+# Real effects by construction: campus scores highest, postgraduates are a
+# little higher again, and engagement declines across the term.
+mode_eff  <- c(online = -6, blended = 0, campus = 6)[mode]
+stage_eff <- c(ug = 0, pg = 3)[stage]
+sat  <- round(60 + mode_eff + stage_eff + 0.25 * (prior - 62) + rnorm(n, 0, 9))
+
+subj <- rnorm(n, 0, 8)
+wk4  <- round(70 + subj + rnorm(n, 0, 6))
+wk8  <- round(64 + subj + rnorm(n, 0, 6))
+wk12 <- round(58 + subj + rnorm(n, 0, 6))
+
+cl <- function(x) pmin(100, pmax(0, x))
+responses <- data.frame(mode = mode, stage = stage, prior = prior,
+                        sat = cl(sat), wk4 = cl(wk4), wk8 = cl(wk8),
+                        wk12 = cl(wk12), stringsAsFactors = FALSE)
+dat <- read_responses(responses, crs)
+res <- run_analysis_plan(dat, crs)
+res
+```
+
+## 4. RQ1: one-way ANOVA
+
+```{r}
+#| label: acc-anova1
+r <- res[["RQ1"]]
+s <- summary(aov(sat ~ factor(mode), data = dat))[[1]]
+
+tab <- compare_table(
+  compare_row("F",           r$F_stat, s[["F value"]][1], "base R aov()"),
+  compare_row("df between",  r$df1,    s[["Df"]][1],      "base R aov()"),
+  compare_row("df within",   r$df2,    s[["Df"]][2],      "base R aov()"),
+  compare_row("p",           r$p,      s[["Pr(>F)"]][1],  "base R aov()"),
+  compare_row("eta squared", r$eta2,
+              s[["Sum Sq"]][1] / sum(s[["Sum Sq"]]), "hand-computed"),
+  compare_row("mean, campus", r$group_means[["campus"]],
+              mean(dat$sat[dat$mode == "campus"]), "base R mean()")
+)
+compare_report(tab, caption = "RQ1 vs base R")
+sf_log(tab)
+```
+
+```{r}
+#| label: acc-anova1-jmv
+j  <- jmv::ANOVA(data = data.frame(sat = dat$sat, mode = factor(dat$mode)),
+                 dep = "sat", factors = "mode", effectSize = "eta")
+jt <- as.data.frame(j$main)
+tab <- compare_table(
+  compare_row("F", r$F_stat, jt$F[1], "jmv::ANOVA()", tol = 1e-5),
+  compare_row("p", r$p,      jt$p[1], "jmv::ANOVA()", tol = 1e-6),
+  compare_row("eta squared", r$eta2, jt[["etaSq"]][1], "jmv::ANOVA()", tol = 1e-5)
+)
+compare_report(tab, caption = "RQ1 against a third opinion")
+sf_log(tab)
+```
+
+```{r}
+#| label: acc-anova1-tukey
+# Post-hoc comparisons, checked against base R's own Tukey HSD.
+th <- TukeyHSD(aov(sat ~ factor(mode), data = dat))[[1]]
+list(surveyframe = r$tukey, base_R = round(th, 5))
+```
+
+```{r}
+#| label: acc-anova1-plot
+boxplot(sat ~ mode, data = dat, col = c("#fee0d2", "#fc9272", "#de2d26"),
+        border = "#a50f15", ylab = "Satisfaction",
+        main = sprintf("RQ1: F(%d, %d) = %.2f", r$df1, r$df2, r$F_stat))
+points(seq_along(r$group_means), unlist(r$group_means)[levels(factor(dat$mode))],
+       pch = 18, cex = 2, col = "#08519c")
+```
+
+-   [ ] All 6 base R verdicts and all 3 `jmv` verdicts read `match`.
+-   [ ] The Tukey tables agree row for row.
+-   [ ] The blue diamonds sit inside their boxes.
+
+## 5. RQ2: Kruskal-Wallis
+
+```{r}
+#| label: acc-kw
+r  <- res[["RQ2"]]
+kw <- kruskal.test(sat ~ factor(mode), data = dat)
+
+tab <- compare_table(
+  compare_row("H",  r$H,  unname(kw$statistic), "base R kruskal.test()"),
+  compare_row("df", r$df, unname(kw$parameter), "base R kruskal.test()"),
+  compare_row("p",  r$p,  kw$p.value,           "base R kruskal.test()")
+)
+compare_report(tab, caption = "RQ2 vs base R")
+sf_log(tab)
+```
+
+-   [ ] All 3 verdicts read `match`.
+
+## 6. RQ3 and RQ4: two-way ANOVA and ANCOVA
+
+```{r}
+#| label: acc-anova2
+r  <- res[["RQ3"]]
+s2 <- summary(aov(sat ~ factor(mode) * factor(stage), data = dat))[[1]]
+tb <- r$table
+row <- function(t, e) t[trimws(t$effect) == e, ][1, ]
+
+tab <- compare_table(
+  compare_row("F, mode",  row(tb, "mode")$F,  s2[["F value"]][1], "base R aov()"),
+  compare_row("F, stage", row(tb, "stage")$F, s2[["F value"]][2], "base R aov()"),
+  compare_row("F, interaction", row(tb, "mode:stage")$F,
+              s2[["F value"]][3], "base R aov()"),
+  compare_row("p, mode",  row(tb, "mode")$p,  s2[["Pr(>F)"]][1],  "base R aov()"),
+  compare_row("p, interaction", row(tb, "mode:stage")$p,
+              s2[["Pr(>F)"]][3], "base R aov()")
+)
+compare_report(tab, caption = "RQ3 two-way ANOVA vs base R")
+sf_log(tab)
+```
+
+```{r}
+#| label: acc-anova2-plot
+with(dat, interaction.plot(factor(mode), factor(stage), sat,
+     col = c("#1b9e77", "#d95f02"), lwd = 2, ylab = "mean satisfaction",
+     xlab = "delivery mode", trace.label = "stage",
+     main = "RQ3: is there an interaction to see?"))
+```
+
+```{r}
+#| label: acc-ancova
+r  <- res[["RQ4"]]
+# Type I sums of squares, group entered first, matching the runner's formula.
+s3 <- summary(aov(sat ~ factor(mode) + prior, data = dat))[[1]]
+tb <- r$table
+rw <- function(t, e) t[trimws(t$effect) == e, ][1, ]
+
+tab <- compare_table(
+  compare_row("F, mode",  rw(tb, "mode")[["F value"]],  s3[["F value"]][1],
+              "base R aov()"),
+  compare_row("F, prior", rw(tb, "prior")[["F value"]], s3[["F value"]][2],
+              "base R aov()"),
+  compare_row("p, mode",  rw(tb, "mode")[["Pr(>F)"]],   s3[["Pr(>F)"]][1],
+              "base R aov()"),
+  compare_row("p, prior", rw(tb, "prior")[["Pr(>F)"]],  s3[["Pr(>F)"]][2],
+              "base R aov()")
+)
+compare_report(tab, caption = "RQ4 ANCOVA vs base R")
+sf_log(tab)
+```
+
+-   [ ] Every two-way and ANCOVA verdict reads `match`.
+-   [ ] The interaction plot's lines are roughly parallel when the
+    interaction p is large, and cross or fan when it is small.
+-   [ ] `slope_warning` on the ANCOVA result says something usable if the
+    homogeneity-of-slopes assumption is in doubt.
+
+## 7. RQ5: repeated-measures ANOVA, the bug fixed in this release
+
+::: callout-important
+## What was wrong before 0.4.0
+
+`sframe_run_repeated_anova()` never coerced the subject identifier to a
+factor, so `aov()` used the wrong error stratum. On validation data F came
+out **0.94** where `jmv::anovaRM()` gives **22.64**. It produced a plausible
+number with no error, which is why no earlier review caught it.
+
+This section is the proof that it is fixed. If any verdict here is not
+`match`, do not ship.
+:::
+
+```{r}
+#| label: acc-rm
+r <- res[["RQ5"]]
+
+# Reference built by hand in long format, with subject as an explicit factor
+# and the correct within-subject error stratum.
+long <- data.frame(
+  subject   = factor(rep(seq_len(nrow(dat)), 3)),
+  condition = factor(rep(c("wk4", "wk8", "wk12"), each = nrow(dat)),
+                     levels = c("wk4", "wk8", "wk12")),
+  score     = c(dat$wk4, dat$wk8, dat$wk12)
+)
+fit <- aov(score ~ condition + Error(subject / condition), data = long)
+within <- summary(fit)[["Error: subject:condition"]][[1]]
+within
+```
+
+```{r}
+#| label: acc-rm-cmp
+tab <- compare_table(
+  compare_row("F",  r$F_stat, within[["F value"]][1], "base R aov() with Error()",
+              tol = 1e-4),
+  compare_row("df1", r$df1,   within[["Df"]][1],      "base R aov() with Error()"),
+  compare_row("df2", r$df2,   within[["Df"]][2],      "base R aov() with Error()"),
+  compare_row("p",  r$p,      within[["Pr(>F)"]][1],  "base R aov() with Error()",
+              tol = 1e-6)
+)
+compare_report(tab, caption = "RQ5 repeated ANOVA vs the correct error stratum")
+sf_log(tab)
+```
+
+```{r}
+#| label: acc-rm-jmv
+jr <- jmv::anovaRM(
+  data = data.frame(wk4 = dat$wk4, wk8 = dat$wk8, wk12 = dat$wk12),
+  rm = list(list(label = "week", levels = c("wk4", "wk8", "wk12"))),
+  rmCells = list(list(measure = "wk4", cell = "wk4"),
+                 list(measure = "wk8", cell = "wk8"),
+                 list(measure = "wk12", cell = "wk12")),
+  rmTerms = list("week"), effectSize = "partEta")
+jrt <- as.data.frame(jr$rmTable)
+jrt
+```
+
+```{r}
+#| label: acc-rm-jmv-cmp
+tab <- compare_table(
+  compare_row("F", r$F_stat, jrt[["F[none]"]][1], "jmv::anovaRM()", tol = 1e-3),
+  compare_row("p", r$p,      jrt[["p[none]"]][1], "jmv::anovaRM()", tol = 1e-6)
+)
+compare_report(tab, caption = "RQ5 against jmv, the tool that exposed the bug")
+sf_log(tab)
+```
+
+```{r}
+#| label: acc-rm-plot
+matplot(t(as.matrix(dat[1:40, c("wk4", "wk8", "wk12")])), type = "l",
+        col = "#cccccc", lty = 1, xaxt = "n", ylab = "engagement",
+        xlab = "measurement week",
+        main = sprintf("RQ5: F(%d, %d) = %.2f", r$df1, r$df2, r$F_stat))
+axis(1, at = 1:3, labels = c("week 4", "week 8", "week 12"))
+lines(colMeans(dat[, c("wk4", "wk8", "wk12")]), col = "#b2182b", lwd = 3)
+```
+
+-   [ ] F, both degrees of freedom, and p match the hand-built error stratum.
+-   [ ] `jmv::anovaRM()` agrees. **This is the check that would have caught
+    the 0.3.4 bug.**
+-   [ ] The grey lines are individual respondents and the red line is the
+    mean. Repeated-measures ANOVA is testing the red line while using the
+    grey lines to remove between-person variance.
+
+## 8. RQ6: Friedman
+
+```{r}
+#| label: acc-friedman
+r  <- res[["RQ6"]]
+fm <- friedman.test(as.matrix(dat[, c("wk4", "wk8", "wk12")]))
+
+tab <- compare_table(
+  compare_row("chi-square", r$statistic, unname(fm$statistic),
+              "base R friedman.test()"),
+  compare_row("df", r$df, unname(fm$parameter), "base R friedman.test()"),
+  compare_row("p",  r$p,  fm$p.value,           "base R friedman.test()")
+)
+compare_report(tab, caption = "RQ6 vs base R")
+sf_log(tab)
+```
+
+-   [ ] All 3 verdicts read `match`.
+
+## Verdict for this file
+
+```{r}
+#| label: verdict
+sf_verdict()
+```
+
+-   [ ] `0 DIFFERS, 0 CHECK`.
+-   [ ] Section 7 in particular is clean.

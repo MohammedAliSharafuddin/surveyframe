@@ -75,3 +75,5 @@
 ^mas_review_033\.(qmd|html)$
 ^mas_review_034\.(md|qmd|html)$
 ^demo($|/)
+^review_040($|/)
+^mas_review_040\.(md|qmd|html)$

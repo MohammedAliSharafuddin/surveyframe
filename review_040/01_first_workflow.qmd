@@ -1,0 +1,498 @@
+---
+title: "01. Your first complete surveyframe workflow"
+subtitle: "Questionnaire, plan, both collection routes, data, results, report"
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    embed-resources: true
+editor: visual
+execute:
+  warning: false
+  message: false
+  error: true
+---
+
+```{r}
+#| label: setup
+#| include: false
+source("_setup.R")
+```
+
+This file is the whole package in one sitting. A short staff survey is
+designed, checked, exported to both collection routes, filled in with
+simulated answers, read back, analysed against its own pre-declared plan, and
+written up. Nothing here is loaded from a fixture.
+
+If you only run one file before the release, run this one.
+
+## 1. Build the questionnaire
+
+An instrument holds 3 kinds of thing: reusable choice sets, the items
+themselves, and the analysis plan. Building the choice set once and pointing
+items at it is what makes the codebook and the exports consistent later.
+
+```{r}
+#| label: build
+staff <- sf_instrument(
+  title   = "Staff experience survey",
+  version = "1.0.0",
+  components = list(
+    # --- choice sets, declared once and reused -----------------------------
+    sf_choices("agree5", 1:5,
+               c("Strongly disagree", "Disagree", "Neutral",
+                 "Agree", "Strongly agree")),
+    sf_choices("dept", c("teaching", "admin", "research"),
+               c("Teaching", "Administration", "Research")),
+
+    # --- items --------------------------------------------------------------
+    sf_item("dept",   "Which department are you in?",
+            type = "single_choice", choice_set = "dept", required = TRUE),
+    sf_item("years",  "How many years have you worked here?",
+            type = "numeric", required = TRUE),
+    sf_item("wl1",    "My workload is manageable.",
+            type = "likert", choice_set = "agree5", scale_id = "wellbeing"),
+    sf_item("wl2",    "I can complete my duties within contracted hours.",
+            type = "likert", choice_set = "agree5", scale_id = "wellbeing"),
+    sf_item("wl3",    "I often work evenings to keep up.",
+            type = "likert", choice_set = "agree5", scale_id = "wellbeing",
+            reverse = TRUE),
+    sf_item("sup1",   "My line manager supports me.",
+            type = "likert", choice_set = "agree5", scale_id = "support"),
+    sf_item("sup2",   "I get useful feedback on my work.",
+            type = "likert", choice_set = "agree5", scale_id = "support"),
+    sf_item("sup3",   "I know who to ask when I am stuck.",
+            type = "likert", choice_set = "agree5", scale_id = "support"),
+
+    # --- scales, so the items above become 2 scores -------------------------
+    sf_scale("wellbeing", "Workload wellbeing",
+             items = c("wl1", "wl2", "wl3")),
+    sf_scale("support",   "Perceived support",
+             items = c("sup1", "sup2", "sup3"))
+  ),
+
+  # --- the analysis plan, declared before any data exists -------------------
+  analysis_plan = list(
+    list(id = "RQ1",
+         research_question = "How reliable are the 2 scales?",
+         family = "psychometrics", method = "reliability_alpha"),
+    list(id = "RQ2",
+         research_question = "Do the 3 departments differ on workload wellbeing?",
+         family = "group_comparison", method = "anova_one",
+         roles = list(outcome = "wellbeing", group = "dept")),
+    list(id = "RQ3",
+         research_question = "Does perceived support relate to workload wellbeing?",
+         family = "association", method = "correlation_pearson",
+         # Correlation takes x and y, not `variables`. See the checkbox in
+         # section 9 for why that is worth knowing.
+         roles = list(x = "support", y = "wellbeing"))
+  )
+)
+
+staff
+```
+
+::: callout-note
+## This is the point of the package
+
+`RQ1` to `RQ3` were written before a single response existed. Everything
+below executes that plan rather than searching for a result. The instrument
+carries the plan, so it cannot drift from the analysis that gets reported.
+:::
+
+-   [ ] The printed instrument lists 8 items, 2 scales, and 3 plan entries.
+
+## 2. Check it before you collect anything
+
+```{r}
+#| label: validate
+v <- validate_sframe(staff)
+v
+```
+
+```{r}
+#| label: validate-count
+data.frame(
+  check = c("problems found", "instrument is usable"),
+  value = c(length(v$problems), length(v$problems) == 0)
+)
+```
+
+-   [ ] `problems found` is 0. A real instrument that fails here should say
+    plainly what is wrong. If you want to see that, add an item pointing at a
+    choice set that does not exist and rerun.
+
+## 3. The integrity hash
+
+The instrument stores a SHA-256 hash of its own content. That hash is the
+instrument's identity, and it is how a result can be tied to the exact
+instrument that produced it.
+
+```{r}
+#| label: hash
+f <- tempfile(fileext = ".sframe")
+write_sframe(staff, f)
+back <- read_sframe(f)
+
+compare_report(
+  compare_table(
+    compare_row("hash is a fixed point across a write and read",
+                identical(staff$integrity$hash, back$integrity$hash), 1,
+                "write_sframe() then read_sframe()", tol = 0)
+  ),
+  caption = "Serialisation is a fixed point"
+)
+cat("stored hash:", substr(staff$integrity$hash, 1, 16), "...\n")
+```
+
+::: callout-important
+## 0.4.0 fixed this
+
+Before this release a freshly built instrument was not a serialisation fixed
+point. Identical content carried 2 different hashes depending on whether it
+had been through a read, which undercuts the claim that the hash is the
+instrument's identity. If this verdict is not `match`, the release is not
+shippable.
+:::
+
+-   [ ] The verdict reads `match`.
+
+## 4. Route one: the static HTML survey
+
+```{r}
+#| label: html-route
+h <- sf_html_route(staff)
+h
+```
+
+```{r}
+#| label: html-open
+#| eval: false
+# Run this line to open the exported survey and click through it yourself.
+browseURL(attr(h, "path"))
+```
+
+-   [ ] `items present in the exported HTML` equals `data-collecting items`.
+-   [ ] **Open it.** Run the chunk above, answer the survey, and submit.
+    Confirm the required questions block submission when empty, and that the
+    downloaded CSV has one column per item.
+
+## 5. Route two: Shiny
+
+Both routes run in every file of this suite. The reason is specific: 0.4.0
+fixed a defect where the Shiny collector pipe-joined multi-column answers
+into a single column, so data collected that way could not be read back by
+the package at all, silently and with no error at collection time. A demo
+that exercised only the HTML route would have passed throughout.
+
+```{r}
+#| label: shiny-widgets
+sf_shiny_widgets(staff)
+```
+
+```{r}
+#| label: shiny-roundtrip
+set.seed(2026)
+rt <- sf_shiny_roundtrip(staff, function(i) list(
+  dept  = sample(c("teaching", "admin", "research"), 1),
+  years = sample(1:30, 1),
+  wl1 = sample(1:5, 1), wl2 = sample(1:5, 1), wl3 = sample(1:5, 1),
+  sup1 = sample(1:5, 1), sup2 = sample(1:5, 1), sup3 = sample(1:5, 1)
+), n = 5)
+
+rt$summary
+```
+
+```{r}
+#| label: shiny-read
+rt$read_back
+```
+
+-   [ ] `read_responses() accepted it` reads `TRUE`.
+-   [ ] The columns above are one per item, with no pipe-joined values.
+
+```{r}
+#| label: shiny-launch
+#| eval: false
+# Launch the real thing and answer it in a browser.
+render_survey(staff, mode = "shiny")
+```
+
+## 6. Dummy data at a realistic size
+
+The 5 simulated respondents above prove the plumbing. They are far too few to
+analyse, so here is a proper sample with a real effect built into it, which
+gives the accuracy checks below something to find.
+
+```{r}
+#| label: dummy
+set.seed(11)
+n <- 180
+dept <- sample(c("teaching", "admin", "research"), n, TRUE,
+               prob = c(0.5, 0.3, 0.2))
+
+# Teaching staff carry a heavier workload by construction, so RQ2 should
+# find a difference. Support and wellbeing share a latent driver, so RQ3
+# should find a positive correlation.
+load_effect <- c(teaching = -0.7, admin = 0.2, research = 0.4)[dept]
+latent      <- rnorm(n)
+
+lik <- function(mu) pmin(5, pmax(1, round(mu + rnorm(n, 0, 0.8))))
+
+responses <- data.frame(
+  dept  = dept,
+  years = pmax(1, round(rgamma(n, 2, 0.25))),
+  wl1   = lik(3.2 + load_effect + 0.5 * latent),
+  wl2   = lik(3.1 + load_effect + 0.5 * latent),
+  wl3   = lik(3.3 - load_effect - 0.4 * latent),
+  sup1  = lik(3.4 + 0.6 * latent),
+  sup2  = lik(3.3 + 0.6 * latent),
+  sup3  = lik(3.5 + 0.5 * latent),
+  stringsAsFactors = FALSE
+)
+
+dat <- read_responses(responses, staff)
+str(dat)
+```
+
+-   [ ] `read_responses()` accepted the frame without complaint.
+
+## 7. Scale scoring
+
+`wl3` was declared `reverse = TRUE` at design time, so scoring flips it
+without anyone having to remember to.
+
+```{r}
+#| label: score
+scored <- score_scales(dat, staff)
+round(head(scored[, c("wl1", "wl2", "wl3", "wellbeing", "support")], 5), 2)
+```
+
+```{r}
+#| label: score-accuracy
+# Recompute the wellbeing score by hand, reversing wl3 on a 1 to 5 scale.
+manual <- rowMeans(cbind(dat$wl1, dat$wl2, 6 - dat$wl3))
+
+tab <- compare_table(
+  compare_row("mean wellbeing score", mean(scored$wellbeing), mean(manual),
+              "hand-computed, wl3 reversed"),
+  compare_row("sd wellbeing score", sd(scored$wellbeing), sd(manual),
+              "hand-computed, wl3 reversed"),
+  compare_row("max absolute row difference",
+              max(abs(scored$wellbeing - manual)), 0,
+              "hand-computed, wl3 reversed")
+)
+compare_report(tab, caption = "Reverse scoring is applied as declared")
+sf_log(tab)
+```
+
+-   [ ] All 3 verdicts read `match`. If the row difference is not 0, reverse
+    scoring is not doing what the instrument declares, and every scale score
+    in the package is suspect.
+
+## 8. Run the pre-declared plan
+
+```{r}
+#| label: run
+results <- run_analysis_plan(dat, staff)
+results
+```
+
+-   [ ] All 3 research questions ran and each printed an APA sentence.
+
+## 9. Statistical accuracy, question by question
+
+### RQ1: reliability against `psych`
+
+```{r}
+#| label: acc-alpha
+rq1 <- results[["RQ1"]]
+wb  <- dat[, c("wl1", "wl2", "wl3")]
+sp  <- dat[, c("sup1", "sup2", "sup3")]
+
+# psych::alpha() needs the same reversal the instrument declares, so the
+# comparison is like for like. check.keys = FALSE keeps psych from choosing
+# its own reversal and quietly making the 2 incomparable.
+wb_rev <- data.frame(wl1 = wb$wl1, wl2 = wb$wl2, wl3 = 6 - wb$wl3)
+pa_wb  <- psych::alpha(wb_rev, check.keys = FALSE, warnings = FALSE)
+pa_sp  <- psych::alpha(sp,     check.keys = FALSE, warnings = FALSE)
+
+# The result carries one entry per scale, keyed by scale id.
+tab <- compare_table(
+  compare_row("alpha, wellbeing", rq1$wellbeing$alpha,
+              pa_wb$total$raw_alpha, "psych::alpha()"),
+  compare_row("alpha, support", rq1$support$alpha,
+              pa_sp$total$raw_alpha, "psych::alpha()")
+)
+compare_report(tab, caption = "RQ1 reliability vs psych")
+sf_log(tab)
+```
+
+```{r}
+#| label: acc-alpha-plot
+plot(reliability_report(dat, staff))
+```
+
+-   [ ] Both alphas match `psych`.
+-   [ ] The plot names both scales and its bars agree with the table.
+
+### RQ2: one-way ANOVA against base R and `jmv`
+
+```{r}
+#| label: acc-anova
+rq2 <- results[["RQ2"]]
+fit <- aov(wellbeing ~ factor(dept), data = scored)
+s   <- summary(fit)[[1]]
+
+tab <- compare_table(
+  compare_row("F",          rq2$F_stat, s[["F value"]][1], "base R aov()"),
+  compare_row("df between", rq2$df1, s[["Df"]][1],     "base R aov()"),
+  compare_row("df within",  rq2$df2, s[["Df"]][2],     "base R aov()"),
+  compare_row("p",          rq2$p,      s[["Pr(>F)"]][1],  "base R aov()"),
+  compare_row("eta squared", rq2$eta2,
+              s[["Sum Sq"]][1] / sum(s[["Sum Sq"]]), "base R aov()")
+)
+compare_report(tab, caption = "RQ2 one-way ANOVA vs base R")
+sf_log(tab)
+```
+
+```{r}
+#| label: acc-anova-jmv
+j <- jmv::ANOVA(data = data.frame(wellbeing = scored$wellbeing,
+                                  dept = factor(scored$dept)),
+                dep = "wellbeing", factors = "dept",
+                effectSize = "eta")
+jt <- as.data.frame(j$main)
+jt
+```
+
+```{r}
+#| label: acc-anova-jmv-compare
+tab <- compare_table(
+  compare_row("F", rq2$F_stat, jt$F[1], "jmv::ANOVA()", tol = 1e-5),
+  compare_row("p", rq2$p, jt$p[1], "jmv::ANOVA()", tol = 1e-5)
+)
+compare_report(tab, caption = "RQ2 against a third opinion")
+sf_log(tab)
+```
+
+```{r}
+#| label: acc-anova-plot
+boxplot(wellbeing ~ dept, data = scored,
+        col = c("#c7e9c0", "#a1d99b", "#74c476"), border = "#31a354",
+        ylab = "Workload wellbeing", xlab = "Department",
+        main = "RQ2: the difference the test is reporting")
+```
+
+-   [ ] F, both degrees of freedom, and p match base R.
+-   [ ] `jmv` agrees to the printed precision.
+-   [ ] The boxplot shows the direction the APA sentence claims. **This is
+    the check a table cannot do for you.** A significant p with a plot that
+    contradicts the write-up is a reporting bug, not a statistics bug.
+
+### RQ3: correlation against base R and `psych`
+
+```{r}
+#| label: acc-cor
+rq3 <- results[["RQ3"]]
+ct  <- cor.test(scored$support, scored$wellbeing, method = "pearson")
+
+tab <- compare_table(
+  compare_row("r",        rq3$r,  unname(ct$estimate),  "base R cor.test()"),
+  compare_row("df",       rq3$df, unname(ct$parameter), "base R cor.test()"),
+  compare_row("p",        rq3$p,  ct$p.value,           "base R cor.test()"),
+  # ci is named c(estimate, lower, upper), so the bounds are 2 and 3.
+  compare_row("CI lower", rq3$ci[["lower"]], ct$conf.int[1], "base R cor.test()"),
+  compare_row("CI upper", rq3$ci[["upper"]], ct$conf.int[2], "base R cor.test()")
+)
+compare_report(tab, caption = "RQ3 correlation vs base R")
+sf_log(tab)
+```
+
+```{r}
+#| label: acc-cor-plot
+plot(scored$support, scored$wellbeing, pch = 19, col = "#4292c680",
+     xlab = "Perceived support", ylab = "Workload wellbeing",
+     main = sprintf("RQ3: r = %.3f", rq3$r))
+abline(lm(wellbeing ~ support, data = scored), col = "#b2182b", lwd = 2)
+```
+
+-   [ ] r, df, p, and both interval bounds match base R.
+-   [ ] The cloud slopes the way r says it does.
+-   [ ] **Known inconsistency, logged 2026-08-02.** Writing this block as
+    `roles = list(variables = c("support", "wellbeing"))` returns
+    `Error: Test failed.` for Pearson and Spearman, works for Kendall, and
+    returns `undefined columns selected` for partial correlation. Nine other
+    methods accept `variables`. The entry is in `dogfeed.todo.md` and needs
+    an owner decision: fix the vocabulary in 0.4.0, or document the
+    correlation roles as `x` and `y` only. Either way the error message
+    should name the roles it wanted.
+
+## 10. Data quality and missingness
+
+```{r}
+#| label: quality
+q <- quality_report(dat, staff)
+q
+plot(q)
+```
+
+```{r}
+#| label: missing
+# Knock a hole in the data so missingness has something to report, including
+# one respondent who skipped a whole battery.
+holed <- dat
+holed[3:8, "sup1"] <- NA
+holed[20, c("wl1", "wl2", "wl3")] <- NA
+
+m <- missing_data_report(holed, staff)
+m
+plot(m)
+```
+
+::: callout-note
+## What to look at here
+
+Respondent 20 skipped an entire battery. Confirm the report says so rather
+than reporting 0 percent missing for that person. A reviewer found exactly
+that defect during this release, and it is the shape of problem worth
+watching for throughout: software returning something plausible instead of
+saying it has no answer.
+:::
+
+-   [ ] Missingness for `sup1` reads 6 of 180.
+-   [ ] Respondent 20 is visible as a person with missing data, not as a
+    complete case.
+
+## 11. Write it up
+
+```{r}
+#| label: report
+#| eval: false
+# Produces the full HTML report: instrument, quality, reliability,
+# descriptives, and every analysis-plan result.
+render_report(staff, dat, output_file = "01_workflow_report.html")
+browseURL("01_workflow_report.html")
+```
+
+```{r}
+#| label: codebook
+cb <- codebook_report(staff)
+head(cb$table, 12)
+```
+
+-   [ ] Run the report chunk. Every research question appears with its APA
+    sentence, and no section is empty.
+-   [ ] The codebook lists every item with its type and choice set.
+
+## Verdict for this file
+
+```{r}
+#| label: verdict
+sf_verdict()
+```
+
+-   [ ] The line above reads `0 DIFFERS, 0 CHECK`.
+-   [ ] **Overall:** a first-time user could follow this file start to finish
+    without outside help. If any step needed knowledge that is not on the
+    page, that is a finding worth logging.

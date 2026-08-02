@@ -1,0 +1,262 @@
+---
+title: "07. Correlation"
+subtitle: "Pearson, Spearman, Kendall, partial correlation"
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    embed-resources: true
+editor: visual
+execute:
+  warning: false
+  message: false
+  error: true
+---
+
+```{r}
+#| label: setup
+#| include: false
+source("_setup.R")
+```
+
+Four methods over the same field combination: **2 numeric, slider, rating, or
+Likert items**, plus one more for the partial correlation to control for.
+
+::: callout-warning
+## Read this before writing your own plan
+
+The correlation methods take the roles `x` and `y`. They do **not** accept
+`variables`, although 9 other methods do and `correlation_kendall` does. A
+block written with `variables` returns `Error: Test failed.` for Pearson and
+Spearman, and `undefined columns selected` for partial correlation. This is
+logged in `dogfeed.todo.md` and needs an owner decision before release.
+:::
+
+## 1. Questionnaire and plan
+
+```{r}
+#| label: build
+wb <- sf_instrument(
+  title = "Wellbeing and study habits", version = "1.0.0",
+  components = list(
+    sf_item("sleep",  "Average hours of sleep per night", type = "numeric"),
+    sf_item("stress", "Stress level this week (0 to 100)",
+            type = "slider", slider_min = 0, slider_max = 100),
+    sf_item("grade",  "Most recent assessment mark (0 to 100)",
+            type = "numeric"),
+    sf_item("hours",  "Hours studied last week", type = "numeric")
+  ),
+  analysis_plan = list(
+    list(id = "RQ1", research_question = "Does sleep relate to stress?",
+         family = "association", method = "correlation_pearson",
+         roles = list(x = "sleep", y = "stress")),
+    list(id = "RQ2", research_question = "The same on ranks.",
+         family = "association", method = "correlation_spearman",
+         roles = list(x = "sleep", y = "stress")),
+    list(id = "RQ3", research_question = "The same with Kendall's tau.",
+         family = "association", method = "correlation_kendall",
+         roles = list(x = "sleep", y = "stress")),
+    list(id = "RQ4", research_question =
+           "Do study hours relate to grade once stress is controlled?",
+         family = "association", method = "partial_correlation",
+         roles = list(x = "hours", y = "grade", controls = "stress"))
+  )
+)
+wb
+```
+
+## 2. Both collection routes
+
+```{r}
+#| label: routes
+set.seed(33)
+sf_both_routes(wb, function(i) list(
+  sleep = round(runif(1, 4, 9), 1), stress = sample(0:100, 1),
+  grade = sample(30:95, 1), hours = sample(0:40, 1)
+), n = 4)
+```
+
+## 3. Dummy data
+
+```{r}
+#| label: data
+set.seed(555)
+n      <- 200
+sleep  <- round(rnorm(n, 6.8, 1.1), 1)
+# Stress falls as sleep rises, so RQ1 to RQ3 have a real negative relation.
+stress <- round(pmin(100, pmax(0, 95 - 7 * sleep + rnorm(n, 0, 12))))
+hours  <- round(pmax(0, rnorm(n, 14, 6)))
+# Grade rises with hours and falls with stress, so the partial correlation
+# is genuinely smaller than the raw one.
+grade  <- round(pmin(100, pmax(0, 45 + 1.1 * hours - 0.20 * stress +
+                                 rnorm(n, 0, 8))))
+
+dat <- read_responses(
+  data.frame(sleep = sleep, stress = stress, grade = grade, hours = hours),
+  wb)
+res <- run_analysis_plan(dat, wb)
+res
+```
+
+## 4. RQ1: Pearson
+
+```{r}
+#| label: acc-pearson
+r  <- res[["RQ1"]]
+ct <- cor.test(dat$sleep, dat$stress, method = "pearson")
+
+tab <- compare_table(
+  compare_row("r",        r$r,  unname(ct$estimate),  "base R cor.test()"),
+  compare_row("df",       r$df, unname(ct$parameter), "base R cor.test()"),
+  compare_row("p",        r$p,  ct$p.value,           "base R cor.test()"),
+  compare_row("CI lower", r$ci[["lower"]], ct$conf.int[1], "base R cor.test()"),
+  compare_row("CI upper", r$ci[["upper"]], ct$conf.int[2], "base R cor.test()")
+)
+compare_report(tab, caption = "RQ1 vs base R")
+sf_log(tab)
+```
+
+```{r}
+#| label: acc-pearson-jmv
+j  <- jmv::corrMatrix(data = dat[, c("sleep", "stress")],
+                      vars = c("sleep", "stress"), pearson = TRUE,
+                      spearman = TRUE, kendall = TRUE)
+jm <- as.data.frame(j$matrix)
+jm
+```
+
+```{r}
+#| label: acc-pearson-jmv-cmp
+# jmv returns the matrix as characters with an em-rule on the diagonal, so
+# the off-diagonal cell has to be pulled out and coerced. Row 2 is stress,
+# column "sleep[r]" is its correlation with sleep.
+jmv_cell <- function(col) as.numeric(jm[[col]][2])
+
+tab <- compare_table(
+  compare_row("Pearson r", r$r, jmv_cell("sleep[r]"), "jmv::corrMatrix()",
+              tol = 1e-6),
+  compare_row("Pearson p", r$p, jmv_cell("sleep[rp]"), "jmv::corrMatrix()",
+              tol = 1e-8)
+)
+compare_report(tab, caption = "RQ1 against a third opinion")
+sf_log(tab)
+```
+
+```{r}
+#| label: acc-pearson-plot
+plot(dat$sleep, dat$stress, pch = 19, col = "#41618980",
+     xlab = "hours of sleep", ylab = "stress",
+     main = sprintf("RQ1: r = %.3f [%.2f, %.2f]",
+                    r$r, r$ci[["lower"]], r$ci[["upper"]]))
+abline(lm(stress ~ sleep, data = dat), col = "#b2182b", lwd = 2)
+```
+
+-   [ ] All 5 base R verdicts and both `jmv` verdicts read `match`.
+-   [ ] The line slopes the way r says. A positive r with a falling line
+    means the variables were passed the wrong way round somewhere.
+
+## 5. RQ2 and RQ3: Spearman and Kendall
+
+```{r}
+#| label: acc-rank
+rs <- res[["RQ2"]]
+rk <- res[["RQ3"]]
+cs <- suppressWarnings(cor.test(dat$sleep, dat$stress, method = "spearman"))
+ck <- suppressWarnings(cor.test(dat$sleep, dat$stress, method = "kendall"))
+
+tab <- compare_table(
+  compare_row("Spearman rho", rs$r, unname(cs$estimate), "base R cor.test()"),
+  compare_row("Spearman p",   rs$p, cs$p.value,          "base R cor.test()"),
+  compare_row("Kendall tau",  rk$r, unname(ck$estimate), "base R cor.test()"),
+  compare_row("Kendall p",    rk$p, ck$p.value,          "base R cor.test()")
+)
+compare_report(tab, caption = "RQ2 and RQ3 vs base R")
+sf_log(tab)
+```
+
+```{r}
+#| label: acc-rank-jmv
+tab <- compare_table(
+  compare_row("Spearman rho", rs$r, jmv_cell("sleep[rho]"),
+              "jmv::corrMatrix()", tol = 1e-6),
+  compare_row("Kendall tau",  rk$r, jmv_cell("sleep[tau]"),
+              "jmv::corrMatrix()", tol = 1e-6)
+)
+compare_report(tab, caption = "Rank correlations against a third opinion")
+sf_log(tab)
+```
+
+::: callout-note
+## Why the rank intervals are not compared here
+
+Pearson's interval is analytic, from the Fisher z transform, so it can be
+checked against `cor.test()` exactly. The rank correlations bootstrap their
+interval instead, so it is not reproducible to `1e-6` and there is no base R
+number to compare it to. Check that the interval brackets the estimate and
+is a sensible width, rather than looking for a `match`.
+:::
+
+```{r}
+#| label: acc-rank-ci
+data.frame(
+  method   = c("Spearman", "Kendall"),
+  estimate = c(rs$r, rk$r),
+  lower    = c(rs$ci[["lower"]], rk$ci[["lower"]]),
+  upper    = c(rs$ci[["upper"]], rk$ci[["upper"]]),
+  brackets_the_estimate = c(
+    rs$r >= rs$ci[["lower"]] && rs$r <= rs$ci[["upper"]],
+    rk$r >= rk$ci[["lower"]] && rk$r <= rk$ci[["upper"]])
+)
+```
+
+-   [ ] All 4 base R verdicts and both `jmv` verdicts read `match`.
+-   [ ] Both bootstrap intervals bracket their own estimate.
+
+## 6. RQ4: partial correlation
+
+```{r}
+#| label: acc-partial
+r <- res[["RQ4"]]
+
+# Partial correlation by hand: correlate the residuals of both variables
+# after regressing each on the control.
+rx <- residuals(lm(hours ~ stress, data = dat))
+ry <- residuals(lm(grade ~ stress, data = dat))
+pc <- cor.test(rx, ry)
+
+raw <- cor(dat$hours, dat$grade)
+
+tab <- compare_table(
+  compare_row("partial r", r$r, unname(pc$estimate),
+              "hand-computed from residuals"),
+  compare_row("p",         r$p, pc$p.value,
+              "hand-computed from residuals", tol = 1e-8),
+  compare_row("n",         r$n, nrow(dat), "nrow()")
+)
+compare_report(tab, caption = "RQ4 vs a hand-computed partial correlation")
+sf_log(tab)
+```
+
+```{r}
+#| label: acc-partial-plot
+barplot(c("raw r" = raw, "partial r" = r$r),
+        col = c("#bdbdbd", "#3182bd"), border = NA, ylim = c(0, 1),
+        ylab = "correlation of hours with grade",
+        main = "RQ4: what controlling for stress removes")
+```
+
+-   [ ] All 3 verdicts read `match`.
+-   [ ] The partial correlation is smaller than the raw one, which is the
+    point of running it. If they are identical, the control is not being
+    applied.
+-   [ ] `r$controls` names `stress`, so the write-up can say what was
+    controlled for.
+
+## Verdict for this file
+
+```{r}
+#| label: verdict
+sf_verdict()
+```
+
+-   [ ] `0 DIFFERS, 0 CHECK`.
