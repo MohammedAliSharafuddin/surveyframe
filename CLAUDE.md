@@ -252,10 +252,10 @@ absorbed into 0.4.0 and 0.4.1, rather than left open. Earlier drafts of this fil
 
 ### In flight
 
-**0.5 is the merged small-sample plus MCDM release, on branch `v0.5-dev`
-(worktree `../surveyframe-v0.5-dev`, clean tree, 6 commits ahead of
-`main`).** 0.4 merged into it on 2026-07-25, so no 0.4 ships. What is
-built and committed there:
+**0.4.0 is the merged small-sample plus MCDM release, on branch `v0.5-dev`
+(worktree `../surveyframe-v0.5-dev`).** The branch label stays `v0.5-dev`
+deliberately, see the version-numbering section above. 0.4 merged into it on
+2026-07-25, so no separate 0.4 ships. What is built and committed there:
 
 - The whole small-sample track: Hodges-Lehmann on Mann-Whitney,
   pseudomedian CI on paired Wilcoxon, exact odds-ratio CI on Fisher,
@@ -351,26 +351,69 @@ no error, so none of them would surface without cross-validation.
 All 5 fixes land in CRAN 0.4.0 by owner decision 2026-07-30. 4 of them
 shipped inside 0.3.4, so they are live on CRAN now.
 
-### Open engineering work on 0.5
+### 0.4.0 engineering is complete (2026-08-02)
 
-Not built: `sensitivity_analysis()`, `sf_conjoint_design()`, the
-`vignettes/mcdm-analysis.Rmd` vignette, the Shiny renderer for the 2 new item
-types (`R/render_survey.R` still has no reference to either, so a decision
-question renders on the static survey and in the builder but not in the Shiny
-survey path), and the section 1g sample sframe as a real fixture. Citations
-exist for 2 of the 10 methods only, and DEMATEL's source is unresolved
-between 2 Battelle reports. The `../mcdm` harvest audit's owner sign-off on
-the section 1 data contract was never taken, which is the release's standing
-rework risk. Closed on 2026-07-30: the builder inspector editor, and the
-stale inlined static template.
+Blocks A, B, and C are closed, plus the RStudio add-in (H1, on branch
+`feature/rstudio-addin`). Full suite 1473 on `v0.5-dev`, 1486 on the add-in
+branch. Everything the earlier draft of this section listed as "not built"
+now exists: `sensitivity_analysis()`, `sf_conjoint_design()`, the Shiny
+renderer for both decision item types, the bundled hotel-supplier fixture,
+`vignettes/mcdm-analysis.Rmd` (axe-core clean), and all 10 method citations.
+B1's data-contract sign-off, the release's standing rework risk, was taken
+on 2026-07-31.
 
-### Hard blocker
+**Two pre-existing defects were found and fixed on owner decision, both
+breaking and both recorded in NEWS.** The Shiny collector emitted joined
+columns for matrix, ranking, and multi-select (`mx = "4|5"` where the reader
+expects `mx__r1`, `mx__r2`), so data collected that way could not be read
+back by the package at all, silently, with no error at collection time. And
+a freshly built instrument was not a serialisation fixed point: identical
+content carried 2 different hashes depending on whether it had been through
+a read, which undercuts the claim that the hash is the instrument's
+identity. A test now asserts the 3 bundled instruments still hash to what
+they store, because if that ever fails every stored `.sframe` moved with it.
 
-`inst/CITATION` needs the combined small-sample and MCDM paper's preprint
-DOI, and CRAN will not accept a placeholder. By the 2026-07-26 decision
-the paper deliberately waits until 0.5's original 10 methods are
-complete, so this is sequenced behind the engineering rather than chased
-on a date. The 2026-10-15 gate has no remaining bearing on anything.
+**Two review tasks found defects that were not in the task list, and both
+had the same shape: software returning something plausible instead of
+saying it had no answer.** B11 found ELECTRE reporting an empty outranking
+relation as "all 9 alternatives jointly best", with `sensitivity_analysis()`
+then calling that result stable, which is the strongest robustness signal
+the function has produced by the weakest input it can take. B13 found the
+rated performance matrix unwirable in both GUIs, because neither gave matrix
+items the level the `performance_items` role wanted, so a path the vignette
+teaches could only be built by writing R. Worth carrying into the remaining
+review: where a result looks clean, ask whether it is clean or merely quiet.
+
+**Three planned tasks were not what they were written as.** B10's exemption
+already existed by construction, and the real defect was next door, in
+missingness reporting 0 percent for a respondent who skipped an entire
+battery. B12 needed no engineering at all, only user-facing documentation.
+C4's "8 machine-fixable" items were 7 judgement calls plus one partly
+machine task, and 12 dogfeed entries were re-laned to 0.4.1 as a result.
+
+**Verification discipline, reinforced.** Every fix is checked against an
+independent oracle where one exists (`psych`, `jmv`, RMCDA) and
+mutation-checked. Two lessons repeated often enough to record: a browser
+reading of a Shiny widget is unreliable, because selectize.js hides the real
+`<select>` and made a working dropdown look empty twice, so UI defects are
+established in R first and the browser corroborates; and roughly 6 of my own
+harness errors in this session initially looked like package bugs (invented
+method and role names, an invented function argument, `as.data.frame()`
+silently mangling column names), so a surprising failure is worth attributing
+before it is reported.
+
+### Hard blocker, and the one human gate
+
+**`inst/CITATION` needs the MCDM preprint DOI (task D6), and CRAN will not
+accept a placeholder.** The small-sample paper moved to 0.4.1 on 2026-07-31,
+so only the MCDM paper gates this release. Target journal: *Operations
+Research and Decisions*, diamond OA.
+
+**H2 is the other gate and cannot be automated.** Verifying the RStudio
+add-in inside a real RStudio session needs the owner at a keyboard, the
+add-in ships in 0.4.0, and Part J of `mas_review_040.qmd` carries the click
+path. Everything else outstanding in blocks D and E is mechanical release
+paperwork.
 
 ### Also open, unrelated to a single release
 
@@ -450,14 +493,25 @@ name before pushing.
 ### Resume release work (CRAN 0.4.0, local 0.5.0)
 
 ```
-Read CLAUDE.md's version-numbering section and todo_master_0.4.md, then
-todo_0.5.md for the engineering detail. Work on branch v0.5-dev in the
-worktree ../surveyframe-v0.5-dev. The small-sample track and all 10 MCDM
-computations are already built and committed there. This ships to CRAN as
-0.4.0, not 0.5.0: keep the local branch and file names, set DESCRIPTION to
-0.4.0 only at release time. Re-verify every file and line anchor before
-editing, they drift. Start at the first unchecked task in priority order,
-P0 first. Model tiers per the 2026-07-27 decision: Opus leads, no Fable.
+Read CLAUDE.md's version-numbering section and todo_master_0.4.md. Blocks
+A, B, and C are closed as of 2026-08-02, plus the RStudio add-in on branch
+feature/rstudio-addin. Only 2 things stand between here and submission:
+D6's preprint DOI for inst/CITATION (no placeholder accepted) and H2, the
+owner verifying the add-in in RStudio. Blocks D and E are what remains.
+Work on branch v0.5-dev in the worktree ../surveyframe-v0.5-dev, and set
+DESCRIPTION to 0.4.0 only at release time (task E1). Re-verify every file
+and line anchor before editing, they drift.
+```
+
+### Verify 0.4.0 before submitting (the human half)
+
+```
+Read CLAUDE.md, then open mas_review_040.qmd in RStudio and work through it
+chunk by chunk. Part B is a correctness check rather than a feature check,
+because 0.4.0 changes numbers earlier versions reported. Part J is the
+RStudio add-in click path and is a release blocker, since H2 cannot be
+automated. Part L lists the open owner decisions. Log new feedback in
+dogfeed.todo.md rather than leaving it in the review file.
 ```
 
 ### Run the field-validation work (absorbed into 0.4.0 and 0.4.1)
