@@ -5,25 +5,91 @@ sframe_strip_component_class <- function(component) {
   component
 }
 
+# Put a component through the reader's own restore function before writing it,
+# then drop the class. A component built by an sf_* constructor carries every
+# optional field as NULL, and the restore functions drop those, so a fresh
+# component serialised more keys than the same component after a round trip.
+# That is one half of why write, read, write used to change an instrument's
+# hash. The restore functions are idempotent on content, checked against both
+# fresh and shipped components, so this leaves settled files byte-identical.
+sframe_normalise_component <- function(component, restore) {
+  sframe_strip_component_class(restore(sframe_strip_component_class(component)))
+}
+
 sframe_serialization_payload <- function(instrument, hash_value = "") {
   # Strip list-level names before serialisation so items, choices, scales,
   # branching, and checks are always written as JSON arrays. Without unname(),
   # instruments built with Map() (which attaches item IDs as list names) produce
   # a JSON object keyed by item ID, while the round-tripped structure produces
   # integer-keyed or differently keyed objects, causing a hash mismatch on read.
-  list(
+  payload <- list(
     hash = list(algo = "sha256", value = hash_value),
     version = instrument$meta$version,
     meta = instrument$meta,
-    items    = unname(lapply(instrument$items,    sframe_strip_component_class)),
-    choices  = unname(lapply(instrument$choices,  sframe_strip_component_class)),
-    scales   = unname(lapply(instrument$scales,   sframe_strip_component_class)),
-    branching = unname(lapply(instrument$branching, sframe_strip_component_class)),
-    checks   = unname(lapply(instrument$checks,   sframe_strip_component_class)),
-    analysis_plan = instrument$analysis_plan %||% list(),
+    items    = unname(lapply(instrument$items,
+                             sframe_normalise_component, sframe_restore_item)),
+    choices  = unname(lapply(instrument$choices,
+                             sframe_normalise_component, sframe_restore_choices)),
+    scales   = unname(lapply(instrument$scales,
+                             sframe_normalise_component, sframe_restore_scale)),
+    branching = unname(lapply(instrument$branching,
+                              sframe_normalise_component, sframe_restore_branch)),
+    checks   = unname(lapply(instrument$checks,
+                             sframe_normalise_component, sframe_restore_check)),
+    # Normalised through the same restore path the reader uses, so that
+    # writing an instrument and writing it again after a read produce the
+    # same bytes and therefore the same hash.
+    #
+    # Without this, serialisation was not a fixed point. A plan block built
+    # by sf_instrument() carries only what the caller supplied, while
+    # sframe_restore_analysis_block() fills in 8 fields on read (options,
+    # decision_rule, reporting_references, status, requires_data, test,
+    # interpretation, citations). So write, read, write changed the hash of
+    # identical content: measured ec822fff then 3fa36502 on a plain 2-item
+    # Likert instrument. An instrument could carry 2 different hashes
+    # depending on whether it had been through a read, which is a poor
+    # property for a value that is meant to be the instrument's identity.
+    #
+    # The function is idempotent, verified on both a fresh block and a
+    # shipped one, so applying it here leaves already-settled files
+    # untouched and only pulls fresh ones up to the same form.
+    analysis_plan = unname(lapply(
+      instrument$analysis_plan %||% list(),
+      sframe_restore_analysis_block
+    )),
     models = unname(lapply(instrument$models %||% list(), sframe_model_plain)),
     render = instrument$render
   )
+
+  # `designs` is added only when the instrument actually declares one.
+  #
+  # The hash covers the payload's key set, so writing an empty
+  # `designs` array would change the hash of every instrument that
+  # does not use the feature. Reading an old file would still
+  # succeed, because read_sframe() hashes the parsed payload and
+  # that payload has no `designs` key either, so it stays
+  # self-consistent. The damage is subtler: an instrument read from
+  # an existing file and written back would come out with a
+  # different hash from the one it went in with, so the same content
+  # would silently change identity. It would also desync from the
+  # builder's JS sframeCanon(). Measured on the tourism demo:
+  # c3df10ec before, febd07c5 after.
+  designs <- instrument$designs %||% list()
+  if (length(designs) > 0) {
+    payload$designs <- unname(lapply(designs, sframe_conjoint_plain))
+  }
+
+  payload
+}
+
+# Conjoint designs carry data frames, which jsonlite would restore as a list
+# of rows with the column types guessed. Stored as plain column lists and
+# rebuilt on read, so a design round-trips with its hash intact.
+sframe_conjoint_plain <- function(design) {
+  out <- unclass(design)
+  out$profiles <- as.list(design$profiles)
+  out$tasks    <- as.list(design$tasks)
+  out
 }
 
 sframe_json_object <- function() {
@@ -176,6 +242,14 @@ sframe_restore_item <- function(item) {
     sframe_empty_to_null(item$matrix_items),
     "character"
   )
+  item$comparison_items <- sframe_as_vector(
+    sframe_empty_to_null(item$comparison_items),
+    "character"
+  )
+  item$comparison_scale <- sframe_empty_to_null(item$comparison_scale)
+  if (!is.null(item$comparison_scale)) {
+    item$comparison_scale <- as.character(item$comparison_scale)[1]
+  }
   item$slider_min <- if (!is.null(sframe_empty_to_null(item$slider_min))) {
     as.numeric(item$slider_min)
   } else {
@@ -243,6 +317,25 @@ sframe_restore_branch <- function(branch) {
   }
   class(branch) <- "sf_branch"
   branch
+}
+
+sframe_restore_conjoint <- function(design) {
+  design$attributes <- lapply(design$attributes %||% list(),
+                              function(x) sframe_as_vector(x, "character"))
+  rebuild <- function(cols) {
+    if (is.null(cols) || length(cols) == 0) return(NULL)
+    cols <- lapply(cols, function(col) sframe_as_vector(col))
+    as.data.frame(cols, stringsAsFactors = FALSE)
+  }
+  design$profiles <- rebuild(design$profiles)
+  design$tasks    <- rebuild(design$tasks)
+  # Round-tripping through JSON turns a length-1 integer into a double, and
+  # the print method and the schedule arithmetic both expect integers.
+  for (f in c("seed", "blocks", "n_alternatives", "n_tasks")) {
+    if (!is.null(design[[f]])) design[[f]] <- as.integer(design[[f]])
+  }
+  class(design) <- "sf_conjoint_design"
+  design
 }
 
 sframe_restore_check <- function(check) {
@@ -448,6 +541,9 @@ read_sframe <- function(path, validate = TRUE) {
       scales    = lapply(parsed$scales, sframe_restore_scale),
       branching = lapply(parsed$branching, sframe_restore_branch),
       checks    = lapply(parsed$checks, sframe_restore_check),
+      # Absent in every file written before conjoint designs existed, so this
+      # stays an empty list rather than failing on an older instrument.
+      designs   = lapply(parsed$designs %||% list(), sframe_restore_conjoint),
       analysis_plan = lapply(
         parsed$analysis_plan %||% list(),
         sframe_restore_analysis_block

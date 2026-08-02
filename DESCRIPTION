@@ -1,6 +1,6 @@
 Package: surveyframe
 Title: Survey Instrument Workflows
-Version: 0.3.4
+Version: 0.3.4.9000
 Authors@R: c(
     person(
       given = "Mohammed Ali",
@@ -39,13 +39,16 @@ Suggests:
     psych (>= 2.3.0),
     MASS,
     nnet,
+    logistf (>= 1.24.0),
     digest (>= 0.6.0),
     lavaan (>= 0.6-0),
     testthat (>= 3.0.0),
     knitr,
     rmarkdown,
     naniar (>= 1.0.0),
-    pagedown (>= 0.20)
+    pagedown (>= 0.20),
+    RMCDA (>= 0.3.1),
+    rstudioapi (>= 0.13)
 VignetteBuilder: knitr
 Config/testthat/edition: 3
 Config/roxygen2/version: 8.0.0
