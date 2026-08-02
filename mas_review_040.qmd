@@ -1,0 +1,584 @@
+---
+title: "MAS Review: surveyframe 0.4.0 Pre-Submission Review"
+format:
+  html:
+    toc: true
+    toc-depth: 2
+    embed-resources: true
+editor: visual
+execute:
+  warning: false
+  message: false
+  error: true
+---
+
+```{r}
+#| label: setup
+#| include: false
+# Works both before and after the release candidate is installed. If the
+# installed surveyframe is older than this branch, fall back to the source
+# tree so the chunks still run. `error: true` above means a chunk that fails
+# is reported inline rather than halting the whole document, which matters
+# when working through this one chunk at a time.
+if (!requireNamespace("surveyframe", quietly = TRUE) ||
+    !nzchar(system.file("extdata", "hotel_supplier_mcdm.sframe",
+                        package = "surveyframe"))) {
+  if (requireNamespace("devtools", quietly = TRUE) && file.exists("DESCRIPTION")) {
+    devtools::load_all(".", quiet = TRUE)
+  }
+}
+library(surveyframe)
+
+# Locate a bundled file whether surveyframe is installed or loaded from source.
+sf_fixture <- function(name) {
+  p <- system.file("extdata", name, package = "surveyframe")
+  if (nzchar(p) && file.exists(p)) return(p)
+  local <- file.path("inst", "extdata", name)
+  if (file.exists(local)) return(local)
+  stop("Fixture not found: ", name,
+       ". Install the release candidate (Part A) or run from the package root.")
+}
+```
+
+**Reviewer:** Mohammed Ali Sharafuddin\
+**Date created:** 2026-08-02\
+**Version under review:** 0.4.0 (feature work committed on branch `v0.5-dev`, DESCRIPTION still reads 0.3.4 until task E1, not yet tagged, not yet on CRAN)\
+**Purpose:** Human verification of everything 0.4.0 changes before win-builder and CRAN submission. This release merges what were once planned as two: small-sample inference and the whole decision-analysis family. It also corrects 4 statistical and wiring bugs found by independent cross-validation, and it carries 2 deliberate breaking changes.
+
+**Read this first.** 0.4.0 changes numbers that earlier versions reported. Part B is not a feature check, it is a correctness check: anything computed with 0.3.4 or earlier using `item_report()` or repeated-measures ANOVA should be re-run rather than trusted. Two further changes alter output shape rather than values, and both are flagged in NEWS as breaking: the Shiny collector now emits expansion columns, and `quality_report()` counts those columns as data.
+
+**Machine verification note (2026-08-02):** the automated pass is complete. Full suite 1473 passed, 0 failed, 1 skipped. Every fix in Parts B to G was checked against an independent oracle where one exists (`psych`, `jmv`, RMCDA) and mutation-checked, meaning the guard was reverted, the test confirmed to fail, and the guard restored. UI claims were driven in headless Chrome with the screenshot read back. Items ticked below without reviewer initials were verified that way.
+
+**What machine verification cannot settle.** Prose judgement, visual verdicts, real-device behaviour, and anything needing a screen reader or a real clipboard are left unticked here and carried in `dogfeed.todo.md` under `lane: 0.4.1`, alongside the ICSRI capture and the faculty demo. That was an owner decision on 2026-08-02: 12 such items moved out of 0.4.0 so that human-judgement work does not sit on the critical path of a release whose other human gate had already been moved off it. **Part J is the exception.** The RStudio add-in cannot be verified in any automated way at all, and it ships in this release, so it is a genuine blocker for E8.
+
+**A note on how this round went.** Two review tasks (B11 and B13) each found a defect that was not in the task list, and both were the same shape: the software returning something plausible instead of saying it had no answer. That pattern is worth carrying into the reading below. Where a result looks clean, the question to ask is whether it is clean or merely quiet.
+
+**Runnable document note:** the R chunks execute when this file is rendered, against the installed surveyframe, so the rendered HTML doubles as a partial verification record. Chunks that install packages, open a browser, or launch a Shiny app are marked `eval: false` and are for the interactive RStudio session only.
+
+Work through this document sequentially in a fresh RStudio session with a real browser.
+
+------------------------------------------------------------------------
+
+## Prerequisites
+
+-   [ ] RStudio open with a clean R session (restart R first).
+-   [ ] Chrome or Firefox available.
+-   [ ] `devtools`, `remotes`, `ggplot2`, `psych`, `jmv`, `shiny`, `quarto` installed.
+-   [ ] Optional but exercised below: `RMCDA` (cross-check oracle), `logistf`, `naniar`, `pagedown`.
+-   [ ] `rstudioapi` installed, for Part J.
+-   [ ] Internet access.
+
+```{r}
+#| label: prereq
+#| eval: false
+pkgs <- c("devtools", "remotes", "ggplot2", "psych", "jmv", "shiny",
+          "RMCDA", "logistf", "naniar", "pagedown", "rstudioapi")
+data.frame(
+  package   = pkgs,
+  installed = vapply(pkgs, requireNamespace, logical(1), quietly = TRUE)
+)
+```
+
+------------------------------------------------------------------------
+
+## Part A — Installation and metadata (4 items)
+
+```{r}
+#| label: a1-install
+#| eval: false
+remotes::install_github("MohammedAliSharafuddin/surveyframe",
+                        ref = "v0.5-dev", force = TRUE)
+packageVersion("surveyframe")
+# Expected after task E1: '0.4.0'
+```
+
+-   [ ] A1.1 Installation completes with no errors or warnings.
+-   [ ] A1.2 `packageVersion()` reports 0.4.0 (only after E1 sets it; before that it still reads 0.3.4 and that is expected).
+-   [ ] A1.3 `NEWS.md` opens with the 0.4.0 section and its "Corrected results" heading is the first thing under it.
+-   [ ] A1.4 The README roadmap no longer promises small-sample at v0.4 and MCDM at v0.5.
+
+------------------------------------------------------------------------
+
+## Part B — Corrected results (8 items)
+
+These 4 bugs all produced plausible output with no error, which is why none surfaced without cross-validation. Confirm each correction reads sensibly, and decide whether any of your own past analyses need re-running.
+
+### B1 — Item-rest correlation
+
+The old code subtracted each item from a `rowMeans()` total, which leaves roughly noise carrying the item negatively. On a highly reliable scale every item came back strongly negative.
+
+```{r}
+#| label: b1-item-rest
+set.seed(42)
+n <- 300
+latent <- rnorm(n)
+scale_data <- as.data.frame(lapply(1:6, function(i) {
+  round(pmin(pmax(latent * 1.1 + rnorm(n, sd = 0.55) + 4, 1), 7))
+}))
+names(scale_data) <- paste0("q", 1:6)
+
+inst <- sf_instrument(
+  title = "Item-rest check", version = "1.0.0",
+  components = c(
+    lapply(names(scale_data), function(id) sf_item(id, id, type = "likert")),
+    list(sf_scale("s1", "Scale", items = names(scale_data)))
+  )
+)
+ir <- item_report(scale_data, inst)$s1$diagnostics[, c("item_id", "item_rest_r")]
+oracle <- psych::alpha(scale_data, warnings = FALSE)$item.stats$r.drop
+
+data.frame(ir, psych_r_drop = round(oracle, 4),
+           difference = round(ir$item_rest_r - oracle, 10))
+```
+
+-   [ ] B1.1 Every `item_rest_r` is positive and around 0.81 to 0.85. Before the fix they were about **-0.46**.
+-   [ ] B1.2 The difference column is 0 to 10 decimal places against `psych`.
+
+### B2 — Repeated-measures ANOVA
+
+The subject identifier was left as an integer, so `aov()` treated it as a continuous covariate and tested the condition effect against the wrong error term. Correcting it was two changes, not one: with a factor subject there is no `Error: Within` stratum at all, so the effect had to be located differently.
+
+```{r}
+#| label: b2-repeated-anova
+set.seed(7)
+n <- 40
+subject_effect <- rnorm(n, sd = 2)
+wide <- data.frame(
+  t1 = subject_effect + rnorm(n, sd = 0.6) + 3.0,
+  t2 = subject_effect + rnorm(n, sd = 0.6) + 3.8,
+  t3 = subject_effect + rnorm(n, sd = 0.6) + 4.6
+)
+res <- surveyframe:::sframe_run_repeated_anova(
+  wide, list(measures = c("t1", "t2", "t3"))
+)
+c(F = round(res$F_stat, 3), df1 = res$df1, df2 = res$df2,
+  p = signif(res$p, 3))
+```
+
+```{r}
+#| label: b2-jmv-oracle
+#| eval: false
+# Independent oracle. Expected: F = 86.92699 on df 2 and 78.
+jtab <- as.data.frame(jmv::anovaRM(
+  data    = wide,
+  rm      = list(list(label = "condition", levels = c("t1", "t2", "t3"))),
+  rmCells = lapply(c("t1", "t2", "t3"), function(v) list(measure = v, cell = v)),
+  rmTerms = list("condition")
+)$rmTable)
+jtab[1, c("F[none]", "df[none]", "p[none]")]
+```
+
+-   [ ] B2.1 F is about **86.93 on df 2 and 78**. Before the fix it reported F = 1.45, p = 0.24, a non-significant result where the truth is overwhelming.
+-   [ ] B2.2 The `jmv` oracle chunk agrees to 4 decimal places.
+-   [ ] B2.3 **Owner judgement:** decide whether any repeated-measures result you have already reported needs re-running and, if published, corrected.
+
+### B3 — Validation accepted a real builder export
+
+`known_vars` held only base item and scale ids, so a plan naming an expansion column failed validation for a variable that does exist.
+
+```{r}
+#| label: b3-known-vars
+inst <- sf_instrument(
+  title = "Expansion", version = "1.0.0",
+  components = list(
+    sf_choices("ag5", 1:5, c("a", "b", "c", "d", "e")),
+    sf_item("mx", "Rate", type = "matrix",
+            matrix_items = c("Alpha", "Basilica"), choice_set = "ag5")
+  ),
+  analysis_plan = list(list(
+    id = "RQ1", research_question = "Ratings?", family = "descriptive",
+    method = "frequency", roles = list(variable = "mx__Alpha")
+  ))
+)
+validate_sframe(inst, strict = FALSE)
+```
+
+-   [ ] B3.1 `valid` is TRUE and `problems` is empty. Before the fix this instrument failed validation.
+
+### B4 — SEM syntax generators check the model type
+
+A covariance-based model produced PLS-SEM syntax with no complaint: a runnable script estimating a model nobody declared.
+
+```{r}
+#| label: b4-model-guard
+cb <- sf_model("cb_1", "CB", type = "cb_sem",
+  constructs = list(sf_construct("SAT", "Satisfaction", c("s1", "s2")),
+                    sf_construct("LOY", "Loyalty", c("l1", "l2"))),
+  paths = list(sf_path("SAT", "LOY")))
+tryCatch(seminr_syntax(cb), error = function(e) conditionMessage(e))
+```
+
+-   [ ] B4.1 The call errors, and the message names the function, the family it generates, and that generating anyway would estimate a different model.
+-   [ ] B4.2 **Read the wording.** Does it tell a researcher what to do next, or only that something is wrong?
+
+------------------------------------------------------------------------
+
+## Part C — Decision analysis, the worked example (10 items)
+
+The bundled hotel-supplier fixture is the spine of the MCDM vignette and the release gate for this family. It exercises every declared data path at once.
+
+```{r}
+#| label: c1-fixture
+demo <- read_sframe(sf_fixture("hotel_supplier_mcdm.sframe"))
+resp <- utils::read.csv(sf_fixture("hotel_supplier_mcdm_responses.csv"),
+                        check.names = FALSE)
+c(items = length(demo$items),
+  expansion_columns = length(sframe_item_expansion_columns(demo)),
+  respondents = nrow(resp))
+```
+
+```{r}
+#| label: c2-run-plan
+results <- run_analysis_plan(resp, demo, plots = TRUE)
+data.frame(
+  RQ     = vapply(results, function(r) r$block_id, ""),
+  method = toupper(vapply(results, function(r) r$test, "")),
+  rows   = vapply(results, function(r) nrow(r$table), 0),
+  error  = vapply(results, function(r) r$error %||% "none", "")
+)
+```
+
+-   [ ] C1.1 42 expansion columns, 12 respondents, 8 items.
+-   [ ] C1.2 All 4 blocks return rows and no error.
+-   [ ] C1.3 The AHP consistency ratio is reported and below 0.10.
+
+```{r}
+#| label: c3-two-topsis
+knitr::kable(results[["RQ2"]]$table, caption = "Audited figures")
+knitr::kable(results[["RQ3"]]$table, caption = "Staff ratings")
+```
+
+-   [ ] C1.4 The two rankings differ. They read different weight sources and different matrices, so identical results would mean one declared path was being ignored.
+-   [ ] C1.5 **Owner judgement:** is the reframing trap explained clearly enough in the vignette? Price is declared `benefit` only because the question asked about value for money. Nothing in the data distinguishes that from a raw price rating, and getting it wrong yields a confident, inverted ranking.
+
+```{r}
+#| label: c4-sensitivity
+sens <- sensitivity_analysis(
+  x = matrix(c(4.1, 3.0, 210, 36, 3.6, 4.5, 180, 48, 4.8, 2.5, 260, 24,
+               3.9, 4.0, 150, 72, 4.4, 3.8, 230, 30), nrow = 5, byrow = TRUE),
+  weights        = results[["RQ2"]]$weights,
+  criteria_types = c("benefit", "benefit", "cost", "cost"),
+  method         = "topsis",
+  alternatives   = c("Alpha", "Basilica", "Coral", "Dhoni", "Equator"),
+  criteria       = c("service", "location", "price", "delivery")
+)
+sens
+```
+
+-   [ ] C1.6 `stable` is FALSE, 4 of 8 perturbations move the ranking, and `top_changed` is FALSE throughout.
+-   [ ] C1.7 **Owner judgement:** the print output distinguishes "the winner holds" from "the full ranking holds". Is that distinction clear enough to stop someone quoting positions 2 to 5 as firmly as position 1?
+
+### C2 — Non-results must not read as findings
+
+This is the B11 finding. ELECTRE I on a 9-criterion problem establishes no outranking at all, and used to report every alternative at rank 1, with `sensitivity_analysis()` then calling that stable.
+
+```{r}
+#| label: c5-degenerate-electre
+set.seed(2026)
+x9 <- matrix(round(runif(81, 1, 100), 1), nrow = 9)
+w9 <- rep(1 / 9, 9)
+ct9 <- rep(c("benefit", "cost"), length.out = 9)
+sensitivity_analysis(x9, w9, ct9, method = "electre")
+```
+
+-   [ ] C2.1 The output says "No result to test" rather than "Stable".
+-   [ ] C2.2 **Owner judgement:** does the wording make clear this is an absence of discrimination rather than a robust ranking? This is the single most dangerous message in the decision family, because the old behaviour gave the strongest possible reassurance for the weakest possible result.
+
+------------------------------------------------------------------------
+
+## Part D — Declared conjoint designs (4 items)
+
+`sf_conjoint_design()` is a design generator, not an estimator. surveyframe does not fit choice models and says so.
+
+```{r}
+#| label: d1-conjoint
+design <- sf_conjoint_design(
+  "hotel_dce",
+  attributes = list(
+    price    = c("50", "100", "150"),
+    board    = c("room only", "breakfast"),
+    distance = c("beachfront", "10 min walk")
+  ),
+  method = "balanced", n_profiles = 6, seed = 42
+)
+design
+```
+
+```{r}
+#| label: d2-reproducible
+again <- sf_conjoint_design(
+  "hotel_dce",
+  attributes = list(
+    price    = c("50", "100", "150"),
+    board    = c("room only", "breakfast"),
+    distance = c("beachfront", "10 min walk")
+  ),
+  method = "balanced", n_profiles = 6, seed = 42
+)
+identical(design$profiles, again$profiles)
+```
+
+-   [ ] D1.1 The same seed reproduces the identical design.
+-   [ ] D1.2 The print output states plainly that surveyframe does not fit choice models.
+-   [ ] D1.3 **Owner judgement:** the heuristic method is named `"balanced"`, not `"fractional"`, because it is a repeated-sampling search rather than a catalogued orthogonal array. Is that distinction stated clearly enough in `?sf_conjoint_design` for a reviewer who expects a true fractional factorial?
+-   [ ] D1.4 **Owner judgement:** is the `profiles` escape hatch, for supplying a D-optimal design generated elsewhere, discoverable enough?
+
+------------------------------------------------------------------------
+
+## Part E — Breaking change: the Shiny collector's output shape (5 items)
+
+The Shiny survey used to pipe-join a matrix item's cells into one column, so `mx = "4|5"` where the reader expects `mx__r1` and `mx__r2`. That data could not be read back by the package at all, and nothing said so at collection time. Ranking and multi-select had the same problem.
+
+```{r}
+#| label: e1-export-shape
+inst <- sf_instrument(
+  title = "Shapes", version = "1.0.0",
+  components = list(
+    sf_choices("ag5", 1:5, c("a", "b", "c", "d", "e")),
+    sf_item("mx", "Rate", type = "matrix",
+            matrix_items = c("r1", "r2"), choice_set = "ag5"),
+    sf_item("ms", "Pick", type = "multiple_choice", choice_set = "ag5"),
+    sf_item("rk", "Order", type = "ranking", choice_set = "ag5")
+  )
+)
+row <- surveyframe:::sframe_response_row(
+  inst,
+  list(mx__1 = 4, mx__2 = 5, ms = c("1", "3"), rk = "3|1|2|5|4"),
+  surveyframe:::sframe_branch_lookup(inst),
+  started_at = Sys.time(), submitted_at = Sys.time()
+)
+names(row)
+```
+
+-   [ ] E1.1 The columns are `mx__r1`, `mx__r2`, `ms__1` to `ms__5`, `rk__1` to `rk__5`. No bare `mx`, `ms`, or `rk`.
+-   [ ] E1.2 Multi-select columns carry 0 or 1; ranking columns carry rank positions.
+-   [ ] E1.3 `read_responses()` accepts the row (it rejected the old shape).
+-   [ ] E1.4 **Owner decision, already taken 2026-08-02 but worth re-confirming with the NEWS text in front of you:** this changes column names for anyone mid-collection through `render_survey()`. Is the NEWS wording explicit enough about what they must do with data already gathered?
+
+### E2 — The header-rewriting trap
+
+```{r}
+#| label: e2-name-repair
+inst2 <- sf_instrument(
+  title = "Spaced", version = "1.0.0",
+  components = list(
+    sf_choices("cs", 1:3, c("Low", "Mid", "High")),
+    sf_item("q1", "Q", type = "matrix",
+            matrix_items = c("Service quality", "Delivery speed"),
+            choice_set = "cs")
+  )
+)
+cols <- sframe_item_expansion_columns(inst2)
+d <- as.data.frame(stats::setNames(lapply(cols, function(x) rep(1:3, 2)), cols),
+                   check.names = FALSE)
+f <- tempfile(fileext = ".csv"); utils::write.csv(d, f, row.names = FALSE)
+
+# What a researcher types. read.csv() rewrites the header.
+tryCatch(read_responses(utils::read.csv(f), inst2, strict = TRUE),
+         error = function(e) conditionMessage(e))
+```
+
+-   [ ] E2.1 The error names the original column, the rewritten form, and `check.names = FALSE`. **Read it as someone who has not seen this before:** does it get them unstuck?
+
+------------------------------------------------------------------------
+
+## Part F — Quality reporting and hashing (4 items)
+
+```{r}
+#| label: f1-missingness
+inst3 <- sf_instrument(
+  title = "Missing", version = "1.0.0",
+  components = list(
+    sf_choices("ag5", 1:5, c("a", "b", "c", "d", "e")),
+    sf_item("s1", "I1", type = "likert", choice_set = "ag5", scale_id = "sc"),
+    sf_item("s2", "I2", type = "likert", choice_set = "ag5", scale_id = "sc"),
+    sf_scale("sc", "Scale", items = c("s1", "s2")),
+    sf_item("mx", "Rate", type = "matrix",
+            matrix_items = c("r1", "r2"), choice_set = "ag5")
+  )
+)
+dat <- data.frame(s1 = c(3, 4, 5), s2 = c(3, 5, 4),
+                  mx__r1 = c(1, 1, NA), mx__r2 = c(2, 2, NA))
+q <- quality_report(dat, inst3)
+q$missing$respondent_miss
+```
+
+-   [ ] F1.1 Respondent 3, who skipped the whole matrix, shows a non-zero missing rate. It used to report 0 percent, because expansion columns were invisible to the check.
+-   [ ] F1.2 **Owner judgement:** reported missingness will move for any instrument using matrix, ranking, multi-select, or decision items. Is the NEWS entry clear that the old figures were understated rather than the new ones inflated?
+
+```{r}
+#| label: f2-hash-fixed-point
+inst4 <- sf_instrument(
+  title = "Fixed point", version = "1.0.0",
+  components = list(
+    sf_choices("ag5", 1:5, c("a", "b", "c", "d", "e")),
+    sf_item("q1", "Q1", type = "likert", choice_set = "ag5")
+  )
+)
+p1 <- tempfile(fileext = ".sframe"); write_sframe(inst4, p1)
+h1 <- jsonlite::fromJSON(p1, simplifyVector = FALSE)$hash$value
+back <- read_sframe(p1)
+p2 <- tempfile(fileext = ".sframe"); write_sframe(back, p2)
+h2 <- jsonlite::fromJSON(p2, simplifyVector = FALSE)$hash$value
+c(written = substr(h1, 1, 16), rewritten = substr(h2, 1, 16),
+  identical = identical(h1, h2))
+```
+
+-   [ ] F2.1 The hash is identical across write, read, write. Before the fix, identical content carried two different hashes depending on whether it had been through a read.
+-   [ ] F2.2 The 3 bundled instruments still hash to the values they store (the automated test asserts this; if it ever fails, every stored `.sframe` moved with it).
+
+------------------------------------------------------------------------
+
+## Part G — The two GUIs (6 items, browser required)
+
+```{r}
+#| label: g1-builder
+#| eval: false
+launch_builder(open = TRUE)
+```
+
+-   [ ] G1.1 Add-question menu shows the Decision (MCDM) group without scrolling.
+-   [ ] G1.2 Adding a pairwise item draws a real preview, not an empty body.
+-   [ ] G1.3 A decision question's sample labels are marked as samples.
+
+```{r}
+#| label: g2-studio
+#| eval: false
+demo <- read_sframe(sf_fixture("hotel_supplier_mcdm.sframe"))
+resp <- utils::read.csv(sf_fixture("hotel_supplier_mcdm_responses.csv"),
+                        check.names = FALSE)
+launch_studio(instrument = demo, responses = resp,
+              respondent_id = "respondent_id", screen = "analysis")
+```
+
+-   [ ] G2.1 Selecting TOPSIS offers 4 options under "Performance matrix items". This was empty for all 7 ranking methods before 0.4.0, which made the rated-matrix path unbuildable in the GUI.
+-   [ ] G2.2 Selecting AHP offers `crit_pairs` under "Pairwise" but not `crit_influence`. The two comparison scales are not interchangeable.
+-   [ ] G2.3 **Owner judgement:** the variable panel badges decision items PWC and WGT. Do those codes mean anything to a researcher who has not read the docs?
+
+------------------------------------------------------------------------
+
+## Part H — Vignette and accessibility (3 items)
+
+```{r}
+#| label: h1-vignette
+#| eval: false
+vignette("mcdm-analysis", package = "surveyframe")
+```
+
+-   [ ] H1.1 The vignette knits offline and every chart carries alt text.
+-   [ ] H1.2 axe-core reports zero WCAG 2.2 AA violations (machine-verified 2026-08-02: 0 violations, 24 passing checks).
+-   [ ] H1.3 **Owner judgement, prose:** the vignette describes its own sensitivity example as *not* stable, and explains why the winner holding is a defensible claim while the full ranking is not. Does that read clearly, or does it undercut confidence in the method?
+
+------------------------------------------------------------------------
+
+## Part J — RStudio add-in (H2) — REQUIRES A REAL RSTUDIO SESSION
+
+**This Part is a release blocker.** Nothing here can be automated. The add-in registers with RStudio's Addins menu, which only exists inside the IDE, so there is no headless equivalent. E8 should not proceed until J1 to J4 are ticked.
+
+The add-in ships on branch `feature/rstudio-addin`. Its 4 entries are launchers plus one text insert, and nothing else: no analytical code, no `rstudioapi` call anywhere else in the package, and `rstudioapi` stays in Suggests.
+
+### J1 — Install and confirm the menu
+
+```{r}
+#| label: j1-install
+#| eval: false
+# From the repository root, on the add-in branch.
+# git checkout feature/rstudio-addin
+devtools::load_all(".")
+# Then look at the RStudio Addins dropdown (the toolbar button, or
+# Tools > Addins > Browse Addins).
+```
+
+-   [ ] J1.1 All 4 entries appear under Addins, listed as: Open SurveyBuilder, Open SurveyStudio, Open Dashboard, Insert sframe skeleton.
+-   [ ] J1.2 Each entry's description reads sensibly in the Browse Addins dialog (that dialog shows the `Description:` field from `addins.dcf`).
+-   [ ] J1.3 **Judgement:** are 4 entries the right number? The plan deliberately cut 5 further ideas, including an `sf_item()` inserter and demo launchers, to keep the menu small. Does the menu feel useful or sparse in practice?
+
+### J2 — The three launchers
+
+Run each from the Addins menu, not from the console. The point is that the menu binding works, which the console cannot tell you.
+
+-   [ ] J2.1 **Open SurveyBuilder** opens the builder in a browser.
+-   [ ] J2.2 **Open SurveyStudio** opens the studio in a browser.
+-   [ ] J2.3 **Open Dashboard** opens the dashboard in a browser.
+-   [ ] J2.4 Each returns control to RStudio cleanly; the console is not left blocked in a way that feels broken.
+-   [ ] J2.5 **Judgement:** when a launcher opens, is it obvious what happened? A Shiny app taking over the console without explanation can read as a hang.
+
+### J3 — Insert sframe skeleton
+
+This is the entry most likely to be someone's first contact with the constructors, so the inserted text matters more than it looks.
+
+-   [ ] J3.1 Open a new, empty `.R` file, place the cursor, and run **Insert sframe skeleton** from the menu. Text is inserted at the cursor.
+-   [ ] J3.2 Select the inserted text and run it. It executes with no error.
+-   [ ] J3.3 The final line, `validate_sframe(instrument)`, reports a valid instrument.
+-   [ ] J3.4 Inserting a second time at a different cursor position works, and does not overwrite the first.
+-   [ ] J3.5 **Judgement, and the important one:** read the skeleton as a newcomer. Does it teach the right shape? It deliberately declares a choice set as its own component and references it by `choice_set = "agree5"`, includes a scale, and ends with a validation call. The implementation guide's original version was written against an API that no longer exists, so this was rewritten from source and executed to confirm it builds a valid instrument. Whether it is the *right* teaching example is a judgement only you can make.
+-   [ ] J3.6 **Judgement:** should the skeleton include an `analysis_plan` block at all? It currently does, on the argument that a pre-declared plan is the package's whole thesis and a skeleton without one teaches the wrong habit. The counter-argument is that it makes the insert longer and more intimidating.
+
+### J4 — Failure behaviour
+
+```{r}
+#| label: j4-fail-soft
+#| eval: false
+# The add-ins must fail soft, never error, when rstudioapi is missing.
+# Simulate by checking the guard directly rather than uninstalling anything.
+surveyframe:::sframe_addin_ready()
+# Expected: TRUE in RStudio with rstudioapi installed.
+```
+
+-   [ ] J4.1 With `rstudioapi` installed, `sframe_addin_ready()` returns TRUE.
+-   [ ] J4.2 Confirm the package still loads and works normally in a plain R console outside RStudio (`R --vanilla`, `library(surveyframe)`, run any analysis). The add-in layer must be invisible there.
+-   [ ] J4.3 **Judgement:** if `rstudioapi` were missing, the add-in prints a message and returns NULL rather than erroring. Is the message clear about what to install?
+
+### J5 — Sign-off
+
+-   [ ] J5.1 **Owner sign-off on H2.** Record the RStudio version and OS used, since add-in registration is IDE-version-sensitive.
+
+------------------------------------------------------------------------
+
+## Part K — Release safety (8 items)
+
+```{r}
+#| label: k1-checks
+#| eval: false
+devtools::document()
+devtools::test()
+urlchecker::url_check()
+spelling::spell_check_package()
+```
+
+-   [ ] K1.1 `devtools::document()` clean, no NAMESPACE churn beyond the new exports.
+-   [ ] K1.2 Full suite green (machine-verified 2026-08-02: 1473 passed, 0 failed, 1 skipped).
+-   [ ] K1.3 `urlchecker::url_check()` clean.
+-   [ ] K1.4 `spelling::spell_check_package()` clean, or every hit is a deliberate term.
+
+```{r}
+#| label: k2-cran-check
+#| eval: false
+# From the shell, in the repository root:
+# R CMD build .
+# R CMD check --as-cran surveyframe_0.4.0.tar.gz
+```
+
+-   [ ] K1.5 0 errors, 0 warnings, at most 1 note (incoming feasibility).
+-   [ ] K1.6 Win-builder R-release and R-devel both Status OK.
+-   [ ] K1.7 No dev-only file reaches the tarball. Check especially `todo_master_0.4.md`, `mas_review_040.*`, and `data-raw/`.
+-   [ ] K1.8 pkgdown builds from `main` only, and the new vignette appears under "Specialised analyses".
+
+------------------------------------------------------------------------
+
+## Part L — Outstanding owner decisions
+
+Not verification. These are open questions this round surfaced that only you can close.
+
+-   [ ] L1.1 **`inst/CITATION` is the one hard CRAN blocker.** It needs the MCDM preprint DOI, and CRAN will not accept a placeholder. Nothing else in this list stops E8.
+-   [ ] L1.2 The 12 dogfeed items re-laned to 0.4.1 on 2026-08-02: confirm that split still looks right once you have read this document.
+-   [ ] L1.3 D2.6's remaining halves stay open and human: the live dashboard filter check, and revising examples and vignettes to use labelled levels consistently.
+-   [ ] L1.4 Whether the two breaking changes (Shiny export shape, missingness counting) warrant anything louder than a NEWS entry, given 0.4.0 is a minor release.
+
+------------------------------------------------------------------------
+
+## Sign-off
+
+-   [ ] Reviewer initials and date once Parts A to K are complete.
+-   [ ] Part J (RStudio add-in) explicitly signed off, since it cannot be machine-verified and blocks E8.
+-   [ ] Any new feedback logged in `dogfeed.todo.md` rather than left in this document.

@@ -72,35 +72,36 @@ small-sample track, all 10 MCDM computations with both UI registries,
 
 Work top down. Anything in the same tier can run in parallel.
 
-- **P0, done 2026-07-31:** A2 to A5, all 4 validation bug fixes, on
-  `v0.5-dev` at 0743e10. (B1, A1, A6, C8, I1, I2, I3, B2, B3, B12, and C7
-  are also done. C7 landed on `main` at 556743d.)
-- **P1, core engineering, now the live tier:** B4, B5, B6, B9, B10, B14,
-  and **H1 (the RStudio add-in build, folded into 0.4.0 scope
-  2026-07-31)**, worktree isolated so it cannot collide with `v0.5-dev`.
-- **P2, verification and docs:** B11, B13, B15, B16, C6, and **H2 (verify
-  the add-in in a real RStudio session, owner-only, cannot be
-  automated)**.
-- **P3, field validation (narrowed 2026-07-31):** C3 to C5 only. C1 and
-  C2 moved to block F (0.4.1) and no longer gate 0.4.0.
-- **P4, manuscript and release:** **D2, D2a (the MCDM paper) do not start
-  until 0.4.0's engineering is submission-ready** (owner decision
-  2026-07-31), since the paper describes the shipped software. Then D4,
-  D5, D6, then E1 to E8. E8 cannot run before D6.
-- **P5, after 0.4.0 ships:** F0, F0a, F0b, F0c (the small-sample paper,
-  moved here 2026-07-31 so its applied-validation section can draw on
-  F0a's real-survey data), F1 to F6, then G1 to G4.
-- **Parallel at any time:** H3 (Ethos repo check, no surveyframe tarball
-  content, stays independent of release numbering), I4 to I9.
+- **P0 to P3, done 2026-08-02.** Blocks A, B, and C are closed for 0.4.0.
+  A1 to A6, B1 to B16, C3 to C8, plus H1. The 2 pre-existing defects logged
+  during the work (the Shiny export shape and the serialisation fixed point)
+  were both fixed on owner decision the same day.
+- **P4, the live tier: manuscript and release.** D2 and D2a (the MCDM paper
+  and its OpenAlex pass) can now start, since the engineering they describe
+  is submission-ready. Then D4, D5, **D6 (the preprint DOI in
+  `inst/CITATION`, the only hard CRAN blocker)**, then E1 to E8.
+- **P4 human gate, blocking E8: H2.** Verifying the RStudio add-in inside a
+  real RStudio session. It cannot be automated in any form, the add-in ships
+  in this release, and Part J of `mas_review_040.qmd` carries the click path.
+- **P5, after 0.4.0 ships:** F0, F0a, F0b, F0c, F1 to F6, then G1 to G4.
+  Block F now also carries the 12 dogfeed items re-laned on 2026-08-02.
+- **Parallel at any time:** H3, I4 to I9.
 
-Critical path, restated 2026-07-31. Block A is closed and B1 signed off,
-so nothing outstanding can now invalidate work already built. What
-remains of block B (B4, B5, B6, B9, B10, B14) completes the engineering,
-which releases the vignette and the browser passes, which release block
-D, whose preprint DOI is the only hard CRAN blocker, which releases block
-E. ICSRI and the real-survey rounds no longer sit on this path, since
-C1/C2 moved to 0.4.1, and neither does the small-sample paper, since
-D1/D1a moved with them.
+Critical path, restated 2026-08-02. Only 2 things stand between here and
+submission. **D6 needs a preprint DOI that does not exist yet**, and CRAN
+will not take a placeholder. **H2 needs the owner in front of RStudio.**
+Everything else in blocks A to E is either done or mechanical release
+paperwork (E1 to E7). Nothing outstanding can invalidate work already
+built.
+
+**What this round changed about the plan itself.** Three tasks turned out
+not to be what they were written as. B10's exemption was already there by
+construction, and the real defect was next door in missingness. B12 needed
+no engineering, only documentation. C4's "8 machine-fixable items" were 7
+judgement calls and one partly-machine task. Two review tasks, B11 and B13,
+each found a defect that was not in the list at all. The common shape in
+both was software returning something plausible rather than saying it had
+no answer, which is worth carrying into the remaining review.
 
 ## Delegation and model tiering
 
@@ -297,18 +298,21 @@ before editing.
   DOI 10.1155/2018/3696457, a peer-reviewed open-access systematic review
   a reader can actually obtain and check the implementation against.
   DEMATEL is the one method carrying 2 citations, deliberately.
-- [ ] **B4 [Sonnet, Opus review]** `sensitivity_analysis()` in
+- [x] **B4 [Sonnet, Opus review]** `sensitivity_analysis()` in
   `R/decision_sensitivity.R`: classed `sframe_sensitivity` object, `$table`,
   `plot()` and `print()` methods, callable from a plan block via
   `options$sensitivity = TRUE`.
-- [ ] **B5 [Sonnet]** `sf_conjoint_design()`, a declared design generator
+  **Done 2026-08-01, `v0.5-dev` at 250c1ac.** Classed `sframe_sensitivity` with `$table`, `plot()`, `print()`, and a `$stable` verdict. Covers all 7 ranking methods through the `compute()` signature they share; AHP, ANP, and DEMATEL are refused with a typed error since they produce weights rather than consume them. Wired to plan blocks via `options$sensitivity = TRUE` through one central hook rather than 7 runner edits. **The mutation check earned its place:** 55 tests passed, then deleting the renormalisation still passed all 55, because the test only checked the weight moved in the right direction, which holds either way. Rewritten to pin the exact renormalised share (0.4231, not 0.44) and now fails 4 when reverted. Later gained a `degenerate` flag, see B11.
+- [x] **B5 [Sonnet]** `sf_conjoint_design()`, a declared design generator
   and not an estimator. **Owner decision 2026-07-31: build it in 0.4.0**,
   superseding its standing as the first deferral if the window tightens.
   A new export is a permanent CRAN API commitment, so this was decided
   explicitly rather than allowed to drift.
-- [ ] **B6 [Sonnet]** Shiny renderer for both new item types in
+  **Done 2026-08-01, `v0.5-dev` at c900034.** `full`, `balanced`, and `random` methods plus a `profiles` escape hatch, seed always recorded so the design regenerates from the contract, and the caller's RNG stream restored. Named `"balanced"` rather than `"fractional"` deliberately: it is a repeated-sampling search, not a catalogued orthogonal array, and the name should not imply guarantees it lacks. **Serialisation was the risk.** The hash covers the payload's key set, so `designs` is written only when a design exists. An earlier draft justified that by claiming an unconditional key would fail the integrity check on every stored file; running the mutation disproved it, because `read_sframe()` hashes the parsed payload and stays self-consistent. The real damage is identity change on rewrite (c3df10ec in, febd07c5 out). Comment and test corrected to the true failure mode.
+- [x] **B6 [Sonnet]** Shiny renderer for both new item types in
   `R/render_survey.R` and `R/survey_module.R`. Neither file references
   either type today.
+  **Done 2026-08-01, `v0.5-dev` at c41e370.** Saaty strips with verbal anchors on both sides, directed influence rows, constant-sum boxes, required-item logic including the total-must-be-100 rule. **The output shape was the real decision.** The existing matrix type pipe-joins its cells into one column, verified directly, which does not match the contract `read_responses()` expects. Copying that would have produced a decision survey that renders correctly and yields data the package cannot analyse, so decision items emit real expansion columns instead. The test that carries the weight runs Shiny inputs through to `sframe_assemble_pairwise()` and back. Matrix's own defect was logged rather than folded in silently, and later fixed, see the breaking-change entry below.
 - [x] **B7 [Sonnet]** Builder inspector editor for `comparison_items` and
   `comparison_scale`, plus Theme B preview parity. **Done 2026-07-30,
   `v0.5-dev` at 9fdeb0e**, brought forward from its own slot because A1's
@@ -325,17 +329,20 @@ before editing.
   every decision question, because the inlined renderer predated d218786.
   The script is tracked on `dev` only, so it was copied into the worktree to
   run, and `data-raw/` stays gitignored there.
-- [ ] **B9 [Sonnet]** Google Sheets Apps Script generator
+- [x] **B9 [Sonnet]** Google Sheets Apps Script generator
   (`R/google_sheets.R`) emits the 3 new column patterns, plus the round
   trip from static survey to collector CSV to `read_responses()` to
   assembled matrix.
-- [ ] **B10 [Sonnet]** Exempt the pairwise columns from
+  **Done 2026-08-01, `v0.5-dev` at 394fd91.** The Sheets header generator was the **4th** independent copy of the expansion-column derivation, after `read_responses()` and `validate_sframe()`, and those 2 had already drifted apart once, which is what made a real builder export fail validation in A4. All callers now read `sframe_item_expansion_columns()`, so the sheet cannot fall behind the reader, and the 3 decision column patterns come along without a per-type branch.
+- [x] **B10 [Sonnet]** Exempt the pairwise columns from
   `quality_report()`'s straightlining and speeding checks.
-- [ ] **B11 [Opus decision, Haiku automation]** UI/UX and stress review for
+  **Done 2026-08-01, `v0.5-dev` at 394fd91. The task's premise was wrong and checking first is what showed it.** Straight-lining iterates declared scales and a decision item is never in one; timing is wall-clock with no item involvement. No exemption was needed, and both facts are now pinned by tests. The same probe found the real defect next door: missingness matched on bare item ids, so every expansion column was invisible and a respondent who skipped all 3 pairwise questions was reported at **0 percent missing**. Expansion columns now count, which also brings matrix, ranking, and multi-select into the missingness figures for the first time. That moves numbers users already have, so it has its own NEWS heading.
+- [x] **B11 [Opus decision, Haiku automation]** UI/UX and stress review for
   the 7 methods not yet covered (TOPSIS, VIKOR, MOORA, SMART, WASPAS,
   PROMETHEE, ELECTRE): web and mobile rendering, simulated results, 9x9
   stress test, grouped versus separate layout. Runs after A1. Already done
   for AHP, ANP, and DEMATEL.
+  **Done 2026-08-02, `v0.5-dev` at 052da00. The 9x9 stress pass found a defect that was not in the task list.** 6 of the 7 ranking methods returned complete rankings under 10ms. ELECTRE I returned every score at 0 and every alternative at rank 1, which is legitimate for the method (no alternative clears concordance with 9 criteria at the default thresholds) but was reported as though it were a finding: the table listed 9 alternatives at rank 1 and the APA sentence reported a kernel containing all of them. **Worse, `sensitivity_analysis()` called that `stable = TRUE`** — the strongest robustness signal the function has, produced by the weakest result it can be handed. ELECTRE now says no outranking was established, and sensitivity gained a `degenerate` flag whose `print()` leads with "No result to test". Both regression tests skip themselves if the fixture stops being degenerate, so they cannot rot into passing for the wrong reason.
 - [x] **B12 [Opus decision]** PROMETHEE's CHECK status. **Done
   2026-07-31, `v0.5-dev` at 1d8481a. The engineering half was already
   finished before this task was read**, which the task list did not
@@ -359,24 +366,27 @@ before editing.
   says "will often disagree" and cites the number. It also records that
   `usual` ties ranks readily, since a step function scores every non-zero
   difference identically.
-- [ ] **B13 [Haiku]** Verify SurveyStudio MCDM support live against fixed
+- [x] **B13 [Haiku]** Verify SurveyStudio MCDM support live against fixed
   builder output. **Partly unblocked 2026-07-30**: `studio_level_meta()` had
   no branch for either decision item type, so every MCDM role dropdown in the
   studio was empty. Fixed with the scale-aware split in 83ce595 (see A6). The
   live click-through in a running app is still open, and it is where the rest
   of the studio's decision handling gets checked.
-- [ ] **B14 [Sonnet, Opus review]** Build the section 1g sample sframe as a
+  **Done 2026-08-02, `v0.5-dev` at d074914. The most consequential find of the batch.** All 7 ranking methods showed `performance_items` with **0 options** in SurveyStudio despite the fixture declaring 4 matrix items. The role matches on a `"matrix"` level and neither GUI gave matrix items one: the studio classified them `"identifier"`, the builder grouped them under `"expanded"`, which no role accepts. **The rated performance matrix was unwirable in both GUIs**, so path C, which RQ3 of the fixture and the vignette both teach, could only be built by writing R. Fixed in both. **The measurement needs recording as much as the fix:** the browser reader reported 0 options even after the fix was correctly in place, because selectize.js hides the real `<select>`. The defect is therefore established in R with no browser involved, 4 choices with the fix and 0 without; the live run corroborates rather than proves.
+- [x] **B14 [Sonnet, Opus review]** Build the section 1g sample sframe as a
   real fixture. Release gate: builds with shipped constructors, validates,
   round-trips with a stable hash, renders on all 3 survey surfaces, exports
   the exact 42 expansion columns, and all 4 plan blocks return a table and
   a chart with no error field.
-- [ ] **B15 [Sonnet]** `vignettes/mcdm-analysis.Rmd` to the 0.3.4 house
+  **Done 2026-08-01, `v0.5-dev` at 4bb9203, generator at 1af4c24.** Bundled instrument plus 12 seeded respondents, 7.7 KB. All 6 gates check out: shipped constructors only, validates with 0 problems, hashes to the value it stores, renders on all 3 surfaces, declares exactly the 42 expansion columns with all 42 writable from the live page, and every block returns a table and chart. The 2 TOPSIS blocks return different rankings, which is the point of including both, and a test asserts they differ because identical scores would mean a declared path was being ignored. **Gate 3 failed at first, and not because of the fixture:** a freshly built instrument was not a serialisation fixed point. Confirmed on a plain Likert instrument, logged, and later fixed properly.
+- [x] **B15 [Sonnet]** `vignettes/mcdm-analysis.Rmd` to the 0.3.4 house
   rules: offline knit, `set.seed()`, shared WCAG style block, `lang:
   en-GB`, `fig.alt` on every chart.
-- [ ] **B16 [Haiku]** axe-core pass through chromote on the new vignette,
+  **Done 2026-08-02, `v0.5-dev` at 2cbdd4e.** `vignettes/mcdm-analysis.Rmd`, offline knit, `lang: en-GB`, `set.seed()`, shared WCAG block, `fig.alt` on all 3 charts, built on B14's fixture so every number is reproducible. Names the 2 traps that make an MCDM result confidently wrong: the benefit/cost reframing (price is `benefit` only because the question asked about value for money) and the non-interchangeable comparison scales. **A first draft implied the sensitivity example was stable; checking showed it is not** (4 of 8 perturbations move the ranking while the leader holds), so the section now draws that distinction rather than the neater but false one.
+- [x] **B16 [Haiku]** axe-core pass through chromote on the new vignette,
   zero violations. `_pkgdown.yml` has no vignette listing, so no pkgdown
   edit is needed.
-
+  **Done 2026-08-02, `v0.5-dev` at 2cbdd4e.** axe-core 4.10.3 through chromote against the WCAG 2.2 AA tag set: **0 violations, 24 passing checks**, re-run after the prose edits rather than trusting the first pass. `_pkgdown.yml` gained a "Specialised analyses" section, which also fixed an unrelated gap: **`small-sample` was missing from the article index entirely**, so that vignette would never have reached the site.
 ## Block C. 0.4.0 field validation, absorbed from 0.3.5
 
 Was `todo_0.3.5.md`. No 0.3.5 release ships. Dogfeed protocol applies:
@@ -388,11 +398,12 @@ covers only the 12 dogfeed items already logged before this date; the
 fresh ICSRI and real-survey feedback is captured and triaged as 0.4.1
 work instead (see F0/F0a and F4 below).
 
-- [ ] **C3 [Opus]** Triage the 12 already-logged items to 0.4.0 or
+- [x] **C3 [Opus]** Triage the 12 already-logged items to 0.4.0 or
   wontfix. Patch-scope constraints no longer bind. (Splitting fresh
   ICSRI/real-survey feedback no longer applies here, since that capture
   itself now happens under block F.)
-- [ ] **C4 [Opus lead, Sonnet batches, Haiku verification]** Clear the 8
+  **Done 2026-08-02, `dev` at f9144c6. Re-reading the entries changed the answer.** The "8 machine-fixable items" grouping does not hold: 7 of the 8 state in their own text that they need human eyes, and D2.6 says it is bigger than a spot check. **The triage also had to correct itself** — it first named E2.6 as the one machine-fixable entry, whose own text reads "Visual judgement call", which is exactly the error the triage existed to catch. Owner decision the same day: 12 entries re-laned to 0.4.1 beside the ICSRI capture and faculty demo.
+- [x] **C4 [Opus lead, Sonnet batches, Haiku verification]** Clear the 8
   machine-fixable open items already logged: B1.3 interpretation and
   decision-rule pairing, D2.5 phone-width scale-correlation heatmap, D2.6
   filter live-check and full levels and labels audit, E2.6 bounds error
@@ -400,14 +411,17 @@ work instead (see F0/F0a and F4 below).
   presentability, J1.5 APA interval prose, K1.7 MCAR interpretation
   wording, L1.4 to L1.7 PDF pagination, greyscale legibility, browser
   print and brand colour, N1.9 SurveyStudio Copy-result clipboard.
-- [ ] **C5 [Opus lead, Haiku verification]** Record this block's fixes in
+  **Done 2026-08-02, `v0.5-dev` at 07ed716, scope reduced by C3.** Only D2.6's machine halves were ever machine-actionable. The `levels`/`labels` audit ran across all 11 `sf_item()` types: labels reach the analysis table for every one of the 8 carrying a choice set, and text, textarea, and date correctly show raw values. Ranking and matrix analyse end to end. **The audit found one real defect:** a matrix row label containing a space produces a column containing a space, which the collectors write correctly but `read.csv()` rewrites (`check.names` defaults TRUE), so `read_responses()` rejected it as undeclared with nothing to say the header had been rewritten. The error now names the cause and the fix, and stays quiet for a genuinely stray column. **6 of the 7 attempts at this audit failed on my own harness**, not the package: a method name that does not exist, a role name from a different method, an invented `sf_branch()` argument, and `as.data.frame()` mangling column names twice.
+- [x] **C5 [Opus lead, Haiku verification]** Record this block's fixes in
   `mas_review_040.md`, modelled on `mas_review_034.md`, chromote-verified
   for every UI item. Narrower in scope than before: covers only C4's 8
   items, since the ICSRI/real-survey rounds that used to feed this
   document now get recorded under F4's `mas_review_041.md` instead.
-- [ ] **C6 [Haiku]** Fix README's Roadmap section, which still promises
+  **Done 2026-08-02.** `mas_review_040.qmd`, modelled on `mas_review_034.qmd`, renders clean with 0 errors and every chunk producing its expected value (checked by grepping the rendered HTML for the specific figures, not just for a successful build). Parts A to H cover the release; **Part J is a dedicated RStudio add-in click path and is marked a release blocker**, since H2 cannot be automated at all. Part L carries the 4 open owner decisions. Chunks resolve fixtures whether surveyframe is installed or loaded from source, and `error: true` means a failing chunk reports inline rather than halting, which matters when working through it one chunk at a time.
+- [x] **C6 [Haiku]** Fix README's Roadmap section, which still promises
   small-sample inference at v0.4 and MCDM at v0.5. It is live on CRAN and
   on the pkgdown site.
+  **Done 2026-08-01, `v0.5-dev` at 115350b.** The old text promised small-sample at v0.4 and MCDM at v0.5, both live on CRAN and the pkgdown site, telling readers to wait for versions that will never exist. Replaced with what 0.4.0 actually contains, a line explaining the 2 releases merged, and a pointer to NEWS rather than a restated version plan, since restating it in 2 places is what let it go stale.
 - [x] **C8 [Opus]** Placeholder labels announced as placeholders. **Done
   2026-07-30, `v0.5-dev` at 83ce595**, raised in the same live session as A6.
   New decision and matrix questions ship with sample labels so they render at
@@ -582,13 +596,14 @@ clean, full suite green) and be verified before E8 (submission). H3 stays
 independent of release numbering, since it is an Ethos-repo check with no
 surveyframe tarball content.
 
-- [ ] **H1 [Sonnet, worktree isolation]** Build the RStudio add-in per
+- [x] **H1 [Sonnet, worktree isolation]** Build the RStudio add-in per
   `todo_rstudio_addin.md`: `inst/rstudio/addins.dcf`,
   `R/rstudio_addins.R`, `rstudioapi` in Suggests, the 4 agreed menu items
   and nothing more. Nothing exists yet on any branch. The "do not merge
   until 0.3.4 is accepted" condition is now satisfied. Cut
   `feature/rstudio-addin` from `dev` in its own worktree; keep the diff
   to new files plus one DESCRIPTION line.
+  **Done 2026-08-02, `feature/rstudio-addin` at 0194ffb.** 3 launchers and one skeleton insert, the agreed 4 and nothing more. All 3 constraints tested rather than asserted: `rstudioapi` in Suggests only, no file outside `R/rstudio_addins.R` calls `rstudioapi::`, and every binding fails soft. **The skeleton needed rewriting from source** — the guide's version passed `id =` to `sf_instrument()`, named the component list `items =`, and gave `sf_item()` an inline `choices =`, none of which exist. Since a bad skeleton teaches the wrong shape to whoever reaches for it first, the test parses it, evaluates it, validates the instrument, and round-trips it. 26 tests. Branched from `v0.5-dev` rather than `dev`, because it now ships in 0.4.0 and cutting from `dev` would have forced a merge.
 - [ ] **H2 [Owner]** Verify the add-in inside a real RStudio session.
   Cannot be automated. Must complete before E8.
 - [ ] **H3 [Haiku]** Confirm the Ethos R bridge is repointed from asrda-r
@@ -627,29 +642,24 @@ surveyframe tarball content.
 
 ## Totals
 
-**48 open, 17 done, 65 total. Counted from the checkboxes on
-2026-07-31, not carried forward.**
+**33 open, 32 done, 65 total. Counted from the checkboxes on 2026-08-02.**
 
-The earlier figure of 66 was one too many, and 3 items (I1, I2, I3) had
-been recorded as "Done 2026-07-30" in their text while their boxes stayed
-unticked. Both are corrected here. The total moved to 65 when D3, the
-combined manuscript, was dropped on 2026-07-31.
+Done on 2026-08-02, on top of the 17 recorded on 2026-07-31: B4, B5, B6,
+B9, B10, B11, B13, B14, B15, B16, C3, C4, C5, C6, and H1. That is 15
+tasks, and 2 unplanned fixes alongside them.
 
-Done: A1, A6, B7, B8, C8, I1, I2, I3 on 2026-07-30, then B1, A2, A3, A4,
-A5, B2, B3, B12, and C7 on 2026-07-31.
+**The 2 unplanned fixes were both pre-existing and both owner-decided.**
+The Shiny collector emitted joined columns for matrix, ranking, and
+multi-select, so that data could not be read back by the package at all;
+fixed and recorded as breaking. A freshly built instrument was not a
+serialisation fixed point, so identical content could carry 2 different
+hashes depending on whether it had been through a read; fixed, with a test
+asserting the 3 bundled instruments still hash to what they store, because
+if that ever fails every `.sframe` in the wild moved with it.
 
-**9 closed on 2026-07-31**, of which 2 cost far less than the list
-implied. B12 needed no engineering at all, since the step function was
-already implemented and already the default, leaving only the missing
-documentation. C7 was a `main`-only gap, `dev` having carried all 12
-entries all along. Against that, A5 cost more than budgeted: its guard
-exposed the same defect in both bundled demo instruments, so the data had
-to be repaired and re-hashed as well.
+Remaining split across the 33, counted from the tags: Sonnet-led 12,
+Haiku-led 9, Owner or human 9, Opus-led 3.
 
-Remaining split across the 48, counted from the tags: Sonnet-led 18,
-Haiku-led 12, Owner or human 11, Opus-led 7.
-
-By release: 0.4.0 carries 40 (blocks A to E, minus C1/C2 and D1/D1a,
-plus H1/H2 added 2026-07-31), 0.4.1 carries 10 (F0, F0a, F0b, F0c added
-2026-07-31, on top of the original 6), the expansion carries 4, and 10
-sit outside a single release (H3 and block I).
+By release: 0.4.0 carries 13 (blocks D and E, plus H2), 0.4.1 carries 10
+in block F plus the 12 re-laned dogfeed entries, the expansion carries 4,
+and 6 sit outside a single release (H3 and block I).
