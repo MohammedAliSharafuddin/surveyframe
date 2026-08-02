@@ -23,11 +23,12 @@ with an earlier version should be re-run rather than trusted.
 - Repeated-measures ANOVA tested the condition effect against the wrong
   error term, because the subject identifier was left as an integer and
   [`aov()`](https://rdrr.io/r/stats/aov.html) treated it as a continuous
-  covariate. On a fixture where `jmv::anovaRM()` gives F(2, 78) = 86.93,
-  surveyframe reported F = 1.45, p = 0.24. Correcting the identifier
-  alone was not sufficient: the corrected design produces no
-  `Error: Within` stratum, so the effect is now located by searching the
-  strata rather than by a fixed name.
+  covariate. On a fixture where
+  [`jmv::anovaRM()`](https://rdrr.io/pkg/jmv/man/anovaRM.html) gives
+  F(2, 78) = 86.93, surveyframe reported F = 1.45, p = 0.24. Correcting
+  the identifier alone was not sufficient: the corrected design produces
+  no `Error: Within` stratum, so the effect is now located by searching
+  the strata rather than by a fixed name.
 - [`validate_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/validate_sframe.md)
   rejected valid instruments. Its known-variable list held only base
   item and scale ids, so an analysis plan naming an expansion column
