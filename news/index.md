@@ -2,6 +2,8 @@
 
 ## surveyframe 0.3.4
 
+CRAN release: 2026-07-24
+
 This release completes the plotting, interface, statistics, and
 reporting work started in 0.3.3. Every analysis family now has a chart,
 every effect size ships with a confidence interval, reports accept
