@@ -1161,3 +1161,69 @@ to label their paths.
 Needs an owner decision on scope only, since the fix changes generated
 syntax for every `cb_sem` model, labelled or not. The defect itself is not
 in doubt.
+
+### [open] `lane: 0.4.0` — `sf_conjoint_design(method = "balanced")` is rewarded for dropping a level entirely, and the balance report hides it
+Found 2026-08-03 while writing review file 15. Three attributes, 3 by 3 by 2,
+so 18 profiles in the full factorial, keeping 9:
+
+    attributes: price    = low, mid, high
+                response = 4 hours, 1 day, 3 days
+                contract = 12 months, 24 months
+
+    sf_conjoint_design("x", attributes = att, method = "balanced",
+                       n_profiles = 9, n_alternatives = 3, seed = 20260803)
+
+    reported imbalance : 2.89
+    reported level_counts$response : 3 days 4  |  4 hours 5
+    actual counts over the DECLARED levels :
+        4 hours 5  |  1 day 0  |  3 days 4
+
+`1 day` appears in no profile. No respondent ever sees it, so its effect
+cannot be estimated, and a third of the response attribute is missing from
+an experiment that declared it.
+
+The cause is in `sframe_conjoint_imbalance()` (`R/conjoint_design.R:27`).
+The level penalty is built from `table(col)` on the observed column, and
+`table()` on a character vector only counts levels that are present. A level
+with zero profiles contributes nothing to the penalty. Worse than nothing:
+removing a level makes the surviving counts more even, so the search that is
+meant to find balance is **actively rewarded** for throwing a level away.
+
+`sframe_conjoint_select()` then keeps the lowest-penalty subset it found, and
+that is systematically a subset with a level missing.
+
+Measured over 60 seeds at this size:
+
+| method | designs with at least 1 level nobody sees |
+|---|---|
+| `"balanced"` | **41 of 60** |
+| `"random"` | 0 of 60 |
+
+So `"balanced"` is far worse than `"random"` at the one job it exists to do,
+and a user who reads the help file and picks `"balanced"` for a better design
+gets a worse one. Brute force confirms subsets with every level present exist
+in abundance at this size, so the search is not failing for want of a
+solution.
+
+The reporting compounds it. `$balance$level_counts` is built from the same
+`table()` call, so the absent level is simply not listed rather than listed
+as `0`. The help file says the achieved balance is reported "so the design
+can be inspected rather than trusted", and inspecting it does not reveal the
+problem. Nothing errors and an imbalance of 2.89 looks like a good score.
+
+Suggested fix, and both halves are needed:
+
+1. Count levels against the **declared** levels, not the observed ones, in
+   `sframe_conjoint_imbalance()`. `table(factor(col, levels = declared))`
+   makes a zero cell cost the most rather than nothing.
+2. Reject any candidate subset that drops a level outright, rather than
+   scoring it, since such a design is not merely unbalanced but partly
+   inestimable. If no subset covering every level exists at the requested
+   `n_profiles`, say so instead of returning one that does not.
+
+`$balance$level_counts` should list every declared level including the zeros
+either way, since that is what makes the report worth reading.
+
+Needs an owner decision on scope only. This changes every design any
+existing call produced, so anything already fielded from a `"balanced"`
+design should be checked for an unseen level before the fix lands.

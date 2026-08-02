@@ -1,0 +1,924 @@
+---
+title: "15. Weight sensitivity and conjoint designs"
+subtitle: "sensitivity_analysis() and sf_conjoint_design(), both new in 0.4.0"
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    embed-resources: true
+editor: visual
+execute:
+  warning: false
+  message: false
+  error: true
+---
+
+```{r}
+#| label: setup
+#| include: false
+source("_setup.R")
+```
+
+Two additions that sit either side of the MCDM work in file `13`.
+
+`sensitivity_analysis()` comes after a ranking and asks whether it survives
+contact with a slightly different set of weights. A ranking that flips when a
+weight moves 5 percent is not a finding, and until this release surveyframe
+had no way to say so.
+
+`sf_conjoint_design()` comes before any data, and generates the profile set
+and task schedule for a choice experiment. It is a design generator and not
+an estimator, which the section on it takes seriously.
+
+## 1. Questionnaire and plan
+
+```{r}
+#| label: build
+alternatives <- c("Alpha", "Basilica", "Coral", "Delta", "Equator")
+criteria     <- c("service", "location", "price", "delivery")
+
+rate_item <- function(crit) sf_item(
+  paste0("rate_", crit),
+  sprintf("Rate each supplier on %s", crit),
+  type = "matrix", choice_set = "rating5", matrix_items = alternatives)
+
+supply <- sf_instrument(
+  title = "Supplier selection", version = "1.0.0",
+  components = c(
+    list(
+      sf_choices("rating5", as.character(1:5),
+                 c("Very poor", "Poor", "Acceptable", "Good", "Excellent")),
+      sf_item("crit_points",
+              "Split 100 points across the 4 criteria by importance",
+              type = "criteria_weight", comparison_items = criteria)
+    ),
+    lapply(criteria, rate_item),
+    list(
+      # A conjoint design is a component of the instrument, like an item or
+      # a scale. Declaring it here is what makes it part of the contract
+      # rather than a script somebody ran once.
+      sf_conjoint_design(
+        "pack_choice", label = "Service package choice experiment",
+        attributes = list(
+          price      = c("low", "mid", "high"),
+          response   = c("4 hours", "1 day", "3 days"),
+          contract   = c("12 months", "24 months")
+        ),
+        method = "balanced", n_profiles = 9, n_alternatives = 3,
+        blocks = 1, seed = 20260803
+      )
+    )
+  ),
+  analysis_plan = list(
+    list(id = "RQ1", research_question =
+           "Which supplier ranks best on the criteria as weighted?",
+         family = "decision", method = "topsis",
+         roles = list(performance_items = paste0("rate_", criteria),
+                      weights_item = "crit_points"),
+         options = list(criteria_types = rep("benefit", 4),
+                        sensitivity = TRUE)),
+    list(id = "RQ2", research_question =
+           "The same question by VIKOR, which reads compromise differently.",
+         family = "decision", method = "vikor",
+         roles = list(performance_items = paste0("rate_", criteria),
+                      weights_item = "crit_points"),
+         options = list(criteria_types = rep("benefit", 4),
+                        sensitivity = TRUE, v = 0.5))
+  )
+)
+supply
+```
+
+```{r}
+#| label: build-check
+v <- tryCatch(validate_sframe(supply), error = function(e) e)
+list(problems = if (inherits(v, "error")) conditionMessage(v)
+     else v$problems %||% "none",
+     designs = length(supply$designs))
+```
+
+::: callout-tip
+## Every criterion is `benefit` here, and that is not laziness
+
+The performance matrix is collected on a 1 to 5 rating scale where higher is
+better, including for price: a respondent rating price `5` means the price is
+good, not that it is high. Declaring price as a `cost` criterion would invert
+a rating that is already the right way round. Cost criteria belong on raw
+measured values, as file `13` uses them.
+:::
+
+## 2. Both collection routes
+
+```{r}
+#| label: routes
+set.seed(15)
+rate_answers <- function(i) {
+  a <- function() as.character(sample(1:5, 1))
+  vals <- list()
+  for (crit in criteria)
+    for (k in seq_along(alternatives))
+      vals[[paste0("rate_", crit, "__", k)]] <- a()
+  w <- round(100 * prop.table(runif(4)))
+  vals$crit_points__service  <- w[1]
+  vals$crit_points__location <- w[2]
+  vals$crit_points__price    <- w[3]
+  vals$crit_points__delivery <- w[4]
+  vals
+}
+sf_both_routes(supply, rate_answers, n = 4)
+```
+
+```{r}
+#| label: routes-inputs
+sf_answer_template(supply)
+```
+
+-   [ ] Both routes report 5 data-collecting items and all 5 read back.
+-   [ ] The matrix items post positional inputs (`rate_service__1`) and
+    write labelled columns (`rate_service__Alpha`). That is the mismatch
+    worth knowing before writing any collection script.
+
+## 3. Dummy data with a deliberately close race
+
+```{r}
+#| label: data
+set.seed(1515)
+n <- 60
+# Alpha and Basilica are built to be close, so the ranking has something at
+# stake when the weights move. Coral is strong on price alone, which is what
+# makes it sensitive to the price weight in particular.
+true_perf <- rbind(
+  Alpha    = c(service = 4.3, location = 4.1, price = 3.2, delivery = 4.0),
+  Basilica = c(4.1, 4.2, 3.4, 4.1),
+  Coral    = c(3.4, 3.3, 4.7, 3.5),
+  Delta    = c(3.8, 3.6, 3.6, 3.7),
+  Equator  = c(3.2, 3.4, 3.3, 3.1)
+)
+
+sim <- sf_shiny_roundtrip(supply, function(i) {
+  vals <- list()
+  for (crit in criteria)
+    for (k in seq_along(alternatives)) {
+      v <- round(true_perf[k, crit] + rnorm(1, 0, 0.7))
+      vals[[paste0("rate_", crit, "__", k)]] <-
+        as.character(min(5, max(1, v)))
+    }
+  # Weights are collected, not assumed. Respondents differ, and the runner
+  # aggregates them.
+  w <- c(service = 30, location = 25, price = 25, delivery = 20) +
+    round(rnorm(4, 0, 5))
+  w <- round(100 * w / sum(w))
+  w[4] <- 100 - sum(w[1:3])
+  vals$crit_points__service  <- w[1]
+  vals$crit_points__location <- w[2]
+  vals$crit_points__price    <- w[3]
+  vals$crit_points__delivery <- w[4]
+  vals
+}, n = n)
+
+dat <- sim$read_back
+res <- run_analysis_plan(dat, supply)
+data.frame(respondents = nrow(dat), columns = ncol(dat))
+```
+
+```{r}
+#| label: data-matrix
+# The performance matrix the runner used, rebuilt. result$matrix_source is a
+# label such as "collected", not a matrix, so it has to be rebuilt rather
+# than read off the result.
+rm_out <- sframe_rated_matrix(dat, supply, paste0("rate_", criteria))
+perf <- rm_out$matrix
+dimnames(perf) <- list(rm_out$alternatives, rm_out$criteria)
+round(perf, 3)
+```
+
+```{r}
+#| label: data-weights
+w_out <- sframe_collected_weights(dat, supply, "crit_points")
+weights <- w_out$weights %||% w_out
+round(weights, 4)
+```
+
+::: callout-important
+## The criteria are named after the items, not after the criteria
+
+`sframe_rated_matrix()` names the matrix columns `rate_service`,
+`rate_location`, and so on, because a criterion in a rated performance matrix
+**is** an item. The collected weights come back named `service`,
+`location`, and so on, because those are the `comparison_items` of the
+`criteria_weight` question. The 2 vectors line up by position and not by
+name, and everything below is aligned positionally for that reason. Joining
+them by name gives an empty result and a table of `CHECK` verdicts.
+:::
+
+```{r}
+#| label: data-align
+crit_cols <- rm_out$criteria          # rate_service, rate_location, ...
+w_vec     <- unname(weights)          # aligned by position, not by name
+data.frame(position = seq_along(crit_cols),
+           matrix_column = crit_cols,
+           weight_name = names(weights),
+           weight = round(w_vec, 4), row.names = NULL)
+```
+
+## 4. RQ1: the ranking, and whether it survives the weights
+
+```{r}
+#| label: topsis
+r <- res[["RQ1"]]
+data.frame(alternative = r$alternatives, score = round(r$scores, 4),
+           rank = r$ranks, row.names = NULL)
+r$apa
+```
+
+```{r}
+#| label: topsis-hand
+# An independent TOPSIS, written out in full. Vector normalisation, weight,
+# distance to the ideal and anti-ideal, closeness coefficient. This is the
+# oracle for everything below, so it is checked against surveyframe's own
+# ranking before it is trusted.
+topsis_by_hand <- function(x, w, types) {
+  w <- w / sum(w)
+  norm <- sweep(x, 2, sqrt(colSums(x^2)), "/")
+  v <- sweep(norm, 2, w, "*")
+  best  <- ifelse(types == "benefit", apply(v, 2, max), apply(v, 2, min))
+  worst <- ifelse(types == "benefit", apply(v, 2, min), apply(v, 2, max))
+  dp <- sqrt(rowSums(sweep(v, 2, best,  "-")^2))
+  dm <- sqrt(rowSums(sweep(v, 2, worst, "-")^2))
+  dm / (dp + dm)
+}
+types <- rep("benefit", ncol(perf))
+hand_scores <- topsis_by_hand(perf, w_vec, types)
+hand_ranks  <- rank(-hand_scores, ties.method = "min")
+
+tab <- compare_table(
+  compare_row("largest gap across all 5 closeness scores",
+              max(abs(r$scores - hand_scores)), 0,
+              "TOPSIS written out by hand"),
+  compare_row("rankings agree exactly",
+              sum(r$ranks != hand_ranks), 0,
+              "TOPSIS written out by hand"),
+  compare_row("the leader is the same",
+              as.numeric(r$alternatives[which.min(r$ranks)] ==
+                           names(which.min(hand_ranks))), 1,
+              "TOPSIS written out by hand"),
+  compare_row("weights sum to 1 after normalisation",
+              sum(w_vec / sum(w_vec)), 1, "by definition")
+)
+compare_report(tab, caption = "The hand-written oracle agrees with the runner")
+sf_log(tab)
+```
+
+-   [ ] The oracle matches before it is used. Everything in section 5 rests
+    on it, so a `DIFFERS` here invalidates that section rather than this one.
+
+## 5. The sensitivity table, reproduced by hand
+
+```{r}
+#| label: sens-attached
+sa <- r$sensitivity
+sa
+```
+
+```{r}
+#| label: sens-hand
+# Reproducing the whole table. For each criterion and direction: multiply
+# that one weight by (1 +/- delta), renormalise the whole vector to sum to
+# 1, rerun the hand-written TOPSIS, and compare the new ranking to the base
+# one with a Spearman correlation.
+delta <- sa$delta
+base_ranks <- rank(-hand_scores, ties.method = "min")
+
+hand_rows <- do.call(rbind, lapply(seq_along(crit_cols), function(j) {
+  do.call(rbind, lapply(c(1, -1), function(sgn) {
+    w2 <- w_vec / sum(w_vec)
+    w2[j] <- w2[j] * (1 + sgn * delta)
+    w2 <- w2 / sum(w2)
+    s2 <- topsis_by_hand(perf, w2, types)
+    rr <- rank(-s2, ties.method = "min")
+    data.frame(
+      criterion = crit_cols[j],
+      direction = if (sgn > 0) "up" else "down",
+      weight    = w2[j],
+      rho       = suppressWarnings(cor(base_ranks, rr, method = "spearman")),
+      rank_changed = any(rr != base_ranks),
+      top_changed  = which.min(rr) != which.min(base_ranks),
+      row.names = NULL, stringsAsFactors = FALSE
+    )
+  }))
+}))
+hand_rows
+```
+
+```{r}
+#| label: sens-cmp
+st <- sa$table
+key <- function(tb) paste(tb$criterion, tb$direction)
+ord <- match(key(st), key(hand_rows))
+hr  <- hand_rows[ord, ]
+
+tab <- compare_table(
+  compare_row("rows in the table", nrow(st), 2 * length(crit_cols),
+              "one up and one down per criterion"),
+  # The weight column is rounded to 4 decimal places for display, so the
+  # tolerance here is half of the last reported digit and no more. Every
+  # other row in this block runs at the 1e-6 default.
+  compare_row("largest gap across all perturbed weights",
+              max(abs(st$weight - hr$weight)), 0,
+              "hand-perturbed and renormalised", tol = 5e-5),
+  compare_row("largest gap across all Spearman correlations",
+              max(abs(st$rho - hr$rho)), 0, "base R cor(method = spearman)"),
+  compare_row("rank_changed flags agree",
+              sum(st$rank_changed != hr$rank_changed), 0,
+              "hand-recomputed rankings"),
+  compare_row("top_changed flags agree",
+              sum(st$top_changed != hr$top_changed), 0,
+              "hand-recomputed rankings"),
+  compare_row("the stable flag agrees with the table",
+              as.numeric(sa$stable), as.numeric(!any(hr$rank_changed)),
+              "hand-recomputed rankings"),
+  compare_row("perturbations that changed the ranking",
+              sa$n_changed, sum(hr$rank_changed), "hand-recomputed"),
+  compare_row("perturbations that changed the leader",
+              sa$n_top_changed, sum(hr$top_changed), "hand-recomputed")
+)
+compare_report(tab, caption = "The whole sensitivity table, reproduced")
+sf_log(tab)
+```
+
+```{r}
+#| label: sens-arith
+# The perturbation arithmetic, spelled out for one row so it can be checked
+# without reading any code. Weight times 1.05, then the whole vector
+# renormalised so it still sums to 1.
+j  <- 1
+wn <- w_vec / sum(w_vec)
+expected_up <- (wn[j] * (1 + delta)) /
+  (sum(wn) - wn[j] + wn[j] * (1 + delta))
+row_up <- st[st$criterion == crit_cols[j] & st$direction == "up", ]
+
+tab <- compare_table(
+  compare_row(sprintf("%s weight, base", crit_cols[j]), wn[j],
+              w_vec[j] / sum(w_vec), "collected and normalised"),
+  # Same rounding as above: the table reports 4 decimal places.
+  compare_row(sprintf("%s weight, perturbed up", crit_cols[j]),
+              row_up$weight, expected_up,
+              "hand-computed renormalisation", tol = 5e-5),
+  compare_row("the table rounds the weight column to 4 places",
+              row_up$weight, round(expected_up, 4),
+              "which is what the tolerance above allows for"),
+  compare_row("delta is the declared default", delta, 0.05,
+              "sensitivity_analysis() default")
+)
+compare_report(tab, caption = "The perturbation arithmetic, one row")
+sf_log(tab)
+```
+
+```{r}
+#| label: sens-plot
+op <- par(mar = c(4, 10, 3, 1))
+cols <- ifelse(st$rank_changed, "#b2182b", "#1b7837")
+barplot(rev(st$rho), horiz = TRUE, las = 1, border = NA, col = rev(cols),
+        names.arg = rev(paste(st$criterion, st$direction)),
+        xlim = c(min(0, min(st$rho)), 1), xlab = "Spearman rho vs the base ranking",
+        main = sprintf("RQ1: weight sensitivity at %.0f%%", delta * 100),
+        cex.names = 0.85)
+abline(v = 1, lty = 2)
+par(op)
+```
+
+-   [ ] Every bar reaches 1 where the ranking held. A bar short of 1 is a
+    perturbation that moved something.
+-   [ ] The printed conclusion sentence agrees with the bars. Read it: it is
+    what a reviewer will be told.
+
+::: callout-note
+## This ranking is not stable, and that is the honest result
+
+Four of the 8 perturbations reorder the alternatives. The **leader does not
+change** in any of them, so the headline finding survives, but the ordering
+below it does not. That distinction is exactly what `top_changed` and
+`rank_changed` are 2 separate columns for. Reporting "Alpha ranked first and
+the ranking is robust" would be wrong here. Reporting "Alpha ranked first
+under every 5 percent perturbation tested" would be right.
+:::
+
+## 6. A stable ranking, so the other verdict is exercised
+
+A check that only ever returns one answer has not been checked. The same
+machinery is run here on a matrix with a clear winner, where nothing a 5
+percent nudge can do will change anything.
+
+```{r}
+#| label: stable
+# Dominant on every criterion, so no reweighting can dislodge it.
+clear <- rbind(
+  Alpha = c(5.0, 4.9, 4.8),
+  Beta  = c(3.0, 3.1, 2.9),
+  Gamma = c(1.5, 1.4, 1.6)
+)
+colnames(clear) <- c("service", "location", "delivery")
+
+sa_clear <- sensitivity_analysis(
+  clear, weights = c(0.5, 0.3, 0.2),
+  criteria_types = rep("benefit", 3), method = "topsis", delta = 0.05,
+  alternatives = rownames(clear), criteria = colnames(clear))
+sa_clear
+```
+
+```{r}
+#| label: stable-cmp
+types3 <- rep("benefit", 3)
+base3  <- rank(-topsis_by_hand(clear, c(0.5, 0.3, 0.2), types3),
+               ties.method = "min")
+hc <- unlist(lapply(1:3, function(j) vapply(c(1, -1), function(sgn) {
+  w2 <- c(0.5, 0.3, 0.2)
+  w2[j] <- w2[j] * (1 + sgn * 0.05); w2 <- w2 / sum(w2)
+  any(rank(-topsis_by_hand(clear, w2, types3), ties.method = "min") != base3)
+}, logical(1))))
+
+tab <- compare_table(
+  compare_row("this ranking IS stable", as.numeric(sa_clear$stable), 1,
+              "a dominant alternative"),
+  compare_row("no perturbation changed the ranking",
+              sa_clear$n_changed, sum(hc), "hand-recomputed rankings"),
+  compare_row("and it is not flagged degenerate",
+              as.numeric(isTRUE(sa_clear$degenerate)), 0,
+              "the 3 alternatives do rank differently"),
+  # The pair that matters: section 5 returned FALSE on real data and this
+  # returns TRUE, so the flag is reading the data rather than a constant.
+  compare_row("the collected decision in section 5 was not stable",
+              as.numeric(sa$stable), 0, "the same function, different data")
+)
+compare_report(tab, caption = "The stable verdict, exercised")
+sf_log(tab)
+```
+
+-   [ ] `stable` reads `TRUE` here and `FALSE` in section 5. Both answers
+    come out of the same function on the same day, which is what makes
+    either of them worth reading.
+
+## 7. The degenerate case, which is defect B11's fix
+
+B11 found ELECTRE reporting an empty outranking relation as "all 9
+alternatives jointly best", and `sensitivity_analysis()` then calling that
+result stable. That was the strongest robustness signal the function can
+produce, generated by the weakest input it can take.
+
+```{r}
+#| label: degenerate
+flat <- matrix(rep(1, 12), nrow = 4,
+               dimnames = list(paste0("Option", 1:4),
+                               c("a", "b", "c")))
+sa_flat <- sensitivity_analysis(
+  flat, weights = rep(1/3, 3), criteria_types = rep("benefit", 3),
+  method = "electre")
+sa_flat
+```
+
+```{r}
+#| label: degenerate-cmp
+tab <- compare_table(
+  compare_row("every alternative got the same rank",
+              length(unique(sa_flat$base_ranks)), 1,
+              "an identical performance matrix"),
+  compare_row("and it is flagged degenerate",
+              as.numeric(isTRUE(sa_flat$degenerate)), 1,
+              "the B11 fix"),
+  compare_row("no perturbation changed anything, vacuously",
+              sa_flat$n_changed, 0, "there was nothing to change"),
+  # The mutation check: a matrix that DOES discriminate must not be flagged,
+  # or the flag is simply always on and the row above means nothing.
+  compare_row("a discriminating matrix is not flagged",
+              as.numeric(isTRUE(sensitivity_analysis(
+                clear, weights = c(0.5, 0.3, 0.2),
+                criteria_types = rep("benefit", 3),
+                method = "electre")$degenerate)), 0,
+              "the flag is not always on")
+)
+compare_report(tab, caption = "The degenerate guard, both directions")
+sf_log(tab)
+```
+
+-   [ ] Read the printed paragraph. It says there is no result to test, and
+    it says why. Before the fix this printed "Stable".
+-   [ ] **Worth an owner decision.** `$stable` still reads `TRUE` in the
+    degenerate case, and it is `$degenerate` that carries the warning. A
+    human reading the printed output is told plainly. Anyone reading
+    `sa$stable` in a script is not. Decide whether that is the contract you
+    want before signing off.
+
+## 8. RQ2: the same check under VIKOR
+
+```{r}
+#| label: vikor
+r2 <- res[["RQ2"]]
+data.frame(alternative = r2$alternatives, score = round(r2$scores, 4),
+           rank = r2$ranks, row.names = NULL)
+r2$sensitivity
+```
+
+```{r}
+#| label: vikor-cmp
+sv <- r2$sensitivity
+
+tab <- compare_table(
+  compare_row("sensitivity attached to the VIKOR block too",
+              as.numeric(!is.null(sv)), 1,
+              "options = list(sensitivity = TRUE)"),
+  compare_row("it tested the same 8 perturbations",
+              nrow(sv$table), 2 * length(crit_cols),
+              "4 criteria, up and down"),
+  compare_row("it names VIKOR, not TOPSIS", as.numeric(sv$method == "vikor"),
+              1, "the method it was attached to"),
+  compare_row("the base ranks are VIKOR's, not TOPSIS's",
+              sum(unname(sv$base_ranks) != unname(r2$ranks)), 0,
+              "the block's own ranking"),
+  compare_row("and they are NOT the TOPSIS ranks",
+              as.numeric(any(unname(sv$base_ranks) != unname(r$ranks))), 1,
+              "the 2 methods rank differently here")
+)
+compare_report(tab, caption = "Sensitivity travels with its method")
+sf_log(tab)
+```
+
+::: callout-note
+## Why the last 2 rows matter
+
+The perturbation reruns the ranking, so it has to rerun **the same** ranking
+under **the same** tuning. VIKOR's `v` parameter and WASPAS's `lambda` both
+change the answer, and a sensitivity run that dropped them would be testing a
+different model from the one it reports on. The runner passes them through
+deliberately.
+:::
+
+```{r}
+#| label: vikor-agree
+# The 2 methods side by side. This is not a compare_row block, because
+# TOPSIS and VIKOR are entitled to disagree: TOPSIS ranks by distance to an
+# ideal point, VIKOR by a compromise between group utility and individual
+# regret. A DIFFERS verdict would say "stop and investigate" about a
+# difference that is the whole reason both are offered.
+data.frame(
+  alternative = r$alternatives,
+  topsis_rank = r$ranks,
+  vikor_rank  = r2$ranks,
+  row.names = NULL
+)
+c(rank_correlation = cor(r$ranks, r2$ranks, method = "spearman"),
+  topsis_leader = which.min(r$ranks), vikor_leader = which.min(r2$ranks))
+```
+
+-   [ ] **Read this table rather than ticking it.** The 2 methods name
+    different leaders on the same data, and neither is wrong. That is a
+    finding about this decision, not about the package: the top 2
+    alternatives were built to be close, section 5 showed the ranking is
+    sensitive to the weights, and this is what that looks like from a second
+    method. A decision this close should be reported as close.
+-   [ ] A rank correlation near zero, rather than the moderate figure here,
+    would be a different matter and worth investigating.
+
+## 9. The conjoint design
+
+```{r}
+#| label: conjoint
+design <- supply$designs[[1]]
+design$id
+design$method
+design$seed
+design$profiles
+```
+
+```{r}
+#| label: conjoint-tasks
+design$tasks
+```
+
+```{r}
+#| label: conjoint-cmp
+att <- design$attributes
+full_size <- prod(vapply(att, length, integer(1)))
+
+tab <- compare_table(
+  compare_row("full factorial size", design$balance$n_full_factorial,
+              full_size, "3 times 3 times 2"),
+  compare_row("profiles kept", nrow(design$profiles), 9,
+              "n_profiles = 9 was declared"),
+  compare_row("one column per attribute plus an id",
+              ncol(design$profiles), length(att) + 1,
+              "3 attributes declared"),
+  compare_row("profile ids are unique",
+              length(unique(design$profiles$profile_id)),
+              nrow(design$profiles), "by construction"),
+  compare_row("every profile is a real combination of declared levels",
+              sum(vapply(names(att), function(a)
+                all(design$profiles[[a]] %in% att[[a]]), logical(1))),
+              length(att), "one check per attribute"),
+  compare_row("no duplicated profile",
+              sum(duplicated(design$profiles[, names(att)])), 0,
+              "base R duplicated()")
+)
+compare_report(tab, caption = "The generated profile set")
+sf_log(tab)
+```
+
+```{r}
+#| label: conjoint-tasks-cmp
+tk <- design$tasks
+per_task <- table(paste(tk$block, tk$task))
+
+tab <- compare_table(
+  compare_row("alternatives per task", max(per_task), 3,
+              "n_alternatives = 3 was declared"),
+  compare_row("every task is full", min(per_task), 3,
+              "no short task"),
+  compare_row("blocks", length(unique(tk$block)), 1,
+              "blocks = 1 was declared"),
+  compare_row("tasks fill the profile set",
+              nrow(tk), nrow(design$profiles),
+              "9 profiles across 3 tasks of 3"),
+  compare_row("no profile appears twice in one task",
+              sum(vapply(split(tk$profile_id, paste(tk$block, tk$task)),
+                         function(p) anyDuplicated(p) > 0, logical(1))), 0,
+              "a respondent must not choose between 2 identical options"),
+  compare_row("every task profile is in the profile set",
+              sum(!tk$profile_id %in% design$profiles$profile_id), 0,
+              "the schedule references the design")
+)
+compare_report(tab, caption = "The task schedule")
+sf_log(tab)
+```
+
+-   [ ] No task shows the same profile twice. That is the failure that would
+    make a choice task unanswerable, and it is the one worth checking by eye
+    in the printed table as well.
+
+```{r}
+#| label: conjoint-balance
+design$balance$level_counts
+design$balance$imbalance
+```
+
+```{r}
+#| label: conjoint-balance-cmp
+lc <- design$balance$level_counts
+# Counted against the DECLARED levels, which is the whole point of the next
+# 3 rows. Counting against the observed ones cannot see a level that is
+# absent, and that is exactly what has gone wrong here.
+observed <- function(a) as.integer(table(factor(design$profiles[[a]],
+                                                levels = att[[a]])))
+reported_levels <- function(a) names(unlist(lc[[a]]))
+
+tab <- compare_table(
+  compare_row("counts sum to the profile count, price",
+              sum(observed("price")), nrow(design$profiles),
+              "base R sum(table())"),
+  compare_row("counts sum to the profile count, response",
+              sum(observed("response")), nrow(design$profiles),
+              "base R sum(table())"),
+  compare_row("every profile uses declared levels only",
+              sum(vapply(names(att), function(a)
+                all(design$profiles[[a]] %in% att[[a]]), logical(1))),
+              length(att), "one check per attribute")
+)
+compare_report(tab, caption = "The profile set against its declaration")
+sf_log(tab)
+```
+
+```{r}
+#| label: conjoint-unseen
+# The declared levels against the levels that actually appear.
+data.frame(
+  attribute = rep(names(att), lengths(att)),
+  level     = unlist(att, use.names = FALSE),
+  profiles  = unlist(lapply(names(att), observed)),
+  row.names = NULL
+)
+data.frame(
+  attribute = names(att),
+  declared_levels = lengths(att),
+  levels_reported_in_balance = vapply(names(att),
+                                      function(a) length(reported_levels(a)),
+                                      integer(1)),
+  levels_nobody_sees = vapply(names(att),
+                              function(a) sum(observed(a) == 0), integer(1)),
+  row.names = NULL
+)
+```
+
+::: callout-important
+## Sixth finding, logged in `dogfeed.todo.md`
+
+At least one declared level appears in **no profile**. No respondent ever
+sees it, so its effect cannot be estimated, and part of the declared
+experiment is silently inestimable. The reported `imbalance` looks like a
+good score, and `$balance$level_counts` does not list the missing level at
+all rather than listing it as `0`, so inspecting the design does not reveal
+it.
+
+The cause is that `sframe_conjoint_imbalance()` counts with `table()` on the
+observed column, so a level with zero profiles contributes nothing to the
+penalty. Dropping a level makes the surviving counts more even, so the search
+that exists to find balance is rewarded for throwing a level away. Measured
+over 60 seeds at this size, `"balanced"` produced a design with an unseen
+level 41 times and `"random"` never did.
+
+Needs an owner decision. The next chunk measures it rather than asserting it.
+:::
+
+```{r}
+#| label: conjoint-unseen-measure
+# 30 seeds per method, same attributes and same size. This is the evidence
+# behind the finding, run live rather than quoted.
+has_unseen <- function(d) any(vapply(names(att), function(a)
+  any(table(factor(d$profiles[[a]], levels = att[[a]])) == 0), logical(1)))
+sweep_method <- function(m) mean(vapply(1:30, function(s)
+  has_unseen(sf_conjoint_design("s", attributes = att, method = m,
+                                n_profiles = 9, n_alternatives = 3,
+                                seed = s)), logical(1)))
+rates <- c(balanced = sweep_method("balanced"), random = sweep_method("random"))
+round(rates, 3)
+```
+
+```{r}
+#| label: conjoint-unseen-cmp
+# These rows record the defect as it stands. They are written so they read
+# `match` while it is present, and would flip to DIFFERS once it is fixed,
+# which is the signal to rewrite this section.
+tab <- compare_table(
+  compare_row("balanced drops a level on most seeds",
+              as.numeric(rates[["balanced"]] > 0.5), 1,
+              "DEFECT, 30 seeds"),
+  compare_row("random never does",
+              rates[["random"]], 0, "30 seeds"),
+  compare_row("so balanced is worse than random at its own job",
+              as.numeric(rates[["balanced"]] > rates[["random"]]), 1,
+              "DEFECT, the comparison that matters"),
+  compare_row("and the balance report omits the missing level",
+              sum(vapply(names(att), function(a)
+                length(reported_levels(a)) < length(att[[a]]), logical(1))),
+              sum(vapply(names(att), function(a)
+                any(observed(a) == 0), logical(1))),
+              "level_counts is built from the same table() call")
+)
+compare_report(tab, caption = "Measuring the balanced-design defect")
+sf_log(tab)
+```
+
+-   [ ] Every row reads `match`, which here means **the defect is present as
+    described**, not that the feature works. If any row flips to `DIFFERS`
+    the defect has been fixed and this section should be rewritten.
+-   [ ] A design with an unseen level should not be shipped to respondents.
+    Until this is fixed, `method = "random"` is the safer choice at this
+    size, and `profiles` lets a design generated elsewhere be declared here
+    instead.
+
+::: callout-note
+## `balanced` is a search, not a construction
+
+The help file says so plainly, and the finding above is not a contradiction
+of it. `"balanced"` samples repeatedly and keeps the most even subset it
+found. It is not a catalogued orthogonal fractional factorial and does not
+carry those guarantees. The defect is not that the search is approximate. It
+is that the objective it searches against cannot see a missing level, so the
+search is pulled towards designs that drop one.
+:::
+
+```{r}
+#| label: conjoint-reproducible
+# The design is reproducible by construction, which is the claim that makes
+# it a declaration rather than a script somebody ran once.
+again <- sf_conjoint_design(
+  "pack_choice", label = "Service package choice experiment",
+  attributes = design$attributes, method = "balanced", n_profiles = 9,
+  n_alternatives = 3, blocks = 1, seed = design$seed)
+different_seed <- sf_conjoint_design(
+  "pack_choice", attributes = design$attributes, method = "balanced",
+  n_profiles = 9, n_alternatives = 3, blocks = 1, seed = design$seed + 1L)
+
+tab <- compare_table(
+  compare_row("same seed reproduces the profiles exactly",
+              as.numeric(identical(again$profiles, design$profiles)), 1,
+              "regenerated from the stored declaration"),
+  compare_row("and the task schedule too",
+              as.numeric(identical(again$tasks, design$tasks)), 1,
+              "regenerated from the stored declaration"),
+  compare_row("the seed was recorded rather than left implicit",
+              as.numeric(is.numeric(design$seed) && length(design$seed) == 1),
+              1, "sf_conjoint_design() stores it"),
+  # The mutation check: a different seed must give a different design, or
+  # the seed is not doing anything and the first 2 rows are vacuous.
+  compare_row("a different seed gives a different design",
+              as.numeric(!identical(different_seed$profiles,
+                                    design$profiles)), 1,
+              "the seed is load-bearing")
+)
+compare_report(tab, caption = "Reproducibility of the declared design")
+sf_log(tab)
+```
+
+-   [ ] The last row is the one that makes the first 2 mean something. Two
+    identical designs prove nothing if the seed is ignored.
+
+```{r}
+#| label: conjoint-methods
+# The 3 generation methods side by side on the same attributes.
+mk <- function(m, np) sf_conjoint_design(
+  "cmp", attributes = design$attributes, method = m, n_profiles = np,
+  n_alternatives = 3, blocks = 1, seed = 99)
+d_full <- mk("full", NULL)
+d_rand <- mk("random", 9)
+d_bal  <- mk("balanced", 9)
+
+data.frame(
+  method     = c("full", "random", "balanced"),
+  profiles   = c(nrow(d_full$profiles), nrow(d_rand$profiles),
+                 nrow(d_bal$profiles)),
+  imbalance  = c(d_full$balance$imbalance, d_rand$balance$imbalance,
+                 d_bal$balance$imbalance),
+  row.names = NULL
+)
+```
+
+```{r}
+#| label: conjoint-methods-cmp
+tab <- compare_table(
+  compare_row("full enumerates every combination",
+              nrow(d_full$profiles), full_size, "3 times 3 times 2"),
+  compare_row("full factorial is perfectly balanced",
+              d_full$balance$imbalance, 0, "by construction"),
+  compare_row("random keeps the number asked for",
+              nrow(d_rand$profiles), 9, "n_profiles = 9"),
+  compare_row("balanced keeps the number asked for",
+              nrow(d_bal$profiles), 9, "n_profiles = 9"),
+  compare_row("balanced scores better than random on the metric",
+              as.numeric(d_bal$balance$imbalance <=
+                           d_rand$balance$imbalance), 1,
+              "the search does optimise what it measures")
+)
+compare_report(tab, caption = "The 3 generation methods")
+sf_log(tab)
+```
+
+-   [ ] `balanced` scores better than `random` on the imbalance metric. It
+    optimises what it measures. The finding above is that what it measures
+    is missing a term, so a better score can mean a worse design.
+-   [ ] `full` is the only one of the 3 that cannot drop a level, because it
+    keeps every combination.
+
+```{r}
+#| label: conjoint-plot
+op <- par(mfrow = c(1, 3), mar = c(4, 4, 3, 1))
+for (a in names(att)) {
+  barplot(table(factor(design$profiles[[a]], levels = att[[a]])),
+          col = "#9ecae1", border = NA, ylab = "Profiles", main = a,
+          las = 2, cex.names = 0.8)
+  abline(h = nrow(design$profiles) / length(att[[a]]), lty = 2,
+         col = "#b2182b")
+}
+par(op)
+```
+
+-   [ ] Each attribute's bars sit near its dashed line, which is the even
+    spread. A bar far from it is a level respondents will rarely see.
+
+## 10. What the design does not do
+
+```{r}
+#| label: not-an-estimator
+# sf_conjoint_design() is a generator. There is no choice-model estimator in
+# surveyframe, and no analysis-plan method takes a conjoint design as a role.
+plan_methods <- c("topsis", "vikor", "conjoint", "choice_model")
+data.frame(
+  method = plan_methods,
+  available = vapply(plan_methods, function(m) {
+    out <- sframe_run_one_block(
+      list(id = "X", research_question = "Q", family = "decision",
+           method = m, roles = list()), dat, supply)
+    is.null(out$error) || !grepl("unavailable", out$error)
+  }, logical(1)),
+  row.names = NULL
+)
+```
+
+-   [ ] `conjoint` and `choice_model` are **not** analysis-plan methods, and
+    the message says the test is unavailable rather than returning
+    something. Fitting the choice model is the user's job, in `mlogit`,
+    `apollo`, or similar, and the design object gives them the profile set
+    and the task schedule to do it with.
+
+## Verdict for this file
+
+```{r}
+#| label: verdict
+sf_verdict()
+```
+
+-   [ ] `0 DIFFERS, 0 CHECK`.
+-   [ ] The whole sensitivity table was reproduced by hand, including the
+    renormalisation arithmetic, and both verdicts, stable and unstable, were
+    exercised.
+-   [ ] The degenerate guard fires on a flat matrix and does not fire on a
+    discriminating one.
+-   [ ] The conjoint design regenerates identically from its stored seed,
+    and a different seed changes it.
