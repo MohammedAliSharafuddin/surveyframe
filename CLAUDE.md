@@ -21,7 +21,7 @@ pre-declared plan rather than a post-hoc search. This is the package's main
 differentiator and the thesis of the JSS paper.
 
 Current version: **0.3.4, live on CRAN, published 2026-07-24** (submitted
-2026-07-25 local time, `main` at 6556f91). Verified on the CRAN package
+2026-07-25 local time, tagged `v0.3.4`). Verified on the CRAN package
 page and the check-results page on 2026-07-30: all 13 flavours Status OK,
 no notes, no warnings. `main` is pushed to both `origin` and `public` and
 matches the public repository exactly. The pkgdown site shows 0.3.4 and
@@ -129,8 +129,12 @@ the complete edition of the ASRDA textbook.
 
 There is one local working tree with two GitHub remotes.
 
-- `origin` points to the public **surveyframe** repository.
-- `private` points to the private **surveyframe-dev** repository.
+- `origin` points to the private **surveyframe-dev** repository.
+- `public` points to the public **surveyframe** repository.
+
+**Corrected 2026-08-04.** This section previously said the reverse, that
+`origin` was public and a remote called `private` existed. Neither is true.
+Check with `git remote -v` before pushing rather than trusting prose.
 
 Two branches keep the public repository clean while the private repository keeps
 the planning files.
@@ -152,15 +156,19 @@ Dev-only files (tracked on `dev` only):
   `todo_0.6.md` through `todo_1.0.md`, `todo_rstudio_addin.md`
 - `mas_review_032.md` through `mas_review_034.md` and their `.qmd`/`.html`
   renders, `kimi_review_034.md`, `qwen_review_034.md`
+- `mas_review_040.qmd` (deferred, superseded by `review_040/`)
+- `review_040/` (the 0.4.0 review suite: 20 `.qmd` files, `_setup.R`, and
+  `HANDOVER.md`). Its rendered `.html`, `.pdf`, `.csv`, and `.sframe`
+  artefacts are gitignored on `dev` too, since the HTML alone runs to 15 MB
 - `data-raw/` (holds `inline_static_template.R`, which regenerates the
   builder's inlined copy of the static survey template)
 
-**2 hygiene gaps, open as of 2026-07-30.** `main`'s `.gitignore` names only
-the original 6 files, so the newer planning files are not gitignored there.
-`.Rbuildignore` still names `todo_0.4.1.md` (renamed to `todo_0.5.1.md` on
-2026-07-25) and omits `kimi_review_034.md` and `qwen_review_034.md`. Close
-both before the next tarball is built from a branch that carries these
-files.
+**Both hygiene gaps are closed as of 2026-08-03.** `.Rbuildignore` now names
+`todo_0.5.1.md`, `kimi_review_034.md`, `qwen_review_034.md`, `review_040/`,
+and `mas_review_040.qmd`. `main`'s `.gitignore` was extended twice, on
+2026-08-02 for the newer planning files and on 2026-08-03 for the review
+suite. That second one matters: `.Rbuildignore` protects the CRAN tarball but
+has no effect on pkgdown, which reads straight off the working tree.
 
 Routine work happens on `main`. When the planning files change, switch to `dev`,
 merge `main`, update the files, and push `dev` to `private`. To resume planning
@@ -217,17 +225,22 @@ Run from the repository root.
 
 ```r
 devtools::document()          # regenerate man/ and NAMESPACE
-devtools::test()              # run the test suite (721 passing at the 0.3.4
-                              # release; v0.5-dev adds the decision and
-                              # small-sample files on top, all green)
+devtools::test()              # run the test suite (721 at the 0.3.4 release,
+                              # 1506 on main once 0.4.0 merged)
 devtools::load_all()          # load for interactive work
 rmarkdown::render("vignettes/surveyframe.Rmd", output_dir = tempdir())
 ```
 
 ```bash
-R CMD build .                                   # build the source tarball
-R CMD check --as-cran surveyframe_0.3.4.tar.gz  # full CRAN check
+R CMD build .                                        # build the source tarball
+R CMD check --as-cran surveyframe_0.3.4.9000.tar.gz  # full CRAN check
 ```
+
+**A green `devtools::test()` is not a green check.** Merging 0.4.0 to `main`
+put it through `R CMD check --as-cran` for the first time and found an
+undeclared `jmv` dependency and temp-directory detritus, neither of which
+`devtools::test()` can see. Run the real check before believing a release is
+ready.
 
 A clean CRAN check is 0 errors, 0 warnings, and at most 1 NOTE (incoming
 feasibility). The vignette builds offline because the data-collection step uses
@@ -237,13 +250,20 @@ feasibility). The vignette builds offline because the data-collection step uses
 
 ## Current status and immediate next steps
 
-Status verified against the code, the branches, and CRAN on 2026-07-30.
+Status verified against the code, the branches, CI, and CRAN on 2026-08-04.
+
+**Read this first.** 0.4.0's engineering is complete and now sits on `main`,
+installable from GitHub. The review suite is complete and found 8 defects
+needing owner decisions. Git history was rewritten on 2026-08-04, so any
+clone older than that is stale. The 2 CRAN blockers are unchanged: the MCDM
+preprint DOI (D6) and the owner verifying the RStudio add-in (H2). Jump to
+"0.4.0 is on `main`", "The review suite", and "Git history was rewritten".
 
 ### Shipped
 
 **0.3.4 is live on CRAN (published 2026-07-24), all 13 check flavours OK,
-no notes.** Nothing about that release is outstanding. `main` at 6556f91 is
-pushed to `origin` and `public`, the pkgdown site shows 0.3.4 with no
+no notes.** Nothing about that release is outstanding. The release commit is
+tagged `v0.3.4` on both remotes, the pkgdown site shows 0.3.4 with no
 dev-only files, and `mas_review_034` is signed off with every
 human-judgement item explicitly moved to `dogfeed.todo.md` for the
 field-validation round, which was labelled 0.3.5 at the time and is now
@@ -402,6 +422,131 @@ method and role names, an invented function argument, `as.data.frame()`
 silently mangling column names), so a surprising failure is worth attributing
 before it is reported.
 
+### 0.4.0 is on `main` and installable from GitHub (2026-08-04)
+
+`v0.5-dev` and `feature/rstudio-addin` merged into `main` on 2026-08-03, and
+`main` is pushed to both remotes. The whole 0.4.0 engineering plus the
+RStudio add-in is therefore installable for testing:
+
+```r
+remotes::install_github("MohammedAliSharafuddin/surveyframe")
+# add build_vignettes = TRUE for the 3 vignettes, which install_github skips
+```
+
+Verified from a clean library on the public repo, not just locally:
+`sensitivity_analysis()` and `sf_conjoint_design()` present, the add-in's
+`inst/rstudio/addins.dcf` present, the MCDM fixture present, and a live
+TOPSIS run returning Equator. `DESCRIPTION` reads **`0.3.4.9000`**, a
+development marker so a GitHub build is distinguishable from CRAN 0.3.4.
+Task E1 still sets `0.4.0` at release time.
+
+**Merging to `main` put 0.4.0 through `R CMD check --as-cran` for the first
+time and found 3 packaging problems that `devtools::test()` cannot see.** A
+green local suite alongside a red check is the lesson to carry.
+
+1. **WARNING, now fixed.** `test-repeated-anova-strata.R` used
+   `jmv::anovaRM()` as the A3 oracle while `jmv` was in no DESCRIPTION field.
+   `skip_if_not_installed()` does not help, because the check flags the `::`
+   reference itself. `jmv` joined Suggests.
+2. **NOTE, partly fixed.** `pagedown::chrome_print()` leaves Chrome's scratch
+   directories in `tempdir()`. `sframe_clean_chrome_detritus()` in
+   `R/reporting.R` sweeps them, fixed in `render_report()` rather than in the
+   test so real users benefit. macOS now reports `Status: OK`. **Ubuntu still
+   reports the NOTE**, most likely because Chrome exits asynchronously and
+   the directories appear after the `on.exit()` sweep has run. It does not
+   affect the CRAN submission, because both `chrome_print()` callers carry
+   `skip_on_cran()` and CI only runs them because `r-lib/actions` sets
+   `NOT_CRAN: true`. Note it in `cran-comments.md` rather than chasing it.
+3. **Not fixed, and it will bite.** 36 `geom_errorbarh()` deprecation
+   warnings from ggplot2 4.0.0 at `R/plots.R:1644` and `:1757`. Not a check
+   failure yet. The fix is `geom_errorbar(orientation = "y")` with `height`
+   becoming `width`.
+
+`_pkgdown.yml` also had to gain a Decision analysis section: pkgdown refuses
+to build when a documented topic is missing from the reference index, and
+0.4.0 added 10 that were never indexed, so the site build had been failing
+since the merge.
+
+### The review suite, and the 8 defects it found (2026-08-04)
+
+**`review_040/` replaces `mas_review_040.qmd`**, which was 120 chunks in 1
+file and suited neither a reviewer working in sittings nor a first-time
+user. It is deferred rather than deleted. Twenty files, each a complete
+workflow that stands alone: questionnaire, pre-declared plan, static HTML
+route, Shiny route, dummy data, and every reported number compared against
+base R and a reference package. **566 checked numbers**, all reading `match`,
+across 16 automated files. Files `18`, `19`, and `20` need a keyboard.
+`review_040/HANDOVER.md` carries the file template, the verified result
+field names for every method, and 16 reference-call traps.
+
+**Eight defects, all logged in `dogfeed.todo.md`, none caught by any test
+suite.** Four of the last 5 have the shape B11 and B13 had: software
+returning something plausible instead of saying it has no answer.
+
+| # | Finding | Lane |
+|---|---|---|
+| 1 | `item_report()` ignores `reverse = TRUE` while `score_scales()` and `reliability_report()` honour it | 0.4.0 |
+| 2 | Correlation roles: `variables` works for Kendall, fails for Pearson and Spearman | 0.4.0 |
+| 3 | `assumption_report()` reports checks that never ran | 0.4.1 |
+| 4 | Display-only items get a Shiny response column, and it counts as missing | 0.4.0 |
+| 5 | `sem_lavaan_syntax()` writes an indirect effect lavaan cannot parse | 0.4.0 |
+| 6 | Conjoint `"balanced"` is rewarded for dropping a level | 0.4.0 |
+| 7 | `render_results(citation_format = )` is validated then ignored | 0.4.0 |
+| 8 | `codebook_report()` omits the item help text | 0.4.1 |
+
+**5 and 6 are the ones to take first.** 5 is a hard error in the single case
+a `cb_sem` model is most often declared for. 6 cannot be repaired after
+collection, since a fielded design with an unseen level is partly
+inestimable, and `"balanced"` is measurably worse than `"random"` at
+avoiding it. **1 changes numbers the package has already printed for users**,
+which is why it needs a decision rather than a quiet fix.
+
+**Two ways the suite was wrong about itself, both producing a confident
+`match` that meant nothing.** A field that does not exist compares equal to
+itself: file `13`'s hash gate read `hotel$integrity$hash` twice, and there is
+no `$integrity` element on an `sframe`, so it compared `NULL` to `NULL`. And
+a mismatched reference looks exactly like a defect: an apparent ninth
+finding about skewness was surveyframe reporting the b1 and b2 estimators,
+which is `psych`'s own default. **Every new claim needs a mutation check.
+Revert the thing being tested and confirm the test fails.** A check that
+cannot fail is not a check.
+
+### Git history was rewritten on 2026-08-04
+
+Every `Co-Authored-By` trailer is gone from every branch and from the
+`v0.3.3` tag, on both remotes. Verified by cloning the public repo fresh: 0
+trailers, and the only authors are the 2 `MohamedaliS` and
+`Mohammed Ali Sharafuddin` identities. GitHub's Contributors list no longer
+shows a second name.
+
+Consequences to know:
+
+- **Every SHA from `274217f` (2026-06-15) onward changed.** Any clone made
+  before 2026-08-04 is stale and needs
+  `git fetch origin && git reset --hard origin/<branch>`.
+- All 5 branches were realigned: `main`, `dev`, `v0.5-dev`, `v0.4-dev`, and
+  `feature/rstudio-addin`. Shared commits rewrote to identical SHAs across
+  the separate passes, so the branches did not fork.
+- **The `v0.3.3` tag had 2 different objects with the same name**, the public
+  one 2 commits behind the local one. The rewrite forced a choice and took
+  the newer local target, preserving its message and tagger date. Both
+  remotes now agree.
+
+Local backup tags `backup/main-pre-rewrite`, `backup/dev-pre-rewrite`, and
+`backup/dev-pre-rewrite2` hold the pre-rewrite tips and were deliberately
+not pushed. They are the only record of the pre-rewrite history, so they
+live on one machine and nowhere else.
+
+**`v0.3.4` was tagged retrospectively on 2026-08-05, on both remotes.** The
+CRAN release had no tag, only `v0.3.3` did, so the commit that shipped to
+CRAN was findable only by reading `main`'s history. The rewrite had also
+orphaned `6556f91`, the SHA this file recorded for it: that commit survives
+only inside the 3 backup tags. Its counterpart on the rewritten `main` is
+`19ada2c`, identified by an identical tree hash rather than by message or
+date, and that is what `v0.3.4` points at. Tag each release as it ships from
+now on, because a rewrite makes a recorded SHA worthless and a tag moves
+with the history.
+
 ### Hard blocker, and the one human gate
 
 **`inst/CITATION` needs the MCDM preprint DOI (task D6), and CRAN will not
@@ -411,7 +556,7 @@ Research and Decisions*, diamond OA.
 
 **H2 is the other gate and cannot be automated.** Verifying the RStudio
 add-in inside a real RStudio session needs the owner at a keyboard, the
-add-in ships in 0.4.0, and Part J of `mas_review_040.qmd` carries the click
+add-in ships in 0.4.0, and `review_040/19_rstudio_addin.qmd` carries the click
 path. Everything else outstanding in blocks D and E is mechanical release
 paperwork.
 
@@ -493,25 +638,32 @@ name before pushing.
 ### Resume release work (CRAN 0.4.0, local 0.5.0)
 
 ```
-Read CLAUDE.md's version-numbering section and todo_master_0.4.md. Blocks
-A, B, and C are closed as of 2026-08-02, plus the RStudio add-in on branch
-feature/rstudio-addin. Only 2 things stand between here and submission:
-D6's preprint DOI for inst/CITATION (no placeholder accepted) and H2, the
-owner verifying the add-in in RStudio. Blocks D and E are what remains.
-Work on branch v0.5-dev in the worktree ../surveyframe-v0.5-dev, and set
-DESCRIPTION to 0.4.0 only at release time (task E1). Re-verify every file
-and line anchor before editing, they drift.
+Read CLAUDE.md's version-numbering section and todo_master_0.4.md. The
+0.4.0 engineering is complete and merged into main as of 2026-08-03, so
+work on main rather than v0.5-dev, which is now an ancestor of it. Only 2
+things stand between here and submission: D6's preprint DOI for
+inst/CITATION (no placeholder accepted) and H2, the owner verifying the
+add-in in RStudio. Blocks D and E are what remains, plus decisions on the
+8 defects in dogfeed.todo.md.
+
+DESCRIPTION reads 0.3.4.9000, a development marker. Set it to 0.4.0 only
+at release time (task E1). Git history was rewritten on 2026-08-04, so
+fetch and hard-reset before doing anything if your clone predates that.
+Re-verify every file and line anchor before editing, they drift.
 ```
 
 ### Verify 0.4.0 before submitting (the human half)
 
 ```
-Read CLAUDE.md, then open mas_review_040.qmd in RStudio and work through it
-chunk by chunk. Part B is a correctness check rather than a feature check,
-because 0.4.0 changes numbers earlier versions reported. Part J is the
-RStudio add-in click path and is a release blocker, since H2 cannot be
-automated. Part L lists the open owner decisions. Log new feedback in
-dogfeed.todo.md rather than leaving it in the review file.
+Read CLAUDE.md, then work through review_040/ in RStudio, starting with
+00_start_here.qmd. Files 01 to 17 run without you and should report
+0 DIFFERS and 0 CHECK; if any file reports otherwise, that is the finding.
+Files 18, 19, and 20 need a keyboard, and 19 is the release blocker, since
+H2 cannot be automated. File 20 section 7 is where the decisions on the 8
+open defects get recorded. Log new feedback in dogfeed.todo.md rather than
+leaving it in a review file.
+
+mas_review_040.qmd is deferred, not current. Do not work from it.
 ```
 
 ### Run the field-validation work (absorbed into 0.4.0 and 0.4.1)
