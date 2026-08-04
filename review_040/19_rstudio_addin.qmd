@@ -1,0 +1,340 @@
+---
+title: "19. The RStudio add-in"
+subtitle: "Task H2. A release blocker, and it cannot be automated."
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    embed-resources: true
+editor: visual
+execute:
+  warning: false
+  message: false
+  error: true
+---
+
+```{r}
+#| label: setup
+#| include: false
+source("_setup.R")
+```
+
+::: callout-important
+## This file is a release blocker
+
+Task **H2** is the owner verifying the add-in inside a real RStudio session.
+It ships in 0.4.0. Nothing in this file, and nothing in the test suite, can
+stand in for that, because the add-in's whole surface is the RStudio Addins
+menu and the only way to know a menu entry works is to click it.
+
+Everything that **can** be checked from R is checked below. Then section 4 is
+the click path, and it needs you at a keyboard inside RStudio.
+:::
+
+## 1. Where the add-in lives, and how to get it
+
+The add-in is on its own branch. It is **not** on `v0.5-dev`, so the build
+loaded by the rest of this suite does not contain it.
+
+```{r}
+#| label: locate
+# Under devtools::load_all() the namespace path IS the package root, while
+# for an installed package it is the library subdirectory. Walking up until
+# a DESCRIPTION appears covers both.
+sf_root <- local({
+  p <- getNamespaceInfo("surveyframe", "path")
+  for (i in 1:3) {
+    if (file.exists(file.path(p, "DESCRIPTION"))) break
+    p <- dirname(p)
+  }
+  p
+})
+addin_files <- c(
+  bindings = file.path(sf_root, "inst", "rstudio", "addins.dcf"),
+  source   = file.path(sf_root, "R", "rstudio_addins.R"),
+  tests    = file.path(sf_root, "tests", "testthat",
+                       "test-rstudio-addins.R")
+)
+data.frame(
+  file = names(addin_files),
+  present_in_the_loaded_build = file.exists(addin_files),
+  row.names = NULL
+)
+```
+
+```{r}
+#| label: on-branch
+on_addin_branch  <- all(file.exists(addin_files))
+off_addin_branch <- !on_addin_branch
+on_addin_branch
+```
+
+::: callout-tip
+## If the row above reads `FALSE`, that is expected
+
+You are on `v0.5-dev`, which does not carry the add-in. To review it, work in
+a checkout of `feature/rstudio-addin`:
+
+``` bash
+cd ../surveyframe-v0.5-dev
+git worktree add ../surveyframe-addin feature/rstudio-addin
+```
+
+Then open `../surveyframe-addin` in RStudio and follow section 4 there.
+
+To make the automated rows in this file run, load that build **before**
+`_setup.R` does its own search, by running this in the console and then
+re-rendering:
+
+``` r
+devtools::load_all("../surveyframe-addin")
+```
+
+`_setup.R` only looks for a 0.4.0 build when one is not already loaded, so
+loading the add-in build first is enough. The checks below were written and
+verified against `feature/rstudio-addin` at commit `0194ffb`, where all of
+them pass.
+
+The branch is 1 commit ahead of `v0.5-dev` and 1 behind, so it needs a merge
+from `v0.5-dev` before it goes anywhere near a tarball. The commit it is
+missing is the `read.csv()` header explanation. **Merge first, then review**,
+or you will review a build that is not the one shipping.
+:::
+
+## 2. What the 4 bindings are
+
+```{r}
+#| label: bindings
+declared <- data.frame(
+  menu_entry = c("Open SurveyBuilder", "Open SurveyStudio",
+                 "Open Dashboard", "Insert sframe skeleton"),
+  binding = c("addin_launch_builder", "addin_launch_studio",
+              "addin_launch_dashboard", "addin_insert_skeleton"),
+  interactive = c(TRUE, TRUE, TRUE, FALSE),
+  row.names = NULL
+)
+declared
+```
+
+```{r}
+#| label: bindings-cmp
+#| eval: !expr on_addin_branch
+dcf <- read.dcf(addin_files[["bindings"]])
+tab <- compare_table(
+  compare_row("4 menu entries are declared", nrow(dcf), 4,
+              "inst/rstudio/addins.dcf"),
+  compare_row("every declared binding exists in the package",
+              sum(dcf[, "Binding"] %in% ls(asNamespace("surveyframe"),
+                                           all.names = TRUE)), 4,
+              "a binding with no function is a dead menu entry"),
+  compare_row("the bindings are the 4 agreed ones",
+              sum(sort(dcf[, "Binding"]) == sort(declared$binding)), 4,
+              "todo_rstudio_addin.md"),
+  compare_row("every entry has a description",
+              sum(nzchar(dcf[, "Description"])), 4,
+              "the menu shows it on hover")
+)
+compare_report(tab, caption = "The add-in bindings")
+sf_log(tab)
+```
+
+```{r}
+#| label: bindings-skipped
+#| eval: !expr off_addin_branch
+cat("Skipped. The loaded build does not carry the add-in.\n",
+    "Re-run this file from a checkout of feature/rstudio-addin.\n")
+```
+
+## 3. The 2 rules that hold this file apart
+
+The add-in source states 2 design rules. Both are checkable and both matter
+more than the menu entries do.
+
+```{r}
+#| label: rules
+#| eval: !expr on_addin_branch
+r_dir <- file.path(sf_root, "R")
+other_files <- setdiff(list.files(r_dir, pattern = "[.]R$", full.names = TRUE),
+                       addin_files[["source"]])
+leaks <- vapply(other_files, function(f)
+  any(grepl("rstudioapi::", readLines(f, warn = FALSE), fixed = TRUE)),
+  logical(1))
+addin_src <- readLines(addin_files[["source"]], warn = FALSE)
+
+tab <- compare_table(
+  compare_row("no other file in R/ calls rstudioapi",
+              sum(leaks), 0,
+              "surveyframe must behave identically outside RStudio"),
+  compare_row("rstudioapi is guarded before every use",
+              as.numeric(any(grepl("requireNamespace\\(\"rstudioapi\"",
+                                   addin_src))), 1,
+              "it is in Suggests, not Imports"),
+  compare_row("the bindings fail soft rather than erroring",
+              as.numeric(sum(grepl("invisible\\(NULL\\)", addin_src)) >= 4),
+              1, "one soft return per binding"),
+  compare_row("rstudioapi is in Suggests, not Imports",
+              as.numeric(grepl("rstudioapi",
+                               paste(readLines(file.path(sf_root,
+                                                         "DESCRIPTION"),
+                                               warn = FALSE),
+                                     collapse = "\n"))), 1,
+              "DESCRIPTION")
+)
+compare_report(tab, caption = "The add-in stays out of the package's way")
+sf_log(tab)
+```
+
+```{r}
+#| label: skeleton
+#| eval: !expr on_addin_branch
+# The inserted skeleton, parsed and evaluated. A skeleton that does not
+# build a valid instrument is worse than no skeleton, because the user's
+# first experience of the package is an error they did not write.
+skel <- surveyframe:::sframe_addin_skeleton()
+cat(skel)
+```
+
+```{r}
+#| label: skeleton-cmp
+#| eval: !expr on_addin_branch
+env <- new.env(parent = globalenv())
+parsed <- tryCatch({ eval(parse(text = skel), envir = env); TRUE },
+                   error = function(e) { message(conditionMessage(e)); FALSE })
+built <- env$instrument
+prob <- tryCatch(validate_sframe(built)$problems %||% list(),
+                 error = function(e) list(conditionMessage(e)))
+
+tab <- compare_table(
+  compare_row("the skeleton parses and runs", as.numeric(parsed), 1,
+              "eval(parse(text = skeleton))"),
+  compare_row("it builds an sframe",
+              as.numeric(inherits(built, "sframe")), 1, "class check"),
+  compare_row("which validates with no problems", length(prob), 0,
+              "validate_sframe()"),
+  compare_row("it declares an analysis plan, not just items",
+              length(built$analysis_plan), 1,
+              "the pre-declared plan is the package's point"),
+  compare_row("and the plan block runs on data",
+              as.numeric(is.null(run_analysis_plan(
+                read_responses(data.frame(q1 = sample(1:5, 40, TRUE),
+                                          q2 = sample(1:5, 40, TRUE)),
+                               built), built)[["RQ1"]]$error)), 1,
+              "a skeleton whose own plan errors is not a starting point")
+)
+compare_report(tab, caption = "The inserted skeleton")
+sf_log(tab)
+```
+
+::: callout-note
+## Why the skeleton is checked this hard
+
+The implementation guide's original skeleton was written against an API that
+no longer exists. It passed `id =` to `sf_instrument()`, named the component
+list `items =`, and handed `sf_item()` an inline `choices =` argument. Every
+one of those is wrong now. A skeleton is the first code a new user runs, and
+it arrives with the package's authority behind it.
+:::
+
+## 4. The click path, which is task H2
+
+Do this in **RStudio**, not in a terminal, not in VS Code, and not in this
+document.
+
+**Setup.**
+
+-   [ ] Open the `feature/rstudio-addin` checkout as an RStudio project.
+-   [ ] `devtools::load_all()`, or install the branch with
+    `devtools::install()`. Installing is the truer test, because the Addins
+    menu reads `inst/rstudio/addins.dcf` from the installed package.
+-   [ ] Confirm `rstudioapi` is installed. If it is not, install it, then
+    come back to the last check in this section and remove it again.
+
+**The menu.**
+
+-   [ ] Open **Addins** in the RStudio toolbar. A **surveyframe** section
+    appears.
+-   [ ] All 4 entries are listed, with the names in section 2.
+-   [ ] The descriptions read sensibly in the menu. They are the only
+    explanation a user gets.
+
+**Each entry.**
+
+-   [ ] **Open SurveyBuilder.** The builder opens in a browser. RStudio
+    stays responsive or shows the usual Shiny busy state, and does not hang
+    with no explanation.
+-   [ ] **Open SurveyStudio.** Studio opens. Stop it and confirm the R
+    console returns to a prompt.
+-   [ ] **Open Dashboard.** The dashboard opens. Stop it and confirm the
+    console returns.
+-   [ ] **Insert sframe skeleton.** Put the cursor in an empty R script and
+    run it. The skeleton appears **at the cursor**, correctly indented, and
+    does not overwrite anything.
+-   [ ] Select some existing text first, then run it again. Confirm the
+    behaviour is what you want, whether that is replacing the selection or
+    inserting beside it. Decide and log it either way.
+-   [ ] Run the inserted skeleton. It builds an instrument and
+    `validate_sframe()` passes, with no editing.
+
+**Failing soft.**
+
+-   [ ] Remove `rstudioapi` (`remove.packages("rstudioapi")`), restart R,
+    and run one of the add-ins. You get a **message** naming `rstudioapi`
+    and telling you how to install it, and **not** an error. Then reinstall
+    it.
+-   [ ] Run `library(surveyframe)` in a plain R console outside RStudio.
+    Nothing about the add-in loads, warns, or fails.
+
+**The one that is easy to skip.**
+
+-   [ ] Close every Shiny app and confirm no orphaned R process is left
+    running. Three launchers in one menu is 3 ways to leave a port open.
+
+## 5. What to record
+
+```{r}
+#| label: record
+data.frame(
+  check = c("Addins menu shows the surveyframe section",
+            "All 4 entries present and correctly described",
+            "SurveyBuilder launches and stops cleanly",
+            "SurveyStudio launches and stops cleanly",
+            "Dashboard launches and stops cleanly",
+            "Skeleton inserts at the cursor",
+            "Inserted skeleton runs and validates",
+            "Fails soft without rstudioapi",
+            "Nothing happens outside RStudio",
+            "No orphaned processes after closing"),
+  result = "",
+  row.names = NULL
+)
+```
+
+-   [ ] Fill the `result` column in by hand, or tick the boxes in section 4.
+    Either is fine. **An unrecorded H2 is an unverified H2**, and this is the
+    task standing between 0.4.0 and submission alongside the preprint DOI.
+-   [ ] Log anything that surprised you in `dogfeed.todo.md`, status `open`.
+    Do not fix it here.
+
+## 6. Before this branch merges
+
+-   [ ] `feature/rstudio-addin` has been merged **from** `v0.5-dev` so it
+    carries the whole release, not a snapshot of it.
+-   [ ] The full suite passes on the merged branch. It was 1486 on the
+    add-in branch and 1473 on `v0.5-dev` at the last count, so expect
+    roughly 1486 after the merge.
+-   [ ] The diff is still new files plus one `DESCRIPTION` line. Anything
+    else in it needs explaining.
+-   [ ] `R CMD check --as-cran` is clean on the merged branch, which file
+    `20` covers.
+
+## Verdict for this file
+
+```{r}
+#| label: verdict
+sf_verdict()
+```
+
+-   [ ] `0 DIFFERS, 0 CHECK` on the automated rows, or every row skipped
+    because the loaded build is `v0.5-dev`.
+-   [ ] **Section 4 has been done at a keyboard in RStudio.** That is H2.
+    Nothing above it discharges the task.

@@ -1,0 +1,476 @@
+---
+title: "18. The three graphical interfaces"
+subtitle: "SurveyBuilder, SurveyStudio, and the dashboard. Needs a keyboard."
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    embed-resources: true
+editor: visual
+execute:
+  warning: false
+  message: false
+  error: true
+---
+
+```{r}
+#| label: setup
+#| include: false
+source("_setup.R")
+```
+
+::: callout-important
+## This file cannot be finished by rendering it
+
+Everything below section 4 is a click path. The chunks check what can be
+checked from R: that the files ship, that the state functions round-trip, and
+that the decision item types reach both GUIs' internals. **None of that tells
+you whether the interfaces work.**
+
+Two rules from this release apply here and are worth reading before you
+start.
+
+1. **A browser reading of a Shiny widget is unreliable.** selectize.js
+   replaces the real `<select>` element, so a headless browser reads a
+   working dropdown as empty. That happened twice during 0.4.0 and cost 2
+   rounds of investigation. Establish a UI defect in R first, and let the
+   browser corroborate.
+2. **A UI claim needs a click-path run with the screenshot read back.** Not
+   an inspection of the code that draws it.
+:::
+
+## 1. What ships
+
+```{r}
+#| label: files
+gui_files <- c(
+  builder   = system.file("builder/survey_builder.html", package = "surveyframe"),
+  studio    = system.file("shiny/app.R", package = "surveyframe"),
+  dashboard = system.file("shiny/dashboard/app.R", package = "surveyframe")
+)
+data.frame(
+  gui = names(gui_files),
+  found = nzchar(gui_files),
+  kb = ifelse(nzchar(gui_files), round(file.size(gui_files) / 1024, 1), NA),
+  row.names = NULL
+)
+```
+
+```{r}
+#| label: files-cmp
+tab <- compare_table(
+  compare_row("all 3 interface files ship",
+              sum(nzchar(gui_files)), 3, "system.file()"),
+  compare_row("the builder is a single self-contained HTML file",
+              as.numeric(nzchar(gui_files[["builder"]]) &&
+                           !grepl('src="http', paste(
+                             readLines(gui_files[["builder"]], warn = FALSE),
+                             collapse = ""), fixed = TRUE)), 1,
+              "no external script tags"),
+  compare_row("the 6 launchers are exported",
+              sum(c("launch_builder", "launch_studio", "launch_dashboard",
+                    "launch_builder_demo", "launch_studio_demo",
+                    "launch_dashboard_demo") %in%
+                    getNamespaceExports("surveyframe")), 6,
+              "3 launchers and 3 demo launchers")
+)
+compare_report(tab, caption = "The 3 interfaces ship")
+sf_log(tab)
+```
+
+::: callout-note
+## Why the builder being self-contained matters
+
+The SurveyBuilder is one HTML file with no external requests. It runs from a
+file path, on a laptop with no network, inside an institution that blocks
+CDNs. That is a deliberate property and the check above is what protects it.
+:::
+
+## 2. The instrument used for the click paths
+
+```{r}
+#| label: build
+demo <- sf_instrument(
+  title = "GUI review instrument", version = "1.0.0",
+  components = list(
+    sf_choices("agree5", as.character(1:5),
+               c("Strongly disagree", "Disagree", "Neutral", "Agree",
+                 "Strongly agree")),
+    sf_choices("site", c("north", "south"), c("Northside", "Southside")),
+
+    sf_item("site", "Which site?", type = "single_choice",
+            choice_set = "site", required = TRUE),
+    sf_item("s1", "The service met my expectations.", type = "likert",
+            choice_set = "agree5", scale_id = "sat"),
+    sf_item("s2", "Staff were helpful.", type = "likert",
+            choice_set = "agree5", scale_id = "sat"),
+    sf_item("s3", "I would come back.", type = "likert",
+            choice_set = "agree5", scale_id = "sat"),
+    sf_item("wait", "Minutes waited", type = "numeric"),
+
+    # The 2 item types added in 0.4.0. Getting these into both GUIs was
+    # defect 3 from the independent validation round.
+    sf_item("crit_pairs", "Which criterion matters more?",
+            type = "pairwise_comparison",
+            comparison_items = c("Cost", "Speed", "Quality"),
+            comparison_scale = "saaty"),
+    sf_item("crit_points", "Split 100 points across the criteria",
+            type = "criteria_weight",
+            comparison_items = c("Cost", "Speed", "Quality")),
+    sf_item("rate_cost", "Rate each supplier on cost", type = "matrix",
+            choice_set = "agree5",
+            matrix_items = c("Alpha", "Basilica", "Coral")),
+
+    sf_scale("sat", "Satisfaction", items = c("s1", "s2", "s3"))
+  ),
+  analysis_plan = list(
+    list(id = "RQ1", research_question = "How satisfied are people?",
+         family = "descriptive", method = "scale_descriptives",
+         roles = list(variables = "sat")),
+    list(id = "RQ2", research_question = "Which criterion weighs most?",
+         family = "decision", method = "ahp",
+         roles = list(pairwise = "crit_pairs"))
+  )
+)
+inst_path <- file.path(tempdir(), "gui_review.sframe")
+write_sframe(demo, inst_path, overwrite = TRUE)
+inst_path
+```
+
+```{r}
+#| label: build-data
+set.seed(18)
+sim <- sf_shiny_roundtrip(demo, function(i) {
+  a <- function() as.character(sample(1:5, 1))
+  w <- round(100 * prop.table(runif(3))); w[3] <- 100 - sum(w[1:2])
+  list(site = sample(c("north", "south"), 1),
+       s1 = a(), s2 = a(), s3 = a(), wait = sample(5:60, 1),
+       crit_pairs__Cost__vs__Speed = sample(1:9, 1),
+       crit_pairs__Cost__vs__Quality = sample(1:9, 1),
+       crit_pairs__Speed__vs__Quality = sample(1:9, 1),
+       crit_points__Cost = w[1], crit_points__Speed = w[2],
+       crit_points__Quality = w[3],
+       rate_cost__1 = a(), rate_cost__2 = a(), rate_cost__3 = a())
+}, n = 60)
+resp_path <- file.path(tempdir(), "gui_review_responses.csv")
+write.csv(sim$collected, resp_path, row.names = FALSE)
+c(instrument = inst_path, responses = resp_path, rows = nrow(sim$collected))
+```
+
+::: callout-tip
+## Keep these 2 paths open
+
+Every click path below loads one or both. Copy them somewhere you can paste
+from, because you will type them into 3 different file pickers.
+:::
+
+## 3. What can be checked without a browser
+
+```{r}
+#| label: builder-state
+# The builder's own state functions, round-tripped. The GUI is a thin layer
+# over these, so a failure here is a failure in the GUI whatever the screen
+# shows.
+empty <- sframe_builder_empty_state()
+state <- sframe_builder_state_from_instrument(demo)
+
+tab <- compare_table(
+  compare_row("an empty state is produced",
+              as.numeric(is.list(empty)), 1,
+              "sframe_builder_empty_state()"),
+  compare_row("every item reaches the builder state",
+              length(state$items), length(demo$items), "9 declared"),
+  compare_row("every choice set reaches it",
+              length(state$choices), length(demo$choices), "2 declared"),
+  compare_row("the scale reaches it",
+              length(state$scales), length(demo$scales), "1 declared"),
+  compare_row("the analysis plan reaches it",
+              length(state$analysis_plan), length(demo$analysis_plan),
+              "2 blocks declared")
+)
+compare_report(tab, caption = "Instrument to builder state")
+sf_log(tab)
+```
+
+```{r}
+#| label: builder-validate
+# The draft validator the builder calls on every edit.
+ok <- sframe_builder_validate_draft(
+  meta = demo$meta, choices = demo$choices, items = demo$items,
+  scales = demo$scales, branching = demo$branching, checks = demo$checks,
+  analysis_plan = demo$analysis_plan, models = demo$models,
+  render = demo$render)
+
+# A draft that should NOT validate: an item pointing at a choice set that
+# was never declared.
+broken_items <- demo$items
+broken_items[[1]]$choice_set <- "nosuchset"
+bad <- sframe_builder_validate_draft(
+  meta = demo$meta, choices = demo$choices, items = broken_items,
+  scales = demo$scales)
+
+str(ok, max.level = 1)
+```
+
+```{r}
+#| label: builder-validate-cmp
+n_problems <- function(x) length(x$problems %||% x$errors %||% list())
+
+tab <- compare_table(
+  compare_row("a good draft validates clean", n_problems(ok), 0,
+              "the instrument built above"),
+  # The mutation check. A validator that accepts everything is worse than
+  # none, because it tells the user their draft is fine.
+  compare_row("a draft with an undeclared choice set does not",
+              as.numeric(n_problems(bad) > 0), 1,
+              "choice_set = 'nosuchset'")
+)
+compare_report(tab, caption = "The builder's draft validator")
+sf_log(tab)
+bad$problems %||% bad$errors
+```
+
+```{r}
+#| label: studio-levels
+# Defect 3 and defect 6 both landed here. studio_level_meta() had no branch
+# for the 2 decision item types, so SurveyStudio showed empty MCDM
+# dropdowns, and the pairwise level had to be split into Saaty and influence
+# so an AHP block could not be pointed at a DEMATEL item.
+studio_src <- paste(readLines(system.file("shiny/app.R",
+                                          package = "surveyframe"),
+                              warn = FALSE), collapse = "\n")
+has <- function(x) as.numeric(grepl(x, studio_src, fixed = TRUE))
+
+tab <- compare_table(
+  compare_row("SurveyStudio knows the pairwise item type",
+              has("pairwise_comparison"), 1, "inst/shiny/app.R"),
+  compare_row("and the criteria-weight item type",
+              has("criteria_weight"), 1, "inst/shiny/app.R"),
+  compare_row("the Saaty and influence levels are separate",
+              has("pairwise_saaty") * has("pairwise_influence"), 1,
+              "the defect 6 guard"),
+  compare_row("studio_level_meta() has a branch for them",
+              as.numeric(grepl(
+                "studio_level_meta[\\s\\S]{0,4000}pairwise_comparison",
+                studio_src, perl = TRUE)), 1,
+              "inst/shiny/app.R")
+)
+compare_report(tab, caption = "The decision item types reached SurveyStudio")
+sf_log(tab)
+```
+
+```{r}
+#| label: builder-types
+builder_src <- paste(readLines(gui_files[["builder"]], warn = FALSE),
+                     collapse = "\n")
+bhas <- function(x) as.numeric(grepl(x, builder_src, fixed = TRUE))
+
+tab <- compare_table(
+  compare_row("the builder knows the pairwise item type",
+              bhas("pairwise_comparison"), 1, "survey_builder.html"),
+  compare_row("and the criteria-weight item type",
+              bhas("criteria_weight"), 1, "survey_builder.html"),
+  compare_row("the scale split reached the builder too",
+              bhas("pairwise_saaty") * bhas("pairwise_influence"), 1,
+              "the defect 6 guard"),
+  compare_row("the inspector can edit comparison_items",
+              bhas("comparison_items"), 1, "survey_builder.html"),
+  compare_row("and comparison_scale",
+              bhas("comparison_scale"), 1, "survey_builder.html"),
+  # The renderer keeps an "Unsupported item type" fallback, and should: it
+  # is the last branch, for a type the builder has genuinely never heard of.
+  # The fix was giving the 2 decision types their own branches BEFORE it, so
+  # the check is that those branches exist, not that the fallback is gone.
+  compare_row("the inlined template has a pairwise renderer",
+              bhas("t==='pairwise_comparison'") * bhas("renderPairwise"), 1,
+              "the inline-template fix"),
+  compare_row("and a criteria-weight renderer",
+              bhas("t==='criteria_weight'") * bhas("renderCriteria"), 1,
+              "the inline-template fix"),
+  compare_row("the unsupported-type fallback is still there for real gaps",
+              bhas("Unsupported item type"), 1,
+              "the last branch, and it should stay"),
+  compare_row("all 10 MCDM methods are offered",
+              sum(vapply(c("topsis", "ahp", "anp", "dematel", "vikor",
+                           "moora", "smart", "waspas", "promethee",
+                           "electre"), bhas, numeric(1)) > 0), 10,
+              "the JS method registry")
+)
+compare_report(tab, caption = "The decision item types reached the builder")
+sf_log(tab)
+```
+
+-   [ ] Every row reads `match`. **These are greps, and a grep is not a
+    click.** They rule out the crudest failure, a type the GUI has never
+    heard of, and nothing more. Sections 4 to 6 are the actual review.
+
+## 4. SurveyBuilder click path
+
+```{r}
+#| label: launch-builder
+#| eval: false
+launch_builder()
+```
+
+Run the chunk above by hand. It opens one HTML file in your browser.
+
+**Build from nothing.**
+
+-   [ ] Add a question. The Add-question menu opens and **the whole menu is
+    visible without scrolling**, including the Decision group at the bottom.
+    That group was clipped out of view before commit 266f2a1.
+-   [ ] Add one of each: a Likert item, a single choice, a matrix, a
+    pairwise comparison, and a criteria weight.
+-   [ ] For the pairwise item, the inspector offers **comparison items** and
+    **comparison scale**. Set 3 items and choose the Saaty scale.
+-   [ ] For the criteria-weight item, set the same 3 items.
+-   [ ] Open the **Preview** tab. Every question draws a real widget with a
+    body, not an empty box. The empty preview body was fixed in 9fdeb0e and
+    is the obvious thing to regress.
+-   [ ] On the criteria-weight question in Preview, enter points that do
+    **not** total 100 and try to advance. It refuses, and says why.
+-   [ ] Export the survey. It downloads an HTML file, and opening it shows a
+    real widget for the pairwise and criteria-weight questions rather than
+    the grey "Unsupported item type" line. That fallback still exists and
+    should, for a type the builder has genuinely never heard of. Seeing it on
+    a decision item is the regression.
+-   [ ] Open the exported file and answer every question. It submits.
+
+**Round-trip an existing instrument.**
+
+-   [ ] Import `gui_review.sframe`, the path printed in section 2.
+-   [ ] All 9 questions arrive, with their choice sets, the scale, and both
+    analysis-plan blocks.
+-   [ ] Open the analysis-plan editor and look at RQ2, the AHP block. Its
+    **pairwise** role dropdown offers `crit_pairs` and is **not empty**.
+    That dropdown being empty was defect 3.
+-   [ ] Add a DEMATEL block. Its influence role must **not** offer
+    `crit_pairs`, because that item is on the Saaty scale. Confirm the 2
+    scales are not interchangeable in the dropdowns.
+-   [ ] Export back to `.sframe` and reimport. Nothing is lost.
+
+::: callout-important
+## The one to look hardest at
+
+An AHP block pointed at a DEMATEL influence item returns plausible weights
+from meaningless input, with no error anywhere. Defect 6. The guard is on 4
+surfaces and the builder is one of them. If the dropdown offers you the wrong
+item type, stop and log it.
+:::
+
+## 5. SurveyStudio click path
+
+```{r}
+#| label: launch-studio
+#| eval: false
+launch_studio(instrument = inst_path, responses = resp_path,
+              meta_cols = c("started_at", "submitted_at"))
+```
+
+```{r}
+#| label: launch-studio-demo
+#| eval: false
+# Or with the bundled demo, if you would rather start from something known.
+launch_studio_demo()
+```
+
+**Build screen.**
+
+-   [ ] The instrument loads and all 9 items are listed.
+-   [ ] Select the pairwise item. The inspector shows its comparison items
+    and its scale, and both are editable.
+-   [ ] The analysis-plan editor's role dropdowns are **populated** for both
+    blocks. Empty MCDM dropdowns were defect 3 and 6.
+
+**Preview screen.**
+
+-   [ ] Every one of the 9 items renders a working widget, including the
+    pairwise grid and the constant-sum question.
+-   [ ] **Check the dropdowns by clicking them, not by looking.** A
+    selectize dropdown that looks empty may be populated, and one that looks
+    populated may be stale. This is the single most misleading surface in
+    the package.
+
+**Data screen.**
+
+-   [ ] The 60 responses load and the column count matches the instrument's
+    contract.
+-   [ ] The expansion columns are present, one per pair, per criterion, and
+    per matrix row.
+
+**Quality screen.**
+
+-   [ ] The quality report renders and its respondent count is 60.
+-   [ ] Note the missing-data figure. Nobody skipped anything, so anything
+    above 0 is worth reading against the fourth finding in
+    `dogfeed.todo.md`.
+
+**Analysis screen.**
+
+-   [ ] Both plan blocks run. RQ2 returns AHP weights and a consistency
+    ratio.
+-   [ ] The consistency ratio is reported, not hidden. Random pairwise
+    judgements should produce a poor one, and it should say so.
+
+**Dashboard screen.**
+
+-   [ ] It renders inside Studio and the plots are legible.
+
+## 6. The standalone dashboard
+
+```{r}
+#| label: launch-dashboard
+#| eval: false
+launch_dashboard(instrument = inst_path, responses = resp_path)
+```
+
+-   [ ] It launches and shows the same figures as the Studio dashboard
+    screen.
+-   [ ] The plots are legible and the labels are not clipped.
+
+::: callout-note
+## An open decision, not a defect
+
+Whether to keep or deprecate the standalone dashboard is one of the open
+owner decisions carried into this release. It duplicates a screen inside
+SurveyStudio. Use this section to form a view: if it gives you nothing
+Studio does not, that is the answer.
+:::
+
+## 7. Accessibility
+
+0.3.4 ran 2 WCAG 2.2 AA passes and 0.4.0 added the MCDM vignette, which is
+axe-core clean. The 2 new item types are new interactive surfaces and were
+not part of those passes.
+
+-   [ ] **Keyboard only.** Unplug the mouse. Tab through the exported survey
+    and reach every control, including every cell of the pairwise grid and
+    the constant-sum inputs. Nothing is reachable only by clicking.
+-   [ ] The focus outline is visible on every control, including inside the
+    matrix.
+-   [ ] The constant-sum error message is announced, not only coloured. A
+    red border alone fails.
+-   [ ] Zoom to 200 percent. The pairwise grid reflows rather than
+    overflowing horizontally.
+-   [ ] On a narrow window, the matrix reflows to the mobile `<select>`
+    layout and stays usable.
+
+## 8. What to do with what you find
+
+-   [ ] Log every observation in `dogfeed.todo.md`, one item per entry,
+    status `open`. Do not fix anything while reviewing.
+-   [ ] For any UI defect, establish it in R first if you can, then attach
+    the screenshot. A browser observation on its own has been wrong twice in
+    this release.
+
+## Verdict for this file
+
+```{r}
+#| label: verdict
+sf_verdict()
+```
+
+-   [ ] `0 DIFFERS, 0 CHECK` on the automated rows.
+-   [ ] **Every checkbox in sections 4 to 7 has been ticked by hand.** The
+    verdict line above says nothing about the interfaces. If you have not
+    opened all 3, this file is not complete.

@@ -106,55 +106,103 @@ comparison was.
 
 ## Order to work through
 
-**Written and passing.** Each renders with 0 errors and every comparison
+The suite is complete. Every file renders with 0 errors and every comparison
 reads `match`.
+
+**Run in any order, but `01` first if you are new to the package.**
 
 | File | Covers | Comparisons |
 |------------------|--------------------------------------|--------|
 | `01_first_workflow` | The whole package in one sitting | 17 |
+| `02_field_types` | Every item type, one demo each | 64 |
+| `03_descriptives` | Frequencies, descriptives, missingness, quality, outliers | 60 |
 | `04_categorical` | Chi-square, Fisher, McNemar, Cochran Q | 23 |
 | `05_two_group` | t, Mann-Whitney, paired t, Wilcoxon | 28 |
 | `06_multi_group` | ANOVA, Kruskal, two-way, ANCOVA, repeated, Friedman | 30 |
 | `07_correlation` | Pearson, Spearman, Kendall, partial | 16 |
 | `08_regression` | Linear, logistic, ordinal, multinomial, Firth | 32 |
 | `09_psychometrics` | Alpha, omega, item diagnostics, EFA, validity | 23 |
+| `10_model_syntax` | CFA, CB-SEM, PLS-SEM, and the model-type guard | 50 |
+| `11_mediation_moderation` | Indirect effects and interactions | 38 |
 | `12_small_sample` | The whole small-sample track | 19 |
-| `13_mcdm` | All 10 MCDM methods | 15 |
+| `13_mcdm` | All 10 MCDM methods | 17 |
+| `15_sensitivity_conjoint` | Weight sensitivity and conjoint designs | 57 |
+| `16_collection_routes` | Static, Shiny, Sheets, branching, the hash | 46 |
+| `17_reporting` | Reports, codebook, PDF, interpretations | 46 |
 
-That is 203 checked numbers across 43 of the 50 analysis methods.
+That is 566 checked numbers.
 
-**Still to write.** The pattern is settled, so these are mechanical rather
-than exploratory.
+**These 3 need you at a keyboard.** They carry a handful of automated rows
+and a great many checkboxes, and the checkboxes are the point.
 
-| File | Covers | Needs a keyboard? |
+| File | Covers | What it needs |
 |------------------|--------------------------------------|------------------|
-| `02` | Every item type, one demo each | no |
-| `03` | Descriptives, frequencies, quality, missingness | no |
-| `10` | Model syntax: CFA, CB-SEM, PLS-SEM | no |
-| `11` | Mediation and moderation | no |
-| `15` | Sensitivity analysis and conjoint designs | no |
-| `16` | Collection routes and branching | no |
-| `17` | Reporting and the codebook | no |
-| `18` | The 3 GUIs | **yes** |
-| `19` | The RStudio add-in | **yes, release blocker** |
-| `20` | Release safety and owner decisions | partly |
+| `18_guis` | SurveyBuilder, SurveyStudio, the dashboard | a browser |
+| `19_rstudio_addin` | The add-in, task **H2** | RStudio, **release blocker** |
+| `20_release_safety` | Pre-flight, `R CMD check`, owner decisions | a terminal |
 
-## What this suite has already found
+::: callout-note
+## There is no file `14`
 
-Three defects, all logged in `dogfeed.todo.md`, none of which any test suite
-had caught.
+The numbering leaves room for a second decision-analysis file that was not
+needed once `13` and `15` between them covered the ground.
+:::
 
-1. **`item_report()` ignores `reverse = TRUE`** while `score_scales()` and
-   `reliability_report()` honour it. A reverse-keyed item reports a strongly
-   negative item-rest correlation on a scale whose alpha reads 0.84, and it
-   depresses every other item in the scale as well. Needs an owner decision
-   for 0.4.0. See file `09`, section 5.
-2. **`roles = list(variables = ...)`** works for `correlation_kendall`,
-   fails with `Test failed.` for Pearson and Spearman, and leaks
-   `undefined columns selected` for partial correlation, while 9 other
-   methods accept it. See file `07`.
-3. **`assumption_report()` prints "Assumption checks were computed."** when
-   no check ran. Laned to 0.4.1. See file `05`, section 8.
+## What this suite has found
+
+Eight defects, all logged in `dogfeed.todo.md`, none of which any test suite
+had caught. None is fixed here: that is the dogfeed protocol, and file `20`
+section 7 is where the decisions get recorded.
+
+| # | Finding | Lane | File |
+|---|--------------------------------------------------|-------|------|
+| 1 | `item_report()` ignores `reverse = TRUE` | 0.4.0 | `09` |
+| 2 | Correlation roles: `variables` works for Kendall only | 0.4.0 | `07` |
+| 3 | `assumption_report()` reports checks that never ran | 0.4.1 | `05` |
+| 4 | Display-only items get a Shiny column, and it counts as missing | 0.4.0 | `02`, `16` |
+| 5 | `sem_lavaan_syntax()` writes an indirect effect lavaan cannot parse | 0.4.0 | `10` |
+| 6 | Conjoint `"balanced"` is rewarded for dropping a level | 0.4.0 | `15` |
+| 7 | `render_results(citation_format = )` is validated then ignored | 0.4.0 | `17` |
+| 8 | `codebook_report()` omits the item help text | 0.4.1 | `17` |
+
+The 3 worth reading first:
+
+-   **5** is a hard error. A `cb_sem` model with an indirect effect and
+    unlabelled paths generates syntax lavaan refuses to parse, which is the
+    single case a structural model is most often declared for.
+-   **6** cannot be repaired after collection. A fielded conjoint design with
+    a level nobody ever sees is partly inestimable, and `"balanced"` is worse
+    than `"random"` at avoiding it.
+-   **1** changes numbers the package has already printed for users, which is
+    why it needs a decision rather than a fix.
+
+Findings 1 to 3 came from the first sitting. Findings 4 to 8 came from the
+second, and 4 of those 5 have the same shape as B11 and B13 before them:
+**software returning something plausible instead of saying it has no
+answer**. Where a result looks clean, ask whether it is clean or merely
+quiet.
+
+## Two ways this suite has been wrong about itself
+
+Both are worth knowing, because both produced a confident `match` that meant
+nothing.
+
+1. **A field that does not exist compares equal to itself.** File `13`'s
+   hash gate read `hotel$integrity$hash` twice. There is no `$integrity`
+   element on an `sframe`, so it compared `NULL` to `NULL`, which is
+   `identical()` and therefore a pass, whatever the package did. The hash
+   lives in the `.sframe` file's JSON and `read_sframe()` verifies it on the
+   way in. Both `13` and `16` now read the stored value and carry a mutation
+   check.
+2. **A mismatched reference looks exactly like a defect.** surveyframe
+   reports the b1 and b2 shape estimators, which is `psych`'s default and
+   `e1071`'s type 3. Comparing against `psych::skew(type = 1)`, the obvious
+   choice, gives a gap of exactly `((n-1)/n)^1.5` that reads as a bug and is
+   not one.
+
+The rule both point at: **every new claim needs a mutation check.** Revert
+the thing being tested and confirm the test fails. A check that cannot fail
+is not a check.
 
 ## Environment this ran on
 
@@ -164,7 +212,19 @@ data.frame(
   item = c("R", "platform", "surveyframe loaded from",
            "0.4.0 feature present"),
   value = c(R.version.string, R.version$platform,
-            dirname(dirname(getNamespaceInfo("surveyframe", "path"))),
+            local({
+              # Under devtools::load_all() the namespace path IS the package
+              # root; for an installed package it is the library
+              # subdirectory. Walk up until a DESCRIPTION appears, because
+              # dirname(dirname()) covers only the second case and lands 2
+              # levels too high on a loaded source tree.
+              p <- getNamespaceInfo("surveyframe", "path")
+              for (i in 1:3) {
+                if (file.exists(file.path(p, "DESCRIPTION"))) break
+                p <- dirname(p)
+              }
+              p
+            }),
             as.character(sf_is_040())),
   stringsAsFactors = FALSE
 )
@@ -173,7 +233,7 @@ data.frame(
 ```{r}
 #| label: refs
 pk <- c("jmv", "psych", "DescTools", "MASS", "nnet", "logistf", "naniar",
-        "lavaan", "seminr", "RMCDA", "car")
+        "lavaan", "seminr", "RMCDA", "car", "e1071")
 data.frame(
   package = pk,
   version = vapply(pk, function(p)

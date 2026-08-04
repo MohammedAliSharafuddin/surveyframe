@@ -1,0 +1,503 @@
+---
+title: "20. Release safety and the open decisions"
+subtitle: "The pre-flight checks, R CMD check, and everything still waiting on the owner"
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    embed-resources: true
+editor: visual
+execute:
+  warning: false
+  message: false
+  error: true
+---
+
+```{r}
+#| label: setup
+#| include: false
+source("_setup.R")
+```
+
+The last file. Nothing here is about whether surveyframe computes the right
+numbers, which is what the 18 files before it are for. This is about whether
+the tarball is fit to send.
+
+Sections 1 to 5 run automatically and are cheap. Section 6 is the long check
+and has to be run by hand. Section 7 is the list of decisions only the owner
+can take, and it is the reason this file exists.
+
+```{r}
+#| label: paths
+# Under devtools::load_all() the namespace path IS the package root, while
+# for an installed package it is the library subdirectory. Walking up until
+# a DESCRIPTION appears covers both, where dirname(dirname()) covers only
+# the second and silently lands 2 levels too high on a loaded source tree.
+sf_pkg_root <- function() {
+  p <- getNamespaceInfo("surveyframe", "path")
+  for (i in 1:3) {
+    if (file.exists(file.path(p, "DESCRIPTION"))) return(p)
+    p <- dirname(p)
+  }
+  stop("Could not locate the package root from ",
+       getNamespaceInfo("surveyframe", "path"), call. = FALSE)
+}
+pkg_root <- sf_pkg_root()
+desc <- read.dcf(file.path(pkg_root, "DESCRIPTION"))
+c(root = pkg_root, version = desc[1, "Version"])
+```
+
+## 1. The version number
+
+::: callout-important
+## The local branch label and the CRAN version differ on purpose
+
+The branch is `v0.5-dev` and the release is CRAN **0.4.0**. That is an owner
+decision from 2026-07-30 and nothing should be renamed to match. There is no
+0.3.5 and no 0.5.x on CRAN.
+
+`DESCRIPTION` is bumped to `0.4.0` **at release time only**, which is task
+E1. Until then it reads `0.3.4`, and that is correct rather than an
+oversight.
+:::
+
+```{r}
+#| label: version
+version <- desc[1, "Version"]
+tab <- compare_table(
+  compare_row("DESCRIPTION carries a version at all",
+              as.numeric(nzchar(version)), 1, "DESCRIPTION"),
+  compare_row("it is either the pre-bump 0.3.4 or the release 0.4.0",
+              as.numeric(version %in% c("0.3.4", "0.4.0")), 1,
+              "task E1 bumps it"),
+  compare_row("a 0.4.0 feature is present whatever the version says",
+              as.numeric(sf_is_040()), 1,
+              "sensitivity_analysis() is new in this release")
+)
+compare_report(tab, caption = "The version number")
+sf_log(tab)
+```
+
+-   [ ] If the version reads `0.3.4`, **E1 has not been done yet** and the
+    tarball must not be built. If it reads `0.4.0`, E1 is done and the rest
+    of this file is the pre-flight.
+
+## 2. The hard blocker: `inst/CITATION`
+
+```{r}
+#| label: citation
+cit_path <- file.path(pkg_root, "inst", "CITATION")
+cit <- if (file.exists(cit_path))
+  paste(readLines(cit_path, warn = FALSE), collapse = "\n") else ""
+placeholder <- grepl("TBD|TODO|XXX|PLACEHOLDER|10\\.XXXX|FIXME", cit,
+                     ignore.case = TRUE)
+has_doi <- grepl("doi", cit, ignore.case = TRUE)
+c(exists = file.exists(cit_path), has_doi_field = has_doi,
+  has_placeholder = placeholder)
+```
+
+```{r}
+#| label: citation-cmp
+tab <- compare_table(
+  compare_row("inst/CITATION exists",
+              as.numeric(file.exists(cit_path)), 1, "the file"),
+  compare_row("it parses as R", as.numeric(!inherits(tryCatch(
+    parse(text = cit), error = function(e) e), "error")), 1,
+    "CRAN evaluates it"),
+  compare_row("it carries no placeholder text",
+              as.numeric(placeholder), 0, "CRAN will not accept one"),
+  compare_row("the package self-citation is present",
+              as.numeric(grepl("surveyframe", cit, fixed = TRUE)), 1,
+              "the Manual bibentry")
+)
+compare_report(tab, caption = "The citation file")
+sf_log(tab)
+```
+
+::: callout-important
+## D6 is the hard blocker, and it is not machine-checkable
+
+`inst/CITATION` needs the **MCDM preprint DOI**, and CRAN will not accept a
+placeholder. The rows above confirm there is no placeholder string in the
+file. They cannot confirm the preprint exists, is posted, or has a DOI.
+
+Target journal is *Operations Research and Decisions*, diamond open access.
+The small-sample paper moved to 0.4.1 on 2026-07-31, so this is the only
+paper gating 0.4.0.
+:::
+
+-   [ ] The MCDM preprint is posted and has a DOI.
+-   [ ] That DOI is in `inst/CITATION` as a second `bibentry`.
+-   [ ] The DOI resolves. Paste it into a browser and check, rather than
+    trusting the string.
+
+## 3. What must not be in the tarball
+
+```{r}
+#| label: buildignore
+rbi <- readLines(file.path(pkg_root, ".Rbuildignore"), warn = FALSE)
+# The dev-only files, as CLAUDE.md lists them.
+dev_only <- c("CLAUDE.md", "roadmap.md", "revision_todo_0.3.md",
+              "cran-comments.md", "todo.md", "dogfeed.todo.md",
+              "todo_master_0.4.md", "todo_0.3.5.md", "todo_0.4.md",
+              "todo_0.5.md", "todo_0.5.1.md", "todo_rstudio_addin.md",
+              "mas_review_034.md", "mas_review_040.qmd",
+              "kimi_review_034.md", "qwen_review_034.md")
+present <- dev_only[file.exists(file.path(pkg_root, dev_only))]
+ignored <- vapply(dev_only, function(f)
+  any(vapply(rbi, function(p)
+    grepl(p, f, perl = TRUE), logical(1))), logical(1))
+
+data.frame(
+  file = dev_only,
+  present_on_this_branch = dev_only %in% present,
+  matched_by_rbuildignore = unname(ignored),
+  row.names = NULL
+)
+```
+
+```{r}
+#| label: buildignore-cmp
+# The question that actually matters is not whether .Rbuildignore is
+# complete, but whether anything it misses is on this branch. A gap in the
+# list is harmless if the file is not there to be included.
+at_risk <- dev_only[dev_only %in% present & !ignored[dev_only]]
+
+tab <- compare_table(
+  compare_row("dev-only files present but not ignored",
+              length(at_risk), 0,
+              "the ones that would reach the tarball"),
+  compare_row("the review suite is not on the release branch",
+              as.numeric(dir.exists(file.path(pkg_root, "review_040"))), 0,
+              "review_040 lives in surveyframe-dev"),
+  compare_row(".Rbuildignore excludes the check artefacts",
+              as.numeric(any(grepl("Rcheck", rbi))), 1,
+              "surveyframe.Rcheck must not ship"),
+  compare_row("and any built tarball",
+              as.numeric(any(grepl("tar\\\\.gz", rbi))), 1,
+              "a tarball inside a tarball")
+)
+compare_report(tab, caption = "Nothing dev-only reaches the build")
+sf_log(tab)
+```
+
+::: callout-note
+## The known `.Rbuildignore` gaps, and why they do not bite here
+
+CLAUDE.md records 2 hygiene gaps: `main`'s `.gitignore` names only the
+original 6 dev-only files, and `.Rbuildignore` still names `todo_0.4.1.md`,
+which was renamed to `todo_0.5.1.md` on 2026-07-25, while omitting
+`kimi_review_034.md` and `qwen_review_034.md`.
+
+Both are real and both should be closed. Neither affects **this** tarball,
+because the release branch carries no planning files at all, which is what
+the first row above measures. Close them anyway, before a tarball is ever
+built from a branch that does carry them.
+:::
+
+-   [ ] The first row reads 0. If it does not, name the files in
+    `.Rbuildignore` before building.
+-   [ ] `.Rbuildignore`'s stale `todo_0.4.1.md` entry is corrected to
+    `todo_0.5.1.md`, and the 2 review files are added.
+
+## 4. Dependencies
+
+```{r}
+#| label: deps
+field <- function(f) {
+  v <- if (f %in% colnames(desc)) desc[1, f] else ""
+  trimws(strsplit(v, ",")[[1]])
+}
+deps <- list(Imports = field("Imports"), Suggests = field("Suggests"),
+             Depends = field("Depends"))
+str(deps)
+```
+
+```{r}
+#| label: deps-cmp
+# Every line of R/, read once. readLines() takes one path at a time, so the
+# files are read with lapply() and flattened rather than handed the vector
+# list.files() returns.
+r_source <- unlist(lapply(
+  list.files(file.path(pkg_root, "R"), pattern = "[.]R$", full.names = TRUE),
+  readLines, warn = FALSE))
+
+# Comments and roxygen blocks are stripped before anything is counted as a
+# call. Without this, `lavaan::cfa()` inside an @examples block and
+# `knitr::kable()` inside an explanatory comment both read as unguarded
+# calls to a Suggests package, which is a false failure and cost this file
+# a round. The rule is crude, everything from the first # on a line, and it
+# is stated rather than hidden because a # inside a string would also go.
+r_code <- sub("#.*$", "", r_source)
+
+imports <- gsub("\\s*\\(.*", "", deps$Imports)
+imports <- imports[nzchar(imports)]
+suggests <- gsub("\\s*\\(.*", "", deps$Suggests)
+suggests <- suggests[nzchar(suggests)]
+expected_hard <- c("jsonlite", "rlang", "openssl")
+
+# Which Suggests packages the source actually calls, as opposed to merely
+# mentions. RMCDA is a test-time oracle and seminr is named only inside a
+# generated script, so neither appears here and neither needs a guard.
+called <- suggests[vapply(suggests, function(p)
+  any(grepl(paste0(p, "::"), r_code, fixed = TRUE)), logical(1))]
+called
+
+tab <- compare_table(
+  compare_row("the hard imports are still the agreed 3",
+              sum(expected_hard %in% imports), 3,
+              "jsonlite, rlang, openssl"),
+  compare_row("and nothing else crept into Imports",
+              length(setdiff(imports, expected_hard)), 0,
+              "CLAUDE.md's dependency rule"),
+  compare_row("the optional packages this release added are in Suggests",
+              sum(c("RMCDA", "logistf", "naniar", "pagedown") %in% suggests),
+              4, "0.4.0 and 0.3.4 additions"),
+  # Guarded means: every Suggests package the source actually CALLS is
+  # behind a check_installed() or requireNamespace(). A package named only
+  # in a generated syntax string is not called by surveyframe, and the
+  # generated script carries its own check_installed() line, so counting
+  # those as unguarded gives a false failure.
+  compare_row("every Suggests package the source calls is guarded",
+              sum(vapply(called, function(p) any(grepl(
+                sprintf("(check_installed|requireNamespace)\\(\\s*[\"']%s", p),
+                r_code)), logical(1))), length(called),
+              "check_installed() or requireNamespace()"),
+  compare_row("and at least 5 Suggests packages are actually called",
+              as.numeric(length(called) >= 5), 1,
+              "a vacuous pass if the list were empty")
+)
+compare_report(tab, caption = "The dependency contract")
+sf_log(tab)
+```
+
+-   [ ] Imports is still 3 packages. Every method added in 0.4.0 landed in
+    core with an optional package guarded at the call site, which is the
+    rule that keeps surveyframe installable anywhere.
+
+## 5. Examples and vignettes
+
+```{r}
+#| label: examples
+rd <- list.files(file.path(pkg_root, "man"), pattern = "[.]Rd$",
+                 full.names = TRUE)
+launchers <- grep("launch_", rd, value = TRUE)
+has_examples <- function(f) any(grepl("\\\\examples\\{",
+                                      readLines(f, warn = FALSE)))
+is_guarded <- function(f) {
+  x <- paste(readLines(f, warn = FALSE), collapse = "\n")
+  if (!grepl("\\\\examples\\{", x)) return(TRUE)          # no example, safe
+  grepl("donttest|dontrun|open = FALSE|launch.browser = FALSE", x)
+}
+data.frame(
+  file = basename(launchers),
+  has_example = vapply(launchers, has_examples, logical(1)),
+  safe = vapply(launchers, is_guarded, logical(1)),
+  row.names = NULL
+)
+```
+
+```{r}
+#| label: examples-cmp
+vig <- list.files(file.path(pkg_root, "vignettes"), pattern = "[.]Rmd$")
+
+tab <- compare_table(
+  compare_row("no launcher example opens a browser on a check machine",
+              sum(!vapply(launchers, is_guarded, logical(1))), 0,
+              "donttest, dontrun, or a FALSE argument"),
+  compare_row("the vignettes are present",
+              as.numeric(length(vig) >= 3), 1,
+              "surveyframe, small-sample, mcdm-analysis"),
+  compare_row("the MCDM vignette shipped",
+              as.numeric("mcdm-analysis.Rmd" %in% vig), 1,
+              "0.4.0's headline feature needs one"),
+  compare_row("the small-sample vignette shipped",
+              as.numeric("small-sample.Rmd" %in% vig), 1,
+              "the other half of the release")
+)
+compare_report(tab, caption = "Examples and vignettes")
+sf_log(tab)
+vig
+```
+
+::: callout-note
+## Why the launcher examples matter more than they look
+
+A CRAN check machine has no display and no patience. An example that opens a
+browser, or starts a Shiny app and waits, fails the check on machines that
+have nothing to do with the bug. `launch_builder()`'s example uses
+`open = FALSE` and inspects the path, which is the right shape: it exercises
+the function without launching anything.
+:::
+
+## 6. `R CMD check --as-cran`
+
+This is the long one. It is not run inside this document, because it takes
+minutes, needs the version bumped first, and its output belongs in
+`cran-comments.md` rather than here.
+
+```{bash}
+#| label: check
+#| eval: false
+cd ../surveyframe-v0.5-dev
+R CMD build .
+R CMD check --as-cran surveyframe_0.4.0.tar.gz
+```
+
+-   [ ] `0 errors, 0 warnings`.
+-   [ ] At most **1 note**, the incoming-feasibility one. Anything else is
+    investigated before submission, not explained away in
+    `cran-comments.md`.
+-   [ ] The tarball contains no `review_040/`, no planning file, no
+    `.Rcheck` directory, and no nested tarball. `tar -tzf` it and read the
+    list.
+-   [ ] The full test suite passes. Expect roughly **1486** after the
+    add-in branch is merged, against 1473 on `v0.5-dev` alone.
+-   [ ] Both vignettes build offline. The data-collection chunks are
+    `eval = FALSE` and the analysis runs on simulated or bundled data, so
+    there should be no network access anywhere in the build.
+
+```{r}
+#| label: check-suite
+#| eval: false
+# Worth running on its own first, because it is faster than a full check and
+# it is what usually breaks.
+devtools::test()
+```
+
+**The other machines.**
+
+-   [ ] win-builder, both `r-devel` and `r-release`.
+-   [ ] The macOS builder.
+-   [ ] Both come back with the same 1 note or fewer. A Windows-only failure
+    on a package with 3 hard dependencies is usually a file-path or an
+    encoding problem, and it is worth finding before CRAN does.
+
+**The branch.**
+
+-   [ ] `feature/rstudio-addin` has been merged from `v0.5-dev` and back,
+    so the tarball carries both the release and the add-in. File `19`
+    section 6 has the detail.
+-   [ ] `NEWS.md` states plainly that 0.3.5 and 0.5 were planned and never
+    released, since the version history jumps from 0.3.4 to 0.4.0.
+
+## 7. The open decisions
+
+Eight findings from this suite need an owner decision. None is fixed, which
+is the dogfeed protocol working as intended. All 8 are in
+`dogfeed.todo.md` with the evidence.
+
+```{r}
+#| label: decisions
+decisions <- data.frame(
+  n = 1:8,
+  finding = c(
+    "item_report() ignores reverse = TRUE",
+    "correlation roles: `variables` works for Kendall, fails for Pearson and Spearman",
+    "assumption_report() says checks were computed when none ran",
+    "display-only items get a Shiny column and count as missing data",
+    "sem_lavaan_syntax() writes an indirect effect lavaan cannot parse",
+    "conjoint 'balanced' is rewarded for dropping a level entirely",
+    "render_results(citation_format = ) is validated and then ignored",
+    "codebook_report() omits the item help text"),
+  found_in = c("09", "07", "05", "02 and 16", "10", "15", "17", "17"),
+  lane = c("0.4.0", "0.4.0", "0.4.1", "0.4.0", "0.4.0", "0.4.0",
+           "0.4.0", "0.4.1"),
+  row.names = NULL
+)
+decisions
+```
+
+::: callout-important
+## The 3 that would change published output
+
+**5**, the CB-SEM indirect effect, is the one to take first. The generated
+syntax does not run, in the single case a structural model is most often
+declared for. It is a hard error rather than a quiet wrong number, so it
+surfaces immediately, but it means the mediation route through `cb_sem` is
+unusable as shipped for anyone who does not label their paths.
+
+**6**, the conjoint design, is the most expensive to discover late. A
+fielded design with a level nobody ever sees cannot be repaired after
+collection, and `"balanced"` is worse than `"random"` at avoiding it.
+
+**1**, the `item_report()` keying, changes numbers the package has already
+printed for users. That is why it needs a decision rather than a fix.
+:::
+
+-   [ ] Each of the 8 has a decision recorded against it: fix in 0.4.0, lane
+    to 0.4.1, or document as intended behaviour.
+-   [ ] Every fix taken for 0.4.0 has a `NEWS.md` entry, and the ones that
+    change numbers are marked breaking.
+-   [ ] **7 has a cheap honest option.** Reducing `citation_format` to
+    `"apa"` and saying in NEWS that the other 2 were never implemented costs
+    almost nothing and removes a false claim from the manual. Leaving it
+    documented and inert is the option that should not survive review.
+
+## 8. The carried items, unrelated to a single release
+
+-   [ ] The `.bib` reference carry-in decision. Leaning defer.
+-   [ ] The Codecov badge.
+-   [ ] Keep or deprecate the standalone dashboard. File `18` section 6 is
+    where to form a view.
+-   [ ] An interactive pass over `R/survey_module.R`.
+-   [ ] **README's Roadmap section still promises small-sample at 0.4 and
+    MCDM at 0.5.** Both ship in 0.4.0. That is on a public page and it is a
+    5-minute fix.
+
+```{r}
+#| label: readme
+readme <- paste(readLines(file.path(pkg_root, "README.md"), warn = FALSE),
+                collapse = "\n")
+tab <- compare_table(
+  compare_row("README no longer promises MCDM at 0.5",
+              as.numeric(grepl("0\\.5[^0-9]{0,40}MCDM|MCDM[^.]{0,40}0\\.5",
+                               readme)), 0,
+              "both ship in 0.4.0"),
+  compare_row("README mentions the current release",
+              as.numeric(grepl("0\\.4\\.0", readme, fixed = TRUE)), 1,
+              "the version being shipped")
+)
+compare_report(tab, caption = "The public README")
+sf_log(tab)
+```
+
+-   [ ] Both rows read `match` before `main` is pushed. The README is the
+    first page anyone sees, and pkgdown rebuilds it on every push.
+
+## 9. Sign-off
+
+```{r}
+#| label: signoff
+data.frame(
+  gate = c("All 19 review files run with 0 DIFFERS and 0 CHECK",
+           "Every manual checkbox in 18, 19, and 20 is ticked",
+           "H2: the add-in verified in a real RStudio session",
+           "D6: the MCDM preprint DOI is in inst/CITATION",
+           "All 8 open findings have a recorded decision",
+           "E1: DESCRIPTION reads 0.4.0",
+           "R CMD check --as-cran: 0 errors, 0 warnings, at most 1 note",
+           "win-builder and macOS builder agree",
+           "feature/rstudio-addin merged both ways",
+           "NEWS.md complete, breaking changes marked",
+           "README roadmap corrected"),
+  done = "",
+  row.names = NULL
+)
+```
+
+-   [ ] Fill this in. An unrecorded gate is an unmet gate.
+
+## Verdict for this file
+
+```{r}
+#| label: verdict
+sf_verdict()
+```
+
+-   [ ] `0 DIFFERS` on the automated rows, **except** the version row while
+    E1 is outstanding and the README rows until that 5-minute fix is made.
+    Both are expected to differ before release and to match after.
+-   [ ] Section 6 has been run on a real machine and its output pasted into
+    `cran-comments.md`.
+-   [ ] Sections 7 and 8 have been read by the owner, not skimmed.
