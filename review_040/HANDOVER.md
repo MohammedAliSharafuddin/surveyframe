@@ -43,6 +43,27 @@ unnecessary.
 `_setup.R` holds every shared helper. Read it once. Do not duplicate its
 helpers inside a `.qmd`.
 
+### Running against an installed build rather than the worktree
+
+`remotes::install_github("MohammedAliSharafuddin/surveyframe", build_vignettes = TRUE)`
+installs `main`, which carries the whole 0.4.0 release plus the add-in.
+`_setup.R` only falls back to `devtools::load_all("../surveyframe-v0.5-dev")`
+when no 0.4.0 build is already loaded, so **installing silently switches
+which build the suite reviews**. That is usually what you want, since it is
+the tarball-shaped thing.
+
+Two caveats.
+
+- Four reference packages the suite uses are not in Suggests and need
+  installing separately: `DescTools`, `car`, `e1071`, `seminr`.
+- **Files `19` and `20` read the source tree and cannot fully run against an
+  installed package.** Installation drops `.Rbuildignore`, compiles `R/*.R`
+  into a lazy-load database, strips the `inst/` prefix so
+  `inst/rstudio/addins.dcf` becomes `rstudio/addins.dcf`, and renames
+  `vignettes/` to `doc/`. File `19` detects this and skips cleanly. File `20`
+  does not, and would error reading `.Rbuildignore`. Run those 2 from a
+  source checkout of `main`.
+
 ### What is left for the owner, not for a model
 
 1. **H2.** File `19` section 4, at a keyboard in RStudio. Release blocker.

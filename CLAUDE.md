@@ -177,6 +177,33 @@ on a fresh device, clone surveyframe-dev and check out `dev`.
 `.Rbuildignore` excludes all dev-only files and the `jss-paper`, `pkgdown`, and
 version-archive directories so the CRAN build never sees them.
 
+**Branch state, verified 2026-08-05.** All 5 branches are identical on local
+and `origin`, and `main` is identical on `origin` and `public`.
+
+| Branch | Ancestor of `main`? | Keep? |
+|---|---|---|
+| `main` | is `main` | yes, the release branch |
+| `dev` | no, and never will be | yes, it carries the planning files |
+| `v0.5-dev` | **yes, fully merged** | yes for now, every planning file names it |
+| `v0.4-dev` | **yes, fully merged** | deletable, finished work |
+| `feature/rstudio-addin` | **yes, fully merged** | deletable, finished work |
+
+Tested with `git merge-base --is-ancestor`, so the 3 merged branches hold no
+commit `main` lacks. No branch is checked out in a worktree: the `v0.4-dev`
+and `v0.5-dev` worktrees sit at detached HEADs on those same commits, so
+deleting the refs would not disturb them. **`v0.5-dev` being an ancestor
+means release work now belongs on `main`**, whatever the older continuation
+prompts say.
+
+The public repo has 2 branches and both belong there: `main`, and `gh-pages`,
+which `.github/workflows/pkgdown.yaml` writes on every push to `main`. The
+site was last deployed from `b9d44c5` and carries no dev-only files, so the
+`clean: true` fix is holding.
+
+**Tags: `v0.3.3` and `v0.3.4`, on both remotes.** See the history-rewrite
+section for why `v0.3.4` was created retrospectively and why a recorded SHA
+is not a substitute for a tag.
+
 ---
 
 ## Conventions
@@ -250,7 +277,8 @@ feasibility). The vignette builds offline because the data-collection step uses
 
 ## Current status and immediate next steps
 
-Status verified against the code, the branches, CI, and CRAN on 2026-08-04.
+Status verified against the code, the branches, both remotes, CI, and CRAN on
+2026-08-05.
 
 **Read this first.** 0.4.0's engineering is complete and now sits on `main`,
 installable from GitHub. The review suite is complete and found 8 defects
