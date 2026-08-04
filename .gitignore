@@ -57,3 +57,6 @@ report_interp.html
 mas_review_040.html
 review_040/*.html
 review_040/*_files/
+review_040/*.pdf
+review_040/*.sframe
+review_040/*.csv
