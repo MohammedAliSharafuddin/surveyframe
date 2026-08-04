@@ -426,7 +426,7 @@ html_path <- export_static_survey(
   output_path = file.path(tempdir(), "tourism_services_survey.html"),
   open        = FALSE
 )
-#> Static survey written to '/tmp/RtmpsRdTIY/tourism_services_survey.html' (85.2
+#> Static survey written to '/tmp/RtmpQ3a7PG/tourism_services_survey.html' (85.2
 #> KB).
 file.exists(html_path)
 #> [1] TRUE
@@ -479,7 +479,7 @@ script_path <- export_google_sheet(
   sheet_url  = "https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID",
   output_dir = tempdir()
 )
-#> Apps Script written to: /tmp/RtmpsRdTIY/surveyframe_collector.gs
+#> Apps Script written to: /tmp/RtmpQ3a7PG/surveyframe_collector.gs
 #> Follow the setup instructions inside the file to deploy it.
 file.exists(script_path)
 #> [1] TRUE
@@ -1036,7 +1036,7 @@ results_path <- render_results(
   output_file = file.path(tempdir(), "tourism_results.html")
 )
 cat("Results report written:", results_path, "\n")
-#> Results report written: /tmp/RtmpsRdTIY/tourism_results.html
+#> Results report written: /tmp/RtmpQ3a7PG/tourism_results.html
 cat("Size:", round(file.size(results_path) / 1024, 1), "KB\n")
 #> Size: 13.5 KB
 ```
