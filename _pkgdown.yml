@@ -182,6 +182,22 @@ reference:
       - sample_size_plan
       - run_analysis_plan
 
+  - title: "Decision analysis"
+    desc: >
+      Multi-criteria decision analysis, new in 0.4.0. The 10 methods run
+      through the analysis plan like any other, so the functions here are the
+      ones that assemble their input, test how stable a ranking is, and build
+      choice designs.
+    contents:
+      - sensitivity_analysis
+      - sf_conjoint_design
+      - sframe_assemble_pairwise
+      - sframe_aggregate_judgements
+      - sframe_collected_weights
+      - sframe_rated_matrix
+      - sframe_decision_options
+      - sframe_dematel_compute
+
   - title: "Confidence intervals"
     desc: >
       Base-R bootstrap and effect-size confidence interval helpers, reused
@@ -209,6 +225,8 @@ reference:
       - theme_surveyframe
       - plot.sframe_analysis_results
       - sframe_plot_correlation_matrix
+      - sframe_plot_decision_ranking
+      - sframe_plot_dematel_influence
       - sframe_plot_descriptives
       - sframe_plot_efa_loadings
       - sframe_plot_efa_scree

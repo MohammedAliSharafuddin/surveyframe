@@ -1,5 +1,20 @@
 # codebook_report.R
 
+# Remove the scratch directories Chrome leaves in tempdir() after a
+# chrome_print() call. `before` is the listing taken immediately before the
+# call, so only entries created during it are considered, and of those only
+# the ones matching Chrome's own naming are removed.
+sframe_clean_chrome_detritus <- function(before) {
+  after <- list.files(tempdir(), all.files = TRUE, no.. = TRUE)
+  new   <- setdiff(after, before)
+  chrome <- grep("^(com\\.google\\.Chrome\\.|scoped_dir|\\.com\\.google\\.Chrome\\.)",
+                 new, value = TRUE)
+  if (length(chrome)) {
+    unlink(file.path(tempdir(), chrome), recursive = TRUE, force = TRUE)
+  }
+  invisible(chrome)
+}
+
 #' Generate a survey codebook from an instrument object
 #'
 #' Produces a structured codebook listing all items, their types, choice sets,
@@ -337,6 +352,13 @@ render_report <- function(
       plot_palette = plot_palette,
       interpretations = interpretations
     )
+    # Chrome writes its own scratch directories into tempdir() and does not
+    # remove them, which R CMD check reports as detritus in the temp
+    # directory. Only entries that appear during this call and match Chrome's
+    # own naming are removed, so nothing else in tempdir() is touched.
+    before <- list.files(tempdir(), all.files = TRUE, no.. = TRUE)
+    on.exit(sframe_clean_chrome_detritus(before), add = TRUE)
+
     printed <- tryCatch(
       pagedown::chrome_print(input = html_tmp, output = dest),
       error = function(e) {
