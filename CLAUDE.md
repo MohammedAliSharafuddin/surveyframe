@@ -560,10 +560,12 @@ Consequences to know:
   the newer local target, preserving its message and tagger date. Both
   remotes now agree.
 
-Local backup tags `backup/main-pre-rewrite`, `backup/dev-pre-rewrite`, and
-`backup/dev-pre-rewrite2` hold the pre-rewrite tips and were deliberately
-not pushed. They are the only record of the pre-rewrite history, so they
-live on one machine and nowhere else.
+Backup tags `backup/main-pre-rewrite`, `backup/dev-pre-rewrite`, and
+`backup/dev-pre-rewrite2` hold the pre-rewrite tips. **Pushed to `origin`
+only on 2026-08-05**, so the pre-rewrite history has a second copy off the
+one machine that held it. They must never go to `public`: they reach commits
+that still carry the `Co-Authored-By` trailers, 1, 5, and 1 respectively, and
+pushing them there would undo the rewrite.
 
 **`v0.3.4` was tagged retrospectively on 2026-08-05, on both remotes.** The
 CRAN release had no tag, only `v0.3.3` did, so the commit that shipped to
