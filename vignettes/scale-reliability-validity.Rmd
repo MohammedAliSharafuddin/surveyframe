@@ -121,7 +121,7 @@ published_loadings <- list(
 )
 
 validity <- validity_report(published_loadings)
-kable(validity$reliability, digits = 2,
+kable(as.data.frame(validity), digits = 2,
       caption = "Composite reliability and average variance extracted")
 ```
 

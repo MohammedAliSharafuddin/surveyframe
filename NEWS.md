@@ -37,6 +37,64 @@ with an earlier version should be re-run rather than trusted.
   never declared. All 3 now refuse a mismatched estimation family, and the
   builder filters each model role to the types its generator can produce.
 
+## Breaking: `validate_sframe()` and `validate_model()` return a diagnostic
+
+Both validators previously returned two different things depending on
+`strict`: the object itself, invisibly, when `strict = TRUE`, and a bare
+unclassed list when `strict = FALSE`. Neither was a diagnostic, the
+success path printed nothing at all, and the `strict = FALSE` return had
+no methods. Both now return an `sframe_validation` object, and they
+return it visibly, so `validate_sframe(instrument)` typed at the console
+shows the user what it found.
+
+* The object records `valid`, every `problems` message, and a `checks`
+  table listing all 18 instrument checks (10 for a model) whether or not
+  each found anything. A diagnostic that lists only failures cannot tell
+  a user that a check passed from one that was never reached.
+* Read it with `print()`, `summary()` for the check roster,
+  `as.data.frame()` for one row per problem, `sf_is_valid()`, and
+  `sf_problems()`.
+* `strict = TRUE` still aborts with `sframe_validation_error` when
+  anything is wrong. That has not changed.
+* **`$valid` and `$problems` keep working**, so the common reading
+  pattern needs no migration.
+* **What breaks**: code using the `strict = TRUE` return as an
+  instrument, as in `instrument <- validate_sframe(instrument)`. Wrap it
+  in `as_sframe()`. Passing a validation result where an instrument is
+  expected now raises a directed error naming `as_sframe()` rather than
+  failing obscurely further down.
+
+Raised by a Journal of Statistical Software editor reviewing the code:
+"we would at least expect that the object is not silently returned and
+that the print method is adapted to allow the user to read directly the
+diagnostic".
+
+## New: accessor and exploration methods for every class
+
+The same review found that the classes carried `print`, `summary` and
+`format` only, so user code had no route to their contents except `$` on
+the underlying list, which makes the internal layout part of the public
+contract. Two facts made that concrete: `as.data.frame()` failed on all
+14 result classes with "cannot coerce class ... to a data.frame", and `[`
+dropped the class on the list-backed reports, so `results[1:2]` silently
+degraded to a bare list and lost its print method.
+
+* `as.data.frame()` now works on the instrument and on every report
+  class, returning that object's primary table.
+* `[` keeps the class on `sframe_analysis_results`,
+  `sframe_reliability_report` and `sframe_item_report`.
+* Instrument accessors: `sf_meta()`, `sf_items()`, `sf_scales()`,
+  `sf_choice_sets()`, `sf_branches()`, `sf_checks()`, `sf_models()` and
+  `sf_plan()`, with `sf_plan<-` for declaring the plan. The component
+  accessors return an `sf_component_list` named by ID, so
+  `sf_items(instrument)[["sat_1"]]` reaches one item.
+* Component accessors: `sf_id()` and `sf_label()`.
+* Report accessors: `sf_apa()` and `sf_flagged()`.
+* Coercion: `as_sframe()`.
+
+The vignettes and the examples are rewritten to use these rather than
+`$`. The registered S3 method count goes from 41 to 103.
+
 ## Breaking: the Shiny collector now emits expansion columns
 
 * `render_survey()` pipe-joined a matrix item's cells into a single column,

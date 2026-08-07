@@ -228,7 +228,7 @@ the ranking is recomputed. `rho` is the rank correlation with the original
 ranking, and `top_changed` records whether the leading alternative changed.
 
 ```{r sensitivity-table}
-kable(sens$table, row.names = FALSE,
+kable(as.data.frame(sens), row.names = FALSE,
       caption = "Ranking stability under a 5 percent change in each weight.")
 ```
 
@@ -286,11 +286,14 @@ Because every block is declared in the instrument, the whole analysis is one
 call and the report writes itself in the same order the plan was declared.
 
 ```{r summary, echo = FALSE}
+# as.data.frame() flattens the results to one row per block, so the whole
+# summary is a column selection rather than a loop over internals.
+results_df <- as.data.frame(results)
 summary_df <- data.frame(
-  RQ = vapply(results, function(r) r$block_id %||% "", ""),
-  Question = vapply(results, function(r) r$research_question %||% "", ""),
-  Method = toupper(vapply(results, function(r) r$test %||% "", "")),
-  Result = vapply(results, function(r) r$apa %||% "", ""),
+  RQ = results_df$block_id,
+  Question = results_df$research_question,
+  Method = toupper(results_df$test),
+  Result = results_df$apa,
   check.names = FALSE, stringsAsFactors = FALSE
 )
 kable(summary_df, row.names = FALSE,

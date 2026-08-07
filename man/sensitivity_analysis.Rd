@@ -65,7 +65,7 @@ sa <- sensitivity_analysis(
   criteria       = c("service", "location", "price")
 )
 sa$stable
-sa$table
+as.data.frame(sa)
 }
 \seealso{
 \code{\link[=run_analysis_plan]{run_analysis_plan()}}, \code{\link[=sframe_decision_options]{sframe_decision_options()}}
