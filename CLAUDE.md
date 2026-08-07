@@ -18,7 +18,12 @@ and reproducible reporting.
 The core idea is a proactive workflow. The instrument is a methodological
 contract declared before data collection. Analysis is the execution of that
 pre-declared plan rather than a post-hoc search. This is the package's main
-differentiator and the thesis of the JSS paper.
+differentiator and the thesis of the SF1 paper. JSS rejected that paper on
+aims and scope on 2026-08-07, because it contributes workflow discipline
+rather than statistical methodology. That judgement is accepted. The paper
+goes to **the R Journal**, where re-usable architectures and package papers
+are in scope by name, so the same property is the contribution rather than
+the objection.
 
 Current version: **0.3.4, live on CRAN, published 2026-07-24** (submitted
 2026-07-25 local time, tagged `v0.3.4`). Verified on the CRAN package
@@ -96,9 +101,11 @@ surveyframe is the source of truth for a wider product and publication set.
 - **surveyframe-dev** (private): the full working repository. Tracks everything,
   including this file, the roadmap, the to-do notes, and the brand sources.
   Open this repository when working across devices.
-- **surveyframe-jss-paper** (private): the JSS manuscript, moved out of
-  surveyframe-dev on 2026-07-10. Clone it beside this repository when working
-  on the paper.
+- **surveyframe-jss-paper** (private): the SF1 manuscript, moved out of
+  surveyframe-dev on 2026-07-10. The repository name is now historical:
+  **JSS rejected it on 2026-08-07 and the target is the R Journal**, with the
+  manuscript pinned to CRAN 0.4.0. Clone it beside this repository when
+  working on the paper.
 - **ethos** (private, JavaScript): a research-workflow product built on
   surveyframe. Calls surveyframe as the engine.
 - **ethos-pro** (private, TypeScript): the institutional governance layer on top
@@ -253,7 +260,8 @@ Run from the repository root.
 ```r
 devtools::document()          # regenerate man/ and NAMESPACE
 devtools::test()              # run the test suite (721 at the 0.3.4 release,
-                              # 1506 on main once 0.4.0 merged)
+                              # 1506 on main once 0.4.0 merged, 1676 on dev
+                              # after the 2026-08-07 accessor work)
 devtools::load_all()          # load for interactive work
 rmarkdown::render("vignettes/surveyframe.Rmd", output_dir = tempdir())
 ```
@@ -281,11 +289,15 @@ Status verified against the code, the branches, both remotes, CI, and CRAN on
 2026-08-05.
 
 **Read this first.** 0.4.0's engineering is complete and now sits on `main`,
-installable from GitHub. The review suite is complete and found 8 defects
-needing owner decisions. Git history was rewritten on 2026-08-04, so any
-clone older than that is stale. The 2 CRAN blockers are unchanged: the MCDM
-preprint DOI (D6) and the owner verifying the RStudio add-in (H2). Jump to
-"0.4.0 is on `main`", "The review suite", and "Git history was rewritten".
+installable from GitHub. A **breaking API change landed on `dev` on
+2026-08-07**: `validate_sframe()` returns a diagnostic and every class gained
+accessors. The review suite is complete and found 8 defects needing owner
+decisions. Git history was rewritten on 2026-08-04, so any clone older than
+that is stale. The 2 CRAN blockers are unchanged: the MCDM preprint DOI (D6)
+and the owner verifying the RStudio add-in (H2), and **both now also gate the
+SF1 manuscript**, which is pinned to CRAN 0.4.0 for the R Journal. Jump to
+"0.4.0 is on `main`", "Breaking API change", "The review suite", and "Git
+history was rewritten".
 
 ### Shipped
 
@@ -538,6 +550,64 @@ finding about skewness was surveyframe reporting the b1 and b2 estimators,
 which is `psych`'s own default. **Every new claim needs a mutation check.
 Revert the thing being tested and confirm the test fails.** A check that
 cannot fail is not a check.
+
+### Breaking API change: accessors and the validation diagnostic (2026-08-07)
+
+Built in response to the 2 package defects a JSS editor recorded alongside
+the scope rejection of the manuscript. Both are real S3 design defects that a
+reviewer at any venue would raise. On `dev`, 1676 tests passing,
+`R CMD check --as-cran` Status: OK. **This is the API the SF1 manuscript is
+pinned to, so treat it as frozen for the purposes of that paper.**
+
+**1. `validate_sframe()` and `validate_model()` now return an
+`sframe_validation` object**, visibly, from both `strict` branches. The old
+behaviour was worse than the editors described. They wrote that it "returns
+the object passed in the input augmented with a $valid and $problems", which
+misreads the code: `strict = TRUE` returned the instrument invisibly and
+`strict = FALSE` returned a bare unclassed `list(valid, problems)` that was
+not the instrument at all. So the function was polymorphic in return type on
+a logical flag, one branch was silent and the other had no methods.
+
+- `$valid` and `$problems` are kept deliberately, so the common reading
+  pattern needs no migration. The only internal reader in `R/` was 1 line in
+  `studio_builder.R`, and the 16 `$valid` reads in `inst/shiny/app.R` read
+  `sframe_builder_validate_draft()`'s own return, so the Shiny app and the
+  builder JS were untouched.
+- **What breaks**: `instr <- validate_sframe(instr)`. Wrap in `as_sframe()`.
+  `sframe_check_instrument()` catches a validation object passed where an
+  instrument is wanted and names `as_sframe()` in the error.
+- The object carries a `checks` table listing all 18 instrument checks (10
+  for a model) whether or not each found anything, so a check that passed is
+  distinguishable from one that never ran.
+
+**2. Accessor and exploration methods on every class.** Two facts made the
+editors' point concrete, both verified rather than assumed: `as.data.frame()`
+**errored** on all 14 result classes with "cannot coerce class ... to a
+data.frame", and `[` **dropped the class** on the list-backed reports, so
+`results[1:2]` silently degraded to a bare list and lost its print method.
+Added: `as.data.frame()` on all 14, class-preserving `[` on 3, and
+`sf_meta()`, `sf_items()`, `sf_scales()`, `sf_choice_sets()`,
+`sf_branches()`, `sf_checks()`, `sf_models()`, `sf_plan()`, `sf_plan<-`,
+`sf_id()`, `sf_label()`, `sf_apa()`, `sf_flagged()`, `sf_is_valid()`,
+`sf_problems()`, `sf_object()`, `as_sframe()`. **41 to 103 registered S3
+methods.** New files: `R/accessors.R`, `R/as_data_frame.R`,
+`R/validation_result.R`, `tests/testthat/test-accessors.R`. The vignettes and
+the roxygen examples are rewritten off `$`. `codebook_report()` now reads the
+same 5 shared table builders as `as.data.frame()`, so the 2 views of an
+instrument cannot drift.
+
+**Verification discipline held.** Every guarantee was mutation-checked: the 2
+`[` methods, the directed error, the check-roster status, and the shared
+builder were each reverted in turn and the intended test confirmed to fail.
+
+**Never run `git checkout <branch> -- .` in this repository.** Doing it on
+2026-08-07, only to read the dev-only planning files, reverted every tracked
+modification of that session and destroyed an uncommitted change to
+`mas_review_040.qmd` that could not be recovered. Because the convention here
+is to commit only when asked, the working tree is routinely the only copy of
+the work, so any destructive git command is a data-loss event. Read files
+with Read or grep, and take a tar backup into the scratchpad when a session
+accumulates substantial uncommitted work.
 
 ### Git history was rewritten on 2026-08-04
 

@@ -184,8 +184,10 @@ write_sframe <- function(instrument, path, pretty = TRUE, overwrite = FALSE) {
     )
   }
 
-  # Validate before writing and persist the validation flag.
-  instrument <- validate_sframe(instrument, strict = TRUE)
+  # Validate before writing and persist the validation flag. validate_sframe()
+  # returns a diagnostic since 0.4.0, so the instrument comes back through
+  # as_sframe().
+  instrument <- as_sframe(validate_sframe(instrument, strict = TRUE))
 
   # Build the full JSON payload with an empty hash placeholder
   payload <- sframe_serialization_payload(instrument)
@@ -555,7 +557,7 @@ read_sframe <- function(path, validate = TRUE) {
   )
 
   if (validate) {
-    instrument <- validate_sframe(instrument, strict = TRUE)
+    instrument <- as_sframe(validate_sframe(instrument, strict = TRUE))
   }
 
   instrument

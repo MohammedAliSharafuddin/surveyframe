@@ -141,7 +141,7 @@ pilot <- data.frame(
   covariate = rnorm(20, 0, 1)
 )
 
-study$analysis_plan <- list(
+sf_plan(study) <- list(
   list(id = "RQ1",
        research_question = "Does the treatment arm score higher than control?",
        family = "group_comparison", method = "mann_whitney",
@@ -164,7 +164,7 @@ shift, again with an interval rather than a point value.
 before <- rnorm(8, 50, 6)
 after  <- before + rnorm(8, 4, 5)
 
-study$analysis_plan <- list(
+sf_plan(study) <- list(
   list(id = "RQ2",
        research_question = "Did scores change from before to after?",
        family = "group_comparison", method = "wilcoxon_pair",
@@ -186,7 +186,7 @@ interval alongside the test's p-value. The interval is only defined for a
 requested, since base R's `fisher.test()` cannot return both together.
 
 ```{r fisher}
-study$analysis_plan <- list(
+sf_plan(study) <- list(
   list(id = "RQ3",
        research_question = "Is conversion associated with study arm?",
        family = "association", method = "fisher_exact",
@@ -219,7 +219,7 @@ penalised-likelihood correction (Firth, 1993) addresses both. surveyframe's
 `firth_logistic` runner needs the optional `logistf` package.
 
 ```{r firth, eval = requireNamespace("logistf", quietly = TRUE)}
-study$analysis_plan <- list(
+sf_plan(study) <- list(
   list(id = "RQ4",
        research_question = "Does the covariate predict conversion?",
        family = "regression", method = "firth_logistic",
