@@ -29,29 +29,11 @@ rmcda_extras <- c(
 
 all_methods <- c(core_methods, rmcda_extras)
 
-# Reference data based on typical MCDM literature patterns
-# (Used when API limit is hit; reflects relative citation counts)
-reference_data <- data.frame(
-  method = c(
-    "AHP", "TOPSIS", "ANP", "VIKOR", "DEMATEL", "ELECTRE", "PROMETHEE",
-    "MOORA", "SMART", "WASPAS", "COPRAS", "ARAS", "CODAS", "EDAS",
-    "MULTIMOORA", "MARCOS", "MABAC", "TODIM", "SAW", "WSM", "WPM",
-    "CRITIC", "ENTROPY", "SWARA", "FUCOM", "PIPRECIA", "ARWU"
-  ),
-  total_works = c(
-    4802, 2156, 892, 654, 487, 356, 312, 289, 267, 245, 134, 98, 87, 76,
-    64, 52, 48, 43, 39, 36, 31, 28, 26, 24, 22, 20, 18
-  ),
-  top_work_citations = c(
-    4802, 2156, 892, 654, 487, 356, 312, 289, 267, 245, 134, 98, 87, 76,
-    64, 52, 48, 43, 39, 36, 31, 28, 26, 24, 22, 20, 18
-  ),
-  total_citations = c(
-    12540, 6847, 3421, 2156, 1834, 987, 843, 721, 654, 589, 412, 287, 234, 198,
-    156, 134, 112, 98, 76, 67, 54, 47, 41, 35, 31, 28, 24
-  ),
-  stringsAsFactors = FALSE
-)
+# No hardcoded reference/fallback numbers here on purpose. A prior version
+# of this script kept an invented "reference_data" table for use when the
+# API failed; that produced fabricated citation counts labelled as if they
+# were real query results (see the stop() below). Real data or no data,
+# never invented data.
 
 # Function to query OpenAlex for a single method using system curl
 query_openalex_method <- function(method_name) {
@@ -124,7 +106,7 @@ query_openalex_method <- function(method_name) {
 # Query all methods (with rate limiting to be respectful)
 message("Querying OpenAlex API for MCDM methods...")
 message("Total methods to query: ", length(all_methods))
-message("Note: Queries may be rate-limited. Reference data will be used as fallback.\n")
+message("Note: queries may be rate-limited; a total failure stops the script rather than substituting invented data.\n")
 
 results_list <- list()
 api_success_count <- 0
@@ -146,23 +128,26 @@ for (i in seq_along(all_methods)) {
 
 message(sprintf("\nAPI queries succeeded for: %d / %d methods", api_success_count, length(all_methods)))
 
-# If API queries failed, use reference data
+# If API queries failed, stop rather than substitute invented numbers.
+# A prior version of this script fell back to a hardcoded "reference_data"
+# table the author had made up ("based on typical MCDM literature
+# patterns") and wrote it to the results CSV labelled only as "Reference
+# (literature estimates)". That table was then read back and reported as
+# though it were real OpenAlex citation data, which it was not. D2a's
+# purpose is to verify method selection against real evidence; invented
+# numbers cannot do that, so a failed run must fail visibly, not produce
+# a CSV that looks like a completed query. See ../portfolio-planner
+# decisions.md 2026-08-13 for the incident this fixes.
 if (api_success_count == 0) {
-  message("API limit reached. Using reference data from literature for demonstration.\n")
-
-  # Expand reference data to include all methods
-  reference_data$category <- ifelse(
-    reference_data$method %in% core_methods,
-    "Core (0.4.0)",
-    "Extra (0.4.2+)"
+  stop(
+    "OpenAlex API queries all failed (0/", length(all_methods),
+    " succeeded), most likely rate-limiting or a network/proxy budget ",
+    "limit (this environment has returned HTTP 429 with an exhausted ",
+    "daily budget before; OpenAlex itself is free and unmetered, so ",
+    "this is a local/proxy constraint, not an OpenAlex policy). ",
+    "Re-run this script from a network with real OpenAlex access rather ",
+    "than editing in a fallback data table. No results file is written."
   )
-  reference_data$avg_citations_per_work <- round(
-    reference_data$total_citations / reference_data$total_works, 2
-  )
-  reference_data$most_cited_title <- "Reference data (from literature)"
-  reference_data$data_source <- "Reference (literature estimates)"
-
-  results_df <- reference_data
 } else {
   # Combine results into a data frame
   results_df <- do.call(rbind, results_list)
