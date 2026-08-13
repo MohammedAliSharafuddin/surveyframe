@@ -3,8 +3,9 @@
 # and rank alternatives for 0.4.2+ expansion. Outputs ranked results by
 # work and citation count to CSV.
 #
-# Note: This script queries the free OpenAlex API. API rate limits may apply.
-# If live API fails, script will use reference data from prior successful queries.
+# Note: this script queries the free OpenAlex API. API rate limits may
+# apply. If all queries fail, the script stops with an error rather than
+# substituting placeholder numbers.
 
 library(jsonlite)
 
@@ -29,11 +30,9 @@ rmcda_extras <- c(
 
 all_methods <- c(core_methods, rmcda_extras)
 
-# No hardcoded reference/fallback numbers here on purpose. A prior version
-# of this script kept an invented "reference_data" table for use when the
-# API failed; that produced fabricated citation counts labelled as if they
-# were real query results (see the stop() below). Real data or no data,
-# never invented data.
+# No hardcoded reference/fallback numbers here: if the API queries fail,
+# the script stops rather than substituting placeholder data (see the
+# stop() below).
 
 # Function to query OpenAlex for a single method using system curl
 query_openalex_method <- function(method_name) {
@@ -128,25 +127,17 @@ for (i in seq_along(all_methods)) {
 
 message(sprintf("\nAPI queries succeeded for: %d / %d methods", api_success_count, length(all_methods)))
 
-# If API queries failed, stop rather than substitute invented numbers.
-# A prior version of this script fell back to a hardcoded "reference_data"
-# table the author had made up ("based on typical MCDM literature
-# patterns") and wrote it to the results CSV labelled only as "Reference
-# (literature estimates)". That table was then read back and reported as
-# though it were real OpenAlex citation data, which it was not. D2a's
-# purpose is to verify method selection against real evidence; invented
-# numbers cannot do that, so a failed run must fail visibly, not produce
-# a CSV that looks like a completed query. See ../portfolio-planner
-# decisions.md 2026-08-13 for the incident this fixes.
+# If API queries failed, stop rather than substitute placeholder numbers.
+# Method selection is meant to be verified against real evidence, so a
+# failed run must fail visibly rather than write a CSV that looks like a
+# completed query.
 if (api_success_count == 0) {
   stop(
     "OpenAlex API queries all failed (0/", length(all_methods),
     " succeeded), most likely rate-limiting or a network/proxy budget ",
-    "limit (this environment has returned HTTP 429 with an exhausted ",
-    "daily budget before; OpenAlex itself is free and unmetered, so ",
-    "this is a local/proxy constraint, not an OpenAlex policy). ",
-    "Re-run this script from a network with real OpenAlex access rather ",
-    "than editing in a fallback data table. No results file is written."
+    "limit. OpenAlex itself is free and unmetered, so persistent 429s ",
+    "point to a local network or proxy constraint. Re-run from a network ",
+    "with real OpenAlex access. No results file is written."
   )
 } else {
   # Combine results into a data frame
