@@ -64,12 +64,12 @@ At least 2 entries, all distinct. A \code{"saaty"} pairwise item renders
 \code{n(n-1)/2} unordered pair rows, an \code{"influence"} item renders \code{n(n-1)}
 ordered rows, and a \code{"criteria_weight"} item renders one numeric input
 per entry. An advisory warning is raised above 7 items (\code{"saaty"}) or 6
-(\code{"influence"}); above 10 the item is rejected.}
+(\code{"influence"}), and above 10 the item is rejected.}
 
 \item{comparison_scale}{Character or NULL. For \code{"pairwise_comparison"}
 only. \code{"saaty"} (the default) gives the bipolar 1-9 importance scale used
-by AHP and ANP; \code{"influence"} gives the unipolar 0-4 directed influence
-scale used by DEMATEL.}
+by AHP and ANP, while \code{"influence"} gives the unipolar 0-4 directed
+influence scale used by DEMATEL.}
 
 \item{slider_min}{Numeric or NULL. Minimum value for \code{"slider"} type.}
 

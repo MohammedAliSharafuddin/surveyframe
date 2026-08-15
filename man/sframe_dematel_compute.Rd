@@ -23,14 +23,15 @@ solves the total-relation matrix \code{T = N(I - N)^-1} in closed form rather
 than by truncating the series. \code{D} is each criterion's row sum of \code{T}
 (how much it influences the others, direct and indirect combined) and \code{R}
 its column sum (how much it is influenced). Prominence \code{D + R} is overall
-involvement in the system; relation \code{D - R} is net direction, positive for
-a net cause and negative or zero for a net effect. The threshold is the
-arithmetic mean of every entry of \code{T}: relations at or above it are
-considered significant enough to draw in an influence diagram.
+involvement in the system, while relation \code{D - R} is net direction,
+positive for a net cause and negative or zero for a net effect. The
+threshold is the arithmetic mean of every entry of \code{T}: relations at or
+above it are considered significant enough to draw in an influence
+diagram.
 }
 \details{
 \code{solve()} fails outright if \code{I - N} is exactly singular, which does not
-arise for a matrix normalised this way in ordinary use; no fallback series
+arise for a matrix normalised this way in ordinary use. No fallback series
 truncation is implemented, unlike the harvested source, because a singular
 \code{I - N} here would signal a malformed matrix rather than a case to work
 around silently.
