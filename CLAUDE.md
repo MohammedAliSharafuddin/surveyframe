@@ -655,15 +655,27 @@ with the history.
 
 ### Hard blocker
 
-**`inst/CITATION` needs the MCDM preprint DOI (task D6), and CRAN will not
-accept a placeholder.** The small-sample paper moved to 0.4.1 on 2026-07-31,
-so only the MCDM paper gates this release. Target journal: *Operations
-Research and Decisions*, diamond OA. The manuscript itself moved out of this
-repository on 2026-08-14, to `../research/surveyframe_manuscripts/mcdm/`,
-tracked as SF2. It still needs 2 things before it can be posted for a DOI: a
-proofread fix (7 of 12 references are never cited in text) and removing the
-double-blind placeholder, since a preprint needs a real byline. Everything
-else outstanding in blocks D and E is mechanical release paperwork.
+**`inst/CITATION` needs a citable reference for the MCDM paper (task D6),
+and CRAN will not accept a placeholder DOI.** The small-sample paper moved
+to 0.4.1 on 2026-07-31, so only the MCDM paper gates this release. Owner
+decision 2026-08-15: **SF2 goes straight to journal submission at
+*Operations Research and Decisions* (diamond OA), no preprint DOI step.**
+This changes D6's timeline. A preprint DOI was same-day and self-service;
+a journal DOI depends on that journal's own review and acceptance
+schedule, months rather than days. Two ways to unblock CRAN 0.4.0 without
+waiting on that: cite the manuscript in `inst/CITATION` as "submitted" or
+"in preparation" with no DOI field at all (CRAN accepts this citation
+form; the placeholder-DOI prohibition is about a fake or reserved-but-dead
+DOI string, not about a paper that legitimately has none yet), or revisit
+the preprint-DOI route later if the journal timeline turns out to matter.
+The manuscript itself moved out of this repository on 2026-08-14, to
+`../research/surveyframe_manuscripts/mcdm/`, tracked as SF2, LaTeX-typeset
+for the ORD template, compiles clean, real byline in place (the LaTeX
+version; the older `manuscript_draft.md` still carries a stale
+double-blind placeholder line, harmless since the LaTeX is the submission
+vehicle). D2a's OpenAlex literature verification is not yet finalised
+with clean automated numbers. Everything else outstanding in blocks D and
+E is mechanical release paperwork.
 
 **H2 is done.** The RStudio add-in was owner-verified inside a real RStudio
 session on 2026-08-15. See H2's entry in `todo_master_0.4.md` for the 2
