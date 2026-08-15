@@ -56,6 +56,18 @@ the 2026-08-15 renumbering and may still use the pre-2026-08-15 numbers.
 Cross-check against `CLAUDE.md`'s version-numbering table, which is
 current, before trusting a specific version number below.**
 
+**2026-08-15, later the same day, owner decision: `todo_0.5.md` and
+`todo_0.6.md` swapped content.** Text and open-ended response analysis
+is now the 0.5 release, targeted for release within 15 days, since its
+scope is narrower and self-contained. Structural model execution and
+the semScreenR bridge, the harder release of the pair, moved to 0.6
+with no fresh target date set. The net effect against the *original*
+(pre-2026-08-15) feature-track numbers below: structural models nets
+back out at 0.6, its original number, while text analysis moves from
+its original 0.7 to 0.5. The summary table immediately below and the
+`### v0.5` / `### v0.6` version-track sections are corrected for this;
+other prose in this document may still lag.
+
 The authoritative version-numbering table lives in `CLAUDE.md`.
 
 | Branch/worktree label (unchanged) | CRAN version | Planning file (renamed 2026-08-15) |
@@ -140,10 +152,10 @@ the slip and record why in `portfolio-planner/decisions.md`.
 | **0.4.0** | The next CRAN release. Small-sample inference plus MCDM and DEMATEL (all 10 methods) plus the 5 bugs found by independent validation plus the absorbed field validation, plus the 2026-08-07 breaking API change (validation diagnostic and the accessor family) and the RStudio add-in. Built on `v0.5-dev`, merged to `main` on 2026-08-03, specified in `todo_0.4.md`, tracked in `todo_master_0.4.md`. **Engineering, review, and release paperwork all complete as of 2026-08-15**: DESCRIPTION at `0.4.0`, NEWS.md complete, 1506 tests passing, `R CMD check --as-cran` Status OK at 0/0/0, tarball audited clean, `cran-comments.md` drafted, `inst/CITATION` citing SF2 with no DOI dependency, H2 owner-verified | win-builder submitted 2026-08-15, results pending. CRAN submission (E8) follows those results and minds CRAN's release-spacing preference against 2026-07-24 |
 | 0.4.1 | Faculty demo proofing on 0.4.0: demo session to college faculty, then UI/UX and documentation fixes, plus the 4 device-dependent field items and the ICSRI 2026 audience feedback captured from the 8-9 August 2026 conference. Detail in `todo_0.4.1.md`, tasks in `todo_master_0.4.md` block F. Renumbered from 0.4.1 to 0.5.1 on 2026-07-25 and back to 0.4.1 on 2026-07-30. Also carries the small-sample paper's citation into `inst/CITATION` (F6). Open decision: whether the first RMCDA method batch rides here or waits for 0.4.2 | TBC, follows 0.4.0 |
 | 0.4.2 onward | The RMCDA method expansion: the roughly 41 MCDM methods beyond the 10 shipping in 0.4.0, ported in batches, each cross-checked against RMCDA as a Suggests-only test-time oracle. Tasks in `todo_master_0.4.md` block G. Method-per-patch grouping not yet decided (G1), and the data-driven priority order it wants still depends on D2a's OpenAlex pass finishing | TBC |
-| 0.6 | SEM and PLS execution, invariance | 2027-03-11 |
-| 0.7 | Text and open-ended response analysis | 2027-04-25 |
-| 0.8 | Provenance part 1: `sf_version`, `sf_review`, `sf_pilot`, response hashing (SHA Layers 2-3) | 2027-06-09 |
-| 0.9 | Provenance part 2: `sf_bundle`, `verify_bundle`, manifest, sfReport (SHA Layers 4-5) | 2027-07-24 |
+| 0.5 | Text and open-ended response analysis. Swapped ahead of structural models on 2026-08-15 (owner decision): narrower, self-contained scope. Detail in `todo_0.5.md` | within 15 days of 2026-08-15 |
+| 0.6 | SEM and PLS execution, invariance, the semScreenR bridge. Swapped behind text analysis on 2026-08-15: carries the harder engineering (the fitting data contract, an external CRAN-pending dependency). Detail in `todo_0.6.md` | TBC, no fresh date set after the swap (2027-03-11 predates it) |
+| 0.7 | Provenance part 1: `sf_version`, `sf_review`, `sf_pilot`, response hashing (SHA Layers 2-3) | 2027-06-09 |
+| 0.8 | Provenance part 2: `sf_bundle`, `verify_bundle`, manifest, sfReport (SHA Layers 4-5) | 2027-07-24 |
 | 1.0 | Integration contract, AI and agentic layer, JASP/jamovi export, API freeze, Merkle root and DOI archival, launch at SaaS parity | 2027-10-22 |
 
 ---
@@ -455,7 +467,7 @@ Exit criteria: an instrument can declare an MCDM research question, collect the
 matrix data, and run the plan to a ranked result with a defensible report
 section. No new hard dependencies.
 
-### v0.6 — Structural model execution (target 2027-03-11)
+### v0.6 — Structural model execution (target TBC, was 2027-03-11 as v0.5 pre-swap; swapped behind text analysis 2026-08-15)
 
 Headline: move from syntax generation to fitted models, and connect screening.
 
@@ -473,7 +485,7 @@ Deliverables:
 Exit criteria: an sframe measurement model can be screened, fitted, and reported
 end to end, with invariance results, using optional packages.
 
-### v0.7 — Text and open-ended response analysis (target 2027-04-25)
+### v0.5 — Text and open-ended response analysis (target within 15 days of 2026-08-15; formerly v0.7, swapped ahead of structural models the same day)
 
 Headline: structured analysis of open-ended and free-text survey responses.
 
@@ -494,7 +506,7 @@ Exit criteria: an instrument with open-ended items can declare a text research
 question, run the plan, and receive term frequencies, themes, representative
 quotes, and a defensible report section. No new hard dependency.
 
-### v0.8 — Provenance layer, part one (target 2027-06-09)
+### v0.7 — Provenance layer, part one (target 2027-06-09; formerly v0.8, shifted down by 0.1 in the earlier 2026-08-15 renumbering — unrelated to the 0.5/0.6 swap)
 
 Headline: give the instrument a lifecycle and a review trail.
 
@@ -517,7 +529,7 @@ Exit criteria: an instrument can carry a versioned history with review and pilot
 evidence that survives save and reload, and a response file is bound to the
 instrument version by an aggregate hash.
 
-### v0.9 — Provenance layer, part two, and reporting (target 2027-07-24)
+### v0.8 — Provenance layer, part two, and reporting (target 2027-07-24; formerly v0.9, shifted down by 0.1 in the earlier 2026-08-15 renumbering — unrelated to the 0.5/0.6 swap)
 
 Headline: tamper-evident bundles and a Quarto-native report.
 

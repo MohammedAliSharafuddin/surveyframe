@@ -87,6 +87,19 @@ stale regardless of numbering. Each file's own title line and this table
 are authoritative; do not trust a bare version number inside a file's
 body without checking both.
 
+**Owner decision 2026-08-15 (later the same day): `todo_0.5.md` and
+`todo_0.6.md` swapped content.** Text and open-ended response analysis is
+now `todo_0.5.md`, targeted for release within 15 days, since its scope
+is narrower and self-contained (no new item types, no serialisation
+work, one new file). Structural model execution and the semScreenR
+bridge, the harder release of the pair, moved to `todo_0.6.md` with no
+fresh target date set. Self-referential mentions inside each file (the
+title, "the 0.x cycle", the "todo_0.x integration checklist" pointer)
+were swapped along with the content; sibling-release comparisons inside
+each file (a "less parallel than 0.x" note, a "0.x lavaan fits" note)
+were deliberately left as the literal digit already there, since the
+swap makes those correct rather than requiring a change.
+
 | Branch/worktree label (unchanged) | CRAN version | Planning file (renamed 2026-08-15) | Content |
 |---|---|---|---|
 | branch `v0.5-dev`, worktree `../surveyframe-v0.5-dev` | **0.4.0** | `todo_0.4.md` | MCDM plus small-sample plus the 5 bug fixes plus absorbed field validation |
