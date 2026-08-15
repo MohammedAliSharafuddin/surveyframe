@@ -40,3 +40,15 @@ in v0.4 and when to prefer each one.,
       url = {https://doi.org/10.5281/zenodo.20221929},
       note = {Companion textbook describing the small-sample methods surveyframe adds in v0.4 and when to prefer each one.},
     }
+
+Sharafuddin M (2026). “surveyframe: A Pre-Declared, Reproducible
+Framework for Multi-Criteria Decision Analysis in Survey Research.”
+Manuscript in preparation for Operations Research and Decisions.
+Describes the 10 MCDM methods surveyframe adds in v0.4.
+
+    @Unpublished{,
+      title = {surveyframe: A Pre-Declared, Reproducible Framework for Multi-Criteria Decision Analysis in Survey Research},
+      author = {Mohammed Ali Sharafuddin},
+      year = {2026},
+      note = {Manuscript in preparation for Operations Research and Decisions. Describes the 10 MCDM methods surveyframe adds in v0.4.},
+    }
