@@ -7,6 +7,16 @@
 > 0.5.x on CRAN. This file remains the engineering spec for the release.
 > The canonical task list, priority order, and model tiers are in
 > `todo_master_0.4.md`.
+>
+> **Status 2026-08-15: this release is built, checked, and waiting on
+> win-builder.** The engineering closed on 2026-08-02 and merged to `main`
+> on 2026-08-03. Release paperwork (block E of `todo_master_0.4.md`) was
+> worked through on 2026-08-15: DESCRIPTION at `0.4.0`, NEWS.md complete,
+> 1506 tests passing, `R CMD check --as-cran` Status OK at 0/0/0,
+> `cran-comments.md` drafted, tarball audited clean of dev-only files,
+> `inst/CITATION` citing SF2 with no DOI. A tarball went to win-builder
+> the same day and the results are pending. Only the CRAN submission
+> itself remains. This file stays as the engineering record.
 
 Dev-only planning file, tracked on `dev` only. Its name is in `.gitignore`
 and `.Rbuildignore`. Companion to `CLAUDE.md`, `todo_0.4.md`, and

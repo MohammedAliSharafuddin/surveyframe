@@ -39,7 +39,10 @@ release.
 ## Baseline verified 2026-07-30
 
 0.3.4 is live on CRAN, published 2026-07-24, all 13 check flavours Status
-OK with no notes. `main` at 6556f91 matches the public repository. The
+OK with no notes. `main` at 6556f91 matches the public repository. **That
+SHA no longer exists**: the 2026-08-04 history rewrite orphaned it, and its
+counterpart on the rewritten `main` is `19ada2c`, which is what the
+`v0.3.4` tag points at. See `CLAUDE.md`'s history-rewrite section. The
 pkgdown site shows 0.3.4 and carries no dev-only files. `mas_review_034`
 is signed off. Nothing from that release is outstanding.
 
@@ -58,9 +61,13 @@ small-sample track, all 10 MCDM computations with both UI registries,
    small-sample paper.** No combined manuscript. The MCDM paper describes
    the 10 shipped methods only, with the RMCDA expansion named as roadmap
    rather than claimed as shipped, matching D2's original scope. Both
-   papers' preprint DOIs gate `inst/CITATION` for 0.4.0 independently;
-   D3 (the combined draft) is dropped and D4 no longer needs an owner
-   1-vs-2 read, since 2 was decided directly. See the journal and title
+   papers' preprint DOIs were expected to gate `inst/CITATION` for 0.4.0
+   independently. D3 (the combined draft) is dropped and D4 no longer needs
+   an owner 1-vs-2 read, since 2 was decided directly. **Superseded in part
+   on 2026-08-15**: no preprint DOI gates 0.4.0 at all. SF2 went straight to
+   journal submission and is cited in `inst/CITATION` as in preparation with
+   no DOI, and MX3, the small-sample paper, moved to 0.4.1 with block F on
+   2026-07-31 and carries its own citation there (F6). See the journal and title
    decisions in D1/D2 below and the paper-track entry in
    `../portfolio-planner/decisions.md`.
 3. **Confirm the 8-into-0.4.0 and 4-into-0.4.1 split** of the 12 open
@@ -76,13 +83,18 @@ Work top down. Anything in the same tier can run in parallel.
   A1 to A6, B1 to B16, C3 to C8, plus H1. The 2 pre-existing defects logged
   during the work (the Shiny export shape and the serialisation fixed point)
   were both fixed on owner decision the same day.
-- **P4, the live tier: manuscript and release.** D2 and D2a (the MCDM paper
-  and its OpenAlex pass) can now start, since the engineering they describe
-  is submission-ready. Then D4, D5, **D6 (the preprint DOI in
-  `inst/CITATION`, the only hard CRAN blocker)**, then E1 to E8.
-- **P4 human gate, blocking E8: H2.** Verifying the RStudio add-in inside a
-  real RStudio session. It cannot be automated in any form, the add-in ships
-  in this release, and Part J of `mas_review_040.qmd` carries the click path.
+- **P4, the live tier: manuscript and release. Closed 2026-08-15 apart from
+  D2a and E8.** D2 (the MCDM manuscript) was drafted, proofread, and
+  submitted to *Operations Research and Decisions*. D4, D5, and D6 are all
+  resolved, and D6 stopped being a blocker when `inst/CITATION` moved to an
+  in-preparation citation with no DOI. E1 to E5 and E7 are done, E6 is
+  submitted to win-builder with results pending, and E8 (the CRAN submission
+  itself) waits on those results. D2a, the OpenAlex pass, is still open and
+  gates nothing in this release, only G1's grouping decision at 0.4.2.
+- **P4 human gate, blocking E8: H2. Done 2026-08-15**, owner-verified inside
+  a real RStudio session. It could not be automated in any form, the add-in
+  ships in this release, and Part J of `mas_review_040.qmd` carried the click
+  path.
 - **P5, after 0.4.0 ships:** F0, F0a, F0b, F0c, F1 to F6, then G1 to G4.
   Block F now also carries the 12 dogfeed items re-laned on 2026-08-02.
 - **Parallel at any time:** H3, I4 to I9.
@@ -97,8 +109,28 @@ have been fine; ORD's own guidelines do not say either way). SF2 itself
 was submitted to ORD the same day, its own proofread pass complete
 (negative-prose and antithesis rewrite, 2 missing citations added, the
 roadmap-disclosure section removed on owner instruction). **H2 is done**,
-owner-verified in a real RStudio session on 2026-08-15. Block E, the
-mechanical release paperwork, is what remains.
+owner-verified in a real RStudio session on 2026-08-15.
+
+**Critical path, restated again later on 2026-08-15. Block E is worked
+through and only E8 remains.** DESCRIPTION reads `0.4.0`, NEWS.md is
+complete, `devtools::test()` gives 0 failures on 1506 tests,
+`R CMD check --as-cran` returns Status OK at 0 errors, 0 warnings, 0 notes,
+the tarball was audited against every dev-only file named in `CLAUDE.md`
+and carries none, and `cran-comments.md` is drafted. A tarball went to
+win-builder the same day and the results are pending, so E6 is submitted
+rather than closed. E8, the CRAN submission itself, is the only step left.
+
+**One real gap surfaced during that release prep.** The 2026-08-07 breaking
+API change (the validation diagnostic and the accessor family) had been
+built and tested on `dev` and never merged to `main`, so `main` had already
+passed a full CRAN check without any of it. Cherry-picked `c67dab9` onto
+`main` and re-verified from scratch. NEWS.md turned out to have the same
+shape of gap: its 0.4.0 section documented the later bug-fix, accessor, and
+polish work while never mentioning the MCDM extension or the small-sample
+statistics track, which are this release's headline features. Both were
+fixed on 2026-08-15. The lesson to carry: a commit on `dev` is no evidence
+that `main` has it, and a changelog that reads complete can still be missing
+the release's whole subject.
 
 **What this round changed about the plan itself.** Three tasks turned out
 not to be what they were written as. B10's exemption was already there by
@@ -469,7 +501,7 @@ schedule either way. Only the MCDM paper (D2/D2a) now gates 0.4.0's
 `inst/CITATION`; the small-sample paper's DOI is added to `inst/CITATION`
 as part of 0.4.1 instead (see F6).
 
-- [ ] **D2 [Sonnet draft, Opus review]** MCDM-only manuscript,
+- [x] **D2 [Sonnet draft, Opus review]** MCDM-only manuscript,
   **"surveyframe: A Pre-Declared, Reproducible Framework for
   Multi-Criteria Decision Analysis in Survey Research."** Target
   journal, set 2026-07-31 (supersedes the Journal of Multi-Criteria
@@ -480,8 +512,20 @@ as part of 0.4.1 instead (see F6).
   (~$2,630/£1,750/€2,170 APC), DMAME is Q1 but its APC is £2,500-£3,500,
   the most expensive of the 3 options considered. General OR scope, not
   MCDM-specific, but MCDM sits inside it. Covers the 10 methods that
-  ship in 0.4.0 only, with the RMCDA expansion named as roadmap rather
-  than claimed as shipped.
+  ship in 0.4.0 only. **Done 2026-08-15, submitted to *Operations Research
+  and Decisions*.** Drafted, moved to `../research/surveyframe_manuscripts/mcdm/`
+  on 2026-08-14 as SF2, typeset to the ORD LaTeX template with a real byline,
+  and proofread the same day (see D4). The "Roadmap: the wider MCDA family"
+  section was removed on owner instruction, since the roughly 41-method
+  expansion plan, the CRAN version numbers, and the 0.4.2 timing are forward
+  product detail with no place in a peer-reviewed methods paper. The RMCDA
+  citation was kept on owner instruction and relocated to the Background
+  section's package survey as a factual, present-tense mention. A rendered
+  supplementary-material PDF was added for the submission, produced from this
+  repository's `vignettes/mcdm-analysis.Rmd` as PDF output, 8 pages, running
+  the hotel-supplier worked example end to end. Final state: 18 of 18
+  references cited, 0 orphaned, compiles clean at 11 pages with 0 undefined
+  references.
   - [ ] **D2a [Sonnet]** OpenAlex query pass over the MCDM literature:
     search works for all 10 shipped methods (AHP, ANP, DEMATEL, VIKOR,
     MOORA, SMART, WASPAS, PROMETHEE, ELECTRE, TOPSIS) plus the ~41 RMCDA
@@ -502,7 +546,17 @@ as part of 0.4.1 instead (see F6).
     53 queries through before hitting this sandbox's network proxy's daily
     budget cap (`$0 remaining, resets at midnight UTC`), not a real
     OpenAlex limit. No results file was written. Needs a further rerun
-    with budget available.
+    with budget available. **Partly resolved 2026-08-15 by a different
+    route.** A manual OpenAlex web-UI export (topic T10050,
+    "Multi-Criteria Decision Making", ANDed against the 10 core method
+    names) was downloaded and cleaned by
+    `../research/surveyframe_manuscripts/mcdm/clean_openalex_topic_export.R`,
+    giving 17,474 rows deduplicated by title and tagged per method. The
+    per-method summary confirms the 10 shipped methods as the core, led by
+    AHP (3,749 title mentions, 183,770 citations) and TOPSIS (3,452 /
+    115,660), down to SMART (110 / 2,484). The tagging is a title-only
+    proxy, since the web-UI export carries no abstract text, so the API
+    rerun is still worth doing before G1's priority order is fixed.
 - [x] **D4 [Owner]** Proofread the MCDM draft. **Done 2026-08-15.** The 7
   uncited references were fixed earlier; a final pass the same day
   rewrote every negative-prose and antithesis construction to direct
@@ -523,22 +577,43 @@ as part of 0.4.1 instead (see F6).
 
 ## Block E. 0.4.0 release paperwork
 
-- [ ] **E1 [Haiku]** Set DESCRIPTION to `0.4.0`. The branch stays
-  `v0.5-dev`.
-- [ ] **E2 [Sonnet]** NEWS.md entry headed 0.4.0, as a clean per-release
+**Worked through on 2026-08-15.** E1 to E5 and E7 are done, E6 is
+submitted with results pending, and E8 is the only step left.
+
+- [x] **E1 [Haiku]** Set DESCRIPTION to `0.4.0`. The branch stays
+  `v0.5-dev`. **Done 2026-08-15**, from the `0.3.4.9000` development
+  marker.
+- [x] **E2 [Sonnet]** NEWS.md entry headed 0.4.0, as a clean per-release
   changelog, stating that 0.3.5 and 0.5 were planned and never released
-  and what each absorbed.
-- [ ] **E3 [Sonnet]** `cran-comments.md` for the merged diff, framed as
-  0.3.4 to 0.4.0.
-- [ ] **E4 [Haiku]** `devtools::document()` clean, full suite green.
-- [ ] **E5 [Haiku]** `R CMD check --as-cran` at 0 errors, 0 warnings, at
+  and what each absorbed. **Done 2026-08-15**, in 2 passes. The first
+  dropped "(in development)" from the header and added the
+  never-released statement. The second added the MCDM and small-sample
+  sections, which the section had omitted entirely while documenting the
+  later bug-fix, accessor, and polish work, so the changelog was missing
+  the release's own headline features.
+- [x] **E3 [Sonnet]** `cran-comments.md` for the merged diff, framed as
+  0.3.4 to 0.4.0. **Done 2026-08-15.** Written from `CLAUDE.md`'s feature
+  description in place of NEWS.md, since NEWS.md's gap was found first.
+  9 numbered changes, the 2 breaking ones flagged, test environments
+  recording win-builder as submitted with results pending.
+- [x] **E4 [Haiku]** `devtools::document()` clean, full suite green.
+  **Done 2026-08-15.** NAMESPACE regenerated (cosmetic import-block
+  reformatting from roxygen2 8.1.0, no functional change, verified by
+  diff). Suite: 0 failures, 1506 passes, 36 warnings (the pre-existing
+  `geom_errorbarh` deprecation), 1 skip.
+- [x] **E5 [Haiku]** `R CMD check --as-cran` at 0 errors, 0 warnings, at
   most 1 note, plus `urlchecker::url_check()` and
-  `spelling::spell_check_package()`.
+  `spelling::spell_check_package()`. **Done 2026-08-15**: Status OK on
+  the built tarball at 0 errors, 0 warnings, 0 notes.
 - [ ] **E6 [Haiku]** Win-builder R-release and R-devel, both Status OK.
-- [ ] **E7 [Haiku]** Confirm no dev-only file reaches the tarball or
-  pkgdown, and that pkgdown builds from `main` only.
+  **Submitted 2026-08-15, results pending.** Leave open until both
+  flavours report back.
+- [x] **E7 [Haiku]** Confirm no dev-only file reaches the tarball or
+  pkgdown, and that pkgdown builds from `main` only. **Done 2026-08-15**:
+  the built tarball's full file listing was audited against every
+  dev-only file named in `CLAUDE.md` and none is present.
 - [ ] **E8 [Owner]** CRAN submission as 0.4.0, minding the release-spacing
-  preference against 2026-07-24.
+  preference against 2026-07-24. Waits on E6.
 
 ## Block F. CRAN 0.4.1, faculty demo proofing
 

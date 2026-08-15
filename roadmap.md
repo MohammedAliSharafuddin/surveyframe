@@ -1,6 +1,37 @@
 # surveyframe roadmap (0.3 through 1.0)
 
-Last updated: 2026-07-30.
+Last updated: 2026-08-15.
+
+**2026-08-15: 0.4.0 is release-ready and waiting on win-builder only.**
+Block E, the release paperwork, is worked through. DESCRIPTION reads
+`0.4.0`, NEWS.md carries a complete 0.4.0 section (the MCDM and
+small-sample headline sections were missing and were added the same day),
+`devtools::test()` returns 0 failures on 1506 tests,
+`R CMD check --as-cran` returns Status OK with 0 errors, 0 warnings, and 0
+notes, the built tarball was audited against every dev-only file named in
+`CLAUDE.md` and carries none of them, and `cran-comments.md` is drafted. A
+tarball went to win-builder on 2026-08-15 and the results are pending. CRAN
+submission (task E8) is the only step left.
+
+**2026-08-15: the D6 blocker is closed.** `inst/CITATION` cites SF2, the
+MCDM manuscript, as `bibtype = "Unpublished"`, "Manuscript in preparation
+for Operations Research and Decisions", with no DOI field. Owner decision
+the same day sent SF2 straight to journal submission at *Operations
+Research and Decisions*, skipping the preprint-DOI step, so no DOI gates
+this release. CRAN's placeholder prohibition is about a fake DOI string,
+which is a different thing from a paper that legitimately has none yet.
+H2, the owner verification of the RStudio add-in in a real RStudio
+session, was also completed on 2026-08-15.
+
+**2026-08-15: the 2026-08-07 accessor work reached `main` late.** The
+breaking API change (`validate_sframe()` and `validate_model()` returning
+an `sframe_validation` diagnostic, plus the `sf_*` accessor family and
+`as.data.frame()` on all 14 result classes) was built and tested on `dev`
+on 2026-08-07 and never merged to `main`. The gap surfaced during the
+0.4.0 release prep on 2026-08-15, by which point `main` had already passed
+a full CRAN check without it. Fixed by cherry-picking `c67dab9` onto
+`main` and re-verifying from scratch. A commit on `dev` is no evidence
+that `main` has it.
 
 **2026-07-30, owner decision: the CRAN numbering is renumbered and the
 local labels stay as they are.** CRAN runs **0.3.4 to 0.4.0 to 0.4.1 to
@@ -14,6 +45,18 @@ longer binds. Branches, worktrees, and planning-file names are
 deliberately not renamed, so DESCRIPTION reads `0.4.0` while the branch
 is still called `v0.5-dev`. Full task list, priority order, and model
 tiers: `todo_master_0.4.md`.
+
+The authoritative version-numbering table lives in `CLAUDE.md` and is
+reproduced here unchanged. Do not rename branches, worktrees, or planning
+files to match CRAN.
+
+| Local label (keep as is) | CRAN version | Content |
+|---|---|---|
+| branch `v0.5-dev`, worktree `../surveyframe-v0.5-dev`, `todo_0.5.md` | **0.4.0** | MCDM plus small-sample plus the 5 bug fixes plus absorbed field validation |
+| `todo_0.5.1.md` | **0.4.1** | Faculty demo proofing plus the device-dependent field items |
+| the RMCDA method expansion | **0.4.2** onward | The roughly 41 extra MCDM methods |
+| `todo_0.3.5.md` | never published | Absorbed into 0.4.0 and 0.4.1 |
+| branch `v0.4-dev` | never published | Small-sample track, already merged into `v0.5-dev` |
 
 **2026-07-25: 0.4 merged into 0.5 by owner decision**, fired early,
 ahead of the original 2026-10-15 DOI-live gate (`decisions.md` in
@@ -86,9 +129,9 @@ the slip and record why in `portfolio-planner/decisions.md`.
 | ~~0.3.5~~ | **Cancelled as a release, 2026-07-30.** Its field-validation scope (ICSRI 2026 audience feedback from the 8-9 August 2026 conference, 3 to 5 human testing rounds, and the fixes both surface) is absorbed into 0.4.0 for the 8 machine-fixable items and into 0.4.1 for the 4 device-dependent ones. Strict patch scope no longer applies | superseded, see 0.4.0 |
 | ~~0.4 (old)~~ | **Merged into the release now numbered 0.4.0, 2026-07-25.** Small-sample inference engineering implemented and tested, committed on `v0.4-dev`, then branched into `v0.5-dev` | superseded |
 | ~~0.5~~ | **Renumbered to 0.4.0, 2026-07-30.** The branch `v0.5-dev`, the worktree, and `todo_0.5.md` keep the 0.5 label deliberately. Only the published number changed | superseded, see 0.4.0 |
-| **0.4.0** | The next CRAN release. Small-sample inference plus MCDM and DEMATEL (all 10 methods) plus the 5 bugs found by independent validation plus the absorbed field validation. Built on `v0.5-dev`, specified in `todo_0.5.md`, tracked in `todo_master_0.4.md`. Still open: `sensitivity_analysis()`, `sf_conjoint_design()`, the Shiny renderer and builder inspector for the 2 decision item types, 8 method citations, the vignette, and the preprint DOI for `inst/CITATION` | TBC, gated on the manuscript DOI and on ICSRI feedback, so not before September 2026 |
-| 0.4.1 | Faculty demo proofing on 0.4.0: demo session to college faculty, then UI/UX and documentation fixes, plus the 4 device-dependent field items. Renumbered from 0.4.1 to 0.5.1 on 2026-07-25 and back to 0.4.1 on 2026-07-30. Open decision: whether the first RMCDA method batch rides here or waits for 0.4.2 | TBC, follows 0.4.0 |
-| 0.4.2 onward | The RMCDA method expansion: the roughly 41 MCDM methods beyond the 10 shipping in 0.4.0, ported in batches, each cross-checked against RMCDA as a Suggests-only test-time oracle. Method-per-patch grouping not yet decided | TBC |
+| **0.4.0** | The next CRAN release. Small-sample inference plus MCDM and DEMATEL (all 10 methods) plus the 5 bugs found by independent validation plus the absorbed field validation, plus the 2026-08-07 breaking API change (validation diagnostic and the accessor family) and the RStudio add-in. Built on `v0.5-dev`, merged to `main` on 2026-08-03, specified in `todo_0.5.md`, tracked in `todo_master_0.4.md`. **Engineering, review, and release paperwork all complete as of 2026-08-15**: DESCRIPTION at `0.4.0`, NEWS.md complete, 1506 tests passing, `R CMD check --as-cran` Status OK at 0/0/0, tarball audited clean, `cran-comments.md` drafted, `inst/CITATION` citing SF2 with no DOI dependency, H2 owner-verified | win-builder submitted 2026-08-15, results pending. CRAN submission (E8) follows those results and minds CRAN's release-spacing preference against 2026-07-24 |
+| 0.4.1 | Faculty demo proofing on 0.4.0: demo session to college faculty, then UI/UX and documentation fixes, plus the 4 device-dependent field items and the ICSRI 2026 audience feedback captured from the 8-9 August 2026 conference. Detail in `todo_0.5.1.md`, tasks in `todo_master_0.4.md` block F. Renumbered from 0.4.1 to 0.5.1 on 2026-07-25 and back to 0.4.1 on 2026-07-30. Also carries the small-sample paper's citation into `inst/CITATION` (F6). Open decision: whether the first RMCDA method batch rides here or waits for 0.4.2 | TBC, follows 0.4.0 |
+| 0.4.2 onward | The RMCDA method expansion: the roughly 41 MCDM methods beyond the 10 shipping in 0.4.0, ported in batches, each cross-checked against RMCDA as a Suggests-only test-time oracle. Tasks in `todo_master_0.4.md` block G. Method-per-patch grouping not yet decided (G1), and the data-driven priority order it wants still depends on D2a's OpenAlex pass finishing | TBC |
 | 0.6 | SEM and PLS execution, invariance | 2027-03-11 |
 | 0.7 | Text and open-ended response analysis | 2027-04-25 |
 | 0.8 | Provenance part 1: `sf_version`, `sf_review`, `sf_pilot`, response hashing (SHA Layers 2-3) | 2027-06-09 |
@@ -519,7 +562,8 @@ Deliverables (provenance parity):
 - Merkle-root extension on top of the v0.9 manifest.
 - DOI-linked archival deposit.
 - API declared stable; semantic-versioning guarantees begin.
-- `inst/CITATION` updated to point to the published JSS paper.
+- `inst/CITATION` updated to point to the published SF1 paper (the R Journal
+  since 2026-08-08).
 
 Coincides with: Ethos public launch, Ethos Pro institutional launch, and the
 ASRDA textbook complete edition.
@@ -557,7 +601,7 @@ makes the tooling real.
 | 1 | 0.3 to 0.4 | Parts I to III (foundations, instrument design, sampling, data capture and quality), Part IV ch 9 (reliability), Part V (descriptives, assumptions), Part VI ch 13 to 16 (correlation, parametric and non-parametric comparisons, agreement). Part VI non-parametric and Part XIII ch 37 resampling draw on the v0.4 small-sample helpers. |
 | 2 | 0.5 to 0.7 | Part XII ch 34 to 35 (MCDM, fuzzy and hybrid) on v0.5; Part IV ch 10 (validity and invariance) and Part IX ch 26 to 27 (factor, confirmatory and structural models) on v0.6; Part III ch 8 (text data processing and open-ended responses) and Part VII ch 17 (text visualisation) on v0.7. |
 | 3 | 0.8 to 0.9 | Part VII ch 18 (automated reporting), Part XIV ch 39 to 40 (workflow automation and open science, data management and DOI registration). |
-| 4 | 1.0 | Part XI ch 33 (survey weighting and variance estimation). Complete edition published at v1.0 with the JSS-paper citation. |
+| 4 | 1.0 | Part XI ch 33 (survey weighting and variance estimation). Complete edition published at v1.0 with the SF1 paper citation (the R Journal since 2026-08-08). |
 
 Note: Part III ch 8 (text) sits early in the book but its surveyframe tooling
 lands at v0.7, so the chapter is written in Stage 2 even though its part is in
@@ -573,9 +617,9 @@ ch 32 (machine learning), Part XIII ch 36 (IRT) and ch 38 (meta-analysis).
 
 | surveyframe | Methodology paper |
 |---|---|
-| 0.3 | JSS software paper (OJS 6454, submitted 2026-06-02; returned without full review 2026-06; revise and resubmit). Plus the v0.3 design paper (not yet started). |
+| 0.3 | SF1, the package paper. Submitted to JSS 2026-06-02 (OJS 6454), returned without full review 2026-06, revised twice, then **rejected on aims and scope 2026-08-07**. Redirected to the R Journal on 2026-08-08 and pinned to CRAN 0.4.0. Plus the v0.3 design paper (not yet started). |
 | 0.3.4 to 0.3.5 | No separate paper. The visualisation arc is patch work. Plots feed figures in every later methodology paper and in ASRDA ch 17. |
-| 0.5 | Small-sample survey inference paper (smallsamplelab, draft exists) **and** MCDM and DEMATEL methodology paper (not started) — both cite 0.5, since 0.4 merged into 0.5 on 2026-07-25. |
+| 0.4.0 (local 0.5) | 2 papers, both drafted. **SF2**, the MCDM and DEMATEL methodology paper, submitted to *Operations Research and Decisions* on 2026-08-15 and tracked in `../research/surveyframe_manuscripts/mcdm/`. **MX3**, the small-sample correction-selection method, drafted for *MethodsX* and tracked in `../research/methodsx/mx3_small_sample_protocol/`, with co-author comments applied on 2026-08-15 and the author team's own review still outstanding. `inst/CITATION` cites SF2 as in preparation with no DOI, so neither paper gates the release. |
 | 0.6 | semScreenR package and SEM-screening methodology paper, not started. |
 | 0.7 | Text and open-ended analysis methodology paper, not started. |
 | 0.8 and 0.9 | Covered by three papers, in submission order: SSR 6.0 (proof-of-integrity, submitted post-0.9, unchanged as of the 2026-07-14 scope decision), then MethodsX (sframe-schema standard, standalone repo `sframe-schema`), then JOI (informetrics framing of the Derivative Citation Model). MethodsX and JOI added 2026-07-14; both cite SSR 6.0 rather than duplicating it. |
@@ -585,8 +629,20 @@ ch 32 (machine learning), Part XIII ch 36 (IRT) and ch 38 (meta-analysis).
 
 ## Growth and citation track (parallel)
 
-### 1. JSS paper — surveyframe (highest priority)
+### 1. SF1, the surveyframe package paper (highest priority)
 
+- **Venue changed 2026-08-08: the R Journal.** JSS rejected the manuscript on
+  aims and scope on 2026-08-07, since surveyframe contributes workflow
+  discipline and pre-registration enforcement in place of statistical
+  methodology. The R Journal names package papers and re-usable
+  architectures in its own scope, so the same property is the contribution
+  there. The manuscript is pinned to **CRAN 0.4.0**, whose API froze with
+  the 2026-08-07 accessor and validation-diagnostic work.
+- The manuscript lives in its own private repository,
+  `../surveyframe-jss-paper`, whose name is now historical. The 2 package
+  defects the JSS editors recorded alongside the rejection are both fixed
+  and ship in 0.4.0.
+- History below, kept for the record.
 - Journal of Statistical Software. Manuscript at `jss-paper/surveyframe.Rnw`.
 - Positions surveyframe as a proactive workflow: the instrument is a
   methodological contract declared before data collection, so analysis is the
@@ -612,17 +668,28 @@ ch 32 (machine learning), Part XIII ch 36 (IRT) and ch 38 (meta-analysis).
   defect first (returns neither the screened model nor pruned data).
 - A methods paper on rule-based, cross-validated SEM data screening.
 
-### 4. Small-sample methods paper
+### 4. Small-sample methods paper (MX3)
 
-- Based on the `small-sample-survey-framework` simulation study.
-- The published paper justifies the helpers shipped in v0.4.
-- Proofread, post a preprint DOI, then submit. Preprint DOI must land by 0.4.
+- Based on the `small-sample-survey-framework` simulation study, validated by
+  a 2000-replication-per-scenario simulation.
+- The published paper justifies the helpers shipped in CRAN 0.4.0.
+- Drafted at `../research/methodsx/mx3_small_sample_protocol/`, targeting
+  *MethodsX*, tracked as MX3 in `../research/PORTFOLIO.md`. Co-author comments
+  were applied on 2026-08-15 (title, author order, CRediT, abstract length,
+  highlights, and an R-generated graphical abstract), and it compiles clean at
+  12 pages.
+- **No preprint DOI gates any release.** That requirement was dropped on
+  2026-08-15 when `inst/CITATION` moved to citing SF2 without a DOI. MX3's
+  own citation joins `inst/CITATION` at 0.4.1 instead (task F6).
+- Outstanding before submission: the author team's own review, a co-author
+  ORCID, and a full OpenAlex novelty pass.
 
 ### 5. ASRDA textbook — staged with surveyframe progress
 
 - "From Constructs to Conclusions Using R." Quarto book.
 - Released in stages that track surveyframe capability.
-- Gated on the JSS paper being accepted so it can cite a peer-reviewed reference.
+- Gated on SF1 being accepted so it can cite a peer-reviewed reference. Venue is
+  the R Journal since 2026-08-08.
 - At v1.0 the textbook is retitled to reflect SSR 6.0, agentic AI, and the
   surveyframe unique selling point.
 
@@ -630,7 +697,7 @@ ch 32 (machine learning), Part XIII ch 36 (IRT) and ch 38 (meta-analysis).
 
 - Applied papers: maritime research set (JMR), Maldives cross-border e-commerce
   PLS-SEM (cbec-maldives-smes), and the logistics-trade island-economies study
-  (ILPTFIE). Each cites surveyframe and, once published, the JSS paper.
+  (ILPTFIE). Each cites surveyframe and, once published, the SF1 paper.
 - pkgdown gallery of worked instruments across domains.
 - CRAN task views: listed in Psychometrics. Re-approach OfficialStatistics if
   v0.9 ships complex-survey weighting.
@@ -643,7 +710,7 @@ ch 32 (machine learning), Part XIII ch 36 (IRT) and ch 38 (meta-analysis).
 - **Ethos** and **Ethos Pro** treat surveyframe as the source-of-truth engine.
   They need the frozen integration contract and the provenance layer. They launch
   at surveyframe 1.0 (2027-10-22).
-- **ASRDA textbook** complete edition matches v1.0 capability and cites the JSS
+- **ASRDA textbook** complete edition matches v1.0 capability and cites the SF1
   paper.
 - The Ethos build train runs one cycle behind surveyframe. Each Ethos milestone
   depends on the matching surveyframe release landing first.

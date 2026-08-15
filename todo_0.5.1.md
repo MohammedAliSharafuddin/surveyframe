@@ -7,6 +7,16 @@
 > first RMCDA method batch rides here, which would end this patch's
 > strict scope, or waits for 0.4.2. Canonical task list:
 > `todo_master_0.4.md`, block F.
+>
+> **Status 2026-08-15.** 0.4.0 is built, checked, and waiting on
+> win-builder, so this patch's own work starts once that release reaches
+> CRAN. Two things below have moved on since this file was written. The
+> add-in verification listed under preparation is already done: H2 was
+> owner-verified in a real RStudio session on 2026-08-15, so the check
+> here narrows to a fresh-install confirmation on a machine that has never
+> had surveyframe. And the ICSRI 2026 audience feedback from the 8-9
+> August 2026 conference is captured as task F0 in `todo_master_0.4.md`
+> rather than here.
 
 Dev-only planning file, tracked on `dev` only. Its name is in `.gitignore`
 and `.Rbuildignore`. Companion to `CLAUDE.md` and `todo_0.5.md`.

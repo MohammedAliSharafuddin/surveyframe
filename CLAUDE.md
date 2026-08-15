@@ -292,18 +292,27 @@ feasibility). The vignette builds offline because the data-collection step uses
 ## Current status and immediate next steps
 
 Status verified against the code, the branches, both remotes, CI, and CRAN on
-2026-08-05.
+2026-08-05, and against the commit history and the working tree again on
+2026-08-15.
 
-**Read this first.** 0.4.0's engineering is complete and now sits on `main`,
-installable from GitHub. A **breaking API change landed on `dev` on
-2026-08-07**: `validate_sframe()` returns a diagnostic and every class gained
-accessors. The review suite is complete and found 8 defects needing owner
+**Read this first.** 0.4.0 is built, checked, and waiting on win-builder.
+Its engineering completed on 2026-08-02 and merged to `main` on 2026-08-03.
+The release paperwork was worked through on 2026-08-15: DESCRIPTION reads
+`0.4.0`, NEWS.md is complete (the MCDM and small-sample sections were
+missing and were added the same day), 1506 tests pass,
+`R CMD check --as-cran` returns Status OK at 0 errors, 0 warnings, 0 notes,
+the tarball is audited clean of dev-only files, and `cran-comments.md` is
+drafted. A tarball went to win-builder on 2026-08-15 with results pending,
+and the CRAN submission itself is the only step left. **Both former
+blockers are closed**: D6 no longer needs a DOI, since `inst/CITATION`
+cites SF2 as in preparation, and H2 was owner-verified in a real RStudio
+session on 2026-08-15. The **breaking API change built on `dev` on
+2026-08-07** (`validate_sframe()` returning a diagnostic, plus the accessor
+family) had never reached `main` and was cherry-picked across on
+2026-08-15. The review suite is complete and found 8 defects needing owner
 decisions. Git history was rewritten on 2026-08-04, so any clone older than
-that is stale. **H2 (the RStudio add-in) is done, owner-verified in a real
-RStudio session on 2026-08-15.** The one remaining hard CRAN blocker is D6,
-the MCDM preprint DOI, which also gates the SF1 manuscript, pinned to CRAN
-0.4.0 for the R Journal. Jump to "0.4.0 is on `main`", "Breaking API
-change", "The review suite", and "Git history was rewritten".
+that is stale. Jump to "0.4.0 is on `main`", "Breaking API change", "The
+review suite", and "Git history was rewritten".
 
 ### Shipped
 
@@ -696,6 +705,39 @@ things the verification pass found and fixed along the way: an
 `install()`-vs-`load_all()` Addins-menu quirk (environmental, not a package
 defect) and a genuine fix to the inserted skeleton, which built a
 statistically weak 2-item scale and now builds 3.
+
+### Block E, the release paperwork, worked through 2026-08-15
+
+E1 to E5 and E7 are done, E6 is submitted with results pending, and E8, the
+CRAN submission itself, is the only step left. Full per-task detail in
+`todo_master_0.4.md` block E.
+
+- DESCRIPTION moved from the `0.3.4.9000` development marker to `0.4.0`.
+- NEWS.md dropped "(in development)" from its header, gained the plain
+  statement that 0.3.5 and 0.5 were planned and never released, and then
+  gained the MCDM and small-sample sections, which had been missing
+  outright. The section had documented the later bug-fix, accessor, and
+  polish work while never mentioning this release's 2 headline features.
+- `devtools::document()` regenerated NAMESPACE, a cosmetic import-block
+  reformat from roxygen2 8.1.0 with no functional change, verified by diff.
+  `devtools::test()`: 0 failures, 1506 passes, 36 warnings (the
+  pre-existing `geom_errorbarh` deprecation), 1 skip.
+- `R CMD check --as-cran` on the built tarball: Status OK, 0 errors, 0
+  warnings, 0 notes. The Ubuntu Chrome-detritus NOTE recorded in the
+  2026-08-04 section did not reappear.
+- The tarball's full file listing was audited against every dev-only file
+  named in this file. None is present.
+- `cran-comments.md` is drafted, written from this file's feature
+  description in place of NEWS.md, since NEWS.md's own gap was found first.
+  It records win-builder as submitted with results pending.
+
+**The accessor work reached `main` 8 days late, and the release prep is how
+it was found.** See the breaking-API-change section above. The same shape of
+gap produced the NEWS.md omission. Both are the same failure to check that a
+thing believed done had actually landed where it needed to be, so the check
+worth building in is: before calling a release feature-complete, confirm
+each headline feature appears in the branch being shipped and in the
+changelog describing it.
 
 ### Also open, unrelated to a single release
 

@@ -6,7 +6,23 @@ files list) and add its name to `.gitignore`. This file supersedes
 `todo_0.4.md` section 9 for the RStudio add-in specifically — that section
 now just points here.
 
+> **Status 2026-08-15: built, merged, and owner-verified. This file is now
+> a record.** H1 built the add-in on 2026-08-02 on `feature/rstudio-addin`
+> (3 launchers plus the skeleton insert, the agreed 4 and nothing more, 26
+> tests), it merged to `main` on 2026-08-03, and H2 verified all 4 bindings
+> inside a real RStudio session on 2026-08-15. It ships in CRAN 0.4.0.
+> Two things the verification found. First, `devtools::load_all()` leaves the
+> Addins-menu Package column blank and every click fails, since RStudio
+> builds the call as `<package>:::<binding>()` and cannot resolve a package
+> name for a dev-loaded package, so `devtools::install()` plus a full
+> RStudio restart is needed. Second, the inserted skeleton built a 2-item
+> scale, which reduces alpha to a single pairwise correlation and leaves a
+> factor unidentifiable in any later measurement model, so it now builds 3
+> items. Full detail in `todo_master_0.4.md` block H.
+
 ## Isolation is the point of this file
+
+The paragraph below is the original 2026-07 framing, kept for the record.
 
 **0.3.4 is mid-release** (mas_review_034 verification in progress, then
 CRAN submission). This work must not touch anything the release depends
