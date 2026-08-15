@@ -368,7 +368,7 @@ missing_data_report <- function(data, instrument = NULL, variables = NULL) {
 #' @param variables Character vector of numeric variables to screen. When
 #'   `NULL`, all numeric columns are used.
 #' @param method Outlier rule. `"zscore"` flags absolute z scores above
-#'   `z_cut`; `"iqr"` flags values outside Tukey fences; `"mahalanobis"`
+#'   `z_cut`, `"iqr"` flags values outside Tukey fences, and `"mahalanobis"`
 #'   flags rows above the chi-square cutoff for the selected variables.
 #' @param z_cut Numeric cutoff for `"zscore"`. Defaults to `3`.
 #' @param iqr_multiplier Numeric multiplier for `"iqr"` fences. Defaults to
@@ -1470,7 +1470,7 @@ sframe_run_mediation <- function(data, roles, options = list()) {
 #'   correlations. Constructs with a single item have no monotrait
 #'   correlations, so their HTMT entries are `NA`. Without this argument,
 #'   `htmt` falls back to the absolute inter-construct correlation matrix
-#'   from `construct_scores` (the pre-0.3.4 behaviour); the `htmt_method`
+#'   from `construct_scores` (the pre-0.3.4 behaviour). The `htmt_method`
 #'   element records which was computed.
 #'
 #' @return An object of class `sframe_validity_report`.
