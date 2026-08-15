@@ -5,26 +5,30 @@ on `main` and to `.Rbuildignore` (see A7 and C7 below, which cover the
 whole ignore-file gap).
 
 Written 2026-07-30. **This is the single entry point for release work from
-here.** The per-release files stay in place for their detail:
-`todo_0.5.md` (the 0.4.0 engineering spec), `todo_0.4.md` (the
-small-sample record, already built), `todo_0.5.1.md` (the 0.4.1 demo
-patch), `todo_0.3.5.md` (superseded, absorbed), `todo_rstudio_addin.md`,
-and `todo_0.6.md` through `todo_1.0.md` for later releases.
+here.** The per-release files stay in place for their detail: `todo_0.4.md`
+(the 0.4.0 engineering spec, merged 2026-08-15 from the previously
+separate MCDM/DEMATEL file and the small-sample file, both fully built),
+`todo_0.4.1.md` (the 0.4.1 demo patch), `todo_0.3.5.md` (superseded,
+absorbed), `todo_rstudio_addin.md`, and `todo_0.5.md` through
+`todo_1.0.md` for later releases.
 
 ---
 
-## Version numbering: local labels versus CRAN versions
+## Version numbering: branch labels versus CRAN versions
 
-**The local development labels and the CRAN version numbers deliberately
-differ.** Owner decision 2026-07-30. Do not rename branches, worktrees, or
-planning files to match CRAN.
+**Branches and worktrees keep their historical labels regardless of CRAN
+version** (owner decision 2026-07-30). `todo_*.md` planning files are
+different: renumbered 2026-08-15 to match CRAN version numbers directly,
+closing the mismatch that caused repeated confusion through this release.
+Full detail and the historical rename mapping: `CLAUDE.md`'s
+version-numbering section.
 
-| Local label (keep as is) | CRAN version | Content |
+| Branch/worktree label (unchanged) | CRAN version | Planning file (renamed 2026-08-15) |
 |---|---|---|
-| branch `v0.5-dev`, worktree `../surveyframe-v0.5-dev`, `todo_0.5.md` | **0.4.0** | MCDM plus small-sample plus the 5 bug fixes plus absorbed field validation |
-| `todo_0.5.1.md` | **0.4.1** | Faculty demo proofing plus the device-dependent field items |
-| the RMCDA expansion, block G below | **0.4.2** onward | The roughly 41 extra MCDM methods |
-| `todo_0.3.5.md` | never published | Absorbed into 0.4.0 and 0.4.1 |
+| branch `v0.5-dev`, worktree `../surveyframe-v0.5-dev` | **0.4.0** | `todo_0.4.md` |
+| (follows `v0.5-dev`) | **0.4.1** | `todo_0.4.1.md` |
+| (follows `v0.5-dev`) | **0.4.2** onward | the RMCDA expansion, block G below |
+| — | never published | `todo_0.3.5.md` |
 | branch `v0.4-dev` | never published | Small-sample track, already merged into `v0.5-dev` |
 
 Consequences. CRAN numbering runs 0.3.4 to 0.4.0 to 0.4.1 to 0.4.2. There
@@ -285,13 +289,13 @@ session rather than by any suite. Detail and evidence:
 
 ## Block B. 0.4.0 MCDM and decision-family completion
 
-Spec: `todo_0.5.md`, sections 1 to 8. Re-grep every file and line anchor
+Spec: `todo_0.4.md`, sections 1 to 8. Re-grep every file and line anchor
 before editing.
 
 - [x] **B1 [Owner, Opus]** Sign off the section 1 data contract (matrix
   encoding, aggregation defaults, column conventions). **Signed off
   2026-07-31.** Verified the built code on `v0.5-dev` against every
-  subsection of `todo_0.5.md` section 1: the two matrix kinds (1a) stay
+  subsection of `todo_0.4.md` section 1: the two matrix kinds (1a) stay
   separate with `weights_source`/`matrix_source` provenance,
   signed-integer column encoding (1c, `item__a__vs__b`, `item__a__to__b`,
   `item__crit`) confirmed in `R/read_responses.R` and exercised in
@@ -474,7 +478,7 @@ work instead (see F0/F0a and F4 below).
   carried all 12 newer planning files in both `.gitignore` and
   `.Rbuildignore`, so the fix was to bring `main` level, adding 13 lines
   to each. That also retires the stale `todo_0.4.1.md` pattern, which had
-  matched nothing since the 2026-07-25 rename to `todo_0.5.1.md`. This
+  matched nothing since the 2026-07-25 rename to `todo_0.4.1.md`. This
   matters beyond tidiness because `.Rbuildignore` protects only the CRAN
   tarball, while pkgdown reads the working tree directly and honours
   neither file, so a build from a branch carrying these files could
@@ -617,7 +621,7 @@ submitted with results pending, and E8 is the only step left.
 
 ## Block F. CRAN 0.4.1, faculty demo proofing
 
-Detail: `todo_0.5.1.md`. Strict patch scope, UI, UX, and documentation
+Detail: `todo_0.4.1.md`. Strict patch scope, UI, UX, and documentation
 only, no new exports, unless decision 1 puts the first RMCDA batch here.
 
 - [ ] **F0 [Owner]** Moved from block C on 2026-07-31. Capture ICSRI 2026
@@ -681,7 +685,7 @@ RMCDA (CRAN 0.3.1) carries roughly 51 methods against the 10 shipping in
 - [ ] **G1 [Opus, Owner]** Decide the method-per-patch grouping across the
   roughly 41 extras, and whether the first batch rides 0.4.1 or waits for
   0.4.2 (open decision 1).
-- [ ] **G2 [Sonnet]** Write the expansion planning file on `todo_0.5.md`'s
+- [ ] **G2 [Sonnet]** Write the expansion planning file on `todo_0.4.md`'s
   pattern: harvest audit per method, integration checklist, delegation
   rules.
 - [ ] **G3 [Sonnet per batch, Opus for shared-file wiring]** Port each

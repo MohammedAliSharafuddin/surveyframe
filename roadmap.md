@@ -33,29 +33,37 @@ a full CRAN check without it. Fixed by cherry-picking `c67dab9` onto
 `main` and re-verifying from scratch. A commit on `dev` is no evidence
 that `main` has it.
 
-**2026-07-30, owner decision: the CRAN numbering is renumbered and the
-local labels stay as they are.** CRAN runs **0.3.4 to 0.4.0 to 0.4.1 to
-0.4.2**. There is no 0.3.5 and no 0.5.x on CRAN. The merged small-sample
-plus MCDM release, built on branch `v0.5-dev` and specified in
-`todo_0.5.md`, publishes as **0.4.0**. The faculty-demo patch
-(`todo_0.5.1.md`) publishes as **0.4.1**. The RMCDA method expansion
-publishes from **0.4.2** onward. The cancelled 0.3.5's field-validation
-scope is absorbed into 0.4.0 and 0.4.1, so its strict patch scope no
-longer binds. Branches, worktrees, and planning-file names are
-deliberately not renamed, so DESCRIPTION reads `0.4.0` while the branch
-is still called `v0.5-dev`. Full task list, priority order, and model
+**2026-07-30, owner decision: the CRAN numbering is renumbered.** CRAN
+runs **0.3.4 to 0.4.0 to 0.4.1 to 0.4.2**. There is no 0.3.5 and no 0.5.x
+on CRAN. The merged small-sample plus MCDM release, built on branch
+`v0.5-dev` and specified in `todo_0.4.md`, publishes as **0.4.0**. The
+faculty-demo patch (`todo_0.4.1.md`) publishes as **0.4.1**. The RMCDA
+method expansion publishes from **0.4.2** onward. The cancelled 0.3.5's
+field-validation scope is absorbed into 0.4.0 and 0.4.1, so its strict
+patch scope no longer binds. Full task list, priority order, and model
 tiers: `todo_master_0.4.md`.
 
-The authoritative version-numbering table lives in `CLAUDE.md` and is
-reproduced here unchanged. Do not rename branches, worktrees, or planning
-files to match CRAN.
+**2026-08-15, owner decision: `todo_*.md` planning files are renumbered
+to match CRAN version numbers directly**, ending the local-vs-CRAN
+mismatch that caused repeated confusion through the 0.4.0 release.
+Branches and worktrees keep their historical labels regardless (renaming
+one after commits exist buys nothing), so DESCRIPTION reads `0.4.0`
+while the branch is still called `v0.5-dev`, but every planning file from
+here on states its own version number directly. **Below this point, and
+through the rest of this document, any remaining `v0.5` to `v1.0`
+mentions of the older feature-track releases have not yet been swept for
+the 2026-08-15 renumbering and may still use the pre-2026-08-15 numbers.
+Cross-check against `CLAUDE.md`'s version-numbering table, which is
+current, before trusting a specific version number below.**
 
-| Local label (keep as is) | CRAN version | Content |
+The authoritative version-numbering table lives in `CLAUDE.md`.
+
+| Branch/worktree label (unchanged) | CRAN version | Planning file (renamed 2026-08-15) |
 |---|---|---|
-| branch `v0.5-dev`, worktree `../surveyframe-v0.5-dev`, `todo_0.5.md` | **0.4.0** | MCDM plus small-sample plus the 5 bug fixes plus absorbed field validation |
-| `todo_0.5.1.md` | **0.4.1** | Faculty demo proofing plus the device-dependent field items |
-| the RMCDA method expansion | **0.4.2** onward | The roughly 41 extra MCDM methods |
-| `todo_0.3.5.md` | never published | Absorbed into 0.4.0 and 0.4.1 |
+| branch `v0.5-dev`, worktree `../surveyframe-v0.5-dev` | **0.4.0** | `todo_0.4.md` |
+| (follows `v0.5-dev`) | **0.4.1** | `todo_0.4.1.md` |
+| (follows `v0.5-dev`) | **0.4.2** onward | the RMCDA method expansion, block G in `todo_master_0.4.md` |
+| — | never published | `todo_0.3.5.md` |
 | branch `v0.4-dev` | never published | Small-sample track, already merged into `v0.5-dev` |
 
 **2026-07-25: 0.4 merged into 0.5 by owner decision**, fired early,
@@ -128,9 +136,9 @@ the slip and record why in `portfolio-planner/decisions.md`.
 | 0.3.4 | **Live on CRAN, published 2026-07-24, all 13 check flavours OK with no notes.** All plotting, UI, statistics, and reporting work. The plotting and UI half (visualisation breadth, `plot()` S3 methods, plots into every surface, the builder rework, date bounds, the 2 WCAG 2.2 AA passes) is implemented and committed. The statistics and reporting half joins it by owner decision on 2026-07-17, since 0.3.4 had not been submitted: effect-size confidence intervals (base-R bootstrap `bootstrap_ci`, `cohens_d_ci`, `cramers_v_ci`, `eta_sq_ci`), psychometric depth (Henseler HTMT, real Little's MCAR via naniar, omega and EFA polish), report polish and PDF (`render_report(format = "pdf")` via pagedown, theming, accessibility, codebook upgrades) | done, CRAN 2026-07-24 |
 | ~~0.3.5~~ | **Cancelled as a release, 2026-07-30.** Its field-validation scope (ICSRI 2026 audience feedback from the 8-9 August 2026 conference, 3 to 5 human testing rounds, and the fixes both surface) is absorbed into 0.4.0 for the 8 machine-fixable items and into 0.4.1 for the 4 device-dependent ones. Strict patch scope no longer applies | superseded, see 0.4.0 |
 | ~~0.4 (old)~~ | **Merged into the release now numbered 0.4.0, 2026-07-25.** Small-sample inference engineering implemented and tested, committed on `v0.4-dev`, then branched into `v0.5-dev` | superseded |
-| ~~0.5~~ | **Renumbered to 0.4.0, 2026-07-30.** The branch `v0.5-dev`, the worktree, and `todo_0.5.md` keep the 0.5 label deliberately. Only the published number changed | superseded, see 0.4.0 |
-| **0.4.0** | The next CRAN release. Small-sample inference plus MCDM and DEMATEL (all 10 methods) plus the 5 bugs found by independent validation plus the absorbed field validation, plus the 2026-08-07 breaking API change (validation diagnostic and the accessor family) and the RStudio add-in. Built on `v0.5-dev`, merged to `main` on 2026-08-03, specified in `todo_0.5.md`, tracked in `todo_master_0.4.md`. **Engineering, review, and release paperwork all complete as of 2026-08-15**: DESCRIPTION at `0.4.0`, NEWS.md complete, 1506 tests passing, `R CMD check --as-cran` Status OK at 0/0/0, tarball audited clean, `cran-comments.md` drafted, `inst/CITATION` citing SF2 with no DOI dependency, H2 owner-verified | win-builder submitted 2026-08-15, results pending. CRAN submission (E8) follows those results and minds CRAN's release-spacing preference against 2026-07-24 |
-| 0.4.1 | Faculty demo proofing on 0.4.0: demo session to college faculty, then UI/UX and documentation fixes, plus the 4 device-dependent field items and the ICSRI 2026 audience feedback captured from the 8-9 August 2026 conference. Detail in `todo_0.5.1.md`, tasks in `todo_master_0.4.md` block F. Renumbered from 0.4.1 to 0.5.1 on 2026-07-25 and back to 0.4.1 on 2026-07-30. Also carries the small-sample paper's citation into `inst/CITATION` (F6). Open decision: whether the first RMCDA method batch rides here or waits for 0.4.2 | TBC, follows 0.4.0 |
+| ~~0.5~~ | **Renumbered to 0.4.0, 2026-07-30.** The branch `v0.5-dev`, the worktree, and `todo_0.4.md` keep the 0.5 label deliberately. Only the published number changed | superseded, see 0.4.0 |
+| **0.4.0** | The next CRAN release. Small-sample inference plus MCDM and DEMATEL (all 10 methods) plus the 5 bugs found by independent validation plus the absorbed field validation, plus the 2026-08-07 breaking API change (validation diagnostic and the accessor family) and the RStudio add-in. Built on `v0.5-dev`, merged to `main` on 2026-08-03, specified in `todo_0.4.md`, tracked in `todo_master_0.4.md`. **Engineering, review, and release paperwork all complete as of 2026-08-15**: DESCRIPTION at `0.4.0`, NEWS.md complete, 1506 tests passing, `R CMD check --as-cran` Status OK at 0/0/0, tarball audited clean, `cran-comments.md` drafted, `inst/CITATION` citing SF2 with no DOI dependency, H2 owner-verified | win-builder submitted 2026-08-15, results pending. CRAN submission (E8) follows those results and minds CRAN's release-spacing preference against 2026-07-24 |
+| 0.4.1 | Faculty demo proofing on 0.4.0: demo session to college faculty, then UI/UX and documentation fixes, plus the 4 device-dependent field items and the ICSRI 2026 audience feedback captured from the 8-9 August 2026 conference. Detail in `todo_0.4.1.md`, tasks in `todo_master_0.4.md` block F. Renumbered from 0.4.1 to 0.5.1 on 2026-07-25 and back to 0.4.1 on 2026-07-30. Also carries the small-sample paper's citation into `inst/CITATION` (F6). Open decision: whether the first RMCDA method batch rides here or waits for 0.4.2 | TBC, follows 0.4.0 |
 | 0.4.2 onward | The RMCDA method expansion: the roughly 41 MCDM methods beyond the 10 shipping in 0.4.0, ported in batches, each cross-checked against RMCDA as a Suggests-only test-time oracle. Tasks in `todo_master_0.4.md` block G. Method-per-patch grouping not yet decided (G1), and the data-driven priority order it wants still depends on D2a's OpenAlex pass finishing | TBC |
 | 0.6 | SEM and PLS execution, invariance | 2027-03-11 |
 | 0.7 | Text and open-ended response analysis | 2027-04-25 |
@@ -416,7 +424,7 @@ Exit criteria: a study with n < 30 can run the plan and receive method-choice
 guidance plus a small-sample-appropriate result with interval coverage notes.
 The RStudio add-in installs and registers correctly on CRAN.
 
-### v0.4.1 — Faculty demo proofing (renumbered to v0.5.1, 2026-07-25 — see `todo_0.5.1.md`)
+### v0.4.1 — Faculty demo proofing (renumbered to v0.5.1, 2026-07-25 — see `todo_0.4.1.md`)
 
 Headline: a live demo session to college faculty, then UI/UX and documentation
 fixes based on that session's feedback.

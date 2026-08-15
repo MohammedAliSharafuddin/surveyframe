@@ -62,19 +62,28 @@ crawlers do not render SVG previews) to PNG, added JSON-LD structured data,
 added `robots.txt`, and gave the small-sample textbook reference in README a
 full citation with its Zenodo DOI.
 
-## Version numbering: local labels versus CRAN versions (read before any release work)
+## Version numbering: branch labels versus CRAN versions (read before any release work)
 
-**Owner decision 2026-07-30: the local development labels and the CRAN
-version numbers deliberately differ. Do not rename branches, worktrees, or
-planning files to match CRAN.**
+**Owner decision 2026-07-30, partly reversed 2026-08-15.** Branches and
+worktrees keep their historical labels regardless of CRAN version, since
+renaming one after commits exist buys nothing. `todo_*.md` planning files
+are different: as of 2026-08-15 they are renumbered to match CRAN version
+numbers directly, closing the local-vs-CRAN mismatch that caused repeated
+confusion through the 0.4.0 release. `todo_0.4.md` (formerly 2 separate
+files, `todo_0.4.md` and `todo_0.5.md`, merged 2026-08-15) is the CRAN
+0.4.0 spec; `todo_0.4.1.md` (formerly `todo_0.5.1.md`) is 0.4.1;
+`todo_0.5.md` through `todo_0.8.md` (formerly `todo_0.6.md` through
+`todo_0.9.md`) each shifted down by 0.1 to match. `todo_1.0.md` is
+unchanged, since 1.0 is an external launch gate (Ethos GA, Ethos Pro GA,
+the ASRDA complete edition), not a slot in the sequential feature track.
 
-| Local label (keep as is) | CRAN version | Content |
-|---|---|---|
-| branch `v0.5-dev`, worktree `../surveyframe-v0.5-dev`, `todo_0.5.md` | **0.4.0** | MCDM plus small-sample plus the 5 bug fixes plus absorbed field validation |
-| `todo_0.5.1.md` | **0.4.1** | Faculty demo proofing plus the device-dependent field items |
-| the RMCDA method expansion | **0.4.2** onward | The roughly 41 extra MCDM methods |
-| `todo_0.3.5.md` | never published | Absorbed into 0.4.0 and 0.4.1 |
-| branch `v0.4-dev` | never published | Small-sample track, already merged into `v0.5-dev` |
+| Branch/worktree label (unchanged) | CRAN version | Planning file (renamed 2026-08-15) | Content |
+|---|---|---|---|
+| branch `v0.5-dev`, worktree `../surveyframe-v0.5-dev` | **0.4.0** | `todo_0.4.md` | MCDM plus small-sample plus the 5 bug fixes plus absorbed field validation |
+| (follows `v0.5-dev`) | **0.4.1** | `todo_0.4.1.md` | Faculty demo proofing plus the device-dependent field items |
+| (follows `v0.5-dev`) | **0.4.2** onward | the RMCDA method expansion, block G in `todo_master_0.4.md` | The roughly 41 extra MCDM methods |
+| — | never published | `todo_0.3.5.md` | Absorbed into 0.4.0 and 0.4.1 |
+| branch `v0.4-dev` | never published | — | Small-sample track, already merged into `v0.5-dev` |
 
 **CRAN numbering runs 0.3.4 to 0.4.0 to 0.4.1 to 0.4.2.** There is no 0.3.5
 and no 0.5.x on CRAN, and no 0.4 in the old small-sample-only sense either,
@@ -165,8 +174,8 @@ Dev-only files (tracked on `dev` only):
 - `cran-comments.md`
 - `todo.md`
 - `dogfeed.todo.md`
-- `todo_0.3.5.md`, `todo_0.4.md`, `todo_0.5.md`, `todo_0.5.1.md`,
-  `todo_0.6.md` through `todo_1.0.md`, `todo_rstudio_addin.md`
+- `todo_0.3.5.md`, `todo_0.4.md`, `todo_0.4.1.md`,
+  `todo_0.5.md` through `todo_1.0.md`, `todo_rstudio_addin.md`
 - `mas_review_032.md` through `mas_review_034.md` and their `.qmd`/`.html`
   renders, `kimi_review_034.md`, `qwen_review_034.md`
 - `mas_review_040.qmd` (deferred, superseded by `review_040/`)
@@ -177,7 +186,7 @@ Dev-only files (tracked on `dev` only):
   builder's inlined copy of the static survey template)
 
 **Both hygiene gaps are closed as of 2026-08-03.** `.Rbuildignore` now names
-`todo_0.5.1.md`, `kimi_review_034.md`, `qwen_review_034.md`, `review_040/`,
+`todo_0.4.1.md`, `kimi_review_034.md`, `qwen_review_034.md`, `review_040/`,
 and `mas_review_040.qmd`. `main`'s `.gitignore` was extended twice, on
 2026-08-02 for the newer planning files and on 2026-08-03 for the review
 suite. That second one matters: `.Rbuildignore` protects the CRAN tarball but
@@ -754,11 +763,12 @@ call on the standalone dashboard, and an interactive pass over
 
 **`todo_master_0.4.md` holds all 64 open tasks** in 9 blocks with a model
 tier and a priority tier per task, plus the 3 open decisions. Read it
-first for release work. Per-release detail stays in `todo_0.5.md` (the
-0.4.0 engineering spec), `todo_0.5.1.md` (0.4.1), `todo_rstudio_addin.md`,
-and `todo_0.6.md` through `todo_1.0.md`. `todo_0.4.md` is the small-sample
-record, already built. `todo_0.3.5.md` is superseded, absorbed into 0.4.0
-and 0.4.1.
+first for release work. Per-release detail stays in `todo_0.4.md` (the
+0.4.0 engineering spec, merged 2026-08-15 from the previously separate
+MCDM/DEMATEL file and the small-sample file, both fully built and
+shipped), `todo_0.4.1.md` (0.4.1), `todo_rstudio_addin.md`, and
+`todo_0.5.md` through `todo_1.0.md` for later releases. `todo_0.3.5.md`
+is superseded, absorbed into 0.4.0 and 0.4.1.
 
 The full task list is in `revision_todo_0.3.md`. The version and growth plan is
 in `roadmap.md`.

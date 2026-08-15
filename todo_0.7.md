@@ -1,205 +1,242 @@
-# todo_0.7.md — surveyframe v0.7: Text and open-ended response analysis
+# todo_0.7.md — surveyframe 0.7: Provenance part one (SHA Layers 2-3)
 
 Dev-only planning file, tracked on `dev` only. Its name is in `.gitignore`
-and `.Rbuildignore`. Companion to `CLAUDE.md`, `todo_0.5.md` (whose
-"Architecture ground truth" section and integration checklist apply
-verbatim here), and
-`../portfolio-planner/development_instructions/06_v05_v07_implementation.md`
-(v0.7 section — intent only, this file is the verified plan).
+and `.Rbuildignore`. Companion to `CLAUDE.md` and
+`../portfolio-planner/development_instructions/07_v08_v09_implementation.md`
+(the provenance guide, revised 2026-07-14 — closer to buildable than the
+05/06 guides, but the serialisation notes below still correct it).
 
-Last updated: 2026-07-25. Target CRAN submission: 2027-04-25. Theme:
-structured analysis of open-ended responses. Source approach: the Omani
-gateways JMR thematic analysis (tidytext, quanteda, stm).
+Last updated: 2026-07-25. Target CRAN submission: 2027-06-09. Theme:
+instrument lifecycle (versioning, review, pilot) and response hashing.
+
+**Cardinal rule (from the guide, still binding): no provenance feature
+ships before 0.8, and Layers 2-5 are one contiguous chain across 0.8
+and 0.9.** The SSR 6.0 paper (DOI 10.31235/osf.io/jmbv8_v1) cites these
+exact function names; confirm alignment before renaming anything.
 
 Anchors verified against `main` 2026-07-25; re-grep before editing.
 
 ---
 
-## Ground truth specific to this release
+## Source material and its status
 
-- `"text"` and `"textarea"` item types already exist in the `sf_item()`
-  enum (`R/sf_item.R:53-56`). No new item types, no serialisation work,
-  no builder item-inspector work.
-- The 06 guide proposes a `render_text_section()` in `R/reporting.R`.
-  **Do not build it.** Since 0.3.4, `.render_report_analysis_section()`
-  (`R/reporting.R:752`) renders any result generically from `$table`,
-  `$plot`, `apa`, and the interpretation fields. Text runners that
-  return a proper `$table` and `$plot` flow through the report, the
-  studio Analyse cards, and `render_results()` with zero reporting-side
-  code. Quote lists are the one shape that may not fit a table; check
-  how `syntax` results render (`R/reporting.R`, the analysis section
-  branch for `result$syntax`) and mirror that pattern for a
-  `$quotes` field if needed — that is the only permissible reporting
-  change.
-- Central humanisation (`sframe_humanize_table()`) maps coded values to
-  labels; free-text terms are not coded values, so text tables pass
-  through unchanged. No work needed, just awareness.
-- Base path must work with zero optional packages (jsonlite, rlang,
-  openssl only).
+The asrda-r repo (MohammedAliSharafuddin/asrda-r) holds the prototype
+modules: `instrument_versioning.R` -> `R/sf_version.R`,
+`expert_review.R` -> `R/sf_review.R`, `pilot_summary.R` ->
+`R/sf_pilot.R` (its bundle/citation/report modules are 0.9). **asrda-r
+is not cloned locally as of 2026-07-25**: first step is
+`gh repo clone MohammedAliSharafuddin/asrda-r ../asrda-r`, then a
+read-through noting every assumption each module makes about its
+calling environment. Absorption is copy-and-adapt; asrda-r never
+appears in DESCRIPTION.
 
-## Method ids and their wiring
+## Hashing ground truth (verified, all in R/read_write_sframe.R)
 
-Family string `"text"` (metadata). Ids, per the 06 guide's table:
+- `sframe_serialization_payload(instrument, hash_value)` (line 8) builds
+  the serialised list; the hash slot is `list(algo = "sha256", value)`.
+- `sframe_canonical_payload(x)` (33) canonicalises for hashing;
+  `sframe_hash_payload(payload)` (64) = `as.character(openssl::sha256(...))`
+  over canonical JSON; `sframe_hash_value(instrument)` (76) is the
+  public entry. There is also a `sframe_legacy_hash_payload()` (70) for
+  old files — the version-chain work must not break legacy reads.
+- `write_sframe()` (106), `read_sframe(path, validate = TRUE)` (388),
+  parse-time checks in `sframe_validate_parsed_payload()` (334).
+- Component restore functions (`sframe_restore_item()` 168 and
+  neighbours) show the required pattern for restoring any new
+  serialised structure.
 
-| id | Engine | Guard |
-|---|---|---|
-| `term_freq` | base R | none |
-| `co_occurrence` | base R | none |
-| `tidy_sentiment` | tidytext | `sframe_require_tidytext()` |
-| `topic_model_lda` | tidytext + topicmodels | guarded both |
-| `stm_topics` | stm (+ tidytext for tokenising) | guarded both |
-| `quanteda_dfm` | quanteda | guarded |
+## Design decision A (owner + lead, before any code): what the version
+hash covers
 
-Every id goes through the full todo_0.5 integration checklist: switch
-case in `sframe_run_one_block()` (`R/analysis_plan.R:1101`), roles
-(`item` role: one text/textarea item id; `k` and `seed` in options),
-default-roles fallback in `sframe_analysis_roles()`
-(`R/statistics_reports.R:57`), `.sframe_citations` entries (harvest and
-verify the references used in the Omani gateways manuscript and the
-package docs of tidytext/stm/quanteda — no unverified citations),
-plot cases in `sframe_plot_for_result()` (`R/plots.R:636`), builder
-`<optgroup label="Text">` + `ANALYSIS_REGISTRY` entries
-(`inst/builder/survey_builder.html` ~969, ~2690), studio registry +
-requirements strings (`inst/shiny/app.R` ~324, ~722), block-field
-restore if any new field is added (`R/read_write_sframe.R:254` — `k`
-and `seed` live in `options`, which already round-trips, so likely
-none), tests, `render_results()` render check.
+The guide computes `sf_version()`'s hash over the full canonical
+payload and also says the version chain is embedded in meta and hashed
+by Layer 1. Those two rules are circular: appending version entry N
+changes the payload, so entry N+1 hashes different content even when
+the instrument itself is untouched, and entry N can never contain its
+own hash. Resolve before coding. Recommended resolution:
 
-DESCRIPTION Suggests additions: `tidytext (>= 0.4.0)`,
-`quanteda (>= 3.0.0)`, `stm (>= 1.3.0)`, `topicmodels`. All guarded via
-new `sframe_require_*()` helpers in `R/conditions.R` (pattern line 26).
+- The **content hash** (what `sf_version()` stores and what reviews and
+  pilots bind to) is computed over the canonical payload **excluding**
+  `meta$version_chain`, `meta$reviews`, `meta$pilots` — an
+  instrument-content identity that is stable while provenance
+  accumulates.
+- The **file hash** (Layer 1, unchanged behaviour) still covers
+  everything serialised, provenance included, so a tampered chain still
+  fails `read_sframe()`.
+- Implement as `sframe_content_payload(instrument)` beside
+  `sframe_canonical_payload()`, with tests proving: adding a version
+  entry leaves the content hash unchanged; editing an item changes it.
+
+Document the decision in the vignette and flag it to the owner for the
+SSR 6.0 alignment check.
+
+## Design decision B: where artefacts live
+
+Guide: `sf$meta$version_chain`, `sf$meta$reviews`, `sf$meta$pilots`.
+Keep that, and thread it through: `sframe_serialization_payload()`
+gains the three fields, `read_sframe()` restores them via new
+`sframe_restore_version()` / `sframe_restore_review()` /
+`sframe_restore_pilot()` (classed objects re-classed on read, the same
+way items are), and `sframe_validate_parsed_payload()` tolerates their
+absence (every pre-0.8 file lacks them).
 
 ---
 
-## 1. R/text_analysis.R — cleaning and base-R analysis
+## 1. R/sf_version.R — Layer 2
 
-New file, house header comment. Exported:
+Per the guide's code with corrections:
 
-- `clean_text_responses(data, item_id, lowercase = TRUE, remove_punct =
-  TRUE, strip_numbers = FALSE)` per the guide, plus: validate `item_id`
-  is a text/textarea item when an instrument is supplied (optional
-  `instrument` arg), and keep a `respondent` attribute mapping cleaned
-  entries back to row indices so quotes can cite a respondent id later.
-- `term_frequency(text, stop_words = NULL, top_n = 30L)` per the guide
-  (data frame: term, n, pct). Ship a small built-in English stop-word
-  vector (base R constant, ~150 words, sourced and licence-checked) so
-  the base path has sensible defaults without tidytext; `stop_words =
-  NULL` means use it, `character(0)` means none.
-- Internal `.sframe_cooccurrence(text, top_n)`: pairwise within-response
-  co-occurrence counts on the top terms, returning a long data frame
-  (term_a, term_b, n) — renders as a table and feeds a heatmap plot.
+- `sf_version(instrument, state, parent_hash)` — argument named
+  `instrument` (house convention), `sframe_check_instrument()` first,
+  states `c("draft", "review", "pilot", "active", "archived")` (the
+  guide's prose says "published" in one place and "active" in the code;
+  standardise on **active**, matching the 0.9 bundle guide). Hash from
+  design decision A. Typed conditions via the house pattern in
+  `R/conditions.R` (`sframe_abort_validation()` neighbours; classes
+  `sframe_invalid_state`, `sframe_no_version`, `sframe_state_mismatch`
+  as in the guide).
+- `transition_state(instrument, from, to)` per the guide, plus a
+  transition-legality table (draft->review->pilot->active->archived,
+  with review->draft and pilot->review allowed as rework loops; anything
+  else errors). The guide allows any from/to; tighten it and document.
+- `print.sf_version()` per the guide. Add `format()` and `summary()`
+  for consistency with the 0.3.2 S3 completeness pass.
+- `chain_valid` in the guide only checks nchar == 64; real validation
+  (each parent_hash equals the previous hash) belongs in
+  `validate_sframe()` (#4) — keep the constructor cheap.
 
-Runners `sframe_run_term_freq()`, `sframe_run_co_occurrence()` wrap
-these into the runner contract (`$table`, `apa` with n_responses and
-top term, `prompt`).
+## 2. R/sf_review.R and R/sf_pilot.R
 
-## 2. Guarded engines
+Per the guide with corrections:
 
-- `sframe_run_tidy_sentiment()`: tidytext + a dictionary; default
-  "bing" (shipped inside tidytext, no download). `$table`: sentiment
-  counts and proportion positive; per-response scores kept in the
-  result for the plot.
-- `sframe_run_topic_model_lda()`: tokenise with tidytext, cast to a
-  document-term matrix, `topicmodels::LDA(k, control = list(seed))`.
-  `$table`: top 10 terms per topic with beta.
-- `sframe_run_stm_topics()`: per the guide's sketch but with the
-  tokenising corrected (the guide's `unnest_tokens` call passes bare
-  symbols into a function context; write and test it properly), fixed
-  `set.seed(options$seed %||% 42)` before fitting, `$table`: topic,
-  proportion, top terms. Model object kept under `$fit` and **stripped
-  before serialisation** (same rule as the 0.6 lavaan fits).
-- `sframe_run_quanteda_dfm()`: dfm summary (features, sparsity, top
-  features table).
-- All runners return `list(test = id, error = ...)` when the item has
-  fewer than a documented minimum of usable responses (suggest 10);
-  small-n text analysis produces garbage silently otherwise.
+- Both take `instrument` first, `sframe_check_instrument()` first, and
+  read the current version via the internal `.current_version()` (name
+  it `sframe_current_version()`, house prefix, defined once in
+  sf_version.R).
+- `sf_review()`: validate `recommendation`, validate `date` as ISO
+  8601, validate every `item_flags`/`scale_flags` name against the
+  instrument's real item and scale ids (abort listing unknown ids —
+  the artefact is worthless if it flags items that do not exist).
+- `sf_pilot()`: validate `completion_rate` in [0,1], `n_pilot` positive
+  integer, `flagged_items` against real item ids, `reliability` names
+  against real scale ids.
+- Attach helpers `add_review(instrument, review)` /
+  `add_pilot(instrument, pilot)` appending to `meta$reviews` /
+  `meta$pilots` after checking the artefact's `instrument_hash` matches
+  the current content hash (follow the `add_model()` precedent,
+  `R/model_layer.R:447`, for the attach-and-return-instrument idiom).
+- print/format/summary methods for both classes.
 
-## 3. extract_quotes()
+## 3. Response hashing in read_responses() — Layer 3
 
-Exported per the guide (`extract_quotes(model, text, n_quotes = 3L)`),
-generalised: accept the `stm_topics` result object (not the raw stm
-model) so it can read `$fit` and the respondent mapping from #1, and
-return a data frame (topic, rank, respondent, quote) that renders as a
-table. When the runner ran inside a plan, quotes attach to the result
-as `$quotes` and render via the reporting pattern settled in the
-ground-truth section.
+`read_responses()` (`R/read_responses.R:43`) already handles matrix and
+ranking expansion columns before returning. Hash the **returned** frame
+(post-processing), not the raw file:
 
-## 4. Plots
+- The guide's `.hash_row(paste(row_vec, collapse = "|"))` via
+  `apply(df, 1, ...)` is order- and formatting-fragile (`apply` coerces
+  the frame to a character matrix, so numeric formatting and column
+  order silently matter). Fix: hash a canonical per-row JSON —
+  `jsonlite::toJSON(as.list(row), auto_unbox = TRUE)` with columns
+  first sorted by name — implemented once as
+  `sframe_hash_response_row()`, documented as the canonical response
+  serialisation. Determinism test: same data, shuffled column order,
+  same hashes.
+- Attach as attributes per the guide: `row_hashes`, `response_hash`
+  (sha256 over the concatenated row hashes, in row order),
+  `instrument_hash` (from the instrument argument already present),
+  `hash_timestamp` (UTC ISO 8601).
+- `validate_response_hash(df)` exported per the guide (recompute,
+  compare, typed abort `sframe_hash_mismatch` naming the first
+  divergent row index; class `sframe_no_hash` when attributes absent).
+- Attribute survival is fragile in R (subsetting drops attributes).
+  Document loudly: validation applies to the frame as returned;
+  a subset/mutated frame fails or loses the hash by design, because
+  that is exactly what tamper-evidence means. Add a
+  `sframe_rehash_responses()` internal for the studio path if the
+  studio mutates frames before analysis (check
+  `inst/shiny/app.R` response handling before deciding it is needed).
 
-In `R/plots.R`, ggplot2-guarded, both palettes, registered in
-`sframe_plot_for_result()`:
+## 4. validate_sframe() extensions
 
-- `sframe_plot_term_frequency()`: horizontal bar, top 20 terms.
-- `sframe_plot_cooccurrence()`: tile heatmap of the top-term pairs.
-- `sframe_plot_sentiment()`: diverging bar of sentiment counts (reuse
-  the diverging-chart machinery from
-  `sframe_draw_likert_diverging()` where sensible).
-- `sframe_plot_topics()`: faceted top-terms bars, one facet per topic
-  (serves both LDA and STM results).
+`R/validate_sframe.R`: two new checks at the end, per the guide —
+version-chain link integrity (each entry's parent_hash equals the
+previous entry's hash, first entry parent NULL) and artefact binding
+(every review/pilot `instrument_hash` matches the content hash of the
+version it claims). Errors through `sframe_abort_validation()` with
+the chain position in the message. Both checks skip silently when the
+meta fields are absent (pre-0.8 files stay valid).
 
-## 5. Vignette: vignettes/text-analysis.Rmd
+## 5. Round-trip and compatibility tests
 
-Per the guide's outline (instrument with text items beside Likert
-items, clean + term_frequency, co-occurrence, STM with k = 3 guarded,
-quotes per topic, the rendered report section). Simulated text via a
-seeded sampler over a small phrase bank defined in the vignette. House
+- Full lifecycle round-trip: draft -> review (+sf_review) -> pilot
+  (+sf_pilot) -> active, write_sframe, read_sframe, classes restored,
+  chain validates, content hash stable throughout (decision A test).
+- Legacy file test: every `inst/extdata/*.sframe` demo file still reads
+  and validates (no version chain present).
+- Response hashing: hash determinism, validate pass, single-cell
+  corruption fails naming the row, `read_responses()` output for the
+  bundled demo CSV carries all four attributes.
+
+## 6. Vignette: vignettes/instrument-lifecycle.Rmd
+
+The guide's 11-step outline is right; keep it. Add a short "what is
+hashed" section explaining design decision A in user language. House
 rules: WCAG style block, `lang: en-GB`, `fig.alt`, offline knit,
-axe-core zero violations. Every guarded chunk knits cleanly when the
-engine is absent.
+axe-core zero violations.
 
-## 6. Exit checklist
+## 7. Exit checklist
 
-- `clean_text_responses()`, `term_frequency()`, `extract_quotes()`
-  exported and documented; internal runners for all 6 ids wired through
-  every integration-checklist point including both JS registries.
-- `term_freq` and `co_occurrence` fully functional with only hard
-  Imports installed (verified in a no-Suggests library).
-- 4 Suggests added, all guarded; `$fit` objects stripped before any
-  serialisation.
-- Minimum-response guard tested for every runner; seed determinism
-  tested for LDA and STM (same seed, same top terms).
-- Vignette knits with and without engines, axe-core clean.
+- `sf_version()`, `transition_state()`, `sf_review()`, `sf_pilot()`,
+  `add_review()`, `add_pilot()`, `validate_response_hash()` exported,
+  documented, print/format/summary methods complete.
+- Serialisation: three meta fields serialised, restored, legacy files
+  unaffected, `sframe_content_payload()` tested per decision A.
+- `validate_sframe()` chain and binding checks live.
+- Lifecycle vignette knits clean, axe-core clean.
 - `devtools::document()`; full suite; `R CMD check --as-cran`
-  0/0/<=1 NOTE both with and without Suggests; win-builder both
-  flavours; `cran-comments.md`; NEWS.md.
-- Owner reminders: text methodology paper (per-release rule); ASRDA
-  Part III ch 8 and Part VII ch 17 become real here; Ethos surfaces
-  text analysis next cycle.
+  0/0/<=1 NOTE; win-builder both flavours; `cran-comments.md`; NEWS.md.
+- SSR 6.0 function-name alignment confirmed against the preprint
+  (owner review, listed as a named exit item).
+- Owner reminders: Ethos Pro's approval workflow builds on these
+  artefacts next cycle; 0.8 starts from this chain — do not merge
+  anything here that 0.8's `sf_bundle()` contract (see todo_0.8.md)
+  would have to undo.
 
 ---
 
 ## Delegation, model tiering, and token budget
 
-Binding policy per `todo_0.4.md`. Same conflict rule as 0.5/0.6: agents
-deliver computations + runners + tests in `R/text_analysis.R` and plot
-helpers in standalone diffs; the lead applies all shared-file wiring
-(switch, plot dispatcher, JS registries, conditions helpers) in one
-pass.
+Binding policy per `todo_0.4.md`.
 
 ### Build order and agent assignment
 
-- **Lead (Fable/Opus):** implement `term_freq` end to end as the
-  reference diff (cleaning function, runner, plot, wiring, test), and
-  settle the `$quotes` rendering pattern against the real
-  `.render_report_analysis_section()` code.
-- **Agent 1 (Sonnet):** `co_occurrence` + its heatmap + tests.
-- **Agent 2 (Sonnet):** `tidy_sentiment` + `quanteda_dfm` + tests.
-- **Agent 3 (Sonnet):** `topic_model_lda` + `stm_topics` +
-  `extract_quotes()` + tests (one brief, shared tokenising machinery).
-- **Agent 4 (Sonnet):** vignette after the runners land.
-- **Agent 5 (Haiku):** verification sweeps; the no-Suggests library
-  check run; seed-determinism test executions.
+- **Lead (Fable/Opus):** clone asrda-r, module read-through notes,
+  design decisions A and B with the owner, then implement
+  `sframe_content_payload()` + `sf_version()` + serialisation threading
+  as the reference diff — the hashing semantics are the release; do not
+  delegate them.
+- **Agent 1 (Sonnet):** `sf_review()` + `sf_pilot()` + attach helpers +
+  S3 methods + tests (pure constructors on top of the landed reference).
+- **Agent 2 (Sonnet):** response hashing (#3) + determinism and
+  corruption tests. Independent of Agent 1.
+- **Agent 3 (Sonnet):** `validate_sframe()` extensions (#4) + legacy
+  compatibility tests, after the reference diff lands.
+- **Agent 4 (Sonnet):** vignette after #1-#4.
+- **Agent 5 (Haiku):** verification sweeps, document runs, the
+  extdata legacy-file check, knit checks.
 
 ### Model tiering
 
-- **Haiku:** sweeps, document runs, knit checks, no-Suggests runs.
-- **Sonnet:** all runners after the reference diff, plots, vignette.
-- **Opus/Fable:** the reference diff, the quotes-rendering decision,
-  shared-file wiring, review of every delegated diff (STM tokenising
-  and the respondent mapping are the correctness risks).
+- **Haiku:** sweeps, mechanical verification.
+- **Sonnet:** constructors, response hashing, validation checks,
+  vignette — all fully specified above.
+- **Opus/Fable:** hashing semantics, serialisation threading, the
+  asrda-r read, review of every delegated diff (special attention to
+  anything that could change an existing file hash — that is a
+  compatibility break, not a refactor).
 
 ### Token-saving rules (binding)
 
-The same 6 rules as todo_0.4/todo_0.5. Addition: the phrase bank and
-simulated-text sampler are written once in the vignette and copied into
-test fixtures, not regenerated ad hoc by each agent.
+The same 6 rules as todo_0.4/todo_0.5. Addition: asrda-r is read once
+by the lead; agents receive the module notes, never the repo.

@@ -1,7 +1,15 @@
 # todo_1.0.md — surveyframe v1.0: Integration contract, AI layer, launch
 
+> **Kept at `1.0`, not shifted, in the 2026-08-15 renumbering that moved
+> every other `todo_0.5.md` through `todo_0.9.md` file down by 0.1 to
+> match CRAN version numbers directly.** 1.0 is an external launch gate
+> (Ethos GA, Ethos Pro GA, the ASRDA complete edition), not a slot in the
+> sequential feature track, so it does not participate in that shift.
+> The file formerly named `todo_0.9.md` is now `todo_0.8.md`; references
+> below are updated to match.
+
 Dev-only planning file, tracked on `dev` only. Its name is in `.gitignore`
-and `.Rbuildignore`. Companion to `CLAUDE.md`, `todo_0.9.md`, and
+and `.Rbuildignore`. Companion to `CLAUDE.md`, `todo_0.8.md`, and
 `../portfolio-planner/development_instructions/08_v10_ai_layer.md` plus
 `09_ethos_database_schema.md`/`10_ethos_architecture.md` (Ethos side).
 
@@ -36,7 +44,7 @@ package, which must never require internet or an API key.
   The weighting work generalises this, it does not invent it.
 - The **sframe-schema repo already exists locally**
   (`../sframe-schema`, created 2026-07-14 as v0.1-draft, bumped to a
-  stable 1.0 during 0.9 per todo_0.9.md). `inst/schema/sframe_v1.json`
+  stable 1.0 during 0.8 per todo_0.8.md). `inst/schema/sframe_v1.json`
   in the package is generated from or verified against that repo —
   single source of truth, do not hand-maintain two copies. The MethodsX
   paper describes this schema.
