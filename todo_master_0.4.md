@@ -87,12 +87,18 @@ Work top down. Anything in the same tier can run in parallel.
   Block F now also carries the 12 dogfeed items re-laned on 2026-08-02.
 - **Parallel at any time:** H3, I4 to I9.
 
-Critical path, restated 2026-08-02. Only 2 things stand between here and
-submission. **D6 needs a preprint DOI that does not exist yet**, and CRAN
-will not take a placeholder. **H2 needs the owner in front of RStudio.**
-Everything else in blocks A to E is either done or mechanical release
-paperwork (E1 to E7). Nothing outstanding can invalidate work already
-built.
+Critical path, restated 2026-08-15. **Both things blocking submission are
+now closed.** D6 no longer needs a preprint DOI: owner decision 2026-08-15
+cites SF2 in `inst/CITATION` as `Unpublished`/in preparation instead,
+verified to parse and render cleanly, after checking that a preprint on
+Operations Research and Decisions specifically was not something to
+gamble the journal relationship on without asking first (MethodsX would
+have been fine; ORD's own guidelines do not say either way). SF2 itself
+was submitted to ORD the same day, its own proofread pass complete
+(negative-prose and antithesis rewrite, 2 missing citations added, the
+roadmap-disclosure section removed on owner instruction). **H2 is done**,
+owner-verified in a real RStudio session on 2026-08-15. Block E, the
+mechanical release paperwork, is what remains.
 
 **What this round changed about the plan itself.** Three tasks turned out
 not to be what they were written as. B10's exemption was already there by
@@ -497,17 +503,23 @@ as part of 0.4.1 instead (see F6).
     budget cap (`$0 remaining, resets at midnight UTC`), not a real
     OpenAlex limit. No results file was written. Needs a further rerun
     with budget available.
-- [ ] **D4 [Owner]** Proofread the MCDM draft, now at
-  `../research/surveyframe_manuscripts/mcdm/manuscript_draft.md`. A
-  2026-08-14 pass found the style rules clean but flagged 7 of 12
-  reference-list entries (VIKOR, MOORA, SMART, WASPAS, ELECTRE, and both
-  DEMATEL sources) as never cited in text, Section 3.5, not yet fixed.
-- [ ] **D5 [Owner]** Post the MCDM preprint, obtain its DOI. The current
-  draft still opens "Author details removed for double-blind review"
-  (correct for the journal submission copy, wrong for a preprint), which
-  needs resolving before posting.
-- [ ] **D6 [Haiku]** Add the MCDM bibentry to `inst/CITATION`. **Hard
-  CRAN blocker.** CRAN will not accept a placeholder DOI.
+- [x] **D4 [Owner]** Proofread the MCDM draft. **Done 2026-08-15.** The 7
+  uncited references were fixed earlier; a final pass the same day
+  rewrote every negative-prose and antithesis construction to direct
+  affirmative statements (41 instances of "not" down to 1 idiomatic
+  case), added 2 more missing citations (R itself, surveyframe itself),
+  and removed the "Roadmap: the wider MCDA family" section on owner
+  instruction (forward business/product detail with no place in a
+  peer-reviewed paper), keeping the RMCDA citation itself relocated to
+  the Background section as a factual, present-tense mention.
+- [x] **D5 [Owner]** Superseded 2026-08-15: no preprint. SF2 submitted
+  directly to Operations Research and Decisions, real byline already in
+  place in the LaTeX version (the double-blind placeholder only ever
+  lived in the older markdown draft).
+- [x] **D6 [Haiku]** Add the MCDM bibentry to `inst/CITATION`. **Done
+  2026-08-15**, without a DOI: cited as `Unpublished`/in preparation,
+  verified to parse and render cleanly via
+  `utils:::readCitationFile()`. No longer a CRAN blocker.
 
 ## Block E. 0.4.0 release paperwork
 
