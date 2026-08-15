@@ -241,14 +241,14 @@ rq1$effect_label
 rq1$prompt
 #> [1] "There was a positive, large significant correlation between digital_marketing and satisfaction, r(118) = 0.54 [0.40, 0.65], p < .001. Explain what this means for your research question."
 unlist(rq1$citations)
-#>                                                                                                                                                              field_2018 
-#>                                                                                 "Field, A. (2018). *Discovering statistics using IBM SPSS statistics* (5th ed.). SAGE." 
-#>                                                                                                                                                              cohen_1988 
-#>                                                               "Cohen, J. (1988). *Statistical power analysis for the behavioral sciences* (2nd ed.). Lawrence Erlbaum." 
-#>                                                                                                                                                                  r_core 
-#>                                               "R Core Team. (2026). *R: A language and environment for statistical computing*. R Foundation for Statistical Computing." 
-#>                                                                                                                                                             surveyframe 
-#> "Sharafuddin, M. A. (2026). *surveyframe: Survey Instrument Workflows* (Version 0.3.4.9000) [Computer software]. https://github.com/MohammedAliSharafuddin/surveyframe"
+#>                                                                                                                                                         field_2018 
+#>                                                                            "Field, A. (2018). *Discovering statistics using IBM SPSS statistics* (5th ed.). SAGE." 
+#>                                                                                                                                                         cohen_1988 
+#>                                                          "Cohen, J. (1988). *Statistical power analysis for the behavioral sciences* (2nd ed.). Lawrence Erlbaum." 
+#>                                                                                                                                                             r_core 
+#>                                          "R Core Team. (2026). *R: A language and environment for statistical computing*. R Foundation for Statistical Computing." 
+#>                                                                                                                                                        surveyframe 
+#> "Sharafuddin, M. A. (2026). *surveyframe: Survey Instrument Workflows* (Version 0.4.0) [Computer software]. https://github.com/MohammedAliSharafuddin/surveyframe"
 ```
 
 ## Render the results report
