@@ -277,7 +277,7 @@ sframe_plot_regression <- function(result, data, palette = c("web", "print")) {
 #' `counts` is a named numeric vector in scale order (names are the response
 #' labels, e.g. "Strongly disagree" .. "Strongly agree"), not sorted
 #' alphabetically or by frequency. The middle category of an odd-length
-#' scale is treated as neutral and split evenly across the zero line; an
+#' scale is treated as neutral and split evenly across the zero line. An
 #' even-length scale has no neutral category. This is the standard
 #' survey-report convention (Pew Research, SurveyMonkey) for visualising an
 #' ordered agree/disagree scale, and reads in one glance which way opinion
@@ -296,7 +296,7 @@ sframe_plot_regression <- function(result, data, palette = c("web", "print")) {
 #' @param counts Named numeric vector of response counts, in scale order.
 #' @param theme_color Character. Hex colour for the "agree" pole.
 #' @param palette One of `"web"` or `"print"`. See `sframe_brand()`.
-#' @return Invisibly `NULL`; called for its plotting side effect on the
+#' @return Invisibly `NULL`, called for its plotting side effect on the
 #'   current graphics device.
 #' @export
 #' @keywords internal
@@ -557,7 +557,7 @@ sframe_plot_likert_matrix <- function(item, data, choice_set, palette = c("web",
 #' several charts instead of showing them the way a Likert matrix or a
 #' typical multi-item satisfaction grid is reported: one grouped chart, one
 #' diverging bar per item, sharing an x scale and a legend. Applies only
-#' when every item in the scale shares the same choice set; scales that mix
+#' when every item in the scale shares the same choice set. Scales that mix
 #' response scales fall back to one chart per item.
 #'
 #' @param items A list of `"likert"` sframe items belonging to one scale, in
@@ -901,8 +901,8 @@ sframe_plot_efa_scree <- function(x, palette = c("web", "print")) {
 #'
 #' @param x An `sframe_efa_solution` object from [efa_solution()].
 #' @param palette One of `"web"` (diverging red/teal gradient) or `"print"`
-#'   (white-to-black gradient by magnitude; sign is conveyed by the printed
-#'   label, not colour, so it stays legible in monochrome). See
+#'   (white-to-black gradient by magnitude, with sign conveyed by the
+#'   printed label rather than colour, so it stays legible in monochrome). See
 #'   `sframe_brand()`.
 #' @return A ggplot2 object.
 #' @export
@@ -998,14 +998,14 @@ sframe_plot_reliability <- function(x, palette = c("web", "print")) {
 #' existing base-graphics precedent in this file
 #' ([sframe_draw_likert_diverging()]) so it renders without ggplot2. An
 #' alternative view of the same crosstab data
-#' `sframe_plot_crosstab()` renders as a grouped bar; use whichever reads
+#' `sframe_plot_crosstab()` renders as a grouped bar. Use whichever reads
 #' better for the table's shape (mosaic scales better to unbalanced group
 #' sizes).
 #'
 #' @param result A `crosstab`/`chi_square` result list with a contingency
 #'   `table`.
 #' @param palette One of `"web"` or `"print"`. See `sframe_brand()`.
-#' @return Invisibly `NULL`; called for its plotting side effect on the
+#' @return Invisibly `NULL`, called for its plotting side effect on the
 #'   current graphics device.
 #' @export
 #' @seealso `sframe_plot_crosstab()`
@@ -1360,7 +1360,7 @@ sframe_plot_scale_chart <- function(scores, label, palette = c("web", "print")) 
 #' multimodality, tails) instead of reading it off a bar height. Each
 #' variable is standardised (z-scored) before plotting so variables on
 #' different original scales (a 5-point Likert item next to a 0-100 slider)
-#' share one comparable y-axis; standardising is a linear transform and does
+#' share one comparable y-axis. Standardising is a linear transform and does
 #' not change skewness. Each violin's subtitle-free panel keeps the
 #' variable's skewness value in its axis label. Grouped `descriptives_report()`
 #' output (one row per variable per `split_by` group) is faceted by group.
@@ -1451,7 +1451,7 @@ plot.sframe_descriptives_report <- function(x, data, ..., palette = c("web", "pr
 #' `mann_whitney`, `kruskal_wallis`, and `anova_one`. One function instead of
 #' four, since the underlying comparison (an outcome split by a grouping
 #' factor) and the data shape needed to plot it are identical across all
-#' four tests; only the inferential statistic differs.
+#' four tests, and only the inferential statistic differs.
 #'
 #' @param result A result list from one of the four runners above, with
 #'   `vars = c(group_column, outcome_column)`.

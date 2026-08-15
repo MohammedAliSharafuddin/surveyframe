@@ -14,8 +14,8 @@
 #'   expected.
 #' @param submitted_at Character or NULL. The name of the column containing
 #'   submission timestamps.
-#' @param meta_cols Character vector or NULL. Additional column names that are
-#'   not item IDs but should be retained (for example, condition assignment or
+#' @param meta_cols Character vector or NULL. Additional column names, outside
+#'   the item IDs, to retain (for example, condition assignment or
 #'   source URL).
 #' @param strict Logical. When `TRUE` (default), columns in the response data
 #'   outside the declared item IDs and metadata columns raise an error.
