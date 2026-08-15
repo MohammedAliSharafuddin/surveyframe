@@ -1,59 +1,78 @@
-# CRAN submission notes - surveyframe 0.3.4
+# CRAN submission notes - surveyframe 0.4.0
 
 ## Summary
 
-This release completes the plotting, interface, statistics, and reporting
-work started in 0.3.3. Every analysis family gains a chart, every effect
-size ships with a confidence interval, reports accept written
-interpretations and can print to PDF, both dashboards gain quality and
-correlation panels, date questions gain bounds, and the builder and
-vignettes pass a WCAG 2.2 AA accessibility audit. Hard dependencies
-(jsonlite, rlang, openssl) are unchanged. naniar and pagedown join Suggests,
-both optional and guarded with `requireNamespace()`.
+This release adds a multi-criteria decision analysis (MCDA) extension and a
+small-sample statistics track, corrects 4 pre-existing defects found by
+independent cross-validation, and fixes 2 S3 design defects raised by a
+Journal of Statistical Software editor: `validate_sframe()` and
+`validate_model()` now return a visible `sframe_validation` diagnostic
+object instead of silently returning the instrument or an unclassed list,
+and every result class gained accessor and coercion methods
+(`as.data.frame()`, class-preserving `[`, `sf_meta()`, `sf_items()`,
+`as_sframe()`, and others). Hard dependencies (jsonlite, rlang, openssl) are
+unchanged. RMCDA and rstudioapi join Suggests, both optional and guarded
+with `requireNamespace()`/`rlang::check_installed()`.
+
+This is 0.4.0, not 0.3.5: 0.3.5 was planned as a field-validation round and
+0.5.0 was, at one stage, this release's own working label. Neither number
+was released; both are absorbed into 0.4.0 and the following 0.4.1.
 
 ## Changes in this release
 
-1. Four new exported base-R helpers for confidence intervals:
-   `bootstrap_ci()`, `cohens_d_ci()`, `cramers_v_ci()`, `eta_sq_ci()`.
-   Nine analysis-plan runners attach an interval to their effect size, and
-   the APA strings carry it.
-2. `validity_report()` computes the Henseler heterotrait-monotrait ratio
-   from item-level data; `missing_data_report()` runs Little's MCAR test
-   when naniar is installed; `reliability_report()` and `efa_solution()`
-   gain additional diagnostics and tidy output frames.
-3. `render_report(format = "pdf")` prints the HTML report to PDF through
-   pagedown when a local Chrome or Chromium is available, and aborts with
-   an actionable, typed error otherwise. HTML remains the default and is
-   unchanged apart from the theming below.
-4. A new `interpretations` argument on `render_report()` and
-   `render_results()` lets a written interpretation be added to each
-   research question after results are known, shown beside the
-   pre-declared decision rule. Interpretations are report content only and
-   are never written into the instrument file.
-5. `run_analysis_plan(plots = TRUE)` now attaches a ggplot2 chart (with a
-   base-graphics fallback when ggplot2 is unavailable) to every supported
-   analysis family, and every analysis-plan block returns a table, a
-   chart, or generated syntax.
-6. New `date_min`/`date_max` bounds on `sf_item(type = "date")`, enforced
-   in the builder inspector, the exported survey's native date picker, and
-   page-level validation.
-7. The exported survey, SurveyBuilder, and all seven vignettes pass a
-   WCAG 2.2 AA audit (axe-core, zero violations).
+1. MCDA extension: 10 decision methods (AHP, ANP, DEMATEL, VIKOR, MOORA,
+   SMART, WASPAS, PROMETHEE, ELECTRE, TOPSIS), 2 new item types
+   (`pairwise_comparison`, `criteria_weight`) for collecting judgement data
+   directly inside a survey instrument, a documented aggregation layer
+   (`sframe_assemble_pairwise()`, `sframe_aggregate_judgements()`,
+   `sframe_rated_matrix()`), and `sensitivity_analysis()` for perturbation
+   checks on a ranking. Every method carries a verified literature citation.
+   RMCDA is used in Suggests as a test-time cross-check oracle.
+2. Small-sample statistics track: the Hodges-Lehmann shift estimator on
+   Mann-Whitney, the paired Wilcoxon pseudomedian confidence interval, the
+   exact odds-ratio confidence interval on Fisher's test, and Firth's
+   bias-reduced logistic regression (logistf in Suggests), plus a
+   small-sample advisory surfaced on `assumption_report()` and
+   `sample_size_plan()`.
+3. `sf_conjoint_design()` declares a conjoint design for data collection.
+4. An RStudio add-in (4 menu items) ships in `inst/rstudio/addins.dcf`,
+   owner-verified in a real RStudio session.
+5. **Breaking**: `validate_sframe()` and `validate_model()` return an
+   `sframe_validation` object visibly from both `strict` branches, rather
+   than the previous behaviour (the instrument returned invisibly when
+   `strict = TRUE`, a bare unclassed list when `strict = FALSE`). `$valid`
+   and `$problems` keep working. Code using the `strict = TRUE` return as
+   an instrument needs `as_sframe()`; a directed error names it if missed.
+6. **New**: `as.data.frame()` now works on the instrument and all 14 result
+   classes. `[` preserves class on 3 list-backed report types. New
+   accessors: `sf_meta()`, `sf_items()`, `sf_scales()`, `sf_choice_sets()`,
+   `sf_branches()`, `sf_checks()`, `sf_models()`, `sf_plan()`/`sf_plan<-`,
+   `sf_id()`, `sf_label()`, `sf_apa()`, `sf_flagged()`, `sf_is_valid()`,
+   `sf_problems()`, `sf_object()`, `as_sframe()`.
+7. **Breaking**: the Shiny collector (`render_survey()`) now emits
+   expansion columns for matrix, ranking, and multi-select items, matching
+   the static template and Google Sheets collector. Responses collected
+   under the old joined-column shape need re-shaping before they can be
+   read; the new decision item types were unaffected, since they already
+   emitted the correct columns.
+8. 4 corrected results, none previously erroring or warning:
+   `item_report()`'s item-rest correlation, repeated-measures ANOVA's error
+   stratum, `validate_sframe()`'s expansion-column rejection, and the SEM
+   syntax generators ignoring `model$type`.
+9. `quality_report()` now counts expansion columns in its missingness
+   figures; reported missingness rates will change for instruments using
+   matrix, ranking, multi-select, or the 2 new decision item types.
 
 ## Test environments
 
-- Local: Ubuntu, R 4.6.0 (2026-04-24), x86_64-pc-linux-gnu
-- win-builder: R 4.6.1 (release, 2026-06-24 ucrt)
-- win-builder: R-devel (unstable, 2026-07-23 r90295 ucrt)
+- Local: Ubuntu, R 4.6.0, x86_64-pc-linux-gnu
+- win-builder: submitted 2026-08-15, results pending
 
 ## R CMD check results
 
 `R CMD check --as-cran` returned Status: OK with 0 errors, 0 warnings, and
-0 notes on every environment:
-
-- Local (2026-07-25, release-candidate tarball): Status: OK.
-- win-builder R-release (2026-07-25): Status: OK.
-- win-builder R-devel (2026-07-25): Status: OK.
+0 notes locally (2026-08-15, release-candidate tarball). win-builder
+results pending.
 
 ## Reverse dependencies
 
@@ -61,4 +80,4 @@ surveyframe has no reverse dependencies on CRAN.
 
 ## Submission outcome
 
-Submitted 2026-07-25.
+Not yet submitted to CRAN. Awaiting win-builder results.
