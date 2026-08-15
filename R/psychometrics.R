@@ -329,7 +329,7 @@ print.sframe_efa_report <- function(x, ...) {
 #' Produces a character string of `lavaan` model syntax derived from the
 #' scale structure in the instrument. The syntax can be passed directly to
 #' `lavaan::cfa()`. Reverse-coded items are noted in a comment but are not
-#' transformed in the syntax; recoding should be applied to the data before
+#' transformed in the syntax. Recoding should be applied to the data before
 #' fitting the model.
 #'
 #' @param instrument An `sframe` object.
@@ -360,7 +360,7 @@ print.sframe_efa_report <- function(x, ...) {
 #' cat(syntax)
 #'
 #' \dontrun{
-#' # lavaan is not installed by default; install it before fitting.
+#' # lavaan is not installed by default. Install it before fitting.
 #' demo   <- sframe_demo_data()
 #' scored <- score_scales(demo$responses, demo$instrument)
 #' fit    <- lavaan::cfa(syntax, data = scored, std.lv = TRUE)

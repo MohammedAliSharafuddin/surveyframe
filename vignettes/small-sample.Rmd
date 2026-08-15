@@ -69,8 +69,8 @@ surveyframe's small-sample tools do three things: flag when a sample has
 crossed below the n = 30 threshold, prefer exact or distribution-free
 alternatives to the asymptotic default where one exists, and pair every
 affected estimate with a confidence interval rather than a point value
-alone. None of this replaces judgement about the study design. It surfaces
-the cases where that judgement matters most.
+alone. Together they surface the cases where design judgement matters most,
+leaving that judgement itself to the researcher.
 
 ## Planning a small-sample study
 
@@ -204,8 +204,8 @@ fe_results[[1]]$odds_ratio_conf_int
 
 `bootstrap_ci()` computes a bootstrap interval for an arbitrary statistic,
 useful when no exact interval exists for the estimator you need. It is
-already exported and used elsewhere in the package; here it is applied to
-the median of the pilot outcome scores.
+already exported and used elsewhere in the package, applied here to the
+median of the pilot outcome scores.
 
 ```{r bootstrap-median}
 bootstrap_ci(pilot$outcome, FUN = stats::median, R = 999)
@@ -233,8 +233,8 @@ firth_results[[1]]$coefficients
 ```
 
 ```{r firth-note, eval = !requireNamespace("logistf", quietly = TRUE), echo = FALSE}
-cat("logistf is not installed in this build environment; the Firth example",
-    "above is skipped. Install logistf to run it.\n")
+cat("logistf is not installed in this build environment, so the Firth",
+    "example above is skipped. Install logistf to run it.\n")
 ```
 
 ## Cohen's d with a bootstrap interval

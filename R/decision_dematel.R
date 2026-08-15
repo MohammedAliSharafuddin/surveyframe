@@ -59,13 +59,14 @@ sframe_check_dematel_input <- function(x) {
 #' than by truncating the series. `D` is each criterion's row sum of `T`
 #' (how much it influences the others, direct and indirect combined) and `R`
 #' its column sum (how much it is influenced). Prominence `D + R` is overall
-#' involvement in the system; relation `D - R` is net direction, positive for
-#' a net cause and negative or zero for a net effect. The threshold is the
-#' arithmetic mean of every entry of `T`: relations at or above it are
-#' considered significant enough to draw in an influence diagram.
+#' involvement in the system, while relation `D - R` is net direction,
+#' positive for a net cause and negative or zero for a net effect. The
+#' threshold is the arithmetic mean of every entry of `T`: relations at or
+#' above it are considered significant enough to draw in an influence
+#' diagram.
 #'
 #' `solve()` fails outright if `I - N` is exactly singular, which does not
-#' arise for a matrix normalised this way in ordinary use; no fallback series
+#' arise for a matrix normalised this way in ordinary use. No fallback series
 #' truncation is implemented, unlike the harvested source, because a singular
 #' `I - N` here would signal a malformed matrix rather than a case to work
 #' around silently.
