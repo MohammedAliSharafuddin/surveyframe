@@ -19,16 +19,9 @@ execute:
 source("_setup.R")
 ```
 
-Two questions that look similar and are not. Mediation asks **how** an effect
-travels: does workload reach burnout by way of sleep? Moderation asks **when**
-an effect holds: is the workload effect stronger for people with less
-support?
+Two questions that look similar and are not. Mediation asks **how** an effect travels: does workload reach burnout by way of sleep? Moderation asks **when** an effect holds: is the workload effect stronger for people with less support?
 
-Both are declared in the instrument before data exists, which matters more
-here than almost anywhere else in the package. Mediation and moderation are
-where a post-hoc search does the most damage, because with 3 numeric items
-there are 6 mediation models and 6 moderation models available and any of
-them can be reported as though it were the plan.
+Both are declared in the instrument before data exists, which matters more here than almost anywhere else in the package. Mediation and moderation are where a post-hoc search does the most damage, because with 3 numeric items there are 6 mediation models and 6 moderation models available and any of them can be reported as though it were the plan.
 
 ## 1. Questionnaire and plan
 
@@ -72,14 +65,11 @@ if (inherits(v, "error")) conditionMessage(v) else
 ## The field-to-method map this file demonstrates
 
 | You have | You want | Method |
-|-------------------------|--------------------|-----------------------|
+|--------------------------|---------------------|------------------------|
 | 3 numeric items, one on the path between the others | how the effect travels | `mediation` |
 | 3 numeric items, one changing the strength of another | when the effect holds | `moderation` |
 
-Both take 3 roles and no more. Mediation wants `predictor`, `mediator`,
-`outcome`. Moderation wants `predictor`, `moderator`, `outcome`. Swapping
-`mediator` for `moderator` in the roles list changes the question entirely
-and nothing will warn you, which is why the plan is declared up front.
+Both take 3 roles and no more. Mediation wants `predictor`, `mediator`, `outcome`. Moderation wants `predictor`, `moderator`, `outcome`. Swapping `mediator` for `moderator` in the roles list changes the question entirely and nothing will warn you, which is why the plan is declared up front.
 :::
 
 ## 2. Both collection routes
@@ -201,11 +191,7 @@ sf_log(tab)
 ::: callout-note
 ## Why the identity is checked rather than assumed
 
-`total = direct + indirect` holds in OLS only when all 3 models are fitted on
-the same rows. surveyframe drops incomplete cases once, before fitting, which
-is what makes it hold here. A package that dropped rows per model would give
-a mediation table where the parts do not sum to the whole, and it would look
-like rounding.
+`total = direct + indirect` holds in OLS only when all 3 models are fitted on the same rows. surveyframe drops incomplete cases once, before fitting, which is what makes it hold here. A package that dropped rows per model would give a mediation table where the parts do not sum to the whole, and it would look like rounding.
 :::
 
 ```{r}
@@ -239,9 +225,7 @@ compare_report(tab, caption = "The bootstrap interval, reproduced")
 sf_log(tab)
 ```
 
--   [ ] The declared `bootstrap = 2000` reached the runner. If it reads
-    1000, the option was ignored and the interval is not what the plan asked
-    for.
+-   [ ] The declared `bootstrap = 2000` reached the runner. If it reads 1000, the option was ignored and the interval is not what the plan asked for.
 
 ```{r}
 #| label: acc-med-sobel
@@ -302,8 +286,7 @@ par(op)
 ```
 
 -   [ ] Every mediation number matches, including both bootstrap bounds.
--   [ ] The dotted zero line sits outside the dashed interval. If it sits
-    inside, the APA sentence must not claim mediation.
+-   [ ] The dotted zero line sits outside the dashed interval. If it sits inside, the APA sentence must not claim mediation.
 -   [ ] The direct and indirect bars stack to the total bar.
 
 ## 5. RQ2: moderation
@@ -388,11 +371,7 @@ sf_log(tab)
 ::: callout-note
 ## The last row is the one worth understanding
 
-Centring the predictors changes the lower-order coefficients but not the
-interaction. The slope reported at the moderator's mean is exactly the
-`hours` coefficient a centred model would print. That is why the 2 agree,
-and it is the quickest way to satisfy yourself that surveyframe's uncentred
-fit and the centred advice you have probably read are the same model.
+Centring the predictors changes the lower-order coefficients but not the interaction. The slope reported at the moderator's mean is exactly the `hours` coefficient a centred model would print. That is why the 2 agree, and it is the quickest way to satisfy yourself that surveyframe's uncentred fit and the centred advice you have probably read are the same model.
 :::
 
 ```{r}
@@ -416,9 +395,7 @@ compare_report(tab, caption = "Recovering the simulated interaction")
 sf_log(tab)
 ```
 
--   [ ] The tolerance on the first row is loosened to 0.01, and the reason
-    is stated: it is a sampling-recovery check on 300 rows, not an
-    arithmetic check. Every other row in this file runs at 1e-6.
+-   [ ] The tolerance on the first row is loosened to 0.01, and the reason is stated: it is a sampling-recovery check on 300 rows, not an arithmetic check. Every other row in this file runs at 1e-6.
 
 ```{r}
 #| label: acc-mod-plot
@@ -437,15 +414,12 @@ legend("topleft", lwd = 2, col = cols, bty = "n",
                         vapply(names(cols), value_at, numeric(1))))
 ```
 
--   [ ] The 3 lines fan out rather than sitting parallel. Parallel lines
-    mean no interaction, whatever the coefficient table says.
+-   [ ] The 3 lines fan out rather than sitting parallel. Parallel lines mean no interaction, whatever the coefficient table says.
 -   [ ] The red line, low support, is the steepest.
 
 ## 6. What happens when the roles are wrong
 
-A role list that names a column that is not there, or a role the method does
-not use, is the most common way one of these blocks fails. Both should say so
-rather than returning something.
+A role list that names a column that is not there, or a role the method does not use, is the most common way one of these blocks fails. Both should say so rather than returning something.
 
 ```{r}
 #| label: roles
@@ -503,11 +477,7 @@ compare_report(tab, caption = "Bad role lists fail loudly")
 sf_log(tab)
 ```
 
--   [ ] Read the 4 messages above. The last scenario, predictor and outcome
-    swapped, is the one that **cannot** be caught: both columns exist, so it
-    returns a perfectly good answer to a question nobody asked. That is what
-    the pre-declared plan is for, and it is worth noticing that no amount of
-    validation replaces it.
+-   [ ] Read the 4 messages above. The last scenario, predictor and outcome swapped, is the one that **cannot** be caught: both columns exist, so it returns a perfectly good answer to a question nobody asked. That is what the pre-declared plan is for, and it is worth noticing that no amount of validation replaces it.
 
 ## Verdict for this file
 
@@ -517,6 +487,5 @@ sf_verdict()
 ```
 
 -   [ ] `0 DIFFERS, 0 CHECK`.
--   [ ] The mediation decomposition adds up, the bootstrap interval
-    reproduces exactly, and the simple slopes match a hand-computed model.
+-   [ ] The mediation decomposition adds up, the bootstrap interval reproduces exactly, and the simple slopes match a hand-computed model.
 -   [ ] Both APA sentences are usable in a write-up without editing.

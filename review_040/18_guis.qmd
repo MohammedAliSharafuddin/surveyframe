@@ -90,49 +90,388 @@ CDNs. That is a deliberate property and the check above is what protects it.
 
 ```{r}
 #| label: build
+# 2026-08-15: expanded again, from 18 items/7 blocks to 35 items/48 blocks,
+# on request, to cover every statistical family the package ships, not a
+# sample of them: all 4 descriptive methods, all 4 association/categorical
+# methods, all 10 group_comparison methods (including both ANOVAs,
+# ANCOVA, repeated-measures ANOVA, and Friedman), all 4 correlation
+# methods, all 5 prediction/regression methods, all 5 psychometrics
+# methods, all 3 model-syntax generators plus mediation and moderation,
+# and all 10 decision methods. Saved as a real file rather than a
+# tempdir() throwaway, so it can be loaded directly:
+# `read_sframe("review_040/gui_review_full.sframe")`.
+#
+# Verified before this went in the file, the same discipline as the
+# smaller version above: builds, validates with 0 problems, round-trips
+# through write_sframe()/read_sframe() with all 3 models intact, reaches
+# sframe_builder_state_from_instrument() and
+# sframe_builder_validate_draft() with 0 problems, and **all 48
+# analysis_plan blocks ran to completion (no `error` field) against 60
+# rows of simulated responses** before this was written into the file.
+# See the build-plan-run chunk below for that run.
+lik <- function(id, label, scale) sf_item(id, label, type = "likert",
+                                          choice_set = "agree5",
+                                          scale_id = scale)
+
 demo <- sf_instrument(
-  title = "GUI review instrument", version = "1.0.0",
+  title = "GUI and statistics review instrument", version = "1.0.0",
   components = list(
     sf_choices("agree5", as.character(1:5),
                c("Strongly disagree", "Disagree", "Neutral", "Agree",
                  "Strongly agree")),
     sf_choices("site", c("north", "south"), c("Northside", "Southside")),
+    sf_choices("channels", c("call", "email", "chat", "in_person"),
+               c("Phone", "Email", "Live chat", "In person")),
+    sf_choices("priority", c("fast", "cheap", "good"),
+               c("Fast delivery", "Low price", "High quality")),
+    sf_choices("time_of_day", c("morning", "afternoon", "evening"),
+               c("Morning", "Afternoon", "Evening")),
+    sf_choices("yn", c("yes", "no"), c("Yes", "No")),
+    sf_choices("mode_cs", c("online", "in_person", "hybrid"),
+               c("Online", "In person", "Hybrid")),
 
     sf_item("site", "Which site?", type = "single_choice",
             choice_set = "site", required = TRUE),
-    sf_item("s1", "The service met my expectations.", type = "likert",
-            choice_set = "agree5", scale_id = "sat"),
-    sf_item("s2", "Staff were helpful.", type = "likert",
-            choice_set = "agree5", scale_id = "sat"),
-    sf_item("s3", "I would come back.", type = "likert",
-            choice_set = "agree5", scale_id = "sat"),
+
+    # 3 three-item scales, so a real measurement model (CFA/CB-SEM/PLS-SEM)
+    # and a real 3-factor EFA both have something genuine to find, not just
+    # 1 scale reused everywhere.
+    lik("s1", "The service met my expectations.", "sat"),
+    lik("s2", "Staff were helpful.", "sat"),
+    lik("s3", "I would come back.", "sat"),
+    lik("v1", "This service is worth what I paid.", "val"),
+    lik("v2", "I get good value here.", "val"),
+    lik("v3", "The price is fair for what I get.", "val"),
+    lik("l1", "I would recommend this to a friend.", "loy"),
+    lik("l2", "I consider myself a loyal customer.", "loy"),
+    lik("l3", "I will keep using this service.", "loy"),
+
     sf_item("wait", "Minutes waited", type = "numeric"),
 
     # The 2 item types added in 0.4.0. Getting these into both GUIs was
-    # defect 3 from the independent validation round.
+    # defect 3 from the independent validation round. crit_influence is
+    # the same 3 criteria on the influence scale, not the Saaty scale,
+    # feeding DEMATEL, so the non-interchangeable-scales guard (defect 6)
+    # has a genuine second item to be tested against, not just crit_pairs
+    # reused.
     sf_item("crit_pairs", "Which criterion matters more?",
             type = "pairwise_comparison",
             comparison_items = c("Cost", "Speed", "Quality"),
             comparison_scale = "saaty"),
+    sf_item("crit_influence", "How strongly does one criterion drive another?",
+            type = "pairwise_comparison",
+            comparison_items = c("Cost", "Speed", "Quality"),
+            comparison_scale = "influence"),
     sf_item("crit_points", "Split 100 points across the criteria",
             type = "criteria_weight",
             comparison_items = c("Cost", "Speed", "Quality")),
     sf_item("rate_cost", "Rate each supplier on cost", type = "matrix",
             choice_set = "agree5",
             matrix_items = c("Alpha", "Basilica", "Coral")),
+    sf_item("rate_speed", "Rate each supplier on speed", type = "matrix",
+            choice_set = "agree5",
+            matrix_items = c("Alpha", "Basilica", "Coral")),
+    sf_item("rate_quality", "Rate each supplier on quality", type = "matrix",
+            choice_set = "agree5",
+            matrix_items = c("Alpha", "Basilica", "Coral")),
 
-    sf_scale("sat", "Satisfaction", items = c("s1", "s2", "s3"))
+    # The remaining 7 collecting types, so all 13 are exercised somewhere
+    # in this instrument.
+    sf_item("channels", "Which channels have you used?",
+            type = "multiple_choice", choice_set = "channels"),
+    sf_item("comment", "One word for today's visit", type = "text",
+            placeholder = "e.g. Smooth"),
+    sf_item("notes", "Anything else you'd like to tell us?",
+            type = "textarea"),
+    sf_item("visit_date", "Date of your visit", type = "date",
+            date_min = "2026-01-01", date_max = "2026-12-31"),
+    sf_item("effort", "How much effort did this take? (0 to 10)",
+            type = "slider", slider_min = 0, slider_max = 10,
+            slider_step = 1),
+    sf_item("rank_priorities", "Rank these in order of importance",
+            type = "ranking", choice_set = "priority"),
+    sf_item("overall_rating", "Overall rating of today's visit",
+            type = "rating", rating_max = 5),
+    sf_item("preferred_time", "When do you usually visit?",
+            type = "single_choice", choice_set = "time_of_day"),
+
+    # Categorical and paired-binary items, for chi-square, Fisher, McNemar,
+    # and Cochran's Q.
+    sf_item("member", "Are you a member?", type = "single_choice",
+            choice_set = "yn"),
+    sf_item("used_q1", "Did you use the app in week 1?",
+            type = "single_choice", choice_set = "yn"),
+    sf_item("used_q2", "Did you use the app in week 2?",
+            type = "single_choice", choice_set = "yn"),
+    sf_item("used_q3", "Did you use the app in week 3?",
+            type = "single_choice", choice_set = "yn"),
+
+    # A 3-level grouping factor, for one-way/two-way ANOVA, Kruskal-Wallis,
+    # ANCOVA, and multinomial regression.
+    sf_item("mode", "How did you attend?", type = "single_choice",
+            choice_set = "mode_cs"),
+
+    # 3 repeated numeric measures, for repeated-measures ANOVA and Friedman.
+    sf_item("wk4", "Confidence at week 4 (0 to 100)", type = "numeric"),
+    sf_item("wk8", "Confidence at week 8 (0 to 100)", type = "numeric"),
+    sf_item("wk12", "Confidence at week 12 (0 to 100)", type = "numeric"),
+
+    # A before/after pair, for the paired t-test and Wilcoxon.
+    sf_item("confidence_pre", "Confidence before training (0 to 100)",
+            type = "numeric"),
+    sf_item("confidence_post", "Confidence after training (0 to 100)",
+            type = "numeric"),
+
+    sf_scale("sat", "Satisfaction", items = c("s1", "s2", "s3")),
+    sf_scale("val", "Value", items = c("v1", "v2", "v3")),
+    sf_scale("loy", "Loyalty", items = c("l1", "l2", "l3"))
   ),
   analysis_plan = list(
-    list(id = "RQ1", research_question = "How satisfied are people?",
+    # Descriptive family, all 4 methods.
+    list(id = "RQ1", research_question = "How is site distributed?",
+         family = "descriptive", method = "frequency",
+         roles = list(variable = "site")),
+    list(id = "RQ2", research_question = "What do wait and effort look like?",
+         family = "descriptive", method = "descriptives",
+         roles = list(variables = c("wait", "effort"))),
+    list(id = "RQ3", research_question = "How satisfied are people?",
          family = "descriptive", method = "scale_descriptives",
          roles = list(variables = "sat")),
-    list(id = "RQ2", research_question = "Which criterion weighs most?",
+    list(id = "RQ4", research_question = "Where are the gaps in the data?",
+         family = "descriptive", method = "missing_data",
+         roles = list(variables = c("wait", "effort", "s1", "s2", "s3"))),
+    list(id = "RQ5", research_question = "Is the data quality acceptable?",
+         family = "descriptive", method = "quality",
+         roles = list()),
+
+    # Association/categorical, all 4 methods.
+    list(id = "RQ6", research_question = "Does site relate to preferred time?",
+         family = "association", method = "chi_square",
+         roles = list(row = "site", column = "preferred_time")),
+    list(id = "RQ7", research_question = "The same with an exact test.",
+         family = "association", method = "fisher_exact",
+         roles = list(row = "site", column = "member")),
+    list(id = "RQ8", research_question =
+           "Did app use change from week 1 to week 2?",
+         family = "group_comparison", method = "mcnemar",
+         roles = list(before = "used_q1", after = "used_q2")),
+    list(id = "RQ9", research_question =
+           "Did app use change across all 3 weeks?",
+         family = "group_comparison", method = "cochran_q",
+         roles = list(measures = c("used_q1", "used_q2", "used_q3"))),
+
+    # Group comparison, all 10 methods: 2 independent, 2 paired, 2 one-way,
+    # two-way, ANCOVA, and 2 repeated-measures.
+    list(id = "RQ10", research_question = "Does wait time differ by site?",
+         family = "group_comparison", method = "t_test_ind",
+         roles = list(outcome = "wait", group = "site")),
+    list(id = "RQ11", research_question = "Same, without assuming normality.",
+         family = "group_comparison", method = "mann_whitney",
+         roles = list(outcome = "wait", group = "site")),
+    list(id = "RQ12", research_question =
+           "Did confidence change after training?",
+         family = "group_comparison", method = "t_test_pair",
+         roles = list(before = "confidence_pre", after = "confidence_post")),
+    list(id = "RQ13", research_question = "Same, without assuming normality.",
+         family = "group_comparison", method = "wilcoxon_pair",
+         roles = list(before = "confidence_pre", after = "confidence_post")),
+    list(id = "RQ14", research_question = "Does satisfaction differ by mode?",
+         family = "group_comparison", method = "anova_one",
+         roles = list(outcome = "sat", group = "mode")),
+    list(id = "RQ15", research_question = "Same, without assuming normality.",
+         family = "group_comparison", method = "kruskal_wallis",
+         roles = list(outcome = "sat", group = "mode")),
+    list(id = "RQ16", research_question =
+           "Do mode and site interact on satisfaction?",
+         family = "group_comparison", method = "anova_two",
+         roles = list(factor1 = "mode", factor2 = "site", outcome = "sat")),
+    list(id = "RQ17", research_question =
+           "Does mode affect satisfaction, controlling for wait?",
+         family = "group_comparison", method = "ancova",
+         roles = list(group = "mode", covariates = "wait", outcome = "sat")),
+    list(id = "RQ18", research_question =
+           "Does confidence change over 3 checkpoints?",
+         family = "group_comparison", method = "repeated_anova",
+         roles = list(measures = c("wk4", "wk8", "wk12"))),
+    list(id = "RQ19", research_question = "Same, without assuming normality.",
+         family = "group_comparison", method = "friedman",
+         roles = list(measures = c("wk4", "wk8", "wk12"))),
+
+    # Correlation, all 4 methods.
+    list(id = "RQ20", research_question = "Does wait relate to effort?",
+         family = "association", method = "correlation_pearson",
+         roles = list(x = "wait", y = "effort")),
+    list(id = "RQ21", research_question = "Same, on ranks.",
+         family = "association", method = "correlation_spearman",
+         roles = list(x = "wait", y = "effort")),
+    list(id = "RQ22", research_question = "Same, with Kendall's tau.",
+         family = "association", method = "correlation_kendall",
+         roles = list(x = "wait", y = "effort")),
+    list(id = "RQ23", research_question =
+           "Does wait relate to effort once overall rating is controlled?",
+         family = "association", method = "partial_correlation",
+         roles = list(x = "wait", y = "effort", controls = "overall_rating")),
+
+    # Prediction/regression, all 5 methods.
+    list(id = "RQ24", research_question = "What predicts wait time?",
+         family = "prediction", method = "regression_linear",
+         roles = list(outcome = "wait",
+                      predictors = c("effort", "overall_rating"))),
+    list(id = "RQ25", research_question = "What predicts membership?",
+         family = "prediction", method = "regression_logistic_binary",
+         roles = list(outcome = "member",
+                      predictors = c("effort", "overall_rating"))),
+    list(id = "RQ26", research_question =
+           "What predicts the first satisfaction item?",
+         family = "prediction", method = "regression_logistic_ordinal",
+         roles = list(outcome = "s1",
+                      predictors = c("effort", "overall_rating"))),
+    list(id = "RQ27", research_question = "What predicts attendance mode?",
+         family = "prediction", method = "regression_logistic_multinomial",
+         roles = list(outcome = "mode",
+                      predictors = c("effort", "overall_rating"))),
+    list(id = "RQ28", research_question =
+           "What predicts membership, Firth-corrected?",
+         family = "prediction", method = "firth_logistic",
+         roles = list(outcome = "member", predictors = "effort")),
+
+    # Psychometrics, all 5 methods.
+    list(id = "RQ29", research_question = "Are the 3 scales reliable?",
+         family = "psychometrics", method = "reliability_alpha"),
+    list(id = "RQ30", research_question = "Same, by omega.",
+         family = "psychometrics", method = "reliability_omega"),
+    list(id = "RQ31", research_question = "Does any item weaken its scale?",
+         family = "psychometrics", method = "item_diagnostics"),
+    list(id = "RQ32", research_question = "Is this data suitable for EFA?",
+         family = "psychometrics", method = "efa_readiness"),
+    list(id = "RQ33", research_question = "Do 3 factors emerge as designed?",
+         family = "psychometrics", method = "efa_solution",
+         roles = list(items = c("s1", "s2", "s3", "v1", "v2", "v3",
+                                 "l1", "l2", "l3")),
+         options = list(nfactors = 3)),
+
+    # Model syntax (all 3 generators) plus mediation and moderation.
+    list(id = "RQ34", research_question =
+           "Do the 9 items measure the 3 constructs they claim to?",
+         family = "model", method = "cfa_lavaan_syntax",
+         roles = list(model = "m_cfa")),
+    list(id = "RQ35", research_question =
+           "Does value carry part of satisfaction's effect on loyalty?",
+         family = "model", method = "sem_lavaan_syntax",
+         roles = list(model = "m_cb")),
+    list(id = "RQ36", research_question =
+           "Same structural question, by partial least squares.",
+         family = "model", method = "seminr_syntax",
+         roles = list(model = "m_pls")),
+    list(id = "RQ37", research_question =
+           "Does wait reach overall rating by way of effort?",
+         family = "model", method = "mediation",
+         roles = list(predictor = "wait", mediator = "effort",
+                      outcome = "overall_rating"),
+         options = list(bootstrap = 500)),
+    list(id = "RQ38", research_question =
+           "Is the wait effect on rating weaker at high effort?",
+         family = "model", method = "moderation",
+         roles = list(predictor = "wait", moderator = "effort",
+                      outcome = "overall_rating")),
+
+    # Decision, all 10 methods: 3 weight/classification methods (AHP, ANP,
+    # DEMATEL) and 7 ranking methods sharing performance_items/weights_item.
+    list(id = "RQ39", research_question = "Which criterion weighs most? (AHP)",
          family = "decision", method = "ahp",
-         roles = list(pairwise = "crit_pairs"))
+         roles = list(pairwise = "crit_pairs")),
+    list(id = "RQ40", research_question =
+           "Same, allowing criteria to influence each other. (ANP)",
+         family = "decision", method = "anp",
+         roles = list(pairwise = "crit_pairs")),
+    list(id = "RQ41", research_question =
+           "Which criteria drive the others? (DEMATEL)",
+         family = "decision", method = "dematel",
+         roles = list(pairwise = "crit_influence")),
+    list(id = "RQ42", research_question =
+           "Which supplier ranks best overall? (TOPSIS)",
+         family = "decision", method = "topsis",
+         roles = list(
+           performance_items = c("rate_cost", "rate_speed", "rate_quality"),
+           weights_item = "crit_points")),
+    list(id = "RQ43", research_question =
+           "Same, by VIKOR's compromise ranking.",
+         family = "decision", method = "vikor",
+         roles = list(
+           performance_items = c("rate_cost", "rate_speed", "rate_quality"),
+           weights_item = "crit_points")),
+    list(id = "RQ44", research_question = "Same, by MOORA.",
+         family = "decision", method = "moora",
+         roles = list(
+           performance_items = c("rate_cost", "rate_speed", "rate_quality"),
+           weights_item = "crit_points")),
+    list(id = "RQ45", research_question = "Same, by SMART.",
+         family = "decision", method = "smart",
+         roles = list(
+           performance_items = c("rate_cost", "rate_speed", "rate_quality"),
+           weights_item = "crit_points")),
+    list(id = "RQ46", research_question = "Same, by WASPAS.",
+         family = "decision", method = "waspas",
+         roles = list(
+           performance_items = c("rate_cost", "rate_speed", "rate_quality"),
+           weights_item = "crit_points")),
+    list(id = "RQ47", research_question =
+           "Same, by PROMETHEE's net flows.",
+         family = "decision", method = "promethee",
+         roles = list(
+           performance_items = c("rate_cost", "rate_speed", "rate_quality"),
+           weights_item = "crit_points")),
+    list(id = "RQ48", research_question =
+           "Same, by ELECTRE's outranking.",
+         family = "decision", method = "electre",
+         roles = list(
+           performance_items = c("rate_cost", "rate_speed", "rate_quality"),
+           weights_item = "crit_points"))
   )
 )
-inst_path <- file.path(tempdir(), "gui_review.sframe")
+
+# 3 declared models, added after construction (add_model()), same pattern
+# as file 10. cb_sem's paths are labelled deliberately: an unlabelled cb_sem
+# model with an indirect effect is defect 5, the one dogfeed finding that is
+# a hard error in the single case a structural model is most often
+# declared for, and this fixture should demonstrate the working shape, not
+# the broken one.
+constructs_reflective <- function() list(
+  sf_construct("sat", label = "Satisfaction",
+               items = c("s1", "s2", "s3"), mode = "reflective"),
+  sf_construct("val", label = "Value",
+               items = c("v1", "v2", "v3"), mode = "reflective"),
+  sf_construct("loy", label = "Loyalty",
+               items = c("l1", "l2", "l3"), mode = "reflective")
+)
+m_cfa <- sf_model("m_cfa", "Measurement model", type = "cfa",
+                  constructs = constructs_reflective())
+m_cb <- sf_model(
+  "m_cb", "Structural model, covariance-based", type = "cb_sem",
+  constructs = constructs_reflective(),
+  paths = list(
+    sf_path("sat", "val", label = "a"),
+    sf_path("val", "loy", label = "b"),
+    sf_path("sat", "loy", label = "c")
+  ),
+  indirect = list(sf_indirect("sat", through = "val", to = "loy"))
+)
+m_pls <- sf_model(
+  "m_pls", "Structural model, partial least squares", type = "pls_sem",
+  constructs = list(
+    sf_construct("sat", items = c("s1", "s2", "s3"), mode = "composite"),
+    sf_construct("val", items = c("v1", "v2", "v3"), mode = "composite"),
+    sf_construct("loy", items = c("l1", "l2", "l3"), mode = "reflective")
+  ),
+  paths = list(sf_path("sat", "val"), sf_path("val", "loy"))
+)
+demo <- add_model(demo, m_cfa)
+demo <- add_model(demo, m_cb)
+demo <- add_model(demo, m_pls)
+
+# Saved as a real file, not tempdir(), so it survives this session and can
+# be loaded directly: read_sframe("review_040/gui_review_full.sframe").
+inst_path <- file.path(getwd(), "gui_review_full.sframe")
 write_sframe(demo, inst_path, overwrite = TRUE)
 inst_path
 ```
@@ -141,20 +480,82 @@ inst_path
 #| label: build-data
 set.seed(18)
 sim <- sf_shiny_roundtrip(demo, function(i) {
-  a <- function() as.character(sample(1:5, 1))
+  a  <- function() as.character(sample(1:5, 1))
+  yn <- function() sample(c("yes", "no"), 1)
   w <- round(100 * prop.table(runif(3))); w[3] <- 100 - sum(w[1:2])
-  list(site = sample(c("north", "south"), 1),
-       s1 = a(), s2 = a(), s3 = a(), wait = sample(5:60, 1),
-       crit_pairs__Cost__vs__Speed = sample(1:9, 1),
-       crit_pairs__Cost__vs__Quality = sample(1:9, 1),
-       crit_pairs__Speed__vs__Quality = sample(1:9, 1),
-       crit_points__Cost = w[1], crit_points__Speed = w[2],
-       crit_points__Quality = w[3],
-       rate_cost__1 = a(), rate_cost__2 = a(), rate_cost__3 = a())
+  list(
+    site = sample(c("north", "south"), 1),
+    s1 = a(), s2 = a(), s3 = a(),
+    v1 = a(), v2 = a(), v3 = a(),
+    l1 = a(), l2 = a(), l3 = a(),
+    wait = sample(5:60, 1),
+    crit_pairs__Cost__vs__Speed = sample(1:9, 1),
+    crit_pairs__Cost__vs__Quality = sample(1:9, 1),
+    crit_pairs__Speed__vs__Quality = sample(1:9, 1),
+    crit_influence__Cost__to__Speed = sample(0:4, 1),
+    crit_influence__Cost__to__Quality = sample(0:4, 1),
+    crit_influence__Speed__to__Cost = sample(0:4, 1),
+    crit_influence__Speed__to__Quality = sample(0:4, 1),
+    crit_influence__Quality__to__Cost = sample(0:4, 1),
+    crit_influence__Quality__to__Speed = sample(0:4, 1),
+    crit_points__Cost = w[1], crit_points__Speed = w[2],
+    crit_points__Quality = w[3],
+    rate_cost__1 = a(), rate_cost__2 = a(), rate_cost__3 = a(),
+    rate_speed__1 = a(), rate_speed__2 = a(), rate_speed__3 = a(),
+    rate_quality__1 = a(), rate_quality__2 = a(), rate_quality__3 = a(),
+    channels = sample(c("call", "email", "chat", "in_person"),
+                       size = sample(1:2, 1)),
+    comment = sample(c("Smooth", "Slow", "Great", "Okay"), 1),
+    notes = sample(c("", "Parking was hard to find.", "Keep it up."), 1),
+    visit_date = as.character(as.Date("2026-01-01") + sample(0:300, 1)),
+    effort = sample(0:10, 1),
+    rank_priorities = paste(sample(c("fast", "cheap", "good")),
+                             collapse = "|"),
+    overall_rating = sample(1:5, 1),
+    preferred_time = sample(c("morning", "afternoon", "evening"), 1),
+    member = yn(), used_q1 = yn(), used_q2 = yn(), used_q3 = yn(),
+    mode = sample(c("online", "in_person", "hybrid"), 1),
+    wk4 = sample(20:60, 1), wk8 = sample(30:75, 1), wk12 = sample(40:90, 1),
+    confidence_pre = sample(20:60, 1), confidence_post = sample(30:85, 1)
+  )
 }, n = 60)
-resp_path <- file.path(tempdir(), "gui_review_responses.csv")
+resp_path <- file.path(getwd(), "gui_review_full_responses.csv")
 write.csv(sim$collected, resp_path, row.names = FALSE)
 c(instrument = inst_path, responses = resp_path, rows = nrow(sim$collected))
+```
+
+```{r}
+#| label: build-plan-run
+# All 48 blocks should run to completion against the simulated data. A
+# block with an `error` field here means the click-through below would hit
+# the same error inside SurveyStudio's Analysis screen, so this is checked
+# before, not discovered during, the manual pass.
+plan_results <- if (!inherits(sim$read_back, "error")) {
+  run_analysis_plan(sim$read_back, demo)
+} else {
+  list()
+}
+plan_status <- data.frame(
+  block = names(plan_results),
+  status = vapply(plan_results, function(b) {
+    if (is.null(b$error)) "OK" else paste("ERROR:", b$error)
+  }, character(1)),
+  row.names = NULL
+)
+plan_status
+```
+
+```{r}
+#| label: build-plan-run-cmp
+tab <- compare_table(
+  compare_row("all 48 declared blocks are present in the results",
+              length(plan_results), length(demo$analysis_plan), "48 declared"),
+  compare_row("every block ran with no error field",
+              sum(plan_status$status == "OK"), nrow(plan_status),
+              "run_analysis_plan() on the simulated data")
+)
+compare_report(tab, caption = "Every method family runs against this fixture")
+sf_log(tab)
 ```
 
 ::: callout-tip
@@ -179,14 +580,14 @@ tab <- compare_table(
               as.numeric(is.list(empty)), 1,
               "sframe_builder_empty_state()"),
   compare_row("every item reaches the builder state",
-              length(state$items), length(demo$items), "9 declared"),
+              length(state$items), length(demo$items), "35 declared"),
   compare_row("every choice set reaches it",
-              length(state$choices), length(demo$choices), "2 declared"),
-  compare_row("the scale reaches it",
-              length(state$scales), length(demo$scales), "1 declared"),
+              length(state$choices), length(demo$choices), "7 declared"),
+  compare_row("every scale reaches it",
+              length(state$scales), length(demo$scales), "3 declared"),
   compare_row("the analysis plan reaches it",
               length(state$analysis_plan), length(demo$analysis_plan),
-              "2 blocks declared")
+              "48 blocks declared")
 )
 compare_report(tab, caption = "Instrument to builder state")
 sf_log(tab)
@@ -319,14 +720,22 @@ Run the chunk above by hand. It opens one HTML file in your browser.
 -   [ ] Add a question. The Add-question menu opens and **the whole menu is
     visible without scrolling**, including the Decision group at the bottom.
     That group was clipped out of view before commit 266f2a1.
--   [ ] Add one of each: a Likert item, a single choice, a matrix, a
-    pairwise comparison, and a criteria weight.
+-   [ ] Add one of each of the **13 collecting item types**, so every one
+    gets a real click rather than being covered only by section 2's
+    programmatic build: Likert, single choice, multiple choice, numeric,
+    text, textarea, date, slider, rating, matrix, ranking, pairwise
+    comparison, and criteria weight.
 -   [ ] For the pairwise item, the inspector offers **comparison items** and
     **comparison scale**. Set 3 items and choose the Saaty scale.
 -   [ ] For the criteria-weight item, set the same 3 items.
+-   [ ] For the ranking item, the inspector lets you attach a choice set and
+    the built survey lets a respondent drag items into order.
+-   [ ] For the slider and rating items, their numeric bounds (min/max/step,
+    or max stars) are editable in the inspector and carry through to Preview.
 -   [ ] Open the **Preview** tab. Every question draws a real widget with a
-    body, not an empty box. The empty preview body was fixed in 9fdeb0e and
-    is the obvious thing to regress.
+    body, not an empty box, for **all 13 types**, not only the ones added in
+    0.4.0. The empty preview body was fixed in 9fdeb0e and is the obvious
+    thing to regress.
 -   [ ] On the criteria-weight question in Preview, enter points that do
     **not** total 100 and try to advance. It refuses, and says why.
 -   [ ] Export the survey. It downloads an HTML file, and opening it shows a
@@ -334,20 +743,40 @@ Run the chunk above by hand. It opens one HTML file in your browser.
     the grey "Unsupported item type" line. That fallback still exists and
     should, for a type the builder has genuinely never heard of. Seeing it on
     a decision item is the regression.
--   [ ] Open the exported file and answer every question. It submits.
+-   [ ] Open the exported file and answer every question, across all 13
+    types. It submits.
 
 **Round-trip an existing instrument.**
 
--   [ ] Import `gui_review.sframe`, the path printed in section 2.
--   [ ] All 9 questions arrive, with their choice sets, the scale, and both
-    analysis-plan blocks.
--   [ ] Open the analysis-plan editor and look at RQ2, the AHP block. Its
-    **pairwise** role dropdown offers `crit_pairs` and is **not empty**.
+-   [ ] Import `gui_review_full.sframe`, the path printed in section 2 (a
+    real file now, not a `tempdir()` one, so you can also just open it
+    directly from `review_040/` without running any R first).
+-   [ ] All 35 questions arrive, with their 7 choice sets, all 3 scales,
+    all 3 models, and all 48 analysis-plan blocks (RQ1 to RQ48).
+-   [ ] Open the analysis-plan editor and look at **RQ39**, the AHP block.
+    Its **pairwise** role dropdown offers `crit_pairs` and is **not empty**.
     That dropdown being empty was defect 3.
--   [ ] Add a DEMATEL block. Its influence role must **not** offer
-    `crit_pairs`, because that item is on the Saaty scale. Confirm the 2
-    scales are not interchangeable in the dropdowns.
--   [ ] Export back to `.sframe` and reimport. Nothing is lost.
+-   [ ] Look at **RQ41**, the DEMATEL block already in the plan. Its
+    **pairwise** role dropdown offers `crit_influence`, **not** `crit_pairs`,
+    because that item is on the Saaty scale. If you edit it and the dropdown
+    offers `crit_pairs` too, that is defect 6 regressing: confirm the 2
+    scales are not interchangeable.
+-   [ ] Look at **RQ42**, the TOPSIS block. Its **performance items** role
+    offers `rate_cost`, `rate_speed`, and `rate_quality` (the `matrix` items,
+    task B13's fix), and its **weights item** role offers `crit_points`.
+    **RQ43 to RQ48** are the same 2 roles on VIKOR, MOORA, SMART, WASPAS,
+    PROMETHEE, and ELECTRE in turn, so this is 6 more chances for the same
+    dropdown to misbehave, not just 1.
+-   [ ] Spot-check across the other families, since 48 blocks is too many to
+    click every one: **RQ14/RQ16/RQ17** (`group` populated with `mode`,
+    `factor1`/`factor2` with `mode`/`site`), **RQ23** (`controls` populated
+    with `overall_rating`, the 1 role none of the other correlation blocks
+    have), **RQ33** (`items` offering all 9 Likert items across the 3
+    scales), and **RQ34 to RQ36** (a **model** role dropdown, not an item
+    role, offering `m_cfa`/`m_cb`/`m_pls` by name). A model-role dropdown
+    being empty or offering the wrong model type was defect 5's shape.
+-   [ ] Export back to `.sframe` and reimport. Nothing is lost, across all
+    35 items, all 3 models, and all 48 blocks.
 
 ::: callout-important
 ## The one to look hardest at
@@ -376,16 +805,21 @@ launch_studio_demo()
 
 **Build screen.**
 
--   [ ] The instrument loads and all 9 items are listed.
+-   [ ] The instrument loads and all 35 items are listed.
 -   [ ] Select the pairwise item. The inspector shows its comparison items
     and its scale, and both are editable.
--   [ ] The analysis-plan editor's role dropdowns are **populated** for both
-    blocks. Empty MCDM dropdowns were defect 3 and 6.
+-   [ ] The analysis-plan editor's role dropdowns are **populated** for
+    all 48 blocks, not only the decision ones. Empty MCDM dropdowns were
+    defect 3 and 6. Spot-check a few from outside the decision family too:
+    RQ16's `factor1`/`factor2` dropdowns (two-way ANOVA), RQ34's `model`
+    dropdown (CFA syntax), RQ37's `predictor`/`mediator`/`outcome` triple
+    (mediation).
 
 **Preview screen.**
 
--   [ ] Every one of the 9 items renders a working widget, including the
-    pairwise grid and the constant-sum question.
+-   [ ] Every one of the 35 items renders a working widget, including the
+    pairwise grid, the constant-sum question, the ranking drag list, and the
+    slider and rating controls.
 -   [ ] **Check the dropdowns by clicking them, not by looking.** A
     selectize dropdown that looks empty may be populated, and one that looks
     populated may be stale. This is the single most misleading surface in
@@ -394,9 +828,9 @@ launch_studio_demo()
 **Data screen.**
 
 -   [ ] The 60 responses load and the column count matches the instrument's
-    contract.
--   [ ] The expansion columns are present, one per pair, per criterion, and
-    per matrix row.
+    contract (57 columns, per the build-data chunk in section 2).
+-   [ ] The expansion columns are present, one per pair, per criterion, per
+    matrix row, per multiple-choice option, and per ranking option.
 
 **Quality screen.**
 
@@ -407,10 +841,22 @@ launch_studio_demo()
 
 **Analysis screen.**
 
--   [ ] Both plan blocks run. RQ2 returns AHP weights and a consistency
-    ratio.
--   [ ] The consistency ratio is reported, not hidden. Random pairwise
-    judgements should produce a poor one, and it should say so.
+-   [ ] All 48 plan blocks run, spanning descriptive, association,
+    categorical, group comparison (including both ANOVAs, ANCOVA,
+    repeated-measures ANOVA, and Friedman), correlation, regression,
+    psychometrics, model syntax, mediation and moderation, and all 10
+    decision methods. Confirmed to run cleanly against the simulated data
+    in section 2's `build-plan-run` chunk before this file asked you to
+    click through it live; that chunk's `plan_status` table names the exact
+    block if any one of them fails here but not there.
+-   [ ] RQ39's (AHP) consistency ratio is reported, not hidden. Random
+    pairwise judgements should produce a poor one, and it should say so.
+-   [ ] RQ42 to RQ48 (the 7 ranking methods) each state their
+    `matrix_source` and `weights_source` (both "collected" here), so every
+    result names where its 2 inputs came from, not just TOPSIS.
+-   [ ] RQ34 to RQ36 return generated **syntax as text**, not a fitted
+    model. That is correct: surveyframe does not fit SEM itself, only
+    declares it, per file `10`.
 
 **Dashboard screen.**
 

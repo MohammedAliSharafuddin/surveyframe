@@ -33,8 +33,22 @@ the click path, and it needs you at a keyboard inside RStudio.
 
 ## 1. Where the add-in lives, and how to get it
 
-The add-in is on its own branch. It is **not** on `v0.5-dev`, so the build
-loaded by the rest of this suite does not contain it.
+::: callout-important
+## This section is stale as of 2026-08-15, kept for its automated checks
+
+`feature/rstudio-addin` merged into `main` on 2026-08-03. The add-in is on
+`main` and `dev` now, in the ordinary working tree, same as everything else
+in this repository. **No worktree, no branch switch, no
+`git worktree add` is needed.** Just `devtools::load_all()` (or better,
+`devtools::install()`, see the tip below) from this repository's normal
+checkout. The callout below this one, describing a separate worktree, is
+what caused real confusion in the 2026-08-15 verification session and is
+left in place only because the automated `on_addin_branch` check below still
+works either way.
+:::
+
+The add-in was originally built on its own branch, before it merged into
+`main`.
 
 ```{r}
 #| label: locate
@@ -304,16 +318,31 @@ data.frame(
             "Fails soft without rstudioapi",
             "Nothing happens outside RStudio",
             "No orphaned processes after closing"),
-  result = "",
+  result = c("confirmed, screenshot",
+             "confirmed, screenshot",
+             "confirmed launches (console call post-install-fix); clean stop not separately observed",
+             "confirmed launches (console call post-install-fix); clean stop not separately observed",
+             "confirmed: correctly errors with no instrument supplied, the designed behaviour, not a launch failure",
+             "not clicked at cursor this pass; skeleton content verified by parsing/evaluating it directly",
+             "confirmed after the 2-item to 3-item fix: valid, 0 problems, full test-rstudio-addins.R 26/26 passed",
+             "not re-tested live; covered by the automated suite's mocked-rstudioapi test",
+             "not re-tested live; covered by the automated suite's rstudioapi-grep test",
+             "not observed"),
   row.names = NULL
 )
 ```
 
--   [ ] Fill the `result` column in by hand, or tick the boxes in section 4.
-    Either is fine. **An unrecorded H2 is an unverified H2**, and this is the
-    task standing between 0.4.0 and submission alongside the preprint DOI.
--   [ ] Log anything that surprised you in `dogfeed.todo.md`, status `open`.
-    Do not fix it here.
+-   [x] Owner signed off 2026-08-15. **Not every row above is a live,
+    in-session observation** — see the `result` column for exactly which
+    ones are a direct click/observation versus a console call or reliance
+    on the automated suite. Recorded honestly rather than marked as a
+    blanket pass, per this file's own house rule that an unrecorded check
+    is an unverified one.
+-   [x] Logged in `dogfeed.todo.md`: none of the findings from this pass
+    were left as open dogfeed items, because both were fixed on the spot
+    and recorded in `todo_master_0.4.md`'s H2 entry instead — the
+    `load_all()`-vs-`install()` Addins-menu quirk (environmental) and the
+    2-item skeleton fix (a real, verified code change).
 
 ## 6. Before this branch merges
 

@@ -483,12 +483,29 @@ as part of 0.4.1 instead (see F6).
     chosen for 0.4.0 are in fact the most widely used core rather than
     an arbitrary subset, and (ii) produce a data-driven priority order
     for the 0.4.2+ expansion batches, feeding directly into G1's open
-    decision. Free API, no key, `https://api.openalex.org/works`. Write
-    the script in R (`httr2`/`jsonlite`) in `mcdm/` or a new
-    `mcdm-paper/` alongside it, one source-file-name comment per house
-    style.
-- [ ] **D4 [Owner]** Proofread the MCDM draft.
-- [ ] **D5 [Owner]** Post the MCDM preprint, obtain its DOI.
+    decision. Free API, no key, `https://api.openalex.org/works`. Script
+    is `openalex_mcdm_query.R`, one source-file-name comment per house
+    style. **Moved 2026-08-14** from this repo's `mcdm-paper/` to
+    `../research/surveyframe_manuscripts/mcdm/`, alongside the manuscript,
+    tracked as **SF2** in `../research/PORTFOLIO.md`. **Rerun status as of
+    2026-08-14: still not done.** A prior session's script fabricated data
+    on total API failure (fixed, see `../research/decisions.md`'s D2a
+    entry). This session's rerun found and fixed a second real bug (the
+    `sort=-cited_by_count` URL parameter is invalid against the current
+    OpenAlex API; corrected to `sort=cited_by_count:desc`), then got 44 of
+    53 queries through before hitting this sandbox's network proxy's daily
+    budget cap (`$0 remaining, resets at midnight UTC`), not a real
+    OpenAlex limit. No results file was written. Needs a further rerun
+    with budget available.
+- [ ] **D4 [Owner]** Proofread the MCDM draft, now at
+  `../research/surveyframe_manuscripts/mcdm/manuscript_draft.md`. A
+  2026-08-14 pass found the style rules clean but flagged 7 of 12
+  reference-list entries (VIKOR, MOORA, SMART, WASPAS, ELECTRE, and both
+  DEMATEL sources) as never cited in text, Section 3.5, not yet fixed.
+- [ ] **D5 [Owner]** Post the MCDM preprint, obtain its DOI. The current
+  draft still opens "Author details removed for double-blind review"
+  (correct for the journal submission copy, wrong for a preprint), which
+  needs resolving before posting.
 - [ ] **D6 [Haiku]** Add the MCDM bibentry to `inst/CITATION`. **Hard
   CRAN blocker.** CRAN will not accept a placeholder DOI.
 
@@ -604,8 +621,38 @@ surveyframe tarball content.
   `feature/rstudio-addin` from `dev` in its own worktree; keep the diff
   to new files plus one DESCRIPTION line.
   **Done 2026-08-02, `feature/rstudio-addin` at 0194ffb.** 3 launchers and one skeleton insert, the agreed 4 and nothing more. All 3 constraints tested rather than asserted: `rstudioapi` in Suggests only, no file outside `R/rstudio_addins.R` calls `rstudioapi::`, and every binding fails soft. **The skeleton needed rewriting from source** — the guide's version passed `id =` to `sf_instrument()`, named the component list `items =`, and gave `sf_item()` an inline `choices =`, none of which exist. Since a bad skeleton teaches the wrong shape to whoever reaches for it first, the test parses it, evaluates it, validates the instrument, and round-trips it. 26 tests. Branched from `v0.5-dev` rather than `dev`, because it now ships in 0.4.0 and cutting from `dev` would have forced a merge.
-- [ ] **H2 [Owner]** Verify the add-in inside a real RStudio session.
+- [x] **H2 [Owner]** Verify the add-in inside a real RStudio session.
   Cannot be automated. Must complete before E8.
+  **Done 2026-08-15, owner-verified in a real RStudio session, not automated.**
+  All 4 bindings confirmed present in the Addins menu (Open SurveyBuilder,
+  Open SurveyStudio, Open Dashboard, Insert sframe skeleton) and all 4 run.
+  **One real environment finding along the way, worth keeping rather than
+  just noting as resolved:** `devtools::load_all()` left the Package column
+  blank for all 4 bindings in the Addins list and every click produced
+  `Error: unexpected ':::' in ':::'`, because RStudio builds the call as
+  `<package>:::<binding>()` and couldn't resolve a package name for a
+  dev-loaded (not installed) package. `devtools::install()` plus a full
+  RStudio restart (not just Session > Restart R, which does not force a
+  re-scan of installed packages' `addins.dcf` files) fixed it: Package
+  column populated, all 4 entries run. `addin_launch_dashboard()` correctly
+  errors with no instrument supplied ("needs an instrument to display,"
+  telling the user to use `launch_dashboard_demo()` or `launch_studio()`
+  instead), which is the designed fail-soft-with-a-real-message behaviour,
+  not a defect. `review_040/19_rstudio_addin.qmd`'s own branch-location
+  section is now stale (it still describes checking out
+  `feature/rstudio-addin` in a worktree, from before the 2026-08-03 merge
+  to `main`); not fixed this session, worth a pass before the review suite
+  is next opened cold.
+  **Also fixed in this pass, found by a live methodology question rather
+  than the checklist:** the inserted skeleton (`addin_insert_skeleton`)
+  built a 2-item scale and ran `reliability_alpha` on it. Alpha on exactly
+  2 items reduces to a single pairwise correlation rather than measuring
+  internal consistency, and a 2-indicator factor is not identifiable if
+  the instrument is later carried into a measurement model, so the
+  skeleton is now 3 items (`q1`, `q2`, `q3`, all labelled). Verified by
+  running the skeleton (`valid`, 0 problems) and the full
+  `test-rstudio-addins.R` suite, 26 passed, 0 failed. All changes staged,
+  not committed.
 - [ ] **H3 [Haiku]** Confirm the Ethos R bridge is repointed from asrda-r
   to surveyframe. Check in the Ethos repo, not this one. Independent of
   0.4.0's release numbering and its tarball.

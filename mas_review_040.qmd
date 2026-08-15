@@ -61,12 +61,12 @@ Work through this document sequentially in a fresh RStudio session with a real b
 
 ## Prerequisites
 
--   [ ] RStudio open with a clean R session (restart R first).
--   [ ] Chrome or Firefox available.
--   [ ] `devtools`, `remotes`, `ggplot2`, `psych`, `jmv`, `shiny`, `quarto` installed.
--   [ ] Optional but exercised below: `RMCDA` (cross-check oracle), `logistf`, `naniar`, `pagedown`.
--   [ ] `rstudioapi` installed, for Part J.
--   [ ] Internet access.
+- [ ] RStudio open with a clean R session (restart R first).
+- [ ] Chrome or Firefox available.
+- [ ] `devtools`, `remotes`, `ggplot2`, `psych`, `jmv`, `shiny`, `quarto` installed.
+- [ ] Optional but exercised below: `RMCDA` (cross-check oracle), `logistf`, `naniar`, `pagedown`.
+- [ ] `rstudioapi` installed, for Part J.
+- [ ] Internet access.
 
 ```{r}
 #| label: prereq
@@ -92,10 +92,10 @@ packageVersion("surveyframe")
 # Expected after task E1: '0.4.0'
 ```
 
--   [ ] A1.1 Installation completes with no errors or warnings.
--   [ ] A1.2 `packageVersion()` reports 0.4.0 (only after E1 sets it; before that it still reads 0.3.4 and that is expected).
--   [ ] A1.3 `NEWS.md` opens with the 0.4.0 section and its "Corrected results" heading is the first thing under it.
--   [ ] A1.4 The README roadmap no longer promises small-sample at v0.4 and MCDM at v0.5.
+- [ ] A1.1 Installation completes with no errors or warnings.
+- [ ] A1.2 `packageVersion()` reports 0.4.0 (only after E1 sets it; before that it still reads 0.3.4 and that is expected).
+- [ ] A1.3 `NEWS.md` opens with the 0.4.0 section and its "Corrected results" heading is the first thing under it.
+- [ ] A1.4 The README roadmap no longer promises small-sample at v0.4 and MCDM at v0.5.
 
 ------------------------------------------------------------------------
 
@@ -131,8 +131,8 @@ data.frame(ir, psych_r_drop = round(oracle, 4),
            difference = round(ir$item_rest_r - oracle, 10))
 ```
 
--   [ ] B1.1 Every `item_rest_r` is positive and around 0.81 to 0.85. Before the fix they were about **-0.46**.
--   [ ] B1.2 The difference column is 0 to 10 decimal places against `psych`.
+- [ ] B1.1 Every `item_rest_r` is positive and around 0.81 to 0.85. Before the fix they were about **-0.46**.
+- [ ] B1.2 The difference column is 0 to 10 decimal places against `psych`.
 
 ### B2 — Repeated-measures ANOVA
 
@@ -168,9 +168,9 @@ jtab <- as.data.frame(jmv::anovaRM(
 jtab[1, c("F[none]", "df[none]", "p[none]")]
 ```
 
--   [ ] B2.1 F is about **86.93 on df 2 and 78**. Before the fix it reported F = 1.45, p = 0.24, a non-significant result where the truth is overwhelming.
--   [ ] B2.2 The `jmv` oracle chunk agrees to 4 decimal places.
--   [ ] B2.3 **Owner judgement:** decide whether any repeated-measures result you have already reported needs re-running and, if published, corrected.
+- [ ] B2.1 F is about **86.93 on df 2 and 78**. Before the fix it reported F = 1.45, p = 0.24, a non-significant result where the truth is overwhelming.
+- [ ] B2.2 The `jmv` oracle chunk agrees to 4 decimal places.
+- [ ] B2.3 **Owner judgement:** decide whether any repeated-measures result you have already reported needs re-running and, if published, corrected.
 
 ### B3 — Validation accepted a real builder export
 
@@ -193,7 +193,7 @@ inst <- sf_instrument(
 validate_sframe(inst, strict = FALSE)
 ```
 
--   [ ] B3.1 `valid` is TRUE and `problems` is empty. Before the fix this instrument failed validation.
+- [ ] B3.1 `valid` is TRUE and `problems` is empty. Before the fix this instrument failed validation.
 
 ### B4 — SEM syntax generators check the model type
 
@@ -208,8 +208,8 @@ cb <- sf_model("cb_1", "CB", type = "cb_sem",
 tryCatch(seminr_syntax(cb), error = function(e) conditionMessage(e))
 ```
 
--   [ ] B4.1 The call errors, and the message names the function, the family it generates, and that generating anyway would estimate a different model.
--   [ ] B4.2 **Read the wording.** Does it tell a researcher what to do next, or only that something is wrong?
+- [ ] B4.1 The call errors, and the message names the function, the family it generates, and that generating anyway would estimate a different model.
+- [ ] B4.2 **Read the wording.** Does it tell a researcher what to do next, or only that something is wrong?
 
 ------------------------------------------------------------------------
 
@@ -238,9 +238,9 @@ data.frame(
 )
 ```
 
--   [ ] C1.1 42 expansion columns, 12 respondents, 8 items.
--   [ ] C1.2 All 4 blocks return rows and no error.
--   [ ] C1.3 The AHP consistency ratio is reported and below 0.10.
+- [ ] C1.1 42 expansion columns, 12 respondents, 8 items.
+- [ ] C1.2 All 4 blocks return rows and no error.
+- [ ] C1.3 The AHP consistency ratio is reported and below 0.10.
 
 ```{r}
 #| label: c3-two-topsis
@@ -248,8 +248,8 @@ knitr::kable(results[["RQ2"]]$table, caption = "Audited figures")
 knitr::kable(results[["RQ3"]]$table, caption = "Staff ratings")
 ```
 
--   [ ] C1.4 The two rankings differ. They read different weight sources and different matrices, so identical results would mean one declared path was being ignored.
--   [ ] C1.5 **Owner judgement:** is the reframing trap explained clearly enough in the vignette? Price is declared `benefit` only because the question asked about value for money. Nothing in the data distinguishes that from a raw price rating, and getting it wrong yields a confident, inverted ranking.
+- [ ] C1.4 The two rankings differ. They read different weight sources and different matrices, so identical results would mean one declared path was being ignored.
+- [ ] C1.5 **Owner judgement:** is the reframing trap explained clearly enough in the vignette? Price is declared `benefit` only because the question asked about value for money. Nothing in the data distinguishes that from a raw price rating, and getting it wrong yields a confident, inverted ranking.
 
 ```{r}
 #| label: c4-sensitivity
@@ -265,8 +265,8 @@ sens <- sensitivity_analysis(
 sens
 ```
 
--   [ ] C1.6 `stable` is FALSE, 4 of 8 perturbations move the ranking, and `top_changed` is FALSE throughout.
--   [ ] C1.7 **Owner judgement:** the print output distinguishes "the winner holds" from "the full ranking holds". Is that distinction clear enough to stop someone quoting positions 2 to 5 as firmly as position 1?
+- [ ] C1.6 `stable` is FALSE, 4 of 8 perturbations move the ranking, and `top_changed` is FALSE throughout.
+- [ ] C1.7 **Owner judgement:** the print output distinguishes "the winner holds" from "the full ranking holds". Is that distinction clear enough to stop someone quoting positions 2 to 5 as firmly as position 1?
 
 ### C2 — Non-results must not read as findings
 
@@ -281,8 +281,8 @@ ct9 <- rep(c("benefit", "cost"), length.out = 9)
 sensitivity_analysis(x9, w9, ct9, method = "electre")
 ```
 
--   [ ] C2.1 The output says "No result to test" rather than "Stable".
--   [ ] C2.2 **Owner judgement:** does the wording make clear this is an absence of discrimination rather than a robust ranking? This is the single most dangerous message in the decision family, because the old behaviour gave the strongest possible reassurance for the weakest possible result.
+- [ ] C2.1 The output says "No result to test" rather than "Stable".
+- [ ] C2.2 **Owner judgement:** does the wording make clear this is an absence of discrimination rather than a robust ranking? This is the single most dangerous message in the decision family, because the old behaviour gave the strongest possible reassurance for the weakest possible result.
 
 ------------------------------------------------------------------------
 
@@ -318,10 +318,10 @@ again <- sf_conjoint_design(
 identical(design$profiles, again$profiles)
 ```
 
--   [ ] D1.1 The same seed reproduces the identical design.
--   [ ] D1.2 The print output states plainly that surveyframe does not fit choice models.
--   [ ] D1.3 **Owner judgement:** the heuristic method is named `"balanced"`, not `"fractional"`, because it is a repeated-sampling search rather than a catalogued orthogonal array. Is that distinction stated clearly enough in `?sf_conjoint_design` for a reviewer who expects a true fractional factorial?
--   [ ] D1.4 **Owner judgement:** is the `profiles` escape hatch, for supplying a D-optimal design generated elsewhere, discoverable enough?
+- [ ] D1.1 The same seed reproduces the identical design.
+- [ ] D1.2 The print output states plainly that surveyframe does not fit choice models.
+- [ ] D1.3 **Owner judgement:** the heuristic method is named `"balanced"`, not `"fractional"`, because it is a repeated-sampling search rather than a catalogued orthogonal array. Is that distinction stated clearly enough in `?sf_conjoint_design` for a reviewer who expects a true fractional factorial?
+- [ ] D1.4 **Owner judgement:** is the `profiles` escape hatch, for supplying a D-optimal design generated elsewhere, discoverable enough?
 
 ------------------------------------------------------------------------
 
@@ -350,10 +350,10 @@ row <- surveyframe:::sframe_response_row(
 names(row)
 ```
 
--   [ ] E1.1 The columns are `mx__r1`, `mx__r2`, `ms__1` to `ms__5`, `rk__1` to `rk__5`. No bare `mx`, `ms`, or `rk`.
--   [ ] E1.2 Multi-select columns carry 0 or 1; ranking columns carry rank positions.
--   [ ] E1.3 `read_responses()` accepts the row (it rejected the old shape).
--   [ ] E1.4 **Owner decision, already taken 2026-08-02 but worth re-confirming with the NEWS text in front of you:** this changes column names for anyone mid-collection through `render_survey()`. Is the NEWS wording explicit enough about what they must do with data already gathered?
+- [ ] E1.1 The columns are `mx__r1`, `mx__r2`, `ms__1` to `ms__5`, `rk__1` to `rk__5`. No bare `mx`, `ms`, or `rk`.
+- [ ] E1.2 Multi-select columns carry 0 or 1; ranking columns carry rank positions.
+- [ ] E1.3 `read_responses()` accepts the row (it rejected the old shape).
+- [ ] E1.4 **Owner decision, already taken 2026-08-02 but worth re-confirming with the NEWS text in front of you:** this changes column names for anyone mid-collection through `render_survey()`. Is the NEWS wording explicit enough about what they must do with data already gathered?
 
 ### E2 — The header-rewriting trap
 
@@ -378,7 +378,7 @@ tryCatch(read_responses(utils::read.csv(f), inst2, strict = TRUE),
          error = function(e) conditionMessage(e))
 ```
 
--   [ ] E2.1 The error names the original column, the rewritten form, and `check.names = FALSE`. **Read it as someone who has not seen this before:** does it get them unstuck?
+- [ ] E2.1 The error names the original column, the rewritten form, and `check.names = FALSE`. **Read it as someone who has not seen this before:** does it get them unstuck?
 
 ------------------------------------------------------------------------
 
@@ -403,8 +403,8 @@ q <- quality_report(dat, inst3)
 q$missing$respondent_miss
 ```
 
--   [ ] F1.1 Respondent 3, who skipped the whole matrix, shows a non-zero missing rate. It used to report 0 percent, because expansion columns were invisible to the check.
--   [ ] F1.2 **Owner judgement:** reported missingness will move for any instrument using matrix, ranking, multi-select, or decision items. Is the NEWS entry clear that the old figures were understated rather than the new ones inflated?
+- [ ] F1.1 Respondent 3, who skipped the whole matrix, shows a non-zero missing rate. It used to report 0 percent, because expansion columns were invisible to the check.
+- [ ] F1.2 **Owner judgement:** reported missingness will move for any instrument using matrix, ranking, multi-select, or decision items. Is the NEWS entry clear that the old figures were understated rather than the new ones inflated?
 
 ```{r}
 #| label: f2-hash-fixed-point
@@ -424,8 +424,8 @@ c(written = substr(h1, 1, 16), rewritten = substr(h2, 1, 16),
   identical = identical(h1, h2))
 ```
 
--   [ ] F2.1 The hash is identical across write, read, write. Before the fix, identical content carried two different hashes depending on whether it had been through a read.
--   [ ] F2.2 The 3 bundled instruments still hash to the values they store (the automated test asserts this; if it ever fails, every stored `.sframe` moved with it).
+- [ ] F2.1 The hash is identical across write, read, write. Before the fix, identical content carried two different hashes depending on whether it had been through a read.
+- [ ] F2.2 The 3 bundled instruments still hash to the values they store (the automated test asserts this; if it ever fails, every stored `.sframe` moved with it).
 
 ------------------------------------------------------------------------
 
@@ -437,9 +437,9 @@ c(written = substr(h1, 1, 16), rewritten = substr(h2, 1, 16),
 launch_builder(open = TRUE)
 ```
 
--   [ ] G1.1 Add-question menu shows the Decision (MCDM) group without scrolling.
--   [ ] G1.2 Adding a pairwise item draws a real preview, not an empty body.
--   [ ] G1.3 A decision question's sample labels are marked as samples.
+- [ ] G1.1 Add-question menu shows the Decision (MCDM) group without scrolling.
+- [ ] G1.2 Adding a pairwise item draws a real preview, not an empty body.
+- [ ] G1.3 A decision question's sample labels are marked as samples.
 
 ```{r}
 #| label: g2-studio
@@ -451,9 +451,9 @@ launch_studio(instrument = demo, responses = resp,
               respondent_id = "respondent_id", screen = "analysis")
 ```
 
--   [ ] G2.1 Selecting TOPSIS offers 4 options under "Performance matrix items". This was empty for all 7 ranking methods before 0.4.0, which made the rated-matrix path unbuildable in the GUI.
--   [ ] G2.2 Selecting AHP offers `crit_pairs` under "Pairwise" but not `crit_influence`. The two comparison scales are not interchangeable.
--   [ ] G2.3 **Owner judgement:** the variable panel badges decision items PWC and WGT. Do those codes mean anything to a researcher who has not read the docs?
+- [ ] G2.1 Selecting TOPSIS offers 4 options under "Performance matrix items". This was empty for all 7 ranking methods before 0.4.0, which made the rated-matrix path unbuildable in the GUI.
+- [ ] G2.2 Selecting AHP offers `crit_pairs` under "Pairwise" but not `crit_influence`. The two comparison scales are not interchangeable.
+- [ ] G2.3 **Owner judgement:** the variable panel badges decision items PWC and WGT. Do those codes mean anything to a researcher who has not read the docs?
 
 ------------------------------------------------------------------------
 
@@ -465,9 +465,9 @@ launch_studio(instrument = demo, responses = resp,
 vignette("mcdm-analysis", package = "surveyframe")
 ```
 
--   [ ] H1.1 The vignette knits offline and every chart carries alt text.
--   [ ] H1.2 axe-core reports zero WCAG 2.2 AA violations (machine-verified 2026-08-02: 0 violations, 24 passing checks).
--   [ ] H1.3 **Owner judgement, prose:** the vignette describes its own sensitivity example as *not* stable, and explains why the winner holding is a defensible claim while the full ranking is not. Does that read clearly, or does it undercut confidence in the method?
+- [ ] H1.1 The vignette knits offline and every chart carries alt text.
+- [ ] H1.2 axe-core reports zero WCAG 2.2 AA violations (machine-verified 2026-08-02: 0 violations, 24 passing checks).
+- [ ] H1.3 **Owner judgement, prose:** the vignette describes its own sensitivity example as *not* stable, and explains why the winner holding is a defensible claim while the full ranking is not. Does that read clearly, or does it undercut confidence in the method?
 
 ------------------------------------------------------------------------
 
@@ -489,30 +489,30 @@ devtools::load_all(".")
 # Tools > Addins > Browse Addins).
 ```
 
--   [ ] J1.1 All 4 entries appear under Addins, listed as: Open SurveyBuilder, Open SurveyStudio, Open Dashboard, Insert sframe skeleton.
--   [ ] J1.2 Each entry's description reads sensibly in the Browse Addins dialog (that dialog shows the `Description:` field from `addins.dcf`).
--   [ ] J1.3 **Judgement:** are 4 entries the right number? The plan deliberately cut 5 further ideas, including an `sf_item()` inserter and demo launchers, to keep the menu small. Does the menu feel useful or sparse in practice?
+- [ ] J1.1 All 4 entries appear under Addins, listed as: Open SurveyBuilder, Open SurveyStudio, Open Dashboard, Insert sframe skeleton.
+- [ ] J1.2 Each entry's description reads sensibly in the Browse Addins dialog (that dialog shows the `Description:` field from `addins.dcf`).
+- [ ] J1.3 **Judgement:** are 4 entries the right number? The plan deliberately cut 5 further ideas, including an `sf_item()` inserter and demo launchers, to keep the menu small. Does the menu feel useful or sparse in practice?
 
 ### J2 — The three launchers
 
 Run each from the Addins menu, not from the console. The point is that the menu binding works, which the console cannot tell you.
 
--   [ ] J2.1 **Open SurveyBuilder** opens the builder in a browser.
--   [ ] J2.2 **Open SurveyStudio** opens the studio in a browser.
--   [ ] J2.3 **Open Dashboard** opens the dashboard in a browser.
--   [ ] J2.4 Each returns control to RStudio cleanly; the console is not left blocked in a way that feels broken.
--   [ ] J2.5 **Judgement:** when a launcher opens, is it obvious what happened? A Shiny app taking over the console without explanation can read as a hang.
+- [ ] J2.1 **Open SurveyBuilder** opens the builder in a browser.
+- [ ] J2.2 **Open SurveyStudio** opens the studio in a browser.
+- [ ] J2.3 **Open Dashboard** opens the dashboard in a browser.
+- [ ] J2.4 Each returns control to RStudio cleanly; the console is not left blocked in a way that feels broken.
+- [ ] J2.5 **Judgement:** when a launcher opens, is it obvious what happened? A Shiny app taking over the console without explanation can read as a hang.
 
 ### J3 — Insert sframe skeleton
 
 This is the entry most likely to be someone's first contact with the constructors, so the inserted text matters more than it looks.
 
--   [ ] J3.1 Open a new, empty `.R` file, place the cursor, and run **Insert sframe skeleton** from the menu. Text is inserted at the cursor.
--   [ ] J3.2 Select the inserted text and run it. It executes with no error.
--   [ ] J3.3 The final line, `validate_sframe(instrument)`, reports a valid instrument.
--   [ ] J3.4 Inserting a second time at a different cursor position works, and does not overwrite the first.
--   [ ] J3.5 **Judgement, and the important one:** read the skeleton as a newcomer. Does it teach the right shape? It deliberately declares a choice set as its own component and references it by `choice_set = "agree5"`, includes a scale, and ends with a validation call. The implementation guide's original version was written against an API that no longer exists, so this was rewritten from source and executed to confirm it builds a valid instrument. Whether it is the *right* teaching example is a judgement only you can make.
--   [ ] J3.6 **Judgement:** should the skeleton include an `analysis_plan` block at all? It currently does, on the argument that a pre-declared plan is the package's whole thesis and a skeleton without one teaches the wrong habit. The counter-argument is that it makes the insert longer and more intimidating.
+- [ ] J3.1 Open a new, empty `.R` file, place the cursor, and run **Insert sframe skeleton** from the menu. Text is inserted at the cursor.
+- [ ] J3.2 Select the inserted text and run it. It executes with no error.
+- [ ] J3.3 The final line, `validate_sframe(instrument)`, reports a valid instrument.
+- [ ] J3.4 Inserting a second time at a different cursor position works, and does not overwrite the first.
+- [ ] J3.5 **Judgement, and the important one:** read the skeleton as a newcomer. Does it teach the right shape? It deliberately declares a choice set as its own component and references it by `choice_set = "agree5"`, includes a scale, and ends with a validation call. The implementation guide's original version was written against an API that no longer exists, so this was rewritten from source and executed to confirm it builds a valid instrument. Whether it is the *right* teaching example is a judgement only you can make.
+- [ ] J3.6 **Judgement:** should the skeleton include an `analysis_plan` block at all? It currently does, on the argument that a pre-declared plan is the package's whole thesis and a skeleton without one teaches the wrong habit. The counter-argument is that it makes the insert longer and more intimidating.
 
 ### J4 — Failure behaviour
 
@@ -525,13 +525,13 @@ surveyframe:::sframe_addin_ready()
 # Expected: TRUE in RStudio with rstudioapi installed.
 ```
 
--   [ ] J4.1 With `rstudioapi` installed, `sframe_addin_ready()` returns TRUE.
--   [ ] J4.2 Confirm the package still loads and works normally in a plain R console outside RStudio (`R --vanilla`, `library(surveyframe)`, run any analysis). The add-in layer must be invisible there.
--   [ ] J4.3 **Judgement:** if `rstudioapi` were missing, the add-in prints a message and returns NULL rather than erroring. Is the message clear about what to install?
+- [ ] J4.1 With `rstudioapi` installed, `sframe_addin_ready()` returns TRUE.
+- [ ] J4.2 Confirm the package still loads and works normally in a plain R console outside RStudio (`R --vanilla`, `library(surveyframe)`, run any analysis). The add-in layer must be invisible there.
+- [ ] J4.3 **Judgement:** if `rstudioapi` were missing, the add-in prints a message and returns NULL rather than erroring. Is the message clear about what to install?
 
 ### J5 — Sign-off
 
--   [ ] J5.1 **Owner sign-off on H2.** Record the RStudio version and OS used, since add-in registration is IDE-version-sensitive.
+- [ ] J5.1 **Owner sign-off on H2.** Record the RStudio version and OS used, since add-in registration is IDE-version-sensitive.
 
 ------------------------------------------------------------------------
 
@@ -546,10 +546,10 @@ urlchecker::url_check()
 spelling::spell_check_package()
 ```
 
--   [ ] K1.1 `devtools::document()` clean, no NAMESPACE churn beyond the new exports.
--   [ ] K1.2 Full suite green (machine-verified 2026-08-02: 1473 passed, 0 failed, 1 skipped).
--   [ ] K1.3 `urlchecker::url_check()` clean.
--   [ ] K1.4 `spelling::spell_check_package()` clean, or every hit is a deliberate term.
+- [ ] K1.1 `devtools::document()` clean, no NAMESPACE churn beyond the new exports.
+- [ ] K1.2 Full suite green (machine-verified 2026-08-02: 1473 passed, 0 failed, 1 skipped).
+- [ ] K1.3 `urlchecker::url_check()` clean.
+- [ ] K1.4 `spelling::spell_check_package()` clean, or every hit is a deliberate term.
 
 ```{r}
 #| label: k2-cran-check
@@ -559,10 +559,10 @@ spelling::spell_check_package()
 # R CMD check --as-cran surveyframe_0.4.0.tar.gz
 ```
 
--   [ ] K1.5 0 errors, 0 warnings, at most 1 note (incoming feasibility).
--   [ ] K1.6 Win-builder R-release and R-devel both Status OK.
--   [ ] K1.7 No dev-only file reaches the tarball. Check especially `todo_master_0.4.md`, `mas_review_040.*`, and `data-raw/`.
--   [ ] K1.8 pkgdown builds from `main` only, and the new vignette appears under "Specialised analyses".
+- [ ] K1.5 0 errors, 0 warnings, at most 1 note (incoming feasibility).
+- [ ] K1.6 Win-builder R-release and R-devel both Status OK.
+- [ ] K1.7 No dev-only file reaches the tarball. Check especially `todo_master_0.4.md`, `mas_review_040.*`, and `data-raw/`.
+- [ ] K1.8 pkgdown builds from `main` only, and the new vignette appears under "Specialised analyses".
 
 ------------------------------------------------------------------------
 
@@ -570,15 +570,15 @@ spelling::spell_check_package()
 
 Not verification. These are open questions this round surfaced that only you can close.
 
--   [ ] L1.1 **`inst/CITATION` is the one hard CRAN blocker.** It needs the MCDM preprint DOI, and CRAN will not accept a placeholder. Nothing else in this list stops E8.
--   [ ] L1.2 The 12 dogfeed items re-laned to 0.4.1 on 2026-08-02: confirm that split still looks right once you have read this document.
--   [ ] L1.3 D2.6's remaining halves stay open and human: the live dashboard filter check, and revising examples and vignettes to use labelled levels consistently.
--   [ ] L1.4 Whether the two breaking changes (Shiny export shape, missingness counting) warrant anything louder than a NEWS entry, given 0.4.0 is a minor release.
+- [ ] L1.1 **`inst/CITATION` is the one hard CRAN blocker.** It needs the MCDM preprint DOI, and CRAN will not accept a placeholder. Nothing else in this list stops E8.
+- [ ] L1.2 The 12 dogfeed items re-laned to 0.4.1 on 2026-08-02: confirm that split still looks right once you have read this document.
+- [ ] L1.3 D2.6's remaining halves stay open and human: the live dashboard filter check, and revising examples and vignettes to use labelled levels consistently.
+- [ ] L1.4 Whether the two breaking changes (Shiny export shape, missingness counting) warrant anything louder than a NEWS entry, given 0.4.0 is a minor release.
 
 ------------------------------------------------------------------------
 
 ## Sign-off
 
--   [ ] Reviewer initials and date once Parts A to K are complete.
--   [ ] Part J (RStudio add-in) explicitly signed off, since it cannot be machine-verified and blocks E8.
--   [ ] Any new feedback logged in `dogfeed.todo.md` rather than left in this document.
+- [ ] Reviewer initials and date once Parts A to K are complete.
+- [ ] Part J (RStudio add-in) explicitly signed off, since it cannot be machine-verified and blocks E8.
+- [ ] Any new feedback logged in `dogfeed.todo.md` rather than left in this document.

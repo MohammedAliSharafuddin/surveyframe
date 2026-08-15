@@ -106,6 +106,12 @@ surveyframe is the source of truth for a wider product and publication set.
   **JSS rejected it on 2026-08-07 and the target is the R Journal**, with the
   manuscript pinned to CRAN 0.4.0. Clone it beside this repository when
   working on the paper.
+- **research** (private): the manuscript portfolio repository. Holds **SF2**,
+  the MCDM paper (D2/D2a in this file's release blocks), at
+  `research/surveyframe_manuscripts/mcdm/`, moved out of surveyframe-dev on
+  2026-08-14. It was drafted here first as `mcdm-paper/`; that folder no
+  longer exists in this repository. `research/PORTFOLIO.md` tracks SF2
+  alongside SF1 and the rest of the author's manuscript portfolio.
 - **ethos** (private, JavaScript): a research-workflow product built on
   surveyframe. Calls surveyframe as the engine.
 - **ethos-pro** (private, TypeScript): the institutional governance layer on top
@@ -293,11 +299,11 @@ installable from GitHub. A **breaking API change landed on `dev` on
 2026-08-07**: `validate_sframe()` returns a diagnostic and every class gained
 accessors. The review suite is complete and found 8 defects needing owner
 decisions. Git history was rewritten on 2026-08-04, so any clone older than
-that is stale. The 2 CRAN blockers are unchanged: the MCDM preprint DOI (D6)
-and the owner verifying the RStudio add-in (H2), and **both now also gate the
-SF1 manuscript**, which is pinned to CRAN 0.4.0 for the R Journal. Jump to
-"0.4.0 is on `main`", "Breaking API change", "The review suite", and "Git
-history was rewritten".
+that is stale. **H2 (the RStudio add-in) is done, owner-verified in a real
+RStudio session on 2026-08-15.** The one remaining hard CRAN blocker is D6,
+the MCDM preprint DOI, which also gates the SF1 manuscript, pinned to CRAN
+0.4.0 for the R Journal. Jump to "0.4.0 is on `main`", "Breaking API
+change", "The review suite", and "Git history was rewritten".
 
 ### Shipped
 
@@ -647,30 +653,37 @@ date, and that is what `v0.3.4` points at. Tag each release as it ships from
 now on, because a rewrite makes a recorded SHA worthless and a tag moves
 with the history.
 
-### Hard blocker, and the one human gate
+### Hard blocker
 
 **`inst/CITATION` needs the MCDM preprint DOI (task D6), and CRAN will not
 accept a placeholder.** The small-sample paper moved to 0.4.1 on 2026-07-31,
 so only the MCDM paper gates this release. Target journal: *Operations
-Research and Decisions*, diamond OA.
+Research and Decisions*, diamond OA. The manuscript itself moved out of this
+repository on 2026-08-14, to `../research/surveyframe_manuscripts/mcdm/`,
+tracked as SF2. It still needs 2 things before it can be posted for a DOI: a
+proofread fix (7 of 12 references are never cited in text) and removing the
+double-blind placeholder, since a preprint needs a real byline. Everything
+else outstanding in blocks D and E is mechanical release paperwork.
 
-**H2 is the other gate and cannot be automated.** Verifying the RStudio
-add-in inside a real RStudio session needs the owner at a keyboard, the
-add-in ships in 0.4.0, and `review_040/19_rstudio_addin.qmd` carries the click
-path. Everything else outstanding in blocks D and E is mechanical release
-paperwork.
+**H2 is done.** The RStudio add-in was owner-verified inside a real RStudio
+session on 2026-08-15. See H2's entry in `todo_master_0.4.md` for the 2
+things the verification pass found and fixed along the way: an
+`install()`-vs-`load_all()` Addins-menu quirk (environmental, not a package
+defect) and a genuine fix to the inserted skeleton, which built a
+statistically weak 2-item scale and now builds 3.
 
 ### Also open, unrelated to a single release
 
-The RStudio add-in exists only as a plan (`todo_rstudio_addin.md`). No
-files, no branch, no `rstudioapi` in Suggests. Its "do not merge until
-0.3.4 is accepted" condition is now satisfied, so it can be built and
-merged at any time. Smaller carried items: the `.bib` reference carry-in
-decision (leaning defer), the Codecov badge, guarding the Shiny launcher
-`\donttest` examples, the keep-versus-deprecate call on the standalone
-dashboard, an interactive pass over `R/survey_module.R`, and README's
-Roadmap section, which still promises small-sample at 0.4 and MCDM at
-0.5 on a public page.
+**This paragraph was stale and is corrected here.** It previously said the
+RStudio add-in existed only as a plan and that README's Roadmap section
+still promised small-sample at 0.4 and MCDM at 0.5. Both were wrong by the
+time this was read: the add-in was built 2026-08-02 (H1), merged to `main`
+2026-08-03, and owner-verified 2026-08-15 (H2, above); README was fixed
+2026-08-01 (C4). Remaining smaller carried items, still genuinely open: the
+`.bib` reference carry-in decision (leaning defer), the Codecov badge,
+guarding the Shiny launcher `\donttest` examples, the keep-versus-deprecate
+call on the standalone dashboard, and an interactive pass over
+`R/survey_module.R`.
 
 **`todo_master_0.4.md` holds all 64 open tasks** in 9 blocks with a model
 tier and a priority tier per task, plus the 3 open decisions. Read it

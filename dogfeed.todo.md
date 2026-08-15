@@ -1284,3 +1284,55 @@ working from it cannot see what respondents were told.
 
 Small and low risk: add the column, blank where no help was declared.
 Laned to 0.4.1 because nothing is wrong with what the codebook does print.
+
+### [open] `lane: owner decision` — SurveyBuilder: reordering items and analysis-plan blocks has no keyboard path
+Found 2026-08-15 in a full HTML/CSS/GUI proofread of
+`inst/builder/survey_builder.html`. Checked the global `keydown` listener
+directly (it handles Escape, Ctrl+S, Ctrl+Z, Ctrl+Y, Ctrl+O and nothing
+else) and confirmed both the sidebar item list and the Analyse tab's plan
+cards use native HTML5 drag-and-drop (`draggable`, `ondragstart`,
+`ondragover`, `ondrop`) exclusively, with no arrow-key handler and no
+move-up/move-down buttons anywhere in the file.
+
+A keyboard-only user cannot reorder survey items or analysis-plan blocks at
+all. This is WCAG 2.1.1 (Keyboard), a Level A criterion, the most basic
+conformance level, not a AA polish item like most of the entries in this
+file's `0.4.1` lane. Flagged as an owner decision on scope and lane rather
+than pre-assigned, given that severity: fixing it properly means adding a
+real keyboard alternative (arrow keys while a card has focus, or explicit
+move buttons), not a one-line change.
+
+### [open] `lane: owner decision` — SurveyBuilder: no heading structure and no responsive layout in the tool itself
+Found 2026-08-15, same pass. Two separate findings bundled here because
+both trace to the same cause: checking the outer application markup
+against the file's own embedded respondent-facing template
+(`<script type="text/template" id="staticSurveyTpl">`), which is inert text
+the browser never renders as part of the builder.
+
+**No headings.** The only 3 `<h1>`/`<h2>` tags in the whole 3,514-line file
+sit inside that inert template. The actual builder application (sidebar,
+Build/Preview/Analyse panels, inspector, modals) has zero heading elements,
+so a screen-reader user has no heading-based way to navigate between
+sections, only linear tabbing.
+
+**No responsive breakpoints.** The single `@media (max-width:600px)` in the
+file (checked directly) also belongs to the embedded template, not the
+builder. The app's own CSS fixes `.sidebar` at 224px and `.inspector` at
+320px inside an `overflow:hidden` flex row with no fallback. The exported
+survey a respondent fills in does get real mobile treatment (matrix reflow
+and the rest); the design tool itself does not, so it is desktop-only.
+
+Neither is a one-line fix: a heading structure needs a real information
+architecture pass across the whole app, and a responsive layout needs a
+genuine breakpoint design for the 3-column shell. Logged for a scoping
+decision rather than attempted here.
+
+### [open] `lane: 0.4.1` — SurveyBuilder: weak focus indicator on the sidebar search box
+Found 2026-08-15, same pass. `.sb-search input:focus{outline:none;
+background:rgba(255,255,255,.12)}`: the only focus change is a background
+alpha shift from 8 percent to 12 percent white on the dark sidebar, a
+4-point difference unlikely to read as "focus moved here" for most users.
+Smaller than the 2 entries above (a real, if subtle, indicator exists,
+unlike the choice-row input fixed the same session, see the `git log` for
+`inst/builder/survey_builder.html`), so laned as ordinary AA polish rather
+than flagged as a scope decision.
