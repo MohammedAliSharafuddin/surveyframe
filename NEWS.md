@@ -8,6 +8,68 @@ number either. Local branches and worktrees kept the `v0.5-dev` name
 throughout development, a label mismatch that is intentional and recorded
 in the project's own internal notes, not a sign of a skipped release.
 
+## New: multi-criteria decision analysis (MCDA)
+
+surveyframe's decision-family extension links survey collection directly to
+10 MCDA methods, closing the gap between MCDA computation packages, which
+assume a clean matrix already exists, and survey software, which has no
+concept of a decision method at all.
+
+* 10 decision methods: the Analytic Hierarchy Process (AHP), the Analytic
+  Network Process (ANP), the Decision Making Trial and Evaluation Laboratory
+  method (DEMATEL), VIKOR, MOORA, SMART, WASPAS, PROMETHEE, ELECTRE, and
+  TOPSIS. Every method carries a verified literature citation.
+* 2 new item types collect judgement data directly inside the survey
+  instrument: `pairwise_comparison` (Saaty's 1-to-9 ratio scale for AHP and
+  ANP, or a 0-to-4 directed influence scale for DEMATEL) and
+  `criteria_weight` (a constant-sum allocation across criteria).
+* A documented aggregation layer (`R/decision_data.R`) turns per-respondent
+  answers into the matrices the methods consume: `sframe_assemble_pairwise()`
+  builds one matrix per respondent and validates every pair was answered,
+  `sframe_aggregate_judgements()` combines them (geometric mean for AHP/ANP,
+  which preserves reciprocity, or arithmetic mean for DEMATEL), and
+  `sframe_rated_matrix()` builds a performance matrix from ordinary matrix
+  items. AHP judgements are additionally screened for consistency against
+  Saaty's random-index table, with the CR distribution reported whether or
+  not a study has pre-declared a filtering threshold.
+* Every ranking method resolves its matrix and weight inputs in the same
+  order (a researcher-supplied override, then a collected item, then a
+  typed error naming what is missing) and records where each input came
+  from, so a results table states the provenance of every number.
+* `sensitivity_analysis()` reports how far a ranking moves under a declared
+  perturbation of the weights, and carries a `degenerate` flag so a
+  ranking that never separated its alternatives cannot report false
+  stability (see "Decision analysis: non-results now say so" below).
+* Both the visual builder and SurveyStudio support the 2 new item types,
+  and the static HTML survey, the Shiny module, and the builder preview
+  render all 3 judgement-collection structures identically.
+* RMCDA joins Suggests as a test-time cross-check oracle: an independent
+  computation of the same method on the same matrix is required to agree
+  with the package's own result before a method's implementation is
+  accepted. This practice caught a real defect during development, a
+  WASPAS runner that had inherited SMART's normalisation step by mistake.
+
+## New: small-sample statistics
+
+A track of corrections for comparisons run on small samples, where the
+ordinary versions of these tests can flip significance on repeated draws
+from data whose true difference never changed.
+
+* The Hodges-Lehmann shift estimator as an alternative to the independent
+  two-group Mann-Whitney comparison.
+* The paired Wilcoxon pseudomedian confidence interval as an alternative to
+  the paired t-test.
+* The exact odds-ratio confidence interval on Fisher's test for small
+  2x2 tables, avoiding the ad hoc continuity correction a conventional
+  Wald interval needs when a cell is zero.
+* Firth's bias-reduced logistic regression (`logistf` in Suggests) for
+  regression prone to separation at small n.
+* A small-sample advisory surfaced on `assumption_report()` and
+  `sample_size_plan()`, flagging when a study's sample size falls in the
+  range where these corrections are worth considering.
+* `vignettes/small-sample.Rmd` walks through when to prefer each
+  correction over its conventional counterpart.
+
 ## Corrected results (read before comparing against earlier output)
 
 Four defects found by independent cross-validation are fixed. Each
