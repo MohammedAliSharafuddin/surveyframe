@@ -272,7 +272,7 @@ input,textarea,select{font-family:inherit;font-size:13px}
 .crow-dh{color:var(--t3);cursor:grab;font-size:10px}
 .crow input{flex:1;border:none;padding:3px 4px;font-size:11px;
   color:var(--t1);background:transparent}
-.crow input:focus{outline:none}
+.crow input:focus{outline:2px solid var(--cp);outline-offset:-2px;border-radius:3px}
 .crow-rm{color:var(--t3);font-size:13px;border-radius:3px;padding:1px 3px;
   transition:all var(--d1)}
 .crow-rm:hover{color:var(--cd);background:var(--cd-l)}
@@ -560,6 +560,7 @@ textarea.pv-inp:focus{border-color:var(--pvc);
 .rs-h3{font-size:12px;font-weight:600;margin:14px 0 4px;color:var(--t1)}
 .rs-p{font-size:11px;color:var(--t3);line-height:1.5;margin-bottom:8px}
 .rs-method{font-size:11px;color:var(--t2);margin-bottom:8px}
+.rs-tbl-cap{font-size:10px;font-style:italic;margin-bottom:4px}
 .rs-tbl{width:100%;border-collapse:collapse;margin-bottom:8px}
 .rs-tbl th{font-size:10px;text-transform:uppercase;letter-spacing:.04em;
   color:var(--t3);border-top:1.5px solid var(--t2);border-bottom:1px solid var(--cb);
@@ -648,8 +649,8 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
   </div>
   <div class="tb-r">
     <div class="tb-hist">
-      <button type="button" id="undoBtn" title="Undo (Ctrl+Z)" onclick="undo()" disabled>&#8630;</button>
-      <button type="button" id="redoBtn" title="Redo (Ctrl+Y)" onclick="redo()" disabled>&#8631;</button>
+      <button type="button" id="undoBtn" title="Undo (Ctrl+Z)" aria-label="Undo" onclick="undo()" disabled>&#8630;</button>
+      <button type="button" id="redoBtn" title="Redo (Ctrl+Y)" aria-label="Redo" onclick="redo()" disabled>&#8631;</button>
     </div>
     <span class="save-st" id="saveSt">No changes</span>
     <span class="tb-sep" aria-hidden="true"></span>
@@ -708,7 +709,7 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
            scale, chosen by comparison_scale, so each gets its own entry
            rather than making the researcher find a hidden switch. -->
       <div class="fg"><div class="fg-lbl">Decision (MCDM)</div>
-        <button type="button" class="fi" onclick="qAdd('pairwise_comparison','saaty');closeFabMenu()"><span class="fi-ic">&#8646;</span>Pairwise comparison (AHP)</button>
+        <button type="button" class="fi" onclick="qAdd('pairwise_comparison','saaty');closeFabMenu()"><span class="fi-ic">&#8646;</span>Pairwise comparison (AHP, ANP)</button>
         <button type="button" class="fi" onclick="qAdd('pairwise_comparison','influence');closeFabMenu()"><span class="fi-ic">&#8594;</span>Influence matrix (DEMATEL)</button>
         <button type="button" class="fi" onclick="qAdd('criteria_weight');closeFabMenu()"><span class="fi-ic">%</span>Criteria weights</button>
       </div>
@@ -2587,7 +2588,7 @@ function renderItemList(){
     if(sc)bgs.push('<span class="badge b-sc">'+esc(sc.id)+'</span>');
     if(item.reverse)bgs.push('<span class="badge b-rv">rev</span>');
     if(ck)bgs.push('<span class="badge b-ck">attn</span>');
-    return pd+'<div class="ic'+(selId===item.id?' sel':'')+'" role="listitem" draggable="true" data-idx="'+ri+'" data-id="'+esc(item.id)+'" onclick="selItem(\''+item.id+'\')" ondragstart="dStart(event,'+ri+')" ondragover="dOver(event,'+ri+',event)" ondrop="dDrop(event,'+ri+')" ondragleave="this.classList.remove(\'drag-t\',\'drag-b\')"><div class="ic-h" title="Drag to reorder">&#8942;</div><div class="ic-body"><div class="'+lc+'">'+esc(item.label||'(no label)')+'</div><div class="ic-meta">'+bgs.join('')+'</div></div><div class="ic-acts"><button type="button" class="ib" title="Duplicate" onclick="event.stopPropagation();dupItem(\''+item.id+'\')">&#10697;</button><button type="button" class="ib del" title="Delete" onclick="event.stopPropagation();delItem(\''+item.id+'\')">&#128465;</button></div></div>';
+    return pd+'<div class="ic'+(selId===item.id?' sel':'')+'" role="listitem" draggable="true" data-idx="'+ri+'" data-id="'+esc(item.id)+'" onclick="selItem(\''+item.id+'\')" ondragstart="dStart(event,'+ri+')" ondragover="dOver(event,'+ri+',event)" ondrop="dDrop(event,'+ri+')" ondragleave="this.classList.remove(\'drag-t\',\'drag-b\')"><div class="ic-h" title="Drag to reorder">&#8942;</div><div class="ic-body"><div class="'+lc+'">'+esc(item.label||'(no label)')+'</div><div class="ic-meta">'+bgs.join('')+'</div></div><div class="ic-acts"><button type="button" class="ib" title="Duplicate" aria-label="Duplicate question" onclick="event.stopPropagation();dupItem(\''+item.id+'\')">&#10697;</button><button type="button" class="ib del" title="Delete" aria-label="Delete question" onclick="event.stopPropagation();delItem(\''+item.id+'\')">&#128465;</button></div></div>';
   }).join('');
 }
 function selItem(id){selId=id;renderItemList();openInsp(id);}
@@ -3399,7 +3400,7 @@ function updatePlanInterp(id,val){
   rq.decision_rule=val.trim();rq.interpretation=val.trim();
   setDirty();
 }
-// Report outline tab: a skeleton of the eventual render_report() document —
+// Report outline tab: a skeleton of the eventual render_report() document:
 // study header, quality and descriptives stubs, then one section per plan
 // with an empty results table and a figure placeholder (the table+plot
 // pairing the R report emits), then models and references.
@@ -3414,10 +3415,11 @@ function reportSkeletonHtml(plans){
   plans.forEach(function(rq,i){
     var method=rq.method||rq.test;
     out+='<div class="rs-h3">3.'+(i+1)+' '+esc(rq.research_question||('Research question '+(i+1)))+'</div>';
-    out+='<div class="rs-method">Method: '+esc(TLBLS[method]||method)+(rq.requires_data===false?' (syntax generation only — no result table)':'')+'</div>';
+    out+='<div class="rs-method">Method: '+esc(TLBLS[method]||method)+(rq.requires_data===false?' (syntax generation only, no result table)':'')+'</div>';
     if(rq.requires_data!==false){
+      out+='<div class="rs-tbl-cap">Table 3.'+(i+1)+': '+esc(TLBLS[method]||method)+' results</div>';
       out+='<table class="rs-tbl"><thead><tr><th>Statistic</th><th>Value</th><th>Interpretation</th></tr></thead><tbody>'+phRow+phRow+'</tbody></table>';
-      out+='<div class="rs-fig"><span class="rs-fig-ic">&#128200;</span><span class="rs-fig-cap">Figure 3.'+(i+1)+' — '+esc(TLBLS[method]||method)+' chart, paired with the table above</span></div>';
+      out+='<div class="rs-fig"><span class="rs-fig-ic">&#128200;</span><span class="rs-fig-cap">Figure 3.'+(i+1)+': '+esc(TLBLS[method]||method)+' chart, paired with the table above</span></div>';
     }
     // The editable field sits below the table and chart, matching where
     // render_report() prints the paired "Planned decision rule" and
@@ -3454,7 +3456,7 @@ function renderAnalyse(){
   var cardHtml=function(plans){return plans.map(function(rq,i){var method=rq.method||rq.test,reg=ANALYSIS_REGISTRY[method]||{},alpha=(rq.options&&rq.options.alpha)||rq.alpha,vars=asArr(rq.variables);if(!vars.length)vars=flattenRoles(rq.roles||{});var refs=asArr(rq.reporting_references);if(!refs.length)refs=asArr(rq.citations);var drg=draggable?' draggable="true" ondragstart="pStart(event,\''+rq.id+'\')" ondragover="pOver(event,\''+rq.id+'\')" ondrop="pDrop(event,\''+rq.id+'\')" ondragend="pEnd(event)" ondragleave="this.classList.remove(\'drag-t\',\'drag-b\')"':'';return'<div class="rq-card'+(draggable?' rq-drag':'')+'"'+drg+' onclick="openRQModal(\''+rq.id+'\')"><div style="display:flex;align-items:flex-start;gap:8px"><span class="rq-num"'+(draggable?' title="Drag to reorder"':'')+'>'+(i+1)+'</span><div style="flex:1"><div class="rq-q">'+esc(rq.research_question)+'</div><div class="rq-meta"><span class="tc">'+esc(TLBLS[method]||method)+'</span>'+(reg.showAlpha?'<span class="ac">significance='+esc(alpha||0.05)+'</span>':'')+(rq.status?'<span class="ac">'+esc(rq.status)+'</span>':'')+refs.map(function(k){return'<span class="cc">'+esc(CSHORT[k]||k)+'</span>';}).join('')+'</div>'+(vars.length?'<div style="margin-top:6px;display:flex;gap:3px;flex-wrap:wrap">'+vars.map(function(v){return'<span class="vchip">'+esc(v)+'</span>';}).join('')+'</div>':'')+(rq.decision_rule||rq.interpretation?'<div class="rq-interp">'+esc(rq.decision_rule||rq.interpretation)+'</div>':'<div class="rq-no-int">Decision rule pending.</div>')+'</div></div></div>';}).join('');};
   if(anTab==='run'){
     rb.innerHTML=cardHtml(runPlans);
-    if(syntaxOnly.length)rb.innerHTML+='<div style="padding:8px 12px;font-size:11px;color:var(--t3);border-top:1px solid var(--bdr);margin-top:4px">'+syntaxOnly.length+' syntax-only method(s) excluded — these generate lavaan or seminr strings without requiring response data.</div>';
+    if(syntaxOnly.length)rb.innerHTML+='<div style="padding:8px 12px;font-size:11px;color:var(--t3);border-top:1px solid var(--bdr);margin-top:4px">'+syntaxOnly.length+' syntax-only method(s) excluded. These generate lavaan or seminr strings without requiring response data.</div>';
   }else if(anTab==='report'){
     rb.innerHTML=reportSkeletonHtml(allPlans);
   }else{
