@@ -66,13 +66,16 @@ was released; both are absorbed into 0.4.0 and the following 0.4.1.
 ## Test environments
 
 - Local: Ubuntu, R 4.6.0, x86_64-pc-linux-gnu
-- win-builder: submitted 2026-08-15, results pending
+- win-builder: R 4.6.1 (release, 2026-06-24 ucrt), checked 2026-08-15
 
 ## R CMD check results
 
 `R CMD check --as-cran` returned Status: OK with 0 errors, 0 warnings, and
-0 notes locally (2026-08-15, release-candidate tarball). win-builder
-results pending.
+0 notes on every environment:
+
+- Local (2026-08-15, release-candidate tarball): Status: OK.
+- win-builder R-release (2026-08-15): Status: OK. Install 12 seconds,
+  check 424 seconds.
 
 ## Reverse dependencies
 
@@ -80,4 +83,4 @@ surveyframe has no reverse dependencies on CRAN.
 
 ## Submission outcome
 
-Not yet submitted to CRAN. Awaiting win-builder results.
+Not yet submitted to CRAN.
