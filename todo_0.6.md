@@ -50,7 +50,7 @@ Family string `"text"` (metadata). Ids, per the 06 guide's table:
 | `stm_topics` | stm (+ tidytext for tokenising) | guarded both |
 | `quanteda_dfm` | quanteda | guarded |
 
-Every id goes through the full todo_0.5 integration checklist: switch
+Every id goes through the full todo_0.4 integration checklist: switch
 case in `sframe_run_one_block()` (`R/analysis_plan.R:1101`), roles
 (`item` role: one text/textarea item id; `k` and `seed` in options),
 default-roles fallback in `sframe_analysis_roles()`

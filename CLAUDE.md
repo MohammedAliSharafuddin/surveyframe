@@ -77,6 +77,16 @@ files, `todo_0.4.md` and `todo_0.5.md`, merged 2026-08-15) is the CRAN
 unchanged, since 1.0 is an external launch gate (Ethos GA, Ethos Pro GA,
 the ASRDA complete edition), not a slot in the sequential feature track.
 
+**Filenames and every `.md`-suffixed cross-reference are fully fixed and
+verified.** Bare in-prose mentions without the `.md` suffix (`"the 0.5
+cycle"`, `"per todo_0.5"`) were fixed where they were live pointers to
+another file's content (an integration checklist, a shared section), but
+were not exhaustively swept everywhere they appear, since many are
+scheduling colour in files whose own target dates (2027) are already
+stale regardless of numbering. Each file's own title line and this table
+are authoritative; do not trust a bare version number inside a file's
+body without checking both.
+
 | Branch/worktree label (unchanged) | CRAN version | Planning file (renamed 2026-08-15) | Content |
 |---|---|---|---|
 | branch `v0.5-dev`, worktree `../surveyframe-v0.5-dev` | **0.4.0** | `todo_0.4.md` | MCDM plus small-sample plus the 5 bug fixes plus absorbed field validation |

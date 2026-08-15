@@ -188,7 +188,7 @@ seminr model.
   bundle work — leave a comment).
 - Plan runners `sframe_run_cfa_fit()`, `sframe_run_sem_fit()` in
   `R/model_layer.R` following the runner contract, registered per the
-  todo_0.5 integration checklist (switch, citations, plot, builder,
+  todo_0.4 integration checklist (switch, citations, plot, builder,
   studio, restore). Non-convergence and lavaan warnings surface as an
   `error`/`warning` field, never a crash.
 - Plot: `sframe_plot_cfa_loadings()` (loading dot plot per construct,
@@ -353,7 +353,7 @@ Binding policy per `todo_0.4.md`. This release parallelises less than
   one brief).
 - **Lead:** #5 bridge (blocker-sensitive), #6 higher-order, all
   shared-file wiring (switch, plot dispatcher, JS registries) in one
-  pass, per the conflict rule from todo_0.5.
+  pass, per the conflict rule from todo_0.4.
 - **Agent 4 (Sonnet):** #7 vignette after #1-#4 land.
 - **Agent 5 (Haiku):** verification sweeps throughout; plus the
   double `R CMD check` run (with and without optional packages).
