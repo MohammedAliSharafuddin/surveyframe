@@ -557,13 +557,22 @@ which is `psych`'s own default. **Every new claim needs a mutation check.
 Revert the thing being tested and confirm the test fails.** A check that
 cannot fail is not a check.
 
-### Breaking API change: accessors and the validation diagnostic (2026-08-07)
+### Breaking API change: accessors and the validation diagnostic (2026-08-07, merged to `main` 2026-08-15)
 
 Built in response to the 2 package defects a JSS editor recorded alongside
 the scope rejection of the manuscript. Both are real S3 design defects that a
-reviewer at any venue would raise. On `dev`, 1676 tests passing,
-`R CMD check --as-cran` Status: OK. **This is the API the SF1 manuscript is
-pinned to, so treat it as frozen for the purposes of that paper.**
+reviewer at any venue would raise. Originally built and tested on `dev` only
+(1676 tests passing, `R CMD check --as-cran` Status: OK), and **never merged
+to `main`, an oversight not discovered until the 0.4.0 release prep itself
+on 2026-08-15**, by which point `main` had already been through a full CRAN
+check that passed cleanly without this work in it at all. Cherry-picked
+`c67dab9` onto `main` (excluding `CLAUDE.md`, which does not belong there),
+re-verified: `devtools::test()` 0 FAIL, `R CMD check --as-cran` Status OK, 0
+errors, 0 warnings, 0 notes, tarball audited clean of dev-only files. **This
+is the API the SF1 manuscript is pinned to, so treat it as frozen for the
+purposes of that paper.** Lesson for future dev-only feature work: confirm a
+commit actually reached `main` before treating a release as feature-complete,
+since `dev` having a commit is not evidence `main` does.
 
 **1. `validate_sframe()` and `validate_model()` now return an
 `sframe_validation` object**, visibly, from both `strict` branches. The old
