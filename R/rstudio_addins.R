@@ -51,6 +51,13 @@ addin_launch_dashboard <- function() {
 # passed id = to sf_instrument(), named the component list items =, and
 # handed sf_item() an inline choices = argument. Choice sets are declared as
 # their own component and referenced by id.
+#
+# 3 items per scale, not 2 (fixed 2026-08-15). Alpha on exactly 2 items
+# reduces to a single pairwise correlation rather than measuring internal
+# consistency, and a 2-indicator factor is not identifiable if this
+# instrument is later carried into a measurement model. The skeleton is the
+# first thing a new user copies, so it should not model the statistical
+# floor as if it were normal practice.
 sframe_addin_skeleton <- function() {
   paste(
     'instrument <- sf_instrument(',
@@ -68,7 +75,9 @@ sframe_addin_skeleton <- function() {
     '            choice_set = "agree5", scale_id = "construct_1"),',
     '    sf_item("q2", "Second item text.", type = "likert",',
     '            choice_set = "agree5", scale_id = "construct_1"),',
-    '    sf_scale("construct_1", "Construct one", items = c("q1", "q2"))',
+    '    sf_item("q3", "Third item text.", type = "likert",',
+    '            choice_set = "agree5", scale_id = "construct_1"),',
+    '    sf_scale("construct_1", "Construct one", items = c("q1", "q2", "q3"))',
     '  ),',
     '  analysis_plan = list(',
     '    list(',
@@ -76,7 +85,7 @@ sframe_addin_skeleton <- function() {
     '      research_question = "How reliable is construct one?",',
     '      family            = "measurement",',
     '      method            = "reliability_alpha",',
-    '      roles             = list(items = c("q1", "q2"))',
+    '      roles             = list(items = c("q1", "q2", "q3"))',
     '    )',
     '  )',
     ')',
