@@ -52,7 +52,7 @@ test_that("a fresh instrument and its round trip serialise to the same payload",
   expect_identical(a, b)
 
   # the parts that used to diverge
-  fresh <- sframe_serialization_payload(validate_sframe(inst, strict = TRUE))
+  fresh <- sframe_serialization_payload(as_sframe(validate_sframe(inst, strict = TRUE)))
   roundtripped <- sframe_serialization_payload(read_sframe(p))
   expect_identical(fresh$items, roundtripped$items)
   expect_identical(fresh$analysis_plan, roundtripped$analysis_plan)

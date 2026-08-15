@@ -44,8 +44,8 @@ sframe_clean_chrome_detritus <- function(before) {
 #'
 #' cb <- codebook_report(instr)
 #' print(cb)
-#' nrow(cb$items_table)
-#' nrow(cb$scales_table)
+#' nrow(sf_items(cb))
+#' nrow(sf_scales(cb))
 codebook_report <- function(instrument, format = c("html", "md")) {
   sframe_check_instrument(instrument)
   format <- rlang::arg_match(format)
@@ -62,107 +62,19 @@ codebook_report <- function(instrument, format = c("html", "md")) {
     item_ids
   )
 
-  items_table <- data.frame(
-    id         = vapply(instrument$items, function(i) i$id,          character(1)),
-    label      = vapply(instrument$items, function(i) i$label,       character(1)),
-    type       = vapply(instrument$items, function(i) i$type,        character(1)),
-    choice_set = vapply(instrument$items, function(i) i$choice_set %||% "", character(1)),
-    scale_id   = vapply(instrument$items, function(i) i$scale_id %||% "", character(1)),
-    reverse    = vapply(instrument$items, function(i) isTRUE(i$reverse), logical(1)),
-    required   = vapply(instrument$items, function(i) isTRUE(i$required), logical(1)),
-    stringsAsFactors = FALSE,
-    check.names = FALSE
-  )
+  # The 5 tables come from the shared builders in as_data_frame.R, so the
+  # codebook and as.data.frame() on the instrument cannot drift apart.
+  items_table <- sframe_items_table(instrument)
 
-  choices_table <- if (length(instrument$choices) > 0) {
-    rows <- lapply(instrument$choices, function(cs) {
-      data.frame(
-        choice_set_id = cs$id,
-        value         = as.character(cs$values),
-        label         = cs$labels,
-        stringsAsFactors = FALSE,
-        check.names = FALSE
-      )
-    })
-    do.call(rbind, rows)
-  } else {
-    data.frame(
-      choice_set_id = character(0),
-      value = character(0),
-      label = character(0),
-      stringsAsFactors = FALSE,
-      check.names = FALSE
-    )
-  }
+  choices_table <- sframe_choices_table(instrument)
 
-  scales_table <- if (length(instrument$scales) > 0) {
-    data.frame(
-      id     = vapply(instrument$scales, function(s) s$id,    character(1)),
-      label  = vapply(instrument$scales, function(s) s$label, character(1)),
-      method = vapply(instrument$scales, function(s) s$method, character(1)),
-      n_items = vapply(instrument$scales, function(s) length(s$items), integer(1)),
-      items  = vapply(instrument$scales, function(s) paste(s$items, collapse = ", "), character(1)),
-      stringsAsFactors = FALSE,
-      check.names = FALSE
-    )
-  } else {
-    data.frame(
-      id = character(0),
-      label = character(0),
-      method = character(0),
-      n_items = integer(0),
-      items = character(0),
-      stringsAsFactors = FALSE,
-      check.names = FALSE
-    )
-  }
+  scales_table <- sframe_scales_table(instrument)
 
   # The pre-declared analysis plan and the measurement models belong in the
   # codebook, so one document fully records the instrument a study used.
-  plan_table <- if (length(instrument$analysis_plan %||% list()) > 0) {
-    data.frame(
-      id = vapply(instrument$analysis_plan, function(b) b$id %||% "", character(1)),
-      research_question = vapply(instrument$analysis_plan,
-        function(b) b$research_question %||% "", character(1)),
-      method = vapply(instrument$analysis_plan, sframe_analysis_method, character(1)),
-      variables = vapply(instrument$analysis_plan,
-        function(b) paste(sframe_analysis_vars(b), collapse = ", "), character(1)),
-      decision_rule = vapply(instrument$analysis_plan,
-        function(b) b$decision_rule %||% b$interpretation %||% "", character(1)),
-      stringsAsFactors = FALSE,
-      check.names = FALSE
-    )
-  } else {
-    data.frame(
-      id = character(0), research_question = character(0),
-      method = character(0), variables = character(0),
-      decision_rule = character(0),
-      stringsAsFactors = FALSE, check.names = FALSE
-    )
-  }
+  plan_table <- sframe_plan_table(instrument)
 
-  models_table <- if (length(instrument$models %||% list()) > 0) {
-    data.frame(
-      id = vapply(instrument$models, function(m) m$id %||% "", character(1)),
-      label = vapply(instrument$models, function(m) m$label %||% "", character(1)),
-      type = vapply(instrument$models, function(m) m$type %||% "", character(1)),
-      engine = vapply(instrument$models, function(m) m$engine %||% "", character(1)),
-      n_constructs = vapply(instrument$models, function(m) {
-        length(sframe_model_constructs(m))
-      }, integer(1)),
-      n_paths = vapply(instrument$models, function(m) {
-        length(m$structural$paths %||% list())
-      }, integer(1)),
-      stringsAsFactors = FALSE,
-      check.names = FALSE
-    )
-  } else {
-    data.frame(
-      id = character(0), label = character(0), type = character(0),
-      engine = character(0), n_constructs = integer(0), n_paths = integer(0),
-      stringsAsFactors = FALSE, check.names = FALSE
-    )
-  }
+  models_table <- sframe_models_table(instrument)
 
   structure(
     list(

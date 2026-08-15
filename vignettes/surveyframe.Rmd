@@ -397,13 +397,25 @@ study
 ## Validate and serialise
 
 `validate_sframe()` checks every item ID, choice set reference, and scale
-membership before any data is collected. `write_sframe()` saves the validated
-instrument with a SHA-256 hash so any post-collection edits are detectable.
+membership before any data is collected. It returns a diagnostic that prints
+what it found, so printing the call is enough to read the result.
+`write_sframe()` saves the validated instrument with a SHA-256 hash so any
+post-collection edits are detectable.
 
 ```{r validate}
+validate_sframe(study, strict = FALSE)
+```
+
+Read the parts of the diagnostic with the accessors rather than reaching into
+it. `summary()` shows every check that ran, including the ones that found
+nothing, which is how you tell a check that passed from a check that was
+never reached.
+
+```{r validate-explore}
 v <- validate_sframe(study, strict = FALSE)
-v$valid
-length(v$problems)
+sf_is_valid(v)
+sf_problems(v)
+head(summary(v), 5)
 ```
 
 ```{r write}
@@ -413,7 +425,7 @@ sframe_path <- write_sframe(study, file.path(tempdir(), "tourism_services_v1.sfr
 
 # Reload the instrument from disk at any time with:
 study2 <- read_sframe(sframe_path)
-identical(study$meta$title, study2$meta$title)
+identical(sf_meta(study)$title, sf_meta(study2)$title)
 ```
 
 ---
@@ -631,10 +643,12 @@ cat("Columns:    ", ncol(responses), "\n")
 
 ```{r quality}
 qr <- quality_report(responses, study, respondent_id = "respondent_id")
+# as.data.frame() gives the summary row, so no reaching into the object.
+qr_summary <- as.data.frame(qr)
 quality_summary <- data.frame(
   Metric = c("Respondents", "Items", "Flagged for review", "Flag rate"),
-  Value  = c(qr$summary$n_respondents, qr$summary$n_items, qr$summary$n_flagged,
-             sprintf("%.1f%%", 100 * qr$summary$flag_rate)),
+  Value  = c(qr_summary$n_respondents, qr_summary$n_items, qr_summary$n_flagged,
+             sprintf("%.1f%%", 100 * qr_summary$flag_rate)),
   stringsAsFactors = FALSE
 )
 kable(quality_summary, align = c("l", "r"), caption = "Quality screening summary")
@@ -647,12 +661,13 @@ not automatic exclusion.
 
 ```{r missing}
 mr <- missing_data_report(responses, study)
-# mr holds $item_missing, $respondent_missing, $patterns, $mcar, and $apa.
-kable(mr$item_missing, digits = 2,
+# as.data.frame() returns the item-level table, which is what the report is
+# mainly about.
+kable(as.data.frame(mr), digits = 2,
       col.names = c("Variable", "Missing (n)", "Missing (%)", "Valid (n)"),
       caption = "Item-level missingness")
-# $apa provides a plain-language summary suitable for a methods section.
-cat(mr$apa, "\n")
+# sf_apa() gives a plain-language summary suitable for a methods section.
+cat(sf_apa(mr), "\n")
 ```
 
 ---
@@ -696,12 +711,15 @@ par(op)
 ```{r reliability}
 if (requireNamespace("psych", quietly = TRUE)) {
   rr <- reliability_report(scored, study, omega = FALSE)
-  rel_df <- do.call(rbind, lapply(rr, function(s) data.frame(
-    Scale   = paste0(s$label, " (", s$scale_id, ")"),
-    Items   = s$n_items,
-    N       = s$n,
-    Alpha   = if (!is.null(s$alpha)) sprintf("%.2f", s$alpha) else "n/a",
-    stringsAsFactors = FALSE)))
+  # One row per scale, with NA where a statistic could not be computed.
+  rr_df <- as.data.frame(rr)
+  rel_df <- data.frame(
+    Scale = paste0(rr_df$label, " (", rr_df$scale_id, ")"),
+    Items = rr_df$n_items,
+    N     = rr_df$n,
+    Alpha = ifelse(is.na(rr_df$alpha), "n/a", sprintf("%.2f", rr_df$alpha)),
+    stringsAsFactors = FALSE
+  )
   kable(rel_df, row.names = FALSE, align = c("l", "c", "c", "r"),
         caption = "Scale reliability")
 }
@@ -746,7 +764,7 @@ loadings_list <- list(
   TS   = c(ts_1 = 0.84, ts_2 = 0.80)
 )
 vr <- validity_report(loadings_list)
-print(vr$reliability)
+print(as.data.frame(vr))
 ```
 
 AVE above 0.50 and CR above 0.70 are the conventional thresholds for
@@ -763,7 +781,7 @@ variable roles it needs. `run_analysis_plan()` executes every block and returns
 one result per question.
 
 ```{r plan}
-study$analysis_plan <- list(
+sf_plan(study) <- list(
   list(
     id               = "RQ1",
     research_question = "Are digital marketing perceptions associated with tourist satisfaction?",
@@ -807,7 +825,7 @@ study$analysis_plan <- list(
   )
 )
 
-length(study$analysis_plan)
+length(sf_plan(study))
 ```
 
 ---

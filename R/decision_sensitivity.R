@@ -75,7 +75,7 @@
 #'   criteria       = c("service", "location", "price")
 #' )
 #' sa$stable
-#' sa$table
+#' as.data.frame(sa)
 sensitivity_analysis <- function(x,
                                  weights,
                                  criteria_types,
