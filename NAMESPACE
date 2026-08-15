@@ -133,18 +133,24 @@ export(validate_model)
 export(validate_sframe)
 export(validity_report)
 export(write_sframe)
-importFrom(jsonlite,fromJSON)
-importFrom(jsonlite,toJSON)
+importFrom(jsonlite,
+  fromJSON,
+  toJSON
+)
 importFrom(openssl,sha256)
-importFrom(rlang,"%||%")
-importFrom(rlang,.data)
-importFrom(rlang,abort)
-importFrom(rlang,arg_match)
-importFrom(rlang,check_installed)
-importFrom(rlang,warn)
-importFrom(stats,complete.cases)
-importFrom(stats,cor)
-importFrom(stats,density)
-importFrom(stats,sd)
-importFrom(stats,var)
+importFrom(rlang,
+  "%||%",
+  .data,
+  abort,
+  arg_match,
+  check_installed,
+  warn
+)
+importFrom(stats,
+  complete.cases,
+  cor,
+  density,
+  sd,
+  var
+)
 importFrom(utils,capture.output)
