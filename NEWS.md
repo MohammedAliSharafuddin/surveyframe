@@ -1,7 +1,12 @@
-# surveyframe 0.4.0 (in development)
+# surveyframe 0.4.0
 
-This release is in progress. Entries are added as the work lands rather
-than reconstructed at submission time.
+Two version numbers were planned and never released. 0.3.5 was to hold a
+field-validation round; that work is absorbed into this release and into
+0.4.1. 0.5.0 was, at one stage, this release's own working label before
+it was renumbered to follow 0.3.4 directly; nothing shipped under that
+number either. Local branches and worktrees kept the `v0.5-dev` name
+throughout development, a label mismatch that is intentional and recorded
+in the project's own internal notes, not a sign of a skipped release.
 
 ## Corrected results (read before comparing against earlier output)
 
