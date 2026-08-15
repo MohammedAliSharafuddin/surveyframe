@@ -653,29 +653,33 @@ date, and that is what `v0.3.4` points at. Tag each release as it ships from
 now on, because a rewrite makes a recorded SHA worthless and a tag moves
 with the history.
 
-### Hard blocker
+### Hard blocker: closed 2026-08-15
 
-**`inst/CITATION` needs a citable reference for the MCDM paper (task D6),
-and CRAN will not accept a placeholder DOI.** The small-sample paper moved
-to 0.4.1 on 2026-07-31, so only the MCDM paper gates this release. Owner
-decision 2026-08-15: **SF2 goes straight to journal submission at
-*Operations Research and Decisions* (diamond OA), no preprint DOI step.**
-This changes D6's timeline. A preprint DOI was same-day and self-service;
-a journal DOI depends on that journal's own review and acceptance
-schedule, months rather than days. Two ways to unblock CRAN 0.4.0 without
-waiting on that: cite the manuscript in `inst/CITATION` as "submitted" or
-"in preparation" with no DOI field at all (CRAN accepts this citation
-form; the placeholder-DOI prohibition is about a fake or reserved-but-dead
-DOI string, not about a paper that legitimately has none yet), or revisit
-the preprint-DOI route later if the journal timeline turns out to matter.
+**D6 is done.** `inst/CITATION` needed a citable reference for the MCDM
+paper, and CRAN will not accept a placeholder DOI. SF2 goes straight to
+journal submission at *Operations Research and Decisions* (diamond OA),
+no preprint step, an owner decision made 2026-08-15 after checking: MethodsX
+(Elsevier's general policy, confirmed) allows preprints freely, but ORD's
+own Instructions for Authors only carries the generic "not published
+previously elsewhere" clause with no explicit preprint ruling either way,
+so a preprint DOI for SF2 specifically was not something to gamble the
+journal relationship on without asking the editors first. Resolved instead
+by citing the manuscript in `inst/CITATION` as `bibtype = "Unpublished"`,
+"Manuscript in preparation for Operations Research and Decisions", no DOI
+field at all. Verified this parses and renders cleanly via
+`utils:::readCitationFile()`. CRAN's placeholder-DOI prohibition is about a
+fake or reserved-but-dead DOI string, not about a paper that legitimately
+has none yet, so this is not a placeholder in the sense CRAN objects to.
+
 The manuscript itself moved out of this repository on 2026-08-14, to
 `../research/surveyframe_manuscripts/mcdm/`, tracked as SF2, LaTeX-typeset
 for the ORD template, compiles clean, real byline in place (the LaTeX
 version; the older `manuscript_draft.md` still carries a stale
 double-blind placeholder line, harmless since the LaTeX is the submission
-vehicle). D2a's OpenAlex literature verification is not yet finalised
-with clean automated numbers. Everything else outstanding in blocks D and
-E is mechanical release paperwork.
+vehicle). D2a's OpenAlex literature verification is not yet finalised with
+clean automated numbers, but no longer gates the release now that D6 is
+closed. Everything else outstanding in blocks D and E is mechanical
+release paperwork.
 
 **H2 is done.** The RStudio add-in was owner-verified inside a real RStudio
 session on 2026-08-15. See H2's entry in `todo_master_0.4.md` for the 2
