@@ -70,7 +70,7 @@
 #'   analysis_plan = plan
 #' )
 #' print(instr)
-#' length(instr$analysis_plan)
+#' length(sf_plan(instr))
 sf_instrument <- function(
     title,
     version     = "0.1.0",
