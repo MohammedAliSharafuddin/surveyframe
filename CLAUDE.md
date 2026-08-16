@@ -327,24 +327,29 @@ Status verified against the code, the branches, both remotes, CI, and CRAN on
 2026-08-05, and against the commit history and the working tree again on
 2026-08-15.
 
-**Read this first.** 0.4.0 is built, checked, and waiting on win-builder.
-Its engineering completed on 2026-08-02 and merged to `main` on 2026-08-03.
-The release paperwork was worked through on 2026-08-15: DESCRIPTION reads
-`0.4.0`, NEWS.md is complete (the MCDM and small-sample sections were
-missing and were added the same day), 1506 tests pass,
-`R CMD check --as-cran` returns Status OK at 0 errors, 0 warnings, 0 notes,
-the tarball is audited clean of dev-only files, and `cran-comments.md` is
-drafted. A tarball went to win-builder on 2026-08-15 with results pending,
-and the CRAN submission itself is the only step left. **Both former
-blockers are closed**: D6 no longer needs a DOI, since `inst/CITATION`
-cites SF2 as in preparation, and H2 was owner-verified in a real RStudio
-session on 2026-08-15. The **breaking API change built on `dev` on
-2026-08-07** (`validate_sframe()` returning a diagnostic, plus the accessor
-family) had never reached `main` and was cherry-picked across on
-2026-08-15. The review suite is complete and found 8 defects needing owner
-decisions. Git history was rewritten on 2026-08-04, so any clone older than
-that is stale. Jump to "0.4.0 is on `main`", "Breaking API change", "The
-review suite", and "Git history was rewritten".
+**Read this first.** 0.4.0's own engineering and release paperwork are
+done: engineering completed 2026-08-02, merged to `main` 2026-08-03,
+DESCRIPTION reads `0.4.0`, NEWS.md is complete, 1506 tests pass,
+`R CMD check --as-cran` returns Status OK at 0/0/0, the tarball is
+audited clean of dev-only files, `cran-comments.md` is drafted, and
+win-builder passed (R-release, 2026-08-15). **Both former blockers are
+closed**: D6 no longer needs a DOI, since `inst/CITATION` cites SF2 as
+in preparation, and H2 was owner-verified in a real RStudio session on
+2026-08-15. **But 0.4.0's CRAN submission is deliberately held, owner
+decision 2026-08-16**: 0.5's text-analysis features are being bundled
+in before submission rather than shipping 0.4.0 alone when CRAN
+reopens. See `todo_0.5.md` for the build plan (9 method ids) and its
+2026-08-17 addendum for the schedule — engineering targets landing
+Monday to Wednesday (17-19 August, ahead of a Claude usage-offer
+deadline), vignette/exit-checklist/bundled-release-paperwork over the
+22-23 August weekend, submission after that. The **breaking API change
+built on `dev` on 2026-08-07** (`validate_sframe()` returning a
+diagnostic, plus the accessor family) had never reached `main` and was
+cherry-picked across on 2026-08-15. The review suite is complete and
+found 8 defects needing owner decisions. Git history was rewritten on
+2026-08-04, so any clone older than that is stale. Jump to "0.4.0 is on
+`main`", "Breaking API change", "The review suite", and "Git history
+was rewritten".
 
 ### Shipped
 

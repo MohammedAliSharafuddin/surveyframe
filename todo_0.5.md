@@ -26,6 +26,21 @@
 > this release. `extract_quotes()`'s output is deliberately kept clean
 > enough to export for a researcher who wants to take it into RQDA or
 > qcoder downstream, rather than surveyframe building a coding UI itself.
+>
+> **Owner decision 2026-08-17: engineering pulled forward to Mon-Wed
+> (17-19 August), ahead of a Claude usage-offer deadline.** A 50% extra
+> usage offer ends 2026-08-19; all 9 ids' engineering targets landing
+> by then, running in parallel with unrelated weekday human-review work
+> (see `../portfolio-planner/decisions.md` 2026-08-17). This changes
+> *when* the build happens, not the plan itself. The vignette, the full
+> exit checklist, and the bundled 0.4.0+0.5 release paperwork/check
+> cycles stay weekend work (22-23 August) regardless, since they are
+> sequential-after the runners landing and can't be pulled forward the
+> same way. **Also owner decision 2026-08-16, still standing**: 0.5's
+> features are bundled into 0.4.0 before CRAN submission, rather than
+> submitting 0.4.0 alone when CRAN reopens — so 0.4.0's own CRAN
+> submission now waits on this file's exit checklist clearing, not the
+> other way round.
 
 Dev-only planning file, tracked on `dev` only. Its name is in `.gitignore`
 and `.Rbuildignore`. Companion to `CLAUDE.md`, `todo_0.4.md` (whose
@@ -34,9 +49,12 @@ verbatim here), and
 `../portfolio-planner/development_instructions/06_v05_v07_implementation.md`
 (v0.6 section — intent only, this file is the verified plan).
 
-Last updated: 2026-08-15. Target CRAN submission: within 15 days
-(practical target set 2026-08-15, superseding the 2027-04-25 slot this
-file carried before the swap). Theme: structured analysis of open-ended
+Last updated: 2026-08-17. Target: engineering complete Mon-Wed
+17-19 August 2026; vignette, exit checklist, and bundled 0.4.0+0.5
+release paperwork over the 22-23 August weekend; CRAN submission of
+the bundled release follows, superseding the original within-15-days
+target (set 2026-08-15) now that 0.5 ships bundled into 0.4.0 rather
+than standing alone. Theme: structured analysis of open-ended
 responses. Source approach: the Omani gateways JMR thematic analysis
 (tidytext, quanteda, stm).
 
