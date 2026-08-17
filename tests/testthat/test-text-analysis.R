@@ -264,3 +264,51 @@ test_that("a result with no $quotes renders no quotes table (mutation check)", {
   } else ""
   expect_equal(quotes_html, "")
 })
+
+# ---------------------------------------------------------------------------
+# Regression: text-family results are not run through the instrument-wide
+# label substitution (review_050 finding: a respondent's own word could
+# collide with an unrelated item's choice CODE and get silently swapped for
+# that item's choice LABEL, reading as thematic signal that was actually a
+# coincidence).
+# ---------------------------------------------------------------------------
+
+test_that("term_freq's term column is not relabelled when it collides with an unrelated choice code", {
+  cs <- sf_choices("dept", values = c("pool", "spa"), labels = c("Pool area", "Spa area"))
+  instr <- sf_instrument(
+    title = "Collision fixture", version = "1.0.0",
+    components = list(
+      cs,
+      sf_item("dept", "Which department?", type = "single_choice", choice_set = "dept"),
+      sf_item("comments", "Any comments?", type = "textarea")
+    )
+  )
+  data <- data.frame(
+    dept = sample(c("pool", "spa"), 15, replace = TRUE),
+    comments = rep("the pool area was great and the pool was clean", 15),
+    stringsAsFactors = FALSE
+  )
+  instr$analysis_plan <- list(list(
+    id = "RQ1", research_question = "Top terms?", family = "text",
+    method = "term_freq", roles = list(item = "comments"), options = list(),
+    alpha = 0.05, citations = character(0), interpretation = "", result = NULL
+  ))
+  res <- run_analysis_plan(data, instr)
+  expect_equal(res[[1]]$table$term[1], "pool")
+})
+
+test_that("mutation check: a non-text result IS still humanized (the exclusion is scoped, not global)", {
+  cs <- sf_choices("q5", values = 1:2, labels = c("Low", "High"))
+  instr <- sf_instrument(
+    title = "humanize sanity", version = "1.0.0",
+    components = list(cs, sf_item("rating", "Rating?", type = "single_choice", choice_set = "q5"))
+  )
+  data <- data.frame(rating = c("1", "1", "2"), stringsAsFactors = FALSE)
+  instr$analysis_plan <- list(list(
+    id = "RQ1", research_question = "dist", family = "descriptive",
+    method = "frequency", roles = list(variable = "rating"), options = list(),
+    alpha = 0.05, citations = character(0), interpretation = "", result = NULL
+  ))
+  res <- run_analysis_plan(data, instr)
+  expect_true(all(c("Low", "High") %in% res[[1]]$table$Value))
+})

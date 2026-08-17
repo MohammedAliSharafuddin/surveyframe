@@ -10,11 +10,15 @@ extract_quotes(model, text, n_quotes = 3L)
 \item{model}{A \code{stm_topics} result list from \code{\link[=sframe_run_stm_topics]{sframe_run_stm_topics()}}
 (i.e. \code{result}, not \code{result$fit} and not the raw \code{stm} object).}
 
-\item{text}{The response vector the topic model was fit on, indexed by
-\emph{original} row/respondent. Either the raw or \code{\link[=clean_text_responses]{clean_text_responses()}}-
-cleaned vector works, since both are indexed the same way; only the
-text actually quoted differs (cleaned text is lower-cased and stripped
-of punctuation).}
+\item{text}{The response vector the topic model was fit on: either the
+raw vector (one entry per original data row, indexed 1:1 by row
+number) or the \code{\link[=clean_text_responses]{clean_text_responses()}}-cleaned vector, which drops
+blank/missing rows and is therefore \emph{shorter}, its positions no
+longer equal original row numbers once any earlier row was dropped.
+Both forms work correctly: when \code{text} carries the \code{respondent}
+attribute \code{\link[=clean_text_responses]{clean_text_responses()}} sets, that mapping is used to find
+each quote's real position; otherwise \code{text} is assumed to be the raw,
+1:1-indexed vector.}
 
 \item{n_quotes}{Integer. Quotes to return per topic. Default \code{3L}.}
 }
