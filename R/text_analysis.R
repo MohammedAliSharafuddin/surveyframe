@@ -986,3 +986,191 @@ sframe_run_cooccurrence_network <- function(data, roles, options, instrument) {
     )
   )
 }
+
+
+# ---------------------------------------------------------------------------
+# tidy_sentiment (todo_0.5.md section 1b): tidytext + the bundled "bing"
+# lexicon. quanteda_dfm below uses quanteda. Both guard via the
+# sframe_require_*() helpers in R/conditions.R.
+
+# Runner contract wrapper: $table (sentiment counts plus proportion
+# positive, one block per group level when options$group is set, same
+# shape convention as sframe_run_term_freq()'s grouped table), $scores (a
+# per-response data.frame for the plot), apa, prompt. `roles$item` names
+# the text/textarea item; `options$group` is resolved by
+# sframe_run_one_block() exactly as for term_freq.
+sframe_run_tidy_sentiment <- function(data, roles, options, instrument) {
+  sframe_require_tidytext(reason = "to run tidy sentiment analysis.")
+  item_id <- sframe_role_values(roles, "item", "")[1]
+  err <- sframe_require_columns(data, item_id, "Tidy sentiment")
+  if (!is.null(err)) return(list(test = "tidy_sentiment", error = err))
+  group_id <- options$group %||% NULL
+
+  lexicon <- tidytext::get_sentiments("bing")
+
+  # Reuses .sframe_tokenise() rather than tidytext::unnest_tokens(), so this
+  # runner tokenises identically to term_freq/ngram_frequency (same
+  # lower-casing, punctuation stripping, and stop-word list) and the two
+  # analyses can't drift on what counts as a "word" for the same text item.
+  # A tidytext-native unnest_tokens() would only earn its keep here if this
+  # runner needed tidytext's own tokenisation rules (e.g. n-grams with
+  # sentence boundaries), which bing-lexicon word matching does not.
+  score_one <- function(cleaned) {
+    respondent <- attr(cleaned, "respondent")
+    toks <- .sframe_tokenise(cleaned, stop_words = character(0))
+    per_resp <- lapply(toks, function(one) {
+      if (length(one) == 0) return(c(positive = 0L, negative = 0L))
+      sent <- lexicon$sentiment[match(one, lexicon$word)]
+      c(positive = sum(sent == "positive", na.rm = TRUE),
+        negative = sum(sent == "negative", na.rm = TRUE))
+    })
+    scores <- do.call(rbind, per_resp)
+    data.frame(
+      respondent = respondent,
+      positive   = as.integer(scores[, "positive"]),
+      negative   = as.integer(scores[, "negative"]),
+      score      = as.integer(scores[, "positive"]) - as.integer(scores[, "negative"]),
+      stringsAsFactors = FALSE
+    )
+  }
+
+  build_one <- function(cleaned) {
+    n_resp <- length(cleaned)
+    if (n_resp < .sframe_text_min_responses) {
+      return(list(
+        table = NULL, scores = NULL,
+        error = sprintf(
+          "Tidy sentiment needs at least %d usable responses (found %d).",
+          .sframe_text_min_responses, n_resp
+        )
+      ))
+    }
+    scores <- score_one(cleaned)
+    n_pos <- sum(scores$score > 0)
+    n_neg <- sum(scores$score < 0)
+    n_neu <- sum(scores$score == 0)
+    tbl <- data.frame(
+      sentiment = c("positive", "negative", "neutral"),
+      n = c(n_pos, n_neg, n_neu),
+      prop = round(c(n_pos, n_neg, n_neu) / n_resp, 3),
+      stringsAsFactors = FALSE
+    )
+    list(table = tbl, scores = scores, error = NULL)
+  }
+
+  cleaned_all <- clean_text_responses(data, item_id, instrument = instrument)
+
+  if (is.null(group_id) || !nzchar(group_id) || !group_id %in% colnames(data)) {
+    built <- build_one(cleaned_all)
+    if (!is.null(built$error)) return(list(test = "tidy_sentiment", error = built$error))
+    prop_pos <- built$table$prop[built$table$sentiment == "positive"]
+    return(list(
+      test = "tidy_sentiment", variable = item_id,
+      n = length(cleaned_all), table = built$table, scores = built$scores,
+      apa = sprintf("Sentiment for %s (N = %d responses, %.1f%% positive).",
+                    item_id, length(cleaned_all), prop_pos * 100),
+      prompt = "Review the balance of positive and negative sentiment for coherence with the research question."
+    ))
+  }
+
+  # Grouped path: mirrors sframe_run_term_freq()'s grouped branch exactly,
+  # splitting the *original* row set by group level before cleaning each
+  # subset, so the respondent attribute stays correct within each group.
+  group_vals <- as.character(data[[group_id]])
+  respondent_of_cleaned <- attr(cleaned_all, "respondent")
+  levels_present <- sort(unique(stats::na.omit(group_vals[respondent_of_cleaned])))
+  blocks <- lapply(levels_present, function(lv) {
+    idx <- respondent_of_cleaned[group_vals[respondent_of_cleaned] == lv]
+    subset_txt <- structure(cleaned_all[respondent_of_cleaned %in% idx], respondent = idx)
+    built <- build_one(subset_txt)
+    if (!is.null(built$error)) {
+      return(list(
+        table = data.frame(group = lv, sentiment = NA_character_, n = NA_integer_,
+                            prop = NA_real_, note = built$error,
+                            stringsAsFactors = FALSE),
+        scores = NULL
+      ))
+    }
+    tbl <- built$table
+    tbl$group <- lv
+    tbl$note <- NA_character_
+    list(table = tbl[c("group", "sentiment", "n", "prop", "note")],
+         scores = built$scores)
+  })
+  table_blocks <- lapply(blocks, `[[`, "table")
+  combined_table <- if (length(table_blocks)) do.call(rbind, table_blocks) else
+    data.frame(group = character(0), sentiment = character(0), n = integer(0),
+               prop = numeric(0), note = character(0), stringsAsFactors = FALSE)
+  score_blocks <- Filter(Negate(is.null), lapply(blocks, `[[`, "scores"))
+  combined_scores <- if (length(score_blocks)) do.call(rbind, score_blocks) else NULL
+
+  list(
+    test = "tidy_sentiment", variable = item_id, group = group_id,
+    n = length(cleaned_all), table = combined_table, scores = combined_scores,
+    apa = sprintf("Sentiment for %s by %s (N = %d responses, %d groups).",
+                  item_id, group_id, length(cleaned_all), length(levels_present)),
+    prompt = "Compare the balance of positive and negative sentiment across groups for coherence with the research question."
+  )
+}
+
+# ---------------------------------------------------------------------------
+# quanteda_dfm (todo_0.5.md section 1b): a descriptive document-feature
+# matrix summary. Table-only (no plot, no group role for this method id).
+
+# Runner contract wrapper: $table with feature count, sparsity, and the top
+# features by frequency; apa; prompt. `roles$item` names the text/textarea
+# item.
+sframe_run_quanteda_dfm <- function(data, roles, options, instrument) {
+  sframe_require_quanteda(reason = "to build a document-feature matrix.")
+  item_id <- sframe_role_values(roles, "item", "")[1]
+  err <- sframe_require_columns(data, item_id, "Quanteda DFM")
+  if (!is.null(err)) return(list(test = "quanteda_dfm", error = err))
+
+  cleaned <- clean_text_responses(data, item_id, instrument = instrument)
+  n_resp <- length(cleaned)
+  if (n_resp < .sframe_text_min_responses) {
+    return(list(
+      test = "quanteda_dfm",
+      error = sprintf(
+        "Quanteda DFM needs at least %d usable responses (found %d).",
+        .sframe_text_min_responses, n_resp
+      )
+    ))
+  }
+
+  dfm <- quanteda::dfm(quanteda::tokens(as.character(cleaned)))
+  n_features <- quanteda::nfeat(dfm)
+  sparsity <- round(quanteda::sparsity(dfm), 4)
+  freq <- sort(quanteda::colSums(dfm), decreasing = TRUE)
+  top_n <- options$top_n %||% 30L
+  top_tbl <- utils::head(
+    data.frame(term = names(freq), n = as.integer(freq),
+               stringsAsFactors = FALSE, row.names = NULL),
+    top_n
+  )
+
+  # $table is the descriptive summary row (feature count, sparsity, N),
+  # kept as a single-row data.frame so the generic report path
+  # (is.data.frame(result$table), see R/reporting.R) renders it like any
+  # other runner's table; $top_features carries the term/frequency table
+  # separately, the same way $scores sits alongside $table for
+  # tidy_sentiment above.
+  summary_tbl <- data.frame(
+    n_responses = n_resp,
+    n_features  = n_features,
+    sparsity    = sparsity,
+    stringsAsFactors = FALSE
+  )
+
+  list(
+    test = "quanteda_dfm", variable = item_id,
+    n = n_resp,
+    table = summary_tbl,
+    top_features = top_tbl,
+    apa = sprintf(
+      "Document-feature matrix for %s (N = %d responses, %d features, sparsity = %.3f).",
+      item_id, n_resp, n_features, sparsity
+    ),
+    prompt = "Review the leading features and matrix sparsity for coherence with the research question."
+  )
+}

@@ -761,6 +761,25 @@ analysis_registry <- local({
                       "Requires the optional igraph package"),
       output = "A Louvain-clustered, force-directed term co-occurrence network (node table plus edge list).",
       refs = c("blondel_2008", "fruchterman_1991")
+    ),
+    tidy_sentiment = list(
+      family = "text", label = "Sentiment",
+      roles = list(
+        role("item", "Text item", levels = "text"),
+        role("group", "Group by", min = 0, max = 1, levels = c("nominal", "ordinal"))
+      ),
+      show_alpha = FALSE, show_hypotheses = FALSE, show_effect_size = FALSE,
+      assumptions = c("At least 10 usable responses", "Requires the optional tidytext package"),
+      output = "Positive/negative sentiment counts and proportion positive (bing lexicon), optionally split by a group variable, and a diverging bar chart.",
+      refs = character(0)
+    ),
+    quanteda_dfm = list(
+      family = "text", label = "Document-feature matrix",
+      roles = list(role("item", "Text item", levels = "text")),
+      show_alpha = FALSE, show_hypotheses = FALSE, show_effect_size = FALSE,
+      assumptions = c("At least 10 usable responses", "Requires the optional quanteda package"),
+      output = "Document-feature matrix summary: feature count, sparsity, and top features.",
+      refs = character(0)
     )
   )
 })

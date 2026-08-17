@@ -1302,6 +1302,8 @@ sframe_run_one_block <- function(block, data, instrument, plots = FALSE,
       ngram_freq = sframe_run_ngram_freq(data, roles, options, instrument),
       term_context = sframe_run_term_context(data, roles, options, instrument),
       co_occurrence_network = sframe_run_cooccurrence_network(data, roles, options, instrument),
+      tidy_sentiment = sframe_run_tidy_sentiment(data, roles, options, instrument),
+      quanteda_dfm = sframe_run_quanteda_dfm(data, roles, options, instrument),
       list(test = test, error = paste0("Test '", test, "' is unavailable."))
     )
   }, error = function(e) {

@@ -852,6 +852,7 @@ sframe_plot_for_result <- function(result, data, palette = c("web", "print")) {
     stm_topics          = function() sframe_plot_topics(result, palette),
     ngram_freq          = function() sframe_plot_ngram_frequency(result, palette),
     co_occurrence_network = function() sframe_plot_cooccurrence_network(result, palette),
+    tidy_sentiment      = function() sframe_plot_sentiment(result, palette),
     NULL
   )
   if (is.null(builder)) return(NULL)
@@ -2182,5 +2183,57 @@ sframe_plot_cooccurrence_network <- function(result, palette = c("web", "print")
       axis.ticks = ggplot2::element_blank(),
       panel.grid = ggplot2::element_blank()
     )
+}
+
+
+#' Sentiment plot: diverging bar of positive versus negative counts
+#'
+#' A ggplot2 diverging bar for a `tidy_sentiment` result: positive counts
+#' extend one direction, negative counts the other, so bar position (not
+#' colour alone) carries the primary polarity signal, the same convention
+#' [sframe_draw_likert_diverging()] uses for Likert agreement (dark ramp
+#' toward the pole) rebuilt here in ggplot2 rather than called directly,
+#' since that helper is base-graphics and Likert-scale-specific. Facets by
+#' group when `result$table` carries a `group` column, mirroring
+#' [sframe_plot_term_frequency()]'s grouped branch.
+#'
+#' @param result A `tidy_sentiment` result list from [run_analysis_plan()].
+#' @param palette One of `"web"` or `"print"`. See `sframe_brand()`.
+#' @return A ggplot2 object, or `NULL` when the result carries no table.
+#' @export
+#' @seealso [run_analysis_plan()], [sframe_draw_likert_diverging()]
+sframe_plot_sentiment <- function(result, palette = c("web", "print")) {
+  rlang::check_installed("ggplot2", reason = "to plot sentiment.")
+  palette <- match.arg(palette)
+  tbl <- result$table
+  if (!is.data.frame(tbl) || nrow(tbl) == 0 || !"sentiment" %in% names(tbl)) return(NULL)
+  brand <- sframe_brand(palette)
+  grouped <- "group" %in% names(tbl)
+
+  bar_tbl <- tbl[tbl$sentiment %in% c("positive", "negative"), , drop = FALSE]
+  bar_tbl <- bar_tbl[!is.na(bar_tbl$n), , drop = FALSE]
+  if (nrow(bar_tbl) == 0) return(NULL)
+  # Diverging signed count: negative sentiment plotted on the negative side
+  # of zero, positive sentiment on the positive side, so the bar's position
+  # relative to the zero line is the primary signal (matching the Likert
+  # diverging convention), with the dark/light pole colouring as a
+  # secondary cue.
+  bar_tbl$signed_n <- ifelse(bar_tbl$sentiment == "negative", -bar_tbl$n, bar_tbl$n)
+  bar_tbl$sentiment <- factor(bar_tbl$sentiment, levels = c("negative", "positive"))
+  fill_map <- stats::setNames(c(brand$accent, brand$teal), c("negative", "positive"))
+
+  p <- ggplot2::ggplot(bar_tbl, ggplot2::aes(x = if (grouped) .data$group else "", y = .data$signed_n,
+                                             fill = .data$sentiment)) +
+    ggplot2::geom_col(colour = brand$ink, linewidth = 0.3, width = 0.6) +
+    ggplot2::geom_hline(yintercept = 0, colour = brand$ink, linewidth = 0.5) +
+    ggplot2::coord_flip() +
+    ggplot2::scale_fill_manual(values = fill_map, name = NULL) +
+    ggplot2::labs(
+      title = paste("Sentiment for", result$variable %||% ""),
+      x = NULL, y = "Response count (negative | positive)"
+    ) +
+    theme_surveyframe(palette = palette)
+  if (grouped) p <- p + ggplot2::facet_wrap(~ group, scales = "free_y")
+  p
 }
 
