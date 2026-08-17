@@ -1333,17 +1333,18 @@ sframe_run_one_block <- function(block, data, instrument, plots = FALSE,
   # The runners above compute on the raw response codes (item ids, coded
   # choice values), so the table they build carries those, not what a
   # reader sees. Substitute labels here, once, for every test type, rather
-  # than teaching each runner about the instrument's labels. Text-family
-  # results are excluded: their table columns hold a respondent's own
+  # than teaching each runner about the instrument's labels. A text-family
+  # id's free-text columns (term, term_a/term_b, before/match/after) are
+  # excluded via .sframe_text_free_text_cols: those hold a respondent's own
   # words, not coded values, and humanising them risks silently relabelling
-  # a term that happens to collide with an unrelated item's choice code
-  # (see .sframe_text_method_ids's comment).
-  if (!test %in% .sframe_text_method_ids) {
-    result$table <- tryCatch(
-      sframe_humanize_table(result$table, sframe_label_lookup(instrument)),
-      error = function(e) result$table
-    )
-  }
+  # a term that happens to collide with an unrelated item's choice code. A
+  # coded column on the same table, such as term_freq's `group`, is not in
+  # that exclusion list and keeps humanising normally.
+  result$table <- tryCatch(
+    sframe_humanize_table(result$table, sframe_label_lookup(instrument),
+                          exclude_cols = .sframe_text_free_text_cols[[test]] %||% character(0)),
+    error = function(e) result$table
+  )
   if (isTRUE(plots) && is.null(result$plot)) {
     result$plot <- sframe_plot_for_result(result, data, palette = plot_palette)
   }
