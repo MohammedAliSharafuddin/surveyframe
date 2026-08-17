@@ -255,6 +255,55 @@ sframe_plot_term_frequency <- function(result, palette = c("web", "print")) {
   p
 }
 
+#' Term co-occurrence heatmap
+#'
+#' Tile heatmap of pairwise within-response term co-occurrence counts for a
+#' `co_occurrence` result. The result's edge list (`term_a`, `term_b`, `n`)
+#' is pivoted into a full symmetric term-by-term grid before plotting, so
+#' each pair's tile appears twice, once on either side of the diagonal, the
+#' way the other tile heatmaps in this file (`sframe_plot_correlation_matrix()`,
+#' `sframe_plot_efa_loadings()`) read as a full grid rather than a triangle.
+#'
+#' @param result A `co_occurrence` result list from [run_analysis_plan()].
+#' @param palette One of `"web"` or `"print"`. See `sframe_brand()`.
+#' @return A ggplot2 object, or `NULL` when the result carries no table.
+#' @export
+#' @seealso [run_analysis_plan()], [term_frequency()]
+sframe_plot_cooccurrence <- function(result, palette = c("web", "print")) {
+  rlang::check_installed("ggplot2", reason = "to plot term co-occurrence.")
+  palette <- match.arg(palette)
+  tbl <- result$table
+  if (!is.data.frame(tbl) || nrow(tbl) == 0 ||
+      !all(c("term_a", "term_b", "n") %in% names(tbl))) {
+    return(NULL)
+  }
+  brand <- sframe_brand(palette)
+  terms <- sort(unique(c(tbl$term_a, tbl$term_b)))
+  # Mirror every pair into both triangles so the grid reads symmetrically;
+  # the diagonal (a term against itself) carries no co-occurrence, so it is
+  # left at 0 rather than showing a term's own frequency.
+  long <- rbind(
+    data.frame(term_a = tbl$term_a, term_b = tbl$term_b, n = tbl$n),
+    data.frame(term_a = tbl$term_b, term_b = tbl$term_a, n = tbl$n)
+  )
+  long$term_a <- factor(long$term_a, levels = terms)
+  long$term_b <- factor(long$term_b, levels = rev(terms))
+  # sframe_heatmap_label_colour() expects a magnitude on roughly a 0-1 (or
+  # -1 to 1) scale; n is an unbounded count, so normalise against the
+  # largest count in the table before asking it which tiles need white text.
+  long$label_colour <- sframe_heatmap_label_colour(long$n / max(tbl$n), brand$ink)
+  fill_high <- if (palette == "web") brand$teal else brand$muted
+  ggplot2::ggplot(long, ggplot2::aes(x = .data$term_a, y = .data$term_b)) +
+    ggplot2::geom_tile(ggplot2::aes(fill = .data$n), colour = brand$ink, linewidth = 0.3) +
+    ggplot2::geom_text(ggplot2::aes(label = .data$n, colour = .data$label_colour), size = 3) +
+    ggplot2::scale_colour_identity() +
+    ggplot2::scale_fill_gradient(low = "white", high = fill_high,
+                                 limits = c(0, max(tbl$n))) +
+    ggplot2::labs(title = paste("Term co-occurrence for", result$variable %||% ""),
+                  x = NULL, y = NULL, fill = "n") +
+    theme_surveyframe(palette = palette) + sframe_theme_angled_x()
+}
+
 sframe_plot_crosstab <- function(result, palette = c("web", "print")) {
   palette <- match.arg(palette)
   tbl <- result$table
@@ -767,6 +816,7 @@ sframe_plot_for_result <- function(result, data, palette = c("web", "print")) {
     },
     item_diagnostics    = function() sframe_plot_item_diagnostics(result, palette),
     term_freq           = function() sframe_plot_term_frequency(result, palette),
+    co_occurrence       = function() sframe_plot_cooccurrence(result, palette),
     NULL
   )
   if (is.null(builder)) return(NULL)

@@ -119,6 +119,7 @@ sframe_analysis_roles <- function(block) {
     # Text family (todo_0.5.md). `group` (section 1a) is optional so a bare
     # 2-element variable list still resolves without one.
     term_freq = list(item = vars[1], group = vars[2]),
+    co_occurrence = list(item = vars[1]),
     list(variables = vars)
   )
 }
