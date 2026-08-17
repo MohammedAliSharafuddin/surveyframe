@@ -198,6 +198,18 @@ reference:
       - sframe_decision_options
       - sframe_dematel_compute
 
+  - title: "Text analysis"
+    desc: >
+      Structured analysis of open-ended text responses, new in 0.5.0: term
+      and n-gram frequency, keyword-in-context concordance, co-occurrence
+      (plain and network), sentiment, topic modelling, and quote extraction.
+    contents:
+      - clean_text_responses
+      - term_frequency
+      - ngram_frequency
+      - term_context
+      - extract_quotes
+
   - title: "Confidence intervals"
     desc: >
       Base-R bootstrap and effect-size confidence interval helpers, reused
@@ -242,6 +254,12 @@ reference:
       - sframe_plot_variable_distribution
       - sframe_draw_mosaic
       - sframe_likert_scale_groups
+      - sframe_plot_term_frequency
+      - sframe_plot_ngram_frequency
+      - sframe_plot_cooccurrence
+      - sframe_plot_cooccurrence_network
+      - sframe_plot_sentiment
+      - sframe_plot_topics
 
   - title: "Print, format, and summary methods"
     desc: >
