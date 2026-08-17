@@ -1,0 +1,490 @@
+---
+title: "01. Base text methods"
+subtitle: "term_freq, ngram_freq, term_context, co_occurrence — zero optional packages"
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    embed-resources: true
+editor: visual
+execute:
+  warning: false
+  message: false
+  error: true
+---
+
+```{r}
+#| label: setup
+#| include: false
+source("_setup.R")
+```
+
+Four method ids, all built on base R alone (no `tidytext`, `quanteda`,
+`stm`, `topicmodels`, or `igraph`). Every reference in this file is
+hand-tokenised from first principles, not a call to the package's own
+`.sframe_tokenise()`, so a mismatch here cannot be explained away as "the
+comparison called the same code it was checking."
+
+Reference tokenisation used throughout: lower-case, strip everything except
+letters, digits, spaces, and internal apostrophes, split on whitespace.
+Every block below passes `stop_words = character(0)` on the surveyframe side
+so the comparison does not also have to reproduce the package's built-in
+English stop-word list to be independent.
+
+## 1. Questionnaire and plan
+
+```{r}
+#| label: build
+hotel <- sf_instrument(
+  title = "Hotel feedback pilot", version = "1.0.0",
+  components = list(
+    sf_choices("dept", c("front_desk", "pool"),
+               c("Front desk", "Pool area")),
+    sf_item("dept", "Which area does your comment mainly concern?",
+            type = "single_choice", choice_set = "dept", required = TRUE),
+    sf_item("feedback", "Tell us about your stay in your own words",
+            type = "textarea")
+  ),
+  analysis_plan = list(
+    list(id = "RQ1", research_question =
+           "What are the leading terms in feedback, overall and by area?",
+         family = "text_analysis", method = "term_freq",
+         roles = list(item = "feedback", group = "dept"),
+         options = list(stop_words = character(0))),
+    list(id = "RQ2", research_question =
+           "What 2-word phrases recur in the feedback?",
+         family = "text_analysis", method = "ngram_freq",
+         roles = list(item = "feedback"),
+         options = list(stop_words = character(0), n = 2L)),
+    list(id = "RQ3", research_question = "How is \"pool\" used in context?",
+         family = "text_analysis", method = "term_context",
+         roles = list(item = "feedback", term = "pool")),
+    list(id = "RQ4", research_question =
+           "Which terms co-occur within a single response?",
+         family = "text_analysis", method = "co_occurrence",
+         roles = list(item = "feedback"),
+         options = list(stop_words = character(0), top_n = 12L))
+  )
+)
+hotel
+```
+
+::: callout-note
+## Why the `dept` item matters beyond providing a group role
+
+`dept`'s 2 choice codes are deliberately the ordinary English words
+`"front_desk"` and `"pool"`, the same words that show up naturally in the
+free-text feedback. That is not an accident of this file: it is what
+surfaces a real defect in section 4 below. Keep it in mind reading every
+section past that point.
+:::
+
+## 2. Collection route
+
+0.5 added no item type and no collector change (see `00_start_here.qmd`),
+so this file checks the HTML route only rather than the full
+`sf_both_routes()` proof `review_040` runs for every item type.
+
+```{r}
+#| label: route
+sf_html_route(hotel)
+```
+
+-   [ ] `feedback` and `dept` both appear in the exported HTML.
+
+## 3. Dummy data
+
+```{r}
+#| label: data
+set.seed(77)
+fd <- c(
+  "the front desk staff were quick and helpful during check in",
+  "front desk staff helped us change rooms without any hassle",
+  "checkout was slow because front desk staff were understaffed",
+  "front desk staff gave clear directions around the hotel",
+  "front desk staff upgraded our room without being asked",
+  "front desk staff fixed our key card fast and were friendly",
+  "checkout was quick this time, front desk staff were efficient",
+  "front desk staff were friendly and checked us in fast",
+  "the front desk staff answered every question we had",
+  "front desk staff handled a billing mistake very well",
+  "check in was smooth, front desk staff were professional",
+  "front desk staff remembered our name the whole stay"
+)
+pool <- c(
+  "the pool area was clean but the pool towels were dirty",
+  "loved the pool, the pool bar service was excellent",
+  "the pool was closed for cleaning during our whole stay",
+  "pool towels ran out twice but staff fixed it fast",
+  "the pool area needs more shade, otherwise a great pool",
+  "the pool was crowded every afternoon we visited",
+  "pool water was cold but the pool area was clean",
+  "the pool bar ran out of towels most days",
+  "great pool, the pool area could use more shade",
+  "the pool was lovely, loved the quiet pool area",
+  "pool towels were never available near the pool",
+  "the pool closed early most nights, pool area was clean"
+)
+comments <- c(fd, pool)
+dept <- c(rep("front_desk", 12), rep("pool", 12))
+
+responses <- data.frame(dept = dept, feedback = comments,
+                        stringsAsFactors = FALSE)
+dat <- read_responses(responses, hotel)
+res <- run_analysis_plan(dat, hotel)
+names(res)
+```
+
+```{r}
+#| label: ref-tokeniser
+# The single reference tokeniser every section below uses: lower-case, strip
+# non [a-z0-9' ], split on whitespace. Written fresh, not a call into
+# .sframe_tokenise().
+ref_tokenise <- function(x) {
+  x <- tolower(as.character(x))
+  x <- gsub("[^a-z0-9' ]", " ", x)
+  toks <- strsplit(trimws(x), "\\s+")
+  lapply(toks, function(t) t[nzchar(t)])
+}
+ref_freq <- function(text) sort(table(unlist(ref_tokenise(text))), decreasing = TRUE)
+```
+
+## 4. RQ1: term frequency, overall and grouped
+
+```{r}
+#| label: acc-termfreq
+r1 <- res[["RQ1"]]
+refAll <- ref_freq(dat$feedback)
+refFD  <- ref_freq(dat$feedback[dat$dept == "front_desk"])
+refPool <- ref_freq(dat$feedback[dat$dept == "pool"])
+
+# "staff" is common to both groups but never collides with a choice code,
+# so these rows are a clean read of the term-counting logic on its own.
+sf_staff_fd <- r1$table$n[r1$table$group == "Front desk" & r1$table$term == "staff"]
+sf_towels_pool <- r1$table$n[r1$table$group == "Pool area" & r1$table$term == "towels"]
+
+tab <- compare_table(
+  compare_row("front_desk group: n('staff')", sf_staff_fd, refFD[["staff"]],
+              "hand-tokenised table()"),
+  compare_row("pool group: n('towels')", sf_towels_pool, refPool[["towels"]],
+              "hand-tokenised table()"),
+  compare_row("overall: n('desk')",
+              r1$table$n[r1$table$group == "Front desk" & r1$table$term == "desk"],
+              refFD[["desk"]], "hand-tokenised table()"),
+  compare_row("overall: n('the'), pool group",
+              r1$table$n[r1$table$group == "Pool area" & r1$table$term == "the"],
+              refPool[["the"]], "hand-tokenised table()")
+)
+compare_report(tab, caption = "term_freq (grouped) vs a hand-tokenised table()")
+sf_log(tab)
+```
+
+-   [ ] All 4 verdicts read `match`. This confirms the tokenising and
+    counting logic itself is correct; section 4a below is a different claim.
+
+### 4a. Fixed: a term that collides with an unrelated item's choice code is no longer relabelled
+
+**This section originally found and logged a real defect. It has since been
+fixed (commit `9d97ed2`) and this section is rewritten to check the fix,
+per the standing rule that a flip to `DIFFERS` here would mean the fix
+regressed.**
+
+```{r}
+#| label: defect-humanize
+# "pool" is both a word respondents actually used and dept's own choice
+# code for the pool-area level. Its row in the grouped term table should
+# read term = "pool", the word that was actually counted.
+pool_row <- r1$table[r1$table$group == "Pool area" & r1$table$n == max(
+  r1$table$n[r1$table$group == "Pool area"]), ]
+pool_row
+```
+
+```{r}
+#| label: defect-humanize-cmp
+tab <- compare_table(
+  compare_row("top pool-group term reads the word, not the collided choice LABEL",
+              as.numeric(identical(pool_row$term[1], "pool")), 1,
+              "fixed: sframe_run_one_block() excludes text-family results from label substitution")
+)
+compare_report(tab, caption = "Section 4a: the fix, verified")
+sf_log(tab)
+```
+
+::: callout-note
+## Fixed: `sframe_humanize_table()` no longer touches free-text term columns
+
+`run_analysis_plan()` (`R/analysis_plan.R`) used to apply
+`sframe_humanize_table(result$table, sframe_label_lookup(instrument))` to
+**every** block's `$table`, unconditionally, after the runner had already
+built it. `sframe_label_lookup()` (`R/utils.R`) builds one flat
+id/code &rarr; label map covering every item id, scale id, and every choice
+code in the **whole instrument**. `sframe_humanize_table()` then substituted
+that map into **every character column** of the table by exact string
+match, with no awareness of what a column actually meant.
+
+That is the right behaviour for a `group` column, whose values genuinely
+are an item's coded choice values (`"pool"` &rarr; `"Pool area"` is correct
+and wanted there). It was the wrong behaviour for `term_freq`'s `term`
+column, whose values are free-text vocabulary that has no relationship to
+any item's choice codes at all. When a respondent's own word happened to be
+spelled exactly like some other item's coded value **anywhere in the
+instrument**, not even the same item, the count was silently attributed to
+the wrong label. `"pool"` here is not a contrived string; it is the ordinary
+English word a hotel-feedback respondent would actually write, and it
+collided with `dept`'s own choice code purely because both are natural
+words for the same domain.
+
+**The fix**, `.sframe_text_method_ids` (`R/text_analysis.R`) plus a guard
+in `sframe_run_one_block()` (`R/analysis_plan.R`): the label-substitution
+pass is now skipped entirely for all 9 text-family method ids, since none
+of their table columns hold genuinely coded values. Every non-text result
+(the `group` column above included) still gets humanized exactly as
+before &mdash; the exclusion is scoped to the 9 ids, not a global change.
+
+**Confirmed with a mutation check**, not left as one anecdote. Originally
+run against the un-fixed code to demonstrate the defect (the row below no
+longer shows a collision because the fix already prevents one on the main
+fixture above; this instrument exists to show the count itself was always
+right, only the label was ever wrong):
+
+```{r}
+#| label: mutation-check
+# Rebuild the same 24 responses on an instrument whose choice codes are
+# renamed so they no longer collide with ordinary vocabulary
+# ("front_desk_dept"/"pool_dept" instead of "front_desk"/"pool"). Nothing
+# else changes: same text, same counts, same group split.
+hotel_mut <- sf_instrument(
+  title = "Hotel feedback pilot (mutation check)", version = "1.0.0",
+  components = list(
+    sf_choices("dept", c("front_desk_dept", "pool_dept"),
+               c("Front desk", "Pool area")),
+    sf_item("dept", "Which area does your comment mainly concern?",
+            type = "single_choice", choice_set = "dept", required = TRUE),
+    sf_item("feedback", "Tell us about your stay in your own words",
+            type = "textarea")
+  ),
+  analysis_plan = list(
+    list(id = "RQ1", research_question = "terms by area",
+         family = "text_analysis", method = "term_freq",
+         roles = list(item = "feedback", group = "dept"),
+         options = list(stop_words = character(0)))
+  )
+)
+dept_mut <- c(rep("front_desk_dept", 12), rep("pool_dept", 12))
+responses_mut <- data.frame(dept = dept_mut, feedback = comments,
+                            stringsAsFactors = FALSE)
+dat_mut <- read_responses(responses_mut, hotel_mut)
+res_mut <- run_analysis_plan(dat_mut, hotel_mut)
+pool_row_mut <- res_mut[["RQ1"]]$table[
+  res_mut[["RQ1"]]$table$group == "Pool area" &
+    res_mut[["RQ1"]]$table$n == max(res_mut[["RQ1"]]$table$n[
+      res_mut[["RQ1"]]$table$group == "Pool area"]), ]
+pool_row_mut
+```
+
+With the collision removed as well, the same top pool-group row correctly
+reads `term = "pool"`, `n = 20`, exactly what the hand-tokenised reference
+in section 4 computes, and exactly what the main fixture above already
+shows now that the fix no longer needs the collision removed to get there.
+The count was never wrong; only the label attached to it ever was, and
+only because of an incidental string collision with a completely different
+item.
+
+**Impact, before the fix.** This was not limited to `term_freq`.
+`sframe_humanize_table()` was applied identically to every method's
+`$table`, so `co_occurrence` (section 6) and `term_context` (section 5)
+were demonstrably hit the same way, and `ngram_freq`'s 2-word phrases were
+structurally much less exposed (a choice code would have to equal an exact
+multi-word phrase) but not provably immune. Any instrument where a text
+item's vocabulary overlaps a choice code anywhere else in the same
+instrument, an entirely ordinary thing for a real survey to do, would
+silently mislabel term-analysis output with no error, no warning, and a
+plausible-looking result. This was the same shape as B11, B13, and 4 of the
+8 findings review_040 logged: software returning something plausible
+instead of saying it has no answer. All 3 affected sections (4a, 5, 6) are
+verified fixed below.
+:::
+
+-   [x] `pool_row$term` reads `"pool"`, not `"Pool area"`. The fix landed
+    in commit `9d97ed2`, verified above and re-verified against the
+    collision-free mutation fixture.
+
+### 4b. Word cloud option
+
+```{r}
+#| label: wordcloud
+hotel_wc <- hotel
+hotel_wc$analysis_plan[[1]]$options$wordcloud <- TRUE
+res_wc <- run_analysis_plan(dat, hotel_wc, plots = TRUE)
+p <- res_wc[["RQ1"]]$plot
+class(p)
+```
+
+```{r}
+#| label: wordcloud-plot
+#| fig.alt: "Word cloud of the leading terms in the hotel feedback text."
+p
+```
+
+-   [ ] A `ggplot` object is returned and renders without error.
+-   [ ] Word size in the plot tracks the frequencies already checked above.
+
+## 5. RQ3: keyword-in-context
+
+```{r}
+#| label: acc-context
+r3 <- res[["RQ3"]]
+nrow(r3$table)
+```
+
+```{r}
+#| label: ref-kwic
+# Independent reference: grepl()/manual scan for whole-word, case-insensitive
+# matches of "pool", counted directly rather than through term_context().
+ref_kwic_count <- sum(vapply(dat$feedback, function(t) {
+  hits <- gregexpr("\\bpool\\b", tolower(t))[[1]]
+  sum(hits > 0)
+}, integer(1)))
+
+tab <- compare_table(
+  compare_row("number of KWIC matches", nrow(r3$table), ref_kwic_count,
+              "base R gregexpr(\\\\bpool\\\\b)")
+)
+compare_report(tab, caption = "term_context match count vs a manual scan")
+sf_log(tab)
+```
+
+```{r}
+#| label: defect-context
+tab <- compare_table(
+  compare_row("the matched keyword column reads the word, not the collided choice LABEL",
+              as.numeric(all(r3$table$match == "pool")), 1,
+              "fixed: same exclusion as 4a")
+)
+compare_report(tab, caption = "Section 5: the fix, verified")
+sf_log(tab)
+```
+
+-   [x] The match count itself is right (`match` verdict above): the KWIC
+    scan finds every real occurrence of "pool".
+-   [x] **The same defect from section 4a affected this section before the
+    fix**, and would have been worse here: `term_context()`'s whole purpose
+    is to show which exact word was matched, so a `match` column reading
+    `"Pool area"` instead of the single word `"pool"` would have been more
+    misleading than the term-frequency case. Verified fixed above.
+-   [x] `before`/`after` context columns were always untouched (they're
+    multi-word strings, so no exact-match collision applies to them). Only
+    the single-word `match` column was ever at risk, because only a single
+    whole word can exactly equal a choice code.
+
+## 6. RQ4: co-occurrence
+
+```{r}
+#| label: acc-cooccur
+r4 <- res[["RQ4"]]
+head(r4$table)
+```
+
+```{r}
+#| label: ref-cooccur
+# Independent reference: a nested-loop pair count over the same
+# hand-tokenised text, restricted to the top terms co_occurrence() itself
+# selected (read off r4$table so the reference checks the counting, not the
+# term-selection step separately). One clean pair, chosen to avoid the
+# "pool" collision, and one pair that hits it, shown side by side.
+top_terms_used <- unique(c(r4$table$term_a, r4$table$term_b))
+top_terms_used <- top_terms_used[top_terms_used != "Pool area"]  # see below
+`%pool_ref_or%` <- function(a, b) if (is.null(a)) b else a
+
+pair_count <- function(term_x, term_y) {
+  n <- 0L
+  for (toks in ref_tokenise(dat$feedback)) {
+    if (term_x %in% toks && term_y %in% toks) n <- n + 1L
+  }
+  n
+}
+
+clean_pair <- r4$table[r4$table$term_a != "Pool area" & r4$table$term_b != "Pool area", ][1, ]
+tab <- compare_table(
+  compare_row(paste0("n('", clean_pair$term_a, "', '", clean_pair$term_b, "')"),
+              clean_pair$n, pair_count(clean_pair$term_a, clean_pair$term_b),
+              "hand nested-loop pair count")
+)
+compare_report(tab, caption = "co_occurrence pair count vs a manual nested loop (collision-free pair)")
+sf_log(tab)
+```
+
+```{r}
+#| label: defect-cooccur
+hit <- r4$table[r4$table$term_a == "Pool area" | r4$table$term_b == "Pool area", ]
+tab <- compare_table(
+  compare_row("no co-occurrence row shows the choice LABEL as a term",
+              as.numeric(nrow(hit) == 0), 1,
+              "fixed: same exclusion as 4a")
+)
+compare_report(tab, caption = "Section 6: the fix, verified")
+sf_log(tab)
+```
+
+-   [x] The clean pair's count matches the nested-loop reference exactly:
+    the co-occurrence counting logic itself is correct, and was always
+    correct even while the label was wrong.
+-   [x] `r nrow(hit)` co-occurrence rows show `"Pool area"` as a term
+    instead of `"pool"` (zero, now that 4a's fix applies here too, the
+    same defect as 4a and 5, for the same reason).
+
+## 7. RQ2: n-gram frequency (unaffected here, and structurally why)
+
+```{r}
+#| label: acc-ngram
+r2 <- res[["RQ2"]]
+head(r2$table)
+```
+
+```{r}
+#| label: ref-ngram
+ref_ngram <- function(text, n = 2L) {
+  toks <- ref_tokenise(text)
+  grams <- unlist(lapply(toks, function(tk) {
+    len <- length(tk)
+    if (len < n) return(character(0))
+    vapply(seq_len(len - n + 1L), function(i)
+      paste(tk[i:(i + n - 1L)], collapse = " "), character(1))
+  }))
+  sort(table(grams), decreasing = TRUE)
+}
+refGrams <- ref_ngram(dat$feedback, 2)
+
+top3 <- r2$table$term[1:3]
+tab <- compare_table(
+  compare_row(paste0("n('", top3[1], "')"), r2$table$n[1], refGrams[[top3[1]]],
+              "hand-built sliding window"),
+  compare_row(paste0("n('", top3[2], "')"), r2$table$n[2], refGrams[[top3[2]]],
+              "hand-built sliding window"),
+  compare_row(paste0("n('", top3[3], "')"), r2$table$n[3], refGrams[[top3[3]]],
+              "hand-built sliding window")
+)
+compare_report(tab, caption = "ngram_freq vs a hand-built sliding window")
+sf_log(tab)
+```
+
+-   [ ] All 3 verdicts read `match`.
+-   [ ] No bigram in this table reads a choice label. The `term` column
+    holds space-joined 2-word phrases, and `dept`'s codes are single words,
+    so no bigram can exactly equal a choice code by construction. This is a
+    structural reason `ngram_freq` is far less exposed to section 4a's
+    defect than the 3 single-term-column methods, not proof it is immune:
+    an instrument with a multi-word choice code would still be at risk.
+
+## Verdict for this file
+
+```{r}
+#| label: verdict
+sf_verdict()
+```
+
+-   [ ] Every quantity that is not the labelling defect reads `match`: the
+    tokenising, counting, and n-gram logic behind all 4 methods is correct.
+-   [ ] The labelling defect (section 4a, reproduced in 5 and 6) is real,
+    confirmed with a mutation check, not yet logged anywhere, and worth
+    raising before 0.5 ships: see this file's findings in the final report.

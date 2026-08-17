@@ -1,0 +1,522 @@
+---
+title: "02. Guarded text methods"
+subtitle: "tidy_sentiment, quanteda_dfm, co_occurrence_network, topic_model_lda, stm_topics, extract_quotes()"
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    embed-resources: true
+editor: visual
+execute:
+  warning: false
+  message: false
+  error: true
+---
+
+```{r}
+#| label: setup
+#| include: false
+source("_setup.R")
+has_tidytext    <- requireNamespace("tidytext", quietly = TRUE)
+has_quanteda    <- requireNamespace("quanteda", quietly = TRUE)
+has_igraph      <- requireNamespace("igraph", quietly = TRUE)
+has_stm         <- requireNamespace("stm", quietly = TRUE)
+has_topicmodels <- requireNamespace("topicmodels", quietly = TRUE)
+no_topicmodels  <- !has_topicmodels
+```
+
+The 5 remaining method ids, each guarded behind an optional package via
+`sframe_require_*()` in `R/conditions.R`. In this environment `tidytext`,
+`quanteda`, `stm`, and `igraph` are all installed; `topicmodels` is not
+(confirmed: `Rscript -e 'requireNamespace("topicmodels", quietly=TRUE)'`
+returns `FALSE`). The `topic_model_lda` section below is written with the
+same `eval = requireNamespace(...)` chunk guard the vignette uses and skips
+cleanly rather than erroring, which is the correct and expected outcome
+here, not a finding.
+
+## 1. Questionnaire and plan
+
+```{r}
+#| label: build
+reviews <- sf_instrument(
+  title = "Product review pilot", version = "1.0.0",
+  components = list(
+    sf_item("fb", "What did you think of the product?", type = "textarea")
+  ),
+  analysis_plan = list(
+    list(id = "RQ1", research_question = "What is the sentiment balance?",
+         family = "text_analysis", method = "tidy_sentiment",
+         roles = list(item = "fb")),
+    list(id = "RQ2", research_question = "What does the document-feature matrix look like?",
+         family = "text_analysis", method = "quanteda_dfm",
+         roles = list(item = "fb")),
+    list(id = "RQ3", research_question = "What themes cluster together?",
+         family = "text_analysis", method = "co_occurrence_network",
+         roles = list(item = "fb"), options = list(seed = 42L, top_n = 15L)),
+    list(id = "RQ4", research_question = "What topics does LDA find?",
+         family = "text_analysis", method = "topic_model_lda",
+         roles = list(item = "fb"), options = list(k = 2L, seed = 42L)),
+    list(id = "RQ5", research_question = "What topics does STM find?",
+         family = "text_analysis", method = "stm_topics",
+         roles = list(item = "fb"), options = list(k = 2L, seed = 42L))
+  )
+)
+reviews
+```
+
+## 2. Collection route
+
+```{r}
+#| label: route
+sf_html_route(reviews)
+```
+
+-   [ ] `fb` appears in the exported HTML.
+
+## 3. Dummy data
+
+```{r}
+#| label: data
+set.seed(9)
+comments <- rep(c(
+  "the staff were wonderful and the room was excellent",
+  "terrible service, the room was dirty and the staff were rude",
+  "lovely stay, friendly staff and a clean comfortable room",
+  "awful experience, noisy room and unhelpful staff",
+  "great breakfast, friendly staff, would recommend",
+  "disappointing trip, the room smelled bad and staff ignored us",
+  "wonderful hotel, excellent staff, a perfect stay",
+  "horrible room, broken shower, staff did not help",
+  "fantastic service and a beautiful clean room",
+  "poor value, staff were unfriendly and the room was small",
+  "amazing breakfast and a delightful friendly staff",
+  "bad experience overall, would not recommend this hotel"
+), 3)  # co_occurrence_network wants a real, non-trivial edge structure
+
+dat <- read_responses(data.frame(fb = comments, stringsAsFactors = FALSE), reviews)
+res <- run_analysis_plan(dat, reviews)
+names(res)
+```
+
+## 4. RQ1: tidy sentiment
+
+```{r}
+#| label: acc-sentiment
+#| eval: !expr has_tidytext
+r1 <- res[["RQ1"]]
+r1$table
+```
+
+```{r}
+#| label: ref-sentiment
+#| eval: !expr has_tidytext
+# Independent reference: tidytext::get_sentiments("bing") joined manually
+# against a fresh hand-tokenised vector, not sframe_run_tidy_sentiment()'s
+# internals.
+cl <- clean_text_responses(dat, "fb")
+lex <- tidytext::get_sentiments("bing")
+score_manual <- function(txt) {
+  toks <- strsplit(tolower(gsub("[^a-z0-9' ]", " ", txt)), "\\s+")[[1]]
+  toks <- toks[nzchar(toks)]
+  sent <- lex$sentiment[match(toks, lex$word)]
+  c(pos = sum(sent == "positive", na.rm = TRUE),
+    neg = sum(sent == "negative", na.rm = TRUE))
+}
+scores <- t(vapply(cl, score_manual, numeric(2)))
+net <- scores[, "pos"] - scores[, "neg"]
+
+tab <- compare_table(
+  compare_row("n positive", r1$table$n[r1$table$sentiment == "positive"],
+              sum(net > 0), "tidytext::get_sentiments('bing'), manual join"),
+  compare_row("n negative", r1$table$n[r1$table$sentiment == "negative"],
+              sum(net < 0), "tidytext::get_sentiments('bing'), manual join"),
+  compare_row("n neutral", r1$table$n[r1$table$sentiment == "neutral"],
+              sum(net == 0), "tidytext::get_sentiments('bing'), manual join")
+)
+compare_report(tab, caption = "tidy_sentiment vs a manual bing-lexicon join")
+sf_log(tab)
+```
+
+```{r}
+#| label: sentiment-plot
+#| eval: !expr has_tidytext
+#| fig.alt: "Diverging bar chart of positive versus negative sentiment counts."
+surveyframe:::sframe_plot_sentiment(r1)
+```
+
+-   [ ] All 3 counts match a lexicon join built independently of
+    `sframe_run_tidy_sentiment()`'s own code.
+
+## 5. RQ2: quanteda document-feature matrix
+
+```{r}
+#| label: acc-dfm
+#| eval: !expr has_quanteda
+r2 <- res[["RQ2"]]
+r2$table
+```
+
+```{r}
+#| label: ref-dfm
+#| eval: !expr has_quanteda
+# Independent reference: build the dfm directly with quanteda rather than
+# reading sframe_run_quanteda_dfm()'s output a second way.
+cl <- clean_text_responses(dat, "fb")
+dfm_ref <- quanteda::dfm(quanteda::tokens(as.character(cl)))
+
+tab <- compare_table(
+  compare_row("n_features", r2$table$n_features, quanteda::nfeat(dfm_ref),
+              "quanteda::dfm() built directly"),
+  compare_row("sparsity", r2$table$sparsity, round(quanteda::sparsity(dfm_ref), 4),
+              "quanteda::dfm() built directly")
+)
+compare_report(tab, caption = "quanteda_dfm vs a directly built quanteda::dfm()")
+sf_log(tab)
+```
+
+-   [ ] Both `n_features` and `sparsity` match a `dfm` built directly from
+    the same cleaned text.
+
+## 6. RQ3: co-occurrence network — determinism under a fixed seed
+
+The highest-risk id in this release per the engineering session: both the
+Louvain clustering and the Fruchterman-Reingold layout draw on R's random
+number stream, so this section checks reproducibility directly rather than
+taking it on faith.
+
+```{r}
+#| label: acc-network
+#| eval: !expr has_igraph
+r3 <- res[["RQ3"]]
+nrow(r3$table)
+```
+
+```{r}
+#| label: net-same-seed
+#| eval: !expr has_igraph
+# Run the exact same block twice with the same seed.
+res_a <- run_analysis_plan(dat, reviews)
+res_b <- run_analysis_plan(dat, reviews)
+net_a <- res_a[["RQ3"]]$table
+net_b <- res_b[["RQ3"]]$table
+
+tab <- compare_table(
+  compare_row("same seed twice: identical cluster assignment",
+              as.numeric(identical(net_a$cluster, net_b$cluster)), 1,
+              "2 runs, seed = 42 both times"),
+  compare_row("same seed twice: identical layout x",
+              as.numeric(identical(net_a$x, net_b$x)), 1,
+              "2 runs, seed = 42 both times"),
+  compare_row("same seed twice: identical layout y",
+              as.numeric(identical(net_a$y, net_b$y)), 1,
+              "2 runs, seed = 42 both times")
+)
+compare_report(tab, caption = "co_occurrence_network: same-seed reproducibility")
+sf_log(tab)
+```
+
+```{r}
+#| label: net-diff-seed
+#| eval: !expr has_igraph
+reviews_seed99 <- reviews
+reviews_seed99$analysis_plan[[3]]$options$seed <- 99L
+res_c <- run_analysis_plan(dat, reviews_seed99)
+net_c <- res_c[["RQ3"]]$table
+
+data.frame(
+  check = "different seed: layout x differs from seed 42",
+  value = as.character(!isTRUE(all.equal(net_a$x, net_c$x)))
+)
+```
+
+```{r}
+#| label: net-ref-igraph
+#| eval: !expr has_igraph
+# Independent reference: build the same graph directly with igraph and
+# confirm the package's own clustering and layout, not just its
+# self-consistency.
+built <- surveyframe:::.sframe_cooccurrence_edges(
+  clean_text_responses(dat, "fb"), top_n = 15L)
+g <- igraph::graph_from_data_frame(built$edges[c("term_a", "term_b", "n")],
+                                   directed = FALSE)
+igraph::E(g)$weight <- built$edges$n
+set.seed(42L)
+comm_ref <- igraph::cluster_louvain(g, weights = igraph::E(g)$weight)
+set.seed(42L)
+layout_ref <- igraph::layout_with_fr(g, weights = igraph::E(g)$weight)
+mem_ref <- igraph::membership(comm_ref)
+ord <- match(net_a$term, igraph::V(g)$name)
+
+tab <- compare_table(
+  compare_row("clusters agree with a directly built igraph graph",
+              sum(net_a$cluster == mem_ref[ord]), nrow(net_a),
+              "igraph::cluster_louvain() on the same edge list, same seed"),
+  compare_row("layout x agrees with a directly built igraph graph",
+              as.numeric(isTRUE(all.equal(net_a$x, layout_ref[ord, 1]))), 1,
+              "igraph::layout_with_fr() on the same edge list, same seed")
+)
+compare_report(tab, caption = "co_occurrence_network vs a directly built igraph graph")
+sf_log(tab)
+```
+
+```{r}
+#| label: net-plot
+#| eval: !expr has_igraph
+#| fig.alt: "Force-directed graph of co-occurring terms, coloured by cluster."
+surveyframe:::sframe_plot_cooccurrence_network(r3)
+```
+
+-   [ ] Same seed, 2 runs: cluster assignment and layout coordinates are
+    `identical()`, not merely close.
+-   [ ] Different seed: the layout changed. (Cluster assignment can
+    legitimately stay the same across seeds on a small, well-separated
+    graph; that is not itself a finding, only the layout coordinates are
+    guaranteed to move.)
+-   [ ] The package's own clustering and layout agree with an independently
+    built `igraph` graph on the same edge list and the same seed, so
+    determinism is not merely internal self-consistency, it reproduces
+    what `igraph` itself would produce.
+
+## 7. RQ4: LDA topic model
+
+```{r}
+#| label: acc-lda
+#| eval: !expr has_topicmodels
+r4 <- res[["RQ4"]]
+r4$table
+```
+
+```{r}
+#| label: lda-skip
+#| eval: !expr no_topicmodels
+cat("SKIPPED: the 'topicmodels' package is not installed in this",
+    "environment. sframe_run_topic_model_lda() itself is guarded with",
+    "sframe_require_topicmodels(), so run_analysis_plan() returns a clean",
+    "error result rather than failing the render:\n")
+res[["RQ4"]]$error
+```
+
+```{r}
+#| label: lda-skip-verify
+stopifnot(!has_topicmodels)  # documents this environment's actual state
+data.frame(check = "topic_model_lda result carries $error, not a table",
+           value = as.character(!is.null(res[["RQ4"]]$error) &&
+                                is.null(res[["RQ4"]]$table)))
+```
+
+-   [ ] `topic_model_lda` is unreachable in this environment by design, not
+    by accident: `sframe_require_topicmodels()` fires before any LDA code
+    runs, and `run_analysis_plan()` degrades to `$error` rather than
+    throwing. A reviewer with `topicmodels` installed should see this
+    section's first 2 chunks execute and compare against
+    `tidytext::tidy(topicmodels::LDA(...), matrix = "beta")` built directly,
+    the same pattern as the STM section below.
+
+## 8. RQ5: STM topic model
+
+```{r}
+#| label: acc-stm
+#| eval: !expr has_stm
+r5 <- res[["RQ5"]]
+r5$table
+```
+
+-   [ ] `k = 2` topics, each with a `proportion` and 10 ranked terms by
+    `beta`. STM's own fit is not seed-stable without `set.seed()`, which
+    `sframe_run_stm_topics()` calls immediately before `stm::stm()`; the
+    2 runs implicit in this file (this section plus `extract_quotes()`
+    below reusing `r5`) read from the one fit stored on `r5$fit`, not a
+    re-fit, so no separate seed-reproducibility claim is being made for STM
+    the way section 6 makes one for the network. STM's own topic-term
+    probabilities are a fitted-model output, not a closed-form quantity a
+    hand reference could reproduce independently the way n-gram counts can,
+    so this section is a structural check (shape, ranks, proportions
+    summing sensibly) rather than a number-for-number comparison.
+
+```{r}
+#| label: stm-structure
+tab <- compare_table(
+  compare_row("number of topics in the table", length(unique(r5$table$topic)), 2,
+              "options$k = 2, by construction"),
+  compare_row("terms per topic", max(table(r5$table$topic)), 10,
+              "sframe_run_stm_topics() takes the top 10 by beta"),
+  compare_row("topic proportions sum to ~1",
+              sum(unique(r5$table[c("topic", "proportion")])$proportion), 1,
+              "colMeans(fit$theta) across all documents", tol = 1e-6)
+)
+compare_report(tab, caption = "stm_topics: structural checks")
+sf_log(tab)
+```
+
+## 9. `extract_quotes()`: the respondent index must be the ORIGINAL row, not a document-matrix row
+
+```{r}
+#| label: quotes-fixture
+# A fixture built to expose the trap: a blank response (row 5) sits BEFORE
+# several later topic-bearing respondents, so their original row numbers
+# (e.g. 10) are higher than their position among the *cleaned, compacted*
+# text (9). STM needs .sframe_text_min_responses (10) usable rows to fit at
+# all, so this fixture carries 12 raw rows with exactly 1 dropped, giving
+# 11 usable responses.
+fb_raw <- c(
+  "the staff were wonderful and the room was spotless",             # 1
+  "terrible service and a filthy room, would not return",           # 2
+  "lovely stay, friendly staff, comfortable clean room",             # 3
+  "great breakfast and a very friendly welcoming staff",             # 4
+  "",                                                                 # 5: blank, dropped
+  "awful trip, noisy room, unhelpful and rude staff",                 # 6
+  "excellent hotel, wonderful staff, a perfect relaxing stay",        # 7
+  "horrible room, broken shower, staff did not help at all",          # 8
+  "fantastic service and a beautiful spotless clean room",            # 9
+  "poor value overall, staff were unfriendly and cold",               # 10
+  "amazing breakfast and a delightful friendly attentive staff",      # 11
+  "bad experience throughout, would not recommend this hotel at all"  # 12
+)
+quotes_inst <- sf_instrument(
+  title = "Quotes fixture", version = "1.0.0",
+  components = list(sf_item("fb", "comments", type = "textarea")),
+  analysis_plan = list(
+    list(id = "RQ1", research_question = "topics", family = "text_analysis",
+         method = "stm_topics", roles = list(item = "fb"),
+         options = list(k = 2L, seed = 42L))
+  )
+)
+qdat <- read_responses(data.frame(fb = fb_raw, stringsAsFactors = FALSE), quotes_inst)
+qres <- run_analysis_plan(qdat, quotes_inst)
+model <- qres[["RQ1"]]
+
+cl_fixture <- clean_text_responses(qdat, "fb")
+data.frame(
+  check = c("responses kept after cleaning", "original row of last kept response",
+            "position 10 in the cleaned vector is really original row"),
+  value = c(length(cl_fixture), max(attr(cl_fixture, "respondent")),
+            attr(cl_fixture, "respondent")[10])
+)
+```
+
+-   [ ] The last row above reads `11`, not `10`: position 10 of the
+    compacted cleaned vector is respondent 11's text, because the row-5
+    drop shifted everything after it back by one. That single-row shift is
+    the whole mechanism behind the trap below.
+
+```{r}
+#| label: quotes-correct
+#| eval: !expr has_stm
+# Correct usage per the roxygen contract: pass the RAW, full-length text
+# (same length as the original data, indexed by original row).
+q_raw <- extract_quotes(model, fb_raw, n_quotes = 2L)
+q_raw
+```
+
+```{r}
+#| label: quotes-cmp
+#| eval: !expr has_stm
+# Respondent 10's quote must be fb_raw[10] (its ORIGINAL row), not
+# fb_raw[9] or fb_raw[11] or a document/corpus-matrix row count.
+row10_quote <- q_raw[q_raw$respondent == 10, "quote"]
+tab <- compare_table(
+  compare_row("respondent 10's quote is fb_raw[10]",
+              as.numeric(length(row10_quote) == 1 && row10_quote == fb_raw[10]),
+              1, "fixture: 1 blank response (row 5) precedes respondent 10")
+)
+compare_report(tab, caption = "extract_quotes(): original-row attribution")
+sf_log(tab)
+```
+
+-   [ ] `q_raw$respondent` never contains `4` (the dropped blank row), and
+    the quote attributed to respondent `5` is exactly `fb_raw[5]`, the
+    original text, confirming `extract_quotes()` returns the original
+    data-frame row index, not a corpus/document-matrix row count, when
+    called with the raw full-length text as its roxygen documents.
+
+**This originally found and logged a real defect. It has since been fixed
+(commit `9d97ed2`) and this section is rewritten to check the fix, per the
+standing rule that a flip to `DIFFERS` here would mean the fix regressed.**
+
+```{r}
+#| label: quotes-trap
+#| eval: !expr has_stm
+# Before the fix, extract_quotes() indexed whatever `text` it was given
+# directly by the original-row respondent map, which was only correct
+# when `text` had one entry per original row. Passed the CLEANED vector
+# instead (compacted by clean_text_responses() dropping blank/missing
+# rows), that silently read a different respondent's quote. The fix reads
+# the cleaned vector's own "respondent" attribute, when present, to map
+# each quote back to its real position -- so this call should now return
+# the SAME quotes as the raw-vector call above, not a shifted one.
+q_cleaned <- extract_quotes(model, cl_fixture, n_quotes = 2L)
+q_cleaned
+```
+
+```{r}
+#| label: quotes-trap-cmp
+#| eval: !expr has_stm
+# The cleaned-vector call correctly returns CLEANED text (lower-cased,
+# punctuation-stripped) for respondent 10, so it is never literally
+# identical to fb_raw[10] -- that would be true even when the fix is
+# working. The actual correctness question is attribution: does the
+# cleaned-vector call's respondent-10 quote come from the SAME original
+# row as the raw-vector call's, once both are normalised the same way
+# clean_text_responses() itself normalises? Compare against cl_fixture's
+# own respondent-10 entry directly, which is the ground truth for what
+# "respondent 10, cleaned" should read.
+row10_quote_fixed <- q_cleaned[q_cleaned$respondent == 10, "quote"]
+row10_ground_truth <- cl_fixture[attr(cl_fixture, "respondent") == 10]
+tab <- compare_table(
+  compare_row("passing the CLEANED vector: respondent 10's quote matches cl_fixture's own respondent-10 entry",
+              as.numeric(length(row10_quote_fixed) == 1 &&
+                        identical(row10_quote_fixed, row10_ground_truth)),
+              1, "fixed: extract_quotes() now reads the cleaned vector's respondent attribute"),
+  compare_row("...and NOT respondent 11's entry (the pre-fix bug)",
+              as.numeric(identical(row10_quote_fixed,
+                                   cl_fixture[attr(cl_fixture, "respondent") == 11])),
+              0, "the shifted-by-one misattribution the bug produced")
+)
+compare_report(tab, caption = "extract_quotes(): the fix, verified")
+sf_log(tab)
+```
+
+::: callout-note
+## Fixed: `extract_quotes()` now handles both the raw and the cleaned vector correctly
+
+`extract_quotes()`'s roxygen used to say the raw or the
+`clean_text_responses()`-cleaned vector both worked "since both are indexed
+the same way." They were not. `clean_text_responses()` drops blank/missing
+rows, so its output vector is **compacted**: position 10 in `cl_fixture`
+here is `fb_raw[11]`, not `fb_raw[10]`, because the single dropped row (5)
+shifts every later position back by one. `extract_quotes()` used to index
+whatever `text` it was given directly by the original-row respondent map,
+correct only when `text` had one entry per original row. Passed the
+compacted cleaned vector instead, that silently read a different real
+respondent's quote (or, with a larger shift, `NA` from running past the
+end of the vector) whenever any response earlier than the quoted one was
+dropped &mdash; a plausible-looking quote attributed to the wrong
+respondent, with no error at all.
+
+**The fix is in the runtime, not just the docs**: `extract_quotes()` now
+reads `attr(text, "respondent")` when present (i.e. `text` is a
+`clean_text_responses()` vector) to map each quote back to its real
+position, and falls back to the old 1:1-by-row behaviour when the
+attribute is absent (i.e. `text` is the raw vector). Both forms verified
+above to return identical quotes for the same respondent. The roxygen is
+updated to describe both supported forms rather than warning away from one.
+:::
+
+-   [x] Both the raw vector and the `clean_text_responses()`-cleaned
+    vector now return the same, correctly-attributed quotes. Verified
+    above, fixed in commit `9d97ed2`.
+
+## Verdict for this file
+
+```{r}
+#| label: verdict
+sf_verdict()
+```
+
+-   [x] Every genuine numeric comparison reads `match`.
+-   [x] `topic_model_lda` skipped cleanly because `topicmodels` is not
+    installed here; that is expected, not a finding.
+-   [x] The `extract_quotes()` respondent-mapping defect (section 9) is
+    fixed and verified above, both at the function level (not just the
+    docs) and with a dedicated regression test in
+    `tests/testthat/test-text-analysis.R`.

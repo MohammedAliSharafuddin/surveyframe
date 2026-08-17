@@ -1,0 +1,123 @@
+---
+title: "0.5 text-analysis review suite: start here"
+subtitle: "Read this file first, then work through 01 and 02"
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    embed-resources: true
+    code-fold: false
+editor: visual
+execute:
+  warning: false
+  message: false
+  error: true
+---
+
+```{r}
+#| label: setup
+#| include: false
+source("_setup.R")
+```
+
+## What this suite is for
+
+surveyframe 0.5 adds one file, `R/text_analysis.R`, and 9 analysis-plan
+method ids for open-ended text: `term_freq`, `ngram_freq`, `term_context`,
+`co_occurrence`, `co_occurrence_network`, `tidy_sentiment`, `quanteda_dfm`,
+`topic_model_lda`, `stm_topics`, plus the standalone `extract_quotes()`. No
+new item types, no serialisation changes: a text/textarea item that already
+existed just gained analysis coverage.
+
+The scope is narrower than 0.4.0's, so this suite is proportionally smaller:
+**2 files instead of 20.** The goal is the same: confirm every number
+surveyframe reports for a text method against an independent computation,
+built from first principles rather than by calling the package's own
+internal helpers a second time.
+
+`review_040/HANDOVER.md` documents the file template, the shared helpers,
+and the token-saving rules this suite reuses unchanged. Read that once if
+you have not; it is not repeated here.
+
+## Order to work through
+
+| File | Covers | Comparisons |
+|---|---|---|
+| `01_base_text_methods` | `term_freq` (incl. `group` role, word cloud), `ngram_freq`, `term_context`, `co_occurrence` — the 4 ids needing zero optional packages | 20 |
+| `02_guarded_text_methods` | `tidy_sentiment`, `quanteda_dfm`, `co_occurrence_network` (seed determinism), `topic_model_lda` (skips, see below), `stm_topics`, `extract_quotes()` | 17 |
+
+37 checked numbers total. There is no file `03`: this scope does not need
+one, and padding the file count to look more like `review_040` would not add
+review value.
+
+## Reading a comparison
+
+Same 3-word verdict column and log-scale plot as `review_040`. `match` means
+the difference is at or below tolerance (default `1e-6`); `DIFFERS` means
+stop and investigate; `CHECK` means one side returned `NA`, usually a
+reference-call problem rather than a package one. See `review_040/HANDOVER.md`
+section 4 (the reference-call traps table) before treating any `DIFFERS` in
+this suite as a package defect — it may be the comparison's own reference
+call that is wrong, the same way it was 9 times out of 17 in the 0.4.0 suite.
+
+## Environment check
+
+```{r}
+#| label: env
+data.frame(
+  item = c("R", "platform", "surveyframe loaded from",
+           "0.5 text-analysis feature present"),
+  value = c(R.version.string, R.version$platform,
+            local({
+              p <- getNamespaceInfo("surveyframe", "path")
+              for (i in 1:3) {
+                if (file.exists(file.path(p, "DESCRIPTION"))) break
+                p <- dirname(p)
+              }
+              p
+            }),
+            as.character(sf_is_050())),
+  stringsAsFactors = FALSE
+)
+```
+
+```{r}
+#| label: refs
+pk <- c("tidytext", "quanteda", "stm", "topicmodels", "igraph", "ggplot2")
+data.frame(
+  package = pk,
+  version = vapply(pk, function(p)
+    if (requireNamespace(p, quietly = TRUE))
+      as.character(utils::packageVersion(p)) else "MISSING", character(1)),
+  row.names = NULL
+)
+```
+
+-   [ ] `0.5 text-analysis feature present` reads `TRUE`. If it reads
+    `FALSE`, `_setup.R` fell back to an installed build with none of this
+    work in it, and nothing below means anything.
+-   [ ] `tidytext`, `quanteda`, `stm`, `igraph`, and `ggplot2` all report a
+    version. **`topicmodels` is expected to read `MISSING` in this
+    environment** — it is not installed here, confirmed via
+    `Rscript -e 'requireNamespace("topicmodels", quietly=TRUE)'` returning
+    `FALSE`. File `02`'s `topic_model_lda` section is guarded with the same
+    `eval = requireNamespace(...)` pattern the vignette uses and skips
+    cleanly rather than erroring; that skip is expected, not a finding.
+
+::: callout-note
+## Why there is no HTML/Shiny collection-route section here
+
+`review_040`'s file template opens every file with both collection routes
+(`sf_both_routes()`), because 0.4.0 changed how the Shiny collector wrote
+matrix/ranking/multi-select columns. 0.5 adds no item type and no collector
+change: a `text`/`textarea` item collects exactly as it always has, on both
+routes, and that is already covered by `review_040`'s own field-type file.
+Files `01` and `02` still build a real instrument and a real analysis plan
+(the package's central claim), they just do not re-prove routes this release
+did not touch.
+:::
+
+## Where to record what you find
+
+Log findings in `dogfeed.todo.md`, one entry each, status `open`. Do not fix
+anything while reviewing.
