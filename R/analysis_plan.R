@@ -1333,11 +1333,17 @@ sframe_run_one_block <- function(block, data, instrument, plots = FALSE,
   # The runners above compute on the raw response codes (item ids, coded
   # choice values), so the table they build carries those, not what a
   # reader sees. Substitute labels here, once, for every test type, rather
-  # than teaching each runner about the instrument's labels.
-  result$table <- tryCatch(
-    sframe_humanize_table(result$table, sframe_label_lookup(instrument)),
-    error = function(e) result$table
-  )
+  # than teaching each runner about the instrument's labels. Text-family
+  # results are excluded: their table columns hold a respondent's own
+  # words, not coded values, and humanising them risks silently relabelling
+  # a term that happens to collide with an unrelated item's choice code
+  # (see .sframe_text_method_ids's comment).
+  if (!test %in% .sframe_text_method_ids) {
+    result$table <- tryCatch(
+      sframe_humanize_table(result$table, sframe_label_lookup(instrument)),
+      error = function(e) result$table
+    )
+  }
   if (isTRUE(plots) && is.null(result$plot)) {
     result$plot <- sframe_plot_for_result(result, data, palette = plot_palette)
   }

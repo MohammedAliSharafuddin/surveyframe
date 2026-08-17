@@ -4,6 +4,22 @@
 # full 9-method-id build plan; this file grows across that build rather than
 # landing complete in one diff.
 
+# The 9 text-family method ids. Every one of them can put a free-text word
+# straight into a result table column (term, term_a/term_b, match), and a
+# respondent's own word is not a coded value, so it must never go through
+# sframe_run_one_block()'s label-substitution pass: a term that happens to
+# match some unrelated item's choice CODE (e.g. a respondent writes "pool"
+# and a department item has a choice coded "pool") would otherwise be
+# silently swapped for that item's choice LABEL ("Pool area"), which reads
+# as real thematic signal rather than the coincidence it is. Found in
+# review_050, confirmed with a mutation check (colliding code renamed,
+# same top term reads correctly).
+.sframe_text_method_ids <- c(
+  "term_freq", "ngram_freq", "term_context", "co_occurrence",
+  "co_occurrence_network", "tidy_sentiment", "quanteda_dfm",
+  "topic_model_lda", "stm_topics"
+)
+
 # A small built-in English stop-word list so the base path (no tidytext
 # installed) has sensible defaults. Based on the Snowball project's English
 # stop word list (Porter, M., snowballstem.org/algorithms/english/stop.txt),
@@ -582,11 +598,15 @@ sframe_run_stm_topics <- function(data, roles, options, instrument) {
 #'
 #' @param model A `stm_topics` result list from [sframe_run_stm_topics()]
 #'   (i.e. `result`, not `result$fit` and not the raw `stm` object).
-#' @param text The response vector the topic model was fit on, indexed by
-#'   *original* row/respondent. Either the raw or [clean_text_responses()]-
-#'   cleaned vector works, since both are indexed the same way; only the
-#'   text actually quoted differs (cleaned text is lower-cased and stripped
-#'   of punctuation).
+#' @param text The response vector the topic model was fit on: either the
+#'   raw vector (one entry per original data row, indexed 1:1 by row
+#'   number) or the [clean_text_responses()]-cleaned vector, which drops
+#'   blank/missing rows and is therefore *shorter*, its positions no
+#'   longer equal original row numbers once any earlier row was dropped.
+#'   Both forms work correctly: when `text` carries the `respondent`
+#'   attribute [clean_text_responses()] sets, that mapping is used to find
+#'   each quote's real position; otherwise `text` is assumed to be the raw,
+#'   1:1-indexed vector.
 #' @param n_quotes Integer. Quotes to return per topic. Default `3L`.
 #'
 #' @return A data.frame with columns `topic`, `rank`, `respondent` (the
@@ -609,9 +629,21 @@ extract_quotes <- function(model, text, n_quotes = 3L) {
 
   # findThoughts() takes `texts` aligned 1:1 with the model's own document
   # rows (fit-document order), which is exactly what respondent_map indexes
-  # into; `text` is indexed by original row, so re-index it into
-  # fit-document order first.
-  doc_texts <- as.character(text)[respondent_map]
+  # into; `text` is indexed by original row. A clean_text_responses()
+  # vector drops blank/missing rows, so its positions do NOT equal
+  # original row numbers once any earlier row was dropped (found in
+  # review_050: passing it as though it did silently attributed a quote
+  # to the wrong respondent). Its `respondent` attribute gives the true
+  # row-to-position map; a raw vector has none, so it is assumed to
+  # already be indexed 1:1 by row.
+  text_respondent <- attr(text, "respondent")
+  text <- as.character(text)
+  if (!is.null(text_respondent)) {
+    pos_of_row <- stats::setNames(seq_along(text_respondent), text_respondent)
+    doc_texts <- text[pos_of_row[as.character(respondent_map)]]
+  } else {
+    doc_texts <- text[respondent_map]
+  }
 
   ft <- stm::findThoughts(fit, texts = doc_texts, topics = seq_len(k), n = n_quotes)
 
