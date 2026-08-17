@@ -817,6 +817,8 @@ sframe_plot_for_result <- function(result, data, palette = c("web", "print")) {
     item_diagnostics    = function() sframe_plot_item_diagnostics(result, palette),
     term_freq           = function() sframe_plot_term_frequency(result, palette),
     co_occurrence       = function() sframe_plot_cooccurrence(result, palette),
+    topic_model_lda     = ,
+    stm_topics          = function() sframe_plot_topics(result, palette),
     NULL
   )
   if (is.null(builder)) return(NULL)
@@ -1966,3 +1968,47 @@ sframe_plot_variable_distribution <- function(data, variable, palette = c("web",
 
   list(histogram = histogram, boxplot = boxplot, qq = qq)
 }
+
+#' Topic-model top-terms plot: faceted bars, one facet per topic
+#'
+#' Serves both [sframe_run_topic_model_lda()] and [sframe_run_stm_topics()]
+#' results with no dispatch on `result$test`: both runners emit a `$table`
+#' with the same `topic`/`term`/`beta` columns (LDA's beta from
+#' `tidytext::tidy()`, STM's from its fitted word-topic distribution), so
+#' this function reads that shared shape directly.
+#'
+#' @param result A `topic_model_lda` or `stm_topics` result list from
+#'   [run_analysis_plan()].
+#' @param palette One of `"web"` or `"print"`. See `sframe_brand()`.
+#' @return A ggplot2 object, or `NULL` when the result carries no usable
+#'   table.
+#' @export
+#' @seealso [sframe_run_topic_model_lda()], [sframe_run_stm_topics()]
+sframe_plot_topics <- function(result, palette = c("web", "print")) {
+  rlang::check_installed("ggplot2", reason = "to plot topic terms.")
+  palette <- match.arg(palette)
+  tbl <- result$table
+  if (!is.data.frame(tbl) || nrow(tbl) == 0 ||
+      !all(c("topic", "term", "beta") %in% names(tbl))) {
+    return(NULL)
+  }
+  brand <- sframe_brand(palette)
+
+  plot_tbl <- do.call(rbind, lapply(split(tbl, tbl$topic), function(d) {
+    utils::head(d[order(-d$beta), , drop = FALSE], 10)
+  }))
+  plot_tbl$topic <- factor(paste("Topic", plot_tbl$topic),
+                            levels = paste("Topic", sort(unique(plot_tbl$topic))))
+  plot_tbl$term <- factor(plot_tbl$term,
+                           levels = rev(unique(plot_tbl$term[order(plot_tbl$beta)])))
+
+  p <- ggplot2::ggplot(plot_tbl, ggplot2::aes(x = .data$term, y = .data$beta)) +
+    ggplot2::geom_col(fill = brand$fill, colour = brand$ink, linewidth = 0.3, width = 0.72) +
+    ggplot2::coord_flip() +
+    ggplot2::facet_wrap(~ topic, scales = "free_y") +
+    ggplot2::labs(title = paste("Top terms per topic for", result$variable %||% ""),
+                  x = NULL, y = "Term probability") +
+    theme_surveyframe(palette = palette)
+  p
+}
+

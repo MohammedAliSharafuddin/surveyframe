@@ -307,3 +307,331 @@ sframe_run_co_occurrence <- function(data, roles, options, instrument) {
     prompt = "Review the strongest co-occurring term pairs for coherence with the research question."
   )
 }
+
+
+# ---------------------------------------------------------------------------
+# Topic models: LDA (topicmodels) and STM (stm)
+# ---------------------------------------------------------------------------
+#
+# Both runners emit a $table with the same 4 core columns (topic, term, beta,
+# rank), even though the 2 packages compute "beta" differently (LDA's is
+# tidytext::tidy()'s per-topic word probability; STM's is exp() of the
+# fitted content-covariate-free log word-topic distribution, fit$beta$logbeta,
+# which is a probability over the vocabulary in exactly the same sense). This
+# is deliberate: sframe_plot_topics() below reads that shared shape and needs
+# no result$test dispatch to serve both. STM's table additionally carries a
+# `proportion` column (mean per-document topic weight from fit$theta) since
+# that is part of the brief's requested STM table, but it is not needed by
+# the shared plot.
+#
+# The fitted model object ($fit$model) is runtime-only, exactly like every
+# other run_analysis_plan() result (see R/read_write_sframe.R's
+# sframe_restore_analysis_block(): only block *definitions* are persisted to
+# a .sframe file, never computed results). It is kept on the result list
+# only so extract_quotes() can read it back in the same R session; it must
+# never be copied into anything JSON-safe (jsonlite::toJSON(), a builder
+# payload, a hash target) and callers must not assume it survives a
+# save/reload round trip.
+
+# Guard shared by both topic-model runners: package plus minimum-response
+# checks, returning either NULL (fine to proceed) or an error string.
+.sframe_topic_model_guard <- function(cleaned, k, test) {
+  n_resp <- length(cleaned)
+  if (n_resp < .sframe_text_min_responses) {
+    return(sprintf(
+      "%s needs at least %d usable responses (found %d).",
+      test, .sframe_text_min_responses, n_resp
+    ))
+  }
+  NULL
+}
+
+#' Fit an LDA topic model on open-ended text
+#'
+#' Cleans the text item via [clean_text_responses()], tokenises with the
+#' package's shared internal tokeniser (reused rather than a second
+#' tidytext-based tokeniser, so LDA and `term_frequency()` can never
+#' drift on cleaning/stop-word rules), casts the token counts to a
+#' document-term matrix with `tidytext::cast_dtm()`, and fits
+#' `topicmodels::LDA()`.
+#'
+#' @param data A data.frame of responses.
+#' @param roles A list with `item`, the text/textarea item id.
+#' @param options A list; `k` (topic count, default `4L`), `seed` (default
+#'   `42L`), `stop_words` (passed through to the tokeniser).
+#' @param instrument Optional `sframe` instrument, passed to
+#'   [clean_text_responses()] for item-type validation.
+#'
+#' @return A runner-contract result list: `test = "topic_model_lda"`,
+#'   `table` (topic/term/beta/rank, top 10 terms per topic), `fit` (a
+#'   runtime-only list holding the LDA model object and the document-row-to-
+#'   respondent mapping needed by [extract_quotes()]), `apa`, `prompt`. On
+#'   failure: `list(test = "topic_model_lda", error = <message>)`.
+#' @keywords internal
+sframe_run_topic_model_lda <- function(data, roles, options, instrument) {
+  item_id <- sframe_role_values(roles, "item", "")[1]
+  err <- sframe_require_columns(data, item_id, "LDA topic model")
+  if (!is.null(err)) return(list(test = "topic_model_lda", error = err))
+
+  install_err <- tryCatch({
+    sframe_require_tidytext(reason = "to build the document-term matrix for LDA.")
+    sframe_require_topicmodels(reason = "to fit LDA topic models.")
+    NULL
+  }, error = function(e) conditionMessage(e))
+  if (!is.null(install_err)) return(list(test = "topic_model_lda", error = install_err))
+
+  k <- options$k %||% 4L
+  seed <- options$seed %||% 42L
+
+  cleaned <- clean_text_responses(data, item_id, instrument = instrument)
+  guard_err <- .sframe_topic_model_guard(cleaned, k, "LDA topic modelling")
+  if (!is.null(guard_err)) return(list(test = "topic_model_lda", error = guard_err))
+
+  toks <- .sframe_tokenise(cleaned, options$stop_words)
+  doc_ids <- rep(seq_along(toks), lengths(toks))
+  terms <- unlist(toks, use.names = FALSE)
+  if (!length(terms)) {
+    return(list(test = "topic_model_lda",
+                error = "No usable tokens remain after cleaning and stop-word removal."))
+  }
+  long <- as.data.frame(table(doc = doc_ids, term = terms), stringsAsFactors = FALSE)
+  names(long) <- c("doc", "term", "n")
+  long <- long[long$n > 0, , drop = FALSE]
+  long$doc <- as.integer(as.character(long$doc))
+
+  dtm <- tidytext::cast_dtm(long, doc, term, n)
+  if (nrow(dtm) < k) {
+    return(list(test = "topic_model_lda", error = sprintf(
+      "LDA needs at least k = %d documents with usable tokens (found %d).",
+      k, nrow(dtm)
+    )))
+  }
+
+  fit <- topicmodels::LDA(dtm, k = k, control = list(seed = seed))
+
+  beta_tbl <- tidytext::tidy(fit, matrix = "beta")
+  top_terms <- do.call(rbind, lapply(split(beta_tbl, beta_tbl$topic), function(d) {
+    d <- d[order(-d$beta), , drop = FALSE]
+    d <- utils::head(d, 10)
+    d$rank <- seq_len(nrow(d))
+    d
+  }))
+  top_terms <- top_terms[order(top_terms$topic, top_terms$rank),
+                          c("topic", "term", "beta", "rank")]
+  rownames(top_terms) <- NULL
+
+  # Row-to-respondent mapping: dtm rownames are the "doc" ids that survived
+  # tokenising/stop-word removal (as characters, so re-parsed to integer
+  # rather than trusted to sort numerically), indexing into
+  # clean_text_responses()'s own "respondent" attribute.
+  respondent_attr <- attr(cleaned, "respondent")
+  dtm_respondent <- respondent_attr[as.integer(rownames(dtm))]
+
+  topic1 <- top_terms[top_terms$topic == 1, , drop = FALSE]
+  topic1_terms <- utils::head(topic1$term, 5)
+
+  list(
+    test = "topic_model_lda",
+    variable = item_id,
+    n = nrow(dtm),
+    table = top_terms,
+    fit = list(
+      model = fit,                      # runtime-only, see file header note
+      dtm_respondent = dtm_respondent
+    ),
+    apa = sprintf(
+      "LDA topic model (k = %d, N = %d documents). Topic 1 top terms: %s.",
+      k, nrow(dtm), paste(topic1_terms, collapse = ", ")
+    ),
+    prompt = "Review topic coherence and label each topic from its top terms."
+  )
+}
+
+#' Fit a structural topic model (STM) on open-ended text
+#'
+#' Cleans the text item via [clean_text_responses()], tokenises with
+#' `tidytext::unnest_tokens()` (tidyeval column names via `rlang::sym()` and
+#' `!!`, not bare symbols; see the source comment at the tokenising step for
+#' why), casts to a document-term matrix, converts it to `stm`'s corpus
+#' format with `stm::readCorpus(type = "slam")` and `stm::prepDocuments()`,
+#' and fits `stm::stm()` after a fixed `set.seed()` (stm's own fit is not
+#' otherwise seed-stable).
+#'
+#' @inheritParams sframe_run_topic_model_lda
+#'
+#' @return A runner-contract result list: `test = "stm_topics"`, `table`
+#'   (topic/proportion/term/beta/rank; proportion is the topic's mean
+#'   document weight, beta its per-term probability, both from the fitted
+#'   `stm` object), `fit` (a runtime-only list holding the `stm` model
+#'   object and the document-to-respondent mapping needed by
+#'   [extract_quotes()]), `apa`, `prompt`. On failure:
+#'   `list(test = "stm_topics", error = <message>)`.
+#' @keywords internal
+sframe_run_stm_topics <- function(data, roles, options, instrument) {
+  item_id <- sframe_role_values(roles, "item", "")[1]
+  err <- sframe_require_columns(data, item_id, "STM topic model")
+  if (!is.null(err)) return(list(test = "stm_topics", error = err))
+
+  install_err <- tryCatch({
+    sframe_require_stm(reason = "to fit structural topic models.")
+    sframe_require_tidytext(reason = "to tokenise text for STM.")
+    NULL
+  }, error = function(e) conditionMessage(e))
+  if (!is.null(install_err)) return(list(test = "stm_topics", error = install_err))
+
+  k <- options$k %||% 3L
+  seed <- options$seed %||% 42L
+
+  cleaned <- clean_text_responses(data, item_id, instrument = instrument)
+  guard_err <- .sframe_topic_model_guard(cleaned, k, "STM topic modelling")
+  if (!is.null(guard_err)) return(list(test = "stm_topics", error = guard_err))
+
+  # Tokenising step, isolated and tested on its own (test-text-topics.R):
+  # tidytext::unnest_tokens() evaluates its column-name arguments (the
+  # output and input columns) with NSE. A bare symbol assembled from a
+  # variable inside a function (as.name("word") or similar) does not
+  # resolve the way a literal name typed at the call site does; the fix
+  # verified here is rlang::sym() to build the symbol and `!!` to splice it
+  # in, i.e. the standard tidyeval pattern, not unnest_tokens_() (superseded
+  # in current tidytext).
+  doc_df <- data.frame(.doc = seq_along(cleaned), .text = cleaned,
+                        stringsAsFactors = FALSE)
+  word_sym <- rlang::sym(".word")
+  text_sym <- rlang::sym(".text")
+  tokenised <- tidytext::unnest_tokens(doc_df, !!word_sym, !!text_sym)
+
+  stop_words <- options$stop_words
+  if (is.null(stop_words)) stop_words <- .sframe_text_stopwords_en
+  if (length(stop_words) > 0) {
+    tokenised <- tokenised[!(tokenised$.word %in% stop_words), , drop = FALSE]
+  }
+  if (nrow(tokenised) == 0) {
+    return(list(test = "stm_topics",
+                error = "No usable tokens remain after cleaning and stop-word removal."))
+  }
+
+  counts <- as.data.frame(table(doc = tokenised$.doc, term = tokenised$.word),
+                           stringsAsFactors = FALSE)
+  names(counts) <- c("doc", "term", "n")
+  counts <- counts[counts$n > 0, , drop = FALSE]
+  counts$doc <- as.integer(as.character(counts$doc))
+
+  dtm <- tidytext::cast_dtm(counts, doc, term, n)
+  respondent_attr <- attr(cleaned, "respondent")
+  dtm_respondent <- respondent_attr[as.integer(rownames(dtm))]
+
+  corp <- stm::readCorpus(dtm, type = "slam")
+  prepped <- stm::prepDocuments(corp$documents, corp$vocab, verbose = FALSE)
+  # prepDocuments() can drop documents left empty after its own vocabulary
+  # trimming; drop the same rows from the respondent map so it stays
+  # aligned 1:1 with prepped$documents (and, in turn, with the fitted
+  # model's per-document rows).
+  if (!is.null(prepped$docs.removed) && length(prepped$docs.removed) > 0) {
+    dtm_respondent <- dtm_respondent[-prepped$docs.removed]
+  }
+
+  if (length(prepped$documents) < k) {
+    return(list(test = "stm_topics", error = sprintf(
+      "STM needs at least k = %d documents with usable tokens (found %d).",
+      k, length(prepped$documents)
+    )))
+  }
+
+  set.seed(seed)
+  fit <- stm::stm(prepped$documents, prepped$vocab, K = k, verbose = FALSE)
+
+  proportions <- colMeans(fit$theta)
+  beta_mat <- exp(fit$beta$logbeta[[1]])  # K x V probabilities, no content covariate
+  vocab <- prepped$vocab
+  top_terms <- do.call(rbind, lapply(seq_len(k), function(topic_i) {
+    ord <- order(-beta_mat[topic_i, ])
+    top <- utils::head(ord, 10)
+    data.frame(
+      topic = topic_i,
+      proportion = round(proportions[topic_i], 4),
+      term = vocab[top],
+      beta = beta_mat[topic_i, top],
+      rank = seq_along(top),
+      stringsAsFactors = FALSE
+    )
+  }))
+  rownames(top_terms) <- NULL
+
+  list(
+    test = "stm_topics",
+    variable = item_id,
+    n = length(prepped$documents),
+    table = top_terms,
+    fit = list(
+      model = fit,                   # runtime-only, see file header note
+      respondent = dtm_respondent
+    ),
+    apa = sprintf("STM topic model (k = %d, N = %d documents).",
+                  k, length(prepped$documents)),
+    prompt = "Review topic coherence and proportions, and label each topic from its top terms."
+  )
+}
+
+#' Extract representative quotes for each STM topic
+#'
+#' Takes the result of [sframe_run_stm_topics()] (not a raw `stm` model
+#' object) and, for each topic, pulls the top `n_quotes` documents by
+#' topic-document probability using `stm::findThoughts()`, then maps each
+#' one back to its original respondent row via the mapping
+#' [sframe_run_stm_topics()] stored on `result$fit`.
+#'
+#' @param model A `stm_topics` result list from [sframe_run_stm_topics()]
+#'   (i.e. `result`, not `result$fit` and not the raw `stm` object).
+#' @param text The response vector the topic model was fit on, indexed by
+#'   *original* row/respondent. Either the raw or [clean_text_responses()]-
+#'   cleaned vector works, since both are indexed the same way; only the
+#'   text actually quoted differs (cleaned text is lower-cased and stripped
+#'   of punctuation).
+#' @param n_quotes Integer. Quotes to return per topic. Default `3L`.
+#'
+#' @return A data.frame with columns `topic`, `rank`, `respondent` (the
+#'   original row index in the data the model's `text` argument came from,
+#'   not a document-matrix or corpus row index), and `quote`.
+#' @export
+extract_quotes <- function(model, text, n_quotes = 3L) {
+  sframe_require_stm(reason = "to extract representative quotes.")
+  if (!is.list(model) || is.null(model$fit) || is.null(model$fit$model) ||
+      is.null(model$fit$respondent)) {
+    rlang::abort(
+      paste0("`model` must be a stm_topics result list from sframe_run_stm_topics(), ",
+             "carrying $fit$model and $fit$respondent."),
+      class = "sframe_error"
+    )
+  }
+  fit <- model$fit$model
+  respondent_map <- model$fit$respondent
+  k <- fit$settings$dim$K
+
+  # findThoughts() takes `texts` aligned 1:1 with the model's own document
+  # rows (fit-document order), which is exactly what respondent_map indexes
+  # into; `text` is indexed by original row, so re-index it into
+  # fit-document order first.
+  doc_texts <- as.character(text)[respondent_map]
+
+  ft <- stm::findThoughts(fit, texts = doc_texts, topics = seq_len(k), n = n_quotes)
+
+  rows <- lapply(seq_len(k), function(topic_i) {
+    idx <- ft$index[[topic_i]]
+    if (!length(idx)) return(NULL)
+    data.frame(
+      topic = topic_i,
+      rank = seq_along(idx),
+      respondent = respondent_map[idx],
+      quote = doc_texts[idx],
+      stringsAsFactors = FALSE
+    )
+  })
+  rows <- Filter(Negate(is.null), rows)
+  out <- if (length(rows)) do.call(rbind, rows) else {
+    data.frame(topic = integer(0), rank = integer(0),
+               respondent = integer(0), quote = character(0),
+               stringsAsFactors = FALSE)
+  }
+  rownames(out) <- NULL
+  out
+}
