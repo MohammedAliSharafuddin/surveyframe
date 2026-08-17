@@ -816,3 +816,173 @@ sframe_run_term_context <- function(data, roles, options, instrument) {
     prompt = "Read the surrounding context of each match for coherence with the research question."
   )
 }
+
+
+# ---------------------------------------------------------------------------
+# Co-occurrence network (method id `co_occurrence_network`, todo_0.5.md)
+# ---------------------------------------------------------------------------
+
+# Pairwise within-response co-occurrence edge list over the top-N terms by
+# frequency. Named and shaped to match the `.sframe_cooccurrence(text, top_n,
+# stop_words)` contract Agent 2 is landing in a separate worktree (long
+# data.frame term_a, term_b, n; term_a < term_b; n > 0 only) so the lead can
+# de-duplicate the two implementations at merge time. This copy is
+# self-contained (no dependency on Agent 2's function, which cannot be
+# present in an isolated worktree) and additionally returns the
+# term_frequency() table it computed the top terms from, so the runner below
+# does not have to tokenise/rank twice.
+#
+# For every response, for every unordered pair of distinct top-terms both
+# present in that response, the pair count is incremented exactly once per
+# qualifying response, regardless of how many times either term repeats
+# within that response.
+.sframe_cooccurrence_edges <- function(text, top_n = 20L, stop_words = NULL) {
+  freq <- term_frequency(text, stop_words = stop_words, top_n = top_n)
+  empty_edges <- data.frame(term_a = character(0), term_b = character(0),
+                             n = integer(0), stringsAsFactors = FALSE)
+  top_terms <- freq$term
+  if (!length(top_terms)) return(list(edges = empty_edges, freq = freq))
+
+  toks_list <- .sframe_tokenise(text, stop_words = stop_words)
+  pair_counts <- new.env(parent = emptyenv())
+  for (toks in toks_list) {
+    present <- unique(toks[toks %in% top_terms])
+    n_present <- length(present)
+    if (n_present < 2) next
+    present <- sort(present)
+    for (i in seq_len(n_present - 1L)) {
+      for (j in seq.int(i + 1L, n_present)) {
+        key <- paste(present[i], present[j], sep = "\001")
+        pair_counts[[key]] <- (pair_counts[[key]] %||% 0L) + 1L
+      }
+    }
+  }
+
+  keys <- ls(pair_counts)
+  if (!length(keys)) return(list(edges = empty_edges, freq = freq))
+  parts <- strsplit(keys, "\001", fixed = TRUE)
+  edges <- data.frame(
+    term_a = vapply(parts, `[[`, character(1), 1),
+    term_b = vapply(parts, `[[`, character(1), 2),
+    n = as.integer(unlist(mget(keys, envir = pair_counts), use.names = FALSE)),
+    stringsAsFactors = FALSE
+  )
+  edges <- edges[edges$n > 0, , drop = FALSE]
+  edges <- edges[order(edges$term_a, edges$term_b), ]
+  rownames(edges) <- NULL
+  list(edges = edges, freq = freq)
+}
+
+# Minimum edge-content guard for the co-occurrence network: below this the
+# network has too little structure to interpret (a handful of isolated
+# points, or one giant undifferentiated blob). Separate from, and applied
+# in addition to, .sframe_text_min_responses above, which guards the raw
+# response count rather than the resulting graph's content.
+.sframe_cooccurrence_min_terms <- 5L
+
+# Runner contract wrapper around the co-occurrence network build: $table
+# (one row per node: term, frequency, cluster, x, y), $edges (term_a,
+# term_b, n), apa, prompt. `roles$item` names the text/textarea item;
+# `options$top_n` (default 20L), `options$seed` (default 42L), and
+# `options$stop_words` as in term_frequency(). Requires the optional
+# igraph package (sframe_require_igraph()).
+#
+# Edges are detected via igraph::cluster_louvain() and the layout is
+# computed with the Fruchterman-Reingold force-directed algorithm
+# (igraph::layout_with_fr()). Both clustering and layout draw on R's
+# random number stream, so both are re-seeded from `options$seed`
+# immediately before each call, independently, rather than once at the
+# top of the function: this keeps the result reproducible across
+# repeated calls even if a future change alters how many other random
+# draws happen in between. The igraph graph object is not kept anywhere
+# in the return value; the result carries only plain data.frames.
+sframe_run_cooccurrence_network <- function(data, roles, options, instrument) {
+  sframe_require_igraph("to build the term co-occurrence network for `co_occurrence_network`.")
+
+  item_id <- sframe_role_values(roles, "item", "")[1]
+  err <- sframe_require_columns(data, item_id, "Co-occurrence network")
+  if (!is.null(err)) return(list(test = "co_occurrence_network", error = err))
+
+  top_n <- options$top_n %||% 20L
+  seed  <- options$seed %||% 42L
+
+  cleaned <- clean_text_responses(data, item_id, instrument = instrument)
+  n_resp <- length(cleaned)
+  if (n_resp < .sframe_text_min_responses) {
+    return(list(
+      test = "co_occurrence_network",
+      error = sprintf(
+        "Co-occurrence network needs at least %d usable responses (found %d).",
+        .sframe_text_min_responses, n_resp
+      )
+    ))
+  }
+
+  built <- .sframe_cooccurrence_edges(cleaned, top_n = top_n, stop_words = options$stop_words)
+  edges <- built$edges
+  freq  <- built$freq
+
+  terms_with_edges <- if (nrow(edges) > 0) unique(c(edges$term_a, edges$term_b)) else character(0)
+  if (length(terms_with_edges) < .sframe_cooccurrence_min_terms || nrow(edges) < 1L) {
+    return(list(
+      test = "co_occurrence_network",
+      error = sprintf(
+        paste0(
+          "Co-occurrence network needs at least %d distinct terms with at ",
+          "least 1 co-occurrence edge between them (found %d terms, %d edges)."
+        ),
+        .sframe_cooccurrence_min_terms, length(terms_with_edges), nrow(edges)
+      )
+    ))
+  }
+
+  g <- igraph::graph_from_data_frame(edges[c("term_a", "term_b", "n")], directed = FALSE)
+  igraph::E(g)$weight <- edges$n
+
+  # Reseed immediately before each RNG-drawing call, not once at the top:
+  # see the roxygen note above.
+  set.seed(seed)
+  comm <- igraph::cluster_louvain(g, weights = igraph::E(g)$weight)
+
+  set.seed(seed)
+  layout <- igraph::layout_with_fr(g, weights = igraph::E(g)$weight)
+
+  node_names  <- igraph::V(g)$name
+  membership  <- igraph::membership(comm)
+  freq_lookup <- stats::setNames(freq$n, freq$term)
+
+  table <- data.frame(
+    term      = node_names,
+    frequency = as.integer(freq_lookup[node_names]),
+    cluster   = as.integer(membership[node_names]),
+    x         = layout[, 1],
+    y         = layout[, 2],
+    stringsAsFactors = FALSE
+  )
+
+  modularity <- igraph::modularity(comm)
+  n_clusters <- length(unique(table$cluster))
+
+  # The igraph graph object `g` and community object `comm` are deliberately
+  # not attached to the result at all (unlike the LDA/STM runners elsewhere
+  # in this release, which keep a model object): only plain data.frames
+  # (`table`, `edges`) leave this function.
+  list(
+    test = "co_occurrence_network",
+    variable = item_id,
+    n = n_resp,
+    table = table,
+    edges = edges,
+    apa = sprintf(
+      paste0(
+        "Term co-occurrence network for %s (N = %d responses, %d terms, ",
+        "%d edges, %d clusters, modularity = %.2f)."
+      ),
+      item_id, n_resp, nrow(table), nrow(edges), n_clusters, modularity
+    ),
+    prompt = paste(
+      "Inspect each cluster for thematic coherence and note any",
+      "high-frequency terms that bridge two clusters."
+    )
+  )
+}

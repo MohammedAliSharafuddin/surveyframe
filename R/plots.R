@@ -851,6 +851,7 @@ sframe_plot_for_result <- function(result, data, palette = c("web", "print")) {
     topic_model_lda     = ,
     stm_topics          = function() sframe_plot_topics(result, palette),
     ngram_freq          = function() sframe_plot_ngram_frequency(result, palette),
+    co_occurrence_network = function() sframe_plot_cooccurrence_network(result, palette),
     NULL
   )
   if (is.null(builder)) return(NULL)
@@ -2042,5 +2043,144 @@ sframe_plot_topics <- function(result, palette = c("web", "print")) {
                   x = NULL, y = "Term probability") +
     theme_surveyframe(palette = palette)
   p
+}
+
+
+# Fixed 8-slot categorical palette for cluster identity in the co-occurrence
+# network plot, plus a 9th "Other" grey bucket for a 9th-or-later cluster.
+# Deliberately NOT sframe_series_colours()/sframe_series_fill_colours():
+# those interpolate a colour ramp past their fixed 5-colour set, which is
+# exactly the "hue-cycling" the dataviz skill says not to do for a
+# categorical channel. Per the dataviz skill's colour-formula guidance,
+# more series than the fixed hue count should fold into an explicit "Other"
+# bucket rather than generate a new, unvalidated hue.
+#
+# The `web` 8 hues are the dataviz skill's own documented default
+# categorical palette (references/palette.md, light-mode column), already
+# validated there: all 8 pass the *adjacent*-pair CVD/contrast gates used
+# for bar/stack/line charts. This network plot draws points, an *all-pairs*
+# form (any two nodes can sit side by side), where the same reference
+# documents that no ordering of the full eight clears the all-pairs floor
+# past the first three slots; a true all-pairs-safe cap would be 3, not 8.
+# The brief for this method id fixes the boundary at 8 explicitly, so that
+# is what is implemented and tested here; the shortfall past slot 3 is
+# mitigated, not eliminated, by three secondary encodings already in the
+# plot (point size = term frequency, edges = topology, and the legend/table
+# = text) rather than colour alone carrying cluster identity. Flagged for
+# the lead rather than silently narrowed to 3.
+.sframe_cluster_palette <- function(n_clusters, palette = c("web", "print")) {
+  palette <- match.arg(palette)
+  hues <- if (palette == "web") {
+    c("#2a78d6", "#eb6834", "#1baf7a", "#eda100",
+      "#e87ba4", "#008300", "#4a3aa7", "#e34948")
+  } else {
+    # Print: an 8-step black-to-light grey ramp, consistent with
+    # sframe_brand("print")'s existing achromatic convention for series.
+    c("#141414", "#333333", "#4d4d4d", "#666666",
+      "#808080", "#999999", "#b3b3b3", "#cccccc")
+  }
+  other <- if (palette == "web") "#8a8a86" else "#a6a6a6"
+  n_clusters <- max(1L, as.integer(n_clusters))
+  if (n_clusters <= length(hues)) {
+    out <- hues[seq_len(n_clusters)]
+    names(out) <- as.character(seq_len(n_clusters))
+    return(out)
+  }
+  out <- c(hues, other)
+  names(out) <- c(as.character(seq_along(hues)), "Other")
+  out
+}
+
+#' Term co-occurrence network plot
+#'
+#' Plots a `co_occurrence_network` result's node table (`term`, `frequency`,
+#' `cluster`, `x`, `y`) as a network diagram: edges (from `result$edges`) as
+#' line segments underneath, nodes as points sized by term frequency and
+#' coloured by Louvain cluster, with term labels on the larger points only.
+#' Labelling every point on a dense network risks overlap chaos, so only
+#' the top 15 nodes by frequency are labelled; the full term list stays
+#' available in `result$table`.
+#'
+#' Clusters beyond the first 8 (ranked largest first) are folded into a
+#' single "Other" bucket rather than cycling or interpolating a new hue,
+#' per the dataviz skill's categorical-colour guidance; see
+#' `.sframe_cluster_palette()`.
+#'
+#' @param result A `co_occurrence_network` result list from
+#'   [run_analysis_plan()], carrying `table` and `edges`.
+#' @param palette One of `"web"` or `"print"`. See `sframe_brand()`.
+#' @return A ggplot2 object, or `NULL` when the result carries no table.
+#' @export
+#' @seealso [run_analysis_plan()]
+sframe_plot_cooccurrence_network <- function(result, palette = c("web", "print")) {
+  rlang::check_installed("ggplot2", reason = "to plot the co-occurrence network.")
+  palette <- match.arg(palette)
+  tbl <- result$table
+  if (!is.data.frame(tbl) || nrow(tbl) == 0 || !all(c("term", "x", "y", "cluster") %in% names(tbl))) {
+    return(NULL)
+  }
+  brand <- sframe_brand(palette)
+  edges <- result$edges
+  has_edges <- is.data.frame(edges) && nrow(edges) > 0 &&
+    all(c("term_a", "term_b") %in% names(edges))
+
+  # Rank clusters largest-first (by member count) and fold anything past
+  # rank 8 into "Other", so the palette above is never asked for more than
+  # 8 real hues.
+  sizes <- sort(table(tbl$cluster), decreasing = TRUE)
+  rank_of <- stats::setNames(seq_along(sizes), names(sizes))
+  n_clusters <- length(sizes)
+  tbl$cluster_rank <- as.integer(rank_of[as.character(tbl$cluster)])
+  tbl$cluster_label <- if (n_clusters > 8) {
+    ifelse(tbl$cluster_rank <= 8, as.character(tbl$cluster_rank), "Other")
+  } else {
+    as.character(tbl$cluster_rank)
+  }
+  pal <- .sframe_cluster_palette(n_clusters, palette)
+  level_order <- if (n_clusters > 8) c(as.character(1:8), "Other") else as.character(seq_len(n_clusters))
+  level_order <- level_order[level_order %in% unique(tbl$cluster_label)]
+  tbl$cluster_label <- factor(tbl$cluster_label, levels = level_order)
+
+  p <- ggplot2::ggplot()
+
+  if (has_edges) {
+    edge_xy <- merge(edges, tbl[c("term", "x", "y")], by.x = "term_a", by.y = "term")
+    edge_xy <- merge(edge_xy, tbl[c("term", "x", "y")], by.x = "term_b", by.y = "term",
+                      suffixes = c("_a", "_b"))
+    p <- p + ggplot2::geom_segment(
+      data = edge_xy,
+      ggplot2::aes(x = .data$x_a, y = .data$y_a, xend = .data$x_b, yend = .data$y_b),
+      colour = brand$grid, linewidth = 0.4, alpha = 0.7
+    )
+  }
+
+  p <- p +
+    ggplot2::geom_point(
+      data = tbl,
+      ggplot2::aes(x = .data$x, y = .data$y, size = .data$frequency,
+                   colour = .data$cluster_label)
+    ) +
+    ggplot2::scale_size(range = c(2, 10), guide = "none") +
+    ggplot2::scale_colour_manual(values = pal, name = "Cluster", drop = TRUE)
+
+  # Label only the top 15 nodes by frequency: a legible plot without labels
+  # on every node beats an unreadable one with them, and the full term list
+  # is already in result$table for anyone who wants it.
+  label_tbl <- utils::head(tbl[order(-tbl$frequency), , drop = FALSE], 15)
+  p <- p + ggplot2::geom_text(
+    data = label_tbl,
+    ggplot2::aes(x = .data$x, y = .data$y, label = .data$term),
+    colour = brand$ink, size = 3, vjust = -1, fontface = "bold"
+  )
+
+  p +
+    ggplot2::labs(title = paste("Term co-occurrence network for", result$variable %||% ""),
+                  x = NULL, y = NULL) +
+    theme_surveyframe(palette = palette) +
+    ggplot2::theme(
+      axis.text = ggplot2::element_blank(),
+      axis.ticks = ggplot2::element_blank(),
+      panel.grid = ggplot2::element_blank()
+    )
 }
 

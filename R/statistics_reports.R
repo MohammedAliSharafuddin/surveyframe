@@ -124,6 +124,7 @@ sframe_analysis_roles <- function(block) {
     stm_topics = list(item = vars[1]),
     ngram_freq = list(item = vars[1]),
     term_context = list(item = vars[1]),
+    co_occurrence_network = list(item = vars[1]),
     list(variables = vars)
   )
 }
