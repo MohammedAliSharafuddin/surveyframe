@@ -726,6 +726,14 @@ analysis_registry <- local({
       assumptions = "At least 10 usable responses",
       output = "Top terms by frequency, optionally split by a group variable, and a bar chart or word cloud.",
       refs = character(0)
+    ),
+    co_occurrence = list(
+      family = "text", label = "Co-occurrence",
+      roles = list(role("item", "Text item", levels = "text")),
+      show_alpha = FALSE, show_hypotheses = FALSE, show_effect_size = FALSE,
+      assumptions = c("At least 10 usable responses", "At least 1 co-occurring term pair"),
+      output = "Pairwise within-response co-occurrence counts on the top terms, and a heatmap.",
+      refs = character(0)
     )
   )
 })

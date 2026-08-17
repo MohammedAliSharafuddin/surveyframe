@@ -1286,6 +1286,7 @@ sframe_run_one_block <- function(block, data, instrument, plots = FALSE,
       moderation = sframe_run_moderation(data, roles),
       mediation = sframe_run_mediation(data, roles, options),
       term_freq = sframe_run_term_freq(data, roles, options, instrument),
+      co_occurrence = sframe_run_co_occurrence(data, roles, options, instrument),
       list(test = test, error = paste0("Test '", test, "' is unavailable."))
     )
   }, error = function(e) {

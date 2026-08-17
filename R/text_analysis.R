@@ -228,3 +228,82 @@ sframe_run_term_freq <- function(data, roles, options, instrument) {
     prompt = "Compare the leading terms across groups for coherence with the research question."
   )
 }
+
+# Pairwise within-response term co-occurrence on the top `top_n` terms
+# (ranked the same way term_frequency() ranks them, so the 2 outputs agree
+# on which terms matter). For every response, every unordered pair of
+# distinct top terms both present in that response's token set counts once,
+# regardless of how many times either token repeats within the response.
+#
+# @return A data.frame with columns `term_a`, `term_b`, `n`, one row per
+#   pair with n > 0, sorted by n descending, term_a < term_b alphabetically.
+.sframe_cooccurrence <- function(text, top_n = 20L, stop_words = NULL) {
+  toks_by_resp <- .sframe_tokenise(text, stop_words)
+  top <- term_frequency(text, stop_words = stop_words, top_n = top_n)
+  if (nrow(top) < 2) {
+    return(data.frame(term_a = character(0), term_b = character(0),
+                       n = integer(0), stringsAsFactors = FALSE))
+  }
+  top_terms <- top$term
+  pair_counts <- new.env(parent = emptyenv())
+  for (toks in toks_by_resp) {
+    present <- unique(toks[toks %in% top_terms])
+    if (length(present) < 2) next
+    pairs <- utils::combn(sort(present), 2, simplify = FALSE)
+    for (p in pairs) {
+      key <- paste(p[1], p[2], sep = "")
+      pair_counts[[key]] <- (pair_counts[[key]] %||% 0L) + 1L
+    }
+  }
+  keys <- ls(pair_counts)
+  if (!length(keys)) {
+    return(data.frame(term_a = character(0), term_b = character(0),
+                       n = integer(0), stringsAsFactors = FALSE))
+  }
+  parts <- strsplit(keys, "", fixed = TRUE)
+  out <- data.frame(
+    term_a = vapply(parts, `[[`, character(1), 1),
+    term_b = vapply(parts, `[[`, character(1), 2),
+    n = as.integer(unlist(mget(keys, envir = pair_counts), use.names = FALSE)),
+    stringsAsFactors = FALSE, row.names = NULL
+  )
+  out <- out[order(-out$n, out$term_a, out$term_b), ]
+  row.names(out) <- NULL
+  out
+}
+
+# Runner contract wrapper around .sframe_cooccurrence(): $table, apa
+# (n_responses and n_pairs), prompt. `roles$item` names the text/textarea
+# item; `options$top_n` (default 20L) sets how many top terms co-occurrence
+# is computed over. No group role for this id.
+sframe_run_co_occurrence <- function(data, roles, options, instrument) {
+  item_id <- sframe_role_values(roles, "item", "")[1]
+  err <- sframe_require_columns(data, item_id, "Co-occurrence")
+  if (!is.null(err)) return(list(test = "co_occurrence", error = err))
+  top_n <- options$top_n %||% 20L
+
+  cleaned <- clean_text_responses(data, item_id, instrument = instrument)
+  n_resp <- length(cleaned)
+  if (n_resp < .sframe_text_min_responses) {
+    return(list(
+      test = "co_occurrence",
+      error = sprintf(
+        "Co-occurrence needs at least %d usable responses (found %d).",
+        .sframe_text_min_responses, n_resp
+      )
+    ))
+  }
+
+  edges <- .sframe_cooccurrence(cleaned, top_n = top_n, stop_words = options$stop_words)
+  if (nrow(edges) == 0) {
+    return(list(test = "co_occurrence", error = "No co-occurring term pairs found."))
+  }
+
+  list(
+    test = "co_occurrence", variable = item_id,
+    n = n_resp, table = edges,
+    apa = sprintf("Term co-occurrence for %s (N = %d responses, %d co-occurring pairs).",
+                  item_id, n_resp, nrow(edges)),
+    prompt = "Review the strongest co-occurring term pairs for coherence with the research question."
+  )
+}
