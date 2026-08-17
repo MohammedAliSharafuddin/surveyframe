@@ -1289,6 +1289,8 @@ sframe_run_one_block <- function(block, data, instrument, plots = FALSE,
       co_occurrence = sframe_run_co_occurrence(data, roles, options, instrument),
       topic_model_lda = sframe_run_topic_model_lda(data, roles, options, instrument),
       stm_topics = sframe_run_stm_topics(data, roles, options, instrument),
+      ngram_freq = sframe_run_ngram_freq(data, roles, options, instrument),
+      term_context = sframe_run_term_context(data, roles, options, instrument),
       list(test = test, error = paste0("Test '", test, "' is unavailable."))
     )
   }, error = function(e) {

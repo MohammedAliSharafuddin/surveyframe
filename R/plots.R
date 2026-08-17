@@ -240,6 +240,16 @@ sframe_plot_term_frequency <- function(result, palette = c("web", "print")) {
     )
   }
 
+  .sframe_plot_term_bar(tbl, title = paste("Top terms for", result$variable %||% ""),
+                        palette = palette, brand = brand, grouped = grouped)
+}
+
+# Shared horizontal-bar builder behind sframe_plot_term_frequency() (the
+# non-word-cloud path) and sframe_plot_ngram_frequency(): top-20-per-group
+# term bars, term/n-gram terms ordered by frequency, with optional group
+# faceting. `tbl` needs `term` and `n` columns and, when `grouped` is `TRUE`,
+# a `group` column.
+.sframe_plot_term_bar <- function(tbl, title, palette, brand, grouped = FALSE) {
   bar_tbl <- if (grouped) tbl else within(tbl, group <- "all")
   bar_tbl <- do.call(rbind, lapply(split(bar_tbl, bar_tbl$group), function(d) {
     utils::head(d[order(-d$n), , drop = FALSE], 20)
@@ -248,11 +258,32 @@ sframe_plot_term_frequency <- function(result, palette = c("web", "print")) {
   p <- ggplot2::ggplot(bar_tbl, ggplot2::aes(x = .data$term, y = .data$n)) +
     ggplot2::geom_col(fill = brand$fill, colour = brand$ink, linewidth = 0.3, width = 0.72) +
     ggplot2::coord_flip() +
-    ggplot2::labs(title = paste("Top terms for", result$variable %||% ""),
-                  x = NULL, y = "Frequency") +
+    ggplot2::labs(title = title, x = NULL, y = "Frequency") +
     theme_surveyframe(palette = palette)
   if (grouped) p <- p + ggplot2::facet_wrap(~ group, scales = "free_y")
   p
+}
+
+#' N-gram-frequency plot: horizontal bar
+#'
+#' Top 20 n-grams from an `ngram_freq` result as a horizontal bar chart.
+#' Shares its bar-building logic with [sframe_plot_term_frequency()]'s bar
+#' path via the internal `.sframe_plot_term_bar()` helper; unlike that
+#' function, there is no word-cloud mode and no group faceting for this id.
+#'
+#' @param result An `ngram_freq` result list from [run_analysis_plan()].
+#' @param palette One of `"web"` or `"print"`. See `sframe_brand()`.
+#' @return A ggplot2 object, or `NULL` when the result carries no table.
+#' @export
+#' @seealso [run_analysis_plan()], [ngram_frequency()]
+sframe_plot_ngram_frequency <- function(result, palette = c("web", "print")) {
+  rlang::check_installed("ggplot2", reason = "to plot n-gram frequency.")
+  palette <- match.arg(palette)
+  tbl <- result$table
+  if (!is.data.frame(tbl) || nrow(tbl) == 0 || !"term" %in% names(tbl)) return(NULL)
+  brand <- sframe_brand(palette)
+  .sframe_plot_term_bar(tbl, title = paste("Top n-grams for", result$variable %||% ""),
+                        palette = palette, brand = brand, grouped = FALSE)
 }
 
 #' Term co-occurrence heatmap
@@ -819,6 +850,7 @@ sframe_plot_for_result <- function(result, data, palette = c("web", "print")) {
     co_occurrence       = function() sframe_plot_cooccurrence(result, palette),
     topic_model_lda     = ,
     stm_topics          = function() sframe_plot_topics(result, palette),
+    ngram_freq          = function() sframe_plot_ngram_frequency(result, palette),
     NULL
   )
   if (is.null(builder)) return(NULL)
