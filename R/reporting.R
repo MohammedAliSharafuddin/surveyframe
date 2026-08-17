@@ -779,6 +779,15 @@ sframe_clean_interpretations <- function(interpretations) {
       syntax_html <- if (!is.null(result$syntax)) {
         sprintf("<pre><code>%s</code></pre>", htmltools_escape(result$syntax))
       } else ""
+      # extract_quotes() attaches $quotes (topic, rank, respondent, quote) to
+      # a topic-model result: a second, separate table alongside the main
+      # $table rather than a substitute for it, so it renders through the
+      # same generic table builder under its own heading (todo_0.5.md's
+      # ground-truth note: mirror the $syntax pattern, don't build a new
+      # render_text_section()).
+      quotes_html <- if (is.data.frame(result$quotes) && nrow(result$quotes) > 0) {
+        .render_report_table(result$quotes, "Representative quotes")
+      } else ""
       paste(
         c(
           "<div class=\"rq-block\">",
@@ -789,6 +798,7 @@ sframe_clean_interpretations <- function(interpretations) {
           table_html,
           plot_html,
           syntax_html,
+          quotes_html,
           if (nzchar(extra)) extra,
           "</div>"
         ),

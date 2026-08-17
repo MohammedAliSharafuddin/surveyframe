@@ -116,6 +116,17 @@ sframe_analysis_roles <- function(block) {
     ahp = list(pairwise = vars[1]),
     anp = list(pairwise = vars[1]),
     dematel = list(pairwise = vars[1]),
+    # Text family (todo_0.5.md). `group` (section 1a) is optional so a bare
+    # 2-element variable list still resolves without one.
+    term_freq = list(item = vars[1], group = vars[2]),
+    co_occurrence = list(item = vars[1]),
+    topic_model_lda = list(item = vars[1]),
+    stm_topics = list(item = vars[1]),
+    ngram_freq = list(item = vars[1]),
+    term_context = list(item = vars[1]),
+    co_occurrence_network = list(item = vars[1]),
+    tidy_sentiment = list(item = vars[1], group = vars[2]),
+    quanteda_dfm = list(item = vars[1]),
     list(variables = vars)
   )
 }

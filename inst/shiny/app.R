@@ -715,6 +715,71 @@ analysis_registry <- local({
       assumptions = "Directed 0-4 influence matrix",
       output = "Cause-effect table (prominence, relation, role) and influence map.",
       refs = character(0)
+    ),
+    term_freq = list(
+      family = "text", label = "Term frequency",
+      roles = list(
+        role("item", "Text item", levels = "text"),
+        role("group", "Group by", min = 0, max = 1, levels = c("nominal", "ordinal"))
+      ),
+      show_alpha = FALSE, show_hypotheses = FALSE, show_effect_size = FALSE,
+      assumptions = "At least 10 usable responses",
+      output = "Top terms by frequency, optionally split by a group variable, and a bar chart or word cloud.",
+      refs = character(0)
+    ),
+    co_occurrence = list(
+      family = "text", label = "Co-occurrence",
+      roles = list(role("item", "Text item", levels = "text")),
+      show_alpha = FALSE, show_hypotheses = FALSE, show_effect_size = FALSE,
+      assumptions = c("At least 10 usable responses", "At least 1 co-occurring term pair"),
+      output = "Pairwise within-response co-occurrence counts on the top terms, and a heatmap.",
+      refs = character(0)
+    ),
+    ngram_freq = list(
+      family = "text", label = "N-gram frequency",
+      roles = list(role("item", "Text item", levels = "text")),
+      show_alpha = FALSE, show_hypotheses = FALSE, show_effect_size = FALSE,
+      assumptions = "At least 10 usable responses",
+      output = "Top bigrams or trigrams by frequency, and a bar chart.",
+      refs = character(0)
+    ),
+    term_context = list(
+      family = "text", label = "Keyword in context",
+      roles = list(role("item", "Text item", levels = "text")),
+      show_alpha = FALSE, show_hypotheses = FALSE, show_effect_size = FALSE,
+      assumptions = c("At least 10 usable responses",
+                      "Set the keyword via options.term after creating this research question"),
+      output = "A keyword-in-context concordance table (before/match/after) for a chosen term.",
+      refs = character(0)
+    ),
+    co_occurrence_network = list(
+      family = "text", label = "Co-occurrence network",
+      roles = list(role("item", "Text item", levels = "text")),
+      show_alpha = FALSE, show_hypotheses = FALSE, show_effect_size = FALSE,
+      assumptions = c("At least 10 usable responses",
+                      "At least 5 distinct terms with 1 co-occurrence edge",
+                      "Requires the optional igraph package"),
+      output = "A Louvain-clustered, force-directed term co-occurrence network (node table plus edge list).",
+      refs = c("blondel_2008", "fruchterman_1991")
+    ),
+    tidy_sentiment = list(
+      family = "text", label = "Sentiment",
+      roles = list(
+        role("item", "Text item", levels = "text"),
+        role("group", "Group by", min = 0, max = 1, levels = c("nominal", "ordinal"))
+      ),
+      show_alpha = FALSE, show_hypotheses = FALSE, show_effect_size = FALSE,
+      assumptions = c("At least 10 usable responses", "Requires the optional tidytext package"),
+      output = "Positive/negative sentiment counts and proportion positive (bing lexicon), optionally split by a group variable, and a diverging bar chart.",
+      refs = character(0)
+    ),
+    quanteda_dfm = list(
+      family = "text", label = "Document-feature matrix",
+      roles = list(role("item", "Text item", levels = "text")),
+      show_alpha = FALSE, show_hypotheses = FALSE, show_effect_size = FALSE,
+      assumptions = c("At least 10 usable responses", "Requires the optional quanteda package"),
+      output = "Document-feature matrix summary: feature count, sparsity, and top features.",
+      refs = character(0)
     )
   )
 })

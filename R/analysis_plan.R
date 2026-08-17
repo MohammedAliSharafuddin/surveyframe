@@ -154,6 +154,16 @@
     apa = "Aiken, L. S., & West, S. G. (1991). *Multiple regression: Testing and interpreting interactions*. SAGE.",
     use = "moderation"
   ),
+  blondel_2008 = list(
+    key  = "blondel_2008",
+    apa  = "Blondel, V. D., Guillaume, J.-L., Lambiotte, R., & Lefebvre, E. (2008). Fast unfolding of communities in large networks. *Journal of Statistical Mechanics: Theory and Experiment*, *2008*(10), P10008. https://doi.org/10.1088/1742-5468/2008/10/P10008",
+    use  = "co_occurrence_network"
+  ),
+  fruchterman_1991 = list(
+    key  = "fruchterman_1991",
+    apa  = "Fruchterman, T. M. J., & Reingold, E. M. (1991). Graph drawing by force-directed placement. *Software: Practice and Experience*, *21*(11), 1129-1164. https://doi.org/10.1002/spe.4380211102",
+    use  = "co_occurrence_network"
+  ),
   r_core = list(
     key  = "r_core",
     apa  = "R Core Team. (2026). *R: A language and environment for statistical computing*. R Foundation for Statistical Computing.",
@@ -1202,6 +1212,16 @@ sframe_run_one_block <- function(block, data, instrument, plots = FALSE,
   if (length(weights) > 0 && is.null(options$weights)) {
     options$weights <- weights[1]
   }
+  # Optional `group` role on term_freq/tidy_sentiment (todo_0.5.md section
+  # 1a): resolved into options the same way weights is above, so the 2
+  # runners read options$group without knowing about roles at all. Additive
+  # only, so every other method's options are untouched.
+  if (test %in% c("term_freq", "tidy_sentiment")) {
+    group <- sframe_role_values(roles, "group")
+    if (length(group) > 0 && is.null(options$group)) {
+      options$group <- group[1]
+    }
+  }
   if (!is.null(block$alpha) && sframe_method_uses_alpha(test)) {
     options$alpha <- block$alpha
   }
@@ -1275,6 +1295,15 @@ sframe_run_one_block <- function(block, data, instrument, plots = FALSE,
       electre            = sframe_run_electre(data, roles, options, instrument),
       moderation = sframe_run_moderation(data, roles),
       mediation = sframe_run_mediation(data, roles, options),
+      term_freq = sframe_run_term_freq(data, roles, options, instrument),
+      co_occurrence = sframe_run_co_occurrence(data, roles, options, instrument),
+      topic_model_lda = sframe_run_topic_model_lda(data, roles, options, instrument),
+      stm_topics = sframe_run_stm_topics(data, roles, options, instrument),
+      ngram_freq = sframe_run_ngram_freq(data, roles, options, instrument),
+      term_context = sframe_run_term_context(data, roles, options, instrument),
+      co_occurrence_network = sframe_run_cooccurrence_network(data, roles, options, instrument),
+      tidy_sentiment = sframe_run_tidy_sentiment(data, roles, options, instrument),
+      quanteda_dfm = sframe_run_quanteda_dfm(data, roles, options, instrument),
       list(test = test, error = paste0("Test '", test, "' is unavailable."))
     )
   }, error = function(e) {
