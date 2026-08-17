@@ -49,6 +49,26 @@ sframe_require_nnet <- function(reason) {
   rlang::check_installed("nnet", reason = reason)
 }
 
+sframe_require_tidytext <- function(reason) {
+  rlang::check_installed("tidytext", reason = reason)
+}
+
+sframe_require_topicmodels <- function(reason) {
+  rlang::check_installed("topicmodels", reason = reason)
+}
+
+sframe_require_stm <- function(reason) {
+  rlang::check_installed("stm", reason = reason)
+}
+
+sframe_require_quanteda <- function(reason) {
+  rlang::check_installed("quanteda", reason = reason)
+}
+
+sframe_require_igraph <- function(reason) {
+  rlang::check_installed("igraph", reason = reason)
+}
+
 sframe_require_logistf <- function(reason) {
   rlang::check_installed("logistf", reason = reason)
 }

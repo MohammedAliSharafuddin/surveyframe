@@ -120,6 +120,8 @@ sframe_analysis_roles <- function(block) {
     # 2-element variable list still resolves without one.
     term_freq = list(item = vars[1], group = vars[2]),
     co_occurrence = list(item = vars[1]),
+    topic_model_lda = list(item = vars[1]),
+    stm_topics = list(item = vars[1]),
     list(variables = vars)
   )
 }
