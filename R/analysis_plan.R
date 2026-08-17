@@ -1202,6 +1202,16 @@ sframe_run_one_block <- function(block, data, instrument, plots = FALSE,
   if (length(weights) > 0 && is.null(options$weights)) {
     options$weights <- weights[1]
   }
+  # Optional `group` role on term_freq/tidy_sentiment (todo_0.5.md section
+  # 1a): resolved into options the same way weights is above, so the 2
+  # runners read options$group without knowing about roles at all. Additive
+  # only, so every other method's options are untouched.
+  if (test %in% c("term_freq", "tidy_sentiment")) {
+    group <- sframe_role_values(roles, "group")
+    if (length(group) > 0 && is.null(options$group)) {
+      options$group <- group[1]
+    }
+  }
   if (!is.null(block$alpha) && sframe_method_uses_alpha(test)) {
     options$alpha <- block$alpha
   }
@@ -1275,6 +1285,7 @@ sframe_run_one_block <- function(block, data, instrument, plots = FALSE,
       electre            = sframe_run_electre(data, roles, options, instrument),
       moderation = sframe_run_moderation(data, roles),
       mediation = sframe_run_mediation(data, roles, options),
+      term_freq = sframe_run_term_freq(data, roles, options, instrument),
       list(test = test, error = paste0("Test '", test, "' is unavailable."))
     )
   }, error = function(e) {
