@@ -180,6 +180,81 @@ sframe_plot_frequency <- function(result, palette = c("web", "print")) {
     theme_surveyframe(palette = palette) + sframe_theme_angled_x()
 }
 
+# Deterministic word-cloud layout: an Archimedean-ish spiral driven by the
+# golden angle, so words are spread out rather than overlapping in a line.
+# No new dependency (see todo_0.5.md: "do not add a wordcloud/ggwordcloud
+# package for this"); a real word cloud only needs distinct, non-degenerate
+# positions, not a packing algorithm.
+.sframe_wordcloud_layout <- function(n) {
+  if (n == 0) return(data.frame(x = numeric(0), y = numeric(0)))
+  golden_angle <- pi * (3 - sqrt(5))
+  i <- seq_len(n)
+  r <- sqrt(i)
+  theta <- i * golden_angle
+  data.frame(x = r * cos(theta), y = r * sin(theta))
+}
+
+#' Term-frequency plot: horizontal bar or word cloud
+#'
+#' Top terms from a `term_freq` result as a horizontal bar chart, or a word
+#' cloud when `result$options$wordcloud` is `TRUE` (opt-in, default
+#' `FALSE`). Facets by group when the result carries a `group` role
+#' (todo_0.5.md section 1a).
+#'
+#' @param result A `term_freq` result list from [run_analysis_plan()].
+#' @param palette One of `"web"` or `"print"`. See `sframe_brand()`.
+#' @return A ggplot2 object, or `NULL` when the result carries no table.
+#' @export
+#' @seealso [run_analysis_plan()], [term_frequency()]
+sframe_plot_term_frequency <- function(result, palette = c("web", "print")) {
+  rlang::check_installed("ggplot2", reason = "to plot term frequency.")
+  palette <- match.arg(palette)
+  tbl <- result$table
+  if (!is.data.frame(tbl) || nrow(tbl) == 0 || !"term" %in% names(tbl)) return(NULL)
+  brand <- sframe_brand(palette)
+  grouped <- "group" %in% names(tbl)
+  wordcloud <- isTRUE(result$options$wordcloud)
+
+  if (wordcloud) {
+    # The word cloud shows the overall top terms; a per-group cloud is not
+    # a legible shape, so the grouped table is collapsed back to overall
+    # frequency first when needed.
+    plot_tbl <- if (grouped) {
+      stats::aggregate(n ~ term, data = tbl, FUN = sum)
+    } else {
+      tbl
+    }
+    plot_tbl <- plot_tbl[order(-plot_tbl$n), , drop = FALSE]
+    plot_tbl <- utils::head(plot_tbl, 60)
+    layout <- .sframe_wordcloud_layout(nrow(plot_tbl))
+    plot_tbl$x <- layout$x
+    plot_tbl$y <- layout$y
+    return(
+      ggplot2::ggplot(plot_tbl, ggplot2::aes(x = .data$x, y = .data$y,
+                                             label = .data$term, size = .data$n)) +
+        ggplot2::geom_text(colour = brand$teal, fontface = "bold") +
+        ggplot2::scale_size(range = c(3, 12), guide = "none") +
+        ggplot2::labs(title = paste("Term cloud for", result$variable %||% "")) +
+        ggplot2::theme_void() +
+        ggplot2::theme(plot.title = ggplot2::element_text(face = "bold", hjust = 0.5))
+    )
+  }
+
+  bar_tbl <- if (grouped) tbl else within(tbl, group <- "all")
+  bar_tbl <- do.call(rbind, lapply(split(bar_tbl, bar_tbl$group), function(d) {
+    utils::head(d[order(-d$n), , drop = FALSE], 20)
+  }))
+  bar_tbl$term <- factor(bar_tbl$term, levels = rev(unique(bar_tbl$term[order(bar_tbl$n)])))
+  p <- ggplot2::ggplot(bar_tbl, ggplot2::aes(x = .data$term, y = .data$n)) +
+    ggplot2::geom_col(fill = brand$fill, colour = brand$ink, linewidth = 0.3, width = 0.72) +
+    ggplot2::coord_flip() +
+    ggplot2::labs(title = paste("Top terms for", result$variable %||% ""),
+                  x = NULL, y = "Frequency") +
+    theme_surveyframe(palette = palette)
+  if (grouped) p <- p + ggplot2::facet_wrap(~ group, scales = "free_y")
+  p
+}
+
 sframe_plot_crosstab <- function(result, palette = c("web", "print")) {
   palette <- match.arg(palette)
   tbl <- result$table
@@ -691,6 +766,7 @@ sframe_plot_for_result <- function(result, data, palette = c("web", "print")) {
       graphics::plot(result$report_obj, data = data, palette = palette)
     },
     item_diagnostics    = function() sframe_plot_item_diagnostics(result, palette),
+    term_freq           = function() sframe_plot_term_frequency(result, palette),
     NULL
   )
   if (is.null(builder)) return(NULL)

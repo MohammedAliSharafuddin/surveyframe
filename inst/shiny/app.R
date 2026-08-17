@@ -715,6 +715,17 @@ analysis_registry <- local({
       assumptions = "Directed 0-4 influence matrix",
       output = "Cause-effect table (prominence, relation, role) and influence map.",
       refs = character(0)
+    ),
+    term_freq = list(
+      family = "text", label = "Term frequency",
+      roles = list(
+        role("item", "Text item", levels = "text"),
+        role("group", "Group by", min = 0, max = 1, levels = c("nominal", "ordinal"))
+      ),
+      show_alpha = FALSE, show_hypotheses = FALSE, show_effect_size = FALSE,
+      assumptions = "At least 10 usable responses",
+      output = "Top terms by frequency, optionally split by a group variable, and a bar chart or word cloud.",
+      refs = character(0)
     )
   )
 })
