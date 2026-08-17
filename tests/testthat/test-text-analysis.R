@@ -297,6 +297,39 @@ test_that("term_freq's term column is not relabelled when it collides with an un
   expect_equal(res[[1]]$table$term[1], "pool")
 })
 
+test_that("term_freq's own group column IS still humanized on the same table its term column is excluded from", {
+  # Regression for a bug introduced and caught while fixing the collision
+  # above: the first fix excluded the WHOLE table from humanization for
+  # every text id, which silently also stopped humanizing `group` (a
+  # genuinely coded value, e.g. "pool" -> "Pool area" is correct and
+  # wanted there). The fix must be column-scoped, not table-scoped.
+  cs <- sf_choices("dept", values = c("pool", "spa"), labels = c("Pool area", "Spa area"))
+  instr <- sf_instrument(
+    title = "Group-still-humanized fixture", version = "1.0.0",
+    components = list(
+      cs,
+      sf_item("dept", "Which department?", type = "single_choice", choice_set = "dept"),
+      sf_item("comments", "Any comments?", type = "textarea")
+    )
+  )
+  data <- data.frame(
+    dept = c(rep("pool", 12), rep("spa", 12)),
+    comments = rep("the pool area was great and the pool was clean", 24),
+    stringsAsFactors = FALSE
+  )
+  instr$analysis_plan <- list(list(
+    id = "RQ1", research_question = "Top terms by dept?", family = "text",
+    method = "term_freq", roles = list(item = "comments", group = "dept"),
+    options = list(), alpha = 0.05, citations = character(0),
+    interpretation = "", result = NULL
+  ))
+  res <- run_analysis_plan(data, instr)
+  tbl <- res[[1]]$table
+  expect_true("Pool area" %in% tbl$group)
+  expect_true("pool" %in% tbl$term)
+  expect_false("Pool area" %in% tbl$term)
+})
+
 test_that("mutation check: a non-text result IS still humanized (the exclusion is scoped, not global)", {
   cs <- sf_choices("q5", values = 1:2, labels = c("Low", "High"))
   instr <- sf_instrument(
