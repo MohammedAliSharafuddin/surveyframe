@@ -4,20 +4,33 @@
 # full 9-method-id build plan; this file grows across that build rather than
 # landing complete in one diff.
 
-# The 9 text-family method ids. Every one of them can put a free-text word
-# straight into a result table column (term, term_a/term_b, match), and a
-# respondent's own word is not a coded value, so it must never go through
-# sframe_run_one_block()'s label-substitution pass: a term that happens to
-# match some unrelated item's choice CODE (e.g. a respondent writes "pool"
-# and a department item has a choice coded "pool") would otherwise be
-# silently swapped for that item's choice LABEL ("Pool area"), which reads
-# as real thematic signal rather than the coincidence it is. Found in
-# review_050, confirmed with a mutation check (colliding code renamed,
-# same top term reads correctly).
+# The 9 text-family method ids.
 .sframe_text_method_ids <- c(
   "term_freq", "ngram_freq", "term_context", "co_occurrence",
   "co_occurrence_network", "tidy_sentiment", "quanteda_dfm",
   "topic_model_lda", "stm_topics"
+)
+
+# Which of each text id's $table columns hold a respondent's own words
+# (free text) rather than a coded value, keyed by test id. Passed to
+# sframe_humanize_table()'s `exclude_cols` in sframe_run_one_block() so
+# those columns are not relabelled: a free-text word can otherwise collide
+# with an unrelated item's choice CODE anywhere in the instrument and get
+# silently swapped for that item's choice LABEL (found in review_050; a
+# comment containing "pool" read back as "Pool area" because some other
+# item happened to code a choice "pool" -- confirmed with a mutation
+# check). Ids not listed here (tidy_sentiment, quanteda_dfm) have no
+# free-text column in $table and so need no exclusion; a genuinely coded
+# column on the SAME table, such as term_freq's `group`, is deliberately
+# left off every list below so it keeps humanising normally.
+.sframe_text_free_text_cols <- list(
+  term_freq              = "term",
+  ngram_freq             = "term",
+  term_context           = c("before", "match", "after"),
+  co_occurrence          = c("term_a", "term_b"),
+  co_occurrence_network  = "term",
+  topic_model_lda        = "term",
+  stm_topics             = "term"
 )
 
 # A small built-in English stop-word list so the base path (no tidytext
