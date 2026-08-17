@@ -154,6 +154,16 @@
     apa = "Aiken, L. S., & West, S. G. (1991). *Multiple regression: Testing and interpreting interactions*. SAGE.",
     use = "moderation"
   ),
+  blondel_2008 = list(
+    key  = "blondel_2008",
+    apa  = "Blondel, V. D., Guillaume, J.-L., Lambiotte, R., & Lefebvre, E. (2008). Fast unfolding of communities in large networks. *Journal of Statistical Mechanics: Theory and Experiment*, *2008*(10), P10008. https://doi.org/10.1088/1742-5468/2008/10/P10008",
+    use  = "co_occurrence_network"
+  ),
+  fruchterman_1991 = list(
+    key  = "fruchterman_1991",
+    apa  = "Fruchterman, T. M. J., & Reingold, E. M. (1991). Graph drawing by force-directed placement. *Software: Practice and Experience*, *21*(11), 1129-1164. https://doi.org/10.1002/spe.4380211102",
+    use  = "co_occurrence_network"
+  ),
   r_core = list(
     key  = "r_core",
     apa  = "R Core Team. (2026). *R: A language and environment for statistical computing*. R Foundation for Statistical Computing.",
@@ -1291,6 +1301,7 @@ sframe_run_one_block <- function(block, data, instrument, plots = FALSE,
       stm_topics = sframe_run_stm_topics(data, roles, options, instrument),
       ngram_freq = sframe_run_ngram_freq(data, roles, options, instrument),
       term_context = sframe_run_term_context(data, roles, options, instrument),
+      co_occurrence_network = sframe_run_cooccurrence_network(data, roles, options, instrument),
       list(test = test, error = paste0("Test '", test, "' is unavailable."))
     )
   }, error = function(e) {

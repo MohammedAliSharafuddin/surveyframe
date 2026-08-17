@@ -751,6 +751,16 @@ analysis_registry <- local({
                       "Set the keyword via options.term after creating this research question"),
       output = "A keyword-in-context concordance table (before/match/after) for a chosen term.",
       refs = character(0)
+    ),
+    co_occurrence_network = list(
+      family = "text", label = "Co-occurrence network",
+      roles = list(role("item", "Text item", levels = "text")),
+      show_alpha = FALSE, show_hypotheses = FALSE, show_effect_size = FALSE,
+      assumptions = c("At least 10 usable responses",
+                      "At least 5 distinct terms with 1 co-occurrence edge",
+                      "Requires the optional igraph package"),
+      output = "A Louvain-clustered, force-directed term co-occurrence network (node table plus edge list).",
+      refs = c("blondel_2008", "fruchterman_1991")
     )
   )
 })
