@@ -747,8 +747,8 @@ analysis_registry <- local({
       family = "text", label = "Keyword in context",
       roles = list(role("item", "Text item", levels = "text")),
       show_alpha = FALSE, show_hypotheses = FALSE, show_effect_size = FALSE,
-      assumptions = c("At least 10 usable responses",
-                      "Set the keyword via options.term after creating this research question"),
+      show_term = TRUE,
+      assumptions = c("At least 10 usable responses"),
       output = "A keyword-in-context concordance table (before/match/after) for a chosen term.",
       refs = character(0)
     ),
@@ -2616,6 +2616,7 @@ server <- function(input, output, session) {
         tags$div(class = "hint", "Variables are assigned below by methodological role."),
         uiOutput("analysis_role_fields"),
         uiOutput("analysis_alpha_field"),
+        uiOutput("analysis_term_field"),
         textAreaInput(
           "analysis_decision_rule",
           "Planned decision rule",
@@ -2669,6 +2670,9 @@ server <- function(input, output, session) {
         if (isTRUE(reg$show_alpha)) {
           tags$p(tags$strong("Significance level: "), input$analysis_alpha %||% 0.05)
         },
+        if (isTRUE(reg$show_term)) {
+          tags$p(tags$strong("Keyword: "), input$analysis_term %||% "(not set)")
+        },
         if (length(reg$refs %||% character(0)) > 0) {
           tags$p(tags$strong("Reporting references: "), paste(reg$refs, collapse = ", "))
         }
@@ -2719,6 +2723,20 @@ server <- function(input, output, session) {
     )
   })
 
+  output$analysis_term_field <- renderUI({
+    method <- input$analysis_method %||% "descriptives"
+    reg <- analysis_registry[[method]] %||% analysis_registry$descriptives
+    if (!isTRUE(reg$show_term)) {
+      return(NULL)
+    }
+    textInput(
+      "analysis_term",
+      "Keyword *",
+      value = shiny::isolate(input$analysis_term %||% ""),
+      placeholder = "Enter the keyword to search for"
+    )
+  })
+
   output$analysis_plan_validation <- renderUI({
     method <- input$analysis_method %||% "descriptives"
     status <- studio_validate_plan_roles(method, current_analysis_roles())
@@ -2751,12 +2769,19 @@ server <- function(input, output, session) {
       showNotification(paste(status$messages, collapse = " "), type = "error")
       return()
     }
+    if (isTRUE(reg$show_term) && is.null(trim_or_null(input$analysis_term))) {
+      showNotification("A keyword is required for this method.", type = "error")
+      return()
+    }
     plan_id <- studio_safe_id(trim_or_null(input$analysis_plan_id) %||%
                                 studio_next_plan_id(rv$builder$analysis_plan), prefix = "RQ")
     question <- trim_or_null(input$analysis_question) %||% paste(reg$label, "analysis")
     options <- list()
     if (isTRUE(reg$show_alpha)) {
       options$alpha <- input$analysis_alpha %||% 0.05
+    }
+    if (isTRUE(reg$show_term)) {
+      options$term <- trim_or_null(input$analysis_term) %||% ""
     }
     block <- list(
       id = plan_id,

@@ -1008,6 +1008,10 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
         </select></div>
       </div>
       <div class="field" id="rq-alpha-field"><label class="fl" for="rq-alpha">Significance level</label><div class="fc"><select id="rq-alpha"><option value="0.05">0.05</option><option value="0.01">0.01</option><option value="0.10">0.10</option></select></div></div>
+      <div class="field" id="rq-term-field" style="display:none"><label class="fl" for="rq-term">Keyword <span class="fr">*</span></label><div class="fc"><input type="text" id="rq-term" placeholder="Enter the keyword to search for"></div></div>
+      <div class="field" id="rq-wordcloud-field" style="display:none"><label class="fl" for="rq-wordcloud">Word cloud</label><div class="fc"><label style="display:flex;align-items:center;gap:6px;font-weight:400"><input type="checkbox" id="rq-wordcloud"> Render as a word cloud instead of a bar chart</label></div></div>
+      <div class="field" id="rq-seed-field" style="display:none"><label class="fl" for="rq-seed">Random seed</label><div class="fc"><input type="number" id="rq-seed" step="1" placeholder="42"></div></div>
+      <div class="field" id="rq-topn-field" style="display:none"><label class="fl" for="rq-topn">Top N terms</label><div class="fc"><input type="number" id="rq-topn" step="1" min="1" placeholder="20"></div></div>
     </div>
     <div class="field" id="rqCitDiv"></div>
     <div id="rqPreview" class="preview-card"></div>
@@ -3069,11 +3073,11 @@ electre:{family:'decision',label:'ELECTRE I',roles:[{id:'performance_items',labe
 ahp:{family:'decision',label:'AHP',roles:[{id:'pairwise',label:'Pairwise comparison item',min:1,max:1,levels:['pairwise_saaty']}],showAlpha:false,showHypotheses:false,showEffectSize:false,assumptions:['Reciprocal pairwise matrix','Consistency ratio below 0.10 recommended'],output:'Criterion weights and consistency ratio.',refs:['saaty_1980']},
 anp:{family:'decision',label:'ANP',roles:[{id:'pairwise',label:'Pairwise comparison item',min:1,max:1,levels:['pairwise_saaty']}],showAlpha:false,showHypotheses:false,showEffectSize:false,assumptions:['Reciprocal pairwise matrix','Supermatrix must converge'],output:'Limiting priority weights from the supermatrix.',refs:[]},
 dematel:{family:'decision',label:'DEMATEL',roles:[{id:'pairwise',label:'Influence comparison item',min:1,max:1,levels:['pairwise_influence']}],showAlpha:false,showHypotheses:false,showEffectSize:false,assumptions:['Directed 0-4 influence matrix'],output:'Cause-effect table (prominence, relation, role) and influence map.',refs:[]},
-term_freq:{family:'text',label:'Term frequency',roles:[{id:'item',label:'Text item',min:1,max:1,levels:['text']},{id:'group',label:'Group by (optional)',min:0,max:1,levels:['nominal','ordinal']}],showAlpha:false,showHypotheses:false,showEffectSize:false,assumptions:['At least 10 usable responses'],output:'Top terms by frequency, optionally split by a group variable, and a bar chart or word cloud.',refs:[]},
+term_freq:{family:'text',label:'Term frequency',roles:[{id:'item',label:'Text item',min:1,max:1,levels:['text']},{id:'group',label:'Group by (optional)',min:0,max:1,levels:['nominal','ordinal']}],showAlpha:false,showHypotheses:false,showEffectSize:false,showWordcloud:true,assumptions:['At least 10 usable responses'],output:'Top terms by frequency, optionally split by a group variable, and a bar chart or word cloud.',refs:[]},
 co_occurrence:{family:'text',label:'Co-occurrence',roles:[{id:'item',label:'Text item',min:1,max:1,levels:['text']}],showAlpha:false,showHypotheses:false,showEffectSize:false,assumptions:['At least 10 usable responses','At least 1 co-occurring term pair'],output:'Pairwise within-response co-occurrence counts on the top terms, and a heatmap.',refs:[]},
 ngram_freq:{family:'text',label:'N-gram frequency',roles:[{id:'item',label:'Text item',min:1,max:1,levels:['text']}],showAlpha:false,showHypotheses:false,showEffectSize:false,assumptions:['At least 10 usable responses'],output:'Top bigrams or trigrams by frequency, and a bar chart.',refs:[]},
-term_context:{family:'text',label:'Keyword in context',roles:[{id:'item',label:'Text item',min:1,max:1,levels:['text']}],showAlpha:false,showHypotheses:false,showEffectSize:false,assumptions:['At least 10 usable responses','Set the keyword via options.term after creating this research question'],output:'A keyword-in-context concordance table (before/match/after) for a chosen term.',refs:[]},
-co_occurrence_network:{family:'text',label:'Co-occurrence network',roles:[{id:'item',label:'Text item',min:1,max:1,levels:['text']}],showAlpha:false,showHypotheses:false,showEffectSize:false,assumptions:['At least 10 usable responses','At least 5 distinct terms with 1 co-occurrence edge','Requires the optional igraph package'],output:'A Louvain-clustered, force-directed term co-occurrence network (node table plus edge list).',refs:['blondel_2008','fruchterman_1991']},
+term_context:{family:'text',label:'Keyword in context',roles:[{id:'item',label:'Text item',min:1,max:1,levels:['text']}],showAlpha:false,showHypotheses:false,showEffectSize:false,showTerm:true,assumptions:['At least 10 usable responses'],output:'A keyword-in-context concordance table (before/match/after) for a chosen term.',refs:[]},
+co_occurrence_network:{family:'text',label:'Co-occurrence network',roles:[{id:'item',label:'Text item',min:1,max:1,levels:['text']}],showAlpha:false,showHypotheses:false,showEffectSize:false,showSeed:true,showTopN:true,assumptions:['At least 10 usable responses','At least 5 distinct terms with 1 co-occurrence edge','Requires the optional igraph package'],output:'A Louvain-clustered, force-directed term co-occurrence network (node table plus edge list).',refs:['blondel_2008','fruchterman_1991']},
 tidy_sentiment:{family:'text',label:'Sentiment',roles:[{id:'item',label:'Text item',min:1,max:1,levels:['text']},{id:'group',label:'Group by (optional)',min:0,max:1,levels:['nominal','ordinal']}],showAlpha:false,showHypotheses:false,showEffectSize:false,assumptions:['At least 10 usable responses','Requires the optional tidytext package'],output:'Positive/negative sentiment counts and proportion positive (bing lexicon), optionally split by a group variable, and a diverging bar chart.',refs:[]},
 quanteda_dfm:{family:'text',label:'Document-feature matrix',roles:[{id:'item',label:'Text item',min:1,max:1,levels:['text']}],showAlpha:false,showHypotheses:false,showEffectSize:false,assumptions:['At least 10 usable responses','Requires the optional quanteda package'],output:'Document-feature matrix summary: feature count, sparsity, and top features.',refs:[]}
 };
@@ -3197,6 +3201,10 @@ function openRQModal(id){
   sv('rq-q',rq?rq.research_question||'':'');sv('rq-interp',rq?rq.decision_rule||rq.interpretation||'':'');
   document.getElementById('rq-test').value=method;
   document.getElementById('rq-alpha').value=rq?String((rq.options&&rq.options.alpha)||rq.alpha||0.05):'0.05';
+  document.getElementById('rq-term').value=rq&&rq.options&&rq.options.term?String(rq.options.term):'';
+  document.getElementById('rq-wordcloud').checked=!!(rq&&rq.options&&rq.options.wordcloud);
+  document.getElementById('rq-seed').value=rq&&rq.options&&rq.options.seed!=null?String(rq.options.seed):'';
+  document.getElementById('rq-topn').value=rq&&rq.options&&rq.options.top_n!=null?String(rq.options.top_n):'';
   document.getElementById('rqDelBtn').style.display=id?'inline-flex':'none';
   popRQVars(rolesFromLegacy(rq,method));onTestChg(false);
   document.getElementById('rqSuggest').style.display='none';
@@ -3247,6 +3255,10 @@ function onTestChg(renderRoles){
   if(renderRoles!==false)renderRoleFields({});
   var t=document.getElementById('rq-test').value,reg=ANALYSIS_REGISTRY[t]||{},cits=reg.refs||[];
   var af=document.getElementById('rq-alpha-field');if(af)af.style.display=reg.showAlpha?'block':'none';
+  var tf=document.getElementById('rq-term-field');if(tf)tf.style.display=reg.showTerm?'block':'none';
+  var wf=document.getElementById('rq-wordcloud-field');if(wf)wf.style.display=reg.showWordcloud?'block':'none';
+  var sf=document.getElementById('rq-seed-field');if(sf)sf.style.display=reg.showSeed?'block':'none';
+  var nf=document.getElementById('rq-topn-field');if(nf)nf.style.display=reg.showTopN?'block':'none';
   document.getElementById('rqCitDiv').innerHTML=cits.length?'<label class="fl">Reporting references</label><div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:4px">'+cits.map(function(k){return'<span class="cc">'+esc(CSHORT[k]||k)+'</span>';}).join('')+'</div>':'';
   validatePlanRoles();
 }
@@ -3264,7 +3276,12 @@ function suggestTest(){
 function saveRQ(){
   var q=gv('rq-q').trim();if(!q){toast('Research question text required','err');return;}
   var t=document.getElementById('rq-test').value,reg=ANALYSIS_REGISTRY[t]||{},roles=collectRoles(),vars=flattenRoles(roles);
+  if(reg.showTerm&&!gv('rq-term').trim()){toast('Keyword is required for this method','err');return;}
   var opts={};if(reg.showAlpha)opts.alpha=parseFloat(gv('rq-alpha'))||0.05;
+  if(reg.showTerm)opts.term=gv('rq-term').trim();
+  if(reg.showWordcloud)opts.wordcloud=document.getElementById('rq-wordcloud').checked;
+  if(reg.showSeed&&gv('rq-seed').trim())opts.seed=parseInt(gv('rq-seed'),10);
+  if(reg.showTopN&&gv('rq-topn').trim())opts.top_n=parseInt(gv('rq-topn'),10);
   var rq={id:editRqId||uid(),research_question:q,family:reg.family||'',method:t,test:t,roles:roles,variables:vars,options:opts,hypotheses:reg.showHypotheses?{null:'No effect or association is present.',alternative:'An effect or association is present.'}:null,decision_rule:gv('rq-interp').trim(),interpretation:gv('rq-interp').trim(),reporting_references:reg.refs||[],citations:reg.refs||[],status:'valid_plan',requires_data:!['cfa_lavaan_syntax','sem_lavaan_syntax','seminr_syntax'].includes(t),result:null};
   snap();
   if(editRqId){var i=S.analysis_plan.findIndex(function(r){return r.id===editRqId;});if(i>=0)S.analysis_plan[i]=rq;}
