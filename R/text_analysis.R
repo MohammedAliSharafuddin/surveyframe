@@ -635,3 +635,184 @@ extract_quotes <- function(model, text, n_quotes = 3L) {
   rownames(out) <- NULL
   out
 }
+
+#' N-gram frequency for open-ended text
+#'
+#' Tokenises `text` via the same tokeniser as [term_frequency()] (whitespace
+#' splitting, lower-casing, punctuation stripping, and stop-word removal),
+#' then slides a window of `n` tokens across each response's token vector
+#' and counts how often each resulting n-gram occurs. `n = 2` (the default)
+#' gives bigrams; `n = 3` gives trigrams. Because stop words are already
+#' removed by the shared tokeniser, an n-gram never straddles a dropped
+#' word; it is built only from tokens that survive filtering, in their
+#' original order within each response.
+#'
+#' @param text Character vector of responses (raw or already cleaned by
+#'   [clean_text_responses()]).
+#' @param n Integer. N-gram size. Default `2` (bigrams).
+#' @param stop_words Character vector of words to exclude, or `NULL` to use
+#'   the built-in English list, or `character(0)` for no filtering.
+#' @param top_n Integer. Maximum number of n-grams to return, most frequent
+#'   first. Default `30`.
+#'
+#' @return A data.frame with columns `term` (the space-joined n-gram), `n`,
+#'   and `pct`.
+#' @export
+ngram_frequency <- function(text, n = 2L, stop_words = NULL, top_n = 30L) {
+  n <- as.integer(n)
+  toks_list <- .sframe_tokenise(text, stop_words)
+  grams <- unlist(lapply(toks_list, function(toks) {
+    len <- length(toks)
+    if (len < n) return(character(0))
+    starts <- seq_len(len - n + 1L)
+    vapply(starts, function(i) paste(toks[i:(i + n - 1L)], collapse = " "),
+           character(1))
+  }), use.names = FALSE)
+  if (!length(grams)) {
+    return(data.frame(term = character(0), n = integer(0), pct = numeric(0),
+                       stringsAsFactors = FALSE))
+  }
+  tbl <- sort(table(grams), decreasing = TRUE)
+  total <- sum(tbl)
+  out <- data.frame(
+    term = names(tbl),
+    n    = as.integer(tbl),
+    pct  = round(as.numeric(tbl) / total * 100, 1),
+    stringsAsFactors = FALSE, row.names = NULL
+  )
+  utils::head(out, top_n)
+}
+
+#' Keyword-in-context concordance for open-ended text
+#'
+#' Finds every case-insensitive, whole-word match of `term` in `text` and
+#' returns the words immediately before and after each match, so a reader
+#' can judge how a term is actually being used rather than reading a bare
+#' frequency count. Matching is on whole words only, so searching for
+#' "room" does not match "roomy". `text` is expected to already have been
+#' run through [clean_text_responses()] (its `respondent` attribute is used
+#' to cite the original row index for each match; when absent, positions
+#' `seq_along(text)` are used instead). Tokenisation here is a plain
+#' whitespace split, not the internal stop-word-stripping tokeniser behind
+#' [term_frequency()]: stop words are part of a match's context and
+#' stripping them would corrupt the very thing a concordance is for.
+#'
+#' @param text Character vector of responses, ideally already cleaned by
+#'   [clean_text_responses()].
+#' @param term Character. A single keyword to search for.
+#' @param window Integer. Maximum number of words of context to keep before
+#'   and after each match. Default `6`.
+#' @param max_matches Integer. Maximum number of matches to return, counted
+#'   across all responses. Default `20`.
+#'
+#' @return A data.frame with columns `respondent`, `before`, `match`, and
+#'   `after`.
+#' @export
+term_context <- function(text, term, window = 6L, max_matches = 20L) {
+  if (!is.character(term) || length(term) != 1L || is.na(term) || !nzchar(term)) {
+    rlang::abort("`term` must be a single non-empty string.", class = "sframe_error")
+  }
+  respondent <- attr(text, "respondent")
+  if (is.null(respondent)) respondent <- seq_along(text)
+  window <- as.integer(window)
+  max_matches <- as.integer(max_matches)
+  term_lower <- tolower(term)
+
+  out_resp <- integer(0)
+  out_before <- character(0)
+  out_match <- character(0)
+  out_after <- character(0)
+
+  for (i in seq_along(text)) {
+    if (length(out_resp) >= max_matches) break
+    one <- text[i]
+    if (is.na(one) || !nzchar(trimws(one))) next
+    toks <- strsplit(one, "\\s+")[[1]]
+    toks <- toks[nzchar(toks)]
+    hits <- which(tolower(toks) == term_lower)
+    if (!length(hits)) next
+    for (h in hits) {
+      if (length(out_resp) >= max_matches) break
+      before_idx <- if (h > 1L) seq(max(1L, h - window), h - 1L) else integer(0)
+      after_idx  <- if (h < length(toks)) seq(h + 1L, min(length(toks), h + window)) else integer(0)
+      out_resp   <- c(out_resp, respondent[i])
+      out_before <- c(out_before, if (length(before_idx)) paste(toks[before_idx], collapse = " ") else "")
+      out_match  <- c(out_match, toks[h])
+      out_after  <- c(out_after, if (length(after_idx)) paste(toks[after_idx], collapse = " ") else "")
+    }
+  }
+  data.frame(respondent = out_resp, before = out_before, match = out_match,
+             after = out_after, stringsAsFactors = FALSE)
+}
+
+
+
+# Runner contract wrapper around ngram_frequency(): $table, apa, prompt.
+# `roles$item` names the text/textarea item; `options$n` controls n-gram
+# size (default 2, bigrams); `options$top_n`. No group role for this id.
+sframe_run_ngram_freq <- function(data, roles, options, instrument) {
+  item_id <- sframe_role_values(roles, "item", "")[1]
+  err <- sframe_require_columns(data, item_id, "N-gram frequency")
+  if (!is.null(err)) return(list(test = "ngram_freq", error = err))
+  n <- as.integer(options$n %||% 2L)
+  top_n <- options$top_n %||% 30L
+
+  cleaned <- clean_text_responses(data, item_id, instrument = instrument)
+  n_resp <- length(cleaned)
+  if (n_resp < .sframe_text_min_responses) {
+    return(list(
+      test = "ngram_freq",
+      error = sprintf(
+        "N-gram frequency needs at least %d usable responses (found %d).",
+        .sframe_text_min_responses, n_resp
+      )
+    ))
+  }
+  tbl <- ngram_frequency(cleaned, n = n, stop_words = options$stop_words, top_n = top_n)
+  list(
+    test = "ngram_freq", variable = item_id, n = n_resp, table = tbl,
+    apa = sprintf("%d-gram frequency for %s (N = %d responses, top n-gram \"%s\").",
+                  n, item_id, n_resp,
+                  if (nrow(tbl) > 0) tbl$term[1] else "none"),
+    prompt = "Review the leading n-grams for coherence with the research question."
+  )
+}
+
+# Runner contract wrapper around term_context(): $table, apa, prompt. No
+# plot for this id (keyword-in-context is a table only). `roles$item` names
+# the text/textarea item; `roles$term` (or `options$term`) is the keyword
+# to search, required; `options$window`, `options$max_matches`.
+sframe_run_term_context <- function(data, roles, options, instrument) {
+  item_id <- sframe_role_values(roles, "item", "")[1]
+  err <- sframe_require_columns(data, item_id, "Term context")
+  if (!is.null(err)) return(list(test = "term_context", error = err))
+  term <- sframe_role_values(roles, "term", "")[1]
+  if (!nzchar(term)) term <- as.character(options$term %||% "")[1]
+  if (is.na(term) || !nzchar(term)) {
+    return(list(
+      test = "term_context",
+      error = "Term context needs a keyword: set roles$term or options$term."
+    ))
+  }
+  window <- options$window %||% 6L
+  max_matches <- options$max_matches %||% 20L
+
+  cleaned <- clean_text_responses(data, item_id, instrument = instrument)
+  n_resp <- length(cleaned)
+  if (n_resp < .sframe_text_min_responses) {
+    return(list(
+      test = "term_context",
+      error = sprintf(
+        "Term context needs at least %d usable responses (found %d).",
+        .sframe_text_min_responses, n_resp
+      )
+    ))
+  }
+  tbl <- term_context(cleaned, term = term, window = window, max_matches = max_matches)
+  list(
+    test = "term_context", variable = item_id, term = term, table = tbl,
+    apa = sprintf("Keyword-in-context for \"%s\" in %s (N = %d responses, %d matches).",
+                  term, item_id, n_resp, nrow(tbl)),
+    prompt = "Read the surrounding context of each match for coherence with the research question."
+  )
+}

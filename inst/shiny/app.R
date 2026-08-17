@@ -734,6 +734,23 @@ analysis_registry <- local({
       assumptions = c("At least 10 usable responses", "At least 1 co-occurring term pair"),
       output = "Pairwise within-response co-occurrence counts on the top terms, and a heatmap.",
       refs = character(0)
+    ),
+    ngram_freq = list(
+      family = "text", label = "N-gram frequency",
+      roles = list(role("item", "Text item", levels = "text")),
+      show_alpha = FALSE, show_hypotheses = FALSE, show_effect_size = FALSE,
+      assumptions = "At least 10 usable responses",
+      output = "Top bigrams or trigrams by frequency, and a bar chart.",
+      refs = character(0)
+    ),
+    term_context = list(
+      family = "text", label = "Keyword in context",
+      roles = list(role("item", "Text item", levels = "text")),
+      show_alpha = FALSE, show_hypotheses = FALSE, show_effect_size = FALSE,
+      assumptions = c("At least 10 usable responses",
+                      "Set the keyword via options.term after creating this research question"),
+      output = "A keyword-in-context concordance table (before/match/after) for a chosen term.",
+      refs = character(0)
     )
   )
 })
