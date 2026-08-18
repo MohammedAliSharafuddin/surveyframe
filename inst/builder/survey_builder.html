@@ -3217,7 +3217,7 @@ function popRQVars(roleValues){
 }
 function renderRoleFields(roleValues){
   var method=document.getElementById('rq-test').value,reg=ANALYSIS_REGISTRY[method]||ANALYSIS_REGISTRY.mann_whitney;
-  document.getElementById('rqRoleFields').innerHTML=(reg.roles||[]).map(function(role){var selected=roleValues[role.id]||[];if(!Array.isArray(selected))selected=selected?[selected]:[];var multi=role.max>1;return'<div class="role-card"><label class="fl" for="role_'+esc(role.id)+'">'+esc(role.label)+(role.min>0?' <span class="fr">*</span>':'')+'</label><select id="role_'+esc(role.id)+'" data-role-id="'+esc(role.id)+'" '+(multi?'multiple size="4"':'')+' onchange="validatePlanRoles()">'+roleOptions(role,selected)+'</select></div>';}).join('');
+  document.getElementById('rqRoleFields').innerHTML=(reg.roles||[]).map(function(role){var selected=roleValues[role.id]||[];if(!Array.isArray(selected))selected=selected?[selected]:[];var multi=role.max>1;return'<div class="role-card"><label class="fl" for="role_'+esc(role.id)+'">'+esc(role.label)+(role.min>0?' <span class="fr">*</span>':'')+'</label><select id="role_'+esc(role.id)+'" data-role-id="'+esc(role.id)+'" '+(multi?'multiple size="4"':'')+' onchange="validatePlanRoles();suggestTest()">'+roleOptions(role,selected)+'</select></div>';}).join('');
   validatePlanRoles();
 }
 function collectRoles(){var roles={};document.querySelectorAll('[data-role-id]').forEach(function(sel){var id=sel.getAttribute('data-role-id');var vals=Array.from(sel.selectedOptions||[]).map(function(o){return o.value;}).filter(Boolean);roles[id]=sel.multiple?vals:(vals[0]||'');});return roles;}
@@ -3262,8 +3262,9 @@ function onTestChg(renderRoles){
   document.getElementById('rqCitDiv').innerHTML=cits.length?'<label class="fl">Reporting references</label><div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:4px">'+cits.map(function(k){return'<span class="cc">'+esc(CSHORT[k]||k)+'</span>';}).join('')+'</div>':'';
   validatePlanRoles();
 }
+var TEXT_METHOD_IDS=['term_freq','ngram_freq','term_context','co_occurrence','co_occurrence_network','tidy_sentiment','quanteda_dfm','topic_model_lda','stm_topics'];
 function suggestTest(){
-  var sel=flattenRoles(collectRoles()),box=document.getElementById('rqSuggest'),msg=document.getElementById('rqSuggestMsg');
+  var sel=flattenRoles(collectRoles()),box=document.getElementById('rqSuggest'),msg=document.getElementById('rqSuggestMsg'),curMethod=document.getElementById('rq-test').value;
   if(sel.length===0){box.style.display='none';return;}
   var cats=sel.map(getVarCat);
   // A single selected text/textarea item has no pairwise partner to look
@@ -3276,11 +3277,25 @@ function suggestTest(){
   // never meant to include 'text'), suggesting term_freq regardless of
   // what else is selected.
   if(cats.indexOf('text')>-1){
+    // Never override an ALREADY-chosen text method just because its own
+    // role got filled in: every text method's primary role is a single
+    // text item, and this function is wired to fire on every role
+    // select's onchange, so without this guard picking the item for
+    // term_context (say) would immediately bounce the method back to
+    // term_freq on every edit, making every other text method
+    // unreachable through the role picker.
+    if(TEXT_METHOD_IDS.indexOf(curMethod)>-1){box.style.display='none';return;}
     document.getElementById('rq-test').value='term_freq';onTestChg();
     msg.textContent=(ANALYSIS_REGISTRY.term_freq||{}).label+' is suggested from the selected variable type.';box.style.display='flex';
     return;
   }
   if(sel.length<2){box.style.display='none';return;}
+  // Only auto-apply a suggestion while still on the modal's initial
+  // placeholder method ('mann_whitney', set by openRQModal() for a new
+  // plan): once a user has deliberately picked something else, refiring
+  // this on every role edit would otherwise fight that choice the same
+  // way the text case above would.
+  if(curMethod!=='mann_whitney'){box.style.display='none';return;}
   var sug=sel.length===2?(TEST_SUGGEST[cats[0]+'+'+cats[1]]||'correlation_pearson'):'regression_linear';
   if(sug==='mann_whitney'){
     var gid=sel[cats[0]==='cat'?0:1],n=groupLevels(gid);
