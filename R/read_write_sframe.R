@@ -203,8 +203,19 @@ write_sframe <- function(instrument, path, pretty = TRUE, overwrite = FALSE) {
   # Insert real hash
   payload$hash$value <- sframe_hash_payload(payload)
 
+  # digits = NA is required, matching sframe_hash_json()'s own call exactly:
+  # without it, jsonlite::toJSON()'s default (4 significant digits) rounds
+  # any non-round decimal in the payload -- a scale weight of 1/3, say --
+  # before it reaches disk, while the hash just above was computed over the
+  # full-precision value. The file's own embedded hash would then never
+  # match what read_sframe() (or any other reader) recomputes from the
+  # actually-written, rounded text: every such file would fail its own
+  # integrity check as "modified" despite never having been touched.
+  # Caught by building a standalone browser-based verifier and testing it
+  # against a real instrument with a non-round weight -- read_sframe()
+  # itself reproduced the same false failure once asked to reload that file.
   json_out <- jsonlite::toJSON(payload, auto_unbox = TRUE, pretty = pretty,
-                               null = "null")
+                               null = "null", digits = NA)
   writeLines(json_out, con = path, useBytes = FALSE)
 
   invisible(path)

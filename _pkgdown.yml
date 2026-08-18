@@ -45,6 +45,8 @@ home:
     check data quality, score scales, run psychometric diagnostics,
     and generate reproducible reports from one source object.
   links:
+    - text: Verify a .sframe file
+      href: verify/
     - text: SurveyBuilder
       href: reference/launch_builder.html
     - text: SurveyStudio interface
@@ -64,6 +66,9 @@ navbar:
     - text: "Changelog"
       href: news/index.html
   right:
+    - text: "Verify a file"
+      href: verify/
+      aria-label: "Verify a .sframe file's integrity hash"
     - icon: fa-github
       href: https://github.com/MohammedAliSharafuddin/surveyframe
       aria-label: GitHub

@@ -1,12 +1,10 @@
 # surveyframe 0.4.0
 
-Two version numbers were planned and never released. 0.3.5 was to hold a
-field-validation round; that work is absorbed into this release and into
-0.4.1. 0.5.0 was, at one stage, this release's own working label before
-it was renumbered to follow 0.3.4 directly; nothing shipped under that
-number either. Local branches and worktrees kept the `v0.5-dev` name
-throughout development, a label mismatch that is intentional and recorded
-in the project's own internal notes, not a sign of a skipped release.
+A major release. It adds multi-criteria decision analysis (10 methods),
+small-sample statistics, text and open-ended response analysis (9 methods),
+and a disclosed-amendment and Git-linked provenance trail for `.sframe`
+files, alongside 4 corrected results and 2 breaking changes. See below for
+full detail on each.
 
 ## New: multi-criteria decision analysis (MCDA)
 
@@ -133,15 +131,12 @@ existing hash check, without weakening it.
 * `amendment_log()` returns the full history as a data frame, one row per
   disclosed amendment, exportable with `write.csv()`.
 * An edit made directly to a `.sframe` file, bypassing `amend_sframe()`,
-  still fails `read_sframe()`'s integrity check exactly as before -- the
-  amendment log is an additional disclosed path, not a relaxation of the
-  existing hash check.
+  still fails `read_sframe()`'s integrity check exactly as before. The
+  amendment log adds a disclosed path alongside the existing hash check.
 * `link_git_commit()` records the current Git commit SHA and subject line
-  alongside an instrument, so the SHA-256 hash's role narrows to
-  confirming the file matches what a named, already-explained commit
-  produced, rather than trying to substitute for commit history. Degrades
-  gracefully (no error) when Git isn't installed or the path isn't a
-  repository; Git remains entirely optional, never a dependency.
+  alongside an instrument. This ties the SHA-256 hash to a specific,
+  already-explained commit. It returns an informative message when Git
+  isn't installed or the path isn't a repository. Git is optional.
 * `inst/schema/sframe_schema.json` documents the `.sframe` format (every
   top-level field, including the new `amendments` log) as a standalone
   JSON Schema, so a reviewer or a second tool can read and validate a
@@ -158,8 +153,8 @@ existing hash check, without weakening it.
 ## Corrected results (read before comparing against earlier output)
 
 Four defects found by independent cross-validation are fixed. Each
-produced plausible numbers with no error or warning, so results computed
-with an earlier version should be re-run rather than trusted.
+produced normal-looking numbers with no error or warning, so re-run any
+results computed with an earlier version.
 
 * `item_report()` returned the wrong item-rest correlation. It subtracted
   each item from a `rowMeans()` total, which leaves roughly noise carrying
@@ -174,7 +169,7 @@ with an earlier version should be re-run rather than trusted.
   `jmv::anovaRM()` gives F(2, 78) = 86.93, surveyframe reported F = 1.45,
   p = 0.24. Correcting the identifier alone was not sufficient: the
   corrected design produces no `Error: Within` stratum, so the effect is
-  now located by searching the strata rather than by a fixed name.
+  now located by searching the strata directly.
 * `validate_sframe()` rejected valid instruments. Its known-variable list
   held only base item and scale ids, so an analysis plan naming an
   expansion column (`item__sub`, `item__option`, `item__a__vs__b`,
@@ -213,8 +208,7 @@ shows the user what it found.
 * **What breaks**: code using the `strict = TRUE` return as an
   instrument, as in `instrument <- validate_sframe(instrument)`. Wrap it
   in `as_sframe()`. Passing a validation result where an instrument is
-  expected now raises a directed error naming `as_sframe()` rather than
-  failing obscurely further down.
+  expected now raises a directed error naming `as_sframe()` immediately.
 
 Raised by a Journal of Statistical Software editor reviewing the code:
 "we would at least expect that the object is not silently returned and
@@ -244,8 +238,8 @@ degraded to a bare list and lost its print method.
 * Report accessors: `sf_apa()` and `sf_flagged()`.
 * Coercion: `as_sframe()`.
 
-The vignettes and the examples are rewritten to use these rather than
-`$`. The registered S3 method count goes from 41 to 103.
+The vignettes and the examples are rewritten to use these accessors. The
+registered S3 method count goes from 41 to 103.
 
 ## Breaking: the Shiny collector now emits expansion columns
 
@@ -286,9 +280,8 @@ The vignettes and the examples are rewritten to use these rather than
   clears concordance against any other, so every score is 0 and every
   alternative ranks 1. That is legitimate behaviour for the method, but the
   results table read as "all 9 alternatives are jointly best" and the APA
-  sentence reported a kernel containing every alternative. A note now states
-  that the equal ranks are an absence of evidence rather than a tie for first
-  place.
+  sentence reported a kernel containing every alternative. A note now
+  explains the equal ranks as an absence of evidence.
 * `sensitivity_analysis()` gains a `degenerate` flag for the same reason. A
   ranking that never separated the alternatives cannot be changed by
   perturbing a weight, so every check passed and `stable` came back `TRUE`:
@@ -323,10 +316,10 @@ The vignettes and the examples are rewritten to use these rather than
   AHP had one. Every reference was checked against the publication record.
 * `sframe_decision_options()` documents PROMETHEE's preference functions
   and records why the default is `"usual"`, Brans and Vincke's type I step
-  function, rather than the linear function that several other
-  implementations default to. The difference is material: net flows always
-  differ between the 2 functions, and the ranking itself changed in 226 of
-  400 randomly drawn 4-alternative by 3-criterion matrices.
+  function, chosen over the linear function several other implementations
+  default to. Net flows differ between the 2 functions, and the ranking
+  changed in 226 of 400 randomly drawn 4-alternative by 3-criterion
+  matrices.
 
 # surveyframe 0.3.4
 
@@ -461,10 +454,10 @@ unchanged. naniar and pagedown join Suggests.
 
 ## Bug fixes
 
-* `sf_item()`'s `date_min` and `date_max` no longer accept an ambiguous
-  date string (for example `"01/02/2024"`); only `"YYYY-MM-DD"` or a
-  `Date` object is accepted, and anything else is a validation error
-  rather than a silently misparsed date.
+* `sf_item()`'s `date_min` and `date_max` accept only `"YYYY-MM-DD"` or a
+  `Date` object now (an ambiguous string such as `"01/02/2024"` used to
+  parse silently into a specific date depending on locale). Anything
+  else raises a validation error.
 * `bootstrap_ci()`, `cohens_d_ci()`, `cramers_v_ci()`, and `eta_sq_ci()`
   no longer alter the random-number seed for code that runs after a
   reproducible, seeded call.
@@ -646,10 +639,10 @@ methods, and no new bundled datasets.
 * `write_sframe()` now strips list-level names from the item, choice, scale,
   branching, check, and model collections before serialisation. Instruments
   built with `Map()` or other helpers that attach element names (for example,
-  using item IDs as names) previously serialised those collections as keyed
-  JSON objects rather than arrays. This produced a hash mismatch and an
-  integrity error on `read_sframe()`. Saved instruments now round-trip
-  correctly regardless of how the component lists were constructed.
+  using item IDs as names) previously serialised those collections as
+  keyed JSON objects, producing a hash mismatch and an integrity error
+  on `read_sframe()`. Saved instruments now round-trip correctly
+  regardless of how the component lists were constructed.
 
 ## User experience
 

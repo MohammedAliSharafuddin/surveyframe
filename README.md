@@ -8,6 +8,12 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 <!-- badges: end -->
 
+> **Just here to verify a `.sframe` file's integrity hash or read its
+> amendment log?** Skip everything below —
+> **[verify a file now](https://mohammedalisharafuddin.github.io/surveyframe/verify/)**.
+> No R, no install; it runs entirely in your browser and nothing is
+> uploaded.
+
 `surveyframe` is a research-design-first survey package for R. Most survey tools
 collect answers and return counts. `surveyframe` begins at the research design
 and carries it through to a written results report.
