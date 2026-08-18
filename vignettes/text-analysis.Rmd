@@ -217,7 +217,7 @@ A word cloud is available as an opt-in alternative to the bar chart
 (`options$wordcloud = TRUE`), useful in a slide deck where a bar chart's
 axis would be redundant.
 
-```{r wordcloud, fig.alt = "A word cloud of the most frequent terms, sized by frequency.", eval = has_ggplot}
+```{r wordcloud, fig.alt = "A circular word cloud of the most frequent terms, sized and shaded (dark for frequent, light for rare) by frequency.", eval = has_ggplot}
 sframe_plot_term_frequency(
   list(test = "term_freq", variable = "comments", table = terms,
        options = list(wordcloud = TRUE))
@@ -345,11 +345,12 @@ results[["RQ5"]]$plot
 The diverging bar answers "how many responses leaned positive." A
 different question, "which *words* drove that," has its own opt-in view: a
 comparison cloud (`options$wordcloud = TRUE`, the same toggle
-`term_freq`'s word cloud uses), negative-sentiment words above the centre
-line and positive-sentiment words below it, each sized by how often it
-occurred.
+`term_freq`'s word cloud uses), negative-sentiment words to the left of
+centre and positive-sentiment words to the right, matching the diverging
+bar's own left-negative/right-positive convention, each sized and shaded
+(dark for frequent, light for rare) by how often it occurred.
 
-```{r sentiment-cloud, fig.alt = "Comparison word cloud: negative-sentiment terms above the centre line in red, positive-sentiment terms below it in teal, each sized by frequency.", eval = has_tidytext && has_ggplot}
+```{r sentiment-cloud, fig.alt = "Comparison word cloud: negative-sentiment terms to the left of centre in red, positive-sentiment terms to the right in teal, each sized and shaded by frequency.", eval = has_tidytext && has_ggplot}
 instr_cloud <- instr
 plan <- sf_plan(instr_cloud)
 plan[[which(vapply(plan, `[[`, "", "id") == "RQ5")]]$options <- list(wordcloud = TRUE)
