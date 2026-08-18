@@ -107,6 +107,54 @@ role-resolution, and reporting pipeline every other method family uses.
   what the family deliberately does not attempt (stemming/lemmatisation,
   tf-idf, and keyness comparison are not yet implemented).
 
+## New: disclosed amendments and a Git-linked provenance trail
+
+`write_sframe()`'s SHA-256 hash proves a `.sframe` file is unchanged since
+it was written, but gives no way to distinguish a legitimate revision
+(a data-entry correction, bot-response removal, a documented model
+respecification) from an undisclosed edit -- both break the hash
+identically. This release adds a disclosed-revision path alongside the
+existing hash check, without weakening it.
+
+* `amend_sframe()` compares an instrument before and after a change and
+  appends a structured, timestamped entry to an ordered amendment log --
+  never overwrites -- recording the reason (a controlled vocabulary:
+  `data_correction`, `bot_removal`, `model_respecification`,
+  `instrument_revision`, `other`), a free-text explanation, and which
+  top-level fields changed.
+* Two tiers, by default inferred from the reason: `"pipeline"` amendments
+  (data corrections, bot removal) need only a reason. `"design"`
+  amendments (anything touching the analysis plan or a model) require a
+  `deviation_report` describing what changed in the research question,
+  method, or model and why, matching how a formal preregistration
+  deviation is normally handled. `signoff` is never left blank -- it
+  records a reviewer's name or the literal `"none"`, so an unreviewed
+  design change stays visible to an auditor.
+* `amendment_log()` returns the full history as a data frame, one row per
+  disclosed amendment, exportable with `write.csv()`.
+* An edit made directly to a `.sframe` file, bypassing `amend_sframe()`,
+  still fails `read_sframe()`'s integrity check exactly as before -- the
+  amendment log is an additional disclosed path, not a relaxation of the
+  existing hash check.
+* `link_git_commit()` records the current Git commit SHA and subject line
+  alongside an instrument, so the SHA-256 hash's role narrows to
+  confirming the file matches what a named, already-explained commit
+  produced, rather than trying to substitute for commit history. Degrades
+  gracefully (no error) when Git isn't installed or the path isn't a
+  repository; Git remains entirely optional, never a dependency.
+* `inst/schema/sframe_schema.json` documents the `.sframe` format (every
+  top-level field, including the new `amendments` log) as a standalone
+  JSON Schema, so a reviewer or a second tool can read and validate a
+  `.sframe` file without installing the package. `.sframe` was already
+  plain, git-diffable JSON before this release; the schema makes that
+  format explicit and independently checkable.
+* `vignettes/surveyframe.Rmd` gains a "What the SHA-256 hash proves, and
+  what it does not" section, stating plainly that the hash proves file
+  identity, not methodological validity, and pointing to the
+  design-time `analysis_plan` binding and `run_analysis_plan()`'s
+  single-pass execution as the package's separate, complementary defence
+  against HARKing and p-hacking.
+
 ## Corrected results (read before comparing against earlier output)
 
 Four defects found by independent cross-validation are fixed. Each
