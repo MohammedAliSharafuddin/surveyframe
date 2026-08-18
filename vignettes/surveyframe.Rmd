@@ -524,6 +524,16 @@ weaken the hash check: an edit made directly to the file, bypassing
 `amend_sframe()`, still fails `read_sframe()`'s integrity check exactly as
 before.
 
+Be clear about what this does and does not guarantee. `amend_sframe()`
+records a disclosed change -- it cannot compel disclosure, the same way a
+preregistration deviation report can't be forced. Nothing prevents a
+researcher from reconstructing an instrument from scratch and calling
+`write_sframe()` on it directly, skipping the amendment log entirely. What
+the mechanism actually guarantees is narrower and still useful: *if* a
+change is disclosed through `amend_sframe()`, the record is structured,
+timestamped, and permanent inside the file -- not that every change will
+be.
+
 ### Linking a saved instrument to its Git commit
 
 A bare hash gives no diff, author, or explanation for a change -- Git

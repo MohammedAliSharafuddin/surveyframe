@@ -11,8 +11,10 @@ sframe_run_topic_model_lda(data, roles, options, instrument)
 
 \item{roles}{A list with \code{item}, the text/textarea item id.}
 
-\item{options}{A list; \code{k} (topic count, default \code{4L}), \code{seed} (default
-\code{42L}), \code{stop_words} (passed through to the tokeniser).}
+\item{options}{A list; \code{k} (topic count, default \code{4L} -- a demonstration
+value, not a recommendation; see \code{vignette("text-analysis")}'s topic-
+modelling section for \code{topicmodels::perplexity()}-based selection),
+\code{seed} (default \code{42L}), \code{stop_words} (passed through to the tokeniser).}
 
 \item{instrument}{Optional \code{sframe} instrument, passed to
 \code{\link[=clean_text_responses]{clean_text_responses()}} for item-type validation.}

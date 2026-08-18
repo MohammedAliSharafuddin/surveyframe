@@ -396,7 +396,17 @@ cat("_quanteda is not installed in this environment, so this section did not run
 
 `stm_topics` fits a structural topic model via the optional `stm` package
 (tokenising uses `tidytext`, so both are needed). A small `k` keeps this
-example fast; a real study would try several values of `k` and compare fit.
+example fast; a real study would try several values of `k` and compare
+fit -- `k = 3` (or `topic_model_lda`'s default `k = 4`) is a demonstration
+value, not a recommendation, and neither default was chosen from any
+fit criterion. The accepted way to choose `k` is to fit a range of
+candidate values and compare them on held-out likelihood or a coherence
+metric: `stm::searchK()` does this directly for `stm_topics`'s underlying
+model (pass it the same `documents`/`vocab` `stm::prepDocuments()` would
+produce), and `topicmodels::perplexity()` on a held-out split serves the
+same purpose for `topic_model_lda`. Neither is wrapped by surveyframe --
+`k` selection is a modelling decision for the researcher to make and
+report, not a default to trust unexamined.
 
 ```{r stm, eval = has_stm && has_tidytext}
 sf_plan(instr) <- c(sf_plan(instr), list(list(
