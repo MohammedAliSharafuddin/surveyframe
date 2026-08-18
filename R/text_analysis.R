@@ -1103,7 +1103,33 @@ sframe_run_tidy_sentiment <- function(data, roles, options, instrument) {
     list(table = tbl, scores = scores, error = NULL)
   }
 
+  # Word x sentiment counts across ALL cleaned responses, not per group
+  # even when the `group` role is set: the comparison cloud
+  # sframe_plot_sentiment() builds when options$wordcloud = TRUE needs
+  # one word list, not one per group, since a faceted pair of comparison
+  # clouds is a lot of chart for a plot whose whole point is a single
+  # at-a-glance positive/negative read. Mirrors the classic tidytext
+  # count(word, sentiment, sort = TRUE) pattern (see
+  # bookdown.org/jdholster1/idsr/text-analysis.html section 8.4), built
+  # on the same tokeniser every other text-family runner uses so this
+  # can't drift from term_frequency()'s own counts.
+  word_sentiment_counts <- function(cleaned) {
+    toks <- unlist(.sframe_tokenise(cleaned, stop_words = character(0)), use.names = FALSE)
+    empty <- data.frame(word = character(0), sentiment = character(0),
+                        n = integer(0), stringsAsFactors = FALSE)
+    if (!length(toks)) return(empty)
+    sent <- lexicon$sentiment[match(toks, lexicon$word)]
+    keep <- !is.na(sent)
+    if (!any(keep)) return(empty)
+    tbl <- table(word = toks[keep], sentiment = sent[keep])
+    df <- as.data.frame(tbl, stringsAsFactors = FALSE)
+    names(df) <- c("word", "sentiment", "n")
+    df <- df[df$n > 0, , drop = FALSE]
+    df[order(-df$n), , drop = FALSE]
+  }
+
   cleaned_all <- clean_text_responses(data, item_id, instrument = instrument)
+  word_sentiment <- word_sentiment_counts(cleaned_all)
 
   if (is.null(group_id) || !nzchar(group_id) || !group_id %in% colnames(data)) {
     built <- build_one(cleaned_all)
@@ -1112,6 +1138,7 @@ sframe_run_tidy_sentiment <- function(data, roles, options, instrument) {
     return(list(
       test = "tidy_sentiment", variable = item_id,
       n = length(cleaned_all), table = built$table, scores = built$scores,
+      word_sentiment = word_sentiment,
       apa = sprintf("Sentiment for %s (N = %d responses, %.1f%% positive).",
                     item_id, length(cleaned_all), prop_pos * 100),
       prompt = "Review the balance of positive and negative sentiment for coherence with the research question."
@@ -1152,6 +1179,7 @@ sframe_run_tidy_sentiment <- function(data, roles, options, instrument) {
   list(
     test = "tidy_sentiment", variable = item_id, group = group_id,
     n = length(cleaned_all), table = combined_table, scores = combined_scores,
+    word_sentiment = word_sentiment,
     apa = sprintf("Sentiment for %s by %s (N = %d responses, %d groups).",
                   item_id, group_id, length(cleaned_all), length(levels_present)),
     prompt = "Compare the balance of positive and negative sentiment across groups for coherence with the research question."

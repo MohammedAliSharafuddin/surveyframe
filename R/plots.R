@@ -200,39 +200,61 @@ sframe_plot_frequency <- function(result, palette = c("web", "print")) {
 #
 # `sizes` must be the same values the caller will later map to the
 # `geom_text()` `size` aesthetic (via `scale_size_identity()`, so the
-# rendered size matches exactly what was measured here) — the algorithm
-# only needs sizes *relative* to each other to be consistent between
-# measurement and render, not calibrated to any particular physical unit.
+# rendered size matches exactly what was measured here).
 #
-# `padding` is deliberately generous (45%, not a cosmetic ~10-15%):
-# `pdf(NULL)`'s default font is not necessarily the same one ggplot2's
-# theme actually renders with, so a bounding box measured against the
-# null device's metrics is an estimate, not a guarantee, of the real
-# glyph extent. Erring toward extra whitespace is the safe direction; an
-# under-estimate is a real, visible overlap, which is the defect this
-# function exists to fix.
-.sframe_wordcloud_layout <- function(words, sizes, padding = 0.85) {
+# Measured via `grid::textGrob()`/`grid::grobWidth()`/`grobHeight()`, not
+# base graphics `strwidth()`/`strheight()` (the first version's approach):
+# ggplot2 draws `geom_text()` through the grid graphics system, so
+# measuring through grid tracks the actual rendered glyph size far more
+# closely than base graphics' `pdf(NULL)` + `strwidth()`/`strheight()`
+# trick did — that mismatch was exactly why the first fix needed a huge
+# (85%) padding buffer to avoid overlap, which produced the "still looks
+# scattered" complaint: most of the visible whitespace was safety margin
+# against a measurement the algorithm didn't actually trust. `padding`
+# drops to a normal ~15% now that the measurement is accurate enough to
+# trust, giving the tight packing a real word cloud has.
+#
+# `centers` (optional, one `x`/`y` row per word) lets the SAME
+# spiral-and-collide engine build a grouped cloud (see
+# `sframe_plot_sentiment()`'s comparison cloud): each word spirals
+# outward from its own group's anchor point rather than a shared origin,
+# while collision detection stays global, so the two groups never
+# overlap each other at the boundary. Defaults to every word sharing the
+# origin, the single-cloud case `sframe_plot_term_frequency()` uses.
+#
+# Still no new dependency (todo_0.5.md: "do not add a wordcloud/
+# ggwordcloud package for this"): `grid` and `grDevices::pdf(NULL)` (a
+# null device, writes no file) are both base R, not the wordcloud/
+# ggwordcloud packages themselves.
+.sframe_wordcloud_layout <- function(words, sizes, centers = NULL, padding = 0.15) {
   n <- length(words)
   if (n == 0) {
     return(data.frame(term = character(0), x = numeric(0), y = numeric(0)))
   }
-  # Largest word first: it anchors the centre, and each later (smaller)
+  if (is.null(centers)) centers <- data.frame(x = rep(0, n), y = rep(0, n))
+
+  # Largest word first: it anchors its cluster, and each later (smaller)
   # word has an easier time finding a gap than the reverse order would.
   ord <- order(-sizes)
   words <- words[ord]
   sizes <- sizes[ord]
+  centers <- centers[ord, , drop = FALSE]
 
   grDevices::pdf(NULL)
   on.exit(grDevices::dev.off(), add = TRUE)
-  cex <- sizes / 4
-  # strwidth() vectorises cex correctly, one value per string; strheight()
-  # does NOT, despite taking a `cex` vector without complaint (it silently
-  # applies only the first element to every string). Confirmed directly:
-  # strheight(c("a","bb"), cex = c(4, 1)) returns the same height twice.
-  # mapply() forces one strheight() call per word, avoiding that trap.
-  half_w <- graphics::strwidth(words, units = "inches", cex = cex, font = 2) / 2 * (1 + padding)
-  half_h <- mapply(function(w, cx) graphics::strheight(w, units = "inches", cex = cx, font = 2),
-                   words, cex) / 2 * (1 + padding)
+  # The `size` aesthetic ggplot2's geom_text() takes is in mm; converting
+  # to points (the unit grid::gpar(fontsize=) wants) with the same
+  # mm-to-pt factor ggplot2 itself uses internally (72.27/25.4) is what
+  # makes this measurement track the real render, not just a
+  # self-consistent but arbitrarily-scaled estimate.
+  pt_size <- sizes * (72.27 / 25.4)
+  dims <- lapply(seq_along(words), function(i) {
+    g <- grid::textGrob(words[i], gp = grid::gpar(fontsize = pt_size[i], fontface = "bold"))
+    c(w = as.numeric(grid::convertWidth(grid::grobWidth(g), "inches")),
+      h = as.numeric(grid::convertHeight(grid::grobHeight(g), "inches")))
+  })
+  half_w <- vapply(dims, `[[`, numeric(1), "w") / 2 * (1 + padding)
+  half_h <- vapply(dims, `[[`, numeric(1), "h") / 2 * (1 + padding)
 
   placed_x <- placed_y <- placed_hw <- placed_hh <- numeric(0)
   overlaps <- function(x, y, hw, hh) {
@@ -248,11 +270,11 @@ sframe_plot_frequency <- function(result, palette = c("web", "print")) {
       # An elliptical spiral (x grows faster than y) matches how a word
       # cloud actually reads, wide and short, rather than the wasted
       # vertical space a perfectly circular spiral produces.
-      cand_x <- r * cos(theta) * 1.5
-      cand_y <- r * sin(theta)
+      cand_x <- centers$x[i] + r * cos(theta) * 1.5
+      cand_y <- centers$y[i] + r * sin(theta)
       if (!overlaps(cand_x, cand_y, half_w[i], half_h[i])) break
-      theta <- theta + 0.15
-      r <- r + 0.02
+      theta <- theta + 0.1
+      r <- r + 0.012
       if (r > 30) break  # pathological fallback; not hit in practice
     }
     x[i] <- cand_x
@@ -263,7 +285,14 @@ sframe_plot_frequency <- function(result, palette = c("web", "print")) {
     placed_hh <- c(placed_hh, half_h[i])
   }
 
-  data.frame(term = words, x = x, y = y, stringsAsFactors = FALSE)
+  # half_w/half_h ride along so a caller can compute the plot's actual
+  # extent (x +/- half_w, y +/- half_h), not just the anchor points: a
+  # coord_fixed() built from the anchor points alone clips every word's
+  # far edge, which is exactly what happened before this was added (long
+  # words at the outer edge of the sentiment comparison cloud were cut
+  # off mid-word).
+  data.frame(term = words, x = x, y = y, half_w = half_w, half_h = half_h,
+             stringsAsFactors = FALSE)
 }
 
 #' Term-frequency plot: horizontal bar or word cloud
@@ -315,12 +344,13 @@ sframe_plot_term_frequency <- function(result, palette = c("web", "print")) {
     plot_tbl$size <- 5 + rescale01(sqrt(plot_tbl$n)) * 13
     layout <- .sframe_wordcloud_layout(plot_tbl$term, plot_tbl$size)
     plot_tbl <- merge(plot_tbl, layout, by = "term")
-    # Tight coordinate limits from the actual placed extents (plus a
-    # small margin), rather than letting ggplot2's default expansion add
-    # a wide band of empty space no word ever reaches.
-    pad <- max(plot_tbl$size) / 20
-    xlim <- range(plot_tbl$x) + c(-1, 1) * pad
-    ylim <- range(plot_tbl$y) + c(-1, 1) * pad
+    # Tight coordinate limits from the actual placed extents (each word's
+    # anchor point +/- its OWN measured half-width/half-height, not just
+    # the anchor points themselves), rather than letting ggplot2's default
+    # expansion add a wide empty band, or clipping a word whose far edge
+    # extends past its anchor point.
+    xlim <- range(c(plot_tbl$x - plot_tbl$half_w, plot_tbl$x + plot_tbl$half_w))
+    ylim <- range(c(plot_tbl$y - plot_tbl$half_h, plot_tbl$y + plot_tbl$half_h))
     return(
       ggplot2::ggplot(plot_tbl, ggplot2::aes(x = .data$x, y = .data$y,
                                              label = .data$term, size = .data$size)) +
@@ -2279,16 +2309,53 @@ sframe_plot_cooccurrence_network <- function(result, palette = c("web", "print")
 }
 
 
-#' Sentiment plot: diverging bar of positive versus negative counts
+# Comparison-cloud layout: negative words spiral outward from an anchor
+# above the origin, positive words from an anchor below it, using the
+# SAME spiral-and-collide engine sframe_plot_term_frequency()'s word
+# cloud does (.sframe_wordcloud_layout()'s `centers` argument exists for
+# exactly this), so the two groups never overlap each other or
+# themselves. This is the base-R/ggplot2 equivalent of the classic
+# tidytext comparison cloud (bookdown.org/jdholster1/idsr/text-analysis.html
+# section 8.4: count(word, sentiment) %>% acast() %>% comparison.cloud()),
+# without adding the wordcloud/reshape2 dependency that reference code
+# uses — consistent with todo_0.5.md's "no wordcloud/ggwordcloud package"
+# rule for the plain term-frequency cloud.
+.sframe_sentiment_cloud_layout <- function(word_sentiment, max_per_side = 25) {
+  neg <- utils::head(word_sentiment[word_sentiment$sentiment == "negative", , drop = FALSE], max_per_side)
+  pos <- utils::head(word_sentiment[word_sentiment$sentiment == "positive", , drop = FALSE], max_per_side)
+  both <- rbind(neg, pos)
+  if (nrow(both) == 0) return(NULL)
+  # Sized off the COMBINED range, not per group, so a count of 20 looks
+  # the same size whichever side it lands on.
+  rng <- range(both$n)
+  size01 <- if (diff(rng) == 0) rep(0.5, nrow(both)) else (sqrt(both$n) - sqrt(rng[1])) / (sqrt(rng[2]) - sqrt(rng[1]))
+  both$size <- 5 + size01 * 13
+  anchor_offset <- 1.4
+  centers <- data.frame(x = 0, y = ifelse(both$sentiment == "negative", anchor_offset, -anchor_offset))
+  layout <- .sframe_wordcloud_layout(both$word, both$size, centers = centers)
+  merge(both, layout, by.x = "word", by.y = "term")
+}
+
+#' Sentiment plot: diverging bar, or a positive/negative comparison cloud
 #'
-#' A ggplot2 diverging bar for a `tidy_sentiment` result: positive counts
-#' extend one direction, negative counts the other, so bar position (not
-#' colour alone) carries the primary polarity signal, the same convention
-#' [sframe_draw_likert_diverging()] uses for Likert agreement (dark ramp
-#' toward the pole) rebuilt here in ggplot2 rather than called directly,
-#' since that helper is base-graphics and Likert-scale-specific. Facets by
-#' group when `result$table` carries a `group` column, mirroring
-#' [sframe_plot_term_frequency()]'s grouped branch.
+#' A ggplot2 diverging bar for a `tidy_sentiment` result by default:
+#' positive counts extend one direction, negative counts the other, so bar
+#' position (not colour alone) carries the primary polarity signal, the
+#' same convention [sframe_draw_likert_diverging()] uses for Likert
+#' agreement (dark ramp toward the pole) rebuilt here in ggplot2 rather
+#' than called directly, since that helper is base-graphics and
+#' Likert-scale-specific. Facets by group when `result$table` carries a
+#' `group` column, mirroring [sframe_plot_term_frequency()]'s grouped
+#' branch.
+#'
+#' When `result$options$wordcloud` is `TRUE` (opt-in, default `FALSE`,
+#' matching [sframe_plot_term_frequency()]'s own word-cloud toggle),
+#' draws a comparison cloud instead: negative-sentiment words above the
+#' centre line, positive-sentiment words below it, each word sized by how
+#' often it occurred, using the internal `tidy_sentiment` runner's
+#' `$word_sentiment` word-by-sentiment counts. Answers a different
+#' question from the diverging bar: not "how many responses leaned
+#' positive," but "which *words* drove that."
 #'
 #' @param result A `tidy_sentiment` result list from [run_analysis_plan()].
 #' @param palette One of `"web"` or `"print"`. See `sframe_brand()`.
@@ -2302,6 +2369,52 @@ sframe_plot_sentiment <- function(result, palette = c("web", "print")) {
   if (!is.data.frame(tbl) || nrow(tbl) == 0 || !"sentiment" %in% names(tbl)) return(NULL)
   brand <- sframe_brand(palette)
   grouped <- "group" %in% names(tbl)
+
+  if (isTRUE(result$options$wordcloud)) {
+    ws <- result$word_sentiment
+    if (!is.data.frame(ws) || nrow(ws) == 0) return(NULL)
+    cloud_tbl <- .sframe_sentiment_cloud_layout(ws)
+    if (is.null(cloud_tbl)) return(NULL)
+    fill_map <- stats::setNames(c(brand$accent, brand$teal), c("negative", "positive"))
+    # Tight coordinate limits from the actual placed extents (each word's
+    # anchor point +/- its own measured half-width/half-height), the same
+    # fix sframe_plot_term_frequency()'s single cloud needed: without it,
+    # a long word at the outer edge (e.g. "comfortable") clips mid-word
+    # rather than sitting fully inside the panel.
+    xlim <- range(c(cloud_tbl$x - cloud_tbl$half_w, cloud_tbl$x + cloud_tbl$half_w))
+    y_data_range <- range(c(cloud_tbl$y - cloud_tbl$half_h, cloud_tbl$y + cloud_tbl$half_h))
+    # The 2 group labels sit past the outermost word on each side, at a
+    # fixed offset from the data's own extent, the same "anchor beyond the
+    # content" placement the tidytext/wordcloud comparison.cloud() example
+    # uses its own boxed labels for.
+    label_pad <- diff(y_data_range) * 0.08
+    ylim <- y_data_range + c(-1, 1) * label_pad
+    # Negative words are anchored at +offset (the .sframe_sentiment_cloud_
+    # layout() call above), positive at -offset, so the top label is
+    # always "negative" and the bottom always "positive" regardless of
+    # the data's actual extent.
+    labels_df <- data.frame(
+      x = 0, y = ylim, label = c("positive", "negative"),
+      stringsAsFactors = FALSE
+    )
+    return(
+      ggplot2::ggplot(cloud_tbl, ggplot2::aes(x = .data$x, y = .data$y,
+                                              label = .data$word, size = .data$size,
+                                              colour = .data$sentiment)) +
+        ggplot2::geom_text(fontface = "bold") +
+        ggplot2::geom_label(data = labels_df,
+                            ggplot2::aes(x = .data$x, y = .data$y, label = .data$label),
+                            inherit.aes = FALSE,
+                            fill = brand$grid, colour = brand$ink, fontface = "bold",
+                            label.size = 0, size = 3.6) +
+        ggplot2::scale_size_identity() +
+        ggplot2::scale_colour_manual(values = fill_map, guide = "none") +
+        ggplot2::coord_fixed(xlim = xlim, ylim = ylim, expand = TRUE) +
+        ggplot2::labs(title = paste("Sentiment terms for", result$variable %||% "")) +
+        ggplot2::theme_void() +
+        ggplot2::theme(plot.title = ggplot2::element_text(face = "bold", hjust = 0.5))
+    )
+  }
 
   bar_tbl <- tbl[tbl$sentiment %in% c("positive", "negative"), , drop = FALSE]
   bar_tbl <- bar_tbl[!is.na(bar_tbl$n), , drop = FALSE]

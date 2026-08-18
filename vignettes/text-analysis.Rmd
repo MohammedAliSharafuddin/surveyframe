@@ -342,6 +342,23 @@ results[["RQ5"]]$apa
 results[["RQ5"]]$plot
 ```
 
+The diverging bar answers "how many responses leaned positive." A
+different question, "which *words* drove that," has its own opt-in view: a
+comparison cloud (`options$wordcloud = TRUE`, the same toggle
+`term_freq`'s word cloud uses), negative-sentiment words above the centre
+line and positive-sentiment words below it, each sized by how often it
+occurred.
+
+```{r sentiment-cloud, fig.alt = "Comparison word cloud: negative-sentiment terms above the centre line in red, positive-sentiment terms below it in teal, each sized by frequency.", eval = has_tidytext && has_ggplot}
+instr_cloud <- instr
+plan <- sf_plan(instr_cloud)
+plan[[which(vapply(plan, `[[`, "", "id") == "RQ5")]]$options <- list(wordcloud = TRUE)
+sf_plan(instr_cloud) <- plan
+
+result_cloud <- run_analysis_plan(responses, instr_cloud, plots = TRUE)
+result_cloud[["RQ5"]]$plot
+```
+
 ```{r sentiment-note, eval = !has_tidytext, echo = FALSE, results = "asis"}
 cat("_tidytext is not installed in this environment, so this section did not run.",
     "Install tidytext to see the sentiment breakdown._")

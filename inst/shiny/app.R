@@ -770,7 +770,10 @@ analysis_registry <- local({
       ),
       show_alpha = FALSE, show_hypotheses = FALSE, show_effect_size = FALSE,
       assumptions = c("At least 10 usable responses", "Requires the optional tidytext package"),
-      output = "Positive/negative sentiment counts and proportion positive (bing lexicon), optionally split by a group variable, and a diverging bar chart.",
+      output = paste("Positive/negative sentiment counts and proportion positive (bing lexicon),",
+                     "optionally split by a group variable, and a diverging bar chart or a",
+                     "positive/negative comparison cloud (options$wordcloud = TRUE; no Studio",
+                     "field for this option yet, same as term_freq's word cloud toggle)."),
       refs = character(0)
     ),
     quanteda_dfm = list(

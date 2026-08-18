@@ -238,3 +238,75 @@ test_that("sframe_plot_sentiment returns NULL when the result carries no table",
   skip_if_not_installed("ggplot2")
   expect_null(sframe_plot_sentiment(list(table = NULL)))
 })
+
+# ---------------------------------------------------------------------------
+# $word_sentiment and the comparison-cloud plot (options$wordcloud = TRUE)
+# ---------------------------------------------------------------------------
+
+test_that("sframe_run_tidy_sentiment() attaches word x sentiment counts", {
+  skip_if_not_installed("tidytext")
+  result <- sframe_run_tidy_sentiment(
+    make_sentiment_data(), list(item = "comments"), list(), NULL
+  )
+  ws <- result$word_sentiment
+  expect_true(is.data.frame(ws))
+  expect_true(all(c("word", "sentiment", "n") %in% names(ws)))
+  expect_true(all(ws$sentiment %in% c("positive", "negative")))
+  # From the hand-verified fixture: "amazing" appears in 2 positive
+  # responses, "terrible" in 2 negative ones.
+  expect_equal(ws$n[ws$word == "amazing"], 2L)
+  expect_equal(ws$n[ws$word == "terrible"], 2L)
+})
+
+test_that("the comparison cloud places negative words above and positive words below the centre line", {
+  skip_if_not_installed("tidytext")
+  skip_if_not_installed("ggplot2")
+  result <- sframe_run_tidy_sentiment(
+    make_sentiment_data(), list(item = "comments"), list(), NULL
+  )
+  cloud_tbl <- surveyframe:::.sframe_sentiment_cloud_layout(result$word_sentiment)
+  expect_true(all(cloud_tbl$y[cloud_tbl$sentiment == "negative"] > 0))
+  expect_true(all(cloud_tbl$y[cloud_tbl$sentiment == "positive"] < 0))
+})
+
+test_that("the comparison cloud's two groups never overlap each other or themselves", {
+  skip_if_not_installed("tidytext")
+  skip_if_not_installed("ggplot2")
+  result <- sframe_run_tidy_sentiment(
+    make_sentiment_data(), list(item = "comments"), list(), NULL
+  )
+  cloud_tbl <- surveyframe:::.sframe_sentiment_cloud_layout(result$word_sentiment)
+  n <- nrow(cloud_tbl)
+  overlap_found <- FALSE
+  for (i in seq_len(n - 1)) {
+    for (j in seq.int(i + 1, n)) {
+      dx <- abs(cloud_tbl$x[i] - cloud_tbl$x[j])
+      dy <- abs(cloud_tbl$y[i] - cloud_tbl$y[j])
+      if (dx < (cloud_tbl$half_w[i] + cloud_tbl$half_w[j]) &&
+          dy < (cloud_tbl$half_h[i] + cloud_tbl$half_h[j])) {
+        overlap_found <- TRUE
+      }
+    }
+  }
+  expect_false(overlap_found)
+})
+
+test_that("sframe_plot_sentiment draws a comparison cloud when opted in", {
+  skip_if_not_installed("tidytext")
+  skip_if_not_installed("ggplot2")
+  result <- sframe_run_tidy_sentiment(
+    make_sentiment_data(), list(item = "comments"), list(wordcloud = TRUE), NULL
+  )
+  result$options <- list(wordcloud = TRUE)
+  p <- sframe_plot_sentiment(result)
+  expect_s3_class(p, "ggplot")
+  # Every word's rendered extent must sit fully inside the panel's data
+  # range (the concrete clipping failure mode caught and fixed while
+  # building this: coord_fixed() computed from anchor points alone cuts
+  # off the far edge of a long word at the boundary).
+  built <- ggplot2::ggplot_build(p)
+  panel_range <- built$layout$panel_params[[1]]$x.range
+  cloud_tbl <- surveyframe:::.sframe_sentiment_cloud_layout(result$word_sentiment)
+  expect_true(all(cloud_tbl$x - cloud_tbl$half_w >= panel_range[1] - 1e-6))
+  expect_true(all(cloud_tbl$x + cloud_tbl$half_w <= panel_range[2] + 1e-6))
+})
