@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Verify a .sframe file — surveyframe</title>
+<title>Verify a .sframe file: surveyframe</title>
 <meta name="description" content="Check a surveyframe .sframe file's SHA-256 integrity hash and read its disclosed-amendment log, entirely in your browser. Nothing is uploaded.">
 <meta name="robots" content="index, follow">
 <link rel="icon" href="../../favicon-32x32.png" sizes="32x32">
@@ -106,15 +106,15 @@
   <h1>Verify a .sframe file</h1>
   <p class="lede">
     Checks a <code>.sframe</code> instrument file's SHA-256 integrity hash and
-    reads its disclosed-amendment log, if it has one — entirely in this page.
+    reads its disclosed-amendment log, if it has one, entirely in this page.
   </p>
 
   <div class="privacy">
     <span>🔒</span>
     <span><strong>Nothing is uploaded.</strong> This page has no server component.
     Your file is read and hashed by your browser's own SubtleCrypto API and never
-    leaves your device. You can verify this yourself: view this page's source —
-    it's a single, self-contained HTML file with no network requests.</span>
+    leaves your device. You can verify this yourself: view this page's source.
+    It's a single, self-contained HTML file with no network requests.</span>
   </div>
 
   <div class="card">
@@ -138,10 +138,10 @@
   <p class="scope-note">
     <strong>What this proves, and what it does not.</strong> A matching hash
     confirms the file is byte-identical to what <code>write_sframe()</code>
-    produced — it proves file identity, not methodological validity. It says
-    nothing about question wording, sampling, or measurement quality, and an
-    amendment log only records changes a researcher chose to disclose through
-    <code>amend_sframe()</code> — it cannot compel disclosure. See the
+    produced. That proves file identity. It says nothing about question
+    wording, sampling, or measurement quality, and an amendment log only
+    records changes a researcher chose to disclose through
+    <code>amend_sframe()</code>, which cannot compel disclosure. See the
     <a href="../articles/surveyframe.html#validate-and-serialise">package
     vignette</a> for the full explanation and the package's separate,
     complementary defence against HARKing and p-hacking.
@@ -257,7 +257,7 @@ async function verify(text){
   }
 
   if(!parsed||typeof parsed!=='object'||!parsed.hash||!parsed.items){
-    resultEl.innerHTML='<p class="err">This does not look like a .sframe payload — expected top-level '+
+    resultEl.innerHTML='<p class="err">This does not look like a .sframe payload. Expected top-level '+
       '<code>hash</code>, <code>items</code>, <code>choices</code>, and <code>scales</code> keys.</p>';
     return;
   }
@@ -268,11 +268,11 @@ async function verify(text){
 
   var status, note;
   if(storedHash&&storedHash===canon){
-    status='ok'; note='Integrity verified — this file is byte-identical to what write_sframe() produced.';
+    status='ok'; note='Integrity verified. This file is byte-identical to what write_sframe() produced.';
   }else if(storedHash&&storedHash===legacy){
-    status='legacy'; note='Integrity verified against the legacy (pre-canonical) hash format — this file predates surveyframe 0.3’s canonical serialisation. Content is unchanged, but consider re-saving it with a current package version.';
+    status='legacy'; note='Integrity verified against the legacy (pre-canonical) hash format. This file predates surveyframe 0.3’s canonical serialisation. Content is unchanged; consider re-saving it with a current package version.';
   }else{
-    status='fail'; note='Hash mismatch — this file does not match its own recorded hash. It may have been edited after write_sframe() produced it, outside amend_sframe()’s disclosed-revision path.';
+    status='fail'; note='Hash mismatch. This file does not match its own recorded hash. It may have been edited after write_sframe() produced it, outside amend_sframe()’s disclosed-revision path.';
   }
 
   var icon={ok:'✅',legacy:'⚠️',fail:'❌'}[status];
@@ -284,7 +284,7 @@ async function verify(text){
 
   html+='<table><caption>File</caption><tbody>';
   html+='<tr><th>Title</th><td>'+esc((parsed.meta&&parsed.meta.title)||'(untitled)')+'</td></tr>';
-  html+='<tr><th>Instrument version</th><td>'+esc(parsed.version||(parsed.meta&&parsed.meta.version)||'—')+'</td></tr>';
+  html+='<tr><th>Instrument version</th><td>'+esc(parsed.version||(parsed.meta&&parsed.meta.version)||'-')+'</td></tr>';
   html+='<tr><th>Items / choice sets / scales</th><td>'+
     (parsed.items||[]).length+' / '+(parsed.choices||[]).length+' / '+(parsed.scales||[]).length+'</td></tr>';
   html+='<tr><th>Recorded hash</th><td>'+shortHash(storedHash)+'</td></tr>';
@@ -297,7 +297,7 @@ async function verify(text){
     html+='<thead><tr><th>#</th><th>Timestamp (UTC)</th><th>Reason</th><th>Tier</th>'+
       '<th>Explanation</th><th>Deviation report</th><th>Signoff</th><th>Changed fields</th></tr></thead><tbody>';
     amendments.forEach(function(a,i){
-      var tierBadge='<span class="badge-tier '+esc(a.tier||'')+'">'+esc(a.tier||'—')+'</span>';
+      var tierBadge='<span class="badge-tier '+esc(a.tier||'')+'">'+esc(a.tier||'-')+'</span>';
       // jsonlite's auto_unbox = TRUE writes a single-element character vector
       // as a bare JSON string rather than a 1-element array, so
       // changed_fields may arrive here as either "items" or ["items"].
@@ -311,9 +311,9 @@ async function verify(text){
         '<td>'+esc(a.reason_code)+'</td>'+
         '<td>'+tierBadge+'</td>'+
         '<td>'+esc(a.reason_text)+'</td>'+
-        '<td>'+esc(a.deviation_report||'—')+'</td>'+
+        '<td>'+esc(a.deviation_report||'none')+'</td>'+
         '<td>'+esc(a.signoff||'none')+'</td>'+
-        '<td>'+esc(cf.join(', ')||'—')+'</td>'+
+        '<td>'+esc(cf.join(', ')||'none')+'</td>'+
       '</tr>';
     });
     html+='</tbody></table>';
