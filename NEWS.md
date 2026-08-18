@@ -70,6 +70,43 @@ from data whose true difference never changed.
 * `vignettes/small-sample.Rmd` walks through when to prefer each
   correction over its conventional counterpart.
 
+## New: text and open-ended response analysis
+
+A 9-method text-analysis family for open-ended survey items, from term
+frequency through topic modelling, sharing the same analysis-plan,
+role-resolution, and reporting pipeline every other method family uses.
+
+* `term_freq`: top terms by frequency, optionally split by a group
+  variable, rendered as a bar chart or a word cloud.
+* `ngram_freq`: top bigrams or trigrams by frequency.
+* `term_context`: a keyword-in-context concordance table (before/match/
+  after) for a chosen keyword.
+* `co_occurrence`: pairwise within-response co-occurrence counts on the
+  top terms, rendered as a heatmap.
+* `co_occurrence_network`: a Louvain-clustered (Blondel et al. 2008),
+  force-directed (Fruchterman & Reingold 1991) term co-occurrence
+  network; requires the optional igraph package.
+* `tidy_sentiment`: positive/negative sentiment counts and proportion
+  positive using the bing lexicon, optionally split by a group variable,
+  rendered as a diverging bar chart or a positive/negative comparison
+  word cloud; requires the optional tidytext package.
+* `quanteda_dfm`: a document-feature matrix summary (feature count,
+  sparsity, top features); requires the optional quanteda package.
+* `topic_model_lda`: Latent Dirichlet Allocation topic modelling, top
+  terms per topic as a ranked table and a faceted bar chart; requires
+  the optional tidytext and topicmodels packages.
+* `stm_topics`: structural topic modelling, the same top-terms-per-topic
+  output; requires the optional stm and tidytext packages.
+* A shared cleaning step (`clean_text_responses()`) and a 174-word
+  Snowball-based English stopword list, both exported so a study can
+  reuse or override them outside a runner.
+* Both the visual builder and SurveyStudio support all 9 methods,
+  including the word-cloud, top-N, seed, and topic-count (`k`) options
+  that steer their plots and models.
+* `vignettes/text-analysis.Rmd` walks through cleaning, each method, and
+  what the family deliberately does not attempt (stemming/lemmatisation,
+  tf-idf, and keyness comparison are not yet implemented).
+
 ## Corrected results (read before comparing against earlier output)
 
 Four defects found by independent cross-validation are fixed. Each
