@@ -222,11 +222,30 @@ sframe_plot_frequency <- function(result, palette = c("web", "print")) {
 # overlap each other at the boundary. Defaults to every word sharing the
 # origin, the single-cloud case `sframe_plot_term_frequency()` uses.
 #
+# `aspect` scales the spiral's x-growth relative to its (fixed) y-growth:
+# `aspect = 1` is a circular spiral (`sframe_plot_term_frequency()`'s
+# cloud); `aspect < 1` grows taller and narrower than it does wide, which
+# is what keeps 2 side-by-side clusters (`sframe_plot_sentiment()`'s
+# left/right comparison cloud) from spreading into each other
+# horizontally as readily as a wide ellipse would.
+#
+# `shape = "circle"` additionally caps the spiral radius at a disc sized
+# to roughly hold the words' total rendered area (accounting for a
+# packing-inefficiency factor, since rectangular bounding boxes and a
+# spiral search never tile perfectly), and wraps the search back toward
+# the centre instead of growing past that radius once a word's natural
+# spiral would exceed it — so a smaller word placed later fills a real
+# interior gap near the centre rather than spilling out past a ragged
+# organic edge. `shape = "organic"` (default) is uncapped, the original
+# freeform behaviour.
+#
 # Still no new dependency (todo_0.5.md: "do not add a wordcloud/
 # ggwordcloud package for this"): `grid` and `grDevices::pdf(NULL)` (a
 # null device, writes no file) are both base R, not the wordcloud/
 # ggwordcloud packages themselves.
-.sframe_wordcloud_layout <- function(words, sizes, centers = NULL, padding = 0.15) {
+.sframe_wordcloud_layout <- function(words, sizes, centers = NULL, padding = 0.15,
+                                     aspect = 1.5, shape = c("organic", "circle")) {
+  shape <- match.arg(shape)
   n <- length(words)
   if (n == 0) {
     return(data.frame(term = character(0), x = numeric(0), y = numeric(0)))
@@ -256,6 +275,12 @@ sframe_plot_frequency <- function(result, palette = c("web", "print")) {
   half_w <- vapply(dims, `[[`, numeric(1), "w") / 2 * (1 + padding)
   half_h <- vapply(dims, `[[`, numeric(1), "h") / 2 * (1 + padding)
 
+  # Packing-efficiency factor: an Archimedean spiral search over
+  # rectangular bounding boxes fills roughly half a disc's true area in
+  # practice, not all of it, so the target radius is inflated to
+  # compensate rather than coming out too cramped.
+  max_r <- if (shape == "circle") sqrt(sum(4 * half_w * half_h) / pi / 0.5) else Inf
+
   placed_x <- placed_y <- placed_hw <- placed_hh <- numeric(0)
   overlaps <- function(x, y, hw, hh) {
     if (!length(placed_x)) return(FALSE)
@@ -266,16 +291,22 @@ sframe_plot_frequency <- function(result, palette = c("web", "print")) {
   for (i in seq_len(n)) {
     theta <- 0
     r <- 0
+    attempts <- 0L
     repeat {
-      # An elliptical spiral (x grows faster than y) matches how a word
-      # cloud actually reads, wide and short, rather than the wasted
-      # vertical space a perfectly circular spiral produces.
-      cand_x <- centers$x[i] + r * cos(theta) * 1.5
+      cand_x <- centers$x[i] + r * cos(theta) * aspect
       cand_y <- centers$y[i] + r * sin(theta)
       if (!overlaps(cand_x, cand_y, half_w[i], half_h[i])) break
       theta <- theta + 0.1
       r <- r + 0.012
-      if (r > 30) break  # pathological fallback; not hit in practice
+      if (r > max_r) {
+        # Wrap back toward the centre rather than growing past the
+        # target disc: jump to a substantially different angle so the
+        # retry does not just re-walk the same failed trajectory.
+        r <- 0.02
+        theta <- theta + pi / 3
+      }
+      attempts <- attempts + 1L
+      if (attempts > 4000L) break  # pathological fallback; not hit in practice
     }
     x[i] <- cand_x
     y[i] <- cand_y
@@ -342,7 +373,10 @@ sframe_plot_term_frequency <- function(result, palette = c("web", "print")) {
       (v - rng[1]) / diff(rng)
     }
     plot_tbl$size <- 5 + rescale01(sqrt(plot_tbl$n)) * 13
-    layout <- .sframe_wordcloud_layout(plot_tbl$term, plot_tbl$size)
+    # aspect = 1 (equal x/y growth) plus shape = "circle" (radius-capped,
+    # wrapped fill) is the circular word cloud shape.
+    layout <- .sframe_wordcloud_layout(plot_tbl$term, plot_tbl$size,
+                                       aspect = 1, shape = "circle")
     plot_tbl <- merge(plot_tbl, layout, by = "term")
     # Tight coordinate limits from the actual placed extents (each word's
     # anchor point +/- its OWN measured half-width/half-height, not just
@@ -353,9 +387,16 @@ sframe_plot_term_frequency <- function(result, palette = c("web", "print")) {
     ylim <- range(c(plot_tbl$y - plot_tbl$half_h, plot_tbl$y + plot_tbl$half_h))
     return(
       ggplot2::ggplot(plot_tbl, ggplot2::aes(x = .data$x, y = .data$y,
-                                             label = .data$term, size = .data$size)) +
+                                             label = .data$term, size = .data$size,
+                                             alpha = .data$n)) +
+        # Colour is a fixed hue (brand$teal); ALPHA is what varies
+        # dark-to-light with frequency, so the more frequent (already
+        # bigger) a term is, the darker it also reads, and a term is
+        # never lightened past a WCAG-conscious floor (0.5, not down to
+        # near-invisible) even at the bottom of the frequency range.
         ggplot2::geom_text(colour = brand$teal, fontface = "bold") +
         ggplot2::scale_size_identity() +
+        ggplot2::scale_alpha_continuous(range = c(0.5, 1), guide = "none") +
         ggplot2::coord_fixed(xlim = xlim, ylim = ylim, expand = TRUE) +
         ggplot2::labs(title = paste("Term cloud for", result$variable %||% "")) +
         ggplot2::theme_void() +
@@ -377,10 +418,30 @@ sframe_plot_term_frequency <- function(result, palette = c("web", "print")) {
   bar_tbl <- do.call(rbind, lapply(split(bar_tbl, bar_tbl$group), function(d) {
     utils::head(d[order(-d$n), , drop = FALSE], 20)
   }))
-  bar_tbl$term <- factor(bar_tbl$term, levels = rev(unique(bar_tbl$term[order(bar_tbl$n)])))
-  p <- ggplot2::ggplot(bar_tbl, ggplot2::aes(x = .data$term, y = .data$n)) +
+  # A single global factor level list (one position per distinct term,
+  # largest anywhere in the combined table wins) is wrong for a faceted
+  # chart with `scales = "free_y"`: the same term can appear in more than
+  # one group at a different frequency, but a shared factor only has ONE
+  # position for it, so a facet's own bars come out sorted by whichever
+  # group happened to set that position, not that facet's own values --
+  # confirmed by rendering a real 2-group case (a term with n=18 in one
+  # facet was not visually near the top of that facet at all). The
+  # standard fix (the same one `tidytext::reorder_within()` automates):
+  # make the factor level itself carry the group, sort per group, then
+  # strip the group suffix back off only for the printed label.
+  bar_tbl$term_facet <- paste(bar_tbl$term, bar_tbl$group, sep = "\r")
+  bar_tbl <- bar_tbl[order(bar_tbl$group, bar_tbl$n), ]
+  # Ascending factor levels (smallest first, largest last): after
+  # coord_flip(), ggplot2 draws the LAST level at the top, so this is
+  # what puts the largest bar at the top of the chart, matching the
+  # standard word-frequency convention (e.g. the LADAL tutorial's
+  # frequency plots). The previous rev() here put the smallest bar on
+  # top instead -- confirmed by rendering, not just read.
+  bar_tbl$term_facet <- factor(bar_tbl$term_facet, levels = unique(bar_tbl$term_facet))
+  p <- ggplot2::ggplot(bar_tbl, ggplot2::aes(x = .data$term_facet, y = .data$n)) +
     ggplot2::geom_col(fill = brand$fill, colour = brand$ink, linewidth = 0.3, width = 0.72) +
     ggplot2::coord_flip() +
+    ggplot2::scale_x_discrete(labels = function(x) sub("\r.*$", "", x)) +
     ggplot2::labs(title = title, x = NULL, y = "Frequency") +
     theme_surveyframe(palette = palette)
   if (grouped) p <- p + ggplot2::facet_wrap(~ group, scales = "free_y")
@@ -2156,12 +2217,25 @@ sframe_plot_topics <- function(result, palette = c("web", "print")) {
   }))
   plot_tbl$topic <- factor(paste("Topic", plot_tbl$topic),
                             levels = paste("Topic", sort(unique(plot_tbl$topic))))
-  plot_tbl$term <- factor(plot_tbl$term,
-                           levels = rev(unique(plot_tbl$term[order(plot_tbl$beta)])))
+  # Same fix as .sframe_plot_term_bar()'s: a single global factor level
+  # per term is wrong once the same word appears in more than one topic
+  # (a common case) at a different beta, since a shared factor only has
+  # one position for it, so a topic facet's own bars would not actually
+  # sort by that facet's own beta values. Carry the topic in the factor
+  # level itself, sort per topic, then strip the topic suffix back off
+  # only for the printed label (the same pattern
+  # `tidytext::reorder_within()` automates, done by hand here since
+  # tidytext is Suggests-only and this chart also serves the base-R LDA
+  # path). Ascending within each topic, largest last: coord_flip() draws
+  # the last level at the top.
+  plot_tbl$term_facet <- paste(plot_tbl$term, plot_tbl$topic, sep = "\r")
+  plot_tbl <- plot_tbl[order(plot_tbl$topic, plot_tbl$beta), ]
+  plot_tbl$term_facet <- factor(plot_tbl$term_facet, levels = unique(plot_tbl$term_facet))
 
-  p <- ggplot2::ggplot(plot_tbl, ggplot2::aes(x = .data$term, y = .data$beta)) +
+  p <- ggplot2::ggplot(plot_tbl, ggplot2::aes(x = .data$term_facet, y = .data$beta)) +
     ggplot2::geom_col(fill = brand$fill, colour = brand$ink, linewidth = 0.3, width = 0.72) +
     ggplot2::coord_flip() +
+    ggplot2::scale_x_discrete(labels = function(x) sub("\r.*$", "", x)) +
     ggplot2::facet_wrap(~ topic, scales = "free_y") +
     ggplot2::labs(title = paste("Top terms per topic for", result$variable %||% ""),
                   x = NULL, y = "Term probability") +
@@ -2330,9 +2404,14 @@ sframe_plot_cooccurrence_network <- function(result, palette = c("web", "print")
   rng <- range(both$n)
   size01 <- if (diff(rng) == 0) rep(0.5, nrow(both)) else (sqrt(both$n) - sqrt(rng[1])) / (sqrt(rng[2]) - sqrt(rng[1]))
   both$size <- 5 + size01 * 13
+  # Negative left, positive right: reads the same direction as the
+  # diverging bar chart (negative extends left of zero, positive right).
+  # aspect < 1 grows each cluster taller/narrower than a circular or
+  # wide-elliptical spiral would, which is what keeps the 2 clusters from
+  # spreading into each other horizontally between the anchors.
   anchor_offset <- 1.4
-  centers <- data.frame(x = 0, y = ifelse(both$sentiment == "negative", anchor_offset, -anchor_offset))
-  layout <- .sframe_wordcloud_layout(both$word, both$size, centers = centers)
+  centers <- data.frame(x = ifelse(both$sentiment == "negative", -anchor_offset, anchor_offset), y = 0)
+  layout <- .sframe_wordcloud_layout(both$word, both$size, centers = centers, aspect = 0.65)
   merge(both, layout, by.x = "word", by.y = "term")
 }
 
@@ -2381,26 +2460,32 @@ sframe_plot_sentiment <- function(result, palette = c("web", "print")) {
     # fix sframe_plot_term_frequency()'s single cloud needed: without it,
     # a long word at the outer edge (e.g. "comfortable") clips mid-word
     # rather than sitting fully inside the panel.
-    xlim <- range(c(cloud_tbl$x - cloud_tbl$half_w, cloud_tbl$x + cloud_tbl$half_w))
-    y_data_range <- range(c(cloud_tbl$y - cloud_tbl$half_h, cloud_tbl$y + cloud_tbl$half_h))
+    x_data_range <- range(c(cloud_tbl$x - cloud_tbl$half_w, cloud_tbl$x + cloud_tbl$half_w))
+    ylim <- range(c(cloud_tbl$y - cloud_tbl$half_h, cloud_tbl$y + cloud_tbl$half_h))
     # The 2 group labels sit past the outermost word on each side, at a
     # fixed offset from the data's own extent, the same "anchor beyond the
     # content" placement the tidytext/wordcloud comparison.cloud() example
     # uses its own boxed labels for.
-    label_pad <- diff(y_data_range) * 0.08
-    ylim <- y_data_range + c(-1, 1) * label_pad
-    # Negative words are anchored at +offset (the .sframe_sentiment_cloud_
-    # layout() call above), positive at -offset, so the top label is
-    # always "negative" and the bottom always "positive" regardless of
-    # the data's actual extent.
+    label_pad <- diff(x_data_range) * 0.08
+    xlim <- x_data_range + c(-1, 1) * label_pad
+    # Negative words are anchored at -offset (left), positive at +offset
+    # (right) -- the same .sframe_sentiment_cloud_layout() call above --
+    # matching the diverging bar's own left-negative/right-positive
+    # convention, so the left label is always "negative" and the right
+    # always "positive" regardless of the data's actual extent.
     labels_df <- data.frame(
-      x = 0, y = ylim, label = c("positive", "negative"),
+      x = xlim, y = 0, label = c("negative", "positive"),
       stringsAsFactors = FALSE
     )
     return(
       ggplot2::ggplot(cloud_tbl, ggplot2::aes(x = .data$x, y = .data$y,
                                               label = .data$word, size = .data$size,
-                                              colour = .data$sentiment)) +
+                                              colour = .data$sentiment, alpha = .data$n)) +
+        # Colour is the categorical negative/positive hue; ALPHA is what
+        # varies dark-to-light with frequency within each side (the same
+        # mechanism the term cloud uses), floored at 0.5 so even the
+        # least-frequent word on a side stays legible rather than fading
+        # toward invisible.
         ggplot2::geom_text(fontface = "bold") +
         ggplot2::geom_label(data = labels_df,
                             ggplot2::aes(x = .data$x, y = .data$y, label = .data$label),
@@ -2409,6 +2494,7 @@ sframe_plot_sentiment <- function(result, palette = c("web", "print")) {
                             label.size = 0, size = 3.6) +
         ggplot2::scale_size_identity() +
         ggplot2::scale_colour_manual(values = fill_map, guide = "none") +
+        ggplot2::scale_alpha_continuous(range = c(0.5, 1), guide = "none") +
         ggplot2::coord_fixed(xlim = xlim, ylim = ylim, expand = TRUE) +
         ggplot2::labs(title = paste("Sentiment terms for", result$variable %||% "")) +
         ggplot2::theme_void() +

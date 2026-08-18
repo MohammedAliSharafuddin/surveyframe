@@ -215,6 +215,46 @@ test_that("sframe_plot_topics() returns a ggplot object for an STM result", {
   expect_s3_class(p, "ggplot")
 })
 
+test_that("sframe_plot_topics() puts the highest-probability term at the top of each facet", {
+  skip_if_not_installed("ggplot2")
+  tbl <- data.frame(
+    topic = c(1L, 1L, 1L, 2L, 2L, 2L),
+    term = c("low", "mid", "high", "z", "y", "x"),
+    beta = c(0.01, 0.05, 0.3, 0.02, 0.1, 0.4),
+    rank = c(3L, 2L, 1L, 3L, 2L, 1L),
+    stringsAsFactors = FALSE
+  )
+  p <- sframe_plot_topics(list(test = "stm_topics", variable = "x", table = tbl))
+  lv <- levels(p$data$term_facet)
+  # The LAST factor level is what coord_flip() draws at the top; the
+  # highest-beta term in each topic's own facet ("high" in Topic 1, "x"
+  # in Topic 2) must be last within that facet's own levels.
+  t1_levels <- lv[grepl("\rTopic 1$", lv)]
+  expect_equal(t1_levels[length(t1_levels)], paste0("high", "\r", "Topic 1"))
+  t2_levels <- lv[grepl("\rTopic 2$", lv)]
+  expect_equal(t2_levels[length(t2_levels)], paste0("x", "\r", "Topic 2"))
+})
+
+test_that("sframe_plot_topics() sorts each facet by ITS OWN beta, not a shared global order", {
+  skip_if_not_installed("ggplot2")
+  # "shared" appears in both topics but at a much higher beta in topic 2
+  # than "solo" (topic 1 only): a global (not per-facet) factor level
+  # would misorder whichever facet it doesn't match.
+  tbl <- data.frame(
+    topic = c(1L, 1L, 2L, 2L),
+    term  = c("solo", "shared", "other", "shared"),
+    beta  = c(0.30, 0.05, 0.02, 0.40),
+    rank  = c(1L, 2L, 2L, 1L),
+    stringsAsFactors = FALSE
+  )
+  p <- sframe_plot_topics(list(test = "stm_topics", variable = "x", table = tbl))
+  lv <- levels(p$data$term_facet)
+  t1 <- lv[grepl("\rTopic 1$", lv)]
+  expect_equal(t1[length(t1)], paste0("solo", "\r", "Topic 1"))
+  t2 <- lv[grepl("\rTopic 2$", lv)]
+  expect_equal(t2[length(t2)], paste0("shared", "\r", "Topic 2"))
+})
+
 test_that("sframe_plot_topics() returns NULL when there is no usable table", {
   skip_if_not_installed("ggplot2")
   expect_null(sframe_plot_topics(list(test = "topic_model_lda", table = NULL)))

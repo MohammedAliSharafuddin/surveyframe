@@ -258,15 +258,15 @@ test_that("sframe_run_tidy_sentiment() attaches word x sentiment counts", {
   expect_equal(ws$n[ws$word == "terrible"], 2L)
 })
 
-test_that("the comparison cloud places negative words above and positive words below the centre line", {
+test_that("the comparison cloud places negative words left and positive words right of centre", {
   skip_if_not_installed("tidytext")
   skip_if_not_installed("ggplot2")
   result <- sframe_run_tidy_sentiment(
     make_sentiment_data(), list(item = "comments"), list(), NULL
   )
   cloud_tbl <- surveyframe:::.sframe_sentiment_cloud_layout(result$word_sentiment)
-  expect_true(all(cloud_tbl$y[cloud_tbl$sentiment == "negative"] > 0))
-  expect_true(all(cloud_tbl$y[cloud_tbl$sentiment == "positive"] < 0))
+  expect_true(all(cloud_tbl$x[cloud_tbl$sentiment == "negative"] < 0))
+  expect_true(all(cloud_tbl$x[cloud_tbl$sentiment == "positive"] > 0))
 })
 
 test_that("the comparison cloud's two groups never overlap each other or themselves", {
@@ -309,4 +309,23 @@ test_that("sframe_plot_sentiment draws a comparison cloud when opted in", {
   cloud_tbl <- surveyframe:::.sframe_sentiment_cloud_layout(result$word_sentiment)
   expect_true(all(cloud_tbl$x - cloud_tbl$half_w >= panel_range[1] - 1e-6))
   expect_true(all(cloud_tbl$x + cloud_tbl$half_w <= panel_range[2] + 1e-6))
+})
+
+test_that("the comparison cloud's words are darker (more opaque) the more frequent they are", {
+  skip_if_not_installed("tidytext")
+  skip_if_not_installed("ggplot2")
+  result <- sframe_run_tidy_sentiment(
+    make_sentiment_data(), list(item = "comments"), list(wordcloud = TRUE), NULL
+  )
+  result$options <- list(wordcloud = TRUE)
+  p <- sframe_plot_sentiment(result)
+  built_data <- ggplot2::ggplot_build(p)$data[[1]]
+  # Alpha must vary (not a single flat value) and must be floored, not
+  # allowed to fade toward invisible.
+  expect_gt(length(unique(built_data$alpha)), 1)
+  expect_true(all(built_data$alpha >= 0.5 - 1e-6))
+  expect_true(all(built_data$alpha <= 1))
+  # The single most frequent word overall must be at (or near) full
+  # opacity, not just "some word somewhere is dark".
+  expect_equal(max(built_data$alpha), 1)
 })

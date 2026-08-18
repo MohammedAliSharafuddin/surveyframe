@@ -207,6 +207,20 @@ test_that("sframe_plot_term_frequency returns a ggplot for a bar chart", {
   expect_s3_class(res[[1]]$plot, "ggplot")
 })
 
+test_that("the bar chart puts the largest term at the top after coord_flip (LADAL convention)", {
+  skip_if_not_installed("ggplot2")
+  tbl <- data.frame(term = c("small", "medium", "large"), n = c(1, 5, 10),
+                    pct = c(10, 50, 100), stringsAsFactors = FALSE)
+  p <- sframe_plot_term_frequency(list(test = "term_freq", variable = "x", table = tbl))
+  # The LAST factor level is what coord_flip() draws at the top. The
+  # ungrouped path still tags a "\rall" group suffix internally (see
+  # .sframe_plot_term_bar()), stripped off for the printed label but
+  # still present on the raw factor level.
+  lv <- levels(p$data$term_facet)
+  expect_equal(lv[length(lv)], paste0("large", "\r", "all"))
+  expect_equal(lv[1], paste0("small", "\r", "all"))
+})
+
 test_that("sframe_plot_term_frequency draws a word cloud when opted in", {
   skip_if_not_installed("ggplot2")
   instr <- add_text_rq(make_text_instrument(), roles = list(item = "comments"),
@@ -220,6 +234,40 @@ test_that("sframe_plot_term_frequency draws a word cloud when opted in", {
   # todo_0.5.md's exit checklist calls out.
   coords <- unique(built$data[[1]][c("x", "y")])
   expect_equal(nrow(coords), nrow(built$data[[1]]))
+})
+
+test_that("the term cloud's words are darker (more opaque) the more frequent they are", {
+  skip_if_not_installed("ggplot2")
+  instr <- add_text_rq(make_text_instrument(), roles = list(item = "comments"),
+                       options = list(wordcloud = TRUE))
+  res <- run_analysis_plan(make_text_data(), instr, plots = TRUE)
+  built_data <- ggplot2::ggplot_build(res[[1]]$plot)$data[[1]]
+  expect_gt(length(unique(built_data$alpha)), 1)
+  expect_true(all(built_data$alpha >= 0.5 - 1e-6))
+  expect_equal(max(built_data$alpha), 1)
+})
+
+test_that(".sframe_wordcloud_layout(shape = 'circle') roughly fills a disc rather than sprawling", {
+  words <- paste0("word", 1:20)
+  sizes <- rep(10, 20)
+  layout_circle <- surveyframe:::.sframe_wordcloud_layout(words, sizes, aspect = 1, shape = "circle")
+  layout_organic <- surveyframe:::.sframe_wordcloud_layout(words, sizes, aspect = 1, shape = "organic")
+  r_circle <- sqrt(layout_circle$x^2 + layout_circle$y^2)
+  r_organic <- sqrt(layout_organic$x^2 + layout_organic$y^2)
+  # The capped/wrapped disc must not sprawl further out than the
+  # uncapped spiral does for the identical word set.
+  expect_lte(max(r_circle), max(r_organic) + 1e-6)
+})
+
+test_that("mutation check: shape = 'circle' actually constrains the radius (not a no-op)", {
+  # A pathologically tiny disc (huge words, tiny target radius) forces the
+  # wrap-around branch to fire; confirms the cap is load-bearing rather
+  # than vacuously satisfied because 20 small words never reached it.
+  words <- paste0("word", 1:15)
+  sizes <- rep(30, 15)
+  layout <- surveyframe:::.sframe_wordcloud_layout(words, sizes, aspect = 1, shape = "circle")
+  expect_equal(nrow(layout), 15L)
+  expect_true(all(is.finite(layout$x)) && all(is.finite(layout$y)))
 })
 
 test_that(".sframe_wordcloud_layout() places no two words' bounding boxes overlapping", {
@@ -291,6 +339,30 @@ test_that("sframe_plot_term_frequency facets by group when the group role is pre
   res <- run_analysis_plan(data, instr, plots = TRUE)
   expect_s3_class(res[[1]]$plot, "ggplot")
   expect_true(inherits(res[[1]]$plot$facet, "FacetWrap"))
+})
+
+test_that("each facet of a grouped bar chart sorts by ITS OWN frequency, not a shared global order", {
+  skip_if_not_installed("ggplot2")
+  # "shared" appears in both groups but at a HIGHER count in group "b"
+  # than "solo" (which only appears in group "a"): a global (not
+  # per-facet) factor level would place "shared" in one fixed position
+  # for both facets, which is wrong for whichever facet it doesn't match.
+  tbl <- data.frame(
+    group = c("a", "a", "b", "b"),
+    term  = c("solo", "shared", "other", "shared"),
+    n     = c(10, 3, 2, 20),
+    pct   = c(50, 15, 10, 90),
+    stringsAsFactors = FALSE
+  )
+  p <- sframe_plot_term_frequency(list(test = "term_freq", variable = "x", table = tbl))
+  lv <- levels(p$data$term_facet)
+  # Facet "a": solo (10) must outrank shared (3) -- solo's level must
+  # come after shared's among the group-"a" levels.
+  a_levels <- lv[grepl("\ra$", lv)]
+  expect_equal(a_levels[length(a_levels)], paste0("solo", "\r", "a"))
+  # Facet "b": shared (20) must outrank other (2).
+  b_levels <- lv[grepl("\rb$", lv)]
+  expect_equal(b_levels[length(b_levels)], paste0("shared", "\r", "b"))
 })
 
 # ---------------------------------------------------------------------------
