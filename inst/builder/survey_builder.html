@@ -3022,7 +3022,7 @@ function saveCheck(){
 }
 
 // Analyse registry and role-based plan editor
-var CSHORT={field_2018:'Field (2018)',cohen_1988:'Cohen (1988)',mann_1947:'Mann & Whitney (1947)',kruskal_1952:'Kruskal & Wallis (1952)',spearman_1904:'Spearman (1904)',kendall_1938:'Kendall (1938)',cronbach_1951:'Cronbach (1951)',hosmer_2013:'Hosmer et al. (2013)',mackinnon_2008:'MacKinnon (2008)',aiken_1991:'Aiken & West (1991)',firth_1993:'Firth (1993)',heinze_2002:'Heinze & Schemper (2002)'};
+var CSHORT={field_2018:'Field (2018)',cohen_1988:'Cohen (1988)',mann_1947:'Mann & Whitney (1947)',kruskal_1952:'Kruskal & Wallis (1952)',spearman_1904:'Spearman (1904)',kendall_1938:'Kendall (1938)',cronbach_1951:'Cronbach (1951)',hosmer_2013:'Hosmer et al. (2013)',mackinnon_2008:'MacKinnon (2008)',aiken_1991:'Aiken & West (1991)',firth_1993:'Firth (1993)',heinze_2002:'Heinze & Schemper (2002)',blondel_2008:'Blondel et al. (2008)',fruchterman_1991:'Fruchterman & Reingold (1991)'};
 var ANALYSIS_REGISTRY={
 frequency:{family:'descriptive',label:'Frequency table',roles:[{id:'variable',label:'Variable',min:1,max:1,levels:['nominal','ordinal','likert']}],showAlpha:false,showHypotheses:false,showEffectSize:false,assumptions:[],output:'Counts, percentages, valid percentages, missing values.',refs:[]},
 descriptives:{family:'descriptive',label:'Descriptives',roles:[{id:'variables',label:'Variables',min:1,max:99,levels:['continuous','scale','ordinal','likert']},{id:'split_by',label:'Split by (optional)',min:0,max:1,levels:['nominal','ordinal']}],showAlpha:false,showHypotheses:false,showEffectSize:false,assumptions:[],output:'N, valid N, missing N, mean, SD, median, IQR, range, skewness, kurtosis, SE, CI.',refs:[]},
@@ -3192,7 +3192,7 @@ function getAllVars(){
   var scales=S.scales.map(function(s){var m=varLevel(s.id);return{id:s.id,label:s.id+' - '+(s.label||'scale score'),level:m.level,kind:'scale',meta:m,scale:s};});
   return items.concat(scales);
 }
-function getVarCat(id){var m=varLevel(id);if(m.level==='likert')return'lik';return['nominal','ordinal'].includes(m.level)?'cat':'cont';}
+function getVarCat(id){var m=varLevel(id);if(m.level==='likert')return'lik';if(m.level==='text')return'text';return['nominal','ordinal'].includes(m.level)?'cat':'cont';}
 function rolesFromLegacy(rq,method){if(rq&&rq.roles)return rq.roles;var v=(rq&&rq.variables)||[];if(!Array.isArray(v))v=[v];if(!method)return{};var r={},defs=(ANALYSIS_REGISTRY[method]||{}).roles||[];defs.forEach(function(role,idx){if(role.max===1)r[role.id]=v[idx]||'';else r[role.id]=v.slice(idx);});return r;}
 function openRQModal(id){
   editRqId=id||null;var rq=id?S.analysis_plan.find(function(r){return r.id===id;}):null;
@@ -3264,8 +3264,24 @@ function onTestChg(renderRoles){
 }
 function suggestTest(){
   var sel=flattenRoles(collectRoles()),box=document.getElementById('rqSuggest'),msg=document.getElementById('rqSuggestMsg');
+  if(sel.length===0){box.style.display='none';return;}
+  var cats=sel.map(getVarCat);
+  // A single selected text/textarea item has no pairwise partner to look
+  // up in TEST_SUGGEST below (every other suggestion path needs >=2
+  // variables), but it is the single most common case for the whole
+  // text-analysis family, so it gets its own path rather than falling
+  // through to "no suggestion" the way every other 1-variable selection
+  // correctly still does. A text item combined with anything else also
+  // bypasses the pairwise table below (its 2-category combinations were
+  // never meant to include 'text'), suggesting term_freq regardless of
+  // what else is selected.
+  if(cats.indexOf('text')>-1){
+    document.getElementById('rq-test').value='term_freq';onTestChg();
+    msg.textContent=(ANALYSIS_REGISTRY.term_freq||{}).label+' is suggested from the selected variable type.';box.style.display='flex';
+    return;
+  }
   if(sel.length<2){box.style.display='none';return;}
-  var cats=sel.map(getVarCat),sug=sel.length===2?(TEST_SUGGEST[cats[0]+'+'+cats[1]]||'correlation_pearson'):'regression_linear';
+  var sug=sel.length===2?(TEST_SUGGEST[cats[0]+'+'+cats[1]]||'correlation_pearson'):'regression_linear';
   if(sug==='mann_whitney'){
     var gid=sel[cats[0]==='cat'?0:1],n=groupLevels(gid);
     if(n!==null&&n>2)sug='kruskal_wallis';
