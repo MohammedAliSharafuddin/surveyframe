@@ -41,6 +41,11 @@ jobs:
       - name: Add robots.txt
         run: cp pkgdown/extra/robots.txt docs/robots.txt
 
+      - name: Add the standalone .sframe verifier
+        run: |
+          mkdir -p docs/verify
+          cp pkgdown/extra/verify/index.html docs/verify/index.html
+
       - name: Deploy to GitHub pages
         uses: JamesIves/github-pages-deploy-action@v4.5.0
         with:

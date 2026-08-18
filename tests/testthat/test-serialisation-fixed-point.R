@@ -87,3 +87,32 @@ test_that("the restore functions are idempotent on content", {
   expect_identical(inst$analysis_plan[[1]],
                    sframe_restore_analysis_block(inst$analysis_plan[[1]]))
 })
+
+test_that("a non-round decimal survives write_sframe()/read_sframe() without a false integrity failure", {
+  # write_sframe()'s hash is computed with digits = NA (full precision,
+  # sframe_hash_payload() -> sframe_hash_json()), but the JSON actually
+  # written to disk used to go through jsonlite::toJSON() with its default
+  # digits = 4, silently rounding any non-round decimal (a scale weight of
+  # 1/3, say) before it reached disk. The file's own embedded hash was
+  # computed over the un-rounded value, so read_sframe() (or any other
+  # reader) recomputing the hash from the actually-written, rounded text
+  # got a different hash and reported "modified" on a file nobody had
+  # touched. Caught via a standalone browser-based .sframe verifier, which
+  # reproduced the same false failure independently of this package.
+  # Fixed by adding digits = NA to write_sframe()'s own toJSON() call, so
+  # the same full-precision value that was hashed is the one written.
+  path <- tempfile(fileext = ".sframe")
+  instr <- sf_instrument(
+    title = "Non-round weight", version = "1.0.0",
+    components = list(
+      sf_choices("ag5", 1:5, c("a", "b", "c", "d", "e")),
+      sf_item("q1", "Q1", type = "likert", choice_set = "ag5", scale_id = "sc"),
+      sf_scale("sc", "S", items = "q1", weights = 1 / 3)
+    )
+  )
+  write_sframe(instr, path, overwrite = TRUE)
+  written <- jsonlite::fromJSON(path, simplifyVector = FALSE)
+  expect_equal(as.numeric(written$scales[[1]]$weights[[1]]), 1 / 3)
+  back <- expect_no_error(read_sframe(path))
+  expect_equal(back$scales[[1]]$weights, 1 / 3)
+})
