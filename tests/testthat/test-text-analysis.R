@@ -222,6 +222,67 @@ test_that("sframe_plot_term_frequency draws a word cloud when opted in", {
   expect_equal(nrow(coords), nrow(built$data[[1]]))
 })
 
+test_that(".sframe_wordcloud_layout() places no two words' bounding boxes overlapping", {
+  skip_if_not_installed("ggplot2")
+  # A deliberately adversarial fixture: many words of similar, large size,
+  # which is exactly the case that overlapped under the old golden-angle
+  # spiral (no collision check) and under the first collision-aware
+  # attempt (strheight() silently ignoring a vectorised cex, so every
+  # bounding box used the same height regardless of font size).
+  words <- c("staff", "service", "helpful", "friendly", "quick", "clean",
+             "spotless", "attentive", "welcome", "comfortable")
+  sizes <- rep(16, length(words))
+  layout <- surveyframe:::.sframe_wordcloud_layout(words, sizes)
+  grDevices::pdf(NULL)
+  on.exit(grDevices::dev.off())
+  cex <- sizes / 4
+  hw <- graphics::strwidth(words, units = "inches", cex = cex, font = 2) / 2
+  hh <- mapply(function(w, cx) graphics::strheight(w, units = "inches", cex = cx, font = 2),
+              words, cex) / 2
+  layout <- merge(layout, data.frame(term = words, hw = hw, hh = hh, stringsAsFactors = FALSE),
+                  by = "term")
+  n <- nrow(layout)
+  overlap_found <- FALSE
+  for (i in seq_len(n - 1)) {
+    for (j in seq.int(i + 1, n)) {
+      dx <- abs(layout$x[i] - layout$x[j])
+      dy <- abs(layout$y[i] - layout$y[j])
+      if (dx < (layout$hw[i] + layout$hw[j]) && dy < (layout$hh[i] + layout$hh[j])) {
+        overlap_found <- TRUE
+      }
+    }
+  }
+  expect_false(overlap_found)
+})
+
+test_that("mutation check: shrinking the padding to near-zero lets an overlap through", {
+  # Confirms the test above is actually sensitive to overlap, not
+  # vacuously passing regardless of the layout.
+  words <- c("staff", "service", "helpful", "friendly", "quick")
+  sizes <- rep(16, length(words))
+  layout <- surveyframe:::.sframe_wordcloud_layout(words, sizes, padding = -0.85)
+  grDevices::pdf(NULL)
+  on.exit(grDevices::dev.off())
+  cex <- sizes / 4
+  hw <- graphics::strwidth(words, units = "inches", cex = cex, font = 2) / 2 * (1 + 0.85)
+  hh <- mapply(function(w, cx) graphics::strheight(w, units = "inches", cex = cx, font = 2),
+              words, cex) / 2 * (1 + 0.85)
+  layout <- merge(layout, data.frame(term = words, hw = hw, hh = hh, stringsAsFactors = FALSE),
+                  by = "term")
+  n <- nrow(layout)
+  overlap_found <- FALSE
+  for (i in seq_len(n - 1)) {
+    for (j in seq.int(i + 1, n)) {
+      dx <- abs(layout$x[i] - layout$x[j])
+      dy <- abs(layout$y[i] - layout$y[j])
+      if (dx < (layout$hw[i] + layout$hw[j]) && dy < (layout$hh[i] + layout$hh[j])) {
+        overlap_found <- TRUE
+      }
+    }
+  }
+  expect_true(overlap_found)
+})
+
 test_that("sframe_plot_term_frequency facets by group when the group role is present", {
   skip_if_not_installed("ggplot2")
   data <- make_text_data()

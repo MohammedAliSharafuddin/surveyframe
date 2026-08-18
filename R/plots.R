@@ -180,18 +180,90 @@ sframe_plot_frequency <- function(result, palette = c("web", "print")) {
     theme_surveyframe(palette = palette) + sframe_theme_angled_x()
 }
 
-# Deterministic word-cloud layout: an Archimedean-ish spiral driven by the
-# golden angle, so words are spread out rather than overlapping in a line.
-# No new dependency (see todo_0.5.md: "do not add a wordcloud/ggwordcloud
-# package for this"); a real word cloud only needs distinct, non-degenerate
-# positions, not a packing algorithm.
-.sframe_wordcloud_layout <- function(n) {
-  if (n == 0) return(data.frame(x = numeric(0), y = numeric(0)))
-  golden_angle <- pi * (3 - sqrt(5))
-  i <- seq_len(n)
-  r <- sqrt(i)
-  theta <- i * golden_angle
-  data.frame(x = r * cos(theta), y = r * sin(theta))
+# Word-cloud layout via the actual algorithm the wordcloud/ggwordcloud
+# packages use (Jonathan Feinberg's Wordle placement, as described at
+# cran.r-project.org/web/packages/ggwordcloud/vignettes/ggwordcloud.html
+# and r-graph-gallery.com/wordcloud.html): words are placed largest first,
+# each one walking an outward spiral from the centre until it finds a
+# position whose bounding box does not overlap any word already placed.
+# The previous version was a bare golden-angle spiral with NO collision
+# check at all, so a large word could and did overlap its neighbours
+# whenever positions happened to land close together (visible in the
+# 0.5 vignette/demo's word clouds: "comfortable" overlapping "respond").
+#
+# Still no new dependency (todo_0.5.md: "do not add a wordcloud/
+# ggwordcloud package for this"): text is measured with base
+# `grDevices::pdf(NULL)` (a null device, writes no file, the standard R
+# trick for off-screen `strwidth()`/`strheight()`) plus base graphics
+# string-metric functions, not the wordcloud/ggwordcloud packages
+# themselves.
+#
+# `sizes` must be the same values the caller will later map to the
+# `geom_text()` `size` aesthetic (via `scale_size_identity()`, so the
+# rendered size matches exactly what was measured here) — the algorithm
+# only needs sizes *relative* to each other to be consistent between
+# measurement and render, not calibrated to any particular physical unit.
+#
+# `padding` is deliberately generous (45%, not a cosmetic ~10-15%):
+# `pdf(NULL)`'s default font is not necessarily the same one ggplot2's
+# theme actually renders with, so a bounding box measured against the
+# null device's metrics is an estimate, not a guarantee, of the real
+# glyph extent. Erring toward extra whitespace is the safe direction; an
+# under-estimate is a real, visible overlap, which is the defect this
+# function exists to fix.
+.sframe_wordcloud_layout <- function(words, sizes, padding = 0.85) {
+  n <- length(words)
+  if (n == 0) {
+    return(data.frame(term = character(0), x = numeric(0), y = numeric(0)))
+  }
+  # Largest word first: it anchors the centre, and each later (smaller)
+  # word has an easier time finding a gap than the reverse order would.
+  ord <- order(-sizes)
+  words <- words[ord]
+  sizes <- sizes[ord]
+
+  grDevices::pdf(NULL)
+  on.exit(grDevices::dev.off(), add = TRUE)
+  cex <- sizes / 4
+  # strwidth() vectorises cex correctly, one value per string; strheight()
+  # does NOT, despite taking a `cex` vector without complaint (it silently
+  # applies only the first element to every string). Confirmed directly:
+  # strheight(c("a","bb"), cex = c(4, 1)) returns the same height twice.
+  # mapply() forces one strheight() call per word, avoiding that trap.
+  half_w <- graphics::strwidth(words, units = "inches", cex = cex, font = 2) / 2 * (1 + padding)
+  half_h <- mapply(function(w, cx) graphics::strheight(w, units = "inches", cex = cx, font = 2),
+                   words, cex) / 2 * (1 + padding)
+
+  placed_x <- placed_y <- placed_hw <- placed_hh <- numeric(0)
+  overlaps <- function(x, y, hw, hh) {
+    if (!length(placed_x)) return(FALSE)
+    any(abs(x - placed_x) < (hw + placed_hw) & abs(y - placed_y) < (hh + placed_hh))
+  }
+
+  x <- y <- numeric(n)
+  for (i in seq_len(n)) {
+    theta <- 0
+    r <- 0
+    repeat {
+      # An elliptical spiral (x grows faster than y) matches how a word
+      # cloud actually reads, wide and short, rather than the wasted
+      # vertical space a perfectly circular spiral produces.
+      cand_x <- r * cos(theta) * 1.5
+      cand_y <- r * sin(theta)
+      if (!overlaps(cand_x, cand_y, half_w[i], half_h[i])) break
+      theta <- theta + 0.15
+      r <- r + 0.02
+      if (r > 30) break  # pathological fallback; not hit in practice
+    }
+    x[i] <- cand_x
+    y[i] <- cand_y
+    placed_x  <- c(placed_x,  cand_x)
+    placed_y  <- c(placed_y,  cand_y)
+    placed_hw <- c(placed_hw, half_w[i])
+    placed_hh <- c(placed_hh, half_h[i])
+  }
+
+  data.frame(term = words, x = x, y = y, stringsAsFactors = FALSE)
 }
 
 #' Term-frequency plot: horizontal bar or word cloud
@@ -218,22 +290,43 @@ sframe_plot_term_frequency <- function(result, palette = c("web", "print")) {
   if (wordcloud) {
     # The word cloud shows the overall top terms; a per-group cloud is not
     # a legible shape, so the grouped table is collapsed back to overall
-    # frequency first when needed.
+    # frequency first when needed. Capped at 40 (not 60): the collision-
+    # avoiding layout below trades word count for legibility on purpose,
+    # and 40 already matches what other captions in this package call
+    # "the top terms" for a word cloud.
     plot_tbl <- if (grouped) {
       stats::aggregate(n ~ term, data = tbl, FUN = sum)
     } else {
       tbl
     }
     plot_tbl <- plot_tbl[order(-plot_tbl$n), , drop = FALSE]
-    plot_tbl <- utils::head(plot_tbl, 60)
-    layout <- .sframe_wordcloud_layout(nrow(plot_tbl))
-    plot_tbl$x <- layout$x
-    plot_tbl$y <- layout$y
+    plot_tbl <- utils::head(plot_tbl, 40)
+    # Area-proportional sizing (size ~ sqrt(n), per the ggwordcloud
+    # vignette's "true proportionality" recommendation: printed AREA
+    # should track the value, not printed height) rescaled to a legible
+    # point range, then held fixed via scale_size_identity() so the size
+    # actually rendered is exactly the size .sframe_wordcloud_layout()
+    # measured collisions against.
+    rescale01 <- function(v) {
+      rng <- range(v)
+      if (diff(rng) == 0) return(rep(0.5, length(v)))
+      (v - rng[1]) / diff(rng)
+    }
+    plot_tbl$size <- 5 + rescale01(sqrt(plot_tbl$n)) * 13
+    layout <- .sframe_wordcloud_layout(plot_tbl$term, plot_tbl$size)
+    plot_tbl <- merge(plot_tbl, layout, by = "term")
+    # Tight coordinate limits from the actual placed extents (plus a
+    # small margin), rather than letting ggplot2's default expansion add
+    # a wide band of empty space no word ever reaches.
+    pad <- max(plot_tbl$size) / 20
+    xlim <- range(plot_tbl$x) + c(-1, 1) * pad
+    ylim <- range(plot_tbl$y) + c(-1, 1) * pad
     return(
       ggplot2::ggplot(plot_tbl, ggplot2::aes(x = .data$x, y = .data$y,
-                                             label = .data$term, size = .data$n)) +
+                                             label = .data$term, size = .data$size)) +
         ggplot2::geom_text(colour = brand$teal, fontface = "bold") +
-        ggplot2::scale_size(range = c(3, 12), guide = "none") +
+        ggplot2::scale_size_identity() +
+        ggplot2::coord_fixed(xlim = xlim, ylim = ylim, expand = TRUE) +
         ggplot2::labs(title = paste("Term cloud for", result$variable %||% "")) +
         ggplot2::theme_void() +
         ggplot2::theme(plot.title = ggplot2::element_text(face = "bold", hjust = 0.5))
