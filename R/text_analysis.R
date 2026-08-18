@@ -428,7 +428,7 @@ sframe_run_topic_model_lda <- function(data, roles, options, instrument) {
   long <- long[long$n > 0, , drop = FALSE]
   long$doc <- as.integer(as.character(long$doc))
 
-  dtm <- tidytext::cast_dtm(long, doc, term, n)
+  dtm <- tidytext::cast_dtm(long, "doc", "term", "n")
   if (nrow(dtm) < k) {
     return(list(test = "topic_model_lda", error = sprintf(
       "LDA needs at least k = %d documents with usable tokens (found %d).",
@@ -545,7 +545,7 @@ sframe_run_stm_topics <- function(data, roles, options, instrument) {
   counts <- counts[counts$n > 0, , drop = FALSE]
   counts$doc <- as.integer(as.character(counts$doc))
 
-  dtm <- tidytext::cast_dtm(counts, doc, term, n)
+  dtm <- tidytext::cast_dtm(counts, "doc", "term", "n")
   respondent_attr <- attr(cleaned, "respondent")
   dtm_respondent <- respondent_attr[as.integer(rownames(dtm))]
 
