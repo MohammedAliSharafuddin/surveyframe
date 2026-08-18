@@ -3,7 +3,7 @@
 ![surveyframe](reference/figures/readme-logo.png)
 
 > **Just here to verify a `.sframe` file’s integrity hash or read its
-> amendment log?** Skip everything below — **[verify a file
+> amendment log?** **[Verify a file
 > now](https://mohammedalisharafuddin.github.io/surveyframe/verify/)**.
 > No R, no install; it runs entirely in your browser and nothing is
 > uploaded.
