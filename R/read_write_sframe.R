@@ -79,6 +79,14 @@ sframe_serialization_payload <- function(instrument, hash_value = "") {
     payload$designs <- unname(lapply(designs, sframe_conjoint_plain))
   }
 
+  # `amendments` follows the same added-only-when-non-empty rule as `designs`
+  # above and for the same reason: an instrument that has never been amended
+  # must hash identically before and after this feature existed.
+  amendments <- instrument$amendments %||% list()
+  if (length(amendments) > 0) {
+    payload$amendments <- unname(lapply(amendments, sframe_amendment_plain))
+  }
+
   payload
 }
 
@@ -551,7 +559,11 @@ read_sframe <- function(path, validate = TRUE) {
         sframe_restore_analysis_block
       ),
       models    = lapply(parsed$models %||% list(), sframe_restore_model),
-      render    = parsed$render %||% list()
+      render    = parsed$render %||% list(),
+      # Absent in every file written before amend_sframe() existed, so this
+      # stays an empty list rather than failing on an older instrument, same
+      # precedent as `designs` above.
+      amendments = lapply(parsed$amendments %||% list(), sframe_restore_amendment)
     ),
     class = "sframe"
   )
