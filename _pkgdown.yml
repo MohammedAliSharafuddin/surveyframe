@@ -91,12 +91,14 @@ articles:
   - title: "Specialised analyses"
     desc: >
       Read these when a study calls for them. Small-sample inference covers
-      studies below the n = 30 threshold, and multi-criteria decision analysis
-      covers ranking alternatives against criteria that compete.
+      studies below the n = 30 threshold, multi-criteria decision analysis
+      covers ranking alternatives against criteria that compete, and text
+      analysis covers open-ended survey responses.
     navbar: ~
     contents:
       - small-sample
       - mcdm-analysis
+      - text-analysis
 
 reference:
   - title: "Design"
@@ -129,13 +131,32 @@ reference:
   - title: "Save and load"
     desc: >
       Read and write instruments as portable .sframe JSON files with
-      SHA-256 integrity hashing.
+      SHA-256 integrity hashing, and record disclosed revisions to them.
     contents:
       - write_sframe
       - read_sframe
       - validate_sframe
       - validate_model
       - model_json
+      - amend_sframe
+      - amendment_log
+      - link_git_commit
+      - sframe_validation
+
+  - title: "Accessors and coercion"
+    desc: >
+      Read parts of an instrument, a validation result, or a report
+      without reaching into the object directly, new in 0.4.0.
+    contents:
+      - as_sframe
+      - sf_accessors
+      - sf_component_list
+      - sf_identity
+      - "sf_plan<-"
+      - sf_report_accessors
+      - sf_validation_accessors
+      - sframe_as_data_frame
+      - sframe_subset
 
   - title: "Deploy"
     desc: >
