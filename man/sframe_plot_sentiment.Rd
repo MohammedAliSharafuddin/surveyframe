@@ -2,7 +2,7 @@
 % Please edit documentation in R/plots.R
 \name{sframe_plot_sentiment}
 \alias{sframe_plot_sentiment}
-\title{Sentiment plot: diverging bar of positive versus negative counts}
+\title{Sentiment plot: diverging bar, or a positive/negative comparison cloud}
 \usage{
 sframe_plot_sentiment(result, palette = c("web", "print"))
 }
@@ -15,14 +15,25 @@ sframe_plot_sentiment(result, palette = c("web", "print"))
 A ggplot2 object, or \code{NULL} when the result carries no table.
 }
 \description{
-A ggplot2 diverging bar for a \code{tidy_sentiment} result: positive counts
-extend one direction, negative counts the other, so bar position (not
-colour alone) carries the primary polarity signal, the same convention
-\code{\link[=sframe_draw_likert_diverging]{sframe_draw_likert_diverging()}} uses for Likert agreement (dark ramp
-toward the pole) rebuilt here in ggplot2 rather than called directly,
-since that helper is base-graphics and Likert-scale-specific. Facets by
-group when \code{result$table} carries a \code{group} column, mirroring
-\code{\link[=sframe_plot_term_frequency]{sframe_plot_term_frequency()}}'s grouped branch.
+A ggplot2 diverging bar for a \code{tidy_sentiment} result by default:
+positive counts extend one direction, negative counts the other, so bar
+position (not colour alone) carries the primary polarity signal, the
+same convention \code{\link[=sframe_draw_likert_diverging]{sframe_draw_likert_diverging()}} uses for Likert
+agreement (dark ramp toward the pole) rebuilt here in ggplot2 rather
+than called directly, since that helper is base-graphics and
+Likert-scale-specific. Facets by group when \code{result$table} carries a
+\code{group} column, mirroring \code{\link[=sframe_plot_term_frequency]{sframe_plot_term_frequency()}}'s grouped
+branch.
+}
+\details{
+When \code{result$options$wordcloud} is \code{TRUE} (opt-in, default \code{FALSE},
+matching \code{\link[=sframe_plot_term_frequency]{sframe_plot_term_frequency()}}'s own word-cloud toggle),
+draws a comparison cloud instead: negative-sentiment words above the
+centre line, positive-sentiment words below it, each word sized by how
+often it occurred, using the internal \code{tidy_sentiment} runner's
+\verb{$word_sentiment} word-by-sentiment counts. Answers a different
+question from the diverging bar: not "how many responses leaned
+positive," but "which \emph{words} drove that."
 }
 \seealso{
 \code{\link[=run_analysis_plan]{run_analysis_plan()}}, \code{\link[=sframe_draw_likert_diverging]{sframe_draw_likert_diverging()}}
