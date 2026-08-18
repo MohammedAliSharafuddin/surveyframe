@@ -65,6 +65,7 @@
 <li class="nav-item"><a class="nav-link" href="news/index.html">Changelog</a></li>
       </ul>
 <ul class="navbar-nav">
+<li class="nav-item"><a class="nav-link" href="verify/" aria-label="Verify a .sframe file's integrity hash">Verify a file</a></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/MohammedAliSharafuddin/surveyframe" aria-label="GitHub"><span class="fa fa-github"></span></a></li>
       </ul>
 </div>
@@ -81,6 +82,9 @@
 </div>
 <!-- badges: start -->
 
+<blockquote>
+<p><strong>Just here to verify a <code>.sframe</code> file’s integrity hash or read its amendment log?</strong> Skip everything below — <strong><a href="https://mohammedalisharafuddin.github.io/surveyframe/verify/">verify a file now</a></strong>. No R, no install; it runs entirely in your browser and nothing is uploaded.</p>
+</blockquote>
 <p><code>surveyframe</code> is a research-design-first survey package for R. Most survey tools collect answers and return counts. <code>surveyframe</code> begins at the research design and carries it through to a written results report.</p>
 <p>The unit of work is the instrument, a typed <code>sframe</code> object that stores three things together:</p>
 <ol style="list-style-type: decimal">
@@ -110,7 +114,7 @@
 <div class="section level2">
 <h2 id="already-have-data">Already have data?<a class="anchor" aria-label="anchor" href="#already-have-data"></a>
 </h2>
-<p>If you have collected responses in a CSV or Google Sheet and want to start from the analysis step, build a minimal instrument that matches your column names and load the data directly:</p>
+<p><code>surveyframe</code> is not a replacement for whatever collection tool your institution already has approved – Qualtrics, REDCap, Google Forms, or a paper form typed up afterward. It reads response data as a plain CSV or <code>data.frame</code> from any of them: export from your collection tool, rename columns to match your instrument’s item IDs (or build the instrument to match the export), and load it. If you have collected responses in a CSV or Google Sheet and want to start from the analysis step, build a minimal instrument that matches your column names and load the data directly:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://mohammedalisharafuddin.github.io/surveyframe/">surveyframe</a></span><span class="op">)</span></span>
 <span></span>
@@ -308,9 +312,10 @@
 <div class="section level2">
 <h2 id="roadmap">Roadmap<a class="anchor" aria-label="anchor" href="#roadmap"></a>
 </h2>
-<p>Small-sample inference and multi-criteria decision analysis both arrive in 0.4.0. They were once planned as two releases, v0.4 and v0.5, and were merged into one. There is no 0.3.5 and no 0.5.x.</p>
-<p>0.4.0 adds small-sample helpers validated by a simulation study (Hodges-Lehmann, paired-Wilcoxon pseudomedian, exact Fisher odds-ratio intervals, Firth logistic regression), 10 MCDM methods (TOPSIS, AHP, ANP, DEMATEL, VIKOR, MOORA, SMART, WASPAS, PROMETHEE, ELECTRE) with 2 new question types for collecting judgements, weight-sensitivity analysis, and declared conjoint designs.</p>
-<p>After that, 0.4.1 is a demo-proofing patch, and 0.4.2 onward ports further MCDM methods in batches. See <code>NEWS.md</code> for what each release contains.</p>
+<p>Small-sample inference, multi-criteria decision analysis, and text and open-ended response analysis all arrive in 0.4.0. Small-sample and MCDM were once planned as two releases, v0.4 and v0.5, and text analysis had at one stage its own working label before it, too, was folded into 0.4.0. There is no 0.3.5 and no 0.5.x.</p>
+<p>0.4.0 adds small-sample helpers validated by a simulation study (Hodges-Lehmann, paired-Wilcoxon pseudomedian, exact Fisher odds-ratio intervals, Firth logistic regression); 10 MCDM methods (TOPSIS, AHP, ANP, DEMATEL, VIKOR, MOORA, SMART, WASPAS, PROMETHEE, ELECTRE) with 2 new question types for collecting judgements, weight-sensitivity analysis, and declared conjoint designs; a 9-method text and open-ended response analysis family (term/n-gram frequency, keyword in context, co-occurrence and co-occurrence networks, sentiment, document-feature matrices, and topic modelling via LDA or a structural topic model); and a disclosed-amendment and Git-linked provenance mechanism alongside the existing <code>.sframe</code> integrity hash. See <code>NEWS.md</code> for the full detail on each.</p>
+<p><strong>After 0.4.0, no new capability theme for at least one release cycle.</strong> Four themes landing in one release is already more than this project should repeat; 0.4.1 and 0.4.2 are stabilisation and bug-fix releases against what 0.4.0 shipped, not a vehicle for new method families. If that changes, it will be stated here first, not discovered from a diff.</p>
+<p><strong>If this package is ever archived by CRAN</strong>, the GitHub repository remains the canonical source: <code>remotes::install_github("MohammedAliSharafuddin/surveyframe")</code>. Each CRAN release is also deposited to Zenodo with its own DOI, so a specific version stays citable and retrievable independently of both CRAN’s and GitHub’s continued availability.</p>
 </div>
 <div class="section level2">
 <h2 id="citation">Citation<a class="anchor" aria-label="anchor" href="#citation"></a>
@@ -338,6 +343,7 @@
 <li><a href="https://cloud.r-project.org/package=surveyframe" class="external-link">View on CRAN</a></li>
 <li><a href="https://github.com/MohammedAliSharafuddin/surveyframe/" class="external-link">Browse source code</a></li>
 <li><a href="https://github.com/MohammedAliSharafuddin/surveyframe/issues" class="external-link">Report a bug</a></li>
+<li><a href="verify/">Verify a .sframe file</a></li>
 <li><a href="reference/launch_builder.html">SurveyBuilder</a></li>
 <li><a href="articles/surveyframe.html">SurveyStudio interface</a></li>
 <li><a href="https://github.com/MohammedAliSharafuddin/surveyframe" class="external-link">GitHub repository</a></li>

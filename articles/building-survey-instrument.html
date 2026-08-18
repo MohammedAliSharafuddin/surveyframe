@@ -59,6 +59,7 @@
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul>
 <ul class="navbar-nav">
+<li class="nav-item"><a class="nav-link" href="../verify/" aria-label="Verify a .sframe file's integrity hash">Verify a file</a></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/MohammedAliSharafuddin/surveyframe" aria-label="GitHub"><span class="fa fa-github"></span></a></li>
       </ul>
 </div>
@@ -247,17 +248,26 @@ instrument items.</p>
 <div class="section level2">
 <h2 id="validate-the-instrument">Validate the instrument<a class="anchor" aria-label="anchor" href="#validate-the-instrument"></a>
 </h2>
+<p><code><a href="../reference/validate_sframe.html">validate_sframe()</a></code> returns a diagnostic. Print it to read
+the result, and use the accessors to get at the parts.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">validation</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/validate_sframe.html">validate_sframe</a></span><span class="op">(</span><span class="va">instr</span>, strict <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span><span class="va">validation</span><span class="op">$</span><span class="va">valid</span></span>
-<span><span class="co">#&gt; [1] TRUE</span></span>
-<span><span class="va">validation</span><span class="op">$</span><span class="va">problems</span></span>
-<span><span class="co">#&gt; character(0)</span></span></code></pre></div>
-<p>In production, strict validation returns the validated instrument or
-stops with a structured error.</p>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/validate_sframe.html">validate_sframe</a></span><span class="op">(</span><span class="va">instr</span>, strict <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="co">#&gt; &lt;sframe validation&gt;</span></span>
+<span><span class="co">#&gt;   Instrument:  Digital marketing study (teaching slice) (1.0.0)</span></span>
+<span><span class="co">#&gt;   Status:      valid</span></span>
+<span><span class="co">#&gt;   Checks:      18 run, 0 with problems</span></span></code></pre></div>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">instr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/validate_sframe.html">validate_sframe</a></span><span class="op">(</span><span class="va">instr</span><span class="op">)</span></span>
-<span><span class="va">instr</span><span class="op">$</span><span class="va">meta</span><span class="op">$</span><span class="va">validated</span></span>
+<code class="sourceCode R"><span><span class="va">validation</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/validate_sframe.html">validate_sframe</a></span><span class="op">(</span><span class="va">instr</span>, strict <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/sf_validation_accessors.html">sf_is_valid</a></span><span class="op">(</span><span class="va">validation</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] TRUE</span></span>
+<span><span class="fu"><a href="../reference/sf_validation_accessors.html">sf_problems</a></span><span class="op">(</span><span class="va">validation</span><span class="op">)</span></span>
+<span><span class="co">#&gt; character(0)</span></span></code></pre></div>
+<p>In production, strict validation stops with a structured error when
+anything is wrong. When it passes, <code><a href="../reference/as_sframe.html">as_sframe()</a></code> recovers the
+instrument with its validated stamp set.</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">instr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/as_sframe.html">as_sframe</a></span><span class="op">(</span><span class="fu"><a href="../reference/validate_sframe.html">validate_sframe</a></span><span class="op">(</span><span class="va">instr</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/sf_accessors.html">sf_meta</a></span><span class="op">(</span><span class="va">instr</span><span class="op">)</span><span class="op">$</span><span class="va">validated</span></span>
 <span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
 </div>
 <div class="section level2">
@@ -266,16 +276,16 @@ stops with a structured error.</p>
 <p>The <code>.sframe</code> file is the portable instrument file. It
 keeps the validated metadata, the analysis plan, and the model in one
 place.</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>fileext <span class="op">=</span> <span class="st">".sframe"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/write_sframe.html">write_sframe</a></span><span class="op">(</span><span class="va">instr</span>, <span class="va">path</span>, overwrite <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">loaded</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_sframe.html">read_sframe</a></span><span class="op">(</span><span class="va">path</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">inherits</a></span><span class="op">(</span><span class="va">loaded</span>, <span class="st">"sframe"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] TRUE</span></span>
-<span><span class="va">loaded</span><span class="op">$</span><span class="va">meta</span><span class="op">$</span><span class="va">title</span></span>
+<span><span class="fu"><a href="../reference/sf_accessors.html">sf_meta</a></span><span class="op">(</span><span class="va">loaded</span><span class="op">)</span><span class="op">$</span><span class="va">title</span></span>
 <span><span class="co">#&gt; [1] "Digital marketing study (teaching slice)"</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">loaded</span><span class="op">$</span><span class="va">analysis_plan</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="fu"><a href="../reference/sf_accessors.html">sf_plan</a></span><span class="op">(</span><span class="va">loaded</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 2</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">loaded</span><span class="op">$</span><span class="va">models</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 1</span></span></code></pre></div>
@@ -285,7 +295,7 @@ place.</p>
 </h2>
 <p>The same instrument, plan, and model can be authored in
 SurveyBuilder, which saves a <code>.sframe</code> file for use in R.</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/launch_builder.html">launch_builder</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/launch_builder_demo.html">launch_builder_demo</a></span><span class="op">(</span>open <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 </div>

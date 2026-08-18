@@ -24,10 +24,13 @@ model syntax, and finish with the visual tools.
 ### Specialised analyses
 
 Read these when a study calls for them. Small-sample inference covers
-studies below the n = 30 threshold, and multi-criteria decision analysis
-covers ranking alternatives against criteria that compete.
+studies below the n = 30 threshold, multi-criteria decision analysis
+covers ranking alternatives against criteria that compete, and text
+analysis covers open-ended survey responses.
 
 - [Small-sample
   inference](https://mohammedalisharafuddin.github.io/surveyframe/articles/small-sample.md):
 - [Multi-criteria decision
   analysis](https://mohammedalisharafuddin.github.io/surveyframe/articles/mcdm-analysis.md):
+- [Text and open-ended response
+  analysis](https://mohammedalisharafuddin.github.io/surveyframe/articles/text-analysis.md):

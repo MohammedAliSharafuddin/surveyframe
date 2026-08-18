@@ -30,9 +30,9 @@ outlier_report(
 
 - method:
 
-  Outlier rule. `"zscore"` flags absolute z scores above `z_cut`;
-  `"iqr"` flags values outside Tukey fences; `"mahalanobis"` flags rows
-  above the chi-square cutoff for the selected variables.
+  Outlier rule. `"zscore"` flags absolute z scores above `z_cut`,
+  `"iqr"` flags values outside Tukey fences, and `"mahalanobis"` flags
+  rows above the chi-square cutoff for the selected variables.
 
 - z_cut:
 

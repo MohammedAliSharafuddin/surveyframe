@@ -2,8 +2,8 @@
 
 Opens a temporary copy of the SurveyBuilder with the bundled input-types
 instrument already injected into the JavaScript state. The demo
-questions, scales, and analysis plan are visible immediately — no manual
-file-load step is required.
+questions, scales, and analysis plan are visible immediately, with no
+manual file-load step required.
 
 ## Usage
 

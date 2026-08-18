@@ -35,7 +35,8 @@
       <ul class="navbar-nav me-auto"><li class="nav-item"><a class="nav-link" href="../articles/surveyframe.html">Get started</a></li>
 <li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="active nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
-      </ul><ul class="navbar-nav"><li class="nav-item"><a class="external-link nav-link" href="https://github.com/MohammedAliSharafuddin/surveyframe" aria-label="GitHub"><span class="fa fa-github"></span></a></li>
+      </ul><ul class="navbar-nav"><li class="nav-item"><a class="nav-link" href="../verify/" aria-label="Verify a .sframe file's integrity hash">Verify a file</a></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/MohammedAliSharafuddin/surveyframe" aria-label="GitHub"><span class="fa fa-github"></span></a></li>
       </ul></div>
 
 
@@ -49,17 +50,108 @@
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.4.0" id="surveyframe-040">surveyframe 0.4.0<a class="anchor" aria-label="anchor" href="#surveyframe-040"></a></h2>
-<p>Two version numbers were planned and never released. 0.3.5 was to hold a field-validation round; that work is absorbed into this release and into 0.4.1. 0.5.0 was, at one stage, this release’s own working label before it was renumbered to follow 0.3.4 directly; nothing shipped under that number either. Local branches and worktrees kept the <code>v0.5-dev</code> name throughout development, a label mismatch that is intentional and recorded in the project’s own internal notes, not a sign of a skipped release.</p>
+<p>A major release. It adds multi-criteria decision analysis (10 methods), small-sample statistics, text and open-ended response analysis (9 methods), and a disclosed-amendment and Git-linked provenance trail for <code>.sframe</code> files, alongside 4 corrected results and 2 breaking changes. See below for full detail on each.</p>
+<div class="section level3">
+<h3 id="new-multi-criteria-decision-analysis-mcda-0-4-0">New: multi-criteria decision analysis (MCDA)<a class="anchor" aria-label="anchor" href="#new-multi-criteria-decision-analysis-mcda-0-4-0"></a></h3>
+<p>surveyframe’s decision-family extension links survey collection directly to 10 MCDA methods, closing the gap between MCDA computation packages, which assume a clean matrix already exists, and survey software, which has no concept of a decision method at all.</p>
+<ul><li>10 decision methods: the Analytic Hierarchy Process (AHP), the Analytic Network Process (ANP), the Decision Making Trial and Evaluation Laboratory method (DEMATEL), VIKOR, MOORA, SMART, WASPAS, PROMETHEE, ELECTRE, and TOPSIS. Every method carries a verified literature citation.</li>
+<li>2 new item types collect judgement data directly inside the survey instrument: <code>pairwise_comparison</code> (Saaty’s 1-to-9 ratio scale for AHP and ANP, or a 0-to-4 directed influence scale for DEMATEL) and <code>criteria_weight</code> (a constant-sum allocation across criteria).</li>
+<li>A documented aggregation layer (<code>R/decision_data.R</code>) turns per-respondent answers into the matrices the methods consume: <code><a href="../reference/sframe_assemble_pairwise.html">sframe_assemble_pairwise()</a></code> builds one matrix per respondent and validates every pair was answered, <code><a href="../reference/sframe_aggregate_judgements.html">sframe_aggregate_judgements()</a></code> combines them (geometric mean for AHP/ANP, which preserves reciprocity, or arithmetic mean for DEMATEL), and <code><a href="../reference/sframe_rated_matrix.html">sframe_rated_matrix()</a></code> builds a performance matrix from ordinary matrix items. AHP judgements are additionally screened for consistency against Saaty’s random-index table, with the CR distribution reported whether or not a study has pre-declared a filtering threshold.</li>
+<li>Every ranking method resolves its matrix and weight inputs in the same order (a researcher-supplied override, then a collected item, then a typed error naming what is missing) and records where each input came from, so a results table states the provenance of every number.</li>
+<li>
+<code><a href="../reference/sensitivity_analysis.html">sensitivity_analysis()</a></code> reports how far a ranking moves under a declared perturbation of the weights, and carries a <code>degenerate</code> flag so a ranking that never separated its alternatives cannot report false stability (see “Decision analysis: non-results now say so” below).</li>
+<li>Both the visual builder and SurveyStudio support the 2 new item types, and the static HTML survey, the Shiny module, and the builder preview render all 3 judgement-collection structures identically.</li>
+<li>RMCDA joins Suggests as a test-time cross-check oracle: an independent computation of the same method on the same matrix is required to agree with the package’s own result before a method’s implementation is accepted. This practice caught a real defect during development, a WASPAS runner that had inherited SMART’s normalisation step by mistake.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="new-small-sample-statistics-0-4-0">New: small-sample statistics<a class="anchor" aria-label="anchor" href="#new-small-sample-statistics-0-4-0"></a></h3>
+<p>A track of corrections for comparisons run on small samples, where the ordinary versions of these tests can flip significance on repeated draws from data whose true difference never changed.</p>
+<ul><li>The Hodges-Lehmann shift estimator as an alternative to the independent two-group Mann-Whitney comparison.</li>
+<li>The paired Wilcoxon pseudomedian confidence interval as an alternative to the paired t-test.</li>
+<li>The exact odds-ratio confidence interval on Fisher’s test for small 2x2 tables, avoiding the ad hoc continuity correction a conventional Wald interval needs when a cell is zero.</li>
+<li>Firth’s bias-reduced logistic regression (<code>logistf</code> in Suggests) for regression prone to separation at small n.</li>
+<li>A small-sample advisory surfaced on <code><a href="../reference/assumption_report.html">assumption_report()</a></code> and <code><a href="../reference/sample_size_plan.html">sample_size_plan()</a></code>, flagging when a study’s sample size falls in the range where these corrections are worth considering.</li>
+<li>
+<code>vignettes/small-sample.Rmd</code> walks through when to prefer each correction over its conventional counterpart.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="new-text-and-open-ended-response-analysis-0-4-0">New: text and open-ended response analysis<a class="anchor" aria-label="anchor" href="#new-text-and-open-ended-response-analysis-0-4-0"></a></h3>
+<p>A 9-method text-analysis family for open-ended survey items, from term frequency through topic modelling, sharing the same analysis-plan, role-resolution, and reporting pipeline every other method family uses.</p>
+<ul><li>
+<code>term_freq</code>: top terms by frequency, optionally split by a group variable, rendered as a bar chart or a word cloud.</li>
+<li>
+<code>ngram_freq</code>: top bigrams or trigrams by frequency.</li>
+<li>
+<code>term_context</code>: a keyword-in-context concordance table (before/match/ after) for a chosen keyword.</li>
+<li>
+<code>co_occurrence</code>: pairwise within-response co-occurrence counts on the top terms, rendered as a heatmap.</li>
+<li>
+<code>co_occurrence_network</code>: a Louvain-clustered (Blondel et al. 2008), force-directed (Fruchterman &amp; Reingold 1991) term co-occurrence network; requires the optional igraph package.</li>
+<li>
+<code>tidy_sentiment</code>: positive/negative sentiment counts and proportion positive using the bing lexicon, optionally split by a group variable, rendered as a diverging bar chart or a positive/negative comparison word cloud; requires the optional tidytext package.</li>
+<li>
+<code>quanteda_dfm</code>: a document-feature matrix summary (feature count, sparsity, top features); requires the optional quanteda package.</li>
+<li>
+<code>topic_model_lda</code>: Latent Dirichlet Allocation topic modelling, top terms per topic as a ranked table and a faceted bar chart; requires the optional tidytext and topicmodels packages.</li>
+<li>
+<code>stm_topics</code>: structural topic modelling, the same top-terms-per-topic output; requires the optional stm and tidytext packages.</li>
+<li>A shared cleaning step (<code><a href="../reference/clean_text_responses.html">clean_text_responses()</a></code>) and a 174-word Snowball-based English stopword list, both exported so a study can reuse or override them outside a runner.</li>
+<li>Both the visual builder and SurveyStudio support all 9 methods, including the word-cloud, top-N, seed, and topic-count (<code>k</code>) options that steer their plots and models.</li>
+<li>
+<code>vignettes/text-analysis.Rmd</code> walks through cleaning, each method, and what the family deliberately does not attempt (stemming/lemmatisation, tf-idf, and keyness comparison are not yet implemented).</li>
+</ul></div>
+<div class="section level3">
+<h3 id="new-disclosed-amendments-and-a-git-linked-provenance-trail-0-4-0">New: disclosed amendments and a Git-linked provenance trail<a class="anchor" aria-label="anchor" href="#new-disclosed-amendments-and-a-git-linked-provenance-trail-0-4-0"></a></h3>
+<p><code><a href="../reference/write_sframe.html">write_sframe()</a></code>’s SHA-256 hash proves a <code>.sframe</code> file is unchanged since it was written, but gives no way to distinguish a legitimate revision (a data-entry correction, bot-response removal, a documented model respecification) from an undisclosed edit – both break the hash identically. This release adds a disclosed-revision path alongside the existing hash check, without weakening it.</p>
+<ul><li>
+<code><a href="../reference/amend_sframe.html">amend_sframe()</a></code> compares an instrument before and after a change and appends a structured, timestamped entry to an ordered amendment log – never overwrites – recording the reason (a controlled vocabulary: <code>data_correction</code>, <code>bot_removal</code>, <code>model_respecification</code>, <code>instrument_revision</code>, <code>other</code>), a free-text explanation, and which top-level fields changed.</li>
+<li>Two tiers, by default inferred from the reason: <code>"pipeline"</code> amendments (data corrections, bot removal) need only a reason. <code>"design"</code> amendments (anything touching the analysis plan or a model) require a <code>deviation_report</code> describing what changed in the research question, method, or model and why, matching how a formal preregistration deviation is normally handled. <code>signoff</code> is never left blank – it records a reviewer’s name or the literal <code>"none"</code>, so an unreviewed design change stays visible to an auditor.</li>
+<li>
+<code><a href="../reference/amendment_log.html">amendment_log()</a></code> returns the full history as a data frame, one row per disclosed amendment, exportable with <code><a href="https://rdrr.io/r/utils/write.table.html" class="external-link">write.csv()</a></code>.</li>
+<li>An edit made directly to a <code>.sframe</code> file, bypassing <code><a href="../reference/amend_sframe.html">amend_sframe()</a></code>, still fails <code><a href="../reference/read_sframe.html">read_sframe()</a></code>’s integrity check exactly as before. The amendment log adds a disclosed path alongside the existing hash check.</li>
+<li>
+<code><a href="../reference/link_git_commit.html">link_git_commit()</a></code> records the current Git commit SHA and subject line alongside an instrument. This ties the SHA-256 hash to a specific, already-explained commit. It returns an informative message when Git isn’t installed or the path isn’t a repository. Git is optional.</li>
+<li>
+<code>inst/schema/sframe_schema.json</code> documents the <code>.sframe</code> format (every top-level field, including the new <code>amendments</code> log) as a standalone JSON Schema, so a reviewer or a second tool can read and validate a <code>.sframe</code> file without installing the package. <code>.sframe</code> was already plain, git-diffable JSON before this release; the schema makes that format explicit and independently checkable.</li>
+<li>
+<code>vignettes/surveyframe.Rmd</code> gains a “What the SHA-256 hash proves, and what it does not” section, stating plainly that the hash proves file identity, not methodological validity, and pointing to the design-time <code>analysis_plan</code> binding and <code><a href="../reference/run_analysis_plan.html">run_analysis_plan()</a></code>’s single-pass execution as the package’s separate, complementary defence against HARKing and p-hacking.</li>
+</ul></div>
 <div class="section level3">
 <h3 id="corrected-results-read-before-comparing-against-earlier-output-0-4-0">Corrected results (read before comparing against earlier output)<a class="anchor" aria-label="anchor" href="#corrected-results-read-before-comparing-against-earlier-output-0-4-0"></a></h3>
-<p>Four defects found by independent cross-validation are fixed. Each produced plausible numbers with no error or warning, so results computed with an earlier version should be re-run rather than trusted.</p>
+<p>Four defects found by independent cross-validation are fixed. Each produced normal-looking numbers with no error or warning, so re-run any results computed with an earlier version.</p>
 <ul><li>
 <code><a href="../reference/item_report.html">item_report()</a></code> returned the wrong item-rest correlation. It subtracted each item from a <code><a href="https://rdrr.io/r/base/colSums.html" class="external-link">rowMeans()</a></code> total, which leaves roughly noise carrying the item negatively, so a highly reliable scale reported strong negative values. On simulated data with alpha 0.947 every item came back at about -0.46. The statistic is now the item against the sum of the other items in its scale, and matches <code><a href="https://rdrr.io/pkg/psych/man/alpha.html" class="external-link">psych::alpha()</a></code>’s <code>item.stats$r.drop</code> to 1e-10.</li>
-<li>Repeated-measures ANOVA tested the condition effect against the wrong error term, because the subject identifier was left as an integer and <code><a href="https://rdrr.io/r/stats/aov.html" class="external-link">aov()</a></code> treated it as a continuous covariate. On a fixture where <code><a href="https://rdrr.io/pkg/jmv/man/anovaRM.html" class="external-link">jmv::anovaRM()</a></code> gives F(2, 78) = 86.93, surveyframe reported F = 1.45, p = 0.24. Correcting the identifier alone was not sufficient: the corrected design produces no <code>Error: Within</code> stratum, so the effect is now located by searching the strata rather than by a fixed name.</li>
+<li>Repeated-measures ANOVA tested the condition effect against the wrong error term, because the subject identifier was left as an integer and <code><a href="https://rdrr.io/r/stats/aov.html" class="external-link">aov()</a></code> treated it as a continuous covariate. On a fixture where <code><a href="https://rdrr.io/pkg/jmv/man/anovaRM.html" class="external-link">jmv::anovaRM()</a></code> gives F(2, 78) = 86.93, surveyframe reported F = 1.45, p = 0.24. Correcting the identifier alone was not sufficient: the corrected design produces no <code>Error: Within</code> stratum, so the effect is now located by searching the strata directly.</li>
 <li>
 <code><a href="../reference/validate_sframe.html">validate_sframe()</a></code> rejected valid instruments. Its known-variable list held only base item and scale ids, so an analysis plan naming an expansion column (<code>item__sub</code>, <code>item__option</code>, <code>item__a__vs__b</code>, <code>item__crit</code>) failed validation for variables that do exist, including real exports from the visual builder. <code><a href="../reference/read_responses.html">read_responses()</a></code> already accepted those columns. Both now derive the list from one shared helper.</li>
 <li>The SEM syntax generators ignored the model type. <code><a href="../reference/seminr_syntax.html">seminr_syntax()</a></code>, <code><a href="../reference/sem_lavaan_syntax.html">sem_lavaan_syntax()</a></code>, and <code><a href="../reference/cfa_lavaan_syntax.html">cfa_lavaan_syntax()</a></code> never checked <code>model$type</code>, and the builder offered every saved model to all 3 generators, so a covariance-based model produced PLS-SEM syntax with no complaint. That is a runnable script estimating a model the researcher never declared. All 3 now refuse a mismatched estimation family, and the builder filters each model role to the types its generator can produce.</li>
 </ul></div>
+<div class="section level3">
+<h3 id="breaking-validate_sframe-and-validate_model-return-a-diagnostic-0-4-0">Breaking: <code>validate_sframe()</code> and <code>validate_model()</code> return a diagnostic<a class="anchor" aria-label="anchor" href="#breaking-validate_sframe-and-validate_model-return-a-diagnostic-0-4-0"></a></h3>
+<p>Both validators previously returned two different things depending on <code>strict</code>: the object itself, invisibly, when <code>strict = TRUE</code>, and a bare unclassed list when <code>strict = FALSE</code>. Neither was a diagnostic, the success path printed nothing at all, and the <code>strict = FALSE</code> return had no methods. Both now return an <code>sframe_validation</code> object, and they return it visibly, so <code>validate_sframe(instrument)</code> typed at the console shows the user what it found.</p>
+<ul><li>The object records <code>valid</code>, every <code>problems</code> message, and a <code>checks</code> table listing all 18 instrument checks (10 for a model) whether or not each found anything. A diagnostic that lists only failures cannot tell a user that a check passed from one that was never reached.</li>
+<li>Read it with <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code>, <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> for the check roster, <code><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame()</a></code> for one row per problem, <code><a href="../reference/sf_validation_accessors.html">sf_is_valid()</a></code>, and <code><a href="../reference/sf_validation_accessors.html">sf_problems()</a></code>.</li>
+<li>
+<code>strict = TRUE</code> still aborts with <code>sframe_validation_error</code> when anything is wrong. That has not changed.</li>
+<li>
+<strong><code>$valid</code> and <code>$problems</code> keep working</strong>, so the common reading pattern needs no migration.</li>
+<li>
+<strong>What breaks</strong>: code using the <code>strict = TRUE</code> return as an instrument, as in <code>instrument &lt;- validate_sframe(instrument)</code>. Wrap it in <code><a href="../reference/as_sframe.html">as_sframe()</a></code>. Passing a validation result where an instrument is expected now raises a directed error naming <code><a href="../reference/as_sframe.html">as_sframe()</a></code> immediately.</li>
+</ul><p>Raised by a Journal of Statistical Software editor reviewing the code: “we would at least expect that the object is not silently returned and that the print method is adapted to allow the user to read directly the diagnostic”.</p>
+</div>
+<div class="section level3">
+<h3 id="new-accessor-and-exploration-methods-for-every-class-0-4-0">New: accessor and exploration methods for every class<a class="anchor" aria-label="anchor" href="#new-accessor-and-exploration-methods-for-every-class-0-4-0"></a></h3>
+<p>The same review found that the classes carried <code>print</code>, <code>summary</code> and <code>format</code> only, so user code had no route to their contents except <code>$</code> on the underlying list, which makes the internal layout part of the public contract. Two facts made that concrete: <code><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame()</a></code> failed on all 14 result classes with “cannot coerce class … to a data.frame”, and <code>[</code> dropped the class on the list-backed reports, so <code>results[1:2]</code> silently degraded to a bare list and lost its print method.</p>
+<ul><li>
+<code><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame()</a></code> now works on the instrument and on every report class, returning that object’s primary table.</li>
+<li>
+<code>[</code> keeps the class on <code>sframe_analysis_results</code>, <code>sframe_reliability_report</code> and <code>sframe_item_report</code>.</li>
+<li>Instrument accessors: <code><a href="../reference/sf_accessors.html">sf_meta()</a></code>, <code><a href="../reference/sf_accessors.html">sf_items()</a></code>, <code><a href="../reference/sf_accessors.html">sf_scales()</a></code>, <code><a href="../reference/sf_accessors.html">sf_choice_sets()</a></code>, <code><a href="../reference/sf_accessors.html">sf_branches()</a></code>, <code><a href="../reference/sf_accessors.html">sf_checks()</a></code>, <code><a href="../reference/sf_accessors.html">sf_models()</a></code> and <code><a href="../reference/sf_accessors.html">sf_plan()</a></code>, with <code>sf_plan&lt;-</code> for declaring the plan. The component accessors return an <code>sf_component_list</code> named by ID, so <code>sf_items(instrument)[["sat_1"]]</code> reaches one item.</li>
+<li>Component accessors: <code><a href="../reference/sf_identity.html">sf_id()</a></code> and <code><a href="../reference/sf_identity.html">sf_label()</a></code>.</li>
+<li>Report accessors: <code><a href="../reference/sf_report_accessors.html">sf_apa()</a></code> and <code><a href="../reference/sf_report_accessors.html">sf_flagged()</a></code>.</li>
+<li>Coercion: <code><a href="../reference/as_sframe.html">as_sframe()</a></code>.</li>
+</ul><p>The vignettes and the examples are rewritten to use these accessors. The registered S3 method count goes from 41 to 103.</p>
+</div>
 <div class="section level3">
 <h3 id="breaking-the-shiny-collector-now-emits-expansion-columns-0-4-0">Breaking: the Shiny collector now emits expansion columns<a class="anchor" aria-label="anchor" href="#breaking-the-shiny-collector-now-emits-expansion-columns-0-4-0"></a></h3>
 <ul><li>
@@ -74,7 +166,7 @@
 </ul></div>
 <div class="section level3">
 <h3 id="decision-analysis-non-results-now-say-so-0-4-0">Decision analysis: non-results now say so<a class="anchor" aria-label="anchor" href="#decision-analysis-non-results-now-say-so-0-4-0"></a></h3>
-<ul><li>ELECTRE I reports when it establishes no outranking relation at all. On a 9-criterion problem at the default 0.70 and 0.30 thresholds no alternative clears concordance against any other, so every score is 0 and every alternative ranks 1. That is legitimate behaviour for the method, but the results table read as “all 9 alternatives are jointly best” and the APA sentence reported a kernel containing every alternative. A note now states that the equal ranks are an absence of evidence rather than a tie for first place.</li>
+<ul><li>ELECTRE I reports when it establishes no outranking relation at all. On a 9-criterion problem at the default 0.70 and 0.30 thresholds no alternative clears concordance against any other, so every score is 0 and every alternative ranks 1. That is legitimate behaviour for the method, but the results table read as “all 9 alternatives are jointly best” and the APA sentence reported a kernel containing every alternative. A note now explains the equal ranks as an absence of evidence.</li>
 <li>
 <code><a href="../reference/sensitivity_analysis.html">sensitivity_analysis()</a></code> gains a <code>degenerate</code> flag for the same reason. A ranking that never separated the alternatives cannot be changed by perturbing a weight, so every check passed and <code>stable</code> came back <code>TRUE</code>: the strongest robustness signal the function can give, produced by the weakest result it can be handed. <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code> now leads with “No result to test” instead of “Stable” in that case.</li>
 </ul></div>
@@ -91,7 +183,7 @@
 <h3 id="decision-analysis-0-4-0">Decision analysis<a class="anchor" aria-label="anchor" href="#decision-analysis-0-4-0"></a></h3>
 <ul><li>All 10 MCDM methods now return a citation. Previously only TOPSIS and AHP had one. Every reference was checked against the publication record.</li>
 <li>
-<code><a href="../reference/sframe_decision_options.html">sframe_decision_options()</a></code> documents PROMETHEE’s preference functions and records why the default is <code>"usual"</code>, Brans and Vincke’s type I step function, rather than the linear function that several other implementations default to. The difference is material: net flows always differ between the 2 functions, and the ranking itself changed in 226 of 400 randomly drawn 4-alternative by 3-criterion matrices.</li>
+<code><a href="../reference/sframe_decision_options.html">sframe_decision_options()</a></code> documents PROMETHEE’s preference functions and records why the default is <code>"usual"</code>, Brans and Vincke’s type I step function, chosen over the linear function several other implementations default to. Net flows differ between the 2 functions, and the ranking changed in 226 of 400 randomly drawn 4-alternative by 3-criterion matrices.</li>
 </ul></div>
 </div>
     <div class="section level2">
@@ -156,7 +248,7 @@
 <div class="section level3">
 <h3 id="bug-fixes-0-3-4">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-3-4"></a></h3>
 <ul><li>
-<code><a href="../reference/sf_item.html">sf_item()</a></code>’s <code>date_min</code> and <code>date_max</code> no longer accept an ambiguous date string (for example <code>"01/02/2024"</code>); only <code>"YYYY-MM-DD"</code> or a <code>Date</code> object is accepted, and anything else is a validation error rather than a silently misparsed date.</li>
+<code><a href="../reference/sf_item.html">sf_item()</a></code>’s <code>date_min</code> and <code>date_max</code> accept only <code>"YYYY-MM-DD"</code> or a <code>Date</code> object now (an ambiguous string such as <code>"01/02/2024"</code> used to parse silently into a specific date depending on locale). Anything else raises a validation error.</li>
 <li>
 <code><a href="../reference/bootstrap_ci.html">bootstrap_ci()</a></code>, <code><a href="../reference/cohens_d_ci.html">cohens_d_ci()</a></code>, <code><a href="../reference/cramers_v_ci.html">cramers_v_ci()</a></code>, and <code><a href="../reference/eta_sq_ci.html">eta_sq_ci()</a></code> no longer alter the random-number seed for code that runs after a reproducible, seeded call.</li>
 </ul></div>
@@ -259,7 +351,7 @@
 <div class="section level4">
 <h4 id="serialisation-0-3-1">Serialisation<a class="anchor" aria-label="anchor" href="#serialisation-0-3-1"></a></h4>
 <ul><li>
-<code><a href="../reference/write_sframe.html">write_sframe()</a></code> now strips list-level names from the item, choice, scale, branching, check, and model collections before serialisation. Instruments built with <code><a href="https://rdrr.io/r/base/funprog.html" class="external-link">Map()</a></code> or other helpers that attach element names (for example, using item IDs as names) previously serialised those collections as keyed JSON objects rather than arrays. This produced a hash mismatch and an integrity error on <code><a href="../reference/read_sframe.html">read_sframe()</a></code>. Saved instruments now round-trip correctly regardless of how the component lists were constructed.</li>
+<code><a href="../reference/write_sframe.html">write_sframe()</a></code> now strips list-level names from the item, choice, scale, branching, check, and model collections before serialisation. Instruments built with <code><a href="https://rdrr.io/r/base/funprog.html" class="external-link">Map()</a></code> or other helpers that attach element names (for example, using item IDs as names) previously serialised those collections as keyed JSON objects, producing a hash mismatch and an integrity error on <code><a href="../reference/read_sframe.html">read_sframe()</a></code>. Saved instruments now round-trip correctly regardless of how the component lists were constructed.</li>
 </ul></div>
 </div>
 <div class="section level3">

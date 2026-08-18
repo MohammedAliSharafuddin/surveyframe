@@ -1,7 +1,7 @@
 # The visual workflow: SurveyBuilder, SurveyStudio, and the dashboard
 
-`surveyframe` has three graphical entry points. They are kept separate
-in v0.3, and each maps onto a part of the research-design workflow.
+`surveyframe` has three graphical entry points, kept separate on
+purpose, each mapping onto a part of the research-design workflow.
 
 - [`launch_builder()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/launch_builder.md)
   opens SurveyBuilder, a standalone questionnaire builder. It runs in
@@ -20,7 +20,10 @@ in v0.3, and each maps onto a part of the research-design workflow.
 ## Input-types demo
 
 The input-types demo covers the main controls available in SurveyBuilder
-and SurveyStudio.
+and SurveyStudio. The two decision item types, `pairwise_comparison` and
+`criteria_weight`, are not part of this demo. They get their own worked
+example in the MCDM vignette, because they only make sense alongside a
+declared decision method and a set of alternatives.
 
 ``` r
 

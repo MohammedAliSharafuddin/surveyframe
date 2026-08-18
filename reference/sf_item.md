@@ -91,14 +91,14 @@ sf_item(
   unordered pair rows, an `"influence"` item renders `n(n-1)` ordered
   rows, and a `"criteria_weight"` item renders one numeric input per
   entry. An advisory warning is raised above 7 items (`"saaty"`) or 6
-  (`"influence"`); above 10 the item is rejected.
+  (`"influence"`), and above 10 the item is rejected.
 
 - comparison_scale:
 
   Character or NULL. For `"pairwise_comparison"` only. `"saaty"` (the
-  default) gives the bipolar 1-9 importance scale used by AHP and ANP;
-  `"influence"` gives the unipolar 0-4 directed influence scale used by
-  DEMATEL.
+  default) gives the bipolar 1-9 importance scale used by AHP and ANP,
+  while `"influence"` gives the unipolar 0-4 directed influence scale
+  used by DEMATEL.
 
 - slider_min:
 

@@ -59,6 +59,7 @@
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul>
 <ul class="navbar-nav">
+<li class="nav-item"><a class="nav-link" href="../verify/" aria-label="Verify a .sframe file's integrity hash">Verify a file</a></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/MohammedAliSharafuddin/surveyframe" aria-label="GitHub"><span class="fa fa-github"></span></a></li>
       </ul>
 </div>
@@ -95,8 +96,8 @@ div.sourceCode { overflow: visible; }
 pre.sourceCode a:empty { display: none; }
 #TOC a { display: inline-block; min-height: 24px; }
 </style>
-<p><code>surveyframe</code> has three graphical entry points. They are
-kept separate in v0.3, and each maps onto a part of the research-design
+<p><code>surveyframe</code> has three graphical entry points, kept
+separate on purpose, each mapping onto a part of the research-design
 workflow.</p>
 <ul>
 <li>
@@ -119,7 +120,11 @@ for an instrument and response data that already exist.</li>
 <h2 id="input-types-demo">Input-types demo<a class="anchor" aria-label="anchor" href="#input-types-demo"></a>
 </h2>
 <p>The input-types demo covers the main controls available in
-SurveyBuilder and SurveyStudio.</p>
+SurveyBuilder and SurveyStudio. The two decision item types,
+<code>pairwise_comparison</code> and <code>criteria_weight</code>, are
+not part of this demo. They get their own worked example in the MCDM
+vignette, because they only make sense alongside a declared decision
+method and a set of alternatives.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">demo</span>      <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sframe_input_types_demo_data.html">sframe_input_types_demo_data</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">instr</span>     <span class="op">&lt;-</span> <span class="va">demo</span><span class="op">$</span><span class="va">instrument</span></span>

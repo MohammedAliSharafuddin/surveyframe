@@ -39,8 +39,8 @@ sf_scale(
 - items:
 
   Character vector. The `id` values of items that belong to this scale.
-  Order controls presentation in reports; scoring uses the same item IDs
-  regardless of order.
+  Order controls presentation in reports, while scoring uses the same
+  item IDs regardless of order.
 
 - method:
 

@@ -23,7 +23,7 @@ launch_dashboard(
 - instrument:
 
   An `sframe` object. Required. Calling `launch_dashboard()` with no
-  instrument errors with guidance; use
+  instrument errors with guidance. Use
   [`launch_dashboard_demo()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/launch_dashboard_demo.md)
   for the bundled demo or
   [`launch_studio()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/launch_studio.md)

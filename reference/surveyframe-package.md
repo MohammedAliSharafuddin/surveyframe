@@ -6,8 +6,11 @@ collection, quality checking, scoring, psychometric diagnostics, and
 reproducible reporting. The package covers static HTML survey export, an
 embeddable Shiny survey module, an interactive response dashboard, a
 role-based analysis planner with pre-declared research questions, common
-survey statistics, and model syntax planning for EFA, CFA, CB-SEM, and
-PLS-SEM.
+survey statistics with small-sample alternatives (Hodges-Lehmann,
+pseudomedian, exact odds-ratio, and Firth logistic regression), multi-
+criteria decision analysis (AHP, ANP, DEMATEL, VIKOR, MOORA, SMART,
+WASPAS, PROMETHEE, ELECTRE, and TOPSIS), and model syntax planning for
+EFA, CFA, CB-SEM, and PLS-SEM.
 
 ### Core workflow
 
@@ -26,6 +29,10 @@ PLS-SEM.
     [`validate_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/validate_sframe.md)
     and
     [`write_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/write_sframe.md).
+    [`validate_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/validate_sframe.md)
+    returns an `sframe_validation` diagnostic rather than the instrument
+    itself. Recover a validated instrument with
+    [`as_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/as_sframe.md).
 
 3.  **Deploy** a Shiny survey with
     [`render_survey()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_survey.md).
@@ -47,7 +54,8 @@ PLS-SEM.
     [`efa_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/efa_report.md),
     [`cfa_syntax()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/cfa_syntax.md),
     and
-    [`run_analysis_plan()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/run_analysis_plan.md).
+    [`run_analysis_plan()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/run_analysis_plan.md),
+    which also runs any decision-analysis blocks in the plan.
 
 7.  **Report** with
     [`codebook_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/codebook_report.md),
@@ -60,7 +68,14 @@ PLS-SEM.
 Every function in the package operates on an `sframe` object. The object
 is the single source of truth for item definitions, scale structure,
 reverse-coding keys, branching rules, check specifications, analysis
-plans, and optional model specifications.
+plans, and optional model specifications. Accessors such as
+[`sf_meta()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_accessors.md),
+[`sf_items()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_accessors.md),
+[`sf_scales()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_accessors.md),
+[`sf_plan()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_accessors.md),
+and
+[`sf_models()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_accessors.md)
+read its parts without reaching into the object directly.
 
 ### File format
 

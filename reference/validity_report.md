@@ -30,7 +30,7 @@ validity_report(loadings, construct_scores = NULL, items_by_construct = NULL)
   Constructs with a single item have no monotrait correlations, so their
   HTMT entries are `NA`. Without this argument, `htmt` falls back to the
   absolute inter-construct correlation matrix from `construct_scores`
-  (the pre-0.3.4 behaviour); the `htmt_method` element records which was
+  (the pre-0.3.4 behaviour). The `htmt_method` element records which was
   computed.
 
 ## Value

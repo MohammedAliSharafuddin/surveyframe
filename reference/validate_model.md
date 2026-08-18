@@ -24,10 +24,26 @@ validate_model(model, instrument = NULL, strict = TRUE)
 
 - strict:
 
-  Logical. When `TRUE`, invalid models raise an error. When `FALSE`, a
-  list with `valid` and `problems` is returned.
+  Logical. When `TRUE`, invalid models raise an error. When `FALSE`,
+  problems are reported in the returned diagnostic without stopping.
 
 ## Value
 
-The model invisibly when valid and `strict = TRUE`, otherwise a
-validation result list.
+An
+[sframe_validation](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_validation.md)
+object. The model is carried inside it and can be recovered with
+[`sf_object()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_validation_accessors.md).
+
+## Changed in 0.4.0
+
+Earlier versions returned the model invisibly when `strict = TRUE` and a
+bare unclassed list when `strict = FALSE`. Both paths now return an
+[sframe_validation](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_validation.md)
+object, visibly, so the diagnostic is readable at the console. Code that
+read `$valid` and `$problems` keeps working.
+
+## See also
+
+[sframe_validation](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_validation.md),
+[`sf_problems()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_validation_accessors.md),
+[`sf_is_valid()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_validation_accessors.md)

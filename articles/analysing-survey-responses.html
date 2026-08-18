@@ -59,6 +59,7 @@
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul>
 <ul class="navbar-nav">
+<li class="nav-item"><a class="nav-link" href="../verify/" aria-label="Verify a .sframe file's integrity hash">Verify a file</a></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/MohammedAliSharafuddin/surveyframe" aria-label="GitHub"><span class="fa fa-github"></span></a></li>
       </ul>
 </div>
@@ -146,7 +147,7 @@ only known columns.</p>
 </h2>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/missing_data_report.html">missing_data_report</a></span><span class="op">(</span><span class="va">responses</span>, <span class="va">instr</span><span class="op">)</span></span>
-<span><span class="fu">kable</span><span class="op">(</span><span class="va">mr</span><span class="op">$</span><span class="va">item_missing</span>, digits <span class="op">=</span> <span class="fl">2</span>,</span>
+<span><span class="fu">kable</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">mr</span><span class="op">)</span>, digits <span class="op">=</span> <span class="fl">2</span>,</span>
 <span>      col.names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Variable"</span>, <span class="st">"Missing (n)"</span>, <span class="st">"Missing (%)"</span>, <span class="st">"Valid (n)"</span><span class="op">)</span>,</span>
 <span>      caption <span class="op">=</span> <span class="st">"Item-level missingness"</span><span class="op">)</span></span></code></pre></div>
 <table class="table">
@@ -274,10 +275,12 @@ only known columns.</p>
 <span>  submitted_at  <span class="op">=</span> <span class="st">"submitted_at"</span>,</span>
 <span>  started_at    <span class="op">=</span> <span class="st">"started_at"</span></span>
 <span><span class="op">)</span></span>
+<span><span class="co"># as.data.frame() gives the summary row.</span></span>
+<span><span class="va">qr_summary</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">qr</span><span class="op">)</span></span>
 <span><span class="va">quality_summary</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
 <span>  Metric <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Respondents"</span>, <span class="st">"Items"</span>, <span class="st">"Flagged for review"</span>, <span class="st">"Flag rate"</span><span class="op">)</span>,</span>
-<span>  Value  <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">qr</span><span class="op">$</span><span class="va">summary</span><span class="op">$</span><span class="va">n_respondents</span>, <span class="va">qr</span><span class="op">$</span><span class="va">summary</span><span class="op">$</span><span class="va">n_items</span>, <span class="va">qr</span><span class="op">$</span><span class="va">summary</span><span class="op">$</span><span class="va">n_flagged</span>,</span>
-<span>             <span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="st">"%.1f%%"</span>, <span class="fl">100</span> <span class="op">*</span> <span class="va">qr</span><span class="op">$</span><span class="va">summary</span><span class="op">$</span><span class="va">flag_rate</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  Value  <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">qr_summary</span><span class="op">$</span><span class="va">n_respondents</span>, <span class="va">qr_summary</span><span class="op">$</span><span class="va">n_items</span>, <span class="va">qr_summary</span><span class="op">$</span><span class="va">n_flagged</span>,</span>
+<span>             <span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="st">"%.1f%%"</span>, <span class="fl">100</span> <span class="op">*</span> <span class="va">qr_summary</span><span class="op">$</span><span class="va">flag_rate</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>  stringsAsFactors <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span>
 <span><span class="fu">kable</span><span class="op">(</span><span class="va">quality_summary</span>, align <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"l"</span>, <span class="st">"r"</span><span class="op">)</span>, caption <span class="op">=</span> <span class="st">"Quality screening summary"</span><span class="op">)</span></span></code></pre></div>
@@ -419,7 +422,7 @@ variables that fill each role. A correlation expects <code>x</code> and
 <code>dependent</code> variable. A group comparison expects a
 <code>group</code> and an <code>outcome</code>.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">instr</span><span class="op">$</span><span class="va">analysis_plan</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/sf_accessors.html">sf_plan</a></span><span class="op">(</span><span class="va">instr</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>id <span class="op">=</span> <span class="st">"RQ1"</span>,</span>
 <span>       research_question <span class="op">=</span> <span class="st">"Is digital marketing perception associated with satisfaction?"</span>,</span>
 <span>       family <span class="op">=</span> <span class="st">"association"</span>, method <span class="op">=</span> <span class="st">"correlation_pearson"</span>,</span>

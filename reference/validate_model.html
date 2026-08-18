@@ -37,7 +37,8 @@ duplicate paths, indirect paths, and engine/type compatibility."><meta property=
       <ul class="navbar-nav me-auto"><li class="nav-item"><a class="nav-link" href="../articles/surveyframe.html">Get started</a></li>
 <li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
-      </ul><ul class="navbar-nav"><li class="nav-item"><a class="external-link nav-link" href="https://github.com/MohammedAliSharafuddin/surveyframe" aria-label="GitHub"><span class="fa fa-github"></span></a></li>
+      </ul><ul class="navbar-nav"><li class="nav-item"><a class="nav-link" href="../verify/" aria-label="Verify a .sframe file's integrity hash">Verify a file</a></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/MohammedAliSharafuddin/surveyframe" aria-label="GitHub"><span class="fa fa-github"></span></a></li>
       </ul></div>
 
 
@@ -75,13 +76,27 @@ must match instrument item IDs.</p></dd>
 
 <dt id="arg-strict">strict<a class="anchor" aria-label="anchor" href="#arg-strict"></a></dt>
 <dd><p>Logical. When <code>TRUE</code>, invalid models raise an error. When
-<code>FALSE</code>, a list with <code>valid</code> and <code>problems</code> is returned.</p></dd>
+<code>FALSE</code>, problems are reported in the returned diagnostic without
+stopping.</p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>The model invisibly when valid and <code>strict = TRUE</code>, otherwise a
-validation result list.</p>
+    <p>An <a href="sframe_validation.html">sframe_validation</a> object. The model is carried inside it and
+can be recovered with <code><a href="sf_validation_accessors.html">sf_object()</a></code>.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="changed-in-">Changed in 0.4.0<a class="anchor" aria-label="anchor" href="#changed-in-"></a></h2>
+
+
+<p>Earlier versions returned the model invisibly when <code>strict = TRUE</code> and a
+bare unclassed list when <code>strict = FALSE</code>. Both paths now return an
+<a href="sframe_validation.html">sframe_validation</a> object, visibly, so the diagnostic is readable at the
+console. Code that read <code>$valid</code> and <code>$problems</code> keeps working.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
+    <div class="dont-index"><p><a href="sframe_validation.html">sframe_validation</a>, <code><a href="sf_validation_accessors.html">sf_problems()</a></code>, <code><a href="sf_validation_accessors.html">sf_is_valid()</a></code></p></div>
     </div>
 
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

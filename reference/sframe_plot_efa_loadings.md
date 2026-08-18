@@ -18,9 +18,9 @@ sframe_plot_efa_loadings(x, palette = c("web", "print"))
 - palette:
 
   One of `"web"` (diverging red/teal gradient) or `"print"`
-  (white-to-black gradient by magnitude; sign is conveyed by the printed
-  label, not colour, so it stays legible in monochrome). See
-  `sframe_brand()`.
+  (white-to-black gradient by magnitude, with sign conveyed by the
+  printed label rather than colour, so it stays legible in monochrome).
+  See `sframe_brand()`.
 
 ## Value
 

@@ -59,6 +59,7 @@
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul>
 <ul class="navbar-nav">
+<li class="nav-item"><a class="nav-link" href="../verify/" aria-label="Verify a .sframe file's integrity hash">Verify a file</a></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/MohammedAliSharafuddin/surveyframe" aria-label="GitHub"><span class="fa fa-github"></span></a></li>
       </ul>
 </div>
@@ -116,9 +117,9 @@ that a single p-value does not convey.</p>
 has crossed below the n = 30 threshold, prefer exact or
 distribution-free alternatives to the asymptotic default where one
 exists, and pair every affected estimate with a confidence interval
-rather than a point value alone. None of this replaces judgement about
-the study design. It surfaces the cases where that judgement matters
-most.</p>
+rather than a point value alone. Together they surface the cases where
+design judgement matters most, leaving that judgement itself to the
+researcher.</p>
 </div>
 <div class="section level2">
 <h2 id="planning-a-small-sample-study">Planning a small-sample study<a class="anchor" aria-label="anchor" href="#planning-a-small-sample-study"></a>
@@ -198,7 +199,7 @@ the shift rather than a point estimate alone.</p>
 <span>  covariate <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">20</span>, <span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">study</span><span class="op">$</span><span class="va">analysis_plan</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span><span class="fu"><a href="../reference/sf_accessors.html">sf_plan</a></span><span class="op">(</span><span class="va">study</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>id <span class="op">=</span> <span class="st">"RQ1"</span>,</span>
 <span>       research_question <span class="op">=</span> <span class="st">"Does the treatment arm score higher than control?"</span>,</span>
 <span>       family <span class="op">=</span> <span class="st">"group_comparison"</span>, method <span class="op">=</span> <span class="st">"mann_whitney"</span>,</span>
@@ -244,7 +245,7 @@ within-pair shift, again with an interval rather than a point value.</p>
 <code class="sourceCode R"><span><span class="va">before</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">8</span>, <span class="fl">50</span>, <span class="fl">6</span><span class="op">)</span></span>
 <span><span class="va">after</span>  <span class="op">&lt;-</span> <span class="va">before</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">8</span>, <span class="fl">4</span>, <span class="fl">5</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">study</span><span class="op">$</span><span class="va">analysis_plan</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span><span class="fu"><a href="../reference/sf_accessors.html">sf_plan</a></span><span class="op">(</span><span class="va">study</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>id <span class="op">=</span> <span class="st">"RQ2"</span>,</span>
 <span>       research_question <span class="op">=</span> <span class="st">"Did scores change from before to after?"</span>,</span>
 <span>       family <span class="op">=</span> <span class="st">"group_comparison"</span>, method <span class="op">=</span> <span class="st">"wilcoxon_pair"</span>,</span>
@@ -290,7 +291,7 @@ interval is only defined for a 2x2 table, and is dropped (not
 approximated) when <code>simulate_p_value</code> is requested, since
 base R’s <code><a href="https://rdrr.io/r/stats/fisher.test.html" class="external-link">fisher.test()</a></code> cannot return both together.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">study</span><span class="op">$</span><span class="va">analysis_plan</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/sf_accessors.html">sf_plan</a></span><span class="op">(</span><span class="va">study</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>id <span class="op">=</span> <span class="st">"RQ3"</span>,</span>
 <span>       research_question <span class="op">=</span> <span class="st">"Is conversion associated with study arm?"</span>,</span>
 <span>       family <span class="op">=</span> <span class="st">"association"</span>, method <span class="op">=</span> <span class="st">"fisher_exact"</span>,</span>
@@ -332,8 +333,7 @@ base R’s <code><a href="https://rdrr.io/r/stats/fisher.test.html" class="exter
 <p><code><a href="../reference/bootstrap_ci.html">bootstrap_ci()</a></code> computes a bootstrap interval for an
 arbitrary statistic, useful when no exact interval exists for the
 estimator you need. It is already exported and used elsewhere in the
-package; here it is applied to the median of the pilot outcome
-scores.</p>
+package, applied here to the median of the pilot outcome scores.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/bootstrap_ci.html">bootstrap_ci</a></span><span class="op">(</span><span class="va">pilot</span><span class="op">$</span><span class="va">outcome</span>, FUN <span class="op">=</span> <span class="fu">stats</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/r/stats/median.html" class="external-link">median</a></span>, R <span class="op">=</span> <span class="fl">999</span><span class="op">)</span></span>
 <span><span class="co">#&gt; estimate    lower    upper </span></span>
@@ -348,7 +348,7 @@ penalised-likelihood correction (Firth, 1993) addresses both.
 surveyframe’s <code>firth_logistic</code> runner needs the optional
 <code>logistf</code> package.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">study</span><span class="op">$</span><span class="va">analysis_plan</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/sf_accessors.html">sf_plan</a></span><span class="op">(</span><span class="va">study</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>id <span class="op">=</span> <span class="st">"RQ4"</span>,</span>
 <span>       research_question <span class="op">=</span> <span class="st">"Does the covariate predict conversion?"</span>,</span>
 <span>       family <span class="op">=</span> <span class="st">"regression"</span>, method <span class="op">=</span> <span class="st">"firth_logistic"</span>,</span>

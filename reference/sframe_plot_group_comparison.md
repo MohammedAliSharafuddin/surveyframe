@@ -5,7 +5,7 @@ carries `vars = c(group_column, outcome_column)`: `t_test_ind`,
 `mann_whitney`, `kruskal_wallis`, and `anova_one`. One function instead
 of four, since the underlying comparison (an outcome split by a grouping
 factor) and the data shape needed to plot it are identical across all
-four tests; only the inferential statistic differs.
+four tests, and only the inferential statistic differs.
 
 ## Usage
 

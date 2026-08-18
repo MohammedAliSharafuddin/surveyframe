@@ -5,10 +5,10 @@ response options ("1 = Strongly disagree; 2 = Disagree; ...") and its
 `scale_id` with the scale's label, so each row of the printed codebook
 is self-contained.
 [`codebook_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/codebook_report.md)
-itself keeps the raw ids (for joining `items_table` to
-`choices_table`/`scales_table` programmatically); this is for the
-rendered document, where a reader should not need to cross-reference a
-separate table just to see what "1" means on a scale shared by many
+itself keeps the raw ids, for joining `items_table` to
+`choices_table`/`scales_table` programmatically. This enrichment is for
+the rendered document, where a reader should not need to cross-reference
+a separate table just to see what "1" means on a scale shared by many
 items.
 
 ## Usage

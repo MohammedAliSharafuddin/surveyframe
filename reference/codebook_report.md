@@ -55,8 +55,8 @@ print(cb)
 #>      id  label   type scale_id reverse
 #> 1 sat_1 Item 1 likert      sat   FALSE
 #> 2 sat_2 Item 2 likert      sat   FALSE
-nrow(cb$items_table)
+nrow(sf_items(cb))
 #> [1] 2
-nrow(cb$scales_table)
+nrow(sf_scales(cb))
 #> [1] 1
 ```

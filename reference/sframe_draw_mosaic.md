@@ -5,7 +5,7 @@ Base-graphics mosaic plot (via
 matching the existing base-graphics precedent in this file
 ([`sframe_draw_likert_diverging()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_draw_likert_diverging.md))
 so it renders without ggplot2. An alternative view of the same crosstab
-data `sframe_plot_crosstab()` renders as a grouped bar; use whichever
+data `sframe_plot_crosstab()` renders as a grouped bar. Use whichever
 reads better for the table's shape (mosaic scales better to unbalanced
 group sizes).
 
@@ -27,7 +27,7 @@ sframe_draw_mosaic(result, palette = c("web", "print"))
 
 ## Value
 
-Invisibly `NULL`; called for its plotting side effect on the current
+Invisibly `NULL`, called for its plotting side effect on the current
 graphics device.
 
 ## See also

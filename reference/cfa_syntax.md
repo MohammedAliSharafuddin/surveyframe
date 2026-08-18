@@ -4,7 +4,7 @@ Produces a character string of `lavaan` model syntax derived from the
 scale structure in the instrument. The syntax can be passed directly to
 [`lavaan::cfa()`](https://rdrr.io/pkg/lavaan/man/cfa.html).
 Reverse-coded items are noted in a comment but are not transformed in
-the syntax; recoding should be applied to the data before fitting the
+the syntax. Recoding should be applied to the data before fitting the
 model.
 
 ## Usage
@@ -66,7 +66,7 @@ cat(syntax)
 #> sat =~ sat_1 + sat_2 + sat_3
 
 if (FALSE) { # \dontrun{
-# lavaan is not installed by default; install it before fitting.
+# lavaan is not installed by default. Install it before fitting.
 demo   <- sframe_demo_data()
 scored <- score_scales(demo$responses, demo$instrument)
 fit    <- lavaan::cfa(syntax, data = scored, std.lv = TRUE)

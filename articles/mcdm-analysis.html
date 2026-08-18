@@ -59,6 +59,7 @@
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul>
 <ul class="navbar-nav">
+<li class="nav-item"><a class="nav-link" href="../verify/" aria-label="Verify a .sframe file's integrity hash">Verify a file</a></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/MohammedAliSharafuddin/surveyframe" aria-label="GitHub"><span class="fa fa-github"></span></a></li>
       </ul>
 </div>
@@ -232,11 +233,11 @@ the judgements depart from that.</p>
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">ahp</span><span class="op">$</span><span class="va">cr</span>, <span class="fl">4</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 0.0197</span></span></code></pre></div>
 <p>Saaty’s convention treats a consistency ratio below 0.10 as
-acceptable. This one is well inside it. A ratio above 0.10 does not
-invalidate the data, but it should be reported rather than hidden, and
-<code>options$cr_filter = TRUE</code> will drop individual respondents
-above the threshold before aggregation if a study has pre-declared that
-rule.</p>
+acceptable. This one is well inside it. A ratio above 0.10 should be
+reported alongside the result, since it still yields a usable weight
+set. <code>options$cr_filter = TRUE</code> will drop individual
+respondents above the threshold before aggregation if a study has
+pre-declared that rule.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ahp</span><span class="op">$</span><span class="va">plot</span></span></code></pre></div>
 <p><img src="mcdm-analysis_files/figure-html/ahp-plot-1.png" class="r-plt" alt="Bar chart of the four criterion weights derived from pairwise comparisons, with service carrying the largest weight and delivery the smallest." width="672"></p>
@@ -446,7 +447,7 @@ renormalised, and the ranking is recomputed. <code>rho</code> is the
 rank correlation with the original ranking, and <code>top_changed</code>
 records whether the leading alternative changed.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">kable</span><span class="op">(</span><span class="va">sens</span><span class="op">$</span><span class="va">table</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<code class="sourceCode R"><span><span class="fu">kable</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">sens</span><span class="op">)</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>      caption <span class="op">=</span> <span class="st">"Ranking stability under a 5 percent change in each weight."</span><span class="op">)</span></span></code></pre></div>
 <table class="table">
 <caption>Ranking stability under a 5 percent change in each
@@ -549,8 +550,8 @@ weights.</p>
 <h2 id="which-criteria-drive-the-others">Which criteria drive the others<a class="anchor" aria-label="anchor" href="#which-criteria-drive-the-others"></a>
 </h2>
 <p>The criteria are not independent. Delivery speed and price move
-together; service quality may drive both. DEMATEL asks respondents how
-strongly each factor influences each other factor and separates the
+together, and service quality may drive both. DEMATEL asks respondents
+how strongly each factor influences each other factor and separates the
 causes from the effects.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">dematel</span> <span class="op">&lt;-</span> <span class="va">results</span><span class="op">[[</span><span class="st">"RQ4"</span><span class="op">]</span><span class="op">]</span></span>

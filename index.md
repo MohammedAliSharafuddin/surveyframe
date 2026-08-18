@@ -2,6 +2,12 @@
 
 ![surveyframe](reference/figures/readme-logo.png)
 
+> **Just here to verify a `.sframe` file’s integrity hash or read its
+> amendment log?** Skip everything below — **[verify a file
+> now](https://mohammedalisharafuddin.github.io/surveyframe/verify/)**.
+> No R, no install; it runs entirely in your browser and nothing is
+> uploaded.
+
 `surveyframe` is a research-design-first survey package for R. Most
 survey tools collect answers and return counts. `surveyframe` begins at
 the research design and carries it through to a written results report.
@@ -58,9 +64,15 @@ PLS-SEM models.
 
 ## Already have data?
 
-If you have collected responses in a CSV or Google Sheet and want to
-start from the analysis step, build a minimal instrument that matches
-your column names and load the data directly:
+`surveyframe` is not a replacement for whatever collection tool your
+institution already has approved – Qualtrics, REDCap, Google Forms, or a
+paper form typed up afterward. It reads response data as a plain CSV or
+`data.frame` from any of them: export from your collection tool, rename
+columns to match your instrument’s item IDs (or build the instrument to
+match the export), and load it. If you have collected responses in a CSV
+or Google Sheet and want to start from the analysis step, build a
+minimal instrument that matches your column names and load the data
+directly:
 
 ``` r
 
@@ -314,20 +326,37 @@ are available for manual use. Tests and examples avoid opening browsers.
 
 ## Roadmap
 
-Small-sample inference and multi-criteria decision analysis both arrive
-in 0.4.0. They were once planned as two releases, v0.4 and v0.5, and
-were merged into one. There is no 0.3.5 and no 0.5.x.
+Small-sample inference, multi-criteria decision analysis, and text and
+open-ended response analysis all arrive in 0.4.0. Small-sample and MCDM
+were once planned as two releases, v0.4 and v0.5, and text analysis had
+at one stage its own working label before it, too, was folded into
+0.4.0. There is no 0.3.5 and no 0.5.x.
 
 0.4.0 adds small-sample helpers validated by a simulation study
 (Hodges-Lehmann, paired-Wilcoxon pseudomedian, exact Fisher odds-ratio
-intervals, Firth logistic regression), 10 MCDM methods (TOPSIS, AHP,
+intervals, Firth logistic regression); 10 MCDM methods (TOPSIS, AHP,
 ANP, DEMATEL, VIKOR, MOORA, SMART, WASPAS, PROMETHEE, ELECTRE) with 2
 new question types for collecting judgements, weight-sensitivity
-analysis, and declared conjoint designs.
+analysis, and declared conjoint designs; a 9-method text and open-ended
+response analysis family (term/n-gram frequency, keyword in context,
+co-occurrence and co-occurrence networks, sentiment, document-feature
+matrices, and topic modelling via LDA or a structural topic model); and
+a disclosed-amendment and Git-linked provenance mechanism alongside the
+existing `.sframe` integrity hash. See `NEWS.md` for the full detail on
+each.
 
-After that, 0.4.1 is a demo-proofing patch, and 0.4.2 onward ports
-further MCDM methods in batches. See `NEWS.md` for what each release
-contains.
+**After 0.4.0, no new capability theme for at least one release cycle.**
+Four themes landing in one release is already more than this project
+should repeat; 0.4.1 and 0.4.2 are stabilisation and bug-fix releases
+against what 0.4.0 shipped, not a vehicle for new method families. If
+that changes, it will be stated here first, not discovered from a diff.
+
+**If this package is ever archived by CRAN**, the GitHub repository
+remains the canonical source:
+`remotes::install_github("MohammedAliSharafuddin/surveyframe")`. Each
+CRAN release is also deposited to Zenodo with its own DOI, so a specific
+version stays citable and retrievable independently of both CRAN’s and
+GitHub’s continued availability.
 
 ## Citation
 

@@ -2,6 +2,12 @@
 
 ![surveyframe](reference/figures/readme-logo.png)
 
+> **Just here to verify a `.sframe` file’s integrity hash or read its
+> amendment log?** Skip everything below — **[verify a file
+> now](https://mohammedalisharafuddin.github.io/surveyframe/verify/)**.
+> No R, no install; it runs entirely in your browser and nothing is
+> uploaded.
+
 `surveyframe` is a research-design-first survey package for R. Most
 survey tools collect answers and return counts. `surveyframe` begins at
 the research design and carries it through to a written results report.
@@ -58,9 +64,15 @@ PLS-SEM models.
 
 ## Already have data?
 
-If you have collected responses in a CSV or Google Sheet and want to
-start from the analysis step, build a minimal instrument that matches
-your column names and load the data directly:
+`surveyframe` is not a replacement for whatever collection tool your
+institution already has approved – Qualtrics, REDCap, Google Forms, or a
+paper form typed up afterward. It reads response data as a plain CSV or
+`data.frame` from any of them: export from your collection tool, rename
+columns to match your instrument’s item IDs (or build the instrument to
+match the export), and load it. If you have collected responses in a CSV
+or Google Sheet and want to start from the analysis step, build a
+minimal instrument that matches your column names and load the data
+directly:
 
 ``` r
 
@@ -314,20 +326,37 @@ are available for manual use. Tests and examples avoid opening browsers.
 
 ## Roadmap
 
-Small-sample inference and multi-criteria decision analysis both arrive
-in 0.4.0. They were once planned as two releases, v0.4 and v0.5, and
-were merged into one. There is no 0.3.5 and no 0.5.x.
+Small-sample inference, multi-criteria decision analysis, and text and
+open-ended response analysis all arrive in 0.4.0. Small-sample and MCDM
+were once planned as two releases, v0.4 and v0.5, and text analysis had
+at one stage its own working label before it, too, was folded into
+0.4.0. There is no 0.3.5 and no 0.5.x.
 
 0.4.0 adds small-sample helpers validated by a simulation study
 (Hodges-Lehmann, paired-Wilcoxon pseudomedian, exact Fisher odds-ratio
-intervals, Firth logistic regression), 10 MCDM methods (TOPSIS, AHP,
+intervals, Firth logistic regression); 10 MCDM methods (TOPSIS, AHP,
 ANP, DEMATEL, VIKOR, MOORA, SMART, WASPAS, PROMETHEE, ELECTRE) with 2
 new question types for collecting judgements, weight-sensitivity
-analysis, and declared conjoint designs.
+analysis, and declared conjoint designs; a 9-method text and open-ended
+response analysis family (term/n-gram frequency, keyword in context,
+co-occurrence and co-occurrence networks, sentiment, document-feature
+matrices, and topic modelling via LDA or a structural topic model); and
+a disclosed-amendment and Git-linked provenance mechanism alongside the
+existing `.sframe` integrity hash. See `NEWS.md` for the full detail on
+each.
 
-After that, 0.4.1 is a demo-proofing patch, and 0.4.2 onward ports
-further MCDM methods in batches. See `NEWS.md` for what each release
-contains.
+**After 0.4.0, no new capability theme for at least one release cycle.**
+Four themes landing in one release is already more than this project
+should repeat; 0.4.1 and 0.4.2 are stabilisation and bug-fix releases
+against what 0.4.0 shipped, not a vehicle for new method families. If
+that changes, it will be stated here first, not discovered from a diff.
+
+**If this package is ever archived by CRAN**, the GitHub repository
+remains the canonical source:
+`remotes::install_github("MohammedAliSharafuddin/surveyframe")`. Each
+CRAN release is also deposited to Zenodo with its own DOI, so a specific
+version stays citable and retrievable independently of both CRAN’s and
+GitHub’s continued availability.
 
 ## Citation
 
@@ -399,7 +428,7 @@ here.
 ## Save and load
 
 Read and write instruments as portable .sframe JSON files with SHA-256
-integrity hashing.
+integrity hashing, and record disclosed revisions to them.
 
 - [`write_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/write_sframe.md)
   : Write an instrument to a .sframe file
@@ -411,6 +440,69 @@ integrity hashing.
   : Validate a surveyframe model specification
 - [`model_json()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/model_json.md)
   : Serialise a model specification to JSON
+- [`amend_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/amend_sframe.md)
+  : Record a disclosed amendment to an instrument
+- [`amendment_log()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/amendment_log.md)
+  : Read an instrument's amendment log
+- [`link_git_commit()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/link_git_commit.md)
+  : Link an instrument to its current Git commit
+- [`print(`*`<sframe_validation>`*`)`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_validation.md)
+  [`format(`*`<sframe_validation>`*`)`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_validation.md)
+  [`summary(`*`<sframe_validation>`*`)`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_validation.md)
+  [`as.data.frame(`*`<sframe_validation>`*`)`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_validation.md)
+  : Report on a validation result
+
+## Accessors and coercion
+
+Read parts of an instrument, a validation result, or a report without
+reaching into the object directly, new in 0.4.0.
+
+- [`as_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/as_sframe.md)
+  : Coerce to an instrument
+- [`sf_meta()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_accessors.md)
+  [`sf_items()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_accessors.md)
+  [`sf_scales()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_accessors.md)
+  [`sf_choice_sets()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_accessors.md)
+  [`sf_branches()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_accessors.md)
+  [`sf_checks()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_accessors.md)
+  [`sf_models()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_accessors.md)
+  [`sf_plan()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_accessors.md)
+  : Explore a surveyframe object
+- [`print(`*`<sf_component_list>`*`)`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_component_list.md)
+  [`` `[`( ``*`<sf_component_list>`*`)`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_component_list.md)
+  : A list of instrument components
+- [`sf_id()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_identity.md)
+  [`sf_label()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_identity.md)
+  : The ID and label of an instrument component
+- [`` `sf_plan<-`() ``](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_plan-set.md)
+  : Set the pre-declared analysis plan
+- [`sf_apa()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_report_accessors.md)
+  [`sf_flagged()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_report_accessors.md)
+  : Read the reportable parts of an analysis or quality result
+- [`sf_is_valid()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_validation_accessors.md)
+  [`sf_problems()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_validation_accessors.md)
+  [`sf_object()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_validation_accessors.md)
+  : Read a validation diagnostic
+- [`as.data.frame(`*`<sframe>`*`)`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_as_data_frame.md)
+  [`as.data.frame(`*`<sf_choices>`*`)`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_as_data_frame.md)
+  [`as.data.frame(`*`<sframe_codebook>`*`)`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_as_data_frame.md)
+  [`as.data.frame(`*`<sframe_reliability_report>`*`)`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_as_data_frame.md)
+  [`as.data.frame(`*`<sframe_item_report>`*`)`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_as_data_frame.md)
+  [`as.data.frame(`*`<sframe_efa_report>`*`)`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_as_data_frame.md)
+  [`as.data.frame(`*`<sframe_efa_solution>`*`)`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_as_data_frame.md)
+  [`as.data.frame(`*`<sframe_descriptives_report>`*`)`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_as_data_frame.md)
+  [`as.data.frame(`*`<sframe_missing_data_report>`*`)`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_as_data_frame.md)
+  [`as.data.frame(`*`<sframe_validity_report>`*`)`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_as_data_frame.md)
+  [`as.data.frame(`*`<sframe_assumption_report>`*`)`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_as_data_frame.md)
+  [`as.data.frame(`*`<sframe_sample_size_plan>`*`)`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_as_data_frame.md)
+  [`as.data.frame(`*`<sframe_quality_report>`*`)`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_as_data_frame.md)
+  [`as.data.frame(`*`<sframe_sensitivity>`*`)`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_as_data_frame.md)
+  [`as.data.frame(`*`<sframe_analysis_results>`*`)`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_as_data_frame.md)
+  : Coerce a surveyframe object to a data frame
+- [`` `[`( ``*`<sframe_analysis_results>`*`)`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_subset.md)
+  [`` `[`( ``*`<sframe_reliability_report>`*`)`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_subset.md)
+  [`` `[`( ``*`<sframe_item_report>`*`)`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_subset.md)
+  : Subset a surveyframe report
 
 ## Deploy
 
@@ -514,6 +606,23 @@ choice designs.
 - [`sframe_dematel_compute()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_dematel_compute.md)
   : The DEMATEL total-relation classification
 
+## Text analysis
+
+Structured analysis of open-ended text responses, new in 0.5.0: term and
+n-gram frequency, keyword-in-context concordance, co-occurrence (plain
+and network), sentiment, topic modelling, and quote extraction.
+
+- [`clean_text_responses()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/clean_text_responses.md)
+  : Clean open-ended text responses for analysis
+- [`term_frequency()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/term_frequency.md)
+  : Term frequency for open-ended text
+- [`ngram_frequency()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/ngram_frequency.md)
+  : N-gram frequency for open-ended text
+- [`term_context()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/term_context.md)
+  : Keyword-in-context concordance for open-ended text
+- [`extract_quotes()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/extract_quotes.md)
+  : Extract representative quotes for each STM topic
+
 ## Confidence intervals
 
 Base-R bootstrap and effect-size confidence interval helpers, reused
@@ -587,6 +696,19 @@ Opt-in ggplot2 charts for analysis results, and the package theme.
   : Mosaic plot for a two-way categorical result
 - [`sframe_likert_scale_groups()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_likert_scale_groups.md)
   : Group a scale's Likert items for a combined diverging chart
+- [`sframe_plot_term_frequency()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_plot_term_frequency.md)
+  : Term-frequency plot: horizontal bar or word cloud
+- [`sframe_plot_ngram_frequency()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_plot_ngram_frequency.md)
+  : N-gram-frequency plot: horizontal bar
+- [`sframe_plot_cooccurrence()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_plot_cooccurrence.md)
+  : Term co-occurrence heatmap
+- [`sframe_plot_cooccurrence_network()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_plot_cooccurrence_network.md)
+  : Term co-occurrence network plot
+- [`sframe_plot_sentiment()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_plot_sentiment.md)
+  : Sentiment plot: diverging bar, or a positive/negative comparison
+  cloud
+- [`sframe_plot_topics()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_plot_topics.md)
+  : Topic-model top-terms plot: faceted bars, one facet per topic
 
 ## Print, format, and summary methods
 
@@ -678,10 +800,13 @@ model syntax, and finish with the visual tools.
 ### Specialised analyses
 
 Read these when a study calls for them. Small-sample inference covers
-studies below the n = 30 threshold, and multi-criteria decision analysis
-covers ranking alternatives against criteria that compete.
+studies below the n = 30 threshold, multi-criteria decision analysis
+covers ranking alternatives against criteria that compete, and text
+analysis covers open-ended survey responses.
 
 - [Small-sample
   inference](https://mohammedalisharafuddin.github.io/surveyframe/articles/small-sample.md):
 - [Multi-criteria decision
   analysis](https://mohammedalisharafuddin.github.io/surveyframe/articles/mcdm-analysis.md):
+- [Text and open-ended response
+  analysis](https://mohammedalisharafuddin.github.io/surveyframe/articles/text-analysis.md):

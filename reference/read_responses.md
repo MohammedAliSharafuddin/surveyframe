@@ -41,9 +41,8 @@ read_responses(
 
 - meta_cols:
 
-  Character vector or NULL. Additional column names that are not item
-  IDs but should be retained (for example, condition assignment or
-  source URL).
+  Character vector or NULL. Additional column names, outside the item
+  IDs, to retain (for example, condition assignment or source URL).
 
 - strict:
 

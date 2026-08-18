@@ -86,8 +86,8 @@ round(ahp$cr, 4)
 ```
 
 Saaty’s convention treats a consistency ratio below 0.10 as acceptable.
-This one is well inside it. A ratio above 0.10 does not invalidate the
-data, but it should be reported rather than hidden, and
+This one is well inside it. A ratio above 0.10 should be reported
+alongside the result, since it still yields a usable weight set.
 `options$cr_filter = TRUE` will drop individual respondents above the
 threshold before aggregation if a study has pre-declared that rule.
 
@@ -242,7 +242,7 @@ the leading alternative changed.
 
 ``` r
 
-kable(sens$table, row.names = FALSE,
+kable(as.data.frame(sens), row.names = FALSE,
       caption = "Ranking stability under a 5 percent change in each weight.")
 ```
 
@@ -287,8 +287,8 @@ reported as robust to the weights.
 ## Which criteria drive the others
 
 The criteria are not independent. Delivery speed and price move
-together; service quality may drive both. DEMATEL asks respondents how
-strongly each factor influences each other factor and separates the
+together, and service quality may drive both. DEMATEL asks respondents
+how strongly each factor influences each other factor and separates the
 causes from the effects.
 
 ``` r

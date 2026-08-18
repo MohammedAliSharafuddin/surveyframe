@@ -14,8 +14,8 @@ surveyframe’s small-sample tools do three things: flag when a sample has
 crossed below the n = 30 threshold, prefer exact or distribution-free
 alternatives to the asymptotic default where one exists, and pair every
 affected estimate with a confidence interval rather than a point value
-alone. None of this replaces judgement about the study design. It
-surfaces the cases where that judgement matters most.
+alone. Together they surface the cases where design judgement matters
+most, leaving that judgement itself to the researcher.
 
 ## Planning a small-sample study
 
@@ -107,7 +107,7 @@ pilot <- data.frame(
   covariate = rnorm(20, 0, 1)
 )
 
-study$analysis_plan <- list(
+sf_plan(study) <- list(
   list(id = "RQ1",
        research_question = "Does the treatment arm score higher than control?",
        family = "group_comparison", method = "mann_whitney",
@@ -141,7 +141,7 @@ within-pair shift, again with an interval rather than a point value.
 before <- rnorm(8, 50, 6)
 after  <- before + rnorm(8, 4, 5)
 
-study$analysis_plan <- list(
+sf_plan(study) <- list(
   list(id = "RQ2",
        research_question = "Did scores change from before to after?",
        family = "group_comparison", method = "wilcoxon_pair",
@@ -176,7 +176,7 @@ return both together.
 
 ``` r
 
-study$analysis_plan <- list(
+sf_plan(study) <- list(
   list(id = "RQ3",
        research_question = "Is conversion associated with study arm?",
        family = "association", method = "fisher_exact",
@@ -205,8 +205,8 @@ fe_results[[1]]$odds_ratio_conf_int
 [`bootstrap_ci()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/bootstrap_ci.md)
 computes a bootstrap interval for an arbitrary statistic, useful when no
 exact interval exists for the estimator you need. It is already exported
-and used elsewhere in the package; here it is applied to the median of
-the pilot outcome scores.
+and used elsewhere in the package, applied here to the median of the
+pilot outcome scores.
 
 ``` r
 
@@ -225,7 +225,7 @@ package.
 
 ``` r
 
-study$analysis_plan <- list(
+sf_plan(study) <- list(
   list(id = "RQ4",
        research_question = "Does the covariate predict conversion?",
        family = "regression", method = "firth_logistic",

@@ -8,7 +8,7 @@ session and cannot see unexported functions. `counts` is a named numeric
 vector in scale order (names are the response labels, e.g. "Strongly
 disagree" .. "Strongly agree"), not sorted alphabetically or by
 frequency. The middle category of an odd-length scale is treated as
-neutral and split evenly across the zero line; an even-length scale has
+neutral and split evenly across the zero line. An even-length scale has
 no neutral category. This is the standard survey-report convention (Pew
 Research, SurveyMonkey) for visualising an ordered agree/disagree scale,
 and reads in one glance which way opinion leans, unlike a plain
@@ -40,7 +40,7 @@ sframe_draw_likert_diverging(
 
 ## Value
 
-Invisibly `NULL`; called for its plotting side effect on the current
+Invisibly `NULL`, called for its plotting side effect on the current
 graphics device.
 
 ## Details

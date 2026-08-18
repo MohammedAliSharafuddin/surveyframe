@@ -164,22 +164,37 @@ instr <- add_model(instr, ts_model)
 
 ## Validate the instrument
 
+[`validate_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/validate_sframe.md)
+returns a diagnostic. Print it to read the result, and use the accessors
+to get at the parts.
+
+``` r
+
+validate_sframe(instr, strict = FALSE)
+#> <sframe validation>
+#>   Instrument:  Digital marketing study (teaching slice) (1.0.0)
+#>   Status:      valid
+#>   Checks:      18 run, 0 with problems
+```
+
 ``` r
 
 validation <- validate_sframe(instr, strict = FALSE)
-validation$valid
+sf_is_valid(validation)
 #> [1] TRUE
-validation$problems
+sf_problems(validation)
 #> character(0)
 ```
 
-In production, strict validation returns the validated instrument or
-stops with a structured error.
+In production, strict validation stops with a structured error when
+anything is wrong. When it passes,
+[`as_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/as_sframe.md)
+recovers the instrument with its validated stamp set.
 
 ``` r
 
-instr <- validate_sframe(instr)
-instr$meta$validated
+instr <- as_sframe(validate_sframe(instr))
+sf_meta(instr)$validated
 #> [1] TRUE
 ```
 
@@ -196,9 +211,9 @@ write_sframe(instr, path, overwrite = TRUE)
 loaded <- read_sframe(path)
 inherits(loaded, "sframe")
 #> [1] TRUE
-loaded$meta$title
+sf_meta(loaded)$title
 #> [1] "Digital marketing study (teaching slice)"
-length(loaded$analysis_plan)
+length(sf_plan(loaded))
 #> [1] 2
 length(loaded$models)
 #> [1] 1

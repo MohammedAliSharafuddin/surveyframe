@@ -37,11 +37,50 @@ appropriate class:
 
 `.sframe` files are UTF-8 JSON with a SHA-256 integrity hash in the
 top-level `hash` key. The hash is computed over the full serialised
-content with the `hash.value` field set to an empty string. Do not
-modify the JSON schema without updating
-[`write_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/write_sframe.md),
-[`read_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_sframe.md),
-and the schema version in `DESCRIPTION`.
+content with the `hash.value` field set to an empty string. The full
+field-by-field format is documented independently of the R source in
+`inst/schema/sframe_schema.json` (a JSON Schema, so a reviewer or a
+second tool can validate a `.sframe` file without installing this
+package). Do not modify the payload’s top-level keys without updating,
+together: `sframe_serialization_payload()` and
+[`read_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_sframe.md)’s
+reconstruction in `R/read_write_sframe.R`, the schema file, and this
+document.
+
+An `.sframe` file’s SHA-256 hash proves the file on disk is unchanged
+since
+[`write_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/write_sframe.md)
+produced it. It proves nothing about the content’s methodological
+quality, and it cannot be a substitute for disclosed revision –
+[`amend_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/amend_sframe.md)
+gives legitimate revision a structured, recorded path, but it is opt-in:
+nothing stops a contributor from reconstructing an instrument and
+writing it fresh instead of calling
+[`amend_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/amend_sframe.md)
+first. Do not describe the hash, the amendment log, or
+[`link_git_commit()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/link_git_commit.md)
+in documentation as detecting or preventing undisclosed change beyond
+what they actually do – the hash detects that a file changed; the
+amendment log records a change the researcher chose to disclose. Neither
+compels disclosure.
+
+## Stability policy
+
+Exported functions are not removed or renamed without a deprecation
+cycle: mark the old name
+[`.Deprecated()`](https://rdrr.io/r/base/Deprecated.html), keep it
+working for at least one minor release, and record the change in
+`NEWS.md` under a “Deprecated” heading. Breaking changes to an exported
+function’s arguments or return type are also recorded in `NEWS.md`,
+explicitly labelled “Breaking,” whether or not the function’s name
+changed (see the 0.4.0 entry for
+[`validate_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/validate_sframe.md)’s
+return-type change as the pattern to follow). The `.sframe` JSON Schema
+(`inst/schema/sframe_schema.json`) follows the same rule: a new required
+top-level key breaks every file written before it existed, so new keys
+are added only as optional, backward-compatible additions (see how
+`designs` and `amendments` are both added-only-when-present in
+`sframe_serialization_payload()` for the pattern).
 
 ## Code style
 

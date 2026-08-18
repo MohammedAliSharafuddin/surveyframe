@@ -141,6 +141,6 @@ print(instr)
 #>   Scales:     1
 #>   Analysis:   1 block(s)
 #>   Status:     not validated
-length(instr$analysis_plan)
+length(sf_plan(instr))
 #> [1] 1
 ```

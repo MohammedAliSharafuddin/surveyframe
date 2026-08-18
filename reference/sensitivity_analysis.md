@@ -89,7 +89,7 @@ sa <- sensitivity_analysis(
 )
 sa$stable
 #> [1] TRUE
-sa$table
+as.data.frame(sa)
 #>   criterion direction weight rho rank_changed top_changed
 #> 1   service        up 0.4118   1        FALSE       FALSE
 #> 2   service      down 0.3878   1        FALSE       FALSE

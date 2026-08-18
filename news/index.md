@@ -2,20 +2,181 @@
 
 ## surveyframe 0.4.0
 
-Two version numbers were planned and never released. 0.3.5 was to hold a
-field-validation round; that work is absorbed into this release and into
-0.4.1. 0.5.0 was, at one stage, this release’s own working label before
-it was renumbered to follow 0.3.4 directly; nothing shipped under that
-number either. Local branches and worktrees kept the `v0.5-dev` name
-throughout development, a label mismatch that is intentional and
-recorded in the project’s own internal notes, not a sign of a skipped
-release.
+A major release. It adds multi-criteria decision analysis (10 methods),
+small-sample statistics, text and open-ended response analysis (9
+methods), and a disclosed-amendment and Git-linked provenance trail for
+`.sframe` files, alongside 4 corrected results and 2 breaking changes.
+See below for full detail on each.
+
+### New: multi-criteria decision analysis (MCDA)
+
+surveyframe’s decision-family extension links survey collection directly
+to 10 MCDA methods, closing the gap between MCDA computation packages,
+which assume a clean matrix already exists, and survey software, which
+has no concept of a decision method at all.
+
+- 10 decision methods: the Analytic Hierarchy Process (AHP), the
+  Analytic Network Process (ANP), the Decision Making Trial and
+  Evaluation Laboratory method (DEMATEL), VIKOR, MOORA, SMART, WASPAS,
+  PROMETHEE, ELECTRE, and TOPSIS. Every method carries a verified
+  literature citation.
+- 2 new item types collect judgement data directly inside the survey
+  instrument: `pairwise_comparison` (Saaty’s 1-to-9 ratio scale for AHP
+  and ANP, or a 0-to-4 directed influence scale for DEMATEL) and
+  `criteria_weight` (a constant-sum allocation across criteria).
+- A documented aggregation layer (`R/decision_data.R`) turns
+  per-respondent answers into the matrices the methods consume:
+  [`sframe_assemble_pairwise()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_assemble_pairwise.md)
+  builds one matrix per respondent and validates every pair was
+  answered,
+  [`sframe_aggregate_judgements()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_aggregate_judgements.md)
+  combines them (geometric mean for AHP/ANP, which preserves
+  reciprocity, or arithmetic mean for DEMATEL), and
+  [`sframe_rated_matrix()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_rated_matrix.md)
+  builds a performance matrix from ordinary matrix items. AHP judgements
+  are additionally screened for consistency against Saaty’s random-index
+  table, with the CR distribution reported whether or not a study has
+  pre-declared a filtering threshold.
+- Every ranking method resolves its matrix and weight inputs in the same
+  order (a researcher-supplied override, then a collected item, then a
+  typed error naming what is missing) and records where each input came
+  from, so a results table states the provenance of every number.
+- [`sensitivity_analysis()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sensitivity_analysis.md)
+  reports how far a ranking moves under a declared perturbation of the
+  weights, and carries a `degenerate` flag so a ranking that never
+  separated its alternatives cannot report false stability (see
+  “Decision analysis: non-results now say so” below).
+- Both the visual builder and SurveyStudio support the 2 new item types,
+  and the static HTML survey, the Shiny module, and the builder preview
+  render all 3 judgement-collection structures identically.
+- RMCDA joins Suggests as a test-time cross-check oracle: an independent
+  computation of the same method on the same matrix is required to agree
+  with the package’s own result before a method’s implementation is
+  accepted. This practice caught a real defect during development, a
+  WASPAS runner that had inherited SMART’s normalisation step by
+  mistake.
+
+### New: small-sample statistics
+
+A track of corrections for comparisons run on small samples, where the
+ordinary versions of these tests can flip significance on repeated draws
+from data whose true difference never changed.
+
+- The Hodges-Lehmann shift estimator as an alternative to the
+  independent two-group Mann-Whitney comparison.
+- The paired Wilcoxon pseudomedian confidence interval as an alternative
+  to the paired t-test.
+- The exact odds-ratio confidence interval on Fisher’s test for small
+  2x2 tables, avoiding the ad hoc continuity correction a conventional
+  Wald interval needs when a cell is zero.
+- Firth’s bias-reduced logistic regression (`logistf` in Suggests) for
+  regression prone to separation at small n.
+- A small-sample advisory surfaced on
+  [`assumption_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/assumption_report.md)
+  and
+  [`sample_size_plan()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sample_size_plan.md),
+  flagging when a study’s sample size falls in the range where these
+  corrections are worth considering.
+- `vignettes/small-sample.Rmd` walks through when to prefer each
+  correction over its conventional counterpart.
+
+### New: text and open-ended response analysis
+
+A 9-method text-analysis family for open-ended survey items, from term
+frequency through topic modelling, sharing the same analysis-plan,
+role-resolution, and reporting pipeline every other method family uses.
+
+- `term_freq`: top terms by frequency, optionally split by a group
+  variable, rendered as a bar chart or a word cloud.
+- `ngram_freq`: top bigrams or trigrams by frequency.
+- `term_context`: a keyword-in-context concordance table (before/match/
+  after) for a chosen keyword.
+- `co_occurrence`: pairwise within-response co-occurrence counts on the
+  top terms, rendered as a heatmap.
+- `co_occurrence_network`: a Louvain-clustered (Blondel et al. 2008),
+  force-directed (Fruchterman & Reingold 1991) term co-occurrence
+  network; requires the optional igraph package.
+- `tidy_sentiment`: positive/negative sentiment counts and proportion
+  positive using the bing lexicon, optionally split by a group variable,
+  rendered as a diverging bar chart or a positive/negative comparison
+  word cloud; requires the optional tidytext package.
+- `quanteda_dfm`: a document-feature matrix summary (feature count,
+  sparsity, top features); requires the optional quanteda package.
+- `topic_model_lda`: Latent Dirichlet Allocation topic modelling, top
+  terms per topic as a ranked table and a faceted bar chart; requires
+  the optional tidytext and topicmodels packages.
+- `stm_topics`: structural topic modelling, the same top-terms-per-topic
+  output; requires the optional stm and tidytext packages.
+- A shared cleaning step
+  ([`clean_text_responses()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/clean_text_responses.md))
+  and a 174-word Snowball-based English stopword list, both exported so
+  a study can reuse or override them outside a runner.
+- Both the visual builder and SurveyStudio support all 9 methods,
+  including the word-cloud, top-N, seed, and topic-count (`k`) options
+  that steer their plots and models.
+- `vignettes/text-analysis.Rmd` walks through cleaning, each method, and
+  what the family deliberately does not attempt (stemming/lemmatisation,
+  tf-idf, and keyness comparison are not yet implemented).
+
+### New: disclosed amendments and a Git-linked provenance trail
+
+[`write_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/write_sframe.md)’s
+SHA-256 hash proves a `.sframe` file is unchanged since it was written,
+but gives no way to distinguish a legitimate revision (a data-entry
+correction, bot-response removal, a documented model respecification)
+from an undisclosed edit – both break the hash identically. This release
+adds a disclosed-revision path alongside the existing hash check,
+without weakening it.
+
+- [`amend_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/amend_sframe.md)
+  compares an instrument before and after a change and appends a
+  structured, timestamped entry to an ordered amendment log – never
+  overwrites – recording the reason (a controlled vocabulary:
+  `data_correction`, `bot_removal`, `model_respecification`,
+  `instrument_revision`, `other`), a free-text explanation, and which
+  top-level fields changed.
+- Two tiers, by default inferred from the reason: `"pipeline"`
+  amendments (data corrections, bot removal) need only a reason.
+  `"design"` amendments (anything touching the analysis plan or a model)
+  require a `deviation_report` describing what changed in the research
+  question, method, or model and why, matching how a formal
+  preregistration deviation is normally handled. `signoff` is never left
+  blank – it records a reviewer’s name or the literal `"none"`, so an
+  unreviewed design change stays visible to an auditor.
+- [`amendment_log()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/amendment_log.md)
+  returns the full history as a data frame, one row per disclosed
+  amendment, exportable with
+  [`write.csv()`](https://rdrr.io/r/utils/write.table.html).
+- An edit made directly to a `.sframe` file, bypassing
+  [`amend_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/amend_sframe.md),
+  still fails
+  [`read_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_sframe.md)’s
+  integrity check exactly as before. The amendment log adds a disclosed
+  path alongside the existing hash check.
+- [`link_git_commit()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/link_git_commit.md)
+  records the current Git commit SHA and subject line alongside an
+  instrument. This ties the SHA-256 hash to a specific,
+  already-explained commit. It returns an informative message when Git
+  isn’t installed or the path isn’t a repository. Git is optional.
+- `inst/schema/sframe_schema.json` documents the `.sframe` format (every
+  top-level field, including the new `amendments` log) as a standalone
+  JSON Schema, so a reviewer or a second tool can read and validate a
+  `.sframe` file without installing the package. `.sframe` was already
+  plain, git-diffable JSON before this release; the schema makes that
+  format explicit and independently checkable.
+- `vignettes/surveyframe.Rmd` gains a “What the SHA-256 hash proves, and
+  what it does not” section, stating plainly that the hash proves file
+  identity, not methodological validity, and pointing to the design-time
+  `analysis_plan` binding and
+  [`run_analysis_plan()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/run_analysis_plan.md)’s
+  single-pass execution as the package’s separate, complementary defence
+  against HARKing and p-hacking.
 
 ### Corrected results (read before comparing against earlier output)
 
 Four defects found by independent cross-validation are fixed. Each
-produced plausible numbers with no error or warning, so results computed
-with an earlier version should be re-run rather than trusted.
+produced normal-looking numbers with no error or warning, so re-run any
+results computed with an earlier version.
 
 - [`item_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/item_report.md)
   returned the wrong item-rest correlation. It subtracted each item from
@@ -34,7 +195,7 @@ with an earlier version should be re-run rather than trusted.
   F(2, 78) = 86.93, surveyframe reported F = 1.45, p = 0.24. Correcting
   the identifier alone was not sufficient: the corrected design produces
   no `Error: Within` stratum, so the effect is now located by searching
-  the strata rather than by a fixed name.
+  the strata directly.
 - [`validate_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/validate_sframe.md)
   rejected valid instruments. Its known-variable list held only base
   item and scale ids, so an analysis plan naming an expansion column
@@ -55,6 +216,88 @@ with an earlier version should be re-run rather than trusted.
   the researcher never declared. All 3 now refuse a mismatched
   estimation family, and the builder filters each model role to the
   types its generator can produce.
+
+### Breaking: `validate_sframe()` and `validate_model()` return a diagnostic
+
+Both validators previously returned two different things depending on
+`strict`: the object itself, invisibly, when `strict = TRUE`, and a bare
+unclassed list when `strict = FALSE`. Neither was a diagnostic, the
+success path printed nothing at all, and the `strict = FALSE` return had
+no methods. Both now return an `sframe_validation` object, and they
+return it visibly, so `validate_sframe(instrument)` typed at the console
+shows the user what it found.
+
+- The object records `valid`, every `problems` message, and a `checks`
+  table listing all 18 instrument checks (10 for a model) whether or not
+  each found anything. A diagnostic that lists only failures cannot tell
+  a user that a check passed from one that was never reached.
+- Read it with [`print()`](https://rdrr.io/r/base/print.html),
+  [`summary()`](https://rdrr.io/r/base/summary.html) for the check
+  roster, [`as.data.frame()`](https://rdrr.io/r/base/as.data.frame.html)
+  for one row per problem,
+  [`sf_is_valid()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_validation_accessors.md),
+  and
+  [`sf_problems()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_validation_accessors.md).
+- `strict = TRUE` still aborts with `sframe_validation_error` when
+  anything is wrong. That has not changed.
+- **`$valid` and `$problems` keep working**, so the common reading
+  pattern needs no migration.
+- **What breaks**: code using the `strict = TRUE` return as an
+  instrument, as in `instrument <- validate_sframe(instrument)`. Wrap it
+  in
+  [`as_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/as_sframe.md).
+  Passing a validation result where an instrument is expected now raises
+  a directed error naming
+  [`as_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/as_sframe.md)
+  immediately.
+
+Raised by a Journal of Statistical Software editor reviewing the code:
+“we would at least expect that the object is not silently returned and
+that the print method is adapted to allow the user to read directly the
+diagnostic”.
+
+### New: accessor and exploration methods for every class
+
+The same review found that the classes carried `print`, `summary` and
+`format` only, so user code had no route to their contents except `$` on
+the underlying list, which makes the internal layout part of the public
+contract. Two facts made that concrete:
+[`as.data.frame()`](https://rdrr.io/r/base/as.data.frame.html) failed on
+all 14 result classes with “cannot coerce class … to a data.frame”, and
+`[` dropped the class on the list-backed reports, so `results[1:2]`
+silently degraded to a bare list and lost its print method.
+
+- [`as.data.frame()`](https://rdrr.io/r/base/as.data.frame.html) now
+  works on the instrument and on every report class, returning that
+  object’s primary table.
+- `[` keeps the class on `sframe_analysis_results`,
+  `sframe_reliability_report` and `sframe_item_report`.
+- Instrument accessors:
+  [`sf_meta()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_accessors.md),
+  [`sf_items()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_accessors.md),
+  [`sf_scales()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_accessors.md),
+  [`sf_choice_sets()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_accessors.md),
+  [`sf_branches()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_accessors.md),
+  [`sf_checks()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_accessors.md),
+  [`sf_models()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_accessors.md)
+  and
+  [`sf_plan()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_accessors.md),
+  with `sf_plan<-` for declaring the plan. The component accessors
+  return an `sf_component_list` named by ID, so
+  `sf_items(instrument)[["sat_1"]]` reaches one item.
+- Component accessors:
+  [`sf_id()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_identity.md)
+  and
+  [`sf_label()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_identity.md).
+- Report accessors:
+  [`sf_apa()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_report_accessors.md)
+  and
+  [`sf_flagged()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_report_accessors.md).
+- Coercion:
+  [`as_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/as_sframe.md).
+
+The vignettes and the examples are rewritten to use these accessors. The
+registered S3 method count goes from 41 to 103.
 
 ### Breaking: the Shiny collector now emits expansion columns
 
@@ -100,8 +343,8 @@ with an earlier version should be re-run rather than trusted.
   and every alternative ranks 1. That is legitimate behaviour for the
   method, but the results table read as “all 9 alternatives are jointly
   best” and the APA sentence reported a kernel containing every
-  alternative. A note now states that the equal ranks are an absence of
-  evidence rather than a tie for first place.
+  alternative. A note now explains the equal ranks as an absence of
+  evidence.
 - [`sensitivity_analysis()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sensitivity_analysis.md)
   gains a `degenerate` flag for the same reason. A ranking that never
   separated the alternatives cannot be changed by perturbing a weight,
@@ -142,11 +385,10 @@ with an earlier version should be re-run rather than trusted.
   record.
 - [`sframe_decision_options()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_decision_options.md)
   documents PROMETHEE’s preference functions and records why the default
-  is `"usual"`, Brans and Vincke’s type I step function, rather than the
-  linear function that several other implementations default to. The
-  difference is material: net flows always differ between the 2
-  functions, and the ranking itself changed in 226 of 400 randomly drawn
-  4-alternative by 3-criterion matrices.
+  is `"usual"`, Brans and Vincke’s type I step function, chosen over the
+  linear function several other implementations default to. Net flows
+  differ between the 2 functions, and the ranking changed in 226 of 400
+  randomly drawn 4-alternative by 3-criterion matrices.
 
 ## surveyframe 0.3.4
 
@@ -301,10 +543,10 @@ unchanged. naniar and pagedown join Suggests.
 ### Bug fixes
 
 - [`sf_item()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_item.md)’s
-  `date_min` and `date_max` no longer accept an ambiguous date string
-  (for example `"01/02/2024"`); only `"YYYY-MM-DD"` or a `Date` object
-  is accepted, and anything else is a validation error rather than a
-  silently misparsed date.
+  `date_min` and `date_max` accept only `"YYYY-MM-DD"` or a `Date`
+  object now (an ambiguous string such as `"01/02/2024"` used to parse
+  silently into a specific date depending on locale). Anything else
+  raises a validation error.
 - [`bootstrap_ci()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/bootstrap_ci.md),
   [`cohens_d_ci()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/cohens_d_ci.md),
   [`cramers_v_ci()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/cramers_v_ci.md),
@@ -527,8 +769,8 @@ statistical methods, and no new bundled datasets.
   check, and model collections before serialisation. Instruments built
   with [`Map()`](https://rdrr.io/r/base/funprog.html) or other helpers
   that attach element names (for example, using item IDs as names)
-  previously serialised those collections as keyed JSON objects rather
-  than arrays. This produced a hash mismatch and an integrity error on
+  previously serialised those collections as keyed JSON objects,
+  producing a hash mismatch and an integrity error on
   [`read_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_sframe.md).
   Saved instruments now round-trip correctly regardless of how the
   component lists were constructed.
