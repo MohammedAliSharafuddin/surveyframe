@@ -134,6 +134,7 @@ responses <- read_responses(
   submitted_at = "submitted_at",
   meta_cols = "started_at"
 )
+# \donttest{
 old <- options(surveyframe.use_quarto = FALSE)
 out <- tryCatch(
   render_report(
@@ -147,4 +148,5 @@ out <- tryCatch(
 )
 file.exists(out)
 #> [1] TRUE
+# }
 ```
