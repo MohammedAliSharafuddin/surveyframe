@@ -782,7 +782,7 @@ sframe_clean_interpretations <- function(interpretations) {
       # extract_quotes() attaches $quotes (topic, rank, respondent, quote) to
       # a topic-model result: a second, separate table alongside the main
       # $table rather than a substitute for it, so it renders through the
-      # same generic table builder under its own heading (todo_0.5.md's
+      # same generic table builder under its own heading (todo_text_analysis.md's
       # ground-truth note: mirror the $syntax pattern, don't build a new
       # render_text_section()).
       quotes_html <- if (is.data.frame(result$quotes) && nrow(result$quotes) > 0) {

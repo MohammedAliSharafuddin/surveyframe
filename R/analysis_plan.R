@@ -1212,7 +1212,7 @@ sframe_run_one_block <- function(block, data, instrument, plots = FALSE,
   if (length(weights) > 0 && is.null(options$weights)) {
     options$weights <- weights[1]
   }
-  # Optional `group` role on term_freq/tidy_sentiment (todo_0.5.md section
+  # Optional `group` role on term_freq/tidy_sentiment (todo_text_analysis.md section
   # 1a): resolved into options the same way weights is above, so the 2
   # runners read options$group without knowing about roles at all. Additive
   # only, so every other method's options are untouched.
