@@ -43,6 +43,11 @@ field-validation scope is absorbed into 0.4.0 and 0.4.1, so its strict
 patch scope no longer binds. Full task list, priority order, and model
 tiers: `todo_master_0.4.md`.
 
+**Superseded 2026-08-20: the `todo_*.md` files are named by theme now,
+not by version number, because numbering them failed twice. See
+`CLAUDE.md` for the rename table.** The 2026-08-15 decision it replaces
+read as follows.
+
 **2026-08-15, owner decision: `todo_*.md` planning files are renumbered
 to match CRAN version numbers directly**, ending the local-vs-CRAN
 mismatch that caused repeated confusion through the 0.4.0 release.
@@ -55,6 +60,15 @@ mentions of the older feature-track releases have not yet been swept for
 the 2026-08-15 renumbering and may still use the pre-2026-08-15 numbers.
 Cross-check against `CLAUDE.md`'s version-numbering table, which is
 current, before trusting a specific version number below.**
+
+**Superseded 2026-08-19/20. The paragraph below describes the
+2026-08-15 swap under the old numbering and is kept as the record of
+that day. What is true now: text analysis shipped inside 0.4.0, 0.5
+means SEM and PLS execution, 0.6 is the terminal release, and 0.7, 0.8,
+0.9, and 1.0 are retired. The planning files were renamed by theme on
+2026-08-20, so `todo_0.5.md` is now `todo_text_analysis.md` and
+`todo_0.6.md` is now `todo_sem_execution.md`. See `CLAUDE.md`'s version
+table.**
 
 **2026-08-15, later the same day, owner decision: `todo_0.5.md` and
 `todo_0.6.md` swapped content.** Text and open-ended response analysis
@@ -152,11 +166,10 @@ the slip and record why in `portfolio-planner/decisions.md`.
 | **0.4.0** | The next CRAN release. Small-sample inference plus MCDM and DEMATEL (all 10 methods) plus the 5 bugs found by independent validation plus the absorbed field validation, plus the 2026-08-07 breaking API change (validation diagnostic and the accessor family) and the RStudio add-in. Built on `v0.5-dev`, merged to `main` on 2026-08-03, specified in `todo_0.4.md`, tracked in `todo_master_0.4.md`. **Engineering, review, and release paperwork all complete as of 2026-08-15**: DESCRIPTION at `0.4.0`, NEWS.md complete, 1506 tests passing, `R CMD check --as-cran` Status OK at 0/0/0, tarball audited clean, `cran-comments.md` drafted, `inst/CITATION` citing SF2 with no DOI dependency, H2 owner-verified | win-builder submitted 2026-08-15, results pending. CRAN submission (E8) follows those results and minds CRAN's release-spacing preference against 2026-07-24 |
 | 0.4.1 | Faculty demo proofing on 0.4.0: demo session to college faculty, then UI/UX and documentation fixes, plus the 4 device-dependent field items and the ICSRI 2026 audience feedback captured from the 8-9 August 2026 conference. Detail in `todo_0.4.1.md`, tasks in `todo_master_0.4.md` block F. Renumbered from 0.4.1 to 0.5.1 on 2026-07-25 and back to 0.4.1 on 2026-07-30. Also carries the small-sample paper's citation into `inst/CITATION` (F6). Open decision: whether the first RMCDA method batch rides here or waits for 0.4.2 | TBC, follows 0.4.0 |
 | 0.4.2 onward | The RMCDA method expansion: the roughly 41 MCDM methods beyond the 10 shipping in 0.4.0, ported in batches, each cross-checked against RMCDA as a Suggests-only test-time oracle. Tasks in `todo_master_0.4.md` block G. Method-per-patch grouping not yet decided (G1), and the data-driven priority order it wants still depends on D2a's OpenAlex pass finishing | TBC |
-| 0.5 | Text and open-ended response analysis. Swapped ahead of structural models on 2026-08-15 (owner decision): narrower, self-contained scope. Detail in `todo_0.5.md` | within 15 days of 2026-08-15 |
-| 0.6 | SEM and PLS execution, invariance, the semScreenR bridge. Swapped behind text analysis on 2026-08-15: carries the harder engineering (the fitting data contract, an external CRAN-pending dependency). Detail in `todo_0.6.md` | TBC, no fresh date set after the swap (2027-03-11 predates it) |
-| 0.7 | Provenance part 1: `sf_version`, `sf_review`, `sf_pilot`, response hashing (SHA Layers 2-3) | 2027-06-09 |
-| 0.8 | Provenance part 2: `sf_bundle`, `verify_bundle`, manifest, sfReport (SHA Layers 4-5) | 2027-07-24 |
-| 1.0 | Integration contract, AI and agentic layer, JASP/jamovi export, API freeze, Merkle root and DOI archival, launch at SaaS parity | 2027-10-22 |
+| ~~0.5 (text analysis)~~ | **Shipped inside 0.4.0.** Text and open-ended response analysis carried the label 0.5 between 2026-08-15 and 2026-08-19, then the renumbering folded it into 0.4.0, where it belongs. Engineering complete 2026-08-18. Detail in `todo_text_analysis.md` | superseded, see 0.4.0 |
+| **0.5** | SEM and PLS execution, invariance, the semScreenR bridge. Renumbered from 0.6 on 2026-08-19, once text analysis vacated the 0.5 slot by shipping in 0.4.0. Carries the harder engineering of the pair (the fitting data contract, an external CRAN-pending dependency). Detail in `todo_sem_execution.md` | not started, TBC (2027-03-11 predates the renumbering) |
+| **0.6** | The terminal release, merged 2026-08-19 from the former 0.7, 0.8, 0.9, and 1.0. Provenance SHA Layers 3 to 5 (`sf_version`, `sf_review`, `sf_pilot`, response hashing, `sf_bundle`, `verify_bundle`, manifest, sfReport), the integration contract, the AI and agentic layer, JASP/jamovi export, API freeze, Merkle root and DOI archival, then launch at SaaS parity. **Layer 2 already shipped inside 0.4.0**, so re-scope part 1 before building. Detail in `todo_provenance_part1.md`, `todo_provenance_part2.md`, and `todo_integration_launch.md` | TBC, needs re-estimation, likely spans more than one 45-day cycle |
+| ~~0.7, 0.8, 0.9, 1.0~~ | **Retired 2026-08-19. Nothing is assigned to them.** 0.7's text theme shipped in 0.4.0. The rest merged into 0.6. The former 2027-06-09, 2027-07-24, and 2027-10-22 dates are retired with them | superseded, see 0.5 and 0.6 |
 
 ---
 

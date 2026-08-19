@@ -1,4 +1,18 @@
-# todo_0.8.md — surveyframe 0.8: Provenance part two (SHA Layers 4-5)
+# todo_provenance_part2.md: surveyframe 0.6, provenance SHA layers, part two
+
+> **Renamed 2026-08-20 from `todo_0.8.md`. 0.8 is retired and no longer
+> exists.** The 2026-08-19 renumbering merged the former 0.7, 0.8, 0.9,
+> and 1.0 into a single terminal release, **0.6**. This file's content
+> folds into that release. Its SHA Layers 4 and 5 scope is unchanged and
+> still real. Its predecessor is now `todo_provenance_part1.md`, and the
+> chain stays contiguous inside the one 0.6 release.
+
+> **Filenames on this branch are themed, not numbered, since 2026-08-20.**
+> The numbered names churned 3 times (renumbered 2026-07-30, shifted by
+> 0.1 on 2026-08-15, swapped later that same day) and then contradicted
+> the 2026-08-19 renumbering outright. A themed name cannot go stale when
+> a version moves. The canonical version table lives in
+> `../portfolio-planner/CLAUDE.md` and overrides any number written here.
 
 Dev-only planning file, tracked on `dev` only. Its name is in `.gitignore`
 and `.Rbuildignore`. Companion to `CLAUDE.md`, `todo_0.7.md` (must be

@@ -1,4 +1,20 @@
-# todo_0.5.md — surveyframe 0.5: Text and open-ended response analysis
+# todo_text_analysis.md: surveyframe 0.4.0, text and open-ended response analysis
+
+> **Renamed 2026-08-20 from `todo_0.5.md`. This content is 0.4.0, not 0.5.**
+> Text analysis shipped inside 0.4.0, engineering complete 2026-08-18.
+> The 2026-08-19 renumbering gave 0.5 a different meaning entirely, SEM
+> and PLS execution, which lives in `todo_sem_execution.md`. The old
+> filename said 0.5 and misled a planning session on 2026-08-20, which is
+> what prompted this rename. Every "0.5" in the prose below means text
+> analysis under the pre-2026-08-19 numbering and should be read as
+> 0.4.0.
+
+> **Filenames on this branch are themed, not numbered, since 2026-08-20.**
+> The numbered names churned 3 times (renumbered 2026-07-30, shifted by
+> 0.1 on 2026-08-15, swapped later that same day) and then contradicted
+> the 2026-08-19 renumbering outright. A themed name cannot go stale when
+> a version moves. The canonical version table lives in
+> `../portfolio-planner/CLAUDE.md` and overrides any number written here.
 
 > **Owner decision 2026-08-15: swapped with structural models.** This
 > file was `todo_0.6.md` until today; the structural-model/semScreenR

@@ -241,6 +241,7 @@ This suite reviews `R/text_analysis.R` and its wiring into
 `R/analysis_plan.R`, `R/plots.R`, `R/conditions.R`, `R/statistics_reports.R`,
 and `DESCRIPTION`, all present on `dev` at commit `a0add1e` ("Merge branch
 'main' into dev"). This work has not been pushed to any remote and is not
-on `main`. See `todo_0.5.md` for the full 9-method-id build plan and
+on `main`. See `todo_text_analysis.md` (renamed from `todo_0.5.md`
+on 2026-08-20; this work is 0.4.0, not 0.5) for the full 9-method-id build plan and
 `CLAUDE.md`'s "In flight" section for where 0.5 sits relative to the held
 0.4.0 CRAN submission.

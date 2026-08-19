@@ -1,4 +1,21 @@
-# todo_0.6.md — surveyframe 0.6: Structural model execution and semScreenR bridge
+# todo_sem_execution.md: surveyframe 0.5, structural model execution and semScreenR bridge
+
+> **Renamed 2026-08-20 from `todo_0.6.md`. This is the real 0.5.**
+> The 2026-08-19 renumbering moved SEM and PLS execution from 0.6 to
+> **0.5**, because the old 0.5 slot's text-analysis content had already
+> shipped inside 0.4.0. This release has not started and carries no
+> target date. Every "0.6" in the prose below means this release under
+> the old numbering and should be read as 0.5. The number 0.6 now means
+> the terminal provenance and launch release, which is a different thing,
+> covered by `todo_provenance_part1.md`, `todo_provenance_part2.md`, and
+> `todo_integration_launch.md`.
+
+> **Filenames on this branch are themed, not numbered, since 2026-08-20.**
+> The numbered names churned 3 times (renumbered 2026-07-30, shifted by
+> 0.1 on 2026-08-15, swapped later that same day) and then contradicted
+> the 2026-08-19 renumbering outright. A themed name cannot go stale when
+> a version moves. The canonical version table lives in
+> `../portfolio-planner/CLAUDE.md` and overrides any number written here.
 
 > **Owner decision 2026-08-15: swapped with text analysis.** This file
 > was `todo_0.5.md` until today; text analysis was `todo_0.6.md`. Text

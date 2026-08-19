@@ -1,4 +1,20 @@
-# todo_1.0.md — surveyframe v1.0: Integration contract, AI layer, launch
+# todo_integration_launch.md: surveyframe 0.6, integration contract, AI layer, launch
+
+> **Renamed 2026-08-20 from `todo_1.0.md`. There is no 1.0 any more.**
+> The 2026-08-19 renumbering merged the former 0.8, 0.9, and 1.0 into a
+> single terminal release, **0.6**, which is now the last version on this
+> track and the launch gate for Ethos, Ethos Pro, and the ASRDA complete
+> edition. The note below arguing that 1.0 should keep its number is
+> superseded: the launch gate moved to 0.6 rather than the number moving
+> to the launch. The 2027-10-22 date is also retired and awaits
+> re-estimation.
+
+> **Filenames on this branch are themed, not numbered, since 2026-08-20.**
+> The numbered names churned 3 times (renumbered 2026-07-30, shifted by
+> 0.1 on 2026-08-15, swapped later that same day) and then contradicted
+> the 2026-08-19 renumbering outright. A themed name cannot go stale when
+> a version moves. The canonical version table lives in
+> `../portfolio-planner/CLAUDE.md` and overrides any number written here.
 
 > **Kept at `1.0`, not shifted, in the 2026-08-15 renumbering that moved
 > every other `todo_0.5.md` through `todo_0.9.md` file down by 0.1 to

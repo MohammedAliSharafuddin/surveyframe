@@ -64,49 +64,70 @@ full citation with its Zenodo DOI.
 
 ## Version numbering: branch labels versus CRAN versions (read before any release work)
 
-**Owner decision 2026-07-30, partly reversed 2026-08-15.** Branches and
-worktrees keep their historical labels regardless of CRAN version, since
-renaming one after commits exist buys nothing. `todo_*.md` planning files
-are different: as of 2026-08-15 they are renumbered to match CRAN version
-numbers directly, closing the local-vs-CRAN mismatch that caused repeated
-confusion through the 0.4.0 release. `todo_0.4.md` (formerly 2 separate
-files, `todo_0.4.md` and `todo_0.5.md`, merged 2026-08-15) is the CRAN
-0.4.0 spec; `todo_0.4.1.md` (formerly `todo_0.5.1.md`) is 0.4.1;
-`todo_0.5.md` through `todo_0.8.md` (formerly `todo_0.6.md` through
-`todo_0.9.md`) each shifted down by 0.1 to match. `todo_1.0.md` is
-unchanged, since 1.0 is an external launch gate (Ethos GA, Ethos Pro GA,
-the ASRDA complete edition), not a slot in the sequential feature track.
+**Owner decision 2026-07-30, revised 2026-08-15, superseded 2026-08-20.**
+Branches and worktrees keep their historical labels regardless of CRAN
+version, since renaming one after commits exist buys nothing. That part
+still holds: branch `v0.5-dev` carries **0.4.0** work and keeps its name.
 
-**Filenames and every `.md`-suffixed cross-reference are fully fixed and
-verified.** Bare in-prose mentions without the `.md` suffix (`"the 0.5
-cycle"`, `"per todo_0.5"`) were fixed where they were live pointers to
-another file's content (an integration checklist, a shared section), but
-were not exhaustively swept everywhere they appear, since many are
-scheduling colour in files whose own target dates (2027) are already
-stale regardless of numbering. Each file's own title line and this table
-are authoritative; do not trust a bare version number inside a file's
-body without checking both.
+**`todo_*.md` planning files are now named by theme, not by version
+number (2026-08-20).** Numbering them was tried twice and failed twice.
+They were renumbered on 2026-07-30, shifted down by 0.1 on 2026-08-15,
+swapped in content later that same day, and then the portfolio-level
+renumbering of 2026-08-19 made the numbers wrong again within 4 days. On
+2026-08-20 a planning session read `todo_0.5.md`, saw text analysis, and
+reported "0.5 engineering is complete" to the owner. Text analysis is
+0.4.0. The real 0.5 had not started. A themed filename cannot fail that
+way.
 
-**Owner decision 2026-08-15 (later the same day): `todo_0.5.md` and
-`todo_0.6.md` swapped content.** Text and open-ended response analysis is
-now `todo_0.5.md`, targeted for release within 15 days, since its scope
-is narrower and self-contained (no new item types, no serialisation
-work, one new file). Structural model execution and the semScreenR
-bridge, the harder release of the pair, moved to `todo_0.6.md` with no
-fresh target date set. Self-referential mentions inside each file (the
-title, "the 0.x cycle", the "todo_0.x integration checklist" pointer)
-were swapped along with the content; sibling-release comparisons inside
-each file (a "less parallel than 0.x" note, a "0.x lavaan fits" note)
-were deliberately left as the literal digit already there, since the
-swap makes those correct rather than requiring a change.
+Renames applied 2026-08-20:
 
-| Branch/worktree label (unchanged) | CRAN version | Planning file (renamed 2026-08-15) | Content |
+| Old name | New name | Real version |
+|---|---|---|
+| `todo_0.5.md` | `todo_text_analysis.md` | 0.4.0, shipped |
+| `todo_0.6.md` | `todo_sem_execution.md` | **0.5**, not started |
+| `todo_0.7.md` | `todo_provenance_part1.md` | folds into 0.6 |
+| `todo_0.8.md` | `todo_provenance_part2.md` | folds into 0.6 |
+| `todo_1.0.md` | `todo_integration_launch.md` | folds into 0.6 |
+
+`todo_0.4.md`, `todo_0.4.1.md`, `todo_0.3.5.md`, and `todo_master_0.4.md`
+keep their names, since those numbers are CRAN numbers and are still
+correct. `.gitignore` and `.Rbuildignore` were updated to match, which
+also cleared a live defect: both still listed `todo_0.5.1.md`, a name
+that stopped existing on 2026-07-30, so `todo_0.4.1.md` was never
+actually ignored and would have shipped inside a build tarball.
+
+## surveyframe version numbering (canonical, read before naming a version)
+
+Renumbered portfolio-wide 2026-08-19. Check any version number against
+this table before using it.
+
+| Version | Theme | Plan file | State |
 |---|---|---|---|
-| branch `v0.5-dev`, worktree `../surveyframe-v0.5-dev` | **0.4.0** | `todo_0.4.md` | MCDM plus small-sample plus the 5 bug fixes plus absorbed field validation |
+| **0.4.0** | MCDM, small-sample, text analysis, provenance SHA Layer 2 | `todo_0.4.md`, `todo_text_analysis.md`, `todo_master_0.4.md` | engineering complete, held for CRAN |
+| **0.4.1** | faculty demo proofing, field validation | `todo_0.4.1.md` | after 0.4.0 |
+| **0.4.2** onward | RMCDA method expansion batches | block G of `todo_master_0.4.md` | after 0.4.1 |
+| **0.5** | SEM and PLS execution, semScreenR bridge | `todo_sem_execution.md` | not started, date TBC |
+| **0.6** | provenance SHA Layers 3-5, integration contract, AI and agentic layer, SaaS-parity launch | `todo_provenance_part1.md`, `todo_provenance_part2.md`, `todo_integration_launch.md` | terminal release, date TBC |
+
+**0.7, 0.8, 0.9, and 1.0 are retired. Nothing is assigned to them.**
+0.7's text theme shipped inside 0.4.0. The former 0.8, 0.9, and 1.0
+merged into 0.6, the last version on this track and the launch gate for
+Ethos, Ethos Pro, and the ASRDA complete edition. The matching table in
+`../portfolio-planner/CLAUDE.md` is the portfolio-level canonical copy,
+and the 2 are kept in step.
+
+**Bare in-prose version numbers inside the older planning files were
+never exhaustively swept.** Each file's title line and its dated banner
+are authoritative, together with this table. Do not trust a bare version
+number written in a file's body.
+
+| Branch/worktree label (unchanged) | CRAN version | Planning file | Content |
+|---|---|---|---|
+| branch `v0.5-dev`, worktree `../surveyframe-v0.5-dev` | **0.4.0** | `todo_0.4.md` | MCDM plus small-sample plus the 5 bug fixes plus absorbed field validation. The `v0.5` label is historical and does not mean 0.5 |
 | (follows `v0.5-dev`) | **0.4.1** | `todo_0.4.1.md` | Faculty demo proofing plus the device-dependent field items |
-| (follows `v0.5-dev`) | **0.4.2** onward | the RMCDA method expansion, block G in `todo_master_0.4.md` | The roughly 41 extra MCDM methods |
-| — | never published | `todo_0.3.5.md` | Absorbed into 0.4.0 and 0.4.1 |
-| branch `v0.4-dev` | never published | — | Small-sample track, already merged into `v0.5-dev` |
+| (follows `v0.5-dev`) | **0.4.2** onward | block G in `todo_master_0.4.md` | The roughly 41 extra MCDM methods |
+| n/a | never published | `todo_0.3.5.md` | Absorbed into 0.4.0 and 0.4.1 |
+| branch `v0.4-dev` | never published | n/a | Small-sample track, already merged into `v0.5-dev` |
 
 **CRAN numbering runs 0.3.4 to 0.4.0 to 0.4.1 to 0.4.2.** There is no 0.3.5
 and no 0.5.x on CRAN, and no 0.4 in the old small-sample-only sense either,
@@ -198,7 +219,10 @@ Dev-only files (tracked on `dev` only):
 - `todo.md`
 - `dogfeed.todo.md`
 - `todo_0.3.5.md`, `todo_0.4.md`, `todo_0.4.1.md`,
-  `todo_0.5.md` through `todo_1.0.md`, `todo_rstudio_addin.md`
+  `todo_master_0.4.md`, `todo_text_analysis.md`,
+  `todo_sem_execution.md`, `todo_provenance_part1.md`,
+  `todo_provenance_part2.md`, `todo_integration_launch.md`,
+  `todo_rstudio_addin.md`
 - `mas_review_032.md` through `mas_review_034.md` and their `.qmd`/`.html`
   renders, `kimi_review_034.md`, `qwen_review_034.md`
 - `mas_review_040.qmd` (deferred, superseded by `review_040/`)
@@ -336,9 +360,11 @@ win-builder passed (R-release, 2026-08-15). **Both former blockers are
 closed**: D6 no longer needs a DOI, since `inst/CITATION` cites SF2 as
 in preparation, and H2 was owner-verified in a real RStudio session on
 2026-08-15. **But 0.4.0's CRAN submission is deliberately held, owner
-decision 2026-08-16**: 0.5's text-analysis features are being bundled
-in before submission rather than shipping 0.4.0 alone when CRAN
-reopens. See `todo_0.5.md` for the build plan (9 method ids) and its
+decision 2026-08-16**: the text-analysis features are being bundled
+in before submission, instead of shipping 0.4.0 alone when CRAN
+reopens. (That work was labelled "0.5" when this paragraph was written.
+It is 0.4.0 content, see the version table above.)
+See `todo_text_analysis.md` for the build plan (9 method ids) and its
 2026-08-17 addendum for the schedule — engineering targets landing
 Monday to Wednesday (17-19 August, ahead of a Claude usage-offer
 deadline), vignette/exit-checklist/bundled-release-paperwork over the
@@ -794,9 +820,11 @@ tier and a priority tier per task, plus the 3 open decisions. Read it
 first for release work. Per-release detail stays in `todo_0.4.md` (the
 0.4.0 engineering spec, merged 2026-08-15 from the previously separate
 MCDM/DEMATEL file and the small-sample file, both fully built and
-shipped), `todo_0.4.1.md` (0.4.1), `todo_rstudio_addin.md`, and
-`todo_0.5.md` through `todo_1.0.md` for later releases. `todo_0.3.5.md`
-is superseded, absorbed into 0.4.0 and 0.4.1.
+shipped), `todo_0.4.1.md` (0.4.1), `todo_rstudio_addin.md`,
+`todo_text_analysis.md` (also 0.4.0), `todo_sem_execution.md` (0.5),
+and `todo_provenance_part1.md`, `todo_provenance_part2.md`, and
+`todo_integration_launch.md` (all 3 fold into the terminal 0.6).
+`todo_0.3.5.md` is superseded, absorbed into 0.4.0 and 0.4.1.
 
 The full task list is in `revision_todo_0.3.md`. The version and growth plan is
 in `roadmap.md`.
