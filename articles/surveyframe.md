@@ -523,15 +523,15 @@ study_amended <- amend_sframe(
 
 amendment_log(study_amended)
 #>              timestamp         reason_code
-#> 1 2026-08-18T21:47:44Z instrument_revision
+#> 1 2026-08-19T04:04:34Z instrument_revision
 #>                                    reason_text   tier author
 #> 1 Clarified item wording after pilot feedback. design   <NA>
 #>                                     deviation_report signoff
 #> 1 Wording only; the construct measured is unchanged.    none
 #>                                                      previous_hash
-#> 1 6caa15713fa1f5ce92a00d1c7fab1b63d580326ba78583528d87ad906ed9cf83
+#> 1 75831b8c129a62b9839dd489aef4a95b3cd95489a8ad1ed40c0d1f5841a678de
 #>                                                           new_hash
-#> 1 89b8fdd3bb86a069bdba5f2fce2b6b7096f45696df2ce1922a6a2ebc77957da3
+#> 1 6244ac6b6d410de94cede720a08bceca111b27caf71123eb40eec02619d70481
 #>   changed_fields
 #> 1          items
 ```
@@ -622,7 +622,7 @@ html_path <- export_static_survey(
   output_path = file.path(tempdir(), "tourism_services_survey.html"),
   open        = FALSE
 )
-#> Static survey written to '/tmp/RtmpCdlBXw/tourism_services_survey.html' (85.2
+#> Static survey written to '/tmp/RtmpJYpcWJ/tourism_services_survey.html' (85.2
 #> KB).
 file.exists(html_path)
 #> [1] TRUE
@@ -675,7 +675,7 @@ script_path <- export_google_sheet(
   sheet_url  = "https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID",
   output_dir = tempdir()
 )
-#> Apps Script written to: /tmp/RtmpCdlBXw/surveyframe_collector.gs
+#> Apps Script written to: /tmp/RtmpJYpcWJ/surveyframe_collector.gs
 #> Follow the setup instructions inside the file to deploy it.
 file.exists(script_path)
 #> [1] TRUE
@@ -1238,7 +1238,7 @@ results_path <- render_results(
   output_file = file.path(tempdir(), "tourism_results.html")
 )
 cat("Results report written:", results_path, "\n")
-#> Results report written: /tmp/RtmpCdlBXw/tourism_results.html
+#> Results report written: /tmp/RtmpJYpcWJ/tourism_results.html
 cat("Size:", round(file.size(results_path) / 1024, 1), "KB\n")
 #> Size: 13.5 KB
 ```

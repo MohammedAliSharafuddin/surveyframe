@@ -158,13 +158,18 @@ instr <- sf_instrument(
   )
 )
 
-instr <- validate_sframe(instr)
 write_sframe(instr, tempfile(fileext = ".sframe"))
+
+# See the instrument as a survey a respondent would fill in:
+export_static_survey(instr, open = FALSE)
 ```
 
 [`write_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/write_sframe.md)
 validates the instrument and writes the validated object, including the
 validation flag, the analysis plan, and any saved model specifications.
+[`export_static_survey()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/export_static_survey.md)
+renders it as a self-contained HTML survey, the same function covered in
+“Visual tools” below.
 
 ## Import and score
 

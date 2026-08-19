@@ -195,9 +195,11 @@
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">instr</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/validate_sframe.html">validate_sframe</a></span><span class="op">(</span><span class="va">instr</span><span class="op">)</span></span>
-<span><span class="fu"><a href="reference/write_sframe.html">write_sframe</a></span><span class="op">(</span><span class="va">instr</span>, <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>fileext <span class="op">=</span> <span class="st">".sframe"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><code><a href="reference/write_sframe.html">write_sframe()</a></code> validates the instrument and writes the validated object, including the validation flag, the analysis plan, and any saved model specifications.</p>
+<span><span class="fu"><a href="reference/write_sframe.html">write_sframe</a></span><span class="op">(</span><span class="va">instr</span>, <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>fileext <span class="op">=</span> <span class="st">".sframe"</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># See the instrument as a survey a respondent would fill in:</span></span>
+<span><span class="fu"><a href="reference/export_static_survey.html">export_static_survey</a></span><span class="op">(</span><span class="va">instr</span>, open <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+<p><code><a href="reference/write_sframe.html">write_sframe()</a></code> validates the instrument and writes the validated object, including the validation flag, the analysis plan, and any saved model specifications. <code><a href="reference/export_static_survey.html">export_static_survey()</a></code> renders it as a self-contained HTML survey, the same function covered in “Visual tools” below.</p>
 </div>
 <div class="section level2">
 <h2 id="import-and-score">Import and score<a class="anchor" aria-label="anchor" href="#import-and-score"></a>
