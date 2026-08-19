@@ -289,6 +289,7 @@ async function verify(text){
   html+='<table><caption>File</caption><tbody>';
   html+='<tr><th>Title</th><td>'+esc((parsed.meta&&parsed.meta.title)||'(untitled)')+'</td></tr>';
   html+='<tr><th>Instrument version</th><td>'+esc(parsed.version||(parsed.meta&&parsed.meta.version)||'-')+'</td></tr>';
+  html+='<tr><th>Created</th><td>'+esc((parsed.meta&&parsed.meta.created_at)||'(not recorded; predates the created_at field)')+'</td></tr>';
   html+='<tr><th>Items / choice sets / scales</th><td>'+
     (parsed.items||[]).length+' / '+(parsed.choices||[]).length+' / '+(parsed.scales||[]).length+'</td></tr>';
   html+='<tr><th>Recorded hash</th><td>'+shortHash(storedHash)+'</td></tr>';
