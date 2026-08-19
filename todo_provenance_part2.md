@@ -15,7 +15,7 @@
 > `../portfolio-planner/CLAUDE.md` and overrides any number written here.
 
 Dev-only planning file, tracked on `dev` only. Its name is in `.gitignore`
-and `.Rbuildignore`. Companion to `CLAUDE.md`, `todo_0.7.md` (must be
+and `.Rbuildignore`. Companion to `CLAUDE.md`, `todo_provenance_part1.md` (must be
 shipped first — the chain is contiguous), and
 `../portfolio-planner/development_instructions/07_v08_v09_implementation.md`
 (v0.8 section, including the 2026-07-14 Layer 5 chaining revision).

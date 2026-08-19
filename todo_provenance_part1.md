@@ -220,7 +220,7 @@ axe-core zero violations.
   (owner review, listed as a named exit item).
 - Owner reminders: Ethos Pro's approval workflow builds on these
   artefacts next cycle; 0.8 starts from this chain — do not merge
-  anything here that 0.8's `sf_bundle()` contract (see todo_0.8.md)
+  anything here that 0.8's `sf_bundle()` contract (see todo_provenance_part2.md)
   would have to undo.
 
 ---

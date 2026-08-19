@@ -140,7 +140,7 @@ rbi <- readLines(file.path(pkg_root, ".Rbuildignore"), warn = FALSE)
 dev_only <- c("CLAUDE.md", "roadmap.md", "revision_todo_0.3.md",
               "cran-comments.md", "todo.md", "dogfeed.todo.md",
               "todo_master_0.4.md", "todo_0.3.5.md", "todo_0.4.md",
-              "todo_0.5.md", "todo_0.5.1.md", "todo_rstudio_addin.md",
+              "todo_text_analysis.md", "todo_0.4.1.md", "todo_rstudio_addin.md",
               "mas_review_034.md", "mas_review_040.qmd",
               "kimi_review_034.md", "qwen_review_034.md")
 present <- dev_only[file.exists(file.path(pkg_root, dev_only))]

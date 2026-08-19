@@ -191,7 +191,7 @@ sframe_plot_frequency <- function(result, palette = c("web", "print")) {
 # whenever positions happened to land close together (visible in the
 # 0.5 vignette/demo's word clouds: "comfortable" overlapping "respond").
 #
-# Still no new dependency (todo_0.5.md: "do not add a wordcloud/
+# Still no new dependency (todo_text_analysis.md: "do not add a wordcloud/
 # ggwordcloud package for this"): text is measured with base
 # `grDevices::pdf(NULL)` (a null device, writes no file, the standard R
 # trick for off-screen `strwidth()`/`strheight()`) plus base graphics
@@ -239,7 +239,7 @@ sframe_plot_frequency <- function(result, palette = c("web", "print")) {
 # organic edge. `shape = "organic"` (default) is uncapped, the original
 # freeform behaviour.
 #
-# Still no new dependency (todo_0.5.md: "do not add a wordcloud/
+# Still no new dependency (todo_text_analysis.md: "do not add a wordcloud/
 # ggwordcloud package for this"): `grid` and `grDevices::pdf(NULL)` (a
 # null device, writes no file) are both base R, not the wordcloud/
 # ggwordcloud packages themselves.
@@ -331,7 +331,7 @@ sframe_plot_frequency <- function(result, palette = c("web", "print")) {
 #' Top terms from a `term_freq` result as a horizontal bar chart, or a word
 #' cloud when `result$options$wordcloud` is `TRUE` (opt-in, default
 #' `FALSE`). Facets by group when the result carries a `group` role
-#' (todo_0.5.md section 1a).
+#' (todo_text_analysis.md section 1a).
 #'
 #' @param result A `term_freq` result list from [run_analysis_plan()].
 #' @param palette One of `"web"` or `"print"`. See `sframe_brand()`.
@@ -2392,7 +2392,7 @@ sframe_plot_cooccurrence_network <- function(result, palette = c("web", "print")
 # tidytext comparison cloud (bookdown.org/jdholster1/idsr/text-analysis.html
 # section 8.4: count(word, sentiment) %>% acast() %>% comparison.cloud()),
 # without adding the wordcloud/reshape2 dependency that reference code
-# uses — consistent with todo_0.5.md's "no wordcloud/ggwordcloud package"
+# uses — consistent with todo_text_analysis.md's "no wordcloud/ggwordcloud package"
 # rule for the plain term-frequency cloud.
 .sframe_sentiment_cloud_layout <- function(word_sentiment, max_per_side = 25) {
   neg <- utils::head(word_sentiment[word_sentiment$sentiment == "negative", , drop = FALSE], max_per_side)

@@ -25,7 +25,7 @@
 > below are updated to match.
 
 Dev-only planning file, tracked on `dev` only. Its name is in `.gitignore`
-and `.Rbuildignore`. Companion to `CLAUDE.md`, `todo_0.8.md`, and
+and `.Rbuildignore`. Companion to `CLAUDE.md`, `todo_provenance_part2.md`, and
 `../portfolio-planner/development_instructions/08_v10_ai_layer.md` plus
 `09_ethos_database_schema.md`/`10_ethos_architecture.md` (Ethos side).
 
@@ -60,7 +60,7 @@ package, which must never require internet or an API key.
   The weighting work generalises this, it does not invent it.
 - The **sframe-schema repo already exists locally**
   (`../sframe-schema`, created 2026-07-14 as v0.1-draft, bumped to a
-  stable 1.0 during 0.8 per todo_0.8.md). `inst/schema/sframe_v1.json`
+  stable 1.0 during 0.8 per todo_provenance_part2.md). `inst/schema/sframe_v1.json`
   in the package is generated from or verified against that repo —
   single source of truth, do not hand-maintain two copies. The MethodsX
   paper describes this schema.
