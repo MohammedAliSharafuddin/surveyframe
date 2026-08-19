@@ -87,7 +87,7 @@ instr <- sf_instrument("Customer Satisfaction Survey",
 out <- export_static_survey(instr,
                              output_path = file.path(tempdir(), "sat.html"),
                              open = FALSE)
-#> Static survey written to '/tmp/RtmpthXXVK/sat.html' (57.9 KB).
+#> Static survey written to '/tmp/RtmpkdGVJs/sat.html' (57.9 KB).
 file.exists(out)
 #> [1] TRUE
 
@@ -96,7 +96,7 @@ file.exists(out)
 export_static_survey(instr,
                      output_path = file.path(tempdir(), "sat_browser.html"),
                      overwrite = TRUE)
-#> Static survey written to '/tmp/RtmpthXXVK/sat_browser.html' (57.9 KB).
+#> Static survey written to '/tmp/RtmpkdGVJs/sat_browser.html' (57.9 KB).
 
 # Write with a Google Apps Script endpoint for server-side collection
 export_static_survey(
@@ -106,6 +106,6 @@ export_static_survey(
   open         = FALSE,
   overwrite    = TRUE
 )
-#> Static survey written to '/tmp/RtmpthXXVK/sat_endpoint.html' (57.9 KB).
+#> Static survey written to '/tmp/RtmpkdGVJs/sat_endpoint.html' (57.9 KB).
 # }
 ```

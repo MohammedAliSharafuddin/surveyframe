@@ -113,7 +113,7 @@
   </p>
 
   <div class="privacy">
-    <span>🔒</span>
+    <span><i class="fa-solid fa-lock" aria-hidden="true"></i></span>
     <span><strong>Nothing is uploaded.</strong> This page has no server component.
     Your file is read and hashed by your browser's own SubtleCrypto API and never
     leaves your device. You can verify this yourself: view this page's source.
@@ -279,7 +279,11 @@ async function verify(text){
     status='fail'; note='Hash mismatch. This file does not match its own recorded hash. It may have been edited after write_sframe() produced it, outside amend_sframe()’s disclosed-revision path.';
   }
 
-  var icon={ok:'✅',legacy:'⚠️',fail:'❌'}[status];
+  var icon={
+    ok:'<i class="fa-solid fa-circle-check" aria-hidden="true"></i>',
+    legacy:'<i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>',
+    fail:'<i class="fa-solid fa-circle-xmark" aria-hidden="true"></i>'
+  }[status];
   var label={ok:'Verified',legacy:'Verified (legacy format)',fail:'Not verified'}[status];
 
   var html='';
@@ -289,6 +293,7 @@ async function verify(text){
   html+='<table><caption>File</caption><tbody>';
   html+='<tr><th>Title</th><td>'+esc((parsed.meta&&parsed.meta.title)||'(untitled)')+'</td></tr>';
   html+='<tr><th>Instrument version</th><td>'+esc(parsed.version||(parsed.meta&&parsed.meta.version)||'-')+'</td></tr>';
+  html+='<tr><th>Created</th><td>'+esc((parsed.meta&&parsed.meta.created_at)||'(not recorded; predates the created_at field)')+'</td></tr>';
   html+='<tr><th>Items / choice sets / scales</th><td>'+
     (parsed.items||[]).length+' / '+(parsed.choices||[]).length+' / '+(parsed.scales||[]).length+'</td></tr>';
   html+='<tr><th>Recorded hash</th><td>'+shortHash(storedHash)+'</td></tr>';
