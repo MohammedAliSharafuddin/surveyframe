@@ -2622,6 +2622,12 @@ var TB={likert:'b-li',single_choice:'b-si',multiple_choice:'b-mu',numeric:'b-nu'
 function renderItemList(){
   var el=document.getElementById('itemList'),q=(gv('itemSearch')||'').toLowerCase();
   var items=S.items.filter(function(i){return!q||(i.label||'').toLowerCase().includes(q)||(i.id||'').toLowerCase().includes(q);});
+  // role="list" requires every child to be a listitem. The empty state is a
+  // panel of guidance, not a list of anything, so the role is dropped while
+  // it is showing and restored once there are items. Without this, an empty
+  // survey fails WCAG's aria-required-children, which axe rates critical, and
+  // a screen reader announces a list containing nothing it can describe.
+  if(!items.length){el.removeAttribute('role');}else{el.setAttribute('role','list');}
   if(!items.length){el.innerHTML='<div class="sb-empty"><div class="sb-empty-ic">&#128196;</div><div class="sb-empty-t">No questions yet</div><div class="sb-empty-b">Use "+ Add question" below to choose a question type, or start from an existing file.</div><div class="sb-empty-cta"><button type="button" class="sb-cta-s" onclick="openFile()">Open an existing .sframe</button><button type="button" class="sb-cta-s" onclick="openSettings()">Set up survey settings</button></div></div>';return;}
   var cp=null;
   el.innerHTML=items.map(function(item){
