@@ -25,12 +25,26 @@ goes to **the R Journal**, where re-usable architectures and package papers
 are in scope by name, so the same property is the contribution rather than
 the objection.
 
-Current version: **0.3.4, live on CRAN, published 2026-07-24** (submitted
-2026-07-25 local time, tagged `v0.3.4`). Verified on the CRAN package
-page and the check-results page on 2026-07-30: all 13 flavours Status OK,
-no notes, no warnings. `main` is pushed to both `origin` and `public` and
-matches the public repository exactly. The pkgdown site shows 0.3.4 and
-carries no dev-only files. 0.3.4 shipped all plotting, interface,
+Current version: **0.4.0, live on CRAN, published 2026-08-20** (submitted
+2026-08-19, resubmitted 2026-08-20 after the pretest NOTEs, tagged
+`v0.4.0` at commit `4212857`). Verified on the CRAN package page on
+2026-08-22: Version 0.4.0, Published 2026-08-20, all 10 vignettes
+listed. It bundles 4 themes in one release: MCDA (10 methods),
+small-sample inference, text analysis (9 method ids), and the
+disclosed-amendment provenance layer. 2 breaking changes ship with it,
+the validator return type and the Shiny collector's expansion columns.
+The next release is 0.4.1.
+
+The `v0.4.0` tag was created retrospectively on 2026-08-22, because the
+release was not tagged as it shipped. The commit was identified by
+extracting `surveyframe_0.4.0.tar.gz` (`Packaged: 2026-08-20 06:57:37
+UTC`) and diffing `R/`, `tests/`, and `inst/` against the candidate
+commits: identical to `4212857`, and differing from `3bc9be2` in
+`tests/` and in the presence of `inst/WORDLIST`. This is the second
+release in a row that had to be reconstructed after the fact. Tag at
+submission.
+
+**0.3.4** (CRAN 2026-07-24, tagged `v0.3.4`) shipped all plotting, interface,
 statistics, and reporting work: visualisation breadth, 5 `plot()` S3
 methods, 2 WCAG-checked palettes, the builder rework, date bounds, the 4
 bootstrap CI helpers, Henseler HTMT, Little's MCAR via naniar, PDF
@@ -103,7 +117,7 @@ this table before using it.
 
 | Version | Theme | Plan file | State |
 |---|---|---|---|
-| **0.4.0** | MCDM, small-sample, text analysis, provenance SHA Layer 2 | `todo_0.4.md`, `todo_text_analysis.md`, `todo_master_0.4.md` | engineering complete, held for CRAN |
+| **0.4.0** | MCDM, small-sample, text analysis, provenance SHA Layer 2 | `todo_0.4.md`, `todo_text_analysis.md`, `todo_master_0.4.md` | **published on CRAN 2026-08-20**, tagged `v0.4.0` |
 | **0.4.1** | faculty demo proofing, field validation | `todo_0.4.1.md` | after 0.4.0 |
 | **0.4.2** onward | RMCDA method expansion batches | block G of `todo_master_0.4.md` | after 0.4.1 |
 | **0.5** | SEM and PLS execution, semScreenR bridge | `todo_sem_execution.md` | not started, date TBC |
@@ -351,31 +365,32 @@ Status verified against the code, the branches, both remotes, CI, and CRAN on
 2026-08-05, and against the commit history and the working tree again on
 2026-08-15.
 
-**Read this first.** 0.4.0's own engineering and release paperwork are
-done: engineering completed 2026-08-02, merged to `main` 2026-08-03,
-DESCRIPTION reads `0.4.0`, NEWS.md is complete, 1506 tests pass,
-`R CMD check --as-cran` returns Status OK at 0/0/0, the tarball is
-audited clean of dev-only files, `cran-comments.md` is drafted, and
-win-builder passed (R-release, 2026-08-15). **Both former blockers are
-closed**: D6 no longer needs a DOI, since `inst/CITATION` cites SF2 as
-in preparation, and H2 was owner-verified in a real RStudio session on
-2026-08-15. **But 0.4.0's CRAN submission is deliberately held, owner
-decision 2026-08-16**: the text-analysis features are being bundled
-in before submission, instead of shipping 0.4.0 alone when CRAN
-reopens. (That work was labelled "0.5" when this paragraph was written.
-It is 0.4.0 content, see the version table above.)
-See `todo_text_analysis.md` for the build plan (9 method ids) and its
-2026-08-17 addendum for the schedule — engineering targets landing
-Monday to Wednesday (17-19 August, ahead of a Claude usage-offer
-deadline), vignette/exit-checklist/bundled-release-paperwork over the
-22-23 August weekend, submission after that. The **breaking API change
-built on `dev` on 2026-08-07** (`validate_sframe()` returning a
-diagnostic, plus the accessor family) had never reached `main` and was
-cherry-picked across on 2026-08-15. The review suite is complete and
-found 8 defects needing owner decisions. Git history was rewritten on
-2026-08-04, so any clone older than that is stale. Jump to "0.4.0 is on
-`main`", "Breaking API change", "The review suite", and "Git history
-was rewritten".
+**Read this first.** **0.4.0 is published on CRAN, 2026-08-20.** It was
+submitted 2026-08-19 and resubmitted the next day from `4212857` after
+the pretest raised 2 NOTEs, a DESCRIPTION spelling flag on the MCDA
+acronyms (answered with `inst/WORDLIST`) and slow plot and report-render
+examples (answered with `skip_on_cran()`). Everything the earlier draft
+of this paragraph described as pending is done: the text-analysis bundle
+landed, NEWS.md and `cran-comments.md` cover all 4 themes, and the
+provenance layer was folded in on 2026-08-19. Full suite 1911 passing.
+
+The release is tagged `v0.4.0`, retrospectively, on 2026-08-22.
+
+**What is actually open now.** 0.4.1 is the next release, per
+`todo_0.4.1.md`: faculty demo proofing, field validation, and the
+dogfeed items laned there. Nothing is queued for CRAN in the near term,
+and CRAN asks maintainers not to submit more often than roughly every 1
+to 2 months, so cosmetic fixes accumulate against 0.4.1 rather than
+justifying a submission of their own. The review suite's 8 defects still
+need owner decisions. Git history was rewritten on 2026-08-04, so any
+clone older than that is stale.
+
+**This section was stale for 2 days and misled a session.** On
+2026-08-22 it still described 0.4.0 as held and unsubmitted, so a
+session planning a vignette CSS fix concluded the fix could ride along
+with a pending tarball, when in fact the release had already shipped and
+the fix has to wait for 0.4.1. Update this section on the day a release
+goes out, not on the next planning pass.
 
 ### Shipped
 
