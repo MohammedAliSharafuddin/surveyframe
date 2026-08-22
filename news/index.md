@@ -2,6 +2,8 @@
 
 ## surveyframe 0.4.0
 
+CRAN release: 2026-08-20
+
 A major release. It adds multi-criteria decision analysis (10 methods),
 small-sample statistics, text and open-ended response analysis (9
 methods), and a disclosed-amendment and Git-linked provenance trail for
