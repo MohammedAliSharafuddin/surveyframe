@@ -77,3 +77,4 @@
 ^review_040($|/)
 ^mas_review_040\.(md|qmd|html)$
 ^review_050($|/)
+^OPEN_ISSUE_[^/]+\.md$

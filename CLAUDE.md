@@ -385,6 +385,54 @@ justifying a submission of their own. The review suite's 8 defects still
 need owner decisions. Git history was rewritten on 2026-08-04, so any
 clone older than that is stale.
 
+**The `sframe_format` blocker is closed, 2026-08-26.** It was the top
+priority on resume and it gated 0.4.1. The change itself is sound and is
+now on `dev`. There was no defect: the reported "passes filtered, fails
+full" behaviour was 2 measurements taken either side of an unrecorded
+fixture restore. Run mode has no bearing on
+`test-serialisation-fixed-point.R:71`, which compares a recomputed hash
+against the one the fixture stores, so fixture bytes are the only
+variable. Proved by running the single file, the route reported as
+passing, against the pre-change bytes: 3 failures, the reported signature
+exactly. Full suite green on 2 routes, `test_dir()` at 1911 passing and
+`devtools::test()` at 1949, with a 0.1 second poller recording zero
+byte-changes to the 3 fixtures across an 8.5 minute run. The pre-change
+bytes are byte-identical to the installed 0.4.0, to the stale
+`surveyframe.Rcheck/` copies, and to `dev`'s own blobs, and no code path
+in the package can produce them, since `write_sframe()` under this change
+always writes the field. Full record in
+`OPEN_ISSUE_sframe_format.md`. **The lesson: before attributing a failure
+to how a suite was run, record the state of every input at each run.** The
+4 things ruled out on 2026-08-22 were each ruled out correctly, and each
+answered "which test writes these files" when no test does.
+
+**Two hygiene defects were found while closing it, one fixed and one
+open.** Fixed: `OPEN_ISSUE_sframe_format.md` was shipping inside the CRAN
+tarball, since it was in neither `.Rbuildignore` nor `main`'s
+`.gitignore`, so `R CMD check` reported it under `checking top-level
+files`. `.Rbuildignore` now carries `^OPEN_ISSUE_[^/]+\.md$`. Still open:
+**`main`'s `.gitignore` is stale.** It lists `todo_0.5.1.md`,
+`todo_0.5.md`, and `todo_0.6.md` through `todo_1.0.md`, all retired on
+2026-08-20, and omits `todo_0.4.1.md`, `todo_text_analysis.md`,
+`todo_sem_execution.md`, `todo_provenance_part1.md`,
+`todo_provenance_part2.md`, `todo_integration_launch.md`, and
+`OPEN_ISSUE_sframe_format.md`. The 2026-08-20 rename pass updated
+`.Rbuildignore` and did not update `main`'s `.gitignore`, so the pkgdown
+protection described above is incomplete.
+
+**`dev` is behind `main` on `R/read_write_sframe.R`, and that is now the
+first thing to do.** Found while closing the blocker, because it is the
+same file. `write_sframe()`'s own `toJSON()` call on `dev` has no
+`digits = NA`, so `dev` still carries the rounding defect `main` fixed on
+2026-08-19, where a non-round decimal reached disk rounded to 4
+significant digits while the embedded hash was computed at full
+precision, so the file failed its own integrity check untouched. The
+whole amendments serialisation is absent from `dev` too, and
+`test-amendments.R`, `test-git-link.R`, `test-sframe-schema.R`, and the
+`digits = NA` regression test are on `main` and not on `dev`. **Merge
+`main` into `dev` before any 0.4.1 work.** The `sframe_format` change
+applies cleanly on top either way, so it did not need to wait.
+
 **This section was stale for 2 days and misled a session.** On
 2026-08-22 it still described 0.4.0 as held and unsubmitted, so a
 session planning a vignette CSS fix concluded the fix could ride along
