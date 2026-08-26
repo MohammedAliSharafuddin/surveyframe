@@ -1,3 +1,30 @@
+# surveyframe 0.4.1 (development)
+
+## Bug fix: straight-lining check no longer flags short scales by default
+
+`quality_report()`'s straight-lining check applied to any scale with 2 or
+more items. On a 2-item scale, giving the same response to both items is
+what a genuinely consistent respondent does, not evidence of inattention,
+so the check produced a large share of false positives on short scales.
+Found while proofreading the R Journal package paper against the bundled
+demonstration instrument, whose 5 scales are all 2 or 3 items: the check
+flagged 109 of 120 respondents (91 percent), driven almost entirely by
+the three 2-item scales, each independently flagging 44 to 53 percent of
+respondents.
+
+`quality_report()` gains a `straightline_min_items` argument, defaulting
+to 4. A scale shorter than the threshold is recorded as `checked = FALSE`
+with an empty flag list, not silently skipped and not reported as a clean
+0 percent pass, so a caller can tell "too short to check" apart from
+"checked and nobody straight-lined it". `print.sframe_quality_report()`
+and the `render_report()` quality table both surface the distinction.
+Pass `straightline_min_items = 2` to restore the previous, more
+permissive behaviour.
+
+On the bundled demonstration instrument this drops the flag rate from 91
+percent to 5 percent, all 6 remaining flags from the genuine attention
+check.
+
 # surveyframe 0.4.0
 
 Two version numbers were planned and never released. 0.3.5 was to hold a

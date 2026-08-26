@@ -1184,9 +1184,17 @@ sframe_quality_checks_table <- function(qr) {
     )
   }
   for (s in qr$straightline %||% list()) {
+    # A scale below straightline_min_items carries flag_rate = NA and
+    # checked = FALSE (see quality_report()), so it is reported as
+    # not checked rather than as sprintf() silently rendering "NA% flagged".
+    result_text <- if (isFALSE(s$checked)) {
+      sprintf("not checked, %d items", s$n_items %||% NA_integer_)
+    } else {
+      sprintf("%.1f%% flagged", (s$flag_rate %||% NA_real_) * 100)
+    }
     rows[[length(rows) + 1]] <- data.frame(
       Check = s$scale_id %||% "", Type = "Straight-lining",
-      Result = sprintf("%.1f%% flagged", (s$flag_rate %||% NA_real_) * 100),
+      Result = result_text,
       stringsAsFactors = FALSE
     )
   }
