@@ -385,6 +385,43 @@ justifying a submission of their own. The review suite's 8 defects still
 need owner decisions. Git history was rewritten on 2026-08-04, so any
 clone older than that is stale.
 
+**2 fixes sit on unmerged branches off `dev`, both need attention before
+`dev` and 0.4.1 work continue.**
+
+- `fix/sframe-format`: adds `SFRAME_FORMAT_VERSION` ("1.0"), written as
+  `sframe_format` in every file `write_sframe()` writes. **Not merged
+  because it triggers an unexplained failure**:
+  `test-serialisation-fixed-point.R:71` passes run alone, passes under a
+  filtered run, and fails 3 times under the full `test_dir`, after which
+  the 3 bundled `inst/extdata/` fixtures revert to their pre-change bytes.
+  Cause not found. Full detail and the leads worth trying first are in
+  `OPEN_ISSUE_sframe_format.md` at the repo root. **Top priority when
+  surveyframe work next resumes.** Old files without the field still
+  verify, so this is additive, not breaking, once the failure is
+  explained. Unblocks `sframe-schema`'s `instrument` conformance profile
+  (already pushed, v0.2-draft) and PocketStat's `.sframe` loader.
+- `fix/vignette-code-wrap`: cherry-picks `a0d4465` from `main`
+  ("wrap long source lines instead of scrolling them sideways") onto
+  `dev`. That commit landed on `main` on 2026-08-22 and was never ported.
+  Real, previously-shipping bug: pandoc's own screen stylesheet
+  outranks a plain `pre code` rule on specificity, so vignette source
+  chunks scrolled sideways while output blocks wrapped correctly. The
+  CRAN page for `analysing-survey-responses.html` still shows this,
+  which is expected and not a regression, 0.4.0 published to CRAN on
+  2026-08-20, 2 days before the fix, so CRAN's copy simply predates it.
+  **This one is safe to merge**, already re-verified in headless Chrome
+  against all 10 of `dev`'s vignettes (the same 10 the original commit
+  touched, confirmed 1 for 1): 0 chunks overflowing, matching `main`'s
+  own numbers exactly. Held off `dev` only so a session doesn't merge it
+  bundled with the sframe_format branch by habit; they are unrelated and
+  should land separately.
+
+**`main` and `dev` have diverged on at least these 2 commits, discovered
+one at a time rather than by comparing the branches directly.** Worth a
+session that diffs `main` against `dev` properly before assuming any
+more `main`-only fixes are absent, or any more `dev`-only work is
+missing from `main`.
+
 **This section was stale for 2 days and misled a session.** On
 2026-08-22 it still described 0.4.0 as held and unsubmitted, so a
 session planning a vignette CSS fix concluded the fix could ride along
