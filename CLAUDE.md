@@ -385,21 +385,9 @@ justifying a submission of their own. The review suite's 8 defects still
 need owner decisions. Git history was rewritten on 2026-08-04, so any
 clone older than that is stale.
 
-**2 fixes sit on unmerged branches off `dev`, both need attention before
-`dev` and 0.4.1 work continue.**
+**1 fix now sits on an unmerged branch off `dev`.** `fix/sframe-format`
+was the other, and it is merged, see the next paragraph.
 
-- `fix/sframe-format`: adds `SFRAME_FORMAT_VERSION` ("1.0"), written as
-  `sframe_format` in every file `write_sframe()` writes. **Not merged
-  because it triggers an unexplained failure**:
-  `test-serialisation-fixed-point.R:71` passes run alone, passes under a
-  filtered run, and fails 3 times under the full `test_dir`, after which
-  the 3 bundled `inst/extdata/` fixtures revert to their pre-change bytes.
-  Cause not found. Full detail and the leads worth trying first are in
-  `OPEN_ISSUE_sframe_format.md` at the repo root. **Top priority when
-  surveyframe work next resumes.** Old files without the field still
-  verify, so this is additive, not breaking, once the failure is
-  explained. Unblocks `sframe-schema`'s `instrument` conformance profile
-  (already pushed, v0.2-draft) and PocketStat's `.sframe` loader.
 - `fix/vignette-code-wrap`: cherry-picks `a0d4465` from `main`
   ("wrap long source lines instead of scrolling them sideways") onto
   `dev`. That commit landed on `main` on 2026-08-22 and was never ported.
@@ -412,15 +400,61 @@ clone older than that is stale.
   **This one is safe to merge**, already re-verified in headless Chrome
   against all 10 of `dev`'s vignettes (the same 10 the original commit
   touched, confirmed 1 for 1): 0 chunks overflowing, matching `main`'s
-  own numbers exactly. Held off `dev` only so a session doesn't merge it
-  bundled with the sframe_format branch by habit; they are unrelated and
-  should land separately.
+  own numbers exactly.
 
-**`main` and `dev` have diverged on at least these 2 commits, discovered
-one at a time rather than by comparing the branches directly.** Worth a
-session that diffs `main` against `dev` properly before assuming any
-more `main`-only fixes are absent, or any more `dev`-only work is
-missing from `main`.
+**The `sframe_format` blocker is closed, 2026-08-26.** It was the top
+priority on resume and it gated 0.4.1. The change itself is sound and is
+now on `dev`. There was no defect: the reported "passes filtered, fails
+full" behaviour was 2 measurements taken either side of an unrecorded
+fixture restore. Run mode has no bearing on
+`test-serialisation-fixed-point.R:71`, which compares a recomputed hash
+against the one the fixture stores, so fixture bytes are the only
+variable. Proved by running the single file, the route reported as
+passing, against the pre-change bytes: 3 failures, the reported signature
+exactly. Full suite green on 2 routes, `test_dir()` at 1911 passing and
+`devtools::test()` at 1949, with a 0.1 second poller recording zero
+byte-changes to the 3 fixtures across an 8.5 minute run. The pre-change
+bytes are byte-identical to the installed 0.4.0, to the stale
+`surveyframe.Rcheck/` copies, and to `dev`'s own blobs, and no code path
+in the package can produce them, since `write_sframe()` under this change
+always writes the field. Full record in
+`OPEN_ISSUE_sframe_format.md`. **The lesson: before attributing a failure
+to how a suite was run, record the state of every input at each run.** The
+4 things ruled out on 2026-08-22 were each ruled out correctly, and each
+answered "which test writes these files" when no test does.
+
+**Two hygiene defects were found while closing it, one fixed and one
+open.** Fixed: `OPEN_ISSUE_sframe_format.md` was shipping inside the CRAN
+tarball, since it was in neither `.Rbuildignore` nor `main`'s
+`.gitignore`, so `R CMD check` reported it under `checking top-level
+files`. `.Rbuildignore` now carries `^OPEN_ISSUE_[^/]+\.md$`. Still open:
+**`main`'s `.gitignore` is stale.** It lists `todo_0.5.1.md`,
+`todo_0.5.md`, and `todo_0.6.md` through `todo_1.0.md`, all retired on
+2026-08-20, and omits `todo_0.4.1.md`, `todo_text_analysis.md`,
+`todo_sem_execution.md`, `todo_provenance_part1.md`,
+`todo_provenance_part2.md`, `todo_integration_launch.md`, and
+`OPEN_ISSUE_sframe_format.md`. The 2026-08-20 rename pass updated
+`.Rbuildignore` and did not update `main`'s `.gitignore`, so the pkgdown
+protection described above is incomplete.
+
+**`dev` is behind `main` on `R/read_write_sframe.R`, and that is now the
+first thing to do.** Found while closing the blocker, because it is the
+same file. `write_sframe()`'s own `toJSON()` call on `dev` has no
+`digits = NA`, so `dev` still carries the rounding defect `main` fixed on
+2026-08-19, where a non-round decimal reached disk rounded to 4
+significant digits while the embedded hash was computed at full
+precision, so the file failed its own integrity check untouched. The
+whole amendments serialisation is absent from `dev` too, and
+`test-amendments.R`, `test-git-link.R`, `test-sframe-schema.R`, and the
+`digits = NA` regression test are on `main` and not on `dev`. **Merge
+`main` into `dev` before any 0.4.1 work.** The `sframe_format` change
+applies cleanly on top either way, so it did not need to wait. A third
+symptom, found in the same check: `dev`'s `text_analysis.R` calls
+`tidytext::cast_dtm()` with bare NSE where `main` passes strings, so
+`R CMD check --as-cran` on `dev` reports 6 no-visible-binding lines
+(`doc`, `term`, `n` in `sframe_run_topic_model_lda` and
+`sframe_run_stm_topics`) that `main` does not. That is the whole of
+`dev`'s single remaining NOTE, and it clears when `dev` takes `main`.
 
 **This section was stale for 2 days and misled a session.** On
 2026-08-22 it still described 0.4.0 as held and unsubmitted, so a
