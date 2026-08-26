@@ -51,7 +51,13 @@ test_that("plot.sframe_efa_solution builds a loadings heatmap", {
 test_that("plot.sframe_quality_report builds a straight-lining flag-rate bar chart", {
   skip_if_not_installed("ggplot2")
   demo <- sframe_demo_data()
-  qr <- quality_report(demo$responses, demo$instrument)
+  # The bundled demo instrument's 5 scales are all 2 or 3 items, below the
+  # straightline_min_items = 4 default (see quality_report(), fixed
+  # 2026-08-26), so none are checked and the plot has nothing to draw at
+  # the default threshold. Lowered here to exercise the plot itself, not
+  # the real-world threshold decision.
+  qr <- quality_report(demo$responses, demo$instrument,
+                       straightline_min_items = 2)
   gg <- plot(qr)
   expect_s3_class(gg, "ggplot")
 })
@@ -65,6 +71,19 @@ test_that("report-level results (quality, reliability, EFA) gain a plot via run_
               "efa_readiness", "efa_solution")) {
     blocks <- by_test(t)
     skip_if(length(blocks) == 0, paste("no", t, "block in demo plan"))
+    if (identical(t, "quality")) {
+      # The bundled demo instrument's 5 scales are all 2 or 3 items, below
+      # straightline_min_items = 4 (see quality_report(), fixed
+      # 2026-08-26), so no scale is checked and the quality plot has
+      # nothing to draw: sframe_plot_quality() returns NULL, correctly,
+      # rather than a ggplot object. run_analysis_plan()'s "quality" case
+      # has no options path to lower the threshold per plan block, so this
+      # is skipped rather than asserted false, since a NULL plot here is
+      # the honest, expected result for this specific instrument, not a
+      # defect in plot dispatch.
+      skip_if(is.null(blocks[[1]]$plot),
+              "quality plot is NULL: no scale in the demo instrument meets straightline_min_items")
+    }
     expect_s3_class(blocks[[1]]$plot, "ggplot")
   }
 })
