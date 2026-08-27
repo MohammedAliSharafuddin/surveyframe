@@ -1337,7 +1337,7 @@ unlike the choice-row input fixed the same session, see the `git log` for
 `inst/builder/survey_builder.html`), so laned as ordinary AA polish rather
 than flagged as a scope decision.
 
-### [open] `lane: 0.4.1` — the rendered report is not reproducible
+### [fixed] `lane: 0.4.1` — the rendered report is not reproducible
 
 Found 2026-08-28 by `review_041/02_quarto_reproducibility.qmd`, the file
 written to check the audit claim rather than assume it. **This is the most
@@ -1376,7 +1376,7 @@ reproducible without the caller doing anything. Whichever is chosen,
 `render_report()` should record the seed in the artefact next to the
 instrument hash, so the report states what reproducing it would take.
 
-### [open] `lane: 0.4.1` — `render_report()` does not say which engine rendered it
+### [fixed] `lane: 0.4.1` — `render_report()` does not say which engine rendered it
 
 Found 2026-08-28, same suite. `render_report()` prefers Quarto, rendering
 `inst/templates/report.qmd` with the instrument, data, and hash as
@@ -1403,7 +1403,7 @@ falling back, for users whose reproducibility claim depends on it. Either
 way the rendered report should name its own engine next to the instrument
 hash it already carries.
 
-### [open] `lane: 0.4.1` — `sframe_plot_quality()` returns NULL on the bundled demo
+### [fixed] `lane: 0.4.1` — `sframe_plot_quality()` returns NULL on the bundled demo
 
 Found 2026-08-28 by `review_041/01_function_coverage.qmd`, on a function no
 test and no review file had ever called. **A regression introduced by a
@@ -1424,3 +1424,39 @@ This is the "can it say no?" shape recorded in `TESTING.md`. Returning
 check". The fix is to carry `checked = FALSE` through to the caller, as
 `quality_report()` already does, and have the report print a line saying why
 there is no chart rather than silently omitting it.
+
+### Resolution of the 3 findings above, 2026-08-28
+
+All 3 fixed on the owner decisions taken the same day, each the recommended
+option.
+
+**Reproducibility.** `run_analysis_plan()` gains `seed`, defaulting to a fixed
+value, applied once at the top of the run through `sframe_with_seed()` rather
+than threaded through every helper signature. That covers all 5 bootstrap CI
+call sites and anything else random the plan reaches. It also pins
+`mc.cores = 1` for the duration, because `psych::fa.parallel()` splits across
+forked workers whose own RNG streams `set.seed()` cannot reach, and splits by
+core count, so the answer otherwise depended on the machine. Seeding alone got
+the demo from 32 differing values to 10; the serialisation took it to 0. The
+caller's RNG state and `mc.cores` are both restored on exit.
+
+**Engine.** Announced 3 ways, because each serves a different reader: a
+message for the console, an `engine` attribute on the returned path for a
+script, and a line in the report for whoever opens the file later with neither.
+The analysis seed is printed alongside, so the artefact states what
+reproducing it would take. The seed reaches the Quarto template as a
+parameter rather than being looked up inside it, since Quarto renders in a
+separate R session against the installed package, which is not necessarily
+the build doing the rendering.
+
+**Quality chart.** `sframe_quality_plot_note()` gives the reason there is no
+chart, distinguishing "nothing was flagged" from "no scale was long enough to
+check", and `render_report()` prints it where the figure would have been.
+`NULL` cannot carry an attribute, so the reason is a separate call rather than
+metadata on the return value.
+
+Verified: `tests/testthat/test-report-reproducibility.R`, 17 expectations, all
+4 changes independently mutation-checked. The `mc.cores` half needed a test on
+the bundled demo specifically, because a fixture without scales never reaches
+`fa.parallel()` and passed either way. Full suite FAIL 0, PASS 2067.
+`R CMD check --as-cran` Status OK, 0 errors, 0 warnings, 0 notes.
