@@ -52,7 +52,6 @@
 ^pkgdown($|/)
 ^man/figures/brand-preview\.png$
 ^CLAUDE\.md$
-^todo\.md$
 ^\.Rproj\.user$
 ^\.positai$
 ^\.claude$
@@ -79,4 +78,3 @@
 ^mas_review_040\.(md|qmd|html)$
 ^review_050($|/)
 ^bsr_paper_template\.docx$
-^review_032_functions\.R$
