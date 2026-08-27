@@ -27,13 +27,11 @@ check.
 
 # surveyframe 0.4.0
 
-Two version numbers were planned and never released. 0.3.5 was to hold a
-field-validation round; that work is absorbed into this release and into
-0.4.1. 0.5.0 was, at one stage, this release's own working label before
-it was renumbered to follow 0.3.4 directly; nothing shipped under that
-number either. Local branches and worktrees kept the `v0.5-dev` name
-throughout development, a label mismatch that is intentional and recorded
-in the project's own internal notes, not a sign of a skipped release.
+A major release. It adds multi-criteria decision analysis (10 methods),
+small-sample statistics, text and open-ended response analysis (9 methods),
+and a disclosed-amendment and Git-linked provenance trail for `.sframe`
+files, alongside 4 corrected results and 2 breaking changes. See below for
+full detail on each.
 
 ## New: multi-criteria decision analysis (MCDA)
 
@@ -97,11 +95,93 @@ from data whose true difference never changed.
 * `vignettes/small-sample.Rmd` walks through when to prefer each
   correction over its conventional counterpart.
 
+## New: text and open-ended response analysis
+
+A 9-method text-analysis family for open-ended survey items, from term
+frequency through topic modelling, sharing the same analysis-plan,
+role-resolution, and reporting pipeline every other method family uses.
+
+* `term_freq`: top terms by frequency, optionally split by a group
+  variable, rendered as a bar chart or a word cloud.
+* `ngram_freq`: top bigrams or trigrams by frequency.
+* `term_context`: a keyword-in-context concordance table (before/match/
+  after) for a chosen keyword.
+* `co_occurrence`: pairwise within-response co-occurrence counts on the
+  top terms, rendered as a heatmap.
+* `co_occurrence_network`: a Louvain-clustered (Blondel et al. 2008),
+  force-directed (Fruchterman & Reingold 1991) term co-occurrence
+  network; requires the optional igraph package.
+* `tidy_sentiment`: positive/negative sentiment counts and proportion
+  positive using the bing lexicon, optionally split by a group variable,
+  rendered as a diverging bar chart or a positive/negative comparison
+  word cloud; requires the optional tidytext package.
+* `quanteda_dfm`: a document-feature matrix summary (feature count,
+  sparsity, top features); requires the optional quanteda package.
+* `topic_model_lda`: Latent Dirichlet Allocation topic modelling, top
+  terms per topic as a ranked table and a faceted bar chart; requires
+  the optional tidytext and topicmodels packages.
+* `stm_topics`: structural topic modelling, the same top-terms-per-topic
+  output; requires the optional stm and tidytext packages.
+* A shared cleaning step (`clean_text_responses()`) and a 174-word
+  Snowball-based English stopword list, both exported so a study can
+  reuse or override them outside a runner.
+* Both the visual builder and SurveyStudio support all 9 methods,
+  including the word-cloud, top-N, seed, and topic-count (`k`) options
+  that steer their plots and models.
+* `vignettes/text-analysis.Rmd` walks through cleaning, each method, and
+  what the family deliberately does not attempt (stemming/lemmatisation,
+  tf-idf, and keyness comparison are not yet implemented).
+
+## New: disclosed amendments and a Git-linked provenance trail
+
+`write_sframe()`'s SHA-256 hash proves a `.sframe` file is unchanged since
+it was written, but gives no way to distinguish a legitimate revision
+(a data-entry correction, bot-response removal, a documented model
+respecification) from an undisclosed edit -- both break the hash
+identically. This release adds a disclosed-revision path alongside the
+existing hash check, without weakening it.
+
+* `amend_sframe()` compares an instrument before and after a change and
+  appends a structured, timestamped entry to an ordered amendment log --
+  never overwrites -- recording the reason (a controlled vocabulary:
+  `data_correction`, `bot_removal`, `model_respecification`,
+  `instrument_revision`, `other`), a free-text explanation, and which
+  top-level fields changed.
+* Two tiers, by default inferred from the reason: `"pipeline"` amendments
+  (data corrections, bot removal) need only a reason. `"design"`
+  amendments (anything touching the analysis plan or a model) require a
+  `deviation_report` describing what changed in the research question,
+  method, or model and why, matching how a formal preregistration
+  deviation is normally handled. `signoff` is never left blank -- it
+  records a reviewer's name or the literal `"none"`, so an unreviewed
+  design change stays visible to an auditor.
+* `amendment_log()` returns the full history as a data frame, one row per
+  disclosed amendment, exportable with `write.csv()`.
+* An edit made directly to a `.sframe` file, bypassing `amend_sframe()`,
+  still fails `read_sframe()`'s integrity check exactly as before. The
+  amendment log adds a disclosed path alongside the existing hash check.
+* `link_git_commit()` records the current Git commit SHA and subject line
+  alongside an instrument. This ties the SHA-256 hash to a specific,
+  already-explained commit. It returns an informative message when Git
+  isn't installed or the path isn't a repository. Git is optional.
+* `inst/schema/sframe_schema.json` documents the `.sframe` format (every
+  top-level field, including the new `amendments` log) as a standalone
+  JSON Schema, so a reviewer or a second tool can read and validate a
+  `.sframe` file without installing the package. `.sframe` was already
+  plain, git-diffable JSON before this release; the schema makes that
+  format explicit and independently checkable.
+* `vignettes/surveyframe.Rmd` gains a "What the SHA-256 hash proves, and
+  what it does not" section, stating plainly that the hash proves file
+  identity, not methodological validity, and pointing to the
+  design-time `analysis_plan` binding and `run_analysis_plan()`'s
+  single-pass execution as the package's separate, complementary defence
+  against HARKing and p-hacking.
+
 ## Corrected results (read before comparing against earlier output)
 
 Four defects found by independent cross-validation are fixed. Each
-produced plausible numbers with no error or warning, so results computed
-with an earlier version should be re-run rather than trusted.
+produced normal-looking numbers with no error or warning, so re-run any
+results computed with an earlier version.
 
 * `item_report()` returned the wrong item-rest correlation. It subtracted
   each item from a `rowMeans()` total, which leaves roughly noise carrying
@@ -116,7 +196,7 @@ with an earlier version should be re-run rather than trusted.
   `jmv::anovaRM()` gives F(2, 78) = 86.93, surveyframe reported F = 1.45,
   p = 0.24. Correcting the identifier alone was not sufficient: the
   corrected design produces no `Error: Within` stratum, so the effect is
-  now located by searching the strata rather than by a fixed name.
+  now located by searching the strata directly.
 * `validate_sframe()` rejected valid instruments. Its known-variable list
   held only base item and scale ids, so an analysis plan naming an
   expansion column (`item__sub`, `item__option`, `item__a__vs__b`,
@@ -155,8 +235,7 @@ shows the user what it found.
 * **What breaks**: code using the `strict = TRUE` return as an
   instrument, as in `instrument <- validate_sframe(instrument)`. Wrap it
   in `as_sframe()`. Passing a validation result where an instrument is
-  expected now raises a directed error naming `as_sframe()` rather than
-  failing obscurely further down.
+  expected now raises a directed error naming `as_sframe()` immediately.
 
 Raised by a Journal of Statistical Software editor reviewing the code:
 "we would at least expect that the object is not silently returned and
@@ -186,8 +265,8 @@ degraded to a bare list and lost its print method.
 * Report accessors: `sf_apa()` and `sf_flagged()`.
 * Coercion: `as_sframe()`.
 
-The vignettes and the examples are rewritten to use these rather than
-`$`. The registered S3 method count goes from 41 to 103.
+The vignettes and the examples are rewritten to use these accessors. The
+registered S3 method count goes from 41 to 103.
 
 ## Breaking: the Shiny collector now emits expansion columns
 
@@ -228,9 +307,8 @@ The vignettes and the examples are rewritten to use these rather than
   clears concordance against any other, so every score is 0 and every
   alternative ranks 1. That is legitimate behaviour for the method, but the
   results table read as "all 9 alternatives are jointly best" and the APA
-  sentence reported a kernel containing every alternative. A note now states
-  that the equal ranks are an absence of evidence rather than a tie for first
-  place.
+  sentence reported a kernel containing every alternative. A note now
+  explains the equal ranks as an absence of evidence.
 * `sensitivity_analysis()` gains a `degenerate` flag for the same reason. A
   ranking that never separated the alternatives cannot be changed by
   perturbing a weight, so every check passed and `stable` came back `TRUE`:
@@ -265,10 +343,10 @@ The vignettes and the examples are rewritten to use these rather than
   AHP had one. Every reference was checked against the publication record.
 * `sframe_decision_options()` documents PROMETHEE's preference functions
   and records why the default is `"usual"`, Brans and Vincke's type I step
-  function, rather than the linear function that several other
-  implementations default to. The difference is material: net flows always
-  differ between the 2 functions, and the ranking itself changed in 226 of
-  400 randomly drawn 4-alternative by 3-criterion matrices.
+  function, chosen over the linear function several other implementations
+  default to. Net flows differ between the 2 functions, and the ranking
+  changed in 226 of 400 randomly drawn 4-alternative by 3-criterion
+  matrices.
 
 # surveyframe 0.3.4
 
@@ -403,10 +481,10 @@ unchanged. naniar and pagedown join Suggests.
 
 ## Bug fixes
 
-* `sf_item()`'s `date_min` and `date_max` no longer accept an ambiguous
-  date string (for example `"01/02/2024"`); only `"YYYY-MM-DD"` or a
-  `Date` object is accepted, and anything else is a validation error
-  rather than a silently misparsed date.
+* `sf_item()`'s `date_min` and `date_max` accept only `"YYYY-MM-DD"` or a
+  `Date` object now (an ambiguous string such as `"01/02/2024"` used to
+  parse silently into a specific date depending on locale). Anything
+  else raises a validation error.
 * `bootstrap_ci()`, `cohens_d_ci()`, `cramers_v_ci()`, and `eta_sq_ci()`
   no longer alter the random-number seed for code that runs after a
   reproducible, seeded call.
@@ -588,10 +666,10 @@ methods, and no new bundled datasets.
 * `write_sframe()` now strips list-level names from the item, choice, scale,
   branching, check, and model collections before serialisation. Instruments
   built with `Map()` or other helpers that attach element names (for example,
-  using item IDs as names) previously serialised those collections as keyed
-  JSON objects rather than arrays. This produced a hash mismatch and an
-  integrity error on `read_sframe()`. Saved instruments now round-trip
-  correctly regardless of how the component lists were constructed.
+  using item IDs as names) previously serialised those collections as
+  keyed JSON objects, producing a hash mismatch and an integrity error
+  on `read_sframe()`. Saved instruments now round-trip correctly
+  regardless of how the component lists were constructed.
 
 ## User experience
 

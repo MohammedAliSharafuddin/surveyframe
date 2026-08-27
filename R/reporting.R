@@ -203,6 +203,7 @@ print.sframe_codebook <- function(x, ...) {
 #'   submitted_at = "submitted_at",
 #'   meta_cols = "started_at"
 #' )
+#' \donttest{
 #' old <- options(surveyframe.use_quarto = FALSE)
 #' out <- tryCatch(
 #'   render_report(
@@ -215,6 +216,7 @@ print.sframe_codebook <- function(x, ...) {
 #'   finally = options(old)
 #' )
 #' file.exists(out)
+#' }
 render_report <- function(
     instrument,
     data              = NULL,

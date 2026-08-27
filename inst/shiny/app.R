@@ -723,6 +723,7 @@ analysis_registry <- local({
         role("group", "Group by", min = 0, max = 1, levels = c("nominal", "ordinal"))
       ),
       show_alpha = FALSE, show_hypotheses = FALSE, show_effect_size = FALSE,
+      show_wordcloud = TRUE, show_top_n = TRUE, default_top_n = 30L,
       assumptions = "At least 10 usable responses",
       output = "Top terms by frequency, optionally split by a group variable, and a bar chart or word cloud.",
       refs = character(0)
@@ -731,6 +732,7 @@ analysis_registry <- local({
       family = "text", label = "Co-occurrence",
       roles = list(role("item", "Text item", levels = "text")),
       show_alpha = FALSE, show_hypotheses = FALSE, show_effect_size = FALSE,
+      show_top_n = TRUE, default_top_n = 20L,
       assumptions = c("At least 10 usable responses", "At least 1 co-occurring term pair"),
       output = "Pairwise within-response co-occurrence counts on the top terms, and a heatmap.",
       refs = character(0)
@@ -739,6 +741,7 @@ analysis_registry <- local({
       family = "text", label = "N-gram frequency",
       roles = list(role("item", "Text item", levels = "text")),
       show_alpha = FALSE, show_hypotheses = FALSE, show_effect_size = FALSE,
+      show_ngram_n = TRUE, show_top_n = TRUE, default_top_n = 30L,
       assumptions = "At least 10 usable responses",
       output = "Top bigrams or trigrams by frequency, and a bar chart.",
       refs = character(0)
@@ -756,6 +759,7 @@ analysis_registry <- local({
       family = "text", label = "Co-occurrence network",
       roles = list(role("item", "Text item", levels = "text")),
       show_alpha = FALSE, show_hypotheses = FALSE, show_effect_size = FALSE,
+      show_top_n = TRUE, default_top_n = 20L, show_seed = TRUE,
       assumptions = c("At least 10 usable responses",
                       "At least 5 distinct terms with 1 co-occurrence edge",
                       "Requires the optional igraph package"),
@@ -769,19 +773,40 @@ analysis_registry <- local({
         role("group", "Group by", min = 0, max = 1, levels = c("nominal", "ordinal"))
       ),
       show_alpha = FALSE, show_hypotheses = FALSE, show_effect_size = FALSE,
+      show_wordcloud = TRUE,
       assumptions = c("At least 10 usable responses", "Requires the optional tidytext package"),
       output = paste("Positive/negative sentiment counts and proportion positive (bing lexicon),",
                      "optionally split by a group variable, and a diverging bar chart or a",
-                     "positive/negative comparison cloud (options$wordcloud = TRUE; no Studio",
-                     "field for this option yet, same as term_freq's word cloud toggle)."),
+                     "positive/negative comparison cloud (options$wordcloud = TRUE)."),
       refs = character(0)
     ),
     quanteda_dfm = list(
       family = "text", label = "Document-feature matrix",
       roles = list(role("item", "Text item", levels = "text")),
       show_alpha = FALSE, show_hypotheses = FALSE, show_effect_size = FALSE,
+      show_top_n = TRUE, default_top_n = 30L,
       assumptions = c("At least 10 usable responses", "Requires the optional quanteda package"),
       output = "Document-feature matrix summary: feature count, sparsity, and top features.",
+      refs = character(0)
+    ),
+    topic_model_lda = list(
+      family = "text", label = "Topic model (LDA)",
+      roles = list(role("item", "Text item", levels = "text")),
+      show_alpha = FALSE, show_hypotheses = FALSE, show_effect_size = FALSE,
+      show_k = TRUE, default_k = 4L, show_seed = TRUE,
+      assumptions = c("At least 10 usable responses", "Enough documents to support k topics",
+                      "Requires the optional tidytext and topicmodels packages"),
+      output = "Top terms per topic (LDA, Gibbs-free VEM) as a ranked table, and a faceted bar chart.",
+      refs = character(0)
+    ),
+    stm_topics = list(
+      family = "text", label = "Topic model (STM)",
+      roles = list(role("item", "Text item", levels = "text")),
+      show_alpha = FALSE, show_hypotheses = FALSE, show_effect_size = FALSE,
+      show_k = TRUE, default_k = 3L, show_seed = TRUE,
+      assumptions = c("At least 10 usable responses", "Enough documents to support k topics",
+                      "Requires the optional stm and tidytext packages"),
+      output = "Top terms per topic (structural topic model) as a ranked table, and a faceted bar chart.",
       refs = character(0)
     )
   )
@@ -2620,6 +2645,11 @@ server <- function(input, output, session) {
         uiOutput("analysis_role_fields"),
         uiOutput("analysis_alpha_field"),
         uiOutput("analysis_term_field"),
+        uiOutput("analysis_wordcloud_field"),
+        uiOutput("analysis_top_n_field"),
+        uiOutput("analysis_ngram_n_field"),
+        uiOutput("analysis_k_field"),
+        uiOutput("analysis_seed_field"),
         textAreaInput(
           "analysis_decision_rule",
           "Planned decision rule",
@@ -2675,6 +2705,23 @@ server <- function(input, output, session) {
         },
         if (isTRUE(reg$show_term)) {
           tags$p(tags$strong("Keyword: "), input$analysis_term %||% "(not set)")
+        },
+        if (isTRUE(reg$show_wordcloud)) {
+          tags$p(tags$strong("Display: "),
+                 if (isTRUE(input$analysis_wordcloud)) "Word cloud" else "Bar chart")
+        },
+        if (isTRUE(reg$show_top_n)) {
+          tags$p(tags$strong("Top N: "), input$analysis_top_n %||% reg$default_top_n %||% 30L)
+        },
+        if (isTRUE(reg$show_ngram_n)) {
+          tags$p(tags$strong("N-gram size: "),
+                 paste0(input$analysis_ngram_n %||% "2", "-word"))
+        },
+        if (isTRUE(reg$show_k)) {
+          tags$p(tags$strong("Topics (k): "), input$analysis_k %||% reg$default_k %||% 4L)
+        },
+        if (isTRUE(reg$show_seed)) {
+          tags$p(tags$strong("Random seed: "), input$analysis_seed %||% 42L)
         },
         if (length(reg$refs %||% character(0)) > 0) {
           tags$p(tags$strong("Reporting references: "), paste(reg$refs, collapse = ", "))
@@ -2740,6 +2787,75 @@ server <- function(input, output, session) {
     )
   })
 
+  output$analysis_wordcloud_field <- renderUI({
+    method <- input$analysis_method %||% "descriptives"
+    reg <- analysis_registry[[method]] %||% analysis_registry$descriptives
+    if (!isTRUE(reg$show_wordcloud)) {
+      return(NULL)
+    }
+    checkboxInput(
+      "analysis_wordcloud",
+      "Show as word cloud (instead of a bar chart)",
+      value = shiny::isolate(input$analysis_wordcloud %||% FALSE)
+    )
+  })
+
+  output$analysis_top_n_field <- renderUI({
+    method <- input$analysis_method %||% "descriptives"
+    reg <- analysis_registry[[method]] %||% analysis_registry$descriptives
+    if (!isTRUE(reg$show_top_n)) {
+      return(NULL)
+    }
+    numericInput(
+      "analysis_top_n",
+      "Top N terms",
+      value = shiny::isolate(input$analysis_top_n %||% reg$default_top_n %||% 30L),
+      min = 1, max = 200, step = 1
+    )
+  })
+
+  output$analysis_ngram_n_field <- renderUI({
+    method <- input$analysis_method %||% "descriptives"
+    reg <- analysis_registry[[method]] %||% analysis_registry$descriptives
+    if (!isTRUE(reg$show_ngram_n)) {
+      return(NULL)
+    }
+    selectInput(
+      "analysis_ngram_n",
+      "N-gram size",
+      choices = c("Bigrams (2 words)" = "2", "Trigrams (3 words)" = "3"),
+      selected = shiny::isolate(input$analysis_ngram_n %||% "2")
+    )
+  })
+
+  output$analysis_k_field <- renderUI({
+    method <- input$analysis_method %||% "descriptives"
+    reg <- analysis_registry[[method]] %||% analysis_registry$descriptives
+    if (!isTRUE(reg$show_k)) {
+      return(NULL)
+    }
+    numericInput(
+      "analysis_k",
+      "Number of topics (k)",
+      value = shiny::isolate(input$analysis_k %||% reg$default_k %||% 4L),
+      min = 2, max = 20, step = 1
+    )
+  })
+
+  output$analysis_seed_field <- renderUI({
+    method <- input$analysis_method %||% "descriptives"
+    reg <- analysis_registry[[method]] %||% analysis_registry$descriptives
+    if (!isTRUE(reg$show_seed)) {
+      return(NULL)
+    }
+    numericInput(
+      "analysis_seed",
+      "Random seed",
+      value = shiny::isolate(input$analysis_seed %||% 42L),
+      min = 0, step = 1
+    )
+  })
+
   output$analysis_plan_validation <- renderUI({
     method <- input$analysis_method %||% "descriptives"
     status <- studio_validate_plan_roles(method, current_analysis_roles())
@@ -2785,6 +2901,21 @@ server <- function(input, output, session) {
     }
     if (isTRUE(reg$show_term)) {
       options$term <- trim_or_null(input$analysis_term) %||% ""
+    }
+    if (isTRUE(reg$show_wordcloud)) {
+      options$wordcloud <- isTRUE(input$analysis_wordcloud)
+    }
+    if (isTRUE(reg$show_top_n)) {
+      options$top_n <- as.integer(input$analysis_top_n %||% reg$default_top_n %||% 30L)
+    }
+    if (isTRUE(reg$show_ngram_n)) {
+      options$n <- as.integer(input$analysis_ngram_n %||% "2")
+    }
+    if (isTRUE(reg$show_k)) {
+      options$k <- as.integer(input$analysis_k %||% reg$default_k %||% 4L)
+    }
+    if (isTRUE(reg$show_seed)) {
+      options$seed <- as.integer(input$analysis_seed %||% 42L)
     }
     block <- list(
       id = plan_id,

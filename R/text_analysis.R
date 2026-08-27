@@ -386,8 +386,10 @@ sframe_run_co_occurrence <- function(data, roles, options, instrument) {
 #'
 #' @param data A data.frame of responses.
 #' @param roles A list with `item`, the text/textarea item id.
-#' @param options A list; `k` (topic count, default `4L`), `seed` (default
-#'   `42L`), `stop_words` (passed through to the tokeniser).
+#' @param options A list; `k` (topic count, default `4L` -- a demonstration
+#'   value, not a recommendation; see `vignette("text-analysis")`'s topic-
+#'   modelling section for `topicmodels::perplexity()`-based selection),
+#'   `seed` (default `42L`), `stop_words` (passed through to the tokeniser).
 #' @param instrument Optional `sframe` instrument, passed to
 #'   [clean_text_responses()] for item-type validation.
 #'
@@ -428,7 +430,7 @@ sframe_run_topic_model_lda <- function(data, roles, options, instrument) {
   long <- long[long$n > 0, , drop = FALSE]
   long$doc <- as.integer(as.character(long$doc))
 
-  dtm <- tidytext::cast_dtm(long, doc, term, n)
+  dtm <- tidytext::cast_dtm(long, "doc", "term", "n")
   if (nrow(dtm) < k) {
     return(list(test = "topic_model_lda", error = sprintf(
       "LDA needs at least k = %d documents with usable tokens (found %d).",
@@ -545,7 +547,7 @@ sframe_run_stm_topics <- function(data, roles, options, instrument) {
   counts <- counts[counts$n > 0, , drop = FALSE]
   counts$doc <- as.integer(as.character(counts$doc))
 
-  dtm <- tidytext::cast_dtm(counts, doc, term, n)
+  dtm <- tidytext::cast_dtm(counts, "doc", "term", "n")
   respondent_attr <- attr(cleaned, "respondent")
   dtm_respondent <- respondent_attr[as.integer(rownames(dtm))]
 
