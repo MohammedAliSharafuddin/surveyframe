@@ -336,8 +336,11 @@ Run from the repository root.
 ```r
 devtools::document()          # regenerate man/ and NAMESPACE
 devtools::test()              # run the test suite (721 at the 0.3.4 release,
-                              # 1506 on main once 0.4.0 merged, 1676 on dev
-                              # after the 2026-08-07 accessor work)
+                              # 1506 on main once 0.4.0 merged, 1991 on dev
+                              # after the 2026-08-27 main merge. test_dir()
+                              # reports fewer passes and 60 skips, because
+                              # skip_on_cran() only skips where NOT_CRAN is
+                              # unset and devtools::test() sets it)
 devtools::load_all()          # load for interactive work
 rmarkdown::render("vignettes/surveyframe.Rmd", output_dir = tempdir())
 ```
@@ -385,22 +388,11 @@ justifying a submission of their own. The review suite's 8 defects still
 need owner decisions. Git history was rewritten on 2026-08-04, so any
 clone older than that is stale.
 
-**1 fix now sits on an unmerged branch off `dev`.** `fix/sframe-format`
-was the other, and it is merged, see the next paragraph.
-
-- `fix/vignette-code-wrap`: cherry-picks `a0d4465` from `main`
-  ("wrap long source lines instead of scrolling them sideways") onto
-  `dev`. That commit landed on `main` on 2026-08-22 and was never ported.
-  Real, previously-shipping bug: pandoc's own screen stylesheet
-  outranks a plain `pre code` rule on specificity, so vignette source
-  chunks scrolled sideways while output blocks wrapped correctly. The
-  CRAN page for `analysing-survey-responses.html` still shows this,
-  which is expected and not a regression, 0.4.0 published to CRAN on
-  2026-08-20, 2 days before the fix, so CRAN's copy simply predates it.
-  **This one is safe to merge**, already re-verified in headless Chrome
-  against all 10 of `dev`'s vignettes (the same 10 the original commit
-  touched, confirmed 1 for 1): 0 chunks overflowing, matching `main`'s
-  own numbers exactly.
+**Both fix branches are now dealt with, and `dev` has taken `main`.**
+`fix/sframe-format` is merged. `fix/vignette-code-wrap` is **redundant
+and can be deleted**: it cherry-picked `a0d4465` from `main`, and the
+`main` merge of 2026-08-27 brings that commit itself, verified by
+counting the wrap rule in the merged tree, 10 vignettes of 10.
 
 **The `sframe_format` blocker is closed, 2026-08-26.** It was the top
 priority on resume and it gated 0.4.1. The change itself is sound and is
@@ -437,25 +429,55 @@ files`. `.Rbuildignore` now carries `^OPEN_ISSUE_[^/]+\.md$`. Still open:
 `.Rbuildignore` and did not update `main`'s `.gitignore`, so the pkgdown
 protection described above is incomplete.
 
-**`dev` is behind `main` on `R/read_write_sframe.R`, and that is now the
-first thing to do.** Found while closing the blocker, because it is the
-same file. `write_sframe()`'s own `toJSON()` call on `dev` has no
-`digits = NA`, so `dev` still carries the rounding defect `main` fixed on
-2026-08-19, where a non-round decimal reached disk rounded to 4
-significant digits while the embedded hash was computed at full
-precision, so the file failed its own integrity check untouched. The
-whole amendments serialisation is absent from `dev` too, and
-`test-amendments.R`, `test-git-link.R`, `test-sframe-schema.R`, and the
-`digits = NA` regression test are on `main` and not on `dev`. **Merge
-`main` into `dev` before any 0.4.1 work.** The `sframe_format` change
-applies cleanly on top either way, so it did not need to wait. A third
-symptom, found in the same check: `dev`'s `text_analysis.R` calls
-`tidytext::cast_dtm()` with bare NSE where `main` passes strings, so
-`R CMD check --as-cran` on `dev` reports 6 no-visible-binding lines
-(`doc`, `term`, `n` in `sframe_run_topic_model_lda` and
-`sframe_run_stm_topics`) that `main` does not. That is the whole of
-`dev`'s single remaining NOTE, and it clears when `dev` takes `main`.
+**`main` merged into `dev` on 2026-08-27, and `dev` was 20 commits
+behind.** The gap was found while closing the `sframe_format` blocker,
+because `R/read_write_sframe.R` is the file both touch. What came
+across, beyond the vignette wrap above:
 
+- `b5de9a4`, the `digits = NA` fix on `write_sframe()`'s own `toJSON()`.
+  Without it a non-round decimal reached disk rounded to 4 significant
+  digits while the embedded hash was computed at full precision, so the
+  file failed its own integrity check untouched. Its regression test came
+  with it.
+- `37cef48`, the whole disclosed-amendments and Git-linked-hash
+  provenance layer, absent from `dev`'s serialisation entirely, plus
+  `R/amendments.R`, `R/git_link.R`, `test-amendments.R`,
+  `test-git-link.R`, and `test-sframe-schema.R`.
+- `8a54bca`, quoted `cast_dtm()` column arguments, which was the whole of
+  `dev`'s single remaining `R CMD check` NOTE.
+- `4212857` (`inst/WORDLIST`), `c45b361` (`skip_on_cran()` on the slow
+  tests), and the standalone `.sframe` verifier page.
+
+`R/read_write_sframe.R` auto-merged and was checked by hand rather than
+trusted. All 4 things are present: the payload writes `sframe_format`
+first and appends `amendments` when non-empty, `write_sframe()` has
+`digits = NA`, and `read_sframe()` restores amendments.
+
+**One real conflict beyond `.Rbuildignore`, and it is what the merge
+existed to surface.** `main`'s `test-sframe-schema.R:34` asserts that a
+written file carries no top-level key the schema does not document, and
+`sframe_format` was a key `inst/schema/sframe_schema.json` had never
+heard of. Fixed in the schema rather than in the test, since the schema
+is the format's public documentation and keying conformance profiles to
+this field is the reason the field exists. Added as a property and
+deliberately **not** as a required one, so files written before
+2026-08-22 stay valid. Mutation-checked: reverting the schema addition
+fails the test again.
+
+**Verified on the merged tree.** `test_dir()` after `load_all()`: FAIL 0,
+PASS 1840, SKIP 60. `devtools::test()`: FAIL 0, PASS 1991, SKIP 6. The 3
+bundled fixtures unchanged by md5 and still carrying `sframe_format`,
+with a 0.1 second poller recording zero byte-changes. `R CMD check
+--as-cran` on the built tarball: **Status OK, 0 errors, 0 warnings, 0
+notes**, tests OK at 62s, vignettes rebuilt, tarball audited clean of
+dev-only files. The skip counts differ between the 2 routes because
+`skip_on_cran()` only skips where `NOT_CRAN` is unset, which
+`devtools::test()` sets and plain `Rscript` does not. The 38 warnings on
+the `devtools` route are the pre-existing `geom_errorbarh` deprecations.
+
+DESCRIPTION now reads **`0.4.0.9000`** on `dev`, the post-release
+development marker that came across with `main`. Set it to `0.4.1` at
+release time.
 **This section was stale for 2 days and misled a session.** On
 2026-08-22 it still described 0.4.0 as held and unsubmitted, so a
 session planning a vignette CSS fix concluded the fix could ride along
