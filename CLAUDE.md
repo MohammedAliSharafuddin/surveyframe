@@ -227,6 +227,9 @@ the planning files.
 Dev-only files (tracked on `dev` only):
 
 - `CLAUDE.md` (this file)
+- `TESTING.md` (why the suite misses what it misses, and the 4 practices
+  that do catch defects here. Tasks T1 to T4 in `todo_0.4.1.md`)
+- `OPEN_ISSUE_sframe_format.md`
 - `roadmap.md`
 - `revision_todo_0.3.md`
 - `cran-comments.md`
@@ -753,7 +756,7 @@ returning something plausible instead of saying it has no answer.
 | 2 | Correlation roles: `variables` works for Kendall, fails for Pearson and Spearman | 0.4.0 |
 | 3 | `assumption_report()` reports checks that never ran | 0.4.1 |
 | 4 | Display-only items get a Shiny response column, and it counts as missing | 0.4.0 |
-| 5 | `sem_lavaan_syntax()` writes an indirect effect lavaan cannot parse | 0.4.0 |
+| 5 | `sem_lavaan_syntax()` writes an indirect effect lavaan cannot parse | **fixed 2026-08-28.** It parses and fails at fit time, which is why a parse check never caught it |
 | 6 | Conjoint `"balanced"` is rewarded for dropping a level | 0.4.0 |
 | 7 | `render_results(citation_format = )` is validated then ignored | 0.4.0 |
 | 8 | `codebook_report()` omits the item help text | 0.4.1 |

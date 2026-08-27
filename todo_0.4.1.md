@@ -273,6 +273,108 @@ Verification:
 **A `%in%` rule written before this release needs no re-export.** The
 renderers now accept the array those files already carry.
 
+---
+
+## Testing strategy: the 4 practices that would have caught these
+
+Added 2026-08-28 after asking why every release ships defects. The answer,
+measured against this project's own record rather than assumed: **of the
+roughly 20 significant defects logged for 0.3.3 through 0.4.1, none is
+recorded as having been found by the test suite.** The suite grew from 368
+to 2034 tests over that period. The 2 defects found in the AIC-RSAM
+re-platforming shipped through 1991 of them.
+
+They were found instead by an independent oracle (`psych`, `jmv`, `RMCDA`),
+by driving the real artefact in a browser, by a human working a whole
+workflow, by writing a second implementation, or by using the package on
+real research. Full diagnosis in `TESTING.md`.
+
+These 4 tasks turn that diagnosis into work. They are ordered by yield.
+
+### T1. Execute every artefact the package generates
+
+**Why.** surveyframe generates 4 things it never runs: the static survey
+HTML, the builder HTML, the Apps Script collector, and lavaan/seminr
+syntax. Every one of them was tested by asserting on the *text*. Both
+2026-08-27 defects and the mediation-syntax defect below lived in exactly
+that gap.
+
+**Status: 3 of 4 done.**
+
+- [x] Static survey HTML, driven in headless Chrome by clicking the real
+      control. `test-branching-in-values.R`, plus the existing
+      `test-aic-rsam-branching.R`.
+- [x] Apps Script collector, run in V8 against a mock Sheets API.
+      `test-collector-header-drift.R`.
+- [x] lavaan and seminr syntax, **fitted rather than parsed**.
+      `test-generated-syntax-runs.R`. This found a live defect on the day
+      it was written, see below.
+- [ ] **Builder HTML.** `inst/builder/survey_builder.html` is 3698 lines of
+      JS with no test that runs it. `test-builder-text-options.R` and
+      `test-builder-analysis.R` assert on its source text. Bug 6, the
+      pairwise scale mismatch, and the 2026-07-30 empty-dropdown defects all
+      came from here and all were found by hand. This is the largest
+      remaining instance.
+
+**A finding worth carrying: parsing is not running.** The mediation defect
+(review defect 5, open since it was logged on 2026-08-04 and fixed
+2026-08-28) produced syntax that `lavaan::lavParseModelString()` accepts and
+`lavaan::sem()` rejects, because `sem_lavaan_syntax()` wrote
+`indirect_A_B_C := A__B*B__C` while emitting the structural paths
+unlabelled, so the labels the definition multiplied were never defined. A
+parse test would have passed it for another 3 releases. **When adding a
+test for generated code, run it the way a user runs it, not the way a
+linter would.**
+
+### T2. Make oracle testing routine rather than occasional
+
+**Why.** `psych`, `jmv`, and `RMCDA` between them found the item-rest
+correlation defect, the repeated-ANOVA stratum defect, and WASPAS using
+SMART's normalisation. All 3 returned a plausible number with no error, so
+no self-written assertion could have caught them. An oracle is the only
+technique that does.
+
+- [ ] Inventory every exported statistical function against whether an
+      oracle exists for it. `psych` for psychometrics, `jmv` for the
+      classical tests, `RMCDA` for the 10 MCDA methods, `lavaan` for CFA
+      and CB-SEM fit statistics, `boot` for the bootstrap CIs.
+- [ ] Write a differential test for each one that has an oracle and does
+      not yet have one. One file per oracle keeps the skips clean.
+- [ ] Record in `TESTING.md` which functions have no oracle and why, so the
+      gap is visible rather than merely absent.
+
+### T3. Run a "can it say no?" audit
+
+**Why.** The recurring shape in this project is software returning
+something plausible instead of reporting that it has no answer. Logged
+instances: ELECTRE reporting an empty outranking relation as "all 9
+alternatives jointly best", with `sensitivity_analysis()` then calling that
+stable; `assumption_report()` reporting checks that never ran; missingness
+reporting 0 percent for a respondent who skipped an entire battery;
+`render_results(citation_format =)` validated and then ignored. It was
+noticed twice, on 2026-08-02 and 2026-08-04, and never turned into a sweep.
+
+- [ ] For every exported function that returns a result, ask what it
+      returns when it has no answer: empty input, all-missing input, a
+      degenerate case (1 alternative, 1 item, 1 group), an argument that is
+      validated and then unused.
+- [ ] Where the honest answer is "cannot compute", make it say so, in the
+      shape `quality_report()`'s `straightline_min_items` already uses:
+      `checked = FALSE` with an empty result, distinguishable from a clean
+      pass.
+- [ ] Add the degenerate case to that function's tests.
+
+### T4. Dogfeed a real instrument before the release, not after
+
+**Why.** Re-platforming 1 real study on 2026-08-27 found 2 defects, 1 of
+them silent data corruption of collected responses. That single afternoon
+out-yielded 2034 tests. It is currently done after a release, which is how
+0.3.0 through 0.4.0 all shipped the `%in%` defect.
+
+- [ ] Move the dogfeed pass ahead of the release gate in `todo_master_0.4.md`'s
+      block E, so a real instrument is built, exported, fielded, and read
+      back before DESCRIPTION is bumped.
+
 ## Before the demo (preparation, not deliverables)
 
 - Rebuild the demo flow on the released 0.4: instrument design in the

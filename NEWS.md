@@ -1,5 +1,27 @@
 # surveyframe 0.4.1 (development)
 
+## Bug fix: a mediation model's generated lavaan syntax can now be fitted
+
+`sem_lavaan_syntax()` wrote an indirect effect as
+`indirect_A_B_C := A__B*B__C` while emitting the structural paths
+unlabelled, so the labels the definition multiplied were never defined.
+lavaan accepted the syntax and then refused the model at fit time with
+"unknown label(s) in variable definition(s)". This is a hard error in the
+single case a `cb_sem` model is most often declared for, mediation.
+
+A path an indirect effect walks now carries its derived label in the
+structural block, so the label written on the path and the label multiplied
+in the `:=` line cannot diverge. A path the author labelled by hand keeps
+that label, and a model with no indirect effects generates exactly what it
+did before. The total-effect line is emitted whenever the direct path is
+labelled in the output, rather than only when it was labelled by hand.
+
+The defect was logged on 2026-08-04 and survived because the syntax
+generators were tested by matching substrings. It parses. Only fitting it
+reveals the problem, so the new tests fit the generated syntax to simulated
+data with a known mediation structure, and check `seminr` output by running
+it, rather than reading either.
+
 ## Bug fix: the Apps Script collector no longer corrupts data after an instrument change
 
 The generated Google Apps Script collector wrote the sheet's header row once,
