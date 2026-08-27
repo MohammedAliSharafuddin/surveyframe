@@ -1,5 +1,58 @@
 # surveyframe 0.4.1 (development)
 
+## Bug fix: the Apps Script collector no longer corrupts data after an instrument change
+
+The generated Google Apps Script collector wrote the sheet's header row once,
+when it first created the sheet, and then built every response row
+positionally from `EXPECTED_COLUMNS`. Add an item to the instrument
+mid-collection, regenerate the collector, redeploy it onto the same sheet,
+and the header stayed as first deployed while rows arrived in the new order.
+Every column from the insertion point onward was off by one.
+
+Nothing errored. The sheet stayed well-formed, `read_responses()` read it
+without complaint, and the values were simply under the wrong headings, so a
+researcher had no reason to suspect anything until an analysis made no sense.
+Adding an item mid-collection is what a pilot study does after a
+face-validity pass, so this is not an exotic case.
+
+The collector is now header-driven. It reads the sheet's live header, appends
+only columns the instrument has genuinely gained, at the right-hand end, and
+maps every value by name. An existing column never moves, so rows already
+collected stay valid, and **a redeploy after an instrument change is safe**.
+
+Regression-tested by running the generated `doPost()` against a mock of the
+Sheets API it calls, since the collector is JavaScript the R package never
+executes and a test that only read the template would pass even if the logic
+were wrong. `V8` joins Suggests as the test-time engine.
+
+## Bug fix: multi-value `%in%` branching rules now work in exported surveys
+
+A branching rule using `%in%` with more than 1 value never fired in an
+exported survey. The gated item stayed hidden whatever the respondent
+answered, with no error shown to the respondent or the researcher.
+Present since 0.3.0, so every release up to 0.4.0 shipped it.
+
+`sf_branch()` documents a vector for `%in%`, and a vector serialises to a
+JSON array. All 3 evaluators then disagreed about what they had been
+handed. The static survey template's JavaScript called `value.split(',')`,
+which an array does not have, so the rule threw and the item stayed
+hidden. `sframe_module_eval_op()` read only the array's first element, so
+a rule matched its first value and silently rejected the rest.
+`.evaluate_branch()` handled arrays correctly but never split the
+comma-separated string an older builder or a hand-written file carries.
+Only 1 of the 6 combinations of evaluator and value shape was right.
+
+All 3 now share `sframe_branch_in_values()` and accept both shapes, so an
+instrument written before this release starts working without being
+re-exported, and the 3 code paths can no longer drift apart. Verified end
+to end in headless Chrome against a real exported survey: before the fix
+the gated item stayed hidden for every answer, after it the item appears
+for each value in the rule and stays hidden for a value outside it.
+
+`validate_sframe()` gains a `branching_values` check that flags a `%in%`
+rule whose value no evaluator can consume, since the reason this survived
+3 releases is that nothing ever said a word about it.
+
 ## Bug fix: straight-lining check no longer flags short scales by default
 
 `quality_report()`'s straight-lining check applied to any scale with 2 or
