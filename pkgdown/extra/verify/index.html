@@ -1,0 +1,384 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Verify a .sframe file: surveyframe</title>
+<meta name="description" content="Check a surveyframe .sframe file's SHA-256 integrity hash and read its disclosed-amendment log, entirely in your browser. Nothing is uploaded.">
+<meta name="robots" content="index, follow">
+<link rel="icon" type="image/png" sizes="96x96" href="../favicon-96x96.png">
+<link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
+<link rel="manifest" href="../site.webmanifest">
+<link rel="canonical" href="https://mohammedalisharafuddin.github.io/surveyframe/verify/">
+<!-- Same theme assets the rest of the pkgdown site uses, so this page matches
+     it exactly rather than approximating the colours and font by hand. -->
+<link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
+<link href="../deps/Inter-0.4.10/font.css" rel="stylesheet">
+<link href="../deps/JetBrains_Mono-0.4.10/font.css" rel="stylesheet">
+<link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script>
+<style>
+  :root{
+    --navy:#0B3A78; --teal:#16B3B1; --ink:#1a2233; --sub:#57627a;
+    --bg:#ffffff; --panel:#f6f8fb; --line:#e2e8f0;
+    --ok-bg:#e9f8f2; --ok-line:#1f9d6e; --ok-ink:#0d5c3f;
+    --fail-bg:#fdecee; --fail-line:#d8394c; --fail-ink:#7f1626;
+    --legacy-bg:#fff8e6; --legacy-line:#c9911a; --legacy-ink:#6b4a06;
+  }
+  body{color:var(--ink); background:var(--bg); padding-top:56px}
+  a{color:var(--navy)}
+  main{max-width:840px; margin:0 auto; padding:32px 20px 64px}
+  h1{font-size:1.6rem; margin:0 0 6px}
+  p.lede{color:var(--sub); margin:0 0 24px; font-size:1.02rem}
+  .card{
+    border:1px solid var(--line); border-radius:12px; background:var(--panel);
+    padding:20px; margin-bottom:20px;
+  }
+  .privacy{
+    display:flex; gap:10px; align-items:flex-start; font-size:.92rem; color:var(--sub);
+    border-left:3px solid var(--teal); padding-left:12px; margin-bottom:24px;
+  }
+  .privacy strong{color:var(--ink)}
+  #drop{
+    border:2px dashed var(--line); border-radius:12px; padding:36px 20px;
+    text-align:center; cursor:pointer; transition:border-color .15s, background .15s;
+    background:#fff;
+  }
+  #drop.hover{border-color:var(--teal); background:#f0fdfc}
+  #drop p{margin:6px 0}
+  #drop .big{font-size:1.05rem; font-weight:600}
+  #drop .small{font-size:.88rem; color:var(--sub)}
+  input[type=file]{display:none}
+  .or-paste{margin-top:16px}
+  .or-paste summary{cursor:pointer; font-size:.92rem; color:var(--navy); font-weight:600}
+  textarea#pasteArea{
+    width:100%; min-height:140px; margin-top:10px; font-family:JetBrains Mono,monospace;
+    font-size:.82rem; padding:10px; border:1px solid var(--line); border-radius:8px;
+  }
+  #result{display:none; margin-top:24px}
+  .banner{
+    border-radius:12px; padding:18px 20px; font-weight:700; font-size:1.05rem;
+    display:flex; align-items:center; gap:10px; margin-bottom:16px;
+  }
+  .banner.ok{background:var(--ok-bg); border:1px solid var(--ok-line); color:var(--ok-ink)}
+  .banner.fail{background:var(--fail-bg); border:1px solid var(--fail-line); color:var(--fail-ink)}
+  .banner.legacy{background:var(--legacy-bg); border:1px solid var(--legacy-line); color:var(--legacy-ink)}
+  .banner .ic{font-size:1.3rem}
+  table{width:100%; border-collapse:collapse; font-size:.88rem; margin:10px 0 4px}
+  table caption{text-align:left; font-weight:700; margin-bottom:6px; font-size:.95rem}
+  th,td{border:1px solid var(--line); padding:6px 8px; text-align:left; vertical-align:top}
+  th{background:#eef2f8; font-weight:600}
+  code.hash{font-family:JetBrains Mono,monospace; font-size:.78rem; word-break:break-all}
+  .scope-note{
+    font-size:.88rem; color:var(--sub); border-left:3px solid var(--line);
+    padding-left:12px; margin-top:20px;
+  }
+  .scope-note strong{color:var(--ink)}
+  .err{color:var(--fail-ink); font-weight:600; margin-top:12px}
+  .badge-tier{
+    display:inline-block; padding:1px 7px; border-radius:999px; font-size:.75rem; font-weight:700;
+  }
+  .badge-tier.pipeline{background:#e9f8f2; color:var(--ok-ink)}
+  .badge-tier.design{background:var(--legacy-bg); color:var(--legacy-ink)}
+</style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg fixed-top bg-primary" data-bs-theme="dark" aria-label="Site navigation">
+  <div class="container">
+    <a class="navbar-brand me-2" href="../index.html">surveyframe</a>
+    <small class="nav-text text-muted me-auto">0.4.0</small>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div id="navbar" class="collapse navbar-collapse ms-3">
+      <ul class="navbar-nav me-auto">
+        <li class="nav-item"><a class="nav-link" href="../articles/surveyframe.html">Get started</a></li>
+        <li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
+        <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
+      </ul>
+      <ul class="navbar-nav">
+        <li class="nav-item"><a class="nav-link active" aria-current="page" href="./">Verify a file</a></li>
+        <li class="nav-item"><a class="external-link nav-link" href="https://github.com/MohammedAliSharafuddin/surveyframe" aria-label="GitHub"><span class="fa fa-github"></span></a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<main>
+  <h1>Verify a .sframe file</h1>
+  <p class="lede">
+    Checks a <code>.sframe</code> instrument file's SHA-256 integrity hash and
+    reads its disclosed-amendment log, if it has one, entirely in this page.
+  </p>
+
+  <div class="privacy">
+    <span><i class="fa-solid fa-lock" aria-hidden="true"></i></span>
+    <span><strong>Nothing is uploaded.</strong> This page has no server component.
+    Your file is read and hashed by your browser's own SubtleCrypto API and never
+    leaves your device. You can verify this yourself: view this page's source.
+    It's a single, self-contained HTML file with no network requests.</span>
+  </div>
+
+  <div class="card">
+    <div id="drop" tabindex="0" role="button" aria-label="Choose or drop a .sframe file">
+      <p class="big">Drop a .sframe file here, or click to choose one</p>
+      <p class="small">Only .sframe / .json files are read. Nothing is sent anywhere.</p>
+      <input type="file" id="fileInput" accept=".sframe,.json,application/json">
+    </div>
+    <details class="or-paste">
+      <summary>Or paste the file's JSON text instead</summary>
+      <textarea id="pasteArea" placeholder="Paste the contents of a .sframe file here"></textarea>
+      <div style="margin-top:8px; display:flex; gap:8px">
+        <button class="btn btn-primary" id="pasteBtn">Verify pasted text</button>
+        <button class="btn btn-outline-primary" id="clearBtn" type="button">Clear</button>
+      </div>
+    </details>
+  </div>
+
+  <div id="result"></div>
+
+  <p class="scope-note">
+    <strong>What this proves, and what it does not.</strong> A matching hash
+    confirms the file is byte-identical to what <code>write_sframe()</code>
+    produced. That proves file identity. It says nothing about question
+    wording, sampling, or measurement quality, and an amendment log only
+    records changes a researcher chose to disclose through
+    <code>amend_sframe()</code>, which cannot compel disclosure. See the
+    <a href="../articles/surveyframe.html#validate-and-serialise">package
+    vignette</a> for the full explanation and the package's separate,
+    complementary defence against HARKing and p-hacking.
+  </p>
+</main>
+
+<footer class="border-top py-4 mt-3">
+  <div class="container d-flex flex-wrap justify-content-between gap-2" style="color:var(--sub); font-size:.85rem">
+    <p class="mb-0">Developed by Mohammed Ali Sharafuddin. Part of the
+      <a href="../index.html">surveyframe</a> documentation site.</p>
+    <p class="mb-0"><a href="https://github.com/MohammedAliSharafuddin/surveyframe">Source on GitHub</a></p>
+  </div>
+</footer>
+
+<script>
+'use strict';
+
+// -- Pure-JS SHA-256 (RFC 6234), used only if crypto.subtle is unavailable --
+// (e.g. a very old browser). Byte-for-byte the same fallback surveyframe's
+// own SurveyBuilder ships, so this page's hash computation matches both
+// the builder and write_sframe() in R without introducing a second
+// implementation to keep in sync.
+(function(){
+  function rr(n,d){return(n>>>d)|(n<<(32-d));}
+  var K=[0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2];
+  window.sha256pure=function(msg){
+    var bytes=[];
+    for(var i=0;i<msg.length;i++){var c=msg.charCodeAt(i);if(c<128)bytes.push(c);else if(c<2048)bytes.push(192|(c>>6),128|(c&63));else bytes.push(224|(c>>12),128|((c>>6)&63),128|(c&63));}
+    var l=bytes.length;bytes.push(128);while(bytes.length%64!==56)bytes.push(0);
+    var blen=l*8;bytes.push(0,0,0,0,(blen>>>24)&255,(blen>>>16)&255,(blen>>>8)&255,blen&255);
+    var h=[0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19];
+    for(var b=0;b<bytes.length;b+=64){
+      var w=[];
+      for(var j=0;j<16;j++)w[j]=(bytes[b+j*4]<<24)|(bytes[b+j*4+1]<<16)|(bytes[b+j*4+2]<<8)|bytes[b+j*4+3];
+      for(var j=16;j<64;j++){var s0=rr(w[j-15],7)^rr(w[j-15],18)^(w[j-15]>>>3);var s1=rr(w[j-2],17)^rr(w[j-2],19)^(w[j-2]>>>10);w[j]=(w[j-16]+s0+w[j-7]+s1)>>>0;}
+      var a=h[0],bv=h[1],c2=h[2],d2=h[3],e=h[4],f=h[5],g=h[6],hh=h[7];
+      for(var j=0;j<64;j++){var S1=rr(e,6)^rr(e,11)^rr(e,25);var ch=(e&f)^(~e&g);var temp1=(hh+S1+ch+K[j]+w[j])>>>0;var S0=rr(a,2)^rr(a,13)^rr(a,22);var maj=(a&bv)^(a&c2)^(bv&c2);var temp2=(S0+maj)>>>0;hh=g;g=f;f=e;e=(d2+temp1)>>>0;d2=c2;c2=bv;bv=a;a=(temp1+temp2)>>>0;}
+      h[0]=(h[0]+a)>>>0;h[1]=(h[1]+bv)>>>0;h[2]=(h[2]+c2)>>>0;h[3]=(h[3]+d2)>>>0;h[4]=(h[4]+e)>>>0;h[5]=(h[5]+f)>>>0;h[6]=(h[6]+g)>>>0;h[7]=(h[7]+hh)>>>0;
+    }
+    return h.map(function(v){return('00000000'+v.toString(16)).slice(-8);}).join('');
+  };
+})();
+
+// -- Canonical form + hashing, matching R's sframe_canonical_payload() and --
+// sframe_hash_payload() (R/read_write_sframe.R), and the SurveyBuilder's own
+// sframeCanon()/sframeHash(): recursively sort object keys, replace null
+// with an empty object, then hash the compact JSON string.
+function sframeCanon(x){
+  if(x===null)return{};
+  if(Array.isArray(x))return x.map(sframeCanon);
+  if(x&&typeof x==='object'){
+    var o={};
+    Object.keys(x).sort().forEach(function(k){o[k]=sframeCanon(x[k]);});
+    return o;
+  }
+  return x;
+}
+async function sha256hex(str){
+  if(window.crypto&&window.crypto.subtle){
+    try{
+      var dig=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(str));
+      return Array.from(new Uint8Array(dig)).map(function(b){return b.toString(16).padStart(2,'0');}).join('');
+    }catch(e){/* fall through to pure-JS below */}
+  }
+  return window.sha256pure(str);
+}
+// Canonical hash: matches write_sframe()/read_sframe() since 0.4.0.
+async function canonicalHash(payload){
+  var p=Object.assign({},payload);
+  p.hash=Object.assign({},p.hash,{value:''});
+  return sha256hex(JSON.stringify(sframeCanon(p)));
+}
+// Legacy hash: matches files written before canonical serialisation existed
+// (jsonlite::toJSON with no key sorting). Checked as a fallback so an older
+// file reads as "verified (legacy format)" rather than a false FAIL.
+async function legacyHash(payload){
+  var p=Object.assign({},payload);
+  p.hash=Object.assign({},p.hash,{value:''});
+  return sha256hex(JSON.stringify(p));
+}
+// Content hash for amendment entries: matches sframe_content_hash()
+// (R/amendments.R) -- the same canonical process, but with `hash` and
+// `amendments` themselves excluded, so an entry never has to record the
+// hash of a payload that includes that entry's own hash field.
+async function contentHash(payload){
+  var p=Object.assign({},payload);
+  delete p.hash;
+  delete p.amendments;
+  return sha256hex(JSON.stringify(sframeCanon(p)));
+}
+
+function esc(s){
+  return String(s==null?'':s).replace(/[&<>"']/g,function(c){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+  });
+}
+function shortHash(h){
+  if(!h)return '<span style="color:#999">(none)</span>';
+  return '<code class="hash">'+esc(h)+'</code>';
+}
+
+async function verify(text){
+  var resultEl=document.getElementById('result');
+  resultEl.style.display='block';
+  resultEl.innerHTML='<p>Checking…</p>';
+
+  var parsed;
+  try{
+    parsed=JSON.parse(text);
+  }catch(e){
+    resultEl.innerHTML='<p class="err">Could not parse this as JSON: '+esc(e.message)+
+      '</p><p>Make sure you selected a .sframe file (or pasted its full contents), not a response CSV or another file type.</p>';
+    return;
+  }
+
+  if(!parsed||typeof parsed!=='object'||!parsed.hash||!parsed.items){
+    resultEl.innerHTML='<p class="err">This does not look like a .sframe payload. Expected top-level '+
+      '<code>hash</code>, <code>items</code>, <code>choices</code>, and <code>scales</code> keys.</p>';
+    return;
+  }
+
+  var storedHash=(parsed.hash&&parsed.hash.value)||'';
+  var canon=await canonicalHash(parsed);
+  var legacy=await legacyHash(parsed);
+
+  var status, note;
+  if(storedHash&&storedHash===canon){
+    status='ok'; note='Integrity verified. This file is byte-identical to what write_sframe() produced.';
+  }else if(storedHash&&storedHash===legacy){
+    status='legacy'; note='Integrity verified against the legacy (pre-canonical) hash format. This file predates surveyframe 0.3’s canonical serialisation. Content is unchanged; consider re-saving it with a current package version.';
+  }else{
+    status='fail'; note='Hash mismatch. This file does not match its own recorded hash. It may have been edited after write_sframe() produced it, outside amend_sframe()’s disclosed-revision path.';
+  }
+
+  var icon={
+    ok:'<i class="fa-solid fa-circle-check" aria-hidden="true"></i>',
+    legacy:'<i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>',
+    fail:'<i class="fa-solid fa-circle-xmark" aria-hidden="true"></i>'
+  }[status];
+  var label={ok:'Verified',legacy:'Verified (legacy format)',fail:'Not verified'}[status];
+
+  var html='';
+  html+='<div class="banner '+status+'"><span class="ic">'+icon+'</span><span>'+label+'</span></div>';
+  html+='<p>'+esc(note)+'</p>';
+
+  html+='<table><caption>File</caption><tbody>';
+  html+='<tr><th>Title</th><td>'+esc((parsed.meta&&parsed.meta.title)||'(untitled)')+'</td></tr>';
+  html+='<tr><th>Instrument version</th><td>'+esc(parsed.version||(parsed.meta&&parsed.meta.version)||'-')+'</td></tr>';
+  html+='<tr><th>Created</th><td>'+esc((parsed.meta&&parsed.meta.created_at)||'(not recorded; predates the created_at field)')+'</td></tr>';
+  html+='<tr><th>Items / choice sets / scales</th><td>'+
+    (parsed.items||[]).length+' / '+(parsed.choices||[]).length+' / '+(parsed.scales||[]).length+'</td></tr>';
+  html+='<tr><th>Recorded hash</th><td>'+shortHash(storedHash)+'</td></tr>';
+  html+='<tr><th>Recomputed hash</th><td>'+shortHash(canon)+'</td></tr>';
+  html+='</tbody></table>';
+
+  var amendments=parsed.amendments||[];
+  if(amendments.length>0){
+    html+='<table><caption>Disclosed amendment log ('+amendments.length+')</caption>';
+    html+='<thead><tr><th>#</th><th>Timestamp (UTC)</th><th>Reason</th><th>Tier</th>'+
+      '<th>Explanation</th><th>Deviation report</th><th>Signoff</th><th>Changed fields</th></tr></thead><tbody>';
+    amendments.forEach(function(a,i){
+      var tierBadge='<span class="badge-tier '+esc(a.tier||'')+'">'+esc(a.tier||'-')+'</span>';
+      // jsonlite's auto_unbox = TRUE writes a single-element character vector
+      // as a bare JSON string rather than a 1-element array, so
+      // changed_fields may arrive here as either "items" or ["items"].
+      // R's own reader tolerates this via unlist(); normalise the same way.
+      var cf=a.changed_fields;
+      if(typeof cf==='string')cf=cf?[cf]:[];
+      else if(!Array.isArray(cf))cf=[];
+      html+='<tr>'+
+        '<td>'+(i+1)+'</td>'+
+        '<td>'+esc(a.timestamp)+'</td>'+
+        '<td>'+esc(a.reason_code)+'</td>'+
+        '<td>'+tierBadge+'</td>'+
+        '<td>'+esc(a.reason_text)+'</td>'+
+        '<td>'+esc(a.deviation_report||'none')+'</td>'+
+        '<td>'+esc(a.signoff||'none')+'</td>'+
+        '<td>'+esc(cf.join(', ')||'none')+'</td>'+
+      '</tr>';
+    });
+    html+='</tbody></table>';
+    html+='<p style="font-size:.85rem;color:var(--sub)">Amendment content hashes are recorded by '+
+      '<code>amend_sframe()</code> at the time each change was disclosed and are not '+
+      're-verified against the current file above; they document what the instrument’s '+
+      'content was immediately before and after that specific, disclosed change.</p>';
+  }else{
+    html+='<p style="font-size:.9rem;color:var(--sub)">No disclosed amendments recorded in this file.</p>';
+  }
+
+  resultEl.innerHTML=html;
+}
+
+// -- Wiring ------------------------------------------------------------------
+var dropEl=document.getElementById('drop');
+var fileInput=document.getElementById('fileInput');
+
+function readFile(f){
+  if(!f)return;
+  var r=new FileReader();
+  r.onload=function(ev){ verify(ev.target.result); };
+  r.onerror=function(){
+    document.getElementById('result').style.display='block';
+    document.getElementById('result').innerHTML='<p class="err">Could not read that file.</p>';
+  };
+  r.readAsText(f);
+}
+
+dropEl.addEventListener('click', function(){ fileInput.click(); });
+dropEl.addEventListener('keydown', function(e){
+  if(e.key==='Enter'||e.key===' '){ e.preventDefault(); fileInput.click(); }
+});
+fileInput.addEventListener('change', function(e){ readFile(e.target.files[0]); });
+
+['dragenter','dragover'].forEach(function(evt){
+  dropEl.addEventListener(evt, function(e){ e.preventDefault(); dropEl.classList.add('hover'); });
+});
+['dragleave','drop'].forEach(function(evt){
+  dropEl.addEventListener(evt, function(e){ e.preventDefault(); dropEl.classList.remove('hover'); });
+});
+dropEl.addEventListener('drop', function(e){
+  var f=e.dataTransfer&&e.dataTransfer.files&&e.dataTransfer.files[0];
+  readFile(f);
+});
+
+document.getElementById('pasteBtn').addEventListener('click', function(){
+  var txt=document.getElementById('pasteArea').value.trim();
+  if(!txt)return;
+  verify(txt);
+});
+document.getElementById('clearBtn').addEventListener('click', function(){
+  document.getElementById('pasteArea').value='';
+  document.getElementById('result').style.display='none';
+});
+</script>
+</body>
+</html>

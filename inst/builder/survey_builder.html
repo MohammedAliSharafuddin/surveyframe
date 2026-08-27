@@ -1048,7 +1048,7 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
           <optgroup label="Regression"><option value="regression_linear">Linear regression</option><option value="regression_logistic_binary">Binary logistic</option><option value="regression_logistic_ordinal">Ordinal logistic</option><option value="regression_logistic_multinomial">Multinomial logistic</option><option value="firth_logistic">Firth penalised logistic</option><option value="mediation">Mediation</option><option value="moderation">Moderation</option></optgroup>
           <optgroup label="Measurement and models"><option value="reliability_alpha">Cronbach alpha</option><option value="reliability_omega">McDonald omega</option><option value="item_diagnostics">Item diagnostics</option><option value="efa_readiness">EFA readiness</option><option value="efa_solution">EFA solution</option><option value="cfa_lavaan_syntax">CFA lavaan syntax</option><option value="sem_lavaan_syntax">CB-SEM lavaan syntax</option><option value="seminr_syntax">PLS-SEM seminr syntax</option></optgroup>
           <optgroup label="Decision"><option value="topsis">TOPSIS</option><option value="vikor">VIKOR</option><option value="moora">MOORA</option><option value="smart">SMART</option><option value="waspas">WASPAS</option><option value="promethee">PROMETHEE II</option><option value="electre">ELECTRE I</option><option value="ahp">AHP</option><option value="anp">ANP</option><option value="dematel">DEMATEL</option></optgroup>
-          <optgroup label="Text"><option value="term_freq">Term frequency</option><option value="co_occurrence">Co-occurrence</option><option value="ngram_freq">N-gram frequency</option><option value="term_context">Keyword in context</option><option value="co_occurrence_network">Co-occurrence network</option><option value="tidy_sentiment">Sentiment</option><option value="quanteda_dfm">Document-feature matrix</option></optgroup>
+          <optgroup label="Text"><option value="term_freq">Term frequency</option><option value="co_occurrence">Co-occurrence</option><option value="ngram_freq">N-gram frequency</option><option value="term_context">Keyword in context</option><option value="co_occurrence_network">Co-occurrence network</option><option value="tidy_sentiment">Sentiment</option><option value="quanteda_dfm">Document-feature matrix</option><option value="topic_model_lda">Topic model (LDA)</option><option value="stm_topics">Topic model (STM)</option></optgroup>
         </select></div>
       </div>
       <div class="field" id="rq-alpha-field"><label class="fl" for="rq-alpha">Significance level</label><div class="fc"><select id="rq-alpha"><option value="0.05">0.05</option><option value="0.01">0.01</option><option value="0.10">0.10</option></select></div></div>
@@ -1056,6 +1056,7 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
       <div class="field" id="rq-wordcloud-field" style="display:none"><label class="fl" for="rq-wordcloud">Word cloud</label><div class="fc"><label style="display:flex;align-items:center;gap:6px;font-weight:400"><input type="checkbox" id="rq-wordcloud"> Render as a word cloud instead of a bar chart</label></div></div>
       <div class="field" id="rq-seed-field" style="display:none"><label class="fl" for="rq-seed">Random seed</label><div class="fc"><input type="number" id="rq-seed" step="1" placeholder="42"></div></div>
       <div class="field" id="rq-topn-field" style="display:none"><label class="fl" for="rq-topn">Top N terms</label><div class="fc"><input type="number" id="rq-topn" step="1" min="1" placeholder="20"></div></div>
+      <div class="field" id="rq-k-field" style="display:none"><label class="fl" for="rq-k">Number of topics (k)</label><div class="fc"><input type="number" id="rq-k" step="1" min="2" placeholder="4"></div></div>
     </div>
     <div class="field" id="rqCitDiv"></div>
     <div id="rqPreview" class="preview-card"></div>
@@ -3124,12 +3125,14 @@ ahp:{family:'decision',label:'AHP',roles:[{id:'pairwise',label:'Pairwise compari
 anp:{family:'decision',label:'ANP',roles:[{id:'pairwise',label:'Pairwise comparison item',min:1,max:1,levels:['pairwise_saaty']}],showAlpha:false,showHypotheses:false,showEffectSize:false,assumptions:['Reciprocal pairwise matrix','Supermatrix must converge'],output:'Limiting priority weights from the supermatrix.',refs:[]},
 dematel:{family:'decision',label:'DEMATEL',roles:[{id:'pairwise',label:'Influence comparison item',min:1,max:1,levels:['pairwise_influence']}],showAlpha:false,showHypotheses:false,showEffectSize:false,assumptions:['Directed 0-4 influence matrix'],output:'Cause-effect table (prominence, relation, role) and influence map.',refs:[]},
 term_freq:{family:'text',label:'Term frequency',roles:[{id:'item',label:'Text item',min:1,max:1,levels:['text']},{id:'group',label:'Group by (optional)',min:0,max:1,levels:['nominal','ordinal']}],showAlpha:false,showHypotheses:false,showEffectSize:false,showWordcloud:true,assumptions:['At least 10 usable responses'],output:'Top terms by frequency, optionally split by a group variable, and a bar chart or word cloud.',refs:[]},
-co_occurrence:{family:'text',label:'Co-occurrence',roles:[{id:'item',label:'Text item',min:1,max:1,levels:['text']}],showAlpha:false,showHypotheses:false,showEffectSize:false,assumptions:['At least 10 usable responses','At least 1 co-occurring term pair'],output:'Pairwise within-response co-occurrence counts on the top terms, and a heatmap.',refs:[]},
-ngram_freq:{family:'text',label:'N-gram frequency',roles:[{id:'item',label:'Text item',min:1,max:1,levels:['text']}],showAlpha:false,showHypotheses:false,showEffectSize:false,assumptions:['At least 10 usable responses'],output:'Top bigrams or trigrams by frequency, and a bar chart.',refs:[]},
+co_occurrence:{family:'text',label:'Co-occurrence',roles:[{id:'item',label:'Text item',min:1,max:1,levels:['text']}],showAlpha:false,showHypotheses:false,showEffectSize:false,showTopN:true,assumptions:['At least 10 usable responses','At least 1 co-occurring term pair'],output:'Pairwise within-response co-occurrence counts on the top terms, and a heatmap.',refs:[]},
+ngram_freq:{family:'text',label:'N-gram frequency',roles:[{id:'item',label:'Text item',min:1,max:1,levels:['text']}],showAlpha:false,showHypotheses:false,showEffectSize:false,showTopN:true,assumptions:['At least 10 usable responses'],output:'Top bigrams or trigrams by frequency, and a bar chart.',refs:[]},
 term_context:{family:'text',label:'Keyword in context',roles:[{id:'item',label:'Text item',min:1,max:1,levels:['text']}],showAlpha:false,showHypotheses:false,showEffectSize:false,showTerm:true,assumptions:['At least 10 usable responses'],output:'A keyword-in-context concordance table (before/match/after) for a chosen term.',refs:[]},
 co_occurrence_network:{family:'text',label:'Co-occurrence network',roles:[{id:'item',label:'Text item',min:1,max:1,levels:['text']}],showAlpha:false,showHypotheses:false,showEffectSize:false,showSeed:true,showTopN:true,assumptions:['At least 10 usable responses','At least 5 distinct terms with 1 co-occurrence edge','Requires the optional igraph package'],output:'A Louvain-clustered, force-directed term co-occurrence network (node table plus edge list).',refs:['blondel_2008','fruchterman_1991']},
 tidy_sentiment:{family:'text',label:'Sentiment',roles:[{id:'item',label:'Text item',min:1,max:1,levels:['text']},{id:'group',label:'Group by (optional)',min:0,max:1,levels:['nominal','ordinal']}],showAlpha:false,showHypotheses:false,showEffectSize:false,showWordcloud:true,assumptions:['At least 10 usable responses','Requires the optional tidytext package'],output:'Positive/negative sentiment counts and proportion positive (bing lexicon), optionally split by a group variable, and a diverging bar chart or a positive/negative comparison cloud.',refs:[]},
-quanteda_dfm:{family:'text',label:'Document-feature matrix',roles:[{id:'item',label:'Text item',min:1,max:1,levels:['text']}],showAlpha:false,showHypotheses:false,showEffectSize:false,assumptions:['At least 10 usable responses','Requires the optional quanteda package'],output:'Document-feature matrix summary: feature count, sparsity, and top features.',refs:[]}
+quanteda_dfm:{family:'text',label:'Document-feature matrix',roles:[{id:'item',label:'Text item',min:1,max:1,levels:['text']}],showAlpha:false,showHypotheses:false,showEffectSize:false,showTopN:true,assumptions:['At least 10 usable responses','Requires the optional quanteda package'],output:'Document-feature matrix summary: feature count, sparsity, and top features.',refs:[]},
+topic_model_lda:{family:'text',label:'Topic model (LDA)',roles:[{id:'item',label:'Text item',min:1,max:1,levels:['text']}],showAlpha:false,showHypotheses:false,showEffectSize:false,showK:true,showSeed:true,assumptions:['At least 10 usable responses','Enough documents to support k topics','Requires the optional tidytext and topicmodels packages'],output:'Top terms per topic (LDA) as a ranked table, and a faceted bar chart.',refs:[]},
+stm_topics:{family:'text',label:'Topic model (STM)',roles:[{id:'item',label:'Text item',min:1,max:1,levels:['text']}],showAlpha:false,showHypotheses:false,showEffectSize:false,showK:true,showSeed:true,assumptions:['At least 10 usable responses','Enough documents to support k topics','Requires the optional stm and tidytext packages'],output:'Top terms per topic (structural topic model) as a ranked table, and a faceted bar chart.',refs:[]}
 };
 var TCITS={};var TLBLS={};Object.keys(ANALYSIS_REGISTRY).forEach(function(k){TCITS[k]=ANALYSIS_REGISTRY[k].refs||[];TLBLS[k]=ANALYSIS_REGISTRY[k].label;});
 // Likert items are ordinal scores: pairing them with continuous or other
@@ -3255,9 +3258,14 @@ function openRQModal(id){
   document.getElementById('rq-wordcloud').checked=!!(rq&&rq.options&&rq.options.wordcloud);
   document.getElementById('rq-seed').value=rq&&rq.options&&rq.options.seed!=null?String(rq.options.seed):'';
   document.getElementById('rq-topn').value=rq&&rq.options&&rq.options.top_n!=null?String(rq.options.top_n):'';
+  document.getElementById('rq-k').value=rq&&rq.options&&rq.options.k!=null?String(rq.options.k):'';
   document.getElementById('rqDelBtn').style.display=id?'inline-flex':'none';
   popRQVars(rolesFromLegacy(rq,method));onTestChg(false);
-  document.getElementById('rqSuggest').style.display='none';
+  // A fresh plan gets the same text-family nudge suggestTest() shows once a
+  // role is picked, but evaluated immediately on open so it doesn't depend
+  // on the user finding a role to select first (see hasTextItems() in
+  // suggestTest()). Editing an existing plan always hides it, unchanged.
+  if(id){document.getElementById('rqSuggest').style.display='none';}else{suggestTest();}
   openModal('m-rq');startRQPlaceholders();
 }
 function popRQVars(roleValues){
@@ -3267,7 +3275,7 @@ function popRQVars(roleValues){
 }
 function renderRoleFields(roleValues){
   var method=document.getElementById('rq-test').value,reg=ANALYSIS_REGISTRY[method]||ANALYSIS_REGISTRY.mann_whitney;
-  document.getElementById('rqRoleFields').innerHTML=(reg.roles||[]).map(function(role){var selected=roleValues[role.id]||[];if(!Array.isArray(selected))selected=selected?[selected]:[];var multi=role.max>1;return'<div class="role-card"><label class="fl" for="role_'+esc(role.id)+'">'+esc(role.label)+(role.min>0?' <span class="fr">*</span>':'')+'</label><select id="role_'+esc(role.id)+'" data-role-id="'+esc(role.id)+'" '+(multi?'multiple size="4"':'')+' onchange="validatePlanRoles()">'+roleOptions(role,selected)+'</select></div>';}).join('');
+  document.getElementById('rqRoleFields').innerHTML=(reg.roles||[]).map(function(role){var selected=roleValues[role.id]||[];if(!Array.isArray(selected))selected=selected?[selected]:[];var multi=role.max>1;return'<div class="role-card"><label class="fl" for="role_'+esc(role.id)+'">'+esc(role.label)+(role.min>0?' <span class="fr">*</span>':'')+'</label><select id="role_'+esc(role.id)+'" data-role-id="'+esc(role.id)+'" '+(multi?'multiple size="4"':'')+' onchange="validatePlanRoles();suggestTest()">'+roleOptions(role,selected)+'</select></div>';}).join('');
   validatePlanRoles();
 }
 function collectRoles(){var roles={};document.querySelectorAll('[data-role-id]').forEach(function(sel){var id=sel.getAttribute('data-role-id');var vals=Array.from(sel.selectedOptions||[]).map(function(o){return o.value;}).filter(Boolean);roles[id]=sel.multiple?vals:(vals[0]||'');});return roles;}
@@ -3309,12 +3317,34 @@ function onTestChg(renderRoles){
   var wf=document.getElementById('rq-wordcloud-field');if(wf)wf.style.display=reg.showWordcloud?'block':'none';
   var sf=document.getElementById('rq-seed-field');if(sf)sf.style.display=reg.showSeed?'block':'none';
   var nf=document.getElementById('rq-topn-field');if(nf)nf.style.display=reg.showTopN?'block':'none';
+  var kf=document.getElementById('rq-k-field');if(kf)kf.style.display=reg.showK?'block':'none';
   document.getElementById('rqCitDiv').innerHTML=cits.length?'<label class="fl">Reporting references</label><div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:4px">'+cits.map(function(k){return'<span class="cc">'+esc(CSHORT[k]||k)+'</span>';}).join('')+'</div>':'';
   validatePlanRoles();
 }
+var TEXT_METHOD_IDS=['term_freq','ngram_freq','term_context','co_occurrence','co_occurrence_network','tidy_sentiment','quanteda_dfm','topic_model_lda','stm_topics'];
+function hasTextItems(){return S.items.some(function(i){return i.type==='text'||i.type==='textarea';});}
 function suggestTest(){
-  var sel=flattenRoles(collectRoles()),box=document.getElementById('rqSuggest'),msg=document.getElementById('rqSuggestMsg');
-  if(sel.length===0){box.style.display='none';return;}
+  var sel=flattenRoles(collectRoles()),box=document.getElementById('rqSuggest'),msg=document.getElementById('rqSuggestMsg'),curMethod=document.getElementById('rq-test').value;
+  if(sel.length===0){
+    // No role picked yet, so the variables-first suggestion logic below
+    // can never fire for text data: role selects filter their options by
+    // level, and no non-text method declares levels:['text'], so a text
+    // item is not even a selectable option before a text method is
+    // already chosen. Surface the same nudge here instead, driven off
+    // whether the survey has any text/textarea items at all rather than
+    // off a role selection -- this is what actually makes the text
+    // family reachable from a fresh, still-empty modal. Guarded the same
+    // way as the general suggestion below: only on a brand-new plan
+    // still on the modal's placeholder default, so it never overrides a
+    // plan the user (or a saved plan being edited) already chose.
+    if(!editRqId&&curMethod==='mann_whitney'&&hasTextItems()){
+      document.getElementById('rq-test').value='term_freq';onTestChg();
+      msg.textContent='This survey has open-ended text items. '+((ANALYSIS_REGISTRY.term_freq||{}).label)+' is suggested as a starting point; pick a different text method above if you meant another one.';
+      box.style.display='flex';
+      return;
+    }
+    box.style.display='none';return;
+  }
   var cats=sel.map(getVarCat);
   // A single selected text/textarea item has no pairwise partner to look
   // up in TEST_SUGGEST below (every other suggestion path needs >=2
@@ -3326,11 +3356,25 @@ function suggestTest(){
   // never meant to include 'text'), suggesting term_freq regardless of
   // what else is selected.
   if(cats.indexOf('text')>-1){
+    // Never override an ALREADY-chosen text method just because its own
+    // role got filled in: every text method's primary role is a single
+    // text item, and this function is wired to fire on every role
+    // select's onchange, so without this guard picking the item for
+    // term_context (say) would immediately bounce the method back to
+    // term_freq on every edit, making every other text method
+    // unreachable through the role picker.
+    if(TEXT_METHOD_IDS.indexOf(curMethod)>-1){box.style.display='none';return;}
     document.getElementById('rq-test').value='term_freq';onTestChg();
     msg.textContent=(ANALYSIS_REGISTRY.term_freq||{}).label+' is suggested from the selected variable type.';box.style.display='flex';
     return;
   }
   if(sel.length<2){box.style.display='none';return;}
+  // Only auto-apply a suggestion while still on the modal's initial
+  // placeholder method ('mann_whitney', set by openRQModal() for a new
+  // plan): once a user has deliberately picked something else, refiring
+  // this on every role edit would otherwise fight that choice the same
+  // way the text case above would.
+  if(curMethod!=='mann_whitney'){box.style.display='none';return;}
   var sug=sel.length===2?(TEST_SUGGEST[cats[0]+'+'+cats[1]]||'correlation_pearson'):'regression_linear';
   if(sug==='mann_whitney'){
     var gid=sel[cats[0]==='cat'?0:1],n=groupLevels(gid);
@@ -3348,6 +3392,7 @@ function saveRQ(){
   if(reg.showWordcloud)opts.wordcloud=document.getElementById('rq-wordcloud').checked;
   if(reg.showSeed&&gv('rq-seed').trim())opts.seed=parseInt(gv('rq-seed'),10);
   if(reg.showTopN&&gv('rq-topn').trim())opts.top_n=parseInt(gv('rq-topn'),10);
+  if(reg.showK&&gv('rq-k').trim())opts.k=parseInt(gv('rq-k'),10);
   var rq={id:editRqId||uid(),research_question:q,family:reg.family||'',method:t,test:t,roles:roles,variables:vars,options:opts,hypotheses:reg.showHypotheses?{null:'No effect or association is present.',alternative:'An effect or association is present.'}:null,decision_rule:gv('rq-interp').trim(),interpretation:gv('rq-interp').trim(),reporting_references:reg.refs||[],citations:reg.refs||[],status:'valid_plan',requires_data:!['cfa_lavaan_syntax','sem_lavaan_syntax','seminr_syntax'].includes(t),result:null};
   snap();
   if(editRqId){var i=S.analysis_plan.findIndex(function(r){return r.id===editRqId;});if(i>=0)S.analysis_plan[i]=rq;}

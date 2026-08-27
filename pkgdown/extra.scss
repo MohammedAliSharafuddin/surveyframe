@@ -1,0 +1,23 @@
+// pkgdown/extra.scss
+// Wrap long source lines in code chunks instead of scrolling them sideways.
+// pkgdown's own pkgdown.scss sets `word-wrap: normal` on `pre, pre code`, and
+// Bootstrap's `pre` default is `white-space: pre; overflow: auto`, so a 200
+// character line in a vignette chunk runs off the right edge of the page.
+//
+// Only source chunks are wrapped. Printed output stays on a horizontal
+// scrollbar, because wrapping a fixed-width printed table or matrix destroys
+// its column alignment.
+
+div.sourceCode > pre.sourceCode,
+div.sourceCode > pre.sourceCode > code {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+// Indent the continuation of a wrapped line so it is not mistaken for the
+// start of a new statement.
+div.sourceCode > pre.sourceCode > code {
+  padding-left: 2ch;
+  text-indent: -2ch;
+}
