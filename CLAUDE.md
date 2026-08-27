@@ -260,8 +260,15 @@ on a fresh device, clone surveyframe-dev and check out `dev`.
 `.Rbuildignore` excludes all dev-only files and the `jss-paper`, `pkgdown`, and
 version-archive directories so the CRAN build never sees them.
 
-**Branch state, verified 2026-08-05.** All 5 branches are identical on local
-and `origin`, and `main` is identical on `origin` and `public`.
+**Branch state, verified 2026-08-05, and partly superseded 2026-08-27.**
+The table below still describes the 5 branches correctly. **The claim
+that `main` is identical on `origin` and `public` stopped holding on
+2026-08-26**, when `cf4af32` went to `public/main` alone. Re-converged
+2026-08-27 by merging rather than forcing, and all 3 now sit on the same
+commit. The 2 `fix/*` branches created after this table are both deleted,
+see the Current status section. Check with
+`git rev-parse main origin/main public/main` rather than trusting this
+paragraph.
 
 | Branch | Ancestor of `main`? | Keep? |
 |---|---|---|
@@ -388,11 +395,14 @@ justifying a submission of their own. The review suite's 8 defects still
 need owner decisions. Git history was rewritten on 2026-08-04, so any
 clone older than that is stale.
 
-**Both fix branches are now dealt with, and `dev` has taken `main`.**
-`fix/sframe-format` is merged. `fix/vignette-code-wrap` is **redundant
-and can be deleted**: it cherry-picked `a0d4465` from `main`, and the
-`main` merge of 2026-08-27 brings that commit itself, verified by
-counting the wrap rule in the merged tree, 10 vignettes of 10.
+**Both fix branches are deleted, 2026-08-27.** `fix/sframe-format` was
+merged into `dev`. `fix/vignette-code-wrap` was redundant, since the
+`main` merge brings `a0d4465` itself, proved rather than assumed: its
+cherry-pick `5a3852e` and `a0d4465` produce identical patches apart from
+blob index lines, and all 10 vignettes in the merged tree carry the wrap
+rule. Deleted local and on `origin`, with both tips preserved as tags
+`retired/fix-sframe-format` and `retired/fix-vignette-code-wrap`, pushed
+to `origin`, so the deletion is reversible.
 
 **The `sframe_format` blocker is closed, 2026-08-26.** It was the top
 priority on resume and it gated 0.4.1. The change itself is sound and is
@@ -415,19 +425,41 @@ to how a suite was run, record the state of every input at each run.** The
 4 things ruled out on 2026-08-22 were each ruled out correctly, and each
 answered "which test writes these files" when no test does.
 
-**Two hygiene defects were found while closing it, one fixed and one
-open.** Fixed: `OPEN_ISSUE_sframe_format.md` was shipping inside the CRAN
-tarball, since it was in neither `.Rbuildignore` nor `main`'s
-`.gitignore`, so `R CMD check` reported it under `checking top-level
-files`. `.Rbuildignore` now carries `^OPEN_ISSUE_[^/]+\.md$`. Still open:
-**`main`'s `.gitignore` is stale.** It lists `todo_0.5.1.md`,
-`todo_0.5.md`, and `todo_0.6.md` through `todo_1.0.md`, all retired on
-2026-08-20, and omits `todo_0.4.1.md`, `todo_text_analysis.md`,
-`todo_sem_execution.md`, `todo_provenance_part1.md`,
-`todo_provenance_part2.md`, `todo_integration_launch.md`, and
-`OPEN_ISSUE_sframe_format.md`. The 2026-08-20 rename pass updated
-`.Rbuildignore` and did not update `main`'s `.gitignore`, so the pkgdown
-protection described above is incomplete.
+**The ignore files had drifted 3 ways, all fixed 2026-08-27, and the
+drift was wider than the first pass reported.** The 2026-08-20 themed
+rename updated `.Rbuildignore` on `dev` and stopped there, which left 3
+separate holes.
+
+1. **`main`'s `.gitignore` was covering 41 of the 64 dev-only paths.**
+   Measured with `git check-ignore` over every path tracked on `dev` and
+   not on `main`, rather than read by eye, which is why the count came
+   out at 23 leaking rather than the 7 a reading of the file suggested.
+   The 23 were `OPEN_ISSUE_sframe_format.md`, all 5 of `demo/`, all 5 of
+   `review_050/`, the 6 `mas_review_032`, `033`, and `034` `.md` and
+   `.qmd` sources, whose `.html` renders alone were listed, and the 6
+   themed `todo_*` files. Fixed, mutation-checked by restoring the old
+   file and confirming the 23 reappear. This one mattered most, because
+   `.Rbuildignore` has no effect on pkgdown, which reads straight off the
+   working tree.
+2. **`main`'s `.Rbuildignore` was the pre-rename version**, so the branch
+   that actually builds the CRAN tarball still excluded 7 names that
+   stopped existing and excluded none of the 6 that replaced them.
+   Synced to `dev`'s. The 2 are now byte-identical, which is what they
+   should be, since `.Rbuildignore` is a package file. `.gitignore` is
+   the one that legitimately differs between the branches.
+3. **`OPEN_ISSUE_sframe_format.md` was shipping inside the CRAN
+   tarball**, in neither file, and `R CMD check` reported it under
+   `checking top-level files`. Both now carry it.
+
+**A fourth thing was found by the push itself: `main` had diverged
+between the 2 remotes.** `cf4af32`, committed 2026-08-26, was on
+`public/main` and had never reached `origin/main`, so `git push public
+main` was rejected. Merged rather than forced, and both remotes plus
+local now sit on the same commit. The claim elsewhere in this file that
+all branches are identical on both remotes was true on 2026-08-05 and
+stopped being true on 2026-08-26. **Push `main` to both remotes in the
+same breath, and check `git rev-parse main origin/main public/main`
+agree before believing they do.**
 
 **`main` merged into `dev` on 2026-08-27, and `dev` was 20 commits
 behind.** The gap was found while closing the `sframe_format` blocker,
@@ -475,9 +507,15 @@ dev-only files. The skip counts differ between the 2 routes because
 `devtools::test()` sets and plain `Rscript` does not. The 38 warnings on
 the `devtools` route are the pre-existing `geom_errorbarh` deprecations.
 
-DESCRIPTION now reads **`0.4.0.9000`** on `dev`, the post-release
-development marker that came across with `main`. Set it to `0.4.1` at
-release time.
+**DESCRIPTION reads `0.4.0.9000` on `dev` and `0.4.0` on `main`, and an
+earlier draft of this paragraph had that backwards.** The `.9000` marker
+was already on `dev` before the 2026-08-27 merge. It did not come across
+with `main`, which still reads the shipped CRAN version. Set both to
+`0.4.1` at release time, task E1's equivalent for that release. Leaving
+`main` at a released version rather than a development marker is a
+departure from how `0.3.4.9000` was handled, and it is worth a decision
+rather than drift.
+
 **This section was stale for 2 days and misled a session.** On
 2026-08-22 it still described 0.4.0 as held and unsubmitted, so a
 session planning a vignette CSS fix concluded the fix could ride along
