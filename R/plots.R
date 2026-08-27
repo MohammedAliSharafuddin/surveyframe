@@ -1,4 +1,35 @@
 # plots.R
+
+# Why sframe_plot_quality() has nothing to draw.
+#
+# A NULL return reads as "nothing was flagged" and can equally mean "no scale
+# was long enough to check", which are opposite conclusions. Since 0.4.1
+# straight-lining skips scales shorter than `straightline_min_items`, and an
+# instrument whose scales are all short (the bundled demo's 5 scales are 2 or
+# 3 items) yields no rows at all, so the chart vanished from the report with
+# nothing said. NULL cannot carry an attribute, so the reason is a separate
+# call, which render_report() prints in place of the missing chart.
+sframe_quality_plot_note <- function(x) {
+  stopifnot(inherits(x, "sframe_quality_report"))
+  sl <- x$straightline %||% list()
+  if (length(sl) == 0) {
+    return("No scales were defined, so straight-lining was not checked.")
+  }
+  rates <- vapply(sl, function(s) s$flag_rate %||% NA_real_, numeric(1))
+  if (any(!is.na(rates))) {
+    return(NULL)
+  }
+  if (any(vapply(sl, function(s) isTRUE(s$checked), logical(1)))) {
+    "No scale was flagged for straight-lining, so there is no chart to draw."
+  } else {
+    paste0("No scale was long enough to check for straight-lining, so there ",
+           "is no chart to draw. Straight-lining needs at least ",
+           "`straightline_min_items` items in a scale, 4 by default, because ",
+           "identical answers to 2 or 3 items are what a consistent ",
+           "respondent gives rather than evidence of inattention.")
+  }
+}
+
 # v0.3.4 visualisation foundation: the surveyframe brand theme and the first
 # family of analysis plots. ggplot2 lives in Suggests, so every entry point
 # is guarded with rlang::check_installed().
@@ -1436,6 +1467,13 @@ sframe_plot_quality <- function(x, palette = c("web", "print")) {
   })
   df <- do.call(rbind, rows)
   df <- df[!is.na(df$flag_rate), , drop = FALSE]
+  # Returning NULL here reads as "nothing was flagged" and can mean "no scale
+  # was long enough to check", which are opposite things. Since 0.4.1
+  # straight-lining skips scales shorter than straightline_min_items, and an
+  # instrument whose scales are all short (the bundled demo's are all 2 or 3
+  # items) produced an empty frame and a silently missing chart. The NULL is
+  # kept, because there is genuinely nothing to draw, but it now carries the
+  # reason so the caller can say which case it is instead of guessing.
   if (nrow(df) == 0) return(NULL)
   # Web keeps the deliberate red "flagged" warning colour; print swaps to
   # the light neutral fill (a large solid red-analogue area would be just

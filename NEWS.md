@@ -1,5 +1,56 @@
 # surveyframe 0.4.1 (development)
 
+## Reports are now reproducible, and say how they were made
+
+**Breaking in the sense that numbers move once.** `run_analysis_plan()` gains
+a `seed` argument, defaulting to a fixed value. Every bootstrap confidence
+interval in an analysis plan, and the parallel analysis behind the EFA
+family, previously drew from the global random stream unseeded, so the same
+instrument and the same data gave different intervals on every run. Two runs
+on the bundled demo differed in 32 of 1768 values, and the difference reached
+the text a researcher would quote:
+
+```
+run 1:  U = 1576, z = -0.98, p = 0.327, r = 0.09 [0.01, 0.27]
+run 2:  U = 1576, z = -0.98, p = 0.327, r = 0.09 [0.00, 0.27]
+```
+
+The test statistic and the p value were stable throughout, because they are
+computed analytically. Only the interval moved, which is why nothing ever
+looked wrong. **Confidence intervals produced by earlier releases are not
+wrong, but they are not reproducible, and re-running an analysis under 0.4.1
+will give a slightly different interval.** Pass `seed = NULL` for the old
+behaviour.
+
+Seeding also pins `mc.cores` to 1 for the duration of the run.
+`psych::fa.parallel()` splits its simulation across forked workers whose own
+random streams `set.seed()` cannot reach, and splits the work by core count,
+so the result otherwise depended on the machine it ran on. The caller's
+random stream and `mc.cores` option are both restored afterwards.
+
+`render_report()` now says which of its 2 engines produced the file. It
+prefers Quarto and falls back to a built-in HTML writer when Quarto is absent
+or its render fails, and the 2 produce materially different documents,
+roughly 5.8 MB against 1.9 MB on the bundled demo. Until now both paths
+returned a file path and nothing else, so a caller could not tell which they
+had. The engine is now announced 3 ways: a message on the console, an
+`engine` attribute on the returned path so a script can assert on it, and a
+line in the report itself alongside the instrument hash. The analysis seed is
+printed there too, so the artefact states what reproducing it would take.
+
+## Bug fix: a missing straight-lining chart now says why
+
+`sframe_plot_quality()` returned `NULL` whenever no scale had a
+straight-lining flag rate, and the chart simply disappeared from the report.
+After this release's `straightline_min_items` change that became the normal
+case for short scales: the bundled demo's 5 scales are all 2 or 3 items, so
+every one is recorded as unchecked and the chart vanished with nothing said.
+An absent chart read as "nothing was flagged" while meaning "nothing was long
+enough to check", which are opposite conclusions.
+
+`sframe_quality_plot_note()` returns the reason there is no chart, and
+`render_report()` prints it in place of the missing figure.
+
 ## Bug fix: a mediation model's generated lavaan syntax can now be fitted
 
 `sem_lavaan_syntax()` wrote an indirect effect as
