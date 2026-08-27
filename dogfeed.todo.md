@@ -1336,3 +1336,91 @@ Smaller than the 2 entries above (a real, if subtle, indicator exists,
 unlike the choice-row input fixed the same session, see the `git log` for
 `inst/builder/survey_builder.html`), so laned as ordinary AA polish rather
 than flagged as a scope decision.
+
+### [open] `lane: 0.4.1` — the rendered report is not reproducible
+
+Found 2026-08-28 by `review_041/02_quarto_reproducibility.qmd`, the file
+written to check the audit claim rather than assume it. **This is the most
+serious of the 3 findings from that suite**, because the rendered report is
+what a study is judged on.
+
+`run_analysis_plan()` gives different answers on identical inputs. Two runs
+on the bundled demo differ in **32 of 1768 values**, and the difference
+reaches the published prose:
+
+```
+render 1:  U = 1576, z = -0.98, p = 0.327, r = 0.09 [0.01, 0.27]
+render 2:  U = 1576, z = -0.98, p = 0.327, r = 0.09 [0.00, 0.27]
+```
+
+The test statistic and p value are stable, because they are computed
+analytically. The interval a researcher would quote is not.
+
+Two independent causes, both unseeded randomness:
+
+1. **Bootstrap effect-size CIs.** `bootstrap_ci()` takes `seed` and defaults
+   it to `NULL`, so it only seeds when asked, and nothing in the analysis
+   path asks. Five call sites: `R/analysis_plan.R` lines 315
+   (`cramers_v_ci`), 422 (`cohens_d_ci`), 492 (`eta_sq_ci`), 546
+   (`bootstrap_ci` directly), and 653 (`sframe_kw_eta_sq_ci`).
+2. **Parallel analysis in EFA**, inheriting `psych::fa.parallel()`'s own
+   unseeded simulation. `pc.sim`, `fa.sim`, and the simulated eigenvalue
+   matrix all move, which can change the recommended number of factors.
+
+**Needs an owner decision, and it is not a quiet fix.** Seeding by default
+changes confidence intervals the package has already printed for users, the
+same class as `review_040` finding 1. Options: a default seed in
+`run_analysis_plan()`, a `seed` argument threaded to every CI helper, or
+documenting the instability and leaving it. Only the first makes the report
+reproducible without the caller doing anything. Whichever is chosen,
+`render_report()` should record the seed in the artefact next to the
+instrument hash, so the report states what reproducing it would take.
+
+### [open] `lane: 0.4.1` — `render_report()` does not say which engine rendered it
+
+Found 2026-08-28, same suite. `render_report()` prefers Quarto, rendering
+`inst/templates/report.qmd` with the instrument, data, and hash as
+parameters, and falls back to the base-R writer in `.render_report_html()`
+when Quarto is missing or its render fails. The fallback is the right
+engineering choice. Its silence is not.
+
+From identical inputs the 2 artefacts were **5.8 MB and 1.9 MB**. They are
+different documents. Both code paths end in `return(invisible(dest))` and
+hand back a file path, with no return value, attribute, message, or metadata
+field naming the engine. The only way to find out is to read the HTML
+afterwards and look for Quarto's fingerprint, which is what
+`review_041/_setup.R`'s `sf_report_engine()` does.
+
+The practical failure: a researcher renders on a machine with Quarto, writes
+their method section around that artefact, and the same script later produces
+the fallback on a colleague's machine or a CI runner. Both are called "the
+surveyframe report".
+
+Suggested: a `message()` naming the engine, plus an `engine` attribute on the
+returned path so a script can assert on it. A stricter option is
+`engine = c("auto", "quarto", "html")` where `"quarto"` errors rather than
+falling back, for users whose reproducibility claim depends on it. Either
+way the rendered report should name its own engine next to the instrument
+hash it already carries.
+
+### [open] `lane: 0.4.1` — `sframe_plot_quality()` returns NULL on the bundled demo
+
+Found 2026-08-28 by `review_041/01_function_coverage.qmd`, on a function no
+test and no review file had ever called. **A regression introduced by a
+0.4.1 fix.**
+
+The straight-lining fix was correct: `quality_report()` now takes
+`straightline_min_items`, defaulting to 4, and records a shorter scale as
+`checked = FALSE` rather than reporting a false 0 percent. The bundled demo
+instrument's 5 scales are 2 or 3 items, so every one now comes back
+`checked = FALSE` with `flag_rate = NA`. `sframe_plot_quality()` drops the
+NA rows, finds none left, and returns `NULL`. The quality chart disappears
+from the rendered report with nothing said.
+
+Verified: with `straightline_min_items = 2` the same call returns a plot.
+
+This is the "can it say no?" shape recorded in `TESTING.md`. Returning
+`NULL` reads as "nothing was flagged" and means "nothing was long enough to
+check". The fix is to carry `checked = FALSE` through to the caller, as
+`quality_report()` already does, and have the report print a line saying why
+there is no chart rather than silently omitting it.

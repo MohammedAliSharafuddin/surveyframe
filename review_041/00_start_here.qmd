@@ -1,0 +1,130 @@
+---
+title: "0.4.1 review suite: start here"
+subtitle: "Read this first, then 01 and 02"
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    embed-resources: true
+editor: visual
+execute:
+  warning: false
+  message: false
+  error: true
+---
+
+```{r}
+#| label: setup
+#| include: false
+source("_setup.R")
+```
+
+## What this suite is for
+
+0.4.1 is a bug-fix release. Its scope is 4 defects found in the field plus
+the testing work that followed, so this suite is not a repeat of
+`review_040`'s 20-file sweep of every statistical method. It has 2 jobs the
+earlier suites did not do.
+
+**File 01 is a coverage ledger.** It enumerates the package's export list at
+render time and calls every function in it, so "all functions are tested" is
+a property that can be checked rather than a claim. A function added
+tomorrow shows up as an uncovered row on the next render.
+
+**File 02 is the Quarto audit.** The rendered report is the artefact a study
+is judged on. This file checks that the engine which produced it is the one
+the researcher thinks produced it, that the same inputs give the same
+report, and that the chain from instrument to hash to artefact holds.
+
+```{r}
+#| label: files
+files <- data.frame(
+  file = c("01_function_coverage.qmd", "02_quarto_reproducibility.qmd"),
+  covers = c("all 123 exports, smoke-called, with the gaps named",
+             "render_report()'s 2 engines, reproducibility, the audit chain"),
+  read_it = c("to see what is and is not exercised",
+              "before trusting any rendered report as evidence"),
+  stringsAsFactors = FALSE
+)
+knitr::kable(files, caption = "The suite")
+```
+
+## Read file 02 first if you are short of time
+
+Its finding is the one that affects every study run with this package: the
+report is **not reproducible**. `run_analysis_plan()` gives different answers
+on the same inputs, because 5 bootstrap confidence-interval helpers and the
+EFA parallel analysis run unseeded. The published interval moves between
+renders. File 02 section 3.1 has the detail and the owner decision it needs.
+
+## What this suite inherits, and what is new
+
+`review_040/HANDOVER.md` documents the file template, the comparison helpers,
+the token-saving rules, and 16 reference-call traps. All of it applies here
+unchanged and is not repeated. `_setup.R` in this directory is
+`review_040/_setup.R` plus 2 new sections.
+
+```{r}
+#| label: whats-new
+newbits <- data.frame(
+  helper = c("sf_exports()", "sf_smoke()", "sf_coverage_ledger()",
+             "sf_coverage_verdict()", "sf_report_engine()",
+             "sf_render_both_engines()", "sf_render_twice()"),
+  purpose = c("the export list, minus S3 methods",
+              "call one export and record what happened",
+              "every export against what the suite touched",
+              "the one-line summary and the uncovered rows",
+              "which engine produced a rendered report, read off the artefact",
+              "the same report down each engine, side by side",
+              "the same inputs twice, for a reproducibility check"),
+  stringsAsFactors = FALSE
+)
+knitr::kable(newbits, caption = "New in this suite's _setup.R")
+```
+
+## The build under review
+
+```{r}
+#| label: build
+b <- data.frame(
+  check = c("package version", "0.4.1 feature present",
+            "quarto available", "quarto version"),
+  value = c(as.character(utils::packageVersion("surveyframe")),
+            as.character(sf_is_041()),
+            as.character(sf_quarto_available()),
+            sf_quarto_version()),
+  stringsAsFactors = FALSE
+)
+knitr::kable(b, caption = "Build")
+```
+
+`sf_is_041()` tests for a feature rather than a version string, because
+DESCRIPTION reads `0.4.0.9000` on `dev` and `0.4.0` on `main`, so the number
+cannot tell the development build from the released one.
+
+## How to run it
+
+```r
+# from the repository root
+quarto render review_041/01_function_coverage.qmd
+quarto render review_041/02_quarto_reproducibility.qmd
+```
+
+Each file loads the working tree with `pkgload::load_all()` if an installed
+0.4.1 is not on the library path, so no install step is needed.
+
+Rendered `.html` output is gitignored, as in the other suites. Only the
+`.qmd` sources, `_setup.R`, and `HANDOVER.md` are tracked.
+
+## What to do with what you find
+
+Log it in `dogfeed.todo.md` rather than leaving it in a review file, so it
+survives into a release lane. Findings from this suite's first run are
+already logged there.
+
+## What is not here yet
+
+This suite covers breadth and the report. It does not repeat `review_040`'s
+per-method accuracy files, which remain valid for the statistics, nor
+`review_050`'s text-analysis files. `HANDOVER.md` lists the files that would
+complete it and what each would cover.
