@@ -78,3 +78,5 @@
 ^review_040($|/)
 ^mas_review_040\.(md|qmd|html)$
 ^review_050($|/)
+^bsr_paper_template\.docx$
+^review_032_functions\.R$
