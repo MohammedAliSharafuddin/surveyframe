@@ -398,6 +398,51 @@ justifying a submission of their own. The review suite's 8 defects still
 need owner decisions. Git history was rewritten on 2026-08-04, so any
 clone older than that is stale.
 
+**The demo library is built, 2026-08-28.** Twenty-two small demos in
+`inst/extdata/demos/`, each doing one job, so a failure points at one method
+rather than at the 34-block tourism instrument. They reach **all 59 analysis
+methods and all 15 item types**, asserted in `test-demo-library.R` against the
+package's own dispatch and `formals(sf_item)$type`, so a method added later
+holds the suite red until it has a demo. That assertion found 8 methods with
+no demo the first time it ran, including every topic-model and sentiment
+method.
+
+Each demo ships 4 artefacts: the instrument, the responses, a codebook
+carrying **variable and value labels**, and the results surveyframe produced.
+`sframe_export_labelled()` writes SPSS `.sav` or Stata `.dta` with the
+question wording and response options attached, so a reader can check our
+arithmetic in software they already trust. `haven` joins Suggests.
+`vignette("learn-by-example")` teaches from the library, with 22 generated
+screenshots of the real exported survey.
+
+Generators are `data-raw/build_demo_library.R` and
+`data-raw/capture_demo_screenshots.R`, both dev-only and force-added like
+`build_mcdm_fixture.R`. **The build generator runs each plan and refuses to
+write a demo whose blocks error**, which caught `frequencies` where the method
+is `frequency`, and caught `seminr_syntax()` correctly refusing a `cb_sem`
+model.
+
+**Three lessons from building it, all of which cost a cycle.**
+
+Effects have to be calibrated against what is delivered, not what was
+intended. Likert banding attenuates loadings, so a designed alpha of 0.82
+arrived as 0.68, and a population d of 0.8 drew a sample at 0.56.
+
+Screenshots have to be read back. The first capture run produced 17 pictures
+of a landing page, because every exported survey opens on a Start button. The
+second produced a picture of the consent gate correctly refusing to continue.
+Neither would have shown up in a file-size check.
+
+`utils::read.csv()` silently mangles a matrix column whose row label contains
+a space: `session__Opening keynote` becomes `session__Opening.keynote` and
+stops matching the instrument's contract. `sframe_demo()` reads with
+`check.names = FALSE`, and the vignette names the trap.
+
+**Still open on the demo work**: opening a generated `.sav` in a real copy of
+SPSS, JASP or jamovi. A `haven` round trip proves the file is well formed, and
+it does not prove the software displays the labels where a user expects them.
+That is a manual check.
+
 **Both fix branches are deleted, 2026-08-27.** `fix/sframe-format` was
 merged into `dev`. `fix/vignette-code-wrap` was redundant, since the
 `main` merge brings `a0d4465` itself, proved rather than assumed: its
