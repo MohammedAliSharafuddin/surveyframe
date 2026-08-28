@@ -7,6 +7,10 @@ inst/doc
 docs
 *.sframe
 !inst/extdata/*.sframe
+# The negation above does not recurse, so the demo library's instruments
+# need their own line. Without it all 23 .sframe files were ignored and
+# the library shipped as data with no instruments.
+!inst/extdata/demos/*.sframe
 *.tar.gz
 *.zip
 *.Rcheck/
