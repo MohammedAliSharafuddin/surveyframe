@@ -109,6 +109,19 @@ articles:
       - text-analysis
 
 reference:
+  - title: "Demo library"
+    desc: >
+      Twenty-two small demos, each doing one job, with an instrument,
+      response data, a codebook of variable and value labels, and the
+      results surveyframe produced. Load one, change it, and keep going.
+      See the "Learn by example" article.
+    contents:
+      - sframe_demos
+      - sframe_demo
+      - sframe_demo_branding
+      - sframe_demo_qmd
+      - sframe_export_labelled
+
   - title: "Design"
     desc: >
       Start visually in the HTML SurveyBuilder or construct instruments in R.
