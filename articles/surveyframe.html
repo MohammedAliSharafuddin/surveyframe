@@ -590,15 +590,15 @@ than looking identical to a signed-off one.</li>
 <span></span>
 <span><span class="fu"><a href="../reference/amendment_log.html">amendment_log</a></span><span class="op">(</span><span class="va">study_amended</span><span class="op">)</span></span>
 <span><span class="co">#&gt;              timestamp         reason_code</span></span>
-<span><span class="co">#&gt; 1 2026-08-28T16:50:14Z instrument_revision</span></span>
+<span><span class="co">#&gt; 1 2026-08-28T16:58:20Z instrument_revision</span></span>
 <span><span class="co">#&gt;                                    reason_text   tier author</span></span>
 <span><span class="co">#&gt; 1 Clarified item wording after pilot feedback. design   &lt;NA&gt;</span></span>
 <span><span class="co">#&gt;                                     deviation_report signoff</span></span>
 <span><span class="co">#&gt; 1 Wording only; the construct measured is unchanged.    none</span></span>
 <span><span class="co">#&gt;                                                      previous_hash</span></span>
-<span><span class="co">#&gt; 1 93aa8a61f8e3b36b52f0ead99b05ffa0f4cc103c2bfbce591e267998e45ccc28</span></span>
+<span><span class="co">#&gt; 1 5db62ecaf964f0adf537d83f1ab6187d11b9764d5f37d943bd2206e61b382f3a</span></span>
 <span><span class="co">#&gt;                                                           new_hash</span></span>
-<span><span class="co">#&gt; 1 f67479039f72bb1b02418a899ca1e586d627d5db1c789fea65e7e4c38a8e96dd</span></span>
+<span><span class="co">#&gt; 1 159dce85b361e9d6ee44e0ef60f583dd11dafb170403932a0d6645ff3cce0ba1</span></span>
 <span><span class="co">#&gt;   changed_fields</span></span>
 <span><span class="co">#&gt; 1          items</span></span></code></pre></div>
 <p><code><a href="../reference/amendment_log.html">amendment_log()</a></code> returns the full history as a data frame
@@ -671,7 +671,7 @@ GitHub Pages, shared by email, or opened directly from disk.</p>
 <span>  output_path <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"tourism_services_survey.html"</span><span class="op">)</span>,</span>
 <span>  open        <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; Static survey written to '/tmp/RtmpkKibbf/tourism_services_survey.html' (85.5</span></span>
+<span><span class="co">#&gt; Static survey written to '/tmp/RtmpQJW1mF/tourism_services_survey.html' (85.5</span></span>
 <span><span class="co">#&gt; KB).</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/files.html" class="external-link">file.exists</a></span><span class="op">(</span><span class="va">html_path</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
@@ -724,7 +724,7 @@ no string-splitting step.</p>
 <span>  sheet_url  <span class="op">=</span> <span class="st">"https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID"</span>,</span>
 <span>  output_dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; Apps Script written to: /tmp/RtmpkKibbf/surveyframe_collector.gs</span></span>
+<span><span class="co">#&gt; Apps Script written to: /tmp/RtmpQJW1mF/surveyframe_collector.gs</span></span>
 <span><span class="co">#&gt; Follow the setup instructions inside the file to deploy it.</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/files.html" class="external-link">file.exists</a></span><span class="op">(</span><span class="va">script_path</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
@@ -1724,7 +1724,7 @@ and descriptives alongside the analysis results.</p>
 <span>  output_file <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"tourism_results.html"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Results report written:"</span>, <span class="va">results_path</span>, <span class="st">"\n"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Results report written: /tmp/RtmpkKibbf/tourism_results.html</span></span>
+<span><span class="co">#&gt; Results report written: /tmp/RtmpQJW1mF/tourism_results.html</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Size:"</span>, <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.info.html" class="external-link">file.size</a></span><span class="op">(</span><span class="va">results_path</span><span class="op">)</span> <span class="op">/</span> <span class="fl">1024</span>, <span class="fl">1</span><span class="op">)</span>, <span class="st">"KB\n"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Size: 13.5 KB</span></span></code></pre></div>
 <p>The results report contains one section per research question, with
@@ -1748,7 +1748,7 @@ plain frequency bar.</p>
 <span>  include_analysis <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  include_models   <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; Report rendered with the Quarto engine: /tmp/RtmpkKibbf/tourism_report.html</span></span></code></pre></div>
+<span><span class="co">#&gt; Report rendered with the Quarto engine: /tmp/RtmpQJW1mF/tourism_report.html</span></span></code></pre></div>
 <hr>
 </div>
 <div class="section level2">
