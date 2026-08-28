@@ -36,7 +36,7 @@ sframe_theme_colour <- function(instrument, theme = NULL) {
   result <- switch(rule$operator,
     "=="   = any(dep_chr %in% rule_chr),
     "!="   = all(!dep_chr %in% rule_chr),
-    "%in%" = any(dep_chr %in% rule_chr),
+    "%in%" = any(trimws(dep_chr) %in% sframe_branch_in_values(rule$value)),
     ">"    = any(!is.na(dep_num) & !is.na(rule_num) & dep_num > rule_num),
     ">="   = any(!is.na(dep_num) & !is.na(rule_num) & dep_num >= rule_num),
     "<"    = any(!is.na(dep_num) & !is.na(rule_num) & dep_num < rule_num),

@@ -341,7 +341,11 @@ render_report <- function(
       include_analysis    = include_analysis,
       include_models      = include_models,
       plot_palette        = plot_palette,
-      instrument_hash     = sframe_hash_value(instrument)
+      instrument_hash     = sframe_hash_value(instrument),
+      # Passed rather than looked up inside the template: Quarto renders in a
+      # separate R session against the installed package, which is not
+      # necessarily the build doing the rendering.
+      analysis_seed       = as.character(sframe_report_seed(data, instrument))
     )
 
     param_args <- unlist(lapply(names(params), function(name) {
@@ -381,7 +385,7 @@ render_report <- function(
 
     if (isTRUE(quarto_ok)) {
       if (file.copy(rendered, dest, overwrite = TRUE)) {
-        return(invisible(dest))
+        return(sframe_report_result(dest, "quarto"))
       }
     }
   }
@@ -401,6 +405,39 @@ render_report <- function(
     interpretations     = interpretations
   )
 
+  sframe_report_result(dest, "html")
+}
+
+# render_report() has 2 engines and used to end both branches with the
+# destination path and nothing else, so a caller could not tell which one had
+# run. The 2 artefacts are not close substitutes: on the bundled demo the
+# Quarto render is roughly 5.8 MB and the base-R fallback roughly 1.9 MB, from
+# identical inputs. A study that treats the report as its audit artefact needs
+# to know which it is holding, and a script needs to be able to assert on it.
+#
+# The engine is announced 3 ways, because each serves a different reader: a
+# message for the person at the console, an attribute for a script, and a line
+# in the report itself for whoever opens the file later with no access to
+# either.
+# The seed a report's numbers were produced under. run_analysis_plan() records
+# it on its result; when there is no plan to run there is nothing random to
+# reproduce, so the field says so rather than printing a seed that governed
+# nothing.
+sframe_report_seed <- function(data, instrument) {
+  if (is.null(data) || length(instrument$analysis_plan %||% list()) == 0) {
+    return("not applicable, no analysis plan run")
+  }
+  formals(run_analysis_plan)$seed %||% "unseeded"
+}
+
+sframe_report_result <- function(dest, engine) {
+  rlang::inform(
+    paste0("Report rendered with the ",
+           if (identical(engine, "quarto")) "Quarto" else "built-in HTML",
+           " engine: ", dest),
+    class = "sframe_report_engine"
+  )
+  attr(dest, "engine") <- engine
   invisible(dest)
 }
 
@@ -495,9 +532,15 @@ sframe_clean_interpretations <- function(interpretations) {
         ),
         stringsAsFactors = FALSE
       )
+      # When there is no straight-lining chart, say why rather than leaving a
+      # gap. An absent chart otherwise reads as "nothing was flagged" when it
+      # can equally mean "no scale was long enough to check".
+      note <- sframe_quality_plot_note(qr)
       paste(
         "<h2>Data Quality</h2>",
         .render_report_table(summary_tbl, "Quality summary"),
+        if (!is.null(note)) sprintf("<p class=\"sf-note\">%s</p>",
+                                    htmltools_escape(note)) else NULL,
         collapse = "\n"
       )
     }
@@ -594,10 +637,17 @@ sframe_clean_interpretations <- function(interpretations) {
     )
   }
 
+  # The engine and the analysis seed sit next to the hash deliberately. The
+  # hash says which instrument this report describes. The engine says which of
+  # the 2 renderers produced it, since they produce different documents. The
+  # seed says what would be needed to get the same numbers again, because
+  # every bootstrap interval in the report depends on it.
   repro_tbl <- data.frame(
-    Field = c("Instrument hash", "Generated"),
+    Field = c("Instrument hash", "Rendering engine", "Analysis seed", "Generated"),
     Value = c(
       sframe_hash_value(instrument),
+      "built-in HTML",
+      as.character(sframe_report_seed(data, instrument)),
       format(Sys.time(), "%Y-%m-%d %H:%M %Z")
     ),
     stringsAsFactors = FALSE
@@ -784,7 +834,7 @@ sframe_clean_interpretations <- function(interpretations) {
       # extract_quotes() attaches $quotes (topic, rank, respondent, quote) to
       # a topic-model result: a second, separate table alongside the main
       # $table rather than a substitute for it, so it renders through the
-      # same generic table builder under its own heading (todo_0.5.md's
+      # same generic table builder under its own heading (todo_text_analysis.md's
       # ground-truth note: mirror the $syntax pattern, don't build a new
       # render_text_section()).
       quotes_html <- if (is.data.frame(result$quotes) && nrow(result$quotes) > 0) {

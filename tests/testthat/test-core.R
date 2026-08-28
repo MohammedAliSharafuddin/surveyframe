@@ -488,9 +488,46 @@ test_that("quality_report() flags straight-lining respondents", {
   resp  <- suppressWarnings(
     read_responses(resp, instr, respondent_id = "id",
                    submitted_at = "submitted_at"))
-  qr    <- quality_report(resp, instr)
+  # sat has 3 items, below the default straightline_min_items = 4, so the
+  # threshold is lowered explicitly here to exercise the detection logic
+  # itself. The default's own behaviour is covered separately below.
+  qr <- quality_report(resp, instr, straightline_min_items = 3)
   expect_true("sat" %in% names(qr$straightline))
+  expect_true(isTRUE(qr$straightline$sat$checked))
   expect_gte(length(qr$straightline$sat$flagged_rows), 5)
+})
+
+test_that("quality_report() does not check a scale shorter than straightline_min_items by default", {
+  # sat has 3 items. Real fix, 2026-08-26: a 2-item scale flagged 44 to 53%
+  # of a bundled demo instrument's respondents for giving the same answer
+  # to both items, which is what a genuinely consistent respondent does on
+  # a short scale, not evidence of inattention. The default threshold of 4
+  # keeps the check meaningful and marks a too-short scale as not checked
+  # rather than silently reporting a 0% flag rate that looks like a clean
+  # pass.
+  instr <- make_instrument()
+  resp  <- make_responses(20)
+  resp[1:20, c("sat_1","sat_2","sat_3")] <- 3
+  resp  <- suppressWarnings(
+    read_responses(resp, instr, respondent_id = "id",
+                   submitted_at = "submitted_at"))
+  qr <- quality_report(resp, instr)
+  expect_true("sat" %in% names(qr$straightline))
+  expect_false(isTRUE(qr$straightline$sat$checked))
+  expect_length(qr$straightline$sat$flagged_rows, 0)
+  expect_true(is.na(qr$straightline$sat$flag_rate))
+})
+
+test_that("straightline_min_items = 2 restores the previous, more permissive behaviour", {
+  instr <- make_instrument()
+  resp  <- make_responses(20)
+  resp[1:20, c("sat_1","sat_2","sat_3")] <- 3
+  resp  <- suppressWarnings(
+    read_responses(resp, instr, respondent_id = "id",
+                   submitted_at = "submitted_at"))
+  qr <- quality_report(resp, instr, straightline_min_items = 2)
+  expect_true(isTRUE(qr$straightline$sat$checked))
+  expect_equal(length(qr$straightline$sat$flagged_rows), 20)
 })
 
 test_that("quality_report() detects duplicate respondent IDs", {

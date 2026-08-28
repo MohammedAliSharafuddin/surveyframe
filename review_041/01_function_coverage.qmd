@@ -1,0 +1,524 @@
+---
+title: "01. Function coverage"
+subtitle: "Every exported function, called at least once, with the gaps named"
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    embed-resources: true
+editor: visual
+execute:
+  warning: false
+  message: false
+  error: true
+---
+
+```{r}
+#| label: setup
+#| include: false
+source("_setup.R")
+```
+
+"Comprehensive" has to be a property that can be checked, or it is a claim.
+This file enumerates the package's own export list **at render time** and
+calls every function in it, so a function added tomorrow appears as an
+uncovered row on the next render rather than quietly going untested.
+
+This is a smoke pass, not an accuracy pass. It asks whether each function
+can be called and what it returns. Whether the answer is *right* is what
+the per-family files are for, here and in `review_040`. Both matter, and
+they fail differently: an accuracy file cannot find a defect in a function
+nobody ever calls, and several of this package's defects lived in exactly
+such paths.
+
+## 1. The export list
+
+```{r}
+#| label: exports
+ex <- sf_exports()
+cat(sprintf("%d exported objects, excluding S3 methods, which are exercised\nthrough their generics rather than by name.\n", length(ex)))
+```
+
+```{r}
+#| label: export-families
+family <- function(f) {
+  if (grepl("^sf_(item|choices|scale|branch|check|instrument|model|construct|path|indirect|covariance|conjoint)", f)) "construction"
+  else if (grepl("^(sf_(meta|items|scales|choice_sets|branches|checks|models|plan|id|label|apa|flagged|is_valid|problems|object)|as_sframe)", f)) "accessors"
+  else if (grepl("^(read_|write_|export_|link_git|amend|amendment)", f)) "io and provenance"
+  else if (grepl("^(validate_|sframe_check)", f)) "validation"
+  else if (grepl("^(run_analysis|score_|assumption_|posthoc_|efa_|cfa_|sem_|seminr_|item_report|reliability_|validity_|quality_|codebook_|missing)", f)) "analysis"
+  else if (grepl("^(bootstrap_ci|cohens_d_ci|eta_sq_ci|cramers_v_ci|sample_size)", f)) "inference helpers"
+  else if (grepl("(topsis|ahp|anp|dematel|vikor|moora|smart|waspas|promethee|electre|decision|sensitivity)", f, ignore.case = TRUE)) "decision analysis"
+  else if (grepl("(term_|ngram|cooccur|co_occurrence|sentiment|topic|quote|clean_text)", f)) "text analysis"
+  else if (grepl("^(sframe_plot|sframe_draw|theme_surveyframe|sframe_likert_scale_groups)", f)) "plotting"
+  else if (grepl("^(render_|launch_|survey_module|studio)", f)) "reporting and apps"
+  else "other"
+}
+fam <- vapply(ex, family, character(1))
+knitr::kable(as.data.frame(table(family = fam), responseName = "functions"),
+             caption = "Exports by family")
+```
+
+## 2. Fixtures the smoke pass calls against
+
+One small instrument with a plan, one bundled demo, one decision instrument.
+Between them they satisfy the argument requirements of nearly every export.
+
+```{r}
+#| label: fixtures
+set.seed(41)
+
+inst <- sf_instrument(
+  title = "Coverage", version = "1.0.0",
+  components = list(
+    sf_choices("ag5", 1:5, c("Strongly disagree", "Disagree", "Neutral",
+                             "Agree", "Strongly agree")),
+    sf_choices("grp", c("a", "b"), c("Group A", "Group B")),
+    sf_item("g",  "Group",  type = "single_choice", choice_set = "grp"),
+    sf_item("q1", "Item 1", type = "likert", choice_set = "ag5", scale_id = "S"),
+    sf_item("q2", "Item 2", type = "likert", choice_set = "ag5", scale_id = "S"),
+    sf_item("q3", "Item 3", type = "likert", choice_set = "ag5", scale_id = "S"),
+    sf_item("age", "Age", type = "numeric"),
+    sf_item("open", "Anything else?", type = "textarea"),
+    sf_scale("S", "Satisfaction", items = c("q1", "q2", "q3"))
+  ),
+  analysis_plan = list(
+    list(id = "RQ1", research_question = "What are the distributions?",
+         family = "descriptive", method = "frequencies",
+         roles = list(variables = "q1")),
+    list(id = "RQ2", research_question = "Do the groups differ?",
+         family = "group_comparison", method = "t_test_ind",
+         roles = list(outcome = "age", group = "g"))
+  )
+)
+
+n <- 80
+dat <- data.frame(
+  respondent_id = sprintf("r%02d", seq_len(n)),
+  g   = sample(c("a", "b"), n, TRUE),
+  q1  = sample(1:5, n, TRUE), q2 = sample(1:5, n, TRUE), q3 = sample(1:5, n, TRUE),
+  age = round(rnorm(n, 40, 10)),
+  open = sample(c("the service was good", "slow but polite",
+                  "very helpful staff", "too expensive"), n, TRUE),
+  stringsAsFactors = FALSE
+)
+resp <- read_responses(dat, inst, respondent_id = "respondent_id")
+demo <- sframe_demo_data()
+
+fx <- data.frame(
+  fixture = c("inst", "resp", "demo$instrument", "demo$responses"),
+  what = c("3-item scale, 1 group, 1 numeric, 1 open text, 2-block plan",
+           paste(nrow(resp), "simulated responses"),
+           "bundled tourism instrument", "bundled tourism responses"),
+  stringsAsFactors = FALSE
+)
+knitr::kable(fx, caption = "Fixtures")
+```
+
+## 3. The smoke pass
+
+Each call is recorded with `sf_smoke()`. `ok` means it returned a value.
+`ERROR` means it raised where a value was expected, and is a finding.
+`skipped` means calling it needs a browser, a network, or a human, and the
+reason is recorded rather than the row being omitted.
+
+```{r}
+#| label: smoke-construction
+sf_smoke("sf_instrument", inst)
+sf_smoke("sf_item", sf_item("x", "X", type = "text"))
+sf_smoke("sf_choices", sf_choices("c1", 1:2, c("a", "b")))
+sf_smoke("sf_scale", sf_scale("S2", "S2", items = c("q1", "q2")))
+sf_smoke("sf_branch", sf_branch("q2", "q1", "%in%", c(4, 5)))
+sf_smoke("sf_check", sf_check("chk1", item_id = "q1", type = "attention",
+                              pass_values = 3))
+sf_smoke("sf_model", sf_model(id = "m", type = "cfa",
+  constructs = list(sf_construct("S", items = c("q1", "q2", "q3")))))
+sf_smoke("sf_construct", sf_construct("S", items = c("q1", "q2")))
+sf_smoke("sf_path", sf_path("A", "B"))
+sf_smoke("sf_indirect", sf_indirect("A", "B", "C"))
+sf_smoke("sf_covariance", sf_covariance("A", "B"))
+```
+
+```{r}
+#| label: smoke-accessors
+sf_smoke("sf_meta", sf_meta(inst))
+sf_smoke("sf_items", sf_items(inst))
+sf_smoke("sf_scales", sf_scales(inst))
+sf_smoke("sf_choice_sets", sf_choice_sets(inst))
+sf_smoke("sf_branches", sf_branches(inst))
+sf_smoke("sf_checks", sf_checks(inst))
+sf_smoke("sf_models", sf_models(inst))
+sf_smoke("sf_plan", sf_plan(inst))
+sf_smoke("sf_plan<-", { i2 <- inst; sf_plan(i2) <- sf_plan(inst); sf_plan(i2) })
+sf_smoke("sf_id", sf_id(sf_items(inst)[[1]]))
+sf_smoke("sf_label", sf_label(sf_items(inst)[[1]]))
+sf_smoke("as_sframe", as_sframe(validate_sframe(inst, strict = FALSE)))
+sf_smoke("sf_is_valid", sf_is_valid(validate_sframe(inst, strict = FALSE)))
+sf_smoke("sf_problems", sf_problems(validate_sframe(inst, strict = FALSE)))
+sf_smoke("sf_object", sf_object(validate_sframe(inst, strict = FALSE)))
+```
+
+```{r}
+#| label: smoke-io
+p_sf <- tempfile(fileext = ".sframe")
+sf_smoke("write_sframe", write_sframe(inst, p_sf, overwrite = TRUE))
+sf_smoke("read_sframe", read_sframe(p_sf))
+sf_smoke("validate_sframe", validate_sframe(inst, strict = FALSE))
+sf_smoke("read_responses", read_responses(dat, inst, respondent_id = "respondent_id"))
+sf_smoke("export_static_survey",
+         export_static_survey(inst, tempfile(fileext = ".html"),
+                              open = FALSE, overwrite = TRUE))
+sf_smoke("export_google_sheet",
+         export_google_sheet(inst, sheet_url = "https://example.com/x",
+                             output_dir = tempdir()))
+sf_smoke("read_sheet_responses", NULL, expect = "skip",
+         note = "needs a live Google Sheet and network")
+sf_smoke("amend_sframe", {
+  rev <- inst; rev$meta$title <- "Coverage v2"
+  # instrument_revision is a design-tier reason, and the package rightly
+  # refuses one without a deviation report. That refusal is the behaviour
+  # worth having, so the smoke call satisfies it rather than working round it.
+  amend_sframe(inst, rev, reason_code = "instrument_revision",
+               reason_text = "smoke test", author = "reviewer",
+               deviation_report = "Title reworded during coverage smoke test.")
+})
+```
+
+```{r}
+#| label: smoke-analysis
+sf_smoke("run_analysis_plan", run_analysis_plan(resp, inst))
+sf_smoke("score_scales", score_scales(resp, inst))
+sf_smoke("reliability_report", reliability_report(resp, inst))
+sf_smoke("item_report", item_report(resp, inst))
+sf_smoke("quality_report", quality_report(resp, inst))
+sf_smoke("codebook_report", codebook_report(inst))
+sf_smoke("missing_report", missing_report(resp, inst))
+sf_smoke("assumption_report", assumption_report(resp, inst))
+sf_smoke("descriptives_report", descriptives_report(resp, variables = c("age", "q1")))
+sf_smoke("cfa_syntax", cfa_syntax(inst))
+sf_smoke("sample_size_plan", sample_size_plan("mean", margin_error = 0.5, sd = 1))
+```
+
+```{r}
+#| label: smoke-inference
+sf_smoke("bootstrap_ci", bootstrap_ci(resp$age, seed = 1))
+sf_smoke("cohens_d_ci", cohens_d_ci(resp$age[resp$g == "a"], resp$age[resp$g == "b"]))
+sf_smoke("eta_sq_ci", eta_sq_ci(resp$age, resp$g))
+sf_smoke("cramers_v_ci", cramers_v_ci(table(resp$g, resp$q1)))
+```
+
+```{r}
+#| label: smoke-text
+txt <- resp$open[!is.na(resp$open)]
+sf_smoke("clean_text_responses", clean_text_responses(data.frame(open = txt), "open"))
+sf_smoke("term_frequency", term_frequency(txt))
+sf_smoke("ngram_frequency", ngram_frequency(txt, n = 2))
+sf_smoke("extract_quotes", NULL, expect = "skip",
+         note = "needs a fitted stm topic model")
+```
+
+```{r}
+#| label: smoke-plots
+# Plot functions are the least-covered family in the package: 5 of them were
+# called by no test and no review file before this suite existed.
+rel <- reliability_report(resp, inst)
+sf_smoke("theme_surveyframe", theme_surveyframe())
+sf_smoke("sframe_plot_descriptives",
+         sframe_plot_descriptives(descriptives_report(resp, variables = "age"), resp))
+sf_smoke("sframe_plot_missingness",
+         sframe_plot_missingness(missing_data_report(resp, inst)))
+sf_smoke("sframe_plot_quality", sframe_plot_quality(quality_report(resp, inst)))
+sf_smoke("sframe_plot_reliability", sframe_plot_reliability(rel))
+sf_smoke("sframe_plot_term_frequency", NULL, expect = "skip",
+         note = "takes an analysis-plan result, not term_frequency() output, see 4.1")
+sf_smoke("sframe_plot_ngram_frequency", NULL, expect = "skip",
+         note = "takes an analysis-plan result, not ngram_frequency() output, see 4.1")
+sf_smoke("sframe_likert_scale_groups", sframe_likert_scale_groups(inst))
+```
+
+```{r}
+#| label: smoke-reporting
+sf_smoke("render_report",
+         render_report(inst, resp, output_path = tempfile(fileext = ".html")))
+sf_smoke("launch_builder", NULL, expect = "skip", note = "opens a browser")
+sf_smoke("launch_studio", NULL, expect = "skip", note = "starts a Shiny app")
+sf_smoke("launch_dashboard", NULL, expect = "skip", note = "starts a Shiny app")
+sf_smoke("launch_builder_demo", NULL, expect = "skip", note = "opens a browser")
+sf_smoke("launch_dashboard_demo", NULL, expect = "skip", note = "starts a Shiny app")
+sf_smoke("survey_module_ui", NULL, expect = "skip", note = "Shiny module, needs a session")
+sf_smoke("survey_module_server", NULL, expect = "skip", note = "Shiny module, needs a session")
+sf_smoke("sframe_demo_data", sframe_demo_data())
+sf_smoke("sframe_input_types_demo_data", sframe_input_types_demo_data())
+```
+
+```{r}
+#| label: smoke-decision
+hotel <- read_sframe(sf_fixture("hotel_supplier_mcdm.sframe"))
+sf_smoke("sframe_decision_options", sframe_decision_options(hotel))
+sf_smoke("sf_conjoint_design",
+         sf_conjoint_design("cj1",
+                            attributes = list(brand = c("A", "B"),
+                                              price = c("1", "2")),
+                            method = "full"))
+```
+
+```{r}
+#| label: smoke-models
+mdl <- sf_model(id = "m", type = "cfa", engine = "lavaan",
+  constructs = list(sf_construct("S", items = c("q1", "q2", "q3"))))
+# Both engines require at least 1 structural path, which validate_model()
+# says plainly rather than generating empty syntax. A 2-construct model is
+# the smallest thing that satisfies it.
+two_con <- list(sf_construct("S", items = c("q1", "q2")),
+                sf_construct("T", items = c("q3", "age")))
+sem_mdl <- sf_model(id = "sm", type = "cb_sem", engine = "lavaan",
+  constructs = two_con, paths = list(sf_path("S", "T")))
+pls_mdl <- sf_model(id = "pm", type = "pls_sem", engine = "seminr",
+  constructs = list(sf_construct("S", items = c("q1", "q2"), mode = "composite"),
+                    sf_construct("T", items = c("q3", "age"), mode = "composite")),
+  paths = list(sf_path("S", "T")))
+sf_smoke("validate_model", validate_model(mdl, instrument = inst, strict = FALSE))
+sf_smoke("add_model", add_model(inst, mdl))
+sf_smoke("model_json", model_json(mdl))
+sf_smoke("model_report_template", model_report_template(mdl))
+sf_smoke("cfa_lavaan_syntax", cfa_lavaan_syntax(inst, mdl))
+sf_smoke("sem_lavaan_syntax", sem_lavaan_syntax(sem_mdl, inst))
+sf_smoke("seminr_syntax", seminr_syntax(pls_mdl))
+sf_smoke("efa_syntax", efa_syntax(items = c("q1", "q2", "q3"), nfactors = 1))
+```
+
+```{r}
+#| label: smoke-reports-2
+sf_smoke("missing_data_report", missing_data_report(resp, inst))
+sf_smoke("outlier_report", outlier_report(resp, variables = "age"))
+sf_smoke("posthoc_report",
+         posthoc_report(resp, method = "anova", outcome = "age", group = "g"))
+sf_smoke("amendment_log", amendment_log(inst))
+sf_smoke("link_git_commit", link_git_commit(inst, repo_path = "."))
+sf_smoke("term_context", term_context(txt, term = "good"))
+sf_smoke("sf_apa", sf_apa(run_analysis_plan(resp, inst)))
+sf_smoke("sf_flagged", sf_flagged(quality_report(resp, inst)))
+sf_smoke("sframe_codebook_items_display",
+         sframe_codebook_items_display(codebook_report(inst)))
+```
+
+```{r}
+#| label: smoke-efa
+# The demo instrument has enough items for a factor solution. The coverage
+# fixture's 3-item scale does not.
+efa_ok <- tryCatch({
+  ef <- efa_solution(demo$responses, demo$instrument, nfactors = 2)
+  TRUE
+}, error = function(e) FALSE)
+if (efa_ok) {
+  sf_smoke("efa_solution", efa_solution(demo$responses, demo$instrument, nfactors = 2))
+  sf_smoke("efa_report", efa_report(demo$responses, demo$instrument, nfactors = 2))
+  er <- efa_report(demo$responses, demo$instrument, nfactors = 2)
+  sf_smoke("sframe_plot_efa_loadings", sframe_plot_efa_loadings(ef))
+  sf_smoke("sframe_plot_efa_scree", sframe_plot_efa_scree(er))
+} else {
+  for (f in c("efa_solution", "efa_report", "sframe_plot_efa_loadings",
+              "sframe_plot_efa_scree")) {
+    sf_smoke(f, NULL, expect = "skip", note = "no EFA solution on this fixture")
+  }
+}
+```
+
+```{r}
+#| label: smoke-builder-state
+sf_smoke("sframe_builder_empty_state", sframe_builder_empty_state())
+sf_smoke("sframe_builder_state_from_instrument",
+         sframe_builder_state_from_instrument(inst))
+sf_smoke("sframe_builder_validate_draft", {
+  st <- sframe_builder_state_from_instrument(inst)
+  sframe_builder_validate_draft(st$meta, st$choices, st$items, st$scales,
+                                st$branching, st$checks, st$analysis_plan,
+                                st$models, st$render)
+})
+```
+
+```{r}
+#| label: smoke-decision-2
+sf_smoke("sframe_assemble_pairwise", NULL, expect = "skip",
+         note = "needs collected pairwise judgements, covered in review_040 file 13")
+sf_smoke("sframe_aggregate_judgements", NULL, expect = "skip",
+         note = "needs collected pairwise judgements, covered in review_040 file 13")
+sf_smoke("sframe_collected_weights", NULL, expect = "skip",
+         note = "needs a criteria_weight item with data, covered in review_040 file 13")
+sf_smoke("sframe_rated_matrix", NULL, expect = "skip",
+         note = "needs a rated performance matrix, covered in review_040 file 13")
+sf_smoke("sensitivity_analysis", NULL, expect = "skip",
+         note = "needs an MCDA result, covered in review_040 file 15")
+```
+
+```{r}
+#| label: smoke-plots-2
+# The remaining plot builders. Several take a result object rather than data,
+# so each is fed the result its own family produces.
+res <- run_analysis_plan(resp, inst)
+cs  <- sf_choice_sets(inst)[["ag5"]]
+sf_smoke("sframe_plot_correlation_matrix",
+         sframe_plot_correlation_matrix(resp, vars = c("q1", "q2", "q3")))
+sf_smoke("sframe_plot_variable_distribution",
+         sframe_plot_variable_distribution(resp, "age"))
+sf_smoke("sframe_plot_scale_chart",
+         sframe_plot_scale_chart(score_scales(resp, inst)[["S"]], "Satisfaction"))
+sf_smoke("sframe_plot_item_chart",
+         sframe_plot_item_chart(sf_items(inst)[["q1"]], resp$q1, cs))
+sf_smoke("sframe_plot_likert_scale", NULL, expect = "skip",
+         note = "needs the choice-set object shape used inside render_report()")
+sf_smoke("sframe_draw_likert_diverging",
+         sframe_draw_likert_diverging(table(resp$q1)))
+sf_smoke("sframe_plot_validity", NULL, expect = "skip",
+         note = "needs a validity_report(), which needs a fitted factor solution")
+sf_smoke("validity_report", NULL, expect = "skip",
+         note = "needs loadings and construct scores from a fitted model")
+for (f in c("sframe_plot_group_comparison", "sframe_plot_paired_comparison",
+            "sframe_plot_regression_diagnostics", "sframe_plot_decision_ranking",
+            "sframe_plot_dematel_influence", "sframe_plot_cooccurrence",
+            "sframe_plot_cooccurrence_network", "sframe_plot_sentiment",
+            "sframe_plot_topics", "sframe_plot_likert_matrix",
+            "sframe_draw_mosaic")) {
+  sf_smoke(f, NULL, expect = "skip",
+           note = "takes a result object from its own family, covered where that family is")
+}
+```
+
+```{r}
+#| label: smoke-render
+sf_smoke("render_survey", NULL, expect = "skip",
+         note = "mode is \"shiny\" only, the static route is export_static_survey()")
+sf_smoke("render_results",
+         render_results(res, inst, output_path = tempfile(fileext = ".html")))
+sf_smoke("launch_studio_demo", NULL, expect = "skip", note = "starts a Shiny app")
+```
+
+## 4. The ledger
+
+Every export, and what this suite did with it. Rows reading `NOT EXERCISED`
+are the honest gaps.
+
+```{r}
+#| label: ledger
+ledger <- sf_coverage_ledger(
+  also_called_in = list.files(".", pattern = "\\.qmd$", full.names = TRUE))
+knitr::kable(ledger, caption = "Coverage ledger, all exports")
+```
+
+```{r}
+#| label: ledger-verdict
+uncovered <- sf_coverage_verdict(ledger)
+```
+
+### 4.1 What the ledger found on its first run, and how it was resolved
+
+Writing this file was itself a test of the argument for it, and it found 2
+things on functions **no test and no review file had ever called**.
+
+**A regression in 0.4.1, from a fix in 0.4.1.**
+`sframe_plot_quality()` returns `NULL` on the bundled demo.
+
+```{r}
+#| label: quality-plot-regression
+q_default <- quality_report(demo$responses, demo$instrument)
+q_low     <- quality_report(demo$responses, demo$instrument,
+                            straightline_min_items = 2)
+scale_sizes <- vapply(demo$instrument$scales, function(s) length(s$items), integer(1))
+
+reg <- data.frame(
+  fact = c("longest scale in the demo instrument",
+           "straightline_min_items default in 0.4.1",
+           "scales actually checked",
+           "sframe_plot_quality() with the default",
+           "sframe_plot_quality() with the threshold lowered to 2"),
+  value = c(max(scale_sizes), 4L,
+            sum(vapply(q_default$straightline,
+                       function(s) isTRUE(s$checked), logical(1))),
+            if (is.null(sframe_plot_quality(q_default))) "NULL" else "a plot",
+            if (is.null(sframe_plot_quality(q_low))) "NULL" else "a plot"),
+  stringsAsFactors = FALSE
+)
+knitr::kable(reg, caption = "Why the quality plot disappeared")
+```
+
+The 0.4.1 fix stopping `quality_report()` from straight-line-checking scales
+shorter than 4 items was correct, and the bundled instrument's 5 scales are
+all 2 or 3 items. Every scale therefore comes back `checked = FALSE` with
+`flag_rate = NA`, `sframe_plot_quality()` drops the NA rows, finds none left,
+and returns `NULL`. The quality chart vanishes from the rendered report with
+nothing said.
+
+```{r}
+#| label: quality-plot-verdict
+qp <- compare_table(
+  compare_row("quality plot returns NULL when no scale is checkable",
+              as.numeric(is.null(sframe_plot_quality(q_default))), 1,
+              "correct, there is nothing to draw"),
+  compare_row("and the reason is available to the caller",
+              as.numeric(grepl("long enough to check",
+                               sframe_quality_plot_note(q_default) %||% "")),
+              1, "sframe_quality_plot_note()"),
+  compare_row("it renders once a scale is long enough to check",
+              as.numeric(!is.null(sframe_plot_quality(q_low))), 1,
+              "threshold lowered to 2"),
+  compare_row("and then the note falls silent",
+              as.numeric(is.null(sframe_quality_plot_note(q_low))), 1,
+              "no note when there is a chart")
+)
+compare_report(qp, caption = "Quality plot and its explanation")
+sf_log(qp)
+```
+
+- [x] **Fixed 2026-08-28.** `sframe_plot_quality()` still returns `NULL`,
+      which is right when there is nothing to draw, and
+      `sframe_quality_plot_note()` now carries the reason.
+      `render_report()` prints it where the figure would have been, so an
+      absent chart says "no scale was long enough to check" instead of
+      reading as "nothing was flagged".
+
+**Five plot builders take a result object, not the data.**
+`sframe_plot_term_frequency()`, `sframe_plot_ngram_frequency()` and their
+neighbours expect the analysis-plan runner's result, with `$table` and
+`$options`, rather than the output of the same-named helper
+(`term_frequency()`). Handed the wrong shape they return `NULL` rather than
+saying so, which is the same "can it say no?" pattern. They are recorded as
+skipped above and belong in a text-analysis accuracy file, alongside
+`review_050`.
+
+**Eight of the first-draft rows in this file were my own errors, not the
+package's**: wrong argument order, an argument that does not exist, and a
+`mode` value that is not accepted. That ratio is worth stating, because the
+lesson from earlier releases holds. A surprising failure is worth
+attributing before it is reported.
+
+```{r}
+#| label: coverage-comparison
+cov_tab <- compare_table(
+  compare_row("every export accounted for in the ledger",
+              nrow(ledger), length(sf_exports()), "sf_exports()"),
+  compare_row("exports raising an unexpected error",
+              sum(ledger$status == "ERROR"), 0, "sf_smoke()"),
+  # 1 export returns NULL by design: sframe_plot_quality() has nothing to
+  # draw when no scale is long enough to straight-line check, and
+  # sframe_quality_plot_note() carries the reason. Asserted as 1 rather than
+  # 0 so a second NULL-returning export shows up as a DIFFERS.
+  compare_row("exports returning NULL, all of them documented",
+              sum(ledger$status == "NULL"), 1, "sf_smoke(), see 4.1")
+)
+compare_report(cov_tab, caption = "Coverage")
+sf_log(cov_tab)
+```
+
+## 5. Sign-off
+
+```{r}
+#| label: verdict
+sf_verdict()
+```
+
+- [ ] The ledger accounts for every export, with no row reading
+      `NOT EXERCISED` that is not either a launcher, a Shiny module, or
+      documented in section 4 as needing a human.
+- [ ] No row reads `ERROR`.
+- [ ] Any new export added since the last render appears here and has been
+      given a smoke call.

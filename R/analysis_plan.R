@@ -1184,9 +1184,17 @@ sframe_quality_checks_table <- function(qr) {
     )
   }
   for (s in qr$straightline %||% list()) {
+    # A scale below straightline_min_items carries flag_rate = NA and
+    # checked = FALSE (see quality_report()), so it is reported as
+    # not checked rather than as sprintf() silently rendering "NA% flagged".
+    result_text <- if (isFALSE(s$checked)) {
+      sprintf("not checked, %d items", s$n_items %||% NA_integer_)
+    } else {
+      sprintf("%.1f%% flagged", (s$flag_rate %||% NA_real_) * 100)
+    }
     rows[[length(rows) + 1]] <- data.frame(
       Check = s$scale_id %||% "", Type = "Straight-lining",
-      Result = sprintf("%.1f%% flagged", (s$flag_rate %||% NA_real_) * 100),
+      Result = result_text,
       stringsAsFactors = FALSE
     )
   }
@@ -1212,7 +1220,7 @@ sframe_run_one_block <- function(block, data, instrument, plots = FALSE,
   if (length(weights) > 0 && is.null(options$weights)) {
     options$weights <- weights[1]
   }
-  # Optional `group` role on term_freq/tidy_sentiment (todo_0.5.md section
+  # Optional `group` role on term_freq/tidy_sentiment (todo_text_analysis.md section
   # 1a): resolved into options the same way weights is above, so the 2
   # runners read options$group without knowing about roles at all. Additive
   # only, so every other method's options are untouched.
@@ -1374,6 +1382,14 @@ sframe_run_one_block <- function(block, data, instrument, plots = FALSE,
 #'   bar charts for frequency and chi-square blocks, scatter plots with a
 #'   regression overlay for correlation and linear-regression blocks.
 #'   Defaults to `FALSE`.
+#' @param seed Integer or `NULL`. The random seed the analysis runs under.
+#'   Defaults to a fixed value so the same instrument and the same data give
+#'   the same answer every time, which is what makes a rendered report usable
+#'   as an audit artefact. Every bootstrap confidence interval in the plan, and
+#'   the parallel analysis behind the EFA family, depend on it. Pass `NULL` for
+#'   the unseeded behaviour of releases before 0.4.1. The caller's own random
+#'   stream is restored afterwards, so seeding here does not affect anything
+#'   that runs later.
 #' @param plot_palette One of `"web"` (brand colours, for on-screen use) or
 #'   `"print"` (black, grey, and white, for journal-ready print figures).
 #'   Applied to every plot attached when `plots = TRUE`. See `sframe_brand()`.
@@ -1405,10 +1421,33 @@ sframe_run_one_block <- function(block, data, instrument, plots = FALSE,
 #' print(results)
 #' }
 run_analysis_plan <- function(data, instrument, scored = TRUE, plots = FALSE,
-                              plot_palette = c("web", "print")) {
+                              plot_palette = c("web", "print"), seed = 20260828L) {
   plot_palette <- match.arg(plot_palette)
   sframe_check_instrument(instrument)
   stopifnot(is.data.frame(data))
+
+  # Seeded by default since 0.4.1. Every bootstrap confidence interval in this
+  # function, and the parallel analysis inside the EFA path, drew from the
+  # global RNG without a seed, so the same instrument and the same data gave
+  # different intervals on every run: 32 of 1768 values moved between 2 runs
+  # of the bundled demo, and the movement reached the APA string a researcher
+  # would quote. A report that changes between renders cannot be the audit
+  # artefact of a study, which is what render_report() output is for.
+  #
+  # Seeding once here rather than threading `seed` through every helper keeps
+  # the change to one place and covers anything random the plan reaches.
+  # sframe_with_seed() restores the caller's RNG state on exit, so a plan run
+  # does not reset randomness for unrelated code afterwards. Pass seed = NULL
+  # for the pre-0.4.1 behaviour.
+  if (!is.null(seed)) {
+    out <- sframe_with_seed(seed, run_analysis_plan(
+      data, instrument, scored = scored, plots = plots,
+      plot_palette = plot_palette, seed = NULL))
+    # Recorded so render_report() can print it next to the instrument hash: a
+    # report should state what reproducing it would take.
+    attr(out, "seed") <- seed
+    return(out)
+  }
   if (isTRUE(plots)) {
     rlang::check_installed("ggplot2",
       reason = "to attach plots to analysis results (plots = TRUE).")

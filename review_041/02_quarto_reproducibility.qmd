@@ -1,0 +1,514 @@
+---
+title: "02. Quarto rendering, audit and reproducibility"
+subtitle: "Which engine actually produced the report in front of you"
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    embed-resources: true
+editor: visual
+execute:
+  warning: false
+  message: false
+  error: true
+---
+
+```{r}
+#| label: setup
+#| include: false
+source("_setup.R")
+```
+
+The rendered report is the audit artefact of a surveyframe study. It is what
+a supervisor, a reviewer, or an ethics panel is shown, and the claim it
+carries is that the numbers in it came from this instrument and this data,
+reproducibly. This file checks that claim rather than assuming it.
+
+`render_report()` has **2 engines**. It prefers Quarto, rendering
+`inst/templates/report.qmd` with the instrument, the data, and the
+instrument hash passed as parameters. If Quarto is missing, or its render
+fails for any reason, it falls back to a base-R HTML writer in
+`.render_report_html()`.
+
+The fallback is the thing to look at closely. It is the correct engineering
+choice, since a user without Quarto should still get a report. Whether the
+user can **tell which one they got** is a separate question, and it is the
+one that matters for an audit.
+
+## 1. Is Quarto present on this machine, and is the template shipped?
+
+```{r}
+#| label: environment
+env <- data.frame(
+  check = c("quarto on PATH", "quarto version",
+            "report.qmd shipped in the installed package",
+            "surveyframe.use_quarto option"),
+  value = c(
+    sf_quarto_bin(),
+    sf_quarto_version(),
+    system.file("templates", "report.qmd", package = "surveyframe"),
+    as.character(getOption("surveyframe.use_quarto", TRUE))
+  ),
+  stringsAsFactors = FALSE
+)
+knitr::kable(env, caption = "Rendering environment")
+```
+
+If `quarto on PATH` is empty, every result below describes the fallback and
+the Quarto claims in this file are untested rather than passed. That
+distinction is the whole point of the section, so read the table before the
+rest.
+
+```{r}
+#| label: gate
+quarto_here <- sf_quarto_available()
+if (!quarto_here) {
+  cat("Quarto is NOT installed on this machine.\n",
+      "Everything below reports the fallback engine only.\n",
+      "Install Quarto and re-render before signing this file off.\n")
+}
+```
+
+## 2. Both engines, on the same instrument and the same data
+
+The bundled tourism demo is the realistic case: a full instrument with
+responses, the shape a real study hands to `render_report()`.
+
+```{r}
+#| label: both-engines
+demo <- sframe_demo_data()
+engines <- sf_render_both_engines(demo$instrument, demo$responses)
+knitr::kable(engines, caption = "The same report down each engine")
+```
+
+Two things to read here.
+
+`engine_used` is detected by inspecting the artefact, not by trusting the
+request. `sf_report_engine()` looks for Quarto's own generator metadata and
+runtime identifiers in the HTML. A row where `requested` is `quarto` and
+`engine_used` is `fallback (base R)` means the fallback fired **silently**,
+which is exactly the case an auditor needs to be able to see.
+
+`hash_stamped` asks whether the instrument's SHA-256 appears in the rendered
+document. That is the link between the artefact and the instrument it claims
+to describe. A report without it cannot be tied back to anything.
+
+```{r}
+#| label: engine-comparison
+tab <- compare_table(
+  compare_row("quarto engine used when quarto requested",
+              as.numeric(engines$engine_used[1] == "quarto"), 1,
+              "sf_report_engine() on the artefact"),
+  compare_row("instrument hash stamped, quarto engine",
+              as.numeric(engines$hash_stamped[1]), 1, "grep on the artefact"),
+  compare_row("instrument hash stamped, fallback engine",
+              as.numeric(engines$hash_stamped[2]), 1, "grep on the artefact"),
+  compare_row("both engines produced a file",
+              as.numeric(all(!is.na(engines$size_kb))), 1, "file.exists()")
+)
+compare_report(tab, caption = "Engine selection and hash stamping")
+sf_log(tab)
+```
+
+### The finding this file exists for
+
+**A caller cannot tell which engine rendered their report.** Both paths end
+in `return(invisible(dest))` and hand back a file path. There is no return
+value, attribute, message, or metadata field naming the engine. The only way
+to find out, the one used above, is to read the HTML afterwards and look for
+Quarto's fingerprint.
+
+The 2 artefacts are not close substitutes. On the run recorded while writing
+this file the Quarto report was **5.8 MB** and the fallback **1.9 MB**, from
+identical inputs. They are different documents.
+
+The practical failure: a researcher runs `render_report()` on a machine
+where Quarto is installed, gets the Quarto artefact, and writes their method
+section around it. The same script later runs on a colleague's machine, or a
+CI runner, or after a PATH change, and silently produces the fallback. Both
+are called "the surveyframe report". Nothing in either says which it is.
+
+```{r}
+#| label: engine-observability
+# Measured, not asserted. Each row is checked against a real render.
+probe <- local({
+  old <- options(surveyframe.use_quarto = FALSE); on.exit(options(old), add = TRUE)
+  f <- tempfile(fileext = ".html")
+  msgs <- character(0)
+  path <- withCallingHandlers(
+    suppressWarnings(render_report(demo$instrument, demo$responses,
+                                   output_path = f)),
+    message = function(m) { msgs <<- c(msgs, conditionMessage(m)); invokeRestart("muffleMessage") })
+  list(path = path, msgs = msgs,
+       body = paste(readLines(f, warn = FALSE), collapse = "\n"))
+})
+observable <- data.frame(
+  route = c("message emitted during the render",
+            "attribute on the returned path",
+            "a line inside the rendered report",
+            "return value of render_report()"),
+  names_the_engine = c(
+    if (any(grepl("engine", probe$msgs, ignore.case = TRUE))) "yes" else "no",
+    if (!is.null(attr(probe$path, "engine"))) paste0("yes, engine = \"",
+        attr(probe$path, "engine"), "\"") else "no",
+    if (grepl("Rendering engine", probe$body, fixed = TRUE)) "yes, beside the instrument hash" else "no",
+    "the destination path, as before"),
+  stringsAsFactors = FALSE
+)
+knitr::kable(observable, caption = "Ways a caller can learn which engine ran")
+```
+
+- [ ] **Owner decision.** Should `render_report()` say which engine it used?
+      The suggestion on the table is a `message()` naming the engine plus an
+      `engine` attribute on the returned path, so a script can assert on it.
+      A stricter option is an argument such as `engine = c("auto", "quarto",
+      "html")`, where `"quarto"` errors rather than falling back, for users
+      whose reproducibility claim depends on it.
+- [ ] Whichever is chosen, the rendered report should name its own engine
+      somewhere visible, next to the instrument hash it already carries.
+
+## 3. Reproducibility: the same inputs twice
+
+An audit artefact has to be reproducible. The same instrument and the same
+data, rendered twice, should give the same document. Timestamps and
+temporary paths legitimately differ between runs, so they are normalised
+before comparison and reported separately. Normalising is itself a risk, so
+the raw comparison is shown alongside.
+
+```{r}
+#| label: reproducible-quarto
+rep_q <- if (quarto_here) sf_render_twice(demo$instrument, demo$responses,
+                                          use_quarto = TRUE) else NULL
+rep_f <- sf_render_twice(demo$instrument, demo$responses, use_quarto = FALSE)
+
+rep_tab <- data.frame(
+  engine = c(if (quarto_here) rep_q$engine, rep_f$engine),
+  identical_raw = c(if (quarto_here) rep_q$identical_raw, rep_f$identical_raw),
+  identical_after_normalising = c(if (quarto_here) rep_q$identical_normalised,
+                                  rep_f$identical_normalised),
+  stringsAsFactors = FALSE
+)
+knitr::kable(rep_tab, caption = "Same inputs, rendered twice")
+```
+
+`identical_raw` being `FALSE` while `identical_after_normalising` is `TRUE`
+is the healthy result: the documents differ only in their render timestamp
+and temp paths. Both being `FALSE` is a finding, and means the report varies
+between runs on something other than time.
+
+```{r}
+#| label: reproducibility-check
+# Fixed on 2026-08-28, so both rows now assert that reproducibility holds.
+# The quarto row is asserted only when the installed build is the one under
+# review, because Quarto renders in a separate session that loads the
+# installed package. See 3.2.
+matches <- sf_installed_matches_source()
+rt <- compare_table(
+  compare_row("fallback report reproducible after normalising",
+              as.numeric(isTRUE(rep_f$identical_normalised)), 1,
+              "2 renders, same inputs"),
+  if (quarto_here && matches) compare_row(
+              "quarto report reproducible after normalising",
+              as.numeric(isTRUE(rep_q$identical_normalised)), 1,
+              "2 renders, same inputs") else NULL
+)
+compare_report(rt, caption = "Render-to-render reproducibility")
+sf_log(rt)
+if (quarto_here && !matches) {
+  cat("The quarto row is held back. The installed surveyframe is a different\n",
+      "build from the one under review, and a Quarto render loads the installed\n",
+      "one. Install this build and re-render to test that engine. See 3.2.\n")
+}
+```
+
+### 3.1 The report is reproducible, and this is how it was fixed
+
+Both engines now produce the same document twice from identical inputs. They
+did not before 2026-08-28, and the cause was upstream of rendering:
+`run_analysis_plan()` was non-deterministic, differing in **32 of 1768
+values** between 2 runs on the same instrument and the same responses.
+
+Three independent causes, all of them unseeded randomness, all now fixed.
+
+```{r}
+#| label: plan-nondeterminism
+r1 <- run_analysis_plan(demo$responses, demo$instrument)
+r2 <- run_analysis_plan(demo$responses, demo$instrument)
+s1 <- capture.output(str(r1, max.level = 7))
+s2 <- capture.output(str(r2, max.level = 7))
+differing <- sum(s1 != s2[seq_along(s1)], na.rm = TRUE)
+
+nd <- data.frame(
+  source = c("bootstrap effect-size CIs", "parallel analysis in EFA",
+             "jittered points on group-comparison charts"),
+  what_moved = c("r_ci, d_ci, eta_ci, v_ci, and the APA strings quoting them",
+                 "pc.sim, fa.sim and the simulated eigenvalue matrix",
+                 "the scatter drawn over each boxplot"),
+  fix = c("run_analysis_plan() gains seed, defaulting to a fixed value",
+          "the same seeding, plus mc.cores pinned to 1 so forked workers draw from the parent stream",
+          "position_jitter(seed = ) on the shared boxplot helper"),
+  stringsAsFactors = FALSE
+)
+knitr::kable(nd, caption = "Three sources of non-determinism, all fixed")
+cat(sprintf("\nstr() lines differing between 2 identical runs: %d of %d\n",
+            differing, length(s1)))
+```
+
+`bootstrap_ci()` takes `seed` and defaulted it to `NULL`, so it seeded only
+when asked, and nothing in the analysis path asked. The 5 call sites are
+`R/analysis_plan.R` lines 315, 422, 492, 546, and 653, covering
+`cramers_v_ci()`, `cohens_d_ci()`, `eta_sq_ci()`, a direct `bootstrap_ci()`,
+and `sframe_kw_eta_sq_ci()`. The EFA path inherited `psych::fa.parallel()`'s
+own simulation, which splits across forked `mclapply()` workers whose streams
+`set.seed()` never reached, and which split by core count so the answer
+depended on the machine.
+
+**The third cause appeared only after the first 2 were fixed.** With the
+numbers settled, 5 lines of the rendered report still moved, all of them
+embedded chart images: `geom_jitter()` drew its offsets from the global stream
+at plot time, which is after `run_analysis_plan()` restores the caller's
+state. A report used as an audit artefact has to settle in its pictures as
+well as its numbers, so the shared boxplot helper now uses
+`position_jitter(seed = )`.
+
+The visible effect before the fix, taken from 2 renders of the bundled demo:
+
+```
+render 1:  U = 1576, z = -0.98, p = 0.327, r = 0.09 [0.01, 0.27]
+render 2:  U = 1576, z = -0.98, p = 0.327, r = 0.09 [0.00, 0.27]
+```
+
+The test statistic and the p value are stable, because they are computed
+analytically. The interval a researcher would quote in a paper is not.
+
+**Why this matters more than its size suggests.** A report that changes
+between renders cannot be the audit artefact of a study. Re-running the
+analysis to check a number produces a different number, and neither the
+researcher nor a reviewer can tell whether that reflects a change in the
+data, a change in the package, or nothing at all. It also undercuts the
+instrument hash: the hash pins the *instrument*, and the report then varies
+anyway.
+
+- [x] **Owner decision taken 2026-08-28: seed by default and record it.**
+      `run_analysis_plan()` gains `seed`, defaulting to a fixed value, applied
+      once at the top of the run so it reaches anything random the plan
+      touches. `seed = NULL` restores the earlier behaviour. This does change
+      confidence intervals the package has already printed, the same class as
+      `review_040`'s finding 1, so NEWS states plainly that intervals from
+      earlier releases are reproducible from this release onward and move
+      once when a study is re-run.
+- [x] `render_report()` records the seed in the artefact beside the
+      instrument hash, on both engines, so a report states what reproducing
+      it would take.
+
+### 3.2 A Quarto render measures the installed package
+
+Worth knowing before reading the quarto row above, and it produced a phantom
+defect on the day this section was rewritten.
+
+Quarto renders `inst/templates/report.qmd` in a **separate R session**, which
+resolves `library(surveyframe)` against the installed package. A working tree
+loaded with `pkgload::load_all()` reaches the fallback engine and never
+reaches the Quarto one. On 2026-08-28 that showed as the fallback rendering
+reproducibly while Quarto appeared to keep moving its intervals, and the cause
+was the subprocess running CRAN 0.4.0, which has no seeding, rather than any
+defect in the build under review.
+
+```{r}
+#| label: installed-build
+ib <- data.frame(
+  check = c("installed build carries the feature under review",
+            "so the quarto row above is",
+            "to test the quarto engine"),
+  value = c(as.character(sf_installed_matches_source()),
+            if (sf_installed_matches_source()) "measuring this build" else
+              "held back, see the note under section 3",
+            "R CMD INSTALL this working tree, then re-render"),
+  stringsAsFactors = FALSE
+)
+knitr::kable(ib, caption = "Which build a Quarto render actually loads")
+```
+
+Verified on 2026-08-28 by installing the working tree into a temporary
+library and re-rendering: **0 differing lines on both engines**.
+
+## 4. The audit chain: does the report bind to the instrument?
+
+The hash is the instrument's identity. A report that carries it can be tied
+to the exact `.sframe` that produced it, and a `.sframe` that fails its own
+integrity check can be caught. This checks that the chain actually holds
+end to end, rather than that a hash-shaped string appears somewhere.
+
+```{r}
+#| label: audit-chain
+inst <- demo$instrument
+stored <- sframe_hash_value(inst)
+
+f <- tempfile(fileext = ".html")
+suppressMessages(render_report(inst, demo$responses, output_path = f))
+body <- paste(readLines(f, warn = FALSE), collapse = "\n")
+
+# The instrument round-tripped through a file must still hash the same, or
+# the value printed in the report identifies nothing stable.
+p <- tempfile(fileext = ".sframe")
+write_sframe(inst, p, overwrite = TRUE)
+reread <- read_sframe(p)
+
+chain <- compare_table(
+  compare_row("hash appears in the rendered report",
+              as.numeric(grepl(substr(stored, 1, 16), body, fixed = TRUE)), 1,
+              "grep on the artefact"),
+  compare_row("instrument survives a write/read with the same hash",
+              as.numeric(identical(sframe_hash_value(reread), stored)), 1,
+              "write_sframe() then read_sframe()"),
+  compare_row("stored hash equals recomputed hash",
+              as.numeric(identical(
+                jsonlite::fromJSON(p, simplifyVector = FALSE)$hash$value,
+                sframe_hash_value(reread))), 1,
+              "file's own embedded hash")
+)
+compare_report(chain, caption = "Instrument to report audit chain")
+sf_log(chain)
+```
+
+```{r}
+#| label: format-field
+# 0.4.1 writes the format version into the file, so a consumer can tell which
+# shape of .sframe it holds. An audit trail that cannot version-negotiate is
+# one release away from being unreadable.
+written <- jsonlite::fromJSON(p, simplifyVector = FALSE)
+fmt <- compare_table(
+  compare_row("file states its own format version",
+              as.numeric(!is.null(written$sframe_format)), 1, "sframe_format key"),
+  compare_row("format version is the one this build writes",
+              as.numeric(identical(written$sframe_format,
+                                   surveyframe:::SFRAME_FORMAT_VERSION)), 1,
+              "SFRAME_FORMAT_VERSION")
+)
+compare_report(fmt, caption = "Format declaration")
+sf_log(fmt)
+```
+
+## 5. What happens when Quarto fails rather than being absent
+
+Absence is the easy case. The harder one is a Quarto that exists and then
+errors, which is what a broken install, a missing Chromium for PDF output,
+or a template edit produces. `render_report()` treats both the same way and
+falls back.
+
+```{r}
+#| label: quarto-broken
+# Simulate a broken Quarto by pointing PATH at a directory with none in it.
+# This exercises the same branch a genuinely failing render takes.
+broken <- local({
+  old_path <- Sys.getenv("PATH")
+  on.exit(Sys.setenv(PATH = old_path), add = TRUE)
+  Sys.setenv(PATH = tempdir())
+  f <- tempfile(fileext = ".html")
+  msgs <- character(0)
+  ok <- tryCatch({
+    withCallingHandlers(
+      suppressWarnings(render_report(demo$instrument, demo$responses,
+                                     output_path = f)),
+      message = function(m) {
+        msgs <<- c(msgs, conditionMessage(m)); invokeRestart("muffleMessage")
+      })
+    TRUE
+  }, error = function(e) conditionMessage(e))
+  data.frame(
+    scenario = "quarto not reachable on PATH",
+    render_succeeded = isTRUE(ok),
+    engine_used = if (isTRUE(ok)) sf_report_engine(f) else paste("FAILED:", ok),
+    # Detected, never hardcoded. A literal here would keep reading "match"
+    # after the package started announcing the engine, which is a check that
+    # can no longer fail.
+    told_the_user = any(grepl("engine", msgs, ignore.case = TRUE)),
+    stringsAsFactors = FALSE
+  )
+})
+knitr::kable(broken, caption = "Behaviour when Quarto cannot be reached")
+```
+
+```{r}
+#| label: fallback-silence
+fb <- compare_table(
+  compare_row("a report is still produced when quarto is unreachable",
+              as.numeric(broken$render_succeeded), 1, "graceful degradation"),
+  compare_row("the user is told which engine ran",
+              as.numeric(broken$told_the_user), 1,
+              "message class sframe_report_engine"),
+  compare_row("the artefact names its own engine",
+              as.numeric(grepl("Rendering engine", probe$body, fixed = TRUE)),
+              1, "read off the rendered file")
+)
+compare_report(fb, caption = "Fallback behaviour")
+sf_log(fb)
+```
+
+- [x] Fixed 2026-08-28. The fallback announces itself 3 ways, so a caller who
+      expected Quarto and received the built-in writer can see that from the
+      console, from the returned path, or from the report itself.
+
+## 6. Does the Quarto template itself still run?
+
+The template is a shipped file with its own chunks. It can break
+independently of the R code, and a broken template shows up only as a silent
+fallback, which section 2 established nobody sees.
+
+```{r}
+#| label: template-direct
+tpl <- system.file("templates", "report.qmd", package = "surveyframe")
+tpl_check <- data.frame(
+  check = c("template exists", "template is non-empty",
+            "declares params", "reads the instrument param",
+            "stamps the instrument hash"),
+  value = c(
+    file.exists(tpl),
+    file.exists(tpl) && file.size(tpl) > 0,
+    file.exists(tpl) && any(grepl("^params:", readLines(tpl, warn = FALSE))),
+    file.exists(tpl) && any(grepl("instrument_path", readLines(tpl, warn = FALSE))),
+    file.exists(tpl) && any(grepl("instrument_hash", readLines(tpl, warn = FALSE)))
+  ),
+  stringsAsFactors = FALSE
+)
+knitr::kable(tpl_check, caption = "The shipped Quarto template")
+```
+
+```{r}
+#| label: template-verdict
+tv <- compare_table(
+  compare_row("template ships with the package",
+              as.numeric(tpl_check$value[1]), 1, "system.file()"),
+  compare_row("template is parameterised",
+              as.numeric(tpl_check$value[3]), 1, "params: block"),
+  compare_row("template receives the instrument hash",
+              as.numeric(tpl_check$value[5]), 1, "instrument_hash param")
+)
+compare_report(tv, caption = "Template integrity")
+sf_log(tv)
+```
+
+## 7. Sign-off
+
+```{r}
+#| label: verdict
+sf_verdict()
+```
+
+All 3 findings this file raised on 2026-08-28 are fixed and the sections now
+assert the fixed behaviour. What a reviewer confirms:
+
+- [ ] Section 1 shows Quarto present, and its version recorded here.
+- [ ] Section 2 shows `engine_used` as `quarto` when Quarto is requested, and
+      all 3 observability routes reading `yes`.
+- [ ] Section 3 shows the fallback engine reproducible after normalising.
+- [ ] **Section 3.2 shows the installed build matching this one.** If it
+      reads `FALSE`, the quarto reproducibility row was held back and that
+      engine is untested here. Install this working tree and re-render before
+      signing the section off.
+- [ ] Section 4 shows the audit chain intact: hash in the report, hash stable
+      across a write and read, format version declared, and the analysis seed
+      printed beside the hash.
+- [ ] Section 5 shows the fallback announcing itself, so a caller who expected
+      Quarto can tell what they received.
+- [ ] Section 6 shows the template shipped and parameterised.

@@ -45,7 +45,6 @@ bibentry(
   author   = person("Mohammed Ali", "Sharafuddin",
                     comment = c(ORCID = "0000-0001-5247-2964")),
   year     = "2026",
-  note     = paste("Manuscript in preparation for Operations Research",
-                    "and Decisions. Describes the 10 MCDM methods",
-                    "surveyframe adds in v0.4.")
+  note     = paste("Manuscript in preparation for Computo. Describes the",
+                    "10 MCDM methods surveyframe adds in v0.4.")
 )
