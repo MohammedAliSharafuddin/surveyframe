@@ -121,7 +121,7 @@ results_table(mw_results)
 
 | RQ | Research question | Method | Result (APA) |
 |:---|:---|:---|---:|
-| RQ1 | Does the treatment arm score higher than control? |  | U = 34, z = -1.17, p = 0.241, r = 0.26 \[0.02, 0.65\], Hodges-Lehmann shift = -3.99 \[-14.38, 5.36\] |
+| RQ1 | Does the treatment arm score higher than control? |  | U = 34, z = -1.17, p = 0.241, r = 0.26 \[0.02, 0.64\], Hodges-Lehmann shift = -3.99 \[-14.38, 5.36\] |
 
 ``` r
 
@@ -155,14 +155,14 @@ results_table(wp_results)
 
 | RQ | Research question | Method | Result (APA) |
 |:---|:---|:---|---:|
-| RQ2 | Did scores change from before to after? |  | V = 0, z = -2.45, p = 0.014, r = 0.87 \[0.89, 0.90\], pseudomedian = -6.62 \[-9.04, -4.38\] |
+| RQ2 | Did scores change from before to after? |  | V = 0, z = -2.45, p = 0.014, r = 0.87 \[0.89, 0.90\], pseudomedian = -6.46 \[-11.98, -3.50\] |
 
 ``` r
 
 wp_results[[1]]$pseudomedian
-#> [1] -6.617024
+#> [1] -6.45986
 wp_results[[1]]$pseudomedian_conf_int
-#> [1] -9.043759 -4.377587
+#> [1] -11.977167  -3.498729
 ```
 
 ## Fisher’s exact test with the exact odds-ratio CI
@@ -212,7 +212,7 @@ pilot outcome scores.
 
 bootstrap_ci(pilot$outcome, FUN = stats::median, R = 999)
 #> estimate    lower    upper 
-#> 52.82878 46.89976 57.67398
+#> 52.82878 47.33676 56.66709
 ```
 
 ## Firth logistic regression for a rare or small binary outcome
@@ -265,7 +265,7 @@ implicit in a single point estimate.
 cohens_d_ci(pilot$outcome[pilot$group == "treatment"],
             pilot$outcome[pilot$group == "control"], R = 999)
 #>   estimate      lower      upper 
-#> 0.54201883 0.03383121 1.48685928
+#> 0.54201883 0.02928852 1.54044282
 ```
 
 ## Citation

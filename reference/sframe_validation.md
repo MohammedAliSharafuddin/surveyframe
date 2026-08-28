@@ -90,7 +90,7 @@ v
 #> <sframe validation>
 #>   Instrument:  Demo Survey (0.1.0)
 #>   Status:      valid
-#>   Checks:      18 run, 0 with problems
+#>   Checks:      19 run, 0 with problems
 sf_is_valid(v)
 #> [1] TRUE
 sf_problems(v)
@@ -112,10 +112,11 @@ summary(v)
 #> 10             comparison_scale     ok          0
 #> 11             scale_membership     ok          0
 #> 12               branching_refs     ok          0
-#> 13                   check_refs     ok          0
-#> 14         analysis_plan_models     ok          0
-#> 15      analysis_plan_variables     ok          0
-#> 16 decision_scale_compatibility     ok          0
-#> 17                    model_ids     ok          0
-#> 18                  model_specs     ok          0
+#> 13             branching_values     ok          0
+#> 14                   check_refs     ok          0
+#> 15         analysis_plan_models     ok          0
+#> 16      analysis_plan_variables     ok          0
+#> 17 decision_scale_compatibility     ok          0
+#> 18                    model_ids     ok          0
+#> 19                  model_specs     ok          0
 ```

@@ -97,8 +97,8 @@ kable(quality_summary, align = c("l", "r"), caption = "Quality screening summary
 |:-------------------|------:|
 | Respondents        |   120 |
 | Items              |    15 |
-| Flagged for review |   109 |
-| Flag rate          | 90.8% |
+| Flagged for review |     6 |
+| Flag rate          |  5.0% |
 
 Quality screening summary {.table}
 
@@ -209,7 +209,7 @@ results_table(results)
 |:---|:---|:---|---:|:---|
 | RQ1 | Is digital marketing perception associated with satisfaction? | pearson | r(118) = 0.54 \[0.40, 0.65\], p \< .001 | large |
 | RQ2 | Do the three perception scales predict satisfaction? |  | R² = 0.383, F(3, 116) = 23.95, p \< .001 |  |
-| RQ3 | Do first-time and repeat visitors differ in behavioural intention? |  | U = 1576, z = -0.98, p = 0.327, r = 0.09 \[0.01, 0.27\], Hodges-Lehmann shift = -0.00 \[-0.50, 0.00\] | negligible |
+| RQ3 | Do first-time and repeat visitors differ in behavioural intention? |  | U = 1576, z = -0.98, p = 0.327, r = 0.09 \[0.00, 0.27\], Hodges-Lehmann shift = -0.00 \[-0.50, 0.00\] | negligible |
 
 Pass `plots = TRUE` to attach a brand-styled `ggplot2` chart to each
 result that supports one (descriptive, correlation, chi-square, and
@@ -250,7 +250,7 @@ unlist(rq1$citations)
 #>                                                                                                                                                             r_core 
 #>                                          "R Core Team. (2026). *R: A language and environment for statistical computing*. R Foundation for Statistical Computing." 
 #>                                                                                                                                                        surveyframe 
-#> "Sharafuddin, M. A. (2026). *surveyframe: Survey Instrument Workflows* (Version 0.4.0) [Computer software]. https://github.com/MohammedAliSharafuddin/surveyframe"
+#> "Sharafuddin, M. A. (2026). *surveyframe: Survey Instrument Workflows* (Version 0.4.1) [Computer software]. https://github.com/MohammedAliSharafuddin/surveyframe"
 ```
 
 ## Render the results report

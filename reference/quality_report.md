@@ -17,6 +17,7 @@ quality_report(
   started_at = NULL,
   time_min = NULL,
   straightline_scales = TRUE,
+  straightline_min_items = 4L,
   missing_threshold = 0.2
 )
 ```
@@ -59,6 +60,19 @@ quality_report(
 
   Logical. Whether to check for straight-lining within each defined
   scale block. Defaults to `TRUE`.
+
+- straightline_min_items:
+
+  Integer. The minimum number of items a scale must have before it is
+  checked for straight-lining. Defaults to `4`. A respondent who gives
+  the identical response to every item in a 2-item scale has done
+  exactly what a genuinely consistent respondent does, this is not
+  evidence of inattention on its own, and checking scales that short
+  flags a large share of honest respondents (see the worked example in
+  [`vignette("surveyframe")`](https://mohammedalisharafuddin.github.io/surveyframe/articles/surveyframe.md),
+  where 3 two-item scales alone drove a 91 percent flag rate before this
+  threshold existed). Set to `2` to restore the previous, more
+  permissive behaviour.
 
 - missing_threshold:
 

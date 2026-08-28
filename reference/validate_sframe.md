@@ -61,6 +61,8 @@ The following checks are performed:
 
 - Branching rules referencing item IDs not present in the instrument
 
+- `%in%` branching rules whose `value` no evaluator can consume
+
 - Attention checks referencing item IDs not present in the instrument
 
 - Analysis plan roles referencing missing variables or models
@@ -106,7 +108,7 @@ validate_sframe(instr, strict = FALSE)
 #> <sframe validation>
 #>   Instrument:  Demo Survey (0.1.0)
 #>   Status:      valid
-#>   Checks:      18 run, 0 with problems
+#>   Checks:      19 run, 0 with problems
 
 # Explore it with dedicated methods rather than reaching in with `$`
 v <- validate_sframe(instr, strict = FALSE)
@@ -128,12 +130,13 @@ summary(v)
 #> 10             comparison_scale     ok          0
 #> 11             scale_membership     ok          0
 #> 12               branching_refs     ok          0
-#> 13                   check_refs     ok          0
-#> 14         analysis_plan_models     ok          0
-#> 15      analysis_plan_variables     ok          0
-#> 16 decision_scale_compatibility     ok          0
-#> 17                    model_ids     ok          0
-#> 18                  model_specs     ok          0
+#> 13             branching_values     ok          0
+#> 14                   check_refs     ok          0
+#> 15         analysis_plan_models     ok          0
+#> 16      analysis_plan_variables     ok          0
+#> 17 decision_scale_compatibility     ok          0
+#> 18                    model_ids     ok          0
+#> 19                  model_specs     ok          0
 
 # Recover the validated instrument
 validated <- as_sframe(validate_sframe(instr, strict = TRUE))

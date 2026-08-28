@@ -32,7 +32,7 @@ respondent IDs where supplied."><meta property="og:image" content="https://moham
 
     <a class="navbar-brand me-2" href="../index.html">surveyframe</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -75,6 +75,7 @@ respondent IDs where supplied.</p>
 <span>  started_at <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  time_min <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  straightline_scales <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  straightline_min_items <span class="op">=</span> <span class="fl">4L</span>,</span>
 <span>  missing_threshold <span class="op">=</span> <span class="fl">0.2</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -117,6 +118,18 @@ flagged as speeders when timing data are available.</p></dd>
 <dt id="arg-straightline-scales">straightline_scales<a class="anchor" aria-label="anchor" href="#arg-straightline-scales"></a></dt>
 <dd><p>Logical. Whether to check for straight-lining
 within each defined scale block. Defaults to <code>TRUE</code>.</p></dd>
+
+
+<dt id="arg-straightline-min-items">straightline_min_items<a class="anchor" aria-label="anchor" href="#arg-straightline-min-items"></a></dt>
+<dd><p>Integer. The minimum number of items a scale
+must have before it is checked for straight-lining. Defaults to <code>4</code>. A
+respondent who gives the identical response to every item in a 2-item
+scale has done exactly what a genuinely consistent respondent does,
+this is not evidence of inattention on its own, and checking scales
+that short flags a large share of honest respondents (see the worked
+example in <code><a href="../articles/surveyframe.html">vignette("surveyframe")</a></code>, where 3 two-item scales alone
+drove a 91 percent flag rate before this threshold existed). Set to
+<code>2</code> to restore the previous, more permissive behaviour.</p></dd>
 
 
 <dt id="arg-missing-threshold">missing_threshold<a class="anchor" aria-label="anchor" href="#arg-missing-threshold"></a></dt>

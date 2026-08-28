@@ -10,6 +10,7 @@
 <url><loc>https://mohammedalisharafuddin.github.io/surveyframe/articles/deploying-and-collecting.html</loc></url>
 <url><loc>https://mohammedalisharafuddin.github.io/surveyframe/articles/efa-cfa-sem-pls-syntax.html</loc></url>
 <url><loc>https://mohammedalisharafuddin.github.io/surveyframe/articles/index.html</loc></url>
+<url><loc>https://mohammedalisharafuddin.github.io/surveyframe/articles/learn-by-example.html</loc></url>
 <url><loc>https://mohammedalisharafuddin.github.io/surveyframe/articles/mcdm-analysis.html</loc></url>
 <url><loc>https://mohammedalisharafuddin.github.io/surveyframe/articles/scale-reliability-validity.html</loc></url>
 <url><loc>https://mohammedalisharafuddin.github.io/surveyframe/articles/small-sample.html</loc></url>
@@ -19,6 +20,7 @@
 <url><loc>https://mohammedalisharafuddin.github.io/surveyframe/authors.html</loc></url>
 <url><loc>https://mohammedalisharafuddin.github.io/surveyframe/index.html</loc></url>
 <url><loc>https://mohammedalisharafuddin.github.io/surveyframe/news/index.html</loc></url>
+<url><loc>https://mohammedalisharafuddin.github.io/surveyframe/reference/SFRAME_FORMAT_VERSION.html</loc></url>
 <url><loc>https://mohammedalisharafuddin.github.io/surveyframe/reference/add_model.html</loc></url>
 <url><loc>https://mohammedalisharafuddin.github.io/surveyframe/reference/amend_sframe.html</loc></url>
 <url><loc>https://mohammedalisharafuddin.github.io/surveyframe/reference/amendment_log.html</loc></url>
@@ -114,9 +116,14 @@
 <url><loc>https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_collected_weights.html</loc></url>
 <url><loc>https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_decision_options.html</loc></url>
 <url><loc>https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_dematel_compute.html</loc></url>
+<url><loc>https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_demo.html</loc></url>
+<url><loc>https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_demo_branding.html</loc></url>
 <url><loc>https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_demo_data.html</loc></url>
+<url><loc>https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_demo_qmd.html</loc></url>
+<url><loc>https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_demos.html</loc></url>
 <url><loc>https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_draw_likert_diverging.html</loc></url>
 <url><loc>https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_draw_mosaic.html</loc></url>
+<url><loc>https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_export_labelled.html</loc></url>
 <url><loc>https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_input_types_demo_data.html</loc></url>
 <url><loc>https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_likert_scale_groups.html</loc></url>
 <url><loc>https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_plot_cooccurrence.html</loc></url>

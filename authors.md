@@ -11,14 +11,14 @@ Source:
 [`inst/CITATION`](https://github.com/MohammedAliSharafuddin/surveyframe/blob/main/inst/CITATION)
 
 Sharafuddin M (2026). *surveyframe: Survey Instrument Workflows*. R
-package version 0.4.0,
+package version 0.4.1,
 <https://github.com/MohammedAliSharafuddin/surveyframe>.
 
     @Manual{,
       title = {surveyframe: Survey Instrument Workflows},
       author = {Mohammed Ali Sharafuddin},
       year = {2026},
-      note = {R package version 0.4.0},
+      note = {R package version 0.4.1},
       url = {https://github.com/MohammedAliSharafuddin/surveyframe},
     }
 
@@ -43,12 +43,12 @@ in v0.4 and when to prefer each one.,
 
 Sharafuddin M (2026). “surveyframe: A Pre-Declared, Reproducible
 Framework for Multi-Criteria Decision Analysis in Survey Research.”
-Manuscript in preparation for Operations Research and Decisions.
-Describes the 10 MCDM methods surveyframe adds in v0.4.
+Manuscript in preparation for Computo. Describes the 10 MCDM methods
+surveyframe adds in v0.4.
 
     @Unpublished{,
       title = {surveyframe: A Pre-Declared, Reproducible Framework for Multi-Criteria Decision Analysis in Survey Research},
       author = {Mohammed Ali Sharafuddin},
       year = {2026},
-      note = {Manuscript in preparation for Operations Research and Decisions. Describes the 10 MCDM methods surveyframe adds in v0.4.},
+      note = {Manuscript in preparation for Computo. Describes the 10 MCDM methods surveyframe adds in v0.4.},
     }

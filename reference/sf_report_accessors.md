@@ -51,5 +51,5 @@ block. `sf_flagged()` returns an integer vector of row numbers.
 demo <- sframe_demo_data()
 qr <- quality_report(demo$responses, demo$instrument)
 head(sf_flagged(qr))
-#> [1] 1 2 4 5 6 7
+#> [1]  37  48  61  73 107 108
 ```

@@ -174,7 +174,7 @@ validate_sframe(instr, strict = FALSE)
 #> <sframe validation>
 #>   Instrument:  Digital marketing study (teaching slice) (1.0.0)
 #>   Status:      valid
-#>   Checks:      18 run, 0 with problems
+#>   Checks:      19 run, 0 with problems
 ```
 
 ``` r

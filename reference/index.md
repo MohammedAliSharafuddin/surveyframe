@@ -1,5 +1,23 @@
 # Package index
 
+## Demo library
+
+Twenty-two small demos, each doing one job, with an instrument, response
+data, a codebook of variable and value labels, and the results
+surveyframe produced. Load one, change it, and keep going. See the
+“Learn by example” article.
+
+- [`sframe_demos()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_demos.md)
+  : List the bundled demos
+- [`sframe_demo()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_demo.md)
+  : Load one bundled demo
+- [`sframe_demo_branding()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_demo_branding.md)
+  : The standard demo branding
+- [`sframe_demo_qmd()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_demo_qmd.md)
+  : Copy a demo's Quarto notebook so you can run and change it
+- [`sframe_export_labelled()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_export_labelled.md)
+  : Write responses to SPSS or Stata with the labels attached
+
 ## Design
 
 Start visually in the HTML SurveyBuilder or construct instruments in R.

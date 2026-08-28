@@ -32,7 +32,7 @@ prompts, and reporting references."><meta property="og:image" content="https://m
 
     <a class="navbar-brand me-2" href="../index.html">surveyframe</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -72,7 +72,8 @@ prompts, and reporting references.</p>
 <span>  <span class="va">instrument</span>,</span>
 <span>  scored <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  plots <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  plot_palette <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"web"</span>, <span class="st">"print"</span><span class="op">)</span></span>
+<span>  plot_palette <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"web"</span>, <span class="st">"print"</span><span class="op">)</span>,</span>
+<span>  seed <span class="op">=</span> <span class="fl">20260828L</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -106,6 +107,17 @@ Defaults to <code>FALSE</code>.</p></dd>
 <dd><p>One of <code>"web"</code> (brand colours, for on-screen use) or
 <code>"print"</code> (black, grey, and white, for journal-ready print figures).
 Applied to every plot attached when <code>plots = TRUE</code>. See <code>sframe_brand()</code>.</p></dd>
+
+
+<dt id="arg-seed">seed<a class="anchor" aria-label="anchor" href="#arg-seed"></a></dt>
+<dd><p>Integer or <code>NULL</code>. The random seed the analysis runs under.
+Defaults to a fixed value so the same instrument and the same data give
+the same answer every time, which is what makes a rendered report usable
+as an audit artefact. Every bootstrap confidence interval in the plan, and
+the parallel analysis behind the EFA family, depend on it. Pass <code>NULL</code> for
+the unseeded behaviour of releases before 0.4.1. The caller's own random
+stream is restored afterwards, so seeding here does not affect anything
+that runs later.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -211,7 +223,7 @@ report.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> RQ 18: Is the distribution of satisfaction ratings different across visitor types?</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Test: crosstab</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   APA:  χ²(4, N = 120) = 3.40, p = 0.494, V = 0.17 [0.10, 0.38]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   APA:  χ²(4, N = 120) = 3.40, p = 0.494, V = 0.17 [0.09, 0.38]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> RQ 19: Is there an association between visitor type and behavioural intention rating?</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Test: fisher_exact</span>
@@ -219,23 +231,23 @@ report.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> RQ 20: Do first-time and repeat visitors differ in mean satisfaction score?</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Test: t_test_ind</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   APA:  t(106.77) = 0.15, p = 0.878, d = 0.03 [0.00, 0.43]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   APA:  t(106.77) = 0.15, p = 0.878, d = 0.03 [0.01, 0.43]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> RQ 21: Do respondents rate the two satisfaction items differently?</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Test: t_test_pair</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   APA:  t(119) = 0.82, p = 0.416, d_z = 0.07 [-0.11, 0.26]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   APA:  t(119) = 0.82, p = 0.416, d_z = 0.07 [-0.11, 0.25]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> RQ 22: Is there a significant distributional difference between the first two service quality items?</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Test: wilcoxon_pair</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   APA:  V = 967, z = -1.17, p = 0.240, r = 0.11 [0.01, 0.38], pseudomedian = -0.00 [-0.00, 0.00]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   APA:  V = 967, z = -1.17, p = 0.240, r = 0.11 [0.01, 0.36], pseudomedian = -0.00 [-0.00, 0.00]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> RQ 23: Does satisfaction differ across visitor types?</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Test: kruskal_wallis</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   APA:  H(1) = 0.00, p = 0.949, η² = 0.000 [0.00, 0.03]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   APA:  H(1) = 0.00, p = 0.949, η² = 0.000 [0.00, 0.04]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> RQ 24: Does mean behavioural intention differ between visitor types?</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Test: anova_one</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   APA:  F(1, 118) = 0.74, p = 0.391, η² = 0.006 [0.00, 0.06]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   APA:  F(1, 118) = 0.74, p = 0.391, η² = 0.006 [0.00, 0.07]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> RQ 25: Do visitor types differ in satisfaction after controlling for service quality?</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Test: ancova</span>
@@ -251,7 +263,7 @@ report.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> RQ 28: Are service quality perceptions associated with sustainability perceptions?</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Test: correlation_spearman</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   APA:  r_s(118) = 0.00 [-0.18, 0.19], p = 0.984</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   APA:  r_s(118) = 0.00 [-0.18, 0.20], p = 0.984</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> RQ 29: Is sustainability perception associated with behavioural intention?</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Test: correlation_kendall</span>
@@ -275,7 +287,7 @@ report.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> RQ 34: Does satisfaction mediate the path from digital marketing to behavioural intention?</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Test: mediation</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   APA:  Indirect effect = 0.365, 95% bootstrap CI [0.231, 0.529].</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   APA:  Indirect effect = 0.365, 95% bootstrap CI [0.221, 0.519].</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 </code></pre></div>

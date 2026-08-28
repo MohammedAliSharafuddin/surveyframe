@@ -14,7 +14,8 @@ run_analysis_plan(
   instrument,
   scored = TRUE,
   plots = FALSE,
-  plot_palette = c("web", "print")
+  plot_palette = c("web", "print"),
+  seed = 20260828L
 )
 ```
 
@@ -49,6 +50,17 @@ run_analysis_plan(
   One of `"web"` (brand colours, for on-screen use) or `"print"` (black,
   grey, and white, for journal-ready print figures). Applied to every
   plot attached when `plots = TRUE`. See `sframe_brand()`.
+
+- seed:
+
+  Integer or `NULL`. The random seed the analysis runs under. Defaults
+  to a fixed value so the same instrument and the same data give the
+  same answer every time, which is what makes a rendered report usable
+  as an audit artefact. Every bootstrap confidence interval in the plan,
+  and the parallel analysis behind the EFA family, depend on it. Pass
+  `NULL` for the unseeded behaviour of releases before 0.4.1. The
+  caller's own random stream is restored afterwards, so seeding here
+  does not affect anything that runs later.
 
 ## Value
 
@@ -155,7 +167,7 @@ print(results)
 #> 
 #> RQ 18: Is the distribution of satisfaction ratings different across visitor types?
 #>   Test: crosstab
-#>   APA:  χ²(4, N = 120) = 3.40, p = 0.494, V = 0.17 [0.10, 0.38]
+#>   APA:  χ²(4, N = 120) = 3.40, p = 0.494, V = 0.17 [0.09, 0.38]
 #> 
 #> RQ 19: Is there an association between visitor type and behavioural intention rating?
 #>   Test: fisher_exact
@@ -163,23 +175,23 @@ print(results)
 #> 
 #> RQ 20: Do first-time and repeat visitors differ in mean satisfaction score?
 #>   Test: t_test_ind
-#>   APA:  t(106.77) = 0.15, p = 0.878, d = 0.03 [0.00, 0.43]
+#>   APA:  t(106.77) = 0.15, p = 0.878, d = 0.03 [0.01, 0.43]
 #> 
 #> RQ 21: Do respondents rate the two satisfaction items differently?
 #>   Test: t_test_pair
-#>   APA:  t(119) = 0.82, p = 0.416, d_z = 0.07 [-0.11, 0.26]
+#>   APA:  t(119) = 0.82, p = 0.416, d_z = 0.07 [-0.11, 0.25]
 #> 
 #> RQ 22: Is there a significant distributional difference between the first two service quality items?
 #>   Test: wilcoxon_pair
-#>   APA:  V = 967, z = -1.17, p = 0.240, r = 0.11 [0.01, 0.38], pseudomedian = -0.00 [-0.00, 0.00]
+#>   APA:  V = 967, z = -1.17, p = 0.240, r = 0.11 [0.01, 0.36], pseudomedian = -0.00 [-0.00, 0.00]
 #> 
 #> RQ 23: Does satisfaction differ across visitor types?
 #>   Test: kruskal_wallis
-#>   APA:  H(1) = 0.00, p = 0.949, η² = 0.000 [0.00, 0.03]
+#>   APA:  H(1) = 0.00, p = 0.949, η² = 0.000 [0.00, 0.04]
 #> 
 #> RQ 24: Does mean behavioural intention differ between visitor types?
 #>   Test: anova_one
-#>   APA:  F(1, 118) = 0.74, p = 0.391, η² = 0.006 [0.00, 0.06]
+#>   APA:  F(1, 118) = 0.74, p = 0.391, η² = 0.006 [0.00, 0.07]
 #> 
 #> RQ 25: Do visitor types differ in satisfaction after controlling for service quality?
 #>   Test: ancova
@@ -195,7 +207,7 @@ print(results)
 #> 
 #> RQ 28: Are service quality perceptions associated with sustainability perceptions?
 #>   Test: correlation_spearman
-#>   APA:  r_s(118) = 0.00 [-0.18, 0.19], p = 0.984
+#>   APA:  r_s(118) = 0.00 [-0.18, 0.20], p = 0.984
 #> 
 #> RQ 29: Is sustainability perception associated with behavioural intention?
 #>   Test: correlation_kendall
@@ -219,7 +231,7 @@ print(results)
 #> 
 #> RQ 34: Does satisfaction mediate the path from digital marketing to behavioural intention?
 #>   Test: mediation
-#>   APA:  Indirect effect = 0.365, 95% bootstrap CI [0.231, 0.529].
+#>   APA:  Indirect effect = 0.365, 95% bootstrap CI [0.221, 0.519].
 #> 
 # }
 ```

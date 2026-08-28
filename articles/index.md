@@ -1,5 +1,14 @@
 # Articles
 
+### Start here
+
+Twenty-two small surveys, each doing one job, with the whole path from
+the questionnaire to the report. Choose the demo that matches the data
+you have rather than the name of a test.
+
+- [Learn by example: 22 small
+  surveys](https://mohammedalisharafuddin.github.io/surveyframe/articles/learn-by-example.md):
+
 ### Survey research workflow
 
 Read these in order. Start with the worked example, then build the

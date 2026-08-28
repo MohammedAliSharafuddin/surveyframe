@@ -3,7 +3,7 @@
 Top terms from a `term_freq` result as a horizontal bar chart, or a word
 cloud when `result$options$wordcloud` is `TRUE` (opt-in, default
 `FALSE`). Facets by group when the result carries a `group` role
-(todo_0.5.md section 1a).
+(todo_text_analysis.md section 1a).
 
 ## Usage
 
