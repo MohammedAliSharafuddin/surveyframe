@@ -1863,8 +1863,16 @@ sframe_plot_group_comparison <- function(result, data, palette = c("web", "print
                                    fill = .data$group)) +
     ggplot2::geom_boxplot(outlier.shape = NA, width = 0.55, alpha = 0.85,
                           colour = brand$ink, linewidth = 0.35) +
-    ggplot2::geom_jitter(width = 0.08, height = 0, alpha = 0.6, size = 1.6,
-                         colour = brand$ink) +
+    # Seeded so 2 renders of the same report draw the points in the same
+    # places. geom_jitter() otherwise takes offsets from the global RNG at
+    # plot time, which is after run_analysis_plan() has restored the caller's
+    # stream, so the numbers in a report were reproducible from 0.4.1 while
+    # the charts still moved. For a report used as an audit artefact the
+    # picture has to settle too.
+    ggplot2::geom_point(position = ggplot2::position_jitter(width = 0.08,
+                                                            height = 0,
+                                                            seed = 20260828L),
+                        alpha = 0.6, size = 1.6, colour = brand$ink) +
     ggplot2::scale_fill_manual(values = sframe_series_fill_colours(length(unique(df$group)), palette),
                                guide = "none") +
     ggplot2::labs(title = sprintf("%s by %s", .sframe_title_case_names(outcome_col),
