@@ -1,4 +1,4 @@
-# surveyframe 0.4.1 (development)
+# surveyframe 0.4.1
 
 ## New: a demo library, and a vignette that teaches from it
 
