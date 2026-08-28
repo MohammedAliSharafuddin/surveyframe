@@ -1,5 +1,56 @@
 # surveyframe 0.4.1 (development)
 
+## New: a demo library, and a vignette that teaches from it
+
+Twenty-two small demos, each doing one job, in `inst/extdata/demos/`. They
+serve twice over: as fixtures that point at one method when something breaks,
+and as worked examples somebody can follow for their own survey. The bundled
+tourism and input-types instruments are unchanged, so nothing that reads them
+today is affected.
+
+```r
+sframe_demos()                            # what each one teaches
+sframe_demo("two_group")                  # load one
+sframe_demo("two_group", branded = TRUE)  # with a welcome page and a logo
+sframe_demo_qmd("two_group")              # a Quarto notebook to run and edit
+```
+
+Together the demos reach **all 59 analysis methods and all 15 item types**,
+which the test suite asserts against the package's own dispatch and
+`formals(sf_item)$type` rather than against a hand-written list. A method
+added later appears as uncovered and holds the suite red until it has a demo.
+
+Every demo ships 4 artefacts: the instrument, the responses, a **codebook
+carrying variable and value labels**, and the results surveyframe produced.
+The codebook is what makes the data usable outside R, since a plain CSV
+carries codes and `codebook_report()` names a choice set without giving the
+code-to-text mapping. The results table is the reference to compare against
+when the same data goes through `psych`, SPSS, JASP, jamovi or Stata.
+
+`sframe_export_labelled()` writes an SPSS `.sav` or Stata `.dta` with the
+question wording and the response options already attached, so variables read
+as questions rather than as codes. `haven` joins Suggests.
+
+`vignette("learn-by-example")` works from the survey you are trying to run
+rather than from the function list, with a table that picks the demo from the
+data you hold, screenshots of the real exported survey, and sections on
+branding, display mode, the 3 collection routes, disclosed amendments and
+file verification.
+
+Every demo belongs to one study of an event, its attendees and its sessions,
+which reads as a conference, a training day, a health promotion event, a
+product launch or a community meeting, so the designs transfer to any field.
+
+## Bug fix: reading a CSV whose matrix rows contain spaces
+
+A matrix item expands into one column per row, so a row labelled
+"Opening keynote" produces `session__Opening keynote`. `utils::read.csv()`
+rewrites that as `session__Opening.keynote` under its default
+`check.names = TRUE`, and the column no longer matches the contract the
+instrument declares. `sframe_demo()` reads with `check.names = FALSE`, and
+`vignette("learn-by-example")` names the trap for anyone reading a
+surveyframe CSV by hand.
+
 ## Reports are now reproducible, and say how they were made
 
 **Breaking in the sense that numbers move once.** `run_analysis_plan()` gains

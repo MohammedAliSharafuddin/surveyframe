@@ -1,4 +1,4 @@
-"respondent_id","started_at","submitted_at","session__keynote","session__workshop_a","session__workshop_b","session__panel","format"
+"respondent_id","started_at","submitted_at","session__Opening keynote","session__Workshop A","session__Workshop B","session__Closing panel","format"
 "R001","2026-06-01T09:03:00Z","2026-06-01T09:07:00Z",4,4,2,4,"in_person"
 "R002","2026-06-01T09:03:37Z","2026-06-01T09:07:37Z",4,3,4,5,"in_person"
 "R003","2026-06-01T09:04:14Z","2026-06-01T09:08:14Z",3,3,3,4,"in_person"
