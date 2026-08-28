@@ -2,234 +2,66 @@
 
 ## surveyframe 0.4.1
 
-### New: a demo library, and a vignette that teaches from it
+### New
 
-Twenty-two small demos, each doing one job, in `inst/extdata/demos/`.
-They serve twice over: as fixtures that point at one method when
-something breaks, and as worked examples somebody can follow for their
-own survey. The bundled tourism and input-types instruments are
-unchanged, so nothing that reads them today is affected.
+- **A demo library.** Twenty-two small demos, each showing one thing, in
+  [`sframe_demos()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_demos.md).
+  Load one with `sframe_demo("two_group")`, or get a Quarto notebook to
+  edit with `sframe_demo_qmd("two_group")`. Together they cover every
+  analysis method and every question type.
+- **[`vignette("learn-by-example")`](https://mohammedalisharafuddin.github.io/surveyframe/articles/learn-by-example.md).**
+  Pick the demo that matches the data you have, and follow it from
+  questionnaire to report.
+- **[`sframe_export_labelled()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_export_labelled.md)**
+  writes SPSS `.sav` or Stata `.dta` with the question wording and
+  response options attached, so variables arrive labelled rather than as
+  codes.
+- Each demo also ships a codebook of variable and value labels, and the
+  results surveyframe produced, so you can check the numbers in other
+  software.
 
-``` r
+### Reports are now reproducible
 
-sframe_demos()                            # what each one teaches
-sframe_demo("two_group")                  # load one
-sframe_demo("two_group", branded = TRUE)  # with a welcome page and a logo
-sframe_demo_qmd("two_group")              # a Quarto notebook to run and edit
-```
-
-Together the demos reach **all 59 analysis methods and all 15 item
-types**, which the test suite asserts against the package’s own dispatch
-and `formals(sf_item)$type` rather than against a hand-written list. A
-method added later appears as uncovered and holds the suite red until it
-has a demo.
-
-Every demo ships 4 artefacts: the instrument, the responses, a
-**codebook carrying variable and value labels**, and the results
-surveyframe produced. The codebook is what makes the data usable outside
-R, since a plain CSV carries codes and
-[`codebook_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/codebook_report.md)
-names a choice set without giving the code-to-text mapping. The results
-table is the reference to compare against when the same data goes
-through `psych`, SPSS, JASP, jamovi or Stata.
-
-[`sframe_export_labelled()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_export_labelled.md)
-writes an SPSS `.sav` or Stata `.dta` with the question wording and the
-response options already attached, so variables read as questions rather
-than as codes. `haven` joins Suggests.
-
-[`vignette("learn-by-example")`](https://mohammedalisharafuddin.github.io/surveyframe/articles/learn-by-example.md)
-works from the survey you are trying to run rather than from the
-function list, with a table that picks the demo from the data you hold,
-screenshots of the real exported survey, and sections on branding,
-display mode, the 3 collection routes, disclosed amendments and file
-verification.
-
-Every demo belongs to one study of an event, its attendees and its
-sessions, which reads as a conference, a training day, a health
-promotion event, a product launch or a community meeting, so the designs
-transfer to any field.
-
-### Bug fix: reading a CSV whose matrix rows contain spaces
-
-A matrix item expands into one column per row, so a row labelled
-“Opening keynote” produces `session__Opening keynote`.
-[`utils::read.csv()`](https://rdrr.io/r/utils/read.table.html) rewrites
-that as `session__Opening.keynote` under its default
-`check.names = TRUE`, and the column no longer matches the contract the
-instrument declares.
-[`sframe_demo()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_demo.md)
-reads with `check.names = FALSE`, and
-[`vignette("learn-by-example")`](https://mohammedalisharafuddin.github.io/surveyframe/articles/learn-by-example.md)
-names the trap for anyone reading a surveyframe CSV by hand.
-
-### Reports are now reproducible, and say how they were made
-
-**Breaking in the sense that numbers move once.**
 [`run_analysis_plan()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/run_analysis_plan.md)
-gains a `seed` argument, defaulting to a fixed value. Every bootstrap
-confidence interval in an analysis plan, and the parallel analysis
-behind the EFA family, previously drew from the global random stream
-unseeded, so the same instrument and the same data gave different
-intervals on every run. Two runs on the bundled demo differed in 32 of
-1768 values, and the difference reached the text a researcher would
-quote:
+gains a `seed` argument, set by default. Bootstrap confidence intervals
+and the EFA parallel analysis previously drew from the random stream
+unseeded, so the same data gave a slightly different interval on every
+run.
 
-    run 1:  U = 1576, z = -0.98, p = 0.327, r = 0.09 [0.01, 0.27]
-    run 2:  U = 1576, z = -0.98, p = 0.327, r = 0.09 [0.00, 0.27]
-
-The test statistic and the p value were stable throughout, because they
-are computed analytically. Only the interval moved, which is why nothing
-ever looked wrong. **Confidence intervals produced by earlier releases
-are not wrong, but they are not reproducible, and re-running an analysis
-under 0.4.1 will give a slightly different interval.** Pass
-`seed = NULL` for the old behaviour.
-
-Seeding also pins `mc.cores` to 1 for the duration of the run.
-[`psych::fa.parallel()`](https://rdrr.io/pkg/psych/man/fa.parallel.html)
-splits its simulation across forked workers whose own random streams
-[`set.seed()`](https://rdrr.io/r/base/Random.html) cannot reach, and
-splits the work by core count, so the result otherwise depended on the
-machine it ran on. The caller’s random stream and `mc.cores` option are
-both restored afterwards.
+**Confidence intervals will move once** when you re-run an older
+analysis. Test statistics and p values are unaffected. Use `seed = NULL`
+for the previous behaviour.
 
 [`render_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_report.md)
-now says which of its 2 engines produced the file. It prefers Quarto and
-falls back to a built-in HTML writer when Quarto is absent or its render
-fails, and the 2 produce materially different documents, roughly 5.8 MB
-against 1.9 MB on the bundled demo. Until now both paths returned a file
-path and nothing else, so a caller could not tell which they had. The
-engine is now announced 3 ways: a message on the console, an `engine`
-attribute on the returned path so a script can assert on it, and a line
-in the report itself alongside the instrument hash. The analysis seed is
-printed there too, so the artefact states what reproducing it would
-take.
+now says which engine produced the file, Quarto or the built-in writer,
+in a message, in an `engine` attribute, and in the report itself beside
+the instrument hash and the seed.
 
-### Bug fix: a missing straight-lining chart now says why
+### Bug fixes
 
-[`sframe_plot_quality()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_plot_quality.md)
-returned `NULL` whenever no scale had a straight-lining flag rate, and
-the chart simply disappeared from the report. After this release’s
-`straightline_min_items` change that became the normal case for short
-scales: the bundled demo’s 5 scales are all 2 or 3 items, so every one
-is recorded as unchecked and the chart vanished with nothing said. An
-absent chart read as “nothing was flagged” while meaning “nothing was
-long enough to check”, which are opposite conclusions.
+- **The Google Sheets collector could corrupt collected data.** Adding a
+  question mid-study left the sheet’s header stale while new rows used
+  the new order, so values landed under the wrong headings with no
+  error. The collector now matches columns by name.
+- **Branching rules using `%in%` with more than one value never worked
+  in an exported survey.** The question stayed hidden whatever the
+  respondent answered. Present since 0.3.0.
+- **[`sem_lavaan_syntax()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sem_lavaan_syntax.md)
+  produced a mediation model lavaan could not fit.** Indirect effects
+  referred to path labels that were never written.
+- Straight-lining no longer flags scales shorter than four items, where
+  identical answers are normal rather than careless.
+  [`quality_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/quality_report.md)
+  gains `straightline_min_items`. When no scale is long enough to check,
+  the report now says so instead of omitting the chart silently.
+- Reading a response file with
+  [`read.csv()`](https://rdrr.io/r/utils/read.table.html) no longer
+  mangles matrix columns whose labels contain spaces. Use
+  `check.names = FALSE`.
 
-`sframe_quality_plot_note()` returns the reason there is no chart, and
-[`render_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_report.md)
-prints it in place of the missing figure.
+### Dependencies
 
-### Bug fix: a mediation model’s generated lavaan syntax can now be fitted
-
-[`sem_lavaan_syntax()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sem_lavaan_syntax.md)
-wrote an indirect effect as `indirect_A_B_C := A__B*B__C` while emitting
-the structural paths unlabelled, so the labels the definition multiplied
-were never defined. lavaan accepted the syntax and then refused the
-model at fit time with “unknown label(s) in variable definition(s)”.
-This is a hard error in the single case a `cb_sem` model is most often
-declared for, mediation.
-
-A path an indirect effect walks now carries its derived label in the
-structural block, so the label written on the path and the label
-multiplied in the `:=` line cannot diverge. A path the author labelled
-by hand keeps that label, and a model with no indirect effects generates
-exactly what it did before. The total-effect line is emitted whenever
-the direct path is labelled in the output, rather than only when it was
-labelled by hand.
-
-The defect was logged on 2026-08-04 and survived because the syntax
-generators were tested by matching substrings. It parses. Only fitting
-it reveals the problem, so the new tests fit the generated syntax to
-simulated data with a known mediation structure, and check `seminr`
-output by running it, rather than reading either.
-
-### Bug fix: the Apps Script collector no longer corrupts data after an instrument change
-
-The generated Google Apps Script collector wrote the sheet’s header row
-once, when it first created the sheet, and then built every response row
-positionally from `EXPECTED_COLUMNS`. Add an item to the instrument
-mid-collection, regenerate the collector, redeploy it onto the same
-sheet, and the header stayed as first deployed while rows arrived in the
-new order. Every column from the insertion point onward was off by one.
-
-Nothing errored. The sheet stayed well-formed,
-[`read_responses()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_responses.md)
-read it without complaint, and the values were simply under the wrong
-headings, so a researcher had no reason to suspect anything until an
-analysis made no sense. Adding an item mid-collection is what a pilot
-study does after a face-validity pass, so this is not an exotic case.
-
-The collector is now header-driven. It reads the sheet’s live header,
-appends only columns the instrument has genuinely gained, at the
-right-hand end, and maps every value by name. An existing column never
-moves, so rows already collected stay valid, and **a redeploy after an
-instrument change is safe**.
-
-Regression-tested by running the generated `doPost()` against a mock of
-the Sheets API it calls, since the collector is JavaScript the R package
-never executes and a test that only read the template would pass even if
-the logic were wrong. `V8` joins Suggests as the test-time engine.
-
-### Bug fix: multi-value `%in%` branching rules now work in exported surveys
-
-A branching rule using `%in%` with more than 1 value never fired in an
-exported survey. The gated item stayed hidden whatever the respondent
-answered, with no error shown to the respondent or the researcher.
-Present since 0.3.0, so every release up to 0.4.0 shipped it.
-
-[`sf_branch()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_branch.md)
-documents a vector for `%in%`, and a vector serialises to a JSON array.
-All 3 evaluators then disagreed about what they had been handed. The
-static survey template’s JavaScript called `value.split(',')`, which an
-array does not have, so the rule threw and the item stayed hidden.
-`sframe_module_eval_op()` read only the array’s first element, so a rule
-matched its first value and silently rejected the rest.
-`.evaluate_branch()` handled arrays correctly but never split the
-comma-separated string an older builder or a hand-written file carries.
-Only 1 of the 6 combinations of evaluator and value shape was right.
-
-All 3 now share `sframe_branch_in_values()` and accept both shapes, so
-an instrument written before this release starts working without being
-re-exported, and the 3 code paths can no longer drift apart. Verified
-end to end in headless Chrome against a real exported survey: before the
-fix the gated item stayed hidden for every answer, after it the item
-appears for each value in the rule and stays hidden for a value outside
-it.
-
-[`validate_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/validate_sframe.md)
-gains a `branching_values` check that flags a `%in%` rule whose value no
-evaluator can consume, since the reason this survived 3 releases is that
-nothing ever said a word about it.
-
-### Bug fix: straight-lining check no longer flags short scales by default
-
-[`quality_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/quality_report.md)’s
-straight-lining check applied to any scale with 2 or more items. On a
-2-item scale, giving the same response to both items is what a genuinely
-consistent respondent does, not evidence of inattention, so the check
-produced a large share of false positives on short scales. Found while
-proofreading the R Journal package paper against the bundled
-demonstration instrument, whose 5 scales are all 2 or 3 items: the check
-flagged 109 of 120 respondents (91 percent), driven almost entirely by
-the three 2-item scales, each independently flagging 44 to 53 percent of
-respondents.
-
-[`quality_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/quality_report.md)
-gains a `straightline_min_items` argument, defaulting to 4. A scale
-shorter than the threshold is recorded as `checked = FALSE` with an
-empty flag list, not silently skipped and not reported as a clean 0
-percent pass, so a caller can tell “too short to check” apart from
-“checked and nobody straight-lined it”. `print.sframe_quality_report()`
-and the
-[`render_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_report.md)
-quality table both surface the distinction. Pass
-`straightline_min_items = 2` to restore the previous, more permissive
-behaviour.
-
-On the bundled demonstration instrument this drops the flag rate from 91
-percent to 5 percent, all 6 remaining flags from the genuine attention
-check.
+`haven` and `V8` join Suggests, both optional.
 
 ## surveyframe 0.4.0
 
