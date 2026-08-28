@@ -61,7 +61,8 @@ Suggests:
     stm (>= 1.3.0),
     topicmodels,
     igraph (>= 1.5.0),
-    V8 (>= 4.0.0)
+    V8 (>= 4.0.0),
+    haven (>= 2.5.0)
 VignetteBuilder: knitr
 Config/testthat/edition: 3
 Config/roxygen2/version: 8.1.0

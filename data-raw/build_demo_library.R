@@ -127,11 +127,21 @@ write_demo <- function(name, instrument, responses, run_plan = TRUE,
                         meta_cols = c("started_at", "submitted_at"))
     res <- run_analysis_plan(r, instrument)
     errs <- Filter(function(b) !is.null(b$error), res)
-    if (length(errs)) {
+    # A block whose method needs an optional package that is absent here is a
+    # legitimate skip, and the package guards those methods deliberately. A
+    # block that errors for any other reason is a broken demo and stops the
+    # build.
+    absent <- vapply(errs, function(b)
+      grepl("install|not installed|requires the|cannot be loaded|is required",
+            b$error, ignore.case = TRUE), logical(1))
+    real <- errs[!absent]
+    if (length(real)) {
       stop(sprintf("%s: %d plan block(s) errored, first is: %s", name,
-                   length(errs), errs[[1]]$error), call. = FALSE)
+                   length(real), real[[1]]$error), call. = FALSE)
     }
-    status <- sprintf("%d blocks ok", length(res))
+    status <- sprintf("%d blocks ok%s", length(res),
+                      if (any(absent)) sprintf(", %d skipped for a missing package",
+                                               sum(absent)) else "")
     # The results table is the reference a reader compares against when they
     # run this data through another package.
     utils::write.csv(sframe_demo_results_table(res),
@@ -741,10 +751,19 @@ pls_model <- sf_model(
                sf_path("satisfaction", "intention"),
                sf_path("content_quality", "intention"))
 )
+# A measurement model on its own, so cfa_lavaan_syntax() has something to
+# generate from. The same 3 constructs with no structural paths declared.
+cfa_model <- sf_model(
+  id = "m3", label = "Measurement model only", type = "cfa", engine = "lavaan",
+  constructs = list(
+    sf_construct("content_quality", items = paste0("cq_", 1:3)),
+    sf_construct("satisfaction", items = paste0("sa_", 1:3)),
+    sf_construct("intention", items = paste0("it_", 1:3)))
+)
 sem_pls <- sf_instrument(
   title = "Does content quality bring people back?", version = "1.0.0",
   description = "Three constructs, a declared path model, and the syntax it generates.",
-  components = sem_comp, models = list(sem_model, pls_model),
+  components = sem_comp, models = list(sem_model, pls_model, cfa_model),
   analysis_plan = list(
     list(id = "RQ1", research_question = "What lavaan syntax does this model generate?",
          family = "measurement", method = "sem_lavaan_syntax",
@@ -755,6 +774,16 @@ sem_pls <- sf_instrument(
     list(id = "RQ3", research_question = "Does satisfaction carry content quality through to intention?",
          family = "regression", method = "mediation",
          roles = list(predictor = "content_quality", mediator = "satisfaction",
+                      outcome = "intention")),
+    list(id = "RQ4", research_question = "What CFA syntax does the measurement model generate?",
+         family = "measurement", method = "cfa_lavaan_syntax",
+         roles = list(model = "m3")),
+    list(id = "RQ5", research_question = "And what does a PLS estimate give?",
+         family = "measurement", method = "pls_sem",
+         roles = list(model = "m2")),
+    list(id = "RQ6", research_question = "Does content quality matter more to some attendees than others?",
+         family = "regression", method = "moderation",
+         roles = list(predictor = "content_quality", moderator = "satisfaction",
                       outcome = "intention"))
   )
 )
@@ -840,7 +869,22 @@ open_text <- sf_instrument(
          roles = list(item = "what_worked")),
     list(id = "RQ5", research_question = "Do in-person and online attendees say different things?",
          family = "text", method = "term_freq",
-         roles = list(item = "what_to_improve", group = "format"))
+         roles = list(item = "what_to_improve", group = "format")),
+    list(id = "RQ6", research_question = "Which words cluster together?",
+         family = "text", method = "co_occurrence_network",
+         roles = list(item = "what_worked")),
+    list(id = "RQ7", research_question = "Is the tone positive or negative?",
+         family = "text", method = "tidy_sentiment",
+         roles = list(item = "what_to_improve")),
+    list(id = "RQ8", research_question = "What does a document-feature matrix show?",
+         family = "text", method = "quanteda_dfm",
+         roles = list(item = "what_worked")),
+    list(id = "RQ9", research_question = "What topics are people writing about?",
+         family = "text", method = "topic_model_lda",
+         roles = list(item = "what_to_improve"), options = list(k = 2L)),
+    list(id = "RQ10", research_question = "The same question with a structural topic model.",
+         family = "text", method = "stm_topics",
+         roles = list(item = "what_to_improve"), options = list(k = 2L))
   )
 )
 good_in <- c("the sessions were excellent and well organised",
