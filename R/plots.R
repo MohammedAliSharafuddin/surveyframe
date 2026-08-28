@@ -2,13 +2,10 @@
 
 # Why sframe_plot_quality() has nothing to draw.
 #
-# A NULL return reads as "nothing was flagged" and can equally mean "no scale
-# was long enough to check", which are opposite conclusions. Since 0.4.1
-# straight-lining skips scales shorter than `straightline_min_items`, and an
-# instrument whose scales are all short (the bundled demo's 5 scales are 2 or
-# 3 items) yields no rows at all, so the chart vanished from the report with
-# nothing said. NULL cannot carry an attribute, so the reason is a separate
-# call, which render_report() prints in place of the missing chart.
+# A NULL return alone cannot say whether nothing was flagged or nothing was
+# long enough to check, which are opposite conclusions. NULL carries no
+# attributes, so the reason is a separate call that render_report() prints in
+# place of the missing chart.
 sframe_quality_plot_note <- function(x) {
   stopifnot(inherits(x, "sframe_quality_report"))
   sl <- x$straightline %||% list()
@@ -1863,12 +1860,9 @@ sframe_plot_group_comparison <- function(result, data, palette = c("web", "print
                                    fill = .data$group)) +
     ggplot2::geom_boxplot(outlier.shape = NA, width = 0.55, alpha = 0.85,
                           colour = brand$ink, linewidth = 0.35) +
-    # Seeded so 2 renders of the same report draw the points in the same
-    # places. geom_jitter() otherwise takes offsets from the global RNG at
-    # plot time, which is after run_analysis_plan() has restored the caller's
-    # stream, so the numbers in a report were reproducible from 0.4.1 while
-    # the charts still moved. For a report used as an audit artefact the
-    # picture has to settle too.
+    # Seeded so 2 renders of the same report place the points identically.
+    # geom_jitter() otherwise draws offsets at plot time, after
+    # run_analysis_plan() has restored the caller's RNG stream.
     ggplot2::geom_point(position = ggplot2::position_jitter(width = 0.08,
                                                             height = 0,
                                                             seed = 20260828L),

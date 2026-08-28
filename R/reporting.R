@@ -408,17 +408,10 @@ render_report <- function(
   sframe_report_result(dest, "html")
 }
 
-# render_report() has 2 engines and used to end both branches with the
-# destination path and nothing else, so a caller could not tell which one had
-# run. The 2 artefacts are not close substitutes: on the bundled demo the
-# Quarto render is roughly 5.8 MB and the base-R fallback roughly 1.9 MB, from
-# identical inputs. A study that treats the report as its audit artefact needs
-# to know which it is holding, and a script needs to be able to assert on it.
-#
-# The engine is announced 3 ways, because each serves a different reader: a
-# message for the person at the console, an attribute for a script, and a line
-# in the report itself for whoever opens the file later with no access to
-# either.
+# The 2 engines produce different documents from identical inputs, so a caller
+# needs to know which one ran. It is announced 3 ways: a message for the
+# console, an attribute for a script, and a line in the report for whoever
+# opens the file later.
 # The seed a report's numbers were produced under. run_analysis_plan() records
 # it on its result; when there is no plan to run there is nothing random to
 # reproduce, so the field says so rather than printing a seed that governed

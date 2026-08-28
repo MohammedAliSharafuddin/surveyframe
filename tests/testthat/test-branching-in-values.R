@@ -1,12 +1,8 @@
 # tests/testthat/test-branching-in-values.R
-# A multi-value `%in%` branch rule was dead in every exported survey from 0.3.0
-# to 0.4.0. sf_branch() documents a vector for `%in%`, and a vector serialises
-# to a JSON array, but the static template's evaluate() did
-# value.split(','), which arrays do not have, so the rule threw and the gated
-# item stayed hidden for good. The R side had the mirror-image problem in 2
-# places: sframe_module_eval_op() split only the first element of a vector, and
-# .evaluate_branch() never split a comma-separated string. Nothing errored
-# anywhere, at any layer, which is why it survived 3 releases.
+# Guards multi-value `%in%` branch rules. The value arrives either as a vector,
+# which sf_branch() documents, or as a comma-separated string, and all 3
+# evaluators have to accept both. When they did not, a gated question stayed
+# hidden whatever the respondent answered, with no error anywhere.
 
 branch_instrument <- function(value) {
   sf_instrument(

@@ -1,15 +1,11 @@
 # tests/testthat/test-collector-header-drift.R
-# The generated Apps Script collector wrote the header row once, when it
-# created the sheet, and then built every row positionally from
-# EXPECTED_COLUMNS. Add an item to the instrument mid-collection, regenerate
-# and redeploy, and the sheet's header was stale while rows arrived in the new
-# order, so every column from the insertion point onward was off by one.
-# Nothing errored. The sheet stayed well-formed and read_responses() read it
-# happily, so the corruption was invisible until an analysis made no sense.
+# Guards against the collector corrupting data when an instrument changes
+# mid-study. Writing the header once and then building rows positionally put
+# every value under the wrong heading, with no error.
 #
-# The collector is JavaScript the R package never executes, so a test that only
-# greps the template would pass even if the logic were wrong. This runs the
-# real doPost() against a mock of the Sheets API it uses.
+# The collector is JavaScript the package never runs, so a test that only read
+# the template would pass with the logic wrong. This runs the real doPost()
+# against a mock of the Sheets API.
 
 collector_source <- function() {
   p <- system.file("static_survey", "collector_template.gs",

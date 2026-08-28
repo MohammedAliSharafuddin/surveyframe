@@ -833,13 +833,9 @@ sem_lavaan_syntax <- function(model, instrument = NULL, standardised = TRUE) {
   )
   lines <- c(lines, vapply(constructs, sframe_lavaan_indicator_line, character(1)), "")
 
-  # An indirect effect multiplies parameter labels, so every path it walks has
-  # to carry that label in the structural block. Deriving a label for the ":="
-  # line while leaving the path itself unlabelled produced syntax that parses
-  # and then fails at fit time with lavaan's "unknown label(s) in variable
-  # definition(s)". A parse-only check passes it, which is why it survived: the
-  # defect is not in the syntax's shape but in whether the model it describes
-  # can be estimated.
+  # An indirect effect multiplies parameter labels, so every path it walks must
+  # carry that label in the structural block. Without it lavaan parses the
+  # syntax and then rejects the model with "unknown label(s)".
   sframe_edge_key <- function(from, to) paste(from, to, sep = "->")
   labelled_edges <- unique(unlist(lapply(indirect, function(ind) {
     nodes <- c(ind$from, ind$through, ind$to)

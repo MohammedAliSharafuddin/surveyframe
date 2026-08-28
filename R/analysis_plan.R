@@ -1426,19 +1426,11 @@ run_analysis_plan <- function(data, instrument, scored = TRUE, plots = FALSE,
   sframe_check_instrument(instrument)
   stopifnot(is.data.frame(data))
 
-  # Seeded by default since 0.4.1. Every bootstrap confidence interval in this
-  # function, and the parallel analysis inside the EFA path, drew from the
-  # global RNG without a seed, so the same instrument and the same data gave
-  # different intervals on every run: 32 of 1768 values moved between 2 runs
-  # of the bundled demo, and the movement reached the APA string a researcher
-  # would quote. A report that changes between renders cannot be the audit
-  # artefact of a study, which is what render_report() output is for.
-  #
-  # Seeding once here rather than threading `seed` through every helper keeps
-  # the change to one place and covers anything random the plan reaches.
-  # sframe_with_seed() restores the caller's RNG state on exit, so a plan run
-  # does not reset randomness for unrelated code afterwards. Pass seed = NULL
-  # for the pre-0.4.1 behaviour.
+  # Seeded by default so the same instrument and data give the same answer
+  # every time, which is what makes a rendered report usable as evidence.
+  # Seeding once here covers every bootstrap interval and the EFA parallel
+  # analysis. sframe_with_seed() restores the caller's RNG state on exit.
+  # Pass seed = NULL for the pre-0.4.1 behaviour.
   if (!is.null(seed)) {
     out <- sframe_with_seed(seed, run_analysis_plan(
       data, instrument, scored = scored, plots = plots,
