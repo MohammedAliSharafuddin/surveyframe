@@ -72,7 +72,35 @@ frame_of <- function(n, seed_offset = 0) {
 
 written <- list()
 
-write_demo <- function(name, instrument, responses, run_plan = TRUE) {
+#' The standard branding, applied on demand rather than baked into a fixture.
+#'
+#' One definition serves every demo, so a reader sees a welcome page and a logo
+#' on the demo that matches their own survey, and no fixture on disk changes.
+sframe_demo_branding_block <- function(mode = "standard") {
+  list(
+    mode = mode,
+    theme = "#2563eb",
+    submit_label = "Send my feedback",
+    welcome = list(
+      title = "Thank you for coming",
+      intro_text = paste("This takes about 3 minutes. Your answers help us",
+                         "plan next year's event."),
+      consent_text = "I am happy for my answers to be used in the event report.",
+      consent_required = TRUE,
+      start_label = "Start"),
+    thankyou = list(
+      message = "Thank you. Your feedback has been recorded.",
+      redirect_url = "",
+      show_download = TRUE),
+    header = list(
+      institution = "Riverside Conference Centre",
+      logo_base64 = "",
+      show_progress = TRUE)
+  )
+}
+
+write_demo <- function(name, instrument, responses, run_plan = TRUE,
+                       reuse_responses = NULL) {
   sframe_path <- file.path(out_dir, paste0(name, ".sframe"))
   csv_path    <- file.path(out_dir, paste0(name, "_responses.csv"))
 
@@ -82,7 +110,12 @@ write_demo <- function(name, instrument, responses, run_plan = TRUE) {
   write_sframe(instrument, tmp, overwrite = TRUE)
   instrument <- read_sframe(tmp)
   write_sframe(instrument, sframe_path, overwrite = TRUE)
-  utils::write.csv(responses, csv_path, row.names = FALSE, na = "")
+  # Demos 18 to 22 share an existing response file, since only the render
+  # block or the provenance differs. Duplicating the data would suggest the
+  # studies differ when they do not.
+  if (is.null(reuse_responses)) {
+    utils::write.csv(responses, csv_path, row.names = FALSE, na = "")
+  }
 
   # Run the plan here rather than trusting the block count. A block with an
   # unavailable method still counts as a block and still renders, so a demo
@@ -574,3 +607,528 @@ cr$overall_value <- pmin(100, pmax(0, round(
   40 + 3.2 * (cr$sessions_attended - 6) + 0.16 * (cr$networking_minutes - 75) +
     stats::rnorm(n, 0, 11))))
 write_demo("correlation_regression", correlation_regression, cr)
+
+# --- 10. logistic ----------------------------------------------------------
+# The same predictor against 3 outcome shapes, so a reader sees which model
+# the outcome chooses.
+set.seed(4110)
+n <- 80
+logistic <- sf_instrument(
+  title = "Will they come back?", version = "1.0.0",
+  description = "Binary, ordinal and 3-category outcomes from one predictor.",
+  components = list(
+    sf_item("sessions_attended", "How many sessions did you attend?",
+            type = "numeric", required = TRUE),
+    sf_choices("yn", c("no", "yes"), c("No", "Yes")),
+    sf_item("will_return", "Will you attend next year?", type = "single_choice",
+            choice_set = "yn", required = TRUE),
+    agree5(),
+    sf_item("satisfaction", "I was satisfied with the event.", type = "likert",
+            choice_set = "agree5", required = TRUE),
+    sf_choices("pref", c("workshop", "keynote", "panel"),
+               c("Workshops", "Keynotes", "Panel discussions")),
+    sf_item("preferred_session_type", "Which session type do you value most?",
+            type = "single_choice", choice_set = "pref", required = TRUE)
+  ),
+  analysis_plan = list(
+    list(id = "RQ1", research_question = "Does attending more sessions predict returning?",
+         family = "regression", method = "regression_logistic_binary",
+         roles = list(predictors = "sessions_attended", dependent = "will_return")),
+    list(id = "RQ2", research_question = "And does it predict how satisfied they were?",
+         family = "regression", method = "regression_logistic_ordinal",
+         roles = list(predictors = "sessions_attended", dependent = "satisfaction")),
+    list(id = "RQ3", research_question = "And which session type they prefer?",
+         family = "regression", method = "regression_logistic_multinomial",
+         roles = list(predictors = "sessions_attended",
+                      dependent = "preferred_session_type"))
+  )
+)
+lg <- frame_of(n, 10)
+lg$sessions_attended <- pmax(0, round(stats::rnorm(n, 6, 2.2)))
+z <- scale(lg$sessions_attended)[, 1]
+# odds ratio about 2.4 per standard deviation of sessions
+lg$will_return <- ifelse(stats::runif(n) < stats::plogis(0.2 + 0.88 * z), "yes", "no")
+lg$satisfaction <- lik(0.7 * z + sqrt(1 - 0.49) * stats::rnorm(n))
+lg$preferred_session_type <- ifelse(
+  z > 0.5, sample(c("workshop", "keynote"), n, TRUE, c(0.7, 0.3)),
+  sample(c("keynote", "panel"), n, TRUE, c(0.6, 0.4)))
+write_demo("logistic", logistic, lg)
+
+# --- 11. factor_structure --------------------------------------------------
+# 8 items over 2 scales. n is larger because parallel analysis needs it to
+# settle on the right number of factors.
+set.seed(4111)
+n <- 120
+org_items <- c("The event ran to time.", "It was easy to find my way around.",
+               "Staff were helpful.", "The venue suited the event.")
+con_items <- c("The sessions were relevant to my work.",
+               "The material went deep enough.", "The speakers knew their subject.",
+               "The handouts were useful.")
+comp <- list(agree5())
+for (k in 1:4) comp <- c(comp, list(sf_item(sprintf("org_%d", k), org_items[k],
+  type = "likert", choice_set = "agree5", scale_id = "organisation")))
+for (k in 1:4) comp <- c(comp, list(sf_item(sprintf("con_%d", k), con_items[k],
+  type = "likert", choice_set = "agree5", scale_id = "content")))
+comp <- c(comp, list(
+  sf_scale("organisation", "Perceived organisation", items = paste0("org_", 1:4)),
+  sf_scale("content", "Perceived content quality", items = paste0("con_", 1:4))))
+factor_structure <- sf_instrument(
+  title = "Two things attendees judge", version = "1.0.0",
+  description = "Eight items, 2 factors, and whether the data supports that.",
+  components = comp,
+  analysis_plan = list(
+    list(id = "RQ1", research_question = "Is this data suitable for factor analysis?",
+         family = "measurement", method = "efa_readiness",
+         roles = list(items = c(paste0("org_", 1:4), paste0("con_", 1:4)))),
+    list(id = "RQ2", research_question = "How many factors, and which items load where?",
+         family = "measurement", method = "efa_solution",
+         roles = list(items = c(paste0("org_", 1:4), paste0("con_", 1:4))))
+  )
+)
+f1 <- stats::rnorm(n); f2 <- 0.35 * f1 + sqrt(1 - 0.35^2) * stats::rnorm(n)
+fsx <- frame_of(n, 11)
+o <- indicators(f1, c(0.80, 0.78, 0.74, 0.70))
+c2 <- indicators(f2, c(0.79, 0.76, 0.73, 0.68))
+for (k in 1:4) fsx[[paste0("org_", k)]] <- o[, k]
+for (k in 1:4) fsx[[paste0("con_", k)]] <- c2[, k]
+write_demo("factor_structure", factor_structure, fsx)
+
+# --- 12. sem_pls -----------------------------------------------------------
+set.seed(4112)
+n <- 150
+mk <- function(prefix, labels, scale_id) {
+  lapply(seq_along(labels), function(k)
+    sf_item(sprintf("%s_%d", prefix, k), labels[k], type = "likert",
+            choice_set = "agree5", scale_id = scale_id))
+}
+sem_comp <- c(
+  list(agree5()),
+  mk("cq", c("The sessions were relevant.", "The material went deep enough.",
+             "The speakers knew their subject."), "content_quality"),
+  mk("sa", c("I was satisfied with the event.", "The event met my expectations.",
+             "It was a good use of my time."), "satisfaction"),
+  mk("it", c("I will attend next year.", "I would recommend it to a colleague.",
+             "I would pay to attend again."), "intention"),
+  list(sf_scale("content_quality", "Content quality", items = paste0("cq_", 1:3)),
+       sf_scale("satisfaction", "Satisfaction", items = paste0("sa_", 1:3)),
+       sf_scale("intention", "Intention to return", items = paste0("it_", 1:3)))
+)
+sem_model <- sf_model(
+  id = "m1", label = "Content quality to intention", type = "cb_sem",
+  engine = "lavaan",
+  constructs = list(
+    sf_construct("content_quality", items = paste0("cq_", 1:3)),
+    sf_construct("satisfaction", items = paste0("sa_", 1:3)),
+    sf_construct("intention", items = paste0("it_", 1:3))),
+  paths = list(sf_path("content_quality", "satisfaction"),
+               sf_path("satisfaction", "intention"),
+               sf_path("content_quality", "intention")),
+  indirect = list(sf_indirect("content_quality", "satisfaction", "intention"))
+)
+# Two models on purpose, and the reason is worth teaching. seminr_syntax()
+# refuses a cb_sem model, because generating PLS syntax from a covariance-based
+# declaration would estimate a different model from the one declared. So the
+# same 3 constructs are declared twice, once for each engine, and a reader
+# sees that the model type decides the syntax.
+pls_model <- sf_model(
+  id = "m2", label = "The same paths, estimated by PLS", type = "pls_sem",
+  engine = "seminr",
+  constructs = list(
+    sf_construct("content_quality", items = paste0("cq_", 1:3), mode = "composite"),
+    sf_construct("satisfaction", items = paste0("sa_", 1:3), mode = "composite"),
+    sf_construct("intention", items = paste0("it_", 1:3), mode = "composite")),
+  paths = list(sf_path("content_quality", "satisfaction"),
+               sf_path("satisfaction", "intention"),
+               sf_path("content_quality", "intention"))
+)
+sem_pls <- sf_instrument(
+  title = "Does content quality bring people back?", version = "1.0.0",
+  description = "Three constructs, a declared path model, and the syntax it generates.",
+  components = sem_comp, models = list(sem_model, pls_model),
+  analysis_plan = list(
+    list(id = "RQ1", research_question = "What lavaan syntax does this model generate?",
+         family = "measurement", method = "sem_lavaan_syntax",
+         roles = list(model = "m1")),
+    list(id = "RQ2", research_question = "And the seminr syntax for a PLS estimate?",
+         family = "measurement", method = "seminr_syntax",
+         roles = list(model = "m2")),
+    list(id = "RQ3", research_question = "Does satisfaction carry content quality through to intention?",
+         family = "regression", method = "mediation",
+         roles = list(predictor = "content_quality", mediator = "satisfaction",
+                      outcome = "intention"))
+  )
+)
+# paths 0.45 and 0.40 with a direct 0.20, so the indirect effect is near 0.18
+cqf <- stats::rnorm(n)
+saf <- 0.45 * cqf + sqrt(1 - 0.45^2) * stats::rnorm(n)
+itf <- 0.40 * saf + 0.20 * cqf + sqrt(1 - 0.40^2 - 0.20^2) * stats::rnorm(n)
+sp <- frame_of(n, 12)
+for (k in 1:3) sp[[paste0("cq_", k)]] <- indicators(cqf, 0.80)[, 1]
+for (k in 1:3) sp[[paste0("sa_", k)]] <- indicators(saf, 0.78)[, 1]
+for (k in 1:3) sp[[paste0("it_", k)]] <- indicators(itf, 0.76)[, 1]
+write_demo("sem_pls", sem_pls, sp)
+
+# --- 13. branching ---------------------------------------------------------
+# A multi-value %in% rule, which was dead in every exported survey from 0.3.0
+# to 0.4.0 and is the reason this demo exists.
+set.seed(4113)
+n <- 50
+branching <- sf_instrument(
+  title = "Questions that depend on who you are", version = "1.0.0",
+  description = "Skip logic, and why a skipped question differs from a missing answer.",
+  components = list(
+    sf_choices("who", c("delegate", "speaker", "exhibitor", "visitor"),
+               c("Delegate", "Speaker", "Exhibitor", "Day visitor")),
+    sf_item("attendee_type", "What brought you here?", type = "single_choice",
+            choice_set = "who", required = TRUE),
+    sf_item("sessions_attended", "How many sessions did you attend?",
+            type = "numeric"),
+    sf_item("comment", "Anything you would change about the programme?",
+            type = "text"),
+    sf_branch(item_id = "sessions_attended", depends_on = "attendee_type",
+              operator = "%in%", value = c("delegate", "speaker"),
+              action = "show"),
+    sf_branch(item_id = "comment", depends_on = "attendee_type",
+              operator = "%in%", value = c("delegate", "speaker"),
+              action = "show")
+  ),
+  analysis_plan = list(
+    list(id = "RQ1", research_question = "Who attended, and in what proportions?",
+         family = "descriptive", method = "frequency",
+         roles = list(variable = "attendee_type")),
+    list(id = "RQ2", research_question = "Among those asked, how many sessions did they attend?",
+         family = "descriptive", method = "descriptives",
+         roles = list(variables = "sessions_attended"))
+  )
+)
+br <- frame_of(n, 13)
+br$attendee_type <- sample(c("delegate", "speaker", "exhibitor", "visitor"),
+                           n, TRUE, c(0.55, 0.15, 0.15, 0.15))
+asked <- br$attendee_type %in% c("delegate", "speaker")
+br$sessions_attended <- ifelse(asked, pmax(0, round(stats::rnorm(n, 6, 2.1))), NA)
+br$comment <- ifelse(asked, sample(c("More breaks", "Longer sessions",
+                                     "Better catering", ""), n, TRUE), NA)
+write_demo("branching", branching, br)
+
+# --- 14. open_text ---------------------------------------------------------
+# A small controlled vocabulary, so term frequency, n-grams and topics return
+# something stable and readable.
+set.seed(4114)
+n <- 60
+open_text <- sf_instrument(
+  title = "What worked, and what to change", version = "1.0.0",
+  description = "Two open questions, and the 9 things surveyframe can do with them.",
+  components = list(
+    sf_choices("fmt", c("in_person", "online"), c("In person", "Online")),
+    sf_item("format", "How did you attend?", type = "single_choice",
+            choice_set = "fmt", required = TRUE),
+    sf_item("what_worked", "What worked well?", type = "textarea"),
+    sf_item("what_to_improve", "What should we change?", type = "textarea")
+  ),
+  analysis_plan = list(
+    list(id = "RQ1", research_question = "Which words come up most often?",
+         family = "text", method = "term_freq",
+         roles = list(item = "what_worked")),
+    list(id = "RQ2", research_question = "And which pairs of words?",
+         family = "text", method = "ngram_freq",
+         roles = list(item = "what_worked")),
+    list(id = "RQ3", research_question = "How is a key word actually used?",
+         family = "text", method = "term_context",
+         roles = list(item = "what_worked"), options = list(term = "sessions")),
+    list(id = "RQ4", research_question = "Which words appear together?",
+         family = "text", method = "co_occurrence",
+         roles = list(item = "what_worked")),
+    list(id = "RQ5", research_question = "Do in-person and online attendees say different things?",
+         family = "text", method = "term_freq",
+         roles = list(item = "what_to_improve", group = "format"))
+  )
+)
+good_in <- c("the sessions were excellent and well organised",
+             "excellent speakers and useful practical sessions",
+             "networking was valuable and the venue was good",
+             "well organised sessions with useful handouts")
+good_on <- c("the online platform worked well and was easy",
+             "useful sessions and the recordings were excellent",
+             "easy to join and the speakers were clear",
+             "good content and easy access from home")
+bad_in  <- c("the breaks were too short and rooms were crowded",
+             "more practical sessions and longer breaks please",
+             "catering was poor and signage was confusing",
+             "too crowded and the rooms were hard to find")
+bad_on  <- c("the platform was slow and hard to navigate",
+             "more interaction please and better audio quality",
+             "audio was poor and it was hard to ask questions",
+             "slow platform and little chance to interact")
+ot <- frame_of(n, 14)
+ot$format <- sample(c("in_person", "online"), n, TRUE, c(0.55, 0.45))
+ot$what_worked <- ifelse(ot$format == "in_person",
+                         sample(good_in, n, TRUE), sample(good_on, n, TRUE))
+ot$what_to_improve <- ifelse(ot$format == "in_person",
+                             sample(bad_in, n, TRUE), sample(bad_on, n, TRUE))
+write_demo("open_text", open_text, ot)
+
+# --- 17. multi_response ----------------------------------------------------
+# multiple_choice and ranking both expand into 1 column per option, which a
+# reader who has seen only likert meets here first. read_responses() accepts
+# the expanded form as well as the separated one, and cochran_q needs it.
+set.seed(4117)
+n <- 60
+sess <- c("keynote", "workshop", "panel", "poster", "social")
+reasons <- c("content", "networking", "location")
+multi_response <- sf_instrument(
+  title = "Which sessions, and why come at all?", version = "1.0.0",
+  description = "Two items that expand into one column per option.",
+  components = list(
+    sf_choices("sessions", sess,
+               c("Opening keynote", "Workshops", "Panel discussion",
+                 "Poster session", "Social evening")),
+    sf_item("sessions_chosen", "Which did you attend? Choose any.",
+            type = "multiple_choice", choice_set = "sessions", required = TRUE),
+    sf_choices("reasons", reasons,
+               c("The content", "The networking", "The location")),
+    sf_item("rank_priorities", "Rank your reasons for attending.",
+            type = "ranking", choice_set = "reasons", required = TRUE)
+  ),
+  analysis_plan = list(
+    list(id = "RQ1", research_question = "Which sessions were best attended?",
+         family = "descriptive", method = "descriptives",
+         roles = list(variables = paste0("sessions_chosen__", sess))),
+    list(id = "RQ2", research_question = "Do the sessions differ in how often they were chosen?",
+         family = "categorical", method = "cochran_q",
+         roles = list(measures = paste0("sessions_chosen__", sess))),
+    list(id = "RQ3", research_question = "What did attendees come for?",
+         family = "descriptive", method = "descriptives",
+         roles = list(variables = paste0("rank_priorities__", reasons)))
+  )
+)
+mr <- frame_of(n, 17)
+# keynote about 70 percent, poster about 25, so cochran_q has something to find
+probs <- c(keynote = 0.72, workshop = 0.58, panel = 0.40, poster = 0.25,
+           social = 0.45)
+for (sname in sess) {
+  mr[[paste0("sessions_chosen__", sname)]] <-
+    as.integer(stats::runif(n) < probs[[sname]])
+}
+# a consensus order with content first, and some disagreement
+for (r in seq_len(n)) {
+  ord <- if (stats::runif(1) < 0.65) c("content", "networking", "location") else
+    sample(reasons)
+  for (k in seq_along(reasons)) {
+    mr[r, paste0("rank_priorities__", reasons[k])] <- which(ord == reasons[k])
+  }
+}
+write_demo("multi_response", multi_response, mr)
+
+# --- 15. mcdm_choice -------------------------------------------------------
+# Choosing the venue for next year, which is what an event organiser decides.
+# Reframed from the bundled hotel-supplier fixture, whose data this leaves
+# untouched, and extended so all 10 MCDA methods appear.
+set.seed(4115)
+n <- 12
+crit <- c("cost", "capacity", "transport", "catering")
+venues <- c("Riverside", "Old Mill", "Civic Hall", "Parkview", "Harbour Suite")
+
+mcdm_components <- list(
+  sf_item("crit_pairs", "Compare the importance of each pair of criteria",
+          type = "pairwise_comparison", comparison_items = crit,
+          comparison_scale = "saaty", required = TRUE),
+  sf_item("crit_points", "Divide 100 points across the criteria",
+          type = "criteria_weight", comparison_items = crit, required = TRUE),
+  sf_item("crit_influence", "How strongly does each factor influence the others?",
+          type = "pairwise_comparison", comparison_items = crit,
+          comparison_scale = "influence", required = TRUE)
+)
+
+# The audited figures every matrix method scores. Cost and transport time are
+# cost criteria, where lower is better.
+perf <- list(c(4.1, 3.0, 210, 36), c(3.6, 4.5, 180, 48), c(4.8, 2.5, 260, 24),
+             c(3.9, 4.0, 150, 72), c(4.4, 3.8, 230, 30))
+matrix_block <- function(id, question, method) {
+  list(id = id, research_question = question, family = "decision",
+       method = method, roles = list(weights_item = "crit_pairs"),
+       options = list(matrix = perf, alternatives = venues, criteria = crit,
+                      criteria_types = c("benefit", "benefit", "cost", "cost")))
+}
+mcdm_choice <- sf_instrument(
+  title = "Choosing next year's venue", version = "1.0.0",
+  description = "One decision, 10 methods, and whether they agree.",
+  components = mcdm_components,
+  analysis_plan = c(
+    list(
+      list(id = "RQ1", research_question = "What weight does each criterion carry?",
+           family = "decision", method = "ahp",
+           roles = list(pairwise = "crit_pairs"), options = list(cr_filter = FALSE)),
+      list(id = "RQ2", research_question = "The same weights with network dependence allowed.",
+           family = "decision", method = "anp",
+           roles = list(pairwise = "crit_pairs"), options = list(cr_filter = FALSE)),
+      list(id = "RQ3", research_question = "Which criteria drive the others?",
+           family = "decision", method = "dematel",
+           roles = list(pairwise = "crit_influence"))),
+    Map(matrix_block,
+        sprintf("RQ%d", 4:10),
+        c("Which venue ranks best overall?",
+          "And by compromise ranking?",
+          "And by ratio analysis?",
+          "And by simple multi-attribute rating?",
+          "And by weighted aggregated sum product?",
+          "And by outranking flows?",
+          "And by outranking with thresholds?"),
+        c("topsis", "vikor", "moora", "smart", "waspas", "promethee", "electre"))
+  )
+)
+
+true_w <- c(cost = 0.40, capacity = 0.25, transport = 0.20, catering = 0.15)
+saaty_signed <- function(ratio) {
+  if (ratio >= 1) max(1, min(9, round(ratio))) else -max(2, min(9, round(1 / ratio)))
+}
+md <- frame_of(n, 15)
+pair_cols <- sframe_comparison_columns(
+  Filter(function(i) identical(i$id, "crit_pairs"), mcdm_choice$items)[[1]])
+pairs <- sframe_comparison_pairs(crit, "saaty")
+for (k in seq_len(nrow(pairs))) {
+  r <- true_w[[pairs$a[k]]] / true_w[[pairs$b[k]]]
+  # sd 0.18 keeps the consistency ratio under 0.1, so the judgements hold
+  md[[pair_cols[k]]] <- vapply(seq_len(n), function(i)
+    saaty_signed(r * exp(stats::rnorm(1, 0, 0.18))), numeric(1))
+}
+cw_cols <- paste0("crit_points__", crit)
+for (i in seq_len(n)) {
+  raw <- pmax(5, round(true_w * 100 + stats::rnorm(4, 0, 6)))
+  raw <- round(raw / sum(raw) * 100); raw[4] <- 100 - sum(raw[1:3])
+  for (j in seq_along(crit)) md[i, cw_cols[j]] <- raw[j]
+}
+infl_cols <- sframe_comparison_columns(
+  Filter(function(i) identical(i$id, "crit_influence"), mcdm_choice$items)[[1]])
+infl_pairs <- sframe_comparison_pairs(crit, "influence")
+true_infl <- matrix(c(0, 2, 3, 3,  1, 0, 1, 2,  1, 1, 0, 1,  2, 1, 1, 0),
+                    nrow = 4, byrow = TRUE, dimnames = list(crit, crit))
+for (k in seq_len(nrow(infl_pairs))) {
+  base <- true_infl[infl_pairs$a[k], infl_pairs$b[k]]
+  md[[infl_cols[k]]] <- pmax(0, pmin(4, round(
+    base + stats::rnorm(n, 0, 0.5))))
+}
+write_demo("mcdm_choice", mcdm_choice, md)
+
+# --- 16. small_sample ------------------------------------------------------
+set.seed(4116)
+n <- 18
+small_sample <- sf_instrument(
+  title = "A pilot with 18 attendees", version = "1.0.0",
+  description = "What a defensible answer looks like when n is below 30.",
+  components = list(
+    sf_choices("fmt", c("in_person", "online"), c("In person", "Online")),
+    sf_item("format", "How did you attend?", type = "single_choice",
+            choice_set = "fmt", required = TRUE),
+    sf_item("sessions_attended", "How many sessions did you attend?",
+            type = "numeric", required = TRUE),
+    sf_choices("yn", c("no", "yes"), c("No", "Yes")),
+    sf_item("will_return", "Will you attend next year?", type = "single_choice",
+            choice_set = "yn", required = TRUE)
+  ),
+  analysis_plan = list(
+    list(id = "RQ1", research_question = "Do the 2 formats differ, without assuming normality?",
+         family = "group_comparison", method = "mann_whitney",
+         roles = list(group = "format", outcome = "sessions_attended")),
+    list(id = "RQ2", research_question = "Is format associated with returning, on an exact test?",
+         family = "categorical", method = "fisher_exact",
+         roles = list(row = "format", column = "will_return")),
+    list(id = "RQ3", research_question = "Does attending more sessions predict returning, with a small-sample correction?",
+         family = "regression", method = "firth_logistic",
+         roles = list(predictors = "sessions_attended", dependent = "will_return"))
+  )
+)
+ss <- frame_of(n, 16)
+ss$format <- rep(c("in_person", "online"), each = n / 2)
+# d = 1.0, large on purpose: below 30 there is no power for anything subtle
+ss$sessions_attended <- pmax(0, round(c(stats::rnorm(n / 2, 7.4, 1.8),
+                                        stats::rnorm(n / 2, 5.6, 1.8))))
+ss$will_return <- ifelse(
+  stats::runif(n) < stats::plogis(-1.6 + 0.42 * ss$sessions_attended), "yes", "no")
+write_demo("small_sample", small_sample, ss)
+
+# --- 18 to 20. presentation ------------------------------------------------
+# The same 4 questions as first_survey. What differs is the render block, so a
+# reader comparing a plain survey with a branded one is looking at that and
+# nothing else.
+presentation_of <- function(title, description, render_block, extra = list()) {
+  sf_instrument(
+    title = title, version = "1.0.0", description = description,
+    components = c(first_survey$items, first_survey$choices, extra),
+    render = render_block,
+    analysis_plan = list(
+      list(id = "RQ1", research_question = "Who came to the event?",
+           family = "descriptive", method = "frequency",
+           roles = list(variable = "attendee_type")))
+  )
+}
+write_demo("branded_survey",
+  presentation_of("Event feedback, branded",
+    "The same 4 questions with a welcome page, a logo, a colour and a thank you page.",
+    sframe_demo_branding_block("standard")),
+  fs, reuse_responses = "first_survey")
+
+write_demo("conversational_survey",
+  presentation_of("Event feedback, one question at a time",
+    "The same instrument in conversational mode, for comparison with 18.",
+    sframe_demo_branding_block("conversational")),
+  fs, reuse_responses = "first_survey")
+
+# 20 combines conversational mode with a skip rule. One question at a time
+# advances past hidden questions, so the 2 features interact directly, and
+# that interaction has no other coverage.
+conversational_branching <- sf_instrument(
+  title = "One question at a time, with skip logic", version = "1.0.0",
+  description = "Conversational mode and a multi-value skip rule together.",
+  components = c(branching$items, branching$choices, branching$branching),
+  render = sframe_demo_branding_block("conversational"),
+  analysis_plan = list(
+    list(id = "RQ1", research_question = "Who attended, and in what proportions?",
+         family = "descriptive", method = "frequency",
+         roles = list(variable = "attendee_type")))
+)
+write_demo("conversational_branching", conversational_branching, br,
+           reuse_responses = "branching")
+
+# --- 21. instrument_revision ----------------------------------------------
+# A disclosed amendment: what changed, why, and who signed it off.
+revised <- first_survey
+revised$items <- lapply(revised$items, function(it) {
+  if (identical(it$id, "suggestion")) {
+    it$label <- "What is the single thing you would change about next year?"
+  }
+  it
+})
+revised$meta$version <- "1.1.0"
+instrument_revision <- amend_sframe(
+  first_survey, revised,
+  reason_code = "instrument_revision",
+  reason_text = paste("Reworded the open question after a face-validity pass:",
+                      "readers were listing several changes at once, so the",
+                      "answers were hard to code."),
+  tier = "design",
+  author = "M. A. Sharafuddin",
+  deviation_report = paste("The open question moved from an unbounded prompt",
+                           "to a single-change prompt. No analysis block",
+                           "changed. Responses collected before this",
+                           "amendment remain analysable and are reported",
+                           "separately.")
+)
+write_demo("instrument_revision", instrument_revision, fs,
+           reuse_responses = "first_survey")
+
+# --- 22. verification ------------------------------------------------------
+# The clean file verifies. A tampered copy reports as modified.
+write_demo("verification", first_survey, fs, reuse_responses = "first_survey")
+local({
+  clean <- file.path(out_dir, "verification.sframe")
+  txt <- readLines(clean, warn = FALSE)
+  # Alter 1 response label, leaving the stored hash untouched, which is what a
+  # quiet edit to a shared file looks like.
+  hit <- grep('"I have attended before"', txt, fixed = TRUE)[1]
+  txt[hit] <- sub("I have attended before", "I have attended previously",
+                  txt[hit], fixed = TRUE)
+  writeLines(txt, file.path(out_dir, "verification_tampered.sframe"))
+  cat("  verification_tampered.sframe written (1 label altered, hash left alone)\n")
+})
+
+cat("\nDone. ", length(written), " demos in ", out_dir, "\n", sep = "")
