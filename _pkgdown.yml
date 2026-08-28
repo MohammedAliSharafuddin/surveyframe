@@ -35,7 +35,7 @@ template:
       </script>
 
 # man/figures/logo.png is picked up automatically by pkgdown.
-# Favicons are in pkgdown/favicons/ and picked up by pkgdown >= 2.0.
+# Favicons are in pkgdown/favicon/ and picked up by pkgdown >= 2.0.
 
 home:
   title: "Proactive Survey Research Workflows for R"
