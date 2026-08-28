@@ -68,7 +68,7 @@ script <- export_google_sheet(
   sheet_url = "https://docs.google.com/spreadsheets/d/demo",
   output_dir = tempdir()
 )
-#> Apps Script written to: /tmp/RtmpOL1cPX/surveyframe_collector.gs
+#> Apps Script written to: /tmp/Rtmp4T8o07/surveyframe_collector.gs
 #> Follow the setup instructions inside the file to deploy it.
 file.exists(script)
 #> [1] TRUE
