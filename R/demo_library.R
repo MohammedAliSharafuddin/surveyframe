@@ -137,7 +137,13 @@ sframe_demo <- function(name, branded = FALSE) {
   if (isTRUE(branded)) {
     instrument$render <- sframe_demo_branding()
   }
-  raw <- utils::read.csv(responses_path, stringsAsFactors = FALSE)
+  # check.names = FALSE matters. A matrix item whose rows carry spaces expands
+  # into columns like `session__Opening keynote`, and read.csv()'s default
+  # turns that into `session__Opening.keynote`, which no longer matches the
+  # column contract the instrument declares. Anyone reading a surveyframe CSV
+  # by hand needs the same argument.
+  raw <- utils::read.csv(responses_path, stringsAsFactors = FALSE,
+                         check.names = FALSE)
   responses <- read_responses(raw, instrument, respondent_id = "respondent_id",
                               meta_cols = c("started_at", "submitted_at"))
   list(instrument = instrument, responses = responses,

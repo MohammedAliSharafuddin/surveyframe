@@ -347,7 +347,10 @@ write_demo("likert_scale", likert_scale, ls_df)
 # has only seen a plain likert item will meet here first.
 set.seed(4103)
 n <- 50
-sessions <- c("keynote", "workshop_a", "workshop_b", "panel")
+# Readable row labels, since these become the matrix rows a respondent sees
+# and the expansion column names a reader meets. Spaces are handled, as the
+# bundled input-types fixture already shows with "Staff helpfulness".
+sessions <- c("Opening keynote", "Workshop A", "Workshop B", "Closing panel")
 matrix_likert <- sf_instrument(
   title = "Rate each session", version = "1.0.0",
   description = "One matrix item, and the columns it expands into.",
@@ -365,10 +368,10 @@ matrix_likert <- sf_instrument(
          roles = list(variables = paste0("session__", sessions))),
     list(id = "RQ2", research_question = "How were keynote ratings distributed?",
          family = "descriptive", method = "frequency",
-         roles = list(variable = "session__keynote")),
+         roles = list(variable = paste0("session__", sessions[1]))),
     list(id = "RQ3", research_question = "Did in-person and online attendees rate the keynote differently?",
          family = "categorical", method = "crosstab",
-         roles = list(row = "format", column = "session__keynote"))
+         roles = list(row = "format", column = paste0("session__", sessions[1])))
   )
 )
 ml <- frame_of(n, 3)
