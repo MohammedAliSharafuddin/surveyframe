@@ -79,3 +79,4 @@
 ^OPEN_ISSUE_[^/]+\.md$
 ^bsr_paper_template\.docx$
 ^TESTING\.md$
+^review_041($|/)
