@@ -104,6 +104,37 @@ test_that("the EFA path is deterministic too, not just the bootstraps", {
   expect_identical(once(), once())
 })
 
+test_that("chart jitter is seeded, so the pictures settle as well as the numbers", {
+  # Found after the analysis was seeded: 5 lines of the rendered report still
+  # moved between renders, all of them embedded charts. geom_jitter() drew its
+  # offsets from the global stream at plot time, which is after
+  # run_analysis_plan() restores the caller's state, so a report was
+  # reproducible in its tables and not in its figures.
+  #
+  # Built directly from a result-shaped list so the test exercises the plot
+  # builder itself and can never skip on a fixture's column names.
+  skip_if_not_installed("ggplot2")
+  set.seed(1)
+  dat <- data.frame(
+    grp = rep(c("a", "b"), each = 25),
+    out = c(stats::rnorm(25, 10), stats::rnorm(25, 12))
+  )
+  res <- list(test = "t_test_ind", vars = c("grp", "out"), apa = "t = 1")
+
+  build <- function() {
+    p <- sframe_plot_group_comparison(res, dat)
+    ggplot2::ggplot_build(p)$data
+  }
+  expect_s3_class(sframe_plot_group_comparison(res, dat), "ggplot")
+  expect_identical(build(), build())
+
+  # and the jitter really is applied, so the check is about a seeded jitter
+  # and not about a plot that never moved
+  layers <- ggplot2::ggplot_build(sframe_plot_group_comparison(res, dat))$data
+  expect_true(length(layers) >= 2)
+  expect_false(identical(layers[[2]]$x, as.numeric(factor(dat$grp))))
+})
+
 test_that("render_report() says which engine produced the file", {
   skip_on_cran()
   instr <- plan_instrument()

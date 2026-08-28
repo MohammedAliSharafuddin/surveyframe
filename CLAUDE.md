@@ -887,26 +887,40 @@ with the history.
 
 **D6 is done.** `inst/CITATION` needed a citable reference for the MCDM
 paper, and CRAN will not accept a placeholder DOI. SF2 goes straight to
-journal submission at *Operations Research and Decisions* (diamond OA),
-no preprint step, an owner decision made 2026-08-15 after checking: MethodsX
-(Elsevier's general policy, confirmed) allows preprints freely, but ORD's
-own Instructions for Authors only carries the generic "not published
-previously elsewhere" clause with no explicit preprint ruling either way,
-so a preprint DOI for SF2 specifically was not something to gamble the
-journal relationship on without asking the editors first. Resolved instead
-by citing the manuscript in `inst/CITATION` as `bibtype = "Unpublished"`,
-"Manuscript in preparation for Operations Research and Decisions", no DOI
-field at all. Verified this parses and renders cleanly via
+journal submission with no preprint step, an owner decision made 2026-08-15.
+Resolved by citing the manuscript in `inst/CITATION` as
+`bibtype = "Unpublished"` with no DOI field at all. Verified this parses and renders cleanly via
 `utils:::readCitationFile()`. CRAN's placeholder-DOI prohibition is about a
 fake or reserved-but-dead DOI string, not about a paper that legitimately
 has none yet, so this is not a placeholder in the sense CRAN objects to.
 
+**The venue is Computo, and 2 earlier entries in this file said otherwise.**
+*Operations Research and Decisions* was the 2026-08-15 decision and was
+superseded on 2026-08-22 in favour of **Computo** (French Statistical
+Society, ISSN 2824-7795, diamond open access), over the Austrian Journal of
+Statistics. Computo enforces executable notebooks, frozen dependencies and
+continuous integration, so a paper arguing for reproducibility can
+demonstrate its own claim rather than concede it as a static PDF. Editor
+Julien Chiquet replied for the editorial board on 2026-08-26 encouraging
+submission. `inst/CITATION` was corrected to match on 2026-08-28.
+
+**Owner decision 2026-08-28: SF2 moves to a real instrument with real
+data**, built with co-authors and collected before submission. The current
+worked example is 12 seeded respondents, disclosed honestly in the
+manuscript's `sec-worked`, while the editor's reply cites "a real-world
+example", so collected data closes the gap a reviewer is most likely to
+press on. **Computo executes the notebook in its own CI, so that data has to
+be openly available at render time**, which shapes the consent wording,
+ethics application and anonymisation from the first draft of the instrument.
+That work is planned separately and does not gate any surveyframe release.
+The bundled `hotel_supplier_mcdm` fixture stays simulated and keeps serving
+the package as a teaching demo.
+
 The manuscript itself moved out of this repository on 2026-08-14, to
-`../research/surveyframe_manuscripts/mcdm/`, tracked as SF2, LaTeX-typeset
-for the ORD template, compiles clean, real byline in place (the LaTeX
-version; the older `manuscript_draft.md` still carries a stale
-double-blind placeholder line, harmless since the LaTeX is the submission
-vehicle). D2a's OpenAlex literature verification is not yet finalised with
+`../research/surveyframe_manuscripts/sf2_mcdm/`, tracked as SF2. The
+submission vehicle is now the Quarto notebook in `computo_submission/`,
+which Computo renders in CI. The `latex/` directory and its `ord.sty` are
+left over from the ORD phase and no longer describe the submission. D2a's OpenAlex literature verification is not yet finalised with
 clean automated numbers, but no longer gates the release now that D6 is
 closed. Everything else outstanding in blocks D and E is mechanical
 release paperwork.

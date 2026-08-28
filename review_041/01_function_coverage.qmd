@@ -410,7 +410,7 @@ knitr::kable(ledger, caption = "Coverage ledger, all exports")
 uncovered <- sf_coverage_verdict(ledger)
 ```
 
-### 4.1 What the ledger found on its first run
+### 4.1 What the ledger found on its first run, and how it was resolved
 
 Writing this file was itself a test of the argument for it, and it found 2
 things on functions **no test and no review file had ever called**.
@@ -451,23 +451,30 @@ nothing said.
 ```{r}
 #| label: quality-plot-verdict
 qp <- compare_table(
-  compare_row("quality plot renders on the bundled demo",
-              as.numeric(!is.null(sframe_plot_quality(q_default))), 0,
-              "DEFECT as it stands"),
+  compare_row("quality plot returns NULL when no scale is checkable",
+              as.numeric(is.null(sframe_plot_quality(q_default))), 1,
+              "correct, there is nothing to draw"),
+  compare_row("and the reason is available to the caller",
+              as.numeric(grepl("long enough to check",
+                               sframe_quality_plot_note(q_default) %||% "")),
+              1, "sframe_quality_plot_note()"),
   compare_row("it renders once a scale is long enough to check",
               as.numeric(!is.null(sframe_plot_quality(q_low))), 1,
-              "threshold lowered to 2")
+              "threshold lowered to 2"),
+  compare_row("and then the note falls silent",
+              as.numeric(is.null(sframe_quality_plot_note(q_low))), 1,
+              "no note when there is a chart")
 )
-compare_report(qp, caption = "Quality plot regression")
+compare_report(qp, caption = "Quality plot and its explanation")
 sf_log(qp)
 ```
 
-- [ ] **Owner decision.** The plot should distinguish "no scale was long
-      enough to check" from "nothing was flagged". Returning `NULL` reads as
-      the second and means the first. The shape `quality_report()` itself
-      already uses, `checked = FALSE` carried through to the caller, is the
-      obvious answer, with the report printing a line saying why there is no
-      chart instead of silently omitting it.
+- [x] **Fixed 2026-08-28.** `sframe_plot_quality()` still returns `NULL`,
+      which is right when there is nothing to draw, and
+      `sframe_quality_plot_note()` now carries the reason.
+      `render_report()` prints it where the figure would have been, so an
+      absent chart says "no scale was long enough to check" instead of
+      reading as "nothing was flagged".
 
 **Five plot builders take a result object, not the data.**
 `sframe_plot_term_frequency()`, `sframe_plot_ngram_frequency()` and their
@@ -491,8 +498,12 @@ cov_tab <- compare_table(
               nrow(ledger), length(sf_exports()), "sf_exports()"),
   compare_row("exports raising an unexpected error",
               sum(ledger$status == "ERROR"), 0, "sf_smoke()"),
-  compare_row("exports returning NULL where a value was expected",
-              sum(ledger$status == "NULL"), 0, "sf_smoke()")
+  # 1 export returns NULL by design: sframe_plot_quality() has nothing to
+  # draw when no scale is long enough to straight-line check, and
+  # sframe_quality_plot_note() carries the reason. Asserted as 1 rather than
+  # 0 so a second NULL-returning export shows up as a DIFFERS.
+  compare_row("exports returning NULL, all of them documented",
+              sum(ledger$status == "NULL"), 1, "sf_smoke(), see 4.1")
 )
 compare_report(cov_tab, caption = "Coverage")
 sf_log(cov_tab)

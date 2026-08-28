@@ -17,9 +17,30 @@ reference-call traps all apply here unchanged and are not repeated.
 
 Rendered `.html` is gitignored. Only the sources are tracked.
 
-## 2. What the first run found
+## 2. What the first run found, all 3 fixed 2026-08-28
 
-Three findings, all logged in `dogfeed.todo.md`.
+Three findings, all logged in `dogfeed.todo.md` and **all fixed on
+2026-08-28 in commit `bb427c1` and the jitter follow-up**. Both files now
+assert the fixed behaviour and render at 0 `DIFFERS`. The accounts below are
+kept as the record of what was wrong and how it was found.
+
+**A fourth cause surfaced only after the first 3 were fixed**, and it is the
+one worth remembering. With the numbers settled, 5 lines of the rendered
+report still moved between renders, all of them embedded charts:
+`geom_jitter()` drew its offsets from the global stream at plot time, after
+`run_analysis_plan()` had restored the caller's state. Seeding the analysis
+made the tables reproducible and left the pictures moving. The shared boxplot
+helper now uses `position_jitter(seed = )`.
+
+**A phantom to know about before reading section 3 of file 02.** Quarto
+renders in a separate R session that loads the **installed** package, so a
+working tree loaded with `pkgload::load_all()` never reaches the Quarto
+engine. That showed as the fallback rendering reproducibly while Quarto
+appeared to keep moving, and the cause was CRAN 0.4.0 running in the
+subprocess. `sf_installed_matches_source()` now detects it and the file holds
+the quarto row back with a stated reason instead of reporting a defect that
+belongs to another version. Verified by installing the working tree into a
+temporary library: 0 differing lines on both engines.
 
 **1. The rendered report is not reproducible.** `run_analysis_plan()` gives
 different answers on identical inputs: 32 of 1768 values move between 2 runs.

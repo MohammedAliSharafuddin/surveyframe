@@ -1460,3 +1460,26 @@ Verified: `tests/testthat/test-report-reproducibility.R`, 17 expectations, all
 the bundled demo specifically, because a fixture without scales never reaches
 `fa.parallel()` and passed either way. Full suite FAIL 0, PASS 2067.
 `R CMD check --as-cran` Status OK, 0 errors, 0 warnings, 0 notes.
+
+### Follow-up 2026-08-28: a fourth cause, and a phantom
+
+Re-rendering `review_041` to close the 3 findings surfaced 2 more things.
+
+**A fourth source of non-determinism, visible only once the first 3 were
+fixed.** With the numbers settled, 5 lines of the rendered report still moved
+between renders, all of them embedded charts. `geom_jitter()` draws its
+offsets from the global stream at plot time, which is after
+`run_analysis_plan()` restores the caller's state, so a report was
+reproducible in its tables and not in its figures. The shared boxplot helper
+in `R/plots.R` now uses `position_jitter(seed = )`. Mutation-checked, and
+`test-report-reproducibility.R` gained a self-contained test that builds the
+plot twice and compares the built data.
+
+**A phantom worth remembering.** The Quarto engine appeared to keep moving its
+intervals while the fallback rendered reproducibly. The cause was neither
+engine: Quarto renders in a separate R session that loads the **installed**
+package, which here was CRAN 0.4.0 with no seeding. Installing the working
+tree into a temporary library and re-rendering gave 0 differing lines on both
+engines. `review_041/_setup.R` gained `sf_installed_matches_source()`, and
+file 02 now holds the quarto row back with a stated reason instead of
+reporting a defect belonging to another version.

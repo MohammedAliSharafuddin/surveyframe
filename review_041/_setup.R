@@ -364,6 +364,41 @@ sf_render_both_engines <- function(instrument, data = NULL, ...) {
   out
 }
 
+#' Is the build under review the one an out-of-process render will load?
+#'
+#' Quarto renders `inst/templates/report.qmd` in a separate R session, which
+#' resolves `library(surveyframe)` against the installed package rather than
+#' the working tree this suite loads with `pkgload::load_all()`. A dev tree
+#' therefore measures the *installed* package whenever Quarto is the engine.
+#'
+#' This caught a phantom on 2026-08-28: the fallback engine rendered
+#' reproducibly while the Quarto engine appeared to keep moving its confidence
+#' intervals, and the cause was the subprocess running CRAN 0.4.0, which has no
+#' seeding, rather than any defect in the build under review. Installing the
+#' working tree and re-running gave 0 differing lines on both engines.
+#'
+#' Use it to label a Quarto result honestly instead of reporting a defect that
+#' belongs to a different version.
+sf_installed_matches_source <- function(feature = "seed") {
+  inst <- tryCatch({
+    lib <- find.package("surveyframe", quiet = TRUE)
+    lib <- lib[!grepl("pkgload|devtools", lib)][1]
+    if (is.na(lib) || !nzchar(lib)) return(FALSE)
+    e <- new.env()
+    suppressWarnings(suppressMessages(
+      load(file.path(lib, "R", "surveyframe.rdb"), envir = e)))
+    TRUE
+  }, error = function(e) NA)
+  # Cheaper and more reliable: ask a fresh session what the installed build has.
+  out <- tryCatch(system2(
+    file.path(R.home("bin"), "Rscript"), c("-e",
+      shQuote(sprintf(
+        "cat(%s %%in%% names(formals(surveyframe::run_analysis_plan)))",
+        shQuote(feature)))),
+    stdout = TRUE, stderr = FALSE), error = function(e) "FALSE")
+  isTRUE(grepl("TRUE", paste(out, collapse = " ")))
+}
+
 #' Render the same inputs twice down the same engine and compare the bodies.
 #'
 #' Reproducibility means the same instrument and the same data produce the
