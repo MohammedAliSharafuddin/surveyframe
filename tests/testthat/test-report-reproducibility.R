@@ -1,18 +1,8 @@
 # tests/testthat/test-report-reproducibility.R
-# The rendered report is the audit artefact of a surveyframe study, and until
-# 0.4.1 it was not reproducible. run_analysis_plan() drew from the global RNG
-# without a seed at 5 bootstrap confidence-interval call sites, and the EFA
-# path inherited psych::fa.parallel()'s unseeded simulation, which also splits
-# across mclapply() workers whose forked RNG streams set.seed() does not reach.
-# Two runs on the bundled demo differed in 32 of 1768 values, and the movement
-# reached the APA string a researcher would quote:
-#
-#   render 1:  U = 1576, z = -0.98, p = 0.327, r = 0.09 [0.01, 0.27]
-#   render 2:  U = 1576, z = -0.98, p = 0.327, r = 0.09 [0.00, 0.27]
-#
-# The statistic and the p value were stable throughout, because they are
-# computed analytically. Only the interval moved, which is why nothing looked
-# wrong. Found by review_041/02_quarto_reproducibility.qmd.
+# Guards the reproducibility of a rendered report. Bootstrap intervals and the
+# EFA parallel analysis once drew from the global RNG unseeded, so the same
+# data gave a different interval on every run while the test statistic and p
+# value stayed put, which is why nothing looked wrong.
 
 plan_instrument <- function() {
   sf_instrument(

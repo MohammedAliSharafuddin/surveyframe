@@ -20,12 +20,10 @@ sframe_with_seed <- function(seed, expr) {
       rm(".Random.seed", envir = .GlobalEnv)
     }
   }, add = TRUE)
-  # psych::fa.parallel() splits its simulation across mclapply() workers, and a
-  # forked worker draws from its own RNG stream, which set.seed() in the parent
-  # does not reach. Worse for an audit artefact, the work is split by core
-  # count, so the result would depend on the machine. Forcing serial execution
-  # puts every draw back on the parent's seeded stream and makes the answer the
-  # same on 1 core or 32.
+  # psych::fa.parallel() splits across forked mclapply() workers, whose own RNG
+  # streams set.seed() cannot reach, and splits by core count. Running serially
+  # keeps every draw on the parent's seeded stream and the answer machine
+  # independent.
   old_cores <- getOption("mc.cores")
   on.exit({
     if (is.null(old_cores)) {

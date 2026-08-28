@@ -1,16 +1,10 @@
 # tests/testthat/test-generated-syntax-runs.R
-# The syntax generators emit code for engines this package never runs, and they
-# were tested only with expect_match() on substrings. That is the same test
-# shape that let the %in% branching defect and the collector header drift
-# through: it asserts what the string looks like, never that the thing it
-# describes works.
+# The syntax generators emit code for engines this package never runs, so these
+# tests fit the generated syntax rather than matching it as a string.
 #
-# It hid a real defect for 3 releases. sem_lavaan_syntax() wrote an indirect
-# effect as `indirect_A_B_C := A__B*B__C` while emitting the structural paths
-# unlabelled, so the labels the definition multiplied did not exist. The syntax
-# parsed and then failed at fit time with lavaan's "unknown label(s) in
-# variable definition(s)". A parse check passes it. Only fitting catches it,
-# which is what these tests do.
+# Parsing is not enough: a mediation model once produced syntax lavaan accepted
+# and then refused to fit, because the indirect effect referred to path labels
+# that were never written.
 
 syntax_instrument <- function() {
   items <- list()
