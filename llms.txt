@@ -100,12 +100,17 @@ Start with:
 
 1.  A worked study: digital marketing and tourism services
 2.  Building a survey instrument: questions, plan, and model
-3.  Analysing survey responses: running the plan
-4.  Scale reliability and validity
-5.  EFA, CFA, CB-SEM, and PLS-SEM syntax generation
-6.  The visual workflow: SurveyBuilder, SurveyStudio, and the dashboard
+3.  Deploying a survey and collecting responses on free hosting
+4.  Analysing survey responses: running the plan
+5.  Scale reliability and validity
+6.  EFA, CFA, CB-SEM, and PLS-SEM syntax generation
+7.  The visual workflow: SurveyBuilder, SurveyStudio, and the dashboard
+8.  Learn by example: 22 small surveys, the bundled demo library
+9.  Multi-criteria decision analysis: AHP, TOPSIS, and 8 other methods
+10. Small-sample inference
+11. Text and open-ended response analysis
 
-Read all six vignettes inside R with:
+Read all eleven vignettes inside R with:
 
 ``` r
 
@@ -332,12 +337,12 @@ are available for manual use. Tests and examples avoid opening browsers.
 ## Roadmap
 
 Small-sample inference, multi-criteria decision analysis, and text and
-open-ended response analysis all arrive in 0.4.0. Small-sample and MCDM
-were once planned as two releases, v0.4 and v0.5, and text analysis had
-at one stage its own working label before it, too, was folded into
-0.4.0. There is no 0.3.5 and no 0.5.x.
+open-ended response analysis all shipped in 0.4.0, live on CRAN since
+2026-08-20. Small-sample and MCDM were once planned as two releases,
+v0.4 and v0.5, and text analysis had at one stage its own working label
+before it, too, was folded into 0.4.0. There is no 0.3.5 and no 0.5.x.
 
-0.4.0 adds small-sample helpers validated by a simulation study
+0.4.0 added small-sample helpers validated by a simulation study
 (Hodges-Lehmann, paired-Wilcoxon pseudomedian, exact Fisher odds-ratio
 intervals, Firth logistic regression); 10 MCDM methods (TOPSIS, AHP,
 ANP, DEMATEL, VIKOR, MOORA, SMART, WASPAS, PROMETHEE, ELECTRE) with 2
@@ -350,11 +355,31 @@ a disclosed-amendment and Git-linked provenance mechanism alongside the
 existing `.sframe` integrity hash. See `NEWS.md` for the full detail on
 each.
 
-**After 0.4.0, no new capability theme for at least one release cycle.**
+0.4.1 is a stabilisation release: field-validation fixes found by using
+surveyframe on real instruments, no new capability theme.
+
+**No new capability theme for at least one release cycle after 0.4.0.**
 Four themes landing in one release is already more than this project
 should repeat; 0.4.1 and 0.4.2 are stabilisation and bug-fix releases
 against what 0.4.0 shipped, not a vehicle for new method families. If
 that changes, it will be stated here first, not discovered from a diff.
+
+## When to use surveyframe, and when not to
+
+surveyframe is a fit when a study’s analysis has to be decided before
+data collection: a scale to validate, a pre-registered hypothesis test,
+a measurement model to fit, or an audit trail showing the plan wasn’t
+changed after seeing results. It is not a general-purpose form builder.
+[survey](https://cran.r-project.org/package=survey) and
+[srvyr](https://cran.r-project.org/package=srvyr) are the standard tools
+for weighting and variance estimation on data from a complex probability
+sample, and surveyframe’s own instruments interoperate with that
+workflow rather than replacing it. For collecting responses with no plan
+declared up front, a general web-form tool such as Google Forms,
+Qualtrics, REDCap, or the R package [surveydown](https://surveydown.io/)
+is usually a better starting point. surveyframe reads exported CSV data
+from any of them (see “Already have data?” above) if the analysis plan
+is added afterward.
 
 **If this package is ever archived by CRAN**, the GitHub repository
 remains the canonical source:
@@ -378,8 +403,8 @@ citation("surveyframe")
   Zenodo. <https://doi.org/10.5281/zenodo.20221929>. A companion
   textbook on statistical inference when sample sizes are small, also
   available at <https://flairmi.com/textbooks/smallsamplelab.html>. It
-  describes the small-sample methods that surveyframe will add in v0.4
-  and when to prefer each one.
+  describes the small-sample methods that surveyframe added in 0.4.0 and
+  when to prefer each one.
 
 ## License
 
