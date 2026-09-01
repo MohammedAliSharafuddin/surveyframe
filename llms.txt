@@ -438,6 +438,10 @@ citation("surveyframe")
   available at <https://flairmi.com/textbooks/smallsamplelab.html>. It
   describes the small-sample methods that surveyframe added in 0.4.0 and
   when to prefer each one.
+- Sharafuddin, M. A. (2026). *surveyframe: A Pre-Declared, Reproducible
+  Framework for Multi-Criteria Decision Analysis in Survey Research*.
+  Manuscript in preparation for Computo. Describes the 10 MCDM methods
+  surveyframe added in 0.4.0.
 
 ## License
 
