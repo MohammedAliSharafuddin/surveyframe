@@ -858,6 +858,40 @@ test_that("builder helpers reclassify components from a loaded sframe file", {
   expect_true(rebuilt$valid)
 })
 
+test_that("a builder draft round trip preserves an existing amendment log", {
+  # Found live in SurveyStudio's Amendments screen: sframe_builder_state_
+  # from_instrument()'s draft list carried no amendments field at all, and
+  # sframe_builder_compose_instrument() built a fresh instrument via
+  # sf_instrument(), which also has no amendments argument. SurveyStudio
+  # keeps rv$instrument synced to draft_result()$instrument on every
+  # builder-state change, so an already-amended instrument silently lost
+  # its entire disclosed history the moment it passed through the builder,
+  # not just via this new Amendments screen but via anything that opens an
+  # already-amended .sframe in SurveyStudio at all.
+  instr <- make_instrument(reverse = TRUE)
+  amended <- amend_sframe(
+    instr, instr,
+    reason_code = "data_correction",
+    reason_text = "Corrected a mis-keyed respondent ID."
+  )
+  expect_equal(nrow(amendment_log(amended)), 1)
+
+  state <- surveyframe::sframe_builder_state_from_instrument(amended)
+  expect_equal(length(state$amendments), 1)
+
+  rebuilt <- surveyframe::sframe_builder_validate_draft(
+    meta = state$meta,
+    choices = state$choices,
+    items = state$items,
+    scales = state$scales,
+    branching = state$branching,
+    checks = state$checks,
+    amendments = state$amendments
+  )
+  expect_true(rebuilt$valid)
+  expect_equal(nrow(amendment_log(rebuilt$instrument)), 1)
+})
+
 # ---------------------------------------------------------------------------
 # 14. render_survey() helpers
 # ---------------------------------------------------------------------------
