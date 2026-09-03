@@ -159,7 +159,7 @@ validity_report(published_loadings, construct_scores = scored_constructs)
 The study reported variance inflation factors below 5 for every indicator, which
 indicates no severe multicollinearity. `assumption_report()` returns variance
 inflation factors when a regression is specified, which is shown in the
-analysing-responses vignette.
+"Analysing survey responses" vignette.
 
 ## Cautious interpretation
 

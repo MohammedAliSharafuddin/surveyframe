@@ -11,7 +11,7 @@
 > **Just here to verify a `.sframe` file's integrity hash or read its
 > amendment log?**
 > **[Verify a file now](https://mohammedalisharafuddin.github.io/surveyframe/verify/)**.
-> No R, no install; it runs entirely in your browser and nothing is
+> No R, no install. It runs entirely in your browser and nothing is
 > uploaded.
 
 `surveyframe` is a research-design-first survey package for R. Most survey tools
@@ -71,7 +71,7 @@ packages when you want to fit the generated CFA, CB-SEM, or PLS-SEM models.
 ## Already have data?
 
 `surveyframe` is not a replacement for whatever collection tool your
-institution already has approved -- Qualtrics, REDCap, Google Forms, or a
+institution already has approved: Qualtrics, REDCap, Google Forms, or a
 paper form typed up afterward. It reads response data as a plain CSV or
 `data.frame` from any of them: export from your collection tool, rename
 columns to match your instrument's item IDs (or build the instrument to
@@ -298,7 +298,7 @@ export_static_survey(instr, open = FALSE)
 ```
 
 Use `launch_builder()` to author the questionnaire, the plan, and the model and
-to export the `.sframe` file and model syntax; it runs no statistics.
+to export the `.sframe` file and model syntax. It runs no statistics.
 `launch_studio()` uploads responses, runs the plan on its Analysis Plan screen,
 and renders the report on its Export screen. `launch_dashboard()` is a read-only
 response explorer. Demo launchers are available for training:

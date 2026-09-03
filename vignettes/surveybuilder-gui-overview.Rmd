@@ -96,9 +96,17 @@ collector.
 ## SurveyStudio: the screens
 
 SurveyStudio is a Shiny application, so it can run R. Its left navigation lists
-eight screens in this order: Open Instrument, Preview Survey, Upload Responses,
-Quality Dashboard, Reliability, Analysis Plan, Dashboard, and Export. Survey
-design is done in the SurveyBuilder, and the studio opens the resulting `.sframe`.
+nine screens in this order: Open Instrument, Amendments, Preview Survey, Upload
+Responses, Quality Dashboard, Reliability, Analysis Plan, Dashboard, and
+Export. Survey design is done in the SurveyBuilder, and the studio opens the
+resulting `.sframe`.
+
+The Amendments screen discloses a change to the open instrument: upload a
+revised `.sframe`, give a reason and an explanation, and `amend_sframe()`
+appends the change to the instrument's amendment log rather than replacing
+its history. Exporting the amended instrument keeps that log inside the
+`.sframe` file, readable later with `amendment_log()`.
+
 The Preview Survey screen renders the exact deployable survey, identical to the
 exported HTML.
 
@@ -113,7 +121,10 @@ The Export screen produces the written report through `render_report()`. Its
 options include the codebook, quality, missing data, descriptives, reliability,
 the saved analysis-plan results, and the model appendices. The per-question
 report produced by `render_results()` in an R session is a separate route to a
-written report and is covered in the main vignette.
+written report and is covered in the main vignette. The same screen's
+"Analysis notebook" card writes a Quarto notebook alongside the instrument
+and its responses, via `sframe_analysis_qmd()`, so the same analysis can be
+run and edited outside SurveyStudio.
 
 ## Recommended workflow
 

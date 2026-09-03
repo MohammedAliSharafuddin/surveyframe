@@ -1,4 +1,5 @@
 ---
+lang: en-GB
 title: "Learn by example: 22 small surveys"
 output:
   rmarkdown::html_vignette:
@@ -9,6 +10,27 @@ vignette: >
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
+
+```{=html}
+<style>
+/* WCAG 2.2 AA pass: darker link and syntax-token colours (at least
+   4.5:1 on the #f7f7f7 code background), wrapped code lines instead of a
+   keyboard-inaccessible scroll region, empty per-line anchors removed from
+   the accessibility tree, and 24px minimum TOC link targets. */
+a { color: #0e7c7a; }
+code span.at { color: #576419; }
+code span.dv, code span.fl, code span.bn { color: #276245; }
+code span.co { color: #396a80; }
+/* Pandoc emits `pre > code.sourceCode { white-space: pre }` for screen, which
+   outranks a bare `pre code` rule on specificity, so source chunks have to be
+   named explicitly or they scroll sideways instead of wrapping. */
+pre, pre code, pre > code.sourceCode { white-space: pre-wrap; word-break: break-word; }
+pre > code.sourceCode > span { text-indent: -2em; padding-left: 2em; }
+div.sourceCode { overflow: visible; }
+pre.sourceCode a:empty { display: none; }
+#TOC a { display: inline-block; min-height: 24px; }
+</style>
+```
 
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>", fig.path = "figures/")
@@ -52,20 +74,20 @@ Choose by the data you have, rather than by the name of a test.
 | You have | Use | Demo |
 |---|---|---|
 | A few questions and no plan yet | Start here | `first_survey` |
-| Several items meant to measure one thing | A scale, and its reliability | `likert_scale` |
+| Four items meant to measure one thing | A scale, and its reliability | `likert_scale` |
 | A grid of items rated on one scale | A matrix item | `matrix_likert` |
 | One number and two groups | A two-group comparison | `two_group` |
 | The same people measured twice | A paired test | `paired` |
 | One number and three or more groups | ANOVA and its alternatives | `multi_group` |
 | The same people measured three times | Repeated measures | `repeated` |
 | Two categorical questions | A crosstab and a test of association | `categorical` |
-| Several numbers that may go together | Correlation and regression | `correlation_regression` |
+| Four numbers that may go together | Correlation and regression | `correlation_regression` |
 | A yes/no, ordered, or multi-category outcome | Logistic regression | `logistic` |
 | Many items and a hunch about the structure | Factor analysis | `factor_structure` |
 | Constructs and a path model | SEM and PLS | `sem_pls` |
 | Questions only some people should see | Skip logic | `branching` |
 | Free-text answers | Text analysis | `open_text` |
-| A decision between options on several criteria | MCDA | `mcdm_choice` |
+| A decision between options on four criteria | MCDA | `mcdm_choice` |
 | Fewer than 30 respondents | Small-sample methods | `small_sample` |
 | Tick-all-that-apply, or a ranking | Items that expand | `multi_response` |
 
