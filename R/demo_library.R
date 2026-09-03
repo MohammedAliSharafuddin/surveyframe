@@ -333,6 +333,7 @@ sframe_demo_qmd <- function(name, dir = ".", overwrite = FALSE) {
       class = "sframe_error")
   }
   writeLines(txt, dest)
+  message("Notebook written to: ", dest)
   invisible(dest)
 }
 
@@ -364,7 +365,17 @@ sframe_demo_qmd <- function(name, dir = ".", overwrite = FALSE) {
 #' basename(out$qmd)
 sframe_analysis_qmd <- function(instrument, data, dir = ".", basename = NULL,
                                  overwrite = FALSE) {
+  if (missing(instrument)) {
+    rlang::abort(
+      "`instrument` is required: an sframe object, e.g. from sf_instrument() or read_sframe().",
+      class = "sframe_error")
+  }
   sframe_check_instrument(instrument)
+  if (missing(data)) {
+    rlang::abort(
+      "`data` is required: a data.frame of responses, e.g. from read_responses().",
+      class = "sframe_error")
+  }
   if (!is.data.frame(data)) {
     rlang::abort("`data` must be a data.frame of responses.",
                  class = "sframe_error")
@@ -405,6 +416,12 @@ sframe_analysis_qmd <- function(instrument, data, dir = ".", basename = NULL,
   txt <- gsub("{{CSV_FILE}}", paste0(slug, "_responses.csv"), txt, fixed = TRUE)
   writeLines(txt, qmd_path)
 
+  message(
+    "Notebook written to: ", qmd_path, "\n",
+    "Instrument and responses written alongside it: ",
+    paste0(slug, ".sframe"), ", ", paste0(slug, "_responses.csv"), "\n",
+    "Keep all 3 files together, then open and render the notebook."
+  )
   invisible(list(qmd = qmd_path, sframe = sframe_path, csv = csv_path))
 }
 
