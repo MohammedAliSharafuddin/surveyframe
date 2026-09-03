@@ -894,12 +894,12 @@ sframe_clean_interpretations <- function(interpretations) {
 # Render a base-R plot to a base64-embedded PNG <img> for the HTML fallback.
 .render_report_plot_png <- function(draw, height = 320) {
   tmp <- tempfile(fileext = ".png")
+  on.exit(unlink(tmp), add = TRUE)
   grDevices::png(tmp, width = 720, height = height, res = 96, bg = "white")
   ok <- tryCatch({ draw(); TRUE }, error = function(e) FALSE)
   grDevices::dev.off()
   if (!isTRUE(ok) || !file.exists(tmp)) return(NULL)
   raw <- readBin(tmp, "raw", file.info(tmp)$size)
-  unlink(tmp)
   sprintf(
     "<img alt=\"distribution\" style=\"max-width:100%%;height:auto\" src=\"data:image/png;base64,%s\">",
     openssl::base64_encode(raw)
@@ -912,13 +912,13 @@ sframe_clean_interpretations <- function(interpretations) {
 .render_report_ggplot_png <- function(gg, alt = "result chart") {
   if (!requireNamespace("ggplot2", quietly = TRUE)) return(NULL)
   tmp <- tempfile(fileext = ".png")
+  on.exit(unlink(tmp), add = TRUE)
   ok <- tryCatch({
     ggplot2::ggsave(tmp, gg, width = 7.2, height = 4.2, dpi = 110, bg = "white")
     TRUE
   }, error = function(e) FALSE)
   if (!isTRUE(ok) || !file.exists(tmp)) return(NULL)
   raw <- readBin(tmp, "raw", file.info(tmp)$size)
-  unlink(tmp)
   sprintf(
     "<img alt=\"%s\" style=\"max-width:100%%;height:auto\" src=\"data:image/png;base64,%s\">",
     htmltools_escape(alt), openssl::base64_encode(raw)
