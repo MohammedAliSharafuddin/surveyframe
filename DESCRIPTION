@@ -11,10 +11,11 @@ Authors@R: c(
     )
   )
 Description: Provides a design-first survey research workflow. An
-    instrument, a pre-declared analysis plan, and a measurement or
-    structural model are held together in one typed, integrity-checked
-    object (the 'sframe'), so a study's confirmatory tests are fixed
-    before responses arrive rather than chosen afterward. Includes
+    instrument, an analysis plan declared before data collection, and a
+    measurement or structural model are held together in one typed,
+    integrity-checked object (the 'sframe'), so a study's confirmatory
+    tests are fixed before responses arrive rather than chosen
+    afterward. Includes
     visual instrument design via a browser-based builder or 'Shiny'
     studio, export to a self-contained static HTML survey, an embeddable
     'Shiny' module, SHA-256 integrity-checked serialisation to the
