@@ -106,6 +106,23 @@ test_that("sframe_demo_qmd() writes a runnable notebook with no placeholders lef
   expect_no_error(sframe_demo_qmd("two_group", dir = dir, overwrite = TRUE))
 })
 
+test_that("sframe_demo_qmd() and sframe_analysis_qmd() report where they wrote to", {
+  # Both returned their path only invisibly, with no message, so a user
+  # calling them for a side effect (as the help page's own example does,
+  # sframe_demo_qmd("two_group", dir = tempdir())) saw no confirmation at
+  # all that anything happened or where it landed.
+  dir <- tempfile("qmd-msg-"); dir.create(dir)
+  on.exit(unlink(dir, recursive = TRUE), add = TRUE)
+
+  expect_message(sframe_demo_qmd("two_group", dir = dir), "written to.*two_group\\.qmd")
+
+  demo <- sframe_demo("likert_scale")
+  expect_message(
+    sframe_analysis_qmd(demo$instrument, demo$responses, dir = dir),
+    "written to.*\\.qmd"
+  )
+})
+
 test_that("sframe_analysis_qmd() writes a runnable notebook for any instrument, not just a bundled demo", {
   dir <- tempfile("analysis-qmd-"); dir.create(dir)
   on.exit(unlink(dir, recursive = TRUE), add = TRUE)
