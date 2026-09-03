@@ -121,6 +121,15 @@ sframe_demo_dir <- function() {
 #' head(demo$responses)
 sframe_demo <- function(name, branded = FALSE) {
   idx <- sframe_demo_index()
+  if (missing(name)) {
+    rlang::abort(
+      paste0(
+        "`name` is required: pick one of the ", length(idx$name),
+        " demo names from sframe_demos(), e.g. sframe_demo(\"",
+        idx$name[[1]], "\")."
+      ),
+      class = "sframe_error")
+  }
   if (!isTRUE(name %in% idx$name)) {
     rlang::abort(
       paste0("Unknown demo: '", name, "'. See sframe_demos() for the ",
@@ -289,6 +298,15 @@ sframe_export_labelled <- function(data, instrument, path) {
 #' basename(out)
 sframe_demo_qmd <- function(name, dir = ".", overwrite = FALSE) {
   idx <- sframe_demo_index()
+  if (missing(name)) {
+    rlang::abort(
+      paste0(
+        "`name` is required: pick one of the ", length(idx$name),
+        " demo names from sframe_demos(), e.g. sframe_demo_qmd(\"",
+        idx$name[[1]], "\")."
+      ),
+      class = "sframe_error")
+  }
   if (!isTRUE(name %in% idx$name)) {
     rlang::abort(
       paste0("Unknown demo: '", name, "'. See sframe_demos()."),
@@ -316,6 +334,78 @@ sframe_demo_qmd <- function(name, dir = ".", overwrite = FALSE) {
   }
   writeLines(txt, dest)
   invisible(dest)
+}
+
+#' Write a Quarto analysis notebook for any instrument
+#'
+#' Unlike [sframe_demo_qmd()], which only works for one of the bundled demo
+#' instruments (it looks `name` up in [sframe_demos()]), this writes a
+#' runnable Quarto notebook for any instrument, using its own responses. The
+#' notebook reads the instrument and its responses back from 2 companion
+#' files written alongside it, so all 3 files must stay together.
+#'
+#' @param instrument An `sframe` object.
+#' @param data A `data.frame` of responses, read by [read_responses()] when
+#'   the notebook runs.
+#' @param dir Directory to write into. Defaults to the working directory.
+#' @param basename Character or `NULL`. File base name shared by the `.qmd`,
+#'   `.sframe`, and `_responses.csv` files. Defaults to a slug of the
+#'   instrument's title.
+#' @param overwrite Logical. Overwrite existing files of the same name.
+#'
+#' @return A list with `qmd`, `sframe`, and `csv` paths, invisibly.
+#' @export
+#' @seealso [sframe_demo_qmd()], [write_sframe()], [read_responses()]
+#' @examples
+#' item  <- sf_item("q1", "How satisfied are you?", type = "text")
+#' instr <- sf_instrument("Demo", components = list(item))
+#' resp  <- data.frame(q1 = c("Great", "Fine"))
+#' out <- sframe_analysis_qmd(instr, resp, dir = tempdir())
+#' basename(out$qmd)
+sframe_analysis_qmd <- function(instrument, data, dir = ".", basename = NULL,
+                                 overwrite = FALSE) {
+  sframe_check_instrument(instrument)
+  if (!is.data.frame(data)) {
+    rlang::abort("`data` must be a data.frame of responses.",
+                 class = "sframe_error")
+  }
+  tpl <- system.file("demos", "analysis_general.qmd", package = "surveyframe")
+  if (!nzchar(tpl)) {
+    rlang::abort("Notebook template not found. Please reinstall surveyframe.",
+                 class = "sframe_error")
+  }
+
+  title <- sf_meta(instrument)$title %||% "survey"
+  slug  <- basename %||% gsub("[^A-Za-z0-9]+", "_", title)
+  slug  <- gsub("^_+|_+$", "", slug)
+  if (!nzchar(slug)) slug <- "survey"
+
+  if (!dir.exists(dir)) dir.create(dir, recursive = TRUE, showWarnings = FALSE)
+
+  sframe_path <- file.path(dir, paste0(slug, ".sframe"))
+  csv_path    <- file.path(dir, paste0(slug, "_responses.csv"))
+  qmd_path    <- file.path(dir, paste0(slug, ".qmd"))
+  for (dest in c(sframe_path, csv_path, qmd_path)) {
+    if (file.exists(dest) && !isTRUE(overwrite)) {
+      rlang::abort(
+        paste0("'", dest, "' already exists. Use overwrite = TRUE to replace it."),
+        class = "sframe_error")
+    }
+  }
+
+  write_sframe(instrument, sframe_path, overwrite = overwrite)
+  utils::write.csv(data, csv_path, row.names = FALSE, na = "")
+
+  # sframe_path/csv_path are file.path(dir, "<slug>.<ext>"), so their file
+  # names are exactly these 2 suffixes on slug; built this way instead of via
+  # base::basename() because the `basename` argument above shadows it.
+  txt <- readLines(tpl, warn = FALSE)
+  txt <- gsub("{{TITLE}}", title, txt, fixed = TRUE)
+  txt <- gsub("{{SFRAME_FILE}}", paste0(slug, ".sframe"), txt, fixed = TRUE)
+  txt <- gsub("{{CSV_FILE}}", paste0(slug, "_responses.csv"), txt, fixed = TRUE)
+  writeLines(txt, qmd_path)
+
+  invisible(list(qmd = qmd_path, sframe = sframe_path, csv = csv_path))
 }
 
 # The analysis methods sframe_run_one_block() actually dispatches on, read out

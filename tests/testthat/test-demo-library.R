@@ -81,6 +81,16 @@ test_that("sframe_demo() rejects an unknown name rather than guessing", {
   expect_error(sframe_demo("no_such_demo"), "Unknown demo")
 })
 
+test_that("sframe_demo() and sframe_demo_qmd() point to sframe_demos() when name is omitted", {
+  # Calling either with no argument previously surfaced R's generic
+  # "argument \"name\" is missing, with no default", which names neither
+  # the fix (sframe_demos()) nor an example.
+  expect_error(sframe_demo(), "sframe_demos\\(\\)")
+  expect_error(sframe_demo(), "name.*required")
+  expect_error(sframe_demo_qmd(), "sframe_demos\\(\\)")
+  expect_error(sframe_demo_qmd(), "name.*required")
+})
+
 test_that("sframe_demo_qmd() writes a runnable notebook with no placeholders left", {
   # Base R rather than withr, which this package deliberately does not
   # depend on: an undeclared withr import was removed once before.
@@ -94,6 +104,39 @@ test_that("sframe_demo_qmd() writes a runnable notebook with no placeholders lef
   # and it refuses to clobber by default
   expect_error(sframe_demo_qmd("two_group", dir = dir), "already exists")
   expect_no_error(sframe_demo_qmd("two_group", dir = dir, overwrite = TRUE))
+})
+
+test_that("sframe_analysis_qmd() writes a runnable notebook for any instrument, not just a bundled demo", {
+  dir <- tempfile("analysis-qmd-"); dir.create(dir)
+  on.exit(unlink(dir, recursive = TRUE), add = TRUE)
+
+  demo <- sframe_demo("two_group")
+  out <- sframe_analysis_qmd(demo$instrument, demo$responses, dir = dir)
+
+  expect_true(file.exists(out$qmd))
+  expect_true(file.exists(out$sframe))
+  expect_true(file.exists(out$csv))
+
+  txt <- readLines(out$qmd, warn = FALSE)
+  expect_false(any(grepl("{{", txt, fixed = TRUE)))
+  expect_true(any(grepl("read_sframe(", txt, fixed = TRUE)))
+  expect_true(any(grepl("read_responses(", txt, fixed = TRUE)))
+
+  # The notebook's own load/run chunks actually work against the files
+  # sframe_analysis_qmd() wrote, not just parse: this is the exact defect
+  # class the demo library's own build generator was built to catch, a
+  # notebook that looks right but fails the moment somebody runs it.
+  old_wd <- getwd()
+  on.exit(setwd(old_wd), add = TRUE)
+  setwd(dir)
+  instr <- read_sframe(basename(out$sframe))
+  resp  <- read_responses(basename(out$csv), instr, strict = FALSE)
+  results <- run_analysis_plan(resp, instr)
+  expect_gt(length(results), 0)
+
+  # refuses to clobber by default, same convention as sframe_demo_qmd()
+  expect_error(sframe_analysis_qmd(demo$instrument, demo$responses, dir = dir), "already exists")
+  expect_no_error(sframe_analysis_qmd(demo$instrument, demo$responses, dir = dir, overwrite = TRUE))
 })
 
 test_that("sframe_export_labelled() attaches variable and value labels", {
