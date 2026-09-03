@@ -1,7 +1,3 @@
-if (!exists("meta") || is.null(meta)) {
-  meta <- utils::packageDescription("surveyframe")
-}
-
 year <- if (!is.null(meta$Date) && nzchar(meta$Date)) {
   format(as.Date(meta$Date), "%Y")
 } else {
