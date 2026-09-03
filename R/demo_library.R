@@ -100,6 +100,11 @@ sframe_demo_dir <- function() {
 
 #' Load one bundled demo
 #'
+#' One of the 22-item teaching library, each demonstrating one analysis
+#' method end to end. For the demo that instead exercises every input type
+#' SurveyBuilder and SurveyStudio support in a single instrument, see
+#' [sframe_input_types_demo_data()].
+#'
 #' @param name Character. A demo name, as listed by [sframe_demos()].
 #' @param branded Logical. When `TRUE`, the instrument comes back with the
 #'   standard welcome page, logo, theme colour and thank you page spliced into
@@ -114,7 +119,8 @@ sframe_demo_dir <- function() {
 #'   this demo, which is the reference to compare against when you run the
 #'   same data through another package.
 #' @export
-#' @seealso [sframe_demos()], [sframe_export_labelled()]
+#' @seealso [sframe_demos()], [sframe_export_labelled()],
+#'   [sframe_input_types_demo_data()]
 #' @examples
 #' demo <- sframe_demo("two_group")
 #' demo$instrument
