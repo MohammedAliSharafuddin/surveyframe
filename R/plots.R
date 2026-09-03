@@ -1382,6 +1382,7 @@ sframe_plot_reliability <- function(x, palette = c("web", "print")) {
 #' @return Invisibly `NULL`, called for its plotting side effect on the
 #'   current graphics device.
 #' @export
+#' @keywords internal
 #' @seealso `sframe_plot_crosstab()`
 sframe_draw_mosaic <- function(result, palette = c("web", "print")) {
   palette <- match.arg(palette)

@@ -24,7 +24,10 @@ this demo, which is the reference to compare against when you run the
 same data through another package.
 }
 \description{
-Load one bundled demo
+One of the 22-item teaching library, each demonstrating one analysis
+method end to end. For the demo that instead exercises every input type
+SurveyBuilder and SurveyStudio support in a single instrument, see
+\code{\link[=sframe_input_types_demo_data]{sframe_input_types_demo_data()}}.
 }
 \examples{
 demo <- sframe_demo("two_group")
@@ -32,5 +35,6 @@ demo$instrument
 head(demo$responses)
 }
 \seealso{
-\code{\link[=sframe_demos]{sframe_demos()}}, \code{\link[=sframe_export_labelled]{sframe_export_labelled()}}
+\code{\link[=sframe_demos]{sframe_demos()}}, \code{\link[=sframe_export_labelled]{sframe_export_labelled()}},
+\code{\link[=sframe_input_types_demo_data]{sframe_input_types_demo_data()}}
 }
