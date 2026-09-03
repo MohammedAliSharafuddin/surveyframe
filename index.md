@@ -378,9 +378,9 @@ probability sample.
 
 Haven’t decided the analysis yet? Collect first with any web-form tool,
 Google Forms, Qualtrics, REDCap, or the R package
-[surveydown](https://surveydown.io/), and add the plan when you’re
-ready: surveyframe reads exported CSV data from any of them (see
-“Already have data?” above).
+[surveydown](https://github.com/surveydown-dev/surveydown), and add the
+plan when you’re ready: surveyframe reads exported CSV data from any of
+them (see “Already have data?” above).
 
 **If this package is ever archived by CRAN**, the GitHub repository
 remains the canonical source:
