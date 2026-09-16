@@ -186,6 +186,8 @@ textarea.inp-std:focus{border-color:var(--cp);box-shadow:0 0 0 3px color-mix(in 
   background:var(--cf);color:var(--t2);font-size:11px;display:flex;
   align-items:center;justify-content:center;cursor:pointer}
 .rank-mv:hover{border-color:var(--cp);color:var(--cp);background:var(--tint)}
+.rank-confirm{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:10px}
+.rank-status{font-size:13px;color:var(--t2)}
 
 /* Pairwise comparison (AHP/ANP Saaty scale, DEMATEL influence scale) */
 .pw-wrap{display:flex;flex-direction:column;gap:14px;margin-top:8px}
@@ -419,7 +421,9 @@ function isVisible(itemId,seen){
 }
 
 // ── Helpers ────────────────────────────────────────────────────────────────
-function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+// esc(0) must be "0". Coercing with s||'' turned an option coded 0 into
+// value="", so a real answer was stored and validated as no answer.
+function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function h(tag,attrs,inner){return'<'+tag+' '+(attrs||'')+'>'+inner+'</'+tag+'>';}
 function wrapItem(item,inner){
   return'<div class="item'+(isVisible(item.id)?'':' hidden')+'" id="item_'+esc(item.id)+'" data-id="'+esc(item.id)+'">'
@@ -619,51 +623,49 @@ function renderCriteriaWeight(item){
     return'<div class="cw-row"><span class="cw-lbl">'+esc(crit)+'</span>'
       +'<input type="number" inputmode="numeric" class="inp-std cw-input" min="0" max="100" value="'+esc(saved)+'"'
       +' aria-label="Points for '+esc(crit)+'"'
-      +' oninput="clampCwInput(this,\''+esc(item.id)+'\');setResp(\''+esc(rowKey)+'\',this.value);updateCwTotal(\''+esc(item.id)+'\')"></div>';
+      +' oninput="setResp(\''+esc(rowKey)+'\',this.value);updateCwTotal(\''+esc(item.id)+'\')"></div>';
   }).join('');
   return'<div class="cw-wrap" id="cw_'+esc(item.id)+'">'+rows
-    +'<div class="cw-total" id="cwtotal_'+esc(item.id)+'">Total: 0 / 100</div></div>';
+    +'<div class="cw-total" id="cwtotal_'+esc(item.id)+'">'+cwTotalText(cwTotal(item))+'</div></div>';
 }
-// Clamps a single criteria-weight input to an integer 0-100, and also caps it
-// so it cannot push the running total past 100: the HTML `max` attribute
-// only affects the spinner arrows, not typed or pasted input, so without
-// this a respondent can type any value into every field regardless of what
-// the other fields already hold.
-function clampCwInput(input,itemId){
-  var raw=input.value.replace(/[^0-9]/g,'');
-  var val=raw===''?0:parseInt(raw,10);
-  if(val>100)val=100;
-  var wrap=document.getElementById('cw_'+itemId);
-  var others=0;
-  if(wrap){
-    wrap.querySelectorAll('input[type="number"]').forEach(function(inp){
-      if(inp!==input)others+=parseInt(inp.value,10)||0;
-    });
-  }
-  if(others+val>100)val=Math.max(0,100-others);
-  input.value=raw===''?'':String(val);
+// Constant-sum points are stored exactly as typed. Each entry must be a whole
+// number from 0 to 100 and the entries must total 100, and validatePage() says
+// so when they do not. Rewriting an entry on input turned 2.5 into 25, and
+// capping it against the other fields silently changed an allocation the
+// participant was part way through editing.
+function cwTotal(item){
+  var total=0,invalid=false,anyEntered=false;
+  (item.comparison_items||[]).forEach(function(crit){
+    var v=responses[item.id+'__'+crit];
+    var s=String(v==null?'':v).trim();
+    if(s==='')return;
+    anyEntered=true;
+    if(!/^[0-9]+$/.test(s)||parseInt(s,10)>100){invalid=true;return;}
+    total+=parseInt(s,10);
+  });
+  return{total:total,invalid:invalid,anyEntered:anyEntered};
+}
+function cwTotalText(t){
+  return t.invalid?'Use whole numbers from 0 to 100':'Total: '+t.total+' / 100';
 }
 function updateCwTotal(itemId){
-  var wrap=document.getElementById('cw_'+itemId);if(!wrap)return;
-  var inputs=wrap.querySelectorAll('input[type="number"]');
-  var total=0;inputs.forEach(function(inp){total+=parseInt(inp.value,10)||0;});
   var el=document.getElementById('cwtotal_'+itemId);
-  if(el){
-    el.textContent='Total: '+total+' / 100';
-    el.className='cw-total '+(total===100?'cw-ok':'cw-bad');
-  }
+  var item=SF.items.filter(function(i){return i.id===itemId;})[0];
+  if(!el||!item)return;
+  var t=cwTotal(item);
+  el.textContent=cwTotalText(t);
+  el.className='cw-total '+(!t.invalid&&t.total===100?'cw-ok':'cw-bad');
 }
 function renderNumeric(item){
   var saved=responses[item.id]||'';
-  // slider_min/slider_max double as hard bounds for numeric entry; values
-  // typed outside the range are clamped on change.
-  // Numbers bypass esc(): esc(0) would collapse to an empty string
+  // slider_min/slider_max are the bounds for numeric entry. What the
+  // participant types is stored as typed, and validatePage() asks for a
+  // correction when it is outside the bounds. Clamping on change rewrote a
+  // cleared field to the minimum, an answer nobody gave.
   var mn=item.slider_min!=null?' min="'+(+item.slider_min)+'"':'';
   var mx=item.slider_max!=null?' max="'+(+item.slider_max)+'"':'';
   return'<input type="number" class="inp-std inp-narrow" id="inp_'+esc(item.id)+'" value="'+esc(saved)+'"'+mn+mx+ariaFor(item)
-    +' onchange="if(this.min!==\'\'&&+this.value<+this.min)this.value=this.min;'
-    +'if(this.max!==\'\'&&+this.value>+this.max)this.value=this.max;'
-    +'setResp(\''+esc(item.id)+'\',this.value)">';
+    +' onchange="setResp(\''+esc(item.id)+'\',this.value)">';
 }
 function renderText(item){
   var saved=responses[item.id]||'';
@@ -714,6 +716,11 @@ function renderRanking(item,cs){
     rankOrders[item.id]=cs.values.map(function(v,i){return{v:String(v),l:cs.labels[i]||String(v)};});
   }
   var order=rankOrders[item.id];
+  var confirmed=!!responses[item.id];
+  var status=confirmed
+    ?'<span class="rank-status" role="status">Your order is recorded.</span>'
+    :'<button type="button" class="btn btn-s rank-keep" onclick="rankConfirm(\''+esc(item.id)+'\')">Keep this order</button>'
+      +'<span class="rank-status" role="status">Drag the options or use the arrows, or keep the order shown.</span>';
   return'<div class="rank-list" id="rank_'+esc(item.id)+'" ondragover="event.preventDefault()">'+order.map(function(opt,i){
     return'<div class="rank-item" draggable="true" data-id="'+esc(item.id)+'" data-v="'+esc(opt.v)+'"'
       +' ondragstart="rankDragStart(event)" ondragover="rankDragOver(event)" ondrop="rankDrop(event,\''+esc(item.id)+'\')" ondragleave="this.classList.remove(\'drag-over\')">'
@@ -727,7 +734,8 @@ function renderRanking(item,cs){
       +' onclick="rankMove(\''+esc(item.id)+'\',\''+esc(opt.v)+'\',1)">&#9660;</button>'
       +'</span>'
       +'</div>';
-  }).join('')+'</div>';
+  }).join('')+'</div>'
+    +'<div class="rank-confirm">'+status+'</div>';
 }
 
 // ── Response handlers ──────────────────────────────────────────────────────
@@ -785,14 +793,29 @@ function rankDrop(e,itemId){
   var tgtIdx=items.indexOf(e.currentTarget);
   if(srcIdx>tgtIdx)list.insertBefore(dragSrc,e.currentTarget);
   else list.insertBefore(dragSrc,e.currentTarget.nextSibling);
-  // Update numbers
-  [].slice.call(list.querySelectorAll('.rank-item')).forEach(function(el,i){
-    el.querySelector('.rank-num').textContent=i+1;
-  });
-  // Persist order
   var newOrder=[].slice.call(list.querySelectorAll('.rank-item')).map(function(el){return el.dataset.v;});
-  responses[itemId]=newOrder.join(',');
   dragSrc=null;
+  rankSetOrder(itemId,newOrder);
+  renderScreen();
+}
+// The one place a ranking changes. The displayed order (rankOrders) and the
+// recorded answer (responses) are written together. Writing only the answer
+// on a drag left the page showing one order while submitting another.
+function rankSetOrder(itemId,values){
+  var byV={};
+  (rankOrders[itemId]||[]).forEach(function(o){byV[o.v]=o;});
+  rankOrders[itemId]=values.map(function(v){return byV[String(v)];}).filter(Boolean);
+  responses[itemId]=rankOrders[itemId].map(function(o){return o.v;}).join(',');
+  var err=document.getElementById('err_'+itemId);
+  if(err)err.classList.remove('show');
+  updateBranching();
+}
+// Records the order on display as the participant's answer, for when the
+// order shown is already the one they would choose.
+function rankConfirm(itemId){
+  var order=rankOrders[itemId]; if(!order)return;
+  rankSetOrder(itemId,order.map(function(o){return o.v;}));
+  renderScreen();
 }
 // Keyboard alternative to drag: move an option one position up or down
 function rankMove(itemId,v,dir){
@@ -800,8 +823,9 @@ function rankMove(itemId,v,dir){
   var i=order.findIndex(function(o){return o.v===String(v);});
   var j=i+dir;
   if(i<0||j<0||j>=order.length)return;
-  var tmp=order[i];order[i]=order[j];order[j]=tmp;
-  responses[itemId]=order.map(function(o){return o.v;}).join(',');
+  var moved=order.map(function(o){return o.v;});
+  var tmp=moved[i];moved[i]=moved[j];moved[j]=tmp;
+  rankSetOrder(itemId,moved);
   renderScreen();
   var btn=document.querySelector('#rank_'+itemId+' .rank-item[data-v="'+v+'"] .rank-mv'+(dir<0?'':' + .rank-mv'));
   if(btn)btn.focus();
@@ -829,24 +853,43 @@ function validatePage(items){
       ok=false;
     }
   });
-  // A criteria_weight total that isn't exactly 100 blocks page advance even
-  // if some points have been entered, matching the matrix/date pattern of
-  // checking a per-type invariant independent of the plain `required` flag.
-  // clampCwInput() already stops any single field or the running total from
-  // exceeding 100, so the only remaining failure mode here is an incomplete
-  // allocation (total < 100).
+  // A number typed outside a numeric item's bounds, or text that is not a
+  // number, is kept as typed and blocks the page until corrected, even on an
+  // optional item.
+  items.forEach(function(item){
+    if(item.type!=='numeric'||!isVisible(item.id))return;
+    var s=String(responses[item.id]==null?'':responses[item.id]).trim();
+    if(s==='')return;
+    var n=Number(s);
+    var hasMin=item.slider_min!=null,hasMax=item.slider_max!=null;
+    var msg='';
+    if(!isFinite(n))msg='Please enter a number.';
+    else if((hasMin&&n<+item.slider_min)||(hasMax&&n>+item.slider_max)){
+      msg=hasMin&&hasMax?'Please enter a number from '+(+item.slider_min)+' to '+(+item.slider_max)+'.'
+        :hasMin?'Please enter a number of '+(+item.slider_min)+' or more.'
+        :'Please enter a number of '+(+item.slider_max)+' or less.';
+    }
+    if(msg){
+      var err=document.getElementById('err_'+item.id);
+      if(err){err.textContent=msg;err.classList.add('show');}
+      if(ok){
+        var el=document.getElementById('item_'+item.id);
+        if(el)el.scrollIntoView({behavior:'smooth',block:'center'});
+      }
+      ok=false;
+    }
+  });
+  // A criteria_weight allocation must be whole numbers totalling exactly 100.
+  // Once any points are entered this applies even to an optional item.
   items.forEach(function(item){
     if(item.type!=='criteria_weight'||!isVisible(item.id))return;
-    var crits=item.comparison_items||[];
-    var total=0,anyEntered=false;
-    crits.forEach(function(crit){
-      var v=responses[item.id+'__'+crit];
-      if(v!==undefined&&v!==null&&String(v)!=='')anyEntered=true;
-      total+=parseInt(v,10)||0;
-    });
-    if((item.required||anyEntered)&&total!==100){
+    var t=cwTotal(item);
+    if(t.invalid||((item.required||t.anyEntered)&&t.total!==100)){
       var err=document.getElementById('err_'+item.id);
-      if(err){err.textContent='The points must add up to exactly 100 (currently '+total+').';err.classList.add('show');}
+      var cwMsg=t.invalid
+        ?'Enter a whole number from 0 to 100 for each option.'
+        :'The points must add up to exactly 100 (currently '+t.total+').';
+      if(err){err.textContent=cwMsg;err.classList.add('show');}
       if(ok){
         var el=document.getElementById('item_'+item.id);
         if(el)el.scrollIntoView({behavior:'smooth',block:'center'});
@@ -892,7 +935,10 @@ function validatePage(items){
     }
     if(missing){
       var err=document.getElementById('err_'+item.id);
-      if(err){err.textContent='This question is required.';err.classList.add('show');}
+      var reqMsg=t==='ranking'
+        ?'Please order the options, or choose Keep this order.'
+        :'This question is required.';
+      if(err){err.textContent=reqMsg;err.classList.add('show');}
       if(ok){
         var el=document.getElementById('item_'+item.id);
         if(el)el.scrollIntoView({behavior:'smooth',block:'center'});
@@ -951,10 +997,9 @@ function doSubmit(){
       // One column per option holding its rank (1 = top), so the data is
       // directly analysable without reshaping.
       var cs=choiceMap[item.choice_set]||{values:[]};
+      // An untouched ranking is unanswered, so its columns stay empty. The
+      // declared order is not a preference the participant expressed.
       var order=(responses[item.id]||'').split(',').filter(Boolean);
-      if(!order.length&&rankOrders[item.id]){
-        order=rankOrders[item.id].map(function(o){return o.v;});
-      }
       (cs.values||[]).forEach(function(v){
         var pos=order.indexOf(String(v));
         row[item.id+'__'+String(v)]=pos>=0?String(pos+1):'';
