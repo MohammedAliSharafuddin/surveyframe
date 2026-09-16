@@ -8,6 +8,7 @@ sframe_validation_checks <- c(
   "item_id_format",
   "duplicate_choice_ids",
   "duplicate_scale_ids",
+  "id_namespace",
   "item_labels",
   "item_choice_set_refs",
   "item_scale_refs",
@@ -15,6 +16,8 @@ sframe_validation_checks <- c(
   "decision_item_shape",
   "comparison_scale",
   "scale_membership",
+  "scale_parameters",
+  "reverse_item_membership",
   "branching_refs",
   "branching_values",
   "check_refs",
@@ -37,12 +40,18 @@ sframe_validation_checks <- c(
 #' - Invalid item IDs
 #' - Duplicate choice-set IDs
 #' - Duplicate scale IDs
+#' - Item IDs, scale IDs and response columns that share a name, or take a
+#'   reserved metadata name such as `submitted_at`. A scale's score is stored
+#'   in a column named by its ID, so a shared name would overwrite data
 #' - Items with missing labels
 #' - Items referencing a missing `choice_set` in the instrument
 #' - Items referencing a missing `scale_id` in the instrument
 #' - Items marked `reverse = TRUE` without a `scale_id`
 #' - Choice sets referenced by items but not present in the instrument
 #' - Scale `items` vectors containing IDs not present in the instrument
+#' - Scale scoring parameters: repeated items, a `min_valid` outside 1 to the
+#'   number of items, and weights that are not positive finite numbers
+#' - Reverse coding declared for an item outside the scale that declares it
 #' - Branching rules referencing item IDs not present in the instrument
 #' - `%in%` branching rules whose `value` no evaluator can consume
 #' - Attention checks referencing item IDs not present in the instrument
@@ -158,6 +167,31 @@ validate_sframe <- function(instrument, strict = TRUE) {
     )
   }
 
+  # One namespace for everything that becomes a column in response data.
+  # Duplicates within items or within scales are reported above, so this looks
+  # for names claimed by more than one kind, and for reserved metadata names.
+  expansion_cols <- sframe_item_expansion_columns(instrument)
+  claims <- unique(data.frame(
+    name = c(item_ids, scale_ids, expansion_cols),
+    kind = c(rep("an item ID", length(item_ids)),
+             rep("a scale ID", length(scale_ids)),
+             rep("a response column of another item", length(expansion_cols))),
+    stringsAsFactors = FALSE
+  ))
+  for (nm in unique(claims$name[duplicated(claims$name)])) {
+    add("id_namespace",
+      paste0("'", nm, "' is used as ",
+             paste(claims$kind[claims$name == nm], collapse = " and as "),
+             ". Each becomes a column in response data, and a scale's score ",
+             "would overwrite the other. Rename one of them."))
+  }
+  for (nm in intersect(unique(c(item_ids, scale_ids)),
+                       sframe_reserved_response_columns)) {
+    add("id_namespace",
+      paste0("'", nm, "' is reserved for response metadata, so an item or ",
+             "scale cannot use it as an ID."))
+  }
+
   for (item in instrument$items) {
     # Missing labels
     if (is.null(item$label) || nchar(trimws(item$label)) == 0) {
@@ -229,6 +263,19 @@ validate_sframe <- function(instrument, strict = TRUE) {
       add("scale_membership",
         paste0("Scale '", scale$id, "' references unknown item(s): ",
                paste(missing_items, collapse = ", ")))
+    }
+    add("scale_parameters", sframe_scale_parameter_problems(scale))
+    add("reverse_item_membership", sframe_scale_reverse_problems(scale))
+  }
+  # An item reversed at item level is reversed within the scale its scale_id
+  # names, so that scale must list it.
+  for (item in instrument$items) {
+    if (!isTRUE(item$reverse) || is.null(item$scale_id)) next
+    owner <- Filter(function(s) identical(s$id, item$scale_id), instrument$scales)
+    if (length(owner) == 1 && !item$id %in% owner[[1]]$items) {
+      add("reverse_item_membership",
+        paste0("Item '", item$id, "' is reverse = TRUE within scale '",
+               item$scale_id, "', which does not list it among its items."))
     }
   }
 

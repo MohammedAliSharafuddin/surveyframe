@@ -31,6 +31,24 @@ This section grows as each group of fixes lands.
   reads the sheet directly, bypassing `read_sheet_responses()`, should expect
   text cells where numbers appeared before.
 
+* **Scale scores and reliability can change.** Re-run analyses of scales
+  that reverse-code items, share items with other scales, or had an absent
+  item column. Reverse coding now applies within the scale that declares it,
+  a scale with an absent item column counts that item as unanswered, and
+  report figures now show the scores `score_scales()` computes.
+* **Some instruments that validated before are now rejected.** An item and a
+  scale sharing an ID, an ID equal to a response column or to `respondent_id`,
+  `response_id`, `started_at` or `submitted_at`, reverse coding for an item
+  outside the scale declaring it, repeated scale items, a `min_valid` outside
+  1 to the number of items, and weights that are zero, negative or infinite
+  are all reported by `validate_sframe()`, and `sf_scale()` refuses the scale
+  parameters directly. Rename or correct the declaration.
+* **A reverse-coded item needs declared response bounds**: a numeric choice
+  set, `slider_min` and `slider_max`, or a rating maximum. Scoring reports an
+  error for a reversed item that has none.
+* **A factor column is scored through its labels.** A factor whose labels are
+  text is an error. Convert it to numeric codes first.
+
 ## Collection fixes
 
 * **The Shiny survey erased every answer.** In `render_survey()`, each answer
@@ -86,6 +104,38 @@ This section grows as each group of fixes lands.
   said it did, and starts every answer blank. Moving between pages
   scrolls the module into view, where it scrolled the whole host page.
 
+## Scoring fixes
+
+* **A scale could overwrite a question's answers.** A scale's score is stored
+  in a column named by its ID, and an item and a scale were allowed the same
+  ID, so `score_scales()` replaced the item's answers with the score, and an
+  analysis of that item read the score. Shared names are now rejected at
+  validation, and `score_scales()` refuses to overwrite data.
+* **One scale could reverse another scale's item.** A scale listing an item in
+  `reverse_items` reversed it everywhere, which changed the scores and the
+  alpha of any other scale using that item.
+* **Reports published a different scale score from the instrument's.** The
+  report figures and the Quarto report template took a plain row mean,
+  ignoring the declared method, reverse coding, weights and `min_valid`, so a
+  declared sum of 2 and 4 was shown as 3.
+* **A missing item column lowered the scoring threshold.** With `min_valid =
+  NULL`, meaning every item, a 3-item scale with 1 absent column was scored on
+  2 items. The absent item now counts as unanswered, with a warning.
+* **Reversal used the sample's own range** for an item with no numeric choice
+  set, so the same answer received a different reversed value as respondents
+  were added. Slider and rating items now reverse on their declared limits.
+* **A factor was scored on its level positions**, so a factor holding 10 and
+  20 was scored as 1 and 2.
+* **`item_report()` diagnostics now match the scale's scoring.** Item-rest
+  correlations use the reversed orientation, where a reverse-keyed item used
+  to come out strongly negative beside a high alpha. They use respondents who
+  answered every item, where a missing item counted as 0. Floor and ceiling
+  use the item's declared lowest and highest response, where they used the
+  sample's extremes, and are `NA` for an item that declares no bounds.
+* `sf_scale()` now checks its parameters, and refuses a constructed item
+  passed inside a scale's `items`, which was silently dropped from the
+  instrument.
+
 ## Documentation
 
 * **`export_google_sheet()` told researchers to let anyone with the link edit
@@ -96,6 +146,10 @@ This section grows as each group of fixes lands.
 * The `survey_module_ui()` and `survey_module_server()` help is rewritten,
   covering supported item types, what is submitted, a failed save, and
   changing the instrument, with a complete example that stores responses.
+* The `item_report()` help describes item-rest correlations, where it said
+  item-total, and the nested result it returns, with both ways to extract it.
+  The `sf_scale()` help states the rules for `min_valid`, `weights` and
+  `reverse_items`.
 
 ## Dependencies
 
