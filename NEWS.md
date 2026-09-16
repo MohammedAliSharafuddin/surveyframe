@@ -1,3 +1,107 @@
+# surveyframe 0.4.2 (in development)
+
+A defect-fix release. An external review of 0.4.1 found defects that
+silently alter or lose data, and this release corrects them. Collection
+defects come first, because an answer recorded wrongly is lost for good.
+This section grows as each group of fixes lands.
+
+## What you need to change
+
+* **`survey_module_server()` returns a different response shape.** The
+  response is now the collection row, as a list: `response_id`,
+  `started_at`, `submitted_at`, then one element per response column, named
+  as `read_responses()` expects. A multiple-choice question becomes one
+  element per option holding `"1"` or `"0"`, and a matrix, ranking or
+  decision question becomes one element per row, option, pair or criterion.
+  Values are character. An item hidden by branching, or left unanswered, is
+  `NA`. The module previously returned one raw input value per item, and
+  lacked controls for matrix, ranking, rating and decision questions.
+* **Untouched sliders, rankings and dates are now unanswered** in
+  `render_survey()` and the survey module. A slider counts once the
+  respondent moves it, and a ranking once it is reordered or confirmed with
+  "Keep this order". Previously a slider stored its starting position, a
+  ranking stored the declared order, and a date question in the module
+  stored today's date, for anyone who moved past them.
+* **`render_survey(save_responses = "csv")` refuses a response file written
+  for different questions**, when the app starts and on each submission.
+  Collect a changed instrument into a new file. A file with the same columns
+  in another order is still accepted, and rows are aligned by column name.
+* **Google Sheets responses are stored as text.** Regenerate and redeploy the
+  collector script with `export_google_sheet()` to get the fix. Code that
+  reads the sheet directly, bypassing `read_sheet_responses()`, should expect
+  text cells where numbers appeared before.
+
+## Collection fixes
+
+* **The Shiny survey erased every answer.** In `render_survey()`, each answer
+  re-drew the survey page, and the re-drawn questions reported themselves
+  empty, so every answer was wiped about a second after it was given. A
+  submitted response came back blank. This affected every standard-mode
+  survey run with `render_survey()` in 0.4.1 and earlier. Answers now stay
+  put, and the page stays as it is when a question is
+  answered.
+* **The Google Sheets collector could turn an answer into a formula.** An
+  answer beginning with `=` was evaluated by the spreadsheet, so `=1+1` was
+  stored as `2`, and a code such as `007` lost its leading zeros. Answers are
+  now stored exactly as submitted. The same fix applies to collectors
+  generated from the survey builder.
+* **The exported survey changed typed numbers.** Clearing a number field with
+  a minimum wrote the minimum in, a number outside the range was replaced
+  with the nearest limit, and in a points allocation `2.5` became `25`. What
+  the respondent types is now kept, and the survey asks for a correction.
+* **An option coded 0 was recorded as a blank** in the exported survey, so
+  a respondent choosing it on a required question was blocked from
+  continuing, and 0 looked identical to a blank. Affected 0/1 codings and 0 to 10
+  scales.
+* **A ranking could show one order and submit another** in the exported
+  survey after dragging, and an untouched ranking was submitted as if the
+  respondent had chosen the order shown.
+* **Shiny matrix and ranking questions showed codes in place of labels.** A
+  five-point agreement scale appeared as `1 2 3 4 5`. Shiny rankings also
+  stored labels, so every rank came out empty wherever labels and codes
+  differed.
+* **Shiny rankings needed a mouse.** Each option now
+  has move up and move down buttons, and the new position is announced.
+* **Shiny decision questions started with an answer selected**, "Equally
+  important" or "No influence", and points allocations started at 0, so an
+  untouched question submitted an invented judgement. They
+  now start empty. Every Shiny date question was also pre-filled with
+  today's date, and now starts empty.
+* **Appending to a Shiny response file ignored its header**, so a changed
+  instrument wrote answers under another question's heading. An existing
+  empty file also received headerless rows.
+* **The survey module lacked 5 item types.** Matrix, rating,
+  ranking, pairwise comparison and criteria weight showed only a
+  placeholder, and a required one made the survey impossible to finish. The
+  module now uses the same questions as `render_survey()`.
+* **The survey module submitted answers the respondent had removed.** A
+  cleared answer, and an answer to a question branching later hid, were both
+  submitted. A multiple-choice answer lost all but its first selection when
+  the page was revisited.
+* **A failed save in the survey module showed the thank-you screen.** The
+  survey was marked complete before `on_submit` ran, and an error there
+  ended the session. The respondent now sees a message, stays on the page
+  and can try again.
+* Changing a reactive instrument now resets the survey module, as its help
+  said it did, and starts every answer blank. Moving between pages
+  scrolls the module into view, where it scrolled the whole host page.
+
+## Documentation
+
+* **`export_google_sheet()` told researchers to let anyone with the link edit
+  the response sheet**, which exposes participant data to anyone holding the
+  URL. The collector writes through the sheet it is attached to, so link
+  sharing was always unnecessary. The help now says to keep the sheet private. If you
+  followed the old advice, review the sheet's sharing settings.
+* The `survey_module_ui()` and `survey_module_server()` help is rewritten,
+  covering supported item types, what is submitted, a failed save, and
+  changing the instrument, with a complete example that stores responses.
+
+## Dependencies
+
+`callr`, `chromote`, `httpuv` and `pkgload` join Suggests. They are used only
+by tests that drive a survey in a real browser, which are skipped on CRAN.
+
 # surveyframe 0.4.1
 
 ## New
