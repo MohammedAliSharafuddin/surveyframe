@@ -37,6 +37,8 @@
 ^todo_provenance_part2\.md$
 ^todo_integration_launch\.md$
 ^todo_rstudio_addin\.md$
+^todo_review_defects\.md$
+^HANDOVER_0\.4\.2_BUILD\.md$
 ^docs($|/)
 ^data-raw($|/)
 ^\.codex($|/)

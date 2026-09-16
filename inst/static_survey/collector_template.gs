@@ -43,8 +43,8 @@ function doPost(e) {
     // insertion point onward was off by one. Nothing errored, the sheet stayed
     // well-formed, and read_responses() read it happily.
     const header = readHeader_(sheet);
-    const row = header.map(col => data[col] !== undefined ? data[col] : "");
-    sheet.appendRow(row);
+    const row = header.map(col => data[col] !== undefined ? String(data[col]) : "");
+    appendRowAsText_(sheet, row);
 
     return ContentService
       .createTextOutput(JSON.stringify({ status: "ok", rows: sheet.getLastRow() - 1 }))
@@ -55,6 +55,20 @@ function doPost(e) {
       .createTextOutput(JSON.stringify({ status: "error", message: err.toString() }))
       .setMimeType(ContentService.MimeType.JSON);
   }
+}
+
+// Writes one response row as text, never as user-entered values.
+// appendRow() and a bare setValues() both parse a cell the way typing into
+// it would, so an answer beginning with "=" became a formula: "=1+1" was
+// stored as 2, and "=IMPORTXML(...)" was evaluated inside the researcher's
+// own sheet. Numeric codes lost their leading zeros the same way. Forcing
+// the range to the plain text format before writing stores every answer
+// exactly as the participant submitted it.
+function appendRowAsText_(sheet, row) {
+  if (!row.length) return;
+  const target = sheet.getRange(sheet.getLastRow() + 1, 1, 1, row.length);
+  target.setNumberFormat("@");
+  target.setValues([row]);
 }
 
 // Returns the sheet's live header, creating or extending it as needed.

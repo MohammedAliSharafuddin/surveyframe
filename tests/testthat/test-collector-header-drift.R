@@ -45,6 +45,7 @@ Sheet.prototype.getRange = function(row, col, nRows, nCols){
       }
       return this;
     },
+    setNumberFormat: function(){ return this; },
     setFontWeight: function(){ return this; },
     setBackground: function(){ return this; },
     setFontColor:  function(){ return this; }
