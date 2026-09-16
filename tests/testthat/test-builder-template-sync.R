@@ -30,7 +30,8 @@ test_that("the builder's static survey template matches template.html", {
   inlined <- inlined_block(builder, "<!-- STATIC_TEMPLATE_START:",
                            "<!-- STATIC_TEMPLATE_END -->")
   expect_identical(unescape_script(inlined),
-                   asset("static_survey", "template.html"))
+                   asset("static_survey", "template.html"),
+                   info = "Run data-raw/inline_static_template.R to regenerate the builder.")
 })
 
 test_that("the builder's collector matches collector_template.gs", {
@@ -38,5 +39,6 @@ test_that("the builder's collector matches collector_template.gs", {
   inlined <- inlined_block(builder, "<!-- COLLECTOR_TEMPLATE_START:",
                            "<!-- COLLECTOR_TEMPLATE_END -->")
   expect_identical(unescape_script(inlined),
-                   asset("static_survey", "collector_template.gs"))
+                   asset("static_survey", "collector_template.gs"),
+                   info = "Run data-raw/inline_static_template.R to regenerate the builder.")
 })

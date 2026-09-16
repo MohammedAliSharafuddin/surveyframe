@@ -22,7 +22,8 @@ surveyframe_v0.2/
 surveyframe_V0.3/
 surveyframe_v_0.3.1/
 cran-comments.md
-data-raw/
+data-raw/*
+!data-raw/inline_static_template.R
 roadmap.md
 todo.md
 revision_todo_0.3.md
@@ -70,3 +71,5 @@ report_interp.html
 TESTING.md
 bsr_paper_template.docx
 review_032_functions.R
+tests/testthat/_problems/
+tests/testthat/testthat-problems.rds
