@@ -329,12 +329,16 @@ quality_report <- function(
   }
 
   # --- Duplicates ---
-  dup_result <- list(flagged_rows = integer(0), n_duplicates = 0L)
+  # checked = FALSE when there is no respondent id column, so a check that
+  # never ran is never reported as 0 duplicates.
+  dup_result <- list(flagged_rows = integer(0), n_duplicates = NA_integer_,
+                     checked = FALSE)
   if (!is.null(respondent_id) && respondent_id %in% colnames(data)) {
     ids <- data[[respondent_id]]
     dup_result <- list(
       flagged_rows = which(duplicated(ids) | duplicated(ids, fromLast = TRUE)),
-      n_duplicates = sum(duplicated(ids))
+      n_duplicates = sum(duplicated(ids)),
+      checked = TRUE
     )
   }
 

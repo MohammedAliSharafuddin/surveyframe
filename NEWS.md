@@ -49,6 +49,27 @@ This section grows as each group of fixes lands.
 * **A factor column is scored through its labels.** A factor whose labels are
   text is an error. Convert it to numeric codes first.
 
+* **Some statistics change.** Re-run analyses using Cochran's Q with missing
+  answers, ANCOVA, partial correlation, a Firth likelihood ratio, PLS-SEM
+  constructs with non-consecutive indicators, or a Mann-Whitney or Wilcoxon
+  signed-rank test. The rank tests now use the normal approximation without
+  continuity correction for z, p, r and its interval alike, so their p
+  values move slightly, and z is now signed by the direction of the
+  difference.
+* **ANCOVA tables hold adjusted tests**, each term tested after all others,
+  with columns `effect`, `df`, `sum_sq`, `mean_sq`, `F` and `p`.
+* **`sample_size_plan()` now calculates power** for t tests, ANOVA and, with
+  the new `f2`, regression. The new `d` and `f` arguments give the expected
+  effect, and a medium effect is assumed, with a warning, when they are
+  left out. Estimates now depend on `alpha` and `power`.
+* **`run_analysis_plan()` refuses repeated block IDs** and gains `strict`.
+  Its results carry a `status` attribute counting failed blocks, so check
+  it, or set `strict = TRUE`, before treating a returned object as success.
+* **Bootstrap intervals can be withheld.** `bootstrap_ci()`, `cohens_d_ci()`,
+  `cramers_v_ci()` and `eta_sq_ci()` return `NA` bounds with a `reason`
+  attribute when fewer than 90% of resamples give a value or all give the
+  same value, and every result records its resample counts.
+
 ## Collection fixes
 
 * **The Shiny survey erased every answer.** In `render_survey()`, each answer
@@ -136,6 +157,48 @@ This section grows as each group of fixes lands.
   passed inside a scale's `items`, which was silently dropped from the
   instrument.
 
+## Statistics fixes
+
+* **Cochran's Q counted a missing answer as an observed 0**, changing both Q
+  and the analysed N, and read any unrecognised code as 0. Missing answers
+  now remove the respondent, and codes other than 1/0, TRUE/FALSE and yes/no
+  are reported.
+* **PLS-SEM syntax could add an indicator the model left out.** A construct
+  over `Q1` and `Q3` was written as the range `Q1` to `Q3`, adding `Q2`.
+* **Indirect effects could use a path the model never declared**, and a
+  model with parallel mediators wrote its total effect twice, each copy
+  holding one route. Both are now caught or corrected.
+* **ANCOVA reported an unadjusted group test as adjusted.** The group was
+  tested before the covariates. The slope check also left out every
+  covariate after the first.
+* **Partial correlation p values used the wrong degrees of freedom**, and
+  partial Spearman ranked the residuals where it must rank the variables.
+* **`sample_size_plan()` returned 64 or 50 per group for t tests and ANOVA**
+  whatever alpha and power were requested, while printing both.
+* **The Firth likelihood-ratio statistic was half its true value.**
+* **Two-way ANOVA gave the residual row a partial eta squared of 0.5.**
+* **Results tables rounded p values to 2 decimals**, showing .004 as 0.
+  They now show 3 decimals, or <.001.
+* **Every `render_results()` table put a whole row in a single cell**,
+  headers included. Each value now has its own cell.
+* **Rank-test effect sizes and their intervals described different
+  statistics.** A signed-rank r also divided by pairs the test had dropped.
+* **Bootstrap intervals hid failed resamples**, and a collapsed distribution
+  gave a zero-width interval. A Kruskal-Wallis resample with every value
+  tied gave an effect of 0.
+* **An analysis plan whose blocks all failed returned as if it had
+  succeeded**, and a scale-scoring failure before analysis went unrecorded.
+* **The t test ignored `var_equal`**, and t tests and one-way ANOVA judged
+  significance at .05 whatever `alpha` the block declared. Options a method
+  never reads are now listed in `options_ignored`.
+* **Reliability, item and EFA blocks analysed every scale** whatever the
+  block selected. The quality block ran its duplicate check only when given
+  a respondent ID it was never passed, and reported 0 duplicates. It now
+  reads the collected ID column, and says when a check did not run.
+* **Statistics read a factor on its level positions**, and linear regression
+  turned a text predictor into a number. Factors are read through their
+  labels, and text predictors stay categorical.
+
 ## Documentation
 
 * **`export_google_sheet()` told researchers to let anyone with the link edit
@@ -150,6 +213,8 @@ This section grows as each group of fixes lands.
   item-total, and the nested result it returns, with both ways to extract it.
   The `sf_scale()` help states the rules for `min_valid`, `weights` and
   `reverse_items`.
+* The `sample_size_plan()` help separates power calculations from precision
+  targets and rules of thumb, and states which arguments each one uses.
 
 ## Dependencies
 

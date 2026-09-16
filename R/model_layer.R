@@ -428,6 +428,21 @@ validate_model <- function(model, instrument = NULL, strict = TRUE) {
         paste0("Indirect effect from '", ind$from, "' to '", ind$to,
                "' must include at least one mediator."))
     }
+    # Every step along the route must be a declared path, or the effect
+    # multiplies a parameter the model never estimates.
+    route <- c(ind$from, ind$through, ind$to)
+    declared <- vapply(sframe_model_paths(model), function(path) {
+      paste(path$from, path$to, sep = " -> ")
+    }, character(1))
+    if (length(route) > 1) {
+      steps <- paste(utils::head(route, -1), utils::tail(route, -1), sep = " -> ")
+      for (step in setdiff(steps, declared)) {
+        add("indirect_effects",
+          paste0("Indirect effect from '", ind$from, "' to '", ind$to,
+                 "' needs a declared path '", step, "'. Declare it with ",
+                 "sf_path(), or remove the indirect effect."))
+      }
+    }
   }
 
   if ((model$type %||% "") == "pls_sem" && !(model$engine %||% "") %in% c("seminr", "plspm")) {
@@ -884,6 +899,11 @@ sem_lavaan_syntax <- function(model, instrument = NULL, standardised = TRUE) {
 
   if (length(indirect) > 0) {
     lines <- c(lines, "# Indirect and total effects")
+    # One total per origin and outcome, written after every indirect effect,
+    # holding the direct path and all the indirect effects between the pair.
+    # Writing a total inside this loop gave parallel mediators a duplicated
+    # total, each copy holding only one indirect effect.
+    totals <- list()
     for (ind in indirect) {
       nodes <- c(ind$from, ind$through, ind$to)
       edges <- paste(utils::head(nodes, -1), utils::tail(nodes, -1), sep = "->")
@@ -905,10 +925,12 @@ sem_lavaan_syntax <- function(model, instrument = NULL, standardised = TRUE) {
       }, logical(1))]
       direct_label <- if (length(direct)) sframe_path_label(direct[[1]]) else NULL
       if (!is.null(direct_label)) {
-        lines <- c(lines,
-          paste0("total_", ind$from, "_", ind$to, " := ",
-                 direct_label, " + ", effect_name))
+        key <- paste0("total_", ind$from, "_", ind$to)
+        totals[[key]] <- c(totals[[key]] %||% direct_label, effect_name)
       }
+    }
+    for (key in names(totals)) {
+      lines <- c(lines, paste0(key, " := ", paste(totals[[key]], collapse = " + ")))
     }
   }
 
@@ -937,9 +959,14 @@ seminr_syntax <- function(model, data_name = "data", nboot = NULL, seed = 123) {
     if (length(items) == 1L || identical(con$mode, "single_item")) {
       sprintf('  composite("%s", single_item("%s"))', con$id, items[[1]])
     } else {
+      # A range is written only when it names exactly the declared indicators,
+      # in order. Checking that each name was a prefix plus a number let
+      # c("Q1", "Q3") become multi_items("Q", 1:3), adding Q2 to the model.
       prefix <- sub("[0-9]+$", "", items[[1]])
       suffixes <- suppressWarnings(as.integer(sub(paste0("^", prefix), "", items)))
-      if (all(!is.na(suffixes)) && identical(items, paste0(prefix, suffixes))) {
+      if (nzchar(prefix) && all(!is.na(suffixes)) &&
+          identical(as.character(items),
+                    paste0(prefix, seq(min(suffixes), max(suffixes))))) {
         sprintf('  composite("%s", multi_items("%s", %s))',
                 con$id, prefix, paste(range(suffixes), collapse = ":"))
       } else {
