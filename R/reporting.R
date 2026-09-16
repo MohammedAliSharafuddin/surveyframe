@@ -1040,11 +1040,24 @@ sframe_clean_interpretations <- function(interpretations) {
     }
   }
 
+  # Scale figures plot the scores score_scales() computes, so the method,
+  # reversal, weights and min_valid the instrument declares all apply. A row
+  # mean of the item columns ignored every one of them, so a declared sum of
+  # 2 and 4 was published as 3.
+  scale_scores <- NULL
+  if (length(instrument$scales %||% list()) > 0) {
+    scale_scores <- tryCatch(
+      score_scales(data, instrument, keep_items = FALSE, keep_meta = FALSE),
+      error = function(e) {
+        blocks <<- c(blocks, sprintf(
+          "<p><em>Scale scores could not be computed: %s</em></p>",
+          htmltools_escape(conditionMessage(e))))
+        NULL
+      })
+  }
   for (sc in instrument$scales %||% list()) {
-    cols <- intersect(sc$items, names(data))
-    if (!length(cols)) next
-    nums <- lapply(data[cols], function(x) suppressWarnings(as.numeric(x)))
-    scores <- rowMeans(do.call(cbind, nums), na.rm = TRUE)
+    if (is.null(scale_scores) || !sc$id %in% names(scale_scores)) next
+    scores <- scale_scores[[sc$id]]
     scores <- scores[!is.na(scores)]
     if (!length(scores)) next
     if (has_ggplot) {

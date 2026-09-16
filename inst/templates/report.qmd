@@ -316,12 +316,20 @@ for (item in q_items) {
   }
 }
 
-# One histogram per scale score
+# One histogram per scale score, from score_scales(), so the declared method,
+# reversal, weights and min_valid all apply
+scale_scores <- NULL
+if (length(instrument$scales %||% list()) > 0) {
+  scale_scores <- tryCatch(
+    score_scales(responses, instrument, keep_items = FALSE, keep_meta = FALSE),
+    error = function(e) {
+      cat(sprintf("\n*Scale scores could not be computed: %s*\n\n", conditionMessage(e)))
+      NULL
+    })
+}
 for (sc in instrument$scales %||% list()) {
-  cols <- intersect(sc$items, names(responses))
-  if (!length(cols)) next
-  nums <- lapply(responses[cols], function(x) suppressWarnings(as.numeric(x)))
-  scores <- rowMeans(do.call(cbind, nums), na.rm = TRUE); scores <- scores[!is.na(scores)]
+  if (is.null(scale_scores) || !sc$id %in% names(scale_scores)) next
+  scores <- scale_scores[[sc$id]]; scores <- scores[!is.na(scores)]
   if (!length(scores)) next
   cat(sprintf("\n**%s (scale score)**\n\n", sc$label %||% sc$id))
   if (has_ggplot) {
