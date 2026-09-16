@@ -67,7 +67,11 @@ Suggests:
     topicmodels,
     igraph (>= 1.5.0),
     V8 (>= 4.0.0),
-    haven (>= 2.5.0)
+    haven (>= 2.5.0),
+    callr,
+    chromote,
+    httpuv,
+    pkgload
 VignetteBuilder: knitr
 Config/testthat/edition: 3
 Config/roxygen2/version: 8.1.0
