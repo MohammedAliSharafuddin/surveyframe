@@ -341,6 +341,15 @@ This section grows as each group of fixes lands.
   URL. The collector writes through the sheet it is attached to, so link
   sharing was always unnecessary. The help now says to keep the sheet private. If you
   followed the old advice, review the sheet's sharing settings.
+* **The cross-check claim made for the decision methods is narrowed to what
+  the suite holds.** 0.4.0 said an independent computation had to agree
+  before a method was accepted. The suite calls RMCDA for 5 of the 10
+  methods, and 4 of those compare numbers: AHP weights, VIKOR's S, R and Q,
+  MOORA's ratio system and WASPAS scores. The ELECTRE call compares the
+  ordering of one concordance pair. ANP, DEMATEL, SMART, PROMETHEE and
+  TOPSIS are checked against hand-derived values and published worked
+  examples, with no second implementation. Both kinds of evidence are
+  recorded per method in `vignette("mcdm-analysis")`.
 * The `survey_module_ui()` and `survey_module_server()` help is rewritten,
   covering supported item types, what is submitted, a failed save, and
   changing the instrument, with a complete example that stores responses.
@@ -464,10 +473,12 @@ concept of a decision method at all.
   and the static HTML survey, the Shiny module, and the builder preview
   render all 3 judgement-collection structures identically.
 * RMCDA joins Suggests as a test-time cross-check oracle: an independent
-  computation of the same method on the same matrix is required to agree
-  with the package's own result before a method's implementation is
-  accepted. This practice caught a real defect during development, a
-  WASPAS runner that had inherited SMART's normalisation step by mistake.
+  computation of the same method on the same matrix is compared with the
+  package's own result. This practice caught a real defect during
+  development, a WASPAS runner that had inherited SMART's normalisation
+  step by mistake. (Corrected in 0.4.2: this bullet first said independent
+  agreement was required before any method was accepted, which was wider
+  than the suite. See 0.4.2's note for the coverage each method has.)
 
 ## New: small-sample statistics
 

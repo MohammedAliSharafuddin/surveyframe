@@ -52,7 +52,7 @@ mapping onto a part of the research-design workflow.
 
 The input-types demo covers the main controls available in SurveyBuilder and
 SurveyStudio. The two decision item types, `pairwise_comparison` and
-`criteria_weight`, are not part of this demo. They get their own worked
+`criteria_weight`, sit outside this demo. They get their own worked
 example in the MCDM vignette, because they only make sense alongside a
 declared decision method and a set of alternatives.
 
@@ -103,8 +103,8 @@ resulting `.sframe`.
 
 The Amendments screen discloses a change to the open instrument: upload a
 revised `.sframe`, give a reason and an explanation, and `amend_sframe()`
-appends the change to the instrument's amendment log rather than replacing
-its history. Exporting the amended instrument keeps that log inside the
+appends the change to the instrument's amendment log, where every earlier
+entry stays as it was written. Exporting the amended instrument keeps that log inside the
 `.sframe` file, readable later with `amendment_log()`.
 
 The Preview Survey screen renders the exact deployable survey, identical to the
@@ -140,7 +140,7 @@ run and edited outside SurveyStudio.
 ## Demo launchers
 
 This vignette leaves the demo launchers unevaluated, because CRAN examples and
-vignettes should not open browsers.
+vignettes leave browsers closed.
 
 ```{r gui-demo, eval = FALSE}
 launch_builder_demo()

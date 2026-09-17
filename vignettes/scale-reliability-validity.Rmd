@@ -47,7 +47,7 @@ the reliability and validity evidence from the published Thailand digital
 marketing study (Sharafuddin, Madhavan, and Wangtueai 2024). The reliability and
 item reports read scale definitions from an instrument, so they are shown on the
 bundled tourism demo, a synthetic companion to the study. The validity summary
-runs on the loadings the paper reported, which needs no raw data.
+runs on the loadings the paper reported, which is all it needs.
 
 ## Reliability from the instrument
 
@@ -108,7 +108,7 @@ efa_report(responses, instr)
 
 ## Convergent validity from the published loadings
 
-This step needs no raw data. `validity_report()` computes composite reliability
+This step runs on the loadings alone. `validity_report()` computes composite reliability
 and average variance extracted from standardised loadings. Feeding the outer
 loadings reported in the paper reproduces its convergent validity, which is a
 direct check of the measurement model.
@@ -157,7 +157,7 @@ validity_report(published_loadings, construct_scores = scored_constructs)
 ## Collinearity
 
 The study reported variance inflation factors below 5 for every indicator, which
-indicates no severe multicollinearity. `assumption_report()` returns variance
+indicates multicollinearity mild enough to proceed. `assumption_report()` returns variance
 inflation factors when a regression is specified, which is shown in the
 "Analysing survey responses" vignette.
 

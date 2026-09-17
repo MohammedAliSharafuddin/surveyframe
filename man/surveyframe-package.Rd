@@ -61,6 +61,25 @@ and \code{sframe_demo_qmd("two_group")} writes a notebook to edit.
 \code{vignette("learn-by-example")} teaches from the same library.
 }
 
+\subsection{How functions are named}{
+
+Three families, which the prefix tells apart.
+\itemize{
+\item \code{sf_} builds or reads the instrument object model: the constructors
+\code{\link[=sf_item]{sf_item()}} and \code{\link[=sf_scale]{sf_scale()}}, the accessors \code{\link[=sf_items]{sf_items()}} and \code{\link[=sf_plan]{sf_plan()}},
+and the replacement forms such as \verb{sf_plan<-}.
+\item \code{sframe_} covers everything the package adds around that object: the
+plots such as \code{\link[=sframe_plot_reliability]{sframe_plot_reliability()}}, the demo library through
+\code{\link[=sframe_demos]{sframe_demos()}}, the decision helpers, and the builder's own state.
+\item The workflow verbs carry no prefix, because they name the step a
+researcher is taking: \code{\link[=validate_sframe]{validate_sframe()}}, \code{\link[=score_scales]{score_scales()}},
+\code{\link[=run_analysis_plan]{run_analysis_plan()}}, \code{\link[=render_report]{render_report()}}, and the \verb{_report()} family.
+}
+
+The prefixes group functions; they do not pair them. No name stem appears
+under both, so there is no \code{sframe_} twin of an \code{sf_} function to look for.
+}
+
 \subsection{File format}{
 
 Instruments are stored as UTF-8 JSON files with the \code{.sframe} extension.

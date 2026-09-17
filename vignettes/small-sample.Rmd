@@ -72,7 +72,7 @@ wide, often asymmetric uncertainty that a single p-value does not convey.
 surveyframe's small-sample tools do three things: flag when a sample has
 crossed below the n = 30 threshold, prefer exact or distribution-free
 alternatives to the asymptotic default where one exists, and pair every
-affected estimate with a confidence interval rather than a point value
+affected estimate with a confidence interval in place of a point value
 alone. Together they surface the cases where design judgement matters most,
 leaving that judgement itself to the researcher.
 
@@ -135,7 +135,7 @@ is.null(ar_large$advisory)
 
 The Mann-Whitney runner now reports the Hodges-Lehmann shift estimate
 alongside the rank-biserial effect size, with a confidence interval on the
-shift rather than a point estimate alone.
+shift, which a point estimate alone leaves out.
 
 ```{r mann-whitney}
 pilot <- data.frame(
@@ -162,7 +162,7 @@ mw_results[[1]]$hl_conf_int
 ## Paired Wilcoxon with the pseudomedian CI
 
 The paired runner reports a Hodges-Lehmann pseudomedian for the within-pair
-shift, again with an interval rather than a point value.
+shift, again with an interval in place of a point value.
 
 ```{r wilcoxon-pair}
 before <- rnorm(8, 50, 6)
@@ -245,8 +245,8 @@ cat("logistf is not installed in this build environment, so the Firth",
 
 `cohens_d_ci()` pairs Cohen's d with a bootstrap interval, which is
 informative precisely where it matters most: interval width grows visibly
-as n falls, making the extra uncertainty at small n explicit rather than
-implicit in a single point estimate.
+as n falls, making the extra uncertainty at small n explicit, where a single
+point estimate leaves it implicit.
 
 ```{r cohens-d}
 cohens_d_ci(pilot$outcome[pilot$group == "treatment"],

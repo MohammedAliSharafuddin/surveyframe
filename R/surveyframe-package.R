@@ -53,6 +53,23 @@
 #' and `sframe_demo_qmd("two_group")` writes a notebook to edit.
 #' `vignette("learn-by-example")` teaches from the same library.
 #'
+#' ## How functions are named
+#'
+#' Three families, which the prefix tells apart.
+#'
+#' * `sf_` builds or reads the instrument object model: the constructors
+#'   [sf_item()] and [sf_scale()], the accessors [sf_items()] and [sf_plan()],
+#'   and the replacement forms such as `sf_plan<-`.
+#' * `sframe_` covers everything the package adds around that object: the
+#'   plots such as [sframe_plot_reliability()], the demo library through
+#'   [sframe_demos()], the decision helpers, and the builder's own state.
+#' * The workflow verbs carry no prefix, because they name the step a
+#'   researcher is taking: [validate_sframe()], [score_scales()],
+#'   [run_analysis_plan()], [render_report()], and the `_report()` family.
+#'
+#' The prefixes group functions; they do not pair them. No name stem appears
+#' under both, so there is no `sframe_` twin of an `sf_` function to look for.
+#'
 #' ## File format
 #'
 #' Instruments are stored as UTF-8 JSON files with the `.sframe` extension.

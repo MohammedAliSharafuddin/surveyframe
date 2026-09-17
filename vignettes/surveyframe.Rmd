@@ -410,8 +410,8 @@ post-collection edits are detectable.
 validate_sframe(study, strict = FALSE)
 ```
 
-Read the parts of the diagnostic with the accessors rather than reaching into
-it. `summary()` shows every check that ran, including the ones that found
+Read the parts of the diagnostic with the accessors, which saves reaching
+into it. `summary()` shows every check that ran, including the ones that found
 nothing, which is how you tell a check that passed from a check that was
 never reached.
 
@@ -437,8 +437,8 @@ identical(sf_meta(study)$title, sf_meta(study2)$title)
 The hash `write_sframe()` embeds confirms one thing: the `.sframe` file on
 disk is byte-identical to what was written. If any byte changes, whether an
 item's wording, a scale's membership, or a plan's variables, `read_sframe()`
-detects the mismatch and refuses to load the file rather than silently
-accepting it.
+detects the mismatch and refuses to load the file, where silent acceptance
+would leave a reader believing a changed file was the original.
 
 That is a narrow, specific guarantee. It proves file identity. It does not
 prove the survey has good questions, an unbiased sample, or a sound
@@ -446,19 +446,20 @@ analysis, and it says nothing about p-hacking or HARKing on its own. The
 package's actual defence against those two is a separate mechanism: the
 `analysis_plan` slot is bound to the instrument at design time, before data
 arrive, and `run_analysis_plan()` executes that pre-declared plan in one
-pass rather than letting a plan be assembled after looking at results. Keep
+pass, which is what keeps a plan from being assembled after looking at
+results. Keep
 the two claims distinct: "this file wasn't edited after the fact" and
 "this analysis was decided before seeing the data" are different guarantees
 from different mechanisms, and neither substitutes for the other.
 
 ### `.sframe` is plain JSON, not a proprietary format
 
-A `.sframe` file is ordinary, git-diffable, UTF-8 JSON, not a binary or
-R-specific object. Any tool that reads JSON can open one, and the format
+A `.sframe` file is ordinary, git-diffable, UTF-8 JSON, readable in any text
+editor. Any tool that reads JSON can open one, and the format
 is documented independently of this package in
 `system.file("schema", "sframe_schema.json", package = "surveyframe")`, a
-JSON Schema a reviewer or a second tool can validate against without
-installing R.
+JSON Schema a reviewer or a second tool can validate against, with R left
+out of the loop.
 
 ```{r schema-path}
 schema_path <- system.file("schema", "sframe_schema.json", package = "surveyframe")
@@ -470,8 +471,7 @@ source file does. If `tourism_services_v1.sframe` were committed to a Git
 repository, revising it and running `git diff` on the file would show
 exactly which lines, which item, which choice, which plan block, changed,
 alongside Git's own commit history for who changed it and when. That diff
-is Git's job, not this package's. See the next section for how the two
-connect.
+is Git's job, and the next section shows how the two connect.
 
 ### Disclosed revision: `amend_sframe()`
 
@@ -496,8 +496,8 @@ risk to the plan's design-time-binding logic:
   describing what changed in the research question, method, or model and
   why, and record `signoff` explicitly, as a reviewer's name or the
   literal value `"none"` when no second sign-off was given, so an
-  unreviewed design change stays visible to an auditor rather than looking
-  identical to a signed-off one.
+  unreviewed design change stays visible to an auditor, where an empty field
+  would read as a sign-off.
 
 ```{r amend}
 # Suppose a pilot round surfaces an ambiguous item and it needs rewording.
@@ -523,9 +523,9 @@ amendment_log(study_amended)
 `amendment_log()` returns the full history as a data frame, one row per
 disclosed change, printable or exported with `write.csv()` for an external
 audit trail. `write_sframe()` on the amended instrument persists the log in
-the file; a reviewer who later loads it with `read_sframe()` sees both the
-current content and every disclosed step that produced it. This does not
-weaken the hash check: an edit made directly to the file, bypassing
+the file. A reviewer who later loads it with `read_sframe()` sees both the
+current content and every disclosed step that produced it, and the hash check
+keeps its full force: an edit made directly to the file, bypassing
 `amend_sframe()`, still fails `read_sframe()`'s integrity check exactly as
 before.
 
@@ -541,14 +541,15 @@ every change is disclosed in the first place.
 
 ### Linking a saved instrument to its Git commit
 
-A bare hash gives no diff, author, or explanation for a change. Git
-already provides all three. `link_git_commit()` points the instrument at
-Git rather than duplicating it: it records the current commit's SHA and
+A bare hash carries the file's identity alone. A diff, an author and an
+explanation come from Git, which already provides all three.
+`link_git_commit()` points the instrument at Git and leaves the history
+there: it records the current commit's SHA and
 subject line, so the SHA-256 hash's role narrows to confirming that the
 file on disk matches what that specific, already-explained commit
 produced. It degrades gracefully with no error when Git isn't installed or
-the path isn't a repository. Git is optional, never a dependency of the
-rest of the package.
+the path isn't a repository. Git stays optional, and the rest of the package
+runs on its own.
 
 ```{r git-link}
 link_git_commit(study_amended, repo_path = tempdir())
@@ -561,8 +562,7 @@ link_git_commit(study_amended, repo_path = tempdir())
 ### Store the Google Sheets endpoint in the instrument
 
 When an endpoint URL is set on the instrument, `export_static_survey()` reads it
-automatically. Set the URL once, export as many times as needed without
-repeating the argument.
+automatically. Set the URL once, and every later export reuses it.
 
 ```{r endpoint, eval = FALSE}
 # Replace with your deployed Apps Script URL after the setup steps below.
@@ -594,7 +594,7 @@ or SurveyStudio chrome used to build it. Question text sits in a serif
 typeface, options render as bordered cards with a selection tick, Likert
 items render as numbered squares, and a slim progress bar tracks completion.
 Every one of those colours derives from the instrument's single theme colour,
-so the line below re-skins the whole survey without touching anything else.
+so the line below re-skins the whole survey on its own.
 
 ```{r theme}
 study$render$theme <- "#0f766e"
@@ -605,8 +605,8 @@ Two things about the export matter for planning a real deployment.
 * **It is designed for a phone first.** Option cards and touch targets meet a
   44 pixel minimum, and a matrix question (see the input-types demo in the
   SurveyBuilder vignette) reflows from a table into stacked, labelled cards
-  below 600 pixels of width, so no question ever needs horizontal scrolling
-  to complete on a small screen.
+  below 600 pixels of width, so every question completes on a small screen
+  within its width.
 * **It meets WCAG 2.2 AA.** Every control carries an accessible name, keyboard
   focus is visible on option cards, a validation error is announced to
   assistive technology, and required questions are marked by more than
@@ -622,7 +622,7 @@ per row, a multiple-choice question gets one 0/1 column per option, and a
 ranking question gets one column per option holding its rank. A five-option
 multiple-choice item named `channels`, for example, becomes five columns,
 `channels__option1` through `channels__option5`, each holding `0` or `1`,
-ready for analysis with no string-splitting step.
+ready for analysis, with the splitting already done.
 
 ```{r gs-export}
 script_path <- export_google_sheet(
@@ -803,7 +803,7 @@ cat(sf_apa(mr), "\n")
 `score_scales()` appends one column per scale to the data frame, using the
 scoring rules stored in the instrument. If a column with the same name as a
 scale already exists in the data frame, `score_scales()` skips that scale so
-pre-scored data is never overwritten.
+pre-scored data survives intact.
 
 ```{r score}
 scored <- score_scales(responses, study)
@@ -972,7 +972,7 @@ if (requireNamespace("psych", quietly = TRUE)) {
 
 Review the `$normality` and `$homogeneity` slots to decide whether parametric
 or non-parametric alternatives are appropriate. The analysis plan can override
-the test method per block if the default is not suitable.
+the test method per block wherever the default fits the data poorly.
 
 ---
 
@@ -1006,8 +1006,8 @@ significance and practical significance are distinct judgements.
 When ggplot2 is installed, `plots = TRUE` attaches a brand-styled chart to
 every supported block: bar charts for frequency and chi-square blocks, and
 scatter plots with a regression overlay for correlation and regression
-blocks. Plotting stays opt-in, so nothing changes for installations without
-ggplot2.
+blocks. Plotting stays opt-in, so an installation that skips ggplot2 keeps
+working as before.
 
 ```{r run-plan-plots, eval=requireNamespace("ggplot2", quietly = TRUE), fig.width=7, fig.height=4.5, fig.alt="Chart attached to the first analysis-plan result by run_analysis_plan with plots enabled"}
 results_p <- run_analysis_plan(scored, study, plots = TRUE)
@@ -1042,7 +1042,7 @@ method, each paired with its own chart drawn directly beneath its table. A
 Likert item's distribution renders as a diverging stacked bar, with agreement
 and disagreement categories running away from a shared zero line and any
 neutral category split evenly across it, so the balance of opinion is
-readable at a glance rather than inferred from a plain frequency bar.
+readable at a glance, where a plain frequency bar leaves it to be inferred.
 
 ```{r render-report}
 render_report(
@@ -1100,7 +1100,7 @@ render_report(
 
 As more respondents complete the survey, re-running from the
 `read_sheet_responses()` call above refreshes every result, table, and figure
-in the report without changing any analysis code.
+in the report, leaving the analysis code as it stands.
 
 ---
 
