@@ -228,6 +228,9 @@ sf_plan.sframe <- function(x, ...) x$analysis_plan %||% list()
                  class = "sframe_error")
   }
   x$analysis_plan <- value
+  # The stamp records that this content passed validation. Replacing the plan
+  # changes the content, so it goes, and validate_sframe() sets it again.
+  x$meta$validated <- FALSE
   x
 }
 
