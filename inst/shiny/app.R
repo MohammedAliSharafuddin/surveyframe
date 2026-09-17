@@ -1666,6 +1666,7 @@ server <- function(input, output, session) {
       models = rv$builder$models %||% list(),
       render = rv$builder$render %||% list(),
       amendments = rv$builder$amendments %||% list(),
+      designs = rv$builder$designs %||% list(),
       origin = rv$builder$origin
     )
   })
@@ -1817,7 +1818,7 @@ server <- function(input, output, session) {
       return()
     }
 
-    item <- sf_item(
+    edits <- list(
       id = item_id,
       label = item_label,
       type = item_type,
@@ -1827,7 +1828,15 @@ server <- function(input, output, session) {
       placeholder = if (item_type %in% c("text", "textarea")) trim_or_null(input$item_placeholder) else NULL
     )
 
-    existing <- item_id %in% vapply(rv$builder$items, function(x) x$id, character(1))
+    ids <- vapply(rv$builder$items, function(x) x$id, character(1))
+    existing <- item_id %in% ids
+    # An edit applies the form's fields to the item already there, so reverse
+    # coding, scale membership, the page and type settings survive it.
+    item <- if (existing) {
+      surveyframe::sframe_builder_update_item(rv$builder$items[[match(item_id, ids)]], edits)
+    } else {
+      surveyframe::sframe_builder_as_item(edits)
+    }
     state <- rv$builder
     state$items <- upsert_component(state$items, item)
     set_builder_state(state)
