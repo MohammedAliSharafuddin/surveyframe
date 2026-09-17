@@ -311,6 +311,28 @@ This section grows as each group of fixes lands.
 * **Shipped demo results could fall out of step with the package.** A test
   now holds every demo's results file equal to what the package computes.
 
+## SurveyStudio round-trip fixes
+
+* **A rebuild in SurveyStudio dropped item-level reverse coding.** Studio
+  replaces the instrument it holds with a rebuild from its editor whenever
+  the draft is valid, and that rebuild cleared every item's `reverse` flag,
+  keeping only the reversal declared on a scale. An item marked
+  `reverse = TRUE` was scored as though answered in the same direction as
+  the rest, moving every composite and alpha built on it.
+* **A rebuild dropped conjoint designs**, so a declared design was lost as
+  soon as the instrument passed through Studio.
+* **An item held as a plain list lost its settings**: date limits, matrix
+  rows, slider and rating settings, comparison items and the comparison
+  scale. Every field the item constructor accepts is now carried.
+* **Editing an item in Studio erased what the form does not show.** Saving
+  the item replaced it wholesale, so changing an item's wording cleared its
+  reverse coding, scale membership, page and type settings. An edit now
+  applies to the item already there, and settings belonging to the previous
+  type are dropped only when the type itself changes.
+* Reverse coding stays where it was declared. A scale's `reverse_items` stay
+  on the scale, where a rebuild used to copy them onto each item, which
+  changed a loaded instrument's content simply by opening it.
+
 ## Documentation
 
 * **`export_google_sheet()` told researchers to let anyone with the link edit
