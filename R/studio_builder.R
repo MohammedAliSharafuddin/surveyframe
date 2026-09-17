@@ -148,7 +148,10 @@ sframe_builder_state_from_instrument <- function(instrument = NULL) {
     # disclosed amendment log. sf_instrument() itself takes no amendments
     # argument; it is reattached after composing, in
     # sframe_builder_compose_instrument().
-    amendments = instrument$amendments %||% list()
+    amendments = instrument$amendments %||% list(),
+    # What the instrument was when read from a file, reattached on compose, so
+    # a Studio edit of a loaded file is still recognised as a revision.
+    origin = attr(instrument, "sframe_origin")
   )
 }
 
@@ -162,7 +165,8 @@ sframe_builder_compose_instrument <- function(
     analysis_plan = list(),
     models = list(),
     render = list(),
-    amendments = list()
+    amendments = list(),
+    origin = NULL
 ) {
   choices <- lapply(choices, sframe_builder_as_choice)
   items <- lapply(items, sframe_builder_as_item)
@@ -212,8 +216,23 @@ sframe_builder_compose_instrument <- function(
   if (length(amendments) > 0) {
     instrument$amendments <- amendments
   }
+  if (!is.null(origin)) {
+    attr(instrument, "sframe_origin") <- origin
+  }
 
   instrument
+}
+
+# The reason write_sframe() would refuse a valid draft as an undisclosed or
+# inconsistent revision, or NULL when it would write.
+sframe_builder_revision_problem <- function(instrument) {
+  checked <- tryCatch(as_sframe(validate_sframe(instrument, strict = TRUE)),
+                      error = function(e) NULL)
+  if (is.null(checked)) return(NULL)
+  tryCatch({
+    sframe_check_amendment_boundary(checked)
+    NULL
+  }, error = function(e) conditionMessage(e))
 }
 
 #' Validate a SurveyStudio draft state
@@ -226,8 +245,13 @@ sframe_builder_compose_instrument <- function(
 #'   theme) carried from the loaded instrument so previews and exports match.
 #' @param amendments List of previously disclosed amendment entries, carried
 #'   through unchanged so a draft round trip does not drop them.
+#' @param origin The load record of an instrument read with [read_sframe()],
+#'   from the builder state, or `NULL`. Carried onto the draft so an edit of a
+#'   loaded file is recognised as a revision.
 #'
-#' @return A list with `valid`, `problems`, and `instrument`.
+#' @return A list with `valid`, `problems`, `instrument`, and
+#'   `revision_problem`: the reason [write_sframe()] would refuse the draft as
+#'   an undisclosed revision, or `NULL`.
 #' @export
 sframe_builder_validate_draft <- function(
     meta,
@@ -239,7 +263,8 @@ sframe_builder_validate_draft <- function(
     analysis_plan = list(),
     models = list(),
     render = list(),
-    amendments = list()
+    amendments = list(),
+    origin = NULL
 ) {
   instrument <- sframe_builder_compose_instrument(
     meta = meta,
@@ -251,7 +276,8 @@ sframe_builder_validate_draft <- function(
     analysis_plan = analysis_plan,
     models = models,
     render = render,
-    amendments = amendments
+    amendments = amendments,
+    origin = origin
   )
 
   validation <- validate_sframe(instrument, strict = FALSE)
@@ -318,6 +344,9 @@ sframe_builder_validate_draft <- function(
   list(
     valid = length(problems) == 0,
     problems = problems,
-    instrument = instrument
+    instrument = instrument,
+    revision_problem = if (length(problems) == 0) {
+      sframe_builder_revision_problem(instrument)
+    }
   )
 }

@@ -1665,7 +1665,8 @@ server <- function(input, output, session) {
       analysis_plan = rv$builder$analysis_plan %||% list(),
       models = rv$builder$models %||% list(),
       render = rv$builder$render %||% list(),
-      amendments = rv$builder$amendments %||% list()
+      amendments = rv$builder$amendments %||% list(),
+      origin = rv$builder$origin
     )
   })
 
@@ -3626,7 +3627,16 @@ server <- function(input, output, session) {
   }
 
   output$export_sframe_ui <- renderUI({
-    if (isTRUE(draft_result()$valid)) {
+    if (isTRUE(draft_result()$valid) && !is.null(draft_result()$revision_problem)) {
+      # An edited file needs its change disclosed on the Amendments screen, or
+      # an explicit decision to save it as a new instrument.
+      tagList(
+        tags$p(class = "hint", draft_result()$revision_problem),
+        checkboxInput("export_as_new",
+          "Save as a new instrument, without the previous amendment log", value = FALSE),
+        downloadButton("download_sframe_btn", "Download .sframe", class = "btn-primary")
+      )
+    } else if (isTRUE(draft_result()$valid)) {
       downloadButton("download_sframe_btn", "Download .sframe", class = "btn-primary")
     } else {
       export_disabled_btn(
@@ -3656,7 +3666,16 @@ server <- function(input, output, session) {
         stop("Draft validation must pass before exporting a .sframe file.")
       }
       tmp <- tempfile(fileext = ".sframe")
-      surveyframe::write_sframe(draft$instrument, tmp, overwrite = TRUE)
+      instrument <- draft$instrument
+      as_new <- !is.null(draft$revision_problem) && isTRUE(input$export_as_new)
+      if (!is.null(draft$revision_problem) && !as_new) {
+        stop(draft$revision_problem)
+      }
+      if (as_new) {
+        instrument$amendments <- list()
+        attr(instrument, "sframe_origin") <- NULL
+      }
+      surveyframe::write_sframe(instrument, tmp, overwrite = TRUE, new_instrument = as_new)
       file.copy(tmp, file, overwrite = TRUE)
     }
   )

@@ -91,6 +91,30 @@ This section grows as each group of fixes lands.
   weights. A requested sensitivity run that could not be made is recorded
   in the result's `sensitivity_error`.
 
+* **`write_sframe()` refuses an undisclosed revision.** An instrument read
+  with `read_sframe()` and then changed must record the change with
+  `amend_sframe()` before it is written, and its amendment log must stay
+  complete and in order. To publish changed content as a separate instrument,
+  clear its amendment log and pass `new_instrument = TRUE`. SurveyStudio
+  offers the same choice when exporting an edited file.
+* **`amend_sframe()` sets the tier from what changed.** An amendment that
+  changes the analysis plan, a model or a conjoint design is design tier and
+  needs a `deviation_report`, whatever `reason_code` or `tier` says.
+* **`.sframe` files write one-member collections as arrays**, as the
+  published instrument profile and the builder already did. Reading an older
+  file and writing it again gives it a new hash where it held such a
+  collection. Older files still read and verify as they are.
+* **`read_responses()` reads a CSV file as text** and converts only columns
+  of items with numeric responses. Identifiers such as `001` and metadata
+  columns now arrive as text, and numeric answers as doubles. A response file
+  with 2 columns of the same name is refused.
+* **`link_git_commit()` gains `path` and returns `verified`**, which is `TRUE`
+  only when the instrument matches that file as committed. `linked` alone
+  confirms a repository and a commit.
+* **Some shipped demo results changed** to match the corrected statistics:
+  `likert_scale`, `two_group`, `paired`, `multi_group`, `sem_pls`,
+  `mcdm_choice` and `small_sample`.
+
 ## Collection fixes
 
 * **The Shiny survey erased every answer.** In `render_survey()`, each answer
@@ -253,6 +277,40 @@ This section grows as each group of fixes lands.
   design that never showed one as perfectly balanced. Balance now counts
   every declared level, and the design lists any level it never shows.
 
+## Provenance and file fixes
+
+* **A revised instrument could be written with its change undisclosed.**
+  Reading a file, editing it in memory and writing it produced a consistent
+  file with nothing in its amendment log, and a log with entries removed or
+  reordered was written as readily.
+* **An amendment could record a fingerprint of content that was never
+  written**, because the fingerprint was taken before validation updated the
+  instrument.
+* **A plan or model change could be recorded as a routine pipeline
+  amendment**, skipping its deviation report.
+* **A one-item scale was written as a single value** where the published
+  instrument profile requires an array, so a valid instrument failed the
+  profile, and the builder and R hashed the same instrument differently.
+* **The file reader, the bundled schema and the published profile disagreed**
+  on required fields. They now share one core, `hash`, `meta` and `items`, and
+  the reader refuses a file from a newer major format version.
+* **`read_responses()` changed values on the way in.** A respondent ID of `001`
+  became `1`, a text answer of `NA` became missing, a matrix missing a row
+  column raised no warning, and a duplicated column was silently dropped.
+* **The Google Sheets collector could mis-file answers under a duplicate or
+  blank heading**, and 2 submissions could interleave while the header was
+  being extended. Submissions now run inside a lock, and an ambiguous header
+  sends the raw submission to an "Unmapped submissions" sheet.
+* **`sframe_export_labelled()` left matrix cells, option columns and text-held
+  codes unlabelled.** Every response column now carries its row, option or
+  criterion wording, and every column of choice codes carries value labels.
+* **Generated notebooks hid failed analyses**, never ran their report step,
+  and broke on a title containing a quote. Each failed block now shows its
+  error, the report renders when at least one analysis succeeded, and titles
+  are escaped.
+* **Shipped demo results could fall out of step with the package.** A test
+  now holds every demo's results file equal to what the package computes.
+
 ## Documentation
 
 * **`export_google_sheet()` told researchers to let anyone with the link edit
@@ -272,6 +330,13 @@ This section grows as each group of fixes lands.
 * The `sensitivity_analysis()`, `sframe_dematel_compute()` and
   `sframe_rated_matrix()` help describe the new counts, the undefined
   total relation, and how rated items pair with a weight item.
+* The provenance help for `amend_sframe()`, `link_git_commit()`,
+  `read_sframe()` and `write_sframe()` states what the hashes establish: a
+  canonical content check, local and unsigned. They identify content, and
+  who wrote an instrument or when needs other evidence. The bundled schema
+  says the same.
+* The `read_responses()` help describes one contract for undeclared columns
+  and documents expansion columns and value conversion.
 
 ## Dependencies
 
