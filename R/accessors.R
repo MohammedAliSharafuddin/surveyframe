@@ -510,6 +510,33 @@ sf_apa.sframe_validity_report <- sframe_report_apa
 #' @exportS3Method sf_apa sframe_assumption_report
 sf_apa.sframe_assumption_report <- sframe_report_apa
 
+#' Columns the instrument declares that the responses left out
+#'
+#' A partial export gives a quality report every column it holds, and none of
+#' the ones it dropped. This names the declared columns that never arrived, so
+#' a missingness figure can be read against what was expected. They count as
+#' missing for every respondent in [quality_report()]'s rates.
+#'
+#' @param x An `sframe_quality_report` object.
+#' @param ... Passed to methods.
+#'
+#' @return A character vector of column names, empty where the export carried
+#'   every declared column.
+#' @export
+#' @seealso [quality_report()], [sf_flagged()]
+#'
+#' @examples
+#' demo <- sframe_demo_data()
+#' qr   <- quality_report(demo$responses, demo$instrument)
+#' sf_missing_columns(qr)
+sf_missing_columns <- function(x, ...) UseMethod("sf_missing_columns")
+
+#' @rdname sf_missing_columns
+#' @exportS3Method sf_missing_columns sframe_quality_report
+sf_missing_columns.sframe_quality_report <- function(x, ...) {
+  as.character(x$missing$missing_columns %||% character(0))
+}
+
 #' @rdname sf_report_accessors
 #' @exportS3Method sf_flagged sframe_quality_report
 sf_flagged.sframe_quality_report <- function(x, ...) {
