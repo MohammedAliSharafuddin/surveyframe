@@ -40,12 +40,25 @@ runs any decision-analysis blocks in the plan.
 
 \subsection{The instrument object}{
 
-Every function in the package operates on an \code{sframe} object. The object
-is the single source of truth for item definitions, scale structure,
-reverse-coding keys, branching rules, check specifications, analysis plans,
-and optional model specifications. Accessors such as \code{\link[=sf_meta]{sf_meta()}},
-\code{\link[=sf_items]{sf_items()}}, \code{\link[=sf_scales]{sf_scales()}}, \code{\link[=sf_plan]{sf_plan()}}, and \code{\link[=sf_models]{sf_models()}} read its parts
-without reaching into the object directly.
+The workflow runs on an \code{sframe} object. It is the single source of truth
+for item definitions, scale structure, reverse-coding keys, branching
+rules, check specifications, analysis plans, and optional model
+specifications. Accessors such as \code{\link[=sf_meta]{sf_meta()}}, \code{\link[=sf_items]{sf_items()}}, \code{\link[=sf_scales]{sf_scales()}},
+\code{\link[=sf_plan]{sf_plan()}}, and \code{\link[=sf_models]{sf_models()}} read its parts without reaching into the
+object directly.
+
+Some helpers work on plain vectors, for use beside that workflow or on
+their own: the text helpers such as \code{\link[=term_frequency]{term_frequency()}}, and the interval
+helpers \code{\link[=bootstrap_ci]{bootstrap_ci()}}, \code{\link[=cohens_d_ci]{cohens_d_ci()}}, \code{\link[=cramers_v_ci]{cramers_v_ci()}} and
+\code{\link[=eta_sq_ci]{eta_sq_ci()}}.
+}
+
+\subsection{A first session}{
+
+\code{\link[=sframe_demos]{sframe_demos()}} lists 22 worked demos, each one instrument, its responses
+and the results surveyframe produced. \code{sframe_demo("two_group")} loads one,
+and \code{sframe_demo_qmd("two_group")} writes a notebook to edit.
+\code{vignette("learn-by-example")} teaches from the same library.
 }
 
 \subsection{File format}{

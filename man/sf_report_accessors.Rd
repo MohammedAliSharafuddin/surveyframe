@@ -29,18 +29,33 @@ sf_flagged(x, ...)
 \method{sf_flagged}{sframe_quality_report}(x, ...)
 }
 \arguments{
-\item{x}{An \code{sframe_analysis_results} object for \code{sf_apa()}, or an
-\code{sframe_quality_report} for \code{sf_flagged()}.}
+\item{x}{An \code{sframe_analysis_results} object, or one of the reports named
+above, for \code{sf_apa()}. An \code{sframe_quality_report} for \code{sf_flagged()}.}
 
 \item{...}{Passed to methods.}
 }
 \value{
-\code{sf_apa()} returns a named character vector, one element per
-analysis block. \code{sf_flagged()} returns an integer vector of row numbers.
+\code{sf_apa()} returns a character vector: one element per block, named
+by block, for analysis results, and one element for a single report.
+\code{sf_flagged()} returns an integer vector of row positions, sorted, each
+row once.
 }
 \description{
-\code{sf_apa()} returns the APA-formatted sentence for each analysis block.
-\code{sf_flagged()} returns the row numbers a quality report flagged.
+\code{sf_apa()} returns the APA-formatted sentence a result carries.
+\code{sf_flagged()} returns the rows a quality report flagged.
+}
+\details{
+Given analysis results, \code{sf_apa()} answers for every block at once, as a
+character vector named by block. Given one of the standalone reports that
+carry a sentence of their own, an assumption report, a descriptives report,
+a missing-data report or a validity report, it returns that single
+sentence. A result with no sentence gives an empty string, so the shape of
+the answer follows the number of blocks asked about.
+
+\code{sf_flagged()} returns row positions in the response data, as one sorted
+vector with each row once, pooling every check the quality report ran:
+failed attention checks, straight-lining, excess missingness, timing and
+duplicates. Read the report itself for which check flagged a row.
 }
 \examples{
 demo <- sframe_demo_data()

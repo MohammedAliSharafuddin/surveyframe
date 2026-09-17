@@ -777,12 +777,18 @@ cfa_lavaan_syntax <- function(
   }
 
   constructs <- sframe_model_constructs(model)
+  # Every item reversed anywhere in the instrument, on the item or in a
+  # scale's reverse_items. Reading the item flag alone left a scale's reversed
+  # indicators unmarked in the syntax comment.
   reverse_items <- character(0)
   if (!is.null(instrument) && inherits(instrument, "sframe")) {
-    reverse_items <- vapply(instrument$items, function(i) {
+    item_level <- vapply(instrument$items, function(i) {
       if (isTRUE(i$reverse)) i$id else NA_character_
     }, character(1))
-    reverse_items <- reverse_items[!is.na(reverse_items)]
+    scale_level <- unlist(lapply(instrument$scales %||% list(), function(s) {
+      sframe_scale_reverse_ids(instrument, s)
+    }), use.names = FALSE)
+    reverse_items <- unique(c(item_level[!is.na(item_level)], scale_level))
   }
 
   lines <- c(
