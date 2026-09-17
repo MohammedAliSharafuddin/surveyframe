@@ -13,7 +13,10 @@ sframe_rated_matrix(data, instrument, items, statistic = c("mean", "median"))
 
 \item{items}{Character vector of \code{"matrix"} item ids, one per criterion, in
 the intended criterion order. Every item must declare the same
-\code{matrix_items} (the alternatives) in the same order.}
+\code{matrix_items} (the alternatives) in the same order. When a decision
+block also collects weights through a \code{weights_item} whose criterion names
+differ from these ids, the items pair with its criteria in this order, and
+the result notes each pairing.}
 
 \item{statistic}{\code{"mean"} or \code{"median"}.}
 }
