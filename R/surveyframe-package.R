@@ -34,12 +34,24 @@
 #'
 #' ## The instrument object
 #'
-#' Every function in the package operates on an `sframe` object. The object
-#' is the single source of truth for item definitions, scale structure,
-#' reverse-coding keys, branching rules, check specifications, analysis plans,
-#' and optional model specifications. Accessors such as [sf_meta()],
-#' [sf_items()], [sf_scales()], [sf_plan()], and [sf_models()] read its parts
-#' without reaching into the object directly.
+#' The workflow runs on an `sframe` object. It is the single source of truth
+#' for item definitions, scale structure, reverse-coding keys, branching
+#' rules, check specifications, analysis plans, and optional model
+#' specifications. Accessors such as [sf_meta()], [sf_items()], [sf_scales()],
+#' [sf_plan()], and [sf_models()] read its parts without reaching into the
+#' object directly.
+#'
+#' Some helpers work on plain vectors, for use beside that workflow or on
+#' their own: the text helpers such as [term_frequency()], and the interval
+#' helpers [bootstrap_ci()], [cohens_d_ci()], [cramers_v_ci()] and
+#' [eta_sq_ci()].
+#'
+#' ## A first session
+#'
+#' [sframe_demos()] lists 22 worked demos, each one instrument, its responses
+#' and the results surveyframe produced. `sframe_demo("two_group")` loads one,
+#' and `sframe_demo_qmd("two_group")` writes a notebook to edit.
+#' `vignette("learn-by-example")` teaches from the same library.
 #'
 #' ## File format
 #'

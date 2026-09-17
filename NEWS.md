@@ -324,11 +324,12 @@ This section grows as each group of fixes lands.
 * **An item held as a plain list lost its settings**: date limits, matrix
   rows, slider and rating settings, comparison items and the comparison
   scale. Every field the item constructor accepts is now carried.
-* **Editing an item in Studio erased what the form does not show.** Saving
-  the item replaced it wholesale, so changing an item's wording cleared its
-  reverse coding, scale membership, page and type settings. An edit now
-  applies to the item already there, and settings belonging to the previous
-  type are dropped only when the type itself changes.
+* **Studio's item-save handler replaced an item wholesale**, which would
+  have cleared reverse coding, scale membership, page and type settings on
+  any edit. Studio ships no item form, so the handler is unreachable from
+  the interface today and no released version could reach it. It now applies
+  an edit to the item already there, and drops settings belonging to the
+  previous type only when the type itself changes.
 * Reverse coding stays where it was declared. A scale's `reverse_items` stay
   on the scale, where a rebuild used to copy them onto each item, which
   changed a loaded instrument's content simply by opening it.

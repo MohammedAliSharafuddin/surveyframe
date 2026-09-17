@@ -1128,7 +1128,7 @@ if (identical(initial_tab, "auto")) {
     "open"
   }
 }
-if (!initial_tab %in% c("open", "preview", "responses", "quality",
+if (!initial_tab %in% c("open", "amendments", "preview", "responses", "quality",
                        "reliability", "analysis", "dashboard", "export")) {
   initial_tab <- if (inherits(INITIAL_INSTRUMENT, "sframe")) {
     "preview"

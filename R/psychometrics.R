@@ -261,8 +261,13 @@ print.sframe_item_report <- function(x, ...) {
 #'
 #' @return An object of class `sframe_efa_report` with elements `kmo`,
 #'   `bartlett`, `parallel`, and `suggested_nfactors`.
+#' @section Fitting the solution:
+#' This report says whether the data suit a factor analysis and how many
+#' factors to extract. [efa_solution()] then fits that solution and returns
+#' the loadings, so the whole route stays in surveyframe. Take the result to
+#' another package when you want a method surveyframe leaves out.
 #' @export
-#' @seealso [reliability_report()], [cfa_syntax()]
+#' @seealso [efa_solution()], [reliability_report()], [cfa_syntax()]
 #'
 #' @examples
 #' \donttest{
