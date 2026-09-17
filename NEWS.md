@@ -70,6 +70,27 @@ This section grows as each group of fixes lands.
   attribute when fewer than 90% of resamples give a value or all give the
   same value, and every result records its resample counts.
 
+* **Decision rankings can change.** Re-run TOPSIS, VIKOR, MOORA, SMART,
+  WASPAS, PROMETHEE and ELECTRE analyses whose weights or criterion types
+  were named in a different order from the performance matrix, AHP and ANP
+  analyses given a data frame, and aggregations of judgement matrices named
+  in different orders. Weights, criterion types and judgement matrices are
+  now matched by criterion name.
+* **Some decision inputs that ran before are now refused**: weights naming
+  different criteria from the matrix, supplied AHP matrices that are not
+  positive, unit-diagonal and reciprocal, WASPAS values of zero or below,
+  infinite values, a VIKOR `v` or WASPAS `lambda` outside 0 to 1, ELECTRE
+  cutoffs outside 0 to 1, and PROMETHEE thresholds that are negative or out
+  of order. ANP refuses a reducible network, and DEMATEL a matrix whose total
+  relation does not exist.
+* **ELECTRE's kernel follows Roy's definition**, so it can hold more
+  alternatives than before, and is reported as undefined when the
+  outranking relation has a cycle.
+* **`sensitivity_analysis()` results gain `n_perturbations`, `n_effective`
+  and `n_failed`**, and `stable` is `FALSE` when no perturbation moved the
+  weights. A requested sensitivity run that could not be made is recorded
+  in the result's `sensitivity_error`.
+
 ## Collection fixes
 
 * **The Shiny survey erased every answer.** In `render_survey()`, each answer
@@ -199,6 +220,39 @@ This section grows as each group of fixes lands.
   turned a text predictor into a number. Factors are read through their
   labels, and text predictors stay categorical.
 
+## Decision analysis fixes
+
+* **Weights could be applied to the wrong criteria.** They were matched to
+  the performance matrix by count and applied by position, so a weight item
+  listing quality before price gave price the weight meant for quality.
+  Rated items paired with a differently named weight item still pair in
+  declared order, and the result now lists each pairing.
+* **Aggregating judgements combined them by position**, so the same
+  judgement from 2 respondents whose matrices listed criteria in different
+  orders averaged to indifference.
+* **AHP and ANP read a data-frame matrix transposed**, reversing every
+  judgement while keeping perfect consistency.
+* **Factor judgements were read as level positions**, so a judgement of -9
+  became 1.
+* **A supplied AHP matrix got a consistency verdict without being
+  reciprocal**, so rows (1, 9) and (9, 1) received a consistency ratio of 0.
+* **Unavailable consistency ratios**, past 10 criteria, produced infinite
+  and undefined summaries, and filtering called them too inconsistent.
+* **ANP could report a limit that does not exist.** A periodic network now
+  gets its stationary priorities, and a reducible one is refused.
+* **DEMATEL could fail on an undefined inverse**, and named the first
+  criterion the strongest cause when every net relation was 0. It now
+  explains the undefined case and names a cause only when one exists.
+* **WASPAS reversed its normalisation for negative values.**
+* **ELECTRE's kernel could exclude an alternative nothing in it outranked.**
+* **ELECTRE sensitivity re-ranked at the default cutoffs** in place of the
+  cutoffs the result used.
+* **Sensitivity called a ranking stable when no weight had moved**, as
+  happens with weights such as (1, 0).
+* **Conjoint balance rewarded leaving out an attribute level**, scoring a
+  design that never showed one as perfectly balanced. Balance now counts
+  every declared level, and the design lists any level it never shows.
+
 ## Documentation
 
 * **`export_google_sheet()` told researchers to let anyone with the link edit
@@ -215,6 +269,9 @@ This section grows as each group of fixes lands.
   `reverse_items`.
 * The `sample_size_plan()` help separates power calculations from precision
   targets and rules of thumb, and states which arguments each one uses.
+* The `sensitivity_analysis()`, `sframe_dematel_compute()` and
+  `sframe_rated_matrix()` help describe the new counts, the undefined
+  total relation, and how rated items pair with a weight item.
 
 ## Dependencies
 
