@@ -32,3 +32,8 @@ removed by the shared tokeniser, an n-gram never straddles a dropped
 word; it is built only from tokens that survive filtering, in their
 original order within each response.
 }
+\examples{
+demo <- sframe_demo_data()
+cleaned <- clean_text_responses(demo$responses, "comments")
+head(ngram_frequency(cleaned, n = 2, top_n = 10))
+}

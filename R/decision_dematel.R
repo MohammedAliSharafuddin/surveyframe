@@ -295,6 +295,14 @@ sframe_run_dematel <- function(data, roles, options, instrument) {
 #'   fields to plot.
 #' @export
 #' @seealso [sframe_plot_decision_ranking()]
+#' @examples
+#' \donttest{
+#' if (requireNamespace("ggplot2", quietly = TRUE)) {
+#'   demo <- sframe_demo("mcdm_choice")
+#'   res <- run_analysis_plan(demo$responses, demo$instrument)
+#'   sframe_plot_dematel_influence(res$RQ3)
+#' }
+#' }
 sframe_plot_dematel_influence <- function(result, palette = c("web", "print")) {
   rlang::check_installed("ggplot2", reason = "to plot DEMATEL influence.")
   palette <- match.arg(palette)

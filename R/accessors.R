@@ -14,7 +14,13 @@
 # summary rather than dumping their internals. Names are the component ids,
 # so `sf_items(instr)[["sat_1"]]` is the lookup path.
 sframe_component_list <- function(x, what = "component") {
-  ids <- vapply(x, function(el) as.character(el$id %||% "")[1], character(1))
+  # Named through sf_id(), so a component that identifies itself by another
+  # field is named by it. A branch carries no `id`, and reading `id` directly
+  # gave every branch list an empty name and broke [[ lookup.
+  ids <- vapply(x, function(el) {
+    out <- try(sf_id(el), silent = TRUE)
+    if (inherits(out, "try-error")) as.character(el$id %||% "")[1] else out
+  }, character(1))
   names(x) <- ids
   structure(x, class = "sf_component_list", what = what)
 }
@@ -306,7 +312,9 @@ sf_id.sf_choices <- sframe_component_id
 sf_id.sf_scale <- sframe_component_id
 #' @rdname sf_identity
 #' @exportS3Method sf_id sf_branch
-sf_id.sf_branch <- sframe_component_id
+# A branch is identified by the item whose visibility it controls. One rule
+# per target item, which validation enforces.
+sf_id.sf_branch <- function(x, ...) as.character(x$item_id %||% "")[1]
 #' @rdname sf_identity
 #' @exportS3Method sf_id sf_check
 sf_id.sf_check <- sframe_component_id

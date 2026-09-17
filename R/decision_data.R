@@ -543,6 +543,16 @@ sframe_collected_weights <- function(data, instrument, item_id,
 #'   `sd`, `alternatives`, `criteria`, and `statistic`.
 #' @export
 #' @seealso [sframe_collected_weights()]
+#' @examples
+#' q5    <- sf_choices("q5", 1:5,
+#'            c("Very poor", "Poor", "Fair", "Good", "Excellent"))
+#' price <- sf_item("rate_price", "Rate each supplier: value",
+#'                  type = "matrix", matrix_items = c("Alpha", "Basilica"),
+#'                  choice_set = "q5")
+#' study <- sf_instrument("Supplier selection", components = list(q5, price))
+#' responses <- data.frame(rate_price__Alpha = c(3, 4), rate_price__Basilica = c(5, 5))
+#' rm <- sframe_rated_matrix(responses, study, "rate_price")
+#' rm$matrix
 sframe_rated_matrix <- function(data, instrument, items,
                                 statistic = c("mean", "median")) {
   statistic <- match.arg(statistic)

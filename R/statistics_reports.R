@@ -268,6 +268,11 @@ sframe_require_columns <- function(data, cols, method) {
 #'
 #' @return An object of class `sframe_descriptives_report`.
 #' @export
+#' @examples
+#' demo <- sframe_demo_data()
+#' dr <- descriptives_report(demo$responses, variables = c("sat_1", "sat_2"),
+#'                            split_by = "visit_type")
+#' dr$table
 descriptives_report <- function(
     data,
     variables = NULL,
@@ -352,6 +357,10 @@ descriptives_report <- function(
 #'
 #' @return An object of class `sframe_missing_data_report`.
 #' @export
+#' @examples
+#' demo <- sframe_demo_data()
+#' mr <- missing_data_report(demo$responses, demo$instrument)
+#' mr$item_missing
 missing_data_report <- function(data, instrument = NULL, variables = NULL) {
   stopifnot(is.data.frame(data))
   if (is.null(variables)) {
@@ -637,6 +646,11 @@ sframe_small_sample_advisory <- function(n, test) {
 #'
 #' @return An object of class `sframe_assumption_report`.
 #' @export
+#' @examples
+#' demo <- sframe_demo_data()
+#' ar <- assumption_report(demo$responses, variables = c("sat_1", "sat_2"),
+#'                          group = "visit_type")
+#' print(ar)
 assumption_report <- function(
     data,
     variables = NULL,
@@ -811,6 +825,11 @@ print.sframe_assumption_report <- function(x, ...) {
 #'
 #' @return An object of class `sframe_posthoc_report`.
 #' @export
+#' @examples
+#' demo <- sframe_demo_data()
+#' pr <- posthoc_report(demo$responses, method = "kruskal_wallis",
+#'                       outcome = "sat_1", group = "visit_type")
+#' pr$tables$pairwise_wilcox
 posthoc_report <- function(
     data,
     method = c("anova", "kruskal_wallis", "chi_square", "cochran_q"),
@@ -1675,6 +1694,13 @@ sframe_run_mediation <- function(data, roles, options = list()) {
 #'
 #' @return An object of class `sframe_validity_report`.
 #' @export
+#' @examples
+#' loadings <- list(
+#'   sq  = c(sq_1 = 0.80, sq_2 = 0.75, sq_3 = 0.78),
+#'   sat = c(sat_1 = 0.85, sat_2 = 0.82)
+#' )
+#' vr <- validity_report(loadings)
+#' vr$reliability
 validity_report <- function(loadings, construct_scores = NULL,
                             items_by_construct = NULL) {
   if (is.list(loadings) && !is.data.frame(loadings)) {
@@ -1834,7 +1860,7 @@ sframe_henseler_htmt <- function(items_by_construct) {
 #' the overall test of `predictors` predictors.
 #'
 #' When the effect size is left `NULL`, a conventional medium effect is
-#' assumed (`d = 0.5`, `f = 0.25`, `r = 0.30`) and a warning names it. An
+#' assumed (`d` 0.5, `f` 0.25, `r` 0.30) and a warning names it. An
 #' assumed effect is a placeholder. Supply the effect you expect from prior
 #' studies or a pilot.
 #'
@@ -1866,6 +1892,10 @@ sframe_henseler_htmt <- function(items_by_construct) {
 #'   `"rule_of_thumb"` or `"none"`), `alpha`, `power`, `effect_size`,
 #'   `warnings`, `advisory` and `prompt`.
 #' @export
+#' @examples
+#' plan <- sample_size_plan("t_test", d = 0.5, power = 0.80)
+#' plan$estimated_n
+#' plan$method
 sample_size_plan <- function(
     type = c("proportion", "mean", "correlation", "t_test", "anova", "regression", "sem"),
     margin_error = NULL,

@@ -25,6 +25,11 @@ alternative view of the same crosstab data
 better for the table's shape (mosaic scales better to unbalanced group
 sizes).
 }
+\examples{
+demo <- sframe_demo_data()
+res <- run_analysis_plan(demo$responses, demo$instrument)
+sframe_draw_mosaic(res$rq_crosstab)
+}
 \seealso{
 \code{sframe_plot_crosstab()}
 }

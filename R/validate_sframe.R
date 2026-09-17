@@ -109,8 +109,10 @@ sframe_validation_checks <- c(
   "duplicate_item_ids",
   "item_id_format",
   "duplicate_choice_ids",
+  "choice_set_contents",
   "duplicate_scale_ids",
   "id_namespace",
+  "item_config",
   "item_labels",
   "item_choice_set_refs",
   "item_scale_refs",
@@ -123,6 +125,8 @@ sframe_validation_checks <- c(
   "branching_refs",
   "branching_values",
   "check_refs",
+  "duplicate_check_ids",
+  "branch_targets",
   "analysis_plan_blocks",
   "analysis_plan_models",
   "analysis_plan_variables",
@@ -269,6 +273,43 @@ validate_sframe <- function(instrument, strict = TRUE) {
         ". IDs must start with a letter and contain only letters, numbers, and `_` characters."
       )
     )
+  }
+
+  # Per-type item configuration, shared with the constructor. Checking it at
+  # construction alone let a mutated item revalidate clean.
+  item_config <- unlist(lapply(instrument$items, sframe_item_config_problems),
+                        use.names = FALSE)
+  if (length(item_config) > 0) add("item_config", item_config)
+
+  # A choice set's contents, which validation used to read past entirely.
+  choice_content <- unlist(lapply(instrument$choices %||% list(), function(cs) {
+    p <- sframe_choice_content_problems(cs$values, cs$labels)
+    if (length(p) == 0) return(character(0))
+    paste0("Choice set '", as.character(cs$id %||% "(unnamed)")[1], "': ", p)
+  }), use.names = FALSE)
+  if (length(choice_content) > 0) add("choice_set_contents", choice_content)
+
+  # A check's results are keyed by its id, so a repeat overwrote the first.
+  check_ids <- vapply(instrument$checks %||% list(),
+                      function(k) as.character(k$id %||% "")[1], character(1))
+  dup_checks <- unique(check_ids[nzchar(check_ids) & duplicated(check_ids)])
+  if (length(dup_checks) > 0) {
+    add("duplicate_check_ids", paste0(
+      "Duplicate check IDs: ", paste(dup_checks, collapse = ", "),
+      ". Results are keyed by the ID, so the later check replaces the first."))
+  }
+
+  # One branching rule per target item, which is what names a branch.
+  branch_targets <- vapply(instrument$branching %||% list(),
+                           function(b) as.character(b$item_id %||% "")[1],
+                           character(1))
+  dup_targets <- unique(branch_targets[nzchar(branch_targets) &
+                                         duplicated(branch_targets)])
+  if (length(dup_targets) > 0) {
+    add("branch_targets", paste0(
+      "More than one branching rule controls item(s): ",
+      paste(dup_targets, collapse = ", "),
+      ". A rule is identified by the item it controls, so declare one each."))
   }
 
   dup_choice_ids <- choice_ids[duplicated(choice_ids)]

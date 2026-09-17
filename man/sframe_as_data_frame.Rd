@@ -81,7 +81,17 @@ tabular record of an instrument, through \code{\link[=codebook_report]{codebook_
    \code{sframe_efa_report} \tab measure \tab the readiness measures \cr
    \code{sframe_sensitivity} \tab perturbation \tab \code{criterion}, \code{direction}, \code{weight}, \code{rho}, \code{rank_changed}, \code{top_changed} \cr
 }
+}
 
+\section{A summary, and where the full record is}{
+These tables are a summary of the columns a reader scans first. The item
+table leaves out help text, placeholder, matrix rows, comparison items and
+scale, slider and rating settings, date bounds, section introduction and
+page; the scale table leaves out \code{min_valid}, the reverse key and the
+weights. Read the stored declaration in full through \code{\link[=sf_items]{sf_items()}},
+\code{\link[=sf_scales]{sf_scales()}} and the rest of \link{sf_accessors}, each of which returns the
+component objects themselves, or through \code{\link[=write_sframe]{write_sframe()}} for the
+interchange record.
 
 A class holding one table returns it directly, so it keeps that table's own
 row names and \code{row.names} has no effect. Pass \code{row.names} to
