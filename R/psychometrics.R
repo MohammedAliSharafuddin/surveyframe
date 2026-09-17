@@ -1,6 +1,6 @@
 # reliability_report.R
 
-#' Compute reliability statistics for scored scales
+#' Estimate scale reliability from item responses
 #'
 #' Produces Cronbach's alpha and McDonald's omega for each scale defined in
 #' the instrument, along with the number of items and sample size.
@@ -362,8 +362,15 @@ print.sframe_efa_report <- function(x, ...) {
 #'   in the output comment header. Defaults to `TRUE`.
 #'
 #' @return A character string of `lavaan` CFA model syntax.
+#' @section Which of the two to use:
+#' This is the instrument-only convenience wrapper: one call, constructs taken
+#' from the instrument's scales. [cfa_lavaan_syntax()] is the general entry
+#' point, and takes those same arguments plus a declared [sf_model()],
+#' correlated residuals and latent covariances. Reach for it where the
+#' constructs differ from the scales. This wrapper stays supported, so a script
+#' calling it keeps working.
 #' @export
-#' @seealso [efa_report()], [reliability_report()]
+#' @seealso [cfa_lavaan_syntax()], [efa_report()], [reliability_report()]
 #'
 #' @examples
 #' cs    <- sf_choices("ag5", 1:5,

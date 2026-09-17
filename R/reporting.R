@@ -1,3 +1,44 @@
+#' Choosing a report
+#'
+#' The 12 report functions split into 2 shapes, and the split is what tells
+#' them apart.
+#'
+#' # Data in, object out
+#'
+#' These compute and return an object you can read, coerce with
+#' [as.data.frame()] and often plot.
+#'
+#' | Function | Answers |
+#' | --- | --- |
+#' | [codebook_report()] | what the instrument declares, as tables |
+#' | [descriptives_report()] | the distribution of each variable |
+#' | [missing_data_report()] | what is missing, and in what pattern |
+#' | [quality_report()] | which responses the declared checks flagged |
+#' | [reliability_report()] | alpha and omega per scale |
+#' | [item_report()] | how each item behaves inside its scale |
+#' | [efa_report()] | whether the data suit a factor analysis |
+#' | [validity_report()] | convergent and discriminant validity |
+#' | [assumption_report()] | whether a planned test's assumptions hold |
+#' | [posthoc_report()] | which pairs differ after an omnibus test |
+#'
+#' Each returns its primary table through [as.data.frame()], with the rest
+#' reachable through the accessors in [sf_accessors]. A failure is carried in
+#' the object as an error field, so a report keeps rendering around it.
+#'
+#' # Object or data in, file out
+#'
+#' | Function | Writes |
+#' | --- | --- |
+#' | [render_report()] | a whole document, computing its sections from the data |
+#' | [render_results()] | a document from analysis results you already have |
+#'
+#' Reach for [render_results()] where [run_analysis_plan()] has already run,
+#' and [render_report()] to go from responses to a document in one call.
+#'
+#' @name sframe_reports
+#' @seealso [run_analysis_plan()], [sframe_plots]
+NULL
+
 # codebook_report.R
 
 # Remove the scratch directories Chrome leaves in tempdir() after a
@@ -106,6 +147,10 @@ codebook_report <- function(instrument, format = c("html", "md")) {
 #'   replaced by display text.
 #' @export
 #' @seealso [codebook_report()]
+#' @examples
+#' demo <- sframe_demo_data()
+#' cb <- codebook_report(demo$instrument)
+#' head(sframe_codebook_items_display(cb))
 sframe_codebook_items_display <- function(cb) {
   stopifnot(inherits(cb, "sframe_codebook"))
   items_d <- cb$items_table

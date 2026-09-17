@@ -111,6 +111,11 @@
 #'   `"respondent"` attribute giving each entry's original row index in
 #'   `data`, so quotes extracted later can cite a respondent.
 #' @export
+#' @examples
+#' demo <- sframe_demo_data()
+#' cleaned <- clean_text_responses(demo$responses, "comments")
+#' head(cleaned)
+#' attr(cleaned, "respondent")[1:5]
 clean_text_responses <- function(data, item_id, lowercase = TRUE,
                                   remove_punct = TRUE, strip_numbers = FALSE,
                                   instrument = NULL) {
@@ -161,6 +166,10 @@ clean_text_responses <- function(data, item_id, lowercase = TRUE,
 #'
 #' @return A data.frame with columns `term`, `n`, and `pct`.
 #' @export
+#' @examples
+#' demo <- sframe_demo_data()
+#' cleaned <- clean_text_responses(demo$responses, "comments")
+#' head(term_frequency(cleaned, top_n = 10))
 term_frequency <- function(text, stop_words = NULL, top_n = 30L) {
   toks <- unlist(.sframe_tokenise(text, stop_words), use.names = FALSE)
   if (!length(toks)) {
@@ -628,6 +637,21 @@ sframe_run_stm_topics <- function(data, roles, options, instrument) {
 #'   original row index in the data the model's `text` argument came from,
 #'   not a document-matrix or corpus row index), and `quote`.
 #' @export
+#' @examples
+#' \donttest{
+#' if (requireNamespace("stm", quietly = TRUE) &&
+#'     requireNamespace("tidytext", quietly = TRUE)) {
+#'   demo <- sframe_demo_data()
+#'   sf_plan(demo$instrument) <- list(list(
+#'     id = "RQ1", research_question = "What themes appear in the comments?",
+#'     family = "text_analysis", method = "stm_topics",
+#'     roles = list(item = "comments"), options = list(k = 3, seed = 42)
+#'   ))
+#'   res <- run_analysis_plan(demo$responses, demo$instrument)
+#'   quotes <- extract_quotes(res$RQ1, demo$responses$comments, n_quotes = 2)
+#'   quotes
+#' }
+#' }
 extract_quotes <- function(model, text, n_quotes = 3L) {
   sframe_require_stm(reason = "to extract representative quotes.")
   if (!is.list(model) || is.null(model$fit) || is.null(model$fit$model) ||
@@ -705,6 +729,10 @@ extract_quotes <- function(model, text, n_quotes = 3L) {
 #' @return A data.frame with columns `term` (the space-joined n-gram), `n`,
 #'   and `pct`.
 #' @export
+#' @examples
+#' demo <- sframe_demo_data()
+#' cleaned <- clean_text_responses(demo$responses, "comments")
+#' head(ngram_frequency(cleaned, n = 2, top_n = 10))
 ngram_frequency <- function(text, n = 2L, stop_words = NULL, top_n = 30L) {
   n <- as.integer(n)
   toks_list <- .sframe_tokenise(text, stop_words)
@@ -755,6 +783,10 @@ ngram_frequency <- function(text, n = 2L, stop_words = NULL, top_n = 30L) {
 #' @return A data.frame with columns `respondent`, `before`, `match`, and
 #'   `after`.
 #' @export
+#' @examples
+#' demo <- sframe_demo_data()
+#' cleaned <- clean_text_responses(demo$responses, "comments")
+#' term_context(cleaned, "service", window = 4)
 term_context <- function(text, term, window = 6L, max_matches = 20L) {
   if (!is.character(term) || length(term) != 1L || is.na(term) || !nzchar(term)) {
     rlang::abort("`term` must be a single non-empty string.", class = "sframe_error")

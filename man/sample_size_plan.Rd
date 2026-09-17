@@ -66,7 +66,7 @@ calculation when \code{f2} is supplied, from the noncentral F distribution for
 the overall test of \code{predictors} predictors.
 
 When the effect size is left \code{NULL}, a conventional medium effect is
-assumed (\code{d = 0.5}, \code{f = 0.25}, \code{r = 0.30}) and a warning names it. An
+assumed (\code{d} 0.5, \code{f} 0.25, \code{r} 0.30) and a warning names it. An
 assumed effect is a placeholder. Supply the effect you expect from prior
 studies or a pilot.
 }
@@ -79,3 +79,8 @@ of thumb, \verb{50 + 8k} and \code{104 + k}, which ignore \code{alpha} and \code
 \code{"sem"} returns no estimate. Both say so in the returned warnings.
 }
 
+\examples{
+plan <- sample_size_plan("t_test", d = 0.5, power = 0.80)
+plan$estimated_n
+plan$method
+}

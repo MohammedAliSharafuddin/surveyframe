@@ -139,6 +139,19 @@ sframe_models_table <- function(instrument) {
 #' | `sframe_efa_report` | measure | the readiness measures |
 #' | `sframe_sensitivity` | perturbation | `criterion`, `direction`, `weight`, `rho`, `rank_changed`, `top_changed` |
 #'
+# The item and scale tables are a summary, and say so on the page, since an
+# integration reading one as the full declaration loses the type settings.
+#' # A summary, and where the full record is
+#'
+#' These tables are a summary of the columns a reader scans first. The item
+#' table leaves out help text, placeholder, matrix rows, comparison items and
+#' scale, slider and rating settings, date bounds, section introduction and
+#' page; the scale table leaves out `min_valid`, the reverse key and the
+#' weights. Read the stored declaration in full through [sf_items()],
+#' [sf_scales()] and the rest of [sf_accessors], each of which returns the
+#' component objects themselves, or through [write_sframe()] for the
+#' interchange record.
+#'
 #' A class holding one table returns it directly, so it keeps that table's own
 #' row names and `row.names` has no effect. Pass `row.names` to
 #' [base::as.data.frame()] on the returned frame where you need to set them.

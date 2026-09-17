@@ -49,3 +49,12 @@ an undisclosed revision, or \code{NULL}.
 \description{
 Validate a SurveyStudio draft state
 }
+\examples{
+demo  <- sframe_demo_data()
+state <- sframe_builder_state_from_instrument(demo$instrument)
+draft <- sframe_builder_validate_draft(
+  meta = state$meta, choices = state$choices, items = state$items,
+  scales = state$scales, branching = state$branching, checks = state$checks
+)
+draft$valid
+}
