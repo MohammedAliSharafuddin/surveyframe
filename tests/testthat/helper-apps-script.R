@@ -77,6 +77,10 @@ Spreadsheet.prototype.getSheetByName = function(n){ return this.sheets[n] || nul
 Spreadsheet.prototype.insertSheet = function(n){ this.sheets[n] = new Sheet(); return this.sheets[n]; };
 var __ss = new Spreadsheet();
 var SpreadsheetApp = { getActiveSpreadsheet: function(){ return __ss; } };
+var __lock = { waited: 0, released: 0 };
+var LockService = { getScriptLock: function(){ return {
+  waitLock: function(){ __lock.waited++; },
+  releaseLock: function(){ __lock.released++; } }; } };
 var ContentService = {
   createTextOutput: function(t){ return { setMimeType: function(){ return t; } }; },
   MimeType: { JSON: 'json' }

@@ -2311,11 +2311,16 @@ document.addEventListener('DOMContentLoaded',function(){
 //    under Survey > Google Sheets Setup
 
 const SHEET_NAME = "Responses";
+const UNMAPPED_SHEET_NAME = "Unmapped submissions";
 const TARGET_SHEET_URL = {{TARGET_SHEET_URL}};
 const EXPECTED_COLUMNS = {{EXPECTED_COLUMNS}};
 const MAX_BODY_CHARS = 200000;
 
 function doPost(e) {
+  // Header work and the append run inside a script lock, so 2 submissions
+  // cannot interleave while the header is created or extended.
+  const lock = LockService.getScriptLock();
+  lock.waitLock(30000);
   try {
     if (!e || !e.postData || !e.postData.contents) {
       throw new Error("Missing POST body.");
@@ -2342,6 +2347,18 @@ function doPost(e) {
     // insertion point onward was off by one. Nothing errored, the sheet stayed
     // well-formed, and read_responses() read it happily.
     const header = readHeader_(sheet);
+    // A duplicate or blank heading makes the mapping ambiguous: an answer
+    // could land in the wrong column, or in 2. The raw submission is kept on
+    // a separate sheet with the reason, so nothing is mis-filed or lost.
+    const problem = headerProblem_(header);
+    if (problem) {
+      let unmapped = ss.getSheetByName(UNMAPPED_SHEET_NAME);
+      if (!unmapped) unmapped = ss.insertSheet(UNMAPPED_SHEET_NAME);
+      appendRowAsText_(unmapped, [new Date().toISOString(), problem, e.postData.contents]);
+      return ContentService
+        .createTextOutput(JSON.stringify({ status: "unmapped", message: problem }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
     const row = header.map(col => data[col] !== undefined ? String(data[col]) : "");
     appendRowAsText_(sheet, row);
 
@@ -2353,7 +2370,22 @@ function doPost(e) {
     return ContentService
       .createTextOutput(JSON.stringify({ status: "error", message: err.toString() }))
       .setMimeType(ContentService.MimeType.JSON);
+  } finally {
+    lock.releaseLock();
   }
+}
+
+// A heading that is blank before the last filled column, or that appears more
+// than once, leaves no single column for an answer.
+function headerProblem_(header) {
+  const seen = {};
+  for (let i = 0; i < header.length; i++) {
+    const name = header[i];
+    if (name === "") return "The Responses sheet has a blank heading in column " + (i + 1) + ".";
+    if (seen[name]) return "The Responses sheet has more than one column headed " + name + ".";
+    seen[name] = true;
+  }
+  return "";
 }
 
 // Writes one response row as text, never as user-entered values.
@@ -2378,8 +2410,10 @@ function appendRowAsText_(sheet, row) {
 function readHeader_(sheet) {
   let header = [];
   if (sheet.getLastRow() > 0 && sheet.getLastColumn() > 0) {
+    // Headings are read exactly as written. Trimming could merge a heading
+    // with a stray space into a declared column name.
     header = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0]
-                  .map(h => String(h).trim());
+                  .map(h => String(h));
     while (header.length && header[header.length - 1] === "") {
       header.pop();
     }

@@ -14,7 +14,8 @@ sframe_builder_validate_draft(
   analysis_plan = list(),
   models = list(),
   render = list(),
-  amendments = list()
+  amendments = list(),
+  origin = NULL
 )
 }
 \arguments{
@@ -31,9 +32,15 @@ theme) carried from the loaded instrument so previews and exports match.}
 
 \item{amendments}{List of previously disclosed amendment entries, carried
 through unchanged so a draft round trip does not drop them.}
+
+\item{origin}{The load record of an instrument read with \code{\link[=read_sframe]{read_sframe()}},
+from the builder state, or \code{NULL}. Carried onto the draft so an edit of a
+loaded file is recognised as a revision.}
 }
 \value{
-A list with \code{valid}, \code{problems}, and \code{instrument}.
+A list with \code{valid}, \code{problems}, \code{instrument}, and
+\code{revision_problem}: the reason \code{\link[=write_sframe]{write_sframe()}} would refuse the draft as
+an undisclosed revision, or \code{NULL}.
 }
 \description{
 Validate a SurveyStudio draft state
