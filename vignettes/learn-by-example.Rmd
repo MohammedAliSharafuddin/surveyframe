@@ -69,7 +69,7 @@ clinic appointment.
 
 ## Which demo do I need?
 
-Choose by the data you have, rather than by the name of a test.
+Choose by the data you have, and let the name of the test follow from it.
 
 | You have | Use | Demo |
 |---|---|---|
@@ -104,7 +104,8 @@ plan, the data contract and the report together as one object.
 
 The step that matters is the first one. The analysis plan is declared
 **inside the instrument, before any data exists**, so running it later is the
-execution of a contract rather than a search for something significant.
+execution of a contract, which is what separates it from a search for
+something significant.
 
 ## Start here: your first survey
 
@@ -154,7 +155,7 @@ res <- run_analysis_plan(tg$responses, tg$instrument)
 for (b in res) cat(b$test, ": ", b$apa, "\n", sep = "")
 ```
 
-Both tests are declared, so you report both rather than choosing afterwards
+Both tests are declared, so you report both, with the choice made in advance
 whichever gave the smaller p value.
 
 ### The same people, measured twice
@@ -201,7 +202,7 @@ as.data.frame(rel)[, c("scale_id", "n_items", "alpha")]
 ```
 
 One item is reverse worded and declared with `reverse = TRUE`, so scoring
-handles it and you do not have to remember.
+handles it and remembers for you.
 
 ### Factor structure, and a path model
 
@@ -274,7 +275,8 @@ instrument:
 str(sframe_demo_branding(), max.level = 1)
 ```
 
-Applied to any demo with `branded = TRUE`, which changes nothing on disk:
+Applied to any demo with `branded = TRUE`, which leaves the files on disk
+as they are:
 
 ```{r branded, eval = FALSE}
 sframe_demo("two_group", branded = TRUE)
@@ -294,7 +296,7 @@ knitr::include_graphics("figures/presentation-welcome.png")
 knitr::include_graphics("figures/presentation-branded.png")
 ```
 
-Consent is enforced rather than decorative: with `consent_required = TRUE`,
+Consent is enforced: with `consent_required = TRUE`,
 pressing Start without ticking the box refuses to continue.
 
 ### One page, or one question at a time
@@ -396,14 +398,14 @@ sframe_export_labelled(d$responses, d$instrument, "two_group.sav")
 
 The `.sav` arrives with the question wording and the response options already
 attached, so your variables read "The event ran to time." and "Strongly
-disagree" rather than `org_1` and `1`. **The plain CSV carries codes**, and
+disagree" in place of `org_1` and `1`. **The plain CSV carries codes**, and
 the codebook is what gives them meaning, so use one or the other.
 
 **If a number comes out differently, we want to hear about it.** [Open an
 issue](https://github.com/MohammedAliSharafuddin/surveyframe/issues) with the
 demo name, the software you used, and both results. A disagreement is either
-a bug worth fixing or a difference in method worth documenting, and we would
-rather find out from you than not at all.
+a bug worth fixing or a difference in method worth documenting, and either
+way we would like to hear it from you.
 
 ## Run one yourself
 

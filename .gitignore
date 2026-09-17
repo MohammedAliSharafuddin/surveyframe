@@ -24,6 +24,7 @@ surveyframe_v_0.3.1/
 cran-comments.md
 data-raw/*
 !data-raw/inline_static_template.R
+!data-raw/check_house_style.R
 roadmap.md
 todo.md
 revision_todo_0.3.md
