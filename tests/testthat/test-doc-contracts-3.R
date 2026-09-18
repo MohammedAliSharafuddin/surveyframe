@@ -9,8 +9,7 @@
 #              was accepted, which is wider than the 5 oracle calls the suite
 #              makes across 10 methods.
 
-source_of <- function(file) paste(readLines(file.path("..", "..", "R", file),
-                                            warn = FALSE), collapse = "\n")
+source_of <- function(file) sframe_source_text("R", file)
 
 test_that("12: the package page documents the three naming families", {
   src <- source_of("surveyframe-package.R")
@@ -20,27 +19,22 @@ test_that("12: the package page documents the three naming families", {
   expect_match(src, "sframe_` covers", fixed = TRUE)
   expect_match(src, "carry no prefix", fixed = TRUE)
   # the no-pairing claim under test: no stem exists under both prefixes
-  ex <- sub("^export\\((.*)\\)$", "\\1",
-            grep("^export\\(", readLines(file.path("..", "..", "NAMESPACE")),
-                 value = TRUE))
-  ex <- gsub('"', "", ex)
+  ex <- sframe_exports()
   stems_sf <- sub("^sf_", "", grep("^sf_", ex, value = TRUE))
   stems_sframe <- sub("^sframe_", "", grep("^sframe_", ex, value = TRUE))
   expect_length(intersect(stems_sf, stems_sframe), 0)
 })
 
 test_that("13: every export carries an example section", {
-  man <- list.files(file.path("..", "..", "man"), pattern = "[.]Rd$",
-                    full.names = TRUE)
+  man_dir <- sframe_installed_path("man")
+  skip_if(is.na(man_dir), "no man directory here")
+  man <- list.files(man_dir, pattern = "[.]Rd$", full.names = TRUE)
   documented <- unlist(lapply(man, function(f) {
     s <- paste(readLines(f, warn = FALSE), collapse = "\n")
     if (!grepl("\\\\examples\\{", s)) return(character(0))
     regmatches(s, gregexpr("(?<=\\\\alias\\{)[^}]+", s, perl = TRUE))[[1]]
   }))
-  ex <- sub("^export\\((.*)\\)$", "\\1",
-            grep("^export\\(", readLines(file.path("..", "..", "NAMESPACE")),
-                 value = TRUE))
-  ex <- gsub('"', "", ex)
+  ex <- sframe_exports()
   expect_equal(setdiff(ex, documented), character(0))
 })
 
@@ -50,8 +44,8 @@ test_that("15: the two CFA syntax functions say which to use", {
   expect_match(general, "cfa_syntax()", fixed = TRUE)
   expect_match(wrapper, "cfa_lavaan_syntax()", fixed = TRUE)
   # both still exported, since removing the wrapper breaks public scripts
-  ns <- readLines(file.path("..", "..", "NAMESPACE"))
-  expect_true(all(c("export(cfa_syntax)", "export(cfa_lavaan_syntax)") %in% ns))
+  exported <- sframe_exports()
+  expect_true(all(c("cfa_syntax", "cfa_lavaan_syntax") %in% exported))
 })
 
 test_that("17: the plot family has a selection guide naming inputs", {
@@ -73,8 +67,7 @@ test_that("18: the report family index separates the two shapes", {
 })
 
 test_that("batch 3 #16: the oracle claim matches the suite's coverage", {
-  news <- paste(readLines(file.path("..", "..", "NEWS.md"), warn = FALSE),
-                collapse = "\n")
+  news <- sframe_installed_text("NEWS.md")
   expect_false(grepl("is required to agree", news, fixed = TRUE))
   expect_match(news, "5 of the 10", fixed = TRUE)
   # the count under test: 5 tests gate on RMCDA, one per method it checks

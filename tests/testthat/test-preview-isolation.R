@@ -51,7 +51,6 @@ test_that("20: the preview still renders every question", {
 })
 
 test_that("20: Studio's preview asks for an isolated export", {
-  src <- paste(readLines(file.path("..", "..", "inst", "shiny", "app.R"),
-                         warn = FALSE), collapse = "\n")
+  src <- sframe_installed_text("inst", "shiny", "app.R")
   expect_match(src, "preview = TRUE", fixed = TRUE)
 })

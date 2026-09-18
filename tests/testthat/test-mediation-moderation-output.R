@@ -81,11 +81,9 @@ test_that("29: the moderation result carries its conditional slopes as a table",
 })
 
 test_that("29: the report renders the conditional slopes", {
-  src <- paste(readLines(file.path("..", "..", "R", "reporting.R"),
-                         warn = FALSE), collapse = "\n")
-  qmd <- paste(readLines(file.path("..", "..", "inst", "templates",
-                                   "report.qmd"), warn = FALSE),
-               collapse = "\n")
+  src <- sframe_source_text("R", "reporting.R")
+  qmd <- sframe_installed_text("inst", "templates",
+                                   "report.qmd")
   expect_match(src, "sframe_result_supplement", fixed = TRUE)
   expect_match(qmd, "sframe_result_supplement", fixed = TRUE)
 })

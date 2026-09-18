@@ -35,7 +35,6 @@ test_that("31: an interval that could not be computed still says why", {
 })
 
 test_that("31: the accessor's help says the sentence is plain text", {
-  src <- paste(readLines(file.path("..", "..", "R", "accessors.R"),
-                         warn = FALSE), collapse = "\n")
+  src <- sframe_source_text("R", "accessors.R")
   expect_match(src, "italic", fixed = TRUE)
 })

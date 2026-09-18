@@ -979,9 +979,26 @@ sframe_result_from_report <- function(report, test = report$method %||% "") {
 #' @seealso [run_analysis_plan()], [render_report()], [analysis_syntax()]
 #'
 #' @examples
-#' demo <- sframe_demo_data()
-#' results <- run_analysis_plan(demo$responses, demo$instrument)
-#' sframe_result_supplement(results[[1]])
+#' instr <- sf_instrument("Moderation demo", components = list(
+#'   sf_item("y", "Outcome", type = "numeric"),
+#'   sf_item("x", "Predictor", type = "numeric"),
+#'   sf_item("w", "Moderator", type = "numeric")
+#' ))
+#' sf_plan(instr) <- list(list(
+#'   id = "RQ1", research_question = "Does w moderate x?",
+#'   family = "inferential", method = "moderation",
+#'   roles = list(outcome = "y", predictor = "x", moderator = "w")
+#' ))
+#'
+#' set.seed(1)
+#' n <- 80
+#' responses <- data.frame(x = rnorm(n), w = rnorm(n))
+#' responses$y <- 0.4 * responses$x + 0.3 * responses$w +
+#'   0.35 * responses$x * responses$w + rnorm(n, sd = 0.6)
+#' results <- run_analysis_plan(responses, instr)
+#'
+#' # the conditional slopes, at the moderator's own values
+#' sframe_result_supplement(results$RQ1)
 sframe_result_supplement <- function(result) {
   if (!is.list(result)) return(NULL)
   test <- result$test %||% ""

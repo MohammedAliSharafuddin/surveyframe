@@ -147,7 +147,8 @@ test_that("4: link_git_commit() verifies the instrument only against a committed
 
 test_that("G5 and G3: provenance, read and write help promise only what the code does", {
   src <- function(f) {
-    p <- test_path("..", "..", "R", f)
+    p <- sframe_source_path("R", f)
+    skip_if(is.na(p), "no source tree here")
     skip_if(!file.exists(p), "package source not available")
     paste(readLines(p, warn = FALSE), collapse = "\n")
   }

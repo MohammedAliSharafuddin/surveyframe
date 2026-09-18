@@ -149,8 +149,7 @@ test_that("13: a branch has an identity, and lists are named by it", {
 })
 
 test_that("14: the tables say they are summaries and name the full record", {
-  src <- paste(readLines(file.path("..", "..", "R", "as_data_frame.R"),
-                         warn = FALSE), collapse = "\n")
+  src <- sframe_source_text("R", "as_data_frame.R")
   expect_match(src, "summary", fixed = TRUE)
   expect_match(src, "sf_items()", fixed = TRUE)
 })

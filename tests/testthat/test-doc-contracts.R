@@ -16,7 +16,8 @@
 #           screen, and the real "amendments" screen could not be asked for.
 
 source_of <- function(file) {
-  p <- test_path("..", "..", "R", file)
+  p <- sframe_source_path("R", file)
+  skip_if(is.na(p), paste("no source tree for", file))
   skip_if(!file.exists(p), "package source not available")
   paste(readLines(p, warn = FALSE), collapse = "\n")
 }

@@ -7,6 +7,16 @@ This section grows as each group of fixes lands.
 
 ## What you need to change
 
+* **A Shiny-collected response now carries a `respondent_id`**, as the first
+  column, holding a generated identifier such as `RK3P8QX2A`. The static
+  survey has written one since the first release, so the two collection
+  routes produced different column sets for the same instrument, leaving the
+  duplicate check and a retry to work from whatever they could find.
+  **If you are collecting to a CSV written by 0.4.1 or earlier**, that file
+  predates the column: `render_survey()` keeps appending to it and says once
+  that the response went in unidentified. Collect into a new file to record an
+  identifier for every response. Anything reading these files by column
+  position needs updating to read by name.
 * **`survey_module_server()` returns a different response shape.** The
   response is now the collection row, as a list: `response_id`,
   `started_at`, `submitted_at`, then one element per response column, named

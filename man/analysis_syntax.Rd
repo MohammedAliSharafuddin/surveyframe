@@ -45,10 +45,25 @@ computation has no single base-R equivalent to show honestly.
 }
 
 \examples{
-demo <- sframe_demo_data()
-results <- run_analysis_plan(demo$responses, demo$instrument)
-code <- analysis_syntax(results)
-cat(code[[1]], sep = "\n")
+instr <- sf_instrument("Syntax demo", components = list(
+  sf_item("score", "Score", type = "numeric"),
+  sf_item("arm", "Arm", type = "text")
+))
+sf_plan(instr) <- list(list(
+  id = "RQ1", research_question = "Do the arms differ?",
+  family = "inferential", method = "t_test_ind",
+  roles = list(group = "arm", outcome = "score")
+))
+
+set.seed(1)
+responses <- data.frame(
+  arm   = rep(c("control", "treatment"), each = 15),
+  score = c(rnorm(15, 10), rnorm(15, 12))
+)
+results <- run_analysis_plan(responses, instr)
+
+# the call behind the number, with the variables and options resolved
+cat(analysis_syntax(results, which = "RQ1"), sep = "\n")
 }
 \seealso{
 \code{\link[=run_analysis_plan]{run_analysis_plan()}}, \code{\link[=cfa_syntax]{cfa_syntax()}}, \code{\link[=render_report]{render_report()}}

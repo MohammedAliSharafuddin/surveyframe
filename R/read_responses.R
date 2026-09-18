@@ -33,6 +33,12 @@
 #'   expected.
 #' @param submitted_at Character or NULL. The name of the column containing
 #'   submission timestamps.
+#' The metadata columns surveyframe's own collectors write, `respondent_id`,
+#' `response_id`, `started_at` and `submitted_at`, are recognised without being
+#' declared: a file this package collected reads back without naming the columns
+#' it wrote. Anything else outside the instrument still has to be declared, or
+#' `strict = FALSE` used.
+#'
 #' @param meta_cols Character vector or NULL. Additional column names, outside
 #'   the item IDs, to retain (for example, condition assignment or
 #'   source URL).
@@ -115,7 +121,13 @@ read_responses <- function(
   )
   item_ids <- vapply(response_items, function(i) i$id, character(1))
   display_item_ids <- setdiff(all_item_ids, item_ids)
-  declared  <- c(respondent_id, submitted_at, meta_cols)
+  # surveyframe's own collectors write respondent_id, response_id, started_at
+  # and submitted_at, so those names count as declared without the researcher
+  # naming columns the package itself produced. Before this, reading a
+  # collected file strictly meant listing started_at in meta_cols, and adding
+  # respondent_id to the Shiny row would have broken every caller who had.
+  declared  <- c(respondent_id, submitted_at, meta_cols,
+                 sframe_reserved_response_columns)
   data_cols <- colnames(data)
 
   # Matrix and ranking items arrive from the collectors as one column per

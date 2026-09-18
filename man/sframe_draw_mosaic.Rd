@@ -26,9 +26,22 @@ better for the table's shape (mosaic scales better to unbalanced group
 sizes).
 }
 \examples{
-demo <- sframe_demo_data()
-res <- run_analysis_plan(demo$responses, demo$instrument)
-sframe_draw_mosaic(res$rq_crosstab)
+instr <- sf_instrument("Crosstab demo", components = list(
+  sf_item("arm", "Arm", type = "text"),
+  sf_item("outcome", "Outcome", type = "text")
+))
+sf_plan(instr) <- list(list(
+  id = "RQ1", research_question = "Does the outcome differ by arm?",
+  family = "categorical", method = "chi_square",
+  roles = list(row = "arm", column = "outcome")
+))
+
+responses <- data.frame(
+  arm     = rep(c("control", "treatment"), each = 20),
+  outcome = c(rep(c("yes", "no"), c(6, 14)), rep(c("yes", "no"), c(15, 5)))
+)
+res <- run_analysis_plan(responses, instr)
+sframe_draw_mosaic(res$RQ1)
 }
 \seealso{
 \code{sframe_plot_crosstab()}

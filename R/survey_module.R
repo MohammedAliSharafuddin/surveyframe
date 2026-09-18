@@ -413,11 +413,11 @@ sf_mod_survey <- function(instr, page, values, ns, prefix) {
 
   nav <- shiny::div(class = "nav",
     if (page > 1L)
-      shiny::actionButton(ns("sf_back"), "← Back", class = "btn-s"),
+      shiny::actionButton(ns("sf_back"), "\u2190 Back", class = "btn-s"),
     shiny::div(class = "sp"),
     shiny::actionButton(
       ns("sf_next"),
-      if (page < max_page) "Next →"
+      if (page < max_page) "Next \u2192"
       else instr$render$submit_label %||% "Submit",
       class = "btn-p"
     )
@@ -443,7 +443,7 @@ sf_mod_survey <- function(instr, page, values, ns, prefix) {
 
 sf_mod_thankyou <- function(ty) {
   shiny::div(class = "card",
-    shiny::div(class = "ty-ic", "✔"),
+    shiny::div(class = "ty-ic", "\u2714"),
     shiny::div(class = "ty-t", "Thank You"),
     shiny::div(class = "ty-m",
                ty$message %||% "Your response has been recorded.")

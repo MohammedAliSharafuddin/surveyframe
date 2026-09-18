@@ -6,9 +6,7 @@
 # was being saved when nothing was.
 
 builder_source <- function() {
-  paste(readLines(file.path("..", "..", "inst", "builder",
-                            "survey_builder.html"),
-                  warn = FALSE, encoding = "UTF-8"), collapse = "\n")
+  sframe_installed_text("inst", "builder", "survey_builder.html")
 }
 
 autosave_block <- function() {
@@ -83,8 +81,7 @@ test_that("19: the preview says what it does not exercise", {
 })
 
 test_that("19: the help no longer calls it a full live render", {
-  help <- paste(readLines(file.path("..", "..", "R", "builder.R"),
-                          warn = FALSE), collapse = "\n")
+  help <- sframe_source_text("R", "builder.R")
   expect_false(grepl("full live render", help, fixed = TRUE))
   expect_match(help, "layout preview", fixed = TRUE)
   expect_match(help, "export_static_survey()", fixed = TRUE)
