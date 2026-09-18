@@ -78,7 +78,14 @@ sframe_field_shape_problems <- function(instrument) {
     keep(component_problem(instrument$models[[i]], paste0("Model ", i)))
   }
   keep(sframe_scalar_problem(instrument$meta$title, "The instrument title"))
-  keep(sframe_scalar_problem(instrument$meta$version, "The instrument version"))
+  # The format requires meta.title and leaves meta.version optional, so an
+  # absent version is a legal minimal file. A version that IS supplied still
+  # has to be one string: a vector one used to reach the diagnostic's own
+  # printing and fail there.
+  if (!is.null(instrument$meta$version)) {
+    keep(sframe_scalar_problem(instrument$meta$version,
+                               "The instrument version"))
+  }
   out
 }
 
@@ -90,6 +97,26 @@ sframe_meta_display <- function(value, fallback) {
     return(as.character(value))
   }
   fallback
+}
+
+# Whether a method takes its variables from the block's roles at all. The
+# instrument-level methods read the whole instrument instead: a reliability or
+# quality block names no variable and is right not to. Probing the resolver
+# with every role name it knows separates the two without a hand-kept list
+# that would drift as methods are added.
+sframe_method_needs_variables <- function(method) {
+  bag <- list(
+    variables = "x", variable = "x", items = "x", scales = "x",
+    group = "g", outcome = "o", dependent = "o", x = "a", y = "b",
+    item = "i", row = "r", column = "c", predictors = "p",
+    before = "b", after = "a2", measures = c("m1", "m2"),
+    weights_item = "w", performance_items = "pi", mediator = "m",
+    moderator = "mo", controls = "c2", covariates = "c3"
+  )
+  resolved <- tryCatch(
+    sframe_vars_for_method(method, bag, list(method = method)),
+    error = function(e) character(0))
+  length(resolved) > 0
 }
 
 # The shape a plan block has to have before its references mean anything.
@@ -115,9 +142,11 @@ sframe_plan_block_problems <- function(plan, known_methods) {
       keep(p)
     }
     method <- block$method %||% block$test %||% NULL
+    method_name <- ""
     p <- sframe_scalar_problem(method, paste0(where, "'s method"))
     if (is.null(p)) {
       method <- as.character(method)[1]
+      method_name <- method
       if (!method %in% known_methods) {
         keep(paste0(where, " names the unknown method '", method,
                     "'. See ?run_analysis_plan for the methods available."))
@@ -130,9 +159,12 @@ sframe_plan_block_problems <- function(plan, known_methods) {
     if (!is.null(block$roles) && !is.list(block$roles)) {
       keep(paste0(where, "'s roles must be a named list of role assignments."))
     }
-    # An empty roles list is no assignment: it passed the old presence test and
-    # left the block with nothing to run on.
-    if (!roles_ok && !vars_ok) {
+    # An empty roles list is no assignment, and it passed the old presence
+    # test. Only the methods that read variables from roles need one: a
+    # reliability, quality or item-diagnostics block works from the whole
+    # instrument and names no variable.
+    if (!roles_ok && !vars_ok && nzchar(method_name) &&
+        sframe_method_needs_variables(method_name)) {
       keep(paste0(where, " assigns no variables. Give it roles, or the legacy ",
                   "variables field."))
     }
