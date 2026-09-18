@@ -272,7 +272,21 @@ quality_report <- function(
   # because none of its columns were counted at all. Expansion columns now
   # count as item data, which also brings matrix, ranking, and multi-select
   # items into the missingness figures for the first time.
-  expected_cols <- unique(c(item_ids, sframe_item_expansion_columns(instrument)))
+  # What each item is expected to post. An item that expands posts its
+  # expansion columns and never its bare id, so counting the bare id as a
+  # dropped column would inflate the denominator for every respondent.
+  expected_cols <- unique(unlist(lapply(instrument$items, function(it) {
+    expanded <- sframe_item_expansion_columns(instrument, list(it))
+    if (length(expanded) > 0) expanded else as.character(it$id %||% "")[1]
+  }), use.names = FALSE))
+  expected_cols <- expected_cols[nzchar(expected_cols)]
+  # A display-only item collects nothing, so it belongs in neither total.
+  display_only <- vapply(instrument$items, function(it) {
+    as.character(it$type %||% "")[1] %in% c("section_break", "text_block")
+  }, logical(1))
+  if (any(display_only)) {
+    expected_cols <- setdiff(expected_cols, item_ids[display_only])
+  }
   item_cols     <- intersect(expected_cols, colnames(data))
   # A column the export left out entirely used to leave the numerator and the
   # denominator together, so an export carrying 3 of 4 declared items read as

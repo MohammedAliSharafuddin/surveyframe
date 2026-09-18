@@ -27,6 +27,16 @@ function __mkEl(id){
     querySelectorAll:function(){ return []; }, querySelector:function(){ return null; },
     scrollIntoView:function(){}, focus:function(){}, addEventListener:function(){} };
 }
+// Elements a test registers against a selector, so code that reaches for a
+// group of controls (a radio strip, a paired select) can be driven.
+var __selectorEls = {};
+function __registerSelector(sel, els){ __selectorEls[sel] = els; }
+function __mkControl(value){
+  var el = __mkEl('');
+  el.value = value == null ? '' : String(value);
+  el.checked = false;
+  return el;
+}
 var document = {
   getElementById:function(id){
     if (id === 'sf-data') return { textContent: __sfData };
@@ -36,17 +46,32 @@ var document = {
   body:{ dataset:{ endpoint: __endpoint }, classList:__mkClassList() },
   documentElement:{ style:{ setProperty:function(){} } },
   addEventListener:function(){},
-  querySelector:function(){ return null; },
-  querySelectorAll:function(){ return []; },
+  querySelector:function(sel){
+    var hit = __selectorEls[sel];
+    return (hit && hit.length) ? hit[0] : null;
+  },
+  querySelectorAll:function(sel){ return __selectorEls[sel] || []; },
   createElement:function(){ return { click:function(){} }; }
 };
 var window = { scrollTo:function(){}, location:{ reload:function(){}, href:'' } };
 var __posts = [];
+// __fetchFails lets a test drive a delivery failure, which is the one thing a
+// no-cors POST can tell us about. Resolution is synchronous here, so a test
+// reads the settled state straight after submitting.
+var __fetchFails = false;
 function fetch(url, opts){
   __posts.push({ url:url, body:opts.body });
-  return { catch:function(){ return this; } };
+  var failed = __fetchFails;
+  var p = {
+    then:function(onOk){ if(!failed && onOk) onOk({ type:'opaque' }); return p; },
+    catch:function(onErr){ if(failed && onErr) onErr(new Error('network')); return p; }
+  };
+  return p;
 }
-function setTimeout(){}
+// Timers run at once, so a test sees what a respondent would see a moment on.
+var __timeouts = [];
+function setTimeout(fn){ __timeouts.push(fn); }
+function __runTimeouts(){ var t=__timeouts; __timeouts=[]; t.forEach(function(f){ if(f) f(); }); }
 "
 
 # Exports `instrument`, loads the survey's script into a fresh V8 context and

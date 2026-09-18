@@ -161,7 +161,13 @@ sframe_builder_state_from_instrument <- function(instrument = NULL) {
       version = instrument$meta$version %||% "0.1.0",
       description = instrument$meta$description %||% NULL,
       authors = instrument$meta$authors %||% NULL,
-      languages = instrument$meta$languages %||% "en"
+      languages = instrument$meta$languages %||% "en",
+      # When the instrument was created is a fact about it, and the content
+      # hash covers it. Dropping it here made compose stamp the current time,
+      # so a rebuild changed the creation date and moved the hash the
+      # amendment boundary rests on. The 2 usually landed in the same second,
+      # which is why it showed as a 1-in-25 test failure.
+      created_at = instrument$meta$created_at %||% NULL
     ),
     choices = lapply(instrument$choices %||% list(), sframe_builder_as_choice),
     items = lapply(instrument$items %||% list(), sframe_builder_as_item),
@@ -242,6 +248,12 @@ sframe_builder_compose_instrument <- function(
     models = models,
     render = render %||% list()
   )
+
+  # sf_instrument() stamps a fresh created_at, which is right for a new
+  # instrument and wrong for one being rebuilt from an existing state.
+  if (!is.null(meta$created_at)) {
+    instrument$meta$created_at <- as.character(meta$created_at)[1]
+  }
 
   # sf_instrument() has no amendments argument (see its own definition); a
   # freshly built instrument legitimately has none, but one round-tripped

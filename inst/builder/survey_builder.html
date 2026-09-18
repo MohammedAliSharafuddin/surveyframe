@@ -1633,6 +1633,20 @@ var SAATY_STEPS=[9,8,7,6,5,4,3,2,1,-2,-3,-4,-5,-6,-7,-8,-9];
 // DEMATEL unipolar strip: 0 (no influence) to 4 (very high influence).
 var INFLUENCE_STEPS=[0,1,2,3,4];
 var INFLUENCE_LABELS=['None','Low','Medium','High','Very high'];
+// Each comparison renders a radio strip and a select of the same anchors, and
+// the CSS shows one or the other by viewport width. Writing the response alone
+// left the hidden control on its render-time state, so crossing the breakpoint
+// after answering showed a selection the participant had changed. Both are
+// written from the response, so whichever becomes visible agrees with it.
+function setPairwise(rowKey,value){
+  setResp(rowKey,value);
+  var radios=document.querySelectorAll('input[type="radio"][name="'+rowKey+'"]');
+  if(radios&&radios.forEach){
+    radios.forEach(function(r){r.checked=String(r.value)===String(value);});
+  }
+  var sel=document.querySelector('select.pw-select[data-key="'+rowKey+'"]');
+  if(sel)sel.value=String(value);
+}
 function renderPairwiseRow(rowKey,leftLbl,rightLbl,steps,saved,influence){
   var names=steps.map(function(v,i){
     return influence?(INFLUENCE_LABELS[i]||String(v)):(v===1?'Equal':(v>0?(v+' ('+leftLbl+')'):((-v)+' ('+rightLbl+')')));
@@ -1643,7 +1657,7 @@ function renderPairwiseRow(rowKey,leftLbl,rightLbl,steps,saved,influence){
     return'<label class="pw-opt'+(isEqual?' pw-equal':'')+'"><input type="radio" name="'+esc(rowKey)+'" value="'+v+'"'
       +(checked?' checked':'')
       +' aria-label="'+esc(leftLbl)+' vs '+esc(rightLbl)+': '+esc(names[i])+'"'
-      +' onchange="setResp(\''+esc(rowKey)+'\','+v+')">'
+      +' onchange="setPairwise(\''+esc(rowKey)+'\','+v+')">'
       +(influence?'<span class="pw-lbl">'+esc(INFLUENCE_LABELS[i])+'</span>':'<span class="pw-num">'+esc(Math.abs(v))+'</span>')
       +'</label>';
   }).join('');
@@ -1657,8 +1671,9 @@ function renderPairwiseRow(rowKey,leftLbl,rightLbl,steps,saved,influence){
     +steps.map(function(v,i){
       return'<option value="'+v+'"'+(String(saved)===String(v)?' selected':'')+'>'+esc(names[i])+'</option>';
     }).join('');
-  var select='<select class="pw-select" aria-label="'+esc(leftLbl)+' vs '+esc(rightLbl)+'"'
-    +' onchange="setResp(\''+esc(rowKey)+'\',this.value)">'+selectOpts+'</select>';
+  var select='<select class="pw-select" data-key="'+esc(rowKey)+'"'
+    +' aria-label="'+esc(leftLbl)+' vs '+esc(rightLbl)+'"'
+    +' onchange="setPairwise(\''+esc(rowKey)+'\',this.value)">'+selectOpts+'</select>';
   return'<div class="pw-row"><div class="pw-heads"><span>'+esc(leftLbl)+'</span><span>'+esc(rightLbl)+'</span></div>'
     +'<div class="'+(influence?'pw-influence':'pw-strip')+'" role="radiogroup" aria-label="'+esc(leftLbl)+' vs '+esc(rightLbl)+'">'
     +opts+'</div>'+select+'</div>';
@@ -1852,7 +1867,10 @@ function setRating(id,val,max){
   if(err)err.classList.remove('show');
   var btns=document.querySelectorAll('.star-btn[data-id="'+id+'"]');
   btns.forEach(function(b){b.classList.toggle('active',parseInt(b.dataset.v)<=val);});
-  updateProgress();
+  // Every other answer handler refreshes branching. Leaving it out here kept a
+  // question a rating reveals hidden until some other control was touched,
+  // while validation, which reads the same rules, still demanded an answer.
+  updateBranching();
 }
 function updateBranching(){
   SF.items.forEach(function(item){
@@ -1992,39 +2010,7 @@ function validatePage(items){
   items.forEach(function(item){
     if(!item.required||!isVisible(item.id))return;
     var t=item.type;
-    var missing=false;
-    if(t==='matrix'){
-      (item.matrix_items||[]).forEach(function(row){
-        var key=item.id+'__'+row;
-        if(!responses[key]||responses[key]==='')missing=true;
-      });
-    } else if(t==='multiple_choice'){
-      var v=responses[item.id];
-      if(!v||v==='')missing=true;
-    } else if(t==='criteria_weight'){
-      (item.comparison_items||[]).forEach(function(crit){
-        var key=item.id+'__'+crit;
-        if(responses[key]===undefined||responses[key]===null||String(responses[key])==='')missing=true;
-      });
-    } else if(t==='pairwise_comparison'){
-      var comp=item.comparison_items||[];
-      var scale=item.comparison_scale||'saaty';
-      if(scale==='influence'){
-        for(var i=0;i<comp.length;i++)for(var j=0;j<comp.length;j++){
-          if(i===j)continue;
-          var key=item.id+'__'+comp[i]+'__to__'+comp[j];
-          if(responses[key]===undefined||responses[key]===null||String(responses[key])==='')missing=true;
-        }
-      }else{
-        for(var i=0;i<comp.length;i++)for(var j=i+1;j<comp.length;j++){
-          var key=item.id+'__'+comp[i]+'__vs__'+comp[j];
-          if(responses[key]===undefined||responses[key]===null||String(responses[key])==='')missing=true;
-        }
-      }
-    } else {
-      var v2=responses[item.id];
-      if(v2===null||v2===undefined||String(v2).trim()==='')missing=true;
-    }
+    var missing=!itemAnswered(item);
     if(missing){
       var err=document.getElementById('err_'+item.id);
       var reqMsg=t==='ranking'
@@ -2138,18 +2124,39 @@ function doSubmit(){
   // response, a forced file download is unwanted noise, and even without
   // one the download is offered as a button, never forced.
   window._lastCsv={csv:csvStr,name:(SF.meta.title||'survey')+'_response_'+respId+'.csv'};
-  if(ENDPOINT){
-    // no-cors with a text/plain body: an application/json header triggers a
-    // CORS preflight that Google Apps Script never answers, so the POST is
-    // silently blocked in real deployments. Apps Script parses the body
-    // regardless of content type.
-    fetch(ENDPOINT,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:JSON.stringify(row)})
-      .catch(function(){});
-  }
+  window._lastRow=row;
   screen='thankyou';
-  renderScreen();
+  if(ENDPOINT){
+    sendResponse(row);
+  }else{
+    deliveryState='local';
+    renderScreen();
+  }
   var wrap=document.getElementById('prog-bar-wrap');
   if(wrap)wrap.hidden=true;
+}
+// What is known about delivery, and no more. 'local' is a survey with no
+// collector, where the download is the only copy. 'sending' is in flight.
+// 'sent' means the request left the browser without error: the POST is
+// no-cors, so the collector's answer is unreadable and acceptance can never
+// be confirmed from here. 'failed' means fetch itself rejected, which used to
+// be discarded by an empty .catch() while the screen said the response had
+// been recorded.
+var deliveryState=null;
+function sendResponse(row){
+  deliveryState='sending';
+  renderScreen();
+  // no-cors with a text/plain body: an application/json header triggers a
+  // CORS preflight that Google Apps Script never answers, so the POST is
+  // silently blocked in real deployments. Apps Script parses the body
+  // regardless of content type.
+  fetch(ENDPOINT,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:JSON.stringify(row)})
+    .then(function(){deliveryState='sent';renderScreen();})
+    .catch(function(){deliveryState='failed';renderScreen();});
+}
+function retrySubmission(){
+  if(!window._lastRow)return;
+  sendResponse(window._lastRow);
 }
 function toCsv(rows){
   if(!rows.length)return'';
@@ -2176,6 +2183,43 @@ function renderScreen(){
   else if(screen==='survey')renderSurvey();
   else renderThankyou();
 }
+function hasVal(key){
+  var v=responses[key];
+  return v!==undefined&&v!==null&&String(v).trim()!=='';
+}
+// Whether an item has been answered in full. Progress feedback and the
+// required-item walk both read this, so what a participant is told matches
+// what they are stopped for. Progress used to read the parent response key
+// for every type but matrix, and a pairwise or criteria-weight answer lives
+// in child keys, so a completed comparison counted as unanswered.
+function itemAnswered(item){
+  var t=item.type;
+  if(t==='matrix'){
+    var rows=item.matrix_items||[];
+    return rows.length>0&&rows.every(function(r){return hasVal(item.id+'__'+r);});
+  }
+  if(t==='criteria_weight'){
+    var crits=item.comparison_items||[];
+    return crits.length>0&&crits.every(function(c){return hasVal(item.id+'__'+c);});
+  }
+  if(t==='pairwise_comparison'){
+    var comp=item.comparison_items||[];
+    if(comp.length<2)return false;
+    var scale=item.comparison_scale||'saaty';
+    for(var i=0;i<comp.length;i++){
+      for(var j=0;j<comp.length;j++){
+        if(scale==='influence'){
+          if(i===j)continue;
+          if(!hasVal(item.id+'__'+comp[i]+'__to__'+comp[j]))return false;
+        }else if(j>i){
+          if(!hasVal(item.id+'__'+comp[i]+'__vs__'+comp[j]))return false;
+        }
+      }
+    }
+    return true;
+  }
+  return hasVal(item.id);
+}
 function updateProgress(){
   var wrap=document.getElementById('prog-bar-wrap');
   var bar=document.getElementById('progBar');
@@ -2197,17 +2241,7 @@ function updateProgress(){
       if(item.type==='section_break'||item.type==='text_block')return;
       if(!isVisible(item.id))return;
       total++;
-      if(item.type==='matrix'){
-        var rows=item.matrix_items||[];
-        var complete=rows.length>0&&rows.every(function(r){
-          var v=responses[item.id+'__'+r];
-          return v!=null&&v!=='';
-        });
-        if(complete)done++;
-      }else{
-        var v=responses[item.id];
-        if(v!=null&&v!=='')done++;
-      }
+      if(itemAnswered(item))done++;
     });
     if(total===0){wrap.hidden=true;return;}
     p=Math.round((done/total)*100);
@@ -2263,24 +2297,40 @@ function renderThankyou(){
   // The download button appears when the designer enabled it, or whenever
   // no collector endpoint exists (the downloaded CSV is then the only copy
   // of the response, so it must stay reachable, as a choice, never forced).
-  var showDl=(TY.show_download||!ENDPOINT)&&window._lastCsv;
+  var failed=deliveryState==='failed';
+  // A failed send makes the download the only copy of the response, so it is
+  // offered whatever the designer chose.
+  var showDl=(TY.show_download||!ENDPOINT||failed)&&window._lastCsv;
   var offlineNote=(!ENDPOINT&&window._lastCsv)
     ?'<div class="ty-note">This survey has no online collector. Download your response below and return the file to the researcher.</div>':'';
+  var failNote=failed
+    ?'<div class="ty-note" role="alert">Your answers could not be sent. They are still held in this page. Try sending them again, or download the file below and return it to the researcher. Leaving or reloading this page loses them.</div>':'';
   var dlBtn=showDl
     ?'<button type="button" class="btn btn-p" onclick="downloadCsv(window._lastCsv.csv,window._lastCsv.name)">Download my response (CSV)</button>':'';
-  var again='<button type="button" class="btn btn-s" onclick="window.location.reload()">Submit another response</button>';
-  var cont=TY.redirect_url
+  var retryBtn=failed
+    ?'<button type="button" class="btn btn-p" onclick="retrySubmission()">Try sending again</button>':'';
+  // Starting over discards a response that has yet to reach the collector, so
+  // it is offered once delivery is settled.
+  var again=failed?'':'<button type="button" class="btn btn-s" onclick="window.location.reload()">Submit another response</button>';
+  var cont=(TY.redirect_url&&!failed)
     ?'<a class="btn btn-s" style="text-decoration:none" href="'+esc(TY.redirect_url)+'">Continue</a>':'';
+  var title=failed?'Almost done':'Thank You';
+  var icon=failed?'&#33;':'&#10004;';
+  var msg=failed
+    ?'Your answers are complete.'
+    :(TY.message||'Your response has been recorded. Thank you for participating.');
   el.innerHTML='<div class="card"><div class="card-body">'
-    +'<div class="ty-ic">&#10004;</div>'
-    +'<div class="ty-title">Thank You</div>'
-    +'<div class="ty-msg">'+esc(TY.message||'Your response has been recorded. Thank you for participating.')+'</div>'
+    +'<div class="ty-ic">'+icon+'</div>'
+    +'<div class="ty-title">'+title+'</div>'
+    +'<div class="ty-msg">'+esc(msg)+'</div>'
+    +failNote
     +offlineNote
-    +'<div class="ty-acts">'+dlBtn+cont+again+'</div>'
+    +'<div class="ty-acts">'+retryBtn+dlBtn+cont+again+'</div>'
     +'</div></div>';
   // Auto-redirect only when nothing on this screen needs the respondent's
-  // attention (no download offer), so the file is never yanked away.
-  if(TY.redirect_url&&!showDl){
+  // attention (no download offer, no failed delivery), so the file is never
+  // yanked away and a failure is never redirected past.
+  if(TY.redirect_url&&!showDl&&!failed&&deliveryState!=='sending'){
     setTimeout(function(){window.location.href=TY.redirect_url;},2500);
   }
 }
