@@ -121,3 +121,54 @@ test_that("F3 in the item editor: changing the type drops the old type's setting
   expect_identical(as.numeric(updated$page), 3)
   expect_identical(updated$placeholder, "Type here")
 })
+
+# Found while chasing a 1-in-25 failure of the test above, and not in the
+# review: the builder's projection dropped meta$created_at, so composing an
+# instrument back stamped the current time. The two usually landed in the same
+# second and the content hash matched; crossing a second boundary showed that
+# a Studio rebuild had been changing when the instrument was created, and with
+# it the content hash that the amendment boundary rests on.
+
+test_that("a Studio rebuild keeps the instrument's creation time", {
+  instr <- roundtrip_instrument()
+  instr$meta$created_at <- "2020-01-01T00:00:00Z"
+
+  st <- sframe_builder_state_from_instrument(instr)
+  expect_identical(st$meta$created_at, "2020-01-01T00:00:00Z")
+
+  rebuilt <- sframe_builder_compose_instrument(
+    meta = st$meta, choices = st$choices, items = st$items, scales = st$scales,
+    branching = st$branching, checks = st$checks,
+    analysis_plan = st$analysis_plan, models = st$models, render = st$render,
+    amendments = st$amendments, designs = st$designs)
+  expect_identical(rebuilt$meta$created_at, "2020-01-01T00:00:00Z")
+})
+
+test_that("a rebuild's content hash holds across a second boundary", {
+  instr <- roundtrip_instrument()
+  path <- tempfile(fileext = ".sframe")
+  write_sframe(instr, path)
+  loaded <- read_sframe(path)
+
+  st <- sframe_builder_state_from_instrument(loaded)
+  # the clock moves between loading and composing, as it does in a real
+  # session, where the old projection took a fresh timestamp
+  Sys.sleep(1.1)
+  draft <- sframe_builder_validate_draft(
+    meta = st$meta, choices = st$choices, items = st$items, scales = st$scales,
+    branching = st$branching, checks = st$checks,
+    analysis_plan = st$analysis_plan, models = st$models, render = st$render,
+    amendments = st$amendments, designs = st$designs, origin = st$origin)
+
+  expect_identical(
+    sframe_content_hash(as_sframe(validate_sframe(draft$instrument,
+                                                  strict = TRUE))),
+    sframe_content_hash(loaded))
+  expect_null(draft$revision_problem)
+})
+
+test_that("an instrument built fresh still gets a creation time", {
+  new <- sf_instrument("Fresh", components = list(
+    sf_item("q1", "One", type = "numeric")))
+  expect_match(new$meta$created_at, "^[0-9]{4}-[0-9]{2}-[0-9]{2}T")
+})

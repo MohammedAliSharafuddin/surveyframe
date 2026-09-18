@@ -2365,8 +2365,16 @@ server <- function(input, output, session) {
   output$preview_gate <- renderUI({
     draft <- draft_result()
     if (length(draft$instrument$items) == 0) {
+      # Studio opens an instrument that already exists, and questions are
+      # authored in the builder. The old wording named an authoring screen
+      # Studio has never had, while the Open screen next door routed
+      # authoring correctly.
       return(tags$div(class = "card",
-        "Add at least one item in Build Survey before previewing."))
+        tags$p("This instrument has no questions yet, so there is nothing to preview."),
+        tags$p(paste0(
+          "Design the questions in the SurveyBuilder, which opens with ",
+          "launch_builder(), export the .sframe, then load it on the Open ",
+          "Instrument screen to preview, analyse and re-export it."))))
     }
     if (!draft$valid) {
       return(tags$div(class = "card",
