@@ -433,7 +433,13 @@ sframe_plot_term_frequency <- function(result, palette = c("web", "print")) {
     # and 40 already matches what other captions in this package call
     # "the top terms" for a word cloud.
     plot_tbl <- if (grouped) {
-      stats::aggregate(n ~ term, data = tbl, FUN = sum)
+      # The runner carries overall counts taken before any per-group cutoff.
+      # Summing the grouped table instead sums rows already truncated to
+      # top_n, so a term ranked just below the cutoff in every group vanished
+      # even where it led the corpus. Where the runner supplies none, the sum
+      # stands in and the caption says what it is.
+      result$overall_table %||% stats::aggregate(n ~ term, data = tbl,
+                                                 FUN = sum)
     } else {
       tbl
     }
