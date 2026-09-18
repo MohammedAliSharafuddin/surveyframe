@@ -23,7 +23,12 @@ unique respondent identifiers. If NULL, no respondent ID column is
 expected.}
 
 \item{submitted_at}{Character or NULL. The name of the column containing
-submission timestamps.}
+submission timestamps.
+The metadata columns surveyframe's own collectors write, \code{respondent_id},
+\code{response_id}, \code{started_at} and \code{submitted_at}, are recognised without being
+declared: a file this package collected reads back without naming the columns
+it wrote. Anything else outside the instrument still has to be declared, or
+\code{strict = FALSE} used.}
 
 \item{meta_cols}{Character vector or NULL. Additional column names, outside
 the item IDs, to retain (for example, condition assignment or

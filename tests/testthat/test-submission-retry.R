@@ -12,7 +12,7 @@ retry_instrument <- function() {
 
 test_that("22: a saved row is written once, whatever the callback does", {
   path <- tempfile(fileext = ".csv")
-  row <- sframe_response_row(retry_instrument(), list(sf1_q1 = "fine"),
+  row <- sframe_response_row(retry_instrument(), list(q1 = "fine"),
                              list(), Sys.time())
 
   state <- sframe_new_submission_state()
@@ -33,7 +33,7 @@ test_that("22: a saved row is written once, whatever the callback does", {
 
 test_that("22: a retry that succeeds completes the submission", {
   path <- tempfile(fileext = ".csv")
-  row <- sframe_response_row(retry_instrument(), list(sf1_q1 = "fine"),
+  row <- sframe_response_row(retry_instrument(), list(q1 = "fine"),
                              list(), Sys.time())
   state <- sframe_new_submission_state()
 
@@ -53,7 +53,7 @@ test_that("22: a retry that succeeds completes the submission", {
 test_that("22: the two failures are told apart", {
   # a directory where a file has to go, so the write cannot succeed
   path <- tempfile(); dir.create(path)
-  row <- sframe_response_row(retry_instrument(), list(sf1_q1 = "fine"),
+  row <- sframe_response_row(retry_instrument(), list(q1 = "fine"),
                              list(), Sys.time())
   state <- sframe_new_submission_state()
 
@@ -72,7 +72,7 @@ test_that("22: the two failures are told apart", {
 
 test_that("22: with no callback, one save completes the submission", {
   path <- tempfile(fileext = ".csv")
-  row <- sframe_response_row(retry_instrument(), list(sf1_q1 = "fine"),
+  row <- sframe_response_row(retry_instrument(), list(q1 = "fine"),
                              list(), Sys.time())
   res <- sframe_persist_response(row, path, NULL, sframe_new_submission_state())
   expect_true(res$saved)

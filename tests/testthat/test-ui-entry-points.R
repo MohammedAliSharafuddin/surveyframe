@@ -8,8 +8,7 @@
 #      produced an error message where a dashboard was expected.
 
 app_source <- function() {
-  paste(readLines(file.path("..", "..", "inst", "shiny", "app.R"),
-                  warn = FALSE), collapse = "\n")
+  sframe_installed_text("inst", "shiny", "app.R")
 }
 
 test_that("22: the preview gate names a route Studio has", {

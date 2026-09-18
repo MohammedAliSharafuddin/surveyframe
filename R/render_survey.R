@@ -207,8 +207,19 @@ sframe_expansion_values <- function(item, instrument, input_values) {
   }), cols)
 }
 
+# A per-response identifier, in the shape the static survey already writes:
+# "R" and 8 upper-case base36 characters. The static template generated one from
+# the first release and the Shiny path generated none, so the 2 collection
+# routes produced different column sets for the same instrument, and neither a
+# duplicate check nor an idempotent retry had a key to work from.
+sframe_new_response_id <- function() {
+  alphabet <- c(0:9, LETTERS)
+  paste0("R", paste(sample(alphabet, 8, replace = TRUE), collapse = ""))
+}
+
 sframe_response_row <- function(instrument, input_values, branch_lookup,
-                                 started_at, submitted_at = Sys.time()) {
+                                 started_at, submitted_at = Sys.time(),
+                                 response_id = sframe_new_response_id()) {
   # Multi-column items expand to one column per sub-item, option, pair, or
   # criterion rather than to a single joined column, matching the static
   # template and the Google Sheets collector. Before 0.4.0 the Shiny path
@@ -250,6 +261,7 @@ sframe_response_row <- function(instrument, input_values, branch_lookup,
 
   sframe_as_data_frame(as.data.frame(c(
     list(
+      respondent_id = response_id,
       started_at   = format(as.POSIXct(started_at,   tz = "UTC"), "%Y-%m-%dT%H:%M:%SZ"),
       submitted_at = format(as.POSIXct(submitted_at, tz = "UTC"), "%Y-%m-%dT%H:%M:%SZ")
     ),
@@ -325,6 +337,20 @@ sframe_check_response_header <- function(path, header, columns) {
   if (is.null(header) || setequal(header, columns)) return(invisible(TRUE))
   missing <- setdiff(header, columns)
   extra <- setdiff(columns, header)
+  # A file written before this version had no respondent_id column. Every
+  # question column still matches, so the file is compatible and a study
+  # collecting today keeps collecting: the row is aligned to the header it
+  # finds and the id is left out of that file, rather than refusing the append
+  # or writing answers under the wrong headings.
+  if (identical(extra, "respondent_id") && length(missing) == 0) {
+    rlang::inform(
+      paste0("'", path, "' was written before responses carried a ",
+             "respondent_id, so this response is appended without one. Collect ",
+             "into a new file to record an identifier for every response."),
+      class = "sframe_response_id_absent"
+    )
+    return(invisible(TRUE))
+  }
   rlang::abort(
     c(
       paste0("The response file '", path, "' was written for a different ",
@@ -498,7 +524,7 @@ sframe_render_input <- function(item, choices_lookup, values = list()) {
           lapply(seq_len(stars), function(i) {
             actionButton(
               inputId = paste0(item$id, "_star_", i),
-              label   = if ((item$rating_icon %||% "star") == "heart") "♥" else "★",
+              label   = if ((item$rating_icon %||% "star") == "heart") "\u2665" else "\u2605",
               class   = paste("sf-star-btn", if (isTRUE(i <= given)) "active"),
               `aria-label` = paste(i, "of", stars),
               onclick = sprintf(
@@ -540,16 +566,16 @@ sframe_render_input <- function(item, choices_lookup, values = list()) {
             tags$div(
               class        = "sf-rank-item",
               `data-value` = code,
-              tags$span(class = "sf-rank-handle", `aria-hidden` = "true", "⠿"),
+              tags$span(class = "sf-rank-handle", `aria-hidden` = "true", "\u283f"),
               tags$span(class = "sf-rank-label", label),
               tags$span(
                 class = "sf-rank-moves",
                 tags$button(type = "button", class = "sf-rank-move",
                             `aria-label` = paste("Move", label, "up"),
-                            onclick = "sfRankMove(this, -1)", "▲"),
+                            onclick = "sfRankMove(this, -1)", "\u25b2"),
                 tags$button(type = "button", class = "sf-rank-move",
                             `aria-label` = paste("Move", label, "down"),
-                            onclick = "sfRankMove(this, 1)", "▼")
+                            onclick = "sfRankMove(this, 1)", "\u25bc")
               )
             )
           })

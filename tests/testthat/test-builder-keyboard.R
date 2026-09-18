@@ -14,9 +14,7 @@
 # exercises them at a real keyboard.
 
 builder_source <- function() {
-  paste(readLines(file.path("..", "..", "inst", "builder",
-                            "survey_builder.html"),
-                  warn = FALSE, encoding = "UTF-8"), collapse = "\n")
+  sframe_installed_text("inst", "builder", "survey_builder.html")
 }
 
 test_that("16: a question row can be reached and chosen by keyboard", {

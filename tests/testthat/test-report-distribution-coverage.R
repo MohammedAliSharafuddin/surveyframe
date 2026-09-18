@@ -12,11 +12,9 @@
 
 engine_sources <- function() {
   list(
-    r = paste(readLines(file.path("..", "..", "R", "reporting.R"),
-                        warn = FALSE), collapse = "\n"),
-    qmd = paste(readLines(file.path("..", "..", "inst", "templates",
-                                    "report.qmd"), warn = FALSE),
-                collapse = "\n"))
+    r = sframe_source_text("R", "reporting.R"),
+    qmd = sframe_installed_text("inst", "templates",
+                                    "report.qmd"))
 }
 
 test_that("18: both engines forward the palette to the diverging chart", {
@@ -71,8 +69,7 @@ test_that("23: both engines render a result's supplementary table", {
   expect_match(src$r, "sframe_result_supplement(result)", fixed = TRUE)
   expect_match(src$qmd, "sframe_result_supplement(r)", fixed = TRUE)
   # and the quanteda runner's leading features are one of the things it names
-  helper <- paste(readLines(file.path("..", "..", "R", "analysis_plan.R"),
-                            warn = FALSE), collapse = "\n")
+  helper <- sframe_source_text("R", "analysis_plan.R")
   expect_match(helper, "Leading features", fixed = TRUE)
   expect_match(helper, "result$top_features", fixed = TRUE)
 })
@@ -108,9 +105,8 @@ test_that("23: the leading features reach a rendered report", {
 # this test existed.
 
 test_that("the Quarto template calls only exported functions", {
-  qmd <- paste(readLines(file.path("..", "..", "inst", "templates",
-                                   "report.qmd"), warn = FALSE),
-               collapse = "\n")
+  qmd <- sframe_installed_text("inst", "templates",
+                                   "report.qmd")
   expect_false(grepl("surveyframe:::", qmd, fixed = TRUE))
 })
 
@@ -120,9 +116,8 @@ test_that("the Quarto template calls only exported functions", {
 # newly exported function the template uses before the package is reinstalled,
 # which is what a developer hits.
 template_surveyframe_calls <- function() {
-  qmd <- paste(readLines(file.path("..", "..", "inst", "templates",
-                                   "report.qmd"), warn = FALSE),
-               collapse = "\n")
+  qmd <- sframe_installed_text("inst", "templates",
+                                   "report.qmd")
   called <- unique(unlist(regmatches(
     qmd, gregexpr("\\b(sframe_[a-z_0-9]+|analysis_syntax|score_scales|read_sframe|read_responses|codebook_report|quality_report|reliability_report|item_report|efa_report|validity_report|run_analysis_plan|descriptives_report|missing_data_report)\\b",
                   qmd, perl = TRUE))))
@@ -150,10 +145,7 @@ installed_surveyframe_exports <- function() {
 test_that("every surveyframe function the template calls is exported here", {
   called <- template_surveyframe_calls()
   expect_gt(length(called), 0)
-  dev_exports <- sub("^export\\((.*)\\)$", "\\1",
-                     grep("^export\\(", readLines(file.path("..", "..", "NAMESPACE")),
-                          value = TRUE))
-  dev_exports <- gsub('"', "", dev_exports)
+  dev_exports <- sframe_exports()
   expect_equal(setdiff(called, dev_exports), character(0))
 })
 

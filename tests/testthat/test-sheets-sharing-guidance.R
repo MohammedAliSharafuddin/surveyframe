@@ -11,7 +11,8 @@
 # is told to do before any code runs.
 
 roxygen_source <- function() {
-  path <- test_path("..", "..", "R", "google_sheets.R")
+  path <- sframe_source_path("R", "google_sheets.R")
+  skip_if(is.na(path), "no source tree here")
   skip_if_not(file.exists(path), "package source not available")
   lines <- readLines(path, warn = FALSE)
   lines[grepl("^\\s*#'", lines)]

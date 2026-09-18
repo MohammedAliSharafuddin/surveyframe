@@ -41,7 +41,8 @@ test_that("carried over: generated CFA syntax names scale-level reversed items",
 })
 
 source_of <- function(file) {
-  p <- test_path("..", "..", "R", file)
+  p <- sframe_source_path("R", file)
+  skip_if(is.na(p), paste("no source tree for", file))
   skip_if(!file.exists(p), "package source not available")
   paste(readLines(p, warn = FALSE), collapse = "\n")
 }
