@@ -353,6 +353,31 @@ This section grows as each group of fixes lands.
   design that never showed one as perfectly balanced. Balance now counts
   every declared level, and the design lists any level it never shows.
 
+## Text analysis fixes
+
+* **Words with accents and text in other scripts were being cut up.** The
+  tokeniser kept ASCII letters alone, so "café" was counted as "caf",
+  "naïve" became two fragments, and a response written in a non-Latin script
+  could come out empty. Every Unicode letter and digit is now kept, in term
+  frequency, n-grams, co-occurrence, topic models and sentiment.
+  **Term counts and topic models over non-English text will change.**
+* **N-grams reported phrases nobody wrote.** Stop words were removed before
+  the window slid over what was left, so "clean but not comfortable" produced
+  the bigram "clean comfortable". An n-gram is now built only from words that
+  were next to each other, which is what makes it a phrase a respondent used.
+  **Bigram and trigram tables will change, and some will be smaller.**
+* **A respondent with no group value was counted into every group** in
+  grouped sentiment. With twelve responses per group, both groups reported
+  thirteen, the extra one scored as neutral. Grouped term frequency had the
+  same mismatch between the text and the rows it came from.
+* **A response of punctuation alone counted as a usable response.** Rows were
+  chosen before punctuation and numbers were stripped, so such a response
+  survived as an empty string, counted towards the minimum corpus, and scored
+  as a neutral observation in sentiment.
+* **`term_context(window = 0)` copied the match into its own context.** A zero
+  window now gives empty context, and a negative one is refused, as is
+  `max_matches` below 1 and an n-gram size below 2.
+
 ## Report fixes
 
 * **A report could not render into a folder whose name contains a space.**
