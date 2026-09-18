@@ -378,12 +378,67 @@ This section grows as each group of fixes lands.
   window now gives empty context, and a negative one is refused, as is
   `max_matches` below 1 and an n-gram size below 2.
 
+## New: the R code behind each result
+
+* **A report now shows the statistical call that produced each number.** Every
+  result carries a folded "Show R code" block with the call, the variables and
+  the options resolved, so a reader sees `cor.test(x, y, method = "pearson")`
+  where the wrapper call was all that showed before. Both
+  report engines show it, and `render_report(show_code = FALSE)` leaves it
+  out.
+* **`analysis_syntax()` returns that code**, for one result or a whole set.
+  `header = TRUE` prepends the lines that load the instrument, read the
+  responses and score the scales, giving a script that runs on its own.
+* The code is built from the same resolved specification the analysis ran, and
+  the package's tests run the generated code and compare its statistic and p
+  against the package's own result. Where a method falls outside its coverage
+  the block is omitted, which keeps the report honest about what it can show. The model families already carried their
+  syntax, through `cfa_syntax()` and its neighbours.
+
+## Figure fixes
+
+* **Grouped rating charts drew two segments over each other.** The negative
+  block started at zero while the neutral block straddled zero, so with five
+  equally frequent options ten percentage points of the bar were drawn twice
+  and the bar was ten points short. This affected the matrix and scale charts
+  in every report. The single-item chart was always correct.
+* **A repeated-measures figure described more respondents than its test.** The
+  test drops anyone missing a measure, where the figure dropped missing
+  values measure by measure, so an excluded respondent could move the plotted
+  medians. The figure now uses the same respondents and says how many.
+* **A Q-Q plot compared raw values against the wrong line.** The reference was
+  y = x, so a normal variable with a mean of 100 looked severely non-normal.
+  The line now follows the sample's own quartiles.
+* **A network figure renumbered its clusters.** Clusters were relabelled by
+  size while the legend said "Cluster", so the cluster a table called 2 could
+  appear as Cluster 1. The figure now uses the same numbers as the table.
+
 ## Report fixes
 
 * **A report could not render into a folder whose name contains a space.**
   The Quarto renderer's arguments were passed to the shell unquoted, so such
   a path split into several arguments and the render failed, falling back to
   the built-in HTML engine with no explanation. Each argument is now quoted.
+* **Distributions disappeared when ggplot2 was absent.** A scale's rating
+  items are grouped into one chart, and every item in such a scale was skipped
+  whether or not that chart could be drawn, though the built-in charts draw
+  each one. A missing optional package now costs the grouping and keeps the
+  information.
+* **A print-palette report mixed monochrome and colour figures**, because the
+  single-item diverging chart was drawn with the default palette.
+* **A quanteda result's leading features never reached the report**, though its
+  own prompt asked a reader to review them. A moderation's conditional slopes
+  at the moderator's own values were missing in the same way. Both now render
+  as a second table under the result.
+* **A mediation table did not say which model produced it.** It gave Direct,
+  Indirect and Total with no variable names and no a or b path, so two
+  negative paths looked the same as two positive ones: both give a positive
+  indirect effect. The table now names the predictor, mediator and outcome and
+  reports a and b with their signs.
+* **APA numbers follow APA 7 more closely.** `p` loses its leading zero,
+  as `p = .032`, and an interval says its level, as `95% CI [0.12, 0.48]`.
+  The sentence is plain text, so italicising the symbols stays the author's
+  step, and `?sf_apa` now says so.
 * **A report claimed an analysis seed when analysis was switched off.**
   `render_report(include_analysis = FALSE)` still printed a seed beside the
   instrument hash, which reads as provenance for an analysis that never ran.
