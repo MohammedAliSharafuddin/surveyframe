@@ -687,7 +687,11 @@ read_sframe <- function(path, validate = TRUE) {
     path = path,
     content_hash = sframe_content_hash(instrument),
     amendment_new_hashes = vapply(instrument$amendments %||% list(),
-                                  function(a) a$new_hash %||% "", character(1))
+                                  function(a) a$new_hash %||% "", character(1)),
+    # Every field of every recorded entry, so an edit to a disclosure is as
+    # detectable as an edit to the content it describes.
+    amendment_entry_hashes = sframe_amendment_entry_hashes(
+      instrument$amendments %||% list())
   )
 
   instrument

@@ -324,7 +324,10 @@ sframe_ci_string <- function(ci) {
     return(sprintf(" [no bootstrap interval: %s]", attr(ci, "reason")))
   }
   if (is.null(ci) || anyNA(ci[c("lower", "upper")])) return("")
-  sprintf(" [%.2f, %.2f]", ci[["lower"]], ci[["upper"]])
+  # A bare bracketed pair says nothing about what it covers, and APA asks for
+  # the level. The level travels on the interval where a caller set one.
+  level <- attr(ci, "level") %||% 0.95
+  sprintf(" %g%% CI [%.2f, %.2f]", 100 * level, ci[["lower"]], ci[["upper"]])
 }
 
 # --- Internal helpers backing the runners' CI keys ------------------------

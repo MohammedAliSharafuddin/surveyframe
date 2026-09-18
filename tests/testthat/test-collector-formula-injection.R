@@ -81,3 +81,58 @@ test_that("neither copy of the collector writes user-entered values", {
                  info = paste("user-entered write still present in", basename(p)))
   }
 })
+
+# A8, reopened by review: the original fix set the plain-text number format and
+# then called setValues(). Google documents setValues() as applying
+# user-entered semantics and promises nothing about the number format
+# suppressing that, and the mock used to encode the assumption it was meant to
+# test by returning the string unchanged whenever the format was "@". The mock
+# now parses regardless of format, so an answer can only survive literally
+# through the Sheets API's documented RAW option.
+
+test_that("A8: the row is written through the documented RAW option", {
+  skip_if_not_installed("V8")
+  ctx <- apps_script_context(c("respondent_id", "q1"))
+  apps_script_post(ctx, c(respondent_id = "r1", q1 = "=1+1"))
+
+  writes <- ctx$get("__rawWrites")
+  expect_gt(nrow(writes), 0)
+  expect_true(all(writes$option == "RAW"))
+})
+
+test_that("A8: a formula-like answer is stored as the participant typed it", {
+  skip_if_not_installed("V8")
+  ctx <- apps_script_context(c("respondent_id", "q1", "q2", "q3"))
+  apps_script_post(ctx, c(respondent_id = "r1", q1 = "=1+1",
+                          q2 = '=IMPORTXML("http://x","//a")', q3 = "007"))
+  row <- ctx$get("__ss.sheets['Responses'].rows[1]")
+  expect_equal(row[[2]], "=1+1")
+  expect_equal(row[[3]], '=IMPORTXML("http://x","//a")')
+  expect_equal(row[[4]], "007")
+})
+
+test_that("A8: the response says which write path stored the row", {
+  skip_if_not_installed("V8")
+  ctx <- apps_script_context(c("respondent_id", "q1"))
+  apps_script_post(ctx, c(respondent_id = "r1", q1 = "ok"))
+  parsed <- apps_script_reply(ctx)
+  expect_equal(parsed$status, "ok")
+  expect_equal(parsed$stored, "raw")
+  expect_null(parsed$warning)
+})
+
+test_that("A8: without the advanced service the fallback is unsafe, and says so", {
+  skip_if_not_installed("V8")
+  ctx <- apps_script_context(c("respondent_id", "q1"))
+  # the researcher skipped the Services step
+  ctx$eval("Sheets = undefined;")
+  apps_script_post(ctx, c(respondent_id = "r1", q1 = "=1+1"))
+  parsed <- apps_script_reply(ctx)
+
+  expect_equal(parsed$stored, "user_entered_with_text_format")
+  expect_match(parsed$warning, "RAW", fixed = TRUE)
+  # and the answer really is mangled on that path, which is why it warns: this
+  # is the behaviour Google's contract allows and the old test assumed away
+  row <- ctx$get("__ss.sheets['Responses'].rows[1]")
+  expect_false(identical(row[[2]], "=1+1"))
+})

@@ -3,13 +3,24 @@
 # A field every check below reads as a length-1 string. Anything else has to
 # be reported, because the checks reach it through vapply(..., character(1))
 # and an ordinary R error there leaves no diagnostic at all.
-sframe_scalar_problem <- function(value, what, allow_empty = FALSE) {
+sframe_scalar_problem <- function(value, what, allow_empty = FALSE,
+                                  require_character = TRUE) {
   if (is.null(value)) return(paste0(what, " is missing."))
+  if (!is.atomic(value)) {
+    return(paste0(what, " must be one value, and is ", class(value)[1], "."))
+  }
   if (length(value) != 1) {
     return(paste0(what, " must be one value, and has length ",
                   length(value), "."))
   }
   if (is.na(value)) return(paste0(what, " is NA."))
+  # Every check downstream reads these through vapply(..., character(1)), so a
+  # numeric id passed the old length-and-NA test and then failed there with an
+  # ordinary R type error instead of a diagnostic.
+  if (require_character && !is.character(value)) {
+    return(paste0(what, " must be text, and is ", class(value)[1],
+                  ". Quote it."))
+  }
   if (!allow_empty && !nzchar(as.character(value))) {
     return(paste0(what, " is empty."))
   }
@@ -19,20 +30,52 @@ sframe_scalar_problem <- function(value, what, allow_empty = FALSE) {
 sframe_field_shape_problems <- function(instrument) {
   out <- character(0)
   keep <- function(p) if (!is.null(p)) out <<- c(out, p)
+  # A component that is no list cannot be read with $ at all, so it is reported
+  # here and its fields are left alone.
+  component_problem <- function(x, what) {
+    if (!is.list(x)) {
+      return(paste0(what, " must be a list of fields, and is ",
+                    class(x)[1], "."))
+    }
+    NULL
+  }
   for (i in seq_along(instrument$items)) {
     it <- instrument$items[[i]]
+    bad <- component_problem(it, paste0("Item ", i))
+    if (!is.null(bad)) { keep(bad); next }
     keep(sframe_scalar_problem(it$id, paste0("Item ", i, "'s id")))
     keep(sframe_scalar_problem(it$label, paste0("Item ", i, "'s label"),
                                allow_empty = TRUE))
     keep(sframe_scalar_problem(it$type, paste0("Item ", i, "'s type")))
   }
   for (i in seq_along(instrument$choices)) {
+    bad <- component_problem(instrument$choices[[i]],
+                             paste0("Choice set ", i))
+    if (!is.null(bad)) { keep(bad); next }
     keep(sframe_scalar_problem(instrument$choices[[i]]$id,
                                paste0("Choice set ", i, "'s id")))
   }
   for (i in seq_along(instrument$scales)) {
+    bad <- component_problem(instrument$scales[[i]], paste0("Scale ", i))
+    if (!is.null(bad)) { keep(bad); next }
     keep(sframe_scalar_problem(instrument$scales[[i]]$id,
                                paste0("Scale ", i, "'s id")))
+  }
+  # A plan block that cannot be read, and a branch or check the same, belong
+  # here too: the reference walk below dereferences all of them.
+  for (i in seq_along(instrument$analysis_plan)) {
+    keep(component_problem(instrument$analysis_plan[[i]],
+                           paste0("Analysis plan block ", i)))
+  }
+  for (i in seq_along(instrument$branching)) {
+    keep(component_problem(instrument$branching[[i]],
+                           paste0("Branching rule ", i)))
+  }
+  for (i in seq_along(instrument$checks)) {
+    keep(component_problem(instrument$checks[[i]], paste0("Check ", i)))
+  }
+  for (i in seq_along(instrument$models)) {
+    keep(component_problem(instrument$models[[i]], paste0("Model ", i)))
   }
   keep(sframe_scalar_problem(instrument$meta$title, "The instrument title"))
   keep(sframe_scalar_problem(instrument$meta$version, "The instrument version"))
@@ -82,12 +125,14 @@ sframe_plan_block_problems <- function(plan, known_methods) {
     } else {
       keep(p)
     }
-    has_roles <- !is.null(block$roles)
-    has_vars  <- !is.null(block$variables)
-    if (has_roles && !is.list(block$roles)) {
+    roles_ok <- is.list(block$roles) && length(unlist(block$roles)) > 0
+    vars_ok <- length(unlist(block$variables)) > 0
+    if (!is.null(block$roles) && !is.list(block$roles)) {
       keep(paste0(where, "'s roles must be a named list of role assignments."))
     }
-    if (!has_roles && !has_vars) {
+    # An empty roles list is no assignment: it passed the old presence test and
+    # left the block with nothing to run on.
+    if (!roles_ok && !vars_ok) {
       keep(paste0(where, " assigns no variables. Give it roles, or the legacy ",
                   "variables field."))
     }
@@ -215,6 +260,36 @@ validate_sframe <- function(instrument, strict = TRUE) {
   log <- sframe_new_problem_log()
   add <- function(check, messages) sframe_log_problem(log, check, messages)
 
+  # The one exit every path takes. It aborts under strict mode, sets the
+  # validated stamp from this run, and builds the diagnostic. The shape gate
+  # below used to return on its own, which skipped both the strict abort and
+  # the stamp: a malformed field gave a diagnostic while strict = TRUE carried
+  # on, and the instrument it returned still said it had been validated, so
+  # write_sframe() wrote it.
+  finish <- function() {
+    if (strict && length(log$problems) > 0) {
+      sframe_abort_validation(
+        paste0(
+          "Instrument validation failed with ",
+          length(log$problems),
+          " problem(s):\n",
+          paste0("  - ", log$problems, collapse = "\n")
+        ),
+        instrument_title = sframe_meta_display(instrument$meta$title,
+                                               "(untitled)")
+      )
+    }
+    instrument$meta$validated <- length(log$problems) == 0
+    sframe_new_validation(
+      log,
+      roster  = sframe_validation_checks,
+      subject = "instrument",
+      title   = sframe_meta_display(instrument$meta$title, "(untitled)"),
+      version = sframe_meta_display(instrument$meta$version, "(unversioned)"),
+      object  = instrument
+    )
+  }
+
   # Shape gate. Every check below reads an id as a length-1 string, so a
   # malformed field has to become a problem here. Reaching vapply() with one
   # raised an ordinary R error and the diagnostic was never built, which broke
@@ -222,14 +297,7 @@ validate_sframe <- function(instrument, strict = TRUE) {
   shape <- sframe_field_shape_problems(instrument)
   if (length(shape) > 0) {
     add("field_shapes", shape)
-    return(sframe_new_validation(
-      log,
-      roster  = sframe_validation_checks,
-      subject = "instrument",
-      title   = sframe_meta_display(instrument$meta$title, "(untitled)"),
-      version = sframe_meta_display(instrument$meta$version, "(unversioned)"),
-      object  = instrument
-    ))
+    return(finish())
   }
 
   item_ids    <- vapply(instrument$items,    function(x) x$id, character(1))
@@ -604,30 +672,8 @@ validate_sframe <- function(instrument, strict = TRUE) {
     }
   }
 
-  if (strict && length(log$problems) > 0) {
-    sframe_abort_validation(
-      paste0(
-        "Instrument validation failed with ",
-        length(log$problems),
-        " problem(s):\n",
-        paste0("  - ", log$problems, collapse = "\n")
-      ),
-      instrument_title = instrument$meta$title
-    )
-  }
-
   # The validated stamp travels on the instrument carried by the result, so
-  # as_sframe() hands back an instrument that records the outcome. It is set
-  # from this run either way: leaving an earlier TRUE in place let a failed
-  # diagnostic carry an instrument that still printed as valid.
-  instrument$meta$validated <- length(log$problems) == 0
-
-  sframe_new_validation(
-    log,
-    roster  = sframe_validation_checks,
-    subject = "instrument",
-    title   = instrument$meta$title,
-    version = instrument$meta$version,
-    object  = instrument
-  )
+  # as_sframe() hands back an instrument that records the outcome, and strict
+  # mode aborts. Both happen in finish(), which every exit shares.
+  finish()
 }

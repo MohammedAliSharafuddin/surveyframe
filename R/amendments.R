@@ -49,6 +49,21 @@ sframe_amendment_default_tier <- function(reason_code) {
 # amend_sframe()'s and amendment_log()'s roxygen so the two are never
 # confused: `previous_hash`/`new_hash` in an amendment entry are a content
 # fingerprint, not the .sframe file's own integrity hash.
+# A canonical fingerprint of one amendment entry, over every field it records.
+# The boundary used to compare each entry's new_hash alone, which covers the
+# content the amendment produced and says nothing about the disclosure itself,
+# so an entry's author, reason, tier or sign-off could be rewritten afterwards
+# and the log still passed as intact.
+sframe_amendment_entry_hash <- function(entry) {
+  if (!is.list(entry)) return("")
+  entry <- entry[order(names(entry))]
+  as.character(openssl::sha256(sframe_hash_json(entry, canonical = TRUE)))
+}
+
+sframe_amendment_entry_hashes <- function(amendments) {
+  vapply(amendments %||% list(), sframe_amendment_entry_hash, character(1))
+}
+
 sframe_content_hash <- function(instrument, box = TRUE) {
   payload <- sframe_serialization_payload(instrument, box = box)
   payload$hash <- NULL
@@ -120,12 +135,21 @@ sframe_check_amendment_boundary <- function(instrument, new_instrument = FALSE) 
   }
 
   if (!is.null(origin)) {
-    loaded <- origin$amendment_new_hashes %||% character(0)
-    now <- vapply(am, function(a) a$new_hash %||% "", character(1))
+    # Compared over whole entries, so editing an existing amendment's author,
+    # reason, tier or sign-off is caught. Comparing new_hash alone left every
+    # field of the disclosure rewritable after the fact.
+    loaded <- origin$amendment_entry_hashes %||%
+      (origin$amendment_new_hashes %||% character(0))
+    now <- if (is.null(origin$amendment_entry_hashes)) {
+      vapply(am, function(a) a$new_hash %||% "", character(1))
+    } else {
+      sframe_amendment_entry_hashes(am)
+    }
     if (length(now) < length(loaded) || !identical(now[seq_along(loaded)], loaded)) {
       abort(sprintf(paste0(
         "The amendment log read from '%s' has been shortened or altered. ",
-        "An amendment log only grows."), origin$path))
+        "An amendment log only grows, and a recorded entry stays as it was ",
+        "written."), origin$path))
     }
     if (!identical(current, origin$content_hash) && length(now) == length(loaded)) {
       abort(sprintf(paste0(

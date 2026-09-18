@@ -872,7 +872,13 @@ sframe_draw_likert_diverging <- function(counts, theme_color = "#16B3B1",
     if (sum(counts) == 0) next
     pct <- 100 * as.numeric(counts) / sum(counts)
 
-    x <- 0
+    # The negative stack starts where the neutral segment ends, which is half
+    # its width left of zero. Starting at 0 drew the negatives over the
+    # neutral segment: with 5 equally frequent categories the negatives ran
+    # -40 to 0 and neutral ran -10 to 10, so 10 percentage points of the bar
+    # were drawn twice and the bar came out 10 points short. The single-item
+    # chart already did this correctly.
+    x <- if (has_neutral) pct[neu_idx] / 2 else 0
     for (i in rev(neg_idx)) {
       w <- pct[i]
       segs[[length(segs) + 1]] <- data.frame(
@@ -2159,8 +2165,18 @@ sframe_plot_repeated_measures <- function(result, data, palette = c("web", "prin
   vars <- result$vars
   if (length(vars) < 2 || !all(vars %in% colnames(data))) return(NULL)
   use_median <- identical(result$test, "friedman")
+  # The runner drops any respondent missing a measure, so the figure has to
+  # describe the same people. Dropping missing values within each measure
+  # separately let a respondent the test excluded move the plotted centres.
+  present <- intersect(vars, names(data))
+  complete <- if (length(present)) {
+    data[stats::complete.cases(data[, present, drop = FALSE]), , drop = FALSE]
+  } else {
+    data
+  }
+  n_complete <- nrow(complete)
   rows <- lapply(vars, function(v) {
-    x <- suppressWarnings(as.numeric(data[[v]]))
+    x <- suppressWarnings(as.numeric(complete[[v]]))
     x <- x[!is.na(x)]
     if (!length(x)) return(NULL)
     if (use_median) {
@@ -2188,7 +2204,10 @@ sframe_plot_repeated_measures <- function(result, data, palette = c("web", "prin
     ggplot2::scale_x_discrete(labels = .sframe_title_case_names) +
     ggplot2::labs(
       title = "Ratings across conditions", subtitle = result$apa %||% NULL,
-      x = NULL, y = if (use_median) "Median" else "Mean (\u00B1 SE)"
+      x = NULL, y = if (use_median) "Median" else "Mean (\u00B1 SE)",
+      caption = sprintf(
+        "%d respondents with a complete set of measures, as the test used.",
+        n_complete)
     ) +
     theme_surveyframe(palette = palette)
 }
@@ -2451,13 +2470,23 @@ sframe_plot_variable_distribution <- function(data, variable, palette = c("web",
     theme_surveyframe(palette = palette)
 
   qq_theoretical <- stats::qqnorm(x, plot.it = FALSE)
+  # The reference line follows the sample's own location and scale, drawn
+  # through the first and third quartiles as qqline() does. A bare geom_abline()
+  # is y = x, so a normal variable centred on 100 sat far from it and read as
+  # a severe departure from normality when it was nothing of the kind.
+  qs <- stats::quantile(x, c(0.25, 0.75), names = FALSE, na.rm = TRUE)
+  ts <- stats::qnorm(c(0.25, 0.75))
+  qq_slope <- if (diff(ts) != 0) diff(qs) / diff(ts) else 1
+  qq_intercept <- qs[1] - qq_slope * ts[1]
   qq <- ggplot2::ggplot(
       data.frame(theoretical = qq_theoretical$x, sample = qq_theoretical$y),
       ggplot2::aes(x = .data$theoretical, y = .data$sample)) +
-    ggplot2::geom_abline(colour = brand$muted, linetype = "dashed") +
+    ggplot2::geom_abline(slope = qq_slope, intercept = qq_intercept,
+                         colour = brand$muted, linetype = "dashed") +
     ggplot2::geom_point(colour = brand$teal, alpha = 0.75, size = 2) +
     ggplot2::labs(title = paste("Normal Q-Q of", var_label),
-                 x = "Theoretical quantiles", y = "Sample quantiles") +
+                 x = "Theoretical quantiles", y = "Sample quantiles",
+                 caption = "Reference line through the sample's quartiles.") +
     theme_surveyframe(palette = palette)
 
   list(histogram = histogram, boxplot = boxplot, qq = qq)
@@ -2624,13 +2653,22 @@ sframe_plot_cooccurrence_network <- function(result, palette = c("web", "print")
   rank_of <- stats::setNames(seq_along(sizes), names(sizes))
   n_clusters <- length(sizes)
   tbl$cluster_rank <- as.integer(rank_of[as.character(tbl$cluster)])
+  # The label is the cluster's own id, so a cluster the table calls 2 is
+  # called 2 here. Numbering by size instead meant the figure and the table
+  # disagreed about which cluster was which, under a legend titled "Cluster".
+  # Size rank still decides the drawing order and which clusters are pooled.
   tbl$cluster_label <- if (n_clusters > 8) {
-    ifelse(tbl$cluster_rank <= 8, as.character(tbl$cluster_rank), "Other")
+    ifelse(tbl$cluster_rank <= 8, as.character(tbl$cluster), "Other")
   } else {
-    as.character(tbl$cluster_rank)
+    as.character(tbl$cluster)
   }
   pal <- .sframe_cluster_palette(n_clusters, palette)
-  level_order <- if (n_clusters > 8) c(as.character(1:8), "Other") else as.character(seq_len(n_clusters))
+  by_size <- names(sizes)
+  level_order <- if (n_clusters > 8) {
+    c(by_size[seq_len(8)], "Other")
+  } else {
+    by_size
+  }
   level_order <- level_order[level_order %in% unique(tbl$cluster_label)]
   tbl$cluster_label <- factor(tbl$cluster_label, levels = level_order)
 
@@ -2832,4 +2870,3 @@ sframe_plot_sentiment <- function(result, palette = c("web", "print")) {
   if (grouped) p <- p + ggplot2::facet_wrap(~ group, scales = "free_y")
   p
 }
-

@@ -233,10 +233,14 @@ sframe_p_cell <- function(p) {
          ifelse(p < .001, "<.001", formatC(p, digits = 3, format = "f")))
 }
 
+# APA 7 asks for no leading zero on a statistic that cannot exceed 1, and p is
+# one of those, so "= 0.032" becomes "= .032". 3 decimals for an exact p is
+# within the guide's 2-or-3. A p of exactly 1 keeps its digit, since there is
+# no leading zero to drop.
 sframe_p_string <- function(p) {
   if (is.na(p)) return("= NA")
   if (p < .001) return("< .001")
-  sprintf("= %s", formatC(p, digits = 3, format = "f"))
+  sprintf("= %s", sub("^0\\.", ".", formatC(p, digits = 3, format = "f")))
 }
 
 # ---------------------------------------------------------------------------
@@ -954,6 +958,61 @@ sframe_result_from_report <- function(report, test = report$method %||% "") {
   out
 }
 
+#' The second table a result carries, if it has one
+#'
+#' Some results hold a table beside their main one that a reader needs: a
+#' quanteda result's leading features, or a moderation's conditional slopes at
+#' the moderator's own values. Both report engines render whatever this returns,
+#' under its own caption, so the 2 cannot drift on what a result shows.
+#'
+#' This is exported because the Quarto report template runs in a separate R
+#' session against the installed package, so everything it calls has to be
+#' part of the public surface. A template calling an internal through `:::`
+#' fails there and the renderer falls back to the built-in HTML engine without
+#' saying why.
+#'
+#' @param result One analysis block's result from [run_analysis_plan()].
+#'
+#' @return A list with `table` and `caption`, or `NULL` where the result has no
+#'   second table.
+#' @export
+#' @seealso [run_analysis_plan()], [render_report()], [analysis_syntax()]
+#'
+#' @examples
+#' demo <- sframe_demo_data()
+#' results <- run_analysis_plan(demo$responses, demo$instrument)
+#' sframe_result_supplement(results[[1]])
+sframe_result_supplement <- function(result) {
+  if (!is.list(result)) return(NULL)
+  test <- result$test %||% ""
+
+  if (identical(test, "moderation") &&
+      is.data.frame(result$conditional_effects) &&
+      nrow(result$conditional_effects) > 0) {
+    grid <- result$conditional_effects
+    vars <- result$vars %||% character(0)
+    mod_name <- if (length(vars) >= 3) vars[[3]] else "moderator"
+    x_name <- if (length(vars) >= 2) vars[[2]] else "predictor"
+    out <- data.frame(
+      Level = as.character(grid$level %||% seq_len(nrow(grid))),
+      check.names = FALSE, stringsAsFactors = FALSE
+    )
+    out[[sprintf("%s value", mod_name)]] <- sprintf("%.3f", grid$moderator_value)
+    out[[sprintf("Slope of %s", x_name)]] <- sprintf("%.3f", grid$simple_slope)
+    return(list(
+      table = out,
+      caption = sprintf("Conditional effect of %s at values of %s",
+                        x_name, mod_name)))
+  }
+
+  # The quanteda DFM runner's leading features, which its own prompt asks a
+  # reader to review.
+  if (is.data.frame(result$top_features) && nrow(result$top_features) > 0) {
+    return(list(table = result$top_features, caption = "Leading features"))
+  }
+  NULL
+}
+
 # v0.3.4: formatted result tables for the inferential runners, suitable for
 # knitr::kable(). Built centrally from each runner's existing fields so the
 # runners themselves stay untouched; results that already carry a table
@@ -1096,12 +1155,34 @@ sframe_result_table <- function(result) {
         check.names = FALSE, stringsAsFactors = FALSE, row.names = NULL
       )
     },
-    mediation = data.frame(
-      Effect = c("Direct (c')", "Indirect (a\u00D7b)", "Total (c)"),
-      Estimate = fmt(c(result$direct, result$indirect, result$total)),
-      `95% CI` = c("", sprintf("[%.3f, %.3f]", result$indirect_ci[[1]], result$indirect_ci[[2]]), ""),
-      check.names = FALSE, stringsAsFactors = FALSE
-    ),
+    mediation = {
+      # vars is outcome, predictor, mediator, as sframe_run_mediation() builds
+      # it. Naming them, and reporting a and b, is what lets a reader tell
+      # which model produced these effects and see the signs behind the
+      # product: 2 negatives give the same positive indirect effect as 2
+      # positives, and the table used to show neither.
+      y <- result$vars[[1]]; x <- result$vars[[2]]; m <- result$vars[[3]]
+      has_ci <- length(result$indirect_ci) >= 2 &&
+        all(is.finite(unlist(result$indirect_ci[1:2])))
+      data.frame(
+        Effect = c(
+          sprintf("a (%s \u2192 %s)", x, m),
+          sprintf("b (%s \u2192 %s)", m, y),
+          sprintf("Direct (c', %s \u2192 %s)", x, y),
+          sprintf("Indirect (a\u00D7b, %s \u2192 %s \u2192 %s)", x, m, y),
+          sprintf("Total (c, %s \u2192 %s)", x, y)
+        ),
+        Estimate = fmt(c(result$a_path, result$b_path, result$direct,
+                         result$indirect, result$total)),
+        `95% CI` = c("", "", "",
+                     if (has_ci) {
+                       sprintf("[%.3f, %.3f]", result$indirect_ci[[1]],
+                               result$indirect_ci[[2]])
+                     } else "",
+                     ""),
+        check.names = FALSE, stringsAsFactors = FALSE
+      )
+    },
     quality = {
       qr <- result$report_obj
       if (is.null(qr)) NULL else sframe_quality_checks_table(qr)

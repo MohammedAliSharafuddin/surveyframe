@@ -14,7 +14,12 @@
 # Enough of SpreadsheetApp to run doPost(), with user-entered coercion.
 apps_script_mock <- "
 function coerceUserEntered_(v, fmt){
-  if (fmt === '@') return String(v);          // plain text: stored literally
+  // Google documents setValues() as applying user-entered semantics, and makes
+  // no promise that the plain-text number format suppresses parsing. The mock
+  // used to return the string unchanged for fmt === '@', which assumed exactly
+  // the thing under test and made the assertions pass by construction. It now
+  // parses regardless of format, so only a write through the documented RAW
+  // path can store an answer literally.
   if (typeof v !== 'string') return v;
   if (v.charAt(0) === '=') {                  // Sheets parses the cell
     var expr = v.slice(1);
@@ -27,7 +32,12 @@ function coerceUserEntered_(v, fmt){
   return v;
 }
 
-function Sheet(){ this.rows = []; this.fmt = {}; }
+function Sheet(){ this.rows = []; this.fmt = {}; this.name = 'Responses'; }
+Sheet.prototype.getName = function(){ return this.name; };
+// Returns the single mock spreadsheet rather than a stored reference: holding
+// the parent on the sheet makes __ss circular, and a test reading a sheet back
+// through JSON then kills the V8 context outright.
+Sheet.prototype.getParent = function(){ return __ss; };
 Sheet.prototype.key_ = function(r, c){ return r + ':' + c; };
 Sheet.prototype.getLastRow = function(){ return this.rows.length; };
 Sheet.prototype.getLastColumn = function(){
@@ -74,8 +84,35 @@ Sheet.prototype.getRange = function(row, col, nRows, nCols){
 };
 function Spreadsheet(){ this.sheets = {}; }
 Spreadsheet.prototype.getSheetByName = function(n){ return this.sheets[n] || null; };
-Spreadsheet.prototype.insertSheet = function(n){ this.sheets[n] = new Sheet(); return this.sheets[n]; };
+Spreadsheet.prototype.insertSheet = function(n){
+  var sh = new Sheet(); sh.name = n;
+  this.sheets[n] = sh; return sh;
+};
+Spreadsheet.prototype.getId = function(){ return 'mock-spreadsheet-id'; };
 var __ss = new Spreadsheet();
+
+// The Sheets advanced service, which is the documented literal-write path.
+// valueInputOption RAW stores a value without parsing it, so this writes the
+// string through untouched. __sheetsEnabled lets a test run the fallback too.
+var __sheetsEnabled = true;
+var __rawWrites = [];
+var Sheets = {
+  Spreadsheets: {
+    Values: {
+      update: function(body, spreadsheetId, rangeA1, opts){
+        if (!__sheetsEnabled) throw new Error('advanced service disabled');
+        __rawWrites.push({ range: rangeA1, option: opts && opts.valueInputOption });
+        var m = /^(.*)!A([0-9]+)$/.exec(rangeA1);
+        var sheet = __ss.getSheetByName(m[1]);
+        var t = parseInt(m[2], 10) - 1;
+        while (sheet.rows.length <= t) sheet.rows.push([]);
+        // RAW: exactly what was sent, with no coercion at all.
+        sheet.rows[t] = body.values[0].slice();
+        return { updatedCells: body.values[0].length };
+      }
+    }
+  }
+};
 var SpreadsheetApp = { getActiveSpreadsheet: function(){ return __ss; } };
 var __lock = { waited: 0, released: 0 };
 var LockService = { getScriptLock: function(){ return {
@@ -107,9 +144,16 @@ apps_script_context <- function(columns) {
 
 apps_script_post <- function(ctx, values) {
   body <- jsonlite::toJSON(as.list(values), auto_unbox = TRUE)
-  ctx$eval(sprintf("doPost({ postData: { contents: %s } });",
+  # The collector's own JSON reply is kept, so a test can read what the
+  # collector told the respondent as well as what it stored.
+  ctx$eval(sprintf("__lastReply = doPost({ postData: { contents: %s } });",
                    jsonlite::toJSON(as.character(body), auto_unbox = TRUE)))
   invisible(ctx)
+}
+
+# The collector's JSON reply to the last submission, parsed.
+apps_script_reply <- function(ctx) {
+  jsonlite::fromJSON(ctx$get("__lastReply"))
 }
 
 # The stored cell, as a string, for one column of one collected row.

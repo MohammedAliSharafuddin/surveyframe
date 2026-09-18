@@ -259,13 +259,30 @@ sframe_resolve_decision_inputs <- function(data, roles, options, instrument,
       } else ""
     ))
   }
-  if (is.null(names(out$weights)) && length(criteria) == length(out$weights)) {
+  # Align by name against the criteria the resolved matrix actually has.
+  # sframe_decision_options() aligns whatever it can, but a collected
+  # performance matrix is built here, after options were normalised, so at that
+  # point there were no criterion names to align against. Named weights were
+  # then carried through and applied by position, which is how a matrix ordered
+  # price, quality took weights supplied as quality, price the wrong way round.
+  if (length(criteria) > 0 && length(out$weights) == length(criteria)) {
+    out$weights <- sframe_align_to_criteria(
+      out$weights, names(out$weights), criteria, "`options$weights`")
+  } else if (is.null(names(out$weights)) &&
+             length(criteria) == length(out$weights)) {
     names(out$weights) <- criteria
   }
 
-  # 3. Criterion directions. All benefit unless declared otherwise.
+  # 3. Criterion directions. All benefit unless declared otherwise, and aligned
+  # by name for the same reason as the weights.
   out$criteria_types <- options[["criteria_types"]] %||%
     rep("benefit", ncol(out$matrix))
+  if (length(criteria) > 0 && length(out$criteria_types) == length(criteria) &&
+      !is.null(names(out$criteria_types))) {
+    out$criteria_types <- sframe_align_to_criteria(
+      out$criteria_types, names(out$criteria_types), criteria,
+      "`options$criteria_types`")
+  }
   out$alternatives <- rownames(out$matrix)
   out$criteria <- criteria
   out$options <- options

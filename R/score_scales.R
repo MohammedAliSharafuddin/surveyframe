@@ -98,7 +98,16 @@ sframe_scale_matrix <- function(data, instrument, scale, cols) {
 # Refuses scoring when a scale id names data score_scales() would overwrite: an
 # item, an expansion column, or response metadata. validate_sframe() reports the
 # same collision, and this guards instruments that were never validated.
-sframe_check_score_columns <- function(instrument) {
+#
+# `data` matters as much as the declaration. The declared ids alone missed a
+# collision with a column the responses actually carry and the instrument never
+# mentions, so a scale called "site" replaced a collected "site" column with
+# its own scores and the metadata was gone.
+#
+# The rule is explicit: a scale's score column has to be a new column. Scoring
+# an already-scored frame is done by dropping those columns first, which says
+# what is being replaced instead of replacing it silently.
+sframe_check_score_columns <- function(instrument, data = NULL) {
   scale_ids <- vapply(instrument$scales, function(s) s$id, character(1))
   item_ids <- vapply(instrument$items, function(i) i$id, character(1))
   taken <- c(item_ids, sframe_item_expansion_columns(instrument),
@@ -113,6 +122,21 @@ sframe_check_score_columns <- function(instrument) {
                    "Rename the scale.")),
       class = c("sframe_validation_error", "sframe_error")
     )
+  }
+  if (!is.null(data)) {
+    in_data <- intersect(scale_ids, colnames(data))
+    if (length(in_data) > 0) {
+      rlang::abort(
+        c(paste0("The responses already hold a column named ",
+                 paste0("'", in_data, "'", collapse = ", "),
+                 ", which is also a scale ID."),
+          i = paste0("score_scales() stores each score in a column named by ",
+                     "its scale ID, so scoring would replace that data. ",
+                     "Rename the scale, or drop the column first where it ",
+                     "holds scores from an earlier run.")),
+        class = c("sframe_validation_error", "sframe_error")
+      )
+    }
   }
   invisible(TRUE)
 }
@@ -194,7 +218,7 @@ score_scales <- function(data, instrument, keep_items = TRUE, keep_meta = TRUE) 
   stopifnot(is.data.frame(data))
 
   item_ids <- vapply(instrument$items, function(i) i$id, character(1))
-  sframe_check_score_columns(instrument)
+  sframe_check_score_columns(instrument, data)
 
   scored <- data
 
