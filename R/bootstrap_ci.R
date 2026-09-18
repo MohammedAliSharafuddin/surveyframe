@@ -321,13 +321,15 @@ sframe_fisher_z_ci <- function(r, n, conf.level = 0.95) {
 # so runners on degenerate data keep their 0.3.3 output.
 sframe_ci_string <- function(ci) {
   if (!is.null(ci) && !is.null(attr(ci, "reason"))) {
-    return(sprintf(" [no bootstrap interval: %s]", attr(ci, "reason")))
+    return(sprintf(", no bootstrap interval: %s", attr(ci, "reason")))
   }
   if (is.null(ci) || anyNA(ci[c("lower", "upper")])) return("")
   # A bare bracketed pair says nothing about what it covers, and APA asks for
   # the level. The level travels on the interval where a caller set one.
   level <- attr(ci, "level") %||% 0.95
-  sprintf(" %g%% CI [%.2f, %.2f]", 100 * level, ci[["lower"]], ci[["upper"]])
+  # ", 95% CI [a, b]" reads as APA writes it: the estimate, a comma, then the
+  # labelled interval. A bare bracketed pair said nothing about the level.
+  sprintf(", %g%% CI [%.2f, %.2f]", 100 * level, ci[["lower"]], ci[["upper"]])
 }
 
 # --- Internal helpers backing the runners' CI keys ------------------------

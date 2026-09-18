@@ -525,8 +525,22 @@ test_that("friedman, partial_correlation, and mediation tables are populated", {
 
   med <- by_test("mediation")
   skip_if(length(med) == 0, "demo plan has no mediation block")
-  expect_identical(med[[1]]$table$Effect,
-                   c("Direct (c')", "Indirect (a×b)", "Total (c)"))
+  # 0.4.2 reports the a and b paths and names the predictor, mediator and
+  # outcome in each label, so a reader can see which model produced the
+  # effects and whether a and b share a sign. It used to give the 3 effects
+  # alone, with no variable named.
+  effects <- med[[1]]$table$Effect
+  expect_length(effects, 5)
+  expect_true(any(grepl("^a ", effects)))
+  expect_true(any(grepl("^b ", effects)))
+  expect_true(any(grepl("Direct", effects, fixed = TRUE)))
+  expect_true(any(grepl("Indirect", effects, fixed = TRUE)))
+  expect_true(any(grepl("Total", effects, fixed = TRUE)))
+  # the variables are named, so the label is more than a Greek letter
+  vars <- med[[1]]$vars
+  expect_true(all(vapply(vars, function(v) {
+    any(grepl(v, effects, fixed = TRUE))
+  }, logical(1))))
 })
 
 test_that("moderation, logistic, and repeated-measures plots draw", {
