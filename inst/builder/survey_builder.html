@@ -371,6 +371,9 @@ input,textarea,select{font-family:inherit;font-size:13px}
 .alert-w{background:var(--cw-l);color:var(--cw-t);border:1px solid var(--cw-bd);
   padding:9px 12px;border-radius:var(--r);font-size:12px;line-height:1.5}
 
+.pv-note{margin:0 8px 10px;padding:9px 12px;border:1px solid var(--cb);
+  border-left:3px solid var(--toast-warn);border-radius:6px;background:var(--t1);
+  color:var(--t2);font-size:12px;line-height:1.5}
 /* -- Preview --------------------------------------------------------------
    Theme B renderer, mirroring inst/static_survey/template.html so the
    Preview tab matches the exported survey: serif question typography,
@@ -726,7 +729,7 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
              aria-label="Search items" oninput="renderItemList()">
     </div>
   </div>
-  <div class="sb-body" id="itemList" role="list" aria-label="Survey items"></div>
+  <div class="sb-body" id="itemList" role="listbox" aria-label="Survey items"></div>
   <div class="sb-footer">
     <!-- The former single Add-question menu is split into four controls
          (v0.3.4 builder rework): question types, section break, branching,
@@ -819,6 +822,16 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
         <div class="pvtab active" onclick="setPvTab('survey')"   id="pvt-survey">Survey</div>
         <div class="pvtab"        onclick="setPvTab('thankyou')" id="pvt-thankyou">Thank You</div>
       </div>
+    </div>
+    <!-- What this preview does and does not establish. It renders layout and
+         wording from the builder's own markup; it does not run the deployed
+         survey's answer, validation and branching lifecycle, so a researcher
+         cannot tell from here whether a required or conditional survey is
+         answerable. Export the survey and open it to test that. -->
+    <div class="pv-note" id="pvNote" role="note">
+      <strong>Layout preview.</strong> This shows wording, order and branding.
+      Answering, required checks and branching are not exercised here, so use
+      <em>Export survey</em> and open the file to test the respondent's path.
     </div>
     <div class="pv-frame" id="pvFrame"></div>
   </div>
@@ -1190,6 +1203,10 @@ input,textarea,select{font-family:inherit;font-size:15px}
   outline:3px solid var(--deep);outline-offset:2px}
 
 /* Likert: numbered square buttons with tiny labels, single-colour theme */
+/* Announced by a screen reader, off screen for everyone else. Carries the
+   page heading that focus moves to on a page change. */
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;
+  overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 .likert-row{display:flex;gap:9px;overflow-x:auto;padding-bottom:2px}
 .likert-opt{flex:1;min-width:56px;display:flex;flex-direction:column;align-items:center;
   gap:4px;padding:10px 4px;min-height:58px;border:1px solid var(--cb);border-radius:6px;
@@ -1348,7 +1365,18 @@ textarea.inp-std:focus{border-color:var(--cp);box-shadow:0 0 0 3px color-mix(in 
   .star-btn{font-size:31px}
   .prog-hdr{padding:9px 14px}
   .btn{padding:10px 20px}
-  .likert-opt{min-width:50px}
+  /* The strip stacks below 600px. Even at a 50px minimum, 7 options need
+     350px and the builder's 11-point NPS preset needs 550px before gaps, so
+     the full range cannot fit a 390px viewport and a participant saw part of
+     the scale with both endpoints off screen. Each option becomes a labelled
+     row, the same adaptation the matrix already makes, so every point of the
+     scale is visible and reachable without horizontal scrolling. */
+  .likert-row{flex-direction:column;gap:8px;overflow-x:visible}
+  .likert-opt{flex:none;width:100%;min-width:0;flex-direction:row;
+    align-items:center;justify-content:flex-start;gap:12px;
+    padding:12px 14px;min-height:44px;text-align:left}
+  .likert-num{font-size:16px;min-width:22px;text-align:center}
+  .likert-lbl{font-size:14px;max-width:none;flex:1}
 
   /* Matrix reflows into stacked row-cards below 600px: each matrix row
      becomes its own card and each column becomes a labelled tap target
@@ -1483,8 +1511,14 @@ function evaluate(op,actual,value){
     // from a hand-written file or an older builder. Arrays have no .split, so
     // assuming the string form threw and left the gated item hidden for good.
     case'%in%':{
-      var vals=Array.isArray(value)?value:String(value).split(',');
-      return vals.map(function(s){return String(s).trim();}).includes(String(actual).trim());
+      var vals=(Array.isArray(value)?value:String(value).split(',')).map(function(s){return String(s).trim();});
+      // A multi-select answer is stored comma-joined, so it is itself a set.
+      // Comparing the whole string meant selecting a and b matched no rule
+      // allowing either. Any selected value the rule allows satisfies it,
+      // which is what the Shiny evaluator does with the selected vector.
+      var given=String(actual).split(',').map(function(s){return s.trim();})
+        .filter(function(s){return s!=='';});
+      return given.some(function(g){return vals.includes(g);});
     }
     case'>': return !isNaN(an)&&!isNaN(vn)&&an>vn;
     case'>=':return !isNaN(an)&&!isNaN(vn)&&an>=vn;
@@ -1573,7 +1607,8 @@ function renderTextBlock(item){
 }
 function renderLikert(item,cs){
   var saved=responses[item.id];
-  return'<div class="likert-row" role="radiogroup" aria-labelledby="q_'+esc(item.id)+'">'+cs.values.map(function(v,i){
+  return'<div class="likert-row" role="radiogroup" aria-labelledby="q_'+esc(item.id)+'"'
+    +' aria-describedby="err_'+esc(item.id)+'">'+cs.values.map(function(v,i){
     var checked=String(saved)===String(v);
     return'<label class="likert-opt"><input type="radio" name="'+esc(item.id)+'" value="'+esc(v)+'"'+(checked?' checked':'')
       +(item.required?' aria-required="true"':'')
@@ -1584,7 +1619,10 @@ function renderLikert(item,cs){
 }
 function renderSingle(item,cs){
   var saved=responses[item.id];
-  return'<div class="choice-list">'+cs.values.map(function(v,i){
+  // A named radiogroup, so an option is announced with its question. Without
+  // it a screen reader read "Low" with nothing to say what was being asked.
+  return'<div class="choice-list" role="radiogroup" aria-labelledby="q_'+esc(item.id)+'"'
+    +' aria-describedby="err_'+esc(item.id)+'">'+cs.values.map(function(v,i){
     var checked=String(saved)===String(v);
     return'<label class="choice-opt"><input type="radio" name="'+esc(item.id)+'" value="'+esc(v)+'"'
       +(checked?' checked':'')+(item.required?' aria-required="true"':'')
@@ -1594,7 +1632,9 @@ function renderSingle(item,cs){
 }
 function renderMulti(item,cs){
   var saved=(responses[item.id]||'').split(',').filter(Boolean);
-  return'<div class="choice-list">'+cs.values.map(function(v,i){
+  // A group, not a radiogroup: several answers are allowed here.
+  return'<div class="choice-list" role="group" aria-labelledby="q_'+esc(item.id)+'"'
+    +' aria-describedby="err_'+esc(item.id)+'">'+cs.values.map(function(v,i){
     var chk=saved.includes(String(v));
     return'<label class="choice-opt"><input type="checkbox" name="'+esc(item.id)+'" value="'+esc(v)+'"'
       +(chk?' checked':'')+(item.required?' aria-required="true"':'')
@@ -1812,11 +1852,17 @@ function renderRating(item){
   var saved=parseInt(responses[item.id])||0;
   var stars='';
   for(var i=1;i<=mx;i++){
+    // Each star is a radio that reports its own state, so a participant
+    // returning to the question hears what they chose. The buttons used to
+    // announce "3 of 5" with no question name and no selected state at all.
     stars+='<button type="button" class="star-btn'+(i<=saved?' active':'')+'" data-id="'+esc(item.id)+'" data-v="'+i+'"'
+      +' role="radio" aria-checked="'+(i===saved?'true':'false')+'"'
       +' onclick="setRating(\''+esc(item.id)+'\','+i+','+mx+')"'
       +' aria-label="'+i+' of '+mx+'">'+icon+'</button>';
   }
-  return'<div class="star-row" id="stars_'+esc(item.id)+'">'+stars+'</div>';
+  return'<div class="star-row" id="stars_'+esc(item.id)+'" role="radiogroup"'
+    +' aria-labelledby="q_'+esc(item.id)+'"'
+    +' aria-describedby="err_'+esc(item.id)+'">'+stars+'</div>';
 }
 function renderRanking(item,cs){
   if(!rankOrders[item.id]){
@@ -1866,7 +1912,13 @@ function setRating(id,val,max){
   var err=document.getElementById('err_'+id);
   if(err)err.classList.remove('show');
   var btns=document.querySelectorAll('.star-btn[data-id="'+id+'"]');
-  btns.forEach(function(b){b.classList.toggle('active',parseInt(b.dataset.v)<=val);});
+  btns.forEach(function(b){
+    var v=parseInt(b.dataset.v);
+    b.classList.toggle('active',v<=val);
+    // The visual fill runs up to the choice; the reported state names the one
+    // chosen, which is what a screen reader announces.
+    if(b.setAttribute)b.setAttribute('aria-checked',v===val?'true':'false');
+  });
   // Every other answer handler refreshes branching. Leaving it out here kept a
   // question a rating reveals hidden until some other control was touched,
   // while validation, which reads the same rules, still demanded an answer.
@@ -1957,8 +2009,7 @@ function validatePage(items){
       var err=document.getElementById('err_'+item.id);
       if(err){err.textContent=msg;err.classList.add('show');}
       if(ok){
-        var el=document.getElementById('item_'+item.id);
-        if(el)el.scrollIntoView({behavior:'smooth',block:'center'});
+        focusProblem(item.id);
       }
       ok=false;
     }
@@ -1983,8 +2034,7 @@ function validatePage(items){
       var err=document.getElementById('err_'+item.id);
       if(err){err.textContent=msg;err.classList.add('show');}
       if(ok){
-        var el=document.getElementById('item_'+item.id);
-        if(el)el.scrollIntoView({behavior:'smooth',block:'center'});
+        focusProblem(item.id);
       }
       ok=false;
     }
@@ -2001,8 +2051,7 @@ function validatePage(items){
         :'The points must add up to exactly 100 (currently '+t.total+').';
       if(err){err.textContent=cwMsg;err.classList.add('show');}
       if(ok){
-        var el=document.getElementById('item_'+item.id);
-        if(el)el.scrollIntoView({behavior:'smooth',block:'center'});
+        focusProblem(item.id);
       }
       ok=false;
     }
@@ -2018,8 +2067,7 @@ function validatePage(items){
         :'This question is required.';
       if(err){err.textContent=reqMsg;err.classList.add('show');}
       if(ok){
-        var el=document.getElementById('item_'+item.id);
-        if(el)el.scrollIntoView({behavior:'smooth',block:'center'});
+        focusProblem(item.id);
       }
       ok=false;
     }
@@ -2043,6 +2091,27 @@ function startSurvey(){
   currentPage=1;
   renderScreen();
 }
+// Scrolling alone told a keyboard or screen-reader user that something was
+// wrong somewhere off screen. Focus moves to the question with the problem, so
+// the error, which each group names through aria-describedby, is announced
+// with the control that has it.
+function focusProblem(itemId){
+  var el=document.getElementById('item_'+itemId);
+  if(!el)return;
+  if(el.scrollIntoView)el.scrollIntoView({behavior:'smooth',block:'center'});
+  var ctrl=el.querySelector?el.querySelector('input,select,textarea,button'):null;
+  var target=ctrl||el;
+  if(target.setAttribute&&!ctrl)target.setAttribute('tabindex','-1');
+  if(target.focus)target.focus();
+}
+// A page change replaces the whole card, so focus has to be placed again or it
+// sits on a button that no longer exists.
+function focusPageStart(){
+  var el=document.getElementById('page-heading');
+  if(!el)return;
+  if(el.setAttribute)el.setAttribute('tabindex','-1');
+  if(el.focus)el.focus();
+}
 function nextPage(){
   var items=pages[currentPage-1]||[];
   if(!validatePage(items))return;
@@ -2050,12 +2119,14 @@ function nextPage(){
   currentPage++;
   renderScreen();
   window.scrollTo({top:0,behavior:'smooth'});
+  focusPageStart();
 }
 function prevPage(){
   if(currentPage<=1)return;
   currentPage--;
   renderScreen();
   window.scrollTo({top:0,behavior:'smooth'});
+  focusPageStart();
 }
 
 // ── Submission ─────────────────────────────────────────────────────────────
@@ -2284,6 +2355,8 @@ function renderSurvey(){
     ?'<div class="q-eyebrow">Question '+currentPage+' of '+maxPage+'</div>'
     :'';
   el.innerHTML='<div class="card"><div class="card-body">'
+    +'<h2 id="page-heading" class="sr-only">'+esc(SF.meta.title)
+    +(maxPage>1?' \u2014 page '+currentPage+' of '+maxPage:'')+'</h2>'
     +(currentPage===1?'<h1 class="wl-title" style="margin-bottom:6px">'+esc(SF.meta.title)+'</h1>'+(SF.meta.description?'<div style="color:var(--t2);font-size:14px;line-height:1.55;margin-bottom:22px">'+esc(SF.meta.description)+'</div>':''):'')
     +paginationInfo
     +'<div id="survey-err" class="err-banner">Please answer all required questions before continuing.</div>'
@@ -2552,8 +2625,48 @@ function gv(id){return(document.getElementById(id)||{}).value||'';}
 function sv(id,v){var e=document.getElementById(id);if(e)e.value=v||'';}
 
 // -- Autosave ---------------------------------------------------------------
-function autoSave(){if(!dirty)return;try{localStorage.setItem('sf_as',JSON.stringify({state:S,ts:Date.now()}));}catch(e){}}
-function chkAutoSave(){try{var d=localStorage.getItem('sf_as');if(!d)return;var p=JSON.parse(d),age=Math.round((Date.now()-p.ts)/60000);if(age>120)return;document.getElementById('recTime').textContent=age+'min';document.getElementById('recBan').hidden=false;window._as=p.state;}catch(e){}}
+// A save that cannot write is worse than none, because the researcher carries
+// on believing their work is held. A private window, blocked site data or a
+// full quota all land here, and the failure used to go into an empty catch.
+var autosaveUnavailable=false;
+function autoSave(){
+  if(!dirty)return;
+  try{
+    localStorage.setItem('sf_as',JSON.stringify({state:S,ts:Date.now()}));
+    autosaveUnavailable=false;
+  }catch(e){
+    if(!autosaveUnavailable){
+      autosaveUnavailable=true;
+      toast('Autosave is unavailable in this browser. Save the .sframe yourself.','warn');
+    }
+  }
+}
+// How old a recovery is, in the unit a researcher reads it in.
+function recoveryAge(ms){
+  var mins=Math.max(0,Math.round(ms/60000));
+  if(mins<60)return mins+' min';
+  var hours=Math.round(mins/60);
+  if(hours<24)return hours+(hours===1?' hour':' hours');
+  var days=Math.round(hours/24);
+  return days+(days===1?' day':' days');
+}
+// An autosave is offered however old it is, and goes only when the researcher
+// dismisses it. The old 120-minute cutoff silently withheld recoverable work,
+// so returning the next day showed an empty builder with the session still
+// sitting in storage.
+function chkAutoSave(){
+  try{
+    var d=localStorage.getItem('sf_as');
+    if(!d)return;
+    var p=JSON.parse(d);
+    if(!p||!p.state)return;
+    document.getElementById('recTime').textContent=recoveryAge(Date.now()-(p.ts||Date.now()));
+    document.getElementById('recBan').hidden=false;
+    window._as=p.state;
+  }catch(e){
+    autosaveUnavailable=true;
+  }
+}
 function restoreAuto(){if(window._as){S=window._as;ra();setDirty();toast('Session restored','ok');}dismissRec();}
 function dismissRec(){document.getElementById('recBan').hidden=true;try{localStorage.removeItem('sf_as');}catch(e){}}
 setInterval(autoSave,30000);window.addEventListener('beforeunload',autoSave);
@@ -2577,8 +2690,23 @@ document.addEventListener('click',function(e){var m=document.getElementById('fab
 function setMode(m){document.querySelectorAll('.m-btn').forEach(function(b){b.setAttribute('aria-pressed',b.dataset.mode===m?'true':'false');});document.querySelectorAll('.mp').forEach(function(p){p.classList.remove('active');});document.getElementById('mp-'+m).classList.add('active');if(m==='preview')renderPreview();if(m==='analyse')renderAnalyse();}
 
 // -- Modals -----------------------------------------------------------------
-function openModal(id){document.getElementById(id).classList.add('open');}
-function closeModal(id){document.getElementById(id).classList.remove('open');if(id==='m-rq')stopRQPlaceholders();}
+// What had focus before a dialog opened, so closing it returns the keyboard
+// user where they were. Opening used to add a class and nothing else, leaving
+// focus behind the dialog entirely.
+var __modalReturn=null;
+function openModal(id){
+  __modalReturn=document.activeElement;
+  var m=document.getElementById(id);
+  m.classList.add('open');
+  var first=m.querySelector('input,select,textarea,button');
+  if(first&&first.focus)first.focus();
+}
+function closeModal(id){
+  document.getElementById(id).classList.remove('open');
+  if(id==='m-rq')stopRQPlaceholders();
+  if(__modalReturn&&__modalReturn.focus)__modalReturn.focus();
+  __modalReturn=null;
+}
 
 // -- Animated sample placeholders (Add Analysis Plan modal) -----------------
 // The Research question and Planned decision rule placeholders cycle
@@ -2814,12 +2942,14 @@ var TB={likert:'b-li',single_choice:'b-si',multiple_choice:'b-mu',numeric:'b-nu'
 function renderItemList(){
   var el=document.getElementById('itemList'),q=(gv('itemSearch')||'').toLowerCase();
   var items=S.items.filter(function(i){return!q||(i.label||'').toLowerCase().includes(q)||(i.id||'').toLowerCase().includes(q);});
-  // role="list" requires every child to be a listitem. The empty state is a
-  // panel of guidance, not a list of anything, so the role is dropped while
-  // it is showing and restored once there are items. Without this, an empty
-  // survey fails WCAG's aria-required-children, which axe rates critical, and
-  // a screen reader announces a list containing nothing it can describe.
-  if(!items.length){el.removeAttribute('role');}else{el.setAttribute('role','list');}
+  // role="listbox" requires every child to be an option, which is what a
+  // question row is: choosing one opens it for editing, so it reports
+  // aria-selected. The empty state is a panel of guidance and no list of
+  // anything, so the role is dropped while it is showing and restored once
+  // there are items. Without this, an empty survey fails WCAG's
+  // aria-required-children, which axe rates critical, and a screen reader
+  // announces a list containing nothing it can describe.
+  if(!items.length){el.removeAttribute('role');}else{el.setAttribute('role','listbox');}
   if(!items.length){el.innerHTML='<div class="sb-empty"><div class="sb-empty-ic">&#128196;</div><div class="sb-empty-t">No questions yet</div><div class="sb-empty-b">Use "+ Add question" below to choose a question type, or start from an existing file.</div><div class="sb-empty-cta"><button type="button" class="sb-cta-s" onclick="openFile()">Open an existing .sframe</button><button type="button" class="sb-cta-s" onclick="openSettings()">Set up survey settings</button></div></div>';return;}
   var cp=null;
   el.innerHTML=items.map(function(item){
@@ -2835,10 +2965,47 @@ function renderItemList(){
     if(sc)bgs.push('<span class="badge b-sc">'+esc(sc.id)+'</span>');
     if(item.reverse)bgs.push('<span class="badge b-rv">rev</span>');
     if(ck)bgs.push('<span class="badge b-ck">attn</span>');
-    return pd+'<div class="ic'+(selId===item.id?' sel':'')+'" role="listitem" draggable="true" data-idx="'+ri+'" data-id="'+esc(item.id)+'" onclick="selItem(\''+item.id+'\')" ondragstart="dStart(event,'+ri+')" ondragover="dOver(event,'+ri+',event)" ondrop="dDrop(event,'+ri+')" ondragleave="this.classList.remove(\'drag-t\',\'drag-b\')"><div class="ic-h" title="Drag to reorder">&#8942;</div><div class="ic-body"><div class="'+lc+'">'+esc(item.label||'(no label)')+'</div><div class="ic-meta">'+bgs.join('')+'</div></div><div class="ic-acts"><button type="button" class="ib" title="Duplicate" aria-label="Duplicate question" onclick="event.stopPropagation();dupItem(\''+item.id+'\')">&#10697;</button><button type="button" class="ib del" title="Delete" aria-label="Delete question" onclick="event.stopPropagation();delItem(\''+item.id+'\')">&#128465;</button></div></div>';
+    // The row is focusable and answers Enter, Space and the arrow keys, where
+    // it used to be a plain div with a click handler and no keyboard route to
+    // selecting a question for editing. Ordering gains explicit named buttons,
+    // since drag handlers alone leave a keyboard user with no way to reorder.
+    return pd+'<div class="ic'+(selId===item.id?' sel':'')+'" role="option" tabindex="0" aria-selected="'+(selId===item.id?'true':'false')+'" draggable="true" data-idx="'+ri+'" data-id="'+esc(item.id)+'" onclick="selItem(\''+item.id+'\')" onkeydown="itemRowKey(event,\''+item.id+'\','+ri+')" ondragstart="dStart(event,'+ri+')" ondragover="dOver(event,'+ri+',event)" ondrop="dDrop(event,'+ri+')" ondragleave="this.classList.remove(\'drag-t\',\'drag-b\')"><div class="ic-h" title="Drag to reorder" aria-hidden="true">&#8942;</div><div class="ic-body"><div class="'+lc+'">'+esc(item.label||'(no label)')+'</div><div class="ic-meta">'+bgs.join('')+'</div></div><div class="ic-acts"><button type="button" class="ib" title="Move up" aria-label="Move question up" onclick="event.stopPropagation();moveItemBy('+ri+',-1)">&#8593;</button><button type="button" class="ib" title="Move down" aria-label="Move question down" onclick="event.stopPropagation();moveItemBy('+ri+',1)">&#8595;</button><button type="button" class="ib" title="Duplicate" aria-label="Duplicate question" onclick="event.stopPropagation();dupItem(\''+item.id+'\')">&#10697;</button><button type="button" class="ib del" title="Delete" aria-label="Delete question" onclick="event.stopPropagation();delItem(\''+item.id+'\')">&#128465;</button></div></div>';
   }).join('');
 }
 function selItem(id){selId=id;renderItemList();openInsp(id);}
+// Enter or Space opens a question for editing; Alt with an arrow moves it, so
+// ordering has a keyboard route alongside the drag handlers. A bare arrow
+// walks the list, leaving the browser's own Tab order intact.
+function itemRowKey(e,id,idx){
+  var k=e.key;
+  if(k==='Enter'||k===' '){e.preventDefault();selItem(id);return;}
+  if(e.altKey&&(k==='ArrowUp'||k==='ArrowDown')){
+    e.preventDefault();
+    moveItemBy(idx,k==='ArrowUp'?-1:1);
+    return;
+  }
+  if(k==='ArrowUp'||k==='ArrowDown'){
+    e.preventDefault();
+    var rows=document.querySelectorAll('.ic');
+    var next=idx+(k==='ArrowUp'?-1:1);
+    if(next<0||next>=rows.length)return;
+    if(rows[next]&&rows[next].focus)rows[next].focus();
+  }
+}
+// Moves a question one place, and records an undo step as the drag reorder
+// does. A move off either end does nothing.
+function moveItemBy(idx,delta){
+  var to=idx+delta;
+  if(idx<0||idx>=S.items.length||to<0||to>=S.items.length)return;
+  snap();
+  var moved=S.items.splice(idx,1)[0];
+  S.items.splice(to,0,moved);
+  renderItemList();
+  // Focus follows the question that moved, so a run of moves needs no
+  // reaching for the mouse.
+  var rows=document.querySelectorAll('.ic');
+  if(rows[to]&&rows[to].focus)rows[to].focus();
+}
 
 // -- Drag reorder -----------------------------------------------------------
 function dStart(e,idx){dragSrc=idx;e.currentTarget.classList.add('dragging');}

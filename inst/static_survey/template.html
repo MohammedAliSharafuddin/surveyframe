@@ -98,6 +98,10 @@ input,textarea,select{font-family:inherit;font-size:15px}
   outline:3px solid var(--deep);outline-offset:2px}
 
 /* Likert: numbered square buttons with tiny labels, single-colour theme */
+/* Announced by a screen reader, off screen for everyone else. Carries the
+   page heading that focus moves to on a page change. */
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;
+  overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 .likert-row{display:flex;gap:9px;overflow-x:auto;padding-bottom:2px}
 .likert-opt{flex:1;min-width:56px;display:flex;flex-direction:column;align-items:center;
   gap:4px;padding:10px 4px;min-height:58px;border:1px solid var(--cb);border-radius:6px;
@@ -256,7 +260,18 @@ textarea.inp-std:focus{border-color:var(--cp);box-shadow:0 0 0 3px color-mix(in 
   .star-btn{font-size:31px}
   .prog-hdr{padding:9px 14px}
   .btn{padding:10px 20px}
-  .likert-opt{min-width:50px}
+  /* The strip stacks below 600px. Even at a 50px minimum, 7 options need
+     350px and the builder's 11-point NPS preset needs 550px before gaps, so
+     the full range cannot fit a 390px viewport and a participant saw part of
+     the scale with both endpoints off screen. Each option becomes a labelled
+     row, the same adaptation the matrix already makes, so every point of the
+     scale is visible and reachable without horizontal scrolling. */
+  .likert-row{flex-direction:column;gap:8px;overflow-x:visible}
+  .likert-opt{flex:none;width:100%;min-width:0;flex-direction:row;
+    align-items:center;justify-content:flex-start;gap:12px;
+    padding:12px 14px;min-height:44px;text-align:left}
+  .likert-num{font-size:16px;min-width:22px;text-align:center}
+  .likert-lbl{font-size:14px;max-width:none;flex:1}
 
   /* Matrix reflows into stacked row-cards below 600px: each matrix row
      becomes its own card and each column becomes a labelled tap target
@@ -391,8 +406,14 @@ function evaluate(op,actual,value){
     // from a hand-written file or an older builder. Arrays have no .split, so
     // assuming the string form threw and left the gated item hidden for good.
     case'%in%':{
-      var vals=Array.isArray(value)?value:String(value).split(',');
-      return vals.map(function(s){return String(s).trim();}).includes(String(actual).trim());
+      var vals=(Array.isArray(value)?value:String(value).split(',')).map(function(s){return String(s).trim();});
+      // A multi-select answer is stored comma-joined, so it is itself a set.
+      // Comparing the whole string meant selecting a and b matched no rule
+      // allowing either. Any selected value the rule allows satisfies it,
+      // which is what the Shiny evaluator does with the selected vector.
+      var given=String(actual).split(',').map(function(s){return s.trim();})
+        .filter(function(s){return s!=='';});
+      return given.some(function(g){return vals.includes(g);});
     }
     case'>': return !isNaN(an)&&!isNaN(vn)&&an>vn;
     case'>=':return !isNaN(an)&&!isNaN(vn)&&an>=vn;
@@ -481,7 +502,8 @@ function renderTextBlock(item){
 }
 function renderLikert(item,cs){
   var saved=responses[item.id];
-  return'<div class="likert-row" role="radiogroup" aria-labelledby="q_'+esc(item.id)+'">'+cs.values.map(function(v,i){
+  return'<div class="likert-row" role="radiogroup" aria-labelledby="q_'+esc(item.id)+'"'
+    +' aria-describedby="err_'+esc(item.id)+'">'+cs.values.map(function(v,i){
     var checked=String(saved)===String(v);
     return'<label class="likert-opt"><input type="radio" name="'+esc(item.id)+'" value="'+esc(v)+'"'+(checked?' checked':'')
       +(item.required?' aria-required="true"':'')
@@ -492,7 +514,10 @@ function renderLikert(item,cs){
 }
 function renderSingle(item,cs){
   var saved=responses[item.id];
-  return'<div class="choice-list">'+cs.values.map(function(v,i){
+  // A named radiogroup, so an option is announced with its question. Without
+  // it a screen reader read "Low" with nothing to say what was being asked.
+  return'<div class="choice-list" role="radiogroup" aria-labelledby="q_'+esc(item.id)+'"'
+    +' aria-describedby="err_'+esc(item.id)+'">'+cs.values.map(function(v,i){
     var checked=String(saved)===String(v);
     return'<label class="choice-opt"><input type="radio" name="'+esc(item.id)+'" value="'+esc(v)+'"'
       +(checked?' checked':'')+(item.required?' aria-required="true"':'')
@@ -502,7 +527,9 @@ function renderSingle(item,cs){
 }
 function renderMulti(item,cs){
   var saved=(responses[item.id]||'').split(',').filter(Boolean);
-  return'<div class="choice-list">'+cs.values.map(function(v,i){
+  // A group, not a radiogroup: several answers are allowed here.
+  return'<div class="choice-list" role="group" aria-labelledby="q_'+esc(item.id)+'"'
+    +' aria-describedby="err_'+esc(item.id)+'">'+cs.values.map(function(v,i){
     var chk=saved.includes(String(v));
     return'<label class="choice-opt"><input type="checkbox" name="'+esc(item.id)+'" value="'+esc(v)+'"'
       +(chk?' checked':'')+(item.required?' aria-required="true"':'')
@@ -720,11 +747,17 @@ function renderRating(item){
   var saved=parseInt(responses[item.id])||0;
   var stars='';
   for(var i=1;i<=mx;i++){
+    // Each star is a radio that reports its own state, so a participant
+    // returning to the question hears what they chose. The buttons used to
+    // announce "3 of 5" with no question name and no selected state at all.
     stars+='<button type="button" class="star-btn'+(i<=saved?' active':'')+'" data-id="'+esc(item.id)+'" data-v="'+i+'"'
+      +' role="radio" aria-checked="'+(i===saved?'true':'false')+'"'
       +' onclick="setRating(\''+esc(item.id)+'\','+i+','+mx+')"'
       +' aria-label="'+i+' of '+mx+'">'+icon+'</button>';
   }
-  return'<div class="star-row" id="stars_'+esc(item.id)+'">'+stars+'</div>';
+  return'<div class="star-row" id="stars_'+esc(item.id)+'" role="radiogroup"'
+    +' aria-labelledby="q_'+esc(item.id)+'"'
+    +' aria-describedby="err_'+esc(item.id)+'">'+stars+'</div>';
 }
 function renderRanking(item,cs){
   if(!rankOrders[item.id]){
@@ -774,7 +807,13 @@ function setRating(id,val,max){
   var err=document.getElementById('err_'+id);
   if(err)err.classList.remove('show');
   var btns=document.querySelectorAll('.star-btn[data-id="'+id+'"]');
-  btns.forEach(function(b){b.classList.toggle('active',parseInt(b.dataset.v)<=val);});
+  btns.forEach(function(b){
+    var v=parseInt(b.dataset.v);
+    b.classList.toggle('active',v<=val);
+    // The visual fill runs up to the choice; the reported state names the one
+    // chosen, which is what a screen reader announces.
+    if(b.setAttribute)b.setAttribute('aria-checked',v===val?'true':'false');
+  });
   // Every other answer handler refreshes branching. Leaving it out here kept a
   // question a rating reveals hidden until some other control was touched,
   // while validation, which reads the same rules, still demanded an answer.
@@ -865,8 +904,7 @@ function validatePage(items){
       var err=document.getElementById('err_'+item.id);
       if(err){err.textContent=msg;err.classList.add('show');}
       if(ok){
-        var el=document.getElementById('item_'+item.id);
-        if(el)el.scrollIntoView({behavior:'smooth',block:'center'});
+        focusProblem(item.id);
       }
       ok=false;
     }
@@ -891,8 +929,7 @@ function validatePage(items){
       var err=document.getElementById('err_'+item.id);
       if(err){err.textContent=msg;err.classList.add('show');}
       if(ok){
-        var el=document.getElementById('item_'+item.id);
-        if(el)el.scrollIntoView({behavior:'smooth',block:'center'});
+        focusProblem(item.id);
       }
       ok=false;
     }
@@ -909,8 +946,7 @@ function validatePage(items){
         :'The points must add up to exactly 100 (currently '+t.total+').';
       if(err){err.textContent=cwMsg;err.classList.add('show');}
       if(ok){
-        var el=document.getElementById('item_'+item.id);
-        if(el)el.scrollIntoView({behavior:'smooth',block:'center'});
+        focusProblem(item.id);
       }
       ok=false;
     }
@@ -926,8 +962,7 @@ function validatePage(items){
         :'This question is required.';
       if(err){err.textContent=reqMsg;err.classList.add('show');}
       if(ok){
-        var el=document.getElementById('item_'+item.id);
-        if(el)el.scrollIntoView({behavior:'smooth',block:'center'});
+        focusProblem(item.id);
       }
       ok=false;
     }
@@ -951,6 +986,27 @@ function startSurvey(){
   currentPage=1;
   renderScreen();
 }
+// Scrolling alone told a keyboard or screen-reader user that something was
+// wrong somewhere off screen. Focus moves to the question with the problem, so
+// the error, which each group names through aria-describedby, is announced
+// with the control that has it.
+function focusProblem(itemId){
+  var el=document.getElementById('item_'+itemId);
+  if(!el)return;
+  if(el.scrollIntoView)el.scrollIntoView({behavior:'smooth',block:'center'});
+  var ctrl=el.querySelector?el.querySelector('input,select,textarea,button'):null;
+  var target=ctrl||el;
+  if(target.setAttribute&&!ctrl)target.setAttribute('tabindex','-1');
+  if(target.focus)target.focus();
+}
+// A page change replaces the whole card, so focus has to be placed again or it
+// sits on a button that no longer exists.
+function focusPageStart(){
+  var el=document.getElementById('page-heading');
+  if(!el)return;
+  if(el.setAttribute)el.setAttribute('tabindex','-1');
+  if(el.focus)el.focus();
+}
 function nextPage(){
   var items=pages[currentPage-1]||[];
   if(!validatePage(items))return;
@@ -958,12 +1014,14 @@ function nextPage(){
   currentPage++;
   renderScreen();
   window.scrollTo({top:0,behavior:'smooth'});
+  focusPageStart();
 }
 function prevPage(){
   if(currentPage<=1)return;
   currentPage--;
   renderScreen();
   window.scrollTo({top:0,behavior:'smooth'});
+  focusPageStart();
 }
 
 // ── Submission ─────────────────────────────────────────────────────────────
@@ -1192,6 +1250,8 @@ function renderSurvey(){
     ?'<div class="q-eyebrow">Question '+currentPage+' of '+maxPage+'</div>'
     :'';
   el.innerHTML='<div class="card"><div class="card-body">'
+    +'<h2 id="page-heading" class="sr-only">'+esc(SF.meta.title)
+    +(maxPage>1?' \u2014 page '+currentPage+' of '+maxPage:'')+'</h2>'
     +(currentPage===1?'<h1 class="wl-title" style="margin-bottom:6px">'+esc(SF.meta.title)+'</h1>'+(SF.meta.description?'<div style="color:var(--t2);font-size:14px;line-height:1.55;margin-bottom:22px">'+esc(SF.meta.description)+'</div>':''):'')
     +paginationInfo
     +'<div id="survey-err" class="err-banner">Please answer all required questions before continuing.</div>'

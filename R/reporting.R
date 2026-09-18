@@ -390,19 +390,11 @@ render_report <- function(
       # Passed rather than looked up inside the template: Quarto renders in a
       # separate R session against the installed package, which is not
       # necessarily the build doing the rendering.
-      analysis_seed       = as.character(sframe_report_seed(data, instrument))
+      analysis_seed       = as.character(
+        sframe_report_seed(data, instrument, include_analysis))
     )
 
-    param_args <- unlist(lapply(names(params), function(name) {
-      value <- params[[name]]
-      if (is.logical(value)) {
-        value <- tolower(as.character(value))
-      }
-      if (is.character(value)) {
-        value <- normalizePath(value, winslash = "/", mustWork = FALSE)
-      }
-      c("-P", paste0(name, ":", value))
-    }), use.names = FALSE)
+    param_args <- sframe_quarto_param_args(params)
     # Render with the working directory set to the render dir so Quarto creates
     # its intermediate `*_files/libs` there and can inline them for
     # embed-resources. Output next to the input, then copy to the destination.
@@ -453,6 +445,32 @@ render_report <- function(
   sframe_report_result(dest, "html")
 }
 
+# The "-P name:value" arguments for a Quarto render.
+#
+# system2() joins its args into one command line, so a value containing a space
+# used to split into several shell arguments. Each value is quoted here, which
+# keeps it whole whatever it holds.
+#
+# Only the parameters that name a file are normalised. normalizePath() used to
+# run over every character value, so the seed text "not applicable, no analysis
+# plan run" was rewritten as an absolute path under the working directory.
+sframe_quarto_param_names_path <- c("instrument_path", "data_path",
+                                    "interpretations_path")
+
+sframe_quarto_param_args <- function(params) {
+  unlist(lapply(names(params), function(name) {
+    value <- params[[name]]
+    if (is.logical(value)) {
+      value <- tolower(as.character(value))
+    }
+    if (is.character(value) && name %in% sframe_quarto_param_names_path &&
+        nzchar(value)) {
+      value <- normalizePath(value, winslash = "/", mustWork = FALSE)
+    }
+    c("-P", shQuote(paste0(name, ":", value)))
+  }), use.names = FALSE)
+}
+
 # The 2 engines produce different documents from identical inputs, so a caller
 # needs to know which one ran. It is announced 3 ways: a message for the
 # console, an attribute for a script, and a line in the report for whoever
@@ -461,8 +479,13 @@ render_report <- function(
 # it on its result; when there is no plan to run there is nothing random to
 # reproduce, so the field says so rather than printing a seed that governed
 # nothing.
-sframe_report_seed <- function(data, instrument) {
-  if (is.null(data) || length(instrument$analysis_plan %||% list()) == 0) {
+# The seed the report's analysis ran under, or a statement that none did.
+# Asking only whether data and a plan existed meant a report rendered with
+# include_analysis = FALSE printed a seed beside the instrument hash, which
+# reads as provenance for an analysis that never ran.
+sframe_report_seed <- function(data, instrument, include_analysis = TRUE) {
+  if (!isTRUE(include_analysis) || is.null(data) ||
+      length(instrument$analysis_plan %||% list()) == 0) {
     return("not applicable, no analysis plan run")
   }
   formals(run_analysis_plan)$seed %||% "unseeded"
@@ -685,7 +708,7 @@ sframe_clean_interpretations <- function(interpretations) {
     Value = c(
       sframe_hash_value(instrument),
       "built-in HTML",
-      as.character(sframe_report_seed(data, instrument)),
+      as.character(sframe_report_seed(data, instrument, include_analysis)),
       format(Sys.time(), "%Y-%m-%d %H:%M %Z")
     ),
     stringsAsFactors = FALSE

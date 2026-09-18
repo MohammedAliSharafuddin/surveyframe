@@ -2393,8 +2393,11 @@ server <- function(input, output, session) {
     # export_static_survey() instead of re-creating the layout with widgets.
     tmp <- tempfile(fileext = ".html")
     ok <- tryCatch({
+      # preview = TRUE strips the collector and the redirect, so the promise
+      # below is enforced by the export instead of trusted.
       suppressMessages(surveyframe::export_static_survey(
-        instr, output_path = tmp, open = FALSE, overwrite = TRUE
+        instr, output_path = tmp, open = FALSE, overwrite = TRUE,
+        preview = TRUE
       ))
       TRUE
     }, error = function(e) FALSE)
@@ -2405,7 +2408,10 @@ server <- function(input, output, session) {
     html <- paste(readLines(tmp, warn = FALSE, encoding = "UTF-8"), collapse = "\n")
     tagList(
       tags$p(class = "hint", style = "margin-bottom: 12px;",
-        "This is the exact deployable survey. Anything entered here stays in this preview."),
+        paste0("This is the deployable survey, exported with collection ",
+               "switched off. Anything entered here goes nowhere: the ",
+               "collector endpoint and the completion redirect are both ",
+               "removed from the preview.")),
       tags$iframe(
         srcdoc = html,
         style = "width:100%;height:78vh;border:1px solid var(--cb);border-radius:10px;background:#fff;",

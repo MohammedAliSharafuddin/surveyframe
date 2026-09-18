@@ -15,9 +15,17 @@ sframe_choices_lookup <- function(instrument) {
   )
 }
 
+# Every rule that controls an item, keyed by that item. Holding a single rule
+# per item meant a second rule on the same item replaced the first, so a
+# 2-condition gate ran on one condition. The static survey already kept them
+# all and combined them with AND; this is the same contract on the R side.
 sframe_branch_lookup <- function(instrument) {
   bl <- list()
-  for (rule in instrument$branching) bl[[rule$item_id]] <- rule
+  for (rule in instrument$branching %||% list()) {
+    id <- as.character(rule$item_id %||% "")[1]
+    if (!nzchar(id)) next
+    bl[[id]] <- c(bl[[id]] %||% list(), list(rule))
+  }
   bl
 }
 
@@ -36,6 +44,8 @@ sframe_theme_colour <- function(instrument, theme = NULL) {
   result <- switch(rule$operator,
     "=="   = any(dep_chr %in% rule_chr),
     "!="   = all(!dep_chr %in% rule_chr),
+    # A multi-select answer is itself a set, so any selected value the rule
+    # allows satisfies it.
     "%in%" = any(trimws(dep_chr) %in% sframe_branch_in_values(rule$value)),
     ">"    = any(!is.na(dep_num) & !is.na(rule_num) & dep_num > rule_num),
     ">="   = any(!is.na(dep_num) & !is.na(rule_num) & dep_num >= rule_num),
@@ -46,10 +56,40 @@ sframe_theme_colour <- function(instrument, theme = NULL) {
   if (rule$action == "show") result else !result
 }
 
-sframe_item_visible <- function(item, input_values, branch_lookup) {
-  rule <- branch_lookup[[item$id]]
-  if (is.null(rule)) return(TRUE)
-  .evaluate_branch(rule, input_values[[rule$depends_on]])
+# Whether an item is on screen. Rules on one item combine with AND, and a
+# controlling item that is itself hidden counts as unanswered, so visibility
+# cascades down a chain and a stale answer behind a closed branch cannot
+# reveal anything. `seen` stops a declared cycle recursing, matching the
+# static evaluator, which treats a repeat as visible so the walk terminates.
+sframe_item_visible <- function(item, input_values, branch_lookup,
+                                seen = character(0)) {
+  id <- as.character(item$id %||% "")[1]
+  rules <- branch_lookup[[id]]
+  if (is.null(rules) || length(rules) == 0) return(TRUE)
+  if (id %in% seen) return(TRUE)
+  seen <- c(seen, id)
+
+  for (rule in rules) {
+    dep <- as.character(rule$depends_on %||% "")[1]
+    dep_visible <- TRUE
+    if (nzchar(dep) && !is.null(branch_lookup[[dep]])) {
+      dep_visible <- sframe_item_visible(list(id = dep), input_values,
+                                         branch_lookup, seen)
+    }
+    dep_val <- if (dep_visible) input_values[[dep]] else NULL
+    if (!.evaluate_branch(rule, dep_val)) return(FALSE)
+  }
+  TRUE
+}
+
+# The items a conversational survey walks, in order, leaving out the ones
+# branching excludes. Navigation used to iterate every answerable item, so a
+# participant could be required to answer a question the contract excludes,
+# which serialisation then blanked.
+sframe_visible_sequence <- function(instrument, input_values, branch_lookup,
+                                    items = NULL) {
+  items <- items %||% (instrument$items %||% list())
+  Filter(function(i) sframe_item_visible(i, input_values, branch_lookup), items)
 }
 
 sframe_missing_value <- function(item, value) {
@@ -215,6 +255,61 @@ sframe_response_row <- function(instrument, input_values, branch_lookup,
     ),
     item_values
   ), stringsAsFactors = FALSE, check.names = FALSE))
+}
+
+# Submission has 2 steps that fail independently: writing the response, and
+# handing it to on_submit. They shared one error handler, so a callback failure
+# after a successful write told the participant nothing was saved and left them
+# on the form. Submitting again appended the same answers a second time.
+#
+# The state records what has already succeeded for this submission, so a retry
+# repeats only what is left. It is per session and per submission, which is
+# what makes a retry idempotent without changing the collected columns.
+sframe_new_submission_state <- function() {
+  list(saved = FALSE, notified = FALSE)
+}
+
+# Runs the outstanding steps and returns the state, whether the submission is
+# complete, and a message where a step failed.
+sframe_persist_response <- function(row, output_path, on_submit, state) {
+  state <- state %||% sframe_new_submission_state()
+
+  if (!isTRUE(state$saved)) {
+    if (is.null(output_path)) {
+      state$saved <- TRUE
+    } else {
+      err <- tryCatch({
+        sframe_append_response_csv(output_path, row)
+        NULL
+      }, error = function(e) e)
+      if (!is.null(err)) {
+        return(list(
+          state = state, saved = FALSE, notified = FALSE,
+          message = paste0("Your answers could not be saved: ",
+                           conditionMessage(err),
+                           " Your answers are still on this page, so you can ",
+                           "try again.")))
+      }
+      state$saved <- TRUE
+    }
+  }
+
+  if (!isTRUE(state$notified) && is.function(on_submit)) {
+    err <- tryCatch({
+      on_submit(row)
+      NULL
+    }, error = function(e) e)
+    if (!is.null(err)) {
+      return(list(
+        state = state, saved = TRUE, notified = FALSE,
+        message = paste0("Your answers are saved. A follow-up step failed: ",
+                         conditionMessage(err),
+                         " Trying again repeats that step alone, and will not ",
+                         "record your answers twice.")))
+    }
+  }
+  state$notified <- TRUE
+  list(state = state, saved = TRUE, notified = TRUE, message = NULL)
 }
 
 # The header of an existing response file, or NULL when there is none yet.
@@ -949,6 +1044,9 @@ render_survey <- function(
     page_state  <- shiny::reactiveVal("welcome")   # welcome | survey | thankyou
     conv_idx    <- shiny::reactiveVal(1L)
     submitted_row <- shiny::reactiveVal(NULL)
+    # What this submission has already done, so a retry after a failure
+    # repeats only the step that failed.
+    submission_state <- shiny::reactiveVal(sframe_new_submission_state())
 
     input_values <- shiny::reactive({ shiny::reactiveValuesToList(input) })
 
@@ -966,7 +1064,12 @@ render_survey <- function(
     shiny::observeEvent(input$conv_nav, {
       parts  <- strsplit(input$conv_nav, "_")[[1]]
       dir    <- parts[1]
-      items  <- Filter(function(i) i$type %in% answerable_types, instrument$items)
+      # Branching decides the sequence, so a question the contract excludes
+      # is never navigated to. Walking every answerable item could require an
+      # answer to a hidden question, which serialisation then blanked.
+      items  <- sframe_visible_sequence(
+        instrument, input_values(), branch_lookup,
+        Filter(function(i) i$type %in% answerable_types, instrument$items))
       n      <- length(items)
       cur    <- conv_idx()
       item   <- items[[cur]]
@@ -1001,20 +1104,21 @@ render_survey <- function(
           type = "error", duration = 6)
         return()
       }
-      row <- sframe_response_row(instrument, iv, bl, started_at)
-      err <- tryCatch({
-        if (identical(save_responses, "csv"))
-          sframe_append_response_csv(output_path, row)
-        if (is.function(on_submit)) on_submit(row)
-        NULL
-      }, error = function(e) e)
-      if (!is.null(err)) {
-        shiny::showNotification(
-          paste("Could not save response:", conditionMessage(err)),
-          type = "error", duration = 8)
+      row <- submitted_row() %||% sframe_response_row(instrument, iv, bl,
+                                                      started_at)
+      res <- sframe_persist_response(
+        row,
+        if (identical(save_responses, "csv")) output_path else NULL,
+        on_submit,
+        submission_state())
+      submission_state(res$state)
+      # The row is held so a retry writes the same answers, rather than
+      # rebuilding them from inputs that may have moved.
+      submitted_row(row)
+      if (!is.null(res$message)) {
+        shiny::showNotification(res$message, type = "error", duration = 10)
         return()
       }
-      submitted_row(row)
       page_state("thankyou")
     })
 
@@ -1092,15 +1196,20 @@ render_survey <- function(
       iv         <- shiny::isolate(input_values())
       all_items  <- instrument$items
       ans_items  <- Filter(function(i) i$type %in% answerable_types, all_items)
+      # Conversational mode shows one of these at a time, and it has to be the
+      # same sequence navigation walks or the index points at another question.
+      conv_items <- sframe_visible_sequence(instrument, iv, branch_lookup,
+                                            ans_items)
 
       progress_ui <- if (show_progress) shiny::uiOutput("sf_progress")
 
       # ---- CONVERSATIONAL MODE ----
       if (conv_mode) {
+        if (length(conv_items) == 0) return(NULL)
         cur  <- conv_idx()
-        cur  <- min(cur, length(ans_items))
-        item <- ans_items[[cur]]
-        n    <- length(ans_items)
+        cur  <- min(max(cur, 1), length(conv_items))
+        item <- conv_items[[cur]]
+        n    <- length(conv_items)
 
         item_ui <- tags$div(
           class = "sf-item-wrap",

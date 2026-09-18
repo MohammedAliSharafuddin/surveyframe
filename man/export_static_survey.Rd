@@ -9,7 +9,8 @@ export_static_survey(
   output_path = NULL,
   open = interactive(),
   endpoint_url = NULL,
-  overwrite = FALSE
+  overwrite = FALSE,
+  preview = FALSE
 )
 }
 \arguments{
@@ -27,6 +28,12 @@ collection mechanism.}
 
 \item{overwrite}{Logical. Whether to overwrite an existing file at
 \code{output_path}. Defaults to \code{FALSE}.}
+
+\item{preview}{Logical. \code{TRUE} exports a survey that collects nothing: the
+collector endpoint and the completion redirect are both removed, and the
+thank-you screen says the response went nowhere. This is what SurveyStudio's
+preview uses, so a test answer cannot reach a live study's collector.
+Supplying \code{endpoint_url} alongside it is an error. Defaults to \code{FALSE}.}
 }
 \value{
 The output path, invisibly.
