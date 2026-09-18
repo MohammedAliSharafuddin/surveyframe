@@ -21,11 +21,20 @@ function __mkClassList(){
     toggle:function(c,on){ if(on===undefined) on=!this._s[c]; if(on) this._s[c]=1; else delete this._s[c]; },
     contains:function(c){ return !!this._s[c]; } };
 }
+// The id of the element focused last, so a test can read where a keyboard
+// user would have been sent. ariaChecked and setAttribute are recorded too,
+// since a control's reported state is the thing under test.
+var __lastFocused = null;
 function __mkEl(id){
-  return { id:id, value:'', textContent:'', innerHTML:'', hidden:false, checked:false,
+  var el = { id:id, value:'', textContent:'', innerHTML:'', hidden:false, checked:false,
+    ariaChecked:null, attrs:{},
     dataset:{}, style:{ setProperty:function(){} }, classList:__mkClassList(),
     querySelectorAll:function(){ return []; }, querySelector:function(){ return null; },
-    scrollIntoView:function(){}, focus:function(){}, addEventListener:function(){} };
+    scrollIntoView:function(){}, addEventListener:function(){},
+    setAttribute:function(k,v){ this.attrs[k]=String(v); if(k==='aria-checked') this.ariaChecked=String(v); },
+    getAttribute:function(k){ return this.attrs[k]===undefined?null:this.attrs[k]; } };
+  el.focus = function(){ __lastFocused = el.id; };
+  return el;
 }
 // Elements a test registers against a selector, so code that reaches for a
 // group of controls (a radio strip, a paired select) can be driven.

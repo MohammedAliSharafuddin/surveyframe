@@ -169,6 +169,82 @@ This section grows as each group of fixes lands.
 * Changing a reactive instrument now resets the survey module, as its help
   said it did, and starts every answer blank. Moving between pages
   scrolls the module into view, where it scrolled the whole host page.
+* **The static survey said a response had been recorded before it knew.** A
+  failed send was discarded and the thank-you screen appeared anyway, and a
+  configured redirect then carried the participant away with the answers in
+  nobody's hands. A failure now says so, keeps the CSV download reachable,
+  offers a retry, and withholds the redirect. The submission is a `no-cors`
+  POST, so the collector's reply is unreadable and acceptance cannot be
+  confirmed from the page. The screen claims only that the request was sent.
+* **A completed comparison or points allocation counted as unanswered** in
+  the progress display, because progress read the question's own answer
+  where these types store one answer per pair or per criterion. Progress and
+  the required-question check now share one rule.
+* **A rating left the question that depends on it hidden** until another
+  control was touched, while the required check still demanded an answer to
+  it.
+* **A comparison answered on a phone could show the wrong selection on a
+  wider screen**, and the reverse. Each question renders a button strip and
+  a dropdown, shown by screen width, and each recorded the answer while
+  leaving the other as it was. The stored judgement was always the one given.
+* **Long rating scales now stack on a phone.** An 11-point scale needed 550
+  pixels, so a participant on a 390-pixel screen saw part of it with both
+  ends off screen. Below 600 pixels each point becomes a full-width row.
+* **Choice groups, rating scales and validation errors now read correctly to
+  a screen reader.** A group carries its question as its name, each rating
+  star reports whether it is the one chosen, and an error is announced with
+  the control that has it. Validation and a page change move focus to the
+  task instead of only scrolling.
+
+* **A multi-select answer failed a branching rule that allowed any of its
+  options.** Selecting two options stored them together, and the static
+  survey compared the pair as one value, so a rule showing a follow-up for
+  either option stayed closed. Any selected option the rule allows now
+  satisfies it, which is what the Shiny survey already did.
+* **A second branching rule on the same question replaced the first** in the
+  Shiny survey, so a question gated on two conditions ran on one. Every rule
+  is kept and they combine, and a question controlled by one that is itself
+  hidden now counts as unanswered, so a stale answer behind a closed branch
+  keeps the questions below it closed too. The static survey already worked this way.
+* **One-question-at-a-time mode ignored branching**, so a participant could
+  be required to answer a question the rules exclude, which was then blanked
+  on submission. Navigation follows the same visible sequence the rest of
+  the survey uses.
+* **A failed callback after a saved response invited a duplicate.** The save
+  and the `on_submit` callback shared one error handler, so a callback
+  failure reported that nothing was saved and submitting again wrote the
+  answers a second time. The two steps are tracked separately, a retry
+  repeats only what failed, and the two failures now read differently.
+
+## Researcher interface fixes
+
+* **SurveyStudio's preview could send test answers to the live collector.**
+  It exported the real instrument and the export fell back to the
+  instrument's configured Google Sheets endpoint, so a test response could
+  land in a running study's sheet beside real participants'. The preview now
+  exports with `preview = TRUE`, a new `export_static_survey()` argument that
+  removes the collector and the completion redirect. **If you previewed a
+  configured instrument in Studio on 0.4.1 or earlier, check the collecting
+  sheet for test rows.**
+* **The SurveyBuilder question list can be worked from the keyboard.**
+  A question row takes focus, opens on Enter or Space, and moves with Alt and
+  an arrow key, and named move-up and move-down buttons sit beside duplicate
+  and delete. Ordering was previously drag-only.
+* **An autosaved builder session is offered however old it is.** Recovery
+  refused anything older than two hours while the session sat in storage, so
+  returning the next day showed an empty builder. The banner reports the age
+  and clears the session only when dismissed. Where the browser refuses to
+  store anything, the builder now says so, where it used to appear to save.
+* Opening a builder dialog moves focus into it, and closing one returns focus
+  where it was.
+* **The builder's Preview is labelled a layout preview**, which is what it
+  is: it shows wording, order and branding and leaves out answering, required
+  checks and branching. Export the survey, or use Studio's preview, to test
+  the respondent's path.
+* The RStudio "Open Dashboard" addin asks which instrument to open, where it
+  called the launcher with nothing to show and produced an error.
+* SurveyStudio's preview points at the builder, where it used to name a
+  "Build Survey" screen of its own.
 
 ## Scoring fixes
 
@@ -276,6 +352,16 @@ This section grows as each group of fixes lands.
 * **Conjoint balance rewarded leaving out an attribute level**, scoring a
   design that never showed one as perfectly balanced. Balance now counts
   every declared level, and the design lists any level it never shows.
+
+## Report fixes
+
+* **A report could not render into a folder whose name contains a space.**
+  The Quarto renderer's arguments were passed to the shell unquoted, so such
+  a path split into several arguments and the render failed, falling back to
+  the built-in HTML engine with no explanation. Each argument is now quoted.
+* **A report claimed an analysis seed when analysis was switched off.**
+  `render_report(include_analysis = FALSE)` still printed a seed beside the
+  instrument hash, which reads as provenance for an analysis that never ran.
 
 ## Provenance and file fixes
 

@@ -42,6 +42,11 @@
 #'   collection mechanism.
 #' @param overwrite Logical. Whether to overwrite an existing file at
 #'   `output_path`. Defaults to `FALSE`.
+#' @param preview Logical. `TRUE` exports a survey that collects nothing: the
+#'   collector endpoint and the completion redirect are both removed, and the
+#'   thank-you screen says the response went nowhere. This is what SurveyStudio's
+#'   preview uses, so a test answer cannot reach a live study's collector.
+#'   Supplying `endpoint_url` alongside it is an error. Defaults to `FALSE`.
 #'
 #' @return The output path, invisibly.
 #' @export
@@ -83,10 +88,30 @@ export_static_survey <- function(
     output_path  = NULL,
     open         = interactive(),
     endpoint_url = NULL,
-    overwrite    = FALSE
+    overwrite    = FALSE,
+    preview      = FALSE
 ) {
   sframe_check_instrument(instrument)
   rlang::check_installed("jsonlite", reason = "to serialise the instrument as JSON.")
+
+  # A preview has to be unable to collect, rather than merely expected not to.
+  # SurveyStudio's preview exported the real instrument and the endpoint fell
+  # back to its configured collector below, so test answers could land in a
+  # live study's sheet beside real participants'.
+  if (isTRUE(preview) && !is.null(endpoint_url)) {
+    rlang::abort(
+      paste0("A preview export collects nothing, so `endpoint_url` cannot be ",
+             "supplied with `preview = TRUE`. Drop one of the two."),
+      class = "sframe_error")
+  }
+  if (isTRUE(preview)) {
+    instrument$render$google_sheets_endpoint <- NULL
+    # A redirect would carry the researcher out of the preview to whatever the
+    # study points at on completion.
+    instrument$render$thankyou$redirect_url <- NULL
+    instrument$render$thankyou$message <-
+      "Preview only. Nothing was sent, and no response was recorded."
+  }
 
   # Fix B: fall back to endpoint stored by the builder if no argument supplied
   endpoint_url <- endpoint_url %||%
