@@ -39,6 +39,7 @@
 ^todo_rstudio_addin\.md$
 ^todo_review_defects\.md$
 ^HANDOVER_.*\.md$
+^REVIEW_.*\.md$
 ^docs($|/)
 ^data-raw($|/)
 ^\.codex($|/)
