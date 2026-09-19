@@ -207,3 +207,160 @@ test_that("a column name with a space survives", {
   got <- run_syntax(code, d)
   expect_lt(abs(unname(got$statistic) - res$t), 1e-8)
 })
+
+# ── The coverage roster ──────────────────────────────────────────────────────
+# Reopened by the pre-publication review. The header above claimed every covered
+# method is run and compared. Eleven were. anova_two, ancova, friedman,
+# regression_logistic_binary, fisher_exact, mcnemar and descriptives were
+# declared covered by the generator and never executed, and the only set-level
+# gate asked that at least one returned block be covered and that the text
+# parse. It stayed green if a method lost its generator, or generated parseable
+# code computing something else.
+#
+# The roster below is asserted equal to sframe_syntax_methods, so a method added
+# to the generator without an execution case here fails this file.
+
+roster_data <- function(n = 90) {
+  set.seed(11)
+  base <- syntax_data(n)
+  base$cat2  <- rep(c("yes", "no"), length.out = n)
+  base$cat2b <- rep(c("hi", "lo"), each = n / 2)
+  # a paired binary pair with off-diagonal disagreement, which McNemar needs
+  base$b1 <- rep(c(1, 0, 1, 0), length.out = n)
+  base$b2 <- rep(c(1, 1, 0, 0), length.out = n)
+  base$m1 <- stats::rnorm(n, 10, 2)
+  base$m2 <- stats::rnorm(n, 11, 2)
+  base$m3 <- stats::rnorm(n, 12, 2)
+  base
+}
+
+roster_instrument <- function() {
+  num <- c("score", "after", "cov", "yes", "b1", "b2", "m1", "m2", "m3")
+  txt <- c("grp", "grp3", "grp_b", "cat2", "cat2b")
+  sf_instrument("Roster", components = c(
+    lapply(num, function(x) sf_item(x, x, type = "numeric")),
+    lapply(txt, function(x) sf_item(x, x, type = "text"))
+  ))
+}
+
+roster_result <- function(method, roles, options = list()) {
+  instr <- roster_instrument()
+  block <- list(id = "RQ1", research_question = "Agrees?",
+                family = "inferential", method = method, roles = roles)
+  if (length(options)) block$options <- options
+  sf_plan(instr) <- list(block)
+  run_analysis_plan(roster_data(), instr)$RQ1
+}
+
+
+# Every case names the number it compares, so a method cannot join the roster
+# without one. The first version read a statistic only when the generated call
+# returned an htest and the package happened to name the field, which silently
+# skipped 11 of the 18: an aov, a summary.lm, a coefficient matrix and a bare
+# numeric all fell through, and so did every correlation, because the package
+# reports r where the field list looked for "statistic".
+htest_stat <- function(got) unname(got$statistic[[1]])
+htest_p    <- function(got) unname(got$p.value[[1]])
+# The generated ANOVA code ends on summary(aov(...)), so the object already IS
+# the summary. Calling summary() again indexes past its end.
+aov_f <- function(got) {
+  tab <- if (inherits(got, "summary.aov")) got[[1]] else summary(got)[[1]]
+  unname(tab[["F value"]][[1]])
+}
+
+syntax_cases <- list(
+  list(m = "t_test_ind", roles = list(group = "grp", outcome = "score"),
+       want = function(r) c(r$t, r$p), have = function(g) c(htest_stat(g), htest_p(g))),
+  list(m = "t_test_pair", roles = list(before = "score", after = "after"),
+       want = function(r) c(r$t, r$p), have = function(g) c(htest_stat(g), htest_p(g))),
+  list(m = "mann_whitney", roles = list(group = "grp", outcome = "score"),
+       want = function(r) c(r$U, r$p), have = function(g) c(htest_stat(g), htest_p(g))),
+  list(m = "wilcoxon_pair", roles = list(before = "score", after = "after"),
+       want = function(r) c(r$V, r$p), have = function(g) c(htest_stat(g), htest_p(g))),
+  list(m = "kruskal_wallis", roles = list(group = "grp3", outcome = "score"),
+       want = function(r) c(r$H, r$p), have = function(g) c(htest_stat(g), htest_p(g))),
+  # an aov, so the F comes out of summary() rather than off an htest
+  list(m = "anova_one", roles = list(group = "grp3", outcome = "score"),
+       want = function(r) r$F_stat, have = aov_f),
+  list(m = "anova_two", roles = list(factor1 = "grp", factor2 = "grp_b",
+                                     outcome = "score"),
+       want = function(r) r$table[["F"]][[1]], have = aov_f),
+  # ancova generates an anova data frame, and the package tables the same rows
+  # drop1() lists <none> first and its F is NA, so the group row is taken by
+  # name. The package tables the same adjusted effect.
+  list(m = "ancova", roles = list(group = "grp3", covariates = "cov",
+                                  outcome = "score"),
+       want = function(r) r$table[["F"]][r$table$effect == "grp3"][[1]],
+       have = function(g) unname(g[["F value"]][rownames(g) == "group"][[1]])),
+  list(m = "friedman", roles = list(measures = c("m1", "m2", "m3")),
+       want = function(r) c(r$chisq %||% r$statistic, r$p),
+       have = function(g) c(htest_stat(g), htest_p(g))),
+  # correlations report r, which is the estimate rather than the statistic
+  list(m = "correlation_pearson", roles = list(x = "score", y = "after"),
+       want = function(r) c(r$r, r$p),
+       have = function(g) c(unname(g$estimate[[1]]), htest_p(g))),
+  list(m = "correlation_spearman", roles = list(x = "score", y = "after"),
+       want = function(r) c(r$r, r$p),
+       have = function(g) c(unname(g$estimate[[1]]), htest_p(g))),
+  list(m = "correlation_kendall", roles = list(x = "score", y = "after"),
+       want = function(r) c(r$r, r$p),
+       have = function(g) c(unname(g$estimate[[1]]), htest_p(g))),
+  # a summary.lm: the slope on the first predictor, and the model R squared
+  list(m = "regression_linear", roles = list(predictors = c("cov", "after"),
+                                             dependent = "score"),
+       want = function(r) c(r$coefficients[["Estimate"]][[2]], r$r2),
+       have = function(g) c(unname(g$coefficients[2, 1]), unname(g$r.squared))),
+  # The generated block ends on exp(cbind(...)), so what comes back is the odds
+  # ratio and its interval, not the log-odds estimate. Comparing the package's
+  # Estimate against it read -0.08 against 0.92, the same coefficient on two
+  # scales.
+  list(m = "regression_logistic_binary",
+       roles = list(predictors = "score", dependent = "yes"),
+       want = function(r) r$coefficients[["odds_ratio"]][[2]],
+       have = function(g) unname(g[2, 1])),
+  list(m = "crosstab", roles = list(row = "cat2", column = "cat2b"),
+       want = function(r) c(r$chi_sq, r$p),
+       have = function(g) c(htest_stat(g), htest_p(g))),
+  # Fisher has no test statistic, so the p and the odds ratio are the claim
+  list(m = "fisher_exact", roles = list(row = "cat2", column = "cat2b"),
+       want = function(r) c(r$p, r$odds_ratio),
+       have = function(g) c(htest_p(g), unname(g$estimate[[1]]))),
+  list(m = "mcnemar", roles = list(before = "b1", after = "b2"),
+       want = function(r) c(r$chi_sq %||% r$statistic, r$p),
+       have = function(g) c(htest_stat(g), htest_p(g))),
+  # The generated block ends on a vapply() of sd over the named variables, so
+  # the sd is the number to compare, one per variable and in that order.
+  list(m = "descriptives", roles = list(variables = c("score", "after")),
+       want = function(r) as.numeric(r$table[["sd"]]),
+       have = function(g) unname(g))
+)
+
+test_that("every method the generator declares has an execution case", {
+  expect_setequal(vapply(syntax_cases, function(x) x$m, character(1)),
+                  sframe_syntax_methods)
+})
+
+test_that("every case names the numbers it compares", {
+  # Without this a case with no comparator would pass the roster check and
+  # assert nothing, which is how the first 11 got through.
+  for (case in syntax_cases) {
+    expect_true(is.function(case$want), info = case$m)
+    expect_true(is.function(case$have), info = case$m)
+  }
+})
+
+test_that("each covered method's generated code reproduces its own numbers", {
+  for (case in syntax_cases) {
+    res <- roster_result(case$m, case$roles)
+    code <- analysis_syntax(res)
+    expect_false(is.null(code), info = case$m)
+
+    got <- run_syntax(code, roster_data())
+    want <- as.numeric(case$want(res))
+    have <- as.numeric(case$have(got))
+
+    expect_false(any(is.na(want)), info = paste(case$m, "package number missing"))
+    expect_false(any(is.na(have)), info = paste(case$m, "generated number missing"))
+    expect_equal(have, want, tolerance = 1e-6, info = case$m)
+  }
+})
