@@ -1,4 +1,4 @@
-# surveyframe 0.4.2 (in development)
+# surveyframe 0.4.2
 
 A defect-fix release. An external review of 0.4.1 found defects that
 silently alter or lose data, and this release corrects them. Collection
