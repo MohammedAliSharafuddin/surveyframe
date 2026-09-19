@@ -436,6 +436,12 @@ This section grows as each group of fixes lands.
   information.
 * **A print-palette report mixed monochrome and colour figures**, because the
   single-item diverging chart was drawn with the default palette.
+* **Collected multiple-choice answers were missing from the distributions.**
+  A multiple-choice question is collected as one column per option, and the
+  section looked for a single column under the question's own name, so every
+  such question was skipped. Both report engines now count the options, label
+  them from the choice set, and state how many respondents answered, since one
+  respondent can pick several.
 * **A quanteda result's leading features never reached the report**, though its
   own prompt asked a reader to review them. A moderation's conditional slopes
   at the moderator's own values were missing in the same way. Both now render
@@ -545,6 +551,15 @@ This section grows as each group of fixes lands.
   says the same.
 * The `read_responses()` help describes one contract for undeclared columns
   and documents expansion columns and value conversion.
+* **`vignette("scale-reliability-validity")` said that supplying construct
+  scores returns the HTMT matrix.** It returns the absolute inter-construct
+  correlations, and records `htmt_method = "correlation_fallback"` to say which
+  it computed. The Henseler heterotrait-monotrait ratio needs
+  `items_by_construct`, which records `htmt_method = "henseler"`.
+  `validity_report()`'s own help was already accurate, and the vignette
+  overstated it in an unevaluated chunk. The section now names what each
+  argument gives, and its examples run, so a build would contradict the claim
+  if it drifted again.
 
 ## Dependencies
 

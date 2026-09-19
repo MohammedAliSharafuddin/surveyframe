@@ -286,6 +286,40 @@ for (item in q_items) {
     cat("\n\n")
     next
   }
+  # A multiple-choice question posts one indicator column per option, named
+  # item__option, and never a column under its own id, so requiring the parent
+  # column dropped every collected multi-select from this section. The R engine
+  # does the same, so the 2 agree.
+  if (identical(t, "multiple_choice") && !item$id %in% names(responses)) {
+    cs <- choice_by(item$choice_set %||% "")
+    # Matched by prefix rather than through sframe_item_expansion_columns(),
+    # which is internal: this template runs in a separate session against the
+    # installed package, so it can call exported functions only. The indicator
+    # columns are item__option by construction, and matching the names the
+    # collector actually wrote also covers an option outside the choice set.
+    present <- grep(paste0("^", item$id, "__"), names(responses), value = TRUE)
+    if (length(present) == 0) next
+    picked <- vapply(present, function(cn) {
+      sum(as.character(responses[[cn]]) %in% c("1", "TRUE", "true", "yes"),
+          na.rm = TRUE)
+    }, numeric(1))
+    labels <- sub(paste0("^", item$id, "__"), "", present)
+    if (!is.null(cs)) {
+      hit <- match(labels, as.character(cs$values))
+      labels[!is.na(hit)] <- cs$labels[hit[!is.na(hit)]]
+    }
+    names(picked) <- labels
+    if (!sum(picked)) next
+    cat(sprintf("\n**%s**\n\n", item$label %||% item$id))
+    cat(sprintf("%d respondents, who could pick more than one.\n\n",
+                nrow(responses)))
+    op <- par(mar = c(4, 9, 1, 1))
+    barplot(rev(picked), horiz = TRUE, las = 1, col = THEME,
+            border = "white", xlab = "Respondents")
+    par(op)
+    cat("\n\n")
+    next
+  }
   if (!item$id %in% names(responses)) next
   col <- responses[[item$id]]
   if (t %in% c("likert", "single_choice", "multiple_choice")) {
