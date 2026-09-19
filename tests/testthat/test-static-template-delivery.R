@@ -74,6 +74,54 @@ test_that("8: a delivery that left the browser reports what it can", {
   expect_false(grepl("Try sending again", html, fixed = TRUE))
 })
 
+# Reopened by the pre-publication review. deliveryState 'sent' means the request
+# left the browser, and nothing more: a no-cors POST is opaque, so a collector
+# that replied "unmapped", or "error", or refused the write for want of the
+# Sheets API, is indistinguishable here from one that stored the row. The screen
+# claimed "your response has been recorded" on that state, hid the download,
+# offered a reload that discards the only copy, and auto-redirected away from it.
+
+test_that("8: an unconfirmed send does not claim the response was recorded", {
+  skip_if_not_installed("V8")
+  html <- app_html(submit_with(fails = FALSE))
+
+  expect_false(grepl("has been recorded", html, fixed = TRUE))
+  # and it says what is actually known, which is that receipt is unconfirmed
+  expect_match(html, "cannot confirm", fixed = TRUE)
+})
+
+test_that("8: an unconfirmed send keeps the response downloadable", {
+  skip_if_not_installed("V8")
+  # the designer left the download off, and it is offered anyway, because this
+  # page is holding the only copy anyone can prove exists
+  html <- app_html(submit_with(fails = FALSE))
+  expect_match(html, "Download my response", fixed = TRUE)
+})
+
+test_that("8: an unconfirmed send is never auto-redirected past", {
+  skip_if_not_installed("V8")
+  ctx <- submit_with(fails = FALSE,
+                     thankyou = list(redirect_url = "https://example.com/next"))
+  ctx$eval("__runTimeouts();")
+  expect_equal(ctx$get("window.location.href"), "")
+  # the participant can still choose to go, so the study is not a dead end
+  expect_match(app_html(ctx), "https://example.com/next", fixed = TRUE)
+})
+
+test_that("8: restarting over an unconfirmed send asks before discarding it", {
+  skip_if_not_installed("V8")
+  ctx <- submit_with(fails = FALSE)
+  ctx$eval("__confirmAnswer = false; __reloads = 0; restartSurvey();")
+
+  expect_equal(ctx$get("__confirms.length"), 1)
+  expect_match(ctx$get("__confirms[0]"), "download", ignore.case = TRUE)
+  # declining leaves the page, and the response, exactly where they were
+  expect_equal(ctx$get("__reloads"), 0)
+
+  ctx$eval("__confirmAnswer = true; restartSurvey();")
+  expect_equal(ctx$get("__reloads"), 1)
+})
+
 test_that("8: with no collector the screen still offers the download", {
   skip_if_not_installed("V8")
   ctx <- submit_with(fails = FALSE, endpoint = "")
@@ -82,10 +130,15 @@ test_that("8: with no collector the screen still offers the download", {
   expect_match(app_html(ctx), "Download my response", fixed = TRUE)
 })
 
-test_that("8: a redirect still runs once delivery leaves the browser", {
+test_that("8: a local survey with no collector still redirects", {
   skip_if_not_installed("V8")
-  ctx <- submit_with(fails = FALSE,
+  # With no endpoint there is nothing to be unconfirmed about, and the download
+  # is the documented way the response travels, so the offer stays on screen and
+  # the redirect waits for the participant to take it.
+  ctx <- submit_with(fails = FALSE, endpoint = "",
                      thankyou = list(redirect_url = "https://example.com/next"))
   ctx$eval("__runTimeouts();")
-  expect_equal(ctx$get("window.location.href"), "https://example.com/next")
+  expect_equal(ctx$get("deliveryState"), "local")
+  expect_equal(ctx$get("window.location.href"), "")
+  expect_match(app_html(ctx), "https://example.com/next", fixed = TRUE)
 })

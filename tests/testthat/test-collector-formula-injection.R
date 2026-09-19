@@ -63,9 +63,11 @@ test_that("the builder's inlined collector carries the same text-write fix", {
   skip_if(!nzchar(p) || !file.exists(p), "builder not found")
   builder <- paste(readLines(p, warn = FALSE), collapse = "\n")
 
-  expect_true(grepl("appendRowAsText_", builder, fixed = TRUE))
+  expect_true(grepl("appendResponseRow_", builder, fixed = TRUE))
   expect_true(grepl("setNumberFormat(\"@\")", builder, fixed = TRUE))
   expect_false(grepl("sheet.appendRow(row)", builder, fixed = TRUE))
+  # and the inlined copy fails closed too, which is the whole point of gate 1
+  expect_true(grepl("this response was NOT saved", builder, fixed = TRUE))
 })
 
 test_that("neither copy of the collector writes user-entered values", {

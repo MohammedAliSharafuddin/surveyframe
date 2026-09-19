@@ -2371,9 +2371,15 @@ function renderThankyou(){
   // no collector endpoint exists (the downloaded CSV is then the only copy
   // of the response, so it must stay reachable, as a choice, never forced).
   var failed=deliveryState==='failed';
-  // A failed send makes the download the only copy of the response, so it is
-  // offered whatever the designer chose.
-  var showDl=(TY.show_download||!ENDPOINT||failed)&&window._lastCsv;
+  // A no-cors POST is opaque, so 'sent' means the request left and nothing more.
+  // The collector may have replied "unmapped", or "error", or refused the write
+  // because the Sheets API is not enabled, and none of that is readable here.
+  // Receipt is therefore unconfirmed whenever a collector is configured, and the
+  // page must not assert storage it cannot observe.
+  var unconfirmed=deliveryState==='sent'&&!!ENDPOINT;
+  // A failed or unconfirmed send makes the download the only copy anyone can
+  // prove exists, so it is offered whatever the designer chose.
+  var showDl=(TY.show_download||!ENDPOINT||failed||unconfirmed)&&window._lastCsv;
   var offlineNote=(!ENDPOINT&&window._lastCsv)
     ?'<div class="ty-note">This survey has no online collector. Download your response below and return the file to the researcher.</div>':'';
   var failNote=failed
@@ -2382,30 +2388,56 @@ function renderThankyou(){
     ?'<button type="button" class="btn btn-p" onclick="downloadCsv(window._lastCsv.csv,window._lastCsv.name)">Download my response (CSV)</button>':'';
   var retryBtn=failed
     ?'<button type="button" class="btn btn-p" onclick="retrySubmission()">Try sending again</button>':'';
-  // Starting over discards a response that has yet to reach the collector, so
-  // it is offered once delivery is settled.
-  var again=failed?'':'<button type="button" class="btn btn-s" onclick="window.location.reload()">Submit another response</button>';
+  // Starting over reloads, which discards the page's copy of the response. That
+  // copy is the only proof of the answers wherever receipt is unconfirmed, so
+  // the button asks first rather than being withheld: a researcher fielding on
+  // one shared device still needs it.
+  var again=failed?'':'<button type="button" class="btn btn-s" onclick="restartSurvey()">Submit another response</button>';
   var cont=(TY.redirect_url&&!failed)
     ?'<a class="btn btn-s" style="text-decoration:none" href="'+esc(TY.redirect_url)+'">Continue</a>':'';
   var title=failed?'Almost done':'Thank You';
   var icon=failed?'&#33;':'&#10004;';
+  // The designer's own message is still shown where they wrote one. What changed
+  // is the default, which used to assert recording on a state that cannot
+  // establish it.
   var msg=failed
     ?'Your answers are complete.'
-    :(TY.message||'Your response has been recorded. Thank you for participating.');
+    :(TY.message||(unconfirmed
+        ?'Your answers have been sent. Thank you for participating.'
+        :'Your response has been recorded. Thank you for participating.'));
+  var unconfirmedNote=unconfirmed
+    ?'<div class="ty-note">Your answers were sent, and this page cannot confirm '
+     +'the researcher’s collector stored them. Download the file below to '
+     +'keep a copy you can send on if you are asked for one.</div>':'';
   el.innerHTML='<div class="card"><div class="card-body">'
     +'<div class="ty-ic">'+icon+'</div>'
     +'<div class="ty-title">'+title+'</div>'
     +'<div class="ty-msg">'+esc(msg)+'</div>'
     +failNote
+    +unconfirmedNote
     +offlineNote
     +'<div class="ty-acts">'+retryBtn+dlBtn+cont+again+'</div>'
     +'</div></div>';
   // Auto-redirect only when nothing on this screen needs the respondent's
   // attention (no download offer, no failed delivery), so the file is never
-  // yanked away and a failure is never redirected past.
+  // yanked away and a failure is never redirected past. An unconfirmed send
+  // always offers the download, so it never auto-redirects either: the Continue
+  // link is still there for a participant who chooses to go on.
   if(TY.redirect_url&&!showDl&&!failed&&deliveryState!=='sending'){
     setTimeout(function(){window.location.href=TY.redirect_url;},2500);
   }
+}
+// Reloading is the only way to clear the form for the next participant, and it
+// drops window._lastCsv with it. Where that copy is the only one anyone can
+// prove exists, the participant is asked before it goes.
+function restartSurvey(){
+  var atRisk=window._lastCsv&&(deliveryState==='failed'||
+    (deliveryState==='sent'&&!!ENDPOINT)||!ENDPOINT);
+  if(atRisk&&!confirm('Starting a new response clears this one from the page. '
+    +'If you have not used Download my response, that copy is lost. Continue?')){
+    return;
+  }
+  window.location.reload();
 }
 
 // ── Init ───────────────────────────────────────────────────────────────────
@@ -2430,7 +2462,7 @@ document.addEventListener('DOMContentLoaded',function(){
 // 3. Paste this entire file, replacing any existing code
 // 4. Add the Sheets advanced service: in the editor, Services > add
 //    "Google Sheets API", with the identifier "Sheets". This is what lets the
-//    collector store an answer literally; see appendRowAsText_() below for why
+//    collector store an answer literally; see appendResponseRow_() below for why
 //    it matters and what happens without it.
 // 5. Click Deploy > New deployment > Web app
 // 6. Set "Who has access" to "Anyone"
@@ -2481,27 +2513,20 @@ function doPost(e) {
     if (problem) {
       let unmapped = ss.getSheetByName(UNMAPPED_SHEET_NAME);
       if (!unmapped) unmapped = ss.insertSheet(UNMAPPED_SHEET_NAME);
-      appendRowAsText_(unmapped, [new Date().toISOString(), problem, e.postData.contents]);
+      appendDiagnosticRow_(unmapped, [new Date().toISOString(), problem, e.postData.contents]);
       return ContentService
         .createTextOutput(JSON.stringify({ status: "unmapped", message: problem }))
         .setMimeType(ContentService.MimeType.JSON);
     }
     const row = header.map(col => data[col] !== undefined ? String(data[col]) : "");
-    const literal = appendRowAsText_(sheet, row);
+    // Throws when the answer cannot be stored literally, which the catch below
+    // turns into status "error". There is one write path and it is the literal
+    // one, so a status of "ok" means the row is on the sheet as submitted.
+    appendResponseRow_(sheet, row);
 
-    // The response says which write path stored the row, so a researcher can
-    // tell a literal RAW write from the fallback that depends on the plain-text
-    // format alone.
-    const reply = { status: "ok", rows: sheet.getLastRow() - 1,
-                    stored: literal ? "raw" : "user_entered_with_text_format" };
-    if (!literal) {
-      reply.warning = "The Sheets advanced service is unavailable, so answers " +
-        "were written without the RAW option. Add it under Services > Google " +
-        "Sheets API, with the identifier Sheets, so an answer beginning with " +
-        "'=' is stored literally.";
-    }
     return ContentService
-      .createTextOutput(JSON.stringify(reply))
+      .createTextOutput(JSON.stringify({ status: "ok", rows: sheet.getLastRow() - 1,
+                                         stored: "raw" }))
       .setMimeType(ContentService.MimeType.JSON);
 
   } catch (err) {
@@ -2540,27 +2565,57 @@ function headerProblem_(header) {
 // on the plain-text number format alone to suppress parsing rests on
 // behaviour Google does not promise. RAW is the promise.
 //
-// Where the advanced service is unavailable, the plain-text format plus
-// setValues() is used and the response says so, since refusing the write
-// outright would lose a live study's answers. Enable the service.
-function appendRowAsText_(sheet, row) {
-  if (!row.length) return true;
+// Where the advanced service is unavailable, a response row is REFUSED rather
+// than written through setValues(). The earlier version wrote it anyway and
+// named the degradation in a `warning` field, which nothing could read: the
+// respondent's page posts no-cors, so the browser sees only that the request
+// left. The participant was shown "your response has been recorded" over an
+// answer the collector had just altered. Failing closed leaves the page holding
+// the only copy, which it can then offer as a download. Enable the service.
+function appendResponseRow_(sheet, row) {
+  if (!row.length) return;
+  if (!sheetsApiAvailable_()) {
+    throw new Error(
+      "The Google Sheets advanced service is not enabled, so an answer " +
+      "cannot be stored literally and this response was NOT saved. In the " +
+      "Apps Script editor, add Services > Google Sheets API with the " +
+      "identifier Sheets, then ask the participant to send again.");
+  }
+  const startRow = sheet.getLastRow() + 1;
+  sheet.getRange(startRow, 1, 1, row.length).setNumberFormat("@");
+  Sheets.Spreadsheets.Values.update(
+    { values: [row.map(function (v) { return v === null ? "" : String(v); })] },
+    sheet.getParent().getId(),
+    sheet.getName() + "!A" + startRow,
+    { valueInputOption: "RAW" }
+  );
+}
+
+function sheetsApiAvailable_() {
+  return typeof Sheets !== "undefined" && Sheets.Spreadsheets &&
+    Sheets.Spreadsheets.Values;
+}
+
+// A diagnostic row, for the header and unmapped sheets. These hold a copy of a
+// submission the collector could not file, so a best-effort write beats none:
+// losing the copy is the worse failure. The plain-text format is applied and
+// the row may still be coerced, which is acceptable for a record nothing reads
+// programmatically. A response row never comes through here.
+function appendDiagnosticRow_(sheet, row) {
+  if (!row.length) return;
   const startRow = sheet.getLastRow() + 1;
   const target = sheet.getRange(startRow, 1, 1, row.length);
   target.setNumberFormat("@");
-  if (typeof Sheets !== "undefined" && Sheets.Spreadsheets &&
-      Sheets.Spreadsheets.Values) {
-    const rangeA1 = sheet.getName() + "!A" + startRow;
+  if (sheetsApiAvailable_()) {
     Sheets.Spreadsheets.Values.update(
       { values: [row.map(function (v) { return v === null ? "" : String(v); })] },
       sheet.getParent().getId(),
-      rangeA1,
+      sheet.getName() + "!A" + startRow,
       { valueInputOption: "RAW" }
     );
-    return true;
+    return;
   }
   target.setValues([row]);
-  return false;
 }
 
 // Returns the sheet's live header, creating or extending it as needed.
