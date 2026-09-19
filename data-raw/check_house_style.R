@@ -24,7 +24,9 @@ BANNED <- c(
   "rather than"      = "rather than",
   "instead of a"     = "instead of a",
   "instead of the"   = "instead of the",
-  "and not"          = "and not",
+  # Anchored at both ends: without the closing boundary this fired on
+  # "and nothing is uploaded", which is not the banned construction.
+  "and not"          = "\\band not\\b",
   "not X but Y"      = "\\bnot\\b[^.;]{1,60}\\bbut\\b",
   "em or en dash"    = "—|–",
   "semicolon"        = ";",
@@ -84,6 +86,13 @@ files <- if (length(args)) args else c(
 files <- files[file.exists(files)]
 
 res <- do.call(rbind, lapply(files, check_one))
+# Files under 50 words are skipped, so a short-file-only run has nothing to
+# report. Say that, because ordering a NULL frame aborts with an error about
+# a unary operator, which reads as a broken checker.
+if (is.null(res)) {
+  cat("Nothing to check: every file given is under 50 words.\n")
+  quit(status = 0)
+}
 res <- res[order(-res$per_1000), ]
 bad <- res[res$over | nzchar(res$banned), ]
 
