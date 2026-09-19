@@ -47,13 +47,27 @@ automated checks do not open a browser.
 
 ## Installation
 
+> **Collecting data right now? Install 0.4.2 from GitHub.**
+> An external review of 0.4.1, the version on CRAN, found defects that
+> silently alter or lose a participant's answer, and defects that give a
+> wrong statistic. 0.4.2 corrects them and goes to CRAN on 26 September
+> 2026. Until it is accepted there, this is the version to collect with:
+>
+> ```r
+> remotes::install_github("MohammedAliSharafuddin/surveyframe")
+> ```
+>
+> `NEWS.md` lists every fix, and separately lists what changes for you:
+> some scores and statistics move, and a Shiny-collected response gains a
+> `respondent_id` column.
+
 Install from CRAN:
 
 ```r
 install.packages("surveyframe")
 ```
 
-To get unreleased changes from the development version:
+To get changes not yet released to CRAN:
 
 ```r
 remotes::install_github("MohammedAliSharafuddin/surveyframe")
@@ -334,8 +348,19 @@ alongside, on top of the existing `.sframe` integrity hash. Full
 detail in `NEWS.md`.
 
 0.4.1 focuses on stability: fixes found by using surveyframe on real
-instruments, no new capability theme. 0.4.2 continues in the same
-direction.
+instruments, no new capability theme.
+
+0.4.2 is a defect-fix release, correcting what an external review of
+0.4.1 found across 8 batches: 171 findings, 154 fixed here and 17
+deferred with a stated reason. The ones that matter most to a live study
+are in collection, where a participant's answer could be altered or lost
+with no signal, and in scoring, where the report path recomputed scale
+scores by a second method that ignored reverse coding and the declared
+minimum. Some numbers therefore move between 0.4.1 and 0.4.2, and
+`NEWS.md` says which, under "What you need to change". Reports also gained a
+folded "Show R code" block, and `analysis_syntax()` returns the
+statistical call behind a result with its variables and options resolved,
+so a reader can copy the code and reproduce the number.
 
 ## When to use surveyframe, and when not to
 
