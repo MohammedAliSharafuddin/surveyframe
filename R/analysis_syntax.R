@@ -13,8 +13,12 @@
 # defaults were applied. A separate hand-written approximation would drift from
 # what the package actually computes, which is the one failure mode that would
 # make this feature worse than no feature at all.
-# tests/testthat/test-analysis-syntax.R runs the generated code and compares
-# its statistic and p against the package's own result, so drift breaks a test.
+# tests/testthat/test-analysis-syntax.R holds one execution case per method in
+# sframe_syntax_methods, asserted equal to that roster, and each case names the
+# number it compares against the package's own result. So a method cannot join
+# the generator without an executed comparison, and drift breaks a test. Before
+# the pre-publication review this comment claimed that coverage while 7 of the
+# 18 methods were never executed.
 
 # A quoted string, or a bare number for a numeric option.
 sframe_code_value <- function(x) {
@@ -68,7 +72,11 @@ sframe_syntax_methods <- c(
 # frame the lines read from.
 sframe_syntax_call <- function(result, frame = "scored") {
   test <- as.character(result$test %||% "")[1]
-  vars <- as.character(result$vars %||% character(0))
+  # Most runners record the resolved variables as `vars`. The descriptives
+  # runner records them as `variables`, so reading `vars` alone generated
+  # `vars <- c()` and code that summarised nothing. The roster test compares the
+  # generated number against the package's, which is how that surfaced.
+  vars <- as.character(result$vars %||% result$variables %||% character(0))
   opts <- result$options %||% list()
   num <- function(i) sframe_code_num(frame, vars[i])
   col <- function(i) sframe_code_col(frame, vars[i])
