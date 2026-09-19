@@ -1111,6 +1111,40 @@ sframe_clean_interpretations <- function(interpretations) {
       }
       next
     }
+    # A multiple-choice question posts one indicator column per option, named
+    # item__option, and never a column of its own, so requiring the parent
+    # column dropped every collected multi-select from this section. The
+    # indicators are counted here and the denominator is stated, since each
+    # respondent may pick several.
+    if (identical(t, "multiple_choice") && !item$id %in% names(data)) {
+      cs <- choice_by(item$choice_set %||% "")
+      cols <- sframe_item_expansion_columns(instrument, list(item))
+      present <- intersect(cols, names(data))
+      if (length(present) == 0) next
+      picked <- vapply(present, function(cn) {
+        sum(as.character(data[[cn]]) %in% c("1", "TRUE", "true", "yes"),
+            na.rm = TRUE)
+      }, numeric(1))
+      labels <- sub(paste0("^", item$id, "__"), "", present)
+      if (!is.null(cs)) {
+        hit <- match(labels, as.character(cs$values))
+        labels[!is.na(hit)] <- cs$labels[hit[!is.na(hit)]]
+      }
+      names(picked) <- labels
+      if (!sum(picked)) next
+      n_resp <- nrow(data)
+      img <- .render_report_plot_png(function() {
+        op <- graphics::par(mar = c(4, 9, 1, 1)); on.exit(graphics::par(op))
+        graphics::barplot(rev(picked), horiz = TRUE, las = 1, col = theme,
+                          border = "white", xlab = "Respondents")
+      })
+      if (!is.null(img)) {
+        blocks <- c(blocks, sprintf(
+          "<h3>%s</h3><p class=\"hint\">%d respondents, who could pick more than one.</p>%s",
+          htmltools_escape(item$label %||% item$id), n_resp, img))
+      }
+      next
+    }
     if (!item$id %in% names(data)) next
     col <- data[[item$id]]
     if (t %in% c("likert", "single_choice", "multiple_choice")) {

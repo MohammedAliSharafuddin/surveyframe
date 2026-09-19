@@ -116,8 +116,11 @@ test_that("the Quarto template calls only exported functions", {
 # newly exported function the template uses before the package is reinstalled,
 # which is what a developer hits.
 template_surveyframe_calls <- function() {
-  qmd <- sframe_installed_text("inst", "templates",
-                                   "report.qmd")
+  lines <- readLines(sframe_installed_path("inst", "templates", "report.qmd"),
+                     warn = FALSE)
+  # A comment names a function to explain why it is avoided, so stripping
+  # comments is what keeps this a check on calls rather than on prose.
+  qmd <- paste(sub("#.*$", "", lines), collapse = "\n")
   called <- unique(unlist(regmatches(
     qmd, gregexpr("\\b(sframe_[a-z_0-9]+|analysis_syntax|score_scales|read_sframe|read_responses|codebook_report|quality_report|reliability_report|item_report|efa_report|validity_report|run_analysis_plan|descriptives_report|missing_data_report)\\b",
                   qmd, perl = TRUE))))
