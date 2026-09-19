@@ -52,22 +52,55 @@
 \arguments{
 \item{x}{A surveyframe object.}
 
-\item{row.names}{Passed to \code{\link[base:as.data.frame]{base::as.data.frame()}}.}
+\item{row.names}{Passed to \code{\link[base:as.data.frame]{base::as.data.frame()}} by the methods that
+build a frame. Ignored by the methods that return a stored table.}
 
 \item{optional}{Passed to \code{\link[base:as.data.frame]{base::as.data.frame()}}.}
 
 \item{...}{Ignored. Present for S3 consistency.}
 }
 \value{
-A data frame.
+A data frame, with the columns listed above for the class given.
 }
 \description{
-Every surveyframe class returns its primary table. For an instrument that
-is the item table, for a validation result the problems, for a report the
-table it is mainly about. Where an object holds more than one table, the
-others are reachable through the named accessors in \link{sf_accessors} or,
-for a full tabular record of an instrument, through \code{\link[=codebook_report]{codebook_report()}}.
+Every surveyframe class returns its primary table, and each class has its
+own columns. Where an object holds more than one table, the others are
+reachable through the named accessors in \link{sf_accessors}, or, for a full
+tabular record of an instrument, through \code{\link[=codebook_report]{codebook_report()}}.
 }
+\section{What each class gives}{
+\tabular{lll}{
+   Class \tab One row per \tab Columns \cr
+   \code{sframe} \tab item \tab \code{id}, \code{label}, \code{type}, \code{choice_set}, \code{scale_id}, \code{reverse}, \code{required} \cr
+   \code{sframe_codebook} \tab item \tab the codebook's item table \cr
+   \code{sframe_validation} \tab problem \tab \code{check}, \code{problem} \cr
+   \code{sframe_analysis_results} \tab block \tab \code{block}, \code{research_question}, \code{method}, \code{apa} \cr
+   \code{sframe_reliability_report} \tab scale \tab \code{scale_id}, \code{label}, \code{n_items}, \code{n}, \code{alpha}, \code{omega} \cr
+   \code{sframe_item_report} \tab item \tab \code{scale_id} and the item diagnostics \cr
+   \code{sframe_quality_report} \tab check \tab the flattened quality checks \cr
+   \code{sframe_efa_report} \tab measure \tab the readiness measures \cr
+   \code{sframe_sensitivity} \tab perturbation \tab \code{criterion}, \code{direction}, \code{weight}, \code{rho}, \code{rank_changed}, \code{top_changed} \cr
+}
+}
+
+\section{A summary, and where the full record is}{
+These tables are a summary of the columns a reader scans first. The item
+table leaves out help text, placeholder, matrix rows, comparison items and
+scale, slider and rating settings, date bounds, section introduction and
+page; the scale table leaves out \code{min_valid}, the reverse key and the
+weights. Read the stored declaration in full through \code{\link[=sf_items]{sf_items()}},
+\code{\link[=sf_scales]{sf_scales()}} and the rest of \link{sf_accessors}, each of which returns the
+component objects themselves, or through \code{\link[=write_sframe]{write_sframe()}} for the
+interchange record.
+
+A class holding one table returns it directly, so it keeps that table's own
+row names and \code{row.names} has no effect. Pass \code{row.names} to
+\code{\link[base:as.data.frame]{base::as.data.frame()}} on the returned frame where you need to set them.
+The coercion gives one view of an object. An instrument, for example,
+returns its items, and its choice sets and scales come from
+\code{\link[=sf_choice_sets]{sf_choice_sets()}}, \code{\link[=sf_scales]{sf_scales()}} or \code{\link[=codebook_report]{codebook_report()}}.
+}
+
 \examples{
 cs    <- sf_choices("ag5", 1:5,
            c("Strongly disagree", "Disagree", "Neutral",

@@ -69,12 +69,26 @@ test_that("a strong within-subject effect is detected", {
   expect_gt(res$eta2, 0.5)
 })
 
-test_that("subject id is a factor in the fitted long data", {
-  dat <- rm_fixture(n = 12)
-  mat <- as.data.frame(dat)
-  mat$.subject <- factor(seq_len(nrow(mat)))
-  expect_s3_class(mat$.subject, "factor")
-  expect_length(levels(mat$.subject), 12)
+test_that("the runner fits the subject id as a factor, not a covariate", {
+  # Batch 6 #9: this test used to build its own factor and assert it was one,
+  # which is true by construction and cannot detect the conversion being
+  # removed from the runner. The fitted result distinguishes the two:
+  # Error(.subject / condition) with a factor gives exactly 2 strata and 22
+  # residual df for 12 subjects over 3 conditions, where an integer .subject is
+  # read as a continuous covariate and gives 3 strata and 30.
+  res <- sframe_run_repeated_anova(rm_fixture(n = 12), rm_roles)
+  expect_null(res$error)
+
+  # 12 subjects over 3 conditions. A factor .subject puts 11 df into the
+  # between-subject stratum and leaves 22 for the within-subject error; an
+  # integer .subject is read as one continuous covariate and leaves 30.
+  expect_equal(res$df1, 2)
+  expect_equal(res$df2, 22)
+
+  # and the fit carries the 2 named strata the stratification produces
+  expect_true(any(grepl("Error: .subject", res$fit_summary, fixed = TRUE)))
+  expect_true(any(grepl("Error: .subject:condition", res$fit_summary,
+                        fixed = TRUE)))
 })
 
 test_that("an unbalanced design (some subjects missing one condition) still finds the within-subject stratum", {

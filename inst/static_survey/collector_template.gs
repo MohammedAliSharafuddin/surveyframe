@@ -6,17 +6,26 @@
 // 1. Open the target Google Sheet
 // 2. Go to Extensions > Apps Script
 // 3. Paste this entire file, replacing any existing code
-// 4. Click Deploy > New deployment > Web app
-// 5. Set "Who has access" to "Anyone"
-// 6. Copy the Web App URL and paste it into the SurveyBuilder
+// 4. Add the Sheets advanced service: in the editor, Services > add
+//    "Google Sheets API", with the identifier "Sheets". This is what lets the
+//    collector store an answer literally; see appendRowAsText_() below for why
+//    it matters and what happens without it.
+// 5. Click Deploy > New deployment > Web app
+// 6. Set "Who has access" to "Anyone"
+// 7. Copy the Web App URL and paste it into the SurveyBuilder
 //    under Survey > Google Sheets Setup
 
 const SHEET_NAME = "Responses";
+const UNMAPPED_SHEET_NAME = "Unmapped submissions";
 const TARGET_SHEET_URL = {{TARGET_SHEET_URL}};
 const EXPECTED_COLUMNS = {{EXPECTED_COLUMNS}};
 const MAX_BODY_CHARS = 200000;
 
 function doPost(e) {
+  // Header work and the append run inside a script lock, so 2 submissions
+  // cannot interleave while the header is created or extended.
+  const lock = LockService.getScriptLock();
+  lock.waitLock(30000);
   try {
     if (!e || !e.postData || !e.postData.contents) {
       throw new Error("Missing POST body.");
@@ -43,18 +52,93 @@ function doPost(e) {
     // insertion point onward was off by one. Nothing errored, the sheet stayed
     // well-formed, and read_responses() read it happily.
     const header = readHeader_(sheet);
-    const row = header.map(col => data[col] !== undefined ? data[col] : "");
-    sheet.appendRow(row);
+    // A duplicate or blank heading makes the mapping ambiguous: an answer
+    // could land in the wrong column, or in 2. The raw submission is kept on
+    // a separate sheet with the reason, so nothing is mis-filed or lost.
+    const problem = headerProblem_(header);
+    if (problem) {
+      let unmapped = ss.getSheetByName(UNMAPPED_SHEET_NAME);
+      if (!unmapped) unmapped = ss.insertSheet(UNMAPPED_SHEET_NAME);
+      appendRowAsText_(unmapped, [new Date().toISOString(), problem, e.postData.contents]);
+      return ContentService
+        .createTextOutput(JSON.stringify({ status: "unmapped", message: problem }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+    const row = header.map(col => data[col] !== undefined ? String(data[col]) : "");
+    const literal = appendRowAsText_(sheet, row);
 
+    // The response says which write path stored the row, so a researcher can
+    // tell a literal RAW write from the fallback that depends on the plain-text
+    // format alone.
+    const reply = { status: "ok", rows: sheet.getLastRow() - 1,
+                    stored: literal ? "raw" : "user_entered_with_text_format" };
+    if (!literal) {
+      reply.warning = "The Sheets advanced service is unavailable, so answers " +
+        "were written without the RAW option. Add it under Services > Google " +
+        "Sheets API, with the identifier Sheets, so an answer beginning with " +
+        "'=' is stored literally.";
+    }
     return ContentService
-      .createTextOutput(JSON.stringify({ status: "ok", rows: sheet.getLastRow() - 1 }))
+      .createTextOutput(JSON.stringify(reply))
       .setMimeType(ContentService.MimeType.JSON);
 
   } catch (err) {
     return ContentService
       .createTextOutput(JSON.stringify({ status: "error", message: err.toString() }))
       .setMimeType(ContentService.MimeType.JSON);
+  } finally {
+    lock.releaseLock();
   }
+}
+
+// A heading that is blank before the last filled column, or that appears more
+// than once, leaves no single column for an answer.
+function headerProblem_(header) {
+  const seen = {};
+  for (let i = 0; i < header.length; i++) {
+    const name = header[i];
+    if (name === "") return "The Responses sheet has a blank heading in column " + (i + 1) + ".";
+    if (seen[name]) return "The Responses sheet has more than one column headed " + name + ".";
+    seen[name] = true;
+  }
+  return "";
+}
+
+// Writes one response row literally, never as user-entered values.
+//
+// appendRow() and setValues() both parse a cell the way typing into it would,
+// so an answer beginning with "=" became a formula: "=1+1" was stored as 2,
+// and "=IMPORTXML(...)" was evaluated inside the researcher's own sheet.
+// Numeric codes lost their leading zeros the same way.
+//
+// The documented way to store a value without parsing is the Sheets API's
+// valueInputOption RAW, which the Sheets advanced service exposes here:
+// https://developers.google.com/workspace/sheets/api/reference/rest/v4/ValueInputOption
+// Google documents setValues() as applying user-entered semantics, so relying
+// on the plain-text number format alone to suppress parsing rests on
+// behaviour Google does not promise. RAW is the promise.
+//
+// Where the advanced service is unavailable, the plain-text format plus
+// setValues() is used and the response says so, since refusing the write
+// outright would lose a live study's answers. Enable the service.
+function appendRowAsText_(sheet, row) {
+  if (!row.length) return true;
+  const startRow = sheet.getLastRow() + 1;
+  const target = sheet.getRange(startRow, 1, 1, row.length);
+  target.setNumberFormat("@");
+  if (typeof Sheets !== "undefined" && Sheets.Spreadsheets &&
+      Sheets.Spreadsheets.Values) {
+    const rangeA1 = sheet.getName() + "!A" + startRow;
+    Sheets.Spreadsheets.Values.update(
+      { values: [row.map(function (v) { return v === null ? "" : String(v); })] },
+      sheet.getParent().getId(),
+      rangeA1,
+      { valueInputOption: "RAW" }
+    );
+    return true;
+  }
+  target.setValues([row]);
+  return false;
 }
 
 // Returns the sheet's live header, creating or extending it as needed.
@@ -65,8 +149,10 @@ function doPost(e) {
 function readHeader_(sheet) {
   let header = [];
   if (sheet.getLastRow() > 0 && sheet.getLastColumn() > 0) {
+    // Headings are read exactly as written. Trimming could merge a heading
+    // with a stray space into a declared column name.
     header = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0]
-                  .map(h => String(h).trim());
+                  .map(h => String(h));
     while (header.length && header[header.length - 1] === "") {
       header.pop();
     }

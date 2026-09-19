@@ -45,6 +45,7 @@ Sheet.prototype.getRange = function(row, col, nRows, nCols){
       }
       return this;
     },
+    setNumberFormat: function(){ return this; },
     setFontWeight: function(){ return this; },
     setBackground: function(){ return this; },
     setFontColor:  function(){ return this; }
@@ -55,6 +56,7 @@ Spreadsheet.prototype.getSheetByName = function(n){ return this.sheets[n] || nul
 Spreadsheet.prototype.insertSheet = function(n){ this.sheets[n] = new Sheet(); return this.sheets[n]; };
 var __ss = new Spreadsheet();
 var SpreadsheetApp = { getActiveSpreadsheet: function(){ return __ss; } };
+var LockService = { getScriptLock: function(){ return { waitLock: function(){}, releaseLock: function(){} }; } };
 var ContentService = {
   createTextOutput: function(t){ return { setMimeType: function(){ return t; } }; },
   MimeType: { JSON: 'json' }

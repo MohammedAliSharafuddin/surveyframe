@@ -14,7 +14,13 @@
 # summary rather than dumping their internals. Names are the component ids,
 # so `sf_items(instr)[["sat_1"]]` is the lookup path.
 sframe_component_list <- function(x, what = "component") {
-  ids <- vapply(x, function(el) as.character(el$id %||% "")[1], character(1))
+  # Named through sf_id(), so a component that identifies itself by another
+  # field is named by it. A branch carries no `id`, and reading `id` directly
+  # gave every branch list an empty name and broke [[ lookup.
+  ids <- vapply(x, function(el) {
+    out <- try(sf_id(el), silent = TRUE)
+    if (inherits(out, "try-error")) as.character(el$id %||% "")[1] else out
+  }, character(1))
   names(x) <- ids
   structure(x, class = "sf_component_list", what = what)
 }
@@ -73,18 +79,34 @@ print.sf_component_list <- function(x, ...) {
 #' replace reaching into the object with `$`, which ties user code to the
 #' internal layout.
 #'
-#' `sf_items()`, `sf_scales()`, `sf_choice_sets()`, `sf_branches()`,
-#' `sf_checks()` and `sf_models()` return the component objects as an
-#' [sf_component_list]. `sf_meta()` returns the metadata as a list and
-#' `sf_plan()` returns the pre-declared analysis plan. For a flat table of the
-#' same content, call `as.data.frame()` on the object instead.
+#' What each one gives back depends on what it is asked. Given an instrument,
+#' the component accessors return the component objects as an
+#' [sf_component_list], which prints as a list and is subset with `[` and
+#' `[[`. Given a codebook, the same verbs return the table the codebook
+#' already holds, a plain data frame with one row per item, scale, choice set,
+#' model or plan block.
+#'
+#' | Accessor | On an `sframe` | On an `sframe_codebook` |
+#' | --- | --- | --- |
+#' | `sf_meta()` | list of metadata | list of metadata |
+#' | `sf_items()` | `sf_component_list` of items | data frame of items |
+#' | `sf_scales()` | `sf_component_list` of scales | data frame of scales |
+#' | `sf_choice_sets()` | `sf_component_list` of choice sets | data frame of choice sets |
+#' | `sf_branches()` | `sf_component_list` of branching rules | not available |
+#' | `sf_checks()` | `sf_component_list` of checks | not available |
+#' | `sf_models()` | `sf_component_list` of models | data frame of models |
+#' | `sf_plan()` | list of plan blocks | data frame of plan blocks |
+#'
+#' `as.data.frame()` on an instrument gives its items as a table, which is one
+#' part of it, and a component list has no coercion of its own. For every
+#' table an instrument can produce, use [codebook_report()].
 #'
 #' @param x A surveyframe object.
 #' @param ... Passed to methods.
 #'
-#' @return `sf_items()`, `sf_scales()`, `sf_choice_sets()`, `sf_branches()`,
-#'   `sf_checks()` and `sf_models()` return an [sf_component_list].
-#'   `sf_meta()` and `sf_plan()` return lists.
+#' @return A list for `sf_meta()` and `sf_plan()` on an instrument, an
+#'   [sf_component_list] for the component accessors on an instrument, and a
+#'   data frame for any of them on a codebook. See the table above.
 #' @name sf_accessors
 #' @seealso [as_sframe()], [sf_problems()], [sframe_validation]
 #'
@@ -212,6 +234,9 @@ sf_plan.sframe <- function(x, ...) x$analysis_plan %||% list()
                  class = "sframe_error")
   }
   x$analysis_plan <- value
+  # The stamp records that this content passed validation. Replacing the plan
+  # changes the content, so it goes, and validate_sframe() sets it again.
+  x$meta$validated <- FALSE
   x
 }
 
@@ -287,7 +312,9 @@ sf_id.sf_choices <- sframe_component_id
 sf_id.sf_scale <- sframe_component_id
 #' @rdname sf_identity
 #' @exportS3Method sf_id sf_branch
-sf_id.sf_branch <- sframe_component_id
+# A branch is identified by the item whose visibility it controls. One rule
+# per target item, which validation enforces.
+sf_id.sf_branch <- function(x, ...) as.character(x$item_id %||% "")[1]
 #' @rdname sf_identity
 #' @exportS3Method sf_id sf_check
 sf_id.sf_check <- sframe_component_id
@@ -417,15 +444,35 @@ as_sframe.sframe_validation <- function(x, ...) {
 
 #' Read the reportable parts of an analysis or quality result
 #'
-#' `sf_apa()` returns the APA-formatted sentence for each analysis block.
-#' `sf_flagged()` returns the row numbers a quality report flagged.
+#' `sf_apa()` returns the APA-formatted sentence a result carries.
+#' `sf_flagged()` returns the rows a quality report flagged.
 #'
-#' @param x An `sframe_analysis_results` object for `sf_apa()`, or an
-#'   `sframe_quality_report` for `sf_flagged()`.
+#' Given analysis results, `sf_apa()` answers for every block at once, as a
+#' character vector named by block. Given one of the standalone reports that
+#' carry a sentence of their own, an assumption report, a descriptives report,
+#' a missing-data report or a validity report, it returns that single
+#' sentence. A result with no sentence gives an empty string, so the shape of
+#' the answer follows the number of blocks asked about.
+#'
+#' The sentence is plain text. APA 7 asks for italic Latin statistical symbols,
+#' so a manuscript needs `t`, `F`, `p`, `r`, `d` and the rest italicised after
+#' pasting: a character vector cannot carry that styling. Numbers are already
+#' APA-formatted, including no leading zero on `p` and a labelled confidence
+#' interval.
+#'
+#' `sf_flagged()` returns row positions in the response data, as one sorted
+#' vector with each row once, pooling every check the quality report ran:
+#' failed attention checks, straight-lining, excess missingness, timing and
+#' duplicates. Read the report itself for which check flagged a row.
+#'
+#' @param x An `sframe_analysis_results` object, or one of the reports named
+#'   above, for `sf_apa()`. An `sframe_quality_report` for `sf_flagged()`.
 #' @param ... Passed to methods.
 #'
-#' @return `sf_apa()` returns a named character vector, one element per
-#'   analysis block. `sf_flagged()` returns an integer vector of row numbers.
+#' @return `sf_apa()` returns a character vector: one element per block, named
+#'   by block, for analysis results, and one element for a single report.
+#'   `sf_flagged()` returns an integer vector of row positions, sorted, each
+#'   row once.
 #' @name sf_report_accessors
 #'
 #' @examples
@@ -468,6 +515,33 @@ sf_apa.sframe_validity_report <- sframe_report_apa
 #' @rdname sf_report_accessors
 #' @exportS3Method sf_apa sframe_assumption_report
 sf_apa.sframe_assumption_report <- sframe_report_apa
+
+#' Columns the instrument declares that the responses left out
+#'
+#' A partial export gives a quality report every column it holds, and none of
+#' the ones it dropped. This names the declared columns that never arrived, so
+#' a missingness figure can be read against what was expected. They count as
+#' missing for every respondent in [quality_report()]'s rates.
+#'
+#' @param x An `sframe_quality_report` object.
+#' @param ... Passed to methods.
+#'
+#' @return A character vector of column names, empty where the export carried
+#'   every declared column.
+#' @export
+#' @seealso [quality_report()], [sf_flagged()]
+#'
+#' @examples
+#' demo <- sframe_demo_data()
+#' qr   <- quality_report(demo$responses, demo$instrument)
+#' sf_missing_columns(qr)
+sf_missing_columns <- function(x, ...) UseMethod("sf_missing_columns")
+
+#' @rdname sf_missing_columns
+#' @exportS3Method sf_missing_columns sframe_quality_report
+sf_missing_columns.sframe_quality_report <- function(x, ...) {
+  as.character(x$missing$missing_columns %||% character(0))
+}
 
 #' @rdname sf_report_accessors
 #' @exportS3Method sf_flagged sframe_quality_report
