@@ -36,11 +36,35 @@ addin_launch_studio <- function() {
   launch_studio()
 }
 
+# Asks the researcher for a .sframe file, and returns NULL where the dialog is
+# cancelled or unavailable. Its own function so a test can drive both answers.
+sframe_addin_choose_sframe <- function(
+    caption = "Choose an instrument (.sframe)") {
+  if (!requireNamespace("rstudioapi", quietly = TRUE) ||
+      !rstudioapi::isAvailable()) {
+    return(NULL)
+  }
+  path <- tryCatch(
+    rstudioapi::selectFile(caption = caption, filter = "sframe files (*.sframe)",
+                           existing = TRUE),
+    error = function(e) NULL)
+  if (is.null(path) || !length(path) || !nzchar(path)) return(NULL)
+  path
+}
+
 #' @keywords internal
 #' @noRd
 addin_launch_dashboard <- function() {
   if (!sframe_addin_ready()) return(invisible(NULL))
-  launch_dashboard()
+  # launch_dashboard() refuses a missing instrument, so calling it with no
+  # arguments turned an advertised menu entry into an error message. The addin
+  # asks which instrument to open, and does nothing where that is cancelled.
+  path <- sframe_addin_choose_sframe()
+  if (is.null(path)) return(invisible(NULL))
+  # Read first, so a file that will not load reports itself here rather than
+  # inside the launcher.
+  instrument <- read_sframe(path)
+  launch_dashboard(instrument = instrument)
 }
 
 # The skeleton is checked against the shipped constructors by

@@ -19,7 +19,14 @@ sframe_items_table <- function(instrument) {
     type       = vapply(instrument$items, function(i) i$type,  character(1)),
     choice_set = vapply(instrument$items, function(i) i$choice_set %||% "", character(1)),
     scale_id   = vapply(instrument$items, function(i) i$scale_id %||% "", character(1)),
-    reverse    = vapply(instrument$items, function(i) isTRUE(i$reverse), logical(1)),
+    # Reversal is declared either on the item or in its scale's reverse_items,
+    # and both are scored. Reading the item flag alone showed an item its scale
+    # reverses as though it were scored in the same direction as the rest.
+    reverse    = vapply(instrument$items, function(i) {
+      isTRUE(i$reverse) || any(vapply(instrument$scales %||% list(), function(s) {
+        i$id %in% sframe_scale_reverse_ids(instrument, s)
+      }, logical(1)))
+    }, logical(1)),
     required   = vapply(instrument$items, function(i) isTRUE(i$required), logical(1)),
     stringsAsFactors = FALSE,
     check.names = FALSE
@@ -113,18 +120,52 @@ sframe_models_table <- function(instrument) {
 
 #' Coerce a surveyframe object to a data frame
 #'
-#' Every surveyframe class returns its primary table. For an instrument that
-#' is the item table, for a validation result the problems, for a report the
-#' table it is mainly about. Where an object holds more than one table, the
-#' others are reachable through the named accessors in [sf_accessors] or,
-#' for a full tabular record of an instrument, through [codebook_report()].
+#' Every surveyframe class returns its primary table, and each class has its
+#' own columns. Where an object holds more than one table, the others are
+#' reachable through the named accessors in [sf_accessors], or, for a full
+#' tabular record of an instrument, through [codebook_report()].
+#'
+#' # What each class gives
+#'
+#' | Class | One row per | Columns |
+#' | --- | --- | --- |
+#' | `sframe` | item | `id`, `label`, `type`, `choice_set`, `scale_id`, `reverse`, `required` |
+#' | `sframe_codebook` | item | the codebook's item table |
+#' | `sframe_validation` | problem | `check`, `problem` |
+#' | `sframe_analysis_results` | block | `block`, `research_question`, `method`, `apa` |
+#' | `sframe_reliability_report` | scale | `scale_id`, `label`, `n_items`, `n`, `alpha`, `omega` |
+#' | `sframe_item_report` | item | `scale_id` and the item diagnostics |
+#' | `sframe_quality_report` | check | the flattened quality checks |
+#' | `sframe_efa_report` | measure | the readiness measures |
+#' | `sframe_sensitivity` | perturbation | `criterion`, `direction`, `weight`, `rho`, `rank_changed`, `top_changed` |
+#'
+# The item and scale tables are a summary, and say so on the page, since an
+# integration reading one as the full declaration loses the type settings.
+#' # A summary, and where the full record is
+#'
+#' These tables are a summary of the columns a reader scans first. The item
+#' table leaves out help text, placeholder, matrix rows, comparison items and
+#' scale, slider and rating settings, date bounds, section introduction and
+#' page; the scale table leaves out `min_valid`, the reverse key and the
+#' weights. Read the stored declaration in full through [sf_items()],
+#' [sf_scales()] and the rest of [sf_accessors], each of which returns the
+#' component objects themselves, or through [write_sframe()] for the
+#' interchange record.
+#'
+#' A class holding one table returns it directly, so it keeps that table's own
+#' row names and `row.names` has no effect. Pass `row.names` to
+#' [base::as.data.frame()] on the returned frame where you need to set them.
+#' The coercion gives one view of an object. An instrument, for example,
+#' returns its items, and its choice sets and scales come from
+#' [sf_choice_sets()], [sf_scales()] or [codebook_report()].
 #'
 #' @param x A surveyframe object.
-#' @param row.names Passed to [base::as.data.frame()].
+#' @param row.names Passed to [base::as.data.frame()] by the methods that
+#'   build a frame. Ignored by the methods that return a stored table.
 #' @param optional Passed to [base::as.data.frame()].
 #' @param ... Ignored. Present for S3 consistency.
 #'
-#' @return A data frame.
+#' @return A data frame, with the columns listed above for the class given.
 #' @name sframe_as_data_frame
 #' @seealso [sf_accessors], [codebook_report()]
 #'

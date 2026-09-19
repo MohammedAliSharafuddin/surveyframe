@@ -1,6 +1,6 @@
 Package: surveyframe
 Title: Survey Instrument Workflows
-Version: 0.4.1
+Version: 0.4.2
 Authors@R: c(
     person(
       given = "Mohammed Ali",
@@ -53,6 +53,7 @@ Suggests:
     logistf (>= 1.24.0),
     digest (>= 0.6.0),
     lavaan (>= 0.6-0),
+    seminr (>= 2.3.0),
     testthat (>= 3.0.0),
     knitr,
     rmarkdown,
@@ -67,7 +68,11 @@ Suggests:
     topicmodels,
     igraph (>= 1.5.0),
     V8 (>= 4.0.0),
-    haven (>= 2.5.0)
+    haven (>= 2.5.0),
+    callr,
+    chromote,
+    httpuv,
+    pkgload
 VignetteBuilder: knitr
 Config/testthat/edition: 3
 Config/roxygen2/version: 8.1.0

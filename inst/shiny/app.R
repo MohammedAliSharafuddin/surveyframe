@@ -1128,7 +1128,7 @@ if (identical(initial_tab, "auto")) {
     "open"
   }
 }
-if (!initial_tab %in% c("open", "preview", "responses", "quality",
+if (!initial_tab %in% c("open", "amendments", "preview", "responses", "quality",
                        "reliability", "analysis", "dashboard", "export")) {
   initial_tab <- if (inherits(INITIAL_INSTRUMENT, "sframe")) {
     "preview"
@@ -1665,7 +1665,9 @@ server <- function(input, output, session) {
       analysis_plan = rv$builder$analysis_plan %||% list(),
       models = rv$builder$models %||% list(),
       render = rv$builder$render %||% list(),
-      amendments = rv$builder$amendments %||% list()
+      amendments = rv$builder$amendments %||% list(),
+      designs = rv$builder$designs %||% list(),
+      origin = rv$builder$origin
     )
   })
 
@@ -1816,7 +1818,7 @@ server <- function(input, output, session) {
       return()
     }
 
-    item <- sf_item(
+    edits <- list(
       id = item_id,
       label = item_label,
       type = item_type,
@@ -1826,7 +1828,15 @@ server <- function(input, output, session) {
       placeholder = if (item_type %in% c("text", "textarea")) trim_or_null(input$item_placeholder) else NULL
     )
 
-    existing <- item_id %in% vapply(rv$builder$items, function(x) x$id, character(1))
+    ids <- vapply(rv$builder$items, function(x) x$id, character(1))
+    existing <- item_id %in% ids
+    # An edit applies the form's fields to the item already there, so reverse
+    # coding, scale membership, the page and type settings survive it.
+    item <- if (existing) {
+      surveyframe::sframe_builder_update_item(rv$builder$items[[match(item_id, ids)]], edits)
+    } else {
+      surveyframe::sframe_builder_as_item(edits)
+    }
     state <- rv$builder
     state$items <- upsert_component(state$items, item)
     set_builder_state(state)
@@ -2355,8 +2365,16 @@ server <- function(input, output, session) {
   output$preview_gate <- renderUI({
     draft <- draft_result()
     if (length(draft$instrument$items) == 0) {
+      # Studio opens an instrument that already exists, and questions are
+      # authored in the builder. The old wording named an authoring screen
+      # Studio has never had, while the Open screen next door routed
+      # authoring correctly.
       return(tags$div(class = "card",
-        "Add at least one item in Build Survey before previewing."))
+        tags$p("This instrument has no questions yet, so there is nothing to preview."),
+        tags$p(paste0(
+          "Design the questions in the SurveyBuilder, which opens with ",
+          "launch_builder(), export the .sframe, then load it on the Open ",
+          "Instrument screen to preview, analyse and re-export it."))))
     }
     if (!draft$valid) {
       return(tags$div(class = "card",
@@ -2375,8 +2393,11 @@ server <- function(input, output, session) {
     # export_static_survey() instead of re-creating the layout with widgets.
     tmp <- tempfile(fileext = ".html")
     ok <- tryCatch({
+      # preview = TRUE strips the collector and the redirect, so the promise
+      # below is enforced by the export instead of trusted.
       suppressMessages(surveyframe::export_static_survey(
-        instr, output_path = tmp, open = FALSE, overwrite = TRUE
+        instr, output_path = tmp, open = FALSE, overwrite = TRUE,
+        preview = TRUE
       ))
       TRUE
     }, error = function(e) FALSE)
@@ -2387,7 +2408,10 @@ server <- function(input, output, session) {
     html <- paste(readLines(tmp, warn = FALSE, encoding = "UTF-8"), collapse = "\n")
     tagList(
       tags$p(class = "hint", style = "margin-bottom: 12px;",
-        "This is the exact deployable survey. Anything entered here stays in this preview."),
+        paste0("This is the deployable survey, exported with collection ",
+               "switched off. Anything entered here goes nowhere: the ",
+               "collector endpoint and the completion redirect are both ",
+               "removed from the preview.")),
       tags$iframe(
         srcdoc = html,
         style = "width:100%;height:78vh;border:1px solid var(--cb);border-radius:10px;background:#fff;",
@@ -3626,7 +3650,16 @@ server <- function(input, output, session) {
   }
 
   output$export_sframe_ui <- renderUI({
-    if (isTRUE(draft_result()$valid)) {
+    if (isTRUE(draft_result()$valid) && !is.null(draft_result()$revision_problem)) {
+      # An edited file needs its change disclosed on the Amendments screen, or
+      # an explicit decision to save it as a new instrument.
+      tagList(
+        tags$p(class = "hint", draft_result()$revision_problem),
+        checkboxInput("export_as_new",
+          "Save as a new instrument, without the previous amendment log", value = FALSE),
+        downloadButton("download_sframe_btn", "Download .sframe", class = "btn-primary")
+      )
+    } else if (isTRUE(draft_result()$valid)) {
       downloadButton("download_sframe_btn", "Download .sframe", class = "btn-primary")
     } else {
       export_disabled_btn(
@@ -3656,7 +3689,16 @@ server <- function(input, output, session) {
         stop("Draft validation must pass before exporting a .sframe file.")
       }
       tmp <- tempfile(fileext = ".sframe")
-      surveyframe::write_sframe(draft$instrument, tmp, overwrite = TRUE)
+      instrument <- draft$instrument
+      as_new <- !is.null(draft$revision_problem) && isTRUE(input$export_as_new)
+      if (!is.null(draft$revision_problem) && !as_new) {
+        stop(draft$revision_problem)
+      }
+      if (as_new) {
+        instrument$amendments <- list()
+        attr(instrument, "sframe_origin") <- NULL
+      }
+      surveyframe::write_sframe(instrument, tmp, overwrite = TRUE, new_instrument = as_new)
       file.copy(tmp, file, overwrite = TRUE)
     }
   )
