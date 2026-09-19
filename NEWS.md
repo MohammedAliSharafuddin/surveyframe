@@ -36,10 +36,15 @@ This section grows as each group of fixes lands.
   for different questions**, when the app starts and on each submission.
   Collect a changed instrument into a new file. A file with the same columns
   in another order is still accepted, and rows are aligned by column name.
-* **Google Sheets responses are stored as text.** Regenerate and redeploy the
-  collector script with `export_google_sheet()` to get the fix. Code that
-  reads the sheet directly, bypassing `read_sheet_responses()`, should expect
-  text cells where numbers appeared before.
+* **Google Sheets collection now needs the Sheets advanced service.** The
+  generated collector stores an answer through the Sheets API's `RAW` option,
+  which is the documented way to store a value without the spreadsheet parsing
+  it. Regenerate and redeploy the collector with `export_google_sheet()`, and
+  in the Apps Script editor add Services > Google Sheets API with the
+  identifier `Sheets`. **A collector lacking it refuses each response** and
+  replies with an error, in place of storing an answer it would have to alter.
+  Code that reads the sheet directly, bypassing `read_sheet_responses()`,
+  should expect text cells where numbers appeared before.
 
 * **Scale scores and reliability can change.** Re-run analyses of scales
   that reverse-code items, share items with other scales, or had an absent
@@ -136,9 +141,29 @@ This section grows as each group of fixes lands.
   answered.
 * **The Google Sheets collector could turn an answer into a formula.** An
   answer beginning with `=` was evaluated by the spreadsheet, so `=1+1` was
-  stored as `2`, and a code such as `007` lost its leading zeros. Answers are
-  now stored exactly as submitted. The same fix applies to collectors
-  generated from the survey builder.
+  stored as `2`, and a code such as `007` lost its leading zeros. A stored
+  answer is now written through the Sheets API's `RAW` option, which stores it
+  as submitted. A deployment lacking that option refuses the response and says
+  so, in place of altering it. The same fix applies to collectors generated
+  from the survey builder. See the setup note above.
+* **The exported survey said a response had been recorded when it could not
+  know.** The page posts with `no-cors`, which leaves the collector's reply
+  unreadable, so the browser can establish that a request left and nothing
+  further. The thank-you screen claimed the response had been recorded, hid the
+  download, offered a restart that discarded the page's only copy, and could
+  auto-redirect away from it. It now reports that the answers were sent and
+  that receipt is unconfirmed, keeps the download available, withholds the
+  restart that would clear the response, and leaves any redirect for the
+  participant to choose.
+* **A custom thank-you message no longer shows on a survey with a collector.**
+  A message set through `render$thankyou$message` is fixed text, written before
+  anyone knew how delivery would go, so a wording such as "your response has
+  been recorded" put a claim on screen beside the page's own statement that
+  receipt was unconfirmed. The package's own status is shown instead. A custom message still
+  shows on a download-only survey, where nothing is being claimed about a
+  collector. Put debrief text, contact details or payment instructions on a
+  final display item or in the redirect target, where they always reach the
+  participant.
 * **The exported survey changed typed numbers.** Clearing a number field with
   a minimum wrote the minimum in, a number outside the range was replaced
   with the nearest limit, and in a points allocation `2.5` became `25`. What

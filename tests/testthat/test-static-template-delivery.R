@@ -142,3 +142,37 @@ test_that("8: a local survey with no collector still redirects", {
   expect_equal(ctx$get("window.location.href"), "")
   expect_match(app_html(ctx), "https://example.com/next", fixed = TRUE)
 })
+
+# Reopened again: the first pass at gate 2 changed only the DEFAULT message, on
+# the reasoning that a designer's own wording was their claim to make. That was
+# wrong. The package is the thing that knows receipt is unconfirmed, and a custom
+# message asserting storage produced a screen that said "your response has been
+# recorded" and "cannot confirm" at the same time.
+
+test_that("8: a custom thank-you message cannot assert storage either", {
+  skip_if_not_installed("V8")
+  ctx <- submit_with(fails = FALSE, thankyou = list(
+    message = "Your response has been recorded. Thank you."))
+  html <- app_html(ctx)
+
+  expect_false(grepl("has been recorded", html, fixed = TRUE))
+  expect_match(html, "cannot confirm", fixed = TRUE)
+  expect_match(html, "Download my response", fixed = TRUE)
+})
+
+test_that("8: a custom message still shows where delivery is not in doubt", {
+  skip_if_not_installed("V8")
+  # No collector, so nothing was sent and nothing is being claimed about it. The
+  # researcher's own wording is what the participant should read.
+  ctx <- submit_with(fails = FALSE, endpoint = "", thankyou = list(
+    message = "Thank you. Please email the file to the research team."))
+  expect_match(app_html(ctx), "email the file", fixed = TRUE)
+})
+
+test_that("8: an unconfirmed send does not offer a destructive restart", {
+  skip_if_not_installed("V8")
+  # The review's gate: no "Submit another response" on a state that cannot
+  # establish the answers are stored. A researcher on a shared device reloads.
+  html <- app_html(submit_with(fails = FALSE))
+  expect_false(grepl("Submit another response", html, fixed = TRUE))
+})

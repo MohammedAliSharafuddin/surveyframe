@@ -1283,23 +1283,27 @@ function renderThankyou(){
     ?'<button type="button" class="btn btn-p" onclick="downloadCsv(window._lastCsv.csv,window._lastCsv.name)">Download my response (CSV)</button>':'';
   var retryBtn=failed
     ?'<button type="button" class="btn btn-p" onclick="retrySubmission()">Try sending again</button>':'';
-  // Starting over reloads, which discards the page's copy of the response. That
-  // copy is the only proof of the answers wherever receipt is unconfirmed, so
-  // the button asks first rather than being withheld: a researcher fielding on
-  // one shared device still needs it.
-  var again=failed?'':'<button type="button" class="btn btn-s" onclick="restartSurvey()">Submit another response</button>';
+  // Starting over reloads, which discards the page's copy of the response. On a
+  // failed or unconfirmed send that copy is the only proof the answers exist, so
+  // the button is withheld, as it already was on failure. A researcher fielding
+  // on one shared device reloads the browser themselves, which is a deliberate
+  // act on their own device rather than a button beside "Download my response".
+  var again=(failed||unconfirmed)?'':'<button type="button" class="btn btn-s" onclick="restartSurvey()">Submit another response</button>';
   var cont=(TY.redirect_url&&!failed)
     ?'<a class="btn btn-s" style="text-decoration:none" href="'+esc(TY.redirect_url)+'">Continue</a>':'';
   var title=failed?'Almost done':'Thank You';
   var icon=failed?'&#33;':'&#10004;';
-  // The designer's own message is still shown where they wrote one. What changed
-  // is the default, which used to assert recording on a state that cannot
-  // establish it.
-  var msg=failed
-    ?'Your answers are complete.'
-    :(TY.message||(unconfirmed
-        ?'Your answers have been sent. Thank you for participating.'
-        :'Your response has been recorded. Thank you for participating.'));
+  // The package's own status wins on a failed or unconfirmed send. A designer's
+  // message is fixed text written before anyone knew how delivery would go, and
+  // a custom "your response has been recorded" put that claim on screen beside
+  // "cannot confirm", which is worse than either alone. Failure already
+  // overrode it; an unconfirmed send is the same case. A custom message is shown
+  // wherever nothing is being claimed about a collector, which is the
+  // download-only survey.
+  var msg=(failed||unconfirmed)
+    ?(failed?'Your answers are complete.'
+            :'Your answers have been sent. Thank you for participating.')
+    :(TY.message||'Your response has been recorded. Thank you for participating.');
   var unconfirmedNote=unconfirmed
     ?'<div class="ty-note">Your answers were sent, and this page cannot confirm '
      +'the researcher’s collector stored them. Download the file below to '
