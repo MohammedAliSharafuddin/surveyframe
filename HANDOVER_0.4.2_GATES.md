@@ -16,6 +16,10 @@ the source before any work started, and all five held.
 | 4 | Static A1/A2/A3 in a real browser, asserting the stored row | **open** |
 | 5 | Enforce and complete `analysis_syntax()`'s method coverage | **done**, `5feb7ee` |
 
+Gate 2 was reopened once and closed again in `18427dd`, see below. The full
+suite on the gate branch is 0 failures and 0 errors, with 66 skips on the
+`Rscript` route and 3 pre-existing warnings.
+
 `NEWS.md` is corrected for gates 1 and 2, so it no longer claims unconditionally
 that a Sheets answer is stored as submitted, and it records the thank-you screen
 change.
@@ -104,8 +108,10 @@ that a real browser's event handling reaches the same row.
 
 ## Also outstanding, beyond the gates
 
-- **`R CMD check --as-cran` on a freshly built tarball.** Not run since the gate
-  work started.
+- **`R CMD check --as-cran`: done, `Status: 1 NOTE`**, the note being
+  "Number of updates in past 6 months: 7". Run on the tarball built from
+  `4b8003b`. Tests inside the check took 194s and passed. Re-run after gate 4,
+  since a check on one tree says nothing about the next.
 - **A fresh-clone install run** of `sframe_demo()` across the 22 demos,
   `launch_builder()`, and an `export_static_survey()` round trip.
 - **win-builder**, R-release and R-devel.
