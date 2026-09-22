@@ -1266,9 +1266,15 @@ function renderThankyou(){
   // no collector endpoint exists (the downloaded CSV is then the only copy
   // of the response, so it must stay reachable, as a choice, never forced).
   var failed=deliveryState==='failed';
-  // A failed send makes the download the only copy of the response, so it is
-  // offered whatever the designer chose.
-  var showDl=(TY.show_download||!ENDPOINT||failed)&&window._lastCsv;
+  // A no-cors POST is opaque, so 'sent' means the request left and nothing more.
+  // The collector may have replied "unmapped", or "error", or refused the write
+  // because the Sheets API is not enabled, and none of that is readable here.
+  // Receipt is therefore unconfirmed whenever a collector is configured, and the
+  // page must not assert storage it cannot observe.
+  var unconfirmed=deliveryState==='sent'&&!!ENDPOINT;
+  // A failed or unconfirmed send makes the download the only copy anyone can
+  // prove exists, so it is offered whatever the designer chose.
+  var showDl=(TY.show_download||!ENDPOINT||failed||unconfirmed)&&window._lastCsv;
   var offlineNote=(!ENDPOINT&&window._lastCsv)
     ?'<div class="ty-note">This survey has no online collector. Download your response below and return the file to the researcher.</div>':'';
   var failNote=failed
@@ -1277,30 +1283,60 @@ function renderThankyou(){
     ?'<button type="button" class="btn btn-p" onclick="downloadCsv(window._lastCsv.csv,window._lastCsv.name)">Download my response (CSV)</button>':'';
   var retryBtn=failed
     ?'<button type="button" class="btn btn-p" onclick="retrySubmission()">Try sending again</button>':'';
-  // Starting over discards a response that has yet to reach the collector, so
-  // it is offered once delivery is settled.
-  var again=failed?'':'<button type="button" class="btn btn-s" onclick="window.location.reload()">Submit another response</button>';
+  // Starting over reloads, which discards the page's copy of the response. On a
+  // failed or unconfirmed send that copy is the only proof the answers exist, so
+  // the button is withheld, as it already was on failure. A researcher fielding
+  // on one shared device reloads the browser themselves, which is a deliberate
+  // act on their own device rather than a button beside "Download my response".
+  var again=(failed||unconfirmed)?'':'<button type="button" class="btn btn-s" onclick="restartSurvey()">Submit another response</button>';
   var cont=(TY.redirect_url&&!failed)
     ?'<a class="btn btn-s" style="text-decoration:none" href="'+esc(TY.redirect_url)+'">Continue</a>':'';
   var title=failed?'Almost done':'Thank You';
   var icon=failed?'&#33;':'&#10004;';
-  var msg=failed
-    ?'Your answers are complete.'
+  // The package's own status wins on a failed or unconfirmed send. A designer's
+  // message is fixed text written before anyone knew how delivery would go, and
+  // a custom "your response has been recorded" put that claim on screen beside
+  // "cannot confirm", which is worse than either alone. Failure already
+  // overrode it; an unconfirmed send is the same case. A custom message is shown
+  // wherever nothing is being claimed about a collector, which is the
+  // download-only survey.
+  var msg=(failed||unconfirmed)
+    ?(failed?'Your answers are complete.'
+            :'Your answers have been sent. Thank you for participating.')
     :(TY.message||'Your response has been recorded. Thank you for participating.');
+  var unconfirmedNote=unconfirmed
+    ?'<div class="ty-note">Your answers were sent, and this page cannot confirm '
+     +'the researcher’s collector stored them. Download the file below to '
+     +'keep a copy you can send on if you are asked for one.</div>':'';
   el.innerHTML='<div class="card"><div class="card-body">'
     +'<div class="ty-ic">'+icon+'</div>'
     +'<div class="ty-title">'+title+'</div>'
     +'<div class="ty-msg">'+esc(msg)+'</div>'
     +failNote
+    +unconfirmedNote
     +offlineNote
     +'<div class="ty-acts">'+retryBtn+dlBtn+cont+again+'</div>'
     +'</div></div>';
   // Auto-redirect only when nothing on this screen needs the respondent's
   // attention (no download offer, no failed delivery), so the file is never
-  // yanked away and a failure is never redirected past.
+  // yanked away and a failure is never redirected past. An unconfirmed send
+  // always offers the download, so it never auto-redirects either: the Continue
+  // link is still there for a participant who chooses to go on.
   if(TY.redirect_url&&!showDl&&!failed&&deliveryState!=='sending'){
     setTimeout(function(){window.location.href=TY.redirect_url;},2500);
   }
+}
+// Reloading is the only way to clear the form for the next participant, and it
+// drops window._lastCsv with it. Where that copy is the only one anyone can
+// prove exists, the participant is asked before it goes.
+function restartSurvey(){
+  var atRisk=window._lastCsv&&(deliveryState==='failed'||
+    (deliveryState==='sent'&&!!ENDPOINT)||!ENDPOINT);
+  if(atRisk&&!confirm('Starting a new response clears this one from the page. '
+    +'If you have not used Download my response, that copy is lost. Continue?')){
+    return;
+  }
+  window.location.reload();
 }
 
 // ── Init ───────────────────────────────────────────────────────────────────

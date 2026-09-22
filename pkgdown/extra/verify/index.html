@@ -88,7 +88,7 @@
 <nav class="navbar navbar-expand-lg fixed-top bg-primary" data-bs-theme="dark" aria-label="Site navigation">
   <div class="container">
     <a class="navbar-brand me-2" href="../index.html">surveyframe</a>
-    <small class="nav-text text-muted me-auto">0.4.0</small>
+    <small class="nav-text text-muted me-auto">0.4.2</small>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -141,8 +141,9 @@
 
   <p class="scope-note">
     <strong>What this proves, and what it does not.</strong> A matching hash
-    confirms the file is byte-identical to what <code>write_sframe()</code>
-    produced. That proves file identity. It says nothing about question
+    confirms that the instrument content matches the SHA-256 digest stored by
+    <code>write_sframe()</code>. That detects later content changes. It does not
+    authenticate the author, and it says nothing about question
     wording, sampling, or measurement quality, and an amendment log only
     records changes a researcher chose to disclose through
     <code>amend_sframe()</code>, which cannot compel disclosure. See the
@@ -273,7 +274,7 @@ async function verify(text){
 
   var status, note;
   if(storedHash&&storedHash===canon){
-    status='ok'; note='Integrity verified. This file is byte-identical to what write_sframe() produced.';
+    status='ok'; note='Integrity verified. The instrument content matches the SHA-256 digest stored in this file.';
   }else if(storedHash&&storedHash===legacy){
     status='legacy'; note='Integrity verified against the legacy (pre-canonical) hash format. This file predates surveyframe 0.3’s canonical serialisation. Content is unchanged; consider re-saving it with a current package version.';
   }else{

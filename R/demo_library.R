@@ -100,8 +100,9 @@ sframe_demo_dir <- function() {
 
 #' Load one bundled demo
 #'
-#' One of the 22-item teaching library, each demonstrating one analysis
-#' method end to end. For the demo that instead exercises every input type
+#' One of the 22-item teaching library: 17 analysis examples, three
+#' presentation examples, and two provenance examples. For the demo that
+#' instead exercises every input type
 #' SurveyBuilder and SurveyStudio support in a single instrument, see
 #' [sframe_input_types_demo_data()].
 #'
@@ -304,8 +305,11 @@ sframe_export_labelled <- function(data, instrument, path) {
 #'
 #' The code route through a demo is a notebook that renders to a report, which
 #' is what a research workflow looks like. This writes one for the named demo:
-#' load the instrument, read the responses, run the pre-declared plan, render
-#' the report, and export the data for checking elsewhere.
+#' load and validate the instrument and responses, inspect the complete ordered
+#' analysis plan, screen data quality, run the plan with status and plots,
+#' inspect each result and its reproducible syntax, compare the bundled expected
+#' results, render analysis and full reports, and export the data for checking
+#' elsewhere.
 #'
 #' @param name Character. A demo name, as listed by [sframe_demos()].
 #' @param dir Directory to write into. Defaults to the working directory.
@@ -365,8 +369,9 @@ sframe_demo_qmd <- function(name, dir = ".", overwrite = FALSE) {
 #'
 #' Unlike [sframe_demo_qmd()], which only works for one of the bundled demo
 #' instruments (it looks `name` up in [sframe_demos()]), this writes a
-#' runnable Quarto notebook for any instrument, using its own responses. The
-#' notebook reads the instrument and its responses back from 2 companion
+#' runnable Quarto notebook for any instrument, using its own responses. It
+#' exposes the complete ordered plan, screening, run status, detailed results,
+#' plots and reports. The notebook reads the instrument and its responses back from 2 companion
 #' files written alongside it, so all 3 files must stay together.
 #'
 #' @param instrument An `sframe` object.

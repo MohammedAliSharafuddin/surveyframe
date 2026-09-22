@@ -86,9 +86,9 @@ SurveyStudio. The output preview on the right shows counts, such as the number
 of plans, the number of data-dependent run items, and the number of saved
 models.
 
-The model builder, also on the right, creates constructs from the scales,
-adds structural paths, and writes lavaan or seminr syntax along with the model
-JSON into the `.sframe` file. The Google Sheet panel does not collect data on
+The model builder, also on the right, creates constructs from the scales and
+adds structural paths. The `.sframe` stores that model specification, and
+surveyframe can generate lavaan or seminr syntax from it. The Google Sheet panel does not collect data on
 its own. It explains that, after saving the `.sframe` file, you run
 `export_google_sheet(instr, sheet_url = "...")` in R to generate the Apps Script
 collector.
@@ -176,8 +176,9 @@ launch_studio(
 ```
 
 SurveyStudio reads the objects passed by `launch_studio()`. With response data
-present, `screen = "auto"` opens the Upload Responses screen, and
-`screen = "analysis"` opens the Analysis Plan screen.
+present, `screen = "auto"` opens the Dashboard. With an instrument alone it
+opens Preview Survey, and with neither it opens Open Instrument.
+`screen = "analysis"` opens the Analysis Plan screen explicitly.
 
 ## Dashboard
 
