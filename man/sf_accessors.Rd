@@ -2,74 +2,7 @@
 % Please edit documentation in R/accessors.R
 \name{sf_accessors}
 \alias{sf_accessors}
-\alias{sf_meta}
-\alias{sf_items}
-\alias{sf_scales}
-\alias{sf_choice_sets}
-\alias{sf_branches}
-\alias{sf_checks}
-\alias{sf_models}
-\alias{sf_plan}
-\alias{sf_meta.sframe}
-\alias{sf_items.sframe}
-\alias{sf_scales.sframe}
-\alias{sf_choice_sets.sframe}
-\alias{sf_branches.sframe}
-\alias{sf_checks.sframe}
-\alias{sf_models.sframe}
-\alias{sf_plan.sframe}
-\alias{sf_meta.sframe_codebook}
-\alias{sf_items.sframe_codebook}
-\alias{sf_scales.sframe_codebook}
-\alias{sf_choice_sets.sframe_codebook}
-\alias{sf_models.sframe_codebook}
-\alias{sf_plan.sframe_codebook}
 \title{Explore a surveyframe object}
-\usage{
-sf_meta(x, ...)
-
-sf_items(x, ...)
-
-sf_scales(x, ...)
-
-sf_choice_sets(x, ...)
-
-sf_branches(x, ...)
-
-sf_checks(x, ...)
-
-sf_models(x, ...)
-
-sf_plan(x, ...)
-
-\method{sf_meta}{sframe}(x, ...)
-
-\method{sf_items}{sframe}(x, ...)
-
-\method{sf_scales}{sframe}(x, ...)
-
-\method{sf_choice_sets}{sframe}(x, ...)
-
-\method{sf_branches}{sframe}(x, ...)
-
-\method{sf_checks}{sframe}(x, ...)
-
-\method{sf_models}{sframe}(x, ...)
-
-\method{sf_plan}{sframe}(x, ...)
-
-\method{sf_meta}{sframe_codebook}(x, ...)
-
-\method{sf_items}{sframe_codebook}(x, ...)
-
-\method{sf_scales}{sframe_codebook}(x, ...)
-
-\method{sf_choice_sets}{sframe_codebook}(x, ...)
-
-\method{sf_models}{sframe_codebook}(x, ...)
-
-\method{sf_plan}{sframe_codebook}(x, ...)
-}
 \arguments{
 \item{x}{A surveyframe object.}
 

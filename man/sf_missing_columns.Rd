@@ -2,12 +2,9 @@
 % Please edit documentation in R/accessors.R
 \name{sf_missing_columns}
 \alias{sf_missing_columns}
-\alias{sf_missing_columns.sframe_quality_report}
 \title{Columns the instrument declares that the responses left out}
 \usage{
 sf_missing_columns(x, ...)
-
-\method{sf_missing_columns}{sframe_quality_report}(x, ...)
 }
 \arguments{
 \item{x}{An \code{sframe_quality_report} object.}

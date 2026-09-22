@@ -2,53 +2,7 @@
 % Please edit documentation in R/as_data_frame.R
 \name{sframe_as_data_frame}
 \alias{sframe_as_data_frame}
-\alias{as.data.frame.sframe}
-\alias{as.data.frame.sf_choices}
-\alias{as.data.frame.sframe_codebook}
-\alias{as.data.frame.sframe_reliability_report}
-\alias{as.data.frame.sframe_item_report}
-\alias{as.data.frame.sframe_efa_report}
-\alias{as.data.frame.sframe_efa_solution}
-\alias{as.data.frame.sframe_descriptives_report}
-\alias{as.data.frame.sframe_missing_data_report}
-\alias{as.data.frame.sframe_validity_report}
-\alias{as.data.frame.sframe_assumption_report}
-\alias{as.data.frame.sframe_sample_size_plan}
-\alias{as.data.frame.sframe_quality_report}
-\alias{as.data.frame.sframe_sensitivity}
-\alias{as.data.frame.sframe_analysis_results}
 \title{Coerce a surveyframe object to a data frame}
-\usage{
-\method{as.data.frame}{sframe}(x, row.names = NULL, optional = FALSE, ...)
-
-\method{as.data.frame}{sf_choices}(x, row.names = NULL, optional = FALSE, ...)
-
-\method{as.data.frame}{sframe_codebook}(x, row.names = NULL, optional = FALSE, ...)
-
-\method{as.data.frame}{sframe_reliability_report}(x, row.names = NULL, optional = FALSE, ...)
-
-\method{as.data.frame}{sframe_item_report}(x, row.names = NULL, optional = FALSE, ...)
-
-\method{as.data.frame}{sframe_efa_report}(x, row.names = NULL, optional = FALSE, ...)
-
-\method{as.data.frame}{sframe_efa_solution}(x, row.names = NULL, optional = FALSE, ...)
-
-\method{as.data.frame}{sframe_descriptives_report}(x, row.names = NULL, optional = FALSE, ...)
-
-\method{as.data.frame}{sframe_missing_data_report}(x, row.names = NULL, optional = FALSE, ...)
-
-\method{as.data.frame}{sframe_validity_report}(x, row.names = NULL, optional = FALSE, ...)
-
-\method{as.data.frame}{sframe_assumption_report}(x, row.names = NULL, optional = FALSE, ...)
-
-\method{as.data.frame}{sframe_sample_size_plan}(x, row.names = NULL, optional = FALSE, ...)
-
-\method{as.data.frame}{sframe_quality_report}(x, row.names = NULL, optional = FALSE, ...)
-
-\method{as.data.frame}{sframe_sensitivity}(x, row.names = NULL, optional = FALSE, ...)
-
-\method{as.data.frame}{sframe_analysis_results}(x, row.names = NULL, optional = FALSE, ...)
-}
 \arguments{
 \item{x}{A surveyframe object.}
 
