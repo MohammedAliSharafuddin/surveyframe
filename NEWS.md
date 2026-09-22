@@ -71,6 +71,10 @@ This section grows as each group of fixes lands.
   continuity correction for z, p, r and its interval alike, so their p
   values move slightly, and z is now signed by the direction of the
   difference.
+* **Repeated-measures ANOVA now uses complete respondents.** A respondent
+  missing any repeated measure is excluded as a unit before fitting the
+  classical balanced model. Results report the retained `n` and
+  `n_excluded_incomplete`. This replaces a singular fit on incomplete rows.
 * **ANCOVA tables hold adjusted tests**, each term tested after all others,
   with columns `effect`, `df`, `sum_sq`, `mean_sq`, `F` and `p`.
 * **`sample_size_plan()` now calculates power** for t tests, ANOVA and, with

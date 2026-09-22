@@ -114,19 +114,22 @@ results <- run_analysis_plan(scored, instr)
 
 ## Documentation workflow
 
-Start with:
+Choose the route that matches what you need:
 
-1. A worked study: digital marketing and tourism services
-2. Building a survey instrument: questions, plan, and model
-3. Deploying a survey and collecting responses on free hosting
-4. Analysing survey responses: running the plan
-5. Scale reliability and validity
-6. EFA, CFA, CB-SEM, and PLS-SEM syntax generation
-7. The visual workflow: SurveyBuilder, SurveyStudio, and the dashboard
-8. Learn by example: 22 small surveys, the bundled demo library
-9. Multi-criteria decision analysis: AHP, TOPSIS, and 8 other methods
-10. Small-sample inference
-11. Text and open-ended response analysis
+* **Try it in five minutes:** Learn by example: 22 small surveys.
+* **Prefer a visual interface:** SurveyBuilder, SurveyStudio, and the dashboard.
+* **Build and collect:** Building a survey instrument, then Deploying and
+  collecting.
+* **Already have responses:** Analysing survey responses.
+* **Read the complete case study:** Digital marketing and tourism services.
+
+Continue as needed with these:
+
+* Scale reliability and validity
+* EFA, CFA, CB-SEM, and PLS-SEM syntax
+* Multi-criteria decision analysis
+* Small-sample inference
+* Text and open-ended response analysis
 
 Read all eleven vignettes inside R with:
 
