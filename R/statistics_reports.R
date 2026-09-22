@@ -1107,6 +1107,18 @@ sframe_run_repeated_anova <- function(data, roles) {
   err <- sframe_require_columns(data, vars, "Repeated-measures ANOVA")
   if (!is.null(err)) return(list(test = "repeated_anova", error = err))
   mat <- as.data.frame(lapply(data[, vars, drop = FALSE], sframe_num))
+  complete_subject <- stats::complete.cases(mat[, vars, drop = FALSE])
+  n_excluded_incomplete <- sum(!complete_subject)
+  mat <- mat[complete_subject, , drop = FALSE]
+  if (nrow(mat) < 2L) {
+    return(list(
+      test = "repeated_anova",
+      error = paste0("Repeated-measures ANOVA needs at least 2 respondents ",
+                     "with complete measurements."),
+      vars = vars, n = nrow(mat),
+      n_excluded_incomplete = n_excluded_incomplete
+    ))
+  }
   # .subject must be a factor. Left as an integer, aov() treats it as a
   # continuous covariate, the Error(.subject / condition) stratification
   # collapses to a single residual df, and the condition effect is tested
@@ -1153,6 +1165,7 @@ sframe_run_repeated_anova <- function(data, roles) {
   if (is.null(stat_row)) {
     return(list(
       test = "repeated_anova", vars = vars, n = length(unique(long$.subject)),
+      n_excluded_incomplete = n_excluded_incomplete,
       fit_summary = fit_summary,
       apa = "Repeated-measures ANOVA was estimated; inspect `fit_summary` for the within-subject effect.",
       prompt = "Report the within-subject effect, degrees of freedom, p value, effect size where available, and sphericity limitations."
@@ -1169,6 +1182,7 @@ sframe_run_repeated_anova <- function(data, roles) {
     test = "repeated_anova",
     vars = vars,
     n = length(unique(long$.subject)),
+    n_excluded_incomplete = n_excluded_incomplete,
     df1 = df1, df2 = df2, F_stat = F_stat, p = p, eta2 = partial_eta2,
     table = data.frame(
       Statistic = "F", df1 = df1, df2 = df2,
@@ -1454,7 +1468,7 @@ sframe_run_firth_logistic <- function(data, roles, options = list()) {
     return(list(test = "firth_logistic",
                 error = "Firth logistic regression requires at least one predictor."))
   }
-  if (!requireNamespace("logistf", quietly = TRUE)) {
+  if (!sframe_has_package("logistf")) {
     return(list(
       test = "firth_logistic",
       error = "Package 'logistf' needed. Install with: install.packages('logistf')"

@@ -71,6 +71,10 @@ the vignette builds offline. Replacing the simulated data with a call to
 `read_sheet_responses()` connects the same workflow to live responses that grow
 with each submission.
 
+Allow about 30 minutes for the complete case study. For a five-minute runnable
+introduction, begin with the “Learn by example” vignette and its `first_survey`
+demo. Return here for the full design-to-report workflow.
+
 The questionnaire and concept are adopted from:
 
 > Sharafuddin, M. A., Madhavan, M., & Wangtueai, S. (2024). Assessing the
@@ -434,23 +438,24 @@ identical(sf_meta(study)$title, sf_meta(study2)$title)
 
 ### What the SHA-256 hash proves, and what it does not
 
-The hash `write_sframe()` embeds confirms one thing: the `.sframe` file on
-disk is byte-identical to what was written. If any byte changes, whether an
-item's wording, a scale's membership, or a plan's variables, `read_sframe()`
-detects the mismatch and refuses to load the file, where silent acceptance
-would leave a reader believing a changed file was the original.
+The hash `write_sframe()` embeds confirms one thing: the instrument's
+canonicalised content matches the digest stored in the `.sframe` file. Change
+a covered value, an item's wording, a scale's membership, or a plan's
+variables, and `read_sframe()` detects the mismatch and refuses to load the
+file. Silent acceptance would leave a reader believing changed content was
+the original.
 
 That is a narrow, specific guarantee. It proves file identity. It does not
 prove the survey has good questions, an unbiased sample, or a sound
 analysis, and it says nothing about p-hacking or HARKing on its own. The
-package's actual defence against those two is a separate mechanism: the
-`analysis_plan` slot is bound to the instrument at design time, before data
-arrive, and `run_analysis_plan()` executes that pre-declared plan in one
-pass, which is what keeps a plan from being assembled after looking at
-results. Keep
-the two claims distinct: "this file wasn't edited after the fact" and
-"this analysis was decided before seeing the data" are different guarantees
-from different mechanisms, and neither substitutes for the other.
+package supports a separate safeguard: the `analysis_plan` slot can be bound to
+the instrument at design time, before data arrive, and `run_analysis_plan()`
+then executes that recorded plan in one pass. This makes prior decisions easier
+to audit, and it shows that a recorded plan predates a given run. Establishing
+when a researcher first considered an analysis, or compelling disclosure, each
+needs separate evidence: “this content matches its stored digest” and “this
+analysis was declared before seeing the data” rest on different evidence,
+each standing on its own.
 
 ### `.sframe` is plain JSON, not a proprietary format
 
@@ -573,10 +578,12 @@ study$render$google_sheets_endpoint <-
 ### Export the static HTML survey
 
 `export_static_survey()` produces a single self-contained HTML file. Respondents
-open it in any browser, fill it in, and their submission is downloaded as a CSV
-and, if an endpoint is configured, posted to the Google Sheet at the same time.
-The file can be hosted on GitHub Pages, shared by email, or opened directly from
-disk.
+open it in any browser and, if an endpoint is configured, the browser sends the
+submission to Google Sheets. The cross-origin request confirms only that the row was sent. Whether
+the Sheet stored it stays unconfirmed from here. Depending on the thank-you settings, the page can also offer a
+CSV download, but it becomes a local backup only if the respondent saves it.
+Pilot the endpoint and verify a stored row before collection. The HTML can be
+hosted on GitHub Pages, shared by email, or opened directly from disk.
 
 ```{r static-export}
 html_path <- export_static_survey(
@@ -638,10 +645,13 @@ file.exists(script_path)
 1. Open or create a Google Sheet.
 2. Click Extensions, then Apps Script.
 3. Paste the contents of the generated `.gs` file, replacing any existing code.
-4. Click Deploy, then New deployment. Set type to Web app.
-5. Set "Who has access" to Anyone.
-6. Copy the Web App URL.
-7. Paste the URL into `study$render$google_sheets_endpoint` above and
+4. In the Apps Script editor, add **Services > Google Sheets API** and keep its
+   identifier as `Sheets`. Without it, the collector refuses the response rather
+   than risk storing an altered value.
+5. Click Deploy, then New deployment. Set type to Web app.
+6. Set "Who has access" to Anyone.
+7. Copy the Web App URL.
+8. Paste the URL into `study$render$google_sheets_endpoint` above and
    re-export the survey.
 
 ### Pull live responses
@@ -851,17 +861,19 @@ if (requireNamespace("psych", quietly = TRUE)) {
 }
 ```
 
-A Cronbach's alpha of 0.70 or above is conventionally accepted as adequate
-internal consistency (Nunnally, 1978). For scales with three or more items,
-McDonald's omega is a more accurate estimate because it accounts for unequal
-factor loadings across items. Alpha assumes all items load equally on the
-factor. Pass `omega = TRUE` when items within a scale differ substantially in
-their contribution. See `?reliability_report` for details.
+A value near 0.70 is sometimes used as a rough convention, but reliability must
+be interpreted against the construct, intended use, item count, uncertainty,
+and model assumptions. Alpha and the omega variants target reliability under different
+measurement assumptions, so treat them as distinct estimates. Decide which
+quantity answers the study's question, and report that one on its own merits.
+Pass `omega = TRUE` to report the available omega estimates alongside alpha,
+and name the estimate and assumptions in the write-up. See
+`?reliability_report` for details.
 
 ## EFA readiness
 
-Before a confirmatory factor analysis, it is good practice to confirm that the
-item correlations are strong enough to support factoring. `efa_report()` runs
+Before a confirmatory factor analysis, it is useful to screen whether the item
+correlations appear suitable for exploratory factoring. `efa_report()` runs
 the KMO measure of sampling adequacy and Bartlett's test of sphericity, and
 uses parallel analysis to suggest the number of factors.
 
@@ -872,9 +884,12 @@ if (requireNamespace("psych", quietly = TRUE)) {
 }
 ```
 
-A KMO value of 0.60 or above and a significant Bartlett test confirm that the
-correlation structure supports factor analysis. The suggested factor count from
-parallel analysis is a guide. Theory should take precedence.
+A KMO value and Bartlett's test provide preliminary screening evidence, one
+input among several toward judging whether a particular factor model is
+appropriate. Treat 0.60 as a
+rough, informal KMO convention. The factor count from
+parallel analysis is also a guide to interpret with theory, design, loadings,
+residuals, and model fit.
 
 ## Construct validity
 

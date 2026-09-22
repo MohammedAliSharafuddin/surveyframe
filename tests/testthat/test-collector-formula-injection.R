@@ -63,9 +63,11 @@ test_that("the builder's inlined collector carries the same text-write fix", {
   skip_if(!nzchar(p) || !file.exists(p), "builder not found")
   builder <- paste(readLines(p, warn = FALSE), collapse = "\n")
 
-  expect_true(grepl("appendRowAsText_", builder, fixed = TRUE))
+  expect_true(grepl("appendResponseRow_", builder, fixed = TRUE))
   expect_true(grepl("setNumberFormat(\"@\")", builder, fixed = TRUE))
   expect_false(grepl("sheet.appendRow(row)", builder, fixed = TRUE))
+  # and the inlined copy fails closed too, which is the whole point of gate 1
+  expect_true(grepl("this response was NOT saved", builder, fixed = TRUE))
 })
 
 test_that("neither copy of the collector writes user-entered values", {
@@ -121,18 +123,49 @@ test_that("A8: the response says which write path stored the row", {
   expect_null(parsed$warning)
 })
 
-test_that("A8: without the advanced service the fallback is unsafe, and says so", {
+# Reopened a second time by the pre-publication review. The fallback used to
+# write through setValues() and reply {status: "ok"}, with the degradation named
+# only in a `warning` field. The respondent's browser posts no-cors and cannot
+# read any of it, so the participant saw "your response has been recorded" over
+# an answer the collector had just mangled. A write that cannot be performed
+# literally is now refused, which leaves the page holding the only copy and
+# able to say so.
+
+test_that("A8: without the advanced service the response row is refused", {
   skip_if_not_installed("V8")
   ctx <- apps_script_context(c("respondent_id", "q1"))
-  # the researcher skipped the Services step
+  # A researcher who skipped the Services step has no Sheets global at all,
+  # which is what the source guards on with typeof. Disabling the mock's
+  # update() instead makes it throw, and the collector then fails closed for
+  # the wrong reason, so this must be the undefined case.
   ctx$eval("Sheets = undefined;")
   apps_script_post(ctx, c(respondent_id = "r1", q1 = "=1+1"))
   parsed <- apps_script_reply(ctx)
 
-  expect_equal(parsed$stored, "user_entered_with_text_format")
-  expect_match(parsed$warning, "RAW", fixed = TRUE)
-  # and the answer really is mangled on that path, which is why it warns: this
-  # is the behaviour Google's contract allows and the old test assumed away
-  row <- ctx$get("__ss.sheets['Responses'].rows[1]")
-  expect_false(identical(row[[2]], "=1+1"))
+  expect_equal(parsed$status, "error")
+  # the message has to name the step that fixes it, because this is what the
+  # researcher reads in the collector's own execution log
+  expect_match(parsed$message, "Sheets", fixed = TRUE)
+
+  # and nothing was stored: the header is row 0, so a refused write leaves no
+  # row 1 at all. A partially written row would be worse than none.
+  expect_equal(ctx$get("__ss.sheets['Responses'].rows.length"), 1L)
+})
+
+test_that("A8: no shipped path stores a response through user-entered semantics", {
+  skip_if_not_installed("V8")
+  p <- sframe_installed_path("static_survey", "collector_template.gs")
+  skip_if(!nzchar(p), "collector template not found")
+  src <- paste(readLines(p, warn = FALSE), collapse = "\n")
+
+  # setValues() applies user-entered semantics. It may appear for a diagnostic
+  # sheet, never for a response row, so the response path is checked by name.
+  # Asserted present first: sub() returns its input unchanged when the pattern
+  # does not match, so a renamed function would leave this test passing on the
+  # file's opening comment.
+  expect_match(src, "function appendResponseRow_", fixed = TRUE)
+  body <- sub(".*function appendResponseRow_", "", src)
+  body <- sub("\nfunction .*", "", body)
+  expect_false(grepl("setValues(", body, fixed = TRUE),
+               info = "the response write path must not use setValues()")
 })

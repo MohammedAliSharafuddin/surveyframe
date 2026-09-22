@@ -42,13 +42,26 @@ knowing which survey to build, so this article works the other way round: it
 starts from the survey you are trying to run and shows the whole path, from
 the questionnaire to the report.
 
-There are **22 demos**, each doing one job. Every one ships an instrument,
-its response data, a codebook, and the results surveyframe produced, so you
-can load one, change it, and keep going.
+There are **22 demos**: 17 analysis examples, three presentation examples, and
+two provenance examples. Each has an instrument, response data, a codebook,
+and surveyframe's expected results. Presentation and provenance demos reuse the
+matching analysis data where appropriate.
 
 ```{r index}
 head(sframe_demos()[, c("name", "teaches")], 5)
 ```
+
+Try the shortest complete route first:
+
+```{r five-minute-start, eval = FALSE}
+demo <- sframe_demo("first_survey")
+results <- run_analysis_plan(demo$responses, demo$instrument)
+sframe_demo_qmd("first_survey") # write an editable Quarto notebook
+```
+
+The package stores the 22 compact instruments and datasets, and generates a
+notebook only when you ask: `sframe_demo_qmd()` creates one for whichever demo
+you choose.
 
 ## Read this as your own field
 
@@ -90,6 +103,17 @@ Choose by the data you have, and let the name of the test follow from it.
 | A decision between options on four criteria | MCDA | `mcdm_choice` |
 | Fewer than 30 respondents | Small-sample methods | `small_sample` |
 | Tick-all-that-apply, or a ranking | Items that expand | `multi_response` |
+
+The remaining five demos teach presentation and provenance, not a new
+statistical method:
+
+| You want to learn | Demo |
+|---|---|
+| A welcome page, logo, colour, and thank-you page | `branded_survey` |
+| One-question-at-a-time presentation | `conversational_survey` |
+| Conversational presentation with skip logic | `conversational_branching` |
+| A disclosed mid-study revision | `instrument_revision` |
+| Integrity checking and a deliberately altered file | `verification` |
 
 ## The shape of every study
 
@@ -155,8 +179,10 @@ res <- run_analysis_plan(tg$responses, tg$instrument)
 for (b in res) cat(b$test, ": ", b$apa, "\n", sep = "")
 ```
 
-Both tests are declared, so you report both, with the choice made in advance
-whichever gave the smaller p value.
+Both tests are shown for teaching. In a real study, predeclare the primary test
+from the research question, estimand, design, and defensible assumptions,
+before seeing which produces the smaller p-value. If useful, predeclare the
+other as a sensitivity analysis and label it as such when reporting both.
 
 ### The same people, measured twice
 
@@ -364,9 +390,9 @@ report, and it travels inside the instrument.
 
 ### Proving a file is the one you think it is
 
-Every `.sframe` carries a SHA-256 of its own contents. The demo ships a clean
-file and a tampered copy, altered in a single response label with the stored
-hash left alone:
+Every `.sframe` written by the package carries a SHA-256 digest of its
+canonicalised content. The demo ships a clean file and a tampered copy, altered
+in a single response label with the stored digest left alone:
 
 ```{r verify, error = TRUE}
 v <- sframe_demo("verification")
@@ -374,7 +400,11 @@ tampered <- file.path(dirname(v$instrument_path), "verification_tampered.sframe"
 read_sframe(tampered)
 ```
 
-The file refuses to load. That is what the hash is for.
+The altered file refuses to load because its content no longer matches its
+stored digest. This detects an undisclosed content change alone: authorship,
+research quality, and full amendment disclosure each need separate evidence.
+A file can also be checked outside R, on the documentation site's
+**Verify a file** page.
 
 ## Are you an instructor? Do you want to verify against established software?
 
@@ -409,8 +439,8 @@ way we would like to hear it from you.
 
 ## Run one yourself
 
-Each demo comes with a Quarto notebook: load, read, run the plan, render a
-report, export for checking elsewhere.
+An editable Quarto notebook can be generated for every demo: load, read, run
+the plan, render a report, and export for checking elsewhere.
 
 ```{r qmd, eval = FALSE}
 sframe_demo_qmd("two_group")

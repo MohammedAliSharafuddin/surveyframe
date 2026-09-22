@@ -62,7 +62,11 @@ var document = {
   querySelectorAll:function(sel){ return __selectorEls[sel] || []; },
   createElement:function(){ return { click:function(){} }; }
 };
-var window = { scrollTo:function(){}, location:{ reload:function(){}, href:'' } };
+// Reloads are counted, never performed, so a test can tell a page that
+// restarted from one that only offered to.
+var __reloads = 0;
+var window = { scrollTo:function(){},
+               location:{ reload:function(){ __reloads++; }, href:'' } };
 var __posts = [];
 // __fetchFails lets a test drive a delivery failure, which is the one thing a
 // no-cors POST can tell us about. Resolution is synchronous here, so a test
@@ -81,6 +85,11 @@ function fetch(url, opts){
 var __timeouts = [];
 function setTimeout(fn){ __timeouts.push(fn); }
 function __runTimeouts(){ var t=__timeouts; __timeouts=[]; t.forEach(function(f){ if(f) f(); }); }
+// Answers to confirm() are scripted, and every prompt is recorded, so a test
+// can assert that a destructive action asked before taking it.
+var __confirms = [];
+var __confirmAnswer = false;
+function confirm(msg){ __confirms.push(String(msg)); return __confirmAnswer; }
 "
 
 # Exports `instrument`, loads the survey's script into a fresh V8 context and

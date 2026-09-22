@@ -58,7 +58,17 @@ test_that("22: the two failures are told apart", {
   state <- sframe_new_submission_state()
 
   # the write itself fails, which is the one the participant has to act on
-  res <- sframe_persist_response(row, path, NULL, state)
+  write_warnings <- character()
+  res <- withCallingHandlers(
+    sframe_persist_response(row, path, NULL, state),
+    warning = function(w) {
+      write_warnings <<- c(write_warnings, conditionMessage(w))
+      invokeRestart("muffleWarning")
+    }
+  )
+  expect_length(write_warnings, 2)
+  expect_true(any(grepl("not a regular file", write_warnings, fixed = TRUE)))
+  expect_true(any(grepl("it is a directory", write_warnings, fixed = TRUE)))
   expect_false(res$saved)
   expect_match(res$message, "could not be saved", fixed = TRUE)
 

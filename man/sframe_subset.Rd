@@ -2,17 +2,7 @@
 % Please edit documentation in R/as_data_frame.R
 \name{sframe_subset}
 \alias{sframe_subset}
-\alias{[.sframe_analysis_results}
-\alias{[.sframe_reliability_report}
-\alias{[.sframe_item_report}
 \title{Subset a surveyframe report}
-\usage{
-\method{[}{sframe_analysis_results}(x, i, ...)
-
-\method{[}{sframe_reliability_report}(x, i, ...)
-
-\method{[}{sframe_item_report}(x, i, ...)
-}
 \arguments{
 \item{x}{An \code{sframe_analysis_results}, \code{sframe_reliability_report}, or
 \code{sframe_item_report} object.}

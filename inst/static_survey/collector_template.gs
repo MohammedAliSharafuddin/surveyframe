@@ -8,7 +8,7 @@
 // 3. Paste this entire file, replacing any existing code
 // 4. Add the Sheets advanced service: in the editor, Services > add
 //    "Google Sheets API", with the identifier "Sheets". This is what lets the
-//    collector store an answer literally; see appendRowAsText_() below for why
+//    collector store an answer literally; see appendResponseRow_() below for why
 //    it matters and what happens without it.
 // 5. Click Deploy > New deployment > Web app
 // 6. Set "Who has access" to "Anyone"
@@ -59,27 +59,20 @@ function doPost(e) {
     if (problem) {
       let unmapped = ss.getSheetByName(UNMAPPED_SHEET_NAME);
       if (!unmapped) unmapped = ss.insertSheet(UNMAPPED_SHEET_NAME);
-      appendRowAsText_(unmapped, [new Date().toISOString(), problem, e.postData.contents]);
+      appendDiagnosticRow_(unmapped, [new Date().toISOString(), problem, e.postData.contents]);
       return ContentService
         .createTextOutput(JSON.stringify({ status: "unmapped", message: problem }))
         .setMimeType(ContentService.MimeType.JSON);
     }
     const row = header.map(col => data[col] !== undefined ? String(data[col]) : "");
-    const literal = appendRowAsText_(sheet, row);
+    // Throws when the answer cannot be stored literally, which the catch below
+    // turns into status "error". There is one write path and it is the literal
+    // one, so a status of "ok" means the row is on the sheet as submitted.
+    appendResponseRow_(sheet, row);
 
-    // The response says which write path stored the row, so a researcher can
-    // tell a literal RAW write from the fallback that depends on the plain-text
-    // format alone.
-    const reply = { status: "ok", rows: sheet.getLastRow() - 1,
-                    stored: literal ? "raw" : "user_entered_with_text_format" };
-    if (!literal) {
-      reply.warning = "The Sheets advanced service is unavailable, so answers " +
-        "were written without the RAW option. Add it under Services > Google " +
-        "Sheets API, with the identifier Sheets, so an answer beginning with " +
-        "'=' is stored literally.";
-    }
     return ContentService
-      .createTextOutput(JSON.stringify(reply))
+      .createTextOutput(JSON.stringify({ status: "ok", rows: sheet.getLastRow() - 1,
+                                         stored: "raw" }))
       .setMimeType(ContentService.MimeType.JSON);
 
   } catch (err) {
@@ -118,27 +111,57 @@ function headerProblem_(header) {
 // on the plain-text number format alone to suppress parsing rests on
 // behaviour Google does not promise. RAW is the promise.
 //
-// Where the advanced service is unavailable, the plain-text format plus
-// setValues() is used and the response says so, since refusing the write
-// outright would lose a live study's answers. Enable the service.
-function appendRowAsText_(sheet, row) {
-  if (!row.length) return true;
+// Where the advanced service is unavailable, a response row is REFUSED rather
+// than written through setValues(). The earlier version wrote it anyway and
+// named the degradation in a `warning` field, which nothing could read: the
+// respondent's page posts no-cors, so the browser sees only that the request
+// left. The participant was shown "your response has been recorded" over an
+// answer the collector had just altered. Failing closed leaves the page holding
+// the only copy, which it can then offer as a download. Enable the service.
+function appendResponseRow_(sheet, row) {
+  if (!row.length) return;
+  if (!sheetsApiAvailable_()) {
+    throw new Error(
+      "The Google Sheets advanced service is not enabled, so an answer " +
+      "cannot be stored literally and this response was NOT saved. In the " +
+      "Apps Script editor, add Services > Google Sheets API with the " +
+      "identifier Sheets, then ask the participant to send again.");
+  }
+  const startRow = sheet.getLastRow() + 1;
+  sheet.getRange(startRow, 1, 1, row.length).setNumberFormat("@");
+  Sheets.Spreadsheets.Values.update(
+    { values: [row.map(function (v) { return v === null ? "" : String(v); })] },
+    sheet.getParent().getId(),
+    sheet.getName() + "!A" + startRow,
+    { valueInputOption: "RAW" }
+  );
+}
+
+function sheetsApiAvailable_() {
+  return typeof Sheets !== "undefined" && Sheets.Spreadsheets &&
+    Sheets.Spreadsheets.Values;
+}
+
+// A diagnostic row, for the header and unmapped sheets. These hold a copy of a
+// submission the collector could not file, so a best-effort write beats none:
+// losing the copy is the worse failure. The plain-text format is applied and
+// the row may still be coerced, which is acceptable for a record nothing reads
+// programmatically. A response row never comes through here.
+function appendDiagnosticRow_(sheet, row) {
+  if (!row.length) return;
   const startRow = sheet.getLastRow() + 1;
   const target = sheet.getRange(startRow, 1, 1, row.length);
   target.setNumberFormat("@");
-  if (typeof Sheets !== "undefined" && Sheets.Spreadsheets &&
-      Sheets.Spreadsheets.Values) {
-    const rangeA1 = sheet.getName() + "!A" + startRow;
+  if (sheetsApiAvailable_()) {
     Sheets.Spreadsheets.Values.update(
       { values: [row.map(function (v) { return v === null ? "" : String(v); })] },
       sheet.getParent().getId(),
-      rangeA1,
+      sheet.getName() + "!A" + startRow,
       { valueInputOption: "RAW" }
     );
-    return true;
+    return;
   }
   target.setValues([row]);
-  return false;
 }
 
 // Returns the sheet's live header, creating or extending it as needed.
