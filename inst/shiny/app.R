@@ -1605,7 +1605,9 @@ server <- function(input, output, session) {
     builder = initial_builder,
     instrument = INITIAL_INSTRUMENT,
     responses = INITIAL_RESPONSES,
-    active_screen = initial_tab
+    active_screen = initial_tab,
+    open_verification = if (is.null(INITIAL_INSTRUMENT)) NULL else
+      "Instrument supplied by R; no file was checked in this screen."
   )
 
   set_builder_state <- function(state) {
@@ -2012,10 +2014,13 @@ server <- function(input, output, session) {
       rv$builder <- builder_state_from_instrument(loaded)
       rv$instrument <- loaded
       rv$responses <- NULL
+      rv$open_verification <-
+        "Integrity verified: content matches the SHA-256 digest stored in this file."
       sync_builder_inputs(rv$builder)
       showNotification("Instrument loaded. Showing the survey preview.", type = "message")
       switch_tab("preview")
     }, error = function(e) {
+      rv$open_verification <- paste("Integrity check failed:", conditionMessage(e))
       showNotification(paste("Error:", conditionMessage(e)), type = "error")
     })
   })
@@ -2326,10 +2331,24 @@ server <- function(input, output, session) {
   })
 
   output$open_status <- renderUI({
-    if (!is.null(rv$instrument)) {
-      status_badge(TRUE, "Loaded", "No instrument loaded")
+    message <- rv$open_verification
+    if (is.null(message)) {
+      status_badge(FALSE, "Integrity verified", "No file checked")
+    } else if (startsWith(message, "Integrity verified")) {
+      tags$div(
+        status_badge(TRUE, "Integrity verified", "No file checked"),
+        tags$p(class = "hint", message)
+      )
+    } else if (startsWith(message, "Instrument supplied by R")) {
+      tags$div(
+        status_badge(FALSE, "Integrity verified", "Not file-checked"),
+        tags$p(class = "hint", message)
+      )
     } else {
-      status_badge(FALSE, "Loaded", "No instrument loaded")
+      tags$div(
+        tags$span(class = "badge badge-warn", "Not verified"),
+        tags$p(class = "hint", message)
+      )
     }
   })
 
