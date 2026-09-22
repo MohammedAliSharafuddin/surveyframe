@@ -166,7 +166,36 @@ read_responses <- function(
       "for items whose other columns are present: ", paste(partial, collapse = ", ")))
   }
 
-  # Check required item columns are present
+  # Detect R's automatic name repair before reporting the corresponding
+  # declared expansion columns as missing. In strict mode the import cannot
+  # continue, so emitting a missing-column warning immediately before the
+  # more useful name-repair error only obscures the actionable diagnosis.
+  undeclared <- setdiff(data_cols,
+                        c(item_ids, expanded_ids, display_item_ids, declared))
+  known <- c(item_ids, expanded_ids, display_item_ids, declared)
+  mangled <- undeclared[make.names(undeclared) == undeclared &
+                          undeclared %in% make.names(known)]
+  hint <- if (length(mangled) > 0) {
+    originals <- known[make.names(known) %in% mangled]
+    paste0(
+      " ", length(mangled), " of these match a declared column after R's",
+      " name repair (for example '", originals[1], "' became '",
+      mangled[1], "'), so the header was most likely rewritten on import.",
+      " Re-read the file with check.names = FALSE, as in",
+      " read.csv(path, check.names = FALSE)."
+    )
+  } else {
+    ""
+  }
+  if (strict && length(mangled) > 0) {
+    sframe_abort_import(paste0(
+      length(undeclared), " undeclared column(s) found in response data: ",
+      paste(undeclared, collapse = ", "),
+      ". Declare them in meta_cols or set strict = FALSE.", hint
+    ))
+  }
+
+  # Check required item columns are present.
   missing_items <- setdiff(item_ids, c(data_cols, covered_by_expansion))
   if (length(missing_items) > 0) {
     sframe_warn_missing(
@@ -178,9 +207,7 @@ read_responses <- function(
     )
   }
 
-  # Handle undeclared columns
-  undeclared <- setdiff(data_cols,
-                        c(item_ids, expanded_ids, display_item_ids, declared))
+  # Handle other undeclared columns.
   if (length(undeclared) > 0) {
     # A matrix row or choice label containing a space produces an expansion
     # column with a space, which the collectors write correctly. read.csv()
@@ -188,22 +215,6 @@ read_responses <- function(
     # check.names defaults to TRUE. The columns are then undeclared through no
     # fault of the researcher, and the plain message sends them looking for a
     # declaration problem that does not exist. Name the real cause instead.
-    known <- c(item_ids, expanded_ids, display_item_ids, declared)
-    mangled <- undeclared[make.names(undeclared) == undeclared &
-                            undeclared %in% make.names(known)]
-    hint <- if (length(mangled) > 0) {
-      originals <- known[make.names(known) %in% mangled]
-      paste0(
-        " ", length(mangled), " of these match a declared column after R's",
-        " name repair (for example '", originals[1], "' became '",
-        mangled[1], "'), so the header was most likely rewritten on import.",
-        " Re-read the file with check.names = FALSE, as in",
-        " read.csv(path, check.names = FALSE)."
-      )
-    } else {
-      ""
-    }
-
     if (strict) {
       sframe_abort_import(
         paste0(
