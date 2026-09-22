@@ -43,6 +43,8 @@ qwen_review_034.md
 todo_rstudio_addin.md
 todo_review_defects.md
 HANDOVER_0.4.2_BUILD.md
+HANDOVER_*.md
+REVIEW_*.md
 Rplots.pdf
 tests/testthat/file*.html
 CLAUDE.md
