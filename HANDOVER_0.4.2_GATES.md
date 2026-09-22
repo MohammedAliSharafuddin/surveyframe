@@ -116,11 +116,16 @@ that a real browser's event handling reaches the same row.
 
 ## Also outstanding, beyond the gates
 
-- **`R CMD check --as-cran`: done, `Status: 1 NOTE`** repeatedly, as the
-  working tree changed. The checksum below is stale the moment the tree it
-  was built from changes again, which it has twice since this file first
-  recorded one; do not treat a checksum here as current without rebuilding
-  and re-hashing against the commit actually being submitted.
+- **`R CMD check --as-cran`: done against a committed tree, finally.** Every
+  earlier run in this file checked the uncommitted working tree, which cannot
+  be tagged or rebuilt by anyone else. The tree is now committed at `872e60d`
+  on `fix/0.4.2-review-gates`. Rebuilt from that commit and rechecked:
+  **Status: 1 NOTE** (submission frequency), 0 errors, 0 warnings, tests
+  (205s), examples, `--run-donttest`, and vignette re-rendering all OK.
+  Tarball SHA-256 `38cc2caf51bff95529370a15f44e61e5a4a04f6c6828210b32c5810fcfe09bae`,
+  recorded in `cran-comments.md`. This number is only valid for `872e60d`; if
+  the tree changes again before submission, rebuild and re-hash rather than
+  trust this line.
 - **An isolated-library install of the candidate tarball: done.** The Quarto
   integration test ran against installed 0.4.2 and passed. A literal fresh
   clone plus manual `launch_builder()` smoke test remains useful release

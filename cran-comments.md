@@ -42,8 +42,9 @@ package and can only call exported functions.
 
 - `R CMD check --as-cran` on the built tarball: **0 errors, 0 warnings,
   1 NOTE** (the incoming-feasibility note below). Examples,
-  `--run-donttest`, tests, vignette rebuilding, and both manual formats all
-  passed.
+  `--run-donttest`, tests, and vignette rebuilding all passed. Run against
+  commit `872e60d`, tarball SHA-256
+  `38cc2caf51bff95529370a15f44e61e5a4a04f6c6828210b32c5810fcfe09bae`.
 - Full local test suite: 0 failures.
 - [Platform and R-version matrix to fill in before submission. win-builder
   R-release and R-devel are still outstanding as of this file's drafting.]
