@@ -56,10 +56,11 @@ sf_instrument(
   [`sf_choices()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_choices.md),
   [`sf_scale()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_scale.md),
   [`sf_branch()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_branch.md),
+  [`sf_check()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_check.md),
   and
-  [`sf_check()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_check.md).
-  Components are sorted by class automatically. Supply components
-  created by the surveyframe constructors.
+  [`sf_conjoint_design()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_conjoint_design.md).
+  Components are sorted by class automatically, so they can be supplied
+  in any order.
 
 - render:
 

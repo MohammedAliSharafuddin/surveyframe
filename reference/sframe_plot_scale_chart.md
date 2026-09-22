@@ -27,3 +27,16 @@ sframe_plot_scale_chart(scores, label, palette = c("web", "print"))
 
 A ggplot2 object, or `NULL` if ggplot2 is unavailable or `scores` is
 empty.
+
+## Examples
+
+``` r
+# \donttest{
+if (requireNamespace("ggplot2", quietly = TRUE)) {
+  demo <- sframe_demo_data()
+  scored <- score_scales(demo$responses, demo$instrument)
+  sframe_plot_scale_chart(scored$satisfaction, "Satisfaction")
+}
+
+# }
+```

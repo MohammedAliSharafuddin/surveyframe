@@ -26,7 +26,7 @@ the problem messages. sf_object() returns the object that was validated."><meta 
 
     <a class="navbar-brand me-2" href="../index.html">surveyframe</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -52,27 +52,10 @@ the problem messages. sf_object() returns the object that was validated."><meta 
     </div>
 
     <div class="ref-description section level2">
-    <p><code>sf_is_valid()</code> reports whether the object passed. <code>sf_problems()</code> returns
-the problem messages. <code>sf_object()</code> returns the object that was validated.</p>
+    <p><code><a href="sf_is_valid.html">sf_is_valid()</a></code> reports whether the object passed. <code><a href="sf_problems.html">sf_problems()</a></code> returns
+the problem messages. <code><a href="sf_object.html">sf_object()</a></code> returns the object that was validated.</p>
     </div>
 
-    <div class="section level2">
-    <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">sf_is_valid</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu">sf_problems</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu">sf_object</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># S3 method for class 'sframe_validation'</span></span>
-<span><span class="fu">sf_is_valid</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># S3 method for class 'sframe_validation'</span></span>
-<span><span class="fu">sf_problems</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># S3 method for class 'sframe_validation'</span></span>
-<span><span class="fu">sf_object</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
-    </div>
 
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
@@ -88,8 +71,8 @@ the problem messages. <code>sf_object()</code> returns the object that was valid
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p><code>sf_is_valid()</code> returns a single logical. <code>sf_problems()</code> returns a
-character vector, empty when the object is valid. <code>sf_object()</code> returns
+    <p><code><a href="sf_is_valid.html">sf_is_valid()</a></code> returns a single logical. <code><a href="sf_problems.html">sf_problems()</a></code> returns a
+character vector, empty when the object is valid. <code><a href="sf_object.html">sf_object()</a></code> returns
 the validated object.</p>
     </div>
     <div class="section level2">
@@ -103,9 +86,9 @@ the validated object.</p>
 <span class="r-in"><span><span class="va">instr</span> <span class="op">&lt;-</span> <span class="fu"><a href="sf_instrument.html">sf_instrument</a></span><span class="op">(</span><span class="st">"Demo"</span>, components <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">item</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">v</span> <span class="op">&lt;-</span> <span class="fu"><a href="validate_sframe.html">validate_sframe</a></span><span class="op">(</span><span class="va">instr</span>, strict <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="fu">sf_is_valid</span><span class="op">(</span><span class="va">v</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="sf_is_valid.html">sf_is_valid</a></span><span class="op">(</span><span class="va">v</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] TRUE</span>
-<span class="r-in"><span><span class="fu">sf_problems</span><span class="op">(</span><span class="va">v</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="sf_problems.html">sf_problems</a></span><span class="op">(</span><span class="va">v</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> character(0)</span>
 </code></pre></div>
     </div>

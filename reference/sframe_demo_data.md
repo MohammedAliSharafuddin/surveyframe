@@ -14,3 +14,13 @@ sframe_demo_data()
 
 A list with `instrument`, `responses`, `instrument_path`, and
 `responses_path`.
+
+## Examples
+
+``` r
+demo <- sframe_demo_data()
+sf_meta(demo$instrument)$title
+#> [1] "Tourism Services Experience Demo"
+nrow(demo$responses)
+#> [1] 120
+```

@@ -32,7 +32,7 @@ ranking whose leader changes under a 5 percent nudge is not."><meta property="og
 
     <a class="navbar-brand me-2" href="../index.html">surveyframe</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -127,8 +127,13 @@ before renormalisation.</p></dd>
     <p>An object of class <code>sframe_sensitivity</code>, a list with <code>$table</code> (one
 row per criterion and direction, carrying <code>criterion</code>, <code>direction</code>,
 <code>rho</code>, <code>rank_changed</code>, and <code>top_changed</code>), <code>$base_ranks</code>, <code>$method</code>,
-<code>$delta</code>, and <code>$stable</code>, a single logical that is <code>TRUE</code> when no
-perturbation changed the ranking.</p>
+<code>$delta</code>, <code>$stable</code>, <code>$degenerate</code>, <code>$n_perturbations</code>, <code>$n_effective</code>
+and <code>$n_failed</code>. <code>$stable</code> is <code>TRUE</code> when at least one perturbation moved
+the weights and none of those that did changed the ranking. A
+perturbation that leaves the renormalised weights unchanged, as every one
+does for weights such as <code>c(1, 0)</code>, is not effective and tests nothing.
+<code>$degenerate</code> marks a base ranking that places every alternative at the
+same rank, which no perturbation can move.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>

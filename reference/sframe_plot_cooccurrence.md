@@ -34,3 +34,17 @@ A ggplot2 object, or `NULL` when the result carries no table.
 
 [`run_analysis_plan()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/run_analysis_plan.md),
 [`term_frequency()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/term_frequency.md)
+
+## Examples
+
+``` r
+# \donttest{
+if (requireNamespace("ggplot2", quietly = TRUE)) {
+  demo <- sframe_demo("open_text")
+  res <- run_analysis_plan(demo$responses, demo$instrument)
+  sframe_plot_cooccurrence(res$RQ4)
+}
+#> Warning: K=2 is equivalent to a unidimensional scaling model which you may prefer.
+
+# }
+```

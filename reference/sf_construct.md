@@ -41,3 +41,14 @@ sf_construct(
 ## Value
 
 An object of class `sf_construct`.
+
+## Examples
+
+``` r
+sq <- sf_construct("sq", "Service Quality",
+                    items = c("sq_1", "sq_2", "sq_3"))
+sq$mode
+#> [1] "reflective"
+sq$items
+#> [1] "sq_1" "sq_2" "sq_3"
+```

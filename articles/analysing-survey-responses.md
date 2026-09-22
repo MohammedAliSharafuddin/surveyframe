@@ -26,7 +26,10 @@ dim(responses)
 ## Import responses
 
 Response data uses instrument item IDs as column names. Metadata columns
-are declared explicitly. Use `strict = TRUE` to keep only known columns.
+are declared explicitly. With `strict = TRUE`, an undeclared column is
+an error. With `strict = FALSE`, it is retained with a warning. Strict
+mode therefore catches an unexpected export instead of silently
+discarding columns.
 
 ``` r
 
@@ -55,21 +58,21 @@ kable(as.data.frame(mr), digits = 2,
 
 |            | Variable   | Missing (n) | Missing (%) | Valid (n) |
 |:-----------|:-----------|------------:|------------:|----------:|
-| visit_type | visit_type |           0 |           0 |       120 |
-| dm_1       | dm_1       |           0 |           0 |       120 |
-| dm_2       | dm_2       |           0 |           0 |       120 |
-| dm_3       | dm_3       |           0 |           0 |       120 |
-| sq_1       | sq_1       |           0 |           0 |       120 |
-| sq_2       | sq_2       |           0 |           0 |       120 |
-| sq_3       | sq_3       |           0 |           0 |       120 |
-| sus_1      | sus_1      |           0 |           0 |       120 |
-| sus_2      | sus_2      |           0 |           0 |       120 |
-| sat_1      | sat_1      |           0 |           0 |       120 |
-| sat_2      | sat_2      |           0 |           0 |       120 |
-| bi_1       | bi_1       |           0 |           0 |       120 |
-| bi_2       | bi_2       |           0 |           0 |       120 |
-| attention  | attention  |           0 |           0 |       120 |
-| comments   | comments   |           0 |           0 |       120 |
+| visit_type | visit_type |           0 |        0.00 |       120 |
+| dm_1       | dm_1       |           0 |        0.00 |       120 |
+| dm_2       | dm_2       |           0 |        0.00 |       120 |
+| dm_3       | dm_3       |           0 |        0.00 |       120 |
+| sq_1       | sq_1       |           0 |        0.00 |       120 |
+| sq_2       | sq_2       |           0 |        0.00 |       120 |
+| sq_3       | sq_3       |           0 |        0.00 |       120 |
+| sus_1      | sus_1      |           0 |        0.00 |       120 |
+| sus_2      | sus_2      |           0 |        0.00 |       120 |
+| sat_1      | sat_1      |           0 |        0.00 |       120 |
+| sat_2      | sat_2      |           0 |        0.00 |       120 |
+| bi_1       | bi_1       |           0 |        0.00 |       120 |
+| bi_2       | bi_2       |           0 |        0.00 |       120 |
+| attention  | attention  |           0 |        0.00 |       120 |
+| comments   | comments   |          30 |        0.25 |        90 |
 
 Item-level missingness {.table}
 
@@ -207,9 +210,9 @@ results_table(results)
 
 | RQ | Research question | Method | Result (APA) | Effect |
 |:---|:---|:---|---:|:---|
-| RQ1 | Is digital marketing perception associated with satisfaction? | pearson | r(118) = 0.54 \[0.40, 0.65\], p \< .001 | large |
+| RQ1 | Is digital marketing perception associated with satisfaction? | pearson | r(118) = 0.54, 95% CI \[0.40, 0.65\], p \< .001 | large |
 | RQ2 | Do the three perception scales predict satisfaction? |  | R² = 0.383, F(3, 116) = 23.95, p \< .001 |  |
-| RQ3 | Do first-time and repeat visitors differ in behavioural intention? |  | U = 1576, z = -0.98, p = 0.327, r = 0.09 \[0.00, 0.27\], Hodges-Lehmann shift = -0.00 \[-0.50, 0.00\] | negligible |
+| RQ3 | Do first-time and repeat visitors differ in behavioural intention? |  | U = 1576, z = -0.98, p = .326, r = 0.09, 95% CI \[0.00, 0.27\], Hodges-Lehmann shift = -0.00, 95% CI \[-0.50, 0.00\] | negligible |
 
 Pass `plots = TRUE` to attach a brand-styled `ggplot2` chart to each
 result that supports one (descriptive, correlation, chi-square, and
@@ -237,11 +240,11 @@ writing prompt, and the references that support the technique.
 rq1 <- results[[1]]
 
 rq1$apa
-#> [1] "r(118) = 0.54 [0.40, 0.65], p < .001"
+#> [1] "r(118) = 0.54, 95% CI [0.40, 0.65], p < .001"
 rq1$effect_label
 #> [1] "large"
 rq1$prompt
-#> [1] "There was a positive, large significant correlation between digital_marketing and satisfaction, r(118) = 0.54 [0.40, 0.65], p < .001. Explain what this means for your research question."
+#> [1] "There was a positive, large significant correlation between digital_marketing and satisfaction, r(118) = 0.54, 95% CI [0.40, 0.65], p < .001. Explain what this means for your research question."
 unlist(rq1$citations)
 #>                                                                                                                                                         field_2018 
 #>                                                                            "Field, A. (2018). *Discovering statistics using IBM SPSS statistics* (5th ed.). SAGE." 
@@ -250,7 +253,7 @@ unlist(rq1$citations)
 #>                                                                                                                                                             r_core 
 #>                                          "R Core Team. (2026). *R: A language and environment for statistical computing*. R Foundation for Statistical Computing." 
 #>                                                                                                                                                        surveyframe 
-#> "Sharafuddin, M. A. (2026). *surveyframe: Survey Instrument Workflows* (Version 0.4.1) [Computer software]. https://github.com/MohammedAliSharafuddin/surveyframe"
+#> "Sharafuddin, M. A. (2026). *surveyframe: Survey Instrument Workflows* (Version 0.4.2) [Computer software]. https://github.com/MohammedAliSharafuddin/surveyframe"
 ```
 
 ## Render the results report
@@ -282,3 +285,10 @@ launch_studio(
   launch.browser = FALSE
 )
 ```
+
+## Next step
+
+You now have imported, screened, scored, and analysed responses.
+Continue with the scale reliability and validity vignette for
+measurement evidence, or copy an editable worked notebook with
+`sframe_demo_qmd("two_group")`.

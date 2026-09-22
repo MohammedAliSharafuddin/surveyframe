@@ -25,3 +25,13 @@ sf_path(from, to, label = NULL)
 ## Value
 
 An object of class `sf_path`.
+
+## Examples
+
+``` r
+p <- sf_path("sq", "sat", label = "H1")
+p$from
+#> [1] "sq"
+p$to
+#> [1] "sat"
+```

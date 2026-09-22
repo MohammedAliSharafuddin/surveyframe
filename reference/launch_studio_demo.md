@@ -38,3 +38,14 @@ launch_studio_demo(
 ## Value
 
 Called for its side effect.
+
+## Examples
+
+``` r
+demo <- sframe_input_types_demo_data()
+nrow(demo$responses)
+#> [1] 120
+if (FALSE) { # \dontrun{
+launch_studio_demo()
+} # }
+```

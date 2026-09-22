@@ -1,25 +1,15 @@
 # A list of instrument components
 
 The value returned by
-[`sf_items()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_accessors.md),
-[`sf_scales()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_accessors.md),
-[`sf_choice_sets()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_accessors.md),
-[`sf_branches()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_accessors.md),
-[`sf_checks()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_accessors.md)
+[`sf_items()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_items.md),
+[`sf_scales()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_scales.md),
+[`sf_choice_sets()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_choice_sets.md),
+[`sf_branches()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_branches.md),
+[`sf_checks()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_checks.md)
 and
-[`sf_models()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_accessors.md).
+[`sf_models()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_models.md).
 It is a list of component objects named by their IDs, so a single
 component is reached with `[[`.
-
-## Usage
-
-``` r
-# S3 method for class 'sf_component_list'
-print(x, ...)
-
-# S3 method for class 'sf_component_list'
-x[i, ...]
-```
 
 ## Arguments
 
@@ -30,10 +20,6 @@ x[i, ...]
 - ...:
 
   Ignored. Present for S3 consistency.
-
-- i:
-
-  Index, name, or logical vector selecting components.
 
 ## Value
 

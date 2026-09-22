@@ -30,7 +30,7 @@ function is called."><meta property="og:image" content="https://mohammedalishara
 
     <a class="navbar-brand me-2" href="../index.html">surveyframe</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -127,6 +127,22 @@ reporting: <code>loadings_long</code> (item_id, factor, loading),
 cumulative_var).</p>
     </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># \donttest{</span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"psych"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>  <span class="va">demo</span> <span class="op">&lt;-</span> <span class="fu"><a href="sframe_demo_data.html">sframe_demo_data</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu">efa_solution</span><span class="op">(</span><span class="va">demo</span><span class="op">$</span><span class="va">responses</span>, <span class="va">demo</span><span class="op">$</span><span class="va">instrument</span>,</span></span>
+<span class="r-in"><span>                       scales <span class="op">=</span> <span class="st">"service_quality"</span>, nfactors <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="va">fit</span><span class="op">$</span><span class="va">loadings</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      item_id       MR1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> sq_1    sq_1 0.7661667</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> sq_2    sq_2 0.8354284</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> sq_3    sq_3 0.8063057</span>
+<span class="r-in"><span><span class="co"># }</span></span></span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 

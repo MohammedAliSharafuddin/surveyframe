@@ -5,7 +5,7 @@
 > **Just here to verify a `.sframe` file’s integrity hash or read its
 > amendment log?** **[Verify a file
 > now](https://mohammedalisharafuddin.github.io/surveyframe/verify/)**.
-> No R, no install; it runs entirely in your browser and nothing is
+> No R, no install. It runs entirely in your browser and nothing is
 > uploaded.
 
 `surveyframe` is a research-design-first survey package for R. Most
@@ -43,6 +43,21 @@ functions, so automated checks do not open a browser.
 
 ## Installation
 
+> **Collecting data right now? Install 0.4.2 from GitHub.** An external
+> review of 0.4.1, the version on CRAN, found defects that silently
+> alter or lose a participant’s answer, and defects that give a wrong
+> statistic. 0.4.2 corrects them and goes to CRAN on 26 September 2026.
+> Until it is accepted there, this is the version to collect with:
+>
+> ``` r
+>
+> remotes::install_github("MohammedAliSharafuddin/surveyframe")
+> ```
+>
+> `NEWS.md` lists every fix, and separately lists what changes for you:
+> some scores and statistics move, and a Shiny-collected response gains
+> a `respondent_id` column.
+
 Install from CRAN:
 
 ``` r
@@ -50,7 +65,7 @@ Install from CRAN:
 install.packages("surveyframe")
 ```
 
-To get unreleased changes from the development version:
+To get changes not yet released to CRAN:
 
 ``` r
 
@@ -71,7 +86,7 @@ PLS-SEM models.
 ## Already have data?
 
 `surveyframe` is not a replacement for whatever collection tool your
-institution already has approved – Qualtrics, REDCap, Google Forms, or a
+institution already has approved: Qualtrics, REDCap, Google Forms, or a
 paper form typed up afterward. It reads response data as a plain CSV or
 `data.frame` from any of them: export from your collection tool, rename
 columns to match your instrument’s item IDs (or build the instrument to
@@ -102,19 +117,24 @@ results <- run_analysis_plan(scored, instr)
 
 ## Documentation workflow
 
-Start with:
+Choose the route that matches what you need:
 
-1.  A worked study: digital marketing and tourism services
-2.  Building a survey instrument: questions, plan, and model
-3.  Deploying a survey and collecting responses on free hosting
-4.  Analysing survey responses: running the plan
-5.  Scale reliability and validity
-6.  EFA, CFA, CB-SEM, and PLS-SEM syntax generation
-7.  The visual workflow: SurveyBuilder, SurveyStudio, and the dashboard
-8.  Learn by example: 22 small surveys, the bundled demo library
-9.  Multi-criteria decision analysis: AHP, TOPSIS, and 8 other methods
-10. Small-sample inference
-11. Text and open-ended response analysis
+- **Try it in five minutes:** Learn by example: 22 small surveys.
+- **Prefer a visual interface:** SurveyBuilder, SurveyStudio, and the
+  dashboard.
+- **Build and collect:** Building a survey instrument, then Deploying
+  and collecting.
+- **Already have responses:** Analysing survey responses.
+- **Read the complete case study:** Digital marketing and tourism
+  services.
+
+Continue as needed with these:
+
+- Scale reliability and validity
+- EFA, CFA, CB-SEM, and PLS-SEM syntax
+- Multi-criteria decision analysis
+- Small-sample inference
+- Text and open-ended response analysis
 
 Read all eleven vignettes inside R with:
 
@@ -318,7 +338,7 @@ export_static_survey(instr, open = FALSE)
 Use
 [`launch_builder()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/launch_builder.md)
 to author the questionnaire, the plan, and the model and to export the
-`.sframe` file and model syntax; it runs no statistics.
+`.sframe` file and model syntax. It runs no statistics.
 [`launch_studio()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/launch_studio.md)
 uploads responses, runs the plan on its Analysis Plan screen, and
 renders the report on its Export screen.
@@ -361,8 +381,21 @@ alongside, on top of the existing `.sframe` integrity hash. Full detail
 in `NEWS.md`.
 
 0.4.1 focuses on stability: fixes found by using surveyframe on real
-instruments, no new capability theme. 0.4.2 continues in the same
-direction.
+instruments, no new capability theme.
+
+0.4.2 is a defect-fix release, correcting what an external review of
+0.4.1 found across 8 batches: 171 findings, 154 fixed here and 17
+deferred with a stated reason. The ones that matter most to a live study
+are in collection, where a participant’s answer could be altered or lost
+with no signal, and in scoring, where the report path recomputed scale
+scores by a second method that ignored reverse coding and the declared
+minimum. Some numbers therefore move between 0.4.1 and 0.4.2, and
+`NEWS.md` says which, under “What you need to change”. Reports also
+gained a folded “Show R code” block, and
+[`analysis_syntax()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/analysis_syntax.md)
+returns the statistical call behind a result with its variables and
+options resolved, so a reader can copy the code and reproduce the
+number.
 
 ## When to use surveyframe, and when not to
 

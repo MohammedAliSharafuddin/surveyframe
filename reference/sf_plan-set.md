@@ -1,16 +1,13 @@
 # Set the pre-declared analysis plan
 
 The replacement counterpart to
-[`sf_plan()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_accessors.md).
+[`sf_plan()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_plan.md).
 Declaring the plan is the step the whole workflow turns on, so it has a
 named function rather than assignment into the object's internals.
 
 ## Usage
 
 ``` r
-sf_plan(x) <- value
-
-# S3 method for class 'sframe'
 sf_plan(x) <- value
 ```
 
@@ -30,7 +27,7 @@ The updated `sframe` object.
 
 ## See also
 
-[`sf_plan()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_accessors.md),
+[`sf_plan()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_plan.md),
 [`validate_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/validate_sframe.md),
 [`run_analysis_plan()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/run_analysis_plan.md)
 

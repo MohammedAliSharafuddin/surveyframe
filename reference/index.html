@@ -24,7 +24,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">surveyframe</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -289,14 +289,14 @@
 
         <dt>
 
-          <code><a href="sframe_validation.html">print(<i>&lt;sframe_validation&gt;</i>)</a></code> <code><a href="sframe_validation.html">format(<i>&lt;sframe_validation&gt;</i>)</a></code> <code><a href="sframe_validation.html">summary(<i>&lt;sframe_validation&gt;</i>)</a></code> <code><a href="sframe_validation.html">as.data.frame(<i>&lt;sframe_validation&gt;</i>)</a></code>
+          <code><a href="sframe_validation.html">sframe_validation</a></code>
 
         </dt>
         <dd>Report on a validation result</dd>
       </dl></div><div class="section level2">
       <h2 id="accessors-and-coercion">Accessors and coercion<a class="anchor" aria-label="anchor" href="#accessors-and-coercion"></a></h2>
 
-      <div class="section-desc"><p>Read parts of an instrument, a validation result, or a report without reaching into the object directly, new in 0.4.0.</p></div>
+      <div class="section-desc"><p>Read parts of an instrument, a validation result, or a report without reaching into the object directly, new in 0.4.0. Each accessor and as.data.frame method has its own page as of 0.4.2, stating the classes it accepts and what it returns.</p></div>
 
       <dl></dl></div><div class="section level2">
 
@@ -312,24 +312,122 @@
 
         <dt>
 
-          <code><a href="sf_accessors.html">sf_meta()</a></code> <code><a href="sf_accessors.html">sf_items()</a></code> <code><a href="sf_accessors.html">sf_scales()</a></code> <code><a href="sf_accessors.html">sf_choice_sets()</a></code> <code><a href="sf_accessors.html">sf_branches()</a></code> <code><a href="sf_accessors.html">sf_checks()</a></code> <code><a href="sf_accessors.html">sf_models()</a></code> <code><a href="sf_accessors.html">sf_plan()</a></code>
+          <code><a href="sf_accessors.html">sf_accessors</a></code>
 
         </dt>
         <dd>Explore a surveyframe object</dd>
 
         <dt>
 
-          <code><a href="sf_component_list.html">print(<i>&lt;sf_component_list&gt;</i>)</a></code> <code><a href="sf_component_list.html">`[`(<i>&lt;sf_component_list&gt;</i>)</a></code>
+          <code><a href="sf_apa.html">sf_apa()</a></code>
+
+        </dt>
+        <dd>Extract APA-formatted result summaries</dd>
+
+        <dt>
+
+          <code><a href="sf_branches.html">sf_branches()</a></code>
+
+        </dt>
+        <dd>Get branching rules</dd>
+
+        <dt>
+
+          <code><a href="sf_checks.html">sf_checks()</a></code>
+
+        </dt>
+        <dd>Get response-quality checks</dd>
+
+        <dt>
+
+          <code><a href="sf_choice_sets.html">sf_choice_sets()</a></code>
+
+        </dt>
+        <dd>Get choice sets</dd>
+
+        <dt>
+
+          <code><a href="sf_component_list.html">sf_component_list</a></code>
 
         </dt>
         <dd>A list of instrument components</dd>
 
         <dt>
 
-          <code><a href="sf_identity.html">sf_id()</a></code> <code><a href="sf_identity.html">sf_label()</a></code>
+          <code><a href="sf_flagged.html">sf_flagged()</a></code>
+
+        </dt>
+        <dd>Get rows flagged by response-quality checks</dd>
+
+        <dt>
+
+          <code><a href="sf_id.html">sf_id()</a></code>
+
+        </dt>
+        <dd>Get an instrument component ID</dd>
+
+        <dt>
+
+          <code><a href="sf_identity.html">sf_identity</a></code>
 
         </dt>
         <dd>The ID and label of an instrument component</dd>
+
+        <dt>
+
+          <code><a href="sf_is_valid.html">sf_is_valid()</a></code>
+
+        </dt>
+        <dd>Test whether validation passed</dd>
+
+        <dt>
+
+          <code><a href="sf_items.html">sf_items()</a></code>
+
+        </dt>
+        <dd>Get survey items</dd>
+
+        <dt>
+
+          <code><a href="sf_label.html">sf_label()</a></code>
+
+        </dt>
+        <dd>Get an instrument component label</dd>
+
+        <dt>
+
+          <code><a href="sf_meta.html">sf_meta()</a></code>
+
+        </dt>
+        <dd>Get survey metadata</dd>
+
+        <dt>
+
+          <code><a href="sf_missing_columns.html">sf_missing_columns()</a></code>
+
+        </dt>
+        <dd>Columns the instrument declares that the responses left out</dd>
+
+        <dt>
+
+          <code><a href="sf_models.html">sf_models()</a></code>
+
+        </dt>
+        <dd>Get model specifications</dd>
+
+        <dt>
+
+          <code><a href="sf_object.html">sf_object()</a></code>
+
+        </dt>
+        <dd>Recover the validated object</dd>
+
+        <dt>
+
+          <code><a href="sf_plan.html">sf_plan()</a></code>
+
+        </dt>
+        <dd>Get the pre-declared analysis plan</dd>
 
         <dt>
 
@@ -340,31 +438,157 @@
 
         <dt>
 
-          <code><a href="sf_report_accessors.html">sf_apa()</a></code> <code><a href="sf_report_accessors.html">sf_flagged()</a></code>
+          <code><a href="sf_problems.html">sf_problems()</a></code>
+
+        </dt>
+        <dd>Get validation problems</dd>
+
+        <dt>
+
+          <code><a href="sf_report_accessors.html">sf_report_accessors</a></code>
 
         </dt>
         <dd>Read the reportable parts of an analysis or quality result</dd>
 
         <dt>
 
-          <code><a href="sf_validation_accessors.html">sf_is_valid()</a></code> <code><a href="sf_validation_accessors.html">sf_problems()</a></code> <code><a href="sf_validation_accessors.html">sf_object()</a></code>
+          <code><a href="sf_scales.html">sf_scales()</a></code>
+
+        </dt>
+        <dd>Get survey scales</dd>
+
+        <dt>
+
+          <code><a href="sf_validation_accessors.html">sf_validation_accessors</a></code>
 
         </dt>
         <dd>Read a validation diagnostic</dd>
 
         <dt>
 
-          <code><a href="sframe_as_data_frame.html">as.data.frame(<i>&lt;sframe&gt;</i>)</a></code> <code><a href="sframe_as_data_frame.html">as.data.frame(<i>&lt;sf_choices&gt;</i>)</a></code> <code><a href="sframe_as_data_frame.html">as.data.frame(<i>&lt;sframe_codebook&gt;</i>)</a></code> <code><a href="sframe_as_data_frame.html">as.data.frame(<i>&lt;sframe_reliability_report&gt;</i>)</a></code> <code><a href="sframe_as_data_frame.html">as.data.frame(<i>&lt;sframe_item_report&gt;</i>)</a></code> <code><a href="sframe_as_data_frame.html">as.data.frame(<i>&lt;sframe_efa_report&gt;</i>)</a></code> <code><a href="sframe_as_data_frame.html">as.data.frame(<i>&lt;sframe_efa_solution&gt;</i>)</a></code> <code><a href="sframe_as_data_frame.html">as.data.frame(<i>&lt;sframe_descriptives_report&gt;</i>)</a></code> <code><a href="sframe_as_data_frame.html">as.data.frame(<i>&lt;sframe_missing_data_report&gt;</i>)</a></code> <code><a href="sframe_as_data_frame.html">as.data.frame(<i>&lt;sframe_validity_report&gt;</i>)</a></code> <code><a href="sframe_as_data_frame.html">as.data.frame(<i>&lt;sframe_assumption_report&gt;</i>)</a></code> <code><a href="sframe_as_data_frame.html">as.data.frame(<i>&lt;sframe_sample_size_plan&gt;</i>)</a></code> <code><a href="sframe_as_data_frame.html">as.data.frame(<i>&lt;sframe_quality_report&gt;</i>)</a></code> <code><a href="sframe_as_data_frame.html">as.data.frame(<i>&lt;sframe_sensitivity&gt;</i>)</a></code> <code><a href="sframe_as_data_frame.html">as.data.frame(<i>&lt;sframe_analysis_results&gt;</i>)</a></code>
+          <code><a href="sframe_as_data_frame.html">sframe_as_data_frame</a></code>
 
         </dt>
         <dd>Coerce a surveyframe object to a data frame</dd>
 
         <dt>
 
-          <code><a href="sframe_subset.html">`[`(<i>&lt;sframe_analysis_results&gt;</i>)</a></code> <code><a href="sframe_subset.html">`[`(<i>&lt;sframe_reliability_report&gt;</i>)</a></code> <code><a href="sframe_subset.html">`[`(<i>&lt;sframe_item_report&gt;</i>)</a></code>
+          <code><a href="sframe_subset.html">sframe_subset</a></code>
 
         </dt>
         <dd>Subset a surveyframe report</dd>
+
+        <dt>
+
+          <code><a href="as.data.frame.sf_choices.html">as.data.frame(<i>&lt;sf_choices&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Coerce a choice set to a data frame</dd>
+
+        <dt>
+
+          <code><a href="as.data.frame.sframe.html">as.data.frame(<i>&lt;sframe&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Coerce an instrument to its item summary</dd>
+
+        <dt>
+
+          <code><a href="as.data.frame.sframe_analysis_results.html">as.data.frame(<i>&lt;sframe_analysis_results&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Summarise analysis-plan results as a data frame</dd>
+
+        <dt>
+
+          <code><a href="as.data.frame.sframe_assumption_report.html">as.data.frame(<i>&lt;sframe_assumption_report&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Coerce an assumption report to a data frame</dd>
+
+        <dt>
+
+          <code><a href="as.data.frame.sframe_codebook.html">as.data.frame(<i>&lt;sframe_codebook&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Extract the item table from a codebook report</dd>
+
+        <dt>
+
+          <code><a href="as.data.frame.sframe_descriptives_report.html">as.data.frame(<i>&lt;sframe_descriptives_report&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Extract the descriptives results table</dd>
+
+        <dt>
+
+          <code><a href="as.data.frame.sframe_efa_report.html">as.data.frame(<i>&lt;sframe_efa_report&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Coerce an EFA readiness report to a data frame</dd>
+
+        <dt>
+
+          <code><a href="as.data.frame.sframe_efa_solution.html">as.data.frame(<i>&lt;sframe_efa_solution&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Extract the loading table from an EFA solution</dd>
+
+        <dt>
+
+          <code><a href="as.data.frame.sframe_item_report.html">as.data.frame(<i>&lt;sframe_item_report&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Coerce an item report to a data frame</dd>
+
+        <dt>
+
+          <code><a href="as.data.frame.sframe_missing_data_report.html">as.data.frame(<i>&lt;sframe_missing_data_report&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Extract item missingness results</dd>
+
+        <dt>
+
+          <code><a href="as.data.frame.sframe_quality_report.html">as.data.frame(<i>&lt;sframe_quality_report&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Coerce a response-quality report to a data frame</dd>
+
+        <dt>
+
+          <code><a href="as.data.frame.sframe_reliability_report.html">as.data.frame(<i>&lt;sframe_reliability_report&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Coerce a reliability report to a data frame</dd>
+
+        <dt>
+
+          <code><a href="as.data.frame.sframe_sample_size_plan.html">as.data.frame(<i>&lt;sframe_sample_size_plan&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Coerce a sample-size plan to a data frame</dd>
+
+        <dt>
+
+          <code><a href="as.data.frame.sframe_sensitivity.html">as.data.frame(<i>&lt;sframe_sensitivity&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Extract a sensitivity-analysis results table</dd>
+
+        <dt>
+
+          <code><a href="as.data.frame.sframe_validation.html">as.data.frame(<i>&lt;sframe_validation&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Coerce validation problems to a data frame</dd>
+
+        <dt>
+
+          <code><a href="as.data.frame.sframe_validity_report.html">as.data.frame(<i>&lt;sframe_validity_report&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Extract reliability evidence from a validity report</dd>
       </dl></div><div class="section level2">
       <h2 id="deploy">Deploy<a class="anchor" aria-label="anchor" href="#deploy"></a></h2>
 
@@ -512,7 +736,7 @@
           <code><a href="reliability_report.html">reliability_report()</a></code>
 
         </dt>
-        <dd>Compute reliability statistics for scored scales</dd>
+        <dd>Estimate scale reliability from item responses</dd>
 
         <dt>
 
@@ -554,7 +778,7 @@
           <code><a href="cfa_lavaan_syntax.html">cfa_lavaan_syntax()</a></code>
 
         </dt>
-        <dd>Generate lavaan CFA syntax</dd>
+        <dd>Generate lavaan CFA syntax from an instrument or a declared model</dd>
 
         <dt>
 
@@ -746,7 +970,7 @@
       </dl></div><div class="section level2">
       <h2 id="report">Report<a class="anchor" aria-label="anchor" href="#report"></a></h2>
 
-      <div class="section-desc"><p>Generate codebooks, scale appendices, and reproducible HTML reports.</p></div>
+      <div class="section-desc"><p>Generate codebooks, scale appendices, reproducible HTML reports, and the R code behind a computed result.</p></div>
 
       <dl></dl></div><div class="section level2">
 
@@ -754,6 +978,13 @@
 
 
       <dl><dt>
+
+          <code><a href="sframe_reports.html">sframe_reports</a></code>
+
+        </dt>
+        <dd>Choosing a report</dd>
+
+        <dt>
 
           <code><a href="codebook_report.html">codebook_report()</a></code>
 
@@ -787,6 +1018,27 @@
 
         </dt>
         <dd>Create a model reporting template</dd>
+
+        <dt>
+
+          <code><a href="analysis_syntax.html">analysis_syntax()</a></code>
+
+        </dt>
+        <dd>The R code behind an analysis result</dd>
+
+        <dt>
+
+          <code><a href="sframe_result_supplement.html">sframe_result_supplement()</a></code>
+
+        </dt>
+        <dd>The second table a result carries, if it has one</dd>
+
+        <dt>
+
+          <code><a href="sframe_analysis_qmd.html">sframe_analysis_qmd()</a></code>
+
+        </dt>
+        <dd>Write a Quarto analysis notebook for any instrument</dd>
       </dl></div><div class="section level2">
       <h2 id="plotting">Plotting<a class="anchor" aria-label="anchor" href="#plotting"></a></h2>
 
@@ -798,6 +1050,13 @@
 
 
       <dl><dt>
+
+          <code><a href="sframe_plots.html">sframe_plots</a></code>
+
+        </dt>
+        <dd>Choosing a plot</dd>
+
+        <dt>
 
           <code><a href="theme_surveyframe.html">theme_surveyframe()</a></code>
 
@@ -1163,7 +1422,7 @@
           <code><a href="sframe_input_types_demo_data.html">sframe_input_types_demo_data()</a></code>
 
         </dt>
-        <dd>Load bundled input-types demo data</dd>
+        <dd>Load the input-types demo backing SurveyBuilder and SurveyStudio</dd>
 
         <dt>
 

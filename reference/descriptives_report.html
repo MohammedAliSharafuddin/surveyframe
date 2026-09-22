@@ -28,7 +28,7 @@ skewness, kurtosis, standard error, and confidence intervals."><meta property="o
 
     <a class="navbar-brand me-2" href="../index.html">surveyframe</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -100,6 +100,24 @@ columns are used.</p></dd>
     <p>An object of class <code>sframe_descriptives_report</code>.</p>
     </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">demo</span> <span class="op">&lt;-</span> <span class="fu"><a href="sframe_demo_data.html">sframe_demo_data</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">dr</span> <span class="op">&lt;-</span> <span class="fu">descriptives_report</span><span class="op">(</span><span class="va">demo</span><span class="op">$</span><span class="va">responses</span>, variables <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"sat_1"</span>, <span class="st">"sat_2"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>                           split_by <span class="op">=</span> <span class="st">"visit_type"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">dr</span><span class="op">$</span><span class="va">table</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   variable      group  n valid_n missing_n     mean       sd median iqr min max</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1    sat_1 first_time 69      69         0 3.304348 1.128564      3   2   1   5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2    sat_2 first_time 69      69         0 3.304348 1.115458      3   2   1   5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3    sat_1     repeat 51      51         0 3.352941 1.230017      3   1   1   5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4    sat_2     repeat 51      51         0 3.196078 1.095803      3   2   1   5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      skewness   kurtosis        se   ci_low  ci_high weighted_mean</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 -0.06072425 -0.9308346 0.1358632 3.033237 3.575459            NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2  0.01883148 -1.0416986 0.1342853 3.036386 3.572310            NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3 -0.29859520 -0.8012592 0.1722368 3.006993 3.698889            NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4  0.06405216 -0.9234196 0.1534431 2.887879 3.504278            NA</span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 

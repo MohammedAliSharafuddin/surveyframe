@@ -24,7 +24,8 @@ render_report(
   include_analysis = TRUE,
   include_models = TRUE,
   plot_palette = c("web", "print"),
-  interpretations = NULL
+  interpretations = NULL,
+  show_code = TRUE
 )
 ```
 
@@ -109,6 +110,16 @@ render_report(
   do when this argument is NULL. Interpretations are report content only
   and are never written into the instrument.
 
+- show_code:
+
+  Logical. Whether each result carries a folded "Show R code" block with
+  the statistical call that produced it, built by
+  [`analysis_syntax()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/analysis_syntax.md)
+  from the same resolved specification the analysis ran. Defaults to
+  `TRUE`. A method
+  [`analysis_syntax()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/analysis_syntax.md)
+  does not cover shows no block, rather than a guess at the call.
+
 ## Value
 
 The output file path, invisibly.
@@ -146,7 +157,7 @@ out <- tryCatch(
   ),
   finally = options(old)
 )
-#> Report rendered with the built-in HTML engine: /tmp/RtmptVa9K0/file2a4e2b0186d2.html
+#> Report rendered with the built-in HTML engine: /tmp/Rtmp1QvF7K/file26f56214b21c.html
 file.exists(out)
 #> [1] TRUE
 # }

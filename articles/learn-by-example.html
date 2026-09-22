@@ -45,7 +45,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">surveyframe</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -82,14 +82,33 @@
 
     
     
+<style>
+/* WCAG 2.2 AA pass: darker link and syntax-token colours (at least
+   4.5:1 on the #f7f7f7 code background), wrapped code lines instead of a
+   keyboard-inaccessible scroll region, empty per-line anchors removed from
+   the accessibility tree, and 24px minimum TOC link targets. */
+a { color: #0e7c7a; }
+code span.at { color: #576419; }
+code span.dv, code span.fl, code span.bn { color: #276245; }
+code span.co { color: #396a80; }
+/* Pandoc emits `pre > code.sourceCode { white-space: pre }` for screen, which
+   outranks a bare `pre code` rule on specificity, so source chunks have to be
+   named explicitly or they scroll sideways instead of wrapping. */
+pre, pre code, pre > code.sourceCode { white-space: pre-wrap; word-break: break-word; }
+pre > code.sourceCode > span { text-indent: -2em; padding-left: 2em; }
+div.sourceCode { overflow: visible; }
+pre.sourceCode a:empty { display: none; }
+#TOC a { display: inline-block; min-height: 24px; }
+</style>
 <p>Every function in surveyframe is documented. That is a different
 thing from knowing which survey to build, so this article works the
 other way round: it starts from the survey you are trying to run and
 shows the whole path, from the questionnaire to the report.</p>
-<p>There are <strong>22 demos</strong>, each doing one job. Every one
-ships an instrument, its response data, a codebook, and the results
-surveyframe produced, so you can load one, change it, and keep
-going.</p>
+<p>There are <strong>22 demos</strong>: 17 analysis examples, three
+presentation examples, and two provenance examples. Each has an
+instrument, response data, a codebook, and surveyframe’s expected
+results. Presentation and provenance demos reuse the matching analysis
+data where appropriate.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="../reference/sframe_demos.html">sframe_demos</a></span><span class="op">(</span><span class="op">)</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"name"</span>, <span class="st">"teaches"</span><span class="op">)</span><span class="op">]</span>, <span class="fl">5</span><span class="op">)</span></span>
 <span><span class="co">#&gt;            name                                       teaches</span></span>
@@ -98,6 +117,14 @@ going.</p>
 <span><span class="co">#&gt; 3 matrix_likert A matrix item and the columns it expands into</span></span>
 <span><span class="co">#&gt; 4     two_group                     Two groups on one outcome</span></span>
 <span><span class="co">#&gt; 5        paired                The same people measured twice</span></span></code></pre></div>
+<p>Try the shortest complete route first:</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">demo</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sframe_demo.html">sframe_demo</a></span><span class="op">(</span><span class="st">"first_survey"</span><span class="op">)</span></span>
+<span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/run_analysis_plan.html">run_analysis_plan</a></span><span class="op">(</span><span class="va">demo</span><span class="op">$</span><span class="va">responses</span>, <span class="va">demo</span><span class="op">$</span><span class="va">instrument</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/sframe_demo_qmd.html">sframe_demo_qmd</a></span><span class="op">(</span><span class="st">"first_survey"</span><span class="op">)</span> <span class="co"># write an editable Quarto notebook</span></span></code></pre></div>
+<p>The package stores the 22 compact instruments and datasets, and
+generates a notebook only when you ask: <code><a href="../reference/sframe_demo_qmd.html">sframe_demo_qmd()</a></code>
+creates one for whichever demo you choose.</p>
 <div class="section level2">
 <h2 id="read-this-as-your-own-field">Read this as your own field<a class="anchor" aria-label="anchor" href="#read-this-as-your-own-field"></a>
 </h2>
@@ -140,7 +167,8 @@ workshop or a clinic appointment.</p>
 <div class="section level2">
 <h2 id="which-demo-do-i-need">Which demo do I need?<a class="anchor" aria-label="anchor" href="#which-demo-do-i-need"></a>
 </h2>
-<p>Choose by the data you have, rather than by the name of a test.</p>
+<p>Choose by the data you have, and let the name of the test follow from
+it.</p>
 <table class="table">
 <colgroup>
 <col width="33%">
@@ -159,7 +187,7 @@ workshop or a clinic appointment.</p>
 <td><code>first_survey</code></td>
 </tr>
 <tr class="even">
-<td>Several items meant to measure one thing</td>
+<td>Four items meant to measure one thing</td>
 <td>A scale, and its reliability</td>
 <td><code>likert_scale</code></td>
 </tr>
@@ -194,7 +222,7 @@ workshop or a clinic appointment.</p>
 <td><code>categorical</code></td>
 </tr>
 <tr class="odd">
-<td>Several numbers that may go together</td>
+<td>Four numbers that may go together</td>
 <td>Correlation and regression</td>
 <td><code>correlation_regression</code></td>
 </tr>
@@ -224,7 +252,7 @@ workshop or a clinic appointment.</p>
 <td><code>open_text</code></td>
 </tr>
 <tr class="odd">
-<td>A decision between options on several criteria</td>
+<td>A decision between options on four criteria</td>
 <td>MCDA</td>
 <td><code>mcdm_choice</code></td>
 </tr>
@@ -240,6 +268,40 @@ workshop or a clinic appointment.</p>
 </tr>
 </tbody>
 </table>
+<p>The remaining five demos teach presentation and provenance, not a new
+statistical method:</p>
+<table class="table">
+<colgroup>
+<col width="50%">
+<col width="50%">
+</colgroup>
+<thead><tr class="header">
+<th>You want to learn</th>
+<th>Demo</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td>A welcome page, logo, colour, and thank-you page</td>
+<td><code>branded_survey</code></td>
+</tr>
+<tr class="even">
+<td>One-question-at-a-time presentation</td>
+<td><code>conversational_survey</code></td>
+</tr>
+<tr class="odd">
+<td>Conversational presentation with skip logic</td>
+<td><code>conversational_branching</code></td>
+</tr>
+<tr class="even">
+<td>A disclosed mid-study revision</td>
+<td><code>instrument_revision</code></td>
+</tr>
+<tr class="odd">
+<td>Integrity checking and a deliberately altered file</td>
+<td><code>verification</code></td>
+</tr>
+</tbody>
+</table>
 </div>
 <div class="section level2">
 <h2 id="the-shape-of-every-study">The shape of every study<a class="anchor" aria-label="anchor" href="#the-shape-of-every-study"></a>
@@ -252,13 +314,13 @@ one object.</p>
                     render_survey(mode = "shiny")   run_analysis_plan()</code></pre>
 <p>The step that matters is the first one. The analysis plan is declared
 <strong>inside the instrument, before any data exists</strong>, so
-running it later is the execution of a contract rather than a search for
-something significant.</p>
+running it later is the execution of a contract, which is what separates
+it from a search for something significant.</p>
 </div>
 <div class="section level2">
 <h2 id="start-here-your-first-survey">Start here: your first survey<a class="anchor" aria-label="anchor" href="#start-here-your-first-survey"></a>
 </h2>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">demo</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sframe_demo.html">sframe_demo</a></span><span class="op">(</span><span class="st">"first_survey"</span><span class="op">)</span></span>
 <span><span class="va">demo</span><span class="op">$</span><span class="va">instrument</span></span>
 <span><span class="co">#&gt; &lt;sframe&gt;</span></span>
@@ -272,8 +334,8 @@ something significant.</p>
 what a respondent sees:</p>
 <p><img src="figures/survey-first-survey.png" class="r-plt" alt="" width="100%"></p>
 <p>The plan was written at design time:</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">rbind</span>, <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="fu"><a href="../reference/sf_accessors.html">sf_plan</a></span><span class="op">(</span><span class="va">demo</span><span class="op">$</span><span class="va">instrument</span><span class="op">)</span>, <span class="kw">function</span><span class="op">(</span><span class="va">b</span><span class="op">)</span> <span class="op">{</span></span>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">rbind</span>, <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="fu"><a href="../reference/sf_plan.html">sf_plan</a></span><span class="op">(</span><span class="va">demo</span><span class="op">$</span><span class="va">instrument</span><span class="op">)</span>, <span class="kw">function</span><span class="op">(</span><span class="va">b</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>id <span class="op">=</span> <span class="va">b</span><span class="op">$</span><span class="va">id</span>, question <span class="op">=</span> <span class="va">b</span><span class="op">$</span><span class="va">research_question</span>, method <span class="op">=</span> <span class="va">b</span><span class="op">$</span><span class="va">method</span><span class="op">)</span></span>
 <span><span class="op">}</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;    id                         question       method</span></span>
@@ -282,7 +344,7 @@ what a respondent sees:</p>
 <span><span class="co">#&gt; 3 RQ3        How complete is the data? missing_data</span></span>
 <span><span class="co">#&gt; 4 RQ4 Are there inattentive responses?      quality</span></span></code></pre></div>
 <p>And running it is one call:</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/run_analysis_plan.html">run_analysis_plan</a></span><span class="op">(</span><span class="va">demo</span><span class="op">$</span><span class="va">responses</span>, <span class="va">demo</span><span class="op">$</span><span class="va">instrument</span><span class="op">)</span></span>
 <span><span class="va">results</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">apa</span></span>
 <span><span class="co">#&gt; [1] "Frequency distribution for NA (N = 0)."</span></span></code></pre></div>
@@ -299,39 +361,42 @@ unchanged.</p>
 <p>The commonest comparison there is: one number, and two groups of
 people.</p>
 <p><img src="figures/survey-two-group.png" class="r-plt" alt="" width="100%"></p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">tg</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sframe_demo.html">sframe_demo</a></span><span class="op">(</span><span class="st">"two_group"</span><span class="op">)</span></span>
 <span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/run_analysis_plan.html">run_analysis_plan</a></span><span class="op">(</span><span class="va">tg</span><span class="op">$</span><span class="va">responses</span>, <span class="va">tg</span><span class="op">$</span><span class="va">instrument</span><span class="op">)</span></span>
 <span><span class="kw">for</span> <span class="op">(</span><span class="va">b</span> <span class="kw">in</span> <span class="va">res</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="va">b</span><span class="op">$</span><span class="va">test</span>, <span class="st">": "</span>, <span class="va">b</span><span class="op">$</span><span class="va">apa</span>, <span class="st">"\n"</span>, sep <span class="op">=</span> <span class="st">""</span><span class="op">)</span></span>
-<span><span class="co">#&gt; t_test_ind: t(57.89) = 3.36, p = 0.001, d = 0.87 [0.43, 1.35]</span></span>
-<span><span class="co">#&gt; mann_whitney: U = 626, z = -2.62, p = 0.009, r = 0.34 [0.10, 0.54], Hodges-Lehmann shift = 2.00 [0.00, 3.00]</span></span></code></pre></div>
-<p>Both tests are declared, so you report both rather than choosing
-afterwards whichever gave the smaller p value.</p>
+<span><span class="co">#&gt; t_test_ind: t(57.89) = 3.36, p = .001, d = 0.87, 95% CI [0.43, 1.35]</span></span>
+<span><span class="co">#&gt; mann_whitney: U = 626, z = 2.63, p = .009, r = 0.34, 95% CI [0.10, 0.54], Hodges-Lehmann shift = 2.00, 95% CI [0.00, 3.00]</span></span></code></pre></div>
+<p>Both tests are shown for teaching. In a real study, predeclare the
+primary test from the research question, estimand, design, and
+defensible assumptions, before seeing which produces the smaller
+p-value. If useful, predeclare the other as a sensitivity analysis and
+label it as such when reporting both.</p>
 </div>
 <div class="section level3">
 <h3 id="the-same-people-measured-twice">The same people, measured twice<a class="anchor" aria-label="anchor" href="#the-same-people-measured-twice"></a>
 </h3>
 <p><img src="figures/survey-paired.png" class="r-plt" alt="" width="100%"></p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sframe_demo.html">sframe_demo</a></span><span class="op">(</span><span class="st">"paired"</span><span class="op">)</span></span>
 <span><span class="kw">for</span> <span class="op">(</span><span class="va">b</span> <span class="kw">in</span> <span class="fu"><a href="../reference/run_analysis_plan.html">run_analysis_plan</a></span><span class="op">(</span><span class="va">pr</span><span class="op">$</span><span class="va">responses</span>, <span class="va">pr</span><span class="op">$</span><span class="va">instrument</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="va">b</span><span class="op">$</span><span class="va">test</span>, <span class="st">": "</span>, <span class="va">b</span><span class="op">$</span><span class="va">apa</span>, <span class="st">"\n"</span>, sep <span class="op">=</span> <span class="st">""</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
-<span><span class="co">#&gt; t_test_pair: t(49) = -5.11, p &lt; .001, d_z = -0.72 [-1.00, -0.49]</span></span>
-<span><span class="co">#&gt; wilcoxon_pair: V = 156, z = -4.31, p &lt; .001, r = 0.61 [0.43, 0.77], pseudomedian = -7.50 [-12.00, -4.00]</span></span>
+<span><span class="co">#&gt; t_test_pair: t(49) = -5.11, p &lt; .001, d_z = -0.72, 95% CI [-1.00, -0.49]</span></span>
+<span><span class="co">#&gt; wilcoxon_pair: V = 156, z = -4.31, p &lt; .001, r = 0.63, 95% CI [0.43, 0.77], pseudomedian = -7.50, 95% CI [-12.00, -4.00]</span></span>
 <span><span class="co">#&gt; mcnemar: McNemar's chi-square(1) = 11.08, p &lt; .001</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="three-groups-a-second-factor-and-a-covariate">Three groups, a second factor, and a covariate<a class="anchor" aria-label="anchor" href="#three-groups-a-second-factor-and-a-covariate"></a>
 </h3>
 <p><img src="figures/survey-multi-group.png" class="r-plt" alt="" width="100%"></p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mg</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sframe_demo.html">sframe_demo</a></span><span class="op">(</span><span class="st">"multi_group"</span><span class="op">)</span></span>
 <span><span class="kw">for</span> <span class="op">(</span><span class="va">b</span> <span class="kw">in</span> <span class="fu"><a href="../reference/run_analysis_plan.html">run_analysis_plan</a></span><span class="op">(</span><span class="va">mg</span><span class="op">$</span><span class="va">responses</span>, <span class="va">mg</span><span class="op">$</span><span class="va">instrument</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span><span class="op">]</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="va">b</span><span class="op">$</span><span class="va">test</span>, <span class="st">": "</span>, <span class="va">b</span><span class="op">$</span><span class="va">apa</span>, <span class="st">"\n"</span>, sep <span class="op">=</span> <span class="st">""</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
-<span><span class="co">#&gt; anova_one: F(2, 72) = 7.27, p = 0.001, η² = 0.168 [0.07, 0.34]</span></span>
-<span><span class="co">#&gt; kruskal_wallis: H(2) = 12.01, p = 0.002, η² = 0.139 [0.02, 0.33]</span></span></code></pre></div>
+<span><span class="co">#&gt; anova_one: F(2, 72) = 7.27, p = .001, η² = 0.168, 95% CI [0.07, 0.34]</span></span>
+<span><span class="co">#&gt; kruskal_wallis: H(2) = 12.01, p = .002, η² = 0.139, 95% CI [0.02, 0.33]</span></span></code></pre></div>
 <p><code>repeated</code> and <code>categorical</code> follow the same
 shape. See <code>sframe_demo("repeated")</code> and
 <code>sframe_demo("categorical")</code>.</p>
@@ -344,15 +409,15 @@ shape. See <code>sframe_demo("repeated")</code> and
 <h3 id="a-scale-and-whether-it-holds-together">A scale, and whether it holds together<a class="anchor" aria-label="anchor" href="#a-scale-and-whether-it-holds-together"></a>
 </h3>
 <p><img src="figures/survey-likert-scale.png" class="r-plt" alt="" width="100%"></p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ls_demo</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sframe_demo.html">sframe_demo</a></span><span class="op">(</span><span class="st">"likert_scale"</span><span class="op">)</span></span>
 <span><span class="va">rel</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/reliability_report.html">reliability_report</a></span><span class="op">(</span><span class="va">ls_demo</span><span class="op">$</span><span class="va">responses</span>, <span class="va">ls_demo</span><span class="op">$</span><span class="va">instrument</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">rel</span><span class="op">)</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"scale_id"</span>, <span class="st">"n_items"</span>, <span class="st">"alpha"</span><span class="op">)</span><span class="op">]</span></span>
 <span><span class="co">#&gt;       scale_id n_items     alpha</span></span>
 <span><span class="co">#&gt; 1 organisation       4 0.8473312</span></span></code></pre></div>
 <p>One item is reverse worded and declared with
-<code>reverse = TRUE</code>, so scoring handles it and you do not have
-to remember.</p>
+<code>reverse = TRUE</code>, so scoring handles it and remembers for
+you.</p>
 </div>
 <div class="section level3">
 <h3 id="factor-structure-and-a-path-model">Factor structure, and a path model<a class="anchor" aria-label="anchor" href="#factor-structure-and-a-path-model"></a>
@@ -363,9 +428,9 @@ a path model, and generates the syntax for both lavaan and seminr. The
 model type decides which: asking for PLS syntax from a covariance-based
 model is refused, because it would estimate a different model from the
 one you declared.</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">sem</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sframe_demo.html">sframe_demo</a></span><span class="op">(</span><span class="st">"sem_pls"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">vapply</a></span><span class="op">(</span><span class="fu"><a href="../reference/sf_accessors.html">sf_models</a></span><span class="op">(</span><span class="va">sem</span><span class="op">$</span><span class="va">instrument</span><span class="op">)</span>, <span class="kw">function</span><span class="op">(</span><span class="va">m</span><span class="op">)</span> <span class="va">m</span><span class="op">$</span><span class="va">type</span>, <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">character</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">vapply</a></span><span class="op">(</span><span class="fu"><a href="../reference/sf_models.html">sf_models</a></span><span class="op">(</span><span class="va">sem</span><span class="op">$</span><span class="va">instrument</span><span class="op">)</span>, <span class="kw">function</span><span class="op">(</span><span class="va">m</span><span class="op">)</span> <span class="va">m</span><span class="op">$</span><span class="va">type</span>, <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">character</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;        m1        m2        m3 </span></span>
 <span><span class="co">#&gt;  "cb_sem" "pls_sem"     "cfa"</span></span></code></pre></div>
 </div>
@@ -379,7 +444,7 @@ one you declared.</p>
 <p><img src="figures/survey-matrix-likert.png" class="r-plt" alt="" width="100%"></p>
 <p>A matrix does not write one column named after the item. It
 <strong>expands</strong>, one column per row:</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ml</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sframe_demo.html">sframe_demo</a></span><span class="op">(</span><span class="st">"matrix_likert"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grep</a></span><span class="op">(</span><span class="st">"^session__"</span>, <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">ml</span><span class="op">$</span><span class="va">responses</span><span class="op">)</span>, value <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "session__Opening keynote" "session__Workshop A"     </span></span>
@@ -398,9 +463,9 @@ contract the instrument declares. Read with
 <h3 id="questions-only-some-people-see">Questions only some people see<a class="anchor" aria-label="anchor" href="#questions-only-some-people-see"></a>
 </h3>
 <p><img src="figures/survey-branching.png" class="r-plt" alt="" width="100%"></p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">br</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sframe_demo.html">sframe_demo</a></span><span class="op">(</span><span class="st">"branching"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/sf_accessors.html">sf_branches</a></span><span class="op">(</span><span class="va">br</span><span class="op">$</span><span class="va">instrument</span><span class="op">)</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span></span>
+<span><span class="fu"><a href="../reference/sf_branches.html">sf_branches</a></span><span class="op">(</span><span class="va">br</span><span class="op">$</span><span class="va">instrument</span><span class="op">)</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span></span>
 <span><span class="co">#&gt; &lt;sf_branch: sessions_attended&gt;</span></span>
 <span><span class="co">#&gt;   Rule: show when attendee_type %in% delegate, speaker</span></span></code></pre></div>
 <p>A blank left by skip logic is <strong>structural</strong>, not
@@ -410,7 +475,7 @@ when you report completeness.</p>
 <div class="section level3">
 <h3 id="free-text">Free text<a class="anchor" aria-label="anchor" href="#free-text"></a>
 </h3>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ot</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sframe_demo.html">sframe_demo</a></span><span class="op">(</span><span class="st">"open_text"</span><span class="op">)</span></span>
 <span><span class="va">tf</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/run_analysis_plan.html">run_analysis_plan</a></span><span class="op">(</span><span class="va">ot</span><span class="op">$</span><span class="va">responses</span>, <span class="va">ot</span><span class="op">$</span><span class="va">instrument</span><span class="op">)</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span></span>
 <span><span class="co">#&gt; Warning in stm::stm(prepped$documents, prepped$vocab, K = k, verbose = FALSE):</span></span>
@@ -430,7 +495,7 @@ when you report completeness.</p>
 <p>Every demo above ships plain. The whole appearance of a survey lives
 in one <code>render</code> block, which you can read, change and paste
 into your own instrument:</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="fu"><a href="../reference/sframe_demo_branding.html">sframe_demo_branding</a></span><span class="op">(</span><span class="op">)</span>, max.level <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
 <span><span class="co">#&gt; List of 6</span></span>
 <span><span class="co">#&gt;  $ mode        : chr "standard"</span></span>
@@ -439,18 +504,17 @@ into your own instrument:</p>
 <span><span class="co">#&gt;  $ welcome     :List of 5</span></span>
 <span><span class="co">#&gt;  $ thankyou    :List of 3</span></span>
 <span><span class="co">#&gt;  $ header      :List of 3</span></span></code></pre></div>
-<p>Applied to any demo with <code>branded = TRUE</code>, which changes
-nothing on disk:</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<p>Applied to any demo with <code>branded = TRUE</code>, which leaves
+the files on disk as they are:</p>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/sframe_demo.html">sframe_demo</a></span><span class="op">(</span><span class="st">"two_group"</span>, branded <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <p>Plain, then the welcome page a respondent meets first, then the
 questions:</p>
 <p><img src="figures/presentation-plain.png" class="r-plt" alt="" width="100%"></p>
 <p><img src="figures/presentation-welcome.png" class="r-plt" alt="" width="100%"></p>
 <p><img src="figures/presentation-branded.png" class="r-plt" alt="" width="100%"></p>
-<p>Consent is enforced rather than decorative: with
-<code>consent_required = TRUE</code>, pressing Start without ticking the
-box refuses to continue.</p>
+<p>Consent is enforced: with <code>consent_required = TRUE</code>,
+pressing Start without ticking the box refuses to continue.</p>
 <div class="section level3">
 <h3 id="one-page-or-one-question-at-a-time">One page, or one question at a time<a class="anchor" aria-label="anchor" href="#one-page-or-one-question-at-a-time"></a>
 </h3>
@@ -468,7 +532,7 @@ leaving the respondent on a blank card.</p>
 <h2 id="collect-responses-and-share-the-results">Collect responses, and share the results<a class="anchor" aria-label="anchor" href="#collect-responses-and-share-the-results"></a>
 </h2>
 <p>Three routes, and the same instrument serves all three.</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># 1. One self-contained HTML file you can host or email</span></span>
 <span><span class="fu"><a href="../reference/export_static_survey.html">export_static_survey</a></span><span class="op">(</span><span class="va">demo</span><span class="op">$</span><span class="va">instrument</span>, <span class="st">"survey.html"</span><span class="op">)</span></span>
 <span></span>
@@ -478,7 +542,7 @@ leaving the respondent on a blank card.</p>
 <span><span class="co"># 3. A Google Sheets collector, generated as an Apps Script</span></span>
 <span><span class="fu"><a href="../reference/export_google_sheet.html">export_google_sheet</a></span><span class="op">(</span><span class="va">demo</span><span class="op">$</span><span class="va">instrument</span>, sheet_url <span class="op">=</span> <span class="st">"https://..."</span><span class="op">)</span></span></code></pre></div>
 <p>Then the report:</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/render_report.html">render_report</a></span><span class="op">(</span><span class="va">demo</span><span class="op">$</span><span class="va">instrument</span>, <span class="va">demo</span><span class="op">$</span><span class="va">responses</span>, output_path <span class="op">=</span> <span class="st">"report.html"</span><span class="op">)</span></span></code></pre></div>
 <p><code><a href="../reference/render_report.html">render_report()</a></code> prefers Quarto and falls back to a
 built-in HTML writer. <strong>It tells you which one it used</strong>,
@@ -498,7 +562,7 @@ worth seeing before you decide whether to use it.</p>
 </h3>
 <p>A pilot often shows that a question needs rewording. Doing that
 quietly leaves nobody able to tell which version a respondent saw.</p>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">rev</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sframe_demo.html">sframe_demo</a></span><span class="op">(</span><span class="st">"instrument_revision"</span><span class="op">)</span></span>
 <span><span class="va">log</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="fu"><a href="../reference/amendment_log.html">amendment_log</a></span><span class="op">(</span><span class="va">rev</span><span class="op">$</span><span class="va">instrument</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">log</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"reason_code"</span>, <span class="st">"tier"</span>, <span class="st">"reason_text"</span><span class="op">)</span><span class="op">]</span></span>
@@ -512,16 +576,21 @@ deviation report, and it travels inside the instrument.</p>
 <div class="section level3">
 <h3 id="proving-a-file-is-the-one-you-think-it-is">Proving a file is the one you think it is<a class="anchor" aria-label="anchor" href="#proving-a-file-is-the-one-you-think-it-is"></a>
 </h3>
-<p>Every <code>.sframe</code> carries a SHA-256 of its own contents. The
-demo ships a clean file and a tampered copy, altered in a single
-response label with the stored hash left alone:</p>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<p>Every <code>.sframe</code> written by the package carries a SHA-256
+digest of its canonicalised content. The demo ships a clean file and a
+tampered copy, altered in a single response label with the stored digest
+left alone:</p>
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">v</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sframe_demo.html">sframe_demo</a></span><span class="op">(</span><span class="st">"verification"</span><span class="op">)</span></span>
 <span><span class="va">tampered</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/basename.html" class="external-link">dirname</a></span><span class="op">(</span><span class="va">v</span><span class="op">$</span><span class="va">instrument_path</span><span class="op">)</span>, <span class="st">"verification_tampered.sframe"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/read_sframe.html">read_sframe</a></span><span class="op">(</span><span class="va">tampered</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;"> in `sframe_abort_import()`:</span></span></span>
 <span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> Integrity check failed for '/home/runner/work/_temp/Library/surveyframe/extdata/demos/verification_tampered.sframe'. The file may have been modified after it was written. Expected hash: cd0559dd3d78521f047d795300a3e5432ca759354efce4e6383b094c4bf7ef00. Stored hash: a677623e873632d441187904c82cb3067e3c2e6130b5991f618e8509f4473106.</span></span></code></pre></div>
-<p>The file refuses to load. That is what the hash is for.</p>
+<p>The altered file refuses to load because its content no longer
+matches its stored digest. This detects an undisclosed content change
+alone: authorship, research quality, and full amendment disclosure each
+need separate evidence. A file can also be checked outside R, on the
+documentation site’s <strong>Verify a file</strong> page.</p>
 </div>
 </div>
 <div class="section level2">
@@ -532,7 +601,7 @@ software?<a class="anchor" aria-label="anchor" href="#are-you-an-instructor-do-y
 <p>Every demo ships four things: the instrument, the response data, a
 codebook of variable and value labels, and the results surveyframe
 produced.</p>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">d</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sframe_demo.html">sframe_demo</a></span><span class="op">(</span><span class="st">"two_group"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/basename.html" class="external-link">basename</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unlist.html" class="external-link">unlist</a></span><span class="op">(</span><span class="va">d</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"instrument_path"</span>, <span class="st">"responses_path"</span>,</span>
 <span>                    <span class="st">"codebook_path"</span>, <span class="st">"results_path"</span><span class="op">)</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span>
@@ -540,26 +609,27 @@ produced.</p>
 <span><span class="co">#&gt; [3] "two_group_codebook.csv"  "two_group_results.csv"</span></span></code></pre></div>
 <p>Take them into <code>psych</code>, SPSS, JASP, jamovi or Stata, run
 the same test, and compare.</p>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/sframe_export_labelled.html">sframe_export_labelled</a></span><span class="op">(</span><span class="va">d</span><span class="op">$</span><span class="va">responses</span>, <span class="va">d</span><span class="op">$</span><span class="va">instrument</span>, <span class="st">"two_group.sav"</span><span class="op">)</span></span></code></pre></div>
 <p>The <code>.sav</code> arrives with the question wording and the
 response options already attached, so your variables read “The event ran
-to time.” and “Strongly disagree” rather than <code>org_1</code> and
+to time.” and “Strongly disagree” in place of <code>org_1</code> and
 <code>1</code>. <strong>The plain CSV carries codes</strong>, and the
 codebook is what gives them meaning, so use one or the other.</p>
 <p><strong>If a number comes out differently, we want to hear about
 it.</strong> <a href="https://github.com/MohammedAliSharafuddin/surveyframe/issues" class="external-link">Open
 an issue</a> with the demo name, the software you used, and both
 results. A disagreement is either a bug worth fixing or a difference in
-method worth documenting, and we would rather find out from you than not
-at all.</p>
+method worth documenting, and either way we would like to hear it from
+you.</p>
 </div>
 <div class="section level2">
 <h2 id="run-one-yourself">Run one yourself<a class="anchor" aria-label="anchor" href="#run-one-yourself"></a>
 </h2>
-<p>Each demo comes with a Quarto notebook: load, read, run the plan,
-render a report, export for checking elsewhere.</p>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<p>An editable Quarto notebook can be generated for every demo: load,
+read, run the plan, render a report, and export for checking
+elsewhere.</p>
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/sframe_demo_qmd.html">sframe_demo_qmd</a></span><span class="op">(</span><span class="st">"two_group"</span><span class="op">)</span></span></code></pre></div>
 <p>Render it, then start replacing the demo with your own study.</p>
 </div>

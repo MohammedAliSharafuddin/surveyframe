@@ -34,7 +34,7 @@ such as psych or lavaan."><meta property="og:image" content="https://mohammedali
 
     <a class="navbar-brand me-2" href="../index.html">surveyframe</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -114,8 +114,17 @@ notes. Does not affect the diagnostics themselves. Defaults to
 <code>bartlett</code>, <code>parallel</code>, and <code>suggested_nfactors</code>.</p>
     </div>
     <div class="section level2">
+    <h2 id="fitting-the-solution">Fitting the solution<a class="anchor" aria-label="anchor" href="#fitting-the-solution"></a></h2>
+
+
+<p>This report says whether the data suit a factor analysis and how many
+factors to extract. <code><a href="efa_solution.html">efa_solution()</a></code> then fits that solution and returns
+the loadings, so the whole route stays in surveyframe. Take the result to
+another package when you want a method surveyframe leaves out.</p>
+    </div>
+    <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
-    <div class="dont-index"><p><code><a href="reliability_report.html">reliability_report()</a></code>, <code><a href="cfa_syntax.html">cfa_syntax()</a></code></p></div>
+    <div class="dont-index"><p><code><a href="efa_solution.html">efa_solution()</a></code>, <code><a href="reliability_report.html">reliability_report()</a></code>, <code><a href="cfa_syntax.html">cfa_syntax()</a></code></p></div>
     </div>
 
     <div class="section level2">

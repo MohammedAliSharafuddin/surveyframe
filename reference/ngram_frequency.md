@@ -5,10 +5,7 @@ Tokenises `text` via the same tokeniser as
 (whitespace splitting, lower-casing, punctuation stripping, and
 stop-word removal), then slides a window of `n` tokens across each
 response's token vector and counts how often each resulting n-gram
-occurs. `n = 2` (the default) gives bigrams; `n = 3` gives trigrams.
-Because stop words are already removed by the shared tokeniser, an
-n-gram never straddles a dropped word; it is built only from tokens that
-survive filtering, in their original order within each response.
+occurs. `n = 2` (the default) gives bigrams, and `n = 3` gives trigrams.
 
 ## Usage
 
@@ -41,3 +38,24 @@ ngram_frequency(text, n = 2L, stop_words = NULL, top_n = 30L)
 
 A data.frame with columns `term` (the space-joined n-gram), `n`, and
 `pct`.
+
+## Details
+
+An n-gram never straddles a removed stop word. Where "but" and "not" are
+filtered, "clean but not comfortable" yields no bigram at all, because
+"clean" and "comfortable" were never next to each other. This is what
+makes the output phrases respondents actually wrote.
+
+## Examples
+
+``` r
+demo <- sframe_demo_data()
+cleaned <- clean_text_responses(demo$responses, "comments")
+head(ngram_frequency(cleaned, n = 2, top_n = 10))
+#>                     term  n  pct
+#> 1 sustainability details 35 24.1
+#> 2           clear online 31 21.4
+#> 3         online content 31 21.4
+#> 4    service information 24 16.6
+#> 5         useful service 24 16.6
+```

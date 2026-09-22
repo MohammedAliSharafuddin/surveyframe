@@ -32,7 +32,7 @@ prompts, and reporting references."><meta property="og:image" content="https://m
 
     <a class="navbar-brand me-2" href="../index.html">surveyframe</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -73,7 +73,8 @@ prompts, and reporting references.</p>
 <span>  scored <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  plots <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  plot_palette <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"web"</span>, <span class="st">"print"</span><span class="op">)</span>,</span>
-<span>  seed <span class="op">=</span> <span class="fl">20260828L</span></span>
+<span>  seed <span class="op">=</span> <span class="fl">20260828L</span>,</span>
+<span>  strict <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -119,11 +120,21 @@ the unseeded behaviour of releases before 0.4.1. The caller's own random
 stream is restored afterwards, so seeding here does not affect anything
 that runs later.</p></dd>
 
+
+<dt id="arg-strict">strict<a class="anchor" aria-label="anchor" href="#arg-strict"></a></dt>
+<dd><p>Logical. When <code>TRUE</code>, an error is raised if any block fails
+or scale scoring fails, listing each failure. When <code>FALSE</code>, the default,
+failures are kept in the results and counted in their <code>status</code>.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>An object of class <code>sframe_analysis_results</code>, a list with one
-element per analysis block. Each element contains the test result,
+element per analysis block, named by block id. Its <code>status</code> attribute
+holds <code>blocks</code>, <code>succeeded</code>, <code>failed</code>, <code>failed_blocks</code> and <code>scoring</code>, the
+outcome of scoring scales before analysis. A normal return can hold
+failed blocks, so check <code>attr(results, "status")$failed</code> or use
+<code>strict = TRUE</code>. Each block element Each element contains the test result,
 APA string, interpretation prompt, and reporting-reference metadata.
 Inferential blocks also carry a <code>$table</code> data frame suitable for
 <code><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">knitr::kable()</a></code>. Pass to <code><a href="render_results.html">render_results()</a></code> to generate a formatted
@@ -155,7 +166,7 @@ report.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> RQ 1: Is perceived digital marketing effectiveness associated with tourist satisfaction?</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Test: correlation_pearson</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   APA:  r(118) = 0.54 [0.40, 0.65], p &lt; .001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   APA:  r(118) = 0.54, 95% CI [0.40, 0.65], p &lt; .001</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> RQ 2: Do digital marketing, service quality, and sustainability perceptions predict satisfaction?</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Test: regression_linear</span>
@@ -163,7 +174,7 @@ report.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> RQ 3: Do first-time and repeat visitors differ in behavioural intention?</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Test: mann_whitney</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   APA:  U = 1576, z = -0.98, p = 0.327, r = 0.09 [0.00, 0.27], Hodges-Lehmann shift = -0.00 [-0.50, 0.00]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   APA:  U = 1576, z = -0.98, p = .326, r = 0.09, 95% CI [0.00, 0.27], Hodges-Lehmann shift = -0.00, 95% CI [-0.50, 0.00]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> RQ 4: What is the distribution of first-time and repeat visitors?</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Test: frequency</span>
@@ -219,63 +230,63 @@ report.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> RQ 17: Is visitor type associated with attention check response level?</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Test: crosstab</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   APA:  χ²(1, N = 120) = 4.31, p = 0.038, φ = 0.19 [0.03, 0.33]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   APA:  χ²(1, N = 120) = 4.31, p = .038, φ = 0.19, 95% CI [0.03, 0.33]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> RQ 18: Is the distribution of satisfaction ratings different across visitor types?</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Test: crosstab</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   APA:  χ²(4, N = 120) = 3.40, p = 0.494, V = 0.17 [0.09, 0.38]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   APA:  χ²(4, N = 120) = 3.40, p = .494, V = 0.17, 95% CI [0.09, 0.38]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> RQ 19: Is there an association between visitor type and behavioural intention rating?</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Test: fisher_exact</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   APA:  Fisher's exact test, p = 0.454, Cramer's V = 0.17</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   APA:  Fisher's exact test, p = .454, Cramer's V = 0.17</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> RQ 20: Do first-time and repeat visitors differ in mean satisfaction score?</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Test: t_test_ind</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   APA:  t(106.77) = 0.15, p = 0.878, d = 0.03 [0.01, 0.43]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   APA:  t(106.77) = 0.15, p = .878, d = 0.03, 95% CI [0.01, 0.43]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> RQ 21: Do respondents rate the two satisfaction items differently?</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Test: t_test_pair</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   APA:  t(119) = 0.82, p = 0.416, d_z = 0.07 [-0.11, 0.25]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   APA:  t(119) = 0.82, p = .416, d_z = 0.07, 95% CI [-0.11, 0.26]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> RQ 22: Is there a significant distributional difference between the first two service quality items?</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Test: wilcoxon_pair</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   APA:  V = 967, z = -1.17, p = 0.240, r = 0.11 [0.01, 0.36], pseudomedian = -0.00 [-0.00, 0.00]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   APA:  V = 967, z = -1.18, p = .239, r = 0.14, 95% CI [0.01, 0.38], pseudomedian = -0.00, 95% CI [-0.00, 0.00]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> RQ 23: Does satisfaction differ across visitor types?</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Test: kruskal_wallis</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   APA:  H(1) = 0.00, p = 0.949, η² = 0.000 [0.00, 0.04]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   APA:  H(1) = 0.00, p = .949, η² = 0.000, 95% CI [0.00, 0.03]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> RQ 24: Does mean behavioural intention differ between visitor types?</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Test: anova_one</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   APA:  F(1, 118) = 0.74, p = 0.391, η² = 0.006 [0.00, 0.07]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   APA:  F(1, 118) = 0.74, p = .391, η² = 0.006, 95% CI [0.00, 0.07]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> RQ 25: Do visitor types differ in satisfaction after controlling for service quality?</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Test: ancova</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   APA:  ANCOVA estimated group differences adjusted for covariates.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   APA:  Adjusted for service_quality, the group effect was F(1, 117) = 0.07, p = .791.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> RQ 26: Do mean ratings differ across the three digital marketing items within respondents?</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Test: repeated_anova</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   APA:  F(2, 238) = 0.40, p = 0.670, partial η² = 0.003</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   APA:  F(2, 238) = 0.40, p = .670, partial η² = 0.003</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> RQ 27: Do ordinal ratings differ across the three service quality items within respondents?</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Test: friedman</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   APA:  Friedman chi-square(2, N = 120) = 1.09, p = 0.580</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   APA:  Friedman chi-square(2, N = 120) = 1.09, p = .580</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> RQ 28: Are service quality perceptions associated with sustainability perceptions?</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Test: correlation_spearman</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   APA:  r_s(118) = 0.00 [-0.18, 0.20], p = 0.984</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   APA:  r_s(118) = 0.00, 95% CI [-0.19, 0.19], p = .984</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> RQ 29: Is sustainability perception associated with behavioural intention?</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Test: correlation_kendall</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   APA:  tau(118) = 0.05 [-0.11, 0.20], p = 0.519</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   APA:  tau(118) = 0.05, 95% CI [-0.11, 0.20], p = .519</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> RQ 30: Is digital marketing associated with behavioural intention after controlling for satisfaction?</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Test: partial_correlation</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   APA:  partial r(117) = -0.09, p = 0.302</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   APA:  partial r(117) = -0.09, p = .304</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> RQ 31: Do digital marketing and service quality perceptions predict visitor type?</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Test: regression_logistic_binary</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   APA:  χ²(2) = 0.28, p = 0.869, McFadden R² = 0.002</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   APA:  χ²(2) = 0.28, p = .869, McFadden R² = 0.002</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> RQ 32: Do digital marketing and sustainability perceptions predict ordered satisfaction?</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Test: regression_logistic_ordinal</span>
@@ -287,7 +298,7 @@ report.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> RQ 34: Does satisfaction mediate the path from digital marketing to behavioural intention?</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Test: mediation</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   APA:  Indirect effect = 0.365, 95% bootstrap CI [0.221, 0.519].</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   APA:  Indirect effect = 0.365, 95% bootstrap CI [0.218, 0.538], from 1000 of 1000 resamples.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 </code></pre></div>

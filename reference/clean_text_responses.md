@@ -52,3 +52,19 @@ clean_text_responses(
 A character vector of cleaned responses, with an integer `"respondent"`
 attribute giving each entry's original row index in `data`, so quotes
 extracted later can cite a respondent.
+
+## Examples
+
+``` r
+demo <- sframe_demo_data()
+cleaned <- clean_text_responses(demo$responses, "comments")
+head(cleaned)
+#> [1] "useful service information"            
+#> [2] "useful service information"            
+#> [3] "would like more sustainability details"
+#> [4] "useful service information"            
+#> [5] "would like more sustainability details"
+#> [6] "clear online content"                  
+attr(cleaned, "respondent")[1:5]
+#> [1] 2 3 5 7 8
+```

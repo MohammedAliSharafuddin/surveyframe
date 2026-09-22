@@ -27,3 +27,16 @@ missing responses" message rather than an empty bar chart.
 ## See also
 
 [`missing_data_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/missing_data_report.md)
+
+## Examples
+
+``` r
+# \donttest{
+if (requireNamespace("ggplot2", quietly = TRUE)) {
+  demo <- sframe_demo_data()
+  mr <- missing_data_report(demo$responses, demo$instrument)
+  sframe_plot_missingness(mr)
+}
+
+# }
+```

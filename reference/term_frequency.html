@@ -32,7 +32,7 @@ custom vector to override it."><meta property="og:image" content="https://mohamm
 
     <a class="navbar-brand me-2" href="../index.html">surveyframe</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -94,6 +94,20 @@ first. Default <code>30</code>.</p></dd>
     <p>A data.frame with columns <code>term</code>, <code>n</code>, and <code>pct</code>.</p>
     </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">demo</span> <span class="op">&lt;-</span> <span class="fu"><a href="sframe_demo_data.html">sframe_demo_data</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">cleaned</span> <span class="op">&lt;-</span> <span class="fu"><a href="clean_text_responses.html">clean_text_responses</a></span><span class="op">(</span><span class="va">demo</span><span class="op">$</span><span class="va">responses</span>, <span class="st">"comments"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu">term_frequency</span><span class="op">(</span><span class="va">cleaned</span>, top_n <span class="op">=</span> <span class="fl">10</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             term  n  pct</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1        details 35 13.0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2           like 35 13.0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3 sustainability 35 13.0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4          clear 31 11.5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5        content 31 11.5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6         online 31 11.5</span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 

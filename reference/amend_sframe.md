@@ -2,16 +2,9 @@
 
 Appends a structured, disclosed-revision entry to an instrument's
 amendment log, comparing `previous` against `instrument` to record what
-changed and why. This is the path around
-[`read_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_sframe.md)'s
-hash check for *legitimate* revision: a data-entry correction,
-bot-response removal, or a documented model respecification. It does not
-weaken that check –
-[`read_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_sframe.md)
-still hard-aborts on any edit that never went through `amend_sframe()`.
-What it adds is a place for a disclosed change to be recorded inside the
-file itself, alongside the content it explains, rather than only in an
-email or a lab notebook.
+changed and why: a data-entry correction, bot-response removal, or a
+documented model respecification. The record is kept inside the file,
+beside the content it explains.
 
 ## Usage
 
@@ -52,9 +45,10 @@ amend_sframe(
 - tier:
 
   `"pipeline"` or `"design"`. When `NULL` (the default), inferred from
-  `reason_code`: `data_correction`/`bot_removal` default to
-  `"pipeline"`; everything else defaults to `"design"`. Pass explicitly
-  to override the default in either direction.
+  `reason_code`: `data_correction` and `bot_removal` default to
+  `"pipeline"`, and everything else to `"design"`. A change to the
+  analysis plan, a model or a conjoint design is always `"design"`, and
+  asking for `"pipeline"` on one is an error.
 
 - author:
 
@@ -81,28 +75,35 @@ to persist it.
 
 ## Details
 
-Amendments come in two tiers. A `"pipeline"` amendment (data
-corrections, bot removal) is expected researcher behaviour and needs
-only a reason. A `"design"` amendment (anything touching the analysis
-plan or a measurement or structural model) is exactly the kind of
-post-hoc change the design-time analysis plan exists to guard against,
-so it additionally requires a `deviation_report` describing what changed
-in the research question, method, or model and why. `second_signoff` is
-optional at either tier; when omitted, the log entry records
-`signoff = "none"` rather than leaving the field blank, so the absence
-of independent review is visible to anyone auditing the log later.
+[`write_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/write_sframe.md)
+refuses to write an instrument read from a file whose content has
+changed with no amendment recorded, one that changed after its last
+amendment, and one whose amendment log was shortened or reordered.
+[`read_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_sframe.md)
+refuses a file edited on disk without its hash being recomputed. These
+checks are local and the hashes are unsigned: someone who rewrites both
+a file and its log, and recomputes the hashes, is not detected, and
+nothing here establishes who made a change or when.
 
-`previous_hash` and `new_hash` on each entry are a **content**
-fingerprint (a SHA-256 over the instrument's substantive fields – items,
-choices, scales, branching, checks, analysis plan, models, designs –
-with the `hash` and `amendments` fields themselves excluded), not the
-`.sframe` file's own integrity hash from
-[`write_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/write_sframe.md).
-The two serve different purposes: the file hash (via
-[`read_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_sframe.md))
-proves the file on disk is byte-identical to what was written; an
-amendment's content hash proves what the instrument's substance was
-immediately before and after this specific, disclosed change.
+Amendments come in two tiers. A `"pipeline"` amendment (data
+corrections, bot removal) needs only a reason. A `"design"` amendment
+also requires a `deviation_report` describing what changed in the
+research question, method or model, and why. The tier follows the change
+itself: an amendment that changes the analysis plan, a model or a
+conjoint design is always design tier, whatever `reason_code` or `tier`
+says. `second_signoff` is optional. When omitted, the entry records
+`signoff = "none"`, so the absence of a named reviewer is visible. The
+tier, report and signoff are what the author records. None of them is
+independent approval.
+
+`previous_hash` and `new_hash` on each entry are a content fingerprint:
+a SHA-256 over a canonical serialisation of the instrument, with the
+`hash` and `amendments` fields excluded, taken after validation, so
+`new_hash` is the content that is written. It is distinct from the
+file's own integrity hash from
+[`write_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/write_sframe.md),
+which also covers the amendment log. Both identify content. Neither is
+byte identity.
 
 ## See also
 

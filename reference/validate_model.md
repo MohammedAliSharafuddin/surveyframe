@@ -32,7 +32,7 @@ validate_model(model, instrument = NULL, strict = TRUE)
 An
 [sframe_validation](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_validation.md)
 object. The model is carried inside it and can be recovered with
-[`sf_object()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_validation_accessors.md).
+[`sf_object()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_object.md).
 
 ## Changed in 0.4.0
 
@@ -45,5 +45,25 @@ read `$valid` and `$problems` keeps working.
 ## See also
 
 [sframe_validation](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_validation.md),
-[`sf_problems()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_validation_accessors.md),
-[`sf_is_valid()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_validation_accessors.md)
+[`sf_problems()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_problems.md),
+[`sf_is_valid()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_is_valid.md)
+
+## Examples
+
+``` r
+demo <- sframe_demo_data()
+m <- sf_model(
+  "cb1", type = "cb_sem",
+  constructs = list(
+    sf_construct("sq", items = c("sq_1", "sq_2", "sq_3")),
+    sf_construct("sat", items = c("sat_1", "sat_2"))
+  ),
+  paths = list(sf_path("sq", "sat"))
+)
+diag <- validate_model(m, instrument = demo$instrument)
+diag
+#> <sframe validation>
+#>   Model:       cb1 (cb_sem)
+#>   Status:      valid
+#>   Checks:      10 run, 0 with problems
+```

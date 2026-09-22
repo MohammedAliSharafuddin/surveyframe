@@ -21,7 +21,7 @@ purpose, each mapping onto a part of the research-design workflow.
 
 The input-types demo covers the main controls available in SurveyBuilder
 and SurveyStudio. The two decision item types, `pairwise_comparison` and
-`criteria_weight`, are not part of this demo. They get their own worked
+`criteria_weight`, sit outside this demo. They get their own worked
 example in the MCDM vignette, because they only make sense alongside a
 declared decision method and a set of alternatives.
 
@@ -67,21 +67,32 @@ or in SurveyStudio. The output preview on the right shows counts, such
 as the number of plans, the number of data-dependent run items, and the
 number of saved models.
 
-The model builder, also on the right, creates constructs from the
-scales, adds structural paths, and writes lavaan or seminr syntax along
-with the model JSON into the `.sframe` file. The Google Sheet panel does
-not collect data on its own. It explains that, after saving the
-`.sframe` file, you run `export_google_sheet(instr, sheet_url = "...")`
-in R to generate the Apps Script collector.
+The model builder, also on the right, creates constructs from the scales
+and adds structural paths. The `.sframe` stores that model
+specification, and surveyframe can generate lavaan or seminr syntax from
+it. The Google Sheet panel does not collect data on its own. It explains
+that, after saving the `.sframe` file, you run
+`export_google_sheet(instr, sheet_url = "...")` in R to generate the
+Apps Script collector.
 
 ## SurveyStudio: the screens
 
 SurveyStudio is a Shiny application, so it can run R. Its left
-navigation lists eight screens in this order: Open Instrument, Preview
-Survey, Upload Responses, Quality Dashboard, Reliability, Analysis Plan,
-Dashboard, and Export. Survey design is done in the SurveyBuilder, and
-the studio opens the resulting `.sframe`. The Preview Survey screen
-renders the exact deployable survey, identical to the exported HTML.
+navigation lists nine screens in this order: Open Instrument,
+Amendments, Preview Survey, Upload Responses, Quality Dashboard,
+Reliability, Analysis Plan, Dashboard, and Export. Survey design is done
+in the SurveyBuilder, and the studio opens the resulting `.sframe`.
+
+The Amendments screen discloses a change to the open instrument: upload
+a revised `.sframe`, give a reason and an explanation, and
+[`amend_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/amend_sframe.md)
+appends the change to the instrument’s amendment log, where every
+earlier entry stays as it was written. Exporting the amended instrument
+keeps that log inside the `.sframe` file, readable later with
+[`amendment_log()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/amendment_log.md).
+
+The Preview Survey screen renders the exact deployable survey, identical
+to the exported HTML.
 
 The Analysis Plan screen does two jobs. It edits the plan, with the same
 research question, method, significance level, and role fields as the
@@ -99,7 +110,10 @@ reliability, the saved analysis-plan results, and the model appendices.
 The per-question report produced by
 [`render_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_results.md)
 in an R session is a separate route to a written report and is covered
-in the main vignette.
+in the main vignette. The same screen’s “Analysis notebook” card writes
+a Quarto notebook alongside the instrument and its responses, via
+[`sframe_analysis_qmd()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_analysis_qmd.md),
+so the same analysis can be run and edited outside SurveyStudio.
 
 ## Recommended workflow
 
@@ -124,7 +138,7 @@ in the main vignette.
 ## Demo launchers
 
 This vignette leaves the demo launchers unevaluated, because CRAN
-examples and vignettes should not open browsers.
+examples and vignettes leave browsers closed.
 
 ``` r
 
@@ -167,8 +181,10 @@ launch_studio(
 
 SurveyStudio reads the objects passed by
 [`launch_studio()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/launch_studio.md).
-With response data present, `screen = "auto"` opens the Upload Responses
-screen, and `screen = "analysis"` opens the Analysis Plan screen.
+With response data present, `screen = "auto"` opens the Dashboard. With
+an instrument alone it opens Preview Survey, and with neither it opens
+Open Instrument. `screen = "analysis"` opens the Analysis Plan screen
+explicitly.
 
 ## Dashboard
 

@@ -30,7 +30,7 @@ expected-count checks, and sparse-cell warnings."><meta property="og:image" cont
 
     <a class="navbar-brand me-2" href="../index.html">surveyframe</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -108,6 +108,27 @@ checks.</p></dd>
     <p>An object of class <code>sframe_assumption_report</code>.</p>
     </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">demo</span> <span class="op">&lt;-</span> <span class="fu"><a href="sframe_demo_data.html">sframe_demo_data</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">ar</span> <span class="op">&lt;-</span> <span class="fu">assumption_report</span><span class="op">(</span><span class="va">demo</span><span class="op">$</span><span class="va">responses</span>, variables <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"sat_1"</span>, <span class="st">"sat_2"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>                         group <span class="op">=</span> <span class="st">"visit_type"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">ar</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Assumption Report</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Normality:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  variable   n shapiro_w    shapiro_p    skewness   kurtosis</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     sat_1 120 0.9087471 5.651017e-07 -0.17463397 -0.8225522</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     sat_2 120 0.9033205 2.912675e-07  0.04066335 -0.9588129</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Homogeneity of variance:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  variable           test         F         p</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     sat_1         Levene 0.2848288 0.5945575</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     sat_1 Brown-Forsythe 0.2292714 0.6329507</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     sat_2         Levene 0.1956862 0.6590353</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     sat_2 Brown-Forsythe 0.1522047 0.6971406</span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 

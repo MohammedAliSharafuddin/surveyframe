@@ -32,3 +32,18 @@ term_frequency(text, stop_words = NULL, top_n = 30L)
 ## Value
 
 A data.frame with columns `term`, `n`, and `pct`.
+
+## Examples
+
+``` r
+demo <- sframe_demo_data()
+cleaned <- clean_text_responses(demo$responses, "comments")
+head(term_frequency(cleaned, top_n = 10))
+#>             term  n  pct
+#> 1        details 35 13.0
+#> 2           like 35 13.0
+#> 3 sustainability 35 13.0
+#> 4          clear 31 11.5
+#> 5        content 31 11.5
+#> 6         online 31 11.5
+```

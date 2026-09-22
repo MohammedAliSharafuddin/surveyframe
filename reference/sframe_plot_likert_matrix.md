@@ -46,3 +46,17 @@ A ggplot2 object, or `NULL` if no row has response data.
 ## See also
 
 [`sframe_draw_likert_diverging()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_draw_likert_diverging.md)
+
+## Examples
+
+``` r
+# \donttest{
+if (requireNamespace("ggplot2", quietly = TRUE)) {
+  demo <- sframe_demo("matrix_likert")
+  item <- Filter(function(i) i$type == "matrix", demo$instrument$items)[[1]]
+  cs   <- Filter(function(c) c$id == item$choice_set, demo$instrument$choices)[[1]]
+  sframe_plot_likert_matrix(item, demo$responses, cs)
+}
+
+# }
+```

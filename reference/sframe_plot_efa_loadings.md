@@ -29,3 +29,18 @@ A ggplot2 object.
 ## See also
 
 [`efa_solution()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/efa_solution.md)
+
+## Examples
+
+``` r
+# \donttest{
+if (requireNamespace("ggplot2", quietly = TRUE) &&
+    requireNamespace("psych", quietly = TRUE)) {
+  demo <- sframe_demo_data()
+  fit <- efa_solution(demo$responses, demo$instrument,
+                       scales = "service_quality", nfactors = 1)
+  sframe_plot_efa_loadings(fit)
+}
+
+# }
+```

@@ -30,7 +30,7 @@ and cfa_syntax()."><meta property="og:image" content="https://mohammedalisharafu
 
     <a class="navbar-brand me-2" href="../index.html">surveyframe</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -91,8 +91,9 @@ reports and codebooks.</p></dd>
 
 <dt id="arg-items">items<a class="anchor" aria-label="anchor" href="#arg-items"></a></dt>
 <dd><p>Character vector. The <code>id</code> values of items that belong to this
-scale. Order controls presentation in reports, while scoring uses the
-same item IDs regardless of order.</p></dd>
+scale, each listed once. Order controls presentation in reports, while
+scoring uses the same item IDs regardless of order. Items themselves are
+passed to <code><a href="sf_instrument.html">sf_instrument()</a></code> as separate components.</p></dd>
 
 
 <dt id="arg-method">method<a class="anchor" aria-label="anchor" href="#arg-method"></a></dt>
@@ -101,21 +102,28 @@ same item IDs regardless of order.</p></dd>
 
 
 <dt id="arg-min-valid">min_valid<a class="anchor" aria-label="anchor" href="#arg-min-valid"></a></dt>
-<dd><p>Integer or NULL. The minimum number of non-missing items
-required to compute a score for a respondent. When <code>NULL</code>, all items must
-be present. Used by <code><a href="score_scales.html">score_scales()</a></code>.</p></dd>
+<dd><p>Integer or NULL. The minimum number of answered items
+required to compute a score for a respondent, a whole number from 1 to
+the number of items. When <code>NULL</code>, every item must be answered. An item
+whose column is absent from the data counts as unanswered. Used by
+<code><a href="score_scales.html">score_scales()</a></code>.</p></dd>
 
 
 <dt id="arg-reverse-items">reverse_items<a class="anchor" aria-label="anchor" href="#arg-reverse-items"></a></dt>
-<dd><p>Character vector or NULL. A subset of <code>items</code> that are
-reverse-coded. These can also be flagged at the item level with the
-<code>reverse</code> argument in <code><a href="sf_item.html">sf_item()</a></code>. Both sources are respected.</p></dd>
+<dd><p>Character vector or NULL. A subset of <code>items</code> that
+this scale reverse-codes. Reversal applies within this scale only, so the
+same item can be reversed in one scale and scored as answered in another.
+An item can also be flagged with <code>reverse = TRUE</code> in <code><a href="sf_item.html">sf_item()</a></code>, which
+reverses it within the scale named by its <code>scale_id</code>. A reversed item
+needs declared response bounds, from a numeric choice set, slider limits
+or a rating maximum.</p></dd>
 
 
 <dt id="arg-weights">weights<a class="anchor" aria-label="anchor" href="#arg-weights"></a></dt>
-<dd><p>Numeric vector or NULL. Item weights for weighted scoring.
-Must have the same length as <code>items</code> if supplied. <code><a href="score_scales.html">score_scales()</a></code>
-applies the weights to either <code>method = "mean"</code> or <code>method = "sum"</code>.</p></dd>
+<dd><p>Numeric vector or NULL. Item weights for weighted scoring,
+one positive finite number per item, in the order of <code>items</code>.
+<code><a href="score_scales.html">score_scales()</a></code> applies the weights to either <code>method = "mean"</code> or
+<code>method = "sum"</code>.</p></dd>
 
 </dl></div>
     <div class="section level2">

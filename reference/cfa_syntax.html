@@ -32,7 +32,7 @@ fitting the model."><meta property="og:image" content="https://mohammedalisharaf
 
     <a class="navbar-brand me-2" href="../index.html">surveyframe</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -93,8 +93,19 @@ in the output comment header. Defaults to <code>TRUE</code>.</p></dd>
     <p>A character string of <code>lavaan</code> CFA model syntax.</p>
     </div>
     <div class="section level2">
+    <h2 id="which-of-the-two-to-use">Which of the two to use<a class="anchor" aria-label="anchor" href="#which-of-the-two-to-use"></a></h2>
+
+
+<p>This is the instrument-only convenience wrapper: one call, constructs taken
+from the instrument's scales. <code><a href="cfa_lavaan_syntax.html">cfa_lavaan_syntax()</a></code> is the general entry
+point, and takes those same arguments plus a declared <code><a href="sf_model.html">sf_model()</a></code>,
+correlated residuals and latent covariances. Reach for it where the
+constructs differ from the scales. This wrapper stays supported, so a script
+calling it keeps working.</p>
+    </div>
+    <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
-    <div class="dont-index"><p><code><a href="efa_report.html">efa_report()</a></code>, <code><a href="reliability_report.html">reliability_report()</a></code></p></div>
+    <div class="dont-index"><p><code><a href="cfa_lavaan_syntax.html">cfa_lavaan_syntax()</a></code>, <code><a href="efa_report.html">efa_report()</a></code>, <code><a href="reliability_report.html">reliability_report()</a></code></p></div>
     </div>
 
     <div class="section level2">

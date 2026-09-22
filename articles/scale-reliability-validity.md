@@ -6,7 +6,7 @@ Thailand digital marketing study (Sharafuddin, Madhavan, and Wangtueai
 2024). The reliability and item reports read scale definitions from an
 instrument, so they are shown on the bundled tourism demo, a synthetic
 companion to the study. The validity summary runs on the loadings the
-paper reported, which needs no raw data.
+paper reported, which is all it needs.
 
 ## Reliability from the instrument
 
@@ -102,7 +102,7 @@ efa_report(responses, instr)
 
 ## Convergent validity from the published loadings
 
-This step needs no raw data.
+This step runs on the loadings alone.
 [`validity_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/validity_report.md)
 computes composite reliability and average variance extracted from
 standardised loadings. Feeding the outer loadings reported in the paper
@@ -160,22 +160,57 @@ Heterotrait-Monotrait ratios were all below the 0.90 threshold, the
 highest being 0.766 between ease of use and accessibility. Both results
 support discriminant validity.
 
-When construct scores are available,
 [`validity_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/validity_report.md)
-returns the Fornell-Larcker matrix and the HTMT matrix directly.
+computes both, and which one you get depends on what you give it.
+Construct scores give the Fornell-Larcker matrix, and the `htmt` element
+then holds the absolute inter-construct correlations, which is a
+different quantity from the Henseler ratio. Item-level responses per
+construct give the real heterotrait-monotrait ratio. The report records
+which it computed in `htmt_method`, so a write-up can name the quantity
+it reports.
 
 ``` r
 
-validity_report(published_loadings, construct_scores = scored_constructs)
+demo <- sframe_demo_data()
+scored <- score_scales(demo$responses, demo$instrument)
+scale_ids <- vapply(sf_scales(demo$instrument), sf_id, character(1))
+construct_scores <- scored[, scale_ids, drop = FALSE]
+
+loadings <- lapply(sf_scales(demo$instrument), function(s) {
+  stats::setNames(rep(0.8, length(s$items)), s$items)
+})
+names(loadings) <- scale_ids
+
+from_scores <- validity_report(loadings, construct_scores = construct_scores)
+from_scores$htmt_method
+#> [1] "correlation_fallback"
 ```
+
+Passing the items themselves is what asks for the Henseler ratio:
+
+``` r
+
+items_by_construct <- lapply(sf_scales(demo$instrument), function(s) {
+  scored[, s$items, drop = FALSE]
+})
+names(items_by_construct) <- scale_ids
+
+real_htmt <- validity_report(loadings, construct_scores = construct_scores,
+                             items_by_construct = items_by_construct)
+real_htmt$htmt_method
+#> [1] "henseler"
+```
+
+A construct with a single item has no monotrait correlations, so its
+HTMT entries come back `NA`.
 
 ## Collinearity
 
 The study reported variance inflation factors below 5 for every
-indicator, which indicates no severe multicollinearity.
+indicator, which indicates multicollinearity mild enough to proceed.
 [`assumption_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/assumption_report.md)
 returns variance inflation factors when a regression is specified, which
-is shown in the analysing-responses vignette.
+is shown in the “Analysing survey responses” vignette.
 
 ## Cautious interpretation
 

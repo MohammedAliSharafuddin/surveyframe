@@ -2,8 +2,8 @@
 
 ## What this vignette covers
 
-Multi-criteria decision analysis ranks a handful of alternatives against
-several criteria that pull in different directions. surveyframe treats
+Multi-criteria decision analysis ranks a set of alternatives against
+multiple criteria that pull in different directions. surveyframe treats
 it the same way it treats any other analysis: the method, its inputs,
 and the roles they play are declared in the instrument before data is
 collected, and the analysis is the execution of that declaration.
@@ -48,7 +48,7 @@ all of them.
 The 4 declared input sources in the worked example. {.table}
 
 Each result records which source it used, so a report can say where its
-numbers came from rather than leaving a reader to assume.
+numbers came from, which saves a reader from assuming.
 
 ## Criterion weights from pairwise judgements
 
@@ -138,15 +138,16 @@ c(weights = audited$weights_source, matrix = audited$matrix_source)
 Note the `criteria_types` this block declares: service and location are
 `benefit` criteria where more is better, while price and delivery time
 are `cost` criteria where less is better. Getting that wrong silently
-inverts the ranking, which is why it is declared in the instrument
-rather than inferred.
+inverts the ranking, which is why the instrument declares it and
+surveyframe reads it from there.
 
 ## Ranking suppliers on collected ratings
 
-The third block answers a different question with the same method: not
-which supplier the audited figures favour, but which one the staff rate
-best. The performance matrix is built from respondents’ ratings, and the
-weights come from the constant-sum question instead of the pairwise one.
+The third block answers a different question with the same method: which
+supplier the staff rate best, where the first asked which one the
+audited figures favour. The performance matrix is built from
+respondents’ ratings, and the weights come from the constant-sum
+question this time, where the first ranking used the pairwise one.
 
 ``` r
 
@@ -168,8 +169,8 @@ kable(rated$table, row.names = FALSE,
 TOPSIS ranking on staff ratings, weighted by the constant-sum question.
 {.table}
 
-The two rankings do not agree, and that is the useful part. Comparing
-them is a finding rather than a problem to be resolved.
+The two rankings disagree, and that is the useful part. Comparing them
+is a finding in its own right, and it belongs in the write-up.
 
 | Supplier | Rank on audited figures | Rank on staff ratings |
 |:---------|------------------------:|----------------------:|
@@ -268,7 +269,7 @@ plot(sens)
 down, against a dashed reference line at one marking an unchanged
 ranking.](mcdm-analysis_files/figure-html/sensitivity-plot-1.png)
 
-This example is worth reading closely, because it is not the clean case.
+This example is worth reading closely, because it is the awkward case.
 Four of the 8 perturbations changed the ranking, so `stable` is `FALSE`.
 But `top_changed` is `FALSE` throughout: the order shuffles among the
 middle suppliers while Equator stays first under every nudge.
@@ -286,7 +287,7 @@ reported as robust to the weights.
 
 ## Which criteria drive the others
 
-The criteria are not independent. Delivery speed and price move
+The criteria depend on each other. Delivery speed and price move
 together, and service quality may drive both. DEMATEL asks respondents
 how strongly each factor influences each other factor and separates the
 causes from the effects.
@@ -326,8 +327,8 @@ Note that the influence question uses a different scale from the AHP
 one. AHP reads reciprocal relative importance on Saaty’s 1 to 9 ratio
 scale, while DEMATEL reads directed 0 to 4 influence with no
 reciprocity. They are not interchangeable, and surveyframe refuses to
-pair one with the other’s method at validation time rather than
-returning plausible numbers from meaningless input.
+pair one with the other’s method at validation time, which is what stops
+meaningless input returning plausible numbers.
 
 ## Reporting the whole plan
 
@@ -346,18 +347,52 @@ The declared analysis plan and what each block returned. {.table}
 
 ## What surveyframe does not do here
 
-The decision family ranks and weights. It does not tell a researcher
-which method to use, and the choice matters: the 10 available methods
-encode different assumptions about how criteria trade off against one
-another.
+The decision family ranks and weights. The choice of method stays with
+the researcher, and it matters: the 10 available methods encode
+different assumptions about how criteria trade off against one another.
 
 Two limits are worth stating plainly. surveyframe does not estimate
 choice models, so
 [`sf_conjoint_design()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_conjoint_design.md)
 declares a conjoint design without analysing its responses. And
-PROMETHEE defaults to Brans and Vincke’s type I step function rather
-than the linear function some implementations default to, because the
-linear function needs thresholds that are commonly derived from the data
-range, which makes a result depend on a choice nobody declared. See
+PROMETHEE defaults to Brans and Vincke’s type I step function, where
+some implementations default to the linear function, because the linear
+function needs thresholds that are commonly derived from the data range,
+which makes a result depend on a choice nobody declared. See
 [`?sframe_decision_options`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_decision_options.md)
 for the detail, including how far rankings move between the two.
+
+## How each method was checked
+
+A ranking is only as trustworthy as the arithmetic under it, so the
+evidence behind each method is recorded here in full. Two kinds appear.
+An *oracle* check computes the same method on the same matrix with
+RMCDA, an independent package, and compares the numbers. A *derived*
+check compares against values worked out by hand from the published
+formula, or against a worked example printed in the source paper.
+
+| Method | Evidence behind it |
+|----|----|
+| AHP | oracle: RMCDA weights on a consistent matrix. Derived: CR on a consistent and an inconsistent matrix |
+| VIKOR | oracle: RMCDA S, R and Q. Derived: the 2 acceptance conditions |
+| MOORA | oracle: RMCDA ratio-system scores on RMCDA’s own 7-alternative example. Derived: the reference-point variant and direction handling |
+| WASPAS | oracle: RMCDA scores at lambda 0.5 on RMCDA’s own example. Derived: the sum and product parts separately |
+| ELECTRE | oracle: RMCDA’s example, compared on the ordering of one concordance pair. Derived: 2 concordance and discordance entries, and a kernel under direct dominance |
+| ANP | derived: a stored priority-vector fixture, and the limit matrix’s convergence |
+| DEMATEL | derived: 2-by-2 algebra by hand, and a 4-by-4 fixture |
+| SMART | derived: scores of 0.2, 0.6 and 0.7 worked out by hand, and invariance to units |
+| PROMETHEE | derived: flows worked out by hand for the usual and linear preference functions |
+| TOPSIS | derived: dominance endpoints, cost-direction reversal, invariance to units |
+
+RMCDA sits in `Suggests`, so its 5 checks are skipped where it is
+absent. The 5 derived-only methods differ from RMCDA’s in normalisation
+or in the variant implemented, so a numeric comparison there would
+compare 2 different methods. DEMATEL is the clearest case: RMCDA scales
+by a different norm, and the test says so where it derives the expected
+matrix instead.
+
+Reading a citation is a separate check from reproducing a method. The
+registry behind `?sframe_decision_methods` records which publications
+were read directly, and names the 1 case, DEMATEL’s originating 1972
+report, where a later paper’s statement of the same equations stood in
+for a source that stayed out of reach.

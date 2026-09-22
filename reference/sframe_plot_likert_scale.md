@@ -54,3 +54,17 @@ A ggplot2 object, or `NULL` if no item has response data.
 
 [`sframe_plot_likert_matrix()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_plot_likert_matrix.md),
 [`sf_scale()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_scale.md)
+
+## Examples
+
+``` r
+# \donttest{
+if (requireNamespace("ggplot2", quietly = TRUE)) {
+  demo <- sframe_demo("likert_scale")
+  groups <- sframe_likert_scale_groups(demo$instrument)
+  g <- groups[["organisation"]]
+  sframe_plot_likert_scale(g$items, demo$responses, g$choice_set, g$title)
+}
+
+# }
+```

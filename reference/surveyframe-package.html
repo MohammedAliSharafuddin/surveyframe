@@ -37,12 +37,46 @@ render_results().
 The instrument object
 
 
-Every function in the package operates on an sframe object. The object
-is the single source of truth for item definitions, scale structure,
-reverse-coding keys, branching rules, check specifications, analysis plans,
-and optional model specifications. Accessors such as sf_meta(),
-sf_items(), sf_scales(), sf_plan(), and sf_models() read its parts
-without reaching into the object directly.
+The workflow runs on an sframe object. It is the single source of truth
+for item definitions, scale structure, reverse-coding keys, branching
+rules, check specifications, analysis plans, and optional model
+specifications. Accessors such as sf_meta(), sf_items(), sf_scales(),
+sf_plan(), and sf_models() read its parts without reaching into the
+object directly.
+Some helpers work on plain vectors, for use beside that workflow or on
+their own: the text helpers such as term_frequency(), and the interval
+helpers bootstrap_ci(), cohens_d_ci(), cramers_v_ci() and
+eta_sq_ci().
+
+
+
+A first session
+
+
+sframe_demos() lists 22 worked demos, each one instrument, its responses
+and the results surveyframe produced. sframe_demo(&quot;two_group&quot;) loads one,
+and sframe_demo_qmd(&quot;two_group&quot;) writes a notebook to edit.
+vignette(&quot;learn-by-example&quot;) teaches from the same library.
+
+
+
+How functions are named
+
+
+Three families, which the prefix tells apart.
+sf_ builds or reads the instrument object model: the constructors
+sf_item() and sf_scale(), the accessors sf_items() and sf_plan(),
+and the replacement forms such as sf_plan&amp;lt;-.
+sframe_ covers everything the package adds around that object: the
+plots such as sframe_plot_reliability(), the demo library through
+sframe_demos(), the decision helpers, and the builder's own state.
+The workflow verbs carry no prefix, because they name the step a
+researcher is taking: validate_sframe(), score_scales(),
+run_analysis_plan(), render_report(), and the _report() family.
+
+
+The prefixes group functions; they do not pair them. No name stem appears
+under both, so there is no sframe_ twin of an sf_ function to look for.
 
 
 
@@ -90,12 +124,46 @@ render_results().
 The instrument object
 
 
-Every function in the package operates on an sframe object. The object
-is the single source of truth for item definitions, scale structure,
-reverse-coding keys, branching rules, check specifications, analysis plans,
-and optional model specifications. Accessors such as sf_meta(),
-sf_items(), sf_scales(), sf_plan(), and sf_models() read its parts
-without reaching into the object directly.
+The workflow runs on an sframe object. It is the single source of truth
+for item definitions, scale structure, reverse-coding keys, branching
+rules, check specifications, analysis plans, and optional model
+specifications. Accessors such as sf_meta(), sf_items(), sf_scales(),
+sf_plan(), and sf_models() read its parts without reaching into the
+object directly.
+Some helpers work on plain vectors, for use beside that workflow or on
+their own: the text helpers such as term_frequency(), and the interval
+helpers bootstrap_ci(), cohens_d_ci(), cramers_v_ci() and
+eta_sq_ci().
+
+
+
+A first session
+
+
+sframe_demos() lists 22 worked demos, each one instrument, its responses
+and the results surveyframe produced. sframe_demo(&quot;two_group&quot;) loads one,
+and sframe_demo_qmd(&quot;two_group&quot;) writes a notebook to edit.
+vignette(&quot;learn-by-example&quot;) teaches from the same library.
+
+
+
+How functions are named
+
+
+Three families, which the prefix tells apart.
+sf_ builds or reads the instrument object model: the constructors
+sf_item() and sf_scale(), the accessors sf_items() and sf_plan(),
+and the replacement forms such as sf_plan&amp;lt;-.
+sframe_ covers everything the package adds around that object: the
+plots such as sframe_plot_reliability(), the demo library through
+sframe_demos(), the decision helpers, and the builder's own state.
+The workflow verbs carry no prefix, because they name the step a
+researcher is taking: validate_sframe(), score_scales(),
+run_analysis_plan(), render_report(), and the _report() family.
+
+
+The prefixes group functions; they do not pair them. No name stem appears
+under both, so there is no sframe_ twin of an sf_ function to look for.
 
 
 
@@ -130,7 +198,7 @@ Each file includes a SHA-256 integrity hash for reproducibility auditing.
 
     <a class="navbar-brand me-2" href="../index.html">surveyframe</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -191,12 +259,43 @@ runs any decision-analysis blocks in the plan.</p></li>
 <h3 id="the-instrument-object">The instrument object<a class="anchor" aria-label="anchor" href="#the-instrument-object"></a></h3>
 
 
-<p>Every function in the package operates on an <code>sframe</code> object. The object
-is the single source of truth for item definitions, scale structure,
-reverse-coding keys, branching rules, check specifications, analysis plans,
-and optional model specifications. Accessors such as <code><a href="sf_accessors.html">sf_meta()</a></code>,
-<code><a href="sf_accessors.html">sf_items()</a></code>, <code><a href="sf_accessors.html">sf_scales()</a></code>, <code><a href="sf_accessors.html">sf_plan()</a></code>, and <code><a href="sf_accessors.html">sf_models()</a></code> read its parts
-without reaching into the object directly.</p>
+<p>The workflow runs on an <code>sframe</code> object. It is the single source of truth
+for item definitions, scale structure, reverse-coding keys, branching
+rules, check specifications, analysis plans, and optional model
+specifications. Accessors such as <code><a href="sf_meta.html">sf_meta()</a></code>, <code><a href="sf_items.html">sf_items()</a></code>, <code><a href="sf_scales.html">sf_scales()</a></code>,
+<code><a href="sf_plan.html">sf_plan()</a></code>, and <code><a href="sf_models.html">sf_models()</a></code> read its parts without reaching into the
+object directly.</p>
+<p>Some helpers work on plain vectors, for use beside that workflow or on
+their own: the text helpers such as <code><a href="term_frequency.html">term_frequency()</a></code>, and the interval
+helpers <code><a href="bootstrap_ci.html">bootstrap_ci()</a></code>, <code><a href="cohens_d_ci.html">cohens_d_ci()</a></code>, <code><a href="cramers_v_ci.html">cramers_v_ci()</a></code> and
+<code><a href="eta_sq_ci.html">eta_sq_ci()</a></code>.</p>
+</div>
+
+<div class="section">
+<h3 id="a-first-session">A first session<a class="anchor" aria-label="anchor" href="#a-first-session"></a></h3>
+
+
+<p><code><a href="sframe_demos.html">sframe_demos()</a></code> lists 22 worked demos, each one instrument, its responses
+and the results surveyframe produced. <code>sframe_demo("two_group")</code> loads one,
+and <code>sframe_demo_qmd("two_group")</code> writes a notebook to edit.
+<code><a href="../articles/learn-by-example.html">vignette("learn-by-example")</a></code> teaches from the same library.</p>
+</div>
+
+<div class="section">
+<h3 id="how-functions-are-named">How functions are named<a class="anchor" aria-label="anchor" href="#how-functions-are-named"></a></h3>
+
+
+<p>Three families, which the prefix tells apart.</p><ul><li><p><code>sf_</code> builds or reads the instrument object model: the constructors
+<code><a href="sf_item.html">sf_item()</a></code> and <code><a href="sf_scale.html">sf_scale()</a></code>, the accessors <code><a href="sf_items.html">sf_items()</a></code> and <code><a href="sf_plan.html">sf_plan()</a></code>,
+and the replacement forms such as <code>sf_plan&lt;-</code>.</p></li>
+<li><p><code>sframe_</code> covers everything the package adds around that object: the
+plots such as <code><a href="sframe_plot_reliability.html">sframe_plot_reliability()</a></code>, the demo library through
+<code><a href="sframe_demos.html">sframe_demos()</a></code>, the decision helpers, and the builder's own state.</p></li>
+<li><p>The workflow verbs carry no prefix, because they name the step a
+researcher is taking: <code><a href="validate_sframe.html">validate_sframe()</a></code>, <code><a href="score_scales.html">score_scales()</a></code>,
+<code><a href="run_analysis_plan.html">run_analysis_plan()</a></code>, <code><a href="render_report.html">render_report()</a></code>, and the <code>_report()</code> family.</p></li>
+</ul><p>The prefixes group functions; they do not pair them. No name stem appears
+under both, so there is no <code>sframe_</code> twin of an <code>sf_</code> function to look for.</p>
 </div>
 
 <div class="section">

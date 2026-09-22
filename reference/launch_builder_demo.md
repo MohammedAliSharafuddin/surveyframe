@@ -22,3 +22,14 @@ launch_builder_demo(open = TRUE)
 
 Invisibly returns a list with `builder_path`, `demo_file`, and
 `responses_path`.
+
+## Examples
+
+``` r
+demo <- sframe_input_types_demo_data()
+nrow(demo$responses)
+#> [1] 120
+if (FALSE) { # \dontrun{
+launch_builder_demo()
+} # }
+```

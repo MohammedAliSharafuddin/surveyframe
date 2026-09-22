@@ -46,7 +46,7 @@ leans, unlike a plain frequency bar."><meta property="og:image" content="https:/
 
     <a class="navbar-brand me-2" href="../index.html">surveyframe</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -133,6 +133,14 @@ alone.</p>
     <div class="dont-index"><p><code><a href="sframe_plot_item_chart.html">sframe_plot_item_chart()</a></code></p></div>
     </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">counts</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Strongly disagree"</span> <span class="op">=</span> <span class="fl">5</span>, <span class="st">"Disagree"</span> <span class="op">=</span> <span class="fl">10</span>, <span class="st">"Neutral"</span> <span class="op">=</span> <span class="fl">15</span>,</span></span>
+<span class="r-in"><span>            <span class="st">"Agree"</span> <span class="op">=</span> <span class="fl">40</span>, <span class="st">"Strongly agree"</span> <span class="op">=</span> <span class="fl">30</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">sframe_draw_likert_diverging</span><span class="op">(</span><span class="va">counts</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="sframe_draw_likert_diverging-1.png" alt="" width="700" height="433"></span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 

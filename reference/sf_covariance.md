@@ -25,3 +25,13 @@ sf_covariance(from, to, label = NULL)
 ## Value
 
 An object of class `sf_covariance`.
+
+## Examples
+
+``` r
+cov <- sf_covariance("sq", "sus", label = "cov1")
+cov$from
+#> [1] "sq"
+cov$to
+#> [1] "sus"
+```

@@ -28,7 +28,7 @@ structure travels with each resample."><meta property="og:image" content="https:
 
     <a class="navbar-brand me-2" href="../index.html">surveyframe</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -90,7 +90,11 @@ structure travels with each resample.</p>
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A named numeric vector: <code>estimate</code>, <code>lower</code>, <code>upper</code>. The bounds
+    <p>A named numeric vector: <code>estimate</code>, <code>lower</code>, <code>upper</code>, with
+attributes <code>resamples</code>, <code>valid_resamples</code> and, when the interval is
+withheld, <code>reason</code>. The bounds are <code>NA</code> when fewer than 90% of resamples
+give a value, or when every resample gives the same value, since neither
+leaves a sampling distribution to read. The bounds
 are <code>NA</code> with fewer than 3 complete observations or fewer than 2 groups.</p>
     </div>
     <div class="section level2">
@@ -103,6 +107,10 @@ are <code>NA</code> with fewer than 3 complete observations or fewer than 2 grou
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">eta_sq_ci</span><span class="op">(</span><span class="va">mtcars</span><span class="op">$</span><span class="va">mpg</span>, <span class="va">mtcars</span><span class="op">$</span><span class="va">cyl</span>, seed <span class="op">=</span> <span class="fl">42</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  estimate     lower     upper </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 0.7324601 0.6316254 0.8460837 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> attr(,"resamples")</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 2000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> attr(,"valid_resamples")</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 2000</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

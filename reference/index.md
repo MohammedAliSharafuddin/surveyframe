@@ -82,63 +82,98 @@ integrity hashing, and record disclosed revisions to them.
   : Read an instrument's amendment log
 - [`link_git_commit()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/link_git_commit.md)
   : Link an instrument to its current Git commit
-- [`print(`*`<sframe_validation>`*`)`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_validation.md)
-  [`format(`*`<sframe_validation>`*`)`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_validation.md)
-  [`summary(`*`<sframe_validation>`*`)`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_validation.md)
-  [`as.data.frame(`*`<sframe_validation>`*`)`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_validation.md)
+- [`sframe_validation`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_validation.md)
   : Report on a validation result
 
 ## Accessors and coercion
 
 Read parts of an instrument, a validation result, or a report without
-reaching into the object directly, new in 0.4.0.
+reaching into the object directly, new in 0.4.0. Each accessor and
+as.data.frame method has its own page as of 0.4.2, stating the classes
+it accepts and what it returns.
 
 - [`as_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/as_sframe.md)
   : Coerce to an instrument
-- [`sf_meta()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_accessors.md)
-  [`sf_items()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_accessors.md)
-  [`sf_scales()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_accessors.md)
-  [`sf_choice_sets()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_accessors.md)
-  [`sf_branches()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_accessors.md)
-  [`sf_checks()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_accessors.md)
-  [`sf_models()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_accessors.md)
-  [`sf_plan()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_accessors.md)
+- [`sf_accessors`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_accessors.md)
   : Explore a surveyframe object
-- [`print(`*`<sf_component_list>`*`)`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_component_list.md)
-  [`` `[`( ``*`<sf_component_list>`*`)`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_component_list.md)
+- [`sf_apa()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_apa.md)
+  : Extract APA-formatted result summaries
+- [`sf_branches()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_branches.md)
+  : Get branching rules
+- [`sf_checks()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_checks.md)
+  : Get response-quality checks
+- [`sf_choice_sets()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_choice_sets.md)
+  : Get choice sets
+- [`sf_component_list`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_component_list.md)
   : A list of instrument components
-- [`sf_id()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_identity.md)
-  [`sf_label()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_identity.md)
+- [`sf_flagged()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_flagged.md)
+  : Get rows flagged by response-quality checks
+- [`sf_id()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_id.md)
+  : Get an instrument component ID
+- [`sf_identity`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_identity.md)
   : The ID and label of an instrument component
+- [`sf_is_valid()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_is_valid.md)
+  : Test whether validation passed
+- [`sf_items()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_items.md)
+  : Get survey items
+- [`sf_label()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_label.md)
+  : Get an instrument component label
+- [`sf_meta()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_meta.md)
+  : Get survey metadata
+- [`sf_missing_columns()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_missing_columns.md)
+  : Columns the instrument declares that the responses left out
+- [`sf_models()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_models.md)
+  : Get model specifications
+- [`sf_object()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_object.md)
+  : Recover the validated object
+- [`sf_plan()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_plan.md)
+  : Get the pre-declared analysis plan
 - [`` `sf_plan<-`() ``](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_plan-set.md)
   : Set the pre-declared analysis plan
-- [`sf_apa()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_report_accessors.md)
-  [`sf_flagged()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_report_accessors.md)
+- [`sf_problems()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_problems.md)
+  : Get validation problems
+- [`sf_report_accessors`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_report_accessors.md)
   : Read the reportable parts of an analysis or quality result
-- [`sf_is_valid()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_validation_accessors.md)
-  [`sf_problems()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_validation_accessors.md)
-  [`sf_object()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_validation_accessors.md)
+- [`sf_scales()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_scales.md)
+  : Get survey scales
+- [`sf_validation_accessors`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_validation_accessors.md)
   : Read a validation diagnostic
-- [`as.data.frame(`*`<sframe>`*`)`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_as_data_frame.md)
-  [`as.data.frame(`*`<sf_choices>`*`)`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_as_data_frame.md)
-  [`as.data.frame(`*`<sframe_codebook>`*`)`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_as_data_frame.md)
-  [`as.data.frame(`*`<sframe_reliability_report>`*`)`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_as_data_frame.md)
-  [`as.data.frame(`*`<sframe_item_report>`*`)`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_as_data_frame.md)
-  [`as.data.frame(`*`<sframe_efa_report>`*`)`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_as_data_frame.md)
-  [`as.data.frame(`*`<sframe_efa_solution>`*`)`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_as_data_frame.md)
-  [`as.data.frame(`*`<sframe_descriptives_report>`*`)`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_as_data_frame.md)
-  [`as.data.frame(`*`<sframe_missing_data_report>`*`)`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_as_data_frame.md)
-  [`as.data.frame(`*`<sframe_validity_report>`*`)`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_as_data_frame.md)
-  [`as.data.frame(`*`<sframe_assumption_report>`*`)`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_as_data_frame.md)
-  [`as.data.frame(`*`<sframe_sample_size_plan>`*`)`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_as_data_frame.md)
-  [`as.data.frame(`*`<sframe_quality_report>`*`)`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_as_data_frame.md)
-  [`as.data.frame(`*`<sframe_sensitivity>`*`)`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_as_data_frame.md)
-  [`as.data.frame(`*`<sframe_analysis_results>`*`)`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_as_data_frame.md)
+- [`sframe_as_data_frame`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_as_data_frame.md)
   : Coerce a surveyframe object to a data frame
-- [`` `[`( ``*`<sframe_analysis_results>`*`)`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_subset.md)
-  [`` `[`( ``*`<sframe_reliability_report>`*`)`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_subset.md)
-  [`` `[`( ``*`<sframe_item_report>`*`)`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_subset.md)
+- [`sframe_subset`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_subset.md)
   : Subset a surveyframe report
+- [`as.data.frame(`*`<sf_choices>`*`)`](https://mohammedalisharafuddin.github.io/surveyframe/reference/as.data.frame.sf_choices.md)
+  : Coerce a choice set to a data frame
+- [`as.data.frame(`*`<sframe>`*`)`](https://mohammedalisharafuddin.github.io/surveyframe/reference/as.data.frame.sframe.md)
+  : Coerce an instrument to its item summary
+- [`as.data.frame(`*`<sframe_analysis_results>`*`)`](https://mohammedalisharafuddin.github.io/surveyframe/reference/as.data.frame.sframe_analysis_results.md)
+  : Summarise analysis-plan results as a data frame
+- [`as.data.frame(`*`<sframe_assumption_report>`*`)`](https://mohammedalisharafuddin.github.io/surveyframe/reference/as.data.frame.sframe_assumption_report.md)
+  : Coerce an assumption report to a data frame
+- [`as.data.frame(`*`<sframe_codebook>`*`)`](https://mohammedalisharafuddin.github.io/surveyframe/reference/as.data.frame.sframe_codebook.md)
+  : Extract the item table from a codebook report
+- [`as.data.frame(`*`<sframe_descriptives_report>`*`)`](https://mohammedalisharafuddin.github.io/surveyframe/reference/as.data.frame.sframe_descriptives_report.md)
+  : Extract the descriptives results table
+- [`as.data.frame(`*`<sframe_efa_report>`*`)`](https://mohammedalisharafuddin.github.io/surveyframe/reference/as.data.frame.sframe_efa_report.md)
+  : Coerce an EFA readiness report to a data frame
+- [`as.data.frame(`*`<sframe_efa_solution>`*`)`](https://mohammedalisharafuddin.github.io/surveyframe/reference/as.data.frame.sframe_efa_solution.md)
+  : Extract the loading table from an EFA solution
+- [`as.data.frame(`*`<sframe_item_report>`*`)`](https://mohammedalisharafuddin.github.io/surveyframe/reference/as.data.frame.sframe_item_report.md)
+  : Coerce an item report to a data frame
+- [`as.data.frame(`*`<sframe_missing_data_report>`*`)`](https://mohammedalisharafuddin.github.io/surveyframe/reference/as.data.frame.sframe_missing_data_report.md)
+  : Extract item missingness results
+- [`as.data.frame(`*`<sframe_quality_report>`*`)`](https://mohammedalisharafuddin.github.io/surveyframe/reference/as.data.frame.sframe_quality_report.md)
+  : Coerce a response-quality report to a data frame
+- [`as.data.frame(`*`<sframe_reliability_report>`*`)`](https://mohammedalisharafuddin.github.io/surveyframe/reference/as.data.frame.sframe_reliability_report.md)
+  : Coerce a reliability report to a data frame
+- [`as.data.frame(`*`<sframe_sample_size_plan>`*`)`](https://mohammedalisharafuddin.github.io/surveyframe/reference/as.data.frame.sframe_sample_size_plan.md)
+  : Coerce a sample-size plan to a data frame
+- [`as.data.frame(`*`<sframe_sensitivity>`*`)`](https://mohammedalisharafuddin.github.io/surveyframe/reference/as.data.frame.sframe_sensitivity.md)
+  : Extract a sensitivity-analysis results table
+- [`as.data.frame(`*`<sframe_validation>`*`)`](https://mohammedalisharafuddin.github.io/surveyframe/reference/as.data.frame.sframe_validation.md)
+  : Coerce validation problems to a data frame
+- [`as.data.frame(`*`<sframe_validity_report>`*`)`](https://mohammedalisharafuddin.github.io/surveyframe/reference/as.data.frame.sframe_validity_report.md)
+  : Extract reliability evidence from a validity report
 
 ## Deploy
 
@@ -192,7 +227,7 @@ psychometric diagnostics and pre-planned analyses.
 - [`descriptives_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/descriptives_report.md)
   : Descriptive statistics report
 - [`reliability_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/reliability_report.md)
-  : Compute reliability statistics for scored scales
+  : Estimate scale reliability from item responses
 - [`item_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/item_report.md)
   : Generate item-level diagnostics
 - [`efa_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/efa_report.md)
@@ -204,7 +239,7 @@ psychometric diagnostics and pre-planned analyses.
 - [`cfa_syntax()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/cfa_syntax.md)
   : Generate lavaan CFA syntax from an instrument object
 - [`cfa_lavaan_syntax()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/cfa_lavaan_syntax.md)
-  : Generate lavaan CFA syntax
+  : Generate lavaan CFA syntax from an instrument or a declared model
 - [`efa_syntax()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/efa_syntax.md)
   : Generate EFA planning syntax
 - [`sem_lavaan_syntax()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sem_lavaan_syntax.md)
@@ -275,8 +310,11 @@ across the inferential runners.
 
 ## Report
 
-Generate codebooks, scale appendices, and reproducible HTML reports.
+Generate codebooks, scale appendices, reproducible HTML reports, and the
+R code behind a computed result.
 
+- [`sframe_reports`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_reports.md)
+  : Choosing a report
 - [`codebook_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/codebook_report.md)
   : Generate a survey codebook from an instrument object
 - [`sframe_codebook_items_display()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_codebook_items_display.md)
@@ -287,11 +325,19 @@ Generate codebooks, scale appendices, and reproducible HTML reports.
   : Render analysis results to a formatted HTML report
 - [`model_report_template()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/model_report_template.md)
   : Create a model reporting template
+- [`analysis_syntax()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/analysis_syntax.md)
+  : The R code behind an analysis result
+- [`sframe_result_supplement()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_result_supplement.md)
+  : The second table a result carries, if it has one
+- [`sframe_analysis_qmd()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_analysis_qmd.md)
+  : Write a Quarto analysis notebook for any instrument
 
 ## Plotting
 
 Opt-in ggplot2 charts for analysis results, and the package theme.
 
+- [`sframe_plots`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_plots.md)
+  : Choosing a plot
 - [`theme_surveyframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/theme_surveyframe.md)
   : surveyframe brand theme for ggplot2
 - [`plot(`*`<sframe_analysis_results>`*`)`](https://mohammedalisharafuddin.github.io/surveyframe/reference/plot.sframe_analysis_results.md)
@@ -402,7 +448,7 @@ the console and inside reports.
 - [`sframe_demo_data()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_demo_data.md)
   : Load bundled surveyframe demo data
 - [`sframe_input_types_demo_data()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_input_types_demo_data.md)
-  : Load bundled input-types demo data
+  : Load the input-types demo backing SurveyBuilder and SurveyStudio
 - [`sframe_builder_empty_state()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_builder_empty_state.md)
   : Create an empty SurveyStudio builder state
 - [`sframe_builder_state_from_instrument()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_builder_state_from_instrument.md)

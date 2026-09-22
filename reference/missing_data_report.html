@@ -28,7 +28,7 @@ rules. No imputation is performed."><meta property="og:image" content="https://m
 
     <a class="navbar-brand me-2" href="../index.html">surveyframe</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -86,6 +86,29 @@ when an instrument is supplied, otherwise all columns.</p></dd>
     <p>An object of class <code>sframe_missing_data_report</code>.</p>
     </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">demo</span> <span class="op">&lt;-</span> <span class="fu"><a href="sframe_demo_data.html">sframe_demo_data</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">mr</span> <span class="op">&lt;-</span> <span class="fu">missing_data_report</span><span class="op">(</span><span class="va">demo</span><span class="op">$</span><span class="va">responses</span>, <span class="va">demo</span><span class="op">$</span><span class="va">instrument</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">mr</span><span class="op">$</span><span class="va">item_missing</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>              variable missing_n missing_pct valid_n</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> visit_type visit_type         0        0.00     120</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> dm_1             dm_1         0        0.00     120</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> dm_2             dm_2         0        0.00     120</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> dm_3             dm_3         0        0.00     120</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> sq_1             sq_1         0        0.00     120</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> sq_2             sq_2         0        0.00     120</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> sq_3             sq_3         0        0.00     120</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> sus_1           sus_1         0        0.00     120</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> sus_2           sus_2         0        0.00     120</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> sat_1           sat_1         0        0.00     120</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> sat_2           sat_2         0        0.00     120</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> bi_1             bi_1         0        0.00     120</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> bi_2             bi_2         0        0.00     120</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> attention   attention         0        0.00     120</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> comments     comments        30        0.25      90</span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 

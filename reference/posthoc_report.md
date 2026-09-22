@@ -51,3 +51,21 @@ posthoc_report(
 ## Value
 
 An object of class `sframe_posthoc_report`.
+
+## Examples
+
+``` r
+demo <- sframe_demo_data()
+pr <- posthoc_report(demo$responses, method = "kruskal_wallis",
+                      outcome = "sat_1", group = "visit_type")
+pr$tables$pairwise_wilcox
+#> 
+#>  Pairwise comparisons using Wilcoxon rank sum test with continuity correction 
+#> 
+#> data:  x[ok] and g[ok] 
+#> 
+#>        first_time
+#> repeat 0.73      
+#> 
+#> P value adjustment method: holm 
+```

@@ -12,6 +12,11 @@ Replacing the simulated data with a call to
 connects the same workflow to live responses that grow with each
 submission.
 
+Allow about 30 minutes for the complete case study. For a five-minute
+runnable introduction, begin with the “Learn by example” vignette and
+its `first_survey` demo. Return here for the full design-to-report
+workflow.
+
 The questionnaire and concept are adopted from:
 
 > Sharafuddin, M. A., Madhavan, M., & Wangtueai, S. (2024). Assessing
@@ -378,13 +383,13 @@ validate_sframe(study, strict = FALSE)
 #> <sframe validation>
 #>   Instrument:  Digital Marketing Effectiveness of Tourism Services (1.0.0)
 #>   Status:      valid
-#>   Checks:      19 run, 0 with problems
+#>   Checks:      28 run, 0 with problems
 ```
 
-Read the parts of the diagnostic with the accessors rather than reaching
-into it. [`summary()`](https://rdrr.io/r/base/summary.html) shows every
-check that ran, including the ones that found nothing, which is how you
-tell a check that passed from a check that was never reached.
+Read the parts of the diagnostic with the accessors, which saves
+reaching into it. [`summary()`](https://rdrr.io/r/base/summary.html)
+shows every check that ran, including the ones that found nothing, which
+is how you tell a check that passed from a check that was never reached.
 
 ``` r
 
@@ -395,11 +400,11 @@ sf_problems(v)
 #> character(0)
 head(summary(v), 5)
 #>                  check status n_problems
-#> 1   duplicate_item_ids     ok          0
-#> 2       item_id_format     ok          0
-#> 3 duplicate_choice_ids     ok          0
-#> 4  duplicate_scale_ids     ok          0
-#> 5          item_labels     ok          0
+#> 1         field_shapes     ok          0
+#> 2   duplicate_item_ids     ok          0
+#> 3       item_id_format     ok          0
+#> 4 duplicate_choice_ids     ok          0
+#> 5  choice_set_contents     ok          0
 ```
 
 ``` r
@@ -416,33 +421,36 @@ identical(sf_meta(study)$title, sf_meta(study2)$title)
 
 ### What the SHA-256 hash proves, and what it does not
 
-The hash \[write_sframe()\] embeds confirms one thing: the `.sframe`
-file on disk is byte-identical to what was written. If any byte changes
-– an item’s wording, a scale’s membership, a plan’s variables –
-\[read_sframe()\] detects the mismatch and refuses to load the file
-rather than silently accepting it.
+The hash
+[`write_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/write_sframe.md)
+embeds confirms one thing: the instrument’s canonicalised content
+matches the digest stored in the `.sframe` file. Change a covered value,
+an item’s wording, a scale’s membership, or a plan’s variables, and
+[`read_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_sframe.md)
+detects the mismatch and refuses to load the file. Silent acceptance
+would leave a reader believing changed content was the original.
 
 That is a narrow, specific guarantee. It proves file identity. It does
 not prove the survey has good questions, an unbiased sample, or a sound
 analysis, and it says nothing about p-hacking or HARKing on its own. The
-package’s actual defence against those two is a separate mechanism: the
-`analysis_plan` slot is bound to the instrument at design time, before
-data arrive, and
+package supports a separate safeguard: the `analysis_plan` slot can be
+bound to the instrument at design time, before data arrive, and
 [`run_analysis_plan()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/run_analysis_plan.md)
-executes that pre-declared plan in one pass rather than letting a plan
-be assembled after looking at results. Keep the two claims distinct –
-“this file wasn’t edited after the fact” and “this analysis was decided
-before seeing the data” are different guarantees from different
-mechanisms, and neither substitutes for the other.
+then executes that recorded plan in one pass. This makes prior decisions
+easier to audit, and it shows that a recorded plan predates a given run.
+Establishing when a researcher first considered an analysis, or
+compelling disclosure, each needs separate evidence: “this content
+matches its stored digest” and “this analysis was declared before seeing
+the data” rest on different evidence, each standing on its own.
 
 ### `.sframe` is plain JSON, not a proprietary format
 
-A `.sframe` file is ordinary, git-diffable, UTF-8 JSON – not a binary or
-R-specific object. Any tool that reads JSON can open one, and the format
-is documented independently of this package in
+A `.sframe` file is ordinary, git-diffable, UTF-8 JSON, readable in any
+text editor. Any tool that reads JSON can open one, and the format is
+documented independently of this package in
 `system.file("schema", "sframe_schema.json", package = "surveyframe")`,
-a JSON Schema a reviewer or a second tool can validate against without
-installing R.
+a JSON Schema a reviewer or a second tool can validate against, with R
+left out of the loop.
 
 ``` r
 
@@ -452,39 +460,29 @@ jsonlite::fromJSON(schema_path, simplifyVector = FALSE)$required
 #> [1] "hash"
 #> 
 #> [[2]]
-#> [1] "version"
-#> 
-#> [[3]]
 #> [1] "meta"
 #> 
-#> [[4]]
+#> [[3]]
 #> [1] "items"
-#> 
-#> [[5]]
-#> [1] "choices"
-#> 
-#> [[6]]
-#> [1] "scales"
 ```
 
 Because the file is plain text, two versions of it diff the same way any
 source file does. If `tourism_services_v1.sframe` were committed to a
 Git repository, revising it and running `git diff` on the file would
-show exactly which lines – which item, which choice, which plan block –
+show exactly which lines, which item, which choice, which plan block,
 changed, alongside Git’s own commit history for who changed it and when.
-That diff is Git’s job, not this package’s; see the next section for how
-the two connect.
+That diff is Git’s job, and the next section shows how the two connect.
 
 ### Disclosed revision: `amend_sframe()`
 
 A hash mismatch alone can’t distinguish a legitimate correction (fixing
 a data-entry error, removing bot responses, correcting a misspecified
-model) from an undisclosed change – both break the hash identically.
+model) from an undisclosed change: both break the hash identically.
 [`amend_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/amend_sframe.md)
 gives legitimate revision a structured, disclosed path instead: it
 compares the instrument before and after a change, and appends a record
-– never overwrites – of what changed and why, directly inside the
-`.sframe` file next to the content it explains.
+of what changed and why, directly inside the `.sframe` file next to the
+content it explains, never overwriting an earlier entry.
 
 Amendments come in two tiers, because not every change carries the same
 risk to the plan’s design-time-binding logic:
@@ -493,14 +491,14 @@ risk to the plan’s design-time-binding logic:
   expected researcher hygiene and stay low-friction: a reason code and a
   short explanation are enough.
 - **`"design"`** amendments (anything touching the analysis plan or a
-  model – `model_respecification`, or `instrument_revision`/`other` by
+  model, `model_respecification`, or `instrument_revision`/`other` by
   default) are exactly the kind of post-hoc change the design-time plan
   binding exists to guard against. They require a `deviation_report`
   describing what changed in the research question, method, or model and
-  why, and record `signoff` explicitly – as a reviewer’s name, or the
+  why, and record `signoff` explicitly, as a reviewer’s name or the
   literal value `"none"` when no second sign-off was given, so an
-  unreviewed design change stays visible to an auditor rather than
-  looking identical to a signed-off one.
+  unreviewed design change stays visible to an auditor, where an empty
+  field would read as a sign-off.
 
 ``` r
 
@@ -523,31 +521,31 @@ study_amended <- amend_sframe(
 
 amendment_log(study_amended)
 #>              timestamp         reason_code
-#> 1 2026-09-03T12:33:49Z instrument_revision
+#> 1 2026-09-22T20:15:19Z instrument_revision
 #>                                    reason_text   tier author
 #> 1 Clarified item wording after pilot feedback. design   <NA>
 #>                                     deviation_report signoff
 #> 1 Wording only; the construct measured is unchanged.    none
 #>                                                      previous_hash
-#> 1 21da0bcba4511c35a5607739721455a812d1fa0416b6055e4c76767270916060
+#> 1 726c1be14d291fe8239b4855a5b904a66653b7cea99d7461562a204c1123997a
 #>                                                           new_hash
-#> 1 f5a68240484b4fbfc8bf3ed079fc7d21da653f86389f9740b2408c45caf5ab8c
+#> 1 259c6bbe39b0dc3a95c99c5c34d6650e7264d5558656250d9563a148facab76d
 #>   changed_fields
 #> 1          items
 ```
 
 [`amendment_log()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/amendment_log.md)
-returns the full history as a data frame – one row per disclosed change,
+returns the full history as a data frame, one row per disclosed change,
 printable or exported with
 [`write.csv()`](https://rdrr.io/r/utils/write.table.html) for an
 external audit trail.
 [`write_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/write_sframe.md)
-on the amended instrument persists the log in the file; a reviewer who
+on the amended instrument persists the log in the file. A reviewer who
 later loads it with
 [`read_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_sframe.md)
-sees both the current content and every disclosed step that produced it.
-This does not weaken the hash check: an edit made directly to the file,
-bypassing
+sees both the current content and every disclosed step that produced it,
+and the hash check keeps its full force: an edit made directly to the
+file, bypassing
 [`amend_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/amend_sframe.md),
 still fails
 [`read_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_sframe.md)’s
@@ -555,7 +553,7 @@ integrity check exactly as before.
 
 Be clear about what this does and does not guarantee.
 [`amend_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/amend_sframe.md)
-records a disclosed change – it cannot compel disclosure, the same way a
+records a disclosed change. It cannot compel disclosure, the same way a
 preregistration deviation report can’t be forced. Nothing prevents a
 researcher from reconstructing an instrument from scratch and calling
 [`write_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/write_sframe.md)
@@ -563,20 +561,20 @@ on it directly, skipping the amendment log entirely. What the mechanism
 actually guarantees is narrower and still useful: *if* a change is
 disclosed through
 [`amend_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/amend_sframe.md),
-the record is structured, timestamped, and permanent inside the file –
-not that every change will be.
+the record is structured, timestamped, and permanent inside the file. It
+does not guarantee that every change is disclosed in the first place.
 
 ### Linking a saved instrument to its Git commit
 
-A bare hash gives no diff, author, or explanation for a change – Git
-already provides all three.
+A bare hash carries the file’s identity alone. A diff, an author and an
+explanation come from Git, which already provides all three.
 [`link_git_commit()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/link_git_commit.md)
-points the instrument at Git rather than duplicating it: it records the
-current commit’s SHA and subject line, so the SHA-256 hash’s role
+points the instrument at Git and leaves the history there: it records
+the current commit’s SHA and subject line, so the SHA-256 hash’s role
 narrows to confirming that the file on disk matches what that specific,
 already-explained commit produced. It degrades gracefully with no error
-when Git isn’t installed or the path isn’t a repository – Git is
-optional, never a dependency of the rest of the package.
+when Git isn’t installed or the path isn’t a repository. Git stays
+optional, and the rest of the package runs on its own.
 
 ``` r
 
@@ -596,8 +594,8 @@ link_git_commit(study_amended, repo_path = tempdir())
 
 When an endpoint URL is set on the instrument,
 [`export_static_survey()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/export_static_survey.md)
-reads it automatically. Set the URL once, export as many times as needed
-without repeating the argument.
+reads it automatically. Set the URL once, and every later export reuses
+it.
 
 ``` r
 
@@ -610,10 +608,14 @@ study$render$google_sheets_endpoint <-
 
 [`export_static_survey()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/export_static_survey.md)
 produces a single self-contained HTML file. Respondents open it in any
-browser, fill it in, and their submission is downloaded as a CSV and, if
-an endpoint is configured, posted to the Google Sheet at the same time.
-The file can be hosted on GitHub Pages, shared by email, or opened
-directly from disk.
+browser and, if an endpoint is configured, the browser sends the
+submission to Google Sheets. The cross-origin request confirms only that
+the row was sent. Whether the Sheet stored it stays unconfirmed from
+here. Depending on the thank-you settings, the page can also offer a CSV
+download, but it becomes a local backup only if the respondent saves it.
+Pilot the endpoint and verify a stored row before collection. The HTML
+can be hosted on GitHub Pages, shared by email, or opened directly from
+disk.
 
 ``` r
 
@@ -622,7 +624,7 @@ html_path <- export_static_survey(
   output_path = file.path(tempdir(), "tourism_services_survey.html"),
   open        = FALSE
 )
-#> Static survey written to '/tmp/RtmpOsFXo4/tourism_services_survey.html' (85.5
+#> Static survey written to '/tmp/RtmpCY3JCH/tourism_services_survey.html' (95.8
 #> KB).
 file.exists(html_path)
 #> [1] TRUE
@@ -636,7 +638,7 @@ sits in a serif typeface, options render as bordered cards with a
 selection tick, Likert items render as numbered squares, and a slim
 progress bar tracks completion. Every one of those colours derives from
 the instrument’s single theme colour, so the line below re-skins the
-whole survey without touching anything else.
+whole survey on its own.
 
 ``` r
 
@@ -648,8 +650,8 @@ Two things about the export matter for planning a real deployment.
 - **It is designed for a phone first.** Option cards and touch targets
   meet a 44 pixel minimum, and a matrix question (see the input-types
   demo in the SurveyBuilder vignette) reflows from a table into stacked,
-  labelled cards below 600 pixels of width, so no question ever needs
-  horizontal scrolling to complete on a small screen.
+  labelled cards below 600 pixels of width, so every question completes
+  on a small screen within its width.
 - **It meets WCAG 2.2 AA.** Every control carries an accessible name,
   keyboard focus is visible on option cards, a validation error is
   announced to assistive technology, and required questions are marked
@@ -666,7 +668,7 @@ per row, a multiple-choice question gets one 0/1 column per option, and
 a ranking question gets one column per option holding its rank. A
 five-option multiple-choice item named `channels`, for example, becomes
 five columns, `channels__option1` through `channels__option5`, each
-holding `0` or `1`, ready for analysis with no string-splitting step.
+holding `0` or `1`, ready for analysis, with the splitting already done.
 
 ``` r
 
@@ -675,7 +677,7 @@ script_path <- export_google_sheet(
   sheet_url  = "https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID",
   output_dir = tempdir()
 )
-#> Apps Script written to: /tmp/RtmpOsFXo4/surveyframe_collector.gs
+#> Apps Script written to: /tmp/RtmpCY3JCH/surveyframe_collector.gs
 #> Follow the setup instructions inside the file to deploy it.
 file.exists(script_path)
 #> [1] TRUE
@@ -687,10 +689,13 @@ file.exists(script_path)
 2.  Click Extensions, then Apps Script.
 3.  Paste the contents of the generated `.gs` file, replacing any
     existing code.
-4.  Click Deploy, then New deployment. Set type to Web app.
-5.  Set “Who has access” to Anyone.
-6.  Copy the Web App URL.
-7.  Paste the URL into `study$render$google_sheets_endpoint` above and
+4.  In the Apps Script editor, add **Services \> Google Sheets API** and
+    keep its identifier as `Sheets`. Without it, the collector refuses
+    the response rather than risk storing an altered value.
+5.  Click Deploy, then New deployment. Set type to Web app.
+6.  Set “Who has access” to Anyone.
+7.  Copy the Web App URL.
+8.  Paste the URL into `study$render$google_sheets_endpoint` above and
     re-export the survey.
 
 ### Pull live responses
@@ -935,7 +940,7 @@ appends one column per scale to the data frame, using the scoring rules
 stored in the instrument. If a column with the same name as a scale
 already exists in the data frame,
 [`score_scales()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/score_scales.md)
-skips that scale so pre-scored data is never overwritten.
+skips that scale so pre-scored data survives intact.
 
 ``` r
 
@@ -1021,19 +1026,21 @@ if (requireNamespace("psych", quietly = TRUE)) {
 
 Scale reliability {.table}
 
-A Cronbach’s alpha of 0.70 or above is conventionally accepted as
-adequate internal consistency (Nunnally, 1978). For scales with three or
-more items, McDonald’s omega is a more accurate estimate because it
-accounts for unequal factor loadings across items. Alpha assumes all
-items load equally on the factor. Pass `omega = TRUE` when items within
-a scale differ substantially in their contribution. See
+A value near 0.70 is sometimes used as a rough convention, but
+reliability must be interpreted against the construct, intended use,
+item count, uncertainty, and model assumptions. Alpha and the omega
+variants target reliability under different measurement assumptions, so
+treat them as distinct estimates. Decide which quantity answers the
+study’s question, and report that one on its own merits. Pass
+`omega = TRUE` to report the available omega estimates alongside alpha,
+and name the estimate and assumptions in the write-up. See
 [`?reliability_report`](https://mohammedalisharafuddin.github.io/surveyframe/reference/reliability_report.md)
 for details.
 
 ## EFA readiness
 
-Before a confirmatory factor analysis, it is good practice to confirm
-that the item correlations are strong enough to support factoring.
+Before a confirmatory factor analysis, it is useful to screen whether
+the item correlations appear suitable for exploratory factoring.
 [`efa_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/efa_report.md)
 runs the KMO measure of sampling adequacy and Bartlett’s test of
 sphericity, and uses parallel analysis to suggest the number of factors.
@@ -1046,10 +1053,11 @@ if (requireNamespace("psych", quietly = TRUE)) {
 }
 ```
 
-A KMO value of 0.60 or above and a significant Bartlett test confirm
-that the correlation structure supports factor analysis. The suggested
-factor count from parallel analysis is a guide. Theory should take
-precedence.
+A KMO value and Bartlett’s test provide preliminary screening evidence,
+one input among several toward judging whether a particular factor model
+is appropriate. Treat 0.60 as a rough, informal KMO convention. The
+factor count from parallel analysis is also a guide to interpret with
+theory, design, loadings, residuals, and model fit.
 
 ## Construct validity
 
@@ -1146,16 +1154,28 @@ variance (Levene) for grouped tests, and linearity for regression pairs.
 ``` r
 
 if (requireNamespace("psych", quietly = TRUE)) {
-  ar <- assumption_report(scored, study)
+  ar <- assumption_report(scored, variables = scale_cols)
   print(ar)
 }
 #> Assumption Report
+#> 
+#> Normality:
+#>  variable  n shapiro_w    shapiro_p    skewness   kurtosis
+#>      DMRE 60 0.9507082 1.681885e-02 -0.01764237 -0.8595994
+#>      DMAU 60 0.9400575 5.447373e-03 -0.27466443 -0.3742255
+#>      DMEU 60 0.9202802 7.870891e-04 -0.13995250 -0.9009628
+#>      DMPV 60 0.9236779 1.081931e-03 -0.16121971 -1.3529371
+#>      DSQA 60 0.9431484 7.509031e-03 -0.68528436  0.2173799
+#>      DSQT 60 0.9590129 4.211033e-02 -0.37357996 -0.1216330
+#>      DSUQ 60 0.9488769 1.379674e-02  0.04178933 -0.6397338
+#>        TS 60 0.8780098 2.274819e-05 -0.74469442  0.1776129
+#>        BI 60 0.9527818 2.108952e-02 -0.33102932 -0.4335865
 ```
 
 Review the `$normality` and `$homogeneity` slots to decide whether
 parametric or non-parametric alternatives are appropriate. The analysis
-plan can override the test method per block if the default is not
-suitable.
+plan can override the test method per block wherever the default fits
+the data poorly.
 
 ------------------------------------------------------------------------
 
@@ -1164,6 +1184,8 @@ suitable.
 ``` r
 
 results <- run_analysis_plan(scored, study)
+#> Warning: Scale scoring failed before analysis, so blocks run on unscored data: The responses already hold a column named 'DMRE', 'DMAU', 'DMEU', 'DMPV', 'DSQA', 'DSQT', 'DSUQ', 'TS', 'BI', which is also a scale ID.
+#> ℹ score_scales() stores each score in a column named by its scale ID, so scoring would replace that data. Rename the scale, or drop the column first where it holds scores from an earlier run.
 ```
 
 Each result carries an APA-formatted statistic, an effect size, a
@@ -1177,10 +1199,10 @@ results_table(results)
 
 | RQ | Research question | Method | Result (APA) | Effect |
 |:---|:---|:---|---:|:---|
-| RQ1 | Are digital marketing perceptions associated with tourist satisfaction? | pearson | r(58) = 0.19 \[-0.07, 0.42\], p = 0.153 | small |
-| RQ2 | Is service quality associated with tourist satisfaction? | pearson | r(58) = -0.04 \[-0.29, 0.22\], p = 0.778 | negligible |
-| RQ3 | Do service quality and sustainability quality predict satisfaction? |  | R² = 0.210, F(3, 56) = 4.97, p = 0.004 |  |
-| RQ4 | Do first-time and repeat visitors differ in satisfaction? |  | U = 744, z = -4.62, p \< .001, r = 0.60 \[0.41, 0.76\], Hodges-Lehmann shift = 0.67 \[0.67, 1.00\] | large |
+| RQ1 | Are digital marketing perceptions associated with tourist satisfaction? | pearson | r(58) = 0.19, 95% CI \[-0.07, 0.42\], p = .153 | small |
+| RQ2 | Is service quality associated with tourist satisfaction? | pearson | r(58) = -0.04, 95% CI \[-0.29, 0.22\], p = .778 | negligible |
+| RQ3 | Do service quality and sustainability quality predict satisfaction? |  | R² = 0.210, F(3, 56) = 4.97, p = .004 |  |
+| RQ4 | Do first-time and repeat visitors differ in satisfaction? |  | U = 744, z = 4.63, p \< .001, r = 0.60, 95% CI \[0.41, 0.76\], Hodges-Lehmann shift = 0.67, 95% CI \[0.67, 1.00\] | large |
 | RQ5 | Does satisfaction predict behavioural intention? |  | R² = 0.291, F(1, 58) = 23.83, p \< .001 |  |
 
 The full writing prompt for each result is available in `r$prompt`. The
@@ -1189,7 +1211,7 @@ first one reads:
 ``` r
 
 cat(results[[1]]$prompt)
-#> There was a positive, small non-significant correlation between DMRE and TS, r(58) = 0.19 [-0.07, 0.42], p = 0.153. Explain what this means for your research question.
+#> There was a positive, small non-significant correlation between DMRE and TS, r(58) = 0.19, 95% CI [-0.07, 0.42], p = .153. Explain what this means for your research question.
 ```
 
 The `prompt` field is a sentence template for the methods or results
@@ -1203,12 +1225,14 @@ distinct judgements.
 When ggplot2 is installed, `plots = TRUE` attaches a brand-styled chart
 to every supported block: bar charts for frequency and chi-square
 blocks, and scatter plots with a regression overlay for correlation and
-regression blocks. Plotting stays opt-in, so nothing changes for
-installations without ggplot2.
+regression blocks. Plotting stays opt-in, so an installation that skips
+ggplot2 keeps working as before.
 
 ``` r
 
 results_p <- run_analysis_plan(scored, study, plots = TRUE)
+#> Warning: Scale scoring failed before analysis, so blocks run on unscored data: The responses already hold a column named 'DMRE', 'DMAU', 'DMEU', 'DMPV', 'DSQA', 'DSQT', 'DSUQ', 'TS', 'BI', which is also a scale ID.
+#> ℹ score_scales() stores each score in a column named by its scale ID, so scoring would replace that data. Rename the scale, or drop the column first where it holds scores from an earlier run.
 first_plot <- Filter(function(r) !is.null(r$plot), results_p)[[1]]
 first_plot$plot
 ```
@@ -1238,9 +1262,9 @@ results_path <- render_results(
   output_file = file.path(tempdir(), "tourism_results.html")
 )
 cat("Results report written:", results_path, "\n")
-#> Results report written: /tmp/RtmpOsFXo4/tourism_results.html
+#> Results report written: /tmp/RtmpCY3JCH/tourism_results.html
 cat("Size:", round(file.size(results_path) / 1024, 1), "KB\n")
-#> Size: 13.5 KB
+#> Size: 14 KB
 ```
 
 The results report contains one section per research question, with the
@@ -1249,8 +1273,8 @@ chosen method, each paired with its own chart drawn directly beneath its
 table. A Likert item’s distribution renders as a diverging stacked bar,
 with agreement and disagreement categories running away from a shared
 zero line and any neutral category split evenly across it, so the
-balance of opinion is readable at a glance rather than inferred from a
-plain frequency bar.
+balance of opinion is readable at a glance, where a plain frequency bar
+leaves it to be inferred.
 
 ``` r
 
@@ -1266,7 +1290,7 @@ render_report(
   include_analysis = TRUE,
   include_models   = FALSE
 )
-#> Report rendered with the Quarto engine: /tmp/RtmpOsFXo4/tourism_report.html
+#> Report rendered with the Quarto engine: /tmp/RtmpCY3JCH/tourism_report.html
 ```
 
 ------------------------------------------------------------------------
@@ -1313,8 +1337,8 @@ render_report(
 
 As more respondents complete the survey, re-running from the
 [`read_sheet_responses()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_sheet_responses.md)
-call above refreshes every result, table, and figure in the report
-without changing any analysis code.
+call above refreshes every result, table, and figure in the report,
+leaving the analysis code as it stands.
 
 ------------------------------------------------------------------------
 

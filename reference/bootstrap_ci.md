@@ -36,8 +36,12 @@ bootstrap_ci(x, FUN = stats::median, R = 2000, conf.level = 0.95, seed = NULL)
 
 ## Value
 
-A named numeric vector: `estimate`, `lower`, `upper`. The bounds are
-`NA` when `x` has fewer than 3 finite values.
+A named numeric vector: `estimate`, `lower`, `upper`, with attributes
+`resamples`, `valid_resamples` and, when the interval is withheld,
+`reason`. The bounds are `NA` when fewer than 90% of resamples give a
+value, or when every resample gives the same value, since neither leaves
+a sampling distribution to read. The bounds are `NA` when `x` has fewer
+than 3 finite values.
 
 ## See also
 
@@ -51,7 +55,15 @@ A named numeric vector: `estimate`, `lower`, `upper`. The bounds are
 bootstrap_ci(mtcars$mpg, seed = 42)
 #> estimate    lower    upper 
 #>    19.20    16.85    21.40 
+#> attr(,"resamples")
+#> [1] 2000
+#> attr(,"valid_resamples")
+#> [1] 2000
 bootstrap_ci(mtcars$mpg, FUN = mean, conf.level = 0.90, seed = 42)
 #> estimate    lower    upper 
 #> 20.09062 18.41875 21.80031 
+#> attr(,"resamples")
+#> [1] 2000
+#> attr(,"valid_resamples")
+#> [1] 2000
 ```

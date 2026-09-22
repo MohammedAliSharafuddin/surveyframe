@@ -45,7 +45,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">surveyframe</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -120,12 +120,12 @@ exist.</p>
 <p>Nine methods are available, from plain term counting through to topic
 modelling. The base path (<code>term_freq</code>,
 <code>ngram_freq</code>, <code>term_context</code>,
-<code>co_occurrence</code>) needs no optional packages. Five more
+<code>co_occurrence</code>) runs on the package alone. Five more
 (<code>co_occurrence_network</code>, <code>tidy_sentiment</code>,
 <code>quanteda_dfm</code>, <code>topic_model_lda</code>,
-<code>stm_topics</code>) each need one Suggests-only package, guarded
-with <code><a href="https://rlang.r-lib.org/reference/is_installed.html" class="external-link">rlang::check_installed()</a></code>, and every guarded section
-below knits cleanly whether or not that package is installed.</p>
+<code>stm_topics</code>) need one or more Suggests-only packages,
+guarded with <code><a href="https://rlang.r-lib.org/reference/is_installed.html" class="external-link">rlang::check_installed()</a></code>, and every guarded
+section below knits cleanly on either kind of machine.</p>
 </div>
 <div class="section level2">
 <h2 id="a-survey-with-an-open-ended-item-beside-a-likert-scale">A survey with an open-ended item beside a Likert scale<a class="anchor" aria-label="anchor" href="#a-survey-with-an-open-ended-item-beside-a-likert-scale"></a>
@@ -164,7 +164,8 @@ open-ended comments item asking what stood out about their visit.</p>
 <p>The comments are built from a small phrase bank, seeded so the
 example is reproducible. The north branch’s simulated visits lean
 positive, the south branch’s lean mixed, which gives the group-role
-examples below something real to show rather than a coincidence.</p>
+examples below something real to show, where an even split would leave
+only a coincidence.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">positive_pool</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
 <span>  <span class="st">"The staff were incredibly friendly and helpful."</span>,</span>
@@ -272,7 +273,7 @@ response came from.</p>
 </h2>
 <p><code><a href="../reference/term_frequency.html">term_frequency()</a></code> tokenises, lower-cases, strips
 punctuation, removes stop words (a built-in English list ships with the
-package, so this needs no optional dependency), and counts.
+package, so this stage runs on base surveyframe), and counts.
 <code><a href="../reference/ngram_frequency.html">ngram_frequency()</a></code> does the same for 2-word and 3-word
 phrases, which surface a complaint like “long wait” that single-word
 counts would split apart.</p>
@@ -353,42 +354,42 @@ counts would split apart.</p>
 <tr class="odd">
 <td align="left">help us</td>
 <td align="right">12</td>
-<td align="right">3.1</td>
+<td align="right">7.6</td>
 </tr>
 <tr class="even">
 <td align="left">arrived fast</td>
 <td align="right">9</td>
-<td align="right">2.3</td>
+<td align="right">5.7</td>
 </tr>
 <tr class="odd">
-<td align="left">attentive food</td>
-<td align="right">9</td>
-<td align="right">2.3</td>
-</tr>
-<tr class="even">
 <td align="left">food arrived</td>
 <td align="right">9</td>
-<td align="right">2.3</td>
-</tr>
-<tr class="odd">
-<td align="left">server attentive</td>
-<td align="right">9</td>
-<td align="right">2.3</td>
+<td align="right">5.7</td>
 </tr>
 <tr class="even">
-<td align="left">check quick</td>
-<td align="right">8</td>
-<td align="right">2.1</td>
-</tr>
-<tr class="odd">
 <td align="left">helpful whenever</td>
 <td align="right">8</td>
-<td align="right">2.1</td>
+<td align="right">5.1</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left">needed anything</td>
 <td align="right">8</td>
-<td align="right">2.1</td>
+<td align="right">5.1</td>
+</tr>
+<tr class="even">
+<td align="left">comfortable throughout</td>
+<td align="right">7</td>
+<td align="right">4.4</td>
+</tr>
+<tr class="odd">
+<td align="left">friendly staff</td>
+<td align="right">7</td>
+<td align="right">4.4</td>
+</tr>
+<tr class="even">
+<td align="left">staff made</td>
+<td align="right">7</td>
+<td align="right">4.4</td>
 </tr>
 </tbody>
 </table>
@@ -397,7 +398,7 @@ does. Here, <code>term_freq</code> also takes an optional
 <code>group</code> role (covered below), which splits the table and
 facets the chart by a nominal or ordinal covariate.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/sf_accessors.html">sf_plan</a></span><span class="op">(</span><span class="va">instr</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/sf_plan.html">sf_plan</a></span><span class="op">(</span><span class="va">instr</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>id <span class="op">=</span> <span class="st">"RQ1"</span>,</span>
 <span>       research_question <span class="op">=</span> <span class="st">"What themes recur in the open-ended comments?"</span>,</span>
 <span>       family <span class="op">=</span> <span class="st">"text"</span>, method <span class="op">=</span> <span class="st">"term_freq"</span>,</span>
@@ -1033,13 +1034,13 @@ drawing a single panel.</p>
 <p><img src="text-analysis_files/figure-html/group-plot-1.png" class="r-plt" alt="Two side-by-side bar charts of the most frequent terms, one for the north branch and one for the south branch." width="672"></p>
 <p>North’s simulated comments lean toward “friendly”, “helpful”, and
 “clean”. South’s lean toward “wait”, “slow”, and “staff” in a different
-sense, the complaint rather than the compliment. A group split like this
-is what turns “the comments mention staff a lot” into a specific,
-actionable finding.</p>
+sense, the complaint sense of the word, where the North uses the
+compliment. A group split like this is what turns “the comments mention
+staff a lot” into a specific, actionable finding.</p>
 <p>The <code>group</code> role applies the same minimum-response guard
 per group as it does overall: a branch with too few usable responses is
-flagged in the table’s <code>note</code> column rather than silently
-producing a trend from a handful of comments.</p>
+flagged in the table’s <code>note</code> column, which keeps a handful
+of comments from reading as a trend.</p>
 </div>
 <div class="section level2">
 <h2 id="keyword-in-context">Keyword in context<a class="anchor" aria-label="anchor" href="#keyword-in-context"></a>
@@ -1047,8 +1048,7 @@ producing a trend from a handful of comments.</p>
 <p><code><a href="../reference/term_context.html">term_context()</a></code> builds a concordance for one keyword:
 every place it appears, with a window of surrounding words on each side.
 It is the fastest way to read what a keyword actually means in context,
-rather than trusting that a frequent term always means the same
-thing.</p>
+and it settles whether a frequent term keeps one sense throughout.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">kwic</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/term_context.html">term_context</a></span><span class="op">(</span><span class="va">cleaned</span>, term <span class="op">=</span> <span class="st">"wait"</span>, window <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span>
 <span><span class="fu">kable</span><span class="op">(</span><span class="va">kwic</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span>, caption <span class="op">=</span> <span class="st">'Every occurrence of "wait" in context.'</span><span class="op">)</span></span></code></pre></div>
@@ -1163,12 +1163,11 @@ thing.</p>
 <div class="section level2">
 <h2 id="co-occurrence">Co-occurrence<a class="anchor" aria-label="anchor" href="#co-occurrence"></a>
 </h2>
-<p><code>.sframe_cooccurrence()</code>’s public entry point, the
-<code>co_occurrence</code> method, counts how often pairs of frequent
-terms appear together within the same response, and renders as a
-heatmap.</p>
+<p>The analysis-plan method <code>co_occurrence</code> counts how often
+pairs of frequent terms appear together within the same response, and
+renders as a heatmap.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/sf_accessors.html">sf_plan</a></span><span class="op">(</span><span class="va">instr</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="../reference/sf_accessors.html">sf_plan</a></span><span class="op">(</span><span class="va">instr</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/sf_plan.html">sf_plan</a></span><span class="op">(</span><span class="va">instr</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="../reference/sf_plan.html">sf_plan</a></span><span class="op">(</span><span class="va">instr</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>  id <span class="op">=</span> <span class="st">"RQ3"</span>,</span>
 <span>  research_question <span class="op">=</span> <span class="st">"Which terms tend to appear together in the same comment?"</span>,</span>
 <span>  family <span class="op">=</span> <span class="st">"text"</span>, method <span class="op">=</span> <span class="st">"co_occurrence"</span>,</span>
@@ -1244,7 +1243,7 @@ force-directed layout. Both are seeded, so the same
 <code>options$seed</code> always produces the same clusters and the same
 layout.</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/sf_accessors.html">sf_plan</a></span><span class="op">(</span><span class="va">instr</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="../reference/sf_accessors.html">sf_plan</a></span><span class="op">(</span><span class="va">instr</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/sf_plan.html">sf_plan</a></span><span class="op">(</span><span class="va">instr</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="../reference/sf_plan.html">sf_plan</a></span><span class="op">(</span><span class="va">instr</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>  id <span class="op">=</span> <span class="st">"RQ4"</span>,</span>
 <span>  research_question <span class="op">=</span> <span class="st">"Do the frequent terms form distinct thematic clusters?"</span>,</span>
 <span>  family <span class="op">=</span> <span class="st">"text"</span>, method <span class="op">=</span> <span class="st">"co_occurrence_network"</span>,</span>
@@ -1419,11 +1418,11 @@ layout.</p>
 </h2>
 <p><code>tidy_sentiment</code> needs the optional <code>tidytext</code>
 package. It uses the bundled <code>"bing"</code> positive/negative
-lexicon, so no download is needed once tidytext is installed. Like
+lexicon, which arrives with tidytext itself. Like
 <code>term_freq</code>, it accepts an optional <code>group</code>
 role.</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/sf_accessors.html">sf_plan</a></span><span class="op">(</span><span class="va">instr</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="../reference/sf_accessors.html">sf_plan</a></span><span class="op">(</span><span class="va">instr</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/sf_plan.html">sf_plan</a></span><span class="op">(</span><span class="va">instr</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="../reference/sf_plan.html">sf_plan</a></span><span class="op">(</span><span class="va">instr</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>  id <span class="op">=</span> <span class="st">"RQ5"</span>,</span>
 <span>  research_question <span class="op">=</span> <span class="st">"Is sentiment in the comments more positive or negative, and does it differ by branch?"</span>,</span>
 <span>  family <span class="op">=</span> <span class="st">"text"</span>, method <span class="op">=</span> <span class="st">"tidy_sentiment"</span>,</span>
@@ -1504,9 +1503,9 @@ left-negative/right-positive convention, each sized and shaded (dark for
 frequent, light for rare) by how often it occurred.</p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">instr_cloud</span> <span class="op">&lt;-</span> <span class="va">instr</span></span>
-<span><span class="va">plan</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sf_accessors.html">sf_plan</a></span><span class="op">(</span><span class="va">instr_cloud</span><span class="op">)</span></span>
+<span><span class="va">plan</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sf_plan.html">sf_plan</a></span><span class="op">(</span><span class="va">instr_cloud</span><span class="op">)</span></span>
 <span><span class="va">plan</span><span class="op">[[</span><span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">vapply</a></span><span class="op">(</span><span class="va">plan</span>, <span class="va">`[[`</span>, <span class="st">""</span>, <span class="st">"id"</span><span class="op">)</span> <span class="op">==</span> <span class="st">"RQ5"</span><span class="op">)</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">options</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>wordcloud <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/sf_accessors.html">sf_plan</a></span><span class="op">(</span><span class="va">instr_cloud</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">plan</span></span>
+<span><span class="fu"><a href="../reference/sf_plan.html">sf_plan</a></span><span class="op">(</span><span class="va">instr_cloud</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">plan</span></span>
 <span></span>
 <span><span class="va">result_cloud</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/run_analysis_plan.html">run_analysis_plan</a></span><span class="op">(</span><span class="va">responses</span>, <span class="va">instr_cloud</span>, plots <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="va">result_cloud</span><span class="op">[[</span><span class="st">"RQ5"</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">plot</span></span></code></pre></div>
@@ -1516,11 +1515,11 @@ frequent, light for rare) by how often it occurred.</p>
 <h2 id="document-feature-matrix">Document-feature matrix<a class="anchor" aria-label="anchor" href="#document-feature-matrix"></a>
 </h2>
 <p><code>quanteda_dfm</code> needs the optional <code>quanteda</code>
-package. It is a descriptive summary rather than an analysis in its own
-right: feature count, sparsity, and the leading features, useful as a
-sanity check before a heavier method.</p>
+package. It is a descriptive summary ahead of an analysis: feature
+count, sparsity, and the leading features provide a sanity check before
+a heavier method.</p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/sf_accessors.html">sf_plan</a></span><span class="op">(</span><span class="va">instr</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="../reference/sf_accessors.html">sf_plan</a></span><span class="op">(</span><span class="va">instr</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/sf_plan.html">sf_plan</a></span><span class="op">(</span><span class="va">instr</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="../reference/sf_plan.html">sf_plan</a></span><span class="op">(</span><span class="va">instr</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>  id <span class="op">=</span> <span class="st">"RQ6"</span>,</span>
 <span>  research_question <span class="op">=</span> <span class="st">"What does the document-feature matrix of the comments look like?"</span>,</span>
 <span>  family <span class="op">=</span> <span class="st">"text"</span>, method <span class="op">=</span> <span class="st">"quanteda_dfm"</span>,</span>
@@ -1595,22 +1594,22 @@ sanity check before a heavier method.</p>
 <p><code>stm_topics</code> fits a structural topic model via the
 optional <code>stm</code> package (tokenising uses
 <code>tidytext</code>, so both are needed). A small <code>k</code> keeps
-this example fast; a real study would try several values of
-<code>k</code> and compare fit – <code>k = 3</code> (or
+this example fast. A real study would try three to six values of
+<code>k</code> and compare fit. <code>k = 3</code> (or
 <code>topic_model_lda</code>’s default <code>k = 4</code>) is a
-demonstration value, not a recommendation, and neither default was
-chosen from any fit criterion. The accepted way to choose <code>k</code>
-is to fit a range of candidate values and compare them on held-out
+demonstration value chosen to keep the example fast, with a fit
+criterion left out of it. The accepted way to choose <code>k</code> is
+to fit a range of candidate values and compare them on held-out
 likelihood or a coherence metric: <code><a href="https://rdrr.io/pkg/stm/man/searchK.html" class="external-link">stm::searchK()</a></code> does this
 directly for <code>stm_topics</code>’s underlying model (pass it the
 same <code>documents</code>/<code>vocab</code>
 <code><a href="https://rdrr.io/pkg/stm/man/prepDocuments.html" class="external-link">stm::prepDocuments()</a></code> would produce), and
 <code><a href="https://rdrr.io/pkg/topicmodels/man/perplexity.html" class="external-link">topicmodels::perplexity()</a></code> on a held-out split serves the
-same purpose for <code>topic_model_lda</code>. Neither is wrapped by
-surveyframe – <code>k</code> selection is a modelling decision for the
+same purpose for <code>topic_model_lda</code>. Both stay in their own
+packages. <code>k</code> selection is a modelling decision for the
 researcher to make and report, not a default to trust unexamined.</p>
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/sf_accessors.html">sf_plan</a></span><span class="op">(</span><span class="va">instr</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="../reference/sf_accessors.html">sf_plan</a></span><span class="op">(</span><span class="va">instr</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/sf_plan.html">sf_plan</a></span><span class="op">(</span><span class="va">instr</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="../reference/sf_plan.html">sf_plan</a></span><span class="op">(</span><span class="va">instr</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>  id <span class="op">=</span> <span class="st">"RQ7"</span>,</span>
 <span>  research_question <span class="op">=</span> <span class="st">"What topics organise the open-ended comments?"</span>,</span>
 <span>  family <span class="op">=</span> <span class="st">"text"</span>, method <span class="op">=</span> <span class="st">"stm_topics"</span>,</span>
@@ -1935,17 +1934,17 @@ uses.</p>
 </h2>
 <p>This is algorithmic counting and clustering, not interpretation. Term
 frequency, co-occurrence, and topic modelling surface <em>candidate</em>
-themes; a human reader still decides what they mean and whether they
+themes. A human reader still decides what they mean and whether they
 answer the research question.</p>
 <p>surveyframe also does not build a qualitative coding interface.
 Manual, inductive coding (code-and-retrieve, memos, a hierarchical code
 scheme, the qcoder or RQDA style of analysis) is a different paradigm
-from the algorithmic methods here, human interpretation rather than
-counting or clustering, and is out of scope by design.
+from the algorithmic methods here, resting on human interpretation where
+these methods count and cluster, and is out of scope by design.
 <code><a href="../reference/extract_quotes.html">extract_quotes()</a></code>’s output is deliberately a plain data
 frame, clean enough to export and take into a dedicated qualitative
-coding tool for that next step, rather than surveyframe trying to be
-that tool itself.</p>
+coding tool for that next step, which surveyframe leaves to the tools
+built for it.</p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

@@ -5,9 +5,10 @@ from knowing which survey to build, so this article works the other way
 round: it starts from the survey you are trying to run and shows the
 whole path, from the questionnaire to the report.
 
-There are **22 demos**, each doing one job. Every one ships an
-instrument, its response data, a codebook, and the results surveyframe
-produced, so you can load one, change it, and keep going.
+There are **22 demos**: 17 analysis examples, three presentation
+examples, and two provenance examples. Each has an instrument, response
+data, a codebook, and surveyframe’s expected results. Presentation and
+provenance demos reuse the matching analysis data where appropriate.
 
 ``` r
 
@@ -19,6 +20,20 @@ head(sframe_demos()[, c("name", "teaches")], 5)
 #> 4     two_group                     Two groups on one outcome
 #> 5        paired                The same people measured twice
 ```
+
+Try the shortest complete route first:
+
+``` r
+
+demo <- sframe_demo("first_survey")
+results <- run_analysis_plan(demo$responses, demo$instrument)
+sframe_demo_qmd("first_survey") # write an editable Quarto notebook
+```
+
+The package stores the 22 compact instruments and datasets, and
+generates a notebook only when you ask:
+[`sframe_demo_qmd()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_demo_qmd.md)
+creates one for whichever demo you choose.
 
 ## Read this as your own field
 
@@ -40,27 +55,39 @@ workshop or a clinic appointment.
 
 ## Which demo do I need?
 
-Choose by the data you have, rather than by the name of a test.
+Choose by the data you have, and let the name of the test follow from
+it.
 
 | You have | Use | Demo |
 |----|----|----|
 | A few questions and no plan yet | Start here | `first_survey` |
-| Several items meant to measure one thing | A scale, and its reliability | `likert_scale` |
+| Four items meant to measure one thing | A scale, and its reliability | `likert_scale` |
 | A grid of items rated on one scale | A matrix item | `matrix_likert` |
 | One number and two groups | A two-group comparison | `two_group` |
 | The same people measured twice | A paired test | `paired` |
 | One number and three or more groups | ANOVA and its alternatives | `multi_group` |
 | The same people measured three times | Repeated measures | `repeated` |
 | Two categorical questions | A crosstab and a test of association | `categorical` |
-| Several numbers that may go together | Correlation and regression | `correlation_regression` |
+| Four numbers that may go together | Correlation and regression | `correlation_regression` |
 | A yes/no, ordered, or multi-category outcome | Logistic regression | `logistic` |
 | Many items and a hunch about the structure | Factor analysis | `factor_structure` |
 | Constructs and a path model | SEM and PLS | `sem_pls` |
 | Questions only some people should see | Skip logic | `branching` |
 | Free-text answers | Text analysis | `open_text` |
-| A decision between options on several criteria | MCDA | `mcdm_choice` |
+| A decision between options on four criteria | MCDA | `mcdm_choice` |
 | Fewer than 30 respondents | Small-sample methods | `small_sample` |
 | Tick-all-that-apply, or a ranking | Items that expand | `multi_response` |
+
+The remaining five demos teach presentation and provenance, not a new
+statistical method:
+
+| You want to learn | Demo |
+|----|----|
+| A welcome page, logo, colour, and thank-you page | `branded_survey` |
+| One-question-at-a-time presentation | `conversational_survey` |
+| Conversational presentation with skip logic | `conversational_branching` |
+| A disclosed mid-study revision | `instrument_revision` |
+| Integrity checking and a deliberately altered file | `verification` |
 
 ## The shape of every study
 
@@ -73,8 +100,8 @@ the plan, the data contract and the report together as one object.
 
 The step that matters is the first one. The analysis plan is declared
 **inside the instrument, before any data exists**, so running it later
-is the execution of a contract rather than a search for something
-significant.
+is the execution of a contract, which is what separates it from a search
+for something significant.
 
 ## Start here: your first survey
 
@@ -135,12 +162,15 @@ The commonest comparison there is: one number, and two groups of people.
 tg <- sframe_demo("two_group")
 res <- run_analysis_plan(tg$responses, tg$instrument)
 for (b in res) cat(b$test, ": ", b$apa, "\n", sep = "")
-#> t_test_ind: t(57.89) = 3.36, p = 0.001, d = 0.87 [0.43, 1.35]
-#> mann_whitney: U = 626, z = -2.62, p = 0.009, r = 0.34 [0.10, 0.54], Hodges-Lehmann shift = 2.00 [0.00, 3.00]
+#> t_test_ind: t(57.89) = 3.36, p = .001, d = 0.87, 95% CI [0.43, 1.35]
+#> mann_whitney: U = 626, z = 2.63, p = .009, r = 0.34, 95% CI [0.10, 0.54], Hodges-Lehmann shift = 2.00, 95% CI [0.00, 3.00]
 ```
 
-Both tests are declared, so you report both rather than choosing
-afterwards whichever gave the smaller p value.
+Both tests are shown for teaching. In a real study, predeclare the
+primary test from the research question, estimand, design, and
+defensible assumptions, before seeing which produces the smaller
+p-value. If useful, predeclare the other as a sensitivity analysis and
+label it as such when reporting both.
 
 ### The same people, measured twice
 
@@ -152,8 +182,8 @@ pr <- sframe_demo("paired")
 for (b in run_analysis_plan(pr$responses, pr$instrument)) {
   cat(b$test, ": ", b$apa, "\n", sep = "")
 }
-#> t_test_pair: t(49) = -5.11, p < .001, d_z = -0.72 [-1.00, -0.49]
-#> wilcoxon_pair: V = 156, z = -4.31, p < .001, r = 0.61 [0.43, 0.77], pseudomedian = -7.50 [-12.00, -4.00]
+#> t_test_pair: t(49) = -5.11, p < .001, d_z = -0.72, 95% CI [-1.00, -0.49]
+#> wilcoxon_pair: V = 156, z = -4.31, p < .001, r = 0.63, 95% CI [0.43, 0.77], pseudomedian = -7.50, 95% CI [-12.00, -4.00]
 #> mcnemar: McNemar's chi-square(1) = 11.08, p < .001
 ```
 
@@ -167,8 +197,8 @@ mg <- sframe_demo("multi_group")
 for (b in run_analysis_plan(mg$responses, mg$instrument)[1:2]) {
   cat(b$test, ": ", b$apa, "\n", sep = "")
 }
-#> anova_one: F(2, 72) = 7.27, p = 0.001, η² = 0.168 [0.07, 0.34]
-#> kruskal_wallis: H(2) = 12.01, p = 0.002, η² = 0.139 [0.02, 0.33]
+#> anova_one: F(2, 72) = 7.27, p = .001, η² = 0.168, 95% CI [0.07, 0.34]
+#> kruskal_wallis: H(2) = 12.01, p = .002, η² = 0.139, 95% CI [0.02, 0.33]
 ```
 
 `repeated` and `categorical` follow the same shape. See
@@ -190,7 +220,7 @@ as.data.frame(rel)[, c("scale_id", "n_items", "alpha")]
 ```
 
 One item is reverse worded and declared with `reverse = TRUE`, so
-scoring handles it and you do not have to remember.
+scoring handles it and remembers for you.
 
 ### Factor structure, and a path model
 
@@ -286,8 +316,8 @@ str(sframe_demo_branding(), max.level = 1)
 #>  $ header      :List of 3
 ```
 
-Applied to any demo with `branded = TRUE`, which changes nothing on
-disk:
+Applied to any demo with `branded = TRUE`, which leaves the files on
+disk as they are:
 
 ``` r
 
@@ -303,9 +333,8 @@ questions:
 
 ![](figures/presentation-branded.png)
 
-Consent is enforced rather than decorative: with
-`consent_required = TRUE`, pressing Start without ticking the box
-refuses to continue.
+Consent is enforced: with `consent_required = TRUE`, pressing Start
+without ticking the box refuses to continue.
 
 ### One page, or one question at a time
 
@@ -376,9 +405,9 @@ report, and it travels inside the instrument.
 
 ### Proving a file is the one you think it is
 
-Every `.sframe` carries a SHA-256 of its own contents. The demo ships a
-clean file and a tampered copy, altered in a single response label with
-the stored hash left alone:
+Every `.sframe` written by the package carries a SHA-256 digest of its
+canonicalised content. The demo ships a clean file and a tampered copy,
+altered in a single response label with the stored digest left alone:
 
 ``` r
 
@@ -389,7 +418,11 @@ read_sframe(tampered)
 #> ! Integrity check failed for '/home/runner/work/_temp/Library/surveyframe/extdata/demos/verification_tampered.sframe'. The file may have been modified after it was written. Expected hash: cd0559dd3d78521f047d795300a3e5432ca759354efce4e6383b094c4bf7ef00. Stored hash: a677623e873632d441187904c82cb3067e3c2e6130b5991f618e8509f4473106.
 ```
 
-The file refuses to load. That is what the hash is for.
+The altered file refuses to load because its content no longer matches
+its stored digest. This detects an undisclosed content change alone:
+authorship, research quality, and full amendment disclosure each need
+separate evidence. A file can also be checked outside R, on the
+documentation site’s **Verify a file** page.
 
 ## Are you an instructor? Do you want to verify against established software?
 
@@ -418,7 +451,7 @@ sframe_export_labelled(d$responses, d$instrument, "two_group.sav")
 
 The `.sav` arrives with the question wording and the response options
 already attached, so your variables read “The event ran to time.” and
-“Strongly disagree” rather than `org_1` and `1`. **The plain CSV carries
+“Strongly disagree” in place of `org_1` and `1`. **The plain CSV carries
 codes**, and the codebook is what gives them meaning, so use one or the
 other.
 
@@ -426,13 +459,12 @@ other.
 an issue](https://github.com/MohammedAliSharafuddin/surveyframe/issues)
 with the demo name, the software you used, and both results. A
 disagreement is either a bug worth fixing or a difference in method
-worth documenting, and we would rather find out from you than not at
-all.
+worth documenting, and either way we would like to hear it from you.
 
 ## Run one yourself
 
-Each demo comes with a Quarto notebook: load, read, run the plan, render
-a report, export for checking elsewhere.
+An editable Quarto notebook can be generated for every demo: load, read,
+run the plan, render a report, and export for checking elsewhere.
 
 ``` r
 

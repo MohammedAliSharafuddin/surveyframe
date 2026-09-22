@@ -31,8 +31,12 @@ cramers_v_ci(tab, R = 2000, conf.level = 0.95, seed = NULL)
 
 ## Value
 
-A named numeric vector: `estimate`, `lower`, `upper`. The bounds are
-`NA` when the table holds fewer than 3 observations.
+A named numeric vector: `estimate`, `lower`, `upper`, with attributes
+`resamples`, `valid_resamples` and, when the interval is withheld,
+`reason`. The bounds are `NA` when fewer than 90% of resamples give a
+value, or when every resample gives the same value, since neither leaves
+a sampling distribution to read. The bounds are `NA` when the table
+holds fewer than 3 observations.
 
 ## See also
 
@@ -44,4 +48,8 @@ A named numeric vector: `estimate`, `lower`, `upper`. The bounds are
 cramers_v_ci(table(mtcars$am, mtcars$cyl), seed = 42)
 #>  estimate     lower     upper 
 #> 0.5226355 0.2581670 0.8157627 
+#> attr(,"resamples")
+#> [1] 2000
+#> attr(,"valid_resamples")
+#> [1] 1998
 ```

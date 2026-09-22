@@ -3,17 +3,11 @@
 splitting, lower-casing, punctuation stripping, and stop-word removal),
 then slides a window of n tokens across each response's token vector
 and counts how often each resulting n-gram occurs. n = 2 (the default)
-gives bigrams; n = 3 gives trigrams. Because stop words are already
-removed by the shared tokeniser, an n-gram never straddles a dropped
-word; it is built only from tokens that survive filtering, in their
-original order within each response."><meta property="og:description" content="Tokenises text via the same tokeniser as term_frequency() (whitespace
+gives bigrams, and n = 3 gives trigrams."><meta property="og:description" content="Tokenises text via the same tokeniser as term_frequency() (whitespace
 splitting, lower-casing, punctuation stripping, and stop-word removal),
 then slides a window of n tokens across each response's token vector
 and counts how often each resulting n-gram occurs. n = 2 (the default)
-gives bigrams; n = 3 gives trigrams. Because stop words are already
-removed by the shared tokeniser, an n-gram never straddles a dropped
-word; it is built only from tokens that survive filtering, in their
-original order within each response."><meta property="og:image" content="https://mohammedalisharafuddin.github.io/surveyframe/reference/figures/pkgdown-wordmark-tagline.png"><meta property="og:image:alt" content="surveyframe: From research design to reporting"><script type="application/ld+json">
+gives bigrams, and n = 3 gives trigrams."><meta property="og:image" content="https://mohammedalisharafuddin.github.io/surveyframe/reference/figures/pkgdown-wordmark-tagline.png"><meta property="og:image:alt" content="surveyframe: From research design to reporting"><script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "SoftwareSourceCode",
@@ -38,7 +32,7 @@ original order within each response."><meta property="og:image" content="https:/
 
     <a class="navbar-brand me-2" href="../index.html">surveyframe</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -68,10 +62,7 @@ original order within each response."><meta property="og:image" content="https:/
 splitting, lower-casing, punctuation stripping, and stop-word removal),
 then slides a window of <code>n</code> tokens across each response's token vector
 and counts how often each resulting n-gram occurs. <code>n = 2</code> (the default)
-gives bigrams; <code>n = 3</code> gives trigrams. Because stop words are already
-removed by the shared tokeniser, an n-gram never straddles a dropped
-word; it is built only from tokens that survive filtering, in their
-original order within each response.</p>
+gives bigrams, and <code>n = 3</code> gives trigrams.</p>
     </div>
 
     <div class="section level2">
@@ -107,7 +98,27 @@ first. Default <code>30</code>.</p></dd>
     <p>A data.frame with columns <code>term</code> (the space-joined n-gram), <code>n</code>,
 and <code>pct</code>.</p>
     </div>
+    <div class="section level2">
+    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
+    <p>An n-gram never straddles a removed stop word. Where "but" and "not" are
+filtered, "clean but not comfortable" yields no bigram at all, because
+"clean" and "comfortable" were never next to each other. This is what makes
+the output phrases respondents actually wrote.</p>
+    </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">demo</span> <span class="op">&lt;-</span> <span class="fu"><a href="sframe_demo_data.html">sframe_demo_data</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">cleaned</span> <span class="op">&lt;-</span> <span class="fu"><a href="clean_text_responses.html">clean_text_responses</a></span><span class="op">(</span><span class="va">demo</span><span class="op">$</span><span class="va">responses</span>, <span class="st">"comments"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu">ngram_frequency</span><span class="op">(</span><span class="va">cleaned</span>, n <span class="op">=</span> <span class="fl">2</span>, top_n <span class="op">=</span> <span class="fl">10</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                     term  n  pct</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 sustainability details 35 24.1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2           clear online 31 21.4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3         online content 31 21.4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4    service information 24 16.6</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5         useful service 24 16.6</span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 

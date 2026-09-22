@@ -38,7 +38,7 @@ scale shared by many items."><meta property="og:image" content="https://mohammed
 
     <a class="navbar-brand me-2" href="../index.html">surveyframe</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -97,6 +97,41 @@ replaced by display text.</p>
     <div class="dont-index"><p><code><a href="codebook_report.html">codebook_report()</a></code></p></div>
     </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">demo</span> <span class="op">&lt;-</span> <span class="fu"><a href="sframe_demo_data.html">sframe_demo_data</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">cb</span> <span class="op">&lt;-</span> <span class="fu"><a href="codebook_report.html">codebook_report</a></span><span class="op">(</span><span class="va">demo</span><span class="op">$</span><span class="va">instrument</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu">sframe_codebook_items_display</span><span class="op">(</span><span class="va">cb</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>           id                                                      label</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 visit_type                                               Visitor type</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2       dm_1       Digital content helped me discover tourism services.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3       dm_2 Social media information was useful for planning my visit.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4       dm_3 Online promotions improved my interest in the destination.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5       sq_1                   Tourism staff provided reliable service.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6       sq_2              The service environment was easy to navigate.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>            type</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 single_choice</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2        likert</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3        likert</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4        likert</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5        likert</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6        likert</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                                                                           choice_set</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1                                           first_time = First-time visitor; repeat = Repeat visitor</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2 1 = Strongly disagree; 2 = Disagree; 3 = Neither agree nor disagree; 4 = Agree; 5 = Strongly agree</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3 1 = Strongly disagree; 2 = Disagree; 3 = Neither agree nor disagree; 4 = Agree; 5 = Strongly agree</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4 1 = Strongly disagree; 2 = Disagree; 3 = Neither agree nor disagree; 4 = Agree; 5 = Strongly agree</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5 1 = Strongly disagree; 2 = Disagree; 3 = Neither agree nor disagree; 4 = Agree; 5 = Strongly agree</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6 1 = Strongly disagree; 2 = Disagree; 3 = Neither agree nor disagree; 4 = Agree; 5 = Strongly agree</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                          scale_id reverse required</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1                                   FALSE     TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2 Digital marketing effectiveness   FALSE     TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3 Digital marketing effectiveness   FALSE     TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4 Digital marketing effectiveness   FALSE     TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5                 Service quality   FALSE     TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6                 Service quality   FALSE     TRUE</span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 

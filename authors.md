@@ -12,14 +12,14 @@ Source:
 
 Sharafuddin M (2026). *surveyframe: Survey Instrument Workflows*.
 [doi:10.32614/CRAN.package.surveyframe](https://doi.org/10.32614/CRAN.package.surveyframe).
-R package version 0.4.1,
+R package version 0.4.2,
 <https://CRAN.R-project.org/package=surveyframe>.
 
     @Manual{,
       title = {surveyframe: Survey Instrument Workflows},
       author = {Mohammed Ali Sharafuddin},
       year = {2026},
-      note = {R package version 0.4.1},
+      note = {R package version 0.4.2},
       url = {https://CRAN.R-project.org/package=surveyframe},
       doi = {10.32614/CRAN.package.surveyframe},
     }

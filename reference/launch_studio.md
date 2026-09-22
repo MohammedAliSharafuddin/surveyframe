@@ -1,10 +1,10 @@
 # Launch the SurveyStudio interface
 
-Opens the SurveyStudio Shiny application, a visual interface for the
-complete surveyframe workflow. The studio includes screens to build a
-survey draft, open an existing instrument, preview the survey, upload
-responses, review data quality, inspect reliability, plan analyses, and
-export outputs.
+Opens the SurveyStudio Shiny application, the visual interface for
+working with an instrument that already exists. Its screens open an
+instrument, record and read amendments, preview the survey, upload
+responses, review data quality, inspect reliability, work on the
+analysis plan, read the dashboard, and export.
 
 ## Usage
 
@@ -16,7 +16,7 @@ launch_studio(
   submitted_at = NULL,
   meta_cols = NULL,
   strict = TRUE,
-  screen = c("auto", "build", "preview", "data", "quality", "analysis", "dashboard"),
+  screen = "auto",
   port = NULL,
   host = "127.0.0.1",
   launch.browser = interactive()
@@ -55,8 +55,10 @@ launch_studio(
 
 - screen:
 
-  Initial studio screen. One of `"auto"`, `"build"`, `"preview"`,
-  `"data"`, `"quality"`, `"analysis"`, or `"dashboard"`.
+  The screen to open on. One of `"auto"`, which picks by what you
+  supply, or a screen name: `"open"`, `"amendments"`, `"preview"`,
+  `"responses"`, `"quality"`, `"reliability"`, `"analysis"`,
+  `"dashboard"` or `"export"`. `"data"` is accepted for `"responses"`.
 
 - port:
 
@@ -74,6 +76,13 @@ launch_studio(
 ## Value
 
 Called for its side effect.
+
+## Details
+
+Studio reads and analyses an instrument. To author one, question by
+question, use
+[`launch_builder()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/launch_builder.md),
+and open the result here.
 
 ## See also
 

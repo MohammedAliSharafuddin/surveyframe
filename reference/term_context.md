@@ -45,3 +45,32 @@ term_context(text, term, window = 6L, max_matches = 20L)
 ## Value
 
 A data.frame with columns `respondent`, `before`, `match`, and `after`.
+
+## Examples
+
+``` r
+demo <- sframe_demo_data()
+cleaned <- clean_text_responses(demo$responses, "comments")
+term_context(cleaned, "service", window = 4)
+#>    respondent before   match       after
+#> 1           2 useful service information
+#> 2           3 useful service information
+#> 3           7 useful service information
+#> 4          15 useful service information
+#> 5          20 useful service information
+#> 6          36 useful service information
+#> 7          38 useful service information
+#> 8          42 useful service information
+#> 9          45 useful service information
+#> 10         50 useful service information
+#> 11         59 useful service information
+#> 12         65 useful service information
+#> 13         75 useful service information
+#> 14         78 useful service information
+#> 15         84 useful service information
+#> 16         85 useful service information
+#> 17         90 useful service information
+#> 18         93 useful service information
+#> 19         95 useful service information
+#> 20        101 useful service information
+```

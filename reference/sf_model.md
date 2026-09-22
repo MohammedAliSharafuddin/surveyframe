@@ -69,3 +69,22 @@ sf_model(
 ## Value
 
 An object of class `sf_model`.
+
+## Examples
+
+``` r
+m <- sf_model(
+  "cb1", "Quality drives intention", type = "cb_sem",
+  constructs = list(
+    sf_construct("sq", "Service Quality", items = c("sq_1", "sq_2", "sq_3")),
+    sf_construct("sat", "Satisfaction", items = c("sat_1", "sat_2")),
+    sf_construct("bi", "Behavioural Intention", items = c("bi_1", "bi_2"))
+  ),
+  paths = list(sf_path("sq", "sat"), sf_path("sat", "bi")),
+  indirect = list(sf_indirect("sq", through = "sat", to = "bi"))
+)
+m$type
+#> [1] "cb_sem"
+m$engine
+#> [1] "lavaan"
+```

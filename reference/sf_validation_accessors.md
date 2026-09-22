@@ -1,27 +1,11 @@
 # Read a validation diagnostic
 
-`sf_is_valid()` reports whether the object passed. `sf_problems()`
-returns the problem messages. `sf_object()` returns the object that was
-validated.
-
-## Usage
-
-``` r
-sf_is_valid(x, ...)
-
-sf_problems(x, ...)
-
-sf_object(x, ...)
-
-# S3 method for class 'sframe_validation'
-sf_is_valid(x, ...)
-
-# S3 method for class 'sframe_validation'
-sf_problems(x, ...)
-
-# S3 method for class 'sframe_validation'
-sf_object(x, ...)
-```
+[`sf_is_valid()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_is_valid.md)
+reports whether the object passed.
+[`sf_problems()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_problems.md)
+returns the problem messages.
+[`sf_object()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_object.md)
+returns the object that was validated.
 
 ## Arguments
 
@@ -37,9 +21,12 @@ sf_object(x, ...)
 
 ## Value
 
-`sf_is_valid()` returns a single logical. `sf_problems()` returns a
-character vector, empty when the object is valid. `sf_object()` returns
-the validated object.
+[`sf_is_valid()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_is_valid.md)
+returns a single logical.
+[`sf_problems()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_problems.md)
+returns a character vector, empty when the object is valid.
+[`sf_object()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_object.md)
+returns the validated object.
 
 ## See also
 

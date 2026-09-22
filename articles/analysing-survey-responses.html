@@ -45,7 +45,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">surveyframe</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -131,8 +131,10 @@ data.</p>
 <h2 id="import-responses">Import responses<a class="anchor" aria-label="anchor" href="#import-responses"></a>
 </h2>
 <p>Response data uses instrument item IDs as column names. Metadata
-columns are declared explicitly. Use <code>strict = TRUE</code> to keep
-only known columns.</p>
+columns are declared explicitly. With <code>strict = TRUE</code>, an
+undeclared column is an error. With <code>strict = FALSE</code>, it is
+retained with a warning. Strict mode therefore catches an unexpected
+export instead of silently discarding columns.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">responses</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_responses.html">read_responses</a></span><span class="op">(</span></span>
 <span>  <span class="va">demo</span><span class="op">$</span><span class="va">responses_path</span>,</span>
@@ -168,106 +170,106 @@ only known columns.</p>
 <td align="left">visit_type</td>
 <td align="left">visit_type</td>
 <td align="right">0</td>
-<td align="right">0</td>
+<td align="right">0.00</td>
 <td align="right">120</td>
 </tr>
 <tr class="even">
 <td align="left">dm_1</td>
 <td align="left">dm_1</td>
 <td align="right">0</td>
-<td align="right">0</td>
+<td align="right">0.00</td>
 <td align="right">120</td>
 </tr>
 <tr class="odd">
 <td align="left">dm_2</td>
 <td align="left">dm_2</td>
 <td align="right">0</td>
-<td align="right">0</td>
+<td align="right">0.00</td>
 <td align="right">120</td>
 </tr>
 <tr class="even">
 <td align="left">dm_3</td>
 <td align="left">dm_3</td>
 <td align="right">0</td>
-<td align="right">0</td>
+<td align="right">0.00</td>
 <td align="right">120</td>
 </tr>
 <tr class="odd">
 <td align="left">sq_1</td>
 <td align="left">sq_1</td>
 <td align="right">0</td>
-<td align="right">0</td>
+<td align="right">0.00</td>
 <td align="right">120</td>
 </tr>
 <tr class="even">
 <td align="left">sq_2</td>
 <td align="left">sq_2</td>
 <td align="right">0</td>
-<td align="right">0</td>
+<td align="right">0.00</td>
 <td align="right">120</td>
 </tr>
 <tr class="odd">
 <td align="left">sq_3</td>
 <td align="left">sq_3</td>
 <td align="right">0</td>
-<td align="right">0</td>
+<td align="right">0.00</td>
 <td align="right">120</td>
 </tr>
 <tr class="even">
 <td align="left">sus_1</td>
 <td align="left">sus_1</td>
 <td align="right">0</td>
-<td align="right">0</td>
+<td align="right">0.00</td>
 <td align="right">120</td>
 </tr>
 <tr class="odd">
 <td align="left">sus_2</td>
 <td align="left">sus_2</td>
 <td align="right">0</td>
-<td align="right">0</td>
+<td align="right">0.00</td>
 <td align="right">120</td>
 </tr>
 <tr class="even">
 <td align="left">sat_1</td>
 <td align="left">sat_1</td>
 <td align="right">0</td>
-<td align="right">0</td>
+<td align="right">0.00</td>
 <td align="right">120</td>
 </tr>
 <tr class="odd">
 <td align="left">sat_2</td>
 <td align="left">sat_2</td>
 <td align="right">0</td>
-<td align="right">0</td>
+<td align="right">0.00</td>
 <td align="right">120</td>
 </tr>
 <tr class="even">
 <td align="left">bi_1</td>
 <td align="left">bi_1</td>
 <td align="right">0</td>
-<td align="right">0</td>
+<td align="right">0.00</td>
 <td align="right">120</td>
 </tr>
 <tr class="odd">
 <td align="left">bi_2</td>
 <td align="left">bi_2</td>
 <td align="right">0</td>
-<td align="right">0</td>
+<td align="right">0.00</td>
 <td align="right">120</td>
 </tr>
 <tr class="even">
 <td align="left">attention</td>
 <td align="left">attention</td>
 <td align="right">0</td>
-<td align="right">0</td>
+<td align="right">0.00</td>
 <td align="right">120</td>
 </tr>
 <tr class="odd">
 <td align="left">comments</td>
 <td align="left">comments</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">120</td>
+<td align="right">30</td>
+<td align="right">0.25</td>
+<td align="right">90</td>
 </tr>
 </tbody>
 </table>
@@ -426,7 +428,7 @@ variables that fill each role. A correlation expects <code>x</code> and
 <code>dependent</code> variable. A group comparison expects a
 <code>group</code> and an <code>outcome</code>.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/sf_accessors.html">sf_plan</a></span><span class="op">(</span><span class="va">instr</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/sf_plan.html">sf_plan</a></span><span class="op">(</span><span class="va">instr</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>id <span class="op">=</span> <span class="st">"RQ1"</span>,</span>
 <span>       research_question <span class="op">=</span> <span class="st">"Is digital marketing perception associated with satisfaction?"</span>,</span>
 <span>       family <span class="op">=</span> <span class="st">"association"</span>, method <span class="op">=</span> <span class="st">"correlation_pearson"</span>,</span>
@@ -453,10 +455,10 @@ variables that fill each role. A correlation expects <code>x</code> and
 <span><span class="fu">results_table</span><span class="op">(</span><span class="va">results</span><span class="op">)</span></span></code></pre></div>
 <table class="table">
 <colgroup>
-<col width="2%">
-<col width="35%">
-<col width="4%">
-<col width="52%">
+<col width="1%">
+<col width="33%">
+<col width="3%">
+<col width="55%">
 <col width="5%">
 </colgroup>
 <thead><tr class="header">
@@ -472,7 +474,7 @@ variables that fill each role. A correlation expects <code>x</code> and
 <td align="left">Is digital marketing perception associated with
 satisfaction?</td>
 <td align="left">pearson</td>
-<td align="right">r(118) = 0.54 [0.40, 0.65], p &lt; .001</td>
+<td align="right">r(118) = 0.54, 95% CI [0.40, 0.65], p &lt; .001</td>
 <td align="left">large</td>
 </tr>
 <tr class="even">
@@ -488,8 +490,8 @@ satisfaction?</td>
 <td align="left">Do first-time and repeat visitors differ in behavioural
 intention?</td>
 <td align="left"></td>
-<td align="right">U = 1576, z = -0.98, p = 0.327, r = 0.09 [0.00, 0.27],
-Hodges-Lehmann shift = -0.00 [-0.50, 0.00]</td>
+<td align="right">U = 1576, z = -0.98, p = .326, r = 0.09, 95% CI [0.00,
+0.27], Hodges-Lehmann shift = -0.00, 95% CI [-0.50, 0.00]</td>
 <td align="left">negligible</td>
 </tr>
 </tbody>
@@ -514,11 +516,11 @@ writing prompt, and the references that support the technique.</p>
 <code class="sourceCode R"><span><span class="va">rq1</span> <span class="op">&lt;-</span> <span class="va">results</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span></span>
 <span></span>
 <span><span class="va">rq1</span><span class="op">$</span><span class="va">apa</span></span>
-<span><span class="co">#&gt; [1] "r(118) = 0.54 [0.40, 0.65], p &lt; .001"</span></span>
+<span><span class="co">#&gt; [1] "r(118) = 0.54, 95% CI [0.40, 0.65], p &lt; .001"</span></span>
 <span><span class="va">rq1</span><span class="op">$</span><span class="va">effect_label</span></span>
 <span><span class="co">#&gt; [1] "large"</span></span>
 <span><span class="va">rq1</span><span class="op">$</span><span class="va">prompt</span></span>
-<span><span class="co">#&gt; [1] "There was a positive, large significant correlation between digital_marketing and satisfaction, r(118) = 0.54 [0.40, 0.65], p &lt; .001. Explain what this means for your research question."</span></span>
+<span><span class="co">#&gt; [1] "There was a positive, large significant correlation between digital_marketing and satisfaction, r(118) = 0.54, 95% CI [0.40, 0.65], p &lt; .001. Explain what this means for your research question."</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/unlist.html" class="external-link">unlist</a></span><span class="op">(</span><span class="va">rq1</span><span class="op">$</span><span class="va">citations</span><span class="op">)</span></span>
 <span><span class="co">#&gt;                                                                                                                                                         field_2018 </span></span>
 <span><span class="co">#&gt;                                                                            "Field, A. (2018). *Discovering statistics using IBM SPSS statistics* (5th ed.). SAGE." </span></span>
@@ -527,7 +529,7 @@ writing prompt, and the references that support the technique.</p>
 <span><span class="co">#&gt;                                                                                                                                                             r_core </span></span>
 <span><span class="co">#&gt;                                          "R Core Team. (2026). *R: A language and environment for statistical computing*. R Foundation for Statistical Computing." </span></span>
 <span><span class="co">#&gt;                                                                                                                                                        surveyframe </span></span>
-<span><span class="co">#&gt; "Sharafuddin, M. A. (2026). *surveyframe: Survey Instrument Workflows* (Version 0.4.1) [Computer software]. https://github.com/MohammedAliSharafuddin/surveyframe"</span></span></code></pre></div>
+<span><span class="co">#&gt; "Sharafuddin, M. A. (2026). *surveyframe: Survey Instrument Workflows* (Version 0.4.2) [Computer software]. https://github.com/MohammedAliSharafuddin/surveyframe"</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="render-the-results-report">Render the results report<a class="anchor" aria-label="anchor" href="#render-the-results-report"></a>
@@ -553,6 +555,14 @@ full report is produced on the Export screen.</p>
 <span>  screen         <span class="op">=</span> <span class="st">"analysis"</span>,</span>
 <span>  launch.browser <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="next-step">Next step<a class="anchor" aria-label="anchor" href="#next-step"></a>
+</h2>
+<p>You now have imported, screened, scored, and analysed responses.
+Continue with the scale reliability and validity vignette for
+measurement evidence, or copy an editable worked notebook with
+<code>sframe_demo_qmd("two_group")</code>.</p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

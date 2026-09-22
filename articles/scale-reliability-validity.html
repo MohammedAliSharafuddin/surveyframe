@@ -45,7 +45,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">surveyframe</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -113,7 +113,7 @@ Thailand digital marketing study (Sharafuddin, Madhavan, and Wangtueai
 2024). The reliability and item reports read scale definitions from an
 instrument, so they are shown on the bundled tourism demo, a synthetic
 companion to the study. The validity summary runs on the loadings the
-paper reported, which needs no raw data.</p>
+paper reported, which is all it needs.</p>
 <div class="section level2">
 <h2 id="reliability-from-the-instrument">Reliability from the instrument<a class="anchor" aria-label="anchor" href="#reliability-from-the-instrument"></a>
 </h2>
@@ -287,11 +287,11 @@ Bartlett’s test as a screening step before a confirmatory model.</p>
 <div class="section level2">
 <h2 id="convergent-validity-from-the-published-loadings">Convergent validity from the published loadings<a class="anchor" aria-label="anchor" href="#convergent-validity-from-the-published-loadings"></a>
 </h2>
-<p>This step needs no raw data. <code><a href="../reference/validity_report.html">validity_report()</a></code> computes
-composite reliability and average variance extracted from standardised
-loadings. Feeding the outer loadings reported in the paper reproduces
-its convergent validity, which is a direct check of the measurement
-model.</p>
+<p>This step runs on the loadings alone. <code><a href="../reference/validity_report.html">validity_report()</a></code>
+computes composite reliability and average variance extracted from
+standardised loadings. Feeding the outer loadings reported in the paper
+reproduces its convergent validity, which is a direct check of the
+measurement model.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">published_loadings</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>  DMRE <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>dmre_1 <span class="op">=</span> <span class="fl">.815</span>, dmre_2 <span class="op">=</span> <span class="fl">.899</span>, dmre_3 <span class="op">=</span> <span class="fl">.668</span>, dmre_4 <span class="op">=</span> <span class="fl">.838</span><span class="op">)</span>,</span>
@@ -401,19 +401,50 @@ behavioural intention, each exceeded the off-diagonal correlations. The
 Heterotrait-Monotrait ratios were all below the 0.90 threshold, the
 highest being 0.766 between ease of use and accessibility. Both results
 support discriminant validity.</p>
-<p>When construct scores are available, <code><a href="../reference/validity_report.html">validity_report()</a></code>
-returns the Fornell-Larcker matrix and the HTMT matrix directly.</p>
+<p><code><a href="../reference/validity_report.html">validity_report()</a></code> computes both, and which one you get
+depends on what you give it. Construct scores give the Fornell-Larcker
+matrix, and the <code>htmt</code> element then holds the absolute
+inter-construct correlations, which is a different quantity from the
+Henseler ratio. Item-level responses per construct give the real
+heterotrait-monotrait ratio. The report records which it computed in
+<code>htmt_method</code>, so a write-up can name the quantity it
+reports.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/validity_report.html">validity_report</a></span><span class="op">(</span><span class="va">published_loadings</span>, construct_scores <span class="op">=</span> <span class="va">scored_constructs</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">demo</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sframe_demo_data.html">sframe_demo_data</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">scored</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/score_scales.html">score_scales</a></span><span class="op">(</span><span class="va">demo</span><span class="op">$</span><span class="va">responses</span>, <span class="va">demo</span><span class="op">$</span><span class="va">instrument</span><span class="op">)</span></span>
+<span><span class="va">scale_ids</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">vapply</a></span><span class="op">(</span><span class="fu"><a href="../reference/sf_scales.html">sf_scales</a></span><span class="op">(</span><span class="va">demo</span><span class="op">$</span><span class="va">instrument</span><span class="op">)</span>, <span class="va">sf_id</span>, <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">character</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">construct_scores</span> <span class="op">&lt;-</span> <span class="va">scored</span><span class="op">[</span>, <span class="va">scale_ids</span>, drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span></span>
+<span></span>
+<span><span class="va">loadings</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="fu"><a href="../reference/sf_scales.html">sf_scales</a></span><span class="op">(</span><span class="va">demo</span><span class="op">$</span><span class="va">instrument</span><span class="op">)</span>, <span class="kw">function</span><span class="op">(</span><span class="va">s</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/setNames.html" class="external-link">setNames</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0.8</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">s</span><span class="op">$</span><span class="va">items</span><span class="op">)</span><span class="op">)</span>, <span class="va">s</span><span class="op">$</span><span class="va">items</span><span class="op">)</span></span>
+<span><span class="op">}</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">loadings</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">scale_ids</span></span>
+<span></span>
+<span><span class="va">from_scores</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/validity_report.html">validity_report</a></span><span class="op">(</span><span class="va">loadings</span>, construct_scores <span class="op">=</span> <span class="va">construct_scores</span><span class="op">)</span></span>
+<span><span class="va">from_scores</span><span class="op">$</span><span class="va">htmt_method</span></span>
+<span><span class="co">#&gt; [1] "correlation_fallback"</span></span></code></pre></div>
+<p>Passing the items themselves is what asks for the Henseler ratio:</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">items_by_construct</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="fu"><a href="../reference/sf_scales.html">sf_scales</a></span><span class="op">(</span><span class="va">demo</span><span class="op">$</span><span class="va">instrument</span><span class="op">)</span>, <span class="kw">function</span><span class="op">(</span><span class="va">s</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">scored</span><span class="op">[</span>, <span class="va">s</span><span class="op">$</span><span class="va">items</span>, drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span></span>
+<span><span class="op">}</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">items_by_construct</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">scale_ids</span></span>
+<span></span>
+<span><span class="va">real_htmt</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/validity_report.html">validity_report</a></span><span class="op">(</span><span class="va">loadings</span>, construct_scores <span class="op">=</span> <span class="va">construct_scores</span>,</span>
+<span>                             items_by_construct <span class="op">=</span> <span class="va">items_by_construct</span><span class="op">)</span></span>
+<span><span class="va">real_htmt</span><span class="op">$</span><span class="va">htmt_method</span></span>
+<span><span class="co">#&gt; [1] "henseler"</span></span></code></pre></div>
+<p>A construct with a single item has no monotrait correlations, so its
+HTMT entries come back <code>NA</code>.</p>
 </div>
 <div class="section level2">
 <h2 id="collinearity">Collinearity<a class="anchor" aria-label="anchor" href="#collinearity"></a>
 </h2>
 <p>The study reported variance inflation factors below 5 for every
-indicator, which indicates no severe multicollinearity.
+indicator, which indicates multicollinearity mild enough to proceed.
 <code><a href="../reference/assumption_report.html">assumption_report()</a></code> returns variance inflation factors when
-a regression is specified, which is shown in the analysing-responses
-vignette.</p>
+a regression is specified, which is shown in the “Analysing survey
+responses” vignette.</p>
 </div>
 <div class="section level2">
 <h2 id="cautious-interpretation">Cautious interpretation<a class="anchor" aria-label="anchor" href="#cautious-interpretation"></a>

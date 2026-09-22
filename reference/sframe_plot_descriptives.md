@@ -45,3 +45,16 @@ enough data to draw.
 ## See also
 
 [`descriptives_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/descriptives_report.md)
+
+## Examples
+
+``` r
+# \donttest{
+if (requireNamespace("ggplot2", quietly = TRUE)) {
+  demo <- sframe_demo_data()
+  dr <- descriptives_report(demo$responses, variables = c("sat_1", "sat_2"))
+  sframe_plot_descriptives(dr, demo$responses)
+}
+
+# }
+```

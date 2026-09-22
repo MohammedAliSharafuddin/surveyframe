@@ -65,17 +65,69 @@ EFA, CFA, CB-SEM, and PLS-SEM.
 
 ### The instrument object
 
-Every function in the package operates on an `sframe` object. The object
-is the single source of truth for item definitions, scale structure,
-reverse-coding keys, branching rules, check specifications, analysis
-plans, and optional model specifications. Accessors such as
-[`sf_meta()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_accessors.md),
-[`sf_items()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_accessors.md),
-[`sf_scales()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_accessors.md),
-[`sf_plan()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_accessors.md),
+The workflow runs on an `sframe` object. It is the single source of
+truth for item definitions, scale structure, reverse-coding keys,
+branching rules, check specifications, analysis plans, and optional
+model specifications. Accessors such as
+[`sf_meta()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_meta.md),
+[`sf_items()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_items.md),
+[`sf_scales()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_scales.md),
+[`sf_plan()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_plan.md),
 and
-[`sf_models()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_accessors.md)
+[`sf_models()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_models.md)
 read its parts without reaching into the object directly.
+
+Some helpers work on plain vectors, for use beside that workflow or on
+their own: the text helpers such as
+[`term_frequency()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/term_frequency.md),
+and the interval helpers
+[`bootstrap_ci()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/bootstrap_ci.md),
+[`cohens_d_ci()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/cohens_d_ci.md),
+[`cramers_v_ci()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/cramers_v_ci.md)
+and
+[`eta_sq_ci()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/eta_sq_ci.md).
+
+### A first session
+
+[`sframe_demos()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_demos.md)
+lists 22 worked demos, each one instrument, its responses and the
+results surveyframe produced. `sframe_demo("two_group")` loads one, and
+`sframe_demo_qmd("two_group")` writes a notebook to edit.
+[`vignette("learn-by-example")`](https://mohammedalisharafuddin.github.io/surveyframe/articles/learn-by-example.md)
+teaches from the same library.
+
+### How functions are named
+
+Three families, which the prefix tells apart.
+
+- `sf_` builds or reads the instrument object model: the constructors
+  [`sf_item()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_item.md)
+  and
+  [`sf_scale()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_scale.md),
+  the accessors
+  [`sf_items()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_items.md)
+  and
+  [`sf_plan()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_plan.md),
+  and the replacement forms such as `sf_plan<-`.
+
+- `sframe_` covers everything the package adds around that object: the
+  plots such as
+  [`sframe_plot_reliability()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_plot_reliability.md),
+  the demo library through
+  [`sframe_demos()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_demos.md),
+  the decision helpers, and the builder's own state.
+
+- The workflow verbs carry no prefix, because they name the step a
+  researcher is taking:
+  [`validate_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/validate_sframe.md),
+  [`score_scales()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/score_scales.md),
+  [`run_analysis_plan()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/run_analysis_plan.md),
+  [`render_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_report.md),
+  and the `_report()` family.
+
+The prefixes group functions; they do not pair them. No name stem
+appears under both, so there is no `sframe_` twin of an `sf_` function
+to look for.
 
 ### File format
 

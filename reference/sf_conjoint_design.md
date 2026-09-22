@@ -116,19 +116,19 @@ design <- sf_conjoint_design(
   method = "balanced", n_profiles = 6, n_alternatives = 2, seed = 42
 )
 design$profiles
-#>   profile_id price     board   distance
-#> 1         p1    50 breakfast beachfront
-#> 2         p2   100 room only beachfront
-#> 3         p3   150 breakfast beachfront
-#> 4         p4   150 room only beachfront
-#> 5         p5    50 room only beachfront
-#> 6         p6   100 breakfast beachfront
+#>   profile_id price     board    distance
+#> 1         p1   150 breakfast 10 min walk
+#> 2         p2    50 breakfast  beachfront
+#> 3         p3   100 room only  beachfront
+#> 4         p4   150 breakfast  beachfront
+#> 5         p5   100 breakfast 10 min walk
+#> 6         p6    50 room only 10 min walk
 design$tasks
 #>   block task alternative profile_id
-#> 1     1    1           1         p2
-#> 2     1    1           2         p4
+#> 1     1    1           1         p1
+#> 2     1    1           2         p6
 #> 3     1    2           1         p3
-#> 4     1    2           2         p6
+#> 4     1    2           2         p2
 #> 5     1    3           1         p5
-#> 6     1    3           2         p1
+#> 6     1    3           2         p4
 ```

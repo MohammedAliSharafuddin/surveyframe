@@ -2,20 +2,22 @@
 
 ## When is a sample “small”?
 
-Survey research often works with far fewer than the 30-or-more cases
-that justify asymptotic approximations: pilot studies, specialised
-populations, classroom studies, and early-stage organisational
-diagnostics routinely land at n = 10 to 25. Below that conventional
-threshold, p-values from tests that assume large-sample normality can be
-unreliable, and point estimates carry wide, often asymmetric uncertainty
-that a single p-value does not convey.
+Survey research often works with few observations: pilot studies,
+specialised populations, classroom studies, and early-stage
+organisational diagnostics may land at n = 10 to 25. Adequacy depends
+jointly on the design, group balance, outcome distribution, model,
+effect size, and estimand, so a single word count answers little on its
+own. With limited data, estimates are often imprecise and assumptions
+are harder to assess, so an isolated p-value carries limited
+information.
 
-surveyframe’s small-sample tools do three things: flag when a sample has
-crossed below the n = 30 threshold, prefer exact or distribution-free
-alternatives to the asymptotic default where one exists, and pair every
-affected estimate with a confidence interval rather than a point value
-alone. Together they surface the cases where design judgement matters
-most, leaving that judgement itself to the researcher.
+surveyframe uses n = 30 as a visible advisory heuristic that flags where
+assumptions deserve a closer look. Its small-sample tools surface exact
+or alternative procedures where available and pair estimates with
+uncertainty. Choosing one changes the question asked: a rank-based test
+may target a different quantity from a test about means, and
+“distribution-free” carries its own assumptions. Choose the method from
+the study design and estimand, and report the limited precision.
 
 ## Planning a small-sample study
 
@@ -30,7 +32,11 @@ sample_size_plan(type = "t_test", groups = 2)
 #> Sample-Size Plan
 #>   Target:      t_test
 #>   Estimated n: 128
+#>   Method:      power
 #>   Alpha:       0.050   Power: 0.80
+#>   Effect size: d = 0.5
+#> 
+#> Warning: Assumed a medium effect, d = 0.5. Supply d for the effect you expect.
 ```
 
 A worked instrument in this vignette targets n = 20 complete responses,
@@ -96,7 +102,7 @@ is.null(ar_large$advisory)
 
 The Mann-Whitney runner now reports the Hodges-Lehmann shift estimate
 alongside the rank-biserial effect size, with a confidence interval on
-the shift rather than a point estimate alone.
+the shift, which a point estimate alone leaves out.
 
 ``` r
 
@@ -121,20 +127,20 @@ results_table(mw_results)
 
 | RQ | Research question | Method | Result (APA) |
 |:---|:---|:---|---:|
-| RQ1 | Does the treatment arm score higher than control? |  | U = 34, z = -1.17, p = 0.241, r = 0.26 \[0.02, 0.64\], Hodges-Lehmann shift = -3.99 \[-14.38, 5.36\] |
+| RQ1 | Does the treatment arm score higher than control? |  | U = 34, z = -1.21, p = .226, r = 0.27, 95% CI \[0.02, 0.64\], Hodges-Lehmann shift = -3.99, 95% CI \[-13.75, 4.58\] |
 
 ``` r
 
 mw_results[[1]]$hl_shift
 #> [1] -3.987846
 mw_results[[1]]$hl_conf_int
-#> [1] -14.375194   5.363826
+#> [1] -13.750068   4.584132
 ```
 
 ## Paired Wilcoxon with the pseudomedian CI
 
 The paired runner reports a Hodges-Lehmann pseudomedian for the
-within-pair shift, again with an interval rather than a point value.
+within-pair shift, again with an interval in place of a point value.
 
 ``` r
 
@@ -155,14 +161,14 @@ results_table(wp_results)
 
 | RQ | Research question | Method | Result (APA) |
 |:---|:---|:---|---:|
-| RQ2 | Did scores change from before to after? |  | V = 0, z = -2.45, p = 0.014, r = 0.87 \[0.89, 0.90\], pseudomedian = -6.46 \[-11.98, -3.50\] |
+| RQ2 | Did scores change from before to after? |  | V = 0, z = -2.52, p = .012, r = 0.89, 95% CI \[0.89, 0.90\], pseudomedian = -6.46, 95% CI \[-11.70, -3.63\] |
 
 ``` r
 
 wp_results[[1]]$pseudomedian
 #> [1] -6.45986
 wp_results[[1]]$pseudomedian_conf_int
-#> [1] -11.977167  -3.498729
+#> [1] -11.700678  -3.633836
 ```
 
 ## Fisher’s exact test with the exact odds-ratio CI
@@ -212,7 +218,11 @@ pilot outcome scores.
 
 bootstrap_ci(pilot$outcome, FUN = stats::median, R = 999)
 #> estimate    lower    upper 
-#> 52.82878 47.33676 56.66709
+#> 52.82878 47.33676 56.66709 
+#> attr(,"resamples")
+#> [1] 999
+#> attr(,"valid_resamples")
+#> [1] 999
 ```
 
 ## Firth logistic regression for a rare or small binary outcome
@@ -239,7 +249,7 @@ results_table(firth_results)
 
 | RQ | Research question | Method | Result (APA) |
 |:---|:---|:---|---:|
-| RQ4 | Does the covariate predict conversion? |  | Firth logistic regression (n = 20), likelihood ratio = 0.05 |
+| RQ4 | Does the covariate predict conversion? |  | Firth logistic regression (n = 20), likelihood ratio = 0.10 |
 
 ``` r
 
@@ -257,15 +267,19 @@ firth_results[[1]]$coefficients
 [`cohens_d_ci()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/cohens_d_ci.md)
 pairs Cohen’s d with a bootstrap interval, which is informative
 precisely where it matters most: interval width grows visibly as n
-falls, making the extra uncertainty at small n explicit rather than
-implicit in a single point estimate.
+falls, making the extra uncertainty at small n explicit, where a single
+point estimate leaves it implicit.
 
 ``` r
 
 cohens_d_ci(pilot$outcome[pilot$group == "treatment"],
             pilot$outcome[pilot$group == "control"], R = 999)
 #>   estimate      lower      upper 
-#> 0.54201883 0.02928852 1.54044282
+#> 0.54201883 0.02928852 1.54044282 
+#> attr(,"resamples")
+#> [1] 999
+#> attr(,"valid_resamples")
+#> [1] 999
 ```
 
 ## Citation

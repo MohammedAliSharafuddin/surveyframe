@@ -47,3 +47,25 @@ assumption_report(
 ## Value
 
 An object of class `sframe_assumption_report`.
+
+## Examples
+
+``` r
+demo <- sframe_demo_data()
+ar <- assumption_report(demo$responses, variables = c("sat_1", "sat_2"),
+                         group = "visit_type")
+print(ar)
+#> Assumption Report
+#> 
+#> Normality:
+#>  variable   n shapiro_w    shapiro_p    skewness   kurtosis
+#>     sat_1 120 0.9087471 5.651017e-07 -0.17463397 -0.8225522
+#>     sat_2 120 0.9033205 2.912675e-07  0.04066335 -0.9588129
+#> 
+#> Homogeneity of variance:
+#>  variable           test         F         p
+#>     sat_1         Levene 0.2848288 0.5945575
+#>     sat_1 Brown-Forsythe 0.2292714 0.6329507
+#>     sat_2         Levene 0.1956862 0.6590353
+#>     sat_2 Brown-Forsythe 0.1522047 0.6971406
+```

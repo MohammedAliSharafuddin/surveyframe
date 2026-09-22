@@ -33,3 +33,16 @@ A ggplot2 object, or `NULL` when the result carries no ranking.
 ## See also
 
 [`run_analysis_plan()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/run_analysis_plan.md)
+
+## Examples
+
+``` r
+# \donttest{
+if (requireNamespace("ggplot2", quietly = TRUE)) {
+  demo <- sframe_demo("mcdm_choice")
+  res <- run_analysis_plan(demo$responses, demo$instrument)
+  sframe_plot_decision_ranking(res$RQ4)
+}
+
+# }
+```

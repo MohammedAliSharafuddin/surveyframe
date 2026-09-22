@@ -39,3 +39,16 @@ A named list of three ggplot2 objects (`histogram`, `boxplot`, `qq`), or
 
 [`descriptives_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/descriptives_report.md),
 [`sframe_plot_descriptives()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_plot_descriptives.md)
+
+## Examples
+
+``` r
+# \donttest{
+if (requireNamespace("ggplot2", quietly = TRUE)) {
+  demo <- sframe_demo_data()
+  panels <- sframe_plot_variable_distribution(demo$responses, "sat_1")
+  panels$histogram
+}
+
+# }
+```

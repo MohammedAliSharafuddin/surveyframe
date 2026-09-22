@@ -33,3 +33,12 @@ object). Empty list if no scale qualifies.
 
 [`sframe_plot_likert_scale()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_plot_likert_scale.md),
 [`sf_scale()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_scale.md)
+
+## Examples
+
+``` r
+demo <- sframe_demo("likert_scale")
+groups <- sframe_likert_scale_groups(demo$instrument)
+names(groups)
+#> [1] "organisation"
+```

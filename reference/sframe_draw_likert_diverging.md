@@ -58,3 +58,11 @@ colour tone alone.
 ## See also
 
 [`sframe_plot_item_chart()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_plot_item_chart.md)
+
+## Examples
+
+``` r
+counts <- c("Strongly disagree" = 5, "Disagree" = 10, "Neutral" = 15,
+            "Agree" = 40, "Strongly agree" = 30)
+sframe_draw_likert_diverging(counts)
+```

@@ -34,8 +34,8 @@ A list with `normalised` (N), `total_relation` (T), `D`, `R`,
 
 ## Details
 
-[`solve()`](https://rdrr.io/r/base/solve.html) fails outright if `I - N`
-is exactly singular, which does not arise for a matrix normalised this
-way in ordinary use. No fallback series truncation is implemented,
-unlike the harvested source, because a singular `I - N` here would
-signal a malformed matrix rather than a case to work around silently.
+The series converges only when the spectral radius of `N` is below 1.
+Normalisation keeps the radius at or below 1, and it equals 1 when
+criteria influence each other in a closed group with equal totals. That
+case returns an `error` explaining it, and no truncated series is
+substituted.

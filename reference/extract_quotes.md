@@ -45,3 +45,29 @@ extract_quotes(model, text, n_quotes = 3L)
 A data.frame with columns `topic`, `rank`, `respondent` (the original
 row index in the data the model's `text` argument came from, not a
 document-matrix or corpus row index), and `quote`.
+
+## Examples
+
+``` r
+# \donttest{
+if (requireNamespace("stm", quietly = TRUE) &&
+    requireNamespace("tidytext", quietly = TRUE)) {
+  demo <- sframe_demo_data()
+  sf_plan(demo$instrument) <- list(list(
+    id = "RQ1", research_question = "What themes appear in the comments?",
+    family = "text_analysis", method = "stm_topics",
+    roles = list(item = "comments"), options = list(k = 3, seed = 42)
+  ))
+  res <- run_analysis_plan(demo$responses, demo$instrument)
+  quotes <- extract_quotes(res$RQ1, demo$responses$comments, n_quotes = 2)
+  quotes
+}
+#>   topic rank respondent                                   quote
+#> 1     1    1         11                   Clear online content.
+#> 2     1    2         12                   Clear online content.
+#> 3     2    1          5 Would like more sustainability details.
+#> 4     2    2          8 Would like more sustainability details.
+#> 5     3    1          2             Useful service information.
+#> 6     3    2          3             Useful service information.
+# }
+```

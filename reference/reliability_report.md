@@ -1,4 +1,4 @@
-# Compute reliability statistics for scored scales
+# Estimate scale reliability from item responses
 
 Produces Cronbach's alpha and McDonald's omega for each scale defined in
 the instrument, along with the number of items and sample size.

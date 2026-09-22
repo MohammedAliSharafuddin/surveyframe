@@ -48,8 +48,18 @@ efa_report(
 An object of class `sframe_efa_report` with elements `kmo`, `bartlett`,
 `parallel`, and `suggested_nfactors`.
 
+## Fitting the solution
+
+This report says whether the data suit a factor analysis and how many
+factors to extract.
+[`efa_solution()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/efa_solution.md)
+then fits that solution and returns the loadings, so the whole route
+stays in surveyframe. Take the result to another package when you want a
+method surveyframe leaves out.
+
 ## See also
 
+[`efa_solution()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/efa_solution.md),
 [`reliability_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/reliability_report.md),
 [`cfa_syntax()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/cfa_syntax.md)
 

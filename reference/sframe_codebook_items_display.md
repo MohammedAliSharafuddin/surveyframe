@@ -32,3 +32,39 @@ by display text.
 ## See also
 
 [`codebook_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/codebook_report.md)
+
+## Examples
+
+``` r
+demo <- sframe_demo_data()
+cb <- codebook_report(demo$instrument)
+head(sframe_codebook_items_display(cb))
+#>           id                                                      label
+#> 1 visit_type                                               Visitor type
+#> 2       dm_1       Digital content helped me discover tourism services.
+#> 3       dm_2 Social media information was useful for planning my visit.
+#> 4       dm_3 Online promotions improved my interest in the destination.
+#> 5       sq_1                   Tourism staff provided reliable service.
+#> 6       sq_2              The service environment was easy to navigate.
+#>            type
+#> 1 single_choice
+#> 2        likert
+#> 3        likert
+#> 4        likert
+#> 5        likert
+#> 6        likert
+#>                                                                                           choice_set
+#> 1                                           first_time = First-time visitor; repeat = Repeat visitor
+#> 2 1 = Strongly disagree; 2 = Disagree; 3 = Neither agree nor disagree; 4 = Agree; 5 = Strongly agree
+#> 3 1 = Strongly disagree; 2 = Disagree; 3 = Neither agree nor disagree; 4 = Agree; 5 = Strongly agree
+#> 4 1 = Strongly disagree; 2 = Disagree; 3 = Neither agree nor disagree; 4 = Agree; 5 = Strongly agree
+#> 5 1 = Strongly disagree; 2 = Disagree; 3 = Neither agree nor disagree; 4 = Agree; 5 = Strongly agree
+#> 6 1 = Strongly disagree; 2 = Disagree; 3 = Neither agree nor disagree; 4 = Agree; 5 = Strongly agree
+#>                          scale_id reverse required
+#> 1                                   FALSE     TRUE
+#> 2 Digital marketing effectiveness   FALSE     TRUE
+#> 3 Digital marketing effectiveness   FALSE     TRUE
+#> 4 Digital marketing effectiveness   FALSE     TRUE
+#> 5                 Service quality   FALSE     TRUE
+#> 6                 Service quality   FALSE     TRUE
+```

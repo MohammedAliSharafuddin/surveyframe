@@ -1,12 +1,8 @@
-# Item distribution chart, ggplot2 equivalent of the dashboard/studio panel
+# Plot an item response distribution
 
-Shared by
-[`launch_dashboard()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/launch_dashboard.md)
-(`inst/shiny/dashboard/app.R`) and the SurveyStudio dashboard tab
-(`inst/shiny/app.R`), which otherwise duplicated this base-graphics
-chart. Callers fall back to their own base graphics when this returns
-`NULL` (ggplot2 not installed, unsupported item type, or no data), so
-the dashboard keeps working without ggplot2.
+Draws how one item was answered, as the dashboard and SurveyStudio
+panels show it. It returns `NULL` where it has nothing to draw, so a
+caller can fall back to its own chart.
 
 ## Usage
 
@@ -41,3 +37,27 @@ sframe_plot_item_chart(
 ## Value
 
 A ggplot2 object, or `NULL` if this item type/data is unsupported.
+
+## Details
+
+Shared by
+[`launch_dashboard()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/launch_dashboard.md)
+(`inst/shiny/dashboard/app.R`) and the SurveyStudio dashboard tab
+(`inst/shiny/app.R`), which otherwise duplicated this base-graphics
+chart. Callers fall back to their own base graphics when this returns
+`NULL` (ggplot2 not installed, unsupported item type, or no data), so
+the dashboard keeps working without ggplot2.
+
+## Examples
+
+``` r
+# \donttest{
+if (requireNamespace("ggplot2", quietly = TRUE)) {
+  demo <- sframe_demo_data()
+  item <- Filter(function(i) i$id == "sat_1", demo$instrument$items)[[1]]
+  cs   <- Filter(function(c) c$id == item$choice_set, demo$instrument$choices)[[1]]
+  sframe_plot_item_chart(item, demo$responses$sat_1, cs)
+}
+
+# }
+```

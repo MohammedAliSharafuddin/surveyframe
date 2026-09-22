@@ -33,8 +33,21 @@ cfa_syntax(instrument, scales = NULL, std_lv = TRUE)
 
 A character string of `lavaan` CFA model syntax.
 
+## Which of the two to use
+
+This is the instrument-only convenience wrapper: one call, constructs
+taken from the instrument's scales.
+[`cfa_lavaan_syntax()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/cfa_lavaan_syntax.md)
+is the general entry point, and takes those same arguments plus a
+declared
+[`sf_model()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_model.md),
+correlated residuals and latent covariances. Reach for it where the
+constructs differ from the scales. This wrapper stays supported, so a
+script calling it keeps working.
+
 ## See also
 
+[`cfa_lavaan_syntax()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/cfa_lavaan_syntax.md),
 [`efa_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/efa_report.md),
 [`reliability_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/reliability_report.md)
 

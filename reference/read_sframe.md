@@ -1,8 +1,11 @@
 # Read an instrument from a .sframe file
 
 Reads a `.sframe` JSON file and reconstructs an `sframe` instrument
-object. The SHA-256 integrity hash is verified on load unless
-`validate = FALSE`.
+object. The SHA-256 integrity hash is always verified, and a file whose
+content does not match its hash is refused. The hash covers a canonical
+form of the content, so it detects a change to the content of a written
+file, and it ignores whitespace and key order. It is unsigned, so anyone
+who edits a file can also recompute it.
 
 ## Usage
 
@@ -20,11 +23,19 @@ read_sframe(path, validate = TRUE)
 
   Logical. Whether to validate the loaded instrument with
   [`validate_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/validate_sframe.md).
-  Defaults to `TRUE`.
+  Defaults to `TRUE`. This controls structural validation only. The
+  integrity hash is verified either way.
 
 ## Value
 
 An `sframe` object.
+
+## Details
+
+The instrument remembers the content and amendment log it was read with,
+so
+[`write_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/write_sframe.md)
+can refuse an undisclosed revision.
 
 ## See also
 

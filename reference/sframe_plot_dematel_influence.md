@@ -35,3 +35,16 @@ plot.
 ## See also
 
 [`sframe_plot_decision_ranking()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_plot_decision_ranking.md)
+
+## Examples
+
+``` r
+# \donttest{
+if (requireNamespace("ggplot2", quietly = TRUE)) {
+  demo <- sframe_demo("mcdm_choice")
+  res <- run_analysis_plan(demo$responses, demo$instrument)
+  sframe_plot_dematel_influence(res$RQ3)
+}
+
+# }
+```

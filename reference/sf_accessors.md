@@ -4,68 +4,6 @@ Accessors for the parts of an instrument, a codebook, or a report. They
 replace reaching into the object with `$`, which ties user code to the
 internal layout.
 
-## Usage
-
-``` r
-sf_meta(x, ...)
-
-sf_items(x, ...)
-
-sf_scales(x, ...)
-
-sf_choice_sets(x, ...)
-
-sf_branches(x, ...)
-
-sf_checks(x, ...)
-
-sf_models(x, ...)
-
-sf_plan(x, ...)
-
-# S3 method for class 'sframe'
-sf_meta(x, ...)
-
-# S3 method for class 'sframe'
-sf_items(x, ...)
-
-# S3 method for class 'sframe'
-sf_scales(x, ...)
-
-# S3 method for class 'sframe'
-sf_choice_sets(x, ...)
-
-# S3 method for class 'sframe'
-sf_branches(x, ...)
-
-# S3 method for class 'sframe'
-sf_checks(x, ...)
-
-# S3 method for class 'sframe'
-sf_models(x, ...)
-
-# S3 method for class 'sframe'
-sf_plan(x, ...)
-
-# S3 method for class 'sframe_codebook'
-sf_meta(x, ...)
-
-# S3 method for class 'sframe_codebook'
-sf_items(x, ...)
-
-# S3 method for class 'sframe_codebook'
-sf_scales(x, ...)
-
-# S3 method for class 'sframe_codebook'
-sf_choice_sets(x, ...)
-
-# S3 method for class 'sframe_codebook'
-sf_models(x, ...)
-
-# S3 method for class 'sframe_codebook'
-sf_plan(x, ...)
-```
-
 ## Arguments
 
 - x:
@@ -78,25 +16,47 @@ sf_plan(x, ...)
 
 ## Value
 
-`sf_items()`, `sf_scales()`, `sf_choice_sets()`, `sf_branches()`,
-`sf_checks()` and `sf_models()` return an
-[sf_component_list](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_component_list.md).
-`sf_meta()` and `sf_plan()` return lists.
+A list for
+[`sf_meta()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_meta.md)
+and
+[`sf_plan()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_plan.md)
+on an instrument, an
+[sf_component_list](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_component_list.md)
+for the component accessors on an instrument, and a data frame for any
+of them on a codebook. See the table above.
 
 ## Details
 
-`sf_items()`, `sf_scales()`, `sf_choice_sets()`, `sf_branches()`,
-`sf_checks()` and `sf_models()` return the component objects as an
-[sf_component_list](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_component_list.md).
-`sf_meta()` returns the metadata as a list and `sf_plan()` returns the
-pre-declared analysis plan. For a flat table of the same content, call
-[`as.data.frame()`](https://rdrr.io/r/base/as.data.frame.html) on the
-object instead.
+What each one gives back depends on what it is asked. Given an
+instrument, the component accessors return the component objects as an
+[sf_component_list](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_component_list.md),
+which prints as a list and is subset with `[` and `[[`. Given a
+codebook, the same verbs return the table the codebook already holds, a
+plain data frame with one row per item, scale, choice set, model or plan
+block.
+
+|  |  |  |
+|----|----|----|
+| Accessor | On an `sframe` | On an `sframe_codebook` |
+| [`sf_meta()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_meta.md) | list of metadata | list of metadata |
+| [`sf_items()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_items.md) | `sf_component_list` of items | data frame of items |
+| [`sf_scales()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_scales.md) | `sf_component_list` of scales | data frame of scales |
+| [`sf_choice_sets()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_choice_sets.md) | `sf_component_list` of choice sets | data frame of choice sets |
+| [`sf_branches()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_branches.md) | `sf_component_list` of branching rules | not available |
+| [`sf_checks()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_checks.md) | `sf_component_list` of checks | not available |
+| [`sf_models()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_models.md) | `sf_component_list` of models | data frame of models |
+| [`sf_plan()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_plan.md) | list of plan blocks | data frame of plan blocks |
+
+[`as.data.frame()`](https://rdrr.io/r/base/as.data.frame.html) on an
+instrument gives its items as a table, which is one part of it, and a
+component list has no coercion of its own. For every table an instrument
+can produce, use
+[`codebook_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/codebook_report.md).
 
 ## See also
 
 [`as_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/as_sframe.md),
-[`sf_problems()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_validation_accessors.md),
+[`sf_problems()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_problems.md),
 [sframe_validation](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_validation.md)
 
 ## Examples

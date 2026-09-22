@@ -1,6 +1,10 @@
 # Load one bundled demo
 
-Load one bundled demo
+One of the 22-item teaching library: 17 analysis examples, three
+presentation examples, and two provenance examples. For the demo that
+instead exercises every input type SurveyBuilder and SurveyStudio
+support in a single instrument, see
+[`sframe_input_types_demo_data()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_input_types_demo_data.md).
 
 ## Usage
 
@@ -36,7 +40,8 @@ same data through another package.
 ## See also
 
 [`sframe_demos()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_demos.md),
-[`sframe_export_labelled()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_export_labelled.md)
+[`sframe_export_labelled()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_export_labelled.md),
+[`sframe_input_types_demo_data()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_input_types_demo_data.md)
 
 ## Examples
 

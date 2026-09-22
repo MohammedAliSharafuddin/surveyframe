@@ -160,13 +160,11 @@ cat(sem_lavaan_syntax(sem_model))
 #> 
 #> # Indirect and total effects
 #> h10 := h1*h5
-#> total_DME_TS := h3 + h10
 #> h11 := h2*h7
-#> total_DME_TS := h3 + h11
 #> h12 := h1*h5*h9
-#> total_DME_BI := h4 + h12
 #> h13 := h2*h7*h9
-#> total_DME_BI := h4 + h13
+#> total_DME_TS := h3 + h10 + h11
+#> total_DME_BI := h4 + h12 + h13
 ```
 
 ## PLS-SEM syntax: the two-stage higher-order model

@@ -45,7 +45,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">surveyframe</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -125,8 +125,8 @@ for an instrument and response data that already exist.</li>
 </h2>
 <p>The input-types demo covers the main controls available in
 SurveyBuilder and SurveyStudio. The two decision item types,
-<code>pairwise_comparison</code> and <code>criteria_weight</code>, are
-not part of this demo. They get their own worked example in the MCDM
+<code>pairwise_comparison</code> and <code>criteria_weight</code>, sit
+outside this demo. They get their own worked example in the MCDM
 vignette, because they only make sense alongside a declared decision
 method and a set of alternatives.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
@@ -167,10 +167,10 @@ The statistics are produced later, either in an R session with
 on the right shows counts, such as the number of plans, the number of
 data-dependent run items, and the number of saved models.</p>
 <p>The model builder, also on the right, creates constructs from the
-scales, adds structural paths, and writes lavaan or seminr syntax along
-with the model JSON into the <code>.sframe</code> file. The Google Sheet
-panel does not collect data on its own. It explains that, after saving
-the <code>.sframe</code> file, you run
+scales and adds structural paths. The <code>.sframe</code> stores that
+model specification, and surveyframe can generate lavaan or seminr
+syntax from it. The Google Sheet panel does not collect data on its own.
+It explains that, after saving the <code>.sframe</code> file, you run
 <code>export_google_sheet(instr, sheet_url = "...")</code> in R to
 generate the Apps Script collector.</p>
 </div>
@@ -178,12 +178,20 @@ generate the Apps Script collector.</p>
 <h2 id="surveystudio-the-screens">SurveyStudio: the screens<a class="anchor" aria-label="anchor" href="#surveystudio-the-screens"></a>
 </h2>
 <p>SurveyStudio is a Shiny application, so it can run R. Its left
-navigation lists eight screens in this order: Open Instrument, Preview
-Survey, Upload Responses, Quality Dashboard, Reliability, Analysis Plan,
-Dashboard, and Export. Survey design is done in the SurveyBuilder, and
-the studio opens the resulting <code>.sframe</code>. The Preview Survey
-screen renders the exact deployable survey, identical to the exported
-HTML.</p>
+navigation lists nine screens in this order: Open Instrument,
+Amendments, Preview Survey, Upload Responses, Quality Dashboard,
+Reliability, Analysis Plan, Dashboard, and Export. Survey design is done
+in the SurveyBuilder, and the studio opens the resulting
+<code>.sframe</code>.</p>
+<p>The Amendments screen discloses a change to the open instrument:
+upload a revised <code>.sframe</code>, give a reason and an explanation,
+and <code><a href="../reference/amend_sframe.html">amend_sframe()</a></code> appends the change to the instrument’s
+amendment log, where every earlier entry stays as it was written.
+Exporting the amended instrument keeps that log inside the
+<code>.sframe</code> file, readable later with
+<code><a href="../reference/amendment_log.html">amendment_log()</a></code>.</p>
+<p>The Preview Survey screen renders the exact deployable survey,
+identical to the exported HTML.</p>
 <p>The Analysis Plan screen does two jobs. It edits the plan, with the
 same research question, method, significance level, and role fields as
 the builder. It also runs the plan. When response data have been
@@ -196,7 +204,10 @@ before running.</p>
 missing data, descriptives, reliability, the saved analysis-plan
 results, and the model appendices. The per-question report produced by
 <code><a href="../reference/render_results.html">render_results()</a></code> in an R session is a separate route to a
-written report and is covered in the main vignette.</p>
+written report and is covered in the main vignette. The same screen’s
+“Analysis notebook” card writes a Quarto notebook alongside the
+instrument and its responses, via <code><a href="../reference/sframe_analysis_qmd.html">sframe_analysis_qmd()</a></code>, so
+the same analysis can be run and edited outside SurveyStudio.</p>
 </div>
 <div class="section level2">
 <h2 id="recommended-workflow">Recommended workflow<a class="anchor" aria-label="anchor" href="#recommended-workflow"></a>
@@ -219,7 +230,7 @@ exploration.</li>
 <h2 id="demo-launchers">Demo launchers<a class="anchor" aria-label="anchor" href="#demo-launchers"></a>
 </h2>
 <p>This vignette leaves the demo launchers unevaluated, because CRAN
-examples and vignettes should not open browsers.</p>
+examples and vignettes leave browsers closed.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/launch_builder_demo.html">launch_builder_demo</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/launch_studio_demo.html">launch_studio_demo</a></span><span class="op">(</span><span class="op">)</span></span>
@@ -253,8 +264,10 @@ dashboard.</p>
 <span><span class="op">)</span></span></code></pre></div>
 <p>SurveyStudio reads the objects passed by
 <code><a href="../reference/launch_studio.html">launch_studio()</a></code>. With response data present,
-<code>screen = "auto"</code> opens the Upload Responses screen, and
-<code>screen = "analysis"</code> opens the Analysis Plan screen.</p>
+<code>screen = "auto"</code> opens the Dashboard. With an instrument
+alone it opens Preview Survey, and with neither it opens Open
+Instrument. <code>screen = "analysis"</code> opens the Analysis Plan
+screen explicitly.</p>
 </div>
 <div class="section level2">
 <h2 id="dashboard">Dashboard<a class="anchor" aria-label="anchor" href="#dashboard"></a>

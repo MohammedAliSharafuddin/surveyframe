@@ -30,7 +30,7 @@ respondent_id, submitted_at, or meta_cols."><meta property="og:image" content="h
 
     <a class="navbar-brand me-2" href="../index.html">surveyframe</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -94,7 +94,12 @@ expected.</p></dd>
 
 <dt id="arg-submitted-at">submitted_at<a class="anchor" aria-label="anchor" href="#arg-submitted-at"></a></dt>
 <dd><p>Character or NULL. The name of the column containing
-submission timestamps.</p></dd>
+submission timestamps.
+The metadata columns surveyframe's own collectors write, <code>respondent_id</code>,
+<code>response_id</code>, <code>started_at</code> and <code>submitted_at</code>, are recognised without being
+declared: a file this package collected reads back without naming the columns
+it wrote. Anything else outside the instrument still has to be declared, or
+<code>strict = FALSE</code> used.</p></dd>
 
 
 <dt id="arg-meta-cols">meta_cols<a class="anchor" aria-label="anchor" href="#arg-meta-cols"></a></dt>
@@ -104,16 +109,38 @@ source URL).</p></dd>
 
 
 <dt id="arg-strict">strict<a class="anchor" aria-label="anchor" href="#arg-strict"></a></dt>
-<dd><p>Logical. When <code>TRUE</code> (default), columns in the response data
-outside the declared item IDs and metadata columns raise an error.
-When <code>FALSE</code>, undeclared columns are retained with a warning.</p></dd>
+<dd><p>Logical. When <code>TRUE</code> (default), a column outside the declared
+item IDs, their expansion columns and the metadata columns is an error,
+naming the columns. When <code>FALSE</code>, such columns are kept, placed last, with
+a warning.</p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>A <code>data.frame</code> with columns ordered as: metadata columns first, then
-item columns in instrument order. Unrecognised columns are dropped when
-<code>strict = TRUE</code> or appended with a warning when <code>strict = FALSE</code>.</p>
+item columns in instrument order, each item followed by its expansion
+columns, then any undeclared columns kept under <code>strict = FALSE</code>. To keep
+an extra column under <code>strict = TRUE</code>, name it in <code>meta_cols</code>, or select
+the columns you need before reading.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="columns">Columns<a class="anchor" aria-label="anchor" href="#columns"></a></h2>
+    <p>A single-answer item has one column named by its ID. A matrix, ranking,
+multiple-choice or decision item has one column per row, option, pair or
+criterion, named <code>item__sub</code>, and each is checked: a battery with some of its
+columns absent is reported by name. Two columns with the same name are
+refused, since one would otherwise be lost.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="values">Values<a class="anchor" aria-label="anchor" href="#values"></a></h2>
+    <p>A CSV file is read as text, so identifiers such as <code>001</code>, dates and text
+answers arrive exactly as written, a literal <code>NA</code> included. Columns of items
+with numeric responses (numeric, slider and rating items, choice items whose
+codes are all numbers, and ranking, multiple-choice and decision expansion
+columns) are then converted to numbers, with an empty cell or <code>NA</code> read as
+missing. A column that does not convert cleanly is kept as text. Data frames
+go through the same conversion, so a CSV file and a data frame holding the
+same responses read the same.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>

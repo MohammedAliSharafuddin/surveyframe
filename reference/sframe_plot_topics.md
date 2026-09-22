@@ -35,3 +35,19 @@ A ggplot2 object, or `NULL` when the result carries no usable table.
 
 [`sframe_run_topic_model_lda()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_run_topic_model_lda.md),
 [`sframe_run_stm_topics()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_run_stm_topics.md)
+
+## Examples
+
+``` r
+# \donttest{
+if (requireNamespace("ggplot2", quietly = TRUE) &&
+    requireNamespace("stm", quietly = TRUE) &&
+    requireNamespace("tidytext", quietly = TRUE)) {
+  demo <- sframe_demo("open_text")
+  res <- run_analysis_plan(demo$responses, demo$instrument)
+  sframe_plot_topics(res$RQ10)
+}
+#> Warning: K=2 is equivalent to a unidimensional scaling model which you may prefer.
+
+# }
+```

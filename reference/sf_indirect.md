@@ -29,3 +29,11 @@ sf_indirect(from, through, to, label = NULL)
 ## Value
 
 An object of class `sf_indirect`.
+
+## Examples
+
+``` r
+ind <- sf_indirect("sq", through = "sat", to = "bi", label = "mediation")
+ind$through
+#> [1] "sat"
+```

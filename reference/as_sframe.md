@@ -9,12 +9,6 @@ as an instrument, which it no longer is.
 
 ``` r
 as_sframe(x, ...)
-
-# S3 method for class 'sframe'
-as_sframe(x, ...)
-
-# S3 method for class 'sframe_validation'
-as_sframe(x, ...)
 ```
 
 ## Arguments

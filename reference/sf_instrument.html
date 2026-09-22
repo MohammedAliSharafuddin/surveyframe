@@ -30,7 +30,7 @@ produce components that are passed into this function via components."><meta pro
 
     <a class="navbar-brand me-2" href="../index.html">surveyframe</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -107,8 +107,8 @@ Defaults to <code>"en"</code>. Multi-language support is planned for a later rel
 <dt id="arg-components">components<a class="anchor" aria-label="anchor" href="#arg-components"></a></dt>
 <dd><p>List. A list of component objects created by the
 constructor family: <code><a href="sf_item.html">sf_item()</a></code>, <code><a href="sf_choices.html">sf_choices()</a></code>, <code><a href="sf_scale.html">sf_scale()</a></code>,
-<code><a href="sf_branch.html">sf_branch()</a></code>, and <code><a href="sf_check.html">sf_check()</a></code>. Components are sorted by class
-automatically. Supply components created by the surveyframe constructors.</p></dd>
+<code><a href="sf_branch.html">sf_branch()</a></code>, <code><a href="sf_check.html">sf_check()</a></code>, and <code><a href="sf_conjoint_design.html">sf_conjoint_design()</a></code>. Components are
+sorted by class automatically, so they can be supplied in any order.</p></dd>
 
 
 <dt id="arg-render">render<a class="anchor" aria-label="anchor" href="#arg-render"></a></dt>
@@ -183,7 +183,7 @@ or imported from a <code>.sframe</code> file.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Scales:     1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Analysis:   1 block(s)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Status:     not validated</span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="fu"><a href="sf_accessors.html">sf_plan</a></span><span class="op">(</span><span class="va">instr</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="fu"><a href="sf_plan.html">sf_plan</a></span><span class="op">(</span><span class="va">instr</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1</span>
 </code></pre></div>
     </div>

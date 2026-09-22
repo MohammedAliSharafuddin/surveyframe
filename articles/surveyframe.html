@@ -45,7 +45,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">surveyframe</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -118,6 +118,10 @@ section uses 60 simulated responses so the vignette builds offline.
 Replacing the simulated data with a call to
 <code><a href="../reference/read_sheet_responses.html">read_sheet_responses()</a></code> connects the same workflow to live
 responses that grow with each submission.</p>
+<p>Allow about 30 minutes for the complete case study. For a five-minute
+runnable introduction, begin with the “Learn by example” vignette and
+its <code>first_survey</code> demo. Return here for the full
+design-to-report workflow.</p>
 <p>The questionnaire and concept are adopted from:</p>
 <blockquote>
 <p>Sharafuddin, M. A., Madhavan, M., &amp; Wangtueai, S. (2024).
@@ -453,24 +457,24 @@ detectable.</p>
 <span><span class="co">#&gt; &lt;sframe validation&gt;</span></span>
 <span><span class="co">#&gt;   Instrument:  Digital Marketing Effectiveness of Tourism Services (1.0.0)</span></span>
 <span><span class="co">#&gt;   Status:      valid</span></span>
-<span><span class="co">#&gt;   Checks:      19 run, 0 with problems</span></span></code></pre></div>
-<p>Read the parts of the diagnostic with the accessors rather than
+<span><span class="co">#&gt;   Checks:      28 run, 0 with problems</span></span></code></pre></div>
+<p>Read the parts of the diagnostic with the accessors, which saves
 reaching into it. <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> shows every check that ran,
 including the ones that found nothing, which is how you tell a check
 that passed from a check that was never reached.</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">v</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/validate_sframe.html">validate_sframe</a></span><span class="op">(</span><span class="va">study</span>, strict <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/sf_validation_accessors.html">sf_is_valid</a></span><span class="op">(</span><span class="va">v</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/sf_is_valid.html">sf_is_valid</a></span><span class="op">(</span><span class="va">v</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] TRUE</span></span>
-<span><span class="fu"><a href="../reference/sf_validation_accessors.html">sf_problems</a></span><span class="op">(</span><span class="va">v</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/sf_problems.html">sf_problems</a></span><span class="op">(</span><span class="va">v</span><span class="op">)</span></span>
 <span><span class="co">#&gt; character(0)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">v</span><span class="op">)</span>, <span class="fl">5</span><span class="op">)</span></span>
 <span><span class="co">#&gt;                  check status n_problems</span></span>
-<span><span class="co">#&gt; 1   duplicate_item_ids     ok          0</span></span>
-<span><span class="co">#&gt; 2       item_id_format     ok          0</span></span>
-<span><span class="co">#&gt; 3 duplicate_choice_ids     ok          0</span></span>
-<span><span class="co">#&gt; 4  duplicate_scale_ids     ok          0</span></span>
-<span><span class="co">#&gt; 5          item_labels     ok          0</span></span></code></pre></div>
+<span><span class="co">#&gt; 1         field_shapes     ok          0</span></span>
+<span><span class="co">#&gt; 2   duplicate_item_ids     ok          0</span></span>
+<span><span class="co">#&gt; 3       item_id_format     ok          0</span></span>
+<span><span class="co">#&gt; 4 duplicate_choice_ids     ok          0</span></span>
+<span><span class="co">#&gt; 5  choice_set_contents     ok          0</span></span></code></pre></div>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Save the instrument. Keep this file alongside your analysis script.</span></span>
 <span><span class="va">sframe_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/write_sframe.html">write_sframe</a></span><span class="op">(</span><span class="va">study</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"tourism_services_v1.sframe"</span><span class="op">)</span>,</span>
@@ -478,39 +482,41 @@ that passed from a check that was never reached.</p>
 <span></span>
 <span><span class="co"># Reload the instrument from disk at any time with:</span></span>
 <span><span class="va">study2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_sframe.html">read_sframe</a></span><span class="op">(</span><span class="va">sframe_path</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="fu"><a href="../reference/sf_accessors.html">sf_meta</a></span><span class="op">(</span><span class="va">study</span><span class="op">)</span><span class="op">$</span><span class="va">title</span>, <span class="fu"><a href="../reference/sf_accessors.html">sf_meta</a></span><span class="op">(</span><span class="va">study2</span><span class="op">)</span><span class="op">$</span><span class="va">title</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="fu"><a href="../reference/sf_meta.html">sf_meta</a></span><span class="op">(</span><span class="va">study</span><span class="op">)</span><span class="op">$</span><span class="va">title</span>, <span class="fu"><a href="../reference/sf_meta.html">sf_meta</a></span><span class="op">(</span><span class="va">study2</span><span class="op">)</span><span class="op">$</span><span class="va">title</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
 <div class="section level3">
 <h3 id="what-the-sha-256-hash-proves-and-what-it-does-not">What the SHA-256 hash proves, and what it does not<a class="anchor" aria-label="anchor" href="#what-the-sha-256-hash-proves-and-what-it-does-not"></a>
 </h3>
-<p>The hash [write_sframe()] embeds confirms one thing: the
-<code>.sframe</code> file on disk is byte-identical to what was written.
-If any byte changes – an item’s wording, a scale’s membership, a plan’s
-variables – [read_sframe()] detects the mismatch and refuses to load the
-file rather than silently accepting it.</p>
+<p>The hash <code><a href="../reference/write_sframe.html">write_sframe()</a></code> embeds confirms one thing: the
+instrument’s canonicalised content matches the digest stored in the
+<code>.sframe</code> file. Change a covered value, an item’s wording, a
+scale’s membership, or a plan’s variables, and
+<code><a href="../reference/read_sframe.html">read_sframe()</a></code> detects the mismatch and refuses to load the
+file. Silent acceptance would leave a reader believing changed content
+was the original.</p>
 <p>That is a narrow, specific guarantee. It proves file identity. It
 does not prove the survey has good questions, an unbiased sample, or a
 sound analysis, and it says nothing about p-hacking or HARKing on its
-own. The package’s actual defence against those two is a separate
-mechanism: the <code>analysis_plan</code> slot is bound to the
-instrument at design time, before data arrive, and
-<code><a href="../reference/run_analysis_plan.html">run_analysis_plan()</a></code> executes that pre-declared plan in one
-pass rather than letting a plan be assembled after looking at results.
-Keep the two claims distinct – “this file wasn’t edited after the fact”
-and “this analysis was decided before seeing the data” are different
-guarantees from different mechanisms, and neither substitutes for the
-other.</p>
+own. The package supports a separate safeguard: the
+<code>analysis_plan</code> slot can be bound to the instrument at design
+time, before data arrive, and <code><a href="../reference/run_analysis_plan.html">run_analysis_plan()</a></code> then
+executes that recorded plan in one pass. This makes prior decisions
+easier to audit, and it shows that a recorded plan predates a given run.
+Establishing when a researcher first considered an analysis, or
+compelling disclosure, each needs separate evidence: “this content
+matches its stored digest” and “this analysis was declared before seeing
+the data” rest on different evidence, each standing on its own.</p>
 </div>
 <div class="section level3">
 <h3 id="sframe-is-plain-json-not-a-proprietary-format">
 <code>.sframe</code> is plain JSON, not a proprietary format<a class="anchor" aria-label="anchor" href="#sframe-is-plain-json-not-a-proprietary-format"></a>
 </h3>
-<p>A <code>.sframe</code> file is ordinary, git-diffable, UTF-8 JSON –
-not a binary or R-specific object. Any tool that reads JSON can open
-one, and the format is documented independently of this package in
+<p>A <code>.sframe</code> file is ordinary, git-diffable, UTF-8 JSON,
+readable in any text editor. Any tool that reads JSON can open one, and
+the format is documented independently of this package in
 <code>system.file("schema", "sframe_schema.json", package = "surveyframe")</code>,
-a JSON Schema a reviewer or a second tool can validate against without
-installing R.</p>
+a JSON Schema a reviewer or a second tool can validate against, with R
+left out of the loop.</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">schema_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"schema"</span>, <span class="st">"sframe_schema.json"</span>, package <span class="op">=</span> <span class="st">"surveyframe"</span><span class="op">)</span></span>
 <span><span class="fu">jsonlite</span><span class="fu">::</span><span class="fu"><a href="https://jeroen.r-universe.dev/jsonlite/reference/fromJSON.html" class="external-link">fromJSON</a></span><span class="op">(</span><span class="va">schema_path</span>, simplifyVector <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">$</span><span class="va">required</span></span>
@@ -518,38 +524,29 @@ installing R.</p>
 <span><span class="co">#&gt; [1] "hash"</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; [[2]]</span></span>
-<span><span class="co">#&gt; [1] "version"</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; [[3]]</span></span>
 <span><span class="co">#&gt; [1] "meta"</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; [[4]]</span></span>
-<span><span class="co">#&gt; [1] "items"</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; [[5]]</span></span>
-<span><span class="co">#&gt; [1] "choices"</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; [[6]]</span></span>
-<span><span class="co">#&gt; [1] "scales"</span></span></code></pre></div>
+<span><span class="co">#&gt; [[3]]</span></span>
+<span><span class="co">#&gt; [1] "items"</span></span></code></pre></div>
 <p>Because the file is plain text, two versions of it diff the same way
 any source file does. If <code>tourism_services_v1.sframe</code> were
 committed to a Git repository, revising it and running
-<code>git diff</code> on the file would show exactly which lines – which
-item, which choice, which plan block – changed, alongside Git’s own
-commit history for who changed it and when. That diff is Git’s job, not
-this package’s; see the next section for how the two connect.</p>
+<code>git diff</code> on the file would show exactly which lines, which
+item, which choice, which plan block, changed, alongside Git’s own
+commit history for who changed it and when. That diff is Git’s job, and
+the next section shows how the two connect.</p>
 </div>
 <div class="section level3">
 <h3 id="disclosed-revision-amend_sframe">Disclosed revision: <code>amend_sframe()</code><a class="anchor" aria-label="anchor" href="#disclosed-revision-amend_sframe"></a>
 </h3>
 <p>A hash mismatch alone can’t distinguish a legitimate correction
 (fixing a data-entry error, removing bot responses, correcting a
-misspecified model) from an undisclosed change – both break the hash
+misspecified model) from an undisclosed change: both break the hash
 identically. <code><a href="../reference/amend_sframe.html">amend_sframe()</a></code> gives legitimate revision a
 structured, disclosed path instead: it compares the instrument before
-and after a change, and appends a record – never overwrites – of what
-changed and why, directly inside the <code>.sframe</code> file next to
-the content it explains.</p>
+and after a change, and appends a record of what changed and why,
+directly inside the <code>.sframe</code> file next to the content it
+explains, never overwriting an earlier entry.</p>
 <p>Amendments come in two tiers, because not every change carries the
 same risk to the plan’s design-time-binding logic:</p>
 <ul>
@@ -560,15 +557,15 @@ researcher hygiene and stay low-friction: a reason code and a short
 explanation are enough.</li>
 <li>
 <strong><code>"design"</code></strong> amendments (anything touching
-the analysis plan or a model – <code>model_respecification</code>, or
+the analysis plan or a model, <code>model_respecification</code>, or
 <code>instrument_revision</code>/<code>other</code> by default) are
 exactly the kind of post-hoc change the design-time plan binding exists
 to guard against. They require a <code>deviation_report</code>
 describing what changed in the research question, method, or model and
-why, and record <code>signoff</code> explicitly – as a reviewer’s name,
-or the literal value <code>"none"</code> when no second sign-off was
-given, so an unreviewed design change stays visible to an auditor rather
-than looking identical to a signed-off one.</li>
+why, and record <code>signoff</code> explicitly, as a reviewer’s name or
+the literal value <code>"none"</code> when no second sign-off was given,
+so an unreviewed design change stays visible to an auditor, where an
+empty field would read as a sign-off.</li>
 </ul>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Suppose a pilot round surfaces an ambiguous item and it needs rewording.</span></span>
@@ -590,49 +587,50 @@ than looking identical to a signed-off one.</li>
 <span></span>
 <span><span class="fu"><a href="../reference/amendment_log.html">amendment_log</a></span><span class="op">(</span><span class="va">study_amended</span><span class="op">)</span></span>
 <span><span class="co">#&gt;              timestamp         reason_code</span></span>
-<span><span class="co">#&gt; 1 2026-09-03T12:33:49Z instrument_revision</span></span>
+<span><span class="co">#&gt; 1 2026-09-22T20:15:19Z instrument_revision</span></span>
 <span><span class="co">#&gt;                                    reason_text   tier author</span></span>
 <span><span class="co">#&gt; 1 Clarified item wording after pilot feedback. design   &lt;NA&gt;</span></span>
 <span><span class="co">#&gt;                                     deviation_report signoff</span></span>
 <span><span class="co">#&gt; 1 Wording only; the construct measured is unchanged.    none</span></span>
 <span><span class="co">#&gt;                                                      previous_hash</span></span>
-<span><span class="co">#&gt; 1 21da0bcba4511c35a5607739721455a812d1fa0416b6055e4c76767270916060</span></span>
+<span><span class="co">#&gt; 1 726c1be14d291fe8239b4855a5b904a66653b7cea99d7461562a204c1123997a</span></span>
 <span><span class="co">#&gt;                                                           new_hash</span></span>
-<span><span class="co">#&gt; 1 f5a68240484b4fbfc8bf3ed079fc7d21da653f86389f9740b2408c45caf5ab8c</span></span>
+<span><span class="co">#&gt; 1 259c6bbe39b0dc3a95c99c5c34d6650e7264d5558656250d9563a148facab76d</span></span>
 <span><span class="co">#&gt;   changed_fields</span></span>
 <span><span class="co">#&gt; 1          items</span></span></code></pre></div>
-<p><code><a href="../reference/amendment_log.html">amendment_log()</a></code> returns the full history as a data frame
-– one row per disclosed change, printable or exported with
+<p><code><a href="../reference/amendment_log.html">amendment_log()</a></code> returns the full history as a data
+frame, one row per disclosed change, printable or exported with
 <code><a href="https://rdrr.io/r/utils/write.table.html" class="external-link">write.csv()</a></code> for an external audit trail.
 <code><a href="../reference/write_sframe.html">write_sframe()</a></code> on the amended instrument persists the log
-in the file; a reviewer who later loads it with
+in the file. A reviewer who later loads it with
 <code><a href="../reference/read_sframe.html">read_sframe()</a></code> sees both the current content and every
-disclosed step that produced it. This does not weaken the hash check: an
-edit made directly to the file, bypassing <code><a href="../reference/amend_sframe.html">amend_sframe()</a></code>,
-still fails <code><a href="../reference/read_sframe.html">read_sframe()</a></code>’s integrity check exactly as
-before.</p>
+disclosed step that produced it, and the hash check keeps its full
+force: an edit made directly to the file, bypassing
+<code><a href="../reference/amend_sframe.html">amend_sframe()</a></code>, still fails <code><a href="../reference/read_sframe.html">read_sframe()</a></code>’s
+integrity check exactly as before.</p>
 <p>Be clear about what this does and does not guarantee.
-<code><a href="../reference/amend_sframe.html">amend_sframe()</a></code> records a disclosed change – it cannot
-compel disclosure, the same way a preregistration deviation report can’t
-be forced. Nothing prevents a researcher from reconstructing an
-instrument from scratch and calling <code><a href="../reference/write_sframe.html">write_sframe()</a></code> on it
-directly, skipping the amendment log entirely. What the mechanism
-actually guarantees is narrower and still useful: <em>if</em> a change
-is disclosed through <code><a href="../reference/amend_sframe.html">amend_sframe()</a></code>, the record is
-structured, timestamped, and permanent inside the file – not that every
-change will be.</p>
+<code><a href="../reference/amend_sframe.html">amend_sframe()</a></code> records a disclosed change. It cannot compel
+disclosure, the same way a preregistration deviation report can’t be
+forced. Nothing prevents a researcher from reconstructing an instrument
+from scratch and calling <code><a href="../reference/write_sframe.html">write_sframe()</a></code> on it directly,
+skipping the amendment log entirely. What the mechanism actually
+guarantees is narrower and still useful: <em>if</em> a change is
+disclosed through <code><a href="../reference/amend_sframe.html">amend_sframe()</a></code>, the record is structured,
+timestamped, and permanent inside the file. It does not guarantee that
+every change is disclosed in the first place.</p>
 </div>
 <div class="section level3">
 <h3 id="linking-a-saved-instrument-to-its-git-commit">Linking a saved instrument to its Git commit<a class="anchor" aria-label="anchor" href="#linking-a-saved-instrument-to-its-git-commit"></a>
 </h3>
-<p>A bare hash gives no diff, author, or explanation for a change – Git
-already provides all three. <code><a href="../reference/link_git_commit.html">link_git_commit()</a></code> points the
-instrument at Git rather than duplicating it: it records the current
-commit’s SHA and subject line, so the SHA-256 hash’s role narrows to
-confirming that the file on disk matches what that specific,
-already-explained commit produced. It degrades gracefully with no error
-when Git isn’t installed or the path isn’t a repository – Git is
-optional, never a dependency of the rest of the package.</p>
+<p>A bare hash carries the file’s identity alone. A diff, an author and
+an explanation come from Git, which already provides all three.
+<code><a href="../reference/link_git_commit.html">link_git_commit()</a></code> points the instrument at Git and leaves
+the history there: it records the current commit’s SHA and subject line,
+so the SHA-256 hash’s role narrows to confirming that the file on disk
+matches what that specific, already-explained commit produced. It
+degrades gracefully with no error when Git isn’t installed or the path
+isn’t a repository. Git stays optional, and the rest of the package runs
+on its own.</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/link_git_commit.html">link_git_commit</a></span><span class="op">(</span><span class="va">study_amended</span>, repo_path <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; $linked</span></span>
@@ -651,7 +649,7 @@ optional, never a dependency of the rest of the package.</p>
 </h3>
 <p>When an endpoint URL is set on the instrument,
 <code><a href="../reference/export_static_survey.html">export_static_survey()</a></code> reads it automatically. Set the URL
-once, export as many times as needed without repeating the argument.</p>
+once, and every later export reuses it.</p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Replace with your deployed Apps Script URL after the setup steps below.</span></span>
 <span><span class="va">study</span><span class="op">$</span><span class="va">render</span><span class="op">$</span><span class="va">google_sheets_endpoint</span> <span class="op">&lt;-</span></span>
@@ -661,17 +659,21 @@ once, export as many times as needed without repeating the argument.</p>
 <h3 id="export-the-static-html-survey">Export the static HTML survey<a class="anchor" aria-label="anchor" href="#export-the-static-html-survey"></a>
 </h3>
 <p><code><a href="../reference/export_static_survey.html">export_static_survey()</a></code> produces a single self-contained
-HTML file. Respondents open it in any browser, fill it in, and their
-submission is downloaded as a CSV and, if an endpoint is configured,
-posted to the Google Sheet at the same time. The file can be hosted on
-GitHub Pages, shared by email, or opened directly from disk.</p>
+HTML file. Respondents open it in any browser and, if an endpoint is
+configured, the browser sends the submission to Google Sheets. The
+cross-origin request confirms only that the row was sent. Whether the
+Sheet stored it stays unconfirmed from here. Depending on the thank-you
+settings, the page can also offer a CSV download, but it becomes a local
+backup only if the respondent saves it. Pilot the endpoint and verify a
+stored row before collection. The HTML can be hosted on GitHub Pages,
+shared by email, or opened directly from disk.</p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">html_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/export_static_survey.html">export_static_survey</a></span><span class="op">(</span></span>
 <span>  <span class="va">study</span>,</span>
 <span>  output_path <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"tourism_services_survey.html"</span><span class="op">)</span>,</span>
 <span>  open        <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; Static survey written to '/tmp/RtmpOsFXo4/tourism_services_survey.html' (85.5</span></span>
+<span><span class="co">#&gt; Static survey written to '/tmp/RtmpCY3JCH/tourism_services_survey.html' (95.8</span></span>
 <span><span class="co">#&gt; KB).</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/files.html" class="external-link">file.exists</a></span><span class="op">(</span><span class="va">html_path</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
@@ -685,7 +687,7 @@ sits in a serif typeface, options render as bordered cards with a
 selection tick, Likert items render as numbered squares, and a slim
 progress bar tracks completion. Every one of those colours derives from
 the instrument’s single theme colour, so the line below re-skins the
-whole survey without touching anything else.</p>
+whole survey on its own.</p>
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">study</span><span class="op">$</span><span class="va">render</span><span class="op">$</span><span class="va">theme</span> <span class="op">&lt;-</span> <span class="st">"#0f766e"</span></span></code></pre></div>
 <p>Two things about the export matter for planning a real
@@ -695,8 +697,8 @@ deployment.</p>
 <strong>It is designed for a phone first.</strong> Option cards and
 touch targets meet a 44 pixel minimum, and a matrix question (see the
 input-types demo in the SurveyBuilder vignette) reflows from a table
-into stacked, labelled cards below 600 pixels of width, so no question
-ever needs horizontal scrolling to complete on a small screen.</li>
+into stacked, labelled cards below 600 pixels of width, so every
+question completes on a small screen within its width.</li>
 <li>
 <strong>It meets WCAG 2.2 AA.</strong> Every control carries an
 accessible name, keyboard focus is visible on option cards, a validation
@@ -716,15 +718,15 @@ question gets one 0/1 column per option, and a ranking question gets one
 column per option holding its rank. A five-option multiple-choice item
 named <code>channels</code>, for example, becomes five columns,
 <code>channels__option1</code> through <code>channels__option5</code>,
-each holding <code>0</code> or <code>1</code>, ready for analysis with
-no string-splitting step.</p>
+each holding <code>0</code> or <code>1</code>, ready for analysis, with
+the splitting already done.</p>
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">script_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/export_google_sheet.html">export_google_sheet</a></span><span class="op">(</span></span>
 <span>  <span class="va">study</span>,</span>
 <span>  sheet_url  <span class="op">=</span> <span class="st">"https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID"</span>,</span>
 <span>  output_dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; Apps Script written to: /tmp/RtmpOsFXo4/surveyframe_collector.gs</span></span>
+<span><span class="co">#&gt; Apps Script written to: /tmp/RtmpCY3JCH/surveyframe_collector.gs</span></span>
 <span><span class="co">#&gt; Follow the setup instructions inside the file to deploy it.</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/files.html" class="external-link">file.exists</a></span><span class="op">(</span><span class="va">script_path</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
@@ -734,6 +736,10 @@ no string-splitting step.</p>
 <li>Click Extensions, then Apps Script.</li>
 <li>Paste the contents of the generated <code>.gs</code> file, replacing
 any existing code.</li>
+<li>In the Apps Script editor, add <strong>Services &gt; Google Sheets
+API</strong> and keep its identifier as <code>Sheets</code>. Without it,
+the collector refuses the response rather than risk storing an altered
+value.</li>
 <li>Click Deploy, then New deployment. Set type to Web app.</li>
 <li>Set “Who has access” to Anyone.</li>
 <li>Copy the Web App URL.</li>
@@ -1311,7 +1317,7 @@ respondents for researcher review, not automatic exclusion.</p>
 </table>
 <div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># sf_apa() gives a plain-language summary suitable for a methods section.</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="../reference/sf_report_accessors.html">sf_apa</a></span><span class="op">(</span><span class="va">mr</span><span class="op">)</span>, <span class="st">"\n"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="../reference/sf_apa.html">sf_apa</a></span><span class="op">(</span><span class="va">mr</span><span class="op">)</span>, <span class="st">"\n"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Missing-data diagnostics were computed for 55 variable(s).</span></span></code></pre></div>
 <hr>
 </div>
@@ -1321,8 +1327,8 @@ respondents for researcher review, not automatic exclusion.</p>
 <p><code><a href="../reference/score_scales.html">score_scales()</a></code> appends one column per scale to the data
 frame, using the scoring rules stored in the instrument. If a column
 with the same name as a scale already exists in the data frame,
-<code><a href="../reference/score_scales.html">score_scales()</a></code> skips that scale so pre-scored data is never
-overwritten.</p>
+<code><a href="../reference/score_scales.html">score_scales()</a></code> skips that scale so pre-scored data survives
+intact.</p>
 <div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">scored</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/score_scales.html">score_scales</a></span><span class="op">(</span><span class="va">responses</span>, <span class="va">study</span><span class="op">)</span></span>
 <span></span>
@@ -1493,19 +1499,21 @@ overwritten.</p>
 </tr>
 </tbody>
 </table>
-<p>A Cronbach’s alpha of 0.70 or above is conventionally accepted as
-adequate internal consistency (Nunnally, 1978). For scales with three or
-more items, McDonald’s omega is a more accurate estimate because it
-accounts for unequal factor loadings across items. Alpha assumes all
-items load equally on the factor. Pass <code>omega = TRUE</code> when
-items within a scale differ substantially in their contribution. See
-<code><a href="../reference/reliability_report.html">?reliability_report</a></code> for details.</p>
+<p>A value near 0.70 is sometimes used as a rough convention, but
+reliability must be interpreted against the construct, intended use,
+item count, uncertainty, and model assumptions. Alpha and the omega
+variants target reliability under different measurement assumptions, so
+treat them as distinct estimates. Decide which quantity answers the
+study’s question, and report that one on its own merits. Pass
+<code>omega = TRUE</code> to report the available omega estimates
+alongside alpha, and name the estimate and assumptions in the write-up.
+See <code><a href="../reference/reliability_report.html">?reliability_report</a></code> for details.</p>
 </div>
 <div class="section level2">
 <h2 id="efa-readiness">EFA readiness<a class="anchor" aria-label="anchor" href="#efa-readiness"></a>
 </h2>
-<p>Before a confirmatory factor analysis, it is good practice to confirm
-that the item correlations are strong enough to support factoring.
+<p>Before a confirmatory factor analysis, it is useful to screen whether
+the item correlations appear suitable for exploratory factoring.
 <code><a href="../reference/efa_report.html">efa_report()</a></code> runs the KMO measure of sampling adequacy and
 Bartlett’s test of sphericity, and uses parallel analysis to suggest the
 number of factors.</p>
@@ -1514,10 +1522,11 @@ number of factors.</p>
 <span>  <span class="va">er</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/efa_report.html">efa_report</a></span><span class="op">(</span><span class="va">scored</span>, <span class="va">study</span><span class="op">)</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">er</span><span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
-<p>A KMO value of 0.60 or above and a significant Bartlett test confirm
-that the correlation structure supports factor analysis. The suggested
-factor count from parallel analysis is a guide. Theory should take
-precedence.</p>
+<p>A KMO value and Bartlett’s test provide preliminary screening
+evidence, one input among several toward judging whether a particular
+factor model is appropriate. Treat 0.60 as a rough, informal KMO
+convention. The factor count from parallel analysis is also a guide to
+interpret with theory, design, loadings, residuals, and model fit.</p>
 </div>
 <div class="section level2">
 <h2 id="construct-validity">Construct validity<a class="anchor" aria-label="anchor" href="#construct-validity"></a>
@@ -1547,7 +1556,7 @@ any other construct.</p>
 the variable roles it needs. <code><a href="../reference/run_analysis_plan.html">run_analysis_plan()</a></code> executes
 every block and returns one result per question.</p>
 <div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/sf_accessors.html">sf_plan</a></span><span class="op">(</span><span class="va">study</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/sf_plan.html">sf_plan</a></span><span class="op">(</span><span class="va">study</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>    id               <span class="op">=</span> <span class="st">"RQ1"</span>,</span>
 <span>    research_question <span class="op">=</span> <span class="st">"Are digital marketing perceptions associated with tourist satisfaction?"</span>,</span>
@@ -1591,7 +1600,7 @@ every block and returns one result per question.</p>
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="fu"><a href="../reference/sf_accessors.html">sf_plan</a></span><span class="op">(</span><span class="va">study</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="fu"><a href="../reference/sf_plan.html">sf_plan</a></span><span class="op">(</span><span class="va">study</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 5</span></span></code></pre></div>
 <hr>
 </div>
@@ -1604,21 +1613,35 @@ the variables involved. <code><a href="../reference/assumption_report.html">assu
 for grouped tests, and linearity for regression pairs.</p>
 <div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"psych"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="va">ar</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/assumption_report.html">assumption_report</a></span><span class="op">(</span><span class="va">scored</span>, <span class="va">study</span><span class="op">)</span></span>
+<span>  <span class="va">ar</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/assumption_report.html">assumption_report</a></span><span class="op">(</span><span class="va">scored</span>, variables <span class="op">=</span> <span class="va">scale_cols</span><span class="op">)</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">ar</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
-<span><span class="co">#&gt; Assumption Report</span></span></code></pre></div>
+<span><span class="co">#&gt; Assumption Report</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Normality:</span></span>
+<span><span class="co">#&gt;  variable  n shapiro_w    shapiro_p    skewness   kurtosis</span></span>
+<span><span class="co">#&gt;      DMRE 60 0.9507082 1.681885e-02 -0.01764237 -0.8595994</span></span>
+<span><span class="co">#&gt;      DMAU 60 0.9400575 5.447373e-03 -0.27466443 -0.3742255</span></span>
+<span><span class="co">#&gt;      DMEU 60 0.9202802 7.870891e-04 -0.13995250 -0.9009628</span></span>
+<span><span class="co">#&gt;      DMPV 60 0.9236779 1.081931e-03 -0.16121971 -1.3529371</span></span>
+<span><span class="co">#&gt;      DSQA 60 0.9431484 7.509031e-03 -0.68528436  0.2173799</span></span>
+<span><span class="co">#&gt;      DSQT 60 0.9590129 4.211033e-02 -0.37357996 -0.1216330</span></span>
+<span><span class="co">#&gt;      DSUQ 60 0.9488769 1.379674e-02  0.04178933 -0.6397338</span></span>
+<span><span class="co">#&gt;        TS 60 0.8780098 2.274819e-05 -0.74469442  0.1776129</span></span>
+<span><span class="co">#&gt;        BI 60 0.9527818 2.108952e-02 -0.33102932 -0.4335865</span></span></code></pre></div>
 <p>Review the <code>$normality</code> and <code>$homogeneity</code>
 slots to decide whether parametric or non-parametric alternatives are
-appropriate. The analysis plan can override the test method per block if
-the default is not suitable.</p>
+appropriate. The analysis plan can override the test method per block
+wherever the default fits the data poorly.</p>
 <hr>
 </div>
 <div class="section level2">
 <h2 id="run-the-analysis-plan">Run the analysis plan<a class="anchor" aria-label="anchor" href="#run-the-analysis-plan"></a>
 </h2>
 <div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/run_analysis_plan.html">run_analysis_plan</a></span><span class="op">(</span><span class="va">scored</span>, <span class="va">study</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/run_analysis_plan.html">run_analysis_plan</a></span><span class="op">(</span><span class="va">scored</span>, <span class="va">study</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning: Scale scoring failed before analysis, so blocks run on unscored data: The responses already hold a column named 'DMRE', 'DMAU', 'DMEU', 'DMPV', 'DSQA', 'DSQT', 'DSUQ', 'TS', 'BI', which is also a scale ID.</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">ℹ</span> score_scales() stores each score in a column named by its scale ID, so scoring would replace that data. Rename the scale, or drop the column first where it holds scores from an earlier run.</span></span></code></pre></div>
 <p>Each result carries an APA-formatted statistic, an effect size, a
 writing prompt, and the methodological reference that supports the
 chosen test.</p>
@@ -1626,10 +1649,10 @@ chosen test.</p>
 <code class="sourceCode R"><span><span class="fu">results_table</span><span class="op">(</span><span class="va">results</span><span class="op">)</span></span></code></pre></div>
 <table class="table">
 <colgroup>
-<col width="2%">
-<col width="38%">
-<col width="4%">
-<col width="49%">
+<col width="1%">
+<col width="35%">
+<col width="3%">
+<col width="53%">
 <col width="5%">
 </colgroup>
 <thead><tr class="header">
@@ -1645,7 +1668,7 @@ chosen test.</p>
 <td align="left">Are digital marketing perceptions associated with
 tourist satisfaction?</td>
 <td align="left">pearson</td>
-<td align="right">r(58) = 0.19 [-0.07, 0.42], p = 0.153</td>
+<td align="right">r(58) = 0.19, 95% CI [-0.07, 0.42], p = .153</td>
 <td align="left">small</td>
 </tr>
 <tr class="even">
@@ -1653,7 +1676,7 @@ tourist satisfaction?</td>
 <td align="left">Is service quality associated with tourist
 satisfaction?</td>
 <td align="left">pearson</td>
-<td align="right">r(58) = -0.04 [-0.29, 0.22], p = 0.778</td>
+<td align="right">r(58) = -0.04, 95% CI [-0.29, 0.22], p = .778</td>
 <td align="left">negligible</td>
 </tr>
 <tr class="odd">
@@ -1661,7 +1684,7 @@ satisfaction?</td>
 <td align="left">Do service quality and sustainability quality predict
 satisfaction?</td>
 <td align="left"></td>
-<td align="right">R² = 0.210, F(3, 56) = 4.97, p = 0.004</td>
+<td align="right">R² = 0.210, F(3, 56) = 4.97, p = .004</td>
 <td align="left"></td>
 </tr>
 <tr class="even">
@@ -1669,8 +1692,8 @@ satisfaction?</td>
 <td align="left">Do first-time and repeat visitors differ in
 satisfaction?</td>
 <td align="left"></td>
-<td align="right">U = 744, z = -4.62, p &lt; .001, r = 0.60 [0.41,
-0.76], Hodges-Lehmann shift = 0.67 [0.67, 1.00]</td>
+<td align="right">U = 744, z = 4.63, p &lt; .001, r = 0.60, 95% CI
+[0.41, 0.76], Hodges-Lehmann shift = 0.67, 95% CI [0.67, 1.00]</td>
 <td align="left">large</td>
 </tr>
 <tr class="odd">
@@ -1686,7 +1709,7 @@ satisfaction?</td>
 <code>r$prompt</code>. The first one reads:</p>
 <div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="va">results</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">prompt</span><span class="op">)</span></span>
-<span><span class="co">#&gt; There was a positive, small non-significant correlation between DMRE and TS, r(58) = 0.19 [-0.07, 0.42], p = 0.153. Explain what this means for your research question.</span></span></code></pre></div>
+<span><span class="co">#&gt; There was a positive, small non-significant correlation between DMRE and TS, r(58) = 0.19, 95% CI [-0.07, 0.42], p = .153. Explain what this means for your research question.</span></span></code></pre></div>
 <p>The <code>prompt</code> field is a sentence template for the methods
 or results section. The researcher fills in the substantive
 interpretation. The package supplies the statistic and the label. This
@@ -1698,10 +1721,12 @@ significance are distinct judgements.</p>
 <p>When ggplot2 is installed, <code>plots = TRUE</code> attaches a
 brand-styled chart to every supported block: bar charts for frequency
 and chi-square blocks, and scatter plots with a regression overlay for
-correlation and regression blocks. Plotting stays opt-in, so nothing
-changes for installations without ggplot2.</p>
+correlation and regression blocks. Plotting stays opt-in, so an
+installation that skips ggplot2 keeps working as before.</p>
 <div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">results_p</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/run_analysis_plan.html">run_analysis_plan</a></span><span class="op">(</span><span class="va">scored</span>, <span class="va">study</span>, plots <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning: Scale scoring failed before analysis, so blocks run on unscored data: The responses already hold a column named 'DMRE', 'DMAU', 'DMEU', 'DMPV', 'DSQA', 'DSQT', 'DSUQ', 'TS', 'BI', which is also a scale ID.</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">ℹ</span> score_scales() stores each score in a column named by its scale ID, so scoring would replace that data. Rename the scale, or drop the column first where it holds scores from an earlier run.</span></span>
 <span><span class="va">first_plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/funprog.html" class="external-link">Filter</a></span><span class="op">(</span><span class="kw">function</span><span class="op">(</span><span class="va">r</span><span class="op">)</span> <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">r</span><span class="op">$</span><span class="va">plot</span><span class="op">)</span>, <span class="va">results_p</span><span class="op">)</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span></span>
 <span><span class="va">first_plot</span><span class="op">$</span><span class="va">plot</span></span></code></pre></div>
 <p><img src="surveyframe_files/figure-html/run-plan-plots-1.png" class="r-plt" alt="Chart attached to the first analysis-plan result by run_analysis_plan with plots enabled" width="672"></p>
@@ -1724,17 +1749,17 @@ and descriptives alongside the analysis results.</p>
 <span>  output_file <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"tourism_results.html"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Results report written:"</span>, <span class="va">results_path</span>, <span class="st">"\n"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Results report written: /tmp/RtmpOsFXo4/tourism_results.html</span></span>
+<span><span class="co">#&gt; Results report written: /tmp/RtmpCY3JCH/tourism_results.html</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Size:"</span>, <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.info.html" class="external-link">file.size</a></span><span class="op">(</span><span class="va">results_path</span><span class="op">)</span> <span class="op">/</span> <span class="fl">1024</span>, <span class="fl">1</span><span class="op">)</span>, <span class="st">"KB\n"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Size: 13.5 KB</span></span></code></pre></div>
+<span><span class="co">#&gt; Size: 14 KB</span></span></code></pre></div>
 <p>The results report contains one section per research question, with
 the APA statistic, effect size, writing prompt, and the reference for
 the chosen method, each paired with its own chart drawn directly beneath
 its table. A Likert item’s distribution renders as a diverging stacked
 bar, with agreement and disagreement categories running away from a
 shared zero line and any neutral category split evenly across it, so the
-balance of opinion is readable at a glance rather than inferred from a
-plain frequency bar.</p>
+balance of opinion is readable at a glance, where a plain frequency bar
+leaves it to be inferred.</p>
 <div class="sourceCode" id="cb42"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/render_report.html">render_report</a></span><span class="op">(</span></span>
 <span>  <span class="va">study</span>,</span>
@@ -1748,7 +1773,7 @@ plain frequency bar.</p>
 <span>  include_analysis <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  include_models   <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; Report rendered with the Quarto engine: /tmp/RtmpOsFXo4/tourism_report.html</span></span></code></pre></div>
+<span><span class="co">#&gt; Report rendered with the Quarto engine: /tmp/RtmpCY3JCH/tourism_report.html</span></span></code></pre></div>
 <hr>
 </div>
 <div class="section level2">
@@ -1789,7 +1814,8 @@ results.</p>
 <span><span class="op">)</span></span></code></pre></div>
 <p>As more respondents complete the survey, re-running from the
 <code><a href="../reference/read_sheet_responses.html">read_sheet_responses()</a></code> call above refreshes every result,
-table, and figure in the report without changing any analysis code.</p>
+table, and figure in the report, leaving the analysis code as it
+stands.</p>
 <hr>
 </div>
 <div class="section level2">

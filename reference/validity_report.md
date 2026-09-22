@@ -36,3 +36,17 @@ validity_report(loadings, construct_scores = NULL, items_by_construct = NULL)
 ## Value
 
 An object of class `sframe_validity_report`.
+
+## Examples
+
+``` r
+loadings <- list(
+  sq  = c(sq_1 = 0.80, sq_2 = 0.75, sq_3 = 0.78),
+  sat = c(sat_1 = 0.85, sat_2 = 0.82)
+)
+vr <- validity_report(loadings)
+vr$reliability
+#>     construct composite_reliability       AVE n_items
+#> sat       sat             0.8217148 0.6974500       2
+#> sq         sq             0.8203234 0.6036333       3
+```

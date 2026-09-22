@@ -47,6 +47,11 @@ The following checks are performed:
 
 - Duplicate scale IDs
 
+- Item IDs, scale IDs and response columns that share a name, or take a
+  reserved metadata name such as `submitted_at`. A scale's score is
+  stored in a column named by its ID, so a shared name would overwrite
+  data
+
 - Items with missing labels
 
 - Items referencing a missing `choice_set` in the instrument
@@ -58,6 +63,11 @@ The following checks are performed:
 - Choice sets referenced by items but not present in the instrument
 
 - Scale `items` vectors containing IDs not present in the instrument
+
+- Scale scoring parameters: repeated items, a `min_valid` outside 1 to
+  the number of items, and weights that are not positive finite numbers
+
+- Reverse coding declared for an item outside the scale that declares it
 
 - Branching rules referencing item IDs not present in the instrument
 
@@ -86,8 +96,8 @@ an instrument should now wrap the call in
 
 [sframe_validation](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_validation.md),
 [`as_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/as_sframe.md),
-[`sf_problems()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_validation_accessors.md),
-[`sf_is_valid()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_validation_accessors.md),
+[`sf_problems()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_problems.md),
+[`sf_is_valid()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_is_valid.md),
 [`sf_instrument()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_instrument.md),
 [`write_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/write_sframe.md)
 
@@ -108,7 +118,7 @@ validate_sframe(instr, strict = FALSE)
 #> <sframe validation>
 #>   Instrument:  Demo Survey (0.1.0)
 #>   Status:      valid
-#>   Checks:      19 run, 0 with problems
+#>   Checks:      28 run, 0 with problems
 
 # Explore it with dedicated methods rather than reaching in with `$`
 v <- validate_sframe(instr, strict = FALSE)
@@ -118,25 +128,34 @@ sf_problems(v)
 #> character(0)
 summary(v)
 #>                           check status n_problems
-#> 1            duplicate_item_ids     ok          0
-#> 2                item_id_format     ok          0
-#> 3          duplicate_choice_ids     ok          0
-#> 4           duplicate_scale_ids     ok          0
-#> 5                   item_labels     ok          0
-#> 6          item_choice_set_refs     ok          0
-#> 7               item_scale_refs     ok          0
-#> 8         reverse_without_scale     ok          0
-#> 9           decision_item_shape     ok          0
-#> 10             comparison_scale     ok          0
-#> 11             scale_membership     ok          0
-#> 12               branching_refs     ok          0
-#> 13             branching_values     ok          0
-#> 14                   check_refs     ok          0
-#> 15         analysis_plan_models     ok          0
-#> 16      analysis_plan_variables     ok          0
-#> 17 decision_scale_compatibility     ok          0
-#> 18                    model_ids     ok          0
-#> 19                  model_specs     ok          0
+#> 1                  field_shapes     ok          0
+#> 2            duplicate_item_ids     ok          0
+#> 3                item_id_format     ok          0
+#> 4          duplicate_choice_ids     ok          0
+#> 5           choice_set_contents     ok          0
+#> 6           duplicate_scale_ids     ok          0
+#> 7                  id_namespace     ok          0
+#> 8                   item_config     ok          0
+#> 9                   item_labels     ok          0
+#> 10         item_choice_set_refs     ok          0
+#> 11              item_scale_refs     ok          0
+#> 12        reverse_without_scale     ok          0
+#> 13          decision_item_shape     ok          0
+#> 14             comparison_scale     ok          0
+#> 15             scale_membership     ok          0
+#> 16             scale_parameters     ok          0
+#> 17      reverse_item_membership     ok          0
+#> 18               branching_refs     ok          0
+#> 19             branching_values     ok          0
+#> 20                   check_refs     ok          0
+#> 21          duplicate_check_ids     ok          0
+#> 22               branch_targets     ok          0
+#> 23         analysis_plan_blocks     ok          0
+#> 24         analysis_plan_models     ok          0
+#> 25      analysis_plan_variables     ok          0
+#> 26 decision_scale_compatibility     ok          0
+#> 27                    model_ids     ok          0
+#> 28                  model_specs     ok          0
 
 # Recover the validated instrument
 validated <- as_sframe(validate_sframe(instr, strict = TRUE))

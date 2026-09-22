@@ -46,7 +46,7 @@ diagram."><meta property="og:image" content="https://mohammedalisharafuddin.gith
 
     <a class="navbar-brand me-2" href="../index.html">surveyframe</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -108,11 +108,10 @@ diagram.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p><code><a href="https://rdrr.io/r/base/solve.html" class="external-link">solve()</a></code> fails outright if <code>I - N</code> is exactly singular, which does not
-arise for a matrix normalised this way in ordinary use. No fallback series
-truncation is implemented, unlike the harvested source, because a singular
-<code>I - N</code> here would signal a malformed matrix rather than a case to work
-around silently.</p>
+    <p>The series converges only when the spectral radius of <code>N</code> is below 1.
+Normalisation keeps the radius at or below 1, and it equals 1 when criteria
+influence each other in a closed group with equal totals. That case returns
+an <code>error</code> explaining it, and no truncated series is substituted.</p>
     </div>
 
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

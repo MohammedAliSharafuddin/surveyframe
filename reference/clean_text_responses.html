@@ -32,7 +32,7 @@ signal and would otherwise inflate downstream response counts."><meta property="
 
     <a class="navbar-brand me-2" href="../index.html">surveyframe</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -113,6 +113,21 @@ is validated as a <code>"text"</code> or <code>"textarea"</code> item before cle
 <code>data</code>, so quotes extracted later can cite a respondent.</p>
     </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">demo</span> <span class="op">&lt;-</span> <span class="fu"><a href="sframe_demo_data.html">sframe_demo_data</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">cleaned</span> <span class="op">&lt;-</span> <span class="fu">clean_text_responses</span><span class="op">(</span><span class="va">demo</span><span class="op">$</span><span class="va">responses</span>, <span class="st">"comments"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">cleaned</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "useful service information"            </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2] "useful service information"            </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [3] "would like more sustainability details"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [4] "useful service information"            </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [5] "would like more sustainability details"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [6] "clear online content"                  </span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">cleaned</span>, <span class="st">"respondent"</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">]</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 2 3 5 7 8</span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 

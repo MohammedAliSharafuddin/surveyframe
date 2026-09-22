@@ -30,7 +30,7 @@ that found nothing."><meta property="og:image" content="https://mohammedalishara
 
     <a class="navbar-brand me-2" href="../index.html">surveyframe</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -62,20 +62,6 @@ passed, every problem found, and every check that ran, including the checks
 that found nothing.</p>
     </div>
 
-    <div class="section level2">
-    <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S3 method for class 'sframe_validation'</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># S3 method for class 'sframe_validation'</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/format.html" class="external-link">format</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># S3 method for class 'sframe_validation'</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">object</span>, <span class="va">...</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># S3 method for class 'sframe_validation'</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">x</span>, row.names <span class="op">=</span> <span class="cn">NULL</span>, optional <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
-    </div>
 
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
@@ -88,14 +74,6 @@ that found nothing.</p>
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>Ignored. Present for S3 consistency.</p></dd>
 
-
-<dt id="arg-row-names">row.names<a class="anchor" aria-label="anchor" href="#arg-row-names"></a></dt>
-<dd><p>Passed to <code><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">base::as.data.frame()</a></code>.</p></dd>
-
-
-<dt id="arg-optional">optional<a class="anchor" aria-label="anchor" href="#arg-optional"></a></dt>
-<dd><p>Passed to <code><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">base::as.data.frame()</a></code>.</p></dd>
-
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
@@ -105,15 +83,15 @@ character string. <code><a href="https://rdrr.io/r/base/summary.html" class="ext
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>Use <code><a href="sf_validation_accessors.html">sf_is_valid()</a></code> for the pass or fail flag, <code><a href="sf_validation_accessors.html">sf_problems()</a></code> for the
+    <p>Use <code><a href="sf_is_valid.html">sf_is_valid()</a></code> for the pass or fail flag, <code><a href="sf_problems.html">sf_problems()</a></code> for the
 messages, <code><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame()</a></code> for a problem-per-row table, <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> for
 the full check roster, and <code><a href="as_sframe.html">as_sframe()</a></code> to recover the validated
 instrument.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
-    <div class="dont-index"><p><code><a href="validate_sframe.html">validate_sframe()</a></code>, <code><a href="validate_model.html">validate_model()</a></code>, <code><a href="sf_validation_accessors.html">sf_problems()</a></code>,
-<code><a href="sf_validation_accessors.html">sf_is_valid()</a></code>, <code><a href="as_sframe.html">as_sframe()</a></code></p></div>
+    <div class="dont-index"><p><code><a href="validate_sframe.html">validate_sframe()</a></code>, <code><a href="validate_model.html">validate_model()</a></code>, <code><a href="sf_problems.html">sf_problems()</a></code>,
+<code><a href="sf_is_valid.html">sf_is_valid()</a></code>, <code><a href="as_sframe.html">as_sframe()</a></code></p></div>
     </div>
 
     <div class="section level2">
@@ -131,35 +109,44 @@ instrument.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &lt;sframe validation&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Instrument:  Demo Survey (0.1.0)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Status:      valid</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Checks:      19 run, 0 with problems</span>
-<span class="r-in"><span><span class="fu"><a href="sf_validation_accessors.html">sf_is_valid</a></span><span class="op">(</span><span class="va">v</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Checks:      28 run, 0 with problems</span>
+<span class="r-in"><span><span class="fu"><a href="sf_is_valid.html">sf_is_valid</a></span><span class="op">(</span><span class="va">v</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] TRUE</span>
-<span class="r-in"><span><span class="fu"><a href="sf_validation_accessors.html">sf_problems</a></span><span class="op">(</span><span class="va">v</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="sf_problems.html">sf_problems</a></span><span class="op">(</span><span class="va">v</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> character(0)</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">v</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] check   problem</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &lt;0 rows&gt; (or 0-length row.names)</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">v</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                           check status n_problems</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1            duplicate_item_ids     ok          0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2                item_id_format     ok          0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3          duplicate_choice_ids     ok          0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4           duplicate_scale_ids     ok          0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5                   item_labels     ok          0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6          item_choice_set_refs     ok          0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 7               item_scale_refs     ok          0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 8         reverse_without_scale     ok          0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 9           decision_item_shape     ok          0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 10             comparison_scale     ok          0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 11             scale_membership     ok          0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 12               branching_refs     ok          0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 13             branching_values     ok          0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 14                   check_refs     ok          0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 15         analysis_plan_models     ok          0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 16      analysis_plan_variables     ok          0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 17 decision_scale_compatibility     ok          0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 18                    model_ids     ok          0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 19                  model_specs     ok          0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1                  field_shapes     ok          0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2            duplicate_item_ids     ok          0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3                item_id_format     ok          0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4          duplicate_choice_ids     ok          0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5           choice_set_contents     ok          0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6           duplicate_scale_ids     ok          0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7                  id_namespace     ok          0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8                   item_config     ok          0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9                   item_labels     ok          0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10         item_choice_set_refs     ok          0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 11              item_scale_refs     ok          0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 12        reverse_without_scale     ok          0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 13          decision_item_shape     ok          0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 14             comparison_scale     ok          0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 15             scale_membership     ok          0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 16             scale_parameters     ok          0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 17      reverse_item_membership     ok          0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 18               branching_refs     ok          0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 19             branching_values     ok          0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 20                   check_refs     ok          0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 21          duplicate_check_ids     ok          0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 22               branch_targets     ok          0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 23         analysis_plan_blocks     ok          0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 24         analysis_plan_models     ok          0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 25      analysis_plan_variables     ok          0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 26 decision_scale_compatibility     ok          0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 27                    model_ids     ok          0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 28                  model_specs     ok          0</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

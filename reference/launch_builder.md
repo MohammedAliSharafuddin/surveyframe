@@ -37,8 +37,13 @@ The builder includes a three-mode interface.
 
 - Preview:
 
-  A full live render of the survey showing welcome, body, and thank-you
-  pages.
+  A layout preview of the welcome, body and thank-you pages, showing
+  wording, order and branding. It renders from the builder's own markup,
+  so answering, required checks and branching are left out. Use
+  [`export_static_survey()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/export_static_survey.md)
+  and open the file to test the respondent's path, or SurveyStudio's
+  Preview screen, which exports the real survey with collection switched
+  off.
 
 - Analyse:
 

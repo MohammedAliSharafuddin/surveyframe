@@ -45,7 +45,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">surveyframe</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -110,12 +110,11 @@ pre.sourceCode a:empty { display: none; }
 <div class="section level2">
 <h2 id="what-this-vignette-covers">What this vignette covers<a class="anchor" aria-label="anchor" href="#what-this-vignette-covers"></a>
 </h2>
-<p>Multi-criteria decision analysis ranks a handful of alternatives
-against several criteria that pull in different directions. surveyframe
-treats it the same way it treats any other analysis: the method, its
-inputs, and the roles they play are declared in the instrument before
-data is collected, and the analysis is the execution of that
-declaration.</p>
+<p>Multi-criteria decision analysis ranks a set of alternatives against
+multiple criteria that pull in different directions. surveyframe treats
+it the same way it treats any other analysis: the method, its inputs,
+and the roles they play are declared in the instrument before data is
+collected, and the analysis is the execution of that declaration.</p>
 <p>The worked example is a hotel choosing between 5 suppliers on 4
 criteria. It ships with the package, so every number below is
 reproducible.</p>
@@ -185,7 +184,7 @@ scale</td>
 </tbody>
 </table>
 <p>Each result records which source it used, so a report can say where
-its numbers came from rather than leaving a reader to assume.</p>
+its numbers came from, which saves a reader from assuming.</p>
 </div>
 <div class="section level2">
 <h2 id="criterion-weights-from-pairwise-judgements">Criterion weights from pairwise judgements<a class="anchor" aria-label="anchor" href="#criterion-weights-from-pairwise-judgements"></a>
@@ -303,17 +302,17 @@ judgements.</caption>
 <p>Note the <code>criteria_types</code> this block declares: service and
 location are <code>benefit</code> criteria where more is better, while
 price and delivery time are <code>cost</code> criteria where less is
-better. Getting that wrong silently inverts the ranking, which is why it
-is declared in the instrument rather than inferred.</p>
+better. Getting that wrong silently inverts the ranking, which is why
+the instrument declares it and surveyframe reads it from there.</p>
 </div>
 <div class="section level2">
 <h2 id="ranking-suppliers-on-collected-ratings">Ranking suppliers on collected ratings<a class="anchor" aria-label="anchor" href="#ranking-suppliers-on-collected-ratings"></a>
 </h2>
 <p>The third block answers a different question with the same method:
-not which supplier the audited figures favour, but which one the staff
-rate best. The performance matrix is built from respondents’ ratings,
-and the weights come from the constant-sum question instead of the
-pairwise one.</p>
+which supplier the staff rate best, where the first asked which one the
+audited figures favour. The performance matrix is built from
+respondents’ ratings, and the weights come from the constant-sum
+question this time, where the first ranking used the pairwise one.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">rated</span> <span class="op">&lt;-</span> <span class="va">results</span><span class="op">[[</span><span class="st">"RQ3"</span><span class="op">]</span><span class="op">]</span></span>
 <span></span>
@@ -356,8 +355,8 @@ question.</caption>
 </tr>
 </tbody>
 </table>
-<p>The two rankings do not agree, and that is the useful part. Comparing
-them is a finding rather than a problem to be resolved.</p>
+<p>The two rankings disagree, and that is the useful part. Comparing
+them is a finding in its own right, and it belongs in the write-up.</p>
 <table class="table">
 <caption>The same method, two declared input sources, two
 answers.</caption>
@@ -534,7 +533,7 @@ weight.</caption>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">sens</span><span class="op">)</span></span></code></pre></div>
 <p><img src="mcdm-analysis_files/figure-html/sensitivity-plot-1.png" class="r-plt" alt="Bar chart of rank correlation for each criterion perturbed up and down, against a dashed reference line at one marking an unchanged ranking." width="672"></p>
-<p>This example is worth reading closely, because it is not the clean
+<p>This example is worth reading closely, because it is the awkward
 case. Four of the 8 perturbations changed the ranking, so
 <code>stable</code> is <code>FALSE</code>. But <code>top_changed</code>
 is <code>FALSE</code> throughout: the order shuffles among the middle
@@ -553,7 +552,7 @@ weights.</p>
 <div class="section level2">
 <h2 id="which-criteria-drive-the-others">Which criteria drive the others<a class="anchor" aria-label="anchor" href="#which-criteria-drive-the-others"></a>
 </h2>
-<p>The criteria are not independent. Delivery speed and price move
+<p>The criteria depend on each other. Delivery speed and price move
 together, and service quality may drive both. DEMATEL asks respondents
 how strongly each factor influences each other factor and separates the
 causes from the effects.</p>
@@ -618,8 +617,8 @@ more than it is influenced.</p>
 one. AHP reads reciprocal relative importance on Saaty’s 1 to 9 ratio
 scale, while DEMATEL reads directed 0 to 4 influence with no
 reciprocity. They are not interchangeable, and surveyframe refuses to
-pair one with the other’s method at validation time rather than
-returning plausible numbers from meaningless input.</p>
+pair one with the other’s method at validation time, which is what stops
+meaningless input returning plausible numbers.</p>
 </div>
 <div class="section level2">
 <h2 id="reporting-the-whole-plan">Reporting the whole plan<a class="anchor" aria-label="anchor" href="#reporting-the-whole-plan"></a>
@@ -679,19 +678,102 @@ criteria were net causes overall.</td>
 <div class="section level2">
 <h2 id="what-surveyframe-does-not-do-here">What surveyframe does not do here<a class="anchor" aria-label="anchor" href="#what-surveyframe-does-not-do-here"></a>
 </h2>
-<p>The decision family ranks and weights. It does not tell a researcher
-which method to use, and the choice matters: the 10 available methods
-encode different assumptions about how criteria trade off against one
+<p>The decision family ranks and weights. The choice of method stays
+with the researcher, and it matters: the 10 available methods encode
+different assumptions about how criteria trade off against one
 another.</p>
 <p>Two limits are worth stating plainly. surveyframe does not estimate
 choice models, so <code><a href="../reference/sf_conjoint_design.html">sf_conjoint_design()</a></code> declares a conjoint
 design without analysing its responses. And PROMETHEE defaults to Brans
-and Vincke’s type I step function rather than the linear function some
-implementations default to, because the linear function needs thresholds
-that are commonly derived from the data range, which makes a result
-depend on a choice nobody declared. See
-<code><a href="../reference/sframe_decision_options.html">?sframe_decision_options</a></code> for the detail, including how far
-rankings move between the two.</p>
+and Vincke’s type I step function, where some implementations default to
+the linear function, because the linear function needs thresholds that
+are commonly derived from the data range, which makes a result depend on
+a choice nobody declared. See <code><a href="../reference/sframe_decision_options.html">?sframe_decision_options</a></code> for
+the detail, including how far rankings move between the two.</p>
+</div>
+<div class="section level2">
+<h2 id="how-each-method-was-checked">How each method was checked<a class="anchor" aria-label="anchor" href="#how-each-method-was-checked"></a>
+</h2>
+<p>A ranking is only as trustworthy as the arithmetic under it, so the
+evidence behind each method is recorded here in full. Two kinds appear.
+An <em>oracle</em> check computes the same method on the same matrix
+with RMCDA, an independent package, and compares the numbers. A
+<em>derived</em> check compares against values worked out by hand from
+the published formula, or against a worked example printed in the source
+paper.</p>
+<table class="table">
+<colgroup>
+<col width="50%">
+<col width="50%">
+</colgroup>
+<thead><tr class="header">
+<th>Method</th>
+<th>Evidence behind it</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td>AHP</td>
+<td>oracle: RMCDA weights on a consistent matrix. Derived: CR on a
+consistent and an inconsistent matrix</td>
+</tr>
+<tr class="even">
+<td>VIKOR</td>
+<td>oracle: RMCDA S, R and Q. Derived: the 2 acceptance conditions</td>
+</tr>
+<tr class="odd">
+<td>MOORA</td>
+<td>oracle: RMCDA ratio-system scores on RMCDA’s own 7-alternative
+example. Derived: the reference-point variant and direction
+handling</td>
+</tr>
+<tr class="even">
+<td>WASPAS</td>
+<td>oracle: RMCDA scores at lambda 0.5 on RMCDA’s own example. Derived:
+the sum and product parts separately</td>
+</tr>
+<tr class="odd">
+<td>ELECTRE</td>
+<td>oracle: RMCDA’s example, compared on the ordering of one concordance
+pair. Derived: 2 concordance and discordance entries, and a kernel under
+direct dominance</td>
+</tr>
+<tr class="even">
+<td>ANP</td>
+<td>derived: a stored priority-vector fixture, and the limit matrix’s
+convergence</td>
+</tr>
+<tr class="odd">
+<td>DEMATEL</td>
+<td>derived: 2-by-2 algebra by hand, and a 4-by-4 fixture</td>
+</tr>
+<tr class="even">
+<td>SMART</td>
+<td>derived: scores of 0.2, 0.6 and 0.7 worked out by hand, and
+invariance to units</td>
+</tr>
+<tr class="odd">
+<td>PROMETHEE</td>
+<td>derived: flows worked out by hand for the usual and linear
+preference functions</td>
+</tr>
+<tr class="even">
+<td>TOPSIS</td>
+<td>derived: dominance endpoints, cost-direction reversal, invariance to
+units</td>
+</tr>
+</tbody>
+</table>
+<p>RMCDA sits in <code>Suggests</code>, so its 5 checks are skipped
+where it is absent. The 5 derived-only methods differ from RMCDA’s in
+normalisation or in the variant implemented, so a numeric comparison
+there would compare 2 different methods. DEMATEL is the clearest case:
+RMCDA scales by a different norm, and the test says so where it derives
+the expected matrix instead.</p>
+<p>Reading a citation is a separate check from reproducing a method. The
+registry behind <code>?sframe_decision_methods</code> records which
+publications were read directly, and names the 1 case, DEMATEL’s
+originating 1972 report, where a later paper’s statement of the same
+equations stood in for a source that stayed out of reach.</p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

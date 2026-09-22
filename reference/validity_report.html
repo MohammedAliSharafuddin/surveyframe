@@ -24,7 +24,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">surveyframe</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -90,6 +90,19 @@ element records which was computed.</p></dd>
     <p>An object of class <code>sframe_validity_report</code>.</p>
     </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">loadings</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  sq  <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>sq_1 <span class="op">=</span> <span class="fl">0.80</span>, sq_2 <span class="op">=</span> <span class="fl">0.75</span>, sq_3 <span class="op">=</span> <span class="fl">0.78</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  sat <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>sat_1 <span class="op">=</span> <span class="fl">0.85</span>, sat_2 <span class="op">=</span> <span class="fl">0.82</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">vr</span> <span class="op">&lt;-</span> <span class="fu">validity_report</span><span class="op">(</span><span class="va">loadings</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">vr</span><span class="op">$</span><span class="va">reliability</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     construct composite_reliability       AVE n_items</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> sat       sat             0.8217148 0.6974500       2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> sq         sq             0.8203234 0.6036333       3</span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 

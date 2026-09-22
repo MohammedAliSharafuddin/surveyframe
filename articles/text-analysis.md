@@ -12,13 +12,12 @@ exist.
 
 Nine methods are available, from plain term counting through to topic
 modelling. The base path (`term_freq`, `ngram_freq`, `term_context`,
-`co_occurrence`) needs no optional packages. Five more
+`co_occurrence`) runs on the package alone. Five more
 (`co_occurrence_network`, `tidy_sentiment`, `quanteda_dfm`,
-`topic_model_lda`, `stm_topics`) each need one Suggests-only package,
-guarded with
+`topic_model_lda`, `stm_topics`) need one or more Suggests-only
+packages, guarded with
 [`rlang::check_installed()`](https://rlang.r-lib.org/reference/is_installed.html),
-and every guarded section below knits cleanly whether or not that
-package is installed.
+and every guarded section below knits cleanly on either kind of machine.
 
 ## A survey with an open-ended item beside a Likert scale
 
@@ -58,7 +57,8 @@ instr <- sf_instrument(
 The comments are built from a small phrase bank, seeded so the example
 is reproducible. The north branch’s simulated visits lean positive, the
 south branch’s lean mixed, which gives the group-role examples below
-something real to show rather than a coincidence.
+something real to show, where an even split would leave only a
+coincidence.
 
 ``` r
 
@@ -141,8 +141,8 @@ head(attr(cleaned, "respondent"))
 
 [`term_frequency()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/term_frequency.md)
 tokenises, lower-cases, strips punctuation, removes stop words (a
-built-in English list ships with the package, so this needs no optional
-dependency), and counts.
+built-in English list ships with the package, so this stage runs on base
+surveyframe), and counts.
 [`ngram_frequency()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/ngram_frequency.md)
 does the same for 2-word and 3-word phrases, which surface a complaint
 like “long wait” that single-word counts would split apart.
@@ -174,16 +174,16 @@ bigrams <- ngram_frequency(cleaned, n = 2, top_n = 8)
 kable(bigrams, row.names = FALSE, caption = "The 8 most frequent bigrams.")
 ```
 
-| term             |   n | pct |
-|:-----------------|----:|----:|
-| help us          |  12 | 3.1 |
-| arrived fast     |   9 | 2.3 |
-| attentive food   |   9 | 2.3 |
-| food arrived     |   9 | 2.3 |
-| server attentive |   9 | 2.3 |
-| check quick      |   8 | 2.1 |
-| helpful whenever |   8 | 2.1 |
-| needed anything  |   8 | 2.1 |
+| term                   |   n | pct |
+|:-----------------------|----:|----:|
+| help us                |  12 | 7.6 |
+| arrived fast           |   9 | 5.7 |
+| food arrived           |   9 | 5.7 |
+| helpful whenever       |   8 | 5.1 |
+| needed anything        |   8 | 5.1 |
+| comfortable throughout |   7 | 4.4 |
+| friendly staff         |   7 | 4.4 |
+| staff made             |   7 | 4.4 |
 
 The 8 most frequent bigrams. {.table}
 
@@ -359,22 +359,22 @@ branch.](text-analysis_files/figure-html/group-plot-1.png)
 
 North’s simulated comments lean toward “friendly”, “helpful”, and
 “clean”. South’s lean toward “wait”, “slow”, and “staff” in a different
-sense, the complaint rather than the compliment. A group split like this
-is what turns “the comments mention staff a lot” into a specific,
-actionable finding.
+sense, the complaint sense of the word, where the North uses the
+compliment. A group split like this is what turns “the comments mention
+staff a lot” into a specific, actionable finding.
 
 The `group` role applies the same minimum-response guard per group as it
 does overall: a branch with too few usable responses is flagged in the
-table’s `note` column rather than silently producing a trend from a
-handful of comments.
+table’s `note` column, which keeps a handful of comments from reading as
+a trend.
 
 ## Keyword in context
 
 [`term_context()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/term_context.md)
 builds a concordance for one keyword: every place it appears, with a
 window of surrounding words on each side. It is the fastest way to read
-what a keyword actually means in context, rather than trusting that a
-frequent term always means the same thing.
+what a keyword actually means in context, and it settles whether a
+frequent term keeps one sense throughout.
 
 ``` r
 
@@ -404,9 +404,9 @@ Every occurrence of “wait” in context. {.table}
 
 ## Co-occurrence
 
-`.sframe_cooccurrence()`’s public entry point, the `co_occurrence`
-method, counts how often pairs of frequent terms appear together within
-the same response, and renders as a heatmap.
+The analysis-plan method `co_occurrence` counts how often pairs of
+frequent terms appear together within the same response, and renders as
+a heatmap.
 
 ``` r
 
@@ -513,9 +513,8 @@ frequency.](text-analysis_files/figure-html/network-plot-1.png)
 ## Sentiment
 
 `tidy_sentiment` needs the optional `tidytext` package. It uses the
-bundled `"bing"` positive/negative lexicon, so no download is needed
-once tidytext is installed. Like `term_freq`, it accepts an optional
-`group` role.
+bundled `"bing"` positive/negative lexicon, which arrives with tidytext
+itself. Like `term_freq`, it accepts an optional `group` role.
 
 ``` r
 
@@ -584,9 +583,8 @@ frequency.](text-analysis_files/figure-html/sentiment-cloud-1.png)
 ## Document-feature matrix
 
 `quanteda_dfm` needs the optional `quanteda` package. It is a
-descriptive summary rather than an analysis in its own right: feature
-count, sparsity, and the leading features, useful as a sanity check
-before a heavier method.
+descriptive summary ahead of an analysis: feature count, sparsity, and
+the leading features provide a sanity check before a heavier method.
 
 ``` r
 
@@ -632,11 +630,11 @@ The leading features. {.table}
 
 `stm_topics` fits a structural topic model via the optional `stm`
 package (tokenising uses `tidytext`, so both are needed). A small `k`
-keeps this example fast; a real study would try several values of `k`
-and compare fit – `k = 3` (or `topic_model_lda`’s default `k = 4`) is a
-demonstration value, not a recommendation, and neither default was
-chosen from any fit criterion. The accepted way to choose `k` is to fit
-a range of candidate values and compare them on held-out likelihood or a
+keeps this example fast. A real study would try three to six values of
+`k` and compare fit. `k = 3` (or `topic_model_lda`’s default `k = 4`) is
+a demonstration value chosen to keep the example fast, with a fit
+criterion left out of it. The accepted way to choose `k` is to fit a
+range of candidate values and compare them on held-out likelihood or a
 coherence metric:
 [`stm::searchK()`](https://rdrr.io/pkg/stm/man/searchK.html) does this
 directly for `stm_topics`’s underlying model (pass it the same
@@ -644,10 +642,9 @@ directly for `stm_topics`’s underlying model (pass it the same
 [`stm::prepDocuments()`](https://rdrr.io/pkg/stm/man/prepDocuments.html)
 would produce), and
 [`topicmodels::perplexity()`](https://rdrr.io/pkg/topicmodels/man/perplexity.html)
-on a held-out split serves the same purpose for `topic_model_lda`.
-Neither is wrapped by surveyframe – `k` selection is a modelling
-decision for the researcher to make and report, not a default to trust
-unexamined.
+on a held-out split serves the same purpose for `topic_model_lda`. Both
+stay in their own packages. `k` selection is a modelling decision for
+the researcher to make and report, not a default to trust unexamined.
 
 ``` r
 
@@ -755,15 +752,15 @@ render_report(instr, responses, output_file = "hospitality-feedback.html")
 
 This is algorithmic counting and clustering, not interpretation. Term
 frequency, co-occurrence, and topic modelling surface *candidate*
-themes; a human reader still decides what they mean and whether they
+themes. A human reader still decides what they mean and whether they
 answer the research question.
 
 surveyframe also does not build a qualitative coding interface. Manual,
 inductive coding (code-and-retrieve, memos, a hierarchical code scheme,
 the qcoder or RQDA style of analysis) is a different paradigm from the
-algorithmic methods here, human interpretation rather than counting or
-clustering, and is out of scope by design.
+algorithmic methods here, resting on human interpretation where these
+methods count and cluster, and is out of scope by design.
 [`extract_quotes()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/extract_quotes.md)’s
 output is deliberately a plain data frame, clean enough to export and
-take into a dedicated qualitative coding tool for that next step, rather
-than surveyframe trying to be that tool itself.
+take into a dedicated qualitative coding tool for that next step, which
+surveyframe leaves to the tools built for it.

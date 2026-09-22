@@ -26,3 +26,16 @@ A ggplot2 object.
 ## See also
 
 [`quality_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/quality_report.md)
+
+## Examples
+
+``` r
+# \donttest{
+if (requireNamespace("ggplot2", quietly = TRUE)) {
+  demo <- sframe_demo("likert_scale")
+  qr <- quality_report(demo$responses, demo$instrument)
+  sframe_plot_quality(qr)
+}
+
+# }
+```

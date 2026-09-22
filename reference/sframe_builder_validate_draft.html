@@ -24,7 +24,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">surveyframe</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -64,7 +64,10 @@
 <span>  checks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  analysis_plan <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  models <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
-<span>  render <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span></span>
+<span>  render <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  amendments <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  designs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  origin <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -92,12 +95,42 @@
 <dd><p>List of rendering settings (welcome, header/logo, thankyou,
 theme) carried from the loaded instrument so previews and exports match.</p></dd>
 
+
+<dt id="arg-amendments">amendments<a class="anchor" aria-label="anchor" href="#arg-amendments"></a></dt>
+<dd><p>List of previously disclosed amendment entries, carried
+through unchanged so a draft round trip does not drop them.</p></dd>
+
+
+<dt id="arg-designs">designs<a class="anchor" aria-label="anchor" href="#arg-designs"></a></dt>
+<dd><p>List of conjoint designs, carried through unchanged, since
+Studio has no editor for them.</p></dd>
+
+
+<dt id="arg-origin">origin<a class="anchor" aria-label="anchor" href="#arg-origin"></a></dt>
+<dd><p>The load record of an instrument read with <code><a href="read_sframe.html">read_sframe()</a></code>,
+from the builder state, or <code>NULL</code>. Carried onto the draft so an edit of a
+loaded file is recognised as a revision.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A list with <code>valid</code>, <code>problems</code>, and <code>instrument</code>.</p>
+    <p>A list with <code>valid</code>, <code>problems</code>, <code>instrument</code>, and
+<code>revision_problem</code>: the reason <code><a href="write_sframe.html">write_sframe()</a></code> would refuse the draft as
+an undisclosed revision, or <code>NULL</code>.</p>
     </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">demo</span>  <span class="op">&lt;-</span> <span class="fu"><a href="sframe_demo_data.html">sframe_demo_data</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">state</span> <span class="op">&lt;-</span> <span class="fu"><a href="sframe_builder_state_from_instrument.html">sframe_builder_state_from_instrument</a></span><span class="op">(</span><span class="va">demo</span><span class="op">$</span><span class="va">instrument</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">draft</span> <span class="op">&lt;-</span> <span class="fu">sframe_builder_validate_draft</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  meta <span class="op">=</span> <span class="va">state</span><span class="op">$</span><span class="va">meta</span>, choices <span class="op">=</span> <span class="va">state</span><span class="op">$</span><span class="va">choices</span>, items <span class="op">=</span> <span class="va">state</span><span class="op">$</span><span class="va">items</span>,</span></span>
+<span class="r-in"><span>  scales <span class="op">=</span> <span class="va">state</span><span class="op">$</span><span class="va">scales</span>, branching <span class="op">=</span> <span class="va">state</span><span class="op">$</span><span class="va">branching</span>, checks <span class="op">=</span> <span class="va">state</span><span class="op">$</span><span class="va">checks</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">draft</span><span class="op">$</span><span class="va">valid</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] TRUE</span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 

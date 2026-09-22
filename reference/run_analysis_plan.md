@@ -15,7 +15,8 @@ run_analysis_plan(
   scored = TRUE,
   plots = FALSE,
   plot_palette = c("web", "print"),
-  seed = 20260828L
+  seed = 20260828L,
+  strict = FALSE
 )
 ```
 
@@ -62,13 +63,24 @@ run_analysis_plan(
   caller's own random stream is restored afterwards, so seeding here
   does not affect anything that runs later.
 
+- strict:
+
+  Logical. When `TRUE`, an error is raised if any block fails or scale
+  scoring fails, listing each failure. When `FALSE`, the default,
+  failures are kept in the results and counted in their `status`.
+
 ## Value
 
 An object of class `sframe_analysis_results`, a list with one element
-per analysis block. Each element contains the test result, APA string,
-interpretation prompt, and reporting-reference metadata. Inferential
-blocks also carry a `$table` data frame suitable for
-[`knitr::kable()`](https://rdrr.io/pkg/knitr/man/kable.html). Pass to
+per analysis block, named by block id. Its `status` attribute holds
+`blocks`, `succeeded`, `failed`, `failed_blocks` and `scoring`, the
+outcome of scoring scales before analysis. A normal return can hold
+failed blocks, so check `attr(results, "status")$failed` or use
+`strict = TRUE`. Each block element Each element contains the test
+result, APA string, interpretation prompt, and reporting-reference
+metadata. Inferential blocks also carry a `$table` data frame suitable
+for [`knitr::kable()`](https://rdrr.io/pkg/knitr/man/kable.html). Pass
+to
 [`render_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_results.md)
 to generate a formatted report.
 
@@ -99,7 +111,7 @@ print(results)
 #> 
 #> RQ 1: Is perceived digital marketing effectiveness associated with tourist satisfaction?
 #>   Test: correlation_pearson
-#>   APA:  r(118) = 0.54 [0.40, 0.65], p < .001
+#>   APA:  r(118) = 0.54, 95% CI [0.40, 0.65], p < .001
 #> 
 #> RQ 2: Do digital marketing, service quality, and sustainability perceptions predict satisfaction?
 #>   Test: regression_linear
@@ -107,7 +119,7 @@ print(results)
 #> 
 #> RQ 3: Do first-time and repeat visitors differ in behavioural intention?
 #>   Test: mann_whitney
-#>   APA:  U = 1576, z = -0.98, p = 0.327, r = 0.09 [0.00, 0.27], Hodges-Lehmann shift = -0.00 [-0.50, 0.00]
+#>   APA:  U = 1576, z = -0.98, p = .326, r = 0.09, 95% CI [0.00, 0.27], Hodges-Lehmann shift = -0.00, 95% CI [-0.50, 0.00]
 #> 
 #> RQ 4: What is the distribution of first-time and repeat visitors?
 #>   Test: frequency
@@ -163,63 +175,63 @@ print(results)
 #> 
 #> RQ 17: Is visitor type associated with attention check response level?
 #>   Test: crosstab
-#>   APA:  χ²(1, N = 120) = 4.31, p = 0.038, φ = 0.19 [0.03, 0.33]
+#>   APA:  χ²(1, N = 120) = 4.31, p = .038, φ = 0.19, 95% CI [0.03, 0.33]
 #> 
 #> RQ 18: Is the distribution of satisfaction ratings different across visitor types?
 #>   Test: crosstab
-#>   APA:  χ²(4, N = 120) = 3.40, p = 0.494, V = 0.17 [0.09, 0.38]
+#>   APA:  χ²(4, N = 120) = 3.40, p = .494, V = 0.17, 95% CI [0.09, 0.38]
 #> 
 #> RQ 19: Is there an association between visitor type and behavioural intention rating?
 #>   Test: fisher_exact
-#>   APA:  Fisher's exact test, p = 0.454, Cramer's V = 0.17
+#>   APA:  Fisher's exact test, p = .454, Cramer's V = 0.17
 #> 
 #> RQ 20: Do first-time and repeat visitors differ in mean satisfaction score?
 #>   Test: t_test_ind
-#>   APA:  t(106.77) = 0.15, p = 0.878, d = 0.03 [0.01, 0.43]
+#>   APA:  t(106.77) = 0.15, p = .878, d = 0.03, 95% CI [0.01, 0.43]
 #> 
 #> RQ 21: Do respondents rate the two satisfaction items differently?
 #>   Test: t_test_pair
-#>   APA:  t(119) = 0.82, p = 0.416, d_z = 0.07 [-0.11, 0.25]
+#>   APA:  t(119) = 0.82, p = .416, d_z = 0.07, 95% CI [-0.11, 0.26]
 #> 
 #> RQ 22: Is there a significant distributional difference between the first two service quality items?
 #>   Test: wilcoxon_pair
-#>   APA:  V = 967, z = -1.17, p = 0.240, r = 0.11 [0.01, 0.36], pseudomedian = -0.00 [-0.00, 0.00]
+#>   APA:  V = 967, z = -1.18, p = .239, r = 0.14, 95% CI [0.01, 0.38], pseudomedian = -0.00, 95% CI [-0.00, 0.00]
 #> 
 #> RQ 23: Does satisfaction differ across visitor types?
 #>   Test: kruskal_wallis
-#>   APA:  H(1) = 0.00, p = 0.949, η² = 0.000 [0.00, 0.04]
+#>   APA:  H(1) = 0.00, p = .949, η² = 0.000, 95% CI [0.00, 0.03]
 #> 
 #> RQ 24: Does mean behavioural intention differ between visitor types?
 #>   Test: anova_one
-#>   APA:  F(1, 118) = 0.74, p = 0.391, η² = 0.006 [0.00, 0.07]
+#>   APA:  F(1, 118) = 0.74, p = .391, η² = 0.006, 95% CI [0.00, 0.07]
 #> 
 #> RQ 25: Do visitor types differ in satisfaction after controlling for service quality?
 #>   Test: ancova
-#>   APA:  ANCOVA estimated group differences adjusted for covariates.
+#>   APA:  Adjusted for service_quality, the group effect was F(1, 117) = 0.07, p = .791.
 #> 
 #> RQ 26: Do mean ratings differ across the three digital marketing items within respondents?
 #>   Test: repeated_anova
-#>   APA:  F(2, 238) = 0.40, p = 0.670, partial η² = 0.003
+#>   APA:  F(2, 238) = 0.40, p = .670, partial η² = 0.003
 #> 
 #> RQ 27: Do ordinal ratings differ across the three service quality items within respondents?
 #>   Test: friedman
-#>   APA:  Friedman chi-square(2, N = 120) = 1.09, p = 0.580
+#>   APA:  Friedman chi-square(2, N = 120) = 1.09, p = .580
 #> 
 #> RQ 28: Are service quality perceptions associated with sustainability perceptions?
 #>   Test: correlation_spearman
-#>   APA:  r_s(118) = 0.00 [-0.18, 0.20], p = 0.984
+#>   APA:  r_s(118) = 0.00, 95% CI [-0.19, 0.19], p = .984
 #> 
 #> RQ 29: Is sustainability perception associated with behavioural intention?
 #>   Test: correlation_kendall
-#>   APA:  tau(118) = 0.05 [-0.11, 0.20], p = 0.519
+#>   APA:  tau(118) = 0.05, 95% CI [-0.11, 0.20], p = .519
 #> 
 #> RQ 30: Is digital marketing associated with behavioural intention after controlling for satisfaction?
 #>   Test: partial_correlation
-#>   APA:  partial r(117) = -0.09, p = 0.302
+#>   APA:  partial r(117) = -0.09, p = .304
 #> 
 #> RQ 31: Do digital marketing and service quality perceptions predict visitor type?
 #>   Test: regression_logistic_binary
-#>   APA:  χ²(2) = 0.28, p = 0.869, McFadden R² = 0.002
+#>   APA:  χ²(2) = 0.28, p = .869, McFadden R² = 0.002
 #> 
 #> RQ 32: Do digital marketing and sustainability perceptions predict ordered satisfaction?
 #>   Test: regression_logistic_ordinal
@@ -231,7 +243,7 @@ print(results)
 #> 
 #> RQ 34: Does satisfaction mediate the path from digital marketing to behavioural intention?
 #>   Test: mediation
-#>   APA:  Indirect effect = 0.365, 95% bootstrap CI [0.221, 0.519].
+#>   APA:  Indirect effect = 0.365, 95% bootstrap CI [0.218, 0.538], from 1000 of 1000 resamples.
 #> 
 # }
 ```

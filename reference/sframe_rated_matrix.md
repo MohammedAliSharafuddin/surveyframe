@@ -26,7 +26,10 @@ sframe_rated_matrix(data, instrument, items, statistic = c("mean", "median"))
 
   Character vector of `"matrix"` item ids, one per criterion, in the
   intended criterion order. Every item must declare the same
-  `matrix_items` (the alternatives) in the same order.
+  `matrix_items` (the alternatives) in the same order. When a decision
+  block also collects weights through a `weights_item` whose criterion
+  names differ from these ids, the items pair with its criteria in this
+  order, and the result notes each pairing.
 
 - statistic:
 
@@ -40,3 +43,20 @@ A list with `matrix` (alternatives x criteria, with dimnames), `n`,
 ## See also
 
 [`sframe_collected_weights()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_collected_weights.md)
+
+## Examples
+
+``` r
+q5    <- sf_choices("q5", 1:5,
+           c("Very poor", "Poor", "Fair", "Good", "Excellent"))
+price <- sf_item("rate_price", "Rate each supplier: value",
+                 type = "matrix", matrix_items = c("Alpha", "Basilica"),
+                 choice_set = "q5")
+study <- sf_instrument("Supplier selection", components = list(q5, price))
+responses <- data.frame(rate_price__Alpha = c(3, 4), rate_price__Basilica = c(5, 5))
+rm <- sframe_rated_matrix(responses, study, "rate_price")
+rm$matrix
+#>          rate_price
+#> Alpha           3.5
+#> Basilica        5.0
+```

@@ -40,3 +40,18 @@ per the dataviz skill's categorical-colour guidance; see
 ## See also
 
 [`run_analysis_plan()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/run_analysis_plan.md)
+
+## Examples
+
+``` r
+# \donttest{
+if (requireNamespace("ggplot2", quietly = TRUE) &&
+    requireNamespace("igraph", quietly = TRUE)) {
+  demo <- sframe_demo("open_text")
+  res <- run_analysis_plan(demo$responses, demo$instrument)
+  sframe_plot_cooccurrence_network(res$RQ6)
+}
+#> Warning: K=2 is equivalent to a unidimensional scaling model which you may prefer.
+
+# }
+```

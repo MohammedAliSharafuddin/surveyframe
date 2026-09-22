@@ -36,3 +36,16 @@ groups remain after removing missing values, or ggplot2 is unavailable.
 ## See also
 
 [`run_analysis_plan()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/run_analysis_plan.md)
+
+## Examples
+
+``` r
+# \donttest{
+if (requireNamespace("ggplot2", quietly = TRUE)) {
+  demo <- sframe_demo_data()
+  res <- run_analysis_plan(demo$responses, demo$instrument)
+  sframe_plot_group_comparison(res$rq_visit_bi, demo$responses)
+}
+#> NULL
+# }
+```

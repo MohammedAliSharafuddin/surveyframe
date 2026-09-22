@@ -38,9 +38,12 @@ sf_scale(
 
 - items:
 
-  Character vector. The `id` values of items that belong to this scale.
-  Order controls presentation in reports, while scoring uses the same
-  item IDs regardless of order.
+  Character vector. The `id` values of items that belong to this scale,
+  each listed once. Order controls presentation in reports, while
+  scoring uses the same item IDs regardless of order. Items themselves
+  are passed to
+  [`sf_instrument()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_instrument.md)
+  as separate components.
 
 - method:
 
@@ -48,23 +51,27 @@ sf_scale(
 
 - min_valid:
 
-  Integer or NULL. The minimum number of non-missing items required to
-  compute a score for a respondent. When `NULL`, all items must be
-  present. Used by
+  Integer or NULL. The minimum number of answered items required to
+  compute a score for a respondent, a whole number from 1 to the number
+  of items. When `NULL`, every item must be answered. An item whose
+  column is absent from the data counts as unanswered. Used by
   [`score_scales()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/score_scales.md).
 
 - reverse_items:
 
-  Character vector or NULL. A subset of `items` that are reverse-coded.
-  These can also be flagged at the item level with the `reverse`
-  argument in
-  [`sf_item()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_item.md).
-  Both sources are respected.
+  Character vector or NULL. A subset of `items` that this scale
+  reverse-codes. Reversal applies within this scale only, so the same
+  item can be reversed in one scale and scored as answered in another.
+  An item can also be flagged with `reverse = TRUE` in
+  [`sf_item()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_item.md),
+  which reverses it within the scale named by its `scale_id`. A reversed
+  item needs declared response bounds, from a numeric choice set, slider
+  limits or a rating maximum.
 
 - weights:
 
-  Numeric vector or NULL. Item weights for weighted scoring. Must have
-  the same length as `items` if supplied.
+  Numeric vector or NULL. Item weights for weighted scoring, one
+  positive finite number per item, in the order of `items`.
   [`score_scales()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/score_scales.md)
   applies the weights to either `method = "mean"` or `method = "sum"`.
 

@@ -68,3 +68,20 @@ carries three tidy data frames ready for plotting and reporting:
 `loadings_long` (item_id, factor, loading), `communalities_table`
 (item_id, communality, uniqueness), and `variance_table` (factor,
 ss_loadings, proportion_var, cumulative_var).
+
+## Examples
+
+``` r
+# \donttest{
+if (requireNamespace("psych", quietly = TRUE)) {
+  demo <- sframe_demo_data()
+  fit <- efa_solution(demo$responses, demo$instrument,
+                       scales = "service_quality", nfactors = 1)
+  fit$loadings
+}
+#>      item_id       MR1
+#> sq_1    sq_1 0.7661667
+#> sq_2    sq_2 0.8354284
+#> sq_3    sq_3 0.8063057
+# }
+```

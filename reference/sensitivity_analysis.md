@@ -66,8 +66,13 @@ sensitivity_analysis(
 An object of class `sframe_sensitivity`, a list with `$table` (one row
 per criterion and direction, carrying `criterion`, `direction`, `rho`,
 `rank_changed`, and `top_changed`), `$base_ranks`, `$method`, `$delta`,
-and `$stable`, a single logical that is `TRUE` when no perturbation
-changed the ranking.
+`$stable`, `$degenerate`, `$n_perturbations`, `$n_effective` and
+`$n_failed`. `$stable` is `TRUE` when at least one perturbation moved
+the weights and none of those that did changed the ranking. A
+perturbation that leaves the renormalised weights unchanged, as every
+one does for weights such as `c(1, 0)`, is not effective and tests
+nothing. `$degenerate` marks a base ranking that places every
+alternative at the same rank, which no perturbation can move.
 
 ## See also
 

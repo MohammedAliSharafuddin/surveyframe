@@ -32,3 +32,17 @@ A named list of four ggplot2 objects (`residuals_fitted`, `qq`,
 ## See also
 
 [`run_analysis_plan()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/run_analysis_plan.md)
+
+## Examples
+
+``` r
+# \donttest{
+if (requireNamespace("ggplot2", quietly = TRUE)) {
+  demo <- sframe_demo_data()
+  res <- run_analysis_plan(demo$responses, demo$instrument)
+  panels <- sframe_plot_regression_diagnostics(res$rq_predict_sat)
+  panels$residuals_fitted
+}
+
+# }
+```

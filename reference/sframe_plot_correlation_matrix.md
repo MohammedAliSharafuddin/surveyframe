@@ -46,3 +46,16 @@ A ggplot2 object.
 ## See also
 
 [`validity_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/validity_report.md)
+
+## Examples
+
+``` r
+# \donttest{
+if (requireNamespace("ggplot2", quietly = TRUE)) {
+  demo <- sframe_demo_data()
+  sframe_plot_correlation_matrix(demo$responses,
+                                 c("sq_1", "sq_2", "sq_3", "sat_1", "sat_2"))
+}
+
+# }
+```

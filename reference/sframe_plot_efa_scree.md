@@ -29,3 +29,17 @@ A ggplot2 object.
 ## See also
 
 [`efa_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/efa_report.md)
+
+## Examples
+
+``` r
+# \donttest{
+if (requireNamespace("ggplot2", quietly = TRUE) &&
+    requireNamespace("psych", quietly = TRUE)) {
+  demo <- sframe_demo_data()
+  er <- efa_report(demo$responses, demo$instrument)
+  sframe_plot_efa_scree(er)
+}
+
+# }
+```

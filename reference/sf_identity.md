@@ -2,50 +2,6 @@
 
 The ID and label of an instrument component
 
-## Usage
-
-``` r
-sf_id(x, ...)
-
-sf_label(x, ...)
-
-# S3 method for class 'sf_item'
-sf_id(x, ...)
-
-# S3 method for class 'sf_choices'
-sf_id(x, ...)
-
-# S3 method for class 'sf_scale'
-sf_id(x, ...)
-
-# S3 method for class 'sf_branch'
-sf_id(x, ...)
-
-# S3 method for class 'sf_check'
-sf_id(x, ...)
-
-# S3 method for class 'sf_model'
-sf_id(x, ...)
-
-# S3 method for class 'sf_item'
-sf_label(x, ...)
-
-# S3 method for class 'sf_choices'
-sf_label(x, ...)
-
-# S3 method for class 'sf_scale'
-sf_label(x, ...)
-
-# S3 method for class 'sf_branch'
-sf_label(x, ...)
-
-# S3 method for class 'sf_check'
-sf_label(x, ...)
-
-# S3 method for class 'sf_model'
-sf_label(x, ...)
-```
-
 ## Arguments
 
 - x:
@@ -66,8 +22,9 @@ sf_label(x, ...)
 
 ## Value
 
-A single character string. `sf_label()` returns `""` when the component
-carries no label.
+A single character string.
+[`sf_label()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_label.md)
+returns `""` when the component carries no label.
 
 ## Examples
 

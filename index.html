@@ -51,7 +51,7 @@
 
     <a class="navbar-brand me-2" href="index.html">surveyframe</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -83,7 +83,7 @@
 <!-- badges: start -->
 
 <blockquote>
-<p><strong>Just here to verify a <code>.sframe</code> file’s integrity hash or read its amendment log?</strong> <strong><a href="https://mohammedalisharafuddin.github.io/surveyframe/verify/">Verify a file now</a></strong>. No R, no install; it runs entirely in your browser and nothing is uploaded.</p>
+<p><strong>Just here to verify a <code>.sframe</code> file’s integrity hash or read its amendment log?</strong> <strong><a href="https://mohammedalisharafuddin.github.io/surveyframe/verify/">Verify a file now</a></strong>. No R, no install. It runs entirely in your browser and nothing is uploaded.</p>
 </blockquote>
 <p><code>surveyframe</code> is a research-design-first survey package for R. Most survey tools collect answers and return counts. <code>surveyframe</code> begins at the research design and carries it through to a written results report.</p>
 <p>The unit of work is the instrument, a typed <code>sframe</code> object that stores three things together:</p>
@@ -100,22 +100,28 @@
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
-<p>Install from CRAN:</p>
+<blockquote>
+<p><strong>Collecting data right now? Install 0.4.2 from GitHub.</strong> An external review of 0.4.1, the version on CRAN, found defects that silently alter or lose a participant’s answer, and defects that give a wrong statistic. 0.4.2 corrects them and goes to CRAN on 26 September 2026. Until it is accepted there, this is the version to collect with:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"surveyframe"</span><span class="op">)</span></span></code></pre></div>
-<p>To get unreleased changes from the development version:</p>
+<code class="sourceCode R"><span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"MohammedAliSharafuddin/surveyframe"</span><span class="op">)</span></span></code></pre></div>
+<p><code>NEWS.md</code> lists every fix, and separately lists what changes for you: some scores and statistics move, and a Shiny-collected response gains a <code>respondent_id</code> column.</p>
+</blockquote>
+<p>Install from CRAN:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"surveyframe"</span><span class="op">)</span></span></code></pre></div>
+<p>To get changes not yet released to CRAN:</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"MohammedAliSharafuddin/surveyframe"</span><span class="op">)</span></span></code></pre></div>
 <p>Optional packages are only needed for selected features:</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"shiny"</span>, <span class="st">"psych"</span>, <span class="st">"googlesheets4"</span>, <span class="st">"digest"</span>, <span class="st">"MASS"</span>, <span class="st">"nnet"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>Syntax generation works without installing <code>lavaan</code> or <code>seminr</code>. Install those packages when you want to fit the generated CFA, CB-SEM, or PLS-SEM models.</p>
 </div>
 <div class="section level2">
 <h2 id="already-have-data">Already have data?<a class="anchor" aria-label="anchor" href="#already-have-data"></a>
 </h2>
-<p><code>surveyframe</code> is not a replacement for whatever collection tool your institution already has approved – Qualtrics, REDCap, Google Forms, or a paper form typed up afterward. It reads response data as a plain CSV or <code>data.frame</code> from any of them: export from your collection tool, rename columns to match your instrument’s item IDs (or build the instrument to match the export), and load it. If you have collected responses in a CSV or Google Sheet and want to start from the analysis step, build a minimal instrument that matches your column names and load the data directly:</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<p><code>surveyframe</code> is not a replacement for whatever collection tool your institution already has approved: Qualtrics, REDCap, Google Forms, or a paper form typed up afterward. It reads response data as a plain CSV or <code>data.frame</code> from any of them: export from your collection tool, rename columns to match your instrument’s item IDs (or build the instrument to match the export), and load it. If you have collected responses in a CSV or Google Sheet and want to start from the analysis step, build a minimal instrument that matches your column names and load the data directly:</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://mohammedalisharafuddin.github.io/surveyframe/">surveyframe</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># 1. Describe the items you already collected</span></span>
@@ -136,28 +142,35 @@
 <div class="section level2">
 <h2 id="documentation-workflow">Documentation workflow<a class="anchor" aria-label="anchor" href="#documentation-workflow"></a>
 </h2>
-<p>Start with:</p>
-<ol style="list-style-type: decimal">
-<li>A worked study: digital marketing and tourism services</li>
-<li>Building a survey instrument: questions, plan, and model</li>
-<li>Deploying a survey and collecting responses on free hosting</li>
-<li>Analysing survey responses: running the plan</li>
+<p>Choose the route that matches what you need:</p>
+<ul>
+<li>
+<strong>Try it in five minutes:</strong> Learn by example: 22 small surveys.</li>
+<li>
+<strong>Prefer a visual interface:</strong> SurveyBuilder, SurveyStudio, and the dashboard.</li>
+<li>
+<strong>Build and collect:</strong> Building a survey instrument, then Deploying and collecting.</li>
+<li>
+<strong>Already have responses:</strong> Analysing survey responses.</li>
+<li>
+<strong>Read the complete case study:</strong> Digital marketing and tourism services.</li>
+</ul>
+<p>Continue as needed with these:</p>
+<ul>
 <li>Scale reliability and validity</li>
-<li>EFA, CFA, CB-SEM, and PLS-SEM syntax generation</li>
-<li>The visual workflow: SurveyBuilder, SurveyStudio, and the dashboard</li>
-<li>Learn by example: 22 small surveys, the bundled demo library</li>
-<li>Multi-criteria decision analysis: AHP, TOPSIS, and 8 other methods</li>
+<li>EFA, CFA, CB-SEM, and PLS-SEM syntax</li>
+<li>Multi-criteria decision analysis</li>
 <li>Small-sample inference</li>
 <li>Text and open-ended response analysis</li>
-</ol>
+</ul>
 <p>Read all eleven vignettes inside R with:</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/browseVignettes.html" class="external-link">browseVignettes</a></span><span class="op">(</span><span class="st">"surveyframe"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="an-instrument-is-the-research-design">An instrument is the research design<a class="anchor" aria-label="anchor" href="#an-instrument-is-the-research-design"></a>
 </h2>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://mohammedalisharafuddin.github.io/surveyframe/">surveyframe</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">agree5</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/sf_choices.html">sf_choices</a></span><span class="op">(</span></span>
@@ -209,7 +222,7 @@
 <div class="section level2">
 <h2 id="import-and-score">Import and score<a class="anchor" aria-label="anchor" href="#import-and-score"></a>
 </h2>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">responses</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
 <span>  respondent_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"R"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">)</span>,</span>
 <span>  sat_1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">4</span>, <span class="fl">5</span>, <span class="fl">3</span>, <span class="fl">4</span>, <span class="cn">NA</span><span class="op">)</span>,</span>
@@ -227,7 +240,7 @@
 <h2 id="run-the-analysis-plan">Run the analysis plan<a class="anchor" aria-label="anchor" href="#run-the-analysis-plan"></a>
 </h2>
 <p>Each block binds a research question to a technique and to the variables that fill each role. <code><a href="reference/run_analysis_plan.html">run_analysis_plan()</a></code> runs every block and returns one result per question. Earlier <code>.sframe</code> files using <code>variables</code> and <code>test</code> fields remain compatible.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/run_analysis_plan.html">run_analysis_plan</a></span><span class="op">(</span><span class="va">resp</span>, <span class="va">instr</span><span class="op">)</span></span>
 <span><span class="va">results</span></span></code></pre></div>
 <p>Supported method IDs include descriptives, missing data, quality checks, reliability, EFA readiness and solutions, CFA, CB-SEM, and PLS-SEM syntax, chi-square, Fisher’s exact test, McNemar, Cochran’s Q, t-tests, Mann-Whitney, Wilcoxon, one- and two-way ANOVA, ANCOVA, repeated-measures ANOVA, Kruskal-Wallis, Friedman, Pearson, Spearman, and Kendall correlations, partial correlations, linear and logistic regression, mediation, and moderation. Each technique reports an APA statistic, an effect size where it applies, a writing prompt, and the reference that supports it.</p>
@@ -235,14 +248,14 @@
 <div class="section level2">
 <h2 id="render-the-results-report">Render the results report<a class="anchor" aria-label="anchor" href="#render-the-results-report"></a>
 </h2>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="reference/render_results.html">render_results</a></span><span class="op">(</span><span class="va">results</span>, <span class="va">instr</span>, output_file <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>fileext <span class="op">=</span> <span class="st">".html"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>The report holds one section per research question, with the APA result, the writing prompt, a space for the interpretation, and a reference list compiled from the techniques used.</p>
 </div>
 <div class="section level2">
 <h2 id="reliability-efa-and-cfa">Reliability, EFA, and CFA<a class="anchor" aria-label="anchor" href="#reliability-efa-and-cfa"></a>
 </h2>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"psych"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="fu"><a href="reference/reliability_report.html">reliability_report</a></span><span class="op">(</span><span class="va">resp</span>, <span class="va">instr</span>, omega <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span>  <span class="fu"><a href="reference/efa_report.html">efa_report</a></span><span class="op">(</span><span class="va">resp</span>, <span class="va">instr</span><span class="op">)</span></span>
@@ -254,7 +267,7 @@
 <div class="section level2">
 <h2 id="model-layer">Model layer<a class="anchor" aria-label="anchor" href="#model-layer"></a>
 </h2>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">model</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/sf_model.html">sf_model</a></span><span class="op">(</span></span>
 <span>  <span class="st">"model_1"</span>,</span>
 <span>  <span class="st">"Satisfaction model"</span>,</span>
@@ -271,7 +284,7 @@
 <div class="section level2">
 <h2 id="pls-sem-syntax">PLS-SEM syntax<a class="anchor" aria-label="anchor" href="#pls-sem-syntax"></a>
 </h2>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pls_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/sf_model.html">sf_model</a></span><span class="op">(</span></span>
 <span>  <span class="st">"pls_1"</span>,</span>
 <span>  <span class="st">"Satisfaction and loyalty PLS model"</span>,</span>
@@ -289,7 +302,7 @@
 <div class="section level2">
 <h2 id="a-full-study-report">A full study report<a class="anchor" aria-label="anchor" href="#a-full-study-report"></a>
 </h2>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="reference/render_report.html">render_report</a></span><span class="op">(</span></span>
 <span>  <span class="va">instr</span>,</span>
 <span>  data <span class="op">=</span> <span class="va">resp</span>,</span>
@@ -306,11 +319,11 @@
 <div class="section level2">
 <h2 id="visual-tools">Visual tools<a class="anchor" aria-label="anchor" href="#visual-tools"></a>
 </h2>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="reference/launch_builder.html">launch_builder</a></span><span class="op">(</span>open <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="fu"><a href="reference/export_static_survey.html">export_static_survey</a></span><span class="op">(</span><span class="va">instr</span>, open <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
-<p>Use <code><a href="reference/launch_builder.html">launch_builder()</a></code> to author the questionnaire, the plan, and the model and to export the <code>.sframe</code> file and model syntax; it runs no statistics. <code><a href="reference/launch_studio.html">launch_studio()</a></code> uploads responses, runs the plan on its Analysis Plan screen, and renders the report on its Export screen. <code><a href="reference/launch_dashboard.html">launch_dashboard()</a></code> is a read-only response explorer. Demo launchers are available for training:</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<p>Use <code><a href="reference/launch_builder.html">launch_builder()</a></code> to author the questionnaire, the plan, and the model and to export the <code>.sframe</code> file and model syntax. It runs no statistics. <code><a href="reference/launch_studio.html">launch_studio()</a></code> uploads responses, runs the plan on its Analysis Plan screen, and renders the report on its Export screen. <code><a href="reference/launch_dashboard.html">launch_dashboard()</a></code> is a read-only response explorer. Demo launchers are available for training:</p>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="reference/launch_builder_demo.html">launch_builder_demo</a></span><span class="op">(</span>open <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="co"># launch_studio_demo()</span></span>
 <span><span class="co"># launch_dashboard_demo()</span></span></code></pre></div>
@@ -329,7 +342,8 @@
 <strong>Text and open-ended response analysis</strong>, 9 methods: term and n-gram frequency, keyword in context, co-occurrence networks, sentiment, document-feature matrices, and topic modelling via LDA or a structural topic model.</li>
 </ul>
 <p>A disclosed-amendment and Git-linked provenance mechanism shipped alongside, on top of the existing <code>.sframe</code> integrity hash. Full detail in <code>NEWS.md</code>.</p>
-<p>0.4.1 focuses on stability: fixes found by using surveyframe on real instruments, no new capability theme. 0.4.2 continues in the same direction.</p>
+<p>0.4.1 focuses on stability: fixes found by using surveyframe on real instruments, no new capability theme.</p>
+<p>0.4.2 is a defect-fix release, correcting what an external review of 0.4.1 found across 8 batches: 171 findings, 154 fixed here and 17 deferred with a stated reason. The ones that matter most to a live study are in collection, where a participant’s answer could be altered or lost with no signal, and in scoring, where the report path recomputed scale scores by a second method that ignored reverse coding and the declared minimum. Some numbers therefore move between 0.4.1 and 0.4.2, and <code>NEWS.md</code> says which, under “What you need to change”. Reports also gained a folded “Show R code” block, and <code><a href="reference/analysis_syntax.html">analysis_syntax()</a></code> returns the statistical call behind a result with its variables and options resolved, so a reader can copy the code and reproduce the number.</p>
 </div>
 <div class="section level2">
 <h2 id="when-to-use-surveyframe-and-when-not-to">When to use surveyframe, and when not to<a class="anchor" aria-label="anchor" href="#when-to-use-surveyframe-and-when-not-to"></a>
@@ -350,7 +364,7 @@
 <div class="section level2">
 <h2 id="citation">Citation<a class="anchor" aria-label="anchor" href="#citation"></a>
 </h2>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/citation.html" class="external-link">citation</a></span><span class="op">(</span><span class="st">"surveyframe"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
