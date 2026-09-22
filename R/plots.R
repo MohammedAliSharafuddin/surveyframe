@@ -2287,7 +2287,10 @@ sframe_plot_logistic_coefficients <- function(result, palette = c("web", "print"
   brand <- sframe_brand(palette)
   ggplot2::ggplot(df, ggplot2::aes(x = .data$or, y = .data$term)) +
     ggplot2::geom_vline(xintercept = 1, colour = brand$muted, linetype = "dashed") +
-    ggplot2::geom_errorbarh(ggplot2::aes(xmin = .data$lo, xmax = .data$hi), height = 0.18, colour = brand$ink) +
+    ggplot2::geom_errorbar(
+      ggplot2::aes(xmin = .data$lo, xmax = .data$hi),
+      orientation = "y", width = 0.18, colour = brand$ink
+    ) +
     ggplot2::geom_point(colour = brand$teal, size = 2.6) +
     ggplot2::scale_y_discrete(labels = .sframe_title_case_names) +
     ggplot2::labs(
@@ -2400,8 +2403,10 @@ sframe_plot_mediation <- function(result, palette = c("web", "print")) {
   ggplot2::ggplot(df, ggplot2::aes(x = .data$estimate, y = .data$effect)) +
     ggplot2::geom_vline(xintercept = 0, colour = brand$muted, linetype = "dashed") +
     ggplot2::geom_col(fill = brand$fill, colour = brand$ink, width = 0.55, linewidth = 0.3) +
-    ggplot2::geom_errorbarh(ggplot2::aes(xmin = .data$lo, xmax = .data$hi), height = 0.15,
-                            colour = brand$ink, na.rm = TRUE) +
+    ggplot2::geom_errorbar(
+      ggplot2::aes(xmin = .data$lo, xmax = .data$hi),
+      orientation = "y", width = 0.15, colour = brand$ink, na.rm = TRUE
+    ) +
     ggplot2::labs(
       title = "Direct, indirect, and total effects", subtitle = result$apa %||% NULL,
       x = "Estimate", y = NULL
@@ -2846,7 +2851,7 @@ sframe_plot_sentiment <- function(result, palette = c("web", "print")) {
                             ggplot2::aes(x = .data$x, y = .data$y, label = .data$label),
                             inherit.aes = FALSE,
                             fill = brand$grid, colour = brand$ink, fontface = "bold",
-                            label.size = 0, size = 3.6) +
+                            linewidth = 0, size = 3.6) +
         ggplot2::scale_size_identity() +
         ggplot2::scale_colour_manual(values = fill_map, guide = "none") +
         ggplot2::scale_alpha_continuous(range = c(0.5, 1), guide = "none") +

@@ -129,3 +129,10 @@ sframe_humanize_table <- function(tbl, lookup, exclude_cols = character(0)) {
   tbl[char_cols] <- lapply(tbl[char_cols], relabel)
   tbl
 }
+
+# One seam for optional-package availability checks. Besides keeping runners
+# consistent, this lets their missing-dependency branches be tested on a
+# machine where the optional package happens to be installed.
+sframe_has_package <- function(package) {
+  requireNamespace(package, quietly = TRUE)
+}
