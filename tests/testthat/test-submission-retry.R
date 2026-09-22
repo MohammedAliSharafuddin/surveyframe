@@ -57,7 +57,14 @@ test_that("22: the two failures are told apart", {
                              list(), Sys.time())
   state <- sframe_new_submission_state()
 
-  # the write itself fails, which is the one the participant has to act on
+  # The write itself fails, which is the one the participant has to act on.
+  # Opening a directory as a file raises R's own I/O warnings first, muffled
+  # here so they do not leak into the test run's own output. Their number and
+  # exact wording is not asserted: those come from R's internal C layer and
+  # differ by platform. A Windows CI run raised a different count and
+  # different text for the identical failure ("not a regular file" and "it
+  # is a directory" are the POSIX phrasing). What the package itself controls
+  # and promises is res$saved and res$message, asserted below.
   write_warnings <- character()
   res <- withCallingHandlers(
     sframe_persist_response(row, path, NULL, state),
@@ -66,9 +73,7 @@ test_that("22: the two failures are told apart", {
       invokeRestart("muffleWarning")
     }
   )
-  expect_length(write_warnings, 2)
-  expect_true(any(grepl("not a regular file", write_warnings, fixed = TRUE)))
-  expect_true(any(grepl("it is a directory", write_warnings, fixed = TRUE)))
+  expect_gt(length(write_warnings), 0)
   expect_false(res$saved)
   expect_match(res$message, "could not be saved", fixed = TRUE)
 
