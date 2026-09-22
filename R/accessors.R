@@ -46,7 +46,7 @@ sframe_component_list <- function(x, what = "component") {
 #' sf_items(instr)[["q2"]]
 NULL
 
-#' @rdname sf_component_list
+#' @noRd
 #' @exportS3Method print sf_component_list
 print.sf_component_list <- function(x, ...) {
   what <- attr(x, "what") %||% "component"
@@ -60,8 +60,7 @@ print.sf_component_list <- function(x, ...) {
   invisible(x)
 }
 
-#' @rdname sf_component_list
-#' @param i Index, name, or logical vector selecting components.
+#' @noRd
 #' @exportS3Method `[` sf_component_list
 `[.sf_component_list` <- function(x, i, ...) {
   what <- attr(x, "what")
@@ -125,35 +124,107 @@ print.sf_component_list <- function(x, ...) {
 #' as.data.frame(instr)
 NULL
 
-#' @rdname sf_accessors
+#' Get survey metadata
+#'
+#' Reads the title, version, description, language, validation state, and other
+#' metadata without depending on the object's internal list layout.
+#'
+#' @inheritParams sf_accessors
+#' @return A list of instrument or codebook metadata.
+#' @seealso [sf_accessors]
+#' @examples
+#' sf_meta(sframe_demo_data()$instrument)
 #' @export
 sf_meta <- function(x, ...) UseMethod("sf_meta")
 
-#' @rdname sf_accessors
+#' Get survey items
+#'
+#' Returns the declared question items in instrument order.
+#'
+#' @inheritParams sf_accessors
+#' @return An [sf_component_list] for an instrument or an item data frame for a
+#'   codebook.
+#' @seealso [sf_accessors]
+#' @examples
+#' sf_items(sframe_demo_data()$instrument)
 #' @export
 sf_items <- function(x, ...) UseMethod("sf_items")
 
-#' @rdname sf_accessors
+#' Get survey scales
+#'
+#' Returns the scale definitions, including their item membership and scoring
+#' settings.
+#'
+#' @inheritParams sf_accessors
+#' @return An [sf_component_list] for an instrument or a scale data frame for a
+#'   codebook.
+#' @seealso [sf_accessors]
+#' @examples
+#' sf_scales(sframe_demo_data()$instrument)
 #' @export
 sf_scales <- function(x, ...) UseMethod("sf_scales")
 
-#' @rdname sf_accessors
+#' Get choice sets
+#'
+#' Returns the reusable value-and-label sets referenced by closed-response
+#' items.
+#'
+#' @inheritParams sf_accessors
+#' @return An [sf_component_list] for an instrument or a choice-set data frame
+#'   for a codebook.
+#' @seealso [sf_accessors]
+#' @examples
+#' sf_choice_sets(sframe_demo_data()$instrument)
 #' @export
 sf_choice_sets <- function(x, ...) UseMethod("sf_choice_sets")
 
-#' @rdname sf_accessors
+#' Get branching rules
+#'
+#' Returns the rules that control whether conditional items are shown.
+#'
+#' @inheritParams sf_accessors
+#' @return An [sf_component_list] of branching rules.
+#' @seealso [sf_accessors]
+#' @examples
+#' sf_branches(sframe_demo_data()$instrument)
 #' @export
 sf_branches <- function(x, ...) UseMethod("sf_branches")
 
-#' @rdname sf_accessors
+#' Get response-quality checks
+#'
+#' Returns declared attention and other response-quality checks.
+#'
+#' @inheritParams sf_accessors
+#' @return An [sf_component_list] of declared checks.
+#' @seealso [sf_accessors]
+#' @examples
+#' sf_checks(sframe_demo_data()$instrument)
 #' @export
 sf_checks <- function(x, ...) UseMethod("sf_checks")
 
-#' @rdname sf_accessors
+#' Get model specifications
+#'
+#' Returns declared CFA, SEM, PLS-SEM, mediation, and related model objects.
+#'
+#' @inheritParams sf_accessors
+#' @return An [sf_component_list] for an instrument or a model data frame for a
+#'   codebook.
+#' @seealso [sf_accessors]
+#' @examples
+#' sf_models(sframe_demo_data()$instrument)
 #' @export
 sf_models <- function(x, ...) UseMethod("sf_models")
 
-#' @rdname sf_accessors
+#' Get the pre-declared analysis plan
+#'
+#' Returns the ordered analysis blocks attached to an instrument or codebook.
+#'
+#' @inheritParams sf_accessors
+#' @return A list of analysis blocks for an instrument or a plan data frame for
+#'   a codebook.
+#' @seealso [sf_accessors], [sf_plan<-]
+#' @examples
+#' sf_plan(sframe_demo_data()$instrument)
 #' @export
 sf_plan <- function(x, ...) UseMethod("sf_plan")
 
@@ -161,43 +232,43 @@ sf_plan <- function(x, ...) UseMethod("sf_plan")
 # sframe methods
 # ---------------------------------------------------------------------------
 
-#' @rdname sf_accessors
+#' @noRd
 #' @exportS3Method sf_meta sframe
 sf_meta.sframe <- function(x, ...) x$meta
 
-#' @rdname sf_accessors
+#' @noRd
 #' @exportS3Method sf_items sframe
 sf_items.sframe <- function(x, ...) sframe_component_list(x$items, "item")
 
-#' @rdname sf_accessors
+#' @noRd
 #' @exportS3Method sf_scales sframe
 sf_scales.sframe <- function(x, ...) sframe_component_list(x$scales, "scale")
 
-#' @rdname sf_accessors
+#' @noRd
 #' @exportS3Method sf_choice_sets sframe
 sf_choice_sets.sframe <- function(x, ...) {
   sframe_component_list(x$choices, "choice set")
 }
 
-#' @rdname sf_accessors
+#' @noRd
 #' @exportS3Method sf_branches sframe
 sf_branches.sframe <- function(x, ...) {
   sframe_component_list(x$branching %||% list(), "branch rule")
 }
 
-#' @rdname sf_accessors
+#' @noRd
 #' @exportS3Method sf_checks sframe
 sf_checks.sframe <- function(x, ...) {
   sframe_component_list(x$checks %||% list(), "attention check")
 }
 
-#' @rdname sf_accessors
+#' @noRd
 #' @exportS3Method sf_models sframe
 sf_models.sframe <- function(x, ...) {
   sframe_component_list(x$models %||% list(), "model")
 }
 
-#' @rdname sf_accessors
+#' @noRd
 #' @exportS3Method sf_plan sframe
 sf_plan.sframe <- function(x, ...) x$analysis_plan %||% list()
 
@@ -226,7 +297,7 @@ sf_plan.sframe <- function(x, ...) x$analysis_plan %||% list()
 #' length(sf_plan(instr))
 `sf_plan<-` <- function(x, value) UseMethod("sf_plan<-")
 
-#' @rdname sf_plan-set
+#' @noRd
 #' @exportS3Method `sf_plan<-` sframe
 `sf_plan<-.sframe` <- function(x, value) {
   if (!is.list(value)) {
@@ -245,27 +316,27 @@ sf_plan.sframe <- function(x, ...) x$analysis_plan %||% list()
 # same verbs answer for it and return the tables it already holds.
 # ---------------------------------------------------------------------------
 
-#' @rdname sf_accessors
+#' @noRd
 #' @exportS3Method sf_meta sframe_codebook
 sf_meta.sframe_codebook <- function(x, ...) x$instrument_meta
 
-#' @rdname sf_accessors
+#' @noRd
 #' @exportS3Method sf_items sframe_codebook
 sf_items.sframe_codebook <- function(x, ...) x$items_table
 
-#' @rdname sf_accessors
+#' @noRd
 #' @exportS3Method sf_scales sframe_codebook
 sf_scales.sframe_codebook <- function(x, ...) x$scales_table
 
-#' @rdname sf_accessors
+#' @noRd
 #' @exportS3Method sf_choice_sets sframe_codebook
 sf_choice_sets.sframe_codebook <- function(x, ...) x$choices_table
 
-#' @rdname sf_accessors
+#' @noRd
 #' @exportS3Method sf_models sframe_codebook
 sf_models.sframe_codebook <- function(x, ...) x$models_table
 
-#' @rdname sf_accessors
+#' @noRd
 #' @exportS3Method sf_plan sframe_codebook
 sf_plan.sframe_codebook <- function(x, ...) x$plan_table
 
@@ -290,54 +361,71 @@ sf_plan.sframe_codebook <- function(x, ...) x$plan_table
 #' sf_label(item)
 NULL
 
-#' @rdname sf_identity
+#' Get an instrument component ID
+#'
+#' Reads the stable identifier used to refer to a component elsewhere in the
+#' instrument.
+#'
+#' @inheritParams sf_identity
+#' @return A single character identifier.
+#' @seealso [sf_identity], [sf_label()]
+#' @examples
+#' sf_id(sf_item("q1", "Satisfaction", type = "numeric"))
 #' @export
 sf_id <- function(x, ...) UseMethod("sf_id")
 
-#' @rdname sf_identity
+#' Get an instrument component label
+#'
+#' Reads the respondent- or analyst-facing label attached to a component.
+#'
+#' @inheritParams sf_identity
+#' @return A single character label, or `""` when none is declared.
+#' @seealso [sf_identity], [sf_id()]
+#' @examples
+#' sf_label(sf_item("q1", "Satisfaction", type = "numeric"))
 #' @export
 sf_label <- function(x, ...) UseMethod("sf_label")
 
 sframe_component_id <- function(x, ...) as.character(x$id %||% "")[1]
 sframe_component_label <- function(x, ...) as.character(x$label %||% "")[1]
 
-#' @rdname sf_identity
+#' @noRd
 #' @exportS3Method sf_id sf_item
 sf_id.sf_item <- sframe_component_id
-#' @rdname sf_identity
+#' @noRd
 #' @exportS3Method sf_id sf_choices
 sf_id.sf_choices <- sframe_component_id
-#' @rdname sf_identity
+#' @noRd
 #' @exportS3Method sf_id sf_scale
 sf_id.sf_scale <- sframe_component_id
-#' @rdname sf_identity
+#' @noRd
 #' @exportS3Method sf_id sf_branch
 # A branch is identified by the item whose visibility it controls. One rule
 # per target item, which validation enforces.
 sf_id.sf_branch <- function(x, ...) as.character(x$item_id %||% "")[1]
-#' @rdname sf_identity
+#' @noRd
 #' @exportS3Method sf_id sf_check
 sf_id.sf_check <- sframe_component_id
-#' @rdname sf_identity
+#' @noRd
 #' @exportS3Method sf_id sf_model
 sf_id.sf_model <- sframe_component_id
 
-#' @rdname sf_identity
+#' @noRd
 #' @exportS3Method sf_label sf_item
 sf_label.sf_item <- sframe_component_label
-#' @rdname sf_identity
+#' @noRd
 #' @exportS3Method sf_label sf_choices
 sf_label.sf_choices <- sframe_component_label
-#' @rdname sf_identity
+#' @noRd
 #' @exportS3Method sf_label sf_scale
 sf_label.sf_scale <- sframe_component_label
-#' @rdname sf_identity
+#' @noRd
 #' @exportS3Method sf_label sf_branch
 sf_label.sf_branch <- sframe_component_label
-#' @rdname sf_identity
+#' @noRd
 #' @exportS3Method sf_label sf_check
 sf_label.sf_check <- sframe_component_label
-#' @rdname sf_identity
+#' @noRd
 #' @exportS3Method sf_label sf_model
 sf_label.sf_model <- sframe_component_label
 
@@ -368,27 +456,55 @@ sf_label.sf_model <- sframe_component_label
 #' sf_problems(v)
 NULL
 
-#' @rdname sf_validation_accessors
+#' Test whether validation passed
+#'
+#' Reads the overall pass/fail result without inspecting validation internals.
+#'
+#' @inheritParams sf_validation_accessors
+#' @return A single logical value.
+#' @seealso [sf_validation_accessors], [validate_sframe()]
+#' @examples
+#' v <- validate_sframe(sframe_demo_data()$instrument, strict = FALSE)
+#' sf_is_valid(v)
 #' @export
 sf_is_valid <- function(x, ...) UseMethod("sf_is_valid")
 
-#' @rdname sf_validation_accessors
+#' Get validation problems
+#'
+#' Returns every actionable validation message in check order.
+#'
+#' @inheritParams sf_validation_accessors
+#' @return A character vector, empty when validation passed.
+#' @seealso [sf_validation_accessors], [validate_sframe()]
+#' @examples
+#' v <- validate_sframe(sframe_demo_data()$instrument, strict = FALSE)
+#' sf_problems(v)
 #' @export
 sf_problems <- function(x, ...) UseMethod("sf_problems")
 
-#' @rdname sf_validation_accessors
+#' Recover the validated object
+#'
+#' Returns the original object carried by a validation result, whether or not
+#' validation passed.
+#'
+#' @inheritParams sf_validation_accessors
+#' @return The object held by a validation result.
+#' @seealso [sf_validation_accessors], [as_sframe()]
+#' @examples
+#' v <- validate_sframe(sframe_demo_data()$instrument, strict = FALSE)
+#' sf_object(v)
 #' @export
 sf_object <- function(x, ...) UseMethod("sf_object")
 
-#' @rdname sf_validation_accessors
+#' @noRd
 #' @exportS3Method sf_is_valid sframe_validation
 sf_is_valid.sframe_validation <- function(x, ...) isTRUE(x$valid)
 
-#' @rdname sf_validation_accessors
+#' @noRd
 #' @exportS3Method sf_problems sframe_validation
 sf_problems.sframe_validation <- function(x, ...) as.character(x$problems)
 
-#' @rdname sf_validation_accessors
+#' @noRd
 #' @exportS3Method sf_object sframe_validation
 sf_object.sframe_validation <- function(x, ...) x$object
 
@@ -418,11 +534,11 @@ sf_object.sframe_validation <- function(x, ...) x$object
 #' isTRUE(sf_meta(validated)$validated)
 as_sframe <- function(x, ...) UseMethod("as_sframe")
 
-#' @rdname as_sframe
+#' @noRd
 #' @exportS3Method as_sframe sframe
 as_sframe.sframe <- function(x, ...) x
 
-#' @rdname as_sframe
+#' @noRd
 #' @exportS3Method as_sframe sframe_validation
 as_sframe.sframe_validation <- function(x, ...) {
   if (!identical(x$subject, "instrument")) {
@@ -481,15 +597,42 @@ as_sframe.sframe_validation <- function(x, ...) {
 #' head(sf_flagged(qr))
 NULL
 
-#' @rdname sf_report_accessors
+#' Extract APA-formatted result summaries
+#'
+#' Returns the report-ready sentence attached to each analysis result.
+#'
+#' @param x An `sframe_analysis_results`, `sframe_descriptives_report`,
+#'   `sframe_missing_data_report`, `sframe_validity_report`, or
+#'   `sframe_assumption_report` object.
+#' @param ... Passed to methods.
+#' @return A character vector containing one APA-formatted summary per result.
+#' @seealso [sf_report_accessors], [run_analysis_plan()]
+#' @examples
+#' results <- structure(
+#'   list(RQ1 = list(apa = "Mean satisfaction was 4.20.")),
+#'   class = c("sframe_analysis_results", "list")
+#' )
+#' sf_apa(results)
 #' @export
 sf_apa <- function(x, ...) UseMethod("sf_apa")
 
-#' @rdname sf_report_accessors
+#' Get rows flagged by response-quality checks
+#'
+#' Pools failed attention checks, straight-lining, excess missingness, timing,
+#' and duplicate checks into one set of response-row positions.
+#'
+#' @param x An `sframe_quality_report` object.
+#' @param ... Passed to methods.
+#' @return A sorted integer vector of unique response-row positions.
+#' @seealso [sf_report_accessors], [quality_report()]
+#' @examples
+#' demo <- sframe_demo_data()
+#' qr <- quality_report(demo$responses, demo$instrument)
+#' sf_flagged(qr)
 #' @export
 sf_flagged <- function(x, ...) UseMethod("sf_flagged")
 
-#' @rdname sf_report_accessors
+#' @noRd
 #' @exportS3Method sf_apa sframe_analysis_results
 sf_apa.sframe_analysis_results <- function(x, ...) {
   out <- vapply(x, function(r) as.character(r$apa %||% "")[1], character(1))
@@ -500,19 +643,19 @@ sf_apa.sframe_analysis_results <- function(x, ...) {
 # body serves them all.
 sframe_report_apa <- function(x, ...) as.character(x$apa %||% "")[1]
 
-#' @rdname sf_report_accessors
+#' @noRd
 #' @exportS3Method sf_apa sframe_descriptives_report
 sf_apa.sframe_descriptives_report <- sframe_report_apa
 
-#' @rdname sf_report_accessors
+#' @noRd
 #' @exportS3Method sf_apa sframe_missing_data_report
 sf_apa.sframe_missing_data_report <- sframe_report_apa
 
-#' @rdname sf_report_accessors
+#' @noRd
 #' @exportS3Method sf_apa sframe_validity_report
 sf_apa.sframe_validity_report <- sframe_report_apa
 
-#' @rdname sf_report_accessors
+#' @noRd
 #' @exportS3Method sf_apa sframe_assumption_report
 sf_apa.sframe_assumption_report <- sframe_report_apa
 
@@ -537,13 +680,13 @@ sf_apa.sframe_assumption_report <- sframe_report_apa
 #' sf_missing_columns(qr)
 sf_missing_columns <- function(x, ...) UseMethod("sf_missing_columns")
 
-#' @rdname sf_missing_columns
+#' @noRd
 #' @exportS3Method sf_missing_columns sframe_quality_report
 sf_missing_columns.sframe_quality_report <- function(x, ...) {
   as.character(x$missing$missing_columns %||% character(0))
 }
 
-#' @rdname sf_report_accessors
+#' @noRd
 #' @exportS3Method sf_flagged sframe_quality_report
 sf_flagged.sframe_quality_report <- function(x, ...) {
   rows <- unique(c(

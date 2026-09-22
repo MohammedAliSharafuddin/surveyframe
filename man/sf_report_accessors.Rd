@@ -2,32 +2,7 @@
 % Please edit documentation in R/accessors.R
 \name{sf_report_accessors}
 \alias{sf_report_accessors}
-\alias{sf_apa}
-\alias{sf_flagged}
-\alias{sf_apa.sframe_analysis_results}
-\alias{sf_apa.sframe_descriptives_report}
-\alias{sf_apa.sframe_missing_data_report}
-\alias{sf_apa.sframe_validity_report}
-\alias{sf_apa.sframe_assumption_report}
-\alias{sf_flagged.sframe_quality_report}
 \title{Read the reportable parts of an analysis or quality result}
-\usage{
-sf_apa(x, ...)
-
-sf_flagged(x, ...)
-
-\method{sf_apa}{sframe_analysis_results}(x, ...)
-
-\method{sf_apa}{sframe_descriptives_report}(x, ...)
-
-\method{sf_apa}{sframe_missing_data_report}(x, ...)
-
-\method{sf_apa}{sframe_validity_report}(x, ...)
-
-\method{sf_apa}{sframe_assumption_report}(x, ...)
-
-\method{sf_flagged}{sframe_quality_report}(x, ...)
-}
 \arguments{
 \item{x}{An \code{sframe_analysis_results} object, or one of the reports named
 above, for \code{sf_apa()}. An \code{sframe_quality_report} for \code{sf_flagged()}.}
