@@ -167,17 +167,51 @@ reference:
   - title: "Accessors and coercion"
     desc: >
       Read parts of an instrument, a validation result, or a report
-      without reaching into the object directly, new in 0.4.0.
+      without reaching into the object directly, new in 0.4.0. Each
+      accessor and as.data.frame method has its own page as of 0.4.2,
+      stating the classes it accepts and what it returns.
     contents:
       - as_sframe
       - sf_accessors
+      - sf_apa
+      - sf_branches
+      - sf_checks
+      - sf_choice_sets
       - sf_component_list
+      - sf_flagged
+      - sf_id
       - sf_identity
+      - sf_is_valid
+      - sf_items
+      - sf_label
+      - sf_meta
+      - sf_missing_columns
+      - sf_models
+      - sf_object
+      - sf_plan
       - "sf_plan<-"
+      - sf_problems
       - sf_report_accessors
+      - sf_scales
       - sf_validation_accessors
       - sframe_as_data_frame
       - sframe_subset
+      - as.data.frame.sf_choices
+      - as.data.frame.sframe
+      - as.data.frame.sframe_analysis_results
+      - as.data.frame.sframe_assumption_report
+      - as.data.frame.sframe_codebook
+      - as.data.frame.sframe_descriptives_report
+      - as.data.frame.sframe_efa_report
+      - as.data.frame.sframe_efa_solution
+      - as.data.frame.sframe_item_report
+      - as.data.frame.sframe_missing_data_report
+      - as.data.frame.sframe_quality_report
+      - as.data.frame.sframe_reliability_report
+      - as.data.frame.sframe_sample_size_plan
+      - as.data.frame.sframe_sensitivity
+      - as.data.frame.sframe_validation
+      - as.data.frame.sframe_validity_report
 
   - title: "Deploy"
     desc: >
@@ -269,18 +303,24 @@ reference:
 
   - title: "Report"
     desc: >
-      Generate codebooks, scale appendices, and reproducible HTML reports.
+      Generate codebooks, scale appendices, reproducible HTML reports, and
+      the R code behind a computed result.
     contents:
+      - sframe_reports
       - codebook_report
       - sframe_codebook_items_display
       - render_report
       - render_results
       - model_report_template
+      - analysis_syntax
+      - sframe_result_supplement
+      - sframe_analysis_qmd
 
   - title: "Plotting"
     desc: >
       Opt-in ggplot2 charts for analysis results, and the package theme.
     contents:
+      - sframe_plots
       - theme_surveyframe
       - plot.sframe_analysis_results
       - sframe_plot_correlation_matrix
