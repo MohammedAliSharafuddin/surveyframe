@@ -66,7 +66,7 @@ Nine methods are available, from plain term counting through to topic
 modelling. The base path (`term_freq`, `ngram_freq`, `term_context`,
 `co_occurrence`) runs on the package alone. Five more
 (`co_occurrence_network`, `tidy_sentiment`, `quanteda_dfm`,
-`topic_model_lda`, `stm_topics`) each need one Suggests-only package, guarded
+`topic_model_lda`, `stm_topics`) need one or more Suggests-only packages, guarded
 with `rlang::check_installed()`, and every guarded section below knits
 cleanly on either kind of machine.
 
@@ -267,8 +267,8 @@ kable(kwic, row.names = FALSE, caption = 'Every occurrence of "wait" in context.
 
 ## Co-occurrence
 
-`.sframe_cooccurrence()`'s public entry point, the `co_occurrence` method,
-counts how often pairs of frequent terms appear together within the same
+The analysis-plan method `co_occurrence` counts how often pairs of frequent
+terms appear together within the same
 response, and renders as a heatmap.
 
 ```{r cooccurrence}
@@ -371,8 +371,8 @@ cat("_tidytext is not installed in this environment, so this section did not run
 ## Document-feature matrix
 
 `quanteda_dfm` needs the optional `quanteda` package. It is a descriptive
-summary, useful ahead of an analysis: feature count, sparsity,
-and the leading features, useful as a sanity check before a heavier method.
+summary ahead of an analysis: feature count, sparsity, and the leading features
+provide a sanity check before a heavier method.
 
 ```{r dfm, eval = has_quanteda}
 sf_plan(instr) <- c(sf_plan(instr), list(list(
