@@ -13,12 +13,12 @@ the source before any work started, and all five held.
 | 1 | Refuse a Sheets response row that cannot be stored literally | **done**, `a350ce9` |
 | 2 | An opaque send is visibly unconfirmed and non-destructive | **done**, `d1f6687` |
 | 3 | A test coupling collector outcome to what the respondent is told | **done**, `d1f6687` |
-| 4 | Static A1/A2/A3 in a real browser, asserting the stored row | **open** |
+| 4 | Static A1/A2/A3 in a real browser, asserting the stored row | **done**, real Chrome 2026-09-21 |
 | 5 | Enforce and complete `analysis_syntax()`'s method coverage | **done**, `5feb7ee` |
 
-Gate 2 was reopened once and closed again in `18427dd`, see below. The full
-suite on the gate branch is 0 failures and 0 errors, with 66 skips on the
-`Rscript` route and 3 pre-existing warnings.
+Gate 2 was reopened once and closed again in `18427dd`, see below. The original
+gate-branch suite passed with environment and warning debt; the 2026-09-21
+release pass below exercises or precisely asserts those paths instead.
 
 `NEWS.md` is corrected for gates 1 and 2, so it no longer claims unconditionally
 that a Sheets answer is stored as submitted, and it records the thank-you screen
@@ -73,7 +73,7 @@ Running it found a real defect: the `descriptives` generator read `result$vars`,
 which that runner does not set, and emitted `vars <- c()`. The displayed code
 summarised nothing. Fixed with a fallback to `result$variables`.
 
-## Gate 4, the open one
+## Gate 4
 
 **Requirement.** Run the three static-survey collection scenarios in real Chrome
 and assert the assembled or stored row, not a screenshot.
@@ -90,7 +90,15 @@ and assert the assembled or stored row, not a screenshot.
 That is the Shiny collector. Nothing opens an `export_static_survey()` file in a
 browser.
 
-**Suggested shape.** A new `test-static-survey-browser.R`:
+**Runtime evidence.** The exported static survey was driven in real headless
+Chrome on 2026-09-21 and the submitted row was read back from the page:
+
+- an out-of-range numeric value remained exactly as typed;
+- the zero-coded required option stored `"0"` and passed validation; and
+- the displayed ranking order matched both `window._lastRow` and the CSV row.
+
+This closes the release gate. A permanent `test-static-survey-browser.R` would
+still be useful regression infrastructure, following this shape:
 
 1. `export_static_survey(instr, output_path = tempfile(fileext = ".html"))`.
 2. `chromote::ChromoteSession$new()`, then `Page.navigate` to `file://` that path.
@@ -108,22 +116,49 @@ that a real browser's event handling reaches the same row.
 
 ## Also outstanding, beyond the gates
 
-- **`R CMD check --as-cran`: done, `Status: 1 NOTE`**, the note being
-  "Number of updates in past 6 months: 7". Run on the tarball built from
-  `4b8003b`. Tests inside the check took 194s and passed. Re-run after gate 4,
-  since a check on one tree says nothing about the next.
-- **A fresh-clone install run** of `sframe_demo()` across the 22 demos,
-  `launch_builder()`, and an `export_static_survey()` round trip.
-- **win-builder**, R-release and R-devel.
+- **`R CMD check --as-cran`: done, `Status: 1 NOTE`** repeatedly, as the
+  working tree changed. The checksum below is stale the moment the tree it
+  was built from changes again, which it has twice since this file first
+  recorded one; do not treat a checksum here as current without rebuilding
+  and re-hashing against the commit actually being submitted.
+- **An isolated-library install of the candidate tarball: done.** The Quarto
+  integration test ran against installed 0.4.2 and passed. A literal fresh
+  clone plus manual `launch_builder()` smoke test remains useful release
+  hygiene, but is no longer evidence for an unfixed package defect.
+- **win-builder**, R-release and R-devel. **Not run.** This needs uploading to
+  win-builder.r-project.org and reading the emailed result; I have no path to
+  do that from here.
 - **Live-sheet verification** of the RAW write. Gate 1 makes the unsafe path
   unreachable, so what remains is confirming the RAW path stores `=1+1` as text
-  with an empty formula field in a real deployed sheet. This one needs a Google
-  account and cannot be done from here.
-- **Tag `v0.4.2` at submission.** Two of the last three releases had to be
-  reconstructed by tree hash.
-- **The deferred `skip_on_cran()` count is 62**, not the 57 the build handover
-  recorded and not the 61 the review counted. Whoever picks up that deferral
-  should recount rather than trust any of the three.
+  with an empty formula field in a real deployed sheet, plus `+123`, `-123`,
+  `@value`, leading zeros, dates, decimals, Unicode text, and an empty answer.
+  Verify the stored cell's value and formula through the Sheets API, not its
+  rendering. This needs a Google account and cannot be done from here.
+- **`cran-comments.md`: drafted.** States the corrective-release rationale, the
+  2 defect classes, the 2 new exports, and the incoming-feasibility NOTE.
+  Its test-environment table needs win-builder's results before submission.
+- **`REVIEW_0.4.2.md` reconciled with this file.** It described `dea93a0`,
+  before any gate was worked, and its "Hold" decision and unchecked boxes had
+  no note saying they were stale. It now carries a banner and an updated
+  checklist pointing here, with the original text kept as the historical
+  record rather than rewritten.
+- **The working tree is committed as of this pass**, on `fix/0.4.2-review-gates`.
+  It was not before: 45 modified and 31 untracked files, mostly the review's
+  own gate-3 comparators regenerating documentation (16 new per-method
+  `as.data.frame` topics closing batch 8's G1) and the demo-notebook and test
+  hardening described below, had accumulated with no commit. `R CMD check` had
+  been run against that uncommitted tree, which is not the same claim as
+  checking a commit that can be tagged and rebuilt.
+- **Tag `v0.4.2` at submission — still not done, deliberately.** Two of the
+  last three releases had to be reconstructed by tree hash. Tag only once a
+  commit is chosen as the actual submission candidate; do not tag a
+  provisional commit made mid-review.
+- **The former local 7-skip/43-warning run was cleaned up.** Deprecated ggplot2
+  calls were replaced; expected warnings are asserted; incomplete repeated
+  measures use a documented complete-respondent contract; optional-package
+  branches and the quality plot now execute; and `topicmodels` was rebuilt
+  against the installed GSL. The one source-tree Quarto skip runs and passes
+  when the candidate tarball is installed, which is its intended context.
 - **Two mocks of the same collector.** `helper-apps-script.R` and
   `test-collector-header-drift.R` each model Sheets. Gate 1 broke the second one,
   which is how the duplication surfaced. They should be one file.

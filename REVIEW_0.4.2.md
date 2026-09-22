@@ -4,7 +4,17 @@ Reviewed candidate: public `main` at `dea93a0efbc5a23aa27b1a802076f6bba55c836b`.
 
 Review date: 19 September 2026.
 
-## Decision
+> **Superseded, 23 September 2026.** This review's decision and checklist
+> describe the `dea93a0` candidate, before any gate below was worked. All 5
+> gates this review and its follow-up raised are now closed; see
+> [HANDOVER_0.4.2_GATES.md](HANDOVER_0.4.2_GATES.md) for the current status,
+> the commits that closed each one, and what is still outstanding before
+> submission (win-builder, live Google Sheets verification, `cran-comments.md`,
+> tagging). This file is kept as the historical record of what was found and
+> why, not edited to match the current tree. Do not read the unchecked boxes
+> in its final checklist as the current state.
+
+## Decision, as of the review date above
 
 **Hold. Do not submit this candidate to CRAN.**
 
@@ -260,13 +270,22 @@ instrument semantics.
 
 ## Final release checklist
 
-- [ ] Remove/refuse the unsafe Sheets fallback.
-- [ ] Make opaque sends visibly unconfirmed and non-destructive.
-- [ ] Add the coupled collector-to-respondent failure tests.
-- [ ] Run static A1/A2/A3 in real Chrome and assert stored rows.
-- [ ] Enforce and complete the `analysis_syntax()` method coverage roster.
+Left as originally written, since this is the historical record. Current
+status of each item, as of 23 September 2026, is in
+[HANDOVER_0.4.2_GATES.md](HANDOVER_0.4.2_GATES.md).
+
+- [x] Remove/refuse the unsafe Sheets fallback. (gate 1, `a350ce9`)
+- [x] Make opaque sends visibly unconfirmed and non-destructive. (gate 2,
+      `d1f6687`, reopened and closed again `18427dd`)
+- [x] Add the coupled collector-to-respondent failure tests. (gate 3, `d1f6687`)
+- [x] Run static A1/A2/A3 in real Chrome and assert stored rows (2026-09-21).
+- [x] Enforce and complete the `analysis_syntax()` method coverage roster.
+      (gate 5, `5feb7ee`)
 - [x] Install the built tarball into an empty temporary library; load all 22
       demos, obtain `launch_builder(open = FALSE)`, and complete a static export.
-- [ ] Run `R CMD check --as-cran` on that tarball.
-- [ ] Run win-builder on R-release and R-devel.
-- [ ] Tag the exact accepted tree at submission.
+- [x] Run `R CMD check --as-cran` on that tarball. Status 1 NOTE (submission
+      frequency), 0 errors, 0 warnings, run repeatedly as the tree changed.
+- [ ] Run win-builder on R-release and R-devel. **Still open.**
+- [ ] Tag the exact accepted tree at submission. **Not yet — no commit has
+      been tagged, and the working tree this review's gates were fixed against
+      is still uncommitted.** Do this only once a commit is chosen as final.
