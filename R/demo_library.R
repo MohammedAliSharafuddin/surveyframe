@@ -514,6 +514,13 @@ sframe_demo_results_table <- function(res) {
     tb <- b$table
     if (is.data.frame(tb) && nrow(tb) > 0) {
       num <- names(tb)[vapply(tb, is.numeric, logical(1))]
+      # Force-directed coordinates are rendering state rather than analysis
+      # results. Even with a fixed seed, igraph may place the same graph at
+      # different coordinates across platforms, so they do not belong in a
+      # portable reference-results snapshot.
+      if (identical(meth, "co_occurrence_network")) {
+        num <- setdiff(num, c("x", "y"))
+      }
       for (cn in num) {
         for (r in seq_len(nrow(tb))) {
           lab <- if (!is.null(rownames(tb)) && nzchar(rownames(tb)[r]) &&

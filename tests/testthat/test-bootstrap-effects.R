@@ -43,8 +43,12 @@ test_that("15: the signed-rank r uses the same pairs as its test and interval", 
   y <- x + sample(c(-2, -1, 0, 0, 0, 1, 2, 3), 30, replace = TRUE)
   res <- sframe_run_wilcoxon_pair(data.frame(x = x, y = y), c("x", "y"))
   nonzero <- sum(x != y)
+  differences <- x - y
+  nonzero_differences <- differences[differences != 0]
+  expected_V <- sum(rank(abs(nonzero_differences))[nonzero_differences > 0])
 
   expect_equal(res$r, unname(res$r_ci[["estimate"]]), tolerance = 1e-12)
+  expect_equal(res$V, expected_V, tolerance = 1e-12)
   expect_equal(res$p, 2 * stats::pnorm(-abs(res$z)), tolerance = 1e-10)
   expect_equal(res$r, abs(res$z) / sqrt(nonzero), tolerance = 1e-12)
 })

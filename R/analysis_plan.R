@@ -619,9 +619,14 @@ sframe_run_wilcoxon_pair <- function(data, vars) {
   # One definition for z, p, r and the interval, on the non-zero differences
   # the test itself uses. r previously divided by every pair, zeros included.
   n_nonzero <- sum((x - y) != 0)
-  z <- sframe_signed_rank_z(x - y)
+  differences <- x - y
+  nonzero_differences <- differences[is.finite(differences) & differences != 0]
+  signed_ranks <- rank(abs(nonzero_differences))
+  V <- sum(signed_ranks[nonzero_differences > 0])
+  z <- sframe_signed_rank_z(differences)
+  p <- 2 * stats::pnorm(-abs(z))
   r <- abs(z) / sqrt(n_nonzero)
-  r_ci <- sframe_signed_rank_r_ci(x - y)
+  r_ci <- sframe_signed_rank_r_ci(differences)
   pseudomedian <- unname(wt$estimate)
   pseudomedian_conf_int <- as.numeric(wt$conf.int)
   pm_ci_named <- c(lower = pseudomedian_conf_int[1], upper = pseudomedian_conf_int[2])
@@ -633,9 +638,9 @@ sframe_run_wilcoxon_pair <- function(data, vars) {
     n_nonzero = n_nonzero,
     median_x = stats::median(x),
     median_y = stats::median(y),
-    V = unname(wt$statistic),
+    V = V,
     z = z,
-    p = wt$p.value,
+    p = p,
     r = r,
     r_ci = r_ci,
     pseudomedian = pseudomedian,
@@ -643,16 +648,16 @@ sframe_run_wilcoxon_pair <- function(data, vars) {
     effect_label = sframe_effect_label(r, "r"),
     apa = sprintf(
       "V = %.0f, z = %.2f, p %s, r = %.2f%s, pseudomedian = %.2f%s",
-      wt$statistic, z, sframe_p_string(wt$p.value), r,
+      V, z, sframe_p_string(p), r,
       sframe_ci_string(r_ci), pseudomedian, sframe_ci_string(pm_ci_named)
     ),
     prompt = sprintf(
       "The Wilcoxon signed-rank test %s a significant difference between %s (Mdn = %.2f) and %s (Mdn = %.2f), V = %.0f, z = %.2f, p %s, r = %.2f%s (%s effect). Discuss the direction and practical significance.",
-      if (wt$p.value < .05) "revealed" else "did not reveal",
+      if (p < .05) "revealed" else "did not reveal",
       vars[1], stats::median(x),
       vars[2], stats::median(y),
-      wt$statistic, z,
-      sframe_p_string(wt$p.value),
+      V, z,
+      sframe_p_string(p),
       r, sframe_ci_string(r_ci), sframe_effect_label(r, "r")
     )
   )
