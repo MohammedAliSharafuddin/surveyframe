@@ -36,6 +36,13 @@ browser_instrument <- function() {
   ))
 }
 
+# An installed package (as under covr) also has a DESCRIPTION, but no R
+# sources, so load_all() only applies where .R files exist.
+has_package_source <- function(dir) {
+  file.exists(file.path(dir, "DESCRIPTION")) &&
+    length(list.files(file.path(dir, "R"), pattern = "\\.[Rr]$")) > 0L
+}
+
 # Kills the child and builds an error that carries what it wrote to stderr,
 # so a failed start reports its cause instead of only a timeout.
 start_failure <- function(proc, what) {
@@ -50,7 +57,7 @@ start_failure <- function(proc, what) {
 # Serves the app in a background R process and returns a live session.
 serve_survey <- function(instrument, csv) {
   src <- test_path("..", "..")
-  from_source <- file.exists(file.path(src, "DESCRIPTION"))
+  from_source <- has_package_source(src)
   port <- httpuv::randomPort()
   proc <- callr::r_bg(function(src, from_source, instrument, csv, port) {
     if (from_source) pkgload::load_all(src, quiet = TRUE)
@@ -192,7 +199,7 @@ test_that("A5: a ranking can be ordered from the keyboard alone", {
 
 serve_module <- function(instrument, csv) {
   src <- test_path("..", "..")
-  from_source <- file.exists(file.path(src, "DESCRIPTION"))
+  from_source <- has_package_source(src)
   port <- httpuv::randomPort()
   proc <- callr::r_bg(function(src, from_source, instrument, csv, port) {
     if (from_source) pkgload::load_all(src, quiet = TRUE)
