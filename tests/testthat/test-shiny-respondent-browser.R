@@ -36,6 +36,17 @@ browser_instrument <- function() {
   ))
 }
 
+# Kills the child and builds an error that carries what it wrote to stderr,
+# so a failed start reports its cause instead of only a timeout.
+start_failure <- function(proc, what) {
+  alive <- proc$is_alive()
+  err <- tryCatch(paste(utils::tail(proc$read_error_lines(), 15L),
+                        collapse = "\n"), error = function(e) "")
+  proc$kill()
+  paste0("the ", what, " app did not start within 90 seconds (child ",
+         if (alive) "still running" else "exited", ")\n", err)
+}
+
 # Serves the app in a background R process and returns a live session.
 serve_survey <- function(instrument, csv) {
   src <- test_path("..", "..")
@@ -55,8 +66,7 @@ serve_survey <- function(instrument, csv) {
     Sys.sleep(0.5)
   }
   if (!up) {
-    proc$kill()
-    stop("the survey app did not start within 90 seconds")
+    stop(start_failure(proc, "survey"))
   }
   b <- chromote::ChromoteSession$new(width = 1000, height = 2000)
   b$Page$navigate(url)
@@ -206,7 +216,7 @@ serve_module <- function(instrument, csv) {
     if (up) break
     Sys.sleep(0.5)
   }
-  if (!up) { proc$kill(); stop("the module app did not start within 90 seconds") }
+  if (!up) stop(start_failure(proc, "module"))
   b <- chromote::ChromoteSession$new(width = 1000, height = 2400)
   b$Page$navigate(url)
   ready <- "!!(document.getElementById('embedded-sf_start') && window.Shiny && Shiny.shinyapp && Shiny.shinyapp.isConnected())"
