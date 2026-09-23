@@ -11,8 +11,15 @@ skip_on_cran()
 skip_if_not_installed("shiny")
 skip_if_not_installed("chromote")
 skip_if_not_installed("callr")
-skip_if(is.null(tryCatch(chromote::find_chrome(), error = function(e) NULL)),
+chrome <- tryCatch(chromote::find_chrome(), error = function(e) NULL)
+skip_if(length(chrome) != 1L || is.na(chrome) || !nzchar(chrome),
         "Chrome not available")
+
+# covr instruments every expression in the child process, so loading the
+# package and starting Shiny can take substantially longer than in a normal
+# R CMD check. This is a startup deadline, not a fixed delay once the app is
+# ready.
+.browser_start_attempts <- 180L
 
 browser_instrument <- function() {
   sf_instrument(title = "Browser", components = list(
@@ -41,7 +48,7 @@ serve_survey <- function(instrument, csv) {
     shiny::runApp(app, port = port, launch.browser = FALSE)
   }, args = list(normalizePath(src), from_source, instrument, csv, port))
   url <- paste0("http://127.0.0.1:", port)
-  for (i in 1:60) {
+  for (i in seq_len(.browser_start_attempts)) {
     up <- tryCatch({ suppressWarnings(readLines(url, n = 1)); TRUE },
                    error = function(e) FALSE)
     if (up) break
@@ -49,13 +56,13 @@ serve_survey <- function(instrument, csv) {
   }
   if (!up) {
     proc$kill()
-    stop("the survey app did not start within 30 seconds")
+    stop("the survey app did not start within 90 seconds")
   }
   b <- chromote::ChromoteSession$new(width = 1000, height = 2000)
   b$Page$navigate(url)
   # Wait for the survey page itself to be drawn and bound, not a fixed time.
   ready <- "!!(document.getElementById('submit_btn') && window.Shiny && Shiny.shinyapp && Shiny.shinyapp.isConnected())"
-  for (i in 1:60) {
+  for (i in seq_len(.browser_start_attempts)) {
     if (isTRUE(b$Runtime$evaluate(ready, returnByValue = TRUE)$result$value)) break
     Sys.sleep(0.5)
   }
@@ -193,17 +200,17 @@ serve_module <- function(instrument, csv) {
   }, args = list(normalizePath(src), from_source, instrument, csv, port))
   url <- paste0("http://127.0.0.1:", port)
   up <- FALSE
-  for (i in 1:60) {
+  for (i in seq_len(.browser_start_attempts)) {
     up <- tryCatch({ suppressWarnings(readLines(url, n = 1)); TRUE },
                    error = function(e) FALSE)
     if (up) break
     Sys.sleep(0.5)
   }
-  if (!up) { proc$kill(); stop("the module app did not start within 30 seconds") }
+  if (!up) { proc$kill(); stop("the module app did not start within 90 seconds") }
   b <- chromote::ChromoteSession$new(width = 1000, height = 2400)
   b$Page$navigate(url)
   ready <- "!!(document.getElementById('embedded-sf_start') && window.Shiny && Shiny.shinyapp && Shiny.shinyapp.isConnected())"
-  for (i in 1:60) {
+  for (i in seq_len(.browser_start_attempts)) {
     if (isTRUE(b$Runtime$evaluate(ready, returnByValue = TRUE)$result$value)) break
     Sys.sleep(0.5)
   }

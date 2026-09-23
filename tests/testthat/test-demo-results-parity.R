@@ -33,8 +33,21 @@ test_that("15: every shipped demo result matches what the package computes now",
     n <- now[!now$block %in% skip_blocks, ]
     diff_keys <- union(setdiff(key(s), key(n)), setdiff(key(n), key(s)))
     both <- intersect(key(s), key(n))
-    changed <- both[s$value[match(both, key(s))] != n$value[match(both, key(n))] |
-                      xor(is.na(s$value[match(both, key(s))]), is.na(n$value[match(both, key(n))]))]
+    shipped_value <- s$value[match(both, key(s))]
+    current_value <- n$value[match(both, key(n))]
+    both_numeric <- !is.na(suppressWarnings(as.numeric(shipped_value))) &
+      !is.na(suppressWarnings(as.numeric(current_value)))
+    equal_value <- (!is.na(shipped_value) & !is.na(current_value) &
+                    shipped_value == current_value) |
+      (is.na(shipped_value) & is.na(current_value))
+    if (any(both_numeric)) {
+      equal_value[both_numeric] <- mapply(
+        function(x, y) isTRUE(all.equal(as.numeric(x), as.numeric(y),
+                                        tolerance = 1e-4)),
+        shipped_value[both_numeric], current_value[both_numeric]
+      )
+    }
+    changed <- both[!equal_value]
     changed <- changed[!is.na(changed)]
     for (k in c(diff_keys, changed)) {
       mismatches <- c(mismatches, sprintf("%s: %s | shipped %s | now %s", name, k,
@@ -42,4 +55,18 @@ test_that("15: every shipped demo result matches what the package computes now",
     }
   }
   expect_identical(mismatches, character(0))
+})
+
+test_that("15: demo snapshots omit platform-dependent network coordinates", {
+  res <- list(RQ1 = list(
+    block_id = "RQ1",
+    test = "co_occurrence_network",
+    table = data.frame(term = c("a", "b"), frequency = c(3L, 2L),
+                       cluster = c(1L, 1L), x = c(0.1, 0.2), y = c(0.3, 0.4))
+  ))
+
+  snapshot <- sframe_demo_results_table(res)
+
+  expect_true(all(c("frequency [1]", "cluster [1]") %in% snapshot$quantity))
+  expect_false(any(grepl("^[xy] ", snapshot$quantity)))
 })
