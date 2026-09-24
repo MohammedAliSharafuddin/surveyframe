@@ -137,6 +137,32 @@ run and edited outside SurveyStudio.
    run the plan on the Analysis Plan screen, and to export the report.
 6. Use `launch_dashboard()` for read-only response exploration.
 
+## RStudio Addins
+
+In RStudio, the same tools open from the **Addins** menu in the toolbar. The
+4 commands are listed under **surveyframe:** and are searchable by that
+prefix in the command palette. Each one needs the rstudioapi package.
+
+| Command | What opens | What it needs |
+|---|---|---|
+| surveyframe: Design an instrument | SurveyBuilder in the browser | RStudio alone |
+| surveyframe: Open analysis workspace | SurveyStudio, on Open Instrument | RStudio alone, open a `.sframe` there |
+| surveyframe: Analyse an existing instrument | SurveyStudio, on Upload Responses, with the instrument loaded | a `.sframe` file, chosen in a dialog |
+| surveyframe: Insert starter instrument | a template in the active R script, at the cursor | an open R script |
+
+The commands follow the workflow above:
+
+```text
+Design an instrument -> save .sframe -> Analyse an existing instrument ->
+upload responses -> run the plan -> export the report
+```
+
+The starter instrument holds a 5-point choice set, 3 items, one scale, and a
+reliability plan, and it validates as inserted. It ends with a commented
+`write_sframe()` line for saving it. When a command has to stop, because
+RStudio is closed, the console has focus, or a file fails to load, it prints
+one message saying why and what to do next.
+
 ## Demo launchers
 
 This vignette leaves the demo launchers unevaluated, because CRAN examples and
