@@ -3,7 +3,7 @@ Title: Survey Instrument Workflows
 Version: 0.4.2
 Authors@R: c(
     person(
-      given = "Mohammed Ali",
+      given = c("Mohammed", "Ali"),
       family = "Sharafuddin",
       email = "mohammedali.page@gmail.com",
       role = c("aut", "cre"),

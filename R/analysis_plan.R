@@ -166,12 +166,12 @@
   ),
   r_core = list(
     key  = "r_core",
-    apa  = "R Core Team. (2026). *R: A language and environment for statistical computing*. R Foundation for Statistical Computing.",
+    apa  = "R Core Team. ({r_year}). *R: A language and environment for statistical computing*. R Foundation for Statistical Computing.",
     use  = "all"
   ),
   surveyframe = list(
     key  = "surveyframe",
-    apa  = "Sharafuddin, M. A. (2026). *surveyframe: Survey Instrument Workflows* (Version %s) [Computer software]. https://github.com/MohammedAliSharafuddin/surveyframe",
+    apa  = "Sharafuddin, M. A. ({year}). *surveyframe: Survey Instrument Workflows* (Version {version}) [Computer software]. https://github.com/MohammedAliSharafuddin/surveyframe",
     use  = "all"
   )
 )
@@ -181,13 +181,30 @@ sframe_citations_for_test <- function(test) {
   matching <- Filter(function(cit) {
     "all" %in% cit$use || test %in% cit$use
   }, citations)
-  # Inject the live package version into any citation template (the surveyframe
-  # self-citation), so the version never goes stale on a release bump.
+  # Fill the templates from the installed package and the running R, so the
+  # version and the years never go stale on a release bump or a new year.
   ver <- tryCatch(as.character(utils::packageVersion("surveyframe")),
                   error = function(e) "0.3.2")
+  fill <- c("{version}" = ver, "{year}" = .sframe_release_year(),
+            "{r_year}" = R.version$year)
   lapply(matching, function(cit) {
-    if (grepl("%s", cit$apa, fixed = TRUE)) sprintf(cit$apa, ver) else cit$apa
+    apa <- cit$apa
+    for (k in names(fill)) apa <- gsub(k, fill[[k]], apa, fixed = TRUE)
+    apa
   })
+}
+
+# The year this build of surveyframe was released: CRAN's publication date,
+# else the date the tarball was built, else today for a source load.
+.sframe_release_year <- function() {
+  desc <- tryCatch(utils::packageDescription("surveyframe"),
+                   error = function(e) list())
+  for (field in c("Date/Publication", "Packaged", "Date")) {
+    value <- desc[[field]]
+    if (!is.null(value) && !is.na(value) &&
+        grepl("^[0-9]{4}-", value)) return(substr(value, 1L, 4L))
+  }
+  format(Sys.Date(), "%Y")
 }
 
 # ---------------------------------------------------------------------------
