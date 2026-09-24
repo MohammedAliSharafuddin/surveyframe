@@ -27,11 +27,13 @@
   "codeRepository": "https://github.com/MohammedAliSharafuddin/surveyframe",
   "programmingLanguage": "R",
   "license": "https://opensource.org/licenses/MIT",
-  "softwareVersion": "0.3.3",
+  "softwareVersion": "0.4.2",
   "downloadUrl": "https://CRAN.R-project.org/package=surveyframe",
   "author": {
     "@type": "Person",
     "name": "Mohammed Ali Sharafuddin",
+    "givenName": "Mohammed Ali",
+    "familyName": "Sharafuddin",
     "@id": "https://orcid.org/0000-0001-5247-2964"
   }
 }
@@ -227,11 +229,62 @@ exploration.</li>
 </ol>
 </div>
 <div class="section level2">
+<h2 id="rstudio-addins">RStudio Addins<a class="anchor" aria-label="anchor" href="#rstudio-addins"></a>
+</h2>
+<p>In RStudio, the same tools open from the <strong>Addins</strong> menu
+in the toolbar. The 4 commands are listed under
+<strong>surveyframe:</strong> and are searchable by that prefix in the
+command palette. Each one needs the rstudioapi package.</p>
+<table class="table">
+<colgroup>
+<col width="33%">
+<col width="33%">
+<col width="33%">
+</colgroup>
+<thead><tr class="header">
+<th>Command</th>
+<th>What opens</th>
+<th>What it needs</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td>surveyframe: Design an instrument</td>
+<td>SurveyBuilder in the browser</td>
+<td>RStudio alone</td>
+</tr>
+<tr class="even">
+<td>surveyframe: Open analysis workspace</td>
+<td>SurveyStudio, on Open Instrument</td>
+<td>RStudio alone, open a <code>.sframe</code> there</td>
+</tr>
+<tr class="odd">
+<td>surveyframe: Analyse an existing instrument</td>
+<td>SurveyStudio, on Upload Responses, with the instrument loaded</td>
+<td>a <code>.sframe</code> file, chosen in a dialog</td>
+</tr>
+<tr class="even">
+<td>surveyframe: Insert starter instrument</td>
+<td>a template in the active R script, at the cursor</td>
+<td>an open R script</td>
+</tr>
+</tbody>
+</table>
+<p>The commands follow the workflow above:</p>
+<pre class="text"><code>Design an instrument -&gt; save .sframe -&gt; Analyse an existing instrument -&gt;
+upload responses -&gt; run the plan -&gt; export the report</code></pre>
+<p>The starter instrument holds a 5-point choice set, 3 items, one
+scale, and a reliability plan, and it validates as inserted. It ends
+with a commented <code><a href="../reference/write_sframe.html">write_sframe()</a></code> line for saving it. When a
+command has to stop, because RStudio is closed, the console has focus,
+or a file fails to load, it prints one message saying why and what to do
+next.</p>
+</div>
+<div class="section level2">
 <h2 id="demo-launchers">Demo launchers<a class="anchor" aria-label="anchor" href="#demo-launchers"></a>
 </h2>
 <p>This vignette leaves the demo launchers unevaluated, because CRAN
 examples and vignettes leave browsers closed.</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/launch_builder_demo.html">launch_builder_demo</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/launch_studio_demo.html">launch_studio_demo</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/launch_dashboard_demo.html">launch_dashboard_demo</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
@@ -245,7 +298,7 @@ opens the dashboard with the same demo data.</p>
 <div class="section level2">
 <h2 id="standalone-builder">Standalone builder<a class="anchor" aria-label="anchor" href="#standalone-builder"></a>
 </h2>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">builder_file</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/launch_builder.html">launch_builder</a></span><span class="op">(</span>open <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="va">builder_file</span></span></code></pre></div>
 <p>Use SurveyBuilder for questionnaire, plan, and model authoring.
@@ -255,7 +308,7 @@ dashboard.</p>
 <div class="section level2">
 <h2 id="studio-workflow-hub">Studio workflow hub<a class="anchor" aria-label="anchor" href="#studio-workflow-hub"></a>
 </h2>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/launch_studio.html">launch_studio</a></span><span class="op">(</span></span>
 <span>  instrument     <span class="op">=</span> <span class="va">instr</span>,</span>
 <span>  responses      <span class="op">=</span> <span class="va">responses</span>,</span>
@@ -272,7 +325,7 @@ screen explicitly.</p>
 <div class="section level2">
 <h2 id="dashboard">Dashboard<a class="anchor" aria-label="anchor" href="#dashboard"></a>
 </h2>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/launch_dashboard.html">launch_dashboard</a></span><span class="op">(</span></span>
 <span>  instrument     <span class="op">=</span> <span class="va">instr</span>,</span>
 <span>  responses      <span class="op">=</span> <span class="va">responses</span>,</span>

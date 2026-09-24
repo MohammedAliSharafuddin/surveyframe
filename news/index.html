@@ -8,11 +8,13 @@
   "codeRepository": "https://github.com/MohammedAliSharafuddin/surveyframe",
   "programmingLanguage": "R",
   "license": "https://opensource.org/licenses/MIT",
-  "softwareVersion": "0.3.3",
+  "softwareVersion": "0.4.2",
   "downloadUrl": "https://CRAN.R-project.org/package=surveyframe",
   "author": {
     "@type": "Person",
     "name": "Mohammed Ali Sharafuddin",
+    "givenName": "Mohammed Ali",
+    "familyName": "Sharafuddin",
     "@id": "https://orcid.org/0000-0001-5247-2964"
   }
 }
@@ -119,7 +121,13 @@
 <li>Opening a builder dialog moves focus into it, and closing one returns focus where it was.</li>
 <li>
 <strong>The builder’s Preview is labelled a layout preview</strong>, which is what it is: it shows wording, order and branding and leaves out answering, required checks and branching. Export the survey, or use Studio’s preview, to test the respondent’s path.</li>
-<li>The RStudio “Open Dashboard” addin asks which instrument to open, where it called the launcher with nothing to show and produced an error.</li>
+<li>
+<strong>The RStudio add-ins are renamed after what they do</strong>, all under a <code>surveyframe:</code> prefix: Design an instrument, Open analysis workspace, Analyse an existing instrument, and Insert starter instrument. SurveyBuilder was described as a Shiny app, and it is a client-side HTML page.</li>
+<li>
+<strong>“Analyse an existing instrument”, formerly “Open Dashboard”, opens SurveyStudio on Upload Responses</strong> with the chosen instrument loaded, ready for a response file. It used to open an empty dashboard.</li>
+<li>
+<strong>Every add-in stops with one message saying what to do</strong> when RStudio is closed, the console has focus during an insert, the file dialog fails, or the chosen <code>.sframe</code> fails to load. It used to handle a missing rstudioapi alone. The exported launchers keep raising their errors.</li>
+<li>The starter instrument keeps its validation result as <code>validation</code>, and ends with a commented <code><a href="../reference/write_sframe.html">write_sframe()</a></code> line for saving it.</li>
 <li>SurveyStudio’s preview points at the builder, where it used to name a “Build Survey” screen of its own.</li>
 </ul></div>
 <div class="section level3">
@@ -303,6 +311,10 @@
 <li>The <code><a href="../reference/read_responses.html">read_responses()</a></code> help describes one contract for undeclared columns and documents expansion columns and value conversion.</li>
 <li>
 <strong><code><a href="../articles/scale-reliability-validity.html">vignette("scale-reliability-validity")</a></code> said that supplying construct scores returns the HTMT matrix.</strong> It returns the absolute inter-construct correlations, and records <code>htmt_method = "correlation_fallback"</code> to say which it computed. The Henseler heterotrait-monotrait ratio needs <code>items_by_construct</code>, which records <code>htmt_method = "henseler"</code>. <code><a href="../reference/validity_report.html">validity_report()</a></code>’s own help was already accurate, and the vignette overstated it in an unevaluated chunk. The section now names what each argument gives, and its examples run, so a build would contradict the claim if it drifted again.</li>
+<li>
+<strong><code>citation("surveyframe")</code> abbreviated the author as “Sharafuddin M”.</strong> The given names Mohammed Ali were passed to <code><a href="https://rdrr.io/r/utils/person.html" class="external-link">person()</a></code> as one string, which R shortens to a single initial. They are now 2 given names, so the text citation reads “Sharafuddin MA”. The BibTeX entry keeps its correct form. The citation year now comes from the release date, where it followed the date the citation was run.</li>
+<li>
+<strong>The APA citations attached to results carried a fixed year of 2026.</strong> surveyframe’s own citation now takes its year from the installed release, and R Core Team’s from the running version of R.</li>
 </ul></div>
 <div class="section level3">
 <h3 id="dependencies-0-4-2">Dependencies<a class="anchor" aria-label="anchor" href="#dependencies-0-4-2"></a></h3>
