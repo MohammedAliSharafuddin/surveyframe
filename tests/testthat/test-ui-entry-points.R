@@ -5,7 +5,9 @@
 #      question design to the builder, so the gate contradicted it.
 # #23. The RStudio addin called launch_dashboard() with no arguments, and the
 #      launcher refuses a missing instrument, so an advertised menu entry
-#      produced an error message where a dashboard was expected.
+#      produced an error message where a dashboard was expected. The
+#      tests moved to test-rstudio-addins.R when the add-in was redirected
+#      to SurveyStudio.
 
 app_source <- function() {
   sframe_installed_text("inst", "shiny", "app.R")
@@ -27,51 +29,7 @@ test_that("22: every screen the app names is one it has", {
   }, logical(1))))
 })
 
-test_that("23: the dashboard addin opens a chosen instrument", {
-  path <- tempfile(fileext = ".sframe")
-  instr <- sf_instrument("Addin", components = list(
-    sf_item("q1", "One", type = "numeric")))
-  write_sframe(instr, path)
-
-  opened <- NULL
-  local_mocked_bindings(
-    sframe_addin_choose_sframe = function(...) path,
-    launch_dashboard = function(instrument, ...) {
-      opened <<- instrument
-      invisible(NULL)
-    }
-  )
-  addin_launch_dashboard()
-  expect_s3_class(opened, "sframe")
-  expect_identical(sf_meta(opened)$title, "Addin")
-})
-
-test_that("23: cancelling the chooser launches nothing", {
-  launched <- FALSE
-  local_mocked_bindings(
-    sframe_addin_choose_sframe = function(...) NULL,
-    launch_dashboard = function(...) {
-      launched <<- TRUE
-      invisible(NULL)
-    }
-  )
-  expect_silent(addin_launch_dashboard())
-  expect_false(launched)
-})
-
-test_that("23: an unreadable file is reported, and nothing launches", {
-  bad <- tempfile(fileext = ".sframe")
-  writeLines("{ not an instrument", bad)
-
-  launched <- FALSE
-  local_mocked_bindings(
-    sframe_addin_choose_sframe = function(...) bad,
-    launch_dashboard = function(instrument, ...) {
-      force(instrument)
-      launched <<- TRUE
-      invisible(NULL)
-    }
-  )
-  expect_error(addin_launch_dashboard(), class = "sframe_error")
-  expect_false(launched)
-})
+# #23 is now tested in test-rstudio-addins.R. The add-in opens SurveyStudio
+# on the responses screen with the chosen instrument, and turns a cancelled
+# dialog or an unreadable file into silence or one message, before anything
+# launches.
