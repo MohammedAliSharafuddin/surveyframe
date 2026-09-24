@@ -280,8 +280,20 @@ This section grows as each group of fixes lands.
   is: it shows wording, order and branding and leaves out answering, required
   checks and branching. Export the survey, or use Studio's preview, to test
   the respondent's path.
-* The RStudio "Open Dashboard" addin asks which instrument to open, where it
-  called the launcher with nothing to show and produced an error.
+* **The RStudio add-ins are renamed after what they do**, all under a
+  `surveyframe:` prefix: Design an instrument, Open analysis workspace,
+  Analyse an existing instrument, and Insert starter instrument.
+  SurveyBuilder was described as a Shiny app, and it is a client-side HTML
+  page.
+* **"Analyse an existing instrument", formerly "Open Dashboard", opens
+  SurveyStudio on Upload Responses** with the chosen instrument loaded, ready
+  for a response file. It used to open an empty dashboard.
+* **Every add-in stops with one message saying what to do** when RStudio is
+  closed, the console has focus during an insert, the file dialog fails, or
+  the chosen `.sframe` fails to load. It used to handle a missing rstudioapi
+  alone. The exported launchers keep raising their errors.
+* The starter instrument keeps its validation result as `validation`, and
+  ends with a commented `write_sframe()` line for saving it.
 * SurveyStudio's preview points at the builder, where it used to name a
   "Build Survey" screen of its own.
 
@@ -589,6 +601,14 @@ This section grows as each group of fixes lands.
   overstated it in an unevaluated chunk. The section now names what each
   argument gives, and its examples run, so a build would contradict the claim
   if it drifted again.
+* **`citation("surveyframe")` abbreviated the author as "Sharafuddin M".**
+  The given names Mohammed Ali were passed to `person()` as one string, which
+  R shortens to a single initial. They are now 2 given names, so the text
+  citation reads "Sharafuddin MA". The BibTeX entry keeps its correct form. The citation year now comes from the release date, where it
+  followed the date the citation was run.
+* **The APA citations attached to results carried a fixed year of 2026.**
+  surveyframe's own citation now takes its year from the installed release,
+  and R Core Team's from the running version of R.
 
 ## Dependencies
 
