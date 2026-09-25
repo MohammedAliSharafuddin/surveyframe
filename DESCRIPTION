@@ -1,6 +1,6 @@
 Package: surveyframe
 Title: Survey Instrument Workflows
-Version: 0.4.2
+Version: 0.4.2.9000
 Authors@R: c(
     person(
       given = c("Mohammed", "Ali"),
