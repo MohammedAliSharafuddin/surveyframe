@@ -3,11 +3,6 @@
 \name{sframe_validation}
 \alias{sframe_validation}
 \title{Report on a validation result}
-\arguments{
-\item{x, object}{An \code{sframe_validation} object.}
-
-\item{...}{Ignored. Present for S3 consistency.}
-}
 \value{
 \code{print()} returns \code{x} invisibly. \code{format()} returns a single
 character string. \code{summary()} returns the check table as a data frame.

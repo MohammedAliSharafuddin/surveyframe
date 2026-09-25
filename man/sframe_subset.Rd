@@ -3,14 +3,6 @@
 \name{sframe_subset}
 \alias{sframe_subset}
 \title{Subset a surveyframe report}
-\arguments{
-\item{x}{An \code{sframe_analysis_results}, \code{sframe_reliability_report}, or
-\code{sframe_item_report} object.}
-
-\item{i}{Index, name, or logical vector.}
-
-\item{...}{Ignored. Present for S3 consistency.}
-}
 \value{
 An object of the same class as \code{x}.
 }

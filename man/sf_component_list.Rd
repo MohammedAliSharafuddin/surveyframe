@@ -3,11 +3,6 @@
 \name{sf_component_list}
 \alias{sf_component_list}
 \title{A list of instrument components}
-\arguments{
-\item{x}{An \code{sf_component_list}.}
-
-\item{...}{Ignored. Present for S3 consistency.}
-}
 \value{
 \code{print()} returns \code{x} invisibly. \code{[} returns an \code{sf_component_list}.
 }

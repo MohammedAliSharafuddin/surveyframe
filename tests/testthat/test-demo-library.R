@@ -24,6 +24,7 @@ test_that("every demo in the index is on disk and loads", {
 })
 
 test_that("every demo validates, reads back, and runs its plan without an error block", {
+  skip_on_cran()  # renders a report or runs a full plan: slow on CRAN's machines
   for (nm in demo_names()) {
     d <- sframe_demo(nm)
     v <- validate_sframe(d$instrument, strict = FALSE)

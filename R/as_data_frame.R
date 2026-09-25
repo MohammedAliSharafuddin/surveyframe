@@ -162,11 +162,6 @@ sframe_models_table <- function(instrument) {
 #' returns its items, and its choice sets and scales come from
 #' [sf_choice_sets()], [sf_scales()] or [codebook_report()].
 #'
-#' @param x A surveyframe object.
-#' @param row.names Passed to [base::as.data.frame()] by the methods that
-#'   build a frame. Ignored by the methods that return a stored table.
-#' @param optional Passed to [base::as.data.frame()].
-#' @param ... Ignored. Present for S3 consistency.
 #'
 #' @return A data frame, with the columns listed above for the class given.
 #' @name sframe_as_data_frame
@@ -189,7 +184,11 @@ NULL
 #'
 #' Returns one row per item in a surveyframe instrument.
 #'
-#' @inheritParams sframe_as_data_frame
+#' @param x A surveyframe object.
+#' @param row.names Passed to [base::as.data.frame()] by the methods that
+#'   build a frame. Ignored by the methods that return a stored table.
+#' @param optional Passed to [base::as.data.frame()].
+#' @param ... Ignored. Present for S3 consistency.
 #' @return A data frame summarising the instrument's items.
 #' @seealso [sframe_as_data_frame], [sf_items()], [codebook_report()]
 #' @exportS3Method as.data.frame sframe
@@ -203,7 +202,7 @@ as.data.frame.sframe <- function(x, row.names = NULL, optional = FALSE, ...) {
 #'
 #' Returns the stored values and respondent-facing labels in a choice set.
 #'
-#' @inheritParams sframe_as_data_frame
+#' @inheritParams as.data.frame.sframe
 #' @return A data frame with `value` and `label` columns.
 #' @seealso [sframe_as_data_frame], [sf_choices()]
 #' @exportS3Method as.data.frame sf_choices
@@ -218,7 +217,7 @@ as.data.frame.sf_choices <- function(x, row.names = NULL, optional = FALSE, ...)
 
 #' Extract the item table from a codebook report
 #'
-#' @inheritParams sframe_as_data_frame
+#' @inheritParams as.data.frame.sframe
 #' @return The codebook report's item table as a data frame.
 #' @seealso [sframe_as_data_frame], [codebook_report()]
 #' @exportS3Method as.data.frame sframe_codebook
@@ -242,7 +241,7 @@ sframe_num_or_na <- function(x, field) {
 #'
 #' Returns one row per scale with alpha and omega estimates.
 #'
-#' @inheritParams sframe_as_data_frame
+#' @inheritParams as.data.frame.sframe
 #' @return A data frame of scale reliability statistics.
 #' @seealso [sframe_as_data_frame], [reliability_report()]
 #' @exportS3Method as.data.frame sframe_reliability_report
@@ -274,7 +273,7 @@ as.data.frame.sframe_reliability_report <- function(x, row.names = NULL,
 #'
 #' Stacks item diagnostics from every reported scale into one table.
 #'
-#' @inheritParams sframe_as_data_frame
+#' @inheritParams as.data.frame.sframe
 #' @return A data frame of item-level diagnostics.
 #' @seealso [sframe_as_data_frame], [item_report()]
 #' @exportS3Method as.data.frame sframe_item_report
@@ -300,7 +299,7 @@ as.data.frame.sframe_item_report <- function(x, row.names = NULL,
 
 #' Coerce an EFA readiness report to a data frame
 #'
-#' @inheritParams sframe_as_data_frame
+#' @inheritParams as.data.frame.sframe
 #' @return A one-row data frame containing readiness measures and the suggested
 #'   number of factors.
 #' @seealso [sframe_as_data_frame], [efa_report()]
@@ -323,7 +322,7 @@ as.data.frame.sframe_efa_report <- function(x, row.names = NULL,
 
 #' Extract the loading table from an EFA solution
 #'
-#' @inheritParams sframe_as_data_frame
+#' @inheritParams as.data.frame.sframe
 #' @return The solution's long-form factor-loading data frame.
 #' @seealso [sframe_as_data_frame], [efa_solution()]
 #' @exportS3Method as.data.frame sframe_efa_solution
@@ -338,7 +337,7 @@ as.data.frame.sframe_efa_solution <- function(x, row.names = NULL,
 
 #' Extract the descriptives results table
 #'
-#' @inheritParams sframe_as_data_frame
+#' @inheritParams as.data.frame.sframe
 #' @return The primary table from a descriptives report.
 #' @seealso [sframe_as_data_frame], [descriptives_report()]
 #' @exportS3Method as.data.frame sframe_descriptives_report
@@ -349,7 +348,7 @@ as.data.frame.sframe_descriptives_report <- function(x, row.names = NULL,
 
 #' Extract item missingness results
 #'
-#' @inheritParams sframe_as_data_frame
+#' @inheritParams as.data.frame.sframe
 #' @return The item-level missingness table from a missing-data report.
 #' @seealso [sframe_as_data_frame], [missing_data_report()]
 #' @exportS3Method as.data.frame sframe_missing_data_report
@@ -360,7 +359,7 @@ as.data.frame.sframe_missing_data_report <- function(x, row.names = NULL,
 
 #' Extract reliability evidence from a validity report
 #'
-#' @inheritParams sframe_as_data_frame
+#' @inheritParams as.data.frame.sframe
 #' @return The reliability table stored in a validity report.
 #' @seealso [sframe_as_data_frame], [validity_report()]
 #' @exportS3Method as.data.frame sframe_validity_report
@@ -374,7 +373,7 @@ as.data.frame.sframe_validity_report <- function(x, row.names = NULL,
 #' Combines the available normality, homogeneity, and regression checks into a
 #' long-form summary.
 #'
-#' @inheritParams sframe_as_data_frame
+#' @inheritParams as.data.frame.sframe
 #' @return A data frame naming each assumption family, variable, and statistic.
 #' @seealso [sframe_as_data_frame], [assumption_report()]
 #' @exportS3Method as.data.frame sframe_assumption_report
@@ -411,7 +410,7 @@ as.data.frame.sframe_assumption_report <- function(x, row.names = NULL,
 
 #' Coerce a sample-size plan to a data frame
 #'
-#' @inheritParams sframe_as_data_frame
+#' @inheritParams as.data.frame.sframe
 #' @return A one-row data frame containing the analysis type, estimated sample
 #'   size, alpha, and power.
 #' @seealso [sframe_as_data_frame], [sample_size_plan()]
@@ -430,7 +429,7 @@ as.data.frame.sframe_sample_size_plan <- function(x, row.names = NULL,
 
 #' Coerce a response-quality report to a data frame
 #'
-#' @inheritParams sframe_as_data_frame
+#' @inheritParams as.data.frame.sframe
 #' @return A one-row data frame summarising respondents, items, and quality
 #'   flags.
 #' @seealso [sframe_as_data_frame], [quality_report()]
@@ -449,7 +448,7 @@ as.data.frame.sframe_quality_report <- function(x, row.names = NULL,
 
 #' Extract a sensitivity-analysis results table
 #'
-#' @inheritParams sframe_as_data_frame
+#' @inheritParams as.data.frame.sframe
 #' @return The primary results table from a sensitivity analysis.
 #' @seealso [sframe_as_data_frame]
 #' @exportS3Method as.data.frame sframe_sensitivity
@@ -463,7 +462,7 @@ as.data.frame.sframe_sensitivity <- function(x, row.names = NULL,
 #' Returns one row per analysis block, including its research question, method,
 #' APA summary, and any error.
 #'
-#' @inheritParams sframe_as_data_frame
+#' @inheritParams as.data.frame.sframe
 #' @return A data frame with one row per analysis block.
 #' @seealso [sframe_as_data_frame], [run_analysis_plan()]
 #' @exportS3Method as.data.frame sframe_analysis_results
@@ -503,10 +502,6 @@ as.data.frame.sframe_analysis_results <- function(x, row.names = NULL,
 #' Keeps the report class, so a subset still prints as a report and still
 #' answers `as.data.frame()`.
 #'
-#' @param x An `sframe_analysis_results`, `sframe_reliability_report`, or
-#'   `sframe_item_report` object.
-#' @param i Index, name, or logical vector.
-#' @param ... Ignored. Present for S3 consistency.
 #'
 #' @return An object of the same class as `x`.
 #' @name sframe_subset

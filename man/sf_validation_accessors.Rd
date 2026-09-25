@@ -3,11 +3,6 @@
 \name{sf_validation_accessors}
 \alias{sf_validation_accessors}
 \title{Read a validation diagnostic}
-\arguments{
-\item{x}{An \link{sframe_validation} object.}
-
-\item{...}{Passed to methods.}
-}
 \value{
 \code{sf_is_valid()} returns a single logical. \code{sf_problems()} returns a
 character vector, empty when the object is valid. \code{sf_object()} returns

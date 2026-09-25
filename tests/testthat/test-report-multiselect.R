@@ -32,6 +32,7 @@ rendered <- function(instr, data) {
 }
 
 test_that("10: a collected multi-select appears in the distributions", {
+  skip_on_cran()  # renders a report or runs a full plan: slow on CRAN's machines
   html <- rendered(multi_instrument(), multi_responses())
   # the label alone proves nothing: the codebook names every item whether or
   # not the distributions section drew it. The denominator line is written by
@@ -41,12 +42,14 @@ test_that("10: a collected multi-select appears in the distributions", {
 })
 
 test_that("10: the report states the denominator, since answers overlap", {
+  skip_on_cran()  # renders a report or runs a full plan: slow on CRAN's machines
   html <- rendered(multi_instrument(), multi_responses())
   # 4 respondents, 7 selections between them
   expect_match(html, "4 respondents, who could pick more than one", fixed = TRUE)
 })
 
 test_that("10: an item with no indicator columns is left out quietly", {
+  skip_on_cran()  # renders a report or runs a full plan: slow on CRAN's machines
   instr <- multi_instrument()
   data <- multi_responses()
   data <- data[, "age", drop = FALSE]
@@ -54,6 +57,7 @@ test_that("10: an item with no indicator columns is left out quietly", {
 })
 
 test_that("10: a single-choice item is unaffected", {
+  skip_on_cran()  # renders a report or runs a full plan: slow on CRAN's machines
   instr <- sf_instrument("Single", components = list(
     sf_choices("uses", values = c("a", "b"), labels = c("Yes", "No")),
     sf_item("pick", "Pick one", type = "single_choice", choice_set = "uses")))

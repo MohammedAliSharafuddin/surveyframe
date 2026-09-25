@@ -782,6 +782,7 @@ test_that("render_report() writes an HTML report with the fallback renderer", {
 })
 
 test_that("render_report() writes an HTML report through Quarto when available", {
+  skip_on_cran()  # renders a report or runs a full plan: slow on CRAN's machines
   skip_if_not_installed("quarto")
   skip_if_not(nzchar(Sys.which("quarto")), "Quarto CLI not installed")
 
