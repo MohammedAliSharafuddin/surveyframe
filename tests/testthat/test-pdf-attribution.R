@@ -10,6 +10,7 @@ pdf_instrument <- function() {
 }
 
 test_that("14: an HTML report records its engine", {
+  skip_on_cran()  # renders a report or runs a full plan: slow on CRAN's machines
   out <- tempfile(fileext = ".html")
   res <- suppressMessages(render_report(pdf_instrument(), output_file = out,
                                         include_analysis = FALSE))

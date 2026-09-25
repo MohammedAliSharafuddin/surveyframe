@@ -31,8 +31,6 @@ sframe_component_list <- function(x, what = "component") {
 #' [sf_branches()], [sf_checks()] and [sf_models()]. It is a list of component
 #' objects named by their IDs, so a single component is reached with `[[`.
 #'
-#' @param x An `sf_component_list`.
-#' @param ... Ignored. Present for S3 consistency.
 #'
 #' @return `print()` returns `x` invisibly. `[` returns an `sf_component_list`.
 #' @name sf_component_list
@@ -100,8 +98,6 @@ print.sf_component_list <- function(x, ...) {
 #' part of it, and a component list has no coercion of its own. For every
 #' table an instrument can produce, use [codebook_report()].
 #'
-#' @param x A surveyframe object.
-#' @param ... Passed to methods.
 #'
 #' @return A list for `sf_meta()` and `sf_plan()` on an instrument, an
 #'   [sf_component_list] for the component accessors on an instrument, and a
@@ -129,7 +125,8 @@ NULL
 #' Reads the title, version, description, language, validation state, and other
 #' metadata without depending on the object's internal list layout.
 #'
-#' @inheritParams sf_accessors
+#' @param x A surveyframe object.
+#' @param ... Passed to methods.
 #' @return A list of instrument or codebook metadata.
 #' @seealso [sf_accessors]
 #' @examples
@@ -141,7 +138,7 @@ sf_meta <- function(x, ...) UseMethod("sf_meta")
 #'
 #' Returns the declared question items in instrument order.
 #'
-#' @inheritParams sf_accessors
+#' @inheritParams sf_meta
 #' @return An [sf_component_list] for an instrument or an item data frame for a
 #'   codebook.
 #' @seealso [sf_accessors]
@@ -155,7 +152,7 @@ sf_items <- function(x, ...) UseMethod("sf_items")
 #' Returns the scale definitions, including their item membership and scoring
 #' settings.
 #'
-#' @inheritParams sf_accessors
+#' @inheritParams sf_meta
 #' @return An [sf_component_list] for an instrument or a scale data frame for a
 #'   codebook.
 #' @seealso [sf_accessors]
@@ -169,7 +166,7 @@ sf_scales <- function(x, ...) UseMethod("sf_scales")
 #' Returns the reusable value-and-label sets referenced by closed-response
 #' items.
 #'
-#' @inheritParams sf_accessors
+#' @inheritParams sf_meta
 #' @return An [sf_component_list] for an instrument or a choice-set data frame
 #'   for a codebook.
 #' @seealso [sf_accessors]
@@ -182,7 +179,7 @@ sf_choice_sets <- function(x, ...) UseMethod("sf_choice_sets")
 #'
 #' Returns the rules that control whether conditional items are shown.
 #'
-#' @inheritParams sf_accessors
+#' @inheritParams sf_meta
 #' @return An [sf_component_list] of branching rules.
 #' @seealso [sf_accessors]
 #' @examples
@@ -194,7 +191,7 @@ sf_branches <- function(x, ...) UseMethod("sf_branches")
 #'
 #' Returns declared attention and other response-quality checks.
 #'
-#' @inheritParams sf_accessors
+#' @inheritParams sf_meta
 #' @return An [sf_component_list] of declared checks.
 #' @seealso [sf_accessors]
 #' @examples
@@ -206,7 +203,7 @@ sf_checks <- function(x, ...) UseMethod("sf_checks")
 #'
 #' Returns declared CFA, SEM, PLS-SEM, mediation, and related model objects.
 #'
-#' @inheritParams sf_accessors
+#' @inheritParams sf_meta
 #' @return An [sf_component_list] for an instrument or a model data frame for a
 #'   codebook.
 #' @seealso [sf_accessors]
@@ -219,7 +216,7 @@ sf_models <- function(x, ...) UseMethod("sf_models")
 #'
 #' Returns the ordered analysis blocks attached to an instrument or codebook.
 #'
-#' @inheritParams sf_accessors
+#' @inheritParams sf_meta
 #' @return A list of analysis blocks for an instrument or a plan data frame for
 #'   a codebook.
 #' @seealso [sf_accessors], [sf_plan<-]
@@ -346,9 +343,6 @@ sf_plan.sframe_codebook <- function(x, ...) x$plan_table
 
 #' The ID and label of an instrument component
 #'
-#' @param x An [sf_item()], [sf_choices()], [sf_scale()], [sf_branch()],
-#'   [sf_check()] or [sf_model()] object.
-#' @param ... Passed to methods.
 #'
 #' @return A single character string. `sf_label()` returns `""` when the
 #'   component carries no label.
@@ -366,7 +360,9 @@ NULL
 #' Reads the stable identifier used to refer to a component elsewhere in the
 #' instrument.
 #'
-#' @inheritParams sf_identity
+#' @param x An [sf_item()], [sf_choices()], [sf_scale()], [sf_branch()],
+#'   [sf_check()] or [sf_model()] object.
+#' @param ... Passed to methods.
 #' @return A single character identifier.
 #' @seealso [sf_identity], [sf_label()]
 #' @examples
@@ -378,7 +374,7 @@ sf_id <- function(x, ...) UseMethod("sf_id")
 #'
 #' Reads the respondent- or analyst-facing label attached to a component.
 #'
-#' @inheritParams sf_identity
+#' @inheritParams sf_id
 #' @return A single character label, or `""` when none is declared.
 #' @seealso [sf_identity], [sf_id()]
 #' @examples
@@ -438,8 +434,6 @@ sf_label.sf_model <- sframe_component_label
 #' `sf_is_valid()` reports whether the object passed. `sf_problems()` returns
 #' the problem messages. `sf_object()` returns the object that was validated.
 #'
-#' @param x An [sframe_validation] object.
-#' @param ... Passed to methods.
 #'
 #' @return `sf_is_valid()` returns a single logical. `sf_problems()` returns a
 #'   character vector, empty when the object is valid. `sf_object()` returns
@@ -460,7 +454,8 @@ NULL
 #'
 #' Reads the overall pass/fail result without inspecting validation internals.
 #'
-#' @inheritParams sf_validation_accessors
+#' @param x An [sframe_validation] object.
+#' @param ... Passed to methods.
 #' @return A single logical value.
 #' @seealso [sf_validation_accessors], [validate_sframe()]
 #' @examples
@@ -473,7 +468,7 @@ sf_is_valid <- function(x, ...) UseMethod("sf_is_valid")
 #'
 #' Returns every actionable validation message in check order.
 #'
-#' @inheritParams sf_validation_accessors
+#' @inheritParams sf_is_valid
 #' @return A character vector, empty when validation passed.
 #' @seealso [sf_validation_accessors], [validate_sframe()]
 #' @examples
@@ -487,7 +482,7 @@ sf_problems <- function(x, ...) UseMethod("sf_problems")
 #' Returns the original object carried by a validation result, whether or not
 #' validation passed.
 #'
-#' @inheritParams sf_validation_accessors
+#' @inheritParams sf_is_valid
 #' @return The object held by a validation result.
 #' @seealso [sf_validation_accessors], [as_sframe()]
 #' @examples
@@ -581,9 +576,6 @@ as_sframe.sframe_validation <- function(x, ...) {
 #' failed attention checks, straight-lining, excess missingness, timing and
 #' duplicates. Read the report itself for which check flagged a row.
 #'
-#' @param x An `sframe_analysis_results` object, or one of the reports named
-#'   above, for `sf_apa()`. An `sframe_quality_report` for `sf_flagged()`.
-#' @param ... Passed to methods.
 #'
 #' @return `sf_apa()` returns a character vector: one element per block, named
 #'   by block, for analysis results, and one element for a single report.

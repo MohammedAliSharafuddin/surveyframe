@@ -66,8 +66,6 @@ sframe_new_validation <- function(log, roster, subject, title = NULL,
 #' the full check roster, and [as_sframe()] to recover the validated
 #' instrument.
 #'
-#' @param x,object An `sframe_validation` object.
-#' @param ... Ignored. Present for S3 consistency.
 #'
 #' @return `print()` returns `x` invisibly. `format()` returns a single
 #'   character string. `summary()` returns the check table as a data frame.

@@ -3,12 +3,6 @@
 \name{sf_identity}
 \alias{sf_identity}
 \title{The ID and label of an instrument component}
-\arguments{
-\item{x}{An \code{\link[=sf_item]{sf_item()}}, \code{\link[=sf_choices]{sf_choices()}}, \code{\link[=sf_scale]{sf_scale()}}, \code{\link[=sf_branch]{sf_branch()}},
-\code{\link[=sf_check]{sf_check()}} or \code{\link[=sf_model]{sf_model()}} object.}
-
-\item{...}{Passed to methods.}
-}
 \value{
 A single character string. \code{sf_label()} returns \code{""} when the
 component carries no label.

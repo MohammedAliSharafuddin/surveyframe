@@ -3,12 +3,6 @@
 \name{sf_report_accessors}
 \alias{sf_report_accessors}
 \title{Read the reportable parts of an analysis or quality result}
-\arguments{
-\item{x}{An \code{sframe_analysis_results} object, or one of the reports named
-above, for \code{sf_apa()}. An \code{sframe_quality_report} for \code{sf_flagged()}.}
-
-\item{...}{Passed to methods.}
-}
 \value{
 \code{sf_apa()} returns a character vector: one element per block, named
 by block, for analysis results, and one element for a single report.

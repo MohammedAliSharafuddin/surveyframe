@@ -3,16 +3,6 @@
 \name{sframe_as_data_frame}
 \alias{sframe_as_data_frame}
 \title{Coerce a surveyframe object to a data frame}
-\arguments{
-\item{x}{A surveyframe object.}
-
-\item{row.names}{Passed to \code{\link[base:as.data.frame]{base::as.data.frame()}} by the methods that
-build a frame. Ignored by the methods that return a stored table.}
-
-\item{optional}{Passed to \code{\link[base:as.data.frame]{base::as.data.frame()}}.}
-
-\item{...}{Ignored. Present for S3 consistency.}
-}
 \value{
 A data frame, with the columns listed above for the class given.
 }

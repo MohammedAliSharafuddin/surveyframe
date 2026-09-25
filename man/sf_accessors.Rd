@@ -3,11 +3,6 @@
 \name{sf_accessors}
 \alias{sf_accessors}
 \title{Explore a surveyframe object}
-\arguments{
-\item{x}{A surveyframe object.}
-
-\item{...}{Passed to methods.}
-}
 \value{
 A list for \code{sf_meta()} and \code{sf_plan()} on an instrument, an
 \link{sf_component_list} for the component accessors on an instrument, and a

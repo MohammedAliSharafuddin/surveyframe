@@ -40,6 +40,7 @@ test_that("17: a grouped item falls through when ggplot2 is absent", {
 })
 
 test_that("17: every Likert item in a scale is drawn, with ggplot2 present", {
+  skip_on_cran()  # renders a report or runs a full plan: slow on CRAN's machines
   skip_if_not_installed("ggplot2")
   demo <- sframe_demo_data()
   groups <- sframe_likert_scale_groups(demo$instrument)
@@ -75,6 +76,7 @@ test_that("23: both engines render a result's supplementary table", {
 })
 
 test_that("23: the leading features reach a rendered report", {
+  skip_on_cran()  # renders a report or runs a full plan: slow on CRAN's machines
   skip_if_not_installed("quanteda")
   demo <- sframe_demo("open_text")
   skip_if(is.null(demo$instrument), "no open_text demo")

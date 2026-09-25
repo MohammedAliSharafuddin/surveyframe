@@ -1041,7 +1041,7 @@ Inferential blocks also return a `$table` data frame ready for
 adds a codebook, quality summary, and descriptives alongside the analysis
 results.
 
-```{r render-results}
+```{r render-results, eval = identical(Sys.getenv("NOT_CRAN"), "true")}
 results_path <- render_results(
   results,
   study,
@@ -1059,7 +1059,7 @@ and disagreement categories running away from a shared zero line and any
 neutral category split evenly across it, so the balance of opinion is
 readable at a glance, where a plain frequency bar leaves it to be inferred.
 
-```{r render-report}
+```{r render-report, eval = identical(Sys.getenv("NOT_CRAN"), "true")}
 render_report(
   study,
   data             = scored,
