@@ -1905,6 +1905,22 @@ sframe_henseler_htmt <- function(items_by_construct) {
 #'   (total sample size), `method` (`"power"`, `"precision"`,
 #'   `"rule_of_thumb"` or `"none"`), `alpha`, `power`, `effect_size`,
 #'   `warnings`, `advisory` and `prompt`.
+#' @usage
+#' sample_size_plan(
+#'   type = c("proportion", "mean", "correlation", "t_test", "anova",
+#'     "regression", "sem"),
+#'   margin_error = NULL,
+#'   sd = NULL,
+#'   p = 0.5,
+#'   r = NULL,
+#'   alpha = 0.05,
+#'   power = 0.8,
+#'   groups = 2L,
+#'   predictors = NULL,
+#'   d = NULL,
+#'   f = NULL,
+#'   f2 = NULL
+#' )
 #' @export
 #' @examples
 #' plan <- sample_size_plan("t_test", d = 0.5, power = 0.80)

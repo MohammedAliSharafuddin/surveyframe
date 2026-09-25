@@ -5,25 +5,50 @@
 #'
 #' # From a report or a set of results
 #'
-#' Every report that has a natural chart carries a `plot()` method, so
-#' `plot(reliability_report(...))` draws without naming a helper. For a whole
-#' analysis, `plot(results)` draws each block that has a chart, and
-#' `plot(results, which = "RQ1")` selects one block by its ID. This is the
-#' shortest route, and it is the one to reach for first.
+#' Every report that has a natural chart carries a `plot()` method, so a
+#' report draws without naming a helper:
+#'
+#' * `plot(reliability_report(...))` draws one report.
+#' * `plot(results)` draws each block of an analysis that has a chart.
+#' * `plot(results, which = "RQ1")` selects one block by its ID.
+#'
+#' This is the shortest route, and it is the one to reach for first.
 #'
 #' # From a helper, by what it takes
 #'
 #' The helpers exist for assembling a custom report, where you need one chart
 #' on its own terms. They differ in what they accept and in what comes back.
 #'
-#' | Helper | Takes | Gives |
-#' | --- | --- | --- |
-#' | [sframe_plot_reliability()], [sframe_plot_validity()], [sframe_plot_quality()], [sframe_plot_missingness()], [sframe_plot_efa_scree()], [sframe_plot_efa_loadings()] | a report object | 1 plot |
-#' | [sframe_plot_item_chart()], [sframe_plot_scale_chart()], [sframe_plot_likert_matrix()], [sframe_plot_likert_scale()], [sframe_plot_correlation_matrix()], [sframe_plot_descriptives()] | responses, with the instrument | 1 plot |
-#' | [sframe_plot_group_comparison()], [sframe_plot_paired_comparison()], [sframe_plot_decision_ranking()], [sframe_plot_dematel_influence()] | one block's result | 1 plot |
-#' | [sframe_plot_regression_diagnostics()] | a regression result | 4 panels, as a list |
-#' | [sframe_plot_variable_distribution()] | responses and 1 column | 3 panels, as a list |
-#' | [sframe_plot_term_frequency()], [sframe_plot_ngram_frequency()], [sframe_plot_cooccurrence()], [sframe_plot_cooccurrence_network()], [sframe_plot_sentiment()], [sframe_plot_topics()] | a text result | 1 plot |
+#' * **A report object, giving 1 plot:**
+#'   * [sframe_plot_reliability()]
+#'   * [sframe_plot_validity()]
+#'   * [sframe_plot_quality()]
+#'   * [sframe_plot_missingness()]
+#'   * [sframe_plot_efa_scree()]
+#'   * [sframe_plot_efa_loadings()]
+#' * **Responses with the instrument, giving 1 plot:**
+#'   * [sframe_plot_item_chart()]
+#'   * [sframe_plot_scale_chart()]
+#'   * [sframe_plot_likert_matrix()]
+#'   * [sframe_plot_likert_scale()]
+#'   * [sframe_plot_correlation_matrix()]
+#'   * [sframe_plot_descriptives()]
+#' * **One block's result, giving 1 plot:**
+#'   * [sframe_plot_group_comparison()]
+#'   * [sframe_plot_paired_comparison()]
+#'   * [sframe_plot_decision_ranking()]
+#'   * [sframe_plot_dematel_influence()]
+#' * **A regression result, giving 4 panels as a list:**
+#'   * [sframe_plot_regression_diagnostics()]
+#' * **Responses and 1 column, giving 3 panels as a list:**
+#'   * [sframe_plot_variable_distribution()]
+#' * **A text result, giving 1 plot:**
+#'   * [sframe_plot_term_frequency()]
+#'   * [sframe_plot_ngram_frequency()]
+#'   * [sframe_plot_cooccurrence()]
+#'   * [sframe_plot_cooccurrence_network()]
+#'   * [sframe_plot_sentiment()]
+#'   * [sframe_plot_topics()]
 #'
 #' A helper that finds nothing to draw returns `NULL`, so guard the result
 #' where a report has to keep rendering.
