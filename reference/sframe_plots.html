@@ -61,16 +61,46 @@ hold.</p>
 
     <div class="section level2">
     <h2 id="from-a-report-or-a-set-of-results">From a report or a set of results<a class="anchor" aria-label="anchor" href="#from-a-report-or-a-set-of-results"></a></h2>
-    <p>Every report that has a natural chart carries a <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> method, so
-<code>plot(reliability_report(...))</code> draws without naming a helper. For a whole
-analysis, <code>plot(results)</code> draws each block that has a chart, and
-<code>plot(results, which = "RQ1")</code> selects one block by its ID. This is the
-shortest route, and it is the one to reach for first.</p>
+    <p>Every report that has a natural chart carries a <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> method, so a
+report draws without naming a helper:</p><ul><li><p><code>plot(reliability_report(...))</code> draws one report.</p></li>
+<li><p><code>plot(results)</code> draws each block of an analysis that has a chart.</p></li>
+<li><p><code>plot(results, which = "RQ1")</code> selects one block by its ID.</p></li>
+</ul><p>This is the shortest route, and it is the one to reach for first.</p>
     </div>
     <div class="section level2">
     <h2 id="from-a-helper-by-what-it-takes">From a helper, by what it takes<a class="anchor" aria-label="anchor" href="#from-a-helper-by-what-it-takes"></a></h2>
     <p>The helpers exist for assembling a custom report, where you need one chart
-on its own terms. They differ in what they accept and in what comes back.</p><table class="table table"><tr><td>Helper</td><td>Takes</td><td>Gives</td></tr><tr><td><code><a href="sframe_plot_reliability.html">sframe_plot_reliability()</a></code>, <code><a href="sframe_plot_validity.html">sframe_plot_validity()</a></code>, <code><a href="sframe_plot_quality.html">sframe_plot_quality()</a></code>, <code><a href="sframe_plot_missingness.html">sframe_plot_missingness()</a></code>, <code><a href="sframe_plot_efa_scree.html">sframe_plot_efa_scree()</a></code>, <code><a href="sframe_plot_efa_loadings.html">sframe_plot_efa_loadings()</a></code></td><td>a report object</td><td>1 plot</td></tr><tr><td><code><a href="sframe_plot_item_chart.html">sframe_plot_item_chart()</a></code>, <code><a href="sframe_plot_scale_chart.html">sframe_plot_scale_chart()</a></code>, <code><a href="sframe_plot_likert_matrix.html">sframe_plot_likert_matrix()</a></code>, <code><a href="sframe_plot_likert_scale.html">sframe_plot_likert_scale()</a></code>, <code><a href="sframe_plot_correlation_matrix.html">sframe_plot_correlation_matrix()</a></code>, <code><a href="sframe_plot_descriptives.html">sframe_plot_descriptives()</a></code></td><td>responses, with the instrument</td><td>1 plot</td></tr><tr><td><code><a href="sframe_plot_group_comparison.html">sframe_plot_group_comparison()</a></code>, <code><a href="sframe_plot_paired_comparison.html">sframe_plot_paired_comparison()</a></code>, <code><a href="sframe_plot_decision_ranking.html">sframe_plot_decision_ranking()</a></code>, <code><a href="sframe_plot_dematel_influence.html">sframe_plot_dematel_influence()</a></code></td><td>one block's result</td><td>1 plot</td></tr><tr><td><code><a href="sframe_plot_regression_diagnostics.html">sframe_plot_regression_diagnostics()</a></code></td><td>a regression result</td><td>4 panels, as a list</td></tr><tr><td><code><a href="sframe_plot_variable_distribution.html">sframe_plot_variable_distribution()</a></code></td><td>responses and 1 column</td><td>3 panels, as a list</td></tr><tr><td><code><a href="sframe_plot_term_frequency.html">sframe_plot_term_frequency()</a></code>, <code><a href="sframe_plot_ngram_frequency.html">sframe_plot_ngram_frequency()</a></code>, <code><a href="sframe_plot_cooccurrence.html">sframe_plot_cooccurrence()</a></code>, <code><a href="sframe_plot_cooccurrence_network.html">sframe_plot_cooccurrence_network()</a></code>, <code><a href="sframe_plot_sentiment.html">sframe_plot_sentiment()</a></code>, <code><a href="sframe_plot_topics.html">sframe_plot_topics()</a></code></td><td>a text result</td><td>1 plot</td></tr></table><p>A helper that finds nothing to draw returns <code>NULL</code>, so guard the result
+on its own terms. They differ in what they accept and in what comes back.</p><ul><li><p><strong>A report object, giving 1 plot:</strong></p><ul><li><p><code><a href="sframe_plot_reliability.html">sframe_plot_reliability()</a></code></p></li>
+<li><p><code><a href="sframe_plot_validity.html">sframe_plot_validity()</a></code></p></li>
+<li><p><code><a href="sframe_plot_quality.html">sframe_plot_quality()</a></code></p></li>
+<li><p><code><a href="sframe_plot_missingness.html">sframe_plot_missingness()</a></code></p></li>
+<li><p><code><a href="sframe_plot_efa_scree.html">sframe_plot_efa_scree()</a></code></p></li>
+<li><p><code><a href="sframe_plot_efa_loadings.html">sframe_plot_efa_loadings()</a></code></p></li>
+</ul></li>
+<li><p><strong>Responses with the instrument, giving 1 plot:</strong></p><ul><li><p><code><a href="sframe_plot_item_chart.html">sframe_plot_item_chart()</a></code></p></li>
+<li><p><code><a href="sframe_plot_scale_chart.html">sframe_plot_scale_chart()</a></code></p></li>
+<li><p><code><a href="sframe_plot_likert_matrix.html">sframe_plot_likert_matrix()</a></code></p></li>
+<li><p><code><a href="sframe_plot_likert_scale.html">sframe_plot_likert_scale()</a></code></p></li>
+<li><p><code><a href="sframe_plot_correlation_matrix.html">sframe_plot_correlation_matrix()</a></code></p></li>
+<li><p><code><a href="sframe_plot_descriptives.html">sframe_plot_descriptives()</a></code></p></li>
+</ul></li>
+<li><p><strong>One block's result, giving 1 plot:</strong></p><ul><li><p><code><a href="sframe_plot_group_comparison.html">sframe_plot_group_comparison()</a></code></p></li>
+<li><p><code><a href="sframe_plot_paired_comparison.html">sframe_plot_paired_comparison()</a></code></p></li>
+<li><p><code><a href="sframe_plot_decision_ranking.html">sframe_plot_decision_ranking()</a></code></p></li>
+<li><p><code><a href="sframe_plot_dematel_influence.html">sframe_plot_dematel_influence()</a></code></p></li>
+</ul></li>
+<li><p><strong>A regression result, giving 4 panels as a list:</strong></p><ul><li><p><code><a href="sframe_plot_regression_diagnostics.html">sframe_plot_regression_diagnostics()</a></code></p></li>
+</ul></li>
+<li><p><strong>Responses and 1 column, giving 3 panels as a list:</strong></p><ul><li><p><code><a href="sframe_plot_variable_distribution.html">sframe_plot_variable_distribution()</a></code></p></li>
+</ul></li>
+<li><p><strong>A text result, giving 1 plot:</strong></p><ul><li><p><code><a href="sframe_plot_term_frequency.html">sframe_plot_term_frequency()</a></code></p></li>
+<li><p><code><a href="sframe_plot_ngram_frequency.html">sframe_plot_ngram_frequency()</a></code></p></li>
+<li><p><code><a href="sframe_plot_cooccurrence.html">sframe_plot_cooccurrence()</a></code></p></li>
+<li><p><code><a href="sframe_plot_cooccurrence_network.html">sframe_plot_cooccurrence_network()</a></code></p></li>
+<li><p><code><a href="sframe_plot_sentiment.html">sframe_plot_sentiment()</a></code></p></li>
+<li><p><code><a href="sframe_plot_topics.html">sframe_plot_topics()</a></code></p></li>
+</ul></li>
+</ul><p>A helper that finds nothing to draw returns <code>NULL</code>, so guard the result
 where a report has to keep rendering.</p>
     </div>
     <div class="section level2">

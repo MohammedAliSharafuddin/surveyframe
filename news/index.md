@@ -386,6 +386,14 @@ This section grows as each group of fixes lands.
   and ends with a commented
   [`write_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/write_sframe.md)
   line for saving it.
+- **[`library(surveyframe)`](https://mohammedalisharafuddin.github.io/surveyframe/)
+  now says where to start.** In an interactive session it prints a short
+  note: 3 commands that load a branded demo and show it as a respondent
+  sees it and inside SurveyStudio, the functions to start your own study
+  with, `citation("surveyframe")`, and the website. Scripts, Quarto
+  renders and `R CMD check` stay silent, and
+  [`suppressPackageStartupMessages()`](https://rdrr.io/r/base/message.html)
+  removes it.
 - SurveyStudio’s preview points at the builder, where it used to name a
   “Build Survey” screen of its own.
 
@@ -764,6 +772,18 @@ This section grows as each group of fixes lands.
   text citation reads “Sharafuddin MA”. The BibTeX entry keeps its
   correct form. The citation year now comes from the release date, where
   it followed the date the citation was run.
+- **The PDF reference manual kept its text inside the page margins.**
+  Long function names in running text, 2 tables in
+  [`?sframe_plots`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_plots.md)
+  and
+  [`?sframe_as_data_frame`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_as_data_frame.md),
+  and the Usage of
+  [`sf_item()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_item.md)
+  and
+  [`sample_size_plan()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sample_size_plan.md)
+  ran past the right margin in 83 places. The tables are now lists, the
+  Usage lines wrap, and the manual lets a line stretch its spaces before
+  letting a name overflow.
 - **The APA citations attached to results carried a fixed year of
   2026.** surveyframe’s own citation now takes its year from the
   installed release, and R Core Team’s from the running version of R.

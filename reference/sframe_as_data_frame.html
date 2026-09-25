@@ -93,7 +93,21 @@ build a frame. Ignored by the methods that return a stored table.</p></dd>
     <div class="section level2">
     <h2 id="what-each-class-gives">What each class gives<a class="anchor" aria-label="anchor" href="#what-each-class-gives"></a></h2>
 
-<table class="table table"><tr><td>Class</td><td>One row per</td><td>Columns</td></tr><tr><td><code>sframe</code></td><td>item</td><td><code>id</code>, <code>label</code>, <code>type</code>, <code>choice_set</code>, <code>scale_id</code>, <code>reverse</code>, <code>required</code></td></tr><tr><td><code>sframe_codebook</code></td><td>item</td><td>the codebook's item table</td></tr><tr><td><code>sframe_validation</code></td><td>problem</td><td><code>check</code>, <code>problem</code></td></tr><tr><td><code>sframe_analysis_results</code></td><td>block</td><td><code>block</code>, <code>research_question</code>, <code>method</code>, <code>apa</code></td></tr><tr><td><code>sframe_reliability_report</code></td><td>scale</td><td><code>scale_id</code>, <code>label</code>, <code>n_items</code>, <code>n</code>, <code>alpha</code>, <code>omega</code></td></tr><tr><td><code>sframe_item_report</code></td><td>item</td><td><code>scale_id</code> and the item diagnostics</td></tr><tr><td><code>sframe_quality_report</code></td><td>check</td><td>the flattened quality checks</td></tr><tr><td><code>sframe_efa_report</code></td><td>measure</td><td>the readiness measures</td></tr><tr><td><code>sframe_sensitivity</code></td><td>perturbation</td><td><code>criterion</code>, <code>direction</code>, <code>weight</code>, <code>rho</code>, <code>rank_changed</code>, <code>top_changed</code></td></tr></table></div>
+<ul><li><p><code>sframe</code>: one row per item, with <code>id</code>, <code>label</code>, <code>type</code>, <code>choice_set</code>,
+<code>scale_id</code>, <code>reverse</code> and <code>required</code>.</p></li>
+<li><p><code>sframe_codebook</code>: one row per item, the codebook's item table.</p></li>
+<li><p><code>sframe_validation</code>: one row per problem, with <code>check</code> and <code>problem</code>.</p></li>
+<li><p><code>sframe_analysis_results</code>: one row per block, with <code>block</code>,
+<code>research_question</code>, <code>method</code> and <code>apa</code>.</p></li>
+<li><p><code>sframe_reliability_report</code>: one row per scale, with <code>scale_id</code>, <code>label</code>,
+<code>n_items</code>, <code>n</code>, <code>alpha</code> and <code>omega</code>.</p></li>
+<li><p><code>sframe_item_report</code>: one row per item, with <code>scale_id</code> and the item
+diagnostics.</p></li>
+<li><p><code>sframe_quality_report</code>: one row per check, the flattened quality checks.</p></li>
+<li><p><code>sframe_efa_report</code>: one row per measure, the readiness measures.</p></li>
+<li><p><code>sframe_sensitivity</code>: one row per perturbation, with <code>criterion</code>,
+<code>direction</code>, <code>weight</code>, <code>rho</code>, <code>rank_changed</code> and <code>top_changed</code>.</p></li>
+</ul></div>
     <div class="section level2">
     <h2 id="a-summary-and-where-the-full-record-is">A summary, and where the full record is<a class="anchor" aria-label="anchor" href="#a-summary-and-where-the-full-record-is"></a></h2>
     <p>These tables are a summary of the columns a reader scans first. The item

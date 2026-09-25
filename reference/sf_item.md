@@ -10,9 +10,10 @@ item must have a unique `id` within the instrument it is added to.
 sf_item(
   id,
   label,
-  type = c("likert", "single_choice", "multiple_choice", "numeric", "text", "textarea",
-    "date", "matrix", "slider", "ranking", "rating", "pairwise_comparison",
-    "criteria_weight", "section_break", "text_block"),
+  type = c("likert", "single_choice", "multiple_choice", "numeric",
+    "text", "textarea", "date", "matrix", "slider", "ranking", "rating",
+    "pairwise_comparison", "criteria_weight", "section_break",
+    "text_block"),
   required = FALSE,
   choice_set = NULL,
   scale_id = NULL,

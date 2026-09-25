@@ -128,6 +128,8 @@
 <li>
 <strong>Every add-in stops with one message saying what to do</strong> when RStudio is closed, the console has focus during an insert, the file dialog fails, or the chosen <code>.sframe</code> fails to load. It used to handle a missing rstudioapi alone. The exported launchers keep raising their errors.</li>
 <li>The starter instrument keeps its validation result as <code>validation</code>, and ends with a commented <code><a href="../reference/write_sframe.html">write_sframe()</a></code> line for saving it.</li>
+<li>
+<strong><code><a href="https://mohammedalisharafuddin.github.io/surveyframe/">library(surveyframe)</a></code> now says where to start.</strong> In an interactive session it prints a short note: 3 commands that load a branded demo and show it as a respondent sees it and inside SurveyStudio, the functions to start your own study with, <code>citation("surveyframe")</code>, and the website. Scripts, Quarto renders and <code>R CMD check</code> stay silent, and <code><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressPackageStartupMessages()</a></code> removes it.</li>
 <li>SurveyStudio’s preview points at the builder, where it used to name a “Build Survey” screen of its own.</li>
 </ul></div>
 <div class="section level3">
@@ -313,6 +315,8 @@
 <strong><code><a href="../articles/scale-reliability-validity.html">vignette("scale-reliability-validity")</a></code> said that supplying construct scores returns the HTMT matrix.</strong> It returns the absolute inter-construct correlations, and records <code>htmt_method = "correlation_fallback"</code> to say which it computed. The Henseler heterotrait-monotrait ratio needs <code>items_by_construct</code>, which records <code>htmt_method = "henseler"</code>. <code><a href="../reference/validity_report.html">validity_report()</a></code>’s own help was already accurate, and the vignette overstated it in an unevaluated chunk. The section now names what each argument gives, and its examples run, so a build would contradict the claim if it drifted again.</li>
 <li>
 <strong><code>citation("surveyframe")</code> abbreviated the author as “Sharafuddin M”.</strong> The given names Mohammed Ali were passed to <code><a href="https://rdrr.io/r/utils/person.html" class="external-link">person()</a></code> as one string, which R shortens to a single initial. They are now 2 given names, so the text citation reads “Sharafuddin MA”. The BibTeX entry keeps its correct form. The citation year now comes from the release date, where it followed the date the citation was run.</li>
+<li>
+<strong>The PDF reference manual kept its text inside the page margins.</strong> Long function names in running text, 2 tables in <code><a href="../reference/sframe_plots.html">?sframe_plots</a></code> and <code><a href="../reference/sframe_as_data_frame.html">?sframe_as_data_frame</a></code>, and the Usage of <code><a href="../reference/sf_item.html">sf_item()</a></code> and <code><a href="../reference/sample_size_plan.html">sample_size_plan()</a></code> ran past the right margin in 83 places. The tables are now lists, the Usage lines wrap, and the manual lets a line stretch its spaces before letting a name overflow.</li>
 <li>
 <strong>The APA citations attached to results carried a fixed year of 2026.</strong> surveyframe’s own citation now takes its year from the installed release, and R Core Team’s from the running version of R.</li>
 </ul></div>
