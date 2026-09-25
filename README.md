@@ -73,6 +73,11 @@ To get changes not yet released to CRAN:
 remotes::install_github("MohammedAliSharafuddin/surveyframe")
 ```
 
+In an interactive session, `library(surveyframe)` prints a short start-up
+note with a demo to try, the commands to start with, and how to cite the
+package. `suppressPackageStartupMessages(library(surveyframe))` loads it
+quietly, and scripts and rendered documents never show it.
+
 Optional packages are only needed for selected features:
 
 ```r

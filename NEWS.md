@@ -294,6 +294,12 @@ This section grows as each group of fixes lands.
   alone. The exported launchers keep raising their errors.
 * The starter instrument keeps its validation result as `validation`, and
   ends with a commented `write_sframe()` line for saving it.
+* **`library(surveyframe)` now says where to start.** In an interactive
+  session it prints a short note: 3 commands that load a branded demo and
+  show it as a respondent sees it and inside SurveyStudio, the functions to
+  start your own study with, `citation("surveyframe")`, and the website.
+  Scripts, Quarto renders and `R CMD check` stay silent, and
+  `suppressPackageStartupMessages()` removes it.
 * SurveyStudio's preview points at the builder, where it used to name a
   "Build Survey" screen of its own.
 
