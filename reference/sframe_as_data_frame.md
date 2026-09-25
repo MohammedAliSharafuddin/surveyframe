@@ -7,28 +7,6 @@ are reachable through the named accessors in
 or, for a full tabular record of an instrument, through
 [`codebook_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/codebook_report.md).
 
-## Arguments
-
-- x:
-
-  A surveyframe object.
-
-- row.names:
-
-  Passed to
-  [`base::as.data.frame()`](https://rdrr.io/r/base/as.data.frame.html)
-  by the methods that build a frame. Ignored by the methods that return
-  a stored table.
-
-- optional:
-
-  Passed to
-  [`base::as.data.frame()`](https://rdrr.io/r/base/as.data.frame.html).
-
-- ...:
-
-  Ignored. Present for S3 consistency.
-
 ## Value
 
 A data frame, with the columns listed above for the class given.

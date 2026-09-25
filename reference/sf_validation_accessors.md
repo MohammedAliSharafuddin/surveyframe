@@ -7,18 +7,6 @@ returns the problem messages.
 [`sf_object()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_object.md)
 returns the object that was validated.
 
-## Arguments
-
-- x:
-
-  An
-  [sframe_validation](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_validation.md)
-  object.
-
-- ...:
-
-  Passed to methods.
-
 ## Value
 
 [`sf_is_valid()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_is_valid.md)

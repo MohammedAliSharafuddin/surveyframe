@@ -7,16 +7,6 @@ and
 It records whether the object passed, every problem found, and every
 check that ran, including the checks that found nothing.
 
-## Arguments
-
-- x, object:
-
-  An `sframe_validation` object.
-
-- ...:
-
-  Ignored. Present for S3 consistency.
-
 ## Value
 
 [`print()`](https://rdrr.io/r/base/print.html) returns `x` invisibly.

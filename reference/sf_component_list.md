@@ -11,16 +11,6 @@ and
 It is a list of component objects named by their IDs, so a single
 component is reached with `[[`.
 
-## Arguments
-
-- x:
-
-  An `sf_component_list`.
-
-- ...:
-
-  Ignored. Present for S3 consistency.
-
 ## Value
 
 [`print()`](https://rdrr.io/r/base/print.html) returns `x` invisibly.

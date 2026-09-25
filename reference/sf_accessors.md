@@ -4,16 +4,6 @@ Accessors for the parts of an instrument, a codebook, or a report. They
 replace reaching into the object with `$`, which ties user code to the
 internal layout.
 
-## Arguments
-
-- x:
-
-  A surveyframe object.
-
-- ...:
-
-  Passed to methods.
-
 ## Value
 
 A list for

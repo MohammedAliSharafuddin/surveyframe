@@ -2,24 +2,6 @@
 
 The ID and label of an instrument component
 
-## Arguments
-
-- x:
-
-  An
-  [`sf_item()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_item.md),
-  [`sf_choices()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_choices.md),
-  [`sf_scale()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_scale.md),
-  [`sf_branch()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_branch.md),
-  [`sf_check()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_check.md)
-  or
-  [`sf_model()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_model.md)
-  object.
-
-- ...:
-
-  Passed to methods.
-
 ## Value
 
 A single character string.

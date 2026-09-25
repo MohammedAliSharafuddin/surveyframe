@@ -5,20 +5,6 @@ returns the APA-formatted sentence a result carries.
 [`sf_flagged()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_flagged.md)
 returns the rows a quality report flagged.
 
-## Arguments
-
-- x:
-
-  An `sframe_analysis_results` object, or one of the reports named
-  above, for
-  [`sf_apa()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_apa.md).
-  An `sframe_quality_report` for
-  [`sf_flagged()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_flagged.md).
-
-- ...:
-
-  Passed to methods.
-
 ## Value
 
 [`sf_apa()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_apa.md)
