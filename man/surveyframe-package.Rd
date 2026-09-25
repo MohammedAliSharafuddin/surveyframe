@@ -6,6 +6,7 @@
 \alias{surveyframe-package}
 \title{surveyframe: Survey Instrument Workflows for R}
 \description{
+\if{latex}{\out{\global\emergencystretch=3em\global\tolerance=3000\global\hbadness=10000}}
 surveyframe defines a survey instrument as a first-class R object and
 supports a complete workflow from questionnaire design through data
 collection, quality checking, scoring, psychometric diagnostics, and
@@ -104,4 +105,3 @@ Authors:
 }
 
 }
-\keyword{internal}

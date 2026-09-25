@@ -612,6 +612,12 @@ This section grows as each group of fixes lands.
   R shortens to a single initial. They are now 2 given names, so the text
   citation reads "Sharafuddin MA". The BibTeX entry keeps its correct form. The citation year now comes from the release date, where it
   followed the date the citation was run.
+* **The PDF reference manual kept its text inside the page margins.** Long
+  function names in running text, 2 tables in `?sframe_plots` and
+  `?sframe_as_data_frame`, and the Usage of `sf_item()` and
+  `sample_size_plan()` ran past the right margin in 83 places. The tables are
+  now lists, the Usage lines wrap, and the manual lets a line stretch
+  its spaces before letting a name overflow.
 * **The APA citations attached to results carried a fixed year of 2026.**
   surveyframe's own citation now takes its year from the installed release,
   and R Core Team's from the running version of R.

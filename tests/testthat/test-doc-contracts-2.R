@@ -50,7 +50,7 @@ source_of <- function(file) {
 test_that("10: the coercion help describes the schemas and the row.names limit", {
   src <- source_of("as_data_frame.R")
   expect_match(src, "row.names", fixed = TRUE)
-  expect_match(src, "One row per", fixed = TRUE)
+  expect_match(src, "`sframe_validation`: one row per problem", fixed = TRUE)
   # the claim under test: several methods return a stored table directly
   book <- codebook_report(reverse_instrument())
   expect_identical(rownames(as.data.frame(book, row.names = c("x", "y"))),

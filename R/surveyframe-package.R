@@ -1,6 +1,13 @@
+# The \if{latex} line in @description is for the PDF manual. Inline code is
+# set in a typewriter font that cannot be hyphenated, so a long function name
+# near the end of a line ran past the right margin, 83 times in 0.4.2's
+# manual. This page is typeset first, which is why it is no longer marked
+# internal, and \global carries the looser line breaking to every page after
+# it. HTML help and pkgdown ignore the line.
 #' surveyframe: Survey Instrument Workflows for R
 #'
 #' @description
+#' \if{latex}{\out{\global\emergencystretch=3em\global\tolerance=3000\global\hbadness=10000}}
 #' surveyframe defines a survey instrument as a first-class R object and
 #' supports a complete workflow from questionnaire design through data
 #' collection, quality checking, scoring, psychometric diagnostics, and
@@ -75,7 +82,6 @@
 #' Instruments are stored as UTF-8 JSON files with the `.sframe` extension.
 #' Each file includes a SHA-256 integrity hash for reproducibility auditing.
 #'
-#' @keywords internal
 "_PACKAGE"
 
 ## usethis namespace: start

@@ -23,17 +23,21 @@ reachable through the named accessors in \link{sf_accessors}, or, for a full
 tabular record of an instrument, through \code{\link[=codebook_report]{codebook_report()}}.
 }
 \section{What each class gives}{
-\tabular{lll}{
-   Class \tab One row per \tab Columns \cr
-   \code{sframe} \tab item \tab \code{id}, \code{label}, \code{type}, \code{choice_set}, \code{scale_id}, \code{reverse}, \code{required} \cr
-   \code{sframe_codebook} \tab item \tab the codebook's item table \cr
-   \code{sframe_validation} \tab problem \tab \code{check}, \code{problem} \cr
-   \code{sframe_analysis_results} \tab block \tab \code{block}, \code{research_question}, \code{method}, \code{apa} \cr
-   \code{sframe_reliability_report} \tab scale \tab \code{scale_id}, \code{label}, \code{n_items}, \code{n}, \code{alpha}, \code{omega} \cr
-   \code{sframe_item_report} \tab item \tab \code{scale_id} and the item diagnostics \cr
-   \code{sframe_quality_report} \tab check \tab the flattened quality checks \cr
-   \code{sframe_efa_report} \tab measure \tab the readiness measures \cr
-   \code{sframe_sensitivity} \tab perturbation \tab \code{criterion}, \code{direction}, \code{weight}, \code{rho}, \code{rank_changed}, \code{top_changed} \cr
+\itemize{
+\item \code{sframe}: one row per item, with \code{id}, \code{label}, \code{type}, \code{choice_set},
+\code{scale_id}, \code{reverse} and \code{required}.
+\item \code{sframe_codebook}: one row per item, the codebook's item table.
+\item \code{sframe_validation}: one row per problem, with \code{check} and \code{problem}.
+\item \code{sframe_analysis_results}: one row per block, with \code{block},
+\code{research_question}, \code{method} and \code{apa}.
+\item \code{sframe_reliability_report}: one row per scale, with \code{scale_id}, \code{label},
+\code{n_items}, \code{n}, \code{alpha} and \code{omega}.
+\item \code{sframe_item_report}: one row per item, with \code{scale_id} and the item
+diagnostics.
+\item \code{sframe_quality_report}: one row per check, the flattened quality checks.
+\item \code{sframe_efa_report}: one row per measure, the readiness measures.
+\item \code{sframe_sensitivity}: one row per perturbation, with \code{criterion},
+\code{direction}, \code{weight}, \code{rho}, \code{rank_changed} and \code{top_changed}.
 }
 }
 

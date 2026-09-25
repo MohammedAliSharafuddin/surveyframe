@@ -5,7 +5,8 @@
 \title{Sample-size and power planning helper}
 \usage{
 sample_size_plan(
-  type = c("proportion", "mean", "correlation", "t_test", "anova", "regression", "sem"),
+  type = c("proportion", "mean", "correlation", "t_test", "anova",
+    "regression", "sem"),
   margin_error = NULL,
   sd = NULL,
   p = 0.5,

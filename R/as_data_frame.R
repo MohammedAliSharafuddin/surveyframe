@@ -127,17 +127,20 @@ sframe_models_table <- function(instrument) {
 #'
 #' # What each class gives
 #'
-#' | Class | One row per | Columns |
-#' | --- | --- | --- |
-#' | `sframe` | item | `id`, `label`, `type`, `choice_set`, `scale_id`, `reverse`, `required` |
-#' | `sframe_codebook` | item | the codebook's item table |
-#' | `sframe_validation` | problem | `check`, `problem` |
-#' | `sframe_analysis_results` | block | `block`, `research_question`, `method`, `apa` |
-#' | `sframe_reliability_report` | scale | `scale_id`, `label`, `n_items`, `n`, `alpha`, `omega` |
-#' | `sframe_item_report` | item | `scale_id` and the item diagnostics |
-#' | `sframe_quality_report` | check | the flattened quality checks |
-#' | `sframe_efa_report` | measure | the readiness measures |
-#' | `sframe_sensitivity` | perturbation | `criterion`, `direction`, `weight`, `rho`, `rank_changed`, `top_changed` |
+#' * `sframe`: one row per item, with `id`, `label`, `type`, `choice_set`,
+#'   `scale_id`, `reverse` and `required`.
+#' * `sframe_codebook`: one row per item, the codebook's item table.
+#' * `sframe_validation`: one row per problem, with `check` and `problem`.
+#' * `sframe_analysis_results`: one row per block, with `block`,
+#'   `research_question`, `method` and `apa`.
+#' * `sframe_reliability_report`: one row per scale, with `scale_id`, `label`,
+#'   `n_items`, `n`, `alpha` and `omega`.
+#' * `sframe_item_report`: one row per item, with `scale_id` and the item
+#'   diagnostics.
+#' * `sframe_quality_report`: one row per check, the flattened quality checks.
+#' * `sframe_efa_report`: one row per measure, the readiness measures.
+#' * `sframe_sensitivity`: one row per perturbation, with `criterion`,
+#'   `direction`, `weight`, `rho`, `rank_changed` and `top_changed`.
 #'
 # The item and scale tables are a summary, and say so on the page, since an
 # integration reading one as the full declaration loses the type settings.

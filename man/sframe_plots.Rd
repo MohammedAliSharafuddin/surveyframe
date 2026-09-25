@@ -8,25 +8,64 @@ surveyframe draws in 3 ways, and which one fits depends on what you already
 hold.
 }
 \section{From a report or a set of results}{
-Every report that has a natural chart carries a \code{plot()} method, so
-\code{plot(reliability_report(...))} draws without naming a helper. For a whole
-analysis, \code{plot(results)} draws each block that has a chart, and
-\code{plot(results, which = "RQ1")} selects one block by its ID. This is the
-shortest route, and it is the one to reach for first.
+Every report that has a natural chart carries a \code{plot()} method, so a
+report draws without naming a helper:
+\itemize{
+\item \code{plot(reliability_report(...))} draws one report.
+\item \code{plot(results)} draws each block of an analysis that has a chart.
+\item \code{plot(results, which = "RQ1")} selects one block by its ID.
+}
+
+This is the shortest route, and it is the one to reach for first.
 }
 
 \section{From a helper, by what it takes}{
 The helpers exist for assembling a custom report, where you need one chart
-on its own terms. They differ in what they accept and in what comes back.\tabular{lll}{
-   Helper \tab Takes \tab Gives \cr
-   \code{\link[=sframe_plot_reliability]{sframe_plot_reliability()}}, \code{\link[=sframe_plot_validity]{sframe_plot_validity()}}, \code{\link[=sframe_plot_quality]{sframe_plot_quality()}}, \code{\link[=sframe_plot_missingness]{sframe_plot_missingness()}}, \code{\link[=sframe_plot_efa_scree]{sframe_plot_efa_scree()}}, \code{\link[=sframe_plot_efa_loadings]{sframe_plot_efa_loadings()}} \tab a report object \tab 1 plot \cr
-   \code{\link[=sframe_plot_item_chart]{sframe_plot_item_chart()}}, \code{\link[=sframe_plot_scale_chart]{sframe_plot_scale_chart()}}, \code{\link[=sframe_plot_likert_matrix]{sframe_plot_likert_matrix()}}, \code{\link[=sframe_plot_likert_scale]{sframe_plot_likert_scale()}}, \code{\link[=sframe_plot_correlation_matrix]{sframe_plot_correlation_matrix()}}, \code{\link[=sframe_plot_descriptives]{sframe_plot_descriptives()}} \tab responses, with the instrument \tab 1 plot \cr
-   \code{\link[=sframe_plot_group_comparison]{sframe_plot_group_comparison()}}, \code{\link[=sframe_plot_paired_comparison]{sframe_plot_paired_comparison()}}, \code{\link[=sframe_plot_decision_ranking]{sframe_plot_decision_ranking()}}, \code{\link[=sframe_plot_dematel_influence]{sframe_plot_dematel_influence()}} \tab one block's result \tab 1 plot \cr
-   \code{\link[=sframe_plot_regression_diagnostics]{sframe_plot_regression_diagnostics()}} \tab a regression result \tab 4 panels, as a list \cr
-   \code{\link[=sframe_plot_variable_distribution]{sframe_plot_variable_distribution()}} \tab responses and 1 column \tab 3 panels, as a list \cr
-   \code{\link[=sframe_plot_term_frequency]{sframe_plot_term_frequency()}}, \code{\link[=sframe_plot_ngram_frequency]{sframe_plot_ngram_frequency()}}, \code{\link[=sframe_plot_cooccurrence]{sframe_plot_cooccurrence()}}, \code{\link[=sframe_plot_cooccurrence_network]{sframe_plot_cooccurrence_network()}}, \code{\link[=sframe_plot_sentiment]{sframe_plot_sentiment()}}, \code{\link[=sframe_plot_topics]{sframe_plot_topics()}} \tab a text result \tab 1 plot \cr
+on its own terms. They differ in what they accept and in what comes back.
+\itemize{
+\item \strong{A report object, giving 1 plot:}
+\itemize{
+\item \code{\link[=sframe_plot_reliability]{sframe_plot_reliability()}}
+\item \code{\link[=sframe_plot_validity]{sframe_plot_validity()}}
+\item \code{\link[=sframe_plot_quality]{sframe_plot_quality()}}
+\item \code{\link[=sframe_plot_missingness]{sframe_plot_missingness()}}
+\item \code{\link[=sframe_plot_efa_scree]{sframe_plot_efa_scree()}}
+\item \code{\link[=sframe_plot_efa_loadings]{sframe_plot_efa_loadings()}}
 }
-
+\item \strong{Responses with the instrument, giving 1 plot:}
+\itemize{
+\item \code{\link[=sframe_plot_item_chart]{sframe_plot_item_chart()}}
+\item \code{\link[=sframe_plot_scale_chart]{sframe_plot_scale_chart()}}
+\item \code{\link[=sframe_plot_likert_matrix]{sframe_plot_likert_matrix()}}
+\item \code{\link[=sframe_plot_likert_scale]{sframe_plot_likert_scale()}}
+\item \code{\link[=sframe_plot_correlation_matrix]{sframe_plot_correlation_matrix()}}
+\item \code{\link[=sframe_plot_descriptives]{sframe_plot_descriptives()}}
+}
+\item \strong{One block's result, giving 1 plot:}
+\itemize{
+\item \code{\link[=sframe_plot_group_comparison]{sframe_plot_group_comparison()}}
+\item \code{\link[=sframe_plot_paired_comparison]{sframe_plot_paired_comparison()}}
+\item \code{\link[=sframe_plot_decision_ranking]{sframe_plot_decision_ranking()}}
+\item \code{\link[=sframe_plot_dematel_influence]{sframe_plot_dematel_influence()}}
+}
+\item \strong{A regression result, giving 4 panels as a list:}
+\itemize{
+\item \code{\link[=sframe_plot_regression_diagnostics]{sframe_plot_regression_diagnostics()}}
+}
+\item \strong{Responses and 1 column, giving 3 panels as a list:}
+\itemize{
+\item \code{\link[=sframe_plot_variable_distribution]{sframe_plot_variable_distribution()}}
+}
+\item \strong{A text result, giving 1 plot:}
+\itemize{
+\item \code{\link[=sframe_plot_term_frequency]{sframe_plot_term_frequency()}}
+\item \code{\link[=sframe_plot_ngram_frequency]{sframe_plot_ngram_frequency()}}
+\item \code{\link[=sframe_plot_cooccurrence]{sframe_plot_cooccurrence()}}
+\item \code{\link[=sframe_plot_cooccurrence_network]{sframe_plot_cooccurrence_network()}}
+\item \code{\link[=sframe_plot_sentiment]{sframe_plot_sentiment()}}
+\item \code{\link[=sframe_plot_topics]{sframe_plot_topics()}}
+}
+}
 
 A helper that finds nothing to draw returns \code{NULL}, so guard the result
 where a report has to keep rendering.

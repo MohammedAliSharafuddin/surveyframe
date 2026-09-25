@@ -150,6 +150,33 @@ sframe_item_config_problems <- function(item) {
 #' @param page Integer or NULL. Page number for multi-page surveys.
 #'
 #' @return An object of class `sf_item` (a named list).
+#' @usage
+#' sf_item(
+#'   id,
+#'   label,
+#'   type = c("likert", "single_choice", "multiple_choice", "numeric",
+#'     "text", "textarea", "date", "matrix", "slider", "ranking", "rating",
+#'     "pairwise_comparison", "criteria_weight", "section_break",
+#'     "text_block"),
+#'   required = FALSE,
+#'   choice_set = NULL,
+#'   scale_id = NULL,
+#'   reverse = FALSE,
+#'   help = NULL,
+#'   placeholder = NULL,
+#'   matrix_items = NULL,
+#'   comparison_items = NULL,
+#'   comparison_scale = NULL,
+#'   slider_min = NULL,
+#'   slider_max = NULL,
+#'   slider_step = NULL,
+#'   rating_max = NULL,
+#'   rating_icon = NULL,
+#'   date_min = NULL,
+#'   date_max = NULL,
+#'   section_intro = NULL,
+#'   page = NULL
+#' )
 #' @export
 #' @seealso [sf_instrument()], [sf_choices()], [sf_scale()]
 #'
