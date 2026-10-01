@@ -5,6 +5,20 @@
   "description": "Schema for the .sframe instrument format written by write_sframe() and read by read_sframe(). Documented so a reviewer or a second tool can read and validate a .sframe file without installing the R package -- the file is plain UTF-8 JSON, not an R-specific or binary format. Every field here corresponds to a key produced by sframe_serialization_payload() in R/read_write_sframe.R and R/amendments.R.",
   "type": "object",
   "required": ["hash", "meta", "items"],
+  "definitions": {
+    "cslNames": {
+      "type": "array",
+      "description": "CSL names: {\"family\", \"given\"} for a person, {\"literal\"} for an organisation.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "family": { "type": "string" },
+          "given": { "type": "string" },
+          "literal": { "type": "string" }
+        }
+      }
+    }
+  },
   "properties": {
     "sframe_format": {
       "type": "string",
@@ -76,7 +90,7 @@
           },
           "previous_hash": {
             "type": "string",
-            "description": "SHA-256 content hash (64 hex chars) of the instrument's substantive fields (items/choices/scales/branching/checks/analysis_plan/models/designs, excluding `hash` and `amendments` themselves) immediately before this amendment. Distinct from the file-level `hash` field above -- see amend_sframe()'s documentation."
+            "description": "SHA-256 content hash (64 hex chars) of every top-level field except `hash`, `amendments` and `references`, so `meta`, `render` and `version` count as well as the items, choices, scales, branching, checks, plan, models and designs, immediately before this amendment. Distinct from the file-level `hash` field above -- see amend_sframe()'s documentation."
           },
           "new_hash": {
             "type": "string",
@@ -86,6 +100,44 @@
             "type": "array",
             "items": { "type": "string" },
             "description": "Which top-level payload keys differed between previous_hash and new_hash's states, e.g. [\"items\"] or [\"items\", \"analysis_plan\"]. Not a full content diff -- narrows where to look, same design intent as the file-level hash mismatch message."
+          }
+        }
+      }
+    },
+    "references": {
+      "type": "array",
+      "description": "Optional works the instrument cites (surveyframe 0.4.3), as CSL-JSON records: the format Zotero, Mendeley and pandoc share, so a host can hand them straight to a citation processor. Present only when the instrument has at least one, so an instrument that cites nothing hashes as it did before this field existed. Left out of the amendment content hash: citing a source is disclosure, and adding one to a published instrument needs no amendment.",
+      "items": {
+        "type": "object",
+        "required": ["id", "type", "title"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^[A-Za-z0-9_]([A-Za-z0-9_:.#$%&+?<>~/-]*[A-Za-z0-9_])?$", "description": "Citation key, cited in text as [@id]. Unique within the instrument." },
+          "type": { "type": "string", "enum": ["article-journal", "book", "chapter", "paper-conference", "report", "thesis", "webpage", "software", "dataset", "manuscript", "document"] },
+          "title": { "type": "string", "minLength": 1 },
+          "author": { "$ref": "#/definitions/cslNames" },
+          "editor": { "$ref": "#/definitions/cslNames" },
+          "issued": {
+            "type": "object",
+            "description": "CSL date: {\"date-parts\": [[year]]}, or {\"literal\": text} when the year is not a number.",
+            "properties": {
+              "date-parts": { "type": "array", "items": { "type": "array", "items": { "type": ["integer", "string"] } } },
+              "literal": { "type": "string" }
+            }
+          },
+          "container-title": { "type": "string", "description": "The journal, or the book a chapter is in." },
+          "volume": { "type": "string" },
+          "issue": { "type": "string" },
+          "page": { "type": "string", "description": "Page range or article number." },
+          "publisher": { "type": "string" },
+          "edition": { "type": "string" },
+          "DOI": { "type": "string", "description": "Without the https://doi.org/ prefix." },
+          "URL": { "type": "string" },
+          "version": { "type": "string" },
+          "language": { "type": "string", "description": "The work's language code, for example fr. A citation style title-cases English titles only." },
+          "cited_by": {
+            "type": "array",
+            "description": "Where the instrument cites this work: \"instrument\", or \"item:<id>\", \"scale:<id>\", \"plan:<block id>\" or \"model:<id>\". Each target must exist in the instrument. A reference with none is read as cited by the instrument as a whole. surveyframe drops this field when it hands the record to a citation processor.",
+            "items": { "type": "string", "pattern": "^(instrument|(item|scale|plan|model):.+)$" }
           }
         }
       }

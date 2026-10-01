@@ -1,5 +1,66 @@
 # surveyframe (development version)
 
+## References, cited where they are used and listed once at the end
+
+An instrument can now carry the works it draws on, and every report lists
+them once, in a References section at the end, in a standard bibliography
+style.
+
+* **`sf_reference()`** creates a reference as a CSL-JSON record, the format
+  Zotero, Mendeley and pandoc share. **`read_bibtex()`** reads BibTeX, as
+  exported by Google Scholar, Zotero, Mendeley and most journal pages, with
+  no new dependency. **`add_references()`** attaches references to an
+  instrument, and `sf_instrument(components = )` takes them too.
+  **`sframe_references()`** lists them, and **`sframe_bibliography()`**
+  writes the CSL-JSON a citation processor reads.
+* **Each reference says where it is cited**: the instrument as a whole, an
+  item, a scale, a plan block or a model, in its `cited_by` field.
+  `validate_sframe()` gains a `references` check that every target exists
+  and every key is unique. A work not in English can carry `language`, so
+  a style does not title-case its journal name.
+* **`render_report()` cites in text and lists each work once, at the end.**
+  Each result used to carry its own reference list, so the same works
+  repeated through the report. Results now cite their methods in text, for
+  example "(Cohen, 1988; Field, 2018)", and the codebook names the source of
+  each item and scale. A written interpretation can cite a work as `[@key]`.
+  The list at the end is formatted by pandoc's citation processor in APA 7,
+  bundled with the package, or in any style given as `csl = `. The new
+  `references =` argument adds works a host cites in the write-up.
+  `render_results()` lists its references once at the end in the same way.
+* **The 30 built-in method references are also held as CSL-JSON.** A test
+  formats each one through pandoc in APA 7 and compares it with the APA text
+  the package already shipped, so the 2 forms cannot drift apart.
+* **SurveyBuilder has a References tab in Survey settings.** Paste BibTeX or
+  type a reference in, and choose where the instrument cites it. Changes
+  apply at once and do not wait for Save settings.
+
+### The file format
+
+* `references` is a new optional top-level field. It is written only when an
+  instrument has at least one, so an instrument that cites nothing keeps the
+  file hash it had, the rule `designs` and `amendments` already follow.
+* **Citing a source is not an amendment.** The content hash that
+  `amend_sframe()` records leaves `references` out, so a reference added to a
+  published instrument needs no amendment.
+* `inst/schema/sframe_schema.json` documents the field. Its description of
+  the amendment content hash was also wrong: it named only the items,
+  choices, scales, branching, checks, plan, models and designs, while the
+  hash has always covered every field except `hash` and `amendments`,
+  `meta`, `render` and `version` included. Corrected.
+* `inst/csl/apa.csl`, the APA 7 style from the Zotero Style Repository, is
+  bundled under CC BY-SA 3.0. See `inst/COPYRIGHTS`.
+
+## Bug fixes
+
+* **SurveyBuilder no longer drops the amendment log.** Opening an amended
+  `.sframe` file in the builder and saving it wrote the file without its
+  `amendments`, `designs` and `sframe_format` fields, so a disclosed revision
+  vanished with no warning. The builder now carries every field it does not
+  edit through to the next save.
+* **SurveyBuilder's Survey settings dialog scrolls.** A tab taller than the
+  dialog ran past its bottom edge, with its last controls out of reach. The
+  dialog body now shrinks to fit and scrolls.
+
 # surveyframe 0.4.2
 
 A defect-fix release. An external review of 0.4.1 found defects that
