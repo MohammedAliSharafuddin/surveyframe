@@ -228,6 +228,21 @@ print.sframe_codebook <- function(x, ...) {
 #'   [analysis_syntax()] from the same resolved specification the analysis ran.
 #'   Defaults to `TRUE`. A method [analysis_syntax()] does not cover shows no
 #'   block, rather than a guess at the call.
+#' @param references Optional further [sf_reference()] records, for example
+#'   the works a host cites in the written interpretations, which are cited
+#'   in text as `[@id]`. The instrument's own references
+#'   ([add_references()]) and the methods' references are always included.
+#' @param csl Optional path to a Citation Style Language file for the
+#'   References section. Defaults to APA 7th edition, bundled with the
+#'   package. Any style from the Zotero style repository works.
+#'
+#' @section References:
+#' The Quarto report cites in text, author and year, and lists every work it
+#' cites once, in a References section at the end, formatted by pandoc's
+#' citation processor in the chosen style. That covers the methods' own
+#' references, the sources the instrument cites for its items, scales, plan
+#' blocks and models, and `references`. The built-in HTML engine, used when
+#' Quarto is unavailable, lists the methods' references the same way.
 #' @param interpretations Named list or NULL. Written interpretations keyed
 #'   by analysis-plan block id, added after the results are known. When a
 #'   block has an entry, its report section shows the pre-declared decision
@@ -282,7 +297,9 @@ render_report <- function(
     include_models    = TRUE,
     plot_palette      = c("web", "print"),
     interpretations   = NULL,
-    show_code         = TRUE
+    show_code         = TRUE,
+    references        = NULL,
+    csl               = NULL
 ) {
   sframe_check_instrument(instrument)
   plot_palette <- rlang::arg_match(plot_palette)
@@ -418,7 +435,33 @@ render_report <- function(
         sframe_report_seed(data, instrument, include_analysis))
     )
 
+    # The bibliography (0.4.3): every reference the instrument carries, the
+    # host's, and all built-in method references. pandoc lists only those
+    # actually cited, so carrying the full method set costs nothing.
+    style <- csl %||% system.file("csl", "apa.csl", package = "surveyframe")
+    if (nzchar(style) && file.exists(style)) {
+      sframe_bibliography(
+        instrument,
+        extra = c(sframe_flatten_references(list(references %||% list())),
+                  Filter(Negate(is.null), lapply(names(.sframe_citation_csl), sframe_builtin_reference))),
+        file = file.path(render_dir, "references.json")
+      )
+      file.copy(style, file.path(render_dir, "style.csl"), overwrite = TRUE)
+      params$use_citations <- TRUE
+    } else if (!is.null(csl)) {
+      rlang::abort(paste0("The citation style '", csl, "' was not found."), class = "sframe_error")
+    }
+
     param_args <- sframe_quarto_param_args(params)
+    if (isTRUE(params$use_citations)) {
+      # In the front matter of the render copy. Quarto 1.8 ignores a
+      # bibliography given as -M metadata on the command line, so the
+      # citations would print as raw [@key] text.
+      qmd <- readLines(render_input, warn = FALSE)
+      qmd <- append(qmd, c("bibliography: references.json", "csl: style.csl",
+                           "link-citations: true"), after = 1L)
+      writeLines(qmd, render_input)
+    }
     # Render with the working directory set to the render dir so Quarto creates
     # its intermediate `*_files/libs` there and can inline them for
     # embed-resources. Output next to the input, then copy to the destination.

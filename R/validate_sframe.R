@@ -209,7 +209,8 @@ sframe_validation_checks <- c(
   "analysis_plan_variables",
   "decision_scale_compatibility",
   "model_ids",
-  "model_specs"
+  "model_specs",
+  "references"
 )
 
 #' Validate an instrument object
@@ -703,6 +704,11 @@ validate_sframe <- function(instrument, strict = TRUE) {
       )
     }
   }
+
+  # References (0.4.3): unique, well-formed ids, a title each, and every
+  # cited_by target present in the instrument.
+  reference_problems <- sframe_reference_problems(instrument)
+  if (length(reference_problems) > 0) add("references", reference_problems)
 
   # The validated stamp travels on the instrument carried by the result, so
   # as_sframe() hands back an instrument that records the outcome, and strict

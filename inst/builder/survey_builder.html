@@ -350,7 +350,10 @@ input,textarea,select{font-family:inherit;font-size:13px}
 .mx{padding:3px;border-radius:4px;color:var(--t3);font-size:17px;
   transition:all var(--d1)}
 .mx:hover{background:var(--cg);color:var(--t1)}
-.mbody{padding:18px;overflow-y:auto;display:flex;flex-direction:column;gap:12px}
+/* min-height:0 lets the body shrink inside the dialog and scroll. Without it a
+   flex child never shrinks below its content, so a tall tab ran past the
+   bottom of the dialog with its last controls out of reach. Found 2026-10-01. */
+.mbody{padding:18px;overflow-y:auto;min-height:0;display:flex;flex-direction:column;gap:12px}
 .mbody::-webkit-scrollbar{width:4px}
 .mbody::-webkit-scrollbar-thumb{background:var(--cb);border-radius:4px}
 .mfoot{padding:10px 18px;border-top:1px solid var(--cb);
@@ -898,6 +901,7 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
       <div class="stab"        onclick="showST('thankyou')" id="st-thankyou">Thank You</div>
       <div class="stab"        onclick="showST('header')"   id="st-header">Header</div>
       <div class="stab"        onclick="showST('gsheets')"  id="st-gsheets">Google Sheets</div>
+      <div class="stab"        onclick="showST('refs')"     id="st-refs">References</div>
     </div>
     <div class="stp active" id="sp-meta">
       <div class="field"><label class="fl" for="s-title">Survey title <span class="fr">*</span></label><div class="fc"><input type="text" id="s-title"></div></div>
@@ -945,6 +949,35 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
       <div class="field"><label class="fl" for="s-gsu">Google Sheet URL</label><div class="fc"><input type="url" id="s-gsu" placeholder="https://docs.google.com/spreadsheets/d/your-sheet-id"></div></div>
       <div class="field"><label class="fl">Apps Script collector</label><div class="fc"><button type="button" class="btn btn-s btn-sm" onclick="exportSheetsCollector()">Generate collector (.gs)</button></div><span class="fhint">Click to build and download the .gs file from your questions. No URL needed for this step.</span></div>
       <div class="field"><label class="fl" for="s-gsep">Apps Script Web App URL</label><div class="fc"><input type="url" id="s-gsep" placeholder="https://script.google.com/macros/s/your-script-id/exec"></div><span class="fhint">Paste the deployed Web App URL here, then re-export the survey.</span></div>
+    </div>
+    <div class="stp" id="sp-refs">
+      <div class="alert-i">The works this instrument draws on: where a scale or an item comes from, and what supports a planned analysis. Each change applies at once. They are saved in the .sframe file, and the report cites them in text and lists them once, in its References section at the end.</div>
+      <div id="refList" aria-live="polite"></div>
+      <div class="field"><label class="fl" for="r-bib">Paste BibTeX</label><div class="fc"><textarea id="r-bib" rows="4" placeholder="From Google Scholar (Cite, then BibTeX), Zotero, Mendeley or a journal page"></textarea></div></div>
+      <div class="field"><label class="fl" for="r-cite">Cited by</label><div class="fc"><select id="r-cite" multiple size="4"></select></div><span class="fhint">Ctrl-click or Cmd-click to choose more than one. Leave empty to cite it from the instrument as a whole.</span></div>
+      <div style="display:flex;gap:8px;margin:4px 0 12px"><button type="button" class="btn btn-p btn-sm" onclick="addRefsFromBib()">Add from BibTeX</button></div>
+      <details><summary class="fl" style="cursor:pointer">Or type one in</summary>
+        <div class="frow">
+          <div class="field"><label class="fl" for="r-id">Citation key</label><div class="fc"><input type="text" id="r-id" placeholder="likert_1932"></div></div>
+          <div class="field"><label class="fl" for="r-year">Year</label><div class="fc"><input type="text" id="r-year" placeholder="1932"></div></div>
+        </div>
+        <div class="field"><label class="fl" for="r-auth">Authors</label><div class="fc"><input type="text" id="r-auth" placeholder="Likert, R.; Murphy, G."></div><span class="fhint">Family name, then initials. Separate authors with a semicolon. Put an organisation in braces: {R Core Team}.</span></div>
+        <div class="field"><label class="fl" for="r-title">Title</label><div class="fc"><input type="text" id="r-title"></div></div>
+        <div class="frow">
+          <div class="field"><label class="fl" for="r-type">Type</label><div class="fc"><select id="r-type"><option value="article-journal">Journal article</option><option value="book">Book</option><option value="chapter">Book chapter</option><option value="report">Report</option><option value="thesis">Thesis</option><option value="webpage">Web page</option><option value="software">Software</option><option value="dataset">Dataset</option></select></div></div>
+          <div class="field"><label class="fl" for="r-cont">Journal, or book for a chapter</label><div class="fc"><input type="text" id="r-cont"></div></div>
+        </div>
+        <div class="frow">
+          <div class="field"><label class="fl" for="r-vol">Volume</label><div class="fc"><input type="text" id="r-vol"></div></div>
+          <div class="field"><label class="fl" for="r-iss">Issue</label><div class="fc"><input type="text" id="r-iss"></div></div>
+          <div class="field"><label class="fl" for="r-pg">Pages</label><div class="fc"><input type="text" id="r-pg" placeholder="1-55"></div></div>
+        </div>
+        <div class="frow">
+          <div class="field"><label class="fl" for="r-pub">Publisher</label><div class="fc"><input type="text" id="r-pub"></div></div>
+          <div class="field"><label class="fl" for="r-doi">DOI</label><div class="fc"><input type="text" id="r-doi" placeholder="10.1037/..."></div></div>
+        </div>
+        <button type="button" class="btn btn-p btn-sm" onclick="addRefFromForm()">Add reference</button>
+      </details>
     </div>
   </div>
   <div class="mfoot">
@@ -2873,6 +2906,7 @@ function openSettings(tab){
   var prog=document.getElementById('s-prog');if(prog)prog.checked=h.show_progress!==false;
   sv('s-gsu',r.google_sheets_url||'');sv('s-gsep',r.google_sheets_endpoint||'');
   if(h.logo_base64){var lp=document.getElementById('logoPrev');if(lp){var lMtype=h.logo_media_type||'image/png';lp.src='data:'+lMtype+';base64,'+h.logo_base64;lp.style.display='block';}document.getElementById('logoName').textContent='Logo loaded';var rb=document.getElementById('logoRmBtn');if(rb)rb.style.display='inline-flex';}
+  renderRefs();
   showST(tab||'meta');openModal('m-settings');
 }
 function showST(t){document.querySelectorAll('.stab').forEach(function(b){b.classList.remove('active');});document.querySelectorAll('.stp').forEach(function(p){p.classList.remove('active');});document.getElementById('st-'+t).classList.add('active');document.getElementById('sp-'+t).classList.add('active');}
@@ -2902,6 +2936,144 @@ function saveSettings(){
   S.render.google_sheets_url=gv('s-gsu');S.render.google_sheets_endpoint=gv('s-gsep');
   closeModal('m-settings');ra();toast('Settings saved','ok');
 }
+
+// -- References (0.4.3) -------------------------------------------------------
+// CSL-JSON records, the format read_bibtex() and sf_reference() produce in R.
+// Each may say where the instrument cites it, in cited_by.
+//
+// Changes apply to the instrument at once, with undo, and never wait for
+// Save settings. That button rewrites every General, Welcome and Thank You
+// field from its inputs (an empty author list becomes ""), which is a change
+// to an amended instrument's content. Adding a source must change nothing
+// else. S.references is written only when it holds one, as write_sframe()
+// writes it, so a file that cites nothing keeps the hash it had before.
+function refsList(){return S.references||[];}
+function refsCommit(list){if(list.length)S.references=list;else delete S.references;setDirty();}
+var REF_ID=/^[A-Za-z0-9_]([A-Za-z0-9_:.#$%&+?<>~\/-]*[A-Za-z0-9_])?$/;
+function refTargets(){
+  var t=[{v:'instrument',l:'The instrument as a whole'}];
+  (S.scales||[]).forEach(function(x){t.push({v:'scale:'+x.id,l:'Scale: '+(x.label||x.id)});});
+  (S.items||[]).forEach(function(x){if(x.type!=='section_break'&&x.type!=='text_block')t.push({v:'item:'+x.id,l:'Item: '+x.id});});
+  (S.analysis_plan||[]).forEach(function(x){t.push({v:'plan:'+x.id,l:'Plan: '+x.id+(x.research_question?' '+x.research_question:'')});});
+  return t;
+}
+function refShort(r){
+  var a=(r.author||[]).map(function(n){return n.family||n.literal||'';});
+  var who=a.length>2?a[0]+' et al.':a.join(' & ');
+  var yr=(r.issued&&r.issued['date-parts']&&r.issued['date-parts'][0]&&r.issued['date-parts'][0][0])||'n.d.';
+  return (who?who+' ':'')+'('+yr+'). '+(r.title||'');
+}
+function renderRefs(){
+  var box=document.getElementById('refList');if(!box)return;
+  var targets=refTargets();
+  var sel=document.getElementById('r-cite');
+  if(sel)sel.innerHTML=targets.map(function(t){return '<option value="'+esc(t.v)+'">'+esc(t.l)+'</option>';}).join('');
+  var refsDraft=refsList();
+  if(!refsDraft.length){box.innerHTML='<p class="fhint" style="margin:8px 0 12px">No references yet.</p>';return;}
+  box.innerHTML=refsDraft.map(function(r,i){
+    var cited=r.cited_by||[];
+    var checks=targets.map(function(t){return '<label class="fcheck"><input type="checkbox" '+(cited.indexOf(t.v)>=0?'checked ':'')+'onchange="toggleCite('+i+',this.value,this.checked)" value="'+esc(t.v)+'"><span>'+esc(t.l)+'</span></label>';}).join('');
+    return '<div style="border:1px solid var(--bd);border-radius:6px;padding:8px 10px;margin:0 0 8px">'
+      +'<div style="display:flex;gap:8px;align-items:flex-start"><div style="flex:1;font-size:12px"><code>@'+esc(r.id)+'</code> '+esc(refShort(r))+'</div>'
+      +'<button type="button" class="btn btn-g btn-sm" style="color:var(--cd)" onclick="removeRef('+i+')" aria-label="Remove '+esc(r.id)+'">Remove</button></div>'
+      +'<details style="margin-top:4px"><summary class="fhint" style="cursor:pointer">Cited by: '+(cited.length?esc(cited.join(', ')):'not linked yet')+'</summary>'+checks+'</details></div>';
+  }).join('');
+}
+function toggleCite(i,v,on){
+  snap();var list=refsList().slice(),r=list[i];if(!r)return;var c=(r.cited_by||[]).filter(function(x){return x!==v;});if(on)c.push(v);
+  r=Object.assign({},r);if(c.length)r.cited_by=c;else delete r.cited_by;list[i]=r;refsCommit(list);renderRefs();
+}
+function removeRef(i){snap();var list=refsList().slice();list.splice(i,1);refsCommit(list);renderRefs();toast('Reference removed','ok');}
+function chosenTargets(){
+  var sel=document.getElementById('r-cite');if(!sel)return [];
+  return Array.prototype.filter.call(sel.options,function(o){return o.selected;}).map(function(o){return o.value;});
+}
+function addRef(r){
+  if(!REF_ID.test(r.id||'')){toast('Citation key \''+(r.id||'')+'\' is not valid. Use letters, digits and _ : . -','err');return false;}
+  if(!r.title){toast('Reference '+r.id+' needs a title','err');return false;}
+  if(refsList().some(function(x){return x.id===r.id;})){toast('A reference with key '+r.id+' is already here','err');return false;}
+  // No target chosen cites it from the instrument as a whole, so it reaches
+  // the report. An unlinked reference would never be cited, so never listed.
+  var c=chosenTargets();r.cited_by=c.length?c:["instrument"];
+  Object.keys(r).forEach(function(k){if(r[k]===''||r[k]==null)delete r[k];});
+  snap();refsCommit(refsList().concat([r]));return true;
+}
+function refNames(list){
+  return list.filter(function(n){return n.trim();}).map(function(n){
+    n=n.trim();
+    if(/^\{.*\}$/.test(n))return {literal:n.slice(1,-1)};
+    if(n.indexOf(',')>=0){var p=n.split(',');var o={family:p[0].trim()};var g=p.slice(1).join(',').trim();if(g)o.given=g;return o;}
+    var w=n.split(/\s+/);if(w.length===1)return {literal:n};
+    return {family:w[w.length-1],given:w.slice(0,-1).join(' ')};
+  });
+}
+function refIssued(y){y=String(y||'').trim();if(!y)return undefined;var n=parseInt(y,10);return isNaN(n)?{literal:y}:{'date-parts':[[n]]};}
+function addRefFromForm(){
+  var r={id:gv('r-id').trim(),type:gv('r-type')||'article-journal',title:gv('r-title').trim(),
+    author:refNames(gv('r-auth').split(';')),issued:refIssued(gv('r-year')),
+    'container-title':gv('r-cont').trim(),volume:gv('r-vol').trim(),issue:gv('r-iss').trim(),
+    page:gv('r-pg').trim(),publisher:gv('r-pub').trim(),DOI:gv('r-doi').trim().replace(/^(https?:\/\/(dx\.)?doi\.org\/|doi:\s*)/i,'')};
+  if(!r.author.length)delete r.author;
+  if(addRef(r)){['r-id','r-year','r-auth','r-title','r-cont','r-vol','r-iss','r-pg','r-pub','r-doi'].forEach(function(k){sv(k,'');});renderRefs();toast('Reference '+r.id+' added','ok');}
+}
+// BibTeX to CSL-JSON, matching read_bibtex() in R: brace-aware fields, names
+// split on " and " outside braces, the common LaTeX accents, protective
+// braces removed.
+function bibClean(x){
+  if(x==null)return '';
+  var A={"'":{a:'\u00e1',e:'\u00e9',i:'\u00ed',o:'\u00f3',u:'\u00fa',A:'\u00c1',E:'\u00c9',O:'\u00d3'},'`':{a:'\u00e0',e:'\u00e8',o:'\u00f2'},'"':{a:'\u00e4',e:'\u00eb',o:'\u00f6',u:'\u00fc',A:'\u00c4',O:'\u00d6',U:'\u00dc'},'^':{a:'\u00e2',e:'\u00ea',o:'\u00f4'},'~':{n:'\u00f1',a:'\u00e3',o:'\u00f5'}};
+  Object.keys(A).forEach(function(c){Object.keys(A[c]).forEach(function(l){
+    var e=c.replace(/[\^"'`~]/g,function(m){return '\\'+m;});
+    x=x.replace(new RegExp('\\{?\\\\'+e+'\\{?'+l+'\\}?\\}?','g'),A[c][l]);
+  });});
+  x=x.replace(/\\c\{?c\}?/g,'\u00e7').replace(/\\([&%$#_{}])/g,'$1').replace(/---?/g,'-').replace(/~/g,' ').replace(/[{}]/g,'');
+  return x.replace(/\s+/g,' ').trim();
+}
+function bibSplitNames(x){
+  if(!x)return [];var out=[],d=0,cur='';
+  for(var i=0;i<x.length;i++){var ch=x[i];if(ch==='{')d++;else if(ch==='}')d--;
+    if(d===0&&x.substr(i,5).toLowerCase()===' and '){out.push(cur);cur='';i+=4;continue;}cur+=ch;}
+  out.push(cur);
+  return out.map(function(n){n=n.trim();return /^\{[^{}]*\}$/.test(n)?'{'+bibClean(n)+'}':bibClean(n);});
+}
+function parseBib(text){
+  var out=[],i=0,n=text.length;
+  while(i<n){
+    var at=text.indexOf('@',i);if(at<0)break;
+    var open=text.slice(at).search(/[{(]/);if(open<0)break;open+=at;
+    var type=text.slice(at+1,open).trim().toLowerCase();
+    var d=1,j=open+1;while(j<n&&d>0){var c=text[j];if(c==='{')d++;else if(c==='}')d--;j++;}
+    var body=text.slice(open+1,j-1);i=j;
+    if(['comment','preamble','string'].indexOf(type)>=0)continue;
+    var comma=body.indexOf(',');if(comma<0)continue;
+    var key=body.slice(0,comma).trim(),f={},rest=body.slice(comma+1),k=0;
+    while(k<rest.length){
+      var eq=rest.indexOf('=',k);if(eq<0)break;
+      var name=rest.slice(k,eq).replace(/[\s,]/g,'').toLowerCase();var m=eq+1;
+      while(m<rest.length&&/\s/.test(rest[m]))m++;
+      var val='';
+      if(rest[m]==='{'){var dd=1,q=m+1;while(q<rest.length&&dd>0){if(rest[q]==='{')dd++;else if(rest[q]==='}')dd--;q++;}val=rest.slice(m+1,q-1);k=q;}
+      else if(rest[m]==='"'){var q2=rest.indexOf('"',m+1);if(q2<0)q2=rest.length;val=rest.slice(m+1,q2);k=q2+1;}
+      else{var q3=rest.indexOf(',',m);if(q3<0)q3=rest.length;val=rest.slice(m,q3).trim();k=q3;}
+      if(name)f[name]=val;
+    }
+    var map={article:'article-journal',book:'book',booklet:'book',incollection:'chapter',inbook:'chapter',inproceedings:'paper-conference',conference:'paper-conference',techreport:'report',report:'report',phdthesis:'thesis',mastersthesis:'thesis',thesis:'thesis',online:'webpage',electronic:'webpage',software:'software',dataset:'dataset',unpublished:'manuscript'};
+    var ctype=map[type]||(type==='misc'&&(f.url||f.howpublished)?'webpage':'document');
+    out.push({id:key,type:ctype,title:bibClean(f.title),author:refNames(bibSplitNames(f.author)),
+      editor:f.editor?refNames(bibSplitNames(f.editor)):undefined,issued:refIssued(bibClean(f.year||(f.date||'').slice(0,4))),
+      'container-title':bibClean(f.journal||f.journaltitle||f.booktitle||f.series),volume:bibClean(f.volume),
+      issue:bibClean(f.number||f.issue),page:bibClean(f.pages),publisher:bibClean(f.publisher||f.institution||f.school||f.organization),
+      edition:bibClean(f.edition),DOI:bibClean(f.doi).replace(/^(https?:\/\/(dx\.)?doi\.org\/|doi:\s*)/i,''),URL:bibClean(f.url)});
+  }
+  return out;
+}
+function addRefsFromBib(){
+  var t=gv('r-bib');if(!t.trim()){toast('Paste a BibTeX entry first','err');return;}
+  var found=parseBib(t),added=0;
+  found.forEach(function(r){if(!r.author||!r.author.length)delete r.author;if(!r.editor||!r.editor.length)delete r.editor;if(addRef(r))added++;});
+  if(!found.length){toast('No BibTeX entry was found in that text','err');return;}
+  sv('r-bib','');renderRefs();toast(added+' of '+found.length+' reference'+(found.length===1?'':'s')+' added',added?'ok':'err');
+}
 function loadLogo(e){var f=e.target.files[0];if(!f)return;var r=new FileReader();r.onload=function(ev){var dataUrl=ev.target.result;var mimeMatch=dataUrl.match(/^data:([^;]+);base64,/);var mtype=mimeMatch?mimeMatch[1]:'image/png';var b64=dataUrl.split(',')[1];if(!S.render.header)S.render.header={};S.render.header.logo_base64=b64;S.render.header.logo_media_type=mtype;var lp=document.getElementById('logoPrev');if(lp){lp.src='data:'+mtype+';base64,'+b64;lp.style.display='block';}document.getElementById('logoName').textContent=f.name;var rb=document.getElementById('logoRmBtn');if(rb)rb.style.display='inline-flex';};r.readAsDataURL(f);e.target.value='';}
 function removeLogo(){if(S.render.header)S.render.header.logo_base64='';var lp=document.getElementById('logoPrev');if(lp)lp.style.display='none';document.getElementById('logoName').textContent='No logo';var rb=document.getElementById('logoRmBtn');if(rb)rb.style.display='none';}
 
@@ -2917,6 +3089,11 @@ function loadFile(e){
       S.meta=src.meta||S.meta;S.choices=src.choices||[];S.items=src.items||[];
       S.scales=src.scales||[];S.branching=src.branching||[];S.checks=src.checks||[];
       S.analysis_plan=src.analysis_plan||[];S.models=src.models||[];S.render=src.render||S.render;
+      // Fields this builder does not edit are carried through to the next
+      // save. Until 0.4.3 they were dropped, so opening and saving an
+      // amended instrument lost its disclosed amendment log.
+      if(src.references&&src.references.length)S.references=src.references;else delete S.references;
+      S._carry={};['sframe_format','designs','amendments'].forEach(function(k){if(src[k]!==undefined)S._carry[k]=src[k];});
       ['welcome','thankyou','header'].forEach(function(k){if(!S.render[k])S.render[k]={};});
       selId=null;ra();dirty=false;lastSaved=Date.now();updSave();
       // Surface the SHA-256 integrity status instead of loading silently.
@@ -2953,6 +3130,10 @@ async function sframeHash(payload){
 }
 async function saveSframe(){
   var payload={hash:{algo:'sha256',value:''},version:S.meta.version,meta:S.meta,items:S.items,choices:S.choices,scales:S.scales,branching:S.branching,checks:S.checks,analysis_plan:S.analysis_plan,models:S.models||[],render:S.render};
+  // Carried fields and references go back in, each only when present, as
+  // write_sframe() in R writes them.
+  var carry=S._carry||{};Object.keys(carry).forEach(function(k){payload[k]=carry[k];});
+  if(S.references&&S.references.length)payload.references=S.references;
   payload.hash.value=await sframeHash(payload);
   var blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
   var a=document.createElement('a');a.href=URL.createObjectURL(blob);

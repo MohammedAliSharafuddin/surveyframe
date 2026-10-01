@@ -28,6 +28,7 @@ params:
   interpretations_path: ""
   instrument_hash:     ""
   analysis_seed:       ""
+  use_citations:       false
 execute:
   echo:    false
   warning: false
@@ -51,6 +52,28 @@ interps    <- if (nzchar(params$interpretations_path %||% "") &&
 } else {
   list()
 }
+
+# References (0.4.3). render_report() hands pandoc a CSL-JSON bibliography
+# and sets use_citations, so a citation is written in text as [@key] and the
+# reference appears once, in the References section at the end. Each result
+# used to carry its own reference list, repeating the same works.
+use_citations <- isTRUE(as.logical(params$use_citations %||% FALSE))
+cited_keys <- function(target) {
+  # A reference linked to nothing counts as cited by the instrument as a
+  # whole, so every reference the instrument carries reaches the list.
+  refs <- Filter(function(r) target %in% (r$cited_by %||% character(0)) ||
+                   (identical(target, "instrument") && !length(r$cited_by)),
+                 instrument$references %||% list())
+  vapply(refs, function(r) as.character(r$id), character(1))
+}
+cite <- function(keys) {
+  keys <- unique(keys[nzchar(keys)])
+  if (!length(keys)) return("")
+  paste0("[", paste0("@", keys, collapse = "; "), "]")
+}
+# Without a bibliography (a host calling the template directly), the method
+# references are still gathered here and listed once at the end as text.
+fallback_refs <- character(0)
 ```
 
 ```{=html}
@@ -80,6 +103,9 @@ tbody tr:last-child td { border-bottom: 2px solid #1a1a2e !important; }
 .sf-foot { text-align: center; font-size: 12px; color: #94a3b8;
            margin-top: 48px; padding-top: 16px; border-top: 1px solid #eee; }
 .sf-foot a { color: #16B3B1; font-weight: 600; text-decoration: none; }
+/* References, one list at the end in a standard bibliography layout: a
+   hanging indent, and a little space between entries. */
+#refs .csl-entry, .sf-references p { padding-left: 2em; text-indent: -2em; margin: 0 0 0.6em; line-height: 1.5; }
 </style>
 ```
 
@@ -98,6 +124,8 @@ if (!is.null(m$description) && nzchar(m$description))
   cat(sprintf("**Description:** %s\n\n", m$description))
 if (!is.null(m$authors) && length(m$authors) > 0)
   cat(sprintf("**Authors:** %s\n\n", paste(m$authors, collapse = ", ")))
+if (use_citations && length(cited_keys("instrument")) > 0)
+  cat(sprintf("**Draws on:** %s\n\n", cite(cited_keys("instrument"))))
 cat(sprintf("**Validation status:** %s\n\n",
   if (isTRUE(m$validated)) "Valid" else "Not validated"))
 ```
@@ -129,6 +157,22 @@ kable(format = "html", cb$scales_table,
 kable(format = "html", cb$plan_table,
   col.names = c("ID","Research question","Method","Variables","Decision rule"),
   align = c("l","l","l","l","l"))
+```
+
+```{r codebook-sources, eval=params$include_codebook && use_citations}
+#| output: asis
+# Where each item and scale comes from, cited in text. The works themselves
+# are listed in the References section.
+sources <- list()
+for (sc in instrument$scales %||% list()) {
+  keys <- cited_keys(paste0("scale:", sc$id))
+  if (length(keys)) sources[[length(sources) + 1]] <- sprintf("- Scale *%s*: %s", sc$label %||% sc$id, cite(keys))
+}
+for (it in instrument$items %||% list()) {
+  keys <- cited_keys(paste0("item:", it$id))
+  if (length(keys)) sources[[length(sources) + 1]] <- sprintf("- Item `%s`: %s", it$id, cite(keys))
+}
+if (length(sources)) cat("**Sources of items and scales**\n\n", paste(unlist(sources), collapse = "\n"), "\n\n", sep = "")
 ```
 
 ```{r codebook-models, eval=params$include_codebook && !is.null(cb$models_table) && nrow(cb$models_table) > 0}
@@ -424,6 +468,8 @@ if (!has_data) {
       cat(sprintf("**Variables:** %s\n\n", paste(rq$variables, collapse = ", ")))
     if (nzchar(rq$interpretation %||% ""))
       cat(sprintf("**Interpretation prompt:** %s\n\n", rq$interpretation))
+    if (use_citations && length(cited_keys(paste0("plan:", rq$id %||% ""))) > 0)
+      cat(sprintf("**Sources:** %s\n\n", cite(cited_keys(paste0("plan:", rq$id %||% "")))))
     override <- interps[[rq$id %||% ""]] %||% ""
     if (nzchar(override))
       cat(sprintf("**Interpretation:** %s\n\n", override))
@@ -508,10 +554,14 @@ if (!has_data) {
         } else if (nzchar(r$interpretation %||% "")) {
           cat(sprintf("\n**Interpretation:** %s\n\n", r$interpretation))
         }
-        if (length(r$citations) > 0) {
-          cat("**References:**\n\n")
-          lapply(r$citations, function(cit) cat(sprintf("- %s\n", cit)))
-          cat("\n")
+        # Cited in text. The references themselves are listed once, in the
+        # References section at the end.
+        block_key <- r$block_id %||% r$id %||% ""
+        keys <- c(cited_keys(paste0("plan:", block_key)), names(r$citations %||% list()))
+        if (use_citations && length(keys) > 0) {
+          cat(sprintf("*References for this analysis:* %s\n\n", cite(keys)))
+        } else if (length(r$citations) > 0) {
+          fallback_refs <- c(fallback_refs, unlist(r$citations))
         }
       }
     }
@@ -528,6 +578,8 @@ if (!has_data) {
 for (model in instrument$models) {
   cat(sprintf("### %s\n\n", model$label %||% model$id))
   cat(sprintf("**Type:** %s  \n**Engine:** %s\n\n", model$type %||% "", model$engine %||% ""))
+  if (use_citations && length(cited_keys(paste0("model:", model$id %||% ""))) > 0)
+    cat(sprintf("**Sources:** %s\n\n", cite(cited_keys(paste0("model:", model$id %||% "")))))
   syntax <- tryCatch(
     switch(model$type,
       cfa = cfa_lavaan_syntax(instrument = instrument, model = model),
@@ -569,6 +621,25 @@ cat("```r\nlibrary(surveyframe)\n")
 cat("instr     <- read_sframe(\"your_instrument.sframe\")\n")
 cat("responses <- read_responses(\"your_responses.csv\", instr)\n")
 cat("render_report(instr, data = responses, output_file = \"report.html\")\n```\n\n")
+```
+
+---
+
+## References {#sec-references .unnumbered}
+
+```{r references}
+#| output: asis
+# One list for the whole report, in the bibliography style render_report()
+# was given (APA 7 by default), with a hanging indent. pandoc fills the
+# refs block with every work cited above, each once.
+if (use_citations) {
+  cat("::: {#refs .references}\n:::\n\n")
+} else if (length(fallback_refs) > 0) {
+  refs <- sort(unique(fallback_refs))
+  cat("::: {.references .sf-references}\n", paste0(refs, collapse = "\n\n"), "\n:::\n\n", sep = "")
+} else {
+  cat("No references were cited.\n\n")
+}
 ```
 
 ```{=html}
