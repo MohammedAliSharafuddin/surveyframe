@@ -555,8 +555,9 @@ textarea.pv-inp:focus{border-color:var(--pvc);
 .vbadge.con{background:var(--cp-l);color:var(--cp-t)}.vbadge.id{background:var(--vb-id-bg);color:var(--vb-id-fg)}
 .vbadge.lik{background:var(--cs-l);color:var(--cs-t)}.vbadge.scl{background:var(--vb-scl-bg);color:var(--vb-scl-fg)}
 .vbadge.txt{background:var(--vb-txt-bg);color:var(--vb-txt-fg)}
-.role-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.role-card{border:1px solid var(--cb);border-radius:8px;background:var(--cg);padding:9px}
+.role-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}
+.role-card{border:1px solid var(--cb);border-radius:8px;background:var(--cg);padding:9px;min-width:0}
+.role-card select{width:100%;max-width:100%;min-width:0}
 .role-card .fl{margin-bottom:5px}
 .plan-msg{font-size:11px;margin-top:8px;padding:7px 9px;border-radius:var(--r);background:var(--plan-bg);color:var(--plan-fg);border:1px solid var(--plan-bd)}
 .plan-msg.ok{background:var(--cs-l2);color:var(--cs-t);border-color:var(--cs-bd)}
