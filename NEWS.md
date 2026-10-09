@@ -1,5 +1,9 @@
 # surveyframe (development version)
 
+* The analysis plan builder keeps the Outcome and other role dropdowns inside
+  the Add or Edit Analysis Plan dialog when an item label is long. The role
+  grid columns can now shrink, and each select fills its column.
+
 # surveyframe 0.4.2
 
 A defect-fix release. An external review of 0.4.1 found defects that
