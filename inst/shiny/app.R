@@ -205,13 +205,13 @@ optional_choices <- function(ids, none_label = "(None)") {
   c(stats::setNames("", none_label), choices)
 }
 
-table_card <- function(title, headers, rows, empty_label) {
+table_card <- function(title, headers, rows, empty_label, wide = FALSE) {
   tags$div(class = "card",
     tags$div(class = "card-title", title),
     if (length(rows) == 0) {
       tags$p(class = "hint", empty_label)
     } else {
-      tags$table(class = "sf-table",
+      tags$table(class = if (wide) "sf-table sf-table-wide" else "sf-table",
         tags$thead(tags$tr(do.call(tagList, lapply(headers, tags$th)))),
         tags$tbody(rows)
       )
@@ -228,7 +228,7 @@ analysis_registry <- local({
   list(
     frequency = list(
       family = "descriptive", label = "Frequency table",
-      roles = list(role("variable", "Variable", levels = c("nominal", "ordinal", "likert"))),
+      roles = list(role("variable", "Variables", max = 99, levels = c("nominal", "ordinal", "likert"))),
       show_alpha = FALSE, show_hypotheses = FALSE, show_effect_size = FALSE,
       assumptions = character(0),
       output = "Counts, percentages, valid percentages, and missing values.",
@@ -1221,6 +1221,11 @@ ui <- fluidPage(
       }
       .sf-table td { padding: 8px 12px; border: none; vertical-align: top; overflow-wrap: anywhere; }
       .sf-table tbody tr:last-child td { border-bottom: 2px solid #1a1a2e; }
+      /* A table of short ids beside long text, such as the saved analysis
+         plans: words never break mid-word, so a narrow screen scrolls the
+         table sideways and RQ1 stays on one line */
+      .sf-table-wide td { overflow-wrap: break-word; min-width: 4em; }
+      .sf-table-wide td:first-child { white-space: nowrap; min-width: 0; }
       .btn-primary {
         background: #16B3B1; color: #fff; border: none; border-radius: 6px;
         padding: 9px 20px; font-size: 14px; cursor: pointer; font-weight: 600;
@@ -2471,6 +2476,11 @@ server <- function(input, output, session) {
   quality_result <- reactive({
     req(rv$instrument, rv$responses)
     id_col <- trim_or_null(input$resp_id_col)
+    # The collectors write respondent_id, so use it when no column was named.
+    # Without an id the duplicate check cannot run.
+    if (is.null(id_col) && "respondent_id" %in% names(rv$responses)) {
+      id_col <- "respondent_id"
+    }
     # Timing analysis needs the timestamp columns passed explicitly; detect
     # the standard collector columns so sheet imports get completion times.
     sub_col <- if ("submitted_at" %in% names(rv$responses)) "submitted_at"
@@ -2549,8 +2559,13 @@ server <- function(input, output, session) {
 
       tags$div(class = "card",
         tags$div(class = "card-title", "Duplicates and missingness"),
-        tags$p(sprintf("%d duplicate response row(s) detected.",
-                       qr$duplicates$n_duplicates %||% 0L)),
+        if (isTRUE(qr$duplicates$checked)) {
+          tags$p(sprintf("%d duplicate response row(s) detected.",
+                         qr$duplicates$n_duplicates %||% 0L))
+        } else {
+          tags$p(class = "hint",
+            "Duplicates were not checked. Name the respondent ID column to check them.")
+        },
         tags$p(sprintf(
           "%.1f%% of respondents exceed the %.0f%% missing threshold.",
           mean(qr$missing$respondent_miss > qr$missing$flagged_threshold, na.rm = TRUE) * 100,
@@ -2725,7 +2740,7 @@ server <- function(input, output, session) {
     table_card("Saved analysis plans",
       headers = c("ID", "Family", "Method", "Roles", "Status", "Needs data"),
       rows = rows,
-      empty_label = "No saved analysis plans.")
+      empty_label = "No saved analysis plans.", wide = TRUE)
   }
 
   output$analysis_left_panel <- renderUI({

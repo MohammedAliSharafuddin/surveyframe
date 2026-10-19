@@ -264,22 +264,74 @@ sframe_p_string <- function(p) {
 # Individual test runners
 # ---------------------------------------------------------------------------
 
-sframe_run_frequency <- function(data, vars, weights = NULL) {
-  col <- vars[1]
-  err <- sframe_require_columns(data, c(col, weights), "Frequency table")
+# One frequency table per variable. A block may name 1 variable or more,
+# through `variable` or `variables`. With an instrument, each row shows the
+# label from the item's own choice set and keeps the stored code in `Code`,
+# and a declared choice nobody picked appears with a count of 0.
+sframe_run_frequency <- function(data, vars, weights = NULL, instrument = NULL) {
+  vars <- unique(as.character(vars[!is.na(vars) & nzchar(vars)]))
+  if (length(vars) == 0) {
+    return(list(test = "frequency",
+                error = "Frequency table needs at least one variable."))
+  }
+  err <- sframe_require_columns(data, c(vars, weights), "Frequency table")
   if (!is.null(err)) return(list(test = "frequency", error = err))
+  parts <- lapply(vars, function(col) {
+    sframe_frequency_one(data, col, weights, instrument)
+  })
+  names(parts) <- vars
+  if (length(parts) == 1) {
+    one <- parts[[1]]
+    one$test <- "frequency"
+    return(one)
+  }
+  stacked <- do.call(rbind, lapply(vars, function(col) {
+    tb <- parts[[col]]$table
+    cbind(data.frame(Variable = col, stringsAsFactors = FALSE), tb)
+  }))
+  rownames(stacked) <- NULL
+  list(
+    test     = "frequency",
+    variable = vars,
+    weights  = weights,
+    n        = vapply(parts, function(p) p$n, integer(1)),
+    tables   = parts,
+    table    = stacked,
+    apa      = paste(vapply(vars, function(col) {
+      sprintf("Frequency distribution for %s (N = %d).", col,
+              sum(parts[[col]]$table$Frequency))
+    }, character(1)), collapse = " "),
+    prompt   = "Describe each distribution. Note any dominant category and whether the distribution was expected."
+  )
+}
+
+sframe_frequency_one <- function(data, col, weights = NULL, instrument = NULL) {
   vals <- data[[col]]
+  if (is.factor(vals)) vals <- as.character(vals)
   # Empty strings are non-responses (a collected sheet stores "" for items a
   # respondent never saw); count them as missing, not as a category.
   vals[!is.na(vals) & vals == ""] <- NA
-  tbl <- sort(table(vals, useNA = "ifany"), decreasing = TRUE)
-  pct <- round(prop.table(tbl) * 100, 1)
+  codes <- ifelse(is.na(vals), NA_character_, as.character(vals))
+  value_labels <- sframe_item_value_labels(instrument, col)
+  if (length(value_labels) > 0) {
+    # Declared order, then any code the choice set does not list, then missing
+    lev <- c(names(value_labels),
+             sort(setdiff(unique(codes[!is.na(codes)]), names(value_labels))))
+    tbl <- table(factor(codes, levels = lev), useNA = "ifany")
+  } else {
+    tbl <- sort(table(codes, useNA = "ifany"), decreasing = TRUE)
+  }
+  code_col <- names(tbl)
+  shown <- ifelse(!is.na(code_col) & code_col %in% names(value_labels),
+                  unname(value_labels[code_col]), code_col)
+  total <- sum(tbl)
+  pct <- if (total > 0) round(as.numeric(tbl) / total * 100, 1) else rep(NA_real_, length(tbl))
   weighted <- NULL
   if (!is.null(weights) && nzchar(weights) && weights %in% colnames(data)) {
     w <- sframe_num((data[[weights]]))
     weighted <- stats::aggregate(
       w,
-      by = list(Value = ifelse(is.na(vals), NA, as.character(vals))),
+      by = list(Value = codes),
       FUN = sum,
       na.rm = TRUE
     )
@@ -289,23 +341,30 @@ sframe_run_frequency <- function(data, vars, weights = NULL) {
     } else {
       NA_real_
     }
+    if (length(value_labels) > 0) {
+      weighted$Code <- weighted$Value
+      hit <- weighted$Value %in% names(value_labels)
+      weighted$Value[hit] <- unname(value_labels[weighted$Value[hit]])
+    }
   }
   list(
     test      = "frequency",
     variable  = col,
     weights   = weights,
-    n         = length(vals[!is.na(vals)]),
+    n         = sum(!is.na(codes)),
     table     = data.frame(
-      Value     = names(tbl),
+      Value     = shown,
+      Code      = code_col,
       Frequency = as.integer(tbl),
-      Percent   = as.numeric(pct),
+      Percent   = pct,
       stringsAsFactors = FALSE
     ),
     weighted_table = weighted,
-    apa       = sprintf("Frequency distribution for %s (N = %d).", col, sum(tbl)),
+    apa       = sprintf("Frequency distribution for %s (N = %d).", col, total),
     prompt    = "Describe the distribution. Note any dominant category and whether the distribution was expected."
   )
 }
+
 
 sframe_run_crosstab <- function(data, vars, options = list()) {
   weights <- options$weights %||% NULL
@@ -912,7 +971,7 @@ sframe_vars_for_method <- function(method, roles, block) {
   if (length(roles) == 0) return(vars)
   switch(
     method,
-    frequency = sframe_role_values(roles, "variable"),
+    frequency = sframe_role_values(roles, c("variable", "variables")),
     descriptives = sframe_role_values(roles, c("variables", "items", "scales")),
     missing_data = sframe_role_values(roles, c("variables", "items")),
     crosstab = sframe_role_values(roles, c("row", "column", "variables")),
@@ -983,8 +1042,9 @@ sframe_result_from_report <- function(report, test = report$method %||% "") {
 #' The second table a result carries, if it has one
 #'
 #' Some results hold a table beside their main one that a reader needs: a
-#' quanteda result's leading features, or a moderation's conditional slopes at
-#' the moderator's own values. Both report engines render whatever this returns,
+#' quanteda result's leading features, a moderation's conditional slopes at
+#' the moderator's own values, or the counts a descriptives block gives for the
+#' choice items it names. Both report engines render whatever this returns,
 #' under its own caption, so the 2 cannot drift on what a result shows.
 #'
 #' This is exported because the Quarto report template runs in a separate R
@@ -1048,6 +1108,15 @@ sframe_result_supplement <- function(result) {
   # reader to review.
   if (is.data.frame(result$top_features) && nrow(result$top_features) > 0) {
     return(list(table = result$top_features, caption = "Leading features"))
+  }
+
+  # A descriptives block that named choice items alongside numeric ones counts
+  # the choice items in a table of their own.
+  if (identical(test, "descriptives") && is.data.frame(result$categorical) &&
+      nrow(result$categorical) > 0 &&
+      !identical(result$categorical, result$table)) {
+    return(list(table = result$categorical,
+                caption = "Counts and percentages for choice items"))
   }
   NULL
 }
@@ -1322,7 +1391,8 @@ sframe_quality_checks_table <- function(qr) {
     # checked = FALSE (see quality_report()), so it is reported as
     # not checked rather than as sprintf() silently rendering "NA% flagged".
     result_text <- if (isFALSE(s$checked)) {
-      sprintf("not checked, %d items", s$n_items %||% NA_integer_)
+      sprintf("not checked, %d items, minimum %d (straightline_min_items)",
+              s$n_items %||% NA_integer_, s$min_items %||% 4L)
     } else {
       sprintf("%.1f%% flagged", (s$flag_rate %||% NA_real_) * 100)
     }
@@ -1374,8 +1444,8 @@ sframe_run_one_block <- function(block, data, instrument, plots = FALSE,
 
   result <- tryCatch({
     switch(test,
-      frequency          = sframe_run_frequency(data, vars, weights = options$weights),
-      descriptives       = sframe_run_descriptives_result(data, roles, options),
+      frequency          = sframe_run_frequency(data, vars, weights = options$weights, instrument = instrument),
+      descriptives       = sframe_run_descriptives_result(data, roles, options, instrument),
       missing_data       = sframe_run_missing_result(data, instrument, roles),
       quality            = sframe_result_from_report(sframe_run_quality(data, instrument, roles, options), "quality"),
       scale_descriptives = sframe_run_descriptives_result(data, list(variables = vapply(instrument$scales, function(s) s$id, character(1))), options),
@@ -1489,7 +1559,7 @@ sframe_run_one_block <- function(block, data, instrument, plots = FALSE,
   # that exclusion list and keeps humanising normally.
   result$table <- tryCatch(
     sframe_humanize_table(result$table, sframe_label_lookup(instrument),
-                          exclude_cols = .sframe_text_free_text_cols[[test]] %||% character(0)),
+                          exclude_cols = c(.sframe_text_free_text_cols[[test]], "Code")),
     error = function(e) result$table
   )
   if (isTRUE(plots) && is.null(result$plot)) {
@@ -1794,10 +1864,10 @@ render_results <- function(
       ))
     }
 
-    # Build APA-style results table
-    tbl_html <- ""
-    if (!is.null(r$table) && is.data.frame(r$table)) {
-      tbl <- r$table
+    # Build APA-style results table, and the same again for a second table
+    # the result carries (see sframe_result_supplement())
+    table_html <- function(tbl, caption = NULL) {
+      if (!is.data.frame(tbl)) return("")
       # p values keep 3 decimals, or <.001, by column meaning. Rounding every
       # numeric column to 2 showed p = .004 as 0.
       p_cols <- grepl("^p$|^p\\.value$|^p_value$|^Pr\\(>", colnames(tbl),
@@ -1831,10 +1901,17 @@ render_results <- function(
           "</td></tr></tfoot>"
         )
       } else ""
-      tbl_html <- sprintf(
-        '<table class="results-table"><thead><tr>%s</tr></thead><tbody>%s</tbody>%s</table>',
+      sprintf(
+        '<table class="results-table">%s<thead><tr>%s</tr></thead><tbody>%s</tbody>%s</table>',
+        if (is.null(caption)) "" else
+          sprintf("<caption>%s</caption>", htmltools_escape(caption)),
         headers, rows, foot_html
       )
+    }
+    tbl_html <- table_html(r$table)
+    supplement <- sframe_result_supplement(r)
+    if (!is.null(supplement)) {
+      tbl_html <- paste0(tbl_html, table_html(supplement$table, supplement$caption))
     }
 
     effect_badge <- ""

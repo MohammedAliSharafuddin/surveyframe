@@ -155,7 +155,7 @@ sframe_analysis_roles <- function(block) {
   }
   switch(
     method,
-    frequency = list(variable = vars[1]),
+    frequency = list(variable = vars),
     descriptives = list(variables = vars),
     missing_data = list(variables = vars),
     quality = list(variables = vars),
@@ -979,13 +979,59 @@ sframe_phi <- function(tbl, chi_sq = NULL) {
   sqrt(unname(chi_sq) / sum(tbl))
 }
 
-sframe_run_descriptives_result <- function(data, roles, options = list()) {
+# A single_choice or multiple_choice item holds category codes, and the mean of
+# a code is meaningless (a mean gender of 1.59). With an instrument, those
+# columns are counted instead: one row per choice for a single_choice item,
+# and one row per option, counting who selected it, for a multiple_choice
+# item's expansion columns. Every other column keeps its usual statistics.
+sframe_run_descriptives_result <- function(data, roles, options = list(),
+                                           instrument = NULL) {
   vars <- sframe_role_values(roles, c("variables", "items", "scales"))
   split_by <- sframe_role_values(roles, c("split_by", "group"), NULL)[1]
   weights <- sframe_role_values(roles, c("weights", "weight"), NULL)[1]
+  if (length(vars) == 0 && inherits(instrument, "sframe")) {
+    vars <- names(data)[vapply(data, function(x) any(!is.na(sframe_num(x))),
+                               logical(1))]
+    vars <- setdiff(vars, c(split_by, weights))
+  }
+  kinds <- vapply(vars, function(v) sframe_choice_column_kind(instrument, v),
+                  character(1))
+  categorical <- vars[kinds != "other" & vars %in% colnames(data)]
+  numeric_vars <- setdiff(vars, categorical)
+  cat_tbl <- sframe_choice_counts_table(data, categorical, kinds[categorical],
+                                        instrument)
+  note <- NULL
+  if (length(categorical) > 0) {
+    shown <- unique(vapply(categorical, function(v) {
+      if (kinds[[v]] == "option") sub("__.*$", "", v) else v
+    }, character(1)))
+    note <- if (length(shown) == 1) {
+      sprintf("%s is a choice item, so it is reported as counts and percentages.",
+              shown)
+    } else {
+      sprintf("%s are choice items, so they are reported as counts and percentages.",
+              paste(shown, collapse = ", "))
+    }
+  }
+  if (length(numeric_vars) == 0 && length(categorical) > 0) {
+    return(list(
+      test = "descriptives",
+      method = "descriptives",
+      variable = shown,
+      variables = vars,
+      split_by = split_by,
+      weights = weights,
+      table = cat_tbl,
+      categorical = cat_tbl,
+      note = note,
+      apa = paste(sprintf("Counts and percentages were computed for %d choice column(s).",
+                          length(categorical)), note),
+      prompt = "Report the count and percentage for each category, and note any dominant category."
+    ))
+  }
   out <- descriptives_report(
     data,
-    variables = if (length(vars)) vars else NULL,
+    variables = if (length(numeric_vars)) numeric_vars else NULL,
     split_by = split_by,
     conf_level = options$conf_level %||% 0.95,
     weights = weights
@@ -993,8 +1039,76 @@ sframe_run_descriptives_result <- function(data, roles, options = list()) {
   # report_obj keeps the classed object for sframe_plot_for_result() to
   # dispatch plot() on, same pattern as sframe_result_from_report() elsewhere:
   # the unclassed, merged result list is not safe to treat as report-shaped.
-  c(unclass(out), list(test = "descriptives", report_obj = out))
+  res <- c(unclass(out), list(test = "descriptives", report_obj = out))
+  if (!is.null(cat_tbl)) {
+    res$categorical <- cat_tbl
+    res$note <- note
+    res$apa <- paste(res$apa, note)
+  }
+  res
 }
+
+# "single" for a single_choice item, "option" for a multiple_choice item's
+# expansion column (item__option), "other" for anything else.
+sframe_choice_column_kind <- function(instrument, column) {
+  if (!inherits(instrument, "sframe")) return("other")
+  items <- instrument$items %||% list()
+  ids <- vapply(items, function(i) as.character(i$id %||% "")[1], character(1))
+  hit <- match(column, ids)
+  if (!is.na(hit)) {
+    type <- items[[hit]]$type %||% ""
+    if (identical(type, "single_choice")) return("single")
+    if (identical(type, "multiple_choice")) return("single")
+    return("other")
+  }
+  if (grepl("__", column, fixed = TRUE)) {
+    base <- sub("__.*$", "", column)
+    hit <- match(base, ids)
+    if (!is.na(hit) && identical(items[[hit]]$type, "multiple_choice")) {
+      return("option")
+    }
+  }
+  "other"
+}
+
+# One table of counts for the choice columns a descriptives block names:
+# Variable, Value (the choice label), Code, Frequency and Percent of the
+# answered rows.
+sframe_choice_counts_table <- function(data, columns, kinds, instrument) {
+  if (length(columns) == 0) return(NULL)
+  lookup <- sframe_label_lookup(instrument)
+  label_of <- function(id) {
+    lab <- lookup[id]
+    if (is.na(lab)) id else unname(lab)
+  }
+  rows <- lapply(seq_along(columns), function(k) {
+    col <- columns[[k]]
+    if (identical(kinds[[k]], "option")) {
+      base <- sub("__.*$", "", col)
+      option <- substring(col, nchar(base) + 3L)
+      labels <- sframe_item_value_labels(instrument, base)
+      x <- sframe_num(data[[col]])
+      valid <- sum(!is.na(x))
+      picked <- sum(x == 1, na.rm = TRUE)
+      return(data.frame(
+        Variable = label_of(base),
+        Value = if (option %in% names(labels)) unname(labels[option]) else option,
+        Code = col,
+        Frequency = as.integer(picked),
+        Percent = if (valid > 0) round(picked / valid * 100, 1) else NA_real_,
+        stringsAsFactors = FALSE))
+    }
+    one <- sframe_frequency_one(data, col, NULL, instrument)$table
+    one <- one[!is.na(one$Code), , drop = FALSE]
+    valid <- sum(one$Frequency)
+    one$Percent <- if (valid > 0) round(one$Frequency / valid * 100, 1) else NA_real_
+    cbind(data.frame(Variable = rep(label_of(col), nrow(one)), stringsAsFactors = FALSE), one)
+  })
+  out <- do.call(rbind, rows)
+  rownames(out) <- NULL
+  out
+}
+
 
 sframe_run_missing_result <- function(data, instrument, roles) {
   vars <- sframe_role_values(roles, c("variables", "items"))

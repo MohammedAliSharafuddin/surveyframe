@@ -3531,7 +3531,7 @@ function saveCheck(){
 // Analyse registry and role-based plan editor
 var CSHORT={field_2018:'Field (2018)',cohen_1988:'Cohen (1988)',mann_1947:'Mann & Whitney (1947)',kruskal_1952:'Kruskal & Wallis (1952)',spearman_1904:'Spearman (1904)',kendall_1938:'Kendall (1938)',cronbach_1951:'Cronbach (1951)',hosmer_2013:'Hosmer et al. (2013)',mackinnon_2008:'MacKinnon (2008)',aiken_1991:'Aiken & West (1991)',firth_1993:'Firth (1993)',heinze_2002:'Heinze & Schemper (2002)',blondel_2008:'Blondel et al. (2008)',fruchterman_1991:'Fruchterman & Reingold (1991)'};
 var ANALYSIS_REGISTRY={
-frequency:{family:'descriptive',label:'Frequency table',roles:[{id:'variable',label:'Variable',min:1,max:1,levels:['nominal','ordinal','likert']}],showAlpha:false,showHypotheses:false,showEffectSize:false,assumptions:[],output:'Counts, percentages, valid percentages, missing values.',refs:[]},
+frequency:{family:'descriptive',label:'Frequency table',roles:[{id:'variable',label:'Variables',min:1,max:99,levels:['nominal','ordinal','likert']}],showAlpha:false,showHypotheses:false,showEffectSize:false,assumptions:[],output:'Counts, percentages, valid percentages, missing values.',refs:[]},
 descriptives:{family:'descriptive',label:'Descriptives',roles:[{id:'variables',label:'Variables',min:1,max:99,levels:['continuous','scale','ordinal','likert']},{id:'split_by',label:'Split by (optional)',min:0,max:1,levels:['nominal','ordinal']}],showAlpha:false,showHypotheses:false,showEffectSize:false,assumptions:[],output:'N, valid N, missing N, mean, SD, median, IQR, range, skewness, kurtosis, SE, CI.',refs:[]},
 missing_data:{family:'data_quality',label:'Missing values',roles:[{id:'variables',label:'Variables',min:0,max:99,levels:['any']}],showAlpha:false,showHypotheses:false,showEffectSize:false,assumptions:[],output:'Item missingness, respondent missingness, patterns, deletion summary.',refs:[]},
 quality:{family:'data_quality',label:'Quality report',roles:[{id:'variables',label:'Variables',min:0,max:99,levels:['any']}],showAlpha:false,showHypotheses:false,showEffectSize:false,assumptions:[],output:'Attention checks, response quality flags, and quality summary.',refs:[]},
@@ -3729,9 +3729,14 @@ function popRQVars(roleValues){
   document.getElementById('rqVarCBs').innerHTML=vars.length?'<span style="font-size:11px;color:var(--t3)">Assign variables below by methodological role. Variable checkboxes are no longer used for v0.3 plans.</span>':'<span style="font-size:11px;color:var(--t3)">Define items and scales first.</span>';
   renderRoleFields(roleValues||{});
 }
+// R reads some roles under 2 names (sframe_role_values(roles, c("dependent", "outcome"))),
+// so a plan written in R may use either. Read the alias when the builder's own
+// role id is absent, and save under the builder's id.
+var ROLE_ALIASES={dependent:['outcome'],outcome:['dependent'],variable:['variables'],variables:['variable','items'],items:['variables'],weights:['weight'],before:['x'],after:['y'],factor1:['factor_a'],factor2:['factor_b'],covariates:['covariate'],measures:['variables']};
+function roleValueFor(roleValues,id){if(roleValues[id]!=null&&roleValues[id]!=='')return roleValues[id];var al=ROLE_ALIASES[id]||[];for(var k=0;k<al.length;k++){var v=roleValues[al[k]];if(v!=null&&v!==''&&!(Array.isArray(v)&&!v.length))return v;}return [];}
 function renderRoleFields(roleValues){
   var method=document.getElementById('rq-test').value,reg=ANALYSIS_REGISTRY[method]||ANALYSIS_REGISTRY.mann_whitney;
-  document.getElementById('rqRoleFields').innerHTML=(reg.roles||[]).map(function(role){var selected=roleValues[role.id]||[];if(!Array.isArray(selected))selected=selected?[selected]:[];var multi=role.max>1;return'<div class="role-card"><label class="fl" for="role_'+esc(role.id)+'">'+esc(role.label)+(role.min>0?' <span class="fr">*</span>':'')+'</label><select id="role_'+esc(role.id)+'" data-role-id="'+esc(role.id)+'" '+(multi?'multiple size="4"':'')+' onchange="validatePlanRoles();suggestTest()">'+roleOptions(role,selected)+'</select></div>';}).join('');
+  document.getElementById('rqRoleFields').innerHTML=(reg.roles||[]).map(function(role){var selected=roleValueFor(roleValues,role.id);if(!Array.isArray(selected))selected=selected?[selected]:[];var multi=role.max>1;return'<div class="role-card"><label class="fl" for="role_'+esc(role.id)+'">'+esc(role.label)+(role.min>0?' <span class="fr">*</span>':'')+'</label><select id="role_'+esc(role.id)+'" data-role-id="'+esc(role.id)+'" '+(multi?'multiple size="4"':'')+' onchange="validatePlanRoles();suggestTest()">'+roleOptions(role,selected)+'</select></div>';}).join('');
   validatePlanRoles();
 }
 function collectRoles(){var roles={};document.querySelectorAll('[data-role-id]').forEach(function(sel){var id=sel.getAttribute('data-role-id');var vals=Array.from(sel.selectedOptions||[]).map(function(o){return o.value;}).filter(Boolean);roles[id]=sel.multiple?vals:(vals[0]||'');});return roles;}
@@ -4096,9 +4101,9 @@ function exportModelSyntax(){
 
 // -- Init -------------------------------------------------------------------
 chkAutoSave();
-renderItemList();
-renderAnalyse();
-updSave();
+// ra() renders the item list, the Analyse view and the save state, and sets
+// the sidebar title, so a title injected with the state shows on first load.
+ra();
 updHistBtns();
 setInterval(function(){if(lastSaved)updSave();},30000);
 </script>
