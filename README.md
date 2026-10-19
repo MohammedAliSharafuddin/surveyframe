@@ -47,19 +47,17 @@ automated checks do not open a browser.
 
 ## Installation
 
-> **Collecting data right now? Install 0.4.2 from GitHub.**
-> An external review of 0.4.1, the version on CRAN, found defects that
-> silently alter or lose a participant's answer, and defects that give a
-> wrong statistic. 0.4.2 corrects them and goes to CRAN on 26 September
-> 2026. Until it is accepted there, this is the version to collect with:
+> **0.4.3 is on GitHub, ahead of CRAN.** CRAN carries 0.4.2. The GitHub
+> release, 0.4.3, adds fixes found while teaching with it: a frequency table
+> for 2 or more variables, choice labels in frequency tables, counts and
+> percentages for choice items, and fixes to SurveyBuilder and SurveyStudio.
+> Install it with:
 >
 > ```r
 > remotes::install_github("MohammedAliSharafuddin/surveyframe")
 > ```
 >
-> `NEWS.md` lists every fix, and separately lists what changes for you:
-> some scores and statistics move, and a Shiny-collected response gains a
-> `respondent_id` column.
+> `NEWS.md` lists every fix.
 
 Install from CRAN:
 
@@ -369,6 +367,10 @@ minimum. Some numbers therefore move between 0.4.1 and 0.4.2, and
 folded "Show R code" block, and `analysis_syntax()` returns the
 statistical call behind a result with its variables and options resolved,
 so a reader can copy the code and reproduce the number.
+
+0.4.3, a GitHub release, fixes what a teaching session found in 0.4.2:
+frequency and descriptives blocks now handle choice items as categories,
+and SurveyBuilder reads a plan written in R as R does.
 
 ## When to use surveyframe, and when not to
 

@@ -24,7 +24,7 @@ template:
         "codeRepository": "https://github.com/MohammedAliSharafuddin/surveyframe",
         "programmingLanguage": "R",
         "license": "https://opensource.org/licenses/MIT",
-        "softwareVersion": "0.4.2",
+        "softwareVersion": "0.4.3",
         "downloadUrl": "https://CRAN.R-project.org/package=surveyframe",
         "author": {
           "@type": "Person",
@@ -122,6 +122,7 @@ reference:
       - sframe_demo
       - sframe_demo_branding
       - sframe_demo_qmd
+      - preview_demo
       - sframe_export_labelled
 
   - title: "Design"
