@@ -143,7 +143,7 @@ And running it is one call:
 
 results <- run_analysis_plan(demo$responses, demo$instrument)
 results[[1]]$apa
-#> [1] "Frequency distribution for NA (N = 0)."
+#> [1] "Frequency distribution for attendee_type (N = 50)."
 ```
 
 **Adapt this for your own survey.** Replace the items with your

@@ -8,7 +8,7 @@
   "codeRepository": "https://github.com/MohammedAliSharafuddin/surveyframe",
   "programmingLanguage": "R",
   "license": "https://opensource.org/licenses/MIT",
-  "softwareVersion": "0.4.2",
+  "softwareVersion": "0.4.3",
   "downloadUrl": "https://CRAN.R-project.org/package=surveyframe",
   "author": {
     "@type": "Person",
@@ -26,7 +26,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">surveyframe</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.2.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -51,10 +51,47 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="development version" id="surveyframe-development-version">surveyframe (development version)<a class="anchor" aria-label="anchor" href="#surveyframe-development-version"></a></h2>
+<h2 class="pkg-version" data-toc-text="0.4.3" id="surveyframe-043">surveyframe 0.4.3<a class="anchor" aria-label="anchor" href="#surveyframe-043"></a></h2>
+<p>A GitHub release, ahead of the next CRAN submission. It fixes what a teaching session on 0.4.2 found. Install it with <code>remotes::install_github("MohammedAliSharafuddin/surveyframe")</code>.</p>
+<div class="section level3">
+<h3 id="what-you-need-to-change-0-4-3">What you need to change<a class="anchor" aria-label="anchor" href="#what-you-need-to-change-0-4-3"></a></h3>
+<ul><li>
+<strong>A frequency table now shows choice labels, with the code in its own column.</strong> The table’s columns are <code>Value</code> (the label), <code>Code</code>, <code>Frequency</code> and <code>Percent</code>. Code reading <code>Value</code> for the stored code should read <code>Code</code>. Rows follow the choice set’s declared order, and a declared choice nobody picked appears with a count of 0.</li>
+<li>
+<strong>A descriptives block counts choice items.</strong> See below. Numbers for a <code>single_choice</code> or <code>multiple_choice</code> column move from the mean and SD table to a table of counts and percentages.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="analysis-0-4-3">Analysis<a class="anchor" aria-label="anchor" href="#analysis-0-4-3"></a></h3>
+<ul><li>A <code>frequency</code> block gives one frequency table per variable. It reads the <code>variable</code> role, or <code>variables</code>, and either may name more than one item. With more than one, <code>$tables</code> holds each variable’s own result and <code>$table</code> stacks them with a <code>Variable</code> column, and the chart shows one panel per variable. The <code>variables</code> role was ignored before, so a block written that way reported “Frequency distribution for NA (N = 0)”. SurveyBuilder and SurveyStudio both let the role take more than one variable.</li>
+<li>A frequency table labels each code from the item’s own choice set. A code that means different things in 2 choice sets (1 for Male in one, 1 for North in another) used to print as the bare code.</li>
+<li>A <code>descriptives</code> block counts <code>single_choice</code> items and the option columns of a <code>multiple_choice</code> item, giving each category’s count and percentage, and keeps the mean and SD for numeric items. A nominal code has no meaningful mean, and a mean gender of 1.59 was being reported. The result carries the counts in <code>$categorical</code>, the APA line names the items counted, and <code><a href="../reference/sframe_result_supplement.html">sframe_result_supplement()</a></code> returns the counts so both report engines show them beside the numeric table. <code><a href="../reference/render_results.html">render_results()</a></code> now shows that second table for every result that has one.</li>
+<li>The printed quality report has a Duplicates section, so a reader can see why a respondent counted as flagged. It also says when the check needs a respondent id to run.</li>
+<li>A scale shorter than <code>straightline_min_items</code> is still left unchecked for straight-lining by default, since identical answers to 3 items are common among attentive respondents. The printed report now names the threshold and the setting that would check the scale, and the analysis-plan quality table names the threshold too. The argument’s help says how to check 3-item scales, in a call or in a plan.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="surveybuilder-0-4-3">SurveyBuilder<a class="anchor" aria-label="anchor" href="#surveybuilder-0-4-3"></a></h3>
+<ul><li>A plan block saved with the <code>outcome</code> role, which R accepts beside <code>dependent</code>, opens with that variable selected. Regression blocks opened with the first listed variable in its place. The builder reads every role alias R reads, and saves under its own role names.</li>
+<li>The sidebar shows the instrument’s title on first load. A title set by <code><a href="../reference/launch_builder_demo.html">launch_builder_demo()</a></code> read “Untitled Survey” until the first edit.</li>
+<li>The Outcome and other role dropdowns stay inside the Add or Edit Analysis Plan dialog when an item label is long. The role grid columns can now shrink, and each select fills its column.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="surveystudio-0-4-3">SurveyStudio<a class="anchor" aria-label="anchor" href="#surveystudio-0-4-3"></a></h3>
+<ul><li>The Quality Dashboard says when the duplicate check needs an id column, where it printed “NA duplicate response row(s) detected”. It now uses a <code>respondent_id</code> column for the check by default.</li>
+<li>The Saved analysis plans table keeps short ids such as “RQ1” on one line and scrolls sideways on a narrow screen.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="demos-0-4-3">Demos<a class="anchor" aria-label="anchor" href="#demos-0-4-3"></a></h3>
+<ul><li>
+<code><a href="../reference/preview_demo.html">preview_demo()</a></code> opens a branded demo as a respondent sees it in one line, in the browser or on SurveyStudio’s preview screen. The start-up note now shows it.</li>
+<li>The reference results shipped with 6 demos are regenerated for the changes above: <code>first_survey</code>, <code>instrument_revision</code>, <code>verification</code>, <code>branching</code>, <code>conversational_branching</code> and <code>multi_response</code>.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="known-limitation-0-4-3">Known limitation<a class="anchor" aria-label="anchor" href="#known-limitation-0-4-3"></a></h3>
+<ul><li>SurveyBuilder tags every <code>single_choice</code> item as nominal, ordinal ones included. Marking a choice set as ordered needs a new field in the format, which a later release can add.</li>
+</ul></div>
 </div>
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.4.2" id="surveyframe-042">surveyframe 0.4.2<a class="anchor" aria-label="anchor" href="#surveyframe-042"></a></h2>
+<h2 class="pkg-version" data-toc-text="0.4.2" id="surveyframe-042">surveyframe 0.4.2<a class="anchor" aria-label="anchor" href="#surveyframe-042"></a></h2><p class="text-muted">CRAN release: 2026-09-25</p>
 <p>A defect-fix release. An external review of 0.4.1 found defects that silently alter or lose data, and this release corrects them. Collection defects come first, because an answer recorded wrongly is lost for good. This section grows as each group of fixes lands.</p>
 <div class="section level3">
 <h3 id="what-you-need-to-change-0-4-2">What you need to change<a class="anchor" aria-label="anchor" href="#what-you-need-to-change-0-4-2"></a></h3>

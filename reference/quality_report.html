@@ -16,7 +16,7 @@ respondent IDs where supplied."><meta property="og:image" content="https://moham
   "codeRepository": "https://github.com/MohammedAliSharafuddin/surveyframe",
   "programmingLanguage": "R",
   "license": "https://opensource.org/licenses/MIT",
-  "softwareVersion": "0.4.2",
+  "softwareVersion": "0.4.3",
   "downloadUrl": "https://CRAN.R-project.org/package=surveyframe",
   "author": {
     "@type": "Person",
@@ -34,7 +34,7 @@ respondent IDs where supplied."><meta property="og:image" content="https://moham
 
     <a class="navbar-brand me-2" href="../index.html">surveyframe</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.2.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -131,7 +131,13 @@ this is not evidence of inattention on its own, and checking scales
 that short flags a large share of honest respondents (see the worked
 example in <code><a href="../articles/surveyframe.html">vignette("surveyframe")</a></code>, where 3 two-item scales alone
 drove a 91 percent flag rate before this threshold existed). Set to
-<code>2</code> to restore the previous, more permissive behaviour.</p></dd>
+<code>2</code> to restore the previous, more permissive behaviour.
+Many published scales have 3 items, and the default leaves them
+unchecked. Set <code>3</code> to check them, and read a flag on a 3-item scale as a
+prompt to look at the respondent, since identical answers to 3 items are
+common among attentive respondents. The printed report names each scale
+it skipped and the setting that would check it. In an analysis plan, pass
+it on the quality block as <code>options = list(straightline_min_items = 3)</code>.</p></dd>
 
 
 <dt id="arg-missing-threshold">missing_threshold<a class="anchor" aria-label="anchor" href="#arg-missing-threshold"></a></dt>
@@ -191,6 +197,9 @@ defaults: <code>started_at</code>, <code>start_time</code>, <code>started</code>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Median completion time: 966.0 seconds</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Missingness:  0.0% of respondents exceed 20% threshold</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Duplicates:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   0 duplicate response rows, 0 rows flagged</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

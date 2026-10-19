@@ -15,6 +15,8 @@ surveyframe produced. Load one, change it, and keep going. See the
   : The standard demo branding
 - [`sframe_demo_qmd()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_demo_qmd.md)
   : Copy a demo's Quarto notebook so you can run and change it
+- [`preview_demo()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/preview_demo.md)
+  : Preview a demo survey in one line
 - [`sframe_export_labelled()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_export_labelled.md)
   : Write responses to SPSS or Stata with the labels attached
 

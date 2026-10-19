@@ -1,8 +1,96 @@
 # Changelog
 
-## surveyframe (development version)
+## surveyframe 0.4.3
+
+A GitHub release, ahead of the next CRAN submission. It fixes what a
+teaching session on 0.4.2 found. Install it with
+`remotes::install_github("MohammedAliSharafuddin/surveyframe")`.
+
+### What you need to change
+
+- **A frequency table now shows choice labels, with the code in its own
+  column.** The table’s columns are `Value` (the label), `Code`,
+  `Frequency` and `Percent`. Code reading `Value` for the stored code
+  should read `Code`. Rows follow the choice set’s declared order, and a
+  declared choice nobody picked appears with a count of 0.
+- **A descriptives block counts choice items.** See below. Numbers for a
+  `single_choice` or `multiple_choice` column move from the mean and SD
+  table to a table of counts and percentages.
+
+### Analysis
+
+- A `frequency` block gives one frequency table per variable. It reads
+  the `variable` role, or `variables`, and either may name more than one
+  item. With more than one, `$tables` holds each variable’s own result
+  and `$table` stacks them with a `Variable` column, and the chart shows
+  one panel per variable. The `variables` role was ignored before, so a
+  block written that way reported “Frequency distribution for NA (N =
+  0)”. SurveyBuilder and SurveyStudio both let the role take more than
+  one variable.
+- A frequency table labels each code from the item’s own choice set. A
+  code that means different things in 2 choice sets (1 for Male in one,
+  1 for North in another) used to print as the bare code.
+- A `descriptives` block counts `single_choice` items and the option
+  columns of a `multiple_choice` item, giving each category’s count and
+  percentage, and keeps the mean and SD for numeric items. A nominal
+  code has no meaningful mean, and a mean gender of 1.59 was being
+  reported. The result carries the counts in `$categorical`, the APA
+  line names the items counted, and
+  [`sframe_result_supplement()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_result_supplement.md)
+  returns the counts so both report engines show them beside the numeric
+  table.
+  [`render_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_results.md)
+  now shows that second table for every result that has one.
+- The printed quality report has a Duplicates section, so a reader can
+  see why a respondent counted as flagged. It also says when the check
+  needs a respondent id to run.
+- A scale shorter than `straightline_min_items` is still left unchecked
+  for straight-lining by default, since identical answers to 3 items are
+  common among attentive respondents. The printed report now names the
+  threshold and the setting that would check the scale, and the
+  analysis-plan quality table names the threshold too. The argument’s
+  help says how to check 3-item scales, in a call or in a plan.
+
+### SurveyBuilder
+
+- A plan block saved with the `outcome` role, which R accepts beside
+  `dependent`, opens with that variable selected. Regression blocks
+  opened with the first listed variable in its place. The builder reads
+  every role alias R reads, and saves under its own role names.
+- The sidebar shows the instrument’s title on first load. A title set by
+  [`launch_builder_demo()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/launch_builder_demo.md)
+  read “Untitled Survey” until the first edit.
+- The Outcome and other role dropdowns stay inside the Add or Edit
+  Analysis Plan dialog when an item label is long. The role grid columns
+  can now shrink, and each select fills its column.
+
+### SurveyStudio
+
+- The Quality Dashboard says when the duplicate check needs an id
+  column, where it printed “NA duplicate response row(s) detected”. It
+  now uses a `respondent_id` column for the check by default.
+- The Saved analysis plans table keeps short ids such as “RQ1” on one
+  line and scrolls sideways on a narrow screen.
+
+### Demos
+
+- [`preview_demo()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/preview_demo.md)
+  opens a branded demo as a respondent sees it in one line, in the
+  browser or on SurveyStudio’s preview screen. The start-up note now
+  shows it.
+- The reference results shipped with 6 demos are regenerated for the
+  changes above: `first_survey`, `instrument_revision`, `verification`,
+  `branching`, `conversational_branching` and `multi_response`.
+
+### Known limitation
+
+- SurveyBuilder tags every `single_choice` item as nominal, ordinal ones
+  included. Marking a choice set as ordered needs a new field in the
+  format, which a later release can add.
 
 ## surveyframe 0.4.2
+
+CRAN release: 2026-09-25
 
 A defect-fix release. An external review of 0.4.1 found defects that
 silently alter or lose data, and this release corrects them. Collection

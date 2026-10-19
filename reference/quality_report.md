@@ -72,7 +72,13 @@ quality_report(
   [`vignette("surveyframe")`](https://mohammedalisharafuddin.github.io/surveyframe/articles/surveyframe.md),
   where 3 two-item scales alone drove a 91 percent flag rate before this
   threshold existed). Set to `2` to restore the previous, more
-  permissive behaviour.
+  permissive behaviour. Many published scales have 3 items, and the
+  default leaves them unchecked. Set `3` to check them, and read a flag
+  on a 3-item scale as a prompt to look at the respondent, since
+  identical answers to 3 items are common among attentive respondents.
+  The printed report names each scale it skipped and the setting that
+  would check it. In an analysis plan, pass it on the quality block as
+  `options = list(straightline_min_items = 3)`.
 
 - missing_threshold:
 
@@ -135,4 +141,7 @@ print(qr)
 #>   Median completion time: 966.0 seconds
 #> 
 #> Missingness:  0.0% of respondents exceed 20% threshold
+#> 
+#> Duplicates:
+#>   0 duplicate response rows, 0 rows flagged
 ```

@@ -33,7 +33,7 @@
   "codeRepository": "https://github.com/MohammedAliSharafuddin/surveyframe",
   "programmingLanguage": "R",
   "license": "https://opensource.org/licenses/MIT",
-  "softwareVersion": "0.4.2",
+  "softwareVersion": "0.4.3",
   "downloadUrl": "https://CRAN.R-project.org/package=surveyframe",
   "author": {
     "@type": "Person",
@@ -53,7 +53,7 @@
 
     <a class="navbar-brand me-2" href="index.html">surveyframe</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.2.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -103,10 +103,10 @@
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
 <blockquote>
-<p><strong>Collecting data right now? Install 0.4.2 from GitHub.</strong> An external review of 0.4.1, the version on CRAN, found defects that silently alter or lose a participant’s answer, and defects that give a wrong statistic. 0.4.2 corrects them and goes to CRAN on 26 September 2026. Until it is accepted there, this is the version to collect with:</p>
+<p><strong>0.4.3 is on GitHub, ahead of CRAN.</strong> CRAN carries 0.4.2. The GitHub release, 0.4.3, adds fixes found while teaching with it: a frequency table for 2 or more variables, choice labels in frequency tables, counts and percentages for choice items, and fixes to SurveyBuilder and SurveyStudio. Install it with:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"MohammedAliSharafuddin/surveyframe"</span><span class="op">)</span></span></code></pre></div>
-<p><code>NEWS.md</code> lists every fix, and separately lists what changes for you: some scores and statistics move, and a Shiny-collected response gains a <code>respondent_id</code> column.</p>
+<p><code>NEWS.md</code> lists every fix.</p>
 </blockquote>
 <p>Install from CRAN:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
@@ -347,6 +347,7 @@
 <p>A disclosed-amendment and Git-linked provenance mechanism shipped alongside, on top of the existing <code>.sframe</code> integrity hash. Full detail in <code>NEWS.md</code>.</p>
 <p>0.4.1 focuses on stability: fixes found by using surveyframe on real instruments, no new capability theme.</p>
 <p>0.4.2 is a defect-fix release, correcting what an external review of 0.4.1 found across 8 batches: 171 findings, 154 fixed here and 17 deferred with a stated reason. The ones that matter most to a live study are in collection, where a participant’s answer could be altered or lost with no signal, and in scoring, where the report path recomputed scale scores by a second method that ignored reverse coding and the declared minimum. Some numbers therefore move between 0.4.1 and 0.4.2, and <code>NEWS.md</code> says which, under “What you need to change”. Reports also gained a folded “Show R code” block, and <code><a href="reference/analysis_syntax.html">analysis_syntax()</a></code> returns the statistical call behind a result with its variables and options resolved, so a reader can copy the code and reproduce the number.</p>
+<p>0.4.3, a GitHub release, fixes what a teaching session found in 0.4.2: frequency and descriptives blocks now handle choice items as categories, and SurveyBuilder reads a plan written in R as R does.</p>
 </div>
 <div class="section level2">
 <h2 id="when-to-use-surveyframe-and-when-not-to">When to use surveyframe, and when not to<a class="anchor" aria-label="anchor" href="#when-to-use-surveyframe-and-when-not-to"></a>

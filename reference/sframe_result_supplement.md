@@ -1,8 +1,9 @@
 # The second table a result carries, if it has one
 
 Some results hold a table beside their main one that a reader needs: a
-quanteda result's leading features, or a moderation's conditional slopes
-at the moderator's own values. Both report engines render whatever this
+quanteda result's leading features, a moderation's conditional slopes at
+the moderator's own values, or the counts a descriptives block gives for
+the choice items it names. Both report engines render whatever this
 returns, under its own caption, so the 2 cannot drift on what a result
 shows.
 
