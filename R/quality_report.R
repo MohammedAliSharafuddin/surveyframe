@@ -189,6 +189,12 @@ sframe_timing_report <- function(
 #'   example in `vignette("surveyframe")`, where 3 two-item scales alone
 #'   drove a 91 percent flag rate before this threshold existed). Set to
 #'   `2` to restore the previous, more permissive behaviour.
+#'   Many published scales have 3 items, and the default leaves them
+#'   unchecked. Set `3` to check them, and read a flag on a 3-item scale as a
+#'   prompt to look at the respondent, since identical answers to 3 items are
+#'   common among attentive respondents. The printed report names each scale
+#'   it skipped and the setting that would check it. In an analysis plan, pass
+#'   it on the quality block as `options = list(straightline_min_items = 3)`.
 #' @param missing_threshold Numeric. The proportion of missing item responses
 #'   above which a respondent is flagged. Defaults to `0.2`.
 #'
@@ -336,6 +342,7 @@ quality_report <- function(
           scale_id      = scale$id,
           n_items       = length(scale_cols),
           checked       = FALSE,
+          min_items     = as.integer(straightline_min_items),
           flagged_rows  = integer(0),
           flag_rate     = NA_real_
         )
@@ -450,13 +457,29 @@ print.sframe_quality_report <- function(x, ...) {
     cat("\nStraight-lining:\n")
     for (sl in x$straightline) {
       if (isFALSE(sl$checked)) {
-        cat(sprintf("  %-20s not checked, %d item%s, below straightline_min_items\n",
-                    sl$scale_id, sl$n_items, if (sl$n_items == 1L) "" else "s"))
+        min_items <- sl$min_items %||% 4L
+        cat(sprintf("  %-20s not checked, %d item%s, below straightline_min_items (%d)\n",
+                    sl$scale_id, sl$n_items, if (sl$n_items == 1L) "" else "s",
+                    min_items))
+        cat(sprintf("  %-20s to check it, set straightline_min_items = %d\n",
+                    "", sl$n_items))
       } else {
         cat(sprintf("  %-20s flagged %d (%.1f%%)\n",
                     sl$scale_id, length(sl$flagged_rows), sl$flag_rate * 100))
       }
     }
+  }
+  # Duplicates count towards Flagged, so the report says how many there were
+  dup <- x$duplicates %||% list()
+  cat("\nDuplicates:\n")
+  if (isTRUE(dup$checked)) {
+    n_dup <- dup$n_duplicates %||% 0L
+    n_rows <- length(dup$flagged_rows)
+    cat(sprintf("  %d duplicate response row%s, %d row%s flagged\n",
+                n_dup, if (n_dup == 1L) "" else "s",
+                n_rows, if (n_rows == 1L) "" else "s"))
+  } else {
+    cat("  not checked, pass respondent_id to check them\n")
   }
   invisible(x)
 }

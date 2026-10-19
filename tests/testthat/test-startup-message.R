@@ -44,12 +44,8 @@ test_that("the vignette the message points at exists", {
 test_that("the demo commands run as printed", {
   code <- startup_demo_lines()
   expect_length(code, 3)
-  out <- tempfile(fileext = ".html")
-  # Keep the browser closed and write to a temp file, nothing else changed.
-  code[2] <- sub("preview = TRUE)",
-                 sprintf("preview = TRUE, open = FALSE, output_path = %s)",
-                         deparse(out)),
-                 code[2], fixed = TRUE)
+  # Keep the browser closed, nothing else changed.
+  code[1:2] <- sub(")$", ", open = FALSE)", code[1:2])
   studio_args <- NULL
   local_mocked_bindings(
     launch_studio = function(...) {
@@ -58,13 +54,22 @@ test_that("the demo commands run as printed", {
     }
   )
   env <- new.env(parent = asNamespace("surveyframe"))
-  for (line in code) {
-    expect_no_error(suppressMessages(eval(parse(text = line), envir = env)))
-  }
-  expect_s3_class(get("demo", envir = env)$instrument, "sframe")
-  expect_true(file.exists(out))
+  path <- NULL
+  expect_no_error(path <- suppressMessages(eval(parse(text = code[1]), envir = env)))
+  expect_true(file.exists(path))
+  # The preview strips the collector
+  expect_false(any(grepl("script.google.com", readLines(path, warn = FALSE),
+                         fixed = TRUE)))
+  expect_no_error(suppressMessages(eval(parse(text = code[2]), envir = env)))
   expect_s3_class(studio_args[[1]], "sframe")
   expect_identical(studio_args$screen, "preview")
+  expect_false(studio_args$launch.browser)
+  expect_no_error(suppressMessages(eval(parse(text = code[3]), envir = env)))
+  expect_s3_class(get("demo", envir = env)$instrument, "sframe")
+})
+
+test_that("preview_demo() rejects an unknown destination", {
+  expect_error(preview_demo("two_group", where = "phone", open = FALSE))
 })
 
 test_that("attaching is silent outside an interactive session", {

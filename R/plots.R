@@ -265,14 +265,18 @@ sframe_plot_frequency <- function(result, palette = c("web", "print")) {
   tbl <- tbl[!is.na(tbl$Value) & tbl$Value != "NA", , drop = FALSE]
   if (nrow(tbl) == 0) return(NULL)
   brand <- sframe_brand(palette)
-  tbl$Value <- factor(tbl$Value, levels = tbl$Value)
+  tbl$Value <- factor(tbl$Value, levels = unique(tbl$Value))
   ggplot2::ggplot(tbl, ggplot2::aes(x = .data$Value, y = .data$Frequency)) +
     ggplot2::geom_col(fill = brand$fill, colour = brand$ink, linewidth = 0.3, width = 0.72) +
     ggplot2::labs(
-      title = paste("Distribution of", result$variable %||% ""),
+      title = paste("Distribution of", paste(result$variable %||% "", collapse = ", ")),
       x = NULL, y = "Frequency"
     ) +
-    theme_surveyframe(palette = palette) + sframe_theme_angled_x()
+    theme_surveyframe(palette = palette) + sframe_theme_angled_x() +
+    # A block over 2 or more variables shows one panel per variable
+    if ("Variable" %in% names(tbl)) {
+      ggplot2::facet_wrap(ggplot2::vars(.data$Variable), scales = "free_x")
+    } else NULL
 }
 
 # Word-cloud layout via the actual algorithm the wordcloud/ggwordcloud
@@ -1183,7 +1187,11 @@ sframe_plot_for_result <- function(result, data, palette = c("web", "print")) {
     efa_readiness       = ,
     efa_solution        = ,
     descriptives        = function() {
-      if (is.null(result$report_obj)) return(NULL)
+      if (is.null(result$report_obj)) {
+        # Choice items alone are counted, so they plot as a frequency chart
+        if (is.data.frame(result$categorical)) return(sframe_plot_frequency(result, palette))
+        return(NULL)
+      }
       graphics::plot(result$report_obj, data = data, palette = palette)
     },
     item_diagnostics    = function() sframe_plot_item_diagnostics(result, palette),

@@ -47,7 +47,13 @@ this is not evidence of inattention on its own, and checking scales
 that short flags a large share of honest respondents (see the worked
 example in \code{vignette("surveyframe")}, where 3 two-item scales alone
 drove a 91 percent flag rate before this threshold existed). Set to
-\code{2} to restore the previous, more permissive behaviour.}
+\code{2} to restore the previous, more permissive behaviour.
+Many published scales have 3 items, and the default leaves them
+unchecked. Set \code{3} to check them, and read a flag on a 3-item scale as a
+prompt to look at the respondent, since identical answers to 3 items are
+common among attentive respondents. The printed report names each scale
+it skipped and the setting that would check it. In an analysis plan, pass
+it on the quality block as \code{options = list(straightline_min_items = 3)}.}
 
 \item{missing_threshold}{Numeric. The proportion of missing item responses
 above which a respondent is flagged. Defaults to \code{0.2}.}

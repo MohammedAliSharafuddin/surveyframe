@@ -150,7 +150,7 @@ test_that("25: rendered p values keep their precision", {
                                    variables = "g", test = "frequency",
                                    alpha = 0.05, citations = character(0),
                                    interpretation = "", result = NULL))
-  testthat::local_mocked_bindings(sframe_run_frequency = function(data, vars, weights = NULL) {
+  testthat::local_mocked_bindings(sframe_run_frequency = function(data, vars, weights = NULL, instrument = NULL) {
     list(test = "frequency", apa = "x",
          table = data.frame(effect = c("A", "B", "C"), F = c(9.1, 3.2, 20),
                             p = c(0.004, 0.0437, 0.00001)))
@@ -174,7 +174,7 @@ test_that("render_results() puts each value in its own table cell", {
                                    variables = "g", test = "frequency",
                                    alpha = 0.05, citations = character(0),
                                    interpretation = "", result = NULL))
-  testthat::local_mocked_bindings(sframe_run_frequency = function(data, vars, weights = NULL) {
+  testthat::local_mocked_bindings(sframe_run_frequency = function(data, vars, weights = NULL, instrument = NULL) {
     list(test = "frequency", apa = "x",
          table = data.frame(level = c("a", "b"), n = c(9, 12)))
   })
