@@ -42,7 +42,7 @@ The path written, invisibly.
 
 ``` r
 out <- sframe_demo_qmd("two_group", dir = tempdir())
-#> Notebook written to: /tmp/RtmpnmtpbP/two_group.qmd
+#> Notebook written to: /tmp/RtmpMSn8NS/two_group.qmd
 basename(out)
 #> [1] "two_group.qmd"
 ```

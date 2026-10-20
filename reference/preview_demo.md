@@ -52,7 +52,7 @@ returns.
 
 ``` r
 path <- preview_demo("two_group", open = FALSE)
-#> Static survey written to '/tmp/RtmpnmtpbP/surveyframe-preview-two_group.html' (69.3 KB).
+#> Static survey written to '/tmp/RtmpMSn8NS/surveyframe-preview-two_group.html' (69.3 KB).
 file.exists(path)
 #> [1] TRUE
 ```

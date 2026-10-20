@@ -51,6 +51,16 @@ teaching session on 0.4.2 found. Install it with
   analysis-plan quality table names the threshold too. The argument’s
   help says how to check 3-item scales, in a call or in a plan.
 
+### Charts
+
+- A chart from the analysis plan names each variable by its label in the
+  instrument, as the tables beside it do. A regression on the scale
+  `sat` was titled “Observed against fitted values for Sat” while its
+  table read “Satisfaction”. This covers the correlation, regression,
+  group comparison, partial correlation and moderation charts, in
+  [`render_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_report.md)
+  and in SurveyStudio.
+
 ### SurveyBuilder
 
 - A plan block saved with the `outcome` role, which R accepts beside
@@ -71,6 +81,9 @@ teaching session on 0.4.2 found. Install it with
   now uses a `respondent_id` column for the check by default.
 - The Saved analysis plans table keeps short ids such as “RQ1” on one
   line and scrolls sideways on a narrow screen.
+- A result card is headed “RQ 4” when its block id only repeats the
+  number. It read “RQ 4: RQ4”. A block id that says something more, such
+  as “H2a”, still shows beside the number.
 
 ### Demos
 

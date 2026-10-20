@@ -521,15 +521,15 @@ study_amended <- amend_sframe(
 
 amendment_log(study_amended)
 #>              timestamp         reason_code
-#> 1 2026-10-19T12:56:48Z instrument_revision
+#> 1 2026-10-20T07:42:54Z instrument_revision
 #>                                    reason_text   tier author
 #> 1 Clarified item wording after pilot feedback. design   <NA>
 #>                                     deviation_report signoff
 #> 1 Wording only; the construct measured is unchanged.    none
 #>                                                      previous_hash
-#> 1 c0a89d86b81850ea5adc4b310af7b471b3070a265150eb45b6a9451b5f3f4c2c
+#> 1 040a6d50eadd236842513f7a663e5b1f9db0571dd4a6847c828080fc595aa4bb
 #>                                                           new_hash
-#> 1 fbe7182e32f802cf2b71fa6447405db51ab87bedf8bbee5bb3a32ca139dba6d3
+#> 1 d02488b021272c8e852b2872a54133325e9d0a7443242d12e7419b7f1159cdef
 #>   changed_fields
 #> 1          items
 ```
@@ -624,7 +624,7 @@ html_path <- export_static_survey(
   output_path = file.path(tempdir(), "tourism_services_survey.html"),
   open        = FALSE
 )
-#> Static survey written to '/tmp/RtmpZvFSNu/tourism_services_survey.html' (95.8
+#> Static survey written to '/tmp/RtmpazZ5hz/tourism_services_survey.html' (95.8
 #> KB).
 file.exists(html_path)
 #> [1] TRUE
@@ -677,7 +677,7 @@ script_path <- export_google_sheet(
   sheet_url  = "https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID",
   output_dir = tempdir()
 )
-#> Apps Script written to: /tmp/RtmpZvFSNu/surveyframe_collector.gs
+#> Apps Script written to: /tmp/RtmpazZ5hz/surveyframe_collector.gs
 #> Follow the setup instructions inside the file to deploy it.
 file.exists(script_path)
 #> [1] TRUE
@@ -1262,7 +1262,7 @@ results_path <- render_results(
   output_file = file.path(tempdir(), "tourism_results.html")
 )
 cat("Results report written:", results_path, "\n")
-#> Results report written: /tmp/RtmpZvFSNu/tourism_results.html
+#> Results report written: /tmp/RtmpazZ5hz/tourism_results.html
 cat("Size:", round(file.size(results_path) / 1024, 1), "KB\n")
 #> Size: 14 KB
 ```
@@ -1290,7 +1290,7 @@ render_report(
   include_analysis = TRUE,
   include_models   = FALSE
 )
-#> Report rendered with the Quarto engine: /tmp/RtmpZvFSNu/tourism_report.html
+#> Report rendered with the Quarto engine: /tmp/RtmpazZ5hz/tourism_report.html
 ```
 
 ------------------------------------------------------------------------

@@ -69,6 +69,10 @@
 <li>A scale shorter than <code>straightline_min_items</code> is still left unchecked for straight-lining by default, since identical answers to 3 items are common among attentive respondents. The printed report now names the threshold and the setting that would check the scale, and the analysis-plan quality table names the threshold too. The argument’s help says how to check 3-item scales, in a call or in a plan.</li>
 </ul></div>
 <div class="section level3">
+<h3 id="charts-0-4-3">Charts<a class="anchor" aria-label="anchor" href="#charts-0-4-3"></a></h3>
+<ul><li>A chart from the analysis plan names each variable by its label in the instrument, as the tables beside it do. A regression on the scale <code>sat</code> was titled “Observed against fitted values for Sat” while its table read “Satisfaction”. This covers the correlation, regression, group comparison, partial correlation and moderation charts, in <code><a href="../reference/render_report.html">render_report()</a></code> and in SurveyStudio.</li>
+</ul></div>
+<div class="section level3">
 <h3 id="surveybuilder-0-4-3">SurveyBuilder<a class="anchor" aria-label="anchor" href="#surveybuilder-0-4-3"></a></h3>
 <ul><li>A plan block saved with the <code>outcome</code> role, which R accepts beside <code>dependent</code>, opens with that variable selected. Regression blocks opened with the first listed variable in its place. The builder reads every role alias R reads, and saves under its own role names.</li>
 <li>The sidebar shows the instrument’s title on first load. A title set by <code><a href="../reference/launch_builder_demo.html">launch_builder_demo()</a></code> read “Untitled Survey” until the first edit.</li>
@@ -78,6 +82,7 @@
 <h3 id="surveystudio-0-4-3">SurveyStudio<a class="anchor" aria-label="anchor" href="#surveystudio-0-4-3"></a></h3>
 <ul><li>The Quality Dashboard says when the duplicate check needs an id column, where it printed “NA duplicate response row(s) detected”. It now uses a <code>respondent_id</code> column for the check by default.</li>
 <li>The Saved analysis plans table keeps short ids such as “RQ1” on one line and scrolls sideways on a narrow screen.</li>
+<li>A result card is headed “RQ 4” when its block id only repeats the number. It read “RQ 4: RQ4”. A block id that says something more, such as “H2a”, still shows beside the number.</li>
 </ul></div>
 <div class="section level3">
 <h3 id="demos-0-4-3">Demos<a class="anchor" aria-label="anchor" href="#demos-0-4-3"></a></h3>
