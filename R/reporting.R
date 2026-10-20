@@ -1245,8 +1245,25 @@ sframe_clean_interpretations <- function(interpretations) {
 
 # Turn snake_case data-frame names into "Title Case" table headings, e.g.
 # "research_question" -> "Research question", "n_items" -> "N items".
+# Labels for variable ids while run_analysis_plan() draws its charts, so a
+# chart names "Satisfaction" where the instrument says so, and never the bare
+# id "sat". Set only for the duration of a plot call, by
+# .sframe_with_plot_labels().
+.sframe_plot_label_env <- new.env(parent = emptyenv())
+
+.sframe_with_plot_labels <- function(lookup, code) {
+  old <- .sframe_plot_label_env$lookup
+  .sframe_plot_label_env$lookup <- lookup
+  on.exit(.sframe_plot_label_env$lookup <- old, add = TRUE)
+  force(code)
+}
+
 .sframe_title_case_names <- function(names) {
+  lookup <- .sframe_plot_label_env$lookup
   vapply(names, function(nm) {
+    if (length(lookup) && !is.na(nm) && nm %in% names(lookup)) {
+      return(unname(lookup[[nm]]))
+    }
     words <- strsplit(gsub("_", " ", nm), " ")[[1]]
     if (!length(words)) return(nm)
     words[1] <- paste0(toupper(substring(words[1], 1, 1)), substring(words[1], 2))

@@ -1033,6 +1033,17 @@ studio_result_table_tag <- function(tbl) {
 # The chart(s) attached to one analysis-plan result: the main chart, plus a
 # regression's four diagnostic panels stacked beneath it, matching the
 # report's table-plus-plot pairing.
+# A result card's heading. "RQ 4" when the block id only repeats the
+# number ("RQ4", "rq 4"), which printed as "RQ 4: RQ4". Any other id is shown.
+studio_rq_heading <- function(i, block_id) {
+  id <- trimws(if (is.null(block_id)) "" else as.character(block_id))
+  if (!nzchar(id) ||
+      identical(gsub("[^0-9A-Z]", "", toupper(id)), paste0("RQ", i))) {
+    return(sprintf("RQ %d", i))
+  }
+  sprintf("RQ %d: %s", i, id)
+}
+
 studio_result_plot_tags <- function(result) {
   plot_tags <- list(studio_ggplot_img(result$plot))
   if (is.list(result$diagnostic_plots)) {
@@ -3222,7 +3233,7 @@ server <- function(input, output, session) {
       plot_tags <- all_plot_tags[[i]] %||% list()
       tags$div(class = "card",
         tags$div(class = "card-title",
-          sprintf("RQ %d: %s", i, result$block_id %||% "")),
+          studio_rq_heading(i, result$block_id)),
         tags$p(result$research_question %||% ""),
         tags$div(
           tags$span(class = "vbadge", result$test %||% result$method %||% ""),
@@ -3833,7 +3844,7 @@ server <- function(input, output, session) {
         plot_tags <- all_plot_tags[[hit_idx]] %||% list()
       }
       tags$div(class = "card result-canvas-block",
-        tags$div(class = "card-title", sprintf("RQ %d: %s", i, block_id)),
+        tags$div(class = "card-title", studio_rq_heading(i, block_id)),
         tags$p(block$research_question %||% ""),
         tags$div(
           tags$span(class = "vbadge", block$method %||% block$test %||% ""),
