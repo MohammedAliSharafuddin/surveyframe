@@ -1562,13 +1562,16 @@ sframe_run_one_block <- function(block, data, instrument, plots = FALSE,
                           exclude_cols = c(.sframe_text_free_text_cols[[test]], "Code")),
     error = function(e) result$table
   )
+  # Charts name variables by their instrument labels, as the tables do.
+  plot_labels <- if (isTRUE(plots)) sframe_label_lookup(instrument) else character(0)
   if (isTRUE(plots) && is.null(result$plot)) {
-    result$plot <- sframe_plot_for_result(result, data, palette = plot_palette)
+    result$plot <- .sframe_with_plot_labels(plot_labels,
+      sframe_plot_for_result(result, data, palette = plot_palette))
   }
   if (isTRUE(plots) && identical(result$test, "regression_linear") &&
       is.data.frame(result$diagnostics) && is.null(result$diagnostic_plots)) {
-    result$diagnostic_plots <-
-      sframe_plot_regression_diagnostics(result, palette = plot_palette)
+    result$diagnostic_plots <- .sframe_with_plot_labels(plot_labels,
+      sframe_plot_regression_diagnostics(result, palette = plot_palette))
   }
   result
 }
