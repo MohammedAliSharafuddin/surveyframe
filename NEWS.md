@@ -55,6 +55,9 @@ style.
 * **The 30 built-in method references are also held as CSL-JSON.** A test
   formats each one through pandoc in APA 7 and compares it with the APA text
   the package already shipped, which holds the 2 forms together.
+* The building-survey-instrument vignette has a section on citing
+  sources: `sf_reference()`, `read_bibtex()`, where a work is cited, and
+  what `render_report()` does with the list.
 * **SurveyBuilder has a References tab in Survey settings.** Paste BibTeX or
   type a reference in, and choose where the instrument cites it. Changes
   apply at once, ahead of Save settings.
