@@ -95,6 +95,17 @@ style.
   names the threshold too. The argument's help says how to check 3-item
   scales, in a call or in a plan.
 
+## Validation
+
+* **A plan block whose roles its method never reads is refused.** A
+  frequency block naming its item under `items` ran on nothing and reported
+  "Frequency distribution for NA (N = 0)" with an empty table.
+  `validate_sframe()` now says which roles the method reads and which the
+  block names, and `run_analysis_plan()` gives such a block an `error` in
+  place of a result. The roles a method reads are found from the same
+  resolver the analysis uses, so the 2 stay in step. `partial_correlation`
+  and `mediation` also accept every role alias their runners read.
+
 ## Charts
 
 * A chart from the analysis plan names each variable by its label in the
