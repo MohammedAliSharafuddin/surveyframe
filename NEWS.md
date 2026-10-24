@@ -134,6 +134,12 @@ style.
   writes an empty `render` as a JSON array, and the builder held it as one,
   so a theme or welcome screen saved there vanished from the saved file.
   All 19 demos with an empty `render` were affected.
+* **Open asks before replacing unsaved changes**, and opens the file
+  chooser at once when there are none. It replaced them silently. Opening
+  a file also closes the inspector, which kept showing an item from the
+  survey being replaced, and the status reads "Opened" until the next
+  save. It read "Saved just now", which inside a host such as Ethos reads
+  as saved in the host.
 * **SurveyBuilder's Survey settings dialog scrolls.** A tab taller than the
   dialog ran past its bottom edge, with its last controls out of reach. The
   dialog body now shrinks to fit and scrolls.

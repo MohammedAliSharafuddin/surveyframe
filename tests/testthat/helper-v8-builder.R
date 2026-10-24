@@ -30,6 +30,7 @@ var localStorage = { _d:{},
 var navigator = { userAgent:'v8', platform:'' };
 function setInterval(){}
 var __toasts = [];
+var __clicks = [];
 // Element methods the builder calls that the survey template never does.
 var __mkElBase = __mkEl;
 __mkEl = function(id){
@@ -42,6 +43,8 @@ __mkEl = function(id){
   el.blur = function(){};
   el.select = function(){};
   el.options = [];
+  // A click is recorded, so a test can tell whether the file chooser opened.
+  el.click = function(){ __clicks.push(this.id); };
   return el;
 };
 "
