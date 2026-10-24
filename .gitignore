@@ -25,6 +25,7 @@ cran-comments.md
 data-raw/*
 !data-raw/inline_static_template.R
 !data-raw/check_house_style.R
+!data-raw/sync_sframe_schema.R
 roadmap.md
 todo.md
 revision_todo_0.3.md

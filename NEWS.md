@@ -61,6 +61,14 @@ style.
 
 ### The file format
 
+* **The bundled schema is the published one.**
+  `inst/schema/sframe_schema.json` is now a copy of sframe-schema's
+  instrument profile, kept identical by a test. The 2 had drifted: the
+  bundled copy left `sframe_format` optional and lacked `references`, so a
+  file could pass one and fail the other. It now requires `sframe_format`,
+  as `write_sframe()` writes it. `read_sframe()` still reads older files
+  without the field. Every bundled `.sframe` file and a builder save
+  validate against it.
 * `references` is a new optional top-level field. It is written only when an
   instrument has at least one, so an instrument with no references keeps the
   file hash it had, the rule `designs` and `amendments` already follow.

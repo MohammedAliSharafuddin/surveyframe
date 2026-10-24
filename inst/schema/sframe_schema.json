@@ -1,11 +1,11 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://github.com/MohammedAliSharafuddin/surveyframe/inst/schema/sframe_schema.json",
-  "title": "surveyframe .sframe file",
-  "description": "Schema for the .sframe instrument format written by write_sframe() and read by read_sframe(). Documented so a reviewer or a second tool can read and validate a .sframe file without installing the R package -- the file is plain UTF-8 JSON, not an R-specific or binary format. Every field here corresponds to a key produced by sframe_serialization_payload() in R/read_write_sframe.R and R/amendments.R.",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/MohammedAliSharafuddin/sframe-schema/schema/sframe-instrument.schema.json",
+  "title": "sframe, instrument profile",
+  "description": "The implemented profile: the shape surveyframe's write_sframe() emits as of 0.4.3. This is Layer 1 (instrument) of the five-layer model in sframe.schema.json, serialised flat rather than nested under `layers`, plus the verification hash. A file conforming to this profile is a complete, verifiable instrument declaration. It is not a complete provenance chain: response, analysis/reporting and manifest layers arrive with surveyframe 0.6.",
   "type": "object",
-  "required": ["hash", "meta", "items"],
-  "definitions": {
+  "required": ["sframe_format", "hash", "meta", "items"],
+  "$defs": {
     "cslNames": {
       "type": "array",
       "description": "CSL names: {\"family\", \"given\"} for a person, {\"literal\"} for an organisation.",
@@ -22,85 +22,112 @@
   "properties": {
     "sframe_format": {
       "type": "string",
-      "description": "The .sframe format version (SFRAME_FORMAT_VERSION in R/read_write_sframe.R), written as the first key of every file. Distinct from `version` below, which is the instrument's own version, and from the surveyframe package version. Absent in files written before 2026-08-22, which read as legacy files and still verify, since the hash is computed over whatever the file contains. Not listed in `required` for that reason. read_sframe() refuses a file whose major format version is newer than the one it supports. Conformance profiles key on this value.",
-      "examples": ["1.0"]
+      "description": "Version of the file format itself, distinct from the instrument's own `version` and from the package version. Consumers negotiate on this.",
+      "pattern": "^[0-9]+\\.[0-9]+$"
     },
     "hash": {
       "type": "object",
-      "description": "Content integrity hash over a canonical serialisation: object keys are sorted, so whitespace and key order in the file do not affect it. It confirms the content matches what was hashed. It is not byte identity, it does not prove who wrote the file or when, and it is not a proof of methodological validity. See the `amendments` field below for disclosed revisions, and run_analysis_plan() for the plan binding.",
       "required": ["algo", "value"],
+      "description": "SHA-256 over the canonical serialisation with `hash.value` blanked. Canonicalisation sorts object keys alphabetically and recurses. A reference JavaScript implementation is sframeCanon() in surveyframe's survey_builder.html.",
       "properties": {
         "algo": { "const": "sha256" },
-        "value": {
-          "type": "string",
-          "description": "SHA-256 digest (64 lowercase hex characters) computed over the canonical JSON serialisation of every other top-level field, with this field itself set to an empty string during hashing."
+        "value": { "type": "string", "pattern": "^[0-9a-f]{64}$|^$" }
+      }
+    },
+    "version": { "type": ["string", "null"], "description": "The instrument's version, not the format's." },
+    "meta": {
+      "type": "object",
+      "required": ["title"],
+      "properties": {
+        "title": { "type": "string" },
+        "version": { "type": ["string", "null"] },
+        "description": { "type": ["string", "null"] },
+        "authors": { "type": ["array", "string", "null"], "items": { "type": "string" } },
+        "languages": { "type": ["array", "string", "null"], "items": { "type": "string" } },
+        "validated": { "type": ["boolean", "null"] },
+        "created_at": { "type": ["string", "null"] }
+      }
+    },
+    "items": {
+      "type": "array",
+      "description": "Declared items. `type` carries the measurement intent a consumer needs to pick a legitimate analysis.",
+      "items": {
+        "type": "object",
+        "required": ["id", "type"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^[A-Za-z][A-Za-z0-9_]*$" },
+          "label": { "type": ["string", "null"] },
+          "type": {
+            "type": "string",
+            "enum": ["likert", "single_choice", "multiple_choice", "numeric", "text",
+                     "textarea", "date", "matrix", "slider", "ranking", "rating",
+                     "pairwise_comparison", "criteria_weight", "section_break", "text_block"]
+          },
+          "required": { "type": ["boolean", "null"] },
+          "choice_set": { "type": ["string", "null"] },
+          "reverse": { "type": ["boolean", "null"] },
+          "scale_id": { "type": ["string", "null"] }
         }
       }
     },
-    "version": {
-      "type": ["string", "null"],
-      "description": "The instrument's own semantic version string (sf_instrument()'s `version` argument), not the surveyframe package version. Optional."
+    "choices": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "values"],
+        "properties": {
+          "id": { "type": "string" },
+          "values": { "type": "array" },
+          "labels": { "type": ["array", "null"] },
+          "allow_other": { "type": ["boolean", "null"] },
+          "randomise": { "type": ["boolean", "null"] }
+        }
+      }
     },
-    "meta": {
-      "type": "object",
-      "description": "Instrument metadata: title, description, authors, languages, and validation status.",
-      "required": ["title"]
+    "scales": {
+      "type": "array",
+      "description": "Declared scales. A consumer reads these to know which items form a construct, which is what a bare CSV cannot express.",
+      "items": {
+        "type": "object",
+        "required": ["id", "items"],
+        "properties": {
+          "id": { "type": "string" },
+          "label": { "type": ["string", "null"] },
+          "items": { "type": "array", "items": { "type": "string" } },
+          "method": { "type": ["string", "null"] },
+          "min_valid": { "type": ["integer", "null"] }
+        }
+      }
     },
-    "items": { "type": "array", "description": "Question items (sf_item())." },
-    "choices": { "type": "array", "description": "Response option sets (sf_choices()). Optional. `values` and `labels` are always arrays, a one-member set included." },
-    "scales": { "type": "array", "description": "Scale definitions (sf_scale()). Optional. `items`, `reverse_items` and `weights` are always arrays, a one-member collection included." },
-    "branching": { "type": "array", "description": "Branching rules (sf_branch())." },
-    "checks": { "type": "array", "description": "Data quality checks (sf_check())." },
+    "branching": { "type": "array" },
+    "checks": { "type": "array" },
     "analysis_plan": {
       "type": "array",
-      "description": "Pre-declared analysis-plan blocks, bound to the instrument at design time and executed in one pass by run_analysis_plan(). This binding, not the hash, is the package's defence against HARKing and p-hacking; the hash only proves file identity."
+      "description": "Pre-declared analyses. Present here is what makes the file a pre-registration rather than a description."
     },
-    "models": { "type": "array", "description": "Measurement/structural model specifications (sf_model())." },
-    "render": { "type": ["object", "array", "null"], "description": "Optional rendering hints for render_survey(). An instrument with no hints may carry an empty array." },
+    "models": { "type": "array" },
+    "render": { "type": ["array", "object", "null"] },
     "designs": {
       "type": "array",
-      "description": "Optional conjoint designs. Present only when the instrument declares at least one, so instruments that don't use this feature hash identically to files written before it existed."
+      "description": "Optional conjoint designs (surveyframe 0.4.0). Present only when the instrument declares at least one, so an instrument without them hashes as it did before the field existed."
     },
     "amendments": {
       "type": "array",
-      "description": "Optional disclosed-revision log, appended to by amend_sframe(). Present only when the instrument has at least one recorded amendment, for the same backward-compatibility reason as `designs`. Each entry documents one legitimate, disclosed change -- it is not itself a proof of the change's scientific merit, only a structured record of what changed, why, and whether a second reviewer signed off.",
+      "description": "Optional disclosed-revision log (surveyframe 0.4.0), appended by amend_sframe(). Present only when there is at least one entry. previous_hash and new_hash are SHA-256 content hashes over every top-level field except hash, amendments and references.",
       "items": {
         "type": "object",
         "required": ["timestamp", "reason_code", "reason_text", "tier", "signoff", "previous_hash", "new_hash"],
         "properties": {
-          "timestamp": { "type": "string", "description": "UTC, ISO 8601 (e.g. 2026-08-18T18:45:02Z)." },
-          "reason_code": {
-            "type": "string",
-            "enum": ["data_correction", "bot_removal", "model_respecification", "instrument_revision", "other"]
-          },
-          "reason_text": { "type": "string", "description": "Free-text explanation. Always required and non-empty." },
-          "tier": {
-            "type": "string",
-            "enum": ["pipeline", "design"],
-            "description": "\"pipeline\": routine data/collection hygiene (data_correction, bot_removal), low friction. \"design\": a change to the analysis plan or a model, which the design-time plan binding exists to guard against -- requires deviation_report."
-          },
+          "timestamp": { "type": "string" },
+          "reason_code": { "type": "string", "enum": ["data_correction", "bot_removal", "model_respecification", "instrument_revision", "other"] },
+          "reason_text": { "type": "string", "minLength": 1 },
+          "tier": { "type": "string", "enum": ["pipeline", "design"] },
           "author": { "type": ["string", "null"] },
-          "deviation_report": {
-            "type": ["string", "null"],
-            "description": "Required (non-null, non-empty) when tier is \"design\": what changed in the research question, method, or model, and why. Not required for \"pipeline\" amendments."
-          },
-          "signoff": {
-            "type": "string",
-            "description": "A second reviewer's name/identifier, or the literal string \"none\" -- never blank, so an unreviewed design change is visible to an auditor rather than indistinguishable from a signed-off one."
-          },
-          "previous_hash": {
-            "type": "string",
-            "description": "SHA-256 content hash (64 hex chars) of every top-level field except `hash`, `amendments` and `references`, so `meta`, `render` and `version` count as well as the items, choices, scales, branching, checks, plan, models and designs, immediately before this amendment. Distinct from the file-level `hash` field above -- see amend_sframe()'s documentation."
-          },
-          "new_hash": {
-            "type": "string",
-            "description": "The same content hash, computed immediately after this amendment."
-          },
-          "changed_fields": {
-            "type": "array",
-            "items": { "type": "string" },
-            "description": "Which top-level payload keys differed between previous_hash and new_hash's states, e.g. [\"items\"] or [\"items\", \"analysis_plan\"]. Not a full content diff -- narrows where to look, same design intent as the file-level hash mismatch message."
-          }
+          "deviation_report": { "type": ["string", "null"] },
+          "signoff": { "type": "string", "minLength": 1 },
+          "previous_hash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+          "new_hash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+          "changed_fields": { "type": "array", "items": { "type": "string" } }
         }
       }
     },
@@ -114,8 +141,8 @@
           "id": { "type": "string", "pattern": "^[A-Za-z0-9_]([A-Za-z0-9_:.#$%&+?<>~/-]*[A-Za-z0-9_])?$", "description": "Citation key, cited in text as [@id]. Unique within the instrument." },
           "type": { "type": "string", "enum": ["article-journal", "book", "chapter", "paper-conference", "report", "thesis", "webpage", "software", "dataset", "manuscript", "document"] },
           "title": { "type": "string", "minLength": 1 },
-          "author": { "$ref": "#/definitions/cslNames" },
-          "editor": { "$ref": "#/definitions/cslNames" },
+          "author": { "$ref": "#/$defs/cslNames" },
+          "editor": { "$ref": "#/$defs/cslNames" },
           "issued": {
             "type": "object",
             "description": "CSL date: {\"date-parts\": [[year]]}, or {\"literal\": text} when the year is not a number.",
