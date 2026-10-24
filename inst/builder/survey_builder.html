@@ -3083,37 +3083,39 @@ function openFile(){document.getElementById('fileInput').click();}
 function loadFile(e){
   var f=e.target.files[0];if(!f)return;
   var r=new FileReader();
-  r.onload=function(ev){
-    try{
-      var p=JSON.parse(ev.target.result),src=p.meta?p:(p.items?p:null);
-      if(!src){toast('Invalid .sframe file','err');return;}
-      S.meta=src.meta||S.meta;S.choices=src.choices||[];S.items=src.items||[];
-      S.scales=src.scales||[];S.branching=src.branching||[];S.checks=src.checks||[];
-      S.analysis_plan=src.analysis_plan||[];S.models=src.models||[];S.render=src.render||S.render;
-      // Fields this builder does not edit are carried through to the next
-      // save. Until 0.4.3 they were dropped, so opening and saving an
-      // amended instrument lost its disclosed amendment log.
-      if(src.references&&src.references.length)S.references=src.references;else delete S.references;
-      S._carry={};['sframe_format','designs','amendments'].forEach(function(k){if(src[k]!==undefined)S._carry[k]=src[k];});
-      ['welcome','thankyou','header'].forEach(function(k){if(!S.render[k])S.render[k]={};});
-      selId=null;ra();dirty=false;lastSaved=Date.now();updSave();
-      // Surface the SHA-256 integrity status instead of loading silently.
-      // The hash is recomputed over the file's own payload, which matches
-      // both saveSframe() here and write_sframe() in R.
-      var fileHash=(p.hash&&p.hash.value)||'';
-      if(fileHash){
-        var vp=JSON.parse(ev.target.result);
-        vp.hash.value='';
-        sframeHash(vp).then(function(h){
-          if(h===fileHash)toast('Loaded: '+S.meta.title+' — integrity verified (sha256 '+fileHash.slice(0,8)+')','ok');
-          else toast('Loaded: '+S.meta.title+' — integrity hash mismatch; the file was changed outside surveyframe','err');
-        });
-      }else{
-        toast('Loaded: '+S.meta.title+' (no integrity hash in this file)','inf');
-      }
-    }catch(err){toast('Could not parse: '+err.message,'err');}
-  };
+  r.onload=function(ev){openSframeText(ev.target.result);};
   r.readAsText(f);e.target.value='';
+}
+// Opens a .sframe file's text into the builder.
+function openSframeText(text){
+  try{
+    var p=JSON.parse(text),src=p.meta?p:(p.items?p:null);
+    if(!src){toast('Invalid .sframe file','err');return;}
+    S.meta=src.meta||S.meta;S.choices=src.choices||[];S.items=src.items||[];
+    S.scales=src.scales||[];S.branching=src.branching||[];S.checks=src.checks||[];
+    S.analysis_plan=src.analysis_plan||[];S.models=src.models||[];S.render=src.render||S.render;
+    // Fields this builder does not edit are carried through to the next
+    // save. Until 0.4.3 they were dropped, so opening and saving an
+    // amended instrument lost its disclosed amendment log.
+    if(src.references&&src.references.length)S.references=src.references;else delete S.references;
+    S._carry={};['designs','amendments'].forEach(function(k){if(src[k]!==undefined)S._carry[k]=src[k];});
+    ['welcome','thankyou','header'].forEach(function(k){if(!S.render[k])S.render[k]={};});
+    selId=null;ra();dirty=false;lastSaved=Date.now();updSave();
+    // Surface the SHA-256 integrity status instead of loading silently.
+    // The hash is recomputed over the file's own payload, which matches
+    // both saveSframe() here and write_sframe() in R.
+    var fileHash=(p.hash&&p.hash.value)||'';
+    if(fileHash){
+      var vp=JSON.parse(text);
+      vp.hash.value='';
+      sframeHash(vp).then(function(h){
+        if(h===fileHash)toast('Loaded: '+S.meta.title+' — integrity verified (sha256 '+fileHash.slice(0,8)+')','ok');
+        else toast('Loaded: '+S.meta.title+' — integrity hash mismatch; the file was changed outside surveyframe','err');
+      });
+    }else{
+      toast('Loaded: '+S.meta.title+' (no integrity hash in this file)','inf');
+    }
+  }catch(err){toast('Could not parse: '+err.message,'err');}
 }
 
 // -- SHA-256 helper (async, with pure-JS fallback) --------------------------
@@ -3129,12 +3131,20 @@ async function sframeHash(payload){
   // Pure-JS fallback (always available)
   return window.sha256pure(src);
 }
-async function saveSframe(){
-  var payload={hash:{algo:'sha256',value:''},version:S.meta.version,meta:S.meta,items:S.items,choices:S.choices,scales:S.scales,branching:S.branching,checks:S.checks,analysis_plan:S.analysis_plan,models:S.models||[],render:S.render};
-  // Carried fields and references go back in, each only when present, as
-  // write_sframe() in R writes them.
+// The .sframe format version, SFRAME_FORMAT_VERSION in R. Every file carries
+// it, as write_sframe() writes it, and sframe-schema's instrument profile
+// requires it. A file opened with an older value is saved in this shape.
+var SFRAME_FORMAT='1.0';
+// The file as saved, hash still empty. Carried fields and references go back
+// in, each only when present, as write_sframe() in R writes them.
+function sframePayload(){
+  var payload={sframe_format:SFRAME_FORMAT,hash:{algo:'sha256',value:''},version:S.meta.version,meta:S.meta,items:S.items,choices:S.choices,scales:S.scales,branching:S.branching,checks:S.checks,analysis_plan:S.analysis_plan,models:S.models||[],render:S.render};
   var carry=S._carry||{};Object.keys(carry).forEach(function(k){payload[k]=carry[k];});
   if(S.references&&S.references.length)payload.references=S.references;
+  return payload;
+}
+async function saveSframe(){
+  var payload=sframePayload();
   payload.hash.value=await sframeHash(payload);
   var blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
   var a=document.createElement('a');a.href=URL.createObjectURL(blob);
