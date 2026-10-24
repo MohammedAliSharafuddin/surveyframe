@@ -105,18 +105,46 @@ sframe_meta_display <- function(value, fallback) {
 # with every role name it knows separates the two without a hand-kept list
 # that would drift as methods are added.
 sframe_method_needs_variables <- function(method) {
-  bag <- list(
-    variables = "x", variable = "x", items = "x", scales = "x",
-    group = "g", outcome = "o", dependent = "o", x = "a", y = "b",
-    item = "i", row = "r", column = "c", predictors = "p",
-    before = "b", after = "a2", measures = c("m1", "m2"),
-    weights_item = "w", performance_items = "pi", mediator = "m",
-    moderator = "mo", controls = "c2", covariates = "c3"
-  )
-  resolved <- tryCatch(
-    sframe_vars_for_method(method, bag, list(method = method)),
-    error = function(e) character(0))
-  length(resolved) > 0
+  length(sframe_method_role_names(method)) > 0
+}
+
+# Every role name the resolver knows, each with a placeholder value.
+.sframe_role_probe <- list(
+  variables = "x", variable = "x", items = "x", scales = "x",
+  group = "g", outcome = "o", dependent = "o", x = "a", y = "b",
+  item = "i", row = "r", column = "c", predictors = "p",
+  predictor = "p2", before = "b", after = "a2", measures = c("m1", "m2"),
+  factor = "f", factor1 = "f1", factor2 = "f2", factor_a = "fa",
+  factor_b = "fb", covariate = "c4",
+  weights_item = "w", performance_items = "pi", mediator = "m",
+  moderator = "mo", controls = "c2", control = "c5", covariates = "c3"
+)
+
+# The roles a method reads its variables from, found by offering the
+# resolver one role at a time.
+sframe_method_role_names <- function(method) {
+  reads <- vapply(names(.sframe_role_probe), function(role) {
+    resolved <- tryCatch(
+      sframe_vars_for_method(method, .sframe_role_probe[role], list(method = method)),
+      error = function(e) character(0))
+    length(resolved) > 0
+  }, logical(1))
+  names(.sframe_role_probe)[reads]
+}
+
+# Why a block that names roles gives its method no variables, or NULL when
+# it gives some. A frequency block naming its item under `items` ran on
+# nothing and reported "Frequency distribution for NA (N = 0)" with no
+# error (Ethos request 11).
+sframe_unread_roles_problem <- function(method, roles, block) {
+  if (!is.list(roles) || length(unlist(roles)) == 0) return(NULL)
+  reads <- sframe_method_role_names(method)
+  if (length(reads) == 0) return(NULL)
+  if (length(sframe_vars_for_method(method, roles, block)) > 0) return(NULL)
+  paste0("its method '", method, "' reads the role",
+         if (length(reads) > 1) "s " else " ",
+         paste(reads, collapse = " or "), ", and the block names ",
+         paste(names(roles), collapse = ", "), ".")
 }
 
 # The shape a plan block has to have before its references mean anything.
@@ -167,6 +195,10 @@ sframe_plan_block_problems <- function(plan, known_methods) {
         sframe_method_needs_variables(method_name)) {
       keep(paste0(where, " assigns no variables. Give it roles, or the legacy ",
                   "variables field."))
+    }
+    if (roles_ok && !vars_ok && method_name %in% known_methods) {
+      unread <- sframe_unread_roles_problem(method_name, block$roles, block)
+      if (!is.null(unread)) keep(paste0(where, " gives no variables: ", unread))
     }
   }
   dup <- unique(ids[duplicated(ids)])

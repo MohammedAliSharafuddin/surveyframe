@@ -1005,9 +1005,10 @@ sframe_vars_for_method <- function(method, roles, block) {
                              sframe_role_values(roles, "y")),
     correlation_kendall = c(sframe_role_values(roles, "x"),
                             sframe_role_values(roles, "y")),
-    partial_correlation = c(sframe_role_values(roles, "x"),
-                            sframe_role_values(roles, "y"),
-                            sframe_role_values(roles, c("controls", "covariates"))),
+    # Each role alias the runner reads, so the resolver and the runner agree.
+    partial_correlation = c(sframe_role_values(roles, c("x", "predictor")),
+                            sframe_role_values(roles, c("y", "outcome", "dependent")),
+                            sframe_role_values(roles, c("controls", "control", "covariates"))),
     regression_linear = c(sframe_role_values(roles, c("predictors", "covariates")),
                           sframe_role_values(roles, c("dependent", "outcome"))),
     regression_logistic_binary = c(sframe_role_values(roles, c("predictors", "covariates")),
@@ -1021,9 +1022,9 @@ sframe_vars_for_method <- function(method, roles, block) {
     moderation = c(sframe_role_values(roles, "predictor"),
                    sframe_role_values(roles, "moderator"),
                    sframe_role_values(roles, c("outcome", "dependent"))),
-    mediation = c(sframe_role_values(roles, "predictor"),
+    mediation = c(sframe_role_values(roles, c("predictor", "x")),
                   sframe_role_values(roles, "mediator"),
-                  sframe_role_values(roles, c("outcome", "dependent"))),
+                  sframe_role_values(roles, c("outcome", "dependent", "y"))),
     vars
   )
 }
@@ -1442,7 +1443,12 @@ sframe_run_one_block <- function(block, data, instrument, plots = FALSE,
     options$alpha <- block$alpha
   }
 
-  result <- tryCatch({
+  # A block whose roles give its method no variables would compute on
+  # nothing and report N = 0 as a result. It reports why, as an error.
+  unread <- sframe_unread_roles_problem(test, roles, block)
+  result <- if (!is.null(unread)) {
+    list(test = test, error = paste0("No variables to analyse: ", unread))
+  } else tryCatch({
     switch(test,
       frequency          = sframe_run_frequency(data, vars, weights = options$weights, instrument = instrument),
       descriptives       = sframe_run_descriptives_result(data, roles, options, instrument),
