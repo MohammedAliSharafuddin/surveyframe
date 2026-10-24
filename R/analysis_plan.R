@@ -380,10 +380,10 @@ sframe_run_crosstab <- function(data, vars, options = list()) {
   tbl <- table(r, c)
   ct <- tryCatch(
     suppressWarnings(stats::chisq.test(tbl, correct = FALSE)),
-    error = function(e) NULL
+    error = function(e) e
   )
-  if (is.null(ct)) {
-    return(list(test = "crosstab", error = "Chi-square could not be computed."))
+  if (inherits(ct, "error")) {
+    return(list(test = "crosstab", error = sframe_test_failure(ct, data)))
   }
   if (any(ct$expected < 5) && isTRUE(options$simulate_p_value)) {
     ct <- tryCatch(
@@ -453,9 +453,11 @@ sframe_run_mann_whitney <- function(data, vars) {
   g1 <- g1[!is.na(g1)]; g2 <- g2[!is.na(g2)]
   wt <- tryCatch(
     stats::wilcox.test(g1, g2, exact = FALSE, correct = FALSE, conf.int = TRUE),
-    error = function(e) NULL
+    error = function(e) e
   )
-  if (is.null(wt)) return(list(test = "mann_whitney", error = "Test failed."))
+  if (inherits(wt, "error")) {
+    return(list(test = "mann_whitney", error = sframe_test_failure(wt, data, outcome_col)))
+  }
   # z, p, r and the r interval all use the tie-corrected normal approximation
   # without continuity correction, and z is signed by group order. z rebuilt
   # from p/2 was always negative, and the interval described a different r.
@@ -507,8 +509,10 @@ sframe_run_t_test <- function(data, vars, options = list()) {
   g1 <- sframe_num((data[[outcome_col]][data[[group_col]] == groups[1]]))
   g2 <- sframe_num((data[[outcome_col]][data[[group_col]] == groups[2]]))
   g1 <- g1[!is.na(g1)]; g2 <- g2[!is.na(g2)]
-  tt <- tryCatch(stats::t.test(g1, g2, var.equal = var_equal), error = function(e) NULL)
-  if (is.null(tt)) return(list(test = "t_test_ind", error = "Test failed."))
+  tt <- tryCatch(stats::t.test(g1, g2, var.equal = var_equal), error = function(e) e)
+  if (inherits(tt, "error")) {
+    return(list(test = "t_test_ind", error = sframe_test_failure(tt, data, outcome_col)))
+  }
   d <- sframe_cohens_d(g1, g2)
   d_ci <- cohens_d_ci(g1, g2)
   list(
@@ -558,9 +562,11 @@ sframe_run_anova_one <- function(data, vars, options = list()) {
 
   fit <- tryCatch(
     stats::aov(outcome[complete] ~ group[complete]),
-    error = function(e) NULL
+    error = function(e) e
   )
-  if (is.null(fit)) return(list(test = "anova_one", error = "ANOVA failed."))
+  if (inherits(fit, "error")) {
+    return(list(test = "anova_one", error = sframe_test_failure(fit, data, outcome_col)))
+  }
 
   s <- summary(fit)[[1]]
   F_stat <- s[["F value"]][1]
@@ -631,8 +637,10 @@ sframe_run_t_test_pair <- function(data, vars) {
                 error = "Fewer than 2 complete pairs available."))
   }
 
-  tt <- tryCatch(stats::t.test(x, y, paired = TRUE), error = function(e) NULL)
-  if (is.null(tt)) return(list(test = "t_test_pair", error = "Test failed."))
+  tt <- tryCatch(stats::t.test(x, y, paired = TRUE), error = function(e) e)
+  if (inherits(tt, "error")) {
+    return(list(test = "t_test_pair", error = sframe_test_failure(tt, data, vars)))
+  }
 
   diff <- x - y
   dz <- mean(diff, na.rm = TRUE) / stats::sd(diff, na.rm = TRUE)
@@ -688,9 +696,11 @@ sframe_run_wilcoxon_pair <- function(data, vars) {
   wt <- tryCatch(
     stats::wilcox.test(x, y, paired = TRUE, exact = FALSE, correct = FALSE,
                        conf.int = TRUE),
-    error = function(e) NULL
+    error = function(e) e
   )
-  if (is.null(wt)) return(list(test = "wilcoxon_pair", error = "Test failed."))
+  if (inherits(wt, "error")) {
+    return(list(test = "wilcoxon_pair", error = sframe_test_failure(wt, data, vars)))
+  }
 
   # One definition for z, p, r and the interval, on the non-zero differences
   # the test itself uses. r previously divided by every pair, zeros included.
@@ -747,9 +757,11 @@ sframe_run_kruskal <- function(data, vars) {
   complete <- !is.na(outcome) & !is.na(group)
   kt <- tryCatch(
     stats::kruskal.test(outcome[complete] ~ as.factor(group[complete])),
-    error = function(e) NULL
+    error = function(e) e
   )
-  if (is.null(kt)) return(list(test = "kruskal_wallis", error = "Test failed."))
+  if (inherits(kt, "error")) {
+    return(list(test = "kruskal_wallis", error = sframe_test_failure(kt, data, vars[2])))
+  }
   n <- sum(complete)
   eta2 <- (kt$statistic - length(unique(group[complete])) + 1) / (n - length(unique(group[complete])))
   eta2 <- max(0, unname(eta2))
@@ -785,9 +797,12 @@ sframe_run_correlation <- function(data, vars, method = "pearson") {
   n <- sum(complete)
   ct <- tryCatch(
     suppressWarnings(stats::cor.test(x[complete], y[complete], method = method)),
-    error = function(e) NULL
+    error = function(e) e
   )
-  if (is.null(ct)) return(list(test = paste0("correlation_", method), error = "Test failed."))
+  if (inherits(ct, "error")) {
+    return(list(test = paste0("correlation_", method),
+                error = sframe_test_failure(ct, data, vars[1:2])))
+  }
   r <- unname(ct$estimate)
   sym <- switch(method, pearson = "r", spearman = "r_s", kendall = "tau", "r")
   # Fisher z is analytic for Pearson; the rank correlations bootstrap.
@@ -832,9 +847,11 @@ sframe_run_regression <- function(data, vars) {
                        paste(predictors, collapse = " + "))
   fit <- tryCatch(
     stats::lm(stats::as.formula(formula_str), data = pred_data[complete, ]),
-    error = function(e) NULL
+    error = function(e) e
   )
-  if (is.null(fit)) return(list(test = "regression_linear", error = "Regression failed."))
+  if (inherits(fit, "error")) {
+    return(list(test = "regression_linear", error = sframe_test_failure(fit, data, vars)))
+  }
   s <- summary(fit)
   f_stat <- s$fstatistic
   p_val  <- stats::pf(f_stat[1], f_stat[2], f_stat[3], lower.tail = FALSE)
@@ -904,11 +921,11 @@ sframe_run_logistic_binary <- function(data, vars) {
       data = pred_data[complete, ],
       family = stats::binomial(link = "logit")
     ),
-    error = function(e) NULL
+    error = function(e) e
   )
-  if (is.null(fit)) {
+  if (inherits(fit, "error")) {
     return(list(test = "regression_logistic_binary",
-                error = "Logistic regression failed."))
+                error = sframe_test_failure(fit, data, predictors)))
   }
 
   s <- summary(fit)
@@ -964,6 +981,48 @@ sframe_model_by_id <- function(instrument, id) {
   }
   hit <- models[vapply(models, function(model) identical(model$id, id), logical(1))]
   if (length(hit) == 0) NULL else hit[[1]]
+}
+
+# Why a test could not be computed, in words a researcher can act on. It
+# used to say "Test failed." whatever the cause (Ethos request 6). `numeric`
+# names the columns the test reads as numbers.
+sframe_test_failure <- function(e, data, numeric = character(0)) {
+  no_numbers <- Filter(function(v) {
+    col <- data[[v]]
+    !is.null(col) && any(!is.na(col)) && all(is.na(sframe_num(col)))
+  }, numeric)
+  if (length(no_numbers) > 0) {
+    return(paste0("The test needs numbers, and ",
+                  paste0("'", no_numbers, "'", collapse = " and "),
+                  if (length(no_numbers) > 1) " hold" else " holds",
+                  " none. Check the item type each role names."))
+  }
+  msg <- conditionMessage(e)
+  if (grepl("not enough|too few|fewer than", msg, ignore.case = TRUE)) {
+    return(paste0("Too few responses with a value for this test (", msg, ")."))
+  }
+  paste0("The test could not be computed: ", msg)
+}
+
+# The variables a block names that the responses lack, as a message, or NULL
+# when every one is there. A multiple-choice or matrix item is present
+# through its expansion columns (item__option).
+sframe_missing_variables_problem <- function(vars, data, instrument) {
+  cols <- names(data)
+  present <- vapply(vars, function(v) {
+    v %in% cols || any(startsWith(cols, paste0(v, "__")))
+  }, logical(1))
+  missing <- unique(vars[!present])
+  if (length(missing) == 0) return(NULL)
+  item_ids <- vapply(instrument$items %||% list(), function(i) as.character(i$id)[1], character(1))
+  scale_ids <- vapply(instrument$scales %||% list(), function(s) as.character(s$id)[1], character(1))
+  why <- vapply(missing, function(v) {
+    if (v %in% item_ids) paste0("'", v, "' is an item with no column in the responses")
+    else if (v %in% scale_ids) paste0("'", v, "' is a scale with no scored column in the responses")
+    else paste0("'", v, "' is neither an item nor a scale of the instrument")
+  }, character(1))
+  paste0("The block names variables the responses lack: ",
+         paste(why, collapse = ", "), ".")
 }
 
 sframe_vars_for_method <- function(method, roles, block) {
@@ -1446,8 +1505,11 @@ sframe_run_one_block <- function(block, data, instrument, plots = FALSE,
   # A block whose roles give its method no variables would compute on
   # nothing and report N = 0 as a result. It reports why, as an error.
   unread <- sframe_unread_roles_problem(test, roles, block)
+  absent <- if (is.null(unread)) sframe_missing_variables_problem(vars, data, instrument)
   result <- if (!is.null(unread)) {
     list(test = test, error = paste0("No variables to analyse: ", unread))
+  } else if (!is.null(absent)) {
+    list(test = test, error = absent)
   } else tryCatch({
     switch(test,
       frequency          = sframe_run_frequency(data, vars, weights = options$weights, instrument = instrument),
