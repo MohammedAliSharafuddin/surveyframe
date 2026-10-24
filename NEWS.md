@@ -123,6 +123,17 @@ style.
 * **Every file saved from SurveyBuilder carries `sframe_format`**, as
   `write_sframe()` writes it. sframe-schema's instrument profile requires
   the field, so each new file saved from the builder failed that schema.
+* **Save settings writes only the fields you changed.** It wrote every
+  General, Welcome and Thank You field from its input, so an absent author
+  list became an empty string and absent screens took their default
+  wording. On an amended instrument that was a content change nobody had
+  made, and `write_sframe()` refused the file. Opening a file also added
+  empty screen objects to it. An emptied author list or description is now
+  saved as absent, as R writes it.
+* **Settings saved on an instrument with an empty `render` are kept.** R
+  writes an empty `render` as a JSON array, and the builder held it as one,
+  so a theme or welcome screen saved there vanished from the saved file.
+  All 19 demos with an empty `render` were affected.
 * **SurveyBuilder's Survey settings dialog scrolls.** A tab taller than the
   dialog ran past its bottom edge, with its last controls out of reach. The
   dialog body now shrinks to fit and scrolls.

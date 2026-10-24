@@ -61,10 +61,11 @@ builder_context <- function() {
 }
 
 # Opens `instrument` in the builder, through the file write_sframe() writes.
-builder_open <- function(ctx, instrument) {
+# `new_instrument` passes through, for a test that edits a demo directly.
+builder_open <- function(ctx, instrument, new_instrument = FALSE) {
   path <- tempfile(fileext = ".sframe")
   on.exit(unlink(path))
-  write_sframe(instrument, path)
+  write_sframe(instrument, path, new_instrument = new_instrument)
   ctx$call("openSframeText", paste(readLines(path, warn = FALSE), collapse = "\n"))
   invisible(ctx)
 }
