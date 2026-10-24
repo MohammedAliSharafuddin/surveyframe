@@ -1294,11 +1294,28 @@ sframe_clean_interpretations <- function(interpretations) {
 # .sframe_with_plot_labels().
 .sframe_plot_label_env <- new.env(parent = emptyenv())
 
-.sframe_with_plot_labels <- function(lookup, code) {
+.sframe_with_plot_labels <- function(lookup, code, instrument = NULL) {
   old <- .sframe_plot_label_env$lookup
+  old_instrument <- .sframe_plot_label_env$instrument
   .sframe_plot_label_env$lookup <- lookup
-  on.exit(.sframe_plot_label_env$lookup <- old, add = TRUE)
+  .sframe_plot_label_env$instrument <- instrument
+  on.exit({
+    .sframe_plot_label_env$lookup <- old
+    .sframe_plot_label_env$instrument <- old_instrument
+  }, add = TRUE)
   force(code)
+}
+
+# An item's coded values as its choice labels, in the choice set's order, so
+# a chart shows "In person" where the data hold "in_person" (Ethos request
+# 20). Codes the set lacks, and every code outside a labelled plot call, stay
+# as they are.
+.sframe_plot_value_labels <- function(item_id, codes) {
+  labs <- sframe_item_value_labels(.sframe_plot_label_env$instrument, item_id)
+  codes <- as.character(codes)
+  if (!length(labs)) return(factor(codes))
+  shown <- ifelse(codes %in% names(labs), unname(labs[codes]), codes)
+  factor(shown, levels = unique(c(unname(labs), shown)))
 }
 
 .sframe_title_case_names <- function(names) {
