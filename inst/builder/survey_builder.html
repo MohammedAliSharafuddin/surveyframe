@@ -794,7 +794,9 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
   <!-- BUILD mode -->
   <div class="mp active" id="mp-build">
     <div class="build-shell">
-      <div class="canvas" id="canvas">
+      <!-- A scroll region, so keyboard users can reach and scroll it (axe
+           scrollable-region-focusable, Ethos request 8, at 390 px). -->
+      <div class="canvas" id="canvas" tabindex="0" role="region" aria-label="Question editing area">
         <div class="c-prompt" id="cPrompt">
           <div class="c-prompt-ic">&#128196;</div>
           <div class="c-prompt-t">Select a question to edit</div>

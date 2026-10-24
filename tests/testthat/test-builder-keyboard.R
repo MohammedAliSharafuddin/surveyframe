@@ -99,3 +99,15 @@ test_that("the builder's own script parses", {
   expect_true(ctx$get("(function(){ try { new Function(__src); return true; }
                         catch (e) { return false; } })()"))
 })
+
+# Ethos request 8 (2026-10-01): at 390 px, axe reported
+# scrollable-region-focusable on #canvas, a scroll region a keyboard user
+# could neither reach nor scroll.
+test_that("Ethos 8: the canvas scroll region is focusable and named", {
+  src <- builder_source()
+  canvas <- regmatches(src, regexpr('<div class="canvas" id="canvas"[^>]*>', src))
+  expect_length(canvas, 1L)
+  expect_match(canvas, 'tabindex="0"', fixed = TRUE)
+  expect_match(canvas, 'role="region"', fixed = TRUE)
+  expect_match(canvas, 'aria-label="[^"]+"')
+})
