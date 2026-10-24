@@ -120,6 +120,9 @@ style.
   `sframe_format` fields, so a disclosed revision vanished silently. The
   builder now carries every field it leaves unedited through to the next
   save.
+* **Every file saved from SurveyBuilder carries `sframe_format`**, as
+  `write_sframe()` writes it. sframe-schema's instrument profile requires
+  the field, so each new file saved from the builder failed that schema.
 * **SurveyBuilder's Survey settings dialog scrolls.** A tab taller than the
   dialog ran past its bottom edge, with its last controls out of reach. The
   dialog body now shrinks to fit and scrolls.
