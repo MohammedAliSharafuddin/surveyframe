@@ -216,6 +216,56 @@ instr <- as_sframe(validate_sframe(instr))
 sf_meta(instr)$validated
 ```
 
+## Cite the sources the instrument draws on
+
+An instrument rests on published work: the source of each scale, and the
+method behind each plan block. `sf_reference()` records a work as CSL-JSON,
+the format Zotero, Mendeley and pandoc share, and `cited_by` says where the
+instrument cites it: `"instrument"` as a whole, or `"item:<id>"`,
+`"scale:<id>"`, `"plan:<block id>"` or `"model:<id>"`.
+
+```{r references}
+cronbach <- sf_reference(
+  id = "cronbach_1951",
+  title = "Coefficient alpha and the internal structure of tests",
+  author = "Cronbach, L. J.", year = 1951,
+  container = "Psychometrika", volume = "16", issue = "3", pages = "297-334",
+  cited_by = "plan:M1"
+)
+```
+
+A reference copied from Google Scholar, Zotero or a journal page arrives as
+BibTeX, and `read_bibtex()` reads it with base R alone.
+
+```{r bibtex}
+likert <- read_bibtex(text = "@article{likert_1932,
+  author  = {Likert, Rensis},
+  title   = {A technique for the measurement of attitudes},
+  journal = {Archives of Psychology},
+  year    = {1932}, volume = {22}, number = {140}, pages = {1--55}
+}", cited_by = "instrument")
+
+instr <- add_references(instr, cronbach, likert)
+names(sframe_references(instr))
+names(sframe_references(instr, cited_by = "plan:M1"))
+```
+
+`validate_sframe()` checks that every key is unique and that each `cited_by`
+target exists. The references travel inside the `.sframe` file. Citing a
+source is disclosure, outside the design, so the content hash that
+`amend_sframe()` records leaves `references` out, and a source can be added
+to a published instrument directly.
+
+`render_report()` cites each work in text, as author and year, and lists every
+work once, in a References section at the end. That list holds the
+instrument's own references and the references of every method the plan
+ran, formatted by pandoc in APA 7th edition, which ships with the package, or
+in any Citation Style Language file given as `csl = `. A written
+interpretation can cite a work as `[@key]`, and `references = ` adds works
+cited there. `render_results()` lists its references once at the end in the
+same way. In SurveyBuilder, the References tab of Survey settings takes
+pasted BibTeX or a typed reference.
+
 ## Write and read `.sframe` files
 
 The `.sframe` file is the portable instrument file. It keeps the validated
@@ -230,6 +280,7 @@ inherits(loaded, "sframe")
 sf_meta(loaded)$title
 length(sf_plan(loaded))
 length(loaded$models)
+length(sframe_references(loaded))
 ```
 
 ## GUI option
