@@ -75,12 +75,30 @@ absence of a named reviewer is visible. The tier, report and signoff are
 what the author records. None of them is independent approval.
 
 \code{previous_hash} and \code{new_hash} on each entry are a content fingerprint: a
-SHA-256 over a canonical serialisation of the instrument, with the \code{hash}
-and \code{amendments} fields excluded, taken after validation, so \code{new_hash} is
+SHA-256 over a canonical serialisation of the instrument, with the \code{hash},
+\code{amendments} and \code{references} fields excluded, taken after validation, so \code{new_hash} is
 the content that is written. It is distinct from the file's own integrity
 hash from \code{\link[=write_sframe]{write_sframe()}}, which also covers the amendment log. Both
 identify content. Neither is byte identity.
 }
+\section{Wording on the participant's screens}{
+
+The welcome, consent and thank-you wording lives in \code{render}, and both
+hashes cover \code{render}, so editing that wording changes the instrument as
+much as editing an item does. On a published instrument, record it as a
+pipeline-tier amendment with \code{reason_code = "other"} and a \code{reason_text}
+saying what was reworded, then write the file with \code{\link[=write_sframe]{write_sframe()}}. This
+is the intended path for a host that lets researchers edit these screens.
+A file whose JSON is edited directly fails \code{\link[=read_sframe]{read_sframe()}}'s hash check.
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{revised <- instrument
+revised$render$welcome$consent_text <- "I agree to take part."
+revised <- amend_sframe(instrument, revised, "other",
+                        "Consent wording shortened", tier = "pipeline")
+write_sframe(revised, "study.sframe", overwrite = TRUE)
+}\if{html}{\out{</div>}}
+}
+
 \examples{
 item  <- sf_item("q1", "How satisfied are you?", type = "text")
 instr <- sf_instrument("Demo", components = list(item))
