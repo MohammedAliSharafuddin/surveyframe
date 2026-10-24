@@ -2908,7 +2908,22 @@ function openSettings(tab){
   sv('s-gsu',r.google_sheets_url||'');sv('s-gsep',r.google_sheets_endpoint||'');
   if(h.logo_base64){var lp=document.getElementById('logoPrev');if(lp){var lMtype=h.logo_media_type||'image/png';lp.src='data:'+lMtype+';base64,'+h.logo_base64;lp.style.display='block';}document.getElementById('logoName').textContent='Logo loaded';var rb=document.getElementById('logoRmBtn');if(rb)rb.style.display='inline-flex';}
   renderRefs();
+  settingsShown=settingsInputs();
   showST(tab||'meta');openModal('m-settings');
+}
+// What the Settings dialog showed when it opened, so Save settings writes
+// only the fields the user changed. Writing every field from its input made
+// an absent author list "" and filled absent screens with their defaults,
+// a content change nobody made, which write_sframe() refuses on an amended
+// instrument.
+var settingsShown=null;
+var SETTINGS_TEXT=['s-title','s-ver','s-lang','s-authors','s-desc','s-mode','s-submit','s-theme','s-wt','s-wi','s-wc','s-wsl','s-tym','s-tyu','s-inst','s-gsu','s-gsep'];
+var SETTINGS_CHECK=['s-wreq','s-tydl','s-prog'];
+function settingsInputs(){
+  var o={};
+  SETTINGS_TEXT.forEach(function(id){o[id]=gv(id);});
+  SETTINGS_CHECK.forEach(function(id){var e=document.getElementById(id);o[id]=!!(e&&e.checked);});
+  return o;
 }
 function showST(t){document.querySelectorAll('.stab').forEach(function(b){b.classList.remove('active');});document.querySelectorAll('.stp').forEach(function(p){p.classList.remove('active');});document.getElementById('st-'+t).classList.add('active');document.getElementById('sp-'+t).classList.add('active');}
 function normHex(v){
@@ -2925,16 +2940,37 @@ function syncThemeFromText(){
   if(/^#[0-9a-fA-F]{6}$/.test(v)){var p=document.getElementById('s-theme-picker');if(p)p.value=v;}
 }
 function saveSettings(){
+  var now=settingsInputs(),was=settingsShown||{};
+  function changed(id){return now[id]!==was[id];}
+  if(!SETTINGS_TEXT.concat(SETTINGS_CHECK).some(changed)){closeModal('m-settings');toast('No settings changed','inf');return;}
   snap();
-  S.meta.title=gv('s-title')||'Untitled Survey';S.meta.version=gv('s-ver')||'1.0.0';
-  S.meta.languages=gv('s-lang')||'en';S.meta.authors=gv('s-authors');S.meta.description=gv('s-desc');
-  if(!S.render)S.render={};
-  S.render.mode=gv('s-mode')||'standard';S.render.submit_label=gv('s-submit')||'Submit';S.render.theme=normHex(gv('s-theme'));
-  S.render.welcome={title:gv('s-wt'),intro_text:gv('s-wi'),consent_text:gv('s-wc'),consent_required:document.getElementById('s-wreq').checked,start_label:gv('s-wsl')||'Start Survey'};
-  S.render.thankyou={message:gv('s-tym'),redirect_url:gv('s-tyu'),show_download:document.getElementById('s-tydl').checked};
-  if(!S.render.header)S.render.header={};
-  S.render.header.institution=gv('s-inst');S.render.header.show_progress=document.getElementById('s-prog').checked;
-  S.render.google_sheets_url=gv('s-gsu');S.render.google_sheets_endpoint=gv('s-gsep');
+  if(!S.render||Array.isArray(S.render))S.render={};
+  var R=S.render;
+  // A screen's object is created only when one of its fields changes.
+  function part(k){if(!R[k]||typeof R[k]!=='object')R[k]={};return R[k];}
+  // An emptied author list or description is absent, as R writes it.
+  function orNull(v){v=v.trim();return v?v:null;}
+  if(changed('s-title'))S.meta.title=now['s-title']||'Untitled Survey';
+  if(changed('s-ver'))S.meta.version=now['s-ver']||'1.0.0';
+  if(changed('s-lang'))S.meta.languages=now['s-lang']||'en';
+  if(changed('s-authors'))S.meta.authors=orNull(now['s-authors']);
+  if(changed('s-desc'))S.meta.description=orNull(now['s-desc']);
+  if(changed('s-mode'))R.mode=now['s-mode']||'standard';
+  if(changed('s-submit'))R.submit_label=now['s-submit']||'Submit';
+  if(changed('s-theme'))R.theme=normHex(now['s-theme']);
+  if(changed('s-wt'))part('welcome').title=now['s-wt'];
+  if(changed('s-wi'))part('welcome').intro_text=now['s-wi'];
+  if(changed('s-wc'))part('welcome').consent_text=now['s-wc'];
+  if(changed('s-wreq'))part('welcome').consent_required=now['s-wreq'];
+  if(changed('s-wsl'))part('welcome').start_label=now['s-wsl']||'Start Survey';
+  if(changed('s-tym'))part('thankyou').message=now['s-tym'];
+  if(changed('s-tyu'))part('thankyou').redirect_url=now['s-tyu'];
+  if(changed('s-tydl'))part('thankyou').show_download=now['s-tydl'];
+  if(changed('s-inst'))part('header').institution=now['s-inst'];
+  if(changed('s-prog'))part('header').show_progress=now['s-prog'];
+  if(changed('s-gsu'))R.google_sheets_url=now['s-gsu'];
+  if(changed('s-gsep'))R.google_sheets_endpoint=now['s-gsep'];
+  settingsShown=now;
   closeModal('m-settings');ra();toast('Settings saved','ok');
 }
 
@@ -3093,14 +3129,18 @@ function openSframeText(text){
     if(!src){toast('Invalid .sframe file','err');return;}
     S.meta=src.meta||S.meta;S.choices=src.choices||[];S.items=src.items||[];
     S.scales=src.scales||[];S.branching=src.branching||[];S.checks=src.checks||[];
-    S.analysis_plan=src.analysis_plan||[];S.models=src.models||[];S.render=src.render||S.render;
+    S.analysis_plan=src.analysis_plan||[];S.models=src.models||[];
+  // R writes an empty render as []. Held as an array, every setting saved
+  // into it vanished from the saved file, so it is held as an object, and
+  // sframePayload() writes it back as [] while it stays empty. A file with
+  // no render starts with none, where it used to inherit the previous one.
+  S.render=(src.render&&!Array.isArray(src.render))?src.render:{};
     // Fields this builder does not edit are carried through to the next
     // save. Until 0.4.3 they were dropped, so opening and saving an
     // amended instrument lost its disclosed amendment log.
     if(src.references&&src.references.length)S.references=src.references;else delete S.references;
     S._carry={};['designs','amendments'].forEach(function(k){if(src[k]!==undefined)S._carry[k]=src[k];});
-    ['welcome','thankyou','header'].forEach(function(k){if(!S.render[k])S.render[k]={};});
-    selId=null;ra();dirty=false;lastSaved=Date.now();updSave();
+      selId=null;ra();dirty=false;lastSaved=Date.now();updSave();
     // Surface the SHA-256 integrity status instead of loading silently.
     // The hash is recomputed over the file's own payload, which matches
     // both saveSframe() here and write_sframe() in R.
@@ -3138,7 +3178,7 @@ var SFRAME_FORMAT='1.0';
 // The file as saved, hash still empty. Carried fields and references go back
 // in, each only when present, as write_sframe() in R writes them.
 function sframePayload(){
-  var payload={sframe_format:SFRAME_FORMAT,hash:{algo:'sha256',value:''},version:S.meta.version,meta:S.meta,items:S.items,choices:S.choices,scales:S.scales,branching:S.branching,checks:S.checks,analysis_plan:S.analysis_plan,models:S.models||[],render:S.render};
+  var payload={sframe_format:SFRAME_FORMAT,hash:{algo:'sha256',value:''},version:S.meta.version,meta:S.meta,items:S.items,choices:S.choices,scales:S.scales,branching:S.branching,checks:S.checks,analysis_plan:S.analysis_plan,models:S.models||[],render:Object.keys(S.render||{}).length?S.render:[]};
   var carry=S._carry||{};Object.keys(carry).forEach(function(k){payload[k]=carry[k];});
   if(S.references&&S.references.length)payload.references=S.references;
   return payload;
