@@ -151,7 +151,7 @@ sframe_demo <- function(name, branded = FALSE) {
   responses_path  <- file.path(dir, paste0(data_name, "_responses.csv"))
   instrument <- read_sframe(instrument_path)
   if (isTRUE(branded)) {
-    instrument$render <- sframe_demo_branding()
+    instrument$render <- unclass(sframe_demo_branding())
   }
   # check.names = FALSE matters. A matrix item whose rows carry spaces expands
   # into columns like `session__Opening keynote`, and read.csv()'s default
@@ -173,16 +173,20 @@ sframe_demo <- function(name, branded = FALSE) {
 #' The `render` block [sframe_demo()] splices in when `branded = TRUE`. Read
 #' it, change a colour, and paste it into your own instrument.
 #'
-#' @return A named list suitable for `sf_instrument(render = )`: the display
-#'   `mode`, the `theme` colour, the `submit_label`, and the `welcome`,
-#'   `thankyou` and `header` blocks.
+#' @return A named list of class `sframe_branding`, suitable for
+#'   `sf_instrument(render = )`: the display `mode`, the `theme` colour, the
+#'   `submit_label`, and the `welcome`, `thankyou` and `header` blocks.
+#'   Printing it shows each setting as a respondent meets it.
+#'   [sf_instrument()] and [sframe_demo()] store it as a plain list.
 #' @export
+#' @seealso [preview_demo()] to see the branding applied to a demo.
 #' @examples
 #' branding <- sframe_demo_branding()
+#' branding
 #' branding$welcome$title
 #' branding$theme
 sframe_demo_branding <- function() {
-  list(
+  structure(list(
     mode = "standard",
     theme = "#2563eb",
     submit_label = "Send my feedback",
@@ -201,7 +205,34 @@ sframe_demo_branding <- function() {
       institution = "Riverside Conference Centre",
       logo_base64 = "",
       show_progress = TRUE)
+  ), class = c("sframe_branding", "list"))
+}
+
+#' @export
+print.sframe_branding <- function(x, ...) {
+  w <- x$welcome %||% list()
+  ty <- x$thankyou %||% list()
+  h <- x$header %||% list()
+  quoted <- function(s) if (length(s) && nzchar(s)) paste0("\"", s, "\"") else "(none)"
+  lines <- c(
+    "<sframe demo branding>",
+    paste0("  Theme:         ", x$theme %||% "(default)"),
+    paste0("  Mode:          ", x$mode %||% "standard"),
+    paste0("  Header:        ", if (length(h$institution) && nzchar(h$institution)) h$institution else "(no institution)",
+           if (isTRUE(h$show_progress)) ", progress bar shown" else ""),
+    paste0("  Welcome:       ", quoted(w$title)),
+    if (length(w$intro_text) && nzchar(w$intro_text)) paste0("                 ", w$intro_text),
+    paste0("  Consent:       ", quoted(w$consent_text),
+           if (isTRUE(w$consent_required)) ", required" else ""),
+    paste0("  Start button:  ", quoted(w$start_label)),
+    paste0("  Submit button: ", quoted(x$submit_label)),
+    paste0("  Thank you:     ", quoted(ty$message)),
+    "",
+    "A render block for sf_instrument(render = ). See it applied with",
+    "preview_demo(\"two_group\"), or use sframe_demo(name, branded = TRUE)."
   )
+  cat(lines, sep = "\n")
+  invisible(x)
 }
 
 #' Write responses to SPSS or Stata with the labels attached

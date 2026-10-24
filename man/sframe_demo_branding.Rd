@@ -7,9 +7,11 @@
 sframe_demo_branding()
 }
 \value{
-A named list suitable for \code{sf_instrument(render = )}: the display
-\code{mode}, the \code{theme} colour, the \code{submit_label}, and the \code{welcome},
-\code{thankyou} and \code{header} blocks.
+A named list of class \code{sframe_branding}, suitable for
+\code{sf_instrument(render = )}: the display \code{mode}, the \code{theme} colour, the
+\code{submit_label}, and the \code{welcome}, \code{thankyou} and \code{header} blocks.
+Printing it shows each setting as a respondent meets it.
+\code{\link[=sf_instrument]{sf_instrument()}} and \code{\link[=sframe_demo]{sframe_demo()}} store it as a plain list.
 }
 \description{
 The \code{render} block \code{\link[=sframe_demo]{sframe_demo()}} splices in when \code{branded = TRUE}. Read
@@ -17,6 +19,10 @@ it, change a colour, and paste it into your own instrument.
 }
 \examples{
 branding <- sframe_demo_branding()
+branding
 branding$welcome$title
 branding$theme
+}
+\seealso{
+\code{\link[=preview_demo]{preview_demo()}} to see the branding applied to a demo.
 }

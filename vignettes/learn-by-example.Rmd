@@ -298,7 +298,7 @@ Every demo above ships plain. The whole appearance of a survey lives in one
 instrument:
 
 ```{r branding}
-str(sframe_demo_branding(), max.level = 1)
+sframe_demo_branding()
 ```
 
 Applied to any demo with `branded = TRUE`, which leaves the files on disk

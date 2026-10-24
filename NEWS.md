@@ -200,6 +200,10 @@ style.
 
 ## Demos
 
+* `sframe_demo_branding()` prints each setting as a respondent meets it,
+  with a pointer to `preview_demo()`. It printed a raw nested list, which
+  read as a failed demo. It returns a list of class `sframe_branding`, and
+  `sf_instrument()` stores it as a plain list.
 * `sframe_demo("instrument_revision")` takes a further amendment. Its
   amendment log recorded hashes from code that predates the settled content
   hash, so `amend_sframe()` on it failed with "The amendment log is out of
