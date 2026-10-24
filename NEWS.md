@@ -105,6 +105,13 @@ style.
   place of a result. The roles a method reads are found from the same
   resolver the analysis uses, so the 2 stay in step. `partial_correlation`
   and `mediation` also accept every role alias their runners read.
+* **A block's error names its cause.** A block whose role named an item the
+  instrument lacked reported "Test failed.", and 8 other runners gave
+  errors as bare as "ANOVA failed.". `run_analysis_plan()` now names a
+  variable the responses lack, saying whether it is an unknown name, an item
+  with no column or a scale with no scored column, and a test that fails
+  says which variable holds no numbers, or that too few responses had a
+  value, or else passes on R's own reason.
 * **A choice set whose codes read as the same number is refused**, by
   `sf_choices()` and by `validate_sframe()`. Responses to a set whose codes
   are all numbers are read as numbers, so the codes 1 and 1.0, or 2 and 02,

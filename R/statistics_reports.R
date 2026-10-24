@@ -1249,8 +1249,10 @@ sframe_run_repeated_anova <- function(data, roles) {
   )
   long <- long[!is.na(long$value), , drop = FALSE]
   fit <- tryCatch(stats::aov(value ~ condition + Error(.subject / condition), data = long),
-                  error = function(e) NULL)
-  if (is.null(fit)) return(list(test = "repeated_anova", error = "Repeated-measures ANOVA failed."))
+                  error = function(e) e)
+  if (inherits(fit, "error")) {
+    return(list(test = "repeated_anova", error = sframe_test_failure(fit, data, vars)))
+  }
   fit_summary <- utils::capture.output(summary(fit))
   # Error(.subject / condition) always expands to exactly 2 strata, in this
   # fixed order: "Error: .subject" (a between-subjects leftover, degenerate
@@ -1413,8 +1415,10 @@ sframe_run_anova_two <- function(data, roles) {
   df[[f2]] <- as.factor(df[[f2]])
   df <- df[stats::complete.cases(df), , drop = FALSE]
   fit <- tryCatch(stats::aov(stats::as.formula(paste(outcome, "~", f1, "*", f2)), data = df),
-                  error = function(e) NULL)
-  if (is.null(fit)) return(list(test = "anova_two", error = "Two-way ANOVA failed."))
+                  error = function(e) e)
+  if (inherits(fit, "error")) {
+    return(list(test = "anova_two", error = sframe_test_failure(fit, data, outcome)))
+  }
   tab <- summary(fit)[[1]]
   ss_error <- tab[["Sum Sq"]][nrow(tab)]
   partial_eta <- tab[["Sum Sq"]] / (tab[["Sum Sq"]] + ss_error)
