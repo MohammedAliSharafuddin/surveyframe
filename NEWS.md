@@ -15,6 +15,56 @@ teaching session on 0.4.2 found. Install it with
   below. Numbers for a `single_choice` or `multiple_choice` column move from
   the mean and SD table to a table of counts and percentages.
 
+## References, cited where they are used and listed once at the end
+
+An instrument can now carry the works it draws on, and every report lists
+them once, in a References section at the end, in a standard bibliography
+style.
+
+* **`sf_reference()`** creates a reference as a CSL-JSON record, the format
+  Zotero, Mendeley and pandoc share. **`read_bibtex()`** reads BibTeX, as
+  exported by Google Scholar, Zotero, Mendeley and most journal pages, using
+  base R alone. **`add_references()`** attaches references to an
+  instrument, and `sf_instrument(components = )` takes them too.
+  **`sframe_references()`** lists them, and **`sframe_bibliography()`**
+  writes the CSL-JSON a citation processor reads.
+* **Each reference says where it is cited**: the instrument as a whole, an
+  item, a scale, a plan block or a model, in its `cited_by` field.
+  `validate_sframe()` gains a `references` check that every target exists
+  and every key is unique. A work in another language can carry `language`, which keeps a style
+  from title-casing its journal name.
+* **`render_report()` cites in text and lists each work once, at the end.**
+  Each result used to carry its own reference list, so the same works
+  repeated through the report. Results now cite their methods in text, for
+  example "(Cohen, 1988)", and the codebook names the source of
+  each item and scale. A written interpretation can cite a work as `[@key]`.
+  The list at the end is formatted by pandoc's citation processor in APA 7,
+  bundled with the package, or in any style given as `csl = `. The new
+  `references =` argument adds works a host cites in the write-up.
+  `render_results()` lists its references once at the end in the same way.
+* **The 30 built-in method references are also held as CSL-JSON.** A test
+  formats each one through pandoc in APA 7 and compares it with the APA text
+  the package already shipped, which holds the 2 forms together.
+* **SurveyBuilder has a References tab in Survey settings.** Paste BibTeX or
+  type a reference in, and choose where the instrument cites it. Changes
+  apply at once, ahead of Save settings.
+
+### The file format
+
+* `references` is a new optional top-level field. It is written only when an
+  instrument has at least one, so an instrument with no references keeps the
+  file hash it had, the rule `designs` and `amendments` already follow.
+* **Citing a source is disclosure, outside the amendment record.** The
+  content hash that `amend_sframe()` records leaves `references` out, so a
+  reference can be added to a published instrument directly.
+* `inst/schema/sframe_schema.json` documents the field. Its description of
+  the amendment content hash was also wrong: it named only the items,
+  choices, scales, branching, checks, plan, models and designs, while the
+  hash has always covered every field except `hash` and `amendments`,
+  `meta`, `render` and `version` included. Corrected.
+* `inst/csl/apa.csl`, the APA 7 style from the Zotero Style Repository, is
+  bundled under CC BY-SA 3.0. See `inst/COPYRIGHTS`.
+
 ## Analysis
 
 * A `frequency` block gives one frequency table per variable. It reads the
@@ -65,6 +115,14 @@ teaching session on 0.4.2 found. Install it with
 * The Outcome and other role dropdowns stay inside the Add or Edit Analysis
   Plan dialog when an item label is long. The role grid columns can now
   shrink, and each select fills its column.
+* **SurveyBuilder keeps the amendment log.** Opening an amended `.sframe`
+  file in the builder and saving it dropped its `amendments`, `designs` and
+  `sframe_format` fields, so a disclosed revision vanished silently. The
+  builder now carries every field it leaves unedited through to the next
+  save.
+* **SurveyBuilder's Survey settings dialog scrolls.** A tab taller than the
+  dialog ran past its bottom edge, with its last controls out of reach. The
+  dialog body now shrinks to fit and scrolls.
 
 ## SurveyStudio
 
@@ -91,6 +149,7 @@ teaching session on 0.4.2 found. Install it with
 * SurveyBuilder tags every `single_choice` item as nominal, ordinal ones
   included. Marking a choice set as ordered needs a new field in the format,
   which a later release can add.
+
 
 # surveyframe 0.4.2
 

@@ -1,0 +1,10 @@
+surveyframe is distributed under the MIT licence (see LICENSE). One bundled
+file is a third-party work under its own licence:
+
+inst/csl/apa.csl
+  "APA Style 7th edition", a Citation Style Language style from the Zotero
+  Style Repository, http://www.zotero.org/styles/apa, last updated
+  2026-02-07. Licensed under the Creative Commons Attribution-ShareAlike 3.0
+  License, http://creativecommons.org/licenses/by-sa/3.0/. Its authors and
+  contributors are listed in the file itself. It is shipped unmodified and is
+  used by render_report() to format the References section.

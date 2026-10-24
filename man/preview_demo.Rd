@@ -28,8 +28,8 @@ For \code{"browser"}, the path of the HTML page, invisibly. For
 \description{
 Loads a bundled demo with the standard branding and opens it as a
 respondent would see it, either as a standalone page in the browser or on
-SurveyStudio's preview screen. The preview cannot collect, so trying it
-sends nothing anywhere.
+SurveyStudio's preview screen. The preview has its collector removed, so
+trying it is safe.
 }
 \examples{
 path <- preview_demo("two_group", open = FALSE)

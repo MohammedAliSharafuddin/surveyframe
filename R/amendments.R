@@ -68,6 +68,9 @@ sframe_content_hash <- function(instrument, box = TRUE) {
   payload <- sframe_serialization_payload(instrument, box = box)
   payload$hash <- NULL
   payload$amendments <- NULL
+  # Citing a source is disclosure, not a design change, so a reference added
+  # to a published instrument needs no amendment. See R/references.R.
+  payload$references <- NULL
   as.character(openssl::sha256(sframe_hash_json(payload, canonical = TRUE)))
 }
 
