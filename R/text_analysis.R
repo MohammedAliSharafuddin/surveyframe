@@ -398,14 +398,14 @@ sframe_run_co_occurrence <- function(data, roles, options, instrument) {
 # that is part of the brief's requested STM table, but it is not needed by
 # the shared plot.
 #
-# The fitted model object ($fit$model) is runtime-only, exactly like every
+# The fitted model object is runtime-only, exactly like every
 # other run_analysis_plan() result (see R/read_write_sframe.R's
 # sframe_restore_analysis_block(): only block *definitions* are persisted to
-# a .sframe file, never computed results). It is kept on the result list
-# only so extract_quotes() can read it back in the same R session; it must
-# never be copied into anything JSON-safe (jsonlite::toJSON(), a builder
-# payload, a hash target) and callers must not assume it survives a
-# save/reload round trip.
+# a .sframe file, never computed results). It is kept in the result's
+# runtime attribute (sframe_set_runtime()) only so extract_quotes() can read
+# it back in the same R session. An attribute is left out of
+# jsonlite::toJSON(), so the result list serialises as it stands, and callers
+# must not assume the model survives a save/reload round trip.
 
 # Guard shared by both topic-model runners: package plus minimum-response
 # checks, returning either NULL (fine to proceed) or an error string.
@@ -506,21 +506,18 @@ sframe_run_topic_model_lda <- function(data, roles, options, instrument) {
   topic1 <- top_terms[top_terms$topic == 1, , drop = FALSE]
   topic1_terms <- utils::head(topic1$term, 5)
 
-  list(
+  sframe_set_runtime(list(
     test = "topic_model_lda",
     variable = item_id,
     n = nrow(dtm),
     table = top_terms,
-    fit = list(
-      model = fit,                      # runtime-only, see file header note
-      dtm_respondent = dtm_respondent
-    ),
+    fit = list(dtm_respondent = dtm_respondent),
     apa = sprintf(
       "LDA topic model (k = %d, N = %d documents). Topic 1 top terms: %s.",
       k, nrow(dtm), paste(topic1_terms, collapse = ", ")
     ),
     prompt = "Review topic coherence and label each topic from its top terms."
-  )
+  ), "model", fit)  # runtime-only, see file header note
 }
 
 #' Fit a structural topic model (STM) on open-ended text
@@ -633,19 +630,16 @@ sframe_run_stm_topics <- function(data, roles, options, instrument) {
   }))
   rownames(top_terms) <- NULL
 
-  list(
+  sframe_set_runtime(list(
     test = "stm_topics",
     variable = item_id,
     n = length(prepped$documents),
     table = top_terms,
-    fit = list(
-      model = fit,                   # runtime-only, see file header note
-      respondent = dtm_respondent
-    ),
+    fit = list(respondent = dtm_respondent),
     apa = sprintf("STM topic model (k = %d, N = %d documents).",
                   k, length(prepped$documents)),
     prompt = "Review topic coherence and proportions, and label each topic from its top terms."
-  )
+  ), "model", fit)  # runtime-only, see file header note
 }
 
 #' Extract representative quotes for each STM topic
@@ -690,15 +684,16 @@ sframe_run_stm_topics <- function(data, roles, options, instrument) {
 #' }
 extract_quotes <- function(model, text, n_quotes = 3L) {
   sframe_require_stm(reason = "to extract representative quotes.")
-  if (!is.list(model) || is.null(model$fit) || is.null(model$fit$model) ||
-      is.null(model$fit$respondent)) {
+  # The fitted model sits in the result's runtime attribute since 0.4.3. A
+  # result made earlier in the session carried it as $fit$model.
+  fit <- if (is.list(model)) sframe_runtime(model, "model") %||% model$fit$model
+  if (!is.list(model) || is.null(fit) || is.null(model$fit$respondent)) {
     rlang::abort(
       paste0("`model` must be a stm_topics result list from sframe_run_stm_topics(), ",
-             "carrying $fit$model and $fit$respondent."),
+             "carrying its fitted model and $fit$respondent."),
       class = "sframe_error"
     )
   }
-  fit <- model$fit$model
   respondent_map <- model$fit$respondent
   k <- fit$settings$dim$K
 

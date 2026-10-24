@@ -1036,10 +1036,10 @@ sframe_run_descriptives_result <- function(data, roles, options = list(),
     conf_level = options$conf_level %||% 0.95,
     weights = weights
   )
-  # report_obj keeps the classed object for sframe_plot_for_result() to
+  # The runtime report keeps the classed object for sframe_plot_for_result() to
   # dispatch plot() on, same pattern as sframe_result_from_report() elsewhere:
   # the unclassed, merged result list is not safe to treat as report-shaped.
-  res <- c(unclass(out), list(test = "descriptives", report_obj = out))
+  res <- sframe_set_runtime(c(unclass(out), list(test = "descriptives")), "report", out)
   if (!is.null(cat_tbl)) {
     res$categorical <- cat_tbl
     res$note <- note
@@ -1113,10 +1113,11 @@ sframe_choice_counts_table <- function(data, columns, kinds, instrument) {
 sframe_run_missing_result <- function(data, instrument, roles) {
   vars <- sframe_role_values(roles, c("variables", "items"))
   out <- missing_data_report(data, instrument = instrument, variables = if (length(vars)) vars else NULL)
-  # report_obj keeps the original classed object so sframe_plot_for_result()
+  # The runtime report keeps the original classed object so sframe_plot_for_result()
   # can dispatch plot.sframe_missing_data_report() on it, the same pattern
   # sframe_result_from_report() uses for quality/reliability/EFA.
-  c(unclass(out), list(test = "missing_data", table = out$item_missing, report_obj = out))
+  sframe_set_runtime(c(unclass(out), list(test = "missing_data", table = out$item_missing)),
+                     "report", out)
 }
 
 sframe_run_fisher <- function(data, roles, options = list()) {

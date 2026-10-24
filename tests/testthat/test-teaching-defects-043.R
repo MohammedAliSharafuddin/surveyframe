@@ -117,8 +117,9 @@ test_that("3: descriptives never reports a mean for a nominal item", {
 
   expect_null(res$error)
   # The numeric table holds age alone
-  expect_identical(res$report_obj$table$variable, "age")
-  expect_false(any(grepl("gender", res$report_obj$table$variable)))
+  report <- surveyframe:::sframe_runtime(res, "report")
+  expect_identical(report$table$variable, "age")
+  expect_false(any(grepl("gender", report$table$variable)))
   # Gender is counted instead
   cat_tbl <- res$categorical
   expect_true(is.data.frame(cat_tbl))
