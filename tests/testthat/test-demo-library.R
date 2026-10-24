@@ -85,7 +85,7 @@ test_that("branded = TRUE applies the branding and leaves the file alone", {
 
   plain <- sframe_demo(nm)
   branded <- sframe_demo(nm, branded = TRUE)
-  expect_identical(branded$instrument$render, sframe_demo_branding())
+  expect_identical(branded$instrument$render, unclass(sframe_demo_branding()))
   expect_false(identical(plain$instrument$render, branded$instrument$render))
   # One branding definition serves every demo, and nothing on disk moves.
   expect_identical(tools::md5sum(path), before)
