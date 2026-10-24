@@ -1854,10 +1854,8 @@ render_results <- function(
     apa_str <- r$apa %||% ""
     prompt  <- r$interpretation_prompt %||% r$prompt %||% ""
     interp  <- interpretations[[r$block_id %||% r$id %||% ""]] %||% r$interpretation %||% ""
-    cits <- paste(
-      vapply(unlist(r$citations), sframe_md_em, character(1)),
-      collapse = "<br>"
-    )
+    # Cited in text, author and year. The works are listed once, at the end.
+    cits <- htmltools_escape(sframe_intext_citation(names(r$citations %||% list())))
 
     if (!is.null(r$error)) {
       return(sprintf(
@@ -1941,10 +1939,7 @@ render_results <- function(
           <div class="prompt-box">%s</div>
           <div class="interp-text">%s</div>
         </div>
-        <div class="citations-section">
-          <h4>References</h4>
-          <div class="citation-list">%s</div>
-        </div>
+        <p class="citation-list">References for this analysis: %s</p>
       </section>',
       i, rq, htmltools_escape(apa_str), effect_badge,
       tbl_html,
@@ -1956,14 +1951,13 @@ render_results <- function(
   }, character(1)), collapse = "\n")
 
   references_html <- if (length(all_citations) > 0) {
+    # Alphabetical, unnumbered and with a hanging indent, as APA lists them.
+    entries <- sort(unique(unlist(all_citations)))
     items <- paste(
-      sprintf(
-        '<li>%s</li>',
-        vapply(unlist(all_citations), sframe_md_em, character(1))
-      ),
+      sprintf('<div class="csl-entry">%s</div>', vapply(entries, sframe_md_em, character(1))),
       collapse = "\n"
     )
-    sprintf('<section class="references"><h2>References</h2><ol>%s</ol></section>', items)
+    sprintf('<section class="references"><h2>References</h2>%s</section>', items)
   } else ""
 
   html <- sprintf('<!DOCTYPE html>
@@ -2005,7 +1999,6 @@ render_results <- function(
   .prompt-box::before { content: "Writing prompt: "; font-weight: 700; }
   .interp-text { font-size: 15px; color: #333; padding: 8px 0; }
   .empty-interp { color: #aaa; font-style: italic; }
-  .citations-section { border-top: 1px solid #eee; padding-top: 12px; }
   .citation-list { font-size: 13px; color: #555; line-height: 1.8; }
   .results-table { width: 100%%; border-collapse: collapse; font-size: 14px;
                     display: block; overflow-x: auto; max-width: 100%%;
@@ -2020,8 +2013,7 @@ render_results <- function(
   .error-box { background: #fde8e8; border-left: 4px solid #b91c1c;
                 padding: 10px 14px; border-radius: 0 6px 6px 0; color: #7f1d1d; }
   .references { margin-top: 40px; border-top: 2px solid #eee; padding-top: 20px; }
-  .references ol { padding-left: 20px; }
-  .references li { font-size: 14px; margin-bottom: 8px; color: #333; }
+  .references .csl-entry { font-size: 14px; margin-bottom: 8px; color: #333; padding-left: 2em; text-indent: -2em; }
   .meta { color: #777; font-size: 13px; margin-bottom: 32px; }
 </style>
 </head>

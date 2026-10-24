@@ -19,7 +19,9 @@ render_report(
   include_models = TRUE,
   plot_palette = c("web", "print"),
   interpretations = NULL,
-  show_code = TRUE
+  show_code = TRUE,
+  references = NULL,
+  csl = NULL
 )
 }
 \arguments{
@@ -79,6 +81,15 @@ block with the statistical call that produced it, built by
 \code{\link[=analysis_syntax]{analysis_syntax()}} from the same resolved specification the analysis ran.
 Defaults to \code{TRUE}. A method \code{\link[=analysis_syntax]{analysis_syntax()}} does not cover shows no
 block, rather than a guess at the call.}
+
+\item{references}{Optional further \code{\link[=sf_reference]{sf_reference()}} records, for example
+the works a host cites in the written interpretations, which are cited
+in text as \verb{[@id]}. The instrument's own references
+(\code{\link[=add_references]{add_references()}}) and the methods' references are always included.}
+
+\item{csl}{Optional path to a Citation Style Language file for the
+References section. Defaults to APA 7th edition, bundled with the
+package. Any style from the Zotero style repository works.}
 }
 \value{
 The output file path, invisibly.
@@ -90,6 +101,16 @@ When Quarto and the bundled template are available, the report is rendered
 through Quarto. Otherwise, surveyframe writes an internal HTML fallback so
 the reporting workflow still runs on machines without Quarto.
 }
+\section{References}{
+
+The Quarto report cites in text, author and year, and lists every work it
+cites once, in a References section at the end, formatted by pandoc's
+citation processor in the chosen style. That covers the methods' own
+references, the sources the instrument cites for its items, scales, plan
+blocks and models, and \code{references}. The built-in HTML engine, used when
+Quarto is unavailable, lists the methods' references the same way.
+}
+
 \examples{
 instr <- read_sframe(
   system.file("extdata", "tourism_services_demo.sframe",

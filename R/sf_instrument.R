@@ -17,7 +17,8 @@
 #'   Defaults to `"en"`. Multi-language support is planned for a later release.
 #' @param components List. A list of component objects created by the
 #'   constructor family: [sf_item()], [sf_choices()], [sf_scale()],
-#'   [sf_branch()], [sf_check()], and [sf_conjoint_design()]. Components are
+#'   [sf_branch()], [sf_check()], [sf_conjoint_design()], and [sf_reference()].
+#'   Components are
 #'   sorted by class automatically, so they can be supplied in any order.
 #' @param render List or NULL. Optional rendering hints passed to
 #'   [render_survey()], such as theme colour or progress bar visibility.
@@ -89,10 +90,11 @@ sf_instrument <- function(
   branching <- Filter(function(x) inherits(x, "sf_branch"),  components)
   checks    <- Filter(function(x) inherits(x, "sf_check"),   components)
   designs   <- Filter(function(x) inherits(x, "sf_conjoint_design"), components)
+  references <- Filter(function(x) inherits(x, "sf_reference"), components)
 
   # Keep the component list limited to known surveyframe classes.
   known_classes <- c("sf_item", "sf_choices", "sf_scale", "sf_branch",
-                     "sf_check", "sf_conjoint_design")
+                     "sf_check", "sf_conjoint_design", "sf_reference")
   unknown <- Filter(
     function(x) !any(vapply(known_classes, function(cls) inherits(x, cls), logical(1))),
     components
@@ -127,7 +129,8 @@ sf_instrument <- function(
       designs   = designs,
       analysis_plan = analysis_plan %||% list(),
       models    = models %||% list(),
-      render    = render %||% list()
+      render    = render %||% list(),
+      references = unname(references)
     ),
     class = "sframe"
   )

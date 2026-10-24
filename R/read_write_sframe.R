@@ -133,6 +133,14 @@ sframe_serialization_payload <- function(instrument, hash_value = "", box = TRUE
                                        sframe_collection_fields$amendments))
   }
 
+  # `references` (0.4.3) follows the same rule again: an instrument that cites
+  # nothing hashes exactly as it did before references existed. See
+  # R/references.R for why the cite links live on the reference.
+  references <- instrument$references %||% list()
+  if (length(references) > 0) {
+    payload$references <- unname(lapply(references, sframe_reference_plain))
+  }
+
   payload
 }
 
@@ -672,7 +680,9 @@ read_sframe <- function(path, validate = TRUE) {
       # Absent in every file written before amend_sframe() existed, so this
       # stays an empty list rather than failing on an older instrument, same
       # precedent as `designs` above.
-      amendments = lapply(parsed$amendments %||% list(), sframe_restore_amendment)
+      amendments = lapply(parsed$amendments %||% list(), sframe_restore_amendment),
+      # Absent in every file written before 0.4.3, same precedent again.
+      references = lapply(parsed$references %||% list(), sframe_restore_reference)
     ),
     class = "sframe"
   )
