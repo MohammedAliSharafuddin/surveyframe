@@ -110,7 +110,7 @@ test_that("10: the bundled schema agrees with the reader and the writer", {
   path <- system.file("schema", "sframe_schema.json", package = "surveyframe")
   skip_if(!nzchar(path), "bundled schema not found")
   schema <- jsonlite::fromJSON(path, simplifyVector = FALSE)
-  expect_setequal(unlist(schema$required), c("hash", "meta", "items"))
+  expect_setequal(unlist(schema$required), c("sframe_format", "hash", "meta", "items"))
   expect_true("array" %in% unlist(schema$properties$render$type))
   expect_false(grepl("byte-identical", schema$properties$hash$description, fixed = TRUE))
 })

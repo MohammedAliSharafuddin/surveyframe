@@ -464,7 +464,10 @@ editor. Any tool that reads JSON can open one, and the format
 is documented independently of this package in
 `system.file("schema", "sframe_schema.json", package = "surveyframe")`, a
 JSON Schema a reviewer or a second tool can validate against, with R left
-out of the loop.
+out of the loop. It is a copy of the instrument profile published in the
+sframe-schema repository, kept identical by a test, so the package and the
+published format describe the same file. `read_sframe()` also reads files
+written before the `sframe_format` field existed.
 
 ```{r schema-path}
 schema_path <- system.file("schema", "sframe_schema.json", package = "surveyframe")

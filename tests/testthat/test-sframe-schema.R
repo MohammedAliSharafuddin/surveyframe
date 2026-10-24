@@ -15,9 +15,10 @@ test_that("the schema file is installed and parses as JSON", {
   skip_if(!nzchar(path), "schema not found via system.file(); run devtools::load_all() first")
   schema <- jsonlite::fromJSON(path, simplifyVector = FALSE)
   expect_equal(schema$type, "object")
-  # The core every profile shares. version, choices and scales are optional
-  # and default when absent, matching read_sframe().
-  expect_setequal(unlist(schema$required), c("hash", "meta", "items"))
+  # The bundled schema is sframe-schema's instrument profile, which describes
+  # what write_sframe() writes, sframe_format included. read_sframe() also
+  # reads older files without it. version, choices and scales are optional.
+  expect_setequal(unlist(schema$required), c("sframe_format", "hash", "meta", "items"))
   expect_true(all(c("version", "choices", "scales") %in% names(schema$properties)))
 })
 
@@ -61,4 +62,25 @@ test_that("a .sframe file with an amendment round-trips its amendments key again
   entry <- written$amendments[[1]]
   required_entry_keys <- schema$properties$amendments$items$required
   expect_true(all(required_entry_keys %in% names(entry)))
+})
+
+# Ethos request 29 (2026-10-06). The bundled copy did not require
+# sframe_format and lacked references, while sframe-schema's instrument
+# profile required the first and documented the second, so a file could be
+# valid by one and invalid by the other. The bundled copy is now the profile,
+# copied by data-raw/sync_sframe_schema.R.
+test_that("29: the bundled schema is sframe-schema's instrument profile", {
+  bundled <- schema_path()
+  skip_if(!nzchar(bundled), "schema not found via system.file()")
+  profile <- test_path("..", "..", "..", "sframe-schema", "schema",
+                       "sframe-instrument.schema.json")
+  skip_if(!file.exists(profile), "sframe-schema repository not beside this one")
+  expect_identical(readLines(bundled, warn = FALSE), readLines(profile, warn = FALSE))
+})
+
+test_that("29: the bundled schema documents every field write_sframe() can write", {
+  schema <- jsonlite::fromJSON(schema_path(), simplifyVector = FALSE)
+  expect_true(all(c("sframe_format", "references", "designs", "amendments") %in%
+                    names(schema$properties)))
+  expect_identical(schema$properties$sframe_format$type, "string")
 })
