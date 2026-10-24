@@ -11,7 +11,8 @@ sframe_builder_as_choice <- function(choice) {
     values = choice$values,
     labels = choice$labels,
     allow_other = isTRUE(choice$allow_other),
-    randomise = isTRUE(choice$randomise)
+    randomise = isTRUE(choice$randomise),
+    ordered = isTRUE(choice$ordered)
   )
 }
 

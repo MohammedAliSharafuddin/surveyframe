@@ -56,6 +56,12 @@ sframe_choice_content_problems <- function(values, labels) {
 #'   at the end of the choice list. Defaults to `FALSE`.
 #' @param randomise Logical. Whether to randomise the display order of options
 #'   at render time. Defaults to `FALSE`.
+#' @param ordered Logical. Whether the options run in a meaningful order, from
+#'   least to most or the reverse, as in a frequency or an education scale.
+#'   SurveyBuilder and SurveyStudio then treat a `single_choice` item on the
+#'   set as ordinal, which opens the methods for ordered categories. Defaults
+#'   to `FALSE`, nominal. Written to the file only when `TRUE`, so every
+#'   earlier set keeps the hash it had. A `likert` item is ordered by its type.
 #'
 #' @return An object of class `sf_choices` (a named list).
 #' @export
@@ -70,19 +76,25 @@ sframe_choice_content_problems <- function(values, labels) {
 #'              "Agree", "Strongly agree")
 #' )
 #'
-#' # A yes/no set
-#' yn <- sf_choices(
-#'   id     = "yn",
-#'   values = c("yes", "no"),
-#'   labels = c("Yes", "No")
+#' # An ordered set: a single_choice item on it is read as ordinal
+#' often <- sf_choices(
+#'   id      = "often",
+#'   values  = 1:4,
+#'   labels  = c("Rarely", "Sometimes", "Often", "Always"),
+#'   ordered = TRUE
 #' )
 sf_choices <- function(
     id,
     values,
     labels,
     allow_other = FALSE,
-    randomise   = FALSE
+    randomise   = FALSE,
+    ordered     = FALSE
 ) {
+  if (!is.logical(ordered) || length(ordered) != 1 || is.na(ordered)) {
+    rlang::abort("`ordered` must be TRUE or FALSE.",
+                 class = c("sframe_validation_error", "sframe_error"))
+  }
   if (length(values) != length(labels)) {
     rlang::abort(
       "`values` and `labels` must have the same length.",
@@ -98,14 +110,24 @@ sf_choices <- function(
     )
   }
 
-  structure(
-    list(
-      id          = id,
-      values      = values,
-      labels      = labels,
-      allow_other = allow_other,
-      randomise   = randomise
-    ),
-    class = "sf_choices"
+  out <- list(
+    id          = id,
+    values      = values,
+    labels      = labels,
+    allow_other = allow_other,
+    randomise   = randomise
   )
+  # Present only when TRUE, so every set made before the field existed
+  # serialises, and hashes, exactly as it did.
+  if (ordered) out$ordered <- TRUE
+  structure(out, class = "sf_choices")
+}
+
+# Whether the choice set `set_id` declares its options ordered.
+sframe_choice_set_ordered <- function(instrument, set_id) {
+  if (is.null(set_id) || !nzchar(as.character(set_id)[1])) return(FALSE)
+  for (cs in instrument$choices %||% list()) {
+    if (identical(as.character(cs$id)[1], as.character(set_id)[1])) return(isTRUE(cs$ordered))
+  }
+  FALSE
 }
