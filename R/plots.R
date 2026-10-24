@@ -1173,12 +1173,12 @@ sframe_plot_for_result <- function(result, data, palette = c("web", "print")) {
     moderation          = function() sframe_plot_moderation(result, data, palette),
     mediation           = function() sframe_plot_mediation(result, palette),
     missing_data        = function() {
-      if (is.null(result$report_obj)) return(NULL)
-      graphics::plot(result$report_obj, palette = palette)
+      if (is.null(sframe_runtime(result, "report"))) return(NULL)
+      graphics::plot(sframe_runtime(result, "report"), palette = palette)
     },
     # quality/reliability_*/efa_*/item_diagnostics results come from
     # sframe_result_from_report(), which keeps the original classed report
-    # object in $report_obj so plot() can dispatch normally instead of
+    # object as its runtime report so plot() can dispatch normally instead of
     # re-iterating the analysis-plan-field-merged result list as if it were
     # still report-shaped.
     quality             = ,
@@ -1187,12 +1187,12 @@ sframe_plot_for_result <- function(result, data, palette = c("web", "print")) {
     efa_readiness       = ,
     efa_solution        = ,
     descriptives        = function() {
-      if (is.null(result$report_obj)) {
+      if (is.null(sframe_runtime(result, "report"))) {
         # Choice items alone are counted, so they plot as a frequency chart
         if (is.data.frame(result$categorical)) return(sframe_plot_frequency(result, palette))
         return(NULL)
       }
-      graphics::plot(result$report_obj, data = data, palette = palette)
+      graphics::plot(sframe_runtime(result, "report"), data = data, palette = palette)
     },
     item_diagnostics    = function() sframe_plot_item_diagnostics(result, palette),
     term_freq           = function() sframe_plot_term_frequency(result, palette),
@@ -2453,7 +2453,7 @@ sframe_plot_mediation <- function(result, palette = c("web", "print")) {
 sframe_plot_item_diagnostics <- function(result, palette = c("web", "print")) {
   rlang::check_installed("ggplot2", reason = "to plot item-rest correlations.")
   palette <- match.arg(palette)
-  ir <- result$report_obj
+  ir <- sframe_runtime(result, "report")
   if (is.null(ir)) return(NULL)
   tbl <- sframe_item_diagnostics_table(ir)
   if (is.null(tbl) || !"item_rest_r" %in% colnames(tbl)) return(NULL)

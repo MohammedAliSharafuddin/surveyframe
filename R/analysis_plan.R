@@ -1089,14 +1089,45 @@ sframe_vars_for_method <- function(method, roles, block) {
 }
 
 sframe_result_from_report <- function(report, test = report$method %||% "") {
-  out <- unclass(report)
+  out <- sframe_plain(unclass(report))
   out$test <- test
   # Keep the original classed object too: sframe_plot_for_result() dispatches
   # plot.sframe_quality_report()/plot.sframe_reliability_report()/etc. on
   # this, since the unclassed, analysis-plan-field-merged `out` above is not
   # safe to iterate as if every element were still a per-scale/report entry.
-  out$report_obj <- report
-  out
+  sframe_set_runtime(out, "report", report)
+}
+
+# Objects a result needs in this R session alone: the classed report behind
+# a psychometric result, a fitted topic model. They sit in an attribute,
+# which jsonlite::toJSON() leaves out, so every result list serialises as it
+# stands. A fitted stm model inside the list stopped a host serialising the
+# results at all (Ethos request 5). Read them with sframe_runtime().
+sframe_set_runtime <- function(result, name, value) {
+  runtime <- attr(result, "sframe_runtime") %||% list()
+  runtime[[name]] <- value
+  attr(result, "sframe_runtime") <- runtime
+  result
+}
+
+sframe_runtime <- function(result, name) {
+  attr(result, "sframe_runtime")[[name]]
+}
+
+# A report's own fields as plain data: classed lists unclassed, and calls,
+# functions, environments and S4 objects dropped, since none of them has a
+# JSON form. psych's KMO and parallel-analysis objects carry their call.
+sframe_plain <- function(x) {
+  if (is.data.frame(x)) return(x)
+  if (is.list(x)) {
+    keep <- !vapply(x, function(v) {
+      is.language(v) || is.function(v) || is.environment(v) || isS4(v)
+    }, logical(1))
+    x <- x[keep]
+    if (!is.null(oldClass(x))) x <- unclass(x)
+    x[] <- lapply(x, sframe_plain)
+  }
+  x
 }
 
 #' The second table a result carries, if it has one
@@ -1352,23 +1383,23 @@ sframe_result_table <- function(result) {
       )
     },
     quality = {
-      qr <- result$report_obj
+      qr <- sframe_runtime(result, "report")
       if (is.null(qr)) NULL else sframe_quality_checks_table(qr)
     },
     reliability_alpha = {
-      rr <- result$report_obj
+      rr <- sframe_runtime(result, "report")
       if (is.null(rr)) NULL else sframe_reliability_table(rr, c(alpha = "Alpha", alpha_std = "Alpha (std.)"))
     },
     reliability_omega = {
-      rr <- result$report_obj
+      rr <- sframe_runtime(result, "report")
       if (is.null(rr)) NULL else sframe_reliability_table(rr, c(omega_h = "Omega (h)", omega_t = "Omega (t)"))
     },
     item_diagnostics = {
-      ir <- result$report_obj
+      ir <- sframe_runtime(result, "report")
       if (is.null(ir)) NULL else sframe_item_diagnostics_table(ir)
     },
     efa_readiness = {
-      er <- result$report_obj
+      er <- sframe_runtime(result, "report")
       if (is.null(er)) NULL else data.frame(
         Statistic = c("KMO (MSA)", "Bartlett chi-square", "Bartlett df",
                       "Bartlett p", "Suggested factors"),
@@ -1380,7 +1411,7 @@ sframe_result_table <- function(result) {
       )
     },
     efa_solution = {
-      es <- result$report_obj
+      es <- sframe_runtime(result, "report")
       if (is.null(es) || !is.data.frame(es$loadings_long)) NULL else {
         wide <- stats::reshape(es$loadings_long, direction = "wide",
                                idvar = "item_id", timevar = "factor")

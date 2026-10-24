@@ -14,6 +14,16 @@ teaching session on 0.4.2 found. Install it with
 * **A descriptives block counts choice items.** See
   below. Numbers for a `single_choice` or `multiple_choice` column move from
   the mean and SD table to a table of counts and percentages.
+* **Every plan result serialises with `jsonlite::toJSON()`.** The classed
+  report behind a descriptives, missing-data, quality, reliability, EFA or
+  item-diagnostics result, and a fitted LDA or STM topic model, now sit in an
+  attribute for the current R session, which `toJSON()` leaves out. Code
+  reading `result$report_obj` or `result$fit$model` should stop doing so:
+  `extract_quotes()` finds the model itself, and the charts
+  `run_analysis_plan(plots = TRUE)` draws are unchanged. The KMO and parallel-analysis parts of an EFA readiness result
+  are now plain lists holding the same numbers. A host serialising results
+  failed on all of these, 20 blocks across the demos. Charts drawn with
+  `plots = TRUE` stay on the result as `ggplot` objects.
 
 ## References, cited where they are used and listed once at the end
 
