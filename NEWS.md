@@ -171,6 +171,14 @@ style.
 
 ## SurveyBuilder
 
+* **A choice set can be declared ordered.** `sf_choices(ordered = TRUE)`
+  marks options that run in a meaningful order, such as a frequency or an
+  education level, and SurveyBuilder has the same switch in the choice set
+  dialog and beside an item's choice set. A `single_choice` item on an
+  ordered set is tagged ORD, ordinal, in SurveyBuilder and SurveyStudio, so
+  it reaches the methods for ordered categories. Every `single_choice` item
+  was tagged NOM before, the known limitation 0.4.3 shipped with. The field
+  is written only when `TRUE`, so existing files keep their hashes.
 * A plan block saved with the `outcome` role, which R accepts beside
   `dependent`, opens with that variable selected. Regression blocks opened
   with the first listed variable in its place. The builder reads every role
@@ -241,12 +249,6 @@ style.
 * The reference results shipped with 6 demos are regenerated for the changes
   above: `first_survey`, `instrument_revision`, `verification`, `branching`,
   `conversational_branching` and `multi_response`.
-
-## Known limitation
-
-* SurveyBuilder tags every `single_choice` item as nominal, ordinal ones
-  included. Marking a choice set as ordered needs a new field in the format,
-  which a later release can add.
 
 
 # surveyframe 0.4.2

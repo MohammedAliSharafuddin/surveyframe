@@ -391,6 +391,8 @@ sframe_restore_choices <- function(choice) {
   choice$labels <- sframe_as_vector(choice$labels, "character")
   choice$allow_other <- isTRUE(choice$allow_other)
   choice$randomise <- isTRUE(choice$randomise)
+  # Kept only when TRUE, as sf_choices() stores it (0.4.3).
+  choice$ordered <- if (isTRUE(choice$ordered)) TRUE else NULL
   class(choice) <- "sf_choices"
   choice
 }

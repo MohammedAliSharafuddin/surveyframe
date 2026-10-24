@@ -1011,6 +1011,7 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
     <div style="display:flex;gap:14px">
       <label class="fcheck"><input type="checkbox" id="c-other"><span>Include "Other" option</span></label>
       <label class="fcheck"><input type="checkbox" id="c-rand"><span>Randomise order</span></label>
+      <label class="fcheck"><input type="checkbox" id="c-ord"><span>Options run in order (ordinal)</span></label>
     </div>
   </div>
   <div class="mfoot"><button type="button" class="btn btn-s" onclick="closeModal('m-choice')">Cancel</button><div class="sp"></div><button type="button" class="btn btn-p" onclick="saveChoice()">Save choice set</button></div>
@@ -3434,6 +3435,7 @@ function applyCsTemplate(name){
   var ex=S.choices.findIndex(function(c){return c.id===id;});
   var prior=ex>=0?S.choices[ex]:{};
   var cs={id:id,values:tpl.values.slice(),labels:tpl.labels.slice(),allow_other:!!prior.allow_other,randomise:!!prior.randomise};
+  if(prior.ordered)cs.ordered=true;
   if(ex>=0)S.choices[ex]=cs;else S.choices.push(cs);
   setDirty();renderItemList();renderInspBody(item);
   toast('Template applied','ok');
@@ -3455,6 +3457,7 @@ function saveItemChoices(){
   var ex=S.choices.findIndex(function(c){return c.id===id;});
   var prior=ex>=0?S.choices[ex]:{};
   var cs={id:id,values:parsed.values,labels:parsed.labels,allow_other:!!prior.allow_other,randomise:!!prior.randomise};
+  if(prior.ordered)cs.ordered=true;
   if(ex>=0)S.choices[ex]=cs;else S.choices.push(cs);
   renderItemList();renderInspBody(item);
   toast('Choices updated','ok');
@@ -3481,6 +3484,9 @@ function renderInspBody(item){
   var config=isSec||isTxt?'':fgs('Configuration',
     fld('Response type',sel('fi-type',tO,item.type))+
     (NCS.includes(item.type)?fld('Choice set',sel('fi-cs',csO,item.choice_set||'')):'') +
+    (item.type==='single_choice'&&item.choice_set?('<div class="field"><div class="fc">'+
+      '<label class="fcheck"><input type="checkbox" id="fi-csord"'+(csOrdered(item.choice_set)?' checked':'')+' onchange="setCsOrdered(this.checked)"><span>Options run in order (ordinal)</span></label></div>'+
+      '<span class="fhint">For a frequency, an education level or any ranked categories. It applies to the choice set, so every question using it.</span></div>'):'') +
     (NCS.includes(item.type)?fld('Choice labels','<textarea id="fi-choice-lines" rows="5" placeholder="One option per line, or value = Label" onblur="saveItemChoices()">'+esc(itemChoiceLines(item))+'</textarea>','For single choice, these are the respondent-facing category labels.')+
       '<div class="fc tpl-chips" role="group" aria-label="Quick-fill choice templates"><button type="button" onclick="applyCsTemplate(\'agree5\')">5-pt agree</button><button type="button" onclick="applyCsTemplate(\'agree7\')">7-pt agree</button><button type="button" onclick="applyCsTemplate(\'yesno\')">Yes / No</button><button type="button" onclick="applyCsTemplate(\'freq\')">Frequency</button><button type="button" onclick="applyCsTemplate(\'importance\')">Importance</button></div>':'') +
     (item.type==='matrix'?fld('Matrix row labels'+(isSampleList(item)?SAMPLE_TAG:''),ta('fi-mrows',(item.matrix_items||[]).join('\n'),'One label per line'),(isSampleList(item)?SAMPLE_HINT:'')+'One per line.'):'') +
@@ -3697,7 +3703,7 @@ function rmItem(id){
 }
 
 // -- Choices ----------------------------------------------------------------
-function openChoiceModal(){sv('c-id','');document.getElementById('cRows').innerHTML='';document.getElementById('c-other').checked=false;document.getElementById('c-rand').checked=false;openModal('m-choice');}
+function openChoiceModal(){sv('c-id','');document.getElementById('cRows').innerHTML='';document.getElementById('c-other').checked=false;document.getElementById('c-rand').checked=false;document.getElementById('c-ord').checked=false;openModal('m-choice');}
 function addCRow(v,l){v=v||'';l=l||'';var d=document.createElement('div');d.className='crow';d.innerHTML='<span class="crow-dh">&#8942;</span><div style="display:flex;gap:4px;flex:1"><input type="text" placeholder="Value" value="'+esc(String(v))+'" style="flex:.35;border:none;font-size:11px;padding:3px 4px"><input type="text" placeholder="Label" value="'+esc(String(l))+'" style="flex:.65;border:none;font-size:11px;padding:3px 4px"></div><button type="button" class="crow-rm" onclick="this.parentElement.remove()">&#215;</button>';document.getElementById('cRows').appendChild(d);}
 function fillL5(){document.getElementById('cRows').innerHTML='';[[1,'Strongly disagree'],[2,'Disagree'],[3,'Neutral'],[4,'Agree'],[5,'Strongly agree']].forEach(function(p){addCRow(p[0],p[1]);});}
 function fillL7(){document.getElementById('cRows').innerHTML='';[[1,'Strongly disagree'],[2,'Disagree'],[3,'Somewhat disagree'],[4,'Neutral'],[5,'Somewhat agree'],[6,'Agree'],[7,'Strongly agree']].forEach(function(p){addCRow(p[0],p[1]);});}
@@ -3712,6 +3718,9 @@ function saveChoice(){
   if(!vals.length){toast('Add at least one option','err');return;}
   snap();
   var cs={id:id,values:vals,labels:lbls,allow_other:document.getElementById('c-other').checked,randomise:document.getElementById('c-rand').checked};
+  // Written only when set, as sf_choices() writes it, so a set without it
+  // keeps the hash it had.
+  if(document.getElementById('c-ord').checked)cs.ordered=true;
   var ex=S.choices.findIndex(function(c){return c.id===id;});
   if(ex>=0)S.choices[ex]=cs;else S.choices.push(cs);
   closeModal('m-choice');toast('Choice set saved','ok');
@@ -3853,6 +3862,14 @@ function groupLevels(id){
   var cs=S.choices.find(function(c){return c.id===i.choice_set;});
   return cs?(cs.values||[]).length:null;
 }
+// Whether a choice set declares its options ordered (sf_choices(ordered =)).
+function csOrdered(id){var cs=(S.choices||[]).find(function(c){return c.id===id;});return !!(cs&&cs.ordered);}
+function setCsOrdered(on){
+  var item=S.items.find(function(x){return x.id===selId;});if(!item||!item.choice_set)return;
+  var ex=S.choices.findIndex(function(c){return c.id===item.choice_set;});if(ex<0)return;
+  snap();var cs=Object.assign({},S.choices[ex]);if(on)cs.ordered=true;else delete cs.ordered;S.choices[ex]=cs;
+  ra();toast(on?'Choice set '+cs.id+' marked as ordered':'Choice set '+cs.id+' marked as unordered','ok');
+}
 function varLevel(id){
   var sc=S.scales.find(function(s){return s.id===id;});if(sc)return{level:'scale',code:'SCL',cls:'scl',type:'scale score'};
   var i=S.items.find(function(x){return x.id===id;});
@@ -3871,7 +3888,8 @@ function varLevel(id){
   }
   if(!i)return{level:'model',code:'MOD',cls:'id',type:'model'};
   if(i.type==='likert')return{level:'likert',code:'LIK',cls:'lik',type:i.type};
-  if(i.type==='single_choice')return{level:'nominal',code:'NOM',cls:'nom',type:i.type};
+  // A single-choice item on an ordered set is ordinal, as SurveyStudio reads it.
+  if(i.type==='single_choice')return csOrdered(i.choice_set)?{level:'ordinal',code:'ORD',cls:'ord',type:i.type}:{level:'nominal',code:'NOM',cls:'nom',type:i.type};
   // multiple_choice, ranking, and matrix have no single response column of
   // their own; their analysable variables are the expanded sub-columns
   // built in getAllVars(). The parent id is kept out of role dropdowns.

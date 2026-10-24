@@ -816,13 +816,17 @@ analysis_method_choices <- function() {
   stats::setNames(names(analysis_registry), vapply(analysis_registry, function(x) x$label, character(1)))
 }
 
-studio_level_meta <- function(item = NULL, scale = NULL) {
+studio_level_meta <- function(item = NULL, scale = NULL, ordered = FALSE) {
   if (!is.null(scale)) {
     return(list(level = "scale", code = "SCL", type = "scale score"))
   }
   type <- item$type %||% "text"
   if (identical(type, "likert")) {
     return(list(level = "likert", code = "LIK", type = type))
+  }
+  # A single-choice item on a set declared ordered is ordinal (0.4.3).
+  if (identical(type, "single_choice") && isTRUE(ordered)) {
+    return(list(level = "ordinal", code = "ORD", type = type))
   }
   if (type %in% c("single_choice", "multiple_choice")) {
     return(list(level = "nominal", code = "NOM", type = type))
@@ -876,7 +880,8 @@ studio_variable_catalog <- function(instrument) {
     instrument$items %||% list()
   )
   item_rows <- lapply(question_items, function(item) {
-    meta <- studio_level_meta(item = item)
+    meta <- studio_level_meta(item = item,
+                              ordered = sframe_choice_set_ordered(instrument, item$choice_set))
     scale_membership <- item$scale_id %||% ""
     if (!nzchar(scale_membership) && length(instrument$scales %||% list()) > 0) {
       hits <- vapply(instrument$scales, function(scale) item$id %in% (scale$items %||% character(0)), logical(1))
