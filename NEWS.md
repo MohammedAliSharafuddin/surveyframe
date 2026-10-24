@@ -153,6 +153,13 @@ style.
   "Satisfaction". This covers the correlation, regression, group comparison,
   partial correlation and moderation charts, in `render_report()` and in
   SurveyStudio.
+* **A group comparison chart labels its groups**, in the choice set's
+  order, where it showed the stored codes ("in_person" beside a table
+  reading "In person"). This covers the t-test, Mann-Whitney, one-way
+  ANOVA, Kruskal-Wallis and ANCOVA charts. **A crosstab or Fisher chart
+  titles its axes and legend with the items' labels**, where it used their
+  ids. A sweep of every demo chart now finds no id or code where the
+  instrument gives a label.
 
 ## SurveyBuilder
 

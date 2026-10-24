@@ -1665,12 +1665,12 @@ sframe_run_one_block <- function(block, data, instrument, plots = FALSE,
   plot_labels <- if (isTRUE(plots)) sframe_label_lookup(instrument) else character(0)
   if (isTRUE(plots) && is.null(result$plot)) {
     result$plot <- .sframe_with_plot_labels(plot_labels,
-      sframe_plot_for_result(result, data, palette = plot_palette))
+      sframe_plot_for_result(result, data, palette = plot_palette), instrument)
   }
   if (isTRUE(plots) && identical(result$test, "regression_linear") &&
       is.data.frame(result$diagnostics) && is.null(result$diagnostic_plots)) {
     result$diagnostic_plots <- .sframe_with_plot_labels(plot_labels,
-      sframe_plot_regression_diagnostics(result, palette = plot_palette))
+      sframe_plot_regression_diagnostics(result, palette = plot_palette), instrument)
   }
   result
 }

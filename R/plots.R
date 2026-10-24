@@ -662,8 +662,10 @@ sframe_plot_crosstab <- function(result, palette = c("web", "print")) {
     ggplot2::scale_fill_manual(
       values = sframe_series_fill_colours(length(unique(long$Column)), palette)) +
     ggplot2::labs(
-      title = paste("Association between", result$vars[1], "and", result$vars[2]),
-      x = result$vars[1], y = "Count", fill = result$vars[2]
+      title = paste("Association between", .sframe_title_case_names(result$vars[1]),
+                    "and", .sframe_title_case_names(result$vars[2])),
+      x = .sframe_title_case_names(result$vars[1]), y = "Count",
+      fill = .sframe_title_case_names(result$vars[2])
     ) +
     theme_surveyframe(palette = palette) + sframe_theme_angled_x()
 }
@@ -2127,6 +2129,7 @@ sframe_plot_group_comparison <- function(result, data, palette = c("web", "print
   )
   df <- df[!is.na(df$group) & !is.na(df$outcome), , drop = FALSE]
   if (nrow(df) < 2 || length(unique(df$group)) < 2) return(NULL)
+  df$group <- droplevels(.sframe_plot_value_labels(group_col, df$group))
   brand <- sframe_brand(palette)
   ggplot2::ggplot(df, ggplot2::aes(x = .data$group, y = .data$outcome,
                                    fill = .data$group)) +

@@ -76,3 +76,38 @@ test_that("a Studio result heading drops a block id that repeats the number", {
   expect_identical(env$studio_rq_heading(2, "H2a"), "RQ 2: H2a")
   expect_identical(env$studio_rq_heading(3, "RQ4"), "RQ 3: RQ4")
 })
+
+# Ethos request 20 (2026-10-03). The same report's figures labelled axes and
+# legends with item ids and choice codes ("preferred_session_type",
+# "in_person") where the tables beside them used the labels. The fix above
+# covered variable names on 5 chart families. Group comparisons still showed
+# the group codes, and crosstabs titled their axes with item ids.
+
+built_texts <- function(p) {
+  b <- ggplot2::ggplot_build(p)
+  x <- b$layout$panel_params[[1]]$x$get_labels()
+  c(as.character(x), unlist(p$labels))
+}
+
+test_that("Ethos 20: a group comparison chart shows the groups' labels in set order", {
+  skip_if_not_installed("ggplot2")
+  d <- sframe_demo("two_group")
+  res <- run_analysis_plan(d$responses, d$instrument, plots = TRUE)
+  tt <- Filter(function(r) identical(r$test, "t_test_ind"), res)[[1]]
+  ticks <- as.character(ggplot2::ggplot_build(tt$plot)$layout$panel_params[[1]]$x$get_labels())
+  expect_identical(ticks, c("In person", "Online"))
+  expect_false(any(c("online", "in_person") %in% built_texts(tt$plot)))
+})
+
+test_that("Ethos 20: a crosstab chart titles its axes and legend with item labels", {
+  skip_if_not_installed("ggplot2")
+  d <- sframe_demo("categorical")
+  res <- run_analysis_plan(d$responses, d$instrument, plots = TRUE)
+  ct <- Filter(function(r) identical(r$test, "crosstab"), res)[[1]]
+  ids <- ct$vars[1:2]
+  labels <- vapply(ids, function(id) {
+    Filter(function(i) identical(i$id, id), d$instrument$items)[[1]]$label
+  }, character(1))
+  expect_identical(c(ct$plot$labels$x, ct$plot$labels$fill), unname(labels))
+  expect_false(any(ids %in% unlist(ct$plot$labels)))
+})
