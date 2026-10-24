@@ -160,6 +160,12 @@ style.
 
 ## Demos
 
+* `sframe_demo("instrument_revision")` takes a further amendment. Its
+  amendment log recorded hashes from code that predates the settled content
+  hash, so `amend_sframe()` on it failed with "The amendment log is out of
+  sequence at entry 2", and so did `write_sframe()` after any change. The
+  demo is regenerated, its content unchanged, and a test now amends and
+  writes every shipped demo.
 * `preview_demo()` opens a branded demo as a respondent sees it in one line,
   in the browser or on SurveyStudio's preview screen. The start-up note now
   shows it.

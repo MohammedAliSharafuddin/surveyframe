@@ -2,7 +2,7 @@
   "sframe_format": "1.0",
   "hash": {
     "algo": "sha256",
-    "value": "3006061d3a434e0d6cadfc2d696059b67db95801c80ca9bda6fada0373f57094"
+    "value": "857cb6d6f00a1b2c4a8e5a01a9e0eec839b40a77619b4ac60ee30e8ee1af03a0"
   },
   "version": "1.1.0",
   "meta": {
@@ -149,15 +149,15 @@
   "render": [],
   "amendments": [
     {
-      "timestamp": "2026-08-28T10:20:56Z",
+      "timestamp": "2026-10-24T16:31:58Z",
       "reason_code": "instrument_revision",
       "reason_text": "Reworded the open question after a face-validity pass: readers were listing several changes at once, so the answers were hard to code.",
       "tier": "design",
       "author": "M. A. Sharafuddin",
       "deviation_report": "The open question moved from an unbounded prompt to a single-change prompt. No analysis block changed. Responses collected before this amendment remain analysable and are reported separately.",
       "signoff": "none",
-      "previous_hash": "5cd4bc1db8e47bb2e26719848cd4a54ed9fbd534321d294a04cc78c7d3f65b6a",
-      "new_hash": "1d7178f79a84bf9161f0e24af5bd044f4729711ccc8bf669ebe5bb774623dddb",
+      "previous_hash": "d7012871373595f775193b43751c29b8240e0840152c360a4c2a585128e5ea08",
+      "new_hash": "3686557a8249f595bfd67e9897263b5014740fe7d19ef752317464fe909a4467",
       "changed_fields": ["version", "meta", "items"]
     }
   ]
