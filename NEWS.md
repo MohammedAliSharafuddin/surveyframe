@@ -118,6 +118,15 @@ style.
   became one option, and `sframe_export_labelled()` then failed on duplicate
   labels.
 
+## Documentation
+
+* `amend_sframe()`'s help says how to change the wording on the welcome,
+  consent and thank-you screens. That wording is inside both hashes, so on
+  a published instrument it goes through a pipeline-tier amendment with
+  `reason_code = "other"` and then `write_sframe()`. A host editing the
+  JSON directly leaves a file `read_sframe()` refuses. The help also lists
+  `references` among the fields the content hash leaves out.
+
 ## Export
 
 * **Text-coded choices keep their labels in Stata.** Stata attaches value
