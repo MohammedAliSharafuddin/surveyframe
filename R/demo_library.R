@@ -218,6 +218,13 @@ sframe_demo_branding <- function() {
 #' @param path Output file. An `.sav` is written for SPSS, a `.dta` for Stata,
 #'   chosen from the extension.
 #'
+#' @section Text codes in Stata:
+#' Stata attaches value labels to numbers alone. In a `.dta`, a choice set
+#' coded with text, such as `"a"` and `"b"`, is written as 1, 2, 3 in the
+#' set's declared order, each carrying its label, so the file reads back in
+#' Stata with the labels intact. A `.sav` keeps the text codes, which SPSS
+#' labels directly.
+#'
 #' @return The path, invisibly.
 #' @export
 #' @seealso [sframe_demo()], [read_responses()]
@@ -261,6 +268,16 @@ sframe_export_labelled <- function(data, instrument, path) {
       xn <- suppressWarnings(as.numeric(as.character(x)))
       if (!all(is.na(x) | !is.na(xn))) return(x)
       return(haven::labelled(xn, stats::setNames(v, labs)))
+    }
+    # Stata attaches value labels to numbers alone: text codes labelled for
+    # Stata read back as A = 0 and B = 0 (Ethos request 15). For a .dta the
+    # codes become 1, 2, 3 in the set's order, each with its label. A column
+    # holding a code the set lacks keeps its text, unlabelled. SPSS takes
+    # labelled text, so a .sav keeps the codes.
+    if (identical(ext, "dta")) {
+      pos <- match(as.character(x), as.character(vals))
+      if (any(is.na(pos) & !is.na(x))) return(as.character(x))
+      return(haven::labelled(pos, stats::setNames(seq_along(vals), labs)))
     }
     haven::labelled(as.character(x), stats::setNames(as.character(vals), labs))
   }

@@ -111,6 +111,14 @@ style.
   became one option, and `sframe_export_labelled()` then failed on duplicate
   labels.
 
+## Export
+
+* **Text-coded choices keep their labels in Stata.** Stata attaches value
+  labels to numbers alone, so a choice set coded `a` and `b` with labels A
+  and B read back from `sframe_export_labelled()` as A = 0 and B = 0. A
+  `.dta` now holds such codes as 1, 2, 3 in the set's order, each with its
+  label. A `.sav` keeps the text codes, which SPSS labels directly.
+
 ## Charts
 
 * A chart from the analysis plan names each variable by its label in the
