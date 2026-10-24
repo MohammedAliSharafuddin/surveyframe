@@ -2740,14 +2740,16 @@ function doGet(e) {
 
 // -- State ------------------------------------------------------------------
 var S={meta:{title:'Untitled Survey',version:'1.0.0',description:'',authors:'',languages:'en'},choices:[],items:[],scales:[],branching:[],checks:[],analysis_plan:[],models:[],render:{mode:'standard',theme:'#2563eb',submit_label:'Submit',welcome:{title:'Welcome to this survey',intro_text:'Thank you for taking part. Your responses will be used for research and reporting purposes.',consent_text:'I understand the purpose of this survey and agree to participate.',consent_required:false,start_label:'Start Survey'},thankyou:{message:'Thank you for completing this survey.',redirect_url:'',show_download:false},header:{institution:'',logo_base64:'',show_progress:true},google_sheets_url:'',google_sheets_endpoint:''}};
-var hist=[],fut=[],selId=null,editRqId=null,pvTab='survey',pvPage=0,dirty=false,lastSaved=null,dragSrc=null,_cRes=null,anTab='plan';
+var hist=[],fut=[],selId=null,editRqId=null,pvTab='survey',pvPage=0,dirty=false,lastSaved=null,openedAt=null,dragSrc=null,_cRes=null,anTab='plan';
 
 function snap(){hist.push(JSON.stringify(S));if(hist.length>60)hist.shift();fut=[];setDirty();updHistBtns();}
 function undo(){if(!hist.length)return;fut.push(JSON.stringify(S));S=JSON.parse(hist.pop());selId=null;ra();updHistBtns();}
 function redo(){if(!fut.length)return;hist.push(JSON.stringify(S));S=JSON.parse(fut.pop());selId=null;ra();updHistBtns();}
 function updHistBtns(){var u=document.getElementById('undoBtn'),r=document.getElementById('redoBtn');if(u)u.disabled=!hist.length;if(r)r.disabled=!fut.length;}
 function setDirty(){dirty=true;updSave();}
-function updSave(){var e=document.getElementById('saveSt');if(!dirty&&lastSaved){e.textContent='Saved '+tAgo(lastSaved);e.className='save-st saved';}else if(dirty){e.textContent='Unsaved changes';e.className='save-st dirty';}else{e.textContent='No changes';e.className='save-st';}}
+// Opened is its own state: inside a host such as Ethos, "Saved" after
+// opening a file reads as saved in the host, and nothing has been saved.
+function updSave(){var e=document.getElementById('saveSt');if(!dirty&&lastSaved){e.textContent='Saved '+tAgo(lastSaved);e.className='save-st saved';}else if(!dirty&&openedAt){e.textContent='Opened '+tAgo(openedAt);e.className='save-st';}else if(dirty){e.textContent='Unsaved changes';e.className='save-st dirty';}else{e.textContent='No changes';e.className='save-st';}}
 function tAgo(d){var s=Math.round((Date.now()-d)/1000);if(s<10)return'just now';if(s<60)return s+'s ago';return Math.round(s/60)+'m ago';}
 function uid(){return Math.random().toString(36).slice(2,9);}
 function ra(){renderItemList();renderAnalyse();updSave();document.getElementById('sbTitle').textContent=S.meta.title||'Untitled Survey';}
@@ -3115,7 +3117,12 @@ function loadLogo(e){var f=e.target.files[0];if(!f)return;var r=new FileReader()
 function removeLogo(){if(S.render.header)S.render.header.logo_base64='';var lp=document.getElementById('logoPrev');if(lp)lp.style.display='none';document.getElementById('logoName').textContent='No logo';var rb=document.getElementById('logoRmBtn');if(rb)rb.style.display='none';}
 
 // -- File I/O ---------------------------------------------------------------
-function openFile(){document.getElementById('fileInput').click();}
+// Opening a file replaces the survey in the builder, so unsaved work is
+// only discarded once the user says so.
+function openFile(){
+  if(!dirty){document.getElementById('fileInput').click();return;}
+  conf2('Discard unsaved changes?','Opening a file replaces the survey in the builder. Your unsaved changes will be lost. Save first with Save .sframe to keep them.','Open a file').then(function(ok){if(ok)document.getElementById('fileInput').click();});
+}
 function loadFile(e){
   var f=e.target.files[0];if(!f)return;
   var r=new FileReader();
@@ -3140,7 +3147,8 @@ function openSframeText(text){
     // amended instrument lost its disclosed amendment log.
     if(src.references&&src.references.length)S.references=src.references;else delete S.references;
     S._carry={};['designs','amendments'].forEach(function(k){if(src[k]!==undefined)S._carry[k]=src[k];});
-      selId=null;ra();dirty=false;lastSaved=Date.now();updSave();
+      // The inspector showed an item from the survey being replaced.
+    closeInsp();ra();dirty=false;lastSaved=null;openedAt=Date.now();updSave();
     // Surface the SHA-256 integrity status instead of loading silently.
     // The hash is recomputed over the file's own payload, which matches
     // both saveSframe() here and write_sframe() in R.
@@ -4336,7 +4344,7 @@ chkAutoSave();
 // the sidebar title, so a title injected with the state shows on first load.
 ra();
 updHistBtns();
-setInterval(function(){if(lastSaved)updSave();},30000);
+setInterval(function(){if(lastSaved||openedAt)updSave();},30000);
 </script>
 </body>
 </html>
