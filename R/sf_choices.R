@@ -21,6 +21,20 @@ sframe_choice_content_problems <- function(values, labels) {
     out <- c(out, paste0("the value(s) ", paste(dup, collapse = ", "),
                          " appear more than once, so 2 options share a code."))
   }
+  # read_responses() reads a set whose codes are all numbers as numbers, so
+  # codes that read as the same number (1 and 1.0, or 2 and 02) become one
+  # option there, and the labelled export then fails on duplicate labels
+  # (Ethos request 14). Exact repeats are reported above.
+  num <- suppressWarnings(as.numeric(vals))
+  if (!anyNA(num)) {
+    clash <- unique(num[duplicated(num)])
+    clash <- clash[vapply(clash, function(n) length(unique(vals[num == n])) > 1, logical(1))]
+    for (n in clash) {
+      out <- c(out, paste0("the codes ", paste(unique(vals[num == n]), collapse = " and "),
+                           " read as the same number, and responses to an all-numeric ",
+                           "set are read as numbers, so 2 options would share a code."))
+    }
+  }
   out
 }
 

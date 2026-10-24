@@ -105,6 +105,11 @@ style.
   place of a result. The roles a method reads are found from the same
   resolver the analysis uses, so the 2 stay in step. `partial_correlation`
   and `mediation` also accept every role alias their runners read.
+* **A choice set whose codes read as the same number is refused**, by
+  `sf_choices()` and by `validate_sframe()`. Responses to a set whose codes
+  are all numbers are read as numbers, so the codes 1 and 1.0, or 2 and 02,
+  became one option, and `sframe_export_labelled()` then failed on duplicate
+  labels.
 
 ## Charts
 
