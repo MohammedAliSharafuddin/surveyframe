@@ -91,6 +91,14 @@ style.
 
 ## Analysis
 
+* **A descriptives plan table has reader headings**: Variable, N, Valid N,
+  Missing, Mean, SD, the confidence interval's bounds and the rest, as the
+  other plan tables have. It showed `valid_n`, `missing_n` and `sd`. The
+  group column is left out when there is no split, and the weighted mean
+  when there are no weights. `descriptives_report()` keeps its own column
+  names, and the demo reference results keep theirs.
+* Report sentences agree in number: "computed for 1 variable" in place of
+  "1 variable(s)".
 * A `frequency` block gives one frequency table per variable. It reads the
   `variable` role, or `variables`, and either may name more than one item. With
   more than one, `$tables` holds each variable's own result and `$table`
