@@ -25,7 +25,13 @@ render_report(
   include_models = TRUE,
   plot_palette = c("web", "print"),
   interpretations = NULL,
-  show_code = TRUE
+  show_code = TRUE,
+  references = NULL,
+  csl = NULL,
+  title = NULL,
+  authors = NULL,
+  figures = getOption("surveyframe.figures"),
+  figure_dir = NULL
 )
 ```
 
@@ -120,9 +126,64 @@ render_report(
   [`analysis_syntax()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/analysis_syntax.md)
   does not cover shows no block, rather than a guess at the call.
 
+- references:
+
+  Optional further
+  [`sf_reference()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_reference.md)
+  records, for example the works a host cites in the written
+  interpretations, which are cited in text as `[@id]`. The instrument's
+  own references
+  ([`add_references()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/add_references.md))
+  and the methods' references are always included.
+
+- csl:
+
+  Optional path to a Citation Style Language file for the References
+  section. Defaults to APA 7th edition, bundled with the package. Any
+  style from the Zotero style repository works.
+
+- title:
+
+  Character or `NULL`. The report's title. Defaults to the instrument's
+  title.
+
+- authors:
+
+  Character vector or `NULL`. The report's authors, shown under the
+  title. Defaults to the instrument's authors, and is left out when
+  there are none.
+
+- figures:
+
+  List or `NULL`. Size, resolution and format for every figure in the
+  report: any of `width` and `height` in inches, `dpi`, and `format`,
+  `"png"` or `"svg"` inside the report. For example
+  `list(width = 6.5, height = 4, dpi = 300)`. Absent entries keep each
+  engine's own default. Defaults to the `surveyframe.figures` option, so
+  a host can set it once with
+  `options(surveyframe.figures = list(dpi = 300))`.
+
+- figure_dir:
+
+  Character or `NULL`. A directory to write each analysis plan chart
+  into as its own file, through
+  [`sframe_save_figures()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_save_figures.md),
+  at the size, resolution and format in `figures`, where `format` may
+  also be `"tiff"`, `"jpeg"` or `"pdf"`. Needs `data`. Defaults to 300
+  dpi at 7 by 4.5 inches where `figures` names none.
+
 ## Value
 
 The output file path, invisibly.
+
+## References
+
+The Quarto report cites in text, author and year, and lists every work
+it cites once, in a References section at the end, formatted by pandoc's
+citation processor in the chosen style. That covers the methods' own
+references, the sources the instrument cites for its items, scales, plan
+blocks and models, and `references`. The built-in HTML engine, used when
+Quarto is unavailable, lists the methods' references the same way.
 
 ## See also
 
@@ -157,7 +218,7 @@ out <- tryCatch(
   ),
   finally = options(old)
 )
-#> Report rendered with the built-in HTML engine: /tmp/RtmpMSn8NS/file273a7a9e4daa.html
+#> Report rendered with the built-in HTML engine: /tmp/RtmpwBSeRG/file21d72b030e15.html
 file.exists(out)
 #> [1] TRUE
 # }

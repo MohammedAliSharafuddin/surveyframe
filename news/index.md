@@ -2,9 +2,13 @@
 
 ## surveyframe 0.4.3
 
-A GitHub release, ahead of the next CRAN submission. It fixes what a
-teaching session on 0.4.2 found. Install it with
-`remotes::install_github("MohammedAliSharafuddin/surveyframe")`.
+It fixes what a teaching session on 0.4.2 found and what Ethos, the
+research platform built on surveyframe, reported from its own use, and
+adds references carried inside the `.sframe` file. It went out on GitHub
+on 19 October 2026 and reaches CRAN with the fixes since. SurveyBuilder
+no longer changes content its user left alone, so an amended instrument
+saved from it can be written again, and every plan result can be
+serialised by a host.
 
 ### What you need to change
 
@@ -16,9 +20,130 @@ teaching session on 0.4.2 found. Install it with
 - **A descriptives block counts choice items.** See below. Numbers for a
   `single_choice` or `multiple_choice` column move from the mean and SD
   table to a table of counts and percentages.
+- **Every plan result serialises with
+  [`jsonlite::toJSON()`](https://jeroen.r-universe.dev/jsonlite/reference/fromJSON.html).**
+  The classed report behind a descriptives, missing-data, quality,
+  reliability, EFA or item-diagnostics result, and a fitted LDA or STM
+  topic model, now sit in an attribute for the current R session, which
+  `toJSON()` leaves out. Code reading `result$report_obj` or
+  `result$fit$model` should stop doing so:
+  [`extract_quotes()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/extract_quotes.md)
+  finds the model itself, and the charts
+  `run_analysis_plan(plots = TRUE)` draws are unchanged. The KMO and
+  parallel-analysis parts of an EFA readiness result are now plain lists
+  holding the same numbers. A host serialising results failed on all of
+  these, 20 blocks across the demos. Charts drawn with `plots = TRUE`
+  stay on the result as `ggplot` objects.
+- **An empty `render` is written as
+  [`{}`](https://rdrr.io/r/base/Paren.html)**, an empty object, by
+  [`write_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/write_sframe.md)
+  and SurveyBuilder. It was written as `[]`, which a host reading the
+  JSON took for a list. A file written with `[]` still reads and
+  verifies, and an amendment log recorded with `[]` still matches its
+  content, so such a file takes further amendments as before.
+
+### References, cited where they are used and listed once at the end
+
+An instrument can now carry the works it draws on, and every report
+lists them once, in a References section at the end, in a standard
+bibliography style.
+
+- **[`sf_reference()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_reference.md)**
+  creates a reference as a CSL-JSON record, the format Zotero, Mendeley
+  and pandoc share.
+  **[`read_bibtex()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_bibtex.md)**
+  reads BibTeX, as exported by Google Scholar, Zotero, Mendeley and most
+  journal pages, using base R alone.
+  **[`add_references()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/add_references.md)**
+  attaches references to an instrument, and
+  `sf_instrument(components = )` takes them too.
+  **[`sframe_references()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_references.md)**
+  lists them, and
+  **[`sframe_bibliography()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_bibliography.md)**
+  writes the CSL-JSON a citation processor reads.
+- **Each reference says where it is cited**: the instrument as a whole,
+  an item, a scale, a plan block or a model, in its `cited_by` field.
+  [`validate_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/validate_sframe.md)
+  gains a `references` check that every target exists and every key is
+  unique. A work in another language can carry `language`, which keeps a
+  style from title-casing its journal name.
+- **[`render_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_report.md)
+  cites in text and lists each work once, at the end.** Each result used
+  to carry its own reference list, so the same works repeated through
+  the report. Results now cite their methods in text, for example
+  “(Cohen, 1988)”, and the codebook names the source of each item and
+  scale. A written interpretation can cite a work as `[@key]`. The list
+  at the end is formatted by pandoc’s citation processor in APA 7,
+  bundled with the package, or in any style given as `csl =`. The new
+  `references =` argument adds works a host cites in the write-up.
+  [`render_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_results.md)
+  lists its references once at the end in the same way.
+- **The 30 built-in method references are also held as CSL-JSON.** A
+  test formats each one through pandoc in APA 7 and compares it with the
+  APA text the package already shipped, which holds the 2 forms
+  together.
+- The building-survey-instrument vignette has a section on citing
+  sources:
+  [`sf_reference()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_reference.md),
+  [`read_bibtex()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_bibtex.md),
+  where a work is cited, and what
+  [`render_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_report.md)
+  does with the list.
+- **SurveyBuilder has a References tab in Survey settings.** Paste
+  BibTeX or type a reference in, and choose where the instrument cites
+  it. Changes apply at once, ahead of Save settings.
+
+#### The file format
+
+- **`read_sframe(text = )` reads a payload held in memory**, such as
+  JSON a host keeps in a database, with no temporary file.
+  **`verify = FALSE`** reads content whose hash is missing or does not
+  match, with a warning of class `sframe_unverified_warning`, and marks
+  the instrument with the attribute `sframe_verified = FALSE`, which
+  [`print()`](https://rdrr.io/r/base/print.html) shows. A host can then
+  keep every field where it used to rebuild the instrument by hand. Such
+  an instrument is written only as a new instrument, or when its
+  amendment log names exactly its content.
+- **The bundled schema is the published one.**
+  `inst/schema/sframe_schema.json` is now a copy of sframe-schema’s
+  instrument profile, kept identical by a test. The 2 had drifted: the
+  bundled copy left `sframe_format` optional and lacked `references`, so
+  a file could pass one and fail the other. It now requires
+  `sframe_format`, as
+  [`write_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/write_sframe.md)
+  writes it.
+  [`read_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_sframe.md)
+  still reads older files without the field. Every bundled `.sframe`
+  file and a builder save validate against it.
+- `references` is a new optional top-level field. It is written only
+  when an instrument has at least one, so an instrument with no
+  references keeps the file hash it had, the rule `designs` and
+  `amendments` already follow.
+- **Citing a source is disclosure, outside the amendment record.** The
+  content hash that
+  [`amend_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/amend_sframe.md)
+  records leaves `references` out, so a reference can be added to a
+  published instrument directly.
+- `inst/schema/sframe_schema.json` documents the field. Its description
+  of the amendment content hash was also wrong: it named only the items,
+  choices, scales, branching, checks, plan, models and designs, while
+  the hash has always covered every field except `hash` and
+  `amendments`, `meta`, `render` and `version` included. Corrected.
+- `inst/csl/apa.csl`, the APA 7 style from the Zotero Style Repository,
+  is bundled under CC BY-SA 3.0. See `inst/COPYRIGHTS`.
 
 ### Analysis
 
+- **A descriptives plan table has reader headings**: Variable, N, Valid
+  N, Missing, Mean, SD, the confidence interval’s bounds and the rest,
+  as the other plan tables have. It showed `valid_n`, `missing_n` and
+  `sd`. The group column is left out when there is no split, and the
+  weighted mean when there are no weights.
+  [`descriptives_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/descriptives_report.md)
+  keeps its own column names, and the demo reference results keep
+  theirs.
+- Report sentences agree in number: “computed for 1 variable” in place
+  of “1 variable(s)”.
 - A `frequency` block gives one frequency table per variable. It reads
   the `variable` role, or `variables`, and either may name more than one
   item. With more than one, `$tables` holds each variable’s own result
@@ -51,6 +176,115 @@ teaching session on 0.4.2 found. Install it with
   analysis-plan quality table names the threshold too. The argument’s
   help says how to check 3-item scales, in a call or in a plan.
 
+### Reports
+
+- **New
+  [`render_result()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_result.md)
+  renders one analysis result as the report does**: the formatted table
+  with its caption and note, any second table, the APA line, and the
+  chart the report picks for that method, with the instrument’s labels,
+  as an HTML fragment or with the chart written as PNG or SVG. It uses
+  the report’s own code, so a host showing results one at a time and the
+  report agree. A host had to keep its own map from method to chart,
+  which drifted with each release.
+- **Figures at the size, resolution and format a journal asks for.**
+  `render_report(figures = list(width =, height =, dpi =, format =))`
+  applies to every figure in both engines, and defaults to the
+  `surveyframe.figures` option, so a host can set it once.
+  `figure_dir =` also writes each plan chart as its own file, PNG, TIFF,
+  JPEG, PDF or SVG. New
+  [`sframe_save_figures()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_save_figures.md)
+  does the same for the results of `run_analysis_plan(plots = TRUE)`.
+  The report fixed its own figure size, and the built-in engine saved
+  charts at 110 dpi.
+- **`codebook_report(format = "md")` gives Markdown.** The codebook
+  carries itself as Markdown text in `markdown`, a heading and a pipe
+  table for the items, choice sets, scales, plan and models, and
+  [`print()`](https://rdrr.io/r/base/print.html) writes it. Save it with
+  `writeLines(cb$markdown, "codebook.md")`. The format argument changed
+  nothing before, so a host received the printed text table.
+- **[`render_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_report.md)
+  takes `title` and `authors`**, which default to the instrument’s title
+  and authors. Every Quarto report was titled “Survey Research Report”
+  whatever the study. The date under the title is labelled “Rendered” in
+  place of Quarto’s “Published”, since a rendered report has not been
+  published. The built-in HTML engine shows the authors too.
+
+### Validation
+
+- **A plan block whose roles its method never reads is refused.** A
+  frequency block naming its item under `items` ran on nothing and
+  reported “Frequency distribution for NA (N = 0)” with an empty table.
+  [`validate_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/validate_sframe.md)
+  now says which roles the method reads and which the block names, and
+  [`run_analysis_plan()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/run_analysis_plan.md)
+  gives such a block an `error` in place of a result. The roles a method
+  reads are found from the same resolver the analysis uses, so the 2
+  stay in step. `partial_correlation` and `mediation` also accept every
+  role alias their runners read.
+- **A block’s error names its cause.** A block whose role named an item
+  the instrument lacked reported “Test failed.”, and 8 other runners
+  gave errors as bare as “ANOVA failed.”.
+  [`run_analysis_plan()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/run_analysis_plan.md)
+  now names a variable the responses lack, saying whether it is an
+  unknown name, an item with no column or a scale with no scored column,
+  and a test that fails says which variable holds no numbers, or that
+  too few responses had a value, or else passes on R’s own reason.
+- **A choice set whose codes read as the same number is refused**, by
+  [`sf_choices()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_choices.md)
+  and by
+  [`validate_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/validate_sframe.md).
+  Responses to a set whose codes are all numbers are read as numbers, so
+  the codes 1 and 1.0, or 2 and 02, became one option, and
+  [`sframe_export_labelled()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_export_labelled.md)
+  then failed on duplicate labels.
+
+### Documentation
+
+- The visual-workflow vignette shows the tools it describes:
+  SurveyBuilder’s Analyse mode with a plan open, SurveyStudio’s Upload
+  Responses screen and a result on its Run preview tab, the dashboard,
+  and the RStudio Addins menu with the 4 surveyframe commands, each with
+  alt text. The images are generated from the demo launchers.
+- [`amend_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/amend_sframe.md)’s
+  help says how to change the wording on the welcome, consent and
+  thank-you screens. That wording is inside both hashes, so on a
+  published instrument it goes through a pipeline-tier amendment with
+  `reason_code = "other"` and then
+  [`write_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/write_sframe.md).
+  A host editing the JSON directly leaves a file
+  [`read_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_sframe.md)
+  refuses. The help also lists `references` among the fields the content
+  hash leaves out.
+
+### Export
+
+- **Text-coded choices keep their labels in Stata.** Stata attaches
+  value labels to numbers alone, so a choice set coded `a` and `b` with
+  labels A and B read back from
+  [`sframe_export_labelled()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_export_labelled.md)
+  as A = 0 and B = 0. A `.dta` now holds such codes as 1, 2, 3 in the
+  set’s order, each with its label. A `.sav` keeps the text codes, which
+  SPSS labels directly.
+
+### The exported survey
+
+- **A sending screen while the answers are in flight.** The thank-you
+  screen said the response had been recorded while it was still being
+  sent.
+- **Confirmed delivery for a host.** A page that defines
+  `window.sframeSendResponse(row)`, returning a Promise, takes over the
+  send. Resolving to `true` or `{confirmed: true}` shows the response as
+  recorded, in place of the note that the page cannot confirm storage,
+  which every respondent saw, even on a host that confirms.
+- `render$thankyou$show_restart = FALSE` hides “Submit another
+  response”.
+- **Drafts.** `render$save_draft = TRUE` keeps the answers in the
+  browser as the respondent goes, so a closed tab can be resumed from
+  the welcome screen. The draft is cleared once the response is
+  submitted, and kept when delivery fails. SurveyBuilder’s exported
+  survey carries the same template.
+
 ### Charts
 
 - A chart from the analysis plan names each variable by its label in the
@@ -60,9 +294,25 @@ teaching session on 0.4.2 found. Install it with
   group comparison, partial correlation and moderation charts, in
   [`render_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_report.md)
   and in SurveyStudio.
+- **A group comparison chart labels its groups**, in the choice set’s
+  order, where it showed the stored codes (“in_person” beside a table
+  reading “In person”). This covers the t-test, Mann-Whitney, one-way
+  ANOVA, Kruskal-Wallis and ANCOVA charts. **A crosstab or Fisher chart
+  titles its axes and legend with the items’ labels**, where it used
+  their ids. A sweep of every demo chart now finds no id or code where
+  the instrument gives a label.
 
 ### SurveyBuilder
 
+- **A choice set can be declared ordered.** `sf_choices(ordered = TRUE)`
+  marks options that run in a meaningful order, such as a frequency or
+  an education level, and SurveyBuilder has the same switch in the
+  choice set dialog and beside an item’s choice set. A `single_choice`
+  item on an ordered set is tagged ORD, ordinal, in SurveyBuilder and
+  SurveyStudio, so it reaches the methods for ordered categories. Every
+  `single_choice` item was tagged NOM before, the known limitation 0.4.3
+  shipped with. The field is written only when `TRUE`, so existing files
+  keep their hashes.
 - A plan block saved with the `outcome` role, which R accepts beside
   `dependent`, opens with that variable selected. Regression blocks
   opened with the first listed variable in its place. The builder reads
@@ -73,9 +323,59 @@ teaching session on 0.4.2 found. Install it with
 - The Outcome and other role dropdowns stay inside the Add or Edit
   Analysis Plan dialog when an item label is long. The role grid columns
   can now shrink, and each select fills its column.
+- **SurveyBuilder keeps the amendment log.** Opening an amended
+  `.sframe` file in the builder and saving it dropped its `amendments`,
+  `designs` and `sframe_format` fields, so a disclosed revision vanished
+  silently. The builder now carries every field it leaves unedited
+  through to the next save.
+- **Every file saved from SurveyBuilder carries `sframe_format`**, as
+  [`write_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/write_sframe.md)
+  writes it. sframe-schema’s instrument profile requires the field, so
+  each new file saved from the builder failed that schema.
+- **Save settings writes only the fields you changed.** It wrote every
+  General, Welcome and Thank You field from its input, so an absent
+  author list became an empty string and absent screens took their
+  default wording. On an amended instrument that was a content change
+  nobody had made, and
+  [`write_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/write_sframe.md)
+  refused the file. Opening a file also added empty screen objects to
+  it. An emptied author list or description is now saved as absent, as R
+  writes it.
+- **Settings saved on an instrument with an empty `render` are kept.** R
+  writes an empty `render` as a JSON array, and the builder held it as
+  one, so a theme or welcome screen saved there vanished from the saved
+  file. All 19 demos with an empty `render` were affected.
+- **Open asks before replacing unsaved changes**, and opens the file
+  chooser at once when there are none. It replaced them silently.
+  Opening a file also closes the inspector, which kept showing an item
+  from the survey being replaced, and the status reads “Opened” until
+  the next save. It read “Saved just now”, which inside a host such as
+  Ethos reads as saved in the host.
+- The question editing area is a named, focusable region, so a keyboard
+  user can reach and scroll it. At narrow widths it was a scroll region
+  reachable by pointer alone.
+- **SurveyBuilder’s Survey settings dialog scrolls.** A tab taller than
+  the dialog ran past its bottom edge, with its last controls out of
+  reach. The dialog body now shrinks to fit and scrolls.
 
 ### SurveyStudio
 
+- **SurveyStudio has a References screen.** It lists the works the open
+  instrument cites, adds more from pasted BibTeX with where the
+  instrument cites each one, and removes them. Changes apply to the open
+  instrument at once, need no amendment, and travel in the exported
+  `.sframe` file. `launch_studio(screen = "references")` opens on it.
+- **SurveyStudio keeps an instrument’s references.** Its rebuild of the
+  open instrument had no place for them, so they were dropped as soon as
+  a file opened, and lost from anything exported.
+- **The dashboard’s filters are named by their questions** and offer the
+  choice labels. They showed the item id, such as `visit_type`, and the
+  stored codes. Each label is now tied to its control.
+- **Run results on the Analysis Plan screen take the full width.** Each
+  result card sat inside the middle third of the screen, about 230 px
+  wide, so a result table printed “120” one digit per line and cut off
+  its p column. The cards now sit in a full-width row below the 3
+  columns on the Run preview tab.
 - The Quality Dashboard says when the duplicate check needs an id
   column, where it printed “NA duplicate response row(s) detected”. It
   now uses a `respondent_id` column for the check by default.
@@ -87,6 +387,28 @@ teaching session on 0.4.2 found. Install it with
 
 ### Demos
 
+- **Every demo has welcome, consent and thank-you screens.** 19 of the
+  22 shipped with none, so a respondent met the questions with no
+  consent step. They now carry plain screens in the default look,
+  consent required, and `branded = TRUE` still replaces the whole block.
+  `instrument_revision` is rebuilt on the updated `first_survey`, and
+  the learn-by-example screenshots are recaptured.
+- [`sframe_demo_branding()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_demo_branding.md)
+  prints each setting as a respondent meets it, with a pointer to
+  [`preview_demo()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/preview_demo.md).
+  It printed a raw nested list, which read as a failed demo. It returns
+  a list of class `sframe_branding`, and
+  [`sf_instrument()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_instrument.md)
+  stores it as a plain list.
+- `sframe_demo("instrument_revision")` takes a further amendment. Its
+  amendment log recorded hashes from code that predates the settled
+  content hash, so
+  [`amend_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/amend_sframe.md)
+  on it failed with “The amendment log is out of sequence at entry 2”,
+  and so did
+  [`write_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/write_sframe.md)
+  after any change. The demo is regenerated, its content unchanged, and
+  a test now amends and writes every shipped demo.
 - [`preview_demo()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/preview_demo.md)
   opens a branded demo as a respondent sees it in one line, in the
   browser or on SurveyStudio’s preview screen. The start-up note now
@@ -94,12 +416,6 @@ teaching session on 0.4.2 found. Install it with
 - The reference results shipped with 6 demos are regenerated for the
   changes above: `first_survey`, `instrument_revision`, `verification`,
   `branching`, `conversational_branching` and `multi_response`.
-
-### Known limitation
-
-- SurveyBuilder tags every `single_choice` item as nominal, ordinal ones
-  included. Marking a choice set as ordered needs a new field in the
-  format, which a later release can add.
 
 ## surveyframe 0.4.2
 

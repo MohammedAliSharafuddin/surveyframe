@@ -18,16 +18,22 @@ codebook_report(instrument, format = c("html", "md"))
 
 - format:
 
-  Character. Output format. Either `"html"` or `"md"`.
+  Character. Output format. Either `"html"` or `"md"`. With `"md"`, the
+  codebook also carries itself as Markdown text, in `markdown`, and
+  [`print()`](https://rdrr.io/r/base/print.html) writes that text.
 
 ## Value
 
 An object of class `sframe_codebook`, a list with elements
-`instrument_meta`, `items_table`, `choices_table`, and `scales_table`.
-Call [`print()`](https://rdrr.io/r/base/print.html) to display a compact
-summary or use
+`instrument_meta`, `items_table`, `choices_table`, `scales_table`,
+`plan_table`, `models_table` and `format`, and with `format = "md"`,
+`markdown`: one character string holding the whole codebook as Markdown,
+with a pipe table per component. Save it with
+`writeLines(cb$markdown, "codebook.md")`. With `"html"`,
+[`print()`](https://rdrr.io/r/base/print.html) shows a compact summary,
+and
 [`render_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_report.md)
-to include the codebook in a full report.
+includes the codebook in a full report.
 
 ## See also
 
@@ -55,6 +61,18 @@ print(cb)
 #>      id  label   type scale_id reverse
 #> 1 sat_1 Item 1 likert      sat   FALSE
 #> 2 sat_2 Item 2 likert      sat   FALSE
+md <- codebook_report(instr, format = "md")
+cat(substr(md$markdown, 1, 200))
+#> # Codebook: Demo Survey
+#> 
+#> - **Version:** 0.1.0
+#> - **Languages:** en
+#> 
+#> ## Items
+#> 
+#> | id | label | type | choice_set | scale_id | reverse | required |
+#> |---|---|---|---|---|---|---|
+#> | sat_1 | Item 1 | likert 
 nrow(sf_items(cb))
 #> [1] 2
 nrow(sf_scales(cb))

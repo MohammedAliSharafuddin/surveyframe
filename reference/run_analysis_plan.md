@@ -127,11 +127,11 @@ print(results)
 #> 
 #> RQ 5: What are the central tendency and spread of all response items?
 #>   Test: descriptives
-#>   APA:  Descriptive statistics were computed for 12 variable(s).
+#>   APA:  Descriptive statistics were computed for 12 variables.
 #> 
 #> RQ 6: What is the pattern of missing responses across items?
 #>   Test: missing_data
-#>   APA:  Missing-data diagnostics were computed for 12 variable(s).
+#>   APA:  Missing-data diagnostics were computed for 12 variables.
 #> 
 #> RQ 7: Do respondents meet attention check and data quality thresholds?
 #>   Test: quality
@@ -139,7 +139,7 @@ print(results)
 #> 
 #> RQ 8: What are the mean, SD, and range of each composite scale?
 #>   Test: descriptives
-#>   APA:  Descriptive statistics were computed for 5 variable(s).
+#>   APA:  Descriptive statistics were computed for 5 variables.
 #> 
 #> RQ 9: What is the Cronbach alpha internal consistency of each scale?
 #>   Test: reliability_alpha

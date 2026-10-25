@@ -97,6 +97,16 @@ chosen from the extension.</p></dd>
     <p>The path, invisibly.</p>
     </div>
     <div class="section level2">
+    <h2 id="text-codes-in-stata">Text codes in Stata<a class="anchor" aria-label="anchor" href="#text-codes-in-stata"></a></h2>
+
+
+<p>Stata attaches value labels to numbers alone. In a <code>.dta</code>, a choice set
+coded with text, such as <code>"a"</code> and <code>"b"</code>, is written as 1, 2, 3 in the
+set's declared order, each carrying its label, so the file reads back in
+Stata with the labels intact. A <code>.sav</code> keeps the text codes, which SPSS
+labels directly.</p>
+    </div>
+    <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p><code><a href="sframe_demo.html">sframe_demo()</a></code>, <code><a href="read_responses.html">read_responses()</a></code></p></div>
     </div>

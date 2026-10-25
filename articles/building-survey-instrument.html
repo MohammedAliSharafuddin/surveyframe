@@ -268,7 +268,7 @@ the result, and use the accessors to get at the parts.</p>
 <span><span class="co">#&gt; &lt;sframe validation&gt;</span></span>
 <span><span class="co">#&gt;   Instrument:  Digital marketing study (teaching slice) (1.0.0)</span></span>
 <span><span class="co">#&gt;   Status:      valid</span></span>
-<span><span class="co">#&gt;   Checks:      28 run, 0 with problems</span></span></code></pre></div>
+<span><span class="co">#&gt;   Checks:      29 run, 0 with problems</span></span></code></pre></div>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">validation</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/validate_sframe.html">validate_sframe</a></span><span class="op">(</span><span class="va">instr</span>, strict <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/sf_is_valid.html">sf_is_valid</a></span><span class="op">(</span><span class="va">validation</span><span class="op">)</span></span>
@@ -284,12 +284,64 @@ instrument with its validated stamp set.</p>
 <span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
 </div>
 <div class="section level2">
+<h2 id="cite-the-sources-the-instrument-draws-on">Cite the sources the instrument draws on<a class="anchor" aria-label="anchor" href="#cite-the-sources-the-instrument-draws-on"></a>
+</h2>
+<p>An instrument rests on published work: the source of each scale, and
+the method behind each plan block. <code><a href="../reference/sf_reference.html">sf_reference()</a></code> records a
+work as CSL-JSON, the format Zotero, Mendeley and pandoc share, and
+<code>cited_by</code> says where the instrument cites it:
+<code>"instrument"</code> as a whole, or <code>"item:&lt;id&gt;"</code>,
+<code>"scale:&lt;id&gt;"</code>, <code>"plan:&lt;block id&gt;"</code> or
+<code>"model:&lt;id&gt;"</code>.</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">cronbach</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sf_reference.html">sf_reference</a></span><span class="op">(</span></span>
+<span>  id <span class="op">=</span> <span class="st">"cronbach_1951"</span>,</span>
+<span>  title <span class="op">=</span> <span class="st">"Coefficient alpha and the internal structure of tests"</span>,</span>
+<span>  author <span class="op">=</span> <span class="st">"Cronbach, L. J."</span>, year <span class="op">=</span> <span class="fl">1951</span>,</span>
+<span>  container <span class="op">=</span> <span class="st">"Psychometrika"</span>, volume <span class="op">=</span> <span class="st">"16"</span>, issue <span class="op">=</span> <span class="st">"3"</span>, pages <span class="op">=</span> <span class="st">"297-334"</span>,</span>
+<span>  cited_by <span class="op">=</span> <span class="st">"plan:M1"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p>A reference copied from Google Scholar, Zotero or a journal page
+arrives as BibTeX, and <code><a href="../reference/read_bibtex.html">read_bibtex()</a></code> reads it with base R
+alone.</p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">likert</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_bibtex.html">read_bibtex</a></span><span class="op">(</span>text <span class="op">=</span> <span class="st">"@article{likert_1932,</span></span>
+<span><span class="st">  author  = {Likert, Rensis},</span></span>
+<span><span class="st">  title   = {A technique for the measurement of attitudes},</span></span>
+<span><span class="st">  journal = {Archives of Psychology},</span></span>
+<span><span class="st">  year    = {1932}, volume = {22}, number = {140}, pages = {1--55}</span></span>
+<span><span class="st">}"</span>, cited_by <span class="op">=</span> <span class="st">"instrument"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">instr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/add_references.html">add_references</a></span><span class="op">(</span><span class="va">instr</span>, <span class="va">cronbach</span>, <span class="va">likert</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="fu"><a href="../reference/sframe_references.html">sframe_references</a></span><span class="op">(</span><span class="va">instr</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "cronbach_1951" "likert_1932"</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="fu"><a href="../reference/sframe_references.html">sframe_references</a></span><span class="op">(</span><span class="va">instr</span>, cited_by <span class="op">=</span> <span class="st">"plan:M1"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "cronbach_1951"</span></span></code></pre></div>
+<p><code><a href="../reference/validate_sframe.html">validate_sframe()</a></code> checks that every key is unique and
+that each <code>cited_by</code> target exists. The references travel
+inside the <code>.sframe</code> file. Citing a source is disclosure,
+outside the design, so the content hash that <code><a href="../reference/amend_sframe.html">amend_sframe()</a></code>
+records leaves <code>references</code> out, and a source can be added to
+a published instrument directly.</p>
+<p><code><a href="../reference/render_report.html">render_report()</a></code> cites each work in text, as author and
+year, and lists every work once, in a References section at the end.
+That list holds the instrument’s own references and the references of
+every method the plan ran, formatted by pandoc in APA 7th edition, which
+ships with the package, or in any Citation Style Language file given as
+<code>csl =</code>. A written interpretation can cite a work as
+<code>[@key]</code>, and <code>references =</code> adds works cited
+there. <code><a href="../reference/render_results.html">render_results()</a></code> lists its references once at the
+end in the same way. In SurveyBuilder, the References tab of Survey
+settings takes pasted BibTeX or a typed reference, and SurveyStudio has
+a References screen that does the same.</p>
+</div>
+<div class="section level2">
 <h2 id="write-and-read--sframe-files">Write and read <code>.sframe</code> files<a class="anchor" aria-label="anchor" href="#write-and-read--sframe-files"></a>
 </h2>
 <p>The <code>.sframe</code> file is the portable instrument file. It
 keeps the validated metadata, the analysis plan, and the model in one
 place.</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>fileext <span class="op">=</span> <span class="st">".sframe"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/write_sframe.html">write_sframe</a></span><span class="op">(</span><span class="va">instr</span>, <span class="va">path</span>, overwrite <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
@@ -301,14 +353,16 @@ place.</p>
 <span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="fu"><a href="../reference/sf_plan.html">sf_plan</a></span><span class="op">(</span><span class="va">loaded</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 2</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">loaded</span><span class="op">$</span><span class="va">models</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 1</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] 1</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="fu"><a href="../reference/sframe_references.html">sframe_references</a></span><span class="op">(</span><span class="va">loaded</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 2</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="gui-option">GUI option<a class="anchor" aria-label="anchor" href="#gui-option"></a>
 </h2>
 <p>The same instrument, plan, and model can be authored in
 SurveyBuilder, which saves a <code>.sframe</code> file for use in R.</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/launch_builder.html">launch_builder</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/launch_builder_demo.html">launch_builder_demo</a></span><span class="op">(</span>open <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 </div>

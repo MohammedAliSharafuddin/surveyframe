@@ -17,6 +17,7 @@ sframe_builder_validate_draft(
   render = list(),
   amendments = list(),
   designs = list(),
+  references = list(),
   origin = NULL
 )
 ```
@@ -53,6 +54,12 @@ sframe_builder_validate_draft(
 
   List of conjoint designs, carried through unchanged, since Studio has
   no editor for them.
+
+- references:
+
+  List of
+  [`sf_reference()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_reference.md)
+  records, as edited on Studio's References screen.
 
 - origin:
 

@@ -65,14 +65,34 @@ it, change a colour, and paste it into your own instrument.</p>
 
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A named list suitable for <code>sf_instrument(render = )</code>: the display
-<code>mode</code>, the <code>theme</code> colour, the <code>submit_label</code>, and the <code>welcome</code>,
-<code>thankyou</code> and <code>header</code> blocks.</p>
+    <p>A named list of class <code>sframe_branding</code>, suitable for
+<code>sf_instrument(render = )</code>: the display <code>mode</code>, the <code>theme</code> colour, the
+<code>submit_label</code>, and the <code>welcome</code>, <code>thankyou</code> and <code>header</code> blocks.
+Printing it shows each setting as a respondent meets it.
+<code><a href="sf_instrument.html">sf_instrument()</a></code> and <code><a href="sframe_demo.html">sframe_demo()</a></code> store it as a plain list.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
+    <div class="dont-index"><p><code><a href="preview_demo.html">preview_demo()</a></code> to see the branding applied to a demo.</p></div>
     </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">branding</span> <span class="op">&lt;-</span> <span class="fu">sframe_demo_branding</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">branding</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;sframe demo branding&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Theme:         #2563eb</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Mode:          standard</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Header:        Riverside Conference Centre, progress bar shown</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Welcome:       "Thank you for coming"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                  This takes about 3 minutes. Your answers help us plan next year's event.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Consent:       "I am happy for my answers to be used in the event report.", required</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Start button:  "Start"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Submit button: "Send my feedback"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Thank you:     "Thank you. Your feedback has been recorded."</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> A render block for sf_instrument(render = ). See it applied with</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> preview_demo("two_group"), or use sframe_demo(name, branded = TRUE).</span>
 <span class="r-in"><span><span class="va">branding</span><span class="op">$</span><span class="va">welcome</span><span class="op">$</span><span class="va">title</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Thank you for coming"</span>
 <span class="r-in"><span><span class="va">branding</span><span class="op">$</span><span class="va">theme</span></span></span>

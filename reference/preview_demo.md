@@ -2,8 +2,8 @@
 
 Loads a bundled demo with the standard branding and opens it as a
 respondent would see it, either as a standalone page in the browser or
-on SurveyStudio's preview screen. The preview cannot collect, so trying
-it sends nothing anywhere.
+on SurveyStudio's preview screen. The preview has its collector removed,
+so trying it is safe.
 
 ## Usage
 
@@ -52,7 +52,7 @@ returns.
 
 ``` r
 path <- preview_demo("two_group", open = FALSE)
-#> Static survey written to '/tmp/RtmpMSn8NS/surveyframe-preview-two_group.html' (69.3 KB).
+#> Static survey written to '/tmp/RtmpwBSeRG/surveyframe-preview-two_group.html' (72.7 KB).
 file.exists(path)
 #> [1] TRUE
 ```

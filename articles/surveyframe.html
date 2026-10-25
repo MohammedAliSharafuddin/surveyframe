@@ -459,7 +459,7 @@ detectable.</p>
 <span><span class="co">#&gt; &lt;sframe validation&gt;</span></span>
 <span><span class="co">#&gt;   Instrument:  Digital Marketing Effectiveness of Tourism Services (1.0.0)</span></span>
 <span><span class="co">#&gt;   Status:      valid</span></span>
-<span><span class="co">#&gt;   Checks:      28 run, 0 with problems</span></span></code></pre></div>
+<span><span class="co">#&gt;   Checks:      29 run, 0 with problems</span></span></code></pre></div>
 <p>Read the parts of the diagnostic with the accessors, which saves
 reaching into it. <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> shows every check that ran,
 including the ones that found nothing, which is how you tell a check
@@ -518,17 +518,24 @@ readable in any text editor. Any tool that reads JSON can open one, and
 the format is documented independently of this package in
 <code>system.file("schema", "sframe_schema.json", package = "surveyframe")</code>,
 a JSON Schema a reviewer or a second tool can validate against, with R
-left out of the loop.</p>
+left out of the loop. It is a copy of the instrument profile published
+in the sframe-schema repository, kept identical by a test, so the
+package and the published format describe the same file.
+<code><a href="../reference/read_sframe.html">read_sframe()</a></code> also reads files written before the
+<code>sframe_format</code> field existed.</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">schema_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"schema"</span>, <span class="st">"sframe_schema.json"</span>, package <span class="op">=</span> <span class="st">"surveyframe"</span><span class="op">)</span></span>
 <span><span class="fu">jsonlite</span><span class="fu">::</span><span class="fu"><a href="https://jeroen.r-universe.dev/jsonlite/reference/fromJSON.html" class="external-link">fromJSON</a></span><span class="op">(</span><span class="va">schema_path</span>, simplifyVector <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">$</span><span class="va">required</span></span>
 <span><span class="co">#&gt; [[1]]</span></span>
-<span><span class="co">#&gt; [1] "hash"</span></span>
+<span><span class="co">#&gt; [1] "sframe_format"</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; [[2]]</span></span>
-<span><span class="co">#&gt; [1] "meta"</span></span>
+<span><span class="co">#&gt; [1] "hash"</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; [[3]]</span></span>
+<span><span class="co">#&gt; [1] "meta"</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; [[4]]</span></span>
 <span><span class="co">#&gt; [1] "items"</span></span></code></pre></div>
 <p>Because the file is plain text, two versions of it diff the same way
 any source file does. If <code>tourism_services_v1.sframe</code> were
@@ -589,15 +596,15 @@ empty field would read as a sign-off.</li>
 <span></span>
 <span><span class="fu"><a href="../reference/amendment_log.html">amendment_log</a></span><span class="op">(</span><span class="va">study_amended</span><span class="op">)</span></span>
 <span><span class="co">#&gt;              timestamp         reason_code</span></span>
-<span><span class="co">#&gt; 1 2026-10-20T07:42:54Z instrument_revision</span></span>
+<span><span class="co">#&gt; 1 2026-10-25T20:09:06Z instrument_revision</span></span>
 <span><span class="co">#&gt;                                    reason_text   tier author</span></span>
 <span><span class="co">#&gt; 1 Clarified item wording after pilot feedback. design   &lt;NA&gt;</span></span>
 <span><span class="co">#&gt;                                     deviation_report signoff</span></span>
 <span><span class="co">#&gt; 1 Wording only; the construct measured is unchanged.    none</span></span>
 <span><span class="co">#&gt;                                                      previous_hash</span></span>
-<span><span class="co">#&gt; 1 040a6d50eadd236842513f7a663e5b1f9db0571dd4a6847c828080fc595aa4bb</span></span>
+<span><span class="co">#&gt; 1 0edfceef9b270136e2e434c99fe47737d47ad2e5dcdae649d2bbd566efc78cce</span></span>
 <span><span class="co">#&gt;                                                           new_hash</span></span>
-<span><span class="co">#&gt; 1 d02488b021272c8e852b2872a54133325e9d0a7443242d12e7419b7f1159cdef</span></span>
+<span><span class="co">#&gt; 1 bfabe61d61dc63438ad68cf26714370b8da4b52e3941630829a4efbc0534bde2</span></span>
 <span><span class="co">#&gt;   changed_fields</span></span>
 <span><span class="co">#&gt; 1          items</span></span></code></pre></div>
 <p><code><a href="../reference/amendment_log.html">amendment_log()</a></code> returns the full history as a data
@@ -675,7 +682,7 @@ shared by email, or opened directly from disk.</p>
 <span>  output_path <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"tourism_services_survey.html"</span><span class="op">)</span>,</span>
 <span>  open        <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; Static survey written to '/tmp/RtmpazZ5hz/tourism_services_survey.html' (95.8</span></span>
+<span><span class="co">#&gt; Static survey written to '/tmp/Rtmp57C7Gz/tourism_services_survey.html' (99.3</span></span>
 <span><span class="co">#&gt; KB).</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/files.html" class="external-link">file.exists</a></span><span class="op">(</span><span class="va">html_path</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
@@ -728,7 +735,7 @@ the splitting already done.</p>
 <span>  sheet_url  <span class="op">=</span> <span class="st">"https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID"</span>,</span>
 <span>  output_dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; Apps Script written to: /tmp/RtmpazZ5hz/surveyframe_collector.gs</span></span>
+<span><span class="co">#&gt; Apps Script written to: /tmp/Rtmp57C7Gz/surveyframe_collector.gs</span></span>
 <span><span class="co">#&gt; Follow the setup instructions inside the file to deploy it.</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/files.html" class="external-link">file.exists</a></span><span class="op">(</span><span class="va">script_path</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
@@ -1320,7 +1327,7 @@ respondents for researcher review, not automatic exclusion.</p>
 <div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># sf_apa() gives a plain-language summary suitable for a methods section.</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="../reference/sf_apa.html">sf_apa</a></span><span class="op">(</span><span class="va">mr</span><span class="op">)</span>, <span class="st">"\n"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Missing-data diagnostics were computed for 55 variable(s).</span></span></code></pre></div>
+<span><span class="co">#&gt; Missing-data diagnostics were computed for 55 variables.</span></span></code></pre></div>
 <hr>
 </div>
 <div class="section level2">
@@ -1751,9 +1758,9 @@ and descriptives alongside the analysis results.</p>
 <span>  output_file <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"tourism_results.html"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Results report written:"</span>, <span class="va">results_path</span>, <span class="st">"\n"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Results report written: /tmp/RtmpazZ5hz/tourism_results.html</span></span>
+<span><span class="co">#&gt; Results report written: /tmp/Rtmp57C7Gz/tourism_results.html</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Size:"</span>, <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.info.html" class="external-link">file.size</a></span><span class="op">(</span><span class="va">results_path</span><span class="op">)</span> <span class="op">/</span> <span class="fl">1024</span>, <span class="fl">1</span><span class="op">)</span>, <span class="st">"KB\n"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Size: 14 KB</span></span></code></pre></div>
+<span><span class="co">#&gt; Size: 11.6 KB</span></span></code></pre></div>
 <p>The results report contains one section per research question, with
 the APA statistic, effect size, writing prompt, and the reference for
 the chosen method, each paired with its own chart drawn directly beneath
@@ -1775,7 +1782,7 @@ leaves it to be inferred.</p>
 <span>  include_analysis <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  include_models   <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; Report rendered with the Quarto engine: /tmp/RtmpazZ5hz/tourism_report.html</span></span></code></pre></div>
+<span><span class="co">#&gt; Report rendered with the Quarto engine: /tmp/Rtmp57C7Gz/tourism_report.html</span></span></code></pre></div>
 <hr>
 </div>
 <div class="section level2">

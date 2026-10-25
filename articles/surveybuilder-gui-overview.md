@@ -58,6 +58,12 @@ the decision rule. The form offers only the role set a method needs and
 reads the measurement level of each variable, so a saved plan is
 coherent.
 
+![SurveyBuilder in Analyse mode with the Edit Analysis Plan dialog open.
+The dialog shows the research question, Variable X and Variable Y role
+dropdowns, Pearson correlation as the method, a significance level of
+0.05, the reporting references, the planned output and assumptions, and
+the decision rule.](figures/gui-builder-analyse-plan.png)
+
 The Run and Report tabs relabel the same plan list as a “run queue” and
 a “report outline”. They do not compute anything. SurveyBuilder stores
 each plan with an empty result, because the browser cannot run R. The
@@ -78,10 +84,16 @@ Apps Script collector.
 ## SurveyStudio: the screens
 
 SurveyStudio is a Shiny application, so it can run R. Its left
-navigation lists nine screens in this order: Open Instrument,
-Amendments, Preview Survey, Upload Responses, Quality Dashboard,
+navigation lists ten screens in this order: Open Instrument, Amendments,
+References, Preview Survey, Upload Responses, Quality Dashboard,
 Reliability, Analysis Plan, Dashboard, and Export. Survey design is done
 in the SurveyBuilder, and the studio opens the resulting `.sframe`.
+
+![SurveyStudio's Upload Responses screen. The left navigation lists the
+ten screens. The main panel has a CSV file chooser, respondent ID and
+submitted-at column fields, a strict column check, and help on loading
+responses collected elsewhere or from a Google
+Sheet.](figures/gui-studio-responses.png)
 
 The Amendments screen discloses a change to the open instrument: upload
 a revised `.sframe`, give a reason and an explanation, and
@@ -91,17 +103,28 @@ earlier entry stays as it was written. Exporting the amended instrument
 keeps that log inside the `.sframe` file, readable later with
 [`amendment_log()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/amendment_log.md).
 
+The References screen lists the works the instrument cites and adds more
+from pasted BibTeX, each with where the instrument cites it. Citing a
+source needs no amendment, and the references travel in the exported
+`.sframe` file.
+
 The Preview Survey screen renders the exact deployable survey, identical
 to the exported HTML.
 
 The Analysis Plan screen does two jobs. It edits the plan, with the same
 research question, method, significance level, and role fields as the
 builder. It also runs the plan. When response data have been uploaded,
-the screen calls
+the Run preview tab calls
 [`run_analysis_plan()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/run_analysis_plan.md)
-and shows a “Run results” table with the plan ID, the method, and the
-APA result for each research question. Without responses, it asks you to
-upload data before running.
+and shows a card for each research question: the APA result, the effect
+size, a formatted table and the chart, across the width of the screen.
+Without responses, it asks you to upload data before running.
+
+![A SurveyStudio result card on the Analysis Plan screen's Run preview
+tab: research question 1 asks whether digital experience is associated
+with behavioural intention, with the result r(118) = 0.60, 95% CI 0.48
+to 0.71, p below .001, a one-row table of the statistic, and a scatter
+plot with a fitted line.](figures/gui-studio-analysis.png)
 
 The Export screen produces the written report through
 [`render_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_report.md).
@@ -141,6 +164,11 @@ In RStudio, the same tools open from the **Addins** menu in the toolbar.
 The 4 commands are listed under **surveyframe:** and are searchable by
 that prefix in the command palette. Each one needs the rstudioapi
 package.
+
+![The RStudio Addins menu filtered by the word surveyframe, listing 4
+commands: Design an instrument, Open analysis workspace, Analyse an
+existing instrument, and Insert starter
+instrument.](figures/gui-rstudio-addins.png)
 
 | Command | What opens | What it needs |
 |----|----|----|
@@ -227,6 +255,11 @@ launch_dashboard(
 ```
 
 Use the dashboard after data collection for read-only exploration.
+
+![The response dashboard's Overview tab: filters named by their
+questions and a date range, tiles for 120 filtered responses, 19 survey
+items, 2 scales, 1 attention check and the date range, and an instrument
+summary table.](figures/gui-dashboard.png)
 
 ## Known limitations
 

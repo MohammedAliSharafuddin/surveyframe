@@ -54,7 +54,7 @@ v
 #> <sframe validation>
 #>   Instrument:  Demo Survey (0.1.0)
 #>   Status:      valid
-#>   Checks:      28 run, 0 with problems
+#>   Checks:      29 run, 0 with problems
 sf_is_valid(v)
 #> [1] TRUE
 sf_problems(v)
@@ -92,4 +92,5 @@ summary(v)
 #> 26 decision_scale_compatibility     ok          0
 #> 27                    model_ids     ok          0
 #> 28                  model_specs     ok          0
+#> 29                   references     ok          0
 ```

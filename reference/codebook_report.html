@@ -75,15 +75,21 @@ as HTML or Markdown.</p>
 
 
 <dt id="arg-format">format<a class="anchor" aria-label="anchor" href="#arg-format"></a></dt>
-<dd><p>Character. Output format. Either <code>"html"</code> or <code>"md"</code>.</p></dd>
+<dd><p>Character. Output format. Either <code>"html"</code> or <code>"md"</code>.
+With <code>"md"</code>, the codebook also carries itself as Markdown text, in
+<code>markdown</code>, and <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code> writes that text.</p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>An object of class <code>sframe_codebook</code>, a list with elements
-<code>instrument_meta</code>, <code>items_table</code>, <code>choices_table</code>, and <code>scales_table</code>.
-Call <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code> to display a compact summary or use <code><a href="render_report.html">render_report()</a></code> to
-include the codebook in a full report.</p>
+<code>instrument_meta</code>, <code>items_table</code>, <code>choices_table</code>, <code>scales_table</code>,
+<code>plan_table</code>, <code>models_table</code> and <code>format</code>, and with <code>format = "md"</code>,
+<code>markdown</code>: one character string holding the whole codebook as Markdown,
+with a pipe table per component. Save it with
+<code>writeLines(cb$markdown, "codebook.md")</code>. With <code>"html"</code>, <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code>
+shows a compact summary, and <code><a href="render_report.html">render_report()</a></code> includes the codebook in a
+full report.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
@@ -111,6 +117,18 @@ include the codebook in a full report.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      id  label   type scale_id reverse</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1 sat_1 Item 1 likert      sat   FALSE</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2 sat_2 Item 2 likert      sat   FALSE</span>
+<span class="r-in"><span><span class="va">md</span> <span class="op">&lt;-</span> <span class="fu">codebook_report</span><span class="op">(</span><span class="va">instr</span>, format <span class="op">=</span> <span class="st">"md"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/substr.html" class="external-link">substr</a></span><span class="op">(</span><span class="va">md</span><span class="op">$</span><span class="va">markdown</span>, <span class="fl">1</span>, <span class="fl">200</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> # Codebook: Demo Survey</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - **Version:** 0.1.0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - **Languages:** en</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ## Items</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> | id | label | type | choice_set | scale_id | reverse | required |</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |---|---|---|---|---|---|---|</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> | sat_1 | Item 1 | likert </span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="fu"><a href="sf_items.html">sf_items</a></span><span class="op">(</span><span class="va">cb</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 2</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="fu"><a href="sf_scales.html">sf_scales</a></span><span class="op">(</span><span class="va">cb</span><span class="op">)</span><span class="op">)</span></span></span>

@@ -181,7 +181,7 @@ validate_sframe(instr, strict = FALSE)
 #> <sframe validation>
 #>   Instrument:  Digital marketing study (teaching slice) (1.0.0)
 #>   Status:      valid
-#>   Checks:      28 run, 0 with problems
+#>   Checks:      29 run, 0 with problems
 ```
 
 ``` r
@@ -205,6 +205,68 @@ sf_meta(instr)$validated
 #> [1] TRUE
 ```
 
+## Cite the sources the instrument draws on
+
+An instrument rests on published work: the source of each scale, and the
+method behind each plan block.
+[`sf_reference()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_reference.md)
+records a work as CSL-JSON, the format Zotero, Mendeley and pandoc
+share, and `cited_by` says where the instrument cites it: `"instrument"`
+as a whole, or `"item:<id>"`, `"scale:<id>"`, `"plan:<block id>"` or
+`"model:<id>"`.
+
+``` r
+
+cronbach <- sf_reference(
+  id = "cronbach_1951",
+  title = "Coefficient alpha and the internal structure of tests",
+  author = "Cronbach, L. J.", year = 1951,
+  container = "Psychometrika", volume = "16", issue = "3", pages = "297-334",
+  cited_by = "plan:M1"
+)
+```
+
+A reference copied from Google Scholar, Zotero or a journal page arrives
+as BibTeX, and
+[`read_bibtex()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_bibtex.md)
+reads it with base R alone.
+
+``` r
+
+likert <- read_bibtex(text = "@article{likert_1932,
+  author  = {Likert, Rensis},
+  title   = {A technique for the measurement of attitudes},
+  journal = {Archives of Psychology},
+  year    = {1932}, volume = {22}, number = {140}, pages = {1--55}
+}", cited_by = "instrument")
+
+instr <- add_references(instr, cronbach, likert)
+names(sframe_references(instr))
+#> [1] "cronbach_1951" "likert_1932"
+names(sframe_references(instr, cited_by = "plan:M1"))
+#> [1] "cronbach_1951"
+```
+
+[`validate_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/validate_sframe.md)
+checks that every key is unique and that each `cited_by` target exists.
+The references travel inside the `.sframe` file. Citing a source is
+disclosure, outside the design, so the content hash that
+[`amend_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/amend_sframe.md)
+records leaves `references` out, and a source can be added to a
+published instrument directly.
+
+[`render_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_report.md)
+cites each work in text, as author and year, and lists every work once,
+in a References section at the end. That list holds the instrument’s own
+references and the references of every method the plan ran, formatted by
+pandoc in APA 7th edition, which ships with the package, or in any
+Citation Style Language file given as `csl =`. A written interpretation
+can cite a work as `[@key]`, and `references =` adds works cited there.
+[`render_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_results.md)
+lists its references once at the end in the same way. In SurveyBuilder,
+the References tab of Survey settings takes pasted BibTeX or a typed
+reference, and SurveyStudio has a References screen that does the same.
+
 ## Write and read `.sframe` files
 
 The `.sframe` file is the portable instrument file. It keeps the
@@ -224,6 +286,8 @@ length(sf_plan(loaded))
 #> [1] 2
 length(loaded$models)
 #> [1] 1
+length(sframe_references(loaded))
+#> [1] 2
 ```
 
 ## GUI option

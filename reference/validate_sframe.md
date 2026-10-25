@@ -118,7 +118,7 @@ validate_sframe(instr, strict = FALSE)
 #> <sframe validation>
 #>   Instrument:  Demo Survey (0.1.0)
 #>   Status:      valid
-#>   Checks:      28 run, 0 with problems
+#>   Checks:      29 run, 0 with problems
 
 # Explore it with dedicated methods rather than reaching in with `$`
 v <- validate_sframe(instr, strict = FALSE)
@@ -156,6 +156,7 @@ summary(v)
 #> 26 decision_scale_compatibility     ok          0
 #> 27                    model_ids     ok          0
 #> 28                  model_specs     ok          0
+#> 29                   references     ok          0
 
 # Recover the validated instrument
 validated <- as_sframe(validate_sframe(instr, strict = TRUE))

@@ -494,18 +494,25 @@ when you report completeness.</p>
 <div class="section level2">
 <h2 id="make-it-yours">Make it yours<a class="anchor" aria-label="anchor" href="#make-it-yours"></a>
 </h2>
-<p>Every demo above ships plain. The whole appearance of a survey lives
-in one <code>render</code> block, which you can read, change and paste
-into your own instrument:</p>
+<p>Every demo above ships with plain welcome, consent and thank-you
+screens and the default look. The whole appearance of a survey lives in
+one <code>render</code> block, which you can read, change and paste into
+your own instrument:</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="fu"><a href="../reference/sframe_demo_branding.html">sframe_demo_branding</a></span><span class="op">(</span><span class="op">)</span>, max.level <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
-<span><span class="co">#&gt; List of 6</span></span>
-<span><span class="co">#&gt;  $ mode        : chr "standard"</span></span>
-<span><span class="co">#&gt;  $ theme       : chr "#2563eb"</span></span>
-<span><span class="co">#&gt;  $ submit_label: chr "Send my feedback"</span></span>
-<span><span class="co">#&gt;  $ welcome     :List of 5</span></span>
-<span><span class="co">#&gt;  $ thankyou    :List of 3</span></span>
-<span><span class="co">#&gt;  $ header      :List of 3</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/sframe_demo_branding.html">sframe_demo_branding</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; &lt;sframe demo branding&gt;</span></span>
+<span><span class="co">#&gt;   Theme:         #2563eb</span></span>
+<span><span class="co">#&gt;   Mode:          standard</span></span>
+<span><span class="co">#&gt;   Header:        Riverside Conference Centre, progress bar shown</span></span>
+<span><span class="co">#&gt;   Welcome:       "Thank you for coming"</span></span>
+<span><span class="co">#&gt;                  This takes about 3 minutes. Your answers help us plan next year's event.</span></span>
+<span><span class="co">#&gt;   Consent:       "I am happy for my answers to be used in the event report.", required</span></span>
+<span><span class="co">#&gt;   Start button:  "Start"</span></span>
+<span><span class="co">#&gt;   Submit button: "Send my feedback"</span></span>
+<span><span class="co">#&gt;   Thank you:     "Thank you. Your feedback has been recorded."</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; A render block for sf_instrument(render = ). See it applied with</span></span>
+<span><span class="co">#&gt; preview_demo("two_group"), or use sframe_demo(name, branded = TRUE).</span></span></code></pre></div>
 <p>Applied to any demo with <code>branded = TRUE</code>, which leaves
 the files on disk as they are:</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
@@ -587,7 +594,7 @@ left alone:</p>
 <span><span class="va">tampered</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/basename.html" class="external-link">dirname</a></span><span class="op">(</span><span class="va">v</span><span class="op">$</span><span class="va">instrument_path</span><span class="op">)</span>, <span class="st">"verification_tampered.sframe"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/read_sframe.html">read_sframe</a></span><span class="op">(</span><span class="va">tampered</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;"> in `sframe_abort_import()`:</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> Integrity check failed for '/home/runner/work/_temp/Library/surveyframe/extdata/demos/verification_tampered.sframe'. The file may have been modified after it was written. Expected hash: cd0559dd3d78521f047d795300a3e5432ca759354efce4e6383b094c4bf7ef00. Stored hash: a677623e873632d441187904c82cb3067e3c2e6130b5991f618e8509f4473106.</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> Integrity check failed for '/home/runner/work/_temp/Library/surveyframe/extdata/demos/verification_tampered.sframe'. The file may have been modified after it was written. Expected hash: cfdca4de693431558469490f62cb609f7c416601cc00151575f8310fa5792f84. Stored hash: a182ec0a9cc574a5fb649f4c47b224dcade895443d32946d27c4a35195c33ecd.</span></span></code></pre></div>
 <p>The altered file refuses to load because its content no longer
 matches its stored digest. This detects an undisclosed content change
 alone: authorship, research quality, and full amendment disclosure each

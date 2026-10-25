@@ -383,7 +383,7 @@ validate_sframe(study, strict = FALSE)
 #> <sframe validation>
 #>   Instrument:  Digital Marketing Effectiveness of Tourism Services (1.0.0)
 #>   Status:      valid
-#>   Checks:      28 run, 0 with problems
+#>   Checks:      29 run, 0 with problems
 ```
 
 Read the parts of the diagnostic with the accessors, which saves
@@ -450,19 +450,26 @@ text editor. Any tool that reads JSON can open one, and the format is
 documented independently of this package in
 `system.file("schema", "sframe_schema.json", package = "surveyframe")`,
 a JSON Schema a reviewer or a second tool can validate against, with R
-left out of the loop.
+left out of the loop. It is a copy of the instrument profile published
+in the sframe-schema repository, kept identical by a test, so the
+package and the published format describe the same file.
+[`read_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_sframe.md)
+also reads files written before the `sframe_format` field existed.
 
 ``` r
 
 schema_path <- system.file("schema", "sframe_schema.json", package = "surveyframe")
 jsonlite::fromJSON(schema_path, simplifyVector = FALSE)$required
 #> [[1]]
-#> [1] "hash"
+#> [1] "sframe_format"
 #> 
 #> [[2]]
-#> [1] "meta"
+#> [1] "hash"
 #> 
 #> [[3]]
+#> [1] "meta"
+#> 
+#> [[4]]
 #> [1] "items"
 ```
 
@@ -521,15 +528,15 @@ study_amended <- amend_sframe(
 
 amendment_log(study_amended)
 #>              timestamp         reason_code
-#> 1 2026-10-20T07:42:54Z instrument_revision
+#> 1 2026-10-25T20:09:06Z instrument_revision
 #>                                    reason_text   tier author
 #> 1 Clarified item wording after pilot feedback. design   <NA>
 #>                                     deviation_report signoff
 #> 1 Wording only; the construct measured is unchanged.    none
 #>                                                      previous_hash
-#> 1 040a6d50eadd236842513f7a663e5b1f9db0571dd4a6847c828080fc595aa4bb
+#> 1 0edfceef9b270136e2e434c99fe47737d47ad2e5dcdae649d2bbd566efc78cce
 #>                                                           new_hash
-#> 1 d02488b021272c8e852b2872a54133325e9d0a7443242d12e7419b7f1159cdef
+#> 1 bfabe61d61dc63438ad68cf26714370b8da4b52e3941630829a4efbc0534bde2
 #>   changed_fields
 #> 1          items
 ```
@@ -624,7 +631,7 @@ html_path <- export_static_survey(
   output_path = file.path(tempdir(), "tourism_services_survey.html"),
   open        = FALSE
 )
-#> Static survey written to '/tmp/RtmpazZ5hz/tourism_services_survey.html' (95.8
+#> Static survey written to '/tmp/Rtmp57C7Gz/tourism_services_survey.html' (99.3
 #> KB).
 file.exists(html_path)
 #> [1] TRUE
@@ -677,7 +684,7 @@ script_path <- export_google_sheet(
   sheet_url  = "https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID",
   output_dir = tempdir()
 )
-#> Apps Script written to: /tmp/RtmpazZ5hz/surveyframe_collector.gs
+#> Apps Script written to: /tmp/Rtmp57C7Gz/surveyframe_collector.gs
 #> Follow the setup instructions inside the file to deploy it.
 file.exists(script_path)
 #> [1] TRUE
@@ -928,7 +935,7 @@ Item-level missingness {.table}
 
 # sf_apa() gives a plain-language summary suitable for a methods section.
 cat(sf_apa(mr), "\n")
-#> Missing-data diagnostics were computed for 55 variable(s).
+#> Missing-data diagnostics were computed for 55 variables.
 ```
 
 ------------------------------------------------------------------------
@@ -1262,9 +1269,9 @@ results_path <- render_results(
   output_file = file.path(tempdir(), "tourism_results.html")
 )
 cat("Results report written:", results_path, "\n")
-#> Results report written: /tmp/RtmpazZ5hz/tourism_results.html
+#> Results report written: /tmp/Rtmp57C7Gz/tourism_results.html
 cat("Size:", round(file.size(results_path) / 1024, 1), "KB\n")
-#> Size: 14 KB
+#> Size: 11.6 KB
 ```
 
 The results report contains one section per research question, with the
@@ -1290,7 +1297,7 @@ render_report(
   include_analysis = TRUE,
   include_models   = FALSE
 )
-#> Report rendered with the Quarto engine: /tmp/RtmpazZ5hz/tourism_report.html
+#> Report rendered with the Quarto engine: /tmp/Rtmp57C7Gz/tourism_report.html
 ```
 
 ------------------------------------------------------------------------

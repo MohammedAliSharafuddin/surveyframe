@@ -1,7 +1,7 @@
 # Export a self-contained static HTML survey
 
 Generates a single HTML file that presents the survey instrument in a
-browser, with no Shiny server and no internet connection. Every item
+browser by itself, offline, with the Shiny server left out. Every item
 type, branching, required-item checks and multi-page navigation run in
 the browser's own JavaScript.
 
@@ -50,9 +50,9 @@ export_static_survey(
   Logical. `TRUE` exports a survey that collects nothing: the collector
   endpoint and the completion redirect are both removed, and the
   thank-you screen says the response went nowhere. This is what
-  SurveyStudio's preview uses, so a test answer cannot reach a live
-  study's collector. Supplying `endpoint_url` alongside it is an error.
-  Defaults to `FALSE`.
+  SurveyStudio's preview uses, which keeps a test answer away from a
+  live study's collector. Supplying `endpoint_url` alongside it is an
+  error. Defaults to `FALSE`.
 
 ## Value
 
@@ -69,9 +69,9 @@ When `output_path` is `NULL`, the file is written to
 On submission the survey builds a one-row CSV in the browser's memory
 and shows the thank-you screen. When `endpoint_url` is supplied, it also
 sends the response as a POST request to that URL, for example a Google
-Apps Script web app. The browser reports nothing back from that request,
-so the survey treats it as sent and the respondent sees the thank-you
-screen either way.
+Apps Script web app. The browser reads back none of the reply to that
+request, so the survey treats it as sent and the respondent sees the
+thank-you screen either way.
 
 The thank-you screen offers the CSV as a download button, which the
 respondent chooses to use. It appears when the instrument's thank-you
@@ -81,6 +81,25 @@ file is the only copy of the response.
 Plan for both parts. Test the endpoint with a pilot submission and
 confirm the row arrives before collecting, and treat the download as a
 route a respondent may decline.
+
+## For a host page: confirmed delivery, restarts and drafts
+
+While a response is being sent, the survey shows a sending screen. A
+host that can confirm delivery, such as a platform embedding the survey,
+defines `window.sframeSendResponse(row)` in the page before the survey
+script runs. The survey then hands each response to that function in
+place of its own POST. It returns a Promise: resolving to `true`, or to
+`{confirmed: true}`, shows the response as recorded. Resolving to
+anything else shows it as sent and unconfirmed, and a rejection shows
+the failure screen with a retry.
+
+Two settings in the instrument's `render` block suit a host too.
+`render$thankyou$show_restart = FALSE` hides "Submit another response".
+`render$save_draft = TRUE` keeps the answers in the browser's local
+storage as the respondent goes, under a key drawn from the instrument's
+content, so a respondent who closes the tab is offered to resume on
+return. The draft is cleared once the response is submitted, and kept
+when delivery fails.
 
 The exported file works offline. It can be hosted on GitHub Pages,
 Netlify, any static file server, or e-mailed as an attachment for
@@ -108,7 +127,7 @@ instr <- sf_instrument("Customer Satisfaction Survey",
 out <- export_static_survey(instr,
                              output_path = file.path(tempdir(), "sat.html"),
                              open = FALSE)
-#> Static survey written to '/tmp/RtmpMSn8NS/sat.html' (68.6 KB).
+#> Static survey written to '/tmp/RtmpwBSeRG/sat.html' (72 KB).
 file.exists(out)
 #> [1] TRUE
 
@@ -117,7 +136,7 @@ file.exists(out)
 export_static_survey(instr,
                      output_path = file.path(tempdir(), "sat_browser.html"),
                      overwrite = TRUE)
-#> Static survey written to '/tmp/RtmpMSn8NS/sat_browser.html' (68.6 KB).
+#> Static survey written to '/tmp/RtmpwBSeRG/sat_browser.html' (72 KB).
 
 # Write with a Google Apps Script endpoint for server-side collection
 export_static_survey(
@@ -127,6 +146,6 @@ export_static_survey(
   open         = FALSE,
   overwrite    = TRUE
 )
-#> Static survey written to '/tmp/RtmpMSn8NS/sat_endpoint.html' (68.6 KB).
+#> Static survey written to '/tmp/RtmpwBSeRG/sat_endpoint.html' (72 KB).
 # }
 ```

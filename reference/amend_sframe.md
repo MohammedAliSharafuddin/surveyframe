@@ -98,12 +98,31 @@ independent approval.
 
 `previous_hash` and `new_hash` on each entry are a content fingerprint:
 a SHA-256 over a canonical serialisation of the instrument, with the
-`hash` and `amendments` fields excluded, taken after validation, so
-`new_hash` is the content that is written. It is distinct from the
-file's own integrity hash from
+`hash`, `amendments` and `references` fields excluded, taken after
+validation, so `new_hash` is the content that is written. It is distinct
+from the file's own integrity hash from
 [`write_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/write_sframe.md),
 which also covers the amendment log. Both identify content. Neither is
 byte identity.
+
+## Wording on the participant's screens
+
+The welcome, consent and thank-you wording lives in `render`, and both
+hashes cover `render`, so editing that wording changes the instrument as
+much as editing an item does. On a published instrument, record it as a
+pipeline-tier amendment with `reason_code = "other"` and a `reason_text`
+saying what was reworded, then write the file with
+[`write_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/write_sframe.md).
+This is the intended path for a host that lets researchers edit these
+screens. A file whose JSON is edited directly fails
+[`read_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_sframe.md)'s
+hash check.
+
+    revised <- instrument
+    revised$render$welcome$consent_text <- "I agree to take part."
+    revised <- amend_sframe(instrument, revised, "other",
+                            "Consent wording shortened", tier = "pipeline")
+    write_sframe(revised, "study.sframe", overwrite = TRUE)
 
 ## See also
 

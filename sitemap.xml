@@ -22,6 +22,7 @@
 <url><loc>https://mohammedalisharafuddin.github.io/surveyframe/news/index.html</loc></url>
 <url><loc>https://mohammedalisharafuddin.github.io/surveyframe/reference/SFRAME_FORMAT_VERSION.html</loc></url>
 <url><loc>https://mohammedalisharafuddin.github.io/surveyframe/reference/add_model.html</loc></url>
+<url><loc>https://mohammedalisharafuddin.github.io/surveyframe/reference/add_references.html</loc></url>
 <url><loc>https://mohammedalisharafuddin.github.io/surveyframe/reference/amend_sframe.html</loc></url>
 <url><loc>https://mohammedalisharafuddin.github.io/surveyframe/reference/amendment_log.html</loc></url>
 <url><loc>https://mohammedalisharafuddin.github.io/surveyframe/reference/analysis_syntax.html</loc></url>
@@ -90,11 +91,13 @@
 <url><loc>https://mohammedalisharafuddin.github.io/surveyframe/reference/print.sf_scale.html</loc></url>
 <url><loc>https://mohammedalisharafuddin.github.io/surveyframe/reference/print.sframe.html</loc></url>
 <url><loc>https://mohammedalisharafuddin.github.io/surveyframe/reference/quality_report.html</loc></url>
+<url><loc>https://mohammedalisharafuddin.github.io/surveyframe/reference/read_bibtex.html</loc></url>
 <url><loc>https://mohammedalisharafuddin.github.io/surveyframe/reference/read_responses.html</loc></url>
 <url><loc>https://mohammedalisharafuddin.github.io/surveyframe/reference/read_sframe.html</loc></url>
 <url><loc>https://mohammedalisharafuddin.github.io/surveyframe/reference/read_sheet_responses.html</loc></url>
 <url><loc>https://mohammedalisharafuddin.github.io/surveyframe/reference/reliability_report.html</loc></url>
 <url><loc>https://mohammedalisharafuddin.github.io/surveyframe/reference/render_report.html</loc></url>
+<url><loc>https://mohammedalisharafuddin.github.io/surveyframe/reference/render_result.html</loc></url>
 <url><loc>https://mohammedalisharafuddin.github.io/surveyframe/reference/render_results.html</loc></url>
 <url><loc>https://mohammedalisharafuddin.github.io/surveyframe/reference/render_survey.html</loc></url>
 <url><loc>https://mohammedalisharafuddin.github.io/surveyframe/reference/run_analysis_plan.html</loc></url>
@@ -133,6 +136,7 @@
 <url><loc>https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_plan-set.html</loc></url>
 <url><loc>https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_plan.html</loc></url>
 <url><loc>https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_problems.html</loc></url>
+<url><loc>https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_reference.html</loc></url>
 <url><loc>https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_report_accessors.html</loc></url>
 <url><loc>https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_scale.html</loc></url>
 <url><loc>https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_scales.html</loc></url>
@@ -144,6 +148,7 @@
 <url><loc>https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_analysis_qmd.html</loc></url>
 <url><loc>https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_as_data_frame.html</loc></url>
 <url><loc>https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_assemble_pairwise.html</loc></url>
+<url><loc>https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_bibliography.html</loc></url>
 <url><loc>https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_builder_empty_state.html</loc></url>
 <url><loc>https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_builder_state_from_instrument.html</loc></url>
 <url><loc>https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_builder_validate_draft.html</loc></url>
@@ -187,10 +192,12 @@
 <url><loc>https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_plot_variable_distribution.html</loc></url>
 <url><loc>https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_plots.html</loc></url>
 <url><loc>https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_rated_matrix.html</loc></url>
+<url><loc>https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_references.html</loc></url>
 <url><loc>https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_reports.html</loc></url>
 <url><loc>https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_result_supplement.html</loc></url>
 <url><loc>https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_run_stm_topics.html</loc></url>
 <url><loc>https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_run_topic_model_lda.html</loc></url>
+<url><loc>https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_save_figures.html</loc></url>
 <url><loc>https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_small_sample_advisory.html</loc></url>
 <url><loc>https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_subset.html</loc></url>
 <url><loc>https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_validation.html</loc></url>

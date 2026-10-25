@@ -33,6 +33,14 @@ sframe_export_labelled(data, instrument, path)
 
 The path, invisibly.
 
+## Text codes in Stata
+
+Stata attaches value labels to numbers alone. In a `.dta`, a choice set
+coded with text, such as `"a"` and `"b"`, is written as 1, 2, 3 in the
+set's declared order, each carrying its label, so the file reads back in
+Stata with the labels intact. A `.sav` keeps the text codes, which SPSS
+labels directly.
+
 ## See also
 
 [`sframe_demo()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_demo.md),

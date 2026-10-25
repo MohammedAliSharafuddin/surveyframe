@@ -148,7 +148,7 @@ in <code><a href="as_sframe.html">as_sframe()</a></code>.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &lt;sframe validation&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Instrument:  Demo Survey (0.1.0)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Status:      valid</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Checks:      28 run, 0 with problems</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Checks:      29 run, 0 with problems</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Explore it with dedicated methods rather than reaching in with `$`</span></span></span>
 <span class="r-in"><span><span class="va">v</span> <span class="op">&lt;-</span> <span class="fu">validate_sframe</span><span class="op">(</span><span class="va">instr</span>, strict <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
@@ -186,6 +186,7 @@ in <code><a href="as_sframe.html">as_sframe()</a></code>.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 26 decision_scale_compatibility     ok          0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 27                    model_ids     ok          0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 28                  model_specs     ok          0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 29                   references     ok          0</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Recover the validated instrument</span></span></span>
 <span class="r-in"><span><span class="va">validated</span> <span class="op">&lt;-</span> <span class="fu"><a href="as_sframe.html">as_sframe</a></span><span class="op">(</span><span class="fu">validate_sframe</span><span class="op">(</span><span class="va">instr</span>, strict <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span></span>

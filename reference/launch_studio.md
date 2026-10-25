@@ -56,9 +56,10 @@ launch_studio(
 - screen:
 
   The screen to open on. One of `"auto"`, which picks by what you
-  supply, or a screen name: `"open"`, `"amendments"`, `"preview"`,
-  `"responses"`, `"quality"`, `"reliability"`, `"analysis"`,
-  `"dashboard"` or `"export"`. `"data"` is accepted for `"responses"`.
+  supply, or a screen name: `"open"`, `"amendments"`, `"references"`,
+  `"preview"`, `"responses"`, `"quality"`, `"reliability"`,
+  `"analysis"`, `"dashboard"` or `"export"`. `"data"` is accepted for
+  `"responses"`.
 
 - port:
 

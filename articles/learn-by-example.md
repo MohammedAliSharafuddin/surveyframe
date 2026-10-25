@@ -300,20 +300,27 @@ head(tf$table, 5)
 
 ## Make it yours
 
-Every demo above ships plain. The whole appearance of a survey lives in
-one `render` block, which you can read, change and paste into your own
+Every demo above ships with plain welcome, consent and thank-you screens
+and the default look. The whole appearance of a survey lives in one
+`render` block, which you can read, change and paste into your own
 instrument:
 
 ``` r
 
-str(sframe_demo_branding(), max.level = 1)
-#> List of 6
-#>  $ mode        : chr "standard"
-#>  $ theme       : chr "#2563eb"
-#>  $ submit_label: chr "Send my feedback"
-#>  $ welcome     :List of 5
-#>  $ thankyou    :List of 3
-#>  $ header      :List of 3
+sframe_demo_branding()
+#> <sframe demo branding>
+#>   Theme:         #2563eb
+#>   Mode:          standard
+#>   Header:        Riverside Conference Centre, progress bar shown
+#>   Welcome:       "Thank you for coming"
+#>                  This takes about 3 minutes. Your answers help us plan next year's event.
+#>   Consent:       "I am happy for my answers to be used in the event report.", required
+#>   Start button:  "Start"
+#>   Submit button: "Send my feedback"
+#>   Thank you:     "Thank you. Your feedback has been recorded."
+#> 
+#> A render block for sf_instrument(render = ). See it applied with
+#> preview_demo("two_group"), or use sframe_demo(name, branded = TRUE).
 ```
 
 Applied to any demo with `branded = TRUE`, which leaves the files on
@@ -415,7 +422,7 @@ v <- sframe_demo("verification")
 tampered <- file.path(dirname(v$instrument_path), "verification_tampered.sframe")
 read_sframe(tampered)
 #> Error in `sframe_abort_import()`:
-#> ! Integrity check failed for '/home/runner/work/_temp/Library/surveyframe/extdata/demos/verification_tampered.sframe'. The file may have been modified after it was written. Expected hash: cd0559dd3d78521f047d795300a3e5432ca759354efce4e6383b094c4bf7ef00. Stored hash: a677623e873632d441187904c82cb3067e3c2e6130b5991f618e8509f4473106.
+#> ! Integrity check failed for '/home/runner/work/_temp/Library/surveyframe/extdata/demos/verification_tampered.sframe'. The file may have been modified after it was written. Expected hash: cfdca4de693431558469490f62cb609f7c416601cc00151575f8310fa5792f84. Stored hash: a182ec0a9cc574a5fb649f4c47b224dcade895443d32946d27c4a35195c33ecd.
 ```
 
 The altered file refuses to load because its content no longer matches

@@ -57,8 +57,9 @@ sf_instrument(
   [`sf_scale()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_scale.md),
   [`sf_branch()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_branch.md),
   [`sf_check()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_check.md),
+  [`sf_conjoint_design()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_conjoint_design.md),
   and
-  [`sf_conjoint_design()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_conjoint_design.md).
+  [`sf_reference()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_reference.md).
   Components are sorted by class automatically, so they can be supplied
   in any order.
 

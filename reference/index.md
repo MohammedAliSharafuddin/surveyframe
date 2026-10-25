@@ -325,6 +325,8 @@ R code behind a computed result.
   : Render a reproducible survey report
 - [`render_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_results.md)
   : Render analysis results to a formatted HTML report
+- [`render_result()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_result.md)
+  : Render one analysis result as the report does
 - [`model_report_template()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/model_report_template.md)
   : Create a model reporting template
 - [`analysis_syntax()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/analysis_syntax.md)
@@ -333,6 +335,24 @@ R code behind a computed result.
   : The second table a result carries, if it has one
 - [`sframe_analysis_qmd()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_analysis_qmd.md)
   : Write a Quarto analysis notebook for any instrument
+- [`sframe_save_figures()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_save_figures.md)
+  : Save the charts from an analysis plan as files
+
+## References
+
+Cite the works an instrument draws on. The references travel in the
+.sframe file and the report lists each one once, at the end.
+
+- [`sf_reference()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_reference.md)
+  : Create a reference
+- [`read_bibtex()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_bibtex.md)
+  : Read references from BibTeX
+- [`add_references()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/add_references.md)
+  : Add references to an instrument
+- [`sframe_references()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_references.md)
+  : List an instrument's references
+- [`sframe_bibliography()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_bibliography.md)
+  : Write a bibliography as CSL-JSON
 
 ## Plotting
 

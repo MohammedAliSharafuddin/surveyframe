@@ -52,47 +52,153 @@
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.4.3" id="surveyframe-043">surveyframe 0.4.3<a class="anchor" aria-label="anchor" href="#surveyframe-043"></a></h2>
-<p>A GitHub release, ahead of the next CRAN submission. It fixes what a teaching session on 0.4.2 found. Install it with <code>remotes::install_github("MohammedAliSharafuddin/surveyframe")</code>.</p>
+<p>It fixes what a teaching session on 0.4.2 found and what Ethos, the research platform built on surveyframe, reported from its own use, and adds references carried inside the <code>.sframe</code> file. It went out on GitHub on 19 October 2026 and reaches CRAN with the fixes since. SurveyBuilder no longer changes content its user left alone, so an amended instrument saved from it can be written again, and every plan result can be serialised by a host.</p>
 <div class="section level3">
 <h3 id="what-you-need-to-change-0-4-3">What you need to change<a class="anchor" aria-label="anchor" href="#what-you-need-to-change-0-4-3"></a></h3>
 <ul><li>
 <strong>A frequency table now shows choice labels, with the code in its own column.</strong> The table’s columns are <code>Value</code> (the label), <code>Code</code>, <code>Frequency</code> and <code>Percent</code>. Code reading <code>Value</code> for the stored code should read <code>Code</code>. Rows follow the choice set’s declared order, and a declared choice nobody picked appears with a count of 0.</li>
 <li>
 <strong>A descriptives block counts choice items.</strong> See below. Numbers for a <code>single_choice</code> or <code>multiple_choice</code> column move from the mean and SD table to a table of counts and percentages.</li>
+<li>
+<strong>Every plan result serialises with <code><a href="https://jeroen.r-universe.dev/jsonlite/reference/fromJSON.html" class="external-link">jsonlite::toJSON()</a></code>.</strong> The classed report behind a descriptives, missing-data, quality, reliability, EFA or item-diagnostics result, and a fitted LDA or STM topic model, now sit in an attribute for the current R session, which <code>toJSON()</code> leaves out. Code reading <code>result$report_obj</code> or <code>result$fit$model</code> should stop doing so: <code><a href="../reference/extract_quotes.html">extract_quotes()</a></code> finds the model itself, and the charts <code>run_analysis_plan(plots = TRUE)</code> draws are unchanged. The KMO and parallel-analysis parts of an EFA readiness result are now plain lists holding the same numbers. A host serialising results failed on all of these, 20 blocks across the demos. Charts drawn with <code>plots = TRUE</code> stay on the result as <code>ggplot</code> objects.</li>
+<li>
+<strong>An empty <code>render</code> is written as <code><a href="https://rdrr.io/r/base/Paren.html" class="external-link">{}</a></code></strong>, an empty object, by <code><a href="../reference/write_sframe.html">write_sframe()</a></code> and SurveyBuilder. It was written as <code>[]</code>, which a host reading the JSON took for a list. A file written with <code>[]</code> still reads and verifies, and an amendment log recorded with <code>[]</code> still matches its content, so such a file takes further amendments as before.</li>
 </ul></div>
 <div class="section level3">
+<h3 id="references-cited-where-they-are-used-and-listed-once-at-the-end-0-4-3">References, cited where they are used and listed once at the end<a class="anchor" aria-label="anchor" href="#references-cited-where-they-are-used-and-listed-once-at-the-end-0-4-3"></a></h3>
+<p>An instrument can now carry the works it draws on, and every report lists them once, in a References section at the end, in a standard bibliography style.</p>
+<ul><li>
+<strong><code><a href="../reference/sf_reference.html">sf_reference()</a></code></strong> creates a reference as a CSL-JSON record, the format Zotero, Mendeley and pandoc share. <strong><code><a href="../reference/read_bibtex.html">read_bibtex()</a></code></strong> reads BibTeX, as exported by Google Scholar, Zotero, Mendeley and most journal pages, using base R alone. <strong><code><a href="../reference/add_references.html">add_references()</a></code></strong> attaches references to an instrument, and <code>sf_instrument(components = )</code> takes them too. <strong><code><a href="../reference/sframe_references.html">sframe_references()</a></code></strong> lists them, and <strong><code><a href="../reference/sframe_bibliography.html">sframe_bibliography()</a></code></strong> writes the CSL-JSON a citation processor reads.</li>
+<li>
+<strong>Each reference says where it is cited</strong>: the instrument as a whole, an item, a scale, a plan block or a model, in its <code>cited_by</code> field. <code><a href="../reference/validate_sframe.html">validate_sframe()</a></code> gains a <code>references</code> check that every target exists and every key is unique. A work in another language can carry <code>language</code>, which keeps a style from title-casing its journal name.</li>
+<li>
+<strong><code><a href="../reference/render_report.html">render_report()</a></code> cites in text and lists each work once, at the end.</strong> Each result used to carry its own reference list, so the same works repeated through the report. Results now cite their methods in text, for example “(Cohen, 1988)”, and the codebook names the source of each item and scale. A written interpretation can cite a work as <code>[@key]</code>. The list at the end is formatted by pandoc’s citation processor in APA 7, bundled with the package, or in any style given as <code>csl =</code>. The new <code>references =</code> argument adds works a host cites in the write-up. <code><a href="../reference/render_results.html">render_results()</a></code> lists its references once at the end in the same way.</li>
+<li>
+<strong>The 30 built-in method references are also held as CSL-JSON.</strong> A test formats each one through pandoc in APA 7 and compares it with the APA text the package already shipped, which holds the 2 forms together.</li>
+<li>The building-survey-instrument vignette has a section on citing sources: <code><a href="../reference/sf_reference.html">sf_reference()</a></code>, <code><a href="../reference/read_bibtex.html">read_bibtex()</a></code>, where a work is cited, and what <code><a href="../reference/render_report.html">render_report()</a></code> does with the list.</li>
+<li>
+<strong>SurveyBuilder has a References tab in Survey settings.</strong> Paste BibTeX or type a reference in, and choose where the instrument cites it. Changes apply at once, ahead of Save settings.</li>
+</ul><div class="section level4">
+<h4 id="the-file-format-0-4-3">The file format<a class="anchor" aria-label="anchor" href="#the-file-format-0-4-3"></a></h4>
+<ul><li>
+<strong><code>read_sframe(text = )</code> reads a payload held in memory</strong>, such as JSON a host keeps in a database, with no temporary file. <strong><code>verify = FALSE</code></strong> reads content whose hash is missing or does not match, with a warning of class <code>sframe_unverified_warning</code>, and marks the instrument with the attribute <code>sframe_verified = FALSE</code>, which <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code> shows. A host can then keep every field where it used to rebuild the instrument by hand. Such an instrument is written only as a new instrument, or when its amendment log names exactly its content.</li>
+<li>
+<strong>The bundled schema is the published one.</strong> <code>inst/schema/sframe_schema.json</code> is now a copy of sframe-schema’s instrument profile, kept identical by a test. The 2 had drifted: the bundled copy left <code>sframe_format</code> optional and lacked <code>references</code>, so a file could pass one and fail the other. It now requires <code>sframe_format</code>, as <code><a href="../reference/write_sframe.html">write_sframe()</a></code> writes it. <code><a href="../reference/read_sframe.html">read_sframe()</a></code> still reads older files without the field. Every bundled <code>.sframe</code> file and a builder save validate against it.</li>
+<li>
+<code>references</code> is a new optional top-level field. It is written only when an instrument has at least one, so an instrument with no references keeps the file hash it had, the rule <code>designs</code> and <code>amendments</code> already follow.</li>
+<li>
+<strong>Citing a source is disclosure, outside the amendment record.</strong> The content hash that <code><a href="../reference/amend_sframe.html">amend_sframe()</a></code> records leaves <code>references</code> out, so a reference can be added to a published instrument directly.</li>
+<li>
+<code>inst/schema/sframe_schema.json</code> documents the field. Its description of the amendment content hash was also wrong: it named only the items, choices, scales, branching, checks, plan, models and designs, while the hash has always covered every field except <code>hash</code> and <code>amendments</code>, <code>meta</code>, <code>render</code> and <code>version</code> included. Corrected.</li>
+<li>
+<code>inst/csl/apa.csl</code>, the APA 7 style from the Zotero Style Repository, is bundled under CC BY-SA 3.0. See <code>inst/COPYRIGHTS</code>.</li>
+</ul></div>
+</div>
+<div class="section level3">
 <h3 id="analysis-0-4-3">Analysis<a class="anchor" aria-label="anchor" href="#analysis-0-4-3"></a></h3>
-<ul><li>A <code>frequency</code> block gives one frequency table per variable. It reads the <code>variable</code> role, or <code>variables</code>, and either may name more than one item. With more than one, <code>$tables</code> holds each variable’s own result and <code>$table</code> stacks them with a <code>Variable</code> column, and the chart shows one panel per variable. The <code>variables</code> role was ignored before, so a block written that way reported “Frequency distribution for NA (N = 0)”. SurveyBuilder and SurveyStudio both let the role take more than one variable.</li>
+<ul><li>
+<strong>A descriptives plan table has reader headings</strong>: Variable, N, Valid N, Missing, Mean, SD, the confidence interval’s bounds and the rest, as the other plan tables have. It showed <code>valid_n</code>, <code>missing_n</code> and <code>sd</code>. The group column is left out when there is no split, and the weighted mean when there are no weights. <code><a href="../reference/descriptives_report.html">descriptives_report()</a></code> keeps its own column names, and the demo reference results keep theirs.</li>
+<li>Report sentences agree in number: “computed for 1 variable” in place of “1 variable(s)”.</li>
+<li>A <code>frequency</code> block gives one frequency table per variable. It reads the <code>variable</code> role, or <code>variables</code>, and either may name more than one item. With more than one, <code>$tables</code> holds each variable’s own result and <code>$table</code> stacks them with a <code>Variable</code> column, and the chart shows one panel per variable. The <code>variables</code> role was ignored before, so a block written that way reported “Frequency distribution for NA (N = 0)”. SurveyBuilder and SurveyStudio both let the role take more than one variable.</li>
 <li>A frequency table labels each code from the item’s own choice set. A code that means different things in 2 choice sets (1 for Male in one, 1 for North in another) used to print as the bare code.</li>
 <li>A <code>descriptives</code> block counts <code>single_choice</code> items and the option columns of a <code>multiple_choice</code> item, giving each category’s count and percentage, and keeps the mean and SD for numeric items. A nominal code has no meaningful mean, and a mean gender of 1.59 was being reported. The result carries the counts in <code>$categorical</code>, the APA line names the items counted, and <code><a href="../reference/sframe_result_supplement.html">sframe_result_supplement()</a></code> returns the counts so both report engines show them beside the numeric table. <code><a href="../reference/render_results.html">render_results()</a></code> now shows that second table for every result that has one.</li>
 <li>The printed quality report has a Duplicates section, so a reader can see why a respondent counted as flagged. It also says when the check needs a respondent id to run.</li>
 <li>A scale shorter than <code>straightline_min_items</code> is still left unchecked for straight-lining by default, since identical answers to 3 items are common among attentive respondents. The printed report now names the threshold and the setting that would check the scale, and the analysis-plan quality table names the threshold too. The argument’s help says how to check 3-item scales, in a call or in a plan.</li>
 </ul></div>
 <div class="section level3">
+<h3 id="reports-0-4-3">Reports<a class="anchor" aria-label="anchor" href="#reports-0-4-3"></a></h3>
+<ul><li>
+<strong>New <code><a href="../reference/render_result.html">render_result()</a></code> renders one analysis result as the report does</strong>: the formatted table with its caption and note, any second table, the APA line, and the chart the report picks for that method, with the instrument’s labels, as an HTML fragment or with the chart written as PNG or SVG. It uses the report’s own code, so a host showing results one at a time and the report agree. A host had to keep its own map from method to chart, which drifted with each release.</li>
+<li>
+<strong>Figures at the size, resolution and format a journal asks for.</strong> <code>render_report(figures = list(width =, height =, dpi =, format =))</code> applies to every figure in both engines, and defaults to the <code>surveyframe.figures</code> option, so a host can set it once. <code>figure_dir =</code> also writes each plan chart as its own file, PNG, TIFF, JPEG, PDF or SVG. New <code><a href="../reference/sframe_save_figures.html">sframe_save_figures()</a></code> does the same for the results of <code>run_analysis_plan(plots = TRUE)</code>. The report fixed its own figure size, and the built-in engine saved charts at 110 dpi.</li>
+<li>
+<strong><code>codebook_report(format = "md")</code> gives Markdown.</strong> The codebook carries itself as Markdown text in <code>markdown</code>, a heading and a pipe table for the items, choice sets, scales, plan and models, and <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code> writes it. Save it with <code>writeLines(cb$markdown, "codebook.md")</code>. The format argument changed nothing before, so a host received the printed text table.</li>
+<li>
+<strong><code><a href="../reference/render_report.html">render_report()</a></code> takes <code>title</code> and <code>authors</code></strong>, which default to the instrument’s title and authors. Every Quarto report was titled “Survey Research Report” whatever the study. The date under the title is labelled “Rendered” in place of Quarto’s “Published”, since a rendered report has not been published. The built-in HTML engine shows the authors too.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="validation-0-4-3">Validation<a class="anchor" aria-label="anchor" href="#validation-0-4-3"></a></h3>
+<ul><li>
+<strong>A plan block whose roles its method never reads is refused.</strong> A frequency block naming its item under <code>items</code> ran on nothing and reported “Frequency distribution for NA (N = 0)” with an empty table. <code><a href="../reference/validate_sframe.html">validate_sframe()</a></code> now says which roles the method reads and which the block names, and <code><a href="../reference/run_analysis_plan.html">run_analysis_plan()</a></code> gives such a block an <code>error</code> in place of a result. The roles a method reads are found from the same resolver the analysis uses, so the 2 stay in step. <code>partial_correlation</code> and <code>mediation</code> also accept every role alias their runners read.</li>
+<li>
+<strong>A block’s error names its cause.</strong> A block whose role named an item the instrument lacked reported “Test failed.”, and 8 other runners gave errors as bare as “ANOVA failed.”. <code><a href="../reference/run_analysis_plan.html">run_analysis_plan()</a></code> now names a variable the responses lack, saying whether it is an unknown name, an item with no column or a scale with no scored column, and a test that fails says which variable holds no numbers, or that too few responses had a value, or else passes on R’s own reason.</li>
+<li>
+<strong>A choice set whose codes read as the same number is refused</strong>, by <code><a href="../reference/sf_choices.html">sf_choices()</a></code> and by <code><a href="../reference/validate_sframe.html">validate_sframe()</a></code>. Responses to a set whose codes are all numbers are read as numbers, so the codes 1 and 1.0, or 2 and 02, became one option, and <code><a href="../reference/sframe_export_labelled.html">sframe_export_labelled()</a></code> then failed on duplicate labels.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="documentation-0-4-3">Documentation<a class="anchor" aria-label="anchor" href="#documentation-0-4-3"></a></h3>
+<ul><li>The visual-workflow vignette shows the tools it describes: SurveyBuilder’s Analyse mode with a plan open, SurveyStudio’s Upload Responses screen and a result on its Run preview tab, the dashboard, and the RStudio Addins menu with the 4 surveyframe commands, each with alt text. The images are generated from the demo launchers.</li>
+<li>
+<code><a href="../reference/amend_sframe.html">amend_sframe()</a></code>’s help says how to change the wording on the welcome, consent and thank-you screens. That wording is inside both hashes, so on a published instrument it goes through a pipeline-tier amendment with <code>reason_code = "other"</code> and then <code><a href="../reference/write_sframe.html">write_sframe()</a></code>. A host editing the JSON directly leaves a file <code><a href="../reference/read_sframe.html">read_sframe()</a></code> refuses. The help also lists <code>references</code> among the fields the content hash leaves out.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="export-0-4-3">Export<a class="anchor" aria-label="anchor" href="#export-0-4-3"></a></h3>
+<ul><li>
+<strong>Text-coded choices keep their labels in Stata.</strong> Stata attaches value labels to numbers alone, so a choice set coded <code>a</code> and <code>b</code> with labels A and B read back from <code><a href="../reference/sframe_export_labelled.html">sframe_export_labelled()</a></code> as A = 0 and B = 0. A <code>.dta</code> now holds such codes as 1, 2, 3 in the set’s order, each with its label. A <code>.sav</code> keeps the text codes, which SPSS labels directly.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="the-exported-survey-0-4-3">The exported survey<a class="anchor" aria-label="anchor" href="#the-exported-survey-0-4-3"></a></h3>
+<ul><li>
+<strong>A sending screen while the answers are in flight.</strong> The thank-you screen said the response had been recorded while it was still being sent.</li>
+<li>
+<strong>Confirmed delivery for a host.</strong> A page that defines <code>window.sframeSendResponse(row)</code>, returning a Promise, takes over the send. Resolving to <code>true</code> or <code>{confirmed: true}</code> shows the response as recorded, in place of the note that the page cannot confirm storage, which every respondent saw, even on a host that confirms.</li>
+<li>
+<code>render$thankyou$show_restart = FALSE</code> hides “Submit another response”.</li>
+<li>
+<strong>Drafts.</strong> <code>render$save_draft = TRUE</code> keeps the answers in the browser as the respondent goes, so a closed tab can be resumed from the welcome screen. The draft is cleared once the response is submitted, and kept when delivery fails. SurveyBuilder’s exported survey carries the same template.</li>
+</ul></div>
+<div class="section level3">
 <h3 id="charts-0-4-3">Charts<a class="anchor" aria-label="anchor" href="#charts-0-4-3"></a></h3>
 <ul><li>A chart from the analysis plan names each variable by its label in the instrument, as the tables beside it do. A regression on the scale <code>sat</code> was titled “Observed against fitted values for Sat” while its table read “Satisfaction”. This covers the correlation, regression, group comparison, partial correlation and moderation charts, in <code><a href="../reference/render_report.html">render_report()</a></code> and in SurveyStudio.</li>
+<li>
+<strong>A group comparison chart labels its groups</strong>, in the choice set’s order, where it showed the stored codes (“in_person” beside a table reading “In person”). This covers the t-test, Mann-Whitney, one-way ANOVA, Kruskal-Wallis and ANCOVA charts. <strong>A crosstab or Fisher chart titles its axes and legend with the items’ labels</strong>, where it used their ids. A sweep of every demo chart now finds no id or code where the instrument gives a label.</li>
 </ul></div>
 <div class="section level3">
 <h3 id="surveybuilder-0-4-3">SurveyBuilder<a class="anchor" aria-label="anchor" href="#surveybuilder-0-4-3"></a></h3>
-<ul><li>A plan block saved with the <code>outcome</code> role, which R accepts beside <code>dependent</code>, opens with that variable selected. Regression blocks opened with the first listed variable in its place. The builder reads every role alias R reads, and saves under its own role names.</li>
+<ul><li>
+<strong>A choice set can be declared ordered.</strong> <code>sf_choices(ordered = TRUE)</code> marks options that run in a meaningful order, such as a frequency or an education level, and SurveyBuilder has the same switch in the choice set dialog and beside an item’s choice set. A <code>single_choice</code> item on an ordered set is tagged ORD, ordinal, in SurveyBuilder and SurveyStudio, so it reaches the methods for ordered categories. Every <code>single_choice</code> item was tagged NOM before, the known limitation 0.4.3 shipped with. The field is written only when <code>TRUE</code>, so existing files keep their hashes.</li>
+<li>A plan block saved with the <code>outcome</code> role, which R accepts beside <code>dependent</code>, opens with that variable selected. Regression blocks opened with the first listed variable in its place. The builder reads every role alias R reads, and saves under its own role names.</li>
 <li>The sidebar shows the instrument’s title on first load. A title set by <code><a href="../reference/launch_builder_demo.html">launch_builder_demo()</a></code> read “Untitled Survey” until the first edit.</li>
 <li>The Outcome and other role dropdowns stay inside the Add or Edit Analysis Plan dialog when an item label is long. The role grid columns can now shrink, and each select fills its column.</li>
+<li>
+<strong>SurveyBuilder keeps the amendment log.</strong> Opening an amended <code>.sframe</code> file in the builder and saving it dropped its <code>amendments</code>, <code>designs</code> and <code>sframe_format</code> fields, so a disclosed revision vanished silently. The builder now carries every field it leaves unedited through to the next save.</li>
+<li>
+<strong>Every file saved from SurveyBuilder carries <code>sframe_format</code></strong>, as <code><a href="../reference/write_sframe.html">write_sframe()</a></code> writes it. sframe-schema’s instrument profile requires the field, so each new file saved from the builder failed that schema.</li>
+<li>
+<strong>Save settings writes only the fields you changed.</strong> It wrote every General, Welcome and Thank You field from its input, so an absent author list became an empty string and absent screens took their default wording. On an amended instrument that was a content change nobody had made, and <code><a href="../reference/write_sframe.html">write_sframe()</a></code> refused the file. Opening a file also added empty screen objects to it. An emptied author list or description is now saved as absent, as R writes it.</li>
+<li>
+<strong>Settings saved on an instrument with an empty <code>render</code> are kept.</strong> R writes an empty <code>render</code> as a JSON array, and the builder held it as one, so a theme or welcome screen saved there vanished from the saved file. All 19 demos with an empty <code>render</code> were affected.</li>
+<li>
+<strong>Open asks before replacing unsaved changes</strong>, and opens the file chooser at once when there are none. It replaced them silently. Opening a file also closes the inspector, which kept showing an item from the survey being replaced, and the status reads “Opened” until the next save. It read “Saved just now”, which inside a host such as Ethos reads as saved in the host.</li>
+<li>The question editing area is a named, focusable region, so a keyboard user can reach and scroll it. At narrow widths it was a scroll region reachable by pointer alone.</li>
+<li>
+<strong>SurveyBuilder’s Survey settings dialog scrolls.</strong> A tab taller than the dialog ran past its bottom edge, with its last controls out of reach. The dialog body now shrinks to fit and scrolls.</li>
 </ul></div>
 <div class="section level3">
 <h3 id="surveystudio-0-4-3">SurveyStudio<a class="anchor" aria-label="anchor" href="#surveystudio-0-4-3"></a></h3>
-<ul><li>The Quality Dashboard says when the duplicate check needs an id column, where it printed “NA duplicate response row(s) detected”. It now uses a <code>respondent_id</code> column for the check by default.</li>
+<ul><li>
+<strong>SurveyStudio has a References screen.</strong> It lists the works the open instrument cites, adds more from pasted BibTeX with where the instrument cites each one, and removes them. Changes apply to the open instrument at once, need no amendment, and travel in the exported <code>.sframe</code> file. <code>launch_studio(screen = "references")</code> opens on it.</li>
+<li>
+<strong>SurveyStudio keeps an instrument’s references.</strong> Its rebuild of the open instrument had no place for them, so they were dropped as soon as a file opened, and lost from anything exported.</li>
+<li>
+<strong>The dashboard’s filters are named by their questions</strong> and offer the choice labels. They showed the item id, such as <code>visit_type</code>, and the stored codes. Each label is now tied to its control.</li>
+<li>
+<strong>Run results on the Analysis Plan screen take the full width.</strong> Each result card sat inside the middle third of the screen, about 230 px wide, so a result table printed “120” one digit per line and cut off its p column. The cards now sit in a full-width row below the 3 columns on the Run preview tab.</li>
+<li>The Quality Dashboard says when the duplicate check needs an id column, where it printed “NA duplicate response row(s) detected”. It now uses a <code>respondent_id</code> column for the check by default.</li>
 <li>The Saved analysis plans table keeps short ids such as “RQ1” on one line and scrolls sideways on a narrow screen.</li>
 <li>A result card is headed “RQ 4” when its block id only repeats the number. It read “RQ 4: RQ4”. A block id that says something more, such as “H2a”, still shows beside the number.</li>
 </ul></div>
 <div class="section level3">
 <h3 id="demos-0-4-3">Demos<a class="anchor" aria-label="anchor" href="#demos-0-4-3"></a></h3>
 <ul><li>
+<strong>Every demo has welcome, consent and thank-you screens.</strong> 19 of the 22 shipped with none, so a respondent met the questions with no consent step. They now carry plain screens in the default look, consent required, and <code>branded = TRUE</code> still replaces the whole block. <code>instrument_revision</code> is rebuilt on the updated <code>first_survey</code>, and the learn-by-example screenshots are recaptured.</li>
+<li>
+<code><a href="../reference/sframe_demo_branding.html">sframe_demo_branding()</a></code> prints each setting as a respondent meets it, with a pointer to <code><a href="../reference/preview_demo.html">preview_demo()</a></code>. It printed a raw nested list, which read as a failed demo. It returns a list of class <code>sframe_branding</code>, and <code><a href="../reference/sf_instrument.html">sf_instrument()</a></code> stores it as a plain list.</li>
+<li>
+<code>sframe_demo("instrument_revision")</code> takes a further amendment. Its amendment log recorded hashes from code that predates the settled content hash, so <code><a href="../reference/amend_sframe.html">amend_sframe()</a></code> on it failed with “The amendment log is out of sequence at entry 2”, and so did <code><a href="../reference/write_sframe.html">write_sframe()</a></code> after any change. The demo is regenerated, its content unchanged, and a test now amends and writes every shipped demo.</li>
+<li>
 <code><a href="../reference/preview_demo.html">preview_demo()</a></code> opens a branded demo as a respondent sees it in one line, in the browser or on SurveyStudio’s preview screen. The start-up note now shows it.</li>
 <li>The reference results shipped with 6 demos are regenerated for the changes above: <code>first_survey</code>, <code>instrument_revision</code>, <code>verification</code>, <code>branching</code>, <code>conversational_branching</code> and <code>multi_response</code>.</li>
-</ul></div>
-<div class="section level3">
-<h3 id="known-limitation-0-4-3">Known limitation<a class="anchor" aria-label="anchor" href="#known-limitation-0-4-3"></a></h3>
-<ul><li>SurveyBuilder tags every <code>single_choice</code> item as nominal, ordinal ones included. Marking a choice set as ordered needs a new field in the format, which a later release can add.</li>
 </ul></div>
 </div>
     <div class="section level2">
