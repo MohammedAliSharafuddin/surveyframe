@@ -9,13 +9,19 @@ codebook_report(instrument, format = c("html", "md"))
 \arguments{
 \item{instrument}{An \code{sframe} object.}
 
-\item{format}{Character. Output format. Either \code{"html"} or \code{"md"}.}
+\item{format}{Character. Output format. Either \code{"html"} or \code{"md"}.
+With \code{"md"}, the codebook also carries itself as Markdown text, in
+\code{markdown}, and \code{print()} writes that text.}
 }
 \value{
 An object of class \code{sframe_codebook}, a list with elements
-\code{instrument_meta}, \code{items_table}, \code{choices_table}, and \code{scales_table}.
-Call \code{print()} to display a compact summary or use \code{render_report()} to
-include the codebook in a full report.
+\code{instrument_meta}, \code{items_table}, \code{choices_table}, \code{scales_table},
+\code{plan_table}, \code{models_table} and \code{format}, and with \code{format = "md"},
+\code{markdown}: one character string holding the whole codebook as Markdown,
+with a pipe table per component. Save it with
+\code{writeLines(cb$markdown, "codebook.md")}. With \code{"html"}, \code{print()}
+shows a compact summary, and \code{render_report()} includes the codebook in a
+full report.
 }
 \description{
 Produces a structured codebook listing all items, their types, choice sets,
@@ -35,6 +41,8 @@ instr <- sf_instrument("Demo Survey", components = list(cs, i1, i2, scale))
 
 cb <- codebook_report(instr)
 print(cb)
+md <- codebook_report(instr, format = "md")
+cat(substr(md$markdown, 1, 200))
 nrow(sf_items(cb))
 nrow(sf_scales(cb))
 }

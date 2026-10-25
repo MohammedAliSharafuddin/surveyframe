@@ -129,6 +129,11 @@ style.
 
 ## Reports
 
+* **`codebook_report(format = "md")` gives Markdown.** The codebook carries
+  itself as Markdown text in `markdown`, a heading and a pipe table for the
+  items, choice sets, scales, plan and models, and `print()` writes it. Save
+  it with `writeLines(cb$markdown, "codebook.md")`. The format argument
+  changed nothing before, so a host received the printed text table.
 * **`render_report()` takes `title` and `authors`**, which default to the
   instrument's title and authors. Every Quarto report was titled "Survey
   Research Report" whatever the study. The date under the title is labelled
