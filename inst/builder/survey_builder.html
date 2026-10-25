@@ -3140,9 +3140,9 @@ function openSframeText(text){
     S.meta=src.meta||S.meta;S.choices=src.choices||[];S.items=src.items||[];
     S.scales=src.scales||[];S.branching=src.branching||[];S.checks=src.checks||[];
     S.analysis_plan=src.analysis_plan||[];S.models=src.models||[];
-  // R writes an empty render as []. Held as an array, every setting saved
-  // into it vanished from the saved file, so it is held as an object, and
-  // sframePayload() writes it back as [] while it stays empty. A file with
+  // R wrote an empty render as [] before 0.4.3. Held as an array, every
+  // setting saved into it vanished from the saved file, so it is held as an
+  // object, and written as one, {}, as R writes it now. A file with
   // no render starts with none, where it used to inherit the previous one.
   S.render=(src.render&&!Array.isArray(src.render))?src.render:{};
     // Fields this builder does not edit are carried through to the next
@@ -3189,7 +3189,7 @@ var SFRAME_FORMAT='1.0';
 // The file as saved, hash still empty. Carried fields and references go back
 // in, each only when present, as write_sframe() in R writes them.
 function sframePayload(){
-  var payload={sframe_format:SFRAME_FORMAT,hash:{algo:'sha256',value:''},version:S.meta.version,meta:S.meta,items:S.items,choices:S.choices,scales:S.scales,branching:S.branching,checks:S.checks,analysis_plan:S.analysis_plan,models:S.models||[],render:Object.keys(S.render||{}).length?S.render:[]};
+  var payload={sframe_format:SFRAME_FORMAT,hash:{algo:'sha256',value:''},version:S.meta.version,meta:S.meta,items:S.items,choices:S.choices,scales:S.scales,branching:S.branching,checks:S.checks,analysis_plan:S.analysis_plan,models:S.models||[],render:S.render||{}};
   var carry=S._carry||{};Object.keys(carry).forEach(function(k){payload[k]=carry[k];});
   if(S.references&&S.references.length)payload.references=S.references;
   return payload;

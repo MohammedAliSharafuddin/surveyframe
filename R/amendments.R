@@ -64,8 +64,11 @@ sframe_amendment_entry_hashes <- function(amendments) {
   vapply(amendments %||% list(), sframe_amendment_entry_hash, character(1))
 }
 
-sframe_content_hash <- function(instrument, box = TRUE) {
+sframe_content_hash <- function(instrument, box = TRUE, empty_render_array = FALSE) {
   payload <- sframe_serialization_payload(instrument, box = box)
+  # Before 0.4.3 an empty render serialised as [], and amendment logs
+  # recorded then hash it that way.
+  if (isTRUE(empty_render_array) && length(payload$render) == 0) payload$render <- list()
   payload$hash <- NULL
   payload$amendments <- NULL
   # Citing a source is disclosure, not a design change, so a reference added
@@ -85,7 +88,8 @@ sframe_content_hash_candidates <- function(instrument) {
       ins <- instrument
       if (identical(v, "absent")) ins$meta$validated <- NULL
       else if (!identical(v, "keep")) ins$meta$validated <- v
-      out <- c(out, sframe_content_hash(ins, box = box))
+      out <- c(out, sframe_content_hash(ins, box = box),
+               sframe_content_hash(ins, box = box, empty_render_array = TRUE))
     }
   }
   unique(out)
@@ -347,6 +351,19 @@ amend_sframe <- function(previous, instrument, reason_code, reason_text,
     "none"
   }
 
+  # The previous state as the log last recorded it, where that is one of the
+  # serialisations it may have used, so the log stays in sequence across a
+  # change of serialisation such as the empty render of 0.4.3.
+  last_new <- if (length(previous$amendments)) {
+    previous$amendments[[length(previous$amendments)]]$new_hash
+  }
+  previous_hash <- if (!is.null(last_new) &&
+                       last_new %in% sframe_content_hash_candidates(previous_v)) {
+    last_new
+  } else {
+    sframe_content_hash(previous_v)
+  }
+
   entry <- structure(
     list(
       timestamp = format(Sys.time(), "%Y-%m-%dT%H:%M:%SZ", tz = "UTC"),
@@ -356,7 +373,7 @@ amend_sframe <- function(previous, instrument, reason_code, reason_text,
       author = author,
       deviation_report = deviation_report,
       signoff = signoff,
-      previous_hash = sframe_content_hash(previous_v),
+      previous_hash = previous_hash,
       new_hash = sframe_content_hash(instrument_v),
       changed_fields = as.character(changed_fields)
     ),
