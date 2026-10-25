@@ -103,14 +103,13 @@ sframe_serialization_payload <- function(instrument, hash_value = "", box = TRUE
       sframe_restore_analysis_block
     )),
     models = unname(lapply(instrument$models %||% list(), sframe_model_plain)),
-    # An empty render is an empty object, {}, which is what render is. It
-    # was written as [], which a host reading the JSON took for a list
-    # (Ethos request 3). Files with [] still verify, since the reader hashes
-    # the file as written, and amendment logs recorded with [] still match
-    # (sframe_content_hash_candidates()).
-    render = if (length(instrument$render %||% list()) == 0) {
-      structure(list(), names = character(0))
-    } else instrument$render
+    # Written in the shape it holds. sf_instrument() makes an empty render an
+    # empty named list, written as {}, which is what render is: it was
+    # written as [], which a host reading the JSON took for a list (Ethos
+    # request 3). An instrument read from a file written with [] keeps [], so
+    # it re-serialises to the hash its file stores, and its amendment log
+    # still matches.
+    render = instrument$render %||% list()
   )
 
   # `designs` is added only when the instrument actually declares one.

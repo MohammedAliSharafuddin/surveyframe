@@ -129,8 +129,10 @@ sf_instrument <- function(
       designs   = designs,
       analysis_plan = analysis_plan %||% list(),
       models    = models %||% list(),
-      # A classed render, such as sframe_demo_branding(), is stored plain.
-      render    = unclass(render %||% list()),
+      # A classed render, such as sframe_demo_branding(), is stored plain,
+      # and an empty one as an empty named list, which is written as {}.
+      render    = if (length(render) == 0) structure(list(), names = character(0))
+                  else unclass(render),
       references = unname(references)
     ),
     class = "sframe"
