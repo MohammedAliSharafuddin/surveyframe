@@ -100,9 +100,9 @@ collector.
 ## SurveyStudio: the screens
 
 SurveyStudio is a Shiny application, so it can run R. Its left navigation lists
-nine screens in this order: Open Instrument, Amendments, Preview Survey, Upload
-Responses, Quality Dashboard, Reliability, Analysis Plan, Dashboard, and
-Export. Survey design is done in the SurveyBuilder, and the studio opens the
+ten screens in this order: Open Instrument, Amendments, References, Preview
+Survey, Upload Responses, Quality Dashboard, Reliability, Analysis Plan,
+Dashboard, and Export. Survey design is done in the SurveyBuilder, and the studio opens the
 resulting `.sframe`.
 
 ```{r fig-studio-responses, echo = FALSE, out.width = "100%", fig.alt = "SurveyStudio's Upload Responses screen. The left navigation lists the nine screens. The main panel has a CSV file chooser, respondent ID and submitted-at column fields, a strict column check, and help on loading responses collected elsewhere or from a Google Sheet."}
@@ -114,6 +114,10 @@ revised `.sframe`, give a reason and an explanation, and `amend_sframe()`
 appends the change to the instrument's amendment log, where every earlier
 entry stays as it was written. Exporting the amended instrument keeps that log inside the
 `.sframe` file, readable later with `amendment_log()`.
+
+The References screen lists the works the instrument cites and adds more from
+pasted BibTeX, each with where the instrument cites it. Citing a source needs
+no amendment, and the references travel in the exported `.sframe` file.
 
 The Preview Survey screen renders the exact deployable survey, identical to the
 exported HTML.

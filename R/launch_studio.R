@@ -3,8 +3,8 @@
 # The screens SurveyStudio has, in navigation order, matching the tabs in
 # inst/shiny/app.R.
 sframe_studio_screens <- function() {
-  c("open", "amendments", "preview", "responses", "quality", "reliability",
-    "analysis", "dashboard", "export")
+  c("open", "amendments", "references", "preview", "responses", "quality",
+    "reliability", "analysis", "dashboard", "export")
 }
 
 # Resolves the `screen` argument to a screen Studio has. "build" used to be
@@ -49,7 +49,8 @@ sframe_studio_screen <- function(screen) {
 #' @param strict Logical. Passed to [read_responses()] when `responses` is a
 #'   CSV path.
 #' @param screen The screen to open on. One of `"auto"`, which picks by what
-#'   you supply, or a screen name: `"open"`, `"amendments"`, `"preview"`,
+#'   you supply, or a screen name: `"open"`, `"amendments"`,
+#'   `"references"`, `"preview"`,
 #'   `"responses"`, `"quality"`, `"reliability"`, `"analysis"`,
 #'   `"dashboard"` or `"export"`. `"data"` is accepted for `"responses"`.
 #' @param port TCP port for the Shiny server.

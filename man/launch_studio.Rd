@@ -35,7 +35,8 @@ is a CSV path.}
 CSV path.}
 
 \item{screen}{The screen to open on. One of \code{"auto"}, which picks by what
-you supply, or a screen name: \code{"open"}, \code{"amendments"}, \code{"preview"},
+you supply, or a screen name: \code{"open"}, \code{"amendments"},
+\code{"references"}, \code{"preview"},
 \code{"responses"}, \code{"quality"}, \code{"reliability"}, \code{"analysis"},
 \code{"dashboard"} or \code{"export"}. \code{"data"} is accepted for \code{"responses"}.}
 

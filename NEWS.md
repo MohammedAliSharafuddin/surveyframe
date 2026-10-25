@@ -232,6 +232,11 @@ style.
 
 ## SurveyStudio
 
+* **SurveyStudio has a References screen.** It lists the works the open
+  instrument cites, adds more from pasted BibTeX with where the instrument
+  cites each one, and removes them. Changes apply to the open instrument at
+  once, need no amendment, and travel in the exported `.sframe` file.
+  `launch_studio(screen = "references")` opens on it.
 * **SurveyStudio keeps an instrument's references.** Its rebuild of the
   open instrument had no place for them, so they were dropped as soon as a
   file opened, and lost from anything exported.
