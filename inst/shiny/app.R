@@ -1551,7 +1551,11 @@ ui <- fluidPage(
           column(4, uiOutput("analysis_left_panel")),
           column(4, uiOutput("analysis_middle_panel")),
           column(4, uiOutput("analysis_right_panel"))
-        )
+        ),
+        # Run results take the full width below the 3 columns. Inside the
+        # middle third they had about 230 px at 1440, so a result table
+        # printed "120" one digit per line and clipped its p column.
+        uiOutput("analysis_results_row")
       ),
 
       tags$div(id = "screen-dashboard", class = screen_class("dashboard"),
@@ -2823,7 +2827,7 @@ server <- function(input, output, session) {
         if (syntax_n > 0) tags$p(class = "hint", paste0(
           syntax_n, " syntax-only method(s) excluded from the run queue ",
           "(generate lavaan or seminr strings without response data).")),
-        uiOutput("analysis_results_output")
+        tags$p(class = "hint", "Results for each block are below.")
       ))
     }
     if (identical(stage, "Report")) {
@@ -3209,6 +3213,11 @@ server <- function(input, output, session) {
       return(list())
     }
     lapply(results, studio_result_plot_tags)
+  })
+
+  output$analysis_results_row <- renderUI({
+    if (!identical(input$analysis_stage %||% "Plan", "Run")) return(NULL)
+    fluidRow(column(12, uiOutput("analysis_results_output")))
   })
 
   output$analysis_results_output <- renderUI({

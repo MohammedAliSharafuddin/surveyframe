@@ -225,6 +225,11 @@ style.
 
 ## SurveyStudio
 
+* **Run results on the Analysis Plan screen take the full width.** Each
+  result card sat inside the middle third of the screen, about 230 px wide,
+  so a result table printed "120" one digit per line and cut off its p
+  column. The cards now sit in a full-width row below the 3 columns on the
+  Run preview tab.
 * The Quality Dashboard says when the duplicate check needs an id column, where it
   printed "NA duplicate response row(s) detected". It now uses a
   `respondent_id` column for the check by default.
