@@ -23,7 +23,9 @@ render_report(
   references = NULL,
   csl = NULL,
   title = NULL,
-  authors = NULL
+  authors = NULL,
+  figures = getOption("surveyframe.figures"),
+  figure_dir = NULL
 )
 }
 \arguments{
@@ -99,6 +101,19 @@ instrument's title.}
 \item{authors}{Character vector or \code{NULL}. The report's authors, shown under
 the title. Defaults to the instrument's authors, and is left out when
 there are none.}
+
+\item{figures}{List or \code{NULL}. Size, resolution and format for every figure
+in the report: any of \code{width} and \code{height} in inches, \code{dpi}, and \code{format},
+\code{"png"} or \code{"svg"} inside the report. For example
+\code{list(width = 6.5, height = 4, dpi = 300)}. Absent entries keep each
+engine's own default. Defaults to the \code{surveyframe.figures} option, so a
+host can set it once with \code{options(surveyframe.figures = list(dpi = 300))}.}
+
+\item{figure_dir}{Character or \code{NULL}. A directory to write each analysis
+plan chart into as its own file, through \code{\link[=sframe_save_figures]{sframe_save_figures()}}, at the
+size, resolution and format in \code{figures}, where \code{format} may also be
+\code{"tiff"}, \code{"jpeg"} or \code{"pdf"}. Needs \code{data}. Defaults to 300 dpi at
+7 by 4.5 inches where \code{figures} names none.}
 }
 \value{
 The output file path, invisibly.

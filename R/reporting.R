@@ -288,6 +288,17 @@ print.sframe_codebook <- function(x, ...) {
 #' @param authors Character vector or `NULL`. The report's authors, shown under
 #'   the title. Defaults to the instrument's authors, and is left out when
 #'   there are none.
+#' @param figures List or `NULL`. Size, resolution and format for every figure
+#'   in the report: any of `width` and `height` in inches, `dpi`, and `format`,
+#'   `"png"` or `"svg"` inside the report. For example
+#'   `list(width = 6.5, height = 4, dpi = 300)`. Absent entries keep each
+#'   engine's own default. Defaults to the `surveyframe.figures` option, so a
+#'   host can set it once with `options(surveyframe.figures = list(dpi = 300))`.
+#' @param figure_dir Character or `NULL`. A directory to write each analysis
+#'   plan chart into as its own file, through [sframe_save_figures()], at the
+#'   size, resolution and format in `figures`, where `format` may also be
+#'   `"tiff"`, `"jpeg"` or `"pdf"`. Needs `data`. Defaults to 300 dpi at
+#'   7 by 4.5 inches where `figures` names none.
 #' @param csl Optional path to a Citation Style Language file for the
 #'   References section. Defaults to APA 7th edition, bundled with the
 #'   package. Any style from the Zotero style repository works.
@@ -357,9 +368,17 @@ render_report <- function(
     references        = NULL,
     csl               = NULL,
     title             = NULL,
-    authors           = NULL
+    authors           = NULL,
+    figures           = getOption("surveyframe.figures"),
+    figure_dir        = NULL
 ) {
   sframe_check_instrument(instrument)
+  # Figure size, resolution and format (Ethos request 19). The built-in engine
+  # reads them from .sframe_figure_env, the Quarto template from its params.
+  figures <- sframe_figure_settings(figures)
+  old_figures <- .sframe_figure_env$settings
+  .sframe_figure_env$settings <- figures
+  on.exit(.sframe_figure_env$settings <- old_figures, add = TRUE)
   # The study's own title and authors, where every report read "Survey
   # Research Report" whatever the study (Ethos request 23).
   report_title <- as.character(title %||% instrument$meta$title %||% "Survey report")[1]
@@ -367,6 +386,19 @@ render_report <- function(
   report_authors <- report_authors[!is.na(report_authors) & nzchar(trimws(report_authors))]
   plot_palette <- rlang::arg_match(plot_palette)
   interpretations <- sframe_clean_interpretations(interpretations)
+
+  # Each plan chart as its own file, for a journal submission.
+  if (!is.null(figure_dir)) {
+    if (is.null(data)) {
+      rlang::abort("`figure_dir` needs `data`, since the charts are drawn from the responses.",
+                   class = "sframe_error")
+    }
+    chart_results <- run_analysis_plan(data, instrument, plots = TRUE,
+                                       plot_palette = plot_palette)
+    sframe_save_figures(chart_results, figure_dir,
+                        width = figures$width %||% 7, height = figures$height %||% 4.5,
+                        dpi = figures$dpi %||% 300, format = figures$format %||% "png")
+  }
 
   format <- rlang::arg_match(format)
   dest <- output_file %||% output_path %||%
@@ -495,7 +527,12 @@ render_report <- function(
       # separate R session against the installed package, which is not
       # necessarily the build doing the rendering.
       analysis_seed       = as.character(
-        sframe_report_seed(data, instrument, include_analysis))
+        sframe_report_seed(data, instrument, include_analysis)),
+      # Empty means the template's own default.
+      fig_width           = as.character(figures$width %||% ""),
+      fig_height          = as.character(figures$height %||% ""),
+      fig_dpi             = as.character(figures$dpi %||% ""),
+      fig_format          = if (identical(figures$format, "svg")) "svg" else ""
     )
 
     # The bibliography (0.4.3): every reference the instrument carries, the
@@ -1129,7 +1166,10 @@ sframe_clean_interpretations <- function(interpretations) {
 .render_report_plot_png <- function(draw, height = 320) {
   tmp <- tempfile(fileext = ".png")
   on.exit(unlink(tmp), add = TRUE)
-  grDevices::png(tmp, width = 720, height = height, res = 96, bg = "white")
+  s <- .sframe_figure_env$settings %||% list()
+  res <- s$dpi %||% 96
+  grDevices::png(tmp, width = (s$width %||% 7.5) * res,
+                 height = (s$height %||% (height / 96)) * res, res = res, bg = "white")
   ok <- tryCatch({ draw(); TRUE }, error = function(e) FALSE)
   grDevices::dev.off()
   if (!isTRUE(ok) || !file.exists(tmp)) return(NULL)
@@ -1145,17 +1185,20 @@ sframe_clean_interpretations <- function(interpretations) {
 # for the ggplot2 objects run_analysis_plan(plots = TRUE) attaches.
 .render_report_ggplot_png <- function(gg, alt = "result chart") {
   if (!requireNamespace("ggplot2", quietly = TRUE)) return(NULL)
-  tmp <- tempfile(fileext = ".png")
+  s <- .sframe_figure_env$settings %||% list()
+  svg <- identical(s$format, "svg")
+  tmp <- tempfile(fileext = if (svg) ".svg" else ".png")
   on.exit(unlink(tmp), add = TRUE)
   ok <- tryCatch({
-    ggplot2::ggsave(tmp, gg, width = 7.2, height = 4.2, dpi = 110, bg = "white")
+    ggplot2::ggsave(tmp, gg, width = s$width %||% 7.2, height = s$height %||% 4.2,
+                    dpi = s$dpi %||% 110, bg = "white")
     TRUE
   }, error = function(e) FALSE)
   if (!isTRUE(ok) || !file.exists(tmp)) return(NULL)
   raw <- readBin(tmp, "raw", file.info(tmp)$size)
   sprintf(
-    "<img alt=\"%s\" style=\"max-width:100%%;height:auto\" src=\"data:image/png;base64,%s\">",
-    htmltools_escape(alt), openssl::base64_encode(raw)
+    "<img alt=\"%s\" style=\"max-width:100%%;height:auto\" src=\"data:image/%s;base64,%s\">",
+    htmltools_escape(alt), if (svg) "svg+xml" else "png", openssl::base64_encode(raw)
   )
 }
 
