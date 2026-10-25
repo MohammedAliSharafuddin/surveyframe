@@ -314,6 +314,7 @@ reference:
       - sframe_codebook_items_display
       - render_report
       - render_results
+      - render_result
       - model_report_template
       - analysis_syntax
       - sframe_result_supplement
