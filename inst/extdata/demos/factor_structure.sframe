@@ -2,7 +2,7 @@
   "sframe_format": "1.0",
   "hash": {
     "algo": "sha256",
-    "value": "5d0029b9b68b01d53f844ab9813dd5977ae5dca0901cc734701a6770bbe55488"
+    "value": "64316057440f2bf1856dc9299586613c8795c40c1ec9d51651e2a8ffa273aa37"
   },
   "version": "1.0.0",
   "meta": {
@@ -170,5 +170,16 @@
     }
   ],
   "models": [],
-  "render": []
+  "render": {
+    "welcome": {
+      "title": "Two things attendees judge",
+      "intro_text": "Thank you for taking part. This survey takes a few minutes.",
+      "consent_text": "I agree to take part, and for my answers to be used for this study.",
+      "consent_required": true,
+      "start_label": "Start"
+    },
+    "thankyou": {
+      "message": "Thank you for completing this survey."
+    }
+  }
 }

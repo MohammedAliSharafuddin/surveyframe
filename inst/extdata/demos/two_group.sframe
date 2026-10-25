@@ -2,7 +2,7 @@
   "sframe_format": "1.0",
   "hash": {
     "algo": "sha256",
-    "value": "bf86bd1596e7043345d3256ba9f33b5300109fd56a74c1485d62303cdacb4b4b"
+    "value": "2b4728d603b27d5513ceeb74d9615998920fbbe8a4444eaf3143641018e30111"
   },
   "version": "1.0.0",
   "meta": {
@@ -82,5 +82,16 @@
     }
   ],
   "models": [],
-  "render": []
+  "render": {
+    "welcome": {
+      "title": "In person or online?",
+      "intro_text": "Thank you for taking part. This survey takes a few minutes.",
+      "consent_text": "I agree to take part, and for my answers to be used for this study.",
+      "consent_required": true,
+      "start_label": "Start"
+    },
+    "thankyou": {
+      "message": "Thank you for completing this survey."
+    }
+  }
 }

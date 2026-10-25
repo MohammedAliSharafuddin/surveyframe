@@ -168,6 +168,22 @@ sframe_demo <- function(name, branded = FALSE) {
        results_path  = file.path(dir, paste0(name, "_results.csv")))
 }
 
+# The welcome, consent and thank-you screens every unbranded demo ships with
+# (Ethos request 3), so a demo opened as a starting point already asks for
+# consent. Plain wording and the default look, which branded = TRUE replaces.
+# Used by data-raw/build_demo_library.R on dev.
+sframe_demo_screens <- function(title) {
+  list(
+    welcome = list(
+      title = title,
+      intro_text = "Thank you for taking part. This survey takes a few minutes.",
+      consent_text = "I agree to take part, and for my answers to be used for this study.",
+      consent_required = TRUE,
+      start_label = "Start"),
+    thankyou = list(message = "Thank you for completing this survey.")
+  )
+}
+
 #' The standard demo branding
 #'
 #' The `render` block [sframe_demo()] splices in when `branded = TRUE`. Read

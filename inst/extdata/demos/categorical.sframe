@@ -2,7 +2,7 @@
   "sframe_format": "1.0",
   "hash": {
     "algo": "sha256",
-    "value": "74d247e4c71fb4a48a11e7305aa81c8d5e8a9433ad55954929ec16a610909d07"
+    "value": "11d3e27b633105f50bdd2cd95b13bbf5a5d5bc2db6643ac7207e9bf5319fd3cb"
   },
   "version": "1.0.0",
   "meta": {
@@ -108,5 +108,16 @@
     }
   ],
   "models": [],
-  "render": []
+  "render": {
+    "welcome": {
+      "title": "What do attendees prefer?",
+      "intro_text": "Thank you for taking part. This survey takes a few minutes.",
+      "consent_text": "I agree to take part, and for my answers to be used for this study.",
+      "consent_required": true,
+      "start_label": "Start"
+    },
+    "thankyou": {
+      "message": "Thank you for completing this survey."
+    }
+  }
 }

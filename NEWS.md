@@ -285,6 +285,12 @@ style.
 
 ## Demos
 
+* **Every demo has welcome, consent and thank-you screens.** 19 of the 22
+  shipped with none, so a respondent met the questions with no consent step.
+  They now carry plain screens in the default look, consent required, and
+  `branded = TRUE` still replaces the whole block. `instrument_revision` is
+  rebuilt on the updated `first_survey`, and the learn-by-example screenshots
+  are recaptured.
 * `sframe_demo_branding()` prints each setting as a respondent meets it,
   with a pointer to `preview_demo()`. It printed a raw nested list, which
   read as a failed demo. It returns a list of class `sframe_branding`, and

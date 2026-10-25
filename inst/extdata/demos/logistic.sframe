@@ -2,7 +2,7 @@
   "sframe_format": "1.0",
   "hash": {
     "algo": "sha256",
-    "value": "142e5e507a212926d7bf3d64c5d65b0bd070f330586e8c6be0fb16b2bc90ac3c"
+    "value": "d1fcef9c2da703cd737f58ea99130ba536321be6d218b9bf6f4ce3a74135062d"
   },
   "version": "1.0.0",
   "meta": {
@@ -130,5 +130,16 @@
     }
   ],
   "models": [],
-  "render": []
+  "render": {
+    "welcome": {
+      "title": "Will they come back?",
+      "intro_text": "Thank you for taking part. This survey takes a few minutes.",
+      "consent_text": "I agree to take part, and for my answers to be used for this study.",
+      "consent_required": true,
+      "start_label": "Start"
+    },
+    "thankyou": {
+      "message": "Thank you for completing this survey."
+    }
+  }
 }

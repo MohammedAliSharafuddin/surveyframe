@@ -2,7 +2,7 @@
   "sframe_format": "1.0",
   "hash": {
     "algo": "sha256",
-    "value": "9c1497d5940ab11bbd93e21eab472cb5e48ea0a54e1ffcc9cb3f5344e7c35746"
+    "value": "be6053bc0665d73e5484ca1c61dc5ec2508f796a928232a6c3c5c561aea9c0cf"
   },
   "version": "1.0.0",
   "meta": {
@@ -391,5 +391,16 @@
       "options": []
     }
   ],
-  "render": []
+  "render": {
+    "welcome": {
+      "title": "Does content quality bring people back?",
+      "intro_text": "Thank you for taking part. This survey takes a few minutes.",
+      "consent_text": "I agree to take part, and for my answers to be used for this study.",
+      "consent_required": true,
+      "start_label": "Start"
+    },
+    "thankyou": {
+      "message": "Thank you for completing this survey."
+    }
+  }
 }

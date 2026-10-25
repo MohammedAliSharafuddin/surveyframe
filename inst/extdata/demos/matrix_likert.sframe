@@ -2,7 +2,7 @@
   "sframe_format": "1.0",
   "hash": {
     "algo": "sha256",
-    "value": "3e76952b9715837d25b7462df950a29c164be70478fe0586981bae17d25ac76a"
+    "value": "45e359aed9adf75acfad01492cc21bf4ee95e6caf8ee7b6c3e2de7cb4633fe88"
   },
   "version": "1.0.0",
   "meta": {
@@ -112,5 +112,16 @@
     }
   ],
   "models": [],
-  "render": []
+  "render": {
+    "welcome": {
+      "title": "Rate each session",
+      "intro_text": "Thank you for taking part. This survey takes a few minutes.",
+      "consent_text": "I agree to take part, and for my answers to be used for this study.",
+      "consent_required": true,
+      "start_label": "Start"
+    },
+    "thankyou": {
+      "message": "Thank you for completing this survey."
+    }
+  }
 }

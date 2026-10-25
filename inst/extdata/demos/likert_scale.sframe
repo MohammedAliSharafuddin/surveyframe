@@ -2,7 +2,7 @@
   "sframe_format": "1.0",
   "hash": {
     "algo": "sha256",
-    "value": "cf0b7acfce9040c87066c65a63d3e7340f26d90e523863f109ddfc39ceb8eeba"
+    "value": "24b3e4403b15ed3418e8e977128ef7066aa2b25bf0efaa5b68592b3940766ddd"
   },
   "version": "1.0.0",
   "meta": {
@@ -136,5 +136,16 @@
     }
   ],
   "models": [],
-  "render": []
+  "render": {
+    "welcome": {
+      "title": "Was the event well organised?",
+      "intro_text": "Thank you for taking part. This survey takes a few minutes.",
+      "consent_text": "I agree to take part, and for my answers to be used for this study.",
+      "consent_required": true,
+      "start_label": "Start"
+    },
+    "thankyou": {
+      "message": "Thank you for completing this survey."
+    }
+  }
 }

@@ -2,7 +2,7 @@
   "sframe_format": "1.0",
   "hash": {
     "algo": "sha256",
-    "value": "fad77a72dfd342f7b0ec677317d86fbb01943b965cdc11c418a96eee6001b019"
+    "value": "51a87c46cdfb50d5318b6aca8516ab31ca666b4ad16143bd176a740031097bcb"
   },
   "version": "1.0.0",
   "meta": {
@@ -151,5 +151,16 @@
     }
   ],
   "models": [],
-  "render": []
+  "render": {
+    "welcome": {
+      "title": "What goes with getting value from the event?",
+      "intro_text": "Thank you for taking part. This survey takes a few minutes.",
+      "consent_text": "I agree to take part, and for my answers to be used for this study.",
+      "consent_required": true,
+      "start_label": "Start"
+    },
+    "thankyou": {
+      "message": "Thank you for completing this survey."
+    }
+  }
 }
