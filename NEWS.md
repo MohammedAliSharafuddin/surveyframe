@@ -212,6 +212,21 @@ style.
   `.dta` now holds such codes as 1, 2, 3 in the set's order, each with its
   label. A `.sav` keeps the text codes, which SPSS labels directly.
 
+## The exported survey
+
+* **A sending screen while the answers are in flight.** The thank-you screen
+  said the response had been recorded while it was still being sent.
+* **Confirmed delivery for a host.** A page that defines
+  `window.sframeSendResponse(row)`, returning a Promise, takes over the send.
+  Resolving to `true` or `{confirmed: true}` shows the response as recorded,
+  in place of the note that the page cannot confirm storage, which every
+  respondent saw, even on a host that confirms.
+* `render$thankyou$show_restart = FALSE` hides "Submit another response".
+* **Drafts.** `render$save_draft = TRUE` keeps the answers in the browser as
+  the respondent goes, so a closed tab can be resumed from the welcome screen.
+  The draft is cleared once the response is submitted, and kept when delivery
+  fails. SurveyBuilder's exported survey carries the same template.
+
 ## Charts
 
 * A chart from the analysis plan names each variable by its label in the

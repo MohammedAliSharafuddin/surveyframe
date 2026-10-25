@@ -32,7 +32,7 @@ collection mechanism.}
 \item{preview}{Logical. \code{TRUE} exports a survey that collects nothing: the
 collector endpoint and the completion redirect are both removed, and the
 thank-you screen says the response went nowhere. This is what SurveyStudio's
-preview uses, so a test answer cannot reach a live study's collector.
+preview uses, which keeps a test answer away from a live study's collector.
 Supplying \code{endpoint_url} alongside it is an error. Defaults to \code{FALSE}.}
 }
 \value{
@@ -40,7 +40,7 @@ The output path, invisibly.
 }
 \description{
 Generates a single HTML file that presents the survey instrument in a
-browser, with no Shiny server and no internet connection. Every item type,
+browser by itself, offline, with the Shiny server left out. Every item type,
 branching, required-item checks and multi-page navigation run in the
 browser's own JavaScript.
 }
@@ -52,7 +52,7 @@ an explicit \code{output_path} for any production export that should be kept.
 On submission the survey builds a one-row CSV in the browser's memory and
 shows the thank-you screen. When \code{endpoint_url} is supplied, it also sends
 the response as a POST request to that URL, for example a Google Apps
-Script web app. The browser reports nothing back from that request, so the
+Script web app. The browser reads back none of the reply to that request, so the
 survey treats it as sent and the respondent sees the thank-you screen
 either way.
 
@@ -64,6 +64,23 @@ file is the only copy of the response.
 Plan for both parts. Test the endpoint with a pilot submission and confirm
 the row arrives before collecting, and treat the download as a route a
 respondent may decline.
+}
+
+\section{For a host page: confirmed delivery, restarts and drafts}{
+While a response is being sent, the survey shows a sending screen. A host
+that can confirm delivery, such as a platform embedding the survey, defines
+\code{window.sframeSendResponse(row)} in the page before the survey script runs.
+The survey then hands each response to that function in place of its own
+POST. It returns a Promise: resolving to \code{true}, or to \code{{confirmed: true}},
+shows the response as recorded. Resolving to anything else shows it as sent
+and unconfirmed, and a rejection shows the failure screen with a retry.
+
+Two settings in the instrument's \code{render} block suit a host too.
+\code{render$thankyou$show_restart = FALSE} hides "Submit another response".
+\code{render$save_draft = TRUE} keeps the answers in the browser's local storage
+as the respondent goes, under a key drawn from the instrument's content, so
+a respondent who closes the tab is offered to resume on return. The draft
+is cleared once the response is submitted, and kept when delivery fails.
 
 The exported file works offline. It can be hosted on GitHub Pages,
 Netlify, any static file server, or e-mailed as an attachment for
