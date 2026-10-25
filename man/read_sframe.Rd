@@ -4,22 +4,32 @@
 \alias{read_sframe}
 \title{Read an instrument from a .sframe file}
 \usage{
-read_sframe(path, validate = TRUE)
+read_sframe(path = NULL, validate = TRUE, text = NULL, verify = TRUE)
 }
 \arguments{
-\item{path}{Character. The path to a \code{.sframe} file.}
+\item{path}{Character. The path to a \code{.sframe} file. Leave it \code{NULL} and
+give \code{text} to read a payload held in memory.}
 
 \item{validate}{Logical. Whether to validate the loaded instrument with
 \code{\link[=validate_sframe]{validate_sframe()}}. Defaults to \code{TRUE}. This controls structural
-validation only. The integrity hash is verified either way.}
+validation only. \code{verify} controls the integrity hash.}
+
+\item{text}{Character. The \code{.sframe} JSON itself, for example a payload a
+host keeps in a database, read with no temporary file. One string, or
+lines to be joined.}
+
+\item{verify}{Logical. Whether to refuse content whose hash is missing or
+does not match. Defaults to \code{TRUE}. With \code{FALSE}, such content is read
+with a warning of class \code{sframe_unverified_warning} and the instrument is
+marked unverified (see the Unverified reads section).}
 }
 \value{
 An \code{sframe} object.
 }
 \description{
-Reads a \code{.sframe} JSON file and reconstructs an \code{sframe} instrument object.
-The SHA-256 integrity hash is always verified, and a file whose content does
-not match its hash is refused. The hash covers a canonical form of the
+Reads a \code{.sframe} JSON file, or the same JSON held as text, and
+reconstructs an \code{sframe} instrument object. The SHA-256 integrity hash is
+verified by default, and content that does not match its hash is refused. The hash covers a canonical form of the
 content, so it detects a change to the content of a written file, and it
 ignores whitespace and key order. It is unsigned, so anyone who edits a file
 can also recompute it.
@@ -28,6 +38,17 @@ can also recompute it.
 The instrument remembers the content and amendment log it was read with, so
 \code{\link[=write_sframe]{write_sframe()}} can refuse an undisclosed revision.
 }
+\section{Unverified reads}{
+
+\code{verify = FALSE} is for a host holding a payload it cannot vouch for, which
+it would otherwise rebuild by hand and lose fields doing so. The result
+carries the attribute \code{sframe_verified}, \code{FALSE} (it is \code{TRUE} on every
+verified read), and \code{print()} says so. \code{\link[=write_sframe]{write_sframe()}} refuses to write an
+unverified instrument with no amendment log unless \code{new_instrument = TRUE}
+declares it new, since nothing ties its content to a state anyone wrote. One
+with a log must match the log's last entry, as every instrument must.
+}
+
 \examples{
 instr <- read_sframe(
   system.file("extdata", "tourism_services_demo.sframe",

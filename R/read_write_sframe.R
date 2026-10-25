@@ -533,7 +533,7 @@ sframe_restore_model <- function(model) {
 # published instrument profile reads. A file with no sframe_format predates the
 # field (2026-08-22) and is read as a legacy file. A newer major format version
 # is refused, since its shape may have changed in ways this reader cannot see.
-sframe_validate_parsed_payload <- function(parsed, path) {
+sframe_validate_parsed_payload <- function(parsed, path, require_hash = TRUE) {
   if (!is.null(parsed$sframe_format)) {
     fmt <- as.character(parsed$sframe_format)[1]
     if (!grepl("^[0-9]+\\.[0-9]+$", fmt)) {
@@ -550,7 +550,7 @@ sframe_validate_parsed_payload <- function(parsed, path) {
                "Update surveyframe to read it."), path = path)
     }
   }
-  required <- c("hash", "meta", "items")
+  required <- c(if (require_hash) "hash", "meta", "items")
   missing <- setdiff(required, names(parsed))
   if (length(missing) > 0) {
     sframe_abort_import(
@@ -563,9 +563,9 @@ sframe_validate_parsed_payload <- function(parsed, path) {
     )
   }
 
-  if (!is.list(parsed$hash) ||
+  if (require_hash && (!is.list(parsed$hash) ||
       !identical(parsed$hash$algo %||% "", "sha256") ||
-      is.null(parsed$hash$value)) {
+      is.null(parsed$hash$value))) {
     sframe_abort_import(
       "Invalid .sframe file: missing SHA-256 hash metadata.",
       path = path
@@ -586,9 +586,9 @@ sframe_validate_parsed_payload <- function(parsed, path) {
 
 #' Read an instrument from a .sframe file
 #'
-#' Reads a `.sframe` JSON file and reconstructs an `sframe` instrument object.
-#' The SHA-256 integrity hash is always verified, and a file whose content does
-#' not match its hash is refused. The hash covers a canonical form of the
+#' Reads a `.sframe` JSON file, or the same JSON held as text, and
+#' reconstructs an `sframe` instrument object. The SHA-256 integrity hash is
+#' verified by default, and content that does not match its hash is refused. The hash covers a canonical form of the
 #' content, so it detects a change to the content of a written file, and it
 #' ignores whitespace and key order. It is unsigned, so anyone who edits a file
 #' can also recompute it.
@@ -596,10 +596,27 @@ sframe_validate_parsed_payload <- function(parsed, path) {
 #' The instrument remembers the content and amendment log it was read with, so
 #' [write_sframe()] can refuse an undisclosed revision.
 #'
-#' @param path Character. The path to a `.sframe` file.
+#' @param path Character. The path to a `.sframe` file. Leave it `NULL` and
+#'   give `text` to read a payload held in memory.
 #' @param validate Logical. Whether to validate the loaded instrument with
 #'   [validate_sframe()]. Defaults to `TRUE`. This controls structural
-#'   validation only. The integrity hash is verified either way.
+#'   validation only. `verify` controls the integrity hash.
+#' @param text Character. The `.sframe` JSON itself, for example a payload a
+#'   host keeps in a database, read with no temporary file. One string, or
+#'   lines to be joined.
+#' @param verify Logical. Whether to refuse content whose hash is missing or
+#'   does not match. Defaults to `TRUE`. With `FALSE`, such content is read
+#'   with a warning of class `sframe_unverified_warning` and the instrument is
+#'   marked unverified (see the Unverified reads section).
+#'
+#' @section Unverified reads:
+#' `verify = FALSE` is for a host holding a payload it cannot vouch for, which
+#' it would otherwise rebuild by hand and lose fields doing so. The result
+#' carries the attribute `sframe_verified`, `FALSE` (it is `TRUE` on every
+#' verified read), and `print()` says so. [write_sframe()] refuses to write an
+#' unverified instrument with no amendment log unless `new_instrument = TRUE`
+#' declares it new, since nothing ties its content to a state anyone wrote. One
+#' with a log must match the log's last entry, as every instrument must.
 #'
 #' @return An `sframe` object.
 #' @export
@@ -611,23 +628,32 @@ sframe_validate_parsed_payload <- function(parsed, path) {
 #'               package = "surveyframe")
 #' )
 #' print(instr)
-read_sframe <- function(path, validate = TRUE) {
-  if (!file.exists(path)) {
-    sframe_abort_import(
-      paste0("File not found: '", path, "'."),
-      path = path
-    )
-  }
-
-  raw_text <- tryCatch(
-    readLines(path, warn = FALSE, encoding = "UTF-8"),
-    error = function(e) {
+read_sframe <- function(path = NULL, validate = TRUE, text = NULL, verify = TRUE) {
+  # A payload held in memory (Ethos request 4), so a host need not write a
+  # temporary file to read it faithfully.
+  if (!is.null(text)) {
+    if (!is.null(path)) {
+      sframe_abort_import("Give `path` or `text`, not both.", path = path)
+    }
+    raw_text <- as.character(text)
+    path <- "<text>"
+  } else {
+    if (is.null(path) || !file.exists(path)) {
       sframe_abort_import(
-        paste0("Could not read file: '", path, "'. ", conditionMessage(e)),
+        paste0("File not found: '", path %||% "", "'."),
         path = path
       )
     }
-  )
+    raw_text <- tryCatch(
+      readLines(path, warn = FALSE, encoding = "UTF-8"),
+      error = function(e) {
+        sframe_abort_import(
+          paste0("Could not read file: '", path, "'. ", conditionMessage(e)),
+          path = path
+        )
+      }
+    )
+  }
 
   raw_json <- paste(raw_text, collapse = "\n")
 
@@ -641,16 +667,25 @@ read_sframe <- function(path, validate = TRUE) {
     }
   )
 
-  sframe_validate_parsed_payload(parsed, path)
+  sframe_validate_parsed_payload(parsed, path, require_hash = verify)
 
   # Verify hash
-  stored_hash <- parsed$hash$value
-  parsed$hash$value <- ""
-  computed_hash  <- sframe_hash_payload(parsed)
-  legacy_hash    <- sframe_legacy_hash_payload(parsed)
+  stored_hash <- if (is.list(parsed$hash)) parsed$hash$value
+  hash_ok <- FALSE
+  if (!is.null(stored_hash)) {
+    parsed$hash$value <- ""
+    computed_hash <- sframe_hash_payload(parsed)
+    legacy_hash   <- sframe_legacy_hash_payload(parsed)
+    hash_ok <- identical(stored_hash, computed_hash) || identical(stored_hash, legacy_hash)
+  }
 
-  if (!identical(stored_hash, computed_hash) &&
-      !identical(stored_hash, legacy_hash)) {
+  if (!hash_ok && !verify) {
+    rlang::warn(
+      paste0("'", path, "' was read without a matching integrity hash and is ",
+             "marked unverified. write_sframe() writes it only as a new ",
+             "instrument, or when its amendment log names this content."),
+      class = c("sframe_unverified_warning", "sframe_warning"))
+  } else if (!hash_ok) {
     sframe_abort_import(
       paste0(
         "Integrity check failed for '", path, "'. ",
@@ -702,8 +737,10 @@ read_sframe <- function(path, validate = TRUE) {
 
   # What the instrument was when read, kept on the object and never written,
   # so write_sframe() can tell a disclosed revision from an undisclosed one.
+  attr(instrument, "sframe_verified") <- hash_ok
   attr(instrument, "sframe_origin") <- list(
     path = path,
+    verified = hash_ok,
     content_hash = sframe_content_hash(instrument),
     amendment_new_hashes = vapply(instrument$amendments %||% list(),
                                   function(a) a$new_hash %||% "", character(1)),

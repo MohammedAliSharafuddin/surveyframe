@@ -33,6 +33,9 @@ print.sframe <- function(x, ...) {
       status
     )
   )
+  if (isFALSE(attr(x, "sframe_verified"))) {
+    cat("  Hash:       unverified, read with verify = FALSE\n")
+  }
   invisible(x)
 }
 

@@ -72,6 +72,14 @@ style.
 
 ### The file format
 
+* **`read_sframe(text = )` reads a payload held in memory**, such as JSON a
+  host keeps in a database, with no temporary file. **`verify = FALSE`**
+  reads content whose hash is missing or does not match, with a warning of
+  class `sframe_unverified_warning`, and marks the instrument with the
+  attribute `sframe_verified = FALSE`, which `print()` shows. A host can then
+  keep every field where it used to rebuild the instrument by hand. Such an
+  instrument is written only as a new instrument, or when its amendment log
+  names exactly its content.
 * **The bundled schema is the published one.**
   `inst/schema/sframe_schema.json` is now a copy of sframe-schema's
   instrument profile, kept identical by a test. The 2 had drifted: the
