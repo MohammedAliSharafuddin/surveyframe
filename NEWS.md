@@ -141,6 +141,10 @@ style.
 
 ## Documentation
 
+* The visual-workflow vignette shows the tools it describes: SurveyBuilder's
+  Analyse mode with a plan open, SurveyStudio's Upload Responses screen and
+  a result on its Run preview tab, and the dashboard, each with alt text.
+  The images are generated from the demo launchers.
 * `amend_sframe()`'s help says how to change the wording on the welcome,
   consent and thank-you screens. That wording is inside both hashes, so on
   a published instrument it goes through a pipeline-tier amendment with
