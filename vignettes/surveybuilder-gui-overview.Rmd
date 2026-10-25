@@ -105,7 +105,7 @@ Survey, Upload Responses, Quality Dashboard, Reliability, Analysis Plan,
 Dashboard, and Export. Survey design is done in the SurveyBuilder, and the studio opens the
 resulting `.sframe`.
 
-```{r fig-studio-responses, echo = FALSE, out.width = "100%", fig.alt = "SurveyStudio's Upload Responses screen. The left navigation lists the nine screens. The main panel has a CSV file chooser, respondent ID and submitted-at column fields, a strict column check, and help on loading responses collected elsewhere or from a Google Sheet."}
+```{r fig-studio-responses, echo = FALSE, out.width = "100%", fig.alt = "SurveyStudio's Upload Responses screen. The left navigation lists the ten screens. The main panel has a CSV file chooser, respondent ID and submitted-at column fields, a strict column check, and help on loading responses collected elsewhere or from a Google Sheet."}
 knitr::include_graphics("figures/gui-studio-responses.png")
 ```
 
@@ -159,6 +159,10 @@ run and edited outside SurveyStudio.
 In RStudio, the same tools open from the **Addins** menu in the toolbar. The
 4 commands are listed under **surveyframe:** and are searchable by that
 prefix in the command palette. Each one needs the rstudioapi package.
+
+```{r fig-rstudio-addins, echo = FALSE, fig.alt = "The RStudio Addins menu filtered by the word surveyframe, listing 4 commands: Design an instrument, Open analysis workspace, Analyse an existing instrument, and Insert starter instrument."}
+knitr::include_graphics("figures/gui-rstudio-addins.png")
+```
 
 | Command | What opens | What it needs |
 |---|---|---|
