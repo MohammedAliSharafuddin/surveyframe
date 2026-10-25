@@ -1092,10 +1092,11 @@ function doSubmit(){
   window._lastCsv={csv:csvStr,name:(SF.meta.title||'survey')+'_response_'+respId+'.csv'};
   window._lastRow=row;
   screen='thankyou';
-  if(ENDPOINT){
+  if(hasCollector()){
     sendResponse(row);
   }else{
     deliveryState='local';
+    clearDraft();
     renderScreen();
   }
   var wrap=document.getElementById('prog-bar-wrap');
@@ -1107,17 +1108,33 @@ function doSubmit(){
 // no-cors, so the collector's answer is unreadable and acceptance can never
 // be confirmed from here. 'failed' means fetch itself rejected, which used to
 // be discarded by an empty .catch() while the screen said the response had
-// been recorded.
+// been recorded. 'confirmed' comes only from a host's own sender (below),
+// which can read its collector's answer, and is shown as recorded.
 var deliveryState=null;
+// A host that can confirm delivery defines window.sframeSendResponse(row)
+// before the page loads. It returns a Promise: resolving to true, or to
+// {confirmed: true}, marks the response recorded, resolving to anything else
+// marks it sent and unconfirmed, and a rejection marks it failed.
+function hostSender(){return typeof window.sframeSendResponse==='function';}
+function hasCollector(){return !!ENDPOINT||hostSender();}
 function sendResponse(row){
   deliveryState='sending';
   renderScreen();
+  if(hostSender()){
+    var p;
+    try{p=Promise.resolve(window.sframeSendResponse(row));}catch(e){p=Promise.reject(e);}
+    p.then(function(res){
+      deliveryState=(res===true||(res&&res.confirmed===true))?'confirmed':'sent';
+      clearDraft();renderScreen();
+    },function(){deliveryState='failed';renderScreen();});
+    return;
+  }
   // no-cors with a text/plain body: an application/json header triggers a
   // CORS preflight that Google Apps Script never answers, so the POST is
   // silently blocked in real deployments. Apps Script parses the body
   // regardless of content type.
   fetch(ENDPOINT,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:JSON.stringify(row)})
-    .then(function(){deliveryState='sent';renderScreen();})
+    .then(function(){deliveryState='sent';clearDraft();renderScreen();})
     .catch(function(){deliveryState='failed';renderScreen();});
 }
 function retrySubmission(){
@@ -1146,9 +1163,43 @@ function downloadCsv(csv,name){
 function renderScreen(){
   updateProgress();
   if(screen==='welcome')renderWelcome();
-  else if(screen==='survey')renderSurvey();
+  else if(screen==='survey'){renderSurvey();saveDraft();}
   else renderThankyou();
 }
+// Drafts (render$save_draft = true). Answers are kept in this browser's
+// localStorage under a key from the instrument's content, so a respondent who
+// closes the tab can resume, and a revised instrument starts clean. Cleared
+// once the response is submitted, and kept when delivery fails.
+function draftKey(){
+  var s=JSON.stringify([SF.meta&&SF.meta.title,SF.meta&&SF.meta.version,SF.items]),h=5381;
+  for(var i=0;i<s.length;i++){h=((h<<5)+h+s.charCodeAt(i))|0;}
+  return 'sframe_draft_'+(h>>>0).toString(36);
+}
+function draftStore(){
+  if(!R.save_draft)return null;
+  try{return window.localStorage||null;}catch(e){return null;}
+}
+function saveDraft(){
+  var st=draftStore();if(!st||screen!=='survey')return;
+  try{st.setItem(draftKey(),JSON.stringify({responses:responses,page:currentPage,saved:Date.now()}));}catch(e){}
+}
+function loadDraft(){
+  var st=draftStore();if(!st)return null;
+  try{var d=JSON.parse(st.getItem(draftKey())||'null');return d&&d.responses?d:null;}catch(e){return null;}
+}
+function clearDraft(){
+  var st=draftStore();if(!st)return;
+  try{st.removeItem(draftKey());}catch(e){}
+}
+function resumeDraft(){
+  var d=loadDraft();if(!d)return;
+  Object.keys(d.responses).forEach(function(k){responses[k]=d.responses[k];});
+  screen='survey';
+  currentPage=Math.min(Math.max(1,parseInt(d.page,10)||1),maxPage);
+  renderScreen();
+}
+document.addEventListener('change',saveDraft);
+document.addEventListener('input',saveDraft);
 function hasVal(key){
   var v=responses[key];
   return v!==undefined&&v!==null&&String(v).trim()!=='';
@@ -1222,16 +1273,25 @@ function updateProgress(){
 }
 function renderWelcome(){
   var el=document.getElementById('app');
+  var draft=loadDraft();
   if(!WL.intro_text&&!WL.consent_text&&!SF.meta.description){
+    if(draft){resumeDraft();return;}
     startSurvey();return;
   }
+  // A draft offers to carry on. It is saved only from the questions, so the
+  // respondent had already consented.
+  var resume=draft
+    ?'<div class="ty-note" role="status">You have answers saved from an earlier visit.</div>'
+     +'<button type="button" class="btn btn-p btn-lg" onclick="resumeDraft()" style="margin-bottom:10px">Resume where you left off</button> '
+    :'';
   el.innerHTML='<div class="card"><div class="card-body">'
     +'<h1 class="wl-title">'+esc(WL.title||SF.meta.title)+'</h1>'
     +(WL.intro_text?'<div class="wl-intro">'+esc(WL.intro_text)+'</div>':'')
     +(WL.consent_text?'<div class="consent-box">'+esc(WL.consent_text)+'</div>':'')
     +(WL.consent_required?'<label class="consent-chk"><input type="checkbox" id="consent-chk" style="accent-color:var(--cp)"><span>I have read and consent to participate.</span></label>':'')
     +'<div class="item-err" id="consent-err" style="margin-bottom:12px"></div>'
-    +'<button type="button" class="btn btn-p btn-lg" onclick="startSurvey()">'+esc(WL.start_label||'Start Survey')+'</button>'
+    +resume
+    +'<button type="button" class="btn '+(draft?'btn-s':'btn-p')+' btn-lg" onclick="startSurvey()">'+esc(WL.start_label||'Start Survey')+'</button>'
     +'</div></div>';
 }
 function renderSurvey(){
@@ -1262,6 +1322,15 @@ function renderSurvey(){
 }
 function renderThankyou(){
   var el=document.getElementById('app');
+  // While the answers are in flight the page says so, and claims nothing
+  // about storage. It used to show the thank-you message, "recorded", here.
+  if(deliveryState==='sending'){
+    el.innerHTML='<div class="card"><div class="card-body" role="status" aria-live="polite">'
+      +'<div class="ty-title">Sending your answers</div>'
+      +'<div class="ty-msg">Keep this page open until it confirms they have gone.</div>'
+      +'</div></div>';
+    return;
+  }
   // The download button appears when the designer enabled it, or whenever
   // no collector endpoint exists (the downloaded CSV is then the only copy
   // of the response, so it must stay reachable, as a choice, never forced).
@@ -1271,11 +1340,11 @@ function renderThankyou(){
   // because the Sheets API is not enabled, and none of that is readable here.
   // Receipt is therefore unconfirmed whenever a collector is configured, and the
   // page must not assert storage it cannot observe.
-  var unconfirmed=deliveryState==='sent'&&!!ENDPOINT;
+  var unconfirmed=deliveryState==='sent'&&hasCollector();
   // A failed or unconfirmed send makes the download the only copy anyone can
   // prove exists, so it is offered whatever the designer chose.
-  var showDl=(TY.show_download||!ENDPOINT||failed||unconfirmed)&&window._lastCsv;
-  var offlineNote=(!ENDPOINT&&window._lastCsv)
+  var showDl=(TY.show_download||!hasCollector()||failed||unconfirmed)&&window._lastCsv;
+  var offlineNote=(!hasCollector()&&window._lastCsv)
     ?'<div class="ty-note">This survey has no online collector. Download your response below and return the file to the researcher.</div>':'';
   var failNote=failed
     ?'<div class="ty-note" role="alert">Your answers could not be sent. They are still held in this page. Try sending them again, or download the file below and return it to the researcher. Leaving or reloading this page loses them.</div>':'';
@@ -1288,7 +1357,9 @@ function renderThankyou(){
   // the button is withheld, as it already was on failure. A researcher fielding
   // on one shared device reloads the browser themselves, which is a deliberate
   // act on their own device rather than a button beside "Download my response".
-  var again=(failed||unconfirmed)?'':'<button type="button" class="btn btn-s" onclick="restartSurvey()">Submit another response</button>';
+  // thankyou$show_restart = false hides it, for a host that serves one
+  // response per link.
+  var again=(failed||unconfirmed||TY.show_restart===false)?'':'<button type="button" class="btn btn-s" onclick="restartSurvey()">Submit another response</button>';
   var cont=(TY.redirect_url&&!failed)
     ?'<a class="btn btn-s" style="text-decoration:none" href="'+esc(TY.redirect_url)+'">Continue</a>':'';
   var title=failed?'Almost done':'Thank You';
@@ -1331,7 +1402,7 @@ function renderThankyou(){
 // prove exists, the participant is asked before it goes.
 function restartSurvey(){
   var atRisk=window._lastCsv&&(deliveryState==='failed'||
-    (deliveryState==='sent'&&!!ENDPOINT)||!ENDPOINT);
+    (deliveryState==='sent'&&hasCollector())||!hasCollector());
   if(atRisk&&!confirm('Starting a new response clears this one from the page. '
     +'If you have not used Download my response, that copy is lost. Continue?')){
     return;

@@ -94,7 +94,10 @@ function confirm(msg){ __confirms.push(String(msg)); return __confirmAnswer; }
 
 # Exports `instrument`, loads the survey's script into a fresh V8 context and
 # returns the context. The survey is left on its first screen, unrendered.
-static_survey_context <- function(instrument, endpoint_url = "") {
+# `pre` is JavaScript run after the stub and before the survey script, for a
+# test that needs something in place at load, such as localStorage or a host
+# sender.
+static_survey_context <- function(instrument, endpoint_url = "", pre = NULL) {
   skip_if_not_installed("V8")
   path <- tempfile(fileext = ".html")
   suppressMessages(export_static_survey(instrument, output_path = path,
@@ -114,6 +117,7 @@ static_survey_context <- function(instrument, endpoint_url = "") {
   ctx$assign("__sfData", sf_data)
   ctx$assign("__endpoint", endpoint_url)
   ctx$eval(static_dom_stub)
+  if (!is.null(pre)) ctx$eval(pre)
   ctx$eval(script)
   ctx
 }
