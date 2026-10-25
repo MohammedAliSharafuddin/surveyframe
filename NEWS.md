@@ -142,6 +142,13 @@ style.
 
 ## Reports
 
+* **New `render_result()` renders one analysis result as the report does**:
+  the formatted table with its caption and note, any second table, the APA
+  line, and the chart the report picks for that method, with the
+  instrument's labels, as an HTML fragment or with the chart written as PNG
+  or SVG. It uses the report's own code, so a host showing results one at a
+  time and the report agree. A host had to keep its own map from method to
+  chart, which drifted with each release.
 * **Figures at the size, resolution and format a journal asks for.**
   `render_report(figures = list(width =, height =, dpi =, format =))` applies
   to every figure in both engines, and defaults to the `surveyframe.figures`
