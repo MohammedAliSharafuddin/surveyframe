@@ -54,8 +54,8 @@ sframe_figure_settings <- function(figures) {
 #' @param format One of `"png"` (default), `"tiff"`, `"jpeg"`, `"pdf"` or
 #'   `"svg"`.
 #'
-#' @return The paths written, named by block id, invisibly. A block with no
-#'   chart writes nothing.
+#' @return The paths written, named by block id, invisibly. Only blocks
+#'   that drew a chart write a file.
 #' @export
 #' @seealso [render_report()], which takes the same settings as `figures`.
 #' @examples
