@@ -337,7 +337,8 @@ descriptives_report <- function(
       split_by = split_by,
       weights = weights,
       table = table,
-      apa = sprintf("Descriptive statistics were computed for %d variable(s).", length(variables)),
+      apa = sprintf("Descriptive statistics were computed for %s.",
+                    sframe_count_noun(length(variables), "variable")),
       prompt = "Report central tendency, variability, missingness, and any skewed distributions before inferential tests."
     ),
     class = "sframe_descriptives_report"
@@ -464,7 +465,8 @@ missing_data_report <- function(data, instrument = NULL, variables = NULL) {
       ),
       scale_missing_rules = scale_rules,
       mcar = sframe_mcar_test(item_data),
-      apa = sprintf("Missing-data diagnostics were computed for %d variable(s).", length(variables)),
+      apa = sprintf("Missing-data diagnostics were computed for %s.",
+                    sframe_count_noun(length(variables), "variable")),
       prompt = "Report item and respondent missingness, the missing-data pattern, and the deletion rule used for each analysis."
     ),
     class = "sframe_missing_data_report"
@@ -984,6 +986,33 @@ sframe_phi <- function(tbl, chi_sq = NULL) {
 # columns are counted instead: one row per choice for a single_choice item,
 # and one row per option, counting who selected it, for a multiple_choice
 # item's expansion columns. Every other column keeps its usual statistics.
+# "1 variable", "3 variables": a count that agrees with its noun. Report
+# sentences read "1 variable(s)" (Ethos request 22).
+sframe_count_noun <- function(n, noun, plural = paste0(noun, "s")) {
+  paste(n, if (identical(as.integer(n), 1L)) noun else plural)
+}
+
+# descriptive_stats()'s table with headings a reader expects, as the other
+# plan tables have them (Ethos request 22). The group column goes when there
+# is no split, and the weighted mean when there are no weights.
+sframe_descriptives_display_table <- function(table, conf_level = 0.95) {
+  if (!is.data.frame(table) || nrow(table) == 0) return(table)
+  if ("group" %in% names(table) && all(table$group == "All")) table$group <- NULL
+  if ("weighted_mean" %in% names(table) && all(is.na(table$weighted_mean))) {
+    table$weighted_mean <- NULL
+  }
+  ci <- paste0(round(100 * conf_level), "% CI")
+  headings <- c(variable = "Variable", group = "Group", n = "N",
+                valid_n = "Valid N", missing_n = "Missing", mean = "Mean",
+                sd = "SD", median = "Median", iqr = "IQR", min = "Min",
+                max = "Max", skewness = "Skewness", kurtosis = "Kurtosis",
+                se = "SE", ci_low = paste(ci, "lower"), ci_high = paste(ci, "upper"),
+                weighted_mean = "Weighted mean")
+  hit <- names(table) %in% names(headings)
+  names(table)[hit] <- unname(headings[names(table)[hit]])
+  table
+}
+
 sframe_run_descriptives_result <- function(data, roles, options = list(),
                                            instrument = NULL) {
   vars <- sframe_role_values(roles, c("variables", "items", "scales"))
@@ -1040,6 +1069,10 @@ sframe_run_descriptives_result <- function(data, roles, options = list(),
   # dispatch plot() on, same pattern as sframe_result_from_report() elsewhere:
   # the unclassed, merged result list is not safe to treat as report-shaped.
   res <- sframe_set_runtime(c(unclass(out), list(test = "descriptives")), "report", out)
+  # The plan table reads like the other plan tables. descriptive_stats()
+  # keeps its own column names, and the runtime report keeps the full table.
+  res$table <- sframe_descriptives_display_table(res$table,
+                                                 options$conf_level %||% 0.95)
   if (!is.null(cat_tbl)) {
     res$categorical <- cat_tbl
     res$note <- note

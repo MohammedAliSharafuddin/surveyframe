@@ -560,6 +560,12 @@ sframe_demo_results_table <- function(res) {
         value = b$apa, stringsAsFactors = FALSE)
     }
     tb <- b$table
+    # A descriptives block shows display headings, and the snapshot keeps the
+    # report's own column names, so its quantities stay stable keys.
+    if (identical(meth, "descriptives") &&
+        is.data.frame(sframe_runtime(b, "report")$table)) {
+      tb <- sframe_runtime(b, "report")$table
+    }
     if (is.data.frame(tb) && nrow(tb) > 0) {
       num <- names(tb)[vapply(tb, is.numeric, logical(1))]
       # Force-directed coordinates are rendering state rather than analysis
