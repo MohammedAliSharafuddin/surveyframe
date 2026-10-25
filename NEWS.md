@@ -1,8 +1,11 @@
 # surveyframe 0.4.3
 
-A GitHub release, ahead of the next CRAN submission. It fixes what a
-teaching session on 0.4.2 found. Install it with
-`remotes::install_github("MohammedAliSharafuddin/surveyframe")`.
+It fixes what a teaching session on 0.4.2 found and what Ethos, the
+research platform built on surveyframe, reported from its own use, and adds
+references carried inside the `.sframe` file. It went out on GitHub on 19
+October 2026 and reaches CRAN with the fixes since. SurveyBuilder no longer
+changes content its user left alone, so an amended instrument saved from it
+can be written again, and every plan result can be serialised by a host.
 
 ## What you need to change
 
