@@ -27,8 +27,8 @@ sframe_save_figures(
 \code{"svg"}.}
 }
 \value{
-The paths written, named by block id, invisibly. A block with no
-chart writes nothing.
+The paths written, named by block id, invisibly. Only blocks
+that drew a chart write a file.
 }
 \description{
 Writes each chart \code{\link[=run_analysis_plan]{run_analysis_plan()}} drew with \code{plots = TRUE} to its own
