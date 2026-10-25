@@ -225,6 +225,9 @@ style.
 
 ## SurveyStudio
 
+* **The dashboard's filters are named by their questions** and offer the
+  choice labels. They showed the item id, such as `visit_type`, and the
+  stored codes. Each label is now tied to its control.
 * **Run results on the Analysis Plan screen take the full width.** Each
   result card sat inside the middle third of the screen, about 230 px wide,
   so a result table printed "120" one digit per line and cut off its p

@@ -159,15 +159,20 @@ server <- function(input, output, session) {
       return(NULL)
     }
 
+    # Each filter is named by its question and offers the choice labels, as
+    # the rest of the dashboard does. It showed the item id and the stored
+    # codes. selectInput()'s own label ties the text to the control.
+    labels <- sframe_label_lookup(instr)
     cats <- lapply(categorical_filters, function(nm) {
       vals <- sort(unique(as.character(responses[[nm]][!is.na(responses[[nm]])])))
       if (!length(vals)) return(NULL)
+      value_labels <- sframe_item_value_labels(instr, nm)
+      shown <- ifelse(vals %in% names(value_labels), unname(value_labels[vals]), vals)
       div(
-        tags$label(nm),
         selectInput(
           paste0("filter_", nm),
-          NULL,
-          choices = vals,
+          if (nm %in% names(labels)) unname(labels[[nm]]) else nm,
+          choices = stats::setNames(vals, shown),
           selected = character(0),
           multiple = TRUE,
           width = "100%"
