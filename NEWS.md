@@ -27,6 +27,11 @@ can be written again, and every plan result can be serialised by a host.
   are now plain lists holding the same numbers. A host serialising results
   failed on all of these, 20 blocks across the demos. Charts drawn with
   `plots = TRUE` stay on the result as `ggplot` objects.
+* **An empty `render` is written as `{}`**, an empty object, by
+  `write_sframe()` and SurveyBuilder. It was written as `[]`, which a host
+  reading the JSON took for a list. A file written with `[]` still reads and
+  verifies, and an amendment log recorded with `[]` still matches its
+  content, so such a file takes further amendments as before.
 
 ## References, cited where they are used and listed once at the end
 

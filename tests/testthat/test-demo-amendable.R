@@ -17,7 +17,9 @@ for (demo in sframe_demos()$name) {
     if (length(log) == 0) {
       expect_length(log, 0L)
     } else {
-      expect_identical(log[[length(log)]]$new_hash, sframe_content_hash(ins))
+      # The rule write_sframe() applies: the last entry names this content in
+      # one of the serialisations a log may have used.
+      expect_true(log[[length(log)]]$new_hash %in% sframe_content_hash_candidates(ins))
     }
   })
 
