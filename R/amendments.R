@@ -120,6 +120,14 @@ sframe_check_amendment_boundary <- function(instrument, new_instrument = FALSE) 
     }
   }
 
+  # Content read without a matching hash ties to no state anyone wrote, so
+  # with no log to vouch for it, it is written only as a new instrument.
+  if (!isTRUE(new_instrument) && isFALSE(origin$verified) && length(am) == 0) {
+    abort(sprintf(paste0(
+      "This instrument was read from '%s' without a matching integrity hash. ",
+      "Write it as a new instrument with new_instrument = TRUE."), origin$path))
+  }
+
   if (isTRUE(new_instrument)) {
     if (length(am) > 0) {
       abort(paste0(
