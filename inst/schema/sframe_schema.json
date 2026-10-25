@@ -80,7 +80,11 @@
           "values": { "type": "array" },
           "labels": { "type": ["array", "null"] },
           "allow_other": { "type": ["boolean", "null"] },
-          "randomise": { "type": ["boolean", "null"] }
+          "randomise": { "type": ["boolean", "null"] },
+          "ordered": {
+            "type": "boolean",
+            "description": "Optional (surveyframe 0.4.3). True when the options run in a meaningful order, as in a frequency or an education scale, so a single_choice item on the set is ordinal. Present only when true, so a set without it hashes as it did before the field existed."
+          }
         }
       }
     },
