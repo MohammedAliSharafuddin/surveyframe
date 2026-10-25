@@ -64,11 +64,17 @@ sframe_clean_chrome_detritus <- function(before) {
 #'
 #' @param instrument An `sframe` object.
 #' @param format Character. Output format. Either `"html"` or `"md"`.
+#'   With `"md"`, the codebook also carries itself as Markdown text, in
+#'   `markdown`, and `print()` writes that text.
 #'
 #' @return An object of class `sframe_codebook`, a list with elements
-#'   `instrument_meta`, `items_table`, `choices_table`, and `scales_table`.
-#'   Call `print()` to display a compact summary or use `render_report()` to
-#'   include the codebook in a full report.
+#'   `instrument_meta`, `items_table`, `choices_table`, `scales_table`,
+#'   `plan_table`, `models_table` and `format`, and with `format = "md"`,
+#'   `markdown`: one character string holding the whole codebook as Markdown,
+#'   with a pipe table per component. Save it with
+#'   `writeLines(cb$markdown, "codebook.md")`. With `"html"`, `print()`
+#'   shows a compact summary, and `render_report()` includes the codebook in a
+#'   full report.
 #' @export
 #' @seealso [render_report()]
 #'
@@ -85,6 +91,8 @@ sframe_clean_chrome_detritus <- function(before) {
 #'
 #' cb <- codebook_report(instr)
 #' print(cb)
+#' md <- codebook_report(instr, format = "md")
+#' cat(substr(md$markdown, 1, 200))
 #' nrow(sf_items(cb))
 #' nrow(sf_scales(cb))
 codebook_report <- function(instrument, format = c("html", "md")) {
@@ -117,7 +125,7 @@ codebook_report <- function(instrument, format = c("html", "md")) {
 
   models_table <- sframe_models_table(instrument)
 
-  structure(
+  out <- structure(
     list(
       instrument_meta = instrument$meta,
       items_table     = items_table,
@@ -129,6 +137,45 @@ codebook_report <- function(instrument, format = c("html", "md")) {
     ),
     class = "sframe_codebook"
   )
+  # format = "md" used to change nothing, so a host asking for Markdown got
+  # the printed text table (Ethos request 9).
+  if (identical(format, "md")) out$markdown <- sframe_codebook_markdown(out)
+  out
+}
+
+# A data frame as a Markdown pipe table, cells escaped.
+sframe_md_table <- function(df) {
+  if (!is.data.frame(df) || nrow(df) == 0) return("None.")
+  cell <- function(v) {
+    v <- vapply(v, function(e) paste(as.character(unlist(e)), collapse = ", "), character(1))
+    v[is.na(v)] <- ""
+    gsub("\\|", "\\\\|", gsub("[\r\n]+", " ", v))
+  }
+  body <- vapply(seq_len(nrow(df)), function(r) {
+    paste0("| ", paste(vapply(df, function(col) cell(col[r]), character(1)), collapse = " | "), " |")
+  }, character(1))
+  c(paste0("| ", paste(cell(names(df)), collapse = " | "), " |"),
+    paste0("|", paste(rep("---", ncol(df)), collapse = "|"), "|"),
+    body)
+}
+
+sframe_codebook_markdown <- function(cb) {
+  m <- cb$instrument_meta %||% list()
+  meta_line <- function(label, value) {
+    value <- paste(as.character(unlist(value)), collapse = ", ")
+    if (length(value) && nzchar(value)) paste0("- **", label, ":** ", value)
+  }
+  lines <- c(
+    paste0("# Codebook: ", m$title %||% "Untitled"), "",
+    meta_line("Version", m$version), meta_line("Authors", m$authors),
+    meta_line("Languages", m$languages), meta_line("Description", m$description), "",
+    "## Items", "", sframe_md_table(cb$items_table), "",
+    "## Choice sets", "", sframe_md_table(cb$choices_table), "",
+    "## Scales", "", sframe_md_table(cb$scales_table), "",
+    "## Analysis plan", "", sframe_md_table(cb$plan_table), "",
+    "## Models", "", sframe_md_table(cb$models_table)
+  )
+  paste(lines, collapse = "\n")
 }
 
 #' Enrich a codebook's items table for display
@@ -172,6 +219,10 @@ sframe_codebook_items_display <- function(cb) {
 
 #' @exportS3Method print sframe_codebook
 print.sframe_codebook <- function(x, ...) {
+  if (!is.null(x$markdown)) {
+    cat(x$markdown, "\n", sep = "")
+    return(invisible(x))
+  }
   cat(sprintf("Codebook: %s v%s\n", x$instrument_meta$title,
               x$instrument_meta$version))
   cat(sprintf("  %d items  |  %d choice sets  |  %d scales\n",
