@@ -21,7 +21,9 @@ render_report(
   interpretations = NULL,
   show_code = TRUE,
   references = NULL,
-  csl = NULL
+  csl = NULL,
+  title = NULL,
+  authors = NULL
 )
 }
 \arguments{
@@ -90,6 +92,13 @@ in text as \verb{[@id]}. The instrument's own references
 \item{csl}{Optional path to a Citation Style Language file for the
 References section. Defaults to APA 7th edition, bundled with the
 package. Any style from the Zotero style repository works.}
+
+\item{title}{Character or \code{NULL}. The report's title. Defaults to the
+instrument's title.}
+
+\item{authors}{Character vector or \code{NULL}. The report's authors, shown under
+the title. Defaults to the instrument's authors, and is left out when
+there are none.}
 }
 \value{
 The output file path, invisibly.

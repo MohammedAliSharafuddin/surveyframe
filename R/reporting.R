@@ -232,6 +232,11 @@ print.sframe_codebook <- function(x, ...) {
 #'   the works a host cites in the written interpretations, which are cited
 #'   in text as `[@id]`. The instrument's own references
 #'   ([add_references()]) and the methods' references are always included.
+#' @param title Character or `NULL`. The report's title. Defaults to the
+#'   instrument's title.
+#' @param authors Character vector or `NULL`. The report's authors, shown under
+#'   the title. Defaults to the instrument's authors, and is left out when
+#'   there are none.
 #' @param csl Optional path to a Citation Style Language file for the
 #'   References section. Defaults to APA 7th edition, bundled with the
 #'   package. Any style from the Zotero style repository works.
@@ -299,9 +304,16 @@ render_report <- function(
     interpretations   = NULL,
     show_code         = TRUE,
     references        = NULL,
-    csl               = NULL
+    csl               = NULL,
+    title             = NULL,
+    authors           = NULL
 ) {
   sframe_check_instrument(instrument)
+  # The study's own title and authors, where every report read "Survey
+  # Research Report" whatever the study (Ethos request 23).
+  report_title <- as.character(title %||% instrument$meta$title %||% "Survey report")[1]
+  report_authors <- as.character(authors %||% instrument$meta$authors %||% character(0))
+  report_authors <- report_authors[!is.na(report_authors) & nzchar(trimws(report_authors))]
   plot_palette <- rlang::arg_match(plot_palette)
   interpretations <- sframe_clean_interpretations(interpretations)
 
@@ -453,15 +465,23 @@ render_report <- function(
     }
 
     param_args <- sframe_quarto_param_args(params)
-    if (isTRUE(params$use_citations)) {
-      # In the front matter of the render copy. Quarto 1.8 ignores a
-      # bibliography given as -M metadata on the command line, so the
-      # citations would print as raw [@key] text.
-      qmd <- readLines(render_input, warn = FALSE)
-      qmd <- append(qmd, c("bibliography: references.json", "csl: style.csl",
-                           "link-citations: true"), after = 1L)
-      writeLines(qmd, render_input)
-    }
+    # Title, authors and the date label go in the front matter of the render
+    # copy, as the bibliography does: Quarto 1.8 ignores a bibliography given
+    # as -M metadata on the command line. Quarto labels the date "Published"
+    # by default, which a report that has not been published should not say.
+    # JSON strings are valid YAML, so toJSON() quotes each value safely.
+    yaml_str <- function(s) as.character(jsonlite::toJSON(s, auto_unbox = TRUE))
+    front <- c(
+      paste0("title: ", yaml_str(report_title)),
+      if (length(report_authors)) c("author:", paste0("  - ", vapply(report_authors, yaml_str, character(1)))),
+      "language:", "  title-block-published: \"Rendered\"",
+      if (isTRUE(params$use_citations)) c("bibliography: references.json", "csl: style.csl",
+                                          "link-citations: true")
+    )
+    qmd <- readLines(render_input, warn = FALSE)
+    qmd <- qmd[!grepl("^title:", qmd) | seq_along(qmd) > grep("^---", qmd)[2]]
+    qmd <- append(qmd, front, after = 1L)
+    writeLines(qmd, render_input)
     # Render with the working directory set to the render dir so Quarto creates
     # its intermediate `*_files/libs` there and can inline them for
     # embed-resources. Output next to the input, then copy to the destination.
@@ -507,7 +527,9 @@ render_report <- function(
     include_models      = include_models,
     plot_palette        = plot_palette,
     interpretations     = interpretations,
-    show_code           = show_code
+    show_code           = show_code,
+    title               = report_title,
+    authors             = report_authors
   )
 
   sframe_report_result(dest, "html")
@@ -609,7 +631,9 @@ sframe_clean_interpretations <- function(interpretations) {
     include_models = TRUE,
     plot_palette = "web",
     interpretations = list(),
-    show_code = TRUE
+    show_code = TRUE,
+    title = NULL,
+    authors = character(0)
 ) {
   meta <- instrument$meta %||% list()
   sections <- character(0)
@@ -791,11 +815,11 @@ sframe_clean_interpretations <- function(interpretations) {
     )
   )
 
-  title <- htmltools_escape(meta$title %||% "Survey Report")
-  subtitle <- sprintf(
-    "Version %s",
-    htmltools_escape(meta$version %||% "")
-  )
+  title <- htmltools_escape(title %||% meta$title %||% "Survey report")
+  subtitle <- paste(c(
+    if (length(authors)) htmltools_escape(paste(authors, collapse = ", ")),
+    sprintf("Version %s", htmltools_escape(meta$version %||% ""))
+  ), collapse = " &middot; ")
 
   html <- sprintf(
     paste(

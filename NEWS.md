@@ -127,6 +127,14 @@ style.
   names the threshold too. The argument's help says how to check 3-item
   scales, in a call or in a plan.
 
+## Reports
+
+* **`render_report()` takes `title` and `authors`**, which default to the
+  instrument's title and authors. Every Quarto report was titled "Survey
+  Research Report" whatever the study. The date under the title is labelled
+  "Rendered" in place of Quarto's "Published", since a rendered report
+  has not been published. The built-in HTML engine shows the authors too.
+
 ## Validation
 
 * **A plan block whose roles its method never reads is refused.** A
