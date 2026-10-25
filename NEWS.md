@@ -232,6 +232,9 @@ style.
 
 ## SurveyStudio
 
+* **SurveyStudio keeps an instrument's references.** Its rebuild of the
+  open instrument had no place for them, so they were dropped as soon as a
+  file opened, and lost from anything exported.
 * **The dashboard's filters are named by their questions** and offer the
   choice labels. They showed the item id, such as `visit_type`, and the
   stored codes. Each label is now tied to its control.

@@ -172,3 +172,19 @@ test_that("an instrument built fresh still gets a creation time", {
     sf_item("q1", "One", type = "numeric")))
   expect_match(new$meta$created_at, "^[0-9]{4}-[0-9]{2}-[0-9]{2}T")
 })
+
+# References (0.4.3) took the same path as designs before F2: the state
+# projection and compose had no field for them, so SurveyStudio's standing
+# draft sync dropped every reference. The amendment hash leaves references
+# out, so the export that lost them went through unchallenged.
+test_that("references survive the Studio rebuild", {
+  ins <- sframe_demo("first_survey")$instrument
+  ins <- add_references(ins, sf_reference(
+    "cronbach_1951", "Coefficient alpha and the internal structure of tests",
+    author = "Cronbach, L. J.", year = 1951, cited_by = "instrument"))
+  state <- sframe_builder_state_from_instrument(ins)
+  draft <- do.call(sframe_builder_validate_draft, state)
+  expect_true(draft$valid)
+  expect_identical(names(sframe_references(draft$instrument)), "cronbach_1951")
+  expect_identical(sframe_references(draft$instrument)[[1]]$cited_by, "instrument")
+})

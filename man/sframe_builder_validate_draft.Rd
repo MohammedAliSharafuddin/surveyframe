@@ -16,6 +16,7 @@ sframe_builder_validate_draft(
   render = list(),
   amendments = list(),
   designs = list(),
+  references = list(),
   origin = NULL
 )
 }
@@ -36,6 +37,9 @@ through unchanged so a draft round trip does not drop them.}
 
 \item{designs}{List of conjoint designs, carried through unchanged, since
 Studio has no editor for them.}
+
+\item{references}{List of \code{\link[=sf_reference]{sf_reference()}} records, as edited on Studio's
+References screen.}
 
 \item{origin}{The load record of an instrument read with \code{\link[=read_sframe]{read_sframe()}},
 from the builder state, or \code{NULL}. Carried onto the draft so an edit of a

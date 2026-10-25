@@ -133,7 +133,8 @@ sframe_builder_empty_state <- function() {
     analysis_plan = list(),
     models = list(),
     render = list(),
-    designs = list()
+    designs = list(),
+    references = list()
   )
 }
 
@@ -188,6 +189,10 @@ sframe_builder_state_from_instrument <- function(instrument = NULL) {
     # Conjoint designs have no Studio editor, and are carried through untouched
     # so a rebuild keeps them. They were dropped here.
     designs = instrument$designs %||% list(),
+    # References too, edited on Studio's References screen. The rebuild
+    # dropped them, and since the amendment hash leaves references out,
+    # nothing refused the export that lost them.
+    references = instrument$references %||% list(),
     # What the instrument was when read from a file, reattached on compose, so
     # a Studio edit of a loaded file is still recognised as a revision.
     origin = attr(instrument, "sframe_origin")
@@ -206,6 +211,7 @@ sframe_builder_compose_instrument <- function(
     render = list(),
     amendments = list(),
     designs = list(),
+    references = list(),
     origin = NULL
 ) {
   choices <- lapply(choices, sframe_builder_as_choice)
@@ -244,7 +250,8 @@ sframe_builder_compose_instrument <- function(
     authors = meta$authors %||% NULL,
     languages = meta$languages %||% "en",
     components = c(choices, items, scales, branching, checks,
-                   designs %||% list()),
+                   designs %||% list(),
+                   sframe_flatten_references(list(references %||% list()))),
     analysis_plan = analysis_plan,
     models = models,
     render = render %||% list()
@@ -294,6 +301,8 @@ sframe_builder_revision_problem <- function(instrument) {
 #'   through unchanged so a draft round trip does not drop them.
 #' @param designs List of conjoint designs, carried through unchanged, since
 #'   Studio has no editor for them.
+#' @param references List of [sf_reference()] records, as edited on Studio's
+#'   References screen.
 #' @param origin The load record of an instrument read with [read_sframe()],
 #'   from the builder state, or `NULL`. Carried onto the draft so an edit of a
 #'   loaded file is recognised as a revision.
@@ -322,6 +331,7 @@ sframe_builder_validate_draft <- function(
     render = list(),
     amendments = list(),
     designs = list(),
+    references = list(),
     origin = NULL
 ) {
   instrument <- sframe_builder_compose_instrument(
@@ -336,6 +346,7 @@ sframe_builder_validate_draft <- function(
     render = render,
     amendments = amendments,
     designs = designs,
+    references = references,
     origin = origin
   )
 
