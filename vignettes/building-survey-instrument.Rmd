@@ -264,7 +264,8 @@ in any Citation Style Language file given as `csl = `. A written
 interpretation can cite a work as `[@key]`, and `references = ` adds works
 cited there. `render_results()` lists its references once at the end in the
 same way. In SurveyBuilder, the References tab of Survey settings takes
-pasted BibTeX or a typed reference.
+pasted BibTeX or a typed reference, and SurveyStudio has a References
+screen that does the same.
 
 ## Write and read `.sframe` files
 

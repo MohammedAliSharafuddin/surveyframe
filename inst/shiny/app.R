@@ -1144,8 +1144,7 @@ if (identical(initial_tab, "auto")) {
     "open"
   }
 }
-if (!initial_tab %in% c("open", "amendments", "preview", "responses", "quality",
-                       "reliability", "analysis", "dashboard", "export")) {
+if (!initial_tab %in% sframe_studio_screens()) {
   initial_tab <- if (inherits(INITIAL_INSTRUMENT, "sframe")) {
     "preview"
   } else {
@@ -1322,6 +1321,9 @@ ui <- fluidPage(
           tags$a(href = "#", `data-tab` = "amendments",
                  class = tab_link_class("amendments"), "Amendments")),
         tags$li(class = "studio-nav-item",
+          tags$a(href = "#", `data-tab` = "references",
+                 class = tab_link_class("references"), "References")),
+        tags$li(class = "studio-nav-item",
           tags$a(href = "#", `data-tab` = "preview",
                  class = tab_link_class("preview"), "Preview Survey")),
         tags$li(class = "studio-nav-item",
@@ -1468,6 +1470,29 @@ ui <- fluidPage(
           tags$p(class = "hint",
             "Every disclosed change to this instrument, oldest first. Saved into the .sframe file itself once you export it."),
           tags$div(style = "overflow-x:auto", shiny::tableOutput("amendment_log_table"))
+        )
+      ),
+
+      # References (0.4.3): the works the instrument cites, carried in the
+      # .sframe file and listed once at the end of the report.
+      tags$div(id = "screen-references", class = screen_class("references"),
+        tags$h2(class = "screen-title", "References"),
+        uiOutput("refs_gate"),
+        uiOutput("refs_table"),
+        tags$div(class = "card",
+          tags$div(class = "card-title", "Add references"),
+          tags$p(class = "hint",
+            "Paste BibTeX from Google Scholar (Cite, then BibTeX), Zotero, Mendeley or a journal page. Citing a source needs no amendment, and each change applies to the open instrument at once. Export it to keep the references in the .sframe file."),
+          textAreaInput("refs_bibtex", "BibTeX", rows = 6, width = "100%",
+            placeholder = "@article{key, author = {Family, Given}, title = {...}, journal = {...}, year = {...}}"),
+          selectizeInput("refs_cited_by", "Cited by", choices = NULL, multiple = TRUE,
+            options = list(placeholder = "The instrument as a whole")),
+          actionButton("refs_add_btn", "Add from BibTeX", class = "btn-primary")
+        ),
+        tags$div(class = "card",
+          tags$div(class = "card-title", "Remove a reference"),
+          selectInput("refs_remove_id", "Citation key", choices = NULL),
+          actionButton("refs_remove_btn", "Remove reference")
         )
       ),
 
@@ -2049,6 +2074,84 @@ server <- function(input, output, session) {
       rv$open_verification <- paste("Integrity check failed:", conditionMessage(e))
       showNotification(paste("Error:", conditionMessage(e)), type = "error")
     })
+  })
+
+  # -- References -------------------------------------------------------------
+  # Edits rv$builder$references, which the draft sync composes into the open
+  # instrument, so a reference added here is in everything exported.
+  refs_targets <- reactive({
+    ins <- rv$instrument
+    if (is.null(ins)) return(character(0))
+    ids <- function(x) vapply(x %||% list(), function(c) as.character(c$id)[1], character(1))
+    items <- Filter(function(i) !(i$type %in% c("section_break", "text_block")), ins$items %||% list())
+    c("The instrument as a whole" = "instrument",
+      stats::setNames(paste0("item:", ids(items)), paste("Item:", ids(items))),
+      stats::setNames(paste0("scale:", ids(ins$scales)), paste("Scale:", ids(ins$scales))),
+      stats::setNames(paste0("plan:", ids(ins$analysis_plan)), paste("Plan:", ids(ins$analysis_plan))),
+      stats::setNames(paste0("model:", ids(ins$models)), paste("Model:", ids(ins$models))))
+  })
+
+  observe({
+    updateSelectizeInput(session, "refs_cited_by", choices = refs_targets(), server = FALSE)
+    keys <- vapply(rv$builder$references %||% list(), function(r) r$id, character(1))
+    updateSelectInput(session, "refs_remove_id", choices = keys)
+  })
+
+  output$refs_gate <- renderUI({
+    if (is.null(rv$instrument)) {
+      tags$div(class = "card", "Open an instrument on the Open Instrument screen first.")
+    }
+  })
+
+  output$refs_table <- renderUI({
+    refs <- rv$builder$references %||% list()
+    rows <- lapply(refs, function(r) {
+      who <- vapply(r$author %||% list(), function(a) a$family %||% a$literal %||% "", character(1))
+      who <- if (length(who) > 2) paste(who[1], "et al.") else paste(who, collapse = " & ")
+      year <- tryCatch(r$issued[["date-parts"]][[1]][[1]], error = function(e) NULL) %||%
+        r$issued$literal %||% "n.d."
+      tags$tr(
+        tags$td(tags$code(r$id)),
+        tags$td(paste0(who, " (", year, "). ", r$title %||% "")),
+        tags$td(paste(r$cited_by %||% "instrument", collapse = ", "))
+      )
+    })
+    table_card("References in this instrument", c("Key", "Reference", "Cited by"), rows,
+               "No references yet. The report lists every work the instrument cites once, at the end.",
+               wide = TRUE)
+  })
+
+  observeEvent(input$refs_add_btn, {
+    req(rv$instrument)
+    text <- input$refs_bibtex %||% ""
+    if (!nzchar(trimws(text))) {
+      showNotification("Paste a BibTeX entry first.", type = "error")
+      return()
+    }
+    cited <- input$refs_cited_by
+    if (!length(cited)) cited <- "instrument"
+    tryCatch({
+      found <- surveyframe::read_bibtex(text = text, cited_by = cited)
+      if (!length(found)) stop("No BibTeX entry was found in that text.")
+      current <- rv$builder$references %||% list()
+      clash <- intersect(names(found), vapply(current, function(r) r$id, character(1)))
+      if (length(clash)) stop("A reference with key ", paste(clash, collapse = ", "), " is already here.")
+      state <- rv$builder
+      state$references <- c(current, unname(found))
+      set_builder_state(state)
+      updateTextAreaInput(session, "refs_bibtex", value = "")
+      showNotification(sprintf("%d reference%s added.", length(found),
+                               if (length(found) == 1) "" else "s"), type = "message")
+    }, error = function(e) showNotification(conditionMessage(e), type = "error"))
+  })
+
+  observeEvent(input$refs_remove_btn, {
+    key <- input$refs_remove_id %||% ""
+    req(nzchar(key))
+    state <- rv$builder
+    state$references <- Filter(function(r) !identical(r$id, key), state$references %||% list())
+    set_builder_state(state)
+    showNotification(paste("Removed", key), type = "message")
   })
 
   output$amend_gate <- renderUI({
