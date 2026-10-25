@@ -318,6 +318,18 @@ reference:
       - analysis_syntax
       - sframe_result_supplement
       - sframe_analysis_qmd
+      - sframe_save_figures
+
+  - title: "References"
+    desc: >
+      Cite the works an instrument draws on. The references travel in the
+      .sframe file and the report lists each one once, at the end.
+    contents:
+      - sf_reference
+      - read_bibtex
+      - add_references
+      - sframe_references
+      - sframe_bibliography
 
   - title: "Plotting"
     desc: >

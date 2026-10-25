@@ -29,6 +29,10 @@ params:
   instrument_hash:     ""
   analysis_seed:       ""
   use_citations:       false
+  fig_width:           ""
+  fig_height:          ""
+  fig_dpi:             ""
+  fig_format:          ""
 execute:
   echo:    false
   warning: false
@@ -40,6 +44,19 @@ library(surveyframe)
 library(knitr)
 
 `%||%` <- function(x, y) if (is.null(x)) y else x
+
+# Figure size, resolution and format from render_report(figures = ) (Ethos
+# request 19). Empty keeps the defaults. A stated dpi is the pixel density
+# the figure is written at, so retina doubling is turned off.
+fig_opts <- list()
+if (nzchar(params$fig_width %||% ""))  fig_opts$fig.width  <- as.numeric(params$fig_width)
+if (nzchar(params$fig_height %||% "")) fig_opts$fig.height <- as.numeric(params$fig_height)
+if (nzchar(params$fig_dpi %||% "")) {
+  fig_opts$dpi <- as.numeric(params$fig_dpi)
+  fig_opts$fig.retina <- 1
+}
+if (identical(params$fig_format %||% "", "svg")) fig_opts$dev <- "svg"
+if (length(fig_opts)) do.call(knitr::opts_chunk$set, fig_opts)
 
 instrument <- readRDS(params$instrument_path)
 has_data   <- nzchar(params$data_path) && file.exists(params$data_path)

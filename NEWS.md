@@ -142,6 +142,14 @@ style.
 
 ## Reports
 
+* **Figures at the size, resolution and format a journal asks for.**
+  `render_report(figures = list(width =, height =, dpi =, format =))` applies
+  to every figure in both engines, and defaults to the `surveyframe.figures`
+  option, so a host can set it once. `figure_dir =` also writes each plan
+  chart as its own file, PNG, TIFF, JPEG, PDF or SVG. New
+  `sframe_save_figures()` does the same for the results of
+  `run_analysis_plan(plots = TRUE)`. The report fixed its own figure size,
+  and the built-in engine saved charts at 110 dpi.
 * **`codebook_report(format = "md")` gives Markdown.** The codebook carries
   itself as Markdown text in `markdown`, a heading and a pipe table for the
   items, choice sets, scales, plan and models, and `print()` writes it. Save
