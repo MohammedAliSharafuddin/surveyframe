@@ -2,7 +2,7 @@
   "sframe_format": "1.0",
   "hash": {
     "algo": "sha256",
-    "value": "857cb6d6f00a1b2c4a8e5a01a9e0eec839b40a77619b4ac60ee30e8ee1af03a0"
+    "value": "59eb163ca5b667ed869cc494d55052cb32bd09394e5d24385dd3d3a1cc931be1"
   },
   "version": "1.1.0",
   "meta": {
@@ -146,18 +146,29 @@
     }
   ],
   "models": [],
-  "render": [],
+  "render": {
+    "welcome": {
+      "title": "Event feedback",
+      "intro_text": "Thank you for taking part. This survey takes a few minutes.",
+      "consent_text": "I agree to take part, and for my answers to be used for this study.",
+      "consent_required": true,
+      "start_label": "Start"
+    },
+    "thankyou": {
+      "message": "Thank you for completing this survey."
+    }
+  },
   "amendments": [
     {
-      "timestamp": "2026-10-24T16:31:58Z",
+      "timestamp": "2026-10-25T19:10:39Z",
       "reason_code": "instrument_revision",
       "reason_text": "Reworded the open question after a face-validity pass: readers were listing several changes at once, so the answers were hard to code.",
       "tier": "design",
       "author": "M. A. Sharafuddin",
       "deviation_report": "The open question moved from an unbounded prompt to a single-change prompt. No analysis block changed. Responses collected before this amendment remain analysable and are reported separately.",
       "signoff": "none",
-      "previous_hash": "d7012871373595f775193b43751c29b8240e0840152c360a4c2a585128e5ea08",
-      "new_hash": "3686557a8249f595bfd67e9897263b5014740fe7d19ef752317464fe909a4467",
+      "previous_hash": "1338f3b6e1b8debda475c0f3fd3f580310238fc7c4cf4cd373cd541c199b426f",
+      "new_hash": "92edede0e4ee7daad6f56fe4482ef438f5ebfab8d1d1f077fc8fcd97c058c12e",
       "changed_fields": ["version", "meta", "items"]
     }
   ]

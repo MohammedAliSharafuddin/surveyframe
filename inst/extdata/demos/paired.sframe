@@ -2,7 +2,7 @@
   "sframe_format": "1.0",
   "hash": {
     "algo": "sha256",
-    "value": "ece99be2aa5a145806f28c740e360f9701204d5d2e28f80d4b67b3db5ad209d3"
+    "value": "9f7d124809f50c00b96e649d7640f0b23ad001bdedad51e73f0442d448e17285"
   },
   "version": "1.0.0",
   "meta": {
@@ -121,5 +121,16 @@
     }
   ],
   "models": [],
-  "render": []
+  "render": {
+    "welcome": {
+      "title": "Before and after the workshop",
+      "intro_text": "Thank you for taking part. This survey takes a few minutes.",
+      "consent_text": "I agree to take part, and for my answers to be used for this study.",
+      "consent_required": true,
+      "start_label": "Start"
+    },
+    "thankyou": {
+      "message": "Thank you for completing this survey."
+    }
+  }
 }

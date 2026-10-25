@@ -2,7 +2,7 @@
   "sframe_format": "1.0",
   "hash": {
     "algo": "sha256",
-    "value": "d6466bdb96f27eee7cce56d14cbae4f46c111df11e94c194c0299a25a762a93a"
+    "value": "2d5e9cffb0d081f83bcab8ecbb0d9a3218f8a016dd7d99b00c203411314485b0"
   },
   "version": "1.0.0",
   "meta": {
@@ -587,5 +587,16 @@
     }
   ],
   "models": [],
-  "render": []
+  "render": {
+    "welcome": {
+      "title": "Choosing next year's venue",
+      "intro_text": "Thank you for taking part. This survey takes a few minutes.",
+      "consent_text": "I agree to take part, and for my answers to be used for this study.",
+      "consent_required": true,
+      "start_label": "Start"
+    },
+    "thankyou": {
+      "message": "Thank you for completing this survey."
+    }
+  }
 }

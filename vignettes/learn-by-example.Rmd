@@ -293,9 +293,9 @@ head(tf$table, 5)
 
 ## Make it yours
 
-Every demo above ships plain. The whole appearance of a survey lives in one
-`render` block, which you can read, change and paste into your own
-instrument:
+Every demo above ships with plain welcome, consent and thank-you screens and
+the default look. The whole appearance of a survey lives in one `render`
+block, which you can read, change and paste into your own instrument:
 
 ```{r branding}
 sframe_demo_branding()

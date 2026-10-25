@@ -76,9 +76,9 @@ test_that("an emptied author list is saved as absent, as R writes it", {
 
 test_that("a setting saved on an instrument with an empty render is kept", {
   ins <- sframe_demo("first_survey")$instrument
-  expect_length(ins$render, 0L)
+  ins$render <- list()
   ctx <- builder_context()
-  builder_open(ctx, ins)
+  builder_open(ctx, ins, new_instrument = TRUE)
   settings_save(ctx, list(`s-theme` = "#aa0000", `s-wt` = "Welcome"))
   back <- read_sframe(builder_save(ctx), validate = FALSE)
   expect_identical(back$render$theme, "#aa0000")

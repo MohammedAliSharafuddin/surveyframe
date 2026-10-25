@@ -2,7 +2,7 @@
   "sframe_format": "1.0",
   "hash": {
     "algo": "sha256",
-    "value": "d73d4ae885a9ba3d3dd32bce3e5a6883af09d413164476a1d36480d2cbc73f1c"
+    "value": "3831aa0ff811471dce0a7a2d8069a571f8dc8acead5abeee4b61e1fb1a5fa832"
   },
   "version": "1.0.0",
   "meta": {
@@ -230,5 +230,16 @@
     }
   ],
   "models": [],
-  "render": []
+  "render": {
+    "welcome": {
+      "title": "What worked, and what to change",
+      "intro_text": "Thank you for taking part. This survey takes a few minutes.",
+      "consent_text": "I agree to take part, and for my answers to be used for this study.",
+      "consent_required": true,
+      "start_label": "Start"
+    },
+    "thankyou": {
+      "message": "Thank you for completing this survey."
+    }
+  }
 }
