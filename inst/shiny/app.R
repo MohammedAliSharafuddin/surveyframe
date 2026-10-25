@@ -1694,6 +1694,7 @@ server <- function(input, output, session) {
       render = rv$builder$render %||% list(),
       amendments = rv$builder$amendments %||% list(),
       designs = rv$builder$designs %||% list(),
+      references = rv$builder$references %||% list(),
       origin = rv$builder$origin
     )
   })
