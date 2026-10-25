@@ -333,7 +333,7 @@ syntax_cases <- list(
   # The generated block ends on a vapply() of sd over the named variables, so
   # the sd is the number to compare, one per variable and in that order.
   list(m = "descriptives", roles = list(variables = c("score", "after")),
-       want = function(r) as.numeric(r$table[["sd"]]),
+       want = function(r) as.numeric(r$table[["SD"]]),
        have = function(g) unname(g))
 )
 
