@@ -43,6 +43,7 @@ test_that("19: the built-in engine draws charts at the stated size and dpi", {
   f <- tempfile(fileext = ".png"); writeBin(openssl::base64_decode(b64), f)
   expect_equal(unname(png_size(f)), c(800, 400))
   env$settings <- list(format = "svg")
+  skip_if(!surveyframe:::sframe_svg_available(), "this R can write no SVG")
   expect_match(surveyframe:::.render_report_ggplot_png(gg), "data:image/svg+xml;base64,", fixed = TRUE)
 })
 
@@ -69,4 +70,20 @@ test_that("19: render_report() takes figures and figure_dir", {
   expect_true("900x600" %in% sizes)
   expect_error(render_report(d$instrument, NULL, output_file = out, figure_dir = dir),
                "needs `data`")
+})
+
+# CI found it on macOS: R's own svg() device needs Cairo, which the macOS
+# build lacks, so an SVG request drew no chart at all. Without a way to write
+# SVG, the report falls back to PNG, and a request for SVG files says why.
+test_that("19: without an SVG device the report falls back to PNG", {
+  skip_if_not_installed("ggplot2")
+  local_mocked_bindings(sframe_svg_available = function() FALSE)
+  gg <- ggplot2::ggplot(data.frame(x = 1:3, y = 1:3), ggplot2::aes(x, y)) + ggplot2::geom_point()
+  env <- surveyframe:::.sframe_figure_env
+  old <- env$settings; on.exit(env$settings <- old)
+  env$settings <- list(format = "svg")
+  expect_match(surveyframe:::.render_report_ggplot_png(gg), "data:image/png;base64,", fixed = TRUE)
+  d <- sframe_demo("two_group")
+  res <- run_analysis_plan(d$responses, d$instrument, plots = TRUE)
+  expect_error(sframe_save_figures(res, tempfile(), format = "svg"), "svglite")
 })

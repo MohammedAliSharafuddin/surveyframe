@@ -92,6 +92,7 @@ render_result <- function(result, data, instrument = NULL,
       error = function(e) NULL)
   }
 
+  if (identical(format, "svg")) sframe_check_svg()
   if (format %in% c("png", "svg")) {
     out$chart_file <- if (inherits(out$chart, "ggplot")) {
       f <- tempfile(fileext = paste0(".", format))

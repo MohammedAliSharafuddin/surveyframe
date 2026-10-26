@@ -1186,7 +1186,8 @@ sframe_clean_interpretations <- function(interpretations) {
 .render_report_ggplot_png <- function(gg, alt = "result chart") {
   if (!requireNamespace("ggplot2", quietly = TRUE)) return(NULL)
   s <- .sframe_figure_env$settings %||% list()
-  svg <- identical(s$format, "svg")
+  # An SVG request falls back to PNG where this R cannot write SVG.
+  svg <- identical(s$format, "svg") && sframe_svg_available()
   tmp <- tempfile(fileext = if (svg) ".svg" else ".png")
   on.exit(unlink(tmp), add = TRUE)
   ok <- tryCatch({

@@ -157,6 +157,9 @@ style.
   `sframe_save_figures()` does the same for the results of
   `run_analysis_plan(plots = TRUE)`. The report fixed its own figure size,
   and the built-in engine saved charts at 110 dpi.
+  SVG uses svglite where it is installed, now in Suggests, and R's own
+  Cairo device otherwise. Where neither is available the report draws PNG,
+  and a request to write SVG files says to install svglite.
 * **`codebook_report(format = "md")` gives Markdown.** The codebook carries
   itself as Markdown text in `markdown`, a heading and a pipe table for the
   items, choice sets, scales, plan and models, and `print()` writes it. Save

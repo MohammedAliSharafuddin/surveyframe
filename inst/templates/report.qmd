@@ -55,7 +55,12 @@ if (nzchar(params$fig_dpi %||% "")) {
   fig_opts$dpi <- as.numeric(params$fig_dpi)
   fig_opts$fig.retina <- 1
 }
-if (identical(params$fig_format %||% "", "svg")) fig_opts$dev <- "svg"
+# svglite writes SVG anywhere. R's own svg() needs Cairo, absent from the
+# macOS build, and with neither the figures stay PNG.
+if (identical(params$fig_format %||% "", "svg")) {
+  if (requireNamespace("svglite", quietly = TRUE)) fig_opts$dev <- "svglite"
+  else if (isTRUE(capabilities("cairo"))) fig_opts$dev <- "svg"
+}
 if (length(fig_opts)) do.call(knitr::opts_chunk$set, fig_opts)
 
 instrument <- readRDS(params$instrument_path)
