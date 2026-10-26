@@ -35,6 +35,21 @@ sframe_figure_settings <- function(figures) {
   figures
 }
 
+# Whether this R can write SVG. svglite writes it anywhere, and R's own svg()
+# device needs Cairo, which the macOS build of R lacks, so an SVG request
+# failed there with no chart at all.
+sframe_svg_available <- function() {
+  requireNamespace("svglite", quietly = TRUE) || isTRUE(capabilities("cairo"))
+}
+
+sframe_check_svg <- function() {
+  if (!sframe_svg_available()) {
+    rlang::abort(paste0("SVG output needs the svglite package on this system. ",
+                        "Install it with install.packages(\"svglite\")."),
+                 class = "sframe_error")
+  }
+}
+
 # The settings in force while render_report() draws, read by the built-in
 # HTML engine's chart helpers.
 .sframe_figure_env <- new.env(parent = emptyenv())
@@ -73,6 +88,7 @@ sframe_save_figures <- function(results, dir, width = 7, height = 4.5, dpi = 300
   rlang::check_installed("ggplot2", reason = "to save charts as files.")
   format <- rlang::arg_match(format)
   sframe_figure_settings(list(width = width, height = height, dpi = dpi, format = format))
+  if (identical(format, "svg")) sframe_check_svg()
   dir.create(dir, recursive = TRUE, showWarnings = FALSE)
   paths <- character(0)
   for (i in seq_along(results)) {

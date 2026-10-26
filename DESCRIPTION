@@ -69,6 +69,7 @@ Suggests:
     igraph (>= 1.5.0),
     V8 (>= 4.0.0),
     haven (>= 2.5.0),
+    svglite,
     callr,
     chromote,
     httpuv,
