@@ -869,6 +869,16 @@ studio_level_meta <- function(item = NULL, scale = NULL, ordered = FALSE) {
   list(level = "identifier", code = "ID", type = type)
 }
 
+# Whether a choice set declares its options ordered (sf_choices(ordered =)).
+studio_choice_set_ordered <- function(instrument, set_id) {
+  set_id <- as.character(set_id %||% "")[1]
+  if (!nzchar(set_id)) return(FALSE)
+  for (cs in instrument$choices %||% list()) {
+    if (identical(as.character(cs$id)[1], set_id)) return(isTRUE(cs$ordered))
+  }
+  FALSE
+}
+
 studio_variable_catalog <- function(instrument) {
   if (is.null(instrument)) {
     return(list())
@@ -881,7 +891,7 @@ studio_variable_catalog <- function(instrument) {
   )
   item_rows <- lapply(question_items, function(item) {
     meta <- studio_level_meta(item = item,
-                              ordered = sframe_choice_set_ordered(instrument, item$choice_set))
+                              ordered = studio_choice_set_ordered(instrument, item$choice_set))
     scale_membership <- item$scale_id %||% ""
     if (!nzchar(scale_membership) && length(instrument$scales %||% list()) > 0) {
       hits <- vapply(instrument$scales, function(scale) item$id %in% (scale$items %||% character(0)), logical(1))
@@ -1144,7 +1154,11 @@ if (identical(initial_tab, "auto")) {
     "open"
   }
 }
-if (!initial_tab %in% sframe_studio_screens()) {
+# The same list as sframe_studio_screens() in R/launch_studio.R, written out:
+# this file runs through shiny::runApp() and sees exported functions alone.
+# launch_studio() has already checked the screen against that list.
+if (!initial_tab %in% c("open", "amendments", "references", "preview", "responses",
+                       "quality", "reliability", "analysis", "dashboard", "export")) {
   initial_tab <- if (inherits(INITIAL_INSTRUMENT, "sframe")) {
     "preview"
   } else {
