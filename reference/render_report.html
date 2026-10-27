@@ -90,7 +90,8 @@ the reporting workflow still runs on machines without Quarto.</p>
 <span>  title <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  authors <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  figures <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"surveyframe.figures"</span><span class="op">)</span>,</span>
-<span>  figure_dir <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  figure_dir <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  open <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/interactive.html" class="external-link">interactive</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -225,6 +226,12 @@ size, resolution and format in <code>figures</code>, where <code>format</code> m
 <code>"tiff"</code>, <code>"jpeg"</code> or <code>"pdf"</code>. Needs <code>data</code>. Defaults to 300 dpi at
 7 by 4.5 inches where <code>figures</code> names none.</p></dd>
 
+
+<dt id="arg-open">open<a class="anchor" aria-label="anchor" href="#arg-open"></a></dt>
+<dd><p>Logical. Whether to show the finished report: in RStudio's
+Viewer pane inside RStudio, and in the web browser otherwise. Defaults to
+<code>TRUE</code> in an interactive session and <code>FALSE</code> in a script.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
@@ -272,7 +279,7 @@ Quarto is unavailable, lists the methods' references the same way.</p>
 <span class="r-in"><span>  <span class="op">)</span>,</span></span>
 <span class="r-in"><span>  finally <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span><span class="va">old</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Report rendered with the built-in HTML engine: /tmp/Rtmpn45ivP/file210c70b26c61.html</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Report rendered with the built-in HTML engine: /tmp/RtmpWBC9Zs/file20d06816477e.html</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/files.html" class="external-link">file.exists</a></span><span class="op">(</span><span class="va">out</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] TRUE</span>
 <span class="r-in"><span><span class="co"># }</span></span></span>

@@ -31,7 +31,8 @@ render_report(
   title = NULL,
   authors = NULL,
   figures = getOption("surveyframe.figures"),
-  figure_dir = NULL
+  figure_dir = NULL,
+  open = interactive()
 )
 ```
 
@@ -172,6 +173,12 @@ render_report(
   also be `"tiff"`, `"jpeg"` or `"pdf"`. Needs `data`. Defaults to 300
   dpi at 7 by 4.5 inches where `figures` names none.
 
+- open:
+
+  Logical. Whether to show the finished report: in RStudio's Viewer pane
+  inside RStudio, and in the web browser otherwise. Defaults to `TRUE`
+  in an interactive session and `FALSE` in a script.
+
 ## Value
 
 The output file path, invisibly.
@@ -218,7 +225,7 @@ out <- tryCatch(
   ),
   finally = options(old)
 )
-#> Report rendered with the built-in HTML engine: /tmp/Rtmpn45ivP/file210c70b26c61.html
+#> Report rendered with the built-in HTML engine: /tmp/RtmpWBC9Zs/file20d06816477e.html
 file.exists(out)
 #> [1] TRUE
 # }
