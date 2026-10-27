@@ -4041,6 +4041,7 @@ server <- function(input, output, session) {
           instrument = rv$instrument,
           data = rv$responses,
           output_file = file,
+          open = FALSE,
           include_codebook = isTRUE(input$rpt_codebook),
           include_quality = isTRUE(input$rpt_quality),
           include_missing = isTRUE(input$rpt_missing),

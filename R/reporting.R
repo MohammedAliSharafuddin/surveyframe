@@ -299,6 +299,9 @@ print.sframe_codebook <- function(x, ...) {
 #'   size, resolution and format in `figures`, where `format` may also be
 #'   `"tiff"`, `"jpeg"` or `"pdf"`. Needs `data`. Defaults to 300 dpi at
 #'   7 by 4.5 inches where `figures` names none.
+#' @param open Logical. Whether to show the finished report: in RStudio's
+#'   Viewer pane inside RStudio, and in the web browser otherwise. Defaults to
+#'   `TRUE` in an interactive session and `FALSE` in a script.
 #' @param csl Optional path to a Citation Style Language file for the
 #'   References section. Defaults to APA 7th edition, bundled with the
 #'   package. Any style from the Zotero style repository works.
@@ -370,7 +373,8 @@ render_report <- function(
     title             = NULL,
     authors           = NULL,
     figures           = getOption("surveyframe.figures"),
-    figure_dir        = NULL
+    figure_dir        = NULL,
+    open              = interactive()
 ) {
   sframe_check_instrument(instrument)
   # Figure size, resolution and format (Ethos request 19). The built-in engine
@@ -395,9 +399,13 @@ render_report <- function(
     }
     chart_results <- run_analysis_plan(data, instrument, plots = TRUE,
                                        plot_palette = plot_palette)
-    sframe_save_figures(chart_results, figure_dir,
+    saved <- sframe_save_figures(chart_results, figure_dir,
                         width = figures$width %||% 7, height = figures$height %||% 4.5,
                         dpi = figures$dpi %||% 300, format = figures$format %||% "png")
+    rlang::inform(paste0("Saved ", length(saved), " chart file",
+                         if (length(saved) == 1) "" else "s", " in ",
+                         normalizePath(figure_dir, mustWork = FALSE), "."),
+                  class = "sframe_report_progress")
   }
 
   format <- rlang::arg_match(format)
@@ -429,7 +437,7 @@ render_report <- function(
         include_codebook = include_codebook,
         include_missing = include_missing,
         include_descriptives = include_descriptives,
-        include_analysis = include_analysis,
+        include_analysis = include_analysis, open = FALSE,
         include_models = include_models,
         plot_palette = plot_palette,
         interpretations = interpretations,
@@ -460,7 +468,8 @@ render_report <- function(
     rlang::inform(
       paste0("Report rendered with the ",
              if (identical(content_engine, "quarto")) "Quarto" else "built-in HTML",
-             " engine and printed to PDF with pagedown: ", dest),
+             " engine and printed to PDF with pagedown: ",
+             normalizePath(dest, mustWork = FALSE)),
       class = "sframe_report_engine"
     )
     return(invisible(dest))
@@ -576,6 +585,9 @@ render_report <- function(
     # Using --output-dir elsewhere makes the self-contained bundling fail to
     # find quarto.js (it is created relative to the working directory).
     rendered <- file.path(render_dir, "report.html")
+    # Quarto prints nothing while it works, which for a minute looks like a hang.
+    rlang::inform("Rendering the report with Quarto. This usually takes under a minute.",
+                  class = "sframe_report_progress")
     quarto_ok <- tryCatch({
       old_wd <- getwd()
       on.exit(setwd(old_wd), add = TRUE)
@@ -597,7 +609,7 @@ render_report <- function(
 
     if (isTRUE(quarto_ok)) {
       if (file.copy(rendered, dest, overwrite = TRUE)) {
-        return(sframe_report_result(dest, "quarto"))
+        return(sframe_report_result(dest, "quarto", open))
       }
     }
   }
@@ -620,7 +632,7 @@ render_report <- function(
     authors             = report_authors
   )
 
-  sframe_report_result(dest, "html")
+  sframe_report_result(dest, "html", open)
 }
 
 # The "-P name:value" arguments for a Quarto render.
@@ -669,15 +681,38 @@ sframe_report_seed <- function(data, instrument, include_analysis = TRUE) {
   formals(run_analysis_plan)$seed %||% "unseeded"
 }
 
-sframe_report_result <- function(dest, engine) {
+sframe_report_result <- function(dest, engine, open = FALSE) {
+  # The full path: a relative output_file named only its basename, and a
+  # reader could not tell where the report had gone.
   rlang::inform(
     paste0("Report rendered with the ",
            if (identical(engine, "quarto")) "Quarto" else "built-in HTML",
-           " engine: ", dest),
+           " engine: ", normalizePath(dest, mustWork = FALSE)),
     class = "sframe_report_engine"
   )
+  if (isTRUE(open)) sframe_show_report(dest)
   attr(dest, "engine") <- engine
   invisible(dest)
+}
+
+# Shows a finished report. RStudio's Viewer displays files inside the
+# session's temporary directory alone, so a copy goes there. Elsewhere the
+# report opens in the web browser.
+sframe_show_report <- function(path) {
+  path <- normalizePath(path, mustWork = FALSE)
+  if (!file.exists(path)) return(invisible(FALSE))
+  if (grepl("\\.html?$", path, ignore.case = TRUE) &&
+      requireNamespace("rstudioapi", quietly = TRUE) &&
+      isTRUE(tryCatch(rstudioapi::isAvailable(), error = function(e) FALSE))) {
+    dir <- tempfile("surveyframe-view-")
+    dir.create(dir)
+    copy <- file.path(dir, basename(path))
+    file.copy(path, copy, overwrite = TRUE)
+    rstudioapi::viewer(copy)
+  } else {
+    utils::browseURL(paste0("file://", path))
+  }
+  invisible(TRUE)
 }
 
 # Drop entries that cannot be rendered: unnamed values, non-character

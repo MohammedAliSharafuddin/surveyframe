@@ -142,6 +142,13 @@ style.
 
 ## Reports
 
+* **`render_report()` shows the report it writes.** In an interactive
+  session the new `open = TRUE` default opens it in RStudio's Viewer pane, or
+  in the web browser outside RStudio, and `open = FALSE` keeps it closed. The
+  completion message gives the full path, where it gave the path as written,
+  often a bare file name. A line says when Quarto starts, since it works in
+  silence for up to a minute, and `figure_dir =` reports where the chart
+  files went.
 * **New `render_result()` renders one analysis result as the report does**:
   the formatted table with its caption and note, any second table, the APA
   line, and the chart the report picks for that method, with the
