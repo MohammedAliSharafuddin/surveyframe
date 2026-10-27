@@ -1929,7 +1929,7 @@ render_results <- function(
   # If called with instrument only (no pre-computed results), delegate
   if (is.null(results)) {
     return(render_report(instrument, output_file = dest,
-                         interpretations = interpretations))
+                         interpretations = interpretations, open = FALSE))
   }
 
   stopifnot(inherits(results, "sframe_analysis_results"))

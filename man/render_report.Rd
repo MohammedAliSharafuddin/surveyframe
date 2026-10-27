@@ -25,7 +25,8 @@ render_report(
   title = NULL,
   authors = NULL,
   figures = getOption("surveyframe.figures"),
-  figure_dir = NULL
+  figure_dir = NULL,
+  open = interactive()
 )
 }
 \arguments{
@@ -114,6 +115,10 @@ plan chart into as its own file, through \code{\link[=sframe_save_figures]{sfram
 size, resolution and format in \code{figures}, where \code{format} may also be
 \code{"tiff"}, \code{"jpeg"} or \code{"pdf"}. Needs \code{data}. Defaults to 300 dpi at
 7 by 4.5 inches where \code{figures} names none.}
+
+\item{open}{Logical. Whether to show the finished report: in RStudio's
+Viewer pane inside RStudio, and in the web browser otherwise. Defaults to
+\code{TRUE} in an interactive session and \code{FALSE} in a script.}
 }
 \value{
 The output file path, invisibly.
