@@ -74,11 +74,11 @@ print-friendly report). Applied to every chart the report embeds.
 See \code{sframe_brand()}.}
 
 \item{interpretations}{Named list or NULL. Written interpretations keyed
-by analysis-plan block id, added after the results are known. When a
-block has an entry, its report section shows the pre-declared decision
-rule under a "Planned decision rule" label followed by the written
-text under an "Interpretation" label. Blocks without an entry render
-exactly as they do when this argument is NULL. Interpretations are
+by analysis-plan block id, added after the results are known. Each
+block's section prints the hypotheses and planned decision rule it
+declared before its result, with or without an entry. An entry prints
+after the result under "Interpretation (written after the results)",
+in place of any interpretation the block holds. Interpretations are
 report content only and are never written into the instrument.}
 
 \item{show_code}{Logical. Whether each result carries a folded "Show R code"

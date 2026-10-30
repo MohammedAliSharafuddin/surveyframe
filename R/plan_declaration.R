@@ -50,3 +50,15 @@ sframe_declaration_html <- function(block) {
   paste(sprintf("<p><strong>%s:</strong> %s</p>", names(d),
                 vapply(d, htmltools_escape, character(1))), collapse = "\n")
 }
+
+# Every block's declaration and written interpretation, keyed by block id,
+# for the Quarto template, with the label the interpretation prints under.
+sframe_plan_declarations <- function(instrument, interpretations = list()) {
+  plan <- instrument$analysis_plan %||% list()
+  blocks <- lapply(plan, function(b) {
+    list(declaration = sframe_plan_declaration(b),
+         interpretation = sframe_written_interpretation(b, interpretations))
+  })
+  names(blocks) <- vapply(plan, function(b) as.character(b$id %||% "")[1], character(1))
+  list(interpretation_label = sframe_interpretation_label, blocks = blocks)
+}

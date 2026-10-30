@@ -315,11 +315,11 @@ print.sframe_codebook <- function(x, ...) {
 #' blocks and models, and `references`. The built-in HTML engine, used when
 #' Quarto is unavailable, lists the methods' references the same way.
 #' @param interpretations Named list or NULL. Written interpretations keyed
-#'   by analysis-plan block id, added after the results are known. When a
-#'   block has an entry, its report section shows the pre-declared decision
-#'   rule under a "Planned decision rule" label followed by the written
-#'   text under an "Interpretation" label. Blocks without an entry render
-#'   exactly as they do when this argument is NULL. Interpretations are
+#'   by analysis-plan block id, added after the results are known. Each
+#'   block's section prints the hypotheses and planned decision rule it
+#'   declared before its result, with or without an entry. An entry prints
+#'   after the result under "Interpretation (written after the results)",
+#'   in place of any interpretation the block holds. Interpretations are
 #'   report content only and are never written into the instrument.
 #'
 #' @return The output file path, invisibly.
@@ -517,12 +517,19 @@ render_report <- function(
     } else {
       tmp_interp <- ""
     }
+    # What each block declared, and its written interpretation, computed here
+    # (D12). Quarto renders against the installed package, so the template
+    # calls exported functions only and reads these as data.
+    tmp_decl <- tempfile(fileext = ".rds")
+    saveRDS(sframe_plan_declarations(instrument, interpretations), tmp_decl)
+    temp_rds <- c(temp_rds, tmp_decl)
     on.exit(unlink(temp_rds, force = TRUE), add = TRUE)
 
     params <- list(
       instrument_path     = tmp_instr,
       data_path           = tmp_data,
       interpretations_path = tmp_interp,
+      declarations_path   = tmp_decl,
       include_quality     = include_quality && !is.null(data),
       include_reliability = include_reliability && !is.null(data),
       include_codebook    = include_codebook,
@@ -646,7 +653,7 @@ render_report <- function(
 # run over every character value, so the seed text "not applicable, no analysis
 # plan run" was rewritten as an absolute path under the working directory.
 sframe_quarto_param_names_path <- c("instrument_path", "data_path",
-                                    "interpretations_path")
+                                    "interpretations_path", "declarations_path")
 
 sframe_quarto_param_args <- function(params) {
   unlist(lapply(names(params), function(name) {
