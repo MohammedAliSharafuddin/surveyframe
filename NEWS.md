@@ -133,6 +133,12 @@ style.
 
 ## Analysis
 
+* **One check for every weight column.** Frequency, cross-tabulation and
+  descriptives blocks stop with an error naming the weight column when a
+  weight is negative, infinite or not a number, or when the weights sum to
+  zero. A row with a missing weight is dropped, and the result says how many
+  were (D6, CX-09).
+
 * **Kendall's tau reports N, with no degrees of freedom.** `cor.test()`
   gives Kendall no df, yet the line read `tau(58)` and the table carried a
   df column. It now reads `tau = 0.39, 95% CI [...], p < .001, N = 60`.
