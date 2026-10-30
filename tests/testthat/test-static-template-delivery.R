@@ -147,15 +147,18 @@ test_that("8: a local survey with no collector still redirects", {
 # the reasoning that a designer's own wording was their claim to make. That was
 # wrong. The package is the thing that knows receipt is unconfirmed, and a custom
 # message asserting storage produced a screen that said "your response has been
-# recorded" and "cannot confirm" at the same time.
+# recorded" and "cannot confirm" at the same time. D4 keeps the 2 voices apart:
+# the status line is the package's, and the message is shown below it, so the
+# guidance is that a message should not state delivery (see the help).
 
-test_that("8: a custom thank-you message cannot assert storage either", {
+test_that("8: an unconfirmed send keeps the package's status beside a custom message", {
   skip_if_not_installed("V8")
   ctx <- submit_with(fails = FALSE, thankyou = list(
-    message = "Your response has been recorded. Thank you."))
+    message = "Thank you. Contact the team with questions."))
   html <- app_html(ctx)
 
   expect_false(grepl("has been recorded", html, fixed = TRUE))
+  expect_match(html, "Contact the team with questions.", fixed = TRUE)
   expect_match(html, "cannot confirm", fixed = TRUE)
   expect_match(html, "Download my response", fixed = TRUE)
 })

@@ -165,7 +165,7 @@ launch_builder_demo <- function(open = TRUE) {
         start_label      = "Start Survey"
       ),
       thankyou        = list(
-        message      = "Thank you for completing this survey.",
+        message      = "Thank you for participating.",
         redirect_url = "",
         show_download = FALSE
       ),
