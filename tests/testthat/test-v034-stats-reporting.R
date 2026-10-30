@@ -129,7 +129,7 @@ test_that("the HTML fallback carries the brand variables, print styles, and tabl
   expect_match(html, "@media print", fixed = TRUE)
   expect_match(html, "scope=\"col\"", fixed = TRUE)
   if (requireNamespace("ggplot2", quietly = TRUE)) {
-    expect_match(html, "alt=\"Chart for ")
+    expect_match(html, "alt=\"Chart of the result for ", fixed = TRUE)
   }
 })
 
