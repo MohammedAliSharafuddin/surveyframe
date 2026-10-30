@@ -43,7 +43,10 @@
 #' @param x Numeric performance matrix, alternatives in rows and criteria in
 #'   columns.
 #' @param weights Numeric weight vector, one per criterion. Renormalised to
-#'   sum to 1 before use.
+#'   sum to 1 before use. Unnamed weights are taken in the order of the
+#'   criteria. Named weights are matched to the criteria by name, in any order,
+#'   and a name that is not a criterion, or a criterion with no weight, is an
+#'   error.
 #' @param criteria_types Character vector of `"benefit"` or `"cost"`, one per
 #'   criterion.
 #' @param method Ranking method. One of `"topsis"`, `"vikor"`, `"moora"`,
@@ -96,10 +99,13 @@ sensitivity_analysis <- function(x,
   if (!is.numeric(x)) {
     sframe_abort_validation("`x` must be a numeric performance matrix.")
   }
-  weights <- as.numeric(weights)
   criteria_types <- as.character(criteria_types)
 
   n_criteria <- ncol(x)
+  criteria <- criteria %||% colnames(x) %||%
+    paste0("criterion_", seq_len(n_criteria))
+  weights <- as.numeric(sframe_align_to_criteria(
+    weights, names(weights), criteria, "`weights`"))
   if (length(weights) != n_criteria) {
     sframe_abort_validation(sprintf(
       "`weights` has %d value(s) for %d criteria.", length(weights), n_criteria
@@ -130,8 +136,6 @@ sensitivity_analysis <- function(x,
     )
   }
 
-  criteria <- criteria %||% colnames(x) %||%
-    paste0("criterion_", seq_len(n_criteria))
   alternatives <- alternatives %||% rownames(x) %||%
     paste0("alternative_", seq_len(nrow(x)))
 

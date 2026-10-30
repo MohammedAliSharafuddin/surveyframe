@@ -133,6 +133,11 @@ style.
 
 ## Analysis
 
+* **Named weights in `sensitivity_analysis()` match criteria by name.**
+  Named weights are matched to the criteria in any order, as the ranking
+  blocks already do, and a name that is not a criterion or a criterion with
+  no weight is an error. Unnamed weights keep the order of the criteria.
+
 * **Logistic syntax codes the outcome as the analysis does.** The code
   `analysis_syntax()` writes for a binary logistic regression recodes the
   outcome to 0 and 1 the way the runner does before `glm()`, so a text
