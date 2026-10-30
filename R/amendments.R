@@ -184,6 +184,15 @@ sframe_check_amendment_boundary <- function(instrument, new_instrument = FALSE) 
         "An amendment log only grows, and a recorded entry stays as it was ",
         "written."), origin$path))
     }
+    # The first entry on a file read with no log starts from the content read
+    # (CX-01). Each later entry follows the one before, as checked above.
+    if (length(loaded) == 0 && length(am) > 0 &&
+        !identical(am[[1]]$previous_hash %||% "", origin$content_hash)) {
+      abort(sprintf(paste0(
+        "The first amendment does not start from the content read from '%s'. ",
+        "Record changes with amend_sframe() from the instrument as read."),
+        origin$path))
+    }
     if (!identical(current, origin$content_hash) && length(now) == length(loaded)) {
       abort(sprintf(paste0(
         "This instrument was read from '%s' and its content has changed with ",
@@ -269,7 +278,9 @@ sframe_amendment_plain <- function(a) {
 #' ```
 #'
 #' @param previous An `sframe` object: the instrument's state before this
-#'   amendment.
+#'   amendment. Read from a file, it must still match that file, or its last
+#'   recorded amendment, so the log starts from a state a file held.
+#'   An edit made to it after reading is refused.
 #' @param instrument An `sframe` object: the instrument's state after the
 #'   change this call discloses.
 #' @param reason_code One of `"data_correction"`, `"bot_removal"`,
@@ -377,15 +388,35 @@ amend_sframe <- function(previous, instrument, reason_code, reason_text,
     "none"
   }
 
-  # The previous state as the log last recorded it, where that is one of the
-  # serialisations it may have used, so the log stays in sequence across a
-  # change of serialisation such as the empty render of 0.4.3.
+  # The anchor: the previous state as the log last recorded it, else the
+  # content of the file `previous` was read from (CX-01). A `previous` that
+  # no longer matches its anchor carries an undisclosed edit, and a log
+  # started from it would describe a state no file held. Candidates cover the
+  # serialisations an older version may have used, such as the empty render
+  # of 0.4.3. An instrument built in R, with no log and no file, is its own
+  # anchor.
   last_new <- if (length(previous$amendments)) {
-    previous$amendments[[length(previous$amendments)]]$new_hash
+    previous$amendments[[length(previous$amendments)]]$new_hash %||% ""
   }
-  previous_hash <- if (!is.null(last_new) &&
-                       last_new %in% sframe_content_hash_candidates(previous_v)) {
+  origin <- attr(previous, "sframe_origin")
+  previous_hash <- if (!is.null(last_new)) {
+    if (!last_new %in% sframe_content_hash_candidates(previous_v)) {
+      rlang::abort(paste0(
+        "`previous` has changed since its last recorded amendment, so it is ",
+        "not the state that amendment produced. Amend from the instrument as ",
+        "read, and record every change in `instrument`."),
+        class = c("sframe_validation_error", "sframe_error"))
+    }
     last_new
+  } else if (!is.null(origin$content_hash)) {
+    if (!origin$content_hash %in% sframe_content_hash_candidates(previous_v)) {
+      rlang::abort(sprintf(paste0(
+        "`previous` has changed since it was read from '%s', so it is not the ",
+        "state that file holds. Amend from the instrument as read, and record ",
+        "every change in `instrument`."), origin$path),
+        class = c("sframe_validation_error", "sframe_error"))
+    }
+    origin$content_hash
   } else {
     sframe_content_hash(previous_v)
   }
@@ -414,7 +445,11 @@ amend_sframe <- function(previous, instrument, reason_code, reason_text,
   amended <- instrument
   amended$amendments <- c(previous$amendments %||% list(), list(entry))
 
-  as_sframe(validate_sframe(amended, strict = TRUE))
+  # The log descends from the file `previous` was read from, so the write
+  # boundary checks it against that file, whatever `instrument` was read from.
+  amended <- as_sframe(validate_sframe(amended, strict = TRUE))
+  attr(amended, "sframe_origin") <- origin
+  amended
 }
 
 #' Read an instrument's amendment log

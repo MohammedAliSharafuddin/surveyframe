@@ -17,7 +17,9 @@ amend_sframe(
 }
 \arguments{
 \item{previous}{An \code{sframe} object: the instrument's state before this
-amendment.}
+amendment. Read from a file, it must still match that file, or its last
+recorded amendment, so the log starts from a state a file held.
+An edit made to it after reading is refused.}
 
 \item{instrument}{An \code{sframe} object: the instrument's state after the
 change this call discloses.}

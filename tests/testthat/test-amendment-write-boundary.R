@@ -245,3 +245,53 @@ test_that("E2: a broken link inside the amendment log is refused on its own", {
   expect_error(write_sframe(fresh, tempfile(fileext = ".sframe")),
                "out of sequence", class = "sframe_error")
 })
+
+# CX-01. amend_sframe() took previous_hash from whatever `previous` held. A
+# file read, edited in memory and then amended got a log starting from the
+# edited state, which no file ever held, and the edit itself went
+# undisclosed. The anchor is the content read, or the last amendment's
+# new_hash, and a `previous` that no longer matches it is refused.
+
+amend_label <- function(previous, label) {
+  after <- previous
+  after$items[[1]]$label <- label
+  amend_sframe(previous, after, reason_code = "instrument_revision",
+               reason_text = "Clarified wording.", deviation_report = "Wording only.")
+}
+
+test_that("CX-01: amend_sframe() refuses a previous edited since it was read", {
+  loaded <- read_sframe(written(base_instrument()))
+  edited <- loaded
+  edited$items[[1]]$label <- "Quietly changed"
+  expect_error(amend_label(edited, "Openly changed"),
+               class = "sframe_validation_error", regexp = "changed since it was read")
+})
+
+test_that("CX-01: amend_sframe() refuses a previous edited since its last amendment", {
+  path <- tempfile(fileext = ".sframe")
+  write_sframe(amend_label(read_sframe(written(base_instrument())), "First"), path)
+  loaded <- read_sframe(path)
+  loaded$items[[2]]$label <- "Quietly changed"
+  expect_error(amend_label(loaded, "Second"),
+               class = "sframe_validation_error", regexp = "last recorded amendment")
+})
+
+test_that("CX-01: the first amendment of a file read starts from the content read", {
+  loaded <- read_sframe(written(base_instrument()))
+  amended <- amend_label(loaded, "Openly changed")
+  expect_identical(amended$amendments[[1]]$previous_hash,
+                   attr(loaded, "sframe_origin")$content_hash)
+})
+
+test_that("CX-01: the write boundary refuses a first entry with another anchor", {
+  loaded <- read_sframe(written(base_instrument()))
+  amended <- amend_label(loaded, "Openly changed")
+  amended$amendments[[1]]$previous_hash <- strrep("0", 64)
+  expect_error(write_sframe(amended, tempfile(fileext = ".sframe")),
+               class = "sframe_validation_error", regexp = "content read from")
+})
+
+test_that("CX-01: an instrument built in R, with no file, still amends", {
+  amended <- amend_label(base_instrument(), "Openly changed")
+  expect_no_error(write_sframe(amended, tempfile(fileext = ".sframe")))
+})
