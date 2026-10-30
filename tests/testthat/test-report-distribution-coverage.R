@@ -133,9 +133,11 @@ template_surveyframe_calls <- function() {
 # What the INSTALLED package exports, read from its NAMESPACE on disk.
 # getNamespaceExports() is no use here: under pkgload it answers for the tree
 # being developed, which is exactly the namespace the Quarto session does NOT
-# see.
+# see. Read from the library the Quarto session loads: the build under test,
+# which the setup puts first on R_LIBS, and not the user library, which
+# may hold an older install.
 installed_surveyframe_exports <- function() {
-  for (lib in .libPaths()) {
+  for (lib in sframe_build_libpath()) {
     ns <- file.path(lib, "surveyframe", "NAMESPACE")
     if (file.exists(ns)) {
       lines <- readLines(ns, warn = FALSE)
