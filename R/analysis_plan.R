@@ -1739,6 +1739,11 @@ sframe_run_one_block <- function(block, data, instrument, plots = FALSE,
     error = function(e) result
   )
 
+  # APA 7 writes a statistic bounded by 1 with no leading zero. Done here,
+  # once, for every runner's text (D9, CX-24).
+  result$apa <- sframe_apa_text(result$apa)
+  result$prompt <- sframe_apa_text(result$prompt)
+
   result$research_question <- block$research_question
   result$block_id          <- block$id
   result$family            <- block$family %||% ""

@@ -13,7 +13,7 @@
 "RQ2","crosstab","Online: Panel discussions","5"
 "RQ2","crosstab","In person: Workshops","19"
 "RQ2","crosstab","Online: Workshops","4"
-"RQ3","fisher_exact","apa","Fisher's exact test, p < .001, Cramer's V = 0.53"
+"RQ3","fisher_exact","apa","Fisher's exact test, p < .001, Cramer's V = .53"
 "RQ3","fisher_exact","In person: Keynotes","7"
 "RQ3","fisher_exact","Online: Keynotes","21"
 "RQ3","fisher_exact","In person: Panel discussions","4"

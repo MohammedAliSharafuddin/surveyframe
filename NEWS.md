@@ -269,6 +269,11 @@ style.
 
 ## Reports
 
+* **A statistic that cannot exceed 1 has no leading zero.** Result text and
+  prompts write r, r_s, tau, phi, Cramer's V, R squared, eta squared and
+  their intervals as APA 7 does, `r(58) = .53, 95% CI [.33, .69]`, as p
+  values already were. d, t, z, means and other values keep the zero. Done
+  once for every analysis, and the demo results are regenerated (D9, CX-24).
 * **The built-in report prints each research question's hypotheses and
   decision rule before its result.** H0 and H1 print where written, then
   the planned decision rule, then the result, then the interpretation,
