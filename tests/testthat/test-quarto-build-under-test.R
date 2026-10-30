@@ -53,3 +53,19 @@ test_that("no test starts a child process with load_all()", {
   }, logical(1))
   expect_identical(basename(files[uses]), character(0))
 })
+
+# Session 5. The fast tier makes no source install, so a test that renders
+# through Quarto or starts Chrome or a callr process would run the installed
+# copy there. Every file that does must call skip_if_not_slow().
+test_that("every Quarto, Chrome or callr test belongs to the slow tier", {
+  files <- list.files(test_path(), pattern = "^test-.*\\.R$", full.names = TRUE)
+  marks <- c(paste0("use_quarto = ", "TRUE"), paste0("chromote", "::"),
+             paste0("find_", "chrome("), paste0("callr", "::"),
+             paste0("Sys.which(\"", "quarto\")"))
+  unmarked <- vapply(files, function(f) {
+    code <- sub("#.*$", "", readLines(f, warn = FALSE))
+    any(vapply(marks, function(m) any(grepl(m, code, fixed = TRUE)), logical(1))) &&
+      !any(grepl("skip_if_not_slow()", code, fixed = TRUE))
+  }, logical(1))
+  expect_identical(basename(files[unmarked]), character(0))
+})
