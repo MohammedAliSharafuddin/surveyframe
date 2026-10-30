@@ -23,7 +23,8 @@ test_that("15: the Mann-Whitney r is the estimate its interval is built around",
   expect_equal(res$r, unname(res$r_ci[["estimate"]]), tolerance = 1e-12)
   # z, p and r describe the same normal approximation
   expect_equal(res$p, 2 * stats::pnorm(-abs(res$z)), tolerance = 1e-10)
-  expect_equal(res$r, abs(res$z) / sqrt(res$n1 + res$n2), tolerance = 1e-12)
+  # signed as z is (D1)
+  expect_equal(res$r, res$z / sqrt(res$n1 + res$n2), tolerance = 1e-12)
 })
 
 test_that("15: the Mann-Whitney z carries the direction of the difference", {
@@ -50,7 +51,7 @@ test_that("15: the signed-rank r uses the same pairs as its test and interval", 
   expect_equal(res$r, unname(res$r_ci[["estimate"]]), tolerance = 1e-12)
   expect_equal(res$V, expected_V, tolerance = 1e-12)
   expect_equal(res$p, 2 * stats::pnorm(-abs(res$z)), tolerance = 1e-10)
-  expect_equal(res$r, abs(res$z) / sqrt(nonzero), tolerance = 1e-12)
+  expect_equal(res$r, res$z / sqrt(nonzero), tolerance = 1e-12)
 })
 
 test_that("16: a collapsed bootstrap distribution gives no interval, with a reason", {

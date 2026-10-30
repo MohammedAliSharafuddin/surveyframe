@@ -123,8 +123,9 @@ bootstrap_ci <- function(x, FUN = stats::median, R = 2000,
 #' Bootstrap confidence interval for Cohen's d
 #'
 #' Percentile bootstrap for the standardised mean difference between two
-#' independent groups. Each resample draws within each group, preserving the
-#' group sizes.
+#' independent groups. The difference is signed, the mean of `x` minus the
+#' mean of `y`, so the interval can include zero. Each resample draws within
+#' each group, preserving the group sizes.
 #'
 #' @param x,y Numeric vectors, one per group.
 #' @param R Integer. Number of bootstrap resamples. Defaults to 2000.
@@ -353,9 +354,10 @@ sframe_rank_z <- function(g1, g2) {
   (U - mu) / sqrt(sig2)
 }
 
-# Rank effect r = |z| / sqrt(n) for two independent groups (Mann-Whitney).
+# Rank effect r = z / sqrt(n) for two independent groups (Mann-Whitney),
+# signed as z is, positive when g1 ranks higher.
 sframe_rank_r <- function(g1, g2) {
-  abs(sframe_rank_z(g1, g2)) / sqrt(length(g1) + length(g2))
+  sframe_rank_z(g1, g2) / sqrt(length(g1) + length(g2))
 }
 
 sframe_rank_r_ci <- function(g1, g2, R = 2000, conf.level = 0.95) {
@@ -385,9 +387,10 @@ sframe_signed_rank_z <- function(d) {
   (V - mu) / sqrt(sig2)
 }
 
-# Signed-rank effect r = |z| / sqrt(n), n being the non-zero differences.
+# Signed-rank effect r = z / sqrt(n), n being the non-zero differences,
+# positive when the differences are mostly positive.
 sframe_signed_rank_r <- function(d) {
-  abs(sframe_signed_rank_z(d)) / sqrt(sum(is.finite(d) & d != 0))
+  sframe_signed_rank_z(d) / sqrt(sum(is.finite(d) & d != 0))
 }
 
 sframe_signed_rank_r_ci <- function(d, R = 2000, conf.level = 0.95) {
