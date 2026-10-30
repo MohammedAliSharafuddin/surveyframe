@@ -5,8 +5,7 @@
 # test. The report now records the surveyframe version and, where the install
 # carries one, its commit (labelled -dirty when built from uncommitted
 # changes), and this test checks that the Quarto process loaded the build
-# under test. render_report() here is the helper's, which renders through
-# that build (helper-build-under-test.R).
+# under test, which setup-build-under-test.R puts first on R_LIBS for the run.
 
 test_that("the Quarto report was rendered by the build under test", {
   skip_on_cran()
