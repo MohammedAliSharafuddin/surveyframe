@@ -299,6 +299,15 @@ efa_report <- function(
   item_data <- as.data.frame(lapply(data[, cols, drop = FALSE],
                                     sframe_num))
   item_data <- item_data[complete.cases(item_data), , drop = FALSE]
+  if (length(cols) < 2 || nrow(item_data) < 3) {
+    rlang::abort(
+      sprintf(paste0("EFA readiness has %d usable item column%s and %d complete row%s after removing missing values. ",
+                     "It needs at least two numeric item columns and three complete rows. ",
+                     "Check that the scales name items with answers."),
+              length(cols), if (length(cols) == 1) "" else "s",
+              nrow(item_data), if (nrow(item_data) == 1) "" else "s"),
+      class = c("sframe_validation_error", "sframe_error"))
+  }
 
   # KMO(), cortest.bartlett(), and fa.parallel() all print "R was not square ..."
   # to stderr (and fa.parallel prints its suggestion to stdout) when given raw

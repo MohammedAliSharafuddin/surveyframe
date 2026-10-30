@@ -1225,9 +1225,14 @@ sframe_run_fisher <- function(data, roles, options = list()) {
   ft <- tryCatch(
     stats::fisher.test(tbl, simulate.p.value = isTRUE(options$simulate_p_value),
                         conf.int = want_ci),
-    error = function(e) NULL
+    error = function(e) e
   )
-  if (is.null(ft)) return(list(test = "fisher_exact", error = "Fisher's exact test failed."))
+  if (inherits(ft, "error")) {
+    return(list(test = "fisher_exact", error = sframe_runner_failure(
+      sprintf("'%s' by '%s' makes a %d x %d table after removing missing values.",
+              vars[1], vars[2], nrow(tbl), ncol(tbl)),
+      "Check that both variables are categorical with at least two categories each.", ft)))
+  }
   effect <- if (all(dim(tbl) == c(2, 2))) sframe_phi(tbl) else sframe_cramers_v(tbl)
   effect_name <- if (all(dim(tbl) == c(2, 2))) "phi" else "Cramer's V"
   list(
@@ -1252,8 +1257,13 @@ sframe_run_mcnemar <- function(data, roles, options = list()) {
   if (!is.null(err)) return(list(test = "mcnemar", error = err))
   tbl <- table(data[[vars[1]]], data[[vars[2]]])
   mt <- tryCatch(stats::mcnemar.test(tbl, correct = isTRUE(options$correct %||% TRUE)),
-                 error = function(e) NULL)
-  if (is.null(mt)) return(list(test = "mcnemar", error = "McNemar test failed."))
+                 error = function(e) e)
+  if (inherits(mt, "error")) {
+    return(list(test = "mcnemar", error = sframe_runner_failure(
+      sprintf("'%s' by '%s' makes a %d x %d table after removing missing values, and McNemar needs a square table with at least two categories.",
+              vars[1], vars[2], nrow(tbl), ncol(tbl)),
+      "Check that both variables are paired items with the same response options.", mt)))
+  }
   list(
     test = "mcnemar",
     vars = vars[1:2],
@@ -1292,8 +1302,13 @@ sframe_run_friedman <- function(data, roles) {
   if (!is.null(err)) return(list(test = "friedman", error = err))
   mat <- as.matrix(as.data.frame(lapply(data[, vars, drop = FALSE], sframe_num)))
   mat <- mat[stats::complete.cases(mat), , drop = FALSE]
-  ft <- tryCatch(stats::friedman.test(mat), error = function(e) NULL)
-  if (is.null(ft)) return(list(test = "friedman", error = "Friedman test failed."))
+  ft <- tryCatch(stats::friedman.test(mat), error = function(e) e)
+  if (inherits(ft, "error")) {
+    return(list(test = "friedman", error = sframe_runner_failure(
+      sprintf("The test could not be computed from %d complete row%s across %s after removing missing values.",
+              nrow(mat), if (nrow(mat) == 1) "" else "s", paste0("'", vars, "'", collapse = ", ")),
+      "Check that the measures are numeric, answered by the same respondents, and that at least two rows and two measures remain.", ft)))
+  }
   list(
     test = "friedman",
     vars = vars,
@@ -1445,7 +1460,7 @@ sframe_run_partial_correlation <- function(data, roles, options = list()) {
     ry <- df[[y]]
   }
   r <- stats::cor(rx, ry)
-  if (!is.finite(r)) return(list(test = "partial_correlation", error = "Partial correlation failed."))
+  if (!is.finite(r)) return(list(test = "partial_correlation", error = sprintf("The partial correlation of '%s' and '%s' is not a finite number from %d complete rows, because one of them does not vary once the controls are removed. Check that both variables are numeric and not constant.", x, y, nrow(df))))
   # Inference on n - 2 - k degrees of freedom, k being the number of controls.
   # The p value was taken from an ordinary correlation test on n - 2 while the
   # printed degrees of freedom said n - 2 - k.
@@ -1555,14 +1570,24 @@ sframe_run_ancova <- function(data, roles) {
   df[covariates] <- sframe_predictor_frame(df, covariates)
   df <- df[stats::complete.cases(df), , drop = FALSE]
   formula <- stats::as.formula(paste(outcome, "~", group, "+", paste(covariates, collapse = " + ")))
-  fit <- tryCatch(stats::lm(formula, data = df), error = function(e) NULL)
-  if (is.null(fit)) return(list(test = "ancova", error = "ANCOVA failed."))
+  fit <- tryCatch(stats::lm(formula, data = df), error = function(e) e)
+  if (inherits(fit, "error")) {
+    return(list(test = "ancova", error = sframe_runner_failure(
+      sprintf("The model for '%s' by '%s' with %d complete rows could not be fitted.",
+              outcome, group, nrow(df)),
+      "Check that the outcome is numeric and that the group has at least two levels with answers.", fit)))
+  }
   # Each term is tested after every other term, by comparing the full model
   # with the model dropping that term. A sequential aov() table with group
   # first tested the group difference before the covariates, which is an
   # unadjusted test labelled as adjusted.
-  adj <- tryCatch(stats::drop1(fit, test = "F"), error = function(e) NULL)
-  if (is.null(adj)) return(list(test = "ancova", error = "ANCOVA failed."))
+  adj <- tryCatch(stats::drop1(fit, test = "F"), error = function(e) e)
+  if (inherits(adj, "error")) {
+    return(list(test = "ancova", error = sframe_runner_failure(
+      sprintf("The adjusted test for '%s' could not be computed from %d complete rows.",
+              group, nrow(df)),
+      "Check that the covariates vary and are not copies of the outcome or the group.", adj)))
+  }
   terms <- trimws(rownames(adj))[-1]
   res_df <- stats::df.residual(fit)
   res_ss <- sum(stats::residuals(fit)^2)
@@ -1634,8 +1659,12 @@ sframe_run_ordinal_logistic <- function(data, roles, options = list()) {
   }
   fit <- tryCatch(MASS::polr(stats::as.formula(paste(outcome, "~", paste(predictors, collapse = " + "))),
                              data = df, Hess = TRUE),
-                  error = function(e) NULL)
-  if (is.null(fit)) return(list(test = "regression_logistic_ordinal", error = "Ordinal logistic regression failed."))
+                  error = function(e) e)
+  if (inherits(fit, "error")) {
+    return(list(test = "regression_logistic_ordinal", error = sframe_runner_failure(
+      sprintf("The model for '%s' with %d complete rows could not be fitted.", outcome, nrow(df)),
+      "Check that every outcome level has answers and that the predictors are not constant or perfectly collinear.", fit)))
+  }
   co <- as.data.frame(summary(fit)$coefficients)
   co$odds_ratio <- exp(co[[1]])
   if ("Std. Error" %in% names(co)) {
@@ -1704,10 +1733,12 @@ sframe_run_firth_logistic <- function(data, roles, options = list()) {
   )
   fit <- tryCatch(
     logistf::logistf(form, data = df, alpha = 1 - conf_level),
-    error = function(e) NULL
+    error = function(e) e
   )
-  if (is.null(fit)) {
-    return(list(test = "firth_logistic", error = "Firth regression failed."))
+  if (inherits(fit, "error")) {
+    return(list(test = "firth_logistic", error = sframe_runner_failure(
+      sprintf("The model for '%s' with %d complete rows could not be fitted.", outcome, nrow(df)),
+      "Check that the outcome has two levels and that the predictors are not constant or perfectly collinear.", fit)))
   }
 
   est <- as.numeric(fit$coefficients)
@@ -1772,8 +1803,12 @@ sframe_run_multinomial_logistic <- function(data, roles, options = list()) {
   }
   fit <- tryCatch(nnet::multinom(stats::as.formula(paste(outcome, "~", paste(predictors, collapse = " + "))),
                                  data = df, trace = FALSE),
-                  error = function(e) NULL)
-  if (is.null(fit)) return(list(test = "regression_logistic_multinomial", error = "Multinomial logistic regression failed."))
+                  error = function(e) e)
+  if (inherits(fit, "error")) {
+    return(list(test = "regression_logistic_multinomial", error = sframe_runner_failure(
+      sprintf("The model for '%s' with %d complete rows could not be fitted.", outcome, nrow(df)),
+      "Check that every outcome category has answers and that the predictors are not constant or perfectly collinear.", fit)))
+  }
   pred <- stats::predict(fit, type = "class")
   class_table <- table(observed = df[[outcome]], predicted = pred)
   null_fit <- tryCatch(nnet::multinom(stats::as.formula(paste(outcome, "~ 1")),
@@ -1824,8 +1859,12 @@ sframe_run_moderation <- function(data, roles) {
   df <- as.data.frame(lapply(data[, vars, drop = FALSE], sframe_num))
   df <- df[stats::complete.cases(df), , drop = FALSE]
   formula <- stats::as.formula(paste(outcome, "~", predictor, "*", moderator))
-  fit <- tryCatch(stats::lm(formula, data = df), error = function(e) NULL)
-  if (is.null(fit)) return(list(test = "moderation", error = "Moderation model failed."))
+  fit <- tryCatch(stats::lm(formula, data = df), error = function(e) e)
+  if (inherits(fit, "error")) {
+    return(list(test = "moderation", error = sframe_runner_failure(
+      sprintf("The model for '%s' with %d complete rows could not be fitted.", outcome, nrow(df)),
+      "Check that the outcome, predictor and moderator are numeric and that none is constant.", fit)))
+  }
   mod_mean <- mean(df[[moderator]], na.rm = TRUE)
   mod_sd <- stats::sd(df[[moderator]], na.rm = TRUE)
   grid <- data.frame(

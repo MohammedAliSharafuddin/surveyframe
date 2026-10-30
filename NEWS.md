@@ -137,6 +137,9 @@ style.
   `meta`, `render` and `version` included. Corrected.
 * `inst/csl/apa.csl`, the APA 7 style from the Zotero Style Repository, is
   bundled under CC BY-SA 3.0. See `inst/COPYRIGHTS`.
+* **A block's `error` opens with the block id and the method**, as in
+  "RQ3 (McNemar test): ". Code that matched the start of an error message
+  needs to allow for it.
 
 ## Analysis
 
@@ -255,6 +258,13 @@ style.
   declared options First and Second with a count of 0 beside unlabelled rows
   1 and 2. Only codes that survive a numeric round trip, such as 1 and 2, are
   now read as numbers. The rest stay as written.
+* **A block that cannot run says which block, what is wrong and what to do.**
+  McNemar, Friedman, ANCOVA, Fisher's exact test, partial correlation, the
+  ordinal, multinomial and Firth logistic models and moderation said only
+  "X failed.", and EFA readiness passed on "'x' is empty". Each now names
+  the data problem, suggests a remedy and keeps R's own message. An infinite
+  value in a variable is named as the cause, where R's message did not say
+  it (CX-13).
 * **`read_responses()` reads semicolon and tab files.** It detects a comma,
   semicolon or tab separator from the header line, and a new `delim`
   argument overrides the detection. A semicolon file is read as Excel writes
