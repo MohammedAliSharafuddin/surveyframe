@@ -646,9 +646,7 @@ efa_solution <- function(
     rlang::abort("EFA solution requires at least two available item columns.",
                  class = c("sframe_validation_error", "sframe_error"))
   }
-  item_data <- as.data.frame(lapply(data[, cols, drop = FALSE], function(x) {
-    suppressWarnings(as.numeric(x))
-  }))
+  item_data <- as.data.frame(lapply(data[, cols, drop = FALSE], sframe_num))
   item_data <- item_data[stats::complete.cases(item_data), , drop = FALSE]
   if (nrow(item_data) < 3) {
     rlang::abort("EFA solution requires at least three complete rows.",

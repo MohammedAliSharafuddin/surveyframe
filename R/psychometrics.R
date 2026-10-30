@@ -297,7 +297,7 @@ efa_report <- function(
   cols      <- intersect(all_items, colnames(data))
 
   item_data <- as.data.frame(lapply(data[, cols, drop = FALSE],
-                                    function(x) suppressWarnings(as.numeric(x))))
+                                    sframe_num))
   item_data <- item_data[complete.cases(item_data), , drop = FALSE]
 
   # KMO(), cortest.bartlett(), and fa.parallel() all print "R was not square ..."

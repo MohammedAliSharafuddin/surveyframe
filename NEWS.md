@@ -133,6 +133,11 @@ style.
 
 ## Analysis
 
+* **EFA reads factor item columns by their labels.** `efa_report()` and
+  `efa_solution()` read item columns with the same rule as every other
+  numeric method, so a factor holding 10 to 50 counts as those values, where
+  its level positions had been used (CX-06).
+
 * **Regression syntax codes predictors as the analysis does.** The code
   `analysis_syntax()` writes for linear, binary, ordinal and multinomial
   logistic regression and ANCOVA codes each predictor the way the package
