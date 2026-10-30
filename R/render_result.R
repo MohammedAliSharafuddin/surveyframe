@@ -22,7 +22,9 @@
 #'   scores them when `instrument` is given.
 #' @param instrument The `sframe` the plan belongs to, or `NULL`. Gives the
 #'   chart the item and choice labels the tables use.
-#' @param palette `"web"` (default) or `"print"`, the report's 2 palettes.
+#' @param palette `"web"` (default) or `"print"`, the report's 2 palettes. A palette
+#'   given explicitly rebuilds the chart with it. Left out, the chart attached
+#'   to the result is used as it is.
 #' @param format `"html"` (default) returns an HTML fragment with the chart
 #'   embedded. `"png"` and `"svg"` write the chart to a file as well, and
 #'   return its path in `chart_file`.
@@ -50,6 +52,7 @@ render_result <- function(result, data, instrument = NULL,
                           palette = c("web", "print"),
                           format = c("html", "png", "svg"),
                           width = 7, height = 4.5, dpi = 150) {
+  explicit_palette <- !missing(palette)
   palette <- rlang::arg_match(palette)
   format <- rlang::arg_match(format)
   if (!is.list(result)) {
@@ -88,7 +91,7 @@ render_result <- function(result, data, instrument = NULL,
   }
   out$chart <- NULL
   if (is.null(result$error) && requireNamespace("ggplot2", quietly = TRUE)) {
-    out$chart <- if (inherits(result$plot, "ggplot")) result$plot else tryCatch(
+    out$chart <- if (!explicit_palette && inherits(result$plot, "ggplot")) result$plot else tryCatch(
       .sframe_with_plot_labels(lookup, sframe_plot_for_result(result, data, palette = palette),
                                instrument),
       error = function(e) NULL)
