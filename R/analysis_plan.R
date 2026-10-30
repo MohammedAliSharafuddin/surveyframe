@@ -845,29 +845,34 @@ sframe_run_correlation <- function(data, vars, method = "pearson") {
   } else {
     sframe_cor_boot_ci(x[complete], y[complete], method)
   }
-  list(
+  # cor.test() produces no df for Kendall, so tau reports N instead.
+  kendall <- identical(method, "kendall")
+  head <- if (kendall) sym else sprintf("%s(%d)", sym, n - 2)
+  tail <- if (kendall) sprintf(", N = %d", n) else ""
+  out <- list(
     test     = paste0("correlation_", method),
     vars     = vars,
     method   = method,
     n        = n,
     r        = r,
-    df       = n - 2,
     p        = ct$p.value,
     ci       = ci,
     effect_label = sframe_effect_label(abs(r), "r"),
     apa      = sprintf(
-      "%s(%d) = %.2f%s, p %s",
-      sym, n - 2, r, sframe_ci_string(ci), sframe_p_string(ct$p.value)
+      "%s = %.2f%s, p %s%s",
+      head, r, sframe_ci_string(ci), sframe_p_string(ct$p.value), tail
     ),
     prompt   = sprintf(
-      "There was a %s, %s %s correlation between %s and %s, %s(%d) = %.2f%s, p %s. Explain what this means for your research question.",
+      "There was a %s, %s %s correlation between %s and %s, %s = %.2f%s, p %s%s. Explain what this means for your research question.",
       if (r > 0) "positive" else "negative",
       sframe_effect_label(abs(r), "r"),
       if (ct$p.value < .05) "significant" else "non-significant",
       vars[1], vars[2],
-      sym, n - 2, r, sframe_ci_string(ci), sframe_p_string(ct$p.value)
+      head, r, sframe_ci_string(ci), sframe_p_string(ct$p.value), tail
     )
   )
+  if (!kendall) out$df <- n - 2
+  out
 }
 
 sframe_run_regression <- function(data, vars) {
@@ -1268,12 +1273,13 @@ sframe_result_table <- function(result) {
                          kendall  = "Kendall tau",
                          "Correlation"),
       n = result$n,
-      df = result$df,
+      df = result$df %||% NA_real_,
       Estimate = fmt(result$r),
       p = sframe_p_string(result$p),
       `Effect size` = result$effect_label %||% "",
       check.names = FALSE, stringsAsFactors = FALSE
-    ),
+    )[, c("Statistic", "n", if (!is.null(result$df)) "df",
+          "Estimate", "p", "Effect size")],
     regression_linear = {
       co <- result$coefficients
       if (!is.data.frame(co)) return(NULL)
