@@ -133,6 +133,11 @@ style.
 
 ## Analysis
 
+* **Kendall's tau reports N, with no degrees of freedom.** `cor.test()`
+  gives Kendall no df, yet the line read `tau(58)` and the table carried a
+  df column. It now reads `tau = 0.39, 95% CI [...], p < .001, N = 60`.
+  Pearson and Spearman keep `r(df)` and `r_s(df)` (D9, CX-17).
+
 * **The paired t test names the higher measure.** Its APA line and prompt
   end with ", higher in <measure>", as the Wilcoxon signed-rank line already
   did (D1 follow-up).
