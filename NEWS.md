@@ -577,6 +577,11 @@ style.
 
 ## SurveyStudio
 
+* **Each screen draws when it is opened.** Studio kept 28 outputs on every
+  screen computing from start-up, because its screens are hidden with CSS
+  and Shiny was not told when one became visible. The screen switch now
+  tells Shiny, so only the open screen's outputs are computed. A browser
+  test opens every screen and checks that it draws.
 * **The Analysis Plan screen has fields for the hypotheses.** Methods that
   test a hypothesis show optional "Null hypothesis (H0)" and "Alternative
   hypothesis (H1)" fields, with a method-appropriate example as placeholder

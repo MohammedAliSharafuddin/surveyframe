@@ -1414,24 +1414,28 @@ ui <- fluidPage(
     ),
     tags$div(class = "studio-main",
       tags$script(HTML("
+        // Screens are shown and hidden with CSS classes, which Shiny cannot
+        // see. Shiny suspends an output while it is hidden, so the switch
+        // fires the 'hidden' and 'shown' events Shiny listens for, and the
+        // opened screen's outputs draw at once.
+        function studioShowScreen(link, tab) {
+          $('.studio-nav-item a').removeClass('active');
+          link.addClass('active');
+          $('.screen.active').not('#screen-' + tab)
+            .removeClass('active').trigger('hidden');
+          $('#screen-' + tab).addClass('active').trigger('shown');
+          Shiny.setInputValue('current_tab', tab, {priority: 'event'});
+        }
+
         $(document).on('click', '[data-tab]', function(e) {
           e.preventDefault();
-          var tab = $(this).data('tab');
-          $('.studio-nav-item a').removeClass('active');
-          $(this).addClass('active');
-          $('.screen').removeClass('active');
-          $('#screen-' + tab).addClass('active');
-          Shiny.setInputValue('current_tab', tab, {priority: 'event'});
+          studioShowScreen($(this), $(this).data('tab'));
         });
 
         Shiny.addCustomMessageHandler('surveyframe-switch-tab', function(tab) {
           var link = $('[data-tab=\"' + tab + '\"]');
           if (link.length === 0) return;
-          $('.studio-nav-item a').removeClass('active');
-          link.addClass('active');
-          $('.screen').removeClass('active');
-          $('#screen-' + tab).addClass('active');
-          Shiny.setInputValue('current_tab', tab, {priority: 'event'});
+          studioShowScreen(link, tab);
         });
 
         // Copies a whole result-canvas block (title, badges, APA line,
@@ -4148,25 +4152,6 @@ server <- function(input, output, session) {
       })
     }
   )
-
-  # Screens are shown and hidden with custom CSS classes, so Shiny would suspend
-  # the content outputs inside hidden screens and not always wake them on switch.
-  # Keep the per-screen content outputs evaluated so every tab renders reliably.
-  for (.oid in c(
-    "instrument_summary_card", "survey_preview_items", "responses_summary_card",
-    "quality_output", "reliability_output",
-    "studio_quality_chart", "studio_reliability_chart",
-    "studio_missing_chart", "studio_scale_cor_chart",
-    "analysis_left_panel", "analysis_middle_panel", "analysis_right_panel",
-    "analysis_results_output", "studio_dashboard_content",
-    "export_sframe_ui", "export_report_ui", "export_interpretations_ui",
-    "download_sframe_btn", "download_report_btn",
-    "qmd_prepare_ui", "qmd_downloads_ui",
-    "qmd_dl_qmd", "qmd_dl_sframe", "qmd_dl_csv",
-    "amend_gate", "amend_revised_status", "amend_deviation_ui", "amendment_log_table"
-  )) {
-    shiny::outputOptions(output, .oid, suspendWhenHidden = FALSE)
-  }
 }
 
 shinyApp(ui = ui, server = server)
