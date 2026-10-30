@@ -1489,13 +1489,13 @@ sframe_clean_interpretations <- function(interpretations) {
     ignore.case = TRUE
   ))
 
-  # Raw data frame names (e.g. "research_question", "n_items") are internal
-  # identifiers, not reader-facing labels: title-case them with spaces unless
-  # the caller supplies its own headings.
-  display_names <- col.names %||% .sframe_title_case_names(colnames(x))
+  # Headings from the APA layer: symbols set as APA 7 sets them, other names
+  # in words, unless the caller supplies its own (CX-24).
+  display_names <- if (is.null(col.names)) sframe_apa_headings(colnames(x)) else
+    htmltools_escape_each(col.names)
 
   header <- paste(
-    sprintf("<th scope=\"col\">%s</th>", htmltools_escape_each(display_names)),
+    sprintf("<th scope=\"col\">%s</th>", display_names),
     collapse = ""
   )
   rows <- paste(

@@ -285,6 +285,11 @@ style.
   p, r, d, N and the other Latin symbols are italic, `r_s` and `d_z` print
   with a subscript, tau and phi as Greek letters and chi-square as its
   symbol. The text was plain in all 3 HTML renderers (CX-24).
+* **Table headings set symbols as APA 7 does.** A `p` column was headed
+  "P", `t` "T" and `df` "Df", and `render_results()` printed raw names such
+  as `missing_pct`. Symbols are now italic, `r_s` has its subscript, a
+  `_pct` column (a proportion) is headed "(proportion)" and drops its
+  leading zero, and other names read as words, in both report engines (CX-24).
 * **The built-in report prints each research question's hypotheses and
   decision rule before its result.** H0 and H1 print where written, then
   the planned decision rule, then the result, then the interpretation,
