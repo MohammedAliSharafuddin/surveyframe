@@ -117,7 +117,9 @@ survey_module_ui <- function(id, width = "100%") {
 #' `on_submit` is called with the response before the survey is marked
 #' complete. If it raises an error, the respondent sees a message and stays on
 #' the last page, can submit again, and the returned reactive stays `NULL`.
-#' The thank-you screen appears only after `on_submit` returns.
+#' The thank-you screen appears only after `on_submit` returns. Without
+#' `on_submit` the module stores nothing, and its thank-you screen tells the
+#' respondent the response has not been saved.
 #'
 #' # Changing the instrument
 #'
@@ -197,7 +199,8 @@ survey_module_server <- function(id, instrument, on_submit = NULL) {
       content <- switch(state$screen,
         welcome  = sf_mod_welcome(instr, ns, prefix),
         survey   = sf_mod_survey(instr, state$page, values, ns, prefix),
-        thankyou = sf_mod_thankyou(instr$render$thankyou %||% list())
+        thankyou = sf_mod_thankyou(instr$render$thankyou %||% list(),
+                                   state$delivery %||% "none")
       )
       shiny::tagList(sf_mod_css(instr), shiny::div(class = "sf-mod", content))
     })
@@ -313,6 +316,7 @@ sframe_module_do_submit <- function(state, instr, values, branch_lookup,
     }
   }
   state$submitted <- resp
+  state$delivery  <- sframe_delivery_outcome(NULL, on_submit)
   state$screen    <- "thankyou"
   invisible(TRUE)
 }
@@ -354,7 +358,8 @@ sf_mod_css <- function(instr) {
      .sf-mod .pg-info{font-size:11px;color:#64748b;margin-bottom:14px}
      .sf-mod .ty-ic{font-size:48px;text-align:center;margin-bottom:12px}
      .sf-mod .ty-t{font-size:20px;font-weight:700;text-align:center;margin-bottom:8px}
-     .sf-mod .ty-m{color:#475569;text-align:center;font-size:13px}",
+     .sf-mod .ty-m{color:#475569;text-align:center;font-size:13px}
+     .sf-mod .ty-status{color:#0f172a;font-weight:600;margin-bottom:8px}",
     theme
   )))
 }
@@ -441,11 +446,13 @@ sf_mod_survey <- function(instr, page, values, ns, prefix) {
   )
 }
 
-sf_mod_thankyou <- function(ty) {
+sf_mod_thankyou <- function(ty, outcome = "none") {
   shiny::div(class = "card",
     shiny::div(class = "ty-ic", "\u2714"),
     shiny::div(class = "ty-t", "Thank You"),
+    shiny::div(class = "ty-m ty-status", role = "status",
+               sframe_delivery_status(outcome)),
     shiny::div(class = "ty-m",
-               ty$message %||% "Your response has been recorded.")
+               ty$message %||% "Thank you for participating.")
   )
 }

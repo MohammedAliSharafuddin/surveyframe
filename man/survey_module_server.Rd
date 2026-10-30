@@ -52,7 +52,9 @@ empty.
 \code{on_submit} is called with the response before the survey is marked
 complete. If it raises an error, the respondent sees a message and stays on
 the last page, can submit again, and the returned reactive stays \code{NULL}.
-The thank-you screen appears only after \code{on_submit} returns.
+The thank-you screen appears only after \code{on_submit} returns. Without
+\code{on_submit} the module stores nothing, and its thank-you screen tells the
+respondent the response has not been saved.
 }
 
 \section{Changing the instrument}{

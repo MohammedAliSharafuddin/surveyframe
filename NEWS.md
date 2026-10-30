@@ -257,6 +257,14 @@ style.
   feedback was recorded. A preview export keeps the study's message too, so
   a researcher sees the text respondents will read, under the status line
   that says nothing was sent.
+* **The Shiny surveys state delivery on their thank-you screen too.**
+  `survey_module_server()` said "Your response has been recorded." and
+  `render_survey()` said "Submitted successfully" whether or not anything
+  stored the answers. A module with no `on_submit`, or `render_survey()` with
+  `save_responses = "none"`, stores nothing. A status line now says what
+  happened: recorded to the CSV, submitted to `on_submit`, or not saved. The
+  study's message sits below it, and the module's default message is
+  "Thank you for participating."
 * **A sending screen while the answers are in flight.** The thank-you screen
   said the response had been recorded while it was still being sent.
 * **Confirmed delivery for a host.** A page that defines
