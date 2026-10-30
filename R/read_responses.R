@@ -26,7 +26,7 @@
 #' go through the same conversion, so a CSV file and a data frame holding the
 #' same responses read the same.
 #'
-#' @param x A file path to a CSV file, a `data.frame`, or a `tibble`.
+#' @param x A file path to a delimited text file, a `data.frame`, or a `tibble`.
 #' @param instrument An `sframe` object created by [sf_instrument()].
 #' @param respondent_id Character or NULL. The name of the column containing
 #'   unique respondent identifiers. If NULL, no respondent ID column is
@@ -46,6 +46,13 @@
 #'   item IDs, their expansion columns and the metadata columns is an error,
 #'   naming the columns. When `FALSE`, such columns are kept, placed last, with
 #'   a warning.
+#' @param delim `NULL` (default), `","`, `";"` or `"\t"`. The field separator
+#'   of a file. When `NULL` it is detected from the header line as a comma,
+#'   semicolon or tab, and a message names the separator when it is not a
+#'   comma. A semicolon file is read the way Excel writes one in a comma
+#'   decimal locale, so a comma is the decimal mark in its numeric columns
+#'   (`3,5` reads as 3.5). A byte order mark is ignored. Not used for data
+#'   frames.
 #'
 #' @return A `data.frame` with columns ordered as: metadata columns first, then
 #'   item columns in instrument order, each item followed by its expansion
@@ -74,10 +81,12 @@ read_responses <- function(
     respondent_id = NULL,
     submitted_at  = NULL,
     meta_cols     = NULL,
-    strict        = TRUE
+    strict        = TRUE,
+    delim         = NULL
 ) {
   sframe_check_instrument(instrument)
 
+  dec <- "."
   # Load data
   if (is.character(x)) {
     if (!file.exists(x)) {
@@ -89,13 +98,28 @@ read_responses <- function(
     # Read as text, with only an empty cell as missing. Type inference turned
     # an id of 001 into 1 and a text answer of NA into a missing value.
     # Declared numeric columns are converted below, for both routes.
+    sep <- sframe_resolve_delim(x, delim)
+    if (!identical(sep, ",")) {
+      rlang::inform(paste0(
+        "Reading '", basename(x), "' with ",
+        c(";" = "a semicolon", "\t" = "a tab")[[sep]],
+        " as the separator",
+        if (identical(sep, ";")) " and a comma as the decimal mark",
+        "."))
+    }
+    if (identical(sep, ";")) dec <- ","
     data <- utils::read.csv(
       x,
+      sep = sep,
       stringsAsFactors = FALSE,
       check.names = FALSE,
       colClasses = "character",
       na.strings = character(0)
     )
+    # A byte order mark stays out of the first name. Re-encoding the file to
+    # drop it would stop at the first byte that is not UTF-8, which cut a
+    # Windows-1252 export short.
+    if (ncol(data)) names(data)[1] <- sub("^\ufeff", "", names(data)[1])
   } else if (is.data.frame(x)) {
     data <- sframe_as_data_frame(x)
   } else {
@@ -247,7 +271,7 @@ read_responses <- function(
   )
 
   out <- sframe_as_data_frame(data[, ordered_cols, drop = FALSE])
-  sframe_convert_declared_columns(out, instrument, response_items)
+  sframe_convert_declared_columns(out, instrument, response_items, dec)
 }
 
 # The response columns whose values are numbers, from the instrument, so only
@@ -285,7 +309,30 @@ sframe_numeric_response_columns <- function(instrument, response_items) {
   unique(cols)
 }
 
-sframe_convert_declared_columns <- function(data, instrument, response_items) {
+# Pick the field separator from the header line, or check an explicit one.
+sframe_resolve_delim <- function(path, delim = NULL) {
+  if (!is.null(delim)) {
+    if (!is.character(delim) || length(delim) != 1L ||
+        !delim %in% c(",", ";", "\t")) {
+      sframe_abort_import(
+        "`delim` must be NULL, \",\", \";\" or \"\\t\" (a comma, semicolon or tab).",
+        path = path)
+    }
+    return(delim)
+  }
+  header <- readLines(path, n = 1L, warn = FALSE, encoding = "UTF-8")
+  if (length(header) == 0L) return(",")
+  header <- sub("^\ufeff", "", header)
+  header <- gsub("\"[^\"]*\"", "", header)
+  counts <- vapply(c(",", ";", "\t"),
+                   function(ch) lengths(regmatches(header, gregexpr(ch, header, fixed = TRUE))),
+                   integer(1))
+  if (max(counts) == 0L) return(",")
+  names(counts)[which.max(counts)]
+}
+
+sframe_convert_declared_columns <- function(data, instrument, response_items,
+                                            dec = ".") {
   for (col in intersect(sframe_numeric_response_columns(instrument, response_items),
                         colnames(data))) {
     x <- data[[col]]
@@ -297,6 +344,7 @@ sframe_convert_declared_columns <- function(data, instrument, response_items) {
     if (!is.character(x)) next
     text <- trimws(x)
     text[!is.na(text) & text %in% c("", "NA")] <- NA_character_
+    if (identical(dec, ",")) text <- sub(",", ".", text, fixed = TRUE)
     converted <- suppressWarnings(as.numeric(text))
     if (all(is.na(text) | !is.na(converted))) data[[col]] <- converted
   }

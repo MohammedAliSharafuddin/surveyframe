@@ -10,11 +10,12 @@ read_responses(
   respondent_id = NULL,
   submitted_at = NULL,
   meta_cols = NULL,
-  strict = TRUE
+  strict = TRUE,
+  delim = NULL
 )
 }
 \arguments{
-\item{x}{A file path to a CSV file, a \code{data.frame}, or a \code{tibble}.}
+\item{x}{A file path to a delimited text file, a \code{data.frame}, or a \code{tibble}.}
 
 \item{instrument}{An \code{sframe} object created by \code{\link[=sf_instrument]{sf_instrument()}}.}
 
@@ -38,6 +39,14 @@ source URL).}
 item IDs, their expansion columns and the metadata columns is an error,
 naming the columns. When \code{FALSE}, such columns are kept, placed last, with
 a warning.}
+
+\item{delim}{\code{NULL} (default), \code{","}, \code{";"} or \code{"\\t"}. The field separator
+of a file. When \code{NULL} it is detected from the header line as a comma,
+semicolon or tab, and a message names the separator when it is not a
+comma. A semicolon file is read the way Excel writes one in a comma
+decimal locale, so a comma is the decimal mark in its numeric columns
+(\verb{3,5} reads as 3.5). A byte order mark is ignored. Not used for data
+frames.}
 }
 \value{
 A \code{data.frame} with columns ordered as: metadata columns first, then
