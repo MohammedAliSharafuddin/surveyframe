@@ -38,8 +38,9 @@ for the embedded or written chart. Defaults 7 by 4.5 at 150 dpi.}
 A list with \code{block_id}, \code{test}, \code{caption}, \code{apa}, \code{table} (a data
 frame), \code{note}, \code{supplement} (a list with \code{table} and \code{caption}, or
 \code{NULL}), \code{chart} (a \code{ggplot}, or \code{NULL} where the method has none or
-ggplot2 is absent), \code{html} (the fragment, for \code{format = "html"}), and
-\code{chart_file} (for \code{"png"} and \code{"svg"}). A result that failed carries its
+ggplot2 is absent), \code{html} (the fragment, for \code{format = "html"}),
+\code{chart_file} (for \code{"png"} and \code{"svg"}) and \code{syntax} where the result has
+one. A result that failed carries its
 \code{error}, and \code{html} shows it.
 }
 \description{

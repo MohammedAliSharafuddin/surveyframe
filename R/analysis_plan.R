@@ -1442,6 +1442,31 @@ sframe_result_table <- function(result) {
         check.names = FALSE, stringsAsFactors = FALSE, row.names = NULL
       )
     },
+    regression_logistic_multinomial = {
+      co <- result$coefficients
+      se <- result$std_errors
+      if (!is.matrix(co) || !is.matrix(se)) return(NULL)
+      ref <- result$reference %||% "the reference category"
+      crit <- stats::qnorm(1 - (1 - (result$conf_level %||% 0.95)) / 2)
+      cats <- rownames(co)
+      terms <- colnames(co)
+      g <- expand.grid(i = seq_along(cats), j = seq_along(terms))
+      b <- co[cbind(g$i, g$j)]
+      s <- se[cbind(g$i, g$j)]
+      data.frame(
+        Outcome = paste(cats[g$i], "vs", ref),
+        Term = terms[g$j],
+        b = fmt(b),
+        SE = fmt(s),
+        z = fmt(b / s),
+        # Numeric, so the APA layer prints it as .032 or <.001 (CX-15).
+        p = 2 * stats::pnorm(-abs(b / s)),
+        OR = fmt(exp(b)),
+        `CI low` = fmt(exp(b - crit * s)),
+        `CI high` = fmt(exp(b + crit * s)),
+        check.names = FALSE, stringsAsFactors = FALSE, row.names = NULL
+      )
+    },
     moderation = {
       co <- result$coefficients
       if (!is.data.frame(co)) return(NULL)
