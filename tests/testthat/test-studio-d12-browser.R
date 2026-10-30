@@ -68,6 +68,25 @@ d12_type <- function(js, id, text) {
     id, jsonlite::toJSON(text, auto_unbox = TRUE)))
 }
 
+# Opens the Export screen, as a researcher does before downloading. Since
+# 746120a a hidden screen is not drawn, so the Download button has no link
+# until its screen shows. These tests read the link from the hidden screen
+# before then, which worked only while every screen was kept drawn.
+d12_open_export <- function(js) {
+  # Studio switches to its launch screen after its first flush, so a click
+  # made before then is undone. Click until Export is open and stays open.
+  open <- "document.getElementById('screen-export').classList.contains('active')"
+  for (i in 1:20) {
+    js("var a = document.querySelector('[data-tab=\"export\"]'); if (a) a.click(); true")
+    Sys.sleep(1)
+    if (isTRUE(js(open))) {
+      Sys.sleep(1)
+      if (isTRUE(js(open))) break
+    }
+  }
+  testthat::expect_true(js(open))
+}
+
 test_that("typed H0, H1 and decision rule reach the saved .sframe", {
   d12_with_studio(d12_instrument(), function(js, wait, download) {
     expect_true(wait("!!document.getElementById('analysis_method')"))
@@ -83,6 +102,7 @@ test_that("typed H0, H1 and decision rule reach the saved .sframe", {
     js("document.getElementById('save_analysis_plan_btn').click(); true")
     expect_true(wait("(document.getElementById('shiny-notification-panel')||{}).innerText.indexOf('Analysis plan saved') >= 0"))
 
+    d12_open_export(js)
     expect_true(wait("!!document.getElementById('download_sframe_btn') && !!document.getElementById('download_sframe_btn').getAttribute('href')"))
     out <- download(tempfile(fileext = ".sframe"))
     block <- read_sframe(out)$analysis_plan[[1]]
@@ -112,6 +132,7 @@ test_that("a file with the old fixed hypotheses saves untouched with the same ha
   expect_true(is.character(before) && nzchar(before))
 
   d12_with_studio(read_sframe(original), function(js, wait, download) {
+    d12_open_export(js)
     expect_true(wait("!!document.getElementById('download_sframe_btn') && !!document.getElementById('download_sframe_btn').getAttribute('href')"))
     # No prompt to save it as a new instrument.
     expect_false(js("document.body.innerText.indexOf('Save as a new instrument') >= 0"))
