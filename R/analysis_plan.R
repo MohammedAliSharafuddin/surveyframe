@@ -2103,12 +2103,12 @@ render_results <- function(
       } else ""
       sprintf(
         '<table class="results-table">%s<thead><tr>%s</tr></thead><tbody>%s</tbody>%s</table>',
-        if (is.null(caption)) "" else
-          sprintf("<caption>%s</caption>", htmltools_escape(caption)),
+        if (is.null(caption)) "" else sframe_apa_caption(caption),
         headers, rows, foot_html
       )
     }
-    tbl_html <- table_html(r$table)
+    # Every table titled, and numbered once the page is assembled (CX-22).
+    tbl_html <- table_html(r$table, sframe_result_float_title(r, i))
     supplement <- sframe_result_supplement(r)
     if (!is.null(supplement)) {
       tbl_html <- paste0(tbl_html, table_html(supplement$table, supplement$caption))
@@ -2236,6 +2236,7 @@ render_results <- function(
     sections_html, references_html
   )
 
-  writeLines(html, dest)
+  # Tables numbered in reading order (CX-22).
+  writeLines(sframe_apa_number_floats(html), dest)
   invisible(dest)
 }

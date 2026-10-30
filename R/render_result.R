@@ -119,13 +119,16 @@ render_result <- function(result, data, instrument = NULL,
         if (is.list(out$supplement) && is.data.frame(out$supplement$table)) {
           .render_report_table(out$supplement$table, caption = out$supplement$caption)
         },
-        if (inherits(out$chart, "ggplot")) .render_report_ggplot_png(out$chart, alt = caption),
+        if (inherits(out$chart, "ggplot")) sframe_apa_figure(.render_report_ggplot_png(
+          out$chart, alt = paste("Chart of the result for", caption)), caption),
         if (nzchar(interp <- sframe_written_interpretation(result))) {
           sprintf("<p><strong>%s:</strong> %s</p>", sframe_interpretation_label,
                   htmltools_escape(interp))
         }
       )
-      out$html <- paste0("<section class=\"sf-result\">", paste(parts, collapse = "\n"), "</section>")
+      # Numbered as the first table and figure of a document of its own (CX-22).
+      out$html <- sframe_apa_number_floats(paste0(
+        "<section class=\"sf-result\">", paste(parts, collapse = "\n"), "</section>"))
     }
   }
   out

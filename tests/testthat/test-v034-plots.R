@@ -170,6 +170,6 @@ test_that("report distributions and analysis sections attach a plot beside its t
   # The RQ1 block's table and its chart appear as one contiguous unit
   rq_start <- regexpr("RQ 1", html)
   rq_chunk <- substr(html, rq_start, rq_start + 1200)
-  expect_match(rq_chunk, "Results table")
+  expect_match(rq_chunk, "<strong>Table [0-9]+</strong>")
   expect_match(rq_chunk, "data:image/png;base64")
 })

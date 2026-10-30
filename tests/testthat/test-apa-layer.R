@@ -121,3 +121,50 @@ test_that("result text and notes count with real plurals, never (s) (CX-24)", {
     expect_false(grepl("[a-z]\\(s\\)", src), label = fn)
   }
 })
+
+test_that("tables and figures are numbered in order with titles and alt text (CX-22)", {
+  html <- paste0(
+    "<table><caption class=\"sf-apa-caption\">First</caption></table>",
+    "<figure class=\"sf-figure\"><figcaption class=\"sf-apa-caption\">Chart</figcaption><img alt=\"x\"></figure>",
+    "<table><caption class=\"sf-apa-caption\">Second</caption></table>")
+  out <- sframe_apa_number_floats(html)
+  expect_match(out, "<strong>Table 1</strong><br><em>First</em>", fixed = TRUE)
+  expect_match(out, "<strong>Figure 1</strong><br><em>Chart</em>", fixed = TRUE)
+  expect_match(out, "<strong>Table 2</strong><br><em>Second</em>", fixed = TRUE)
+
+  set.seed(4)
+  d <- data.frame(a = 1:40, b = 1:40 + stats::rnorm(40, sd = 15))
+  instr <- sf_instrument("APA", components = list(
+    sf_item("a", "A", type = "numeric"), sf_item("b", "B", type = "numeric")))
+  sf_plan(instr) <- list(list(id = "RQ1", research_question = "Is a related to b?",
+    family = "relationship", method = "correlation_pearson",
+    roles = list(x = "a", y = "b")))
+  res <- run_analysis_plan(d, instr, plots = requireNamespace("ggplot2", quietly = TRUE))
+
+  # The built-in engine: the whole report numbers every table and figure.
+  f <- tempfile(fileext = ".html")
+  surveyframe:::.render_report_html(instr, d, output_path = f, include_analysis = TRUE)
+  doc <- paste(readLines(f), collapse = "\n")
+  expect_no_match(doc, "Results table", fixed = TRUE)
+  expect_no_match(doc, "alt=\"distribution\"", fixed = TRUE)
+  n_tab <- lengths(regmatches(doc, gregexpr("<strong>Table [0-9]+</strong>", doc)))
+  expect_true(n_tab >= 2)
+  nums <- as.integer(sub(".*Table ([0-9]+).*", "\\1",
+    regmatches(doc, gregexpr("<strong>Table [0-9]+</strong>", doc))[[1]]))
+  expect_identical(nums, seq_len(n_tab))
+  expect_match(doc, "<em>RQ1: Is a related to b?</em>", fixed = TRUE)
+  if (requireNamespace("ggplot2", quietly = TRUE)) {
+    expect_match(doc, "<strong>Figure 1</strong>", fixed = TRUE)
+    expect_match(doc, "<figure class=\"sf-figure\">", fixed = TRUE)
+  }
+
+  # render_results() and render_result() number theirs too.
+  out <- readLines(render_results(res, instr, output_file = tempfile(fileext = ".html")))
+  expect_true(any(grepl("<strong>Table 1</strong>", out, fixed = TRUE)))
+  one <- render_result(res$RQ1, d, instr)$html
+  expect_match(one, "<strong>Table 1</strong><br><em>RQ1: Is a related to b?</em>", fixed = TRUE)
+  if (requireNamespace("ggplot2", quietly = TRUE)) {
+    expect_match(one, "<strong>Figure 1</strong>", fixed = TRUE)
+    expect_match(one, "alt=\"Chart of the result for RQ1: Is a related to b?\"", fixed = TRUE)
+  }
+})
