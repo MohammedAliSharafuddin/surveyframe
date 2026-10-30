@@ -237,6 +237,11 @@ style.
   the respondent goes, so a closed tab can be resumed from the welcome screen.
   The draft is cleared once the response is submitted, and kept when delivery
   fails. SurveyBuilder's exported survey carries the same template.
+* **A preview sends nothing to a host either.** `export_static_survey(preview
+  = TRUE)` removed the endpoint and the redirect, but a page defining
+  `window.sframeSendResponse()` still received the preview's answers while the
+  screen said nothing was sent. A preview flag in the page now blocks every
+  delivery path, the host's included.
 
 ## Charts
 
