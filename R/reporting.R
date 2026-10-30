@@ -1478,11 +1478,9 @@ sframe_clean_interpretations <- function(interpretations) {
     return("")
   }
 
-  # Round numeric columns to two decimal places for readability.
-  num_cols <- vapply(x, is.numeric, logical(1))
-  if (any(num_cols)) {
-    x[num_cols] <- lapply(x[num_cols], function(col) round(col, 2))
-  }
+  # Cells as every report engine prints them: p by its own rules, the rest to
+  # 2 decimals, blanks for missing values (CX-15).
+  x <- sframe_apa_cells(x)
 
   has_pval <- any(grepl(
     "^p$|^p\\.value$|^p_value$|^Pr\\(>",

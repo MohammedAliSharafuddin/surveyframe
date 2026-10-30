@@ -38,3 +38,25 @@ test_that("a run block's result text and prompt carry no leading zero on r", {
   expect_match(res$RQ1$apa, "^r\\(38\\) = -?\\.[0-9]{2}, 95% CI \\[-?\\.[0-9]+, -?\\.[0-9]+\\]")
   expect_match(res$RQ1$prompt, "r\\(38\\) = -?\\.[0-9]{2}")
 })
+
+test_that("table cells: p by its rules, bounded values without a zero, blanks for missing (CX-15)", {
+  x <- data.frame(term = c("a", NA, "b"), t = c(2.345, 10, 1),
+                  p = c(.004, .00001, 1), r = c(.53, -.2, NA), n = c(10L, 20L, 30L),
+                  stringsAsFactors = FALSE)
+  out <- sframe_apa_cells(x)
+  expect_identical(out$p, c(".004", "<.001", "1.000"))
+  expect_identical(out$r, c(".53", "-.20", ""))
+  expect_identical(out$t, c("2.35", "10.00", "1.00"))
+  expect_identical(out$n, c("10", "20", "30"))
+  expect_identical(out$term, c("a", "", "b"))
+  expect_identical(sframe_p_cell(c(.032, NA)), c(".032", ""))
+})
+
+test_that("every report engine shows a p of .004 as .004 (CX-15)", {
+  tbl <- data.frame(term = "x", t = 3.1, p = 0.004)
+  expect_match(surveyframe:::.render_report_table(tbl, "T"), "<td>.004</td>", fixed = TRUE)
+  tpl <- readLines(system.file("templates", "report.qmd", package = "surveyframe"))
+  kables <- grep("kable\\(.*(r\\$table|sup\\$table)", tpl, value = TRUE)
+  expect_true(length(kables) >= 2)
+  expect_true(all(grepl("sframe_apa_cells(", kables, fixed = TRUE)))
+})
