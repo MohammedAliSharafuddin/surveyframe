@@ -300,6 +300,9 @@ style.
   `R_LIBS`, so every child R process, Quarto included, loads it. The
   earlier `render_report()` shadow never ran under `devtools::test()`, so
   Quarto tests had rendered with the installed copy.
+* **The Quarto build guard fails when a git source tree gives no commit.**
+  It skipped the commit comparison on an empty commit, so a failed lookup
+  let a report from a stale install pass on its version alone.
 
 * **`render_report()` shows the report it writes.** In an interactive
   session the new `open = TRUE` default opens it in the viewer pane of
