@@ -1034,12 +1034,16 @@ sframe_run_descriptives_result <- function(data, roles, options = list(),
   # handling of them.
   usable <- sframe_apply_weights(data, weights)
   if (!is.null(usable$error)) return(list(test = "descriptives", error = usable$error))
+  if (!is.null(split_by) && !split_by %in% colnames(data)) split_by <- NULL
   kinds <- vapply(vars, function(v) sframe_choice_column_kind(instrument, v),
                   character(1))
   categorical <- vars[kinds != "other" & vars %in% colnames(data)]
   numeric_vars <- setdiff(vars, categorical)
-  cat_tbl <- sframe_choice_counts_table(data, categorical, kinds[categorical],
-                                        instrument)
+  cat_tbl <- sframe_choice_counts_table(
+    usable$data, categorical, kinds[categorical], instrument,
+    split_by = split_by,
+    weights = if (!is.null(weights) && weights %in% colnames(data)) weights
+  )
   note <- NULL
   if (length(categorical) > 0) {
     shown <- unique(vapply(categorical, function(v) {
@@ -1051,6 +1055,12 @@ sframe_run_descriptives_result <- function(data, roles, options = list(),
     } else {
       sprintf("%s are choice items, so they are reported as counts and percentages.",
               paste(shown, collapse = ", "))
+    }
+    if (!is.null(split_by)) {
+      note <- paste(note, sprintf("The counts are given for each %s group.", split_by))
+    }
+    if (!is.null(cat_tbl) && !is.null(weights) && weights %in% colnames(data)) {
+      note <- paste(note, sprintf("The counts are weighted by %s.", weights))
     }
   }
   if (!is.null(usable$note) && (length(categorical) > 0 || !is.null(weights))) {
@@ -1123,37 +1133,69 @@ sframe_choice_column_kind <- function(instrument, column) {
 # One table of counts for the choice columns a descriptives block names:
 # Variable, Value (the choice label), Code, Frequency and Percent of the
 # answered rows.
-sframe_choice_counts_table <- function(data, columns, kinds, instrument) {
+sframe_choice_counts_table <- function(data, columns, kinds, instrument,
+                                       split_by = NULL, weights = NULL) {
   if (length(columns) == 0) return(NULL)
   lookup <- sframe_label_lookup(instrument)
   label_of <- function(id) {
     lab <- lookup[id]
     if (is.na(lab)) id else unname(lab)
   }
-  rows <- lapply(seq_along(columns), function(k) {
-    col <- columns[[k]]
-    if (identical(kinds[[k]], "option")) {
-      base <- sub("__.*$", "", col)
-      option <- substring(col, nchar(base) + 3L)
-      labels <- sframe_item_value_labels(instrument, base)
-      x <- sframe_num(data[[col]])
-      valid <- sum(!is.na(x))
-      picked <- sum(x == 1, na.rm = TRUE)
-      return(data.frame(
-        Variable = label_of(base),
-        Value = if (option %in% names(labels)) unname(labels[option]) else option,
-        Code = col,
-        Frequency = as.integer(picked),
-        Percent = if (valid > 0) round(picked / valid * 100, 1) else NA_real_,
-        stringsAsFactors = FALSE))
+  w_all <- if (!is.null(weights)) sframe_num(data[[weights]]) else NULL
+  one_group <- function(d, w) {
+    d_w <- if (!is.null(w)) {
+      d[[".sframe_w"]] <- w
+      ".sframe_w"
     }
-    one <- sframe_frequency_one(data, col, NULL, instrument)$table
-    one <- one[!is.na(one$Code), , drop = FALSE]
-    valid <- sum(one$Frequency)
-    one$Percent <- if (valid > 0) round(one$Frequency / valid * 100, 1) else NA_real_
-    cbind(data.frame(Variable = rep(label_of(col), nrow(one)), stringsAsFactors = FALSE), one)
+    rows <- lapply(seq_along(columns), function(k) {
+      col <- columns[[k]]
+      if (identical(kinds[[k]], "option")) {
+        base <- sub("__.*$", "", col)
+        option <- substring(col, nchar(base) + 3L)
+        labels <- sframe_item_value_labels(instrument, base)
+        x <- sframe_num(d[[col]])
+        wt <- if (is.null(w)) rep(1, length(x)) else w
+        valid <- sum(wt[!is.na(x)])
+        picked <- sum(wt[!is.na(x) & x == 1])
+        return(data.frame(
+          Variable = label_of(base),
+          Value = if (option %in% names(labels)) unname(labels[option]) else option,
+          Code = col,
+          Frequency = if (is.null(w)) as.integer(picked) else picked,
+          Percent = if (valid > 0) round(picked / valid * 100, 1) else NA_real_,
+          stringsAsFactors = FALSE))
+      }
+      fr <- sframe_frequency_one(d, col, d_w, instrument)
+      one <- fr$table
+      one <- one[!is.na(one$Code), , drop = FALSE]
+      if (!is.null(w)) {
+        wt <- fr$weighted_table
+        key <- if ("Code" %in% names(wt)) wt$Code else wt$Value
+        one$Frequency <- vapply(one$Code, function(cd) {
+          sum(wt$Weighted_Frequency[key == cd])
+        }, numeric(1))
+      }
+      valid <- sum(one$Frequency)
+      one$Percent <- if (valid > 0) round(one$Frequency / valid * 100, 1) else NA_real_
+      cbind(data.frame(Variable = rep(label_of(col), nrow(one)), stringsAsFactors = FALSE), one)
+    })
+    out <- do.call(rbind, rows)
+    rownames(out) <- NULL
+    out
+  }
+  if (is.null(split_by) || !split_by %in% colnames(data)) {
+    return(one_group(data, w_all))
+  }
+  grp <- data[[split_by]]
+  levels_in_order <- sframe_group_order(grp, instrument, split_by)
+  labels <- sframe_item_value_labels(instrument, split_by)
+  parts <- lapply(levels_in_order, function(g) {
+    hit <- !is.na(grp) & as.character(grp) == as.character(g)
+    tb <- one_group(data[hit, , drop = FALSE], if (!is.null(w_all)) w_all[hit])
+    shown <- if (as.character(g) %in% names(labels)) unname(labels[as.character(g)]) else as.character(g)
+    cbind(data.frame(Group = rep(shown, nrow(tb)), stringsAsFactors = FALSE), tb)
   })
-  out <- do.call(rbind, rows)
+  out <- do.call(rbind, parts)
   rownames(out) <- NULL
   out
 }
