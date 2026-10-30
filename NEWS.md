@@ -133,6 +133,10 @@ style.
 
 ## Analysis
 
+* **The paired t test names the higher measure.** Its APA line and prompt
+  end with ", higher in <measure>", as the Wilcoxon signed-rank line already
+  did (D1 follow-up).
+
 * **Named weights in `sensitivity_analysis()` match criteria by name.**
   Named weights are matched to the criteria in any order, as the ranking
   blocks already do, and a name that is not a criterion or a criterion with
