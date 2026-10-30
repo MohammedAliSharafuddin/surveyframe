@@ -183,6 +183,15 @@ style.
 
 ## Reports
 
+* **The built-in report prints each research question's hypotheses and
+  decision rule before its result.** H0 and H1 print where written, then
+  the planned decision rule, then the result, then the interpretation,
+  labelled "Interpretation (written after the results)". The decision rule
+  printed only beside a written interpretation, and an interpretation stood
+  in for an empty decision rule. The 2 fixed sentences earlier versions of
+  SurveyBuilder and SurveyStudio saved as hypotheses, and an interpretation
+  copied from the decision rule, are not printed.
+
 * **`render_report()` shows the report it writes.** In an interactive
   session the new `open = TRUE` default opens it in the viewer pane of
   RStudio, Positron or VS Code, or in the web browser elsewhere, and

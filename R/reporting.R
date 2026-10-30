@@ -1003,25 +1003,27 @@ sframe_clean_interpretations <- function(interpretations) {
     return("")
   }
 
-  # The written interpretation and the pre-declared decision rule render as
-  # a pair, so the post-hoc narrative never displaces the prospective
-  # contract. Without an override, output is unchanged.
-  interp_html <- function(block_id, decision_rule) {
-    override <- interpretations[[block_id %||% ""]] %||% ""
-    if (!nzchar(override)) return("")
-    rule_html <- if (nzchar(decision_rule %||% "")) {
-      sprintf("<p><strong>Planned decision rule:</strong> %s</p>",
-              htmltools_escape(decision_rule))
-    } else ""
-    paste0(rule_html,
-           sprintf("<p><strong>Interpretation:</strong> %s</p>",
-                   htmltools_escape(override)))
+  # What the block declared before the data prints above its result, and
+  # the interpretation below it, labelled as written after the results. An
+  # interpretation never stands in for an empty decision rule (D12).
+  declaration_html <- function(block) {
+    d <- sframe_plan_declaration(block)
+    if (length(d) == 0) return("")
+    paste(sprintf("<p><strong>%s:</strong> %s</p>", names(d),
+                  vapply(d, htmltools_escape, character(1))), collapse = "\n")
+  }
+  interp_html <- function(block) {
+    text <- sframe_written_interpretation(block, interpretations)
+    if (!nzchar(text)) return("")
+    sprintf("<p><strong>%s:</strong> %s</p>", sframe_interpretation_label,
+            htmltools_escape(text))
   }
 
   blocks <- if (is.null(data)) {
     vapply(seq_along(plan), function(i) {
       rq <- plan[[i]]
-      extra <- interp_html(rq$id, rq$decision_rule %||% rq$interpretation)
+      declared <- declaration_html(rq)
+      extra <- interp_html(rq)
       paste(
         c(
           "<div class=\"rq-block\">",
@@ -1031,6 +1033,7 @@ sframe_clean_interpretations <- function(interpretations) {
                   htmltools_escape(sframe_analysis_method(rq))),
           sprintf("<p><strong>Variables:</strong> %s</p>",
                   htmltools_escape(paste(sframe_analysis_vars(rq), collapse = ", "))),
+          if (nzchar(declared)) declared,
           if (nzchar(extra)) extra,
           "</div>"
         ),
@@ -1084,7 +1087,8 @@ sframe_clean_interpretations <- function(interpretations) {
         }, character(1))
         plot_html <- paste(c(plot_html, diag_imgs[diag_imgs != ""]), collapse = "\n")
       }
-      extra <- interp_html(result$block_id %||% result$id, result$decision_rule)
+      declared <- declaration_html(result)
+      extra <- interp_html(result)
       # A CFA/SEM/PLS-SEM syntax block has no table or chart to show: its
       # entire output is the generated syntax text, so that goes where a
       # table or chart normally would rather than leaving the block blank.
@@ -1123,6 +1127,7 @@ sframe_clean_interpretations <- function(interpretations) {
           "<div class=\"rq-block\">",
           sprintf("<h3>RQ %d: %s</h3>", i,
                   htmltools_escape(result$research_question %||% paste("Research Question", i))),
+          if (nzchar(declared)) declared,
           sprintf("<p class=\"apa\"><strong>Result:</strong> %s</p>",
                   htmltools_escape(result$apa %||% result$error %||% "")),
           table_html,

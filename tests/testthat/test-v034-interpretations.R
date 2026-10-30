@@ -62,19 +62,21 @@ test_that("fallback report pairs the override with the planned decision rule", {
   friendly <- rq_chunk(html, "RQ 2: How friendly")
   expect_match(friendly, "Planned decision rule:")
   expect_match(friendly, "modal response for friendliness")
-  expect_match(friendly, "Interpretation:")
+  expect_match(friendly, "Interpretation (written after the results):", fixed = TRUE)
   expect_match(friendly, "above the rule threshold")
 
   fast <- rq_chunk(html, "RQ 1: How fast")
-  expect_no_match(fast, "Planned decision rule:")
-  expect_no_match(fast, "Interpretation:")
+  # D12: the decision rule is declared before the data, so it prints with
+  # or without a written interpretation.
+  expect_match(fast, "Planned decision rule:")
+  expect_no_match(fast, "Interpretation")
 })
 
-test_that("NULL interpretations leaves the report unchanged", {
+test_that("NULL interpretations prints the decision rules and no interpretation", {
   fx <- interp_fixture()
   html <- render_fallback(fx$instr, fx$dat)
-  expect_no_match(html, "Planned decision rule:")
-  expect_no_match(html, "Interpretation:")
+  expect_match(html, "Planned decision rule:")
+  expect_no_match(html, "Interpretation (written", fixed = TRUE)
 })
 
 test_that("codebook-only report also renders the override", {
@@ -83,10 +85,10 @@ test_that("codebook-only report also renders the override", {
     interpretations = list(rq_fast = "Speed was pre-drafted before data collection."))
   fast <- rq_chunk(html, "RQ 1: How fast")
   expect_match(fast, "Planned decision rule:")
-  expect_match(fast, "Interpretation:")
+  expect_match(fast, "Interpretation (written after the results):", fixed = TRUE)
   expect_match(fast, "pre-drafted before data collection")
   friendly <- rq_chunk(html, "RQ 2: How friendly")
-  expect_no_match(friendly, "Interpretation:")
+  expect_no_match(friendly, "Interpretation")
 })
 
 test_that("block-id keying survives a plan reorder", {
@@ -99,7 +101,7 @@ test_that("block-id keying survives a plan reorder", {
   friendly <- rq_chunk(html, "RQ 1: How friendly")
   expect_match(friendly, "Friendliness override after reorder")
   fast <- rq_chunk(html, "RQ 2: How fast")
-  expect_no_match(fast, "Interpretation:")
+  expect_no_match(fast, "Interpretation")
 })
 
 test_that("render_results shows the override in place of the prompt fallback", {
