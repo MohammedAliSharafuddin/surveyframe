@@ -25,8 +25,9 @@ are \code{NA} when either group has fewer than 3 finite values.
 }
 \description{
 Percentile bootstrap for the standardised mean difference between two
-independent groups. Each resample draws within each group, preserving the
-group sizes.
+independent groups. The difference is signed, the mean of \code{x} minus the
+mean of \code{y}, so the interval can include zero. Each resample draws within
+each group, preserving the group sizes.
 }
 \examples{
 cohens_d_ci(mtcars$mpg[mtcars$am == 1], mtcars$mpg[mtcars$am == 0],

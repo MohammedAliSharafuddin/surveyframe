@@ -133,6 +133,16 @@ style.
 
 ## Analysis
 
+* **Two-group effect sizes keep their direction.** Cohen's d for the
+  independent t test, and r for Mann-Whitney and the Wilcoxon signed-rank
+  test, were magnitudes, and their bootstrap intervals were intervals of a
+  magnitude, so they could never include zero. Each is now signed, first
+  group minus second in the declared order, as the paired d_z already was.
+  Size labels read the magnitude, and the APA line and prompt name the higher
+  group. `cohens_d_ci()` returns the signed interval. The `two_group`,
+  `paired` and `small_sample` demo results are regenerated: their r values
+  can print with a minus sign, and the `small_sample` r interval now starts at
+  0.12.
 * **A two-group test takes its groups in the declared order.** The
   independent t test and Mann-Whitney ordered the 2 groups by first
   appearance in the data, so re-sorting the responses flipped the sign of t

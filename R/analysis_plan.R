@@ -218,7 +218,8 @@ sframe_cohens_d <- function(x, y) {
   pooled_sd <- sqrt(((nx - 1) * stats::var(x, na.rm = TRUE) +
                      (ny - 1) * stats::var(y, na.rm = TRUE)) / (nx + ny - 2))
   if (pooled_sd == 0) return(NA_real_)
-  abs(mean(x, na.rm = TRUE) - mean(y, na.rm = TRUE)) / pooled_sd
+  # Signed, first group minus second (D1). Size labels read the magnitude.
+  (mean(x, na.rm = TRUE) - mean(y, na.rm = TRUE)) / pooled_sd
 }
 
 # The 2 (or more) groups of a grouping column in their declared order: the
@@ -240,8 +241,16 @@ sframe_group_order <- function(x, instrument = NULL, group_col = NULL) {
   c(values[match(first, shown)], rest)
 }
 
+# ", higher in <group>" for a signed two-group effect, empty when the effect
+# is zero or missing.
+sframe_higher_group <- function(effect, groups) {
+  if (is.na(effect) || effect == 0 || length(groups) < 2) return("")
+  paste0(", higher in ", if (effect > 0) groups[1] else groups[2])
+}
+
 sframe_effect_label <- function(d, type = "d") {
   if (is.na(d)) return("could not be computed")
+  d <- abs(d)
   if (type == "d") {
     if (d < 0.2) return("negligible")
     if (d < 0.5) return("small")
@@ -482,7 +491,7 @@ sframe_run_mann_whitney <- function(data, vars, instrument = NULL) {
   # from p/2 was always negative, and the interval described a different r.
   n <- length(g1) + length(g2)
   z <- sframe_rank_z(g1, g2)
-  r <- abs(z) / sqrt(n)
+  r <- z / sqrt(n)
   r_ci <- sframe_rank_r_ci(g1, g2)
   hl_shift <- unname(wt$estimate)
   hl_conf_int <- as.numeric(wt$conf.int)
@@ -500,17 +509,19 @@ sframe_run_mann_whitney <- function(data, vars, instrument = NULL) {
     hl_conf_int = hl_conf_int,
     effect_label = sframe_effect_label(r, "r"),
     apa      = sprintf(
-      "U = %.0f, z = %.2f, p %s, r = %.2f%s, Hodges-Lehmann shift = %.2f%s",
+      "U = %.0f, z = %.2f, p %s, r = %.2f%s, Hodges-Lehmann shift = %.2f%s%s",
       wt$statistic, z, sframe_p_string(wt$p.value), r,
-      sframe_ci_string(r_ci), hl_shift, sframe_ci_string(hl_ci_named)
+      sframe_ci_string(r_ci), hl_shift, sframe_ci_string(hl_ci_named),
+      sframe_higher_group(r, groups)
     ),
     prompt   = sprintf(
-      "The Mann-Whitney test %s a significant difference between %s (Mdn = %.2f) and %s (Mdn = %.2f), U = %.0f, p %s, r = %.2f%s (%s effect). Interpret the direction and practical significance.",
+      "The Mann-Whitney test %s a significant difference between %s (Mdn = %.2f) and %s (Mdn = %.2f), U = %.0f, p %s, r = %.2f%s (%s effect%s). Interpret the direction and practical significance.",
       if (wt$p.value < .05) "revealed" else "did not reveal",
       groups[1], stats::median(g1),
       groups[2], stats::median(g2),
       wt$statistic, sframe_p_string(wt$p.value),
-      r, sframe_ci_string(r_ci), sframe_effect_label(r, "r")
+      r, sframe_ci_string(r_ci), sframe_effect_label(r, "r"),
+      sframe_higher_group(r, groups)
     )
   )
 }
@@ -548,18 +559,18 @@ sframe_run_t_test <- function(data, vars, options = list(), instrument = NULL) {
     d_ci     = d_ci,
     effect_label = sframe_effect_label(d, "d"),
     apa      = sprintf(
-      "t(%.2f) = %.2f, p %s, d = %.2f%s",
+      "t(%.2f) = %.2f, p %s, d = %.2f%s%s",
       tt$parameter, tt$statistic, sframe_p_string(tt$p.value), d,
-      sframe_ci_string(d_ci)
+      sframe_ci_string(d_ci), sframe_higher_group(d, groups)
     ),
     prompt   = sprintf(
-      "The independent-samples t-test %s a significant difference between %s (M = %.2f, SD = %.2f) and %s (M = %.2f, SD = %.2f), t(%.2f) = %.2f, p %s, d = %.2f%s (%s effect). Discuss the direction and magnitude.",
+      "The independent-samples t-test %s a significant difference between %s (M = %.2f, SD = %.2f) and %s (M = %.2f, SD = %.2f), t(%.2f) = %.2f, p %s, d = %.2f%s (%s effect%s). Discuss the direction and magnitude.",
       if (tt$p.value < alpha) "revealed" else "did not reveal",
       groups[1], mean(g1), stats::sd(g1),
       groups[2], mean(g2), stats::sd(g2),
       tt$parameter, tt$statistic,
       sframe_p_string(tt$p.value), d, sframe_ci_string(d_ci),
-      sframe_effect_label(d, "d")
+      sframe_effect_label(d, "d"), sframe_higher_group(d, groups)
     )
   )
 }
@@ -730,7 +741,7 @@ sframe_run_wilcoxon_pair <- function(data, vars) {
   V <- sum(signed_ranks[nonzero_differences > 0])
   z <- sframe_signed_rank_z(differences)
   p <- 2 * stats::pnorm(-abs(z))
-  r <- abs(z) / sqrt(n_nonzero)
+  r <- z / sqrt(n_nonzero)
   r_ci <- sframe_signed_rank_r_ci(differences)
   pseudomedian <- unname(wt$estimate)
   pseudomedian_conf_int <- as.numeric(wt$conf.int)
@@ -752,18 +763,20 @@ sframe_run_wilcoxon_pair <- function(data, vars) {
     pseudomedian_conf_int = pseudomedian_conf_int,
     effect_label = sframe_effect_label(r, "r"),
     apa = sprintf(
-      "V = %.0f, z = %.2f, p %s, r = %.2f%s, pseudomedian = %.2f%s",
+      "V = %.0f, z = %.2f, p %s, r = %.2f%s, pseudomedian = %.2f%s%s",
       V, z, sframe_p_string(p), r,
-      sframe_ci_string(r_ci), pseudomedian, sframe_ci_string(pm_ci_named)
+      sframe_ci_string(r_ci), pseudomedian, sframe_ci_string(pm_ci_named),
+      sframe_higher_group(r, vars)
     ),
     prompt = sprintf(
-      "The Wilcoxon signed-rank test %s a significant difference between %s (Mdn = %.2f) and %s (Mdn = %.2f), V = %.0f, z = %.2f, p %s, r = %.2f%s (%s effect). Discuss the direction and practical significance.",
+      "The Wilcoxon signed-rank test %s a significant difference between %s (Mdn = %.2f) and %s (Mdn = %.2f), V = %.0f, z = %.2f, p %s, r = %.2f%s (%s effect%s). Discuss the direction and practical significance.",
       if (p < .05) "revealed" else "did not reveal",
       vars[1], stats::median(x),
       vars[2], stats::median(y),
       V, z,
       sframe_p_string(p),
-      r, sframe_ci_string(r_ci), sframe_effect_label(r, "r")
+      r, sframe_ci_string(r_ci), sframe_effect_label(r, "r"),
+      sframe_higher_group(r, vars)
     )
   )
 }
