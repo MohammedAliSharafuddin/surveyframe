@@ -29,6 +29,12 @@ test_that("the Quarto report was rendered by the build under test", {
     commit <- utils::packageDescription("surveyframe")$RemoteSha %||% ""
   }
   expect_true(grepl(paste0("</strong> ", version), line, fixed = TRUE))
+  # A git source tree always has a commit, so an empty one means the lookup
+  # failed, and skipping the comparison would let a stale build pass.
+  if (nzchar(src) && nzchar(Sys.which("git")) &&
+      file.exists(file.path(src, ".git"))) {
+    expect_true(nzchar(commit), label = "the source tree's commit is known")
+  }
   if (nzchar(commit)) {
     label <- sub("^([0-9a-f]{12})[0-9a-f]*", "\\1", commit)
     expect_true(grepl(paste0("commit <code>", label, "</code>"), line, fixed = TRUE))
