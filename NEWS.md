@@ -133,6 +133,10 @@ style.
 
 ## Analysis
 
+* **The seminr script tests every declared indirect effect.**
+  `seminr_syntax()` writes one `specific_effect_significance()` call per
+  `sf_indirect()`, as the lavaan syntax already defined each one.
+
 * **EFA reads factor item columns by their labels.** `efa_report()` and
   `efa_solution()` read item columns with the same rule as every other
   numeric method, so a factor holding 10 to 50 counts as those values, where
