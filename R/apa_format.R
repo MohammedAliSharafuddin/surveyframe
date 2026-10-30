@@ -103,3 +103,24 @@ sframe_apa_cells <- function(x, digits = 2) {
   }
   x
 }
+
+# Result text as HTML: escaped, Latin statistical symbols in italics, r_s and
+# d_z with subscripts, tau and phi as Greek letters, chi-square as its symbol
+# (CX-24). A symbol is marked only where a value follows it, so words in the
+# sentence are left alone.
+sframe_apa_html <- function(x) {
+  if (length(x) == 0) return(character(0))
+  x <- vapply(as.character(x), htmltools_escape, character(1), USE.NAMES = FALSE)
+  follows <- "(?=(\\([^()]*\\))? (=|&lt;|&gt;) )"
+  before <- "(?<![A-Za-z_>])"
+  x <- gsub("chi-square(?=\\()", "\u03c7\u00b2", x, perl = TRUE)
+  x <- gsub(paste0(before, "tau", follows), "\u03c4", x, perl = TRUE)
+  x <- gsub(paste0(before, "phi", follows), "\u03c6", x, perl = TRUE)
+  x <- gsub("Cramer's V", "Cram\u00e9r's V", x, fixed = TRUE)
+  x <- gsub(paste0(before, "(r|d)_([a-z])", follows),
+            "<em>\\1</em><sub>\\2</sub>", x, perl = TRUE)
+  x <- gsub(paste0(before, "R(?=\u00b2", substring(follows, 4)),
+            "<em>R</em>", x, perl = TRUE)
+  gsub(paste0(before, "(SD|SE|t|F|p|r|d|U|V|W|H|z|M|N|n|Q|b|k)", follows),
+       "<em>\\1</em>", x, perl = TRUE)
+}

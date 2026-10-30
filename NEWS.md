@@ -281,6 +281,10 @@ style.
   numbers show 2 decimals, and a missing value is a blank cell, in
   `render_report()`, `render_results()` and `render_result()` alike. The new
   `sframe_apa_cells()` does it (CX-15).
+* **Result text in an HTML report sets its symbols as APA 7 does.** t, F,
+  p, r, d, N and the other Latin symbols are italic, `r_s` and `d_z` print
+  with a subscript, tau and phi as Greek letters and chi-square as its
+  symbol. The text was plain in all 3 HTML renderers (CX-24).
 * **The built-in report prints each research question's hypotheses and
   decision rule before its result.** H0 and H1 print where written, then
   the planned decision rule, then the result, then the interpretation,
