@@ -133,6 +133,12 @@ style.
 
 ## Analysis
 
+* **A two-group test takes its groups in the declared order.** The
+  independent t test and Mann-Whitney ordered the 2 groups by first
+  appearance in the data, so re-sorting the responses flipped the sign of t
+  and z. The order is now the grouping item's choice set as the instrument
+  lists it, then factor levels, then sorted values. The code
+  `analysis_syntax()` writes names the same order.
 * **A statistic is never replaced by a choice label.** A result table read
   every text cell through the instrument's labels, so a statistic equal to a
   choice code took that code's label: the `factor_structure` demo's "Suggested

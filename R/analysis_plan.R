@@ -221,6 +221,25 @@ sframe_cohens_d <- function(x, y) {
   abs(mean(x, na.rm = TRUE) - mean(y, na.rm = TRUE)) / pooled_sd
 }
 
+# The 2 (or more) groups of a grouping column in their declared order: the
+# codes of the item's choice set as the instrument lists them, then factor
+# levels, then sorted values. Never row order, so re-sorting the responses
+# cannot flip the sign of a test. Values the choice set does not list follow
+# its codes, sorted.
+sframe_group_order <- function(x, instrument = NULL, group_col = NULL) {
+  present <- x[!is.na(x)]
+  if (is.factor(present)) present <- as.character(droplevels(present))
+  values <- unique(present)
+  shown <- as.character(values)
+  declared <- if (!is.null(group_col)) {
+    names(sframe_item_value_labels(instrument, group_col))
+  } else character(0)
+  if (length(declared) == 0 && is.factor(x)) declared <- levels(x)
+  first <- declared[declared %in% shown]
+  rest <- sort(values[!shown %in% declared])
+  c(values[match(first, shown)], rest)
+}
+
 sframe_effect_label <- function(d, type = "d") {
   if (is.na(d)) return("could not be computed")
   if (type == "d") {
@@ -440,10 +459,10 @@ sframe_run_crosstab <- function(data, vars, options = list()) {
   )
 }
 
-sframe_run_mann_whitney <- function(data, vars) {
+sframe_run_mann_whitney <- function(data, vars, instrument = NULL) {
   group_col <- vars[1]
   outcome_col <- vars[2]
-  groups <- unique(data[[group_col]][!is.na(data[[group_col]])])
+  groups <- sframe_group_order(data[[group_col]], instrument, group_col)
   if (length(groups) != 2) {
     return(list(test = "mann_whitney",
                 error = "Mann-Whitney requires exactly two groups."))
@@ -496,12 +515,12 @@ sframe_run_mann_whitney <- function(data, vars) {
   )
 }
 
-sframe_run_t_test <- function(data, vars, options = list()) {
+sframe_run_t_test <- function(data, vars, options = list(), instrument = NULL) {
   alpha <- options$alpha %||% 0.05
   var_equal <- isTRUE(options$var_equal)
   group_col <- vars[1]
   outcome_col <- vars[2]
-  groups <- unique(data[[group_col]][!is.na(data[[group_col]])])
+  groups <- sframe_group_order(data[[group_col]], instrument, group_col)
   if (length(groups) != 2) {
     return(list(test = "t_test_ind",
                 error = "Independent t-test requires exactly two groups."))
@@ -1580,8 +1599,8 @@ sframe_run_one_block <- function(block, data, instrument, plots = FALSE,
       fisher_exact       = sframe_run_fisher(data, roles, options),
       mcnemar            = sframe_run_mcnemar(data, roles, options),
       cochran_q          = sframe_run_cochran_q(data, roles),
-      mann_whitney       = sframe_run_mann_whitney(data, vars),
-      t_test_ind         = sframe_run_t_test(data, vars, options),
+      mann_whitney       = sframe_run_mann_whitney(data, vars, instrument),
+      t_test_ind         = sframe_run_t_test(data, vars, options, instrument),
       t_test_pair        = sframe_run_t_test_pair(data, vars),
       kruskal_wallis     = sframe_run_kruskal(data, vars),
       anova_one          = sframe_run_anova_one(data, vars, options),

@@ -45,13 +45,14 @@ sframe_code_num <- function(frame, name) {
 }
 
 # The 2 group vectors the independent t test and Mann-Whitney runners build.
-# They take the groups in order of first appearance and drop missing values
-# within each, which is a different order from the formula interface's sorted
-# levels, and a different p from a formula call on a tied sample.
-sframe_code_two_groups <- function(group_expr, outcome_expr) {
+# They take the groups in the declared order the runner recorded (the choice
+# set's order, then factor levels, then sorted values) and drop missing values
+# within each, which can differ from the formula interface's sorted levels,
+# and gives a different p from a formula call on a tied sample.
+sframe_code_two_groups <- function(group_expr, outcome_expr, groups) {
   c(sprintf("group   <- as.character(%s)", group_expr),
     sprintf("outcome <- %s", outcome_expr),
-    "levels_seen <- unique(group[!is.na(group)])",
+    sprintf("levels_seen <- %s", sframe_code_value(as.character(groups))),
     "g1 <- outcome[group == levels_seen[1]]; g1 <- g1[!is.na(g1)]",
     "g2 <- outcome[group == levels_seen[2]]; g2 <- g2[!is.na(g2)]")
 }
@@ -84,7 +85,7 @@ sframe_syntax_call <- function(result, frame = "scored") {
   switch(test,
     t_test_ind = {
       var_equal <- isTRUE(opts$var_equal)
-      c(sframe_code_two_groups(col(1), num(2)),
+      c(sframe_code_two_groups(col(1), num(2), result$groups),
         sprintf("t.test(g1, g2, var.equal = %s)",
                 sframe_code_value(var_equal)))
     },
@@ -96,7 +97,7 @@ sframe_syntax_call <- function(result, frame = "scored") {
       "t.test(x, y, paired = TRUE)"
     ),
     mann_whitney = c(
-      sframe_code_two_groups(col(1), num(2)),
+      sframe_code_two_groups(col(1), num(2), result$groups),
       "wilcox.test(g1, g2, exact = FALSE, correct = FALSE, conf.int = TRUE)"
     ),
     wilcoxon_pair = c(
