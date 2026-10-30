@@ -147,9 +147,72 @@ sframe_humanize_table <- function(tbl, lookup, exclude_cols = character(0)) {
   char_cols <- vapply(tbl, is.character, logical(1))
   char_cols[orig_names %in% exclude_cols] <- FALSE
   tbl[char_cols] <- lapply(tbl[char_cols], function(x) {
-    relabel(x, if (response_col(x)) lookup else ids_only)
+    sframe_label_terms(relabel(x, if (response_col(x)) lookup else ids_only), ids_only)
   })
   tbl
+}
+
+# An interaction term such as attendee_role:format as its labels joined by a
+# times sign (CX-20). A cell whose parts are not all ids is left alone.
+sframe_label_terms <- function(x, ids) {
+  if (!length(ids)) return(x)
+  vapply(x, function(s) {
+    if (is.na(s) || !grepl(":", s, fixed = TRUE)) return(s)
+    parts <- strsplit(s, ":", fixed = TRUE)[[1]]
+    if (length(parts) < 2 || !all(parts %in% names(ids))) return(s)
+    paste(unname(ids[parts]), collapse = " \u00d7 ")
+  }, character(1), USE.NAMES = FALSE)
+}
+
+# Result text names a variable by its label in the instrument and a group by
+# its choice label, as the tables and charts beside it do (CX-20). Each
+# runner puts the name in where it puts the id, so the template's own words
+# stay as they are. The instrument is set once around the runner call.
+.sframe_text_label_env <- new.env(parent = emptyenv())
+
+.sframe_with_text_labels <- function(instrument, code) {
+  old <- as.list(.sframe_text_label_env)
+  .sframe_text_label_env$instrument <- instrument
+  .sframe_text_label_env$lookup <- sframe_label_lookup(instrument)
+  on.exit({
+    .sframe_text_label_env$instrument <- old$instrument
+    .sframe_text_label_env$lookup <- old$lookup
+  }, add = TRUE)
+  force(code)
+}
+
+# A variable as result text names it: its label in double quotes, since a
+# label is often a question, or the id where it has none. A choice column
+# from a multiple-response item (`item__code`) reads as the item's label and
+# the choice's label, after a colon unless the item label ends a sentence.
+sframe_text_var <- function(id) {
+  lookup <- .sframe_text_label_env$lookup
+  # A label's own double quotes become single ones, as APA 7 nests them,
+  # so "He said 'yes' today" reads unambiguously.
+  in_quotes <- function(s) paste0("\"", gsub("\"", "'", s, fixed = TRUE), "\"")
+  ids <- lookup[setdiff(names(lookup), attr(lookup, "codes"))]
+  vapply(as.character(id), function(i) {
+    if (is.na(i)) return(i)
+    if (i %in% names(ids)) return(in_quotes(ids[[i]]))
+    cut <- regexpr("__", i, fixed = TRUE)
+    if (cut > 0) {
+      base <- substr(i, 1, cut - 1)
+      opt <- substr(i, cut + 2, nchar(i))
+      if (base %in% names(ids)) {
+        sep <- if (grepl("[?.!:]$", ids[[base]])) " " else ": "
+        return(in_quotes(paste0(ids[[base]], sep, sframe_text_value(base, opt))))
+      }
+    }
+    i
+  }, character(1), USE.NAMES = FALSE)
+}
+
+# A coded value of `item` as its choice label, or the code where the item's
+# choice set has none.
+sframe_text_value <- function(item, code) {
+  labs <- sframe_item_value_labels(.sframe_text_label_env$instrument, item)
+  code <- as.character(code)
+  ifelse(!is.na(code) & code %in% names(labs), unname(labs[code]), code)
 }
 
 # One seam for optional-package availability checks. Besides keeping runners

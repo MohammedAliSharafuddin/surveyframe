@@ -29,7 +29,7 @@
 "RQ3","anova_two","partial_eta_sq [2]","0.000199353"
 "RQ3","anova_two","partial_eta_sq [3]","0.0673256"
 "RQ3","anova_two","partial_eta_sq [4]","NA"
-"RQ4","ancova","apa","Adjusted for age, the group effect was F(2, 71) = 8.21, p < .001."
+"RQ4","ancova","apa","Adjusted for ""How old are you?"", the group effect was F(2, 71) = 8.21, p < .001."
 "RQ4","ancova","df [1]","2"
 "RQ4","ancova","df [2]","1"
 "RQ4","ancova","df [3]","71"

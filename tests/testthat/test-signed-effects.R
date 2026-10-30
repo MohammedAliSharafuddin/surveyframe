@@ -55,8 +55,8 @@ test_that("the t test reports a signed d and names the higher group", {
   expect_lt(res$d_ci[["upper"]], 0)
   expect_equal(res$effect_label, "large")
   expect_match(res$apa, "d = -", fixed = TRUE)
-  expect_match(res$apa, "higher in ctrl", fixed = TRUE)
-  expect_match(res$prompt, "higher in ctrl", fixed = TRUE)
+  expect_match(res$apa, "higher in Control", fixed = TRUE)
+  expect_match(res$prompt, "higher in Control", fixed = TRUE)
 })
 
 test_that("Mann-Whitney reports a signed r and names the higher group", {
@@ -66,7 +66,7 @@ test_that("Mann-Whitney reports a signed r and names the higher group", {
   expect_lt(res$r_ci[["upper"]], 0)
   expect_equal(res$effect_label, "large")
   expect_match(res$apa, "r = -", fixed = TRUE)
-  expect_match(res$apa, "higher in ctrl", fixed = TRUE)
+  expect_match(res$apa, "higher in Control", fixed = TRUE)
 })
 
 test_that("the Wilcoxon r is signed by the differences", {

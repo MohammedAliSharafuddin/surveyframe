@@ -371,7 +371,7 @@ sframe_run_frequency <- function(data, vars, weights = NULL, instrument = NULL) 
     tables   = parts,
     table    = stacked,
     apa      = paste(vapply(vars, function(col) {
-      sprintf("Frequency distribution for %s (N = %d).", col,
+      sprintf("Frequency distribution for %s (N = %d).", sframe_text_var(col),
               sum(parts[[col]]$table$Frequency))
     }, character(1)), collapse = " "),
     prompt   = "Describe each distribution. Note any dominant category and whether the distribution was expected."
@@ -438,7 +438,7 @@ sframe_frequency_one <- function(data, col, weights = NULL, instrument = NULL) {
       stringsAsFactors = FALSE
     ),
     weighted_table = weighted,
-    apa       = sprintf("Frequency distribution for %s (N = %d).", col, total),
+    apa       = sprintf("Frequency distribution for %s (N = %d).", sframe_text_var(col), total),
     prompt    = "Describe the distribution. Note any dominant category and whether the distribution was expected."
   )
 }
@@ -512,7 +512,7 @@ sframe_run_crosstab <- function(data, vars, options = list()) {
     prompt   = sprintf(
       "The chi-square test %s a significant association between %s and %s (%s = %.2f%s, %s effect). Describe the pattern in the cross-tabulation.",
       if (ct$p.value < .05) "revealed" else "found no",
-      vars[1], vars[2], effect_name, effect, sframe_ci_string(v_ci),
+      sframe_text_var(vars[1]), sframe_text_var(vars[2]), effect_name, effect, sframe_ci_string(v_ci),
       sframe_effect_label(effect, "r")
     ),
     p_method = if (isTRUE(options$simulate_p_value) && any(ct$expected < 5)) "simulated" else "asymptotic",
@@ -538,6 +538,7 @@ sframe_run_mann_whitney <- function(data, vars, instrument = NULL) {
   g1 <- sframe_num((data[[outcome_col]][data[[group_col]] == groups[1]]))
   g2 <- sframe_num((data[[outcome_col]][data[[group_col]] == groups[2]]))
   g1 <- g1[!is.na(g1)]; g2 <- g2[!is.na(g2)]
+  shown <- sframe_text_value(group_col, groups)
   wt <- tryCatch(
     stats::wilcox.test(g1, g2, exact = FALSE, correct = FALSE, conf.int = TRUE),
     error = function(e) e
@@ -571,16 +572,16 @@ sframe_run_mann_whitney <- function(data, vars, instrument = NULL) {
       "U = %.0f, z = %.2f, p %s, r = %.2f%s, Hodges-Lehmann shift = %.2f%s%s",
       wt$statistic, z, sframe_p_string(wt$p.value), r,
       sframe_ci_string(r_ci), hl_shift, sframe_ci_string(hl_ci_named),
-      sframe_higher_group(r, groups)
+      sframe_higher_group(r, shown)
     ),
     prompt   = sprintf(
       "The Mann-Whitney test %s a significant difference between %s (Mdn = %.2f) and %s (Mdn = %.2f), U = %.0f, p %s, r = %.2f%s (%s effect%s). Interpret the direction and practical significance.",
       if (wt$p.value < .05) "revealed" else "did not reveal",
-      groups[1], stats::median(g1),
-      groups[2], stats::median(g2),
+      shown[1], stats::median(g1),
+      shown[2], stats::median(g2),
       wt$statistic, sframe_p_string(wt$p.value),
       r, sframe_ci_string(r_ci), sframe_effect_label(r, "r"),
-      sframe_higher_group(r, groups)
+      sframe_higher_group(r, shown)
     )
   )
 }
@@ -598,6 +599,7 @@ sframe_run_t_test <- function(data, vars, options = list(), instrument = NULL) {
   g1 <- sframe_num((data[[outcome_col]][data[[group_col]] == groups[1]]))
   g2 <- sframe_num((data[[outcome_col]][data[[group_col]] == groups[2]]))
   g1 <- g1[!is.na(g1)]; g2 <- g2[!is.na(g2)]
+  shown <- sframe_text_value(group_col, groups)
   tt <- tryCatch(stats::t.test(g1, g2, var.equal = var_equal), error = function(e) e)
   if (inherits(tt, "error")) {
     return(list(test = "t_test_ind", error = sframe_test_failure(tt, data, outcome_col)))
@@ -620,16 +622,16 @@ sframe_run_t_test <- function(data, vars, options = list(), instrument = NULL) {
     apa      = sprintf(
       "t(%.2f) = %.2f, p %s, d = %.2f%s%s",
       tt$parameter, tt$statistic, sframe_p_string(tt$p.value), d,
-      sframe_ci_string(d_ci), sframe_higher_group(d, groups)
+      sframe_ci_string(d_ci), sframe_higher_group(d, shown)
     ),
     prompt   = sprintf(
       "The independent-samples t-test %s a significant difference between %s (M = %.2f, SD = %.2f) and %s (M = %.2f, SD = %.2f), t(%.2f) = %.2f, p %s, d = %.2f%s (%s effect%s). Discuss the direction and magnitude.",
       if (tt$p.value < alpha) "revealed" else "did not reveal",
-      groups[1], mean(g1), stats::sd(g1),
-      groups[2], mean(g2), stats::sd(g2),
+      shown[1], mean(g1), stats::sd(g1),
+      shown[2], mean(g2), stats::sd(g2),
       tt$parameter, tt$statistic,
       sframe_p_string(tt$p.value), d, sframe_ci_string(d_ci),
-      sframe_effect_label(d, "d"), sframe_higher_group(d, groups)
+      sframe_effect_label(d, "d"), sframe_higher_group(d, shown)
     )
   )
 }
@@ -666,7 +668,7 @@ sframe_run_anova_one <- function(data, vars, options = list()) {
 
   group_means <- tapply(outcome[complete], group[complete], mean, na.rm = TRUE)
   group_means_str <- paste(
-    paste(names(group_means), sprintf("M=%.2f", group_means), sep = " "),
+    paste(sframe_text_value(vars[1], names(group_means)), sprintf("M=%.2f", group_means), sep = " "),
     collapse = ", "
   )
 
@@ -701,7 +703,7 @@ sframe_run_anova_one <- function(data, vars, options = list()) {
     prompt = sprintf(
       "The one-way ANOVA %s a significant effect of %s on %s, F(%d, %d) = %.2f, p %s, \u03b7\u00b2 = %.3f%s (%s effect). Group means: %s. %s",
       if (!is.na(p_val) && p_val < alpha) "revealed" else "did not reveal",
-      vars[1], vars[2],
+      sframe_text_var(vars[1]), sframe_text_var(vars[2]),
       k - 1, n - k, F_stat, sframe_p_string(p_val),
       eta2, sframe_ci_string(eta_ci), sframe_effect_label(eta2, "eta2"),
       group_means_str,
@@ -756,16 +758,16 @@ sframe_run_t_test_pair <- function(data, vars) {
       "t(%d) = %.2f, p %s, d_z = %.2f%s%s",
       unname(tt$parameter), unname(tt$statistic),
       sframe_p_string(tt$p.value), dz, sframe_ci_string(d_ci),
-      sframe_higher_group(dz, vars)
+      sframe_higher_group(dz, sframe_text_var(vars))
     ),
     prompt = sprintf(
       "The paired-samples t-test %s a significant mean difference between %s (M = %.2f) and %s (M = %.2f), t(%d) = %.2f, p %s, d_z = %.2f%s (%s effect%s). Interpret the direction and practical significance of the change.",
       if (tt$p.value < .05) "revealed" else "did not reveal",
-      vars[1], mean(x), vars[2], mean(y),
+      sframe_text_var(vars[1]), mean(x), sframe_text_var(vars[2]), mean(y),
       unname(tt$parameter), unname(tt$statistic),
       sframe_p_string(tt$p.value),
       dz, sframe_ci_string(d_ci), sframe_effect_label(abs(dz), "d"),
-      sframe_higher_group(dz, vars)
+      sframe_higher_group(dz, sframe_text_var(vars))
     )
   )
 }
@@ -827,17 +829,17 @@ sframe_run_wilcoxon_pair <- function(data, vars) {
       "V = %.0f, z = %.2f, p %s, r = %.2f%s, pseudomedian = %.2f%s%s",
       V, z, sframe_p_string(p), r,
       sframe_ci_string(r_ci), pseudomedian, sframe_ci_string(pm_ci_named),
-      sframe_higher_group(r, vars)
+      sframe_higher_group(r, sframe_text_var(vars))
     ),
     prompt = sprintf(
       "The Wilcoxon signed-rank test %s a significant difference between %s (Mdn = %.2f) and %s (Mdn = %.2f), V = %.0f, z = %.2f, p %s, r = %.2f%s (%s effect%s). Discuss the direction and practical significance.",
       if (p < .05) "revealed" else "did not reveal",
-      vars[1], stats::median(x),
-      vars[2], stats::median(y),
+      sframe_text_var(vars[1]), stats::median(x),
+      sframe_text_var(vars[2]), stats::median(y),
       V, z,
       sframe_p_string(p),
       r, sframe_ci_string(r_ci), sframe_effect_label(r, "r"),
-      sframe_higher_group(r, vars)
+      sframe_higher_group(r, sframe_text_var(vars))
     )
   )
 }
@@ -926,7 +928,7 @@ sframe_run_correlation <- function(data, vars, method = "pearson") {
       if (r > 0) "positive" else "negative",
       sframe_effect_label(abs(r), "r"),
       if (ct$p.value < .05) "significant" else "non-significant",
-      vars[1], vars[2],
+      sframe_text_var(vars[1]), sframe_text_var(vars[2]),
       head, r, sframe_ci_string(ci), sframe_p_string(ct$p.value), tail
     )
   )
@@ -1736,11 +1738,13 @@ sframe_run_one_block <- function(block, data, instrument, plots = FALSE,
   # nothing and report N = 0 as a result. It reports why, as an error.
   unread <- sframe_unread_roles_problem(test, roles, block)
   absent <- if (is.null(unread)) sframe_missing_variables_problem(vars, data, instrument)
+  # Runners name variables and groups by their labels in result text, set
+  # once here for every runner (CX-20).
   result <- if (!is.null(unread)) {
     list(test = test, error = paste0("No variables to analyse: ", unread))
   } else if (!is.null(absent)) {
     list(test = test, error = absent)
-  } else tryCatch({
+  } else .sframe_with_text_labels(instrument, tryCatch({
     switch(test,
       frequency          = sframe_run_frequency(data, vars, weights = options$weights, instrument = instrument),
       descriptives       = sframe_run_descriptives_result(data, roles, options, instrument),
@@ -1822,7 +1826,7 @@ sframe_run_one_block <- function(block, data, instrument, plots = FALSE,
     )
   }, error = function(e) {
     list(test = test, error = sframe_condition_error(e, data, roles, vars))
-  })
+  }))
   if (!is.null(result$error)) {
     result$error <- sframe_block_error(result$error, block$id, test)
   }

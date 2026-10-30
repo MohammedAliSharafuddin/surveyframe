@@ -140,7 +140,7 @@ test_that("term_freq runs end to end through run_analysis_plan and humanizes cle
   expect_null(result$error)
   expect_true(is.data.frame(result$table))
   expect_true(all(c("term", "n", "pct") %in% names(result$table)))
-  expect_match(result$apa, "Term frequency for comments")
+  expect_match(result$apa, "Term frequency for \"Any comments about your stay?\"", fixed = TRUE)
 })
 
 test_that("term_freq below the minimum-response floor errors rather than computing", {

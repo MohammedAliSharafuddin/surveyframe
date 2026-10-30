@@ -64,8 +64,8 @@ test_that("1: a frequency block gives one table per variable", {
   # The combined table names the variable on every row
   expect_true("Variable" %in% names(res$table))
   expect_setequal(unique(res$table$Variable), c("Gender", "Region"))
-  expect_match(res$apa, "gender", fixed = TRUE)
-  expect_match(res$apa, "region", fixed = TRUE)
+  expect_match(res$apa, "\"Gender\"", fixed = TRUE)
+  expect_match(res$apa, "\"Region\"", fixed = TRUE)
 })
 
 test_that("1: a frequency block reads the `variables` role as well", {
@@ -128,7 +128,7 @@ test_that("3: descriptives never reports a mean for a nominal item", {
   female <- cat_tbl[cat_tbl$Variable == "Gender" & cat_tbl$Code == "2", ]
   expect_identical(female$Frequency, 6L)
   expect_equal(female$Percent, 60)
-  expect_match(res$note, "gender is a choice item", fixed = TRUE)
+  expect_match(res$note, "\"Gender\" is a choice item", fixed = TRUE)
 })
 
 test_that("3: descriptives on choice items alone gives counts, not an error", {
