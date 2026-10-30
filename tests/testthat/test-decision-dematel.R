@@ -152,7 +152,7 @@ test_that("a collected influence item runs end to end", {
                                           decreasing = TRUE))
   expect_match(res$apa, "DEMATEL classified 4 criteria")
   expect_true(nzchar(res$prompt))
-  expect_true(any(grepl("arithmetic mean of 2 respondent", res$notes)))
+  expect_true(any(grepl("judgements of 2 respondents via", res$notes)))
 })
 
 test_that("a researcher-supplied matrix takes precedence over a collected item", {

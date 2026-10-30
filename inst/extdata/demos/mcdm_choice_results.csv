@@ -8,7 +8,7 @@
 "RQ1","ahp","Rank [2]","2"
 "RQ1","ahp","Rank [3]","3"
 "RQ1","ahp","Rank [4]","4"
-"RQ2","anp","apa","ANP resolved the limiting priorities of a 4-node comparison network after 7 power-iteration step(s). 'cost' carried the highest limiting weight (0.389)."
+"RQ2","anp","apa","ANP resolved the limiting priorities of a 4-node comparison network after 7 power-iteration steps. 'cost' carried the highest limiting weight (0.389)."
 "RQ2","anp","Weight [1]","0.3892"
 "RQ2","anp","Weight [2]","0.254"
 "RQ2","anp","Weight [3]","0.2109"

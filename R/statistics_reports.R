@@ -1078,8 +1078,8 @@ sframe_run_descriptives_result <- function(data, roles, options = list(),
       table = cat_tbl,
       categorical = cat_tbl,
       note = note,
-      apa = paste(sprintf("Counts and percentages were computed for %d choice column(s).",
-                          length(categorical)), note),
+      apa = paste(sprintf("Counts and percentages were computed for %s.",
+                          sframe_count_noun(length(categorical), "choice column")), note),
       prompt = "Report the count and percentage for each category, and note any dominant category."
     ))
   }

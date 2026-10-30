@@ -277,7 +277,7 @@ test_that("a weight vector of the wrong length is reported, not recycled", {
     data.frame(crit_points__service = 60, crit_points__price = 40),
     study, scored = FALSE
   )[["RQ1"]]
-  expect_match(res$error, "weights 2 criterion/criteria but the performance")
+  expect_match(res$error, "weights 2 criteria but the performance matrix has 3 columns")
 })
 
 test_that("the frequency weighting role is never folded into decision options", {

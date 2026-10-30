@@ -191,8 +191,8 @@ sframe_resolve_decision_inputs <- function(data, roles, options, instrument,
     out$matrix_source <- "collected"
     out$rated <- rated
     out$notes <- c(out$notes, sprintf(
-      "The performance matrix is the respondent %s of %d rated item(s).",
-      rated$statistic, length(performance_items)
+      "The performance matrix is the respondent %s of %s.",
+      rated$statistic, sframe_count_noun(length(performance_items), "rated item")
     ))
   }
   criteria <- colnames(out$matrix)
@@ -217,9 +217,11 @@ sframe_resolve_decision_inputs <- function(data, roles, options, instrument,
     )
     if (length(collected$weights) != ncol(out$matrix)) {
       return(list(error = sprintf(
-        paste0("Item '%s' weights %d criterion/criteria but the performance ",
-               "matrix has %d column(s)."),
-        weights_item[1], length(collected$weights), ncol(out$matrix)
+        paste0("Item '%s' weights %s but the performance ",
+               "matrix has %s."),
+        weights_item[1],
+        sframe_count_noun(length(collected$weights), "criterion", "criteria"),
+        sframe_count_noun(ncol(out$matrix), "column")
       )))
     }
     # Weights follow the matrix by criterion name. A matrix supplied with no
@@ -251,8 +253,8 @@ sframe_resolve_decision_inputs <- function(data, roles, options, instrument,
     out$weights_source <- "collected"
     out$collected_weights <- collected
     out$notes <- c(out$notes, sprintf(
-      "Weights come from %d respondent(s) via item '%s'%s.",
-      collected$n_respondents, collected$item_id,
+      "Weights come from %s via item '%s'%s.",
+      sframe_count_noun(collected$n_respondents, "respondent"), collected$item_id,
       if (collected$n_dropped > 0) {
         sprintf(", with %d dropped as incomplete or inconsistent",
                 collected$n_dropped)
@@ -467,8 +469,8 @@ sframe_resolve_pairwise_matrix <- function(data, roles, options, instrument,
     if (nrow(raw) != ncol(raw)) {
       return(list(error = sprintf(
         paste0("%s needs a square pairwise judgement matrix, but ",
-               "`options$matrix` has %d row(s) and %d column(s)."),
-        method, nrow(raw), ncol(raw)
+               "`options$matrix` has %s and %s."),
+        method, sframe_count_noun(nrow(raw), "row"), sframe_count_noun(ncol(raw), "column")
       )))
     }
     if (anyNA(raw)) {
@@ -480,9 +482,10 @@ sframe_resolve_pairwise_matrix <- function(data, roles, options, instrument,
                              paste0("C", seq_len(nrow(raw))))
     if (length(criteria) != nrow(raw)) {
       return(list(error = sprintf(
-        paste0("`options$criteria` names %d criterion/criteria but ",
-               "`options$matrix` has %d row(s)."),
-        length(criteria), nrow(raw)
+        paste0("`options$criteria` names %s but ",
+               "`options$matrix` has %s."),
+        sframe_count_noun(length(criteria), "criterion", "criteria"),
+        sframe_count_noun(nrow(raw), "row")
       )))
     }
     dimnames(raw) <- list(criteria, criteria)
@@ -533,8 +536,9 @@ sframe_resolve_pairwise_matrix <- function(data, roles, options, instrument,
   out$matrix_source <- "collected"
   out$aggregate <- agg
   out$notes <- c(out$notes, sprintf(
-    "Weights come from %d respondent judgement matrice(s) via item '%s'%s.",
-    agg$n_respondents, pairwise_item[1],
+    "Weights come from %s via item '%s'%s.",
+    sframe_count_noun(agg$n_respondents, "respondent judgement matrix",
+                      "respondent judgement matrices"), pairwise_item[1],
     if (agg$n_dropped_consistency > 0) {
       sprintf(", with %d dropped for a consistency ratio at or above 0.10",
               agg$n_dropped_consistency)
@@ -748,9 +752,10 @@ sframe_run_anp <- function(data, roles, options, instrument) {
     test          = "anp",
     apa           = sprintf(
       paste0("ANP resolved the limiting priorities of a %d-node comparison ",
-             "network after %d power-iteration step(s). '%s' carried the ",
+             "network after %s. '%s' carried the ",
              "highest limiting weight (%.3f)."),
-      length(criteria), fit$iterations, best, max(fit$weights)
+      length(criteria), sframe_count_noun(fit$iterations, "power-iteration step"),
+      best, max(fit$weights)
     ),
     prompt        = paste0(
       "Report the full limiting-priority vector, not the top node alone, ",

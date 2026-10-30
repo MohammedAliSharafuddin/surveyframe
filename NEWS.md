@@ -290,6 +290,10 @@ style.
   as `missing_pct`. Symbols are now italic, `r_s` has its subscript, a
   `_pct` column (a proportion) is headed "(proportion)" and drops its
   leading zero, and other names read as words, in both report engines (CX-24).
+* **Result text counts with real plurals.** "7 power-iteration step(s)",
+  "5 choice column(s)" and the decision methods' notes and errors now read
+  "7 power-iteration steps" and "1 respondent". The demo results are
+  regenerated (CX-24).
 * **The built-in report prints each research question's hypotheses and
   decision rule before its result.** H0 and H1 print where written, then
   the planned decision rule, then the result, then the interpretation,
