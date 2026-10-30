@@ -694,17 +694,19 @@ sframe_run_t_test_pair <- function(data, vars) {
     d_ci = d_ci,
     effect_label = sframe_effect_label(abs(dz), "d"),
     apa = sprintf(
-      "t(%d) = %.2f, p %s, d_z = %.2f%s",
+      "t(%d) = %.2f, p %s, d_z = %.2f%s%s",
       unname(tt$parameter), unname(tt$statistic),
-      sframe_p_string(tt$p.value), dz, sframe_ci_string(d_ci)
+      sframe_p_string(tt$p.value), dz, sframe_ci_string(d_ci),
+      sframe_higher_group(dz, vars)
     ),
     prompt = sprintf(
-      "The paired-samples t-test %s a significant mean difference between %s (M = %.2f) and %s (M = %.2f), t(%d) = %.2f, p %s, d_z = %.2f%s (%s effect). Interpret the direction and practical significance of the change.",
+      "The paired-samples t-test %s a significant mean difference between %s (M = %.2f) and %s (M = %.2f), t(%d) = %.2f, p %s, d_z = %.2f%s (%s effect%s). Interpret the direction and practical significance of the change.",
       if (tt$p.value < .05) "revealed" else "did not reveal",
       vars[1], mean(x), vars[2], mean(y),
       unname(tt$parameter), unname(tt$statistic),
       sframe_p_string(tt$p.value),
-      dz, sframe_ci_string(d_ci), sframe_effect_label(abs(dz), "d")
+      dz, sframe_ci_string(d_ci), sframe_effect_label(abs(dz), "d"),
+      sframe_higher_group(dz, vars)
     )
   )
 }
