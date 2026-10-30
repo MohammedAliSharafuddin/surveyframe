@@ -647,6 +647,12 @@ cat(sprintf("**Instrument hash:** `%s`\n\n", hash_val))
 # instrument this describes, the engine says which of surveyframe's 2
 # renderers produced it, and the seed says what reproducing the numbers takes.
 cat("**Rendering engine:** Quarto\n\n")
+# Quarto renders in its own R process, so the version and commit name the
+# surveyframe that process loaded. RemoteSha is written by remotes and pak.
+sf_desc <- utils::packageDescription("surveyframe")
+sf_sha <- sf_desc$RemoteSha %||% ""
+cat(sprintf("**surveyframe:** %s%s\n\n", sf_desc$Version,
+            if (nzchar(sf_sha)) sprintf(", commit `%s`", substr(sf_sha, 1, 12)) else ""))
 seed_val <- params$analysis_seed
 if (is.null(seed_val) || !nzchar(seed_val)) seed_val <- "not recorded"
 cat(sprintf("**Analysis seed:** `%s`\n\n", seed_val))

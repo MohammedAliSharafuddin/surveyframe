@@ -203,6 +203,11 @@ style.
   block's declaration and interpretation with the built-in engine's helpers
   and hands them to the template, and the `interpretations` help for
   `render_report()` and `render_results()` says what prints where.
+* **A Quarto report records the surveyframe that rendered it.** Its
+  Reproducibility section gives the version, and the commit where the
+  install carries one (`RemoteSha`, written by remotes and pak). Quarto
+  renders in its own R process, which loads the installed package, so this
+  names the code that produced the numbers.
 
 * **`render_report()` shows the report it writes.** In an interactive
   session the new `open = TRUE` default opens it in the viewer pane of
