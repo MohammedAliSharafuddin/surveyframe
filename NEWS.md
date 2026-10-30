@@ -237,6 +237,13 @@ style.
   the respondent goes, so a closed tab can be resumed from the welcome screen.
   The draft is cleared once the response is submitted, and kept when delivery
   fails. SurveyBuilder's exported survey carries the same template.
+* **A draft belongs to the whole instrument, and to a given consent.** The
+  draft's key covers the instrument as exported, less its hash, so a changed
+  choice set or consent text starts afresh. It covered the title, version and
+  items alone. A draft records that consent was given, and resuming goes
+  straight to the questions only then. Otherwise the welcome screen asks for
+  consent first. Drafts held in browsers for a survey already in the field are
+  dropped once it is exported again with this template.
 * **A preview sends nothing to a host either.** `export_static_survey(preview
   = TRUE)` removed the endpoint and the redirect, but a page defining
   `window.sframeSendResponse()` still received the preview's answers while the
