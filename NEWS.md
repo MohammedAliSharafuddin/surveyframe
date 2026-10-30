@@ -231,6 +231,15 @@ style.
 
 ## The exported survey
 
+* **The thank-you screen states delivery, and the message is only thanks.**
+  The screen now opens with a status line the package writes, one for each
+  outcome: recorded, sent but unconfirmed, not sent, or failed. The study's
+  `render$thankyou$message` sits below it in every case except a failed send,
+  so a debrief or contact details reach a Google Sheets respondent too. Before,
+  the package's own text replaced the message there. The default message is now
+  "Thank you for participating." because the old default said "recorded" over
+  a survey with no collector. The `branded_survey` demo no longer claims its
+  feedback was recorded.
 * **A sending screen while the answers are in flight.** The thank-you screen
   said the response had been recorded while it was still being sent.
 * **Confirmed delivery for a host.** A page that defines

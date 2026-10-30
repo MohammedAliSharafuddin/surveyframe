@@ -1195,6 +1195,7 @@ input,textarea,select{font-family:inherit;font-size:15px}
 .ty-ic{font-size:52px;text-align:center;margin-bottom:14px;color:var(--cp)}
 .ty-title{font-family:var(--serif);font-size:27px;font-weight:500;text-align:center;margin-bottom:8px}
 .ty-msg{color:var(--t2);text-align:center;font-size:15px;margin-bottom:22px;white-space:pre-wrap}
+.ty-status{font-weight:600;margin-bottom:10px}
 .ty-note{background:var(--tint);border:1px solid var(--tint-bd);border-radius:6px;
   padding:10px 14px;font-size:13px;color:var(--t2);text-align:center;margin-bottom:16px}
 .ty-acts{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
@@ -2515,10 +2516,10 @@ function renderThankyou(){
   // A failed or unconfirmed send makes the download the only copy anyone can
   // prove exists, so it is offered whatever the designer chose.
   var showDl=(TY.show_download||!hasCollector()||failed||unconfirmed)&&window._lastCsv;
-  var offlineNote=(!hasCollector()&&window._lastCsv)
-    ?'<div class="ty-note">This survey has no online collector. Download your response below and return the file to the researcher.</div>':'';
+  var offlineNote=(!PREVIEW&&!hasCollector()&&window._lastCsv)
+    ?'<div class="ty-note">This survey has no online collector. Download your copy below and return the file to the researcher.</div>':'';
   var failNote=failed
-    ?'<div class="ty-note" role="alert">Your answers could not be sent. They are still held in this page. Try sending them again, or download the file below and return it to the researcher. Leaving or reloading this page loses them.</div>':'';
+    ?'<div class="ty-note" role="alert">Your answers are still held in this page. Try sending them again, or download the file below and return it to the researcher. Leaving or reloading this page loses them.</div>':'';
   var dlBtn=showDl
     ?'<button type="button" class="btn btn-p" onclick="downloadCsv(window._lastCsv.csv,window._lastCsv.name)">Download my response (CSV)</button>':'';
   var retryBtn=failed
@@ -2535,25 +2536,26 @@ function renderThankyou(){
     ?'<a class="btn btn-s" style="text-decoration:none" href="'+esc(TY.redirect_url)+'">Continue</a>':'';
   var title=failed?'Almost done':'Thank You';
   var icon=failed?'&#33;':'&#10004;';
-  // The package's own status wins on a failed or unconfirmed send. A designer's
-  // message is fixed text written before anyone knew how delivery would go, and
-  // a custom "your response has been recorded" put that claim on screen beside
-  // "cannot confirm", which is worse than either alone. Failure already
-  // overrode it; an unconfirmed send is the same case. A custom message is shown
-  // wherever nothing is being claimed about a collector, which is the
-  // download-only survey.
-  var msg=(failed||unconfirmed)
-    ?(failed?'Your answers are complete.'
-            :'Your answers have been sent. Thank you for participating.')
-    :(TY.message||'Your response has been recorded. Thank you for participating.');
+  // Two voices, kept apart. The status line is the package's own and says
+  // what happened to the answers, one line per delivery state, because only
+  // the package knows. The designer's message is written before anyone knows
+  // how delivery will go, so it never states delivery, and it is shown under
+  // the status in every state except a failed send. That keeps a debrief or
+  // contact details in front of a respondent whose send can never be confirmed.
+  var status=PREVIEW?'Preview only. Nothing was sent, and no response was recorded.'
+    :failed?'Your answers could not be sent.'
+    :unconfirmed?'Your answers were sent, and this page cannot confirm the researcher’s collector stored them.'
+    :!hasCollector()?'Your response has not been sent.'
+    :'Your response has been recorded.';
+  var msg=failed?'':(TY.message||'Thank you for participating.');
   var unconfirmedNote=unconfirmed
-    ?'<div class="ty-note">Your answers were sent, and this page cannot confirm '
-     +'the researcher’s collector stored them. Download the file below to '
-     +'keep a copy you can send on if you are asked for one.</div>':'';
+    ?'<div class="ty-note">Download the file below to keep a copy you can '
+     +'send on if you are asked for one.</div>':'';
   el.innerHTML='<div class="card"><div class="card-body">'
     +'<div class="ty-ic">'+icon+'</div>'
     +'<div class="ty-title">'+title+'</div>'
-    +'<div class="ty-msg">'+esc(msg)+'</div>'
+    +'<div class="ty-msg ty-status" role="status">'+esc(status)+'</div>'
+    +(msg?'<div class="ty-msg">'+esc(msg)+'</div>':'')
     +failNote
     +unconfirmedNote
     +offlineNote
@@ -2842,7 +2844,7 @@ function doGet(e) {
 })();
 
 // -- State ------------------------------------------------------------------
-var S={meta:{title:'Untitled Survey',version:'1.0.0',description:'',authors:'',languages:'en'},choices:[],items:[],scales:[],branching:[],checks:[],analysis_plan:[],models:[],render:{mode:'standard',theme:'#2563eb',submit_label:'Submit',welcome:{title:'Welcome to this survey',intro_text:'Thank you for taking part. Your responses will be used for research and reporting purposes.',consent_text:'I understand the purpose of this survey and agree to participate.',consent_required:false,start_label:'Start Survey'},thankyou:{message:'Thank you for completing this survey.',redirect_url:'',show_download:false},header:{institution:'',logo_base64:'',show_progress:true},google_sheets_url:'',google_sheets_endpoint:''}};
+var S={meta:{title:'Untitled Survey',version:'1.0.0',description:'',authors:'',languages:'en'},choices:[],items:[],scales:[],branching:[],checks:[],analysis_plan:[],models:[],render:{mode:'standard',theme:'#2563eb',submit_label:'Submit',welcome:{title:'Welcome to this survey',intro_text:'Thank you for taking part. Your responses will be used for research and reporting purposes.',consent_text:'I understand the purpose of this survey and agree to participate.',consent_required:false,start_label:'Start Survey'},thankyou:{message:'Thank you for participating.',redirect_url:'',show_download:false},header:{institution:'',logo_base64:'',show_progress:true},google_sheets_url:'',google_sheets_endpoint:''}};
 var hist=[],fut=[],selId=null,editRqId=null,pvTab='survey',pvPage=0,dirty=false,lastSaved=null,openedAt=null,dragSrc=null,_cRes=null,anTab='plan';
 
 function snap(){hist.push(JSON.stringify(S));if(hist.length>60)hist.shift();fut=[];setDirty();updHistBtns();}
@@ -3008,7 +3010,7 @@ function openSettings(tab){
   sv('s-wt',w.title||'');sv('s-wi',w.intro_text||'');sv('s-wc',w.consent_text||'');
   sv('s-wsl',w.start_label||'Start Survey');
   var wreq=document.getElementById('s-wreq');if(wreq)wreq.checked=!!w.consent_required;
-  sv('s-tym',ty.message||'Thank you for completing this survey.');sv('s-tyu',ty.redirect_url||'');
+  sv('s-tym',ty.message||'Thank you for participating.');sv('s-tyu',ty.redirect_url||'');
   var tydl=document.getElementById('s-tydl');if(tydl)tydl.checked=!!ty.show_download;
   sv('s-inst',h.institution||'');
   var prog=document.getElementById('s-prog');if(prog)prog.checked=h.show_progress!==false;
@@ -4350,7 +4352,7 @@ function renderPreview(){
     if(!w.intro_text&&!w.consent_text){el.innerHTML='<div style="max-width:620px;margin:0 auto"><div style="background:#fff;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.07);padding:40px;text-align:center;color:var(--t3)"><div style="font-size:32px;margin-bottom:12px">&#128196;</div><p style="font-size:13px">No welcome page configured. <a href="#" onclick="openSettings(\'welcome\');return false" style="color:'+esc(col)+'">Set up welcome page &#8594;</a></p></div></div>';return;}
     el.innerHTML='<div style="max-width:620px;margin:0 auto"><div class="pv-card">'+hdr+'<div class="pv-title">'+esc(w.title||S.meta.title)+'</div>'+(w.intro_text?'<div class="pv-intro">'+esc(w.intro_text).replace(/\n/g,'<br>')+'</div>':'')+(w.consent_text?'<div class="pv-consent">'+esc(w.consent_text)+'</div>':'')+'<div class="pv-submit" style="margin-top:16px"><button type="button" style="background:'+esc(col)+'">'+esc(w.start_label||'Start Survey')+'</button></div></div></div>';return;
   }
-  if(pvTab==='thankyou'){var ty=S.render&&S.render.thankyou?S.render.thankyou:{};el.innerHTML='<div style="max-width:620px;margin:0 auto"><div class="pv-card">'+hdr+'<div class="pv-ty"><div class="pv-ty-ic">&#10003;</div><div class="pv-ty-t">Submitted successfully</div><div class="pv-ty-m">'+esc(ty.message||'Thank you for completing this survey.')+'</div></div></div></div>';return;}
+  if(pvTab==='thankyou'){var ty=S.render&&S.render.thankyou?S.render.thankyou:{};el.innerHTML='<div style="max-width:620px;margin:0 auto"><div class="pv-card">'+hdr+'<div class="pv-ty"><div class="pv-ty-ic">&#10003;</div><div class="pv-ty-t">Submitted successfully</div><div class="pv-ty-m">'+esc(ty.message||'Thank you for participating.')+'</div></div></div></div>';return;}
   if(!S.items.length){el.innerHTML='<div style="max-width:620px;margin:0 auto"><div class="pv-card" style="text-align:center;padding:60px"><p style="color:var(--t3);font-size:13px">Add questions to preview the survey.</p></div></div>';return;}
   var mode=(S.render&&S.render.mode)||'standard';
   var shown=S.items,nav='',eyebrow='',prog='';

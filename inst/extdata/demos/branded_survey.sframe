@@ -2,7 +2,7 @@
   "sframe_format": "1.0",
   "hash": {
     "algo": "sha256",
-    "value": "86e12c227ec32bfdba5010d4eda5ac7d34086ec74284febf074b436df6fd044c"
+    "value": "25d3faba0b90a40da416d32ac0d37d7134b7223e31b6f6fbf394698c0bea84e3"
   },
   "version": "1.0.0",
   "meta": {
@@ -106,7 +106,7 @@
       "start_label": "Start"
     },
     "thankyou": {
-      "message": "Thank you. Your feedback has been recorded.",
+      "message": "Thank you for your feedback.",
       "redirect_url": "",
       "show_download": true
     },

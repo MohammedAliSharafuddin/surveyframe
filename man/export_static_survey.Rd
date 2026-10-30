@@ -75,6 +75,12 @@ POST. It returns a Promise: resolving to \code{true}, or to \code{{confirmed: tr
 shows the response as recorded. Resolving to anything else shows it as sent
 and unconfirmed, and a rejection shows the failure screen with a retry.
 
+The thank-you screen states delivery itself, one line for each outcome:
+recorded, sent but unconfirmed, not sent, or failed. Write
+\code{render$thankyou$message} as thanks, a debrief or contact details, and do
+not state delivery in it. It appears below the status line in every case
+except a failed send, and defaults to "Thank you for participating."
+
 Two settings in the instrument's \code{render} block suit a host too.
 \code{render$thankyou$show_restart = FALSE} hides "Submit another response".
 \code{render$save_draft = TRUE} keeps the answers in the browser's local storage

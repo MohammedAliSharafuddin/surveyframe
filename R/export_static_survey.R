@@ -38,6 +38,12 @@
 #' shows the response as recorded. Resolving to anything else shows it as sent
 #' and unconfirmed, and a rejection shows the failure screen with a retry.
 #'
+#' The thank-you screen states delivery itself, one line for each outcome:
+#' recorded, sent but unconfirmed, not sent, or failed. Write
+#' `render$thankyou$message` as thanks, a debrief or contact details, and do
+#' not state delivery in it. It appears below the status line in every case
+#' except a failed send, and defaults to "Thank you for participating."
+#'
 #' Two settings in the instrument's `render` block suit a host too.
 #' `render$thankyou$show_restart = FALSE` hides "Submit another response".
 #' `render$save_draft = TRUE` keeps the answers in the browser's local storage
@@ -126,8 +132,9 @@ export_static_survey <- function(
     # A redirect would carry the researcher out of the preview to whatever the
     # study points at on completion.
     instrument$render$thankyou$redirect_url <- NULL
-    instrument$render$thankyou$message <-
-      "Preview only. Nothing was sent, and no response was recorded."
+    # The page's own status line says nothing was sent. The study's message
+    # is cleared so the default shows, not wording written for a live run.
+    instrument$render$thankyou$message <- ""
   }
 
   # Fix B: fall back to endpoint stored by the builder if no argument supplied

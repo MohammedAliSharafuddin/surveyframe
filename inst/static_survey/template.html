@@ -51,6 +51,7 @@ input,textarea,select{font-family:inherit;font-size:15px}
 .ty-ic{font-size:52px;text-align:center;margin-bottom:14px;color:var(--cp)}
 .ty-title{font-family:var(--serif);font-size:27px;font-weight:500;text-align:center;margin-bottom:8px}
 .ty-msg{color:var(--t2);text-align:center;font-size:15px;margin-bottom:22px;white-space:pre-wrap}
+.ty-status{font-weight:600;margin-bottom:10px}
 .ty-note{background:var(--tint);border:1px solid var(--tint-bd);border-radius:6px;
   padding:10px 14px;font-size:13px;color:var(--t2);text-align:center;margin-bottom:16px}
 .ty-acts{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
@@ -1371,10 +1372,10 @@ function renderThankyou(){
   // A failed or unconfirmed send makes the download the only copy anyone can
   // prove exists, so it is offered whatever the designer chose.
   var showDl=(TY.show_download||!hasCollector()||failed||unconfirmed)&&window._lastCsv;
-  var offlineNote=(!hasCollector()&&window._lastCsv)
-    ?'<div class="ty-note">This survey has no online collector. Download your response below and return the file to the researcher.</div>':'';
+  var offlineNote=(!PREVIEW&&!hasCollector()&&window._lastCsv)
+    ?'<div class="ty-note">This survey has no online collector. Download your copy below and return the file to the researcher.</div>':'';
   var failNote=failed
-    ?'<div class="ty-note" role="alert">Your answers could not be sent. They are still held in this page. Try sending them again, or download the file below and return it to the researcher. Leaving or reloading this page loses them.</div>':'';
+    ?'<div class="ty-note" role="alert">Your answers are still held in this page. Try sending them again, or download the file below and return it to the researcher. Leaving or reloading this page loses them.</div>':'';
   var dlBtn=showDl
     ?'<button type="button" class="btn btn-p" onclick="downloadCsv(window._lastCsv.csv,window._lastCsv.name)">Download my response (CSV)</button>':'';
   var retryBtn=failed
@@ -1391,25 +1392,26 @@ function renderThankyou(){
     ?'<a class="btn btn-s" style="text-decoration:none" href="'+esc(TY.redirect_url)+'">Continue</a>':'';
   var title=failed?'Almost done':'Thank You';
   var icon=failed?'&#33;':'&#10004;';
-  // The package's own status wins on a failed or unconfirmed send. A designer's
-  // message is fixed text written before anyone knew how delivery would go, and
-  // a custom "your response has been recorded" put that claim on screen beside
-  // "cannot confirm", which is worse than either alone. Failure already
-  // overrode it; an unconfirmed send is the same case. A custom message is shown
-  // wherever nothing is being claimed about a collector, which is the
-  // download-only survey.
-  var msg=(failed||unconfirmed)
-    ?(failed?'Your answers are complete.'
-            :'Your answers have been sent. Thank you for participating.')
-    :(TY.message||'Your response has been recorded. Thank you for participating.');
+  // Two voices, kept apart. The status line is the package's own and says
+  // what happened to the answers, one line per delivery state, because only
+  // the package knows. The designer's message is written before anyone knows
+  // how delivery will go, so it never states delivery, and it is shown under
+  // the status in every state except a failed send. That keeps a debrief or
+  // contact details in front of a respondent whose send can never be confirmed.
+  var status=PREVIEW?'Preview only. Nothing was sent, and no response was recorded.'
+    :failed?'Your answers could not be sent.'
+    :unconfirmed?'Your answers were sent, and this page cannot confirm the researcher’s collector stored them.'
+    :!hasCollector()?'Your response has not been sent.'
+    :'Your response has been recorded.';
+  var msg=failed?'':(TY.message||'Thank you for participating.');
   var unconfirmedNote=unconfirmed
-    ?'<div class="ty-note">Your answers were sent, and this page cannot confirm '
-     +'the researcher’s collector stored them. Download the file below to '
-     +'keep a copy you can send on if you are asked for one.</div>':'';
+    ?'<div class="ty-note">Download the file below to keep a copy you can '
+     +'send on if you are asked for one.</div>':'';
   el.innerHTML='<div class="card"><div class="card-body">'
     +'<div class="ty-ic">'+icon+'</div>'
     +'<div class="ty-title">'+title+'</div>'
-    +'<div class="ty-msg">'+esc(msg)+'</div>'
+    +'<div class="ty-msg ty-status" role="status">'+esc(status)+'</div>'
+    +(msg?'<div class="ty-msg">'+esc(msg)+'</div>':'')
     +failNote
     +unconfirmedNote
     +offlineNote

@@ -180,7 +180,7 @@ sframe_demo_screens <- function(title) {
       consent_text = "I agree to take part, and for my answers to be used for this study.",
       consent_required = TRUE,
       start_label = "Start"),
-    thankyou = list(message = "Thank you for completing this survey.")
+    thankyou = list(message = "Thank you for participating.")
   )
 }
 
@@ -214,7 +214,7 @@ sframe_demo_branding <- function() {
       consent_required = TRUE,
       start_label = "Start"),
     thankyou = list(
-      message = "Thank you. Your feedback has been recorded.",
+      message = "Thank you for your feedback.",
       redirect_url = "",
       show_download = TRUE),
     header = list(

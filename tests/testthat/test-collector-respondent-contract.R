@@ -75,7 +75,7 @@ test_that("the page claims nothing that is false under the weakest outcome", {
   expect_false(grepl("has been recorded", html, fixed = TRUE))
   expect_false(grepl("saved", html, fixed = TRUE))
   # It says what is true of all three: the answers left the browser.
-  expect_match(html, "have been sent", fixed = TRUE)
+  expect_match(html, "were sent", fixed = TRUE)
   expect_match(html, "cannot confirm", fixed = TRUE)
   # And the copy that survives a non-storing outcome stays reachable.
   expect_match(html, "Download my response", fixed = TRUE)
