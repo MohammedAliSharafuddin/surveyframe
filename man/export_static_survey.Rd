@@ -31,7 +31,8 @@ collection mechanism.}
 
 \item{preview}{Logical. \code{TRUE} exports a survey that collects nothing: the
 collector endpoint and the completion redirect are both removed, and the
-thank-you screen says the response went nowhere. This is what SurveyStudio's
+thank-you screen says the response went nowhere, above the study's own
+message as respondents will read it. This is what SurveyStudio's
 preview uses, which keeps a test answer away from a live study's collector.
 Supplying \code{endpoint_url} alongside it is an error. Defaults to \code{FALSE}.}
 }

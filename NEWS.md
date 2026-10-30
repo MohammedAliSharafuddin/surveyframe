@@ -251,7 +251,9 @@ style.
   the package's own text replaced the message there. The default message is now
   "Thank you for participating." because the old default said "recorded" over
   a survey with no collector. The `branded_survey` demo no longer claims its
-  feedback was recorded.
+  feedback was recorded. A preview export keeps the study's message too, so
+  a researcher sees the text respondents will read, under the status line
+  that says nothing was sent.
 * **A sending screen while the answers are in flight.** The thank-you screen
   said the response had been recorded while it was still being sent.
 * **Confirmed delivery for a host.** A page that defines

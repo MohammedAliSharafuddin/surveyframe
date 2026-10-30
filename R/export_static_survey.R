@@ -67,7 +67,8 @@
 #'   `output_path`. Defaults to `FALSE`.
 #' @param preview Logical. `TRUE` exports a survey that collects nothing: the
 #'   collector endpoint and the completion redirect are both removed, and the
-#'   thank-you screen says the response went nowhere. This is what SurveyStudio's
+#'   thank-you screen says the response went nowhere, above the study's own
+#'   message as respondents will read it. This is what SurveyStudio's
 #'   preview uses, which keeps a test answer away from a live study's collector.
 #'   Supplying `endpoint_url` alongside it is an error. Defaults to `FALSE`.
 #'
@@ -132,9 +133,6 @@ export_static_survey <- function(
     # A redirect would carry the researcher out of the preview to whatever the
     # study points at on completion.
     instrument$render$thankyou$redirect_url <- NULL
-    # The page's own status line says nothing was sent. The study's message
-    # is cleared so the default shows, not wording written for a live run.
-    instrument$render$thankyou$message <- ""
   }
 
   # Fix B: fall back to endpoint stored by the builder if no argument supplied
