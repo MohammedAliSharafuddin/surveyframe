@@ -130,8 +130,11 @@ sframe_syntax_call <- function(result, frame = "scored") {
     ancova = c(
       sprintf("group    <- factor(as.character(%s))", col(1)),
       sprintf("outcome  <- %s", num(2)),
-      sprintf("covariate <- %s", num(3)),
-      "fit <- aov(outcome ~ covariate + group)",
+      sprintf("covariate_%d <- %s", seq_along(vars)[-(1:2)],
+              vapply(seq_along(vars)[-(1:2)], num, character(1))),
+      sprintf("fit <- aov(outcome ~ %s + group)",
+              paste(sprintf("covariate_%d", seq_along(vars)[-(1:2)]),
+                    collapse = " + ")),
       "# drop1() tests each term after the others, which is the adjusted",
       "# group effect an ANCOVA reports.",
       "drop1(fit, test = \"F\")"

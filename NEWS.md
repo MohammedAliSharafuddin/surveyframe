@@ -133,6 +133,10 @@ style.
 
 ## Analysis
 
+* **ANCOVA syntax writes every covariate.** `analysis_syntax()` for an
+  ANCOVA wrote only the first declared covariate, so its F differed from
+  the result. It now writes each one (CX-02).
+
 * **Two-group effect sizes keep their direction.** Cohen's d for the
   independent t test, and r for Mann-Whitney and the Wilcoxon signed-rank
   test, were magnitudes, and their bootstrap intervals were intervals of a
