@@ -215,6 +215,9 @@ style.
 
 ## Validation
 
+* **A plan block's hypotheses must hold text fields named `null` and
+  `alternative`.** `validate_sframe()` accepted any shape there, and a report
+  has nothing to print from a hypothesis that is no text.
 * **A plan block whose roles its method never reads is refused.** A
   frequency block naming its item under `items` ran on nothing and reported
   "Frequency distribution for NA (N = 0)" with an empty table.

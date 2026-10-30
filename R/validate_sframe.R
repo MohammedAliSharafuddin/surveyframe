@@ -182,6 +182,18 @@ sframe_plan_block_problems <- function(plan, known_methods) {
     } else {
       keep(p)
     }
+    # Hypotheses are what the researcher declared before the data, so a
+    # report prints them as written. Any other shape has nothing to print.
+    hyp <- block$hypotheses
+    if (!is.null(hyp)) {
+      hyp_ok <- is.list(hyp) && length(hyp) > 0 && !is.null(names(hyp)) &&
+        all(names(hyp) %in% c("null", "alternative")) &&
+        all(vapply(hyp, function(h) is.character(h) && length(h) == 1, logical(1)))
+      if (!hyp_ok) {
+        keep(paste0(where, "'s hypotheses must be a list holding text fields ",
+                    "named null and alternative."))
+      }
+    }
     roles_ok <- is.list(block$roles) && length(unlist(block$roles)) > 0
     vars_ok <- length(unlist(block$variables)) > 0
     if (!is.null(block$roles) && !is.list(block$roles)) {
