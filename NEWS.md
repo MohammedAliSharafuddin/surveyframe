@@ -426,6 +426,13 @@ style.
   and B read back from `sframe_export_labelled()` as A = 0 and B = 0. A
   `.dta` now holds such codes as 1, 2, 3 in the set's order, each with its
   label. A `.sav` keeps the text codes, which SPSS labels directly.
+* **Names and labels fit SPSS and Stata.** `sframe_export_labelled()` failed
+  on matrix row columns such as `session__Opening keynote` and on long MCDA
+  pair names, and sent long labels to Stata uncut. Such names are now made
+  valid for the format, with a number where 2 would match, and labels over
+  the format's limit are cut. One message lists every change as old -> new,
+  and the table is attached to the returned path as `attr(path, "renamed")`
+  (D10, CX-18).
 
 ## The exported survey
 

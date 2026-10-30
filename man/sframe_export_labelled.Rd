@@ -15,7 +15,10 @@ sframe_export_labelled(data, instrument, path)
 chosen from the extension.}
 }
 \value{
-The path, invisibly.
+The path, invisibly. When any name or label was changed, the path
+carries an attribute \code{"renamed"}, a data frame with the columns \code{kind}
+(\code{"name"}, \code{"variable label"} or \code{"value label"}), \code{column}, \code{old} and
+\code{new}. With no changes there is no message and no attribute.
 }
 \description{
 A plain CSV carries codes. \code{dm_1} arrives in SPSS as a column of integers
@@ -32,6 +35,19 @@ coded with text, such as \code{"a"} and \code{"b"}, is written as 1, 2, 3 in the
 set's declared order, each carrying its label, so the file reads back in
 Stata with the labels intact. A \code{.sav} keeps the text codes, which SPSS
 labels directly.
+}
+
+\section{Names and labels that do not fit the format}{
+
+SPSS and Stata refuse column names with spaces or punctuation, names that
+do not start with a letter, and names over the format's length limit (64
+bytes for SPSS, 32 characters for Stata). Matrix row columns such as
+\verb{session__Opening keynote} are renamed to valid names, with illegal
+characters turned into \verb{_}, a leading \code{v} where the first character is not
+a letter, and a number added where two names would otherwise match. Variable
+labels are cut at 256 bytes for SPSS and 80 characters for Stata, and value
+labels at 120 bytes for SPSS and 80 characters for Stata. Everything else
+keeps its full label. One message lists each change as old -> new.
 }
 
 \examples{
