@@ -16,6 +16,10 @@ draft_instrument <- function(choices = c(Yes = "1", No = "2"),
                      welcome = list(title = "Hi", intro_text = "Welcome.",
                                     consent_text = consent_text,
                                     consent_required = consent_required))
+  # The draft key covers created_at, stamped to the second. Each test builds
+  # the instrument twice, so a second boundary between the 2 calls made them
+  # different instruments and the draft failed to resume.
+  ins$meta$created_at <- "2026-10-30T00:00:00Z"
   ins
 }
 draft_storage <- "window.localStorage = { _d:{},
