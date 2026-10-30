@@ -20,6 +20,7 @@ d12_instrument <- function(plan = NULL) {
 # download)` against a live Chrome session and cleans up afterwards.
 d12_with_studio <- function(ins, code) {
   skip_on_cran()
+  skip_if_not_slow()
   skip_if_not_installed("shiny")
   skip_if_not_installed("chromote")
   skip_if_not_installed("callr")

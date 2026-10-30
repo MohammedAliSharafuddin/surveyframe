@@ -9,6 +9,7 @@
 
 test_that("the Quarto report was rendered by the build under test", {
   skip_on_cran()
+  skip_if_not_slow()
   skip_if(!nzchar(Sys.which("quarto")), "Quarto is not installed")
   old <- options(surveyframe.use_quarto = TRUE)
   on.exit(options(old), add = TRUE)

@@ -23,6 +23,7 @@ test_that("23: the built-in engine uses the instrument's title and authors", {
 
 test_that("23: the Quarto report takes title and authors, and says Rendered", {
   skip_on_cran()
+  skip_if_not_slow()
   skip_if(!nzchar(Sys.which("quarto")), "Quarto not installed")
   d <- sframe_demo("two_group")
   ins <- titled_instrument()

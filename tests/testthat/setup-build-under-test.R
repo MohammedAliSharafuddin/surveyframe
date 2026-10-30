@@ -13,9 +13,18 @@
 # is at hand, and goes first on R_LIBS for the whole run. Every child process
 # inherits it. teardown-build-under-test.R puts R_LIBS back at the end of the
 # run. Under R CMD check the installed package is the build under test and
-# nothing changes.
+# nothing changes. The build serves only the slow tier
+# (helper-slow-tests.R), so the fast tier skips it.
 
 local({
+  # The fast tier renders every report with the built-in engine, in this
+  # process, from the source under test. Quarto would render with the
+  # installed copy, since the build is not made.
+  if (sframe_fast_tier()) {
+    options(sframe.test_use_quarto = list(getOption("surveyframe.use_quarto")),
+            surveyframe.use_quarto = FALSE)
+    return(invisible())
+  }
   if (!nzchar(Sys.which("quarto"))) return(invisible())
   lib <- sframe_build_under_test()
   if (is.na(lib)) return(invisible())

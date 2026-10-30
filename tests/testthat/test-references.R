@@ -200,6 +200,7 @@ test_that("render_results() cites in text and lists each reference once, at the 
 
 test_that("the Quarto report cites in text and lists every reference once, at the end", {
   skip_on_cran()
+  skip_if_not_slow()
   skip_if(!nzchar(Sys.which("quarto")), "Quarto not available")
   d <- sframe_demo("likert_scale")
   instr <- d$instrument

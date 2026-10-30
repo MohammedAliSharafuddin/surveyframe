@@ -19,6 +19,7 @@ test_that("14: an HTML report records its engine", {
 
 test_that("14: a PDF records the engine that built its content, and the print step", {
   skip_on_cran()
+  skip_if_not_slow()
   skip_if_not_installed("pagedown")
   skip_if(!nzchar(Sys.which("google-chrome")) &&
           !nzchar(Sys.which("chromium")) &&
@@ -38,6 +39,7 @@ test_that("14: a PDF records the engine that built its content, and the print st
 
 test_that("14: the announced path is the one that was asked for", {
   skip_on_cran()
+  skip_if_not_slow()
   skip_if_not_installed("pagedown")
   skip_if(!nzchar(Sys.which("google-chrome")) &&
           !nzchar(Sys.which("chromium")) &&
