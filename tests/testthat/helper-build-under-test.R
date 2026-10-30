@@ -1,7 +1,8 @@
-# tests/testthat/helper-quarto-build.R
+# tests/testthat/helper-build-under-test.R
 #
-# Quarto renders a report in its own R process, and that process loads
-# surveyframe with library(), from whatever library comes first. Under
+# Quarto renders a report in its own R process, and a browser test starts
+# Studio or a survey in a callr process. Each loads surveyframe with
+# library(), from whatever library comes first. Under
 # devtools::test() that was the copy installed earlier (6b95ede on
 # 2026-10-30), not the source under test, so a Quarto test ran old analysis
 # code and passed wherever its assertions did not need a new function.
@@ -11,7 +12,10 @@
 # an edit to the source makes a new build. render_report() below shadows the
 # package's own in the test environment, and puts that library first on
 # R_LIBS for the length of the call, restored with on.exit(). Every test that
-# calls render_report() goes through it, Quarto or not.
+# calls render_report() goes through it, Quarto or not. A browser test passes
+# sframe_build_libpath() to callr::r_bg(libpath =) and calls
+# library(surveyframe), never pkgload::load_all(): a browser test that loaded
+# the source passed while the installed Studio could not start (7f846f7).
 #
 # Under R CMD check the tests run beside the installed package under test,
 # so no build is needed. Where a source tree is at hand but cannot be built,
@@ -26,13 +30,18 @@ sframe_build_source <- function() {
       dir.exists(file.path(src, "R"))) src else ""
 }
 
-# The commit the source tree is at, or "" outside a git checkout.
+# The commit the source tree is at, with "-dirty" when the files that
+# install differ from it, or "" outside a git checkout.
 sframe_build_commit <- function(src) {
   if (!nzchar(Sys.which("git"))) return("")
-  out <- tryCatch(suppressWarnings(system2("git", c("-C", shQuote(src), "rev-parse", "HEAD"),
-                                           stdout = TRUE, stderr = FALSE)),
-                  error = function(e) character(0))
-  if (length(out) == 1 && grepl("^[0-9a-f]{40}$", out)) out else ""
+  git <- function(...) tryCatch(
+    suppressWarnings(system2("git", c("-C", shQuote(src), ...),
+                             stdout = TRUE, stderr = FALSE)),
+    error = function(e) character(0))
+  out <- git("rev-parse", "HEAD")
+  if (length(out) != 1 || !grepl("^[0-9a-f]{40}$", out)) return("")
+  changed <- git("status", "--porcelain", "--", sframe_build_parts)
+  if (length(changed) > 0) paste0(out, "-dirty") else out
 }
 
 # The temporary library holding the source under test, NA under R CMD check
@@ -55,7 +64,8 @@ sframe_build_under_test <- function() {
     file.copy(file.path(src, p), copy, recursive = TRUE)
   }
   # RemoteSha is the field remotes and pak write on install, and the report
-  # records it, so a test can see which build rendered it.
+  # records it, so a test can see which build rendered it. A build with
+  # uncommitted changes says so.
   commit <- sframe_build_commit(src)
   if (nzchar(commit)) {
     desc <- read.dcf(file.path(copy, "DESCRIPTION"))
@@ -72,10 +82,19 @@ sframe_build_under_test <- function() {
   if (!identical(status, 0L) ||
       !file.exists(file.path(lib, "surveyframe", "DESCRIPTION"))) {
     unlink(lib, recursive = TRUE)
-    return(paste0("skip: the source under test could not be installed for ",
-                  "Quarto (see ", log, ")"))
+    return(paste0("skip: the source under test could not be installed ",
+                  "(see ", log, ")"))
   }
   lib
+}
+
+# The library path for a callr process that must load the build under test.
+# Under R CMD check the installed package is that build.
+sframe_build_libpath <- function() {
+  lib <- sframe_build_under_test()
+  if (is.na(lib)) return(.libPaths())
+  if (startsWith(lib, "skip:")) testthat::skip(sub("^skip: ", "", lib))
+  c(lib, .libPaths())
 }
 
 sframe_quarto_would_render <- function() {

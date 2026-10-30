@@ -3,9 +3,10 @@
 # Session 2, third report (2026-10-30). Quarto renders in its own R process,
 # which loaded the surveyframe installed earlier rather than the source under
 # test. The report now records the surveyframe version and, where the install
-# carries one, its commit, and this test checks that the Quarto process
-# loaded the build under test. render_report() here is the helper's, which
-# renders through that build (helper-quarto-build.R).
+# carries one, its commit (labelled -dirty when built from uncommitted
+# changes), and this test checks that the Quarto process loaded the build
+# under test. render_report() here is the helper's, which renders through
+# that build (helper-build-under-test.R).
 
 test_that("the Quarto report was rendered by the build under test", {
   skip_on_cran()
@@ -30,7 +31,19 @@ test_that("the Quarto report was rendered by the build under test", {
   }
   expect_true(grepl(paste0("</strong> ", version), line, fixed = TRUE))
   if (nzchar(commit)) {
-    expect_true(grepl(paste0("commit <code>", substr(commit, 1, 12), "</code>"), line,
-                      fixed = TRUE))
+    label <- sub("^([0-9a-f]{12})[0-9a-f]*", "\\1", commit)
+    expect_true(grepl(paste0("commit <code>", label, "</code>"), line, fixed = TRUE))
   }
+})
+
+# Session 2, fourth report. The browser tests started Studio and the survey
+# with pkgload::load_all() from source, the pattern behind 7f846f7, where a
+# browser test passed while the installed Studio could not start.
+test_that("no test starts a child process with load_all()", {
+  files <- list.files(test_path(), pattern = "^test-.*\\.R$", full.names = TRUE)
+  uses <- vapply(files, function(f) {
+    code <- sub("#.*$", "", readLines(f, warn = FALSE))
+    any(grepl(paste0("pkgload", "::load_all("), code, fixed = TRUE))
+  }, logical(1))
+  expect_identical(basename(files[uses]), character(0))
 })
