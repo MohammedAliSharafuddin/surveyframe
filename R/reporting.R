@@ -957,7 +957,8 @@ sframe_clean_interpretations <- function(interpretations) {
       "a { color: var(--sf-accent); }",
       "section { margin: 0 0 28px; padding-bottom: 12px; border-bottom: 1px solid var(--sf-line); }",
       "table { display: block; overflow-x: auto; max-width: 100%%; border-collapse: collapse; margin: 16px 0 2px; font-size: .93em; }",
-      "caption { text-align: left; font-style: italic; font-size: .95em; margin-bottom: 4px; }",
+      "caption { text-align: left; font-size: .95em; margin-bottom: 4px; }",
+      "figure { margin: 16px 0; } figcaption { font-size: .95em; margin-bottom: 4px; }",
       "thead tr { border-top: 2px solid var(--sf-rule); border-bottom: 1px solid var(--sf-rule); }",
       "tbody tr:last-child td { border-bottom: 2px solid var(--sf-rule); }",
       "th, td { border: none; padding: 5px 12px; text-align: left; vertical-align: top; }",
@@ -997,7 +998,8 @@ sframe_clean_interpretations <- function(interpretations) {
     paste(sections, collapse = "\n")
   )
 
-  writeLines(html, output_path)
+  # Every table and figure numbered in reading order (CX-22).
+  writeLines(sframe_apa_number_floats(html), output_path)
   invisible(output_path)
 }
 
@@ -1058,21 +1060,23 @@ sframe_clean_interpretations <- function(interpretations) {
 
     vapply(seq_along(results), function(i) {
       result <- results[[i]]
+      # The table and chart are titled by the block and its question, as
+      # render_result() titles them, not by a generic "Results table" (CX-22).
+      rq_label <- sframe_result_float_title(result, i)
       table_html <- ""
       if (is.data.frame(result$table)) {
-        table_html <- .render_report_table(result$table, "Results table")
+        table_html <- .render_report_table(result$table, rq_label)
       }
       # The chart for this result renders directly under its table, as one
       # unit per research question, rather than in a separate section.
-      rq_label <- result$research_question %||% paste("research question", i)
       plot_html <- ""
       if (!is.null(result$plot)) {
         img <- tryCatch(
           .render_report_ggplot_png(result$plot,
-                                    alt = paste("Chart for", rq_label)),
+                                    alt = paste("Chart of the result for", rq_label)),
           error = function(e) NULL
         )
-        if (!is.null(img)) plot_html <- img
+        if (!is.null(img)) plot_html <- sframe_apa_figure(img, rq_label)
       }
       # Regression diagnostics are four separate panels, not one plot, so
       # they render as four stacked images beneath the main chart rather
@@ -1085,7 +1089,8 @@ sframe_clean_interpretations <- function(interpretations) {
               alt = sprintf("Regression diagnostic panel %d for %s", di, rq_label)),
             error = function(e) NULL
           )
-          img %||% ""
+          sframe_apa_figure(img, sprintf("Regression diagnostic panel %d for %s",
+                                         di, rq_label)) %||% ""
         }, character(1))
         plot_html <- paste(c(plot_html, diag_imgs[diag_imgs != ""]), collapse = "\n")
       }
@@ -1187,7 +1192,7 @@ sframe_clean_interpretations <- function(interpretations) {
 }
 
 # Render a base-R plot to a base64-embedded PNG <img> for the HTML fallback.
-.render_report_plot_png <- function(draw, height = 320) {
+.render_report_plot_png <- function(draw, height = 320, alt = "chart") {
   tmp <- tempfile(fileext = ".png")
   on.exit(unlink(tmp), add = TRUE)
   s <- .sframe_figure_env$settings %||% list()
@@ -1199,8 +1204,8 @@ sframe_clean_interpretations <- function(interpretations) {
   if (!isTRUE(ok) || !file.exists(tmp)) return(NULL)
   raw <- readBin(tmp, "raw", file.info(tmp)$size)
   sprintf(
-    "<img alt=\"distribution\" style=\"max-width:100%%;height:auto\" src=\"data:image/png;base64,%s\">",
-    openssl::base64_encode(raw)
+    "<img alt=\"%s\" style=\"max-width:100%%;height:auto\" src=\"data:image/png;base64,%s\">",
+    htmltools_escape(alt), openssl::base64_encode(raw)
   )
 }
 
@@ -1271,7 +1276,8 @@ sframe_clean_interpretations <- function(interpretations) {
                                          palette = plot_palette)
           img <- .render_report_ggplot_png(gg, alt = paste("Distribution of", g$title))
           if (!is.null(img)) {
-            blocks <- c(blocks, sprintf("<h3>%s</h3>%s", htmltools_escape(g$title), img))
+            blocks <- c(blocks, sprintf("<h3>%s</h3>%s", htmltools_escape(g$title),
+              sframe_apa_figure(img, paste("Distribution of", g$title))))
           }
         }
         # The group's one chart covers every member item.
@@ -1293,7 +1299,8 @@ sframe_clean_interpretations <- function(interpretations) {
       }
       if (!is.null(img)) {
         blocks <- c(blocks, sprintf("<h3>%s</h3>%s",
-          htmltools_escape(item$label %||% item$id), img))
+          htmltools_escape(item$label %||% item$id),
+          sframe_apa_figure(img, paste("Distribution of", item$label %||% item$id))))
       }
       next
     }
@@ -1323,11 +1330,12 @@ sframe_clean_interpretations <- function(interpretations) {
         op <- graphics::par(mar = c(4, 9, 1, 1)); on.exit(graphics::par(op))
         graphics::barplot(rev(picked), horiz = TRUE, las = 1, col = theme,
                           border = "white", xlab = "Respondents")
-      })
+      }, alt = paste("Distribution of", item$label %||% item$id))
       if (!is.null(img)) {
         blocks <- c(blocks, sprintf(
           "<h3>%s</h3><p class=\"hint\">%d respondents, who could pick more than one.</p>%s",
-          htmltools_escape(item$label %||% item$id), n_resp, img))
+          htmltools_escape(item$label %||% item$id), n_resp,
+          sframe_apa_figure(img, paste("Distribution of", item$label %||% item$id))))
       }
       next
     }
@@ -1352,7 +1360,8 @@ sframe_clean_interpretations <- function(interpretations) {
           # ones.
           function() sframe_draw_likert_diverging(freq, theme,
                                                   palette = plot_palette),
-          height = if (length(freq) <= 5) 320 else 320 + 22 * length(freq)
+          height = if (length(freq) <= 5) 320 else 320 + 22 * length(freq),
+          alt = paste("Distribution of", item$label %||% item$id)
         )
       } else if (has_ggplot) {
         # Shares theme_surveyframe() (theme_classic()-based) with every
@@ -1365,7 +1374,7 @@ sframe_clean_interpretations <- function(interpretations) {
           op <- graphics::par(mar = c(4, 11, 1, 1)); on.exit(graphics::par(op))
           graphics::barplot(freq, horiz = TRUE, las = 1, col = theme,
                             border = NA, xlab = "Frequency", cex.names = .8)
-        })
+        }, alt = paste("Distribution of", item$label %||% item$id))
       }
     } else if (t %in% c("numeric", "slider", "rating")) {
       num <- suppressWarnings(as.numeric(col)); num <- num[!is.na(num)]
@@ -1378,12 +1387,13 @@ sframe_clean_interpretations <- function(interpretations) {
           op <- graphics::par(mar = c(4, 4, 1, 1)); on.exit(graphics::par(op))
           graphics::hist(num, col = theme, border = "white", main = NULL,
                          xlab = item$label, ylab = "Count", las = 1)
-        })
+        }, alt = paste("Distribution of", item$label %||% item$id))
       }
     }
     if (!is.null(img)) {
       blocks <- c(blocks, sprintf("<h3>%s</h3>%s",
-        htmltools_escape(item$label %||% item$id), img))
+        htmltools_escape(item$label %||% item$id),
+        sframe_apa_figure(img, paste("Distribution of", item$label %||% item$id))))
     }
   }
 
@@ -1416,11 +1426,12 @@ sframe_clean_interpretations <- function(interpretations) {
         graphics::hist(scores, col = theme, border = "white", main = NULL,
           xlab = paste0(sc$label %||% sc$id, " score"), ylab = "Count", las = 1)
         graphics::abline(v = mean(scores), col = "#dc2626", lwd = 2, lty = 2)
-      })
+      }, alt = paste((sc$label %||% sc$id), "scale score distribution"))
     }
     if (!is.null(img)) {
       blocks <- c(blocks, sprintf("<h3>%s (scale score)</h3>%s",
-        htmltools_escape(sc$label %||% sc$id), img))
+        htmltools_escape(sc$label %||% sc$id),
+        sframe_apa_figure(img, paste("Distribution of", sc$label %||% sc$id, "scale scores"))))
     }
   }
 
@@ -1509,9 +1520,8 @@ sframe_clean_interpretations <- function(interpretations) {
     collapse = "\n"
   )
 
-  cap_html <- if (!is.null(caption) && nzchar(caption)) {
-    sprintf("<caption>%s</caption>", htmltools_escape(caption))
-  } else ""
+  # Numbered with the rest of the document's tables (CX-22).
+  cap_html <- if (!is.null(caption) && nzchar(caption)) sframe_apa_caption(caption) else ""
 
   tbl_html <- sprintf(
     "<table>%s<thead><tr>%s</tr></thead><tbody>%s</tbody></table>",

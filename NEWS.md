@@ -294,6 +294,13 @@ style.
   "5 choice column(s)" and the decision methods' notes and errors now read
   "7 power-iteration steps" and "1 respondent". The demo results are
   regenerated (CX-24).
+* **Tables and figures are numbered, titled and described.** The built-in
+  report, `render_results()` and `render_result()` number every table and
+  figure in reading order as APA 7 does, with the number in bold and an
+  italic title below it. A result's table and chart are titled by the block
+  and its research question instead of "Results table", each chart sits in a
+  figure with a caption, and base graphics charts carry real alt text where
+  every one read "distribution" (CX-22).
 * **The built-in report prints each research question's hypotheses and
   decision rule before its result.** H0 and H1 print where written, then
   the planned decision rule, then the result, then the interpretation,

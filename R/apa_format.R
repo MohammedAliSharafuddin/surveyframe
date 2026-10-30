@@ -155,3 +155,43 @@ sframe_apa_headings <- function(names) {
     htmltools_escape(.sframe_title_case_names(nm))
   }, character(1), USE.NAMES = FALSE)
 }
+
+# Tables and figures (CX-22). A renderer marks each table caption and figure
+# caption with class "sf-apa-caption" and an already escaped title. Once the
+# document is assembled, sframe_apa_number_floats() numbers them in reading
+# order as APA 7 does: the number in bold, the title in italics on the line
+# below, tables and figures counted apart.
+sframe_apa_caption <- function(title) {
+  sprintf("<caption class=\"sf-apa-caption\">%s</caption>", htmltools_escape(title))
+}
+
+sframe_apa_figure <- function(img, title) {
+  if (is.null(img) || !nzchar(img)) return(img)
+  sprintf(
+    "<figure class=\"sf-figure\"><figcaption class=\"sf-apa-caption\">%s</figcaption>%s</figure>",
+    htmltools_escape(title), img)
+}
+
+# A result's table and figure title: its block id and research question.
+sframe_result_float_title <- function(result, i = NULL) {
+  block_id <- as.character(result$block_id %||% "")[1]
+  rq <- as.character(result$research_question %||% "")[1]
+  title <- paste(c(if (nzchar(block_id)) block_id, if (nzchar(rq)) rq), collapse = ": ")
+  if (nzchar(title)) title else paste("Research question", i %||% "")
+}
+
+sframe_apa_number_floats <- function(html) {
+  html <- paste(html, collapse = "\n")
+  re <- "<(caption|figcaption) class=\"sf-apa-caption\">"
+  m <- gregexpr(re, html)
+  hits <- regmatches(html, m)[[1]]
+  if (!length(hits)) return(html)
+  is_table <- startsWith(hits, "<caption")
+  num <- ifelse(is_table, cumsum(is_table), cumsum(!is_table))
+  label <- ifelse(is_table, "Table", "Figure")
+  regmatches(html, m) <- list(sprintf("%s<strong>%s %d</strong><br><em>",
+                                      hits, label, num))
+  # Close the italic title before each marked caption's end tag.
+  gsub("(<(caption|figcaption) class=\"sf-apa-caption\"><strong>[^<]*</strong><br><em>[^<]*)</(caption|figcaption)>",
+       "\\1</em></\\3>", html)
+}
