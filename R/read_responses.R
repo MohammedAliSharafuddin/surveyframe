@@ -256,7 +256,14 @@ sframe_numeric_response_columns <- function(instrument, response_items) {
   numeric_codes <- function(item) {
     for (cs in instrument$choices %||% list()) {
       if (identical(cs$id, item$choice_set)) {
-        return(all(!is.na(suppressWarnings(as.numeric(as.character(cs$values))))))
+        # Codes like "01" read as numbers would lose their leading zero, so
+        # only codes that survive a numeric round trip count as numeric.
+        if (is.numeric(cs$values)) return(TRUE)
+        codes <- trimws(as.character(cs$values))
+        num <- suppressWarnings(as.numeric(codes))
+        back <- vapply(num, format, character(1), scientific = FALSE,
+                       trim = TRUE, digits = 15)
+        return(all(!is.na(num) & back == codes))
       }
     }
     FALSE

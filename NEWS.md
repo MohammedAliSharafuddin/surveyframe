@@ -122,6 +122,12 @@ style.
 * A frequency table labels each code from the item's own choice set. A code
   that means different things in 2 choice sets (1 for Male in one, 1 for
   North in another) used to print as the bare code.
+* **Text codes such as "01" keep their leading zero when responses are read.**
+  `read_responses()` converted every choice column whose codes looked like
+  numbers, so "01" and "02" became 1 and 2, and a frequency table showed the
+  declared options First and Second with a count of 0 beside unlabelled rows
+  1 and 2. Only codes that survive a numeric round trip, such as 1 and 2, are
+  now read as numbers. The rest stay as written.
 * A `descriptives` block counts `single_choice` items and the option columns
   of a `multiple_choice` item, giving each category's count and percentage,
   and keeps the mean and SD for numeric items. A nominal code has no
