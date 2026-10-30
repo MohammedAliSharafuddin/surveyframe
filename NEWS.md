@@ -151,6 +151,12 @@ style.
   names the threshold too. The argument's help says how to check 3-item
   scales, in a call or in a plan.
 
+* **An `efa_solution` block that names a missing item says which.** Its
+  `items` and `variables` roles went unchecked, so a block naming an item the
+  instrument or the responses lack failed with "EFA solution requires at least
+  two available item columns." and never named the item. It now fails the
+  standard check, as other methods do, naming the item.
+
 ## Reports
 
 * **`render_report()` shows the report it writes.** In an interactive
