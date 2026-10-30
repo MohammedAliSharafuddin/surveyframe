@@ -32,8 +32,9 @@
 #' @return A list with `block_id`, `test`, `caption`, `apa`, `table` (a data
 #'   frame), `note`, `supplement` (a list with `table` and `caption`, or
 #'   `NULL`), `chart` (a `ggplot`, or `NULL` where the method has none or
-#'   ggplot2 is absent), `html` (the fragment, for `format = "html"`), and
-#'   `chart_file` (for `"png"` and `"svg"`). A result that failed carries its
+#'   ggplot2 is absent), `html` (the fragment, for `format = "html"`),
+#'   `chart_file` (for `"png"` and `"svg"`) and `syntax` where the result has
+#'   one. A result that failed carries its
 #'   `error`, and `html` shows it.
 #' @export
 #' @seealso [run_analysis_plan()], [render_report()], [sframe_save_figures()]
@@ -70,6 +71,7 @@ render_result <- function(result, data, instrument = NULL,
                       error = function(e) table)
   }
   out$table <- table
+  if (!is.null(result$syntax)) out$syntax <- result$syntax
   out$supplement <- tryCatch(sframe_result_supplement(result), error = function(e) NULL)
   keys <- names(result$citations %||% list())
   out$note <- if (length(keys)) paste0("Method references: ", sframe_intext_citation(keys), ".") else ""

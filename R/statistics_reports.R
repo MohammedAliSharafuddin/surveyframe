@@ -1784,16 +1784,32 @@ sframe_run_multinomial_logistic <- function(data, roles, options = list()) {
   } else {
     NA_real_
   }
+  sm <- summary(fit)
+  co <- sm$coefficients
+  if (is.null(dim(co))) {
+    co <- matrix(co, nrow = 1, dimnames = list(fit$lev[2], names(sm$coefficients)))
+    se <- matrix(sm$standard.errors, nrow = 1, dimnames = dimnames(co))
+  } else {
+    se <- sm$standard.errors
+  }
+  zval <- co / se
+  pval <- 2 * stats::pnorm(-abs(zval))
+  reference <- levels(df[[outcome]])[1]
   list(
     test = "regression_logistic_multinomial",
     vars = vars,
     n = nrow(df),
-    coefficients = summary(fit)$coefficients,
-    odds_ratios = exp(summary(fit)$coefficients),
+    reference = reference,
+    coefficients = co,
+    std_errors = se,
+    z_values = zval,
+    p_values = pval,
+    odds_ratios = exp(co),
+    conf_level = 0.95,
     AIC = stats::AIC(fit),
     pseudo_r2 = pseudo_r2,
     classification_table = as.data.frame.matrix(class_table),
-    apa = sprintf("Multinomial logistic regression was estimated with %d complete cases.", nrow(df)),
+    apa = sprintf("Multinomial logistic regression was estimated with %d complete cases, against the reference category %s.", nrow(df), reference),
     prompt = "Report the reference category, odds ratios, model fit, and classification table where meaningful."
   )
 }

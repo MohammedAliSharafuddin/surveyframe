@@ -140,6 +140,11 @@ style.
 
 ## Analysis
 
+* **Multinomial logistic regression has a full table.** It gives b, SE, z,
+  p, the odds ratio and its 95% interval for each outcome category against
+  a named reference category, and the result text names the reference.
+  `render_result()` also returns a result's `syntax` where it has one. The
+  logistic demo results are regenerated (CX-14).
 * **Model outlines give the notes for their own model type.**
   `model_report_template()` gave every model the same notes, asking an EFA
   for structural paths and a PLS-SEM model for fit indices. EFA, CFA, CB-SEM
