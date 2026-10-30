@@ -1103,6 +1103,10 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
         </select></div>
       </div>
       <div class="field" id="rq-alpha-field"><label class="fl" for="rq-alpha">Significance level</label><div class="fc"><select id="rq-alpha"><option value="0.05">0.05</option><option value="0.01">0.01</option><option value="0.10">0.10</option></select></div></div>
+      <div id="rq-hyp-field" style="display:none">
+        <div class="field"><label class="fl" for="rq-h0">Null hypothesis (H0) <span class="fr">optional</span></label><div class="fc"><textarea id="rq-h0" rows="2" placeholder="State what you expect if there is no effect."></textarea></div></div>
+        <div class="field"><label class="fl" for="rq-h1">Alternative hypothesis (H1) <span class="fr">optional</span></label><div class="fc"><textarea id="rq-h1" rows="2" placeholder="State what you expect if there is an effect."></textarea></div></div>
+      </div>
       <div class="field" id="rq-term-field" style="display:none"><label class="fl" for="rq-term">Keyword <span class="fr">*</span></label><div class="fc"><input type="text" id="rq-term" placeholder="Enter the keyword to search for"></div></div>
       <div class="field" id="rq-wordcloud-field" style="display:none"><label class="fl" for="rq-wordcloud">Word cloud</label><div class="fc"><label style="display:flex;align-items:center;gap:6px;font-weight:400"><input type="checkbox" id="rq-wordcloud"> Render as a word cloud instead of a bar chart</label></div></div>
       <div class="field" id="rq-seed-field" style="display:none"><label class="fl" for="rq-seed">Random seed</label><div class="fc"><input type="number" id="rq-seed" step="1" placeholder="42"></div></div>
@@ -4105,11 +4109,28 @@ function getAllVars(){
 }
 function getVarCat(id){var m=varLevel(id);if(m.level==='likert')return'lik';if(m.level==='text')return'text';return['nominal','ordinal'].includes(m.level)?'cat':'cont';}
 function rolesFromLegacy(rq,method){if(rq&&rq.roles)return rq.roles;var v=(rq&&rq.variables)||[];if(!Array.isArray(v))v=[v];if(!method)return{};var r={},defs=(ANALYSIS_REGISTRY[method]||{}).roles||[];defs.forEach(function(role,idx){if(role.max===1)r[role.id]=v[idx]||'';else r[role.id]=v.slice(idx);});return r;}
+// Example hypotheses shown as placeholders only, never saved. One per family,
+// with the t tests worded for means. Anything else gets the generic pair.
+var HYP_EXAMPLES={
+  group_comparison:['The mean of [outcome] does not differ between [group A] and [group B].','The mean of [outcome] differs between [group A] and [group B].'],
+  related_samples:['[Measure] does not change between [time 1] and [time 2].','[Measure] changes between [time 1] and [time 2].'],
+  categorical:['[Variable A] and [variable B] are not associated.','[Variable A] and [variable B] are associated.'],
+  association:['[X] and [Y] are not correlated.','[X] and [Y] are correlated.'],
+  regression:['[Predictor] does not predict [outcome].','[Predictor] predicts [outcome].'],
+  model:['The structural path from [construct A] to [construct B] is zero.','The structural path from [construct A] to [construct B] is not zero.']
+};
+var HYP_GENERIC=['There is no effect or association between [variables].','There is an effect or association between [variables].'];
+var HYP_OLD_TEXT=['No effect or association is present.','An effect or association is present.'];
+function hypExample(method){var reg=ANALYSIS_REGISTRY[method]||{};return HYP_EXAMPLES[reg.family]||HYP_GENERIC;}
+// A hypothesis the researcher wrote. The two fixed sentences older builders
+// saved on their behalf count as unwritten.
+function writtenHyp(v){v=typeof v==='string'?v.trim():'';return HYP_OLD_TEXT.indexOf(v)>=0?'':v;}
 function openRQModal(id){
   editRqId=id||null;var rq=id?S.analysis_plan.find(function(r){return r.id===id;}):null;
   var method=rq?(rq.method||rq.test||'mann_whitney'):'mann_whitney';if(method==='efa')method='efa_readiness';if(method==='cfa')method='cfa_lavaan_syntax';
   document.getElementById('rq-modal-title').textContent=id?'Edit Analysis Plan':'Add Analysis Plan';
   sv('rq-q',rq?rq.research_question||'':'');sv('rq-interp',rq?rq.decision_rule||rq.interpretation||'':'');
+  sv('rq-h0',rq&&rq.hypotheses?writtenHyp(rq.hypotheses.null):'');sv('rq-h1',rq&&rq.hypotheses?writtenHyp(rq.hypotheses.alternative):'');
   document.getElementById('rq-test').value=method;
   document.getElementById('rq-alpha').value=rq?String((rq.options&&rq.options.alpha)||rq.alpha||0.05):'0.05';
   document.getElementById('rq-term').value=rq&&rq.options&&rq.options.term?String(rq.options.term):'';
@@ -4175,10 +4196,13 @@ function validatePlanRoles(){
   var btn=document.getElementById('rqSaveBtn');if(btn)btn.disabled=!complete;
   var prev=document.getElementById('rqPreview');if(prev)prev.innerHTML='<strong>Planned output</strong><br>'+esc(reg.output||'Structured result')+(reg.assumptions&&reg.assumptions.length?'<br><strong>Assumptions</strong>: '+esc(reg.assumptions.join(', ')):'');
 }
+function hypLines(rq){var h=rq.hypotheses||{},a=writtenHyp(h.null),b=writtenHyp(h.alternative);return(a?'<div><strong>H0:</strong> '+esc(a)+'</div>':'')+(b?'<div><strong>H1:</strong> '+esc(b)+'</div>':'');}
 function onTestChg(renderRoles){
   if(renderRoles!==false)renderRoleFields({});
   var t=document.getElementById('rq-test').value,reg=ANALYSIS_REGISTRY[t]||{},cits=reg.refs||[];
   var af=document.getElementById('rq-alpha-field');if(af)af.style.display=reg.showAlpha?'block':'none';
+  var hf=document.getElementById('rq-hyp-field');if(hf)hf.style.display=reg.showHypotheses?'block':'none';
+  if(reg.showHypotheses){var ex=hypExample(t),h0e=document.getElementById('rq-h0'),h1e=document.getElementById('rq-h1');if(h0e)h0e.setAttribute('placeholder',ex[0]);if(h1e)h1e.setAttribute('placeholder',ex[1]);}
   var tf=document.getElementById('rq-term-field');if(tf)tf.style.display=reg.showTerm?'block':'none';
   var wf=document.getElementById('rq-wordcloud-field');if(wf)wf.style.display=reg.showWordcloud?'block':'none';
   var sf=document.getElementById('rq-seed-field');if(sf)sf.style.display=reg.showSeed?'block':'none';
@@ -4259,7 +4283,9 @@ function saveRQ(){
   if(reg.showSeed&&gv('rq-seed').trim())opts.seed=parseInt(gv('rq-seed'),10);
   if(reg.showTopN&&gv('rq-topn').trim())opts.top_n=parseInt(gv('rq-topn'),10);
   if(reg.showK&&gv('rq-k').trim())opts.k=parseInt(gv('rq-k'),10);
-  var rq={id:editRqId||uid(),research_question:q,family:reg.family||'',method:t,test:t,roles:roles,variables:vars,options:opts,hypotheses:reg.showHypotheses?{null:'No effect or association is present.',alternative:'An effect or association is present.'}:null,decision_rule:gv('rq-interp').trim(),interpretation:gv('rq-interp').trim(),reporting_references:reg.refs||[],citations:reg.refs||[],status:'valid_plan',requires_data:!['cfa_lavaan_syntax','sem_lavaan_syntax','seminr_syntax'].includes(t),result:null};
+  // Only what the researcher wrote is saved. Placeholders are examples.
+  var hyp=null;if(reg.showHypotheses){var h0=gv('rq-h0').trim(),h1=gv('rq-h1').trim();if(h0||h1){hyp={};if(h0)hyp.null=h0;if(h1)hyp.alternative=h1;}}
+  var rq={id:editRqId||uid(),research_question:q,family:reg.family||'',method:t,test:t,roles:roles,variables:vars,options:opts,hypotheses:hyp,decision_rule:gv('rq-interp').trim(),interpretation:gv('rq-interp').trim(),reporting_references:reg.refs||[],citations:reg.refs||[],status:'valid_plan',requires_data:!['cfa_lavaan_syntax','sem_lavaan_syntax','seminr_syntax'].includes(t),result:null};
   snap();
   if(editRqId){var i=S.analysis_plan.findIndex(function(r){return r.id===editRqId;});if(i>=0)S.analysis_plan[i]=rq;}
   else S.analysis_plan.push(rq);
@@ -4455,7 +4481,7 @@ function renderAnalyse(){
   // execution queue: the same cards, minus syntax-only methods, reorderable
   // in place (drag order writes back to S.analysis_plan by id).
   var draggable=anTab==='plan'||anTab==='run';
-  var cardHtml=function(plans){return plans.map(function(rq,i){var method=rq.method||rq.test,reg=ANALYSIS_REGISTRY[method]||{},alpha=(rq.options&&rq.options.alpha)||rq.alpha,vars=asArr(rq.variables);if(!vars.length)vars=flattenRoles(rq.roles||{});var refs=asArr(rq.reporting_references);if(!refs.length)refs=asArr(rq.citations);var drg=draggable?' draggable="true" ondragstart="pStart(event,\''+rq.id+'\')" ondragover="pOver(event,\''+rq.id+'\')" ondrop="pDrop(event,\''+rq.id+'\')" ondragend="pEnd(event)" ondragleave="this.classList.remove(\'drag-t\',\'drag-b\')"':'';return'<div class="rq-card'+(draggable?' rq-drag':'')+'"'+drg+' onclick="openRQModal(\''+rq.id+'\')"><div style="display:flex;align-items:flex-start;gap:8px"><span class="rq-num"'+(draggable?' title="Drag to reorder"':'')+'>'+(i+1)+'</span><div style="flex:1"><div class="rq-q">'+esc(rq.research_question)+'</div><div class="rq-meta"><span class="tc">'+esc(TLBLS[method]||method)+'</span>'+(reg.showAlpha?'<span class="ac">significance='+esc(alpha||0.05)+'</span>':'')+(rq.status?'<span class="ac">'+esc(rq.status)+'</span>':'')+refs.map(function(k){return'<span class="cc">'+esc(CSHORT[k]||k)+'</span>';}).join('')+'</div>'+(vars.length?'<div style="margin-top:6px;display:flex;gap:3px;flex-wrap:wrap">'+vars.map(function(v){return'<span class="vchip">'+esc(v)+'</span>';}).join('')+'</div>':'')+(rq.decision_rule||rq.interpretation?'<div class="rq-interp">'+esc(rq.decision_rule||rq.interpretation)+'</div>':'<div class="rq-no-int">Decision rule pending.</div>')+'</div></div></div>';}).join('');};
+  var cardHtml=function(plans){return plans.map(function(rq,i){var method=rq.method||rq.test,reg=ANALYSIS_REGISTRY[method]||{},alpha=(rq.options&&rq.options.alpha)||rq.alpha,vars=asArr(rq.variables);if(!vars.length)vars=flattenRoles(rq.roles||{});var refs=asArr(rq.reporting_references);if(!refs.length)refs=asArr(rq.citations);var drg=draggable?' draggable="true" ondragstart="pStart(event,\''+rq.id+'\')" ondragover="pOver(event,\''+rq.id+'\')" ondrop="pDrop(event,\''+rq.id+'\')" ondragend="pEnd(event)" ondragleave="this.classList.remove(\'drag-t\',\'drag-b\')"':'';return'<div class="rq-card'+(draggable?' rq-drag':'')+'"'+drg+' onclick="openRQModal(\''+rq.id+'\')"><div style="display:flex;align-items:flex-start;gap:8px"><span class="rq-num"'+(draggable?' title="Drag to reorder"':'')+'>'+(i+1)+'</span><div style="flex:1"><div class="rq-q">'+esc(rq.research_question)+'</div><div class="rq-meta"><span class="tc">'+esc(TLBLS[method]||method)+'</span>'+(reg.showAlpha?'<span class="ac">significance='+esc(alpha||0.05)+'</span>':'')+(rq.status?'<span class="ac">'+esc(rq.status)+'</span>':'')+refs.map(function(k){return'<span class="cc">'+esc(CSHORT[k]||k)+'</span>';}).join('')+'</div>'+(vars.length?'<div style="margin-top:6px;display:flex;gap:3px;flex-wrap:wrap">'+vars.map(function(v){return'<span class="vchip">'+esc(v)+'</span>';}).join('')+'</div>':'')+(hypLines(rq)?'<div class="rq-interp">'+hypLines(rq)+'</div>':'')+(rq.decision_rule||rq.interpretation?'<div class="rq-interp">'+esc(rq.decision_rule||rq.interpretation)+'</div>':'<div class="rq-no-int">Decision rule pending.</div>')+'</div></div></div>';}).join('');};
   if(anTab==='run'){
     rb.innerHTML=cardHtml(runPlans);
     if(syntaxOnly.length)rb.innerHTML+='<div style="padding:8px 12px;font-size:11px;color:var(--t3);border-top:1px solid var(--bdr);margin-top:4px">'+syntaxOnly.length+' syntax-only method(s) excluded. These generate lavaan or seminr strings without requiring response data.</div>';

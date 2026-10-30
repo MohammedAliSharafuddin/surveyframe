@@ -341,6 +341,14 @@ style.
 
 ## SurveyBuilder
 
+* **The Plan editor has fields for the hypotheses.** Methods that test a
+  hypothesis show optional "Null hypothesis (H0)" and "Alternative
+  hypothesis (H1)" fields, with a method-appropriate example as placeholder
+  text. Only what you write is saved, and the plan card shows it. The
+  builder saved 2 fixed sentences, "No effect or association is present."
+  and "An effect or association is present.", for every such block, and
+  those load back as empty.
+
 * **Changed content of an opened file saves only as a new instrument.** The
   builder checked a file's hash when it opened and then forgot it, so an
   edited instrument saved as verified, with no amendment. It now keeps the
