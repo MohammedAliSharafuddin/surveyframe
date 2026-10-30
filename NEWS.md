@@ -506,8 +506,9 @@ style.
   captions, long category labels and legends were clipped at the edges.
   A chart from the analysis plan now wraps them to the figure width, lays a
   long legend over as many rows as it needs and keeps a margin at every
-  edge. A legend the chart hides stays hidden. The regression diagnostic
-  panels are not yet fitted (CX-23).
+  edge. A legend the chart hides stays hidden. The 4 regression diagnostic
+  panels are fitted the same way, and each names the outcome by its label
+  (CX-23).
 * A chart from the analysis plan names each variable by its label in the
   instrument, as the tables beside it do. A regression on the scale `sat` was
   titled "Observed against fitted values for Sat" while its table read

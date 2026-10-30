@@ -1350,13 +1350,20 @@ sframe_plot_regression_diagnostics <- function(result, palette = c("web", "print
   d <- result$diagnostics
   if (!is.data.frame(d) || nrow(d) == 0) return(NULL)
   brand <- sframe_brand(palette)
+  # Each panel names the model's outcome, by its label in the instrument
+  # where there is one, so a panel saved on its own says what it checks.
+  outcome <- as.character(result$roles$dependent %||% "")[1]
+  subtitle <- if (!is.na(outcome) && nzchar(outcome)) {
+    paste("Outcome:", .sframe_title_case_names(outcome))
+  }
 
   residuals_fitted <- ggplot2::ggplot(d, ggplot2::aes(x = .data$fitted, y = .data$resid)) +
     ggplot2::geom_hline(yintercept = 0, colour = brand$muted, linetype = "dashed") +
     ggplot2::geom_point(colour = brand$teal, alpha = 0.75, size = 2) +
     ggplot2::geom_smooth(method = "loess", formula = y ~ x, se = FALSE,
                          colour = brand$ink, linewidth = 0.6) +
-    ggplot2::labs(title = "Residuals vs fitted", x = "Fitted values", y = "Residuals") +
+    ggplot2::labs(title = "Residuals vs fitted", subtitle = subtitle,
+                  x = "Fitted values", y = "Residuals") +
     theme_surveyframe(palette = palette)
 
   qq_theoretical <- stats::qqnorm(d$std_resid, plot.it = FALSE)
@@ -1364,7 +1371,7 @@ sframe_plot_regression_diagnostics <- function(result, palette = c("web", "print
   qq <- ggplot2::ggplot(qq_df, ggplot2::aes(x = .data$theoretical, y = .data$sample)) +
     ggplot2::geom_abline(colour = brand$muted, linetype = "dashed") +
     ggplot2::geom_point(colour = brand$teal, alpha = 0.75, size = 2) +
-    ggplot2::labs(title = "Normal Q-Q", x = "Theoretical quantiles",
+    ggplot2::labs(title = "Normal Q-Q", subtitle = subtitle, x = "Theoretical quantiles",
                  y = "Standardised residuals") +
     theme_surveyframe(palette = palette)
 
@@ -1373,7 +1380,7 @@ sframe_plot_regression_diagnostics <- function(result, palette = c("web", "print
     ggplot2::geom_point(colour = brand$teal, alpha = 0.75, size = 2) +
     ggplot2::geom_smooth(method = "loess", formula = y ~ x, se = FALSE,
                          colour = brand$ink, linewidth = 0.6) +
-    ggplot2::labs(title = "Scale-location", x = "Fitted values",
+    ggplot2::labs(title = "Scale-location", subtitle = subtitle, x = "Fitted values",
                  y = expression(sqrt("|Standardised residuals|"))) +
     theme_surveyframe(palette = palette)
 
@@ -1381,12 +1388,13 @@ sframe_plot_regression_diagnostics <- function(result, palette = c("web", "print
     ggplot2::geom_hline(yintercept = 0, colour = brand$muted, linetype = "dashed") +
     ggplot2::geom_point(ggplot2::aes(size = .data$cooksd), colour = brand$teal, alpha = 0.75) +
     ggplot2::scale_size_continuous(range = c(1, 5), guide = "none") +
-    ggplot2::labs(title = "Residuals vs leverage", x = "Leverage",
+    ggplot2::labs(title = "Residuals vs leverage", subtitle = subtitle, x = "Leverage",
                  y = "Standardised residuals") +
     theme_surveyframe(palette = palette)
 
-  list(residuals_fitted = residuals_fitted, qq = qq,
-       scale_location = scale_location, leverage = leverage)
+  # Fitted to the export width like every plan chart (CX-23).
+  lapply(list(residuals_fitted = residuals_fitted, qq = qq,
+              scale_location = scale_location, leverage = leverage), sframe_fit_plot)
 }
 
 #' Scree plot from an EFA readiness report

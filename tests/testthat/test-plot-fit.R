@@ -102,3 +102,27 @@ test_that("fitting leaves a hidden legend hidden and the caller's plot alone", {
 test_that("a chart that fails to build fails once, without a promise warning", {
   expect_error(expect_no_warning(sframe_fit_plot(stop("boom"))), "boom")
 })
+
+test_that("the regression diagnostic panels name the outcome and fit at 6.5 by 4", {
+  skip_if_not_installed("ggplot2")
+  demo <- sframe_demo_data()
+  res <- run_analysis_plan(demo$responses, demo$instrument, plots = TRUE)
+  r <- res$rq_predict_sat
+  long_label <- paste("Overall satisfaction with the hotel stay, the booking",
+                      "process, the room and every service received on site")
+  panels <- .sframe_with_plot_labels(c(satisfaction = long_label),
+                                     sframe_plot_regression_diagnostics(r))
+  expect_length(panels, 4)
+  for (p in panels) {
+    sub <- ggplot2::get_labs(p)$subtitle
+    expect_match(sub, "Overall satisfaction", fixed = TRUE)
+    expect_match(sub, "\n", fixed = TRUE)
+    e <- fit_extents(p)
+    expect_lte(e$title, e$width)
+    expect_lte(e$subtitle, e$width)
+    expect_lte(e$fixed, e$width)
+  }
+  # The plan's own panels name the outcome by its label in the instrument.
+  sub <- ggplot2::get_labs(r$diagnostic_plots$qq)$subtitle
+  expect_match(sub, "^Outcome: .+")
+})
