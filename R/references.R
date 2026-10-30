@@ -763,3 +763,196 @@ sframe_intext_citation <- function(keys) {
   if (!length(parts)) return("")
   paste0("(", paste(sort(parts), collapse = "; "), ")")
 }
+
+# ---------------------------------------------------------------------------
+# References for the built-in HTML engine (D8, CX-10)
+#
+# Quarto resolves [@key] and builds the list through pandoc. The built-in
+# engine has no citation processor, so these helpers do the common part of
+# the job in APA 7: (Author, Year) in text and a hanging-indent list at the
+# end. They read the same sf_reference records as sframe_bibliography().
+# ---------------------------------------------------------------------------
+
+# A named list of sf_reference objects: the instrument's, the host's extra
+# ones, and any built-in method reference (looked up when cited).
+sframe_reference_index <- function(instrument = NULL, extra = NULL) {
+  refs <- list()
+  if (!is.null(instrument)) refs <- c(refs, unname(sframe_references(instrument)))
+  if (!is.null(extra)) refs <- c(refs, sframe_flatten_references(list(extra)))
+  stats::setNames(refs, vapply(refs, function(r) r$id, character(1)))
+}
+
+sframe_reference_lookup <- function(refs, key) {
+  refs[[key]] %||% sframe_builtin_reference(key)
+}
+
+sframe_reference_family <- function(ref) {
+  vapply(ref$author %||% list(), function(a) a$family %||% a$literal %||% "", character(1))
+}
+
+sframe_reference_year <- function(ref) {
+  d <- ref$issued$`date-parts`[[1]][[1]]
+  if (!is.null(d)) return(as.character(d))
+  ref$issued$literal %||% "n.d."
+}
+
+# "[@a]", "[@a; @b]", "[@a, p. 5]", "[see @a]" and "[-@a]" to APA parenthetical
+# citations. A key with no record is left as written so the gap is visible.
+sframe_resolve_citations <- function(text, refs) {
+  if (!length(text) || is.na(text[1])) return(text)
+  one <- function(txt) {
+    m <- gregexpr("\\[[^][]*@[^][]*\\]", txt, perl = TRUE)
+    hits <- regmatches(txt, m)[[1]]
+    if (!length(hits)) return(txt)
+    done <- vapply(hits, function(h) {
+      segs <- trimws(strsplit(substr(h, 2, nchar(h) - 1), ";", fixed = TRUE)[[1]])
+      out <- character(0)
+      resolved <- 0L
+      for (seg in segs) {
+        mm <- regmatches(seg, regexec(
+          "^(.*?)(-?)@([A-Za-z0-9_](?:[A-Za-z0-9_:.#$%&+?<>~/-]*[A-Za-z0-9_])?)(.*)$",
+          seg, perl = TRUE))[[1]]
+        if (length(mm) < 5) { out <- c(out, seg); next }
+        ref <- sframe_reference_lookup(refs, mm[4])
+        if (is.null(ref)) { out <- c(out, seg); next }
+        fam <- sframe_reference_family(ref)
+        who <- if (length(fam) >= 3) paste(fam[1], "et al.")
+               else if (length(fam) == 2) paste(fam, collapse = " & ")
+               else if (length(fam) == 1) fam
+               else ref$title
+        body <- if (identical(mm[3], "-")) sframe_reference_year(ref)
+                else paste0(who, ", ", sframe_reference_year(ref))
+        # The text is HTML, so "Smith & Jones" is written "Smith &amp; Jones".
+        out <- c(out, paste0(trimws(mm[2]), if (nzchar(trimws(mm[2]))) " " else "",
+                             htmltools_escape(body), mm[5]))
+        resolved <- resolved + 1L
+      }
+      # Brackets with no known key, such as "[contact a@b.org]", stay as written.
+      if (resolved == 0L) return(h)
+      paste0("(", paste(out, collapse = "; "), ")")
+    }, character(1))
+    regmatches(txt, m)[[1]] <- done
+    txt
+  }
+  vapply(text, one, character(1), USE.NAMES = FALSE)
+}
+
+# Resolve citations in an HTML document, leaving code blocks alone.
+sframe_resolve_citations_html <- function(html, refs) {
+  parts <- strsplit(html, "(?<=</pre>)|(?=<pre[ >])", perl = TRUE)[[1]]
+  if (!length(parts)) return(html)
+  code <- grepl("^<pre[ >]", parts)
+  parts[!code] <- sframe_resolve_citations(parts[!code], refs)
+  paste(parts, collapse = "")
+}
+
+sframe_ref_initials <- function(given) {
+  if (is.null(given) || !nzchar(given)) return("")
+  toks <- strsplit(trimws(given), "\\s+")[[1]]
+  paste(vapply(toks, function(tk) {
+    if (grepl("\\.", tk)) return(tk)
+    paste(vapply(strsplit(tk, "-", fixed = TRUE)[[1]],
+                 function(p) paste0(substr(p, 1, 1), "."), character(1)), collapse = "-")
+  }, character(1)), collapse = " ")
+}
+
+# Names as APA writes them: "Family, G. G." in a list, "G. G. Family" for editors.
+sframe_ref_names_html <- function(names, inverted = TRUE) {
+  if (!length(names)) return("")
+  one <- function(a) {
+    if (!is.null(a$literal)) return(htmltools_escape(a$literal))
+    ini <- sframe_ref_initials(a$given)
+    fam <- htmltools_escape(a$family %||% "")
+    if (!nzchar(ini)) return(fam)
+    if (inverted) paste0(fam, ", ", htmltools_escape(ini)) else paste0(htmltools_escape(ini), " ", fam)
+  }
+  v <- vapply(names, one, character(1))
+  n <- length(v)
+  if (n > 20) v <- c(v[1:19], "...", v[n])
+  if (length(v) == 1) return(v)
+  if (length(v) == 2) return(paste(v, collapse = if (inverted) ", &amp; " else " &amp; "))
+  paste0(paste(v[-length(v)], collapse = ", "), ", &amp; ", v[length(v)])
+}
+
+sframe_ref_ordinal <- function(x) {
+  n <- suppressWarnings(as.integer(x))
+  if (is.na(n)) return(paste0(x, " ed."))
+  suf <- if (n %% 100 %in% 11:13) "th" else switch(as.character(n %% 10), "1" = "st", "2" = "nd", "3" = "rd", "th")
+  paste0(n, suf, " ed.")
+}
+
+# One reference as APA 7 HTML, or NULL when the engine cannot format its type.
+# Handles article-journal, book, chapter, report, webpage and software.
+sframe_format_reference_html <- function(ref) {
+  e <- htmltools_escape
+  type <- ref$type %||% "article-journal"
+  if (!type %in% c("article-journal", "book", "chapter", "report", "webpage", "software")) return(NULL)
+  if (is.null(ref$title) || !nzchar(ref$title)) return(NULL)
+  dot <- function(x) if (grepl("[.?!]$", sub("</em>$", "", x))) x else paste0(x, ".")
+  who <- sframe_ref_names_html(ref$author)
+  lead <- if (nzchar(who)) paste0(dot(who), " ") else ""
+  yr <- paste0("(", e(sframe_reference_year(ref)), "). ")
+  title <- e(ref$title)
+  pages <- if (!is.null(ref$page)) gsub("-+", "&ndash;", e(ref$page), perl = TRUE)
+  link <- if (!is.null(ref$DOI)) paste0("https://doi.org/", e(ref$DOI))
+          else if (!is.null(ref$URL)) e(ref$URL)
+  pub <- if (!is.null(ref$publisher)) e(ref$publisher)
+  tail <- function(...) {
+    z <- Filter(function(s) !is.null(s) && nzchar(s), list(...))
+    if (length(z)) paste0(" ", paste(z, collapse = " ")) else ""
+  }
+  body <- switch(type,
+    "article-journal" = {
+      src <- if (!is.null(ref$`container-title`)) paste0("<em>", e(ref$`container-title`), "</em>")
+      vol <- if (!is.null(ref$volume)) paste0("<em>", e(ref$volume), "</em>")
+      iss <- if (!is.null(ref$issue)) paste0("(", e(ref$issue), ")")
+      volis <- paste0(vol %||% "", iss %||% "")
+      parts <- c(src, if (nzchar(volis)) volis, pages)
+      paste0(dot(title), if (length(parts)) paste0(" ", paste(parts, collapse = ", "), ".") else "", tail(link))
+    },
+    "book" = paste0("<em>", title, "</em>",
+                    if (!is.null(ref$edition)) paste0(" (", sframe_ref_ordinal(ref$edition), ")") else "",
+                    ".", tail(if (!is.null(pub)) dot(pub), link)),
+    "chapter" = {
+      ed <- if (length(ref$editor)) paste0("In ", sframe_ref_names_html(ref$editor, inverted = FALSE),
+                                           if (length(ref$editor) > 1) " (Eds.), " else " (Ed.), ") else "In "
+      book <- if (!is.null(ref$`container-title`)) paste0("<em>", e(ref$`container-title`), "</em>") else ""
+      pp <- if (!is.null(pages)) paste0(" (pp. ", pages, ")") else ""
+      paste0(dot(title), " ", ed, book, pp, ".", tail(if (!is.null(pub)) dot(pub), link))
+    },
+    "report" = paste0("<em>", title, "</em>.", tail(if (!is.null(pub) && !identical(ref$publisher, who)) dot(pub), link)),
+    "webpage" = paste0("<em>", title, "</em>.",
+                       tail(if (!is.null(ref$`container-title`)) dot(e(ref$`container-title`)), link)),
+    "software" = paste0("<em>", title, "</em>",
+                        if (!is.null(ref$version)) paste0(" (Version ", e(ref$version), ")") else "",
+                        " [Computer software].", tail(if (!is.null(pub)) dot(pub), link))
+  )
+  paste0(lead, yr, body)
+}
+
+# The References section: instrument and extra references, alphabetical, with
+# the hanging indent the analysis report uses. Built-in method references are
+# added when the text cites them. An entry that cannot be formatted gets a note.
+sframe_references_section_html <- function(refs, cited_text = "") {
+  keys <- unique(regmatches(cited_text, gregexpr("(?<=@)[A-Za-z0-9_][A-Za-z0-9_:.#$%&+?<>~/-]*[A-Za-z0-9_]", cited_text, perl = TRUE))[[1]])
+  for (k in setdiff(keys, names(refs))) {
+    b <- sframe_builtin_reference(k)
+    if (!is.null(b)) refs[[k]] <- b
+  }
+  if (!length(refs)) return("")
+  sort_key <- vapply(refs, function(r) {
+    paste(tolower(paste(sframe_reference_family(r), collapse = " ")), sframe_reference_year(r), tolower(r$title %||% ""))
+  }, character(1))
+  refs <- refs[order(sort_key)]
+  entries <- vapply(refs, function(r) {
+    html <- sframe_format_reference_html(r)
+    if (is.null(html)) {
+      return(sprintf(
+        "<div class=\"csl-entry sf-note\">Reference '%s' (type %s) could not be formatted by the built-in engine. Render with Quarto to format it.</div>",
+        htmltools_escape(r$id), htmltools_escape(r$type %||% "unknown")))
+    }
+    sprintf("<div class=\"csl-entry\">%s</div>", html)
+  }, character(1))
+  sprintf("<section class=\"references\"><h2>References</h2>%s</section>",
+          paste(entries, collapse = "\n"))
+}

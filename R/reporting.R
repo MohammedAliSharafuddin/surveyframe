@@ -639,7 +639,9 @@ render_report <- function(
     interpretations     = interpretations,
     show_code           = show_code,
     title               = report_title,
-    authors             = report_authors
+    authors             = report_authors,
+    references          = references,
+    csl                 = csl
   )
 
   sframe_report_result(dest, "html", open)
@@ -746,7 +748,9 @@ sframe_clean_interpretations <- function(interpretations) {
     interpretations = list(),
     show_code = TRUE,
     title = NULL,
-    authors = character(0)
+    authors = character(0),
+    references = NULL,
+    csl = NULL
 ) {
   meta <- instrument$meta %||% list()
   sections <- character(0)
@@ -928,6 +932,18 @@ sframe_clean_interpretations <- function(interpretations) {
     )
   )
 
+  # Citations and the References list (D8). The built-in engine has no
+  # citation processor, so [@key] is resolved here and the list is APA 7.
+  ref_index <- sframe_reference_index(instrument, references)
+  body_text <- paste(sections, collapse = "\n")
+  sections <- sframe_resolve_citations_html(body_text, ref_index)
+  refs_html <- sframe_references_section_html(ref_index, body_text)
+  sections <- c(sections, if (nzchar(refs_html)) refs_html)
+  if (!is.null(csl) && nzchar(csl) && !identical(basename(csl), "apa.csl")) {
+    rlang::inform("The built-in HTML engine formats references in APA 7 only. Use Quarto for another citation style.",
+                  class = "sframe_report_progress")
+  }
+
   title <- htmltools_escape(title %||% meta$title %||% "Survey report")
   subtitle <- paste(c(
     if (length(authors)) htmltools_escape(paste(authors, collapse = ", ")),
@@ -969,6 +985,8 @@ sframe_clean_interpretations <- function(interpretations) {
       ".meta { color: var(--sf-muted); margin-bottom: 24px; }",
       ".rq-block { margin: 18px 0; padding: 14px; background: var(--sf-panel); border: 1px solid var(--sf-line); border-radius: 6px; }",
       ".apa { color: var(--sf-ink); }",
+      ".references .csl-entry { padding-left: 2em; text-indent: -2em; margin-bottom: 8px; }",
+      ".csl-entry.sf-note { color: var(--sf-muted); font-style: italic; }",
       ".sf-foot { text-align: center; font-size: 12px; color: var(--sf-faint); margin-top: 48px; padding-top: 16px; border-top: 1px solid #eee; }",
       ".sf-foot a { color: var(--sf-accent); font-weight: 600; text-decoration: none; }",
       "/* Print (and PDF via pagedown): paginate cleanly, keep a result",
