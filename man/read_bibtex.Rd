@@ -17,7 +17,9 @@ example an entry pasted from Google Scholar.}
 }
 \value{
 A list of \code{sf_reference} objects, named by citation key. An entry
-that fails to parse is skipped with a warning naming it.
+that fails to parse is skipped with a warning naming it. A key used by
+more than one entry is an error that names every repeated key. Entries may
+be written \verb{@article\{key, ...\}} or \verb{@article(key, ...)}.
 }
 \description{
 Parses BibTeX, the format Google Scholar, Zotero, Mendeley and most journal

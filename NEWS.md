@@ -95,6 +95,9 @@ style.
   `@article(key, ...)` as well as `@article{key, ...}`, and a file may mix the
   2. A closing bracket inside a braced or quoted value ended a parenthesised
   entry early.
+* **`read_bibtex()` refuses a key used by more than 1 entry.** The later
+  entry replaced the earlier without a word. It is now an error naming every
+  repeated key, as `add_references()` does for an id the instrument holds.
 
 ### The file format
 
