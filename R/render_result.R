@@ -112,12 +112,18 @@ render_result <- function(result, data, instrument = NULL,
       on.exit(.sframe_figure_env$settings <- old, add = TRUE)
       parts <- c(
         sprintf("<h3>%s</h3>", htmltools_escape(caption)),
+        # What the block declared before the data, above the result (D12).
+        sframe_declaration_html(result),
         if (nzchar(out$apa)) sprintf("<p class=\"sf-apa\">%s</p>", htmltools_escape(out$apa)),
         if (is.data.frame(table)) .render_report_table(table, caption = caption, note = out$note),
         if (is.list(out$supplement) && is.data.frame(out$supplement$table)) {
           .render_report_table(out$supplement$table, caption = out$supplement$caption)
         },
-        if (inherits(out$chart, "ggplot")) .render_report_ggplot_png(out$chart, alt = caption)
+        if (inherits(out$chart, "ggplot")) .render_report_ggplot_png(out$chart, alt = caption),
+        if (nzchar(interp <- sframe_written_interpretation(result))) {
+          sprintf("<p><strong>%s:</strong> %s</p>", sframe_interpretation_label,
+                  htmltools_escape(interp))
+        }
       )
       out$html <- paste0("<section class=\"sf-result\">", paste(parts, collapse = "\n"), "</section>")
     }

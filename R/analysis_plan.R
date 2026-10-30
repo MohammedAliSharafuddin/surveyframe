@@ -1641,8 +1641,8 @@ sframe_run_one_block <- function(block, data, instrument, plots = FALSE,
   result$options           <- options
   result$options_ignored   <- sframe_ignored_options(test, options)
   result$hypotheses        <- block$hypotheses %||% NULL
-  result$decision_rule     <- block$decision_rule %||% block$interpretation %||% ""
-  result$interpretation    <- block$interpretation %||% block$decision_rule %||% ""
+  result$decision_rule     <- block$decision_rule %||% ""
+  result$interpretation    <- block$interpretation %||% ""
   result$citations         <- sframe_citations_for_test(test)
   if (is.null(result$table)) {
     result$table <- tryCatch(sframe_result_table(result), error = function(e) NULL)
@@ -1953,7 +1953,8 @@ render_results <- function(
     rq <- htmltools_escape(r$research_question %||% paste("Research Question", i))
     apa_str <- r$apa %||% ""
     prompt  <- r$interpretation_prompt %||% r$prompt %||% ""
-    interp  <- interpretations[[r$block_id %||% r$id %||% ""]] %||% r$interpretation %||% ""
+    interp  <- sframe_written_interpretation(r, interpretations)
+    declared <- sframe_declaration_html(r)
     # Cited in text, author and year. The works are listed once, at the end.
     cits <- htmltools_escape(sframe_intext_citation(names(r$citations %||% list())))
 
@@ -2030,19 +2031,21 @@ render_results <- function(
           <span class="rq-number">RQ %d</span>
           <h2>%s</h2>
         </div>
+        <div class="declaration">%s</div>
         <div class="result-box">
           <div class="apa-string">%s %s</div>
           %s
         </div>
         <div class="interpretation-section">
-          <h3>Interpretation</h3>
+          <h3>%s</h3>
           <div class="prompt-box">%s</div>
           <div class="interp-text">%s</div>
         </div>
         <p class="citation-list">References for this analysis: %s</p>
       </section>',
-      i, rq, htmltools_escape(apa_str), effect_badge,
+      i, rq, declared, htmltools_escape(apa_str), effect_badge,
       tbl_html,
+      sframe_interpretation_label,
       htmltools_escape(prompt),
       if (nzchar(interp)) htmltools_escape(interp) else
         '<span class="empty-interp">Your interpretation will appear here.</span>',

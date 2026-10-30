@@ -42,3 +42,11 @@ sframe_written_interpretation <- function(block, interpretations = list()) {
   if (!nzchar(text)) text <- sframe_written_text(block$interpretation)
   if (identical(text, sframe_written_text(block$decision_rule))) "" else text
 }
+
+# The declaration as HTML paragraphs, one per field written, or "".
+sframe_declaration_html <- function(block) {
+  d <- sframe_plan_declaration(block)
+  if (length(d) == 0) return("")
+  paste(sprintf("<p><strong>%s:</strong> %s</p>", names(d),
+                vapply(d, htmltools_escape, character(1))), collapse = "\n")
+}

@@ -1006,12 +1006,7 @@ sframe_clean_interpretations <- function(interpretations) {
   # What the block declared before the data prints above its result, and
   # the interpretation below it, labelled as written after the results. An
   # interpretation never stands in for an empty decision rule (D12).
-  declaration_html <- function(block) {
-    d <- sframe_plan_declaration(block)
-    if (length(d) == 0) return("")
-    paste(sprintf("<p><strong>%s:</strong> %s</p>", names(d),
-                  vapply(d, htmltools_escape, character(1))), collapse = "\n")
-  }
+  declaration_html <- sframe_declaration_html
   interp_html <- function(block) {
     text <- sframe_written_interpretation(block, interpretations)
     if (!nzchar(text)) return("")
