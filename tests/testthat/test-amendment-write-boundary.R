@@ -295,3 +295,32 @@ test_that("CX-01: an instrument built in R, with no file, still amends", {
   amended <- amend_label(base_instrument(), "Openly changed")
   expect_no_error(write_sframe(amended, tempfile(fileext = ".sframe")))
 })
+
+# Session 2 review blocker. A file changed by hand and read with
+# verify = FALSE is marked unverified. One amendment then laundered it: the
+# write boundary refused an unverified origin only when it had no amendment
+# log, and amend_sframe() accepted an unverified `previous`, so the new file
+# read back verified with the hand edit and a clean log.
+
+tampered_read <- function() {
+  path <- written(base_instrument())
+  txt <- readLines(path, warn = FALSE)
+  writeLines(sub("Anything else?", "Hand edited", txt, fixed = TRUE), path)
+  suppressWarnings(read_sframe(path, verify = FALSE))
+}
+
+test_that("an unverified read cannot start an amendment", {
+  loaded <- tampered_read()
+  expect_error(amend_label(loaded, "Openly changed"),
+               class = "sframe_validation_error", regexp = "failed its integrity check")
+})
+
+test_that("the write boundary refuses entries appended to an unverified read", {
+  loaded <- tampered_read()
+  bare <- loaded
+  attr(bare, "sframe_origin") <- NULL
+  amended <- amend_label(bare, "Openly changed")
+  attr(amended, "sframe_origin") <- attr(loaded, "sframe_origin")
+  expect_error(write_sframe(amended, tempfile(fileext = ".sframe")),
+               class = "sframe_validation_error", regexp = "integrity hash")
+})

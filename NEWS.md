@@ -24,6 +24,13 @@ can be written again, and every plan result can be serialised by a host.
   read from, or its last recorded amendment. Amend from the instrument as
   read, and put every change in `instrument`. `write_sframe()` also checks
   that the first new entry starts from the content read.
+* **An instrument that failed its integrity check cannot be amended.** A file
+  changed by hand and read with `verify = FALSE` is marked unverified, but one
+  amendment wrote it back as a verified file with the hand edit and a clean
+  log. `amend_sframe()` now refuses a `previous` that failed its integrity
+  check, and `write_sframe()` refuses any entry appended to the log of an
+  unverified read. Restore the original file, or write the content as a new
+  instrument with `new_instrument = TRUE`.
 * **A frequency table now shows choice labels, with the code in its own
   column.** The table's columns are `Value` (the label), `Code`, `Frequency`
   and `Percent`. Code reading `Value` for the stored code should read `Code`.
