@@ -68,3 +68,11 @@ test_that("D4: a preview says nothing was sent", {
   expect_match(html, "Nothing was sent", fixed = TRUE)
   expect_no_match(html, "no online collector", fixed = TRUE)
 })
+
+test_that("D4: a preview export keeps the message the researcher wrote", {
+  out <- tempfile(fileext = ".html")
+  export_static_survey(voices_instrument("Debrief text."), output_path = out,
+                       preview = TRUE, open = FALSE)
+  expect_match(paste(readLines(out, warn = FALSE), collapse = "\n"),
+               "Debrief text.", fixed = TRUE)
+})
