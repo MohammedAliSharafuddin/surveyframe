@@ -90,7 +90,7 @@ sframe_apa_cells <- function(x, digits = 2) {
   if (!is.data.frame(x)) return(x)
   nm <- colnames(x)
   p_col <- grepl(.sframe_apa_p_col_re, nm, ignore.case = TRUE)
-  bounded <- tolower(nm) %in% .sframe_apa_bounded_cols
+  bounded <- tolower(nm) %in% .sframe_apa_bounded_cols | grepl("_pct$", nm)
   for (j in seq_along(x)) {
     v <- x[[j]]
     x[[j]] <- if (is.numeric(v)) {
@@ -123,4 +123,35 @@ sframe_apa_html <- function(x) {
             "<em>R</em>", x, perl = TRUE)
   gsub(paste0(before, "(SD|SE|t|F|p|r|d|U|V|W|H|z|M|N|n|Q|b|k)", follows),
        "<em>\\1</em>", x, perl = TRUE)
+}
+
+# Table headings that are statistical symbols, set as APA 7 sets them. A
+# heading looked up here is HTML already.
+.sframe_apa_heading_map <- c(
+  p = "<em>p</em>", p.value = "<em>p</em>", p_value = "<em>p</em>",
+  t = "<em>t</em>", F = "<em>F</em>", z = "<em>z</em>", U = "<em>U</em>",
+  V = "<em>V</em>", W = "<em>W</em>", H = "<em>H</em>", Q = "<em>Q</em>",
+  n = "<em>n</em>", N = "<em>N</em>", M = "<em>M</em>", SD = "<em>SD</em>",
+  sd = "<em>SD</em>", SE = "<em>SE</em>", se = "<em>SE</em>",
+  std.error = "<em>SE</em>", std_error = "<em>SE</em>", df = "<em>df</em>",
+  r = "<em>r</em>", d = "<em>d</em>", b = "<em>b</em>",
+  r_s = "<em>r</em><sub>s</sub>", d_z = "<em>d</em><sub>z</sub>",
+  tau = "\u03c4", phi = "\u03c6", eta2 = "\u03b7\u00b2",
+  partial_eta2 = "Partial \u03b7\u00b2", R2 = "<em>R</em>\u00b2",
+  r2 = "<em>R</em>\u00b2", r_squared = "<em>R</em>\u00b2",
+  adj_r2 = "Adjusted <em>R</em>\u00b2", OR = "<em>OR</em>",
+  odds_ratio = "<em>OR</em>"
+)
+
+# Column names as table headings in HTML: symbols from the map above, a p
+# column by its meaning, a `_pct` column (a proportion) named as one, and
+# anything else in words with its first letter capitalised.
+sframe_apa_headings <- function(names) {
+  vapply(names, function(nm) {
+    if (is.na(nm)) return("")
+    if (nm %in% names(.sframe_apa_heading_map)) return(.sframe_apa_heading_map[[nm]])
+    if (grepl(.sframe_apa_p_col_re, nm, ignore.case = TRUE)) return("<em>p</em>")
+    if (grepl("_pct$", nm)) nm <- paste(sub("_pct$", "", nm), "(proportion)")
+    htmltools_escape(.sframe_title_case_names(nm))
+  }, character(1), USE.NAMES = FALSE)
 }

@@ -2088,7 +2088,7 @@ render_results <- function(
         cells <- paste(sprintf("<td>%s</td>", escape_each(row)), collapse = "")
         sprintf("<tr>%s</tr>", cells)
       }), collapse = "")
-      headers <- paste(sprintf("<th>%s</th>", escape_each(colnames(tbl))),
+      headers <- paste(sprintf("<th>%s</th>", sframe_apa_headings(colnames(tbl))),
                       collapse = "")
       has_pval <- any(grepl(
         "^p$|^p\\.value$|^p_value$|^Pr\\(>",
