@@ -442,7 +442,9 @@ render_report <- function(
         include_models = include_models,
         plot_palette = plot_palette,
         interpretations = interpretations,
-        show_code = show_code
+        show_code = show_code,
+        references = references, csl = csl,
+        title = title, authors = authors, figures = figures
       ),
       sframe_report_engine = function(m) invokeRestart("muffleMessage")
     )

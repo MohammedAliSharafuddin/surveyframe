@@ -300,6 +300,10 @@ style.
   "5 choice column(s)" and the decision methods' notes and errors now read
   "7 power-iteration steps" and "1 respondent". The demo results are
   regenerated (CX-24).
+* **A PDF report matches the HTML report from the same call.**
+  `render_report(format = "pdf")` dropped `title`, `authors`, `references`,
+  `csl` and `figures` on the way to the HTML report it prints. It now passes
+  all 5 (CX-04).
 * **Tables and figures are numbered, titled and described.** The built-in
   report, `render_results()` and `render_result()` number every table and
   figure in reading order as APA 7 does, with the number in bold and an
