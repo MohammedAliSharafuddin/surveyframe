@@ -61,6 +61,13 @@ An instrument can now carry the works it draws on, and every report lists
 them once, in a References section at the end, in a standard bibliography
 style.
 
+* **The built-in report engine cites and lists references.** Without
+  Quarto, `render_report()` printed `[@key]` raw and left out the
+  instrument's references and any passed in `references`. It now writes
+  each citation as (Author, Year) and ends with an APA 7 References list of
+  articles, books, chapters, reports, web pages and software. An entry of
+  another type shows a visible note, and a `csl` other than APA 7 gets a
+  message that this engine formats APA 7 only (D8, CX-10).
 * **`sf_reference()`** creates a reference as a CSL-JSON record, the format
   Zotero, Mendeley and pandoc share. **`read_bibtex()`** reads BibTeX, as
   exported by Google Scholar, Zotero, Mendeley and most journal pages, using
