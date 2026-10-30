@@ -106,6 +106,26 @@ test_that("CX-12: new_instrument = TRUE refuses the title and version read", {
                class = "sframe_validation_error", regexp = "version")
 })
 
+test_that("CX-12: new_instrument = TRUE on unchanged content says to drop the flag", {
+  loaded <- read_sframe(written(base_instrument()))
+  expect_error(write_sframe(loaded, tempfile(fileext = ".sframe"),
+                            new_instrument = TRUE),
+               class = "sframe_validation_error",
+               regexp = "Nothing changed since it was read: write it without `new_instrument = TRUE`.",
+               fixed = TRUE)
+  expect_no_error(write_sframe(loaded, tempfile(fileext = ".sframe")))
+})
+
+test_that("CX-12: changed content with the same version keeps the version message", {
+  loaded <- read_sframe(written(base_instrument()))
+  loaded$items[[1]]$label <- "A new study"
+  err <- expect_error(write_sframe(loaded, tempfile(fileext = ".sframe"),
+                                   new_instrument = TRUE),
+                      class = "sframe_validation_error")
+  expect_match(conditionMessage(err), "keeps the title and version", fixed = TRUE)
+  expect_false(grepl("Nothing changed", conditionMessage(err), fixed = TRUE))
+})
+
 test_that("CX-12: new_instrument = TRUE takes a new title or a new version", {
   loaded <- read_sframe(written(base_instrument()))
   loaded$items[[1]]$label <- "A new study"

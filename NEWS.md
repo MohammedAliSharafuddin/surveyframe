@@ -14,6 +14,9 @@ can be written again, and every plan result can be serialised by a host.
   the file read, so 2 different files could claim to be one instrument. Set
   `meta$version` (or `meta$title`) before writing. SurveyBuilder applies the
   same rule when it saves changed content of a file it opened.
+  An instrument unchanged since it was read writes without the flag, and the
+  error says so: Ethos, or any caller writing an unchanged file, drops
+  `new_instrument = TRUE`.
 * **A frequency table now shows choice labels, with the code in its own
   column.** The table's columns are `Value` (the label), `Code`, `Frequency`
   and `Percent`. Code reading `Value` for the stored code should read `Code`.
