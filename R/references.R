@@ -257,12 +257,26 @@ sframe_bibtex_entries <- function(text) {
     while (head_end <= n && !chars[head_end] %in% c("{", "(")) head_end <- head_end + 1L
     if (head_end > n) break
     type <- tolower(trimws(paste(chars[(i + 1L):(head_end - 1L)], collapse = "")))
-    close <- if (chars[head_end] == "{") "}" else ")"
+    # A braced entry ends at its matching "}". A parenthesised entry ends at the
+    # first ")" outside braces and double quotes, so brackets in a value stay.
+    parens <- chars[head_end] == "("
     depth <- 1L
+    inner <- 0L
+    quoted <- FALSE
     j <- head_end + 1L
     while (j <= n && depth > 0L) {
-      if (chars[j] == "{" || (close == ")" && chars[j] == "(")) depth <- depth + 1L
-      else if (chars[j] == close) depth <- depth - 1L
+      ch <- chars[j]
+      if (!parens) {
+        if (ch == "{") depth <- depth + 1L else if (ch == "}") depth <- depth - 1L
+      } else if (ch == "{" && !quoted) {
+        inner <- inner + 1L
+      } else if (ch == "}" && !quoted && inner > 0L) {
+        inner <- inner - 1L
+      } else if (ch == "\"" && inner == 0L) {
+        quoted <- !quoted
+      } else if (ch == ")" && inner == 0L && !quoted) {
+        depth <- 0L
+      }
       j <- j + 1L
     }
     body <- paste(chars[(head_end + 1L):(j - 2L)], collapse = "")
