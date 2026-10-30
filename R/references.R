@@ -210,7 +210,9 @@ sframe_reference_targets <- function(x, id) {
 #'   [sf_reference()].
 #'
 #' @return A list of `sf_reference` objects, named by citation key. An entry
-#'   that fails to parse is skipped with a warning naming it.
+#'   that fails to parse is skipped with a warning naming it. A key used by
+#'   more than one entry is an error that names every repeated key. Entries may
+#'   be written `@article{key, ...}` or `@article(key, ...)`.
 #' @export
 #' @examples
 #' refs <- read_bibtex(text = "@article{cronbach_1951,
@@ -232,6 +234,15 @@ read_bibtex <- function(file = NULL, text = NULL, cited_by = NULL) {
   }
   text <- paste(text, collapse = "\n")
   entries <- sframe_bibtex_entries(text)
+  keys <- vapply(entries, function(e) e$key, character(1))
+  repeated <- unique(keys[duplicated(keys)])
+  if (length(repeated)) {
+    sframe_abort_validation(paste0(
+      "The BibTeX has ", if (length(repeated) == 1L) "a reference with id " else "references with ids ",
+      paste0("'", repeated, "'", collapse = ", "),
+      " more than once. Give each entry its own key."
+    ))
+  }
   out <- list()
   for (entry in entries) {
     ref <- tryCatch(sframe_bibtex_to_reference(entry, cited_by), error = function(e) {

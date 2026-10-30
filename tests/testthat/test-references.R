@@ -253,3 +253,19 @@ test_that("read_bibtex() reads parenthesised entries, alone and mixed with brace
   expect_equal(refs$brace_1$title, "A braced entry (with brackets)")
   expect_equal(refs$paren_2$title, "Last one")
 })
+
+test_that("read_bibtex() refuses a key repeated within one import and names every one", {
+  bib <- paste(
+    "@article{a_1, title = {First}, year = {2001}}",
+    "@article{b_1, title = {Other}, year = {2002}}",
+    "@article{a_1, title = {Second}, year = {2003}}",
+    "@misc(b_1, title = {Third})",
+    "@misc{c_1, title = {Unique}}",
+    sep = "\n"
+  )
+  err <- expect_error(read_bibtex(text = bib), class = "sframe_validation_error")
+  expect_match(conditionMessage(err), "a_1", fixed = TRUE)
+  expect_match(conditionMessage(err), "b_1", fixed = TRUE)
+  expect_no_match(conditionMessage(err), "c_1", fixed = TRUE)
+  expect_match(conditionMessage(err), "more than once")
+})
