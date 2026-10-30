@@ -405,6 +405,13 @@ style.
 
 ## SurveyStudio
 
+* **The Analysis Plan screen has fields for the hypotheses.** Methods that
+  test a hypothesis show optional "Null hypothesis (H0)" and "Alternative
+  hypothesis (H1)" fields, with a method-appropriate example as placeholder
+  text. Only what you write is saved. Studio saved 2 fixed sentences, "No
+  effect or association is present." and "An effect or association is
+  present.", for every such block, and those load back as empty.
+
 * **SurveyStudio has a References screen.** It lists the works the open
   instrument cites, adds more from pasted BibTeX with where the instrument
   cites each one, and removes them. Changes apply to the open instrument at

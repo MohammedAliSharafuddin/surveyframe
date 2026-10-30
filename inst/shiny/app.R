@@ -68,6 +68,50 @@ parse_lines <- function(text) {
   values[nzchar(values)]
 }
 
+# Hypothesis helpers for the plan editor. Placeholders are examples only and
+# are never saved. Only text the researcher wrote becomes a hypothesis.
+studio_old_hypothesis_text <- c(
+  null = "No effect or association is present.",
+  alternative = "An effect or association is present."
+)
+
+studio_hypothesis_placeholder <- function(method, which = c("null", "alternative")) {
+  which <- match.arg(which)
+  ex <- if (grepl("^t_test", method %||% "")) {
+    c(null = "The mean of [outcome] does not differ between [group A] and [group B].",
+      alternative = "The mean of [outcome] differs between [group A] and [group B].")
+  } else if (grepl("correlation", method %||% "")) {
+    c(null = "[X] and [Y] are not correlated.",
+      alternative = "[X] and [Y] are correlated.")
+  } else if (grepl("^(anova|kruskal)", method %||% "")) {
+    c(null = "The mean of [outcome] is the same in every [group].",
+      alternative = "The mean of [outcome] differs in at least one [group].")
+  } else if (grepl("chi", method %||% "")) {
+    c(null = "[X] and [Y] are independent.",
+      alternative = "[X] and [Y] are associated.")
+  } else {
+    c(null = "Write what you expect if there is no effect.",
+      alternative = "Write what you expect if there is an effect.")
+  }
+  unname(ex[[which]])
+}
+
+studio_build_hypotheses <- function(null, alternative) {
+  out <- list()
+  n <- trim_or_null(null)
+  a <- trim_or_null(alternative)
+  if (!is.null(n)) out$null <- n
+  if (!is.null(a)) out$alternative <- a
+  if (length(out) > 0) out else NULL
+}
+
+studio_block_hypothesis <- function(block, which = c("null", "alternative")) {
+  which <- match.arg(which)
+  text <- trimws(as.character(block$hypotheses[[which]] %||% "")[1])
+  if (is.na(text) || identical(text, studio_old_hypothesis_text[[which]])) "" else text
+}
+# end studio plan helpers
+
 parse_csv <- function(text) {
   if (is.null(text) || !nzchar(trimws(text))) {
     return(character(0))
@@ -2988,6 +3032,7 @@ server <- function(input, output, session) {
         tags$div(class = "hint", "Variables are assigned below by methodological role."),
         uiOutput("analysis_role_fields"),
         uiOutput("analysis_alpha_field"),
+        uiOutput("analysis_hypotheses_field"),
         uiOutput("analysis_term_field"),
         uiOutput("analysis_wordcloud_field"),
         uiOutput("analysis_top_n_field"),
@@ -3116,6 +3161,41 @@ server <- function(input, output, session) {
       step = 0.001
     )
   })
+
+  output$analysis_hypotheses_field <- renderUI({
+    method <- input$analysis_method %||% "descriptives"
+    reg <- analysis_registry[[method]] %||% analysis_registry$descriptives
+    if (!isTRUE(reg$show_hypotheses)) {
+      return(NULL)
+    }
+    block <- studio_existing_plan_block(shiny::isolate(input$analysis_plan_id))
+    tagList(
+      textAreaInput(
+        "analysis_hyp_null",
+        "Null hypothesis (H0)",
+        value = shiny::isolate(input$analysis_hyp_null %||% studio_block_hypothesis(block, "null")),
+        rows = 2,
+        placeholder = studio_hypothesis_placeholder(method, "null")
+      ),
+      textAreaInput(
+        "analysis_hyp_alt",
+        "Alternative hypothesis (H1)",
+        value = shiny::isolate(input$analysis_hyp_alt %||% studio_block_hypothesis(block, "alternative")),
+        rows = 2,
+        placeholder = studio_hypothesis_placeholder(method, "alternative")
+      )
+    )
+  })
+
+  # The saved block with this plan ID, or an empty list when it is new.
+  studio_existing_plan_block <- function(plan_id) {
+    plan_id <- trim_or_null(plan_id)
+    if (is.null(plan_id)) return(list())
+    for (b in rv$builder$analysis_plan %||% list()) {
+      if (identical(b$id, plan_id)) return(b)
+    }
+    list()
+  }
 
   output$analysis_term_field <- renderUI({
     method <- input$analysis_method %||% "descriptives"
@@ -3271,8 +3351,7 @@ server <- function(input, output, session) {
       variables = studio_flatten_roles(roles),
       options = options,
       hypotheses = if (isTRUE(reg$show_hypotheses)) {
-        list(null = "No effect or association is present.",
-             alternative = "An effect or association is present.")
+        studio_build_hypotheses(input$analysis_hyp_null, input$analysis_hyp_alt)
       } else {
         NULL
       },
