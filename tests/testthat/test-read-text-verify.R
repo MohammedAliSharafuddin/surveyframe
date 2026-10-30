@@ -7,7 +7,7 @@
 
 demo_json <- function() {
   path <- tempfile(fileext = ".sframe")
-  write_sframe(sframe_demo("first_survey")$instrument, path, new_instrument = TRUE)
+  write_sframe(sframe_demo("first_survey")$instrument, path)
   paste(readLines(path), collapse = "\n")
 }
 
@@ -52,6 +52,8 @@ test_that("4: an unverified instrument is written only as a new instrument", {
   ins <- suppressWarnings(read_sframe(text = edited, verify = FALSE))
   path <- tempfile(fileext = ".sframe")
   expect_error(write_sframe(ins, path), "new_instrument = TRUE")
+  # A new instrument also needs a version of its own (CX-12).
+  ins$meta$version <- "1.0.1"
   expect_no_error(write_sframe(ins, path, new_instrument = TRUE))
   expect_true(attr(read_sframe(path), "sframe_verified"))
 })

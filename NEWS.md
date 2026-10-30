@@ -9,6 +9,11 @@ can be written again, and every plan result can be serialised by a host.
 
 ## What you need to change
 
+* **`write_sframe(new_instrument = TRUE)` needs a new title or version** on an
+  instrument read with `read_sframe()`. It accepted the title and version of
+  the file read, so 2 different files could claim to be one instrument. Set
+  `meta$version` (or `meta$title`) before writing. SurveyBuilder applies the
+  same rule when it saves changed content of a file it opened.
 * **A frequency table now shows choice labels, with the code in its own
   column.** The table's columns are `Value` (the label), `Code`, `Frequency`
   and `Percent`. Code reading `Value` for the stored code should read `Code`.

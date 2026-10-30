@@ -242,7 +242,10 @@ sframe_hash_value <- function(instrument) {
 #'   to `FALSE`.
 #' @param new_instrument Logical. `TRUE` declares that the content is a new
 #'   instrument, not a revision of the one it was read from, so no amendment is
-#'   required. The instrument must carry no amendment log. Defaults to `FALSE`.
+#'   required. The instrument must carry no amendment log, and an instrument
+#'   read with [read_sframe()] must have a new `meta$title` or `meta$version`,
+#'   so 2 different files never claim to be one instrument. Defaults to
+#'   `FALSE`.
 #'
 #' @return The file path, invisibly.
 #' @export
@@ -741,6 +744,9 @@ read_sframe <- function(path = NULL, validate = TRUE, text = NULL, verify = TRUE
     path = path,
     verified = hash_ok,
     content_hash = sframe_content_hash(instrument),
+    # The identity read, so a new instrument written from it must differ.
+    title = instrument$meta$title %||% "",
+    version = instrument$meta$version %||% "",
     amendment_new_hashes = vapply(instrument$amendments %||% list(),
                                   function(a) a$new_hash %||% "", character(1)),
     # Every field of every recorded entry, so an edit to a disclosure is as

@@ -135,6 +135,17 @@ sframe_check_amendment_boundary <- function(instrument, new_instrument = FALSE) 
         "another instrument's amendment log. Clear it first with ",
         "instrument$amendments <- list()."))
     }
+    # A new instrument with the title and version of the file it was read
+    # from would be a second file claiming to be that instrument.
+    if (!is.null(origin$version) &&
+        identical(instrument$meta$title %||% "", origin$title) &&
+        identical(instrument$meta$version %||% "", origin$version)) {
+      abort(sprintf(paste0(
+        "new_instrument = TRUE declares a new instrument, but it keeps the ",
+        "title and version of '%s' (\"%s\", version %s). Give it a new ",
+        "meta$version or meta$title first."),
+        origin$path, origin$title, origin$version))
+    }
     return(invisible(TRUE))
   }
 

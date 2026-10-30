@@ -7,6 +7,7 @@
 
 test_that("10: reworded consent goes through a pipeline amendment and writes", {
   ins <- sframe_demo("first_survey", branded = TRUE)$instrument
+  ins$meta$version <- "1.0.1"
   path <- tempfile(fileext = ".sframe")
   write_sframe(ins, path, new_instrument = TRUE)
   published <- read_sframe(path)
@@ -24,6 +25,7 @@ test_that("10: reworded consent goes through a pipeline amendment and writes", {
 
 test_that("10: the same edit without an amendment is refused", {
   ins <- sframe_demo("first_survey", branded = TRUE)$instrument
+  ins$meta$version <- "1.0.1"
   path <- tempfile(fileext = ".sframe")
   write_sframe(ins, path, new_instrument = TRUE)
   published <- read_sframe(path)

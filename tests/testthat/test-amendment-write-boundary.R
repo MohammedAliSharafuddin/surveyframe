@@ -89,9 +89,39 @@ test_that("E2: reordering amendments is refused", {
 test_that("E2: new_instrument = TRUE declares a changed file a new instrument", {
   loaded <- read_sframe(written(base_instrument()))
   loaded$items[[1]]$label <- "A new study"
+  loaded$meta$version <- "0.2.0"
   path <- tempfile(fileext = ".sframe")
   expect_no_error(write_sframe(loaded, path, new_instrument = TRUE))
   expect_identical(read_sframe(path)$items[[1]]$label, "A new study")
+})
+
+# Codex CX-12, decision D2. new_instrument = TRUE accepted the title and
+# version of the file read, so 2 different files could claim to be one
+# instrument. A new instrument needs a new title or version, as in the builder.
+test_that("CX-12: new_instrument = TRUE refuses the title and version read", {
+  loaded <- read_sframe(written(base_instrument()))
+  loaded$items[[1]]$label <- "A new study"
+  expect_error(write_sframe(loaded, tempfile(fileext = ".sframe"),
+                            new_instrument = TRUE),
+               class = "sframe_validation_error", regexp = "version")
+})
+
+test_that("CX-12: new_instrument = TRUE takes a new title or a new version", {
+  loaded <- read_sframe(written(base_instrument()))
+  loaded$items[[1]]$label <- "A new study"
+  retitled <- loaded
+  retitled$meta$title <- "Revisions, second study"
+  expect_no_error(write_sframe(retitled, tempfile(fileext = ".sframe"),
+                               new_instrument = TRUE))
+  bumped <- loaded
+  bumped$meta$version <- "0.1.1"
+  expect_no_error(write_sframe(bumped, tempfile(fileext = ".sframe"),
+                               new_instrument = TRUE))
+})
+
+test_that("CX-12: new_instrument = TRUE on an instrument built in R needs no change", {
+  expect_no_error(write_sframe(base_instrument(), tempfile(fileext = ".sframe"),
+                               new_instrument = TRUE))
 })
 
 test_that("E2: a freshly built instrument writes with no amendment needed", {
