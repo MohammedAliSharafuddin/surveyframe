@@ -295,6 +295,12 @@ style.
   renders in its own R process, which loads the installed package, so this
   names the code that produced the numbers.
 
+* **The tests render Quarto reports with the build under test.** A test
+  setup file installs the source once per run and puts it first on
+  `R_LIBS`, so every child R process, Quarto included, loads it. The
+  earlier `render_report()` shadow never ran under `devtools::test()`, so
+  Quarto tests had rendered with the installed copy.
+
 * **`render_report()` shows the report it writes.** In an interactive
   session the new `open = TRUE` default opens it in the viewer pane of
   RStudio, Positron or VS Code, or in the web browser elsewhere, and
