@@ -116,9 +116,10 @@ size, resolution and format in \code{figures}, where \code{format} may also be
 \code{"tiff"}, \code{"jpeg"} or \code{"pdf"}. Needs \code{data}. Defaults to 300 dpi at
 7 by 4.5 inches where \code{figures} names none.}
 
-\item{open}{Logical. Whether to show the finished report: in RStudio's
-Viewer pane inside RStudio, and in the web browser otherwise. Defaults to
-\code{TRUE} in an interactive session and \code{FALSE} in a script.}
+\item{open}{Logical. Whether to show the finished report: in the viewer
+pane of RStudio, Positron or VS Code, and in the web browser otherwise.
+Defaults to \code{TRUE} in an interactive session and \code{FALSE} in a script.
+Nothing opens during a knitr or Quarto render.}
 }
 \value{
 The output file path, invisibly.

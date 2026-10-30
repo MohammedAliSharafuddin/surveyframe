@@ -299,9 +299,10 @@ print.sframe_codebook <- function(x, ...) {
 #'   size, resolution and format in `figures`, where `format` may also be
 #'   `"tiff"`, `"jpeg"` or `"pdf"`. Needs `data`. Defaults to 300 dpi at
 #'   7 by 4.5 inches where `figures` names none.
-#' @param open Logical. Whether to show the finished report: in RStudio's
-#'   Viewer pane inside RStudio, and in the web browser otherwise. Defaults to
-#'   `TRUE` in an interactive session and `FALSE` in a script.
+#' @param open Logical. Whether to show the finished report: in the viewer
+#'   pane of RStudio, Positron or VS Code, and in the web browser otherwise.
+#'   Defaults to `TRUE` in an interactive session and `FALSE` in a script.
+#'   Nothing opens during a knitr or Quarto render.
 #' @param csl Optional path to a Citation Style Language file for the
 #'   References section. Defaults to APA 7th edition, bundled with the
 #'   package. Any style from the Zotero style repository works.
@@ -690,29 +691,9 @@ sframe_report_result <- function(dest, engine, open = FALSE) {
            " engine: ", normalizePath(dest, mustWork = FALSE)),
     class = "sframe_report_engine"
   )
-  if (isTRUE(open)) sframe_show_report(dest)
+  if (isTRUE(open)) sframe_show(dest)
   attr(dest, "engine") <- engine
   invisible(dest)
-}
-
-# Shows a finished report. RStudio's Viewer displays files inside the
-# session's temporary directory alone, so a copy goes there. Elsewhere the
-# report opens in the web browser.
-sframe_show_report <- function(path) {
-  path <- normalizePath(path, mustWork = FALSE)
-  if (!file.exists(path)) return(invisible(FALSE))
-  if (grepl("\\.html?$", path, ignore.case = TRUE) &&
-      requireNamespace("rstudioapi", quietly = TRUE) &&
-      isTRUE(tryCatch(rstudioapi::isAvailable(), error = function(e) FALSE))) {
-    dir <- tempfile("surveyframe-view-")
-    dir.create(dir)
-    copy <- file.path(dir, basename(path))
-    file.copy(path, copy, overwrite = TRUE)
-    rstudioapi::viewer(copy)
-  } else {
-    utils::browseURL(paste0("file://", path))
-  }
-  invisible(TRUE)
 }
 
 # Drop entries that cannot be rendered: unnamed values, non-character
