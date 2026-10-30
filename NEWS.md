@@ -133,6 +133,11 @@ style.
 
 ## Analysis
 
+* **Logistic syntax codes the outcome as the analysis does.** The code
+  `analysis_syntax()` writes for a binary logistic regression recodes the
+  outcome to 0 and 1 the way the runner does before `glm()`, so a text
+  outcome runs and the coefficients match the result.
+
 * **ANCOVA syntax writes every covariate.** `analysis_syntax()` for an
   ANCOVA wrote only the first declared covariate, so its F differed from
   the result. It now writes each one (CX-02).

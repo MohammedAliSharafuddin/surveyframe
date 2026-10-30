@@ -168,9 +168,12 @@ sframe_syntax_call <- function(result, frame = "scored") {
     regression_logistic_binary = {
       outcome <- vars[length(vars)]
       predictors <- vars[-length(vars)]
-      c(sprintf("fit <- glm(`%s` ~ %s, data = %s, family = binomial())",
-                outcome, paste(sprintf("`%s`", predictors), collapse = " + "),
-                frame),
+      # The runner codes the outcome as as.factor(y), the second level being 1.
+      c(sprintf("model_data <- %s", frame),
+        sprintf("model_data[[\"%s\"]] <- as.integer(as.factor(model_data[[\"%s\"]])) - 1L",
+                outcome, outcome),
+        sprintf("fit <- glm(`%s` ~ %s, data = model_data, family = binomial())",
+                outcome, paste(sprintf("`%s`", predictors), collapse = " + ")),
         "summary(fit)",
         "exp(cbind(`odds ratio` = coef(fit), confint.default(fit)))")
     },
