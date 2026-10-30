@@ -62,3 +62,12 @@ test_that("6: the expansion columns of a multiple-choice item count as present",
   expect_null(surveyframe:::sframe_missing_variables_problem(
     "mc", data.frame(mc__a = 1, mc__b = 0), block_instrument(list())))
 })
+
+test_that("CX-16: an efa_solution block naming a missing item reports it", {
+  r <- run_block("efa_solution", list(items = c("score", "q9")))
+  expect_match(r$error, "'q9' is neither an item nor a scale of the instrument",
+               fixed = TRUE)
+  r <- run_block("efa_solution", list(variables = c("score", "extra")))
+  expect_match(r$error, "'extra' is an item with no column in the responses",
+               fixed = TRUE)
+})
