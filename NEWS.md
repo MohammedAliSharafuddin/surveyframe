@@ -258,6 +258,15 @@ style.
   declared options First and Second with a count of 0 beside unlabelled rows
   1 and 2. Only codes that survive a numeric round trip, such as 1 and 2, are
   now read as numbers. The rest stay as written.
+* **Result text names variables and groups by their labels.** The tables
+  and charts used the instrument's labels, while the text beside them said
+  `attendee_type`, "higher in in_person" and "reference category keynote".
+  A variable now appears as its label in double quotes, since a label is
+  often a question, with any double quotes inside it turned to single ones.
+  A group or category appears as its choice label. An interaction term in a
+  table, such as `attendee_role:format`, reads as its 2 labels joined by
+  a times sign. A runner called outside `run_analysis_plan()` keeps the
+  ids (CX-20).
 * **A block that cannot run says which block, what is wrong and what to do.**
   McNemar, Friedman, ANCOVA, Fisher's exact test, partial correlation, the
   ordinal, multinomial and Firth logistic models and moderation said only

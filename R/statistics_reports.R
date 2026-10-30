@@ -1051,16 +1051,16 @@ sframe_run_descriptives_result <- function(data, roles, options = list(),
     }, character(1)))
     note <- if (length(shown) == 1) {
       sprintf("%s is a choice item, so it is reported as counts and percentages.",
-              shown)
+              sframe_text_var(shown))
     } else {
       sprintf("%s are choice items, so they are reported as counts and percentages.",
-              paste(shown, collapse = ", "))
+              paste(sframe_text_var(shown), collapse = ", "))
     }
     if (!is.null(split_by)) {
-      note <- paste(note, sprintf("The counts are given for each %s group.", split_by))
+      note <- paste(note, sprintf("The counts are given for each group of %s.", sframe_text_var(split_by)))
     }
     if (!is.null(cat_tbl) && !is.null(weights) && weights %in% colnames(data)) {
-      note <- paste(note, sprintf("The counts are weighted by %s.", weights))
+      note <- paste(note, sprintf("The counts are weighted by %s.", sframe_text_var(weights)))
     }
   }
   if (!is.null(usable$note) && (length(categorical) > 0 || !is.null(weights))) {
@@ -1621,7 +1621,7 @@ sframe_run_ancova <- function(data, roles) {
     slope_warning = slope_warning,
     slope_model_summary = if (!is.null(slope_fit)) utils::capture.output(summary(slope_fit)) else NULL,
     apa = sprintf("Adjusted for %s, the group effect was F(%d, %d) = %.2f, p %s.",
-                  paste(covariates, collapse = " and "), as.integer(g$df), as.integer(res_df),
+                  paste(sframe_text_var(covariates), collapse = " and "), as.integer(g$df), as.integer(res_df),
                   g$F, sframe_p_string(g$p)),
     prompt = "Report adjusted group effects and state whether homogeneity of regression slopes was checked."
   )
@@ -1844,7 +1844,7 @@ sframe_run_multinomial_logistic <- function(data, roles, options = list()) {
     AIC = stats::AIC(fit),
     pseudo_r2 = pseudo_r2,
     classification_table = as.data.frame.matrix(class_table),
-    apa = sprintf("Multinomial logistic regression was estimated with %d complete cases, against the reference category %s.", nrow(df), reference),
+    apa = sprintf("Multinomial logistic regression was estimated with %d complete cases, against the reference category %s.", nrow(df), sframe_text_value(outcome, reference)),
     prompt = "Report the reference category, odds ratios, model fit, and classification table where meaningful."
   )
 }

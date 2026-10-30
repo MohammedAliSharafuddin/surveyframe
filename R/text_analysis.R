@@ -250,7 +250,7 @@ sframe_run_term_freq <- function(data, roles, options, instrument) {
       test = "term_freq", variable = item_id,
       n = length(cleaned_all), table = built$table,
       apa = sprintf("Term frequency for %s (N = %d responses, top term \"%s\").",
-                    item_id, length(cleaned_all),
+                    sframe_text_var(item_id), length(cleaned_all),
                     if (nrow(built$table) > 0) built$table$term[1] else "none"),
       prompt = "Review the leading terms for coherence with the research question."
     ))
@@ -298,7 +298,7 @@ sframe_run_term_freq <- function(data, roles, options, instrument) {
     n = length(cleaned_all), table = combined,
     overall_table = if (is.null(overall$error)) overall$table else NULL,
     apa = sprintf("Term frequency for %s by %s (N = %d responses, %d groups).",
-                  item_id, group_id, length(cleaned_all), length(levels_present)),
+                  sframe_text_var(item_id), sframe_text_var(group_id), length(cleaned_all), length(levels_present)),
     prompt = "Compare the leading terms across groups for coherence with the research question."
   )
 }
@@ -377,7 +377,7 @@ sframe_run_co_occurrence <- function(data, roles, options, instrument) {
     test = "co_occurrence", variable = item_id,
     n = n_resp, table = edges,
     apa = sprintf("Term co-occurrence for %s (N = %d responses, %d co-occurring pairs).",
-                  item_id, n_resp, nrow(edges)),
+                  sframe_text_var(item_id), n_resp, nrow(edges)),
     prompt = "Review the strongest co-occurring term pairs for coherence with the research question."
   )
 }
@@ -909,7 +909,7 @@ sframe_run_ngram_freq <- function(data, roles, options, instrument) {
   list(
     test = "ngram_freq", variable = item_id, n = n_resp, table = tbl,
     apa = sprintf("%d-gram frequency for %s (N = %d responses, top n-gram \"%s\").",
-                  n, item_id, n_resp,
+                  n, sframe_text_var(item_id), n_resp,
                   if (nrow(tbl) > 0) tbl$term[1] else "none"),
     prompt = "Review the leading n-grams for coherence with the research question."
   )
@@ -949,7 +949,7 @@ sframe_run_term_context <- function(data, roles, options, instrument) {
   list(
     test = "term_context", variable = item_id, term = term, table = tbl,
     apa = sprintf("Keyword-in-context for \"%s\" in %s (N = %d responses, %d matches).",
-                  term, item_id, n_resp, nrow(tbl)),
+                  term, sframe_text_var(item_id), n_resp, nrow(tbl)),
     prompt = "Read the surrounding context of each match for coherence with the research question."
   )
 }
@@ -1115,7 +1115,7 @@ sframe_run_cooccurrence_network <- function(data, roles, options, instrument) {
         "Term co-occurrence network for %s (N = %d responses, %d terms, ",
         "%d edges, %d clusters, modularity = %.2f)."
       ),
-      item_id, n_resp, nrow(table), nrow(edges), n_clusters, modularity
+      sframe_text_var(item_id), n_resp, nrow(table), nrow(edges), n_clusters, modularity
     ),
     prompt = paste(
       "Inspect each cluster for thematic coherence and note any",
@@ -1232,7 +1232,7 @@ sframe_run_tidy_sentiment <- function(data, roles, options, instrument) {
       n = length(cleaned_all), table = built$table, scores = built$scores,
       word_sentiment = word_sentiment,
       apa = sprintf("Sentiment for %s (N = %d responses, %.1f%% positive).",
-                    item_id, length(cleaned_all), prop_pos * 100),
+                    sframe_text_var(item_id), length(cleaned_all), prop_pos * 100),
       prompt = "Review the balance of positive and negative sentiment for coherence with the research question."
     ))
   }
@@ -1279,7 +1279,7 @@ sframe_run_tidy_sentiment <- function(data, roles, options, instrument) {
     n = length(cleaned_all), table = combined_table, scores = combined_scores,
     word_sentiment = word_sentiment,
     apa = sprintf("Sentiment for %s by %s (N = %d responses, %d groups).",
-                  item_id, group_id, length(cleaned_all), length(levels_present)),
+                  sframe_text_var(item_id), sframe_text_var(group_id), length(cleaned_all), length(levels_present)),
     prompt = "Compare the balance of positive and negative sentiment across groups for coherence with the research question."
   )
 }
@@ -1340,7 +1340,7 @@ sframe_run_quanteda_dfm <- function(data, roles, options, instrument) {
     top_features = top_tbl,
     apa = sprintf(
       "Document-feature matrix for %s (N = %d responses, %d features, sparsity = %.3f).",
-      item_id, n_resp, n_features, sparsity
+      sframe_text_var(item_id), n_resp, n_features, sparsity
     ),
     prompt = "Review the leading features and matrix sparsity for coherence with the research question."
   )
