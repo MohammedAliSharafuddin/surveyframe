@@ -98,3 +98,7 @@ test_that("fitting leaves a hidden legend hidden and the caller's plot alone", {
   invisible(sframe_fit_plot(p3))
   expect_true(inherits(p3$scales$get_scales("fill")$labels, "waiver"))
 })
+
+test_that("a chart that fails to build fails once, without a promise warning", {
+  expect_error(expect_no_warning(sframe_fit_plot(stop("boom"))), "boom")
+})

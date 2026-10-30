@@ -121,6 +121,9 @@ sframe_wrap_text <- function(x, chars) {
 # round the plot. `width` is in inches and defaults to the figure settings
 # in force, then 6.5. Anything that is not a ggplot is returned unchanged.
 sframe_fit_plot <- function(p, width = NULL) {
+  # Forced first, so a chart that fails to build fails here once and is not
+  # built again by the handler below.
+  force(p)
   tryCatch(.sframe_fit_plot(p, width), error = function(e) p)
 }
 
