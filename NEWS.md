@@ -348,6 +348,13 @@ style.
   builder saved 2 fixed sentences, "No effect or association is present."
   and "An effect or association is present.", for every such block, and
   those load back as empty.
+* **The decision rule and the interpretation are separate text boxes.**
+  One box filled both fields. The Plan editor's box is labelled "Decision
+  rule (declared now)" and saves the decision rule only. The report outline
+  shows the rule read-only, with an "Interpretation" box that saves the
+  interpretation only once results exist. An interpretation identical to
+  the rule counts as unwritten, and a file holding only `interpretation`
+  still opens with it as the rule.
 
 * **Changed content of an opened file saves only as a new instrument.** The
   builder checked a file's hash when it opened and then forgot it, so an

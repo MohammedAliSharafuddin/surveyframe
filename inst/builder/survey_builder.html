@@ -1116,7 +1116,7 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
     <div class="field" id="rqCitDiv"></div>
     <div id="rqPreview" class="preview-card"></div>
     <div id="rqValidMsg" class="plan-msg"></div>
-    <div class="field"><label class="fl" for="rq-interp">Planned decision rule in Plan stage</label><div class="fc"><textarea id="rq-interp" rows="3" placeholder="State how the result will answer the research question."></textarea></div></div>
+    <div class="field"><label class="fl" for="rq-interp">Decision rule (declared now)</label><div class="fc"><textarea id="rq-interp" rows="3" placeholder="State how the result will answer the research question."></textarea></div></div>
   </div>
   <div class="mfoot">
     <button type="button" class="btn btn-d btn-sm" id="rqDelBtn" style="display:none" onclick="deleteRQ()">Delete</button>
@@ -4129,7 +4129,7 @@ function openRQModal(id){
   editRqId=id||null;var rq=id?S.analysis_plan.find(function(r){return r.id===id;}):null;
   var method=rq?(rq.method||rq.test||'mann_whitney'):'mann_whitney';if(method==='efa')method='efa_readiness';if(method==='cfa')method='cfa_lavaan_syntax';
   document.getElementById('rq-modal-title').textContent=id?'Edit Analysis Plan':'Add Analysis Plan';
-  sv('rq-q',rq?rq.research_question||'':'');sv('rq-interp',rq?rq.decision_rule||rq.interpretation||'':'');
+  sv('rq-q',rq?rq.research_question||'':'');sv('rq-interp',rq?ruleOf(rq):'');
   sv('rq-h0',rq&&rq.hypotheses?writtenHyp(rq.hypotheses.null):'');sv('rq-h1',rq&&rq.hypotheses?writtenHyp(rq.hypotheses.alternative):'');
   document.getElementById('rq-test').value=method;
   document.getElementById('rq-alpha').value=rq?String((rq.options&&rq.options.alpha)||rq.alpha||0.05):'0.05';
@@ -4196,6 +4196,13 @@ function validatePlanRoles(){
   var btn=document.getElementById('rqSaveBtn');if(btn)btn.disabled=!complete;
   var prev=document.getElementById('rqPreview');if(prev)prev.innerHTML='<strong>Planned output</strong><br>'+esc(reg.output||'Structured result')+(reg.assumptions&&reg.assumptions.length?'<br><strong>Assumptions</strong>: '+esc(reg.assumptions.join(', ')):'');
 }
+// The decision rule is declared at the Plan stage. An older file may carry
+// only the legacy name, interpretation, which R reads as the rule. The
+// interpretation is the researcher's reading of the results. One identical to
+// the rule is the same text saved twice by older builders, so it counts as
+// unwritten.
+function ruleOf(rq){return(rq&&(rq.decision_rule||rq.interpretation))||'';}
+function interpOf(rq){var i=(rq&&rq.interpretation)||'';return i===ruleOf(rq)?'':i;}
 function hypLines(rq){var h=rq.hypotheses||{},a=writtenHyp(h.null),b=writtenHyp(h.alternative);return(a?'<div><strong>H0:</strong> '+esc(a)+'</div>':'')+(b?'<div><strong>H1:</strong> '+esc(b)+'</div>':'');}
 function onTestChg(renderRoles){
   if(renderRoles!==false)renderRoleFields({});
@@ -4285,7 +4292,8 @@ function saveRQ(){
   if(reg.showK&&gv('rq-k').trim())opts.k=parseInt(gv('rq-k'),10);
   // Only what the researcher wrote is saved. Placeholders are examples.
   var hyp=null;if(reg.showHypotheses){var h0=gv('rq-h0').trim(),h1=gv('rq-h1').trim();if(h0||h1){hyp={};if(h0)hyp.null=h0;if(h1)hyp.alternative=h1;}}
-  var rq={id:editRqId||uid(),research_question:q,family:reg.family||'',method:t,test:t,roles:roles,variables:vars,options:opts,hypotheses:hyp,decision_rule:gv('rq-interp').trim(),interpretation:gv('rq-interp').trim(),reporting_references:reg.refs||[],citations:reg.refs||[],status:'valid_plan',requires_data:!['cfa_lavaan_syntax','sem_lavaan_syntax','seminr_syntax'].includes(t),result:null};
+  var editRq=editRqId?S.analysis_plan.find(function(r){return r.id===editRqId;}):null;
+  var rq={id:editRqId||uid(),research_question:q,family:reg.family||'',method:t,test:t,roles:roles,variables:vars,options:opts,hypotheses:hyp,decision_rule:gv('rq-interp').trim(),interpretation:editRq?interpOf(editRq):'',reporting_references:reg.refs||[],citations:reg.refs||[],status:'valid_plan',requires_data:!['cfa_lavaan_syntax','sem_lavaan_syntax','seminr_syntax'].includes(t),result:null};
   snap();
   if(editRqId){var i=S.analysis_plan.findIndex(function(r){return r.id===editRqId;});if(i>=0)S.analysis_plan[i]=rq;}
   else S.analysis_plan.push(rq);
@@ -4417,15 +4425,15 @@ function renderModelBuilder(){
   from.innerHTML=opts;to.innerHTML=opts;
   list.innerHTML=models.length?models.map(function(m){var paths=(m.structural&&m.structural.paths)||[];return'<div class="model-row"><strong>'+esc(m.id)+'</strong> <span class="vbadge">'+esc(m.type||'model')+'</span><div>'+esc((m.measurement&&m.measurement.constructs||[]).length)+' construct(s), '+esc(paths.length)+' path(s)</div><div class="model-paths">'+(paths.length?paths.map(function(p){return'<span class="vchip">'+esc(p.from+' -> '+p.to)+'</span>';}).join(''):'<span class="rq-no-int">No paths yet.</span>')+'</div></div>';}).join(''):'<div class="rq-no-int">No saved models yet.</div>';
 }
-// Inline decision-rule editing in the Report outline. Writes to the same
-// plan-block fields the RQ modal edits (both names, matching saveRQ), so
-// the modal, the plan cards, and the outline stay one source of truth. No
+// Inline interpretation editing in the Report outline. The decision rule is
+// declared in the RQ modal and shown here read-only. This writes the
+// interpretation field only, so the two never overwrite each other. No
 // re-render here: the textarea already shows the value, and re-rendering
 // mid-typing would drop focus.
 function updatePlanInterp(id,val){
   var rq=S.analysis_plan.find(function(r){return r.id===id;});
   if(!rq)return;
-  rq.decision_rule=val.trim();rq.interpretation=val.trim();
+  rq.interpretation=val.trim();
   setDirty();
 }
 // Report outline tab: a skeleton of the eventual render_report() document:
@@ -4449,10 +4457,11 @@ function reportSkeletonHtml(plans){
       out+='<table class="rs-tbl"><thead><tr><th>Statistic</th><th>Value</th><th>Interpretation</th></tr></thead><tbody>'+phRow+phRow+'</tbody></table>';
       out+='<div class="rs-fig"><span class="rs-fig-ic">&#128200;</span><span class="rs-fig-cap">Figure 3.'+(i+1)+': '+esc(TLBLS[method]||method)+' chart, paired with the table above</span></div>';
     }
-    // The editable field sits below the table and chart, matching where
+    // The rule and the interpretation sit below the table and chart, matching where
     // render_report() prints the paired "Planned decision rule" and
     // "Interpretation" lines under each result, not up in the question header.
-    out+='<div class="rs-interp"><label class="rs-interp-lbl" for="rsInterp_'+i+'">Planned decision rule (editable)</label><textarea id="rsInterp_'+i+'" rows="2" placeholder="State how the result will answer the research question." oninput="updatePlanInterp(\''+rq.id+'\',this.value)">'+esc(rq.decision_rule||rq.interpretation||'')+'</textarea></div>';
+    if(ruleOf(rq))out+='<div class="rs-interp"><span class="rs-interp-lbl">Planned decision rule</span><div class="rs-p">'+esc(ruleOf(rq))+'</div></div>';
+    if(rq.result)out+='<div class="rs-interp"><label class="rs-interp-lbl" for="rsInterp_'+i+'">Interpretation</label><textarea id="rsInterp_'+i+'" rows="2" placeholder="State what the result means for the research question." oninput="updatePlanInterp(\''+rq.id+'\',this.value)">'+esc(interpOf(rq))+'</textarea></div>';
   });
   out+='<div class="rs-h2">4. Measurement models</div>';
   if(S.models&&S.models.length){S.models.forEach(function(m){out+='<div class="rs-p"><strong>'+esc(m.id||m.label||'Model')+'</strong> ('+esc(m.type||'model')+', '+((m.measurement&&m.measurement.constructs)?m.measurement.constructs.length:0)+' construct(s)): generated lavaan/seminr syntax is printed in this section.</div>';});}
@@ -4481,7 +4490,7 @@ function renderAnalyse(){
   // execution queue: the same cards, minus syntax-only methods, reorderable
   // in place (drag order writes back to S.analysis_plan by id).
   var draggable=anTab==='plan'||anTab==='run';
-  var cardHtml=function(plans){return plans.map(function(rq,i){var method=rq.method||rq.test,reg=ANALYSIS_REGISTRY[method]||{},alpha=(rq.options&&rq.options.alpha)||rq.alpha,vars=asArr(rq.variables);if(!vars.length)vars=flattenRoles(rq.roles||{});var refs=asArr(rq.reporting_references);if(!refs.length)refs=asArr(rq.citations);var drg=draggable?' draggable="true" ondragstart="pStart(event,\''+rq.id+'\')" ondragover="pOver(event,\''+rq.id+'\')" ondrop="pDrop(event,\''+rq.id+'\')" ondragend="pEnd(event)" ondragleave="this.classList.remove(\'drag-t\',\'drag-b\')"':'';return'<div class="rq-card'+(draggable?' rq-drag':'')+'"'+drg+' onclick="openRQModal(\''+rq.id+'\')"><div style="display:flex;align-items:flex-start;gap:8px"><span class="rq-num"'+(draggable?' title="Drag to reorder"':'')+'>'+(i+1)+'</span><div style="flex:1"><div class="rq-q">'+esc(rq.research_question)+'</div><div class="rq-meta"><span class="tc">'+esc(TLBLS[method]||method)+'</span>'+(reg.showAlpha?'<span class="ac">significance='+esc(alpha||0.05)+'</span>':'')+(rq.status?'<span class="ac">'+esc(rq.status)+'</span>':'')+refs.map(function(k){return'<span class="cc">'+esc(CSHORT[k]||k)+'</span>';}).join('')+'</div>'+(vars.length?'<div style="margin-top:6px;display:flex;gap:3px;flex-wrap:wrap">'+vars.map(function(v){return'<span class="vchip">'+esc(v)+'</span>';}).join('')+'</div>':'')+(hypLines(rq)?'<div class="rq-interp">'+hypLines(rq)+'</div>':'')+(rq.decision_rule||rq.interpretation?'<div class="rq-interp">'+esc(rq.decision_rule||rq.interpretation)+'</div>':'<div class="rq-no-int">Decision rule pending.</div>')+'</div></div></div>';}).join('');};
+  var cardHtml=function(plans){return plans.map(function(rq,i){var method=rq.method||rq.test,reg=ANALYSIS_REGISTRY[method]||{},alpha=(rq.options&&rq.options.alpha)||rq.alpha,vars=asArr(rq.variables);if(!vars.length)vars=flattenRoles(rq.roles||{});var refs=asArr(rq.reporting_references);if(!refs.length)refs=asArr(rq.citations);var drg=draggable?' draggable="true" ondragstart="pStart(event,\''+rq.id+'\')" ondragover="pOver(event,\''+rq.id+'\')" ondrop="pDrop(event,\''+rq.id+'\')" ondragend="pEnd(event)" ondragleave="this.classList.remove(\'drag-t\',\'drag-b\')"':'';return'<div class="rq-card'+(draggable?' rq-drag':'')+'"'+drg+' onclick="openRQModal(\''+rq.id+'\')"><div style="display:flex;align-items:flex-start;gap:8px"><span class="rq-num"'+(draggable?' title="Drag to reorder"':'')+'>'+(i+1)+'</span><div style="flex:1"><div class="rq-q">'+esc(rq.research_question)+'</div><div class="rq-meta"><span class="tc">'+esc(TLBLS[method]||method)+'</span>'+(reg.showAlpha?'<span class="ac">significance='+esc(alpha||0.05)+'</span>':'')+(rq.status?'<span class="ac">'+esc(rq.status)+'</span>':'')+refs.map(function(k){return'<span class="cc">'+esc(CSHORT[k]||k)+'</span>';}).join('')+'</div>'+(vars.length?'<div style="margin-top:6px;display:flex;gap:3px;flex-wrap:wrap">'+vars.map(function(v){return'<span class="vchip">'+esc(v)+'</span>';}).join('')+'</div>':'')+(hypLines(rq)?'<div class="rq-interp">'+hypLines(rq)+'</div>':'')+(ruleOf(rq)?'<div class="rq-interp">'+esc(ruleOf(rq))+'</div>':'<div class="rq-no-int">Decision rule pending.</div>')+'</div></div></div>';}).join('');};
   if(anTab==='run'){
     rb.innerHTML=cardHtml(runPlans);
     if(syntaxOnly.length)rb.innerHTML+='<div style="padding:8px 12px;font-size:11px;color:var(--t3);border-top:1px solid var(--bdr);margin-top:4px">'+syntaxOnly.length+' syntax-only method(s) excluded. These generate lavaan or seminr strings without requiring response data.</div>';
