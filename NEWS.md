@@ -448,6 +448,11 @@ style.
   decision rule only. Saving an edited block keeps the interpretation it
   already had, and an interpretation identical to the decision rule counts
   as unwritten.
+* **Saving an opened file untouched keeps its content hash.** Studio rebuilt
+  the instrument metadata without the file's creation time, so the saved
+  draft carried the time of the save. Any file opened and saved unchanged
+  then failed its hash check and Studio asked to save it as a new
+  instrument. The creation time now carries over from the file.
 
 * **SurveyStudio has a References screen.** It lists the works the open
   instrument cites, adds more from pasted BibTeX with where the instrument

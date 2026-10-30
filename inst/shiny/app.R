@@ -1767,7 +1767,10 @@ server <- function(input, output, session) {
         values <- parse_csv(input$draft_authors %||% "")
         if (length(values) == 0) (m$authors %||% NULL) else values
       },
-      languages = if (length(languages) == 0) (m$languages %||% "en") else languages
+      languages = if (length(languages) == 0) (m$languages %||% "en") else languages,
+      # Carried from the loaded file. Without it the draft is stamped with the
+      # time of the edit and an untouched file no longer matches its hash.
+      created_at = m$created_at
     )
   })
 
