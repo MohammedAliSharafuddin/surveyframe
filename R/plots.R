@@ -1207,7 +1207,8 @@ sframe_plot_for_result <- function(result, data, palette = c("web", "print")) {
     NULL
   )
   if (is.null(builder)) return(NULL)
-  tryCatch(builder(), error = function(e) NULL)
+  # sframe_fit_plot() wraps text to the export width so nothing clips at 6.5 by 4
+  tryCatch(sframe_fit_plot(builder()), error = function(e) NULL)
 }
 
 #' Ranked-score bar chart for a decision-family result
