@@ -133,6 +133,12 @@ style.
 
 ## Analysis
 
+* **Choice descriptives honour `split_by` and weights.** A descriptives
+  block counted choice items raw and pooled whatever its grouping and
+  weights. Counts and percentages now come per group, in the order the
+  choice set declares, and weighted when a weight column is named (D5,
+  CX-07).
+
 * **One check for every weight column.** Frequency, cross-tabulation and
   descriptives blocks stop with an error naming the weight column when a
   weight is negative, infinite or not a number, or when the weights sum to
