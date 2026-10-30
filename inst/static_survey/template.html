@@ -987,6 +987,7 @@ function startSurvey(){
       return;
     }
   }
+  consentGiven=true;
   screen='survey';
   currentPage=1;
   renderScreen();
@@ -1176,8 +1177,13 @@ function renderScreen(){
 // localStorage under a key from the instrument's content, so a respondent who
 // closes the tab can resume, and a revised instrument starts clean. Cleared
 // once the response is submitted, and kept when delivery fails.
+// The key covers the whole instrument as exported, less its hash, so any
+// change (a choice set, the consent text) starts drafts afresh. It used to
+// cover the title, version and items alone, and a draft resumed against
+// changed meaning.
 function draftKey(){
-  var s=JSON.stringify([SF.meta&&SF.meta.title,SF.meta&&SF.meta.version,SF.items]),h=5381;
+  var c={};Object.keys(SF).forEach(function(k){if(k!=='hash')c[k]=SF[k];});
+  var s=JSON.stringify(c),h=5381;
   for(var i=0;i<s.length;i++){h=((h<<5)+h+s.charCodeAt(i))|0;}
   return 'sframe_draft_'+(h>>>0).toString(36);
 }
@@ -1187,7 +1193,7 @@ function draftStore(){
 }
 function saveDraft(){
   var st=draftStore();if(!st||screen!=='survey')return;
-  try{st.setItem(draftKey(),JSON.stringify({responses:responses,page:currentPage,saved:Date.now()}));}catch(e){}
+  try{st.setItem(draftKey(),JSON.stringify({responses:responses,page:currentPage,consented:consentGiven,saved:Date.now()}));}catch(e){}
 }
 function loadDraft(){
   var st=draftStore();if(!st)return null;
@@ -1197,12 +1203,27 @@ function clearDraft(){
   var st=draftStore();if(!st)return;
   try{st.removeItem(draftKey());}catch(e){}
 }
+// Set once the welcome screen's consent check passes. A draft records it, and
+// resumes straight into the survey only when it says consent was given.
+// Otherwise the respondent confirms consent on the welcome screen first.
+var consentGiven=false;
 function resumeDraft(){
-  var d=loadDraft();if(!d)return;
+  var d=loadDraft();if(!d)return false;
+  if(WL.consent_required&&d.consented!==true){
+    var chk=document.getElementById('consent-chk');
+    if(!chk||!chk.checked){
+      screen='welcome';
+      var err=document.getElementById('consent-err');
+      if(err){err.textContent='Please confirm your consent before continuing.';err.classList.add('show');}
+      return false;
+    }
+  }
+  consentGiven=true;
   Object.keys(d.responses).forEach(function(k){responses[k]=d.responses[k];});
   screen='survey';
   currentPage=Math.min(Math.max(1,parseInt(d.page,10)||1),maxPage);
   renderScreen();
+  return true;
 }
 document.addEventListener('change',saveDraft);
 document.addEventListener('input',saveDraft);
@@ -1281,11 +1302,11 @@ function renderWelcome(){
   var el=document.getElementById('app');
   var draft=loadDraft();
   if(!WL.intro_text&&!WL.consent_text&&!SF.meta.description){
-    if(draft){resumeDraft();return;}
+    if(draft&&resumeDraft())return;
     startSurvey();return;
   }
-  // A draft offers to carry on. It is saved only from the questions, so the
-  // respondent had already consented.
+  // A draft offers to carry on. resumeDraft() asks for consent again when the
+  // draft does not record it.
   var resume=draft
     ?'<div class="ty-note" role="status">You have answers saved from an earlier visit.</div>'
      +'<button type="button" class="btn btn-p btn-lg" onclick="resumeDraft()" style="margin-bottom:10px">Resume where you left off</button> '
