@@ -44,6 +44,37 @@ sframe_code_num <- function(frame, name) {
   sprintf("as.numeric(as.character(%s))", sframe_code_col(frame, name))
 }
 
+# The predictor coding every regression runner applies through
+# sframe_predictor_frame(), written out so the generated code needs no :::.
+# A text or factor column whose values all read as numbers enters as a number,
+# any other as a category. Without it R fitted "1" to "5" stored as text as a
+# factor, so the code estimated a different model from the result.
+sframe_code_predictor_fn <- c(
+  "# Predictors as surveyframe codes them: a number when every value reads as",
+  "# a number, a category otherwise.",
+  "as_predictor <- function(x) {",
+  "  if (is.numeric(x)) return(x)",
+  "  labels <- as.character(x)",
+  "  as_num <- suppressWarnings(as.numeric(labels))",
+  "  if (all(is.na(labels) | !is.na(as_num))) as_num else factor(labels)",
+  "}"
+)
+
+# A copy of `frame` as model_data with the predictors coded, for the
+# generators that fit from a data frame.
+sframe_code_predictors <- function(frame, predictors) {
+  c(sframe_code_predictor_fn,
+    sprintf("model_data <- %s", frame),
+    sprintf("for (p in c(%s)) model_data[[p]] <- as_predictor(model_data[[p]])",
+            paste(sprintf("\"%s\"", predictors), collapse = ", ")))
+}
+
+# The model formula with backticked names.
+sframe_code_formula <- function(outcome, predictors) {
+  sprintf("`%s` ~ %s", outcome,
+          paste(sprintf("`%s`", predictors), collapse = " + "))
+}
+
 # The 2 group vectors the independent t test and Mann-Whitney runners build.
 # They take the groups in the declared order the runner recorded (the choice
 # set's order, then factor levels, then sorted values) and drop missing values
@@ -64,6 +95,7 @@ sframe_syntax_methods <- c(
   "kruskal_wallis", "anova_one", "anova_two", "ancova", "friedman",
   "correlation_pearson", "correlation_spearman", "correlation_kendall",
   "regression_linear", "regression_logistic_binary",
+  "regression_logistic_ordinal", "regression_logistic_multinomial",
   # A chi-square block dispatches to the crosstab runner, and the result says
   # "crosstab", so that is the name to switch on.
   "crosstab", "fisher_exact", "mcnemar", "descriptives"
@@ -128,10 +160,11 @@ sframe_syntax_call <- function(result, frame = "scored") {
       "summary(aov(outcome ~ factor_a * factor_b))"
     ),
     ancova = c(
+      sframe_code_predictor_fn,
       sprintf("group    <- factor(as.character(%s))", col(1)),
       sprintf("outcome  <- %s", num(2)),
-      sprintf("covariate_%d <- %s", seq_along(vars)[-(1:2)],
-              vapply(seq_along(vars)[-(1:2)], num, character(1))),
+      sprintf("covariate_%d <- as_predictor(%s)", seq_along(vars)[-(1:2)],
+              vapply(seq_along(vars)[-(1:2)], col, character(1))),
       sprintf("fit <- aov(outcome ~ %s + group)",
               paste(sprintf("covariate_%d", seq_along(vars)[-(1:2)]),
                     collapse = " + ")),
@@ -161,21 +194,45 @@ sframe_syntax_call <- function(result, frame = "scored") {
       # last, so reading vars[1] as the outcome fits a different model.
       outcome <- vars[length(vars)]
       predictors <- vars[-length(vars)]
-      c(sprintf("fit <- lm(`%s` ~ %s, data = %s)", outcome,
-                paste(sprintf("`%s`", predictors), collapse = " + "), frame),
+      c(sframe_code_predictors(frame, predictors),
+        sprintf("model_data[[\"%s\"]] <- %s", outcome,
+                sframe_code_num("model_data", outcome)),
+        sprintf("fit <- lm(%s, data = model_data)",
+                sframe_code_formula(outcome, predictors)),
         "summary(fit)")
     },
     regression_logistic_binary = {
       outcome <- vars[length(vars)]
       predictors <- vars[-length(vars)]
       # The runner codes the outcome as as.factor(y), the second level being 1.
-      c(sprintf("model_data <- %s", frame),
+      c(sframe_code_predictors(frame, predictors),
         sprintf("model_data[[\"%s\"]] <- as.integer(as.factor(model_data[[\"%s\"]])) - 1L",
                 outcome, outcome),
-        sprintf("fit <- glm(`%s` ~ %s, data = model_data, family = binomial())",
-                outcome, paste(sprintf("`%s`", predictors), collapse = " + ")),
+        sprintf("fit <- glm(%s, data = model_data, family = binomial())",
+                sframe_code_formula(outcome, predictors)),
         "summary(fit)",
         "exp(cbind(`odds ratio` = coef(fit), confint.default(fit)))")
+    },
+    # These 2 runners record the outcome first and the predictors after it.
+    regression_logistic_ordinal = {
+      outcome <- vars[1]
+      predictors <- vars[-1]
+      c(sframe_code_predictors(frame, predictors),
+        sprintf("model_data[[\"%s\"]] <- ordered(model_data[[\"%s\"]])",
+                outcome, outcome),
+        sprintf("fit <- MASS::polr(%s, data = model_data, Hess = TRUE)",
+                sframe_code_formula(outcome, predictors)),
+        "summary(fit)")
+    },
+    regression_logistic_multinomial = {
+      outcome <- vars[1]
+      predictors <- vars[-1]
+      c(sframe_code_predictors(frame, predictors),
+        sprintf("model_data[[\"%s\"]] <- as.factor(model_data[[\"%s\"]])",
+                outcome, outcome),
+        sprintf("fit <- nnet::multinom(%s, data = model_data, trace = FALSE)",
+                sframe_code_formula(outcome, predictors)),
+        "summary(fit)")
     },
     crosstab = {
       # correct = FALSE, as the runner does: Yates' correction on a balanced

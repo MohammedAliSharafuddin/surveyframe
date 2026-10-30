@@ -133,6 +133,17 @@ style.
 
 ## Analysis
 
+* **Regression syntax codes predictors as the analysis does.** The code
+  `analysis_syntax()` writes for linear, binary, ordinal and multinomial
+  logistic regression and ANCOVA codes each predictor the way the package
+  does: a number when every value reads as a number, a category otherwise.
+  "1" to "5" stored as text had entered the code as a factor, so it fitted a
+  different model. The ordinal, multinomial and ANCOVA runners now code
+  predictors and covariates by the same rule, so a text covariate that is
+  not a number enters as a category, where it had become missing.
+  `analysis_syntax()` now covers ordinal and multinomial logistic
+  regression.
+
 * **Choice descriptives honour `split_by` and weights.** A descriptives
   block counted choice items raw and pooled whatever its grouping and
   weights. Counts and percentages now come per group, in the order the
