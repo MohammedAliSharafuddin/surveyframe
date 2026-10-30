@@ -25,7 +25,9 @@ scores them when \code{instrument} is given.}
 \item{instrument}{The \code{sframe} the plan belongs to, or \code{NULL}. Gives the
 chart the item and choice labels the tables use.}
 
-\item{palette}{\code{"web"} (default) or \code{"print"}, the report's 2 palettes.}
+\item{palette}{\code{"web"} (default) or \code{"print"}, the report's 2 palettes. A palette
+given explicitly rebuilds the chart with it. Left out, the chart attached
+to the result is used as it is.}
 
 \item{format}{\code{"html"} (default) returns an HTML fragment with the chart
 embedded. \code{"png"} and \code{"svg"} write the chart to a file as well, and

@@ -498,6 +498,10 @@ style.
 
 ## Charts
 
+* **`render_result()` draws the chart in the palette you ask for.** It
+  used the chart attached to the result whatever `palette` said. A palette
+  given explicitly now rebuilds the chart with it. Left out, the attached
+  chart is used as before (CX-19).
 * **Charts fit the default 6.5 by 4 inch export.** Titles, subtitles,
   captions, long category labels and legends were clipped at the edges.
   A chart from the analysis plan now wraps them to the figure width, lays a
