@@ -133,6 +133,12 @@ style.
 
 ## Analysis
 
+* **A statistic is never replaced by a choice label.** A result table read
+  every text cell through the instrument's labels, so a statistic equal to a
+  choice code took that code's label: the `factor_structure` demo's "Suggested
+  factors" read "Disagree" in place of 2. Choice codes are now relabelled only
+  in a column of response values, and never in a Statistic and Value table.
+  Item and scale ids still read as their labels everywhere.
 * **A descriptives plan table has reader headings**: Variable, N, Valid N,
   Missing, Mean, SD, the confidence interval's bounds and the rest, as the
   other plan tables have. It showed `valid_n`, `missing_n` and `sd`. The

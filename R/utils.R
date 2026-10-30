@@ -63,9 +63,13 @@ sframe_label_lookup <- function(instrument) {
       code_labels[[vals[k]]] <- unique(c(code_labels[[vals[k]]], labs[k]))
     }
   }
+  ids <- names(lookup)
   for (code in names(code_labels)) {
     if (length(code_labels[[code]]) == 1) add(code, code_labels[[code]])
   }
+  # Mark which entries are choice codes, so sframe_humanize_table() can keep
+  # them out of cells that hold statistics.
+  attr(lookup, "codes") <- setdiff(names(lookup), ids)
   lookup
 }
 
@@ -114,9 +118,25 @@ sframe_humanize_table <- function(tbl, lookup, exclude_cols = character(0)) {
   if (!is.data.frame(tbl) || nrow(tbl) == 0 || length(lookup) == 0) {
     return(tbl)
   }
-  relabel <- function(x) {
-    hit <- lookup[x]
+  relabel <- function(x, dict = lookup) {
+    hit <- dict[x]
     ifelse(is.na(hit), x, unname(hit))
+  }
+  # A choice code such as "2" is also a number a statistic can take (CX-21:
+  # "Suggested factors" 2 printed as "Disagree"). Ids relabel in any cell.
+  # Codes relabel only in a column of response values: none of its cells is
+  # a number that is not a code, and the table is not a statistic and value
+  # layout, whose cells are statistics by construction.
+  codes <- intersect(attr(lookup, "codes") %||% character(0), names(lookup))
+  ids_only <- lookup[setdiff(names(lookup), codes)]
+  numeric_like <- function(x) {
+    grepl("^[<>=]?\\s*[-+]?[0-9]*\\.?[0-9]+([eE][-+]?[0-9]+)?%?$", trimws(x))
+  }
+  stat_layout <- "Statistic" %in% names(tbl)
+  response_col <- function(x) {
+    if (stat_layout || length(codes) == 0) return(FALSE)
+    x <- x[!is.na(x) & nzchar(x)]
+    length(x) > 0 && !any(numeric_like(x) & !x %in% codes)
   }
   orig_names <- names(tbl)
   rn <- rownames(tbl)
@@ -126,7 +146,9 @@ sframe_humanize_table <- function(tbl, lookup, exclude_cols = character(0)) {
   names(tbl) <- relabel(names(tbl))
   char_cols <- vapply(tbl, is.character, logical(1))
   char_cols[orig_names %in% exclude_cols] <- FALSE
-  tbl[char_cols] <- lapply(tbl[char_cols], relabel)
+  tbl[char_cols] <- lapply(tbl[char_cols], function(x) {
+    relabel(x, if (response_col(x)) lookup else ids_only)
+  })
   tbl
 }
 
