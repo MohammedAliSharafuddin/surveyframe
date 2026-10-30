@@ -660,6 +660,7 @@ textarea.pv-inp:focus{border-color:var(--pvc);
   max-width:360px;width:90%;animation:mIn var(--d2) var(--ease)}
 .conf-t{font-size:14px;font-weight:600;margin-bottom:7px}
 .conf-m{font-size:12px;color:var(--t2);margin-bottom:14px;line-height:1.5}
+.conf-in{width:100%;box-sizing:border-box;padding:6px 8px;font-size:12px;border:1px solid var(--cb);border-radius:6px;margin-bottom:14px}
 .conf-acts{display:flex;gap:7px;justify-content:flex-end}
 
 /* -- Recovery banner ------------------------------------------------------
@@ -1127,6 +1128,7 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
   <div class="conf-box">
     <div class="conf-t" id="confT"></div>
     <div class="conf-m" id="confM"></div>
+    <input type="text" class="conf-in" id="confIn" aria-labelledby="confT" hidden>
     <div class="conf-acts">
       <button type="button" class="btn btn-s btn-sm" onclick="resConf(false)">Cancel</button>
       <button type="button" class="btn btn-d btn-sm" id="confOkBtn" onclick="resConf(true)">Delete</button>
@@ -2909,8 +2911,10 @@ setInterval(autoSave,30000);window.addEventListener('beforeunload',autoSave);
 function toast(msg,type,dur){type=type||'inf';dur=dur||3200;var e=document.createElement('div');e.className='toast '+type;e.textContent=msg;var r=document.getElementById('toastR');r.appendChild(e);setTimeout(function(){e.style.opacity='0';e.style.transition='opacity .25s';setTimeout(function(){e.remove();},250);},dur);}
 
 // -- Confirm ----------------------------------------------------------------
-function conf2(title,msg,okLbl){okLbl=okLbl||'Delete';document.getElementById('confT').textContent=title;document.getElementById('confM').textContent=msg;document.getElementById('confOkBtn').textContent=okLbl;document.getElementById('confOv').classList.add('open');return new Promise(function(res){_cRes=res;});}
-function resConf(v){document.getElementById('confOv').classList.remove('open');if(_cRes){_cRes(v);_cRes=null;}}
+// With a value, the dialog shows a text field holding it, and OK resolves to
+// the text typed in place of true.
+function conf2(title,msg,okLbl,val){okLbl=okLbl||'Delete';document.getElementById('confT').textContent=title;document.getElementById('confM').textContent=msg;document.getElementById('confOkBtn').textContent=okLbl;var inp=document.getElementById('confIn');inp.hidden=(val===undefined);inp.value=(val===undefined)?'':String(val);document.getElementById('confOv').classList.add('open');if(!inp.hidden)inp.focus();return new Promise(function(res){_cRes=res;});}
+function resConf(v){var inp=document.getElementById('confIn');if(v&&inp&&!inp.hidden)v=inp.value;document.getElementById('confOv').classList.remove('open');if(_cRes){_cRes(v);_cRes=null;}}
 
 // -- Fab menu toggle --------------------------------------------------------
 function toggleFabMenu(){closeCfgMenu();var m=document.getElementById('fabMenu'),b=document.getElementById('fabMoreBtn');m.classList.toggle('open');b.classList.toggle('active');}
@@ -3254,10 +3258,17 @@ function openSframeText(text){
     // The hash is recomputed over the file's own payload, which matches
     // both saveSframe() here and write_sframe() in R.
     var fileHash=(p.hash&&p.hash.value)||'';
+    // A file with a hash is an instrument someone wrote. Its title, version
+    // and the hash this builder would save for it as opened are kept, so a
+    // save of changed content is never rehashed as if it were that file.
+    // A file whose own hash does not match keeps no baseline, so any save
+    // of it asks.
+    S._origin=fileHash?{title:S.meta.title,version:S.meta.version,baseline:sframeHashSync(sframePayload())}:null;
     if(fileHash){
       var vp=JSON.parse(text);
       vp.hash.value='';
       sframeHash(vp).then(function(h){
+        if(h!==fileHash&&S._origin)S._origin.baseline='';
         if(h===fileHash)toast('Loaded: '+S.meta.title+' — integrity verified (sha256 '+fileHash.slice(0,8)+')','ok');
         else toast('Loaded: '+S.meta.title+' — integrity hash mismatch; the file was changed outside surveyframe','err');
       });
@@ -3280,6 +3291,35 @@ async function sframeHash(payload){
   // Pure-JS fallback (always available)
   return window.sha256pure(src);
 }
+// The same digest, at once, for the baseline kept when a file opens.
+function sframeHashSync(payload){return window.sha256pure(JSON.stringify(sframeCanon(payload)));}
+// The next version offered for a new instrument: the last number goes up by
+// one, so 1.2.0 becomes 1.2.1.
+function sframeNextVersion(v){
+  v=String(v||'');var m=/^(.*?)(\d+)$/.exec(v);
+  return m?m[1]+(parseInt(m[2],10)+1):(v?v+'.1':'1.0.0');
+}
+// Changed content of an opened file is saved only as a new instrument: a new
+// title or version, with no amendment log, since the log belongs to the file
+// opened. Resolves true when the save may go ahead.
+async function sframeRevisionGate(){
+  var o=S._origin;if(!o)return true;
+  var h=await sframeHash(sframePayload());
+  if(o.baseline&&h===o.baseline)return true;
+  var v=await conf2('Save as a new instrument?',
+    'This survey was opened from a file with an integrity hash, and its content has changed since. '
+    +'Saved under the same title and version, it would claim to be the file you opened. '
+    +'Give it a new version to save it as a new instrument. Its amendment log stays with the original.',
+    'Save as a new instrument',sframeNextVersion(o.version));
+  if(v===false||v===null||v===undefined)return false;
+  v=String(v).trim();
+  if(!v||(v===o.version&&S.meta.title===o.title)){
+    toast('A new instrument needs a new version or title. Nothing was saved.','err');return false;
+  }
+  S.meta.version=v;
+  if(S._carry)delete S._carry.amendments;
+  return true;
+}
 // The .sframe format version, SFRAME_FORMAT_VERSION in R. Every file carries
 // it, as write_sframe() writes it, and sframe-schema's instrument profile
 // requires it. A file opened with an older value is saved in this shape.
@@ -3293,8 +3333,11 @@ function sframePayload(){
   return payload;
 }
 async function saveSframe(){
+  if(!(await sframeRevisionGate()))return;
   var payload=sframePayload();
   payload.hash.value=await sframeHash(payload);
+  // The saved file is now the instrument this builder holds.
+  S._origin={title:S.meta.title,version:S.meta.version,baseline:payload.hash.value};
   var blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
   var a=document.createElement('a');a.href=URL.createObjectURL(blob);
   a.download=(S.meta.title||'survey').replace(/[^a-zA-Z0-9]/g,'_')+'.sframe';a.click();

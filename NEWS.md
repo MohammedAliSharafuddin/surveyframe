@@ -274,6 +274,13 @@ style.
 
 ## SurveyBuilder
 
+* **Changed content of an opened file saves only as a new instrument.** The
+  builder checked a file's hash when it opened and then forgot it, so an
+  edited instrument saved as verified, with no amendment. It now keeps the
+  title, version and content it opened. Saving changed content of a file
+  that had a hash asks for a new version, offering the next one, or cancels.
+  A new instrument needs a new title or version, and the amendment log stays
+  with the original. A file opened without a matching hash asks on every save.
 * **A choice set can be declared ordered.** `sf_choices(ordered = TRUE)`
   marks options that run in a meaningful order, such as a frequency or an
   education level, and SurveyBuilder has the same switch in the choice set
