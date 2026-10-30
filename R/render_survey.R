@@ -321,7 +321,26 @@ sframe_persist_response <- function(row, output_path, on_submit, state) {
     }
   }
   state$notified <- TRUE
-  list(state = state, saved = TRUE, notified = TRUE, message = NULL)
+  list(state = state, saved = TRUE, notified = TRUE, message = NULL,
+       outcome = sframe_delivery_outcome(output_path, on_submit))
+}
+
+# What a submission did with the answers: "written" to the CSV, "handed" to
+# on_submit, or "none", where nothing stored them.
+sframe_delivery_outcome <- function(output_path, on_submit) {
+  if (!is.null(output_path)) "written"
+  else if (is.function(on_submit)) "handed"
+  else "none"
+}
+
+# The status line of a Shiny thank-you screen (D4). It is the package's own
+# voice, kept apart from the researcher's message below it, so a survey that
+# stores nothing says so.
+sframe_delivery_status <- function(outcome) {
+  switch(outcome,
+    written = "Your response has been recorded.",
+    handed  = "Your response has been submitted.",
+    "Your response has not been saved.")
 }
 
 # The header of an existing response file, or NULL when there is none yet.
@@ -1037,6 +1056,7 @@ render_survey <- function(
     .sf-thankyou-icon{font-size:56px;margin-bottom:16px}
     .sf-thankyou-title{font-size:24px;font-weight:700;margin-bottom:10px}
     .sf-thankyou-msg{color:#555;font-size:15px;line-height:1.6}
+    .sf-thankyou-status{color:#0f172a;font-weight:600;margin-bottom:10px}
   ", colour, colour, colour, colour, colour, colour, colour)
   tags <- shiny::tags
 
@@ -1068,6 +1088,7 @@ render_survey <- function(
   server <- function(input, output, session) {
     started_at  <- Sys.time()
     page_state  <- shiny::reactiveVal("welcome")   # welcome | survey | thankyou
+    delivery_outcome <- shiny::reactiveVal("none")
     conv_idx    <- shiny::reactiveVal(1L)
     submitted_row <- shiny::reactiveVal(NULL)
     # What this submission has already done, so a retry after a failure
@@ -1145,6 +1166,7 @@ render_survey <- function(
         shiny::showNotification(res$message, type = "error", duration = 10)
         return()
       }
+      delivery_outcome(res$outcome)
       page_state("thankyou")
     })
 
@@ -1198,7 +1220,9 @@ render_survey <- function(
         return(tags$div(class = "sf-wrap",
           tags$div(class = "sf-card sf-thankyou",
             tags$div(class = "sf-thankyou-icon", "\u2705"),
-            tags$div(class = "sf-thankyou-title", "Submitted successfully"),
+            tags$div(class = "sf-thankyou-title", "Thank You"),
+            tags$div(class = "sf-thankyou-msg sf-thankyou-status", role = "status",
+                     sframe_delivery_status(delivery_outcome())),
             tags$div(class = "sf-thankyou-msg", thankyou_msg),
             if (nzchar(thankyou_redirect)) {
               tags$script(sprintf(
