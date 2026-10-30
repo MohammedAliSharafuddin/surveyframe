@@ -411,6 +411,11 @@ style.
   text. Only what you write is saved. Studio saved 2 fixed sentences, "No
   effect or association is present." and "An effect or association is
   present.", for every such block, and those load back as empty.
+* **The decision rule is no longer copied into the interpretation.** The
+  plan editor box is labelled "Decision rule (declared now)" and saves the
+  decision rule only. Saving an edited block keeps the interpretation it
+  already had, and an interpretation identical to the decision rule counts
+  as unwritten.
 
 * **SurveyStudio has a References screen.** It lists the works the open
   instrument cites, adds more from pasted BibTeX with where the instrument

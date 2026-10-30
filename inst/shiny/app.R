@@ -110,6 +110,13 @@ studio_block_hypothesis <- function(block, which = c("null", "alternative")) {
   text <- trimws(as.character(block$hypotheses[[which]] %||% "")[1])
   if (is.na(text) || identical(text, studio_old_hypothesis_text[[which]])) "" else text
 }
+# The interpretation a saved block already holds. One identical to the
+# decision rule came from the old single-box editor, so it counts as unwritten.
+studio_saved_interpretation <- function(block) {
+  text <- trimws(as.character(block$interpretation %||% "")[1])
+  rule <- trimws(as.character(block$decision_rule %||% "")[1])
+  if (is.na(text) || identical(text, rule)) "" else text
+}
 # end studio plan helpers
 
 parse_csv <- function(text) {
@@ -3041,8 +3048,9 @@ server <- function(input, output, session) {
         uiOutput("analysis_seed_field"),
         textAreaInput(
           "analysis_decision_rule",
-          "Planned decision rule",
-          value = shiny::isolate(input$analysis_decision_rule %||% ""),
+          "Decision rule (declared now)",
+          value = shiny::isolate(input$analysis_decision_rule %||%
+          (studio_existing_plan_block(input$analysis_plan_id)$decision_rule %||% "")),
           rows = 3
         ),
         uiOutput("analysis_plan_validation"),
@@ -3356,7 +3364,8 @@ server <- function(input, output, session) {
         NULL
       },
       decision_rule = trim_or_null(input$analysis_decision_rule) %||% "",
-      interpretation = trim_or_null(input$analysis_decision_rule) %||% "",
+      interpretation = studio_saved_interpretation(
+        studio_existing_plan_block(input$analysis_plan_id)),
       reporting_references = reg$refs %||% character(0),
       citations = reg$refs %||% character(0),
       status = "valid_plan",
