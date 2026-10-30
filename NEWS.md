@@ -133,6 +133,15 @@ style.
 
 ## Analysis
 
+* **Model outlines give the notes for their own model type.**
+  `model_report_template()` gave every model the same notes, asking an EFA
+  for structural paths and a PLS-SEM model for fit indices. EFA, CFA, CB-SEM
+  and PLS-SEM now each get their own list. PLS-SEM follows Hair, Hult,
+  Ringle, Sarstedt, Danks and Ray (2021), doi:10.1007/978-3-030-80519-7, and
+  checks each construct by its mode (reflective, formative or single item)
+  with the thresholds the book gives, then the structural model. The seminr
+  script's assessment section follows the same checks.
+
 * **The seminr script tests every declared indirect effect.**
   `seminr_syntax()` writes one `specific_effect_significance()` call per
   `sf_indirect()`, as the lavaan syntax already defined each one.
