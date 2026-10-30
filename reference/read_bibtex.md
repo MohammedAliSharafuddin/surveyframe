@@ -34,7 +34,9 @@ read_bibtex(file = NULL, text = NULL, cited_by = NULL)
 ## Value
 
 A list of `sf_reference` objects, named by citation key. An entry that
-fails to parse is skipped with a warning naming it.
+fails to parse is skipped with a warning naming it. A key used by more
+than one entry is an error that names every repeated key. Entries may be
+written `@article{key, ...}` or `@article(key, ...)`.
 
 ## Examples
 

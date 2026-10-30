@@ -122,10 +122,18 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span>   seed = 123</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> )</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> # Measurement assessment: reliability, AVE, and HTMT discriminant validity</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> model_summary &lt;- summary(pls_model)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> # Reflective constructs: loadings, reliability, AVE, and HTMT</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> model_summary$loadings</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> model_summary$reliability</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> model_summary$validity$htmt</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> # Structural model: collinearity, R squared, f squared, and PLSpredict</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> model_summary$vif_antecedents</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> model_summary$paths</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> model_summary$fSquare</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> predict_summary &lt;- summary(predict_pls(pls_model, technique = predict_DA, noFolds = 10, reps = 10))</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> # Bootstrapped structural paths</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> boot_summary &lt;- summary(boot_model)</span>

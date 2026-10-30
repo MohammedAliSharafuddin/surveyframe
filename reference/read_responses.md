@@ -14,7 +14,8 @@ read_responses(
   respondent_id = NULL,
   submitted_at = NULL,
   meta_cols = NULL,
-  strict = TRUE
+  strict = TRUE,
+  delim = NULL
 )
 ```
 
@@ -22,7 +23,7 @@ read_responses(
 
 - x:
 
-  A file path to a CSV file, a `data.frame`, or a `tibble`.
+  A file path to a delimited text file, a `data.frame`, or a `tibble`.
 
 - instrument:
 
@@ -54,6 +55,16 @@ read_responses(
   IDs, their expansion columns and the metadata columns is an error,
   naming the columns. When `FALSE`, such columns are kept, placed last,
   with a warning.
+
+- delim:
+
+  `NULL` (default), `","`, `";"` or `"\t"`. The field separator of a
+  file. When `NULL` it is detected from the header line as a comma,
+  semicolon or tab, and a message names the separator when it is not a
+  comma. A semicolon file is read the way Excel writes one in a comma
+  decimal locale, so a comma is the decimal mark in its numeric columns
+  (`3,5` reads as 3.5). A byte order mark is ignored. Not used for data
+  frames.
 
 ## Value
 

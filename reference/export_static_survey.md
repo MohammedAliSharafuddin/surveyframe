@@ -49,10 +49,11 @@ export_static_survey(
 
   Logical. `TRUE` exports a survey that collects nothing: the collector
   endpoint and the completion redirect are both removed, and the
-  thank-you screen says the response went nowhere. This is what
-  SurveyStudio's preview uses, which keeps a test answer away from a
-  live study's collector. Supplying `endpoint_url` alongside it is an
-  error. Defaults to `FALSE`.
+  thank-you screen says the response went nowhere, above the study's own
+  message as respondents will read it. This is what SurveyStudio's
+  preview uses, which keeps a test answer away from a live study's
+  collector. Supplying `endpoint_url` alongside it is an error. Defaults
+  to `FALSE`.
 
 ## Value
 
@@ -93,6 +94,13 @@ place of its own POST. It returns a Promise: resolving to `true`, or to
 anything else shows it as sent and unconfirmed, and a rejection shows
 the failure screen with a retry.
 
+The thank-you screen states delivery itself, one line for each outcome:
+recorded, sent but unconfirmed, not sent, or failed. Write
+`render$thankyou$message` as thanks, a debrief or contact details, and
+do not state delivery in it. It appears below the status line in every
+case except a failed send, and defaults to "Thank you for
+participating."
+
 Two settings in the instrument's `render` block suit a host too.
 `render$thankyou$show_restart = FALSE` hides "Submit another response".
 `render$save_draft = TRUE` keeps the answers in the browser's local
@@ -127,7 +135,7 @@ instr <- sf_instrument("Customer Satisfaction Survey",
 out <- export_static_survey(instr,
                              output_path = file.path(tempdir(), "sat.html"),
                              open = FALSE)
-#> Static survey written to '/tmp/RtmpWBC9Zs/sat.html' (72 KB).
+#> Static survey written to '/tmp/RtmpMjSSLY/sat.html' (73.4 KB).
 file.exists(out)
 #> [1] TRUE
 
@@ -136,7 +144,7 @@ file.exists(out)
 export_static_survey(instr,
                      output_path = file.path(tempdir(), "sat_browser.html"),
                      overwrite = TRUE)
-#> Static survey written to '/tmp/RtmpWBC9Zs/sat_browser.html' (72 KB).
+#> Static survey written to '/tmp/RtmpMjSSLY/sat_browser.html' (73.4 KB).
 
 # Write with a Google Apps Script endpoint for server-side collection
 export_static_survey(
@@ -146,6 +154,6 @@ export_static_survey(
   open         = FALSE,
   overwrite    = TRUE
 )
-#> Static survey written to '/tmp/RtmpWBC9Zs/sat_endpoint.html' (72 KB).
+#> Static survey written to '/tmp/RtmpMjSSLY/sat_endpoint.html' (73.5 KB).
 # }
 ```

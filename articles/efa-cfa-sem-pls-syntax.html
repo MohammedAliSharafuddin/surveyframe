@@ -323,10 +323,18 @@ bootstrap, reliability, AVE, and HTMT calls.</p>
 <span><span class="co">#&gt;   seed = 123</span></span>
 <span><span class="co">#&gt; )</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; # Measurement assessment: reliability, AVE, and HTMT discriminant validity</span></span>
 <span><span class="co">#&gt; model_summary &lt;- summary(pls_model)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; # Reflective constructs: loadings, reliability, AVE, and HTMT</span></span>
+<span><span class="co">#&gt; model_summary$loadings</span></span>
 <span><span class="co">#&gt; model_summary$reliability</span></span>
 <span><span class="co">#&gt; model_summary$validity$htmt</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; # Structural model: collinearity, R squared, f squared, and PLSpredict</span></span>
+<span><span class="co">#&gt; model_summary$vif_antecedents</span></span>
+<span><span class="co">#&gt; model_summary$paths</span></span>
+<span><span class="co">#&gt; model_summary$fSquare</span></span>
+<span><span class="co">#&gt; predict_summary &lt;- summary(predict_pls(pls_model, technique = predict_DA, noFolds = 10, reps = 10))</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; # Bootstrapped structural paths</span></span>
 <span><span class="co">#&gt; boot_summary &lt;- summary(boot_model)</span></span>
@@ -374,7 +382,17 @@ outline.</p>
 <span><span class="co">#&gt; - TS -&gt; BI</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; ## Reporting Notes</span></span>
-<span><span class="co">#&gt; Report estimator, missing-data handling, fit indices, standardised path estimates, indirect effects, reliability, validity, and any item-retention decisions.</span></span></code></pre></div>
+<span><span class="co">#&gt; Report:</span></span>
+<span><span class="co">#&gt; - estimator and missing-data handling</span></span>
+<span><span class="co">#&gt; - chi-square, degrees of freedom and p value</span></span>
+<span><span class="co">#&gt; - CFI, TLI, RMSEA with its confidence interval, and SRMR</span></span>
+<span><span class="co">#&gt; - standardised loadings</span></span>
+<span><span class="co">#&gt; - reliability (alpha, omega or composite reliability) and AVE</span></span>
+<span><span class="co">#&gt; - discriminant validity</span></span>
+<span><span class="co">#&gt; - any modifications made to the model and the reason for each</span></span>
+<span><span class="co">#&gt; - structural paths with confidence intervals</span></span>
+<span><span class="co">#&gt; - R squared for each endogenous construct</span></span>
+<span><span class="co">#&gt; - indirect and total effects with bootstrap confidence intervals</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="where-the-syntax-goes-next">Where the syntax goes next<a class="anchor" aria-label="anchor" href="#where-the-syntax-goes-next"></a>

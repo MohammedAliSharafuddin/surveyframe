@@ -72,7 +72,8 @@ in the instrument. Non-item columns are allowed only when declared through
 <span>  respondent_id <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  submitted_at <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  meta_cols <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  strict <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>  strict <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  delim <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -81,7 +82,7 @@ in the instrument. Non-item columns are allowed only when declared through
 
 
 <dl><dt id="arg-x">x<a class="anchor" aria-label="anchor" href="#arg-x"></a></dt>
-<dd><p>A file path to a CSV file, a <code>data.frame</code>, or a <code>tibble</code>.</p></dd>
+<dd><p>A file path to a delimited text file, a <code>data.frame</code>, or a <code>tibble</code>.</p></dd>
 
 
 <dt id="arg-instrument">instrument<a class="anchor" aria-label="anchor" href="#arg-instrument"></a></dt>
@@ -115,6 +116,16 @@ source URL).</p></dd>
 item IDs, their expansion columns and the metadata columns is an error,
 naming the columns. When <code>FALSE</code>, such columns are kept, placed last, with
 a warning.</p></dd>
+
+
+<dt id="arg-delim">delim<a class="anchor" aria-label="anchor" href="#arg-delim"></a></dt>
+<dd><p><code>NULL</code> (default), <code>","</code>, <code>";"</code> or <code>"\t"</code>. The field separator
+of a file. When <code>NULL</code> it is detected from the header line as a comma,
+semicolon or tab, and a message names the separator when it is not a
+comma. A semicolon file is read the way Excel writes one in a comma
+decimal locale, so a comma is the decimal mark in its numeric columns
+(<code>3,5</code> reads as 3.5). A byte order mark is ignored. Not used for data
+frames.</p></dd>
 
 </dl></div>
     <div class="section level2">

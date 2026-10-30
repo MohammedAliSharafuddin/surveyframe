@@ -54,10 +54,11 @@ render_results(
 
   Named list or NULL. Written interpretations keyed by analysis-plan
   block id, added after the results are known. A block with an entry
-  shows that text in its Interpretation section in place of the
-  pre-declared prompt fallback. Blocks without an entry render exactly
-  as they do when this argument is NULL. Interpretations are report
-  content only and are never written into the instrument.
+  shows that text in its Interpretation section, labelled as written
+  after the results. The hypotheses and planned decision rule a block
+  declared print before its result, with or without an entry.
+  Interpretations are report content only and are never written into the
+  instrument.
 
 ## Value
 

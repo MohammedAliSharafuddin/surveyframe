@@ -110,12 +110,12 @@ render_report(
 - interpretations:
 
   Named list or NULL. Written interpretations keyed by analysis-plan
-  block id, added after the results are known. When a block has an
-  entry, its report section shows the pre-declared decision rule under a
-  "Planned decision rule" label followed by the written text under an
-  "Interpretation" label. Blocks without an entry render exactly as they
-  do when this argument is NULL. Interpretations are report content only
-  and are never written into the instrument.
+  block id, added after the results are known. Each block's section
+  prints the hypotheses and planned decision rule it declared before its
+  result, with or without an entry. An entry prints after the result
+  under "Interpretation (written after the results)", in place of any
+  interpretation the block holds. Interpretations are report content
+  only and are never written into the instrument.
 
 - show_code:
 
@@ -175,9 +175,10 @@ render_report(
 
 - open:
 
-  Logical. Whether to show the finished report: in RStudio's Viewer pane
-  inside RStudio, and in the web browser otherwise. Defaults to `TRUE`
-  in an interactive session and `FALSE` in a script.
+  Logical. Whether to show the finished report: in the viewer pane of
+  RStudio, Positron or VS Code, and in the web browser otherwise.
+  Defaults to `TRUE` in an interactive session and `FALSE` in a script.
+  Nothing opens during a knitr or Quarto render.
 
 ## Value
 
@@ -225,7 +226,7 @@ out <- tryCatch(
   ),
   finally = options(old)
 )
-#> Report rendered with the built-in HTML engine: /tmp/RtmpWBC9Zs/file20d06816477e.html
+#> Report rendered with the built-in HTML engine: /tmp/RtmpMjSSLY/file22f1733d6fc4.html
 file.exists(out)
 #> [1] TRUE
 # }

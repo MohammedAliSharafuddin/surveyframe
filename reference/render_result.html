@@ -104,7 +104,9 @@ chart the item and choice labels the tables use.</p></dd>
 
 
 <dt id="arg-palette">palette<a class="anchor" aria-label="anchor" href="#arg-palette"></a></dt>
-<dd><p><code>"web"</code> (default) or <code>"print"</code>, the report's 2 palettes.</p></dd>
+<dd><p><code>"web"</code> (default) or <code>"print"</code>, the report's 2 palettes. A palette
+given explicitly rebuilds the chart with it. Left out, the chart attached
+to the result is used as it is.</p></dd>
 
 
 <dt id="arg-format">format<a class="anchor" aria-label="anchor" href="#arg-format"></a></dt>
@@ -123,8 +125,9 @@ for the embedded or written chart. Defaults 7 by 4.5 at 150 dpi.</p></dd>
     <p>A list with <code>block_id</code>, <code>test</code>, <code>caption</code>, <code>apa</code>, <code>table</code> (a data
 frame), <code>note</code>, <code>supplement</code> (a list with <code>table</code> and <code>caption</code>, or
 <code>NULL</code>), <code>chart</code> (a <code>ggplot</code>, or <code>NULL</code> where the method has none or
-ggplot2 is absent), <code>html</code> (the fragment, for <code>format = "html"</code>), and
-<code>chart_file</code> (for <code>"png"</code> and <code>"svg"</code>). A result that failed carries its
+ggplot2 is absent), <code>html</code> (the fragment, for <code>format = "html"</code>),
+<code>chart_file</code> (for <code>"png"</code> and <code>"svg"</code>) and <code>syntax</code> where the result has
+one. A result that failed carries its
 <code>error</code>, and <code>html</code> shows it.</p>
     </div>
     <div class="section level2">

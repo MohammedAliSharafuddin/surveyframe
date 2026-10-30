@@ -96,7 +96,9 @@ example an entry pasted from Google Scholar.</p></dd>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>A list of <code>sf_reference</code> objects, named by citation key. An entry
-that fails to parse is skipped with a warning naming it.</p>
+that fails to parse is skipped with a warning naming it. A key used by
+more than one entry is an error that names every repeated key. Entries may
+be written <code>@article{key, ...}</code> or <code>@article(key, ...)</code>.</p>
     </div>
 
     <div class="section level2">

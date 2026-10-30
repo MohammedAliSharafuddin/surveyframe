@@ -92,7 +92,10 @@ columns.</p></dd>
 
 <dt id="arg-weights">weights<a class="anchor" aria-label="anchor" href="#arg-weights"></a></dt>
 <dd><p>Numeric weight vector, one per criterion. Renormalised to
-sum to 1 before use.</p></dd>
+sum to 1 before use. Unnamed weights are taken in the order of the
+criteria. Named weights are matched to the criteria by name, in any order,
+and a name that is not a criterion, or a criterion with no weight, is an
+error.</p></dd>
 
 
 <dt id="arg-criteria-types">criteria_types<a class="anchor" aria-label="anchor" href="#arg-criteria-types"></a></dt>

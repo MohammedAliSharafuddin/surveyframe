@@ -127,7 +127,7 @@ results_table(mw_results)
 
 | RQ | Research question | Method | Result (APA) |
 |:---|:---|:---|---:|
-| RQ1 | Does the treatment arm score higher than control? |  | U = 34, z = -1.21, p = .226, r = 0.27, 95% CI \[0.02, 0.64\], Hodges-Lehmann shift = -3.99, 95% CI \[-13.75, 4.58\] |
+| RQ1 | Does the treatment arm score higher than control? |  | U = 34, z = -1.21, p = .226, r = -.27, 95% CI \[-.64, .17\], Hodges-Lehmann shift = -3.99, 95% CI \[-13.75, 4.58\], higher in Treatment |
 
 ``` r
 
@@ -161,7 +161,7 @@ results_table(wp_results)
 
 | RQ | Research question | Method | Result (APA) |
 |:---|:---|:---|---:|
-| RQ2 | Did scores change from before to after? |  | V = 0, z = -2.52, p = .012, r = 0.89, 95% CI \[0.89, 0.90\], pseudomedian = -6.46, 95% CI \[-11.70, -3.63\] |
+| RQ2 | Did scores change from before to after? |  | V = 0, z = -2.52, p = .012, r = -.89, 95% CI \[-.90, -.89\], pseudomedian = -6.46, 95% CI \[-11.70, -3.63\], higher in after |
 
 ``` r
 
@@ -196,7 +196,7 @@ results_table(fe_results)
 
 | RQ | Research question | Method | Result (APA) |
 |:---|:---|:---|---:|
-| RQ3 | Is conversion associated with study arm? |  | Fisher’s exact test, p = 1.000, phi = 0.12 |
+| RQ3 | Is conversion associated with study arm? |  | Fisher’s exact test, p = 1.000, phi = .12 |
 
 ``` r
 
@@ -275,7 +275,7 @@ point estimate leaves it implicit.
 cohens_d_ci(pilot$outcome[pilot$group == "treatment"],
             pilot$outcome[pilot$group == "control"], R = 999)
 #>   estimate      lower      upper 
-#> 0.54201883 0.02928852 1.54044282 
+#>  0.5420188 -0.3636638  1.5240611 
 #> attr(,"resamples")
 #> [1] 999
 #> attr(,"valid_resamples")

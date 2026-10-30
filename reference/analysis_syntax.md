@@ -92,7 +92,7 @@ cat(analysis_syntax(results, which = "RQ1"), sep = "\n")
 #> # method: t_test_ind | n = 15 + 15
 #> group   <- as.character(scored[["arm"]])
 #> outcome <- as.numeric(as.character(scored[["score"]]))
-#> levels_seen <- unique(group[!is.na(group)])
+#> levels_seen <- c("control", "treatment")
 #> g1 <- outcome[group == levels_seen[1]]; g1 <- g1[!is.na(g1)]
 #> g2 <- outcome[group == levels_seen[2]]; g2 <- g2[!is.na(g2)]
 #> t.test(g1, g2, var.equal = FALSE)

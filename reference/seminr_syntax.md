@@ -70,10 +70,18 @@ cat(seminr_syntax(m))
 #>   seed = 123
 #> )
 #> 
-#> # Measurement assessment: reliability, AVE, and HTMT discriminant validity
 #> model_summary <- summary(pls_model)
+#> 
+#> # Reflective constructs: loadings, reliability, AVE, and HTMT
+#> model_summary$loadings
 #> model_summary$reliability
 #> model_summary$validity$htmt
+#> 
+#> # Structural model: collinearity, R squared, f squared, and PLSpredict
+#> model_summary$vif_antecedents
+#> model_summary$paths
+#> model_summary$fSquare
+#> predict_summary <- summary(predict_pls(pls_model, technique = predict_DA, noFolds = 10, reps = 10))
 #> 
 #> # Bootstrapped structural paths
 #> boot_summary <- summary(boot_model)

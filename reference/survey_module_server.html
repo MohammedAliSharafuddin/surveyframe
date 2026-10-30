@@ -115,7 +115,9 @@ empty.</p>
     <p><code>on_submit</code> is called with the response before the survey is marked
 complete. If it raises an error, the respondent sees a message and stays on
 the last page, can submit again, and the returned reactive stays <code>NULL</code>.
-The thank-you screen appears only after <code>on_submit</code> returns.</p>
+The thank-you screen appears only after <code>on_submit</code> returns. Without
+<code>on_submit</code> the module stores nothing, and its thank-you screen tells the
+respondent the response has not been saved.</p>
     </div>
     <div class="section level2">
     <h2 id="changing-the-instrument">Changing the instrument<a class="anchor" aria-label="anchor" href="#changing-the-instrument"></a></h2>

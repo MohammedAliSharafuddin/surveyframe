@@ -528,15 +528,15 @@ study_amended <- amend_sframe(
 
 amendment_log(study_amended)
 #>              timestamp         reason_code
-#> 1 2026-10-27T06:56:20Z instrument_revision
+#> 1 2026-10-30T19:50:49Z instrument_revision
 #>                                    reason_text   tier author
 #> 1 Clarified item wording after pilot feedback. design   <NA>
 #>                                     deviation_report signoff
 #> 1 Wording only; the construct measured is unchanged.    none
 #>                                                      previous_hash
-#> 1 0756ec09db9c10fe3ae804b6b01d7259157047f05da25547a76d8ab5222eea3b
+#> 1 7a404899473ee96b97542c8974f0303de4d354d17565078a1e40f70143835ec1
 #>                                                           new_hash
-#> 1 db14443884775f1c7f887ee9d19336acbd5f19934bee88c1cd9095aaf3ae25cc
+#> 1 df96fec69aacc935c23367f51670d3faea28d02f0fc1e41737fced5201b1c280
 #>   changed_fields
 #> 1          items
 ```
@@ -631,7 +631,7 @@ html_path <- export_static_survey(
   output_path = file.path(tempdir(), "tourism_services_survey.html"),
   open        = FALSE
 )
-#> Static survey written to '/tmp/RtmpbbTIat/tourism_services_survey.html' (99.3
+#> Static survey written to '/tmp/RtmpvjTzD2/tourism_services_survey.html' (100.7
 #> KB).
 file.exists(html_path)
 #> [1] TRUE
@@ -684,7 +684,7 @@ script_path <- export_google_sheet(
   sheet_url  = "https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID",
   output_dir = tempdir()
 )
-#> Apps Script written to: /tmp/RtmpbbTIat/surveyframe_collector.gs
+#> Apps Script written to: /tmp/RtmpvjTzD2/surveyframe_collector.gs
 #> Follow the setup instructions inside the file to deploy it.
 file.exists(script_path)
 #> [1] TRUE
@@ -1206,11 +1206,11 @@ results_table(results)
 
 | RQ | Research question | Method | Result (APA) | Effect |
 |:---|:---|:---|---:|:---|
-| RQ1 | Are digital marketing perceptions associated with tourist satisfaction? | pearson | r(58) = 0.19, 95% CI \[-0.07, 0.42\], p = .153 | small |
-| RQ2 | Is service quality associated with tourist satisfaction? | pearson | r(58) = -0.04, 95% CI \[-0.29, 0.22\], p = .778 | negligible |
-| RQ3 | Do service quality and sustainability quality predict satisfaction? |  | R² = 0.210, F(3, 56) = 4.97, p = .004 |  |
-| RQ4 | Do first-time and repeat visitors differ in satisfaction? |  | U = 744, z = 4.63, p \< .001, r = 0.60, 95% CI \[0.41, 0.76\], Hodges-Lehmann shift = 0.67, 95% CI \[0.67, 1.00\] | large |
-| RQ5 | Does satisfaction predict behavioural intention? |  | R² = 0.291, F(1, 58) = 23.83, p \< .001 |  |
+| RQ1 | Are digital marketing perceptions associated with tourist satisfaction? | pearson | r(58) = .19, 95% CI \[-.07, .42\], p = .153 | small |
+| RQ2 | Is service quality associated with tourist satisfaction? | pearson | r(58) = -.04, 95% CI \[-.29, .22\], p = .778 | negligible |
+| RQ3 | Do service quality and sustainability quality predict satisfaction? |  | R² = .210, F(3, 56) = 4.97, p = .004 |  |
+| RQ4 | Do first-time and repeat visitors differ in satisfaction? |  | U = 140, z = -4.63, p \< .001, r = -.60, 95% CI \[-.76, -.40\], Hodges-Lehmann shift = -0.67, 95% CI \[-1.00, -0.67\], higher in Repeated visitor | large |
+| RQ5 | Does satisfaction predict behavioural intention? |  | R² = .291, F(1, 58) = 23.83, p \< .001 |  |
 
 The full writing prompt for each result is available in `r$prompt`. The
 first one reads:
@@ -1218,7 +1218,7 @@ first one reads:
 ``` r
 
 cat(results[[1]]$prompt)
-#> There was a positive, small non-significant correlation between DMRE and TS, r(58) = 0.19, 95% CI [-0.07, 0.42], p = .153. Explain what this means for your research question.
+#> There was a positive, small non-significant correlation between "Digital marketing: relevance and engagement" and "Tourist satisfaction", r(58) = .19, 95% CI [-.07, .42], p = .153. Explain what this means for your research question.
 ```
 
 The `prompt` field is a sentence template for the methods or results
@@ -1269,9 +1269,9 @@ results_path <- render_results(
   output_file = file.path(tempdir(), "tourism_results.html")
 )
 cat("Results report written:", results_path, "\n")
-#> Results report written: /tmp/RtmpbbTIat/tourism_results.html
+#> Results report written: /tmp/RtmpvjTzD2/tourism_results.html
 cat("Size:", round(file.size(results_path) / 1024, 1), "KB\n")
-#> Size: 11.6 KB
+#> Size: 13.2 KB
 ```
 
 The results report contains one section per research question, with the
@@ -1298,7 +1298,7 @@ render_report(
   include_models   = FALSE
 )
 #> Rendering the report with Quarto. This usually takes under a minute.
-#> Report rendered with the Quarto engine: /tmp/RtmpbbTIat/tourism_report.html
+#> Report rendered with the Quarto engine: /tmp/RtmpvjTzD2/tourism_report.html
 ```
 
 ------------------------------------------------------------------------

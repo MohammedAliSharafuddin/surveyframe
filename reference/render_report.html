@@ -170,11 +170,11 @@ See <code>sframe_brand()</code>.</p></dd>
 
 <dt id="arg-interpretations">interpretations<a class="anchor" aria-label="anchor" href="#arg-interpretations"></a></dt>
 <dd><p>Named list or NULL. Written interpretations keyed
-by analysis-plan block id, added after the results are known. When a
-block has an entry, its report section shows the pre-declared decision
-rule under a "Planned decision rule" label followed by the written
-text under an "Interpretation" label. Blocks without an entry render
-exactly as they do when this argument is NULL. Interpretations are
+by analysis-plan block id, added after the results are known. Each
+block's section prints the hypotheses and planned decision rule it
+declared before its result, with or without an entry. An entry prints
+after the result under "Interpretation (written after the results)",
+in place of any interpretation the block holds. Interpretations are
 report content only and are never written into the instrument.</p></dd>
 
 
@@ -228,9 +228,10 @@ size, resolution and format in <code>figures</code>, where <code>format</code> m
 
 
 <dt id="arg-open">open<a class="anchor" aria-label="anchor" href="#arg-open"></a></dt>
-<dd><p>Logical. Whether to show the finished report: in RStudio's
-Viewer pane inside RStudio, and in the web browser otherwise. Defaults to
-<code>TRUE</code> in an interactive session and <code>FALSE</code> in a script.</p></dd>
+<dd><p>Logical. Whether to show the finished report: in the viewer
+pane of RStudio, Positron or VS Code, and in the web browser otherwise.
+Defaults to <code>TRUE</code> in an interactive session and <code>FALSE</code> in a script.
+Nothing opens during a knitr or Quarto render.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -279,7 +280,7 @@ Quarto is unavailable, lists the methods' references the same way.</p>
 <span class="r-in"><span>  <span class="op">)</span>,</span></span>
 <span class="r-in"><span>  finally <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span><span class="va">old</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Report rendered with the built-in HTML engine: /tmp/RtmpWBC9Zs/file20d06816477e.html</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Report rendered with the built-in HTML engine: /tmp/RtmpMjSSLY/file22f1733d6fc4.html</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/files.html" class="external-link">file.exists</a></span><span class="op">(</span><span class="va">out</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] TRUE</span>
 <span class="r-in"><span><span class="co"># }</span></span></span>

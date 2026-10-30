@@ -42,5 +42,15 @@ cat(model_report_template(m, include_json = FALSE))
 #> No structural paths specified.
 #> 
 #> ## Reporting Notes
-#> Report estimator, missing-data handling, fit indices, standardised path estimates, indirect effects, reliability, validity, and any item-retention decisions.
+#> Report:
+#> - estimator and missing-data handling
+#> - chi-square, degrees of freedom and p value
+#> - CFI, TLI, RMSEA with its confidence interval, and SRMR
+#> - standardised loadings
+#> - reliability (alpha, omega or composite reliability) and AVE
+#> - discriminant validity
+#> - any modifications made to the model and the reason for each
+#> - structural paths with confidence intervals
+#> - R squared for each endogenous construct
+#> - indirect and total effects with bootstrap confidence intervals
 ```

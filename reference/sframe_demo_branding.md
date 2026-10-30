@@ -41,7 +41,7 @@ branding
 #>   Consent:       "I am happy for my answers to be used in the event report.", required
 #>   Start button:  "Start"
 #>   Submit button: "Send my feedback"
-#>   Thank you:     "Thank you. Your feedback has been recorded."
+#>   Thank you:     "Thank you for your feedback."
 #> 
 #> A render block for sf_instrument(render = ). See it applied with
 #> preview_demo("two_group"), or use sframe_demo(name, branded = TRUE).

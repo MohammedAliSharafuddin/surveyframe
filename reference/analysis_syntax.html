@@ -144,7 +144,7 @@ computation has no single base-R equivalent to show honestly.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> # method: t_test_ind | n = 15 + 15</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> group   &lt;- as.character(scored[["arm"]])</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> outcome &lt;- as.numeric(as.character(scored[["score"]]))</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> levels_seen &lt;- unique(group[!is.na(group)])</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> levels_seen &lt;- c("control", "treatment")</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> g1 &lt;- outcome[group == levels_seen[1]]; g1 &lt;- g1[!is.na(g1)]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> g2 &lt;- outcome[group == levels_seen[2]]; g2 &lt;- g2[!is.na(g2)]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> t.test(g1, g2, var.equal = FALSE)</span>

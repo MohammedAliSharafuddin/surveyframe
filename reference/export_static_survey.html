@@ -108,7 +108,8 @@ collection mechanism.</p></dd>
 <dt id="arg-preview">preview<a class="anchor" aria-label="anchor" href="#arg-preview"></a></dt>
 <dd><p>Logical. <code>TRUE</code> exports a survey that collects nothing: the
 collector endpoint and the completion redirect are both removed, and the
-thank-you screen says the response went nowhere. This is what SurveyStudio's
+thank-you screen says the response went nowhere, above the study's own
+message as respondents will read it. This is what SurveyStudio's
 preview uses, which keeps a test answer away from a live study's collector.
 Supplying <code>endpoint_url</code> alongside it is an error. Defaults to <code>FALSE</code>.</p></dd>
 
@@ -147,6 +148,11 @@ The survey then hands each response to that function in place of its own
 POST. It returns a Promise: resolving to <code>true</code>, or to <code>{confirmed: true}</code>,
 shows the response as recorded. Resolving to anything else shows it as sent
 and unconfirmed, and a rejection shows the failure screen with a retry.</p>
+<p>The thank-you screen states delivery itself, one line for each outcome:
+recorded, sent but unconfirmed, not sent, or failed. Write
+<code>render$thankyou$message</code> as thanks, a debrief or contact details, and do
+not state delivery in it. It appears below the status line in every case
+except a failed send, and defaults to "Thank you for participating."</p>
 <p>Two settings in the instrument's <code>render</code> block suit a host too.
 <code>render$thankyou$show_restart = FALSE</code> hides "Submit another response".
 <code>render$save_draft = TRUE</code> keeps the answers in the browser's local storage
@@ -177,7 +183,7 @@ opening directly from disk.</p>
 <span class="r-in"><span><span class="va">out</span> <span class="op">&lt;-</span> <span class="fu">export_static_survey</span><span class="op">(</span><span class="va">instr</span>,</span></span>
 <span class="r-in"><span>                             output_path <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"sat.html"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>                             open <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Static survey written to '/tmp/RtmpWBC9Zs/sat.html' (72 KB).</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Static survey written to '/tmp/RtmpMjSSLY/sat.html' (73.4 KB).</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/files.html" class="external-link">file.exists</a></span><span class="op">(</span><span class="va">out</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] TRUE</span>
 <span class="r-in"><span></span></span>
@@ -186,7 +192,7 @@ opening directly from disk.</p>
 <span class="r-in"><span><span class="fu">export_static_survey</span><span class="op">(</span><span class="va">instr</span>,</span></span>
 <span class="r-in"><span>                     output_path <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"sat_browser.html"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>                     overwrite <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Static survey written to '/tmp/RtmpWBC9Zs/sat_browser.html' (72 KB).</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Static survey written to '/tmp/RtmpMjSSLY/sat_browser.html' (73.4 KB).</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Write with a Google Apps Script endpoint for server-side collection</span></span></span>
 <span class="r-in"><span><span class="fu">export_static_survey</span><span class="op">(</span></span></span>
@@ -196,7 +202,7 @@ opening directly from disk.</p>
 <span class="r-in"><span>  open         <span class="op">=</span> <span class="cn">FALSE</span>,</span></span>
 <span class="r-in"><span>  overwrite    <span class="op">=</span> <span class="cn">TRUE</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Static survey written to '/tmp/RtmpWBC9Zs/sat_endpoint.html' (72 KB).</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Static survey written to '/tmp/RtmpMjSSLY/sat_endpoint.html' (73.5 KB).</span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 </code></pre></div>
     </div>

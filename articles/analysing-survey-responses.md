@@ -210,9 +210,9 @@ results_table(results)
 
 | RQ | Research question | Method | Result (APA) | Effect |
 |:---|:---|:---|---:|:---|
-| RQ1 | Is digital marketing perception associated with satisfaction? | pearson | r(118) = 0.54, 95% CI \[0.40, 0.65\], p \< .001 | large |
-| RQ2 | Do the three perception scales predict satisfaction? |  | R² = 0.383, F(3, 116) = 23.95, p \< .001 |  |
-| RQ3 | Do first-time and repeat visitors differ in behavioural intention? |  | U = 1576, z = -0.98, p = .326, r = 0.09, 95% CI \[0.00, 0.27\], Hodges-Lehmann shift = -0.00, 95% CI \[-0.50, 0.00\] | negligible |
+| RQ1 | Is digital marketing perception associated with satisfaction? | pearson | r(118) = .54, 95% CI \[.40, .65\], p \< .001 | large |
+| RQ2 | Do the three perception scales predict satisfaction? |  | R² = .383, F(3, 116) = 23.95, p \< .001 |  |
+| RQ3 | Do first-time and repeat visitors differ in behavioural intention? |  | U = 1576, z = -0.98, p = .326, r = -.09, 95% CI \[-.27, .09\], Hodges-Lehmann shift = -0.00, 95% CI \[-0.50, 0.00\], higher in Repeat visitor | negligible |
 
 Pass `plots = TRUE` to attach a brand-styled `ggplot2` chart to each
 result that supports one (descriptive, correlation, chi-square, and
@@ -240,11 +240,11 @@ writing prompt, and the references that support the technique.
 rq1 <- results[[1]]
 
 rq1$apa
-#> [1] "r(118) = 0.54, 95% CI [0.40, 0.65], p < .001"
+#> [1] "r(118) = .54, 95% CI [.40, .65], p < .001"
 rq1$effect_label
 #> [1] "large"
 rq1$prompt
-#> [1] "There was a positive, large significant correlation between digital_marketing and satisfaction, r(118) = 0.54, 95% CI [0.40, 0.65], p < .001. Explain what this means for your research question."
+#> [1] "There was a positive, large significant correlation between \"Digital marketing effectiveness\" and \"Tourist satisfaction\", r(118) = .54, 95% CI [.40, .65], p < .001. Explain what this means for your research question."
 unlist(rq1$citations)
 #>                                                                                                                                                         field_2018 
 #>                                                                            "Field, A. (2018). *Discovering statistics using IBM SPSS statistics* (5th ed.). SAGE." 

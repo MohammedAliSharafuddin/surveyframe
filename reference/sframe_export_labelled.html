@@ -94,7 +94,10 @@ chosen from the extension.</p></dd>
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>The path, invisibly.</p>
+    <p>The path, invisibly. When any name or label was changed, the path
+carries an attribute <code>"renamed"</code>, a data frame with the columns <code>kind</code>
+(<code>"name"</code>, <code>"variable label"</code> or <code>"value label"</code>), <code>column</code>, <code>old</code> and
+<code>new</code>. With no changes there is no message and no attribute.</p>
     </div>
     <div class="section level2">
     <h2 id="text-codes-in-stata">Text codes in Stata<a class="anchor" aria-label="anchor" href="#text-codes-in-stata"></a></h2>
@@ -105,6 +108,20 @@ coded with text, such as <code>"a"</code> and <code>"b"</code>, is written as 1,
 set's declared order, each carrying its label, so the file reads back in
 Stata with the labels intact. A <code>.sav</code> keeps the text codes, which SPSS
 labels directly.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="names-and-labels-that-do-not-fit-the-format">Names and labels that do not fit the format<a class="anchor" aria-label="anchor" href="#names-and-labels-that-do-not-fit-the-format"></a></h2>
+
+
+<p>SPSS and Stata refuse column names with spaces or punctuation, names that
+do not start with a letter, and names over the format's length limit (64
+bytes for SPSS, 32 characters for Stata). Matrix row columns such as
+<code>session__Opening keynote</code> are renamed to valid names, with illegal
+characters turned into <code>_</code>, a leading <code>v</code> where the first character is not
+a letter, and a number added where two names would otherwise match. Variable
+labels are cut at 256 bytes for SPSS and 80 characters for Stata, and value
+labels at 120 bytes for SPSS and 80 characters for Stata. Everything else
+keeps its full label. One message lists each change as old -&gt; new.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>

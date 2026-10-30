@@ -87,7 +87,10 @@ beside the content it explains.</p>
 
 <dl><dt id="arg-previous">previous<a class="anchor" aria-label="anchor" href="#arg-previous"></a></dt>
 <dd><p>An <code>sframe</code> object: the instrument's state before this
-amendment.</p></dd>
+amendment. Read from a file, it must still match that file, or its last
+recorded amendment, so the log starts from a state a file held.
+An edit made to it after reading is refused, and so is one read with
+<code>verify = FALSE</code> that failed its integrity check.</p></dd>
 
 
 <dt id="arg-instrument">instrument<a class="anchor" aria-label="anchor" href="#arg-instrument"></a></dt>

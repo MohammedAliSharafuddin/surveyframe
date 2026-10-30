@@ -25,7 +25,11 @@ amend_sframe(
 
 - previous:
 
-  An `sframe` object: the instrument's state before this amendment.
+  An `sframe` object: the instrument's state before this amendment. Read
+  from a file, it must still match that file, or its last recorded
+  amendment, so the log starts from a state a file held. An edit made to
+  it after reading is refused, and so is one read with `verify = FALSE`
+  that failed its integrity check.
 
 - instrument:
 

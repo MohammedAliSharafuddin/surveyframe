@@ -48,7 +48,9 @@ render_result(
 
 - palette:
 
-  `"web"` (default) or `"print"`, the report's 2 palettes.
+  `"web"` (default) or `"print"`, the report's 2 palettes. A palette
+  given explicitly rebuilds the chart with it. Left out, the chart
+  attached to the result is used as it is.
 
 - format:
 
@@ -66,9 +68,9 @@ render_result(
 A list with `block_id`, `test`, `caption`, `apa`, `table` (a data
 frame), `note`, `supplement` (a list with `table` and `caption`, or
 `NULL`), `chart` (a `ggplot`, or `NULL` where the method has none or
-ggplot2 is absent), `html` (the fragment, for `format = "html"`), and
-`chart_file` (for `"png"` and `"svg"`). A result that failed carries its
-`error`, and `html` shows it.
+ggplot2 is absent), `html` (the fragment, for `format = "html"`),
+`chart_file` (for `"png"` and `"svg"`) and `syntax` where the result has
+one. A result that failed carries its `error`, and `html` shows it.
 
 ## See also
 

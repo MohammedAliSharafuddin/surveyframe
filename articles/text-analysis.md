@@ -498,7 +498,7 @@ Term co-occurrence network: one row per node. {.table}
 ``` r
 
 results[["RQ4"]]$apa
-#> [1] "Term co-occurrence network for comments (N = 60 responses, 20 terms, 145 edges, 3 clusters, modularity = 0.30)."
+#> [1] "Term co-occurrence network for \"What stood out about your visit, good or bad?\" (N = 60 responses, 20 terms, 145 edges, 3 clusters, modularity = 0.30)."
 ```
 
 ``` r
@@ -545,7 +545,7 @@ Sentiment counts, split by branch. {.table}
 ``` r
 
 results[["RQ5"]]$apa
-#> [1] "Sentiment for comments by branch (N = 60 responses, 2 groups)."
+#> [1] "Sentiment for \"What stood out about your visit, good or bad?\" by \"Which branch did you visit?\" (N = 60 responses, 2 groups)."
 ```
 
 ``` r

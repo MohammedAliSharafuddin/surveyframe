@@ -1,8 +1,9 @@
 # Bootstrap confidence interval for Cohen's d
 
 Percentile bootstrap for the standardised mean difference between two
-independent groups. Each resample draws within each group, preserving
-the group sizes.
+independent groups. The difference is signed, the mean of `x` minus the
+mean of `y`, so the interval can include zero. Each resample draws
+within each group, preserving the group sizes.
 
 ## Usage
 

@@ -60,10 +60,12 @@ result carries the attribute `sframe_verified`, `FALSE` (it is `TRUE` on
 every verified read), and [`print()`](https://rdrr.io/r/base/print.html)
 says so.
 [`write_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/write_sframe.md)
-refuses to write an unverified instrument with no amendment log unless
-`new_instrument = TRUE` declares it new, since nothing ties its content
-to a state anyone wrote. One with a log must match the log's last entry,
-as every instrument must.
+refuses to write an unverified instrument unless `new_instrument = TRUE`
+declares it new, since nothing ties its content to a state anyone wrote.
+The exception is one written back unchanged with the amendment log it
+was read with. No amendment can start from it:
+[`amend_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/amend_sframe.md)
+refuses it, and the write refuses any entry appended to its log.
 
 ## See also
 

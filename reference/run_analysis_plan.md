@@ -111,19 +111,19 @@ print(results)
 #> 
 #> RQ 1: Is perceived digital marketing effectiveness associated with tourist satisfaction?
 #>   Test: correlation_pearson
-#>   APA:  r(118) = 0.54, 95% CI [0.40, 0.65], p < .001
+#>   APA:  r(118) = .54, 95% CI [.40, .65], p < .001
 #> 
 #> RQ 2: Do digital marketing, service quality, and sustainability perceptions predict satisfaction?
 #>   Test: regression_linear
-#>   APA:  R² = 0.383, F(3, 116) = 23.95, p < .001
+#>   APA:  R² = .383, F(3, 116) = 23.95, p < .001
 #> 
 #> RQ 3: Do first-time and repeat visitors differ in behavioural intention?
 #>   Test: mann_whitney
-#>   APA:  U = 1576, z = -0.98, p = .326, r = 0.09, 95% CI [0.00, 0.27], Hodges-Lehmann shift = -0.00, 95% CI [-0.50, 0.00]
+#>   APA:  U = 1576, z = -0.98, p = .326, r = -.09, 95% CI [-.27, .09], Hodges-Lehmann shift = -0.00, 95% CI [-0.50, 0.00], higher in Repeat visitor
 #> 
 #> RQ 4: What is the distribution of first-time and repeat visitors?
 #>   Test: frequency
-#>   APA:  Frequency distribution for visit_type (N = 120).
+#>   APA:  Frequency distribution for "Visitor type" (N = 120).
 #> 
 #> RQ 5: What are the central tendency and spread of all response items?
 #>   Test: descriptives
@@ -175,7 +175,7 @@ print(results)
 #> 
 #> RQ 17: Is visitor type associated with attention check response level?
 #>   Test: crosstab
-#>   APA:  χ²(1, N = 120) = 4.31, p = .038, φ = 0.19, 95% CI [0.03, 0.33]
+#>   APA:  χ²(1, N = 120) = 4.31, p = .038, φ = .19, 95% CI [.03, .33]
 #> 
 #> RQ 18: Is the distribution of satisfaction ratings different across visitor types?
 #>   Test: crosstab
@@ -183,35 +183,35 @@ print(results)
 #> 
 #> RQ 19: Is there an association between visitor type and behavioural intention rating?
 #>   Test: fisher_exact
-#>   APA:  Fisher's exact test, p = .454, Cramer's V = 0.17
+#>   APA:  Fisher's exact test, p = .454, Cramer's V = .17
 #> 
 #> RQ 20: Do first-time and repeat visitors differ in mean satisfaction score?
 #>   Test: t_test_ind
-#>   APA:  t(106.77) = 0.15, p = .878, d = 0.03, 95% CI [0.01, 0.43]
+#>   APA:  t(106.77) = 0.15, p = .878, d = 0.03, 95% CI [-0.33, 0.41], higher in First-time visitor
 #> 
 #> RQ 21: Do respondents rate the two satisfaction items differently?
 #>   Test: t_test_pair
-#>   APA:  t(119) = 0.82, p = .416, d_z = 0.07, 95% CI [-0.11, 0.26]
+#>   APA:  t(119) = 0.82, p = .416, d_z = 0.07, 95% CI [-0.11, 0.26], higher in "Overall, I was satisfied with the tourism experience."
 #> 
 #> RQ 22: Is there a significant distributional difference between the first two service quality items?
 #>   Test: wilcoxon_pair
-#>   APA:  V = 967, z = -1.18, p = .239, r = 0.14, 95% CI [0.01, 0.38], pseudomedian = -0.00, 95% CI [-0.00, 0.00]
+#>   APA:  V = 967, z = -1.18, p = .239, r = -.14, 95% CI [-.38, .11], pseudomedian = -0.00, 95% CI [-0.00, 0.00], higher in "The service environment was easy to navigate."
 #> 
 #> RQ 23: Does satisfaction differ across visitor types?
 #>   Test: kruskal_wallis
-#>   APA:  H(1) = 0.00, p = .949, η² = 0.000, 95% CI [0.00, 0.03]
+#>   APA:  H(1) = 0.00, p = .949, η² = .000, 95% CI [.00, .03]
 #> 
 #> RQ 24: Does mean behavioural intention differ between visitor types?
 #>   Test: anova_one
-#>   APA:  F(1, 118) = 0.74, p = .391, η² = 0.006, 95% CI [0.00, 0.07]
+#>   APA:  F(1, 118) = 0.74, p = .391, η² = .006, 95% CI [.00, .07]
 #> 
 #> RQ 25: Do visitor types differ in satisfaction after controlling for service quality?
 #>   Test: ancova
-#>   APA:  Adjusted for service_quality, the group effect was F(1, 117) = 0.07, p = .791.
+#>   APA:  Adjusted for "Service quality", the group effect was F(1, 117) = 0.07, p = .791.
 #> 
 #> RQ 26: Do mean ratings differ across the three digital marketing items within respondents?
 #>   Test: repeated_anova
-#>   APA:  F(2, 238) = 0.40, p = .670, partial η² = 0.003
+#>   APA:  F(2, 238) = 0.40, p = .670, partial η² = .003
 #> 
 #> RQ 27: Do ordinal ratings differ across the three service quality items within respondents?
 #>   Test: friedman
@@ -219,19 +219,19 @@ print(results)
 #> 
 #> RQ 28: Are service quality perceptions associated with sustainability perceptions?
 #>   Test: correlation_spearman
-#>   APA:  r_s(118) = 0.00, 95% CI [-0.19, 0.19], p = .984
+#>   APA:  r_s(118) = .00, 95% CI [-.19, .19], p = .984
 #> 
 #> RQ 29: Is sustainability perception associated with behavioural intention?
 #>   Test: correlation_kendall
-#>   APA:  tau(118) = 0.05, 95% CI [-0.11, 0.20], p = .519
+#>   APA:  tau = .05, 95% CI [-.11, .20], p = .519, N = 120
 #> 
 #> RQ 30: Is digital marketing associated with behavioural intention after controlling for satisfaction?
 #>   Test: partial_correlation
-#>   APA:  partial r(117) = -0.09, p = .304
+#>   APA:  partial r(117) = -.09, p = .304
 #> 
 #> RQ 31: Do digital marketing and service quality perceptions predict visitor type?
 #>   Test: regression_logistic_binary
-#>   APA:  χ²(2) = 0.28, p = .869, McFadden R² = 0.002
+#>   APA:  χ²(2) = 0.28, p = .869, McFadden R² = .002
 #> 
 #> RQ 32: Do digital marketing and sustainability perceptions predict ordered satisfaction?
 #>   Test: regression_logistic_ordinal

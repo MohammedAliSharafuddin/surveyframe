@@ -31,7 +31,10 @@ sensitivity_analysis(
 - weights:
 
   Numeric weight vector, one per criterion. Renormalised to sum to 1
-  before use.
+  before use. Unnamed weights are taken in the order of the criteria.
+  Named weights are matched to the criteria by name, in any order, and a
+  name that is not a criterion, or a criterion with no weight, is an
+  error.
 
 - criteria_types:
 

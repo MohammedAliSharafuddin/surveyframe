@@ -120,9 +120,11 @@ marked unverified (see the Unverified reads section).</p></dd>
 it would otherwise rebuild by hand and lose fields doing so. The result
 carries the attribute <code>sframe_verified</code>, <code>FALSE</code> (it is <code>TRUE</code> on every
 verified read), and <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code> says so. <code><a href="write_sframe.html">write_sframe()</a></code> refuses to write an
-unverified instrument with no amendment log unless <code>new_instrument = TRUE</code>
-declares it new, since nothing ties its content to a state anyone wrote. One
-with a log must match the log's last entry, as every instrument must.</p>
+unverified instrument unless <code>new_instrument = TRUE</code> declares it new, since
+nothing ties its content to a state anyone wrote. The exception is one
+written back unchanged with the amendment log it was read with. No
+amendment can start from it: <code><a href="amend_sframe.html">amend_sframe()</a></code> refuses it, and the write
+refuses any entry appended to its log.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>

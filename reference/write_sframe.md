@@ -44,7 +44,10 @@ write_sframe(
 
   Logical. `TRUE` declares that the content is a new instrument, not a
   revision of the one it was read from, so no amendment is required. The
-  instrument must carry no amendment log. Defaults to `FALSE`.
+  instrument must carry no amendment log, and an instrument read with
+  [`read_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_sframe.md)
+  must have a new `meta$title` or `meta$version`, so 2 different files
+  never claim to be one instrument. Defaults to `FALSE`.
 
 ## Value
 

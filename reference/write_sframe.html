@@ -104,7 +104,10 @@ to <code>FALSE</code>.</p></dd>
 <dt id="arg-new-instrument">new_instrument<a class="anchor" aria-label="anchor" href="#arg-new-instrument"></a></dt>
 <dd><p>Logical. <code>TRUE</code> declares that the content is a new
 instrument, not a revision of the one it was read from, so no amendment is
-required. The instrument must carry no amendment log. Defaults to <code>FALSE</code>.</p></dd>
+required. The instrument must carry no amendment log, and an instrument
+read with <code><a href="read_sframe.html">read_sframe()</a></code> must have a new <code>meta$title</code> or <code>meta$version</code>,
+so 2 different files never claim to be one instrument. Defaults to
+<code>FALSE</code>.</p></dd>
 
 </dl></div>
     <div class="section level2">
