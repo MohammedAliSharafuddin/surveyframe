@@ -199,6 +199,8 @@ export_static_survey <- function(
   )
   html <- replace_placeholder(html, "{{THEME_COLOR}}", theme)
   html <- replace_placeholder(html, "{{ENDPOINT_URL}}", html_escape(endpoint_url))
+  html <- replace_placeholder(html, "{{PREVIEW}}",
+                              if (isTRUE(preview)) "true" else "false")
 
   # Write output
   dir.create(dirname(output_path), showWarnings = FALSE, recursive = TRUE)

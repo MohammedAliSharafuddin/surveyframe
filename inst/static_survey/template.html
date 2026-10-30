@@ -328,6 +328,11 @@ const SF       = JSON.parse(document.getElementById('sf-data').textContent);
 const R        = (SF.render||{});
 const THEME    = R.theme||'{{THEME_COLOR}}'||'#2563eb';
 const ENDPOINT = document.body.dataset.endpoint||'';
+// A preview collects nothing. export_static_survey(preview = TRUE) writes
+// true here, and any other value, the unreplaced placeholder included, is a
+// live survey. The flag is checked before every delivery path, host sender
+// included, so a host's callback cannot receive a preview answer.
+const PREVIEW  = '{{PREVIEW}}'==='true';
 const MODE     = R.mode||'standard';
 const WL       = R.welcome||{};
 const TY       = R.thankyou||{};
@@ -1116,8 +1121,9 @@ var deliveryState=null;
 // {confirmed: true}, marks the response recorded, resolving to anything else
 // marks it sent and unconfirmed, and a rejection marks it failed.
 function hostSender(){return typeof window.sframeSendResponse==='function';}
-function hasCollector(){return !!ENDPOINT||hostSender();}
+function hasCollector(){return !PREVIEW&&(!!ENDPOINT||hostSender());}
 function sendResponse(row){
+  if(PREVIEW){deliveryState='local';renderScreen();return;}
   deliveryState='sending';
   renderScreen();
   if(hostSender()){

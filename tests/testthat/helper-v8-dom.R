@@ -96,13 +96,15 @@ function confirm(msg){ __confirms.push(String(msg)); return __confirmAnswer; }
 # returns the context. The survey is left on its first screen, unrendered.
 # `pre` is JavaScript run after the stub and before the survey script, for a
 # test that needs something in place at load, such as localStorage or a host
-# sender.
-static_survey_context <- function(instrument, endpoint_url = "", pre = NULL) {
+# sender. `...` goes to export_static_survey(), such as `preview = TRUE`.
+static_survey_context <- function(instrument, endpoint_url = "", pre = NULL,
+                                  ...) {
   skip_if_not_installed("V8")
   path <- tempfile(fileext = ".html")
-  suppressMessages(export_static_survey(instrument, output_path = path,
-                                        open = FALSE,
-                                        endpoint_url = endpoint_url))
+  # A preview refuses any endpoint argument, the empty one included.
+  args <- list(instrument, output_path = path, open = FALSE, ...)
+  if (!isTRUE(args$preview)) args$endpoint_url <- endpoint_url
+  suppressMessages(do.call(export_static_survey, args))
   html <- paste(readLines(path, warn = FALSE, encoding = "UTF-8"),
                 collapse = "\n")
   unlink(path)

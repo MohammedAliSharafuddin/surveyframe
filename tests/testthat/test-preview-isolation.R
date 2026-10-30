@@ -54,3 +54,23 @@ test_that("20: Studio's preview asks for an isolated export", {
   src <- sframe_installed_text("inst", "shiny", "app.R")
   expect_match(src, "preview = TRUE", fixed = TRUE)
 })
+
+# CX-03 (Codex 0.4.3): the preview removed the endpoint and redirect, but a
+# host that defines window.sframeSendResponse still made hasCollector() true,
+# so a preview answer reached the host's real data while the page said
+# nothing was sent.
+test_that("CX-03: a preview never calls a host sender", {
+  ctx <- static_survey_context(collector_instrument(), preview = TRUE,
+    pre = "window.__rows = 0; window.sframeSendResponse = function(row){ window.__rows++; return Promise.resolve(true); };")
+  expect_false(ctx$get("hasCollector()"))
+  ctx$eval("responses['q1'] = 'test'; doSubmit();")
+  expect_identical(ctx$get("window.__rows"), 0L)
+  expect_identical(ctx$get("deliveryState"), "local")
+})
+
+test_that("CX-03: a deployable export still uses a host sender", {
+  ctx <- static_survey_context(collector_instrument(),
+    pre = "window.__rows = 0; window.sframeSendResponse = function(row){ window.__rows++; return Promise.resolve(true); };")
+  ctx$eval("responses['q1'] = 'test'; doSubmit();")
+  expect_identical(ctx$get("window.__rows"), 1L)
+})
