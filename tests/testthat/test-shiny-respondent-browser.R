@@ -8,6 +8,7 @@
 # Skipped on CRAN and wherever chromote or Chrome is unavailable.
 
 skip_on_cran()
+skip_if_not_slow()
 skip_if_not_installed("shiny")
 skip_if_not_installed("chromote")
 skip_if_not_installed("callr")

@@ -7,6 +7,7 @@
 
 test_that("every Studio screen draws its content when opened", {
   skip_on_cran()
+  skip_if_not_slow()
   skip_if_not_installed("shiny")
   skip_if_not_installed("chromote")
   skip_if_not_installed("callr")

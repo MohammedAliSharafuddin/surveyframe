@@ -12,3 +12,8 @@ if ("sframe.test_r_libs" %in% names(options())) {
     options(sframe.test_r_libs = NULL)
   })
 }
+
+if ("sframe.test_use_quarto" %in% names(options())) {
+  options(surveyframe.use_quarto = getOption("sframe.test_use_quarto")[[1]],
+          sframe.test_use_quarto = NULL)
+}

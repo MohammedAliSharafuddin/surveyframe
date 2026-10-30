@@ -139,6 +139,7 @@ test_that("D12: render_result() prints the declaration and a written interpretat
 
 test_that("D12: the Quarto template prints the declaration before the result", {
   skip_on_cran()
+  skip_if_not_slow()
   skip_if(!nzchar(Sys.which("quarto")), "Quarto is not installed")
   ins <- declared_instrument(interpretation = "Reject H0 if p < .05.")
   quarto_html <- function(data, interpretations = NULL) {

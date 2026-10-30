@@ -12,6 +12,7 @@ test_that("references is a Studio screen launch_studio() accepts", {
 
 test_that("the References screen adds and removes a reference", {
   skip_on_cran()
+  skip_if_not_slow()
   skip_if_not_installed("shiny")
   skip_if_not_installed("chromote")
   skip_if_not_installed("callr")

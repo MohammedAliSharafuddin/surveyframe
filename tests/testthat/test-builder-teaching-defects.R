@@ -13,6 +13,7 @@
 # Skipped on CRAN and wherever chromote or Chrome is unavailable.
 
 skip_on_cran()
+skip_if_not_slow()
 skip_if_not_installed("chromote")
 chrome <- tryCatch(chromote::find_chrome(), error = function(e) NULL)
 skip_if(length(chrome) != 1L || is.na(chrome) || !nzchar(chrome),

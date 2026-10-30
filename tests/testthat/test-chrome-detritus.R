@@ -45,6 +45,7 @@ test_that("the cleaner leaves entries that already existed before the call", {
 # tests above are the real guard on the cleaner and fail under mutation.
 test_that("render_report(format = 'pdf') leaves no Chrome detritus behind", {
   skip_on_cran()
+  skip_if_not_slow()
   skip_if_not_installed("pagedown")
   chrome <- tryCatch(pagedown::find_chrome(), error = function(e) NULL)
   chrome_command <- if (length(chrome) == 1L && !is.na(chrome) && nzchar(chrome)) {

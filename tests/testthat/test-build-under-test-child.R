@@ -6,6 +6,7 @@
 
 test_that("a child Rscript loads the build under test", {
   skip_on_cran()
+  skip_if_not_slow()
   skip_if(!nzchar(Sys.which("quarto")),
           "the build is made for the run only where Quarto is installed")
   lib <- sframe_build_under_test()

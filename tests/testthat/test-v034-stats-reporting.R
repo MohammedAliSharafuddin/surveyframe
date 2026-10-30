@@ -102,6 +102,7 @@ test_that("render_report format = 'pdf' is guarded and additive", {
     )
   } else {
     skip_on_cran()
+    skip_if_not_slow()
     chrome <- tryCatch(pagedown::find_chrome(), error = function(e) NULL)
     skip_if(is.null(chrome), "No Chrome available for chrome_print()")
     out <- tempfile(fileext = ".pdf")

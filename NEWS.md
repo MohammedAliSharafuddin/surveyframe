@@ -376,6 +376,12 @@ style.
 * **The Quarto build guard fails when a git source tree gives no commit.**
   It skipped the commit comparison on an empty commit, so a failed lookup
   let a report from a stale install pass on its version alone.
+* **The tests have a fast tier and a slow tier.** In a source tree, the 18
+  tests that render through Quarto or drive Chrome run only when
+  `SURVEYFRAME_SLOW_TESTS=true`, and the source install they need is made
+  only then. The skip message names the variable. The fast tier renders
+  every report with the built-in engine from the source under test. Under
+  `R CMD check` nothing changes.
 
 * **`render_report()` shows the report it writes.** In an interactive
   session the new `open = TRUE` default opens it in the viewer pane of
