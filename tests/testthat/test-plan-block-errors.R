@@ -46,7 +46,7 @@ test_that("6: a role naming a text item for a numeric test says so", {
 
 test_that("6: too few responses is reported as such", {
   r <- run_block("correlation_pearson", list(x = "score", y = "other"))
-  expect_match(r$error, "^Too few responses")
+  expect_match(r$error, "^RQ1 \\(.*\\): Too few responses")
 })
 
 test_that("6: no block reports the bare 'Test failed.'", {

@@ -1085,6 +1085,10 @@ sframe_model_by_id <- function(instrument, id) {
 # used to say "Test failed." whatever the cause (Ethos request 6). `numeric`
 # names the columns the test reads as numbers.
 sframe_test_failure <- function(e, data, numeric = character(0)) {
+  infinite <- sframe_infinite_columns(data, numeric)
+  if (length(infinite) > 0) {
+    return(sframe_infinite_message(infinite, e))
+  }
   no_numbers <- Filter(function(v) {
     col <- data[[v]]
     !is.null(col) && any(!is.na(col)) && all(is.na(sframe_num(col)))
@@ -1100,6 +1104,62 @@ sframe_test_failure <- function(e, data, numeric = character(0)) {
     return(paste0("Too few responses with a value for this test (", msg, ")."))
   }
   paste0("The test could not be computed: ", msg)
+}
+
+# The columns among `vars` that hold an infinite value (Inf or -Inf), which no
+# test in the plan can use.
+sframe_infinite_columns <- function(data, vars) {
+  vars <- unique(as.character(vars))
+  vars <- vars[vars %in% names(data)]
+  Filter(function(v) {
+    col <- data[[v]]
+    if (is.factor(col)) return(FALSE)
+    any(is.infinite(suppressWarnings(as.numeric(col))), na.rm = TRUE)
+  }, vars)
+}
+
+sframe_infinite_message <- function(columns, e) {
+  paste0(paste0("'", columns, "'", collapse = " and "),
+         if (length(columns) > 1) " hold" else " holds",
+         " infinite values (Inf or -Inf), which the test cannot use. ",
+         "Recode them as missing or remove those rows, then run the block again. ",
+         "R said: ", conditionMessage(e))
+}
+
+# The message for a runner that caught a condition: the data problem, the
+# remedy and what R said, so the cause survives. The block id and the method
+# are added once, in sframe_block_error().
+sframe_runner_failure <- function(problem, remedy, e) {
+  paste0(problem, " ", remedy, " R said: ", conditionMessage(e))
+}
+
+# How a method is named in an error message.
+sframe_method_label <- function(test) {
+  known <- c(
+    mcnemar = "McNemar test", friedman = "Friedman test",
+    ancova = "ANCOVA", t_test_ind = "independent t-test",
+    t_test_pair = "paired t-test", fisher_exact = "Fisher's exact test",
+    cochran_q = "Cochran's Q", efa_readiness = "EFA readiness",
+    efa_solution = "EFA solution", anova_one = "one-way ANOVA",
+    anova_two = "two-way ANOVA", mann_whitney = "Mann-Whitney test",
+    wilcoxon_pair = "Wilcoxon signed-rank test",
+    kruskal_wallis = "Kruskal-Wallis test",
+    partial_correlation = "partial correlation",
+    regression_logistic_ordinal = "ordinal logistic regression",
+    regression_logistic_multinomial = "multinomial logistic regression",
+    firth_logistic = "Firth logistic regression", moderation = "moderation model"
+  )
+  if (test %in% names(known)) known[[test]] else gsub("_", " ", test)
+}
+
+# Names the block and the method at the front of a block error, once, for
+# every runner. An error that already opens with the block id is left alone.
+sframe_block_error <- function(msg, id, test) {
+  id <- as.character(id %||% "")[1]
+  label <- sframe_method_label(test)
+  head <- if (nzchar(id)) paste0(id, " (", label, "): ") else paste0(label, ": ")
+  if (startsWith(msg, head)) return(msg)
+  paste0(head, msg)
 }
 
 # The variables a block names that the responses lack, as a message, or NULL
@@ -1630,6 +1690,20 @@ sframe_quality_checks_table <- function(qr) {
   do.call(rbind, rows)
 }
 
+# A condition no runner caught, as a message. Infinite values in the block's
+# variables are the cause R does not name, so they are checked first.
+sframe_condition_error <- function(e, data, roles, vars) {
+  named <- c(vars, unlist(roles, use.names = FALSE))
+  infinite <- sframe_infinite_columns(data, named)
+  if (length(infinite) > 0) return(sframe_infinite_message(infinite, e))
+  msg <- conditionMessage(e)
+  if (grepl("is empty|must have|no (usable|complete)|0 \\(non-NA\\) cases", msg)) {
+    return(paste0("No usable responses reach this block after removing missing values. ",
+                  "Check that its variables hold answers. R said: ", msg))
+  }
+  msg
+}
+
 sframe_run_one_block <- function(block, data, instrument, plots = FALSE,
                                  plot_palette = "web") {
   test <- sframe_analysis_method(block)
@@ -1747,8 +1821,11 @@ sframe_run_one_block <- function(block, data, instrument, plots = FALSE,
       list(test = test, error = paste0("Test '", test, "' is unavailable."))
     )
   }, error = function(e) {
-    list(test = test, error = conditionMessage(e))
+    list(test = test, error = sframe_condition_error(e, data, roles, vars))
   })
+  if (!is.null(result$error)) {
+    result$error <- sframe_block_error(result$error, block$id, test)
+  }
 
   # Weight sensitivity is opt-in per block via options$sensitivity = TRUE.
   # Attached here, once, rather than inside each of the 7 ranking runners,
