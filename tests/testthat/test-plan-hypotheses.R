@@ -136,3 +136,28 @@ test_that("D12: render_result() prints the declaration and a written interpretat
                fixed = TRUE)
   expect_true(before(html, "sf-apa", "Interpretation (written"))
 })
+
+test_that("D12: the Quarto template prints the declaration before the result", {
+  skip_on_cran()
+  skip_if(!nzchar(Sys.which("quarto")), "Quarto is not installed")
+  ins <- declared_instrument(interpretation = "Reject H0 if p < .05.")
+  quarto_html <- function(data, interpretations = NULL) {
+    out <- tempfile(fileext = ".html")
+    old_opt <- options(surveyframe.use_quarto = TRUE)
+    on.exit(options(old_opt), add = TRUE)
+    render_report(ins, data, output_file = out, open = FALSE,
+                  interpretations = interpretations)
+    paste(readLines(out, warn = FALSE), collapse = "\n")
+  }
+  html <- quarto_html(hyp_data, list(RQ1 = "The groups differ."))
+  expect_true(grepl("Mean score is equal in both groups.", html, fixed = TRUE))
+  expect_true(grepl("Alternative hypothesis (H1)", html, fixed = TRUE))
+  expect_true(before(html, "Planned decision rule", "Result:"))
+  expect_true(before(html, "Result:", "Interpretation (written after the results)"))
+  expect_true(grepl("The groups differ.", html, fixed = TRUE))
+
+  html <- quarto_html(NULL)
+  expect_true(grepl("Mean score is equal in both groups.", html, fixed = TRUE))
+  expect_false(grepl("Interpretation prompt", html, fixed = TRUE))
+  expect_false(grepl("Interpretation (written", html, fixed = TRUE))
+})

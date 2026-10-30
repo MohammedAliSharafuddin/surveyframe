@@ -197,6 +197,12 @@ style.
   the decision rule as the interpretation when none was written, and a
   result from `run_analysis_plan()` carried its decision rule as its
   interpretation. A result's `interpretation` is now only what was written.
+* **The Quarto report prints the same declaration as the built-in one.** It
+  printed the block's interpretation as an "Interpretation prompt" before
+  the data existed, and no hypotheses. `render_report()` now computes each
+  block's declaration and interpretation with the built-in engine's helpers
+  and hands them to the template, and the `interpretations` help for
+  `render_report()` and `render_results()` says what prints where.
 
 * **`render_report()` shows the report it writes.** In an interactive
   session the new `open = TRUE` default opens it in the viewer pane of

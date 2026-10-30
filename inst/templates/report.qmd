@@ -26,6 +26,7 @@ params:
   show_code:           true
   plot_palette:        "web"
   interpretations_path: ""
+  declarations_path: ""
   instrument_hash:     ""
   analysis_seed:       ""
   use_citations:       false
@@ -481,6 +482,29 @@ if (is.null(rr)) {
 
 ```{r analysis, eval=params$include_analysis && length(instrument$analysis_plan) > 0}
 #| output: asis
+# What each block declared before the data prints above its result, and the
+# interpretation below it, labelled as written after the results (D12).
+# render_report() computes both with the helpers the built-in engine uses,
+# so the 2 reports say the same.
+decls <- if (nzchar(params$declarations_path %||% "") &&
+             file.exists(params$declarations_path)) {
+  readRDS(params$declarations_path)
+} else {
+  list(blocks = list())
+}
+decl_for <- function(b) {
+  id <- as.character(b$block_id %||% b$id %||% "")[1]
+  if (nzchar(id) && id %in% names(decls$blocks)) decls$blocks[[id]] else list()
+}
+declare_md <- function(b) {
+  d <- decl_for(b)$declaration
+  if (length(d) > 0) cat(sprintf("**%s:** %s\n\n", names(d), d), sep = "")
+}
+interp_md <- function(b) {
+  text <- decl_for(b)$interpretation %||% ""
+  if (nzchar(text))
+    cat(sprintf("\n**%s:** %s\n\n", decls$interpretation_label, text))
+}
 if (!has_data) {
   for (i in seq_along(instrument$analysis_plan)) {
     rq <- instrument$analysis_plan[[i]]
@@ -488,13 +512,10 @@ if (!has_data) {
     cat(sprintf("**Planned test:** %s\n\n", rq$test %||% ""))
     if (length(rq$variables %||% character(0)) > 0)
       cat(sprintf("**Variables:** %s\n\n", paste(rq$variables, collapse = ", ")))
-    if (nzchar(rq$interpretation %||% ""))
-      cat(sprintf("**Interpretation prompt:** %s\n\n", rq$interpretation))
+    declare_md(rq)
     if (use_citations && length(cited_keys(paste0("plan:", rq$id %||% ""))) > 0)
       cat(sprintf("**Sources:** %s\n\n", cite(cited_keys(paste0("plan:", rq$id %||% "")))))
-    override <- interps[[rq$id %||% ""]] %||% ""
-    if (nzchar(override))
-      cat(sprintf("**Interpretation:** %s\n\n", override))
+    interp_md(rq)
   }
 } else {
   results <- tryCatch(
@@ -511,6 +532,7 @@ if (!has_data) {
       if (!is.null(r$error)) {
         cat(sprintf("> **Error:** %s\n\n", r$error))
       } else {
+        declare_md(r)
         scale_entries <- Filter(function(e) is.list(e) && !is.null(e$scale_id), r)
         if (!is.null(r$apa)) {
           cat(sprintf("**Result:** %s\n\n", r$apa))
@@ -566,16 +588,7 @@ if (!has_data) {
           print(r$plot)
           cat("\n")
         }
-        override <- interps[[r$block_id %||% r$id %||% ""]] %||% ""
-        if (nzchar(override)) {
-          # A written interpretation renders alongside the pre-declared
-          # decision rule, so the prospective contract stays visible.
-          if (nzchar(r$decision_rule %||% ""))
-            cat(sprintf("\n**Planned decision rule:** %s\n\n", r$decision_rule))
-          cat(sprintf("\n**Interpretation:** %s\n\n", override))
-        } else if (nzchar(r$interpretation %||% "")) {
-          cat(sprintf("\n**Interpretation:** %s\n\n", r$interpretation))
-        }
+        interp_md(r)
         # Cited in text. The references themselves are listed once, in the
         # References section at the end.
         block_key <- r$block_id %||% r$id %||% ""
