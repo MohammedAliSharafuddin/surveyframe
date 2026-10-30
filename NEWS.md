@@ -17,6 +17,13 @@ can be written again, and every plan result can be serialised by a host.
   An instrument unchanged since it was read writes without the flag, and the
   error says so: Ethos, or any caller writing an unchanged file, drops
   `new_instrument = TRUE`.
+* **`amend_sframe()` starts the log from the file as read.** It took the
+  starting fingerprint from whatever `previous` held, so a file read, edited
+  in memory and then amended got a log beginning at a state no file held,
+  and the edit went undisclosed. `previous` must now match the file it was
+  read from, or its last recorded amendment. Amend from the instrument as
+  read, and put every change in `instrument`. `write_sframe()` also checks
+  that the first new entry starts from the content read.
 * **A frequency table now shows choice labels, with the code in its own
   column.** The table's columns are `Value` (the label), `Code`, `Frequency`
   and `Percent`. Code reading `Value` for the stored code should read `Code`.
