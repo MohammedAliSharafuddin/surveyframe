@@ -1552,7 +1552,7 @@ sframe_run_ancova <- function(data, roles) {
   df <- data[, vars, drop = FALSE]
   df[[outcome]] <- sframe_num(df[[outcome]])
   df[[group]] <- as.factor(df[[group]])
-  for (cov in covariates) df[[cov]] <- sframe_num(df[[cov]])
+  df[covariates] <- sframe_predictor_frame(df, covariates)
   df <- df[stats::complete.cases(df), , drop = FALSE]
   formula <- stats::as.formula(paste(outcome, "~", group, "+", paste(covariates, collapse = " + ")))
   fit <- tryCatch(stats::lm(formula, data = df), error = function(e) NULL)
@@ -1626,9 +1626,7 @@ sframe_run_ordinal_logistic <- function(data, roles, options = list()) {
   sframe_require_MASS("to fit ordinal logistic regression with MASS::polr()")
   df <- data[, vars, drop = FALSE]
   df[[outcome]] <- ordered(df[[outcome]])
-  for (p in predictors) {
-    if (is.numeric(df[[p]])) df[[p]] <- sframe_num(df[[p]])
-  }
+  df[predictors] <- sframe_predictor_frame(df, predictors)
   df <- df[stats::complete.cases(df), , drop = FALSE]
   if (nlevels(df[[outcome]]) < 3) {
     return(list(test = "regression_logistic_ordinal",
@@ -1766,6 +1764,7 @@ sframe_run_multinomial_logistic <- function(data, roles, options = list()) {
   sframe_require_nnet("to fit multinomial logistic regression with nnet::multinom()")
   df <- data[, vars, drop = FALSE]
   df[[outcome]] <- as.factor(df[[outcome]])
+  df[predictors] <- sframe_predictor_frame(df, predictors)
   df <- df[stats::complete.cases(df), , drop = FALSE]
   if (nlevels(df[[outcome]]) < 3) {
     return(list(test = "regression_logistic_multinomial",
