@@ -114,7 +114,7 @@ render_result <- function(result, data, instrument = NULL,
         sprintf("<h3>%s</h3>", htmltools_escape(caption)),
         # What the block declared before the data, above the result (D12).
         sframe_declaration_html(result),
-        if (nzchar(out$apa)) sprintf("<p class=\"sf-apa\">%s</p>", htmltools_escape(out$apa)),
+        if (nzchar(out$apa)) sprintf("<p class=\"sf-apa\">%s</p>", sframe_apa_html(out$apa)),
         if (is.data.frame(table)) .render_report_table(table, caption = caption, note = out$note),
         if (is.list(out$supplement) && is.data.frame(out$supplement$table)) {
           .render_report_table(out$supplement$table, caption = out$supplement$caption)

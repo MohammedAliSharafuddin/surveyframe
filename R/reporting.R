@@ -1131,7 +1131,8 @@ sframe_clean_interpretations <- function(interpretations) {
                   htmltools_escape(result$research_question %||% paste("Research Question", i))),
           if (nzchar(declared)) declared,
           sprintf("<p class=\"apa\"><strong>Result:</strong> %s</p>",
-                  htmltools_escape(result$apa %||% result$error %||% "")),
+                  if (!is.null(result$apa)) sframe_apa_html(result$apa)
+                  else htmltools_escape(result$error %||% "")),
           table_html,
           plot_html,
           syntax_html,

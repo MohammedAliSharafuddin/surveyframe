@@ -2141,10 +2141,10 @@ render_results <- function(
         </div>
         <p class="citation-list">References for this analysis: %s</p>
       </section>',
-      i, rq, declared, htmltools_escape(apa_str), effect_badge,
+      i, rq, declared, sframe_apa_html(apa_str), effect_badge,
       tbl_html,
       sframe_interpretation_label,
-      htmltools_escape(prompt),
+      sframe_apa_html(prompt),
       if (nzchar(interp)) htmltools_escape(interp) else
         '<span class="empty-interp">Your interpretation will appear here.</span>',
       cits
