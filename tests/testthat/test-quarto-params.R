@@ -43,10 +43,11 @@ test_that("15: only the path parameters are normalised", {
   # normalizePath() used to run over every character value. On Linux it
   # returns a non-existent relative path unchanged, so the effect is invisible
   # here; on Windows it rewrites separators and can prepend the working
-  # directory. The rule is what this pins: the 3 parameters that name a file,
+  # directory. The rule is what this pins: the 4 parameters that name a file,
   # and no others.
   expect_setequal(sframe_quarto_param_names_path,
-                  c("instrument_path", "data_path", "interpretations_path"))
+                  c("instrument_path", "data_path", "interpretations_path",
+                    "declarations_path"))
 
   params <- list(
     instrument_path = "instr.rds",
