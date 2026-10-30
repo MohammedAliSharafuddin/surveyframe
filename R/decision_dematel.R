@@ -191,9 +191,9 @@ sframe_resolve_dematel_matrix <- function(data, roles, options, instrument) {
   assembly <- sframe_assemble_pairwise(data, instrument, pairwise_item[1])
   agg <- sframe_aggregate_judgements(assembly, method = "arithmetic")
   notes <- c(notes, sprintf(
-    paste0("The influence matrix is the arithmetic mean of %d ",
-           "respondent(s)' directed judgements via item '%s'%s."),
-    agg$n_respondents, pairwise_item[1],
+    paste0("The influence matrix is the arithmetic mean of the directed ",
+           "judgements of %s via item '%s'%s."),
+    sframe_count_noun(agg$n_respondents, "respondent"), pairwise_item[1],
     if (agg$n_dropped > 0) {
       sprintf(", with %d dropped as incomplete or out of range",
               agg$n_dropped)

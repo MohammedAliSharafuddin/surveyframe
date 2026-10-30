@@ -111,3 +111,13 @@ test_that("table headings set symbols as APA 7 does and read as words (CX-24)", 
   expect_no_match(html, ">P<", fixed = TRUE)
   expect_match(html, "<td>.25</td>", fixed = TRUE)
 })
+
+test_that("result text and notes count with real plurals, never (s) (CX-24)", {
+  fns <- c("sframe_run_descriptives_result", "sframe_resolve_decision_inputs",
+           "sframe_resolve_pairwise_matrix", "sframe_run_anp",
+           "sframe_resolve_dematel_matrix")
+  for (fn in fns) {
+    src <- paste(deparse(get(fn, envir = asNamespace("surveyframe"))), collapse = "\n")
+    expect_false(grepl("[a-z]\\(s\\)", src), label = fn)
+  }
+})
