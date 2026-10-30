@@ -140,6 +140,13 @@ sframe_check_amendment_boundary <- function(instrument, new_instrument = FALSE) 
     if (!is.null(origin$version) &&
         identical(instrument$meta$title %||% "", origin$title) &&
         identical(instrument$meta$version %||% "", origin$version)) {
+      # Content that still hashes to the file read has nothing to declare as
+      # new, and writes without the flag.
+      if (identical(sframe_content_hash(instrument), origin$content_hash)) {
+        abort(paste0(
+          "Nothing changed since it was read: write it without ",
+          "`new_instrument = TRUE`."))
+      }
       abort(sprintf(paste0(
         "new_instrument = TRUE declares a new instrument, but it keeps the ",
         "title and version of '%s' (\"%s\", version %s). Give it a new ",
