@@ -36,13 +36,6 @@ browser_instrument <- function() {
   ))
 }
 
-# An installed package (as under covr) also has a DESCRIPTION, but no R
-# sources, so load_all() only applies where .R files exist.
-has_package_source <- function(dir) {
-  file.exists(file.path(dir, "DESCRIPTION")) &&
-    length(list.files(file.path(dir, "R"), pattern = "\\.[Rr]$")) > 0L
-}
-
 # Kills the child and builds an error that carries what it wrote to stderr,
 # so a failed start reports its cause instead of only a timeout.
 start_failure <- function(proc, what) {
@@ -56,15 +49,15 @@ start_failure <- function(proc, what) {
 
 # Serves the app in a background R process and returns a live session.
 serve_survey <- function(instrument, csv) {
-  src <- test_path("..", "..")
-  from_source <- has_package_source(src)
+  # The child loads the build under test with library(), as a user would,
+  # never the source with load_all() (helper-build-under-test.R).
+  libpath <- sframe_build_libpath()
   port <- httpuv::randomPort()
-  proc <- callr::r_bg(function(src, from_source, instrument, csv, port) {
-    if (from_source) pkgload::load_all(src, quiet = TRUE)
-    else library(surveyframe)
+  proc <- callr::r_bg(function(instrument, csv, port) {
+    library(surveyframe)
     app <- render_survey(instrument, save_responses = "csv", output_path = csv)
     shiny::runApp(app, port = port, launch.browser = FALSE)
-  }, args = list(normalizePath(src), from_source, instrument, csv, port))
+  }, args = list(instrument, csv, port), libpath = libpath)
   url <- paste0("http://127.0.0.1:", port)
   for (i in seq_len(.browser_start_attempts)) {
     up <- tryCatch({ suppressWarnings(readLines(url, n = 1)); TRUE },
@@ -198,12 +191,12 @@ test_that("A5: a ranking can be ordered from the keyboard alone", {
 # ── the reusable module, embedded in a host application ───────────────────
 
 serve_module <- function(instrument, csv) {
-  src <- test_path("..", "..")
-  from_source <- has_package_source(src)
+  # The child loads the build under test with library(), as a user would,
+  # never the source with load_all() (helper-build-under-test.R).
+  libpath <- sframe_build_libpath()
   port <- httpuv::randomPort()
-  proc <- callr::r_bg(function(src, from_source, instrument, csv, port) {
-    if (from_source) pkgload::load_all(src, quiet = TRUE)
-    else library(surveyframe)
+  proc <- callr::r_bg(function(instrument, csv, port) {
+    library(surveyframe)
     ui <- shiny::fluidPage(shiny::tags$h1("Host application"),
                            survey_module_ui("embedded"))
     server <- function(input, output, session) {
@@ -214,7 +207,7 @@ serve_module <- function(instrument, csv) {
     }
     shiny::runApp(shiny::shinyApp(ui, server), port = port,
                   launch.browser = FALSE)
-  }, args = list(normalizePath(src), from_source, instrument, csv, port))
+  }, args = list(instrument, csv, port), libpath = libpath)
   url <- paste0("http://127.0.0.1:", port)
   up <- FALSE
   for (i in seq_len(.browser_start_attempts)) {

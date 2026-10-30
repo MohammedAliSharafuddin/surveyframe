@@ -18,14 +18,14 @@ test_that("the References screen adds and removes a reference", {
   chrome <- tryCatch(chromote::find_chrome(), error = function(e) NULL)
   skip_if(length(chrome) != 1L || is.na(chrome) || !nzchar(chrome), "Chrome not found")
 
-  src <- normalizePath(test_path("..", ".."))
-  from_source <- file.exists(file.path(src, "DESCRIPTION")) &&
-    length(list.files(file.path(src, "R"), pattern = "\\.[Rr]$")) > 0L
+  # The child loads the build under test with library(), as a user would,
+  # never the source with load_all() (helper-build-under-test.R).
+  libpath <- sframe_build_libpath()
   port <- httpuv::randomPort()
-  proc <- callr::r_bg(function(src, from_source, port) {
-    if (from_source) pkgload::load_all(src, quiet = TRUE) else library(surveyframe)
+  proc <- callr::r_bg(function(port) {
+    library(surveyframe)
     launch_studio_demo(screen = "references", port = port, launch.browser = FALSE)
-  }, args = list(src, from_source, port))
+  }, args = list(port), libpath = libpath)
   on.exit(proc$kill(), add = TRUE)
   url <- paste0("http://127.0.0.1:", port)
   for (i in 1:180) {

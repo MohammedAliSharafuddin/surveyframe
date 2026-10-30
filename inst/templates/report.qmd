@@ -652,7 +652,9 @@ cat("**Rendering engine:** Quarto\n\n")
 sf_desc <- utils::packageDescription("surveyframe")
 sf_sha <- sf_desc$RemoteSha %||% ""
 cat(sprintf("**surveyframe:** %s%s\n\n", sf_desc$Version,
-            if (nzchar(sf_sha)) sprintf(", commit `%s`", substr(sf_sha, 1, 12)) else ""))
+            if (nzchar(sf_sha)) {
+              sprintf(", commit `%s`", sub("^([0-9a-f]{12})[0-9a-f]*", "\\1", sf_sha))
+            } else ""))
 seed_val <- params$analysis_seed
 if (is.null(seed_val) || !nzchar(seed_val)) seed_val <- "not recorded"
 cat(sprintf("**Analysis seed:** `%s`\n\n", seed_val))
