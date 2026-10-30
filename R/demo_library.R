@@ -272,7 +272,21 @@ print.sframe_branding <- function(x, ...) {
 #' Stata with the labels intact. A `.sav` keeps the text codes, which SPSS
 #' labels directly.
 #'
-#' @return The path, invisibly.
+#' @section Names and labels that do not fit the format:
+#' SPSS and Stata refuse column names with spaces or punctuation, names that
+#' do not start with a letter, and names over the format's length limit (64
+#' bytes for SPSS, 32 characters for Stata). Matrix row columns such as
+#' `session__Opening keynote` are renamed to valid names, with illegal
+#' characters turned into `_`, a leading `v` where the first character is not
+#' a letter, and a number added where two names would otherwise match. Variable
+#' labels are cut at 256 bytes for SPSS and 80 characters for Stata, and value
+#' labels at 120 bytes for SPSS and 80 characters for Stata. Everything else
+#' keeps its full label. One message lists each change as old -> new.
+#'
+#' @return The path, invisibly. When any name or label was changed, the path
+#'   carries an attribute `"renamed"`, a data frame with the columns `kind`
+#'   (`"name"`, `"variable label"` or `"value label"`), `column`, `old` and
+#'   `new`. With no changes there is no message and no attribute.
 #' @export
 #' @seealso [sframe_demo()], [read_responses()]
 #' @examples
@@ -360,9 +374,102 @@ sframe_export_labelled <- function(data, instrument, path) {
     }
   }
 
+  fit <- sframe_fit_labelled(data, ext)
+  data <- fit$data
   if (identical(ext, "sav")) haven::write_sav(data, path)
   else haven::write_dta(data, path)
+  if (nrow(fit$changes)) {
+    rlang::inform(sframe_labelled_message(fit$changes, ext))
+    attr(path, "renamed") <- fit$changes
+  }
   invisible(path)
+}
+
+# Makes column names, variable labels and value labels fit the target format.
+# Returns the data and a data frame of every change (kind, column, old, new).
+sframe_fit_labelled <- function(data, ext) {
+  limits <- if (identical(ext, "dta")) {
+    list(name = 32L, label = 80L, value = 80L)
+  } else {
+    list(name = 64L, label = 256L, value = 120L)
+  }
+  # Stata counts characters and SPSS counts bytes.
+  unit <- if (identical(ext, "dta")) "chars" else "bytes"
+  cut_text <- function(x, n) {
+    if (is.na(x) || nchar(x, unit) <= n) return(x)
+    out <- substr(x, 1L, n)
+    while (nchar(out, unit) > n) out <- substr(out, 1L, nchar(out) - 1L)
+    out
+  }
+  changes <- data.frame(kind = character(), column = character(),
+                        old = character(), new = character(),
+                        stringsAsFactors = FALSE)
+  note <- function(kind, column, old, new) {
+    if (!identical(old, new)) {
+      changes[nrow(changes) + 1L, ] <<- list(kind, column, old, new)
+    }
+  }
+  # Value labels first, while the columns still carry their original names.
+  for (cn in names(data)) {
+    x <- data[[cn]]
+    lab <- attr(x, "label", exact = TRUE)
+    if (is.character(lab) && length(lab) == 1L) {
+      new <- cut_text(lab, limits$label)
+      note("variable label", cn, lab, new)
+      attr(x, "label") <- new
+    }
+    vl <- attr(x, "labels", exact = TRUE)
+    if (!is.null(vl) && length(names(vl))) {
+      old <- names(vl)
+      new <- vapply(old, cut_text, character(1), n = limits$value,
+                    USE.NAMES = FALSE)
+      for (i in which(old != new)) note("value label", cn, old[i], new[i])
+      names(vl) <- new
+      attr(x, "labels") <- vl
+    }
+    data[[cn]] <- x
+  }
+  old_names <- names(data)
+  clean <- gsub("[^A-Za-z0-9_]", "_", old_names)
+  bad_start <- !grepl("^[A-Za-z]", clean)
+  clean[bad_start] <- paste0("v", clean[bad_start])
+  clean <- vapply(clean, cut_text, character(1), n = limits$name,
+                  USE.NAMES = FALSE)
+  # Names that collide once cleaned get a number, kept inside the limit.
+  # Names already valid are never renamed, so they claim their place first.
+  untouched <- old_names == clean
+  taken <- tolower(clean[untouched])
+  for (i in which(!untouched)) {
+    cand <- clean[i]
+    k <- 1L
+    while (tolower(cand) %in% taken) {
+      k <- k + 1L
+      suffix <- paste0("_", k)
+      cand <- paste0(cut_text(clean[i], limits$name - nchar(suffix)), suffix)
+    }
+    clean[i] <- cand
+    taken <- c(taken, tolower(cand))
+  }
+  for (i in which(!untouched)) note("name", old_names[i], old_names[i], clean[i])
+  names(data) <- clean
+  # Label changes are keyed by the new column name once renamed.
+  if (nrow(changes)) {
+    m <- match(changes$column, old_names)
+    changes$column <- ifelse(changes$kind == "name", changes$column,
+                             clean[m])
+  }
+  list(data = data, changes = changes)
+}
+
+sframe_labelled_message <- function(changes, ext) {
+  fmt <- if (identical(ext, "dta")) "Stata" else "SPSS"
+  paste0(
+    "sframe_export_labelled() changed ", nrow(changes), " item",
+    if (nrow(changes) == 1L) "" else "s", " to fit ", fmt, " (old -> new):\n",
+    paste0("  ", changes$kind, " (", changes$column, "): ", changes$old,
+           " -> ", changes$new, collapse = "\n"),
+    "\nThe full table is in attr(path, \"renamed\")."
+  )
 }
 
 #' Copy a demo's Quarto notebook so you can run and change it
