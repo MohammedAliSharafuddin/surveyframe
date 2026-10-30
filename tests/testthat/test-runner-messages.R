@@ -75,8 +75,8 @@ test_that("EFA readiness with no usable rows says what is missing", {
 })
 
 test_that("no runner keeps a bare 'X failed.' message", {
-  src <- readLines(file.path(testthat::test_path("..", ".."), "R", "statistics_reports.R"),
-                   warn = FALSE)
+  src <- strsplit(sframe_source_text("R", "statistics_reports.R"), "\n",
+                  fixed = TRUE)[[1]]
   expect_false(any(grepl("error = \"[A-Za-z' -]+ failed\\.\"", src)))
 })
 
