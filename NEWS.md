@@ -293,6 +293,12 @@ style.
   `dependent`, opens with that variable selected. Regression blocks opened
   with the first listed variable in its place. The builder reads every role
   alias R reads, and saves under its own role names.
+* A mediation block written in R with `x`, `mediator` and `y` opens in the
+  plan editor with those variables selected. The editor replaced `x` and `y`
+  with the first listed variable and left Save disabled. R now holds one role
+  alias table by method, inlined into the builder, and a test fails if the two
+  differ. A required role with no variable chosen shows "Choose a variable"
+  and keeps Save disabled, where it showed the first variable.
 * The sidebar shows the instrument's title on first load. A title set by
   `launch_builder_demo()` read "Untitled Survey" until the first edit.
 * The Outcome and other role dropdowns stay inside the Add or Edit Analysis

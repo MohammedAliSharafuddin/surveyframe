@@ -1055,6 +1055,7 @@ sframe_vars_for_method <- function(method, roles, block) {
                sframe_role_values(roles, c("covariates", "covariate")),
                sframe_role_values(roles, c("outcome", "dependent"))),
     repeated_anova = sframe_role_values(roles, c("measures", "variables")),
+    efa_solution = sframe_role_values(roles, c("items", "variables")),
     kruskal_wallis = c(sframe_role_values(roles, "group"),
                        sframe_role_values(roles, c("outcome", "dependent"))),
     friedman = sframe_role_values(roles, c("measures", "variables")),
