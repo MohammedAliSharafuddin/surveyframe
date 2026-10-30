@@ -159,8 +159,8 @@ test_that("25: rendered p values keep their precision", {
   out <- render_results(res, instr, output_file = tempfile(fileext = ".html"))
   html <- paste(readLines(out, warn = FALSE), collapse = "\n")
 
-  expect_match(html, "<td>0.004</td>", fixed = TRUE)
-  expect_match(html, "<td>0.044</td>", fixed = TRUE)
+  expect_match(html, "<td>.004</td>", fixed = TRUE)
+  expect_match(html, "<td>.044</td>", fixed = TRUE)
   expect_match(html, "<td>&lt;.001</td>", fixed = TRUE)
   expect_false(grepl("<td>0</td>", html, fixed = TRUE))
 })
@@ -182,7 +182,7 @@ test_that("render_results() puts each value in its own table cell", {
   out <- render_results(res, instr, output_file = tempfile(fileext = ".html"))
   html <- paste(readLines(out, warn = FALSE), collapse = "\n")
 
-  expect_match(html, "<th>level</th><th>n</th>", fixed = TRUE)
+  expect_match(html, "<th>Level</th><th><em>n</em></th>", fixed = TRUE)
   expect_match(html, "<tr><td>a</td><td>9</td></tr>", fixed = TRUE)
   expect_match(html, "<tr><td>b</td><td>12</td></tr>", fixed = TRUE)
 })
