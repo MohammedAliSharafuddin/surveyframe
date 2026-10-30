@@ -91,6 +91,10 @@ style.
 * **SurveyBuilder has a References tab in Survey settings.** Paste BibTeX or
   type a reference in, and choose where the instrument cites it. Changes
   apply at once, ahead of Save settings.
+* **`read_bibtex()` reads entries written with parentheses.** BibTeX allows
+  `@article(key, ...)` as well as `@article{key, ...}`, and a file may mix the
+  2. A closing bracket inside a braced or quoted value ended a parenthesised
+  entry early.
 
 ### The file format
 

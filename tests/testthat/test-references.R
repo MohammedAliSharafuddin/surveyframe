@@ -228,3 +228,28 @@ test_that("the Quarto report cites in text and lists every reference once, at th
   expect_false(any(duplicated(ids)))
   expect_true(all(c('id="ref-likert_1932"', 'id="ref-nunnally_1994"', 'id="ref-smith_2020"') %in% ids))
 })
+
+test_that("read_bibtex() reads parenthesised entries, alone and mixed with braced ones", {
+  bib <- paste(
+    "@article(paren_1,",
+    "  author = {Smith, Jo},",
+    "  title = {Scales (and sub-scales) {with} a closing ) bracket},",
+    "  journal = \"Journal (Open)\",",
+    "  year = 2001",
+    ")",
+    "@book{brace_1,",
+    "  author = {Lee, Ann},",
+    "  title = {A braced entry (with brackets)},",
+    "  year = {2002}",
+    "}",
+    "@misc(paren_2, title = {Last one}, year = {2003})",
+    sep = "\n"
+  )
+  refs <- read_bibtex(text = bib)
+  expect_named(refs, c("paren_1", "brace_1", "paren_2"))
+  expect_equal(refs$paren_1$title, "Scales (and sub-scales) with a closing ) bracket")
+  expect_equal(refs$paren_1$`container-title`, "Journal (Open)")
+  expect_equal(refs$paren_1$issued$`date-parts`[[1]][[1]], 2001)
+  expect_equal(refs$brace_1$title, "A braced entry (with brackets)")
+  expect_equal(refs$paren_2$title, "Last one")
+})
