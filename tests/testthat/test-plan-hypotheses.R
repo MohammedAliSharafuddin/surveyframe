@@ -94,3 +94,45 @@ test_that("D12: an interpretation copied from the decision rule is not printed t
                                      interpretation = "Reject H0 if p < .05."))
   expect_no_match(html, "Interpretation", fixed = TRUE)
 })
+
+declared_instrument <- function(interpretation = NULL) {
+  hyp_instrument(
+    hypotheses = list(null = "Mean score is equal in both groups.",
+                      alternative = "Mean score differs between the groups."),
+    decision_rule = "Reject H0 if p < .05.", interpretation = interpretation)
+}
+
+test_that("D12: render_results() prints the declaration before each result", {
+  ins <- declared_instrument()
+  res <- suppressWarnings(run_analysis_plan(hyp_data, ins))
+  out <- tempfile(fileext = ".html")
+  render_results(res, ins, output_file = out,
+                 interpretations = list(RQ1 = "The groups differ."))
+  html <- paste(readLines(out, warn = FALSE), collapse = "\n")
+  expect_match(html, "Null hypothesis (H0):</strong> Mean score is equal", fixed = TRUE)
+  expect_match(html, "Planned decision rule:</strong> Reject H0", fixed = TRUE)
+  expect_true(before(html, "Planned decision rule", "<div class=\"apa-string\">"))
+  expect_match(html, "Interpretation (written after the results)", fixed = TRUE)
+  expect_true(before(html, "<div class=\"apa-string\">", "The groups differ."))
+})
+
+test_that("D12: render_results() never shows the decision rule as the interpretation", {
+  ins <- declared_instrument()
+  res <- suppressWarnings(run_analysis_plan(hyp_data, ins))
+  out <- tempfile(fileext = ".html")
+  render_results(res, ins, output_file = out)
+  html <- paste(readLines(out, warn = FALSE), collapse = "\n")
+  expect_identical(lengths(regmatches(html, gregexpr("Reject H0 if p", html, fixed = TRUE))), 1L)
+  expect_match(html, "Your interpretation will appear here.", fixed = TRUE)
+})
+
+test_that("D12: render_result() prints the declaration and a written interpretation", {
+  ins <- declared_instrument(interpretation = "The groups differ.")
+  res <- suppressWarnings(run_analysis_plan(hyp_data, ins))
+  html <- render_result(res[[1]], hyp_data, ins)$html
+  expect_match(html, "Alternative hypothesis (H1):</strong> Mean score differs", fixed = TRUE)
+  expect_true(before(html, "Planned decision rule", "sf-apa"))
+  expect_match(html, "Interpretation (written after the results):</strong> The groups differ.",
+               fixed = TRUE)
+  expect_true(before(html, "sf-apa", "Interpretation (written"))
+})

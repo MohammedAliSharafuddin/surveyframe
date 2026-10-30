@@ -191,6 +191,12 @@ style.
   in for an empty decision rule. The 2 fixed sentences earlier versions of
   SurveyBuilder and SurveyStudio saved as hypotheses, and an interpretation
   copied from the decision rule, are not printed.
+* **`render_results()` and `render_result()` print the same declaration.**
+  H0, H1 and the decision rule print above the result, and the
+  interpretation below it under the same label. `render_results()` showed
+  the decision rule as the interpretation when none was written, and a
+  result from `run_analysis_plan()` carried its decision rule as its
+  interpretation. A result's `interpretation` is now only what was written.
 
 * **`render_report()` shows the report it writes.** In an interactive
   session the new `open = TRUE` default opens it in the viewer pane of
