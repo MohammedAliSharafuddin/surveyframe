@@ -36,3 +36,61 @@ test_that("D12: hypotheses hold text fields named null and alternative", {
   expect_true(any(grepl("hypotheses", plan_problems(hyp_instrument(
     list(null = 1, alternative = c("a", "b")))))))
 })
+
+hyp_data <- data.frame(score = c(3, 4, 5, 6, 2, 3, 4, 7, 8, 6),
+                       grp = rep(c("a", "b"), each = 5))
+
+engine_html <- function(ins, data = hyp_data, interpretations = list()) {
+  .render_report_analysis_section(ins, data = data, show_code = FALSE,
+                                  interpretations = interpretations)
+}
+
+before <- function(html, a, b) {
+  regexpr(a, html, fixed = TRUE) < regexpr(b, html, fixed = TRUE)
+}
+
+test_that("D12: the built-in engine prints the declaration before the result", {
+  html <- engine_html(hyp_instrument(
+    hypotheses = list(null = "Mean score is equal in both groups.",
+                      alternative = "Mean score differs between the groups."),
+    decision_rule = "Reject H0 if p < .05."),
+    interpretations = list(RQ1 = "The groups differ."))
+  expect_match(html, "Null hypothesis (H0):</strong> Mean score is equal", fixed = TRUE)
+  expect_match(html, "Alternative hypothesis (H1):</strong> Mean score differs", fixed = TRUE)
+  expect_match(html, "Planned decision rule:</strong> Reject H0", fixed = TRUE)
+  expect_true(before(html, "Null hypothesis (H0)", "Result:"))
+  expect_true(before(html, "Planned decision rule", "Result:"))
+  expect_match(html, "Interpretation (written after the results):</strong> The groups differ.",
+               fixed = TRUE)
+  expect_true(before(html, "Result:", "Interpretation (written after"))
+})
+
+test_that("D12: the declaration prints without a written interpretation", {
+  html <- engine_html(hyp_instrument(decision_rule = "Reject H0 if p < .05."))
+  expect_match(html, "Planned decision rule:</strong> Reject H0", fixed = TRUE)
+  html <- engine_html(hyp_instrument(decision_rule = "Reject H0 if p < .05."), data = NULL)
+  expect_match(html, "Planned decision rule:</strong> Reject H0", fixed = TRUE)
+})
+
+test_that("D12: the 2 fixed sentences earlier interfaces saved are no declaration", {
+  html <- engine_html(hyp_instrument(hypotheses = list(
+    null = "No effect or association is present.",
+    alternative = "An effect or association is present.")))
+  expect_no_match(html, "hypothesis (H", fixed = TRUE)
+  expect_no_match(html, "No effect or association", fixed = TRUE)
+})
+
+test_that("D12: an interpretation never stands in for the decision rule", {
+  html <- engine_html(hyp_instrument(interpretation = "Written afterwards."))
+  expect_no_match(html, "Planned decision rule", fixed = TRUE)
+  expect_match(html, "Interpretation (written after the results):</strong> Written afterwards.",
+               fixed = TRUE)
+  html <- engine_html(hyp_instrument(interpretation = "Written afterwards."), data = NULL)
+  expect_no_match(html, "Planned decision rule", fixed = TRUE)
+})
+
+test_that("D12: an interpretation copied from the decision rule is not printed twice", {
+  html <- engine_html(hyp_instrument(decision_rule = "Reject H0 if p < .05.",
+                                     interpretation = "Reject H0 if p < .05."))
+  expect_no_match(html, "Interpretation", fixed = TRUE)
+})
