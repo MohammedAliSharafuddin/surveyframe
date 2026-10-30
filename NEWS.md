@@ -243,6 +243,12 @@ style.
   declared options First and Second with a count of 0 beside unlabelled rows
   1 and 2. Only codes that survive a numeric round trip, such as 1 and 2, are
   now read as numbers. The rest stay as written.
+* **`read_responses()` reads semicolon and tab files.** It detects a comma,
+  semicolon or tab separator from the header line, and a new `delim`
+  argument overrides the detection. A semicolon file is read as Excel writes
+  it in a comma decimal locale, so `3,5` in a numeric column reads as 3.5,
+  and a message says so. A byte order mark no longer joins the first column
+  name.
 * A `descriptives` block counts `single_choice` items and the option columns
   of a `multiple_choice` item, giving each category's count and percentage,
   and keeps the mean and SD for numeric items. A nominal code has no
