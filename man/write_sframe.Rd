@@ -26,7 +26,10 @@ to \code{FALSE}.}
 
 \item{new_instrument}{Logical. \code{TRUE} declares that the content is a new
 instrument, not a revision of the one it was read from, so no amendment is
-required. The instrument must carry no amendment log. Defaults to \code{FALSE}.}
+required. The instrument must carry no amendment log, and an instrument
+read with \code{\link[=read_sframe]{read_sframe()}} must have a new \code{meta$title} or \code{meta$version},
+so 2 different files never claim to be one instrument. Defaults to
+\code{FALSE}.}
 }
 \value{
 The file path, invisibly.
