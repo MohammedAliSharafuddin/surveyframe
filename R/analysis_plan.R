@@ -292,6 +292,48 @@ sframe_p_string <- function(p) {
 # Individual test runners
 # ---------------------------------------------------------------------------
 
+# One weight check for every weighted method (D6, CX-09). `w` is the weight
+# column and `column` its name. A negative, non-finite or non-numeric weight,
+# or a usable total of zero, is an `error` string for the block. A missing
+# (NA or blank) weight drops its row: `keep` marks the rows to use, `dropped`
+# counts the rest and `note` says so.
+sframe_check_weights <- function(w, column) {
+  raw <- trimws(as.character(w))
+  w <- sframe_num(w)
+  missing <- is.na(raw) | !nzchar(raw)
+  bad <- !missing & (is.na(w) | !is.finite(w) | w < 0)
+  keep <- !missing
+  out <- list(error = NULL, keep = keep, dropped = sum(missing), note = NULL)
+  if (any(bad)) {
+    out$error <- sprintf(
+      "The weight column '%s' has %d negative, non-finite or non-numeric value(s). Weights must be finite numbers of zero or more.",
+      column, sum(bad))
+    return(out)
+  }
+  if (sum(w[keep]) <= 0) {
+    out$error <- sprintf("The weights in '%s' sum to zero, so no weighted result can be computed.",
+                         column)
+    return(out)
+  }
+  if (out$dropped > 0) {
+    out$note <- sprintf("%s with a missing weight in '%s' %s dropped.",
+                        sframe_count_noun(out$dropped, "row"), column,
+                        if (out$dropped == 1) "was" else "were")
+  }
+  out
+}
+
+# Checks the weight column of `data` when one is named and present. Returns
+# the usable data with the check, or an error to hand back as the block error.
+sframe_apply_weights <- function(data, weights) {
+  if (is.null(weights) || !nzchar(weights) || !weights %in% colnames(data)) {
+    return(list(data = data, dropped = 0L, note = NULL, error = NULL))
+  }
+  chk <- sframe_check_weights(data[[weights]], weights)
+  list(data = data[chk$keep, , drop = FALSE], dropped = chk$dropped,
+       note = chk$note, error = chk$error)
+}
+
 # One frequency table per variable. A block may name 1 variable or more,
 # through `variable` or `variables`. With an instrument, each row shows the
 # label from the item's own choice set and keeps the stored code in `Code`,
@@ -304,6 +346,9 @@ sframe_run_frequency <- function(data, vars, weights = NULL, instrument = NULL) 
   }
   err <- sframe_require_columns(data, c(vars, weights), "Frequency table")
   if (!is.null(err)) return(list(test = "frequency", error = err))
+  usable <- sframe_apply_weights(data, weights)
+  if (!is.null(usable$error)) return(list(test = "frequency", error = usable$error))
+  data <- usable$data
   parts <- lapply(vars, function(col) {
     sframe_frequency_one(data, col, weights, instrument)
   })
@@ -311,6 +356,11 @@ sframe_run_frequency <- function(data, vars, weights = NULL, instrument = NULL) 
   if (length(parts) == 1) {
     one <- parts[[1]]
     one$test <- "frequency"
+    one$weights_dropped <- usable$dropped
+    if (!is.null(usable$note)) {
+      one$note <- usable$note
+      one$apa <- paste(one$apa, usable$note)
+    }
     return(one)
   }
   stacked <- do.call(rbind, lapply(vars, function(col) {
@@ -318,10 +368,11 @@ sframe_run_frequency <- function(data, vars, weights = NULL, instrument = NULL) 
     cbind(data.frame(Variable = col, stringsAsFactors = FALSE), tb)
   }))
   rownames(stacked) <- NULL
-  list(
+  out <- list(
     test     = "frequency",
     variable = vars,
     weights  = weights,
+    weights_dropped = usable$dropped,
     n        = vapply(parts, function(p) p$n, integer(1)),
     tables   = parts,
     table    = stacked,
@@ -331,6 +382,11 @@ sframe_run_frequency <- function(data, vars, weights = NULL, instrument = NULL) 
     }, character(1)), collapse = " "),
     prompt   = "Describe each distribution. Note any dominant category and whether the distribution was expected."
   )
+  if (!is.null(usable$note)) {
+    out$note <- usable$note
+    out$apa <- paste(out$apa, usable$note)
+  }
+  out
 }
 
 sframe_frequency_one <- function(data, col, weights = NULL, instrument = NULL) {
@@ -398,6 +454,9 @@ sframe_run_crosstab <- function(data, vars, options = list()) {
   weights <- options$weights %||% NULL
   err <- sframe_require_columns(data, c(vars[1:2], weights), "Cross-tabulation")
   if (!is.null(err)) return(list(test = "crosstab", error = err))
+  usable <- sframe_apply_weights(data, weights)
+  if (!is.null(usable$error)) return(list(test = "crosstab", error = usable$error))
+  data <- usable$data
   r <- data[[vars[1]]]
   c <- data[[vars[2]]]
   # Empty strings are non-responses, not a category (see sframe_run_frequency)
@@ -432,10 +491,11 @@ sframe_run_crosstab <- function(data, vars, options = list()) {
     w <- sframe_num((data[[weights]][complete]))
     weighted_table <- stats::xtabs(w ~ r + c)
   }
-  list(
+  out <- list(
     test     = "crosstab",
     vars     = vars,
     weights  = weights,
+    weights_dropped = usable$dropped,
     n        = n,
     table    = as.data.frame.matrix(tbl),
     weighted_table = if (!is.null(weighted_table)) as.data.frame.matrix(weighted_table) else NULL,
@@ -466,6 +526,11 @@ sframe_run_crosstab <- function(data, vars, options = list()) {
       "Some expected counts are below 5; consider Fisher's exact test or simulated p-values for sparse tables."
     } else character(0)
   )
+  if (!is.null(usable$note)) {
+    out$note <- usable$note
+    out$apa <- paste(out$apa, usable$note)
+  }
+  out
 }
 
 sframe_run_mann_whitney <- function(data, vars, instrument = NULL) {

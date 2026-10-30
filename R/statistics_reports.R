@@ -297,6 +297,12 @@ descriptives_report <- function(
   group_levels <- unique(groups)
   if (length(group_levels) == 0) group_levels <- "All"
   w <- if (!is.null(weights) && weights %in% colnames(data)) data[[weights]] else NULL
+  if (!is.null(w)) {
+    chk <- sframe_check_weights(w, weights)
+    if (!is.null(chk$error)) {
+      rlang::abort(chk$error, class = c("sframe_validation_error", "sframe_error"))
+    }
+  }
 
   rows <- list()
   for (group in group_levels) {
@@ -1023,6 +1029,11 @@ sframe_run_descriptives_result <- function(data, roles, options = list(),
                                logical(1))]
     vars <- setdiff(vars, c(split_by, weights))
   }
+  # One weight check for every weighted method (D6). Rows with a missing
+  # weight leave the choice counts only: the numeric table keeps its own
+  # handling of them.
+  usable <- sframe_apply_weights(data, weights)
+  if (!is.null(usable$error)) return(list(test = "descriptives", error = usable$error))
   kinds <- vapply(vars, function(v) sframe_choice_column_kind(instrument, v),
                   character(1))
   categorical <- vars[kinds != "other" & vars %in% colnames(data)]
@@ -1042,6 +1053,9 @@ sframe_run_descriptives_result <- function(data, roles, options = list(),
               paste(shown, collapse = ", "))
     }
   }
+  if (!is.null(usable$note) && (length(categorical) > 0 || !is.null(weights))) {
+    note <- paste(c(note, usable$note), collapse = " ")
+  }
   if (length(numeric_vars) == 0 && length(categorical) > 0) {
     return(list(
       test = "descriptives",
@@ -1050,6 +1064,7 @@ sframe_run_descriptives_result <- function(data, roles, options = list(),
       variables = vars,
       split_by = split_by,
       weights = weights,
+      weights_dropped = usable$dropped,
       table = cat_tbl,
       categorical = cat_tbl,
       note = note,
@@ -1073,8 +1088,9 @@ sframe_run_descriptives_result <- function(data, roles, options = list(),
   # keeps its own column names, and the runtime report keeps the full table.
   res$table <- sframe_descriptives_display_table(res$table,
                                                  options$conf_level %||% 0.95)
-  if (!is.null(cat_tbl)) {
-    res$categorical <- cat_tbl
+  res$weights_dropped <- usable$dropped
+  if (!is.null(cat_tbl) || !is.null(usable$note)) {
+    if (!is.null(cat_tbl)) res$categorical <- cat_tbl
     res$note <- note
     res$apa <- paste(res$apa, note)
   }
