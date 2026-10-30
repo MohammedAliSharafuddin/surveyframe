@@ -44,9 +44,11 @@ The instrument remembers the content and amendment log it was read with, so
 it would otherwise rebuild by hand and lose fields doing so. The result
 carries the attribute \code{sframe_verified}, \code{FALSE} (it is \code{TRUE} on every
 verified read), and \code{print()} says so. \code{\link[=write_sframe]{write_sframe()}} refuses to write an
-unverified instrument with no amendment log unless \code{new_instrument = TRUE}
-declares it new, since nothing ties its content to a state anyone wrote. One
-with a log must match the log's last entry, as every instrument must.
+unverified instrument unless \code{new_instrument = TRUE} declares it new, since
+nothing ties its content to a state anyone wrote. The exception is one
+written back unchanged with the amendment log it was read with. No
+amendment can start from it: \code{\link[=amend_sframe]{amend_sframe()}} refuses it, and the write
+refuses any entry appended to its log.
 }
 
 \examples{

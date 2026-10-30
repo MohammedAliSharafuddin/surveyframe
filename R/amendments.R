@@ -121,8 +121,13 @@ sframe_check_amendment_boundary <- function(instrument, new_instrument = FALSE) 
   }
 
   # Content read without a matching hash ties to no state anyone wrote, so
-  # with no log to vouch for it, it is written only as a new instrument.
-  if (!isTRUE(new_instrument) && isFALSE(origin$verified) && length(am) == 0) {
+  # it is written only as a new instrument, or unchanged with the log it was
+  # read with. An entry appended to it would vouch for content no one can
+  # trace, and the new file would read back verified.
+  n_loaded <- length(origin$amendment_entry_hashes %||%
+                       origin$amendment_new_hashes %||% character(0))
+  if (!isTRUE(new_instrument) && isFALSE(origin$verified) &&
+      (length(am) == 0 || length(am) > n_loaded)) {
     abort(sprintf(paste0(
       "This instrument was read from '%s' without a matching integrity hash. ",
       "Write it as a new instrument with new_instrument = TRUE."), origin$path))
@@ -280,7 +285,8 @@ sframe_amendment_plain <- function(a) {
 #' @param previous An `sframe` object: the instrument's state before this
 #'   amendment. Read from a file, it must still match that file, or its last
 #'   recorded amendment, so the log starts from a state a file held.
-#'   An edit made to it after reading is refused.
+#'   An edit made to it after reading is refused, and so is one read with
+#'   `verify = FALSE` that failed its integrity check.
 #' @param instrument An `sframe` object: the instrument's state after the
 #'   change this call discloses.
 #' @param reason_code One of `"data_correction"`, `"bot_removal"`,
@@ -338,6 +344,17 @@ amend_sframe <- function(previous, instrument, reason_code, reason_text,
     tier <- sframe_amendment_default_tier(reason_code)
   } else {
     tier <- rlang::arg_match(tier, sframe_amendment_tiers)
+  }
+
+  # An instrument that failed its integrity check holds content no file
+  # vouches for, and an amendment from it would write that content back as
+  # verified.
+  if (isFALSE(attr(previous, "sframe_origin")$verified)) {
+    rlang::abort(paste0(
+      "This instrument failed its integrity check when read, so an amendment ",
+      "cannot start from it. Restore the original file, or write the content ",
+      "as a new instrument with `new_instrument = TRUE`."),
+      class = c("sframe_validation_error", "sframe_error"))
   }
 
   # Fingerprints and the diff are taken on validated states, since validation

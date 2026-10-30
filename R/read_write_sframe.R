@@ -616,9 +616,11 @@ sframe_validate_parsed_payload <- function(parsed, path, require_hash = TRUE) {
 #' it would otherwise rebuild by hand and lose fields doing so. The result
 #' carries the attribute `sframe_verified`, `FALSE` (it is `TRUE` on every
 #' verified read), and `print()` says so. [write_sframe()] refuses to write an
-#' unverified instrument with no amendment log unless `new_instrument = TRUE`
-#' declares it new, since nothing ties its content to a state anyone wrote. One
-#' with a log must match the log's last entry, as every instrument must.
+#' unverified instrument unless `new_instrument = TRUE` declares it new, since
+#' nothing ties its content to a state anyone wrote. The exception is one
+#' written back unchanged with the amendment log it was read with. No
+#' amendment can start from it: [amend_sframe()] refuses it, and the write
+#' refuses any entry appended to its log.
 #'
 #' @return An `sframe` object.
 #' @export
