@@ -272,12 +272,6 @@ sframe_effect_label <- function(d, type = "d") {
   "unknown"
 }
 
-# A p value for a table cell: 3 decimals, <.001 below that, blank when missing.
-sframe_p_cell <- function(p) {
-  ifelse(is.na(p), "",
-         ifelse(p < .001, "<.001", formatC(p, digits = 3, format = "f")))
-}
-
 # APA 7 asks for no leading zero on a statistic that cannot exceed 1, and p is
 # one of those, so "= 0.032" becomes "= .032". 3 decimals for an exact p is
 # within the guide's 2-or-3. A p of exactly 1 keeps its digit, since there is
@@ -2081,15 +2075,8 @@ render_results <- function(
     # the result carries (see sframe_result_supplement())
     table_html <- function(tbl, caption = NULL) {
       if (!is.data.frame(tbl)) return("")
-      # p values keep 3 decimals, or <.001, by column meaning. Rounding every
-      # numeric column to 2 showed p = .004 as 0.
-      p_cols <- grepl("^p$|^p\\.value$|^p_value$|^Pr\\(>", colnames(tbl),
-                      ignore.case = TRUE)
-      for (j in which(p_cols & vapply(tbl, is.numeric, logical(1)))) {
-        tbl[[j]] <- sframe_p_cell(tbl[[j]])
-      }
-      num_cols <- vapply(tbl, is.numeric, logical(1))
-      if (any(num_cols)) tbl[num_cols] <- lapply(tbl[num_cols], function(col) round(col, 2))
+      # Cells as every report engine prints them (CX-15).
+      tbl <- sframe_apa_cells(tbl)
       # Each value is escaped on its own. htmltools_escape() pastes a vector
       # into one string, which put a whole row, and the whole header, in a
       # single cell.

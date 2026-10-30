@@ -262,12 +262,12 @@ mr <- tryCatch(missing_data_report(responses, instrument), error = function(e) N
 if (is.null(mr)) {
   cat("Missing-data diagnostics could not be computed from the supplied data.\n\n")
 } else {
-  print(kable(format = "html", mr$item_missing, digits = 2, caption = "Item-wise missingness"))
+  print(kable(format = "html", sframe_apa_cells(mr$item_missing), caption = "Item-wise missingness"))
   patterns_display <- mr$patterns[, intersect(c("description", "n", "percent"), names(mr$patterns)), drop = FALSE]
-  print(kable(format = "html", patterns_display, digits = 2, caption = "Missing-data patterns",
+  print(kable(format = "html", sframe_apa_cells(patterns_display), caption = "Missing-data patterns",
               col.names = c("Pattern", "n", "Percent")))
   if (!is.null(mr$scale_missing_rules) && nrow(mr$scale_missing_rules) > 0)
-    print(kable(format = "html", mr$scale_missing_rules, digits = 2, caption = "Scale missing rules"))
+    print(kable(format = "html", sframe_apa_cells(mr$scale_missing_rules), caption = "Scale missing rules"))
 }
 ```
 
@@ -281,7 +281,7 @@ dr <- tryCatch(descriptives_report(responses), error = function(e) NULL)
 if (is.null(dr)) {
   cat("Descriptive statistics could not be computed from the supplied data.\n\n")
 } else {
-  print(kable(format = "html", dr$table, digits = 2, caption = "Descriptive statistics"))
+  print(kable(format = "html", sframe_apa_cells(dr$table), caption = "Descriptive statistics"))
 }
 ```
 
@@ -557,7 +557,7 @@ if (!has_data) {
         if (!is.null(r$effect_label))
           cat(sprintf("**Effect size:** %s\n\n", r$effect_label))
         if (!is.null(r$table) && is.data.frame(r$table))
-          print(kable(format = "html", r$table, digits = 2))
+          print(kable(format = "html", sframe_apa_cells(r$table)))
         # A second table the result carries: the quanteda runner's leading
         # features, or a moderation's conditional slopes at the moderator's own
         # values. Both were retained by their runner and rendered by neither
@@ -566,7 +566,7 @@ if (!has_data) {
         sup <- sframe_result_supplement(r)
         if (!is.null(sup)) {
           cat("\n")
-          print(kable(format = "html", sup$table, digits = 2,
+          print(kable(format = "html", sframe_apa_cells(sup$table),
                       caption = sup$caption, row.names = FALSE))
           cat("\n")
         }

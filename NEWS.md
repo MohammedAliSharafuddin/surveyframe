@@ -274,6 +274,13 @@ style.
   their intervals as APA 7 does, `r(58) = .53, 95% CI [.33, .69]`, as p
   values already were. d, t, z, means and other values keep the zero. Done
   once for every analysis, and the demo results are regenerated (D9, CX-24).
+* **Every report engine prints a table's cells the same way.** The built-in
+  engine and the Quarto template rounded every number to 2 decimals, so a p
+  of .004 showed as 0. A p column now shows 3 decimals with no leading zero,
+  or `<.001`, a column that cannot exceed 1 drops its leading zero, other
+  numbers show 2 decimals, and a missing value is a blank cell, in
+  `render_report()`, `render_results()` and `render_result()` alike. The new
+  `sframe_apa_cells()` does it (CX-15).
 * **The built-in report prints each research question's hypotheses and
   decision rule before its result.** H0 and H1 print where written, then
   the planned decision rule, then the result, then the interpretation,

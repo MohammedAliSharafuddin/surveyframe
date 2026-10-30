@@ -35,3 +35,71 @@ sframe_apa_text <- function(x) {
   x[ok] <- y
   x
 }
+
+# Column names whose values cannot exceed 1, matched without case.
+.sframe_apa_bounded_cols <- c(
+  "r", "r_s", "rs", "rho", "tau", "phi", "cramer_v", "cramers_v", "cramer's v",
+  "r2", "r_squared", "r.squared", "adj_r2", "adj.r.squared", "eta2", "eta_sq",
+  "partial_eta2", "omega2", "alpha", "omega", "cronbach_alpha"
+)
+
+.sframe_apa_p_col_re <- "^p$|^p\\.value$|^p_value$|^Pr\\(>|^p[._ ]adj"
+
+# A p value for a table cell: 3 decimals with no leading zero, <.001 below
+# that, blank when missing.
+sframe_p_cell <- function(p) {
+  s <- sub("^0\\.", ".", formatC(p, digits = 3, format = "f"))
+  ifelse(is.na(p), "", ifelse(p < .001, "<.001", s))
+}
+
+# A numeric column as text: whole numbers as they are, others to `digits`
+# decimals, the leading zero dropped where the column cannot exceed 1, and a
+# missing value left blank.
+sframe_apa_number <- function(v, digits = 2, bounded = FALSE) {
+  whole <- all(is.na(v) | !is.finite(v) | v == round(v))
+  s <- if (whole) format(v, scientific = FALSE, trim = TRUE)
+       else formatC(v, digits = digits, format = "f")
+  if (bounded) s <- sub("^(-?)0\\.", "\\1.", s)
+  s[is.na(v)] <- ""
+  s
+}
+
+#' Format a result table's cells as an APA 7 report prints them
+#'
+#' The cells of a table from [run_analysis_plan()] as both report engines and
+#' [render_result()] print them, so a table shows the same numbers wherever it
+#' appears. A p value column shows 3 decimals with no leading zero, or
+#' `<.001`. A column that cannot exceed 1, such as `r`, `tau` or `alpha`, drops
+#' its leading zero. Other numbers show 2 decimals, whole numbers none. A
+#' missing value is a blank cell.
+#'
+#' This is exported because the Quarto report template runs in a separate R
+#' session against the installed package.
+#'
+#' @param x A data frame, such as a result's `table`.
+#' @param digits Decimals for numbers other than p values.
+#'
+#' @return A data frame of character columns with the same names.
+#' @export
+#' @keywords internal
+#' @seealso [render_results()], [render_report()]
+#'
+#' @examples
+#' sframe_apa_cells(data.frame(t = 2.345, p = 0.004, r = 0.53, n = 40L))
+sframe_apa_cells <- function(x, digits = 2) {
+  if (!is.data.frame(x)) return(x)
+  nm <- colnames(x)
+  p_col <- grepl(.sframe_apa_p_col_re, nm, ignore.case = TRUE)
+  bounded <- tolower(nm) %in% .sframe_apa_bounded_cols
+  for (j in seq_along(x)) {
+    v <- x[[j]]
+    x[[j]] <- if (is.numeric(v)) {
+      if (p_col[j]) sframe_p_cell(v) else sframe_apa_number(v, digits, bounded[j])
+    } else {
+      v <- as.character(v)
+      v[is.na(v) | v == "NA"] <- ""
+      v
+    }
+  }
+  x
+}
