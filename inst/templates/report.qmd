@@ -7,7 +7,7 @@ format:
     toc-depth: 3
     toc-location: left
     embed-resources: true
-    theme: cosmo
+    theme: [cosmo, report.scss]
     code-fold: true
     grid:
       sidebar-width: 280px

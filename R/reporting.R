@@ -498,7 +498,11 @@ render_report <- function(
     dir.create(render_dir, recursive = TRUE, showWarnings = FALSE)
     on.exit(unlink(render_dir, recursive = TRUE, force = TRUE), add = TRUE)
     render_input <- file.path(render_dir, "report.qmd")
-    if (!file.copy(template, render_input, overwrite = TRUE)) {
+    # report.scss turns off the theme's web font, so the render fetches
+    # nothing from the network.
+    theme_scss <- file.path(dirname(template), "report.scss")
+    if (!file.copy(template, render_input, overwrite = TRUE) ||
+        !file.copy(theme_scss, file.path(render_dir, "report.scss"), overwrite = TRUE)) {
       rlang::abort(
         "Could not prepare the Quarto report template for rendering.",
         class = "sframe_error"

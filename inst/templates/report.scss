@@ -1,0 +1,7 @@
+/*-- scss:defaults --*/
+// inst/templates/report.scss
+//
+// The report sets a system font stack, so the cosmo theme's Google web font
+// is not used. Left on, pandoc fetched it to embed: every report needed the
+// internet, sent Google a request, and hung when the connection stalled.
+$web-font-path: false;
