@@ -700,6 +700,13 @@ style.
 
 ## SurveyBuilder
 
+* **One preview.** The builder's Preview shows the deployable survey,
+  the page `export_survey(preview = TRUE)` writes and SurveyStudio's
+  Preview Survey screen shows. Answering, required checks and branching
+  run as a respondent sees them, and nothing is collected. The builder drew
+  its own copy of the layout, which ran none of them and could drift from
+  the survey. Its Welcome, Survey and Thank You tabs go, since the survey
+  shows its own welcome and thank-you pages.
 * **The Plan editor has fields for the hypotheses.** Methods that test a
   hypothesis show optional "Null hypothesis (H0)" and "Alternative
   hypothesis (H1)" fields, with a method-appropriate example as placeholder

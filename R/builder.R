@@ -12,12 +12,11 @@
 #' \describe{
 #'   \item{Build}{An item editor with a persistent inspector panel,
 #'     drag-to-reorder, undo/redo, and autosave to browser localStorage.}
-#'   \item{Preview}{A layout preview of the welcome, body and thank-you
-#'     pages, showing wording, order and branding. It renders from the
-#'     builder's own markup, so answering, required checks and branching are
-#'     left out. Use [export_survey()] and open the file to test the
-#'     respondent's path, or SurveyStudio's Preview screen, which exports the
-#'     real survey with collection switched off.}
+#'   \item{Preview}{The deployable survey, the page [export_survey()] writes
+#'     with `preview = TRUE` and SurveyStudio's Preview screen shows.
+#'     Answering, required checks and branching run as a respondent sees
+#'     them, and nothing is collected: the collector endpoint and the
+#'     completion redirect are removed.}
 #'   \item{Analyse}{A role-based analysis planner with method-specific
 #'     options, planned outputs, reporting references, and decision rules.}
 #' }

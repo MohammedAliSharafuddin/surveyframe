@@ -62,27 +62,26 @@ test_that("18: the builder's script still parses", {
                         catch (e) { return false; } })()"))
 })
 
-# Batch 7 #19: the builder's Preview renders from its own markup and does not
-# run the deployed survey's answer, validation and branching lifecycle, while
-# launch_builder()'s help called it a full live render. A researcher could not
-# establish from it that a required or conditional survey is answerable. The
-# review's second option is taken: say what the preview is, and name the route
-# that does exercise the respondent's path.
+# Batch 7 #19: the builder's Preview rendered from its own markup and did
+# not run the deployed survey's answer, validation and branching lifecycle,
+# and a note said so. Session 7 (one preview) made it the deployable survey,
+# the page export_survey(preview = TRUE) writes, so the note and the help now
+# say what it is and that it collects nothing. test-builder-preview-browser.R
+# checks the page itself.
 
-test_that("19: the preview says what it does not exercise", {
+test_that("19: the preview says it is the survey, with collection off", {
   src <- builder_source()
   note <- regmatches(src, regexpr('<div class="pv-note"(?s).*?</div>', src,
                                   perl = TRUE))[[1]]
   expect_true(nzchar(note))
-  expect_match(note, "Layout preview", fixed = TRUE)
+  expect_match(note, "collection switched off", fixed = TRUE)
   expect_match(note, "branching", fixed = TRUE)
-  # and it names the route that does test answering
-  expect_match(note, "Export survey", fixed = TRUE)
+  expect_false(grepl("Layout preview", note, fixed = TRUE))
 })
 
-test_that("19: the help no longer calls it a full live render", {
+test_that("19: the help says the preview is export_survey(preview = TRUE)'s page", {
   help <- sframe_source_text("R", "builder.R")
   expect_false(grepl("full live render", help, fixed = TRUE))
-  expect_match(help, "layout preview", fixed = TRUE)
-  expect_match(help, "export_survey()", fixed = TRUE)
+  expect_false(grepl("layout preview", help, fixed = TRUE))
+  expect_match(help, "preview = TRUE", fixed = TRUE)
 })
