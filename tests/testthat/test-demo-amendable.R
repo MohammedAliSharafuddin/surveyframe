@@ -10,7 +10,7 @@
 # starting point and amends it, so a demo that refuses an amendment is a
 # demo a researcher cannot begin from.
 
-for (demo in sframe_list_demos()$name) {
+for (demo in with(sframe_list_demos(), name[focus != "reference"])) {
   test_that(paste0("demo '", demo, "': its amendment log matches its content"), {
     ins <- sframe_demo(demo)$instrument
     log <- ins$amendments

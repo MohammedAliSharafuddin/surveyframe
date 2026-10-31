@@ -24,7 +24,7 @@ Loadings heatmap from a fitted EFA solution
 \donttest{
 if (requireNamespace("ggplot2", quietly = TRUE) &&
     requireNamespace("psych", quietly = TRUE)) {
-  demo <- sframe_demo_data()
+  demo <- sframe_demo("tourism_services")
   fit <- sframe_efa_solution(demo$responses, demo$instrument,
                        scales = "service_quality", nfactors = 1)
   sframe_plot_efa_loadings(fit)

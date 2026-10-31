@@ -73,7 +73,7 @@ can be written again, and every plan result can be serialised by a host.
   syntax generators start `sframe_syntax_`. `cfa_syntax()` and
   `cfa_lavaan_syntax()` become 1 function, `sframe_syntax_cfa()`. The R code
   SurveyStudio, the report template and `sframe_syntax_result()` write
-  uses the new names. `?superseded` lists the 74 old names:
+  uses the new names. `?superseded` lists the old names:
 
   | Old name | New name |
   |---|---|
@@ -151,6 +151,13 @@ can be written again, and every plan result can be serialised by a host.
   | `codebook_report()` | `sframe_codebook()` |
   | `sframe_demos()` | `sframe_list_demos()` |
   | `sf_plan(x) <- value` | `sframe_plan(x) <- value` |
+
+* **The 2 larger demo datasets load through `sframe_demo()`.**
+  `sframe_demo("tourism_services")` replaces `sframe_demo_data()`, and
+  `sframe_demo("input_types")` replaces `sframe_input_types_demo_data()`,
+  with the same fields and the same reading of `submitted_at`.
+  `sframe_list_demos()` lists them last, with focus `"reference"`, apart
+  from the 22 teaching demos. The old names still work.
 
 ## References, cited where they are used and listed once at the end
 

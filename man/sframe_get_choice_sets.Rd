@@ -20,7 +20,7 @@ Returns the reusable value-and-label sets referenced by closed-response
 items.
 }
 \examples{
-sframe_get_choice_sets(sframe_demo_data()$instrument)
+sframe_get_choice_sets(sframe_demo("tourism_services")$instrument)
 }
 \seealso{
 \link{sframe_accessors}

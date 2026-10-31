@@ -51,7 +51,7 @@ another package when you want a method surveyframe leaves out.
 \examples{
 \donttest{
 if (requireNamespace("psych", quietly = TRUE)) {
-  demo <- sframe_demo_data()
+  demo <- sframe_demo("tourism_services")
   er <- sframe_efa_readiness_results(demo$responses, demo$instrument)
   print(er)
 }

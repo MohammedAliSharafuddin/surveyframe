@@ -36,7 +36,7 @@ whitespace split, not the internal stop-word-stripping tokeniser behind
 stripping them would corrupt the very thing a concordance is for.
 }
 \examples{
-demo <- sframe_demo_data()
+demo <- sframe_demo("tourism_services")
 cleaned <- sframe_clean_text(demo$responses, "comments")
 sframe_term_context(cleaned, "service", window = 4)
 }

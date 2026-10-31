@@ -66,7 +66,7 @@ sframe_studio_screen <- function(screen) {
 #' \dontrun{
 #' launch_studio()
 #'
-#' demo <- sframe_demo_data()
+#' demo <- sframe_demo("tourism_services")
 #' launch_studio(instrument = demo$instrument, launch.browser = FALSE)
 #'
 #' launch_studio(

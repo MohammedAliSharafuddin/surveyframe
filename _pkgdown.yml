@@ -397,8 +397,6 @@ reference:
   - title: "Package"
     contents:
       - surveyframe-package
-      - sframe_demo_data
-      - sframe_input_types_demo_data
       - sframe_builder_empty_state
       - sframe_builder_state_from_instrument
       - sframe_builder_validate_draft

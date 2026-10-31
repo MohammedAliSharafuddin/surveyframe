@@ -22,7 +22,7 @@ Missing-data report plot: missingness rate by item
 \examples{
 \donttest{
 if (requireNamespace("ggplot2", quietly = TRUE)) {
-  demo <- sframe_demo_data()
+  demo <- sframe_demo("tourism_services")
   mr <- sframe_missing_data_results(demo$responses, demo$instrument)
   sframe_plot_missingness(mr)
 }

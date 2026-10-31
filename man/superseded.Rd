@@ -75,6 +75,8 @@
 \alias{render_result}
 \alias{codebook_report}
 \alias{sframe_demos}
+\alias{sframe_demo_data}
+\alias{sframe_input_types_demo_data}
 \alias{sf_plan<-}
 \title{Superseded function names}
 \usage{
@@ -224,6 +226,10 @@ codebook_report(...)
 
 sframe_demos(...)
 
+sframe_demo_data()
+
+sframe_input_types_demo_data()
+
 sf_plan(x) <- value
 }
 \arguments{
@@ -321,6 +327,8 @@ warning per old name per session, naming its replacement.
    \code{render_result()} \tab \code{\link[=sframe_format_result]{sframe_format_result()}} \cr
    \code{codebook_report()} \tab \code{\link[=sframe_codebook]{sframe_codebook()}} \cr
    \code{sframe_demos()} \tab \code{\link[=sframe_list_demos]{sframe_list_demos()}} \cr
+   \code{sframe_demo_data()} \tab \code{\link[=sframe_demo]{sframe_demo()}} with \code{"tourism_services"} \cr
+   \code{sframe_input_types_demo_data()} \tab \code{\link[=sframe_demo]{sframe_demo()}} with \code{"input_types"} \cr
    \code{sf_plan(x) <- value} \tab \link[=sframe_plan]{sframe_plan<-} \cr
 }
 }

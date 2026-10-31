@@ -37,7 +37,7 @@ Brown-Forsythe tests, regression residual checks, VIF, Cook's distance,
 expected-count checks, and sparse-cell warnings.
 }
 \examples{
-demo <- sframe_demo_data()
+demo <- sframe_demo("tourism_services")
 ar <- sframe_assumption_results(demo$responses, variables = c("sat_1", "sat_2"),
                          group = "visit_type")
 print(ar)

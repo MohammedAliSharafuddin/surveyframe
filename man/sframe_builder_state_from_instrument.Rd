@@ -17,7 +17,7 @@ can be edited or validated by SurveyStudio.
 Convert an instrument into a SurveyStudio builder state
 }
 \examples{
-demo <- sframe_demo_data()
+demo <- sframe_demo("tourism_services")
 state <- sframe_builder_state_from_instrument(demo$instrument)
 length(state$items)
 length(state$scales)

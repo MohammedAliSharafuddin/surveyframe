@@ -42,7 +42,7 @@ test_that("17: a grouped item falls through when ggplot2 is absent", {
 test_that("17: every Likert item in a scale is drawn, with ggplot2 present", {
   skip_on_cran()  # renders a report or runs a full plan: slow on CRAN's machines
   skip_if_not_installed("ggplot2")
-  demo <- sframe_demo_data()
+  demo <- sframe_demo("tourism_services")
   groups <- sframe_likert_scale_groups(demo$instrument)
   skip_if(length(groups) == 0, "no grouped scale in the demo")
 
@@ -172,7 +172,7 @@ test_that("the Quarto engine actually renders, where the installed package can",
           paste0("the installed surveyframe lacks: ",
                  paste(missing, collapse = ", ")))
 
-  demo <- sframe_demo_data()
+  demo <- sframe_demo("tourism_services")
   out <- tempfile(fileext = ".html")
   on.exit(unlink(out), add = TRUE)
   old <- options(surveyframe.use_quarto = TRUE)

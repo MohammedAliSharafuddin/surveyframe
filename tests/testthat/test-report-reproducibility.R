@@ -90,7 +90,7 @@ test_that("the EFA path is deterministic too, not just the bootstraps", {
   # A fixture without an EFA path passes whether or not mc.cores is pinned, so
   # the bundled demo is used deliberately.
   skip_on_cran()
-  d <- sframe_demo_data()
+  d <- sframe_demo("tourism_services")
   once <- function() {
     r <- run_analysis_plan(d$responses, d$instrument)
     capture.output(str(r, max.level = 7))
@@ -155,7 +155,7 @@ test_that("a missing straight-lining chart says why", {
   # Regression from 0.4.1's own straightline_min_items fix: every scale in an
   # instrument of short scales comes back checked = FALSE, the plot drops the
   # NA rows and returns NULL, and the chart vanished with nothing said.
-  d <- sframe_demo_data()
+  d <- sframe_demo("tourism_services")
   q_default <- sframe_quality_results(d$responses, d$instrument)
   expect_null(sframe_plot_quality(q_default))
   note <- sframe_quality_plot_note(q_default)

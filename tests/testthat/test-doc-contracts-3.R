@@ -49,7 +49,7 @@ test_that("17: the plot family has a selection guide naming inputs", {
   src <- source_of("plots.R")
   expect_match(src, "sframe_plots", fixed = TRUE)
   # the claims under test: the two multi-panel helpers return what it says
-  demo <- sframe_demo_data()
+  demo <- sframe_demo("tourism_services")
   panels <- sframe_plot_variable_distribution(demo$responses, "sat_1")
   expect_length(panels, 3)
 })
@@ -59,7 +59,7 @@ test_that("18: the report family index separates the two shapes", {
   expect_match(src, "sframe_reports", fixed = TRUE)
   # the claim under test: sframe_codebook() returns an object, and
   # render_report() writes a file
-  book <- sframe_codebook(sframe_demo_data()$instrument)
+  book <- sframe_codebook(sframe_demo("tourism_services")$instrument)
   expect_s3_class(book, "sframe_codebook")
 })
 

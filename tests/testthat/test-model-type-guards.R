@@ -82,7 +82,7 @@ test_that("the demo instruments wire each syntax block to a fitting model", {
   # Both shipped demos pointed their seminr block at a cb_sem model, so the
   # demo data itself generated PLS-SEM syntax from a covariance-based model.
   # The guard above caught it. This pins the corrected wiring.
-  demo <- sframe_demo_data()
+  demo <- sframe_demo("tourism_services")
   inst <- demo$instrument
 
   types <- vapply(inst$models, function(m) m$type %||% "", character(1))
@@ -108,7 +108,7 @@ test_that("the demo instruments wire each syntax block to a fitting model", {
 
 test_that("every syntax block in the demo plan actually generates syntax", {
   skip_on_cran()  # runs every block of the demo plan: slow on CRAN's machines
-  demo <- sframe_demo_data()
+  demo <- sframe_demo("tourism_services")
   res <- run_analysis_plan(demo$responses, demo$instrument, scored = FALSE)
   for (t in c("cfa_lavaan_syntax", "sem_lavaan_syntax", "seminr_syntax")) {
     blocks <- Filter(function(r) identical(r$test, t), res)

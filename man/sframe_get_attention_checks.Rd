@@ -18,7 +18,7 @@ An \link{sf_component_list} of declared checks.
 Returns declared attention and other response-quality checks.
 }
 \examples{
-sframe_get_attention_checks(sframe_demo_data()$instrument)
+sframe_get_attention_checks(sframe_demo("tourism_services")$instrument)
 }
 \seealso{
 \link{sframe_accessors}

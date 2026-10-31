@@ -60,7 +60,7 @@ sustainability quality, 0.897 and 0.936 for satisfaction, and 0.921 and 0.950
 for behavioural intention.
 
 ```{r reliability, eval = requireNamespace("psych", quietly = TRUE)}
-demo      <- sframe_demo_data()
+demo      <- sframe_demo("tourism_services")
 instr     <- demo$instrument
 responses <- demo$responses
 
@@ -87,7 +87,7 @@ Item diagnostics identify sparse items, weak item-total relationships, and floor
 or ceiling effects. These are the item-level facts behind a retention decision.
 
 ```{r item-report}
-demo      <- sframe_demo_data()
+demo      <- sframe_demo("tourism_services")
 instr     <- demo$instrument
 responses <- demo$responses
 
@@ -155,7 +155,7 @@ give the real heterotrait-monotrait ratio. The report records which it computed
 in `htmt_method`, so a write-up can name the quantity it reports.
 
 ```{r validity-scores}
-demo <- sframe_demo_data()
+demo <- sframe_demo("tourism_services")
 scored <- score_scales(demo$responses, demo$instrument)
 scale_ids <- vapply(sframe_get_scales(demo$instrument), sframe_id, character(1))
 construct_scores <- scored[, scale_ids, drop = FALSE]

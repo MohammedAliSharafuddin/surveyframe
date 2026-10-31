@@ -64,7 +64,7 @@ question, use \code{\link[=launch_builder]{launch_builder()}}, and open the resu
 \dontrun{
 launch_studio()
 
-demo <- sframe_demo_data()
+demo <- sframe_demo("tourism_services")
 launch_studio(instrument = demo$instrument, launch.browser = FALSE)
 
 launch_studio(

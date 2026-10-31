@@ -2368,7 +2368,7 @@ server <- function(input, output, session) {
 
   observeEvent(input$load_sample_btn, {
     tryCatch({
-      demo <- surveyframe::sframe_input_types_demo_data()
+      demo <- surveyframe::sframe_demo("input_types")
       rv$builder <- builder_state_from_instrument(demo$instrument)
       rv$instrument <- demo$instrument
       rv$responses <- demo$responses

@@ -31,7 +31,7 @@ response data already loaded. The browser is opened automatically by
 default.
 }
 \examples{
-demo <- sframe_input_types_demo_data()
+demo <- sframe_demo("input_types")
 nrow(demo$responses)
 \dontrun{
 launch_studio_demo()

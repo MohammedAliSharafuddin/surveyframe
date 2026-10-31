@@ -33,7 +33,7 @@ including missingness, mean, standard deviation, median, IQR, range,
 skewness, kurtosis, standard error, and confidence intervals.
 }
 \examples{
-demo <- sframe_demo_data()
+demo <- sframe_demo("tourism_services")
 dr <- sframe_descriptives_results(demo$responses, variables = c("sat_1", "sat_2"),
                            split_by = "visit_type")
 dr$table

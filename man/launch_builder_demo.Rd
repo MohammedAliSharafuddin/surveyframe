@@ -21,7 +21,7 @@ scales, and analysis plan are visible immediately, with no manual
 file-load step required.
 }
 \examples{
-demo <- sframe_input_types_demo_data()
+demo <- sframe_demo("input_types")
 nrow(demo$responses)
 \dontrun{
 launch_builder_demo()

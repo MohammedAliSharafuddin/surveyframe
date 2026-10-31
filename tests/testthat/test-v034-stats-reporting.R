@@ -66,7 +66,7 @@ test_that("missing_data_report keeps the unavailable MCAR result when the test c
 test_that("reliability_report notes scales whose omega is unavailable and the plot names them", {
   skip_if_not_installed("psych")
   skip_if_not_installed("ggplot2")
-  demo <- sframe_demo_data()
+  demo <- sframe_demo("tourism_services")
   rr <- sframe_reliability_results(demo$responses, demo$instrument)
   two_item <- Filter(function(s) s$n_items == 2, rr)
   skip_if(length(two_item) == 0, "demo has no 2-item scale")
@@ -77,7 +77,7 @@ test_that("reliability_report notes scales whose omega is unavailable and the pl
 
 test_that("efa_solution returns tidy loadings, communalities, and variance frames", {
   skip_if_not_installed("psych")
-  demo <- sframe_demo_data()
+  demo <- sframe_demo("tourism_services")
   sol <- sframe_efa_solution(demo$responses, demo$instrument, nfactors = 2)
   expect_identical(nrow(sol$loadings_long), nrow(sol$loadings) * 2L)
   expect_named(sol$loadings_long, c("item_id", "factor", "loading"))
@@ -118,7 +118,7 @@ test_that("render_report format = 'pdf' is guarded and additive", {
 
 test_that("the HTML fallback carries the brand variables, print styles, and table semantics", {
   skip_on_cran()
-  demo <- sframe_demo_data()
+  demo <- sframe_demo("tourism_services")
   old <- options(surveyframe.use_quarto = FALSE)
   on.exit(options(old), add = TRUE)
   out <- tempfile(fileext = ".html")
@@ -136,7 +136,7 @@ test_that("the HTML fallback carries the brand variables, print styles, and tabl
 
 test_that("the codebook carries the analysis plan and model summaries", {
   skip_on_cran()
-  demo <- sframe_demo_data()
+  demo <- sframe_demo("tourism_services")
   cb <- sframe_codebook(demo$instrument)
   expect_named(cb$plan_table,
                c("id", "research_question", "method", "variables",

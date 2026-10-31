@@ -19,7 +19,7 @@ codebook.
 Returns the declared question items in instrument order.
 }
 \examples{
-sframe_get_items(sframe_demo_data()$instrument)
+sframe_get_items(sframe_demo("tourism_services")$instrument)
 }
 \seealso{
 \link{sframe_accessors}

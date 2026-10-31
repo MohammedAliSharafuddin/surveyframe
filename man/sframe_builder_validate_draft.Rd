@@ -54,7 +54,7 @@ an undisclosed revision, or \code{NULL}.
 Validate a SurveyStudio draft state
 }
 \examples{
-demo  <- sframe_demo_data()
+demo  <- sframe_demo("tourism_services")
 state <- sframe_builder_state_from_instrument(demo$instrument)
 draft <- sframe_builder_validate_draft(
   meta = state$meta, choices = state$choices, items = state$items,

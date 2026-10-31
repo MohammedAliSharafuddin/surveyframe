@@ -23,7 +23,7 @@ Same sharing rationale as \code{\link[=sframe_plot_item_chart]{sframe_plot_item_
 \examples{
 \donttest{
 if (requireNamespace("ggplot2", quietly = TRUE)) {
-  demo <- sframe_demo_data()
+  demo <- sframe_demo("tourism_services")
   scored <- score_scales(demo$responses, demo$instrument)
   sframe_plot_scale_chart(scored$satisfaction, "Satisfaction")
 }

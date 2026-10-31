@@ -334,7 +334,7 @@ sframe_model_spec <- function(
 #' @export
 #' @seealso [sframe_validation], [sframe_problems()], [sframe_is_valid()]
 #' @examples
-#' demo <- sframe_demo_data()
+#' demo <- sframe_demo("tourism_services")
 #' m <- sframe_model_spec(
 #'   "cb1", type = "cb_sem",
 #'   constructs = list(
@@ -555,7 +555,7 @@ sframe_model_json <- function(model, pretty = TRUE) {
 #' @return The updated `sframe` object.
 #' @export
 #' @examples
-#' demo <- sframe_demo_data()
+#' demo <- sframe_demo("tourism_services")
 #' m <- sframe_model_spec("cb1", type = "cb_sem",
 #'               constructs = list(sframe_construct("sat", items = c("sat_1", "sat_2"))))
 #' instr <- sframe_add_model(demo$instrument, m)
@@ -611,7 +611,7 @@ sframe_add_model <- function(instrument, model, validate = TRUE, replace = TRUE)
 #' @examples
 #' \donttest{
 #' if (requireNamespace("psych", quietly = TRUE)) {
-#'   demo <- sframe_demo_data()
+#'   demo <- sframe_demo("tourism_services")
 #'   fit <- sframe_efa_solution(demo$responses, demo$instrument,
 #'                        scales = "service_quality", nfactors = 1)
 #'   fit$loadings
@@ -814,7 +814,7 @@ sframe_syntax_efa <- function(
 #' @return A lavaan syntax string.
 #' @export
 #' @examples
-#' demo <- sframe_demo_data()
+#' demo <- sframe_demo("tourism_services")
 #' syntax <- sframe_syntax_cfa(demo$instrument,
 #'                              scales = c("satisfaction", "behavioural_intention"))
 #' cat(syntax)

@@ -20,7 +20,7 @@ Returns the scale definitions, including their item membership and scoring
 settings.
 }
 \examples{
-sframe_get_scales(sframe_demo_data()$instrument)
+sframe_get_scales(sframe_demo("tourism_services")$instrument)
 }
 \seealso{
 \link{sframe_accessors}

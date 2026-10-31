@@ -24,7 +24,7 @@
 #' @examples
 #' \donttest{
 #' if (requireNamespace("psych", quietly = TRUE)) {
-#'   demo <- sframe_demo_data()
+#'   demo <- sframe_demo("tourism_services")
 #'   rr <- sframe_reliability_results(demo$responses, demo$instrument, omega = FALSE)
 #'   print(rr)
 #' }
@@ -167,7 +167,7 @@ print.sframe_reliability_report <- function(x, ...) {
 #'
 #' @examples
 #' \donttest{
-#' demo <- sframe_demo_data()
+#' demo <- sframe_demo("tourism_services")
 #' ir <- sframe_item_results(demo$responses, demo$instrument)
 #' print(ir)
 #' # one scale's diagnostics
@@ -272,7 +272,7 @@ print.sframe_item_report <- function(x, ...) {
 #' @examples
 #' \donttest{
 #' if (requireNamespace("psych", quietly = TRUE)) {
-#'   demo <- sframe_demo_data()
+#'   demo <- sframe_demo("tourism_services")
 #'   er <- sframe_efa_readiness_results(demo$responses, demo$instrument)
 #'   print(er)
 #' }

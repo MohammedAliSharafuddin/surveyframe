@@ -19,7 +19,7 @@ Returns the original object carried by a validation result, whether or not
 validation passed.
 }
 \examples{
-v <- validate_sframe(sframe_demo_data()$instrument, strict = FALSE)
+v <- validate_sframe(sframe_demo("tourism_services")$instrument, strict = FALSE)
 sframe_object(v)
 }
 \seealso{

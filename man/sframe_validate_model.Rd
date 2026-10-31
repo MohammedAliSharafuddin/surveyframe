@@ -33,7 +33,7 @@ console. Code that read \verb{$valid} and \verb{$problems} keeps working.
 }
 
 \examples{
-demo <- sframe_demo_data()
+demo <- sframe_demo("tourism_services")
 m <- sframe_model_spec(
   "cb1", type = "cb_sem",
   constructs = list(

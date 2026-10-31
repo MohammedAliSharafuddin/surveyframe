@@ -21,7 +21,7 @@ Reliability plot: alpha and omega by scale
 \donttest{
 if (requireNamespace("ggplot2", quietly = TRUE) &&
     requireNamespace("psych", quietly = TRUE)) {
-  demo <- sframe_demo_data()
+  demo <- sframe_demo("tourism_services")
   rr <- sframe_reliability_results(demo$responses, demo$instrument, omega = FALSE)
   sframe_plot_reliability(rr)
 }
