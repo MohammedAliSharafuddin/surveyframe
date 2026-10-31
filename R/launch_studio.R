@@ -219,3 +219,44 @@ sframe_studio_sframe_text <- function(instrument) {
        problem = NULL)
 }
 
+
+# Whether responses loaded for `old` still fit `new` after a Design save:
+# NULL when every item id and every item's choice codes are unchanged, as
+# after a label, wording, help text or branding edit. Otherwise a message
+# for the person saying the responses were cleared and what changed.
+sframe_studio_response_change <- function(old, new) {
+  codes <- function(instr) {
+    sets <- list()
+    for (cs in instr$choices) sets[[as.character(cs$id)]] <- as.character(cs$values)
+    out <- list()
+    for (it in instr$items) {
+      cs <- as.character(it$choice_set %||% "")[1]
+      out[[as.character(it$id)]] <- if (nzchar(cs) && !is.null(sets[[cs]])) sets[[cs]] else character(0)
+    }
+    out
+  }
+  a <- codes(old)
+  b <- codes(new)
+  changes <- c(
+    sprintf("item %s was removed", setdiff(names(a), names(b))),
+    sprintf("item %s was added", setdiff(names(b), names(a))))
+  for (id in intersect(names(a), names(b))) {
+    gone <- setdiff(a[[id]], b[[id]])
+    added <- setdiff(b[[id]], a[[id]])
+    n <- min(length(gone), length(added))
+    if (n > 0) {
+      changes <- c(changes, sprintf("choice %s of %s was renamed %s",
+                                    gone[seq_len(n)], id, added[seq_len(n)]))
+    }
+    changes <- c(changes,
+      sprintf("choice %s of %s was removed", gone[-seq_len(n)], id),
+      sprintf("choice %s of %s was added", added[-seq_len(n)], id))
+  }
+  if (length(changes) == 0) return(NULL)
+  if (length(changes) > 4) {
+    changes <- c(changes[1:3], paste(length(changes) - 3, "other changes were made"))
+  }
+  listed <- if (length(changes) == 1) changes else
+    paste(paste(changes[-length(changes)], collapse = ", "), "and", changes[length(changes)])
+  paste0("Responses cleared: ", listed, ". Load the responses again.")
+}

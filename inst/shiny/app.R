@@ -2307,7 +2307,9 @@ server <- function(input, output, session) {
   })
 
   # A save in the builder is read and checked as a file would be, and
-  # becomes the open instrument, as an opened file does.
+  # becomes the open instrument, as an opened file does. Loaded responses
+  # stay while their item ids and choice codes still fit, and are cleared
+  # with a message naming what changed when they do not.
   observeEvent(input$builder_sframe, {
     if (!is.null(design_out()$problem)) {
       session$sendCustomMessage("surveyframe-design-saved",
@@ -2318,8 +2320,13 @@ server <- function(input, output, session) {
       loaded <- read_sframe(text = input$builder_sframe)
       design_from_builder <<- TRUE
       rv$builder <- builder_state_from_instrument(loaded)
+      cleared <- if (!is.null(rv$responses) && !is.null(rv$instrument))
+        sframe_studio_response_change(rv$instrument, loaded)
       rv$instrument <- loaded
-      rv$responses <- NULL
+      if (!is.null(cleared)) {
+        rv$responses <- NULL
+        showNotification(cleared, type = "warning", duration = 12)
+      }
       rv$open_verification <- paste(
         "Saved from the Design screen. Integrity verified: content matches",
         "the SHA-256 digest the builder stored.")

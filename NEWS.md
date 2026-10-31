@@ -807,6 +807,10 @@ style.
   Design, and the screen says why. Rewriting it as a new instrument would
   have dropped its amendment log, and a save would have replaced Studio's
   instrument with one that has no history.
+  A save keeps the loaded responses while the item ids and choice codes
+  are unchanged, as after a label, wording, help text or branding edit.
+  When an item or a choice code is added, removed or renamed, the
+  responses are cleared, and a message names what changed.
 
 * **Studio has a Collect screen.** It downloads the Google Sheets Apps
   Script collector for a sheet you name, with the steps to deploy it, and
