@@ -178,6 +178,7 @@ sframe_models_table <- function(instrument) {
 #'
 #' as.data.frame(instr)
 #' as.data.frame(cs)
+#' @family Inspect functions
 NULL
 
 #' Coerce an instrument to its item summary
@@ -192,6 +193,7 @@ NULL
 #' @return A data frame summarising the instrument's items.
 #' @seealso [sframe_as_data_frame], [sframe_get_items()], [sframe_codebook()]
 #' @exportS3Method as.data.frame sframe
+#' @family Inspect functions
 as.data.frame.sframe <- function(x, row.names = NULL, optional = FALSE, ...) {
   out <- sframe_items_table(x)
   if (!is.null(row.names)) rownames(out) <- row.names
@@ -206,6 +208,7 @@ as.data.frame.sframe <- function(x, row.names = NULL, optional = FALSE, ...) {
 #' @return A data frame with `value` and `label` columns.
 #' @seealso [sframe_as_data_frame], [sframe_choice_set()]
 #' @exportS3Method as.data.frame sf_choices
+#' @family Inspect functions
 as.data.frame.sf_choices <- function(x, row.names = NULL, optional = FALSE, ...) {
   data.frame(
     value = as.character(x$values),
@@ -221,6 +224,7 @@ as.data.frame.sf_choices <- function(x, row.names = NULL, optional = FALSE, ...)
 #' @return The codebook report's item table as a data frame.
 #' @seealso [sframe_as_data_frame], [sframe_codebook()]
 #' @exportS3Method as.data.frame sframe_codebook
+#' @family Inspect functions
 as.data.frame.sframe_codebook <- function(x, row.names = NULL, optional = FALSE, ...) {
   x$items_table
 }
@@ -245,6 +249,7 @@ sframe_num_or_na <- function(x, field) {
 #' @return A data frame of scale reliability statistics.
 #' @seealso [sframe_as_data_frame], [sframe_reliability_results()]
 #' @exportS3Method as.data.frame sframe_reliability_report
+#' @family Inspect functions
 as.data.frame.sframe_reliability_report <- function(x, row.names = NULL,
                                                     optional = FALSE, ...) {
   if (length(x) == 0) {
@@ -277,6 +282,7 @@ as.data.frame.sframe_reliability_report <- function(x, row.names = NULL,
 #' @return A data frame of item-level diagnostics.
 #' @seealso [sframe_as_data_frame], [sframe_item_results()]
 #' @exportS3Method as.data.frame sframe_item_report
+#' @family Inspect functions
 as.data.frame.sframe_item_report <- function(x, row.names = NULL,
                                              optional = FALSE, ...) {
   if (length(x) == 0) {
@@ -304,6 +310,7 @@ as.data.frame.sframe_item_report <- function(x, row.names = NULL,
 #'   number of factors.
 #' @seealso [sframe_as_data_frame], [sframe_efa_readiness_results()]
 #' @exportS3Method as.data.frame sframe_efa_report
+#' @family Inspect functions
 as.data.frame.sframe_efa_report <- function(x, row.names = NULL,
                                             optional = FALSE, ...) {
   data.frame(
@@ -326,6 +333,7 @@ as.data.frame.sframe_efa_report <- function(x, row.names = NULL,
 #' @return The solution's long-form factor-loading data frame.
 #' @seealso [sframe_as_data_frame], [sframe_efa_solution()]
 #' @exportS3Method as.data.frame sframe_efa_solution
+#' @family Inspect functions
 as.data.frame.sframe_efa_solution <- function(x, row.names = NULL,
                                               optional = FALSE, ...) {
   x$loadings_long
@@ -341,6 +349,7 @@ as.data.frame.sframe_efa_solution <- function(x, row.names = NULL,
 #' @return The primary table from a descriptives report.
 #' @seealso [sframe_as_data_frame], [sframe_descriptives_results()]
 #' @exportS3Method as.data.frame sframe_descriptives_report
+#' @family Inspect functions
 as.data.frame.sframe_descriptives_report <- function(x, row.names = NULL,
                                                      optional = FALSE, ...) {
   x$table
@@ -352,6 +361,7 @@ as.data.frame.sframe_descriptives_report <- function(x, row.names = NULL,
 #' @return The item-level missingness table from a missing-data report.
 #' @seealso [sframe_as_data_frame], [sframe_missing_data_results()]
 #' @exportS3Method as.data.frame sframe_missing_data_report
+#' @family Inspect functions
 as.data.frame.sframe_missing_data_report <- function(x, row.names = NULL,
                                                      optional = FALSE, ...) {
   x$item_missing
@@ -363,6 +373,7 @@ as.data.frame.sframe_missing_data_report <- function(x, row.names = NULL,
 #' @return The reliability table stored in a validity report.
 #' @seealso [sframe_as_data_frame], [sframe_validity_results()]
 #' @exportS3Method as.data.frame sframe_validity_report
+#' @family Inspect functions
 as.data.frame.sframe_validity_report <- function(x, row.names = NULL,
                                                  optional = FALSE, ...) {
   x$reliability
@@ -377,6 +388,7 @@ as.data.frame.sframe_validity_report <- function(x, row.names = NULL,
 #' @return A data frame naming each assumption family, variable, and statistic.
 #' @seealso [sframe_as_data_frame], [sframe_assumption_results()]
 #' @exportS3Method as.data.frame sframe_assumption_report
+#' @family Inspect functions
 as.data.frame.sframe_assumption_report <- function(x, row.names = NULL,
                                                    optional = FALSE, ...) {
   # The three families carry different columns, so they stack into a long
@@ -415,6 +427,7 @@ as.data.frame.sframe_assumption_report <- function(x, row.names = NULL,
 #'   size, alpha, and power.
 #' @seealso [sframe_as_data_frame], [sframe_sample_size_plan()]
 #' @exportS3Method as.data.frame sframe_sample_size_plan
+#' @family Inspect functions
 as.data.frame.sframe_sample_size_plan <- function(x, row.names = NULL,
                                                   optional = FALSE, ...) {
   data.frame(
@@ -434,6 +447,7 @@ as.data.frame.sframe_sample_size_plan <- function(x, row.names = NULL,
 #'   flags.
 #' @seealso [sframe_as_data_frame], [sframe_quality_results()]
 #' @exportS3Method as.data.frame sframe_quality_report
+#' @family Inspect functions
 as.data.frame.sframe_quality_report <- function(x, row.names = NULL,
                                                 optional = FALSE, ...) {
   data.frame(
@@ -452,6 +466,7 @@ as.data.frame.sframe_quality_report <- function(x, row.names = NULL,
 #' @return The primary results table from a sensitivity analysis.
 #' @seealso [sframe_as_data_frame]
 #' @exportS3Method as.data.frame sframe_sensitivity
+#' @family Inspect functions
 as.data.frame.sframe_sensitivity <- function(x, row.names = NULL,
                                              optional = FALSE, ...) {
   x$table
@@ -466,6 +481,7 @@ as.data.frame.sframe_sensitivity <- function(x, row.names = NULL,
 #' @return A data frame with one row per analysis block.
 #' @seealso [sframe_as_data_frame], [run_analysis_plan()]
 #' @exportS3Method as.data.frame sframe_analysis_results
+#' @family Inspect functions
 as.data.frame.sframe_analysis_results <- function(x, row.names = NULL,
                                                   optional = FALSE, ...) {
   if (length(x) == 0) {
@@ -505,6 +521,7 @@ as.data.frame.sframe_analysis_results <- function(x, row.names = NULL,
 #'
 #' @return An object of the same class as `x`.
 #' @name sframe_subset
+#' @family Inspect functions
 NULL
 
 #' @noRd

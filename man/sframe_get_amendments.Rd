@@ -27,4 +27,9 @@ sframe_get_amendments(instr)
 }
 \seealso{
 \code{\link[=amend_sframe]{amend_sframe()}}
+
+Other Amendments functions:
+\code{\link[=amend_sframe]{amend_sframe()}},
+\code{\link[=sframe_link_git_commit]{sframe_link_git_commit()}}
 }
+\concept{Amendments functions}

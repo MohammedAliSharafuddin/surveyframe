@@ -213,6 +213,7 @@ sframe_composite_score <- function(scale_num, scale, scale_item_ids) {
 #'
 #' scored <- score_scales(responses, instr)
 #' scored$sat
+#' @family Analyse functions
 score_scales <- function(data, instrument, keep_items = TRUE, keep_meta = TRUE) {
   sframe_check_instrument(instrument)
   stopifnot(is.data.frame(data))

@@ -273,6 +273,7 @@ sframe_require_columns <- function(data, cols, method) {
 #' dr <- sframe_descriptives_results(demo$responses, variables = c("sat_1", "sat_2"),
 #'                            split_by = "visit_type")
 #' dr$table
+#' @family Analyse functions
 sframe_descriptives_results <- function(
     data,
     variables = NULL,
@@ -368,6 +369,7 @@ sframe_descriptives_results <- function(
 #' demo <- sframe_demo("tourism_services")
 #' mr <- sframe_missing_data_results(demo$responses, demo$instrument)
 #' mr$item_missing
+#' @family Responses functions
 sframe_missing_data_results <- function(data, instrument = NULL, variables = NULL) {
   stopifnot(is.data.frame(data))
   if (is.null(variables)) {
@@ -507,6 +509,7 @@ sframe_missing_data_results <- function(data, instrument = NULL, variables = NUL
 #'   method = "zscore"
 #' )
 #' outliers$flagged_rows
+#' @family Responses functions
 sframe_outlier_results <- function(
     data,
     variables = NULL,
@@ -659,6 +662,7 @@ sframe_small_sample_advisory <- function(n, test) {
 #' ar <- sframe_assumption_results(demo$responses, variables = c("sat_1", "sat_2"),
 #'                          group = "visit_type")
 #' print(ar)
+#' @family Analyse functions
 sframe_assumption_results <- function(
     data,
     variables = NULL,
@@ -838,6 +842,7 @@ print.sframe_assumption_report <- function(x, ...) {
 #' pr <- sframe_posthoc_results(demo$responses, method = "kruskal_wallis",
 #'                       outcome = "sat_1", group = "visit_type")
 #' pr$tables$pairwise_wilcox
+#' @family Analyse functions
 sframe_posthoc_results <- function(
     data,
     method = c("anova", "kruskal_wallis", "chi_square", "cochran_q"),
@@ -1979,6 +1984,7 @@ sframe_run_mediation <- function(data, roles, options = list()) {
 #' )
 #' vr <- sframe_validity_results(loadings)
 #' vr$reliability
+#' @family Analyse functions
 sframe_validity_results <- function(loadings, construct_scores = NULL,
                             items_by_construct = NULL) {
   if (is.list(loadings) && !is.data.frame(loadings)) {
@@ -2190,6 +2196,7 @@ sframe_henseler_htmt <- function(items_by_construct) {
 #' plan <- sframe_sample_size_plan("t_test", d = 0.5, power = 0.80)
 #' plan$estimated_n
 #' plan$method
+#' @family Plan functions
 sframe_sample_size_plan <- function(
     type = c("proportion", "mean", "correlation", "t_test", "anova", "regression", "sem"),
     margin_error = NULL,

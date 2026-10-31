@@ -137,6 +137,7 @@ sframe_reference_demo <- function(name) {
 #' @examples
 #' head(sframe_list_demos(), 3)
 #' subset(sframe_list_demos(), focus == "provenance")
+#' @family Demo functions
 sframe_list_demos <- function() {
   rbind(sframe_demo_index(), sframe_reference_demo_index())
 }
@@ -179,6 +180,7 @@ sframe_demo_dir <- function() {
 #' demo <- sframe_demo("two_group")
 #' demo$instrument
 #' head(demo$responses)
+#' @family Demo functions
 sframe_demo <- function(name, branded = FALSE) {
   idx <- sframe_demo_index()
   if (missing(name)) {
@@ -261,6 +263,7 @@ sframe_demo_screens <- function(title) {
 #' branding
 #' branding$welcome$title
 #' branding$theme
+#' @family Demo functions
 sframe_demo_branding <- function() {
   structure(list(
     mode = "standard",
@@ -357,6 +360,7 @@ print.sframe_branding <- function(x, ...) {
 #'   export_responses(demo$responses, demo$instrument, out)
 #' }
 #' }
+#' @family Responses functions
 export_responses <- function(data, instrument, path) {
   rlang::check_installed("haven", reason = "to write a labelled SPSS or Stata file.")
   sframe_check_instrument(instrument)
@@ -552,6 +556,7 @@ sframe_labelled_message <- function(changes, ext) {
 #' @examples
 #' out <- sframe_demo_qmd("two_group", dir = tempdir())
 #' basename(out)
+#' @family Demo functions
 sframe_demo_qmd <- function(name, dir = ".", overwrite = FALSE) {
   idx <- sframe_demo_index()
   if (missing(name)) {
@@ -623,6 +628,7 @@ sframe_demo_qmd <- function(name, dir = ".", overwrite = FALSE) {
 #' resp  <- data.frame(q1 = c("Great", "Fine"))
 #' out <- sframe_analysis_qmd(instr, resp, dir = tempdir())
 #' basename(out$qmd)
+#' @family Report functions
 sframe_analysis_qmd <- function(instrument, data, dir = ".", basename = NULL,
                                  overwrite = FALSE) {
   if (missing(instrument)) {

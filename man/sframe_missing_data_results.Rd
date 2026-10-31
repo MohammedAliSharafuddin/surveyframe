@@ -27,3 +27,12 @@ demo <- sframe_demo("tourism_services")
 mr <- sframe_missing_data_results(demo$responses, demo$instrument)
 mr$item_missing
 }
+\seealso{
+Other Responses functions:
+\code{\link[=export_responses]{export_responses()}},
+\code{\link[=read_responses]{read_responses()}},
+\code{\link[=read_sheet_responses]{read_sheet_responses()}},
+\code{\link[=sframe_outlier_results]{sframe_outlier_results()}},
+\code{\link[=sframe_quality_results]{sframe_quality_results()}}
+}
+\concept{Responses functions}

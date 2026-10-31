@@ -61,4 +61,12 @@ if (requireNamespace("haven", quietly = TRUE)) {
 }
 \seealso{
 \code{\link[=sframe_demo]{sframe_demo()}}, \code{\link[=read_responses]{read_responses()}}
+
+Other Responses functions:
+\code{\link[=read_responses]{read_responses()}},
+\code{\link[=read_sheet_responses]{read_sheet_responses()}},
+\code{\link[=sframe_missing_data_results]{sframe_missing_data_results()}},
+\code{\link[=sframe_outlier_results]{sframe_outlier_results()}},
+\code{\link[=sframe_quality_results]{sframe_quality_results()}}
 }
+\concept{Responses functions}

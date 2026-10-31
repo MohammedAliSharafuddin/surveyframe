@@ -29,6 +29,7 @@
 #'   print(rr)
 #' }
 #' }
+#' @family Analyse functions
 sframe_reliability_results <- function(
     data,
     instrument,
@@ -175,6 +176,7 @@ print.sframe_reliability_report <- function(x, ...) {
 #' # every scale in one table
 #' as.data.frame(ir)
 #' }
+#' @family Analyse functions
 sframe_item_results <- function(data, instrument, scales = NULL) {
   sframe_check_instrument(instrument)
   stopifnot(is.data.frame(data))
@@ -277,6 +279,7 @@ print.sframe_item_report <- function(x, ...) {
 #'   print(er)
 #' }
 #' }
+#' @family Analyse functions
 sframe_efa_readiness_results <- function(
     data,
     instrument,

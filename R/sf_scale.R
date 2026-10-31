@@ -47,6 +47,7 @@
 #'   min_valid     = 2,
 #'   reverse_items = NULL
 #' )
+#' @family Design functions
 sframe_scale <- function(
     id,
     label,

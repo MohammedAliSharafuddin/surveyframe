@@ -107,6 +107,7 @@
 #'   overwrite    = TRUE
 #' )
 #' }
+#' @family Collect functions
 export_survey <- function(
     instrument,
     output_path  = NULL,

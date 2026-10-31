@@ -69,4 +69,19 @@ sat_scale <- sframe_scale(
 }
 \seealso{
 \code{\link[=sframe_item]{sframe_item()}}, \code{\link[=score_scales]{score_scales()}}, \code{\link[=sframe_reliability_results]{sframe_reliability_results()}}
+
+Other Design functions:
+\code{\link[=as_sframe]{as_sframe()}},
+\code{\link[=launch_builder]{launch_builder()}},
+\code{\link[=read_sframe]{read_sframe()}},
+\code{\link[=sframe_attention_check]{sframe_attention_check()}},
+\code{\link[=sframe_branch]{sframe_branch()}},
+\code{\link[=sframe_choice_set]{sframe_choice_set()}},
+\code{\link[=sframe_conjoint_design]{sframe_conjoint_design()}},
+\code{\link[=sframe_instrument]{sframe_instrument()}},
+\code{\link[=sframe_item]{sframe_item()}},
+\code{\link{sframe_validation}},
+\code{\link[=validate_sframe]{validate_sframe()}},
+\code{\link[=write_sframe]{write_sframe()}}
 }
+\concept{Design functions}

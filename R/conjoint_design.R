@@ -140,6 +140,7 @@ sframe_conjoint_select <- function(full, n_profiles, method, tries = 200L,
 #' )
 #' design$profiles
 #' design$tasks
+#' @family Design functions
 sframe_conjoint_design <- function(id,
                                attributes,
                                method = c("full", "balanced", "random"),

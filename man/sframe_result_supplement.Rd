@@ -51,4 +51,14 @@ sframe_result_supplement(results$RQ1)
 }
 \seealso{
 \code{\link[=run_analysis_plan]{run_analysis_plan()}}, \code{\link[=render_report]{render_report()}}, \code{\link[=sframe_syntax_result]{sframe_syntax_result()}}
+
+Other Report functions:
+\code{\link[=render_report]{render_report()}},
+\code{\link[=render_results]{render_results()}},
+\code{\link[=sframe_analysis_qmd]{sframe_analysis_qmd()}},
+\code{\link[=sframe_codebook]{sframe_codebook()}},
+\code{\link[=sframe_format_result]{sframe_format_result()}},
+\code{\link{sframe_reports}},
+\code{\link[=sframe_save_figures]{sframe_save_figures()}}
 }
+\concept{Report functions}

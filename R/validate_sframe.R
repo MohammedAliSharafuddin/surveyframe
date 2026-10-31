@@ -331,6 +331,7 @@ sframe_validation_checks <- c(
 #' # Recover the validated instrument
 #' validated <- as_sframe(validate_sframe(instr, strict = TRUE))
 #' isTRUE(sframe_meta(validated)$validated)
+#' @family Design functions
 validate_sframe <- function(instrument, strict = TRUE) {
   sframe_check_instrument(instrument)
 

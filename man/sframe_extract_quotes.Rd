@@ -50,3 +50,11 @@ if (requireNamespace("stm", quietly = TRUE) &&
 }
 }
 }
+\seealso{
+Other Text analysis functions:
+\code{\link[=sframe_clean_text]{sframe_clean_text()}},
+\code{\link[=sframe_ngram_frequency]{sframe_ngram_frequency()}},
+\code{\link[=sframe_term_context]{sframe_term_context()}},
+\code{\link[=sframe_term_frequency]{sframe_term_frequency()}}
+}
+\concept{Text analysis functions}

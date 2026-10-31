@@ -18,25 +18,83 @@ pseudomedian, exact odds-ratio, and Firth logistic regression), multi-
 criteria decision analysis (AHP, ANP, DEMATEL, VIKOR, MOORA, SMART,
 WASPAS, PROMETHEE, ELECTRE, and TOPSIS), and model syntax planning for
 EFA, CFA, CB-SEM, and PLS-SEM.
-\subsection{Core workflow}{
-\enumerate{
-\item \strong{Design} an instrument with \code{\link[=launch_builder]{launch_builder()}} or \code{\link[=sframe_instrument]{sframe_instrument()}} and
-its component constructors: \code{\link[=sframe_item]{sframe_item()}}, \code{\link[=sframe_choice_set]{sframe_choice_set()}}, \code{\link[=sframe_scale]{sframe_scale()}},
-\code{\link[=sframe_branch]{sframe_branch()}}, \code{\link[=sframe_attention_check]{sframe_attention_check()}}.
-\item \strong{Validate and save} with \code{\link[=validate_sframe]{validate_sframe()}} and \code{\link[=write_sframe]{write_sframe()}}.
-\code{validate_sframe()} returns an \code{sframe_validation} diagnostic rather
-than the instrument itself. Recover a validated instrument with
-\code{\link[=as_sframe]{as_sframe()}}.
-\item \strong{Deploy} a Shiny survey with \code{\link[=run_survey]{run_survey()}}.
-\item \strong{Load responses} with \code{\link[=read_responses]{read_responses()}} or \code{\link[=read_sheet_responses]{read_sheet_responses()}}.
-\item \strong{Check quality} with \code{\link[=sframe_quality_results]{sframe_quality_results()}}.
-\item \strong{Score and analyse} with \code{\link[=score_scales]{score_scales()}}, \code{\link[=sframe_descriptives_results]{sframe_descriptives_results()}},
-\code{\link[=sframe_missing_data_results]{sframe_missing_data_results()}}, \code{\link[=sframe_reliability_results]{sframe_reliability_results()}}, \code{\link[=sframe_item_results]{sframe_item_results()}},
-\code{\link[=sframe_efa_readiness_results]{sframe_efa_readiness_results()}}, \code{\link[=sframe_syntax_cfa]{sframe_syntax_cfa()}}, and \code{\link[=run_analysis_plan]{run_analysis_plan()}}, which also
-runs any decision-analysis blocks in the plan.
-\item \strong{Report} with \code{\link[=sframe_codebook]{sframe_codebook()}}, \code{\link[=render_report]{render_report()}}, and
-\code{\link[=render_results]{render_results()}}.
+\subsection{Start here}{
+
+\code{\link[=launch_studio]{launch_studio()}} opens SurveyStudio, which takes an instrument through
+every stage below with no code. \code{launch_studio(demo = "first_survey")}
+opens it on a whole survey to try. In code, \code{sframe_demo("first_survey")}
+loads the same survey, and \code{\link[=sframe_list_demos]{sframe_list_demos()}} lists 22 teaching demos,
+each one instrument, its responses and the results surveyframe produced.
+\code{vignette("learn-by-example")} teaches from the same library.
+
+The stages follow, in order. Each names where it lives in SurveyStudio or
+SurveyBuilder and the function that does it in code.
 }
+
+\subsection{Design}{
+
+In SurveyBuilder, \code{\link[=launch_builder]{launch_builder()}}, the Build mode. In code,
+\code{\link[=sframe_instrument]{sframe_instrument()}} and its makers: \code{\link[=sframe_item]{sframe_item()}},
+\code{\link[=sframe_choice_set]{sframe_choice_set()}}, \code{\link[=sframe_scale]{sframe_scale()}}, \code{\link[=sframe_branch]{sframe_branch()}} and
+\code{\link[=sframe_attention_check]{sframe_attention_check()}}. \code{\link[=validate_sframe]{validate_sframe()}} checks the instrument and
+\code{\link[=write_sframe]{write_sframe()}} saves it as a \code{.sframe} file. \code{validate_sframe()}
+returns an \code{sframe_validation} diagnostic, and \code{\link[=as_sframe]{as_sframe()}} recovers the
+validated instrument.
+}
+
+\subsection{Plan}{
+
+In SurveyBuilder, the Analyse mode. In code, \code{sframe_plan(x) <- plan},
+read back with \code{\link[=sframe_plan]{sframe_plan()}}. \code{\link[=sframe_sample_size_plan]{sframe_sample_size_plan()}} says how many
+responses the plan needs.
+}
+
+\subsection{Preview}{
+
+In SurveyStudio, the Preview screen. In code, \code{\link[=preview_survey]{preview_survey()}}, which
+collects nothing, or \code{\link[=run_survey]{run_survey()}} for a local Shiny survey.
+}
+
+\subsection{Collect}{
+
+In SurveyBuilder, Export survey. In code, \code{\link[=export_survey]{export_survey()}} writes a
+standalone page, optionally saving answers to a Google Sheet through
+\code{\link[=export_google_sheet]{export_google_sheet()}}. \code{\link[=sframe_survey_ui]{sframe_survey_ui()}} and
+\code{\link[=sframe_survey_server]{sframe_survey_server()}} put the survey inside your own Shiny app.
+}
+
+\subsection{Responses}{
+
+In SurveyStudio, the Responses and Quality screens. In code,
+\code{\link[=read_responses]{read_responses()}} or \code{\link[=read_sheet_responses]{read_sheet_responses()}}, then
+\code{\link[=sframe_quality_results]{sframe_quality_results()}}. \code{\link[=export_responses]{export_responses()}} writes them with labels
+for SPSS or Stata.
+}
+
+\subsection{Analyse}{
+
+In SurveyStudio, the Reliability, Analysis Plan and Dashboard screens. In
+code, \code{\link[=score_scales]{score_scales()}} and \code{\link[=run_analysis_plan]{run_analysis_plan()}}, which runs every block of
+the plan, decision-analysis blocks included. The \verb{_results} functions,
+such as \code{\link[=sframe_reliability_results]{sframe_reliability_results()}}, run one analysis on its own.
+}
+
+\subsection{Report}{
+
+In SurveyStudio, the Export screen. In code, \code{\link[=render_report]{render_report()}},
+\code{\link[=render_results]{render_results()}} and \code{\link[=sframe_codebook]{sframe_codebook()}}.
+}
+
+\subsection{References}{
+
+In SurveyStudio, the References screen. In code, \code{\link[=sframe_reference]{sframe_reference()}} and
+\code{\link[=sframe_add_references]{sframe_add_references()}}. The report lists each work once, at the end.
+}
+
+\subsection{Amendments}{
+
+In SurveyStudio, the Amendments screen. In code, \code{\link[=amend_sframe]{amend_sframe()}}, read
+back with \code{\link[=sframe_get_amendments]{sframe_get_amendments()}}.
 }
 
 \subsection{The instrument object}{
@@ -54,21 +112,14 @@ helpers \code{\link[=sframe_bootstrap_ci]{sframe_bootstrap_ci()}}, \code{\link[=
 \code{\link[=sframe_eta_sq_ci]{sframe_eta_sq_ci()}}.
 }
 
-\subsection{A first session}{
-
-\code{\link[=sframe_list_demos]{sframe_list_demos()}} lists 22 worked demos, each one instrument, its responses
-and the results surveyframe produced. \code{sframe_demo("two_group")} loads one,
-and \code{sframe_demo_qmd("two_group")} writes a notebook to edit.
-\code{vignette("learn-by-example")} teaches from the same library.
-}
-
 \subsection{How functions are named}{
 
 Names come in 2 kinds, so a function says which stage it belongs to.
 \itemize{
 \item The stage verbs name the step a researcher is taking and carry no
 prefix: \code{\link[=read_sframe]{read_sframe()}}, \code{\link[=validate_sframe]{validate_sframe()}}, \code{\link[=write_sframe]{write_sframe()}},
-\code{\link[=amend_sframe]{amend_sframe()}}, \code{\link[=run_survey]{run_survey()}}, \code{\link[=export_survey]{export_survey()}}, \code{\link[=read_responses]{read_responses()}},
+\code{\link[=amend_sframe]{amend_sframe()}}, \code{\link[=preview_survey]{preview_survey()}}, \code{\link[=run_survey]{run_survey()}}, \code{\link[=export_survey]{export_survey()}},
+\code{\link[=read_responses]{read_responses()}}, \code{\link[=export_responses]{export_responses()}},
 \code{\link[=score_scales]{score_scales()}}, \code{\link[=run_analysis_plan]{run_analysis_plan()}}, \code{\link[=render_report]{render_report()}},
 \code{\link[=launch_builder]{launch_builder()}} and \code{\link[=launch_studio]{launch_studio()}}.
 \item Everything else takes \code{sframe_}: the makers such as \code{\link[=sframe_item]{sframe_item()}} and
@@ -97,6 +148,10 @@ Useful links:
   \item Report bugs at \url{https://github.com/MohammedAliSharafuddin/surveyframe/issues}
 }
 
+
+Other entry points:
+\code{\link[=launch_dashboard]{launch_dashboard()}},
+\code{\link[=launch_studio]{launch_studio()}}
 }
 \author{
 \strong{Maintainer}: Mohammed Ali Sharafuddin \email{mohammedali.page@gmail.com} (\href{https://orcid.org/0000-0001-5247-2964}{ORCID})
@@ -107,3 +162,4 @@ Authors:
 }
 
 }
+\concept{entry points}

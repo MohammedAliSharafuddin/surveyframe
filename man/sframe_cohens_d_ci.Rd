@@ -35,4 +35,10 @@ sframe_cohens_d_ci(mtcars$mpg[mtcars$am == 1], mtcars$mpg[mtcars$am == 0],
 }
 \seealso{
 \code{\link[=sframe_bootstrap_ci]{sframe_bootstrap_ci()}}
+
+Other Confidence interval functions:
+\code{\link[=sframe_bootstrap_ci]{sframe_bootstrap_ci()}},
+\code{\link[=sframe_cramers_v_ci]{sframe_cramers_v_ci()}},
+\code{\link[=sframe_eta_sq_ci]{sframe_eta_sq_ci()}}
 }
+\concept{Confidence interval functions}

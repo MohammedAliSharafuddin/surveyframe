@@ -128,4 +128,10 @@ export_survey(
 }
 \seealso{
 \code{\link[=launch_studio]{launch_studio()}}, \code{\link[=launch_builder]{launch_builder()}}, \code{\link[=run_survey]{run_survey()}}
+
+Other Collect functions:
+\code{\link[=export_google_sheet]{export_google_sheet()}},
+\code{\link[=sframe_survey_server]{sframe_survey_server()}},
+\code{\link[=sframe_survey_ui]{sframe_survey_ui()}}
 }
+\concept{Collect functions}

@@ -35,3 +35,13 @@ Normalisation keeps the radius at or below 1, and it equals 1 when criteria
 influence each other in a closed group with equal totals. That case returns
 an \code{error} explaining it, and no truncated series is substituted.
 }
+\seealso{
+Other Decision analysis functions:
+\code{\link[=sframe_aggregate_judgements]{sframe_aggregate_judgements()}},
+\code{\link[=sframe_assemble_pairwise]{sframe_assemble_pairwise()}},
+\code{\link[=sframe_collected_weights]{sframe_collected_weights()}},
+\code{\link[=sframe_decision_options]{sframe_decision_options()}},
+\code{\link[=sframe_rated_matrix]{sframe_rated_matrix()}},
+\code{\link[=sframe_sensitivity_analysis]{sframe_sensitivity_analysis()}}
+}
+\concept{Decision analysis functions}

@@ -37,6 +37,7 @@
 #'
 #' @name sframe_reports
 #' @seealso [run_analysis_plan()], [sframe_plots]
+#' @family Report functions
 NULL
 
 # codebook_report.R
@@ -95,6 +96,7 @@ sframe_clean_chrome_detritus <- function(before) {
 #' cat(substr(md$markdown, 1, 200))
 #' nrow(sframe_get_items(cb))
 #' nrow(sframe_get_scales(cb))
+#' @family Report functions
 sframe_codebook <- function(instrument, format = c("html", "md")) {
   sframe_check_instrument(instrument)
   format <- rlang::arg_match(format)
@@ -198,6 +200,7 @@ sframe_codebook_markdown <- function(cb) {
 #' demo <- sframe_demo("tourism_services")
 #' cb <- sframe_codebook(demo$instrument)
 #' head(sframe_codebook_items_display(cb))
+#' @family SurveyStudio helpers
 sframe_codebook_items_display <- function(cb) {
   stopifnot(inherits(cb, "sframe_codebook"))
   items_d <- cb$items_table
@@ -353,6 +356,7 @@ print.sframe_codebook <- function(x, ...) {
 #' )
 #' file.exists(out)
 #' }
+#' @family Report functions
 render_report <- function(
     instrument,
     data              = NULL,

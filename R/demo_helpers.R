@@ -120,6 +120,7 @@ sframe_builder_demo_html <- function(name) {
 #' \dontrun{
 #' launch_dashboard_demo()
 #' }
+#' @family Demo functions
 launch_dashboard_demo <- function(
     port = NULL,
     host = "127.0.0.1",

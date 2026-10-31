@@ -22,3 +22,11 @@ List an instrument's references
 instr <- sframe_demo("likert_scale")$instrument
 sframe_get_references(instr)
 }
+\seealso{
+Other References functions:
+\code{\link[=read_bibtex]{read_bibtex()}},
+\code{\link[=sframe_add_references]{sframe_add_references()}},
+\code{\link[=sframe_bibliography]{sframe_bibliography()}},
+\code{\link[=sframe_reference]{sframe_reference()}}
+}
+\concept{References functions}

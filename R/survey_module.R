@@ -57,6 +57,7 @@
 #'
 #' shinyApp(ui, server)
 #' }
+#' @family Collect functions
 sframe_survey_ui <- function(id, width = "100%") {
   rlang::check_installed("shiny", reason = "to embed a survey module.")
   ns <- shiny::NS(id)
@@ -145,6 +146,7 @@ sframe_survey_ui <- function(id, width = "100%") {
 #' \donttest{
 #' # sframe_survey_ui() has a complete example, including on_submit.
 #' }
+#' @family Collect functions
 sframe_survey_server <- function(id, instrument, on_submit = NULL) {
   rlang::check_installed("shiny", reason = "to use the survey module.")
   rlang::check_installed("digest", reason = "to generate survey response IDs.")

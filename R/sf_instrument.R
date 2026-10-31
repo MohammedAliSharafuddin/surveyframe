@@ -72,6 +72,7 @@
 #' )
 #' print(instr)
 #' length(sframe_plan(instr))
+#' @family Design functions
 sframe_instrument <- function(
     title,
     version     = "0.1.0",

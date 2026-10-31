@@ -42,6 +42,7 @@ sframe_component_list <- function(x, what = "component") {
 #'
 #' sframe_get_items(instr)
 #' sframe_get_items(instr)[["q2"]]
+#' @family Inspect functions
 NULL
 
 #' @noRd
@@ -119,6 +120,7 @@ print.sf_component_list <- function(x, ...) {
 #' sframe_get_items(instr)
 #' sframe_get_scales(instr)[["sat"]]
 #' as.data.frame(instr)
+#' @family Inspect functions
 NULL
 
 #' Get survey metadata
@@ -133,6 +135,7 @@ NULL
 #' @examples
 #' sframe_meta(sframe_demo("tourism_services")$instrument)
 #' @export
+#' @family Inspect functions
 sframe_meta <- function(x, ...) UseMethod("sframe_meta")
 
 #' Get survey items
@@ -146,6 +149,7 @@ sframe_meta <- function(x, ...) UseMethod("sframe_meta")
 #' @examples
 #' sframe_get_items(sframe_demo("tourism_services")$instrument)
 #' @export
+#' @family Inspect functions
 sframe_get_items <- function(x, ...) UseMethod("sframe_get_items")
 
 #' Get survey scales
@@ -160,6 +164,7 @@ sframe_get_items <- function(x, ...) UseMethod("sframe_get_items")
 #' @examples
 #' sframe_get_scales(sframe_demo("tourism_services")$instrument)
 #' @export
+#' @family Inspect functions
 sframe_get_scales <- function(x, ...) UseMethod("sframe_get_scales")
 
 #' Get choice sets
@@ -174,6 +179,7 @@ sframe_get_scales <- function(x, ...) UseMethod("sframe_get_scales")
 #' @examples
 #' sframe_get_choice_sets(sframe_demo("tourism_services")$instrument)
 #' @export
+#' @family Inspect functions
 sframe_get_choice_sets <- function(x, ...) UseMethod("sframe_get_choice_sets")
 
 #' Get branching rules
@@ -186,6 +192,7 @@ sframe_get_choice_sets <- function(x, ...) UseMethod("sframe_get_choice_sets")
 #' @examples
 #' sframe_get_branches(sframe_demo("tourism_services")$instrument)
 #' @export
+#' @family Inspect functions
 sframe_get_branches <- function(x, ...) UseMethod("sframe_get_branches")
 
 #' Get response-quality checks
@@ -198,6 +205,7 @@ sframe_get_branches <- function(x, ...) UseMethod("sframe_get_branches")
 #' @examples
 #' sframe_get_attention_checks(sframe_demo("tourism_services")$instrument)
 #' @export
+#' @family Inspect functions
 sframe_get_attention_checks <- function(x, ...) UseMethod("sframe_get_attention_checks")
 
 #' Get model specifications
@@ -211,6 +219,7 @@ sframe_get_attention_checks <- function(x, ...) UseMethod("sframe_get_attention_
 #' @examples
 #' sframe_get_models(sframe_demo("tourism_services")$instrument)
 #' @export
+#' @family Inspect functions
 sframe_get_models <- function(x, ...) UseMethod("sframe_get_models")
 
 #' Get the pre-declared analysis plan
@@ -224,6 +233,7 @@ sframe_get_models <- function(x, ...) UseMethod("sframe_get_models")
 #' @examples
 #' sframe_plan(sframe_demo("tourism_services")$instrument)
 #' @export
+#' @family Plan functions
 sframe_plan <- function(x, ...) UseMethod("sframe_plan")
 
 # ---------------------------------------------------------------------------
@@ -293,6 +303,7 @@ sframe_plan.sframe <- function(x, ...) x$analysis_plan %||% list()
 #'        roles = list(variables = "q1"))
 #' )
 #' length(sframe_plan(instr))
+#' @family Plan functions
 `sframe_plan<-` <- function(x, value) UseMethod("sframe_plan<-")
 
 #' @noRd
@@ -355,6 +366,7 @@ sframe_plan.sframe_codebook <- function(x, ...) x$plan_table
 #'                 choice_set = "agree5")
 #' sframe_id(item)
 #' sframe_label(item)
+#' @family Inspect functions
 NULL
 
 #' Get an instrument component ID
@@ -370,6 +382,7 @@ NULL
 #' @examples
 #' sframe_id(sframe_item("q1", "Satisfaction", type = "numeric"))
 #' @export
+#' @family Inspect functions
 sframe_id <- function(x, ...) UseMethod("sframe_id")
 
 #' Get an instrument component label
@@ -382,6 +395,7 @@ sframe_id <- function(x, ...) UseMethod("sframe_id")
 #' @examples
 #' sframe_label(sframe_item("q1", "Satisfaction", type = "numeric"))
 #' @export
+#' @family Inspect functions
 sframe_label <- function(x, ...) UseMethod("sframe_label")
 
 sframe_component_id <- function(x, ...) as.character(x$id %||% "")[1]
@@ -451,6 +465,7 @@ sframe_label.sf_model <- sframe_component_label
 #'
 #' sframe_is_valid(v)
 #' sframe_problems(v)
+#' @family Inspect functions
 NULL
 
 #' Test whether validation passed
@@ -465,6 +480,7 @@ NULL
 #' v <- validate_sframe(sframe_demo("tourism_services")$instrument, strict = FALSE)
 #' sframe_is_valid(v)
 #' @export
+#' @family Inspect functions
 sframe_is_valid <- function(x, ...) UseMethod("sframe_is_valid")
 
 #' Get validation problems
@@ -478,6 +494,7 @@ sframe_is_valid <- function(x, ...) UseMethod("sframe_is_valid")
 #' v <- validate_sframe(sframe_demo("tourism_services")$instrument, strict = FALSE)
 #' sframe_problems(v)
 #' @export
+#' @family Inspect functions
 sframe_problems <- function(x, ...) UseMethod("sframe_problems")
 
 #' Recover the validated object
@@ -492,6 +509,7 @@ sframe_problems <- function(x, ...) UseMethod("sframe_problems")
 #' v <- validate_sframe(sframe_demo("tourism_services")$instrument, strict = FALSE)
 #' sframe_object(v)
 #' @export
+#' @family Inspect functions
 sframe_object <- function(x, ...) UseMethod("sframe_object")
 
 #' @noRd
@@ -530,6 +548,7 @@ sframe_object.sframe_validation <- function(x, ...) x$object
 #'
 #' validated <- as_sframe(validate_sframe(instr, strict = TRUE))
 #' isTRUE(sframe_meta(validated)$validated)
+#' @family Design functions
 as_sframe <- function(x, ...) UseMethod("as_sframe")
 
 #' @noRd
@@ -591,6 +610,7 @@ as_sframe.sframe_validation <- function(x, ...) {
 #' demo <- sframe_demo("tourism_services")
 #' qr <- sframe_quality_results(demo$responses, demo$instrument)
 #' head(sframe_flagged(qr))
+#' @family Inspect functions
 NULL
 
 #' Extract APA-formatted result summaries
@@ -610,6 +630,7 @@ NULL
 #' )
 #' sframe_apa(results)
 #' @export
+#' @family Inspect functions
 sframe_apa <- function(x, ...) UseMethod("sframe_apa")
 
 #' Get rows flagged by response-quality checks
@@ -626,6 +647,7 @@ sframe_apa <- function(x, ...) UseMethod("sframe_apa")
 #' qr <- sframe_quality_results(demo$responses, demo$instrument)
 #' sframe_flagged(qr)
 #' @export
+#' @family Inspect functions
 sframe_flagged <- function(x, ...) UseMethod("sframe_flagged")
 
 #' @noRd
@@ -674,6 +696,7 @@ sframe_apa.sframe_assumption_report <- sframe_report_apa
 #' demo <- sframe_demo("tourism_services")
 #' qr   <- sframe_quality_results(demo$responses, demo$instrument)
 #' sframe_missing_columns(qr)
+#' @family Inspect functions
 sframe_missing_columns <- function(x, ...) UseMethod("sframe_missing_columns")
 
 #' @noRd

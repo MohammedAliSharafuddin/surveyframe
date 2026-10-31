@@ -83,6 +83,7 @@ sframe_check_svg <- function() {
 #'   basename(paths)
 #' }
 #' }
+#' @family Report functions
 sframe_save_figures <- function(results, dir, width = 7, height = 4.5, dpi = 300,
                                 format = c("png", "tiff", "jpeg", "pdf", "svg")) {
   rlang::check_installed("ggplot2", reason = "to save charts as files.")

@@ -49,6 +49,7 @@
 #' # The same builder with a demo preloaded
 #' path <- launch_builder(demo = "two_group", open = FALSE)
 #' file.exists(path)
+#' @family Design functions
 launch_builder <- function(open = TRUE, demo = NULL) {
   builder_path <- if (is.null(demo)) {
     system.file("builder", "survey_builder.html", package = "surveyframe")

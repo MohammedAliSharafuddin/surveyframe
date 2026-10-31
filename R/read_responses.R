@@ -75,6 +75,7 @@
 #'   meta_cols = "started_at"
 #' )
 #' head(responses[, c("respondent_id", "visit_type", "dm_1")])
+#' @family Responses functions
 read_responses <- function(
     x,
     instrument,

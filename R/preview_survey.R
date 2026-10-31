@@ -32,6 +32,7 @@
 #' ins <- sframe_demo("first_survey")$instrument
 #' path <- preview_survey(ins, open = FALSE)
 #' file.exists(path)
+#' @family Preview functions
 preview_survey <- function(x, where = c("browser", "studio"),
                            open = interactive()) {
   where <- match.arg(where)

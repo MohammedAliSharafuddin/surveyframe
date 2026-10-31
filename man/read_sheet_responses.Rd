@@ -52,4 +52,12 @@ qr <- sframe_quality_results(responses, instr, respondent_id = "respondent_id")
 }
 \seealso{
 \code{\link[=export_google_sheet]{export_google_sheet()}}, \code{\link[=read_responses]{read_responses()}}, \code{\link[=sframe_quality_results]{sframe_quality_results()}}
+
+Other Responses functions:
+\code{\link[=export_responses]{export_responses()}},
+\code{\link[=read_responses]{read_responses()}},
+\code{\link[=sframe_missing_data_results]{sframe_missing_data_results()}},
+\code{\link[=sframe_outlier_results]{sframe_outlier_results()}},
+\code{\link[=sframe_quality_results]{sframe_quality_results()}}
 }
+\concept{Responses functions}

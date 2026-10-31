@@ -44,4 +44,10 @@ sframe_bootstrap_ci(mtcars$mpg, FUN = mean, conf.level = 0.90, seed = 42)
 }
 \seealso{
 \code{\link[=sframe_cohens_d_ci]{sframe_cohens_d_ci()}}, \code{\link[=sframe_cramers_v_ci]{sframe_cramers_v_ci()}}, \code{\link[=sframe_eta_sq_ci]{sframe_eta_sq_ci()}}
+
+Other Confidence interval functions:
+\code{\link[=sframe_cohens_d_ci]{sframe_cohens_d_ci()}},
+\code{\link[=sframe_cramers_v_ci]{sframe_cramers_v_ci()}},
+\code{\link[=sframe_eta_sq_ci]{sframe_eta_sq_ci()}}
 }
+\concept{Confidence interval functions}

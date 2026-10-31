@@ -83,6 +83,7 @@ sframe_choice_content_problems <- function(values, labels) {
 #'   labels  = c("Rarely", "Sometimes", "Often", "Always"),
 #'   ordered = TRUE
 #' )
+#' @family Design functions
 sframe_choice_set <- function(
     id,
     values,

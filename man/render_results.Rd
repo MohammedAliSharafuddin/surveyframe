@@ -69,4 +69,14 @@ file.exists(out)
 }
 \seealso{
 \code{\link[=run_analysis_plan]{run_analysis_plan()}}, \code{\link[=render_report]{render_report()}}
+
+Other Report functions:
+\code{\link[=render_report]{render_report()}},
+\code{\link[=sframe_analysis_qmd]{sframe_analysis_qmd()}},
+\code{\link[=sframe_codebook]{sframe_codebook()}},
+\code{\link[=sframe_format_result]{sframe_format_result()}},
+\code{\link{sframe_reports}},
+\code{\link[=sframe_result_supplement]{sframe_result_supplement()}},
+\code{\link[=sframe_save_figures]{sframe_save_figures()}}
 }
+\concept{Report functions}

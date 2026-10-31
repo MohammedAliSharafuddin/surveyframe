@@ -70,4 +70,10 @@ answer given to the previous instrument carries into the new one.
 }
 \seealso{
 \code{\link[=sframe_survey_ui]{sframe_survey_ui()}}, \code{\link[=run_survey]{run_survey()}}, \code{\link[=read_responses]{read_responses()}}
+
+Other Collect functions:
+\code{\link[=export_google_sheet]{export_google_sheet()}},
+\code{\link[=export_survey]{export_survey()}},
+\code{\link[=sframe_survey_ui]{sframe_survey_ui()}}
 }
+\concept{Collect functions}

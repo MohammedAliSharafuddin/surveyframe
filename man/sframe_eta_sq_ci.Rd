@@ -35,4 +35,10 @@ sframe_eta_sq_ci(mtcars$mpg, mtcars$cyl, seed = 42)
 }
 \seealso{
 \code{\link[=sframe_bootstrap_ci]{sframe_bootstrap_ci()}}
+
+Other Confidence interval functions:
+\code{\link[=sframe_bootstrap_ci]{sframe_bootstrap_ci()}},
+\code{\link[=sframe_cohens_d_ci]{sframe_cohens_d_ci()}},
+\code{\link[=sframe_cramers_v_ci]{sframe_cramers_v_ci()}}
 }
+\concept{Confidence interval functions}

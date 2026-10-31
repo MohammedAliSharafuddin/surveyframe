@@ -17,3 +17,27 @@ A single character string.
 \description{
 Format an sframe instrument object as a string
 }
+\seealso{
+Other print, format and summary methods:
+\code{\link[=format.sf_branch]{format.sf_branch()}},
+\code{\link[=format.sf_check]{format.sf_check()}},
+\code{\link[=format.sf_choices]{format.sf_choices()}},
+\code{\link[=format.sf_item]{format.sf_item()}},
+\code{\link[=format.sf_model]{format.sf_model()}},
+\code{\link[=format.sf_scale]{format.sf_scale()}},
+\code{\link[=print.sf_branch]{print.sf_branch()}},
+\code{\link[=print.sf_check]{print.sf_check()}},
+\code{\link[=print.sf_choices]{print.sf_choices()}},
+\code{\link[=print.sf_item]{print.sf_item()}},
+\code{\link[=print.sf_model]{print.sf_model()}},
+\code{\link[=print.sf_scale]{print.sf_scale()}},
+\code{\link[=print.sframe]{print.sframe()}},
+\code{\link[=summary.sf_branch]{summary.sf_branch()}},
+\code{\link[=summary.sf_check]{summary.sf_check()}},
+\code{\link[=summary.sf_choices]{summary.sf_choices()}},
+\code{\link[=summary.sf_item]{summary.sf_item()}},
+\code{\link[=summary.sf_model]{summary.sf_model()}},
+\code{\link[=summary.sf_scale]{summary.sf_scale()}},
+\code{\link[=summary.sframe]{summary.sframe()}}
+}
+\concept{print, format and summary methods}

@@ -48,6 +48,7 @@
 #' out$caption
 #' out$table
 #' }
+#' @family Report functions
 sframe_format_result <- function(result, data, instrument = NULL,
                           palette = c("web", "print"),
                           format = c("html", "png", "svg"),

@@ -40,3 +40,11 @@ instr <- sframe_add_references(instr, sframe_reference(
 ))
 length(sframe_get_references(instr))
 }
+\seealso{
+Other References functions:
+\code{\link[=read_bibtex]{read_bibtex()}},
+\code{\link[=sframe_bibliography]{sframe_bibliography()}},
+\code{\link[=sframe_get_references]{sframe_get_references()}},
+\code{\link[=sframe_reference]{sframe_reference()}}
+}
+\concept{References functions}

@@ -89,6 +89,7 @@ sframe_new_validation <- function(log, roster, subject, title = NULL,
 #' sframe_problems(v)
 #' as.data.frame(v)
 #' summary(v)
+#' @family Design functions
 NULL
 
 #' @noRd
@@ -151,6 +152,7 @@ summary.sframe_validation <- function(object, ...) {
 #'   `check` and `problem`.
 #' @seealso [sframe_validation], [sframe_problems()]
 #' @exportS3Method as.data.frame sframe_validation
+#' @family Inspect functions
 as.data.frame.sframe_validation <- function(x, row.names = NULL,
                                             optional = FALSE, ...) {
   data.frame(
