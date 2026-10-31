@@ -142,15 +142,6 @@ launch_studio <- function(
     )
   }
 
-  app_path <- system.file("shiny", package = "surveyframe")
-
-  if (!nzchar(app_path) || !file.exists(file.path(app_path, "app.R"))) {
-    rlang::abort(
-      "SurveyStudio app not found. Please reinstall surveyframe.",
-      class = "sframe_error"
-    )
-  }
-
   shiny::shinyOptions(
     surveyframe_instrument = instrument,
     surveyframe_responses = responses,
@@ -167,10 +158,30 @@ launch_studio <- function(
   )
 
   shiny::runApp(
-    appDir = app_path,
+    appDir = sframe_studio_app(),
     port = port,
     host = host,
     launch.browser = launch.browser,
     quiet = TRUE
   )
+}
+
+# Builds SurveyStudio from inst/shiny/app.R, sourced into an environment
+# whose parent is the package namespace, so the app calls internal helpers
+# directly (naming decision 6). The app reads its instrument, responses and
+# screen from the shiny options launch_studio() sets before calling this.
+sframe_studio_app <- function() {
+  app_path <- system.file("shiny", package = "surveyframe")
+  if (!nzchar(app_path) || !file.exists(file.path(app_path, "app.R"))) {
+    rlang::abort(
+      "SurveyStudio app not found. Please reinstall surveyframe.",
+      class = "sframe_error"
+    )
+  }
+  app_env <- new.env(parent = asNamespace("surveyframe"))
+  sys.source(file.path(app_path, "app.R"), envir = app_env)
+  # An app object, unlike a folder, does not serve www/ by itself.
+  www_dir <- file.path(app_path, "www")
+  if (dir.exists(www_dir)) shiny::addResourcePath("sfstudio", www_dir)
+  shiny::shinyApp(ui = app_env$ui, server = app_env$server)
 }

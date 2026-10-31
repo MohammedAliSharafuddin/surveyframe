@@ -36,16 +36,14 @@ updateCheckboxGroupInput <- shiny::updateCheckboxGroupInput
 updateSelectInput <- shiny::updateSelectInput
 updateTextAreaInput <- shiny::updateTextAreaInput
 updateTextInput <- shiny::updateTextInput
+selectizeInput <- shiny::selectizeInput
+updateSelectizeInput <- shiny::updateSelectizeInput
+plotOutput <- shiny::plotOutput
+reactiveVal <- shiny::reactiveVal
 
-builder_empty_state <- surveyframe::sframe_builder_empty_state
-builder_state_from_instrument <- surveyframe::sframe_builder_state_from_instrument
-builder_validate_draft <- surveyframe::sframe_builder_validate_draft
-sframe_branch <- surveyframe::sframe_branch
-sframe_attention_check <- surveyframe::sframe_attention_check
-sframe_choice_set <- surveyframe::sframe_choice_set
-sframe_item <- surveyframe::sframe_item
-sframe_scale <- surveyframe::sframe_scale
-write_sframe <- surveyframe::write_sframe
+builder_empty_state <- sframe_builder_empty_state
+builder_state_from_instrument <- sframe_builder_state_from_instrument
+builder_validate_draft <- sframe_builder_validate_draft
 
 status_badge <- function(ok, label_ok = "Ready", label_no = "Pending") {
   if (ok) {
@@ -920,16 +918,6 @@ studio_level_meta <- function(item = NULL, scale = NULL, ordered = FALSE) {
   list(level = "identifier", code = "ID", type = type)
 }
 
-# Whether a choice set declares its options ordered (sframe_choice_set(ordered =)).
-studio_choice_set_ordered <- function(instrument, set_id) {
-  set_id <- as.character(set_id %||% "")[1]
-  if (!nzchar(set_id)) return(FALSE)
-  for (cs in instrument$choices %||% list()) {
-    if (identical(as.character(cs$id)[1], set_id)) return(isTRUE(cs$ordered))
-  }
-  FALSE
-}
-
 studio_variable_catalog <- function(instrument) {
   if (is.null(instrument)) {
     return(list())
@@ -942,7 +930,7 @@ studio_variable_catalog <- function(instrument) {
   )
   item_rows <- lapply(question_items, function(item) {
     meta <- studio_level_meta(item = item,
-                              ordered = studio_choice_set_ordered(instrument, item$choice_set))
+                              ordered = sframe_choice_set_ordered(instrument, item$choice_set))
     scale_membership <- item$scale_id %||% ""
     if (!nzchar(scale_membership) && length(instrument$scales %||% list()) > 0) {
       hits <- vapply(instrument$scales, function(scale) item$id %in% (scale$items %||% character(0)), logical(1))
@@ -1152,7 +1140,7 @@ studio_parse_paths <- function(text) {
     if (length(parts) != 2 || any(!nzchar(parts))) {
       return(NULL)
     }
-    surveyframe::sframe_path(parts[1], parts[2])
+    sframe_path(parts[1], parts[2])
   }))
 }
 
@@ -1163,7 +1151,7 @@ studio_parse_covariances <- function(text) {
     if (length(parts) != 2 || any(!nzchar(parts))) {
       return(NULL)
     }
-    surveyframe::sframe_covariance(parts[1], parts[2])
+    sframe_covariance(parts[1], parts[2])
   }))
 }
 
@@ -1174,7 +1162,7 @@ studio_parse_indirect <- function(text) {
     if (length(parts) < 3 || any(!nzchar(parts))) {
       return(NULL)
     }
-    surveyframe::sframe_indirect_effect(parts[1], parts[2:(length(parts) - 1)], parts[length(parts)])
+    sframe_indirect_effect(parts[1], parts[2:(length(parts) - 1)], parts[length(parts)])
   }))
 }
 
@@ -1205,11 +1193,8 @@ if (identical(initial_tab, "auto")) {
     "open"
   }
 }
-# The same list as sframe_studio_screens() in R/launch_studio.R, written out:
-# this file runs through shiny::runApp() and sees exported functions alone.
-# launch_studio() has already checked the screen against that list.
-if (!initial_tab %in% c("open", "amendments", "references", "preview", "responses",
-                       "quality", "reliability", "analysis", "dashboard", "export")) {
+# launch_studio() has already checked the screen.
+if (!initial_tab %in% sframe_studio_screens()) {
   initial_tab <- if (inherits(INITIAL_INSTRUMENT, "sframe")) {
     "preview"
   } else {
@@ -1375,7 +1360,7 @@ ui <- fluidPage(
   tags$div(class = "studio-shell",
     tags$div(class = "studio-sidebar",
       tags$div(class = "studio-logo",
-        tags$img(src = "surveyframe-shiny-square-icon.png", alt = "surveyframe"),
+        tags$img(src = "sfstudio/surveyframe-shiny-square-icon.png", alt = "surveyframe"),
         "Survey", tags$span("Studio")
       ),
       tags$ul(class = "studio-nav",
@@ -1737,7 +1722,7 @@ server <- function(input, output, session) {
   if (!is.null(INITIAL_RESPONSES) && !is.data.frame(INITIAL_RESPONSES) &&
       !is.null(rv$instrument)) {
     tryCatch({
-      rv$responses <- surveyframe::read_responses(INITIAL_RESPONSES, rv$instrument)
+      rv$responses <- read_responses(INITIAL_RESPONSES, rv$instrument)
     }, error = function(e) NULL)
   }
 
@@ -1958,9 +1943,9 @@ server <- function(input, output, session) {
     # An edit applies the form's fields to the item already there, so reverse
     # coding, scale membership, the page and type settings survive it.
     item <- if (existing) {
-      surveyframe::sframe_builder_update_item(rv$builder$items[[match(item_id, ids)]], edits)
+      sframe_builder_update_item(rv$builder$items[[match(item_id, ids)]], edits)
     } else {
-      surveyframe::sframe_builder_as_item(edits)
+      sframe_builder_as_item(edits)
     }
     state <- rv$builder
     state$items <- upsert_component(state$items, item)
@@ -2133,7 +2118,7 @@ server <- function(input, output, session) {
     req(input$instr_file)
     tryCatch({
       path <- sframe_validate_upload(input$instr_file, "sframe")
-      loaded <- surveyframe::read_sframe(path)
+      loaded <- read_sframe(path)
       rv$builder <- builder_state_from_instrument(loaded)
       rv$instrument <- loaded
       rv$responses <- NULL
@@ -2203,7 +2188,7 @@ server <- function(input, output, session) {
     cited <- input$refs_cited_by
     if (!length(cited)) cited <- "instrument"
     tryCatch({
-      found <- surveyframe::read_bibtex(text = text, cited_by = cited)
+      found <- read_bibtex(text = text, cited_by = cited)
       if (!length(found)) stop("No BibTeX entry was found in that text.")
       current <- rv$builder$references %||% list()
       clash <- intersect(names(found), vapply(current, function(r) r$id, character(1)))
@@ -2239,7 +2224,7 @@ server <- function(input, output, session) {
     req(input$amend_revised_file)
     tryCatch({
       path <- sframe_validate_upload(input$amend_revised_file, "sframe")
-      amend_revised(surveyframe::read_sframe(path))
+      amend_revised(read_sframe(path))
     }, error = function(e) {
       amend_revised(NULL)
       showNotification(paste("Error:", conditionMessage(e)), type = "error")
@@ -2277,7 +2262,7 @@ server <- function(input, output, session) {
       return(invisible(NULL))
     }
     tryCatch({
-      amended <- surveyframe::amend_sframe(
+      amended <- amend_sframe(
         previous         = rv$instrument,
         instrument       = rev,
         reason_code      = input$amend_reason_code,
@@ -2302,7 +2287,7 @@ server <- function(input, output, session) {
 
   output$amendment_log_table <- shiny::renderTable({
     req(rv$instrument)
-    log <- surveyframe::sframe_get_amendments(rv$instrument)
+    log <- sframe_get_amendments(rv$instrument)
     if (nrow(log) == 0) {
       return(data.frame(Status = "No amendments disclosed yet."))
     }
@@ -2323,7 +2308,7 @@ server <- function(input, output, session) {
     time_col <- trim_or_null(input$resp_time_col)
     tryCatch({
       path <- sframe_validate_upload(input$resp_file, "csv")
-      rv$responses <- surveyframe::read_responses(
+      rv$responses <- read_responses(
         x = path,
         instrument = rv$instrument,
         respondent_id = id_col,
@@ -2351,7 +2336,7 @@ server <- function(input, output, session) {
       return(invisible(NULL))
     }
     tryCatch({
-      rv$responses <- surveyframe::read_sheet_responses(
+      rv$responses <- read_sheet_responses(
         sheet_id      = sheet,
         instrument    = rv$instrument,
         sheet_name    = trim_or_null(input$sheet_tab) %||% "Responses",
@@ -2368,7 +2353,7 @@ server <- function(input, output, session) {
 
   observeEvent(input$load_sample_btn, {
     tryCatch({
-      demo <- surveyframe::sframe_demo("input_types")
+      demo <- sframe_demo("input_types")
       rv$builder <- builder_state_from_instrument(demo$instrument)
       rv$instrument <- demo$instrument
       rv$responses <- demo$responses
@@ -2615,7 +2600,7 @@ server <- function(input, output, session) {
     ok <- tryCatch({
       # preview = TRUE strips the collector and the redirect, so the promise
       # below is enforced by the export instead of trusted.
-      suppressMessages(surveyframe::export_survey(
+      suppressMessages(export_survey(
         instr, output_path = tmp, open = FALSE, overwrite = TRUE,
         preview = TRUE
       ))
@@ -2681,7 +2666,7 @@ server <- function(input, output, session) {
     # the standard collector columns so sheet imports get completion times.
     sub_col <- if ("submitted_at" %in% names(rv$responses)) "submitted_at"
     st_col  <- if ("started_at" %in% names(rv$responses)) "started_at"
-    surveyframe::sframe_quality_results(rv$responses, rv$instrument,
+    sframe_quality_results(rv$responses, rv$instrument,
                                 respondent_id = id_col,
                                 submitted_at = sub_col,
                                 started_at = st_col)
@@ -2781,7 +2766,7 @@ server <- function(input, output, session) {
   reliability_result <- reactive({
     req(rv$instrument, rv$responses)
     tryCatch(
-      surveyframe::sframe_reliability_results(rv$responses, rv$instrument),
+      sframe_reliability_results(rv$responses, rv$instrument),
       error = function(e) NULL
     )
   })
@@ -2799,7 +2784,7 @@ server <- function(input, output, session) {
   output$studio_missing_chart <- shiny::renderPlot({
     req(rv$instrument, rv$responses)
     mr <- tryCatch(
-      surveyframe::sframe_missing_data_results(rv$responses, rv$instrument),
+      sframe_missing_data_results(rv$responses, rv$instrument),
       error = function(e) NULL
     )
     if (is.null(mr)) return()
@@ -2825,7 +2810,7 @@ server <- function(input, output, session) {
     }))
     names(scored) <- vapply(scs, `[[`, character(1), "id")
     gg <- tryCatch(
-      surveyframe::sframe_plot_correlation_matrix(scored, names(scored)),
+      sframe_plot_correlation_matrix(scored, names(scored)),
       error = function(e) NULL
     )
     if (!is.null(gg)) { print(gg); return() }
@@ -3406,7 +3391,7 @@ server <- function(input, output, session) {
       return(NULL)
     }
     tryCatch(
-      surveyframe::run_analysis_plan(
+      run_analysis_plan(
         rv$responses, rv$instrument,
         plots = requireNamespace("ggplot2", quietly = TRUE),
         plot_palette = input$rpt_palette %||% "web"
@@ -3568,7 +3553,7 @@ server <- function(input, output, session) {
       "reflective"
     }
     constructs <- lapply(scales, function(scale) {
-      surveyframe::sframe_construct(
+      sframe_construct(
         id = studio_safe_id(scale$id, prefix = "C"),
         label = scale$label %||% scale$id,
         items = scale$items %||% character(0),
@@ -3580,7 +3565,7 @@ server <- function(input, output, session) {
       showNotification("CB-SEM and PLS-SEM models require at least one structural path.", type = "error")
       return()
     }
-    model <- surveyframe::sframe_model_spec(
+    model <- sframe_model_spec(
       id = studio_safe_id(trim_or_null(input$model_id) %||% paste0("model_", length(rv$instrument$models %||% list()) + 1L), prefix = "model"),
       label = trim_or_null(input$model_label),
       type = type,
@@ -3597,7 +3582,7 @@ server <- function(input, output, session) {
       )
     )
     tryCatch({
-      surveyframe::sframe_validate_model(model, instrument = rv$instrument, strict = TRUE)
+      sframe_validate_model(model, instrument = rv$instrument, strict = TRUE)
       state <- rv$builder
       existing <- vapply(state$models %||% list(), function(x) x$id %||% "", character(1))
       idx <- match(model$id, existing)
@@ -3652,16 +3637,16 @@ server <- function(input, output, session) {
     cards <- lapply(models, function(model) {
       syntax <- tryCatch(
         switch(model$type %||% "",
-          cfa = surveyframe::sframe_syntax_cfa(instrument = rv$instrument, model = model),
-          cb_sem = surveyframe::sframe_syntax_sem(model, instrument = rv$instrument),
-          sem = surveyframe::sframe_syntax_sem(model, instrument = rv$instrument),
-          pls_sem = surveyframe::sframe_syntax_pls(model),
+          cfa = sframe_syntax_cfa(instrument = rv$instrument, model = model),
+          cb_sem = sframe_syntax_sem(model, instrument = rv$instrument),
+          sem = sframe_syntax_sem(model, instrument = rv$instrument),
+          pls_sem = sframe_syntax_pls(model),
           "Syntax preview is not available for this model type."
         ),
         error = function(e) paste("Syntax preview could not be generated:", conditionMessage(e))
       )
       json <- tryCatch(
-        surveyframe::sframe_model_json(model, pretty = TRUE),
+        sframe_model_json(model, pretty = TRUE),
         error = function(e) paste("Model JSON could not be generated:", conditionMessage(e))
       )
       tags$div(class = "card",
@@ -3970,7 +3955,7 @@ server <- function(input, output, session) {
         instrument$amendments <- list()
         attr(instrument, "sframe_origin") <- NULL
       }
-      surveyframe::write_sframe(instrument, tmp, overwrite = TRUE, new_instrument = as_new)
+      write_sframe(instrument, tmp, overwrite = TRUE, new_instrument = as_new)
       file.copy(tmp, file, overwrite = TRUE)
     }
   )
@@ -3997,7 +3982,7 @@ server <- function(input, output, session) {
     req(rv$instrument, rv$responses)
     tryCatch({
       dir <- tempfile("qmd-")
-      qmd_bundle$paths <- surveyframe::sframe_analysis_qmd(
+      qmd_bundle$paths <- sframe_analysis_qmd(
         rv$instrument, rv$responses, dir = dir, overwrite = TRUE)
       showNotification("Analysis notebook prepared. Download all 3 files below into the same folder.",
                        type = "message")
@@ -4132,7 +4117,7 @@ server <- function(input, output, session) {
     },
     content = function(file) {
       tryCatch({
-        surveyframe::render_report(
+        render_report(
           instrument = rv$instrument,
           data = rv$responses,
           output_file = file,
