@@ -808,6 +808,12 @@ style.
   have dropped its amendment log, and a save would have replaced Studio's
   instrument with one that has no history.
 
+* **Studio has a Collect screen.** It downloads the Google Sheets Apps
+  Script collector for a sheet you name, with the steps to deploy it, and
+  the survey file, sending to the collector URL you give. The last step
+  opens the Upload Responses screen, with that sheet ready to read. The
+  Export screen pointed to the SurveyBuilder for both files.
+
 * **A free-text question no longer becomes a Dashboard filter.** A text or
   textarea question with 12 or fewer distinct answers was offered as a
   filter, as `open_comment` in the `input_types` demo was.

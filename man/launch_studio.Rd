@@ -37,7 +37,7 @@ CSV path.}
 
 \item{screen}{The screen to open on. One of \code{"auto"}, which picks by what
 you supply, or a screen name: \code{"design"}, \code{"open"}, \code{"amendments"},
-\code{"references"}, \code{"preview"},
+\code{"references"}, \code{"preview"}, \code{"collect"},
 \code{"responses"}, \code{"quality"}, \code{"reliability"}, \code{"analysis"},
 \code{"dashboard"} or \code{"export"}. \code{"data"} is accepted for \code{"responses"}.}
 
@@ -58,9 +58,9 @@ Called for its side effect.
 \description{
 Opens the SurveyStudio Shiny application, the visual interface for working
 with an instrument. Its screens design an instrument in the SurveyBuilder,
-open one, record and read amendments, preview the survey, upload responses, review
-data quality, inspect reliability, work on the analysis plan, read the
-dashboard, and export.
+open one, record and read amendments, preview the survey, set up its
+collection, upload responses, review data quality, inspect reliability,
+work on the analysis plan, read the dashboard, and export.
 }
 \details{
 The Design screen holds the SurveyBuilder, and a save there becomes the
