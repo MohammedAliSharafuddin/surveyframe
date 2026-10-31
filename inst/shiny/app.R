@@ -1572,8 +1572,6 @@ ui <- fluidPage(
                     accept = ".sframe",
                     buttonLabel = "Browse .sframe file",
                     placeholder = "No file selected"),
-          tags$p(class = "hint",
-            "Design questions, welcome screen, logo, and thank-you page in the SurveyBuilder, then load the .sframe here to preview, analyse, and re-export."),
           uiOutput("open_status")
         ),
         uiOutput("instrument_summary_card")
@@ -1898,8 +1896,9 @@ server <- function(input, output, session) {
     instrument = INITIAL_INSTRUMENT,
     responses = INITIAL_RESPONSES,
     active_screen = initial_tab,
-    open_verification = if (is.null(INITIAL_INSTRUMENT)) NULL else
-      "Instrument supplied by R; no file was checked in this screen."
+    # Where the open instrument came from: "r", "file", "design", or the
+    # message of a failed check.
+    open_verification = if (is.null(INITIAL_INSTRUMENT)) NULL else "r"
   )
 
   set_builder_state <- function(state) {
@@ -2311,8 +2310,7 @@ server <- function(input, output, session) {
       rv$builder <- builder_state_from_instrument(loaded)
       rv$instrument <- loaded
       rv$responses <- NULL
-      rv$open_verification <-
-        "Integrity verified: content matches the SHA-256 digest stored in this file."
+      rv$open_verification <- "file"
       sync_builder_inputs(rv$builder)
       showNotification("Instrument loaded. Showing the survey preview.", type = "message")
       switch_tab("preview")
@@ -2358,9 +2356,7 @@ server <- function(input, output, session) {
         rv$responses <- NULL
         showNotification(cleared, type = "warning", duration = 12)
       }
-      rv$open_verification <- paste(
-        "Saved from the Design screen. Integrity verified: content matches",
-        "the SHA-256 digest the builder stored.")
+      rv$open_verification <- "design"
       sync_builder_inputs(rv$builder)
       session$sendCustomMessage("surveyframe-design-saved",
         list(ok = TRUE, message = "Saved to Studio as the open instrument."))
@@ -2707,7 +2703,7 @@ server <- function(input, output, session) {
           tags$div(class = "stat-lbl", "Scales")),
         tags$div(class = "stat-box",
           tags$div(class = "stat-val", length(rv$builder$analysis_plan %||% list())),
-          tags$div(class = "stat-lbl", "Plans")),
+          tags$div(class = "stat-lbl", "Research questions")),
         tags$div(class = "stat-box",
           tags$div(class = "stat-val", length(rv$builder$models %||% list())),
           tags$div(class = "stat-lbl", "Models")),
@@ -2824,16 +2820,13 @@ server <- function(input, output, session) {
     message <- rv$open_verification
     if (is.null(message)) {
       status_badge(FALSE, "Integrity verified", "No file checked")
-    } else if (startsWith(message, "Integrity verified")) {
-      tags$div(
-        status_badge(TRUE, "Integrity verified", "No file checked"),
-        tags$p(class = "hint", message)
-      )
-    } else if (startsWith(message, "Instrument supplied by R")) {
-      tags$div(
-        status_badge(FALSE, "Integrity verified", "Not file-checked"),
-        tags$p(class = "hint", message)
-      )
+    } else if (identical(message, "file")) {
+      tags$span(class = "badge badge-ok", "File checked: hash verified")
+    } else if (identical(message, "design")) {
+      # A Design save is read and its hash checked as an opened file is.
+      tags$span(class = "badge badge-ok", "Saved from Design: hash verified")
+    } else if (identical(message, "r")) {
+      tags$span(class = "badge badge-wait", "Loaded from R")
     } else {
       tags$div(
         tags$span(class = "badge badge-warn", "Not verified"),
@@ -2856,7 +2849,7 @@ server <- function(input, output, session) {
           tags$div(class = "stat-lbl", "Scales")),
         tags$div(class = "stat-box",
           tags$div(class = "stat-val", length(instr$analysis_plan %||% list())),
-          tags$div(class = "stat-lbl", "Plans")),
+          tags$div(class = "stat-lbl", "Research questions")),
         tags$div(class = "stat-box",
           tags$div(class = "stat-val", length(instr$models %||% list())),
           tags$div(class = "stat-lbl", "Models")),
@@ -3298,7 +3291,7 @@ server <- function(input, output, session) {
         tags$div(class = "stat-row",
           tags$div(class = "stat-box",
             tags$div(class = "stat-val", length(rv$instrument$analysis_plan %||% list())),
-            tags$div(class = "stat-lbl", "Plans")),
+            tags$div(class = "stat-lbl", "Research questions")),
           tags$div(class = "stat-box",
             tags$div(class = "stat-val", length(rv$instrument$models %||% list())),
             tags$div(class = "stat-lbl", "Models"))
