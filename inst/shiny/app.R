@@ -1384,6 +1384,9 @@ ui <- fluidPage(
           tags$a(href = "#", `data-tab` = "preview",
                  class = tab_link_class("preview"), "Preview Survey")),
         tags$li(class = "studio-nav-item",
+          tags$a(href = "#", `data-tab` = "collect",
+                 class = tab_link_class("collect"), "Collect")),
+        tags$li(class = "studio-nav-item",
           tags$a(href = "#", `data-tab` = "responses",
                  class = tab_link_class("responses"), "Upload Responses")),
         tags$li(class = "studio-nav-item",
@@ -1412,7 +1415,7 @@ ui <- fluidPage(
         // opened screen's outputs draw at once.
         function studioShowScreen(link, tab) {
           $('.studio-nav-item a').removeClass('active');
-          link.addClass('active');
+          $('.studio-nav-item a[data-tab=\"' + tab + '\"]').addClass('active');
           $('.screen.active').not('#screen-' + tab)
             .removeClass('active').trigger('hidden');
           $('#screen-' + tab).addClass('active').trigger('shown');
@@ -1626,6 +1629,44 @@ ui <- fluidPage(
         tags$div(id = "survey_preview_frame", uiOutput("survey_preview_items"))
       ),
 
+      # Collect (0.4.3): the Google Sheets collector, the survey file to
+      # deploy, and the way on to reading the responses.
+      tags$div(id = "screen-collect", class = screen_class("collect"),
+        tags$h2(class = "screen-title", "Collect"),
+        uiOutput("collect_gate"),
+        tags$div(class = "card",
+          tags$div(class = "card-title", "1. The Google Sheet and its collector"),
+          tags$p(class = "hint",
+            "Responses go to a Google Sheet you own, through an Apps Script collector bound to it. Keep the sheet private. The collector writes with your access, so the sheet needs no sharing."),
+          textInput("collect_sheet_url", "Google Sheet URL", width = "100%",
+                    placeholder = "https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID"),
+          downloadButton("collect_gs_dl", "Download Apps Script (.gs)", class = "btn-outline"),
+          tags$ol(
+            tags$li("Create a Google Sheet, paste its URL above, and download the Apps Script."),
+            tags$li("In the sheet, open Extensions, then Apps Script. Paste the whole file, replacing any code there."),
+            tags$li("In the editor, open Services and add the Google Sheets API, with the identifier Sheets."),
+            tags$li("Click Deploy, then New deployment, and pick Web app."),
+            tags$li("Set Who has access to Anyone. This lets the survey submit to the web app. It gives no one access to the sheet."),
+            tags$li("Copy the Web app URL into step 2.")
+          )
+        ),
+        tags$div(class = "card",
+          tags$div(class = "card-title", "2. The survey file"),
+          tags$p(class = "hint",
+            "One HTML file holds the whole survey. Put it on any web host, such as GitHub Pages or Netlify, or send the file itself. With a collector URL, each submission goes to your sheet. Without one, the survey runs but stores nothing."),
+          textInput("collect_endpoint", "Collector web app URL", width = "100%",
+                    placeholder = "https://script.google.com/macros/s/.../exec"),
+          downloadButton("collect_survey_dl", "Download survey (.html)", class = "btn-primary")
+        ),
+        tags$div(class = "card",
+          tags$div(class = "card-title", "3. Read the responses"),
+          tags$p(class = "hint",
+            "As responses arrive, read them from the sheet on the Upload Responses screen, which takes the sheet URL from step 1."),
+          tags$a(href = "#", `data-tab` = "responses", class = "btn btn-outline",
+                 "Read from Google Sheet")
+        )
+      ),
+
       tags$div(id = "screen-responses", class = screen_class("responses"),
         tags$h2(class = "screen-title", "Upload Responses"),
         uiOutput("responses_gate"),
@@ -1761,7 +1802,7 @@ ui <- fluidPage(
           tags$p(class = "hint",
             "Generates a self-contained HTML report. Quarto is optional; an internal HTML fallback is available."),
           tags$p(class = "hint",
-            "To export the deployable survey HTML or the Google Sheets collector, use the SurveyBuilder, which owns survey design and deployment.")
+            "The survey file and the Google Sheets collector are on the Collect screen.")
         ),
         tags$div(class = "card",
           tags$div(class = "card-title", "Analysis notebook"),
@@ -2263,6 +2304,57 @@ server <- function(input, output, session) {
         "your changes the open instrument."))
     }
   })
+
+  # -- Collect ----------------------------------------------------------------
+  output$collect_gate <- renderUI({
+    if (is.null(rv$instrument)) {
+      tags$div(class = "card", paste(
+        "Design an instrument on the Design screen, or open one on the Open",
+        "Instrument screen, to collect responses for it."))
+    }
+  })
+
+  # The collector URL an instrument already carries fills step 2.
+  observeEvent(rv$instrument, {
+    updateTextInput(session, "collect_endpoint",
+                    value = rv$instrument$render$google_sheets_endpoint %||% "")
+  })
+
+  # The sheet given in step 1 is the one the Upload Responses screen reads.
+  observeEvent(input$collect_sheet_url, {
+    if (nzchar(trimws(input$collect_sheet_url))) {
+      updateTextInput(session, "sheet_url", value = trimws(input$collect_sheet_url))
+    }
+  }, ignoreInit = TRUE)
+
+  collect_file_stem <- function() {
+    gsub("[^a-zA-Z0-9]", "_", rv$instrument$meta$title %||% "survey")
+  }
+
+  output$collect_survey_dl <- downloadHandler(
+    filename = function() paste0(collect_file_stem(), ".html"),
+    content = function(file) {
+      req(rv$instrument)
+      endpoint <- trimws(input$collect_endpoint %||% "")
+      tmp <- tempfile(fileext = ".html")
+      export_survey(rv$instrument, output_path = tmp, open = FALSE,
+                    endpoint_url = if (nzchar(endpoint)) endpoint else NULL,
+                    overwrite = TRUE)
+      file.copy(tmp, file, overwrite = TRUE)
+    }
+  )
+
+  output$collect_gs_dl <- downloadHandler(
+    filename = function() paste0(collect_file_stem(), "_collector.gs"),
+    content = function(file) {
+      req(rv$instrument)
+      dir <- tempfile("collector")
+      dir.create(dir)
+      path <- export_google_sheet(rv$instrument, trimws(input$collect_sheet_url %||% ""),
+                                  output_dir = dir)
+      file.copy(path, file, overwrite = TRUE)
+    }
+  )
 
   # -- References -------------------------------------------------------------
   # Edits rv$builder$references, which the draft sync composes into the open

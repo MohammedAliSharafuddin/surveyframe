@@ -3,7 +3,7 @@
 # The screens SurveyStudio has, in navigation order, matching the tabs in
 # inst/shiny/app.R.
 sframe_studio_screens <- function() {
-  c("design", "open", "amendments", "references", "preview", "responses", "quality",
+  c("design", "open", "amendments", "references", "preview", "collect", "responses", "quality",
     "reliability", "analysis", "dashboard", "export")
 }
 
@@ -31,9 +31,9 @@ sframe_studio_screen <- function(screen) {
 #'
 #' Opens the SurveyStudio Shiny application, the visual interface for working
 #' with an instrument. Its screens design an instrument in the SurveyBuilder,
-#' open one, record and read amendments, preview the survey, upload responses, review
-#' data quality, inspect reliability, work on the analysis plan, read the
-#' dashboard, and export.
+#' open one, record and read amendments, preview the survey, set up its
+#' collection, upload responses, review data quality, inspect reliability,
+#' work on the analysis plan, read the dashboard, and export.
 #'
 #' The Design screen holds the SurveyBuilder, and a save there becomes the
 #' instrument Studio has open. [launch_builder()] opens the builder on its own.
@@ -50,7 +50,7 @@ sframe_studio_screen <- function(screen) {
 #'   CSV path.
 #' @param screen The screen to open on. One of `"auto"`, which picks by what
 #'   you supply, or a screen name: `"design"`, `"open"`, `"amendments"`,
-#'   `"references"`, `"preview"`,
+#'   `"references"`, `"preview"`, `"collect"`,
 #'   `"responses"`, `"quality"`, `"reliability"`, `"analysis"`,
 #'   `"dashboard"` or `"export"`. `"data"` is accepted for `"responses"`.
 #' @param port TCP port for the Shiny server.
