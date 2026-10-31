@@ -29,6 +29,18 @@ test_that("a removed item or a renamed choice code is named in the message", {
   msg <- sframe_studio_response_change(old, new)
   expect_match(msg, paste0("choice 3 of ", old$items[[1]]$id, " was renamed 9"), fixed = TRUE)
 
+  # A code only added, or only removed, with no rename paired with it.
+  new <- old
+  new$choices[[1]]$values <- c(new$choices[[1]]$values, 6L)
+  new$choices[[1]]$labels <- c(new$choices[[1]]$labels, "Extra")
+  msg <- sframe_studio_response_change(old, new)
+  expect_match(msg, paste0("choice 6 of ", old$items[[1]]$id, " was added"), fixed = TRUE)
+  new <- old
+  new$choices[[1]]$values <- new$choices[[1]]$values[-5]
+  new$choices[[1]]$labels <- new$choices[[1]]$labels[-5]
+  msg <- sframe_studio_response_change(old, new)
+  expect_match(msg, paste0("choice 5 of ", old$items[[1]]$id, " was removed"), fixed = TRUE)
+
   new <- old
   new$items[[length(new$items) + 1]] <- sframe_item("extra_q", "Added in Design", type = "text")
   expect_match(sframe_studio_response_change(old, new), "item extra_q was added", fixed = TRUE)
