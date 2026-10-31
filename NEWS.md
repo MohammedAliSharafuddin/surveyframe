@@ -55,6 +55,13 @@ can be written again, and every plan result can be serialised by a host.
   verifies, and an amendment log recorded with `[]` still matches its
   content, so such a file takes further amendments as before.
 
+## One prefix for every function, and the old names still work
+
+* **Old names keep working, silently.** Set
+  `options(surveyframe.warn_superseded = TRUE)` to get 1 warning per old name
+  per session, naming its replacement, so a script or a host can find every
+  old call before the old names start warning by default.
+
 ## References, cited where they are used and listed once at the end
 
 An instrument can now carry the works it draws on, and every report lists
