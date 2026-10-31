@@ -814,6 +814,16 @@ style.
   opens the Upload Responses screen, with that sheet ready to read. The
   Export screen pointed to the SurveyBuilder for both files.
 
+* **The Export screen takes the report options, and is shorter.** It sets
+  the report's title, authors, format (HTML or PDF), whether each result
+  shows its R code, figure size, resolution and format, a citation style,
+  and further references as BibTeX, as `render_report()` takes them. A line
+  says whether Quarto or the built-in engine will write the report, and
+  what the built-in one cannot do. Each research question folds to its
+  heading and question, so the screen for the `input_types` demo is 5,302
+  px tall in place of 43,730. The analysis notebook downloads as 1 zip in
+  place of 3 files.
+
 * **A free-text question no longer becomes a Dashboard filter.** A text or
   textarea question with 12 or fewer distinct answers was offered as a
   filter, as `open_comment` in the `input_types` demo was.
