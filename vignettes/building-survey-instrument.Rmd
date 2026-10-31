@@ -291,5 +291,5 @@ saves a `.sframe` file for use in R.
 
 ```{r gui, eval = FALSE}
 launch_builder()
-launch_builder_demo(open = FALSE)
+launch_builder(demo = "input_types", open = FALSE)
 ```

@@ -77,6 +77,7 @@
 \alias{sframe_demos}
 \alias{sframe_demo_data}
 \alias{sframe_input_types_demo_data}
+\alias{launch_builder_demo}
 \alias{sf_plan<-}
 \title{Superseded function names}
 \usage{
@@ -230,6 +231,8 @@ sframe_demo_data()
 
 sframe_input_types_demo_data()
 
+launch_builder_demo(open = TRUE)
+
 sf_plan(x) <- value
 }
 \arguments{
@@ -329,6 +332,7 @@ warning per old name per session, naming its replacement.
    \code{sframe_demos()} \tab \code{\link[=sframe_list_demos]{sframe_list_demos()}} \cr
    \code{sframe_demo_data()} \tab \code{\link[=sframe_demo]{sframe_demo()}} with \code{"tourism_services"} \cr
    \code{sframe_input_types_demo_data()} \tab \code{\link[=sframe_demo]{sframe_demo()}} with \code{"input_types"} \cr
+   \code{launch_builder_demo()} \tab \code{\link[=launch_builder]{launch_builder()}} with \code{demo = "input_types"} \cr
    \code{sf_plan(x) <- value} \tab \link[=sframe_plan]{sframe_plan<-} \cr
 }
 }

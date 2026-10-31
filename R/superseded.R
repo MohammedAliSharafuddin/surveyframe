@@ -87,6 +87,7 @@
 #' | `sframe_demos()` | [sframe_list_demos()] |
 #' | `sframe_demo_data()` | [sframe_demo()] with `"tourism_services"` |
 #' | `sframe_input_types_demo_data()` | [sframe_demo()] with `"input_types"` |
+#' | `launch_builder_demo()` | [launch_builder()] with `demo = "input_types"` |
 #' | `sf_plan(x) <- value` | [sframe_plan<-][sframe_plan] |
 #'
 #' @param ... Passed to the new function.
@@ -625,6 +626,16 @@ sframe_demo_data <- function() {
 sframe_input_types_demo_data <- function() {
   sframe_superseded("sframe_input_types_demo_data()", "sframe_demo(\"input_types\")")
   sframe_demo("input_types")
+}
+
+#' @rdname superseded
+#' @export
+launch_builder_demo <- function(open = TRUE) {
+  sframe_superseded("launch_builder_demo()", "launch_builder(demo = \"input_types\")")
+  path <- launch_builder(open = open, demo = "input_types")
+  demo <- sframe_demo("input_types")
+  invisible(list(builder_path = path, demo_file = demo$instrument_path,
+                 responses_path = demo$responses_path))
 }
 
 #' @rdname superseded

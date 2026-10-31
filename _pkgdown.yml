@@ -130,7 +130,6 @@ reference:
       Start visually in the HTML SurveyBuilder or construct instruments in R.
     contents:
       - launch_builder
-      - launch_builder_demo
       - launch_studio_demo
       - launch_dashboard_demo
 

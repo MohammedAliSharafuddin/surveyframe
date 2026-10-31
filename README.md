@@ -324,7 +324,7 @@ and renders the report on its Export screen. `launch_dashboard()` is a read-only
 response explorer. Demo launchers are available for training:
 
 ```r
-launch_builder_demo(open = FALSE)
+launch_builder(demo = "input_types", open = FALSE)
 # launch_studio_demo()
 # launch_dashboard_demo()
 ```

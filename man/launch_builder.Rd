@@ -4,16 +4,22 @@
 \alias{launch_builder}
 \title{Launch the surveyframe visual survey builder}
 \usage{
-launch_builder(open = TRUE)
+launch_builder(open = TRUE, demo = NULL)
 }
 \arguments{
 \item{open}{Logical. When \code{TRUE} (the default), the builder HTML file is
 opened in the system's default web browser with \code{\link[utils:browseURL]{utils::browseURL()}}.
 Set to \code{FALSE} to return the file path without opening it, which is
 useful for automated testing.}
+
+\item{demo}{Optional. A demo name from \code{\link[=sframe_list_demos]{sframe_list_demos()}}. The builder
+then opens from a temporary copy with that demo's questions, scales and
+analysis plan already loaded. \code{"input_types"} shows every input type
+the builder supports.}
 }
 \value{
-The path to the bundled builder HTML file, invisibly.
+The path to the builder HTML file, invisibly: the bundled file, or
+the temporary copy when \code{demo} is given.
 }
 \description{
 Opens the SurveyBuilder, a self-contained HTML application for visual survey
@@ -45,6 +51,10 @@ origins. Saved \code{.sframe} files can be loaded and validated with
 \examples{
 # Retrieve the builder path for inspection without opening the browser
 path <- launch_builder(open = FALSE)
+file.exists(path)
+
+# The same builder with a demo preloaded
+path <- launch_builder(demo = "two_group", open = FALSE)
 file.exists(path)
 }
 \seealso{

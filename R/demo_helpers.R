@@ -1,26 +1,10 @@
 # demo_helpers.R
 
-#' Launch SurveyBuilder with the bundled input-types demo preloaded
-#'
-#' Opens a temporary copy of the SurveyBuilder with the bundled input-types
-#' instrument already injected into the JavaScript state. The demo questions,
-#' scales, and analysis plan are visible immediately, with no manual
-#' file-load step required.
-#'
-#' @param open Logical. When `TRUE` (the default), the pre-populated builder
-#'   HTML is opened in the system's default web browser.
-#'
-#' @return Invisibly returns a list with `builder_path`, `demo_file`, and
-#'   `responses_path`.
-#' @export
-#' @examples
-#' demo <- sframe_demo("input_types")
-#' nrow(demo$responses)
-#' \dontrun{
-#' launch_builder_demo()
-#' }
-launch_builder_demo <- function(open = TRUE) {
-  demo <- sframe_demo("input_types")
+# Writes a temporary copy of the SurveyBuilder with a demo instrument injected
+# into its JavaScript state, so the questions, scales and analysis plan show
+# at once, and returns its path. Used by launch_builder(demo =).
+sframe_builder_demo_html <- function(name) {
+  demo <- sframe_demo(name)
 
   # Build a plain-list serialisation payload (strips R S3 classes)
   payload <- sframe_serialization_payload(demo$instrument)
@@ -112,18 +96,9 @@ launch_builder_demo <- function(open = TRUE) {
   # Write to a per-session temp file
   demo_dir <- file.path(tempdir(), "surveyframe-builder-demo")
   dir.create(demo_dir, recursive = TRUE, showWarnings = FALSE)
-  demo_builder_path <- file.path(demo_dir, "survey_builder_demo.html")
+  demo_builder_path <- file.path(demo_dir, paste0("survey_builder_", name, ".html"))
   writeLines(builder_html, demo_builder_path, useBytes = FALSE)
-
-  if (isTRUE(open)) {
-    utils::browseURL(paste0("file://", normalizePath(demo_builder_path)))
-  }
-
-  invisible(list(
-    builder_path   = demo_builder_path,
-    demo_file      = demo$instrument_path,
-    responses_path = demo$responses_path
-  ))
+  demo_builder_path
 }
 
 #' Launch SurveyStudio with the bundled input-types demo
