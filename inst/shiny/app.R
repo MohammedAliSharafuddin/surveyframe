@@ -1412,10 +1412,23 @@ ui <- fluidPage(
           Shiny.setInputValue('current_tab', tab, {priority: 'event'});
         }
 
+        // A screen the researcher picks wins over the launch screen, which
+        // the server sends after the first flush and can arrive late.
+        var studioPicked = false;
+        function studioLaunchScreen(tab) {
+          if (studioPicked) return;
+          var link = $('[data-tab=\"' + tab + '\"]');
+          if (link.length === 0) return;
+          studioShowScreen(link, tab);
+        }
+
         $(document).on('click', '[data-tab]', function(e) {
           e.preventDefault();
+          studioPicked = true;
           studioShowScreen($(this), $(this).data('tab'));
         });
+
+        Shiny.addCustomMessageHandler('surveyframe-launch-tab', studioLaunchScreen);
 
         Shiny.addCustomMessageHandler('surveyframe-switch-tab', function(tab) {
           var link = $('[data-tab=\"' + tab + '\"]');
@@ -1846,7 +1859,8 @@ server <- function(input, output, session) {
   })
 
   session$onFlushed(function() {
-    switch_tab(shiny::isolate(rv$active_screen %||% initial_tab))
+    session$sendCustomMessage("surveyframe-launch-tab",
+                              shiny::isolate(rv$active_screen %||% initial_tab))
   }, once = TRUE)
 
   observeEvent(input$new_survey_btn, {
