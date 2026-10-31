@@ -78,6 +78,7 @@
 \alias{sframe_demo_data}
 \alias{sframe_input_types_demo_data}
 \alias{launch_builder_demo}
+\alias{launch_studio_demo}
 \alias{sf_plan<-}
 \title{Superseded function names}
 \usage{
@@ -233,12 +234,23 @@ sframe_input_types_demo_data()
 
 launch_builder_demo(open = TRUE)
 
+launch_studio_demo(
+  screen = "preview",
+  port = NULL,
+  host = "127.0.0.1",
+  launch.browser = TRUE
+)
+
 sf_plan(x) <- value
 }
 \arguments{
 \item{...}{Passed to the new function.}
 
 \item{instrument, scales, std_lv}{Passed to \code{\link[=sframe_syntax_cfa]{sframe_syntax_cfa()}}.}
+
+\item{open}{Passed to \code{\link[=launch_builder]{launch_builder()}}.}
+
+\item{screen, port, host, launch.browser}{Passed to \code{\link[=launch_studio]{launch_studio()}}.}
 
 \item{x}{An instrument.}
 
@@ -333,6 +345,7 @@ warning per old name per session, naming its replacement.
    \code{sframe_demo_data()} \tab \code{\link[=sframe_demo]{sframe_demo()}} with \code{"tourism_services"} \cr
    \code{sframe_input_types_demo_data()} \tab \code{\link[=sframe_demo]{sframe_demo()}} with \code{"input_types"} \cr
    \code{launch_builder_demo()} \tab \code{\link[=launch_builder]{launch_builder()}} with \code{demo = "input_types"} \cr
+   \code{launch_studio_demo()} \tab \code{\link[=launch_studio]{launch_studio()}} with \code{demo = "input_types"} \cr
    \code{sf_plan(x) <- value} \tab \link[=sframe_plan]{sframe_plan<-} \cr
 }
 }

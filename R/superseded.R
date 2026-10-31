@@ -88,9 +88,12 @@
 #' | `sframe_demo_data()` | [sframe_demo()] with `"tourism_services"` |
 #' | `sframe_input_types_demo_data()` | [sframe_demo()] with `"input_types"` |
 #' | `launch_builder_demo()` | [launch_builder()] with `demo = "input_types"` |
+#' | `launch_studio_demo()` | [launch_studio()] with `demo = "input_types"` |
 #' | `sf_plan(x) <- value` | [sframe_plan<-][sframe_plan] |
 #'
 #' @param ... Passed to the new function.
+#' @param open Passed to [launch_builder()].
+#' @param screen,port,host,launch.browser Passed to [launch_studio()].
 #' @param instrument,scales,std_lv Passed to [sframe_syntax_cfa()].
 #' @param x An instrument.
 #' @param value The analysis plan, as for [sframe_plan()].
@@ -636,6 +639,14 @@ launch_builder_demo <- function(open = TRUE) {
   demo <- sframe_demo("input_types")
   invisible(list(builder_path = path, demo_file = demo$instrument_path,
                  responses_path = demo$responses_path))
+}
+
+#' @rdname superseded
+#' @export
+launch_studio_demo <- function(screen = "preview", port = NULL, host = "127.0.0.1", launch.browser = TRUE) {
+  sframe_superseded("launch_studio_demo()", "launch_studio(demo = \"input_types\")")
+  launch_studio(demo = "input_types", screen = screen, port = port,
+                host = host, launch.browser = launch.browser)
 }
 
 #' @rdname superseded

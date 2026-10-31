@@ -101,45 +101,6 @@ sframe_builder_demo_html <- function(name) {
   demo_builder_path
 }
 
-#' Launch SurveyStudio with the bundled input-types demo
-#'
-#' Opens SurveyStudio with the bundled input-types questionnaire and simulated
-#' response data already loaded. The browser is opened automatically by
-#' default.
-#'
-#' @param screen Initial studio screen. Defaults to `"preview"` so the demo
-#'   content is immediately visible.
-#' @param port TCP port for the Shiny server.
-#' @param host Host address for the Shiny server.
-#' @param launch.browser Whether to open the browser automatically. Defaults
-#'   to `TRUE` for this demo helper.
-#'
-#' @return Called for its side effect.
-#' @export
-#' @examples
-#' demo <- sframe_demo("input_types")
-#' nrow(demo$responses)
-#' \dontrun{
-#' launch_studio_demo()
-#' }
-launch_studio_demo <- function(
-    screen = "preview",
-    port = NULL,
-    host = "127.0.0.1",
-    launch.browser = TRUE
-) {
-  demo <- sframe_demo("input_types")
-
-  launch_studio(
-    instrument     = demo$instrument,
-    responses      = demo$responses,
-    screen         = screen,
-    port           = port,
-    host           = host,
-    launch.browser = launch.browser
-  )
-}
-
 #' Launch the response dashboard with the bundled input-types demo
 #'
 #' Opens the dashboard with the bundled input-types questionnaire and 120

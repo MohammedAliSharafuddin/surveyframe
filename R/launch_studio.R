@@ -56,6 +56,10 @@ sframe_studio_screen <- function(screen) {
 #' @param port TCP port for the Shiny server.
 #' @param host Host address passed to [shiny::runApp()].
 #' @param launch.browser Whether to open the browser automatically.
+#' @param demo Optional. A demo name from [sframe_list_demos()]. Studio then
+#'   opens with that demo's instrument and responses loaded, in place of
+#'   `instrument` and `responses`, which must be left out.
+#'   `"input_types"` uses every input type Studio supports.
 #'
 #' @return Called for its side effect.
 #' @export
@@ -65,6 +69,9 @@ sframe_studio_screen <- function(screen) {
 #' @examples
 #' \dontrun{
 #' launch_studio()
+#'
+#' # A demo, opened on the preview screen
+#' launch_studio(demo = "two_group", screen = "preview")
 #'
 #' demo <- sframe_demo("tourism_services")
 #' launch_studio(instrument = demo$instrument, launch.browser = FALSE)
@@ -86,11 +93,24 @@ launch_studio <- function(
     screen = "auto",
     port = NULL,
     host = "127.0.0.1",
-    launch.browser = interactive()
+    launch.browser = interactive(),
+    demo = NULL
 ) {
   sframe_require_shiny("to launch SurveyStudio")
 
   screen <- sframe_studio_screen(screen)
+
+  if (!is.null(demo)) {
+    if (!is.null(instrument) || !is.null(responses)) {
+      rlang::abort(
+        paste0("Supply `demo` or `instrument` and `responses`, not both. ",
+               "`demo` loads its own instrument and responses."),
+        class = "sframe_error")
+    }
+    d <- sframe_demo(demo)
+    instrument <- d$instrument
+    responses <- d$responses
+  }
 
   if (!is.null(instrument)) {
     sframe_check_instrument(instrument)

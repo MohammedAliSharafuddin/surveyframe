@@ -164,6 +164,10 @@ can be written again, and every plan result can be serialised by a host.
   demo. `launch_builder()` now always returns the path of the page it opens,
   and the old name still returns its list.
 
+* **`launch_studio(demo =)` opens SurveyStudio with any demo loaded.** It
+  replaces `launch_studio_demo()`, which loaded only the input-types demo.
+  `demo` cannot be combined with `instrument` or `responses`.
+
 ## References, cited where they are used and listed once at the end
 
 An instrument can now carry the works it draws on, and every report lists

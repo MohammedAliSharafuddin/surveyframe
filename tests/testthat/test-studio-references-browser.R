@@ -25,7 +25,7 @@ test_that("the References screen adds and removes a reference", {
   port <- httpuv::randomPort()
   proc <- callr::r_bg(function(port) {
     library(surveyframe)
-    launch_studio_demo(screen = "references", port = port, launch.browser = FALSE)
+    launch_studio(demo = "input_types", screen = "references", port = port, launch.browser = FALSE)
   }, args = list(port), libpath = libpath)
   on.exit(proc$kill(), add = TRUE)
   url <- paste0("http://127.0.0.1:", port)
