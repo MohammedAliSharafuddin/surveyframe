@@ -71,3 +71,48 @@ test_that("Studio no longer keeps every screen's outputs alive", {
   # round trip to make Shiny check visibility again.
   expect_match(src, "addClass('active').trigger('shown')", fixed = TRUE)
 })
+
+test_that("the launch screen does not override a screen picked before it", {
+  skip_on_cran()
+  skip_if_not_slow()
+  skip_if_not_installed("shiny")
+  skip_if_not_installed("chromote")
+  skip_if_not_installed("callr")
+  chrome <- tryCatch(chromote::find_chrome(), error = function(e) NULL)
+  skip_if(length(chrome) != 1L || is.na(chrome) || !nzchar(chrome), "Chrome not found")
+
+  libpath <- sframe_build_libpath()
+  port <- httpuv::randomPort()
+  proc <- callr::r_bg(function(port) {
+    library(surveyframe)
+    launch_studio(demo = "likert_scale", screen = "open", port = port,
+                  launch.browser = FALSE)
+  }, args = list(port), libpath = libpath)
+  on.exit(proc$kill(), add = TRUE)
+  url <- paste0("http://127.0.0.1:", port)
+  for (i in 1:180) {
+    up <- tryCatch({ suppressWarnings(readLines(url, n = 1)); TRUE }, error = function(e) FALSE)
+    if (up) break
+    Sys.sleep(0.5)
+  }
+  skip_if(!up, "Studio did not start")
+  b <- chromote::ChromoteSession$new(width = 1280, height = 900)
+  on.exit(b$close(), add = TRUE)
+  b$Page$navigate(url)
+  js <- function(code) b$Runtime$evaluate(code, returnByValue = TRUE)$result$value
+  for (i in 1:120) {
+    if (isTRUE(tryCatch(js("window.Shiny && Shiny.shinyapp && Shiny.shinyapp.isConnected()"),
+                        error = function(e) FALSE))) break
+    Sys.sleep(0.5)
+  }
+  expect_identical(js("typeof studioLaunchScreen"), "function")
+  # With nothing picked, the launch switch still applies.
+  js("studioLaunchScreen('reliability'); true")
+  expect_true(js("$('#screen-reliability').hasClass('active')"))
+  # The researcher opens Preview, then the start-up switch to the launch
+  # screen arrives late, as it does after a slow first flush.
+  js("document.querySelector('[data-tab=\"preview\"]').click(); true")
+  js("studioLaunchScreen('open'); true")
+  expect_true(js("$('#screen-preview').hasClass('active')"))
+  expect_false(js("$('#screen-open').hasClass('active')"))
+})

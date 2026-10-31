@@ -767,6 +767,10 @@ style.
   The 2 helpers copied into the app when the installed Studio failed to
   start are gone.
 
+* **A screen picked during start-up stays open.** Studio switched to its
+  launch screen after the first page update, so a click made before that
+  was undone. The launch screen now applies only if nothing was picked.
+
 * **Each screen draws when it is opened.** Studio kept 28 outputs on every
   screen computing from start-up, because its screens are hidden with CSS
   and Shiny was not told when one became visible. The screen switch now
