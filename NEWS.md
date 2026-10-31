@@ -831,6 +831,13 @@ style.
   are unsaved changes. The builder's Analyse mode is now Plan, in Studio
   and on its own, after the stages Design, Plan, Preview and Collect.
 
+* **The Open Instrument screen says where the instrument came from.** It
+  reads "Loaded from R", "File checked: hash verified" or "Saved from
+  Design: hash verified", or names the failed check. A Design save showed
+  "Not verified", though its hash was checked. The screen no longer sends
+  you to the SurveyBuilder to design, and the plan's count is labelled
+  "Research questions" on the Open and Analysis screens.
+
 * **The sidebar shows 1 selected screen.** The entry under the mouse took
   the selected look, so with Design open, Design and the entry the mouse
   rested on both looked selected. Hover is now a lighter tint.
