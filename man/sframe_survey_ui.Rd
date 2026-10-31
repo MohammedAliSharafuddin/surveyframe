@@ -67,4 +67,10 @@ shinyApp(ui, server)
 \seealso{
 \code{\link[=sframe_survey_server]{sframe_survey_server()}}, \code{\link[=run_survey]{run_survey()}},
 \code{\link[=export_survey]{export_survey()}}
+
+Other Collect functions:
+\code{\link[=export_google_sheet]{export_google_sheet()}},
+\code{\link[=export_survey]{export_survey()}},
+\code{\link[=sframe_survey_server]{sframe_survey_server()}}
 }
+\concept{Collect functions}

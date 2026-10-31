@@ -41,3 +41,11 @@ refs <- read_bibtex(text = "@article{cronbach_1951,
 }")
 names(refs)
 }
+\seealso{
+Other References functions:
+\code{\link[=sframe_add_references]{sframe_add_references()}},
+\code{\link[=sframe_bibliography]{sframe_bibliography()}},
+\code{\link[=sframe_get_references]{sframe_get_references()}},
+\code{\link[=sframe_reference]{sframe_reference()}}
+}
+\concept{References functions}

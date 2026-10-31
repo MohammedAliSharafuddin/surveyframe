@@ -46,4 +46,14 @@ basename(out$qmd)
 }
 \seealso{
 \code{\link[=sframe_demo_qmd]{sframe_demo_qmd()}}, \code{\link[=write_sframe]{write_sframe()}}, \code{\link[=read_responses]{read_responses()}}
+
+Other Report functions:
+\code{\link[=render_report]{render_report()}},
+\code{\link[=render_results]{render_results()}},
+\code{\link[=sframe_codebook]{sframe_codebook()}},
+\code{\link[=sframe_format_result]{sframe_format_result()}},
+\code{\link{sframe_reports}},
+\code{\link[=sframe_result_supplement]{sframe_result_supplement()}},
+\code{\link[=sframe_save_figures]{sframe_save_figures()}}
 }
+\concept{Report functions}

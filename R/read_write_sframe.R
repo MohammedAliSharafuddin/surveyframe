@@ -258,6 +258,7 @@ sframe_hash_value <- function(instrument) {
 #' )
 #' out <- write_sframe(instr, tempfile(fileext = ".sframe"))
 #' file.exists(out)
+#' @family Design functions
 write_sframe <- function(instrument, path, pretty = TRUE, overwrite = FALSE,
                          new_instrument = FALSE) {
   sframe_check_instrument(instrument)
@@ -632,6 +633,7 @@ sframe_validate_parsed_payload <- function(parsed, path, require_hash = TRUE) {
 #'               package = "surveyframe")
 #' )
 #' print(instr)
+#' @family Design functions
 read_sframe <- function(path = NULL, validate = TRUE, text = NULL, verify = TRUE) {
   # A payload held in memory (Ethos request 4), so a host need not write a
   # temporary file to read it faithfully.

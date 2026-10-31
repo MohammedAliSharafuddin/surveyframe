@@ -32,4 +32,9 @@ length(sframe_plan(instr))
 }
 \seealso{
 \code{\link[=sframe_plan]{sframe_plan()}}, \code{\link[=validate_sframe]{validate_sframe()}}, \code{\link[=run_analysis_plan]{run_analysis_plan()}}
+
+Other Plan functions:
+\code{\link[=sframe_plan]{sframe_plan()}},
+\code{\link[=sframe_sample_size_plan]{sframe_sample_size_plan()}}
 }
+\concept{Plan functions}

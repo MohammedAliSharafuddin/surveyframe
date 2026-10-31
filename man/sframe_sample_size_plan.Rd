@@ -85,3 +85,9 @@ plan <- sframe_sample_size_plan("t_test", d = 0.5, power = 0.80)
 plan$estimated_n
 plan$method
 }
+\seealso{
+Other Plan functions:
+\code{\link[=sframe_plan]{sframe_plan()}},
+\code{\link[=sframe_plan<-]{sframe_plan<-()}}
+}
+\concept{Plan functions}

@@ -88,4 +88,11 @@ ref$id
 }
 \seealso{
 \code{\link[=read_bibtex]{read_bibtex()}}, \code{\link[=sframe_add_references]{sframe_add_references()}}, \code{\link[=sframe_get_references]{sframe_get_references()}}
+
+Other References functions:
+\code{\link[=read_bibtex]{read_bibtex()}},
+\code{\link[=sframe_add_references]{sframe_add_references()}},
+\code{\link[=sframe_bibliography]{sframe_bibliography()}},
+\code{\link[=sframe_get_references]{sframe_get_references()}}
 }
+\concept{References functions}

@@ -44,6 +44,7 @@
 #'   fail_action = "flag",
 #'   label       = "Attention check 1"
 #' )
+#' @family Design functions
 sframe_attention_check <- function(
     id,
     item_id,

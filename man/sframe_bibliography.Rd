@@ -38,3 +38,11 @@ use the same file.
 instr <- sframe_demo("two_group")$instrument
 cat(substr(sframe_bibliography(instr), 1, 200))
 }
+\seealso{
+Other References functions:
+\code{\link[=read_bibtex]{read_bibtex()}},
+\code{\link[=sframe_add_references]{sframe_add_references()}},
+\code{\link[=sframe_get_references]{sframe_get_references()}},
+\code{\link[=sframe_reference]{sframe_reference()}}
+}
+\concept{References functions}

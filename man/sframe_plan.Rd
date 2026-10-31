@@ -23,4 +23,9 @@ sframe_plan(sframe_demo("tourism_services")$instrument)
 }
 \seealso{
 \link{sframe_accessors}, \link{sframe_plan<-}
+
+Other Plan functions:
+\code{\link[=sframe_plan<-]{sframe_plan<-()}},
+\code{\link[=sframe_sample_size_plan]{sframe_sample_size_plan()}}
 }
+\concept{Plan functions}

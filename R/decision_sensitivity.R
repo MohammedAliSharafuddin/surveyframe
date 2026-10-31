@@ -84,6 +84,7 @@
 #' )
 #' sa$stable
 #' as.data.frame(sa)
+#' @family Decision analysis functions
 sframe_sensitivity_analysis <- function(x,
                                  weights,
                                  criteria_types,

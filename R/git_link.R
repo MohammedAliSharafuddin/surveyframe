@@ -69,6 +69,7 @@ sframe_git_run <- function(args, repo_path) {
 #' item  <- sframe_item("q1", "How satisfied are you?", type = "text")
 #' instr <- sframe_instrument("Demo", components = list(item))
 #' sframe_link_git_commit(instr, repo_path = tempdir())
+#' @family Amendments functions
 sframe_link_git_commit <- function(instrument, repo_path = ".", path = NULL) {
   sframe_check_instrument(instrument)
 

@@ -94,6 +94,7 @@ sframe_with_seed <- function(seed, expr) {
 #' @examples
 #' sframe_bootstrap_ci(mtcars$mpg, seed = 42)
 #' sframe_bootstrap_ci(mtcars$mpg, FUN = mean, conf.level = 0.90, seed = 42)
+#' @family Confidence interval functions
 sframe_bootstrap_ci <- function(x, FUN = stats::median, R = 2000,
                          conf.level = 0.95, seed = NULL) {
   if (!is.null(seed)) {
@@ -144,6 +145,7 @@ sframe_bootstrap_ci <- function(x, FUN = stats::median, R = 2000,
 #' @examples
 #' sframe_cohens_d_ci(mtcars$mpg[mtcars$am == 1], mtcars$mpg[mtcars$am == 0],
 #'             seed = 42)
+#' @family Confidence interval functions
 sframe_cohens_d_ci <- function(x, y, R = 2000, conf.level = 0.95, seed = NULL) {
   if (!is.null(seed)) {
     # set.seed() mutates the global RNG stream; restore whatever state the
@@ -193,6 +195,7 @@ sframe_cohens_d_ci <- function(x, y, R = 2000, conf.level = 0.95, seed = NULL) {
 #'
 #' @examples
 #' sframe_cramers_v_ci(table(mtcars$am, mtcars$cyl), seed = 42)
+#' @family Confidence interval functions
 sframe_cramers_v_ci <- function(tab, R = 2000, conf.level = 0.95, seed = NULL) {
   if (!is.null(seed)) {
     # set.seed() mutates the global RNG stream; restore whatever state the
@@ -260,6 +263,7 @@ sframe_cramers_v <- function(tbl) {
 #'
 #' @examples
 #' sframe_eta_sq_ci(mtcars$mpg, mtcars$cyl, seed = 42)
+#' @family Confidence interval functions
 sframe_eta_sq_ci <- function(outcome, group, R = 2000, conf.level = 0.95,
                       seed = NULL) {
   if (!is.null(seed)) {

@@ -79,4 +79,10 @@ file.exists(script)
 }
 \seealso{
 \code{\link[=read_sheet_responses]{read_sheet_responses()}}, \code{\link[=read_responses]{read_responses()}}, \code{\link[=write_sframe]{write_sframe()}}
+
+Other Collect functions:
+\code{\link[=export_survey]{export_survey()}},
+\code{\link[=sframe_survey_server]{sframe_survey_server()}},
+\code{\link[=sframe_survey_ui]{sframe_survey_ui()}}
 }
+\concept{Collect functions}

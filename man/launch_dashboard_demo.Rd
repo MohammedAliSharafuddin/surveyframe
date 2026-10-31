@@ -29,3 +29,11 @@ nrow(demo$responses)
 launch_dashboard_demo()
 }
 }
+\seealso{
+Other Demo functions:
+\code{\link[=sframe_demo]{sframe_demo()}},
+\code{\link[=sframe_demo_branding]{sframe_demo_branding()}},
+\code{\link[=sframe_demo_qmd]{sframe_demo_qmd()}},
+\code{\link[=sframe_list_demos]{sframe_list_demos()}}
+}
+\concept{Demo functions}

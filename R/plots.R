@@ -63,6 +63,7 @@
 #'
 #' @name sframe_plots
 #' @seealso [run_analysis_plan()], [render_report()]
+#' @family Chart functions
 NULL
 
 # plots.R
@@ -208,6 +209,7 @@ sframe_series_fill_colours <- function(k, palette = c("web", "print")) {
 #' ggplot(mtcars, aes(wt, mpg)) +
 #'   geom_point(colour = "#0E9694") +
 #'   theme_surveyframe()
+#' @family Chart functions
 theme_surveyframe <- function(base_size = 12, base_family = "",
                               palette = c("web", "print")) {
   rlang::check_installed("ggplot2", reason = "to use theme_surveyframe().")
@@ -445,6 +447,7 @@ sframe_plot_frequency <- function(result, palette = c("web", "print")) {
 #'   sframe_plot_term_frequency(res$RQ1)
 #' }
 #' }
+#' @family Chart functions
 sframe_plot_term_frequency <- function(result, palette = c("web", "print")) {
   rlang::check_installed("ggplot2", reason = "to plot term frequency.")
   palette <- match.arg(palette)
@@ -581,6 +584,7 @@ sframe_plot_term_frequency <- function(result, palette = c("web", "print")) {
 #'   sframe_plot_ngram_frequency(res$RQ2)
 #' }
 #' }
+#' @family Chart functions
 sframe_plot_ngram_frequency <- function(result, palette = c("web", "print")) {
   rlang::check_installed("ggplot2", reason = "to plot n-gram frequency.")
   palette <- match.arg(palette)
@@ -613,6 +617,7 @@ sframe_plot_ngram_frequency <- function(result, palette = c("web", "print")) {
 #'   sframe_plot_cooccurrence(res$RQ4)
 #' }
 #' }
+#' @family Chart functions
 sframe_plot_cooccurrence <- function(result, palette = c("web", "print")) {
   rlang::check_installed("ggplot2", reason = "to plot term co-occurrence.")
   palette <- match.arg(palette)
@@ -775,6 +780,7 @@ sframe_plot_regression <- function(result, data, palette = c("web", "print")) {
 #' counts <- c("Strongly disagree" = 5, "Disagree" = 10, "Neutral" = 15,
 #'             "Agree" = 40, "Strongly agree" = 30)
 #' sframe_draw_likert_diverging(counts)
+#' @family SurveyStudio helpers
 sframe_draw_likert_diverging <- function(counts, theme_color = "#16B3B1",
                                          palette = c("web", "print")) {
   palette <- match.arg(palette)
@@ -1018,6 +1024,7 @@ sframe_draw_likert_diverging <- function(counts, theme_color = "#16B3B1",
 #'   sframe_plot_likert_matrix(item, demo$responses, cs)
 #' }
 #' }
+#' @family Chart functions
 sframe_plot_likert_matrix <- function(item, data, choice_set, palette = c("web", "print")) {
   rlang::check_installed("ggplot2", reason = "to plot a Likert matrix.")
   palette <- match.arg(palette)
@@ -1067,6 +1074,7 @@ sframe_plot_likert_matrix <- function(item, data, choice_set, palette = c("web",
 #'   sframe_plot_likert_scale(g$items, demo$responses, g$choice_set, g$title)
 #' }
 #' }
+#' @family Chart functions
 sframe_plot_likert_scale <- function(items, data, choice_set, title, palette = c("web", "print")) {
   rlang::check_installed("ggplot2", reason = "to plot a scale's Likert items.")
   palette <- match.arg(palette)
@@ -1107,6 +1115,7 @@ sframe_plot_likert_scale <- function(items, data, choice_set, title, palette = c
 #' demo <- sframe_demo("likert_scale")
 #' groups <- sframe_likert_scale_groups(demo$instrument)
 #' names(groups)
+#' @family SurveyStudio helpers
 sframe_likert_scale_groups <- function(instrument) {
   choice_by <- function(id) {
     for (cs in instrument$choices %||% list()) if (identical(cs$id, id)) return(cs)
@@ -1235,6 +1244,7 @@ sframe_plot_for_result <- function(result, data, palette = c("web", "print")) {
 #'   sframe_plot_decision_ranking(res$RQ4)
 #' }
 #' }
+#' @family Chart functions
 sframe_plot_decision_ranking <- function(result, palette = c("web", "print")) {
   rlang::check_installed("ggplot2", reason = "to plot a decision ranking.")
   palette <- match.arg(palette)
@@ -1344,6 +1354,7 @@ sframe_plot_sensitivity <- function(result, palette = c("web", "print")) {
 #'   panels$residuals_fitted
 #' }
 #' }
+#' @family Chart functions
 sframe_plot_regression_diagnostics <- function(result, palette = c("web", "print")) {
   rlang::check_installed("ggplot2", reason = "to plot regression diagnostics.")
   palette <- match.arg(palette)
@@ -1417,6 +1428,7 @@ sframe_plot_regression_diagnostics <- function(result, palette = c("web", "print
 #'   sframe_plot_efa_scree(er)
 #' }
 #' }
+#' @family Chart functions
 sframe_plot_efa_scree <- function(x, palette = c("web", "print")) {
   rlang::check_installed("ggplot2", reason = "to plot an EFA scree plot.")
   palette <- match.arg(palette)
@@ -1465,6 +1477,7 @@ sframe_plot_efa_scree <- function(x, palette = c("web", "print")) {
 #'   sframe_plot_efa_loadings(fit)
 #' }
 #' }
+#' @family Chart functions
 sframe_plot_efa_loadings <- function(x, palette = c("web", "print")) {
   rlang::check_installed("ggplot2", reason = "to plot an EFA loadings heatmap.")
   palette <- match.arg(palette)
@@ -1520,6 +1533,7 @@ sframe_plot_efa_loadings <- function(x, palette = c("web", "print")) {
 #'   sframe_plot_reliability(rr)
 #' }
 #' }
+#' @family Chart functions
 sframe_plot_reliability <- function(x, palette = c("web", "print")) {
   rlang::check_installed("ggplot2", reason = "to plot a reliability report.")
   palette <- match.arg(palette)
@@ -1594,6 +1608,7 @@ sframe_plot_reliability <- function(x, palette = c("web", "print")) {
 #' )
 #' res <- run_analysis_plan(responses, instr)
 #' sframe_draw_mosaic(res$RQ1)
+#' @family SurveyStudio helpers
 sframe_draw_mosaic <- function(result, palette = c("web", "print")) {
   palette <- match.arg(palette)
   tbl <- result$table
@@ -1633,6 +1648,7 @@ sframe_draw_mosaic <- function(result, palette = c("web", "print")) {
 #'                                  c("sq_1", "sq_2", "sq_3", "sat_1", "sat_2"))
 #' }
 #' }
+#' @family Chart functions
 sframe_plot_correlation_matrix <- function(data, vars, method = "pearson",
                                            palette = c("web", "print")) {
   rlang::check_installed("ggplot2", reason = "to plot a correlation matrix heatmap.")
@@ -1681,6 +1697,7 @@ sframe_plot_correlation_matrix <- function(data, vars, method = "pearson",
 #'   sframe_plot_quality(qr)
 #' }
 #' }
+#' @family Chart functions
 sframe_plot_quality <- function(x, palette = c("web", "print")) {
   rlang::check_installed("ggplot2", reason = "to plot a quality report.")
   palette <- match.arg(palette)
@@ -1759,6 +1776,7 @@ plot.sframe_efa_solution <- function(x, ..., palette = c("web", "print")) {
 #'   sframe_plot_validity(vr)
 #' }
 #' }
+#' @family Chart functions
 sframe_plot_validity <- function(x, palette = c("web", "print")) {
   rlang::check_installed("ggplot2", reason = "to plot a validity report.")
   palette <- match.arg(palette)
@@ -1808,6 +1826,7 @@ plot.sframe_validity_report <- function(x, ..., palette = c("web", "print")) {
 #'   sframe_plot_missingness(mr)
 #' }
 #' }
+#' @family Chart functions
 sframe_plot_missingness <- function(x, palette = c("web", "print")) {
   rlang::check_installed("ggplot2", reason = "to plot a missing-data report.")
   palette <- match.arg(palette)
@@ -1863,6 +1882,7 @@ plot.sframe_missing_data_report <- function(x, ..., palette = c("web", "print"))
 #' @return A ggplot2 object when `which` is supplied, otherwise an invisible
 #'   named list of ggplot2 objects keyed by plan block id.
 #' @export
+#' @family Chart functions
 plot.sframe_analysis_results <- function(x, ..., which = NULL) {
   plots <- list()
   for (i in seq_along(x)) {
@@ -1931,6 +1951,7 @@ plot.sframe_analysis_results <- function(x, ..., which = NULL) {
 #'   sframe_plot_item_chart(item, demo$responses$sat_1, cs)
 #' }
 #' }
+#' @family SurveyStudio helpers
 sframe_plot_item_chart <- function(item, col_data, choice_set = NULL,
                                    palette = c("web", "print")) {
   if (!requireNamespace("ggplot2", quietly = TRUE)) return(NULL)
@@ -1983,6 +2004,7 @@ sframe_plot_item_chart <- function(item, col_data, choice_set = NULL,
 #'   sframe_plot_scale_chart(scored$satisfaction, "Satisfaction")
 #' }
 #' }
+#' @family SurveyStudio helpers
 sframe_plot_scale_chart <- function(scores, label, palette = c("web", "print")) {
   if (!requireNamespace("ggplot2", quietly = TRUE)) return(NULL)
   palette <- match.arg(palette)
@@ -2029,6 +2051,7 @@ sframe_plot_scale_chart <- function(scores, label, palette = c("web", "print")) 
 #'   sframe_plot_descriptives(dr, demo$responses)
 #' }
 #' }
+#' @family Chart functions
 sframe_plot_descriptives <- function(x, data, palette = c("web", "print")) {
   rlang::check_installed("ggplot2", reason = "to plot distribution shape by variable.")
   palette <- match.arg(palette)
@@ -2126,6 +2149,7 @@ plot.sframe_descriptives_report <- function(x, data, ..., palette = c("web", "pr
 #'   sframe_plot_group_comparison(res$rq_visit_bi, demo$responses)
 #' }
 #' }
+#' @family Chart functions
 sframe_plot_group_comparison <- function(result, data, palette = c("web", "print")) {
   rlang::check_installed("ggplot2", reason = "to plot a group comparison.")
   palette <- match.arg(palette)
@@ -2185,6 +2209,7 @@ sframe_plot_group_comparison <- function(result, data, palette = c("web", "print
 #'   sframe_plot_paired_comparison(res$rq_ttest_pair, demo$responses)
 #' }
 #' }
+#' @family Chart functions
 sframe_plot_paired_comparison <- function(result, data, palette = c("web", "print")) {
   rlang::check_installed("ggplot2", reason = "to plot a paired comparison.")
   palette <- match.arg(palette)
@@ -2508,6 +2533,7 @@ sframe_plot_item_diagnostics <- function(result, palette = c("web", "print")) {
 #'   panels$histogram
 #' }
 #' }
+#' @family Chart functions
 sframe_plot_variable_distribution <- function(data, variable, palette = c("web", "print")) {
   rlang::check_installed("ggplot2", reason = "to plot a variable's distribution.")
   palette <- match.arg(palette)
@@ -2580,6 +2606,7 @@ sframe_plot_variable_distribution <- function(data, variable, palette = c("web",
 #'   sframe_plot_topics(res$RQ10)
 #' }
 #' }
+#' @family Chart functions
 sframe_plot_topics <- function(result, palette = c("web", "print")) {
   rlang::check_installed("ggplot2", reason = "to plot topic terms.")
   palette <- match.arg(palette)
@@ -2697,6 +2724,7 @@ sframe_plot_topics <- function(result, palette = c("web", "print")) {
 #'   sframe_plot_cooccurrence_network(res$RQ6)
 #' }
 #' }
+#' @family Chart functions
 sframe_plot_cooccurrence_network <- function(result, palette = c("web", "print")) {
   rlang::check_installed("ggplot2", reason = "to plot the co-occurrence network.")
   palette <- match.arg(palette)
@@ -2846,6 +2874,7 @@ sframe_plot_cooccurrence_network <- function(result, palette = c("web", "print")
 #'   sframe_plot_sentiment(res$RQ7)
 #' }
 #' }
+#' @family Chart functions
 sframe_plot_sentiment <- function(result, palette = c("web", "print")) {
   rlang::check_installed("ggplot2", reason = "to plot sentiment.")
   palette <- match.arg(palette)

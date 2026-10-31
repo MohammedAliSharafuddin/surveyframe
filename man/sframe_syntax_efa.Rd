@@ -33,3 +33,20 @@ Generate EFA planning syntax
 syntax <- sframe_syntax_efa(c("sq_1", "sq_2", "sq_3"), nfactors = 1)
 cat(syntax)
 }
+\seealso{
+Other Models and syntax functions:
+\code{\link[=sframe_add_model]{sframe_add_model()}},
+\code{\link[=sframe_construct]{sframe_construct()}},
+\code{\link[=sframe_covariance]{sframe_covariance()}},
+\code{\link[=sframe_indirect_effect]{sframe_indirect_effect()}},
+\code{\link[=sframe_model_json]{sframe_model_json()}},
+\code{\link[=sframe_model_outline]{sframe_model_outline()}},
+\code{\link[=sframe_model_spec]{sframe_model_spec()}},
+\code{\link[=sframe_path]{sframe_path()}},
+\code{\link[=sframe_syntax_cfa]{sframe_syntax_cfa()}},
+\code{\link[=sframe_syntax_pls]{sframe_syntax_pls()}},
+\code{\link[=sframe_syntax_result]{sframe_syntax_result()}},
+\code{\link[=sframe_syntax_sem]{sframe_syntax_sem()}},
+\code{\link[=sframe_validate_model]{sframe_validate_model()}}
+}
+\concept{Models and syntax functions}

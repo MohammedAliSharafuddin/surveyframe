@@ -49,4 +49,14 @@ if (requireNamespace("ggplot2", quietly = TRUE)) {
 }
 \seealso{
 \code{\link[=render_report]{render_report()}}, which takes the same settings as \code{figures}.
+
+Other Report functions:
+\code{\link[=render_report]{render_report()}},
+\code{\link[=render_results]{render_results()}},
+\code{\link[=sframe_analysis_qmd]{sframe_analysis_qmd()}},
+\code{\link[=sframe_codebook]{sframe_codebook()}},
+\code{\link[=sframe_format_result]{sframe_format_result()}},
+\code{\link{sframe_reports}},
+\code{\link[=sframe_result_supplement]{sframe_result_supplement()}}
 }
+\concept{Report functions}

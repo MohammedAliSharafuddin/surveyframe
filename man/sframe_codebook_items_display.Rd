@@ -30,4 +30,16 @@ head(sframe_codebook_items_display(cb))
 }
 \seealso{
 \code{\link[=sframe_codebook]{sframe_codebook()}}
+
+Other SurveyStudio helpers:
+\code{\link[=sframe_apa_cells]{sframe_apa_cells()}},
+\code{\link[=sframe_builder_empty_state]{sframe_builder_empty_state()}},
+\code{\link[=sframe_builder_state_from_instrument]{sframe_builder_state_from_instrument()}},
+\code{\link[=sframe_builder_validate_draft]{sframe_builder_validate_draft()}},
+\code{\link[=sframe_draw_likert_diverging]{sframe_draw_likert_diverging()}},
+\code{\link[=sframe_draw_mosaic]{sframe_draw_mosaic()}},
+\code{\link[=sframe_likert_scale_groups]{sframe_likert_scale_groups()}},
+\code{\link[=sframe_plot_item_chart]{sframe_plot_item_chart()}},
+\code{\link[=sframe_plot_scale_chart]{sframe_plot_scale_chart()}}
 }
+\concept{SurveyStudio helpers}

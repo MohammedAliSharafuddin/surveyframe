@@ -53,4 +53,44 @@ as.data.frame(instr)
 }
 \seealso{
 \code{\link[=as_sframe]{as_sframe()}}, \code{\link[=sframe_problems]{sframe_problems()}}, \link{sframe_validation}
+
+Other Inspect functions:
+\code{\link[=as.data.frame.sf_choices]{as.data.frame.sf_choices()}},
+\code{\link[=as.data.frame.sframe]{as.data.frame.sframe()}},
+\code{\link[=as.data.frame.sframe_analysis_results]{as.data.frame.sframe_analysis_results()}},
+\code{\link[=as.data.frame.sframe_assumption_report]{as.data.frame.sframe_assumption_report()}},
+\code{\link[=as.data.frame.sframe_codebook]{as.data.frame.sframe_codebook()}},
+\code{\link[=as.data.frame.sframe_descriptives_report]{as.data.frame.sframe_descriptives_report()}},
+\code{\link[=as.data.frame.sframe_efa_report]{as.data.frame.sframe_efa_report()}},
+\code{\link[=as.data.frame.sframe_efa_solution]{as.data.frame.sframe_efa_solution()}},
+\code{\link[=as.data.frame.sframe_item_report]{as.data.frame.sframe_item_report()}},
+\code{\link[=as.data.frame.sframe_missing_data_report]{as.data.frame.sframe_missing_data_report()}},
+\code{\link[=as.data.frame.sframe_quality_report]{as.data.frame.sframe_quality_report()}},
+\code{\link[=as.data.frame.sframe_reliability_report]{as.data.frame.sframe_reliability_report()}},
+\code{\link[=as.data.frame.sframe_sample_size_plan]{as.data.frame.sframe_sample_size_plan()}},
+\code{\link[=as.data.frame.sframe_sensitivity]{as.data.frame.sframe_sensitivity()}},
+\code{\link[=as.data.frame.sframe_validation]{as.data.frame.sframe_validation()}},
+\code{\link[=as.data.frame.sframe_validity_report]{as.data.frame.sframe_validity_report()}},
+\code{\link{sf_component_list}},
+\code{\link[=sframe_apa]{sframe_apa()}},
+\code{\link[=sframe_as_data_frame]{sframe_as_data_frame()}},
+\code{\link[=sframe_flagged]{sframe_flagged()}},
+\code{\link[=sframe_get_attention_checks]{sframe_get_attention_checks()}},
+\code{\link[=sframe_get_branches]{sframe_get_branches()}},
+\code{\link[=sframe_get_choice_sets]{sframe_get_choice_sets()}},
+\code{\link[=sframe_get_items]{sframe_get_items()}},
+\code{\link[=sframe_get_models]{sframe_get_models()}},
+\code{\link[=sframe_get_scales]{sframe_get_scales()}},
+\code{\link[=sframe_id]{sframe_id()}},
+\code{\link{sframe_identity}},
+\code{\link[=sframe_is_valid]{sframe_is_valid()}},
+\code{\link[=sframe_label]{sframe_label()}},
+\code{\link[=sframe_meta]{sframe_meta()}},
+\code{\link[=sframe_missing_columns]{sframe_missing_columns()}},
+\code{\link[=sframe_object]{sframe_object()}},
+\code{\link[=sframe_problems]{sframe_problems()}},
+\code{\link{sframe_report_accessors}},
+\code{\link{sframe_subset}},
+\code{\link{sframe_validation_accessors}}
 }
+\concept{Inspect functions}

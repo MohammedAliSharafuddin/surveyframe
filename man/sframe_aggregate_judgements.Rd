@@ -40,4 +40,13 @@ sframe_aggregate_judgements(list(m1, m2))$matrix
 }
 \seealso{
 \code{\link[=sframe_assemble_pairwise]{sframe_assemble_pairwise()}}
+
+Other Decision analysis functions:
+\code{\link[=sframe_assemble_pairwise]{sframe_assemble_pairwise()}},
+\code{\link[=sframe_collected_weights]{sframe_collected_weights()}},
+\code{\link[=sframe_decision_options]{sframe_decision_options()}},
+\code{\link[=sframe_dematel_compute]{sframe_dematel_compute()}},
+\code{\link[=sframe_rated_matrix]{sframe_rated_matrix()}},
+\code{\link[=sframe_sensitivity_analysis]{sframe_sensitivity_analysis()}}
 }
+\concept{Decision analysis functions}

@@ -59,4 +59,16 @@ if (requireNamespace("psych", quietly = TRUE)) {
 }
 \seealso{
 \code{\link[=sframe_efa_solution]{sframe_efa_solution()}}, \code{\link[=sframe_reliability_results]{sframe_reliability_results()}}, \code{\link[=sframe_syntax_cfa]{sframe_syntax_cfa()}}
+
+Other Analyse functions:
+\code{\link[=run_analysis_plan]{run_analysis_plan()}},
+\code{\link[=score_scales]{score_scales()}},
+\code{\link[=sframe_assumption_results]{sframe_assumption_results()}},
+\code{\link[=sframe_descriptives_results]{sframe_descriptives_results()}},
+\code{\link[=sframe_efa_solution]{sframe_efa_solution()}},
+\code{\link[=sframe_item_results]{sframe_item_results()}},
+\code{\link[=sframe_posthoc_results]{sframe_posthoc_results()}},
+\code{\link[=sframe_reliability_results]{sframe_reliability_results()}},
+\code{\link[=sframe_validity_results]{sframe_validity_results()}}
 }
+\concept{Analyse functions}

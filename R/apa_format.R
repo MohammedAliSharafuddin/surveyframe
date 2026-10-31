@@ -86,6 +86,7 @@ sframe_apa_number <- function(v, digits = 2, bounded = FALSE) {
 #'
 #' @examples
 #' sframe_apa_cells(data.frame(t = 2.345, p = 0.004, r = 0.53, n = 40L))
+#' @family SurveyStudio helpers
 sframe_apa_cells <- function(x, digits = 2) {
   if (!is.data.frame(x)) return(x)
   nm <- colnames(x)

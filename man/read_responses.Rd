@@ -96,4 +96,12 @@ head(responses[, c("respondent_id", "visit_type", "dm_1")])
 }
 \seealso{
 \code{\link[=sframe_quality_results]{sframe_quality_results()}}, \code{\link[=score_scales]{score_scales()}}
+
+Other Responses functions:
+\code{\link[=export_responses]{export_responses()}},
+\code{\link[=read_sheet_responses]{read_sheet_responses()}},
+\code{\link[=sframe_missing_data_results]{sframe_missing_data_results()}},
+\code{\link[=sframe_outlier_results]{sframe_outlier_results()}},
+\code{\link[=sframe_quality_results]{sframe_quality_results()}}
 }
+\concept{Responses functions}

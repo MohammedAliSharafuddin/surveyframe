@@ -50,4 +50,31 @@ if (requireNamespace("ggplot2", quietly = TRUE)) {
 }
 \seealso{
 \code{\link[=sframe_plot_likert_matrix]{sframe_plot_likert_matrix()}}, \code{\link[=sframe_scale]{sframe_scale()}}
+
+Other Chart functions:
+\code{\link[=plot.sframe_analysis_results]{plot.sframe_analysis_results()}},
+\code{\link[=sframe_plot_cooccurrence]{sframe_plot_cooccurrence()}},
+\code{\link[=sframe_plot_cooccurrence_network]{sframe_plot_cooccurrence_network()}},
+\code{\link[=sframe_plot_correlation_matrix]{sframe_plot_correlation_matrix()}},
+\code{\link[=sframe_plot_decision_ranking]{sframe_plot_decision_ranking()}},
+\code{\link[=sframe_plot_dematel_influence]{sframe_plot_dematel_influence()}},
+\code{\link[=sframe_plot_descriptives]{sframe_plot_descriptives()}},
+\code{\link[=sframe_plot_efa_loadings]{sframe_plot_efa_loadings()}},
+\code{\link[=sframe_plot_efa_scree]{sframe_plot_efa_scree()}},
+\code{\link[=sframe_plot_group_comparison]{sframe_plot_group_comparison()}},
+\code{\link[=sframe_plot_likert_matrix]{sframe_plot_likert_matrix()}},
+\code{\link[=sframe_plot_missingness]{sframe_plot_missingness()}},
+\code{\link[=sframe_plot_ngram_frequency]{sframe_plot_ngram_frequency()}},
+\code{\link[=sframe_plot_paired_comparison]{sframe_plot_paired_comparison()}},
+\code{\link[=sframe_plot_quality]{sframe_plot_quality()}},
+\code{\link[=sframe_plot_regression_diagnostics]{sframe_plot_regression_diagnostics()}},
+\code{\link[=sframe_plot_reliability]{sframe_plot_reliability()}},
+\code{\link[=sframe_plot_sentiment]{sframe_plot_sentiment()}},
+\code{\link[=sframe_plot_term_frequency]{sframe_plot_term_frequency()}},
+\code{\link[=sframe_plot_topics]{sframe_plot_topics()}},
+\code{\link[=sframe_plot_validity]{sframe_plot_validity()}},
+\code{\link[=sframe_plot_variable_distribution]{sframe_plot_variable_distribution()}},
+\code{\link{sframe_plots}},
+\code{\link[=theme_surveyframe]{theme_surveyframe()}}
 }
+\concept{Chart functions}

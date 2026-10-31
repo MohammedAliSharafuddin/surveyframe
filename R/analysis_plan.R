@@ -1333,6 +1333,7 @@ sframe_plain <- function(x) {
 #'
 #' # the conditional slopes, at the moderator's own values
 #' sframe_result_supplement(results$RQ1)
+#' @family Report functions
 sframe_result_supplement <- function(result) {
   if (!is.list(result)) return(NULL)
   test <- result$test %||% ""
@@ -1950,6 +1951,7 @@ sframe_run_one_block <- function(block, data, instrument, plots = FALSE,
 #' results <- run_analysis_plan(responses, instr)
 #' print(results)
 #' }
+#' @family Analyse functions
 run_analysis_plan <- function(data, instrument, scored = TRUE, plots = FALSE,
                               plot_palette = c("web", "print"), seed = 20260828L,
                               strict = FALSE) {
@@ -2123,6 +2125,7 @@ sframe_md_em <- function(x) {
 #'                       output_file = tempfile(fileext = ".html"))
 #' file.exists(out)
 #' }
+#' @family Report functions
 render_results <- function(
     results         = NULL,
     instrument,

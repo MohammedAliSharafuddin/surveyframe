@@ -171,4 +171,14 @@ file.exists(out)
 }
 \seealso{
 \code{\link[=sframe_codebook]{sframe_codebook()}}, \code{\link[=sframe_quality_results]{sframe_quality_results()}}, \code{\link[=sframe_reliability_results]{sframe_reliability_results()}}
+
+Other Report functions:
+\code{\link[=render_results]{render_results()}},
+\code{\link[=sframe_analysis_qmd]{sframe_analysis_qmd()}},
+\code{\link[=sframe_codebook]{sframe_codebook()}},
+\code{\link[=sframe_format_result]{sframe_format_result()}},
+\code{\link{sframe_reports}},
+\code{\link[=sframe_result_supplement]{sframe_result_supplement()}},
+\code{\link[=sframe_save_figures]{sframe_save_figures()}}
 }
+\concept{Report functions}

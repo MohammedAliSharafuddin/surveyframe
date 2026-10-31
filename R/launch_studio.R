@@ -83,6 +83,7 @@ sframe_studio_screen <- function(screen) {
 #'   submitted_at  = "submitted_at"
 #' )
 #' }
+#' @family entry points
 launch_studio <- function(
     instrument = NULL,
     responses = NULL,

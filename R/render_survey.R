@@ -917,6 +917,7 @@ sframe_progress_ui <- function(answered, total, colour) {
 #' app <- run_survey(instr, save_responses = "csv",
 #'                       output_path = tempfile(fileext = ".csv"))
 #' }
+#' @family Preview functions
 run_survey <- function(
     instrument,
     mode           = c("shiny"),

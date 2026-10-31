@@ -155,6 +155,7 @@ sframe_lavaan_safe_label <- function(label) {
 #'                     items = c("sq_1", "sq_2", "sq_3"))
 #' sq$mode
 #' sq$items
+#' @family Models and syntax functions
 sframe_construct <- function(
     id,
     label = NULL,
@@ -190,6 +191,7 @@ sframe_construct <- function(
 #' p <- sframe_path("sq", "sat", label = "H1")
 #' p$from
 #' p$to
+#' @family Models and syntax functions
 sframe_path <- function(from, to, label = NULL) {
   sframe_model_check_id(from, "from")
   sframe_model_check_id(to, "to")
@@ -211,6 +213,7 @@ sframe_path <- function(from, to, label = NULL) {
 #' cov <- sframe_covariance("sq", "sus", label = "cov1")
 #' cov$from
 #' cov$to
+#' @family Models and syntax functions
 sframe_covariance <- function(from, to, label = NULL) {
   sframe_model_check_id(from, "from")
   sframe_model_check_id(to, "to")
@@ -232,6 +235,7 @@ sframe_covariance <- function(from, to, label = NULL) {
 #' @examples
 #' ind <- sframe_indirect_effect("sq", through = "sat", to = "bi", label = "mediation")
 #' ind$through
+#' @family Models and syntax functions
 sframe_indirect_effect <- function(from, through, to, label = NULL) {
   sframe_model_check_id(from, "from")
   through <- as.character(through)
@@ -273,6 +277,7 @@ sframe_indirect_effect <- function(from, through, to, label = NULL) {
 #' )
 #' m$type
 #' m$engine
+#' @family Models and syntax functions
 sframe_model_spec <- function(
     id,
     label = NULL,
@@ -345,6 +350,7 @@ sframe_model_spec <- function(
 #' )
 #' diag <- sframe_validate_model(m, instrument = demo$instrument)
 #' diag
+#' @family Models and syntax functions
 sframe_validate_model <- function(model, instrument = NULL, strict = TRUE) {
   model <- sframe_model_as_list(model)
   log <- sframe_new_problem_log()
@@ -537,6 +543,7 @@ sframe_model_validation_checks <- c(
 #' m <- sframe_model_spec("cb1", type = "cb_sem",
 #'               constructs = list(sframe_construct("sq", items = c("sq_1", "sq_2"))))
 #' cat(sframe_model_json(m))
+#' @family Models and syntax functions
 sframe_model_json <- function(model, pretty = TRUE) {
   model <- sframe_model_as_list(model)
   model <- sframe_model_plain(model)
@@ -560,6 +567,7 @@ sframe_model_json <- function(model, pretty = TRUE) {
 #'               constructs = list(sframe_construct("sat", items = c("sat_1", "sat_2"))))
 #' instr <- sframe_add_model(demo$instrument, m)
 #' length(instr$models)
+#' @family Models and syntax functions
 sframe_add_model <- function(instrument, model, validate = TRUE, replace = TRUE) {
   sframe_check_instrument(instrument)
   if (isTRUE(validate)) {
@@ -617,6 +625,7 @@ sframe_add_model <- function(instrument, model, validate = TRUE, replace = TRUE)
 #'   fit$loadings
 #' }
 #' }
+#' @family Analyse functions
 sframe_efa_solution <- function(
     data,
     instrument,
@@ -769,6 +778,7 @@ print.sframe_efa_solution <- function(x, ...) {
 #' @examples
 #' syntax <- sframe_syntax_efa(c("sq_1", "sq_2", "sq_3"), nfactors = 1)
 #' cat(syntax)
+#' @family Models and syntax functions
 sframe_syntax_efa <- function(
     items,
     nfactors = 1L,
@@ -818,6 +828,7 @@ sframe_syntax_efa <- function(
 #' syntax <- sframe_syntax_cfa(demo$instrument,
 #'                              scales = c("satisfaction", "behavioural_intention"))
 #' cat(syntax)
+#' @family Models and syntax functions
 sframe_syntax_cfa <- function(
     instrument = NULL,
     model = NULL,
@@ -918,6 +929,7 @@ sframe_syntax_cfa <- function(
 #'   indirect = list(sframe_indirect_effect("sq", through = "sat", to = "bi"))
 #' )
 #' cat(sframe_syntax_sem(m))
+#' @family Models and syntax functions
 sframe_syntax_sem <- function(model, instrument = NULL, standardised = TRUE) {
   sframe_check_model_type(model, c("cfa", "cb_sem"), "sframe_syntax_sem()",
                           "covariance-based")
@@ -1049,6 +1061,7 @@ sframe_syntax_sem <- function(model, instrument = NULL, standardised = TRUE) {
 #'   paths = list(sframe_path("sq", "sat"))
 #' )
 #' cat(sframe_syntax_pls(m))
+#' @family Models and syntax functions
 sframe_syntax_pls <- function(model, data_name = "data", nboot = NULL, seed = 123) {
   sframe_check_model_type(model, "pls_sem", "sframe_syntax_pls()",
                           "partial-least-squares")
@@ -1285,6 +1298,7 @@ sframe_bullets <- function(...) paste0("- ", c(...))
 #' m <- sframe_model_spec("cb1", type = "cb_sem",
 #'               constructs = list(sframe_construct("sat", items = c("sat_1", "sat_2"))))
 #' cat(sframe_model_outline(m, include_json = FALSE))
+#' @family Models and syntax functions
 sframe_model_outline <- function(model, include_json = TRUE) {
   sframe_validate_model(model, strict = TRUE)
   constructs <- sframe_model_constructs(model)

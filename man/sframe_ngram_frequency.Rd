@@ -40,3 +40,11 @@ demo <- sframe_demo("tourism_services")
 cleaned <- sframe_clean_text(demo$responses, "comments")
 head(sframe_ngram_frequency(cleaned, n = 2, top_n = 10))
 }
+\seealso{
+Other Text analysis functions:
+\code{\link[=sframe_clean_text]{sframe_clean_text()}},
+\code{\link[=sframe_extract_quotes]{sframe_extract_quotes()}},
+\code{\link[=sframe_term_context]{sframe_term_context()}},
+\code{\link[=sframe_term_frequency]{sframe_term_frequency()}}
+}
+\concept{Text analysis functions}

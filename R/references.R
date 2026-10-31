@@ -77,6 +77,7 @@ sframe_reference_types <- c(
 #'   pages = "297-334", cited_by = "scale:satisfaction"
 #' )
 #' ref$id
+#' @family References functions
 sframe_reference <- function(id,
                          title,
                          author    = NULL,
@@ -225,6 +226,7 @@ sframe_reference_targets <- function(x, id) {
 #'   pages   = {297--334}
 #' }")
 #' names(refs)
+#' @family References functions
 read_bibtex <- function(file = NULL, text = NULL, cited_by = NULL) {
   if (is.null(text)) {
     if (is.null(file) || !file.exists(file)) {
@@ -481,6 +483,7 @@ sframe_bibtex_to_reference <- function(entry, cited_by = NULL) {
 #'   volume = "22", issue = "140", pages = "1-55", cited_by = "item:q1"
 #' ))
 #' length(sframe_get_references(instr))
+#' @family References functions
 sframe_add_references <- function(instrument, ..., replace = FALSE) {
   sframe_check_instrument(instrument)
   refs <- sframe_flatten_references(list(...))
@@ -527,6 +530,7 @@ sframe_flatten_references <- function(x) {
 #' @examples
 #' instr <- sframe_demo("likert_scale")$instrument
 #' sframe_get_references(instr)
+#' @family References functions
 sframe_get_references <- function(instrument, cited_by = NULL) {
   sframe_check_instrument(instrument)
   refs <- instrument$references %||% list()
@@ -556,6 +560,7 @@ sframe_get_references <- function(instrument, cited_by = NULL) {
 #' @examples
 #' instr <- sframe_demo("two_group")$instrument
 #' cat(substr(sframe_bibliography(instr), 1, 200))
+#' @family References functions
 sframe_bibliography <- function(instrument = NULL, results = NULL, extra = NULL, file = NULL) {
   refs <- list()
   if (!is.null(instrument)) refs <- c(refs, sframe_get_references(instrument))

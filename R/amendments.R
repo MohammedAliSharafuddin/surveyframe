@@ -323,6 +323,7 @@ sframe_amendment_plain <- function(a) {
 #'   deviation_report = "Wording only; no change to the construct measured."
 #' )
 #' nrow(sframe_get_amendments(amended))
+#' @family Amendments functions
 amend_sframe <- function(previous, instrument, reason_code, reason_text,
                          tier = NULL, author = NULL, deviation_report = NULL,
                          second_signoff = NULL) {
@@ -488,6 +489,7 @@ amend_sframe <- function(previous, instrument, reason_code, reason_text,
 #' item  <- sframe_item("q1", "How satisfied are you?", type = "text")
 #' instr <- sframe_instrument("Demo", components = list(item))
 #' sframe_get_amendments(instr)
+#' @family Amendments functions
 sframe_get_amendments <- function(instrument) {
   sframe_check_instrument(instrument)
   amendments <- instrument$amendments %||% list()

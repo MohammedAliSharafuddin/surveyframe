@@ -320,6 +320,7 @@ sframe_syntax_call <- function(result, frame = "scored") {
 #'
 #' # the call behind the number, with the variables and options resolved
 #' cat(sframe_syntax_result(results, which = "RQ1"), sep = "\n")
+#' @family Models and syntax functions
 sframe_syntax_result <- function(x, which = NULL, data_expr = "scored",
                             header = FALSE) {
   if (inherits(x, "sframe_analysis_results")) {

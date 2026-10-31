@@ -226,6 +226,7 @@ sframe_timing_report <- function(
 #'   straightline_scales = FALSE
 #' )
 #' print(qr)
+#' @family Responses functions
 sframe_quality_results <- function(
     data,
     instrument,

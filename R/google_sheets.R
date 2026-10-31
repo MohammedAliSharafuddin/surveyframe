@@ -69,6 +69,7 @@
 #'   output_dir = tempdir()
 #' )
 #' file.exists(script)
+#' @family Collect functions
 export_google_sheet <- function(instrument, sheet_url, output_dir = ".") {
   sframe_check_instrument(instrument)
   if (!dir.exists(output_dir)) {
@@ -166,6 +167,7 @@ export_google_sheet <- function(instrument, sheet_url, output_dir = ".") {
 #' )
 #' qr <- sframe_quality_results(responses, instr, respondent_id = "respondent_id")
 #' }
+#' @family Responses functions
 read_sheet_responses <- function(
     sheet_id,
     instrument,

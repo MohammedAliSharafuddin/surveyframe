@@ -54,4 +54,8 @@ app <- run_survey(instr, save_responses = "csv",
 }
 \seealso{
 \code{\link[=launch_studio]{launch_studio()}}, \code{\link[=read_responses]{read_responses()}}
+
+Other Preview functions:
+\code{\link[=preview_survey]{preview_survey()}}
 }
+\concept{Preview functions}

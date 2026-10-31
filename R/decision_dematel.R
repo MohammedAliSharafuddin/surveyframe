@@ -75,6 +75,7 @@ sframe_check_dematel_input <- function(x) {
 #'   `prominence` (D + R), `relation` (D - R), `threshold` (mean of T), and
 #'   `role` (a character vector, `"cause"` where relation > 0, else
 #'   `"effect"`).
+#' @family Decision analysis functions
 sframe_dematel_compute <- function(x) {
   n <- nrow(x)
   max_sum <- max(max(rowSums(x)), max(colSums(x)))
@@ -303,6 +304,7 @@ sframe_run_dematel <- function(data, roles, options, instrument) {
 #'   sframe_plot_dematel_influence(res$RQ3)
 #' }
 #' }
+#' @family Chart functions
 sframe_plot_dematel_influence <- function(result, palette = c("web", "print")) {
   rlang::check_installed("ggplot2", reason = "to plot DEMATEL influence.")
   palette <- match.arg(palette)

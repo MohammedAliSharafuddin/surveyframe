@@ -174,6 +174,13 @@ can be written again, and every plan result can be serialised by a host.
   demo name, so it previews your own survey as well as a demo. It replaces
   `preview_demo()`, which still works and still defaults to `"two_group"`.
 
+* **Help is organised by stage.** The reference index runs Design, Plan,
+  Preview, Collect, Responses, Analyse, Report, References and Amendments,
+  each saying where the stage lives in SurveyStudio or SurveyBuilder and
+  which function does it in code, then the toolboxes. `?surveyframe` opens
+  with "Start here" and the same stages, and every help page ends with links
+  to the rest of its section.
+
 ## References, cited where they are used and listed once at the end
 
 An instrument can now carry the works it draws on, and every report lists

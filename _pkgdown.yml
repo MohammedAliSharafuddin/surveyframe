@@ -111,68 +111,142 @@ articles:
       - text-analysis
 
 reference:
-  - title: "Demo library"
+  - title: "Start here"
     desc: >
-      Twenty-two small demos, each doing one job, with an instrument,
-      response data, a codebook of variable and value labels, and the
-      results surveyframe produced. Load one, change it, and keep going.
-      See the "Learn by example" article.
+      SurveyStudio opens an instrument and takes it through every stage
+      below, with no code. ?surveyframe is the map of the package, and
+      sframe_demo("first_survey") is a whole survey to start from.
     contents:
-      - sframe_list_demos
-      - sframe_demo
-      - sframe_demo_branding
-      - sframe_demo_qmd
-      - preview_survey
-      - export_responses
+      - surveyframe-package
+      - launch_studio
+      - launch_dashboard
 
   - title: "Design"
     desc: >
-      Start visually in the HTML SurveyBuilder or construct instruments in R.
+      Make the instrument: its questions, choice sets, scales, branching and
+      attention checks, saved as a portable .sframe file. In SurveyBuilder:
+      the Build mode. In code: `sframe_instrument()` and the makers listed
+      here, then `write_sframe()`.
     contents:
       - launch_builder
-      - launch_dashboard_demo
-
-  - title: "Build an instrument"
-    desc: >
-      Constructor functions for building the sframe instrument object.
-      Start here.
-    contents:
       - sframe_instrument
       - sframe_item
       - sframe_choice_set
       - sframe_scale
       - sframe_branch
       - sframe_attention_check
-      - sframe_model_spec
-      - sframe_construct
-      - sframe_path
-      - sframe_covariance
-      - sframe_indirect_effect
-      - sframe_add_model
-
-  - title: "Save and load"
-    desc: >
-      Read and write instruments as portable .sframe JSON files with
-      SHA-256 integrity hashing, and record disclosed revisions to them.
-    contents:
+      - sframe_conjoint_design
       - write_sframe
       - read_sframe
       - validate_sframe
-      - sframe_validate_model
-      - sframe_model_json
+      - sframe_validation
+      - as_sframe
+
+  - title: "Plan"
+    desc: >
+      Declare the analysis before the data arrive, so the report shows what
+      was planned and what was run. In SurveyBuilder: the Analyse mode. In
+      SurveyStudio: the Analysis Plan screen. In code: `sframe_plan(x) <-
+      plan`.
+    contents:
+      - sframe_plan
+      - "sframe_plan<-"
+      - sframe_sample_size_plan
+
+  - title: "Preview"
+    desc: >
+      See the survey as a respondent meets it, with nothing collected. In
+      SurveyStudio: the Preview screen. In code: `preview_survey()`.
+    contents:
+      - preview_survey
+      - run_survey
+
+  - title: "Collect"
+    desc: >
+      Send the survey out: a standalone HTML page, optionally saving answers
+      to a Google Sheet, or a Shiny module inside your own app. In
+      SurveyBuilder: Export survey, with the Google Sheets settings. In code:
+      `export_survey()`.
+    contents:
+      - export_survey
+      - export_google_sheet
+      - sframe_survey_ui
+      - sframe_survey_server
+
+  - title: "Responses"
+    desc: >
+      Read the answers back against the instrument, check their quality, and
+      export them with labels for other software. In SurveyStudio: the
+      Responses and Quality screens. In code: `read_responses()`.
+    contents:
+      - read_responses
+      - read_sheet_responses
+      - export_responses
+      - sframe_quality_results
+      - sframe_missing_data_results
+      - sframe_outlier_results
+
+  - title: "Analyse"
+    desc: >
+      Score the scales and run the plan, block by block. In SurveyStudio: the
+      Reliability, Analysis Plan and Dashboard screens. In code:
+      `run_analysis_plan()`.
+    contents:
+      - run_analysis_plan
+      - score_scales
+      - sframe_descriptives_results
+      - sframe_reliability_results
+      - sframe_item_results
+      - sframe_efa_readiness_results
+      - sframe_efa_solution
+      - sframe_validity_results
+      - sframe_assumption_results
+      - sframe_posthoc_results
+
+  - title: "Report"
+    desc: >
+      Write up what was run: an HTML or PDF report, a codebook, the figures,
+      and the R code behind each result. In SurveyStudio: the Export screen.
+      In code: `render_report()`.
+    contents:
+      - render_report
+      - render_results
+      - sframe_reports
+      - sframe_format_result
+      - sframe_codebook
+      - sframe_save_figures
+      - sframe_analysis_qmd
+      - sframe_result_supplement
+
+  - title: "References"
+    desc: >
+      Cite the works an instrument draws on. The references travel in the
+      .sframe file and the report lists each one once, at the end. In
+      SurveyStudio: the References screen. In code:
+      `sframe_add_references()`.
+    contents:
+      - sframe_reference
+      - read_bibtex
+      - sframe_add_references
+      - sframe_get_references
+      - sframe_bibliography
+
+  - title: "Amendments"
+    desc: >
+      Change an instrument mid-study, on the record: each amendment is logged
+      with its reason and the hash it replaced. In SurveyStudio: the
+      Amendments screen. In code: `amend_sframe()`.
+    contents:
       - amend_sframe
       - sframe_get_amendments
       - sframe_link_git_commit
-      - sframe_validation
 
-  - title: "Accessors and coercion"
+  - title: "Inspect"
     desc: >
-      Read parts of an instrument, a validation result, or a report
-      without reaching into the object directly, new in 0.4.0. Each
-      accessor and as.data.frame method has its own page as of 0.4.2,
-      stating the classes it accepts and what it returns.
+      Read parts of an instrument, a validation result or a report without
+      reaching into the object, at any stage. Each accessor and as.data.frame
+      method states the classes it accepts and what it returns.
     contents:
-      - as_sframe
       - sframe_accessors
       - sframe_apa
       - sframe_get_branches
@@ -189,8 +263,6 @@ reference:
       - sframe_missing_columns
       - sframe_get_models
       - sframe_object
-      - sframe_plan
-      - "sframe_plan<-"
       - sframe_problems
       - sframe_report_accessors
       - sframe_get_scales
@@ -214,122 +286,27 @@ reference:
       - as.data.frame.sframe_validation
       - as.data.frame.sframe_validity_report
 
-  - title: "Deploy"
+  - title: "Models and syntax"
     desc: >
-      Render the instrument as a Shiny survey or launch SurveyStudio.
+      Declare constructs, paths and covariances, and generate lavaan, seminr
+      and psych syntax from the instrument.
     contents:
-      - run_survey
-      - export_survey
-      - launch_studio
-      - launch_dashboard
-      - sframe_survey_ui
-      - sframe_survey_server
-
-  - title: "Collect responses"
-    desc: >
-      Load and validate response data against the instrument specification.
-    contents:
-      - read_responses
-      - export_google_sheet
-      - read_sheet_responses
-
-  - title: "Quality checks"
-    desc: >
-      Evaluate response data for attention check failures, straight-lining,
-      missingness, and duplicate submissions.
-    contents:
-      - sframe_quality_results
-      - sframe_missing_data_results
-      - sframe_outlier_results
-      - sframe_assumption_results
-
-  - title: "Score and analyse"
-    desc: >
-      Score composite scales, compute reliability statistics, and prepare
-      psychometric diagnostics and pre-planned analyses.
-    contents:
-      - score_scales
-      - sframe_descriptives_results
-      - sframe_reliability_results
-      - sframe_item_results
-      - sframe_efa_readiness_results
-      - sframe_efa_solution
-      - sframe_validity_results
+      - sframe_model_spec
+      - sframe_construct
+      - sframe_path
+      - sframe_covariance
+      - sframe_indirect_effect
+      - sframe_add_model
+      - sframe_validate_model
+      - sframe_model_json
+      - sframe_model_outline
       - sframe_syntax_cfa
       - sframe_syntax_efa
       - sframe_syntax_sem
       - sframe_syntax_pls
-      - sframe_posthoc_results
-      - sframe_sample_size_plan
-      - run_analysis_plan
-
-  - title: "Decision analysis"
-    desc: >
-      Multi-criteria decision analysis, new in 0.4.0. The 10 methods run
-      through the analysis plan like any other, so the functions here are the
-      ones that assemble their input, test how stable a ranking is, and build
-      choice designs.
-    contents:
-      - sframe_sensitivity_analysis
-      - sframe_conjoint_design
-      - sframe_assemble_pairwise
-      - sframe_aggregate_judgements
-      - sframe_collected_weights
-      - sframe_rated_matrix
-      - sframe_decision_options
-      - sframe_dematel_compute
-
-  - title: "Text analysis"
-    desc: >
-      Structured analysis of open-ended text responses, new in 0.5.0: term
-      and n-gram frequency, keyword-in-context concordance, co-occurrence
-      (plain and network), sentiment, topic modelling, and quote extraction.
-    contents:
-      - sframe_clean_text
-      - sframe_term_frequency
-      - sframe_ngram_frequency
-      - sframe_term_context
-      - sframe_extract_quotes
-
-  - title: "Confidence intervals"
-    desc: >
-      Base-R bootstrap and effect-size confidence interval helpers, reused
-      across the inferential runners.
-    contents:
-      - sframe_bootstrap_ci
-      - sframe_cohens_d_ci
-      - sframe_cramers_v_ci
-      - sframe_eta_sq_ci
-
-  - title: "Report"
-    desc: >
-      Generate codebooks, scale appendices, reproducible HTML reports, and
-      the R code behind a computed result.
-    contents:
-      - sframe_reports
-      - sframe_codebook
-      - sframe_codebook_items_display
-      - render_report
-      - render_results
-      - sframe_format_result
-      - sframe_model_outline
       - sframe_syntax_result
-      - sframe_result_supplement
-      - sframe_analysis_qmd
-      - sframe_save_figures
 
-  - title: "References"
-    desc: >
-      Cite the works an instrument draws on. The references travel in the
-      .sframe file and the report lists each one once, at the end.
-    contents:
-      - sframe_reference
-      - read_bibtex
-      - sframe_add_references
-      - sframe_get_references
-      - sframe_bibliography
-
-  - title: "Plotting"
+  - title: "Charts"
     desc: >
       Opt-in ggplot2 charts for analysis results, and the package theme.
     contents:
@@ -352,8 +329,6 @@ reference:
       - sframe_plot_reliability
       - sframe_plot_validity
       - sframe_plot_variable_distribution
-      - sframe_draw_mosaic
-      - sframe_likert_scale_groups
       - sframe_plot_term_frequency
       - sframe_plot_ngram_frequency
       - sframe_plot_cooccurrence
@@ -361,10 +336,58 @@ reference:
       - sframe_plot_sentiment
       - sframe_plot_topics
 
-  - title: "Print, format, and summary methods"
+  - title: "Decision analysis"
     desc: >
-      S3 methods so every component object prints and summarises cleanly at
-      the console and inside reports.
+      Multi-criteria decision analysis. The 10 methods run through the
+      analysis plan like any other, so the functions here assemble their
+      input and test how stable a ranking is.
+    contents:
+      - sframe_sensitivity_analysis
+      - sframe_assemble_pairwise
+      - sframe_aggregate_judgements
+      - sframe_collected_weights
+      - sframe_rated_matrix
+      - sframe_decision_options
+      - sframe_dematel_compute
+
+  - title: "Text analysis"
+    desc: >
+      Open-ended answers: term and n-gram frequency, keyword in context, and
+      quote extraction.
+    contents:
+      - sframe_clean_text
+      - sframe_term_frequency
+      - sframe_ngram_frequency
+      - sframe_term_context
+      - sframe_extract_quotes
+
+  - title: "Confidence intervals"
+    desc: >
+      Base-R bootstrap and effect-size confidence intervals, reused across
+      the inferential runners.
+    contents:
+      - sframe_bootstrap_ci
+      - sframe_cohens_d_ci
+      - sframe_cramers_v_ci
+      - sframe_eta_sq_ci
+
+  - title: "Demos"
+    desc: >
+      22 small teaching demos, each doing one job, and 2 larger reference
+      datasets. Each comes with an instrument and response data, and the
+      teaching demos with a codebook and the results surveyframe produced.
+      See the "Learn by example" article.
+    contents:
+      - sframe_list_demos
+      - sframe_demo
+      - sframe_demo_qmd
+      - sframe_demo_branding
+      - launch_dashboard_demo
+
+  - title: "Methods"
+    desc: >
+      Print, format and summary methods, so every component prints and
+      summarises cleanly at the console and inside reports.
     contents:
       - print.sframe
       - format.sframe
@@ -388,16 +411,27 @@ reference:
       - format.sf_model
       - summary.sf_model
 
-  - title: "Old names (superseded)"
+  - title: "For SurveyStudio and the report template"
+    desc: >
+      Helpers SurveyStudio and the report template call. Exported for now,
+      and to become internal.
     contents:
-      - superseded
-
-  - title: "Package"
-    contents:
-      - surveyframe-package
       - sframe_builder_empty_state
       - sframe_builder_state_from_instrument
       - sframe_builder_validate_draft
+      - sframe_codebook_items_display
+      - sframe_draw_mosaic
+      - sframe_likert_scale_groups
+      - sframe_plot_item_chart
+      - sframe_plot_scale_chart
+      - sframe_draw_likert_diverging
+      - sframe_apa_cells
+
+  - title: "Old names (superseded)"
+    desc: >
+      Every name changed in 0.4.3, each still working, and what replaced it.
+    contents:
+      - superseded
 
 footer:
   structure:

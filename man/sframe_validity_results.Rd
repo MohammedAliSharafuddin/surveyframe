@@ -42,3 +42,16 @@ loadings <- list(
 vr <- sframe_validity_results(loadings)
 vr$reliability
 }
+\seealso{
+Other Analyse functions:
+\code{\link[=run_analysis_plan]{run_analysis_plan()}},
+\code{\link[=score_scales]{score_scales()}},
+\code{\link[=sframe_assumption_results]{sframe_assumption_results()}},
+\code{\link[=sframe_descriptives_results]{sframe_descriptives_results()}},
+\code{\link[=sframe_efa_readiness_results]{sframe_efa_readiness_results()}},
+\code{\link[=sframe_efa_solution]{sframe_efa_solution()}},
+\code{\link[=sframe_item_results]{sframe_item_results()}},
+\code{\link[=sframe_posthoc_results]{sframe_posthoc_results()}},
+\code{\link[=sframe_reliability_results]{sframe_reliability_results()}}
+}
+\concept{Analyse functions}

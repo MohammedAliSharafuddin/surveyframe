@@ -142,6 +142,7 @@ sframe_decision_item <- function(instrument, item_id, types) {
 #' )
 #' responses <- data.frame(pairs__price__vs__speed = c(3, -5))
 #' sframe_assemble_pairwise(responses, study, "pairs")$matrices[[1]]
+#' @family Decision analysis functions
 sframe_assemble_pairwise <- function(data, instrument, item_id) {
   item <- sframe_decision_item(instrument, item_id, "pairwise_comparison")
   items <- as.character(item$comparison_items %||% character(0))
@@ -334,6 +335,7 @@ sframe_align_judgement_matrices <- function(matrices) {
 #' m1 <- matrix(c(1, 3, 1 / 3, 1), 2, 2)
 #' m2 <- matrix(c(1, 5, 1 / 5, 1), 2, 2)
 #' sframe_aggregate_judgements(list(m1, m2))$matrix
+#' @family Decision analysis functions
 sframe_aggregate_judgements <- function(matrices,
                                         method = c("geometric", "arithmetic"),
                                         cr_filter = FALSE) {
@@ -449,6 +451,7 @@ sframe_aggregate_judgements <- function(matrices,
 #' sframe_collected_weights(
 #'   data.frame(pts__price = c(60, 40), pts__speed = c(40, 60)), study, "pts"
 #' )$weights
+#' @family Decision analysis functions
 sframe_collected_weights <- function(data, instrument, item_id,
                                      cr_filter = FALSE) {
   item <- sframe_decision_item(instrument, item_id,
@@ -553,6 +556,7 @@ sframe_collected_weights <- function(data, instrument, item_id,
 #' responses <- data.frame(rate_price__Alpha = c(3, 4), rate_price__Basilica = c(5, 5))
 #' rm <- sframe_rated_matrix(responses, study, "rate_price")
 #' rm$matrix
+#' @family Decision analysis functions
 sframe_rated_matrix <- function(data, instrument, items,
                                 statistic = c("mean", "median")) {
   statistic <- match.arg(statistic)
@@ -672,6 +676,7 @@ sframe_rated_matrix <- function(data, instrument, items,
 #'   criteria = c("service", "price"),
 #'   criteria_types = c("benefit", "cost")
 #' ))$matrix
+#' @family Decision analysis functions
 sframe_decision_options <- function(options) {
   options <- options %||% list()
   alternatives <- as.character(options[["alternatives"]] %||% character(0))

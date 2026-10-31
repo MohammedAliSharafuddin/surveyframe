@@ -40,4 +40,8 @@ file.exists(path)
 \seealso{
 \code{\link[=export_survey]{export_survey()}} for the page you send to respondents,
 \code{\link[=launch_studio]{launch_studio()}}, \code{\link[=sframe_demo]{sframe_demo()}}
+
+Other Preview functions:
+\code{\link[=run_survey]{run_survey()}}
 }
+\concept{Preview functions}

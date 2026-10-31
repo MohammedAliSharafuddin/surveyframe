@@ -130,6 +130,7 @@
 #' cleaned <- sframe_clean_text(demo$responses, "comments")
 #' head(cleaned)
 #' attr(cleaned, "respondent")[1:5]
+#' @family Text analysis functions
 sframe_clean_text <- function(data, item_id, lowercase = TRUE,
                                   remove_punct = TRUE, strip_numbers = FALSE,
                                   instrument = NULL) {
@@ -193,6 +194,7 @@ sframe_clean_text <- function(data, item_id, lowercase = TRUE,
 #' demo <- sframe_demo("tourism_services")
 #' cleaned <- sframe_clean_text(demo$responses, "comments")
 #' head(sframe_term_frequency(cleaned, top_n = 10))
+#' @family Text analysis functions
 sframe_term_frequency <- function(text, stop_words = NULL, top_n = 30L) {
   toks <- unlist(.sframe_tokenise(text, stop_words), use.names = FALSE)
   if (!length(toks)) {
@@ -682,6 +684,7 @@ sframe_run_stm_topics <- function(data, roles, options, instrument) {
 #'   quotes
 #' }
 #' }
+#' @family Text analysis functions
 sframe_extract_quotes <- function(model, text, n_quotes = 3L) {
   sframe_require_stm(reason = "to extract representative quotes.")
   # The fitted model sits in the result's runtime attribute since 0.4.3. A
@@ -766,6 +769,7 @@ sframe_extract_quotes <- function(model, text, n_quotes = 3L) {
 #' demo <- sframe_demo("tourism_services")
 #' cleaned <- sframe_clean_text(demo$responses, "comments")
 #' head(sframe_ngram_frequency(cleaned, n = 2, top_n = 10))
+#' @family Text analysis functions
 sframe_ngram_frequency <- function(text, n = 2L, stop_words = NULL, top_n = 30L) {
   n <- as.integer(n)
   if (length(n) != 1L || is.na(n) || n < 2L) {
@@ -833,6 +837,7 @@ sframe_ngram_frequency <- function(text, n = 2L, stop_words = NULL, top_n = 30L)
 #' demo <- sframe_demo("tourism_services")
 #' cleaned <- sframe_clean_text(demo$responses, "comments")
 #' sframe_term_context(cleaned, "service", window = 4)
+#' @family Text analysis functions
 sframe_term_context <- function(text, term, window = 6L, max_matches = 20L) {
   if (!is.character(term) || length(term) != 1L || is.na(term) || !nzchar(term)) {
     rlang::abort("`term` must be a single non-empty string.", class = "sframe_error")

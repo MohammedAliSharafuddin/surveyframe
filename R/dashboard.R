@@ -62,6 +62,7 @@
 #' )
 #' launch_dashboard(instr, responses)
 #' }
+#' @family entry points
 launch_dashboard <- function(
     instrument      = NULL,
     responses      = NULL,

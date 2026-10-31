@@ -46,4 +46,9 @@ sframe_link_git_commit(instr, repo_path = tempdir())
 }
 \seealso{
 \code{\link[=amend_sframe]{amend_sframe()}}, \code{\link[=write_sframe]{write_sframe()}}
+
+Other Amendments functions:
+\code{\link[=amend_sframe]{amend_sframe()}},
+\code{\link[=sframe_get_amendments]{sframe_get_amendments()}}
 }
+\concept{Amendments functions}

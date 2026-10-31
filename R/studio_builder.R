@@ -116,6 +116,7 @@ sframe_builder_as_check <- function(check) {
 #' state <- sframe_builder_empty_state()
 #' state$meta$title
 #' length(state$items)
+#' @family SurveyStudio helpers
 sframe_builder_empty_state <- function() {
   list(
     meta = list(
@@ -150,6 +151,7 @@ sframe_builder_empty_state <- function() {
 #' state <- sframe_builder_state_from_instrument(demo$instrument)
 #' length(state$items)
 #' length(state$scales)
+#' @family SurveyStudio helpers
 sframe_builder_state_from_instrument <- function(instrument = NULL) {
   if (is.null(instrument)) {
     return(sframe_builder_empty_state())
@@ -319,6 +321,7 @@ sframe_builder_revision_problem <- function(instrument) {
 #'   scales = state$scales, branching = state$branching, checks = state$checks
 #' )
 #' draft$valid
+#' @family SurveyStudio helpers
 sframe_builder_validate_draft <- function(
     meta,
     choices = list(),

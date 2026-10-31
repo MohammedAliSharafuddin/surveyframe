@@ -100,4 +100,12 @@ print(qr)
 }
 \seealso{
 \code{\link[=sframe_attention_check]{sframe_attention_check()}}, \code{\link[=read_responses]{read_responses()}}, \code{\link[=score_scales]{score_scales()}}
+
+Other Responses functions:
+\code{\link[=export_responses]{export_responses()}},
+\code{\link[=read_responses]{read_responses()}},
+\code{\link[=read_sheet_responses]{read_sheet_responses()}},
+\code{\link[=sframe_missing_data_results]{sframe_missing_data_results()}},
+\code{\link[=sframe_outlier_results]{sframe_outlier_results()}}
 }
+\concept{Responses functions}
