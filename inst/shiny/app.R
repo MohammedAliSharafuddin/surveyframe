@@ -1349,6 +1349,23 @@ ui <- fluidPage(
         min-height: 160px; resize: vertical; font-size: 14px; line-height: 1.5;
       }
       .studio-copy-btn { margin: 10px 0; padding: 5px 14px; font-size: 12px; }
+      details.result-canvas-block > summary { cursor: pointer; list-style: none; padding-left: 18px; position: relative; }
+      details.result-canvas-block > summary::-webkit-details-marker { display: none; }
+      details.result-canvas-block > summary::before {
+        content: '\\25B8'; position: absolute; left: 0; top: 0; color: #0f9d9a;
+      }
+      details.result-canvas-block[open] > summary::before { content: '\\25BE'; }
+      details.result-canvas-block > summary .card-title { display: inline; margin: 0; }
+      details.result-canvas-block > summary .hint { display: block; margin: 4px 0 0; }
+      details.result-canvas-block[open] > summary { margin-bottom: 10px; }
+      .opt-row { display: flex; flex-wrap: wrap; column-gap: 20px; }
+      .opt-row > div { flex: 1 1 220px; }
+      .opt-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); column-gap: 12px; }
+      .opt-grid .checkbox, .opt-grid .form-group { margin: 2px 0; }
+      details.opt-more > summary { cursor: pointer; font-weight: 600; margin: 10px 0; list-style: none; }
+      details.opt-more > summary::-webkit-details-marker { display: none; }
+      details.opt-more > summary::before { content: '\\25B8 '; color: #0f9d9a; }
+      details.opt-more[open] > summary::before { content: '\\25BE '; }
       .vbadge {
         display: inline-block; border: 1px solid #d9e2ec; border-radius: 999px;
         padding: 2px 7px; margin: 2px 3px 2px 0; font-size: 11px;
@@ -1773,34 +1790,62 @@ ui <- fluidPage(
           uiOutput("export_sframe_ui")
         ),
         tags$div(class = "card",
-          tags$div(class = "card-title", "Report contents"),
-          checkboxInput("rpt_codebook", "Include codebook", value = TRUE),
-          checkboxInput("rpt_quality", "Include quality report", value = TRUE),
-          checkboxInput("rpt_missing", "Include missing-data report", value = TRUE),
-          checkboxInput("rpt_descriptives", "Include descriptives", value = TRUE),
-          checkboxInput("rpt_reliability", "Include reliability", value = TRUE),
-          checkboxInput("rpt_analysis", "Include analysis-plan results", value = TRUE),
-          checkboxInput("rpt_models", "Include saved models and syntax", value = TRUE),
-          shiny::radioButtons(
-            "rpt_palette", "Chart theme",
-            choices = c(
-              "Colour (on-screen reading)" = "web",
-              "Black and white (print and journal submission)" = "print"
-            ),
-            selected = "web"
-          )
-        ),
-        tags$div(class = "card",
           tags$div(class = "card-title", "Interpretations"),
           tags$p(class = "hint",
-            "Write an interpretation for each research question before exporting. The report shows it alongside the pre-declared decision rule. Interpretations go into the report only, never into the instrument file."),
+            "Open a research question to read its result and write what it means. The report shows each interpretation beside the pre-declared decision rule. Interpretations go into the report only, never into the instrument file."),
           uiOutput("export_interpretations_ui")
         ),
+        # The options render_report() takes from a host (owner 2026-10-30).
         tags$div(class = "card",
-          tags$div(class = "card-title", "Generate"),
+          tags$div(class = "card-title", "Report"),
+          uiOutput("export_engine_note"),
+          tags$div(class = "opt-row",
+            textInput("rpt_title", "Title", placeholder = "The instrument's title"),
+            textInput("rpt_authors", "Authors",
+                      placeholder = "Separated by commas. The instrument's authors")
+          ),
+          tags$div(class = "opt-row",
+            shiny::radioButtons("rpt_format", "Format",
+              choices = c("HTML" = "html", "PDF (needs pagedown and Chrome)" = "pdf"),
+              selected = "html"),
+            shiny::radioButtons(
+              "rpt_palette", "Chart theme",
+              choices = c(
+                "Colour (on-screen reading)" = "web",
+                "Black and white (print and journal submission)" = "print"
+              ),
+              selected = "web"
+            ),
+            tags$div(tags$label(class = "control-label", "Code"),
+              checkboxInput("rpt_show_code", "Show the R code for each result", value = TRUE))
+          ),
+          tags$label(class = "control-label", "Sections"),
+          tags$div(class = "opt-grid",
+            checkboxInput("rpt_codebook", "Codebook", value = TRUE),
+            checkboxInput("rpt_quality", "Quality report", value = TRUE),
+            checkboxInput("rpt_missing", "Missing-data report", value = TRUE),
+            checkboxInput("rpt_descriptives", "Descriptives", value = TRUE),
+            checkboxInput("rpt_reliability", "Reliability", value = TRUE),
+            checkboxInput("rpt_analysis", "Analysis-plan results", value = TRUE),
+            checkboxInput("rpt_models", "Saved models and syntax", value = TRUE)
+          ),
+          tags$details(class = "opt-more",
+            tags$summary("More options: figures, citation style and further references"),
+            tags$div(class = "opt-row",
+              numericInput("rpt_fig_width", "Figure width (inches)", value = NA, min = 1, step = 0.5),
+              numericInput("rpt_fig_height", "Figure height (inches)", value = NA, min = 1, step = 0.5),
+              numericInput("rpt_fig_dpi", "Resolution (dpi)", value = NA, min = 72, step = 50),
+              selectInput("rpt_fig_format", "Figure format",
+                choices = c("Each engine's own" = "default", "PNG" = "png", "SVG" = "svg"))
+            ),
+            tags$p(class = "hint", "Empty fields keep each engine's own figure size and resolution."),
+            fileInput("rpt_csl", "Citation style (.csl)", accept = ".csl"),
+            tags$p(class = "hint",
+              "APA 7 unless you give a style. Any style from the Zotero style repository works with Quarto."),
+            textAreaInput("rpt_bibtex", "Further references (BibTeX)", rows = 4, width = "100%",
+              placeholder = "Works your interpretations cite as [@key]. The instrument's own references are always included.")
+          ),
           uiOutput("export_report_ui"),
-          tags$p(class = "hint",
-            "Generates a self-contained HTML report. Quarto is optional; an internal HTML fallback is available."),
           tags$p(class = "hint",
             "The survey file and the Google Sheets collector are on the Collect screen.")
         ),
@@ -4233,10 +4278,10 @@ server <- function(input, output, session) {
 
   output$export_report_ui <- renderUI({
     if (!is.null(rv$instrument)) {
-      downloadButton("download_report_btn", "Generate HTML report", class = "btn-primary")
+      downloadButton("download_report_btn", "Generate report", class = "btn-primary")
     } else {
       export_disabled_btn(
-        "Generate HTML report",
+        "Generate report",
         "Open or build a valid instrument before generating the report.")
     }
   })
@@ -4290,7 +4335,7 @@ server <- function(input, output, session) {
       dir <- tempfile("qmd-")
       qmd_bundle$paths <- sframe_analysis_qmd(
         rv$instrument, rv$responses, dir = dir, overwrite = TRUE)
-      showNotification("Analysis notebook prepared. Download all 3 files below into the same folder.",
+      showNotification("Analysis notebook prepared. Download it below as 1 zip.",
                        type = "message")
     }, error = function(e) {
       showNotification(paste("Error:", conditionMessage(e)), type = "error")
@@ -4300,24 +4345,20 @@ server <- function(input, output, session) {
   output$qmd_downloads_ui <- renderUI({
     p <- qmd_bundle$paths
     if (is.null(p)) return(NULL)
-    tagList(
-      downloadButton("qmd_dl_qmd", "Download notebook (.qmd)", class = "btn-primary"),
-      downloadButton("qmd_dl_sframe", "Download instrument (.sframe)", class = "btn-outline"),
-      downloadButton("qmd_dl_csv", "Download responses (.csv)", class = "btn-outline")
-    )
+    downloadButton("qmd_dl_zip", "Download notebook (.zip)", class = "btn-primary")
   })
 
-  output$qmd_dl_qmd <- downloadHandler(
-    filename = function() basename(qmd_bundle$paths$qmd),
-    content = function(file) file.copy(qmd_bundle$paths$qmd, file, overwrite = TRUE)
-  )
-  output$qmd_dl_sframe <- downloadHandler(
-    filename = function() basename(qmd_bundle$paths$sframe),
-    content = function(file) file.copy(qmd_bundle$paths$sframe, file, overwrite = TRUE)
-  )
-  output$qmd_dl_csv <- downloadHandler(
-    filename = function() basename(qmd_bundle$paths$csv),
-    content = function(file) file.copy(qmd_bundle$paths$csv, file, overwrite = TRUE)
+  # The notebook, its instrument and its responses in 1 zip, unpacked into
+  # 1 folder, as the notebook reads them.
+  output$qmd_dl_zip <- downloadHandler(
+    filename = function() sub("\\.qmd$", ".zip", basename(qmd_bundle$paths$qmd)),
+    content = function(file) {
+      p <- qmd_bundle$paths
+      files <- c(p$qmd, p$sframe, p$csv)
+      zip_path <- tempfile(fileext = ".zip")
+      utils::zip(zip_path, files = files, flags = "-j9Xq")
+      file.copy(zip_path, file, overwrite = TRUE)
+    }
   )
 
   # The Interpretations card is a JASP/JAMOVI-style output canvas: every
@@ -4361,9 +4402,11 @@ server <- function(input, output, session) {
         result <- results[[hit_idx]]
         plot_tags <- all_plot_tags[[hit_idx]] %||% list()
       }
-      tags$div(class = "card result-canvas-block",
-        tags$div(class = "card-title", studio_rq_heading(i, block_id)),
-        tags$p(block$research_question %||% ""),
+      # Each research question folds, so 36 of them read as a list.
+      tags$details(class = "card result-canvas-block",
+        tags$summary(
+          tags$span(class = "card-title", studio_rq_heading(i, block_id)),
+          tags$span(class = "hint", block$research_question %||% "")),
         tags$div(
           tags$span(class = "vbadge", block$method %||% block$test %||% ""),
           if (!is.null(result) && !is.null(result$effect_label)) {
@@ -4391,7 +4434,7 @@ server <- function(input, output, session) {
         tags$label(class = "vmeta-lbl", "Interpretation"),
         textAreaInput(fld, NULL,
           value = shiny::isolate(input[[fld]] %||% ""),
-          rows = 8, width = "100%",
+          rows = 6, width = "100%",
           placeholder = "State what this result means for the research question.")
       )
     })
@@ -4414,11 +4457,49 @@ server <- function(input, output, session) {
     if (length(out) > 0) out else NULL
   }
 
+  studio_report_authors <- function() {
+    a <- trimws(strsplit(input$rpt_authors %||% "", ",", fixed = TRUE)[[1]])
+    a <- a[nzchar(a)]
+    if (length(a) > 0) a else NULL
+  }
+
+  studio_report_references <- function() {
+    text <- trimws(input$rpt_bibtex %||% "")
+    if (nzchar(text)) read_bibtex(text = text) else NULL
+  }
+
+  # Only the figure settings given, so an empty field keeps the engine's own.
+  studio_report_figures <- function() {
+    f <- list(width = input$rpt_fig_width, height = input$rpt_fig_height,
+              dpi = input$rpt_fig_dpi)
+    f <- Filter(function(v) is.numeric(v) && length(v) == 1 && !is.na(v) && v > 0, f)
+    if ((input$rpt_fig_format %||% "default") %in% c("png", "svg")) f$format <- input$rpt_fig_format
+    if (length(f) > 0) f else NULL
+  }
+
+  # Which engine will write the report, and what the built-in one cannot do.
+  output$export_engine_note <- renderUI({
+    use_quarto <- isTRUE(getOption("surveyframe.use_quarto", TRUE))
+    quarto <- Sys.which("quarto")
+    builtin <- paste(
+      "the built-in engine writes the report. It formats references in APA 7",
+      "only, so another citation style needs Quarto, from quarto.org.")
+    if (use_quarto && nzchar(quarto)) {
+      tags$p(class = "plan-msg ok", paste0(
+        "Quarto found at ", unname(quarto), ". It writes the report, in any citation style."))
+    } else if (!use_quarto) {
+      tags$p(class = "plan-msg", paste0(
+        "Quarto is turned off by options(surveyframe.use_quarto = FALSE), so ", builtin))
+    } else {
+      tags$p(class = "plan-msg", paste0("Quarto was not found, so ", builtin))
+    }
+  })
+
   output$download_report_btn <- downloadHandler(
     filename = function() {
       paste0(
         gsub("[^a-zA-Z0-9]", "_", (rv$instrument$meta$title %||% "survey")),
-        "_report.html"
+        "_report.", if (identical(input$rpt_format, "pdf")) "pdf" else "html"
       )
     },
     content = function(file) {
@@ -4436,7 +4517,14 @@ server <- function(input, output, session) {
           include_analysis = isTRUE(input$rpt_analysis),
           include_models = isTRUE(input$rpt_models),
           plot_palette = input$rpt_palette %||% "web",
-          interpretations = studio_collect_interpretations()
+          interpretations = studio_collect_interpretations(),
+          format = if (identical(input$rpt_format, "pdf")) "pdf" else "html",
+          show_code = !isFALSE(input$rpt_show_code),
+          title = trim_or_null(input$rpt_title),
+          authors = studio_report_authors(),
+          references = studio_report_references(),
+          csl = input$rpt_csl$datapath,
+          figures = studio_report_figures() %||% getOption("surveyframe.figures")
         )
       }, error = function(e) {
         showNotification(paste("Report error:", conditionMessage(e)), type = "error")
