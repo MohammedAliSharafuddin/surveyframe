@@ -21,20 +21,18 @@ test_that("18: both engines forward the palette to the diverging chart", {
   src <- engine_sources()
   expect_match(src$r, "sframe_draw_likert_diverging(freq, theme,", fixed = TRUE)
   expect_match(src$r, "palette = plot_palette", fixed = TRUE)
-  expect_match(src$qmd,
-               "sframe_draw_likert_diverging(freq, THEME, palette = plot_palette)",
-               fixed = TRUE)
+  # The template draws what render_report() built with the same specs.
+  expect_match(src$qmd, "chart$draw()", fixed = TRUE)
 })
 
 test_that("17: a grouped item falls through when ggplot2 is absent", {
   src <- engine_sources()
   # the skip is conditional on a grouped chart being possible
   expect_match(src$r, "if (has_ggplot) {", fixed = TRUE)
-  expect_match(src$qmd, "if (item$id %in% names(group_of) && has_ggplot) {",
-               fixed = TRUE)
-  # and neither engine skips a grouped member unconditionally any more
-  expect_false(grepl("if (gid %in% rendered_groups || !has_ggplot) next",
-                     src$qmd, fixed = TRUE))
+  # The template has no walk of its own any more: it prints the chart specs
+  # render_report() built (naming decision 6).
+  expect_false(grepl("group_of", src$qmd, fixed = TRUE))
+  expect_match(src$qmd, "chart$draw()", fixed = TRUE)
   expect_false(grepl("if (!gid %in% rendered_groups && has_ggplot) {",
                      src$r, fixed = TRUE))
 })
@@ -68,7 +66,8 @@ test_that("23: both engines render a result's supplementary table", {
   # one shared helper decides what a result shows besides its main table, so
   # the 2 engines cannot drift on it
   expect_match(src$r, "sframe_result_supplement(result)", fixed = TRUE)
-  expect_match(src$qmd, "sframe_result_supplement(r)", fixed = TRUE)
+  expect_match(src$r, "sframe_result_supplement(r)", fixed = TRUE)
+  expect_match(src$qmd, "r$supplement", fixed = TRUE)
   # and the quanteda runner's leading features are one of the things it names
   helper <- sframe_source_text("R", "analysis_plan.R")
   expect_match(helper, "Leading features", fixed = TRUE)

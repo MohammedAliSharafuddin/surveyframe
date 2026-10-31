@@ -27,6 +27,7 @@ params:
   plot_palette:        "web"
   interpretations_path: ""
   declarations_path: ""
+  content_path:      ""
   instrument_hash:     ""
   analysis_seed:       ""
   use_citations:       false
@@ -75,12 +76,22 @@ interps    <- if (nzchar(params$interpretations_path %||% "") &&
 } else {
   list()
 }
+# The codebook table, the distribution charts and the plan results,
+# computed by render_report() inside the package (naming decision 6). The
+# template prints them, so it and the built-in engine report the same.
+content <- if (nzchar(params$content_path %||% "") &&
+               file.exists(params$content_path)) {
+  readRDS(params$content_path)
+} else {
+  list(codebook_items = NULL, charts = list(), results = NULL)
+}
 
 # References (0.4.3). render_report() hands pandoc a CSL-JSON bibliography
 # and sets use_citations, so a citation is written in text as [@key] and the
 # reference appears once, in the References section at the end. Each result
 # used to carry its own reference list, repeating the same works.
 use_citations <- isTRUE(as.logical(params$use_citations %||% FALSE))
+show_code <- isTRUE(params$show_code %||% TRUE)
 cited_keys <- function(target) {
   # A reference linked to nothing counts as cited by the instrument as a
   # whole, so every reference the instrument carries reaches the list.
@@ -160,11 +171,7 @@ cat(sprintf("**Validation status:** %s\n\n",
 ```{r codebook, eval=params$include_codebook}
 #| tbl-cap: "Survey items"
 cb <- sframe_codebook(instrument)
-items_d <- sframe_codebook_items_display(cb)
-items_d$reverse  <- ifelse(items_d$reverse,  "Yes", "")
-items_d$required <- ifelse(items_d$required, "Yes", "")
-kable(format = "html", items_d,
-  col.names = c("ID","Label","Type","Response options","Scale","Reverse","Required"),
+kable(format = "html", content$codebook_items,
   align = c("l","l","l","l","l","c","c"))
 ```
 
@@ -291,161 +298,16 @@ if (is.null(dr)) {
 
 ```{r distributions, eval=params$include_descriptives && has_data, fig.width=7, fig.height=3.2, fig.align='left'}
 #| output: asis
-THEME <- instrument$render$theme %||% "#16B3B1"
-if (!grepl("^#[0-9A-Fa-f]{3,6}$", THEME)) THEME <- "#16B3B1"
-
-choice_by <- function(id) {
-  for (c in instrument$choices %||% list()) if (identical(c$id, id)) return(c)
-  NULL
-}
-q_items <- Filter(function(i) !(i$type %in% c("section_break", "text_block")),
-                  instrument$items %||% list())
-
-has_ggplot <- requireNamespace("ggplot2", quietly = TRUE)
-plot_palette <- params$plot_palette %||% "web"
-show_code <- isTRUE(params$show_code %||% TRUE)
-
-# A scale's separate Likert items get one grouped diverging chart, the same
-# way a matrix question's rows do, instead of scattering a related batch of
-# items across several single-item charts.
-scale_groups <- sframe_likert_scale_groups(instrument)
-group_of <- character(0)
-for (g in scale_groups) {
-  ids <- vapply(g$items, function(i) i$id, character(1))
-  group_of[ids] <- g$scale_id
-}
-rendered_groups <- character(0)
-
-# One bar chart per categorical item, one histogram per numeric item. Every
-# chart here shares the ggplot2 theme_surveyframe() (theme_classic()-based)
-# look used everywhere else in the report, so this section reads as one
-# consistent chart family rather than a mix of base-R and ggplot styling.
-for (item in q_items) {
-  t <- item$type
-  if (item$id %in% names(group_of) && has_ggplot) {
-    gid <- group_of[[item$id]]
-    if (gid %in% rendered_groups) next
-    rendered_groups <- c(rendered_groups, gid)
-    g <- scale_groups[[gid]]
-    gg <- sframe_plot_likert_scale(g$items, responses, g$choice_set, g$title,
-                                   palette = plot_palette)
-    if (is.null(gg)) next
-    cat(sprintf("\n**%s**\n\n", g$title))
-    print(gg)
-    cat("\n\n")
-    next
-  }
-  # Without ggplot2 a grouped item falls through to the base-graphics
-  # single-item chart below. Skipping here removed those distributions
-  # altogether, though the package can draw every one of them without the
-  # optional package. The R engine does the same, so the 2 agree.
-  if (identical(t, "matrix")) {
-    # A matrix question has no base response column of its own, only one
-    # expanded <id>__<row> column per row, so it needs its own existence
-    # check and its own chart: every row plotted together, grouped, rather
-    # than as separate single-item charts that lose the question's grouping.
-    if (!has_ggplot) next
-    cs <- choice_by(item$choice_set %||% "")
-    gg <- sframe_plot_likert_matrix(item, responses, cs, palette = plot_palette)
-    if (is.null(gg)) next
-    cat(sprintf("\n**%s**\n\n", item$label %||% item$id))
-    print(gg)
-    cat("\n\n")
-    next
-  }
-  # A multiple-choice question posts one indicator column per option, named
-  # item__option, and never a column under its own id, so requiring the parent
-  # column dropped every collected multi-select from this section. The R engine
-  # does the same, so the 2 agree.
-  if (identical(t, "multiple_choice") && !item$id %in% names(responses)) {
-    cs <- choice_by(item$choice_set %||% "")
-    # Matched by prefix rather than through sframe_item_expansion_columns(),
-    # which is internal: this template runs in a separate session against the
-    # installed package, so it can call exported functions only. The indicator
-    # columns are item__option by construction, and matching the names the
-    # collector actually wrote also covers an option outside the choice set.
-    present <- grep(paste0("^", item$id, "__"), names(responses), value = TRUE)
-    if (length(present) == 0) next
-    picked <- vapply(present, function(cn) {
-      sum(as.character(responses[[cn]]) %in% c("1", "TRUE", "true", "yes"),
-          na.rm = TRUE)
-    }, numeric(1))
-    labels <- sub(paste0("^", item$id, "__"), "", present)
-    if (!is.null(cs)) {
-      hit <- match(labels, as.character(cs$values))
-      labels[!is.na(hit)] <- cs$labels[hit[!is.na(hit)]]
-    }
-    names(picked) <- labels
-    if (!sum(picked)) next
-    cat(sprintf("\n**%s**\n\n", item$label %||% item$id))
-    cat(sprintf("%d respondents, who could pick more than one.\n\n",
-                nrow(responses)))
-    op <- par(mar = c(4, 9, 1, 1))
-    barplot(rev(picked), horiz = TRUE, las = 1, col = THEME,
-            border = "white", xlab = "Respondents")
-    par(op)
-    cat("\n\n")
-    next
-  }
-  if (!item$id %in% names(responses)) next
-  col <- responses[[item$id]]
-  if (t %in% c("likert", "single_choice", "multiple_choice")) {
-    cs <- choice_by(item$choice_set %||% "")
-    if (!is.null(cs)) {
-      freq <- table(factor(col, levels = as.character(cs$values)))
-      names(freq) <- cs$labels
-    } else freq <- table(col)
-    if (!sum(freq)) next
-    cat(sprintf("\n**%s**\n\n", item$label %||% item$id))
-    if (identical(t, "likert") && length(freq) >= 2) {
-      # A Likert item is an ordered agree/disagree scale: a diverging bar
-      # shows which way opinion leans in one glance, unlike a plain
-      # frequency bar that does not distinguish "agree" from "disagree".
-      sframe_draw_likert_diverging(freq, THEME, palette = plot_palette)
-    } else if (has_ggplot) {
-      print(sframe_plot_item_chart(item, col, cs, palette = plot_palette))
-    } else {
-      op <- par(mar = c(4, 11, 1, 1)); barplot(freq, horiz = TRUE, las = 1,
-        col = THEME, border = NA, xlab = "Frequency", cex.names = .8); par(op)
-    }
-    cat("\n\n")
-  } else if (t %in% c("numeric", "slider", "rating")) {
-    num <- suppressWarnings(as.numeric(col)); num <- num[!is.na(num)]
-    if (!length(num)) next
-    cat(sprintf("\n**%s**\n\n", item$label %||% item$id))
-    if (has_ggplot) {
-      print(sframe_plot_item_chart(item, col, NULL, palette = plot_palette))
-    } else {
-      op <- par(mar = c(4, 4, 1, 1)); hist(num, col = THEME, border = "white",
-        main = NULL, xlab = item$label, ylab = "Count", las = 1); par(op)
-    }
-    cat("\n\n")
-  }
-}
-
-# One histogram per scale score, from score_scales(), so the declared method,
-# reversal, weights and min_valid all apply
-scale_scores <- NULL
-if (length(instrument$scales %||% list()) > 0) {
-  scale_scores <- tryCatch(
-    score_scales(responses, instrument, keep_items = FALSE, keep_meta = FALSE),
-    error = function(e) {
-      cat(sprintf("\n*Scale scores could not be computed: %s*\n\n", conditionMessage(e)))
-      NULL
-    })
-}
-for (sc in instrument$scales %||% list()) {
-  if (is.null(scale_scores) || !sc$id %in% names(scale_scores)) next
-  scores <- scale_scores[[sc$id]]; scores <- scores[!is.na(scores)]
-  if (!length(scores)) next
-  cat(sprintf("\n**%s (scale score)**\n\n", sc$label %||% sc$id))
-  if (has_ggplot) {
-    print(sframe_plot_scale_chart(scores, sc$label %||% sc$id, palette = plot_palette))
-  } else {
-    op <- par(mar = c(4, 4, 1, 1)); hist(scores, col = THEME, border = "white",
-      main = NULL, xlab = paste0(sc$label %||% sc$id, " score"), ylab = "Count", las = 1)
-    abline(v = mean(scores), col = "#dc2626", lwd = 2, lty = 2); par(op)
-  }
+# Every chart is drawn by render_report() from the shared chart specs, as
+# the built-in engine draws them: a ggplot object, or a base-graphics
+# drawing function where ggplot2 is absent or a diverging bar is wanted.
+if (!is.null(attr(content$charts, "scale_error")))
+  cat(sprintf("\n*Scale scores could not be computed: %s*\n\n",
+              attr(content$charts, "scale_error")))
+for (chart in content$charts) {
+  cat(sprintf("\n**%s**\n\n", chart$heading))
+  if (!is.null(chart$note)) cat(chart$note, "\n\n")
+  if (!is.null(chart$plot)) print(chart$plot) else chart$draw()
   cat("\n\n")
 }
 ```
@@ -518,12 +380,8 @@ if (!has_data) {
     interp_md(rq)
   }
 } else {
-  results <- tryCatch(
-    run_analysis_plan(responses, instrument,
-                      plots = requireNamespace("ggplot2", quietly = TRUE),
-                      plot_palette = params$plot_palette %||% "web"),
-    error=function(e) NULL)
-  if (is.null(results)) {
+  results <- content$results
+  if (!is.list(results)) {
     cat("Analysis plan could not be executed. Check that variable names match response columns.\n\n")
   } else {
     for (i in seq_along(results)) {
@@ -561,9 +419,9 @@ if (!has_data) {
         # A second table the result carries: the quanteda runner's leading
         # features, or a moderation's conditional slopes at the moderator's own
         # values. Both were retained by their runner and rendered by neither
-        # engine. sframe_result_supplement() is shared with the
+        # engine. render_report() attaches it with the helper the
         # built-in engine so the 2 agree on what a result shows.
-        sup <- sframe_result_supplement(r)
+        sup <- r$supplement
         if (!is.null(sup)) {
           cat("\n")
           print(kable(format = "html", sframe_apa_cells(sup$table),

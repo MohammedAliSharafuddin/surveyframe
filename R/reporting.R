@@ -529,6 +529,12 @@ render_report <- function(
     tmp_decl <- tempfile(fileext = ".rds")
     saveRDS(sframe_plan_declarations(instrument, interpretations), tmp_decl)
     temp_rds <- c(temp_rds, tmp_decl)
+    # The codebook table, charts and plan results, computed once here so the
+    # template only prints them (naming decision 6).
+    tmp_content <- tempfile(fileext = ".rds")
+    saveRDS(sframe_report_content(instrument, data, plot_palette,
+                                  include_analysis = include_analysis), tmp_content)
+    temp_rds <- c(temp_rds, tmp_content)
     on.exit(unlink(temp_rds, force = TRUE), add = TRUE)
 
     params <- list(
@@ -536,6 +542,7 @@ render_report <- function(
       data_path           = tmp_data,
       interpretations_path = tmp_interp,
       declarations_path   = tmp_decl,
+      content_path        = tmp_content,
       include_quality     = include_quality && !is.null(data),
       include_reliability = include_reliability && !is.null(data),
       include_codebook    = include_codebook,
@@ -661,7 +668,8 @@ render_report <- function(
 # run over every character value, so the seed text "not applicable, no analysis
 # plan run" was rewritten as an absolute path under the working directory.
 sframe_quarto_param_names_path <- c("instrument_path", "data_path",
-                                    "interpretations_path", "declarations_path")
+                                    "interpretations_path", "declarations_path",
+                                    "content_path")
 
 sframe_quarto_param_args <- function(params) {
   unlist(lapply(names(params), function(name) {
@@ -1256,10 +1264,48 @@ sframe_clean_interpretations <- function(interpretations) {
   )
 }
 
-# Distribution plots (item bar charts, scale histograms) for the HTML fallback,
-# matching the dashboard. Used only when Quarto is unavailable.
-.render_report_distributions <- function(instrument, data, plot_palette = "web") {
-  if (is.null(data)) return("")
+# What the Quarto template prints, computed here inside the namespace
+# (naming decision 6): the codebook's display table, the distribution
+# charts, and the plan results, each with its supplement table. The
+# built-in engine computes the same things with the same functions, so the
+# 2 engines report the same numbers. `results` is a character string when
+# the plan could not run, and NULL when there is no data or no plan.
+sframe_report_content <- function(instrument, data = NULL, plot_palette = "web",
+                                  include_analysis = TRUE) {
+  items_d <- sframe_codebook_items_display(sframe_codebook(instrument))
+  items_d$reverse  <- ifelse(items_d$reverse,  "Yes", "")
+  items_d$required <- ifelse(items_d$required, "Yes", "")
+  names(items_d) <- c("ID", "Label", "Type", "Response options", "Scale",
+                      "Reverse", "Required")
+  results <- NULL
+  if (!is.null(data) && isTRUE(include_analysis) &&
+      length(instrument$analysis_plan) > 0) {
+    results <- tryCatch(
+      run_analysis_plan(data, instrument,
+                        plots = requireNamespace("ggplot2", quietly = TRUE),
+                        plot_palette = plot_palette),
+      error = function(e) conditionMessage(e))
+    if (is.list(results)) {
+      results <- lapply(results, function(r) {
+        r["supplement"] <- list(sframe_result_supplement(r))
+        r
+      })
+    }
+  }
+  list(codebook_items = items_d,
+       charts = sframe_report_charts(instrument, data, plot_palette),
+       results = results)
+}
+
+# Distribution charts (item bars, grouped Likert scales, matrix questions,
+# multi-selects and scale scores), one spec per chart. Both report engines
+# draw from these specs: the built-in engine embeds each as an image, and
+# render_report() hands them to the Quarto template, which only prints them
+# (naming decision 6). Each spec has a heading, a figure title, alt text, an
+# optional note, and either `plot` (a ggplot) or `draw` (a function drawing
+# with base graphics, with `height` in pixels where it needs more room).
+sframe_report_charts <- function(instrument, data, plot_palette = "web") {
+  if (is.null(data)) return(list())
   theme <- instrument$render$theme %||% "#16B3B1"
   if (!grepl("^#[0-9A-Fa-f]{3,6}$", theme)) theme <- "#16B3B1"
   has_ggplot <- requireNamespace("ggplot2", quietly = TRUE)
@@ -1271,14 +1317,25 @@ sframe_clean_interpretations <- function(interpretations) {
     function(i) !(i$type %in% c("section_break", "text_block")),
     instrument$items %||% list()
   )
-  blocks <- character(0)
+  specs <- list()
+  add <- function(heading, title, alt = title, plot = NULL, draw = NULL,
+                  height = NULL, note = NULL) {
+    if (is.null(plot) && is.null(draw)) return(invisible())
+    specs[[length(specs) + 1L]] <<- list(
+      heading = heading, title = title, alt = alt, note = note,
+      plot = plot, draw = draw, height = height)
+  }
+  item_spec <- function(item, plot = NULL, draw = NULL, height = NULL, note = NULL) {
+    label <- item$label %||% item$id
+    add(label, paste("Distribution of", label), plot = plot, draw = draw,
+        height = height, note = note)
+  }
 
   # A scale's separate Likert items get one grouped diverging chart, the
   # same way a matrix question's rows do, instead of scattering a related
   # batch of items across several single-item charts. group_of[[item_id]]
-  # points back to which scale's group it belongs to; rendered tracks which
-  # groups have already produced their one chart, so only the first member
-  # item encountered triggers it.
+  # points back to which scale's group it belongs to, and rendered_groups
+  # tracks which groups have already produced their one chart.
   scale_groups <- sframe_likert_scale_groups(instrument)
   group_of <- character(0)
   for (g in scale_groups) {
@@ -1289,7 +1346,6 @@ sframe_clean_interpretations <- function(interpretations) {
 
   for (item in q_items) {
     t <- item$type
-    img <- NULL
     if (item$id %in% names(group_of)) {
       gid <- group_of[[item$id]]
       if (has_ggplot) {
@@ -1298,11 +1354,7 @@ sframe_clean_interpretations <- function(interpretations) {
           g <- scale_groups[[gid]]
           gg <- sframe_plot_likert_scale(g$items, data, g$choice_set, g$title,
                                          palette = plot_palette)
-          img <- .render_report_ggplot_png(gg, alt = paste("Distribution of", g$title))
-          if (!is.null(img)) {
-            blocks <- c(blocks, sprintf("<h3>%s</h3>%s", htmltools_escape(g$title),
-              sframe_apa_figure(img, paste("Distribution of", g$title))))
-          }
+          add(g$title, paste("Distribution of", g$title), plot = gg)
         }
         # The group's one chart covers every member item.
         next
@@ -1318,13 +1370,8 @@ sframe_clean_interpretations <- function(interpretations) {
       # its own chart: every row grouped together, not one chart per row.
       if (has_ggplot) {
         cs <- choice_by(item$choice_set %||% "")
-        gg <- sframe_plot_likert_matrix(item, data, cs, palette = plot_palette)
-        img <- .render_report_ggplot_png(gg, alt = paste("Distribution of", item$label %||% item$id))
-      }
-      if (!is.null(img)) {
-        blocks <- c(blocks, sprintf("<h3>%s</h3>%s",
-          htmltools_escape(item$label %||% item$id),
-          sframe_apa_figure(img, paste("Distribution of", item$label %||% item$id))))
+        item_spec(item, plot = sframe_plot_likert_matrix(item, data, cs,
+                                                         palette = plot_palette))
       }
       next
     }
@@ -1332,7 +1379,7 @@ sframe_clean_interpretations <- function(interpretations) {
     # item__option, and never a column of its own, so requiring the parent
     # column dropped every collected multi-select from this section. The
     # indicators are counted here and the denominator is stated, since each
-    # respondent may pick several.
+    # respondent may pick more than one.
     if (identical(t, "multiple_choice") && !item$id %in% names(data)) {
       cs <- choice_by(item$choice_set %||% "")
       cols <- sframe_item_expansion_columns(instrument, list(item))
@@ -1349,18 +1396,14 @@ sframe_clean_interpretations <- function(interpretations) {
       }
       names(picked) <- labels
       if (!sum(picked)) next
-      n_resp <- nrow(data)
-      img <- .render_report_plot_png(function() {
-        op <- graphics::par(mar = c(4, 9, 1, 1)); on.exit(graphics::par(op))
-        graphics::barplot(rev(picked), horiz = TRUE, las = 1, col = theme,
-                          border = "white", xlab = "Respondents")
-      }, alt = paste("Distribution of", item$label %||% item$id))
-      if (!is.null(img)) {
-        blocks <- c(blocks, sprintf(
-          "<h3>%s</h3><p class=\"hint\">%d respondents, who could pick more than one.</p>%s",
-          htmltools_escape(item$label %||% item$id), n_resp,
-          sframe_apa_figure(img, paste("Distribution of", item$label %||% item$id))))
-      }
+      item_spec(item, draw = local({
+        picked <- picked
+        function() {
+          op <- graphics::par(mar = c(4, 9, 1, 1)); on.exit(graphics::par(op))
+          graphics::barplot(rev(picked), horiz = TRUE, las = 1, col = theme,
+                            border = "white", xlab = "Respondents")
+        }
+      }), note = sprintf("%d respondents, who could pick more than one.", nrow(data)))
       next
     }
     if (!item$id %in% names(data)) next
@@ -1378,46 +1421,40 @@ sframe_clean_interpretations <- function(interpretations) {
       if (identical(t, "likert") && length(freq) >= 2) {
         # A Likert item is an ordered agree/disagree scale: a diverging bar
         # shows which way opinion leans, unlike a plain frequency bar.
-        img <- .render_report_plot_png(
-          # plot_palette was dropped here, so a report asked for the print
-          # palette mixed monochrome grouped charts with colour single-item
-          # ones.
-          function() sframe_draw_likert_diverging(freq, theme,
-                                                  palette = plot_palette),
-          height = if (length(freq) <= 5) 320 else 320 + 22 * length(freq),
-          alt = paste("Distribution of", item$label %||% item$id)
-        )
+        item_spec(item, draw = local({
+          freq <- freq
+          function() sframe_draw_likert_diverging(freq, theme, palette = plot_palette)
+        }), height = if (length(freq) <= 5) 320 else 320 + 22 * length(freq))
       } else if (has_ggplot) {
         # Shares theme_surveyframe() (theme_classic()-based) with every
-        # other chart in the report instead of a differently styled base-R
-        # bar chart.
-        gg <- sframe_plot_item_chart(item, col, cs, palette = plot_palette)
-        img <- .render_report_ggplot_png(gg, alt = paste("Distribution of", item$label %||% item$id))
+        # other chart in the report.
+        item_spec(item, plot = sframe_plot_item_chart(item, col, cs, palette = plot_palette))
       } else {
-        img <- .render_report_plot_png(function() {
-          op <- graphics::par(mar = c(4, 11, 1, 1)); on.exit(graphics::par(op))
-          graphics::barplot(freq, horiz = TRUE, las = 1, col = theme,
-                            border = NA, xlab = "Frequency", cex.names = .8)
-        }, alt = paste("Distribution of", item$label %||% item$id))
+        item_spec(item, draw = local({
+          freq <- freq
+          function() {
+            op <- graphics::par(mar = c(4, 11, 1, 1)); on.exit(graphics::par(op))
+            graphics::barplot(freq, horiz = TRUE, las = 1, col = theme,
+                              border = NA, xlab = "Frequency", cex.names = .8)
+          }
+        }))
       }
     } else if (t %in% c("numeric", "slider", "rating")) {
       num <- suppressWarnings(as.numeric(col)); num <- num[!is.na(num)]
       if (!length(num)) next
       if (has_ggplot) {
-        gg <- sframe_plot_item_chart(item, col, NULL, palette = plot_palette)
-        img <- .render_report_ggplot_png(gg, alt = paste("Distribution of", item$label %||% item$id))
+        item_spec(item, plot = sframe_plot_item_chart(item, col, NULL, palette = plot_palette))
       } else {
-        img <- .render_report_plot_png(function() {
-          op <- graphics::par(mar = c(4, 4, 1, 1)); on.exit(graphics::par(op))
-          graphics::hist(num, col = theme, border = "white", main = NULL,
-                         xlab = item$label, ylab = "Count", las = 1)
-        }, alt = paste("Distribution of", item$label %||% item$id))
+        item_spec(item, draw = local({
+          num <- num
+          label <- item$label
+          function() {
+            op <- graphics::par(mar = c(4, 4, 1, 1)); on.exit(graphics::par(op))
+            graphics::hist(num, col = theme, border = "white", main = NULL,
+                           xlab = label, ylab = "Count", las = 1)
+          }
+        }))
       }
-    }
-    if (!is.null(img)) {
-      blocks <- c(blocks, sprintf("<h3>%s</h3>%s",
-        htmltools_escape(item$label %||% item$id),
-        sframe_apa_figure(img, paste("Distribution of", item$label %||% item$id))))
     }
   }
 
@@ -1426,13 +1463,12 @@ sframe_clean_interpretations <- function(interpretations) {
   # mean of the item columns ignored every one of them, so a declared sum of
   # 2 and 4 was published as 3.
   scale_scores <- NULL
+  scale_error <- NULL
   if (length(instrument$scales %||% list()) > 0) {
     scale_scores <- tryCatch(
       score_scales(data, instrument, keep_items = FALSE, keep_meta = FALSE),
       error = function(e) {
-        blocks <<- c(blocks, sprintf(
-          "<p><em>Scale scores could not be computed: %s</em></p>",
-          htmltools_escape(conditionMessage(e))))
+        scale_error <<- conditionMessage(e)
         NULL
       })
   }
@@ -1441,24 +1477,52 @@ sframe_clean_interpretations <- function(interpretations) {
     scores <- scale_scores[[sc$id]]
     scores <- scores[!is.na(scores)]
     if (!length(scores)) next
+    label <- sc$label %||% sc$id
+    heading <- paste0(label, " (scale score)")
+    title <- paste("Distribution of", label, "scale scores")
+    alt <- paste(label, "scale score distribution")
     if (has_ggplot) {
-      gg <- sframe_plot_scale_chart(scores, sc$label %||% sc$id, palette = plot_palette)
-      img <- .render_report_ggplot_png(gg, alt = paste((sc$label %||% sc$id), "scale score distribution"))
+      add(heading, title, alt, plot = sframe_plot_scale_chart(scores, label,
+                                                              palette = plot_palette))
     } else {
-      img <- .render_report_plot_png(function() {
-        op <- graphics::par(mar = c(4, 4, 1, 1)); on.exit(graphics::par(op))
-        graphics::hist(scores, col = theme, border = "white", main = NULL,
-          xlab = paste0(sc$label %||% sc$id, " score"), ylab = "Count", las = 1)
-        graphics::abline(v = mean(scores), col = "#dc2626", lwd = 2, lty = 2)
-      }, alt = paste((sc$label %||% sc$id), "scale score distribution"))
-    }
-    if (!is.null(img)) {
-      blocks <- c(blocks, sprintf("<h3>%s (scale score)</h3>%s",
-        htmltools_escape(sc$label %||% sc$id),
-        sframe_apa_figure(img, paste("Distribution of", sc$label %||% sc$id, "scale scores"))))
+      add(heading, title, alt, draw = local({
+        scores <- scores
+        function() {
+          op <- graphics::par(mar = c(4, 4, 1, 1)); on.exit(graphics::par(op))
+          graphics::hist(scores, col = theme, border = "white", main = NULL,
+            xlab = paste0(label, " score"), ylab = "Count", las = 1)
+          graphics::abline(v = mean(scores), col = "#dc2626", lwd = 2, lty = 2)
+        }
+      }))
     }
   }
+  attr(specs, "scale_error") <- scale_error
+  specs
+}
 
+# Distribution plots for the built-in HTML engine, each spec embedded as an
+# image under its heading.
+.render_report_distributions <- function(instrument, data, plot_palette = "web") {
+  if (is.null(data)) return("")
+  specs <- sframe_report_charts(instrument, data, plot_palette)
+  blocks <- character(0)
+  if (!is.null(attr(specs, "scale_error"))) {
+    blocks <- sprintf("<p><em>Scale scores could not be computed: %s</em></p>",
+                      htmltools_escape(attr(specs, "scale_error")))
+  }
+  for (s in specs) {
+    img <- if (!is.null(s$plot)) {
+      .render_report_ggplot_png(s$plot, alt = s$alt)
+    } else if (!is.null(s$height)) {
+      .render_report_plot_png(s$draw, height = s$height, alt = s$alt)
+    } else {
+      .render_report_plot_png(s$draw, alt = s$alt)
+    }
+    if (is.null(img)) next
+    note <- if (!is.null(s$note)) sprintf("<p class=\"hint\">%s</p>", htmltools_escape(s$note)) else ""
+    blocks <- c(blocks, sprintf("<h3>%s</h3>%s%s", htmltools_escape(s$heading), note,
+                                sframe_apa_figure(img, s$title)))
+  }
   if (!length(blocks)) return("")
   sprintf("<section><h2>Response distributions</h2>%s</section>",
           paste(blocks, collapse = "\n"))
