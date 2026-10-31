@@ -7,6 +7,7 @@
 
 test_that("rerunning data-raw/rename_0.4.3.R changes no file", {
   skip_on_cran()
+  skip_if_not_slow()
   src <- sframe_build_source()
   skip_if(!nzchar(src) || !file.exists(file.path(src, "data-raw", "rename_0.4.3.R")),
           "package source not found")
