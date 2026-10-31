@@ -385,7 +385,7 @@ server <- function(input, output, session) {
     gg <- if (!is.null(mr)) tryCatch(sframe_plot_missingness(mr), error = function(e) NULL)
     if (!is.null(gg)) { print(gg); return() }
     pct <- if (!is.null(mr)) {
-      stats::setNames(mr$item_missing$missing_pct, mr$item_missing$variable)
+      stats::setNames(mr$item_missing$missing_prop, mr$item_missing$variable)
     } else numeric(0)
     pct <- pct[!is.na(pct) & pct > 0]
     if (!length(pct)) {

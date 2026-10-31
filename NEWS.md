@@ -181,6 +181,12 @@ can be written again, and every plan result can be serialised by a host.
   with "Start here" and the same stages, and every help page ends with links
   to the rest of its section.
 
+* **Proportion columns end in `_prop`.** `sframe_item_results()` reports
+  `floor_prop` and `ceiling_prop`, and `sframe_missing_data_results()`
+  reports `missing_prop`, since each holds a proportion between 0 and 1.
+  The `_pct` columns stay as copies for 1 release, and tables show the
+  `_prop` column alone. The demo results files use the new names.
+
 ## References, cited where they are used and listed once at the end
 
 An instrument can now carry the works it draws on, and every report lists
@@ -451,8 +457,8 @@ style.
 * **Table headings set symbols as APA 7 does.** A `p` column was headed
   "P", `t` "T" and `df` "Df", and `render_results()` printed raw names such
   as `missing_pct`. Symbols are now italic, `r_s` has its subscript, a
-  `_pct` column (a proportion) is headed "(proportion)" and drops its
-  leading zero, and other names read as words, in both report engines (CX-24).
+  proportion column such as `missing_prop` reads "Missing proportion" and
+  drops its leading zero, and other names read as words, in both report engines (CX-24).
 * **Result text counts with real plurals.** "7 power-iteration step(s)",
   "5 choice column(s)" and the decision methods' notes and errors now read
   "7 power-iteration steps" and "1 respondent". The demo results are

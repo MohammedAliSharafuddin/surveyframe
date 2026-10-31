@@ -385,7 +385,7 @@ sframe_missing_data_results <- function(data, instrument = NULL, variables = NUL
   item_table <- data.frame(
     variable = variables,
     missing_n = vapply(item_data, function(x) sum(is.na(x)), integer(1)),
-    missing_pct = vapply(item_data, function(x) mean(is.na(x)), numeric(1)),
+    missing_prop = vapply(item_data, function(x) mean(is.na(x)), numeric(1)),
     valid_n = vapply(item_data, function(x) sum(!is.na(x)), integer(1)),
     stringsAsFactors = FALSE,
     check.names = FALSE
@@ -393,10 +393,13 @@ sframe_missing_data_results <- function(data, instrument = NULL, variables = NUL
   respondent_table <- data.frame(
     row = seq_len(n),
     missing_n = rowSums(is.na(item_data)),
-    missing_pct = if (length(variables) == 0) 0 else rowMeans(is.na(item_data)),
+    missing_prop = if (length(variables) == 0) 0 else rowMeans(is.na(item_data)),
     stringsAsFactors = FALSE,
     check.names = FALSE
   )
+  # missing_pct, the name before 0.4.3, kept for 1 release
+  item_table$missing_pct <- item_table$missing_prop
+  respondent_table$missing_pct <- respondent_table$missing_prop
   pattern_key <- if (length(variables) == 0) {
     rep("", n)
   } else {

@@ -100,13 +100,13 @@ test_that("each HTML renderer marks up the result text (CX-24)", {
 
 test_that("table headings set symbols as APA 7 does and read as words (CX-24)", {
   expect_identical(
-    sframe_apa_headings(c("p", "t", "df", "missing_pct", "r_s", "research_question",
+    sframe_apa_headings(c("p", "t", "df", "missing_prop", "r_s", "research_question",
                           "Pr(>|z|)", "SD", "std.error", "n_items")),
-    c("<em>p</em>", "<em>t</em>", "<em>df</em>", "Missing (proportion)",
+    c("<em>p</em>", "<em>t</em>", "<em>df</em>", "Missing proportion",
       "<em>r</em><sub>s</sub>", "Research question", "<em>p</em>", "<em>SD</em>",
       "<em>SE</em>", "N items"))
   expect_identical(sframe_apa_headings("a<b"), "A&lt;b")
-  html <- surveyframe:::.render_report_table(data.frame(t = 2, p = .5, missing_pct = .25), "T")
+  html <- surveyframe:::.render_report_table(data.frame(t = 2, p = .5, missing_prop = .25), "T")
   expect_match(html, "<th scope=\"col\"><em>p</em></th>", fixed = TRUE)
   expect_no_match(html, ">P<", fixed = TRUE)
   expect_match(html, "<td>.25</td>", fixed = TRUE)

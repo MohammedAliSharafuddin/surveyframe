@@ -1833,7 +1833,7 @@ sframe_plot_missingness <- function(x, palette = c("web", "print")) {
   stopifnot(inherits(x, "sframe_missing_data_report"))
   brand <- sframe_brand(palette)
   df <- x$item_missing
-  df <- df[!is.na(df$missing_pct) & df$missing_pct > 0, , drop = FALSE]
+  df <- df[!is.na(df$missing_prop) & df$missing_prop > 0, , drop = FALSE]
   if (nrow(df) == 0) {
     # An empty bar chart with no bars reads as a rendering failure, not a
     # result, so a completely clean dataset gets its own reassuring chart
@@ -1853,8 +1853,8 @@ sframe_plot_missingness <- function(x, palette = c("web", "print")) {
     )
   }
   bar_fill <- if (palette == "web") brand$teal else brand$fill
-  ggplot2::ggplot(df, ggplot2::aes(x = stats::reorder(.data$variable, -.data$missing_pct),
-                                   y = .data$missing_pct)) +
+  ggplot2::ggplot(df, ggplot2::aes(x = stats::reorder(.data$variable, -.data$missing_prop),
+                                   y = .data$missing_prop)) +
     ggplot2::geom_col(fill = bar_fill, colour = brand$ink, linewidth = 0.3, width = 0.65) +
     ggplot2::scale_x_discrete(labels = .sframe_title_case_names) +
     ggplot2::scale_y_continuous(labels = scales_percent_fallback) +

@@ -288,8 +288,9 @@ as.data.frame.sframe_item_report <- function(x, row.names = NULL,
   if (length(x) == 0) {
     return(data.frame(
       scale_id = character(0), item_id = character(0), mean = numeric(0),
-      sd = numeric(0), item_rest_r = numeric(0), floor_pct = numeric(0),
-      ceiling_pct = numeric(0), n_missing = integer(0),
+      sd = numeric(0), item_rest_r = numeric(0), floor_prop = numeric(0),
+      ceiling_prop = numeric(0), n_missing = integer(0), floor_pct = numeric(0),
+      ceiling_pct = numeric(0),
       stringsAsFactors = FALSE
     ))
   }

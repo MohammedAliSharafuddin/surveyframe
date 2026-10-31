@@ -756,6 +756,7 @@ sframe_demo_results_table <- function(res) {
       tb <- sframe_runtime(b, "report")$table
     }
     if (is.data.frame(tb) && nrow(tb) > 0) {
+      tb <- sframe_drop_old_share_cols(tb)
       num <- names(tb)[vapply(tb, is.numeric, logical(1))]
       # Force-directed coordinates are rendering state rather than analysis
       # results. Even with a fixed seed, igraph may place the same graph at

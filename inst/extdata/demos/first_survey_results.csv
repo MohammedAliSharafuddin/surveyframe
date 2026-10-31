@@ -23,8 +23,8 @@
 "RQ3","missing_data","apa","Missing-data diagnostics were computed for 2 variables."
 "RQ3","missing_data","How old are you?: missing_n","3"
 "RQ3","missing_data","What should we do differently next year?: missing_n","5"
-"RQ3","missing_data","How old are you?: missing_pct","0.06"
-"RQ3","missing_data","What should we do differently next year?: missing_pct","0.1"
+"RQ3","missing_data","How old are you?: missing_prop","0.06"
+"RQ3","missing_data","What should we do differently next year?: missing_prop","0.1"
 "RQ3","missing_data","How old are you?: valid_n","47"
 "RQ3","missing_data","What should we do differently next year?: valid_n","45"
 "RQ4","quality","no numeric output",
