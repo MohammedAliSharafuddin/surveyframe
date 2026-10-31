@@ -68,8 +68,8 @@ test_that("the demo commands run as printed", {
   expect_s3_class(get("demo", envir = env)$instrument, "sframe")
 })
 
-test_that("preview_demo() rejects an unknown destination", {
-  expect_error(preview_demo("two_group", where = "phone", open = FALSE))
+test_that("preview_survey() rejects an unknown destination", {
+  expect_error(preview_survey("two_group", where = "phone", open = FALSE))
 })
 
 test_that("attaching is silent outside an interactive session", {

@@ -24,5 +24,5 @@ branding$welcome$title
 branding$theme
 }
 \seealso{
-\code{\link[=preview_demo]{preview_demo()}} to see the branding applied to a demo.
+\code{\link[=preview_survey]{preview_survey()}} to see the branding applied to a demo.
 }

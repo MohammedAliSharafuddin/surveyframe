@@ -255,7 +255,7 @@ sframe_demo_screens <- function(title) {
 #'   Printing it shows each setting as a respondent meets it.
 #'   [sframe_instrument()] and [sframe_demo()] store it as a plain list.
 #' @export
-#' @seealso [preview_demo()] to see the branding applied to a demo.
+#' @seealso [preview_survey()] to see the branding applied to a demo.
 #' @examples
 #' branding <- sframe_demo_branding()
 #' branding
@@ -305,7 +305,7 @@ print.sframe_branding <- function(x, ...) {
     paste0("  Thank you:     ", quoted(ty$message)),
     "",
     "A render block for sframe_instrument(render = ). See it applied with",
-    "preview_demo(\"two_group\"), or use sframe_demo(name, branded = TRUE)."
+    "preview_survey(\"two_group\"), or use sframe_demo(name, branded = TRUE)."
   )
   cat(lines, sep = "\n")
   invisible(x)
