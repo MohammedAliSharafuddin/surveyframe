@@ -191,14 +191,16 @@ vignettes leave browsers closed.
 
 ```{r gui-demo, eval = FALSE}
 launch_builder(demo = "input_types")
-launch_studio_demo()
+launch_studio(demo = "input_types", screen = "preview")
 launch_dashboard_demo()
 ```
 
-`launch_builder(demo = "input_types")` injects the demo state into a temporary copy of
-`survey_builder.html` and opens it, so the demo questions, scales, and analysis
-plan are visible at once. `launch_studio_demo()` opens the studio with an
-instrument and response data already loaded. `launch_dashboard_demo()` opens the
+`launch_builder(demo = "input_types")` injects the demo state into a
+temporary copy of `survey_builder.html` and opens it, so the demo questions,
+scales, and analysis plan are visible at once.
+`launch_studio(demo = "input_types", screen = "preview")` opens the studio
+with an instrument and response data already loaded. Any name from
+`sframe_list_demos()` works as `demo`. `launch_dashboard_demo()` opens the
 dashboard with the same demo data.
 
 ## Standalone builder

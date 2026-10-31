@@ -14,7 +14,8 @@ launch_studio(
   screen = "auto",
   port = NULL,
   host = "127.0.0.1",
-  launch.browser = interactive()
+  launch.browser = interactive(),
+  demo = NULL
 )
 }
 \arguments{
@@ -45,6 +46,11 @@ you supply, or a screen name: \code{"open"}, \code{"amendments"},
 \item{host}{Host address passed to \code{\link[shiny:runApp]{shiny::runApp()}}.}
 
 \item{launch.browser}{Whether to open the browser automatically.}
+
+\item{demo}{Optional. A demo name from \code{\link[=sframe_list_demos]{sframe_list_demos()}}. Studio then
+opens with that demo's instrument and responses loaded, in place of
+\code{instrument} and \code{responses}, which must be left out.
+\code{"input_types"} uses every input type Studio supports.}
 }
 \value{
 Called for its side effect.
@@ -63,6 +69,9 @@ question, use \code{\link[=launch_builder]{launch_builder()}}, and open the resu
 \examples{
 \dontrun{
 launch_studio()
+
+# A demo, opened on the preview screen
+launch_studio(demo = "two_group", screen = "preview")
 
 demo <- sframe_demo("tourism_services")
 launch_studio(instrument = demo$instrument, launch.browser = FALSE)

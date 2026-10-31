@@ -325,7 +325,7 @@ response explorer. Demo launchers are available for training:
 
 ```r
 launch_builder(demo = "input_types", open = FALSE)
-# launch_studio_demo()
+# launch_studio(demo = "input_types", screen = "preview")
 # launch_dashboard_demo()
 ```
 

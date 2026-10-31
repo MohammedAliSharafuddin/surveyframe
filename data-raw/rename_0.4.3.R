@@ -87,6 +87,7 @@ sframe_demos,sframe_list_demos,plain
 sframe_demo_data,sframe_demo,custom
 sframe_input_types_demo_data,sframe_demo,custom
 launch_builder_demo,launch_builder,custom
+launch_studio_demo,launch_studio,custom
 ", stringsAsFactors = FALSE, strip.white = TRUE)
 
 # Wrappers whose arguments differ from the new function's, keyed by old name:
@@ -119,6 +120,15 @@ custom <- list(
       "                 responses_path = demo$responses_path))",
       sep = "\n"),
     "launch_builder(demo = \"input_types\")"
+  ),
+  # launch_studio_demo() opened on the preview screen.
+  launch_studio_demo = c(
+    "screen = \"preview\", port = NULL, host = \"127.0.0.1\", launch.browser = TRUE",
+    paste(
+      "launch_studio(demo = \"input_types\", screen = screen, port = port,",
+      "                host = host, launch.browser = launch.browser)",
+      sep = "\n"),
+    "launch_studio(demo = \"input_types\")"
   )
 )
 
@@ -129,7 +139,9 @@ calls <- c(
   "sframe_demo_data\\(\\)" = "sframe_demo(\"tourism_services\")",
   "sframe_input_types_demo_data\\(\\)" = "sframe_demo(\"input_types\")",
   "launch_builder_demo\\(\\)" = "launch_builder(demo = \"input_types\")",
-  "launch_builder_demo\\(" = "launch_builder(demo = \"input_types\", "
+  "launch_builder_demo\\(" = "launch_builder(demo = \"input_types\", ",
+  "launch_studio_demo\\(\\)" = "launch_studio(demo = \"input_types\", screen = \"preview\")",
+  "launch_studio_demo\\(" = "launch_studio(demo = \"input_types\", "
 )
 
 # Not after a letter, digit, underscore, dot, `$` or `@`, so internal helpers
@@ -188,7 +200,8 @@ files <- setdiff(files, c(
   "R/superseded.R", "R/superseded_warn.R", "data-raw/rename_0.4.3.R",
   "tests/testthat/test-superseded.R", "tests/testthat/test-superseded-warn.R",
   "tests/testthat/test-demo-reference-datasets.R",
-  "tests/testthat/test-launch-builder-demo.R"
+  "tests/testthat/test-launch-builder-demo.R",
+  "tests/testthat/test-launch-studio-demo.R"
 ))
 
 changed <- character()
@@ -254,7 +267,9 @@ out <- c(
   table_rows,
   "#' | `sf_plan(x) <- value` | [sframe_plan<-][sframe_plan] |",
   "#'",
-  "#' @param ... Passed to the new function.",
+  "#' @param ... Passed to the new function.
+#' @param open Passed to [launch_builder()].
+#' @param screen,port,host,launch.browser Passed to [launch_studio()].",
   "#' @param instrument,scales,std_lv Passed to [sframe_syntax_cfa()].",
   "#' @param x An instrument.",
   "#' @param value The analysis plan, as for [sframe_plan()].",
