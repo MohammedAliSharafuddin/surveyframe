@@ -88,6 +88,7 @@ sframe_demo_data,sframe_demo,custom
 sframe_input_types_demo_data,sframe_demo,custom
 launch_builder_demo,launch_builder,custom
 launch_studio_demo,launch_studio,custom
+preview_demo,preview_survey,custom
 ", stringsAsFactors = FALSE, strip.white = TRUE)
 
 # Wrappers whose arguments differ from the new function's, keyed by old name:
@@ -129,6 +130,12 @@ custom <- list(
       "                host = host, launch.browser = launch.browser)",
       sep = "\n"),
     "launch_studio(demo = \"input_types\")"
+  ),
+  # preview_survey() takes an instrument or a demo name, and has no default.
+  preview_demo = c(
+    "name = \"two_group\", where = c(\"browser\", \"studio\"), open = interactive()",
+    "preview_survey(name, where = where, open = open)",
+    "preview_survey()"
   )
 )
 
@@ -141,7 +148,8 @@ calls <- c(
   "launch_builder_demo\\(\\)" = "launch_builder(demo = \"input_types\")",
   "launch_builder_demo\\(" = "launch_builder(demo = \"input_types\", ",
   "launch_studio_demo\\(\\)" = "launch_studio(demo = \"input_types\", screen = \"preview\")",
-  "launch_studio_demo\\(" = "launch_studio(demo = \"input_types\", "
+  "launch_studio_demo\\(" = "launch_studio(demo = \"input_types\", ",
+  "preview_demo\\(\\)" = "preview_survey(\"two_group\")"
 )
 
 # Not after a letter, digit, underscore, dot, `$` or `@`, so internal helpers
@@ -201,7 +209,8 @@ files <- setdiff(files, c(
   "tests/testthat/test-superseded.R", "tests/testthat/test-superseded-warn.R",
   "tests/testthat/test-demo-reference-datasets.R",
   "tests/testthat/test-launch-builder-demo.R",
-  "tests/testthat/test-launch-studio-demo.R"
+  "tests/testthat/test-launch-studio-demo.R",
+  "tests/testthat/test-preview-survey.R"
 ))
 
 changed <- character()
@@ -268,7 +277,8 @@ out <- c(
   "#' | `sf_plan(x) <- value` | [sframe_plan<-][sframe_plan] |",
   "#'",
   "#' @param ... Passed to the new function.
-#' @param open Passed to [launch_builder()].
+#' @param open Passed to [launch_builder()] or [preview_survey()].
+#' @param name,where Passed to [preview_survey()], as its `x` and `where`.
 #' @param screen,port,host,launch.browser Passed to [launch_studio()].",
   "#' @param instrument,scales,std_lv Passed to [sframe_syntax_cfa()].",
   "#' @param x An instrument.",

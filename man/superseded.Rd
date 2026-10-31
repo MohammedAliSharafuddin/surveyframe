@@ -79,6 +79,7 @@
 \alias{sframe_input_types_demo_data}
 \alias{launch_builder_demo}
 \alias{launch_studio_demo}
+\alias{preview_demo}
 \alias{sf_plan<-}
 \title{Superseded function names}
 \usage{
@@ -241,6 +242,12 @@ launch_studio_demo(
   launch.browser = TRUE
 )
 
+preview_demo(
+  name = "two_group",
+  where = c("browser", "studio"),
+  open = interactive()
+)
+
 sf_plan(x) <- value
 }
 \arguments{
@@ -248,9 +255,11 @@ sf_plan(x) <- value
 
 \item{instrument, scales, std_lv}{Passed to \code{\link[=sframe_syntax_cfa]{sframe_syntax_cfa()}}.}
 
-\item{open}{Passed to \code{\link[=launch_builder]{launch_builder()}}.}
+\item{open}{Passed to \code{\link[=launch_builder]{launch_builder()}} or \code{\link[=preview_survey]{preview_survey()}}.}
 
 \item{screen, port, host, launch.browser}{Passed to \code{\link[=launch_studio]{launch_studio()}}.}
+
+\item{name, where}{Passed to \code{\link[=preview_survey]{preview_survey()}}, as its \code{x} and \code{where}.}
 
 \item{x}{An instrument.}
 
@@ -346,6 +355,7 @@ warning per old name per session, naming its replacement.
    \code{sframe_input_types_demo_data()} \tab \code{\link[=sframe_demo]{sframe_demo()}} with \code{"input_types"} \cr
    \code{launch_builder_demo()} \tab \code{\link[=launch_builder]{launch_builder()}} with \code{demo = "input_types"} \cr
    \code{launch_studio_demo()} \tab \code{\link[=launch_studio]{launch_studio()}} with \code{demo = "input_types"} \cr
+   \code{preview_demo()} \tab \code{\link[=preview_survey]{preview_survey()}} \cr
    \code{sf_plan(x) <- value} \tab \link[=sframe_plan]{sframe_plan<-} \cr
 }
 }

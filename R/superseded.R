@@ -89,10 +89,12 @@
 #' | `sframe_input_types_demo_data()` | [sframe_demo()] with `"input_types"` |
 #' | `launch_builder_demo()` | [launch_builder()] with `demo = "input_types"` |
 #' | `launch_studio_demo()` | [launch_studio()] with `demo = "input_types"` |
+#' | `preview_demo()` | [preview_survey()] |
 #' | `sf_plan(x) <- value` | [sframe_plan<-][sframe_plan] |
 #'
 #' @param ... Passed to the new function.
-#' @param open Passed to [launch_builder()].
+#' @param open Passed to [launch_builder()] or [preview_survey()].
+#' @param name,where Passed to [preview_survey()], as its `x` and `where`.
 #' @param screen,port,host,launch.browser Passed to [launch_studio()].
 #' @param instrument,scales,std_lv Passed to [sframe_syntax_cfa()].
 #' @param x An instrument.
@@ -647,6 +649,13 @@ launch_studio_demo <- function(screen = "preview", port = NULL, host = "127.0.0.
   sframe_superseded("launch_studio_demo()", "launch_studio(demo = \"input_types\")")
   launch_studio(demo = "input_types", screen = screen, port = port,
                 host = host, launch.browser = launch.browser)
+}
+
+#' @rdname superseded
+#' @export
+preview_demo <- function(name = "two_group", where = c("browser", "studio"), open = interactive()) {
+  sframe_superseded("preview_demo()", "preview_survey()")
+  preview_survey(name, where = where, open = open)
 }
 
 #' @rdname superseded

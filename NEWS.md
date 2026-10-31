@@ -168,6 +168,12 @@ can be written again, and every plan result can be serialised by a host.
   replaces `launch_studio_demo()`, which loaded only the input-types demo.
   `demo` cannot be combined with `instrument` or `responses`.
 
+* **`preview_survey()` is the Preview stage verb.** `preview_survey(x)`
+  shows a survey as a respondent meets it, with the collector removed, in
+  the browser or on SurveyStudio's preview screen. `x` is an instrument or a
+  demo name, so it previews your own survey as well as a demo. It replaces
+  `preview_demo()`, which still works and still defaults to `"two_group"`.
+
 ## References, cited where they are used and listed once at the end
 
 An instrument can now carry the works it draws on, and every report lists

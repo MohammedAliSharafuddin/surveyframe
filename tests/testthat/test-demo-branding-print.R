@@ -11,7 +11,7 @@ test_that("the branding prints its settings and where to see them applied", {
   expect_match(out, "Theme: +#2563eb", all = FALSE)
   expect_match(out, "Welcome: +\"Thank you for coming\"", all = FALSE)
   expect_match(out, "Consent: .*, required$", all = FALSE)
-  expect_match(out, "preview_demo(\"two_group\")", fixed = TRUE, all = FALSE)
+  expect_match(out, "preview_survey(\"two_group\")", fixed = TRUE, all = FALSE)
   expect_no_match(out, "^\\$", all = TRUE)
 })
 
