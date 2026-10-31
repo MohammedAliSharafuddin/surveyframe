@@ -85,5 +85,6 @@ test_that("29: the report renders the conditional slopes", {
   qmd <- sframe_installed_text("inst", "templates",
                                    "report.qmd")
   expect_match(src, "sframe_result_supplement", fixed = TRUE)
-  expect_match(qmd, "sframe_result_supplement", fixed = TRUE)
+  # The template prints the supplement render_report() attached (decision 6).
+  expect_match(qmd, "r$supplement", fixed = TRUE)
 })

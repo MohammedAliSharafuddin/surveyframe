@@ -62,12 +62,11 @@ test_that("B3: a respondent below min_valid is left out of the figure", {
   expect_equal(unname(got), 3)
 })
 
-test_that("B3: the Quarto report template scores through score_scales()", {
-  path <- system.file("templates", "report.qmd", package = "surveyframe")
-  skip_if(!nzchar(path), "report template not found")
-  qmd <- paste(readLines(path, warn = FALSE), collapse = "\n")
-  block <- regmatches(qmd, regexpr(
-    "# One histogram per scale score[\\s\\S]*?\n```", qmd, perl = TRUE))
+test_that("B3: the charts both engines draw score through score_scales()", {
+  # The Quarto template prints the specs sframe_report_charts() builds.
+  src <- sframe_source_text("R", "reporting.R")
+  block <- regmatches(src, regexpr(
+    "# Scale figures plot the scores[\\s\\S]*?\n}\n", src, perl = TRUE))
   expect_length(block, 1)
   expect_match(block, "score_scales(", fixed = TRUE)
   expect_false(grepl("rowMeans", block, fixed = TRUE))

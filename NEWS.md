@@ -438,6 +438,12 @@ style.
 
 ## Reports
 
+* **One computation feeds both report engines.** `render_report()` now
+  computes the codebook table, every distribution chart and the plan
+  results inside the package and hands them to the Quarto template, which
+  only prints them. The template used to run the analysis plan and draw
+  the charts itself, so the 2 engines could disagree.
+
 * **A statistic that cannot exceed 1 has no leading zero.** Result text and
   prompts write r, r_s, tau, phi, Cramer's V, R squared, eta squared and
   their intervals as APA 7 does, `r(58) = .53, 95% CI [.33, .69]`, as p
