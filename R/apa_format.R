@@ -183,6 +183,15 @@ sframe_apa_figure <- function(img, title) {
     htmltools_escape(title), img)
 }
 
+# The opening of a figure in the Quarto report. knitr writes the image
+# between this and a closing </figure>, and sframe_quarto_apa_floats() gives
+# the image the alt text kept in data-alt.
+sframe_apa_figure_open <- function(title, alt) {
+  sprintf(
+    "<figure class=\"sf-figure\" data-alt=\"%s\"><figcaption class=\"sf-apa-caption\">%s</figcaption>",
+    htmltools_escape(alt), htmltools_escape(title))
+}
+
 # A result's table and figure title: its block id and research question.
 sframe_result_float_title <- function(result, i = NULL) {
   block_id <- as.character(result$block_id %||% "")[1]
@@ -205,4 +214,22 @@ sframe_apa_number_floats <- function(html) {
   # Close the italic title before each marked caption's end tag.
   gsub("(<(caption|figcaption) class=\"sf-apa-caption\"><strong>[^<]*</strong><br><em>[^<]*)</(caption|figcaption)>",
        "\\1</em></\\3>", html)
+}
+
+# The Quarto report (CX-22). knitr writes a table's caption as a plain
+# <caption>, and the template wraps each chart in a marked figure carrying its
+# alt text in data-alt, since knitr writes the image with none. Every caption
+# is a numbered table title, and each marked figure's image takes its alt text.
+sframe_quarto_apa_floats <- function(html) {
+  html <- paste(html, collapse = "\n")
+  html <- gsub("(?s)<caption>\\s*(.*?)\\s*</caption>",
+               "<caption class=\"sf-apa-caption\">\\1</caption>", html, perl = TRUE)
+  # pandoc sets a figure title on lines of its own.
+  html <- gsub("(?s)(<figcaption class=\"sf-apa-caption\">)\\s*(.*?)\\s*</figcaption>",
+               "\\1\\2</figcaption>", html, perl = TRUE)
+  # Quarto adds its own classes after sf-figure.
+  html <- gsub(
+    "(?s)(<figure class=\"sf-figure[^\"]*\" data-alt=\"([^\"]*)\">(?:(?!<img |</figure>).)*?)<img (?![^>]*\\balt=)",
+    "\\1<img alt=\"\\2\" ", html, perl = TRUE)
+  sframe_apa_number_floats(html)
 }

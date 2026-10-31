@@ -132,6 +132,12 @@ thead th { border-top: 2px solid #1a1a2e !important;
 tbody tr { background: none !important; }
 tbody tr:last-child td { border-bottom: 2px solid #1a1a2e !important; }
 .cell-output-display, .cell-output { overflow-x: auto; max-width: 100%; }
+/* APA 7 table and figure titles above the float: the number in bold, the
+   title in italics below it (CX-22). The theme puts captions below, in grey. */
+caption.sf-apa-caption, figcaption.sf-apa-caption {
+  caption-side: top; text-align: left; color: inherit;
+  font-size: .95em; margin-bottom: 4px; }
+figure.sf-figure { margin: 16px 0; }
 
 /* Shared footer */
 .sf-foot { text-align: center; font-size: 12px; color: #94a3b8;
@@ -244,10 +250,9 @@ cat(sprintf("**Respondent missingness:** %.1f%% exceed the %.0f%% threshold.\n\n
   miss_pct, qr$missing$flagged_threshold*100))
 high_miss <- qr$missing$item_miss_rate[qr$missing$item_miss_rate > 0.10]
 if (length(high_miss) > 0) {
-  cat("Items with >10% missing:\n\n")
   print(kable(format = "html", data.frame(Item=names(high_miss),
     Missing=sprintf("%.1f%%", high_miss*100), stringsAsFactors=FALSE),
-    align=c("l","r")))
+    align=c("l","r"), caption = "Items with more than 10% missing"))
 } else { cat("No items exceed 10% missing values.\n\n") }
 ```
 
@@ -307,8 +312,10 @@ if (!is.null(attr(content$charts, "scale_error")))
 for (chart in content$charts) {
   cat(sprintf("\n**%s**\n\n", chart$heading))
   if (!is.null(chart$note)) cat(chart$note, "\n\n")
+  # Numbered and titled after rendering, as the built-in engine's are (CX-22).
+  cat("\n", chart$figure_open, "\n\n", sep = "")
   if (!is.null(chart$plot)) print(chart$plot) else chart$draw()
-  cat("\n\n")
+  cat("\n\n</figure>\n\n")
 }
 ```
 
@@ -402,20 +409,23 @@ if (!has_data) {
           cat(r$syntax)
           cat("\n````\n\n")
         }
-        if (is.null(r$apa) && length(scale_entries) > 0) {
+        # Only where the result has no table of its own, as the built-in engine
+        # shows it, so no 2 tables share a title (CX-22).
+        if (is.null(r$apa) && length(scale_entries) > 0 && !is.data.frame(r$table)) {
           rel_tab <- do.call(rbind, lapply(scale_entries, function(s)
             data.frame(
               Scale = paste0(s$label %||% s$scale_id, " (", s$scale_id, ")"),
               Items = s$n_items %||% NA,
               Alpha = if (!is.null(s$alpha)) sprintf("%.2f", s$alpha) else "n/a",
               stringsAsFactors = FALSE)))
-          print(kable(format = "html", rel_tab, align = c("l", "c", "r"), row.names = FALSE))
+          print(kable(format = "html", rel_tab, align = c("l", "c", "r"), row.names = FALSE,
+                      caption = r$caption_html))
           cat("\n")
         }
         if (!is.null(r$effect_label))
           cat(sprintf("**Effect size:** %s\n\n", r$effect_label))
         if (!is.null(r$table) && is.data.frame(r$table))
-          print(kable(format = "html", sframe_apa_cells(r$table)))
+          print(kable(format = "html", sframe_apa_cells(r$table), caption = r$caption_html))
         # A second table the result carries: the quanteda runner's leading
         # features, or a moderation's conditional slopes at the moderator's own
         # values. Both were retained by their runner and rendered by neither
@@ -425,7 +435,7 @@ if (!has_data) {
         if (!is.null(sup)) {
           cat("\n")
           print(kable(format = "html", sframe_apa_cells(sup$table),
-                      caption = sup$caption, row.names = FALSE))
+                      caption = sup$caption_html, row.names = FALSE))
           cat("\n")
         }
         # The statistical call behind the numbers, folded away. Showing this
@@ -442,9 +452,9 @@ if (!has_data) {
         # The chart for this result sits directly under its table, as one
         # unit per research question, rather than in a separate section.
         if (!is.null(r$plot)) {
-          cat("\n")
+          cat("\n", r$figure_open, "\n\n", sep = "")
           print(r$plot)
-          cat("\n")
+          cat("\n\n</figure>\n\n")
         }
         interp_md(r)
         # Cited in text. The references themselves are listed once, in the
