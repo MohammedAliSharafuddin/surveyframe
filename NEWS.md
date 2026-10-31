@@ -446,6 +446,10 @@ style.
 
 ## Reports
 
+* **A Quarto report renders offline.** The report theme imported a Google
+  web font the report never used, so every render needed the internet, sent
+  Google a request, and hung with no timeout when the connection stalled.
+  The theme's web font is off, and a render fetches nothing.
 * **One computation feeds both report engines.** `render_report()` now
   computes the codebook table, every distribution chart and the plan
   results inside the package and hands them to the Quarto template, which
