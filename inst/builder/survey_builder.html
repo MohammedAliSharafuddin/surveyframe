@@ -709,9 +709,9 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
     <!-- Survey settings lives only in the sidebar CTA (below) to avoid a
          duplicate entry point; the top bar is reserved for document
          actions (Open, Export, Save). -->
-    <button type="button" class="btn btn-s btn-sm" onclick="openFile()">Open</button>
+    <button type="button" class="btn btn-s btn-sm" id="openBtn" onclick="openFile()">Open</button>
     <button type="button" class="btn btn-s btn-sm" onclick="exportSurveyHtml()" title="Export a deployable, self-contained survey HTML">Export survey</button>
-    <button type="button" class="btn btn-p btn-sm" onclick="saveSframe()">Save .sframe</button>
+    <button type="button" class="btn btn-p btn-sm" id="saveBtn" onclick="saveSframe()">Save .sframe</button>
   </div>
 </header>
 
@@ -3342,6 +3342,12 @@ async function saveSframe(){
   if(!(await sframeRevisionGate()))return;
   var payload=sframePayload();
   payload.hash.value=await sframeHash(payload);
+  // In Studio the save goes to Studio, which answers with sframe-saved.
+  if(STUDIO_HOST){
+    studioPendingOrigin={title:S.meta.title,version:S.meta.version,baseline:payload.hash.value};
+    window.parent.postMessage({type:'sframe',text:JSON.stringify(payload,null,2)},location.origin);
+    toast('Saving to Studio','ok');return;
+  }
   // The saved file is now the instrument this builder holds.
   S._origin={title:S.meta.title,version:S.meta.version,baseline:payload.hash.value};
   var blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
@@ -4546,6 +4552,35 @@ chkAutoSave();
 ra();
 updHistBtns();
 setInterval(function(){if(lastSaved||openedAt)updSave();},30000);
+
+// ── SurveyStudio host ──────────────────────────────────────────────────────
+// In SurveyStudio's Design screen (?host=studio) the builder opens the
+// instrument Studio has open and saves to Studio, not to disk. Messages pass
+// only between this window and its parent, on the same origin.
+var STUDIO_HOST=/[?&]host=studio(&|$)/.test(location.search)&&window.parent!==window;
+var studioPendingOrigin=null;
+function studioHostInit(){
+  document.getElementById('openBtn').style.display='none';
+  var sb=document.getElementById('saveBtn');
+  sb.textContent='Save to Studio';sb.title='Make this survey the instrument Studio has open (Ctrl+S)';
+  window.addEventListener('message',function(e){
+    if(e.source!==window.parent||e.origin!==location.origin)return;
+    var d=e.data||{};
+    if(d.type==='sframe'&&typeof d.text==='string'){
+      if(!dirty){openSframeText(d.text);return;}
+      conf2('Load the instrument Studio has open?','The instrument open in Studio has changed. Loading it replaces the survey here, and your unsaved changes will be lost.','Load it').then(function(ok){if(ok)openSframeText(d.text);});
+    }else if(d.type==='sframe-saved'){
+      if(d.ok){
+        if(studioPendingOrigin)S._origin=studioPendingOrigin;
+        dirty=false;lastSaved=Date.now();updSave();
+      }
+      studioPendingOrigin=null;
+      toast(String(d.message||''),d.ok?'ok':'err');
+    }
+  });
+  window.parent.postMessage({type:'need-sframe'},location.origin);
+}
+if(STUDIO_HOST)studioHostInit();
 </script>
 </body>
 </html>
