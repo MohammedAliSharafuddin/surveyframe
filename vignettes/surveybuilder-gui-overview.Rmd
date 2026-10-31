@@ -242,7 +242,7 @@ launch_studio(
 
 Use the Dashboard screen after data collection to explore responses. Each filter takes the question's label and choice labels, and the date range follows `submitted_at`.
 
-```{r fig-dashboard, echo = FALSE, out.width = "100%", fig.alt = "The response dashboard's Overview tab: filters named by their questions and a date range, tiles for 120 filtered responses, 19 survey items, 2 scales, 1 attention check and the date range, and an instrument summary table."}
+```{r fig-dashboard, echo = FALSE, out.width = "100%", fig.alt = "SurveyStudio's Dashboard screen on its Overview tab: 3 filters named by their questions and a date range on submitted_at, tiles for 120 responses, 120 filtered responses, 19 items, 2 scales, 1 check and the date range, and the instrument summary."}
 knitr::include_graphics("figures/gui-dashboard.png")
 ```
 

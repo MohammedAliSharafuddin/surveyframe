@@ -796,6 +796,9 @@ style.
   textarea question with 12 or fewer distinct answers was offered as a
   filter, as `open_comment` in the `input_types` demo was.
 
+* **The SurveyStudio guide shows Studio's Dashboard screen**, with its
+  filters, in place of the retired dashboard app.
+
 * **`launch_dashboard()` opens Studio's Dashboard screen.** It and
   `launch_dashboard_demo()` are superseded by `launch_studio(screen =
   "dashboard")`, and the separate dashboard app is removed.
