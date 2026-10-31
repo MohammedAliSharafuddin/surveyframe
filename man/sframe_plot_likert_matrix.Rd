@@ -25,7 +25,7 @@ A ggplot2 object, or \code{NULL} if no row has response data.
 \description{
 A matrix question asks several rows against one shared response scale
 (a "grid" of Likert items). Plotting each row as its own separate
-\code{\link[=sframe_draw_likert_diverging]{sframe_draw_likert_diverging()}} chart loses the grouping the question
+\code{sframe_draw_likert_diverging()} chart loses the grouping the question
 was designed with, so this draws every row as one diverging bar inside a
 single chart, sharing one x scale and one legend, the standard way a
 Likert matrix is reported (compare a typical multi-item satisfaction
@@ -44,8 +44,6 @@ if (requireNamespace("ggplot2", quietly = TRUE)) {
 }
 }
 \seealso{
-\code{\link[=sframe_draw_likert_diverging]{sframe_draw_likert_diverging()}}
-
 Other Chart functions:
 \code{\link[=plot.sframe_analysis_results]{plot.sframe_analysis_results()}},
 \code{\link[=sframe_plot_cooccurrence]{sframe_plot_cooccurrence()}},

@@ -12,8 +12,7 @@ sframe_demo(name, branded = FALSE)
 \item{branded}{Logical. When \code{TRUE}, the instrument comes back with the
 standard welcome page, logo, theme colour and thank you page spliced into
 its \code{render} block. The bundled file on disk is left unchanged, so the
-same branding can be shown on whichever demo matches your own survey. See
-\code{\link[=sframe_demo_branding]{sframe_demo_branding()}}.}
+same branding can be shown on whichever demo matches your own survey.}
 }
 \value{
 A list with \code{instrument}, \code{responses}, and the paths behind them:
@@ -40,7 +39,6 @@ head(demo$responses)
 \code{\link[=sframe_list_demos]{sframe_list_demos()}}, \code{\link[=export_responses]{export_responses()}}
 
 Other Demo functions:
-\code{\link[=sframe_demo_branding]{sframe_demo_branding()}},
 \code{\link[=sframe_demo_qmd]{sframe_demo_qmd()}},
 \code{\link[=sframe_list_demos]{sframe_list_demos()}}
 }

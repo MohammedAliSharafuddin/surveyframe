@@ -9,8 +9,8 @@
 #' its collector removed, so trying it is safe: no answer is sent anywhere.
 #'
 #' @param x An `sframe` instrument, or a demo name from [sframe_list_demos()].
-#'   A demo is shown with the standard demo branding, see
-#'   [sframe_demo_branding()].
+#'   A demo is shown with the standard demo branding, as
+#'   `sframe_demo(name, branded = TRUE)` applies it.
 #' @param where One of `"browser"`, a standalone HTML page written by
 #'   [export_survey()], or `"studio"`, the preview screen of
 #'   [launch_studio()].

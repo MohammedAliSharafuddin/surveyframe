@@ -111,7 +111,7 @@ sframe_builder_as_check <- function(check) {
 #'
 #' @return A list containing empty metadata, choice, item, scale, branching,
 #'   and check collections suitable for SurveyStudio.
-#' @export
+#' @noRd
 #' @examples
 #' state <- sframe_builder_empty_state()
 #' state$meta$title
@@ -145,7 +145,7 @@ sframe_builder_empty_state <- function() {
 #'
 #' @return A builder state list. Component classes are restored so the state
 #'   can be edited or validated by SurveyStudio.
-#' @export
+#' @noRd
 #' @examples
 #' demo <- sframe_demo("tourism_services")
 #' state <- sframe_builder_state_from_instrument(demo$instrument)
@@ -312,7 +312,7 @@ sframe_builder_revision_problem <- function(instrument) {
 #' @return A list with `valid`, `problems`, `instrument`, and
 #'   `revision_problem`: the reason [write_sframe()] would refuse the draft as
 #'   an undisclosed revision, or `NULL`.
-#' @export
+#' @noRd
 #' @examples
 #' demo  <- sframe_demo("tourism_services")
 #' state <- sframe_builder_state_from_instrument(demo$instrument)

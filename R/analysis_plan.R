@@ -1309,7 +1309,7 @@ sframe_plain <- function(x) {
 #'
 #' @return A list with `table` and `caption`, or `NULL` where the result has no
 #'   second table.
-#' @export
+#' @noRd
 #' @seealso [run_analysis_plan()], [render_report()], [sframe_syntax_result()]
 #'
 #' @examples

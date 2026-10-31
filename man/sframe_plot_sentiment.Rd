@@ -18,7 +18,7 @@ A ggplot2 object, or \code{NULL} when the result carries no table.
 A ggplot2 diverging bar for a \code{tidy_sentiment} result by default:
 positive counts extend one direction, negative counts the other, so bar
 position (not colour alone) carries the primary polarity signal, the
-same convention \code{\link[=sframe_draw_likert_diverging]{sframe_draw_likert_diverging()}} uses for Likert
+same convention \code{sframe_draw_likert_diverging()} uses for Likert
 agreement (dark ramp toward the pole) rebuilt here in ggplot2 rather
 than called directly, since that helper is base-graphics and
 Likert-scale-specific. Facets by group when \code{result$table} carries a
@@ -46,7 +46,7 @@ if (requireNamespace("ggplot2", quietly = TRUE) &&
 }
 }
 \seealso{
-\code{\link[=run_analysis_plan]{run_analysis_plan()}}, \code{\link[=sframe_draw_likert_diverging]{sframe_draw_likert_diverging()}}
+\code{\link[=run_analysis_plan]{run_analysis_plan()}}
 
 Other Chart functions:
 \code{\link[=plot.sframe_analysis_results]{plot.sframe_analysis_results()}},

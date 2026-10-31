@@ -133,7 +133,7 @@ sframe_reference_demo <- function(name) {
 #'   the input `fields` it uses, the statistical `technique` it demonstrates,
 #'   and the demo whose responses it reuses, if any.
 #' @export
-#' @seealso [sframe_demo()], [sframe_demo_branding()], [sframe_demo_qmd()]
+#' @seealso [sframe_demo()], [sframe_demo_qmd()]
 #' @examples
 #' head(sframe_list_demos(), 3)
 #' subset(sframe_list_demos(), focus == "provenance")
@@ -164,8 +164,7 @@ sframe_demo_dir <- function() {
 #' @param branded Logical. When `TRUE`, the instrument comes back with the
 #'   standard welcome page, logo, theme colour and thank you page spliced into
 #'   its `render` block. The bundled file on disk is left unchanged, so the
-#'   same branding can be shown on whichever demo matches your own survey. See
-#'   [sframe_demo_branding()].
+#'   same branding can be shown on whichever demo matches your own survey.
 #'
 #' @return A list with `instrument`, `responses`, and the paths behind them:
 #'   `instrument_path`, `responses_path`, `codebook_path` and `results_path`.
@@ -256,7 +255,7 @@ sframe_demo_screens <- function(title) {
 #'   `submit_label`, and the `welcome`, `thankyou` and `header` blocks.
 #'   Printing it shows each setting as a respondent meets it.
 #'   [sframe_instrument()] and [sframe_demo()] store it as a plain list.
-#' @export
+#' @noRd
 #' @seealso [preview_survey()] to see the branding applied to a demo.
 #' @examples
 #' branding <- sframe_demo_branding()

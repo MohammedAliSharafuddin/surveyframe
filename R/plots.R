@@ -27,8 +27,6 @@
 #'   * [sframe_plot_efa_scree()]
 #'   * [sframe_plot_efa_loadings()]
 #' * **Responses with the instrument, giving 1 plot:**
-#'   * [sframe_plot_item_chart()]
-#'   * [sframe_plot_scale_chart()]
 #'   * [sframe_plot_likert_matrix()]
 #'   * [sframe_plot_likert_scale()]
 #'   * [sframe_plot_correlation_matrix()]
@@ -52,14 +50,6 @@
 #'
 #' A helper that finds nothing to draw returns `NULL`, so guard the result
 #' where a report has to keep rendering.
-#'
-#' # Integration helpers
-#'
-#' [sframe_draw_mosaic()] and [sframe_draw_likert_diverging()] draw into an
-#' open device for the generated reports, and stay exported so those reports
-#' keep working. [sframe_likert_scale_groups()] finds the scales whose items
-#' share a choice set, which is how a report groups them. Take the results
-#' they draw from [run_analysis_plan()].
 #'
 #' @name sframe_plots
 #' @seealso [run_analysis_plan()], [render_report()]
@@ -773,9 +763,8 @@ sframe_plot_regression <- function(result, data, palette = c("web", "print")) {
 #' @param palette One of `"web"` or `"print"`. See `sframe_brand()`.
 #' @return Invisibly `NULL`, called for its plotting side effect on the
 #'   current graphics device.
-#' @export
+#' @noRd
 #' @keywords internal
-#' @seealso [sframe_plot_item_chart()]
 #' @examples
 #' counts <- c("Strongly disagree" = 5, "Disagree" = 10, "Neutral" = 15,
 #'             "Agree" = 40, "Strongly agree" = 30)
@@ -996,7 +985,7 @@ sframe_draw_likert_diverging <- function(counts, theme_color = "#16B3B1",
 #'
 #' A matrix question asks several rows against one shared response scale
 #' (a "grid" of Likert items). Plotting each row as its own separate
-#' [sframe_draw_likert_diverging()] chart loses the grouping the question
+#' `sframe_draw_likert_diverging()` chart loses the grouping the question
 #' was designed with, so this draws every row as one diverging bar inside a
 #' single chart, sharing one x scale and one legend, the standard way a
 #' Likert matrix is reported (compare a typical multi-item satisfaction
@@ -1014,7 +1003,6 @@ sframe_draw_likert_diverging <- function(counts, theme_color = "#16B3B1",
 #' @param palette One of `"web"` or `"print"`. See `sframe_brand()`.
 #' @return A ggplot2 object, or `NULL` if no row has response data.
 #' @export
-#' @seealso [sframe_draw_likert_diverging()]
 #' @examples
 #' \donttest{
 #' if (requireNamespace("ggplot2", quietly = TRUE)) {
@@ -1109,7 +1097,7 @@ sframe_plot_likert_scale <- function(items, data, choice_set, title, palette = c
 #'   each a list with `scale_id`, `title` (the scale's label), `items` (the
 #'   member item objects, in scale order), and `choice_set` (the shared
 #'   choice set object). Empty list if no scale qualifies.
-#' @export
+#' @noRd
 #' @seealso [sframe_plot_likert_scale()], [sframe_scale()]
 #' @examples
 #' demo <- sframe_demo("likert_scale")
@@ -1577,7 +1565,7 @@ sframe_plot_reliability <- function(x, palette = c("web", "print")) {
 #'
 #' Base-graphics mosaic plot (via [graphics::mosaicplot()]), matching the
 #' existing base-graphics precedent in this file
-#' ([sframe_draw_likert_diverging()]) so it renders without ggplot2. An
+#' (`sframe_draw_likert_diverging()`) so it renders without ggplot2. An
 #' alternative view of the same crosstab data
 #' `sframe_plot_crosstab()` renders as a grouped bar. Use whichever reads
 #' better for the table's shape (mosaic scales better to unbalanced group
@@ -1588,7 +1576,7 @@ sframe_plot_reliability <- function(x, palette = c("web", "print")) {
 #' @param palette One of `"web"` or `"print"`. See `sframe_brand()`.
 #' @return Invisibly `NULL`, called for its plotting side effect on the
 #'   current graphics device.
-#' @export
+#' @noRd
 #' @keywords internal
 #' @seealso `sframe_plot_crosstab()`
 #' @examples
@@ -1940,7 +1928,7 @@ plot.sframe_analysis_results <- function(x, ..., which = NULL) {
 #' @param palette One of `"web"` or `"print"`. See `sframe_brand()`.
 #' @return A ggplot2 object, or `NULL` if this item type/data is unsupported.
 #' @keywords internal
-#' @export
+#' @noRd
 #' @examples
 #' \donttest{
 #' if (requireNamespace("ggplot2", quietly = TRUE)) {
@@ -1986,7 +1974,7 @@ sframe_plot_item_chart <- function(item, col_data, choice_set = NULL,
 
 #' Scale score distribution chart, ggplot2 equivalent of the dashboard panel
 #'
-#' Same sharing rationale as [sframe_plot_item_chart()].
+#' Same sharing rationale as `sframe_plot_item_chart()`.
 #'
 #' @param scores Numeric vector of scale scores (already averaged/summed).
 #' @param label Character. Scale label, used as the x-axis title.
@@ -1994,7 +1982,7 @@ sframe_plot_item_chart <- function(item, col_data, choice_set = NULL,
 #' @return A ggplot2 object, or `NULL` if ggplot2 is unavailable or `scores`
 #'   is empty.
 #' @keywords internal
-#' @export
+#' @noRd
 #' @examples
 #' \donttest{
 #' if (requireNamespace("ggplot2", quietly = TRUE)) {
@@ -2843,7 +2831,7 @@ sframe_plot_cooccurrence_network <- function(result, palette = c("web", "print")
 #' A ggplot2 diverging bar for a `tidy_sentiment` result by default:
 #' positive counts extend one direction, negative counts the other, so bar
 #' position (not colour alone) carries the primary polarity signal, the
-#' same convention [sframe_draw_likert_diverging()] uses for Likert
+#' same convention `sframe_draw_likert_diverging()` uses for Likert
 #' agreement (dark ramp toward the pole) rebuilt here in ggplot2 rather
 #' than called directly, since that helper is base-graphics and
 #' Likert-scale-specific. Facets by group when `result$table` carries a
@@ -2863,7 +2851,7 @@ sframe_plot_cooccurrence_network <- function(result, palette = c("web", "print")
 #' @param palette One of `"web"` or `"print"`. See `sframe_brand()`.
 #' @return A ggplot2 object, or `NULL` when the result carries no table.
 #' @export
-#' @seealso [run_analysis_plan()], [sframe_draw_likert_diverging()]
+#' @seealso [run_analysis_plan()]
 #' @examples
 #' \donttest{
 #' if (requireNamespace("ggplot2", quietly = TRUE) &&
