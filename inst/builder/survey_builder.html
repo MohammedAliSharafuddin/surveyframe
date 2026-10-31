@@ -3344,6 +3344,7 @@ async function saveSframe(){
   payload.hash.value=await sframeHash(payload);
   // In Studio the save goes to Studio, which answers with sframe-saved.
   if(STUDIO_HOST){
+    if(document.getElementById('saveBtn').disabled){toast('Studio cannot take a save of this survey now. See the message above the builder.','err');return;}
     studioPendingOrigin={title:S.meta.title,version:S.meta.version,baseline:payload.hash.value};
     window.parent.postMessage({type:'sframe',text:JSON.stringify(payload,null,2)},location.origin);
     toast('Saving to Studio','ok');return;
@@ -4566,7 +4567,13 @@ function studioHostInit(){
   window.addEventListener('message',function(e){
     if(e.source!==window.parent||e.origin!==location.origin)return;
     var d=e.data||{};
-    if(d.type==='sframe'&&typeof d.text==='string'){
+    if(d.type==='sframe-blocked'){
+      // Studio holds an instrument it cannot send, so nothing here may
+      // replace it until it sends one.
+      document.getElementById('saveBtn').disabled=true;
+      toast(String(d.message||''),'err');
+    }else if(d.type==='sframe'&&typeof d.text==='string'){
+      document.getElementById('saveBtn').disabled=false;
       if(!dirty){openSframeText(d.text);return;}
       conf2('Load the instrument Studio has open?','The instrument open in Studio has changed. Loading it replaces the survey here, and your unsaved changes will be lost.','Load it').then(function(ok){if(ok)openSframeText(d.text);});
     }else if(d.type==='sframe-saved'){

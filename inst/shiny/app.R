@@ -1451,14 +1451,24 @@ ui <- fluidPage(
           if (!f || e.source !== f.contentWindow || e.origin !== location.origin) return;
           var d = e.data || {};
           if (d.type === 'need-sframe') {
-            if (studioDesignText) studioDesignPost({type: 'sframe', text: studioDesignText});
+            if (studioDesignProblem) {
+              studioDesignPost({type: 'sframe-blocked', message: studioDesignProblem});
+            } else if (studioDesignText) {
+              studioDesignPost({type: 'sframe', text: studioDesignText});
+            }
           } else if (d.type === 'sframe' && typeof d.text === 'string') {
             Shiny.setInputValue('builder_sframe', d.text, {priority: 'event'});
           }
         });
+        // An instrument Studio cannot send leaves the builder unable to save,
+        // so nothing it holds replaces that instrument and its history.
+        var studioDesignProblem = null;
         Shiny.addCustomMessageHandler('surveyframe-design-sframe', function(m) {
           studioDesignText = m.text || null;
-          if (!m.from_builder && studioDesignText) {
+          studioDesignProblem = m.problem || null;
+          if (studioDesignProblem) {
+            studioDesignPost({type: 'sframe-blocked', message: studioDesignProblem});
+          } else if (!m.from_builder && studioDesignText) {
             studioDesignPost({type: 'sframe', text: studioDesignText});
           }
         });
@@ -2198,18 +2208,26 @@ server <- function(input, output, session) {
   # -- Design -----------------------------------------------------------------
   # The builder on the Design screen is sent the open instrument whenever it
   # changes. A change that is the builder's own save is not sent back.
+  # An instrument Studio cannot write as it is is not sent, and the reason
+  # shows above the builder.
   design_from_builder <- FALSE
+  design_out <- reactive(sframe_studio_sframe_text(rv$instrument))
   observe({
-    text <- sframe_studio_sframe_text(rv$instrument)
+    out <- design_out()
     from_builder <- design_from_builder
     design_from_builder <<- FALSE
     session$sendCustomMessage("surveyframe-design-sframe",
-                              list(text = text, from_builder = from_builder))
+      list(text = out$text, problem = out$problem, from_builder = from_builder))
   })
 
   # A save in the builder is read and checked as a file would be, and
   # becomes the open instrument, as an opened file does.
   observeEvent(input$builder_sframe, {
+    if (!is.null(design_out()$problem)) {
+      session$sendCustomMessage("surveyframe-design-saved",
+        list(ok = FALSE, message = design_out()$problem))
+      return()
+    }
     tryCatch({
       loaded <- read_sframe(text = input$builder_sframe)
       design_from_builder <<- TRUE
@@ -2231,7 +2249,10 @@ server <- function(input, output, session) {
 
   output$design_status <- renderUI({
     ins <- rv$instrument
-    if (is.null(ins)) {
+    problem <- design_out()$problem
+    if (!is.null(problem)) {
+      tags$div(class = "plan-msg", problem)
+    } else if (is.null(ins)) {
       tags$p(class = "hint", paste(
         "No instrument is open. Build one here and save it to Studio, or open",
         "a file on the Open Instrument screen."))

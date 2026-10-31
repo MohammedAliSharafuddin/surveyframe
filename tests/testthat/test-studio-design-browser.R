@@ -12,11 +12,33 @@ test_that("design is a Studio screen launch_studio() accepts", {
 
 test_that("the instrument text Studio sends the builder reads back", {
   demo <- sframe_demo("likert_scale")
-  text <- sframe_studio_sframe_text(demo$instrument)
-  expect_type(text, "character")
-  back <- read_sframe(text = text)
+  out <- sframe_studio_sframe_text(demo$instrument)
+  expect_type(out$text, "character")
+  expect_null(out$problem)
+  back <- read_sframe(text = out$text)
   expect_identical(back$meta$title, demo$instrument$meta$title)
-  expect_null(sframe_studio_sframe_text(NULL))
+  expect_null(sframe_studio_sframe_text(NULL)$text)
+})
+
+# An amended instrument, then changed again with no amendment recorded.
+design_unrecorded_change <- function() {
+  item <- sframe_item("q1", "How satisfied are you?", type = "text")
+  instr <- sframe_instrument("Demo", components = list(item))
+  item2 <- sframe_item("q1", "How satisfied are you overall?", type = "text")
+  revised <- sframe_instrument("Demo", components = list(item2))
+  amended <- amend_sframe(instr, revised, reason_code = "instrument_revision",
+                          reason_text = "Clarified wording.",
+                          deviation_report = "Wording only.")
+  amended$items[[1]]$label <- "Changed with no amendment"
+  amended
+}
+
+test_that("Studio never sends Design an instrument stripped of its amendments", {
+  changed <- design_unrecorded_change()
+  out <- sframe_studio_sframe_text(changed)
+  expect_null(out$text)
+  expect_match(out$problem, "not recorded as an amendment", fixed = TRUE)
+  expect_length(changed$amendments, 1L)
 })
 
 studio_design_session <- function(launch) {
@@ -112,3 +134,35 @@ test_that("Studio opens on Design when it has no instrument", {
   expect_true(s$wait("$('#screen-design').hasClass('active')"))
   expect_true(s$wait("!!document.getElementById('design_frame').contentWindow.S"))
 })
+
+test_that("Design shows why it cannot load an instrument with an unrecorded change", {
+  skip_without_studio_browser()
+  s <- studio_design_session(function(port) {
+    library(surveyframe)
+    item <- sframe_item("q1", "How satisfied are you?", type = "text")
+    instr <- sframe_instrument("Demo", components = list(item))
+    item2 <- sframe_item("q1", "How satisfied are you overall?", type = "text")
+    revised <- sframe_instrument("Demo", components = list(item2))
+    amended <- amend_sframe(instr, revised, reason_code = "instrument_revision",
+                            reason_text = "Clarified wording.",
+                            deviation_report = "Wording only.")
+    amended$items[[1]]$label <- "Changed with no amendment"
+    launch_studio(amended, screen = "design", port = port, launch.browser = FALSE)
+  })
+  skip_if(is.null(s), "Studio did not start")
+  on.exit({ s$b$close(); s$proc$kill() }, add = TRUE)
+  js <- s$js
+  frame <- "document.getElementById('design_frame').contentWindow"
+  status <- "((document.getElementById('design_status')||{}).innerText||'')"
+  expect_true(s$wait(paste0(status, ".indexOf('not recorded as an amendment') >= 0")))
+  expect_true(s$wait(paste0(frame, ".S && ", frame, ".document.getElementById('saveBtn').disabled")))
+  expect_identical(js(paste0(frame, ".S.items.length")), 0L)
+
+  # A save from the builder cannot replace the instrument and its history.
+  js(paste0("var w=", frame, "; w.S._origin = null; w.S.meta.title = 'Saved over it'; w.saveSframe(); true"))
+  Sys.sleep(2)
+  expect_false(grepl("Saved over it", js(status), fixed = TRUE))
+  js("$('[data-tab=\"amendments\"]').click(); true")
+  expect_true(s$wait("((document.getElementById('amendment_log_table')||{}).innerText||'').indexOf('Clarified wording.') >= 0"))
+})
+

@@ -803,6 +803,10 @@ style.
   other window, on the same origin. With no instrument, `launch_studio()`
   and the Addin open on Design. `screen = "build"` names `"design"` in its
   error.
+  An instrument changed with no amendment recorded does not open in
+  Design, and the screen says why. Rewriting it as a new instrument would
+  have dropped its amendment log, and a save would have replaced Studio's
+  instrument with one that has no history.
 
 * **A free-text question no longer becomes a Dashboard filter.** A text or
   textarea question with 12 or fewer distinct answers was offered as a
