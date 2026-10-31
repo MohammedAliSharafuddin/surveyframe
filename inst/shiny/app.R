@@ -1190,7 +1190,7 @@ if (identical(initial_tab, "auto")) {
   } else if (inherits(INITIAL_INSTRUMENT, "sframe")) {
     "preview"
   } else {
-    "open"
+    "design"
   }
 }
 # launch_studio() has already checked the screen.
@@ -1198,7 +1198,7 @@ if (!initial_tab %in% sframe_studio_screens()) {
   initial_tab <- if (inherits(INITIAL_INSTRUMENT, "sframe")) {
     "preview"
   } else {
-    "open"
+    "design"
   }
 }
 
@@ -1369,6 +1369,9 @@ ui <- fluidPage(
       ),
       tags$ul(class = "studio-nav",
         tags$li(class = "studio-nav-item",
+          tags$a(href = "#", `data-tab` = "design",
+                 class = tab_link_class("design"), "Design")),
+        tags$li(class = "studio-nav-item",
           tags$a(href = "#", `data-tab` = "open",
                  class = tab_link_class("open"), "Open Instrument")),
         tags$li(class = "studio-nav-item",
@@ -1434,6 +1437,35 @@ ui <- fluidPage(
 
         Shiny.addCustomMessageHandler('surveyframe-launch-tab', studioLaunchScreen);
 
+        // The Design screen holds the SurveyBuilder in an iframe on this
+        // origin. Each side takes a message only from the other window, on
+        // the same origin. Studio keeps the open instrument's text, for the
+        // builder to ask for once it has loaded.
+        var studioDesignText = null;
+        function studioDesignPost(msg) {
+          var f = document.getElementById('design_frame');
+          if (f && f.contentWindow) f.contentWindow.postMessage(msg, location.origin);
+        }
+        window.addEventListener('message', function(e) {
+          var f = document.getElementById('design_frame');
+          if (!f || e.source !== f.contentWindow || e.origin !== location.origin) return;
+          var d = e.data || {};
+          if (d.type === 'need-sframe') {
+            if (studioDesignText) studioDesignPost({type: 'sframe', text: studioDesignText});
+          } else if (d.type === 'sframe' && typeof d.text === 'string') {
+            Shiny.setInputValue('builder_sframe', d.text, {priority: 'event'});
+          }
+        });
+        Shiny.addCustomMessageHandler('surveyframe-design-sframe', function(m) {
+          studioDesignText = m.text || null;
+          if (!m.from_builder && studioDesignText) {
+            studioDesignPost({type: 'sframe', text: studioDesignText});
+          }
+        });
+        Shiny.addCustomMessageHandler('surveyframe-design-saved', function(m) {
+          studioDesignPost({type: 'sframe-saved', ok: m.ok, message: m.message});
+        });
+
         Shiny.addCustomMessageHandler('surveyframe-switch-tab', function(tab) {
           var link = $('[data-tab=\"' + tab + '\"]');
           if (link.length === 0) return;
@@ -1482,6 +1514,17 @@ ui <- fluidPage(
           }
         };
       ")),
+
+      # Design (0.4.3): the SurveyBuilder, served from this origin, in an
+      # iframe. A save in it becomes the open instrument.
+      tags$div(id = "screen-design", class = screen_class("design"),
+        tags$h2(class = "screen-title", "Design"),
+        uiOutput("design_status"),
+        tags$iframe(id = "design_frame", title = "SurveyBuilder",
+          src = "sfbuilder/survey_builder.html?host=studio",
+          style = paste("width: 100%; height: calc(100vh - 150px); min-height: 600px;",
+                        "border: 1px solid #e0e3ea; border-radius: 8px; background: #fff;"))
+      ),
 
       tags$div(id = "screen-open", class = screen_class("open"),
         tags$h2(class = "screen-title", "Open Instrument"),
@@ -2150,6 +2193,54 @@ server <- function(input, output, session) {
       rv$open_verification <- paste("Integrity check failed:", conditionMessage(e))
       showNotification(paste("Error:", conditionMessage(e)), type = "error")
     })
+  })
+
+  # -- Design -----------------------------------------------------------------
+  # The builder on the Design screen is sent the open instrument whenever it
+  # changes. A change that is the builder's own save is not sent back.
+  design_from_builder <- FALSE
+  observe({
+    text <- sframe_studio_sframe_text(rv$instrument)
+    from_builder <- design_from_builder
+    design_from_builder <<- FALSE
+    session$sendCustomMessage("surveyframe-design-sframe",
+                              list(text = text, from_builder = from_builder))
+  })
+
+  # A save in the builder is read and checked as a file would be, and
+  # becomes the open instrument, as an opened file does.
+  observeEvent(input$builder_sframe, {
+    tryCatch({
+      loaded <- read_sframe(text = input$builder_sframe)
+      design_from_builder <<- TRUE
+      rv$builder <- builder_state_from_instrument(loaded)
+      rv$instrument <- loaded
+      rv$responses <- NULL
+      rv$open_verification <- paste(
+        "Saved from the Design screen. Integrity verified: content matches",
+        "the SHA-256 digest the builder stored.")
+      sync_builder_inputs(rv$builder)
+      session$sendCustomMessage("surveyframe-design-saved",
+        list(ok = TRUE, message = "Saved to Studio as the open instrument."))
+    }, error = function(e) {
+      design_from_builder <<- FALSE
+      session$sendCustomMessage("surveyframe-design-saved",
+        list(ok = FALSE, message = paste("Studio could not open it:", conditionMessage(e))))
+    })
+  })
+
+  output$design_status <- renderUI({
+    ins <- rv$instrument
+    if (is.null(ins)) {
+      tags$p(class = "hint", paste(
+        "No instrument is open. Build one here and save it to Studio, or open",
+        "a file on the Open Instrument screen."))
+    } else {
+      tags$p(class = "hint", paste0(
+        "Open instrument: ", ins$meta$title %||% "Untitled", ", version ",
+        ins$meta$version %||% "", ". Save to Studio in the builder to make ",
+        "your changes the open instrument."))
+    }
   })
 
   # -- References -------------------------------------------------------------

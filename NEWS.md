@@ -796,6 +796,14 @@ style.
   shows a "Filtered responses" tile. The Quality screen still describes
   every response.
 
+* **Studio has a Design screen.** It holds the SurveyBuilder, which opens
+  the instrument Studio has open. Its Save button reads "Save to Studio",
+  and a save becomes Studio's open instrument, read and checked as an
+  opened file is. Studio and the builder each take a message only from the
+  other window, on the same origin. With no instrument, `launch_studio()`
+  and the Addin open on Design. `screen = "build"` names `"design"` in its
+  error.
+
 * **A free-text question no longer becomes a Dashboard filter.** A text or
   textarea question with 12 or fewer distinct answers was offered as a
   filter, as `open_comment` in the `input_types` demo was.

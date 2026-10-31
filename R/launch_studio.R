@@ -3,19 +3,19 @@
 # The screens SurveyStudio has, in navigation order, matching the tabs in
 # inst/shiny/app.R.
 sframe_studio_screens <- function() {
-  c("open", "amendments", "references", "preview", "responses", "quality",
+  c("design", "open", "amendments", "references", "preview", "responses", "quality",
     "reliability", "analysis", "dashboard", "export")
 }
 
 # Resolves the `screen` argument to a screen Studio has. "build" used to be
-# offered and quietly opened another screen, since Studio authors nothing.
+# offered and quietly opened another screen. Its name is now "design".
 sframe_studio_screen <- function(screen) {
   screen <- as.character(screen %||% "auto")[1]
   if (identical(screen, "data")) screen <- "responses"
   if (identical(screen, "build")) {
     rlang::abort(
-      paste0("SurveyStudio has no screen for building a survey. Author an ",
-             "instrument with launch_builder(), then open it here."),
+      paste0("SurveyStudio's screen for building a survey is \"design\". ",
+             "launch_builder() opens the builder on its own."),
       class = "sframe_error")
   }
   if (!screen %in% c("auto", sframe_studio_screens())) {
@@ -30,13 +30,13 @@ sframe_studio_screen <- function(screen) {
 #' Launch the SurveyStudio interface
 #'
 #' Opens the SurveyStudio Shiny application, the visual interface for working
-#' with an instrument that already exists. Its screens open an instrument,
-#' record and read amendments, preview the survey, upload responses, review
+#' with an instrument. Its screens design an instrument in the SurveyBuilder,
+#' open one, record and read amendments, preview the survey, upload responses, review
 #' data quality, inspect reliability, work on the analysis plan, read the
 #' dashboard, and export.
 #'
-#' Studio reads and analyses an instrument. To author one, question by
-#' question, use [launch_builder()], and open the result here.
+#' The Design screen holds the SurveyBuilder, and a save there becomes the
+#' instrument Studio has open. [launch_builder()] opens the builder on its own.
 #'
 #' @param instrument An `sframe` object or NULL.
 #' @param responses A data.frame, tibble, CSV file path, or NULL.
@@ -49,7 +49,7 @@ sframe_studio_screen <- function(screen) {
 #' @param strict Logical. Passed to [read_responses()] when `responses` is a
 #'   CSV path.
 #' @param screen The screen to open on. One of `"auto"`, which picks by what
-#'   you supply, or a screen name: `"open"`, `"amendments"`,
+#'   you supply, or a screen name: `"design"`, `"open"`, `"amendments"`,
 #'   `"references"`, `"preview"`,
 #'   `"responses"`, `"quality"`, `"reliability"`, `"analysis"`,
 #'   `"dashboard"` or `"export"`. `"data"` is accepted for `"responses"`.
@@ -183,5 +183,34 @@ sframe_studio_app <- function() {
   # An app object, unlike a folder, does not serve www/ by itself.
   www_dir <- file.path(app_path, "www")
   if (dir.exists(www_dir)) shiny::addResourcePath("sfstudio", www_dir)
+  # The Design screen loads the builder from the same origin, so the 2
+  # windows can check where each message comes from.
+  builder_dir <- system.file("builder", package = "surveyframe")
+  if (nzchar(builder_dir)) shiny::addResourcePath("sfbuilder", builder_dir)
   shiny::shinyApp(ui = app_env$ui, server = app_env$server)
 }
+
+# The open instrument as .sframe text, for the Design screen to send the
+# builder. An instrument whose content no longer matches its amendment log
+# is written as a new one, as the builder would save it. NULL when there is
+# no instrument or it cannot be written.
+sframe_studio_sframe_text <- function(instrument) {
+  if (!inherits(instrument, "sframe")) return(NULL)
+  tmp <- tempfile(fileext = ".sframe")
+  on.exit(unlink(tmp), add = TRUE)
+  ok <- tryCatch({
+    write_sframe(instrument, tmp, overwrite = TRUE)
+    TRUE
+  }, error = function(e) FALSE)
+  if (!ok) {
+    ok <- tryCatch({
+      instrument$amendments <- list()
+      attr(instrument, "sframe_origin") <- NULL
+      write_sframe(instrument, tmp, overwrite = TRUE, new_instrument = TRUE)
+      TRUE
+    }, error = function(e) FALSE)
+  }
+  if (!ok) return(NULL)
+  paste(readLines(tmp, warn = FALSE, encoding = "UTF-8"), collapse = "\n")
+}
+
