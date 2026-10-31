@@ -823,6 +823,10 @@ style.
   wording, help text or branding edit. When one of those changes, the
   responses are cleared, and a message names what changed.
 
+* **The sidebar shows 1 selected screen.** The entry under the mouse took
+  the selected look, so with Design open, Design and the entry the mouse
+  rested on both looked selected. Hover is now a lighter tint.
+
 * **Every empty Studio screen names the next stage.** With no instrument,
   each screen past Design and Open Instrument links to those 2. With no
   responses, Quality, Reliability and the Dashboard link to Collect and

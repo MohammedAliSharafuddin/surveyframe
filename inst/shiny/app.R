@@ -1235,7 +1235,10 @@ ui <- fluidPage(
         font-size: 14px; border-left: 3px solid transparent;
         transition: background 0.15s, color 0.15s;
       }
-      .studio-nav-item a:hover,
+      /* Only the open screen has the teal bar and white text. Hover is a
+         lighter tint, so the entry under the mouse is never mistaken for
+         the selected one. */
+      .studio-nav-item a:hover { background: #1d2140; color: #c8ccdc; }
       .studio-nav-item a.active {
         background: #22274a; color: #ffffff; border-left-color: #16B3B1;
       }
