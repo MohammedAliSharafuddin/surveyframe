@@ -7,7 +7,7 @@
 sframe_plot_quality(x, palette = c("web", "print"))
 }
 \arguments{
-\item{x}{An \code{sframe_quality_report} object from \code{\link[=quality_report]{quality_report()}}.}
+\item{x}{An \code{sframe_quality_report} object from \code{\link[=sframe_quality_results]{sframe_quality_results()}}.}
 
 \item{palette}{One of \code{"web"} or \code{"print"}. See \code{sframe_brand()}.}
 }
@@ -21,11 +21,11 @@ Quality report plot: straight-lining flag rate by scale
 \donttest{
 if (requireNamespace("ggplot2", quietly = TRUE)) {
   demo <- sframe_demo("likert_scale")
-  qr <- quality_report(demo$responses, demo$instrument)
+  qr <- sframe_quality_results(demo$responses, demo$instrument)
   sframe_plot_quality(qr)
 }
 }
 }
 \seealso{
-\code{\link[=quality_report]{quality_report()}}
+\code{\link[=sframe_quality_results]{sframe_quality_results()}}
 }

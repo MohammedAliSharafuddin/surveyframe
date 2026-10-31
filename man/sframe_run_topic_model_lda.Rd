@@ -17,19 +17,19 @@ modelling section for \code{topicmodels::perplexity()}-based selection),
 \code{seed} (default \code{42L}), \code{stop_words} (passed through to the tokeniser).}
 
 \item{instrument}{Optional \code{sframe} instrument, passed to
-\code{\link[=clean_text_responses]{clean_text_responses()}} for item-type validation.}
+\code{\link[=sframe_clean_text]{sframe_clean_text()}} for item-type validation.}
 }
 \value{
 A runner-contract result list: \code{test = "topic_model_lda"},
 \code{table} (topic/term/beta/rank, top 10 terms per topic), \code{fit} (a
 runtime-only list holding the LDA model object and the document-row-to-
-respondent mapping needed by \code{\link[=extract_quotes]{extract_quotes()}}), \code{apa}, \code{prompt}. On
+respondent mapping needed by \code{\link[=sframe_extract_quotes]{sframe_extract_quotes()}}), \code{apa}, \code{prompt}. On
 failure: \verb{list(test = "topic_model_lda", error = <message>)}.
 }
 \description{
-Cleans the text item via \code{\link[=clean_text_responses]{clean_text_responses()}}, tokenises with the
+Cleans the text item via \code{\link[=sframe_clean_text]{sframe_clean_text()}}, tokenises with the
 package's shared internal tokeniser (reused rather than a second
-tidytext-based tokeniser, so LDA and \code{term_frequency()} can never
+tidytext-based tokeniser, so LDA and \code{sframe_term_frequency()} can never
 drift on cleaning/stop-word rules), casts the token counts to a
 document-term matrix with \code{tidytext::cast_dtm()}, and fits
 \code{topicmodels::LDA()}.

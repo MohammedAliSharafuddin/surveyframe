@@ -8,7 +8,7 @@ sframe_plot_missingness(x, palette = c("web", "print"))
 }
 \arguments{
 \item{x}{An \code{sframe_missing_data_report} object from
-\code{\link[=missing_data_report]{missing_data_report()}}.}
+\code{\link[=sframe_missing_data_results]{sframe_missing_data_results()}}.}
 
 \item{palette}{One of \code{"web"} or \code{"print"}. See \code{sframe_brand()}.}
 }
@@ -23,11 +23,11 @@ Missing-data report plot: missingness rate by item
 \donttest{
 if (requireNamespace("ggplot2", quietly = TRUE)) {
   demo <- sframe_demo_data()
-  mr <- missing_data_report(demo$responses, demo$instrument)
+  mr <- sframe_missing_data_results(demo$responses, demo$instrument)
   sframe_plot_missingness(mr)
 }
 }
 }
 \seealso{
-\code{\link[=missing_data_report]{missing_data_report()}}
+\code{\link[=sframe_missing_data_results]{sframe_missing_data_results()}}
 }

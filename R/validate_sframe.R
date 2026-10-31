@@ -297,7 +297,7 @@ sframe_validation_checks <- c(
 #' used the `strict = TRUE` return as an instrument should now wrap the call
 #' in [as_sframe()].
 #'
-#' @param instrument An `sframe` object created by [sf_instrument()].
+#' @param instrument An `sframe` object created by [sframe_instrument()].
 #' @param strict Logical. When `TRUE` (default), any detected problem raises
 #'   an error of class `sframe_validation_error`. When `FALSE`, problems are
 #'   reported in the returned diagnostic without stopping.
@@ -306,31 +306,31 @@ sframe_validation_checks <- c(
 #'   instrument carried inside it has `meta$validated` set to `TRUE` and can
 #'   be recovered with [as_sframe()].
 #' @export
-#' @seealso [sframe_validation], [as_sframe()], [sf_problems()],
-#'   [sf_is_valid()], [sf_instrument()], [write_sframe()]
+#' @seealso [sframe_validation], [as_sframe()], [sframe_problems()],
+#'   [sframe_is_valid()], [sframe_instrument()], [write_sframe()]
 #'
 #' @examples
 #' # Build a minimal valid instrument and validate it
-#' cs    <- sf_choices("ag5", 1:5,
+#' cs    <- sframe_choice_set("ag5", 1:5,
 #'            c("Strongly disagree", "Disagree", "Neutral",
 #'              "Agree", "Strongly agree"))
-#' item  <- sf_item("sat_1", "The service met my expectations.",
+#' item  <- sframe_item("sat_1", "The service met my expectations.",
 #'                  type = "likert", choice_set = "ag5", scale_id = "sat")
-#' scale <- sf_scale("sat", "Satisfaction", items = "sat_1")
-#' instr <- sf_instrument("Demo Survey", components = list(cs, item, scale))
+#' scale <- sframe_scale("sat", "Satisfaction", items = "sat_1")
+#' instr <- sframe_instrument("Demo Survey", components = list(cs, item, scale))
 #'
 #' # The result prints its own diagnostic
 #' validate_sframe(instr, strict = FALSE)
 #'
 #' # Explore it with dedicated methods rather than reaching in with `$`
 #' v <- validate_sframe(instr, strict = FALSE)
-#' sf_is_valid(v)
-#' sf_problems(v)
+#' sframe_is_valid(v)
+#' sframe_problems(v)
 #' summary(v)
 #'
 #' # Recover the validated instrument
 #' validated <- as_sframe(validate_sframe(instr, strict = TRUE))
-#' isTRUE(sf_meta(validated)$validated)
+#' isTRUE(sframe_meta(validated)$validated)
 validate_sframe <- function(instrument, strict = TRUE) {
   sframe_check_instrument(instrument)
 
@@ -739,7 +739,7 @@ validate_sframe <- function(instrument, strict = TRUE) {
   }
   for (model in instrument$models %||% list()) {
     model_check <- tryCatch(
-      validate_model(model, instrument = instrument, strict = FALSE),
+      sframe_validate_model(model, instrument = instrument, strict = FALSE),
       error = function(e) list(valid = FALSE, problems = conditionMessage(e))
     )
     if (!isTRUE(model_check$valid)) {

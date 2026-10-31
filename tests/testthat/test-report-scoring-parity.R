@@ -22,14 +22,14 @@ captured_scores <- function(instrument, data) {
   seen
 }
 
-agree <- function() sf_choices("ag5", 1:5, c("SD", "D", "N", "A", "SA"))
+agree <- function() sframe_choice_set("ag5", 1:5, c("SD", "D", "N", "A", "SA"))
 
 test_that("B3: a declared sum is plotted as the sum", {
-  ins <- sf_instrument(title = "Sum", components = list(
+  ins <- sframe_instrument(title = "Sum", components = list(
     agree(),
-    sf_item("s1", "One", "numeric", scale_id = "tot"),
-    sf_item("s2", "Two", "numeric", scale_id = "tot"),
-    sf_scale("tot", "Total", items = c("s1", "s2"), method = "sum")
+    sframe_item("s1", "One", "numeric", scale_id = "tot"),
+    sframe_item("s2", "Two", "numeric", scale_id = "tot"),
+    sframe_scale("tot", "Total", items = c("s1", "s2"), method = "sum")
   ))
   d <- data.frame(s1 = c(2, 1), s2 = c(4, 1))
   got <- captured_scores(ins, d)[["Total"]]
@@ -37,12 +37,12 @@ test_that("B3: a declared sum is plotted as the sum", {
 })
 
 test_that("B3: plotted scores are score_scales() scores, reversal included", {
-  ins <- sf_instrument(title = "Reversed", components = list(
+  ins <- sframe_instrument(title = "Reversed", components = list(
     agree(),
-    sf_item("r1", "One", "likert", choice_set = "ag5", scale_id = "sat"),
-    sf_item("r2", "Two", "likert", choice_set = "ag5", scale_id = "sat",
+    sframe_item("r1", "One", "likert", choice_set = "ag5", scale_id = "sat"),
+    sframe_item("r2", "Two", "likert", choice_set = "ag5", scale_id = "sat",
             reverse = TRUE),
-    sf_scale("sat", "Satisfaction", items = c("r1", "r2"))
+    sframe_scale("sat", "Satisfaction", items = c("r1", "r2"))
   ))
   d <- data.frame(r1 = c(5, 2, 4), r2 = c(1, 4, 2))
   got <- captured_scores(ins, d)[["Satisfaction"]]
@@ -50,12 +50,12 @@ test_that("B3: plotted scores are score_scales() scores, reversal included", {
 })
 
 test_that("B3: a respondent below min_valid is left out of the figure", {
-  ins <- sf_instrument(title = "Threshold", components = list(
+  ins <- sframe_instrument(title = "Threshold", components = list(
     agree(),
-    sf_item("t1", "One", "likert", choice_set = "ag5", scale_id = "t"),
-    sf_item("t2", "Two", "likert", choice_set = "ag5", scale_id = "t"),
-    sf_item("t3", "Three", "likert", choice_set = "ag5", scale_id = "t"),
-    sf_scale("t", "Three items", items = c("t1", "t2", "t3"), min_valid = 3L)
+    sframe_item("t1", "One", "likert", choice_set = "ag5", scale_id = "t"),
+    sframe_item("t2", "Two", "likert", choice_set = "ag5", scale_id = "t"),
+    sframe_item("t3", "Three", "likert", choice_set = "ag5", scale_id = "t"),
+    sframe_scale("t", "Three items", items = c("t1", "t2", "t3"), min_valid = 3L)
   ))
   d <- data.frame(t1 = c(3, 5), t2 = c(3, NA), t3 = c(3, NA))
   got <- captured_scores(ins, d)[["Three items"]]

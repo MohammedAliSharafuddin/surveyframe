@@ -57,12 +57,12 @@ test_that("input-types demo has responses for response-producing items", {
 })
 
 test_that("display-only items are not required response columns", {
-  instr <- sf_instrument(
+  instr <- sframe_instrument(
     title = "Display-only read test",
     components = list(
-      sf_item("intro", "Intro", type = "section_break"),
-      sf_item("note", "Note", type = "text_block"),
-      sf_item("age", "Age", type = "numeric")
+      sframe_item("intro", "Intro", type = "section_break"),
+      sframe_item("note", "Note", type = "text_block"),
+      sframe_item("age", "Age", type = "numeric")
     )
   )
 

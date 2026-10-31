@@ -19,8 +19,8 @@ Displays a compact summary of an \code{sframe} instrument object, showing
 the title, version, item count, scale count, and validation status.
 }
 \examples{
-item <- sf_item("q1", "How satisfied are you?", type = "likert",
+item <- sframe_item("q1", "How satisfied are you?", type = "likert",
                 choice_set = "agree5")
-instr <- sf_instrument("My Survey", components = list(item))
+instr <- sframe_instrument("My Survey", components = list(item))
 print(instr)
 }

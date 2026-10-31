@@ -6,8 +6,8 @@
 # with it.
 
 pairwise_instrument <- function(scale = "saaty") {
-  sf_instrument("Pairwise", components = list(
-    sf_item("pw", "Compare the criteria", type = "pairwise_comparison",
+  sframe_instrument("Pairwise", components = list(
+    sframe_item("pw", "Compare the criteria", type = "pairwise_comparison",
             comparison_items = c("cost", "speed"), comparison_scale = scale)
   ))
 }

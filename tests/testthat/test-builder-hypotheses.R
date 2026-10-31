@@ -6,11 +6,11 @@
 # the researcher typed is saved, and the placeholder examples are never saved.
 
 hyp_instrument <- function() {
-  sf_instrument("Hypotheses", components = list(
-    sf_item("score", "Score", type = "numeric"),
-    sf_item("group", "Group", type = "single_choice",
+  sframe_instrument("Hypotheses", components = list(
+    sframe_item("score", "Score", type = "numeric"),
+    sframe_item("group", "Group", type = "single_choice",
             choice_set = "yn"),
-    sf_choices("yn", values = c("0", "1"), labels = c("No", "Yes"))))
+    sframe_choice_set("yn", values = c("0", "1"), labels = c("No", "Yes"))))
 }
 
 # The editor's placeholder animation uses timers the stub DOM lacks.

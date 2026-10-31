@@ -30,7 +30,7 @@ drag-to-reorder, undo/redo, and autosave to browser localStorage.}
 \item{Preview}{A layout preview of the welcome, body and thank-you
 pages, showing wording, order and branding. It renders from the
 builder's own markup, so answering, required checks and branching are
-left out. Use \code{\link[=export_static_survey]{export_static_survey()}} and open the file to test the
+left out. Use \code{\link[=export_survey]{export_survey()}} and open the file to test the
 respondent's path, or SurveyStudio's Preview screen, which exports the
 real survey with collection switched off.}
 \item{Analyse}{A role-based analysis planner with method-specific

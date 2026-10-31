@@ -6,31 +6,31 @@
 # ---------------------------------------------------------------------------
 
 make_instrument <- function(reverse = FALSE) {
-  cs    <- sf_choices("ag5", 1:5,
+  cs    <- sframe_choice_set("ag5", 1:5,
             c("Strongly disagree","Disagree","Neutral","Agree","Strongly agree"))
-  yn    <- sf_choices("yn", c("yes","no"), c("Yes","No"))
-  i1    <- sf_item("sat_1", "The service was fast.",
+  yn    <- sframe_choice_set("yn", c("yes","no"), c("Yes","No"))
+  i1    <- sframe_item("sat_1", "The service was fast.",
                    type = "likert", choice_set = "ag5",
                    scale_id = "sat", required = TRUE)
-  i2    <- sf_item("sat_2", "The staff were helpful.",
+  i2    <- sframe_item("sat_2", "The staff were helpful.",
                    type = "likert", choice_set = "ag5",
                    scale_id = "sat", required = TRUE)
-  i3    <- sf_item("sat_3", "I would recommend this service.",
+  i3    <- sframe_item("sat_3", "I would recommend this service.",
                    type = "likert", choice_set = "ag5",
                    scale_id = "sat", required = TRUE, reverse = reverse)
-  age   <- sf_item("age",    "What is your age?",  type = "numeric")
-  gen   <- sf_item("gender", "Gender?",
+  age   <- sframe_item("age",    "What is your age?",  type = "numeric")
+  gen   <- sframe_item("gender", "Gender?",
                    type = "single_choice", choice_set = "yn")
-  attn  <- sf_item("attn_q", "Please select Agree (4).",
+  attn  <- sframe_item("attn_q", "Please select Agree (4).",
                    type = "likert", choice_set = "ag5")
-  scale <- sf_scale("sat", "Satisfaction",
+  scale <- sframe_scale("sat", "Satisfaction",
                     items = c("sat_1","sat_2","sat_3"),
                     method = "mean", min_valid = 2L)
-  chk   <- sf_check("chk_1", item_id = "attn_q", type = "attention",
+  chk   <- sframe_attention_check("chk_1", item_id = "attn_q", type = "attention",
                     pass_values = 4, fail_action = "flag")
-  rule  <- sf_branch("attn_q", depends_on = "gender",
+  rule  <- sframe_branch("attn_q", depends_on = "gender",
                      operator = "==", value = "yes", action = "show")
-  sf_instrument(
+  sframe_instrument(
     title       = "Service Quality Survey",
     version     = "1.0.0",
     description = "A test instrument.",
@@ -102,8 +102,8 @@ make_timed_responses <- function(include_bad_row = FALSE) {
 # 1. Constructors
 # ---------------------------------------------------------------------------
 
-test_that("sf_item() constructs correctly", {
-  item <- sf_item("q1", "How satisfied are you?", type = "likert",
+test_that("sframe_item() constructs correctly", {
+  item <- sframe_item("q1", "How satisfied are you?", type = "likert",
                   choice_set = "ag5", scale_id = "sat", required = TRUE)
   expect_s3_class(item, "sf_item")
   expect_equal(item$id, "q1")
@@ -112,62 +112,62 @@ test_that("sf_item() constructs correctly", {
   expect_false(item$reverse)
 })
 
-test_that("sf_item() rejects invalid type", {
-  expect_error(sf_item("q1", "Label", type = "checkbox"))
+test_that("sframe_item() rejects invalid type", {
+  expect_error(sframe_item("q1", "Label", type = "checkbox"))
 })
 
-test_that("sf_choices() constructs correctly", {
-  cs <- sf_choices("ag5", 1:5, c("SD","D","N","A","SA"))
+test_that("sframe_choice_set() constructs correctly", {
+  cs <- sframe_choice_set("ag5", 1:5, c("SD","D","N","A","SA"))
   expect_s3_class(cs, "sf_choices")
   expect_equal(length(cs$values), 5)
 })
 
-test_that("sf_choices() validates length mismatch", {
+test_that("sframe_choice_set() validates length mismatch", {
   expect_error(
-    sf_choices("bad", values = 1:3, labels = c("a","b")),
+    sframe_choice_set("bad", values = 1:3, labels = c("a","b")),
     class = "sframe_validation_error"
   )
 })
 
-test_that("sf_scale() constructs correctly", {
-  s <- sf_scale("sat", "Satisfaction", items = c("q1","q2"), method = "mean")
+test_that("sframe_scale() constructs correctly", {
+  s <- sframe_scale("sat", "Satisfaction", items = c("q1","q2"), method = "mean")
   expect_s3_class(s, "sf_scale")
   expect_equal(s$method, "mean")
 })
 
-test_that("sf_scale() validates weight length", {
+test_that("sframe_scale() validates weight length", {
   expect_error(
-    sf_scale("s", "S", items = c("q1","q2"), weights = c(1)),
+    sframe_scale("s", "S", items = c("q1","q2"), weights = c(1)),
     class = "sframe_validation_error"
   )
 })
 
-test_that("sf_branch() constructs correctly", {
-  r <- sf_branch("q2", depends_on = "q1", operator = "==",
+test_that("sframe_branch() constructs correctly", {
+  r <- sframe_branch("q2", depends_on = "q1", operator = "==",
                  value = "yes", action = "show")
   expect_s3_class(r, "sf_branch")
   expect_equal(r$operator, "==")
 })
 
-test_that("sf_check() constructs correctly", {
-  chk <- sf_check("c1", item_id = "attn_q", type = "attention",
+test_that("sframe_attention_check() constructs correctly", {
+  chk <- sframe_attention_check("c1", item_id = "attn_q", type = "attention",
                   pass_values = 4, fail_action = "flag")
   expect_s3_class(chk, "sf_check")
   expect_equal(chk$type, "attention")
 })
 
 # ---------------------------------------------------------------------------
-# 2. sf_instrument()
+# 2. sframe_instrument()
 # ---------------------------------------------------------------------------
 
-test_that("sf_instrument() rejects unknown components", {
+test_that("sframe_instrument() rejects unknown components", {
   expect_error(
-    sf_instrument("T", components = list(list(x = 1))),
+    sframe_instrument("T", components = list(list(x = 1))),
     class = "sframe_validation_error"
   )
 })
 
-test_that("sf_instrument() assembles sframe with correct slot counts", {
+test_that("sframe_instrument() assembles sframe with correct slot counts", {
   instr <- make_instrument()
   expect_s3_class(instr, "sframe")
   expect_equal(length(instr$items),     6)
@@ -177,7 +177,7 @@ test_that("sf_instrument() assembles sframe with correct slot counts", {
   expect_equal(length(instr$checks),    1)
 })
 
-test_that("sf_instrument() meta fields are correct", {
+test_that("sframe_instrument() meta fields are correct", {
   instr <- make_instrument()
   expect_equal(instr$meta$title,   "Service Quality Survey")
   expect_equal(instr$meta$version, "1.0.0")
@@ -198,73 +198,73 @@ test_that("validate_sframe() sets validated = TRUE", {
   # Since 0.4.0 validate_sframe() returns a diagnostic rather than the
   # instrument, so the stamped instrument comes back through as_sframe().
   out <- as_sframe(validate_sframe(make_instrument(), strict = TRUE))
-  expect_true(isTRUE(sf_meta(out)$validated))
+  expect_true(isTRUE(sframe_meta(out)$validated))
 })
 
 test_that("validate_sframe() returns a diagnostic, not the instrument", {
   v <- validate_sframe(make_instrument(), strict = TRUE)
   expect_s3_class(v, "sframe_validation")
   expect_false(inherits(v, "sframe"))
-  expect_true(sf_is_valid(v))
-  expect_length(sf_problems(v), 0)
+  expect_true(sframe_is_valid(v))
+  expect_length(sframe_problems(v), 0)
 })
 
 test_that("passing a validation result where an instrument is wanted errors", {
   v <- validate_sframe(make_instrument(), strict = TRUE)
-  expect_error(codebook_report(v), "as_sframe")
+  expect_error(sframe_codebook(v), "as_sframe")
 })
 
 test_that("validate_sframe() catches duplicate item IDs", {
-  i1    <- sf_item("q1", "One", type = "text")
-  i2    <- sf_item("q1", "Dupe", type = "text")
-  instr <- sf_instrument("Bad", components = list(i1, i2))
+  i1    <- sframe_item("q1", "One", type = "text")
+  i2    <- sframe_item("q1", "Dupe", type = "text")
+  instr <- sframe_instrument("Bad", components = list(i1, i2))
   result <- validate_sframe(instr, strict = FALSE)
   expect_false(result$valid)
   expect_true(any(grepl("Duplicate", result$problems)))
 })
 
 test_that("validate_sframe() catches orphan choice_set", {
-  i <- sf_item("q1", "Q", type = "likert", choice_set = "ghost")
-  instr <- sf_instrument("Bad", components = list(i))
+  i <- sframe_item("q1", "Q", type = "likert", choice_set = "ghost")
+  instr <- sframe_instrument("Bad", components = list(i))
   result <- validate_sframe(instr, strict = FALSE)
   expect_false(result$valid)
   expect_true(any(grepl("choice_set", result$problems)))
 })
 
 test_that("validate_sframe() catches orphan scale_id", {
-  cs <- sf_choices("ag5", 1:5, c("SD","D","N","A","SA"))
-  i  <- sf_item("q1", "Q", type = "likert",
+  cs <- sframe_choice_set("ag5", 1:5, c("SD","D","N","A","SA"))
+  i  <- sframe_item("q1", "Q", type = "likert",
                 choice_set = "ag5", scale_id = "ghost")
-  instr <- sf_instrument("Bad", components = list(cs, i))
+  instr <- sframe_instrument("Bad", components = list(cs, i))
   result <- validate_sframe(instr, strict = FALSE)
   expect_false(result$valid)
 })
 
 test_that("validate_sframe() catches reverse without scale_id", {
-  cs <- sf_choices("ag5", 1:5, c("SD","D","N","A","SA"))
-  i  <- sf_item("q1", "Q", type = "likert",
+  cs <- sframe_choice_set("ag5", 1:5, c("SD","D","N","A","SA"))
+  i  <- sframe_item("q1", "Q", type = "likert",
                 choice_set = "ag5", reverse = TRUE)
-  instr <- sf_instrument("Bad", components = list(cs, i))
+  instr <- sframe_instrument("Bad", components = list(cs, i))
   result <- validate_sframe(instr, strict = FALSE)
   expect_false(result$valid)
   expect_true(any(grepl("reverse", result$problems)))
 })
 
 test_that("validate_sframe() catches scale with missing item", {
-  cs    <- sf_choices("ag5", 1:5, c("SD","D","N","A","SA"))
-  i     <- sf_item("q1", "Q", type = "likert",
+  cs    <- sframe_choice_set("ag5", 1:5, c("SD","D","N","A","SA"))
+  i     <- sframe_item("q1", "Q", type = "likert",
                    choice_set = "ag5", scale_id = "sat")
-  scale <- sf_scale("sat", "Sat", items = c("q1","ghost"))
-  instr <- sf_instrument("Bad", components = list(cs, i, scale))
+  scale <- sframe_scale("sat", "Sat", items = c("q1","ghost"))
+  instr <- sframe_instrument("Bad", components = list(cs, i, scale))
   result <- validate_sframe(instr, strict = FALSE)
   expect_false(result$valid)
   expect_true(any(grepl("ghost", result$problems)))
 })
 
 test_that("validate_sframe() strict mode raises sframe_validation_error", {
-  i1    <- sf_item("q1", "One", type = "text")
-  i2    <- sf_item("q1", "Two", type = "text")
-  instr <- sf_instrument("Bad", components = list(i1, i2))
+  i1    <- sframe_item("q1", "One", type = "text")
+  i2    <- sframe_item("q1", "Two", type = "text")
+  instr <- sframe_instrument("Bad", components = list(i1, i2))
   expect_error(validate_sframe(instr, strict = TRUE),
                class = "sframe_validation_error")
 })
@@ -438,12 +438,12 @@ test_that("score_scales() keep_items = FALSE drops item columns", {
 })
 
 test_that("score_scales() applies weighted mean scoring", {
-  cs <- sf_choices("ag5", 1:5, c("SD", "D", "N", "A", "SA"))
-  i1 <- sf_item("q1", "Q1", type = "likert", choice_set = "ag5", scale_id = "sat")
-  i2 <- sf_item("q2", "Q2", type = "likert", choice_set = "ag5", scale_id = "sat")
-  scale <- sf_scale("sat", "Weighted", items = c("q1", "q2"),
+  cs <- sframe_choice_set("ag5", 1:5, c("SD", "D", "N", "A", "SA"))
+  i1 <- sframe_item("q1", "Q1", type = "likert", choice_set = "ag5", scale_id = "sat")
+  i2 <- sframe_item("q2", "Q2", type = "likert", choice_set = "ag5", scale_id = "sat")
+  scale <- sframe_scale("sat", "Weighted", items = c("q1", "q2"),
                     method = "mean", weights = c(1, 3))
-  instr <- sf_instrument("Weighted mean", components = list(cs, i1, i2, scale))
+  instr <- sframe_instrument("Weighted mean", components = list(cs, i1, i2, scale))
   resp <- data.frame(q1 = 2, q2 = 4, stringsAsFactors = FALSE)
 
   out <- score_scales(resp, instr, keep_meta = FALSE)
@@ -451,12 +451,12 @@ test_that("score_scales() applies weighted mean scoring", {
 })
 
 test_that("score_scales() applies weighted sum scoring", {
-  cs <- sf_choices("ag5", 1:5, c("SD", "D", "N", "A", "SA"))
-  i1 <- sf_item("q1", "Q1", type = "likert", choice_set = "ag5", scale_id = "sat")
-  i2 <- sf_item("q2", "Q2", type = "likert", choice_set = "ag5", scale_id = "sat")
-  scale <- sf_scale("sat", "Weighted", items = c("q1", "q2"),
+  cs <- sframe_choice_set("ag5", 1:5, c("SD", "D", "N", "A", "SA"))
+  i1 <- sframe_item("q1", "Q1", type = "likert", choice_set = "ag5", scale_id = "sat")
+  i2 <- sframe_item("q2", "Q2", type = "likert", choice_set = "ag5", scale_id = "sat")
+  scale <- sframe_scale("sat", "Weighted", items = c("q1", "q2"),
                     method = "sum", weights = c(2, 1))
-  instr <- sf_instrument("Weighted sum", components = list(cs, i1, i2, scale))
+  instr <- sframe_instrument("Weighted sum", components = list(cs, i1, i2, scale))
   resp <- data.frame(q1 = 2, q2 = 4, stringsAsFactors = FALSE)
 
   out <- score_scales(resp, instr, keep_meta = FALSE)
@@ -464,24 +464,24 @@ test_that("score_scales() applies weighted sum scoring", {
 })
 
 # ---------------------------------------------------------------------------
-# 7. quality_report()
+# 7. sframe_quality_results()
 # ---------------------------------------------------------------------------
 
-test_that("quality_report() returns sframe_quality_report", {
+test_that("sframe_quality_results() returns sframe_quality_report", {
   d  <- load_resp(50)
-  qr <- quality_report(d$resp, d$instr, respondent_id = "id")
+  qr <- sframe_quality_results(d$resp, d$instr, respondent_id = "id")
   expect_s3_class(qr, "sframe_quality_report")
   expect_equal(qr$summary$n_respondents, 50)
 })
 
-test_that("quality_report() detects attention check failures", {
+test_that("sframe_quality_results() detects attention check failures", {
   d  <- load_resp(50)
-  qr <- quality_report(d$resp, d$instr, respondent_id = "id")
+  qr <- sframe_quality_results(d$resp, d$instr, respondent_id = "id")
   expect_true("chk_1" %in% names(qr$attention))
   expect_gt(qr$attention$chk_1$n_fail, 0)
 })
 
-test_that("quality_report() flags straight-lining respondents", {
+test_that("sframe_quality_results() flags straight-lining respondents", {
   instr <- make_instrument()
   resp  <- make_responses(20)
   resp[1:5, c("sat_1","sat_2","sat_3")] <- 3
@@ -491,13 +491,13 @@ test_that("quality_report() flags straight-lining respondents", {
   # sat has 3 items, below the default straightline_min_items = 4, so the
   # threshold is lowered explicitly here to exercise the detection logic
   # itself. The default's own behaviour is covered separately below.
-  qr <- quality_report(resp, instr, straightline_min_items = 3)
+  qr <- sframe_quality_results(resp, instr, straightline_min_items = 3)
   expect_true("sat" %in% names(qr$straightline))
   expect_true(isTRUE(qr$straightline$sat$checked))
   expect_gte(length(qr$straightline$sat$flagged_rows), 5)
 })
 
-test_that("quality_report() does not check a scale shorter than straightline_min_items by default", {
+test_that("sframe_quality_results() does not check a scale shorter than straightline_min_items by default", {
   # sat has 3 items. Real fix, 2026-08-26: a 2-item scale flagged 44 to 53%
   # of a bundled demo instrument's respondents for giving the same answer
   # to both items, which is what a genuinely consistent respondent does on
@@ -511,7 +511,7 @@ test_that("quality_report() does not check a scale shorter than straightline_min
   resp  <- suppressWarnings(
     read_responses(resp, instr, respondent_id = "id",
                    submitted_at = "submitted_at"))
-  qr <- quality_report(resp, instr)
+  qr <- sframe_quality_results(resp, instr)
   expect_true("sat" %in% names(qr$straightline))
   expect_false(isTRUE(qr$straightline$sat$checked))
   expect_length(qr$straightline$sat$flagged_rows, 0)
@@ -525,23 +525,23 @@ test_that("straightline_min_items = 2 restores the previous, more permissive beh
   resp  <- suppressWarnings(
     read_responses(resp, instr, respondent_id = "id",
                    submitted_at = "submitted_at"))
-  qr <- quality_report(resp, instr, straightline_min_items = 2)
+  qr <- sframe_quality_results(resp, instr, straightline_min_items = 2)
   expect_true(isTRUE(qr$straightline$sat$checked))
   expect_equal(length(qr$straightline$sat$flagged_rows), 20)
 })
 
-test_that("quality_report() detects duplicate respondent IDs", {
+test_that("sframe_quality_results() detects duplicate respondent IDs", {
   instr <- make_instrument()
   resp  <- make_responses(10)
   resp$id[5] <- resp$id[1]
   resp  <- suppressWarnings(
     read_responses(resp, instr, respondent_id = "id",
                    submitted_at = "submitted_at"))
-  qr    <- quality_report(resp, instr, respondent_id = "id")
+  qr    <- sframe_quality_results(resp, instr, respondent_id = "id")
   expect_gt(qr$duplicates$n_duplicates, 0)
 })
 
-test_that("quality_report() computes timing diagnostics", {
+test_that("sframe_quality_results() computes timing diagnostics", {
   instr <- make_instrument()
   resp <- suppressWarnings(
     read_responses(
@@ -554,7 +554,7 @@ test_that("quality_report() computes timing diagnostics", {
     )
   )
 
-  qr <- quality_report(
+  qr <- sframe_quality_results(
     resp,
     instr,
     respondent_id = "id",
@@ -570,7 +570,7 @@ test_that("quality_report() computes timing diagnostics", {
   expect_equal(qr$timing$median_sec, 70)
 })
 
-test_that("quality_report() auto-detects started_at column", {
+test_that("sframe_quality_results() auto-detects started_at column", {
   instr <- make_instrument()
   resp <- suppressWarnings(
     read_responses(
@@ -583,7 +583,7 @@ test_that("quality_report() auto-detects started_at column", {
     )
   )
 
-  qr <- quality_report(
+  qr <- sframe_quality_results(
     resp,
     instr,
     respondent_id = "id",
@@ -595,9 +595,9 @@ test_that("quality_report() auto-detects started_at column", {
   expect_equal(qr$timing$start_col, "started_at")
 })
 
-test_that("quality_report() reports unavailable timing without start column", {
+test_that("sframe_quality_results() reports unavailable timing without start column", {
   d <- load_resp(10)
-  qr <- quality_report(
+  qr <- sframe_quality_results(
     d$resp,
     d$instr,
     respondent_id = "id",
@@ -608,7 +608,7 @@ test_that("quality_report() reports unavailable timing without start column", {
   expect_false(qr$timing$available)
 })
 
-test_that("quality_report() warns on malformed timing rows", {
+test_that("sframe_quality_results() warns on malformed timing rows", {
   instr <- make_instrument()
   resp <- suppressWarnings(
     read_responses(
@@ -622,7 +622,7 @@ test_that("quality_report() warns on malformed timing rows", {
   )
 
   expect_warning(
-    qr <- quality_report(
+    qr <- sframe_quality_results(
       resp,
       instr,
       respondent_id = "id",
@@ -637,31 +637,31 @@ test_that("quality_report() warns on malformed timing rows", {
 
 test_that("print.sframe_quality_report() produces output", {
   d   <- load_resp(20)
-  qr  <- quality_report(d$resp, d$instr, respondent_id = "id")
+  qr  <- sframe_quality_results(d$resp, d$instr, respondent_id = "id")
   out <- capture.output(print(qr))
   expect_true(any(grepl("Quality Report", out)))
 })
 
 # ---------------------------------------------------------------------------
-# 8. reliability_report()
+# 8. sframe_reliability_results()
 # ---------------------------------------------------------------------------
 
-test_that("reliability_report() returns sframe_reliability_report", {
+test_that("sframe_reliability_results() returns sframe_reliability_report", {
   d  <- load_resp(80)
-  rr <- reliability_report(d$resp, d$instr, omega = FALSE)
+  rr <- sframe_reliability_results(d$resp, d$instr, omega = FALSE)
   expect_s3_class(rr, "sframe_reliability_report")
   expect_equal(length(rr), 1)
   expect_equal(names(rr), "sat")
 })
 
-test_that("reliability_report() alpha is in [0, 1]", {
+test_that("sframe_reliability_results() alpha is in [0, 1]", {
   d  <- load_resp(100)
-  rr <- reliability_report(d$resp, d$instr, omega = FALSE)
+  rr <- sframe_reliability_results(d$resp, d$instr, omega = FALSE)
   expect_gte(rr[[1]]$alpha, 0)
   expect_lte(rr[[1]]$alpha, 1)
 })
 
-test_that("reliability_report() respects reverse-coded items", {
+test_that("sframe_reliability_results() respects reverse-coded items", {
   instr <- make_instrument(reverse = TRUE)
   resp <- data.frame(
     id = paste0("R", 1:10),
@@ -680,18 +680,18 @@ test_that("reliability_report() respects reverse-coded items", {
   )
 
   expect_no_warning(
-    rr <- reliability_report(resp, instr, omega = FALSE)
+    rr <- sframe_reliability_results(resp, instr, omega = FALSE)
   )
   expect_gt(rr[[1]]$alpha, 0.99)
 })
 
 # ---------------------------------------------------------------------------
-# 9. item_report()
+# 9. sframe_item_results()
 # ---------------------------------------------------------------------------
 
-test_that("item_report() returns sframe_item_report with expected columns", {
+test_that("sframe_item_results() returns sframe_item_report with expected columns", {
   d  <- load_resp(40)
-  ir <- item_report(d$resp, d$instr)
+  ir <- sframe_item_results(d$resp, d$instr)
   expect_s3_class(ir, "sframe_item_report")
   expect_equal(names(ir), "sat")
   diag_cols <- colnames(ir[[1]]$diagnostics)
@@ -703,47 +703,47 @@ test_that("item_report() returns sframe_item_report with expected columns", {
 })
 
 # ---------------------------------------------------------------------------
-# 10. cfa_syntax()
+# 10. sframe_syntax_cfa()
 # ---------------------------------------------------------------------------
 
-test_that("cfa_syntax() produces lavaan model string", {
-  syntax <- cfa_syntax(make_instrument())
+test_that("sframe_syntax_cfa() produces lavaan model string", {
+  syntax <- sframe_syntax_cfa(make_instrument())
   expect_type(syntax, "character")
   expect_true(grepl("sat =~", syntax))
   expect_true(grepl("sat_1", syntax))
 })
 
-test_that("cfa_syntax() notes reverse items in comment", {
-  syntax <- cfa_syntax(make_instrument(reverse = TRUE))
+test_that("sframe_syntax_cfa() notes reverse items in comment", {
+  syntax <- sframe_syntax_cfa(make_instrument(reverse = TRUE))
   expect_true(grepl("Reverse-coded", syntax))
   expect_true(grepl("sat_3", syntax))
 })
 
-test_that("cfa_syntax() subset by scale ID works", {
-  syntax <- cfa_syntax(make_instrument(), scales = "sat")
+test_that("sframe_syntax_cfa() subset by scale ID works", {
+  syntax <- sframe_syntax_cfa(make_instrument(), scales = "sat")
   expect_true(grepl("sat =~", syntax))
 })
 
 # ---------------------------------------------------------------------------
-# 11. codebook_report()
+# 11. sframe_codebook()
 # ---------------------------------------------------------------------------
 
-test_that("codebook_report() returns sframe_codebook", {
-  cb <- codebook_report(make_instrument())
+test_that("sframe_codebook() returns sframe_codebook", {
+  cb <- sframe_codebook(make_instrument())
   expect_s3_class(cb, "sframe_codebook")
   expect_equal(nrow(cb$items_table),  6)
   expect_equal(nrow(cb$scales_table), 1)
   expect_gt(nrow(cb$choices_table),   0)
 })
 
-test_that("codebook_report() items_table has required columns", {
-  cb <- codebook_report(make_instrument())
+test_that("sframe_codebook() items_table has required columns", {
+  cb <- sframe_codebook(make_instrument())
   expect_true(all(c("id","label","type","scale_id","reverse","required")
                   %in% colnames(cb$items_table)))
 })
 
 test_that("print.sframe_codebook() produces output without error", {
-  out <- capture.output(print(codebook_report(make_instrument())))
+  out <- capture.output(print(sframe_codebook(make_instrument())))
   expect_true(any(grepl("Codebook", out)))
 })
 
@@ -808,15 +808,15 @@ test_that("builder helpers compose a valid instrument from draft components", {
   )
 
   choices <- list(
-    sf_choices("agree5", 1:5,
+    sframe_choice_set("agree5", 1:5,
       c("Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"))
   )
   items <- list(
-    sf_item("sat_1", "The service was fast.", type = "likert", choice_set = "agree5"),
-    sf_item("sat_2", "The staff were helpful.", type = "likert", choice_set = "agree5")
+    sframe_item("sat_1", "The service was fast.", type = "likert", choice_set = "agree5"),
+    sframe_item("sat_2", "The staff were helpful.", type = "likert", choice_set = "agree5")
   )
   scales <- list(
-    sf_scale("sat", "Satisfaction",
+    sframe_scale("sat", "Satisfaction",
       items = c("sat_1", "sat_2"), reverse_items = "sat_2")
   )
 
@@ -877,7 +877,7 @@ test_that("a builder draft round trip preserves an existing amendment log", {
   # Found live in SurveyStudio's Amendments screen: sframe_builder_state_
   # from_instrument()'s draft list carried no amendments field at all, and
   # sframe_builder_compose_instrument() built a fresh instrument via
-  # sf_instrument(), which also has no amendments argument. SurveyStudio
+  # sframe_instrument(), which also has no amendments argument. SurveyStudio
   # keeps rv$instrument synced to draft_result()$instrument on every
   # builder-state change, so an already-amended instrument silently lost
   # its entire disclosed history the moment it passed through the builder,
@@ -889,7 +889,7 @@ test_that("a builder draft round trip preserves an existing amendment log", {
     reason_code = "data_correction",
     reason_text = "Corrected a mis-keyed respondent ID."
   )
-  expect_equal(nrow(amendment_log(amended)), 1)
+  expect_equal(nrow(sframe_get_amendments(amended)), 1)
 
   state <- surveyframe::sframe_builder_state_from_instrument(amended)
   expect_equal(length(state$amendments), 1)
@@ -904,26 +904,26 @@ test_that("a builder draft round trip preserves an existing amendment log", {
     amendments = state$amendments
   )
   expect_true(rebuilt$valid)
-  expect_equal(nrow(amendment_log(rebuilt$instrument)), 1)
+  expect_equal(nrow(sframe_get_amendments(rebuilt$instrument)), 1)
 })
 
 # ---------------------------------------------------------------------------
-# 14. render_survey() helpers
+# 14. run_survey() helpers
 # ---------------------------------------------------------------------------
 
-test_that("render_survey() returns a shiny app object", {
-  app <- render_survey(make_instrument())
+test_that("run_survey() returns a shiny app object", {
+  app <- run_survey(make_instrument())
   expect_s3_class(app, "shiny.appobj")
 })
 
-test_that("render_survey() requires output_path for csv persistence", {
+test_that("run_survey() requires output_path for csv persistence", {
   expect_error(
-    render_survey(make_instrument(), save_responses = "csv"),
+    run_survey(make_instrument(), save_responses = "csv"),
     class = "sframe_error"
   )
 })
 
-test_that("render_survey() helpers identify visible required items", {
+test_that("run_survey() helpers identify visible required items", {
   instr <- make_instrument()
   branch_lookup <- surveyframe:::sframe_branch_lookup(instr)
   input_values <- list(
@@ -944,9 +944,9 @@ test_that("render_survey() helpers identify visible required items", {
   expect_true(surveyframe:::sframe_item_visible(instr$items[[6]], input_values, branch_lookup))
 })
 
-test_that("render_survey() branching handles all operators and multi-value answers", {
+test_that("run_survey() branching handles all operators and multi-value answers", {
   rule <- function(operator, value, action = "show") {
-    sf_branch("q2", depends_on = "q1", operator = operator, value = value,
+    sframe_branch("q2", depends_on = "q1", operator = operator, value = value,
               action = action)
   }
 
@@ -964,7 +964,7 @@ test_that("render_survey() branching handles all operators and multi-value answe
   expect_true(surveyframe:::.evaluate_branch(rule("==", "a", action = "hide"), NA_character_))
 })
 
-test_that("render_survey() response rows blank hidden items and append to csv", {
+test_that("run_survey() response rows blank hidden items and append to csv", {
   instr <- make_instrument()
   branch_lookup <- surveyframe:::sframe_branch_lookup(instr)
   input_values <- list(
@@ -996,9 +996,9 @@ test_that("render_survey() response rows blank hidden items and append to csv", 
   expect_true(all(c("started_at", "submitted_at", "sat_1") %in% names(saved)))
 })
 
-test_that("render_survey() persists submissions through the Shiny server", {
+test_that("run_survey() persists submissions through the Shiny server", {
   path <- tempfile(fileext = ".csv")
-  app <- render_survey(make_instrument(), save_responses = "csv", output_path = path)
+  app <- run_survey(make_instrument(), save_responses = "csv", output_path = path)
 
   shiny::testServer(app, {
     session$setInputs(
@@ -1017,9 +1017,9 @@ test_that("render_survey() persists submissions through the Shiny server", {
   expect_true(all(c("started_at", "submitted_at", "sat_1", "attn_q") %in% names(saved)))
 })
 
-test_that("render_survey() blocks invalid submissions through the Shiny server", {
+test_that("run_survey() blocks invalid submissions through the Shiny server", {
   path <- tempfile(fileext = ".csv")
-  app <- render_survey(make_instrument(), save_responses = "csv", output_path = path)
+  app <- run_survey(make_instrument(), save_responses = "csv", output_path = path)
 
   shiny::testServer(app, {
     session$setInputs(
@@ -1061,7 +1061,7 @@ test_that("full workflow runs from instrument to scored outputs", {
     )
   )
 
-  qr <- quality_report(
+  qr <- sframe_quality_results(
     resp,
     loaded,
     respondent_id = "id",
@@ -1070,9 +1070,9 @@ test_that("full workflow runs from instrument to scored outputs", {
     time_min = 60
   )
   scored <- score_scales(resp, loaded)
-  rr <- reliability_report(resp, loaded, omega = FALSE)
-  cb <- codebook_report(loaded)
-  syntax <- cfa_syntax(loaded)
+  rr <- sframe_reliability_results(resp, loaded, omega = FALSE)
+  cb <- sframe_codebook(loaded)
+  syntax <- sframe_syntax_cfa(loaded)
 
   expect_true(qr$timing$available)
   expect_true("sat" %in% names(scored))

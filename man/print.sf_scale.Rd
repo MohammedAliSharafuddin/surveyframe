@@ -18,6 +18,6 @@
 Print an sf_scale object
 }
 \examples{
-sc <- sf_scale("sat", "Satisfaction", items = c("q1", "q2", "q3"))
+sc <- sframe_scale("sat", "Satisfaction", items = c("q1", "q2", "q3"))
 print(sc)
 }

@@ -49,11 +49,11 @@ written <- function(instrument) {
 }
 
 singleton_instrument <- function() {
-  sf_instrument(title = "Singletons", components = list(
-    sf_choices("one", values = 1, labels = "Only option"),
-    sf_item("s1", "Single scale item", "likert", choice_set = "one", scale_id = "s"),
-    sf_item("mx", "One-row matrix", "matrix", choice_set = "one", matrix_items = "row"),
-    sf_scale("s", "One-item scale", items = "s1", reverse_items = "s1")
+  sframe_instrument(title = "Singletons", components = list(
+    sframe_choice_set("one", values = 1, labels = "Only option"),
+    sframe_item("s1", "Single scale item", "likert", choice_set = "one", scale_id = "s"),
+    sframe_item("mx", "One-row matrix", "matrix", choice_set = "one", matrix_items = "row"),
+    sframe_scale("s", "One-item scale", items = "s1", reverse_items = "s1")
   ))
 }
 
@@ -67,12 +67,12 @@ test_that("E1: singleton components are written as JSON arrays", {
 })
 
 test_that("E1: written output meets the instrument profile for 0, 1 and many members", {
-  empty <- sf_instrument(title = "Empty", components = list(sf_item("t", "Text", "text")))
-  many <- sf_instrument(title = "Many", components = list(
-    sf_choices("ag", 1:5, as.character(1:5)),
-    sf_item("a", "A", "likert", choice_set = "ag", scale_id = "s"),
-    sf_item("b", "B", "likert", choice_set = "ag", scale_id = "s"),
-    sf_scale("s", "S", items = c("a", "b"))))
+  empty <- sframe_instrument(title = "Empty", components = list(sframe_item("t", "Text", "text")))
+  many <- sframe_instrument(title = "Many", components = list(
+    sframe_choice_set("ag", 1:5, as.character(1:5)),
+    sframe_item("a", "A", "likert", choice_set = "ag", scale_id = "s"),
+    sframe_item("b", "B", "likert", choice_set = "ag", scale_id = "s"),
+    sframe_scale("s", "S", items = c("a", "b"))))
   for (ins in list(empty, singleton_instrument(), many)) {
     expect_identical(profile_problems(written(ins)$parsed), character(0))
   }

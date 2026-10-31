@@ -18,7 +18,7 @@
 Print an sf_branch object
 }
 \examples{
-br <- sf_branch("q2", depends_on = "q1", operator = "==",
+br <- sframe_branch("q2", depends_on = "q1", operator = "==",
                 value = "yes", action = "show")
 print(br)
 }

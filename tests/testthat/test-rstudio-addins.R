@@ -6,7 +6,7 @@
 #
 # That last one is the point of the file. The implementation guide's original
 # skeleton was written against an API that no longer exists: it passed id =
-# to sf_instrument(), called the component list items =, and handed sf_item()
+# to sframe_instrument(), called the component list items =, and handed sframe_item()
 # an inline choices = argument. A skeleton that does not build a valid
 # instrument is worse than no skeleton, because it teaches the wrong shape to
 # whoever reaches for it first.
@@ -60,8 +60,8 @@ test_that("the skeleton uses the current constructor API, not the stale one", {
 
   # the shapes the guide's version got wrong
   expect_no_match(sk, "id\\s*=\\s*\"my_study\"")
-  expect_no_match(sk, "items\\s*=\\s*list\\(\\s*sf_item")
-  expect_no_match(sk, "choices\\s*=\\s*sf_choices")
+  expect_no_match(sk, "items\\s*=\\s*list\\(\\s*sframe_item")
+  expect_no_match(sk, "choices\\s*=\\s*sframe_choice_set")
 
   # and the shapes it should use
   expect_match(sk, "components  = list(", fixed = TRUE)

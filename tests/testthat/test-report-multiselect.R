@@ -5,12 +5,12 @@
 # as one category rather than as separate selections.
 
 multi_instrument <- function() {
-  sf_instrument("Multi", components = list(
-    sf_choices("uses", values = c("a", "b", "c"),
+  sframe_instrument("Multi", components = list(
+    sframe_choice_set("uses", values = c("a", "b", "c"),
                labels = c("Commuting", "Shopping", "Leisure")),
-    sf_item("why", "What do you use it for?", type = "multiple_choice",
+    sframe_item("why", "What do you use it for?", type = "multiple_choice",
             choice_set = "uses"),
-    sf_item("age", "Age", type = "numeric")))
+    sframe_item("age", "Age", type = "numeric")))
 }
 
 # The shape a collector writes: one indicator per option.
@@ -58,9 +58,9 @@ test_that("10: an item with no indicator columns is left out quietly", {
 
 test_that("10: a single-choice item is unaffected", {
   skip_on_cran()  # renders a report or runs a full plan: slow on CRAN's machines
-  instr <- sf_instrument("Single", components = list(
-    sf_choices("uses", values = c("a", "b"), labels = c("Yes", "No")),
-    sf_item("pick", "Pick one", type = "single_choice", choice_set = "uses")))
+  instr <- sframe_instrument("Single", components = list(
+    sframe_choice_set("uses", values = c("a", "b"), labels = c("Yes", "No")),
+    sframe_item("pick", "Pick one", type = "single_choice", choice_set = "uses")))
   html <- rendered(instr, data.frame(pick = c("a", "b", "a"),
                                      stringsAsFactors = FALSE))
   expect_match(html, "Pick one", fixed = TRUE)

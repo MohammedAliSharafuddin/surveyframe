@@ -1,23 +1,23 @@
 make_v03_instrument <- function(reverse = FALSE) {
-  cs <- sf_choices("ag5", 1:5,
+  cs <- sframe_choice_set("ag5", 1:5,
     c("Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"))
-  yn <- sf_choices("yn", c("yes", "no"), c("Yes", "No"))
-  i1 <- sf_item("sat_1", "The service was fast.",
+  yn <- sframe_choice_set("yn", c("yes", "no"), c("Yes", "No"))
+  i1 <- sframe_item("sat_1", "The service was fast.",
     type = "likert", choice_set = "ag5", scale_id = "sat", required = TRUE)
-  i2 <- sf_item("sat_2", "The staff were helpful.",
+  i2 <- sframe_item("sat_2", "The staff were helpful.",
     type = "likert", choice_set = "ag5", scale_id = "sat", required = TRUE)
-  i3 <- sf_item("sat_3", "I would recommend this service.",
+  i3 <- sframe_item("sat_3", "I would recommend this service.",
     type = "likert", choice_set = "ag5", scale_id = "sat",
     required = TRUE, reverse = reverse)
-  age <- sf_item("age", "What is your age?", type = "numeric")
-  gen <- sf_item("gender", "Gender?", type = "single_choice", choice_set = "yn")
-  attn <- sf_item("attn_q", "Please select Agree (4).",
+  age <- sframe_item("age", "What is your age?", type = "numeric")
+  gen <- sframe_item("gender", "Gender?", type = "single_choice", choice_set = "yn")
+  attn <- sframe_item("attn_q", "Please select Agree (4).",
     type = "likert", choice_set = "ag5")
-  scale <- sf_scale("sat", "Satisfaction",
+  scale <- sframe_scale("sat", "Satisfaction",
     items = c("sat_1", "sat_2", "sat_3"), method = "mean", min_valid = 2L)
-  chk <- sf_check("chk_1", item_id = "attn_q", type = "attention",
+  chk <- sframe_attention_check("chk_1", item_id = "attn_q", type = "attention",
     pass_values = 4, fail_action = "flag")
-  sf_instrument(
+  sframe_instrument(
     title = "Service Quality Survey",
     version = "1.0.0",
     components = list(cs, yn, i1, i2, i3, age, gen, attn, scale, chk)
@@ -46,7 +46,7 @@ test_that("descriptives_report computes core summaries and groups", {
     y = c(2, 4, 6, 8)
   )
 
-  dr <- descriptives_report(dat, variables = c("x", "y"), split_by = "group")
+  dr <- sframe_descriptives_results(dat, variables = c("x", "y"), split_by = "group")
   expect_s3_class(dr, "sframe_descriptives_report")
   expect_true(all(c("valid_n", "missing_n", "mean", "sd", "median", "iqr",
                     "skewness", "kurtosis", "se", "ci_low", "ci_high")
@@ -60,7 +60,7 @@ test_that("missing_data_report returns item, respondent, pattern, and scale rule
   dat$sat_1[1:2] <- NA
   dat$sat_2[2] <- NA
 
-  mr <- missing_data_report(dat, instr)
+  mr <- sframe_missing_data_results(dat, instr)
   expect_s3_class(mr, "sframe_missing_data_report")
   expect_true(all(c("item_missing", "respondent_missing", "patterns",
                     "deletion", "scale_missing_rules", "mcar") %in% names(mr)))
@@ -74,14 +74,14 @@ test_that("outlier_report flags univariate and multivariate outliers", {
     y = c(rnorm(20), 99)
   )
 
-  zr <- outlier_report(dat, variables = c("x", "y"), method = "zscore")
+  zr <- sframe_outlier_results(dat, variables = c("x", "y"), method = "zscore")
   expect_s3_class(zr, "sframe_outlier_report")
   expect_true(21 %in% zr$flagged_rows)
 
-  iqr <- outlier_report(dat, variables = "x", method = "iqr")
+  iqr <- sframe_outlier_results(dat, variables = "x", method = "iqr")
   expect_true(21 %in% iqr$flagged_rows)
 
-  mah <- outlier_report(dat, variables = c("x", "y"), method = "mahalanobis")
+  mah <- sframe_outlier_results(dat, variables = c("x", "y"), method = "mahalanobis")
   expect_s3_class(mah, "sframe_outlier_report")
   expect_true("statistic" %in% names(mah$table))
 })
@@ -94,7 +94,7 @@ test_that("assumption_report includes Shapiro and expected-count warnings", {
     h = c("yes", "yes", "no", "yes", "no", "no")
   )
 
-  ar <- assumption_report(
+  ar <- sframe_assumption_results(
     dat,
     variables = "x",
     group = "g",
@@ -112,24 +112,24 @@ test_that("assumption_report attaches a small-sample advisory below n = 30", {
   small <- data.frame(x = rnorm(15), y = rnorm(15))
   large <- data.frame(x = rnorm(50), y = rnorm(50))
 
-  ar_small <- assumption_report(small, variables = c("x", "y"))
+  ar_small <- sframe_assumption_results(small, variables = c("x", "y"))
   expect_type(ar_small$advisory, "character")
   expect_true(nzchar(ar_small$advisory))
   expect_match(ar_small$advisory, "n = 15")
 
-  ar_large <- assumption_report(large, variables = c("x", "y"))
+  ar_large <- sframe_assumption_results(large, variables = c("x", "y"))
   expect_null(ar_large$advisory)
 
   expect_output(print(ar_small), "Note:")
 })
 
 test_that("sample_size_plan attaches a small-sample advisory below n = 30", {
-  ss_small <- sample_size_plan("proportion", margin_error = 0.25)
+  ss_small <- sframe_sample_size_plan("proportion", margin_error = 0.25)
   expect_lt(ss_small$estimated_n, 30)
   expect_type(ss_small$advisory, "character")
   expect_true(nzchar(ss_small$advisory))
 
-  ss_large <- sample_size_plan("correlation", r = 0.3)
+  ss_large <- sframe_sample_size_plan("correlation", r = 0.3)
   expect_gte(ss_large$estimated_n, 30)
   expect_null(ss_large$advisory)
 
@@ -144,12 +144,12 @@ test_that("posthoc_report returns pairwise Wilcoxon and chi-square residuals", {
     z = rep(c("low", "high"), each = 4)
   )
 
-  ph <- posthoc_report(dat, method = "kruskal_wallis", outcome = "y", group = "g")
+  ph <- sframe_posthoc_results(dat, method = "kruskal_wallis", outcome = "y", group = "g")
   expect_s3_class(ph, "sframe_posthoc_report")
   expect_true("pairwise_wilcox" %in% names(ph$tables))
 
   chi <- suppressWarnings(
-    posthoc_report(dat, method = "chi_square", table_vars = c("x", "z"))
+    sframe_posthoc_results(dat, method = "chi_square", table_vars = c("x", "z"))
   )
   expect_true("adjusted_residuals" %in% names(chi$tables))
 })
@@ -200,7 +200,7 @@ test_that("run_analysis_plan supports Fisher exact and McNemar", {
   )
   dat <- make_v03_responses(20)
   dat$gender2 <- sample(c("yes", "no"), 20, replace = TRUE)
-  instr$items <- c(instr$items, list(sf_item("gender2", "Gender 2", type = "single_choice")))
+  instr$items <- c(instr$items, list(sframe_item("gender2", "Gender 2", type = "single_choice")))
   res <- run_analysis_plan(dat, instr, scored = FALSE)
   expect_null(res[[1]]$error)
   expect_null(res[[2]]$error)
@@ -233,8 +233,8 @@ test_that("analysis plan supports simple case weights for frequency and crosstab
 
 test_that("model layer constructs, validates, and generates syntax", {
   instr <- make_v03_instrument()
-  con <- sf_construct("SAT", "Satisfaction", c("sat_1", "sat_2", "sat_3"))
-  model <- sf_model(
+  con <- sframe_construct("SAT", "Satisfaction", c("sat_1", "sat_2", "sat_3"))
+  model <- sframe_model_spec(
     "model_1",
     "Satisfaction model",
     type = "cb_sem",
@@ -245,57 +245,57 @@ test_that("model layer constructs, validates, and generates syntax", {
 
   expect_s3_class(con, "sf_construct")
   expect_s3_class(model, "sf_model")
-  expect_true(validate_model(model, instr, strict = FALSE)$valid)
-  expect_match(model_json(model), '"model_1"', fixed = TRUE)
+  expect_true(sframe_validate_model(model, instr, strict = FALSE)$valid)
+  expect_match(sframe_model_json(model), '"model_1"', fixed = TRUE)
 
-  cfa <- cfa_lavaan_syntax(instr)
+  cfa <- sframe_syntax_cfa(instr)
   expect_match(cfa, "sat =~", fixed = TRUE)
 
-  sem <- sem_lavaan_syntax(model, instr)
+  sem <- sframe_syntax_sem(model, instr)
   expect_match(sem, "SAT =~", fixed = TRUE)
 
-  pls <- sf_model(
+  pls <- sframe_model_spec(
     "pls_1",
     "PLS model",
     type = "pls_sem",
     constructs = list(
-      sf_construct("SAT", "Satisfaction", c("sat_1", "sat_2"), mode = "composite"),
-      sf_construct("LOY", "Loyalty", "sat_3", mode = "single_item")
+      sframe_construct("SAT", "Satisfaction", c("sat_1", "sat_2"), mode = "composite"),
+      sframe_construct("LOY", "Loyalty", "sat_3", mode = "single_item")
     ),
-    paths = list(sf_path("SAT", "LOY"))
+    paths = list(sframe_path("SAT", "LOY"))
   )
-  expect_match(seminr_syntax(pls), "measurement_model <- constructs", fixed = TRUE)
+  expect_match(sframe_syntax_pls(pls), "measurement_model <- constructs", fixed = TRUE)
 
-  pls_without_path <- sf_model(
+  pls_without_path <- sframe_model_spec(
     "pls_bad",
     type = "pls_sem",
-    constructs = list(sf_construct("SAT", items = c("sat_1", "sat_2"), mode = "composite"))
+    constructs = list(sframe_construct("SAT", items = c("sat_1", "sat_2"), mode = "composite"))
   )
-  expect_false(validate_model(pls_without_path, strict = FALSE)$valid)
+  expect_false(sframe_validate_model(pls_without_path, strict = FALSE)$valid)
 })
 
 test_that("model layer constructors reject invalid identifiers", {
-  expect_error(sf_construct("bad id", items = "sat_1"),
+  expect_error(sframe_construct("bad id", items = "sat_1"),
                class = "sframe_validation_error")
-  expect_error(sf_construct("SAT", items = "bad item"),
+  expect_error(sframe_construct("SAT", items = "bad item"),
                class = "sframe_validation_error")
-  expect_error(sf_path("bad id", "SAT"),
+  expect_error(sframe_path("bad id", "SAT"),
                class = "sframe_validation_error")
-  expect_error(sf_covariance("SAT", "bad-id"),
+  expect_error(sframe_covariance("SAT", "bad-id"),
                class = "sframe_validation_error")
-  expect_error(sf_indirect("SAT", c("MED", NA_character_), "LOY"),
+  expect_error(sframe_indirect_effect("SAT", c("MED", NA_character_), "LOY"),
                class = "sframe_validation_error")
-  expect_error(sf_model("bad model", type = "cfa"),
+  expect_error(sframe_model_spec("bad model", type = "cfa"),
                class = "sframe_validation_error")
 })
 
 test_that("add_model and .sframe read/write preserve models and old files work", {
-  instr <- add_model(
+  instr <- sframe_add_model(
     make_v03_instrument(),
-    sf_model(
+    sframe_model_spec(
       "model_1",
       type = "cfa",
-      constructs = list(sf_construct("SAT", items = c("sat_1", "sat_2", "sat_3")))
+      constructs = list(sframe_construct("SAT", items = c("sat_1", "sat_2", "sat_3")))
     )
   )
   path <- tempfile(fileext = ".sframe")
@@ -317,10 +317,10 @@ test_that("add_model and .sframe read/write preserve models and old files work",
 
 test_that("validate_sframe catches invalid model and analysis references", {
   instr <- make_v03_instrument()
-  bad_model <- sf_model(
+  bad_model <- sframe_model_spec(
     "bad_model",
     type = "cfa",
-    constructs = list(sf_construct("BAD", items = c("sat_1", "ghost")))
+    constructs = list(sframe_construct("BAD", items = c("sat_1", "ghost")))
   )
   instr$models <- list(bad_model)
   instr$analysis_plan <- list(list(
@@ -337,12 +337,12 @@ test_that("validate_sframe catches invalid model and analysis references", {
 })
 
 test_that("validate_sframe accepts analysis roles that reference saved models", {
-  instr <- add_model(
+  instr <- sframe_add_model(
     make_v03_instrument(),
-    sf_model(
+    sframe_model_spec(
       "model_1",
       type = "cfa",
-      constructs = list(sf_construct("SAT", items = c("sat_1", "sat_2", "sat_3")))
+      constructs = list(sframe_construct("SAT", items = c("sat_1", "sat_2", "sat_3")))
     )
   )
   instr$analysis_plan <- list(list(
@@ -392,11 +392,11 @@ test_that("Shiny workflow mirrors the role-based analysis planner", {
 })
 
 test_that("sample_size_plan and validity_report return structured outputs", {
-  ss <- sample_size_plan("correlation", r = 0.3)
+  ss <- sframe_sample_size_plan("correlation", r = 0.3)
   expect_s3_class(ss, "sframe_sample_size_plan")
   expect_gt(ss$estimated_n, 0)
 
-  vr <- validity_report(list(SAT = c(sat_1 = .7, sat_2 = .8, sat_3 = .75)))
+  vr <- sframe_validity_results(list(SAT = c(sat_1 = .7, sat_2 = .8, sat_3 = .75)))
   expect_s3_class(vr, "sframe_validity_report")
   expect_true(all(c("composite_reliability", "AVE") %in% names(vr$reliability)))
 })
@@ -482,17 +482,17 @@ test_that("Firth logistic is wired into the analysis-plan registry", {
 })
 
 test_that("0.3.3: free-text path labels become valid lavaan parameter names", {
-  model <- sf_model(
+  model <- sframe_model_spec(
     "m_lbl",
     "Labelled model",
     type = "cb_sem",
     constructs = list(
-      sf_construct("SAT", "Satisfaction", c("sat_1", "sat_2")),
-      sf_construct("LOY", "Loyalty", "sat_3", mode = "single_item")
+      sframe_construct("SAT", "Satisfaction", c("sat_1", "sat_2")),
+      sframe_construct("LOY", "Loyalty", "sat_3", mode = "single_item")
     ),
-    paths = list(sf_path("SAT", "LOY", "H1: SAT positively influences LOY"))
+    paths = list(sframe_path("SAT", "LOY", "H1: SAT positively influences LOY"))
   )
-  syntax <- sem_lavaan_syntax(model)
+  syntax <- sframe_syntax_sem(model)
   expect_match(syntax, "LOY ~ H1*SAT", fixed = TRUE)
   expect_false(grepl("positively influences", syntax, fixed = TRUE))
 
@@ -502,16 +502,16 @@ test_that("0.3.3: free-text path labels become valid lavaan parameter names", {
 })
 
 test_that("0.3.3: seminr syntax loads seminr and uses real summary accessors", {
-  pls <- sf_model(
+  pls <- sframe_model_spec(
     "pls_smoke",
     type = "pls_sem",
     constructs = list(
-      sf_construct("SAT", "Satisfaction", c("sat_1", "sat_2"), mode = "composite"),
-      sf_construct("LOY", "Loyalty", "sat_3", mode = "single_item")
+      sframe_construct("SAT", "Satisfaction", c("sat_1", "sat_2"), mode = "composite"),
+      sframe_construct("LOY", "Loyalty", "sat_3", mode = "single_item")
     ),
-    paths = list(sf_path("SAT", "LOY"))
+    paths = list(sframe_path("SAT", "LOY"))
   )
-  syntax <- seminr_syntax(pls)
+  syntax <- sframe_syntax_pls(pls)
   expect_match(syntax, "library(seminr)", fixed = TRUE)
   expect_match(syntax, "model_summary <- summary(pls_model)", fixed = TRUE)
   expect_match(syntax, "model_summary$validity$htmt", fixed = TRUE)
@@ -520,16 +520,16 @@ test_that("0.3.3: seminr syntax loads seminr and uses real summary accessors", {
 
 test_that("0.3.3: run_analysis_plan accepts pls_sem as a seminr_syntax alias", {
   instr <- make_v03_instrument()
-  pls <- sf_model(
+  pls <- sframe_model_spec(
     "pls_alias",
     type = "pls_sem",
     constructs = list(
-      sf_construct("SAT", "Satisfaction", c("sat_1", "sat_2"), mode = "composite"),
-      sf_construct("LOY", "Loyalty", "sat_3", mode = "single_item")
+      sframe_construct("SAT", "Satisfaction", c("sat_1", "sat_2"), mode = "composite"),
+      sframe_construct("LOY", "Loyalty", "sat_3", mode = "single_item")
     ),
-    paths = list(sf_path("SAT", "LOY"))
+    paths = list(sframe_path("SAT", "LOY"))
   )
-  instr <- add_model(instr, pls)
+  instr <- sframe_add_model(instr, pls)
   instr$analysis_plan <- list(list(
     id = "RQ_pls",
     research_question = "Does satisfaction predict loyalty?",

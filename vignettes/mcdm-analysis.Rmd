@@ -213,7 +213,7 @@ reporting a winner, it is worth asking how much of that result survives a
 small change in the weights.
 
 ```{r sensitivity}
-sens <- sensitivity_analysis(
+sens <- sframe_sensitivity_analysis(
   x = matrix(c(4.1, 3.0, 210, 36,
                3.6, 4.5, 180, 48,
                4.8, 2.5, 260, 24,
@@ -315,7 +315,7 @@ researcher, and it matters: the 10 available methods encode
 different assumptions about how criteria trade off against one another.
 
 Two limits are worth stating plainly. surveyframe does not estimate choice
-models, so `sf_conjoint_design()` declares a conjoint design without
+models, so `sframe_conjoint_design()` declares a conjoint design without
 analysing its responses. And PROMETHEE defaults to Brans and Vincke's type I
 step function, where some implementations default to the linear function,
 because the linear function needs thresholds that are commonly derived

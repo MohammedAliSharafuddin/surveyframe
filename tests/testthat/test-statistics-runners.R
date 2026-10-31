@@ -9,7 +9,7 @@
 # 14. Partial correlation took its p value from an ordinary Pearson test on
 #     n - 2 degrees of freedom while printing n - 2 - k. Spearman ranked the
 #     residuals, where the variables must be ranked before residualising.
-# 22. sample_size_plan() returned 64 or 50 per group for t tests and ANOVA,
+# 22. sframe_sample_size_plan() returned 64 or 50 per group for t tests and ANOVA,
 #     whatever alpha and power were requested, and printed both anyway.
 # 23. The Firth likelihood-ratio statistic was half the reference value.
 # 24. Two-way ANOVA gave the residual row a partial eta squared of 0.5.
@@ -95,13 +95,13 @@ test_that("14: an unsupported method is reported", {
 })
 
 test_that("22: t-test planning follows alpha, power and effect size", {
-  plan <- sample_size_plan("t_test", d = 0.5, alpha = 0.05, power = 0.80)
+  plan <- sframe_sample_size_plan("t_test", d = 0.5, alpha = 0.05, power = 0.80)
   per_group <- ceiling(stats::power.t.test(delta = 0.5, sd = 1, sig.level = 0.05,
                                            power = 0.80)$n)
   expect_identical(as.integer(plan$estimated_n), as.integer(2 * per_group))
 
   # alpha alone moves the estimate, and to the exact reference value
-  strict_alpha <- sample_size_plan("t_test", d = 0.5, alpha = 0.01, power = 0.80)
+  strict_alpha <- sframe_sample_size_plan("t_test", d = 0.5, alpha = 0.01, power = 0.80)
   ref_alpha <- 2 * ceiling(stats::power.t.test(delta = 0.5, sd = 1, sig.level = 0.01,
                                                power = 0.80)$n)
   expect_identical(as.integer(strict_alpha$estimated_n), as.integer(ref_alpha))
@@ -109,7 +109,7 @@ test_that("22: t-test planning follows alpha, power and effect size", {
 })
 
 test_that("22: ANOVA planning follows alpha, power and Cohen's f", {
-  plan <- sample_size_plan("anova", f = 0.25, groups = 3L, alpha = 0.05, power = 0.80)
+  plan <- sframe_sample_size_plan("anova", f = 0.25, groups = 3L, alpha = 0.05, power = 0.80)
   per_group <- ceiling(stats::power.anova.test(
     groups = 3, between.var = 0.25^2 * 3 / 2, within.var = 1,
     sig.level = 0.05, power = 0.80)$n)
@@ -117,7 +117,7 @@ test_that("22: ANOVA planning follows alpha, power and Cohen's f", {
 })
 
 test_that("22: an assumed effect size is stated", {
-  plan <- sample_size_plan("t_test")
+  plan <- sframe_sample_size_plan("t_test")
   expect_match(paste(plan$warnings, collapse = " "), "0.5")
 })
 
@@ -144,8 +144,8 @@ test_that("24: the residual row of a two-way ANOVA carries no effect size", {
 })
 
 test_that("25: rendered p values keep their precision", {
-  instr <- sf_instrument(title = "Render", components = list(
-    sf_item("g", "Group", "text")))
+  instr <- sframe_instrument(title = "Render", components = list(
+    sframe_item("g", "Group", "text")))
   instr$analysis_plan <- list(list(id = "b1", research_question = "Q",
                                    variables = "g", test = "frequency",
                                    alpha = 0.05, citations = character(0),
@@ -168,8 +168,8 @@ test_that("25: rendered p values keep their precision", {
 test_that("render_results() puts each value in its own table cell", {
   # htmltools_escape() pastes a vector into one string, so every results table
   # was written with a whole row in a single cell, headers included.
-  instr <- sf_instrument(title = "Cells", components = list(
-    sf_item("g", "Group", "text")))
+  instr <- sframe_instrument(title = "Cells", components = list(
+    sframe_item("g", "Group", "text")))
   instr$analysis_plan <- list(list(id = "b1", research_question = "Q",
                                    variables = "g", test = "frequency",
                                    alpha = 0.05, citations = character(0),

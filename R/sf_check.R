@@ -4,12 +4,12 @@
 #'
 #' Specifies an attention, instructional, or trap check item at instrument
 #' design time. The check is stored in the instrument object and evaluated
-#' against collected response data by [quality_report()]. This function only
-#' defines the check. Evaluation happens later in [quality_report()].
+#' against collected response data by [sframe_quality_results()]. This function only
+#' defines the check. Evaluation happens later in [sframe_quality_results()].
 #'
 #' @param id Character. A unique identifier for this check.
 #' @param item_id Character. The `id` of the item used as the check. The item
-#'   must be defined separately with [sf_item()] and included in the same
+#'   must be defined separately with [sframe_item()] and included in the same
 #'   instrument.
 #' @param type Character. The check type. One of:
 #'   - `"attention"`: the item has a stated correct answer and flags
@@ -22,7 +22,7 @@
 #'   constitute a pass. For `"attention"` and `"instructional"` types, at
 #'   least one value should be supplied. For `"trap"` types, this is the
 #'   value that should NOT be selected.
-#' @param fail_action Character. What [quality_report()] does with respondents
+#' @param fail_action Character. What [sframe_quality_results()] does with respondents
 #'   who fail this check. Either `"flag"` (mark in the report but retain) or
 #'   `"exclude"` (mark for exclusion).
 #' @param label Character or NULL. An optional human-readable label for the
@@ -32,11 +32,11 @@
 #'
 #' @return An object of class `sf_check` (a named list).
 #' @export
-#' @seealso [sf_item()], [sf_instrument()], [quality_report()]
+#' @seealso [sframe_item()], [sframe_instrument()], [sframe_quality_results()]
 #'
 #' @examples
 #' # An attention check: respondent must select 4
-#' chk <- sf_check(
+#' chk <- sframe_attention_check(
 #'   id          = "attn_1",
 #'   item_id     = "attention_check_q",
 #'   type        = "attention",
@@ -44,7 +44,7 @@
 #'   fail_action = "flag",
 #'   label       = "Attention check 1"
 #' )
-sf_check <- function(
+sframe_attention_check <- function(
     id,
     item_id,
     type        = c("attention", "instructional", "trap"),

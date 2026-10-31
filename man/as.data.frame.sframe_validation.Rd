@@ -23,5 +23,5 @@ A data frame with one row per validation problem and columns
 Coerce validation problems to a data frame
 }
 \seealso{
-\link{sframe_validation}, \code{\link[=sf_problems]{sf_problems()}}
+\link{sframe_validation}, \code{\link[=sframe_problems]{sframe_problems()}}
 }

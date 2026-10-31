@@ -8,10 +8,10 @@
 # prompt to save it as a new instrument.
 
 d12_instrument <- function(plan = NULL) {
-  ins <- sf_instrument(title = "D12 browser", components = list(
-    sf_choices("grp", values = c("a", "b"), labels = c("Group A", "Group B")),
-    sf_item("grp", "Which group are you in?", "single_choice", choice_set = "grp"),
-    sf_item("score", "Your score", "numeric")))
+  ins <- sframe_instrument(title = "D12 browser", components = list(
+    sframe_choice_set("grp", values = c("a", "b"), labels = c("Group A", "Group B")),
+    sframe_item("grp", "Which group are you in?", "single_choice", choice_set = "grp"),
+    sframe_item("score", "Your score", "numeric")))
   if (!is.null(plan)) ins$analysis_plan <- plan
   ins
 }

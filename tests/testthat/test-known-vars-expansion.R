@@ -9,20 +9,20 @@ vendors <- c("Alpha", "Basilica", "Coral")
 crits   <- c("service", "price")
 
 expansion_instrument <- function(plan) {
-  sf_instrument(
+  sframe_instrument(
     title   = "Expansion columns",
     version = "1.0.0",
     components = list(
-      sf_choices("ag5", values = 1:5,
+      sframe_choice_set("ag5", values = 1:5,
                  labels = c("Very poor", "Poor", "Fair", "Good", "Excellent")),
-      sf_item("rate_service", "Rate each supplier: service",
+      sframe_item("rate_service", "Rate each supplier: service",
               type = "matrix", matrix_items = vendors, choice_set = "ag5"),
-      sf_item("pick_one", "Which do you use?",
+      sframe_item("pick_one", "Which do you use?",
               type = "multiple_choice", choice_set = "ag5"),
-      sf_item("crit_pairs", "Compare the criteria",
+      sframe_item("crit_pairs", "Compare the criteria",
               type = "pairwise_comparison", comparison_items = crits,
               comparison_scale = "saaty", required = TRUE),
-      sf_item("crit_points", "Divide 100 points",
+      sframe_item("crit_points", "Divide 100 points",
               type = "criteria_weight", comparison_items = crits,
               required = TRUE)
     ),

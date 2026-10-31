@@ -20,21 +20,21 @@ WASPAS, PROMETHEE, ELECTRE, and TOPSIS), and model syntax planning for
 EFA, CFA, CB-SEM, and PLS-SEM.
 \subsection{Core workflow}{
 \enumerate{
-\item \strong{Design} an instrument with \code{\link[=launch_builder]{launch_builder()}} or \code{\link[=sf_instrument]{sf_instrument()}} and
-its component constructors: \code{\link[=sf_item]{sf_item()}}, \code{\link[=sf_choices]{sf_choices()}}, \code{\link[=sf_scale]{sf_scale()}},
-\code{\link[=sf_branch]{sf_branch()}}, \code{\link[=sf_check]{sf_check()}}.
+\item \strong{Design} an instrument with \code{\link[=launch_builder]{launch_builder()}} or \code{\link[=sframe_instrument]{sframe_instrument()}} and
+its component constructors: \code{\link[=sframe_item]{sframe_item()}}, \code{\link[=sframe_choice_set]{sframe_choice_set()}}, \code{\link[=sframe_scale]{sframe_scale()}},
+\code{\link[=sframe_branch]{sframe_branch()}}, \code{\link[=sframe_attention_check]{sframe_attention_check()}}.
 \item \strong{Validate and save} with \code{\link[=validate_sframe]{validate_sframe()}} and \code{\link[=write_sframe]{write_sframe()}}.
 \code{validate_sframe()} returns an \code{sframe_validation} diagnostic rather
 than the instrument itself. Recover a validated instrument with
 \code{\link[=as_sframe]{as_sframe()}}.
-\item \strong{Deploy} a Shiny survey with \code{\link[=render_survey]{render_survey()}}.
+\item \strong{Deploy} a Shiny survey with \code{\link[=run_survey]{run_survey()}}.
 \item \strong{Load responses} with \code{\link[=read_responses]{read_responses()}} or \code{\link[=read_sheet_responses]{read_sheet_responses()}}.
-\item \strong{Check quality} with \code{\link[=quality_report]{quality_report()}}.
-\item \strong{Score and analyse} with \code{\link[=score_scales]{score_scales()}}, \code{\link[=descriptives_report]{descriptives_report()}},
-\code{\link[=missing_data_report]{missing_data_report()}}, \code{\link[=reliability_report]{reliability_report()}}, \code{\link[=item_report]{item_report()}},
-\code{\link[=efa_report]{efa_report()}}, \code{\link[=cfa_syntax]{cfa_syntax()}}, and \code{\link[=run_analysis_plan]{run_analysis_plan()}}, which also
+\item \strong{Check quality} with \code{\link[=sframe_quality_results]{sframe_quality_results()}}.
+\item \strong{Score and analyse} with \code{\link[=score_scales]{score_scales()}}, \code{\link[=sframe_descriptives_results]{sframe_descriptives_results()}},
+\code{\link[=sframe_missing_data_results]{sframe_missing_data_results()}}, \code{\link[=sframe_reliability_results]{sframe_reliability_results()}}, \code{\link[=sframe_item_results]{sframe_item_results()}},
+\code{\link[=sframe_efa_readiness_results]{sframe_efa_readiness_results()}}, \code{\link[=sframe_syntax_cfa]{sframe_syntax_cfa()}}, and \code{\link[=run_analysis_plan]{run_analysis_plan()}}, which also
 runs any decision-analysis blocks in the plan.
-\item \strong{Report} with \code{\link[=codebook_report]{codebook_report()}}, \code{\link[=render_report]{render_report()}}, and
+\item \strong{Report} with \code{\link[=sframe_codebook]{sframe_codebook()}}, \code{\link[=render_report]{render_report()}}, and
 \code{\link[=render_results]{render_results()}}.
 }
 }
@@ -44,19 +44,19 @@ runs any decision-analysis blocks in the plan.
 The workflow runs on an \code{sframe} object. It is the single source of truth
 for item definitions, scale structure, reverse-coding keys, branching
 rules, check specifications, analysis plans, and optional model
-specifications. Accessors such as \code{\link[=sf_meta]{sf_meta()}}, \code{\link[=sf_items]{sf_items()}}, \code{\link[=sf_scales]{sf_scales()}},
-\code{\link[=sf_plan]{sf_plan()}}, and \code{\link[=sf_models]{sf_models()}} read its parts without reaching into the
+specifications. Accessors such as \code{\link[=sframe_meta]{sframe_meta()}}, \code{\link[=sframe_get_items]{sframe_get_items()}}, \code{\link[=sframe_get_scales]{sframe_get_scales()}},
+\code{\link[=sframe_plan]{sframe_plan()}}, and \code{\link[=sframe_get_models]{sframe_get_models()}} read its parts without reaching into the
 object directly.
 
 Some helpers work on plain vectors, for use beside that workflow or on
-their own: the text helpers such as \code{\link[=term_frequency]{term_frequency()}}, and the interval
-helpers \code{\link[=bootstrap_ci]{bootstrap_ci()}}, \code{\link[=cohens_d_ci]{cohens_d_ci()}}, \code{\link[=cramers_v_ci]{cramers_v_ci()}} and
-\code{\link[=eta_sq_ci]{eta_sq_ci()}}.
+their own: the text helpers such as \code{\link[=sframe_term_frequency]{sframe_term_frequency()}}, and the interval
+helpers \code{\link[=sframe_bootstrap_ci]{sframe_bootstrap_ci()}}, \code{\link[=sframe_cohens_d_ci]{sframe_cohens_d_ci()}}, \code{\link[=sframe_cramers_v_ci]{sframe_cramers_v_ci()}} and
+\code{\link[=sframe_eta_sq_ci]{sframe_eta_sq_ci()}}.
 }
 
 \subsection{A first session}{
 
-\code{\link[=sframe_demos]{sframe_demos()}} lists 22 worked demos, each one instrument, its responses
+\code{\link[=sframe_list_demos]{sframe_list_demos()}} lists 22 worked demos, each one instrument, its responses
 and the results surveyframe produced. \code{sframe_demo("two_group")} loads one,
 and \code{sframe_demo_qmd("two_group")} writes a notebook to edit.
 \code{vignette("learn-by-example")} teaches from the same library.
@@ -64,21 +64,23 @@ and \code{sframe_demo_qmd("two_group")} writes a notebook to edit.
 
 \subsection{How functions are named}{
 
-Three families, which the prefix tells apart.
+Names come in 2 kinds, so a function says which stage it belongs to.
 \itemize{
-\item \code{sf_} builds or reads the instrument object model: the constructors
-\code{\link[=sf_item]{sf_item()}} and \code{\link[=sf_scale]{sf_scale()}}, the accessors \code{\link[=sf_items]{sf_items()}} and \code{\link[=sf_plan]{sf_plan()}},
-and the replacement forms such as \verb{sf_plan<-}.
-\item \code{sframe_} covers everything the package adds around that object: the
-plots such as \code{\link[=sframe_plot_reliability]{sframe_plot_reliability()}}, the demo library through
-\code{\link[=sframe_demos]{sframe_demos()}}, the decision helpers, and the builder's own state.
-\item The workflow verbs carry no prefix, because they name the step a
-researcher is taking: \code{\link[=validate_sframe]{validate_sframe()}}, \code{\link[=score_scales]{score_scales()}},
-\code{\link[=run_analysis_plan]{run_analysis_plan()}}, \code{\link[=render_report]{render_report()}}, and the \verb{_report()} family.
+\item The stage verbs name the step a researcher is taking and carry no
+prefix: \code{\link[=read_sframe]{read_sframe()}}, \code{\link[=validate_sframe]{validate_sframe()}}, \code{\link[=write_sframe]{write_sframe()}},
+\code{\link[=amend_sframe]{amend_sframe()}}, \code{\link[=run_survey]{run_survey()}}, \code{\link[=export_survey]{export_survey()}}, \code{\link[=read_responses]{read_responses()}},
+\code{\link[=score_scales]{score_scales()}}, \code{\link[=run_analysis_plan]{run_analysis_plan()}}, \code{\link[=render_report]{render_report()}},
+\code{\link[=launch_builder]{launch_builder()}} and \code{\link[=launch_studio]{launch_studio()}}.
+\item Everything else takes \code{sframe_}: the makers such as \code{\link[=sframe_item]{sframe_item()}} and
+\code{\link[=sframe_scale]{sframe_scale()}}, the listers such as \code{\link[=sframe_get_items]{sframe_get_items()}}, the accessors
+such as \code{\link[=sframe_plan]{sframe_plan()}}, the \verb{_results} functions such as
+\code{\link[=sframe_reliability_results]{sframe_reliability_results()}}, which return results and write no file,
+the \code{sframe_syntax_} generators, the plots and the demo library.
 }
 
-The prefixes group functions; they do not pair them. No name stem appears
-under both, so there is no \code{sframe_} twin of an \code{sf_} function to look for.
+No 2 names sit 1 letter apart: a lister is \code{sframe_get_items()}, never
+\code{sframe_items()}. The names used before 0.4.3 still work, silently. See
+\link{superseded}.
 }
 
 \subsection{File format}{

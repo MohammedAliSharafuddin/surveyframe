@@ -24,5 +24,5 @@ Combines the available normality, homogeneity, and regression checks into a
 long-form summary.
 }
 \seealso{
-\link{sframe_as_data_frame}, \code{\link[=assumption_report]{assumption_report()}}
+\link{sframe_as_data_frame}, \code{\link[=sframe_assumption_results]{sframe_assumption_results()}}
 }

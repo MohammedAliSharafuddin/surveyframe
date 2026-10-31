@@ -40,7 +40,7 @@
 #'
 #' @return Called for its side effect. Returns nothing.
 #' @export
-#' @seealso [run_analysis_plan()], [quality_report()], [score_scales()]
+#' @seealso [run_analysis_plan()], [sframe_quality_results()], [score_scales()]
 #'
 #' @examples
 #' \dontrun{

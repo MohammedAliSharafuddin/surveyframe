@@ -23,5 +23,5 @@ A data frame of scale reliability statistics.
 Returns one row per scale with alpha and omega estimates.
 }
 \seealso{
-\link{sframe_as_data_frame}, \code{\link[=reliability_report]{reliability_report()}}
+\link{sframe_as_data_frame}, \code{\link[=sframe_reliability_results]{sframe_reliability_results()}}
 }

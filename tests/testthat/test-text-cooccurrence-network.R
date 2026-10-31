@@ -230,9 +230,9 @@ test_that("sframe_plot_cooccurrence_network does not error on a synthetic >8-clu
 
 test_that("co_occurrence_network runs end to end through run_analysis_plan", {
   skip_if_not_installed("igraph")
-  instr <- sf_instrument(
+  instr <- sframe_instrument(
     title = "Network fixture", version = "1.0.0",
-    components = list(sf_item("comments", "Any comments?", type = "textarea"))
+    components = list(sframe_item("comments", "Any comments?", type = "textarea"))
   )
   instr$analysis_plan <- list(list(
     id = "rq1", research_question = "What themes cluster together?",

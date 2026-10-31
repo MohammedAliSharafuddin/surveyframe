@@ -23,8 +23,8 @@ nth_input <- function(html, n = 1) {
 # ── A1: numeric entry is never rewritten ──────────────────────────────────
 
 numeric_instrument <- function(required = FALSE) {
-  sf_instrument(title = "A1", components = list(
-    sf_item("age", "Age in years", "numeric", required = required,
+  sframe_instrument(title = "A1", components = list(
+    sframe_item("age", "Age in years", "numeric", required = required,
             slider_min = 18, slider_max = 99)
   ))
 }
@@ -74,8 +74,8 @@ test_that("A1: an in-range number passes", {
 })
 
 weight_instrument <- function() {
-  sf_instrument(title = "A1cw", components = list(
-    sf_item("w", "Allocate 100 points", "criteria_weight", required = TRUE,
+  sframe_instrument(title = "A1cw", components = list(
+    sframe_item("w", "Allocate 100 points", "criteria_weight", required = TRUE,
             comparison_items = c("price", "quality"))
   ))
 }
@@ -110,14 +110,14 @@ test_that("A1: a constant-sum entry is not rewritten against its siblings", {
 # ── A2: an option coded zero is a real answer ─────────────────────────────
 
 zero_instrument <- function() {
-  sf_instrument(title = "A2", components = list(
-    sf_choices("yn", values = c(0, 1), labels = c("No", "Yes")),
-    sf_choices("nps", values = 0:10, labels = as.character(0:10)),
-    sf_item("smoker", "Do you smoke?", "single_choice", choice_set = "yn",
+  sframe_instrument(title = "A2", components = list(
+    sframe_choice_set("yn", values = c(0, 1), labels = c("No", "Yes")),
+    sframe_choice_set("nps", values = 0:10, labels = as.character(0:10)),
+    sframe_item("smoker", "Do you smoke?", "single_choice", choice_set = "yn",
             required = TRUE),
-    sf_item("rec", "How likely are you to recommend us?", "likert",
+    sframe_item("rec", "How likely are you to recommend us?", "likert",
             choice_set = "nps", required = TRUE),
-    sf_item("grid", "Rate each", "matrix", choice_set = "yn",
+    sframe_item("grid", "Rate each", "matrix", choice_set = "yn",
             matrix_items = c("a", "b"), required = TRUE)
   ))
 }
@@ -167,10 +167,10 @@ test_that("A2: a zero answer is submitted as 0", {
 # ── A3: one ranking state, and no invented preferences ────────────────────
 
 ranking_instrument <- function(required = FALSE) {
-  sf_instrument(title = "A3", components = list(
-    sf_choices("opts", values = c("a", "b", "c"),
+  sframe_instrument(title = "A3", components = list(
+    sframe_choice_set("opts", values = c("a", "b", "c"),
                labels = c("Alpha", "Beta", "Gamma")),
-    sf_item("rk", "Rank these", "ranking", choice_set = "opts",
+    sframe_item("rk", "Rank these", "ranking", choice_set = "opts",
             required = required)
   ))
 }

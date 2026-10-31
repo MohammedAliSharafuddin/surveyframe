@@ -16,6 +16,6 @@ response dataset used in package examples and statistical workflow demos.
 }
 \examples{
 demo <- sframe_demo_data()
-sf_meta(demo$instrument)$title
+sframe_meta(demo$instrument)$title
 nrow(demo$responses)
 }

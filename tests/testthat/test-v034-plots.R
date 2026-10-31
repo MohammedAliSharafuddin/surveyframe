@@ -3,17 +3,17 @@
 # run_analysis_plan(), and $table on the inferential runners.
 
 make_v034_instrument <- function() {
-  cs <- sf_choices("ag5", 1:5,
+  cs <- sframe_choice_set("ag5", 1:5,
     c("Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"))
-  yn <- sf_choices("yn", c("yes", "no"), c("Yes", "No"))
-  i1 <- sf_item("sat_1", "The service was fast.",
+  yn <- sframe_choice_set("yn", c("yes", "no"), c("Yes", "No"))
+  i1 <- sframe_item("sat_1", "The service was fast.",
     type = "likert", choice_set = "ag5", scale_id = "sat", required = TRUE)
-  i2 <- sf_item("sat_2", "The staff were helpful.",
+  i2 <- sframe_item("sat_2", "The staff were helpful.",
     type = "likert", choice_set = "ag5", scale_id = "sat", required = TRUE)
-  age <- sf_item("age", "What is your age?", type = "numeric")
-  gen <- sf_item("gender", "Gender?", type = "single_choice", choice_set = "yn")
-  grp <- sf_item("member", "Member?", type = "single_choice", choice_set = "yn")
-  scale <- sf_scale("sat", "Satisfaction", items = c("sat_1", "sat_2"),
+  age <- sframe_item("age", "What is your age?", type = "numeric")
+  gen <- sframe_item("gender", "Gender?", type = "single_choice", choice_set = "yn")
+  grp <- sframe_item("member", "Member?", type = "single_choice", choice_set = "yn")
+  scale <- sframe_scale("sat", "Satisfaction", items = c("sat_1", "sat_2"),
                     method = "mean")
   plan <- list(
     list(id = "RQF", research_question = "How old are respondents?",
@@ -32,7 +32,7 @@ make_v034_instrument <- function() {
          family = "group_comparison", method = "t_test_ind",
          roles = list(group = "member", outcome = "sat_1"))
   )
-  sf_instrument("Plot test survey",
+  sframe_instrument("Plot test survey",
                 components = list(cs, yn, i1, i2, age, gen, grp, scale),
                 analysis_plan = plan)
 }
@@ -141,11 +141,11 @@ test_that("sframe_draw_likert_diverging renders without ggplot2", {
 
 test_that("report distributions and analysis sections attach a plot beside its table", {
   skip_if_not_installed("ggplot2")
-  cs <- sf_choices("ag5", 1:5,
+  cs <- sframe_choice_set("ag5", 1:5,
     c("Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"))
-  i1 <- sf_item("sat_1", "The service was fast.", type = "likert",
+  i1 <- sframe_item("sat_1", "The service was fast.", type = "likert",
                 choice_set = "ag5", required = TRUE)
-  instr <- sf_instrument("Report combined check",
+  instr <- sframe_instrument("Report combined check",
     components = list(cs, i1),
     analysis_plan = list(list(
       id = "RQ1", research_question = "Distribution of sat_1",

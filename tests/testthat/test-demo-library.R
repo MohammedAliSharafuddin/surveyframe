@@ -10,7 +10,7 @@
 # of the table it checks, so they are derived from the package's own registries
 # at run time.
 
-demo_names <- function() sframe_demos()$name
+demo_names <- function() sframe_list_demos()$name
 
 test_that("every demo in the index is on disk and loads", {
   for (nm in demo_names()) {
@@ -62,7 +62,7 @@ test_that("every demo validates, reads back, and runs its plan without an error 
 })
 
 test_that("the codebook carries value labels, which is what a plain CSV loses", {
-  # codebook_report() gives the variable label and names the choice set, and
+  # sframe_codebook() gives the variable label and names the choice set, and
   # stops there, so a student importing dm_1 into SPSS gets bare integers. The
   # shipped codebook carries both.
   for (nm in demo_names()) {
@@ -95,13 +95,13 @@ test_that("sframe_demo() rejects an unknown name rather than guessing", {
   expect_error(sframe_demo("no_such_demo"), "Unknown demo")
 })
 
-test_that("sframe_demo() and sframe_demo_qmd() point to sframe_demos() when name is omitted", {
+test_that("sframe_demo() and sframe_demo_qmd() point to sframe_list_demos() when name is omitted", {
   # Calling either with no argument previously surfaced R's generic
   # "argument \"name\" is missing, with no default", which names neither
-  # the fix (sframe_demos()) nor an example.
-  expect_error(sframe_demo(), "sframe_demos\\(\\)")
+  # the fix (sframe_list_demos()) nor an example.
+  expect_error(sframe_demo(), "sframe_list_demos\\(\\)")
   expect_error(sframe_demo(), "name.*required")
-  expect_error(sframe_demo_qmd(), "sframe_demos\\(\\)")
+  expect_error(sframe_demo_qmd(), "sframe_list_demos\\(\\)")
   expect_error(sframe_demo_qmd(), "name.*required")
 })
 
@@ -117,10 +117,10 @@ test_that("sframe_demo_qmd() writes a runnable notebook with no placeholders lef
   expect_true(any(grepl('sframe_demo("two_group")', txt, fixed = TRUE)))
   expect_true(any(grepl("plan_table(instrument)", txt, fixed = TRUE)))
   expect_true(any(grepl("wanted_order", txt, fixed = TRUE)))
-  expect_true(any(grepl("missing_data_report", txt, fixed = TRUE)))
-  expect_true(any(grepl("quality_report", txt, fixed = TRUE)))
+  expect_true(any(grepl("sframe_missing_data_results", txt, fixed = TRUE)))
+  expect_true(any(grepl("sframe_quality_results", txt, fixed = TRUE)))
   expect_true(any(grepl("strict = TRUE", txt, fixed = TRUE)))
-  expect_true(any(grepl("analysis_syntax", txt, fixed = TRUE)))
+  expect_true(any(grepl("sframe_syntax_result", txt, fixed = TRUE)))
   expect_true(any(grepl("demo$results_path", txt, fixed = TRUE)))
   expect_true(any(grepl("render_results", txt, fixed = TRUE)))
   expect_true(any(grepl("render_report", txt, fixed = TRUE)))
@@ -162,8 +162,8 @@ test_that("sframe_analysis_qmd() writes a runnable notebook for any instrument, 
   expect_true(any(grepl("read_sframe(", txt, fixed = TRUE)))
   expect_true(any(grepl("read_responses(", txt, fixed = TRUE)))
   expect_true(any(grepl("plan_table(instrument)", txt, fixed = TRUE)))
-  expect_true(any(grepl("quality_report", txt, fixed = TRUE)))
-  expect_true(any(grepl("analysis_syntax", txt, fixed = TRUE)))
+  expect_true(any(grepl("sframe_quality_results", txt, fixed = TRUE)))
+  expect_true(any(grepl("sframe_syntax_result", txt, fixed = TRUE)))
   expect_true(any(grepl("render_results", txt, fixed = TRUE)))
 
   # The notebook's own load/run chunks actually work against the files
@@ -183,13 +183,13 @@ test_that("sframe_analysis_qmd() writes a runnable notebook for any instrument, 
   expect_no_error(sframe_analysis_qmd(demo$instrument, demo$responses, dir = dir, overwrite = TRUE))
 })
 
-test_that("sframe_export_labelled() attaches variable and value labels", {
+test_that("export_responses() attaches variable and value labels", {
   skip_if_not_installed("haven")
   d <- sframe_demo("likert_scale")
   tmp <- tempfile("labelled-"); dir.create(tmp)
   on.exit(unlink(tmp, recursive = TRUE), add = TRUE)
   out <- file.path(tmp, "x.sav")
-  sframe_export_labelled(d$responses, d$instrument, out)
+  export_responses(d$responses, d$instrument, out)
   back <- haven::read_sav(out)
 
   expect_identical(attr(back$org_1, "label"), "The event ran to time.")
@@ -197,7 +197,7 @@ test_that("sframe_export_labelled() attaches variable and value labels", {
   expect_true(!is.null(labs))
   expect_true("Strongly disagree" %in% names(labs))
 
-  expect_error(sframe_export_labelled(d$responses, d$instrument,
+  expect_error(export_responses(d$responses, d$instrument,
                                       file.path(tempdir(), "x.csv")),
                "must end in")
 })
@@ -215,7 +215,7 @@ test_that("the verification demo tells a clean file from a tampered one", {
 
 test_that("the instrument_revision demo records a disclosed amendment", {
   d <- sframe_demo("instrument_revision")
-  log <- as.data.frame(amendment_log(d$instrument))
+  log <- as.data.frame(sframe_get_amendments(d$instrument))
   expect_equal(nrow(log), 1)
   expect_identical(log$reason_code[1], "instrument_revision")
   expect_true(nzchar(log$reason_text[1]))
@@ -225,7 +225,7 @@ test_that("COVERAGE: every analysis method the package dispatches has a demo", {
   # Derived from the dispatch itself, so a method added later shows up here as
   # uncovered instead of quietly going untaught.
   covered <- unique(unlist(lapply(demo_names(), function(nm) {
-    vapply(sf_plan(sframe_demo(nm)$instrument),
+    vapply(sframe_plan(sframe_demo(nm)$instrument),
            function(b) b$method %||% "", character(1))
   })))
   covered <- covered[nzchar(covered)]
@@ -238,7 +238,7 @@ test_that("COVERAGE: every analysis method the package dispatches has a demo", {
 })
 
 test_that("COVERAGE: every item type the package offers appears in a demo", {
-  types <- eval(formals(sf_item)$type)
+  types <- eval(formals(sframe_item)$type)
   used <- unique(unlist(lapply(demo_names(), function(nm) {
     vapply(sframe_demo(nm)$instrument$items,
            function(it) it$type, character(1))

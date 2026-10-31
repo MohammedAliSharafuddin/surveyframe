@@ -1,6 +1,6 @@
 # tests/testthat/test-efa-factor-columns.R
 # EFA reads factor item columns through their labels, not level positions,
-# in efa_report() and efa_solution().
+# in sframe_efa_readiness_results() and sframe_efa_solution().
 
 efa_factor_fixture <- function() {
   set.seed(11)
@@ -14,16 +14,16 @@ efa_factor_fixture <- function() {
     factor(x * 10, levels = c(30, 50, 10, 40, 20))
   }))
   scaled <- as.data.frame(lapply(num, function(x) x * 10))
-  instr <- sf_instrument("EFA factors", components = list(
-    sf_choices("ag", 1:5, c("SD", "D", "N", "A", "SA")),
-    sf_item("a1", "A1", type = "likert", choice_set = "ag"),
-    sf_item("a2", "A2", type = "likert", choice_set = "ag"),
-    sf_item("a3", "A3", type = "likert", choice_set = "ag"),
-    sf_item("b1", "B1", type = "likert", choice_set = "ag"),
-    sf_item("b2", "B2", type = "likert", choice_set = "ag"),
-    sf_item("b3", "B3", type = "likert", choice_set = "ag"),
-    sf_scale("A", "Scale A", items = c("a1", "a2", "a3")),
-    sf_scale("B", "Scale B", items = c("b1", "b2", "b3"))
+  instr <- sframe_instrument("EFA factors", components = list(
+    sframe_choice_set("ag", 1:5, c("SD", "D", "N", "A", "SA")),
+    sframe_item("a1", "A1", type = "likert", choice_set = "ag"),
+    sframe_item("a2", "A2", type = "likert", choice_set = "ag"),
+    sframe_item("a3", "A3", type = "likert", choice_set = "ag"),
+    sframe_item("b1", "B1", type = "likert", choice_set = "ag"),
+    sframe_item("b2", "B2", type = "likert", choice_set = "ag"),
+    sframe_item("b3", "B3", type = "likert", choice_set = "ag"),
+    sframe_scale("A", "Scale A", items = c("a1", "a2", "a3")),
+    sframe_scale("B", "Scale B", items = c("b1", "b2", "b3"))
   ))
   list(num = scaled, fac = fac, instr = instr)
 }
@@ -31,16 +31,16 @@ efa_factor_fixture <- function() {
 test_that("efa_report gives the same KMO for factor and numeric columns", {
   skip_if_not_installed("psych")
   fx <- efa_factor_fixture()
-  a <- efa_report(fx$num, fx$instr)
-  b <- efa_report(fx$fac, fx$instr)
+  a <- sframe_efa_readiness_results(fx$num, fx$instr)
+  b <- sframe_efa_readiness_results(fx$fac, fx$instr)
   expect_equal(b$kmo$MSA, a$kmo$MSA)
 })
 
 test_that("efa_solution gives the same loadings for factor and numeric columns", {
   skip_if_not_installed("psych")
   fx <- efa_factor_fixture()
-  a <- efa_solution(fx$num, fx$instr, nfactors = 2)
-  b <- efa_solution(fx$fac, fx$instr, nfactors = 2)
+  a <- sframe_efa_solution(fx$num, fx$instr, nfactors = 2)
+  b <- sframe_efa_solution(fx$fac, fx$instr, nfactors = 2)
   expect_equal(unname(as.matrix(b$loadings[sapply(b$loadings, is.numeric)])),
                unname(as.matrix(a$loadings[sapply(a$loadings, is.numeric)])),
                tolerance = 1e-4)

@@ -167,13 +167,13 @@ sframe_timing_report <- function(
 #'
 #' @param data A `tibble` or `data.frame` of responses, typically produced by
 #'   [read_responses()].
-#' @param instrument An `sframe` object created by [sf_instrument()].
+#' @param instrument An `sframe` object created by [sframe_instrument()].
 #' @param respondent_id Character or NULL. The column name holding unique
 #'   respondent identifiers. Used for duplicate detection.
 #' @param submitted_at Character or NULL. The column name holding submission
 #'   timestamps. Used for completion time analysis.
 #' @param started_at Character or NULL. The column name holding survey start
-#'   timestamps. When `NULL`, `quality_report()` looks for a recognised
+#'   timestamps. When `NULL`, `sframe_quality_results()` looks for a recognised
 #'   start-time column automatically.
 #' @param time_min Numeric or NULL. Minimum acceptable completion time in
 #'   seconds. Respondents with a submission time below this threshold are
@@ -202,7 +202,7 @@ sframe_timing_report <- function(
 #'   elements: `summary`, `attention`, `timing`, `straightline`, `missing`,
 #'   and `duplicates`. Use `print()` for a formatted summary.
 #' @export
-#' @seealso [sf_check()], [read_responses()], [score_scales()]
+#' @seealso [sframe_attention_check()], [read_responses()], [score_scales()]
 #'
 #' @examples
 #' instr <- read_sframe(
@@ -217,7 +217,7 @@ sframe_timing_report <- function(
 #'   submitted_at = "submitted_at",
 #'   meta_cols = "started_at"
 #' )
-#' qr <- quality_report(
+#' qr <- sframe_quality_results(
 #'   responses,
 #'   instr,
 #'   respondent_id = "respondent_id",
@@ -226,7 +226,7 @@ sframe_timing_report <- function(
 #'   straightline_scales = FALSE
 #' )
 #' print(qr)
-quality_report <- function(
+sframe_quality_results <- function(
     data,
     instrument,
     respondent_id           = NULL,

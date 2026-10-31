@@ -14,7 +14,7 @@
 #' @return `x`, invisibly.
 #' @exportS3Method print sf_choices
 #' @examples
-#' cs <- sf_choices("agree5", 1:5,
+#' cs <- sframe_choice_set("agree5", 1:5,
 #'                  c("Strongly disagree", "Disagree", "Neutral",
 #'                    "Agree", "Strongly agree"))
 #' print(cs)
@@ -63,7 +63,7 @@ summary.sf_choices <- function(object, ...) {
 #' @return `x`, invisibly.
 #' @exportS3Method print sf_item
 #' @examples
-#' it <- sf_item("q1", "How satisfied are you?", type = "likert",
+#' it <- sframe_item("q1", "How satisfied are you?", type = "likert",
 #'               choice_set = "agree5")
 #' print(it)
 print.sf_item <- function(x, ...) {
@@ -109,7 +109,7 @@ summary.sf_item <- function(object, ...) {
 #' @return `x`, invisibly.
 #' @exportS3Method print sf_scale
 #' @examples
-#' sc <- sf_scale("sat", "Satisfaction", items = c("q1", "q2", "q3"))
+#' sc <- sframe_scale("sat", "Satisfaction", items = c("q1", "q2", "q3"))
 #' print(sc)
 print.sf_scale <- function(x, ...) {
   cat(sprintf("<sf_scale: %s | %d item(s)>\n", x$id, length(x$items)))
@@ -155,7 +155,7 @@ summary.sf_scale <- function(object, ...) {
 #' @return `x`, invisibly.
 #' @exportS3Method print sf_branch
 #' @examples
-#' br <- sf_branch("q2", depends_on = "q1", operator = "==",
+#' br <- sframe_branch("q2", depends_on = "q1", operator = "==",
 #'                 value = "yes", action = "show")
 #' print(br)
 print.sf_branch <- function(x, ...) {
@@ -202,7 +202,7 @@ summary.sf_branch <- function(object, ...) {
 #' @return `x`, invisibly.
 #' @exportS3Method print sf_check
 #' @examples
-#' ck <- sf_check("attn1", item_id = "q5", type = "attention",
+#' ck <- sframe_attention_check("attn1", item_id = "q5", type = "attention",
 #'                pass_values = 3)
 #' print(ck)
 print.sf_check <- function(x, ...) {

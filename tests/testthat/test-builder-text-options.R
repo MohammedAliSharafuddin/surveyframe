@@ -12,10 +12,10 @@
 # there is no R-side surface for DOM/JS behaviour.
 
 fresh_text_instrument <- function(options) {
-  sf_instrument(
+  sframe_instrument(
     title = "Text options round trip", version = "1.0.0",
     components = list(
-      sf_item("fb", "Feedback", type = "textarea")
+      sframe_item("fb", "Feedback", type = "textarea")
     ),
     analysis_plan = list(list(
       id = "RQ1", research_question = "What keyword shows up in feedback?",

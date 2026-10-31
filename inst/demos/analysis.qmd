@@ -25,7 +25,7 @@ show_value <- function(x) {
 }
 
 plan_table <- function(instrument) {
-  plan <- sf_plan(instrument)
+  plan <- sframe_plan(instrument)
   if (!length(plan)) return(data.frame())
   do.call(rbind, lapply(seq_along(plan), function(i) {
     b <- plan[[i]]
@@ -79,7 +79,7 @@ data.frame(
 ## The questions
 
 ```{r items}
-codebook <- as.data.frame(codebook_report(instrument))
+codebook <- as.data.frame(sframe_codebook(instrument))
 knitr::kable(codebook[, c("id", "label", "type")])
 ```
 
@@ -103,11 +103,11 @@ collection. A change after collection begins should retain the earlier
 instrument and be disclosed with `amend_sframe()`.
 
 ```{r reorder, eval = FALSE}
-plan <- sf_plan(instrument)
+plan <- sframe_plan(instrument)
 ids <- vapply(plan, `[[`, character(1), "id")
 wanted_order <- rev(ids)             # replace with the order you planned
 stopifnot(setequal(wanted_order, ids))
-sf_plan(instrument) <- plan[match(wanted_order, ids)]
+sframe_plan(instrument) <- plan[match(wanted_order, ids)]
 instrument <- as_sframe(validate_sframe(instrument, strict = TRUE))
 ```
 
@@ -141,22 +141,22 @@ not-applicable section as information about the demo, not a reason to skip
 the step.
 
 ```{r screen}
-missing <- missing_data_report(responses, instrument)
+missing <- sframe_missing_data_results(responses, instrument)
 knitr::kable(as.data.frame(missing))
 
-quality <- quality_report(responses, instrument)
+quality <- sframe_quality_results(responses, instrument)
 knitr::kable(as.data.frame(quality))
 ```
 
 ```{r reliability}
-if (length(sf_scales(instrument)) > 0 &&
+if (length(sframe_get_scales(instrument)) > 0 &&
     requireNamespace("psych", quietly = TRUE)) {
-  reliability <- reliability_report(
+  reliability <- sframe_reliability_results(
     responses, instrument,
     omega = TRUE
   )
   knitr::kable(as.data.frame(reliability))
-} else if (length(sf_scales(instrument)) == 0) {
+} else if (length(sframe_get_scales(instrument)) == 0) {
   cat("This instrument has no scored scales, so reliability is not applicable.\n")
 } else {
   cat("Install the optional psych package to compute reliability.\n")
@@ -197,7 +197,7 @@ plot, reproducible syntax where supported, interpretation prompt, and
 references.
 
 ```{r result-details, results = "asis"}
-plan <- sf_plan(instrument)
+plan <- sframe_plan(instrument)
 for (b in results) {
   planned <- plan[[match(b$block_id, vapply(plan, `[[`, character(1), "id"))]]
   cat("\n###", b$block_id, b$research_question, "\n\n")
@@ -219,7 +219,7 @@ for (b in results) {
   if (length(b$diagnostic_plots %||% list())) {
     for (p in b$diagnostic_plots) print(p)
   }
-  resolved <- analysis_syntax(b)
+  resolved <- sframe_syntax_result(b)
   if (length(resolved)) cat("\n**Resolved R call**\n\n```r\n",
                             paste(resolved, collapse = "\n"), "\n```\n", sep = "")
   if (nzchar(b$prompt %||% "")) cat("\n**Interpretation prompt:**", b$prompt, "\n\n")
@@ -272,7 +272,7 @@ Stata and compare.
 
 ```{r export}
 #| eval: false
-sframe_export_labelled(responses, instrument, "{{DEMO_NAME}}.sav")
+export_responses(responses, instrument, "{{DEMO_NAME}}.sav")
 ```
 
 The `.sav` arrives with the question wording and the response options already
@@ -285,6 +285,6 @@ with the demo name, the software you used, and both results.
 ## Adapt this for your own survey
 
 1. Replace `sframe_demo("{{DEMO_NAME}}")` with your own `read_sframe()` call,
-   or build an instrument with `sf_instrument()`.
+   or build an instrument with `sframe_instrument()`.
 2. Declare your analysis plan **before** you collect anything.
 3. Everything below stays as it is.

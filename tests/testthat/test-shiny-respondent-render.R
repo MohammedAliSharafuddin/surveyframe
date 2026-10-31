@@ -1,6 +1,6 @@
 # tests/testthat/test-shiny-respondent-render.R
 #
-# The standalone Shiny collector, render_survey().
+# The standalone Shiny collector, run_survey().
 #
 # A10. The survey page was a single renderUI that read every input, so each
 #      answer re-rendered the page. The new controls came back at their
@@ -20,7 +20,7 @@
 skip_if_not_installed("shiny")
 
 survey_html <- function(instrument, inputs = list()) {
-  app <- render_survey(instrument)
+  app <- run_survey(instrument)
   html <- NULL
   shiny::testServer(app, {
     if (length(inputs)) do.call(session$setInputs, inputs)
@@ -36,14 +36,14 @@ first_tag <- function(html, pattern) {
 }
 
 labelled_instrument <- function() {
-  sf_instrument(title = "Shiny", components = list(
-    sf_choices("yn", values = c(0, 1), labels = c("No", "Yes")),
-    sf_choices("agree", values = 1:3,
+  sframe_instrument(title = "Shiny", components = list(
+    sframe_choice_set("yn", values = c(0, 1), labels = c("No", "Yes")),
+    sframe_choice_set("agree", values = 1:3,
                labels = c("Disagree", "Neutral", "Agree")),
-    sf_item("q1", "Do you smoke?", "single_choice", choice_set = "yn"),
-    sf_item("t1", "Comment", "text"),
-    sf_item("rk", "Rank these", "ranking", choice_set = "agree"),
-    sf_item("mx", "Rate each", "matrix", choice_set = "agree",
+    sframe_item("q1", "Do you smoke?", "single_choice", choice_set = "yn"),
+    sframe_item("t1", "Comment", "text"),
+    sframe_item("rk", "Rank these", "ranking", choice_set = "agree"),
+    sframe_item("mx", "Rate each", "matrix", choice_set = "agree",
             matrix_items = c("price", "service"))
   ))
 }
@@ -79,7 +79,7 @@ test_that("A10: a matrix cell and a ranking are drawn as answered", {
 test_that("A10: the survey page does not depend on individual answers", {
   # Progress is the part of the page that should move with answers, so it
   # has its own output and the controls are left alone.
-  app <- render_survey(labelled_instrument())
+  app <- run_survey(labelled_instrument())
   shiny::testServer(app, {
     expect_false(is.null(output$sf_progress))
   })
@@ -132,17 +132,17 @@ test_that("A5: every ranking option has labelled move up and move down buttons",
 # ── A6 and the Shiny A3: nothing is answered until the participant answers ─
 
 decision_instrument <- function() {
-  sf_instrument(title = "Decisions", components = list(
-    sf_choices("agree", values = 1:3,
+  sframe_instrument(title = "Decisions", components = list(
+    sframe_choice_set("agree", values = 1:3,
                labels = c("Disagree", "Neutral", "Agree")),
-    sf_item("pw", "Compare", "pairwise_comparison", required = TRUE,
+    sframe_item("pw", "Compare", "pairwise_comparison", required = TRUE,
             comparison_items = c("price", "quality")),
-    sf_item("inf", "Influence", "pairwise_comparison", required = TRUE,
+    sframe_item("inf", "Influence", "pairwise_comparison", required = TRUE,
             comparison_items = c("a", "b"), comparison_scale = "influence"),
-    sf_item("cw", "Allocate 100", "criteria_weight", required = TRUE,
+    sframe_item("cw", "Allocate 100", "criteria_weight", required = TRUE,
             comparison_items = c("price", "quality")),
-    sf_item("rk", "Rank", "ranking", choice_set = "agree", required = TRUE),
-    sf_item("sl", "Satisfaction", "slider", required = TRUE,
+    sframe_item("rk", "Rank", "ranking", choice_set = "agree", required = TRUE),
+    sframe_item("sl", "Satisfaction", "slider", required = TRUE,
             slider_min = 0, slider_max = 10)
   ))
 }

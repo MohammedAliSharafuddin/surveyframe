@@ -3,34 +3,34 @@
 # round-trip.
 
 decision_item_instrument <- function() {
-  sf_instrument("Decision item types check",
+  sframe_instrument("Decision item types check",
     components = list(
-      sf_item("crit_pairs", "Compare criteria", type = "pairwise_comparison",
+      sframe_item("crit_pairs", "Compare criteria", type = "pairwise_comparison",
               comparison_items = c("service", "location", "price"),
               comparison_scale = "saaty", required = TRUE),
-      sf_item("crit_influence", "Influence between criteria",
+      sframe_item("crit_influence", "Influence between criteria",
               type = "pairwise_comparison",
               comparison_items = c("service", "location", "price"),
               comparison_scale = "influence"),
-      sf_item("crit_points", "Divide 100 points", type = "criteria_weight",
+      sframe_item("crit_points", "Divide 100 points", type = "criteria_weight",
               comparison_items = c("service", "location", "price"),
               required = TRUE)
     ))
 }
 
 test_that("sf_item validates pairwise_comparison and criteria_weight", {
-  it <- sf_item("p1", "Compare", type = "pairwise_comparison",
+  it <- sframe_item("p1", "Compare", type = "pairwise_comparison",
                 comparison_items = c("a", "b", "c"), comparison_scale = "saaty")
   expect_identical(it$comparison_items, c("a", "b", "c"))
   expect_identical(it$comparison_scale, "saaty")
 
   expect_error(
-    sf_item("p2", "Compare", type = "pairwise_comparison",
+    sframe_item("p2", "Compare", type = "pairwise_comparison",
             comparison_items = "a", comparison_scale = "saaty"),
     class = "sframe_validation_error"
   )
 
-  cw <- sf_item("w1", "Weights", type = "criteria_weight",
+  cw <- sframe_item("w1", "Weights", type = "criteria_weight",
                 comparison_items = c("a", "b"))
   expect_identical(cw$comparison_items, c("a", "b"))
 })

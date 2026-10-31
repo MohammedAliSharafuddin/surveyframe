@@ -8,15 +8,15 @@
 # template and the Google Sheets collector already emit.
 
 shape_instrument <- function() {
-  sf_instrument(
+  sframe_instrument(
     title = "Shapes", version = "1.0.0",
     components = list(
-      sf_choices("ag5", 1:5, c("a", "b", "c", "d", "e")),
-      sf_item("mx", "Rate", type = "matrix",
+      sframe_choice_set("ag5", 1:5, c("a", "b", "c", "d", "e")),
+      sframe_item("mx", "Rate", type = "matrix",
               matrix_items = c("r1", "r2"), choice_set = "ag5"),
-      sf_item("ms", "Pick", type = "multiple_choice", choice_set = "ag5"),
-      sf_item("rk", "Order", type = "ranking", choice_set = "ag5"),
-      sf_item("txt", "Free", type = "text")
+      sframe_item("ms", "Pick", type = "multiple_choice", choice_set = "ag5"),
+      sframe_item("rk", "Order", type = "ranking", choice_set = "ag5"),
+      sframe_item("txt", "Free", type = "text")
     )
   )
 }
@@ -106,15 +106,15 @@ test_that("every declared expansion column appears in the row", {
 })
 
 test_that("a hidden item blanks all of its expansion columns", {
-  inst <- sf_instrument(
+  inst <- sframe_instrument(
     title = "Branched", version = "1.0.0",
     components = list(
-      sf_choices("yn", c("yes", "no"), c("Yes", "No")),
-      sf_choices("ag5", 1:5, c("a", "b", "c", "d", "e")),
-      sf_item("gate", "Continue?", type = "single_choice", choice_set = "yn"),
-      sf_item("mx", "Rate", type = "matrix",
+      sframe_choice_set("yn", c("yes", "no"), c("Yes", "No")),
+      sframe_choice_set("ag5", 1:5, c("a", "b", "c", "d", "e")),
+      sframe_item("gate", "Continue?", type = "single_choice", choice_set = "yn"),
+      sframe_item("mx", "Rate", type = "matrix",
               matrix_items = c("r1", "r2"), choice_set = "ag5"),
-      sf_branch("mx", depends_on = "gate", operator = "==",
+      sframe_branch("mx", depends_on = "gate", operator = "==",
                 value = "yes", action = "show")
     )
   )

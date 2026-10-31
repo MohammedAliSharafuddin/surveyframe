@@ -358,7 +358,7 @@ server <- function(input, output, session) {
   output$quality_chart <- renderPlot({
     resp <- filtered_responses()
     req(resp)
-    qr <- tryCatch(quality_report(resp, instr), error = function(e) NULL)
+    qr <- tryCatch(sframe_quality_results(resp, instr), error = function(e) NULL)
     gg <- if (!is.null(qr)) tryCatch(sframe_plot_quality(qr), error = function(e) NULL)
     if (!is.null(gg)) { print(gg); return() }
     rates <- if (!is.null(qr)) {
@@ -381,7 +381,7 @@ server <- function(input, output, session) {
   output$missing_chart <- renderPlot({
     resp <- filtered_responses()
     req(resp)
-    mr <- tryCatch(missing_data_report(resp, instr), error = function(e) NULL)
+    mr <- tryCatch(sframe_missing_data_results(resp, instr), error = function(e) NULL)
     gg <- if (!is.null(mr)) tryCatch(sframe_plot_missingness(mr), error = function(e) NULL)
     if (!is.null(gg)) { print(gg); return() }
     pct <- if (!is.null(mr)) {

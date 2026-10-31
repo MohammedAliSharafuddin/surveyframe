@@ -6,21 +6,21 @@
 # 0.4.3 during a teaching session.
 
 label_inst <- function() {
-  ag <- sf_choices("ag5", 1:5, c("SD", "D", "N", "A", "SA"))
+  ag <- sframe_choice_set("ag5", 1:5, c("SD", "D", "N", "A", "SA"))
   items <- list(ag)
   for (s in c("rel", "sat")) {
     for (k in 1:3) {
-      items[[length(items) + 1]] <- sf_item(paste0(s, k), paste("Item", s, k),
+      items[[length(items) + 1]] <- sframe_item(paste0(s, k), paste("Item", s, k),
         type = "likert", choice_set = "ag5", scale_id = s)
     }
   }
-  items[[length(items) + 1]] <- sf_item("orders", "Online orders last month",
+  items[[length(items) + 1]] <- sframe_item("orders", "Online orders last month",
                                         type = "numeric")
-  items[[length(items) + 1]] <- sf_scale("rel", "Delivery reliability",
+  items[[length(items) + 1]] <- sframe_scale("rel", "Delivery reliability",
                                          items = paste0("rel", 1:3))
-  items[[length(items) + 1]] <- sf_scale("sat", "Satisfaction",
+  items[[length(items) + 1]] <- sframe_scale("sat", "Satisfaction",
                                          items = paste0("sat", 1:3))
-  sf_instrument("Labels", components = items, analysis_plan = list(
+  sframe_instrument("Labels", components = items, analysis_plan = list(
     list(id = "RQ1", family = "association", method = "correlation_pearson",
          research_question = "r", roles = list(x = "rel", y = "sat")),
     list(id = "RQ2", family = "regression", method = "regression_linear",

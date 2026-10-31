@@ -15,7 +15,7 @@
 # expected researcher behaviour and stays low-friction. A change to the
 # analysis plan or the measurement/structural model after data collection has
 # begun is exactly the behaviour the design-time plan binding
-# (sf_instrument()'s analysis_plan slot, run_analysis_plan()) exists to
+# (sframe_instrument()'s analysis_plan slot, run_analysis_plan()) exists to
 # guard against, so it is disclosed but made more effortful: a mandatory
 # `deviation_report`, and a `signoff` field that is never silently blank --
 # it explicitly records "none" when no second reviewer is named, so the gap
@@ -46,7 +46,7 @@ sframe_amendment_default_tier <- function(reason_code) {
 # digest of "what the substantive instrument content was at this point" --
 # items, choices, scales, branching, checks, analysis plan, models, designs.
 # Documented as distinct from write_sframe()'s file-level hash in
-# amend_sframe()'s and amendment_log()'s roxygen so the two are never
+# amend_sframe()'s and sframe_get_amendments()'s roxygen so the two are never
 # confused: `previous_hash`/`new_hash` in an amendment entry are a content
 # fingerprint, not the .sframe file's own integrity hash.
 # A canonical fingerprint of one amendment entry, over every field it records.
@@ -309,20 +309,20 @@ sframe_amendment_plain <- function(a) {
 #' @return The amended `sframe` object, with the new entry appended to its
 #'   amendment log. Call [write_sframe()] to persist it.
 #' @export
-#' @seealso [amendment_log()], [write_sframe()], [read_sframe()]
+#' @seealso [sframe_get_amendments()], [write_sframe()], [read_sframe()]
 #'
 #' @examples
-#' item  <- sf_item("q1", "How satisfied are you?", type = "text")
-#' instr <- sf_instrument("Demo", components = list(item))
-#' item2 <- sf_item("q1", "How satisfied are you overall?", type = "text")
-#' revised <- sf_instrument("Demo", components = list(item2))
+#' item  <- sframe_item("q1", "How satisfied are you?", type = "text")
+#' instr <- sframe_instrument("Demo", components = list(item))
+#' item2 <- sframe_item("q1", "How satisfied are you overall?", type = "text")
+#' revised <- sframe_instrument("Demo", components = list(item2))
 #' amended <- amend_sframe(
 #'   instr, revised,
 #'   reason_code = "instrument_revision",
 #'   reason_text = "Clarified item wording after a pilot round.",
 #'   deviation_report = "Wording only; no change to the construct measured."
 #' )
-#' nrow(amendment_log(amended))
+#' nrow(sframe_get_amendments(amended))
 amend_sframe <- function(previous, instrument, reason_code, reason_text,
                          tier = NULL, author = NULL, deviation_report = NULL,
                          second_signoff = NULL) {
@@ -485,10 +485,10 @@ amend_sframe <- function(previous, instrument, reason_code, reason_text,
 #' @seealso [amend_sframe()]
 #'
 #' @examples
-#' item  <- sf_item("q1", "How satisfied are you?", type = "text")
-#' instr <- sf_instrument("Demo", components = list(item))
-#' amendment_log(instr)
-amendment_log <- function(instrument) {
+#' item  <- sframe_item("q1", "How satisfied are you?", type = "text")
+#' instr <- sframe_instrument("Demo", components = list(item))
+#' sframe_get_amendments(instr)
+sframe_get_amendments <- function(instrument) {
   sframe_check_instrument(instrument)
   amendments <- instrument$amendments %||% list()
 

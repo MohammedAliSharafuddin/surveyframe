@@ -120,7 +120,7 @@ sframe_item_config_problems <- function(item) {
 #'   `"text_block"`.
 #' @param required Logical. Whether the respondent must answer this item.
 #' @param choice_set Character or NULL. The `id` of a choice set defined with
-#'   [sf_choices()].
+#'   [sframe_choice_set()].
 #' @param scale_id Character or NULL. The `id` of the scale this item belongs to.
 #' @param reverse Logical. Whether this item is reverse-coded within its scale.
 #' @param help Character or NULL. Help text displayed beneath the question.
@@ -151,7 +151,7 @@ sframe_item_config_problems <- function(item) {
 #'
 #' @return An object of class `sf_item` (a named list).
 #' @usage
-#' sf_item(
+#' sframe_item(
 #'   id,
 #'   label,
 #'   type = c("likert", "single_choice", "multiple_choice", "numeric",
@@ -178,18 +178,18 @@ sframe_item_config_problems <- function(item) {
 #'   page = NULL
 #' )
 #' @export
-#' @seealso [sf_instrument()], [sf_choices()], [sf_scale()]
+#' @seealso [sframe_instrument()], [sframe_choice_set()], [sframe_scale()]
 #'
 #' @examples
-#' item <- sf_item(
+#' item <- sframe_item(
 #'   id = "sat_overall", label = "Overall, how satisfied are you?",
 #'   type = "likert", required = TRUE, choice_set = "agree5",
 #'   scale_id = "satisfaction"
 #' )
 #'
-#' sec <- sf_item("sec_1", "Demographic Information", type = "section_break",
+#' sec <- sframe_item("sec_1", "Demographic Information", type = "section_break",
 #'                section_intro = "Please answer the following questions.")
-sf_item <- function(
+sframe_item <- function(
     id,
     label,
     type          = c("likert", "single_choice", "multiple_choice",

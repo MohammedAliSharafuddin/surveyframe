@@ -21,11 +21,11 @@ migration path for code that used the \code{strict = TRUE} return of
 \code{\link[=validate_sframe]{validate_sframe()}} as an instrument, which it no longer is.
 }
 \examples{
-item  <- sf_item("q1", "How satisfied are you?", type = "text")
-instr <- sf_instrument("Demo", components = list(item))
+item  <- sframe_item("q1", "How satisfied are you?", type = "text")
+instr <- sframe_instrument("Demo", components = list(item))
 
 validated <- as_sframe(validate_sframe(instr, strict = TRUE))
-isTRUE(sf_meta(validated)$validated)
+isTRUE(sframe_meta(validated)$validated)
 }
 \seealso{
 \code{\link[=validate_sframe]{validate_sframe()}}, \link{sframe_validation}

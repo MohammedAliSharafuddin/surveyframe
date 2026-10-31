@@ -103,11 +103,11 @@ test_that("sframe_ahp_compute() reports non-matrix and shape faults", {
 # ---------------------------------------------------------------------------
 
 ahp_instrument <- function() {
-  sf_instrument(
+  sframe_instrument(
     title = "AHP criterion weighting",
     version = "1.0.0",
     components = list(
-      sf_item("crit_pairs", "Compare the importance of each pair of criteria",
+      sframe_item("crit_pairs", "Compare the importance of each pair of criteria",
               type = "pairwise_comparison", comparison_items = crits3,
               comparison_scale = "saaty", required = TRUE)
     )
@@ -242,11 +242,11 @@ test_that("a zero-sum column is spread evenly rather than producing NaN", {
 # ---------------------------------------------------------------------------
 
 anp_instrument <- function() {
-  sf_instrument(
+  sframe_instrument(
     title = "ANP network weighting",
     version = "1.0.0",
     components = list(
-      sf_item("crit_pairs", "Compare the influence of each pair of criteria",
+      sframe_item("crit_pairs", "Compare the influence of each pair of criteria",
               type = "pairwise_comparison", comparison_items = crits3,
               comparison_scale = "saaty", required = TRUE)
     )

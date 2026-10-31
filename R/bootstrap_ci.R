@@ -3,8 +3,8 @@
 # Run `expr` with a fixed RNG seed, restoring whatever state the caller had
 # on exit, so seeding here does not silently reset randomness for unrelated
 # code that runs afterwards. Factored out of the identical blocks that were
-# already inside bootstrap_ci(), cohens_d_ci(), cramers_v_ci() and
-# eta_sq_ci(), and now also used by run_analysis_plan() to make a whole plan
+# already inside sframe_bootstrap_ci(), sframe_cohens_d_ci(), sframe_cramers_v_ci() and
+# sframe_eta_sq_ci(), and now also used by run_analysis_plan() to make a whole plan
 # run reproducible in one place rather than by threading a seed through every
 # helper signature.
 # The percentile interval of bootstrap replicates, recording how many were
@@ -66,7 +66,7 @@ sframe_with_seed <- function(seed, expr) {
 
 # Percentile bootstrap confidence intervals for effect sizes. Base R only:
 # these helpers back the CI keys the analysis-plan runners attach to their
-# results, and v0.4's small-sample methods reuse bootstrap_ci() directly.
+# results, and v0.4's small-sample methods reuse sframe_bootstrap_ci() directly.
 
 #' Percentile bootstrap confidence interval for a statistic
 #'
@@ -89,12 +89,12 @@ sframe_with_seed <- function(seed, expr) {
 #'   leaves a sampling distribution to read. The bounds
 #'   are `NA` when `x` has fewer than 3 finite values.
 #' @export
-#' @seealso [cohens_d_ci()], [cramers_v_ci()], [eta_sq_ci()]
+#' @seealso [sframe_cohens_d_ci()], [sframe_cramers_v_ci()], [sframe_eta_sq_ci()]
 #'
 #' @examples
-#' bootstrap_ci(mtcars$mpg, seed = 42)
-#' bootstrap_ci(mtcars$mpg, FUN = mean, conf.level = 0.90, seed = 42)
-bootstrap_ci <- function(x, FUN = stats::median, R = 2000,
+#' sframe_bootstrap_ci(mtcars$mpg, seed = 42)
+#' sframe_bootstrap_ci(mtcars$mpg, FUN = mean, conf.level = 0.90, seed = 42)
+sframe_bootstrap_ci <- function(x, FUN = stats::median, R = 2000,
                          conf.level = 0.95, seed = NULL) {
   if (!is.null(seed)) {
     # set.seed() mutates the global RNG stream; restore whatever state the
@@ -139,12 +139,12 @@ bootstrap_ci <- function(x, FUN = stats::median, R = 2000,
 #'   leaves a sampling distribution to read. The bounds
 #'   are `NA` when either group has fewer than 3 finite values.
 #' @export
-#' @seealso [bootstrap_ci()]
+#' @seealso [sframe_bootstrap_ci()]
 #'
 #' @examples
-#' cohens_d_ci(mtcars$mpg[mtcars$am == 1], mtcars$mpg[mtcars$am == 0],
+#' sframe_cohens_d_ci(mtcars$mpg[mtcars$am == 1], mtcars$mpg[mtcars$am == 0],
 #'             seed = 42)
-cohens_d_ci <- function(x, y, R = 2000, conf.level = 0.95, seed = NULL) {
+sframe_cohens_d_ci <- function(x, y, R = 2000, conf.level = 0.95, seed = NULL) {
   if (!is.null(seed)) {
     # set.seed() mutates the global RNG stream; restore whatever state the
     # caller had on exit so an opt-in, reproducible seed here does not
@@ -189,11 +189,11 @@ cohens_d_ci <- function(x, y, R = 2000, conf.level = 0.95, seed = NULL) {
 #'   leaves a sampling distribution to read. The bounds
 #'   are `NA` when the table holds fewer than 3 observations.
 #' @export
-#' @seealso [bootstrap_ci()]
+#' @seealso [sframe_bootstrap_ci()]
 #'
 #' @examples
-#' cramers_v_ci(table(mtcars$am, mtcars$cyl), seed = 42)
-cramers_v_ci <- function(tab, R = 2000, conf.level = 0.95, seed = NULL) {
+#' sframe_cramers_v_ci(table(mtcars$am, mtcars$cyl), seed = 42)
+sframe_cramers_v_ci <- function(tab, R = 2000, conf.level = 0.95, seed = NULL) {
   if (!is.null(seed)) {
     # set.seed() mutates the global RNG stream; restore whatever state the
     # caller had on exit so an opt-in, reproducible seed here does not
@@ -256,11 +256,11 @@ sframe_cramers_v <- function(tbl) {
 #'   leaves a sampling distribution to read. The bounds
 #'   are `NA` with fewer than 3 complete observations or fewer than 2 groups.
 #' @export
-#' @seealso [bootstrap_ci()]
+#' @seealso [sframe_bootstrap_ci()]
 #'
 #' @examples
-#' eta_sq_ci(mtcars$mpg, mtcars$cyl, seed = 42)
-eta_sq_ci <- function(outcome, group, R = 2000, conf.level = 0.95,
+#' sframe_eta_sq_ci(mtcars$mpg, mtcars$cyl, seed = 42)
+sframe_eta_sq_ci <- function(outcome, group, R = 2000, conf.level = 0.95,
                       seed = NULL) {
   if (!is.null(seed)) {
     # set.seed() mutates the global RNG stream; restore whatever state the

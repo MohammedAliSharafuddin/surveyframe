@@ -21,7 +21,7 @@ test_that("open = TRUE shows the report, and a script leaves it alone", {
   suppressMessages(surveyframe:::sframe_report_result(out, "html", open = TRUE))
   expect_identical(shown, out)
   shown <- NULL
-  ins <- sf_instrument("Open", components = list(sf_item("q1", "Q", type = "text")))
+  ins <- sframe_instrument("Open", components = list(sframe_item("q1", "Q", type = "text")))
   suppressMessages(render_report(ins, output_file = tempfile(fileext = ".html")))
   expect_null(shown)
 })

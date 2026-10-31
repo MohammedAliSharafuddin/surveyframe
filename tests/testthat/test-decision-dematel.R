@@ -91,11 +91,11 @@ test_that("a non-zero diagonal is zeroed with a note", {
 
 dematel_instrument <- function(roles = list(pairwise = "crit_influence"),
                                options = NULL) {
-  sf_instrument(
+  sframe_instrument(
     title = "Hotel supplier selection",
     version = "1.0.0",
     components = list(
-      sf_item("crit_influence",
+      sframe_item("crit_influence",
               "How strongly does each factor influence the others?",
               type = "pairwise_comparison", comparison_items = crits,
               comparison_scale = "influence")
@@ -175,10 +175,10 @@ test_that("a missing input is a typed error naming what to supply", {
 })
 
 test_that("a saaty-scale item is rejected with a scale-specific message", {
-  study <- sf_instrument(
+  study <- sframe_instrument(
     title = "Wrong scale",
     components = list(
-      sf_item("crit_pairs", "Compare the criteria",
+      sframe_item("crit_pairs", "Compare the criteria",
               type = "pairwise_comparison", comparison_items = crits,
               comparison_scale = "saaty")
     ),

@@ -86,7 +86,7 @@ sframe_serialization_payload <- function(instrument, hash_value = "", box = TRUE
     # same bytes and therefore the same hash.
     #
     # Without this, serialisation was not a fixed point. A plan block built
-    # by sf_instrument() carries only what the caller supplied, while
+    # by sframe_instrument() carries only what the caller supplied, while
     # sframe_restore_analysis_block() fills in 8 fields on read (options,
     # decision_rule, reporting_references, status, requires_data, test,
     # interpretation, citations). So write, read, write changed the hash of
@@ -103,7 +103,7 @@ sframe_serialization_payload <- function(instrument, hash_value = "", box = TRUE
       sframe_restore_analysis_block
     )),
     models = unname(lapply(instrument$models %||% list(), sframe_model_plain)),
-    # Written in the shape it holds. sf_instrument() makes an empty render an
+    # Written in the shape it holds. sframe_instrument() makes an empty render an
     # empty named list, written as {}, which is what render is: it was
     # written as [], which a host reading the JSON took for a list (Ethos
     # request 3). An instrument read from a file written with [] keeps [], so
@@ -233,7 +233,7 @@ sframe_hash_value <- function(instrument) {
 #' recomputed by anyone who edits a file, so it does not establish who wrote an
 #' instrument or when.
 #'
-#' @param instrument An `sframe` object created by [sf_instrument()].
+#' @param instrument An `sframe` object created by [sframe_instrument()].
 #' @param path Character. The file path to write to. The `.sframe` extension
 #'   is appended automatically if not already present.
 #' @param pretty Logical. Whether to write formatted JSON with indentation.
@@ -400,7 +400,7 @@ sframe_restore_choices <- function(choice) {
   choice$labels <- sframe_as_vector(choice$labels, "character")
   choice$allow_other <- isTRUE(choice$allow_other)
   choice$randomise <- isTRUE(choice$randomise)
-  # Kept only when TRUE, as sf_choices() stores it (0.4.3).
+  # Kept only when TRUE, as sframe_choice_set() stores it (0.4.3).
   choice$ordered <- if (isTRUE(choice$ordered)) TRUE else NULL
   class(choice) <- "sf_choices"
   choice

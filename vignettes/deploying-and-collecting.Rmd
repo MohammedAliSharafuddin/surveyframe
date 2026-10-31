@@ -106,13 +106,13 @@ endpoint before you export.
 From the SurveyBuilder, paste the Web App URL into the
 Apps Script Web App URL field on the Google Sheets settings tab, then click
 **Export survey**. From R, store the URL on the instrument and call
-`export_static_survey()`.
+`export_survey()`.
 
 ```{r endpoint-export, eval = FALSE}
 study$render$google_sheets_endpoint <-
   "https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec"
 
-export_static_survey(
+export_survey(
   study,
   output_path = "index.html",
   open        = FALSE
@@ -179,11 +179,11 @@ responses <- read_sheet_responses(
   instrument = study
 )
 
-qr <- quality_report(responses, study, respondent_id = "respondent_id")
+qr <- sframe_quality_results(responses, study, respondent_id = "respondent_id")
 ```
 
 The returned data frame is validated against the instrument and is ready for
-`quality_report()`, `score_scales()`, `reliability_report()`, and
+`sframe_quality_results()`, `score_scales()`, `sframe_reliability_results()`, and
 `run_analysis_plan()`.
 
 ## Updating a live survey

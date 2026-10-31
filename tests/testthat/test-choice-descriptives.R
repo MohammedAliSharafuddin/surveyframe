@@ -3,13 +3,13 @@
 # counts and percentages per group, weighted when weights are given.
 
 choice_instr <- function() {
-  sf_instrument(
+  sframe_instrument(
     "Choice descriptives",
     components = list(
-      sf_choices("col", values = c("red", "blue"), labels = c("Red", "Blue")),
-      sf_choices("arm", values = c("a", "b"), labels = c("A", "B")),
-      sf_item("colour", "Colour", type = "single_choice", choice_set = "col"),
-      sf_item("grp", "Arm", type = "single_choice", choice_set = "arm")
+      sframe_choice_set("col", values = c("red", "blue"), labels = c("Red", "Blue")),
+      sframe_choice_set("arm", values = c("a", "b"), labels = c("A", "B")),
+      sframe_item("colour", "Colour", type = "single_choice", choice_set = "col"),
+      sframe_item("grp", "Arm", type = "single_choice", choice_set = "arm")
     )
   )
 }

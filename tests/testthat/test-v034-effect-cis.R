@@ -4,17 +4,17 @@
 
 test_that("bootstrap_ci is reproducible with a seed and guards small n", {
   x <- mtcars$mpg
-  a <- bootstrap_ci(x, seed = 42)
-  b <- bootstrap_ci(x, seed = 42)
+  a <- sframe_bootstrap_ci(x, seed = 42)
+  b <- sframe_bootstrap_ci(x, seed = 42)
   expect_identical(a, b)
   expect_identical(unname(a["estimate"]), stats::median(x))
   expect_true(a["lower"] <= a["estimate"] && a["estimate"] <= a["upper"])
 
-  narrow <- bootstrap_ci(x, conf.level = 0.5, seed = 42)
-  wide <- bootstrap_ci(x, conf.level = 0.99, seed = 42)
+  narrow <- sframe_bootstrap_ci(x, conf.level = 0.5, seed = 42)
+  wide <- sframe_bootstrap_ci(x, conf.level = 0.99, seed = 42)
   expect_true(narrow["upper"] - narrow["lower"] < wide["upper"] - wide["lower"])
 
-  tiny <- bootstrap_ci(c(1, 2))
+  tiny <- sframe_bootstrap_ci(c(1, 2))
   expect_true(is.na(tiny["lower"]) && is.na(tiny["upper"]))
 })
 
@@ -23,8 +23,8 @@ test_that("a seeded bootstrap call does not disturb the caller's RNG stream", {
   before <- runif(5)
 
   set.seed(123)
-  bootstrap_ci(mtcars$mpg, seed = 999)
-  cohens_d_ci(mtcars$mpg[mtcars$am == 1], mtcars$mpg[mtcars$am == 0], seed = 999)
+  sframe_bootstrap_ci(mtcars$mpg, seed = 999)
+  sframe_cohens_d_ci(mtcars$mpg[mtcars$am == 1], mtcars$mpg[mtcars$am == 0], seed = 999)
   after <- runif(5)
 
   expect_identical(before, after)
@@ -33,25 +33,25 @@ test_that("a seeded bootstrap call does not disturb the caller's RNG stream", {
 test_that("cohens_d_ci brackets the point estimate and guards small groups", {
   set.seed(1)
   x <- rnorm(40, 3.5); y <- rnorm(40, 3.0)
-  ci <- cohens_d_ci(x, y, seed = 42)
+  ci <- sframe_cohens_d_ci(x, y, seed = 42)
   expect_identical(unname(ci["estimate"]),
                    surveyframe:::sframe_cohens_d(x, y))
   expect_true(ci["lower"] <= ci["estimate"] && ci["estimate"] <= ci["upper"])
-  tiny <- cohens_d_ci(c(1, 2), y)
+  tiny <- sframe_cohens_d_ci(c(1, 2), y)
   expect_true(is.na(tiny["lower"]))
 })
 
 test_that("cramers_v_ci and eta_sq_ci return sane intervals", {
   set.seed(2)
   tab <- table(sample(1:2, 120, TRUE), sample(1:3, 120, TRUE))
-  v <- cramers_v_ci(tab, seed = 42)
+  v <- sframe_cramers_v_ci(tab, seed = 42)
   expect_true(v["estimate"] >= 0 && v["upper"] <= 1)
   expect_true(v["lower"] <= v["estimate"] && v["estimate"] <= v["upper"])
 
-  e <- eta_sq_ci(mtcars$mpg, mtcars$cyl, seed = 42)
+  e <- sframe_eta_sq_ci(mtcars$mpg, mtcars$cyl, seed = 42)
   expect_true(e["estimate"] > 0 && e["upper"] <= 1)
   expect_true(e["lower"] <= e["estimate"] && e["estimate"] <= e["upper"])
-  one_group <- eta_sq_ci(mtcars$mpg, rep("a", nrow(mtcars)))
+  one_group <- sframe_eta_sq_ci(mtcars$mpg, rep("a", nrow(mtcars)))
   expect_true(is.na(one_group["lower"]))
 })
 

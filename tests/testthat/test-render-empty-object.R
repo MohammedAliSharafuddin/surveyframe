@@ -6,7 +6,7 @@
 # written, and an amendment recorded against the [] form still matches.
 
 test_that("3: an empty render is written as {}", {
-  ins <- sf_instrument("Plain", components = list(sf_item("q1", "Q", type = "text")))
+  ins <- sframe_instrument("Plain", components = list(sframe_item("q1", "Q", type = "text")))
   path <- tempfile(fileext = ".sframe")
   write_sframe(ins, path)
   txt <- paste(readLines(path), collapse = "\n")
@@ -15,7 +15,7 @@ test_that("3: an empty render is written as {}", {
 })
 
 test_that("3: a file whose log was recorded with render as [] takes a further amendment", {
-  ins <- sf_instrument("Legacy", components = list(sf_item("q1", "Q", type = "text")))
+  ins <- sframe_instrument("Legacy", components = list(sframe_item("q1", "Q", type = "text")))
   revised <- ins
   revised$meta$description <- "First revision"
   revised <- amend_sframe(ins, revised, "other", "First", tier = "pipeline")

@@ -20,8 +20,8 @@
 #    list counted as an assignment.
 
 simple_instrument <- function() {
-  sf_instrument("Pass", components = list(
-    sf_item("q1", "A label", type = "numeric")))
+  sframe_instrument("Pass", components = list(
+    sframe_item("q1", "A label", type = "numeric")))
 }
 
 # ── 1. every validation exit honours strict mode and the stamp ────────────
@@ -35,12 +35,12 @@ test_that("1: strict mode aborts on a malformed field", {
 
 test_that("1: a malformed field clears a stamp the instrument already carried", {
   instr <- as_sframe(validate_sframe(simple_instrument(), strict = TRUE))
-  expect_true(isTRUE(sf_meta(instr)$validated))
+  expect_true(isTRUE(sframe_meta(instr)$validated))
 
   instr$items[[1]]$label <- NA_character_
   res <- validate_sframe(instr, strict = FALSE)
   expect_false(res$valid)
-  expect_false(isTRUE(sf_meta(sf_object(res))$validated))
+  expect_false(isTRUE(sframe_meta(sframe_object(res))$validated))
 })
 
 test_that("1: the writer refuses an instrument that failed the shape gate", {
@@ -49,19 +49,19 @@ test_that("1: the writer refuses an instrument that failed the shape gate", {
   res <- validate_sframe(instr, strict = FALSE)
 
   path <- tempfile(fileext = ".sframe")
-  expect_error(write_sframe(sf_object(res), path))
+  expect_error(write_sframe(sframe_object(res), path))
   expect_false(file.exists(path))
 })
 
 # ── 2. scoring never replaces a column the responses already hold ─────────
 
 scale_instrument <- function(scale_id = "site") {
-  sf_instrument("Scored", components = list(
-    sf_choices("ag5", 1:5, as.character(1:5)),
-    sf_item("q1", "A", "likert", choice_set = "ag5", scale_id = scale_id),
-    sf_item("q2", "B", "likert", choice_set = "ag5", scale_id = scale_id),
-    sf_item("q3", "C", "likert", choice_set = "ag5", scale_id = scale_id),
-    sf_scale(scale_id, "Scale", items = c("q1", "q2", "q3"))))
+  sframe_instrument("Scored", components = list(
+    sframe_choice_set("ag5", 1:5, as.character(1:5)),
+    sframe_item("q1", "A", "likert", choice_set = "ag5", scale_id = scale_id),
+    sframe_item("q2", "B", "likert", choice_set = "ag5", scale_id = scale_id),
+    sframe_item("q3", "C", "likert", choice_set = "ag5", scale_id = scale_id),
+    sframe_scale(scale_id, "Scale", items = c("q1", "q2", "q3"))))
 }
 
 test_that("2: a scale ID matching a collected column is refused", {
@@ -92,11 +92,11 @@ test_that("2: re-scoring an already-scored frame is refused, not silent", {
 # ── 3. weights align to the resolved matrix, however it was built ─────────
 
 rated_instrument <- function() {
-  sf_instrument("MCDA", components = list(
-    sf_choices("r5", 1:5, as.character(1:5)),
-    sf_item("price", "Rate the price", "matrix",
+  sframe_instrument("MCDA", components = list(
+    sframe_choice_set("r5", 1:5, as.character(1:5)),
+    sframe_item("price", "Rate the price", "matrix",
             matrix_items = c("A", "B"), choice_set = "r5"),
-    sf_item("quality", "Rate the quality", "matrix",
+    sframe_item("quality", "Rate the quality", "matrix",
             matrix_items = c("A", "B"), choice_set = "r5")))
 }
 
@@ -138,8 +138,8 @@ test_that("3: an unnamed weight vector is still taken in criterion order", {
 # ── 4. a recorded amendment stays as it was written ───────────────────────
 
 amended_file <- function() {
-  instr <- sf_instrument("Amend", components = list(
-    sf_item("q1", "A", type = "numeric")))
+  instr <- sframe_instrument("Amend", components = list(
+    sframe_item("q1", "A", type = "numeric")))
   path <- tempfile(fileext = ".sframe")
   write_sframe(instr, path)
   prev <- read_sframe(path)

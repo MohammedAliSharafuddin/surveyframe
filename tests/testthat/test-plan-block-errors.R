@@ -7,13 +7,13 @@
 # responses.
 
 block_instrument <- function(plan) {
-  ins <- sf_instrument("Block errors", components = list(
-    sf_item("grp", "Group", type = "single_choice", choice_set = "g"),
-    sf_item("score", "Score", type = "numeric"),
-    sf_item("other", "Other score", type = "numeric"),
-    sf_item("note", "Note", type = "text"),
-    sf_item("extra", "Extra", type = "numeric"),
-    sf_choices("g", values = c("1", "2"), labels = c("A", "B"))))
+  ins <- sframe_instrument("Block errors", components = list(
+    sframe_item("grp", "Group", type = "single_choice", choice_set = "g"),
+    sframe_item("score", "Score", type = "numeric"),
+    sframe_item("other", "Other score", type = "numeric"),
+    sframe_item("note", "Note", type = "text"),
+    sframe_item("extra", "Extra", type = "numeric"),
+    sframe_choice_set("g", values = c("1", "2"), labels = c("A", "B"))))
   ins$analysis_plan <- plan
   ins
 }

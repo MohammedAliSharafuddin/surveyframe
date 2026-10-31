@@ -23,7 +23,7 @@ test_that("printing returns the branding unchanged", {
 })
 
 test_that("the branding is stored as a plain list in an instrument", {
-  ins <- sf_instrument("Branded", components = list(sf_item("q1", "Q", type = "text")),
+  ins <- sframe_instrument("Branded", components = list(sframe_item("q1", "Q", type = "text")),
                        render = sframe_demo_branding())
   expect_identical(class(ins$render), "list")
   expect_identical(class(sframe_demo("two_group", branded = TRUE)$instrument$render), "list")

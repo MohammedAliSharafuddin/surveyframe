@@ -5,9 +5,9 @@
 # (sframe_demo_data()) so results reflect a realistic multi-scale instrument.
 
 # Shared 5-point agreement choice set, built once rather than 5 times below;
-# sf_choices() returns an immutable value object, so re-using it across
+# sframe_choice_set() returns an immutable value object, so re-using it across
 # test_that() blocks in this file carries no shared-state risk.
-ag5_choices <- sf_choices("ag5", 1:5,
+ag5_choices <- sframe_choice_set("ag5", 1:5,
   c("Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"))
 
 test_that("regression diagnostics: run_analysis_plan attaches four ggplot panels", {
@@ -34,7 +34,7 @@ test_that("plot.sframe_reliability_report builds a ggplot with alpha and omega b
   skip_if_not_installed("ggplot2")
   demo <- sframe_demo_data()
   scored <- score_scales(demo$responses, demo$instrument)
-  rr <- reliability_report(scored, demo$instrument)
+  rr <- sframe_reliability_results(scored, demo$instrument)
   gg <- plot(rr)
   expect_s3_class(gg, "ggplot")
 })
@@ -44,7 +44,7 @@ test_that("plot.sframe_efa_report builds a scree plot with the suggested-factor 
   skip_if_not_installed("ggplot2")
   demo <- sframe_demo_data()
   scored <- score_scales(demo$responses, demo$instrument)
-  er <- efa_report(scored, demo$instrument)
+  er <- sframe_efa_readiness_results(scored, demo$instrument)
   gg <- plot(er)
   expect_s3_class(gg, "ggplot")
 })
@@ -54,7 +54,7 @@ test_that("plot.sframe_efa_solution builds a loadings heatmap", {
   skip_if_not_installed("ggplot2")
   demo <- sframe_demo_data()
   scored <- score_scales(demo$responses, demo$instrument)
-  es <- efa_solution(scored, demo$instrument, nfactors = 2)
+  es <- sframe_efa_solution(scored, demo$instrument, nfactors = 2)
   gg <- plot(es)
   expect_s3_class(gg, "ggplot")
 })
@@ -64,11 +64,11 @@ test_that("plot.sframe_quality_report builds a straight-lining flag-rate bar cha
   skip_if_not_installed("ggplot2")
   demo <- sframe_demo_data()
   # The bundled demo instrument's 5 scales are all 2 or 3 items, below the
-  # straightline_min_items = 4 default (see quality_report(), fixed
+  # straightline_min_items = 4 default (see sframe_quality_results(), fixed
   # 2026-08-26), so none are checked and the plot has nothing to draw at
   # the default threshold. Lowered here to exercise the plot itself, not
   # the real-world threshold decision.
-  qr <- quality_report(demo$responses, demo$instrument,
+  qr <- sframe_quality_results(demo$responses, demo$instrument,
                        straightline_min_items = 2)
   gg <- plot(qr)
   expect_s3_class(gg, "ggplot")
@@ -93,13 +93,13 @@ test_that("run_analysis_plan attaches a quality plot for an eligible scale", {
   skip_if_not_installed("ggplot2")
   item_ids <- paste0("q", 1:4)
   items <- lapply(item_ids, function(id) {
-    sf_item(id, id, type = "likert", choice_set = "ag5", scale_id = "sc")
+    sframe_item(id, id, type = "likert", choice_set = "ag5", scale_id = "sc")
   })
-  instr <- sf_instrument(
+  instr <- sframe_instrument(
     "Quality plot dispatch",
     components = c(
       list(ag5_choices), items,
-      list(sf_scale("sc", "Scale", items = item_ids))
+      list(sframe_scale("sc", "Scale", items = item_ids))
     ),
     analysis_plan = list(list(
       id = "RQ1", research_question = "Do responses meet quality thresholds?",
@@ -183,7 +183,7 @@ test_that("plot.sframe_descriptives_report builds a distribution-shape violin pl
   skip_on_cran()
   skip_if_not_installed("ggplot2")
   demo <- sframe_demo_data()
-  dr <- descriptives_report(demo$responses)
+  dr <- sframe_descriptives_results(demo$responses)
   gg <- plot(dr, data = demo$responses)
   expect_s3_class(gg, "ggplot")
   expect_true(any(vapply(gg$layers, function(l) inherits(l$geom, "GeomViolin"), logical(1))))
@@ -193,7 +193,7 @@ test_that("sframe_plot_descriptives requires data and errors clearly without it"
   skip_on_cran()
   skip_if_not_installed("ggplot2")
   demo <- sframe_demo_data()
-  dr <- descriptives_report(demo$responses)
+  dr <- sframe_descriptives_results(demo$responses)
   expect_error(sframe_plot_descriptives(dr, data = list()), class = "sframe_error")
 })
 
@@ -202,7 +202,7 @@ test_that("sframe_plot_descriptives facets by group when split_by is used", {
   skip_if_not_installed("ggplot2")
   demo <- sframe_demo_data()
   skip_if_not("visit_type" %in% names(demo$responses), "demo data has no visit_type column")
-  dr <- descriptives_report(demo$responses, split_by = "visit_type")
+  dr <- sframe_descriptives_results(demo$responses, split_by = "visit_type")
   gg <- sframe_plot_descriptives(dr, data = demo$responses)
   expect_s3_class(gg, "ggplot")
   expect_true("FacetWrap" %in% class(gg$facet))
@@ -219,7 +219,7 @@ test_that("sframe_plot_likert_matrix draws a grouped diverging chart for a matri
   skip_on_cran()
   skip_if_not_installed("ggplot2")
   cs <- ag5_choices
-  item <- sf_item("mx1", "Rate these", type = "matrix", choice_set = "ag5",
+  item <- sframe_item("mx1", "Rate these", type = "matrix", choice_set = "ag5",
                   matrix_items = c("Row A", "Row B", "Row C"))
   set.seed(1)
   resp <- data.frame(check.names = FALSE,
@@ -235,13 +235,13 @@ test_that("sframe_plot_likert_matrix draws a grouped diverging chart for a matri
 test_that("sframe_likert_scale_groups finds scales whose items share a choice set", {
   skip_on_cran()
   cs <- ag5_choices
-  i1 <- sf_item("a_1", "Item A1", type = "likert", choice_set = "ag5", scale_id = "sa")
-  i2 <- sf_item("a_2", "Item A2", type = "likert", choice_set = "ag5", scale_id = "sa")
+  i1 <- sframe_item("a_1", "Item A1", type = "likert", choice_set = "ag5", scale_id = "sa")
+  i2 <- sframe_item("a_2", "Item A2", type = "likert", choice_set = "ag5", scale_id = "sa")
   # A lone item on its own scale should not be grouped (nothing to group with).
-  i3 <- sf_item("b_1", "Item B1", type = "likert", choice_set = "ag5", scale_id = "sb")
-  scale_a <- sf_scale("sa", "Scale A", items = c("a_1", "a_2"))
-  scale_b <- sf_scale("sb", "Scale B", items = c("b_1"))
-  instr <- sf_instrument("Group test", components = list(cs, i1, i2, i3, scale_a, scale_b))
+  i3 <- sframe_item("b_1", "Item B1", type = "likert", choice_set = "ag5", scale_id = "sb")
+  scale_a <- sframe_scale("sa", "Scale A", items = c("a_1", "a_2"))
+  scale_b <- sframe_scale("sb", "Scale B", items = c("b_1"))
+  instr <- sframe_instrument("Group test", components = list(cs, i1, i2, i3, scale_a, scale_b))
 
   groups <- sframe_likert_scale_groups(instr)
   expect_named(groups, "sa")
@@ -252,11 +252,11 @@ test_that("sframe_likert_scale_groups finds scales whose items share a choice se
 test_that("sframe_likert_scale_groups excludes a scale whose items use different choice sets", {
   skip_on_cran()
   ag5 <- ag5_choices
-  yn <- sf_choices("yn", c("yes", "no"), c("Yes", "No"))
-  i1 <- sf_item("a_1", "Item A1", type = "likert", choice_set = "ag5", scale_id = "sa")
-  i2 <- sf_item("a_2", "Item A2", type = "single_choice", choice_set = "yn", scale_id = "sa")
-  scale_a <- sf_scale("sa", "Scale A", items = c("a_1", "a_2"))
-  instr <- sf_instrument("Mixed scale", components = list(ag5, yn, i1, i2, scale_a))
+  yn <- sframe_choice_set("yn", c("yes", "no"), c("Yes", "No"))
+  i1 <- sframe_item("a_1", "Item A1", type = "likert", choice_set = "ag5", scale_id = "sa")
+  i2 <- sframe_item("a_2", "Item A2", type = "single_choice", choice_set = "yn", scale_id = "sa")
+  scale_a <- sframe_scale("sa", "Scale A", items = c("a_1", "a_2"))
+  instr <- sframe_instrument("Mixed scale", components = list(ag5, yn, i1, i2, scale_a))
   expect_length(sframe_likert_scale_groups(instr), 0)
 })
 
@@ -264,8 +264,8 @@ test_that("sframe_plot_likert_scale draws a grouped diverging chart for a scale"
   skip_on_cran()
   skip_if_not_installed("ggplot2")
   cs <- ag5_choices
-  i1 <- sf_item("a_1", "Item A1", type = "likert", choice_set = "ag5", scale_id = "sa")
-  i2 <- sf_item("a_2", "Item A2", type = "likert", choice_set = "ag5", scale_id = "sa")
+  i1 <- sframe_item("a_1", "Item A1", type = "likert", choice_set = "ag5", scale_id = "sa")
+  i2 <- sframe_item("a_2", "Item A2", type = "likert", choice_set = "ag5", scale_id = "sa")
   set.seed(1)
   resp <- data.frame(a_1 = sample(1:5, 60, replace = TRUE), a_2 = sample(1:5, 60, replace = TRUE))
   gg <- sframe_plot_likert_scale(list(i1, i2), resp, cs, title = "Scale A")
@@ -277,10 +277,10 @@ test_that("render_report groups a scale's Likert items into one chart, not one p
   skip_on_cran()
   skip_if_not_installed("ggplot2")
   cs <- ag5_choices
-  i1 <- sf_item("a_1", "First scale item.", type = "likert", choice_set = "ag5", scale_id = "sa")
-  i2 <- sf_item("a_2", "Second scale item.", type = "likert", choice_set = "ag5", scale_id = "sa")
-  scale_a <- sf_scale("sa", "Scale A", items = c("a_1", "a_2"))
-  instr <- sf_instrument("Grouped report test", components = list(cs, i1, i2, scale_a))
+  i1 <- sframe_item("a_1", "First scale item.", type = "likert", choice_set = "ag5", scale_id = "sa")
+  i2 <- sframe_item("a_2", "Second scale item.", type = "likert", choice_set = "ag5", scale_id = "sa")
+  scale_a <- sframe_scale("sa", "Scale A", items = c("a_1", "a_2"))
+  instr <- sframe_instrument("Grouped report test", components = list(cs, i1, i2, scale_a))
   set.seed(1)
   dat <- data.frame(
     respondent_id = paste0("R", 1:40),
@@ -422,7 +422,7 @@ test_that("render_report embeds regression diagnostic panels beside the main cha
 test_that("plot.sframe_validity_report builds CR and AVE bars by construct", {
   skip_on_cran()
   skip_if_not_installed("ggplot2")
-  vr <- validity_report(list(
+  vr <- sframe_validity_results(list(
     SAT = c(sat_1 = 0.82, sat_2 = 0.78, sat_3 = 0.74),
     LOY = c(loy_1 = 0.69, loy_2 = 0.71)
   ))
@@ -484,14 +484,14 @@ test_that("plot.sframe_missing_data_report builds a missingness bar chart", {
   item_cols <- vapply(demo$instrument$items, `[[`, character(1), "id")
   item_cols <- intersect(item_cols, names(resp))
   resp[[item_cols[1]]][1:5] <- NA
-  mr <- missing_data_report(resp, demo$instrument)
+  mr <- sframe_missing_data_results(resp, demo$instrument)
   gg <- plot(mr)
   expect_s3_class(gg, "ggplot")
   expect_s3_class(sframe_plot_missingness(mr, palette = "print"), "ggplot")
 
   # Nothing missing: still a chart (a reassuring "no missing responses"
   # message), not a silent NULL that reads as a rendering failure.
-  mr_clean <- missing_data_report(demo$responses, demo$instrument)
+  mr_clean <- sframe_missing_data_results(demo$responses, demo$instrument)
   none_missing <- all(mr_clean$item_missing$missing_pct == 0)
   if (none_missing) expect_s3_class(plot(mr_clean), "ggplot")
 })

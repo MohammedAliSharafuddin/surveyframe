@@ -32,9 +32,9 @@ carries the same influence as one who allocated exactly 100. A
 reduced to its principal eigenvector.
 }
 \examples{
-study <- sf_instrument(
+study <- sframe_instrument(
   title = "Demo", components = list(
-    sf_item("pts", "Divide 100 points", type = "criteria_weight",
+    sframe_item("pts", "Divide 100 points", type = "criteria_weight",
             comparison_items = c("price", "speed"))
   )
 )

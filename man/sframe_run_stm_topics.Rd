@@ -17,7 +17,7 @@ modelling section for \code{topicmodels::perplexity()}-based selection),
 \code{seed} (default \code{42L}), \code{stop_words} (passed through to the tokeniser).}
 
 \item{instrument}{Optional \code{sframe} instrument, passed to
-\code{\link[=clean_text_responses]{clean_text_responses()}} for item-type validation.}
+\code{\link[=sframe_clean_text]{sframe_clean_text()}} for item-type validation.}
 }
 \value{
 A runner-contract result list: \code{test = "stm_topics"}, \code{table}
@@ -25,11 +25,11 @@ A runner-contract result list: \code{test = "stm_topics"}, \code{table}
 document weight, beta its per-term probability, both from the fitted
 \code{stm} object), \code{fit} (a runtime-only list holding the \code{stm} model
 object and the document-to-respondent mapping needed by
-\code{\link[=extract_quotes]{extract_quotes()}}), \code{apa}, \code{prompt}. On failure:
+\code{\link[=sframe_extract_quotes]{sframe_extract_quotes()}}), \code{apa}, \code{prompt}. On failure:
 \verb{list(test = "stm_topics", error = <message>)}.
 }
 \description{
-Cleans the text item via \code{\link[=clean_text_responses]{clean_text_responses()}}, tokenises with
+Cleans the text item via \code{\link[=sframe_clean_text]{sframe_clean_text()}}, tokenises with
 \code{tidytext::unnest_tokens()} (tidyeval column names via \code{rlang::sym()} and
 \verb{!!}, not bare symbols; see the source comment at the tokenising step for
 why), casts to a document-term matrix, converts it to \code{stm}'s corpus

@@ -1,6 +1,6 @@
 # validation_result.R
 # The sframe_validation class and its methods. Both validate_sframe() and
-# validate_model() return one of these, so a validator returns a diagnostic
+# sframe_validate_model() return one of these, so a validator returns a diagnostic
 # result rather than the object it was handed.
 
 # A small accumulator so every problem is recorded against the check that
@@ -57,11 +57,11 @@ sframe_new_validation <- function(log, roster, subject, title = NULL,
 #' Report on a validation result
 #'
 #' `sframe_validation` is the diagnostic object returned by
-#' [validate_sframe()] and [validate_model()]. It records whether the object
+#' [validate_sframe()] and [sframe_validate_model()]. It records whether the object
 #' passed, every problem found, and every check that ran, including the checks
 #' that found nothing.
 #'
-#' Use [sf_is_valid()] for the pass or fail flag, [sf_problems()] for the
+#' Use [sframe_is_valid()] for the pass or fail flag, [sframe_problems()] for the
 #' messages, `as.data.frame()` for a problem-per-row table, `summary()` for
 #' the full check roster, and [as_sframe()] to recover the validated
 #' instrument.
@@ -71,22 +71,22 @@ sframe_new_validation <- function(log, roster, subject, title = NULL,
 #'   character string. `summary()` returns the check table as a data frame.
 #'   `as.data.frame()` returns one row per problem.
 #' @name sframe_validation
-#' @seealso [validate_sframe()], [validate_model()], [sf_problems()],
-#'   [sf_is_valid()], [as_sframe()]
+#' @seealso [validate_sframe()], [sframe_validate_model()], [sframe_problems()],
+#'   [sframe_is_valid()], [as_sframe()]
 #'
 #' @examples
-#' cs    <- sf_choices("ag5", 1:5,
+#' cs    <- sframe_choice_set("ag5", 1:5,
 #'            c("Strongly disagree", "Disagree", "Neutral",
 #'              "Agree", "Strongly agree"))
-#' item  <- sf_item("sat_1", "The service met my expectations.",
+#' item  <- sframe_item("sat_1", "The service met my expectations.",
 #'                  type = "likert", choice_set = "ag5", scale_id = "sat")
-#' scale <- sf_scale("sat", "Satisfaction", items = "sat_1")
-#' instr <- sf_instrument("Demo Survey", components = list(cs, item, scale))
+#' scale <- sframe_scale("sat", "Satisfaction", items = "sat_1")
+#' instr <- sframe_instrument("Demo Survey", components = list(cs, item, scale))
 #'
 #' v <- validate_sframe(instr, strict = FALSE)
 #' v
-#' sf_is_valid(v)
-#' sf_problems(v)
+#' sframe_is_valid(v)
+#' sframe_problems(v)
 #' as.data.frame(v)
 #' summary(v)
 NULL
@@ -149,7 +149,7 @@ summary.sframe_validation <- function(object, ...) {
 #'
 #' @return A data frame with one row per validation problem and columns
 #'   `check` and `problem`.
-#' @seealso [sframe_validation], [sf_problems()]
+#' @seealso [sframe_validation], [sframe_problems()]
 #' @exportS3Method as.data.frame sframe_validation
 as.data.frame.sframe_validation <- function(x, row.names = NULL,
                                             optional = FALSE, ...) {

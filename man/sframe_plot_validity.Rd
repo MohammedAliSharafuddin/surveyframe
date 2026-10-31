@@ -7,7 +7,7 @@
 sframe_plot_validity(x, palette = c("web", "print"))
 }
 \arguments{
-\item{x}{An \code{sframe_validity_report} object from \code{\link[=validity_report]{validity_report()}}.}
+\item{x}{An \code{sframe_validity_report} object from \code{\link[=sframe_validity_results]{sframe_validity_results()}}.}
 
 \item{palette}{One of \code{"web"} or \code{"print"}. See \code{sframe_brand()}.}
 }
@@ -24,11 +24,11 @@ if (requireNamespace("ggplot2", quietly = TRUE)) {
     sq  = c(sq_1 = 0.80, sq_2 = 0.75, sq_3 = 0.78),
     sat = c(sat_1 = 0.85, sat_2 = 0.82)
   )
-  vr <- validity_report(loadings)
+  vr <- sframe_validity_results(loadings)
   sframe_plot_validity(vr)
 }
 }
 }
 \seealso{
-\code{\link[=validity_report]{validity_report()}}
+\code{\link[=sframe_validity_results]{sframe_validity_results()}}
 }

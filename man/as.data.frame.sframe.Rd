@@ -23,5 +23,5 @@ A data frame summarising the instrument's items.
 Returns one row per item in a surveyframe instrument.
 }
 \seealso{
-\link{sframe_as_data_frame}, \code{\link[=sf_items]{sf_items()}}, \code{\link[=codebook_report]{codebook_report()}}
+\link{sframe_as_data_frame}, \code{\link[=sframe_get_items]{sframe_get_items()}}, \code{\link[=sframe_codebook]{sframe_codebook()}}
 }

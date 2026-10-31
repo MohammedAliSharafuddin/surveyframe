@@ -77,26 +77,26 @@ scale, a branch (region) respondents visited, and one open-ended comments
 item asking what stood out about their visit.
 
 ```{r instrument}
-satisfaction_cs <- sf_choices(
+satisfaction_cs <- sframe_choice_set(
   "agree5", values = 1:5,
   labels = c("Strongly disagree", "Disagree", "Neutral",
              "Agree", "Strongly agree")
 )
-branch_cs <- sf_choices(
+branch_cs <- sframe_choice_set(
   "branch", values = c("north", "south"),
   labels = c("North branch", "South branch")
 )
 
-instr <- sf_instrument(
+instr <- sframe_instrument(
   title = "Hospitality feedback",
   version = "1.0.0",
   components = list(
     satisfaction_cs, branch_cs,
-    sf_item("satisfaction", "Overall, I was satisfied with my visit.",
+    sframe_item("satisfaction", "Overall, I was satisfied with my visit.",
             type = "likert", choice_set = "agree5"),
-    sf_item("branch", "Which branch did you visit?",
+    sframe_item("branch", "Which branch did you visit?",
             type = "single_choice", choice_set = "branch_cs"),
-    sf_item("comments", "What stood out about your visit, good or bad?",
+    sframe_item("comments", "What stood out about your visit, good or bad?",
             type = "textarea")
   )
 )
@@ -160,33 +160,33 @@ kable(head(responses, 4), row.names = FALSE,
 
 ## Cleaning a text item
 
-`clean_text_responses()` pulls one item's responses out of the data, drops
+`sframe_clean_text()` pulls one item's responses out of the data, drops
 blank and missing entries, and applies light, configurable cleaning. It keeps
 a `respondent` attribute mapping each cleaned entry back to its original row,
 so anything built on top (a concordance, a representative quote) can still
 cite where a response came from.
 
 ```{r clean}
-cleaned <- clean_text_responses(responses, "comments", instrument = instr)
+cleaned <- sframe_clean_text(responses, "comments", instrument = instr)
 length(cleaned)
 head(attr(cleaned, "respondent"))
 ```
 
 ## Term and n-gram frequency
 
-`term_frequency()` tokenises, lower-cases, strips punctuation, removes stop
+`sframe_term_frequency()` tokenises, lower-cases, strips punctuation, removes stop
 words (a built-in English list ships with the package, so this stage runs on base
-surveyframe), and counts. `ngram_frequency()` does the same for
+surveyframe), and counts. `sframe_ngram_frequency()` does the same for
 2-word and 3-word phrases, which surface a complaint like "long wait" that
 single-word counts would split apart.
 
 ```{r term-freq}
-terms <- term_frequency(cleaned, top_n = 10)
+terms <- sframe_term_frequency(cleaned, top_n = 10)
 kable(terms, row.names = FALSE, caption = "The 10 most frequent terms.")
 ```
 
 ```{r ngram-freq}
-bigrams <- ngram_frequency(cleaned, n = 2, top_n = 8)
+bigrams <- sframe_ngram_frequency(cleaned, n = 2, top_n = 8)
 kable(bigrams, row.names = FALSE, caption = "The 8 most frequent bigrams.")
 ```
 
@@ -195,7 +195,7 @@ Both run through the analysis plan the same way any other method does. Here,
 the table and facets the chart by a nominal or ordinal covariate.
 
 ```{r plan-term}
-sf_plan(instr) <- list(
+sframe_plan(instr) <- list(
   list(id = "RQ1",
        research_question = "What themes recur in the open-ended comments?",
        family = "text", method = "term_freq",
@@ -255,13 +255,13 @@ trend.
 
 ## Keyword in context
 
-`term_context()` builds a concordance for one keyword: every place it
+`sframe_term_context()` builds a concordance for one keyword: every place it
 appears, with a window of surrounding words on each side. It is the fastest
 way to read what a keyword actually means in context, and it settles whether
 a frequent term keeps one sense throughout.
 
 ```{r context}
-kwic <- term_context(cleaned, term = "wait", window = 5)
+kwic <- sframe_term_context(cleaned, term = "wait", window = 5)
 kable(kwic, row.names = FALSE, caption = 'Every occurrence of "wait" in context.')
 ```
 
@@ -272,7 +272,7 @@ terms appear together within the same
 response, and renders as a heatmap.
 
 ```{r cooccurrence}
-sf_plan(instr) <- c(sf_plan(instr), list(list(
+sframe_plan(instr) <- c(sframe_plan(instr), list(list(
   id = "RQ3",
   research_question = "Which terms tend to appear together in the same comment?",
   family = "text", method = "co_occurrence",
@@ -298,7 +298,7 @@ force-directed layout. Both are seeded, so the same `options$seed` always
 produces the same clusters and the same layout.
 
 ```{r network, eval = has_igraph}
-sf_plan(instr) <- c(sf_plan(instr), list(list(
+sframe_plan(instr) <- c(sframe_plan(instr), list(list(
   id = "RQ4",
   research_question = "Do the frequent terms form distinct thematic clusters?",
   family = "text", method = "co_occurrence_network",
@@ -327,7 +327,7 @@ cat("_igraph is not installed in this environment, so this section did not run."
 `"bing"` positive/negative lexicon, which arrives with tidytext itself. Like `term_freq`, it accepts an optional `group` role.
 
 ```{r sentiment, eval = has_tidytext}
-sf_plan(instr) <- c(sf_plan(instr), list(list(
+sframe_plan(instr) <- c(sframe_plan(instr), list(list(
   id = "RQ5",
   research_question = "Is sentiment in the comments more positive or negative, and does it differ by branch?",
   family = "text", method = "tidy_sentiment",
@@ -355,9 +355,9 @@ bar's own left-negative/right-positive convention, each sized and shaded
 
 ```{r sentiment-cloud, fig.alt = "Comparison word cloud: negative-sentiment terms to the left of centre in red, positive-sentiment terms to the right in teal, each sized and shaded by frequency.", eval = has_tidytext && has_ggplot}
 instr_cloud <- instr
-plan <- sf_plan(instr_cloud)
+plan <- sframe_plan(instr_cloud)
 plan[[which(vapply(plan, `[[`, "", "id") == "RQ5")]]$options <- list(wordcloud = TRUE)
-sf_plan(instr_cloud) <- plan
+sframe_plan(instr_cloud) <- plan
 
 result_cloud <- run_analysis_plan(responses, instr_cloud, plots = TRUE)
 result_cloud[["RQ5"]]$plot
@@ -375,7 +375,7 @@ summary ahead of an analysis: feature count, sparsity, and the leading features
 provide a sanity check before a heavier method.
 
 ```{r dfm, eval = has_quanteda}
-sf_plan(instr) <- c(sf_plan(instr), list(list(
+sframe_plan(instr) <- c(sframe_plan(instr), list(list(
   id = "RQ6",
   research_question = "What does the document-feature matrix of the comments look like?",
   family = "text", method = "quanteda_dfm",
@@ -412,7 +412,7 @@ same purpose for `topic_model_lda`. Both stay in their own packages.
 report, not a default to trust unexamined.
 
 ```{r stm, eval = has_stm && has_tidytext}
-sf_plan(instr) <- c(sf_plan(instr), list(list(
+sframe_plan(instr) <- c(sframe_plan(instr), list(list(
   id = "RQ7",
   research_question = "What topics organise the open-ended comments?",
   family = "text", method = "stm_topics",
@@ -430,13 +430,13 @@ results[["RQ7"]]$apa
 results[["RQ7"]]$plot
 ```
 
-`extract_quotes()` reads the fitted model back off the result and returns
+`sframe_extract_quotes()` reads the fitted model back off the result and returns
 the most representative response for each topic, with the **original**
 respondent index (not a document or matrix row number), so a quote can be
 traced back to the response that produced it.
 
 ```{r quotes, eval = has_stm && has_tidytext}
-quotes <- extract_quotes(results[["RQ7"]], text = cleaned, n_quotes = 2)
+quotes <- sframe_extract_quotes(results[["RQ7"]], text = cleaned, n_quotes = 2)
 kable(quotes, row.names = FALSE,
       caption = "The 2 most representative comments per topic.")
 ```
@@ -471,7 +471,7 @@ surveyframe also does not build a qualitative coding interface. Manual,
 inductive coding (code-and-retrieve, memos, a hierarchical code scheme, the
 qcoder or RQDA style of analysis) is a different paradigm from the
 algorithmic methods here, resting on human interpretation where these methods
-count and cluster, and is out of scope by design. `extract_quotes()`'s output is
+count and cluster, and is out of scope by design. `sframe_extract_quotes()`'s output is
 deliberately a plain data frame, clean enough to export and take into a
 dedicated qualitative coding tool for that next step, which surveyframe
 leaves to the tools built for it.

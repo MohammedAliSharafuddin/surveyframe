@@ -23,5 +23,5 @@ The reliability table stored in a validity report.
 Extract reliability evidence from a validity report
 }
 \seealso{
-\link{sframe_as_data_frame}, \code{\link[=validity_report]{validity_report()}}
+\link{sframe_as_data_frame}, \code{\link[=sframe_validity_results]{sframe_validity_results()}}
 }

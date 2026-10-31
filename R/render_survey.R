@@ -774,7 +774,7 @@ sframe_render_input <- function(item, choices_lookup, values = list()) {
   )
 }
 
-# The respondent-side JavaScript for render_survey(): ranking by drag, by
+# The respondent-side JavaScript for run_survey(): ranking by drag, by
 # keyboard and by confirmation, slider touch tracking, star ratings, and
 # branching visibility sent from the server.
 sframe_survey_js <- function() {
@@ -907,17 +907,17 @@ sframe_progress_ui <- function(answered, total, colour) {
 #'
 #' @examples
 #' \donttest{
-#' cs    <- sf_choices("ag5", 1:5,
+#' cs    <- sframe_choice_set("ag5", 1:5,
 #'            c("Strongly disagree", "Disagree", "Neutral",
 #'              "Agree", "Strongly agree"))
-#' item  <- sf_item("sat_1", "How satisfied are you?",
+#' item  <- sframe_item("sat_1", "How satisfied are you?",
 #'                  type = "likert", choice_set = "ag5")
-#' instr <- sf_instrument("My Survey", components = list(cs, item))
-#' app <- render_survey(instr)
-#' app <- render_survey(instr, save_responses = "csv",
+#' instr <- sframe_instrument("My Survey", components = list(cs, item))
+#' app <- run_survey(instr)
+#' app <- run_survey(instr, save_responses = "csv",
 #'                       output_path = tempfile(fileext = ".csv"))
 #' }
-render_survey <- function(
+run_survey <- function(
     instrument,
     mode           = c("shiny"),
     title          = NULL,
@@ -926,7 +926,7 @@ render_survey <- function(
     output_path    = NULL,
     on_submit      = NULL
 ) {
-  sframe_require_shiny("to deploy surveys with render_survey()")
+  sframe_require_shiny("to deploy surveys with run_survey()")
   sframe_check_instrument(instrument)
   mode           <- rlang::arg_match(mode)
   save_responses <- rlang::arg_match(save_responses)

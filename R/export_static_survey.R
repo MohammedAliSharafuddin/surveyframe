@@ -74,32 +74,32 @@
 #'
 #' @return The output path, invisibly.
 #' @export
-#' @seealso [launch_studio()], [launch_builder()], [render_survey()]
+#' @seealso [launch_studio()], [launch_builder()], [run_survey()]
 #'
 #' @examples
-#' cs    <- sf_choices("ag5", 1:5,
+#' cs    <- sframe_choice_set("ag5", 1:5,
 #'            c("Strongly disagree", "Disagree", "Neutral",
 #'              "Agree", "Strongly agree"))
-#' i1    <- sf_item("sat_1", "Overall I am satisfied with the service.",
+#' i1    <- sframe_item("sat_1", "Overall I am satisfied with the service.",
 #'                  type = "likert", choice_set = "ag5", required = TRUE)
-#' i2    <- sf_item("comments", "Any additional comments?", type = "textarea")
-#' instr <- sf_instrument("Customer Satisfaction Survey",
+#' i2    <- sframe_item("comments", "Any additional comments?", type = "textarea")
+#' instr <- sframe_instrument("Customer Satisfaction Survey",
 #'                        components = list(cs, i1, i2))
 #'
 #' # Write to a temp file without opening the browser
-#' out <- export_static_survey(instr,
+#' out <- export_survey(instr,
 #'                              output_path = file.path(tempdir(), "sat.html"),
 #'                              open = FALSE)
 #' file.exists(out)
 #'
 #' \donttest{
 #' # Write to a temp file and open in the default browser
-#' export_static_survey(instr,
+#' export_survey(instr,
 #'                      output_path = file.path(tempdir(), "sat_browser.html"),
 #'                      overwrite = TRUE)
 #'
 #' # Write with a Google Apps Script endpoint for server-side collection
-#' export_static_survey(
+#' export_survey(
 #'   instr,
 #'   output_path  = file.path(tempdir(), "sat_endpoint.html"),
 #'   endpoint_url = "https://script.google.com/macros/s/XXXXX/exec",
@@ -107,7 +107,7 @@
 #'   overwrite    = TRUE
 #' )
 #' }
-export_static_survey <- function(
+export_survey <- function(
     instrument,
     output_path  = NULL,
     open         = interactive(),

@@ -47,7 +47,7 @@ sframe_choice_content_problems <- function(values, labels) {
 #' that share the same response format.
 #'
 #' @param id Character. A unique identifier for this choice set. Referenced in
-#'   the `choice_set` argument of [sf_item()].
+#'   the `choice_set` argument of [sframe_item()].
 #' @param values Character or numeric vector. The stored values corresponding
 #'   to each response option. Must have the same length as `labels`.
 #' @param labels Character vector. The display labels shown to respondents.
@@ -65,11 +65,11 @@ sframe_choice_content_problems <- function(values, labels) {
 #'
 #' @return An object of class `sf_choices` (a named list).
 #' @export
-#' @seealso [sf_item()], [sf_instrument()]
+#' @seealso [sframe_item()], [sframe_instrument()]
 #'
 #' @examples
 #' # A five-point agreement scale
-#' agree5 <- sf_choices(
+#' agree5 <- sframe_choice_set(
 #'   id     = "agree5",
 #'   values = 1:5,
 #'   labels = c("Strongly disagree", "Disagree", "Neutral",
@@ -77,13 +77,13 @@ sframe_choice_content_problems <- function(values, labels) {
 #' )
 #'
 #' # An ordered set: a single_choice item on it is read as ordinal
-#' often <- sf_choices(
+#' often <- sframe_choice_set(
 #'   id      = "often",
 #'   values  = 1:4,
 #'   labels  = c("Rarely", "Sometimes", "Often", "Always"),
 #'   ordered = TRUE
 #' )
-sf_choices <- function(
+sframe_choice_set <- function(
     id,
     values,
     labels,

@@ -8,12 +8,12 @@
 # but any other role name still ran on nothing.
 
 one_choice_instrument <- function(roles, method = "frequency") {
-  sf_instrument("Roles", components = list(
-    sf_item("q1", "Preferred format", type = "single_choice", choice_set = "fmt"),
-    sf_item("q2", "Satisfaction", type = "numeric"),
-    sf_item("q3", "Value", type = "numeric"),
-    sf_item("q4", "Age", type = "numeric"),
-    sf_choices("fmt", values = c("1", "2"), labels = c("Online", "In person"))
+  sframe_instrument("Roles", components = list(
+    sframe_item("q1", "Preferred format", type = "single_choice", choice_set = "fmt"),
+    sframe_item("q2", "Satisfaction", type = "numeric"),
+    sframe_item("q3", "Value", type = "numeric"),
+    sframe_item("q4", "Age", type = "numeric"),
+    sframe_choice_set("fmt", values = c("1", "2"), labels = c("Online", "In person"))
   ), analysis_plan = list(list(
     id = "RQ1", research_question = "Which format?", method = method,
     roles = roles

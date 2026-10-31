@@ -58,7 +58,7 @@ sframe_run_quality <- function(data, instrument, roles, options) {
   for (key in c("time_min", "missing_threshold", "straightline_min_items")) {
     if (!is.null(options[[key]])) args[[key]] <- options[[key]]
   }
-  do.call(quality_report, args)
+  do.call(sframe_quality_results, args)
 }
 
 # Option keys each method reads. A key outside its method's list, and outside
@@ -270,10 +270,10 @@ sframe_require_columns <- function(data, cols, method) {
 #' @export
 #' @examples
 #' demo <- sframe_demo_data()
-#' dr <- descriptives_report(demo$responses, variables = c("sat_1", "sat_2"),
+#' dr <- sframe_descriptives_results(demo$responses, variables = c("sat_1", "sat_2"),
 #'                            split_by = "visit_type")
 #' dr$table
-descriptives_report <- function(
+sframe_descriptives_results <- function(
     data,
     variables = NULL,
     split_by = NULL,
@@ -366,9 +366,9 @@ descriptives_report <- function(
 #' @export
 #' @examples
 #' demo <- sframe_demo_data()
-#' mr <- missing_data_report(demo$responses, demo$instrument)
+#' mr <- sframe_missing_data_results(demo$responses, demo$instrument)
 #' mr$item_missing
-missing_data_report <- function(data, instrument = NULL, variables = NULL) {
+sframe_missing_data_results <- function(data, instrument = NULL, variables = NULL) {
   stopifnot(is.data.frame(data))
   if (is.null(variables)) {
     variables <- if (!is.null(instrument) && inherits(instrument, "sframe")) {
@@ -501,13 +501,13 @@ missing_data_report <- function(data, instrument = NULL, variables = NULL) {
 #'
 #' @examples
 #' demo <- sframe_demo_data()
-#' outliers <- outlier_report(
+#' outliers <- sframe_outlier_results(
 #'   demo$responses,
 #'   variables = c("dm_1", "dm_2", "sat_1"),
 #'   method = "zscore"
 #' )
 #' outliers$flagged_rows
-outlier_report <- function(
+sframe_outlier_results <- function(
     data,
     variables = NULL,
     method = c("zscore", "iqr", "mahalanobis"),
@@ -656,10 +656,10 @@ sframe_small_sample_advisory <- function(n, test) {
 #' @export
 #' @examples
 #' demo <- sframe_demo_data()
-#' ar <- assumption_report(demo$responses, variables = c("sat_1", "sat_2"),
+#' ar <- sframe_assumption_results(demo$responses, variables = c("sat_1", "sat_2"),
 #'                          group = "visit_type")
 #' print(ar)
-assumption_report <- function(
+sframe_assumption_results <- function(
     data,
     variables = NULL,
     group = NULL,
@@ -835,10 +835,10 @@ print.sframe_assumption_report <- function(x, ...) {
 #' @export
 #' @examples
 #' demo <- sframe_demo_data()
-#' pr <- posthoc_report(demo$responses, method = "kruskal_wallis",
+#' pr <- sframe_posthoc_results(demo$responses, method = "kruskal_wallis",
 #'                       outcome = "sat_1", group = "visit_type")
 #' pr$tables$pairwise_wilcox
-posthoc_report <- function(
+sframe_posthoc_results <- function(
     data,
     method = c("anova", "kruskal_wallis", "chi_square", "cochran_q"),
     outcome = NULL,
@@ -1083,7 +1083,7 @@ sframe_run_descriptives_result <- function(data, roles, options = list(),
       prompt = "Report the count and percentage for each category, and note any dominant category."
     ))
   }
-  out <- descriptives_report(
+  out <- sframe_descriptives_results(
     data,
     variables = if (length(numeric_vars)) numeric_vars else NULL,
     split_by = split_by,
@@ -1203,7 +1203,7 @@ sframe_choice_counts_table <- function(data, columns, kinds, instrument,
 
 sframe_run_missing_result <- function(data, instrument, roles) {
   vars <- sframe_role_values(roles, c("variables", "items"))
-  out <- missing_data_report(data, instrument = instrument, variables = if (length(vars)) vars else NULL)
+  out <- sframe_missing_data_results(data, instrument = instrument, variables = if (length(vars)) vars else NULL)
   # The runtime report keeps the original classed object so sframe_plot_for_result()
   # can dispatch plot.sframe_missing_data_report() on it, the same pattern
   # sframe_result_from_report() uses for quality/reliability/EFA.
@@ -1977,9 +1977,9 @@ sframe_run_mediation <- function(data, roles, options = list()) {
 #'   sq  = c(sq_1 = 0.80, sq_2 = 0.75, sq_3 = 0.78),
 #'   sat = c(sat_1 = 0.85, sat_2 = 0.82)
 #' )
-#' vr <- validity_report(loadings)
+#' vr <- sframe_validity_results(loadings)
 #' vr$reliability
-validity_report <- function(loadings, construct_scores = NULL,
+sframe_validity_results <- function(loadings, construct_scores = NULL,
                             items_by_construct = NULL) {
   if (is.list(loadings) && !is.data.frame(loadings)) {
     loadings <- do.call(rbind, lapply(names(loadings), function(con) {
@@ -2170,7 +2170,7 @@ sframe_henseler_htmt <- function(items_by_construct) {
 #'   `"rule_of_thumb"` or `"none"`), `alpha`, `power`, `effect_size`,
 #'   `warnings`, `advisory` and `prompt`.
 #' @usage
-#' sample_size_plan(
+#' sframe_sample_size_plan(
 #'   type = c("proportion", "mean", "correlation", "t_test", "anova",
 #'     "regression", "sem"),
 #'   margin_error = NULL,
@@ -2187,10 +2187,10 @@ sframe_henseler_htmt <- function(items_by_construct) {
 #' )
 #' @export
 #' @examples
-#' plan <- sample_size_plan("t_test", d = 0.5, power = 0.80)
+#' plan <- sframe_sample_size_plan("t_test", d = 0.5, power = 0.80)
 #' plan$estimated_n
 #' plan$method
-sample_size_plan <- function(
+sframe_sample_size_plan <- function(
     type = c("proportion", "mean", "correlation", "t_test", "anova", "regression", "sem"),
     margin_error = NULL,
     sd = NULL,

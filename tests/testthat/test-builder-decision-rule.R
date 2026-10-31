@@ -7,9 +7,9 @@
 # which saves interpretation only.
 
 rule_instrument <- function() {
-  sf_instrument("Rule", components = list(
-    sf_item("score", "Score", type = "numeric"),
-    sf_item("age", "Age", type = "numeric")))
+  sframe_instrument("Rule", components = list(
+    sframe_item("score", "Score", type = "numeric"),
+    sframe_item("age", "Age", type = "numeric")))
 }
 
 rule_context <- function() {

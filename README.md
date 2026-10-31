@@ -100,12 +100,12 @@ instrument that matches your column names and load the data directly:
 library(surveyframe)
 
 # 1. Describe the items you already collected
-cs  <- sf_choices("agree5", 1:5,
+cs  <- sframe_choice_set("agree5", 1:5,
         c("Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"))
-i1  <- sf_item("q1", "Item 1", type = "likert", choice_set = "agree5", scale_id = "S")
-i2  <- sf_item("q2", "Item 2", type = "likert", choice_set = "agree5", scale_id = "S")
-sc  <- sf_scale("S", "My scale", items = c("q1", "q2"))
-instr <- sf_instrument("My study", components = list(cs, i1, i2, sc))
+i1  <- sframe_item("q1", "Item 1", type = "likert", choice_set = "agree5", scale_id = "S")
+i2  <- sframe_item("q2", "Item 2", type = "likert", choice_set = "agree5", scale_id = "S")
+sc  <- sframe_scale("S", "My scale", items = c("q1", "q2"))
+instr <- sframe_instrument("My study", components = list(cs, i1, i2, sc))
 
 # 2. Load your CSV
 responses <- read_responses("my_data.csv", instr, strict = FALSE)
@@ -145,30 +145,30 @@ browseVignettes("surveyframe")
 ```r
 library(surveyframe)
 
-agree5 <- sf_choices(
+agree5 <- sframe_choice_set(
   "agree5",
   values = 1:5,
   labels = c("Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree")
 )
 
-visitor_type_choices <- sf_choices(
+visitor_type_choices <- sframe_choice_set(
   "visitor_type",
   values = c("first_time", "repeat"),
   labels = c("First-time visitor", "Repeat visitor")
 )
 
-sat_1 <- sf_item("sat_1", "The service was reliable.",
+sat_1 <- sframe_item("sat_1", "The service was reliable.",
   type = "likert", choice_set = "agree5", scale_id = "sat")
-sat_2 <- sf_item("sat_2", "The service was responsive.",
+sat_2 <- sframe_item("sat_2", "The service was responsive.",
   type = "likert", choice_set = "agree5", scale_id = "sat")
-sat_3 <- sf_item("sat_3", "I would recommend the service.",
+sat_3 <- sframe_item("sat_3", "I would recommend the service.",
   type = "likert", choice_set = "agree5", scale_id = "sat")
 
-visitor_type <- sf_item("visitor_type", "Visitor type", type = "single_choice",
+visitor_type <- sframe_item("visitor_type", "Visitor type", type = "single_choice",
   choice_set = "visitor_type")
-sat <- sf_scale("sat", "Satisfaction", items = c("sat_1", "sat_2", "sat_3"))
+sat <- sframe_scale("sat", "Satisfaction", items = c("sat_1", "sat_2", "sat_3"))
 
-instr <- sf_instrument(
+instr <- sframe_instrument(
   "Service Survey",
   components = list(
     agree5, visitor_type_choices, sat_1, sat_2, sat_3, visitor_type, sat
@@ -188,12 +188,12 @@ instr <- sf_instrument(
 write_sframe(instr, tempfile(fileext = ".sframe"))
 
 # See the instrument as a survey a respondent would fill in:
-export_static_survey(instr, open = FALSE)
+export_survey(instr, open = FALSE)
 ```
 
 `write_sframe()` validates the instrument and writes the validated object,
 including the validation flag, the analysis plan, and any saved model
-specifications. `export_static_survey()` renders it as a self-contained
+specifications. `export_survey()` renders it as a self-contained
 HTML survey, the same function covered in "Visual tools" below.
 
 ## Import and score
@@ -210,7 +210,7 @@ responses <- data.frame(
 resp <- read_responses(responses, instr, respondent_id = "respondent_id", strict = FALSE)
 
 score_scales(resp, instr)
-missing_data_report(resp, instr)
+sframe_missing_data_results(resp, instr)
 ```
 
 ## Run the analysis plan
@@ -248,47 +248,47 @@ from the techniques used.
 
 ```r
 if (requireNamespace("psych", quietly = TRUE)) {
-  reliability_report(resp, instr, omega = FALSE)
-  efa_report(resp, instr)
+  sframe_reliability_results(resp, instr, omega = FALSE)
+  sframe_efa_readiness_results(resp, instr)
 }
 
-cfa_syntax(instr)
-cfa_lavaan_syntax(instr, ordered = TRUE)
+sframe_syntax_cfa(instr)
+sframe_syntax_cfa(instr, ordered = TRUE)
 ```
 
 ## Model layer
 
 ```r
-model <- sf_model(
+model <- sframe_model_spec(
   "model_1",
   "Satisfaction model",
   type = "cb_sem",
   constructs = list(
-    sf_construct("SAT", "Satisfaction", c("sat_1", "sat_2", "sat_3"))
+    sframe_construct("SAT", "Satisfaction", c("sat_1", "sat_2", "sat_3"))
   )
 )
 
-instr <- add_model(instr, model)
-model_json(model)
-sem_lavaan_syntax(model, instr)
+instr <- sframe_add_model(instr, model)
+sframe_model_json(model)
+sframe_syntax_sem(model, instr)
 ```
 
 ## PLS-SEM syntax
 
 ```r
-pls_model <- sf_model(
+pls_model <- sframe_model_spec(
   "pls_1",
   "Satisfaction and loyalty PLS model",
   type = "pls_sem",
   constructs = list(
-    sf_construct("SAT", "Satisfaction", c("sat_1", "sat_2"), mode = "composite"),
-    sf_construct("LOY", "Loyalty", "sat_3", mode = "single_item")
+    sframe_construct("SAT", "Satisfaction", c("sat_1", "sat_2"), mode = "composite"),
+    sframe_construct("LOY", "Loyalty", "sat_3", mode = "single_item")
   ),
-  paths = list(sf_path("SAT", "LOY")),
+  paths = list(sframe_path("SAT", "LOY")),
   options = list(bootstrap = 5000)
 )
 
-seminr_syntax(pls_model)
+sframe_syntax_pls(pls_model)
 ```
 
 ## A full study report
@@ -314,7 +314,7 @@ available locally, `render_report()` can use the bundled template.
 
 ```r
 launch_builder(open = FALSE)
-export_static_survey(instr, open = FALSE)
+export_survey(instr, open = FALSE)
 ```
 
 Use `launch_builder()` to author the questionnaire, the plan, and the model and
@@ -330,7 +330,7 @@ launch_builder_demo(open = FALSE)
 ```
 
 Interactive functions such as `launch_builder(open = TRUE)`, `launch_studio()`,
-`render_survey()`, and `launch_dashboard()` are available for manual use. Tests
+`run_survey()`, and `launch_dashboard()` are available for manual use. Tests
 and examples avoid opening browsers.
 
 ## Roadmap
@@ -364,7 +364,7 @@ with no signal, and in scoring, where the report path recomputed scale
 scores by a second method that ignored reverse coding and the declared
 minimum. Some numbers therefore move between 0.4.1 and 0.4.2, and
 `NEWS.md` says which, under "What you need to change". Reports also gained a
-folded "Show R code" block, and `analysis_syntax()` returns the
+folded "Show R code" block, and `sframe_syntax_result()` returns the
 statistical call behind a result with its variables and options resolved,
 so a reader can copy the code and reproduce the number.
 

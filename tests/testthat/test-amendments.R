@@ -8,13 +8,13 @@
 # effortful, not silently as easy as a data correction.
 
 amend_instr <- function(label = "q1") {
-  item <- sf_item("q1", "How satisfied are you?", type = "text")
-  sf_instrument("Demo", components = list(item))
+  item <- sframe_item("q1", "How satisfied are you?", type = "text")
+  sframe_instrument("Demo", components = list(item))
 }
 
 amend_instr_revised <- function() {
-  item <- sf_item("q1", "How satisfied are you overall?", type = "text")
-  sf_instrument("Demo", components = list(item))
+  item <- sframe_item("q1", "How satisfied are you overall?", type = "text")
+  sframe_instrument("Demo", components = list(item))
 }
 
 test_that("a disclosed pipeline amendment succeeds without a deviation report", {
@@ -24,7 +24,7 @@ test_that("a disclosed pipeline amendment succeeds without a deviation report", 
     reason_code = "data_correction",
     reason_text = "Corrected a mis-keyed respondent ID."
   )
-  log <- amendment_log(amended)
+  log <- sframe_get_amendments(amended)
   expect_equal(nrow(log), 1)
   expect_equal(log$tier, "pipeline")
   expect_equal(log$reason_code, "data_correction")
@@ -39,7 +39,7 @@ test_that("bot_removal also defaults to pipeline tier", {
     reason_code = "bot_removal",
     reason_text = "Removed 4 responses matching the bot-timing signature."
   )
-  expect_equal(amendment_log(amended)$tier, "pipeline")
+  expect_equal(sframe_get_amendments(amended)$tier, "pipeline")
 })
 
 test_that("a design-tier amendment without deviation_report errors", {
@@ -64,7 +64,7 @@ test_that("a design-tier amendment with deviation_report succeeds and logs signo
     reason_text = "Dropped a misfitting indicator.",
     deviation_report = "Item cross-loaded on the pilot data; dropped before the main run."
   )
-  log <- amendment_log(amended)
+  log <- sframe_get_amendments(amended)
   expect_equal(log$tier, "design")
   expect_equal(log$signoff, "none")
   expect_true(nzchar(log$deviation_report))
@@ -80,7 +80,7 @@ test_that("a design-tier amendment records a supplied second_signoff", {
     deviation_report = "Wording only; no change to the construct measured.",
     second_signoff = "Ethics Board Ref 2026-114"
   )
-  expect_equal(amendment_log(amended)$signoff, "Ethics Board Ref 2026-114")
+  expect_equal(sframe_get_amendments(amended)$signoff, "Ethics Board Ref 2026-114")
 })
 
 test_that("reason_code must be one of the controlled vocabulary", {
@@ -108,12 +108,12 @@ test_that("changed_fields reflects the actual diff between previous and instrume
     reason_text = "Wording clarified.",
     deviation_report = "Wording only."
   )
-  expect_match(amendment_log(amended)$changed_fields, "items")
+  expect_match(sframe_get_amendments(amended)$changed_fields, "items")
 })
 
-test_that("amendment_log() returns a zero-row data frame for an unamended instrument", {
+test_that("sframe_get_amendments() returns a zero-row data frame for an unamended instrument", {
   instr <- amend_instr()
-  log <- amendment_log(instr)
+  log <- sframe_get_amendments(instr)
   expect_equal(nrow(log), 0)
   expect_true(all(c("timestamp", "reason_code", "tier", "signoff",
                     "previous_hash", "new_hash") %in% names(log)))
@@ -123,7 +123,7 @@ test_that("multiple amendments accumulate as an ordered log, not an overwrite", 
   instr <- amend_instr()
   a1 <- amend_sframe(instr, instr, reason_code = "data_correction", reason_text = "fix 1")
   a2 <- amend_sframe(a1, a1, reason_code = "bot_removal", reason_text = "fix 2")
-  log <- amendment_log(a2)
+  log <- sframe_get_amendments(a2)
   expect_equal(nrow(log), 2)
   expect_equal(log$reason_text, c("fix 1", "fix 2"))
 })
@@ -143,11 +143,11 @@ test_that("a second amendment still accumulates when the 'after' object was not 
   # history) rather than previous$amendments (the actual prior history).
   instr <- amend_instr()
   a1 <- amend_sframe(instr, instr, reason_code = "data_correction", reason_text = "fix 1")
-  expect_equal(nrow(amendment_log(a1)), 1)
+  expect_equal(nrow(sframe_get_amendments(a1)), 1)
 
   fresh_after <- amend_instr_revised()  # built from scratch, carries no amendments
   a2 <- amend_sframe(a1, fresh_after, reason_code = "bot_removal", reason_text = "fix 2")
-  log <- amendment_log(a2)
+  log <- sframe_get_amendments(a2)
   expect_equal(nrow(log), 2)
   expect_equal(log$reason_text, c("fix 1", "fix 2"))
 })
@@ -164,8 +164,8 @@ test_that("amendments survive a write_sframe()/read_sframe() round trip", {
   path <- tempfile(fileext = ".sframe")
   write_sframe(amended, path, overwrite = TRUE)
   back <- read_sframe(path)
-  expect_equal(nrow(amendment_log(back)), 1)
-  expect_equal(amendment_log(back)$reason_code, "instrument_revision")
+  expect_equal(nrow(sframe_get_amendments(back)), 1)
+  expect_equal(sframe_get_amendments(back)$reason_code, "instrument_revision")
 })
 
 test_that("an instrument with no amendments hashes identically to before this feature existed", {

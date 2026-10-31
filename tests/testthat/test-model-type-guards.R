@@ -5,69 +5,69 @@
 # one declared. The mismatch is now refused on both sides.
 
 cb_model <- function() {
-  sf_model(
+  sframe_model_spec(
     "cb_1", "CB-SEM model", type = "cb_sem",
     constructs = list(
-      sf_construct("SAT", "Satisfaction", c("sat_1", "sat_2")),
-      sf_construct("LOY", "Loyalty", c("loy_1", "loy_2"))
+      sframe_construct("SAT", "Satisfaction", c("sat_1", "sat_2")),
+      sframe_construct("LOY", "Loyalty", c("loy_1", "loy_2"))
     ),
-    paths = list(sf_path("SAT", "LOY"))
+    paths = list(sframe_path("SAT", "LOY"))
   )
 }
 
 pls_model <- function() {
-  sf_model(
+  sframe_model_spec(
     "pls_1", "PLS-SEM model", type = "pls_sem",
     constructs = list(
-      sf_construct("SAT", "Satisfaction", c("sat_1", "sat_2"),
+      sframe_construct("SAT", "Satisfaction", c("sat_1", "sat_2"),
                    mode = "composite"),
-      sf_construct("LOY", "Loyalty", c("loy_1", "loy_2"),
+      sframe_construct("LOY", "Loyalty", c("loy_1", "loy_2"),
                    mode = "composite")
     ),
-    paths = list(sf_path("SAT", "LOY"))
+    paths = list(sframe_path("SAT", "LOY"))
   )
 }
 
-test_that("seminr_syntax() refuses a covariance-based model", {
-  expect_error(seminr_syntax(cb_model()), class = "sframe_validation_error")
-  expect_error(seminr_syntax(cb_model()), "cb_sem")
+test_that("sframe_syntax_pls() refuses a covariance-based model", {
+  expect_error(sframe_syntax_pls(cb_model()), class = "sframe_validation_error")
+  expect_error(sframe_syntax_pls(cb_model()), "cb_sem")
 })
 
-test_that("sem_lavaan_syntax() refuses a PLS-SEM model", {
-  expect_error(sem_lavaan_syntax(pls_model()),
+test_that("sframe_syntax_sem() refuses a PLS-SEM model", {
+  expect_error(sframe_syntax_sem(pls_model()),
                class = "sframe_validation_error")
-  expect_error(sem_lavaan_syntax(pls_model()), "pls_sem")
+  expect_error(sframe_syntax_sem(pls_model()), "pls_sem")
 })
 
-test_that("cfa_lavaan_syntax() refuses PLS-SEM, still allows model = NULL", {
-  expect_error(cfa_lavaan_syntax(model = pls_model()),
+test_that("sframe_syntax_cfa() refuses PLS-SEM, still allows model = NULL", {
+  expect_error(sframe_syntax_cfa(model = pls_model()),
                class = "sframe_validation_error")
 
   # deriving the measurement model from an instrument's scales is unaffected
-  instr <- sf_instrument(
+  instr <- sframe_instrument(
     title = "CFA from scales", version = "1.0.0",
     components = list(
-      sf_choices("ag5", 1:5, c("SD", "D", "N", "A", "SA")),
-      sf_item("sat_1", "Item 1", type = "likert", choice_set = "ag5",
+      sframe_choice_set("ag5", 1:5, c("SD", "D", "N", "A", "SA")),
+      sframe_item("sat_1", "Item 1", type = "likert", choice_set = "ag5",
               scale_id = "sat"),
-      sf_item("sat_2", "Item 2", type = "likert", choice_set = "ag5",
+      sframe_item("sat_2", "Item 2", type = "likert", choice_set = "ag5",
               scale_id = "sat"),
-      sf_scale("sat", "Satisfaction", items = c("sat_1", "sat_2"))
+      sframe_scale("sat", "Satisfaction", items = c("sat_1", "sat_2"))
     )
   )
-  expect_match(cfa_lavaan_syntax(instr), "sat =~", fixed = TRUE)
+  expect_match(sframe_syntax_cfa(instr), "sat =~", fixed = TRUE)
 })
 
 test_that("the matching generator still works for each family", {
-  expect_match(seminr_syntax(pls_model()), "measurement_model <- constructs",
+  expect_match(sframe_syntax_pls(pls_model()), "measurement_model <- constructs",
                fixed = TRUE)
-  expect_match(sem_lavaan_syntax(cb_model()), "SAT =~", fixed = TRUE)
+  expect_match(sframe_syntax_sem(cb_model()), "SAT =~", fixed = TRUE)
 })
 
 test_that("the error explains the consequence, not just the mismatch", {
-  err <- tryCatch(seminr_syntax(cb_model()),
+  err <- tryCatch(sframe_syntax_pls(cb_model()),
                   error = function(e) conditionMessage(e))
-  expect_match(err, "seminr_syntax\\(\\)")
+  expect_match(err, "sframe_syntax_pls\\(\\)")
   expect_match(err, "partial-least-squares")
   expect_match(err, "different model")
 })
@@ -75,7 +75,7 @@ test_that("the error explains the consequence, not just the mismatch", {
 test_that("a model with no declared type is refused rather than guessed at", {
   m <- cb_model()
   m$type <- NULL
-  expect_error(seminr_syntax(m), class = "sframe_validation_error")
+  expect_error(sframe_syntax_pls(m), class = "sframe_validation_error")
 })
 
 test_that("the demo instruments wire each syntax block to a fitting model", {

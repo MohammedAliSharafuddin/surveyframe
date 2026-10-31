@@ -6,8 +6,8 @@
 # message.
 
 run_block <- function(method, roles, data, family = "inferential", options = list()) {
-  items <- lapply(names(data), function(n) sf_item(n, n, type = "text"))
-  inst <- sf_instrument(
+  items <- lapply(names(data), function(n) sframe_item(n, n, type = "text"))
+  inst <- sframe_instrument(
     title = "Runner messages", version = "1.0.0", components = items,
     analysis_plan = list(list(
       id = "RQ3", research_question = "Why?", family = family,
@@ -59,10 +59,10 @@ test_that("ANCOVA names the block, the data problem, the remedy and R's message"
 
 test_that("EFA readiness with no usable rows says what is missing", {
   d <- data.frame(a = c(NA_real_, NA, NA), b = c(NA_real_, NA, NA), c = c(NA_real_, NA, NA))
-  items <- lapply(names(d), function(n) sf_item(n, n, type = "likert"))
-  inst <- sf_instrument(
+  items <- lapply(names(d), function(n) sframe_item(n, n, type = "likert"))
+  inst <- sframe_instrument(
     title = "EFA", version = "1.0.0",
-    components = c(items, list(sf_scale("S", "S", items = c("a", "b", "c")))),
+    components = c(items, list(sframe_scale("S", "S", items = c("a", "b", "c")))),
     analysis_plan = list(list(id = "RQ3", research_question = "Why?",
       family = "psychometric", method = "efa_readiness", roles = list(scales = "S")))
   )

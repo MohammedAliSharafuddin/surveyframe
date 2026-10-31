@@ -1,6 +1,6 @@
 # tests/testthat/test-text-ngram-context.R
 # N-gram frequency and keyword-in-context (todo_text_analysis.md), built on the lead
-# reference diff in test-text-analysis.R: ngram_frequency(), term_context(),
+# reference diff in test-text-analysis.R: sframe_ngram_frequency(), sframe_term_context(),
 # sframe_run_ngram_freq(), sframe_run_term_context().
 
 phrases <- c(
@@ -19,12 +19,12 @@ phrases <- c(
 )
 
 make_text_instrument <- function() {
-  sf_instrument(
+  sframe_instrument(
     title = "Text analysis fixture",
     version = "1.0.0",
     components = list(
-      sf_item("comments", "Any comments about your stay?", type = "textarea"),
-      sf_item("branch", "Which branch?", type = "single_choice",
+      sframe_item("comments", "Any comments about your stay?", type = "textarea"),
+      sframe_item("branch", "Which branch?", type = "single_choice",
               choice_set = "branch_cs")
     )
   )
@@ -50,7 +50,7 @@ run_term_context <- function(data, roles, options = list(), instrument = NULL) {
 }
 
 # ---------------------------------------------------------------------------
-# ngram_frequency()
+# sframe_ngram_frequency()
 # ---------------------------------------------------------------------------
 
 test_that("ngram_frequency counts bigrams correctly on a tiny hand-verified fixture", {
@@ -59,7 +59,7 @@ test_that("ngram_frequency counts bigrams correctly on a tiny hand-verified fixt
   #   "clean" "room" "clean" "room"  -> bigrams: clean-room, room-clean, clean-room
   #   "clean" "room" "small" "room"  -> bigrams: clean-room, room-small, small-room
   # Total bigrams: clean room x3, room clean x1, room small x1, small room x1
-  tbl <- ngram_frequency(txt, n = 2L, stop_words = character(0))
+  tbl <- sframe_ngram_frequency(txt, n = 2L, stop_words = character(0))
   expect_equal(tbl$term[1], "clean room")
   expect_equal(tbl$n[1], 3L)
   expect_equal(sum(tbl$n), 6L)
@@ -69,7 +69,7 @@ test_that("ngram_frequency counts trigrams correctly on a tiny hand-verified fix
   txt <- c("clean room every time", "clean room every visit")
   # Tokens: clean room every time / clean room every visit
   # Trigrams: "clean room every" x2, "room every time" x1, "room every visit" x1
-  tbl <- ngram_frequency(txt, n = 3L, stop_words = character(0))
+  tbl <- sframe_ngram_frequency(txt, n = 3L, stop_words = character(0))
   expect_equal(tbl$term[1], "clean room every")
   expect_equal(tbl$n[1], 2L)
   expect_equal(sum(tbl$n), 4L)
@@ -78,34 +78,34 @@ test_that("ngram_frequency counts trigrams correctly on a tiny hand-verified fix
 test_that("ngram_frequency removes stop words before building n-grams by default", {
   # "the" is a stop word, so it never appears inside a returned bigram, and
   # the surviving tokens close the gap it leaves rather than skip a slot.
-  tbl <- ngram_frequency("the clean room and the small room", n = 2L)
+  tbl <- sframe_ngram_frequency("the clean room and the small room", n = 2L)
   expect_false(any(grepl("\\bthe\\b", tbl$term)))
   expect_true("clean room" %in% tbl$term)
 })
 
 test_that("ngram_frequency respects top_n", {
-  cleaned <- clean_text_responses(make_text_data(), "comments")
-  tbl <- ngram_frequency(cleaned, n = 2L, top_n = 3L)
+  cleaned <- sframe_clean_text(make_text_data(), "comments")
+  tbl <- sframe_ngram_frequency(cleaned, n = 2L, top_n = 3L)
   expect_lte(nrow(tbl), 3L)
 })
 
 test_that("ngram_frequency on empty input returns a 0-row table, not an error", {
-  tbl <- ngram_frequency(character(0), n = 2L)
+  tbl <- sframe_ngram_frequency(character(0), n = 2L)
   expect_equal(nrow(tbl), 0L)
   expect_equal(names(tbl), c("term", "n", "pct"))
 })
 
 test_that("ngram_frequency on responses shorter than n returns a 0-row table", {
-  tbl <- ngram_frequency(c("clean", "room"), n = 3L, stop_words = character(0))
+  tbl <- sframe_ngram_frequency(c("clean", "room"), n = 3L, stop_words = character(0))
   expect_equal(nrow(tbl), 0L)
 })
 
 # ---------------------------------------------------------------------------
-# term_context()
+# sframe_term_context()
 # ---------------------------------------------------------------------------
 
 test_that("term_context matches a whole word, case-insensitively", {
-  tbl <- term_context(structure("the room was clean and the staff nice",
+  tbl <- sframe_term_context(structure("the room was clean and the staff nice",
                                 respondent = 7L), "ROOM")
   expect_equal(nrow(tbl), 1L)
   expect_equal(tbl$match[1], "room")
@@ -113,47 +113,47 @@ test_that("term_context matches a whole word, case-insensitively", {
 })
 
 test_that("term_context does not match a substring: 'room' does not match 'roomy'", {
-  tbl <- term_context("the roomy felt roomy", "room")
+  tbl <- sframe_term_context("the roomy felt roomy", "room")
   expect_equal(nrow(tbl), 0L)
 })
 
 test_that("term_context truncates before/after to the window size", {
   txt <- "one two three four room five six seven eight"
-  tbl <- term_context(txt, "room", window = 2L)
+  tbl <- sframe_term_context(txt, "room", window = 2L)
   expect_equal(tbl$before[1], "three four")
   expect_equal(tbl$after[1], "five six")
 })
 
 test_that("term_context handles a match at the start or end of a response", {
-  tbl_start <- term_context("room was clean today", "room", window = 3L)
+  tbl_start <- sframe_term_context("room was clean today", "room", window = 3L)
   expect_equal(tbl_start$before[1], "")
   expect_equal(tbl_start$after[1], "was clean today")
 
-  tbl_end <- term_context("the staff loved the room", "room", window = 3L)
+  tbl_end <- sframe_term_context("the staff loved the room", "room", window = 3L)
   expect_equal(tbl_end$after[1], "")
   expect_equal(tbl_end$before[1], "staff loved the")
 })
 
 test_that("term_context caps total matches at max_matches across responses", {
   txt <- rep("the room was a lovely room", 10)
-  tbl <- term_context(txt, "room", max_matches = 5L)
+  tbl <- sframe_term_context(txt, "room", max_matches = 5L)
   expect_equal(nrow(tbl), 5L)
 })
 
 test_that("term_context uses the respondent attribute when present, else seq_along", {
-  cleaned <- clean_text_responses(make_text_data(), "comments")
+  cleaned <- sframe_clean_text(make_text_data(), "comments")
   resp_attr <- attr(cleaned, "respondent")
-  tbl <- term_context(cleaned, "room", max_matches = 100L)
+  tbl <- sframe_term_context(cleaned, "room", max_matches = 100L)
   expect_true(all(tbl$respondent %in% resp_attr))
 
   no_attr <- c("the small room was clean", "no match here")
-  tbl2 <- term_context(no_attr, "room")
+  tbl2 <- sframe_term_context(no_attr, "room")
   expect_equal(tbl2$respondent[1], 1L)
 })
 
 test_that("term_context errors clearly when term is missing or blank", {
-  expect_error(term_context("the room was clean", ""), class = "sframe_error")
-  expect_error(term_context("the room was clean", NA_character_), class = "sframe_error")
+  expect_error(sframe_term_context("the room was clean", ""), class = "sframe_error")
+  expect_error(sframe_term_context("the room was clean", NA_character_), class = "sframe_error")
 })
 
 # ---------------------------------------------------------------------------

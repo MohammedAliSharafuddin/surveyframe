@@ -56,7 +56,7 @@ test_that("15: the signed-rank r uses the same pairs as its test and interval", 
 
 test_that("16: a collapsed bootstrap distribution gives no interval, with a reason", {
   tab <- table(c("a", "a", "a", "b", "b", "b"), c("x", "x", "x", "y", "y", "y"))
-  ci <- cramers_v_ci(tab, R = 500, seed = 1)
+  ci <- sframe_cramers_v_ci(tab, R = 500, seed = 1)
   expect_true(is.na(ci[["lower"]]) && is.na(ci[["upper"]]))
   expect_false(is.null(attr(ci, "reason")))
   expect_identical(attr(ci, "resamples"), 500L)
@@ -64,7 +64,7 @@ test_that("16: a collapsed bootstrap distribution gives no interval, with a reas
 
 test_that("16: a usable interval reports how many resamples it used", {
   set.seed(2)
-  ci <- cohens_d_ci(stats::rnorm(40), stats::rnorm(40, .5), R = 400, seed = 3)
+  ci <- sframe_cohens_d_ci(stats::rnorm(40), stats::rnorm(40, .5), R = 400, seed = 3)
   expect_true(all(is.finite(ci[c("lower", "upper")])))
   expect_identical(attr(ci, "resamples"), 400L)
   expect_identical(attr(ci, "valid_resamples"), 400L)

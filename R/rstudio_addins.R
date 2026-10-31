@@ -109,8 +109,8 @@ sframe_addin_editor <- function() {
 # validates the resulting instrument. A skeleton that does not build a valid
 # instrument is worse than no skeleton, and the implementation guide's
 # original version was written against an API that no longer exists: it
-# passed id = to sf_instrument(), named the component list items =, and
-# handed sf_item() an inline choices = argument. Choice sets are declared as
+# passed id = to sframe_instrument(), named the component list items =, and
+# handed sframe_item() an inline choices = argument. Choice sets are declared as
 # their own component and referenced by id.
 #
 # 3 items per scale, not 2 (fixed 2026-08-15). Alpha on exactly 2 items
@@ -121,24 +121,24 @@ sframe_addin_editor <- function() {
 # floor as if it were normal practice.
 sframe_addin_skeleton <- function() {
   paste(
-    'instrument <- sf_instrument(',
+    'instrument <- sframe_instrument(',
     '  title       = "My study",',
     '  version     = "1.0.0",',
     '  description = "One line on what this instrument measures.",',
     '  components  = list(',
-    '    sf_choices(',
+    '    sframe_choice_set(',
     '      "agree5",',
     '      values = 1:5,',
     '      labels = c("Strongly disagree", "Disagree", "Neutral",',
     '                 "Agree", "Strongly agree")',
     '    ),',
-    '    sf_item("q1", "First item text.", type = "likert",',
+    '    sframe_item("q1", "First item text.", type = "likert",',
     '            choice_set = "agree5", scale_id = "construct_1"),',
-    '    sf_item("q2", "Second item text.", type = "likert",',
+    '    sframe_item("q2", "Second item text.", type = "likert",',
     '            choice_set = "agree5", scale_id = "construct_1"),',
-    '    sf_item("q3", "Third item text.", type = "likert",',
+    '    sframe_item("q3", "Third item text.", type = "likert",',
     '            choice_set = "agree5", scale_id = "construct_1"),',
-    '    sf_scale("construct_1", "Construct one", items = c("q1", "q2", "q3"))',
+    '    sframe_scale("construct_1", "Construct one", items = c("q1", "q2", "q3"))',
     '  ),',
     '  analysis_plan = list(',
     '    list(',

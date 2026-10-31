@@ -62,6 +62,96 @@ can be written again, and every plan result can be serialised by a host.
   per session, naming its replacement, so a script or a host can find every
   old call before the old names start warning by default.
 
+* **Every exported function takes the `sframe_` prefix or a stage verb.**
+  The stage verbs keep their names (`read_sframe()`, `write_sframe()`,
+  `validate_sframe()`, `amend_sframe()`, `read_responses()`, `score_scales()`,
+  `run_analysis_plan()`, `render_report()`, `launch_builder()` and
+  `launch_studio()`), and 3 change: `run_survey()`, `export_survey()` and
+  `export_responses()`. The 7 listers 1 letter from a maker become
+  `sframe_get_*()`, so `sframe_get_items()` lists what `sframe_item()` makes.
+  Functions that return results and write no file end in `_results`, and the
+  syntax generators start `sframe_syntax_`. `cfa_syntax()` and
+  `cfa_lavaan_syntax()` become 1 function, `sframe_syntax_cfa()`. The R code
+  SurveyStudio, the report template and `sframe_syntax_result()` write
+  uses the new names. `?superseded` lists the 74 old names:
+
+  | Old name | New name |
+  |---|---|
+  | `sf_instrument()` | `sframe_instrument()` |
+  | `sf_item()` | `sframe_item()` |
+  | `sf_choices()` | `sframe_choice_set()` |
+  | `sf_scale()` | `sframe_scale()` |
+  | `sf_branch()` | `sframe_branch()` |
+  | `sf_check()` | `sframe_attention_check()` |
+  | `sf_conjoint_design()` | `sframe_conjoint_design()` |
+  | `sf_construct()` | `sframe_construct()` |
+  | `sf_path()` | `sframe_path()` |
+  | `sf_covariance()` | `sframe_covariance()` |
+  | `sf_indirect()` | `sframe_indirect_effect()` |
+  | `sf_model()` | `sframe_model_spec()` |
+  | `add_model()` | `sframe_add_model()` |
+  | `validate_model()` | `sframe_validate_model()` |
+  | `model_json()` | `sframe_model_json()` |
+  | `model_report_template()` | `sframe_model_outline()` |
+  | `sf_items()` | `sframe_get_items()` |
+  | `sf_scales()` | `sframe_get_scales()` |
+  | `sf_checks()` | `sframe_get_attention_checks()` |
+  | `sf_models()` | `sframe_get_models()` |
+  | `sf_branches()` | `sframe_get_branches()` |
+  | `sf_choice_sets()` | `sframe_get_choice_sets()` |
+  | `sf_meta()` | `sframe_meta()` |
+  | `sf_plan()` | `sframe_plan()` |
+  | `sf_id()` | `sframe_id()` |
+  | `sf_label()` | `sframe_label()` |
+  | `sf_apa()` | `sframe_apa()` |
+  | `sf_flagged()` | `sframe_flagged()` |
+  | `sf_problems()` | `sframe_problems()` |
+  | `sf_is_valid()` | `sframe_is_valid()` |
+  | `sf_object()` | `sframe_object()` |
+  | `sf_missing_columns()` | `sframe_missing_columns()` |
+  | `sample_size_plan()` | `sframe_sample_size_plan()` |
+  | `sf_reference()` | `sframe_reference()` |
+  | `add_references()` | `sframe_add_references()` |
+  | `sframe_references()` | `sframe_get_references()` |
+  | `link_git_commit()` | `sframe_link_git_commit()` |
+  | `amendment_log()` | `sframe_get_amendments()` |
+  | `render_survey()` | `run_survey()` |
+  | `export_static_survey()` | `export_survey()` |
+  | `survey_module_ui()` | `sframe_survey_ui()` |
+  | `survey_module_server()` | `sframe_survey_server()` |
+  | `sframe_export_labelled()` | `export_responses()` |
+  | `quality_report()` | `sframe_quality_results()` |
+  | `missing_data_report()` | `sframe_missing_data_results()` |
+  | `outlier_report()` | `sframe_outlier_results()` |
+  | `reliability_report()` | `sframe_reliability_results()` |
+  | `item_report()` | `sframe_item_results()` |
+  | `efa_report()` | `sframe_efa_readiness_results()` |
+  | `efa_solution()` | `sframe_efa_solution()` |
+  | `validity_report()` | `sframe_validity_results()` |
+  | `descriptives_report()` | `sframe_descriptives_results()` |
+  | `assumption_report()` | `sframe_assumption_results()` |
+  | `posthoc_report()` | `sframe_posthoc_results()` |
+  | `bootstrap_ci()` | `sframe_bootstrap_ci()` |
+  | `cohens_d_ci()` | `sframe_cohens_d_ci()` |
+  | `cramers_v_ci()` | `sframe_cramers_v_ci()` |
+  | `eta_sq_ci()` | `sframe_eta_sq_ci()` |
+  | `cfa_lavaan_syntax()` | `sframe_syntax_cfa()` |
+  | `cfa_syntax()` | `sframe_syntax_cfa()` |
+  | `sem_lavaan_syntax()` | `sframe_syntax_sem()` |
+  | `seminr_syntax()` | `sframe_syntax_pls()` |
+  | `efa_syntax()` | `sframe_syntax_efa()` |
+  | `analysis_syntax()` | `sframe_syntax_result()` |
+  | `clean_text_responses()` | `sframe_clean_text()` |
+  | `term_frequency()` | `sframe_term_frequency()` |
+  | `ngram_frequency()` | `sframe_ngram_frequency()` |
+  | `term_context()` | `sframe_term_context()` |
+  | `extract_quotes()` | `sframe_extract_quotes()` |
+  | `sensitivity_analysis()` | `sframe_sensitivity_analysis()` |
+  | `render_result()` | `sframe_format_result()` |
+  | `codebook_report()` | `sframe_codebook()` |
+  | `sframe_demos()` | `sframe_list_demos()` |
+  | `sf_plan(x) <- value` | `sframe_plan(x) <- value` |
+
 ## References, cited where they are used and listed once at the end
 
 An instrument can now carry the works it draws on, and every report lists

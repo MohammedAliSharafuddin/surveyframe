@@ -1,6 +1,6 @@
 # tests/testthat/test-syntax-predictor-coding.R
 # Session 3 syntax gap. Every regression runner codes its predictors through
-# sframe_predictor_frame(), and the code analysis_syntax() writes codes them the
+# sframe_predictor_frame(), and the code sframe_syntax_result() writes codes them the
 # same way, so a number-like text predictor enters both as a number and the
 # generated code reproduces the package's coefficients.
 
@@ -22,16 +22,16 @@ pc_data <- function(n = 80) {
 }
 
 pc_instrument <- function() {
-  sf_instrument("Predictor coding", components = c(
-    lapply(c("x1", "y"), function(x) sf_item(x, x, type = "numeric")),
+  sframe_instrument("Predictor coding", components = c(
+    lapply(c("x1", "y"), function(x) sframe_item(x, x, type = "numeric")),
     lapply(c("xt", "cat", "grp", "bin", "ord"),
-           function(x) sf_item(x, x, type = "text"))
+           function(x) sframe_item(x, x, type = "text"))
   ))
 }
 
 pc_result <- function(method, roles) {
   instr <- pc_instrument()
-  sf_plan(instr) <- list(list(id = "RQ1", research_question = "Q",
+  sframe_plan(instr) <- list(list(id = "RQ1", research_question = "Q",
                               family = "inferential", method = method,
                               roles = roles))
   res <- run_analysis_plan(pc_data(), instr)$RQ1

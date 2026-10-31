@@ -127,9 +127,9 @@ sframe_conjoint_select <- function(full, n_profiles, method, tries = 200L,
 #'   (long format, one row per block, task, and alternative, ready for a
 #'   choice model), `$balance`, and the declaration that produced them.
 #' @export
-#' @seealso [sf_instrument()]
+#' @seealso [sframe_instrument()]
 #' @examples
-#' design <- sf_conjoint_design(
+#' design <- sframe_conjoint_design(
 #'   "hotel_dce",
 #'   attributes = list(
 #'     price    = c("50", "100", "150"),
@@ -140,7 +140,7 @@ sframe_conjoint_select <- function(full, n_profiles, method, tries = 200L,
 #' )
 #' design$profiles
 #' design$tasks
-sf_conjoint_design <- function(id,
+sframe_conjoint_design <- function(id,
                                attributes,
                                method = c("full", "balanced", "random"),
                                n_profiles = NULL,

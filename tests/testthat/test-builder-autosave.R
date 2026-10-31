@@ -84,5 +84,5 @@ test_that("19: the help no longer calls it a full live render", {
   help <- sframe_source_text("R", "builder.R")
   expect_false(grepl("full live render", help, fixed = TRUE))
   expect_match(help, "layout preview", fixed = TRUE)
-  expect_match(help, "export_static_survey()", fixed = TRUE)
+  expect_match(help, "export_survey()", fixed = TRUE)
 })

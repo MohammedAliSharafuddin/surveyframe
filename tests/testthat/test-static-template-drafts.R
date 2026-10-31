@@ -8,10 +8,10 @@
 draft_instrument <- function(choices = c(Yes = "1", No = "2"),
                              consent_text = "I agree to take part.",
                              consent_required = TRUE) {
-  ins <- sf_instrument("Drafts", components = list(
-      sf_choices("yn", values = unname(choices), labels = names(choices)),
-      sf_item("q1", "Did it help?", type = "single_choice", choice_set = "yn"),
-      sf_item("q2", "Anything else?", type = "text")))
+  ins <- sframe_instrument("Drafts", components = list(
+      sframe_choice_set("yn", values = unname(choices), labels = names(choices)),
+      sframe_item("q1", "Did it help?", type = "single_choice", choice_set = "yn"),
+      sframe_item("q2", "Anything else?", type = "text")))
   ins$render <- list(save_draft = TRUE,
                      welcome = list(title = "Hi", intro_text = "Welcome.",
                                     consent_text = consent_text,

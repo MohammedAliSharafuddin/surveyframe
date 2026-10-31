@@ -9,14 +9,14 @@
 # 3fa36502 after a read.
 
 fresh_instrument <- function() {
-  sf_instrument(
+  sframe_instrument(
     title = "Fixed point", version = "1.0.0",
     components = list(
-      sf_choices("ag5", 1:5, c("a", "b", "c", "d", "e")),
-      sf_item("q1", "Q1", type = "likert", choice_set = "ag5", scale_id = "sc"),
-      sf_item("q2", "Q2", type = "matrix", matrix_items = c("r1", "r2"),
+      sframe_choice_set("ag5", 1:5, c("a", "b", "c", "d", "e")),
+      sframe_item("q1", "Q1", type = "likert", choice_set = "ag5", scale_id = "sc"),
+      sframe_item("q2", "Q2", type = "matrix", matrix_items = c("r1", "r2"),
               choice_set = "ag5"),
-      sf_scale("sc", "S", items = "q1")
+      sframe_scale("sc", "S", items = "q1")
     ),
     analysis_plan = list(list(
       id = "RQ1", research_question = "R?", family = "descriptive",
@@ -102,12 +102,12 @@ test_that("a non-round decimal survives write_sframe()/read_sframe() without a f
   # Fixed by adding digits = NA to write_sframe()'s own toJSON() call, so
   # the same full-precision value that was hashed is the one written.
   path <- tempfile(fileext = ".sframe")
-  instr <- sf_instrument(
+  instr <- sframe_instrument(
     title = "Non-round weight", version = "1.0.0",
     components = list(
-      sf_choices("ag5", 1:5, c("a", "b", "c", "d", "e")),
-      sf_item("q1", "Q1", type = "likert", choice_set = "ag5", scale_id = "sc"),
-      sf_scale("sc", "S", items = "q1", weights = 1 / 3)
+      sframe_choice_set("ag5", 1:5, c("a", "b", "c", "d", "e")),
+      sframe_item("q1", "Q1", type = "likert", choice_set = "ag5", scale_id = "sc"),
+      sframe_scale("sc", "S", items = "q1", weights = 1 / 3)
     )
   )
   write_sframe(instr, path, overwrite = TRUE)

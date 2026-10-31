@@ -13,20 +13,20 @@
 # out duplicates.
 
 teaching_instrument <- function(plan = list()) {
-  sf_instrument(
+  sframe_instrument(
     title = "Teaching deck", version = "1.0.0",
     components = list(
-      sf_choices("gender_set", values = c("1", "2"), labels = c("Male", "Female")),
-      sf_choices("region_set", values = c("1", "2", "3"),
+      sframe_choice_set("gender_set", values = c("1", "2"), labels = c("Male", "Female")),
+      sframe_choice_set("region_set", values = c("1", "2", "3"),
                  labels = c("North", "South", "East")),
-      sf_choices("contact_set", values = c("email", "phone", "post"),
+      sframe_choice_set("contact_set", values = c("email", "phone", "post"),
                  labels = c("Email", "Phone", "Post")),
-      sf_item("gender", "Gender", "single_choice", choice_set = "gender_set"),
-      sf_item("region", "Region", "single_choice", choice_set = "region_set"),
-      sf_item("contact", "Contact by", "multiple_choice",
+      sframe_item("gender", "Gender", "single_choice", choice_set = "gender_set"),
+      sframe_item("region", "Region", "single_choice", choice_set = "region_set"),
+      sframe_item("contact", "Contact by", "multiple_choice",
               choice_set = "contact_set"),
-      sf_item("age", "Age", "numeric"),
-      sf_item("sat", "Satisfaction", "numeric")
+      sframe_item("age", "Age", "numeric"),
+      sframe_item("sat", "Satisfaction", "numeric")
     ),
     analysis_plan = plan
   )
@@ -149,21 +149,21 @@ test_that("3: descriptives on choice items alone gives counts, not an error", {
 # ── 8 ──
 
 test_that("8: the printed report says how to check a short scale", {
-  ins <- sf_instrument(title = "Short scale", components = list(
-    sf_choices("ag", values = 1:5, labels = c("SD", "D", "N", "A", "SA")),
-    sf_item("s1", "One", "likert", choice_set = "ag"),
-    sf_item("s2", "Two", "likert", choice_set = "ag"),
-    sf_item("s3", "Three", "likert", choice_set = "ag"),
-    sf_scale("sc", "Short", items = c("s1", "s2", "s3"))
+  ins <- sframe_instrument(title = "Short scale", components = list(
+    sframe_choice_set("ag", values = 1:5, labels = c("SD", "D", "N", "A", "SA")),
+    sframe_item("s1", "One", "likert", choice_set = "ag"),
+    sframe_item("s2", "Two", "likert", choice_set = "ag"),
+    sframe_item("s3", "Three", "likert", choice_set = "ag"),
+    sframe_scale("sc", "Short", items = c("s1", "s2", "s3"))
   ))
   dat <- data.frame(s1 = c(3, 3, 1, 5), s2 = c(3, 4, 1, 4), s3 = c(3, 2, 1, 5))
 
-  qr <- quality_report(dat, ins)
+  qr <- sframe_quality_results(dat, ins)
   out <- paste(utils::capture.output(print(qr)), collapse = "\n")
   expect_match(out, "straightline_min_items = 3", fixed = TRUE)
   expect_identical(qr$straightline$sc$min_items, 4L)
 
-  qr3 <- quality_report(dat, ins, straightline_min_items = 3)
+  qr3 <- sframe_quality_results(dat, ins, straightline_min_items = 3)
   expect_true(qr3$straightline$sc$checked)
   expect_identical(qr3$straightline$sc$flagged_rows, c(1L, 3L))
 })
@@ -175,12 +175,12 @@ test_that("the printed quality report shows duplicates", {
   dat <- teaching_data()
   dat$respondent_id <- c("a", "b", "b", paste0("r", 4:10))
 
-  checked <- quality_report(dat, ins, respondent_id = "respondent_id")
+  checked <- sframe_quality_results(dat, ins, respondent_id = "respondent_id")
   out <- paste(utils::capture.output(print(checked)), collapse = "\n")
   expect_match(out, "Duplicates:", fixed = TRUE)
   expect_match(out, "1 duplicate", fixed = TRUE)
 
-  unchecked <- quality_report(dat, ins)
+  unchecked <- sframe_quality_results(dat, ins)
   out <- paste(utils::capture.output(print(unchecked)), collapse = "\n")
   expect_match(out, "not checked", fixed = TRUE)
 })

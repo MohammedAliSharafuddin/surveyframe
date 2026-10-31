@@ -103,18 +103,18 @@ write_sframe(revised, "study.sframe", overwrite = TRUE)
 }
 
 \examples{
-item  <- sf_item("q1", "How satisfied are you?", type = "text")
-instr <- sf_instrument("Demo", components = list(item))
-item2 <- sf_item("q1", "How satisfied are you overall?", type = "text")
-revised <- sf_instrument("Demo", components = list(item2))
+item  <- sframe_item("q1", "How satisfied are you?", type = "text")
+instr <- sframe_instrument("Demo", components = list(item))
+item2 <- sframe_item("q1", "How satisfied are you overall?", type = "text")
+revised <- sframe_instrument("Demo", components = list(item2))
 amended <- amend_sframe(
   instr, revised,
   reason_code = "instrument_revision",
   reason_text = "Clarified item wording after a pilot round.",
   deviation_report = "Wording only; no change to the construct measured."
 )
-nrow(amendment_log(amended))
+nrow(sframe_get_amendments(amended))
 }
 \seealso{
-\code{\link[=amendment_log]{amendment_log()}}, \code{\link[=write_sframe]{write_sframe()}}, \code{\link[=read_sframe]{read_sframe()}}
+\code{\link[=sframe_get_amendments]{sframe_get_amendments()}}, \code{\link[=write_sframe]{write_sframe()}}, \code{\link[=read_sframe]{read_sframe()}}
 }

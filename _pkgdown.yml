@@ -118,12 +118,12 @@ reference:
       results surveyframe produced. Load one, change it, and keep going.
       See the "Learn by example" article.
     contents:
-      - sframe_demos
+      - sframe_list_demos
       - sframe_demo
       - sframe_demo_branding
       - sframe_demo_qmd
       - preview_demo
-      - sframe_export_labelled
+      - export_responses
 
   - title: "Design"
     desc: >
@@ -139,18 +139,18 @@ reference:
       Constructor functions for building the sframe instrument object.
       Start here.
     contents:
-      - sf_instrument
-      - sf_item
-      - sf_choices
-      - sf_scale
-      - sf_branch
-      - sf_check
-      - sf_model
-      - sf_construct
-      - sf_path
-      - sf_covariance
-      - sf_indirect
-      - add_model
+      - sframe_instrument
+      - sframe_item
+      - sframe_choice_set
+      - sframe_scale
+      - sframe_branch
+      - sframe_attention_check
+      - sframe_model_spec
+      - sframe_construct
+      - sframe_path
+      - sframe_covariance
+      - sframe_indirect_effect
+      - sframe_add_model
 
   - title: "Save and load"
     desc: >
@@ -160,11 +160,11 @@ reference:
       - write_sframe
       - read_sframe
       - validate_sframe
-      - validate_model
-      - model_json
+      - sframe_validate_model
+      - sframe_model_json
       - amend_sframe
-      - amendment_log
-      - link_git_commit
+      - sframe_get_amendments
+      - sframe_link_git_commit
       - sframe_validation
 
   - title: "Accessors and coercion"
@@ -175,28 +175,28 @@ reference:
       stating the classes it accepts and what it returns.
     contents:
       - as_sframe
-      - sf_accessors
-      - sf_apa
-      - sf_branches
-      - sf_checks
-      - sf_choice_sets
+      - sframe_accessors
+      - sframe_apa
+      - sframe_get_branches
+      - sframe_get_attention_checks
+      - sframe_get_choice_sets
       - sf_component_list
-      - sf_flagged
-      - sf_id
-      - sf_identity
-      - sf_is_valid
-      - sf_items
-      - sf_label
-      - sf_meta
-      - sf_missing_columns
-      - sf_models
-      - sf_object
-      - sf_plan
-      - "sf_plan<-"
-      - sf_problems
-      - sf_report_accessors
-      - sf_scales
-      - sf_validation_accessors
+      - sframe_flagged
+      - sframe_id
+      - sframe_identity
+      - sframe_is_valid
+      - sframe_get_items
+      - sframe_label
+      - sframe_meta
+      - sframe_missing_columns
+      - sframe_get_models
+      - sframe_object
+      - sframe_plan
+      - "sframe_plan<-"
+      - sframe_problems
+      - sframe_report_accessors
+      - sframe_get_scales
+      - sframe_validation_accessors
       - sframe_as_data_frame
       - sframe_subset
       - as.data.frame.sf_choices
@@ -220,12 +220,12 @@ reference:
     desc: >
       Render the instrument as a Shiny survey or launch SurveyStudio.
     contents:
-      - render_survey
-      - export_static_survey
+      - run_survey
+      - export_survey
       - launch_studio
       - launch_dashboard
-      - survey_module_ui
-      - survey_module_server
+      - sframe_survey_ui
+      - sframe_survey_server
 
   - title: "Collect responses"
     desc: >
@@ -240,10 +240,10 @@ reference:
       Evaluate response data for attention check failures, straight-lining,
       missingness, and duplicate submissions.
     contents:
-      - quality_report
-      - missing_data_report
-      - outlier_report
-      - assumption_report
+      - sframe_quality_results
+      - sframe_missing_data_results
+      - sframe_outlier_results
+      - sframe_assumption_results
 
   - title: "Score and analyse"
     desc: >
@@ -251,19 +251,18 @@ reference:
       psychometric diagnostics and pre-planned analyses.
     contents:
       - score_scales
-      - descriptives_report
-      - reliability_report
-      - item_report
-      - efa_report
-      - efa_solution
-      - validity_report
-      - cfa_syntax
-      - cfa_lavaan_syntax
-      - efa_syntax
-      - sem_lavaan_syntax
-      - seminr_syntax
-      - posthoc_report
-      - sample_size_plan
+      - sframe_descriptives_results
+      - sframe_reliability_results
+      - sframe_item_results
+      - sframe_efa_readiness_results
+      - sframe_efa_solution
+      - sframe_validity_results
+      - sframe_syntax_cfa
+      - sframe_syntax_efa
+      - sframe_syntax_sem
+      - sframe_syntax_pls
+      - sframe_posthoc_results
+      - sframe_sample_size_plan
       - run_analysis_plan
 
   - title: "Decision analysis"
@@ -273,8 +272,8 @@ reference:
       ones that assemble their input, test how stable a ranking is, and build
       choice designs.
     contents:
-      - sensitivity_analysis
-      - sf_conjoint_design
+      - sframe_sensitivity_analysis
+      - sframe_conjoint_design
       - sframe_assemble_pairwise
       - sframe_aggregate_judgements
       - sframe_collected_weights
@@ -288,21 +287,21 @@ reference:
       and n-gram frequency, keyword-in-context concordance, co-occurrence
       (plain and network), sentiment, topic modelling, and quote extraction.
     contents:
-      - clean_text_responses
-      - term_frequency
-      - ngram_frequency
-      - term_context
-      - extract_quotes
+      - sframe_clean_text
+      - sframe_term_frequency
+      - sframe_ngram_frequency
+      - sframe_term_context
+      - sframe_extract_quotes
 
   - title: "Confidence intervals"
     desc: >
       Base-R bootstrap and effect-size confidence interval helpers, reused
       across the inferential runners.
     contents:
-      - bootstrap_ci
-      - cohens_d_ci
-      - cramers_v_ci
-      - eta_sq_ci
+      - sframe_bootstrap_ci
+      - sframe_cohens_d_ci
+      - sframe_cramers_v_ci
+      - sframe_eta_sq_ci
 
   - title: "Report"
     desc: >
@@ -310,13 +309,13 @@ reference:
       the R code behind a computed result.
     contents:
       - sframe_reports
-      - codebook_report
+      - sframe_codebook
       - sframe_codebook_items_display
       - render_report
       - render_results
-      - render_result
-      - model_report_template
-      - analysis_syntax
+      - sframe_format_result
+      - sframe_model_outline
+      - sframe_syntax_result
       - sframe_result_supplement
       - sframe_analysis_qmd
       - sframe_save_figures
@@ -326,10 +325,10 @@ reference:
       Cite the works an instrument draws on. The references travel in the
       .sframe file and the report lists each one once, at the end.
     contents:
-      - sf_reference
+      - sframe_reference
       - read_bibtex
-      - add_references
-      - sframe_references
+      - sframe_add_references
+      - sframe_get_references
       - sframe_bibliography
 
   - title: "Plotting"
@@ -390,6 +389,10 @@ reference:
       - print.sf_model
       - format.sf_model
       - summary.sf_model
+
+  - title: "Old names (superseded)"
+    contents:
+      - superseded
 
   - title: "Package"
     contents:

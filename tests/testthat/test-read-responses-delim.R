@@ -4,12 +4,12 @@
 # line, with delim = to override. Semicolon files use a decimal comma.
 
 delim_instrument <- function() {
-  sf_instrument(
+  sframe_instrument(
     "Delim",
     components = list(
-      sf_item("age", "Age", type = "numeric"),
-      sf_item("score", "Score", type = "numeric"),
-      sf_item("note", "Note", type = "text")
+      sframe_item("age", "Age", type = "numeric"),
+      sframe_item("score", "Score", type = "numeric"),
+      sframe_item("note", "Note", type = "text")
     )
   )
 }

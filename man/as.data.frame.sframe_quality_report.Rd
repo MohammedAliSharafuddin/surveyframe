@@ -24,5 +24,5 @@ flags.
 Coerce a response-quality report to a data frame
 }
 \seealso{
-\link{sframe_as_data_frame}, \code{\link[=quality_report]{quality_report()}}
+\link{sframe_as_data_frame}, \code{\link[=sframe_quality_results]{sframe_quality_results()}}
 }

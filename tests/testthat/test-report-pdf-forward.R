@@ -24,7 +24,7 @@ test_that("CX-04: the PDF path forwards title, authors, references, csl and figu
     },
     .package = "pagedown"
   )
-  ref <- sf_reference("zed_2020", "A title", author = "Zed, A.", year = 2020)
+  ref <- sframe_reference("zed_2020", "A title", author = "Zed, A.", year = 2020)
   csl_file <- tempfile(fileext = ".csl")
   writeLines("<style/>", csl_file)
   figs <- list(width = 5, height = 3, dpi = 150, format = "png")

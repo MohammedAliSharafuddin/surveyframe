@@ -23,5 +23,5 @@ A data frame with \code{value} and \code{label} columns.
 Returns the stored values and respondent-facing labels in a choice set.
 }
 \seealso{
-\link{sframe_as_data_frame}, \code{\link[=sf_choices]{sf_choices()}}
+\link{sframe_as_data_frame}, \code{\link[=sframe_choice_set]{sframe_choice_set()}}
 }

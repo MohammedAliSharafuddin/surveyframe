@@ -1,6 +1,6 @@
 # sf_branch.R
 
-# A `%in%` value arrives either as a vector, which is what sf_branch()
+# A `%in%` value arrives either as a vector, which is what sframe_branch()
 # documents and what serialises to a JSON array, or as one comma-separated
 # string from a hand-written file. All 3 evaluators share this so they agree.
 sframe_branch_in_values <- function(value) {
@@ -39,18 +39,18 @@ sframe_branch_in_values <- function(value) {
 #'
 #' @return An object of class `sf_branch` (a named list).
 #' @export
-#' @seealso [sf_instrument()], [validate_sframe()]
+#' @seealso [sframe_instrument()], [validate_sframe()]
 #'
 #' @examples
 #' # Show an open-text follow-up only when the respondent selects "Other"
-#' rule <- sf_branch(
+#' rule <- sframe_branch(
 #'   item_id    = "gender_other",
 #'   depends_on = "gender",
 #'   operator   = "==",
 #'   value      = "other",
 #'   action     = "show"
 #' )
-sf_branch <- function(
+sframe_branch <- function(
     item_id,
     depends_on,
     operator = c("==", "!=", "%in%", ">", ">=", "<", "<="),

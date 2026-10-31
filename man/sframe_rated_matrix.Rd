@@ -32,12 +32,12 @@ aggregate. No new item type is needed. Per-cell counts and standard
 deviations are kept so the report can show how firm each cell is.
 }
 \examples{
-q5    <- sf_choices("q5", 1:5,
+q5    <- sframe_choice_set("q5", 1:5,
            c("Very poor", "Poor", "Fair", "Good", "Excellent"))
-price <- sf_item("rate_price", "Rate each supplier: value",
+price <- sframe_item("rate_price", "Rate each supplier: value",
                  type = "matrix", matrix_items = c("Alpha", "Basilica"),
                  choice_set = "q5")
-study <- sf_instrument("Supplier selection", components = list(q5, price))
+study <- sframe_instrument("Supplier selection", components = list(q5, price))
 responses <- data.frame(rate_price__Alpha = c(3, 4), rate_price__Basilica = c(5, 5))
 rm <- sframe_rated_matrix(responses, study, "rate_price")
 rm$matrix

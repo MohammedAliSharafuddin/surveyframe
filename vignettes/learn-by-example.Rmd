@@ -48,7 +48,7 @@ and surveyframe's expected results. Presentation and provenance demos reuse the
 matching analysis data where appropriate.
 
 ```{r index}
-head(sframe_demos()[, c("name", "teaches")], 5)
+head(sframe_list_demos()[, c("name", "teaches")], 5)
 ```
 
 Try the shortest complete route first:
@@ -122,8 +122,8 @@ plan, the data contract and the report together as one object.
 
 ```
     design ->  export  ->  collect  ->  read  ->  analyse  ->  report
-  sf_instrument()   export_static_survey()   read_responses()   render_report()
-                    render_survey(mode = "shiny")   run_analysis_plan()
+  sframe_instrument()   export_survey()   read_responses()   render_report()
+                    run_survey(mode = "shiny")   run_analysis_plan()
 ```
 
 The step that matters is the first one. The analysis plan is declared
@@ -148,7 +148,7 @@ knitr::include_graphics("figures/survey-first-survey.png")
 The plan was written at design time:
 
 ```{r first-survey-plan}
-do.call(rbind, lapply(sf_plan(demo$instrument), function(b) {
+do.call(rbind, lapply(sframe_plan(demo$instrument), function(b) {
   data.frame(id = b$id, question = b$research_question, method = b$method)
 }))
 ```
@@ -223,7 +223,7 @@ knitr::include_graphics("figures/survey-likert-scale.png")
 
 ```{r likert}
 ls_demo <- sframe_demo("likert_scale")
-rel <- reliability_report(ls_demo$responses, ls_demo$instrument)
+rel <- sframe_reliability_results(ls_demo$responses, ls_demo$instrument)
 as.data.frame(rel)[, c("scale_id", "n_items", "alpha")]
 ```
 
@@ -240,7 +240,7 @@ estimate a different model from the one you declared.
 
 ```{r sem}
 sem <- sframe_demo("sem_pls")
-vapply(sf_models(sem$instrument), function(m) m$type, character(1))
+vapply(sframe_get_models(sem$instrument), function(m) m$type, character(1))
 ```
 
 ## Question types worth meeting
@@ -276,7 +276,7 @@ knitr::include_graphics("figures/survey-branching.png")
 
 ```{r branching}
 br <- sframe_demo("branching")
-sf_branches(br$instrument)[[1]]
+sframe_get_branches(br$instrument)[[1]]
 ```
 
 A blank left by skip logic is **structural**, not missing data. The
@@ -348,10 +348,10 @@ Three routes, and the same instrument serves all three.
 
 ```{r routes, eval = FALSE}
 # 1. One self-contained HTML file you can host or email
-export_static_survey(demo$instrument, "survey.html")
+export_survey(demo$instrument, "survey.html")
 
 # 2. A Shiny app
-render_survey(demo$instrument, mode = "shiny")
+run_survey(demo$instrument, mode = "shiny")
 
 # 3. A Google Sheets collector, generated as an Apps Script
 export_google_sheet(demo$instrument, sheet_url = "https://...")
@@ -381,7 +381,7 @@ leaves nobody able to tell which version a respondent saw.
 
 ```{r amend}
 rev <- sframe_demo("instrument_revision")
-log <- as.data.frame(amendment_log(rev$instrument))
+log <- as.data.frame(sframe_get_amendments(rev$instrument))
 log[, c("reason_code", "tier", "reason_text")]
 ```
 
@@ -423,7 +423,7 @@ Take them into `psych`, SPSS, JASP, jamovi or Stata, run the same test, and
 compare.
 
 ```{r labelled, eval = FALSE}
-sframe_export_labelled(d$responses, d$instrument, "two_group.sav")
+export_responses(d$responses, d$instrument, "two_group.sav")
 ```
 
 The `.sav` arrives with the question wording and the response options already

@@ -18,7 +18,7 @@
 Print an sf_item object
 }
 \examples{
-it <- sf_item("q1", "How satisfied are you?", type = "likert",
+it <- sframe_item("q1", "How satisfied are you?", type = "likert",
               choice_set = "agree5")
 print(it)
 }

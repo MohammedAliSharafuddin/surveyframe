@@ -220,9 +220,9 @@ test_that("ELECTRE says so when it establishes no outranking at all", {
   skip_if(any(sframe_electre_compute(x, w, ct)$outrank_count != 0),
           "this fixture is no longer degenerate")
 
-  inst <- sf_instrument(
+  inst <- sframe_instrument(
     title = "Degenerate ELECTRE", version = "1.0.0",
-    components = list(sf_item("q1", "Q", type = "text")),
+    components = list(sframe_item("q1", "Q", type = "text")),
     analysis_plan = list(list(
       id = "RQ1", research_question = "Which?", family = "decision",
       method = "electre", roles = list(),

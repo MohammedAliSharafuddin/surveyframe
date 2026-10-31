@@ -19,8 +19,8 @@ gate <- function(ctx) {
            await = TRUE) == "true"
 }
 gate_instrument <- function() {
-  sf_instrument("Gate", version = "1.2.0", components = list(
-    sf_item("q1", "How was it?", type = "text")))
+  sframe_instrument("Gate", version = "1.2.0", components = list(
+    sframe_item("q1", "How was it?", type = "text")))
 }
 
 test_that("CX-12: an opened file saved unchanged needs no dialog", {

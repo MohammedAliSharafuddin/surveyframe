@@ -30,5 +30,5 @@ if (requireNamespace("ggplot2", quietly = TRUE)) {
 }
 }
 \seealso{
-\code{\link[=run_analysis_plan]{run_analysis_plan()}}, \code{\link[=term_frequency]{term_frequency()}}
+\code{\link[=run_analysis_plan]{run_analysis_plan()}}, \code{\link[=sframe_term_frequency]{sframe_term_frequency()}}
 }

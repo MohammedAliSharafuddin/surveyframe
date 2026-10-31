@@ -7,7 +7,7 @@
 validate_sframe(instrument, strict = TRUE)
 }
 \arguments{
-\item{instrument}{An \code{sframe} object created by \code{\link[=sf_instrument]{sf_instrument()}}.}
+\item{instrument}{An \code{sframe} object created by \code{\link[=sframe_instrument]{sframe_instrument()}}.}
 
 \item{strict}{Logical. When \code{TRUE} (default), any detected problem raises
 an error of class \code{sframe_validation_error}. When \code{FALSE}, problems are
@@ -64,28 +64,28 @@ in \code{\link[=as_sframe]{as_sframe()}}.
 
 \examples{
 # Build a minimal valid instrument and validate it
-cs    <- sf_choices("ag5", 1:5,
+cs    <- sframe_choice_set("ag5", 1:5,
            c("Strongly disagree", "Disagree", "Neutral",
              "Agree", "Strongly agree"))
-item  <- sf_item("sat_1", "The service met my expectations.",
+item  <- sframe_item("sat_1", "The service met my expectations.",
                  type = "likert", choice_set = "ag5", scale_id = "sat")
-scale <- sf_scale("sat", "Satisfaction", items = "sat_1")
-instr <- sf_instrument("Demo Survey", components = list(cs, item, scale))
+scale <- sframe_scale("sat", "Satisfaction", items = "sat_1")
+instr <- sframe_instrument("Demo Survey", components = list(cs, item, scale))
 
 # The result prints its own diagnostic
 validate_sframe(instr, strict = FALSE)
 
 # Explore it with dedicated methods rather than reaching in with `$`
 v <- validate_sframe(instr, strict = FALSE)
-sf_is_valid(v)
-sf_problems(v)
+sframe_is_valid(v)
+sframe_problems(v)
 summary(v)
 
 # Recover the validated instrument
 validated <- as_sframe(validate_sframe(instr, strict = TRUE))
-isTRUE(sf_meta(validated)$validated)
+isTRUE(sframe_meta(validated)$validated)
 }
 \seealso{
-\link{sframe_validation}, \code{\link[=as_sframe]{as_sframe()}}, \code{\link[=sf_problems]{sf_problems()}},
-\code{\link[=sf_is_valid]{sf_is_valid()}}, \code{\link[=sf_instrument]{sf_instrument()}}, \code{\link[=write_sframe]{write_sframe()}}
+\link{sframe_validation}, \code{\link[=as_sframe]{as_sframe()}}, \code{\link[=sframe_problems]{sframe_problems()}},
+\code{\link[=sframe_is_valid]{sframe_is_valid()}}, \code{\link[=sframe_instrument]{sframe_instrument()}}, \code{\link[=write_sframe]{write_sframe()}}
 }

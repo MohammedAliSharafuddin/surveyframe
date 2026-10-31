@@ -11,13 +11,13 @@
 #      a question the participant could not see.
 
 mixed_instrument <- function() {
-  sf_instrument("Progress", components = list(
-    sf_choices("ag3", values = 1:3, labels = c("Low", "Mid", "High")),
-    sf_item("pick", "Pick one", type = "single_choice", choice_set = "ag3"),
-    sf_item("rate", "Rate us", type = "rating", rating_max = 5),
-    sf_item("pw", "Compare the criteria", type = "pairwise_comparison",
+  sframe_instrument("Progress", components = list(
+    sframe_choice_set("ag3", values = 1:3, labels = c("Low", "Mid", "High")),
+    sframe_item("pick", "Pick one", type = "single_choice", choice_set = "ag3"),
+    sframe_item("rate", "Rate us", type = "rating", rating_max = 5),
+    sframe_item("pw", "Compare the criteria", type = "pairwise_comparison",
             comparison_items = c("cost", "speed"), comparison_scale = "saaty"),
-    sf_item("cw", "Divide 100 points", type = "criteria_weight",
+    sframe_item("cw", "Divide 100 points", type = "criteria_weight",
             comparison_items = c("cost", "speed"))
   ))
 }
@@ -71,10 +71,10 @@ test_that("12: returning to a filled allocation shows its real total", {
 
 test_that("13: a rating reveals the question that depends on it", {
   skip_if_not_installed("V8")
-  instr <- sf_instrument("Branching", components = list(
-    sf_item("rate", "Rate us", type = "rating", rating_max = 5),
-    sf_item("why", "What went wrong?", type = "text"),
-    sf_branch("why", depends_on = "rate", operator = "<", value = 3)
+  instr <- sframe_instrument("Branching", components = list(
+    sframe_item("rate", "Rate us", type = "rating", rating_max = 5),
+    sframe_item("why", "What went wrong?", type = "text"),
+    sframe_branch("why", depends_on = "rate", operator = "<", value = 3)
   ))
   ctx <- static_survey_context(instr)
   # render, then settle the DOM the way a first paint does
@@ -90,10 +90,10 @@ test_that("13: a rating reveals the question that depends on it", {
 
 test_that("13: a rating that hides a question hides it at once", {
   skip_if_not_installed("V8")
-  instr <- sf_instrument("Branching", components = list(
-    sf_item("rate", "Rate us", type = "rating", rating_max = 5),
-    sf_item("why", "What went wrong?", type = "text"),
-    sf_branch("why", depends_on = "rate", operator = "<", value = 3)
+  instr <- sframe_instrument("Branching", components = list(
+    sframe_item("rate", "Rate us", type = "rating", rating_max = 5),
+    sframe_item("why", "What went wrong?", type = "text"),
+    sframe_branch("why", depends_on = "rate", operator = "<", value = 3)
   ))
   ctx <- static_survey_context(instr)
   ctx$eval("screen='survey'; renderItem(SF.items[0]); renderItem(SF.items[1]); updateBranching();")

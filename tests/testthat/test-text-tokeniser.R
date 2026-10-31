@@ -9,10 +9,10 @@
 #     left, so "clean but not comfortable" produced the bigram
 #     "clean comfortable", a phrase no respondent wrote, while the help said
 #     an n-gram never straddles a dropped word.
-# #6. clean_text_responses() chose its rows before stripping punctuation, so a
+# #6. sframe_clean_text() chose its rows before stripping punctuation, so a
 #     response of punctuation alone survived as an empty string and counted
 #     towards the usable total.
-# #7. term_context() coerced `window` with no range check, so 0 made the index
+# #7. sframe_term_context() coerced `window` with no range check, so 0 made the index
 #     sequences run backwards and copied the match into its own context.
 
 test_that("3: a word with an accent survives tokenising", {
@@ -43,7 +43,7 @@ test_that("4: an n-gram is built from words that were next to each other", {
   # "clean but not comfortable", so there is no adjacent pair of kept words
   # here at all, and the table is empty. It used to report
   # "clean comfortable", a phrase nobody wrote.
-  ng <- ngram_frequency("clean but not comfortable", n = 2)
+  ng <- sframe_ngram_frequency("clean but not comfortable", n = 2)
   expect_equal(nrow(ng), 0)
   expect_false("clean comfortable" %in% ng$term)
   # and nothing leaks out of the gap marker
@@ -51,7 +51,7 @@ test_that("4: an n-gram is built from words that were next to each other", {
 })
 
 test_that("4: adjacency inside a run of kept words still counts", {
-  ng <- ngram_frequency(rep("excellent friendly service", 2), n = 2)
+  ng <- sframe_ngram_frequency(rep("excellent friendly service", 2), n = 2)
   expect_true("excellent friendly" %in% ng$term)
   expect_true("friendly service" %in% ng$term)
 })
@@ -59,7 +59,7 @@ test_that("4: adjacency inside a run of kept words still counts", {
 test_that("6: a response that cleans away is dropped, with its mapping", {
   d <- data.frame(comments = c("Great service", "!!!", "...", "Very good"),
                   stringsAsFactors = FALSE)
-  cleaned <- clean_text_responses(d, "comments")
+  cleaned <- sframe_clean_text(d, "comments")
   expect_length(as.character(cleaned), 2)
   expect_true(all(nzchar(as.character(cleaned))))
   # the respondent map still points at the rows the text came from
@@ -69,26 +69,26 @@ test_that("6: a response that cleans away is dropped, with its mapping", {
 test_that("6: a response of numbers alone is dropped when numbers are stripped", {
   d <- data.frame(comments = c("Great service", "12345"),
                   stringsAsFactors = FALSE)
-  cleaned <- clean_text_responses(d, "comments", strip_numbers = TRUE)
+  cleaned <- sframe_clean_text(d, "comments", strip_numbers = TRUE)
   expect_length(as.character(cleaned), 1)
   expect_equal(attr(cleaned, "respondent"), 1L)
 })
 
 test_that("7: a zero window gives empty context, and a negative one is refused", {
   txt <- structure("the service was very good indeed", respondent = 1L)
-  ctx <- term_context(txt, "service", window = 0)
+  ctx <- sframe_term_context(txt, "service", window = 0)
   expect_equal(ctx$match, "service")
   expect_equal(ctx$before, "")
   expect_equal(ctx$after, "")
 
-  expect_error(term_context(txt, "service", window = -1),
+  expect_error(sframe_term_context(txt, "service", window = -1),
                class = "sframe_error")
 })
 
 test_that("7: an n-gram size below 2 is refused", {
-  expect_error(ngram_frequency("clean and comfortable", n = 1),
+  expect_error(sframe_ngram_frequency("clean and comfortable", n = 1),
                class = "sframe_error")
-  expect_error(ngram_frequency("clean and comfortable", n = 0),
+  expect_error(sframe_ngram_frequency("clean and comfortable", n = 0),
                class = "sframe_error")
 })
 

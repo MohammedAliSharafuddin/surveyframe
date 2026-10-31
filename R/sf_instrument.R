@@ -4,7 +4,7 @@
 #'
 #' Assembles a survey instrument from its component objects. This is
 #' the top-level constructor for the `sframe` class. All other constructors
-#' ([sf_item()], [sf_choices()], [sf_scale()], [sf_branch()], [sf_check()])
+#' ([sframe_item()], [sframe_choice_set()], [sframe_scale()], [sframe_branch()], [sframe_attention_check()])
 #' produce components that are passed into this function via `components`.
 #'
 #' @param title Character. The title of the survey instrument.
@@ -16,40 +16,40 @@
 #' @param languages Character vector. Language codes for the instrument.
 #'   Defaults to `"en"`. Multi-language support is planned for a later release.
 #' @param components List. A list of component objects created by the
-#'   constructor family: [sf_item()], [sf_choices()], [sf_scale()],
-#'   [sf_branch()], [sf_check()], [sf_conjoint_design()], and [sf_reference()].
+#'   constructor family: [sframe_item()], [sframe_choice_set()], [sframe_scale()],
+#'   [sframe_branch()], [sframe_attention_check()], [sframe_conjoint_design()], and [sframe_reference()].
 #'   Components are
 #'   sorted by class automatically, so they can be supplied in any order.
 #' @param render List or NULL. Optional rendering hints passed to
-#'   [render_survey()], such as theme colour or progress bar visibility.
+#'   [run_survey()], such as theme colour or progress bar visibility.
 #' @param analysis_plan List. Optional pre-planned analysis blocks created in
 #'   the HTML SurveyBuilder Analyse mode.
-#' @param models List. Optional model specifications created with [sf_model()]
+#' @param models List. Optional model specifications created with [sframe_model_spec()]
 #'   or imported from a `.sframe` file.
 #'
 #' @return An object of class `sframe` with slots `meta`, `items`, `choices`,
 #'   `scales`, `branching`, `checks`, `analysis_plan`, `models`, and `render`.
 #' @export
-#' @seealso [sf_item()], [sf_choices()], [sf_scale()], [sf_branch()],
-#'   [sf_check()], [validate_sframe()], [write_sframe()]
+#' @seealso [sframe_item()], [sframe_choice_set()], [sframe_scale()], [sframe_branch()],
+#'   [sframe_attention_check()], [validate_sframe()], [write_sframe()]
 #'
 #' @examples
-#' choices <- sf_choices("agree5", 1:5,
+#' choices <- sframe_choice_set("agree5", 1:5,
 #'   c("Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"))
 #'
-#' visitor_cs <- sf_choices("visitor", c("new", "returning"),
+#' visitor_cs <- sframe_choice_set("visitor", c("new", "returning"),
 #'                           c("New visitor", "Returning visitor"))
 #'
-#' item1 <- sf_item("sat_1", "The service met my expectations.",
+#' item1 <- sframe_item("sat_1", "The service met my expectations.",
 #'                  type = "likert", choice_set = "agree5",
 #'                  scale_id = "sat", required = TRUE)
-#' item2 <- sf_item("sat_2", "I would recommend this service.",
+#' item2 <- sframe_item("sat_2", "I would recommend this service.",
 #'                  type = "likert", choice_set = "agree5",
 #'                  scale_id = "sat", required = TRUE)
-#' item3 <- sf_item("visitor_type", "I am a",
+#' item3 <- sframe_item("visitor_type", "I am a",
 #'                  type = "single_choice", choice_set = "visitor")
 #'
-#' scale <- sf_scale("sat", "Satisfaction", items = c("sat_1", "sat_2"))
+#' scale <- sframe_scale("sat", "Satisfaction", items = c("sat_1", "sat_2"))
 #'
 #' # The analysis_plan binds each research question to a statistical method
 #' # and the variable roles it needs. Declare it before any data arrive.
@@ -64,15 +64,15 @@
 #'   )
 #' )
 #'
-#' instr <- sf_instrument(
+#' instr <- sframe_instrument(
 #'   title         = "Service Quality Survey",
 #'   version       = "1.0.0",
 #'   components    = list(choices, visitor_cs, item1, item2, item3, scale),
 #'   analysis_plan = plan
 #' )
 #' print(instr)
-#' length(sf_plan(instr))
-sf_instrument <- function(
+#' length(sframe_plan(instr))
+sframe_instrument <- function(
     title,
     version     = "0.1.0",
     description = NULL,

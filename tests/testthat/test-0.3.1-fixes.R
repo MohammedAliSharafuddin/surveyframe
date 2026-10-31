@@ -7,17 +7,17 @@ library(testthat)
 # ── Shared minimal instrument ─────────────────────────────────────────────────
 make_instr <- function(with_matrix = FALSE, with_endpoint = NULL,
                        with_header = FALSE, with_logo = FALSE) {
-  cs <- sf_choices("ag5", 1:5,
+  cs <- sframe_choice_set("ag5", 1:5,
     c("Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"))
   items <- list(cs,
-    sf_item("q1", "Question 1", type = "likert", choice_set = "ag5"))
+    sframe_item("q1", "Question 1", type = "likert", choice_set = "ag5"))
   if (with_matrix) {
     items <- c(items, list(
-      sf_item("mx1", "Matrix item", type = "matrix",
+      sframe_item("mx1", "Matrix item", type = "matrix",
                matrix_items = c("row_a", "row_b"))
     ))
   }
-  instr <- sf_instrument("Test Survey", components = items)
+  instr <- sframe_instrument("Test Survey", components = items)
   if (!is.null(with_endpoint)) {
     if (is.null(instr$render)) instr$render <- list()
     instr$render$google_sheets_endpoint <- with_endpoint
@@ -38,7 +38,7 @@ make_instr <- function(with_matrix = FALSE, with_endpoint = NULL,
 # ── Fix A: static export includes header logo and institution ─────────────────
 test_that("fix-a: exported static survey contains institution and img tag", {
   instr <- make_instr(with_header = TRUE, with_logo = TRUE)
-  out   <- export_static_survey(instr,
+  out   <- export_survey(instr,
              output_path = tempfile(fileext = ".html"),
              open = FALSE)
   html  <- paste(readLines(out, encoding = "UTF-8"), collapse = "\n")
@@ -52,7 +52,7 @@ test_that("fix-a: exported static survey contains institution and img tag", {
 test_that("fix-b: instrument google_sheets_endpoint used as fallback", {
   ep    <- "https://script.google.com/macros/s/TESTID/exec"
   instr <- make_instr(with_endpoint = ep)
-  out   <- export_static_survey(instr,
+  out   <- export_survey(instr,
              output_path = tempfile(fileext = ".html"),
              open = FALSE)
   html  <- paste(readLines(out, encoding = "UTF-8"), collapse = "\n")
@@ -64,7 +64,7 @@ test_that("fix-b: explicit endpoint_url wins over instrument endpoint", {
   ep_instr    <- "https://script.google.com/macros/s/BUILDER/exec"
   ep_explicit <- "https://script.google.com/macros/s/EXPLICIT/exec"
   instr <- make_instr(with_endpoint = ep_instr)
-  out   <- export_static_survey(instr,
+  out   <- export_survey(instr,
              output_path   = tempfile(fileext = ".html"),
              endpoint_url  = ep_explicit,
              open          = FALSE)
@@ -134,7 +134,7 @@ test_that("fix-d: read_sheet_responses body declares started_at as meta_cols", {
 # ── Fix E/F: logo media type stored and used correctly ───────────────────────
 test_that("fix-ef: static export uses logo_media_type when present", {
   instr <- make_instr(with_logo = TRUE)
-  out   <- export_static_survey(instr,
+  out   <- export_survey(instr,
              output_path = tempfile(fileext = ".html"),
              open = FALSE)
   html  <- paste(readLines(out, encoding = "UTF-8"), collapse = "\n")
@@ -150,7 +150,7 @@ test_that("fix-ef: static export falls back to image/png when media type absent"
   instr <- make_instr(with_header = TRUE)
   instr$render$header$logo_base64 <- "aGVsbG8="  # base64("hello")
   # No logo_media_type set -- should default to image/png
-  out  <- export_static_survey(instr,
+  out  <- export_survey(instr,
             output_path = tempfile(fileext = ".html"),
             open = FALSE)
   html <- paste(readLines(out, encoding = "UTF-8"), collapse = "\n")
@@ -161,10 +161,10 @@ test_that("fix-ef: static export falls back to image/png when media type absent"
 })
 
 test_that("0.3.3: item page assignments survive assembly, round trip, and export", {
-  cs <- sf_choices("pg5", 1:5, c("SD", "D", "N", "A", "SA"))
-  i1 <- sf_item("pq_1", "Q1", type = "likert", choice_set = "pg5", page = 1L)
-  i2 <- sf_item("pq_2", "Q2", type = "likert", choice_set = "pg5", page = 2L)
-  instr <- sf_instrument("Page regression", components = list(cs, i1, i2))
+  cs <- sframe_choice_set("pg5", 1:5, c("SD", "D", "N", "A", "SA"))
+  i1 <- sframe_item("pq_1", "Q1", type = "likert", choice_set = "pg5", page = 1L)
+  i2 <- sframe_item("pq_2", "Q2", type = "likert", choice_set = "pg5", page = 2L)
+  instr <- sframe_instrument("Page regression", components = list(cs, i1, i2))
   instr$items[[2]]$page <- 3L
 
   expect_identical(instr$items[[1]]$page, 1L)
@@ -179,19 +179,19 @@ test_that("0.3.3: item page assignments survive assembly, round trip, and export
 
   h <- tempfile(fileext = ".html")
   on.exit(unlink(h), add = TRUE)
-  export_static_survey(instr, output_path = h, open = FALSE, overwrite = TRUE)
+  export_survey(instr, output_path = h, open = FALSE, overwrite = TRUE)
   html <- paste(readLines(h, warn = FALSE), collapse = "")
   expect_match(html, "\"page\":1", fixed = TRUE)
   expect_match(html, "\"page\":3", fixed = TRUE)
 })
 
 test_that("0.3.3: exported survey posts to Apps Script without a CORS preflight", {
-  cs <- sf_choices("cg5", 1:5, c("SD", "D", "N", "A", "SA"))
-  i1 <- sf_item("cq_1", "Q1", type = "likert", choice_set = "cg5")
-  instr <- sf_instrument("CORS regression", components = list(cs, i1))
+  cs <- sframe_choice_set("cg5", 1:5, c("SD", "D", "N", "A", "SA"))
+  i1 <- sframe_item("cq_1", "Q1", type = "likert", choice_set = "cg5")
+  instr <- sframe_instrument("CORS regression", components = list(cs, i1))
   h <- tempfile(fileext = ".html")
   on.exit(unlink(h), add = TRUE)
-  export_static_survey(instr, output_path = h, open = FALSE, overwrite = TRUE,
+  export_survey(instr, output_path = h, open = FALSE, overwrite = TRUE,
                        endpoint_url = "https://script.google.com/macros/s/X/exec")
   html <- paste(readLines(h, warn = FALSE), collapse = "")
   expect_match(html, "mode:'no-cors'", fixed = TRUE)
@@ -200,9 +200,9 @@ test_that("0.3.3: exported survey posts to Apps Script without a CORS preflight"
 })
 
 test_that("0.3.3: multiple_choice items export one 0/1 column per option", {
-  cs <- sf_choices("mc", c("a", "b", "c"), c("Alpha", "Beta", "Gamma"))
-  i1 <- sf_item("q1", "Pick any", type = "multiple_choice", choice_set = "mc")
-  instr <- sf_instrument("Multi-select export", components = list(cs, i1))
+  cs <- sframe_choice_set("mc", c("a", "b", "c"), c("Alpha", "Beta", "Gamma"))
+  i1 <- sframe_item("q1", "Pick any", type = "multiple_choice", choice_set = "mc")
+  instr <- sframe_instrument("Multi-select export", components = list(cs, i1))
 
   gs <- export_google_sheet(instr, sheet_url = "x", output_dir = tempdir())
   on.exit(unlink(gs), add = TRUE)
@@ -214,7 +214,7 @@ test_that("0.3.3: multiple_choice items export one 0/1 column per option", {
 
   h <- tempfile(fileext = ".html")
   on.exit(unlink(h), add = TRUE)
-  export_static_survey(instr, output_path = h, open = FALSE, overwrite = TRUE)
+  export_survey(instr, output_path = h, open = FALSE, overwrite = TRUE)
   html <- paste(readLines(h, warn = FALSE), collapse = "")
   expect_match(html, "multiple_choice", fixed = TRUE)
 
@@ -229,13 +229,13 @@ test_that("0.3.3: multiple_choice items export one 0/1 column per option", {
 })
 
 test_that("0.3.3: matrix table carries data-col attributes for the mobile stacked layout", {
-  cs <- sf_choices("ag3", 1:3, c("Disagree", "Neutral", "Agree"))
-  i1 <- sf_item("m1", "Rate these", type = "matrix", choice_set = "ag3",
+  cs <- sframe_choice_set("ag3", 1:3, c("Disagree", "Neutral", "Agree"))
+  i1 <- sframe_item("m1", "Rate these", type = "matrix", choice_set = "ag3",
                matrix_items = c("Row A", "Row B"))
-  instr <- sf_instrument("Matrix mobile", components = list(cs, i1))
+  instr <- sframe_instrument("Matrix mobile", components = list(cs, i1))
   h <- tempfile(fileext = ".html")
   on.exit(unlink(h), add = TRUE)
-  export_static_survey(instr, output_path = h, open = FALSE, overwrite = TRUE)
+  export_survey(instr, output_path = h, open = FALSE, overwrite = TRUE)
   html <- paste(readLines(h, warn = FALSE), collapse = "")
   expect_match(html, 'data-col=', fixed = TRUE)
   expect_match(html, ".matrix-tbl td:not(.rl)::before", fixed = TRUE)

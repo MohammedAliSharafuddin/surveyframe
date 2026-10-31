@@ -19,7 +19,7 @@ A named list of three ggplot2 objects (\code{histogram}, \code{boxplot},
 }
 \description{
 Unlike \code{\link[=sframe_plot_descriptives]{sframe_plot_descriptives()}}, which summarises skewness and
-kurtosis \emph{across} the variables in a \code{\link[=descriptives_report]{descriptives_report()}} table, this
+kurtosis \emph{across} the variables in a \code{\link[=sframe_descriptives_results]{sframe_descriptives_results()}} table, this
 operates on one variable's raw values directly (the report table only
 stores summary statistics, not the underlying vector), matching the
 pattern \code{\link[=sframe_plot_correlation_matrix]{sframe_plot_correlation_matrix()}} already uses for
@@ -35,5 +35,5 @@ if (requireNamespace("ggplot2", quietly = TRUE)) {
 }
 }
 \seealso{
-\code{\link[=descriptives_report]{descriptives_report()}}, \code{\link[=sframe_plot_descriptives]{sframe_plot_descriptives()}}
+\code{\link[=sframe_descriptives_results]{sframe_descriptives_results()}}, \code{\link[=sframe_plot_descriptives]{sframe_plot_descriptives()}}
 }

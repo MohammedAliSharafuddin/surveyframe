@@ -12,9 +12,9 @@
 #' @return `x`, invisibly.
 #' @exportS3Method print sframe
 #' @examples
-#' item <- sf_item("q1", "How satisfied are you?", type = "likert",
+#' item <- sframe_item("q1", "How satisfied are you?", type = "likert",
 #'                 choice_set = "agree5")
-#' instr <- sf_instrument("My Survey", components = list(item))
+#' instr <- sframe_instrument("My Survey", components = list(item))
 #' print(instr)
 print.sframe <- function(x, ...) {
   n_items  <- length(x$items)
@@ -69,9 +69,9 @@ format.sframe <- function(x, ...) {
 #' @return `object`, invisibly.
 #' @exportS3Method summary sframe
 #' @examples
-#' item <- sf_item("q1", "How satisfied are you?", type = "likert",
+#' item <- sframe_item("q1", "How satisfied are you?", type = "likert",
 #'                 choice_set = "agree5")
-#' instr <- sf_instrument("My Survey", components = list(item))
+#' instr <- sframe_instrument("My Survey", components = list(item))
 #' summary(instr)
 summary.sframe <- function(object, ...) {
   types <- vapply(object$items, function(i) i$type, character(1))
