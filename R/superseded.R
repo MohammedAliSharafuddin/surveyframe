@@ -89,9 +89,9 @@
 #' | `sframe_input_types_demo_data()` | [sframe_demo()] with `"input_types"` |
 #' | `launch_builder_demo()` | [launch_builder()] with `demo = "input_types"` |
 #' | `launch_studio_demo()` | [launch_studio()] with `demo = "input_types"` |
+#' | `preview_demo()` | [preview_survey()] |
 #' | `launch_dashboard()` | [launch_studio()] with `screen = "dashboard"` |
 #' | `launch_dashboard_demo()` | [launch_studio()] with `demo = "input_types"` and `screen = "dashboard"` |
-#' | `preview_demo()` | [preview_survey()] |
 #' | `sf_plan(x) <- value` | [sframe_plan<-][sframe_plan] |
 #'
 #' @param ... Passed to the new function.

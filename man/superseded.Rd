@@ -370,9 +370,9 @@ warning per old name per session, naming its replacement.
    \code{sframe_input_types_demo_data()} \tab \code{\link[=sframe_demo]{sframe_demo()}} with \code{"input_types"} \cr
    \code{launch_builder_demo()} \tab \code{\link[=launch_builder]{launch_builder()}} with \code{demo = "input_types"} \cr
    \code{launch_studio_demo()} \tab \code{\link[=launch_studio]{launch_studio()}} with \code{demo = "input_types"} \cr
+   \code{preview_demo()} \tab \code{\link[=preview_survey]{preview_survey()}} \cr
    \code{launch_dashboard()} \tab \code{\link[=launch_studio]{launch_studio()}} with \code{screen = "dashboard"} \cr
    \code{launch_dashboard_demo()} \tab \code{\link[=launch_studio]{launch_studio()}} with \code{demo = "input_types"} and \code{screen = "dashboard"} \cr
-   \code{preview_demo()} \tab \code{\link[=preview_survey]{preview_survey()}} \cr
    \code{sf_plan(x) <- value} \tab \link[=sframe_plan]{sframe_plan<-} \cr
 }
 }

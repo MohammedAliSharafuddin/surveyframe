@@ -799,6 +799,11 @@ style.
 * **The SurveyStudio guide shows Studio's Dashboard screen**, with its
   filters, in place of the retired dashboard app.
 
+* **`data-raw/rename_0.4.3.R` writes the 2 dashboard wrappers.**
+  `launch_dashboard()` and `launch_dashboard_demo()` were added to
+  `R/superseded.R` by hand, so a rerun of the generator dropped them. A test
+  reruns it on a copy of the source and expects no file to change.
+
 * **`launch_dashboard()` opens Studio's Dashboard screen.** It and
   `launch_dashboard_demo()` are superseded by `launch_studio(screen =
   "dashboard")`, and the separate dashboard app is removed.

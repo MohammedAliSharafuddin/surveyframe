@@ -139,6 +139,50 @@ custom <- list(
   )
 )
 
+# Wrappers written whole, for the 2 dashboard launchers that became a
+# Studio screen and keep their own argument checks. They are not in
+# `renames`, so no source is rewritten for them: the table rows, then the
+# code appended after the generated wrappers.
+whole_rows <- c(
+  "#' | `launch_dashboard()` | [launch_studio()] with `screen = \"dashboard\"` |",
+  "#' | `launch_dashboard_demo()` | [launch_studio()] with `demo = \"input_types\"` and `screen = \"dashboard\"` |"
+)
+whole_code <- c(
+  "#' @rdname superseded",
+  "#' @export",
+  "launch_dashboard <- function(instrument = NULL, responses = NULL, port = NULL, host = \"127.0.0.1\", launch.browser = interactive()) {",
+  "  sframe_superseded(\"launch_dashboard()\", \"launch_studio(screen = \\\"dashboard\\\")\")",
+  "  if (is.null(instrument)) {",
+  "    rlang::abort(",
+  "      paste0(",
+  "        \"launch_dashboard() needs an instrument to display. Pass one (with \",",
+  "        \"responses) from R, use launch_studio(demo = \\\"input_types\\\", \",",
+  "        \"screen = \\\"dashboard\\\") for the bundled demo, or use launch_studio() \",",
+  "        \"to open and upload data interactively.\"",
+  "      ),",
+  "      class = \"sframe_error\"",
+  "    )",
+  "  }",
+  "  sframe_check_instrument(instrument)",
+  "  if (!is.null(responses) && !is.data.frame(responses)) {",
+  "    rlang::abort(",
+  "      \"`responses` must be a data.frame or NULL.\",",
+  "      class = \"sframe_error\"",
+  "    )",
+  "  }",
+  "  launch_studio(instrument, responses = responses, screen = \"dashboard\",",
+  "                port = port, host = host, launch.browser = launch.browser)",
+  "}",
+  "",
+  "#' @rdname superseded",
+  "#' @export",
+  "launch_dashboard_demo <- function(port = NULL, host = \"127.0.0.1\", launch.browser = TRUE) {",
+  "  sframe_superseded(\"launch_dashboard_demo()\", \"launch_studio(demo = \\\"input_types\\\", screen = \\\"dashboard\\\")\")",
+  "  launch_studio(demo = \"input_types\", screen = \"dashboard\", port = port,",
+  "                host = host, launch.browser = launch.browser)",
+  "}"
+)
+
 # Calls rewritten whole before the name rules run, for the old names that
 # became an argument: the pattern after `before`, then the replacement. A
 # roxygen link such as [sframe_demo_data()] becomes [sframe_demo()] first.
@@ -274,13 +318,16 @@ out <- c(
   "#' | Old name | New name |",
   "#' |---|---|",
   table_rows,
+  whole_rows,
   "#' | `sf_plan(x) <- value` | [sframe_plan<-][sframe_plan] |",
   "#'",
   "#' @param ... Passed to the new function.
 #' @param open Passed to [launch_builder()] or [preview_survey()].
 #' @param name,where Passed to [preview_survey()], as its `x` and `where`.
 #' @param screen,port,host,launch.browser Passed to [launch_studio()].",
-  "#' @param instrument,scales,std_lv Passed to [sframe_syntax_cfa()].",
+  "#' @param instrument,scales,std_lv Passed to [sframe_syntax_cfa()]. `instrument` is",
+  "#'   also passed to [launch_studio()] by `launch_dashboard()`.",
+  "#' @param responses A data frame of responses, passed to [launch_studio()].",
   "#' @param x An instrument.",
   "#' @param value The analysis plan, as for [sframe_plan()].",
   "#' @return What the new function returns.",
@@ -298,7 +345,9 @@ out <- c(
   "`sf_plan<-` <- function(x, value) {",
   "  sframe_superseded(\"sf_plan(x) <- value\", \"sframe_plan(x) <- value\")",
   "  `sframe_plan<-`(x, value = value)",
-  "}"
+  "}",
+  "",
+  whole_code
 )
 writeLines(out, "R/superseded.R")
-message("R/superseded.R written with ", nrow(renames) + 1, " wrappers")
+message("R/superseded.R written with ", nrow(renames) + 3, " wrappers")
