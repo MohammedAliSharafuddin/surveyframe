@@ -40,7 +40,7 @@ sorted by class automatically, so they can be supplied in any order.}
 \code{\link[=run_survey]{run_survey()}}, such as theme colour or progress bar visibility.}
 
 \item{analysis_plan}{List. Optional pre-planned analysis blocks created in
-the HTML SurveyBuilder Analyse mode.}
+the HTML SurveyBuilder Plan mode.}
 
 \item{models}{List. Optional model specifications created with \code{\link[=sframe_model_spec]{sframe_model_spec()}}
 or imported from a \code{.sframe} file.}

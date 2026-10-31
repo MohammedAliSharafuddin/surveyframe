@@ -65,10 +65,10 @@ table(vapply(instr$items, function(x) x$type, character(1)))
 dim(responses)
 ```
 
-## SurveyBuilder: the Analyse mode
+## SurveyBuilder: the Plan mode
 
 SurveyBuilder runs entirely in the browser, so it is an authoring tool. Its
-Analyse mode has three tabs, Plan, Run, and Report, with a three-panel layout
+Plan mode has three tabs, Plan, Run, and Report, with a three-panel layout
 underneath: a list of variables and constructs on the left, the analysis plans
 in the middle, and an output preview with the model builder on the right.
 
@@ -78,7 +78,7 @@ significance level, the variables that fill each role, and the decision rule.
 The form offers only the role set a method needs and reads the measurement
 level of each variable, so a saved plan is coherent.
 
-```{r fig-builder-analyse, echo = FALSE, out.width = "100%", fig.alt = "SurveyBuilder in Analyse mode with the Edit Analysis Plan dialog open. The dialog shows the research question, Variable X and Variable Y role dropdowns, Pearson correlation as the method, a significance level of 0.05, the reporting references, the planned output and assumptions, and the decision rule."}
+```{r fig-builder-analyse, echo = FALSE, out.width = "100%", fig.alt = "SurveyBuilder in Plan mode with the Edit Analysis Plan dialog open. The dialog shows the research question, Variable X and Variable Y role dropdowns, Pearson correlation as the method, a significance level of 0.05, the reporting references, the planned output and assumptions, and the decision rule."}
 knitr::include_graphics("figures/gui-builder-analyse-plan.png")
 ```
 

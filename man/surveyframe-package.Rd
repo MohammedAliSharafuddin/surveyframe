@@ -44,7 +44,7 @@ validated instrument.
 
 \subsection{Plan}{
 
-In SurveyBuilder, the Analyse mode. In code, \code{sframe_plan(x) <- plan},
+In SurveyBuilder, the Plan mode. In code, \code{sframe_plan(x) <- plan},
 read back with \code{\link[=sframe_plan]{sframe_plan()}}. \code{\link[=sframe_sample_size_plan]{sframe_sample_size_plan()}} says how many
 responses the plan needs.
 }

@@ -567,7 +567,7 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
   <div class="tb-modes" role="group" aria-label="Builder mode">
     <button type="button" class="m-btn" aria-pressed="true"  data-mode="build"   onclick="setMode('build')">Build</button>
     <button type="button" class="m-btn" aria-pressed="false" data-mode="preview" onclick="setMode('preview')">Preview</button>
-    <button type="button" class="m-btn" aria-pressed="false" data-mode="analyse" onclick="setMode('analyse')">Analyse</button>
+    <button type="button" class="m-btn" aria-pressed="false" data-mode="analyse" onclick="setMode('analyse')">Plan</button>
   </div>
   <div class="tb-r">
     <div class="tb-hist">
@@ -580,7 +580,7 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
          duplicate entry point; the top bar is reserved for document
          actions (Open, Export, Save). -->
     <button type="button" class="btn btn-s btn-sm" id="openBtn" onclick="openFile()">Open</button>
-    <button type="button" class="btn btn-s btn-sm" onclick="exportSurveyHtml()" title="Export a deployable, self-contained survey HTML">Export survey</button>
+    <button type="button" class="btn btn-s btn-sm" id="exportBtn" onclick="exportSurveyHtml()" title="Export a deployable, self-contained survey HTML">Export survey</button>
     <button type="button" class="btn btn-p btn-sm" id="saveBtn" onclick="saveSframe()">Save .sframe</button>
   </div>
 </header>
@@ -2719,7 +2719,10 @@ function updHistBtns(){var u=document.getElementById('undoBtn'),r=document.getEl
 function setDirty(){dirty=true;updSave();}
 // Opened is its own state: inside a host such as Ethos, "Saved" after
 // opening a file reads as saved in the host, and nothing has been saved.
-function updSave(){var e=document.getElementById('saveSt');if(!dirty&&lastSaved){e.textContent='Saved '+tAgo(lastSaved);e.className='save-st saved';}else if(!dirty&&openedAt){e.textContent='Opened '+tAgo(openedAt);e.className='save-st';}else if(dirty){e.textContent='Unsaved changes';e.className='save-st dirty';}else{e.textContent='No changes';e.className='save-st';}}
+function updSave(){var e=document.getElementById('saveSt');
+  // In Studio the save goes to Studio, so the state is Saved or not.
+  if(typeof STUDIO_HOST!=='undefined'&&STUDIO_HOST){e.textContent=dirty?'Unsaved changes':'Saved';e.className='save-st '+(dirty?'dirty':'saved');studioPostDirty();return;}
+  if(!dirty&&lastSaved){e.textContent='Saved '+tAgo(lastSaved);e.className='save-st saved';}else if(!dirty&&openedAt){e.textContent='Opened '+tAgo(openedAt);e.className='save-st';}else if(dirty){e.textContent='Unsaved changes';e.className='save-st dirty';}else{e.textContent='No changes';e.className='save-st';}}
 function tAgo(d){var s=Math.round((Date.now()-d)/1000);if(s<10)return'just now';if(s<60)return s+'s ago';return Math.round(s/60)+'m ago';}
 function uid(){return Math.random().toString(36).slice(2,9);}
 function ra(){renderItemList();renderAnalyse();updSave();document.getElementById('sbTitle').textContent=S.meta.title||'Untitled Survey';}
@@ -4347,9 +4350,20 @@ setInterval(function(){if(lastSaved||openedAt)updSave();},30000);
 // only between this window and its parent, on the same origin.
 // The builder also runs where there is no page, as in the V8 tests.
 var STUDIO_HOST=typeof location!=="undefined"&&/[?&]host=studio(&|$)/.test(location.search)&&window.parent!==window;
-var studioPendingOrigin=null;
+var studioPendingOrigin=null,studioLastDirty=null;
+// Studio shows a reminder while the builder has unsaved changes.
+function studioPostDirty(){
+  if(studioLastDirty===dirty)return;
+  studioLastDirty=dirty;
+  window.parent.postMessage({type:'dirty',dirty:dirty},location.origin);
+}
 function studioHostInit(){
+  // Studio has its own name, Preview Survey screen and Collect screen.
   document.getElementById('openBtn').style.display='none';
+  document.getElementById('exportBtn').style.display='none';
+  document.querySelector('.tb-brand').style.display='none';
+  document.querySelector(".m-btn[data-mode='preview']").style.display='none';
+  updSave();
   var sb=document.getElementById('saveBtn');
   sb.textContent='Save to Studio';sb.title='Make this survey the instrument Studio has open (Ctrl+S)';
   window.addEventListener('message',function(e){

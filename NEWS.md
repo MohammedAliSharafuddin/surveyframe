@@ -823,6 +823,14 @@ style.
   wording, help text or branding edit. When one of those changes, the
   responses are cleared, and a message names what changed.
 
+* **The builder on the Design screen is part of Studio.** It drops its
+  SurveyBuilder name, its Preview mode and its Export survey button, which
+  Studio's Preview Survey and Collect screens do. Its save state reads
+  "Saved" or "Unsaved changes", and Studio's line above it reads
+  "Editing: <title> (<version>)", with a reminder to save only while there
+  are unsaved changes. The builder's Analyse mode is now Plan, in Studio
+  and on its own, after the stages Design, Plan, Preview and Collect.
+
 * **The sidebar shows 1 selected screen.** The entry under the mouse took
   the selected look, so with Design open, Design and the entry the mouse
   rested on both looked selected. Hover is now a lighter tint.
