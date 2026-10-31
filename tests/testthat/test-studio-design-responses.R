@@ -34,6 +34,27 @@ test_that("a removed item or a renamed choice code is named in the message", {
   expect_match(sframe_studio_response_change(old, new), "item extra_q was added", fixed = TRUE)
 })
 
+test_that("a changed item type or matrix row on the same id clears the responses", {
+  old <- sframe_demo("likert_scale")$instrument
+  id <- old$items[[1]]$id
+  new <- old
+  new$items[[1]]$type <- "text"
+  new$items[[1]]$choice_set <- NULL
+  msg <- sframe_studio_response_change(old, new)
+  expect_match(msg, paste0("item ", id, " changed from likert to text"), fixed = TRUE)
+
+  grid <- function(rows) sframe_instrument("Grid", components = list(
+    sframe_choice_set("agree3", values = 1:3, labels = c("No", "Maybe", "Yes")),
+    sframe_item("g1", "Rate each", type = "matrix", choice_set = "agree3",
+                matrix_items = rows)))
+  msg <- sframe_studio_response_change(grid(c("a", "b")), grid(c("a", "c")))
+  expect_match(msg, "row b of g1 was renamed c", fixed = TRUE)
+  msg <- sframe_studio_response_change(grid(c("a", "b")), grid(c("a", "b", "d")))
+  expect_match(msg, "row d of g1 was added", fixed = TRUE)
+  msg <- sframe_studio_response_change(grid(c("a", "b")), grid("a"))
+  expect_match(msg, "row b of g1 was removed", fixed = TRUE)
+})
+
 test_that("a Design save keeps or clears the loaded responses in Studio", {
   skip_on_cran()
   skip_if_not_slow()
