@@ -30,7 +30,6 @@ subset(sframe_list_demos(), focus == "provenance")
 \code{\link[=sframe_demo]{sframe_demo()}}, \code{\link[=sframe_demo_branding]{sframe_demo_branding()}}, \code{\link[=sframe_demo_qmd]{sframe_demo_qmd()}}
 
 Other Demo functions:
-\code{\link[=launch_dashboard_demo]{launch_dashboard_demo()}},
 \code{\link[=sframe_demo]{sframe_demo()}},
 \code{\link[=sframe_demo_branding]{sframe_demo_branding()}},
 \code{\link[=sframe_demo_qmd]{sframe_demo_qmd()}}

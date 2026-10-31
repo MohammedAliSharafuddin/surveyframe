@@ -12,8 +12,8 @@ superseded_wrappers <- function() {
   sort(exports[is_wrapper])
 }
 
-test_that("79 old names are kept as wrappers", {
-  expect_length(superseded_wrappers(), 79)
+test_that("81 old names are kept as wrappers", {
+  expect_length(superseded_wrappers(), 81)
 })
 
 test_that("each wrapper forwards to an exported function", {

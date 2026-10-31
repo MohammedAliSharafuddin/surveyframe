@@ -85,11 +85,10 @@ launch_studio(
 }
 }
 \seealso{
-\code{\link[=launch_builder]{launch_builder()}}, \code{\link[=launch_dashboard]{launch_dashboard()}}, \code{\link[=read_sframe]{read_sframe()}},
+\code{\link[=launch_builder]{launch_builder()}}, \code{\link[=read_sframe]{read_sframe()}},
 \code{\link[=read_responses]{read_responses()}}
 
 Other entry points:
-\code{\link[=launch_dashboard]{launch_dashboard()}},
 \code{\link{surveyframe-package}}
 }
 \concept{entry points}

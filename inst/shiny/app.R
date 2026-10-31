@@ -1269,6 +1269,10 @@ ui <- fluidPage(
       .badge-ok { background: #e6f4ea; color: #2e7d32; }
       .badge-wait { background: #fef3cd; color: #856404; }
       .badge-warn { background: #fde8e8; color: #b91c1c; }
+      .filter-bar { background: #fff; border-radius: 10px; padding: 14px 16px; box-shadow: 0 1px 4px rgba(0,0,0,.07); margin-bottom: 16px; }
+      .filter-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; align-items: end; }
+      .filter-grid label { font-size: 12px; font-weight: 600; color: #475569; }
+      .filter-note { font-size: 11px; color: #94a3b8; margin-top: 8px; }
       .stat-row { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 16px; }
       .stat-box {
         flex: 1; min-width: 120px; background: #f7f8fa; border-radius: 8px;
@@ -1661,6 +1665,7 @@ ui <- fluidPage(
             inline = TRUE
           )
         ),
+        uiOutput("dash_filter_bar"),
         uiOutput("studio_dashboard_content")
       ),
 
@@ -2807,10 +2812,11 @@ server <- function(input, output, session) {
   }, bg = "white")
 
   # Scale-score correlation heatmap for the Dashboard tab's Scales view.
-  # Scores are local row means per scale, matching the standalone dashboard.
+  # Scores are local row means per scale, on the filtered rows.
   output$studio_scale_cor_chart <- shiny::renderPlot({
     req(rv$instrument, rv$responses)
-    resp <- rv$responses
+    resp <- dash_filtered_responses()
+    if (!nrow(resp)) { plot.new(); text(.5, .5, "No responses match the filters.", col = "#94a3b8"); return() }
     scs <- Filter(function(s) length(intersect(s$items, names(resp))) > 0,
                   rv$instrument$scales %||% list())
     if (length(scs) < 2) {
@@ -3699,11 +3705,87 @@ server <- function(input, output, session) {
     NULL
   }
 
+  # The filter bar names each filter by its question and offers the choice
+  # labels. Filters apply to the 4 dashboard views and the CSV download. The
+  # Quality screen stays on every response.
+  dash_date_col <- reactive(dashboard_date_column(rv$responses))
+  dash_filter_cols <- reactive(dashboard_categorical_columns(rv$responses))
+
+  output$dash_filter_bar <- renderUI({
+    req(rv$instrument)
+    responses <- rv$responses
+    instr <- rv$instrument
+    date_col <- dash_date_col()
+    cat_cols <- dash_filter_cols()
+    if (is.null(responses) || nrow(responses) == 0 ||
+        (!length(cat_cols) && is.null(date_col))) {
+      return(NULL)
+    }
+    labels <- sframe_label_lookup(instr)
+    cats <- lapply(cat_cols, function(nm) {
+      vals <- sort(unique(as.character(responses[[nm]][!is.na(responses[[nm]])])))
+      if (!length(vals)) return(NULL)
+      value_labels <- sframe_item_value_labels(instr, nm)
+      shown <- ifelse(vals %in% names(value_labels), unname(value_labels[vals]), vals)
+      tags$div(
+        selectInput(
+          paste0("dash_filter_", nm),
+          if (nm %in% names(labels)) unname(labels[[nm]]) else nm,
+          choices = stats::setNames(vals, shown),
+          selected = character(0),
+          multiple = TRUE,
+          width = "100%"
+        )
+      )
+    })
+    cats <- Filter(Negate(is.null), cats)
+
+    date_ui <- NULL
+    if (!is.null(date_col)) {
+      d <- dashboard_parse_date(responses[[date_col]])
+      d <- d[!is.na(d)]
+      if (length(d)) {
+        date_ui <- tags$div(
+          tags$label(date_col),
+          shiny::dateRangeInput("dash_filter_date_range", NULL, start = min(d),
+                                end = max(d), min = min(d), max = max(d),
+                                width = "100%")
+        )
+      }
+    }
+
+    tags$div(
+      class = "filter-bar",
+      tags$div(class = "card-title", "Filters"),
+      tags$div(class = "filter-grid", c(cats, list(date_ui))),
+      tags$div(class = "filter-note", "Leave a filter blank to include all responses.")
+    )
+  })
+
+  dash_filtered_responses <- reactive({
+    out <- rv$responses
+    if (is.null(out)) return(NULL)
+    for (nm in dash_filter_cols()) {
+      selected <- input[[paste0("dash_filter_", nm)]]
+      if (length(selected)) {
+        out <- out[as.character(out[[nm]]) %in% selected, , drop = FALSE]
+      }
+    }
+    date_col <- dash_date_col()
+    if (!is.null(date_col) && !is.null(input$dash_filter_date_range)) {
+      d <- dashboard_parse_date(out[[date_col]])
+      rng <- dashboard_parse_date(input$dash_filter_date_range)
+      keep <- is.na(d) | (d >= rng[1] & d <= rng[2])
+      out <- out[keep, , drop = FALSE]
+    }
+    out
+  })
+
   output$studio_dashboard_content <- renderUI({
     req(rv$instrument)
     if (is.null(rv$responses)) return(NULL)
     view <- input$dashboard_view %||% "Overview"
-    resp <- rv$responses
+    resp <- dash_filtered_responses()
     instr <- rv$instrument
 
     if (identical(view, "Overview")) {
@@ -3720,7 +3802,10 @@ server <- function(input, output, session) {
         tags$div(class = "stat-val", v), tags$div(class = "stat-lbl", l))
       return(tagList(
         tags$div(class = "stat-row",
-          kpi(nrow(resp), "Responses"),
+          kpi(nrow(rv$responses), "Responses"),
+          tags$div(class = "stat-box", id = "dash_filtered_tile",
+            tags$div(class = "stat-val", nrow(resp)),
+            tags$div(class = "stat-lbl", "Filtered responses")),
           kpi(length(dash_q_items()), "Items"),
           kpi(length(instr$scales %||% list()), "Scales"),
           kpi(length(instr$checks %||% list()), "Checks"),
@@ -3793,7 +3878,8 @@ server <- function(input, output, session) {
 
   output$studio_item_chart <- shiny::renderPlot({
     req(rv$instrument, rv$responses, input$dash_item_sel)
-    resp <- rv$responses
+    resp <- dash_filtered_responses()
+    if (!nrow(resp)) { plot.new(); text(.5, .5, "No responses match the filters.", col = "#94a3b8"); return() }
     item <- dash_find(rv$instrument$items, input$dash_item_sel)
     if (is.null(item) || !input$dash_item_sel %in% names(resp)) {
       plot.new(); text(.5, .5, "No data for this item.", col = "#94a3b8"); return()
@@ -3827,7 +3913,8 @@ server <- function(input, output, session) {
 
   output$studio_item_table <- renderUI({
     req(rv$instrument, rv$responses, input$dash_item_sel)
-    resp <- rv$responses
+    resp <- dash_filtered_responses()
+    if (!nrow(resp)) return(tags$p(class = "hint", "No responses match the filters."))
     item <- dash_find(rv$instrument$items, input$dash_item_sel)
     if (is.null(item) || !input$dash_item_sel %in% names(resp)) return(NULL)
     col_data <- resp[[input$dash_item_sel]]
@@ -3866,7 +3953,8 @@ server <- function(input, output, session) {
 
   output$studio_scale_chart <- shiny::renderPlot({
     req(rv$instrument, rv$responses, input$dash_scale_sel)
-    resp <- rv$responses
+    resp <- dash_filtered_responses()
+    if (!nrow(resp)) { plot.new(); text(.5, .5, "No responses match the filters.", col = "#94a3b8"); return() }
     sc <- dash_find(rv$instrument$scales, input$dash_scale_sel)
     if (is.null(sc)) return()
     cols <- intersect(sc$items, names(resp))
@@ -3889,7 +3977,7 @@ server <- function(input, output, session) {
 
   output$studio_raw_table <- shiny::renderTable({
     req(rv$responses)
-    head(rv$responses, 200)
+    head(dash_filtered_responses(), 200)
   }, striped = TRUE, hover = TRUE, bordered = FALSE, width = "100%", na = "")
 
   output$dash_dl_csv <- downloadHandler(
@@ -3898,7 +3986,7 @@ server <- function(input, output, session) {
              "_responses.csv")
     },
     content = function(file) {
-      utils::write.csv(rv$responses, file, row.names = FALSE, na = "")
+      utils::write.csv(dash_filtered_responses(), file, row.names = FALSE, na = "")
     }
   )
 

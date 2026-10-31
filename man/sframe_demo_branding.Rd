@@ -27,7 +27,6 @@ branding$theme
 \code{\link[=preview_survey]{preview_survey()}} to see the branding applied to a demo.
 
 Other Demo functions:
-\code{\link[=launch_dashboard_demo]{launch_dashboard_demo()}},
 \code{\link[=sframe_demo]{sframe_demo()}},
 \code{\link[=sframe_demo_qmd]{sframe_demo_qmd()}},
 \code{\link[=sframe_list_demos]{sframe_list_demos()}}

@@ -33,7 +33,6 @@ basename(out)
 \code{\link[=sframe_demo]{sframe_demo()}}, \code{\link[=sframe_list_demos]{sframe_list_demos()}}
 
 Other Demo functions:
-\code{\link[=launch_dashboard_demo]{launch_dashboard_demo()}},
 \code{\link[=sframe_demo]{sframe_demo()}},
 \code{\link[=sframe_demo_branding]{sframe_demo_branding()}},
 \code{\link[=sframe_list_demos]{sframe_list_demos()}}

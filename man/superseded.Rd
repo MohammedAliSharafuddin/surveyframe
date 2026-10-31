@@ -81,6 +81,8 @@
 \alias{launch_studio_demo}
 \alias{preview_demo}
 \alias{sf_plan<-}
+\alias{launch_dashboard}
+\alias{launch_dashboard_demo}
 \title{Superseded function names}
 \usage{
 sf_instrument(...)
@@ -249,11 +251,22 @@ preview_demo(
 )
 
 sf_plan(x) <- value
+
+launch_dashboard(
+  instrument = NULL,
+  responses = NULL,
+  port = NULL,
+  host = "127.0.0.1",
+  launch.browser = interactive()
+)
+
+launch_dashboard_demo(port = NULL, host = "127.0.0.1", launch.browser = TRUE)
 }
 \arguments{
 \item{...}{Passed to the new function.}
 
-\item{instrument, scales, std_lv}{Passed to \code{\link[=sframe_syntax_cfa]{sframe_syntax_cfa()}}.}
+\item{instrument, scales, std_lv}{Passed to \code{\link[=sframe_syntax_cfa]{sframe_syntax_cfa()}}. \code{instrument} is
+also passed to \code{\link[=launch_studio]{launch_studio()}} by \code{launch_dashboard()}.}
 
 \item{open}{Passed to \code{\link[=launch_builder]{launch_builder()}} or \code{\link[=preview_survey]{preview_survey()}}.}
 
@@ -264,6 +277,8 @@ sf_plan(x) <- value
 \item{x}{An instrument.}
 
 \item{value}{The analysis plan, as for \code{\link[=sframe_plan]{sframe_plan()}}.}
+
+\item{responses}{A data frame of responses, passed to \code{\link[=launch_studio]{launch_studio()}}.}
 }
 \value{
 What the new function returns.
@@ -355,6 +370,8 @@ warning per old name per session, naming its replacement.
    \code{sframe_input_types_demo_data()} \tab \code{\link[=sframe_demo]{sframe_demo()}} with \code{"input_types"} \cr
    \code{launch_builder_demo()} \tab \code{\link[=launch_builder]{launch_builder()}} with \code{demo = "input_types"} \cr
    \code{launch_studio_demo()} \tab \code{\link[=launch_studio]{launch_studio()}} with \code{demo = "input_types"} \cr
+   \code{launch_dashboard()} \tab \code{\link[=launch_studio]{launch_studio()}} with \code{screen = "dashboard"} \cr
+   \code{launch_dashboard_demo()} \tab \code{\link[=launch_studio]{launch_studio()}} with \code{demo = "input_types"} and \code{screen = "dashboard"} \cr
    \code{preview_demo()} \tab \code{\link[=preview_survey]{preview_survey()}} \cr
    \code{sf_plan(x) <- value} \tab \link[=sframe_plan]{sframe_plan<-} \cr
 }

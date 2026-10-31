@@ -119,7 +119,6 @@ reference:
     contents:
       - surveyframe-package
       - launch_studio
-      - launch_dashboard
 
   - title: "Design"
     desc: >
@@ -382,7 +381,6 @@ reference:
       - sframe_demo
       - sframe_demo_qmd
       - sframe_demo_branding
-      - launch_dashboard_demo
 
   - title: "Methods"
     desc: >

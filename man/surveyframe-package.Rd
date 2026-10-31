@@ -150,7 +150,6 @@ Useful links:
 
 
 Other entry points:
-\code{\link[=launch_dashboard]{launch_dashboard()}},
 \code{\link[=launch_studio]{launch_studio()}}
 }
 \author{

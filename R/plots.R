@@ -1924,15 +1924,14 @@ plot.sframe_analysis_results <- function(x, ..., which = NULL) {
 
 #' Plot an item response distribution
 #'
-#' Draws how one item was answered, as the dashboard and SurveyStudio panels
-#' show it. It returns `NULL` where it has nothing to draw, so a caller can
+#' Draws how one item was answered, as SurveyStudio's Dashboard screen shows
+#' it. It returns `NULL` where it has nothing to draw, so a caller can
 #' fall back to its own chart.
 #'
-#' Shared by `launch_dashboard()` (`inst/shiny/dashboard/app.R`) and the
-#' SurveyStudio dashboard tab (`inst/shiny/app.R`), which otherwise
-#' duplicated this base-graphics chart. Callers fall back to their own base
-#' graphics when this returns `NULL` (ggplot2 not installed, unsupported
-#' item type, or no data), so the dashboard keeps working without ggplot2.
+#' Used by the SurveyStudio Dashboard screen (`inst/shiny/app.R`). Callers
+#' fall back to their own base graphics when this returns `NULL` (ggplot2 not
+#' installed, unsupported item type, or no data), so the screen keeps working
+#' without ggplot2.
 #'
 #' @param item A list with at least `type` and `label` (an sframe item).
 #' @param col_data The response column for this item.

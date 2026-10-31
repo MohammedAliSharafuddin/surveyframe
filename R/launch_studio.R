@@ -63,7 +63,7 @@ sframe_studio_screen <- function(screen) {
 #'
 #' @return Called for its side effect.
 #' @export
-#' @seealso [launch_builder()], [launch_dashboard()], [read_sframe()],
+#' @seealso [launch_builder()], [read_sframe()],
 #'   [read_responses()]
 #'
 #' @examples

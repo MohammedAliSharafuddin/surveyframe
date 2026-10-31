@@ -116,3 +116,54 @@ test_that("the launch screen does not override a screen picked before it", {
   expect_true(js("$('#screen-preview').hasClass('active')"))
   expect_false(js("$('#screen-open').hasClass('active')"))
 })
+
+test_that("a dashboard filter lowers the filtered-responses tile", {
+  skip_on_cran()
+  skip_if_not_slow()
+  skip_if_not_installed("shiny")
+  skip_if_not_installed("chromote")
+  skip_if_not_installed("callr")
+  chrome <- tryCatch(chromote::find_chrome(), error = function(e) NULL)
+  skip_if(length(chrome) != 1L || is.na(chrome) || !nzchar(chrome), "Chrome not found")
+
+  resp <- sframe_demo("input_types")$responses
+  total <- nrow(resp)
+  chosen <- sort(unique(as.character(resp$visit_type[!is.na(resp$visit_type)])))[1]
+  expected <- sum(as.character(resp$visit_type) == chosen, na.rm = TRUE)
+  expect_lt(expected, total)
+
+  libpath <- sframe_build_libpath()
+  port <- httpuv::randomPort()
+  proc <- callr::r_bg(function(port) {
+    library(surveyframe)
+    launch_studio(demo = "input_types", screen = "dashboard", port = port,
+                  launch.browser = FALSE)
+  }, args = list(port), libpath = libpath)
+  on.exit(proc$kill(), add = TRUE)
+  url <- paste0("http://127.0.0.1:", port)
+  for (i in 1:180) {
+    up <- tryCatch({ suppressWarnings(readLines(url, n = 1)); TRUE }, error = function(e) FALSE)
+    if (up) break
+    Sys.sleep(0.5)
+  }
+  skip_if(!up, "Studio did not start")
+  b <- chromote::ChromoteSession$new(width = 1280, height = 900)
+  on.exit(b$close(), add = TRUE)
+  b$Page$navigate(url)
+  js <- function(code) b$Runtime$evaluate(code, returnByValue = TRUE)$result$value
+  wait <- function(cond, tries = 120) {
+    for (i in seq_len(tries)) {
+      if (isTRUE(tryCatch(js(cond), error = function(e) FALSE))) return(TRUE)
+      Sys.sleep(0.5)
+    }
+    FALSE
+  }
+  expect_true(wait("window.Shiny && Shiny.shinyapp && Shiny.shinyapp.isConnected()"))
+  tile <- "(function(){ var e = document.getElementById('dash_filtered_tile');
+    return e ? e.querySelector('.stat-val').innerText.trim() : ''; })()"
+  expect_true(wait(sprintf("%s === '%d'", gsub("\n", " ", tile), total)),
+              label = "tile shows every response before filtering")
+  js(sprintf("Shiny.setInputValue('dash_filter_visit_type', ['%s']); true", chosen))
+  expect_true(wait(sprintf("%s === '%d'", gsub("\n", " ", tile), expected)),
+              label = "tile shows the filtered count")
+})
