@@ -62,7 +62,7 @@ test_that("the Collect screen downloads the survey and its collector", {
   Sys.sleep(1.5)
 
   survey <- fetch("collect_survey_dl")
-  expect_match(survey, "<!DOCTYPE html>", fixed = TRUE, ignore.case = TRUE)
+  expect_match(survey, "<!doctype html>", ignore.case = TRUE)
   expect_match(survey, endpoint, fixed = TRUE)
 
   script <- fetch("collect_gs_dl")
