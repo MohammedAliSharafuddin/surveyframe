@@ -85,6 +85,8 @@
 #' | `render_result()` | [sframe_format_result()] |
 #' | `codebook_report()` | [sframe_codebook()] |
 #' | `sframe_demos()` | [sframe_list_demos()] |
+#' | `sframe_demo_data()` | [sframe_demo()] with `"tourism_services"` |
+#' | `sframe_input_types_demo_data()` | [sframe_demo()] with `"input_types"` |
 #' | `sf_plan(x) <- value` | [sframe_plan<-][sframe_plan] |
 #'
 #' @param ... Passed to the new function.
@@ -609,6 +611,20 @@ codebook_report <- function(...) {
 sframe_demos <- function(...) {
   sframe_superseded("sframe_demos()", "sframe_list_demos()")
   sframe_list_demos(...)
+}
+
+#' @rdname superseded
+#' @export
+sframe_demo_data <- function() {
+  sframe_superseded("sframe_demo_data()", "sframe_demo(\"tourism_services\")")
+  sframe_demo("tourism_services")
+}
+
+#' @rdname superseded
+#' @export
+sframe_input_types_demo_data <- function() {
+  sframe_superseded("sframe_input_types_demo_data()", "sframe_demo(\"input_types\")")
+  sframe_demo("input_types")
 }
 
 #' @rdname superseded

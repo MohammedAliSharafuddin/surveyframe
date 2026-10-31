@@ -30,7 +30,7 @@ four tests, and only the inferential statistic differs.
 \examples{
 \donttest{
 if (requireNamespace("ggplot2", quietly = TRUE)) {
-  demo <- sframe_demo_data()
+  demo <- sframe_demo("tourism_services")
   res <- run_analysis_plan(demo$responses, demo$instrument)
   sframe_plot_group_comparison(res$rq_visit_bi, demo$responses)
 }

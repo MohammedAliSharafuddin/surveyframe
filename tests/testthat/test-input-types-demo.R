@@ -1,5 +1,5 @@
 test_that("input-types demo loads and validates", {
-  demo <- sframe_input_types_demo_data()
+  demo <- sframe_demo("input_types")
 
   expect_s3_class(demo$instrument, "sframe")
   expect_true(is.data.frame(demo$responses))
@@ -12,7 +12,7 @@ test_that("input-types demo loads and validates", {
 })
 
 test_that("input-types demo covers all declared item types", {
-  demo <- sframe_input_types_demo_data()
+  demo <- sframe_demo("input_types")
 
   observed_types <- sort(unique(vapply(
     demo$instrument$items,
@@ -40,7 +40,7 @@ test_that("input-types demo covers all declared item types", {
 })
 
 test_that("input-types demo has responses for response-producing items", {
-  demo <- sframe_input_types_demo_data()
+  demo <- sframe_demo("input_types")
 
   display_only <- c("section_break", "text_block")
 

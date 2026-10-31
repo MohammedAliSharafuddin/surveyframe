@@ -36,7 +36,7 @@ js <- function(session, code) {
 test_that("6: the sidebar shows the injected title on first load", {
   session <- open_demo_builder()
   on.exit(session$close(), add = TRUE)
-  title <- sframe_input_types_demo_data()$instrument$meta$title
+  title <- sframe_demo("input_types")$instrument$meta$title
 
   expect_identical(js(session, "document.getElementById('sbTitle').textContent"),
                    title)

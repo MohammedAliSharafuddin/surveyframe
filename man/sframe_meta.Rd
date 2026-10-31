@@ -19,7 +19,7 @@ Reads the title, version, description, language, validation state, and other
 metadata without depending on the object's internal list layout.
 }
 \examples{
-sframe_meta(sframe_demo_data()$instrument)
+sframe_meta(sframe_demo("tourism_services")$instrument)
 }
 \seealso{
 \link{sframe_accessors}

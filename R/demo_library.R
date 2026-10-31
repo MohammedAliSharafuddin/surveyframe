@@ -70,22 +70,75 @@ sframe_demo_index <- function() {
   )
 }
 
+# The 2 reference datasets. They predate the teaching library, live in
+# inst/extdata rather than inst/extdata/demos, and have no codebook or results
+# table, so they are listed apart with focus "reference".
+sframe_reference_demo_index <- function() {
+  data.frame(
+    name = c("tourism_services", "input_types"),
+    focus = "reference",
+    teaches = c("A realistic multi-scale instrument with 120 responses",
+                "Every input type SurveyBuilder and SurveyStudio support"),
+    fields = c("likert, single_choice, textarea", "every input type"),
+    technique = c("34 plan blocks",
+                  "36 plan blocks"),
+    reuse = NA_character_,
+    stringsAsFactors = FALSE)
+}
+
+sframe_reference_demo_files <- function(name) {
+  switch(name,
+    tourism_services = c("tourism_services_demo.sframe",
+                         "tourism_services_responses.csv"),
+    input_types = c("surveyframe_input_types_demo.sframe",
+                    "surveyframe_input_types_responses.csv"))
+}
+
+# Loads a reference dataset the way its old loader did: submitted_at is the
+# submission time, and the input-types responses are read strictly.
+sframe_reference_demo <- function(name) {
+  files <- sframe_reference_demo_files(name)
+  instrument_path <- system.file("extdata", files[[1]], package = "surveyframe")
+  responses_path <- system.file("extdata", files[[2]], package = "surveyframe")
+  if (!nzchar(instrument_path) || !nzchar(responses_path) ||
+      !file.exists(instrument_path) || !file.exists(responses_path)) {
+    rlang::abort(
+      paste0("Bundled demo '", name, "' not found. Please reinstall surveyframe."),
+      class = "sframe_error")
+  }
+  instrument <- read_sframe(instrument_path)
+  responses <- read_responses(
+    responses_path, instrument,
+    respondent_id = "respondent_id",
+    submitted_at = "submitted_at",
+    meta_cols = "started_at",
+    strict = identical(name, "input_types"))
+  list(instrument = instrument, responses = responses,
+       instrument_path = instrument_path, responses_path = responses_path,
+       codebook_path = NA_character_, results_path = NA_character_)
+}
+
 #' List the bundled demos
 #'
 #' Every demo does one job, so a failure points at one method and a reader can
 #' hold the whole questionnaire in view. Use [sframe_demo()] to load one.
 #'
+#' The 22 teaching demos come first. The last 2 rows, with focus
+#' `"reference"`, are larger datasets: `"tourism_services"`, a realistic
+#' multi-scale instrument, and `"input_types"`, which uses every input type
+#' SurveyBuilder and SurveyStudio support.
+#'
 #' @return A data frame with 1 row per demo: its `name`, whether its `focus`
-#'   is analysis, presentation or provenance, what it `teaches`, the input
-#'   `fields` it uses, the statistical `technique` it demonstrates, and the
-#'   demo whose responses it reuses, if any.
+#'   is analysis, presentation, provenance or reference, what it `teaches`,
+#'   the input `fields` it uses, the statistical `technique` it demonstrates,
+#'   and the demo whose responses it reuses, if any.
 #' @export
 #' @seealso [sframe_demo()], [sframe_demo_branding()], [sframe_demo_qmd()]
 #' @examples
 #' head(sframe_list_demos(), 3)
 #' subset(sframe_list_demos(), focus == "provenance")
 sframe_list_demos <- function() {
-  sframe_demo_index()
+  rbind(sframe_demo_index(), sframe_reference_demo_index())
 }
 
 sframe_demo_dir <- function() {
@@ -100,11 +153,11 @@ sframe_demo_dir <- function() {
 
 #' Load one bundled demo
 #'
-#' One of the 22-item teaching library: 17 analysis examples, three
-#' presentation examples, and two provenance examples. For the demo that
-#' instead exercises every input type
-#' SurveyBuilder and SurveyStudio support in a single instrument, see
-#' [sframe_input_types_demo_data()].
+#' One of the 22-item teaching library: 17 analysis examples, 3
+#' presentation examples, and 2 provenance examples. Or 1 of the 2 reference
+#' datasets: `"tourism_services"`, a realistic multi-scale instrument, and
+#' `"input_types"`, which uses every input type SurveyBuilder and
+#' SurveyStudio support in a single instrument.
 #'
 #' @param name Character. A demo name, as listed by [sframe_list_demos()].
 #' @param branded Logical. When `TRUE`, the instrument comes back with the
@@ -118,10 +171,10 @@ sframe_demo_dir <- function() {
 #'   The codebook carries variable and value labels, so the data means
 #'   something outside R. The results table is what surveyframe reports for
 #'   this demo, which is the reference to compare against when you run the
-#'   same data through another package.
+#'   same data through another package. The 2 reference datasets have no
+#'   codebook or results table, so those 2 paths are `NA`.
 #' @export
-#' @seealso [sframe_list_demos()], [export_responses()],
-#'   [sframe_input_types_demo_data()]
+#' @seealso [sframe_list_demos()], [export_responses()]
 #' @examples
 #' demo <- sframe_demo("two_group")
 #' demo$instrument
@@ -137,10 +190,17 @@ sframe_demo <- function(name, branded = FALSE) {
       ),
       class = "sframe_error")
   }
+  if (isTRUE(name %in% sframe_reference_demo_index()$name)) {
+    demo <- sframe_reference_demo(name)
+    if (isTRUE(branded)) {
+      demo$instrument$render <- unclass(sframe_demo_branding())
+    }
+    return(demo)
+  }
   if (!isTRUE(name %in% idx$name)) {
     rlang::abort(
       paste0("Unknown demo: '", name, "'. See sframe_list_demos() for the ",
-             length(idx$name), " available."),
+             nrow(sframe_list_demos()), " available."),
       class = "sframe_error")
   }
   dir <- sframe_demo_dir()

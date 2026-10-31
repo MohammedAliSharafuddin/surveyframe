@@ -24,7 +24,7 @@ to cross-reference a separate table just to see what "1" means on a
 scale shared by many items.
 }
 \examples{
-demo <- sframe_demo_data()
+demo <- sframe_demo("tourism_services")
 cb <- sframe_codebook(demo$instrument)
 head(sframe_codebook_items_display(cb))
 }

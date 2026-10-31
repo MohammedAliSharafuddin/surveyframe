@@ -39,7 +39,7 @@ item type, or no data), so the dashboard keeps working without ggplot2.
 \examples{
 \donttest{
 if (requireNamespace("ggplot2", quietly = TRUE)) {
-  demo <- sframe_demo_data()
+  demo <- sframe_demo("tourism_services")
   item <- Filter(function(i) i$id == "sat_1", demo$instrument$items)[[1]]
   cs   <- Filter(function(c) c$id == item$choice_set, demo$instrument$choices)[[1]]
   sframe_plot_item_chart(item, demo$responses$sat_1, cs)

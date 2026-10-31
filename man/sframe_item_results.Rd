@@ -41,7 +41,7 @@ sample's own extremes say nothing about a floor or ceiling effect.
 }
 \examples{
 \donttest{
-demo <- sframe_demo_data()
+demo <- sframe_demo("tourism_services")
 ir <- sframe_item_results(demo$responses, demo$instrument)
 print(ir)
 # one scale's diagnostics

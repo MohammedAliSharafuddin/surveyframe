@@ -34,7 +34,7 @@ failed attention checks, straight-lining, excess missingness, timing and
 duplicates. Read the report itself for which check flagged a row.
 }
 \examples{
-demo <- sframe_demo_data()
+demo <- sframe_demo("tourism_services")
 qr <- sframe_quality_results(demo$responses, demo$instrument)
 head(sframe_flagged(qr))
 }

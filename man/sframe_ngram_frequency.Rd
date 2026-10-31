@@ -36,7 +36,7 @@ filtered, "clean but not comfortable" yields no bigram at all, because
 the output phrases respondents actually wrote.
 }
 \examples{
-demo <- sframe_demo_data()
+demo <- sframe_demo("tourism_services")
 cleaned <- sframe_clean_text(demo$responses, "comments")
 head(sframe_ngram_frequency(cleaned, n = 2, top_n = 10))
 }

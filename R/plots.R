@@ -1338,7 +1338,7 @@ sframe_plot_sensitivity <- function(result, palette = c("web", "print")) {
 #' @examples
 #' \donttest{
 #' if (requireNamespace("ggplot2", quietly = TRUE)) {
-#'   demo <- sframe_demo_data()
+#'   demo <- sframe_demo("tourism_services")
 #'   res <- run_analysis_plan(demo$responses, demo$instrument)
 #'   panels <- sframe_plot_regression_diagnostics(res$rq_predict_sat)
 #'   panels$residuals_fitted
@@ -1412,7 +1412,7 @@ sframe_plot_regression_diagnostics <- function(result, palette = c("web", "print
 #' \donttest{
 #' if (requireNamespace("ggplot2", quietly = TRUE) &&
 #'     requireNamespace("psych", quietly = TRUE)) {
-#'   demo <- sframe_demo_data()
+#'   demo <- sframe_demo("tourism_services")
 #'   er <- sframe_efa_readiness_results(demo$responses, demo$instrument)
 #'   sframe_plot_efa_scree(er)
 #' }
@@ -1459,7 +1459,7 @@ sframe_plot_efa_scree <- function(x, palette = c("web", "print")) {
 #' \donttest{
 #' if (requireNamespace("ggplot2", quietly = TRUE) &&
 #'     requireNamespace("psych", quietly = TRUE)) {
-#'   demo <- sframe_demo_data()
+#'   demo <- sframe_demo("tourism_services")
 #'   fit <- sframe_efa_solution(demo$responses, demo$instrument,
 #'                        scales = "service_quality", nfactors = 1)
 #'   sframe_plot_efa_loadings(fit)
@@ -1515,7 +1515,7 @@ sframe_plot_efa_loadings <- function(x, palette = c("web", "print")) {
 #' \donttest{
 #' if (requireNamespace("ggplot2", quietly = TRUE) &&
 #'     requireNamespace("psych", quietly = TRUE)) {
-#'   demo <- sframe_demo_data()
+#'   demo <- sframe_demo("tourism_services")
 #'   rr <- sframe_reliability_results(demo$responses, demo$instrument, omega = FALSE)
 #'   sframe_plot_reliability(rr)
 #' }
@@ -1628,7 +1628,7 @@ sframe_draw_mosaic <- function(result, palette = c("web", "print")) {
 #' @examples
 #' \donttest{
 #' if (requireNamespace("ggplot2", quietly = TRUE)) {
-#'   demo <- sframe_demo_data()
+#'   demo <- sframe_demo("tourism_services")
 #'   sframe_plot_correlation_matrix(demo$responses,
 #'                                  c("sq_1", "sq_2", "sq_3", "sat_1", "sat_2"))
 #' }
@@ -1803,7 +1803,7 @@ plot.sframe_validity_report <- function(x, ..., palette = c("web", "print")) {
 #' @examples
 #' \donttest{
 #' if (requireNamespace("ggplot2", quietly = TRUE)) {
-#'   demo <- sframe_demo_data()
+#'   demo <- sframe_demo("tourism_services")
 #'   mr <- sframe_missing_data_results(demo$responses, demo$instrument)
 #'   sframe_plot_missingness(mr)
 #' }
@@ -1925,7 +1925,7 @@ plot.sframe_analysis_results <- function(x, ..., which = NULL) {
 #' @examples
 #' \donttest{
 #' if (requireNamespace("ggplot2", quietly = TRUE)) {
-#'   demo <- sframe_demo_data()
+#'   demo <- sframe_demo("tourism_services")
 #'   item <- Filter(function(i) i$id == "sat_1", demo$instrument$items)[[1]]
 #'   cs   <- Filter(function(c) c$id == item$choice_set, demo$instrument$choices)[[1]]
 #'   sframe_plot_item_chart(item, demo$responses$sat_1, cs)
@@ -1978,7 +1978,7 @@ sframe_plot_item_chart <- function(item, col_data, choice_set = NULL,
 #' @examples
 #' \donttest{
 #' if (requireNamespace("ggplot2", quietly = TRUE)) {
-#'   demo <- sframe_demo_data()
+#'   demo <- sframe_demo("tourism_services")
 #'   scored <- score_scales(demo$responses, demo$instrument)
 #'   sframe_plot_scale_chart(scored$satisfaction, "Satisfaction")
 #' }
@@ -2024,7 +2024,7 @@ sframe_plot_scale_chart <- function(scores, label, palette = c("web", "print")) 
 #' @examples
 #' \donttest{
 #' if (requireNamespace("ggplot2", quietly = TRUE)) {
-#'   demo <- sframe_demo_data()
+#'   demo <- sframe_demo("tourism_services")
 #'   dr <- sframe_descriptives_results(demo$responses, variables = c("sat_1", "sat_2"))
 #'   sframe_plot_descriptives(dr, demo$responses)
 #' }
@@ -2121,7 +2121,7 @@ plot.sframe_descriptives_report <- function(x, data, ..., palette = c("web", "pr
 #' @examples
 #' \donttest{
 #' if (requireNamespace("ggplot2", quietly = TRUE)) {
-#'   demo <- sframe_demo_data()
+#'   demo <- sframe_demo("tourism_services")
 #'   res <- run_analysis_plan(demo$responses, demo$instrument)
 #'   sframe_plot_group_comparison(res$rq_visit_bi, demo$responses)
 #' }
@@ -2180,7 +2180,7 @@ sframe_plot_group_comparison <- function(result, data, palette = c("web", "print
 #' @examples
 #' \donttest{
 #' if (requireNamespace("ggplot2", quietly = TRUE)) {
-#'   demo <- sframe_demo_data()
+#'   demo <- sframe_demo("tourism_services")
 #'   res <- run_analysis_plan(demo$responses, demo$instrument)
 #'   sframe_plot_paired_comparison(res$rq_ttest_pair, demo$responses)
 #' }
@@ -2503,7 +2503,7 @@ sframe_plot_item_diagnostics <- function(result, palette = c("web", "print")) {
 #' @examples
 #' \donttest{
 #' if (requireNamespace("ggplot2", quietly = TRUE)) {
-#'   demo <- sframe_demo_data()
+#'   demo <- sframe_demo("tourism_services")
 #'   panels <- sframe_plot_variable_distribution(demo$responses, "sat_1")
 #'   panels$histogram
 #' }

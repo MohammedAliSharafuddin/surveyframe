@@ -57,7 +57,7 @@ example in the MCDM vignette, because they only make sense alongside a
 declared decision method and a set of alternatives.
 
 ```{r input-types}
-demo      <- sframe_input_types_demo_data()
+demo      <- sframe_demo("input_types")
 instr     <- demo$instrument
 responses <- demo$responses
 

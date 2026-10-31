@@ -39,7 +39,7 @@ the instrument, along with the number of items and sample size.
 \examples{
 \donttest{
 if (requireNamespace("psych", quietly = TRUE)) {
-  demo <- sframe_demo_data()
+  demo <- sframe_demo("tourism_services")
   rr <- sframe_reliability_results(demo$responses, demo$instrument, omega = FALSE)
   print(rr)
 }

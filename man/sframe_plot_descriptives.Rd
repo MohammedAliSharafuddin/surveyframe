@@ -33,7 +33,7 @@ output (one row per variable per \code{split_by} group) is faceted by group.
 \examples{
 \donttest{
 if (requireNamespace("ggplot2", quietly = TRUE)) {
-  demo <- sframe_demo_data()
+  demo <- sframe_demo("tourism_services")
   dr <- sframe_descriptives_results(demo$responses, variables = c("sat_1", "sat_2"))
   sframe_plot_descriptives(dr, demo$responses)
 }

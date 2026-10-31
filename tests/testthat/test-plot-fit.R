@@ -105,7 +105,7 @@ test_that("a chart that fails to build fails once, without a promise warning", {
 
 test_that("the regression diagnostic panels name the outcome and fit at 6.5 by 4", {
   skip_if_not_installed("ggplot2")
-  demo <- sframe_demo_data()
+  demo <- sframe_demo("tourism_services")
   res <- run_analysis_plan(demo$responses, demo$instrument, plots = TRUE)
   r <- res$rq_predict_sat
   long_label <- paste("Overall satisfaction with the hotel stay, the booking",

@@ -18,7 +18,7 @@ test_that("dashboard filters take the question label and the choice labels", {
 })
 
 test_that("the demo's filter items resolve to their labels", {
-  ins <- sframe_input_types_demo_data()$instrument
+  ins <- sframe_demo("input_types")$instrument
   expect_identical(unname(sframe_label_lookup(ins)[["visit_type"]]),
                    "Was this your first visit?")
   expect_true(length(sframe_item_value_labels(ins, "visit_type")) > 0)

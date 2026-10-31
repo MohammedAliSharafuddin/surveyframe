@@ -25,7 +25,7 @@ the \code{lm} object itself, so the result stays JSON-serialisable.
 \examples{
 \donttest{
 if (requireNamespace("ggplot2", quietly = TRUE)) {
-  demo <- sframe_demo_data()
+  demo <- sframe_demo("tourism_services")
   res <- run_analysis_plan(demo$responses, demo$instrument)
   panels <- sframe_plot_regression_diagnostics(res$rq_predict_sat)
   panels$residuals_fitted

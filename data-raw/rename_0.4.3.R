@@ -84,6 +84,8 @@ sensitivity_analysis,sframe_sensitivity_analysis,plain
 render_result,sframe_format_result,plain
 codebook_report,sframe_codebook,plain
 sframe_demos,sframe_list_demos,plain
+sframe_demo_data,sframe_demo,custom
+sframe_input_types_demo_data,sframe_demo,custom
 ", stringsAsFactors = FALSE, strip.white = TRUE)
 
 # Wrappers whose arguments differ from the new function's, keyed by old name:
@@ -94,7 +96,25 @@ custom <- list(
     "instrument, scales = NULL, std_lv = TRUE",
     "sframe_syntax_cfa(instrument = instrument, scales = scales, std_lv = std_lv)",
     "sframe_syntax_cfa()"
+  ),
+  sframe_demo_data = c(
+    "",
+    "sframe_demo(\"tourism_services\")",
+    "sframe_demo(\"tourism_services\")"
+  ),
+  sframe_input_types_demo_data = c(
+    "",
+    "sframe_demo(\"input_types\")",
+    "sframe_demo(\"input_types\")"
   )
+)
+
+# Calls rewritten whole before the name rules run, for the old names that
+# became an argument: the pattern after `before`, then the replacement. A
+# roxygen link such as [sframe_demo_data()] becomes [sframe_demo()] first.
+calls <- c(
+  "sframe_demo_data\\(\\)" = "sframe_demo(\"tourism_services\")",
+  "sframe_input_types_demo_data\\(\\)" = "sframe_demo(\"input_types\")"
 )
 
 # Not after a letter, digit, underscore, dot, `$` or `@`, so internal helpers
@@ -102,6 +122,13 @@ custom <- list(
 before <- "(?<![A-Za-z0-9_.$@])"
 
 rewrite <- function(txt) {
+  for (old in renames$old[renames$kind == "custom"]) {
+    new <- renames$new[match(old, renames$old)]
+    txt <- gsub(paste0("\\[", old, "\\(\\)\\]"), paste0("[", new, "()]"), txt, perl = TRUE)
+  }
+  for (p in names(calls)) {
+    txt <- gsub(paste0(before, p), calls[[p]], txt, perl = TRUE)
+  }
   for (i in seq_len(nrow(renames))) {
     old <- renames$old[[i]]
     new <- renames$new[[i]]
@@ -144,7 +171,8 @@ files <- c(
 )
 files <- setdiff(files, c(
   "R/superseded.R", "R/superseded_warn.R", "data-raw/rename_0.4.3.R",
-  "tests/testthat/test-superseded.R", "tests/testthat/test-superseded-warn.R"
+  "tests/testthat/test-superseded.R", "tests/testthat/test-superseded-warn.R",
+  "tests/testthat/test-demo-reference-datasets.R"
 ))
 
 changed <- character()
@@ -166,7 +194,9 @@ shown <- function(i) {
 }
 
 table_rows <- vapply(seq_len(nrow(renames)), function(i) {
-  paste0("#' | `", renames$old[[i]], "()` | [", sub("\\(.*$", "", shown(i)), "()] |")
+  args <- sub("^[^(]*\\((.*)\\)$", "\\1", shown(i))
+  with <- if (nzchar(args)) paste0(" with `", args, "`") else ""
+  paste0("#' | `", renames$old[[i]], "()` | [", sub("\\(.*$", "", shown(i)), "()]", with, " |")
 }, character(1))
 
 wrapper <- function(i) {
@@ -183,7 +213,7 @@ wrapper <- function(i) {
     "#' @rdname superseded",
     "#' @export",
     paste0(old, " <- function(", args, ") {"),
-    paste0("  sframe_superseded(\"", old, "()\", \"", shown(i), "\")"),
+    paste0("  sframe_superseded(\"", old, "()\", \"", gsub("\"", "\\\\\"", shown(i)), "\")"),
     paste0("  ", call),
     "}",
     ""

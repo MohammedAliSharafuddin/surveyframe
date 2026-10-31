@@ -10,7 +10,7 @@
 # of the table it checks, so they are derived from the package's own registries
 # at run time.
 
-demo_names <- function() sframe_list_demos()$name
+demo_names <- function() with(sframe_list_demos(), name[focus != "reference"])
 
 test_that("every demo in the index is on disk and loads", {
   for (nm in demo_names()) {

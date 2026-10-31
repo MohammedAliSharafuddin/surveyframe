@@ -70,7 +70,7 @@ without internet access or private data.
 ## Load the demo
 
 ```{r load}
-demo      <- sframe_demo_data()
+demo      <- sframe_demo("tourism_services")
 instr     <- demo$instrument
 responses <- demo$responses
 

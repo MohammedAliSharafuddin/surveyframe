@@ -38,7 +38,7 @@ one back to its original respondent row via the mapping
 \donttest{
 if (requireNamespace("stm", quietly = TRUE) &&
     requireNamespace("tidytext", quietly = TRUE)) {
-  demo <- sframe_demo_data()
+  demo <- sframe_demo("tourism_services")
   sframe_plan(demo$instrument) <- list(list(
     id = "RQ1", research_question = "What themes appear in the comments?",
     family = "text_analysis", method = "stm_topics",

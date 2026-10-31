@@ -195,7 +195,7 @@ sframe_codebook_markdown <- function(cb) {
 #' @export
 #' @seealso [sframe_codebook()]
 #' @examples
-#' demo <- sframe_demo_data()
+#' demo <- sframe_demo("tourism_services")
 #' cb <- sframe_codebook(demo$instrument)
 #' head(sframe_codebook_items_display(cb))
 sframe_codebook_items_display <- function(cb) {

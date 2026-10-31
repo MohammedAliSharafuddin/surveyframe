@@ -18,7 +18,7 @@ A single logical value.
 Reads the overall pass/fail result without inspecting validation internals.
 }
 \examples{
-v <- validate_sframe(sframe_demo_data()$instrument, strict = FALSE)
+v <- validate_sframe(sframe_demo("tourism_services")$instrument, strict = FALSE)
 sframe_is_valid(v)
 }
 \seealso{

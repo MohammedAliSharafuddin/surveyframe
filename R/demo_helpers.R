@@ -1,123 +1,5 @@
 # demo_helpers.R
 
-#' Load bundled surveyframe demo data
-#'
-#' Loads the bundled tourism-services `.sframe` instrument and simulated
-#' response dataset used in package examples and statistical workflow demos.
-#'
-#' @return A list with `instrument`, `responses`, `instrument_path`, and
-#'   `responses_path`.
-#' @export
-#' @examples
-#' demo <- sframe_demo_data()
-#' sframe_meta(demo$instrument)$title
-#' nrow(demo$responses)
-sframe_demo_data <- function() {
-  instrument_path <- system.file(
-    "extdata", "tourism_services_demo.sframe",
-    package = "surveyframe"
-  )
-
-  responses_path <- system.file(
-    "extdata", "tourism_services_responses.csv",
-    package = "surveyframe"
-  )
-
-  if (!nzchar(instrument_path) || !file.exists(instrument_path)) {
-    rlang::abort(
-      "Bundled demo instrument not found. Please reinstall surveyframe.",
-      class = "sframe_error"
-    )
-  }
-
-  if (!nzchar(responses_path) || !file.exists(responses_path)) {
-    rlang::abort(
-      "Bundled demo response file not found. Please reinstall surveyframe.",
-      class = "sframe_error"
-    )
-  }
-
-  instrument <- read_sframe(instrument_path)
-
-  responses <- read_responses(
-    responses_path,
-    instrument,
-    respondent_id = "respondent_id",
-    submitted_at = "submitted_at",
-    meta_cols = "started_at"
-  )
-
-  list(
-    instrument = instrument,
-    responses = responses,
-    instrument_path = instrument_path,
-    responses_path = responses_path
-  )
-}
-
-#' Load the input-types demo backing SurveyBuilder and SurveyStudio
-#'
-#' Loads the bundled `.sframe` instrument and simulated response dataset that
-#' cover all main survey input types supported by surveyframe. This is a
-#' different demo from the 22-item teaching library behind [sframe_demo()]:
-#' where [sframe_demo()] demonstrates one analysis method per call,
-#' this one exists to exercise every input control SurveyBuilder and
-#' SurveyStudio support in a single instrument, and is what backs
-#' [launch_builder_demo()], [launch_studio_demo()], and
-#' [launch_dashboard_demo()].
-#'
-#' @return A list with `instrument`, `responses`, `instrument_path`, and
-#'   `responses_path`.
-#' @export
-#' @seealso [sframe_demo()] for the 22-item teaching library instead.
-#' @examples
-#' demo <- sframe_input_types_demo_data()
-#' sframe_meta(demo$instrument)$title
-#' nrow(demo$responses)
-sframe_input_types_demo_data <- function() {
-  instrument_path <- system.file(
-    "extdata", "surveyframe_input_types_demo.sframe",
-    package = "surveyframe"
-  )
-
-  responses_path <- system.file(
-    "extdata", "surveyframe_input_types_responses.csv",
-    package = "surveyframe"
-  )
-
-  if (!nzchar(instrument_path) || !file.exists(instrument_path)) {
-    rlang::abort(
-      "Bundled input-types demo instrument not found. Please reinstall surveyframe.",
-      class = "sframe_error"
-    )
-  }
-
-  if (!nzchar(responses_path) || !file.exists(responses_path)) {
-    rlang::abort(
-      "Bundled input-types demo response file not found. Please reinstall surveyframe.",
-      class = "sframe_error"
-    )
-  }
-
-  instrument <- read_sframe(instrument_path)
-
-  responses <- read_responses(
-    x = responses_path,
-    instrument = instrument,
-    respondent_id = "respondent_id",
-    submitted_at = "submitted_at",
-    meta_cols = "started_at",
-    strict = TRUE
-  )
-
-  list(
-    instrument = instrument,
-    responses = responses,
-    instrument_path = instrument_path,
-    responses_path = responses_path
-  )
-}
-
 #' Launch SurveyBuilder with the bundled input-types demo preloaded
 #'
 #' Opens a temporary copy of the SurveyBuilder with the bundled input-types
@@ -132,13 +14,13 @@ sframe_input_types_demo_data <- function() {
 #'   `responses_path`.
 #' @export
 #' @examples
-#' demo <- sframe_input_types_demo_data()
+#' demo <- sframe_demo("input_types")
 #' nrow(demo$responses)
 #' \dontrun{
 #' launch_builder_demo()
 #' }
 launch_builder_demo <- function(open = TRUE) {
-  demo <- sframe_input_types_demo_data()
+  demo <- sframe_demo("input_types")
 
   # Build a plain-list serialisation payload (strips R S3 classes)
   payload <- sframe_serialization_payload(demo$instrument)
@@ -260,7 +142,7 @@ launch_builder_demo <- function(open = TRUE) {
 #' @return Called for its side effect.
 #' @export
 #' @examples
-#' demo <- sframe_input_types_demo_data()
+#' demo <- sframe_demo("input_types")
 #' nrow(demo$responses)
 #' \dontrun{
 #' launch_studio_demo()
@@ -271,7 +153,7 @@ launch_studio_demo <- function(
     host = "127.0.0.1",
     launch.browser = TRUE
 ) {
-  demo <- sframe_input_types_demo_data()
+  demo <- sframe_demo("input_types")
 
   launch_studio(
     instrument     = demo$instrument,
@@ -297,7 +179,7 @@ launch_studio_demo <- function(
 #' @return Called for its side effect.
 #' @export
 #' @examples
-#' demo <- sframe_input_types_demo_data()
+#' demo <- sframe_demo("input_types")
 #' nrow(demo$responses)
 #' \dontrun{
 #' launch_dashboard_demo()
@@ -307,7 +189,7 @@ launch_dashboard_demo <- function(
     host = "127.0.0.1",
     launch.browser = TRUE
 ) {
-  demo <- sframe_input_types_demo_data()
+  demo <- sframe_demo("input_types")
 
   launch_dashboard(
     instrument     = demo$instrument,

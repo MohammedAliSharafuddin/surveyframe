@@ -24,7 +24,7 @@ The updated \code{sframe} object.
 Add a model specification to an instrument
 }
 \examples{
-demo <- sframe_demo_data()
+demo <- sframe_demo("tourism_services")
 m <- sframe_model_spec("cb1", type = "cb_sem",
               constructs = list(sframe_construct("sat", items = c("sat_1", "sat_2"))))
 instr <- sframe_add_model(demo$instrument, m)

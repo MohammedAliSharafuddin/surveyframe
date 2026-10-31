@@ -52,7 +52,7 @@ function is called.
 \examples{
 \donttest{
 if (requireNamespace("psych", quietly = TRUE)) {
-  demo <- sframe_demo_data()
+  demo <- sframe_demo("tourism_services")
   fit <- sframe_efa_solution(demo$responses, demo$instrument,
                        scales = "service_quality", nfactors = 1)
   fit$loadings

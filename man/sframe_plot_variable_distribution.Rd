@@ -28,7 +28,7 @@ report-independent, data-driven plots.
 \examples{
 \donttest{
 if (requireNamespace("ggplot2", quietly = TRUE)) {
-  demo <- sframe_demo_data()
+  demo <- sframe_demo("tourism_services")
   panels <- sframe_plot_variable_distribution(demo$responses, "sat_1")
   panels$histogram
 }

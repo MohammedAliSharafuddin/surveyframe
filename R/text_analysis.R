@@ -126,7 +126,7 @@
 #'   `data`, so quotes extracted later can cite a respondent.
 #' @export
 #' @examples
-#' demo <- sframe_demo_data()
+#' demo <- sframe_demo("tourism_services")
 #' cleaned <- sframe_clean_text(demo$responses, "comments")
 #' head(cleaned)
 #' attr(cleaned, "respondent")[1:5]
@@ -190,7 +190,7 @@ sframe_clean_text <- function(data, item_id, lowercase = TRUE,
 #' @return A data.frame with columns `term`, `n`, and `pct`.
 #' @export
 #' @examples
-#' demo <- sframe_demo_data()
+#' demo <- sframe_demo("tourism_services")
 #' cleaned <- sframe_clean_text(demo$responses, "comments")
 #' head(sframe_term_frequency(cleaned, top_n = 10))
 sframe_term_frequency <- function(text, stop_words = NULL, top_n = 30L) {
@@ -671,7 +671,7 @@ sframe_run_stm_topics <- function(data, roles, options, instrument) {
 #' \donttest{
 #' if (requireNamespace("stm", quietly = TRUE) &&
 #'     requireNamespace("tidytext", quietly = TRUE)) {
-#'   demo <- sframe_demo_data()
+#'   demo <- sframe_demo("tourism_services")
 #'   sframe_plan(demo$instrument) <- list(list(
 #'     id = "RQ1", research_question = "What themes appear in the comments?",
 #'     family = "text_analysis", method = "stm_topics",
@@ -763,7 +763,7 @@ sframe_extract_quotes <- function(model, text, n_quotes = 3L) {
 #'   and `pct`.
 #' @export
 #' @examples
-#' demo <- sframe_demo_data()
+#' demo <- sframe_demo("tourism_services")
 #' cleaned <- sframe_clean_text(demo$responses, "comments")
 #' head(sframe_ngram_frequency(cleaned, n = 2, top_n = 10))
 sframe_ngram_frequency <- function(text, n = 2L, stop_words = NULL, top_n = 30L) {
@@ -830,7 +830,7 @@ sframe_ngram_frequency <- function(text, n = 2L, stop_words = NULL, top_n = 30L)
 #'   `after`.
 #' @export
 #' @examples
-#' demo <- sframe_demo_data()
+#' demo <- sframe_demo("tourism_services")
 #' cleaned <- sframe_clean_text(demo$responses, "comments")
 #' sframe_term_context(cleaned, "service", window = 4)
 sframe_term_context <- function(text, term, window = 6L, max_matches = 20L) {

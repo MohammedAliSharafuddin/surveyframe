@@ -150,7 +150,7 @@ test_that("as.data.frame() works on the psychometric reports", {
 })
 
 test_that("as.data.frame() gives the quality report summary row", {
-  demo <- sframe_demo_data()
+  demo <- sframe_demo("tourism_services")
   qr <- sframe_quality_results(demo$responses, demo$instrument)
   df <- as.data.frame(qr)
   expect_equal(nrow(df), 1)
@@ -159,14 +159,14 @@ test_that("as.data.frame() gives the quality report summary row", {
 })
 
 test_that("sframe_flagged() returns the flagged rows the summary counted", {
-  demo <- sframe_demo_data()
+  demo <- sframe_demo("tourism_services")
   qr <- sframe_quality_results(demo$responses, demo$instrument)
   expect_equal(length(sframe_flagged(qr)), as.data.frame(qr)$n_flagged)
 })
 
 test_that("as.data.frame() and sframe_apa() work on analysis results", {
   skip_on_cran()  # renders a report or runs a full plan: slow on CRAN's machines
-  demo <- sframe_demo_data()
+  demo <- sframe_demo("tourism_services")
   res <- run_analysis_plan(demo$responses, demo$instrument)
   df <- as.data.frame(res)
   expect_s3_class(df, "data.frame")
@@ -180,7 +180,7 @@ test_that("as.data.frame() and sframe_apa() work on analysis results", {
 
 test_that("subsetting a report keeps its class", {
   skip_on_cran()  # renders a report or runs a full plan: slow on CRAN's machines
-  demo <- sframe_demo_data()
+  demo <- sframe_demo("tourism_services")
   res <- run_analysis_plan(demo$responses, demo$instrument)
   skip_if(length(res) < 2)
   subset <- res[1:2]

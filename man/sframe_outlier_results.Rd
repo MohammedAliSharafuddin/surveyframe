@@ -39,7 +39,7 @@ Uses transparent screening rules for numeric survey response variables. The
 report supports data review before modelling, not automatic deletion.
 }
 \examples{
-demo <- sframe_demo_data()
+demo <- sframe_demo("tourism_services")
 outliers <- sframe_outlier_results(
   demo$responses,
   variables = c("dm_1", "dm_2", "sat_1"),

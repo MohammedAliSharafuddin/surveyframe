@@ -18,7 +18,7 @@ An \link{sf_component_list} of branching rules.
 Returns the rules that control whether conditional items are shown.
 }
 \examples{
-sframe_get_branches(sframe_demo_data()$instrument)
+sframe_get_branches(sframe_demo("tourism_services")$instrument)
 }
 \seealso{
 \link{sframe_accessors}

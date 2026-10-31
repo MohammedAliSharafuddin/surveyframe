@@ -22,7 +22,7 @@ a missingness figure can be read against what was expected. They count as
 missing for every respondent in \code{\link[=sframe_quality_results]{sframe_quality_results()}}'s rates.
 }
 \examples{
-demo <- sframe_demo_data()
+demo <- sframe_demo("tourism_services")
 qr   <- sframe_quality_results(demo$responses, demo$instrument)
 sframe_missing_columns(qr)
 }

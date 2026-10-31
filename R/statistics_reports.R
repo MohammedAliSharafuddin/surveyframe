@@ -269,7 +269,7 @@ sframe_require_columns <- function(data, cols, method) {
 #' @return An object of class `sframe_descriptives_report`.
 #' @export
 #' @examples
-#' demo <- sframe_demo_data()
+#' demo <- sframe_demo("tourism_services")
 #' dr <- sframe_descriptives_results(demo$responses, variables = c("sat_1", "sat_2"),
 #'                            split_by = "visit_type")
 #' dr$table
@@ -365,7 +365,7 @@ sframe_descriptives_results <- function(
 #' @return An object of class `sframe_missing_data_report`.
 #' @export
 #' @examples
-#' demo <- sframe_demo_data()
+#' demo <- sframe_demo("tourism_services")
 #' mr <- sframe_missing_data_results(demo$responses, demo$instrument)
 #' mr$item_missing
 sframe_missing_data_results <- function(data, instrument = NULL, variables = NULL) {
@@ -500,7 +500,7 @@ sframe_missing_data_results <- function(data, instrument = NULL, variables = NUL
 #' @export
 #'
 #' @examples
-#' demo <- sframe_demo_data()
+#' demo <- sframe_demo("tourism_services")
 #' outliers <- sframe_outlier_results(
 #'   demo$responses,
 #'   variables = c("dm_1", "dm_2", "sat_1"),
@@ -655,7 +655,7 @@ sframe_small_sample_advisory <- function(n, test) {
 #' @return An object of class `sframe_assumption_report`.
 #' @export
 #' @examples
-#' demo <- sframe_demo_data()
+#' demo <- sframe_demo("tourism_services")
 #' ar <- sframe_assumption_results(demo$responses, variables = c("sat_1", "sat_2"),
 #'                          group = "visit_type")
 #' print(ar)
@@ -834,7 +834,7 @@ print.sframe_assumption_report <- function(x, ...) {
 #' @return An object of class `sframe_posthoc_report`.
 #' @export
 #' @examples
-#' demo <- sframe_demo_data()
+#' demo <- sframe_demo("tourism_services")
 #' pr <- sframe_posthoc_results(demo$responses, method = "kruskal_wallis",
 #'                       outcome = "sat_1", group = "visit_type")
 #' pr$tables$pairwise_wilcox

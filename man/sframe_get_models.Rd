@@ -19,7 +19,7 @@ codebook.
 Returns declared CFA, SEM, PLS-SEM, mediation, and related model objects.
 }
 \examples{
-sframe_get_models(sframe_demo_data()$instrument)
+sframe_get_models(sframe_demo("tourism_services")$instrument)
 }
 \seealso{
 \link{sframe_accessors}

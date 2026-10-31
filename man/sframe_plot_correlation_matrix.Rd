@@ -35,7 +35,7 @@ companion to \code{\link[=sframe_validity_results]{sframe_validity_results()}}'s
 \examples{
 \donttest{
 if (requireNamespace("ggplot2", quietly = TRUE)) {
-  demo <- sframe_demo_data()
+  demo <- sframe_demo("tourism_services")
   sframe_plot_correlation_matrix(demo$responses,
                                  c("sq_1", "sq_2", "sq_3", "sat_1", "sat_2"))
 }

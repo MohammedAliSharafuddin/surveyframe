@@ -131,7 +131,7 @@ NULL
 #' @return A list of instrument or codebook metadata.
 #' @seealso [sframe_accessors]
 #' @examples
-#' sframe_meta(sframe_demo_data()$instrument)
+#' sframe_meta(sframe_demo("tourism_services")$instrument)
 #' @export
 sframe_meta <- function(x, ...) UseMethod("sframe_meta")
 
@@ -144,7 +144,7 @@ sframe_meta <- function(x, ...) UseMethod("sframe_meta")
 #'   codebook.
 #' @seealso [sframe_accessors]
 #' @examples
-#' sframe_get_items(sframe_demo_data()$instrument)
+#' sframe_get_items(sframe_demo("tourism_services")$instrument)
 #' @export
 sframe_get_items <- function(x, ...) UseMethod("sframe_get_items")
 
@@ -158,7 +158,7 @@ sframe_get_items <- function(x, ...) UseMethod("sframe_get_items")
 #'   codebook.
 #' @seealso [sframe_accessors]
 #' @examples
-#' sframe_get_scales(sframe_demo_data()$instrument)
+#' sframe_get_scales(sframe_demo("tourism_services")$instrument)
 #' @export
 sframe_get_scales <- function(x, ...) UseMethod("sframe_get_scales")
 
@@ -172,7 +172,7 @@ sframe_get_scales <- function(x, ...) UseMethod("sframe_get_scales")
 #'   for a codebook.
 #' @seealso [sframe_accessors]
 #' @examples
-#' sframe_get_choice_sets(sframe_demo_data()$instrument)
+#' sframe_get_choice_sets(sframe_demo("tourism_services")$instrument)
 #' @export
 sframe_get_choice_sets <- function(x, ...) UseMethod("sframe_get_choice_sets")
 
@@ -184,7 +184,7 @@ sframe_get_choice_sets <- function(x, ...) UseMethod("sframe_get_choice_sets")
 #' @return An [sf_component_list] of branching rules.
 #' @seealso [sframe_accessors]
 #' @examples
-#' sframe_get_branches(sframe_demo_data()$instrument)
+#' sframe_get_branches(sframe_demo("tourism_services")$instrument)
 #' @export
 sframe_get_branches <- function(x, ...) UseMethod("sframe_get_branches")
 
@@ -196,7 +196,7 @@ sframe_get_branches <- function(x, ...) UseMethod("sframe_get_branches")
 #' @return An [sf_component_list] of declared checks.
 #' @seealso [sframe_accessors]
 #' @examples
-#' sframe_get_attention_checks(sframe_demo_data()$instrument)
+#' sframe_get_attention_checks(sframe_demo("tourism_services")$instrument)
 #' @export
 sframe_get_attention_checks <- function(x, ...) UseMethod("sframe_get_attention_checks")
 
@@ -209,7 +209,7 @@ sframe_get_attention_checks <- function(x, ...) UseMethod("sframe_get_attention_
 #'   codebook.
 #' @seealso [sframe_accessors]
 #' @examples
-#' sframe_get_models(sframe_demo_data()$instrument)
+#' sframe_get_models(sframe_demo("tourism_services")$instrument)
 #' @export
 sframe_get_models <- function(x, ...) UseMethod("sframe_get_models")
 
@@ -222,7 +222,7 @@ sframe_get_models <- function(x, ...) UseMethod("sframe_get_models")
 #'   a codebook.
 #' @seealso [sframe_accessors], [sframe_plan<-]
 #' @examples
-#' sframe_plan(sframe_demo_data()$instrument)
+#' sframe_plan(sframe_demo("tourism_services")$instrument)
 #' @export
 sframe_plan <- function(x, ...) UseMethod("sframe_plan")
 
@@ -462,7 +462,7 @@ NULL
 #' @return A single logical value.
 #' @seealso [sframe_validation_accessors], [validate_sframe()]
 #' @examples
-#' v <- validate_sframe(sframe_demo_data()$instrument, strict = FALSE)
+#' v <- validate_sframe(sframe_demo("tourism_services")$instrument, strict = FALSE)
 #' sframe_is_valid(v)
 #' @export
 sframe_is_valid <- function(x, ...) UseMethod("sframe_is_valid")
@@ -475,7 +475,7 @@ sframe_is_valid <- function(x, ...) UseMethod("sframe_is_valid")
 #' @return A character vector, empty when validation passed.
 #' @seealso [sframe_validation_accessors], [validate_sframe()]
 #' @examples
-#' v <- validate_sframe(sframe_demo_data()$instrument, strict = FALSE)
+#' v <- validate_sframe(sframe_demo("tourism_services")$instrument, strict = FALSE)
 #' sframe_problems(v)
 #' @export
 sframe_problems <- function(x, ...) UseMethod("sframe_problems")
@@ -489,7 +489,7 @@ sframe_problems <- function(x, ...) UseMethod("sframe_problems")
 #' @return The object held by a validation result.
 #' @seealso [sframe_validation_accessors], [as_sframe()]
 #' @examples
-#' v <- validate_sframe(sframe_demo_data()$instrument, strict = FALSE)
+#' v <- validate_sframe(sframe_demo("tourism_services")$instrument, strict = FALSE)
 #' sframe_object(v)
 #' @export
 sframe_object <- function(x, ...) UseMethod("sframe_object")
@@ -588,7 +588,7 @@ as_sframe.sframe_validation <- function(x, ...) {
 #' @aliases sf_report_accessors
 #'
 #' @examples
-#' demo <- sframe_demo_data()
+#' demo <- sframe_demo("tourism_services")
 #' qr <- sframe_quality_results(demo$responses, demo$instrument)
 #' head(sframe_flagged(qr))
 NULL
@@ -622,7 +622,7 @@ sframe_apa <- function(x, ...) UseMethod("sframe_apa")
 #' @return A sorted integer vector of unique response-row positions.
 #' @seealso [sframe_report_accessors], [sframe_quality_results()]
 #' @examples
-#' demo <- sframe_demo_data()
+#' demo <- sframe_demo("tourism_services")
 #' qr <- sframe_quality_results(demo$responses, demo$instrument)
 #' sframe_flagged(qr)
 #' @export
@@ -671,7 +671,7 @@ sframe_apa.sframe_assumption_report <- sframe_report_apa
 #' @seealso [sframe_quality_results()], [sframe_flagged()]
 #'
 #' @examples
-#' demo <- sframe_demo_data()
+#' demo <- sframe_demo("tourism_services")
 #' qr   <- sframe_quality_results(demo$responses, demo$instrument)
 #' sframe_missing_columns(qr)
 sframe_missing_columns <- function(x, ...) UseMethod("sframe_missing_columns")

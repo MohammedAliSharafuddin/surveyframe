@@ -171,7 +171,7 @@ test_that("a method outside the covered set says nothing rather than guessing", 
 
 test_that("a whole result set gives one entry per block, named", {
   skip_on_cran()  # renders a report or runs a full plan: slow on CRAN's machines
-  demo <- sframe_demo_data()
+  demo <- sframe_demo("tourism_services")
   results <- run_analysis_plan(demo$responses, demo$instrument)
   code <- sframe_syntax_result(results)
   expect_equal(names(code), names(results))
@@ -185,7 +185,7 @@ test_that("a whole result set gives one entry per block, named", {
 
 test_that("one block can be asked for by id, and an unknown id is refused", {
   skip_on_cran()  # renders a report or runs a full plan: slow on CRAN's machines
-  demo <- sframe_demo_data()
+  demo <- sframe_demo("tourism_services")
   results <- run_analysis_plan(demo$responses, demo$instrument)
   first <- names(results)[[1]]
   expect_equal(sframe_syntax_result(results, which = first),

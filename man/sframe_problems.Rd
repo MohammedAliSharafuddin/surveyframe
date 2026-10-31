@@ -18,7 +18,7 @@ A character vector, empty when validation passed.
 Returns every actionable validation message in check order.
 }
 \examples{
-v <- validate_sframe(sframe_demo_data()$instrument, strict = FALSE)
+v <- validate_sframe(sframe_demo("tourism_services")$instrument, strict = FALSE)
 sframe_problems(v)
 }
 \seealso{

@@ -23,7 +23,7 @@ patterns, listwise and pairwise deletion counts, and scale scoring missing
 rules. No imputation is performed.
 }
 \examples{
-demo <- sframe_demo_data()
+demo <- sframe_demo("tourism_services")
 mr <- sframe_missing_data_results(demo$responses, demo$instrument)
 mr$item_missing
 }

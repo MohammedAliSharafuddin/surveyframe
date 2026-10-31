@@ -40,7 +40,7 @@ rather than kept as empty strings, since they carry no term-frequency
 signal and would otherwise inflate downstream response counts.
 }
 \examples{
-demo <- sframe_demo_data()
+demo <- sframe_demo("tourism_services")
 cleaned <- sframe_clean_text(demo$responses, "comments")
 head(cleaned)
 attr(cleaned, "respondent")[1:5]

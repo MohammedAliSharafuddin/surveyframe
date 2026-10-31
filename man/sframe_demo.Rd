@@ -21,14 +21,15 @@ A list with \code{instrument}, \code{responses}, and the paths behind them:
 The codebook carries variable and value labels, so the data means
 something outside R. The results table is what surveyframe reports for
 this demo, which is the reference to compare against when you run the
-same data through another package.
+same data through another package. The 2 reference datasets have no
+codebook or results table, so those 2 paths are \code{NA}.
 }
 \description{
-One of the 22-item teaching library: 17 analysis examples, three
-presentation examples, and two provenance examples. For the demo that
-instead exercises every input type
-SurveyBuilder and SurveyStudio support in a single instrument, see
-\code{\link[=sframe_input_types_demo_data]{sframe_input_types_demo_data()}}.
+One of the 22-item teaching library: 17 analysis examples, 3
+presentation examples, and 2 provenance examples. Or 1 of the 2 reference
+datasets: \code{"tourism_services"}, a realistic multi-scale instrument, and
+\code{"input_types"}, which uses every input type SurveyBuilder and
+SurveyStudio support in a single instrument.
 }
 \examples{
 demo <- sframe_demo("two_group")
@@ -36,6 +37,5 @@ demo$instrument
 head(demo$responses)
 }
 \seealso{
-\code{\link[=sframe_list_demos]{sframe_list_demos()}}, \code{\link[=export_responses]{export_responses()}},
-\code{\link[=sframe_input_types_demo_data]{sframe_input_types_demo_data()}}
+\code{\link[=sframe_list_demos]{sframe_list_demos()}}, \code{\link[=export_responses]{export_responses()}}
 }

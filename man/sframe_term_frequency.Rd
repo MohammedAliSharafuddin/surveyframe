@@ -27,7 +27,7 @@ packages; pass \code{stop_words = character(0)} to disable filtering, or a
 custom vector to override it.
 }
 \examples{
-demo <- sframe_demo_data()
+demo <- sframe_demo("tourism_services")
 cleaned <- sframe_clean_text(demo$responses, "comments")
 head(sframe_term_frequency(cleaned, top_n = 10))
 }

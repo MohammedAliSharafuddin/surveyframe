@@ -38,7 +38,7 @@ An object of class \code{sframe_posthoc_report}.
 Post-hoc and pairwise comparison report
 }
 \examples{
-demo <- sframe_demo_data()
+demo <- sframe_demo("tourism_services")
 pr <- sframe_posthoc_results(demo$responses, method = "kruskal_wallis",
                       outcome = "sat_1", group = "visit_type")
 pr$tables$pairwise_wilcox

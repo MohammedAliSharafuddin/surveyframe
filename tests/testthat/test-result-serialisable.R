@@ -37,7 +37,7 @@ test_that("5: an EFA readiness result keeps KMO as plain numbers", {
 
 test_that("5: every demo's plan results serialise", {
   skip_on_cran()
-  for (demo in sframe_list_demos()$name) {
+  for (demo in with(sframe_list_demos(), name[focus != "reference"])) {
     d <- sframe_demo(demo)
     res <- suppressWarnings(suppressMessages(run_analysis_plan(d$responses, d$instrument)))
     for (r in res) expect_true(serialises(r), info = paste(demo, r$block_id))
