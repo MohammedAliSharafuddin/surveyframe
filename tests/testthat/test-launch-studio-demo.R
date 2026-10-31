@@ -51,3 +51,26 @@ test_that("launch_studio_demo() forwards with the preview screen", {
   expect_identical(seen$instrument, sframe_demo("input_types")$instrument)
   expect_identical(seen$screen, "preview")
 })
+
+test_that("launch_dashboard() forwards to the Studio dashboard screen", {
+  d <- sframe_demo("input_types")
+  seen <- capture_studio(launch_dashboard(d$instrument, d$responses,
+                                          port = 4322, launch.browser = FALSE))
+  expect_identical(seen$instrument, d$instrument)
+  expect_identical(seen$responses, d$responses)
+  expect_identical(seen$screen, "dashboard")
+  expect_identical(seen$args$port, 4322)
+})
+
+test_that("launch_dashboard_demo() opens the Studio dashboard with the input_types demo", {
+  seen <- capture_studio(launch_dashboard_demo(launch.browser = FALSE))
+  expect_identical(seen$instrument, sframe_demo("input_types")$instrument)
+  expect_identical(seen$screen, "dashboard")
+})
+
+test_that("launch_dashboard() keeps its argument checks", {
+  expect_error(launch_dashboard(), "instrument", class = "sframe_error")
+  d <- sframe_demo("input_types")
+  expect_error(launch_dashboard(d$instrument, responses = 1:3),
+               "data.frame", class = "sframe_error")
+})

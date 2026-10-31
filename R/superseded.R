@@ -89,6 +89,8 @@
 #' | `sframe_input_types_demo_data()` | [sframe_demo()] with `"input_types"` |
 #' | `launch_builder_demo()` | [launch_builder()] with `demo = "input_types"` |
 #' | `launch_studio_demo()` | [launch_studio()] with `demo = "input_types"` |
+#' | `launch_dashboard()` | [launch_studio()] with `screen = "dashboard"` |
+#' | `launch_dashboard_demo()` | [launch_studio()] with `demo = "input_types"` and `screen = "dashboard"` |
 #' | `preview_demo()` | [preview_survey()] |
 #' | `sf_plan(x) <- value` | [sframe_plan<-][sframe_plan] |
 #'
@@ -96,7 +98,9 @@
 #' @param open Passed to [launch_builder()] or [preview_survey()].
 #' @param name,where Passed to [preview_survey()], as its `x` and `where`.
 #' @param screen,port,host,launch.browser Passed to [launch_studio()].
-#' @param instrument,scales,std_lv Passed to [sframe_syntax_cfa()].
+#' @param instrument,scales,std_lv Passed to [sframe_syntax_cfa()]. `instrument` is
+#'   also passed to [launch_studio()] by `launch_dashboard()`.
+#' @param responses A data frame of responses, passed to [launch_studio()].
 #' @param x An instrument.
 #' @param value The analysis plan, as for [sframe_plan()].
 #' @return What the new function returns.
@@ -663,4 +667,38 @@ preview_demo <- function(name = "two_group", where = c("browser", "studio"), ope
 `sf_plan<-` <- function(x, value) {
   sframe_superseded("sf_plan(x) <- value", "sframe_plan(x) <- value")
   `sframe_plan<-`(x, value = value)
+}
+
+#' @rdname superseded
+#' @export
+launch_dashboard <- function(instrument = NULL, responses = NULL, port = NULL, host = "127.0.0.1", launch.browser = interactive()) {
+  sframe_superseded("launch_dashboard()", "launch_studio(screen = \"dashboard\")")
+  if (is.null(instrument)) {
+    rlang::abort(
+      paste0(
+        "launch_dashboard() needs an instrument to display. Pass one (with ",
+        "responses) from R, use launch_studio(demo = \"input_types\", ",
+        "screen = \"dashboard\") for the bundled demo, or use launch_studio() ",
+        "to open and upload data interactively."
+      ),
+      class = "sframe_error"
+    )
+  }
+  sframe_check_instrument(instrument)
+  if (!is.null(responses) && !is.data.frame(responses)) {
+    rlang::abort(
+      "`responses` must be a data.frame or NULL.",
+      class = "sframe_error"
+    )
+  }
+  launch_studio(instrument, responses = responses, screen = "dashboard",
+                port = port, host = host, launch.browser = launch.browser)
+}
+
+#' @rdname superseded
+#' @export
+launch_dashboard_demo <- function(port = NULL, host = "127.0.0.1", launch.browser = TRUE) {
+  sframe_superseded("launch_dashboard_demo()", "launch_studio(demo = \"input_types\", screen = \"dashboard\")")
+  launch_studio(demo = "input_types", screen = "dashboard", port = port,
+                host = host, launch.browser = launch.browser)
 }

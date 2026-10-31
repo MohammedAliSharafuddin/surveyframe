@@ -777,6 +777,17 @@ style.
   launch screen after the first page update, so a click made before that
   was undone. The launch screen now applies only if nothing was picked.
 
+* **The Dashboard screen has filters.** Every text, factor or logical
+  question with 2 to 12 values gets a filter named by its question, with
+  its choice labels, plus a date range on `submitted_at` or `started_at`.
+  The 4 views and the CSV download use the filtered rows, and the Overview
+  shows a "Filtered responses" tile. The Quality screen still describes
+  every response.
+
+* **`launch_dashboard()` opens Studio's Dashboard screen.** It and
+  `launch_dashboard_demo()` are superseded by `launch_studio(screen =
+  "dashboard")`, and the separate dashboard app is removed.
+
 * **Each screen draws when it is opened.** Studio kept 28 outputs on every
   screen computing from start-up, because its screens are hidden with CSS
   and Shiny was not told when one became visible. The screen switch now

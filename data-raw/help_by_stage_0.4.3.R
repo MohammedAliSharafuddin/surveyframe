@@ -15,7 +15,7 @@ sections <- list(
          "SurveyStudio opens an instrument and takes it through every stage",
          "below, with no code. ?surveyframe is the map of the package, and",
          "sframe_demo(\"first_survey\") is a whole survey to start from."),
-       contents = c("surveyframe-package", "launch_studio", "launch_dashboard")),
+       contents = c("surveyframe-package", "launch_studio")),
   list(title = "Design", family = "Design functions",
        desc = paste(
          "Make the instrument: its questions, choice sets, scales, branching",
@@ -134,7 +134,7 @@ sections <- list(
          "teaching demos with a codebook and the results surveyframe",
          "produced. See the \"Learn by example\" article."),
        contents = c("sframe_list_demos", "sframe_demo", "sframe_demo_qmd",
-                    "sframe_demo_branding", "launch_dashboard_demo")),
+                    "sframe_demo_branding")),
   list(title = "Methods", family = "print, format and summary methods",
        desc = paste(
          "Print, format and summary methods, so every component prints and",

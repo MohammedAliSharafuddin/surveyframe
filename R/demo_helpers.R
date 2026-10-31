@@ -100,39 +100,3 @@ sframe_builder_demo_html <- function(name) {
   writeLines(builder_html, demo_builder_path, useBytes = FALSE)
   demo_builder_path
 }
-
-#' Launch the response dashboard with the bundled input-types demo
-#'
-#' Opens the dashboard with the bundled input-types questionnaire and 120
-#' simulated responses already loaded. The browser is opened automatically by
-#' default.
-#'
-#' @param port TCP port for the Shiny server.
-#' @param host Host address for the Shiny server.
-#' @param launch.browser Whether to open the browser automatically. Defaults
-#'   to `TRUE` for this demo helper.
-#'
-#' @return Called for its side effect.
-#' @export
-#' @examples
-#' demo <- sframe_demo("input_types")
-#' nrow(demo$responses)
-#' \dontrun{
-#' launch_dashboard_demo()
-#' }
-#' @family Demo functions
-launch_dashboard_demo <- function(
-    port = NULL,
-    host = "127.0.0.1",
-    launch.browser = TRUE
-) {
-  demo <- sframe_demo("input_types")
-
-  launch_dashboard(
-    instrument     = demo$instrument,
-    responses      = demo$responses,
-    port           = port,
-    host           = host,
-    launch.browser = launch.browser
-  )
-}

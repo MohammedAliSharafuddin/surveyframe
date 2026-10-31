@@ -320,17 +320,17 @@ export_survey(instr, open = FALSE)
 Use `launch_builder()` to author the questionnaire, the plan, and the model and
 to export the `.sframe` file and model syntax. It runs no statistics.
 `launch_studio()` uploads responses, runs the plan on its Analysis Plan screen,
-and renders the report on its Export screen. `launch_dashboard()` is a read-only
-response explorer. Demo launchers are available for training:
+and renders the report on its Export screen. Its Dashboard screen explores
+responses with filters. Demo launchers are available for training:
 
 ```r
 launch_builder(demo = "input_types", open = FALSE)
 # launch_studio(demo = "input_types", screen = "preview")
-# launch_dashboard_demo()
+# launch_studio(demo = "input_types", screen = "dashboard")
 ```
 
 Interactive functions such as `launch_builder(open = TRUE)`, `launch_studio()`,
-`run_survey()`, and `launch_dashboard()` are available for manual use. Tests
+and `run_survey()` are available for manual use. Tests
 and examples avoid opening browsers.
 
 ## Roadmap
