@@ -191,26 +191,31 @@ sframe_studio_app <- function() {
 }
 
 # The open instrument as .sframe text, for the Design screen to send the
-# builder. An instrument whose content no longer matches its amendment log
-# is written as a new one, as the builder would save it. NULL when there is
-# no instrument or it cannot be written.
+# builder, as list(text, problem). An instrument write_sframe() refuses, as
+# one changed with no amendment recorded, is not sent: rewriting it as a new
+# instrument would drop its amendment log, and a save in the builder would
+# then replace Studio's instrument with one that has no history. `problem`
+# says why in plain words. Both are NULL when there is no instrument.
 sframe_studio_sframe_text <- function(instrument) {
-  if (!inherits(instrument, "sframe")) return(NULL)
+  if (!inherits(instrument, "sframe")) return(list(text = NULL, problem = NULL))
   tmp <- tempfile(fileext = ".sframe")
   on.exit(unlink(tmp), add = TRUE)
-  ok <- tryCatch({
+  err <- tryCatch({
     write_sframe(instrument, tmp, overwrite = TRUE)
-    TRUE
-  }, error = function(e) FALSE)
-  if (!ok) {
-    ok <- tryCatch({
-      instrument$amendments <- list()
-      attr(instrument, "sframe_origin") <- NULL
-      write_sframe(instrument, tmp, overwrite = TRUE, new_instrument = TRUE)
-      TRUE
-    }, error = function(e) FALSE)
+    NULL
+  }, error = function(e) conditionMessage(e))
+  if (!is.null(err)) {
+    problem <- if (grepl("changed since its last recorded amendment", err, fixed = TRUE)) {
+      paste("This instrument has changes that are not recorded as an amendment.",
+            "Record an amendment, or save it as a new instrument, before",
+            "editing it in Design.")
+    } else {
+      paste("Design cannot open this instrument, because it cannot be saved",
+            "as it is:", err)
+    }
+    return(list(text = NULL, problem = problem))
   }
-  if (!ok) return(NULL)
-  paste(readLines(tmp, warn = FALSE, encoding = "UTF-8"), collapse = "\n")
+  list(text = paste(readLines(tmp, warn = FALSE, encoding = "UTF-8"), collapse = "\n"),
+       problem = NULL)
 }
 
