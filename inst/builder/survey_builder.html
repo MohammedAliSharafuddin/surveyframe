@@ -378,147 +378,17 @@ input,textarea,select{font-family:inherit;font-size:13px}
   border-left:3px solid var(--toast-warn);border-radius:6px;background:var(--t1);
   color:var(--t2);font-size:12px;line-height:1.5}
 /* -- Preview --------------------------------------------------------------
-   Theme B renderer, mirroring inst/static_survey/template.html so the
-   Preview tab matches the exported survey: serif question typography,
-   numbered Likert squares, bordered choice cards with key chips and ticks,
-   underline text inputs, and a slim theme-coloured progress strip. All
-   tints derive from --pvc (the SURVEY theme colour, set on #pvFrame by
-   renderPreview), never from the builder chrome's own --cp. */
+   The deployable survey from the shared static template, in an iframe that
+   fills the pane (renderPreview). */
 .pv-mode{flex-direction:column;background:var(--cg)}
-.pv-bar{padding:8px 20px;background:var(--cf);border-bottom:1px solid var(--cb);
-  display:flex;align-items:center;gap:12px;flex-shrink:0}
-.pv-bar-lbl{font-size:11px;color:var(--t3)}
-.pvtabs{display:flex;gap:2px;background:var(--cg);border-radius:10px;padding:3px}
-.pvtab{padding:4px 10px;border-radius:var(--r);font-size:11px;font-weight:500;
-  color:var(--t2);cursor:pointer;transition:all var(--d1)}
-.pvtab.active{background:var(--cf);color:var(--cp);font-weight:600;
-  box-shadow:0 1px 3px rgba(0,0,0,.08)}
-.pv-frame{flex:1;overflow-y:auto;padding:24px;
-  --pvc:var(--cp);
-  --pv-serif:Georgia,'Times New Roman',serif;
-  --pv-tint:color-mix(in srgb,var(--pvc) 8%,var(--cf));
-  --pv-tint-bd:color-mix(in srgb,var(--pvc) 30%,#dbe3e6)}
-.pv-prog{max-width:620px;margin:0 auto 10px;height:3px;border-radius:2px;
-  background:color-mix(in srgb,var(--pvc) 14%,var(--cf));overflow:hidden;
-  display:flex;align-items:center}
-.pv-prog-in{height:100%;background:var(--pvc);border-radius:2px;
-  transition:width .3s ease}
-.pv-card{background:var(--cf);border-radius:12px;
-  box-shadow:0 2px 8px rgba(0,0,0,.07);padding:32px;
-  max-width:620px;margin:0 auto}
-.pv-title{font-family:var(--pv-serif);font-size:24px;font-weight:500;
-  letter-spacing:-.2px;margin-bottom:6px}
-.pv-desc{color:var(--t2);margin-bottom:20px;font-size:13px;line-height:1.6}
-.pv-intro{line-height:1.7;margin-bottom:14px;font-size:13px}
-.pv-consent{background:var(--pv-tint);border:1px solid var(--pv-tint-bd);
-  border-radius:var(--r);padding:10px 12px;font-size:12px;color:var(--t2);margin-bottom:14px}
-.pv-eyebrow{font-size:12px;color:var(--pvc);margin-bottom:10px;font-weight:600}
-.pv-sec{margin:24px 0 14px;padding-top:14px;position:relative}
-.pv-sec::before{content:"";position:absolute;top:0;left:0;width:44px;height:2px;
-  background:var(--pvc)}
-.pv-sec-t{font-family:var(--pv-serif);font-size:18px;font-weight:500;
-  letter-spacing:-.2px}
-.pv-sec-sub{color:var(--t2);margin-top:4px;font-size:12px}
-.pv-txtblk{background:var(--pv-tint);border-left:3px solid var(--pvc);
-  padding:10px 12px;border-radius:0 6px 6px 0;margin-bottom:14px;
-  font-size:12px;line-height:1.6;color:var(--t2)}
-.pv-item{margin-bottom:22px}
-.pv-ql{font-family:var(--pv-serif);font-weight:500;margin-bottom:9px;
-  display:flex;gap:6px;align-items:flex-start;font-size:15px}
-.pv-req-mk{color:var(--pvc);font-size:12px;margin-top:2px;flex-shrink:0}
-.pv-help-t{font-size:11px;color:var(--t3);margin:-4px 0 8px;font-weight:400}
-/* Likert: numbered squares with tiny labels */
-.pv-lik-row{display:flex;gap:7px;overflow-x:auto;padding-bottom:2px}
-.pv-lik-opt{flex:1;min-width:46px;display:flex;flex-direction:column;
-  align-items:center;gap:3px;padding:8px 3px;border:1px solid var(--cb);
-  border-radius:var(--r);background:var(--cf);cursor:pointer;text-align:center;
-  transition:all .12s;box-shadow:0 1px 0 rgba(18,33,43,.03);position:relative}
-.pv-lik-opt:hover{border-color:var(--pvc);background:var(--pv-tint)}
-.pv-lik-opt:has(input:checked){background:var(--pvc);border-color:var(--pvc)}
-.pv-lik-opt input{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
-.pv-lik-num{font-size:15px;font-weight:600;color:var(--t2);line-height:1.2}
-.pv-lik-opt:has(input:checked) .pv-lik-num{color:var(--cf)}
-.pv-lik-lbl{font-size:10px;color:var(--t2);line-height:1.25;max-width:70px}
-.pv-lik-opt:has(input:checked) .pv-lik-lbl{color:color-mix(in srgb,var(--cf) 82%,var(--pvc))}
-/* Choice: bordered option cards with key chips and a tick */
-.pv-opts{display:flex;flex-direction:column;gap:7px;counter-reset:pvopt}
-.pv-opt{display:flex;align-items:center;gap:10px;padding:9px 12px;
-  border:1px solid var(--cb);border-radius:var(--r);background:var(--cf);
-  cursor:pointer;transition:all .12s;font-size:13px;position:relative;
-  box-shadow:0 1px 0 rgba(18,33,43,.03);counter-increment:pvopt}
-.pv-opt::before{content:counter(pvopt,upper-alpha);width:22px;height:22px;
-  flex-shrink:0;border:1px solid var(--cb);border-radius:4px;background:var(--cf);
-  display:flex;align-items:center;justify-content:center;font-size:11px;
-  font-weight:700;color:var(--t2)}
-.pv-opt:hover{border-color:var(--pvc);background:var(--pv-tint)}
-.pv-opt:has(input:checked){border-color:var(--pvc);background:var(--pv-tint);
-  box-shadow:inset 0 0 0 1px var(--pvc)}
-.pv-opt:has(input:checked)::before{background:var(--pvc);border-color:var(--pvc);color:var(--cf)}
-.pv-opt::after{content:"\2713";margin-left:auto;color:var(--pvc);
-  font-weight:700;visibility:hidden}
-.pv-opt:has(input:checked)::after{visibility:visible}
-.pv-opt input{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
-/* Short text / number / date: editorial underline inputs */
-.pv-inp{width:100%;border:none;border-bottom:2px solid var(--cb);border-radius:0;
-  padding:7px 2px;font-size:15px;font-family:var(--pv-serif);color:var(--t1);
-  background:transparent;transition:border-color .15s}
-.pv-inp:focus{outline:none;border-bottom-color:var(--pvc)}
-textarea.pv-inp{border:1px solid var(--cb);border-radius:var(--r);padding:9px 11px;
-  font-size:13px;font-family:inherit}
-textarea.pv-inp:focus{border-color:var(--pvc);
-  box-shadow:0 0 0 3px color-mix(in srgb,var(--pvc) 13%,transparent)}
-/* Decision-family preview: pairwise strips and constant-sum weights. */
-.pv-pwc{display:flex;flex-direction:column;gap:10px;margin-top:8px}
-.pv-pwc-row{border:1px solid var(--cb);border-radius:var(--r);padding:8px 10px}
-.pv-pwc-head{display:flex;align-items:center;gap:8px;font-size:11px;
-  color:var(--t2);margin-bottom:6px;flex-wrap:wrap}
-.pv-pwc-side{font-weight:600;color:var(--t1)}
-.pv-pwc-vs{color:var(--t3);text-transform:uppercase;font-size:10px}
-.pv-pwc-q{color:var(--t1)}
-.pv-pwc-more{font-size:11px;color:var(--t3)}
-/* Placeholder cue: an amber chip on the inspector label and a matching note
-   in the preview, so sample labels cannot be mistaken for real ones. */
+.pv-frame{flex:1;display:flex;min-height:0}
+.pv-frame iframe{flex:1;width:100%;border:0;background:#fff}
+.pv-empty{margin:40px auto;color:var(--t3);font-size:13px}
+/* Placeholder cue: an amber chip on the inspector label, so sample labels
+   cannot be mistaken for real ones. */
 .fsample{display:inline-block;margin-left:6px;padding:1px 6px;border-radius:9px;
   background:var(--cw-l);color:var(--fsample-fg);font-size:9px;font-weight:700;
   text-transform:uppercase;letter-spacing:.04em;vertical-align:middle}
-.pv-sample{margin-top:6px;padding:6px 9px;border-radius:5px;
-  background:var(--cw-l);color:var(--fsample-fg);font-size:11px;font-weight:500}
-.pv-cw{display:flex;flex-direction:column;gap:6px;margin-top:8px}
-.pv-cw-row{display:flex;align-items:center;gap:10px}
-.pv-cw-lbl{flex:1;font-size:12px;color:var(--t1)}
-.pv-cw-inp{max-width:90px}
-.pv-cw-tot{font-size:11px;color:var(--t2);margin-top:2px}
-.pv-matrix{border-collapse:collapse;width:100%;font-size:11px;margin-top:8px}
-.pv-matrix th{background:var(--cg);padding:6px 10px;text-align:center;
-  border:1px solid var(--cb);font-weight:600}
-.pv-matrix td{padding:6px 10px;border:1px solid var(--cb);text-align:center}
-.pv-matrix td input{accent-color:var(--pvc)}
-.pv-matrix .rl{text-align:left!important;font-weight:500}
-.pv-slider-w{display:flex;flex-direction:column;gap:4px}
-.pv-slider{width:100%;accent-color:var(--pvc)}
-.pv-slider-r{display:flex;justify-content:space-between;font-size:10px;color:var(--t3)}
-.pv-stars{display:flex;gap:4px;margin-top:5px;font-size:24px;
-  color:color-mix(in srgb,var(--cb) 80%,var(--cf))}
-.pv-ranklist{display:flex;flex-direction:column;gap:7px;margin-top:7px;
-  counter-reset:pvrank}
-.pv-rankitem{display:flex;align-items:center;gap:10px;padding:9px 12px;
-  border:1px solid var(--cb);border-radius:var(--r);background:var(--cf);
-  font-size:13px;color:var(--t1);counter-increment:pvrank}
-.pv-rankitem::before{content:counter(pvrank);width:22px;height:22px;flex-shrink:0;
-  border-radius:5px;background:var(--pvc);color:var(--cf);display:flex;
-  align-items:center;justify-content:center;font-size:11px;font-weight:700}
-.pv-submit{margin-top:24px}
-.pv-submit button{width:100%;padding:11px;border-radius:var(--r);color:var(--cf);
-  font-size:14px;font-weight:600;cursor:default;border:none}
-.pv-nav{display:flex;align-items:center;gap:8px;margin-top:22px}
-.pv-nav button{border:1px solid var(--cb);background:var(--cf);
-  border-radius:var(--r);padding:8px 12px;font-size:12px;font-weight:600;color:var(--t2)}
-.pv-nav button:disabled{opacity:.45;cursor:default}
-.pv-nav .pv-count{flex:1;text-align:center;font-size:11px;color:var(--t3)}
-.pv-ty{text-align:center;padding:40px 20px}
-.pv-ty-ic{font-size:48px;margin-bottom:12px;color:var(--pvc)}
-.pv-ty-t{font-family:var(--pv-serif);font-size:22px;font-weight:500;margin-bottom:7px}
-.pv-ty-m{color:var(--t2);font-size:13px;line-height:1.6}
 
 /* -- Analyse -------------------------------------------------------------- */
 /* flex-direction:column keeps the sub-tab strip ABOVE the three-pane split
@@ -822,23 +692,14 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
 
   <!-- PREVIEW mode -->
   <div class="mp pv-mode" id="mp-preview">
-    <div class="pv-bar">
-      <span class="pv-bar-lbl">Viewing:</span>
-      <div class="pvtabs">
-        <div class="pvtab"        onclick="setPvTab('welcome')"  id="pvt-welcome">Welcome</div>
-        <div class="pvtab active" onclick="setPvTab('survey')"   id="pvt-survey">Survey</div>
-        <div class="pvtab"        onclick="setPvTab('thankyou')" id="pvt-thankyou">Thank You</div>
-      </div>
-    </div>
-    <!-- What this preview does and does not establish. It renders layout and
-         wording from the builder's own markup; it does not run the deployed
-         survey's answer, validation and branching lifecycle, so a researcher
-         cannot tell from here whether a required or conditional survey is
-         answerable. Export the survey and open it to test that. -->
+    <!-- The page export_survey(preview = TRUE) writes: answering, required
+         checks and branching run as a respondent sees them, and nothing is
+         collected. -->
     <div class="pv-note" id="pvNote" role="note">
-      <strong>Layout preview.</strong> This shows wording, order and branding.
-      Answering, required checks and branching are not exercised here, so use
-      <em>Export survey</em> and open the file to test the respondent's path.
+      <strong>The deployable survey, with collection switched off.</strong>
+      Answering, required checks and branching run as a respondent sees them.
+      Anything entered here goes nowhere: the collector endpoint and the
+      completion redirect are both removed from the preview.
     </div>
     <div class="pv-frame" id="pvFrame"></div>
   </div>
@@ -2849,7 +2710,7 @@ function doGet(e) {
 
 // -- State ------------------------------------------------------------------
 var S={meta:{title:'Untitled Survey',version:'1.0.0',description:'',authors:'',languages:'en'},choices:[],items:[],scales:[],branching:[],checks:[],analysis_plan:[],models:[],render:{mode:'standard',theme:'#2563eb',submit_label:'Submit',welcome:{title:'Welcome to this survey',intro_text:'Thank you for taking part. Your responses will be used for research and reporting purposes.',consent_text:'I understand the purpose of this survey and agree to participate.',consent_required:false,start_label:'Start Survey'},thankyou:{message:'Thank you for participating.',redirect_url:'',show_download:false},header:{institution:'',logo_base64:'',show_progress:true},google_sheets_url:'',google_sheets_endpoint:''}};
-var hist=[],fut=[],selId=null,editRqId=null,pvTab='survey',pvPage=0,dirty=false,lastSaved=null,openedAt=null,dragSrc=null,_cRes=null,anTab='plan';
+var hist=[],fut=[],selId=null,editRqId=null,dirty=false,lastSaved=null,openedAt=null,dragSrc=null,_cRes=null,anTab='plan';
 
 function snap(){hist.push(JSON.stringify(S));if(hist.length>60)hist.shift();fut=[];setDirty();updHistBtns();}
 function undo(){if(!hist.length)return;fut.push(JSON.stringify(S));S=JSON.parse(hist.pop());selId=null;ra();updHistBtns();}
@@ -3363,18 +3224,8 @@ async function saveSframe(){
 function sub(str,ph,val){return str.split(ph).join(val);}
 function exportSurveyHtml(){
   if(!S.items||!S.items.length){toast('Add at least one item before exporting a survey','err');return;}
-  var tplEl=document.getElementById('staticSurveyTpl');
-  if(!tplEl||!tplEl.textContent.trim()){toast('Survey template unavailable in this build','err');return;}
-  var tpl=tplEl.textContent.trim().split('<\\/script>').join('<\/script>');
-  var instr={meta:S.meta,items:S.items,choices:S.choices,scales:S.scales,branching:S.branching,checks:S.checks,analysis_plan:S.analysis_plan,models:S.models||[],render:S.render};
-  var json=JSON.stringify(instr).split('<').join('\\u003c');
-  var theme=(S.render&&S.render.theme)||'#2563eb';if(!/^#[0-9A-Fa-f]{3,6}$/.test(theme))theme='#2563eb';
-  var endpoint=(S.render&&S.render.google_sheets_endpoint)||'';
-  var html=tpl;
-  html=sub(html,'{{INSTRUMENT_JSON}}',json);
-  html=sub(html,'{{SURVEY_TITLE}}',esc(S.meta.title||'Survey'));
-  html=sub(html,'{{THEME_COLOR}}',theme);
-  html=sub(html,'{{ENDPOINT_URL}}',esc(endpoint));
+  var html=surveyHtml(false);
+  if(html===null){toast('Survey template unavailable in this build','err');return;}
   var blob=new Blob([html],{type:'text/html'});
   var a=document.createElement('a');a.href=URL.createObjectURL(blob);
   a.download=(S.meta.title||'survey').replace(/[^a-zA-Z0-9]/g,'_')+'.html';a.click();
@@ -4312,103 +4163,39 @@ function deleteRQ(){
 }
 
 // -- Preview ----------------------------------------------------------------
-function setPvTab(t){pvTab=t;pvPage=0;document.querySelectorAll('.pvtab').forEach(function(b){b.classList.remove('active');});document.getElementById('pvt-'+t).classList.add('active');renderPreview();}
-function prevPvPage(){pvPage=Math.max(0,pvPage-1);renderPreview();}
-function nextPvPage(){pvPage=pvPage+1;renderPreview();}
-function renderPreviewItem(item,cm,col){
-  var cs=cm[item.choice_set||''];
-  if(item.type==='section_break')return'<div class="pv-sec"><div class="pv-sec-t">'+esc(item.label)+'</div>'+(item.section_intro?'<div class="pv-sec-sub">'+esc(item.section_intro)+'</div>':'')+'</div>';
-  if(item.type==='text_block')return'<div class="pv-txtblk">'+esc(item.label).replace(/\n/g,'<br>')+'</div>';
-  var lbl='<div class="pv-ql">'+esc(item.label)+(item.required?'<span class="pv-req-mk">*</span>':'')+'</div>'+(item.help?'<div class="pv-help-t">'+esc(item.help)+'</div>':'');
-  var inp='';
-  if(item.type==='likert')inp='<div class="pv-lik-row">'+((cs?cs.values:[]).map(function(v,i){return'<label class="pv-lik-opt"><input type="radio" name="'+esc(item.id)+'"><span class="pv-lik-num">'+esc(v)+'</span><span class="pv-lik-lbl">'+esc((cs.labels||[])[i]||v)+'</span></label>';})).join('')+'</div>';
-  else if(item.type==='single_choice')inp='<div class="pv-opts">'+((cs?cs.values:[]).map(function(v,i){return'<label class="pv-opt"><input type="radio" name="'+esc(item.id)+'"><span>'+esc((cs.labels||[])[i]||v)+'</span></label>';})).join('')+'</div>';
-  else if(item.type==='multiple_choice')inp='<div class="pv-opts">'+((cs?cs.values:[]).map(function(v,i){return'<label class="pv-opt"><input type="checkbox"><span>'+esc((cs.labels||[])[i]||v)+'</span></label>';})).join('')+'</div>';
-  else if(item.type==='numeric')inp='<input class="pv-inp" type="number" placeholder="Enter a number" aria-label="'+esc(item.label)+'" style="max-width:200px">';
-  else if(item.type==='text')inp='<input class="pv-inp" type="text" placeholder="'+esc(item.placeholder||'')+'" aria-label="'+esc(item.label)+'">';
-  else if(item.type==='textarea')inp='<textarea class="pv-inp" rows="3" placeholder="'+esc(item.placeholder||'')+'" aria-label="'+esc(item.label)+'"></textarea>';
-  else if(item.type==='date')inp='<input class="pv-inp" type="date" aria-label="'+esc(item.label)+'" style="max-width:200px"'+(item.date_min?' min="'+esc(item.date_min)+'"':'')+(item.date_max?' max="'+esc(item.date_max)+'"':'')+'>';
-  else if(item.type==='slider')inp='<div class="pv-slider-w"><input type="range" class="pv-slider" min="'+(item.slider_min||0)+'" max="'+(item.slider_max||100)+'" aria-label="'+esc(item.label)+'"><div class="pv-slider-r"><span>'+esc(item.slider_min||0)+'</span><span>'+esc(item.slider_max||100)+'</span></div></div>';
-  else if(item.type==='rating')inp='<div class="pv-stars">'+Array.from({length:item.rating_max||5},function(){return item.rating_icon==='heart'?'&#10084;':'★';}).join('')+'</div>';
-  else if(item.type==='matrix'&&item.matrix_items&&cs)inp='<div style="overflow-x:auto"><table class="pv-matrix"><thead><tr><th></th>'+cs.labels.map(function(l){return'<th>'+esc(l)+'</th>';}).join('')+'</tr></thead><tbody>'+item.matrix_items.map(function(row){return'<tr><td class="rl">'+esc(row)+'</td>'+cs.values.map(function(v){return'<td><input type="radio" name="'+esc(item.id)+'_'+esc(row)+'"></td>';}).join('')+'</tr>';}).join('')+'</tbody></table></div>';
-  else if(item.type==='ranking'&&cs)inp='<div class="pv-ranklist">'+cs.labels.map(function(l){return'<div class="pv-rankitem">'+esc(l)+'<span style="margin-left:auto;color:var(--t3)">&#8942;</span></div>';}).join('')+'</div>';
-  // Decision-family items. The preview mirrors the exported survey's
-  // renderPairwise()/renderCriteriaWeight() layout: one row per pair with a
-  // bipolar 17-point Saaty strip or a unipolar 0-4 influence strip, and
-  // constant-sum point boxes with a running total. Only the first 3 rows are
-  // drawn, with a count of the rest, since 4 criteria already means 6 Saaty
-  // pairs or 12 influence pairs and the preview pane is not the place to
-  // scroll all of them.
-  else if(item.type==='pairwise_comparison'){
-    var crits=item.comparison_items||[];
-    var influence=item.comparison_scale==='influence';
-    var pairs=[];
-    for(var pi=0;pi<crits.length;pi++){
-      for(var pj=0;pj<crits.length;pj++){
-        if(pi===pj)continue;
-        if(!influence&&pj<pi)continue;
-        pairs.push([crits[pi],crits[pj]]);
-      }
-    }
-    var strip=influence?[0,1,2,3,4]:[9,8,7,6,5,4,3,2,1,2,3,4,5,6,7,8,9];
-    var shown=pairs.slice(0,3);
-    inp='<div class="pv-pwc">'+shown.map(function(p,ri){
-      var head=influence?('<span class="pv-pwc-q">How strongly does <b>'+esc(p[0])+'</b> influence <b>'+esc(p[1])+'</b>?</span>')
-                        :('<span class="pv-pwc-side">'+esc(p[0])+'</span><span class="pv-pwc-vs">vs</span><span class="pv-pwc-side">'+esc(p[1])+'</span>');
-      return'<div class="pv-pwc-row"><div class="pv-pwc-head">'+head+'</div><div class="pv-lik-row">'+
-        strip.map(function(v){return'<label class="pv-lik-opt"><input type="radio" name="'+esc(item.id)+'_p'+ri+'"><span class="pv-lik-num">'+v+'</span></label>';}).join('')+
-        '</div></div>';
-    }).join('')+
-      (pairs.length>shown.length?'<div class="pv-pwc-more">'+(pairs.length-shown.length)+' more pair'+(pairs.length-shown.length===1?'':'s')+' in the exported survey, '+pairs.length+' in total</div>':'')+
-      (crits.length<2?'<div class="pv-pwc-more">Add at least 2 items to compare in the inspector.</div>':'')+
-    '</div>';
+// The survey page from the shared static template, as export_survey() writes
+// it. A preview is the page export_survey(preview = TRUE) writes, the one
+// SurveyStudio's Preview Survey screen shows: no endpoint, no completion
+// redirect, and the template's PREVIEW flag set, so it collects nothing.
+function surveyHtml(preview){
+  var tplEl=document.getElementById('staticSurveyTpl');
+  if(!tplEl||!tplEl.textContent.trim())return null;
+  var tpl=tplEl.textContent.trim().split('<\\/script>').join('<\/script>');
+  var render=JSON.parse(JSON.stringify(S.render||{}));
+  if(preview){
+    delete render.google_sheets_endpoint;
+    if(render.thankyou)delete render.thankyou.redirect_url;
   }
-  else if(item.type==='criteria_weight'){
-    var cw=item.comparison_items||[];
-    inp='<div class="pv-cw">'+cw.map(function(c){
-      return'<div class="pv-cw-row"><span class="pv-cw-lbl">'+esc(c)+'</span><input class="pv-inp pv-cw-inp" type="number" min="0" max="100" placeholder="0" aria-label="'+esc(c)+'"></div>';
-    }).join('')+
-      '<div class="pv-cw-tot">Total: <b>0</b> of 100</div>'+
-      (cw.length<2?'<div class="pv-pwc-more">Add at least 2 criteria in the inspector.</div>':'')+
-    '</div>';
-  }
-  // Preview-only cue, never exported: the sample labels are still in place.
-  var sampleNote=(typeof isSampleList==='function'&&isSampleList(item))
-    ?'<div class="pv-sample">Sample labels. Edit "'+(item.type==='matrix'?'Matrix row labels':(item.type==='criteria_weight'?'Criteria':'Items to compare'))+'" in the inspector before collecting data.</div>'
-    :'';
-  return'<div class="pv-item">'+lbl+inp+sampleNote+'</div>';
+  var instr={meta:S.meta,items:S.items,choices:S.choices,scales:S.scales,branching:S.branching,checks:S.checks,analysis_plan:S.analysis_plan,models:S.models||[],render:render};
+  var json=JSON.stringify(instr).split('<').join('\\u003c');
+  var theme=render.theme||'#2563eb';if(!/^#[0-9A-Fa-f]{3,6}$/.test(theme))theme='#2563eb';
+  var endpoint=render.google_sheets_endpoint||'';
+  var html=tpl;
+  html=sub(html,'{{INSTRUMENT_JSON}}',json);
+  html=sub(html,'{{SURVEY_TITLE}}',esc(S.meta.title||'Survey'));
+  html=sub(html,'{{THEME_COLOR}}',theme);
+  html=sub(html,'{{ENDPOINT_URL}}',esc(endpoint));
+  html=sub(html,'{{PREVIEW}}',preview?'true':'false');
+  return html;
 }
 function renderPreview(){
-  var el=document.getElementById('pvFrame');var col=normHex((S.render&&S.render.theme)||'#2563eb');
-  // Theme B: all preview tints derive from the survey's theme colour via
-  // the --pvc custom property (see the .pv-frame CSS block), so the preview
-  // re-skins with the picker exactly like the exported survey does.
-  el.style.setProperty('--pvc',col);
-  var cm={};S.choices.forEach(function(cs){cm[cs.id]=cs;});
-  // Branded header on every preview screen (Welcome, Survey, Thank You),
-  // with a stable logo box so the title does not shift with aspect ratio.
-  var hdr='';if(S.render&&S.render.header){var h=S.render.header;if(h.institution||h.logo_base64){var hMtype=h.logo_media_type||'image/png';hdr='<div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;padding-bottom:14px;border-bottom:1px solid var(--cb)">'+(h.logo_base64?'<img src="data:'+hMtype+';base64,'+h.logo_base64+'" style="height:36px;width:auto;min-width:36px;max-width:200px;object-fit:contain;object-position:left center" alt="Logo">':'')+(h.institution?'<span style="font-size:15px;font-weight:600;color:var(--t1)">'+esc(h.institution)+'</span>':'')+'</div>';}}
-  if(pvTab==='welcome'){
-    var w=S.render&&S.render.welcome?S.render.welcome:{};
-    if(!w.intro_text&&!w.consent_text){el.innerHTML='<div style="max-width:620px;margin:0 auto"><div style="background:#fff;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.07);padding:40px;text-align:center;color:var(--t3)"><div style="font-size:32px;margin-bottom:12px">&#128196;</div><p style="font-size:13px">No welcome page configured. <a href="#" onclick="openSettings(\'welcome\');return false" style="color:'+esc(col)+'">Set up welcome page &#8594;</a></p></div></div>';return;}
-    el.innerHTML='<div style="max-width:620px;margin:0 auto"><div class="pv-card">'+hdr+'<div class="pv-title">'+esc(w.title||S.meta.title)+'</div>'+(w.intro_text?'<div class="pv-intro">'+esc(w.intro_text).replace(/\n/g,'<br>')+'</div>':'')+(w.consent_text?'<div class="pv-consent">'+esc(w.consent_text)+'</div>':'')+'<div class="pv-submit" style="margin-top:16px"><button type="button" style="background:'+esc(col)+'">'+esc(w.start_label||'Start Survey')+'</button></div></div></div>';return;
-  }
-  if(pvTab==='thankyou'){var ty=S.render&&S.render.thankyou?S.render.thankyou:{};el.innerHTML='<div style="max-width:620px;margin:0 auto"><div class="pv-card">'+hdr+'<div class="pv-ty"><div class="pv-ty-ic">&#10003;</div><div class="pv-ty-t">Submitted successfully</div><div class="pv-ty-m">'+esc(ty.message||'Thank you for participating.')+'</div></div></div></div>';return;}
-  if(!S.items.length){el.innerHTML='<div style="max-width:620px;margin:0 auto"><div class="pv-card" style="text-align:center;padding:60px"><p style="color:var(--t3);font-size:13px">Add questions to preview the survey.</p></div></div>';return;}
-  var mode=(S.render&&S.render.mode)||'standard';
-  var shown=S.items,nav='',eyebrow='',prog='';
-  if(mode==='conversational'){
-    pvPage=Math.max(0,Math.min(pvPage,S.items.length-1));
-    shown=[S.items[pvPage]];
-    // Per-question eyebrow and a slim theme-coloured progress strip, both
-    // conversational-mode-only, matching the static template's behaviour.
-    eyebrow='<div class="pv-eyebrow">Question '+(pvPage+1)+' of '+S.items.length+'</div>';
-    prog='<div class="pv-prog"><div class="pv-prog-in" style="width:'+Math.round(((pvPage+1)/S.items.length)*100)+'%"></div></div>';
-    nav='<div class="pv-nav"><button type="button" onclick="prevPvPage()" '+(pvPage===0?'disabled':'')+'>Previous</button><span class="pv-count">Question '+(pvPage+1)+' of '+S.items.length+'</span><button type="button" onclick="nextPvPage()" '+(pvPage>=S.items.length-1?'disabled':'')+'>Next</button></div>';
-  }
-  var items=shown.map(function(item){return renderPreviewItem(item,cm,col);}).join('');
-  var submit=mode==='conversational'&&pvPage<S.items.length-1?'':'<div class="pv-submit"><button type="button" style="background:'+esc(col)+'">'+esc((S.render&&S.render.submit_label)||'Submit')+'</button></div>';
-  el.innerHTML='<div style="max-width:620px;margin:0 auto">'+prog+'<div class="pv-card">'+hdr+(mode==='conversational'?eyebrow:'<div class="pv-title">'+esc(S.meta.title)+'</div>'+(S.meta.description?'<div class="pv-desc">'+esc(S.meta.description)+'</div>':''))+items+nav+submit+'</div></div>';
+  var el=document.getElementById('pvFrame');
+  if(!S.items.length){el.innerHTML='<p class="pv-empty">Add questions to preview the survey.</p>';return;}
+  var html=surveyHtml(true);
+  if(html===null){el.innerHTML='<p class="pv-empty">Survey template unavailable in this build.</p>';return;}
+  var fr=el.querySelector('iframe');
+  if(!fr){el.innerHTML='';fr=document.createElement('iframe');fr.title='Survey preview';el.appendChild(fr);}
+  fr.srcdoc=html;
 }
 
 // -- Analyse ----------------------------------------------------------------
