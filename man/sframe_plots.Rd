@@ -34,8 +34,6 @@ on its own terms. They differ in what they accept and in what comes back.
 }
 \item \strong{Responses with the instrument, giving 1 plot:}
 \itemize{
-\item \code{\link[=sframe_plot_item_chart]{sframe_plot_item_chart()}}
-\item \code{\link[=sframe_plot_scale_chart]{sframe_plot_scale_chart()}}
 \item \code{\link[=sframe_plot_likert_matrix]{sframe_plot_likert_matrix()}}
 \item \code{\link[=sframe_plot_likert_scale]{sframe_plot_likert_scale()}}
 \item \code{\link[=sframe_plot_correlation_matrix]{sframe_plot_correlation_matrix()}}
@@ -69,14 +67,6 @@ on its own terms. They differ in what they accept and in what comes back.
 
 A helper that finds nothing to draw returns \code{NULL}, so guard the result
 where a report has to keep rendering.
-}
-
-\section{Integration helpers}{
-\code{\link[=sframe_draw_mosaic]{sframe_draw_mosaic()}} and \code{\link[=sframe_draw_likert_diverging]{sframe_draw_likert_diverging()}} draw into an
-open device for the generated reports, and stay exported so those reports
-keep working. \code{\link[=sframe_likert_scale_groups]{sframe_likert_scale_groups()}} finds the scales whose items
-share a choice set, which is how a report groups them. Take the results
-they draw from \code{\link[=run_analysis_plan]{run_analysis_plan()}}.
 }
 
 \seealso{

@@ -215,7 +215,6 @@ reference:
       - sframe_codebook
       - sframe_save_figures
       - sframe_analysis_qmd
-      - sframe_result_supplement
 
   - title: "References"
     desc: >
@@ -380,7 +379,6 @@ reference:
       - sframe_list_demos
       - sframe_demo
       - sframe_demo_qmd
-      - sframe_demo_branding
 
   - title: "Methods"
     desc: >
@@ -409,20 +407,11 @@ reference:
       - format.sf_model
       - summary.sf_model
 
-  - title: "For SurveyStudio and the report template"
+  - title: "For the report template"
     desc: >
-      Helpers SurveyStudio and the report template call. Exported for now,
-      and to become internal.
+      The APA cell formatter the Quarto report template calls. Exported
+      because Quarto renders against the installed package.
     contents:
-      - sframe_builder_empty_state
-      - sframe_builder_state_from_instrument
-      - sframe_builder_validate_draft
-      - sframe_codebook_items_display
-      - sframe_draw_mosaic
-      - sframe_likert_scale_groups
-      - sframe_plot_item_chart
-      - sframe_plot_scale_chart
-      - sframe_draw_likert_diverging
       - sframe_apa_cells
 
   - title: "Old names (superseded)"

@@ -48,7 +48,7 @@ one. A result that failed carries its
 \description{
 Takes one result from \code{\link[=run_analysis_plan]{run_analysis_plan()}} and returns what the report
 shows for it: the formatted table with its caption and note, any second
-table \code{\link[=sframe_result_supplement]{sframe_result_supplement()}} gives, the APA line, and the chart the
+table \code{sframe_result_supplement()} gives, the APA line, and the chart the
 report picks for that method, with the instrument's labels. The table, the
 chart and their choice per method come from the code \code{\link[=render_report]{render_report()}}
 uses, so a host rendering results one at a time and the report agree.
@@ -71,7 +71,6 @@ Other Report functions:
 \code{\link[=sframe_analysis_qmd]{sframe_analysis_qmd()}},
 \code{\link[=sframe_codebook]{sframe_codebook()}},
 \code{\link{sframe_reports}},
-\code{\link[=sframe_result_supplement]{sframe_result_supplement()}},
 \code{\link[=sframe_save_figures]{sframe_save_figures()}}
 }
 \concept{Report functions}

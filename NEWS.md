@@ -9,6 +9,14 @@ can be written again, and every plan result can be serialised by a host.
 
 ## What you need to change
 
+* **11 helpers for SurveyStudio and the report template are internal.**
+  `sframe_plot_item_chart()`, `sframe_plot_scale_chart()`,
+  `sframe_draw_likert_diverging()`, `sframe_draw_mosaic()`,
+  `sframe_likert_scale_groups()`, `sframe_codebook_items_display()`, the 3
+  `sframe_builder_*()` state helpers, `sframe_result_supplement()` and
+  `sframe_demo_branding()` were exported only because Studio and the
+  template ran outside the package. `sframe_demo(name, branded = TRUE)`
+  applies the demo branding.
 * **`write_sframe(new_instrument = TRUE)` needs a new title or version** on an
   instrument read with `read_sframe()`. It accepted the title and version of
   the file read, so 2 different files could claim to be one instrument. Set

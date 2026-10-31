@@ -194,7 +194,7 @@ sframe_codebook_markdown <- function(cb) {
 #' @param cb An `sframe_codebook` object from [sframe_codebook()].
 #' @return A data.frame, `cb$items_table` with `choice_set` and `scale_id`
 #'   replaced by display text.
-#' @export
+#' @noRd
 #' @seealso [sframe_codebook()]
 #' @examples
 #' demo <- sframe_demo("tourism_services")

@@ -8,8 +8,8 @@ preview_survey(x, where = c("browser", "studio"), open = interactive())
 }
 \arguments{
 \item{x}{An \code{sframe} instrument, or a demo name from \code{\link[=sframe_list_demos]{sframe_list_demos()}}.
-A demo is shown with the standard demo branding, see
-\code{\link[=sframe_demo_branding]{sframe_demo_branding()}}.}
+A demo is shown with the standard demo branding, as
+\code{sframe_demo(name, branded = TRUE)} applies it.}
 
 \item{where}{One of \code{"browser"}, a standalone HTML page written by
 \code{\link[=export_survey]{export_survey()}}, or \code{"studio"}, the preview screen of

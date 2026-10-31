@@ -298,7 +298,7 @@ the default look. The whole appearance of a survey lives in one `render`
 block, which you can read, change and paste into your own instrument:
 
 ```{r branding}
-sframe_demo_branding()
+sframe_demo("two_group", branded = TRUE)$instrument$render
 ```
 
 Applied to any demo with `branded = TRUE`, which leaves the files on disk

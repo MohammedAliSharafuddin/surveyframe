@@ -820,7 +820,7 @@ test_that("builder helpers compose a valid instrument from draft components", {
       items = c("sat_1", "sat_2"), reverse_items = "sat_2")
   )
 
-  draft <- surveyframe::sframe_builder_validate_draft(
+  draft <- sframe_builder_validate_draft(
     meta = meta,
     choices = choices,
     items = items,
@@ -845,7 +845,7 @@ test_that("builder helpers reclassify components from a loaded sframe file", {
   write_sframe(instr, path, overwrite = TRUE)
 
   loaded <- read_sframe(path)
-  state <- surveyframe::sframe_builder_state_from_instrument(loaded)
+  state <- sframe_builder_state_from_instrument(loaded)
 
   expect_true(all(vapply(state$choices, inherits, logical(1), "sf_choices")))
   expect_true(all(vapply(state$items, inherits, logical(1), "sf_item")))
@@ -853,7 +853,7 @@ test_that("builder helpers reclassify components from a loaded sframe file", {
   expect_true(all(vapply(state$branching, inherits, logical(1), "sf_branch")))
   expect_true(all(vapply(state$checks, inherits, logical(1), "sf_check")))
 
-  rebuilt <- surveyframe::sframe_builder_validate_draft(
+  rebuilt <- sframe_builder_validate_draft(
     meta = state$meta,
     choices = state$choices,
     items = state$items,
@@ -891,10 +891,10 @@ test_that("a builder draft round trip preserves an existing amendment log", {
   )
   expect_equal(nrow(sframe_get_amendments(amended)), 1)
 
-  state <- surveyframe::sframe_builder_state_from_instrument(amended)
+  state <- sframe_builder_state_from_instrument(amended)
   expect_equal(length(state$amendments), 1)
 
-  rebuilt <- surveyframe::sframe_builder_validate_draft(
+  rebuilt <- sframe_builder_validate_draft(
     meta = state$meta,
     choices = state$choices,
     items = state$items,
