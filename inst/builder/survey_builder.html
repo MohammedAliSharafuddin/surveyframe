@@ -4558,7 +4558,8 @@ setInterval(function(){if(lastSaved||openedAt)updSave();},30000);
 // In SurveyStudio's Design screen (?host=studio) the builder opens the
 // instrument Studio has open and saves to Studio, not to disk. Messages pass
 // only between this window and its parent, on the same origin.
-var STUDIO_HOST=/[?&]host=studio(&|$)/.test(location.search)&&window.parent!==window;
+// The builder also runs where there is no page, as in the V8 tests.
+var STUDIO_HOST=typeof location!=="undefined"&&/[?&]host=studio(&|$)/.test(location.search)&&window.parent!==window;
 var studioPendingOrigin=null;
 function studioHostInit(){
   document.getElementById('openBtn').style.display='none';
