@@ -25,7 +25,7 @@ sframe_check_instrument <- function(instrument, arg = "instrument") {
     rlang::abort(
       paste0(
         "The `", arg, "` argument must be an `sframe` object. ",
-        "Build one with `sf_instrument()` and its component constructors, ",
+        "Build one with `sframe_instrument()` and its component constructors, ",
         "or load a saved instrument from disk with `read_sframe()`."
       ),
       class = "sframe_error"

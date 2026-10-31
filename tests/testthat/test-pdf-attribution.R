@@ -5,8 +5,8 @@
 # was asked for.
 
 pdf_instrument <- function() {
-  sf_instrument("Attribution", components = list(
-    sf_item("q1", "A number", type = "numeric")))
+  sframe_instrument("Attribution", components = list(
+    sframe_item("q1", "A number", type = "numeric")))
 }
 
 test_that("14: an HTML report records its engine", {

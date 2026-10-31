@@ -13,20 +13,20 @@ test_that("22: a descriptives plan table has reader headings", {
   expect_false(any(c("valid_n", "missing_n", "sd", "group", "weighted_mean") %in% names(tb)))
 })
 
-test_that("22: descriptives_report() keeps its own column names", {
+test_that("22: sframe_descriptives_results() keeps its own column names", {
   d <- sframe_demo("likert_scale")
   item <- d$instrument$items[[1]]$id
-  dr <- descriptives_report(d$responses, variables = item)
+  dr <- sframe_descriptives_results(d$responses, variables = item)
   expect_true(all(c("variable", "valid_n", "sd") %in% names(dr$table)))
 })
 
 test_that("22: report sentences agree in number", {
   d <- sframe_demo("likert_scale")
   item <- d$instrument$items[[1]]$id
-  expect_match(descriptives_report(d$responses, variables = item)$apa,
+  expect_match(sframe_descriptives_results(d$responses, variables = item)$apa,
                "computed for 1 variable.", fixed = TRUE)
   two <- vapply(d$instrument$items[1:2], function(i) i$id, character(1))
-  expect_match(descriptives_report(d$responses, variables = two)$apa,
+  expect_match(sframe_descriptives_results(d$responses, variables = two)$apa,
                "computed for 2 variables.", fixed = TRUE)
-  expect_no_match(descriptives_report(d$responses, variables = two)$apa, "(s)", fixed = TRUE)
+  expect_no_match(sframe_descriptives_results(d$responses, variables = two)$apa, "(s)", fixed = TRUE)
 })

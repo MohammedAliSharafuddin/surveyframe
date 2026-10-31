@@ -19,17 +19,17 @@
 #'   element per scale. Each element is a list of statistics and a summary
 #'   tibble.
 #' @export
-#' @seealso [sf_scale()], [item_report()]
+#' @seealso [sframe_scale()], [sframe_item_results()]
 #'
 #' @examples
 #' \donttest{
 #' if (requireNamespace("psych", quietly = TRUE)) {
 #'   demo <- sframe_demo_data()
-#'   rr <- reliability_report(demo$responses, demo$instrument, omega = FALSE)
+#'   rr <- sframe_reliability_results(demo$responses, demo$instrument, omega = FALSE)
 #'   print(rr)
 #' }
 #' }
-reliability_report <- function(
+sframe_reliability_results <- function(
     data,
     instrument,
     scales = NULL,
@@ -141,10 +141,10 @@ print.sframe_reliability_report <- function(x, ...) {
 #'
 #' Diagnostics use the scale's scoring orientation, so an item the scale
 #' reverse-codes is reversed first, as in [score_scales()] and
-#' [reliability_report()]. The item-rest correlation is the correlation
+#' [sframe_reliability_results()]. The item-rest correlation is the correlation
 #' between an item and the sum of the scale's other items. It is computed
 #' on respondents who answered every item in the scale, the same rows
-#' [reliability_report()] uses, and `n_missing` counts the item's own missing
+#' [sframe_reliability_results()] uses, and `n_missing` counts the item's own missing
 #' values in `data`.
 #'
 #' Floor and ceiling are the proportions at the item's declared lowest and
@@ -163,19 +163,19 @@ print.sframe_reliability_report <- function(x, ...) {
 #'   `mean`, `sd`, `item_rest_r`, `floor_pct`, `ceiling_pct` and `n_missing`.
 #'   `as.data.frame()` stacks every scale's diagnostics into one table.
 #' @export
-#' @seealso [reliability_report()], [sf_scale()]
+#' @seealso [sframe_reliability_results()], [sframe_scale()]
 #'
 #' @examples
 #' \donttest{
 #' demo <- sframe_demo_data()
-#' ir <- item_report(demo$responses, demo$instrument)
+#' ir <- sframe_item_results(demo$responses, demo$instrument)
 #' print(ir)
 #' # one scale's diagnostics
 #' ir[[1]]$diagnostics
 #' # every scale in one table
 #' as.data.frame(ir)
 #' }
-item_report <- function(data, instrument, scales = NULL) {
+sframe_item_results <- function(data, instrument, scales = NULL) {
   sframe_check_instrument(instrument)
   stopifnot(is.data.frame(data))
 
@@ -263,21 +263,21 @@ print.sframe_item_report <- function(x, ...) {
 #'   `bartlett`, `parallel`, and `suggested_nfactors`.
 #' @section Fitting the solution:
 #' This report says whether the data suit a factor analysis and how many
-#' factors to extract. [efa_solution()] then fits that solution and returns
+#' factors to extract. [sframe_efa_solution()] then fits that solution and returns
 #' the loadings, so the whole route stays in surveyframe. Take the result to
 #' another package when you want a method surveyframe leaves out.
 #' @export
-#' @seealso [efa_solution()], [reliability_report()], [cfa_syntax()]
+#' @seealso [sframe_efa_solution()], [sframe_reliability_results()], [sframe_syntax_cfa()]
 #'
 #' @examples
 #' \donttest{
 #' if (requireNamespace("psych", quietly = TRUE)) {
 #'   demo <- sframe_demo_data()
-#'   er <- efa_report(demo$responses, demo$instrument)
+#'   er <- sframe_efa_readiness_results(demo$responses, demo$instrument)
 #'   print(er)
 #' }
 #' }
-efa_report <- function(
+sframe_efa_readiness_results <- function(
     data,
     instrument,
     scales    = NULL,
@@ -354,57 +354,3 @@ print.sframe_efa_report <- function(x, ...) {
 }
 
 
-# cfa_syntax.R
-
-#' Generate lavaan CFA syntax from an instrument object
-#'
-#' Produces a character string of `lavaan` model syntax derived from the
-#' scale structure in the instrument. The syntax can be passed directly to
-#' `lavaan::cfa()`. Reverse-coded items are noted in a comment but are not
-#' transformed in the syntax. Recoding should be applied to the data before
-#' fitting the model.
-#'
-#' @param instrument An `sframe` object.
-#' @param scales Character vector or NULL. A subset of scale IDs to include.
-#'   When NULL, all scales are included.
-#' @param std_lv Logical. Whether to include the `std.lv = TRUE` argument note
-#'   in the output comment header. Defaults to `TRUE`.
-#'
-#' @return A character string of `lavaan` CFA model syntax.
-#' @section Which of the two to use:
-#' This is the instrument-only convenience wrapper: one call, constructs taken
-#' from the instrument's scales. [cfa_lavaan_syntax()] is the general entry
-#' point, and takes those same arguments plus a declared [sf_model()],
-#' correlated residuals and latent covariances. Reach for it where the
-#' constructs differ from the scales. This wrapper stays supported, so a script
-#' calling it keeps working.
-#' @export
-#' @seealso [cfa_lavaan_syntax()], [efa_report()], [reliability_report()]
-#'
-#' @examples
-#' cs    <- sf_choices("ag5", 1:5,
-#'            c("Strongly disagree", "Disagree", "Neutral",
-#'              "Agree", "Strongly agree"))
-#' i1    <- sf_item("sat_1", "Item 1", type = "likert",
-#'                  choice_set = "ag5", scale_id = "sat")
-#' i2    <- sf_item("sat_2", "Item 2", type = "likert",
-#'                  choice_set = "ag5", scale_id = "sat")
-#' i3    <- sf_item("sat_3", "Item 3 (reverse)", type = "likert",
-#'                  choice_set = "ag5", scale_id = "sat", reverse = TRUE)
-#' scale <- sf_scale("sat", "Satisfaction",
-#'                   items = c("sat_1", "sat_2", "sat_3"))
-#' instr <- sf_instrument("Demo Survey", components = list(cs, i1, i2, i3, scale))
-#'
-#' syntax <- cfa_syntax(instr)
-#' cat(syntax)
-#'
-#' \dontrun{
-#' # lavaan is not installed by default. Install it before fitting.
-#' demo   <- sframe_demo_data()
-#' scored <- score_scales(demo$responses, demo$instrument)
-#' fit    <- lavaan::cfa(syntax, data = scored, std.lv = TRUE)
-#' summary(fit, fit.measures = TRUE)
-#' }
-cfa_syntax <- function(instrument, scales = NULL, std_lv = TRUE) {
-  cfa_lavaan_syntax(instrument = instrument, scales = scales, std_lv = std_lv)
-}

@@ -3,42 +3,42 @@
 #' Shiny module UI for an embedded survey
 #'
 #' Places a survey inside a larger Shiny application. Pair with
-#' [survey_module_server()] in the server function. The module shows a
+#' [sframe_survey_server()] in the server function. The module shows a
 #' welcome screen, the instrument's pages with branching and required-item
 #' checks, and a thank-you screen.
 #'
-#' Every item type is drawn with the same controls [render_survey()] uses, so
+#' Every item type is drawn with the same controls [run_survey()] uses, so
 #' a response collected through the module has the same columns as one
-#' collected there. [survey_module_server()] describes what is returned.
+#' collected there. [sframe_survey_server()] describes what is returned.
 #'
 #' @param id A character string. The module namespace ID, passed identically
-#'   to [survey_module_server()].
+#'   to [sframe_survey_server()].
 #' @param width Character. CSS width for the survey card. Defaults to
 #'   `"100%"`.
 #'
 #' @return A `shiny.tag` object.
 #' @export
-#' @seealso [survey_module_server()], [render_survey()],
-#'   [export_static_survey()]
+#' @seealso [sframe_survey_server()], [run_survey()],
+#'   [export_survey()]
 #'
 #' @examples
 #' \dontrun{
 #' library(shiny)
 #' library(surveyframe)
 #'
-#' cs    <- sf_choices("ag5", 1:5, c("SD", "D", "N", "A", "SA"))
-#' item  <- sf_item("q1", "Rate your experience.", type = "likert",
+#' cs    <- sframe_choice_set("ag5", 1:5, c("SD", "D", "N", "A", "SA"))
+#' item  <- sframe_item("q1", "Rate your experience.", type = "likert",
 #'                  choice_set = "ag5", required = TRUE)
-#' instr <- sf_instrument("Quick Survey", components = list(cs, item))
+#' instr <- sframe_instrument("Quick Survey", components = list(cs, item))
 #' store <- file.path(tempdir(), "responses.csv")
 #'
 #' ui <- fluidPage(
-#'   survey_module_ui("demo"),
+#'   sframe_survey_ui("demo"),
 #'   verbatimTextOutput("result")
 #' )
 #'
 #' server <- function(input, output, session) {
-#'   resp <- survey_module_server(
+#'   resp <- sframe_survey_server(
 #'     "demo", instrument = instr,
 #'     # Called before the survey is marked complete. An error here keeps the
 #'     # respondent on the last page with a message, so nothing is lost.
@@ -57,7 +57,7 @@
 #'
 #' shinyApp(ui, server)
 #' }
-survey_module_ui <- function(id, width = "100%") {
+sframe_survey_ui <- function(id, width = "100%") {
   rlang::check_installed("shiny", reason = "to embed a survey module.")
   ns <- shiny::NS(id)
 
@@ -92,7 +92,7 @@ survey_module_ui <- function(id, width = "100%") {
 #'
 #' # Supported item types
 #'
-#' Every item type is supported, with the same controls [render_survey()]
+#' Every item type is supported, with the same controls [run_survey()]
 #' uses: likert, single choice, multiple choice, numeric, text, text area,
 #' date, slider, rating, ranking, matrix, pairwise comparison and criteria
 #' weight, plus section breaks and text blocks.
@@ -128,7 +128,7 @@ survey_module_ui <- function(id, width = "100%") {
 #' answer given to the previous instrument carries into the new one.
 #'
 #' @param id A character string matching the `id` passed to
-#'   [survey_module_ui()].
+#'   [sframe_survey_ui()].
 #' @param instrument An `sframe` object, or a `reactive` that returns one.
 #' @param on_submit Optional function of one argument, called with the
 #'   response list before the survey is marked complete. Use it to store the
@@ -139,13 +139,13 @@ survey_module_ui <- function(id, width = "100%") {
 #'   `on_submit`, when supplied, has returned. After that it returns the
 #'   response list.
 #' @export
-#' @seealso [survey_module_ui()], [render_survey()], [read_responses()]
+#' @seealso [sframe_survey_ui()], [run_survey()], [read_responses()]
 #'
 #' @examples
 #' \donttest{
-#' # survey_module_ui() has a complete example, including on_submit.
+#' # sframe_survey_ui() has a complete example, including on_submit.
 #' }
-survey_module_server <- function(id, instrument, on_submit = NULL) {
+sframe_survey_server <- function(id, instrument, on_submit = NULL) {
   rlang::check_installed("shiny", reason = "to use the survey module.")
   rlang::check_installed("digest", reason = "to generate survey response IDs.")
   if (!is.null(on_submit) && !is.function(on_submit))
@@ -293,7 +293,7 @@ sframe_module_build_pages <- function(instr) {
   lapply(uq, function(p) items[page_nums == p])
 }
 
-# Builds the response with the same row builder render_survey() uses, so both
+# Builds the response with the same row builder run_survey() uses, so both
 # Shiny routes submit the same columns. on_submit runs first, and the survey
 # is marked complete only once it returns.
 sframe_module_do_submit <- function(state, instr, values, branch_lookup,

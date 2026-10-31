@@ -74,7 +74,7 @@
 #' @examples
 #' x <- matrix(c(4.1, 3.0, 210, 3.6, 4.5, 180, 4.8, 2.5, 260),
 #'             nrow = 3, byrow = TRUE)
-#' sa <- sensitivity_analysis(
+#' sa <- sframe_sensitivity_analysis(
 #'   x,
 #'   weights        = c(0.4, 0.3, 0.3),
 #'   criteria_types = c("benefit", "benefit", "cost"),
@@ -84,7 +84,7 @@
 #' )
 #' sa$stable
 #' as.data.frame(sa)
-sensitivity_analysis <- function(x,
+sframe_sensitivity_analysis <- function(x,
                                  weights,
                                  criteria_types,
                                  method = "topsis",
@@ -296,7 +296,7 @@ sframe_attach_sensitivity <- function(result, data, roles, options,
   }
 
   sa <- tryCatch(
-    do.call(sensitivity_analysis, c(
+    do.call(sframe_sensitivity_analysis, c(
       list(
         x              = checked$matrix,
         weights        = checked$weights,

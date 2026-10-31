@@ -9,8 +9,8 @@ A data frame, with the columns listed above for the class given.
 \description{
 Every surveyframe class returns its primary table, and each class has its
 own columns. Where an object holds more than one table, the others are
-reachable through the named accessors in \link{sf_accessors}, or, for a full
-tabular record of an instrument, through \code{\link[=codebook_report]{codebook_report()}}.
+reachable through the named accessors in \link{sframe_accessors}, or, for a full
+tabular record of an instrument, through \code{\link[=sframe_codebook]{sframe_codebook()}}.
 }
 \section{What each class gives}{
 \itemize{
@@ -36,8 +36,8 @@ These tables are a summary of the columns a reader scans first. The item
 table leaves out help text, placeholder, matrix rows, comparison items and
 scale, slider and rating settings, date bounds, section introduction and
 page; the scale table leaves out \code{min_valid}, the reverse key and the
-weights. Read the stored declaration in full through \code{\link[=sf_items]{sf_items()}},
-\code{\link[=sf_scales]{sf_scales()}} and the rest of \link{sf_accessors}, each of which returns the
+weights. Read the stored declaration in full through \code{\link[=sframe_get_items]{sframe_get_items()}},
+\code{\link[=sframe_get_scales]{sframe_get_scales()}} and the rest of \link{sframe_accessors}, each of which returns the
 component objects themselves, or through \code{\link[=write_sframe]{write_sframe()}} for the
 interchange record.
 
@@ -46,21 +46,21 @@ row names and \code{row.names} has no effect. Pass \code{row.names} to
 \code{\link[base:as.data.frame]{base::as.data.frame()}} on the returned frame where you need to set them.
 The coercion gives one view of an object. An instrument, for example,
 returns its items, and its choice sets and scales come from
-\code{\link[=sf_choice_sets]{sf_choice_sets()}}, \code{\link[=sf_scales]{sf_scales()}} or \code{\link[=codebook_report]{codebook_report()}}.
+\code{\link[=sframe_get_choice_sets]{sframe_get_choice_sets()}}, \code{\link[=sframe_get_scales]{sframe_get_scales()}} or \code{\link[=sframe_codebook]{sframe_codebook()}}.
 }
 
 \examples{
-cs    <- sf_choices("ag5", 1:5,
+cs    <- sframe_choice_set("ag5", 1:5,
            c("Strongly disagree", "Disagree", "Neutral",
              "Agree", "Strongly agree"))
-item  <- sf_item("sat_1", "The service met my expectations.",
+item  <- sframe_item("sat_1", "The service met my expectations.",
                  type = "likert", choice_set = "ag5", scale_id = "sat")
-scale <- sf_scale("sat", "Satisfaction", items = "sat_1")
-instr <- sf_instrument("Demo Survey", components = list(cs, item, scale))
+scale <- sframe_scale("sat", "Satisfaction", items = "sat_1")
+instr <- sframe_instrument("Demo Survey", components = list(cs, item, scale))
 
 as.data.frame(instr)
 as.data.frame(cs)
 }
 \seealso{
-\link{sf_accessors}, \code{\link[=codebook_report]{codebook_report()}}
+\link{sframe_accessors}, \code{\link[=sframe_codebook]{sframe_codebook()}}
 }

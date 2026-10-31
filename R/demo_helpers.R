@@ -10,7 +10,7 @@
 #' @export
 #' @examples
 #' demo <- sframe_demo_data()
-#' sf_meta(demo$instrument)$title
+#' sframe_meta(demo$instrument)$title
 #' nrow(demo$responses)
 sframe_demo_data <- function() {
   instrument_path <- system.file(
@@ -72,7 +72,7 @@ sframe_demo_data <- function() {
 #' @seealso [sframe_demo()] for the 22-item teaching library instead.
 #' @examples
 #' demo <- sframe_input_types_demo_data()
-#' sf_meta(demo$instrument)$title
+#' sframe_meta(demo$instrument)$title
 #' nrow(demo$responses)
 sframe_input_types_demo_data <- function() {
   instrument_path <- system.file(

@@ -1,6 +1,6 @@
 # tests/testthat/test-shiny-respondent-browser.R
 #
-# Drives render_survey() in a real headless Chrome. A10 only happens in a
+# Drives run_survey() in a real headless Chrome. A10 only happens in a
 # browser: the server received each answer, then the page re-drew its controls
 # at their defaults and they reported those defaults back, erasing the answer.
 # testServer() cannot see that, so the proof has to be a browser.
@@ -23,17 +23,17 @@ skip_if(length(chrome) != 1L || is.na(chrome) || !nzchar(chrome),
 .browser_start_attempts <- 180L
 
 browser_instrument <- function() {
-  sf_instrument(title = "Browser", components = list(
-    sf_choices("yn", values = c(0, 1), labels = c("No", "Yes")),
-    sf_choices("agree", values = 1:3,
+  sframe_instrument(title = "Browser", components = list(
+    sframe_choice_set("yn", values = c(0, 1), labels = c("No", "Yes")),
+    sframe_choice_set("agree", values = 1:3,
                labels = c("Disagree", "Neutral", "Agree")),
-    sf_item("q1", "Do you smoke?", "single_choice", choice_set = "yn"),
-    sf_item("t1", "Comment", "text"),
-    sf_item("dob", "Date of birth", "date"),
-    sf_item("rk", "Rank these", "ranking", choice_set = "agree"),
-    sf_item("mx", "Rate each", "matrix", choice_set = "agree",
+    sframe_item("q1", "Do you smoke?", "single_choice", choice_set = "yn"),
+    sframe_item("t1", "Comment", "text"),
+    sframe_item("dob", "Date of birth", "date"),
+    sframe_item("rk", "Rank these", "ranking", choice_set = "agree"),
+    sframe_item("mx", "Rate each", "matrix", choice_set = "agree",
             matrix_items = c("price", "service")),
-    sf_item("sl", "Satisfaction", "slider", slider_min = 0, slider_max = 10)
+    sframe_item("sl", "Satisfaction", "slider", slider_min = 0, slider_max = 10)
   ))
 }
 
@@ -56,7 +56,7 @@ serve_survey <- function(instrument, csv) {
   port <- httpuv::randomPort()
   proc <- callr::r_bg(function(instrument, csv, port) {
     library(surveyframe)
-    app <- render_survey(instrument, save_responses = "csv", output_path = csv)
+    app <- run_survey(instrument, save_responses = "csv", output_path = csv)
     shiny::runApp(app, port = port, launch.browser = FALSE)
   }, args = list(instrument, csv, port), libpath = libpath)
   url <- paste0("http://127.0.0.1:", port)
@@ -199,9 +199,9 @@ serve_module <- function(instrument, csv) {
   proc <- callr::r_bg(function(instrument, csv, port) {
     library(surveyframe)
     ui <- shiny::fluidPage(shiny::tags$h1("Host application"),
-                           survey_module_ui("embedded"))
+                           sframe_survey_ui("embedded"))
     server <- function(input, output, session) {
-      survey_module_server("embedded", instrument, on_submit = function(r) {
+      sframe_survey_server("embedded", instrument, on_submit = function(r) {
         utils::write.csv(as.data.frame(r, check.names = FALSE), csv,
                          row.names = FALSE)
       })
@@ -230,16 +230,16 @@ serve_module <- function(instrument, csv) {
 }
 
 test_that("A7: the embedded module collects advanced items in a real browser", {
-  ins <- sf_instrument(title = "Embedded", components = list(
-    sf_choices("agree", values = 1:3,
+  ins <- sframe_instrument(title = "Embedded", components = list(
+    sframe_choice_set("agree", values = 1:3,
                labels = c("Disagree", "Neutral", "Agree")),
-    sf_item("mx", "Rate each", "matrix", choice_set = "agree",
+    sframe_item("mx", "Rate each", "matrix", choice_set = "agree",
             matrix_items = c("price", "service"), required = TRUE),
-    sf_item("rt", "Stars", "rating", rating_max = 5, required = TRUE),
-    sf_item("rk", "Rank", "ranking", choice_set = "agree", required = TRUE),
-    sf_item("pw", "Compare", "pairwise_comparison",
+    sframe_item("rt", "Stars", "rating", rating_max = 5, required = TRUE),
+    sframe_item("rk", "Rank", "ranking", choice_set = "agree", required = TRUE),
+    sframe_item("pw", "Compare", "pairwise_comparison",
             comparison_items = c("price", "quality"), required = TRUE),
-    sf_item("sl", "Satisfaction", "slider", slider_min = 0, slider_max = 10,
+    sframe_item("sl", "Satisfaction", "slider", slider_min = 0, slider_max = 10,
             required = TRUE)
   ))
   csv <- tempfile(fileext = ".csv")

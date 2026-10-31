@@ -7,21 +7,21 @@ library(surveyframe)
 
 # ---- helpers ----------------------------------------------------------------
 make_instr <- function() {
-  cs <- sf_choices("agree5",
+  cs <- sframe_choice_set("agree5",
     values = 1:5,
     labels = c("Strongly disagree","Disagree","Neutral","Agree","Strongly agree"))
-  sc <- sf_scale("sat", "Satisfaction", items = c("sat1","sat2"))
-  i1 <- sf_item("sat1", "I am satisfied overall.",
+  sc <- sframe_scale("sat", "Satisfaction", items = c("sat1","sat2"))
+  i1 <- sframe_item("sat1", "I am satisfied overall.",
                  type = "likert", required = TRUE, choice_set = "agree5",
                  scale_id = "sat")
-  i2 <- sf_item("sat2", "I would recommend this service.",
+  i2 <- sframe_item("sat2", "I would recommend this service.",
                  type = "likert", required = TRUE, choice_set = "agree5",
                  scale_id = "sat")
-  i3 <- sf_item("gender", "What is your gender?",
+  i3 <- sframe_item("gender", "What is your gender?",
                  type = "single_choice", choice_set = "agree5")
-  i4 <- sf_item("age", "Your age.", type = "numeric")
-  i5 <- sf_item("comments", "Any comments?", type = "textarea")
-  sf_instrument("Test Survey",
+  i4 <- sframe_item("age", "Your age.", type = "numeric")
+  i5 <- sframe_item("comments", "Any comments?", type = "textarea")
+  sframe_instrument("Test Survey",
     components = list(cs, sc, i1, i2, i3, i4, i5))
 }
 
@@ -54,18 +54,18 @@ test_that("sf_item accepts all 13 types", {
              "text","textarea","date","matrix","slider","ranking",
              "rating","section_break","text_block")
   for (t in types)
-    expect_s3_class(sf_item("q1", "Label", type = t), "sf_item")
+    expect_s3_class(sframe_item("q1", "Label", type = t), "sf_item")
 })
 
 test_that("sf_item stores matrix_items", {
-  item <- sf_item("m1", "Rate aspects", type = "matrix",
+  item <- sframe_item("m1", "Rate aspects", type = "matrix",
                   choice_set = "agree5",
                   matrix_items = c("Speed","Quality","Value"))
   expect_equal(item$matrix_items, c("Speed","Quality","Value"))
 })
 
 test_that("sf_item stores slider parameters", {
-  item <- sf_item("sl1", "Pain", type = "slider",
+  item <- sframe_item("sl1", "Pain", type = "slider",
                   slider_min = 0, slider_max = 10, slider_step = 0.5)
   expect_equal(item$slider_min, 0)
   expect_equal(item$slider_max, 10)
@@ -73,41 +73,41 @@ test_that("sf_item stores slider parameters", {
 })
 
 test_that("sf_item stores rating parameters", {
-  item <- sf_item("r1", "Rate us", type = "rating",
+  item <- sframe_item("r1", "Rate us", type = "rating",
                   rating_max = 7, rating_icon = "heart")
   expect_equal(item$rating_max, 7)
   expect_equal(item$rating_icon, "heart")
 })
 
 test_that("sf_item rejects invalid type", {
-  expect_error(sf_item("q1", "Label", type = "checkbox"))
+  expect_error(sframe_item("q1", "Label", type = "checkbox"))
 })
 
 test_that("sf_item section_break stores section_intro", {
-  item <- sf_item("s1", "Demographics", type = "section_break",
+  item <- sframe_item("s1", "Demographics", type = "section_break",
                   section_intro = "Please answer.")
   expect_equal(item$section_intro, "Please answer.")
 })
 
 test_that("sf_item text_block is accepted", {
-  item <- sf_item("tb1", "Read carefully.", type = "text_block")
+  item <- sframe_item("tb1", "Read carefully.", type = "text_block")
   expect_equal(item$type, "text_block")
 })
 
 test_that("sf_item page number is stored", {
-  item <- sf_item("q1", "Q", type = "text", page = 2L)
+  item <- sframe_item("q1", "Q", type = "text", page = 2L)
   expect_equal(item$page, 2L)
 })
 
 test_that("validate_sframe catches invalid item IDs and duplicate component IDs", {
-  cs1 <- sf_choices("agree5", 1:5, c("SD", "D", "N", "A", "SA"))
-  cs2 <- sf_choices("agree5", c("yes", "no"), c("Yes", "No"))
-  bad_item <- sf_item("bad-id", "Bad ID", type = "likert", choice_set = "agree5")
-  item <- sf_item("sat1", "Satisfaction", type = "likert",
+  cs1 <- sframe_choice_set("agree5", 1:5, c("SD", "D", "N", "A", "SA"))
+  cs2 <- sframe_choice_set("agree5", c("yes", "no"), c("Yes", "No"))
+  bad_item <- sframe_item("bad-id", "Bad ID", type = "likert", choice_set = "agree5")
+  item <- sframe_item("sat1", "Satisfaction", type = "likert",
                   choice_set = "agree5", scale_id = "sat")
-  sc1 <- sf_scale("sat", "Satisfaction", items = "sat1")
-  sc2 <- sf_scale("sat", "Duplicate scale", items = "sat1")
-  instr <- sf_instrument("Bad Survey",
+  sc1 <- sframe_scale("sat", "Satisfaction", items = "sat1")
+  sc2 <- sframe_scale("sat", "Duplicate scale", items = "sat1")
+  instr <- sframe_instrument("Bad Survey",
                          components = list(cs1, cs2, bad_item, item, sc1, sc2))
 
   result <- validate_sframe(instr, strict = FALSE)
@@ -171,7 +171,7 @@ test_that("builder HTML has three mode buttons", {
 # ---- export_static_survey ---------------------------------------------------
 test_that("export_static_survey writes a standalone HTML file", {
   tmp <- tempfile(fileext = ".html")
-  out <- export_static_survey(make_instr(), output_path = tmp, open = FALSE)
+  out <- export_survey(make_instr(), output_path = tmp, open = FALSE)
   expect_true(file.exists(out))
   html <- paste(readLines(out, warn = FALSE, encoding = "UTF-8"), collapse = "\n")
   expect_true(grepl("Test Survey", html, fixed = TRUE))
@@ -181,7 +181,7 @@ test_that("export_static_survey writes a standalone HTML file", {
 })
 
 test_that("export_static_survey defaults to tempdir when no path is supplied", {
-  out <- export_static_survey(make_instr(), open = FALSE, overwrite = TRUE)
+  out <- export_survey(make_instr(), open = FALSE, overwrite = TRUE)
   expect_true(file.exists(out))
   expect_true(startsWith(normalizePath(out), normalizePath(tempdir())))
   unlink(out)
@@ -268,7 +268,7 @@ test_that("mann_whitney test returns statistic and apa string", {
   )
   # Add gender2 item to instrument temporarily
   instr$items <- c(instr$items,
-    list(sf_item("gender2","Binary gender",type="single_choice")))
+    list(sframe_item("gender2","Binary gender",type="single_choice")))
   r <- run_analysis_plan(dat, instr)[[1]]
   expect_null(r$error)
   expect_true(nchar(r$apa) > 0)
@@ -365,9 +365,9 @@ test_that("render_results accepts output_path alias", {
 test_that("write_sframe/read_sframe preserve analysis plans and extended item fields", {
   instr <- make_instr()
   instr$items <- c(instr$items, list(
-    sf_item("m1", "Rate aspects", type = "matrix", choice_set = "agree5",
+    sframe_item("m1", "Rate aspects", type = "matrix", choice_set = "agree5",
             matrix_items = c("Speed", "Quality")),
-    sf_item("r1", "Rate us", type = "rating", rating_max = 7,
+    sframe_item("r1", "Rate us", type = "rating", rating_max = 7,
             rating_icon = "heart")
   ))
   instr <- add_rq(instr, "rq1", "How often?", "gender", "frequency")

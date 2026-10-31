@@ -40,11 +40,11 @@ updateTextInput <- shiny::updateTextInput
 builder_empty_state <- surveyframe::sframe_builder_empty_state
 builder_state_from_instrument <- surveyframe::sframe_builder_state_from_instrument
 builder_validate_draft <- surveyframe::sframe_builder_validate_draft
-sf_branch <- surveyframe::sf_branch
-sf_check <- surveyframe::sf_check
-sf_choices <- surveyframe::sf_choices
-sf_item <- surveyframe::sf_item
-sf_scale <- surveyframe::sf_scale
+sframe_branch <- surveyframe::sframe_branch
+sframe_attention_check <- surveyframe::sframe_attention_check
+sframe_choice_set <- surveyframe::sframe_choice_set
+sframe_item <- surveyframe::sframe_item
+sframe_scale <- surveyframe::sframe_scale
 write_sframe <- surveyframe::write_sframe
 
 status_badge <- function(ok, label_ok = "Ready", label_no = "Pending") {
@@ -920,7 +920,7 @@ studio_level_meta <- function(item = NULL, scale = NULL, ordered = FALSE) {
   list(level = "identifier", code = "ID", type = type)
 }
 
-# Whether a choice set declares its options ordered (sf_choices(ordered =)).
+# Whether a choice set declares its options ordered (sframe_choice_set(ordered =)).
 studio_choice_set_ordered <- function(instrument, set_id) {
   set_id <- as.character(set_id %||% "")[1]
   if (!nzchar(set_id)) return(FALSE)
@@ -1152,7 +1152,7 @@ studio_parse_paths <- function(text) {
     if (length(parts) != 2 || any(!nzchar(parts))) {
       return(NULL)
     }
-    surveyframe::sf_path(parts[1], parts[2])
+    surveyframe::sframe_path(parts[1], parts[2])
   }))
 }
 
@@ -1163,7 +1163,7 @@ studio_parse_covariances <- function(text) {
     if (length(parts) != 2 || any(!nzchar(parts))) {
       return(NULL)
     }
-    surveyframe::sf_covariance(parts[1], parts[2])
+    surveyframe::sframe_covariance(parts[1], parts[2])
   }))
 }
 
@@ -1174,7 +1174,7 @@ studio_parse_indirect <- function(text) {
     if (length(parts) < 3 || any(!nzchar(parts))) {
       return(NULL)
     }
-    surveyframe::sf_indirect(parts[1], parts[2:(length(parts) - 1)], parts[length(parts)])
+    surveyframe::sframe_indirect_effect(parts[1], parts[2:(length(parts) - 1)], parts[length(parts)])
   }))
 }
 
@@ -1895,7 +1895,7 @@ server <- function(input, output, session) {
       return()
     }
 
-    choice <- sf_choices(
+    choice <- sframe_choice_set(
       id = choice_id,
       values = values,
       labels = labels,
@@ -1999,7 +1999,7 @@ server <- function(input, output, session) {
       return()
     }
 
-    scale <- sf_scale(
+    scale <- sframe_scale(
       id = scale_id,
       label = scale_label,
       items = scale_items,
@@ -2044,7 +2044,7 @@ server <- function(input, output, session) {
       return()
     }
 
-    rule <- sf_branch(
+    rule <- sframe_branch(
       item_id = target,
       depends_on = depends_on,
       operator = operator,
@@ -2101,7 +2101,7 @@ server <- function(input, output, session) {
       return()
     }
 
-    check <- sf_check(
+    check <- sframe_attention_check(
       id = check_id,
       item_id = item_id,
       type = check_type,
@@ -2302,7 +2302,7 @@ server <- function(input, output, session) {
 
   output$amendment_log_table <- shiny::renderTable({
     req(rv$instrument)
-    log <- surveyframe::amendment_log(rv$instrument)
+    log <- surveyframe::sframe_get_amendments(rv$instrument)
     if (nrow(log) == 0) {
       return(data.frame(Status = "No amendments disclosed yet."))
     }
@@ -2610,12 +2610,12 @@ server <- function(input, output, session) {
     req(instr)
     # Render the exact deployable survey so the preview is identical to what
     # respondents see. Reuses the single static-survey template through
-    # export_static_survey() instead of re-creating the layout with widgets.
+    # export_survey() instead of re-creating the layout with widgets.
     tmp <- tempfile(fileext = ".html")
     ok <- tryCatch({
       # preview = TRUE strips the collector and the redirect, so the promise
       # below is enforced by the export instead of trusted.
-      suppressMessages(surveyframe::export_static_survey(
+      suppressMessages(surveyframe::export_survey(
         instr, output_path = tmp, open = FALSE, overwrite = TRUE,
         preview = TRUE
       ))
@@ -2681,7 +2681,7 @@ server <- function(input, output, session) {
     # the standard collector columns so sheet imports get completion times.
     sub_col <- if ("submitted_at" %in% names(rv$responses)) "submitted_at"
     st_col  <- if ("started_at" %in% names(rv$responses)) "started_at"
-    surveyframe::quality_report(rv$responses, rv$instrument,
+    surveyframe::sframe_quality_results(rv$responses, rv$instrument,
                                 respondent_id = id_col,
                                 submitted_at = sub_col,
                                 started_at = st_col)
@@ -2781,7 +2781,7 @@ server <- function(input, output, session) {
   reliability_result <- reactive({
     req(rv$instrument, rv$responses)
     tryCatch(
-      surveyframe::reliability_report(rv$responses, rv$instrument),
+      surveyframe::sframe_reliability_results(rv$responses, rv$instrument),
       error = function(e) NULL
     )
   })
@@ -2799,7 +2799,7 @@ server <- function(input, output, session) {
   output$studio_missing_chart <- shiny::renderPlot({
     req(rv$instrument, rv$responses)
     mr <- tryCatch(
-      surveyframe::missing_data_report(rv$responses, rv$instrument),
+      surveyframe::sframe_missing_data_results(rv$responses, rv$instrument),
       error = function(e) NULL
     )
     if (is.null(mr)) return()
@@ -3568,7 +3568,7 @@ server <- function(input, output, session) {
       "reflective"
     }
     constructs <- lapply(scales, function(scale) {
-      surveyframe::sf_construct(
+      surveyframe::sframe_construct(
         id = studio_safe_id(scale$id, prefix = "C"),
         label = scale$label %||% scale$id,
         items = scale$items %||% character(0),
@@ -3580,7 +3580,7 @@ server <- function(input, output, session) {
       showNotification("CB-SEM and PLS-SEM models require at least one structural path.", type = "error")
       return()
     }
-    model <- surveyframe::sf_model(
+    model <- surveyframe::sframe_model_spec(
       id = studio_safe_id(trim_or_null(input$model_id) %||% paste0("model_", length(rv$instrument$models %||% list()) + 1L), prefix = "model"),
       label = trim_or_null(input$model_label),
       type = type,
@@ -3597,7 +3597,7 @@ server <- function(input, output, session) {
       )
     )
     tryCatch({
-      surveyframe::validate_model(model, instrument = rv$instrument, strict = TRUE)
+      surveyframe::sframe_validate_model(model, instrument = rv$instrument, strict = TRUE)
       state <- rv$builder
       existing <- vapply(state$models %||% list(), function(x) x$id %||% "", character(1))
       idx <- match(model$id, existing)
@@ -3652,16 +3652,16 @@ server <- function(input, output, session) {
     cards <- lapply(models, function(model) {
       syntax <- tryCatch(
         switch(model$type %||% "",
-          cfa = surveyframe::cfa_lavaan_syntax(instrument = rv$instrument, model = model),
-          cb_sem = surveyframe::sem_lavaan_syntax(model, instrument = rv$instrument),
-          sem = surveyframe::sem_lavaan_syntax(model, instrument = rv$instrument),
-          pls_sem = surveyframe::seminr_syntax(model),
+          cfa = surveyframe::sframe_syntax_cfa(instrument = rv$instrument, model = model),
+          cb_sem = surveyframe::sframe_syntax_sem(model, instrument = rv$instrument),
+          sem = surveyframe::sframe_syntax_sem(model, instrument = rv$instrument),
+          pls_sem = surveyframe::sframe_syntax_pls(model),
           "Syntax preview is not available for this model type."
         ),
         error = function(e) paste("Syntax preview could not be generated:", conditionMessage(e))
       )
       json <- tryCatch(
-        surveyframe::model_json(model, pretty = TRUE),
+        surveyframe::sframe_model_json(model, pretty = TRUE),
         error = function(e) paste("Model JSON could not be generated:", conditionMessage(e))
       )
       tags$div(class = "card",

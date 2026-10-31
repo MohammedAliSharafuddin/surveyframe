@@ -80,12 +80,12 @@ and report the limited precision.
 
 ## Planning a small-sample study
 
-`sample_size_plan()` estimates a required sample size for a design and
+`sframe_sample_size_plan()` estimates a required sample size for a design and
 attaches the same small-sample advisory used elsewhere in the package when
 the estimate itself falls below 30.
 
 ```{r plan-n}
-sample_size_plan(type = "t_test", groups = 2)
+sframe_sample_size_plan(type = "t_test", groups = 2)
 ```
 
 A worked instrument in this vignette targets n = 20 complete responses, well
@@ -94,19 +94,19 @@ question, a numeric outcome, and a binary outcome for the logistic example
 later in this vignette.
 
 ```{r instrument}
-group_cs     <- sf_choices(id = "grp_cs", values = c("control", "treatment"),
+group_cs     <- sframe_choice_set(id = "grp_cs", values = c("control", "treatment"),
                             labels = c("Control", "Treatment"))
-converted_cs <- sf_choices(id = "conv_cs", values = c("no", "yes"),
+converted_cs <- sframe_choice_set(id = "conv_cs", values = c("no", "yes"),
                             labels = c("No", "Yes"))
 
 items <- list(
-  sf_item(id = "group", label = "Study arm", type = "single_choice", choice_set = "grp_cs"),
-  sf_item(id = "outcome", label = "Outcome score", type = "numeric"),
-  sf_item(id = "converted", label = "Converted (yes/no)", type = "single_choice",
+  sframe_item(id = "group", label = "Study arm", type = "single_choice", choice_set = "grp_cs"),
+  sframe_item(id = "outcome", label = "Outcome score", type = "numeric"),
+  sframe_item(id = "converted", label = "Converted (yes/no)", type = "single_choice",
           choice_set = "conv_cs")
 )
 
-study <- sf_instrument(
+study <- sframe_instrument(
   title      = "Small-sample pilot",
   version    = "0.1.0",
   authors    = "surveyframe",
@@ -118,7 +118,7 @@ study
 
 ## Reading the advisory
 
-`assumption_report()` and `sample_size_plan()` both attach an `advisory`
+`sframe_assumption_results()` and `sframe_sample_size_plan()` both attach an `advisory`
 element once a relevant n drops below 30. It prints automatically and is
 also available as a field for programmatic checks.
 
@@ -126,10 +126,10 @@ also available as a field for programmatic checks.
 n20 <- data.frame(score = rnorm(20, mean = 50, sd = 10))
 n50 <- data.frame(score = rnorm(50, mean = 50, sd = 10))
 
-ar_small <- assumption_report(n20, variables = "score")
+ar_small <- sframe_assumption_results(n20, variables = "score")
 ar_small$advisory
 
-ar_large <- assumption_report(n50, variables = "score")
+ar_large <- sframe_assumption_results(n50, variables = "score")
 is.null(ar_large$advisory)
 ```
 
@@ -147,7 +147,7 @@ pilot <- data.frame(
   covariate = rnorm(20, 0, 1)
 )
 
-sf_plan(study) <- list(
+sframe_plan(study) <- list(
   list(id = "RQ1",
        research_question = "Does the treatment arm score higher than control?",
        family = "group_comparison", method = "mann_whitney",
@@ -170,7 +170,7 @@ shift, again with an interval in place of a point value.
 before <- rnorm(8, 50, 6)
 after  <- before + rnorm(8, 4, 5)
 
-sf_plan(study) <- list(
+sframe_plan(study) <- list(
   list(id = "RQ2",
        research_question = "Did scores change from before to after?",
        family = "group_comparison", method = "wilcoxon_pair",
@@ -192,7 +192,7 @@ interval alongside the test's p-value. The interval is only defined for a
 requested, since base R's `fisher.test()` cannot return both together.
 
 ```{r fisher}
-sf_plan(study) <- list(
+sframe_plan(study) <- list(
   list(id = "RQ3",
        research_question = "Is conversion associated with study arm?",
        family = "association", method = "fisher_exact",
@@ -208,13 +208,13 @@ fe_results[[1]]$odds_ratio_conf_int
 
 ## Bootstrap confidence interval on a median
 
-`bootstrap_ci()` computes a bootstrap interval for an arbitrary statistic,
+`sframe_bootstrap_ci()` computes a bootstrap interval for an arbitrary statistic,
 useful when no exact interval exists for the estimator you need. It is
 already exported and used elsewhere in the package, applied here to the
 median of the pilot outcome scores.
 
 ```{r bootstrap-median}
-bootstrap_ci(pilot$outcome, FUN = stats::median, R = 999)
+sframe_bootstrap_ci(pilot$outcome, FUN = stats::median, R = 999)
 ```
 
 ## Firth logistic regression for a rare or small binary outcome
@@ -225,7 +225,7 @@ penalised-likelihood correction (Firth, 1993) addresses both. surveyframe's
 `firth_logistic` runner needs the optional `logistf` package.
 
 ```{r firth, eval = requireNamespace("logistf", quietly = TRUE)}
-sf_plan(study) <- list(
+sframe_plan(study) <- list(
   list(id = "RQ4",
        research_question = "Does the covariate predict conversion?",
        family = "regression", method = "firth_logistic",
@@ -245,13 +245,13 @@ cat("logistf is not installed in this build environment, so the Firth",
 
 ## Cohen's d with a bootstrap interval
 
-`cohens_d_ci()` pairs Cohen's d with a bootstrap interval, which is
+`sframe_cohens_d_ci()` pairs Cohen's d with a bootstrap interval, which is
 informative precisely where it matters most: interval width grows visibly
 as n falls, making the extra uncertainty at small n explicit, where a single
 point estimate leaves it implicit.
 
 ```{r cohens-d}
-cohens_d_ci(pilot$outcome[pilot$group == "treatment"],
+sframe_cohens_d_ci(pilot$outcome[pilot$group == "treatment"],
             pilot$outcome[pilot$group == "control"], R = 999)
 ```
 

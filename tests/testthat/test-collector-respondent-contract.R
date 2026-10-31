@@ -61,8 +61,8 @@ test_that("two of the three outcomes store nothing, and none is readable", {
 
 test_that("the page claims nothing that is false under the weakest outcome", {
   skip_if_not_installed("V8")
-  instr <- sf_instrument("Coupling", components = list(
-    sf_item("q1", "How was it?", type = "text")
+  instr <- sframe_instrument("Coupling", components = list(
+    sframe_item("q1", "How was it?", type = "text")
   ))
   ctx <- static_survey_context(instr, endpoint_url = "https://example.com/collect")
   ctx$eval("__fetchFails = false; responses['q1'] = 'fine'; doSubmit();")
@@ -83,8 +83,8 @@ test_that("the page claims nothing that is false under the weakest outcome", {
 
 test_that("the participant is never walked away from an unstored response", {
   skip_if_not_installed("V8")
-  instr <- sf_instrument("Coupling", components = list(
-    sf_item("q1", "How was it?", type = "text")
+  instr <- sframe_instrument("Coupling", components = list(
+    sframe_item("q1", "How was it?", type = "text")
   ))
   instr$render <- list(thankyou = list(redirect_url = "https://example.com/next"))
   ctx <- static_survey_context(instr, endpoint_url = "https://example.com/collect")

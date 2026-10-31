@@ -19,7 +19,7 @@ electre_opts <- function() {
 }
 
 electre_instrument <- function() {
-  sf_instrument(title = "E", components = list(sf_item("q", "Q", "text")))
+  sframe_instrument(title = "E", components = list(sframe_item("q", "Q", "text")))
 }
 
 run_block <- function(options, method = "electre") {
@@ -45,7 +45,7 @@ test_that("12: a requested sensitivity run that fails says so", {
 
 test_that("13: perturbations that change no weight are not called stable", {
   x <- matrix(c(4, 1, 2, 3, 5, 2), nrow = 3)
-  sa <- sensitivity_analysis(x, c(1, 0), c("benefit", "benefit"), method = "topsis")
+  sa <- sframe_sensitivity_analysis(x, c(1, 0), c("benefit", "benefit"), method = "topsis")
   expect_identical(sa$n_effective, 0L)
   expect_false(sa$stable)
   expect_identical(sa$n_perturbations, 4L)
@@ -53,7 +53,7 @@ test_that("13: perturbations that change no weight are not called stable", {
 
 test_that("13: an ordinary design reports effective and failed perturbation counts", {
   x <- matrix(c(4, 1, 2, 3, 5, 2), nrow = 3)
-  sa <- sensitivity_analysis(x, c(0.6, 0.4), c("benefit", "benefit"), method = "topsis")
+  sa <- sframe_sensitivity_analysis(x, c(0.6, 0.4), c("benefit", "benefit"), method = "topsis")
   expect_identical(sa$n_effective, 4L)
   expect_identical(sa$n_failed, 0L)
 })
@@ -64,7 +64,7 @@ test_that("14: a design that never shows a declared level is not balanced", {
                          stringsAsFactors = FALSE)
   expect_gt(sframe_conjoint_imbalance(profiles, attrs), 0)
 
-  d <- sf_conjoint_design("d", attrs, profiles = profiles, n_alternatives = 2L,
+  d <- sframe_conjoint_design("d", attrs, profiles = profiles, n_alternatives = 2L,
                           n_tasks = 1L, seed = 1)
   expect_identical(d$balance$level_counts$A$a2, 0L)
   expect_identical(d$balance$absent_levels, list(A = "a2"))

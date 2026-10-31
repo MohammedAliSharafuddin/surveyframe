@@ -1,6 +1,6 @@
 # tests/testthat/test-text-topics.R
 # Topic modelling (todo_text_analysis.md): sframe_run_topic_model_lda() (topicmodels),
-# sframe_run_stm_topics() (stm), extract_quotes(), and sframe_plot_topics().
+# sframe_run_stm_topics() (stm), sframe_extract_quotes(), and sframe_plot_topics().
 # Every test needing an optional package skips cleanly when it is missing
 # rather than failing (skip_if_not_installed()).
 
@@ -26,11 +26,11 @@ phrases <- c(
 )
 
 make_text_instrument <- function() {
-  sf_instrument(
+  sframe_instrument(
     title = "Topic model fixture",
     version = "1.0.0",
     components = list(
-      sf_item("comments", "Any comments about your stay?", type = "textarea")
+      sframe_item("comments", "Any comments about your stay?", type = "textarea")
     )
   )
 }
@@ -157,21 +157,21 @@ test_that("sframe_run_stm_topics() min-response guard actually matters", {
 })
 
 # ---------------------------------------------------------------------------
-# extract_quotes()
+# sframe_extract_quotes()
 # ---------------------------------------------------------------------------
 
-test_that("extract_quotes() maps quotes back to original respondent rows, not DTM rows", {
+test_that("sframe_extract_quotes() maps quotes back to original respondent rows, not DTM rows", {
   skip_if_not_installed("tidytext")
   skip_if_not_installed("stm")
-  # Build a fixture where row 1 is blank (dropped by clean_text_responses())
+  # Build a fixture where row 1 is blank (dropped by sframe_clean_text())
   # and the rest are real phrases, so the DTM's document 1 corresponds to
-  # original row 2, not row 1. If extract_quotes() ever regresses to
+  # original row 2, not row 1. If sframe_extract_quotes() ever regresses to
   # reporting a DTM/corpus row index, this misaligns and the test catches it.
   data <- data.frame(comments = c("", phrases), stringsAsFactors = FALSE)
   res <- sframe_run_stm_topics(data, roles, list(k = 3L, seed = 42L), NULL)
   expect_null(res$error)
 
-  quotes <- extract_quotes(res, data$comments, n_quotes = 2L)
+  quotes <- sframe_extract_quotes(res, data$comments, n_quotes = 2L)
   expect_true(is.data.frame(quotes))
   expect_equal(names(quotes), c("topic", "rank", "respondent", "quote"))
   expect_true(nrow(quotes) > 0)
@@ -187,8 +187,8 @@ test_that("extract_quotes() maps quotes back to original respondent rows, not DT
   }
 })
 
-test_that("extract_quotes() rejects a non-stm_topics input", {
-  expect_error(extract_quotes(list(test = "term_freq"), "x"), class = "sframe_error")
+test_that("sframe_extract_quotes() rejects a non-stm_topics input", {
+  expect_error(sframe_extract_quotes(list(test = "term_freq"), "x"), class = "sframe_error")
 })
 
 # ---------------------------------------------------------------------------

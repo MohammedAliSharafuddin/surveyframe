@@ -1,5 +1,5 @@
 # tests/testthat/test-syntax-logistic-coding.R
-# The logistic code analysis_syntax() writes codes the outcome as the runner
+# The logistic code sframe_syntax_result() writes codes the outcome as the runner
 # does: the second level of as.factor(), alphabetical for text, becomes 1.
 
 test_that("logistic syntax gives the runner's coefficients for a text outcome", {
@@ -10,10 +10,10 @@ test_that("logistic syntax gives the runner's coefficients for a text outcome", 
   p <- stats::plogis(1.2 * x)
   d <- data.frame(x = x, y = ifelse(runif(60) < p, "yes", "no"),
                   stringsAsFactors = FALSE)
-  instr <- sf_instrument(
+  instr <- sframe_instrument(
     "Logit",
-    components = list(sf_item("x", "X", type = "numeric"),
-                      sf_item("y", "Y", type = "text")))
+    components = list(sframe_item("x", "X", type = "numeric"),
+                      sframe_item("y", "Y", type = "text")))
   block <- list(id = "RQ1", research_question = "Q",
                 method = "regression_logistic_binary",
                 test = "regression_logistic_binary",
@@ -37,10 +37,10 @@ test_that("logistic syntax codes a numeric and a factor outcome as the runner do
   for (outcome in list(y, factor(ifelse(y == 1, "low", "high"),
                                  levels = c("low", "high")))) {
     d <- data.frame(x = x, y = outcome)
-    instr <- sf_instrument(
+    instr <- sframe_instrument(
       "Logit",
-      components = list(sf_item("x", "X", type = "numeric"),
-                        sf_item("y", "Y", type = "numeric")))
+      components = list(sframe_item("x", "X", type = "numeric"),
+                        sframe_item("y", "Y", type = "numeric")))
     block <- list(id = "RQ1", research_question = "Q",
                   method = "regression_logistic_binary",
                   test = "regression_logistic_binary",

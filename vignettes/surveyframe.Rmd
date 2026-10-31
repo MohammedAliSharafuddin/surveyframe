@@ -99,7 +99,7 @@ and analysis plan to their own context.
 All rated items use a five-point agreement scale.
 
 ```{r choices}
-likert5 <- sf_choices(
+likert5 <- sframe_choice_set(
   "likert5",
   values = 1:5,
   labels = c("Strongly disagree", "Disagree",
@@ -111,13 +111,13 @@ likert5 <- sf_choices(
 
 `stem_items()` builds items that share a common sentence stem. Each item is the
 stem followed by a unique completion. `solo_items()` builds standalone items.
-Neither function is exported, and both use only `sf_item()`.
+Neither function is exported, and both use only `sframe_item()`.
 
 ```{r helpers}
 stem_items <- function(ids, stem, completions, scale_id) {
   Map(
     function(id, comp)
-      sf_item(id, paste(stem, comp),
+      sframe_item(id, paste(stem, comp),
               type = "likert", required = TRUE,
               choice_set = "likert5", scale_id = scale_id),
     ids, completions
@@ -127,7 +127,7 @@ stem_items <- function(ids, stem, completions, scale_id) {
 solo_items <- function(ids, labels, scale_id) {
   Map(
     function(id, lab)
-      sf_item(id, lab,
+      sframe_item(id, lab,
               type = "likert", required = TRUE,
               choice_set = "likert5", scale_id = scale_id),
     ids, labels
@@ -289,63 +289,63 @@ bi_items <- solo_items(
 ### Demographic items
 
 ```{r demographics}
-gender_cs    <- sf_choices("gender",
+gender_cs    <- sframe_choice_set("gender",
   c("male", "female", "transgender"), c("Male", "Female", "Transgender"))
 
-age_cs       <- sf_choices("age",
+age_cs       <- sframe_choice_set("age",
   c("18_25", "26_40", "41_50", "51_60", "60_plus"),
   c("18-25", "26-40", "41-50", "51-60", "60 and above"))
 
-visitor_cs   <- sf_choices("visitor",
+visitor_cs   <- sframe_choice_set("visitor",
   c("first_time", "repeat"),
   c("First-time visitor", "Repeated visitor"))
 
-freq_cs      <- sf_choices("freq_visit",
+freq_cs      <- sframe_choice_set("freq_visit",
   c("lt_1", "once", "2_3", "gt_3"),
   c("Less than 1 time in a year", "Once in a year",
     "2-3 times in a year", "More than 3 times in a year"))
 
-nationality_cs <- sf_choices("nationality",
+nationality_cs <- sframe_choice_set("nationality",
   c("thai", "chinese", "japanese", "korean", "indian", "australian",
     "british", "german", "american", "other"),
   c("Thai", "Chinese", "Japanese", "Korean", "Indian", "Australian",
     "British", "German", "American", "Other"))
 
-education_cs <- sf_choices("education",
+education_cs <- sframe_choice_set("education",
   c("high_school", "diploma", "undergraduate", "post_graduate"),
   c("High school", "Diploma", "Undergraduate", "Post graduate"))
 
-profession_cs <- sf_choices("profession",
+profession_cs <- sframe_choice_set("profession",
   c("student", "business", "salaried", "freelancer", "not_working"),
   c("Student", "Business", "Salaried and working", "Freelancer",
     "Not working (housewife or retired)"))
 
-companion_cs <- sf_choices("companion",
+companion_cs <- sframe_choice_set("companion",
   c("friends", "family", "other"),
   c("Friends", "Family members", "Other"))
 
-group_cs     <- sf_choices("group_size",
+group_cs     <- sframe_choice_set("group_size",
   c("lt_3", "3_5", "gt_5"),
   c("Less than 3", "3-5", "More than 5"))
 
 demo_items <- list(
-  sf_item("gender",        "Gender",                type = "single_choice",
+  sframe_item("gender",        "Gender",                type = "single_choice",
           required = TRUE, choice_set = "gender"),
-  sf_item("age_band",      "Age",                   type = "single_choice",
+  sframe_item("age_band",      "Age",                   type = "single_choice",
           required = TRUE, choice_set = "age"),
-  sf_item("visitor_type",  "I am",                  type = "single_choice",
+  sframe_item("visitor_type",  "I am",                  type = "single_choice",
           required = TRUE, choice_set = "visitor"),
-  sf_item("freq_visit",    "Frequency of visit",    type = "single_choice",
+  sframe_item("freq_visit",    "Frequency of visit",    type = "single_choice",
           required = TRUE, choice_set = "freq_visit"),
-  sf_item("nationality",   "Nationality",           type = "single_choice",
+  sframe_item("nationality",   "Nationality",           type = "single_choice",
           required = TRUE, choice_set = "nationality"),
-  sf_item("education",     "Education level",       type = "single_choice",
+  sframe_item("education",     "Education level",       type = "single_choice",
           required = TRUE, choice_set = "education"),
-  sf_item("profession",    "Profession",            type = "single_choice",
+  sframe_item("profession",    "Profession",            type = "single_choice",
           required = TRUE, choice_set = "profession"),
-  sf_item("companion",     "I visit with my",       type = "single_choice",
+  sframe_item("companion",     "I visit with my",       type = "single_choice",
           required = TRUE, choice_set = "companion"),
-  sf_item("group_size",    "My travel group size is", type = "single_choice",
+  sframe_item("group_size",    "My travel group size is", type = "single_choice",
           required = TRUE, choice_set = "group_size")
 )
 ```
@@ -354,7 +354,7 @@ demo_items <- list(
 
 ```{r scales}
 make_scale <- function(id, label, ids) {
-  sf_scale(id, label, items = ids, method = "mean")
+  sframe_scale(id, label, items = ids, method = "mean")
 }
 
 scales <- list(
@@ -381,7 +381,7 @@ choice_sets <- list(
 rated_items <- c(dmre_items, dmau_items, dmeu_items, dmpv_items,
                  dsqa_items, dsqt_items, dsuq_items, ts_items, bi_items)
 
-study <- sf_instrument(
+study <- sframe_instrument(
   title       = "Digital Marketing Effectiveness of Tourism Services",
   version     = "1.0.0",
   description = paste(
@@ -421,8 +421,8 @@ never reached.
 
 ```{r validate-explore}
 v <- validate_sframe(study, strict = FALSE)
-sf_is_valid(v)
-sf_problems(v)
+sframe_is_valid(v)
+sframe_problems(v)
 head(summary(v), 5)
 ```
 
@@ -433,7 +433,7 @@ sframe_path <- write_sframe(study, file.path(tempdir(), "tourism_services_v1.sfr
 
 # Reload the instrument from disk at any time with:
 study2 <- read_sframe(sframe_path)
-identical(sf_meta(study)$title, sf_meta(study2)$title)
+identical(sframe_meta(study)$title, sframe_meta(study2)$title)
 ```
 
 ### What the SHA-256 hash proves, and what it does not
@@ -509,7 +509,7 @@ risk to the plan's design-time-binding logic:
 
 ```{r amend}
 # Suppose a pilot round surfaces an ambiguous item and it needs rewording.
-dmre_1_revised <- sf_item(
+dmre_1_revised <- sframe_item(
   "dmre_1", paste(dmre_stem, "relevant to my personal travel interests."),
   type = "likert", required = TRUE, choice_set = "likert5", scale_id = "DMRE"
 )
@@ -525,10 +525,10 @@ study_amended <- amend_sframe(
   deviation_report = "Wording only; the construct measured is unchanged."
 )
 
-amendment_log(study_amended)
+sframe_get_amendments(study_amended)
 ```
 
-`amendment_log()` returns the full history as a data frame, one row per
+`sframe_get_amendments()` returns the full history as a data frame, one row per
 disclosed change, printable or exported with `write.csv()` for an external
 audit trail. `write_sframe()` on the amended instrument persists the log in
 the file. A reviewer who later loads it with `read_sframe()` sees both the
@@ -551,7 +551,7 @@ every change is disclosed in the first place.
 
 A bare hash carries the file's identity alone. A diff, an author and an
 explanation come from Git, which already provides all three.
-`link_git_commit()` points the instrument at Git and leaves the history
+`sframe_link_git_commit()` points the instrument at Git and leaves the history
 there: it records the current commit's SHA and
 subject line, so the SHA-256 hash's role narrows to confirming that the
 file on disk matches what that specific, already-explained commit
@@ -560,7 +560,7 @@ the path isn't a repository. Git stays optional, and the rest of the package
 runs on its own.
 
 ```{r git-link}
-link_git_commit(study_amended, repo_path = tempdir())
+sframe_link_git_commit(study_amended, repo_path = tempdir())
 ```
 
 ---
@@ -569,7 +569,7 @@ link_git_commit(study_amended, repo_path = tempdir())
 
 ### Store the Google Sheets endpoint in the instrument
 
-When an endpoint URL is set on the instrument, `export_static_survey()` reads it
+When an endpoint URL is set on the instrument, `export_survey()` reads it
 automatically. Set the URL once, and every later export reuses it.
 
 ```{r endpoint, eval = FALSE}
@@ -580,7 +580,7 @@ study$render$google_sheets_endpoint <-
 
 ### Export the static HTML survey
 
-`export_static_survey()` produces a single self-contained HTML file. Respondents
+`export_survey()` produces a single self-contained HTML file. Respondents
 open it in any browser and, if an endpoint is configured, the browser sends the
 submission to Google Sheets. The cross-origin request confirms only that the row was sent. Whether
 the Sheet stored it stays unconfirmed from here. Depending on the thank-you settings, the page can also offer a
@@ -589,7 +589,7 @@ Pilot the endpoint and verify a stored row before collection. The HTML can be
 hosted on GitHub Pages, shared by email, or opened directly from disk.
 
 ```{r static-export}
-html_path <- export_static_survey(
+html_path <- export_survey(
   study,
   output_path = file.path(tempdir(), "tourism_services_survey.html"),
   open        = FALSE
@@ -781,7 +781,7 @@ cat("Columns:    ", ncol(responses), "\n")
 ## Quality checks
 
 ```{r quality}
-qr <- quality_report(responses, study, respondent_id = "respondent_id")
+qr <- sframe_quality_results(responses, study, respondent_id = "respondent_id")
 # as.data.frame() gives the summary row, so no reaching into the object.
 qr_summary <- as.data.frame(qr)
 quality_summary <- data.frame(
@@ -799,14 +799,14 @@ rate is typically much lower. The flag marks respondents for researcher review,
 not automatic exclusion.
 
 ```{r missing}
-mr <- missing_data_report(responses, study)
+mr <- sframe_missing_data_results(responses, study)
 # as.data.frame() returns the item-level table, which is what the report is
 # mainly about.
 kable(as.data.frame(mr), digits = 2,
       col.names = c("Variable", "Missing (n)", "Missing (%)", "Valid (n)"),
       caption = "Item-level missingness")
-# sf_apa() gives a plain-language summary suitable for a methods section.
-cat(sf_apa(mr), "\n")
+# sframe_apa() gives a plain-language summary suitable for a methods section.
+cat(sframe_apa(mr), "\n")
 ```
 
 ---
@@ -849,7 +849,7 @@ par(op)
 
 ```{r reliability}
 if (requireNamespace("psych", quietly = TRUE)) {
-  rr <- reliability_report(scored, study, omega = FALSE)
+  rr <- sframe_reliability_results(scored, study, omega = FALSE)
   # One row per scale, with NA where a statistic could not be computed.
   rr_df <- as.data.frame(rr)
   rel_df <- data.frame(
@@ -871,18 +871,18 @@ measurement assumptions, so treat them as distinct estimates. Decide which
 quantity answers the study's question, and report that one on its own merits.
 Pass `omega = TRUE` to report the available omega estimates alongside alpha,
 and name the estimate and assumptions in the write-up. See
-`?reliability_report` for details.
+`?sframe_reliability_results` for details.
 
 ## EFA readiness
 
 Before a confirmatory factor analysis, it is useful to screen whether the item
-correlations appear suitable for exploratory factoring. `efa_report()` runs
+correlations appear suitable for exploratory factoring. `sframe_efa_readiness_results()` runs
 the KMO measure of sampling adequacy and Bartlett's test of sphericity, and
 uses parallel analysis to suggest the number of factors.
 
 ```{r efa, eval=FALSE}
 if (requireNamespace("psych", quietly = TRUE)) {
-  er <- efa_report(scored, study)
+  er <- sframe_efa_readiness_results(scored, study)
   print(er)
 }
 ```
@@ -896,7 +896,7 @@ residuals, and model fit.
 
 ## Construct validity
 
-`validity_report()` computes composite reliability (CR) and average variance
+`sframe_validity_results()` computes composite reliability (CR) and average variance
 extracted (AVE) from supplied factor loadings. Discriminant validity is
 assessed via the Fornell-Larcker criterion and HTMT when construct scores are
 supplied.
@@ -907,7 +907,7 @@ loadings_list <- list(
   DMRE = c(dm_1 = 0.78, dm_2 = 0.82, dm_3 = 0.75),
   TS   = c(ts_1 = 0.84, ts_2 = 0.80)
 )
-vr <- validity_report(loadings_list)
+vr <- sframe_validity_results(loadings_list)
 print(as.data.frame(vr))
 ```
 
@@ -925,7 +925,7 @@ variable roles it needs. `run_analysis_plan()` executes every block and returns
 one result per question.
 
 ```{r plan}
-sf_plan(study) <- list(
+sframe_plan(study) <- list(
   list(
     id               = "RQ1",
     research_question = "Are digital marketing perceptions associated with tourist satisfaction?",
@@ -969,7 +969,7 @@ sf_plan(study) <- list(
   )
 )
 
-length(sf_plan(study))
+length(sframe_plan(study))
 ```
 
 ---
@@ -977,13 +977,13 @@ length(sf_plan(study))
 ## Assumption checks
 
 Before running the analysis plan, check statistical assumptions for the
-variables involved. `assumption_report()` tests normality (Shapiro-Wilk for
+variables involved. `sframe_assumption_results()` tests normality (Shapiro-Wilk for
 samples below 5,000), homogeneity of variance (Levene) for grouped tests, and
 linearity for regression pairs.
 
 ```{r assumptions}
 if (requireNamespace("psych", quietly = TRUE)) {
-  ar <- assumption_report(scored, variables = scale_cols)
+  ar <- sframe_assumption_results(scored, variables = scale_cols)
   print(ar)
 }
 ```
@@ -1093,7 +1093,7 @@ responses <- read_sheet_responses(
 )
 
 # 2. Run quality checks on the new data.
-quality_report(responses, study, respondent_id = "respondent_id")
+sframe_quality_results(responses, study, respondent_id = "respondent_id")
 
 # 3. Score the scales.
 scored <- score_scales(responses, study)

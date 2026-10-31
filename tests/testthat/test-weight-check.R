@@ -4,13 +4,13 @@
 # weight drops its row and says so.
 
 weight_instr <- function() {
-  sf_instrument(
+  sframe_instrument(
     "Weights",
     components = list(
-      sf_choices("col", values = c("red", "blue"), labels = c("Red", "Blue")),
-      sf_item("colour", "Colour", type = "single_choice", choice_set = "col"),
-      sf_item("shape", "Shape", type = "single_choice", choice_set = "col"),
-      sf_item("score", "Score", type = "numeric")
+      sframe_choice_set("col", values = c("red", "blue"), labels = c("Red", "Blue")),
+      sframe_item("colour", "Colour", type = "single_choice", choice_set = "col"),
+      sframe_item("shape", "Shape", type = "single_choice", choice_set = "col"),
+      sframe_item("score", "Score", type = "numeric")
     )
   )
 }

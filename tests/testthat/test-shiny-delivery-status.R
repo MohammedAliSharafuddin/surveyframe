@@ -2,8 +2,8 @@
 #
 # D4 in Shiny (session 1 follow-up 4). The module's thank-you screen said
 # "Your response has been recorded." whether or not anything was stored, and
-# render_survey() said "Submitted successfully". A module with no on_submit,
-# or render_survey() with save_responses = "none", stores nothing. The status
+# run_survey() said "Submitted successfully". A module with no on_submit,
+# or run_survey() with save_responses = "none", stores nothing. The status
 # line now comes from what the submission did with the answers: written to
 # the CSV, handed to on_submit, or neither. The researcher's message sits
 # below it, as in the static survey.
@@ -11,8 +11,8 @@
 skip_if_not_installed("shiny")
 
 status_instrument <- function(message = NULL) {
-  ins <- sf_instrument(title = "Status", components = list(
-    sf_item("t1", "Comment", "text")))
+  ins <- sframe_instrument(title = "Status", components = list(
+    sframe_item("t1", "Comment", "text")))
   if (!is.null(message)) ins$render$thankyou$message <- message
   ins
 }
@@ -28,7 +28,7 @@ test_that("the persist step reports what it did with the answers", {
 
 module_thankyou <- function(on_submit = NULL, message = NULL) {
   html <- NULL
-  shiny::testServer(survey_module_server,
+  shiny::testServer(sframe_survey_server,
                     args = list(instrument = status_instrument(message),
                                 on_submit = on_submit), {
     session$setInputs(sf_start = 1)
@@ -53,7 +53,7 @@ test_that("a module with on_submit says the response was handed on", {
 })
 
 app_thankyou <- function(...) {
-  app <- render_survey(status_instrument("Debrief text."), ...)
+  app <- run_survey(status_instrument("Debrief text."), ...)
   html <- NULL
   shiny::testServer(app, {
     session$setInputs(start_btn = 1)
@@ -63,7 +63,7 @@ app_thankyou <- function(...) {
   html
 }
 
-test_that("render_survey() states delivery on its thank-you screen", {
+test_that("run_survey() states delivery on its thank-you screen", {
   html <- app_thankyou()
   expect_match(html, "Your response has not been saved.", fixed = TRUE)
   expect_no_match(html, "Submitted successfully", fixed = TRUE)

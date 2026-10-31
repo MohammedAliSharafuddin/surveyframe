@@ -30,7 +30,7 @@ Computes and plots a full pairwise correlation matrix, independent of
 \code{\link[=run_analysis_plan]{run_analysis_plan()}}'s pairwise \code{correlation_pearson}/\verb{_spearman}/
 \verb{_kendall} runners (which plot one variable pair at a time via
 \code{sframe_plot_correlation()}). Useful directly, and as the visual
-companion to \code{\link[=validity_report]{validity_report()}}'s discriminant-validity checks.
+companion to \code{\link[=sframe_validity_results]{sframe_validity_results()}}'s discriminant-validity checks.
 }
 \examples{
 \donttest{
@@ -42,5 +42,5 @@ if (requireNamespace("ggplot2", quietly = TRUE)) {
 }
 }
 \seealso{
-\code{\link[=validity_report]{validity_report()}}
+\code{\link[=sframe_validity_results]{sframe_validity_results()}}
 }

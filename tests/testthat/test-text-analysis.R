@@ -1,6 +1,6 @@
 # tests/testthat/test-text-analysis.R
 # Text and open-ended response analysis (todo_text_analysis.md). This file covers the
-# lead reference diff: clean_text_responses(), term_frequency(),
+# lead reference diff: sframe_clean_text(), sframe_term_frequency(),
 # .sframe_tokenise(), sframe_run_term_freq() (including the group role and
 # the minimum-response guard), sframe_plot_term_frequency(), and the
 # $quotes reporting hook. Later ids land in their own test files.
@@ -21,12 +21,12 @@ phrases <- c(
 )
 
 make_text_instrument <- function() {
-  sf_instrument(
+  sframe_instrument(
     title = "Text analysis fixture",
     version = "1.0.0",
     components = list(
-      sf_item("comments", "Any comments about your stay?", type = "textarea"),
-      sf_item("branch", "Which branch?", type = "single_choice",
+      sframe_item("comments", "Any comments about your stay?", type = "textarea"),
+      sframe_item("branch", "Which branch?", type = "single_choice",
               choice_set = "branch_cs")
     )
   )
@@ -62,20 +62,20 @@ test_that(".sframe_tokenise returns an empty vector for NA or blank input", {
 })
 
 # ---------------------------------------------------------------------------
-# clean_text_responses()
+# sframe_clean_text()
 # ---------------------------------------------------------------------------
 
 test_that("clean_text_responses drops NA and blank responses and lower-cases", {
   data <- data.frame(comments = c("Great STAY", NA, "  ", "Terrible!"),
                      stringsAsFactors = FALSE)
-  out <- clean_text_responses(data, "comments")
+  out <- sframe_clean_text(data, "comments")
   expect_equal(as.character(out), c("great stay", "terrible"))
   expect_equal(attr(out, "respondent"), c(1L, 4L))
 })
 
 test_that("clean_text_responses respects lowercase/remove_punct/strip_numbers flags", {
   data <- data.frame(comments = "Room 42 was GREAT!!", stringsAsFactors = FALSE)
-  out <- clean_text_responses(data, "comments", lowercase = FALSE,
+  out <- sframe_clean_text(data, "comments", lowercase = FALSE,
                                remove_punct = FALSE, strip_numbers = TRUE)
   # Number stripping leaves a gap ("Room  was"); the final whitespace
   # collapse (always applied, not gated on remove_punct) folds it back to
@@ -88,19 +88,19 @@ test_that("clean_text_responses validates item type against an instrument", {
   data <- make_text_data()
   instr <- make_text_instrument()
   expect_error(
-    clean_text_responses(data, "branch", instrument = instr),
+    sframe_clean_text(data, "branch", instrument = instr),
     class = "sframe_error"
   )
-  expect_silent(clean_text_responses(data, "comments", instrument = instr))
+  expect_silent(sframe_clean_text(data, "comments", instrument = instr))
 })
 
 # ---------------------------------------------------------------------------
-# term_frequency()
+# sframe_term_frequency()
 # ---------------------------------------------------------------------------
 
 test_that("term_frequency counts terms, sorted descending, with n and pct", {
-  cleaned <- clean_text_responses(make_text_data(), "comments")
-  tbl <- term_frequency(cleaned)
+  cleaned <- sframe_clean_text(make_text_data(), "comments")
+  tbl <- sframe_term_frequency(cleaned)
   expect_true(all(c("term", "n", "pct") %in% names(tbl)))
   expect_true(all(diff(tbl$n) <= 0))
   expect_equal(tbl$term[1], "staff")
@@ -108,13 +108,13 @@ test_that("term_frequency counts terms, sorted descending, with n and pct", {
 })
 
 test_that("term_frequency respects top_n", {
-  cleaned <- clean_text_responses(make_text_data(), "comments")
-  tbl <- term_frequency(cleaned, top_n = 3L)
+  cleaned <- sframe_clean_text(make_text_data(), "comments")
+  tbl <- sframe_term_frequency(cleaned, top_n = 3L)
   expect_equal(nrow(tbl), 3L)
 })
 
 test_that("term_frequency on empty input returns a 0-row table, not an error", {
-  tbl <- term_frequency(character(0))
+  tbl <- sframe_term_frequency(character(0))
   expect_equal(nrow(tbl), 0L)
   expect_equal(names(tbl), c("term", "n", "pct"))
 })
@@ -158,10 +158,10 @@ test_that("mutation check: a lower floor lets a small term_freq input compute", 
   old <- surveyframe:::.sframe_text_min_responses
   # Can't reassign a namespace binding directly in a locked namespace test
   # without unlocking it; instead call the runner's own guard logic at n=3
-  # directly via term_frequency(), confirming it is NOT itself empty, i.e.
-  # the error above is solely the runner's floor check, not term_frequency().
-  cleaned <- clean_text_responses(make_text_data(n = 3), "comments")
-  tbl <- term_frequency(cleaned)
+  # directly via sframe_term_frequency(), confirming it is NOT itself empty, i.e.
+  # the error above is solely the runner's floor check, not sframe_term_frequency().
+  cleaned <- sframe_clean_text(make_text_data(n = 3), "comments")
+  tbl <- sframe_term_frequency(cleaned)
   expect_gt(nrow(tbl), 0)
 })
 
@@ -375,14 +375,14 @@ test_that("a $quotes data.frame on a result renders as its own table in the repo
   quotes_df <- data.frame(topic = 1L, rank = 1L, respondent = 3L,
                           quote = "Room was clean and the staff were helpful",
                           stringsAsFactors = FALSE)
-  # Simulate what extract_quotes() will attach once it lands, by patching
+  # Simulate what sframe_extract_quotes() will attach once it lands, by patching
   # run_analysis_plan()'s result in place via the same code path reporting.R
   # reads: instrument$analysis_plan[[i]]$result is not used for this render,
   # reporting.R re-runs the plan itself, so exercise the render helper
   # directly against a result list carrying $quotes.
   result <- list(
     research_question = "What themes recur?", apa = "Term frequency computed.",
-    table = term_frequency(clean_text_responses(data, "comments")),
+    table = sframe_term_frequency(sframe_clean_text(data, "comments")),
     quotes = quotes_df, decision_rule = "", block_id = "rq1"
   )
   html <- surveyframe:::.render_report_table(result$quotes, "Representative quotes")
@@ -407,13 +407,13 @@ test_that("a result with no $quotes renders no quotes table (mutation check)", {
 # ---------------------------------------------------------------------------
 
 test_that("term_freq's term column is not relabelled when it collides with an unrelated choice code", {
-  cs <- sf_choices("dept", values = c("pool", "spa"), labels = c("Pool area", "Spa area"))
-  instr <- sf_instrument(
+  cs <- sframe_choice_set("dept", values = c("pool", "spa"), labels = c("Pool area", "Spa area"))
+  instr <- sframe_instrument(
     title = "Collision fixture", version = "1.0.0",
     components = list(
       cs,
-      sf_item("dept", "Which department?", type = "single_choice", choice_set = "dept"),
-      sf_item("comments", "Any comments?", type = "textarea")
+      sframe_item("dept", "Which department?", type = "single_choice", choice_set = "dept"),
+      sframe_item("comments", "Any comments?", type = "textarea")
     )
   )
   data <- data.frame(
@@ -436,13 +436,13 @@ test_that("term_freq's own group column IS still humanized on the same table its
   # every text id, which silently also stopped humanizing `group` (a
   # genuinely coded value, e.g. "pool" -> "Pool area" is correct and
   # wanted there). The fix must be column-scoped, not table-scoped.
-  cs <- sf_choices("dept", values = c("pool", "spa"), labels = c("Pool area", "Spa area"))
-  instr <- sf_instrument(
+  cs <- sframe_choice_set("dept", values = c("pool", "spa"), labels = c("Pool area", "Spa area"))
+  instr <- sframe_instrument(
     title = "Group-still-humanized fixture", version = "1.0.0",
     components = list(
       cs,
-      sf_item("dept", "Which department?", type = "single_choice", choice_set = "dept"),
-      sf_item("comments", "Any comments?", type = "textarea")
+      sframe_item("dept", "Which department?", type = "single_choice", choice_set = "dept"),
+      sframe_item("comments", "Any comments?", type = "textarea")
     )
   )
   data <- data.frame(
@@ -464,10 +464,10 @@ test_that("term_freq's own group column IS still humanized on the same table its
 })
 
 test_that("mutation check: a non-text result IS still humanized (the exclusion is scoped, not global)", {
-  cs <- sf_choices("q5", values = 1:2, labels = c("Low", "High"))
-  instr <- sf_instrument(
+  cs <- sframe_choice_set("q5", values = 1:2, labels = c("Low", "High"))
+  instr <- sframe_instrument(
     title = "humanize sanity", version = "1.0.0",
-    components = list(cs, sf_item("rating", "Rating?", type = "single_choice", choice_set = "q5"))
+    components = list(cs, sframe_item("rating", "Rating?", type = "single_choice", choice_set = "q5"))
   )
   data <- data.frame(rating = c("1", "1", "2"), stringsAsFactors = FALSE)
   instr$analysis_plan <- list(list(

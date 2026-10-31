@@ -23,5 +23,5 @@ The solution's long-form factor-loading data frame.
 Extract the loading table from an EFA solution
 }
 \seealso{
-\link{sframe_as_data_frame}, \code{\link[=efa_solution]{efa_solution()}}
+\link{sframe_as_data_frame}, \code{\link[=sframe_efa_solution]{sframe_efa_solution()}}
 }

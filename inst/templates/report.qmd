@@ -159,7 +159,7 @@ cat(sprintf("**Validation status:** %s\n\n",
 
 ```{r codebook, eval=params$include_codebook}
 #| tbl-cap: "Survey items"
-cb <- codebook_report(instrument)
+cb <- sframe_codebook(instrument)
 items_d <- sframe_codebook_items_display(cb)
 items_d$reverse  <- ifelse(items_d$reverse,  "Yes", "")
 items_d$required <- ifelse(items_d$required, "Yes", "")
@@ -210,7 +210,7 @@ kable(format = "html", cb$models_table,
 ## Data Quality {#sec-quality .unnumbered}
 
 ```{r quality-check, eval=params$include_quality && has_data}
-qr <- quality_report(responses, instrument)
+qr <- sframe_quality_results(responses, instrument)
 ```
 
 ```{r quality-summary, eval=params$include_quality && has_data}
@@ -258,7 +258,7 @@ kable(format = "html", sl_df, align=c("l","c","r"))
 
 ```{r missing-data, eval=params$include_missing && has_data}
 #| output: asis
-mr <- tryCatch(missing_data_report(responses, instrument), error = function(e) NULL)
+mr <- tryCatch(sframe_missing_data_results(responses, instrument), error = function(e) NULL)
 if (is.null(mr)) {
   cat("Missing-data diagnostics could not be computed from the supplied data.\n\n")
 } else {
@@ -277,7 +277,7 @@ if (is.null(mr)) {
 
 ```{r descriptives, eval=params$include_descriptives && has_data}
 #| output: asis
-dr <- tryCatch(descriptives_report(responses), error = function(e) NULL)
+dr <- tryCatch(sframe_descriptives_results(responses), error = function(e) NULL)
 if (is.null(dr)) {
   cat("Descriptive statistics could not be computed from the supplied data.\n\n")
 } else {
@@ -456,7 +456,7 @@ for (sc in instrument$scales %||% list()) {
 
 ```{r reliability, eval=params$include_reliability && has_data}
 #| output: asis
-rr <- tryCatch(reliability_report(responses, instrument), error = function(e) NULL)
+rr <- tryCatch(sframe_reliability_results(responses, instrument), error = function(e) NULL)
 if (is.null(rr)) {
   cat("Reliability statistics could not be computed from the supplied data.\n\n")
 } else if (length(rr) == 0) {
@@ -574,7 +574,7 @@ if (!has_data) {
         # chunk's own code would display the dispatch loop instead, which says
         # nothing about which test ran with which options.
         if (show_code) {
-          code <- analysis_syntax(r)
+          code <- sframe_syntax_result(r)
           if (!is.null(code)) {
             cat("\n::: {.callout-note collapse=\"true\" title=\"Show R code\"}\n")
             cat("```r\n", paste(code, collapse = "\n"), "\n```\n", sep = "")
@@ -617,10 +617,10 @@ for (model in instrument$models) {
     cat(sprintf("**Sources:** %s\n\n", cite(cited_keys(paste0("model:", model$id %||% "")))))
   syntax <- tryCatch(
     switch(model$type,
-      cfa = cfa_lavaan_syntax(instrument = instrument, model = model),
-      cb_sem = sem_lavaan_syntax(model, instrument = instrument),
-      pls_sem = seminr_syntax(model),
-      efa = efa_syntax(unlist(lapply(model$measurement$constructs, function(con) con$items))),
+      cfa = sframe_syntax_cfa(instrument = instrument, model = model),
+      cb_sem = sframe_syntax_sem(model, instrument = instrument),
+      pls_sem = sframe_syntax_pls(model),
+      efa = sframe_syntax_efa(unlist(lapply(model$measurement$constructs, function(con) con$items))),
       ""
     ),
     error = function(e) paste("Model syntax could not be generated:", conditionMessage(e))
@@ -629,7 +629,7 @@ for (model in instrument$models) {
   cat(syntax)
   cat("\n```\n\n")
   cat("```json\n")
-  cat(model_json(model, pretty = TRUE))
+  cat(sframe_model_json(model, pretty = TRUE))
   cat("\n```\n\n")
 }
 ```

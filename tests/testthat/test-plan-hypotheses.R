@@ -13,10 +13,10 @@ hyp_instrument <- function(hypotheses = NULL, decision_rule = "",
                 decision_rule = decision_rule)
   block$hypotheses <- hypotheses
   block$interpretation <- interpretation
-  sf_instrument(title = "Hypotheses", components = list(
-    sf_choices("ab", values = c("a", "b"), labels = c("A", "B")),
-    sf_item("score", "Score", type = "numeric"),
-    sf_item("grp", "Group", type = "single_choice", choice_set = "ab")),
+  sframe_instrument(title = "Hypotheses", components = list(
+    sframe_choice_set("ab", values = c("a", "b"), labels = c("A", "B")),
+    sframe_item("score", "Score", type = "numeric"),
+    sframe_item("grp", "Group", type = "single_choice", choice_set = "ab")),
     analysis_plan = list(block))
 }
 
@@ -126,10 +126,10 @@ test_that("D12: render_results() never shows the decision rule as the interpreta
   expect_match(html, "Your interpretation will appear here.", fixed = TRUE)
 })
 
-test_that("D12: render_result() prints the declaration and a written interpretation", {
+test_that("D12: sframe_format_result() prints the declaration and a written interpretation", {
   ins <- declared_instrument(interpretation = "The groups differ.")
   res <- suppressWarnings(run_analysis_plan(hyp_data, ins))
-  html <- render_result(res[[1]], hyp_data, ins)$html
+  html <- sframe_format_result(res[[1]], hyp_data, ins)$html
   expect_match(html, "Alternative hypothesis (H1):</strong> Mean score differs", fixed = TRUE)
   expect_true(before(html, "Planned decision rule", "sf-apa"))
   expect_match(html, "Interpretation (written after the results):</strong> The groups differ.",

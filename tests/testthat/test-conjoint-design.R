@@ -1,5 +1,5 @@
 # tests/testthat/test-conjoint-design.R
-# sf_conjoint_design() declares a choice-experiment design as part of the
+# sframe_conjoint_design() declares a choice-experiment design as part of the
 # instrument's contract. It is a generator, not an estimator. The properties
 # that matter are that the design is reproducible from what is stored, that it
 # round-trips with the instrument hash intact, and that adding the feature did
@@ -14,7 +14,7 @@ dce_attributes <- function() {
 }
 
 test_that("a full factorial enumerates every combination", {
-  d <- sf_conjoint_design("d1", dce_attributes(), method = "full", seed = 1)
+  d <- sframe_conjoint_design("d1", dce_attributes(), method = "full", seed = 1)
 
   expect_s3_class(d, "sf_conjoint_design")
   expect_equal(nrow(d$profiles), 3 * 2 * 2)
@@ -25,9 +25,9 @@ test_that("a full factorial enumerates every combination", {
 })
 
 test_that("the same seed reproduces the identical design", {
-  a <- sf_conjoint_design("d1", dce_attributes(), method = "balanced",
+  a <- sframe_conjoint_design("d1", dce_attributes(), method = "balanced",
                           n_profiles = 6, seed = 99)
-  b <- sf_conjoint_design("d1", dce_attributes(), method = "balanced",
+  b <- sframe_conjoint_design("d1", dce_attributes(), method = "balanced",
                           n_profiles = 6, seed = 99)
 
   expect_identical(a$profiles, b$profiles)
@@ -35,9 +35,9 @@ test_that("the same seed reproduces the identical design", {
 })
 
 test_that("a different seed gives a different design", {
-  a <- sf_conjoint_design("d1", dce_attributes(), method = "random",
+  a <- sframe_conjoint_design("d1", dce_attributes(), method = "random",
                           n_profiles = 6, seed = 1)
-  b <- sf_conjoint_design("d1", dce_attributes(), method = "random",
+  b <- sframe_conjoint_design("d1", dce_attributes(), method = "random",
                           n_profiles = 6, seed = 2)
   expect_false(identical(a$profiles, b$profiles) && identical(a$tasks, b$tasks))
 })
@@ -45,12 +45,12 @@ test_that("a different seed gives a different design", {
 test_that("a seed is recorded even when the caller does not supply one", {
   # Without this the design could not be regenerated from the contract, which
   # is the whole point of declaring it.
-  d <- sf_conjoint_design("d1", dce_attributes(), method = "random",
+  d <- sframe_conjoint_design("d1", dce_attributes(), method = "random",
                           n_profiles = 6)
   expect_true(is.integer(d$seed))
   expect_false(is.na(d$seed))
 
-  again <- sf_conjoint_design("d1", dce_attributes(), method = "random",
+  again <- sframe_conjoint_design("d1", dce_attributes(), method = "random",
                               n_profiles = 6, seed = d$seed)
   expect_identical(again$profiles, d$profiles)
 })
@@ -60,7 +60,7 @@ test_that("generating a design does not disturb the caller's RNG stream", {
   before <- runif(3)
 
   set.seed(123)
-  invisible(sf_conjoint_design("d1", dce_attributes(), method = "random",
+  invisible(sframe_conjoint_design("d1", dce_attributes(), method = "random",
                                n_profiles = 6, seed = 7))
   after <- runif(3)
 
@@ -71,10 +71,10 @@ test_that("balanced is at least as even as the average random draw", {
   # The search keeps the best subset it sees, so it cannot be worse than a
   # typical single draw. Compared against the median of 20 random designs
   # rather than one, which would be noise.
-  bal <- sf_conjoint_design("d1", dce_attributes(), method = "balanced",
+  bal <- sframe_conjoint_design("d1", dce_attributes(), method = "balanced",
                             n_profiles = 6, seed = 5)$balance$imbalance
   rand <- vapply(1:20, function(s) {
-    sf_conjoint_design("d1", dce_attributes(), method = "random",
+    sframe_conjoint_design("d1", dce_attributes(), method = "random",
                        n_profiles = 6, seed = s)$balance$imbalance
   }, numeric(1))
 
@@ -82,7 +82,7 @@ test_that("balanced is at least as even as the average random draw", {
 })
 
 test_that("the task schedule has the declared shape, no repeat per task", {
-  d <- sf_conjoint_design("d1", dce_attributes(), method = "full",
+  d <- sframe_conjoint_design("d1", dce_attributes(), method = "full",
                           n_alternatives = 2, n_tasks = 3, blocks = 2, seed = 3)
 
   expect_equal(nrow(d$tasks), 2 * 3 * 2)
@@ -104,7 +104,7 @@ test_that("a supplied design is declared as given", {
     distance = c("beachfront", "10 min walk"),
     stringsAsFactors = FALSE
   )
-  d <- sf_conjoint_design("d1", dce_attributes(), profiles = profiles, seed = 1)
+  d <- sframe_conjoint_design("d1", dce_attributes(), profiles = profiles, seed = 1)
 
   expect_identical(d$method, "supplied")
   expect_equal(nrow(d$profiles), 2)
@@ -119,51 +119,51 @@ test_that("a supplied design using undeclared levels is refused", {
     stringsAsFactors = FALSE
   )
   expect_error(
-    sf_conjoint_design("d1", dce_attributes(), profiles = profiles),
+    sframe_conjoint_design("d1", dce_attributes(), profiles = profiles),
     class = "sframe_validation_error"
   )
 })
 
 test_that("degenerate declarations are refused", {
-  expect_error(sf_conjoint_design("d1", list(price = c("50", "100"))),
+  expect_error(sframe_conjoint_design("d1", list(price = c("50", "100"))),
                class = "sframe_validation_error")
   expect_error(
-    sf_conjoint_design("d1", list(a = c("1", "2"), b = "only")),
+    sframe_conjoint_design("d1", list(a = c("1", "2"), b = "only")),
     class = "sframe_validation_error"
   )
   expect_error(
-    sf_conjoint_design("d1", list(a = c("1", "1"), b = c("x", "y"))),
+    sframe_conjoint_design("d1", list(a = c("1", "1"), b = c("x", "y"))),
     class = "sframe_validation_error"
   )
   expect_error(
-    sf_conjoint_design("d1", dce_attributes(), method = "random"),
+    sframe_conjoint_design("d1", dce_attributes(), method = "random"),
     class = "sframe_validation_error"
   )
   expect_error(
-    sf_conjoint_design("d1", dce_attributes(), method = "random",
+    sframe_conjoint_design("d1", dce_attributes(), method = "random",
                        n_profiles = 999),
     class = "sframe_validation_error"
   )
   expect_error(
-    sf_conjoint_design("d1", dce_attributes(), n_alternatives = 1),
+    sframe_conjoint_design("d1", dce_attributes(), n_alternatives = 1),
     class = "sframe_validation_error"
   )
 })
 
 test_that("asking for more tasks than the profiles support is refused", {
   expect_error(
-    sf_conjoint_design("d1", dce_attributes(), method = "full",
+    sframe_conjoint_design("d1", dce_attributes(), method = "full",
                        n_alternatives = 2, n_tasks = 99),
     class = "sframe_validation_error"
   )
 })
 
 test_that("a design attaches to an instrument and survives a round trip", {
-  d <- sf_conjoint_design("hotel_dce", dce_attributes(), method = "balanced",
+  d <- sframe_conjoint_design("hotel_dce", dce_attributes(), method = "balanced",
                           n_profiles = 6, seed = 42)
-  inst <- sf_instrument(
+  inst <- sframe_instrument(
     title = "DCE", version = "1.0.0",
-    components = list(sf_item("q1", "Anything", type = "text"), d)
+    components = list(sframe_item("q1", "Anything", type = "text"), d)
   )
 
   expect_length(inst$designs, 1)
@@ -181,9 +181,9 @@ test_that("a design attaches to an instrument and survives a round trip", {
 })
 
 test_that("an instrument with no design keeps the key out of the payload", {
-  inst <- sf_instrument(
+  inst <- sframe_instrument(
     title = "No design", version = "1.0.0",
-    components = list(sf_item("q1", "Anything", type = "text"))
+    components = list(sframe_item("q1", "Anything", type = "text"))
   )
   expect_false("designs" %in% names(sframe_serialization_payload(inst)))
 })
@@ -212,16 +212,16 @@ test_that("an existing instrument keeps its hash across a read and rewrite", {
 })
 
 test_that("an instrument declaring a design does carry the key", {
-  d <- sf_conjoint_design("d1", dce_attributes(), method = "full", seed = 1)
-  inst <- sf_instrument(
+  d <- sframe_conjoint_design("d1", dce_attributes(), method = "full", seed = 1)
+  inst <- sframe_instrument(
     title = "With design", version = "1.0.0",
-    components = list(sf_item("q1", "Anything", type = "text"), d)
+    components = list(sframe_item("q1", "Anything", type = "text"), d)
   )
   expect_true("designs" %in% names(sframe_serialization_payload(inst)))
 })
 
 test_that("print states that this declares a design and does not fit models", {
-  d <- sf_conjoint_design("d1", dce_attributes(), method = "full", seed = 1)
+  d <- sframe_conjoint_design("d1", dce_attributes(), method = "full", seed = 1)
   out <- paste(utils::capture.output(print(d)), collapse = "\n")
   expect_match(out, "Conjoint design")
   expect_match(out, "does not fit choice models")

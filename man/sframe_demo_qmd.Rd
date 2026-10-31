@@ -7,7 +7,7 @@
 sframe_demo_qmd(name, dir = ".", overwrite = FALSE)
 }
 \arguments{
-\item{name}{Character. A demo name, as listed by \code{\link[=sframe_demos]{sframe_demos()}}.}
+\item{name}{Character. A demo name, as listed by \code{\link[=sframe_list_demos]{sframe_list_demos()}}.}
 
 \item{dir}{Directory to write into. Defaults to the working directory.}
 
@@ -30,5 +30,5 @@ out <- sframe_demo_qmd("two_group", dir = tempdir())
 basename(out)
 }
 \seealso{
-\code{\link[=sframe_demo]{sframe_demo()}}, \code{\link[=sframe_demos]{sframe_demos()}}
+\code{\link[=sframe_demo]{sframe_demo()}}, \code{\link[=sframe_list_demos]{sframe_list_demos()}}
 }

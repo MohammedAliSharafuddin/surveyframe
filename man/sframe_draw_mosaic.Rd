@@ -26,11 +26,11 @@ better for the table's shape (mosaic scales better to unbalanced group
 sizes).
 }
 \examples{
-instr <- sf_instrument("Crosstab demo", components = list(
-  sf_item("arm", "Arm", type = "text"),
-  sf_item("outcome", "Outcome", type = "text")
+instr <- sframe_instrument("Crosstab demo", components = list(
+  sframe_item("arm", "Arm", type = "text"),
+  sframe_item("outcome", "Outcome", type = "text")
 ))
-sf_plan(instr) <- list(list(
+sframe_plan(instr) <- list(list(
   id = "RQ1", research_question = "Does the outcome differ by arm?",
   family = "categorical", method = "chi_square",
   roles = list(row = "arm", column = "outcome")

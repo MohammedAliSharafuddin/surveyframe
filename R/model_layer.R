@@ -45,7 +45,7 @@ sframe_model_as_list <- function(x) {
   if (is.list(x)) {
     return(x)
   }
-  rlang::abort("`model` must be an sf_model object or a model list.",
+  rlang::abort("`model` must be a model specification from sframe_model_spec() or a model list.",
                class = c("sframe_validation_error", "sframe_error"))
 }
 
@@ -55,7 +55,7 @@ sframe_constructs_from_scales <- function(instrument, scales = NULL) {
     target <- Filter(function(s) s$id %in% scales, target)
   }
   lapply(target, function(scale) {
-    sf_construct(
+    sframe_construct(
       id = scale$id,
       label = scale$label,
       items = scale$items,
@@ -72,7 +72,7 @@ sframe_check_model_type <- function(model, allowed, fn_label, family_label) {
   type <- (sframe_model_as_list(model)$type %||% "")[1]
   if (!nzchar(type)) {
     sframe_abort_validation(sprintf(
-      "%s needs a model with a declared type. Set type in sf_model() to one of %s.",
+      "%s needs a model with a declared type. Set type in sframe_model_spec() to one of %s.",
       fn_label, paste0("'", allowed, "'", collapse = " or ")
     ))
   }
@@ -151,11 +151,11 @@ sframe_lavaan_safe_label <- function(label) {
 #' @return An object of class `sf_construct`.
 #' @export
 #' @examples
-#' sq <- sf_construct("sq", "Service Quality",
+#' sq <- sframe_construct("sq", "Service Quality",
 #'                     items = c("sq_1", "sq_2", "sq_3"))
 #' sq$mode
 #' sq$items
-sf_construct <- function(
+sframe_construct <- function(
     id,
     label = NULL,
     items = character(0),
@@ -187,10 +187,10 @@ sf_construct <- function(
 #' @return An object of class `sf_path`.
 #' @export
 #' @examples
-#' p <- sf_path("sq", "sat", label = "H1")
+#' p <- sframe_path("sq", "sat", label = "H1")
 #' p$from
 #' p$to
-sf_path <- function(from, to, label = NULL) {
+sframe_path <- function(from, to, label = NULL) {
   sframe_model_check_id(from, "from")
   sframe_model_check_id(to, "to")
   structure(
@@ -208,10 +208,10 @@ sf_path <- function(from, to, label = NULL) {
 #' @return An object of class `sf_covariance`.
 #' @export
 #' @examples
-#' cov <- sf_covariance("sq", "sus", label = "cov1")
+#' cov <- sframe_covariance("sq", "sus", label = "cov1")
 #' cov$from
 #' cov$to
-sf_covariance <- function(from, to, label = NULL) {
+sframe_covariance <- function(from, to, label = NULL) {
   sframe_model_check_id(from, "from")
   sframe_model_check_id(to, "to")
   structure(
@@ -230,9 +230,9 @@ sf_covariance <- function(from, to, label = NULL) {
 #' @return An object of class `sf_indirect`.
 #' @export
 #' @examples
-#' ind <- sf_indirect("sq", through = "sat", to = "bi", label = "mediation")
+#' ind <- sframe_indirect_effect("sq", through = "sat", to = "bi", label = "mediation")
 #' ind$through
-sf_indirect <- function(from, through, to, label = NULL) {
+sframe_indirect_effect <- function(from, through, to, label = NULL) {
   sframe_model_check_id(from, "from")
   through <- as.character(through)
   sframe_model_check_ids(through, "through")
@@ -251,29 +251,29 @@ sf_indirect <- function(from, through, to, label = NULL) {
 #'   `"pls_sem"`.
 #' @param engine Optional engine name. Defaults to `"lavaan"` for CFA/CB-SEM
 #'   and `"seminr"` for PLS-SEM.
-#' @param constructs List of [sf_construct()] objects.
-#' @param paths List of [sf_path()] objects.
-#' @param covariances List of [sf_covariance()] objects.
-#' @param indirect List of [sf_indirect()] objects.
+#' @param constructs List of [sframe_construct()] objects.
+#' @param paths List of [sframe_path()] objects.
+#' @param covariances List of [sframe_covariance()] objects.
+#' @param indirect List of [sframe_indirect_effect()] objects.
 #' @param options List of model options, such as `estimator`, `missing`,
 #'   `bootstrap`, or `standardised`.
 #'
 #' @return An object of class `sf_model`.
 #' @export
 #' @examples
-#' m <- sf_model(
+#' m <- sframe_model_spec(
 #'   "cb1", "Quality drives intention", type = "cb_sem",
 #'   constructs = list(
-#'     sf_construct("sq", "Service Quality", items = c("sq_1", "sq_2", "sq_3")),
-#'     sf_construct("sat", "Satisfaction", items = c("sat_1", "sat_2")),
-#'     sf_construct("bi", "Behavioural Intention", items = c("bi_1", "bi_2"))
+#'     sframe_construct("sq", "Service Quality", items = c("sq_1", "sq_2", "sq_3")),
+#'     sframe_construct("sat", "Satisfaction", items = c("sat_1", "sat_2")),
+#'     sframe_construct("bi", "Behavioural Intention", items = c("bi_1", "bi_2"))
 #'   ),
-#'   paths = list(sf_path("sq", "sat"), sf_path("sat", "bi")),
-#'   indirect = list(sf_indirect("sq", through = "sat", to = "bi"))
+#'   paths = list(sframe_path("sq", "sat"), sframe_path("sat", "bi")),
+#'   indirect = list(sframe_indirect_effect("sq", through = "sat", to = "bi"))
 #' )
 #' m$type
 #' m$engine
-sf_model <- function(
+sframe_model_spec <- function(
     id,
     label = NULL,
     type = c("efa", "cfa", "cb_sem", "pls_sem"),
@@ -316,7 +316,7 @@ sf_model <- function(
 #' Checks model IDs, construct IDs, indicators, structural path endpoints,
 #' duplicate paths, indirect paths, and engine/type compatibility.
 #'
-#' @param model An [sf_model()] object or compatible list.
+#' @param model An [sframe_model_spec()] object or compatible list.
 #' @param instrument Optional `sframe` object. When supplied, model indicators
 #'   must match instrument item IDs.
 #' @param strict Logical. When `TRUE`, invalid models raise an error. When
@@ -330,22 +330,22 @@ sf_model <- function(
 #' console. Code that read `$valid` and `$problems` keeps working.
 #'
 #' @return An [sframe_validation] object. The model is carried inside it and
-#'   can be recovered with [sf_object()].
+#'   can be recovered with [sframe_object()].
 #' @export
-#' @seealso [sframe_validation], [sf_problems()], [sf_is_valid()]
+#' @seealso [sframe_validation], [sframe_problems()], [sframe_is_valid()]
 #' @examples
 #' demo <- sframe_demo_data()
-#' m <- sf_model(
+#' m <- sframe_model_spec(
 #'   "cb1", type = "cb_sem",
 #'   constructs = list(
-#'     sf_construct("sq", items = c("sq_1", "sq_2", "sq_3")),
-#'     sf_construct("sat", items = c("sat_1", "sat_2"))
+#'     sframe_construct("sq", items = c("sq_1", "sq_2", "sq_3")),
+#'     sframe_construct("sat", items = c("sat_1", "sat_2"))
 #'   ),
-#'   paths = list(sf_path("sq", "sat"))
+#'   paths = list(sframe_path("sq", "sat"))
 #' )
-#' diag <- validate_model(m, instrument = demo$instrument)
+#' diag <- sframe_validate_model(m, instrument = demo$instrument)
 #' diag
-validate_model <- function(model, instrument = NULL, strict = TRUE) {
+sframe_validate_model <- function(model, instrument = NULL, strict = TRUE) {
   model <- sframe_model_as_list(model)
   log <- sframe_new_problem_log()
   add <- function(check, messages) sframe_log_problem(log, check, messages)
@@ -481,7 +481,7 @@ validate_model <- function(model, instrument = NULL, strict = TRUE) {
         add("indirect_effects",
           paste0("Indirect effect from '", ind$from, "' to '", ind$to,
                  "' needs a declared path '", step, "'. Declare it with ",
-                 "sf_path(), or remove the indirect effect."))
+                 "sframe_path(), or remove the indirect effect."))
       }
     }
   }
@@ -528,16 +528,16 @@ sframe_model_validation_checks <- c(
 
 #' Serialise a model specification to JSON
 #'
-#' @param model An [sf_model()] object.
+#' @param model An [sframe_model_spec()] object.
 #' @param pretty Logical. Whether to pretty-print the JSON.
 #'
 #' @return A JSON string.
 #' @export
 #' @examples
-#' m <- sf_model("cb1", type = "cb_sem",
-#'               constructs = list(sf_construct("sq", items = c("sq_1", "sq_2"))))
-#' cat(model_json(m))
-model_json <- function(model, pretty = TRUE) {
+#' m <- sframe_model_spec("cb1", type = "cb_sem",
+#'               constructs = list(sframe_construct("sq", items = c("sq_1", "sq_2"))))
+#' cat(sframe_model_json(m))
+sframe_model_json <- function(model, pretty = TRUE) {
   model <- sframe_model_as_list(model)
   model <- sframe_model_plain(model)
   jsonlite::toJSON(model, auto_unbox = TRUE, pretty = pretty, null = "null")
@@ -546,7 +546,7 @@ model_json <- function(model, pretty = TRUE) {
 #' Add a model specification to an instrument
 #'
 #' @param instrument An `sframe` object.
-#' @param model An [sf_model()] object.
+#' @param model An [sframe_model_spec()] object.
 #' @param validate Logical. Whether to validate the model against the
 #'   instrument before adding it.
 #' @param replace Logical. Whether to replace an existing model with the same
@@ -556,14 +556,14 @@ model_json <- function(model, pretty = TRUE) {
 #' @export
 #' @examples
 #' demo <- sframe_demo_data()
-#' m <- sf_model("cb1", type = "cb_sem",
-#'               constructs = list(sf_construct("sat", items = c("sat_1", "sat_2"))))
-#' instr <- add_model(demo$instrument, m)
+#' m <- sframe_model_spec("cb1", type = "cb_sem",
+#'               constructs = list(sframe_construct("sat", items = c("sat_1", "sat_2"))))
+#' instr <- sframe_add_model(demo$instrument, m)
 #' length(instr$models)
-add_model <- function(instrument, model, validate = TRUE, replace = TRUE) {
+sframe_add_model <- function(instrument, model, validate = TRUE, replace = TRUE) {
   sframe_check_instrument(instrument)
   if (isTRUE(validate)) {
-    validate_model(model, instrument = instrument, strict = TRUE)
+    sframe_validate_model(model, instrument = instrument, strict = TRUE)
   }
   if (is.null(instrument$models)) {
     instrument$models <- list()
@@ -612,12 +612,12 @@ add_model <- function(instrument, model, validate = TRUE, replace = TRUE) {
 #' \donttest{
 #' if (requireNamespace("psych", quietly = TRUE)) {
 #'   demo <- sframe_demo_data()
-#'   fit <- efa_solution(demo$responses, demo$instrument,
+#'   fit <- sframe_efa_solution(demo$responses, demo$instrument,
 #'                        scales = "service_quality", nfactors = 1)
 #'   fit$loadings
 #' }
 #' }
-efa_solution <- function(
+sframe_efa_solution <- function(
     data,
     instrument,
     items = NULL,
@@ -767,9 +767,9 @@ print.sframe_efa_solution <- function(x, ...) {
 #' @return A character string with R syntax.
 #' @export
 #' @examples
-#' syntax <- efa_syntax(c("sq_1", "sq_2", "sq_3"), nfactors = 1)
+#' syntax <- sframe_syntax_efa(c("sq_1", "sq_2", "sq_3"), nfactors = 1)
 #' cat(syntax)
-efa_syntax <- function(
+sframe_syntax_efa <- function(
     items,
     nfactors = 1L,
     extraction = c("minres", "pa", "ml"),
@@ -792,25 +792,21 @@ efa_syntax <- function(
 #' Generate lavaan CFA syntax from an instrument or a declared model
 #'
 #' The general entry point for CFA syntax. It takes an instrument, and derives
-#' the constructs from its scales, or an [sf_model()] declaring constructs that
+#' the constructs from its scales, or an [sframe_model_spec()] declaring constructs that
 #' cut across them, and it accepts correlated residuals and latent
 #' covariances.
 #'
-#' [cfa_syntax()] is the instrument-only convenience wrapper, kept for the
-#' scripts that call it. Start here when a model is declared, when residual
-#' covariances are needed, or when the constructs differ from the scales.
-#'
 #' Each generator emits the language its engine reads, so they stay separate:
-#' this one and [sem_lavaan_syntax()] write lavaan, [seminr_syntax()] writes
-#' seminr, and [efa_syntax()] writes an exploratory plan.
+#' this one and [sframe_syntax_sem()] write lavaan, [sframe_syntax_pls()] writes
+#' seminr, and [sframe_syntax_efa()] writes an exploratory plan.
 #'
 #' @param instrument Optional `sframe` object used to derive constructs from
 #'   scales when `model` is not supplied.
-#' @param model Optional [sf_model()] object.
+#' @param model Optional [sframe_model_spec()] object.
 #' @param scales Optional scale IDs when deriving a model from an instrument.
 #' @param ordered Logical. Whether to add an ordered-item note.
 #' @param std_lv Logical. Whether to add a `std.lv = TRUE` note.
-#' @param residual_covariances Optional list of [sf_covariance()] objects for
+#' @param residual_covariances Optional list of [sframe_covariance()] objects for
 #'   correlated residuals.
 #' @param latent_covariances Logical. Whether to include model-level latent
 #'   covariances supplied in `model`.
@@ -819,10 +815,10 @@ efa_syntax <- function(
 #' @export
 #' @examples
 #' demo <- sframe_demo_data()
-#' syntax <- cfa_lavaan_syntax(demo$instrument,
+#' syntax <- sframe_syntax_cfa(demo$instrument,
 #'                              scales = c("satisfaction", "behavioural_intention"))
 #' cat(syntax)
-cfa_lavaan_syntax <- function(
+sframe_syntax_cfa <- function(
     instrument = NULL,
     model = NULL,
     scales = NULL,
@@ -834,7 +830,7 @@ cfa_lavaan_syntax <- function(
   # Only when a model is supplied. With model = NULL the measurement model is
   # derived from the instrument's scales below, so there is no type to check.
   if (!is.null(model)) {
-    sframe_check_model_type(model, c("cfa", "cb_sem"), "cfa_lavaan_syntax()",
+    sframe_check_model_type(model, c("cfa", "cb_sem"), "sframe_syntax_cfa()",
                             "covariance-based measurement")
   }
   if (is.null(model)) {
@@ -842,7 +838,7 @@ cfa_lavaan_syntax <- function(
       rlang::abort("Provide either `model` or an `sframe` instrument.",
                    class = c("sframe_validation_error", "sframe_error"))
     }
-    model <- sf_model(
+    model <- sframe_model_spec(
       id = "cfa_model",
       label = paste0(instrument$meta$title, " CFA"),
       type = "cfa",
@@ -850,9 +846,9 @@ cfa_lavaan_syntax <- function(
     )
   }
   if (!is.null(instrument)) {
-    validate_model(model, instrument = instrument, strict = TRUE)
+    sframe_validate_model(model, instrument = instrument, strict = TRUE)
   } else {
-    validate_model(model, strict = TRUE)
+    sframe_validate_model(model, strict = TRUE)
   }
 
   constructs <- sframe_model_constructs(model)
@@ -904,31 +900,31 @@ cfa_lavaan_syntax <- function(
 
 #' Generate lavaan CB-SEM syntax
 #'
-#' @param model An [sf_model()] object of type `"cb_sem"`.
+#' @param model An [sframe_model_spec()] object of type `"cb_sem"`.
 #' @param instrument Optional `sframe` object for indicator validation.
 #' @param standardised Logical. Adds a standardised-estimates fitting note.
 #'
 #' @return A lavaan syntax string.
 #' @export
 #' @examples
-#' m <- sf_model(
+#' m <- sframe_model_spec(
 #'   "cb1", type = "cb_sem",
 #'   constructs = list(
-#'     sf_construct("sq", items = c("sq_1", "sq_2", "sq_3")),
-#'     sf_construct("sat", items = c("sat_1", "sat_2")),
-#'     sf_construct("bi", items = c("bi_1", "bi_2"))
+#'     sframe_construct("sq", items = c("sq_1", "sq_2", "sq_3")),
+#'     sframe_construct("sat", items = c("sat_1", "sat_2")),
+#'     sframe_construct("bi", items = c("bi_1", "bi_2"))
 #'   ),
-#'   paths = list(sf_path("sq", "sat"), sf_path("sat", "bi")),
-#'   indirect = list(sf_indirect("sq", through = "sat", to = "bi"))
+#'   paths = list(sframe_path("sq", "sat"), sframe_path("sat", "bi")),
+#'   indirect = list(sframe_indirect_effect("sq", through = "sat", to = "bi"))
 #' )
-#' cat(sem_lavaan_syntax(m))
-sem_lavaan_syntax <- function(model, instrument = NULL, standardised = TRUE) {
-  sframe_check_model_type(model, c("cfa", "cb_sem"), "sem_lavaan_syntax()",
+#' cat(sframe_syntax_sem(m))
+sframe_syntax_sem <- function(model, instrument = NULL, standardised = TRUE) {
+  sframe_check_model_type(model, c("cfa", "cb_sem"), "sframe_syntax_sem()",
                           "covariance-based")
   if (!is.null(instrument)) {
-    validate_model(model, instrument = instrument, strict = TRUE)
+    sframe_validate_model(model, instrument = instrument, strict = TRUE)
   } else {
-    validate_model(model, strict = TRUE)
+    sframe_validate_model(model, strict = TRUE)
   }
   constructs <- sframe_model_constructs(model)
   paths <- sframe_model_paths(model)
@@ -1036,7 +1032,7 @@ sem_lavaan_syntax <- function(model, instrument = NULL, standardised = TRUE) {
 
 #' Generate seminr PLS-SEM syntax
 #'
-#' @param model An [sf_model()] object of type `"pls_sem"`.
+#' @param model An [sframe_model_spec()] object of type `"pls_sem"`.
 #' @param data_name Name of the data object in generated R code.
 #' @param nboot Number of bootstrap samples.
 #' @param seed Random seed for bootstrap syntax.
@@ -1044,19 +1040,19 @@ sem_lavaan_syntax <- function(model, instrument = NULL, standardised = TRUE) {
 #' @return An R syntax string for `seminr`.
 #' @export
 #' @examples
-#' m <- sf_model(
+#' m <- sframe_model_spec(
 #'   "pls1", type = "pls_sem",
 #'   constructs = list(
-#'     sf_construct("sq", items = c("sq_1", "sq_2", "sq_3")),
-#'     sf_construct("sat", items = c("sat_1", "sat_2"))
+#'     sframe_construct("sq", items = c("sq_1", "sq_2", "sq_3")),
+#'     sframe_construct("sat", items = c("sat_1", "sat_2"))
 #'   ),
-#'   paths = list(sf_path("sq", "sat"))
+#'   paths = list(sframe_path("sq", "sat"))
 #' )
-#' cat(seminr_syntax(m))
-seminr_syntax <- function(model, data_name = "data", nboot = NULL, seed = 123) {
-  sframe_check_model_type(model, "pls_sem", "seminr_syntax()",
+#' cat(sframe_syntax_pls(m))
+sframe_syntax_pls <- function(model, data_name = "data", nboot = NULL, seed = 123) {
+  sframe_check_model_type(model, "pls_sem", "sframe_syntax_pls()",
                           "partial-least-squares")
-  validate_model(model, strict = TRUE)
+  sframe_validate_model(model, strict = TRUE)
   constructs <- sframe_model_constructs(model)
   paths <- sframe_model_paths(model)
   nboot <- nboot %||% model$options$bootstrap %||% 5000L
@@ -1280,17 +1276,17 @@ sframe_bullets <- function(...) paste0("- ", c(...))
 
 #' Create a model reporting template
 #'
-#' @param model An [sf_model()] object.
+#' @param model An [sframe_model_spec()] object.
 #' @param include_json Logical. Whether to include the JSON schema block.
 #'
 #' @return A character string.
 #' @export
 #' @examples
-#' m <- sf_model("cb1", type = "cb_sem",
-#'               constructs = list(sf_construct("sat", items = c("sat_1", "sat_2"))))
-#' cat(model_report_template(m, include_json = FALSE))
-model_report_template <- function(model, include_json = TRUE) {
-  validate_model(model, strict = TRUE)
+#' m <- sframe_model_spec("cb1", type = "cb_sem",
+#'               constructs = list(sframe_construct("sat", items = c("sat_1", "sat_2"))))
+#' cat(sframe_model_outline(m, include_json = FALSE))
+sframe_model_outline <- function(model, include_json = TRUE) {
+  sframe_validate_model(model, strict = TRUE)
   constructs <- sframe_model_constructs(model)
   paths <- sframe_model_paths(model)
   type <- (model$type %||% "")[1]
@@ -1330,7 +1326,7 @@ model_report_template <- function(model, include_json = TRUE) {
     sframe_model_report_notes(model, constructs)
   )
   if (isTRUE(include_json)) {
-    parts <- c(parts, "", "## Model JSON", "```json", model_json(model, pretty = TRUE), "```")
+    parts <- c(parts, "", "## Model JSON", "```json", sframe_model_json(model, pretty = TRUE), "```")
   }
   paste(parts, collapse = "\n")
 }

@@ -5,11 +5,11 @@
 # declared options with a count of 0 and unlabelled rows 1 and 2.
 
 leading_zero_instrument <- function(type = "single_choice") {
-  sf_instrument(
+  sframe_instrument(
     "Leading zeros",
     components = list(
-      sf_choices("codes", c("01", "02"), c("First", "Second")),
-      sf_item("q", "Choice", type = type, choice_set = "codes")
+      sframe_choice_set("codes", c("01", "02"), c("First", "Second")),
+      sframe_item("q", "Choice", type = type, choice_set = "codes")
     ),
     analysis_plan = list(
       list(id = "F", method = "frequency", roles = list(variable = "q"))
@@ -37,22 +37,22 @@ test_that("the frequency table shows the declared labels with real counts", {
 })
 
 test_that("numeric-looking codes still read as numbers", {
-  i <- sf_instrument("Plain", components = list(
-    sf_choices("codes", 1:2, c("First", "Second")),
-    sf_item("q", "Choice", type = "single_choice", choice_set = "codes")
+  i <- sframe_instrument("Plain", components = list(
+    sframe_choice_set("codes", 1:2, c("First", "Second")),
+    sframe_item("q", "Choice", type = "single_choice", choice_set = "codes")
   ))
   d <- read_responses(data.frame(q = c("1", "2", "1")), i)
   expect_type(d$q, "double")
   # as.character(1e5) is "1e+05", which must not count as a changed code.
-  big <- sf_instrument("Big", components = list(
-    sf_choices("codes", c(100000, 200000), c("First", "Second")),
-    sf_item("q", "Choice", type = "single_choice", choice_set = "codes")
+  big <- sframe_instrument("Big", components = list(
+    sframe_choice_set("codes", c(100000, 200000), c("First", "Second")),
+    sframe_item("q", "Choice", type = "single_choice", choice_set = "codes")
   ))
   expect_type(read_responses(data.frame(q = c("100000", "200000")), big)$q,
               "double")
-  mixed <- sf_instrument("Mixed", components = list(
-    sf_choices("codes", c("1", "2.5"), c("First", "Second")),
-    sf_item("q", "Choice", type = "single_choice", choice_set = "codes")
+  mixed <- sframe_instrument("Mixed", components = list(
+    sframe_choice_set("codes", c("1", "2.5"), c("First", "Second")),
+    sframe_item("q", "Choice", type = "single_choice", choice_set = "codes")
   ))
   expect_type(read_responses(data.frame(q = c("1", "2.5")), mixed)$q,
               "double")

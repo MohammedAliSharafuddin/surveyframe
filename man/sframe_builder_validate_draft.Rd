@@ -38,7 +38,7 @@ through unchanged so a draft round trip does not drop them.}
 \item{designs}{List of conjoint designs, carried through unchanged, since
 Studio has no editor for them.}
 
-\item{references}{List of \code{\link[=sf_reference]{sf_reference()}} records, as edited on Studio's
+\item{references}{List of \code{\link[=sframe_reference]{sframe_reference()}} records, as edited on Studio's
 References screen.}
 
 \item{origin}{The load record of an instrument read with \code{\link[=read_sframe]{read_sframe()}},

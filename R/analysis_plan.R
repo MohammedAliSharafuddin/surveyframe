@@ -479,7 +479,7 @@ sframe_run_crosstab <- function(data, vars, options = list()) {
   effect <- if (denom > 0) sqrt(unname(ct$statistic) / denom) else NA_real_
   effect_name <- if (r_dim == 2 && c_dim == 2) "phi" else "Cramer's V"
   effect_symbol <- if (identical(effect_name, "phi")) "\u03c6" else "V"
-  v_ci <- cramers_v_ci(tbl)
+  v_ci <- sframe_cramers_v_ci(tbl)
   weighted_table <- NULL
   if (!is.null(weights) && nzchar(weights) && weights %in% colnames(data)) {
     w <- sframe_num((data[[weights]][complete]))
@@ -605,7 +605,7 @@ sframe_run_t_test <- function(data, vars, options = list(), instrument = NULL) {
     return(list(test = "t_test_ind", error = sframe_test_failure(tt, data, outcome_col)))
   }
   d <- sframe_cohens_d(g1, g2)
-  d_ci <- cohens_d_ci(g1, g2)
+  d_ci <- sframe_cohens_d_ci(g1, g2)
   list(
     test     = "t_test_ind",
     vars     = vars,
@@ -679,7 +679,7 @@ sframe_run_anova_one <- function(data, vars, options = list()) {
     )
   } else NULL
 
-  eta_ci <- eta_sq_ci(outcome[complete], group[complete])
+  eta_ci <- sframe_eta_sq_ci(outcome[complete], group[complete])
 
   list(
     test = "anova_one",
@@ -735,7 +735,7 @@ sframe_run_t_test_pair <- function(data, vars) {
 
   diff <- x - y
   dz <- mean(diff, na.rm = TRUE) / stats::sd(diff, na.rm = TRUE)
-  d_ci <- bootstrap_ci(diff, FUN = function(v) {
+  d_ci <- sframe_bootstrap_ci(diff, FUN = function(v) {
     s <- stats::sd(v)
     if (is.na(s) || s == 0) NA_real_ else mean(v) / s
   })
@@ -1310,15 +1310,15 @@ sframe_plain <- function(x) {
 #' @return A list with `table` and `caption`, or `NULL` where the result has no
 #'   second table.
 #' @export
-#' @seealso [run_analysis_plan()], [render_report()], [analysis_syntax()]
+#' @seealso [run_analysis_plan()], [render_report()], [sframe_syntax_result()]
 #'
 #' @examples
-#' instr <- sf_instrument("Moderation demo", components = list(
-#'   sf_item("y", "Outcome", type = "numeric"),
-#'   sf_item("x", "Predictor", type = "numeric"),
-#'   sf_item("w", "Moderator", type = "numeric")
+#' instr <- sframe_instrument("Moderation demo", components = list(
+#'   sframe_item("y", "Outcome", type = "numeric"),
+#'   sframe_item("x", "Predictor", type = "numeric"),
+#'   sframe_item("w", "Moderator", type = "numeric")
 #' ))
-#' sf_plan(instr) <- list(list(
+#' sframe_plan(instr) <- list(list(
 #'   id = "RQ1", research_question = "Does w moderate x?",
 #'   family = "inferential", method = "moderation",
 #'   roles = list(outcome = "y", predictor = "x", moderator = "w")
@@ -1612,7 +1612,7 @@ sframe_result_table <- function(result) {
   )
 }
 
-# One row per scale, flattening reliability_report()'s per-scale summaries
+# One row per scale, flattening sframe_reliability_results()'s per-scale summaries
 # into a kable-ready table. `columns` is a named vector mapping the report's
 # field name to the column heading to use, since reliability_alpha and
 # reliability_omega only ever populate one coefficient or the other.
@@ -1633,7 +1633,7 @@ sframe_reliability_table <- function(rr, columns) {
   do.call(rbind, rows)
 }
 
-# item_report() is keyed by scale id, each holding its own item-level
+# sframe_item_results() is keyed by scale id, each holding its own item-level
 # diagnostics data.frame; stack them into one table with a Scale column so
 # every item across every scale shows in one place.
 sframe_item_diagnostics_table <- function(ir) {
@@ -1651,7 +1651,7 @@ sframe_item_diagnostics_table <- function(ir) {
   out
 }
 
-# quality_report() covers several distinct checks (attention, straight-
+# sframe_quality_results() covers several distinct checks (attention, straight-
 # lining, duplicates) in separate nested sections; flatten them into one
 # table, one row per check, so the "Do respondents meet quality
 # thresholds?" research question has a single table to point at.
@@ -1666,7 +1666,7 @@ sframe_quality_checks_table <- function(qr) {
   }
   for (s in qr$straightline %||% list()) {
     # A scale below straightline_min_items carries flag_rate = NA and
-    # checked = FALSE (see quality_report()), so it is reported as
+    # checked = FALSE (see sframe_quality_results()), so it is reported as
     # not checked rather than as sprintf() silently rendering "NA% flagged".
     result_text <- if (isFALSE(s$checked)) {
       sprintf("not checked, %d items, minimum %d (straightline_min_items)",
@@ -1751,22 +1751,22 @@ sframe_run_one_block <- function(block, data, instrument, plots = FALSE,
       missing_data       = sframe_run_missing_result(data, instrument, roles),
       quality            = sframe_result_from_report(sframe_run_quality(data, instrument, roles, options), "quality"),
       scale_descriptives = sframe_run_descriptives_result(data, list(variables = vapply(instrument$scales, function(s) s$id, character(1))), options),
-      reliability_alpha  = sframe_result_from_report(reliability_report(data, instrument, scales = sframe_block_scales(roles, instrument), omega = FALSE), "reliability_alpha"),
-      reliability_omega  = sframe_result_from_report(reliability_report(data, instrument, scales = sframe_block_scales(roles, instrument), alpha = FALSE, omega = TRUE), "reliability_omega"),
-      item_diagnostics   = sframe_result_from_report(item_report(data, instrument, scales = sframe_block_scales(roles, instrument)), "item_diagnostics"),
-      efa_readiness      = sframe_result_from_report(efa_report(data, instrument, scales = sframe_block_scales(roles, instrument), nfactors = options$nfactors), "efa_readiness"),
-      efa_solution       = sframe_result_from_report(efa_solution(data, instrument, items = sframe_role_values(roles, c("items", "variables")), nfactors = options$nfactors %||% 1L), "efa_solution"),
+      reliability_alpha  = sframe_result_from_report(sframe_reliability_results(data, instrument, scales = sframe_block_scales(roles, instrument), omega = FALSE), "reliability_alpha"),
+      reliability_omega  = sframe_result_from_report(sframe_reliability_results(data, instrument, scales = sframe_block_scales(roles, instrument), alpha = FALSE, omega = TRUE), "reliability_omega"),
+      item_diagnostics   = sframe_result_from_report(sframe_item_results(data, instrument, scales = sframe_block_scales(roles, instrument)), "item_diagnostics"),
+      efa_readiness      = sframe_result_from_report(sframe_efa_readiness_results(data, instrument, scales = sframe_block_scales(roles, instrument), nfactors = options$nfactors), "efa_readiness"),
+      efa_solution       = sframe_result_from_report(sframe_efa_solution(data, instrument, items = sframe_role_values(roles, c("items", "variables")), nfactors = options$nfactors %||% 1L), "efa_solution"),
       cfa_lavaan_syntax  = {
         model_id <- sframe_role_values(roles, "model", "")[1]
         model <- sframe_model_by_id(instrument, model_id)
-        syntax <- cfa_lavaan_syntax(instrument = instrument, model = model, ordered = isTRUE(options$ordered))
+        syntax <- sframe_syntax_cfa(instrument = instrument, model = model, ordered = isTRUE(options$ordered))
         list(test = test, syntax = syntax, apa = "CFA lavaan syntax generated.", prompt = "Fit the generated syntax with lavaan when ready.")
       },
       sem_lavaan_syntax  = {
         model_id <- sframe_role_values(roles, "model", "")[1]
         model <- sframe_model_by_id(instrument, model_id)
         if (is.null(model)) list(test = test, error = "SEM syntax requires a saved model role.")
-        else list(test = test, syntax = sem_lavaan_syntax(model, instrument), apa = "CB-SEM lavaan syntax generated.", prompt = "Inspect measurement and structural syntax before fitting.")
+        else list(test = test, syntax = sframe_syntax_sem(model, instrument), apa = "CB-SEM lavaan syntax generated.", prompt = "Inspect measurement and structural syntax before fitting.")
       },
       # pls_sem is accepted as an alias: real instruments declare the method
       # by the model type, so both ids resolve to the seminr syntax runner
@@ -1775,7 +1775,7 @@ sframe_run_one_block <- function(block, data, instrument, plots = FALSE,
         model_id <- sframe_role_values(roles, "model", "")[1]
         model <- sframe_model_by_id(instrument, model_id)
         if (is.null(model)) list(test = test, error = "PLS-SEM syntax requires a saved model role.")
-        else list(test = test, syntax = seminr_syntax(model), apa = "PLS-SEM seminr syntax generated.", prompt = "Fit with seminr only when the optional package is installed.")
+        else list(test = test, syntax = sframe_syntax_pls(model), apa = "PLS-SEM seminr syntax generated.", prompt = "Fit with seminr only when the optional package is installed.")
       },
       crosstab           = sframe_run_crosstab(data, vars, options),
       chi_square         = sframe_run_crosstab(data, vars, options),

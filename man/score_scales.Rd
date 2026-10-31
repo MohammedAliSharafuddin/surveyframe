@@ -28,18 +28,18 @@ valid item thresholds. Returns a data frame with one scored column per
 scale.
 }
 \examples{
-cs    <- sf_choices("ag5", 1:5,
+cs    <- sframe_choice_set("ag5", 1:5,
            c("Strongly disagree", "Disagree", "Neutral",
              "Agree", "Strongly agree"))
-i1    <- sf_item("sat_1", "Item 1", type = "likert",
+i1    <- sframe_item("sat_1", "Item 1", type = "likert",
                  choice_set = "ag5", scale_id = "sat")
-i2    <- sf_item("sat_2", "Item 2", type = "likert",
+i2    <- sframe_item("sat_2", "Item 2", type = "likert",
                  choice_set = "ag5", scale_id = "sat")
-i3    <- sf_item("sat_3", "Item 3 (reverse)", type = "likert",
+i3    <- sframe_item("sat_3", "Item 3 (reverse)", type = "likert",
                  choice_set = "ag5", scale_id = "sat", reverse = TRUE)
-scale <- sf_scale("sat", "Satisfaction",
+scale <- sframe_scale("sat", "Satisfaction",
                   items = c("sat_1", "sat_2", "sat_3"), min_valid = 2L)
-instr <- sf_instrument("Demo", components = list(cs, i1, i2, i3, scale))
+instr <- sframe_instrument("Demo", components = list(cs, i1, i2, i3, scale))
 
 responses <- data.frame(
   sat_1 = c(4, 5, 3),
@@ -52,5 +52,5 @@ scored <- score_scales(responses, instr)
 scored$sat
 }
 \seealso{
-\code{\link[=sf_scale]{sf_scale()}}, \code{\link[=reliability_report]{reliability_report()}}
+\code{\link[=sframe_scale]{sframe_scale()}}, \code{\link[=sframe_reliability_results]{sframe_reliability_results()}}
 }

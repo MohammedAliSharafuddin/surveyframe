@@ -27,8 +27,8 @@ test_that("a freshly written .sframe file's top-level keys match the schema's pr
   skip_if(!nzchar(path), "schema not found via system.file(); run devtools::load_all() first")
   schema <- jsonlite::fromJSON(path, simplifyVector = FALSE)
 
-  item <- sf_item("q1", "How satisfied are you?", type = "text")
-  instr <- sf_instrument("Demo", components = list(item))
+  item <- sframe_item("q1", "How satisfied are you?", type = "text")
+  instr <- sframe_instrument("Demo", components = list(item))
   out <- tempfile(fileext = ".sframe")
   write_sframe(instr, out, overwrite = TRUE)
   written <- jsonlite::fromJSON(out, simplifyVector = FALSE)
@@ -44,10 +44,10 @@ test_that("a .sframe file with an amendment round-trips its amendments key again
   schema <- jsonlite::fromJSON(path, simplifyVector = FALSE)
   expect_true("amendments" %in% names(schema$properties))
 
-  item <- sf_item("q1", "How satisfied are you?", type = "text")
-  instr <- sf_instrument("Demo", components = list(item))
-  item2 <- sf_item("q1", "How satisfied are you overall?", type = "text")
-  revised <- sf_instrument("Demo", components = list(item2))
+  item <- sframe_item("q1", "How satisfied are you?", type = "text")
+  instr <- sframe_instrument("Demo", components = list(item))
+  item2 <- sframe_item("q1", "How satisfied are you overall?", type = "text")
+  revised <- sframe_instrument("Demo", components = list(item2))
   amended <- amend_sframe(
     instr, revised,
     reason_code = "instrument_revision",

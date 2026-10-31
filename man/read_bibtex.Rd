@@ -13,7 +13,7 @@ read_bibtex(file = NULL, text = NULL, cited_by = NULL)
 example an entry pasted from Google Scholar.}
 
 \item{cited_by}{Optional \code{cited_by} targets given to every entry read, see
-\code{\link[=sf_reference]{sf_reference()}}.}
+\code{\link[=sframe_reference]{sframe_reference()}}.}
 }
 \value{
 A list of \code{sf_reference} objects, named by citation key. An entry
@@ -23,7 +23,7 @@ be written \verb{@article\{key, ...\}} or \verb{@article(key, ...)}.
 }
 \description{
 Parses BibTeX, the format Google Scholar, Zotero, Mendeley and most journal
-pages export, into \code{\link[=sf_reference]{sf_reference()}} records. Covers the common entry types
+pages export, into \code{\link[=sframe_reference]{sframe_reference()}} records. Covers the common entry types
 (\verb{@article}, \verb{@book}, \verb{@incollection}, \verb{@inbook}, \verb{@inproceedings},
 \verb{@techreport}, \verb{@phdthesis}, \verb{@mastersthesis}, \verb{@misc}, \verb{@online},
 \verb{@software}, \verb{@dataset}, \verb{@unpublished}) and the common fields. Accented

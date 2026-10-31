@@ -6,8 +6,8 @@
 # real participants' data and indistinguishable from it.
 
 collector_instrument <- function() {
-  instr <- sf_instrument("Isolated", components = list(
-    sf_item("q1", "How was it?", type = "text")
+  instr <- sframe_instrument("Isolated", components = list(
+    sframe_item("q1", "How was it?", type = "text")
   ))
   instr$render <- list(
     google_sheets_endpoint = "https://script.google.com/macros/s/LIVE/exec",
@@ -19,7 +19,7 @@ collector_instrument <- function() {
 
 exported <- function(...) {
   path <- tempfile(fileext = ".html")
-  suppressMessages(export_static_survey(output_path = path, open = FALSE, ...))
+  suppressMessages(export_survey(output_path = path, open = FALSE, ...))
   on.exit(unlink(path), add = TRUE)
   paste(readLines(path, warn = FALSE, encoding = "UTF-8"), collapse = "\n")
 }

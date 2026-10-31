@@ -27,9 +27,9 @@ with_plan <- function(instrument, ...) {
 }
 
 two_group <- function() {
-  sf_instrument(title = "Two group", components = list(
-    sf_item("grp", "Group", "text"),
-    sf_item("y", "Outcome", "numeric")
+  sframe_instrument(title = "Two group", components = list(
+    sframe_item("grp", "Group", "text"),
+    sframe_item("y", "Outcome", "numeric")
   ))
 }
 
@@ -71,11 +71,11 @@ test_that("10: duplicate block ids are refused", {
 })
 
 test_that("10: a scoring failure is recorded in the results", {
-  ins <- sf_instrument(title = "Clash", components = list(
-    sf_choices("ag5", 1:5, as.character(1:5)),
-    sf_item("q1", "One", "likert", choice_set = "ag5", scale_id = "q1"),
-    sf_item("q2", "Two", "likert", choice_set = "ag5", scale_id = "q1"),
-    sf_scale("q1", "Clashing", items = c("q1", "q2"))))
+  ins <- sframe_instrument(title = "Clash", components = list(
+    sframe_choice_set("ag5", 1:5, as.character(1:5)),
+    sframe_item("q1", "One", "likert", choice_set = "ag5", scale_id = "q1"),
+    sframe_item("q2", "Two", "likert", choice_set = "ag5", scale_id = "q1"),
+    sframe_scale("q1", "Clashing", items = c("q1", "q2"))))
   ins <- with_plan(ins, block("d", "descriptives", list(variables = "q2")))
   res <- suppressWarnings(run_analysis_plan(data.frame(q1 = 1:3, q2 = 3:1), ins))
   expect_match(attr(res, "status")$scoring, "failed")
@@ -117,14 +117,14 @@ test_that("11: options a method never reads are reported as ignored", {
 # ── 12 ──
 
 two_scales <- function() {
-  sf_instrument(title = "Scoped", components = list(
-    sf_choices("ag5", 1:5, as.character(1:5)),
-    sf_item("a1", "A1", "likert", choice_set = "ag5", scale_id = "a"),
-    sf_item("a2", "A2", "likert", choice_set = "ag5", scale_id = "a"),
-    sf_item("b1", "B1", "likert", choice_set = "ag5", scale_id = "b"),
-    sf_item("b2", "B2", "likert", choice_set = "ag5", scale_id = "b"),
-    sf_scale("a", "A", items = c("a1", "a2")),
-    sf_scale("b", "B", items = c("b1", "b2"))))
+  sframe_instrument(title = "Scoped", components = list(
+    sframe_choice_set("ag5", 1:5, as.character(1:5)),
+    sframe_item("a1", "A1", "likert", choice_set = "ag5", scale_id = "a"),
+    sframe_item("a2", "A2", "likert", choice_set = "ag5", scale_id = "a"),
+    sframe_item("b1", "B1", "likert", choice_set = "ag5", scale_id = "b"),
+    sframe_item("b2", "B2", "likert", choice_set = "ag5", scale_id = "b"),
+    sframe_scale("a", "A", items = c("a1", "a2")),
+    sframe_scale("b", "B", items = c("b1", "b2"))))
 }
 
 scale_data <- function() {
@@ -172,8 +172,8 @@ test_that("6: a text predictor in linear regression stays categorical", {
   set.seed(2)
   d <- data.frame(region = rep(c("north", "south", "west"), 20),
                   y = stats::rnorm(60))
-  ins <- sf_instrument(title = "Reg", components = list(
-    sf_item("region", "Region", "text"), sf_item("y", "Y", "numeric")))
+  ins <- sframe_instrument(title = "Reg", components = list(
+    sframe_item("region", "Region", "text"), sframe_item("y", "Y", "numeric")))
   ins <- with_plan(ins, block("r", "regression_linear",
                               list(predictors = "region", outcome = "y")))
   res <- run_analysis_plan(d, ins)[["r"]]

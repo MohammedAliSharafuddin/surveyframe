@@ -23,5 +23,5 @@ The codebook report's item table as a data frame.
 Extract the item table from a codebook report
 }
 \seealso{
-\link{sframe_as_data_frame}, \code{\link[=codebook_report]{codebook_report()}}
+\link{sframe_as_data_frame}, \code{\link[=sframe_codebook]{sframe_codebook()}}
 }

@@ -4,13 +4,13 @@
 # are bootstrapped on the signed value, and the text names the higher group.
 
 signed_instr <- function() {
-  sf_instrument(
+  sframe_instrument(
     "Signed effects",
     components = list(
-      sf_choices("arm", values = c("treat", "ctrl"),
+      sframe_choice_set("arm", values = c("treat", "ctrl"),
                  labels = c("Treatment", "Control")),
-      sf_item("grp", "Arm", type = "single_choice", choice_set = "arm"),
-      sf_item("score", "Score", type = "numeric")
+      sframe_item("grp", "Arm", type = "single_choice", choice_set = "arm"),
+      sframe_item("score", "Score", type = "numeric")
     )
   )
 }
@@ -38,7 +38,7 @@ test_that("Cohen's d is first group minus second", {
 test_that("the d interval is of the signed value and can include zero", {
   x <- c(1:10, 5.5)
   y <- c(1:10, 5)
-  ci <- cohens_d_ci(x, y, R = 500, seed = 1)
+  ci <- sframe_cohens_d_ci(x, y, R = 500, seed = 1)
   expect_lt(ci[["lower"]], 0)
   expect_gt(ci[["upper"]], 0)
 })

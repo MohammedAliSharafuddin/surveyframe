@@ -13,7 +13,7 @@ write_sframe(
 )
 }
 \arguments{
-\item{instrument}{An \code{sframe} object created by \code{\link[=sf_instrument]{sf_instrument()}}.}
+\item{instrument}{An \code{sframe} object created by \code{\link[=sframe_instrument]{sframe_instrument()}}.}
 
 \item{path}{Character. The file path to write to. The \code{.sframe} extension
 is appended automatically if not already present.}

@@ -8,7 +8,7 @@
 #' Every report that has a natural chart carries a `plot()` method, so a
 #' report draws without naming a helper:
 #'
-#' * `plot(reliability_report(...))` draws one report.
+#' * `plot(sframe_reliability_results(...))` draws one report.
 #' * `plot(results)` draws each block of an analysis that has a chart.
 #' * `plot(results, which = "RQ1")` selects one block by its ID.
 #'
@@ -436,7 +436,7 @@ sframe_plot_frequency <- function(result, palette = c("web", "print")) {
 #' @param palette One of `"web"` or `"print"`. See `sframe_brand()`.
 #' @return A ggplot2 object, or `NULL` when the result carries no table.
 #' @export
-#' @seealso [run_analysis_plan()], [term_frequency()]
+#' @seealso [run_analysis_plan()], [sframe_term_frequency()]
 #' @examples
 #' \donttest{
 #' if (requireNamespace("ggplot2", quietly = TRUE)) {
@@ -572,7 +572,7 @@ sframe_plot_term_frequency <- function(result, palette = c("web", "print")) {
 #' @param palette One of `"web"` or `"print"`. See `sframe_brand()`.
 #' @return A ggplot2 object, or `NULL` when the result carries no table.
 #' @export
-#' @seealso [run_analysis_plan()], [ngram_frequency()]
+#' @seealso [run_analysis_plan()], [sframe_ngram_frequency()]
 #' @examples
 #' \donttest{
 #' if (requireNamespace("ggplot2", quietly = TRUE)) {
@@ -604,7 +604,7 @@ sframe_plot_ngram_frequency <- function(result, palette = c("web", "print")) {
 #' @param palette One of `"web"` or `"print"`. See `sframe_brand()`.
 #' @return A ggplot2 object, or `NULL` when the result carries no table.
 #' @export
-#' @seealso [run_analysis_plan()], [term_frequency()]
+#' @seealso [run_analysis_plan()], [sframe_term_frequency()]
 #' @examples
 #' \donttest{
 #' if (requireNamespace("ggplot2", quietly = TRUE)) {
@@ -1039,7 +1039,7 @@ sframe_plot_likert_matrix <- function(item, data, choice_set, palette = c("web",
 
 #' Grouped diverging chart for a scale's Likert items
 #'
-#' Several *separate* Likert items that make up one [sf_scale()] (unlike a
+#' Several *separate* Likert items that make up one [sframe_scale()] (unlike a
 #' `"matrix"` item's rows, which are one question) are, by default, each
 #' reported as their own single-item diverging chart. That scatters a
 #' related batch of items (a satisfaction scale's 2-3 items, say) across
@@ -1057,7 +1057,7 @@ sframe_plot_likert_matrix <- function(item, data, choice_set, palette = c("web",
 #' @param palette One of `"web"` or `"print"`. See `sframe_brand()`.
 #' @return A ggplot2 object, or `NULL` if no item has response data.
 #' @export
-#' @seealso [sframe_plot_likert_matrix()], [sf_scale()]
+#' @seealso [sframe_plot_likert_matrix()], [sframe_scale()]
 #' @examples
 #' \donttest{
 #' if (requireNamespace("ggplot2", quietly = TRUE)) {
@@ -1102,7 +1102,7 @@ sframe_plot_likert_scale <- function(items, data, choice_set, title, palette = c
 #'   member item objects, in scale order), and `choice_set` (the shared
 #'   choice set object). Empty list if no scale qualifies.
 #' @export
-#' @seealso [sframe_plot_likert_scale()], [sf_scale()]
+#' @seealso [sframe_plot_likert_scale()], [sframe_scale()]
 #' @examples
 #' demo <- sframe_demo("likert_scale")
 #' groups <- sframe_likert_scale_groups(demo$instrument)
@@ -1399,21 +1399,21 @@ sframe_plot_regression_diagnostics <- function(result, palette = c("web", "print
 
 #' Scree plot from an EFA readiness report
 #'
-#' Plots the parallel-analysis eigenvalues from [efa_report()] (both the
+#' Plots the parallel-analysis eigenvalues from [sframe_efa_readiness_results()] (both the
 #' observed factor-analysis eigenvalues and the simulated comparison line),
 #' with the suggested factor count marked.
 #'
-#' @param x An `sframe_efa_report` object from [efa_report()].
+#' @param x An `sframe_efa_report` object from [sframe_efa_readiness_results()].
 #' @param palette One of `"web"` or `"print"`. See `sframe_brand()`.
 #' @return A ggplot2 object.
 #' @export
-#' @seealso [efa_report()]
+#' @seealso [sframe_efa_readiness_results()]
 #' @examples
 #' \donttest{
 #' if (requireNamespace("ggplot2", quietly = TRUE) &&
 #'     requireNamespace("psych", quietly = TRUE)) {
 #'   demo <- sframe_demo_data()
-#'   er <- efa_report(demo$responses, demo$instrument)
+#'   er <- sframe_efa_readiness_results(demo$responses, demo$instrument)
 #'   sframe_plot_efa_scree(er)
 #' }
 #' }
@@ -1447,20 +1447,20 @@ sframe_plot_efa_scree <- function(x, palette = c("web", "print")) {
 
 #' Loadings heatmap from a fitted EFA solution
 #'
-#' @param x An `sframe_efa_solution` object from [efa_solution()].
+#' @param x An `sframe_efa_solution` object from [sframe_efa_solution()].
 #' @param palette One of `"web"` (diverging red/teal gradient) or `"print"`
 #'   (white-to-black gradient by magnitude, with sign conveyed by the
 #'   printed label rather than colour, so it stays legible in monochrome). See
 #'   `sframe_brand()`.
 #' @return A ggplot2 object.
 #' @export
-#' @seealso [efa_solution()]
+#' @seealso [sframe_efa_solution()]
 #' @examples
 #' \donttest{
 #' if (requireNamespace("ggplot2", quietly = TRUE) &&
 #'     requireNamespace("psych", quietly = TRUE)) {
 #'   demo <- sframe_demo_data()
-#'   fit <- efa_solution(demo$responses, demo$instrument,
+#'   fit <- sframe_efa_solution(demo$responses, demo$instrument,
 #'                        scales = "service_quality", nfactors = 1)
 #'   sframe_plot_efa_loadings(fit)
 #' }
@@ -1506,17 +1506,17 @@ sframe_plot_efa_loadings <- function(x, palette = c("web", "print")) {
 
 #' Reliability plot: alpha and omega by scale
 #'
-#' @param x An `sframe_reliability_report` object from [reliability_report()].
+#' @param x An `sframe_reliability_report` object from [sframe_reliability_results()].
 #' @param palette One of `"web"` or `"print"`. See `sframe_brand()`.
 #' @return A ggplot2 object.
 #' @export
-#' @seealso [reliability_report()]
+#' @seealso [sframe_reliability_results()]
 #' @examples
 #' \donttest{
 #' if (requireNamespace("ggplot2", quietly = TRUE) &&
 #'     requireNamespace("psych", quietly = TRUE)) {
 #'   demo <- sframe_demo_data()
-#'   rr <- reliability_report(demo$responses, demo$instrument, omega = FALSE)
+#'   rr <- sframe_reliability_results(demo$responses, demo$instrument, omega = FALSE)
 #'   sframe_plot_reliability(rr)
 #' }
 #' }
@@ -1578,11 +1578,11 @@ sframe_plot_reliability <- function(x, palette = c("web", "print")) {
 #' @keywords internal
 #' @seealso `sframe_plot_crosstab()`
 #' @examples
-#' instr <- sf_instrument("Crosstab demo", components = list(
-#'   sf_item("arm", "Arm", type = "text"),
-#'   sf_item("outcome", "Outcome", type = "text")
+#' instr <- sframe_instrument("Crosstab demo", components = list(
+#'   sframe_item("arm", "Arm", type = "text"),
+#'   sframe_item("outcome", "Outcome", type = "text")
 #' ))
-#' sf_plan(instr) <- list(list(
+#' sframe_plan(instr) <- list(list(
 #'   id = "RQ1", research_question = "Does the outcome differ by arm?",
 #'   family = "categorical", method = "chi_square",
 #'   roles = list(row = "arm", column = "outcome")
@@ -1614,7 +1614,7 @@ sframe_draw_mosaic <- function(result, palette = c("web", "print")) {
 #' [run_analysis_plan()]'s pairwise `correlation_pearson`/`_spearman`/
 #' `_kendall` runners (which plot one variable pair at a time via
 #' `sframe_plot_correlation()`). Useful directly, and as the visual
-#' companion to [validity_report()]'s discriminant-validity checks.
+#' companion to [sframe_validity_results()]'s discriminant-validity checks.
 #'
 #' @param data A data frame of survey responses.
 #' @param vars Character vector of column names to correlate.
@@ -1624,7 +1624,7 @@ sframe_draw_mosaic <- function(result, palette = c("web", "print")) {
 #'   `sframe_brand()`.
 #' @return A ggplot2 object.
 #' @export
-#' @seealso [validity_report()]
+#' @seealso [sframe_validity_results()]
 #' @examples
 #' \donttest{
 #' if (requireNamespace("ggplot2", quietly = TRUE)) {
@@ -1668,16 +1668,16 @@ sframe_plot_correlation_matrix <- function(data, vars, method = "pearson",
 
 #' Quality report plot: straight-lining flag rate by scale
 #'
-#' @param x An `sframe_quality_report` object from [quality_report()].
+#' @param x An `sframe_quality_report` object from [sframe_quality_results()].
 #' @param palette One of `"web"` or `"print"`. See `sframe_brand()`.
 #' @return A ggplot2 object.
 #' @export
-#' @seealso [quality_report()]
+#' @seealso [sframe_quality_results()]
 #' @examples
 #' \donttest{
 #' if (requireNamespace("ggplot2", quietly = TRUE)) {
 #'   demo <- sframe_demo("likert_scale")
-#'   qr <- quality_report(demo$responses, demo$instrument)
+#'   qr <- sframe_quality_results(demo$responses, demo$instrument)
 #'   sframe_plot_quality(qr)
 #' }
 #' }
@@ -1743,11 +1743,11 @@ plot.sframe_efa_solution <- function(x, ..., palette = c("web", "print")) {
 
 #' Validity report plot: composite reliability and AVE by construct
 #'
-#' @param x An `sframe_validity_report` object from [validity_report()].
+#' @param x An `sframe_validity_report` object from [sframe_validity_results()].
 #' @param palette One of `"web"` or `"print"`. See `sframe_brand()`.
 #' @return A ggplot2 object.
 #' @export
-#' @seealso [validity_report()]
+#' @seealso [sframe_validity_results()]
 #' @examples
 #' \donttest{
 #' if (requireNamespace("ggplot2", quietly = TRUE)) {
@@ -1755,7 +1755,7 @@ plot.sframe_efa_solution <- function(x, ..., palette = c("web", "print")) {
 #'     sq  = c(sq_1 = 0.80, sq_2 = 0.75, sq_3 = 0.78),
 #'     sat = c(sat_1 = 0.85, sat_2 = 0.82)
 #'   )
-#'   vr <- validity_report(loadings)
+#'   vr <- sframe_validity_results(loadings)
 #'   sframe_plot_validity(vr)
 #' }
 #' }
@@ -1794,17 +1794,17 @@ plot.sframe_validity_report <- function(x, ..., palette = c("web", "print")) {
 #' Missing-data report plot: missingness rate by item
 #'
 #' @param x An `sframe_missing_data_report` object from
-#'   [missing_data_report()].
+#'   [sframe_missing_data_results()].
 #' @param palette One of `"web"` or `"print"`. See `sframe_brand()`.
 #' @return A ggplot2 object. When no item has missing values, this is a
 #'   short "no missing responses" message rather than an empty bar chart.
 #' @export
-#' @seealso [missing_data_report()]
+#' @seealso [sframe_missing_data_results()]
 #' @examples
 #' \donttest{
 #' if (requireNamespace("ggplot2", quietly = TRUE)) {
 #'   demo <- sframe_demo_data()
-#'   mr <- missing_data_report(demo$responses, demo$instrument)
+#'   mr <- sframe_missing_data_results(demo$responses, demo$instrument)
 #'   sframe_plot_missingness(mr)
 #' }
 #' }
@@ -2002,7 +2002,7 @@ sframe_plot_scale_chart <- function(scores, label, palette = c("web", "print")) 
 
 #' Distribution shape by variable, standardised
 #'
-#' One violin per variable in a [descriptives_report()] table, built from
+#' One violin per variable in a [sframe_descriptives_results()] table, built from
 #' the underlying response data rather than from the summary skewness and
 #' kurtosis numbers, so the reader sees the actual shape (asymmetry,
 #' multimodality, tails) instead of reading it off a bar height. Each
@@ -2010,22 +2010,22 @@ sframe_plot_scale_chart <- function(scores, label, palette = c("web", "print")) 
 #' different original scales (a 5-point Likert item next to a 0-100 slider)
 #' share one comparable y-axis. Standardising is a linear transform and does
 #' not change skewness. Each violin's subtitle-free panel keeps the
-#' variable's skewness value in its axis label. Grouped `descriptives_report()`
+#' variable's skewness value in its axis label. Grouped `sframe_descriptives_results()`
 #' output (one row per variable per `split_by` group) is faceted by group.
 #'
-#' @param x An `sframe_descriptives_report` object from [descriptives_report()].
-#' @param data The same data.frame passed to [descriptives_report()]. Required:
+#' @param x An `sframe_descriptives_report` object from [sframe_descriptives_results()].
+#' @param data The same data.frame passed to [sframe_descriptives_results()]. Required:
 #'   `x` only carries the summary table, not the raw values the violins need.
 #' @param palette One of `"web"` or `"print"`. See `sframe_brand()`.
 #' @return A ggplot2 object, or `NULL` if none of the report's variables have
 #'   enough data to draw.
 #' @export
-#' @seealso [descriptives_report()]
+#' @seealso [sframe_descriptives_results()]
 #' @examples
 #' \donttest{
 #' if (requireNamespace("ggplot2", quietly = TRUE)) {
 #'   demo <- sframe_demo_data()
-#'   dr <- descriptives_report(demo$responses, variables = c("sat_1", "sat_2"))
+#'   dr <- sframe_descriptives_results(demo$responses, variables = c("sat_1", "sat_2"))
 #'   sframe_plot_descriptives(dr, demo$responses)
 #' }
 #' }
@@ -2037,7 +2037,7 @@ sframe_plot_descriptives <- function(x, data, palette = c("web", "print")) {
   if (!is.data.frame(tbl) || nrow(tbl) == 0) return(NULL)
   if (!is.data.frame(data)) {
     rlang::abort(
-      "sframe_plot_descriptives() needs `data` (the data.frame passed to descriptives_report()) to draw the distribution shape.",
+      "sframe_plot_descriptives() needs `data` (the data.frame passed to sframe_descriptives_results()) to draw the distribution shape.",
       class = "sframe_error"
     )
   }
@@ -2459,7 +2459,7 @@ sframe_plot_mediation <- function(result, palette = c("web", "print")) {
     theme_surveyframe(palette = palette)
 }
 
-# Item-rest correlation by scale, from item_report()'s per-scale
+# Item-rest correlation by scale, from sframe_item_results()'s per-scale
 # diagnostics: the standard way to spot a weak or miskeyed item (commonly
 # flagged below 0.30) at a glance, across every scale at once.
 sframe_plot_item_diagnostics <- function(result, palette = c("web", "print")) {
@@ -2487,7 +2487,7 @@ sframe_plot_item_diagnostics <- function(result, palette = c("web", "print")) {
 #' Raw-variable distribution panels: histogram, boxplot, and Q-Q
 #'
 #' Unlike [sframe_plot_descriptives()], which summarises skewness and
-#' kurtosis *across* the variables in a [descriptives_report()] table, this
+#' kurtosis *across* the variables in a [sframe_descriptives_results()] table, this
 #' operates on one variable's raw values directly (the report table only
 #' stores summary statistics, not the underlying vector), matching the
 #' pattern [sframe_plot_correlation_matrix()] already uses for
@@ -2499,7 +2499,7 @@ sframe_plot_item_diagnostics <- function(result, palette = c("web", "print")) {
 #' @return A named list of three ggplot2 objects (`histogram`, `boxplot`,
 #'   `qq`), or `NULL` if fewer than two complete values remain.
 #' @export
-#' @seealso [descriptives_report()], [sframe_plot_descriptives()]
+#' @seealso [sframe_descriptives_results()], [sframe_plot_descriptives()]
 #' @examples
 #' \donttest{
 #' if (requireNamespace("ggplot2", quietly = TRUE)) {

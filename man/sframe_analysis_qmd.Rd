@@ -31,15 +31,15 @@ A list with \code{qmd}, \code{sframe}, and \code{csv} paths, invisibly.
 }
 \description{
 Unlike \code{\link[=sframe_demo_qmd]{sframe_demo_qmd()}}, which only works for one of the bundled demo
-instruments (it looks \code{name} up in \code{\link[=sframe_demos]{sframe_demos()}}), this writes a
+instruments (it looks \code{name} up in \code{\link[=sframe_list_demos]{sframe_list_demos()}}), this writes a
 runnable Quarto notebook for any instrument, using its own responses. It
 exposes the complete ordered plan, screening, run status, detailed results,
 plots and reports. The notebook reads the instrument and its responses back from 2 companion
 files written alongside it, so all 3 files must stay together.
 }
 \examples{
-item  <- sf_item("q1", "How satisfied are you?", type = "text")
-instr <- sf_instrument("Demo", components = list(item))
+item  <- sframe_item("q1", "How satisfied are you?", type = "text")
+instr <- sframe_instrument("Demo", components = list(item))
 resp  <- data.frame(q1 = c("Great", "Fine"))
 out <- sframe_analysis_qmd(instr, resp, dir = tempdir())
 basename(out$qmd)

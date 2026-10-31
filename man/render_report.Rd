@@ -83,14 +83,14 @@ report content only and are never written into the instrument.}
 
 \item{show_code}{Logical. Whether each result carries a folded "Show R code"
 block with the statistical call that produced it, built by
-\code{\link[=analysis_syntax]{analysis_syntax()}} from the same resolved specification the analysis ran.
-Defaults to \code{TRUE}. A method \code{\link[=analysis_syntax]{analysis_syntax()}} does not cover shows no
+\code{\link[=sframe_syntax_result]{sframe_syntax_result()}} from the same resolved specification the analysis ran.
+Defaults to \code{TRUE}. A method \code{\link[=sframe_syntax_result]{sframe_syntax_result()}} does not cover shows no
 block, rather than a guess at the call.}
 
-\item{references}{Optional further \code{\link[=sf_reference]{sf_reference()}} records, for example
+\item{references}{Optional further \code{\link[=sframe_reference]{sframe_reference()}} records, for example
 the works a host cites in the written interpretations, which are cited
 in text as \verb{[@id]}. The instrument's own references
-(\code{\link[=add_references]{add_references()}}) and the methods' references are always included.}
+(\code{\link[=sframe_add_references]{sframe_add_references()}}) and the methods' references are always included.}
 
 \item{csl}{Optional path to a Citation Style Language file for the
 References section. Defaults to APA 7th edition, bundled with the
@@ -170,5 +170,5 @@ file.exists(out)
 }
 }
 \seealso{
-\code{\link[=codebook_report]{codebook_report()}}, \code{\link[=quality_report]{quality_report()}}, \code{\link[=reliability_report]{reliability_report()}}
+\code{\link[=sframe_codebook]{sframe_codebook()}}, \code{\link[=sframe_quality_results]{sframe_quality_results()}}, \code{\link[=sframe_reliability_results]{sframe_reliability_results()}}
 }

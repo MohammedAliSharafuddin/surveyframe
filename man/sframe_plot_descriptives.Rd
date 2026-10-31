@@ -7,9 +7,9 @@
 sframe_plot_descriptives(x, data, palette = c("web", "print"))
 }
 \arguments{
-\item{x}{An \code{sframe_descriptives_report} object from \code{\link[=descriptives_report]{descriptives_report()}}.}
+\item{x}{An \code{sframe_descriptives_report} object from \code{\link[=sframe_descriptives_results]{sframe_descriptives_results()}}.}
 
-\item{data}{The same data.frame passed to \code{\link[=descriptives_report]{descriptives_report()}}. Required:
+\item{data}{The same data.frame passed to \code{\link[=sframe_descriptives_results]{sframe_descriptives_results()}}. Required:
 \code{x} only carries the summary table, not the raw values the violins need.}
 
 \item{palette}{One of \code{"web"} or \code{"print"}. See \code{sframe_brand()}.}
@@ -19,7 +19,7 @@ A ggplot2 object, or \code{NULL} if none of the report's variables have
 enough data to draw.
 }
 \description{
-One violin per variable in a \code{\link[=descriptives_report]{descriptives_report()}} table, built from
+One violin per variable in a \code{\link[=sframe_descriptives_results]{sframe_descriptives_results()}} table, built from
 the underlying response data rather than from the summary skewness and
 kurtosis numbers, so the reader sees the actual shape (asymmetry,
 multimodality, tails) instead of reading it off a bar height. Each
@@ -27,18 +27,18 @@ variable is standardised (z-scored) before plotting so variables on
 different original scales (a 5-point Likert item next to a 0-100 slider)
 share one comparable y-axis. Standardising is a linear transform and does
 not change skewness. Each violin's subtitle-free panel keeps the
-variable's skewness value in its axis label. Grouped \code{descriptives_report()}
+variable's skewness value in its axis label. Grouped \code{sframe_descriptives_results()}
 output (one row per variable per \code{split_by} group) is faceted by group.
 }
 \examples{
 \donttest{
 if (requireNamespace("ggplot2", quietly = TRUE)) {
   demo <- sframe_demo_data()
-  dr <- descriptives_report(demo$responses, variables = c("sat_1", "sat_2"))
+  dr <- sframe_descriptives_results(demo$responses, variables = c("sat_1", "sat_2"))
   sframe_plot_descriptives(dr, demo$responses)
 }
 }
 }
 \seealso{
-\code{\link[=descriptives_report]{descriptives_report()}}
+\code{\link[=sframe_descriptives_results]{sframe_descriptives_results()}}
 }

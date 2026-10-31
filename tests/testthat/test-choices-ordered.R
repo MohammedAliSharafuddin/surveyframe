@@ -7,19 +7,19 @@
 # single_choice item on such a set as ordinal.
 
 ordered_instrument <- function() {
-  sf_instrument("Ordered", components = list(
-    sf_item("freq", "How often do you attend?", type = "single_choice", choice_set = "often"),
-    sf_item("fmt", "Preferred format", type = "single_choice", choice_set = "fmt"),
-    sf_choices("often", values = c("1", "2", "3"),
+  sframe_instrument("Ordered", components = list(
+    sframe_item("freq", "How often do you attend?", type = "single_choice", choice_set = "often"),
+    sframe_item("fmt", "Preferred format", type = "single_choice", choice_set = "fmt"),
+    sframe_choice_set("often", values = c("1", "2", "3"),
                labels = c("Rarely", "Sometimes", "Often"), ordered = TRUE),
-    sf_choices("fmt", values = c("a", "b"), labels = c("Online", "In person"))))
+    sframe_choice_set("fmt", values = c("a", "b"), labels = c("Online", "In person"))))
 }
 
 test_that("ordered is stored only when TRUE", {
   ins <- ordered_instrument()
   expect_true(ins$choices[[1]]$ordered)
   expect_false("ordered" %in% names(ins$choices[[2]]))
-  expect_error(sf_choices("x", values = "1", labels = "A", ordered = NA),
+  expect_error(sframe_choice_set("x", values = "1", labels = "A", ordered = NA),
                "`ordered` must be TRUE or FALSE")
 })
 

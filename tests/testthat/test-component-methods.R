@@ -15,7 +15,7 @@ test_that("each component class exposes print, format, and summary methods", {
 })
 
 test_that("sf_choices methods return expected shapes", {
-  cs <- sf_choices("agree5", 1:5,
+  cs <- sframe_choice_set("agree5", 1:5,
                    c("Strongly disagree", "Disagree", "Neutral",
                      "Agree", "Strongly agree"))
   expect_output(print(cs), "sf_choices")
@@ -26,7 +26,7 @@ test_that("sf_choices methods return expected shapes", {
 })
 
 test_that("sf_item methods return expected shapes", {
-  it <- sf_item("q1", "How satisfied are you?", type = "likert",
+  it <- sframe_item("q1", "How satisfied are you?", type = "likert",
                 choice_set = "agree5")
   expect_output(print(it), "sf_item")
   expect_match(format(it), "likert")
@@ -34,14 +34,14 @@ test_that("sf_item methods return expected shapes", {
 })
 
 test_that("sf_scale methods return expected shapes", {
-  sc <- sf_scale("sat", "Satisfaction", items = c("q1", "q2", "q3"))
+  sc <- sframe_scale("sat", "Satisfaction", items = c("q1", "q2", "q3"))
   expect_output(print(sc), "sf_scale")
   expect_match(format(sc), "3 item")
   expect_identical(summary(sc), sc)
 })
 
 test_that("sf_branch methods use the real field names", {
-  br <- sf_branch("q2", depends_on = "q1", operator = "==",
+  br <- sframe_branch("q2", depends_on = "q1", operator = "==",
                   value = "yes", action = "show")
   expect_output(print(br), "sf_branch")
   expect_match(format(br), "q2")
@@ -50,7 +50,7 @@ test_that("sf_branch methods use the real field names", {
 })
 
 test_that("sf_check methods return expected shapes", {
-  ck <- sf_check("attn1", item_id = "q5", type = "attention",
+  ck <- sframe_attention_check("attn1", item_id = "q5", type = "attention",
                  pass_values = 3)
   expect_output(print(ck), "sf_check")
   expect_match(format(ck), "q5")
@@ -58,7 +58,7 @@ test_that("sf_check methods return expected shapes", {
 })
 
 test_that("sf_model methods report construct count", {
-  mdl <- sf_model("m1", label = "Measurement model", type = "cfa")
+  mdl <- sframe_model_spec("m1", label = "Measurement model", type = "cfa")
   expect_output(print(mdl), "sf_model")
   expect_match(format(mdl), "construct")
   expect_identical(summary(mdl), mdl)

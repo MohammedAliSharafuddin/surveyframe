@@ -1477,7 +1477,7 @@ const SF       = JSON.parse(document.getElementById('sf-data').textContent);
 const R        = (SF.render||{});
 const THEME    = R.theme||'{{THEME_COLOR}}'||'#2563eb';
 const ENDPOINT = document.body.dataset.endpoint||'';
-// A preview collects nothing. export_static_survey(preview = TRUE) writes
+// A preview collects nothing. export_survey(preview = TRUE) writes
 // true here, and any other value, the unreplaced placeholder included, is a
 // live survey. The flag is checked before every delivery path, host sender
 // included, so a host's callback cannot receive a preview answer.
@@ -1555,7 +1555,7 @@ function evaluate(op,actual,value){
   switch(op){
     case'==':return String(actual)===String(value);
     case'!=':return String(actual)!==String(value);
-    // `value` is a JSON array whenever sf_branch() was given a vector, which is
+    // `value` is a JSON array whenever sframe_branch() was given a vector, which is
     // the documented shape for %in%, and a comma-separated string when it came
     // from a hand-written file or an older builder. Arrays have no .split, so
     // assuming the string form threw and left the gated item hidden for good.
@@ -3088,7 +3088,7 @@ function saveSettings(){
 }
 
 // -- References (0.4.3) -------------------------------------------------------
-// CSL-JSON records, the format read_bibtex() and sf_reference() produce in R.
+// CSL-JSON records, the format read_bibtex() and sframe_reference() produce in R.
 // Each may say where the instrument cites it, in cited_by.
 //
 // Changes apply to the instrument at once, with undo, and never wait for
@@ -3350,7 +3350,7 @@ async function saveSframe(){
   dirty=false;lastSaved=Date.now();updSave();toast('Saved as '+a.download,'ok');
 }
 
-// Export a deployable, self-contained survey HTML. Mirrors export_static_survey()
+// Export a deployable, self-contained survey HTML. Mirrors export_survey()
 // in R: take inst/static_survey/template.html (inlined below) and substitute the
 // four placeholders from the in-memory instrument.
 function sub(str,ph,val){return str.split(ph).join(val);}
@@ -3865,7 +3865,7 @@ function saveChoice(){
   if(!vals.length){toast('Add at least one option','err');return;}
   snap();
   var cs={id:id,values:vals,labels:lbls,allow_other:document.getElementById('c-other').checked,randomise:document.getElementById('c-rand').checked};
-  // Written only when set, as sf_choices() writes it, so a set without it
+  // Written only when set, as sframe_choice_set() writes it, so a set without it
   // keeps the hash it had.
   if(document.getElementById('c-ord').checked)cs.ordered=true;
   var ex=S.choices.findIndex(function(c){return c.id===id;});
@@ -4009,7 +4009,7 @@ function groupLevels(id){
   var cs=S.choices.find(function(c){return c.id===i.choice_set;});
   return cs?(cs.values||[]).length:null;
 }
-// Whether a choice set declares its options ordered (sf_choices(ordered =)).
+// Whether a choice set declares its options ordered (sframe_choice_set(ordered =)).
 function csOrdered(id){var cs=(S.choices||[]).find(function(c){return c.id===id;});return !!(cs&&cs.ordered);}
 function setCsOrdered(on){
   var item=S.items.find(function(x){return x.id===selId;});if(!item||!item.choice_set)return;

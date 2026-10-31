@@ -18,7 +18,7 @@
 Print an sf_choices object
 }
 \examples{
-cs <- sf_choices("agree5", 1:5,
+cs <- sframe_choice_set("agree5", 1:5,
                  c("Strongly disagree", "Disagree", "Neutral",
                    "Agree", "Strongly agree"))
 print(cs)

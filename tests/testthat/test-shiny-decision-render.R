@@ -8,16 +8,16 @@
 crits <- c("service", "price", "delivery")
 
 decision_instrument <- function(required = TRUE) {
-  sf_instrument(
+  sframe_instrument(
     title = "Decision render", version = "1.0.0",
     components = list(
-      sf_item("pw", "Compare the criteria", type = "pairwise_comparison",
+      sframe_item("pw", "Compare the criteria", type = "pairwise_comparison",
               comparison_items = crits, comparison_scale = "saaty",
               required = required),
-      sf_item("infl", "Influence among the criteria",
+      sframe_item("infl", "Influence among the criteria",
               type = "pairwise_comparison", comparison_items = crits,
               comparison_scale = "influence", required = required),
-      sf_item("cw", "Divide 100 points", type = "criteria_weight",
+      sframe_item("cw", "Divide 100 points", type = "criteria_weight",
               comparison_items = crits, required = required)
     )
   )
@@ -148,15 +148,15 @@ test_that("a constant-sum item that does not total 100 counts as incomplete", {
 })
 
 test_that("an item with too few comparison items is refused at construction", {
-  # The renderer has a "not fully configured" fallback, but sf_item() refuses
+  # The renderer has a "not fully configured" fallback, but sframe_item() refuses
   # the item before it can ever reach a page, which is the better place.
   expect_error(
-    sf_item("pw2", "Compare", type = "pairwise_comparison",
+    sframe_item("pw2", "Compare", type = "pairwise_comparison",
             comparison_items = character(0)),
     class = "sframe_validation_error"
   )
   expect_error(
-    sf_item("pw3", "Compare", type = "pairwise_comparison",
+    sframe_item("pw3", "Compare", type = "pairwise_comparison",
             comparison_items = "only_one"),
     class = "sframe_validation_error"
   )

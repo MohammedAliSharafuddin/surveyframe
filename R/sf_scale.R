@@ -4,17 +4,17 @@
 #'
 #' Creates a scale definition that groups items and specifies how composite
 #' scores are computed. The scale carries scoring rules used by [score_scales()]
-#' and measurement structure used by [reliability_report()], [item_report()],
-#' and [cfa_syntax()].
+#' and measurement structure used by [sframe_reliability_results()], [sframe_item_results()],
+#' and [sframe_syntax_cfa()].
 #'
 #' @param id Character. A unique identifier for this scale. Referenced in the
-#'   `scale_id` argument of [sf_item()].
+#'   `scale_id` argument of [sframe_item()].
 #' @param label Character. A human-readable name for the scale, used in
 #'   reports and codebooks.
 #' @param items Character vector. The `id` values of items that belong to this
 #'   scale, each listed once. Order controls presentation in reports, while
 #'   scoring uses the same item IDs regardless of order. Items themselves are
-#'   passed to [sf_instrument()] as separate components.
+#'   passed to [sframe_instrument()] as separate components.
 #' @param method Character. Scoring method. Either `"mean"` (default) or
 #'   `"sum"`.
 #' @param min_valid Integer or NULL. The minimum number of answered items
@@ -25,7 +25,7 @@
 #' @param reverse_items Character vector or NULL. A subset of `items` that
 #'   this scale reverse-codes. Reversal applies within this scale only, so the
 #'   same item can be reversed in one scale and scored as answered in another.
-#'   An item can also be flagged with `reverse = TRUE` in [sf_item()], which
+#'   An item can also be flagged with `reverse = TRUE` in [sframe_item()], which
 #'   reverses it within the scale named by its `scale_id`. A reversed item
 #'   needs declared response bounds, from a numeric choice set, slider limits
 #'   or a rating maximum.
@@ -36,10 +36,10 @@
 #'
 #' @return An object of class `sf_scale` (a named list).
 #' @export
-#' @seealso [sf_item()], [score_scales()], [reliability_report()]
+#' @seealso [sframe_item()], [score_scales()], [sframe_reliability_results()]
 #'
 #' @examples
-#' sat_scale <- sf_scale(
+#' sat_scale <- sframe_scale(
 #'   id            = "satisfaction",
 #'   label         = "Customer Satisfaction",
 #'   items         = c("sat_overall", "sat_speed", "sat_quality"),
@@ -47,7 +47,7 @@
 #'   min_valid     = 2,
 #'   reverse_items = NULL
 #' )
-sf_scale <- function(
+sframe_scale <- function(
     id,
     label,
     items,
@@ -79,7 +79,7 @@ sf_scale <- function(
   scale
 }
 
-# Problems with a scale's scoring parameters, shared by sf_scale() and
+# Problems with a scale's scoring parameters, shared by sframe_scale() and
 # validate_sframe() so a scale that skipped the constructor, for example one
 # read from a file, is held to the same rules.
 sframe_scale_parameter_problems <- function(scale) {
@@ -87,7 +87,7 @@ sframe_scale_parameter_problems <- function(scale) {
   items <- scale$items
   if (!is.character(items) || length(items) == 0) {
     return(paste0("Scale '", id, "' needs `items` as a character vector of ",
-                  "item IDs. Pass each item to sf_instrument() as its own ",
+                  "item IDs. Pass each item to sframe_instrument() as its own ",
                   "component and list its ID here."))
   }
   out <- character(0)

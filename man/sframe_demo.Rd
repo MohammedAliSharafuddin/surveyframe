@@ -7,7 +7,7 @@
 sframe_demo(name, branded = FALSE)
 }
 \arguments{
-\item{name}{Character. A demo name, as listed by \code{\link[=sframe_demos]{sframe_demos()}}.}
+\item{name}{Character. A demo name, as listed by \code{\link[=sframe_list_demos]{sframe_list_demos()}}.}
 
 \item{branded}{Logical. When \code{TRUE}, the instrument comes back with the
 standard welcome page, logo, theme colour and thank you page spliced into
@@ -36,6 +36,6 @@ demo$instrument
 head(demo$responses)
 }
 \seealso{
-\code{\link[=sframe_demos]{sframe_demos()}}, \code{\link[=sframe_export_labelled]{sframe_export_labelled()}},
+\code{\link[=sframe_list_demos]{sframe_list_demos()}}, \code{\link[=export_responses]{export_responses()}},
 \code{\link[=sframe_input_types_demo_data]{sframe_input_types_demo_data()}}
 }

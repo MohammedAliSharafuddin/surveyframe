@@ -29,9 +29,9 @@ test_that("a statistic bounded by 1 loses its leading zero, others keep it", {
 test_that("a run block's result text and prompt carry no leading zero on r", {
   set.seed(2)
   d <- data.frame(a = 1:40, b = 1:40 + stats::rnorm(40, sd = 15))
-  instr <- sf_instrument("APA", components = list(
-    sf_item("a", "A", type = "numeric"), sf_item("b", "B", type = "numeric")))
-  sf_plan(instr) <- list(list(id = "RQ1", research_question = "Is a related to b?",
+  instr <- sframe_instrument("APA", components = list(
+    sframe_item("a", "A", type = "numeric"), sframe_item("b", "B", type = "numeric")))
+  sframe_plan(instr) <- list(list(id = "RQ1", research_question = "Is a related to b?",
     family = "relationship", method = "correlation_pearson",
     roles = list(x = "a", y = "b")))
   res <- run_analysis_plan(d, instr)
@@ -84,13 +84,13 @@ test_that("result text in HTML: italic Latin symbols, subscripts, Greek letters 
 test_that("each HTML renderer marks up the result text (CX-24)", {
   set.seed(3)
   d <- data.frame(a = 1:40, b = 1:40 + stats::rnorm(40, sd = 15))
-  instr <- sf_instrument("APA", components = list(
-    sf_item("a", "A", type = "numeric"), sf_item("b", "B", type = "numeric")))
-  sf_plan(instr) <- list(list(id = "RQ1", research_question = "Is a related to b?",
+  instr <- sframe_instrument("APA", components = list(
+    sframe_item("a", "A", type = "numeric"), sframe_item("b", "B", type = "numeric")))
+  sframe_plan(instr) <- list(list(id = "RQ1", research_question = "Is a related to b?",
     family = "relationship", method = "correlation_pearson",
     roles = list(x = "a", y = "b")))
   res <- run_analysis_plan(d, instr)
-  one <- render_result(res$RQ1, d, instr)$html
+  one <- sframe_format_result(res$RQ1, d, instr)$html
   expect_match(one, "<em>r</em>(38) = ", fixed = TRUE)
   built_in <- surveyframe:::.render_report_analysis_section(instr, d, show_code = FALSE)
   expect_match(built_in, "<em>r</em>(38) = ", fixed = TRUE)
@@ -134,9 +134,9 @@ test_that("tables and figures are numbered in order with titles and alt text (CX
 
   set.seed(4)
   d <- data.frame(a = 1:40, b = 1:40 + stats::rnorm(40, sd = 15))
-  instr <- sf_instrument("APA", components = list(
-    sf_item("a", "A", type = "numeric"), sf_item("b", "B", type = "numeric")))
-  sf_plan(instr) <- list(list(id = "RQ1", research_question = "Is a related to b?",
+  instr <- sframe_instrument("APA", components = list(
+    sframe_item("a", "A", type = "numeric"), sframe_item("b", "B", type = "numeric")))
+  sframe_plan(instr) <- list(list(id = "RQ1", research_question = "Is a related to b?",
     family = "relationship", method = "correlation_pearson",
     roles = list(x = "a", y = "b")))
   res <- run_analysis_plan(d, instr, plots = requireNamespace("ggplot2", quietly = TRUE))
@@ -158,10 +158,10 @@ test_that("tables and figures are numbered in order with titles and alt text (CX
     expect_match(doc, "<figure class=\"sf-figure\">", fixed = TRUE)
   }
 
-  # render_results() and render_result() number theirs too.
+  # render_results() and sframe_format_result() number theirs too.
   out <- readLines(render_results(res, instr, output_file = tempfile(fileext = ".html")))
   expect_true(any(grepl("<strong>Table 1</strong>", out, fixed = TRUE)))
-  one <- render_result(res$RQ1, d, instr)$html
+  one <- sframe_format_result(res$RQ1, d, instr)$html
   expect_match(one, "<strong>Table 1</strong><br><em>RQ1: Is a related to b?</em>", fixed = TRUE)
   if (requireNamespace("ggplot2", quietly = TRUE)) {
     expect_match(one, "<strong>Figure 1</strong>", fixed = TRUE)

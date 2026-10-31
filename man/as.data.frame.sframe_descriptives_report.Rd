@@ -23,5 +23,5 @@ The primary table from a descriptives report.
 Extract the descriptives results table
 }
 \seealso{
-\link{sframe_as_data_frame}, \code{\link[=descriptives_report]{descriptives_report()}}
+\link{sframe_as_data_frame}, \code{\link[=sframe_descriptives_results]{sframe_descriptives_results()}}
 }

@@ -15,20 +15,20 @@
 # all 3 lived. These assert the content survives.
 
 roundtrip_instrument <- function() {
-  sf_instrument(title = "Round trip", components = list(
-    sf_choices("ag5", 1:5, as.character(1:5)),
-    sf_item("s1", "One", "likert", choice_set = "ag5", scale_id = "sat"),
-    sf_item("s2", "Two (reversed at item level)", "likert", choice_set = "ag5",
+  sframe_instrument(title = "Round trip", components = list(
+    sframe_choice_set("ag5", 1:5, as.character(1:5)),
+    sframe_item("s1", "One", "likert", choice_set = "ag5", scale_id = "sat"),
+    sframe_item("s2", "Two (reversed at item level)", "likert", choice_set = "ag5",
             scale_id = "sat", reverse = TRUE),
-    sf_item("s3", "Three (reversed at scale level)", "likert", choice_set = "ag5",
+    sframe_item("s3", "Three (reversed at scale level)", "likert", choice_set = "ag5",
             scale_id = "sat"),
-    sf_item("dob", "Date of birth", "date", date_min = "1920-01-01",
+    sframe_item("dob", "Date of birth", "date", date_min = "1920-01-01",
             date_max = "2010-12-31"),
-    sf_item("pw", "Compare", "pairwise_comparison",
+    sframe_item("pw", "Compare", "pairwise_comparison",
             comparison_items = c("price", "quality"), comparison_scale = "saaty"),
-    sf_scale("sat", "Satisfaction", items = c("s1", "s2", "s3"),
+    sframe_scale("sat", "Satisfaction", items = c("s1", "s2", "s3"),
              reverse_items = "s3"),
-    sf_conjoint_design("dce", attributes = list(price = c("low", "high"),
+    sframe_conjoint_design("dce", attributes = list(price = c("low", "high"),
                                                  speed = c("slow", "fast")),
                        method = "full", n_alternatives = 2L, seed = 7)
   ))
@@ -91,7 +91,7 @@ test_that("F1 and F3 in the item editor: editing an item keeps what the form doe
   # SurveyStudio's item form shows the label, type, required flag, choice set,
   # help and placeholder. Saving it replaced the whole item, so an edit to the
   # wording erased reverse coding, scale membership, page and type settings.
-  existing <- sf_item("dob", "Date of birth", "date", required = TRUE,
+  existing <- sframe_item("dob", "Date of birth", "date", required = TRUE,
                       scale_id = "age", reverse = TRUE, page = 2,
                       date_min = "1920-01-01", date_max = "2010-12-31")
   edits <- list(id = "dob", label = "Your date of birth", type = "date",
@@ -109,7 +109,7 @@ test_that("F1 and F3 in the item editor: editing an item keeps what the form doe
 })
 
 test_that("F3 in the item editor: changing the type drops the old type's settings", {
-  existing <- sf_item("mx", "Grid", "matrix", choice_set = "ag5",
+  existing <- sframe_item("mx", "Grid", "matrix", choice_set = "ag5",
                       matrix_items = c("a", "b"), scale_id = "s", page = 3)
   edits <- list(id = "mx", label = "Now free text", type = "text",
                 required = FALSE, choice_set = NULL, help = NULL, placeholder = "Type here")
@@ -168,8 +168,8 @@ test_that("a rebuild's content hash holds across a second boundary", {
 })
 
 test_that("an instrument built fresh still gets a creation time", {
-  new <- sf_instrument("Fresh", components = list(
-    sf_item("q1", "One", type = "numeric")))
+  new <- sframe_instrument("Fresh", components = list(
+    sframe_item("q1", "One", type = "numeric")))
   expect_match(new$meta$created_at, "^[0-9]{4}-[0-9]{2}-[0-9]{2}T")
 })
 
@@ -179,12 +179,12 @@ test_that("an instrument built fresh still gets a creation time", {
 # out, so the export that lost them went through unchallenged.
 test_that("references survive the Studio rebuild", {
   ins <- sframe_demo("first_survey")$instrument
-  ins <- add_references(ins, sf_reference(
+  ins <- sframe_add_references(ins, sframe_reference(
     "cronbach_1951", "Coefficient alpha and the internal structure of tests",
     author = "Cronbach, L. J.", year = 1951, cited_by = "instrument"))
   state <- sframe_builder_state_from_instrument(ins)
   draft <- do.call(sframe_builder_validate_draft, state)
   expect_true(draft$valid)
-  expect_identical(names(sframe_references(draft$instrument)), "cronbach_1951")
-  expect_identical(sframe_references(draft$instrument)[[1]]$cited_by, "instrument")
+  expect_identical(names(sframe_get_references(draft$instrument)), "cronbach_1951")
+  expect_identical(sframe_get_references(draft$instrument)[[1]]$cited_by, "instrument")
 })

@@ -24,5 +24,5 @@ number of factors.
 Coerce an EFA readiness report to a data frame
 }
 \seealso{
-\link{sframe_as_data_frame}, \code{\link[=efa_report]{efa_report()}}
+\link{sframe_as_data_frame}, \code{\link[=sframe_efa_readiness_results]{sframe_efa_readiness_results()}}
 }

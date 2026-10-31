@@ -44,11 +44,11 @@
 #' \donttest{
 #' d <- sframe_demo("two_group")
 #' res <- run_analysis_plan(d$responses, d$instrument)
-#' out <- render_result(res[[1]], d$responses, d$instrument)
+#' out <- sframe_format_result(res[[1]], d$responses, d$instrument)
 #' out$caption
 #' out$table
 #' }
-render_result <- function(result, data, instrument = NULL,
+sframe_format_result <- function(result, data, instrument = NULL,
                           palette = c("web", "print"),
                           format = c("html", "png", "svg"),
                           width = 7, height = 4.5, dpi = 150) {

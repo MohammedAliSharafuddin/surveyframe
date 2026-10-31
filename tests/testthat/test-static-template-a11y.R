@@ -10,13 +10,13 @@
 #      A page change replaced the content with no focus move either.
 
 a11y_instrument <- function(required = TRUE) {
-  sf_instrument("Access", components = list(
-    sf_choices("ag3", values = 1:3, labels = c("Low", "Mid", "High")),
-    sf_item("pick", "Pick one", type = "single_choice", choice_set = "ag3",
+  sframe_instrument("Access", components = list(
+    sframe_choice_set("ag3", values = 1:3, labels = c("Low", "Mid", "High")),
+    sframe_item("pick", "Pick one", type = "single_choice", choice_set = "ag3",
             required = required),
-    sf_item("many", "Pick any", type = "multiple_choice", choice_set = "ag3",
+    sframe_item("many", "Pick any", type = "multiple_choice", choice_set = "ag3",
             required = required),
-    sf_item("rate", "Rate us", type = "rating", rating_max = 5,
+    sframe_item("rate", "Rate us", type = "rating", rating_max = 5,
             required = required)
   ))
 }
@@ -85,9 +85,9 @@ test_that("11: the error is tied to the control that has it", {
 
 test_that("11: changing page moves focus to the new heading", {
   skip_if_not_installed("V8")
-  paged <- sf_instrument("Paged", components = list(
-    sf_item("a", "First", type = "text", page = 1),
-    sf_item("b", "Second", type = "text", page = 2)
+  paged <- sframe_instrument("Paged", components = list(
+    sframe_item("a", "First", type = "text", page = 1),
+    sframe_item("b", "Second", type = "text", page = 2)
   ))
   ctx <- static_survey_context(paged)
   ctx$eval("screen='survey'; currentPage=1; renderScreen(); __lastFocused=null; nextPage();")
@@ -105,7 +105,7 @@ test_that("11: changing page moves focus to the new heading", {
 
 exported_html <- function(instrument) {
   path <- tempfile(fileext = ".html")
-  suppressMessages(export_static_survey(instrument, output_path = path,
+  suppressMessages(export_survey(instrument, output_path = path,
                                         open = FALSE))
   on.exit(unlink(path), add = TRUE)
   paste(readLines(path, warn = FALSE, encoding = "UTF-8"), collapse = "\n")
@@ -119,9 +119,9 @@ mobile_block <- function(html) {
 }
 
 test_that("15: the Likert scale stacks below 600px", {
-  nps <- sf_instrument("NPS", components = list(
-    sf_choices("nps", values = 0:10, labels = as.character(0:10)),
-    sf_item("rec", "How likely are you to recommend us?", type = "likert",
+  nps <- sframe_instrument("NPS", components = list(
+    sframe_choice_set("nps", values = 0:10, labels = as.character(0:10)),
+    sframe_item("rec", "How likely are you to recommend us?", type = "likert",
             choice_set = "nps")
   ))
   block <- mobile_block(exported_html(nps))
@@ -136,9 +136,9 @@ test_that("15: the Likert scale stacks below 600px", {
 
 test_that("15: all 11 NPS points are rendered, so none is lost", {
   skip_if_not_installed("V8")
-  nps <- sf_instrument("NPS", components = list(
-    sf_choices("nps", values = 0:10, labels = as.character(0:10)),
-    sf_item("rec", "How likely are you to recommend us?", type = "likert",
+  nps <- sframe_instrument("NPS", components = list(
+    sframe_choice_set("nps", values = 0:10, labels = as.character(0:10)),
+    sframe_item("rec", "How likely are you to recommend us?", type = "likert",
             choice_set = "nps")
   ))
   ctx <- static_survey_context(nps)

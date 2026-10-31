@@ -10,28 +10,28 @@
 #     report.
 
 one_item <- function() {
-  sf_instrument("Core", components = list(
-    sf_item("q1", "How satisfied are you?", type = "numeric")
+  sframe_instrument("Core", components = list(
+    sframe_item("q1", "How satisfied are you?", type = "numeric")
   ))
 }
 
 test_that("3: a failed validation clears the validated stamp", {
   instr <- as_sframe(validate_sframe(one_item(), strict = TRUE))
-  expect_true(isTRUE(sf_meta(instr)$validated))
+  expect_true(isTRUE(sframe_meta(instr)$validated))
 
-  sf_plan(instr) <- list(
+  sframe_plan(instr) <- list(
     list(id = "RQ1", research_question = "What is the average?",
          family = "descriptive", method = "descriptives",
          roles = list(variables = "nowhere"))
   )
   # the setter alone invalidates the stamp, since the content it validated
   # has changed
-  expect_false(isTRUE(sf_meta(instr)$validated))
+  expect_false(isTRUE(sframe_meta(instr)$validated))
 
   res <- validate_sframe(instr, strict = FALSE)
   expect_false(res$valid)
-  expect_false(isTRUE(sf_meta(sf_object(res))$validated))
-  expect_false(isTRUE(sf_meta(as_sframe(res))$validated))
+  expect_false(isTRUE(sframe_meta(sframe_object(res))$validated))
+  expect_false(isTRUE(sframe_meta(as_sframe(res))$validated))
 })
 
 test_that("3: validation clears a stamp it finds already set", {
@@ -39,16 +39,16 @@ test_that("3: validation clears a stamp it finds already set", {
   # fix would otherwise hide
   instr <- as_sframe(validate_sframe(one_item(), strict = TRUE))
   instr$items[[1]]$scale_id <- "no_such_scale"
-  expect_true(isTRUE(sf_meta(instr)$validated))
+  expect_true(isTRUE(sframe_meta(instr)$validated))
 
   res <- validate_sframe(instr, strict = FALSE)
   expect_false(res$valid)
-  expect_false(isTRUE(sf_meta(sf_object(res))$validated))
+  expect_false(isTRUE(sframe_meta(sframe_object(res))$validated))
 })
 
 test_that("3: the print status follows the diagnostic", {
   instr <- as_sframe(validate_sframe(one_item(), strict = TRUE))
-  sf_plan(instr) <- list(list(id = "RQ1", method = "descriptives",
+  sframe_plan(instr) <- list(list(id = "RQ1", method = "descriptives",
                               roles = list(variables = "nowhere")))
   out <- paste(capture.output(print(instr)), collapse = " ")
   expect_false(grepl("\\bvalid\\b", out))
@@ -59,7 +59,7 @@ test_that("4: a malformed plan block is a validation problem", {
   instr$analysis_plan <- list(list())
   res <- validate_sframe(instr, strict = FALSE)
   expect_false(res$valid)
-  expect_match(paste(sf_problems(res), collapse = " "), "[Aa]nalysis plan")
+  expect_match(paste(sframe_problems(res), collapse = " "), "[Aa]nalysis plan")
 
   # a role container that is a bare string bypassed reference checking
   instr2 <- one_item()

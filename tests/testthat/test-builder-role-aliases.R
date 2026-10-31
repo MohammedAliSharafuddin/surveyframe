@@ -18,9 +18,9 @@ inlined_alias_line <- function() {
 }
 
 alias_instrument <- function() {
-  sf_instrument("Aliases", components = lapply(
+  sframe_instrument("Aliases", components = lapply(
     c("unused", "exposure", "mediator", "outcome"),
-    function(id) sf_item(id, id, type = "numeric")))
+    function(id) sframe_item(id, id, type = "numeric")))
 }
 
 test_that("the builder's inlined alias table is R's alias table", {

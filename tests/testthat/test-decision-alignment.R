@@ -18,8 +18,8 @@
 #     summaries, and filtering reported them as too inconsistent.
 
 weights_instrument <- function(order = c("quality", "price")) {
-  sf_instrument(title = "Weights", components = list(
-    sf_item("w", "Divide 100 points", "criteria_weight",
+  sframe_instrument(title = "Weights", components = list(
+    sframe_item("w", "Divide 100 points", "criteria_weight",
             comparison_items = order)))
 }
 
@@ -130,8 +130,8 @@ test_that("D3: a data-frame matrix is read as written, the same as a matrix", {
 })
 
 pairwise_instrument <- function() {
-  sf_instrument(title = "Pairwise", components = list(
-    sf_item("pw", "Compare", "pairwise_comparison",
+  sframe_instrument(title = "Pairwise", components = list(
+    sframe_item("pw", "Compare", "pairwise_comparison",
             comparison_items = c("price", "quality"))))
 }
 
@@ -178,13 +178,13 @@ test_that("9: unavailable consistency ratios are reported as unavailable", {
 })
 
 test_that("D1: rated items pair with differently named weights in declared order, and say so", {
-  ins <- sf_instrument(title = "Rated", components = list(
-    sf_choices("r5", 1:5, as.character(1:5)),
-    sf_item("rate_price", "Price", "matrix", choice_set = "r5",
+  ins <- sframe_instrument(title = "Rated", components = list(
+    sframe_choice_set("r5", 1:5, as.character(1:5)),
+    sframe_item("rate_price", "Price", "matrix", choice_set = "r5",
             matrix_items = c("A1", "A2")),
-    sf_item("rate_quality", "Quality", "matrix", choice_set = "r5",
+    sframe_item("rate_quality", "Quality", "matrix", choice_set = "r5",
             matrix_items = c("A1", "A2")),
-    sf_item("w", "Divide 100 points", "criteria_weight",
+    sframe_item("w", "Divide 100 points", "criteria_weight",
             comparison_items = c("price", "quality"))))
   data <- data.frame(rate_price__A1 = 2, rate_price__A2 = 4,
                      rate_quality__A1 = 5, rate_quality__A2 = 3,

@@ -1,5 +1,5 @@
 # tests/testthat/test-quality-decision-columns.R
-# B10 asked for the pairwise columns to be exempted from quality_report()'s
+# B10 asked for the pairwise columns to be exempted from sframe_quality_results()'s
 # straight-lining and speeding checks. Checking first showed the exemption was
 # already there by construction, and that the real exposure was somewhere
 # else, so these tests pin both facts:
@@ -14,17 +14,17 @@
 crits <- c("service", "price", "delivery")
 
 quality_instrument <- function() {
-  sf_instrument(
+  sframe_instrument(
     title = "Quality", version = "1.0.0",
     components = list(
-      sf_choices("ag5", 1:5, c("a", "b", "c", "d", "e")),
-      sf_item("s1", "I1", type = "likert", choice_set = "ag5", scale_id = "sc"),
-      sf_item("s2", "I2", type = "likert", choice_set = "ag5", scale_id = "sc"),
-      sf_scale("sc", "Scale", items = c("s1", "s2")),
-      sf_item("pw", "Compare", type = "pairwise_comparison",
+      sframe_choice_set("ag5", 1:5, c("a", "b", "c", "d", "e")),
+      sframe_item("s1", "I1", type = "likert", choice_set = "ag5", scale_id = "sc"),
+      sframe_item("s2", "I2", type = "likert", choice_set = "ag5", scale_id = "sc"),
+      sframe_scale("sc", "Scale", items = c("s1", "s2")),
+      sframe_item("pw", "Compare", type = "pairwise_comparison",
               comparison_items = crits, comparison_scale = "saaty",
               required = TRUE),
-      sf_item("cw", "Allocate", type = "criteria_weight",
+      sframe_item("cw", "Allocate", type = "criteria_weight",
               comparison_items = crits, required = TRUE)
     )
   )
@@ -42,7 +42,7 @@ test_that("a constant set of pairwise judgements is not flagged as straight-lini
   # look like zero variance to a naive row-variance check
   for (col in cols) dat[[col]] <- rep(1, 3)
 
-  q <- quality_report(dat, inst)
+  q <- sframe_quality_results(dat, inst)
 
   # only declared scales are examined, and a decision item is never in one
   expect_setequal(names(q$straightline), "sc")
@@ -59,7 +59,7 @@ test_that("skipping a whole pairwise battery is counted as missing", {
   for (col in pw_cols) dat[[col]] <- c(1, 1, NA)
   for (col in cw_cols) dat[[col]] <- c(50, 30, NA)
 
-  q <- quality_report(dat, inst)
+  q <- sframe_quality_results(dat, inst)
 
   # respondent 3 answered both Likert items and skipped all 6 decision
   # columns, so its missing rate must be well above zero
@@ -80,24 +80,24 @@ test_that("a fully answered decision battery reports no missingness", {
   for (col in pw_cols) dat[[col]] <- c(1, 3)
   for (col in cw_cols) dat[[col]] <- c(40, 30)
 
-  q <- quality_report(dat, inst)
+  q <- sframe_quality_results(dat, inst)
   expect_equal(unname(q$missing$respondent_miss), c(0, 0))
 })
 
 test_that("matrix expansion columns also count towards missingness now", {
   # Same defect, same fix. Matrix items post as item__sub and were invisible
   # to the missingness check for the same reason.
-  inst <- sf_instrument(
+  inst <- sframe_instrument(
     title = "Matrix", version = "1.0.0",
     components = list(
-      sf_choices("ag5", 1:5, c("a", "b", "c", "d", "e")),
-      sf_item("mx", "Rate", type = "matrix",
+      sframe_choice_set("ag5", 1:5, c("a", "b", "c", "d", "e")),
+      sframe_item("mx", "Rate", type = "matrix",
               matrix_items = c("r1", "r2"), choice_set = "ag5")
     )
   )
   dat <- data.frame(mx__r1 = c(3, NA), mx__r2 = c(4, NA))
 
-  q <- quality_report(dat, inst)
+  q <- sframe_quality_results(dat, inst)
   expect_true(all(c("mx__r1", "mx__r2") %in% names(q$missing$item_miss_rate)))
   expect_equal(unname(q$missing$respondent_miss), c(0, 1))
 })

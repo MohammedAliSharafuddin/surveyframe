@@ -31,5 +31,5 @@ groups <- sframe_likert_scale_groups(demo$instrument)
 names(groups)
 }
 \seealso{
-\code{\link[=sframe_plot_likert_scale]{sframe_plot_likert_scale()}}, \code{\link[=sf_scale]{sf_scale()}}
+\code{\link[=sframe_plot_likert_scale]{sframe_plot_likert_scale()}}, \code{\link[=sframe_scale]{sframe_scale()}}
 }

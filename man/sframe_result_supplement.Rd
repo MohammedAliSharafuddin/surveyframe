@@ -28,12 +28,12 @@ fails there and the renderer falls back to the built-in HTML engine without
 saying why.
 }
 \examples{
-instr <- sf_instrument("Moderation demo", components = list(
-  sf_item("y", "Outcome", type = "numeric"),
-  sf_item("x", "Predictor", type = "numeric"),
-  sf_item("w", "Moderator", type = "numeric")
+instr <- sframe_instrument("Moderation demo", components = list(
+  sframe_item("y", "Outcome", type = "numeric"),
+  sframe_item("x", "Predictor", type = "numeric"),
+  sframe_item("w", "Moderator", type = "numeric")
 ))
-sf_plan(instr) <- list(list(
+sframe_plan(instr) <- list(list(
   id = "RQ1", research_question = "Does w moderate x?",
   family = "inferential", method = "moderation",
   roles = list(outcome = "y", predictor = "x", moderator = "w")
@@ -50,5 +50,5 @@ results <- run_analysis_plan(responses, instr)
 sframe_result_supplement(results$RQ1)
 }
 \seealso{
-\code{\link[=run_analysis_plan]{run_analysis_plan()}}, \code{\link[=render_report]{render_report()}}, \code{\link[=analysis_syntax]{analysis_syntax()}}
+\code{\link[=run_analysis_plan]{run_analysis_plan()}}, \code{\link[=render_report]{render_report()}}, \code{\link[=sframe_syntax_result]{sframe_syntax_result()}}
 }

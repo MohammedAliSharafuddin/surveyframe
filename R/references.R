@@ -34,7 +34,7 @@ sframe_reference_types <- c(
 #'
 #' Builds one bibliographic reference as a CSL-JSON record, the format that
 #' Zotero, Mendeley and pandoc share. Attach references to an instrument with
-#' [add_references()] or through `sf_instrument(components = )`, cite them in
+#' [sframe_add_references()] or through `sframe_instrument(components = )`, cite them in
 #' text as `[@id]`, and [render_report()] lists every cited reference once, at
 #' the end of the report.
 #'
@@ -66,10 +66,10 @@ sframe_reference_types <- c(
 #'   `"plan:<block id>"` or `"model:<id>"`. Optional.
 #'
 #' @return An object of class `sf_reference`.
-#' @seealso [read_bibtex()], [add_references()], [sframe_references()]
+#' @seealso [read_bibtex()], [sframe_add_references()], [sframe_get_references()]
 #' @export
 #' @examples
-#' ref <- sf_reference(
+#' ref <- sframe_reference(
 #'   id = "cronbach_1951", type = "article-journal",
 #'   author = "Cronbach, L. J.", year = 1951,
 #'   title = "Coefficient alpha and the internal structure of tests",
@@ -77,7 +77,7 @@ sframe_reference_types <- c(
 #'   pages = "297-334", cited_by = "scale:satisfaction"
 #' )
 #' ref$id
-sf_reference <- function(id,
+sframe_reference <- function(id,
                          title,
                          author    = NULL,
                          year      = NULL,
@@ -197,7 +197,7 @@ sframe_reference_targets <- function(x, id) {
 #' Read references from BibTeX
 #'
 #' Parses BibTeX, the format Google Scholar, Zotero, Mendeley and most journal
-#' pages export, into [sf_reference()] records. Covers the common entry types
+#' pages export, into [sframe_reference()] records. Covers the common entry types
 #' (`@article`, `@book`, `@incollection`, `@inbook`, `@inproceedings`,
 #' `@techreport`, `@phdthesis`, `@mastersthesis`, `@misc`, `@online`,
 #' `@software`, `@dataset`, `@unpublished`) and the common fields. Accented
@@ -207,7 +207,7 @@ sframe_reference_targets <- function(x, id) {
 #' @param text BibTeX as a character string, used instead of `file`, for
 #'   example an entry pasted from Google Scholar.
 #' @param cited_by Optional `cited_by` targets given to every entry read, see
-#'   [sf_reference()].
+#'   [sframe_reference()].
 #'
 #' @return A list of `sf_reference` objects, named by citation key. An entry
 #'   that fails to parse is skipped with a warning naming it. A key used by
@@ -431,7 +431,7 @@ sframe_bibtex_to_reference <- function(entry, cited_by = NULL) {
   type <- sframe_bibtex_type(entry$type, f)
   container <- f$journal %||% f$journaltitle %||% f$booktitle %||% f$series
   year <- f$year %||% (if (!is.null(f$date)) substr(f$date, 1, 4))
-  sf_reference(
+  sframe_reference(
     id = key,
     title = title,
     author = sframe_bibtex_split_names(f$author),
@@ -454,7 +454,7 @@ sframe_bibtex_to_reference <- function(entry, cited_by = NULL) {
 
 #' Add references to an instrument
 #'
-#' Attaches [sf_reference()] records to an instrument. A reference whose id is
+#' Attaches [sframe_reference()] records to an instrument. A reference whose id is
 #' already present replaces the old one when `replace = TRUE`, and is refused
 #' otherwise, which keeps a second source from silently taking over a citation key.
 #' `cited_by` targets of a replaced reference are merged.
@@ -471,17 +471,17 @@ sframe_bibtex_to_reference <- function(entry, cited_by = NULL) {
 #' @return The instrument, with the references added.
 #' @export
 #' @examples
-#' instr <- sf_instrument("Demo", components = list(
-#'   sf_item("q1", "How satisfied are you?", "likert", choice_set = "agree5"),
-#'   sf_choices("agree5", 1:5, c("SD", "D", "N", "A", "SA"))
+#' instr <- sframe_instrument("Demo", components = list(
+#'   sframe_item("q1", "How satisfied are you?", "likert", choice_set = "agree5"),
+#'   sframe_choice_set("agree5", 1:5, c("SD", "D", "N", "A", "SA"))
 #' ))
-#' instr <- add_references(instr, sf_reference(
+#' instr <- sframe_add_references(instr, sframe_reference(
 #'   "likert_1932", "A technique for the measurement of attitudes",
 #'   author = "Likert, R.", year = 1932, container = "Archives of Psychology",
 #'   volume = "22", issue = "140", pages = "1-55", cited_by = "item:q1"
 #' ))
-#' length(sframe_references(instr))
-add_references <- function(instrument, ..., replace = FALSE) {
+#' length(sframe_get_references(instr))
+sframe_add_references <- function(instrument, ..., replace = FALSE) {
   sframe_check_instrument(instrument)
   refs <- sframe_flatten_references(list(...))
   current <- instrument$references %||% list()
@@ -511,7 +511,7 @@ sframe_flatten_references <- function(x) {
   for (el in x) {
     if (inherits(el, "sf_reference")) out[[length(out) + 1L]] <- el
     else if (is.list(el)) out <- c(out, sframe_flatten_references(el))
-    else sframe_abort_validation("add_references() takes sf_reference objects, or lists of them.")
+    else sframe_abort_validation("sframe_add_references() takes references made by sframe_reference(), or lists of them.")
   }
   out
 }
@@ -526,8 +526,8 @@ sframe_flatten_references <- function(x) {
 #' @export
 #' @examples
 #' instr <- sframe_demo("likert_scale")$instrument
-#' sframe_references(instr)
-sframe_references <- function(instrument, cited_by = NULL) {
+#' sframe_get_references(instr)
+sframe_get_references <- function(instrument, cited_by = NULL) {
   sframe_check_instrument(instrument)
   refs <- instrument$references %||% list()
   if (!is.null(cited_by)) refs <- Filter(function(r) any(cited_by %in% (r$cited_by %||% character(0))), refs)
@@ -558,7 +558,7 @@ sframe_references <- function(instrument, cited_by = NULL) {
 #' cat(substr(sframe_bibliography(instr), 1, 200))
 sframe_bibliography <- function(instrument = NULL, results = NULL, extra = NULL, file = NULL) {
   refs <- list()
-  if (!is.null(instrument)) refs <- c(refs, sframe_references(instrument))
+  if (!is.null(instrument)) refs <- c(refs, sframe_get_references(instrument))
   if (!is.null(extra)) refs <- c(refs, sframe_flatten_references(list(extra)))
   refs <- c(refs, sframe_method_references(results))
   seen <- character(0)
@@ -777,7 +777,7 @@ sframe_intext_citation <- function(keys) {
 # ones, and any built-in method reference (looked up when cited).
 sframe_reference_index <- function(instrument = NULL, extra = NULL) {
   refs <- list()
-  if (!is.null(instrument)) refs <- c(refs, unname(sframe_references(instrument)))
+  if (!is.null(instrument)) refs <- c(refs, unname(sframe_get_references(instrument)))
   if (!is.null(extra)) refs <- c(refs, sframe_flatten_references(list(extra)))
   stats::setNames(refs, vapply(refs, function(r) r$id, character(1)))
 }

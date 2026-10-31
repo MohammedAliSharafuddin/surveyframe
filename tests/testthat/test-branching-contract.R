@@ -13,13 +13,13 @@
 #      question the branching excludes, which serialisation then blanked.
 
 multi_instrument <- function() {
-  sf_instrument("Branching", components = list(
-    sf_choices("food", values = c("a", "b", "c"),
+  sframe_instrument("Branching", components = list(
+    sframe_choice_set("food", values = c("a", "b", "c"),
                labels = c("Apples", "Bread", "Cheese")),
-    sf_item("bought", "What did you buy?", type = "multiple_choice",
+    sframe_item("bought", "What did you buy?", type = "multiple_choice",
             choice_set = "food"),
-    sf_item("why", "Why those?", type = "text"),
-    sf_branch("why", depends_on = "bought", operator = "%in%",
+    sframe_item("why", "Why those?", type = "text"),
+    sframe_branch("why", depends_on = "bought", operator = "%in%",
               value = c("a", "b"))
   ))
 }
@@ -53,12 +53,12 @@ test_that("19: a multi-select answer matches a rule on any of its values", {
 # ── #20: one contract across both evaluators ─────────────────────────────
 
 two_rule_instrument <- function() {
-  sf_instrument("Compound", components = list(
-    sf_item("age", "Age", type = "numeric"),
-    sf_item("country", "Country", type = "text"),
-    sf_item("detail", "Tell us more", type = "text"),
-    sf_branch("detail", depends_on = "age", operator = ">=", value = 18),
-    sf_branch("detail", depends_on = "country", operator = "==", value = "UK")
+  sframe_instrument("Compound", components = list(
+    sframe_item("age", "Age", type = "numeric"),
+    sframe_item("country", "Country", type = "text"),
+    sframe_item("detail", "Tell us more", type = "text"),
+    sframe_branch("detail", depends_on = "age", operator = ">=", value = 18),
+    sframe_branch("detail", depends_on = "country", operator = "==", value = "UK")
   ))
 }
 
@@ -78,12 +78,12 @@ test_that("20: every rule on an item is kept, and they combine with AND", {
 })
 
 test_that("20: a hidden controlling item counts as unanswered", {
-  instr <- sf_instrument("Cascade", components = list(
-    sf_item("own", "Do you own a car?", type = "text"),
-    sf_item("make", "Which make?", type = "text"),
-    sf_item("year", "Which year?", type = "text"),
-    sf_branch("make", depends_on = "own", operator = "==", value = "yes"),
-    sf_branch("year", depends_on = "make", operator = "==", value = "Ford")
+  instr <- sframe_instrument("Cascade", components = list(
+    sframe_item("own", "Do you own a car?", type = "text"),
+    sframe_item("make", "Which make?", type = "text"),
+    sframe_item("year", "Which year?", type = "text"),
+    sframe_branch("make", depends_on = "own", operator = "==", value = "yes"),
+    sframe_branch("year", depends_on = "make", operator = "==", value = "Ford")
   ))
   lookup <- sframe_branch_lookup(instr)
   by_id <- function(id) Filter(function(i) i$id == id, instr$items)[[1]]
@@ -100,11 +100,11 @@ test_that("20: a hidden controlling item counts as unanswered", {
 })
 
 test_that("20: a rule cycle terminates", {
-  instr <- sf_instrument("Cycle", components = list(
-    sf_item("a", "A", type = "text"),
-    sf_item("b", "B", type = "text"),
-    sf_branch("a", depends_on = "b", operator = "==", value = "x"),
-    sf_branch("b", depends_on = "a", operator = "==", value = "x")
+  instr <- sframe_instrument("Cycle", components = list(
+    sframe_item("a", "A", type = "text"),
+    sframe_item("b", "B", type = "text"),
+    sframe_branch("a", depends_on = "b", operator = "==", value = "x"),
+    sframe_branch("b", depends_on = "a", operator = "==", value = "x")
   ))
   lookup <- sframe_branch_lookup(instr)
   expect_no_error(sframe_item_visible(instr$items[[1]],

@@ -1,17 +1,17 @@
 # tests/testthat/test-branching-in-values.R
 # Guards multi-value `%in%` branch rules. The value arrives either as a vector,
-# which sf_branch() documents, or as a comma-separated string, and all 3
+# which sframe_branch() documents, or as a comma-separated string, and all 3
 # evaluators have to accept both. When they did not, a gated question stayed
 # hidden whatever the respondent answered, with no error anywhere.
 
 branch_instrument <- function(value) {
-  sf_instrument(
+  sframe_instrument(
     title = "Branching", version = "1.0.0",
     components = list(
-      sf_choices("abc", c("a", "b", "c", "d"), c("A", "B", "C", "D")),
-      sf_item("q1", "Pick one", type = "single_choice", choice_set = "abc"),
-      sf_item("q2", "Gated", type = "text"),
-      sf_branch(item_id = "q2", depends_on = "q1", operator = "%in%",
+      sframe_choice_set("abc", c("a", "b", "c", "d"), c("A", "B", "C", "D")),
+      sframe_item("q1", "Pick one", type = "single_choice", choice_set = "abc"),
+      sframe_item("q2", "Gated", type = "text"),
+      sframe_branch(item_id = "q2", depends_on = "q1", operator = "%in%",
                 value = value, action = "show")
     )
   )
@@ -63,7 +63,7 @@ test_that("a multi-value %in% rule survives write_sframe() as an array", {
   p <- tempfile(fileext = ".sframe")
   write_sframe(instr, p, overwrite = TRUE)
   written <- jsonlite::fromJSON(p, simplifyVector = FALSE)
-  # the array shape is the contract sf_branch() documents, so it must reach
+  # the array shape is the contract sframe_branch() documents, so it must reach
   # the file intact rather than being flattened on the way
   expect_length(written$branching[[1]]$value, 3L)
   back <- read_sframe(p)

@@ -11,8 +11,8 @@
 #      beside the instrument hash, implying an analysis that never ran.
 
 seed_instrument <- function(with_plan = TRUE) {
-  instr <- sf_instrument("Seeded", components = list(
-    sf_item("q1", "A number", type = "numeric")))
+  instr <- sframe_instrument("Seeded", components = list(
+    sframe_item("q1", "A number", type = "numeric")))
   if (with_plan) {
     instr$analysis_plan <- list(list(
       id = "RQ1", research_question = "What is the average?",

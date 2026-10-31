@@ -7,11 +7,11 @@
 # read as a declaration problem they did not have. Found during the D2.6 audit.
 
 spaced_instrument <- function() {
-  sf_instrument(
+  sframe_instrument(
     title = "Spaced", version = "1.0.0",
     components = list(
-      sf_choices("cs", 1:3, c("Low", "Mid", "High")),
-      sf_item("q1", "Q", type = "matrix",
+      sframe_choice_set("cs", 1:3, c("Low", "Mid", "High")),
+      sframe_item("q1", "Q", type = "matrix",
               matrix_items = c("Row one", "Row two"), choice_set = "cs")
     )
   )
@@ -73,15 +73,15 @@ test_that("matrix and ranking items analyse end to end once names survive", {
   # D2.6 asked whether these types work without extra hand-coding. They do,
   # provided the header is not rewritten on the way in.
   for (ty in c("matrix", "ranking")) {
-    comps <- list(sf_choices("cs", 1:3, c("Low", "Mid", "High")))
+    comps <- list(sframe_choice_set("cs", 1:3, c("Low", "Mid", "High")))
     args <- list(id = "q1", label = "Q", type = ty, choice_set = "cs")
     if (ty == "matrix") args$matrix_items <- c("Row one", "Row two")
-    comps <- c(comps, list(do.call(sf_item, args)))
+    comps <- c(comps, list(do.call(sframe_item, args)))
 
-    base <- sf_instrument(title = "t", version = "1.0.0", components = comps)
+    base <- sframe_instrument(title = "t", version = "1.0.0", components = comps)
     cols <- sframe_item_expansion_columns(base)
 
-    inst <- sf_instrument(
+    inst <- sframe_instrument(
       title = "E2E", version = "1.0.0", components = comps,
       analysis_plan = list(list(
         id = "RQ1", research_question = "Spread?", family = "descriptive",

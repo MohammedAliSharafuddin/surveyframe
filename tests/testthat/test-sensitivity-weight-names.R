@@ -1,5 +1,5 @@
 # tests/testthat/test-sensitivity-weight-names.R
-# Named weights match criteria by name in sensitivity_analysis(), as the
+# Named weights match criteria by name in sframe_sensitivity_analysis(), as the
 # ranking blocks already do. Unknown or missing names are errors, unnamed
 # weights stay positional.
 
@@ -17,10 +17,10 @@ wn_args <- function(...) {
 }
 
 test_that("named weights in another order give the same result as in order", {
-  ordered <- do.call(sensitivity_analysis,
+  ordered <- do.call(sframe_sensitivity_analysis,
                      wn_args(weights = c(service = 0.5, location = 0.3,
                                          price = 0.2)))
-  shuffled <- do.call(sensitivity_analysis,
+  shuffled <- do.call(sframe_sensitivity_analysis,
                       wn_args(weights = c(price = 0.2, service = 0.5,
                                           location = 0.3)))
   expect_equal(shuffled$table, ordered$table)
@@ -30,21 +30,21 @@ test_that("named weights in another order give the same result as in order", {
 
 test_that("a weight name that is not a criterion is an error naming it", {
   expect_error(
-    do.call(sensitivity_analysis,
+    do.call(sframe_sensitivity_analysis,
             wn_args(weights = c(service = 0.5, location = 0.3, cost = 0.2))),
     "cost")
 })
 
 test_that("a criterion with no named weight is an error naming it", {
   expect_error(
-    do.call(sensitivity_analysis,
+    do.call(sframe_sensitivity_analysis,
             wn_args(weights = c(service = 0.5, service = 0.3, location = 0.2))),
     "price")
 })
 
 test_that("unnamed weights stay positional", {
-  a <- do.call(sensitivity_analysis, wn_args())
-  b <- do.call(sensitivity_analysis,
+  a <- do.call(sframe_sensitivity_analysis, wn_args())
+  b <- do.call(sframe_sensitivity_analysis,
                wn_args(weights = c(service = 0.5, location = 0.3, price = 0.2)))
   expect_equal(a$table, b$table)
 })

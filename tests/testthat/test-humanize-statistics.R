@@ -4,13 +4,13 @@
 # happened to equal a code ("Suggested factors" 2) printed as "Disagree".
 
 humanize_instr <- function() {
-  sf_instrument(
+  sframe_instrument(
     "Humanize statistics",
     components = list(
-      sf_choices("ag5", values = 1:5,
+      sframe_choice_set("ag5", values = 1:5,
                  labels = c("Strongly disagree", "Disagree", "Neutral",
                             "Agree", "Strongly agree")),
-      sf_item("q1", "Service quality", type = "likert", choice_set = "ag5")
+      sframe_item("q1", "Service quality", type = "likert", choice_set = "ag5")
     )
   )
 }

@@ -11,7 +11,7 @@ hold.
 Every report that has a natural chart carries a \code{plot()} method, so a
 report draws without naming a helper:
 \itemize{
-\item \code{plot(reliability_report(...))} draws one report.
+\item \code{plot(sframe_reliability_results(...))} draws one report.
 \item \code{plot(results)} draws each block of an analysis that has a chart.
 \item \code{plot(results, which = "RQ1")} selects one block by its ID.
 }

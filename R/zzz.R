@@ -18,7 +18,7 @@ sframe_startup_message <- function() {
   paste0(
     "surveyframe ", utils::packageVersion("surveyframe"),
     ": survey instruments, from design to report.\n",
-    "Try a demo (sframe_demos() lists all of them):\n",
+    "Try a demo (sframe_list_demos() lists all of them):\n",
     "  preview_demo(\"two_group\")                    # respondent view\n",
     "  preview_demo(\"two_group\", where = \"studio\")  # in SurveyStudio\n",
     "  demo <- sframe_demo(\"two_group\")             # instrument and data\n",

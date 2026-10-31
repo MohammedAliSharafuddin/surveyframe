@@ -113,7 +113,7 @@ The Amendments screen discloses a change to the open instrument: upload a
 revised `.sframe`, give a reason and an explanation, and `amend_sframe()`
 appends the change to the instrument's amendment log, where every earlier
 entry stays as it was written. Exporting the amended instrument keeps that log inside the
-`.sframe` file, readable later with `amendment_log()`.
+`.sframe` file, readable later with `sframe_get_amendments()`.
 
 The References screen lists the works the instrument cites and adds more from
 pasted BibTeX, each with where the instrument cites it. Citing a source needs

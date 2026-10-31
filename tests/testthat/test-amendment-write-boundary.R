@@ -11,14 +11,14 @@
 #     never written.
 # Batch 5, finding 9. The caller chose the tier, so a plan or model change could
 #     be recorded as "pipeline" with no deviation report.
-# Batch 5, finding 4. link_git_commit() returned HEAD with linked = TRUE without
+# Batch 5, finding 4. sframe_link_git_commit() returned HEAD with linked = TRUE without
 #     comparing the instrument to anything in the repository.
 # G5 and G3. The provenance, read and write help promised more than the code does.
 
 base_instrument <- function(label = "How satisfied are you?") {
-  sf_instrument(title = "Revisions", components = list(
-    sf_item("q1", label, "text"),
-    sf_item("q2", "Anything else?", "text")))
+  sframe_instrument(title = "Revisions", components = list(
+    sframe_item("q1", label, "text"),
+    sframe_item("q2", "Anything else?", "text")))
 }
 
 written <- function(instrument) {
@@ -44,7 +44,7 @@ test_that("E2: the same edit disclosed through amend_sframe() writes and reads b
   path <- tempfile(fileext = ".sframe")
   expect_no_error(write_sframe(amended, path))
   back <- read_sframe(path)
-  expect_identical(nrow(amendment_log(back)), 1L)
+  expect_identical(nrow(sframe_get_amendments(back)), 1L)
   expect_identical(back$items[[1]]$label, "Openly changed")
 })
 
@@ -154,7 +154,7 @@ test_that("8: an amendment's new_hash is the content that is written", {
   amended <- amend_sframe(previous, after, reason_code = "instrument_revision",
                           reason_text = "Fresh.", deviation_report = "Wording.")
   back <- read_sframe(written(amended))
-  expect_identical(amendment_log(back)$new_hash, sframe_content_hash(back))
+  expect_identical(sframe_get_amendments(back)$new_hash, sframe_content_hash(back))
 })
 
 test_that("9: a plan change cannot be recorded as a pipeline amendment", {
@@ -172,7 +172,7 @@ test_that("9: a plan change cannot be recorded as a pipeline amendment", {
     "deviation_report", class = "sframe_error")
 })
 
-test_that("4: link_git_commit() verifies the instrument only against a committed file", {
+test_that("4: sframe_link_git_commit() verifies the instrument only against a committed file", {
   skip_if(!nzchar(Sys.which("git")), "git not available")
   repo <- tempfile("repo"); dir.create(repo)
   git <- function(...) system2("git", c("-C", shQuote(repo), ...), stdout = TRUE, stderr = TRUE)
@@ -182,15 +182,15 @@ test_that("4: link_git_commit() verifies the instrument only against a committed
   write_sframe(ins, path)
   git("add", "study.sframe"); git("commit", "-q", "-m", shQuote("add instrument"))
 
-  same <- link_git_commit(read_sframe(path), repo_path = repo, path = "study.sframe")
+  same <- sframe_link_git_commit(read_sframe(path), repo_path = repo, path = "study.sframe")
   expect_true(same$linked)
   expect_true(same$verified)
 
   changed <- base_instrument("Different content")
-  other <- link_git_commit(changed, repo_path = repo, path = "study.sframe")
+  other <- sframe_link_git_commit(changed, repo_path = repo, path = "study.sframe")
   expect_false(other$verified)
 
-  pointer <- link_git_commit(ins, repo_path = repo)
+  pointer <- sframe_link_git_commit(ins, repo_path = repo)
   expect_false(pointer$verified)
   expect_match(pointer$reason, "path")
 })

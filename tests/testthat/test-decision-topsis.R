@@ -109,11 +109,11 @@ hotel_instrument <- function(roles = list(weights_item = "crit_pairs"),
     criteria       = crits,
     criteria_types = c("benefit", "benefit", "cost", "cost")
   )
-  sf_instrument(
+  sframe_instrument(
     title = "Hotel supplier selection",
     version = "1.0.0",
     components = list(
-      sf_item("crit_pairs", "Compare the importance of each pair of criteria",
+      sframe_item("crit_pairs", "Compare the importance of each pair of criteria",
               type = "pairwise_comparison", comparison_items = crits,
               comparison_scale = "saaty", required = TRUE)
     ),
@@ -194,16 +194,16 @@ test_that("supplied weights take precedence over a collected item", {
 })
 
 test_that("a fully collected performance matrix resolves through path C", {
-  study <- sf_instrument(
+  study <- sframe_instrument(
     title = "Rated suppliers",
     components = list(
-      sf_choices("q5", values = 1:5,
+      sframe_choice_set("q5", values = 1:5,
                  labels = c("Very poor", "Poor", "Fair", "Good", "Excellent")),
-      sf_item("crit_points", "Divide 100 points", type = "criteria_weight",
+      sframe_item("crit_points", "Divide 100 points", type = "criteria_weight",
               comparison_items = c("service", "price")),
-      sf_item("rate_service", "Rate service", type = "matrix",
+      sframe_item("rate_service", "Rate service", type = "matrix",
               matrix_items = c("Alpha", "Basilica"), choice_set = "q5"),
-      sf_item("rate_price", "Rate value for money", type = "matrix",
+      sframe_item("rate_price", "Rate value for money", type = "matrix",
               matrix_items = c("Alpha", "Basilica"), choice_set = "q5")
     ),
     analysis_plan = list(
@@ -239,10 +239,10 @@ test_that("a missing input is a typed error naming what to supply", {
   expect_match(res$error, "needs criterion weights")
   expect_match(res$error, "weights_item")
 
-  no_matrix <- sf_instrument(
+  no_matrix <- sframe_instrument(
     title = "No matrix",
     components = list(
-      sf_item("crit_points", "Divide 100 points", type = "criteria_weight",
+      sframe_item("crit_points", "Divide 100 points", type = "criteria_weight",
               comparison_items = c("service", "price"))
     ),
     analysis_plan = list(
@@ -259,10 +259,10 @@ test_that("a missing input is a typed error naming what to supply", {
 })
 
 test_that("a weight vector of the wrong length is reported, not recycled", {
-  study <- sf_instrument(
+  study <- sframe_instrument(
     title = "Mismatch",
     components = list(
-      sf_item("crit_points", "Divide 100 points", type = "criteria_weight",
+      sframe_item("crit_points", "Divide 100 points", type = "criteria_weight",
               comparison_items = c("service", "price"))
     ),
     analysis_plan = list(

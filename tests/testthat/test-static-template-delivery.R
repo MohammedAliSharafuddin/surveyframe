@@ -9,8 +9,8 @@
 # nobody's hands.
 
 delivery_instrument <- function() {
-  sf_instrument("Delivery", components = list(
-    sf_item("q1", "How was it?", type = "text")
+  sframe_instrument("Delivery", components = list(
+    sframe_item("q1", "How was it?", type = "text")
   ))
 }
 

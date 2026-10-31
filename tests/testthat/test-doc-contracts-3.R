@@ -11,18 +11,18 @@
 
 source_of <- function(file) sframe_source_text("R", file)
 
-test_that("12: the package page documents the three naming families", {
+test_that("12: the package page documents the 2 kinds of name", {
   src <- source_of("surveyframe-package.R")
   expect_match(src, "How functions are named", fixed = TRUE)
-  # each family named, with the claim that they do not pair
-  expect_match(src, "sf_` builds or reads", fixed = TRUE)
-  expect_match(src, "sframe_` covers", fixed = TRUE)
-  expect_match(src, "carry no prefix", fixed = TRUE)
-  # the no-pairing claim under test: no stem exists under both prefixes
+  # both kinds named, and the old names pointed to
+  expect_match(src, "Everything else takes `sframe_`", fixed = TRUE)
+  expect_match(src, "No 2 names sit 1 letter apart", fixed = TRUE)
+  expect_match(src, "carry no", fixed = TRUE)
+  # only the superseded wrappers keep the old sf_ prefix
   ex <- sframe_exports()
-  stems_sf <- sub("^sf_", "", grep("^sf_", ex, value = TRUE))
-  stems_sframe <- sub("^sframe_", "", grep("^sframe_", ex, value = TRUE))
-  expect_length(intersect(stems_sf, stems_sframe), 0)
+  old <- grep("^sf_", ex, value = TRUE)
+  wrappers <- old[vapply(old, function(nm) any(grepl("sframe_superseded(", deparse(body(get(nm, asNamespace("surveyframe")))), fixed = TRUE)), logical(1))]
+  expect_setequal(old, wrappers)
 })
 
 test_that("13: every export carries an example section", {
@@ -38,13 +38,10 @@ test_that("13: every export carries an example section", {
   expect_equal(setdiff(ex, documented), character(0))
 })
 
-test_that("15: the two CFA syntax functions say which to use", {
-  general <- source_of("model_layer.R")
-  wrapper <- source_of("psychometrics.R")
-  expect_match(general, "cfa_syntax()", fixed = TRUE)
-  expect_match(wrapper, "cfa_lavaan_syntax()", fixed = TRUE)
-  # both still exported, since removing the wrapper breaks public scripts
+test_that("15: the 2 CFA syntax functions are 1, and both old names still work", {
   exported <- sframe_exports()
+  expect_true("sframe_syntax_cfa" %in% exported)
+  # removing either old name would break public scripts
   expect_true(all(c("cfa_syntax", "cfa_lavaan_syntax") %in% exported))
 })
 
@@ -60,9 +57,9 @@ test_that("17: the plot family has a selection guide naming inputs", {
 test_that("18: the report family index separates the two shapes", {
   src <- source_of("reporting.R")
   expect_match(src, "sframe_reports", fixed = TRUE)
-  # the claim under test: codebook_report() returns an object, and
+  # the claim under test: sframe_codebook() returns an object, and
   # render_report() writes a file
-  book <- codebook_report(sframe_demo_data()$instrument)
+  book <- sframe_codebook(sframe_demo_data()$instrument)
   expect_s3_class(book, "sframe_codebook")
 })
 

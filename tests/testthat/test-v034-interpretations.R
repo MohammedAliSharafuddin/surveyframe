@@ -4,13 +4,13 @@
 # the pre-declared decision rule, never written into the instrument.
 
 interp_fixture <- function() {
-  cs <- sf_choices("ag5", 1:5,
+  cs <- sframe_choice_set("ag5", 1:5,
     c("Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"))
-  i1 <- sf_item("sat_1", "The service was fast.", type = "likert",
+  i1 <- sframe_item("sat_1", "The service was fast.", type = "likert",
                 choice_set = "ag5", required = TRUE)
-  i2 <- sf_item("sat_2", "The service was friendly.", type = "likert",
+  i2 <- sframe_item("sat_2", "The service was friendly.", type = "likert",
                 choice_set = "ag5", required = TRUE)
-  instr <- sf_instrument("Interpretation check",
+  instr <- sframe_instrument("Interpretation check",
     components = list(cs, i1, i2),
     analysis_plan = list(
       list(id = "rq_fast", research_question = "How fast was the service?",

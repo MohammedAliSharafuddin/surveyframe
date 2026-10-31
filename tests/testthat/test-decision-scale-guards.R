@@ -9,17 +9,17 @@
 crits <- c("Service quality", "Price", "Delivery time")
 
 scale_instrument <- function(plan) {
-  sf_instrument(
+  sframe_instrument(
     title   = "Comparison scale guards",
     version = "1.0.0",
     components = list(
-      sf_item("pw_saaty", "Compare the criteria", type = "pairwise_comparison",
+      sframe_item("pw_saaty", "Compare the criteria", type = "pairwise_comparison",
               comparison_items = crits, comparison_scale = "saaty",
               required = TRUE),
-      sf_item("pw_infl", "Influence among the criteria",
+      sframe_item("pw_infl", "Influence among the criteria",
               type = "pairwise_comparison", comparison_items = crits,
               comparison_scale = "influence", required = TRUE),
-      sf_item("cw", "Divide 100 points", type = "criteria_weight",
+      sframe_item("cw", "Divide 100 points", type = "criteria_weight",
               comparison_items = crits, required = TRUE)
     ),
     analysis_plan = plan

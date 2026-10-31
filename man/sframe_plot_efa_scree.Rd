@@ -7,7 +7,7 @@
 sframe_plot_efa_scree(x, palette = c("web", "print"))
 }
 \arguments{
-\item{x}{An \code{sframe_efa_report} object from \code{\link[=efa_report]{efa_report()}}.}
+\item{x}{An \code{sframe_efa_report} object from \code{\link[=sframe_efa_readiness_results]{sframe_efa_readiness_results()}}.}
 
 \item{palette}{One of \code{"web"} or \code{"print"}. See \code{sframe_brand()}.}
 }
@@ -15,7 +15,7 @@ sframe_plot_efa_scree(x, palette = c("web", "print"))
 A ggplot2 object.
 }
 \description{
-Plots the parallel-analysis eigenvalues from \code{\link[=efa_report]{efa_report()}} (both the
+Plots the parallel-analysis eigenvalues from \code{\link[=sframe_efa_readiness_results]{sframe_efa_readiness_results()}} (both the
 observed factor-analysis eigenvalues and the simulated comparison line),
 with the suggested factor count marked.
 }
@@ -24,11 +24,11 @@ with the suggested factor count marked.
 if (requireNamespace("ggplot2", quietly = TRUE) &&
     requireNamespace("psych", quietly = TRUE)) {
   demo <- sframe_demo_data()
-  er <- efa_report(demo$responses, demo$instrument)
+  er <- sframe_efa_readiness_results(demo$responses, demo$instrument)
   sframe_plot_efa_scree(er)
 }
 }
 }
 \seealso{
-\code{\link[=efa_report]{efa_report()}}
+\code{\link[=sframe_efa_readiness_results]{sframe_efa_readiness_results()}}
 }

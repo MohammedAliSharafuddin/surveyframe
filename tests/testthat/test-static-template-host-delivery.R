@@ -7,9 +7,9 @@
 # could not be hidden, and a closed tab lost every answer.
 
 host_instrument <- function(render = list()) {
-  ins <- sf_instrument("Delivery", components = list(
-    sf_item("q1", "How was it?", type = "text"),
-    sf_item("q2", "Anything else?", type = "text")))
+  ins <- sframe_instrument("Delivery", components = list(
+    sframe_item("q1", "How was it?", type = "text"),
+    sframe_item("q2", "Anything else?", type = "text")))
   ins$render <- render
   ins
 }

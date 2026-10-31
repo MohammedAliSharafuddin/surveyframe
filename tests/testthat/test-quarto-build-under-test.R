@@ -13,8 +13,8 @@ test_that("the Quarto report was rendered by the build under test", {
   skip_if(!nzchar(Sys.which("quarto")), "Quarto is not installed")
   old <- options(surveyframe.use_quarto = TRUE)
   on.exit(options(old), add = TRUE)
-  ins <- sf_instrument(title = "Build check", components = list(
-    sf_item("q1", "Comment", type = "text")))
+  ins <- sframe_instrument(title = "Build check", components = list(
+    sframe_item("q1", "Comment", type = "text")))
   out <- tempfile(fileext = ".html")
   render_report(ins, output_file = out, open = FALSE)
   html <- paste(readLines(out, warn = FALSE), collapse = "\n")

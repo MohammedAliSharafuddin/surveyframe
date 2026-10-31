@@ -10,33 +10,33 @@ character string. \code{summary()} returns the check table as a data frame.
 }
 \description{
 \code{sframe_validation} is the diagnostic object returned by
-\code{\link[=validate_sframe]{validate_sframe()}} and \code{\link[=validate_model]{validate_model()}}. It records whether the object
+\code{\link[=validate_sframe]{validate_sframe()}} and \code{\link[=sframe_validate_model]{sframe_validate_model()}}. It records whether the object
 passed, every problem found, and every check that ran, including the checks
 that found nothing.
 }
 \details{
-Use \code{\link[=sf_is_valid]{sf_is_valid()}} for the pass or fail flag, \code{\link[=sf_problems]{sf_problems()}} for the
+Use \code{\link[=sframe_is_valid]{sframe_is_valid()}} for the pass or fail flag, \code{\link[=sframe_problems]{sframe_problems()}} for the
 messages, \code{as.data.frame()} for a problem-per-row table, \code{summary()} for
 the full check roster, and \code{\link[=as_sframe]{as_sframe()}} to recover the validated
 instrument.
 }
 \examples{
-cs    <- sf_choices("ag5", 1:5,
+cs    <- sframe_choice_set("ag5", 1:5,
            c("Strongly disagree", "Disagree", "Neutral",
              "Agree", "Strongly agree"))
-item  <- sf_item("sat_1", "The service met my expectations.",
+item  <- sframe_item("sat_1", "The service met my expectations.",
                  type = "likert", choice_set = "ag5", scale_id = "sat")
-scale <- sf_scale("sat", "Satisfaction", items = "sat_1")
-instr <- sf_instrument("Demo Survey", components = list(cs, item, scale))
+scale <- sframe_scale("sat", "Satisfaction", items = "sat_1")
+instr <- sframe_instrument("Demo Survey", components = list(cs, item, scale))
 
 v <- validate_sframe(instr, strict = FALSE)
 v
-sf_is_valid(v)
-sf_problems(v)
+sframe_is_valid(v)
+sframe_problems(v)
 as.data.frame(v)
 summary(v)
 }
 \seealso{
-\code{\link[=validate_sframe]{validate_sframe()}}, \code{\link[=validate_model]{validate_model()}}, \code{\link[=sf_problems]{sf_problems()}},
-\code{\link[=sf_is_valid]{sf_is_valid()}}, \code{\link[=as_sframe]{as_sframe()}}
+\code{\link[=validate_sframe]{validate_sframe()}}, \code{\link[=sframe_validate_model]{sframe_validate_model()}}, \code{\link[=sframe_problems]{sframe_problems()}},
+\code{\link[=sframe_is_valid]{sframe_is_valid()}}, \code{\link[=as_sframe]{as_sframe()}}
 }

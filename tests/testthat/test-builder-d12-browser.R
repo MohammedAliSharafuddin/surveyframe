@@ -59,12 +59,12 @@ d12_save <- function(session) {
 }
 
 d12_instrument <- function(plan = list()) {
-  sf_instrument(
+  sframe_instrument(
     "D12 browser", version = "1.0.0",
     components = list(
-      sf_item("score", "Score", type = "numeric"),
-      sf_item("group", "Group", type = "single_choice", choice_set = "yn"),
-      sf_choices("yn", values = c("0", "1"), labels = c("No", "Yes"))),
+      sframe_item("score", "Score", type = "numeric"),
+      sframe_item("group", "Group", type = "single_choice", choice_set = "yn"),
+      sframe_choice_set("yn", values = c("0", "1"), labels = c("No", "Yes"))),
     analysis_plan = plan)
 }
 

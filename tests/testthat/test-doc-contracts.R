@@ -23,26 +23,26 @@ source_of <- function(file) {
 }
 
 demo_instrument <- function() {
-  sf_instrument(title = "Docs", components = list(
-    sf_choices("ag5", 1:5, as.character(1:5)),
-    sf_item("q1", "One", "likert", choice_set = "ag5", scale_id = "s"),
-    sf_scale("s", "S", items = "q1")))
+  sframe_instrument(title = "Docs", components = list(
+    sframe_choice_set("ag5", 1:5, as.character(1:5)),
+    sframe_item("q1", "One", "likert", choice_set = "ag5", scale_id = "s"),
+    sframe_scale("s", "S", items = "q1")))
 }
 
 test_that("G1: accessors return what the help says, per class", {
   instr <- demo_instrument()
-  book <- codebook_report(instr)
+  book <- sframe_codebook(instr)
 
-  expect_s3_class(sf_items(instr), "sf_component_list")
-  expect_s3_class(sf_scales(instr), "sf_component_list")
-  expect_true(is.data.frame(sf_items(book)))
-  expect_true(is.data.frame(sf_plan(book)))
-  expect_true(is.list(sf_meta(instr)))
+  expect_s3_class(sframe_get_items(instr), "sf_component_list")
+  expect_s3_class(sframe_get_scales(instr), "sf_component_list")
+  expect_true(is.data.frame(sframe_get_items(book)))
+  expect_true(is.data.frame(sframe_plan(book)))
+  expect_true(is.list(sframe_meta(instr)))
   # coercing an instrument gives its items table, and a component list has no
   # coercion at all, so the help cannot promise a flat table of the same content
   expect_true(all(c("id", "label", "type") %in% names(as.data.frame(instr))))
   expect_false("values" %in% names(as.data.frame(instr)))
-  expect_error(as.data.frame(sf_items(instr)), "coerce")
+  expect_error(as.data.frame(sframe_get_items(instr)), "coerce")
 })
 
 test_that("G1: the accessor help states the codebook return type and the coercion limit", {

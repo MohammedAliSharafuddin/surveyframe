@@ -24,5 +24,5 @@ size, alpha, and power.
 Coerce a sample-size plan to a data frame
 }
 \seealso{
-\link{sframe_as_data_frame}, \code{\link[=sample_size_plan]{sample_size_plan()}}
+\link{sframe_as_data_frame}, \code{\link[=sframe_sample_size_plan]{sframe_sample_size_plan()}}
 }

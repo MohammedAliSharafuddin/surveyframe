@@ -7,15 +7,15 @@
 \code{print()} returns \code{x} invisibly. \code{[} returns an \code{sf_component_list}.
 }
 \description{
-The value returned by \code{\link[=sf_items]{sf_items()}}, \code{\link[=sf_scales]{sf_scales()}}, \code{\link[=sf_choice_sets]{sf_choice_sets()}},
-\code{\link[=sf_branches]{sf_branches()}}, \code{\link[=sf_checks]{sf_checks()}} and \code{\link[=sf_models]{sf_models()}}. It is a list of component
+The value returned by \code{\link[=sframe_get_items]{sframe_get_items()}}, \code{\link[=sframe_get_scales]{sframe_get_scales()}}, \code{\link[=sframe_get_choice_sets]{sframe_get_choice_sets()}},
+\code{\link[=sframe_get_branches]{sframe_get_branches()}}, \code{\link[=sframe_get_attention_checks]{sframe_get_attention_checks()}} and \code{\link[=sframe_get_models]{sframe_get_models()}}. It is a list of component
 objects named by their IDs, so a single component is reached with \code{[[}.
 }
 \examples{
-item1 <- sf_item("q1", "First question", type = "text")
-item2 <- sf_item("q2", "Second question", type = "text")
-instr <- sf_instrument("Demo", components = list(item1, item2))
+item1 <- sframe_item("q1", "First question", type = "text")
+item2 <- sframe_item("q2", "Second question", type = "text")
+instr <- sframe_instrument("Demo", components = list(item1, item2))
 
-sf_items(instr)
-sf_items(instr)[["q2"]]
+sframe_get_items(instr)
+sframe_get_items(instr)[["q2"]]
 }

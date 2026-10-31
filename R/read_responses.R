@@ -27,7 +27,7 @@
 #' same responses read the same.
 #'
 #' @param x A file path to a delimited text file, a `data.frame`, or a `tibble`.
-#' @param instrument An `sframe` object created by [sf_instrument()].
+#' @param instrument An `sframe` object created by [sframe_instrument()].
 #' @param respondent_id Character or NULL. The name of the column containing
 #'   unique respondent identifiers. If NULL, no respondent ID column is
 #'   expected.
@@ -60,7 +60,7 @@
 #'   an extra column under `strict = TRUE`, name it in `meta_cols`, or select
 #'   the columns you need before reading.
 #' @export
-#' @seealso [quality_report()], [score_scales()]
+#' @seealso [sframe_quality_results()], [score_scales()]
 #'
 #' @examples
 #' responses <- read_responses(

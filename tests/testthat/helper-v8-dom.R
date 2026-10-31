@@ -6,7 +6,7 @@
 #
 # Before this, the template was tested by matching its source text, which
 # passes with the behaviour wrong. The survey is exported through
-# export_static_survey() first, so the script under test is the one a
+# export_survey() first, so the script under test is the one a
 # researcher deploys, with every placeholder filled.
 
 # Just enough of document and window for the template to load and for its
@@ -96,7 +96,7 @@ function confirm(msg){ __confirms.push(String(msg)); return __confirmAnswer; }
 # returns the context. The survey is left on its first screen, unrendered.
 # `pre` is JavaScript run after the stub and before the survey script, for a
 # test that needs something in place at load, such as localStorage or a host
-# sender. `...` goes to export_static_survey(), such as `preview = TRUE`.
+# sender. `...` goes to export_survey(), such as `preview = TRUE`.
 static_survey_context <- function(instrument, endpoint_url = "", pre = NULL,
                                   ...) {
   skip_if_not_installed("V8")
@@ -104,7 +104,7 @@ static_survey_context <- function(instrument, endpoint_url = "", pre = NULL,
   # A preview refuses any endpoint argument, the empty one included.
   args <- list(instrument, output_path = path, open = FALSE, ...)
   if (!isTRUE(args$preview)) args$endpoint_url <- endpoint_url
-  suppressMessages(do.call(export_static_survey, args))
+  suppressMessages(do.call(export_survey, args))
   html <- paste(readLines(path, warn = FALSE, encoding = "UTF-8"),
                 collapse = "\n")
   unlink(path)

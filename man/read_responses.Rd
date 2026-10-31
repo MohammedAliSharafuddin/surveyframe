@@ -17,7 +17,7 @@ read_responses(
 \arguments{
 \item{x}{A file path to a delimited text file, a \code{data.frame}, or a \code{tibble}.}
 
-\item{instrument}{An \code{sframe} object created by \code{\link[=sf_instrument]{sf_instrument()}}.}
+\item{instrument}{An \code{sframe} object created by \code{\link[=sframe_instrument]{sframe_instrument()}}.}
 
 \item{respondent_id}{Character or NULL. The name of the column containing
 unique respondent identifiers. If NULL, no respondent ID column is
@@ -95,5 +95,5 @@ responses <- read_responses(
 head(responses[, c("respondent_id", "visit_type", "dm_1")])
 }
 \seealso{
-\code{\link[=quality_report]{quality_report()}}, \code{\link[=score_scales]{score_scales()}}
+\code{\link[=sframe_quality_results]{sframe_quality_results()}}, \code{\link[=score_scales]{score_scales()}}
 }

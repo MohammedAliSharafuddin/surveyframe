@@ -82,9 +82,9 @@ sframe_demo_index <- function() {
 #' @export
 #' @seealso [sframe_demo()], [sframe_demo_branding()], [sframe_demo_qmd()]
 #' @examples
-#' head(sframe_demos(), 3)
-#' subset(sframe_demos(), focus == "provenance")
-sframe_demos <- function() {
+#' head(sframe_list_demos(), 3)
+#' subset(sframe_list_demos(), focus == "provenance")
+sframe_list_demos <- function() {
   sframe_demo_index()
 }
 
@@ -106,7 +106,7 @@ sframe_demo_dir <- function() {
 #' SurveyBuilder and SurveyStudio support in a single instrument, see
 #' [sframe_input_types_demo_data()].
 #'
-#' @param name Character. A demo name, as listed by [sframe_demos()].
+#' @param name Character. A demo name, as listed by [sframe_list_demos()].
 #' @param branded Logical. When `TRUE`, the instrument comes back with the
 #'   standard welcome page, logo, theme colour and thank you page spliced into
 #'   its `render` block. The bundled file on disk is left unchanged, so the
@@ -120,7 +120,7 @@ sframe_demo_dir <- function() {
 #'   this demo, which is the reference to compare against when you run the
 #'   same data through another package.
 #' @export
-#' @seealso [sframe_demos()], [sframe_export_labelled()],
+#' @seealso [sframe_list_demos()], [export_responses()],
 #'   [sframe_input_types_demo_data()]
 #' @examples
 #' demo <- sframe_demo("two_group")
@@ -132,14 +132,14 @@ sframe_demo <- function(name, branded = FALSE) {
     rlang::abort(
       paste0(
         "`name` is required: pick one of the ", length(idx$name),
-        " demo names from sframe_demos(), e.g. sframe_demo(\"",
+        " demo names from sframe_list_demos(), e.g. sframe_demo(\"",
         idx$name[[1]], "\")."
       ),
       class = "sframe_error")
   }
   if (!isTRUE(name %in% idx$name)) {
     rlang::abort(
-      paste0("Unknown demo: '", name, "'. See sframe_demos() for the ",
+      paste0("Unknown demo: '", name, "'. See sframe_list_demos() for the ",
              length(idx$name), " available."),
       class = "sframe_error")
   }
@@ -190,10 +190,10 @@ sframe_demo_screens <- function(title) {
 #' it, change a colour, and paste it into your own instrument.
 #'
 #' @return A named list of class `sframe_branding`, suitable for
-#'   `sf_instrument(render = )`: the display `mode`, the `theme` colour, the
+#'   `sframe_instrument(render = )`: the display `mode`, the `theme` colour, the
 #'   `submit_label`, and the `welcome`, `thankyou` and `header` blocks.
 #'   Printing it shows each setting as a respondent meets it.
-#'   [sf_instrument()] and [sframe_demo()] store it as a plain list.
+#'   [sframe_instrument()] and [sframe_demo()] store it as a plain list.
 #' @export
 #' @seealso [preview_demo()] to see the branding applied to a demo.
 #' @examples
@@ -244,7 +244,7 @@ print.sframe_branding <- function(x, ...) {
     paste0("  Submit button: ", quoted(x$submit_label)),
     paste0("  Thank you:     ", quoted(ty$message)),
     "",
-    "A render block for sf_instrument(render = ). See it applied with",
+    "A render block for sframe_instrument(render = ). See it applied with",
     "preview_demo(\"two_group\"), or use sframe_demo(name, branded = TRUE)."
   )
   cat(lines, sep = "\n")
@@ -294,10 +294,10 @@ print.sframe_branding <- function(x, ...) {
 #' demo <- sframe_demo("two_group")
 #' out <- file.path(tempdir(), "two_group.sav")
 #' if (requireNamespace("haven", quietly = TRUE)) {
-#'   sframe_export_labelled(demo$responses, demo$instrument, out)
+#'   export_responses(demo$responses, demo$instrument, out)
 #' }
 #' }
-sframe_export_labelled <- function(data, instrument, path) {
+export_responses <- function(data, instrument, path) {
   rlang::check_installed("haven", reason = "to write a labelled SPSS or Stata file.")
   sframe_check_instrument(instrument)
   stopifnot(is.data.frame(data), is.character(path), length(path) == 1)
@@ -310,10 +310,10 @@ sframe_export_labelled <- function(data, instrument, path) {
       class = "sframe_error")
   }
 
-  # sf_choice_sets() gives the sf_choices objects, whose `values` and
+  # sframe_get_choice_sets() gives the sf_choices objects, whose `values` and
   # `labels` sit side by side. sframe_choices_lookup() returns a named
   # character vector instead, which is a different shape.
-  lookup <- sf_choice_sets(instrument)
+  lookup <- sframe_get_choice_sets(instrument)
   # The option label for a code, or the code itself when the set lacks it.
   option_label <- function(set, code) {
     i <- match(as.character(code), as.character(set$values))
@@ -464,7 +464,7 @@ sframe_fit_labelled <- function(data, ext) {
 sframe_labelled_message <- function(changes, ext) {
   fmt <- if (identical(ext, "dta")) "Stata" else "SPSS"
   paste0(
-    "sframe_export_labelled() changed ", nrow(changes), " item",
+    "export_responses() changed ", nrow(changes), " item",
     if (nrow(changes) == 1L) "" else "s", " to fit ", fmt, " (old -> new):\n",
     paste0("  ", changes$kind, " (", changes$column, "): ", changes$old,
            " -> ", changes$new, collapse = "\n"),
@@ -482,13 +482,13 @@ sframe_labelled_message <- function(changes, ext) {
 #' results, render analysis and full reports, and export the data for checking
 #' elsewhere.
 #'
-#' @param name Character. A demo name, as listed by [sframe_demos()].
+#' @param name Character. A demo name, as listed by [sframe_list_demos()].
 #' @param dir Directory to write into. Defaults to the working directory.
 #' @param overwrite Logical. Overwrite an existing file of the same name.
 #'
 #' @return The path written, invisibly.
 #' @export
-#' @seealso [sframe_demo()], [sframe_demos()]
+#' @seealso [sframe_demo()], [sframe_list_demos()]
 #' @examples
 #' out <- sframe_demo_qmd("two_group", dir = tempdir())
 #' basename(out)
@@ -498,14 +498,14 @@ sframe_demo_qmd <- function(name, dir = ".", overwrite = FALSE) {
     rlang::abort(
       paste0(
         "`name` is required: pick one of the ", length(idx$name),
-        " demo names from sframe_demos(), e.g. sframe_demo_qmd(\"",
+        " demo names from sframe_list_demos(), e.g. sframe_demo_qmd(\"",
         idx$name[[1]], "\")."
       ),
       class = "sframe_error")
   }
   if (!isTRUE(name %in% idx$name)) {
     rlang::abort(
-      paste0("Unknown demo: '", name, "'. See sframe_demos()."),
+      paste0("Unknown demo: '", name, "'. See sframe_list_demos()."),
       class = "sframe_error")
   }
   tpl <- system.file("demos", "analysis.qmd", package = "surveyframe")
@@ -539,7 +539,7 @@ sframe_demo_qmd <- function(name, dir = ".", overwrite = FALSE) {
 #' Write a Quarto analysis notebook for any instrument
 #'
 #' Unlike [sframe_demo_qmd()], which only works for one of the bundled demo
-#' instruments (it looks `name` up in [sframe_demos()]), this writes a
+#' instruments (it looks `name` up in [sframe_list_demos()]), this writes a
 #' runnable Quarto notebook for any instrument, using its own responses. It
 #' exposes the complete ordered plan, screening, run status, detailed results,
 #' plots and reports. The notebook reads the instrument and its responses back from 2 companion
@@ -558,8 +558,8 @@ sframe_demo_qmd <- function(name, dir = ".", overwrite = FALSE) {
 #' @export
 #' @seealso [sframe_demo_qmd()], [write_sframe()], [read_responses()]
 #' @examples
-#' item  <- sf_item("q1", "How satisfied are you?", type = "text")
-#' instr <- sf_instrument("Demo", components = list(item))
+#' item  <- sframe_item("q1", "How satisfied are you?", type = "text")
+#' instr <- sframe_instrument("Demo", components = list(item))
 #' resp  <- data.frame(q1 = c("Great", "Fine"))
 #' out <- sframe_analysis_qmd(instr, resp, dir = tempdir())
 #' basename(out$qmd)
@@ -567,7 +567,7 @@ sframe_analysis_qmd <- function(instrument, data, dir = ".", basename = NULL,
                                  overwrite = FALSE) {
   if (missing(instrument)) {
     rlang::abort(
-      "`instrument` is required: an sframe object, e.g. from sf_instrument() or read_sframe().",
+      "`instrument` is required: an sframe object, e.g. from sframe_instrument() or read_sframe().",
       class = "sframe_error")
   }
   sframe_check_instrument(instrument)
@@ -586,7 +586,7 @@ sframe_analysis_qmd <- function(instrument, data, dir = ".", basename = NULL,
                  class = "sframe_error")
   }
 
-  title <- sf_meta(instrument)$title %||% "survey"
+  title <- sframe_meta(instrument)$title %||% "survey"
   # The slug becomes file names inside R strings in the notebook, so it is
   # reduced to safe characters whether it came from the title or `basename`.
   slug  <- gsub("[^A-Za-z0-9_.-]+", "_", basename %||% title)

@@ -5,8 +5,8 @@
 # callback failure turned into duplicate collection.
 
 retry_instrument <- function() {
-  sf_instrument("Retry", components = list(
-    sf_item("q1", "How was it?", type = "text")
+  sframe_instrument("Retry", components = list(
+    sframe_item("q1", "How was it?", type = "text")
   ))
 }
 

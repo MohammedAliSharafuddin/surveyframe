@@ -100,12 +100,12 @@ dim(responses)
 ## Missing data and quality
 
 ```{r screening}
-mr <- missing_data_report(responses, instr)
+mr <- sframe_missing_data_results(responses, instr)
 kable(as.data.frame(mr), digits = 2,
       col.names = c("Variable", "Missing (n)", "Missing (%)", "Valid (n)"),
       caption = "Item-level missingness")
 
-qr <- quality_report(
+qr <- sframe_quality_results(
   responses, instr,
   respondent_id = "respondent_id",
   submitted_at  = "submitted_at",
@@ -151,11 +151,11 @@ par(op)
 
 ## Check assumptions before the plan
 
-`assumption_report()` reports the checks a technique relies on, such as residual
+`sframe_assumption_results()` reports the checks a technique relies on, such as residual
 normality, variance inflation, and influence for a regression.
 
 ```{r assumptions}
-assumption_report(
+sframe_assumption_results(
   scored,
   predictors = c("digital_marketing", "service_quality", "sustainability"),
   outcome    = "satisfaction"
@@ -170,7 +170,7 @@ fill each role. A correlation expects `x` and `y`. A regression expects
 and an `outcome`.
 
 ```{r plan}
-sf_plan(instr) <- list(
+sframe_plan(instr) <- list(
   list(id = "RQ1",
        research_question = "Is digital marketing perception associated with satisfaction?",
        family = "association", method = "correlation_pearson",

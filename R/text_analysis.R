@@ -64,11 +64,11 @@
   "yours", "yourself", "yourselves"
 )
 
-# Shared tokeniser for term_frequency() and ngram_frequency(), so the two
+# Shared tokeniser for sframe_term_frequency() and sframe_ngram_frequency(), so the two
 # can't drift on cleaning rules. Self-contained: lower-cases and strips
 # punctuation itself (keeping internal apostrophes so "don't" survives as
 # one token) rather than assuming the caller already ran
-# clean_text_responses(), since term_frequency()/ngram_frequency() are
+# sframe_clean_text(), since sframe_term_frequency()/sframe_ngram_frequency() are
 # usable standalone on any character vector. `stop_words = NULL` uses the
 # built-in list above; `stop_words = character(0)` disables filtering.
 #
@@ -127,10 +127,10 @@
 #' @export
 #' @examples
 #' demo <- sframe_demo_data()
-#' cleaned <- clean_text_responses(demo$responses, "comments")
+#' cleaned <- sframe_clean_text(demo$responses, "comments")
 #' head(cleaned)
 #' attr(cleaned, "respondent")[1:5]
-clean_text_responses <- function(data, item_id, lowercase = TRUE,
+sframe_clean_text <- function(data, item_id, lowercase = TRUE,
                                   remove_punct = TRUE, strip_numbers = FALSE,
                                   instrument = NULL) {
   if (!is.null(instrument)) {
@@ -181,7 +181,7 @@ clean_text_responses <- function(data, item_id, lowercase = TRUE,
 #' custom vector to override it.
 #'
 #' @param text Character vector of responses (raw or already cleaned by
-#'   [clean_text_responses()]).
+#'   [sframe_clean_text()]).
 #' @param stop_words Character vector of words to exclude, or `NULL` to use
 #'   the built-in English list, or `character(0)` for no filtering.
 #' @param top_n Integer. Maximum number of terms to return, most frequent
@@ -191,9 +191,9 @@ clean_text_responses <- function(data, item_id, lowercase = TRUE,
 #' @export
 #' @examples
 #' demo <- sframe_demo_data()
-#' cleaned <- clean_text_responses(demo$responses, "comments")
-#' head(term_frequency(cleaned, top_n = 10))
-term_frequency <- function(text, stop_words = NULL, top_n = 30L) {
+#' cleaned <- sframe_clean_text(demo$responses, "comments")
+#' head(sframe_term_frequency(cleaned, top_n = 10))
+sframe_term_frequency <- function(text, stop_words = NULL, top_n = 30L) {
   toks <- unlist(.sframe_tokenise(text, stop_words), use.names = FALSE)
   if (!length(toks)) {
     return(data.frame(term = character(0), n = integer(0), pct = numeric(0),
@@ -214,7 +214,7 @@ term_frequency <- function(text, stop_words = NULL, top_n = 30L) {
 # than produce a garbage "trend" from a handful of free-text answers.
 .sframe_text_min_responses <- 10L
 
-# Runner contract wrapper around term_frequency(): $table, apa (n_responses
+# Runner contract wrapper around sframe_term_frequency(): $table, apa (n_responses
 # and the top term), prompt. `roles$item` names the text/textarea item;
 # `options$group` (see sframe_run_one_block()'s group-role resolution)
 # optionally splits by a nominal/ordinal covariate, one block of table rows
@@ -237,11 +237,11 @@ sframe_run_term_freq <- function(data, roles, options, instrument) {
         )
       ))
     }
-    list(table = term_frequency(cleaned, stop_words = options$stop_words,
+    list(table = sframe_term_frequency(cleaned, stop_words = options$stop_words,
                                  top_n = top_n), error = NULL)
   }
 
-  cleaned_all <- clean_text_responses(data, item_id, instrument = instrument)
+  cleaned_all <- sframe_clean_text(data, item_id, instrument = instrument)
 
   if (is.null(group_id) || !nzchar(group_id) || !group_id %in% colnames(data)) {
     built <- build_one(cleaned_all)
@@ -304,7 +304,7 @@ sframe_run_term_freq <- function(data, roles, options, instrument) {
 }
 
 # Pairwise within-response term co-occurrence on the top `top_n` terms
-# (ranked the same way term_frequency() ranks them, so the 2 outputs agree
+# (ranked the same way sframe_term_frequency() ranks them, so the 2 outputs agree
 # on which terms matter). For every response, every unordered pair of
 # distinct top terms both present in that response's token set counts once,
 # regardless of how many times either token repeats within the response.
@@ -313,7 +313,7 @@ sframe_run_term_freq <- function(data, roles, options, instrument) {
 #   pair with n > 0, sorted by n descending, term_a < term_b alphabetically.
 .sframe_cooccurrence <- function(text, top_n = 20L, stop_words = NULL) {
   toks_by_resp <- .sframe_tokenise(text, stop_words)
-  top <- term_frequency(text, stop_words = stop_words, top_n = top_n)
+  top <- sframe_term_frequency(text, stop_words = stop_words, top_n = top_n)
   if (nrow(top) < 2) {
     return(data.frame(term_a = character(0), term_b = character(0),
                        n = integer(0), stringsAsFactors = FALSE))
@@ -356,7 +356,7 @@ sframe_run_co_occurrence <- function(data, roles, options, instrument) {
   if (!is.null(err)) return(list(test = "co_occurrence", error = err))
   top_n <- options$top_n %||% 20L
 
-  cleaned <- clean_text_responses(data, item_id, instrument = instrument)
+  cleaned <- sframe_clean_text(data, item_id, instrument = instrument)
   n_resp <- length(cleaned)
   if (n_resp < .sframe_text_min_responses) {
     return(list(
@@ -402,7 +402,7 @@ sframe_run_co_occurrence <- function(data, roles, options, instrument) {
 # other run_analysis_plan() result (see R/read_write_sframe.R's
 # sframe_restore_analysis_block(): only block *definitions* are persisted to
 # a .sframe file, never computed results). It is kept in the result's
-# runtime attribute (sframe_set_runtime()) only so extract_quotes() can read
+# runtime attribute (sframe_set_runtime()) only so sframe_extract_quotes() can read
 # it back in the same R session. An attribute is left out of
 # jsonlite::toJSON(), so the result list serialises as it stands, and callers
 # must not assume the model survives a save/reload round trip.
@@ -422,9 +422,9 @@ sframe_run_co_occurrence <- function(data, roles, options, instrument) {
 
 #' Fit an LDA topic model on open-ended text
 #'
-#' Cleans the text item via [clean_text_responses()], tokenises with the
+#' Cleans the text item via [sframe_clean_text()], tokenises with the
 #' package's shared internal tokeniser (reused rather than a second
-#' tidytext-based tokeniser, so LDA and `term_frequency()` can never
+#' tidytext-based tokeniser, so LDA and `sframe_term_frequency()` can never
 #' drift on cleaning/stop-word rules), casts the token counts to a
 #' document-term matrix with `tidytext::cast_dtm()`, and fits
 #' `topicmodels::LDA()`.
@@ -436,12 +436,12 @@ sframe_run_co_occurrence <- function(data, roles, options, instrument) {
 #'   modelling section for `topicmodels::perplexity()`-based selection),
 #'   `seed` (default `42L`), `stop_words` (passed through to the tokeniser).
 #' @param instrument Optional `sframe` instrument, passed to
-#'   [clean_text_responses()] for item-type validation.
+#'   [sframe_clean_text()] for item-type validation.
 #'
 #' @return A runner-contract result list: `test = "topic_model_lda"`,
 #'   `table` (topic/term/beta/rank, top 10 terms per topic), `fit` (a
 #'   runtime-only list holding the LDA model object and the document-row-to-
-#'   respondent mapping needed by [extract_quotes()]), `apa`, `prompt`. On
+#'   respondent mapping needed by [sframe_extract_quotes()]), `apa`, `prompt`. On
 #'   failure: `list(test = "topic_model_lda", error = <message>)`.
 #' @keywords internal
 sframe_run_topic_model_lda <- function(data, roles, options, instrument) {
@@ -459,7 +459,7 @@ sframe_run_topic_model_lda <- function(data, roles, options, instrument) {
   k <- options$k %||% 4L
   seed <- options$seed %||% 42L
 
-  cleaned <- clean_text_responses(data, item_id, instrument = instrument)
+  cleaned <- sframe_clean_text(data, item_id, instrument = instrument)
   guard_err <- .sframe_topic_model_guard(cleaned, k, "LDA topic modelling")
   if (!is.null(guard_err)) return(list(test = "topic_model_lda", error = guard_err))
 
@@ -499,7 +499,7 @@ sframe_run_topic_model_lda <- function(data, roles, options, instrument) {
   # Row-to-respondent mapping: dtm rownames are the "doc" ids that survived
   # tokenising/stop-word removal (as characters, so re-parsed to integer
   # rather than trusted to sort numerically), indexing into
-  # clean_text_responses()'s own "respondent" attribute.
+  # sframe_clean_text()'s own "respondent" attribute.
   respondent_attr <- attr(cleaned, "respondent")
   dtm_respondent <- respondent_attr[as.integer(rownames(dtm))]
 
@@ -522,7 +522,7 @@ sframe_run_topic_model_lda <- function(data, roles, options, instrument) {
 
 #' Fit a structural topic model (STM) on open-ended text
 #'
-#' Cleans the text item via [clean_text_responses()], tokenises with
+#' Cleans the text item via [sframe_clean_text()], tokenises with
 #' `tidytext::unnest_tokens()` (tidyeval column names via `rlang::sym()` and
 #' `!!`, not bare symbols; see the source comment at the tokenising step for
 #' why), casts to a document-term matrix, converts it to `stm`'s corpus
@@ -537,7 +537,7 @@ sframe_run_topic_model_lda <- function(data, roles, options, instrument) {
 #'   document weight, beta its per-term probability, both from the fitted
 #'   `stm` object), `fit` (a runtime-only list holding the `stm` model
 #'   object and the document-to-respondent mapping needed by
-#'   [extract_quotes()]), `apa`, `prompt`. On failure:
+#'   [sframe_extract_quotes()]), `apa`, `prompt`. On failure:
 #'   `list(test = "stm_topics", error = <message>)`.
 #' @keywords internal
 sframe_run_stm_topics <- function(data, roles, options, instrument) {
@@ -555,7 +555,7 @@ sframe_run_stm_topics <- function(data, roles, options, instrument) {
   k <- options$k %||% 3L
   seed <- options$seed %||% 42L
 
-  cleaned <- clean_text_responses(data, item_id, instrument = instrument)
+  cleaned <- sframe_clean_text(data, item_id, instrument = instrument)
   guard_err <- .sframe_topic_model_guard(cleaned, k, "STM topic modelling")
   if (!is.null(guard_err)) return(list(test = "stm_topics", error = guard_err))
 
@@ -654,11 +654,11 @@ sframe_run_stm_topics <- function(data, roles, options, instrument) {
 #'   (i.e. `result`, not `result$fit` and not the raw `stm` object).
 #' @param text The response vector the topic model was fit on: either the
 #'   raw vector (one entry per original data row, indexed 1:1 by row
-#'   number) or the [clean_text_responses()]-cleaned vector, which drops
+#'   number) or the [sframe_clean_text()]-cleaned vector, which drops
 #'   blank/missing rows and is therefore *shorter*, its positions no
 #'   longer equal original row numbers once any earlier row was dropped.
 #'   Both forms work correctly: when `text` carries the `respondent`
-#'   attribute [clean_text_responses()] sets, that mapping is used to find
+#'   attribute [sframe_clean_text()] sets, that mapping is used to find
 #'   each quote's real position; otherwise `text` is assumed to be the raw,
 #'   1:1-indexed vector.
 #' @param n_quotes Integer. Quotes to return per topic. Default `3L`.
@@ -672,17 +672,17 @@ sframe_run_stm_topics <- function(data, roles, options, instrument) {
 #' if (requireNamespace("stm", quietly = TRUE) &&
 #'     requireNamespace("tidytext", quietly = TRUE)) {
 #'   demo <- sframe_demo_data()
-#'   sf_plan(demo$instrument) <- list(list(
+#'   sframe_plan(demo$instrument) <- list(list(
 #'     id = "RQ1", research_question = "What themes appear in the comments?",
 #'     family = "text_analysis", method = "stm_topics",
 #'     roles = list(item = "comments"), options = list(k = 3, seed = 42)
 #'   ))
 #'   res <- run_analysis_plan(demo$responses, demo$instrument)
-#'   quotes <- extract_quotes(res$RQ1, demo$responses$comments, n_quotes = 2)
+#'   quotes <- sframe_extract_quotes(res$RQ1, demo$responses$comments, n_quotes = 2)
 #'   quotes
 #' }
 #' }
-extract_quotes <- function(model, text, n_quotes = 3L) {
+sframe_extract_quotes <- function(model, text, n_quotes = 3L) {
   sframe_require_stm(reason = "to extract representative quotes.")
   # The fitted model sits in the result's runtime attribute since 0.4.3. A
   # result made earlier in the session carried it as $fit$model.
@@ -699,7 +699,7 @@ extract_quotes <- function(model, text, n_quotes = 3L) {
 
   # findThoughts() takes `texts` aligned 1:1 with the model's own document
   # rows (fit-document order), which is exactly what respondent_map indexes
-  # into; `text` is indexed by original row. A clean_text_responses()
+  # into; `text` is indexed by original row. A sframe_clean_text()
   # vector drops blank/missing rows, so its positions do NOT equal
   # original row numbers once any earlier row was dropped (found in
   # review_050: passing it as though it did silently attributed a quote
@@ -740,7 +740,7 @@ extract_quotes <- function(model, text, n_quotes = 3L) {
 
 #' N-gram frequency for open-ended text
 #'
-#' Tokenises `text` via the same tokeniser as [term_frequency()] (whitespace
+#' Tokenises `text` via the same tokeniser as [sframe_term_frequency()] (whitespace
 #' splitting, lower-casing, punctuation stripping, and stop-word removal),
 #' then slides a window of `n` tokens across each response's token vector
 #' and counts how often each resulting n-gram occurs. `n = 2` (the default)
@@ -752,7 +752,7 @@ extract_quotes <- function(model, text, n_quotes = 3L) {
 #' the output phrases respondents actually wrote.
 #'
 #' @param text Character vector of responses (raw or already cleaned by
-#'   [clean_text_responses()]).
+#'   [sframe_clean_text()]).
 #' @param n Integer. N-gram size. Default `2` (bigrams).
 #' @param stop_words Character vector of words to exclude, or `NULL` to use
 #'   the built-in English list, or `character(0)` for no filtering.
@@ -764,14 +764,14 @@ extract_quotes <- function(model, text, n_quotes = 3L) {
 #' @export
 #' @examples
 #' demo <- sframe_demo_data()
-#' cleaned <- clean_text_responses(demo$responses, "comments")
-#' head(ngram_frequency(cleaned, n = 2, top_n = 10))
-ngram_frequency <- function(text, n = 2L, stop_words = NULL, top_n = 30L) {
+#' cleaned <- sframe_clean_text(demo$responses, "comments")
+#' head(sframe_ngram_frequency(cleaned, n = 2, top_n = 10))
+sframe_ngram_frequency <- function(text, n = 2L, stop_words = NULL, top_n = 30L) {
   n <- as.integer(n)
   if (length(n) != 1L || is.na(n) || n < 2L) {
     rlang::abort(
       paste0("`n` must be 2 or more. An n-gram of 1 word is a term, which ",
-             "term_frequency() counts."),
+             "sframe_term_frequency() counts."),
       class = "sframe_error")
   }
   # keep_gaps marks a removed stop word with NA, so a window spanning one is
@@ -811,15 +811,15 @@ ngram_frequency <- function(text, n = 2L, stop_words = NULL, top_n = 30L) {
 #' can judge how a term is actually being used rather than reading a bare
 #' frequency count. Matching is on whole words only, so searching for
 #' "room" does not match "roomy". `text` is expected to already have been
-#' run through [clean_text_responses()] (its `respondent` attribute is used
+#' run through [sframe_clean_text()] (its `respondent` attribute is used
 #' to cite the original row index for each match; when absent, positions
 #' `seq_along(text)` are used instead). Tokenisation here is a plain
 #' whitespace split, not the internal stop-word-stripping tokeniser behind
-#' [term_frequency()]: stop words are part of a match's context and
+#' [sframe_term_frequency()]: stop words are part of a match's context and
 #' stripping them would corrupt the very thing a concordance is for.
 #'
 #' @param text Character vector of responses, ideally already cleaned by
-#'   [clean_text_responses()].
+#'   [sframe_clean_text()].
 #' @param term Character. A single keyword to search for.
 #' @param window Integer. Maximum number of words of context to keep before
 #'   and after each match. Default `6`.
@@ -831,9 +831,9 @@ ngram_frequency <- function(text, n = 2L, stop_words = NULL, top_n = 30L) {
 #' @export
 #' @examples
 #' demo <- sframe_demo_data()
-#' cleaned <- clean_text_responses(demo$responses, "comments")
-#' term_context(cleaned, "service", window = 4)
-term_context <- function(text, term, window = 6L, max_matches = 20L) {
+#' cleaned <- sframe_clean_text(demo$responses, "comments")
+#' sframe_term_context(cleaned, "service", window = 4)
+sframe_term_context <- function(text, term, window = 6L, max_matches = 20L) {
   if (!is.character(term) || length(term) != 1L || is.na(term) || !nzchar(term)) {
     rlang::abort("`term` must be a single non-empty string.", class = "sframe_error")
   }
@@ -884,7 +884,7 @@ term_context <- function(text, term, window = 6L, max_matches = 20L) {
 
 
 
-# Runner contract wrapper around ngram_frequency(): $table, apa, prompt.
+# Runner contract wrapper around sframe_ngram_frequency(): $table, apa, prompt.
 # `roles$item` names the text/textarea item; `options$n` controls n-gram
 # size (default 2, bigrams); `options$top_n`. No group role for this id.
 sframe_run_ngram_freq <- function(data, roles, options, instrument) {
@@ -894,7 +894,7 @@ sframe_run_ngram_freq <- function(data, roles, options, instrument) {
   n <- as.integer(options$n %||% 2L)
   top_n <- options$top_n %||% 30L
 
-  cleaned <- clean_text_responses(data, item_id, instrument = instrument)
+  cleaned <- sframe_clean_text(data, item_id, instrument = instrument)
   n_resp <- length(cleaned)
   if (n_resp < .sframe_text_min_responses) {
     return(list(
@@ -905,7 +905,7 @@ sframe_run_ngram_freq <- function(data, roles, options, instrument) {
       )
     ))
   }
-  tbl <- ngram_frequency(cleaned, n = n, stop_words = options$stop_words, top_n = top_n)
+  tbl <- sframe_ngram_frequency(cleaned, n = n, stop_words = options$stop_words, top_n = top_n)
   list(
     test = "ngram_freq", variable = item_id, n = n_resp, table = tbl,
     apa = sprintf("%d-gram frequency for %s (N = %d responses, top n-gram \"%s\").",
@@ -915,7 +915,7 @@ sframe_run_ngram_freq <- function(data, roles, options, instrument) {
   )
 }
 
-# Runner contract wrapper around term_context(): $table, apa, prompt. No
+# Runner contract wrapper around sframe_term_context(): $table, apa, prompt. No
 # plot for this id (keyword-in-context is a table only). `roles$item` names
 # the text/textarea item; `roles$term` (or `options$term`) is the keyword
 # to search, required; `options$window`, `options$max_matches`.
@@ -934,7 +934,7 @@ sframe_run_term_context <- function(data, roles, options, instrument) {
   window <- options$window %||% 6L
   max_matches <- options$max_matches %||% 20L
 
-  cleaned <- clean_text_responses(data, item_id, instrument = instrument)
+  cleaned <- sframe_clean_text(data, item_id, instrument = instrument)
   n_resp <- length(cleaned)
   if (n_resp < .sframe_text_min_responses) {
     return(list(
@@ -945,7 +945,7 @@ sframe_run_term_context <- function(data, roles, options, instrument) {
       )
     ))
   }
-  tbl <- term_context(cleaned, term = term, window = window, max_matches = max_matches)
+  tbl <- sframe_term_context(cleaned, term = term, window = window, max_matches = max_matches)
   list(
     test = "term_context", variable = item_id, term = term, table = tbl,
     apa = sprintf("Keyword-in-context for \"%s\" in %s (N = %d responses, %d matches).",
@@ -966,7 +966,7 @@ sframe_run_term_context <- function(data, roles, options, instrument) {
 # de-duplicate the two implementations at merge time. This copy is
 # self-contained (no dependency on Agent 2's function, which cannot be
 # present in an isolated worktree) and additionally returns the
-# term_frequency() table it computed the top terms from, so the runner below
+# sframe_term_frequency() table it computed the top terms from, so the runner below
 # does not have to tokenise/rank twice.
 #
 # For every response, for every unordered pair of distinct top-terms both
@@ -974,7 +974,7 @@ sframe_run_term_context <- function(data, roles, options, instrument) {
 # qualifying response, regardless of how many times either term repeats
 # within that response.
 .sframe_cooccurrence_edges <- function(text, top_n = 20L, stop_words = NULL) {
-  freq <- term_frequency(text, stop_words = stop_words, top_n = top_n)
+  freq <- sframe_term_frequency(text, stop_words = stop_words, top_n = top_n)
   empty_edges <- data.frame(term_a = character(0), term_b = character(0),
                              n = integer(0), stringsAsFactors = FALSE)
   top_terms <- freq$term
@@ -1021,7 +1021,7 @@ sframe_run_term_context <- function(data, roles, options, instrument) {
 # (one row per node: term, frequency, cluster, x, y), $edges (term_a,
 # term_b, n), apa, prompt. `roles$item` names the text/textarea item;
 # `options$top_n` (default 20L), `options$seed` (default 42L), and
-# `options$stop_words` as in term_frequency(). Requires the optional
+# `options$stop_words` as in sframe_term_frequency(). Requires the optional
 # igraph package (sframe_require_igraph()).
 #
 # Edges are detected via igraph::cluster_louvain() and the layout is
@@ -1043,7 +1043,7 @@ sframe_run_cooccurrence_network <- function(data, roles, options, instrument) {
   top_n <- options$top_n %||% 20L
   seed  <- options$seed %||% 42L
 
-  cleaned <- clean_text_responses(data, item_id, instrument = instrument)
+  cleaned <- sframe_clean_text(data, item_id, instrument = instrument)
   n_resp <- length(cleaned)
   if (n_resp < .sframe_text_min_responses) {
     return(list(
@@ -1204,7 +1204,7 @@ sframe_run_tidy_sentiment <- function(data, roles, options, instrument) {
   # count(word, sentiment, sort = TRUE) pattern (see
   # bookdown.org/jdholster1/idsr/text-analysis.html section 8.4), built
   # on the same tokeniser every other text-family runner uses so this
-  # can't drift from term_frequency()'s own counts.
+  # can't drift from sframe_term_frequency()'s own counts.
   word_sentiment_counts <- function(cleaned) {
     toks <- unlist(.sframe_tokenise(cleaned, stop_words = character(0)), use.names = FALSE)
     empty <- data.frame(word = character(0), sentiment = character(0),
@@ -1220,7 +1220,7 @@ sframe_run_tidy_sentiment <- function(data, roles, options, instrument) {
     df[order(-df$n), , drop = FALSE]
   }
 
-  cleaned_all <- clean_text_responses(data, item_id, instrument = instrument)
+  cleaned_all <- sframe_clean_text(data, item_id, instrument = instrument)
   word_sentiment <- word_sentiment_counts(cleaned_all)
 
   if (is.null(group_id) || !nzchar(group_id) || !group_id %in% colnames(data)) {
@@ -1297,7 +1297,7 @@ sframe_run_quanteda_dfm <- function(data, roles, options, instrument) {
   err <- sframe_require_columns(data, item_id, "Quanteda DFM")
   if (!is.null(err)) return(list(test = "quanteda_dfm", error = err))
 
-  cleaned <- clean_text_responses(data, item_id, instrument = instrument)
+  cleaned <- sframe_clean_text(data, item_id, instrument = instrument)
   n_resp <- length(cleaned)
   if (n_resp < .sframe_text_min_responses) {
     return(list(

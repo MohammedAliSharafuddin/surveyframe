@@ -4,16 +4,16 @@
 # the report's single References section at the end.
 
 demo_instrument <- function() {
-  sf_instrument("References demo", components = list(
-    sf_choices("agree5", 1:5, c("SD", "D", "N", "A", "SA")),
-    sf_item("q1", "The event ran to time.", "likert", choice_set = "agree5", scale_id = "org"),
-    sf_item("q2", "Staff were helpful.", "likert", choice_set = "agree5", scale_id = "org"),
-    sf_scale("org", "Organisation", items = c("q1", "q2"))
+  sframe_instrument("References demo", components = list(
+    sframe_choice_set("agree5", 1:5, c("SD", "D", "N", "A", "SA")),
+    sframe_item("q1", "The event ran to time.", "likert", choice_set = "agree5", scale_id = "org"),
+    sframe_item("q2", "Staff were helpful.", "likert", choice_set = "agree5", scale_id = "org"),
+    sframe_scale("org", "Organisation", items = c("q1", "q2"))
   ))
 }
 
-test_that("sf_reference() builds a CSL-JSON record and refuses a bad key or title", {
-  r <- sf_reference("likert_1932", "A technique for the measurement of attitudes",
+test_that("sframe_reference() builds a CSL-JSON record and refuses a bad key or title", {
+  r <- sframe_reference("likert_1932", "A technique for the measurement of attitudes",
                     author = c("Likert, R.", "{R Core Team}", "Ada Lovelace"), year = 1932,
                     container = "Archives of Psychology", volume = 22, pages = "1-55",
                     doi = "https://doi.org/10.1000/x1", cited_by = c("instrument", "scale:org"))
@@ -25,9 +25,9 @@ test_that("sf_reference() builds a CSL-JSON record and refuses a bad key or titl
   expect_equal(r$volume, "22")
   expect_equal(r$DOI, "10.1000/x1")
   expect_null(r$publisher)
-  expect_error(sf_reference("bad key", "T"), class = "sframe_validation_error")
-  expect_error(sf_reference("ok", "  "), class = "sframe_validation_error")
-  expect_error(sf_reference("ok", "T", cited_by = "page:3"), class = "sframe_validation_error")
+  expect_error(sframe_reference("bad key", "T"), class = "sframe_validation_error")
+  expect_error(sframe_reference("ok", "  "), class = "sframe_validation_error")
+  expect_error(sframe_reference("ok", "T", cited_by = "page:3"), class = "sframe_validation_error")
 })
 
 test_that("read_bibtex() reads common entries, accents, organisations and protected case", {
@@ -67,17 +67,17 @@ test_that("read_bibtex() reads common entries, accents, organisations and protec
   expect_equal(from_file$field_2018$cited_by, "scale:org")
 })
 
-test_that("add_references() refuses a repeated key unless told to replace it", {
+test_that("sframe_add_references() refuses a repeated key unless told to replace it", {
   instr <- demo_instrument()
-  instr <- add_references(instr, sf_reference("a_1", "First", cited_by = "item:q1"))
-  expect_error(add_references(instr, sf_reference("a_1", "Second")), class = "sframe_validation_error")
-  replaced <- add_references(instr, sf_reference("a_1", "Second", cited_by = "scale:org"), replace = TRUE)
+  instr <- sframe_add_references(instr, sframe_reference("a_1", "First", cited_by = "item:q1"))
+  expect_error(sframe_add_references(instr, sframe_reference("a_1", "Second")), class = "sframe_validation_error")
+  replaced <- sframe_add_references(instr, sframe_reference("a_1", "Second", cited_by = "scale:org"), replace = TRUE)
   expect_length(replaced$references, 1)
   expect_equal(replaced$references[[1]]$title, "Second")
   expect_setequal(replaced$references[[1]]$cited_by, c("item:q1", "scale:org"))
-  expect_named(sframe_references(replaced, cited_by = "scale:org"), "a_1")
-  # sf_instrument() takes references as components.
-  direct <- sf_instrument("Direct", components = list(sf_item("q1", "Age?", "numeric"), sf_reference("b_1", "B")))
+  expect_named(sframe_get_references(replaced, cited_by = "scale:org"), "a_1")
+  # sframe_instrument() takes references as components.
+  direct <- sframe_instrument("Direct", components = list(sframe_item("q1", "Age?", "numeric"), sframe_reference("b_1", "B")))
   expect_length(direct$references, 1)
 })
 
@@ -86,7 +86,7 @@ test_that("references round-trip, and an instrument without them keeps its file 
   f0 <- tempfile(fileext = ".sframe"); write_sframe(plain, f0)
   expect_false("references" %in% names(jsonlite::fromJSON(f0, simplifyVector = FALSE)))
 
-  cited <- add_references(plain, sf_reference("a_1", "First", year = 2001, cited_by = "item:q1"))
+  cited <- sframe_add_references(plain, sframe_reference("a_1", "First", year = 2001, cited_by = "item:q1"))
   f1 <- tempfile(fileext = ".sframe"); write_sframe(cited, f1)
   written <- jsonlite::fromJSON(f1, simplifyVector = FALSE)
   # One target still serialises as an array, and the date keeps its nesting.
@@ -103,7 +103,7 @@ test_that("references round-trip, and an instrument without them keeps its file 
 test_that("citing a source is not an amendment: the content hash ignores references", {
   instr <- demo_instrument()
   before <- surveyframe:::sframe_content_hash(instr)
-  after <- surveyframe:::sframe_content_hash(add_references(instr, sf_reference("a_1", "First")))
+  after <- surveyframe:::sframe_content_hash(sframe_add_references(instr, sframe_reference("a_1", "First")))
   expect_identical(before, after)
 
   # An amended instrument read from its file takes a reference and writes
@@ -115,7 +115,7 @@ test_that("citing a source is not an amendment: the content hash ignores referen
                           reason_text = "Wording.", tier = "design", deviation_report = "Item q1 reworded.")
   write_sframe(amended, f, overwrite = TRUE)
   reread <- read_sframe(f)
-  expect_no_error(write_sframe(add_references(reread, sf_reference("a_1", "First")), tempfile(fileext = ".sframe")))
+  expect_no_error(write_sframe(sframe_add_references(reread, sframe_reference("a_1", "First")), tempfile(fileext = ".sframe")))
   # A change to an item still needs one.
   reread$items[[2]]$label <- "Changed without disclosure."
   expect_error(write_sframe(reread, tempfile(fileext = ".sframe")))
@@ -123,8 +123,8 @@ test_that("citing a source is not an amendment: the content hash ignores referen
 
 test_that("validate_sframe() reports a missing target and a repeated key", {
   instr <- demo_instrument()
-  instr$references <- list(sf_reference("a_1", "First", cited_by = "item:nope"),
-                           sf_reference("a_1", "Again", cited_by = "plan:RQ9"))
+  instr$references <- list(sframe_reference("a_1", "First", cited_by = "item:nope"),
+                           sframe_reference("a_1", "Again", cited_by = "plan:RQ9"))
   v <- validate_sframe(instr, strict = FALSE)
   expect_false(v$valid)
   msgs <- paste(unlist(v$problems %||% v$errors), collapse = " | ")
@@ -132,7 +132,7 @@ test_that("validate_sframe() reports a missing target and a repeated key", {
   expect_match(msgs, "plan 'RQ9'")
   expect_match(msgs, "Duplicate reference id")
   expect_true("references" %in% surveyframe:::sframe_validation_checks)
-  expect_true(validate_sframe(add_references(demo_instrument(), sf_reference("ok_1", "Fine", cited_by = "scale:org")), strict = FALSE)$valid)
+  expect_true(validate_sframe(sframe_add_references(demo_instrument(), sframe_reference("ok_1", "Fine", cited_by = "scale:org")), strict = FALSE)$valid)
 })
 
 test_that("every built-in method reference has a CSL record, keyed the same", {
@@ -206,14 +206,14 @@ test_that("the Quarto report cites in text and lists every reference once, at th
   instr <- d$instrument
   scale <- instr$scales[[1]]$id
   block <- instr$analysis_plan[[1]]$id
-  instr <- add_references(instr,
-    sf_reference("likert_1932", "A technique for the measurement of attitudes", author = "Likert, R.",
+  instr <- sframe_add_references(instr,
+    sframe_reference("likert_1932", "A technique for the measurement of attitudes", author = "Likert, R.",
                  year = 1932, container = "Archives of Psychology", volume = "22", issue = "140",
                  pages = "1-55", cited_by = c("instrument", paste0("scale:", scale))),
-    sf_reference("nunnally_1994", "Psychometric theory", author = c("Nunnally, J. C.", "Bernstein, I. H."),
+    sframe_reference("nunnally_1994", "Psychometric theory", author = c("Nunnally, J. C.", "Bernstein, I. H."),
                  year = 1994, type = "book", edition = "3", publisher = "McGraw-Hill", cited_by = paste0("plan:", block)))
   interp <- stats::setNames(list("As earlier work found [@smith_2020]."), block)
-  extra <- list(sf_reference("smith_2020", "Writing about results", author = "Smith, A.", year = 2020, type = "book", publisher = "SAGE"))
+  extra <- list(sframe_reference("smith_2020", "Writing about results", author = "Smith, A.", year = 2020, type = "book", publisher = "SAGE"))
   out <- suppressMessages(render_report(instr, data = d$responses, interpretations = interp,
                                         references = extra, output_file = tempfile(fileext = ".html")))
   skip_if(!identical(attr(out, "engine"), "quarto"), "Quarto render fell back to the built-in engine")

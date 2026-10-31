@@ -5,7 +5,7 @@
 # added them by amendment whenever a researcher opened an example.
 
 test_that("3: every demo has a welcome screen asking for consent, and a thank-you", {
-  for (demo in sframe_demos()$name) {
+  for (demo in sframe_list_demos()$name) {
     r <- sframe_demo(demo)$instrument$render
     expect_true(nzchar(r$welcome$title %||% ""), info = demo)
     expect_true(nzchar(r$welcome$consent_text %||% ""), info = demo)

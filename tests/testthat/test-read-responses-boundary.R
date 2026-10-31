@@ -11,11 +11,11 @@
 # 7. Two columns with the same name were silently reduced to one.
 
 instrument <- function() {
-  sf_instrument(title = "Reader", components = list(
-    sf_choices("ag5", 1:5, as.character(1:5)),
-    sf_item("q1", "Rating", "likert", choice_set = "ag5"),
-    sf_item("note", "Comment", "text"),
-    sf_item("mx", "Grid", "matrix", choice_set = "ag5", matrix_items = c("a", "b"))
+  sframe_instrument(title = "Reader", components = list(
+    sframe_choice_set("ag5", 1:5, as.character(1:5)),
+    sframe_item("q1", "Rating", "likert", choice_set = "ag5"),
+    sframe_item("note", "Comment", "text"),
+    sframe_item("mx", "Grid", "matrix", choice_set = "ag5", matrix_items = c("a", "b"))
   ))
 }
 

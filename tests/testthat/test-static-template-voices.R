@@ -5,8 +5,8 @@
 # state except a failed send. The default message claims nothing.
 
 voices_instrument <- function(message = NULL) {
-  ins <- sf_instrument("Voices", components = list(
-    sf_item("q1", "How was it?", type = "text")))
+  ins <- sframe_instrument("Voices", components = list(
+    sframe_item("q1", "How was it?", type = "text")))
   ins$render <- list(thankyou = if (!is.null(message)) list(message = message) else list())
   ins
 }
@@ -71,7 +71,7 @@ test_that("D4: a preview says nothing was sent", {
 
 test_that("D4: a preview export keeps the message the researcher wrote", {
   out <- tempfile(fileext = ".html")
-  export_static_survey(voices_instrument("Debrief text."), output_path = out,
+  export_survey(voices_instrument("Debrief text."), output_path = out,
                        preview = TRUE, open = FALSE)
   expect_match(paste(readLines(out, warn = FALSE), collapse = "\n"),
                "Debrief text.", fixed = TRUE)

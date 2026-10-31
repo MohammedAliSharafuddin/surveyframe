@@ -86,7 +86,7 @@ test_that("23: the leading features reach a rendered report", {
   # the respondent id
   text_col <- "what_worked"
   skip_if(!text_col %in% names(demo$responses), "no open-text column")
-  sf_plan(instr) <- list(list(
+  sframe_plan(instr) <- list(list(
     id = "RQ1", research_question = "What features lead?",
     family = "text", method = "quanteda_dfm",
     roles = list(item = text_col)))
@@ -124,10 +124,10 @@ template_surveyframe_calls <- function() {
   # comments is what keeps this a check on calls rather than on prose.
   qmd <- paste(sub("#.*$", "", lines), collapse = "\n")
   called <- unique(unlist(regmatches(
-    qmd, gregexpr("\\b(sframe_[a-z_0-9]+|analysis_syntax|score_scales|read_sframe|read_responses|codebook_report|quality_report|reliability_report|item_report|efa_report|validity_report|run_analysis_plan|descriptives_report|missing_data_report)\\b",
+    qmd, gregexpr("\\b(sframe_[a-z_0-9]+|score_scales|read_sframe|read_responses|run_analysis_plan)\\b",
                   qmd, perl = TRUE))))
   # names used as local variables in the template rather than calls
-  setdiff(called, c("sframe_demo", "sframe_demos"))
+  setdiff(called, c("sframe_demo", "sframe_list_demos"))
 }
 
 # What the INSTALLED package exports, read from its NAMESPACE on disk.

@@ -11,8 +11,8 @@
 # without an id, rather than the append being refused mid-study.
 
 id_instrument <- function() {
-  sf_instrument("Identified", components = list(
-    sf_item("q1", "How was it?", type = "text")))
+  sframe_instrument("Identified", components = list(
+    sframe_item("q1", "How was it?", type = "text")))
 }
 
 test_that("a Shiny response carries an identifier, first", {

@@ -134,9 +134,9 @@ sframe_decision_item <- function(instrument, item_id, types) {
 #' @seealso [sframe_aggregate_judgements()], [sframe_collected_weights()]
 #' @examples
 #' crits <- c("price", "speed")
-#' study <- sf_instrument(
+#' study <- sframe_instrument(
 #'   title = "Demo", components = list(
-#'     sf_item("pairs", "Compare the criteria", type = "pairwise_comparison",
+#'     sframe_item("pairs", "Compare the criteria", type = "pairwise_comparison",
 #'             comparison_items = crits)
 #'   )
 #' )
@@ -440,9 +440,9 @@ sframe_aggregate_judgements <- function(matrices,
 #' @export
 #' @seealso [sframe_assemble_pairwise()]
 #' @examples
-#' study <- sf_instrument(
+#' study <- sframe_instrument(
 #'   title = "Demo", components = list(
-#'     sf_item("pts", "Divide 100 points", type = "criteria_weight",
+#'     sframe_item("pts", "Divide 100 points", type = "criteria_weight",
 #'             comparison_items = c("price", "speed"))
 #'   )
 #' )
@@ -544,12 +544,12 @@ sframe_collected_weights <- function(data, instrument, item_id,
 #' @export
 #' @seealso [sframe_collected_weights()]
 #' @examples
-#' q5    <- sf_choices("q5", 1:5,
+#' q5    <- sframe_choice_set("q5", 1:5,
 #'            c("Very poor", "Poor", "Fair", "Good", "Excellent"))
-#' price <- sf_item("rate_price", "Rate each supplier: value",
+#' price <- sframe_item("rate_price", "Rate each supplier: value",
 #'                  type = "matrix", matrix_items = c("Alpha", "Basilica"),
 #'                  choice_set = "q5")
-#' study <- sf_instrument("Supplier selection", components = list(q5, price))
+#' study <- sframe_instrument("Supplier selection", components = list(q5, price))
 #' responses <- data.frame(rate_price__Alpha = c(3, 4), rate_price__Basilica = c(5, 5))
 #' rm <- sframe_rated_matrix(responses, study, "rate_price")
 #' rm$matrix

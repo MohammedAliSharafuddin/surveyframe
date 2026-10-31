@@ -7,7 +7,7 @@
 sframe_codebook_items_display(cb)
 }
 \arguments{
-\item{cb}{An \code{sframe_codebook} object from \code{\link[=codebook_report]{codebook_report()}}.}
+\item{cb}{An \code{sframe_codebook} object from \code{\link[=sframe_codebook]{sframe_codebook()}}.}
 }
 \value{
 A data.frame, \code{cb$items_table} with \code{choice_set} and \code{scale_id}
@@ -17,7 +17,7 @@ replaced by display text.
 Replaces \code{items_table}'s \code{choice_set} id with the choice set's actual
 response options ("1 = Strongly disagree; 2 = Disagree; ...") and its
 \code{scale_id} with the scale's label, so each row of the printed codebook is
-self-contained. \code{\link[=codebook_report]{codebook_report()}} itself keeps the raw ids, for joining
+self-contained. \code{\link[=sframe_codebook]{sframe_codebook()}} itself keeps the raw ids, for joining
 \code{items_table} to \code{choices_table}/\code{scales_table} programmatically. This
 enrichment is for the rendered document, where a reader should not need
 to cross-reference a separate table just to see what "1" means on a
@@ -25,9 +25,9 @@ scale shared by many items.
 }
 \examples{
 demo <- sframe_demo_data()
-cb <- codebook_report(demo$instrument)
+cb <- sframe_codebook(demo$instrument)
 head(sframe_codebook_items_display(cb))
 }
 \seealso{
-\code{\link[=codebook_report]{codebook_report()}}
+\code{\link[=sframe_codebook]{sframe_codebook()}}
 }

@@ -329,7 +329,7 @@ const SF       = JSON.parse(document.getElementById('sf-data').textContent);
 const R        = (SF.render||{});
 const THEME    = R.theme||'{{THEME_COLOR}}'||'#2563eb';
 const ENDPOINT = document.body.dataset.endpoint||'';
-// A preview collects nothing. export_static_survey(preview = TRUE) writes
+// A preview collects nothing. export_survey(preview = TRUE) writes
 // true here, and any other value, the unreplaced placeholder included, is a
 // live survey. The flag is checked before every delivery path, host sender
 // included, so a host's callback cannot receive a preview answer.
@@ -407,7 +407,7 @@ function evaluate(op,actual,value){
   switch(op){
     case'==':return String(actual)===String(value);
     case'!=':return String(actual)!==String(value);
-    // `value` is a JSON array whenever sf_branch() was given a vector, which is
+    // `value` is a JSON array whenever sframe_branch() was given a vector, which is
     // the documented shape for %in%, and a comma-separated string when it came
     // from a hand-written file or an older builder. Arrays have no .split, so
     // assuming the string form threw and left the gated item hidden for good.

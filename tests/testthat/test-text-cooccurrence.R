@@ -7,11 +7,11 @@
 # plot are exercised directly rather than through run_analysis_plan().
 
 make_cooc_instrument <- function() {
-  sf_instrument(
+  sframe_instrument(
     title = "Co-occurrence fixture",
     version = "1.0.0",
     components = list(
-      sf_item("comments", "Any comments about your stay?", type = "textarea")
+      sframe_item("comments", "Any comments about your stay?", type = "textarea")
     )
   )
 }
@@ -139,7 +139,7 @@ test_that("sframe_run_co_occurrence below the minimum-response floor errors rath
 # co-occur, i.e. the error above comes from the guard and not from some
 # other empty-input failure the guard happens to mask.
 test_that("mutation check: the same 3-response input computes once past the floor", {
-  cleaned <- clean_text_responses(make_cooc_data(n = 3), "comments")
+  cleaned <- sframe_clean_text(make_cooc_data(n = 3), "comments")
   edges <- surveyframe:::.sframe_cooccurrence(cleaned, top_n = 20L)
   expect_gt(nrow(edges), 0)
 })
@@ -164,7 +164,7 @@ test_that("sframe_run_co_occurrence reports the zero-edges error on sparse data"
 test_that("mutation check: 2-word overlapping responses do produce edges", {
   data <- data.frame(comments = c("alpha bravo", "alpha bravo"),
                      stringsAsFactors = FALSE)
-  cleaned <- clean_text_responses(data, "comments")
+  cleaned <- sframe_clean_text(data, "comments")
   edges <- surveyframe:::.sframe_cooccurrence(cleaned, top_n = 20L)
   expect_gt(nrow(edges), 0)
 })

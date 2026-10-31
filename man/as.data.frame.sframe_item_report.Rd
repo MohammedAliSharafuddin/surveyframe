@@ -23,5 +23,5 @@ A data frame of item-level diagnostics.
 Stacks item diagnostics from every reported scale into one table.
 }
 \seealso{
-\link{sframe_as_data_frame}, \code{\link[=item_report]{item_report()}}
+\link{sframe_as_data_frame}, \code{\link[=sframe_item_results]{sframe_item_results()}}
 }

@@ -10,38 +10,38 @@ syntax_instrument <- function() {
   items <- list()
   for (s in c("SAT", "TRU", "LOY")) {
     for (i in 1:3) {
-      items <- c(items, list(sf_item(paste0(tolower(s), i), paste(s, i),
+      items <- c(items, list(sframe_item(paste0(tolower(s), i), paste(s, i),
                                      type = "likert", choice_set = "ag5",
                                      scale_id = s)))
     }
   }
-  sf_instrument(
+  sframe_instrument(
     title = "Syntax", version = "1.0.0",
     components = c(
-      list(sf_choices("ag5", 1:5, as.character(1:5))),
+      list(sframe_choice_set("ag5", 1:5, as.character(1:5))),
       items,
-      list(sf_scale("SAT", "Satisfaction", items = paste0("sat", 1:3)),
-           sf_scale("TRU", "Trust",        items = paste0("tru", 1:3)),
-           sf_scale("LOY", "Loyalty",      items = paste0("loy", 1:3)))
+      list(sframe_scale("SAT", "Satisfaction", items = paste0("sat", 1:3)),
+           sframe_scale("TRU", "Trust",        items = paste0("tru", 1:3)),
+           sframe_scale("LOY", "Loyalty",      items = paste0("loy", 1:3)))
     )
   )
 }
 
 mediation_model <- function(labels = FALSE) {
   lab <- function(x) if (labels) x else NULL
-  sf_model(
+  sframe_model_spec(
     id = "m1", type = "cb_sem", engine = "lavaan",
     constructs = list(
-      sf_construct("SAT", items = paste0("sat", 1:3)),
-      sf_construct("TRU", items = paste0("tru", 1:3)),
-      sf_construct("LOY", items = paste0("loy", 1:3))
+      sframe_construct("SAT", items = paste0("sat", 1:3)),
+      sframe_construct("TRU", items = paste0("tru", 1:3)),
+      sframe_construct("LOY", items = paste0("loy", 1:3))
     ),
     paths = list(
-      sf_path("SAT", "TRU", label = lab("a")),
-      sf_path("TRU", "LOY", label = lab("b")),
-      sf_path("SAT", "LOY", label = lab("c"))
+      sframe_path("SAT", "TRU", label = lab("a")),
+      sframe_path("TRU", "LOY", label = lab("b")),
+      sframe_path("SAT", "LOY", label = lab("c"))
     ),
-    indirect = list(sf_indirect(from = "SAT", through = "TRU", to = "LOY"))
+    indirect = list(sframe_indirect_effect(from = "SAT", through = "TRU", to = "LOY"))
   )
 }
 
@@ -62,9 +62,9 @@ mediation_data <- function(n = 300, seed = 42) {
   d
 }
 
-test_that("cfa_syntax() output parses and fits", {
+test_that("sframe_syntax_cfa() output parses and fits", {
   skip_if_not_installed("lavaan")
-  syn <- cfa_syntax(syntax_instrument())
+  syn <- sframe_syntax_cfa(syntax_instrument())
   expect_no_error(lavaan::lavParseModelString(syn))
   fit <- lavaan::cfa(syn, data = mediation_data())
   expect_true(lavaan::lavInspect(fit, "converged"))
@@ -72,7 +72,7 @@ test_that("cfa_syntax() output parses and fits", {
 
 test_that("a mediation model's generated syntax fits, not merely parses", {
   skip_if_not_installed("lavaan")
-  syn <- sem_lavaan_syntax(mediation_model(), syntax_instrument())
+  syn <- sframe_syntax_sem(mediation_model(), syntax_instrument())
 
   # the regression: every label the := lines multiply must be defined on a
   # structural path, or lavaan rejects the model at fit time
@@ -93,7 +93,7 @@ test_that("an unlabelled path an indirect effect walks is labelled in the output
   # The generator derives a label for the := line. Before the fix it did not
   # write that label onto the path, so the definition referenced a name lavaan
   # had never seen.
-  syn <- sem_lavaan_syntax(mediation_model(), syntax_instrument())
+  syn <- sframe_syntax_sem(mediation_model(), syntax_instrument())
   defined <- unlist(regmatches(syn, gregexpr("[A-Za-z0-9_]+(?=\\*)", syn, perl = TRUE)))
   used <- unlist(regmatches(syn, gregexpr("(?<=:= )[A-Za-z0-9_*+ ]+", syn, perl = TRUE)))
   used <- unlist(strsplit(gsub("[+ ]", "*", used), "*", fixed = TRUE))
@@ -105,37 +105,37 @@ test_that("an unlabelled path an indirect effect walks is labelled in the output
 })
 
 test_that("hand-labelled paths keep their labels", {
-  syn <- sem_lavaan_syntax(mediation_model(labels = TRUE), syntax_instrument())
+  syn <- sframe_syntax_sem(mediation_model(labels = TRUE), syntax_instrument())
   expect_match(syn, "TRU ~ a*SAT", fixed = TRUE)
   expect_match(syn, "indirect_SAT_TRU_LOY := a*b", fixed = TRUE)
   expect_match(syn, "total_SAT_LOY := c + indirect_SAT_TRU_LOY", fixed = TRUE)
 })
 
 test_that("a model without indirect effects generates unlabelled paths as before", {
-  plain <- sf_model(
+  plain <- sframe_model_spec(
     id = "m2", type = "cb_sem", engine = "lavaan",
     constructs = list(
-      sf_construct("SAT", items = paste0("sat", 1:3)),
-      sf_construct("LOY", items = paste0("loy", 1:3))
+      sframe_construct("SAT", items = paste0("sat", 1:3)),
+      sframe_construct("LOY", items = paste0("loy", 1:3))
     ),
-    paths = list(sf_path("SAT", "LOY"))
+    paths = list(sframe_path("SAT", "LOY"))
   )
-  syn <- sem_lavaan_syntax(plain, syntax_instrument())
+  syn <- sframe_syntax_sem(plain, syntax_instrument())
   expect_match(syn, "LOY ~ SAT", fixed = TRUE)
   expect_false(grepl("SAT__LOY", syn, fixed = TRUE))
 })
 
-test_that("seminr_syntax() output is runnable R code", {
+test_that("sframe_syntax_pls() output is runnable R code", {
   skip_if_not_installed("seminr")
-  m <- sf_model(
+  m <- sframe_model_spec(
     id = "p1", type = "pls_sem", engine = "seminr",
     constructs = list(
-      sf_construct("SAT", items = paste0("sat", 1:3), mode = "composite"),
-      sf_construct("LOY", items = paste0("loy", 1:3), mode = "composite")
+      sframe_construct("SAT", items = paste0("sat", 1:3), mode = "composite"),
+      sframe_construct("LOY", items = paste0("loy", 1:3), mode = "composite")
     ),
-    paths = list(sf_path("SAT", "LOY"))
+    paths = list(sframe_path("SAT", "LOY"))
   )
-  code <- seminr_syntax(m)
+  code <- sframe_syntax_pls(m)
   exprs <- expect_no_error(parse(text = code))
 
   # Run everything up to the fit. The bootstrap is skipped because 5000

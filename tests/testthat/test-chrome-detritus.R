@@ -55,9 +55,9 @@ test_that("render_report(format = 'pdf') leaves no Chrome detritus behind", {
   }
   skip_if(!nzchar(chrome_command), "No Chrome available for chrome_print()")
 
-  instr <- sf_instrument("Detritus check", components = list(
-    sf_choices("ag5", 1:5, c("SD", "D", "N", "A", "SA")),
-    sf_item("q1", "Item 1", type = "likert", choice_set = "ag5")
+  instr <- sframe_instrument("Detritus check", components = list(
+    sframe_choice_set("ag5", 1:5, c("SD", "D", "N", "A", "SA")),
+    sframe_item("q1", "Item 1", type = "likert", choice_set = "ag5")
   ))
 
   before <- list.files(tempdir(), all.files = TRUE, no.. = TRUE)

@@ -1,13 +1,13 @@
 # git_link.R
 #
 # A content hash identifies an instrument's content. It gives no diff, author,
-# timestamp or reason for a change. Git records those, so link_git_commit()
+# timestamp or reason for a change. Git records those, so sframe_link_git_commit()
 # points at Git. Given the tracked file's path, it also compares the instrument
 # with the file as committed, and reports that comparison as `verified`.
 # Without a path it is a pointer to HEAD and nothing more.
 #
 # Git is optional. No package here depends on it existing, and it is not a
-# hard or Suggests dependency -- link_git_commit() shells out with system2()
+# hard or Suggests dependency -- sframe_link_git_commit() shells out with system2()
 # and degrades to an informative, non-error return value when git is
 # unavailable or the path isn't a repository, so the rest of the package
 # works identically whether or not the researcher uses git at all.
@@ -66,10 +66,10 @@ sframe_git_run <- function(args, repo_path) {
 #' @seealso [amend_sframe()], [write_sframe()]
 #'
 #' @examples
-#' item  <- sf_item("q1", "How satisfied are you?", type = "text")
-#' instr <- sf_instrument("Demo", components = list(item))
-#' link_git_commit(instr, repo_path = tempdir())
-link_git_commit <- function(instrument, repo_path = ".", path = NULL) {
+#' item  <- sframe_item("q1", "How satisfied are you?", type = "text")
+#' instr <- sframe_instrument("Demo", components = list(item))
+#' sframe_link_git_commit(instr, repo_path = tempdir())
+sframe_link_git_commit <- function(instrument, repo_path = ".", path = NULL) {
   sframe_check_instrument(instrument)
 
   if (!sframe_git_available()) {

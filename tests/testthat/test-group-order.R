@@ -5,13 +5,13 @@
 # flipped the sign of t.
 
 order_instr <- function() {
-  sf_instrument(
+  sframe_instrument(
     "Group order",
     components = list(
-      sf_choices("arm", values = c("treat", "ctrl"),
+      sframe_choice_set("arm", values = c("treat", "ctrl"),
                  labels = c("Treatment", "Control")),
-      sf_item("grp", "Arm", type = "single_choice", choice_set = "arm"),
-      sf_item("score", "Score", type = "numeric")
+      sframe_item("grp", "Arm", type = "single_choice", choice_set = "arm"),
+      sframe_item("score", "Score", type = "numeric")
     )
   )
 }
@@ -53,7 +53,7 @@ test_that("without a choice set the groups are factor levels, then sorted", {
   expect_equal(sframe_group_order(c("b", "a", "b", NA)), c("a", "b"))
 })
 
-test_that("analysis_syntax() writes the order the runner used", {
+test_that("sframe_syntax_result() writes the order the runner used", {
   res <- sframe_run_one_block(order_block("t_test_ind"), order_data(),
                               order_instr())
   code <- paste(sframe_syntax_call(res), collapse = "\n")

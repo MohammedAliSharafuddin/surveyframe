@@ -38,12 +38,12 @@ sentiment_phrases <- c(
 )
 
 make_sentiment_instrument <- function() {
-  sf_instrument(
+  sframe_instrument(
     title = "Sentiment fixture",
     version = "1.0.0",
     components = list(
-      sf_item("comments", "Any comments about your stay?", type = "textarea"),
-      sf_item("branch", "Which branch?", type = "single_choice",
+      sframe_item("comments", "Any comments about your stay?", type = "textarea"),
+      sframe_item("branch", "Which branch?", type = "single_choice",
               choice_set = "branch_cs")
     )
   )
@@ -155,7 +155,7 @@ test_that("mutation check: the tidy_sentiment guard is what produces the error a
   # is solely the runner's floor check against .sframe_text_min_responses,
   # not some other failure (e.g. an empty lexicon join).
   data <- make_sentiment_data(n = 3)
-  cleaned <- clean_text_responses(data, "comments")
+  cleaned <- sframe_clean_text(data, "comments")
   res <- surveyframe:::sframe_run_tidy_sentiment(
     data, list(item = "comments"), list(), NULL
   )
@@ -202,7 +202,7 @@ test_that("mutation check: quanteda_dfm's guard is what blocks the n = 3 case", 
   # Confirm a dfm CAN be built at n = 3 directly, so the error above is
   # solely the runner's floor check, not a downstream quanteda failure.
   data <- make_sentiment_data(n = 3)
-  cleaned <- clean_text_responses(data, "comments")
+  cleaned <- sframe_clean_text(data, "comments")
   d <- quanteda::dfm(quanteda::tokens(as.character(cleaned)))
   expect_true(quanteda::nfeat(d) > 0)
 })

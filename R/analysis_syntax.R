@@ -3,8 +3,8 @@
 # The R code behind a result, so a report can show the statistical call that
 # produced each number instead of only the wrapper that dispatched it.
 #
-# The package already generates syntax for the model blocks (cfa_syntax(),
-# sem_lavaan_syntax(), seminr_syntax(), efa_syntax()), and the report renders
+# The package already generates syntax for the model blocks (sframe_syntax_cfa(),
+# sframe_syntax_sem(), sframe_syntax_pls(), sframe_syntax_efa()), and the report renders
 # whatever a result carries in $syntax. This extends that to the ordinary
 # analysis blocks.
 #
@@ -283,7 +283,7 @@ sframe_syntax_call <- function(result, frame = "scored") {
 #' The 2-group, paired, k-group, correlation, regression and categorical
 #' families, and descriptives. `sframe_syntax_methods` lists them. A method
 #' outside that list returns `NULL`: the model families carry their own syntax
-#' already, through [cfa_syntax()] and its neighbours, and for the rest the
+#' already, through [sframe_syntax_cfa()] and its neighbours, and for the rest the
 #' computation has no single base-R equivalent to show honestly.
 #'
 #' @param x An `sframe_analysis_results` object from [run_analysis_plan()], or
@@ -298,14 +298,14 @@ sframe_syntax_call <- function(result, frame = "scored") {
 #' @return A character vector of R code lines, or `NULL` for a method this does
 #'   not cover. For several blocks, a named list of such vectors.
 #' @export
-#' @seealso [run_analysis_plan()], [cfa_syntax()], [render_report()]
+#' @seealso [run_analysis_plan()], [sframe_syntax_cfa()], [render_report()]
 #'
 #' @examples
-#' instr <- sf_instrument("Syntax demo", components = list(
-#'   sf_item("score", "Score", type = "numeric"),
-#'   sf_item("arm", "Arm", type = "text")
+#' instr <- sframe_instrument("Syntax demo", components = list(
+#'   sframe_item("score", "Score", type = "numeric"),
+#'   sframe_item("arm", "Arm", type = "text")
 #' ))
-#' sf_plan(instr) <- list(list(
+#' sframe_plan(instr) <- list(list(
 #'   id = "RQ1", research_question = "Do the arms differ?",
 #'   family = "inferential", method = "t_test_ind",
 #'   roles = list(group = "arm", outcome = "score")
@@ -319,8 +319,8 @@ sframe_syntax_call <- function(result, frame = "scored") {
 #' results <- run_analysis_plan(responses, instr)
 #'
 #' # the call behind the number, with the variables and options resolved
-#' cat(analysis_syntax(results, which = "RQ1"), sep = "\n")
-analysis_syntax <- function(x, which = NULL, data_expr = "scored",
+#' cat(sframe_syntax_result(results, which = "RQ1"), sep = "\n")
+sframe_syntax_result <- function(x, which = NULL, data_expr = "scored",
                             header = FALSE) {
   if (inherits(x, "sframe_analysis_results")) {
     if (!is.null(which)) {
@@ -330,11 +330,11 @@ analysis_syntax <- function(x, which = NULL, data_expr = "scored",
                  paste(names(x), collapse = ", "), "."),
           class = "sframe_error")
       }
-      return(analysis_syntax(x[[which]], data_expr = data_expr,
+      return(sframe_syntax_result(x[[which]], data_expr = data_expr,
                              header = header))
     }
     out <- lapply(x, function(r) {
-      analysis_syntax(r, data_expr = data_expr, header = header)
+      sframe_syntax_result(r, data_expr = data_expr, header = header)
     })
     names(out) <- names(x)
     return(out)

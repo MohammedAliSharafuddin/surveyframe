@@ -2,7 +2,7 @@
 #
 # One APA layer (CX-15, CX-22, CX-24, D9). Each renderer used to format
 # result text, table cells and headings on its own, so the built-in engine,
-# render_results() and render_result() disagreed with each other and with
+# render_results() and sframe_format_result() disagreed with each other and with
 # APA 7. Everything a report shows of a statistic goes through here.
 
 # Statistics that cannot exceed 1 in absolute value. APA 7 writes these, and
@@ -67,7 +67,7 @@ sframe_apa_number <- function(v, digits = 2, bounded = FALSE) {
 #' Format a result table's cells as an APA 7 report prints them
 #'
 #' The cells of a table from [run_analysis_plan()] as both report engines and
-#' [render_result()] print them, so a table shows the same numbers wherever it
+#' [sframe_format_result()] print them, so a table shows the same numbers wherever it
 #' appears. A p value column shows 3 decimals with no leading zero, or
 #' `<.001`. A column that cannot exceed 1, such as `r`, `tau` or `alpha`, drops
 #' its leading zero. Other numbers show 2 decimals, whole numbers none. A

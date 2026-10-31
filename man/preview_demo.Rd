@@ -11,11 +11,11 @@ preview_demo(
 )
 }
 \arguments{
-\item{name}{Character. The demo to preview. \code{\link[=sframe_demos]{sframe_demos()}} lists them.
+\item{name}{Character. The demo to preview. \code{\link[=sframe_list_demos]{sframe_list_demos()}} lists them.
 Defaults to \code{"two_group"}.}
 
 \item{where}{One of \code{"browser"}, a standalone HTML page written by
-\code{\link[=export_static_survey]{export_static_survey()}}, or \code{"studio"}, the preview screen of
+\code{\link[=export_survey]{export_survey()}}, or \code{"studio"}, the preview screen of
 \code{\link[=launch_studio]{launch_studio()}}.}
 
 \item{open}{Logical. Whether to open the browser. Defaults to
@@ -36,5 +36,5 @@ path <- preview_demo("two_group", open = FALSE)
 file.exists(path)
 }
 \seealso{
-\code{\link[=sframe_demo]{sframe_demo()}}, \code{\link[=export_static_survey]{export_static_survey()}}, \code{\link[=launch_studio]{launch_studio()}}
+\code{\link[=sframe_demo]{sframe_demo()}}, \code{\link[=export_survey]{export_survey()}}, \code{\link[=launch_studio]{launch_studio()}}
 }

@@ -22,7 +22,7 @@ SurveyStudio support in a single instrument, and is what backs
 }
 \examples{
 demo <- sframe_input_types_demo_data()
-sf_meta(demo$instrument)$title
+sframe_meta(demo$instrument)$title
 nrow(demo$responses)
 }
 \seealso{

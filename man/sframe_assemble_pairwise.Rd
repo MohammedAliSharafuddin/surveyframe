@@ -35,9 +35,9 @@ declared scale, are dropped whole and counted. Completing partial matrices
 }
 \examples{
 crits <- c("price", "speed")
-study <- sf_instrument(
+study <- sframe_instrument(
   title = "Demo", components = list(
-    sf_item("pairs", "Compare the criteria", type = "pairwise_comparison",
+    sframe_item("pairs", "Compare the criteria", type = "pairwise_comparison",
             comparison_items = crits)
   )
 )

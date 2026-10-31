@@ -8,19 +8,19 @@
 #     4-item scale on the strength of 2 answers.
 
 quality_instrument <- function() {
-  sf_instrument("Quality", components = list(
-    sf_choices("ag5", values = 1:5,
+  sframe_instrument("Quality", components = list(
+    sframe_choice_set("ag5", values = 1:5,
                labels = c("Strongly disagree", "Disagree", "Neutral",
                           "Agree", "Strongly agree")),
-    sf_item("sat_1", "Item 1", type = "likert", choice_set = "ag5",
+    sframe_item("sat_1", "Item 1", type = "likert", choice_set = "ag5",
             scale_id = "sat"),
-    sf_item("sat_2", "Item 2", type = "likert", choice_set = "ag5",
+    sframe_item("sat_2", "Item 2", type = "likert", choice_set = "ag5",
             scale_id = "sat"),
-    sf_item("sat_3", "Item 3", type = "likert", choice_set = "ag5",
+    sframe_item("sat_3", "Item 3", type = "likert", choice_set = "ag5",
             scale_id = "sat"),
-    sf_item("sat_4", "Item 4", type = "likert", choice_set = "ag5",
+    sframe_item("sat_4", "Item 4", type = "likert", choice_set = "ag5",
             scale_id = "sat"),
-    sf_scale("sat", "Satisfaction",
+    sframe_scale("sat", "Satisfaction",
              items = c("sat_1", "sat_2", "sat_3", "sat_4"))
   ))
 }
@@ -30,9 +30,9 @@ test_that("8: a column the export left out is reported, not ignored", {
   # sat_4 never reached the export at all
   data <- data.frame(sat_1 = c(5, 4, 3), sat_2 = c(5, 4, 3),
                      sat_3 = c(5, 4, 3))
-  qr <- quality_report(data, instr)
+  qr <- sframe_quality_results(data, instr)
 
-  expect_equal(sf_missing_columns(qr), "sat_4")
+  expect_equal(sframe_missing_columns(qr), "sat_4")
   # the respondent rate counts the absent column, so an export missing a
   # quarter of the declaration cannot read as complete
   expect_true(all(qr$missing$respondent_miss > 0))
@@ -43,8 +43,8 @@ test_that("8: a complete export reports no absent column", {
   instr <- quality_instrument()
   data <- data.frame(sat_1 = c(5, 4), sat_2 = c(5, 4),
                      sat_3 = c(5, 4), sat_4 = c(5, NA))
-  qr <- quality_report(data, instr)
-  expect_length(sf_missing_columns(qr), 0)
+  qr <- sframe_quality_results(data, instr)
+  expect_length(sframe_missing_columns(qr), 0)
   expect_equal(unname(qr$missing$respondent_miss), c(0, 0.25))
 })
 
@@ -56,7 +56,7 @@ test_that("9: straight-lining needs the declared minimum of answers", {
     sat_3 = c(NA, 3, 3),
     sat_4 = c(NA, 3, 2)
   )
-  qr <- quality_report(data, instr, straightline_min_items = 4)
+  qr <- sframe_quality_results(data, instr, straightline_min_items = 4)
   sl <- qr$straightline$sat
 
   # row 1 answered 2 of 4, which is too little to call inattention
@@ -72,7 +72,7 @@ test_that("9: a lower minimum admits the shorter response", {
   instr <- quality_instrument()
   data <- data.frame(sat_1 = c(3, 5), sat_2 = c(3, 4),
                      sat_3 = c(NA, 3), sat_4 = c(NA, 2))
-  sl <- quality_report(data, instr, straightline_min_items = 2)$straightline$sat
+  sl <- sframe_quality_results(data, instr, straightline_min_items = 2)$straightline$sat
   expect_true(1 %in% sl$flagged_rows)
   expect_equal(sl$n_eligible, 2)
 })

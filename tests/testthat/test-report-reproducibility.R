@@ -5,12 +5,12 @@
 # value stayed put, which is why nothing looked wrong.
 
 plan_instrument <- function() {
-  sf_instrument(
+  sframe_instrument(
     title = "Repro", version = "1.0.0",
     components = list(
-      sf_choices("grp", c("a", "b"), c("A", "B")),
-      sf_item("g", "Group", type = "single_choice", choice_set = "grp"),
-      sf_item("y", "Outcome", type = "numeric")
+      sframe_choice_set("grp", c("a", "b"), c("A", "B")),
+      sframe_item("g", "Group", type = "single_choice", choice_set = "grp"),
+      sframe_item("y", "Outcome", type = "numeric")
     ),
     analysis_plan = list(list(
       id = "RQ1", research_question = "Do the groups differ?",
@@ -156,14 +156,14 @@ test_that("a missing straight-lining chart says why", {
   # instrument of short scales comes back checked = FALSE, the plot drops the
   # NA rows and returns NULL, and the chart vanished with nothing said.
   d <- sframe_demo_data()
-  q_default <- quality_report(d$responses, d$instrument)
+  q_default <- sframe_quality_results(d$responses, d$instrument)
   expect_null(sframe_plot_quality(q_default))
   note <- sframe_quality_plot_note(q_default)
   expect_type(note, "character")
   expect_match(note, "long enough to check", fixed = TRUE)
 
   # once a scale is checkable there is a chart, and so no note
-  q_low <- quality_report(d$responses, d$instrument, straightline_min_items = 2)
+  q_low <- sframe_quality_results(d$responses, d$instrument, straightline_min_items = 2)
   expect_s3_class(sframe_plot_quality(q_low), "ggplot")
   expect_null(sframe_quality_plot_note(q_low))
 })

@@ -23,5 +23,5 @@ The item-level missingness table from a missing-data report.
 Extract item missingness results
 }
 \seealso{
-\link{sframe_as_data_frame}, \code{\link[=missing_data_report]{missing_data_report()}}
+\link{sframe_as_data_frame}, \code{\link[=sframe_missing_data_results]{sframe_missing_data_results()}}
 }

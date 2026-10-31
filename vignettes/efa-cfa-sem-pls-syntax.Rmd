@@ -56,19 +56,19 @@ dsuq <- paste0("dsuq_", 1:5); ts <- paste0("ts_", 1:3); bi <- paste0("bi_", 1:3)
 
 ## EFA planning syntax
 
-`efa_syntax()` writes a short R block that estimates an exploratory factor
+`sframe_syntax_efa()` writes a short R block that estimates an exploratory factor
 solution with the optional `psych` package. This screens the digital marketing
 items before the confirmatory model.
 
 ```{r efa-syntax}
-cat(efa_syntax(items = c(dmre, dmau, dmeu, dmpv), nfactors = 4,
+cat(sframe_syntax_efa(items = c(dmre, dmau, dmeu, dmpv), nfactors = 4,
                extraction = "minres", rotation = "oblimin"))
 ```
 
 ## CFA syntax: the lower-order measurement model
 
 The confirmatory measurement model has the nine lower-order constructs as
-reflective factors. `cfa_lavaan_syntax()` writes lavaan syntax from a model
+reflective factors. `sframe_syntax_cfa()` writes lavaan syntax from a model
 object, with no need for lavaan at this stage.
 
 ```{r cfa}
@@ -77,54 +77,54 @@ construct_def <- list(
   DSQA = dsqa, DSQT = dsqt, DSUQ = dsuq, TS = ts, BI = bi
 )
 
-cfa_model <- sf_model(
+cfa_model <- sframe_model_spec(
   id    = "lower_order_cfa",
   label = "Lower-order measurement model",
   type  = "cfa",
-  constructs = Map(function(id, items) sf_construct(id, id, items),
+  constructs = Map(function(id, items) sframe_construct(id, id, items),
                    names(construct_def), construct_def)
 )
 
-cat(cfa_lavaan_syntax(model = cfa_model))
+cat(sframe_syntax_cfa(model = cfa_model))
 ```
 
 ## CB-SEM syntax: the structural model
 
 The covariance-based reading treats the five constructs as first-order
 reflective factors over their full item sets, with the nine direct paths and the
-four indirect effects from the hypotheses. `sem_lavaan_syntax()` writes the
+four indirect effects from the hypotheses. `sframe_syntax_sem()` writes the
 measurement, structural, and indirect-effect lines.
 
 ```{r cbsem}
-sem_model <- sf_model(
+sem_model <- sframe_model_spec(
   id    = "tourism_structural",
   label = "Digital marketing structural model",
   type  = "cb_sem",
   constructs = list(
-    sf_construct("DME",  "Digital marketing effectiveness", c(dmre, dmau, dmeu, dmpv)),
-    sf_construct("DSQ",  "Destination service quality",     c(dsqa, dsqt)),
-    sf_construct("DSUQ", "Destination sustainability quality", dsuq),
-    sf_construct("TS",   "Tourist satisfaction", ts),
-    sf_construct("BI",   "Behavioural intention", bi)
+    sframe_construct("DME",  "Digital marketing effectiveness", c(dmre, dmau, dmeu, dmpv)),
+    sframe_construct("DSQ",  "Destination service quality",     c(dsqa, dsqt)),
+    sframe_construct("DSUQ", "Destination sustainability quality", dsuq),
+    sframe_construct("TS",   "Tourist satisfaction", ts),
+    sframe_construct("BI",   "Behavioural intention", bi)
   ),
   paths = list(
-    sf_path("DME", "DSQ", label = "h1"),  sf_path("DME", "DSUQ", label = "h2"),
-    sf_path("DME", "TS",  label = "h3"),  sf_path("DME", "BI",   label = "h4"),
-    sf_path("DSQ", "TS",  label = "h5"),  sf_path("DSQ", "BI",   label = "h6"),
-    sf_path("DSUQ", "TS", label = "h7"),  sf_path("DSUQ", "BI",  label = "h8"),
-    sf_path("TS", "BI",   label = "h9")
+    sframe_path("DME", "DSQ", label = "h1"),  sframe_path("DME", "DSUQ", label = "h2"),
+    sframe_path("DME", "TS",  label = "h3"),  sframe_path("DME", "BI",   label = "h4"),
+    sframe_path("DSQ", "TS",  label = "h5"),  sframe_path("DSQ", "BI",   label = "h6"),
+    sframe_path("DSUQ", "TS", label = "h7"),  sframe_path("DSUQ", "BI",  label = "h8"),
+    sframe_path("TS", "BI",   label = "h9")
   ),
   indirect = list(
-    sf_indirect("DME", "DSQ", "TS",  label = "h10"),
-    sf_indirect("DME", "DSUQ", "TS", label = "h11"),
-    sf_indirect("DME", c("DSQ", "TS"), "BI",  label = "h12"),
-    sf_indirect("DME", c("DSUQ", "TS"), "BI", label = "h13")
+    sframe_indirect_effect("DME", "DSQ", "TS",  label = "h10"),
+    sframe_indirect_effect("DME", "DSUQ", "TS", label = "h11"),
+    sframe_indirect_effect("DME", c("DSQ", "TS"), "BI",  label = "h12"),
+    sframe_indirect_effect("DME", c("DSUQ", "TS"), "BI", label = "h13")
   ),
   options = list(estimator = "MLR", missing = "fiml", standardised = TRUE)
 )
 
-validate_model(sem_model)
-cat(sem_lavaan_syntax(sem_model))
+sframe_validate_model(sem_model)
+cat(sframe_syntax_sem(sem_model))
 ```
 
 ## PLS-SEM syntax: the two-stage higher-order model
@@ -132,34 +132,34 @@ cat(sem_lavaan_syntax(sem_model))
 The published study used PLS-SEM with a two-stage treatment of the higher-order
 constructs. The second stage models digital marketing effectiveness and service
 quality as composites of their lower-order construct scores, then estimates the
-structural paths. `seminr_syntax()` writes the seminr code, including the
+structural paths. `sframe_syntax_pls()` writes the seminr code, including the
 bootstrap, reliability, AVE, and HTMT calls.
 
 ```{r pls}
-pls_model <- sf_model(
+pls_model <- sframe_model_spec(
   id    = "tourism_pls",
   label = "Two-stage higher-order PLS model",
   type  = "pls_sem",
   constructs = list(
-    sf_construct("DME",  "Digital marketing effectiveness",
+    sframe_construct("DME",  "Digital marketing effectiveness",
                  c("DMRE", "DMAU", "DMEU", "DMPV"), mode = "composite"),
-    sf_construct("DSQ",  "Destination service quality",
+    sframe_construct("DSQ",  "Destination service quality",
                  c("DSQA", "DSQT"), mode = "composite"),
-    sf_construct("DSUQ", "Destination sustainability quality", dsuq, mode = "composite"),
-    sf_construct("TS",   "Tourist satisfaction", ts, mode = "composite"),
-    sf_construct("BI",   "Behavioural intention", bi, mode = "composite")
+    sframe_construct("DSUQ", "Destination sustainability quality", dsuq, mode = "composite"),
+    sframe_construct("TS",   "Tourist satisfaction", ts, mode = "composite"),
+    sframe_construct("BI",   "Behavioural intention", bi, mode = "composite")
   ),
   paths = list(
-    sf_path("DME", "DSQ"), sf_path("DME", "DSUQ"),
-    sf_path("DME", "TS"),  sf_path("DME", "BI"),
-    sf_path("DSQ", "TS"),  sf_path("DSQ", "BI"),
-    sf_path("DSUQ", "TS"), sf_path("DSUQ", "BI"),
-    sf_path("TS", "BI")
+    sframe_path("DME", "DSQ"), sframe_path("DME", "DSUQ"),
+    sframe_path("DME", "TS"),  sframe_path("DME", "BI"),
+    sframe_path("DSQ", "TS"),  sframe_path("DSQ", "BI"),
+    sframe_path("DSUQ", "TS"), sframe_path("DSUQ", "BI"),
+    sframe_path("TS", "BI")
   ),
   options = list(bootstrap = 1000)
 )
 
-cat(seminr_syntax(pls_model))
+cat(sframe_syntax_pls(pls_model))
 ```
 
 ## Construct modes
@@ -172,10 +172,10 @@ syntax uses composite constructs, as above.
 ## Model JSON and a reporting template
 
 A model serialises to JSON for storage in a `.sframe` file, and
-`model_report_template()` writes a short reporting outline.
+`sframe_model_outline()` writes a short reporting outline.
 
 ```{r json}
-cat(model_report_template(sem_model, include_json = FALSE))
+cat(sframe_model_outline(sem_model, include_json = FALSE))
 ```
 
 ## Where the syntax goes next

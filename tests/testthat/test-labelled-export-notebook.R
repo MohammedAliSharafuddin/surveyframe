@@ -2,7 +2,7 @@
 #
 # Batch 5, findings 13 and 14.
 #
-# 13. sframe_export_labelled() attached value labels only to a base item column
+# 13. export_responses() attached value labels only to a base item column
 #     holding numbers. Matrix cells, which hold the same choice codes, got none,
 #     every expansion column got only the parent question as its label, and
 #     numeric codes held as text, as read from Google Sheets, got no labels.
@@ -11,20 +11,20 @@
 #     into YAML unescaped, so a title with a double quote broke the notebook.
 
 labelled_instrument <- function(title = "Labels") {
-  sf_instrument(title = title, components = list(
-    sf_choices("ag3", 1:3, c("Disagree", "Neutral", "Agree")),
-    sf_choices("fruit", c("a", "b"), c("Apple", "Banana")),
-    sf_item("q1", "Overall", "likert", choice_set = "ag3"),
-    sf_item("mx", "Rate each", "matrix", choice_set = "ag3",
+  sframe_instrument(title = title, components = list(
+    sframe_choice_set("ag3", 1:3, c("Disagree", "Neutral", "Agree")),
+    sframe_choice_set("fruit", c("a", "b"), c("Apple", "Banana")),
+    sframe_item("q1", "Overall", "likert", choice_set = "ag3"),
+    sframe_item("mx", "Rate each", "matrix", choice_set = "ag3",
             matrix_items = c("price", "service")),
-    sf_item("mc", "Which fruit?", "multiple_choice", choice_set = "fruit")
+    sframe_item("mc", "Which fruit?", "multiple_choice", choice_set = "fruit")
   ))
 }
 
 exported <- function(data, ext = "sav") {
   skip_if_not_installed("haven")
   path <- tempfile(fileext = paste0(".", ext))
-  sframe_export_labelled(data, labelled_instrument(), path)
+  export_responses(data, labelled_instrument(), path)
   if (ext == "sav") haven::read_sav(path) else haven::read_dta(path)
 }
 

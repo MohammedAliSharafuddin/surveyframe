@@ -8,24 +8,24 @@ crits <- c("service", "location", "price", "delivery")
 vendors <- c("Alpha", "Basilica", "Coral")
 
 demo_instrument <- function() {
-  sf_instrument(
+  sframe_instrument(
     title = "Hotel supplier selection",
     version = "1.0.0",
     components = list(
-      sf_item("crit_pairs", "Compare each pair of criteria",
+      sframe_item("crit_pairs", "Compare each pair of criteria",
               type = "pairwise_comparison",
               comparison_items = crits, comparison_scale = "saaty"),
-      sf_item("crit_points", "Divide 100 points across the criteria",
+      sframe_item("crit_points", "Divide 100 points across the criteria",
               type = "criteria_weight", comparison_items = crits),
-      sf_item("crit_influence", "How strongly does each factor influence?",
+      sframe_item("crit_influence", "How strongly does each factor influence?",
               type = "pairwise_comparison",
               comparison_items = c("service", "price"),
               comparison_scale = "influence"),
-      sf_choices("q5", values = 1:5,
+      sframe_choice_set("q5", values = 1:5,
                  labels = c("Very poor", "Poor", "Fair", "Good", "Excellent")),
-      sf_item("rate_service", "Rate each supplier: service", type = "matrix",
+      sframe_item("rate_service", "Rate each supplier: service", type = "matrix",
               matrix_items = vendors, choice_set = "q5"),
-      sf_item("rate_price", "Rate each supplier: value", type = "matrix",
+      sframe_item("rate_price", "Rate each supplier: value", type = "matrix",
               matrix_items = vendors, choice_set = "q5")
     )
   )
@@ -36,7 +36,7 @@ demo_instrument <- function() {
 # ---------------------------------------------------------------------------
 
 test_that("saaty items expand to one column per unordered pair", {
-  item <- sf_item("p", "Compare", type = "pairwise_comparison",
+  item <- sframe_item("p", "Compare", type = "pairwise_comparison",
                   comparison_items = c("a", "b", "c"))
   cols <- sframe_comparison_columns(item)
   expect_equal(length(cols), 3)  # n(n-1)/2 = 3
@@ -44,7 +44,7 @@ test_that("saaty items expand to one column per unordered pair", {
 })
 
 test_that("influence items expand to one column per ordered pair", {
-  item <- sf_item("p", "Influence", type = "pairwise_comparison",
+  item <- sframe_item("p", "Influence", type = "pairwise_comparison",
                   comparison_items = c("a", "b", "c"),
                   comparison_scale = "influence")
   cols <- sframe_comparison_columns(item)
@@ -53,7 +53,7 @@ test_that("influence items expand to one column per ordered pair", {
 })
 
 test_that("criteria_weight items expand to one column per criterion", {
-  item <- sf_item("w", "Allocate", type = "criteria_weight",
+  item <- sframe_item("w", "Allocate", type = "criteria_weight",
                   comparison_items = c("a", "b"))
   expect_equal(sframe_comparison_columns(item), c("w__a", "w__b"))
 })
@@ -349,12 +349,12 @@ test_that("the rated matrix aggregates the item__alternative columns", {
 })
 
 test_that("rated criteria must list the same alternatives", {
-  study <- sf_instrument(
+  study <- sframe_instrument(
     title = "Mismatch", components = list(
-      sf_choices("q5", values = 1:2, labels = c("No", "Yes")),
-      sf_item("a", "A", type = "matrix", matrix_items = c("x", "y"),
+      sframe_choice_set("q5", values = 1:2, labels = c("No", "Yes")),
+      sframe_item("a", "A", type = "matrix", matrix_items = c("x", "y"),
               choice_set = "q5"),
-      sf_item("b", "B", type = "matrix", matrix_items = c("x", "z"),
+      sframe_item("b", "B", type = "matrix", matrix_items = c("x", "z"),
               choice_set = "q5")
     )
   )

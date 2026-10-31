@@ -1,5 +1,5 @@
 # tests/testthat/test-syntax-ancova-covariates.R
-# CX-02. The ANCOVA code analysis_syntax() writes carries every declared
+# CX-02. The ANCOVA code sframe_syntax_result() writes carries every declared
 # covariate, so it reproduces the runner's adjusted group F with 2 covariates.
 
 test_that("ANCOVA syntax writes every covariate and matches the runner", {
@@ -7,13 +7,13 @@ test_that("ANCOVA syntax writes every covariate and matches the runner", {
   d <- data.frame(grp = rep(c("a", "b", "c"), each = 10),
                   c1 = rnorm(30), c2 = rnorm(30), stringsAsFactors = FALSE)
   d$y <- d$c1 + 2 * d$c2 + (d$grp == "b") + rnorm(30)
-  instr <- sf_instrument(
+  instr <- sframe_instrument(
     "Ancova",
     components = list(
-      sf_item("grp", "Group", type = "text"),
-      sf_item("y", "Y", type = "numeric"),
-      sf_item("c1", "C1", type = "numeric"),
-      sf_item("c2", "C2", type = "numeric")))
+      sframe_item("grp", "Group", type = "text"),
+      sframe_item("y", "Y", type = "numeric"),
+      sframe_item("c1", "C1", type = "numeric"),
+      sframe_item("c2", "C2", type = "numeric")))
   block <- list(id = "RQ1", research_question = "Q", method = "ancova",
                 test = "ancova",
                 roles = list(group = "grp", outcome = "y",

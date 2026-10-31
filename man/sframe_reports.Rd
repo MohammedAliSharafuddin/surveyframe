@@ -11,21 +11,21 @@ them apart.
 These compute and return an object you can read, coerce with
 \code{\link[=as.data.frame]{as.data.frame()}} and often plot.\tabular{ll}{
    Function \tab Answers \cr
-   \code{\link[=codebook_report]{codebook_report()}} \tab what the instrument declares, as tables \cr
-   \code{\link[=descriptives_report]{descriptives_report()}} \tab the distribution of each variable \cr
-   \code{\link[=missing_data_report]{missing_data_report()}} \tab what is missing, and in what pattern \cr
-   \code{\link[=quality_report]{quality_report()}} \tab which responses the declared checks flagged \cr
-   \code{\link[=reliability_report]{reliability_report()}} \tab alpha and omega per scale \cr
-   \code{\link[=item_report]{item_report()}} \tab how each item behaves inside its scale \cr
-   \code{\link[=efa_report]{efa_report()}} \tab whether the data suit a factor analysis \cr
-   \code{\link[=validity_report]{validity_report()}} \tab convergent and discriminant validity \cr
-   \code{\link[=assumption_report]{assumption_report()}} \tab whether a planned test's assumptions hold \cr
-   \code{\link[=posthoc_report]{posthoc_report()}} \tab which pairs differ after an omnibus test \cr
+   \code{\link[=sframe_codebook]{sframe_codebook()}} \tab what the instrument declares, as tables \cr
+   \code{\link[=sframe_descriptives_results]{sframe_descriptives_results()}} \tab the distribution of each variable \cr
+   \code{\link[=sframe_missing_data_results]{sframe_missing_data_results()}} \tab what is missing, and in what pattern \cr
+   \code{\link[=sframe_quality_results]{sframe_quality_results()}} \tab which responses the declared checks flagged \cr
+   \code{\link[=sframe_reliability_results]{sframe_reliability_results()}} \tab alpha and omega per scale \cr
+   \code{\link[=sframe_item_results]{sframe_item_results()}} \tab how each item behaves inside its scale \cr
+   \code{\link[=sframe_efa_readiness_results]{sframe_efa_readiness_results()}} \tab whether the data suit a factor analysis \cr
+   \code{\link[=sframe_validity_results]{sframe_validity_results()}} \tab convergent and discriminant validity \cr
+   \code{\link[=sframe_assumption_results]{sframe_assumption_results()}} \tab whether a planned test's assumptions hold \cr
+   \code{\link[=sframe_posthoc_results]{sframe_posthoc_results()}} \tab which pairs differ after an omnibus test \cr
 }
 
 
 Each returns its primary table through \code{\link[=as.data.frame]{as.data.frame()}}, with the rest
-reachable through the accessors in \link{sf_accessors}. A failure is carried in
+reachable through the accessors in \link{sframe_accessors}. A failure is carried in
 the object as an error field, so a report keeps rendering around it.
 }
 

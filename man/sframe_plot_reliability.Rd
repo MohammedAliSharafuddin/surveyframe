@@ -7,7 +7,7 @@
 sframe_plot_reliability(x, palette = c("web", "print"))
 }
 \arguments{
-\item{x}{An \code{sframe_reliability_report} object from \code{\link[=reliability_report]{reliability_report()}}.}
+\item{x}{An \code{sframe_reliability_report} object from \code{\link[=sframe_reliability_results]{sframe_reliability_results()}}.}
 
 \item{palette}{One of \code{"web"} or \code{"print"}. See \code{sframe_brand()}.}
 }
@@ -22,11 +22,11 @@ Reliability plot: alpha and omega by scale
 if (requireNamespace("ggplot2", quietly = TRUE) &&
     requireNamespace("psych", quietly = TRUE)) {
   demo <- sframe_demo_data()
-  rr <- reliability_report(demo$responses, demo$instrument, omega = FALSE)
+  rr <- sframe_reliability_results(demo$responses, demo$instrument, omega = FALSE)
   sframe_plot_reliability(rr)
 }
 }
 }
 \seealso{
-\code{\link[=reliability_report]{reliability_report()}}
+\code{\link[=sframe_reliability_results]{sframe_reliability_results()}}
 }

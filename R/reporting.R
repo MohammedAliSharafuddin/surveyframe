@@ -10,19 +10,19 @@
 #'
 #' | Function | Answers |
 #' | --- | --- |
-#' | [codebook_report()] | what the instrument declares, as tables |
-#' | [descriptives_report()] | the distribution of each variable |
-#' | [missing_data_report()] | what is missing, and in what pattern |
-#' | [quality_report()] | which responses the declared checks flagged |
-#' | [reliability_report()] | alpha and omega per scale |
-#' | [item_report()] | how each item behaves inside its scale |
-#' | [efa_report()] | whether the data suit a factor analysis |
-#' | [validity_report()] | convergent and discriminant validity |
-#' | [assumption_report()] | whether a planned test's assumptions hold |
-#' | [posthoc_report()] | which pairs differ after an omnibus test |
+#' | [sframe_codebook()] | what the instrument declares, as tables |
+#' | [sframe_descriptives_results()] | the distribution of each variable |
+#' | [sframe_missing_data_results()] | what is missing, and in what pattern |
+#' | [sframe_quality_results()] | which responses the declared checks flagged |
+#' | [sframe_reliability_results()] | alpha and omega per scale |
+#' | [sframe_item_results()] | how each item behaves inside its scale |
+#' | [sframe_efa_readiness_results()] | whether the data suit a factor analysis |
+#' | [sframe_validity_results()] | convergent and discriminant validity |
+#' | [sframe_assumption_results()] | whether a planned test's assumptions hold |
+#' | [sframe_posthoc_results()] | which pairs differ after an omnibus test |
 #'
 #' Each returns its primary table through [as.data.frame()], with the rest
-#' reachable through the accessors in [sf_accessors]. A failure is carried in
+#' reachable through the accessors in [sframe_accessors]. A failure is carried in
 #' the object as an error field, so a report keeps rendering around it.
 #'
 #' # Object or data in, file out
@@ -79,23 +79,23 @@ sframe_clean_chrome_detritus <- function(before) {
 #' @seealso [render_report()]
 #'
 #' @examples
-#' cs    <- sf_choices("ag5", 1:5,
+#' cs    <- sframe_choice_set("ag5", 1:5,
 #'            c("Strongly disagree", "Disagree", "Neutral",
 #'              "Agree", "Strongly agree"))
-#' i1    <- sf_item("sat_1", "Item 1", type = "likert",
+#' i1    <- sframe_item("sat_1", "Item 1", type = "likert",
 #'                  choice_set = "ag5", scale_id = "sat")
-#' i2    <- sf_item("sat_2", "Item 2", type = "likert",
+#' i2    <- sframe_item("sat_2", "Item 2", type = "likert",
 #'                  choice_set = "ag5", scale_id = "sat")
-#' scale <- sf_scale("sat", "Satisfaction", items = c("sat_1", "sat_2"))
-#' instr <- sf_instrument("Demo Survey", components = list(cs, i1, i2, scale))
+#' scale <- sframe_scale("sat", "Satisfaction", items = c("sat_1", "sat_2"))
+#' instr <- sframe_instrument("Demo Survey", components = list(cs, i1, i2, scale))
 #'
-#' cb <- codebook_report(instr)
+#' cb <- sframe_codebook(instr)
 #' print(cb)
-#' md <- codebook_report(instr, format = "md")
+#' md <- sframe_codebook(instr, format = "md")
 #' cat(substr(md$markdown, 1, 200))
-#' nrow(sf_items(cb))
-#' nrow(sf_scales(cb))
-codebook_report <- function(instrument, format = c("html", "md")) {
+#' nrow(sframe_get_items(cb))
+#' nrow(sframe_get_scales(cb))
+sframe_codebook <- function(instrument, format = c("html", "md")) {
   sframe_check_instrument(instrument)
   format <- rlang::arg_match(format)
 
@@ -183,20 +183,20 @@ sframe_codebook_markdown <- function(cb) {
 #' Replaces `items_table`'s `choice_set` id with the choice set's actual
 #' response options ("1 = Strongly disagree; 2 = Disagree; ...") and its
 #' `scale_id` with the scale's label, so each row of the printed codebook is
-#' self-contained. [codebook_report()] itself keeps the raw ids, for joining
+#' self-contained. [sframe_codebook()] itself keeps the raw ids, for joining
 #' `items_table` to `choices_table`/`scales_table` programmatically. This
 #' enrichment is for the rendered document, where a reader should not need
 #' to cross-reference a separate table just to see what "1" means on a
 #' scale shared by many items.
 #'
-#' @param cb An `sframe_codebook` object from [codebook_report()].
+#' @param cb An `sframe_codebook` object from [sframe_codebook()].
 #' @return A data.frame, `cb$items_table` with `choice_set` and `scale_id`
 #'   replaced by display text.
 #' @export
-#' @seealso [codebook_report()]
+#' @seealso [sframe_codebook()]
 #' @examples
 #' demo <- sframe_demo_data()
-#' cb <- codebook_report(demo$instrument)
+#' cb <- sframe_codebook(demo$instrument)
 #' head(sframe_codebook_items_display(cb))
 sframe_codebook_items_display <- function(cb) {
   stopifnot(inherits(cb, "sframe_codebook"))
@@ -276,13 +276,13 @@ print.sframe_codebook <- function(x, ...) {
 #'   See `sframe_brand()`.
 #' @param show_code Logical. Whether each result carries a folded "Show R code"
 #'   block with the statistical call that produced it, built by
-#'   [analysis_syntax()] from the same resolved specification the analysis ran.
-#'   Defaults to `TRUE`. A method [analysis_syntax()] does not cover shows no
+#'   [sframe_syntax_result()] from the same resolved specification the analysis ran.
+#'   Defaults to `TRUE`. A method [sframe_syntax_result()] does not cover shows no
 #'   block, rather than a guess at the call.
-#' @param references Optional further [sf_reference()] records, for example
+#' @param references Optional further [sframe_reference()] records, for example
 #'   the works a host cites in the written interpretations, which are cited
 #'   in text as `[@id]`. The instrument's own references
-#'   ([add_references()]) and the methods' references are always included.
+#'   ([sframe_add_references()]) and the methods' references are always included.
 #' @param title Character or `NULL`. The report's title. Defaults to the
 #'   instrument's title.
 #' @param authors Character vector or `NULL`. The report's authors, shown under
@@ -324,7 +324,7 @@ print.sframe_codebook <- function(x, ...) {
 #'
 #' @return The output file path, invisibly.
 #' @export
-#' @seealso [codebook_report()], [quality_report()], [reliability_report()]
+#' @seealso [sframe_codebook()], [sframe_quality_results()], [sframe_reliability_results()]
 #'
 #' @examples
 #' instr <- read_sframe(
@@ -756,7 +756,7 @@ sframe_clean_interpretations <- function(interpretations) {
   sections <- character(0)
 
   if (isTRUE(include_codebook)) {
-    cb <- codebook_report(instrument)
+    cb <- sframe_codebook(instrument)
     codebook_parts <- c(
       "<h2>Codebook</h2>",
       .render_report_table(sframe_codebook_items_display(cb), "Survey items",
@@ -789,7 +789,7 @@ sframe_clean_interpretations <- function(interpretations) {
   }
 
   if (isTRUE(include_quality)) {
-    qr <- tryCatch(quality_report(data, instrument), error = function(e) e)
+    qr <- tryCatch(sframe_quality_results(data, instrument), error = function(e) e)
     quality_html <- if (inherits(qr, "error")) {
       sprintf("<p>%s</p>", htmltools_escape(conditionMessage(qr)))
     } else {
@@ -819,7 +819,7 @@ sframe_clean_interpretations <- function(interpretations) {
   }
 
   if (isTRUE(include_missing)) {
-    mr <- tryCatch(missing_data_report(data, instrument), error = function(e) e)
+    mr <- tryCatch(sframe_missing_data_results(data, instrument), error = function(e) e)
     missing_html <- if (inherits(mr, "error")) {
       sprintf("<h2>Missing Data</h2><p>%s</p>", htmltools_escape(conditionMessage(mr)))
     } else {
@@ -839,7 +839,7 @@ sframe_clean_interpretations <- function(interpretations) {
 
   if (isTRUE(include_descriptives)) {
     dr <- tryCatch(
-      descriptives_report(data, variables = intersect(vapply(instrument$items, function(i) i$id, character(1)), colnames(data))),
+      sframe_descriptives_results(data, variables = intersect(vapply(instrument$items, function(i) i$id, character(1)), colnames(data))),
       error = function(e) e
     )
     descriptives_html <- if (inherits(dr, "error")) {
@@ -861,7 +861,7 @@ sframe_clean_interpretations <- function(interpretations) {
   }
 
   if (isTRUE(include_reliability)) {
-    rr <- tryCatch(reliability_report(data, instrument), error = function(e) e)
+    rr <- tryCatch(sframe_reliability_results(data, instrument), error = function(e) e)
     reliability_html <- if (inherits(rr, "error")) {
       sprintf(
         "<h2>Reliability</h2><p>%s</p>",
@@ -1081,7 +1081,7 @@ sframe_clean_interpretations <- function(interpretations) {
     vapply(seq_along(results), function(i) {
       result <- results[[i]]
       # The table and chart are titled by the block and its question, as
-      # render_result() titles them, not by a generic "Results table" (CX-22).
+      # sframe_format_result() titles them, not by a generic "Results table" (CX-22).
       rq_label <- sframe_result_float_title(result, i)
       table_html <- ""
       if (is.data.frame(result$table)) {
@@ -1122,7 +1122,7 @@ sframe_clean_interpretations <- function(interpretations) {
       syntax_html <- if (!is.null(result$syntax)) {
         sprintf("<pre><code>%s</code></pre>", htmltools_escape(result$syntax))
       } else ""
-      # extract_quotes() attaches $quotes (topic, rank, respondent, quote) to
+      # sframe_extract_quotes() attaches $quotes (topic, rank, respondent, quote) to
       # a topic-model result: a second, separate table alongside the main
       # $table rather than a substitute for it, so it renders through the
       # same generic table builder under its own heading (todo_text_analysis.md's
@@ -1144,7 +1144,7 @@ sframe_clean_interpretations <- function(interpretations) {
       # the run_analysis_plan() wrapper instead would say nothing about which
       # test ran with which options.
       code_html <- if (isTRUE(show_code)) {
-        code <- analysis_syntax(result)
+        code <- sframe_syntax_result(result)
         if (is.null(code)) "" else sprintf(
           "<details class=\"sf-code\"><summary>Show R code</summary><pre><code>%s</code></pre></details>",
           htmltools_escape(paste(code, collapse = "\n")))
@@ -1178,14 +1178,14 @@ sframe_clean_interpretations <- function(interpretations) {
 .render_report_model_section <- function(instrument) {
   models <- instrument$models %||% list()
   blocks <- vapply(models, function(model) {
-    json <- htmltools_escape(model_json(model, pretty = TRUE))
+    json <- htmltools_escape(sframe_model_json(model, pretty = TRUE))
     syntax <- tryCatch(
       switch(
         model$type,
-        cfa = cfa_lavaan_syntax(instrument = instrument, model = model),
-        cb_sem = sem_lavaan_syntax(model, instrument = instrument),
-        pls_sem = seminr_syntax(model),
-        efa = efa_syntax(unlist(lapply(sframe_model_constructs(model), function(con) con$items))),
+        cfa = sframe_syntax_cfa(instrument = instrument, model = model),
+        cb_sem = sframe_syntax_sem(model, instrument = instrument),
+        pls_sem = sframe_syntax_pls(model),
+        efa = sframe_syntax_efa(unlist(lapply(sframe_model_constructs(model), function(con) con$items))),
         ""
       ),
       error = function(e) paste0("Model syntax could not be generated: ", conditionMessage(e))

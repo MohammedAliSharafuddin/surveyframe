@@ -22,21 +22,21 @@
 #'
 #' ## Core workflow
 #'
-#' 1. **Design** an instrument with [launch_builder()] or [sf_instrument()] and
-#'    its component constructors: [sf_item()], [sf_choices()], [sf_scale()],
-#'    [sf_branch()], [sf_check()].
+#' 1. **Design** an instrument with [launch_builder()] or [sframe_instrument()] and
+#'    its component constructors: [sframe_item()], [sframe_choice_set()], [sframe_scale()],
+#'    [sframe_branch()], [sframe_attention_check()].
 #' 2. **Validate and save** with [validate_sframe()] and [write_sframe()].
 #'    `validate_sframe()` returns an `sframe_validation` diagnostic rather
 #'    than the instrument itself. Recover a validated instrument with
 #'    [as_sframe()].
-#' 3. **Deploy** a Shiny survey with [render_survey()].
+#' 3. **Deploy** a Shiny survey with [run_survey()].
 #' 4. **Load responses** with [read_responses()] or [read_sheet_responses()].
-#' 5. **Check quality** with [quality_report()].
-#' 6. **Score and analyse** with [score_scales()], [descriptives_report()],
-#'    [missing_data_report()], [reliability_report()], [item_report()],
-#'    [efa_report()], [cfa_syntax()], and [run_analysis_plan()], which also
+#' 5. **Check quality** with [sframe_quality_results()].
+#' 6. **Score and analyse** with [score_scales()], [sframe_descriptives_results()],
+#'    [sframe_missing_data_results()], [sframe_reliability_results()], [sframe_item_results()],
+#'    [sframe_efa_readiness_results()], [sframe_syntax_cfa()], and [run_analysis_plan()], which also
 #'    runs any decision-analysis blocks in the plan.
-#' 7. **Report** with [codebook_report()], [render_report()], and
+#' 7. **Report** with [sframe_codebook()], [render_report()], and
 #'    [render_results()].
 #'
 #' ## The instrument object
@@ -44,38 +44,40 @@
 #' The workflow runs on an `sframe` object. It is the single source of truth
 #' for item definitions, scale structure, reverse-coding keys, branching
 #' rules, check specifications, analysis plans, and optional model
-#' specifications. Accessors such as [sf_meta()], [sf_items()], [sf_scales()],
-#' [sf_plan()], and [sf_models()] read its parts without reaching into the
+#' specifications. Accessors such as [sframe_meta()], [sframe_get_items()], [sframe_get_scales()],
+#' [sframe_plan()], and [sframe_get_models()] read its parts without reaching into the
 #' object directly.
 #'
 #' Some helpers work on plain vectors, for use beside that workflow or on
-#' their own: the text helpers such as [term_frequency()], and the interval
-#' helpers [bootstrap_ci()], [cohens_d_ci()], [cramers_v_ci()] and
-#' [eta_sq_ci()].
+#' their own: the text helpers such as [sframe_term_frequency()], and the interval
+#' helpers [sframe_bootstrap_ci()], [sframe_cohens_d_ci()], [sframe_cramers_v_ci()] and
+#' [sframe_eta_sq_ci()].
 #'
 #' ## A first session
 #'
-#' [sframe_demos()] lists 22 worked demos, each one instrument, its responses
+#' [sframe_list_demos()] lists 22 worked demos, each one instrument, its responses
 #' and the results surveyframe produced. `sframe_demo("two_group")` loads one,
 #' and `sframe_demo_qmd("two_group")` writes a notebook to edit.
 #' `vignette("learn-by-example")` teaches from the same library.
 #'
 #' ## How functions are named
 #'
-#' Three families, which the prefix tells apart.
+#' Names come in 2 kinds, so a function says which stage it belongs to.
 #'
-#' * `sf_` builds or reads the instrument object model: the constructors
-#'   [sf_item()] and [sf_scale()], the accessors [sf_items()] and [sf_plan()],
-#'   and the replacement forms such as `sf_plan<-`.
-#' * `sframe_` covers everything the package adds around that object: the
-#'   plots such as [sframe_plot_reliability()], the demo library through
-#'   [sframe_demos()], the decision helpers, and the builder's own state.
-#' * The workflow verbs carry no prefix, because they name the step a
-#'   researcher is taking: [validate_sframe()], [score_scales()],
-#'   [run_analysis_plan()], [render_report()], and the `_report()` family.
+#' * The stage verbs name the step a researcher is taking and carry no
+#'   prefix: [read_sframe()], [validate_sframe()], [write_sframe()],
+#'   [amend_sframe()], [run_survey()], [export_survey()], [read_responses()],
+#'   [score_scales()], [run_analysis_plan()], [render_report()],
+#'   [launch_builder()] and [launch_studio()].
+#' * Everything else takes `sframe_`: the makers such as [sframe_item()] and
+#'   [sframe_scale()], the listers such as [sframe_get_items()], the accessors
+#'   such as [sframe_plan()], the `_results` functions such as
+#'   [sframe_reliability_results()], which return results and write no file,
+#'   the `sframe_syntax_` generators, the plots and the demo library.
 #'
-#' The prefixes group functions; they do not pair them. No name stem appears
-#' under both, so there is no `sframe_` twin of an `sf_` function to look for.
+#' No 2 names sit 1 letter apart: a lister is `sframe_get_items()`, never
+#' `sframe_items()`. The names used before 0.4.3 still work, silently. See
+#' [superseded].
 #'
 #' ## File format
 #'

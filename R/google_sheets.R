@@ -154,9 +154,9 @@ export_google_sheet <- function(instrument, sheet_url, output_dir = ".") {
 #'   included.
 #'
 #' @return A `data.frame` validated against the instrument, ready for
-#'   [quality_report()], [score_scales()], and [reliability_report()].
+#'   [sframe_quality_results()], [score_scales()], and [sframe_reliability_results()].
 #' @export
-#' @seealso [export_google_sheet()], [read_responses()], [quality_report()]
+#' @seealso [export_google_sheet()], [read_responses()], [sframe_quality_results()]
 #'
 #' @examples
 #' \dontrun{
@@ -164,7 +164,7 @@ export_google_sheet <- function(instrument, sheet_url, output_dir = ".") {
 #'   sheet_id   = "your-sheet-id",
 #'   instrument = instr
 #' )
-#' qr <- quality_report(responses, instr, respondent_id = "respondent_id")
+#' qr <- sframe_quality_results(responses, instr, respondent_id = "respondent_id")
 #' }
 read_sheet_responses <- function(
     sheet_id,

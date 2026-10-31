@@ -80,5 +80,5 @@ launch_dashboard(instr, responses)
 }
 }
 \seealso{
-\code{\link[=run_analysis_plan]{run_analysis_plan()}}, \code{\link[=quality_report]{quality_report()}}, \code{\link[=score_scales]{score_scales()}}
+\code{\link[=run_analysis_plan]{run_analysis_plan()}}, \code{\link[=sframe_quality_results]{sframe_quality_results()}}, \code{\link[=score_scales]{score_scales()}}
 }
