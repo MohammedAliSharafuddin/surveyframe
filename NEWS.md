@@ -488,6 +488,10 @@ style.
   and its research question instead of "Results table", each chart sits in a
   figure with a caption, and base graphics charts carry real alt text where
   every one read "distribution" (CX-22).
+* **The Quarto report numbers its tables and figures too.** Its tables
+  and figures take the same numbers and titles as the built-in report's,
+  every chart image carries alt text where it had none, and a reliability
+  result no longer prints a second table under the same title (CX-22).
 * **The built-in report prints each research question's hypotheses and
   decision rule before its result.** H0 and H1 print where written, then
   the planned decision rule, then the result, then the interpretation,

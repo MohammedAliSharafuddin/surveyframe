@@ -629,6 +629,10 @@ render_report <- function(
     }, error = function(e) FALSE)
 
     if (isTRUE(quarto_ok)) {
+      # Numbered tables and figures with titles and alt text, as the
+      # built-in engine writes them (CX-22).
+      html <- readLines(rendered, warn = FALSE, encoding = "UTF-8")
+      writeLines(sframe_quarto_apa_floats(html), rendered, useBytes = TRUE)
       if (file.copy(rendered, dest, overwrite = TRUE)) {
         return(sframe_report_result(dest, "quarto", open))
       }
@@ -1286,15 +1290,24 @@ sframe_report_content <- function(instrument, data = NULL, plot_palette = "web",
                         plot_palette = plot_palette),
       error = function(e) conditionMessage(e))
     if (is.list(results)) {
-      results <- lapply(results, function(r) {
-        r["supplement"] <- list(sframe_result_supplement(r))
+      # The table and chart titles, escaped for the template's HTML, as
+      # the built-in engine titles them (CX-22).
+      results <- Map(function(r, i) {
+        sup <- sframe_result_supplement(r)
+        if (!is.null(sup)) sup$caption_html <- htmltools_escape(sup$caption)
+        r["supplement"] <- list(sup)
+        title <- sframe_result_float_title(r, i)
+        r$caption_html <- htmltools_escape(title)
+        r$figure_open <- sframe_apa_figure_open(title, paste("Chart of the result for", title))
         r
-      })
+      }, results, seq_along(results))
     }
   }
-  list(codebook_items = items_d,
-       charts = sframe_report_charts(instrument, data, plot_palette),
-       results = results)
+  charts <- sframe_report_charts(instrument, data, plot_palette)
+  for (k in seq_along(charts)) {
+    charts[[k]]$figure_open <- sframe_apa_figure_open(charts[[k]]$title, charts[[k]]$alt)
+  }
+  list(codebook_items = items_d, charts = charts, results = results)
 }
 
 # Distribution charts (item bars, grouped Likert scales, matrix questions,

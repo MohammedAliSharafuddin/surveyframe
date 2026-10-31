@@ -168,3 +168,69 @@ test_that("tables and figures are numbered in order with titles and alt text (CX
     expect_match(one, "alt=\"Chart of the result for RQ1: Is a related to b?\"", fixed = TRUE)
   }
 })
+
+# Session 7. The Quarto report printed plain captions, no figure titles and
+# images with no alt text, so its tables and figures went unnumbered while the
+# built-in engine's were numbered (CX-22).
+test_that("Quarto's captions and marked figures are numbered, with alt text (CX-22)", {
+  html <- paste0(
+    "<table>\n<caption>\nItem-wise missingness\n</caption>\n</table>",
+    "<figure class=\"sf-figure figure\" data-alt=\"Bars of q1\"><figcaption class=\"sf-apa-caption\">\nDistribution of q1\n</figcaption>\n",
+    "<div class=\"quarto-figure\"><figure class=\"figure\"><p><img role=\"img\" src=\"a.png\" class=\"img-fluid\"></p></figure></div></figure>",
+    "<table><caption>RQ1: Is a &amp; b related?</caption></table>",
+    "<figure class=\"sf-figure\" data-alt=\"Kept\"><figcaption class=\"sf-apa-caption\">Second</figcaption><img alt=\"own\" src=\"b.png\"></figure>")
+  out <- sframe_quarto_apa_floats(html)
+  expect_match(out, "<strong>Table 1</strong><br><em>Item-wise missingness</em>", fixed = TRUE)
+  expect_match(out, "<strong>Table 2</strong><br><em>RQ1: Is a &amp; b related?</em>", fixed = TRUE)
+  expect_match(out, "<strong>Figure 1</strong><br><em>Distribution of q1</em>", fixed = TRUE)
+  expect_match(out, "<strong>Figure 2</strong><br><em>Second</em>", fixed = TRUE)
+  expect_match(out, "<img alt=\"Bars of q1\" role=\"img\" src=\"a.png\"", fixed = TRUE)
+  expect_match(out, "<img alt=\"own\" src=\"b.png\">", fixed = TRUE)
+  expect_no_match(out, "alt=\"Kept\" alt=", fixed = TRUE)
+})
+
+test_that("the Quarto report numbers its tables and figures as the built-in one does (CX-22)", {
+  skip_on_cran()
+  skip_if_not_slow()
+  skip_if(!nzchar(Sys.which("quarto")), "Quarto is not installed")
+  skip_if_not_installed("ggplot2")
+  old <- options(surveyframe.use_quarto = TRUE)
+  on.exit(options(old), add = TRUE)
+  set.seed(4)
+  d <- data.frame(a = 1:40, b = 1:40 + stats::rnorm(40, sd = 15))
+  instr <- sframe_instrument("APA", components = list(
+    sframe_item("a", "A", type = "numeric"), sframe_item("b", "B", type = "numeric")))
+  sframe_plan(instr) <- list(list(id = "RQ1", research_question = "Is a related to b?",
+    family = "relationship", method = "correlation_pearson",
+    roles = list(x = "a", y = "b")))
+  out <- tempfile(fileext = ".html")
+  res <- render_report(instr, data = d, output_file = out, open = FALSE)
+  doc <- paste(readLines(out, warn = FALSE), collapse = "\n")
+  expect_match(doc, "Rendering engine:</strong> Quarto", fixed = TRUE)
+  tabs <- regmatches(doc, gregexpr("<strong>Table [0-9]+</strong>", doc))[[1]]
+  expect_true(length(tabs) >= 3)
+  expect_identical(as.integer(gsub("\\D", "", tabs)), seq_along(tabs))
+  expect_match(doc, "<em>Survey items</em>", fixed = TRUE)
+  expect_match(doc, "<em>Descriptive statistics</em>", fixed = TRUE)
+  expect_match(doc, "<em>RQ1: Is a related to b?</em>", fixed = TRUE)
+  figs <- regmatches(doc, gregexpr("<strong>Figure [0-9]+</strong>", doc))[[1]]
+  expect_true(length(figs) >= 2)
+  expect_identical(as.integer(gsub("\\D", "", figs)), seq_along(figs))
+  expect_match(doc, "<em>Distribution of A</em>", fixed = TRUE)
+  expect_match(doc, "alt=\"Chart of the result for RQ1: Is a related to b?\"", fixed = TRUE)
+  # Every image carries alt text.
+  imgs <- regmatches(doc, gregexpr("<img [^>]*>", doc))[[1]]
+  expect_true(length(imgs) >= 2)
+  expect_true(all(grepl("alt=\"[^\"]+\"", imgs)))
+
+  # A reliability result shows its own table alone, as in the built-in
+  # engine, so no 2 tables share a title.
+  lk <- sframe_demo("likert_scale")
+  out2 <- tempfile(fileext = ".html")
+  render_report(lk$instrument, data = lk$responses, output_file = out2, open = FALSE)
+  doc2 <- paste(readLines(out2, warn = FALSE), collapse = "\n")
+  titles <- regmatches(doc2, gregexpr("<strong>Table [0-9]+</strong><br><em>[^<]*", doc2))[[1]]
+  titles <- sub(".*<em>", "", titles)
+  expect_true(length(titles) >= 5)
+  expect_identical(titles[duplicated(titles)], character(0))
+})
