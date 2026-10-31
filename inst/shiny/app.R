@@ -1861,6 +1861,29 @@ ui <- fluidPage(
   )
 )
 
+# What a screen with nothing to show yet says, with a link to each next
+# stage, so the researcher is never left on an empty screen.
+studio_stage_labels <- c(design = "Design", open = "Open Instrument",
+                         collect = "Collect", responses = "Upload Responses")
+studio_next_stage <- function(message, tabs) {
+  tags$div(class = "card next-stage",
+    tags$p(message),
+    tags$p(class = "next-stage-links", tags$span(class = "hint", "Next:"),
+      lapply(tabs, function(tab) {
+        tags$a(href = "#", `data-tab` = tab, class = "btn btn-outline",
+               studio_stage_labels[[tab]])
+      })))
+}
+no_instrument_next <- function(what) {
+  studio_next_stage(paste("No instrument is open. Design one, or open a",
+                          "file, to", paste0(what, ".")), c("design", "open"))
+}
+no_responses_next <- function(what) {
+  studio_next_stage(paste("No responses are loaded. Collect them, or upload",
+                          "a file of responses, to", paste0(what, ".")),
+                    c("collect", "responses"))
+}
+
 server <- function(input, output, session) {
   rv <- reactiveValues(
     builder = initial_builder,
@@ -2360,9 +2383,7 @@ server <- function(input, output, session) {
   # -- Collect ----------------------------------------------------------------
   output$collect_gate <- renderUI({
     if (is.null(rv$instrument)) {
-      tags$div(class = "card", paste(
-        "Design an instrument on the Design screen, or open one on the Open",
-        "Instrument screen, to collect responses for it."))
+      no_instrument_next("collect responses for it")
     }
   })
 
@@ -2431,7 +2452,7 @@ server <- function(input, output, session) {
 
   output$refs_gate <- renderUI({
     if (is.null(rv$instrument)) {
-      tags$div(class = "card", "Open an instrument on the Open Instrument screen first.")
+      no_instrument_next("manage its references")
     }
   })
 
@@ -2488,8 +2509,9 @@ server <- function(input, output, session) {
 
   output$amend_gate <- renderUI({
     if (is.null(rv$instrument)) {
-      tags$div(class = "card",
-        "Open the instrument to amend on the Open Instrument screen first. It becomes the \"previous\" version disclosed against.")
+      studio_next_stage(paste(
+        "Open the instrument to amend first. It becomes the \"previous\"",
+        "version disclosed against."), c("design", "open"))
     }
   })
 
@@ -2845,16 +2867,10 @@ server <- function(input, output, session) {
   output$preview_gate <- renderUI({
     draft <- draft_result()
     if (length(draft$instrument$items) == 0) {
-      # Studio opens an instrument that already exists, and questions are
-      # authored in the builder. The old wording named an authoring screen
-      # Studio has never had, while the Open screen next door routed
-      # authoring correctly.
-      return(tags$div(class = "card",
-        tags$p("This instrument has no questions yet, so there is nothing to preview."),
-        tags$p(paste0(
-          "Design the questions in the SurveyBuilder, which opens with ",
-          "launch_builder(), export the .sframe, then load it on the Open ",
-          "Instrument screen to preview, analyse and re-export it."))))
+      # Questions are written on the Design screen, or come in an opened file.
+      return(studio_next_stage(paste(
+        "There are no questions yet, so there is nothing to preview. Design",
+        "them, or open a file that has them."), c("design", "open")))
     }
     if (!draft$valid) {
       return(tags$div(class = "card",
@@ -2902,8 +2918,7 @@ server <- function(input, output, session) {
 
   output$responses_gate <- renderUI({
     if (is.null(rv$instrument)) {
-      tags$div(class = "card",
-        "Build or open a valid instrument before uploading responses.")
+      no_instrument_next("upload responses for it")
     }
   })
 
@@ -2923,9 +2938,10 @@ server <- function(input, output, session) {
   })
 
   output$quality_gate <- renderUI({
-    if (is.null(rv$instrument) || is.null(rv$responses)) {
-      tags$div(class = "card",
-        "Build or open a valid instrument and load responses before running quality checks.")
+    if (is.null(rv$instrument)) {
+      no_instrument_next("run quality checks")
+    } else if (is.null(rv$responses)) {
+      no_responses_next("run quality checks")
     }
   })
 
@@ -3032,9 +3048,10 @@ server <- function(input, output, session) {
   })
 
   output$reliability_gate <- renderUI({
-    if (is.null(rv$instrument) || is.null(rv$responses)) {
-      tags$div(class = "card",
-        "Build or open a valid instrument and load responses to compute reliability.")
+    if (is.null(rv$instrument)) {
+      no_instrument_next("compute reliability")
+    } else if (is.null(rv$responses)) {
+      no_responses_next("compute reliability")
     }
   })
 
@@ -3138,8 +3155,7 @@ server <- function(input, output, session) {
 
   output$analysis_gate <- renderUI({
     if (is.null(rv$instrument)) {
-      return(tags$div(class = "card",
-        "Build or open a valid instrument before planning analyses."))
+      return(no_instrument_next("plan analyses"))
     }
     NULL
   })
@@ -3939,12 +3955,10 @@ server <- function(input, output, session) {
 
   output$dashboard_gate <- renderUI({
     if (is.null(rv$instrument)) {
-      return(tags$div(class = "card",
-        "Load or build an instrument before opening the dashboard."))
+      return(no_instrument_next("open the dashboard"))
     }
     if (is.null(rv$responses)) {
-      return(tags$div(class = "card",
-        "Load responses before opening a response dashboard."))
+      return(no_responses_next("open the dashboard"))
     }
     NULL
   })
@@ -4248,8 +4262,7 @@ server <- function(input, output, session) {
 
   output$export_gate <- renderUI({
     if (is.null(rv$instrument)) {
-      tags$div(class = "card",
-        "Build or open a valid instrument before exporting files.")
+      no_instrument_next("export files")
     }
   })
 

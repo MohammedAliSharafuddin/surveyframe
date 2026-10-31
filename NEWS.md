@@ -823,6 +823,12 @@ style.
   wording, help text or branding edit. When one of those changes, the
   responses are cleared, and a message names what changed.
 
+* **Every empty Studio screen names the next stage.** With no instrument,
+  each screen past Design and Open Instrument links to those 2. With no
+  responses, Quality, Reliability and the Dashboard link to Collect and
+  Upload Responses. Preview with no questions sent you to
+  `launch_builder()` and back through a file, where Design now does it.
+
 * **Studio has a Collect screen.** It downloads the Google Sheets Apps
   Script collector for a sheet you name, with the steps to deploy it, and
   the survey file, sending to the collector URL you give. The last step
