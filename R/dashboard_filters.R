@@ -4,16 +4,23 @@
 # They choose which columns offer a filter and read dates in the formats
 # survey tools write. Internal, no export.
 
+# Free-text items never offer a filter, however few distinct answers they
+# happen to have.
 #' @noRd
 #' @keywords internal
-dashboard_categorical_columns <- function(data) {
+dashboard_categorical_columns <- function(data, instrument = NULL) {
   if (is.null(data) || !is.data.frame(data)) return(character(0))
+  text_ids <- character(0)
+  if (inherits(instrument, "sframe")) {
+    text_ids <- unlist(lapply(instrument$items, function(i)
+      if (i$type %in% c("text", "textarea")) i$id))
+  }
   cols <- names(data)[vapply(data, function(x) {
     if (!(is.character(x) || is.factor(x) || is.logical(x))) return(FALSE)
     vals <- unique(x[!is.na(x)])
     length(vals) > 1 && length(vals) <= 12
   }, logical(1))]
-  setdiff(cols, grep("(^|_)id$", cols, value = TRUE))
+  setdiff(cols, c(text_ids, grep("(^|_)id$", cols, value = TRUE)))
 }
 
 #' @noRd

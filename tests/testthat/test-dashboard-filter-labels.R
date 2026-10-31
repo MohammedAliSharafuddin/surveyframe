@@ -64,3 +64,14 @@ test_that("dashboard_parse_date reads ISO, UK and US dates and gives NA for the 
   expect_identical(dashboard_parse_date(as.Date("2026-03-01")), as.Date("2026-03-01"))
   expect_true(is.na(dashboard_parse_date(1)))
 })
+
+test_that("free-text answers never become a filter, however few their values", {
+  demo <- sframe_demo("input_types")
+  types <- vapply(demo$instrument$items, function(i) i$type, character(1))
+  ids <- vapply(demo$instrument$items, function(i) i$id, character(1))
+  text_ids <- intersect(ids[types %in% c("text", "textarea")], names(demo$responses))
+  expect_true("open_comment" %in% text_ids)
+  cols <- dashboard_categorical_columns(demo$responses, demo$instrument)
+  expect_length(intersect(cols, text_ids), 0L)
+  expect_true("visit_type" %in% cols)
+})

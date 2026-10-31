@@ -3709,7 +3709,7 @@ server <- function(input, output, session) {
   # labels. Filters apply to the 4 dashboard views and the CSV download. The
   # Quality screen stays on every response.
   dash_date_col <- reactive(dashboard_date_column(rv$responses))
-  dash_filter_cols <- reactive(dashboard_categorical_columns(rv$responses))
+  dash_filter_cols <- reactive(dashboard_categorical_columns(rv$responses, rv$instrument))
 
   output$dash_filter_bar <- renderUI({
     req(rv$instrument)
