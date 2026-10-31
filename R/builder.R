@@ -17,7 +17,7 @@
 #'     Answering, required checks and branching run as a respondent sees
 #'     them, and nothing is collected: the collector endpoint and the
 #'     completion redirect are removed.}
-#'   \item{Analyse}{A role-based analysis planner with method-specific
+#'   \item{Plan}{A role-based analysis planner with method-specific
 #'     options, planned outputs, reporting references, and decision rules.}
 #' }
 #'

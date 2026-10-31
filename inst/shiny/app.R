@@ -1481,6 +1481,8 @@ ui <- fluidPage(
             }
           } else if (d.type === 'sframe' && typeof d.text === 'string') {
             Shiny.setInputValue('builder_sframe', d.text, {priority: 'event'});
+          } else if (d.type === 'dirty') {
+            $('#design_unsaved').toggle(d.dirty === true);
           }
         });
         // An instrument Studio cannot send leaves the builder unable to save,
@@ -1553,6 +1555,9 @@ ui <- fluidPage(
       tags$div(id = "screen-design", class = screen_class("design"),
         tags$h2(class = "screen-title", "Design"),
         uiOutput("design_status"),
+        # Shown while the builder has unsaved changes, which it reports.
+        tags$p(id = "design_unsaved", class = "hint", style = "display: none;",
+               "Unsaved changes. Save to Studio to keep them."),
         tags$iframe(id = "design_frame", title = "SurveyBuilder",
           src = "sfbuilder/survey_builder.html?host=studio",
           style = paste("width: 100%; height: calc(100vh - 150px); min-height: 600px;",
@@ -2377,9 +2382,8 @@ server <- function(input, output, session) {
         "a file on the Open Instrument screen."))
     } else {
       tags$p(class = "hint", paste0(
-        "Open instrument: ", ins$meta$title %||% "Untitled", ", version ",
-        ins$meta$version %||% "", ". Save to Studio in the builder to make ",
-        "your changes the open instrument."))
+        "Editing: ", ins$meta$title %||% "Untitled", " (",
+        ins$meta$version %||% "", ")"))
     }
   })
 

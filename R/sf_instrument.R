@@ -23,7 +23,7 @@
 #' @param render List or NULL. Optional rendering hints passed to
 #'   [run_survey()], such as theme colour or progress bar visibility.
 #' @param analysis_plan List. Optional pre-planned analysis blocks created in
-#'   the HTML SurveyBuilder Analyse mode.
+#'   the HTML SurveyBuilder Plan mode.
 #' @param models List. Optional model specifications created with [sframe_model_spec()]
 #'   or imported from a `.sframe` file.
 #'

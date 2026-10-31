@@ -44,7 +44,7 @@
 #'
 #' ## Plan
 #'
-#' In SurveyBuilder, the Analyse mode. In code, `sframe_plan(x) <- plan`,
+#' In SurveyBuilder, the Plan mode. In code, `sframe_plan(x) <- plan`,
 #' read back with [sframe_plan()]. [sframe_sample_size_plan()] says how many
 #' responses the plan needs.
 #'
