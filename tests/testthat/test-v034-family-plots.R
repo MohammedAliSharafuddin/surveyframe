@@ -492,7 +492,7 @@ test_that("plot.sframe_missing_data_report builds a missingness bar chart", {
   # Nothing missing: still a chart (a reassuring "no missing responses"
   # message), not a silent NULL that reads as a rendering failure.
   mr_clean <- sframe_missing_data_results(demo$responses, demo$instrument)
-  none_missing <- all(mr_clean$item_missing$missing_pct == 0)
+  none_missing <- all(mr_clean$item_missing$missing_prop == 0)
   if (none_missing) expect_s3_class(plot(mr_clean), "ggplot")
 })
 

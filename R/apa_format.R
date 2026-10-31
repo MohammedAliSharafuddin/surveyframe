@@ -43,6 +43,16 @@ sframe_apa_text <- function(x) {
   "partial_eta2", "omega2", "alpha", "omega", "cronbach_alpha"
 )
 
+# floor_pct, ceiling_pct and missing_pct were renamed _prop in 0.4.3 and kept
+# for 1 release. A table shows the _prop column alone.
+sframe_drop_old_share_cols <- function(x) {
+  old <- c("floor_pct", "ceiling_pct", "missing_pct")
+  twin <- c("floor_prop", "ceiling_prop", "missing_prop")
+  drop <- old[old %in% names(x) & twin %in% names(x)]
+  if (length(drop)) x <- x[, setdiff(names(x), drop), drop = FALSE]
+  x
+}
+
 .sframe_apa_p_col_re <- "^p$|^p\\.value$|^p_value$|^Pr\\(>|^p[._ ]adj"
 
 # A p value for a table cell: 3 decimals with no leading zero, <.001 below
@@ -89,9 +99,10 @@ sframe_apa_number <- function(v, digits = 2, bounded = FALSE) {
 #' @family SurveyStudio helpers
 sframe_apa_cells <- function(x, digits = 2) {
   if (!is.data.frame(x)) return(x)
+  x <- sframe_drop_old_share_cols(x)
   nm <- colnames(x)
   p_col <- grepl(.sframe_apa_p_col_re, nm, ignore.case = TRUE)
-  bounded <- tolower(nm) %in% .sframe_apa_bounded_cols | grepl("_pct$", nm)
+  bounded <- tolower(nm) %in% .sframe_apa_bounded_cols | grepl("_prop$", nm)
   for (j in seq_along(x)) {
     v <- x[[j]]
     x[[j]] <- if (is.numeric(v)) {
@@ -145,14 +156,13 @@ sframe_apa_html <- function(x) {
 )
 
 # Column names as table headings in HTML: symbols from the map above, a p
-# column by its meaning, a `_pct` column (a proportion) named as one, and
-# anything else in words with its first letter capitalised.
+# column by its meaning, and anything else in words with its first letter
+# capitalised.
 sframe_apa_headings <- function(names) {
   vapply(names, function(nm) {
     if (is.na(nm)) return("")
     if (nm %in% names(.sframe_apa_heading_map)) return(.sframe_apa_heading_map[[nm]])
     if (grepl(.sframe_apa_p_col_re, nm, ignore.case = TRUE)) return("<em>p</em>")
-    if (grepl("_pct$", nm)) nm <- paste(sub("_pct$", "", nm), "(proportion)")
     htmltools_escape(.sframe_title_case_names(nm))
   }, character(1), USE.NAMES = FALSE)
 }

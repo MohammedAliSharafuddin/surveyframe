@@ -1504,6 +1504,7 @@ sframe_clean_interpretations <- function(interpretations) {
     }
     words <- strsplit(gsub("_", " ", nm), " ")[[1]]
     if (!length(words)) return(nm)
+    words[words == "prop"] <- "proportion"
     words[1] <- paste0(toupper(substring(words[1], 1, 1)), substring(words[1], 2))
     paste(words, collapse = " ")
   }, character(1), USE.NAMES = FALSE)

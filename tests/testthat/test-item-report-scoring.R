@@ -70,10 +70,10 @@ test_that("19: floor and ceiling use the declared bounds of the scale", {
   diag <- sframe_item_results(d, ins)$m$diagnostics
 
   # m1 never reaches 1 or 7
-  expect_equal(diag$floor_pct[diag$item_id == "m1"], 0)
-  expect_equal(diag$ceiling_pct[diag$item_id == "m1"], 0)
-  expect_equal(diag$floor_pct[diag$item_id == "m2"], 0.25)
-  expect_equal(diag$ceiling_pct[diag$item_id == "m2"], 0.25)
+  expect_equal(diag$floor_prop[diag$item_id == "m1"], 0)
+  expect_equal(diag$ceiling_prop[diag$item_id == "m1"], 0)
+  expect_equal(diag$floor_prop[diag$item_id == "m2"], 0.25)
+  expect_equal(diag$ceiling_prop[diag$item_id == "m2"], 0.25)
 })
 
 test_that("19: floor and ceiling are NA for an item with no declared bounds", {
@@ -84,6 +84,6 @@ test_that("19: floor and ceiling are NA for an item with no declared bounds", {
   ))
   d <- data.frame(u1 = c(3, 4, 5), u2 = c(2, 4, 6))
   diag <- sframe_item_results(d, ins)$u$diagnostics
-  expect_true(all(is.na(diag$floor_pct)))
-  expect_true(all(is.na(diag$ceiling_pct)))
+  expect_true(all(is.na(diag$floor_prop)))
+  expect_true(all(is.na(diag$ceiling_prop)))
 })

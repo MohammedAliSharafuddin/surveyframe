@@ -161,7 +161,9 @@ print.sframe_reliability_report <- function(x, ...) {
 #' @return An object of class `sframe_item_report`: a named list with one
 #'   element per scale, each a list holding `scale_id`, `label` and
 #'   `diagnostics`, a data frame with one row per item and columns `item_id`,
-#'   `mean`, `sd`, `item_rest_r`, `floor_pct`, `ceiling_pct` and `n_missing`.
+#'   `mean`, `sd`, `item_rest_r`, `floor_prop`, `ceiling_prop` and `n_missing`. The floor and ceiling
+#'   shares are proportions. `floor_pct` and `ceiling_pct`, their names
+#'   before 0.4.3, are kept as copies for 1 release.
 #'   `as.data.frame()` stacks every scale's diagnostics into one table.
 #' @export
 #' @seealso [sframe_reliability_results()], [sframe_scale()]
@@ -204,15 +206,19 @@ sframe_item_results <- function(data, instrument, scales = NULL) {
       rest      <- rowSums(scale_data[, setdiff(cols, col), drop = FALSE])
       item_rest <- if (nrow(scale_data) > 2) stats::cor(vals, rest) else NA_real_
       bounds    <- sframe_item_bounds(instrument, col)
-      list(
+      d <- list(
         item_id      = col,
         mean         = mean(vals),
         sd           = stats::sd(vals),
         item_rest_r  = item_rest,
-        floor_pct    = if (is.null(bounds)) NA_real_ else mean(vals == bounds[1]),
-        ceiling_pct  = if (is.null(bounds)) NA_real_ else mean(vals == bounds[2]),
+        floor_prop   = if (is.null(bounds)) NA_real_ else mean(vals == bounds[1]),
+        ceiling_prop = if (is.null(bounds)) NA_real_ else mean(vals == bounds[2]),
         n_missing    = sum(is.na(oriented[[col]]))
       )
+      # floor_pct and ceiling_pct, the names before 0.4.3, kept for 1 release
+      d$floor_pct <- d$floor_prop
+      d$ceiling_pct <- d$ceiling_prop
+      d
     })
 
     list(
