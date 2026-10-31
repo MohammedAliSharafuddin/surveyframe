@@ -761,6 +761,12 @@ style.
 
 ## SurveyStudio
 
+* **Studio runs inside the package.** `launch_studio()` now sources the
+  app into an environment under the surveyframe namespace, as
+  `launch_dashboard()` does, so the app calls internal helpers directly.
+  The 2 helpers copied into the app when the installed Studio failed to
+  start are gone.
+
 * **Each screen draws when it is opened.** Studio kept 28 outputs on every
   screen computing from start-up, because its screens are hidden with CSS
   and Shiny was not told when one became visible. The screen switch now

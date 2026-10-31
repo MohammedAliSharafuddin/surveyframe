@@ -43,6 +43,9 @@ test_that("every Studio screen draws its content when opened", {
     FALSE
   }
   expect_true(wait("window.Shiny && Shiny.shinyapp && Shiny.shinyapp.isConnected()"))
+  # app.R runs as an app object, so www/ is served under sfstudio/.
+  expect_true(wait("(function(){ var i = document.querySelector('img[src^=\"sfstudio/\"]');
+    return !!i && i.complete && i.naturalWidth > 0; })()"), label = "header logo loads")
 
   # The output each screen must draw once it is opened.
   screens <- c(
