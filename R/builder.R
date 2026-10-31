@@ -31,8 +31,13 @@
 #'   opened in the system's default web browser with [utils::browseURL()].
 #'   Set to `FALSE` to return the file path without opening it, which is
 #'   useful for automated testing.
+#' @param demo Optional. A demo name from [sframe_list_demos()]. The builder
+#'   then opens from a temporary copy with that demo's questions, scales and
+#'   analysis plan already loaded. `"input_types"` shows every input type
+#'   the builder supports.
 #'
-#' @return The path to the bundled builder HTML file, invisibly.
+#' @return The path to the builder HTML file, invisibly: the bundled file, or
+#'   the temporary copy when `demo` is given.
 #' @export
 #' @seealso [launch_studio()], [read_sframe()], [run_analysis_plan()]
 #'
@@ -40,9 +45,16 @@
 #' # Retrieve the builder path for inspection without opening the browser
 #' path <- launch_builder(open = FALSE)
 #' file.exists(path)
-launch_builder <- function(open = TRUE) {
-  builder_path <- system.file("builder", "survey_builder.html",
-                              package = "surveyframe")
+#'
+#' # The same builder with a demo preloaded
+#' path <- launch_builder(demo = "two_group", open = FALSE)
+#' file.exists(path)
+launch_builder <- function(open = TRUE, demo = NULL) {
+  builder_path <- if (is.null(demo)) {
+    system.file("builder", "survey_builder.html", package = "surveyframe")
+  } else {
+    sframe_builder_demo_html(demo)
+  }
 
   if (!nzchar(builder_path) || !file.exists(builder_path)) {
     rlang::abort(

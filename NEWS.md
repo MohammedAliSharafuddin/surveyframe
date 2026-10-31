@@ -159,6 +159,11 @@ can be written again, and every plan result can be serialised by a host.
   `sframe_list_demos()` lists them last, with focus `"reference"`, apart
   from the 22 teaching demos. The old names still work.
 
+* **`launch_builder(demo =)` opens SurveyBuilder with any demo preloaded.**
+  It replaces `launch_builder_demo()`, which loaded only the input-types
+  demo. `launch_builder()` now always returns the path of the page it opens,
+  and the old name still returns its list.
+
 ## References, cited where they are used and listed once at the end
 
 An instrument can now carry the works it draws on, and every report lists

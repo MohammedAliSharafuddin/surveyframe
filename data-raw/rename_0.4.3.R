@@ -86,6 +86,7 @@ codebook_report,sframe_codebook,plain
 sframe_demos,sframe_list_demos,plain
 sframe_demo_data,sframe_demo,custom
 sframe_input_types_demo_data,sframe_demo,custom
+launch_builder_demo,launch_builder,custom
 ", stringsAsFactors = FALSE, strip.white = TRUE)
 
 # Wrappers whose arguments differ from the new function's, keyed by old name:
@@ -106,6 +107,18 @@ custom <- list(
     "",
     "sframe_demo(\"input_types\")",
     "sframe_demo(\"input_types\")"
+  ),
+  # launch_builder() returns the path alone, so the wrapper rebuilds the list
+  # launch_builder_demo() returned.
+  launch_builder_demo = c(
+    "open = TRUE",
+    paste(
+      "path <- launch_builder(open = open, demo = \"input_types\")",
+      "  demo <- sframe_demo(\"input_types\")",
+      "  invisible(list(builder_path = path, demo_file = demo$instrument_path,",
+      "                 responses_path = demo$responses_path))",
+      sep = "\n"),
+    "launch_builder(demo = \"input_types\")"
   )
 )
 
@@ -114,7 +127,9 @@ custom <- list(
 # roxygen link such as [sframe_demo_data()] becomes [sframe_demo()] first.
 calls <- c(
   "sframe_demo_data\\(\\)" = "sframe_demo(\"tourism_services\")",
-  "sframe_input_types_demo_data\\(\\)" = "sframe_demo(\"input_types\")"
+  "sframe_input_types_demo_data\\(\\)" = "sframe_demo(\"input_types\")",
+  "launch_builder_demo\\(\\)" = "launch_builder(demo = \"input_types\")",
+  "launch_builder_demo\\(" = "launch_builder(demo = \"input_types\", "
 )
 
 # Not after a letter, digit, underscore, dot, `$` or `@`, so internal helpers
@@ -172,7 +187,8 @@ files <- c(
 files <- setdiff(files, c(
   "R/superseded.R", "R/superseded_warn.R", "data-raw/rename_0.4.3.R",
   "tests/testthat/test-superseded.R", "tests/testthat/test-superseded-warn.R",
-  "tests/testthat/test-demo-reference-datasets.R"
+  "tests/testthat/test-demo-reference-datasets.R",
+  "tests/testthat/test-launch-builder-demo.R"
 ))
 
 changed <- character()

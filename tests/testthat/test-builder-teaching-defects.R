@@ -7,7 +7,7 @@
 # 4. A regression block saved with `outcome` (which R accepts beside
 #    `dependent`) opened with the dependent variable set to the first item.
 # 6. The sidebar title read "Untitled Survey" on first load when the state was
-#    injected, as launch_builder_demo() does.
+#    injected, as launch_builder(demo = "input_types") does.
 # 7. The role dropdowns in the analysis plan dialog ran past its right edge.
 #
 # Skipped on CRAN and wherever chromote or Chrome is unavailable.
@@ -20,10 +20,10 @@ skip_if(length(chrome) != 1L || is.na(chrome) || !nzchar(chrome),
         "Chrome not available")
 
 open_demo_builder <- function() {
-  info <- launch_builder_demo(open = FALSE)
+  path <- launch_builder(demo = "input_types", open = FALSE)
   session <- chromote::ChromoteSession$new(width = 1280, height = 900)
   loaded <- session$Page$loadEventFired(wait_ = FALSE)
-  session$Page$navigate(paste0("file://", normalizePath(info$builder_path)),
+  session$Page$navigate(paste0("file://", normalizePath(path)),
                         wait_ = FALSE)
   session$wait_for(loaded)
   session
