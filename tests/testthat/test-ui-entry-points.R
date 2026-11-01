@@ -16,8 +16,10 @@ app_source <- function() {
 test_that("22: the preview gate names a route Studio has", {
   src <- app_source()
   expect_false(grepl("Build Survey", src, fixed = TRUE))
-  # it points at the builder, which is where questions are authored
-  expect_match(src, "launch_builder()", fixed = TRUE)
+  # It links to the Design screen, which holds the builder where questions
+  # are written, and to Open Instrument.
+  expect_match(src, "so there is nothing to preview. Design", fixed = TRUE)
+  expect_match(src, "open a file that has them.\"), c(\"design\", \"open\")", fixed = TRUE)
 })
 
 test_that("22: every screen the app names is one it has", {
