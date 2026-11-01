@@ -144,8 +144,8 @@ reference:
   - title: "Plan"
     desc: >
       Declare the analysis before the data arrive, so the report shows what
-      was planned and what was run. In SurveyBuilder: the Analyse mode. In
-      SurveyStudio: the Analysis Plan screen. In code: `sframe_plan(x) <-
+      was planned and what was run. In SurveyBuilder: the Plan mode. In
+      SurveyStudio: Plan, or the Analyse screen. In code: `sframe_plan(x) <-
       plan`.
     contents:
       - sframe_plan
@@ -188,7 +188,7 @@ reference:
   - title: "Analyse"
     desc: >
       Score the scales and run the plan, block by block. In SurveyStudio: the
-      Reliability, Analysis Plan and Dashboard screens. In code:
+      Explore, Reliability and Analyse screens. In code:
       `run_analysis_plan()`.
     contents:
       - run_analysis_plan
@@ -205,7 +205,7 @@ reference:
   - title: "Report"
     desc: >
       Write up what was run: an HTML or PDF report, a codebook, the figures,
-      and the R code behind each result. In SurveyStudio: the Export screen.
+      and the R code behind each result. In SurveyStudio: the Report screen.
       In code: `render_report()`.
     contents:
       - render_report

@@ -73,7 +73,7 @@ for SPSS or Stata.
 
 \subsection{Analyse}{
 
-In SurveyStudio, the Reliability, Analysis Plan and Dashboard screens. In
+In SurveyStudio, the Explore, Reliability and Analyse screens. In
 code, \code{\link[=score_scales]{score_scales()}} and \code{\link[=run_analysis_plan]{run_analysis_plan()}}, which runs every block of
 the plan, decision-analysis blocks included. The \verb{_results} functions,
 such as \code{\link[=sframe_reliability_results]{sframe_reliability_results()}}, run one analysis on its own.
@@ -81,7 +81,7 @@ such as \code{\link[=sframe_reliability_results]{sframe_reliability_results()}},
 
 \subsection{Report}{
 
-In SurveyStudio, the Export screen. In code, \code{\link[=render_report]{render_report()}},
+In SurveyStudio, the Report screen. In code, \code{\link[=render_report]{render_report()}},
 \code{\link[=render_results]{render_results()}} and \code{\link[=sframe_codebook]{sframe_codebook()}}.
 }
 

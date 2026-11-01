@@ -69,14 +69,14 @@
 #'
 #' ## Analyse
 #'
-#' In SurveyStudio, the Reliability, Analysis Plan and Dashboard screens. In
+#' In SurveyStudio, the Explore, Reliability and Analyse screens. In
 #' code, [score_scales()] and [run_analysis_plan()], which runs every block of
 #' the plan, decision-analysis blocks included. The `_results` functions,
 #' such as [sframe_reliability_results()], run one analysis on its own.
 #'
 #' ## Report
 #'
-#' In SurveyStudio, the Export screen. In code, [render_report()],
+#' In SurveyStudio, the Report screen. In code, [render_report()],
 #' [render_results()] and [sframe_codebook()].
 #'
 #' ## References
