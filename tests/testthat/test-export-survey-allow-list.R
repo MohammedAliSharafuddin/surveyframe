@@ -3,7 +3,7 @@
 # A shared survey carries only what its page reads (session 7). export_survey()
 # embedded the whole instrument minus its hash, so anyone given the link could
 # read the instrument's references, analysis plan, hypotheses and amendment
-# history from the page source. The builder's Preview embeds the same list,
+# history, and the answers to its attention checks, from the page source. The builder's Preview embeds the same list,
 # checked in test-builder-preview-browser.R.
 
 planted_instrument <- function() {
@@ -19,6 +19,11 @@ planted_instrument <- function() {
                     deviation_report = "Planted deviation report")
   y$meta$authors <- list("Planted Author")
   y$render$google_sheets_url <- "https://docs.google.com/spreadsheets/d/PLANTED"
+  # An attention check's answer, and the likert_scale demo's reverse-keyed
+  # org_4 in the organisation scale.
+  y$checks <- list(list(id = "attn_1", type = "attention", item_id = "org_2",
+                        label = "Planted check label", pass_values = list("3"),
+                        fail_action = "flag", notes = "Planted check note"))
   y
 }
 
@@ -37,7 +42,9 @@ for (preview in c(FALSE, TRUE)) {
 
     for (planted in c("Planted research question", "Planted null hypothesis",
                       "Planted alternative hypothesis", "Planted reference title",
-                      "Planted amendment note", "Planted deviation report", "Planted Author", "PLANTED")) {
+                      "Planted amendment note", "Planted deviation report",
+                      "Planted Author", "PLANTED", "Planted check label", "Planted check note", "pass_values", "fail_action", "scale_id",
+                      "\"reverse\"")) {
       expect_false(grepl(planted, html, fixed = TRUE), info = planted)
     }
     j <- survey_json(html)
@@ -46,5 +53,10 @@ for (preview in c(FALSE, TRUE)) {
     expect_true(all(names(j$render) %in% c("header", "mode", "save_draft", "submit_label",
                                            "thankyou", "theme", "welcome")))
     expect_length(j$items, length(planted_instrument()$items))
+    # The page reads which item is a check, to lay it out, and nothing else.
+    expect_identical(j$checks, list(list(item_id = "org_2")))
+    for (item in j$items) {
+      expect_true(all(names(item) %in% sframe_survey_item_fields), info = item$id)
+    }
   })
 }

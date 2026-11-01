@@ -47,7 +47,14 @@ test_that("the builder's Preview is the survey export_survey(preview = TRUE) wri
     "S.analysis_plan[0].research_question = 'Planted research question';",
     "S.analysis_plan[0].hypotheses = {null: 'Planted null hypothesis', alternative: 'Planted alternative hypothesis'};",
     "S.amendments = [{reason_text: 'Planted amendment note'}];",
-    "S.meta.authors = ['Planted Author']; true"))
+    "S.meta.authors = ['Planted Author'];",
+    # An attention check on org_2, made a single choice so the check is what
+    # lays it out as a likert row, and org_4 reverse-keyed in its scale.
+    "S.items[1].type = 'single_choice';",
+    "S.items[3].reverse = true; S.items[3].scale_id = 'organisation';",
+    "S.checks = [{id: 'attn_1', type: 'attention', item_id: S.items[1].id,",
+    "  label: 'Planted check label', pass_values: ['3'], fail_action: 'flag',",
+    "  notes: 'Planted check note'}]; true"))
   js("setMode('preview'); true")
   frame <- "document.querySelector('#pvFrame iframe')"
   expect_true(wait(paste0("!!", frame, " && !!", frame, ".srcdoc")))
@@ -71,7 +78,9 @@ test_that("the builder's Preview is the survey export_survey(preview = TRUE) wri
   expect_identical(a$meta$title, w$meta$title)
   for (planted in c("Planted research question", "Planted null hypothesis",
                     "Planted alternative hypothesis", "Planted reference title",
-                    "Planted amendment note", "Planted Author")) {
+                    "Planted amendment note", "Planted Author",
+                    "Planted check label", "Planted check note", "pass_values",
+                    "fail_action", "scale_id", "\"reverse\"")) {
     expect_false(grepl(planted, shown, fixed = TRUE), info = planted)
   }
   # The same fields in both, so a draft saved in one is found by the other.
@@ -84,4 +93,8 @@ test_that("the builder's Preview is the survey export_survey(preview = TRUE) wri
   expect_match(shown, "data-endpoint=\"\"", fixed = TRUE)
   expect_true(js(paste0(frame, ".contentWindow.eval('PREVIEW')")))
   expect_true(wait(paste0(frame, ".contentDocument.getElementById('app').innerText.length > 0")))
+  # The check item is still laid out as a likert row, past the consent screen.
+  js(paste0(frame, ".contentDocument.getElementById('consent-chk').checked = true;",
+            frame, ".contentWindow.startSurvey(); true"))
+  expect_true(wait(paste0(frame, ".contentDocument.querySelector('#item_org_2 .likert-row') !== null")))
 })

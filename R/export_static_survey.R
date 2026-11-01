@@ -1,10 +1,17 @@
 # export_static_survey.R
 
-# The meta and render fields the survey page reads
-# (inst/static_survey/template.html). A shared survey carries these and
-# nothing else of the meta and render lists. surveyHtml() in
-# inst/builder/survey_builder.html keeps the same 2 lists.
+# The fields of meta, each item, each check and render that the survey page
+# reads (inst/static_survey/template.html). A shared survey carries these
+# and nothing else of them. surveyHtml() in inst/builder/survey_builder.html
+# keeps the same 4 lists. A check's pass values would give away its answer,
+# and an item's scale and reverse keying the construct structure.
 sframe_survey_meta_fields <- c("title", "description")
+sframe_survey_item_fields <- c("id", "type", "label", "required", "choice_set", "help",
+                               "placeholder", "matrix_items", "comparison_items",
+                               "comparison_scale", "slider_min", "slider_max",
+                               "slider_step", "rating_max", "rating_icon", "date_min",
+                               "date_max", "section_intro", "page")
+sframe_survey_check_fields <- "item_id"
 sframe_survey_render_fields <- c("header", "mode", "save_draft", "submit_label",
                                  "thankyou", "theme", "welcome")
 
@@ -194,8 +201,9 @@ export_survey <- function(
 
   # Serialise only what the survey page reads. Anyone given the link can read
   # the page source, so the references, analysis plan, hypotheses, amendment
-  # history, authors and hash stay out. surveyHtml() in the builder keeps the
-  # same list, so its Preview and a draft saved there match this export.
+  # history, authors, check answers, item scales and hash stay out.
+  # surveyHtml() in the builder keeps the same lists, so its Preview and a
+  # draft saved there match this export.
   full <- strip_classes(instrument)
   keep <- function(x, fields) {
     x <- x[names(x) %in% fields]
@@ -203,10 +211,11 @@ export_survey <- function(
   }
   instr_list <- Filter(Negate(is.null), list(
     meta      = keep(full$meta, sframe_survey_meta_fields),
-    items     = full$items,
+    items     = lapply(full$items, keep, sframe_survey_item_fields),
     choices   = full$choices,
     branching = full$branching,
-    checks    = full$checks,
+    checks    = if (!is.null(full$checks))
+                  lapply(full$checks, keep, sframe_survey_check_fields),
     render    = keep(full$render, sframe_survey_render_fields)
   ))
   instr_json <- jsonlite::toJSON(instr_list, auto_unbox = TRUE, null = "null",
