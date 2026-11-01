@@ -45,7 +45,7 @@ mapping onto a part of the research-design workflow.
   responses, runs quality and reliability checks, runs the analysis plan, and
   exports the report, the deployable survey, and the Sheets collector. Survey
   design itself stays in the SurveyBuilder.
-* `launch_studio(screen = "dashboard")` opens the Dashboard screen, a response
+* `launch_studio(screen = "dashboard")` opens the Explore screen, a response
   explorer with filters, for an instrument and response data that already exist.
 
 ## Input-types demo
@@ -99,13 +99,13 @@ collector.
 
 ## SurveyStudio: the screens
 
-SurveyStudio is a Shiny application, so it can run R. Its left navigation lists
-ten screens in this order: Open Instrument, Amendments, References, Preview
-Survey, Upload Responses, Quality Dashboard, Reliability, Analysis Plan,
-Dashboard, and Export. Survey design is done in the SurveyBuilder, and the studio opens the
-resulting `.sframe`.
+SurveyStudio is a Shiny application, so it can run R. Its left navigation
+follows the study. Open Instrument comes first, then 5 groups: Build (Design,
+Plan and Preview), Collect (Collect and Responses), Analyse (Quality, Explore,
+Reliability and Analyse), Report, and Record (References and Amendments).
+Design holds the SurveyBuilder, and Plan opens it in its Plan mode.
 
-```{r fig-studio-responses, echo = FALSE, out.width = "100%", fig.alt = "SurveyStudio's Upload Responses screen. The left navigation lists the ten screens. The main panel has a CSV file chooser, respondent ID and submitted-at column fields, a strict column check, and help on loading responses collected elsewhere or from a Google Sheet."}
+```{r fig-studio-responses, echo = FALSE, out.width = "100%", fig.alt = "SurveyStudio's Responses screen. The left navigation lists the screens in their groups. The main panel has a CSV file chooser, respondent ID and submitted-at column fields, a strict column check, and help on loading responses collected elsewhere or from a Google Sheet."}
 knitr::include_graphics("figures/gui-studio-responses.png")
 ```
 
@@ -119,10 +119,10 @@ The References screen lists the works the instrument cites and adds more from
 pasted BibTeX, each with where the instrument cites it. Citing a source needs
 no amendment, and the references travel in the exported `.sframe` file.
 
-The Preview Survey screen renders the exact deployable survey, identical to the
+The Preview screen renders the exact deployable survey, identical to the
 exported HTML.
 
-The Analysis Plan screen does two jobs. It edits the plan, with the same
+The Analyse screen does two jobs. It edits the plan, with the same
 research question, method, significance level, and role fields as the builder.
 It also runs the plan. When response data have been uploaded, the Run preview
 tab calls `run_analysis_plan()` and shows a card for each research question:
@@ -130,11 +130,11 @@ the APA result, the effect size, a formatted table and the chart, across the
 width of the screen. Without responses, it asks you to upload data before
 running.
 
-```{r fig-studio-analysis, echo = FALSE, out.width = "100%", fig.alt = "A SurveyStudio result card on the Analysis Plan screen's Run preview tab: research question 1 asks whether digital experience is associated with behavioural intention, with the result r(118) = 0.60, 95% CI 0.48 to 0.71, p below .001, a one-row table of the statistic, and a scatter plot with a fitted line."}
+```{r fig-studio-analysis, echo = FALSE, out.width = "100%", fig.alt = "A SurveyStudio result card on the Analyse screen's Run preview tab: research question 1 asks whether digital experience is associated with behavioural intention, with the result r(118) = 0.60, 95% CI 0.48 to 0.71, p below .001, a one-row table of the statistic, and a scatter plot with a fitted line."}
 knitr::include_graphics("figures/gui-studio-analysis.png")
 ```
 
-The Export screen produces the written report through `render_report()`. Its
+The Report screen produces the written report through `render_report()`. Its
 options include the codebook, quality, missing data, descriptives, reliability,
 the saved analysis-plan results, and the model appendices. The per-question
 report produced by `render_results()` in an R session is a separate route to a
@@ -151,7 +151,7 @@ run and edited outside SurveyStudio.
 3. Use `read_sframe()` to load the saved instrument in R.
 4. Use `read_responses()` to import collected data.
 5. Use `launch_studio()` to inspect the instrument and responses together, to
-   run the plan on the Analysis Plan screen, and to export the report.
+   run the plan on the Analyse screen, and to write the report on Report.
 6. Use `launch_studio(screen = "dashboard")` for response exploration with filters.
 
 ## RStudio Addins
@@ -168,7 +168,7 @@ knitr::include_graphics("figures/gui-rstudio-addins.png")
 |---|---|---|
 | surveyframe: Design an instrument | SurveyBuilder in the browser | RStudio alone |
 | surveyframe: Open analysis workspace | SurveyStudio, on Open Instrument | RStudio alone, open a `.sframe` there |
-| surveyframe: Analyse an existing instrument | SurveyStudio, on Upload Responses, with the instrument loaded | a `.sframe` file, chosen in a dialog |
+| surveyframe: Analyse an existing instrument | SurveyStudio, on Responses, with the instrument loaded | a `.sframe` file, chosen in a dialog |
 | surveyframe: Insert starter instrument | a template in the active R script, at the cursor | an open R script |
 
 The commands follow the workflow above:
@@ -201,7 +201,7 @@ scales, and analysis plan are visible at once.
 `launch_studio(demo = "input_types", screen = "preview")` opens the studio
 with an instrument and response data already loaded. Any name from
 `sframe_list_demos()` works as `demo`. Setting `screen = "dashboard"` opens the
-Dashboard screen with the same demo data.
+Explore screen with the same demo data.
 
 ## Standalone builder
 
@@ -225,11 +225,11 @@ launch_studio(
 ```
 
 SurveyStudio reads the objects passed by `launch_studio()`. With response data
-present, `screen = "auto"` opens the Dashboard. With an instrument alone it
-opens Preview Survey, and with neither it opens Open Instrument.
-`screen = "analysis"` opens the Analysis Plan screen explicitly.
+present, `screen = "auto"` opens Explore. With an instrument alone it
+opens Preview, and with neither it opens Open Instrument.
+`screen = "analysis"` opens the Analyse screen explicitly.
 
-## Dashboard
+## Explore
 
 ```{r dashboard, eval = FALSE}
 launch_studio(
@@ -240,9 +240,9 @@ launch_studio(
 )
 ```
 
-Use the Dashboard screen after data collection to explore responses. Each filter takes the question's label and choice labels, and the date range follows `submitted_at`.
+Use the Explore screen after data collection to explore responses. Each filter takes the question's label and choice labels, and the date range follows `submitted_at`.
 
-```{r fig-dashboard, echo = FALSE, out.width = "100%", fig.alt = "SurveyStudio's Dashboard screen on its Overview tab: 3 filters named by their questions and a date range on submitted_at, tiles for 120 responses, 120 filtered responses, 19 items, 2 scales, 1 check and the date range, and the instrument summary."}
+```{r fig-dashboard, echo = FALSE, out.width = "100%", fig.alt = "SurveyStudio's Explore screen on its Overview tab: 3 filters named by their questions and a date range on submitted_at, tiles for 120 responses, 120 filtered responses, 19 items, 2 scales, 1 check and the date range, and the instrument summary."}
 knitr::include_graphics("figures/gui-dashboard.png")
 ```
 

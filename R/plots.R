@@ -1912,11 +1912,11 @@ plot.sframe_analysis_results <- function(x, ..., which = NULL) {
 
 #' Plot an item response distribution
 #'
-#' Draws how one item was answered, as SurveyStudio's Dashboard screen shows
+#' Draws how one item was answered, as SurveyStudio's Explore screen shows
 #' it. It returns `NULL` where it has nothing to draw, so a caller can
 #' fall back to its own chart.
 #'
-#' Used by the SurveyStudio Dashboard screen (`inst/shiny/app.R`). Callers
+#' Used by the SurveyStudio Explore screen (`inst/shiny/app.R`). Callers
 #' fall back to their own base graphics when this returns `NULL` (ggplot2 not
 #' installed, unsupported item type, or no data), so the screen keeps working
 #' without ggplot2.

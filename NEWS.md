@@ -801,6 +801,15 @@ style.
 
 ## SurveyStudio
 
+* **The sidebar follows the study.** Open Instrument comes first, then 5
+  groups under headings: Build (Design, Plan, Preview), Collect (Collect,
+  Responses), Analyse (Quality, Explore, Reliability, Analyse), Report, and
+  Record (References, Amendments). Plan opens Design with SurveyBuilder in its
+  Plan mode, and Design opens it in Build mode. 6 screens have shorter names:
+  Preview Survey is Preview, Upload Responses is Responses, Quality Dashboard
+  is Quality, Dashboard is Explore, Analysis Plan is Analyse and Export is
+  Report. The screen names `launch_studio(screen =)` takes are unchanged.
+
 * **Studio runs inside the package.** `launch_studio()` now sources the
   app into an environment under the surveyframe namespace, as
   `launch_dashboard()` does, so the app calls internal helpers directly.

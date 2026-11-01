@@ -3,7 +3,7 @@
 # Every SurveyStudio screen that has nothing to show yet names the next
 # stage and links to it (session 7). With no instrument, each screen past
 # Design and Open Instrument points to those 2. With an instrument and no
-# responses, the screens that need responses point to Collect and Upload
+# responses, the screens that need responses point to Collect and
 # Responses. Driven in a real Chrome against the build under test.
 
 test_that("the screens list has the Design and Collect stages in order", {
@@ -78,7 +78,7 @@ test_that("with no instrument every later screen names Design and Open Instrumen
   expect_true(s$wait("$('#screen-open').hasClass('active')"))
 })
 
-test_that("with no responses the screens that need them name Collect and Upload Responses", {
+test_that("with no responses the screens that need them name Collect and Responses", {
   skip_without_next_stage_browser()
   s <- next_stage_session(function(port) {
     library(surveyframe)

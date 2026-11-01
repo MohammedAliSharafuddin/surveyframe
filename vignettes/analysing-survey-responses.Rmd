@@ -235,9 +235,9 @@ render_results(results, instr, output_file = "results.html", citation_format = "
 ## In SurveyStudio
 
 SurveyStudio runs the same plan. Open it on the analysis screen, upload the
-responses, and the Analysis Plan screen runs the saved plan and shows a table of
+responses, and the Analyse screen runs the saved plan and shows a table of
 each question with its method and APA result. The full report is produced on the
-Export screen.
+Report screen.
 
 ```{r gui, eval = FALSE}
 launch_studio(

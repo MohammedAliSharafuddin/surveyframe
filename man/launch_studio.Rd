@@ -36,10 +36,12 @@ is a CSV path.}
 CSV path.}
 
 \item{screen}{The screen to open on. One of \code{"auto"}, which picks by what
-you supply, or a screen name: \code{"design"}, \code{"open"}, \code{"amendments"},
-\code{"references"}, \code{"preview"}, \code{"collect"},
-\code{"responses"}, \code{"quality"}, \code{"reliability"}, \code{"analysis"},
-\code{"dashboard"} or \code{"export"}. \code{"data"} is accepted for \code{"responses"}.}
+you supply, or a screen name, given here with its sidebar label:
+\code{"open"} (Open Instrument), \code{"design"} (Design), \code{"preview"} (Preview),
+\code{"collect"} (Collect), \code{"responses"} (Responses), \code{"quality"} (Quality),
+\code{"dashboard"} (Explore), \code{"reliability"} (Reliability), \code{"analysis"}
+(Analyse), \code{"export"} (Report), \code{"references"} (References) or
+\code{"amendments"} (Amendments). \code{"data"} is accepted for \code{"responses"}.}
 
 \item{port}{TCP port for the Shiny server.}
 
@@ -57,10 +59,11 @@ Called for its side effect.
 }
 \description{
 Opens the SurveyStudio Shiny application, the visual interface for working
-with an instrument. Its screens design an instrument in the SurveyBuilder,
-open one, record and read amendments, preview the survey, set up its
-collection, upload responses, review data quality, inspect reliability,
-work on the analysis plan, read the dashboard, and export.
+with an instrument. Its sidebar follows the study: open an instrument,
+then Build (design it, plan its analysis and preview it), Collect (set up
+collection and load the responses), Analyse (check their quality, explore
+them, inspect reliability and run the plan), Report, and Record (its
+references and amendments).
 }
 \details{
 The Design screen holds the SurveyBuilder, and a save there becomes the

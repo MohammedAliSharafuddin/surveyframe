@@ -3,8 +3,8 @@
 # The screens SurveyStudio has, in navigation order, matching the tabs in
 # inst/shiny/app.R.
 sframe_studio_screens <- function() {
-  c("design", "open", "amendments", "references", "preview", "collect", "responses", "quality",
-    "reliability", "analysis", "dashboard", "export")
+  c("open", "design", "preview", "collect", "responses", "quality", "dashboard",
+    "reliability", "analysis", "export", "references", "amendments")
 }
 
 # Resolves the `screen` argument to a screen Studio has. "build" used to be
@@ -30,10 +30,11 @@ sframe_studio_screen <- function(screen) {
 #' Launch the SurveyStudio interface
 #'
 #' Opens the SurveyStudio Shiny application, the visual interface for working
-#' with an instrument. Its screens design an instrument in the SurveyBuilder,
-#' open one, record and read amendments, preview the survey, set up its
-#' collection, upload responses, review data quality, inspect reliability,
-#' work on the analysis plan, read the dashboard, and export.
+#' with an instrument. Its sidebar follows the study: open an instrument,
+#' then Build (design it, plan its analysis and preview it), Collect (set up
+#' collection and load the responses), Analyse (check their quality, explore
+#' them, inspect reliability and run the plan), Report, and Record (its
+#' references and amendments).
 #'
 #' The Design screen holds the SurveyBuilder, and a save there becomes the
 #' instrument Studio has open. [launch_builder()] opens the builder on its own.
@@ -49,10 +50,12 @@ sframe_studio_screen <- function(screen) {
 #' @param strict Logical. Passed to [read_responses()] when `responses` is a
 #'   CSV path.
 #' @param screen The screen to open on. One of `"auto"`, which picks by what
-#'   you supply, or a screen name: `"design"`, `"open"`, `"amendments"`,
-#'   `"references"`, `"preview"`, `"collect"`,
-#'   `"responses"`, `"quality"`, `"reliability"`, `"analysis"`,
-#'   `"dashboard"` or `"export"`. `"data"` is accepted for `"responses"`.
+#'   you supply, or a screen name, given here with its sidebar label:
+#'   `"open"` (Open Instrument), `"design"` (Design), `"preview"` (Preview),
+#'   `"collect"` (Collect), `"responses"` (Responses), `"quality"` (Quality),
+#'   `"dashboard"` (Explore), `"reliability"` (Reliability), `"analysis"`
+#'   (Analyse), `"export"` (Report), `"references"` (References) or
+#'   `"amendments"` (Amendments). `"data"` is accepted for `"responses"`.
 #' @param port TCP port for the Shiny server.
 #' @param host Host address passed to [shiny::runApp()].
 #' @param launch.browser Whether to open the browser automatically.

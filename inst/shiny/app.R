@@ -1210,6 +1210,15 @@ screen_class <- function(tab) {
   paste("screen", if (identical(initial_tab, tab)) "active")
 }
 
+studio_nav_entry <- function(tab, label) {
+  tags$li(class = "studio-nav-item",
+    tags$a(href = "#", `data-tab` = tab, class = tab_link_class(tab), label))
+}
+
+studio_nav_heading <- function(label) {
+  tags$li(class = "studio-nav-heading", label)
+}
+
 ui <- fluidPage(
   tags$head(
     tags$title("SurveyStudio"),
@@ -1241,6 +1250,12 @@ ui <- fluidPage(
       .studio-nav-item a:hover { background: #1d2140; color: #c8ccdc; }
       .studio-nav-item a.active {
         background: #22274a; color: #ffffff; border-left-color: #16B3B1;
+      }
+      /* A group heading is a label, with nothing to click. */
+      .studio-nav-heading {
+        padding: 14px 20px 4px; font-size: 11px; font-weight: 600;
+        letter-spacing: 0.08em; text-transform: uppercase; color: #6b7190;
+        cursor: default; user-select: none;
       }
       .studio-status {
         padding: 16px 20px; font-size: 12px;
@@ -1387,43 +1402,29 @@ ui <- fluidPage(
         tags$img(src = "sfstudio/surveyframe-shiny-square-icon.png", alt = "surveyframe"),
         "Survey", tags$span("Studio")
       ),
+      # The study's order, in groups under headings that cannot be clicked.
+      # Plan is an entry, not a screen: it opens Design with the builder in
+      # its Plan mode. The screen ids stay as they were for launch_studio().
       tags$ul(class = "studio-nav",
+        studio_nav_entry("open", "Open Instrument"),
+        studio_nav_heading("Build"),
+        studio_nav_entry("design", "Design"),
         tags$li(class = "studio-nav-item",
-          tags$a(href = "#", `data-tab` = "design",
-                 class = tab_link_class("design"), "Design")),
-        tags$li(class = "studio-nav-item",
-          tags$a(href = "#", `data-tab` = "open",
-                 class = tab_link_class("open"), "Open Instrument")),
-        tags$li(class = "studio-nav-item",
-          tags$a(href = "#", `data-tab` = "amendments",
-                 class = tab_link_class("amendments"), "Amendments")),
-        tags$li(class = "studio-nav-item",
-          tags$a(href = "#", `data-tab` = "references",
-                 class = tab_link_class("references"), "References")),
-        tags$li(class = "studio-nav-item",
-          tags$a(href = "#", `data-tab` = "preview",
-                 class = tab_link_class("preview"), "Preview Survey")),
-        tags$li(class = "studio-nav-item",
-          tags$a(href = "#", `data-tab` = "collect",
-                 class = tab_link_class("collect"), "Collect")),
-        tags$li(class = "studio-nav-item",
-          tags$a(href = "#", `data-tab` = "responses",
-                 class = tab_link_class("responses"), "Upload Responses")),
-        tags$li(class = "studio-nav-item",
-          tags$a(href = "#", `data-tab` = "quality",
-                 class = tab_link_class("quality"), "Quality Dashboard")),
-        tags$li(class = "studio-nav-item",
-          tags$a(href = "#", `data-tab` = "reliability",
-                 class = tab_link_class("reliability"), "Reliability")),
-        tags$li(class = "studio-nav-item",
-          tags$a(href = "#", `data-tab` = "analysis",
-                 class = tab_link_class("analysis"), "Analysis Plan")),
-        tags$li(class = "studio-nav-item",
-          tags$a(href = "#", `data-tab` = "dashboard",
-                 class = tab_link_class("dashboard"), "Dashboard")),
-        tags$li(class = "studio-nav-item",
-          tags$a(href = "#", `data-tab` = "export",
-                 class = tab_link_class("export"), "Export"))
+          tags$a(href = "#", `data-nav` = "plan", "Plan")),
+        studio_nav_entry("preview", "Preview"),
+        studio_nav_heading("Collect"),
+        studio_nav_entry("collect", "Collect"),
+        studio_nav_entry("responses", "Responses"),
+        studio_nav_heading("Analyse"),
+        studio_nav_entry("quality", "Quality"),
+        studio_nav_entry("dashboard", "Explore"),
+        studio_nav_entry("reliability", "Reliability"),
+        studio_nav_entry("analysis", "Analyse"),
+        studio_nav_heading("Report"),
+        studio_nav_entry("export", "Report"),
+        studio_nav_heading("Record"),
+        studio_nav_entry("references", "References"),
+        studio_nav_entry("amendments", "Amendments")
       ),
       tags$div(class = "studio-status", uiOutput("sidebar_status"))
     ),
@@ -1433,9 +1434,17 @@ ui <- fluidPage(
         // see. Shiny suspends an output while it is hidden, so the switch
         // fires the 'hidden' and 'shown' events Shiny listens for, and the
         // opened screen's outputs draw at once.
-        function studioShowScreen(link, tab) {
+        // Plan is the Design screen with the builder in its Plan mode, and
+        // the entry marked active is the one picked. Any other way to Design
+        // opens the builder in Build mode.
+        function studioShowScreen(link, tab, nav) {
           $('.studio-nav-item a').removeClass('active');
-          $('.studio-nav-item a[data-tab=\"' + tab + '\"]').addClass('active');
+          if (nav === 'plan') {
+            $('.studio-nav-item a[data-nav=\"plan\"]').addClass('active');
+          } else {
+            $('.studio-nav-item a[data-tab=\"' + tab + '\"]').addClass('active');
+          }
+          if (tab === 'design') studioDesignSetMode(nav === 'plan' ? 'analyse' : 'build');
           $('.screen.active').not('#screen-' + tab)
             .removeClass('active').trigger('hidden');
           $('#screen-' + tab).addClass('active').trigger('shown');
@@ -1457,6 +1466,11 @@ ui <- fluidPage(
           studioPicked = true;
           studioShowScreen($(this), $(this).data('tab'));
         });
+        $(document).on('click', '[data-nav=\"plan\"]', function(e) {
+          e.preventDefault();
+          studioPicked = true;
+          studioShowScreen($(this), 'design', 'plan');
+        });
 
         Shiny.addCustomMessageHandler('surveyframe-launch-tab', studioLaunchScreen);
 
@@ -1465,6 +1479,13 @@ ui <- fluidPage(
         // the same origin. Studio keeps the open instrument's text, for the
         // builder to ask for once it has loaded.
         var studioDesignText = null;
+        // The builder mode Design should show, sent again once the builder
+        // has loaded, since a click can come first.
+        var studioDesignMode = 'build';
+        function studioDesignSetMode(mode) {
+          studioDesignMode = mode;
+          studioDesignPost({type: 'mode', mode: mode});
+        }
         function studioDesignPost(msg) {
           var f = document.getElementById('design_frame');
           if (f && f.contentWindow) f.contentWindow.postMessage(msg, location.origin);
@@ -1479,6 +1500,7 @@ ui <- fluidPage(
             } else if (studioDesignText) {
               studioDesignPost({type: 'sframe', text: studioDesignText});
             }
+            studioDesignPost({type: 'mode', mode: studioDesignMode});
           } else if (d.type === 'sframe' && typeof d.text === 'string') {
             Shiny.setInputValue('builder_sframe', d.text, {priority: 'event'});
           } else if (d.type === 'dirty') {
@@ -1647,7 +1669,7 @@ ui <- fluidPage(
       ),
 
       tags$div(id = "screen-preview", class = screen_class("preview"),
-        tags$h2(class = "screen-title", "Preview Survey"),
+        tags$h2(class = "screen-title", "Preview"),
         uiOutput("preview_gate"),
         tags$div(id = "survey_preview_frame", uiOutput("survey_preview_items"))
       ),
@@ -1684,14 +1706,14 @@ ui <- fluidPage(
         tags$div(class = "card",
           tags$div(class = "card-title", "3. Read the responses"),
           tags$p(class = "hint",
-            "As responses arrive, read them from the sheet on the Upload Responses screen, which takes the sheet URL from step 1."),
+            "As responses arrive, read them from the sheet on the Responses screen, which takes the sheet URL from step 1."),
           tags$a(href = "#", `data-tab` = "responses", class = "btn btn-outline",
                  "Read from Google Sheet")
         )
       ),
 
       tags$div(id = "screen-responses", class = screen_class("responses"),
-        tags$h2(class = "screen-title", "Upload Responses"),
+        tags$h2(class = "screen-title", "Responses"),
         uiOutput("responses_gate"),
         tags$div(class = "card",
           tags$div(class = "card-title", "Response data"),
@@ -1735,7 +1757,7 @@ ui <- fluidPage(
       ),
 
       tags$div(id = "screen-quality", class = screen_class("quality"),
-        tags$h2(class = "screen-title", "Quality Dashboard"),
+        tags$h2(class = "screen-title", "Quality"),
         uiOutput("quality_gate"),
         uiOutput("quality_output"),
         plotOutput("studio_quality_chart", height = "260px"),
@@ -1750,7 +1772,7 @@ ui <- fluidPage(
       ),
 
       tags$div(id = "screen-analysis", class = screen_class("analysis"),
-        tags$h2(class = "screen-title", "Analysis Plan"),
+        tags$h2(class = "screen-title", "Analyse"),
         uiOutput("analysis_gate"),
         tags$div(class = "studio-tabs",
           radioButtons(
@@ -1772,7 +1794,7 @@ ui <- fluidPage(
       ),
 
       tags$div(id = "screen-dashboard", class = screen_class("dashboard"),
-        tags$h2(class = "screen-title", "Dashboard"),
+        tags$h2(class = "screen-title", "Explore"),
         uiOutput("dashboard_gate"),
         tags$div(class = "studio-tabs",
           radioButtons(
@@ -1787,7 +1809,7 @@ ui <- fluidPage(
       ),
 
       tags$div(id = "screen-export", class = screen_class("export"),
-        tags$h2(class = "screen-title", "Export"),
+        tags$h2(class = "screen-title", "Report"),
         uiOutput("export_gate"),
         tags$div(class = "card",
           tags$div(class = "card-title", "Instrument file"),
@@ -1870,7 +1892,7 @@ ui <- fluidPage(
 # What a screen with nothing to show yet says, with a link to each next
 # stage, so the researcher is never left on an empty screen.
 studio_stage_labels <- c(design = "Design", open = "Open Instrument",
-                         collect = "Collect", responses = "Upload Responses")
+                         collect = "Collect", responses = "Responses")
 studio_next_stage <- function(message, tabs) {
   tags$div(class = "card next-stage",
     tags$p(message),
@@ -2396,7 +2418,7 @@ server <- function(input, output, session) {
                     value = rv$instrument$render$google_sheets_endpoint %||% "")
   })
 
-  # The sheet given in step 1 is the one the Upload Responses screen reads.
+  # The sheet given in step 1 is the one the Responses screen reads.
   observeEvent(input$collect_sheet_url, {
     if (nzchar(trimws(input$collect_sheet_url))) {
       updateTextInput(session, "sheet_url", value = trimws(input$collect_sheet_url))
@@ -2578,7 +2600,7 @@ server <- function(input, output, session) {
       sync_builder_inputs(rv$builder)
       amend_revised(NULL)
       showNotification(
-        "Amendment applied. Responses were cleared, since the instrument changed; reload them on Upload Responses. Export the .sframe to save this amendment to disk.",
+        "Amendment applied. Responses were cleared, since the instrument changed. Load them again on Responses. Export the .sframe to save this amendment to disk.",
         type = "message", duration = 8)
     }, error = function(e) {
       showNotification(paste("Error:", conditionMessage(e)), type = "error")
@@ -2660,7 +2682,7 @@ server <- function(input, output, session) {
       sync_builder_inputs(rv$builder)
       showNotification(
         paste0("Sample loaded: ", nrow(demo$responses),
-               " responses. Explore Quality, Reliability, Analysis Plan, and Dashboard."),
+               " responses. Open Quality, Explore, Reliability and Analyse."),
         type = "message"
       )
       switch_tab("dashboard")
@@ -3672,9 +3694,9 @@ server <- function(input, output, session) {
   })
 
   # One shared execution of the analysis plan (with charts when ggplot2 is
-  # installed), reused by the Run result cards and the Export screen's
+  # installed), reused by the Run result cards and the Report screen's
   # Interpretations card, so the plan does not run once per consumer.
-  # Depends on input$rpt_palette so switching the Export screen's Chart
+  # Depends on input$rpt_palette so switching the Report screen's Chart
   # theme radio re-renders the preview charts in the chosen palette instead
   # of leaving them fixed at whatever palette was active on first run.
   analysis_results_r <- reactive({

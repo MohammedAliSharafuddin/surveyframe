@@ -1,6 +1,6 @@
 # R/dashboard_filters.R
 #
-# Helpers for the SurveyStudio Dashboard screen's filter bar (inst/shiny/app.R).
+# Helpers for the SurveyStudio Explore screen's filter bar (inst/shiny/app.R).
 # They choose which columns offer a filter and read dates in the formats
 # survey tools write. Internal, no export.
 

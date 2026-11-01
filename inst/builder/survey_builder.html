@@ -4367,7 +4367,7 @@ function studioPostDirty(){
   window.parent.postMessage({type:'dirty',dirty:dirty},location.origin);
 }
 function studioHostInit(){
-  // Studio has its own name, Preview Survey screen and Collect screen.
+  // Studio has its own name, Preview screen and Collect screen.
   document.getElementById('openBtn').style.display='none';
   document.getElementById('exportBtn').style.display='none';
   document.querySelector('.tb-brand').style.display='none';
@@ -4394,6 +4394,9 @@ function studioHostInit(){
       }
       studioPendingOrigin=null;
       toast(String(d.message||''),d.ok?'ok':'err');
+    }else if(d.type==='mode'&&(d.mode==='build'||d.mode==='analyse')){
+      // Studio's Design and Plan entries open this builder in their mode.
+      setMode(d.mode);
     }
   });
   window.parent.postMessage({type:'need-sframe'},location.origin);
