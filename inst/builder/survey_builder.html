@@ -4181,9 +4181,13 @@ function surveyHtml(preview){
   }
   // Only what the survey page reads, the list export_survey() keeps in
   // R/export_static_survey.R. Anyone given the link can read the page source,
-  // so the references, analysis plan, hypotheses and amendments stay out.
+  // so the references, analysis plan, hypotheses, amendments, check answers
+  // and item scales stay out.
   var keep=function(o,fields){var r={};Object.keys(o||{}).forEach(function(k){if(fields.indexOf(k)>=0)r[k]=o[k];});return r;};
-  var instr={meta:keep(S.meta,['title','description']),items:S.items,choices:S.choices,branching:S.branching,checks:S.checks,
+  var itemFields=['id','type','label','required','choice_set','help','placeholder','matrix_items','comparison_items','comparison_scale','slider_min','slider_max','slider_step','rating_max','rating_icon','date_min','date_max','section_intro','page'];
+  var instr={meta:keep(S.meta,['title','description']),
+    items:(S.items||[]).map(function(it){return keep(it,itemFields);}),choices:S.choices,branching:S.branching,
+    checks:(S.checks||[]).map(function(ck){return keep(ck,['item_id']);}),
     render:keep(render,['header','mode','save_draft','submit_label','thankyou','theme','welcome'])};
   var json=JSON.stringify(instr).split('<').join('\\u003c');
   var theme=render.theme||'#2563eb';if(!/^#[0-9A-Fa-f]{3,6}$/.test(theme))theme='#2563eb';
