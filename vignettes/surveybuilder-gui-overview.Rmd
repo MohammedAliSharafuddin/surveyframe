@@ -78,7 +78,7 @@ significance level, the variables that fill each role, and the decision rule.
 The form offers only the role set a method needs and reads the measurement
 level of each variable, so a saved plan is coherent.
 
-```{r fig-builder-analyse, echo = FALSE, out.width = "100%", fig.alt = "SurveyBuilder in Plan mode with the Edit Analysis Plan dialog open. The dialog shows the research question, Variable X and Variable Y role dropdowns, Pearson correlation as the method, a significance level of 0.05, the reporting references, the planned output and assumptions, and the decision rule."}
+```{r fig-builder-analyse, echo = FALSE, out.width = "100%", fig.alt = "SurveyBuilder in Plan mode with the Edit Analysis Plan dialog open. The dialog shows the research question, Variable X and Variable Y role dropdowns, Pearson correlation as the method, a significance level of 0.05, the null and alternative hypotheses, the reporting references, the planned output and assumptions, and the decision rule."}
 knitr::include_graphics("figures/gui-builder-analyse-plan.png")
 ```
 
