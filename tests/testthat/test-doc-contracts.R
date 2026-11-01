@@ -74,7 +74,11 @@ test_that("G10: the Studio help points authoring at launch_builder()", {
 test_that("G10: the screens offered are the screens Studio has", {
   app <- paste(readLines(system.file("shiny", "app.R", package = "surveyframe"),
                          warn = FALSE), collapse = "\n")
-  tabs <- unique(regmatches(app, gregexpr('`data-tab` = "[a-z]+"', app))[[1]])
+  # A sidebar entry is studio_nav_entry("id", label), and an in-screen link
+  # names its screen in `data-tab`.
+  tabs <- unique(c(
+    regmatches(app, gregexpr('`data-tab` = "[a-z]+"', app))[[1]],
+    regmatches(app, gregexpr('studio_nav_entry\\("[a-z]+"', app))[[1]]))
   tabs <- sub('.*"([a-z]+)"$', "\\1", tabs)
   expect_setequal(sframe_studio_screens(), tabs)
 
