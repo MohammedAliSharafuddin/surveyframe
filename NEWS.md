@@ -631,6 +631,14 @@ style.
 
 ## The exported survey
 
+* **A shared survey no longer carries the instrument's references, analysis
+  plan or amendment history.** `export_survey()` embedded the whole instrument
+  in the page, so anyone given the link could read the research questions,
+  hypotheses, references, amendment notes and authors from the page source.
+  The page now carries the title, description, items, choice sets, branching,
+  checks and the 7 display settings it reads. SurveyBuilder's Preview embeds
+  the same fields.
+
 * **The thank-you screen states delivery, and the message is only thanks.**
   The screen now opens with a status line the package writes, one for each
   outcome: recorded, sent but unconfirmed, not sent, or failed. The study's

@@ -41,6 +41,13 @@ test_that("the builder's Preview is the survey export_survey(preview = TRUE) wri
   text <- paste(readLines(path, warn = FALSE, encoding = "UTF-8"), collapse = "\n")
   js(paste0("openSframeText(", jsonlite::toJSON(text, auto_unbox = TRUE), "); true"))
   expect_true(wait("S.items.length > 0"))
+  # The instrument's private parts, which a shared survey must not carry.
+  js(paste0(
+    "S.references = [{id: 'planted', title: 'Planted reference title'}];",
+    "S.analysis_plan[0].research_question = 'Planted research question';",
+    "S.analysis_plan[0].hypotheses = {null: 'Planted null hypothesis', alternative: 'Planted alternative hypothesis'};",
+    "S.amendments = [{reason_text: 'Planted amendment note'}];",
+    "S.meta.authors = ['Planted Author']; true"))
   js("setMode('preview'); true")
   frame <- "document.querySelector('#pvFrame iframe')"
   expect_true(wait(paste0("!!", frame, " && !!", frame, ".srcdoc")))
@@ -62,6 +69,15 @@ test_that("the builder's Preview is the survey export_survey(preview = TRUE) wri
   w <- json_of(written)
   expect_identical(vapply(a$items, `[[`, "", "id"), vapply(w$items, `[[`, "", "id"))
   expect_identical(a$meta$title, w$meta$title)
+  for (planted in c("Planted research question", "Planted null hypothesis",
+                    "Planted alternative hypothesis", "Planted reference title",
+                    "Planted amendment note", "Planted Author")) {
+    expect_false(grepl(planted, shown, fixed = TRUE), info = planted)
+  }
+  # The same fields in both, so a draft saved in one is found by the other.
+  expect_identical(names(a), names(w))
+  expect_identical(a$meta, w$meta)
+  expect_identical(names(a$render), names(w$render))
 
   # Collection is off: no endpoint, no redirect, and the page knows it.
   expect_false(grepl("example.org", shown, fixed = TRUE))

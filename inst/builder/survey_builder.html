@@ -4179,7 +4179,12 @@ function surveyHtml(preview){
     delete render.google_sheets_endpoint;
     if(render.thankyou)delete render.thankyou.redirect_url;
   }
-  var instr={meta:S.meta,items:S.items,choices:S.choices,scales:S.scales,branching:S.branching,checks:S.checks,analysis_plan:S.analysis_plan,models:S.models||[],render:render};
+  // Only what the survey page reads, the list export_survey() keeps in
+  // R/export_static_survey.R. Anyone given the link can read the page source,
+  // so the references, analysis plan, hypotheses and amendments stay out.
+  var keep=function(o,fields){var r={};Object.keys(o||{}).forEach(function(k){if(fields.indexOf(k)>=0)r[k]=o[k];});return r;};
+  var instr={meta:keep(S.meta,['title','description']),items:S.items,choices:S.choices,branching:S.branching,checks:S.checks,
+    render:keep(render,['header','mode','save_draft','submit_label','thankyou','theme','welcome'])};
   var json=JSON.stringify(instr).split('<').join('\\u003c');
   var theme=render.theme||'#2563eb';if(!/^#[0-9A-Fa-f]{3,6}$/.test(theme))theme='#2563eb';
   var endpoint=render.google_sheets_endpoint||'';

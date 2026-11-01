@@ -1,5 +1,13 @@
 # export_static_survey.R
 
+# The meta and render fields the survey page reads
+# (inst/static_survey/template.html). A shared survey carries these and
+# nothing else of the meta and render lists. surveyHtml() in
+# inst/builder/survey_builder.html keeps the same 2 lists.
+sframe_survey_meta_fields <- c("title", "description")
+sframe_survey_render_fields <- c("header", "mode", "save_draft", "submit_label",
+                                 "thankyou", "theme", "welcome")
+
 #' Export a self-contained static HTML survey
 #'
 #' Generates a single HTML file that presents the survey instrument in a
@@ -184,9 +192,23 @@ export_survey <- function(
     x
   }
 
-  # Serialise instrument, stripping the hash slot to keep the JSON clean.
-  instr_list <- strip_classes(instrument)
-  instr_list$hash <- NULL
+  # Serialise only what the survey page reads. Anyone given the link can read
+  # the page source, so the references, analysis plan, hypotheses, amendment
+  # history, authors and hash stay out. surveyHtml() in the builder keeps the
+  # same list, so its Preview and a draft saved there match this export.
+  full <- strip_classes(instrument)
+  keep <- function(x, fields) {
+    x <- x[names(x) %in% fields]
+    if (length(x) == 0L) structure(list(), names = character(0)) else x
+  }
+  instr_list <- Filter(Negate(is.null), list(
+    meta      = keep(full$meta, sframe_survey_meta_fields),
+    items     = full$items,
+    choices   = full$choices,
+    branching = full$branching,
+    checks    = full$checks,
+    render    = keep(full$render, sframe_survey_render_fields)
+  ))
   instr_json <- jsonlite::toJSON(instr_list, auto_unbox = TRUE, null = "null",
                                   digits = NA, pretty = FALSE)
   instr_json <- gsub("<", "\\u003c", instr_json, fixed = TRUE)
