@@ -444,8 +444,55 @@ sframe_frequency_one <- function(data, col, weights = NULL, instrument = NULL) {
 }
 
 
+# Counts with a Total row and column, and the percentages over the chosen
+# denominator (owner 2026-10-31). Each percentage margin describes its own
+# denominator: the Total row of row percentages is the column distribution,
+# and the Total column of column percentages is the row distribution. The
+# first column holds the row levels, then a column per column level and Total.
+sframe_crosstab_margins <- function(tbl, row_var, percent = NULL) {
+  frame <- function(m) {
+    out <- data.frame(level = rownames(m), check.names = FALSE, stringsAsFactors = FALSE)
+    names(out) <- row_var
+    for (j in colnames(m)) out[[j]] <- as.numeric(m[, j])
+    out
+  }
+  m <- unclass(tbl)
+  counts <- stats::addmargins(tbl)
+  dimnames(counts) <- list(c(rownames(m), "Total"), c(colnames(m), "Total"))
+  nr <- nrow(m); nc <- ncol(m)
+  pct <- NULL
+  if (!is.null(percent)) {
+    full <- matrix(NA_real_, nr + 1, nc + 1, dimnames = dimnames(counts))
+    n <- sum(m)
+    if (identical(percent, "row")) {
+      full[seq_len(nr), seq_len(nc)] <- prop.table(tbl, 1) * 100
+      full[seq_len(nr), nc + 1] <- 100
+      full[nr + 1, seq_len(nc)] <- prop.table(margin.table(tbl, 2)) * 100
+      full[nr + 1, nc + 1] <- 100
+    } else if (identical(percent, "column")) {
+      full[seq_len(nr), seq_len(nc)] <- prop.table(tbl, 2) * 100
+      full[nr + 1, seq_len(nc)] <- 100
+      full[seq_len(nr), nc + 1] <- prop.table(margin.table(tbl, 1)) * 100
+      full[nr + 1, nc + 1] <- 100
+    } else {
+      full[] <- unclass(counts) / n * 100
+    }
+    # A row or column with no answers has no percentage to give.
+    full[is.nan(full)] <- 0
+    pct <- frame(full)
+  }
+  list(totals = frame(unclass(counts)), percent_table = pct)
+}
+
 sframe_run_crosstab <- function(data, vars, options = list()) {
   weights <- options$weights %||% NULL
+  percent <- options$percent %||% NULL
+  if (!is.null(percent) && (!is.character(percent) || length(percent) != 1 ||
+                            !percent %in% c("row", "column", "total"))) {
+    return(list(test = "crosstab", error = paste0(
+      "options$percent must be row, column or total: the denominator of the ",
+      "percentages.")))
+  }
   err <- sframe_require_columns(data, c(vars[1:2], weights), "Cross-tabulation")
   if (!is.null(err)) return(list(test = "crosstab", error = err))
   usable <- sframe_apply_weights(data, weights)
@@ -472,6 +519,7 @@ sframe_run_crosstab <- function(data, vars, options = list()) {
       error = function(e) ct
     )
   }
+  margins <- sframe_crosstab_margins(tbl, vars[1], percent)
   n <- sum(tbl)
   r_dim <- nrow(tbl)
   c_dim <- ncol(tbl)
@@ -492,6 +540,9 @@ sframe_run_crosstab <- function(data, vars, options = list()) {
     weights_dropped = usable$dropped,
     n        = n,
     table    = as.data.frame.matrix(tbl),
+    totals   = margins$totals,
+    percent  = percent,
+    percent_table = margins$percent_table,
     weighted_table = if (!is.null(weighted_table)) as.data.frame.matrix(weighted_table) else NULL,
     chi_sq   = unname(ct$statistic),
     df       = unname(ct$parameter),
@@ -1357,6 +1408,20 @@ sframe_result_supplement <- function(result) {
                         x_name, mod_name)))
   }
 
+  # A cross-tab with percent set: each count with its percentage beside it,
+  # totals included, as APA 7 shows a contingency table.
+  if (identical(test, "crosstab") && is.data.frame(result$percent_table)) {
+    tot <- result$totals
+    pct <- result$percent_table
+    out <- tot
+    for (j in names(tot)[-1]) {
+      out[[j]] <- sprintf("%s (%.1f%%)", format(tot[[j]], trim = TRUE), pct[[j]])
+    }
+    label <- c(row = "row percentages", column = "column percentages",
+               total = "percentages of the total")[[result$percent]]
+    return(list(table = out, caption = sprintf("Counts with %s", label)))
+  }
+
   # The quanteda DFM runner's leading features, which its own prompt asks a
   # reader to review.
   if (is.data.frame(result$top_features) && nrow(result$top_features) > 0) {
@@ -1873,6 +1938,19 @@ sframe_run_one_block <- function(block, data, instrument, plots = FALSE,
                           exclude_cols = c(.sframe_text_free_text_cols[[test]], "Code")),
     error = function(e) result$table
   )
+  # A cross-tab's totals and percentages name their levels as the counts
+  # table does: the row levels in the first column and the column levels in
+  # the header. Only those are relabelled, since every other cell is a number.
+  lk <- sframe_label_lookup(instrument)
+  relabel_levels <- function(tab) {
+    if (!is.data.frame(tab) || length(lk) == 0) return(tab)
+    swap <- function(x) { h <- lk[x]; ifelse(is.na(h), x, unname(h)) }
+    tab[[1]] <- swap(tab[[1]])
+    names(tab)[-1] <- swap(names(tab)[-1])
+    tab
+  }
+  result$totals <- relabel_levels(result$totals)
+  result$percent_table <- relabel_levels(result$percent_table)
   # Charts name variables by their instrument labels, as the tables do.
   plot_labels <- if (isTRUE(plots)) sframe_label_lookup(instrument) else character(0)
   if (isTRUE(plots) && is.null(result$plot)) {
@@ -1926,11 +2004,19 @@ sframe_run_one_block <- function(block, data, instrument, plots = FALSE,
 #'   holds `blocks`, `succeeded`, `failed`, `failed_blocks` and `scoring`, the
 #'   outcome of scoring scales before analysis. A normal return can hold
 #'   failed blocks, so check `attr(results, "status")$failed` or use
-#'   `strict = TRUE`. Each block element Each element contains the test result,
+#'   `strict = TRUE`. Each element contains the test result,
 #'   APA string, interpretation prompt, and reporting-reference metadata.
 #'   Inferential blocks also carry a `$table` data frame suitable for
 #'   `knitr::kable()`. Pass to [render_results()] to generate a formatted
 #'   report.
+#' @section Cross-tabulations:
+#' A `crosstab` or `chi_square` block's result carries `$totals`, the
+#' counts with a Total row and column. Set `options = list(percent = "row")`,
+#' `"column"` or `"total"` for `$percent_table`, the percentages over that
+#' denominator. The Total row of row percentages is the column distribution,
+#' and the Total column of column percentages is the row distribution. The
+#' report then shows each count with its percentage beside it, and the chart
+#' draws the percentages.
 #' @export
 #' @seealso [render_results()], [read_sheet_responses()]
 #'

@@ -650,6 +650,15 @@ sframe_plot_crosstab <- function(result, palette = c("web", "print")) {
   brand <- sframe_brand(palette)
   long <- as.data.frame(as.table(as.matrix(tbl)), stringsAsFactors = FALSE)
   names(long) <- c("Row", "Column", "Count")
+  y_label <- "Count"
+  # With percent set, the bars show the percentages, totals left out.
+  pct <- result$percent_table
+  if (is.data.frame(pct) && !is.null(result$percent)) {
+    body <- pct[pct[[1]] != "Total", setdiff(names(pct), "Total"), drop = FALSE]
+    long$Count <- mapply(function(r, c) body[match(r, body[[1]]), c], long$Row, long$Column)
+    y_label <- c(row = "Percent of row", column = "Percent of column",
+                 total = "Percent of total")[[result$percent]]
+  }
   ggplot2::ggplot(long, ggplot2::aes(x = .data$Row, y = .data$Count,
                                      fill = .data$Column)) +
     ggplot2::geom_col(position = ggplot2::position_dodge(width = 0.78),
@@ -659,7 +668,7 @@ sframe_plot_crosstab <- function(result, palette = c("web", "print")) {
     ggplot2::labs(
       title = paste("Association between", .sframe_title_case_names(result$vars[1]),
                     "and", .sframe_title_case_names(result$vars[2])),
-      x = .sframe_title_case_names(result$vars[1]), y = "Count",
+      x = .sframe_title_case_names(result$vars[1]), y = y_label,
       fill = .sframe_title_case_names(result$vars[2])
     ) +
     theme_surveyframe(palette = palette) + sframe_theme_angled_x()

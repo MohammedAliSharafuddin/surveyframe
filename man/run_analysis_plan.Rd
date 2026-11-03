@@ -52,7 +52,7 @@ element per analysis block, named by block id. Its \code{status} attribute
 holds \code{blocks}, \code{succeeded}, \code{failed}, \code{failed_blocks} and \code{scoring}, the
 outcome of scoring scales before analysis. A normal return can hold
 failed blocks, so check \code{attr(results, "status")$failed} or use
-\code{strict = TRUE}. Each block element Each element contains the test result,
+\code{strict = TRUE}. Each element contains the test result,
 APA string, interpretation prompt, and reporting-reference metadata.
 Inferential blocks also carry a \verb{$table} data frame suitable for
 \code{knitr::kable()}. Pass to \code{\link[=render_results]{render_results()}} to generate a formatted
@@ -65,6 +65,17 @@ research question defined during instrument design in the SurveyBuilder.
 Results include APA-formatted statistics, effect sizes, interpretation
 prompts, and reporting references.
 }
+\section{Cross-tabulations}{
+
+A \code{crosstab} or \code{chi_square} block's result carries \verb{$totals}, the
+counts with a Total row and column. Set \code{options = list(percent = "row")},
+\code{"column"} or \code{"total"} for \verb{$percent_table}, the percentages over that
+denominator. The Total row of row percentages is the column distribution,
+and the Total column of column percentages is the row distribution. The
+report then shows each count with its percentage beside it, and the chart
+draws the percentages.
+}
+
 \examples{
 instr <- read_sframe(
   system.file("extdata", "tourism_services_demo.sframe",
