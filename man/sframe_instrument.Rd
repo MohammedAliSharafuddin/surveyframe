@@ -13,7 +13,8 @@ sframe_instrument(
   components = list(),
   render = NULL,
   analysis_plan = list(),
-  models = list()
+  models = list(),
+  study = NULL
 )
 }
 \arguments{
@@ -44,6 +45,12 @@ the HTML SurveyBuilder Plan mode.}
 
 \item{models}{List. Optional model specifications created with \code{\link[=sframe_model_spec]{sframe_model_spec()}}
 or imported from a \code{.sframe} file.}
+
+\item{study}{List or \code{NULL}. The study the instrument serves: \code{problem} (1
+short paragraph), \code{objectives} (a list, each with an \code{id} such as \code{"O1"}
+and its \code{text}) and \code{sampling} (\code{population}, \code{method} from
+\code{\link[=sframe_sampling_methods]{sframe_sampling_methods()}} and \code{planned_n}). Never shown to
+respondents. See \code{\link[=sframe_get_study]{sframe_get_study()}}.}
 }
 \value{
 An object of class \code{sframe} with slots \code{meta}, \code{items}, \code{choices},
@@ -107,7 +114,9 @@ Other Design functions:
 \code{\link[=sframe_branch]{sframe_branch()}},
 \code{\link[=sframe_choice_set]{sframe_choice_set()}},
 \code{\link[=sframe_conjoint_design]{sframe_conjoint_design()}},
+\code{\link[=sframe_get_study]{sframe_get_study()}},
 \code{\link[=sframe_item]{sframe_item()}},
+\code{\link[=sframe_sampling_methods]{sframe_sampling_methods()}},
 \code{\link[=sframe_scale]{sframe_scale()}},
 \code{\link{sframe_validation}},
 \code{\link[=validate_sframe]{validate_sframe()}},

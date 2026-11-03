@@ -129,6 +129,8 @@ reference:
     contents:
       - launch_builder
       - sframe_instrument
+      - sframe_get_study
+      - sframe_sampling_methods
       - sframe_item
       - sframe_choice_set
       - sframe_scale
@@ -264,6 +266,7 @@ reference:
       - sframe_get_models
       - sframe_object
       - sframe_problems
+      - sframe_notes
       - sframe_report_accessors
       - sframe_get_scales
       - sframe_validation_accessors

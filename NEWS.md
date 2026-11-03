@@ -287,6 +287,25 @@ style.
   "RQ3 (McNemar test): ". Code that matched the start of an error message
   needs to allow for it.
 
+## The study an instrument serves
+
+* **A `study` field holds the problem, the objectives and the sampling plan**
+  (D13). `sframe_instrument(study = list(problem = , objectives = ,
+  sampling = ))`: the problem in 1 short paragraph, objectives each with an
+  id such as `O1` and its text, and the sampling plan's population, method
+  (from `sframe_sampling_methods()`) and planned n. A plan block names the
+  objective it serves in `objective`. Read it with `sframe_get_study()`. It is
+  written only when declared, so an instrument without one hashes as before.
+  It is inside the content hash, never on the respondent's page, and a change
+  to it after collection is a design amendment. SurveyBuilder and SurveyStudio
+  carry it through a save.
+* **`validate_sframe()` checks the study and notes the trace.** It refuses a
+  malformed study, an objective id used twice and a plan block naming an
+  objective the study does not declare. It notes, without failing, an
+  objective no research question serves, a research question that names no
+  objective, and a problem over 150 words. `sframe_notes()` reads the notes,
+  and the diagnostic prints them.
+
 ## Amendments and versions
 
 * **`amend_sframe(version = )` sets the version an amendment writes.** `NULL`,

@@ -59,6 +59,7 @@ Other Inspect functions:
 \code{\link[=sframe_label]{sframe_label()}},
 \code{\link[=sframe_meta]{sframe_meta()}},
 \code{\link[=sframe_missing_columns]{sframe_missing_columns()}},
+\code{\link[=sframe_notes]{sframe_notes()}},
 \code{\link[=sframe_problems]{sframe_problems()}},
 \code{\link{sframe_report_accessors}},
 \code{\link{sframe_subset}},

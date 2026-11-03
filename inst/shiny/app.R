@@ -1966,6 +1966,7 @@ server <- function(input, output, session) {
       amendments = rv$builder$amendments %||% list(),
       designs = rv$builder$designs %||% list(),
       references = rv$builder$references %||% list(),
+      study = rv$builder$study,
       origin = rv$builder$origin
     )
   })

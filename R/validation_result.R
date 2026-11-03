@@ -10,6 +10,8 @@ sframe_new_problem_log <- function() {
   log <- new.env(parent = emptyenv())
   log$check    <- character(0)
   log$problems <- character(0)
+  # Notes are said, not counted: they never fail a check (D13).
+  log$notes <- character(0)
   log
 }
 
@@ -39,6 +41,7 @@ sframe_new_validation <- function(log, roster, subject, title = NULL,
   structure(
     list(
       valid      = length(log$problems) == 0,
+      notes      = log$notes %||% character(0),
       problems   = log$problems,
       n_problems = length(log$problems),
       subject    = subject,
@@ -119,6 +122,10 @@ print.sframe_validation <- function(x, ...) {
       cat(sprintf("  %d. %s\n", i, x$problems[i]))
     }
     cat("\nUse summary() for the full check roster.\n")
+  }
+  if (length(x$notes)) {
+    cat("\nNotes:\n")
+    for (i in seq_along(x$notes)) cat(sprintf("  %d. %s\n", i, x$notes[i]))
   }
   invisible(x)
 }

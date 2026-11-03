@@ -254,7 +254,8 @@ sframe_validation_checks <- c(
   "decision_scale_compatibility",
   "model_ids",
   "model_specs",
-  "references"
+  "references",
+  "study"
 )
 
 #' Validate an instrument object
@@ -758,6 +759,11 @@ validate_sframe <- function(instrument, strict = TRUE) {
   # cited_by target present in the instrument.
   reference_problems <- sframe_reference_problems(instrument)
   if (length(reference_problems) > 0) add("references", reference_problems)
+
+  # The study (D13): its shape, and the trace from objective to question.
+  study_check <- sframe_study_problems(instrument)
+  if (length(study_check$problems) > 0) add("study", study_check$problems)
+  log$notes <- c(log$notes, study_check$notes)
 
   # The validated stamp travels on the instrument carried by the result, so
   # as_sframe() hands back an instrument that records the outcome, and strict

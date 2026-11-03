@@ -312,7 +312,7 @@ sframe_amendment_diff <- function(prev_payload, new_payload) {
   keys <- setdiff(union(names(prev_payload), names(new_payload)), c("hash", "amendments"))
   changed <- as.character(Filter(
     function(k) !identical(prev_payload[[k]], new_payload[[k]]), keys))
-  design <- intersect(changed, c("analysis_plan", "models", "designs"))
+  design <- intersect(changed, c("analysis_plan", "models", "designs", "study"))
   if (!identical(sframe_scale_scoring(prev_payload$scales),
                  sframe_scale_scoring(new_payload$scales))) {
     design <- c("the scales scored", design)

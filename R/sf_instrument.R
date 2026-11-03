@@ -26,6 +26,11 @@
 #'   the HTML SurveyBuilder Plan mode.
 #' @param models List. Optional model specifications created with [sframe_model_spec()]
 #'   or imported from a `.sframe` file.
+#' @param study List or `NULL`. The study the instrument serves: `problem` (1
+#'   short paragraph), `objectives` (a list, each with an `id` such as `"O1"`
+#'   and its `text`) and `sampling` (`population`, `method` from
+#'   [sframe_sampling_methods()] and `planned_n`). Never shown to
+#'   respondents. See [sframe_get_study()].
 #'
 #' @return An object of class `sframe` with slots `meta`, `items`, `choices`,
 #'   `scales`, `branching`, `checks`, `analysis_plan`, `models`, and `render`.
@@ -82,7 +87,8 @@ sframe_instrument <- function(
     components  = list(),
     render      = NULL,
     analysis_plan = list(),
-    models = list()
+    models = list(),
+    study = NULL
 ) {
   # Sort components by class into named slots
   items     <- Filter(function(x) inherits(x, "sf_item"),    components)
@@ -134,7 +140,8 @@ sframe_instrument <- function(
       # and an empty one as an empty named list, which is written as {}.
       render    = if (length(render) == 0) structure(list(), names = character(0))
                   else unclass(render),
-      references = unname(references)
+      references = unname(references),
+      study      = study
     ),
     class = "sframe"
   )
