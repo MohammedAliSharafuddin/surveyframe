@@ -3398,7 +3398,9 @@ function sframePayload(){
   return payload;
 }
 async function saveSframe(){
-  if(!(await sframeRevisionGate()))return;
+  // In Studio, Studio keeps the version before and its 1 amendment dialog
+  // asks, so the save goes to it as it is.
+  if(!STUDIO_HOST&&!(await sframeRevisionGate()))return;
   var payload=sframePayload();
   payload.hash.value=await sframeHash(payload);
   // In Studio the save goes to Studio, which answers with sframe-saved.

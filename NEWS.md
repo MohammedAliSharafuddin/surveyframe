@@ -841,6 +841,17 @@ style.
 
 ## SurveyStudio
 
+* **1 amendment dialog, and "Edit in Design" on Amendments.** A Design save
+  that changes an instrument with a history (read from a file, or amended)
+  opens 1 dialog. It shows what the change touches (the fields, the scales
+  whose scoring changes, the models and plan blocks), the reason, the tier,
+  a deviation report for a design change, and the version suggested for each
+  tier with the reason, then records the amendment with `amend_sframe()`,
+  saves a new instrument, or cancels. The builder gets the recorded log and
+  version back. The Amendments screen says "Edit in Design" in place of
+  "edit it in SurveyBuilder and upload the after file", and the upload is
+  folded under "Import an externally revised version", which opens the same
+  dialog. Its own reason and tier form is gone.
 * **The sidebar follows the study.** Open Instrument comes first, then 5
   groups under headings: Build (Design, Plan, Preview), Collect (Collect,
   Responses), Analyse (Quality, Explore, Reliability, Analyse), Report, and

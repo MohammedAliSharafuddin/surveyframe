@@ -1603,39 +1603,19 @@ ui <- fluidPage(
         tags$h2(class = "screen-title", "Amendments"),
         uiOutput("amend_gate"),
         tags$div(class = "card",
-          tags$div(class = "card-title", "Revised instrument"),
+          tags$div(class = "card-title", "Change the instrument"),
           tags$p(class = "hint",
-            "Disclose a change to the instrument currently open. Edit it in the SurveyBuilder, then upload the revised .sframe here as the \"after\" version."),
-          fileInput("amend_revised_file", NULL,
-                    accept = ".sframe",
-                    buttonLabel = "Browse revised .sframe file",
-                    placeholder = "No file selected"),
-          uiOutput("amend_revised_status")
-        ),
-        tags$div(class = "card",
-          tags$div(class = "card-title", "Amendment details"),
-          selectInput("amend_reason_code", "Reason",
-            choices = c(
-              "Data correction" = "data_correction",
-              "Bot or fraudulent-response removal" = "bot_removal",
-              "Model respecification" = "model_respecification",
-              "Instrument revision" = "instrument_revision",
-              "Other" = "other"
-            )),
-          textAreaInput("amend_reason_text", "Explanation", rows = 3,
-            placeholder = "What changed, and why. Required."),
-          selectInput("amend_tier", "Tier",
-            choices = c(
-              "Infer from reason (recommended)" = "",
-              "Pipeline (data or collection correction)" = "pipeline",
-              "Design (research question, method, or model)" = "design"
-            )),
-          uiOutput("amend_deviation_ui"),
-          fluidRow(
-            column(6, textInput("amend_author", "Author (optional)")),
-            column(6, textInput("amend_signoff", "Second reviewer sign-off (optional)"))
-          ),
-          actionButton("apply_amendment_btn", "Apply amendment", class = "btn-primary")
+            "Studio keeps the open instrument as the version before. Edit it in Design and save, and Studio asks what changed and why before it records the amendment."),
+          actionButton("amend_edit_design", "Edit in Design", class = "btn-primary"),
+          tags$details(class = "amend-import",
+            tags$summary("Import an externally revised version"),
+            tags$p(class = "hint",
+              "A revised .sframe file made outside Studio. Studio shows what it changes, then asks for the amendment details."),
+            fileInput("amend_revised_file", NULL,
+                      accept = ".sframe",
+                      buttonLabel = "Browse revised .sframe file",
+                      placeholder = "No file selected")
+          )
         ),
         tags$div(class = "card",
           tags$div(class = "card-title", "Amendment log"),
@@ -2368,7 +2348,34 @@ server <- function(input, output, session) {
       return()
     }
     tryCatch({
-      loaded <- read_sframe(text = input$builder_sframe)
+      # The builder carries the log it was sent, so changed content reads
+      # with a log that does not end at it, until the dialog records it.
+      loaded <- suppressWarnings(read_sframe(text = input$builder_sframe),
+                                 classes = "sframe_amendment_warning")
+      # An instrument with a history (read from a file, or amended) that
+      # changed goes through the amendment dialog (CX-12). Studio keeps the
+      # open instrument as the version before.
+      before <- rv$instrument
+      tracked <- !is.null(before) &&
+        (!is.null(attr(before, "sframe_origin")) || length(before$amendments) > 0)
+      if (tracked && !identical(sframe_content_hash(loaded), sframe_content_hash(before))) {
+        amend_dlg$open(before, loaded,
+          start_label = "Saved from Design. The open instrument is the version before.",
+          allow_new = TRUE,
+          on_apply = function(new, how) {
+            # Sent back to the builder, so it holds the log and version.
+            design_from_builder <<- FALSE
+            msg <- studio_apply_amended(new, how)
+            rv$open_verification <- "design"
+            session$sendCustomMessage("surveyframe-design-saved",
+              list(ok = TRUE, message = msg))
+          },
+          on_cancel = function() {
+            session$sendCustomMessage("surveyframe-design-saved",
+              list(ok = FALSE, message = "Nothing was saved. The changes are still in Design."))
+          })
+        return(invisible(NULL))
+      }
       design_from_builder <<- TRUE
       rv$builder <- builder_state_from_instrument(loaded)
       cleared <- if (!is.null(rv$responses) && !is.null(rv$instrument))
@@ -2540,68 +2547,47 @@ server <- function(input, output, session) {
     }
   })
 
-  amend_revised <- reactiveVal(NULL)
+  # The 1 amendment dialog (UX-06, UX-19). Every start opens it, and it
+  # hands back the instrument to make the open one.
+  amend_dlg <- sframe_studio_amend_server("amend_dlg")
+
+  # The amended or new instrument becomes the open one, as a save does.
+  # Responses stay while their columns still fit.
+  studio_apply_amended <- function(new, how, notify_builder = TRUE) {
+    cleared <- if (!is.null(rv$responses) && !is.null(rv$instrument))
+      sframe_studio_response_change(rv$instrument, new)
+    rv$builder <- builder_state_from_instrument(new)
+    rv$instrument <- new
+    if (!is.null(cleared)) {
+      rv$responses <- NULL
+      showNotification(cleared, type = "warning", duration = 12)
+    }
+    sync_builder_inputs(rv$builder)
+    msg <- if (identical(how, "amendment")) {
+      n <- length(new$amendments)
+      sprintf("Amendment %d recorded. Version %s. Export the .sframe to keep it on disk.",
+              n, new$meta$version %||% "")
+    } else {
+      sprintf("Saved as a new instrument, version %s, with no amendment log.",
+              new$meta$version %||% "")
+    }
+    showNotification(msg, type = "message", duration = 8)
+    msg
+  }
+
+  observeEvent(input$amend_edit_design, {
+    session$sendCustomMessage("surveyframe-switch-tab", "design")
+  })
 
   observeEvent(input$amend_revised_file, {
-    req(input$amend_revised_file)
+    req(input$amend_revised_file, rv$instrument)
     tryCatch({
       path <- sframe_validate_upload(input$amend_revised_file, "sframe")
-      amend_revised(read_sframe(path))
-    }, error = function(e) {
-      amend_revised(NULL)
-      showNotification(paste("Error:", conditionMessage(e)), type = "error")
-    })
-  })
-
-  output$amend_revised_status <- renderUI({
-    rev <- amend_revised()
-    if (is.null(rev)) return(NULL)
-    tags$p(class = "hint", paste0("Revised: \"", rev$meta$title %||% "Untitled", "\" loaded."))
-  })
-
-  # Mirrors sframe_amendment_default_tier(): pipeline for a data/collection
-  # correction, design for everything else. Used only to decide whether the
-  # deviation_report field is shown and required, the real default is
-  # applied by amend_sframe() itself when tier isn't explicitly chosen here.
-  amend_effective_tier <- reactive({
-    if (nzchar(input$amend_tier %||% "")) return(input$amend_tier)
-    if ((input$amend_reason_code %||% "") %in% c("data_correction", "bot_removal")) "pipeline" else "design"
-  })
-
-  output$amend_deviation_ui <- renderUI({
-    if (identical(amend_effective_tier(), "design")) {
-      textAreaInput("amend_deviation_report",
-        "Deviation report (required for a design-tier amendment)", rows = 3,
-        placeholder = "What changed in the research question, method, or model, and why.")
-    }
-  })
-
-  observeEvent(input$apply_amendment_btn, {
-    req(rv$instrument)
-    rev <- amend_revised()
-    if (is.null(rev)) {
-      showNotification("Upload the revised .sframe file first.", type = "warning")
-      return(invisible(NULL))
-    }
-    tryCatch({
-      amended <- amend_sframe(
-        previous         = rv$instrument,
-        instrument       = rev,
-        reason_code      = input$amend_reason_code,
-        reason_text      = input$amend_reason_text,
-        tier             = if (nzchar(input$amend_tier %||% "")) input$amend_tier else NULL,
-        author           = trim_or_null(input$amend_author),
-        deviation_report = trim_or_null(input$amend_deviation_report),
-        second_signoff   = trim_or_null(input$amend_signoff)
-      )
-      rv$builder <- builder_state_from_instrument(amended)
-      rv$instrument <- amended
-      rv$responses <- NULL
-      sync_builder_inputs(rv$builder)
-      amend_revised(NULL)
-      showNotification(
-        "Amendment applied. Responses were cleared, since the instrument changed. Load them again on Responses. Export the .sframe to save this amendment to disk.",
-        type = "message", duration = 8)
+      rev <- suppressWarnings(read_sframe(path), classes = "sframe_amendment_warning")
+      amend_dlg$open(rv$instrument, rev,
+        start_label = paste0("Imported from ", input$amend_revised_file$name,
+                             ". The open instrument is the version before."),
+        on_apply = function(new, how) studio_apply_amended(new, how))
     }, error = function(e) {
       showNotification(paste("Error:", conditionMessage(e)), type = "error")
     })
