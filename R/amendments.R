@@ -306,6 +306,66 @@ sframe_suggest_version <- function(version, tier = c("design", "pipeline")) {
   list(version = paste(n, collapse = "."), reason = why)
 }
 
+# The change between 2 serialisation payloads as amend_sframe() records it:
+# the fields that differ, and those of them that make it design tier.
+sframe_amendment_diff <- function(prev_payload, new_payload) {
+  keys <- setdiff(union(names(prev_payload), names(new_payload)), c("hash", "amendments"))
+  changed <- as.character(Filter(
+    function(k) !identical(prev_payload[[k]], new_payload[[k]]), keys))
+  design <- intersect(changed, c("analysis_plan", "models", "designs"))
+  if (!identical(sframe_scale_scoring(prev_payload$scales),
+                 sframe_scale_scoring(new_payload$scales))) {
+    design <- c("the scales scored", design)
+  }
+  list(changed_fields = changed, design_changes = design)
+}
+
+# The ids of components that were added, removed or changed between 2 lists,
+# named by id, with what happened to each.
+sframe_component_changes <- function(before, after) {
+  ids <- function(l) vapply(l %||% list(), function(x) as.character(x$id %||% "")[1], character(1))
+  b <- stats::setNames(before %||% list(), ids(before))
+  a <- stats::setNames(after %||% list(), ids(after))
+  out <- character(0)
+  for (id in union(names(b), names(a))) {
+    what <- if (!id %in% names(a)) "removed" else if (!id %in% names(b)) "added" else
+      if (!identical(b[[id]], a[[id]])) "changed" else NA_character_
+    if (!is.na(what)) out[[id]] <- what
+  }
+  as.list(out)
+}
+
+# What Studio's amendment dialog shows before a change is applied: the
+# fields, the scales whose scoring changes, the models and plan blocks
+# touched, whether the change is design tier whatever is chosen, and the
+# version each tier suggests, with the reason.
+sframe_amendment_preview <- function(previous, instrument) {
+  prev_v <- as_sframe(validate_sframe(previous, strict = FALSE))
+  new_v <- as_sframe(validate_sframe(instrument, strict = FALSE))
+  pp <- sframe_serialization_payload(prev_v)
+  np <- sframe_serialization_payload(new_v)
+  d <- sframe_amendment_diff(pp, np)
+  sb <- sframe_scale_scoring(pp$scales)
+  sa <- sframe_scale_scoring(np$scales)
+  scales <- union(names(sb), names(sa))
+  scales <- scales[!vapply(scales, function(s) identical(sb[[s]], sa[[s]]), logical(1))]
+  models <- sframe_component_changes(pp$models, np$models)
+  plan <- sframe_component_changes(pp$analysis_plan, np$analysis_plan)
+  version <- previous$meta$version %||% ""
+  list(
+    changed = length(d$changed_fields) > 0,
+    changed_fields = d$changed_fields,
+    design_changes = d$design_changes,
+    design_forced = length(d$design_changes) > 0,
+    scales = scales,
+    models = names(models), model_detail = models,
+    plan_blocks = names(plan), plan_detail = plan,
+    version = version,
+    suggest = list(design = sframe_suggest_version(version, "design"),
+                   pipeline = sframe_suggest_version(version, "pipeline"))
+  )
+}
+
 #' Record a disclosed amendment to an instrument
 #'
 #' Appends a structured, disclosed-revision entry to an instrument's
@@ -447,21 +507,13 @@ amend_sframe <- function(previous, instrument, reason_code, reason_text,
   instrument_v <- as_sframe(validate_sframe(instrument, strict = TRUE))
   prev_payload <- sframe_serialization_payload(previous_v)
   new_payload  <- sframe_serialization_payload(instrument_v)
-  compare_keys <- setdiff(union(names(prev_payload), names(new_payload)),
-                          c("hash", "amendments"))
-  changed_fields <- Filter(
-    function(k) !identical(prev_payload[[k]], new_payload[[k]]),
-    compare_keys
-  )
+  diff <- sframe_amendment_diff(prev_payload, new_payload)
+  changed_fields <- diff$changed_fields
 
   # The tier follows what changed. A plan, model, design or scale scoring
   # change is design tier, whatever the caller asked for, since that is the
   # change the declared-before-collection contract exists to expose.
-  design_changes <- intersect(unlist(changed_fields), c("analysis_plan", "models", "designs"))
-  if (!identical(sframe_scale_scoring(prev_payload$scales),
-                 sframe_scale_scoring(new_payload$scales))) {
-    design_changes <- c("the scales scored", design_changes)
-  }
+  design_changes <- diff$design_changes
   if (length(design_changes) > 0) {
     if (tier_requested && identical(tier, "pipeline")) {
       rlang::abort(
@@ -495,10 +547,7 @@ amend_sframe <- function(previous, instrument, reason_code, reason_text,
     instrument$meta$version <- trimws(version)
     instrument_v <- as_sframe(validate_sframe(instrument, strict = TRUE))
     new_payload <- sframe_serialization_payload(instrument_v)
-    changed_fields <- Filter(
-      function(k) !identical(prev_payload[[k]], new_payload[[k]]),
-      setdiff(union(names(prev_payload), names(new_payload)), c("hash", "amendments"))
-    )
+    changed_fields <- sframe_amendment_diff(prev_payload, new_payload)$changed_fields
   } else if (identical(instrument$meta$version %||% "", previous$meta$version %||% "")) {
     sug <- sframe_suggest_version(previous$meta$version, tier)
     if (!is.null(sug$version)) {
@@ -637,3 +686,4 @@ sframe_get_amendments <- function(instrument) {
     stringsAsFactors = FALSE
   )
 }
+

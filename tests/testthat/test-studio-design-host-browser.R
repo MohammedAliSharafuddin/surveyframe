@@ -75,6 +75,9 @@ test_that("inside Studio the builder is a Design screen, not a second app", {
   expect_match(js("document.getElementById('design_unsaved').innerText"),
                "Unsaved changes. Save to Studio to keep them.", fixed = TRUE)
   js(paste0("var w=", frame, "; w.S._origin = null; w.S.meta.title = 'Saved in Design'; w.saveSframe(); true"))
+  # The demo has a history, so the save opens the amendment dialog (8a).
+  expect_true(wait("$('#amend_dlg-as_new').is(':visible')"))
+  js("$('#amend_dlg-as_new').click(); true")
   expect_true(wait(paste0(status, ".indexOf('Editing: Saved in Design') >= 0")))
   expect_true(wait(paste0("!", unsaved)))
   expect_true(wait(paste0(save_st, " === 'Saved'")))
