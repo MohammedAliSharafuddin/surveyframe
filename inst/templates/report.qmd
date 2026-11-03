@@ -510,6 +510,7 @@ for (model in instrument$models) {
 #| output: asis
 hash_val <- params$instrument_hash
 if (is.null(hash_val) || !nzchar(hash_val)) hash_val <- "see .sframe file"
+cat(sprintf("**Instrument version:** %s\n\n", instrument$meta$version %||% ""))
 cat(sprintf("**Instrument hash:** `%s`\n\n", hash_val))
 # The engine and the seed belong next to the hash: the hash says which
 # instrument this describes, the engine says which of surveyframe's 2
@@ -527,6 +528,15 @@ seed_val <- params$analysis_seed
 if (is.null(seed_val) || !nzchar(seed_val)) seed_val <- "not recorded"
 cat(sprintf("**Analysis seed:** `%s`\n\n", seed_val))
 cat(sprintf("**Report generated:** %s\n\n", format(Sys.time(), "%Y-%m-%d %H:%M %Z")))
+# The version a reader holds and how it got there, from the same table the
+# built-in engine prints.
+if (is.null(content$amendments)) {
+  cat("No amendments are recorded.\n\n")
+} else {
+  cat(sprintf("**Amendments (%d)**, oldest first:\n\n", nrow(content$amendments)))
+  cat(paste(kable(format = "html", content$amendments), collapse = "\n"))
+  cat("\n\n")
+}
 cat("**To reproduce:**\n\n")
 cat("```r\nlibrary(surveyframe)\n")
 cat("instr     <- read_sframe(\"your_instrument.sframe\")\n")

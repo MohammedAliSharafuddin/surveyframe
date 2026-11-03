@@ -309,6 +309,11 @@ style.
   wording to be checked, HTMT takes .85 or .90 and keeps the value applied,
   and PLS keeps .708. Checked against psych, lavaan and seminr. A reliability
   result now carries `alpha_if_deleted` for each item.
+* **The report gives the instrument version and its amendment list.** Under
+  Reproducibility, both engines print the version beside the hash, then
+  every recorded amendment, oldest first: date, tier, reason, what changed,
+  deviation report, author and sign-off. An instrument with no log says "No
+  amendments are recorded."
 
 ## Analysis
 

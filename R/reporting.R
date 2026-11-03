@@ -935,8 +935,9 @@ sframe_clean_interpretations <- function(interpretations) {
   # seed says what would be needed to get the same numbers again, because
   # every bootstrap interval in the report depends on it.
   repro_tbl <- data.frame(
-    Field = c("Instrument hash", "Rendering engine", "Analysis seed", "Generated"),
+    Field = c("Instrument version", "Instrument hash", "Rendering engine", "Analysis seed", "Generated"),
     Value = c(
+      instrument$meta$version %||% "",
       sframe_hash_value(instrument),
       "built-in HTML",
       as.character(sframe_report_seed(data, instrument, include_analysis)),
@@ -947,8 +948,9 @@ sframe_clean_interpretations <- function(interpretations) {
   sections <- c(
     sections,
     sprintf(
-      "<section><h2>Reproducibility</h2>%s</section>",
-      .render_report_table(repro_tbl, "Reproducibility details")
+      "<section><h2>Reproducibility</h2>%s%s</section>",
+      .render_report_table(repro_tbl, "Reproducibility details"),
+      .render_report_amendments(instrument)
     )
   )
 
@@ -1311,7 +1313,17 @@ sframe_report_content <- function(instrument, data = NULL, plot_palette = "web",
   for (k in seq_along(charts)) {
     charts[[k]]$figure_open <- sframe_apa_figure_open(charts[[k]]$title, charts[[k]]$alt)
   }
-  list(codebook_items = items_d, charts = charts, results = results)
+  list(codebook_items = items_d, charts = charts, results = results,
+       amendments = sframe_report_amendments(instrument))
+}
+
+# The amendment list in the built-in report, under Reproducibility: the
+# version a reader holds and how it got there.
+.render_report_amendments <- function(instrument) {
+  tab <- sframe_report_amendments(instrument)
+  if (is.null(tab)) return("<p>No amendments are recorded.</p>")
+  paste0(sprintf("<h3>Amendments (%d)</h3>", nrow(tab)),
+         .render_report_table(tab, "Amendments, oldest first"))
 }
 
 # Distribution charts (item bars, grouped Likert scales, matrix questions,
