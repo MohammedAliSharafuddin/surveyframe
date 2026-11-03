@@ -4,17 +4,34 @@
 \alias{sframe_sampling_methods}
 \title{Sampling methods a study can declare}
 \usage{
-sframe_sampling_methods()
+sframe_sampling_methods(
+  type = c("all", "probability", "non_probability", "census")
+)
+}
+\arguments{
+\item{type}{\code{"all"} (the default), \code{"probability"}, \code{"non_probability"}
+or \code{"census"}.}
 }
 \value{
 A character vector.
 }
 \description{
-The fixed list \code{study$sampling$method} is checked against: 4 probability
-designs, 4 non-probability designs, a census, and other.
+The fixed list \code{study$sampling$method} is checked against.
+\itemize{
+\item Probability methods: \code{"simple_random"}, \code{"systematic"},
+\code{"stratified"} and \code{"cluster"}. Every member of the population has a
+known chance of selection.
+\item Non-probability methods: \code{"convenience"}, \code{"purposive"}, \code{"quota"}
+and \code{"snowball"}. A report says the sample is a non-probability one,
+so its results do not generalise to the population by sampling theory.
+\item \code{"census"}: the whole population is asked.
+\item \code{"other"}: described in \code{study$sampling$method_other}, which is then
+required.
+}
 }
 \examples{
 sframe_sampling_methods()
+sframe_sampling_methods("non_probability")
 }
 \seealso{
 Other Design functions:

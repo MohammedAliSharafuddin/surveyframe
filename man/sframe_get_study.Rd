@@ -18,7 +18,8 @@ when not declared.
 \description{
 Returns the instrument's \code{study}: the problem statement, the objectives
 (each with an \code{id} such as \code{"O1"} and its \code{text}), and the sampling plan
-(\code{population}, \code{method} from \code{\link[=sframe_sampling_methods]{sframe_sampling_methods()}} and \code{planned_n}).
+(\code{population}, \code{method} from \code{\link[=sframe_sampling_methods]{sframe_sampling_methods()}}, \code{method_other}
+describing an \code{"other"} method, and \code{planned_n}).
 Set it with \code{sframe_instrument(study = )} or by assigning
 \code{instrument$study}. Each plan block may name the objective it serves in its
 \code{objective} field. The study is never shown to respondents, since telling

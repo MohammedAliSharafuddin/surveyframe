@@ -9,28 +9,44 @@
 # amendment.
 
 sframe_study_fields <- c("problem", "objectives", "sampling")
-sframe_sampling_fields <- c("population", "method", "planned_n")
+sframe_sampling_fields <- c("population", "method", "method_other", "planned_n")
 
 #' Sampling methods a study can declare
 #'
-#' The fixed list `study$sampling$method` is checked against: 4 probability
-#' designs, 4 non-probability designs, a census, and other.
+#' The fixed list `study$sampling$method` is checked against.
+#' * Probability methods: `"simple_random"`, `"systematic"`,
+#'   `"stratified"` and `"cluster"`. Every member of the population has a
+#'   known chance of selection.
+#' * Non-probability methods: `"convenience"`, `"purposive"`, `"quota"`
+#'   and `"snowball"`. A report says the sample is a non-probability one,
+#'   so its results do not generalise to the population by sampling theory.
+#' * `"census"`: the whole population is asked.
+#' * `"other"`: described in `study$sampling$method_other`, which is then
+#'   required.
 #'
+#' @param type `"all"` (the default), `"probability"`, `"non_probability"`
+#'   or `"census"`.
 #' @return A character vector.
 #' @export
 #' @family Design functions
 #' @examples
 #' sframe_sampling_methods()
-sframe_sampling_methods <- function() {
-  c("simple_random", "systematic", "stratified", "cluster",
-    "convenience", "purposive", "quota", "snowball", "census", "other")
+#' sframe_sampling_methods("non_probability")
+sframe_sampling_methods <- function(type = c("all", "probability", "non_probability", "census")) {
+  type <- match.arg(type)
+  groups <- list(
+    probability = c("simple_random", "systematic", "stratified", "cluster"),
+    non_probability = c("convenience", "purposive", "quota", "snowball"),
+    census = "census")
+  if (identical(type, "all")) c(unlist(groups, use.names = FALSE), "other") else groups[[type]]
 }
 
 #' The study an instrument serves
 #'
 #' Returns the instrument's `study`: the problem statement, the objectives
 #' (each with an `id` such as `"O1"` and its `text`), and the sampling plan
-#' (`population`, `method` from [sframe_sampling_methods()] and `planned_n`).
+#' (`population`, `method` from [sframe_sampling_methods()], `method_other`
+#' describing an `"other"` method, and `planned_n`).
 #' Set it with `sframe_instrument(study = )` or by assigning
 #' `instrument$study`. Each plan block may name the objective it serves in its
 #' `objective` field. The study is never shown to respondents, since telling
@@ -157,6 +173,15 @@ sframe_study_problems <- function(instrument) {
       if (!is.null(sp$method) && (!one_string(sp$method) || !sp$method %in% sframe_sampling_methods())) {
         problems <- c(problems, sprintf("`study$sampling$method` must be one of %s.",
                                         paste(sframe_sampling_methods(), collapse = ", ")))
+      }
+      other <- sp$method_other
+      if (identical(sp$method, "other") && (!one_string(other) || !nzchar(trimws(other)))) {
+        problems <- c(problems, paste0("`study$sampling$method` is \"other\", so ",
+                                       "`study$sampling$method_other` must describe it."))
+      }
+      if (!is.null(other) && !identical(sp$method, "other")) {
+        problems <- c(problems, paste0("`study$sampling$method_other` describes an \"other\" ",
+                                       "method, and the method is not \"other\"."))
       }
       n <- sp$planned_n
       if (!is.null(n) && (!is.numeric(n) || length(n) != 1 || is.na(n) || n < 1 || n != round(n))) {
