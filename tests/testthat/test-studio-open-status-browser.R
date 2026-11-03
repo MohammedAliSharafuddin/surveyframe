@@ -66,6 +66,9 @@ test_that("the Open Instrument screen says where the instrument came from", {
   js("$('.studio-nav-item a[data-tab=\"design\"]').click(); true")
   expect_true(wait(paste0(frame, ".S && ", frame, ".S.items.length > 0")))
   js(paste0("var w=", frame, "; w.S._origin = null; w.S.meta.title = 'Saved in Design'; w.saveSframe(); true"))
+  # The demo has a history, so the save opens the amendment dialog (8a).
+  expect_true(wait("$('#amend_dlg-as_new').is(':visible')"))
+  js("$('#amend_dlg-as_new').click(); true")
   expect_true(wait("((document.getElementById('design_status')||{}).innerText||'').indexOf('Saved in Design') >= 0"))
   expect_true(go_open())
   expect_true(wait(paste0(status, ".indexOf('Saved from Design: hash verified') >= 0")))
