@@ -38,11 +38,13 @@ revised <- sframe_drop_items(ins, "org_4", from = "organisation")
 revised$scales[[1]]$items
 }
 \seealso{
+\code{\link[=sframe_item_flags]{sframe_item_flags()}} to find the items past the usual cut-offs,
 \code{\link[=amend_sframe]{amend_sframe()}} to record the drop.
 
 Other Amendments functions:
 \code{\link[=amend_sframe]{amend_sframe()}},
 \code{\link[=sframe_get_amendments]{sframe_get_amendments()}},
+\code{\link[=sframe_item_flags]{sframe_item_flags()}},
 \code{\link[=sframe_link_git_commit]{sframe_link_git_commit()}}
 }
 \concept{Amendments functions}

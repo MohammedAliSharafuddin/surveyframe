@@ -50,6 +50,7 @@ sframe_link_git_commit(instr, repo_path = tempdir())
 Other Amendments functions:
 \code{\link[=amend_sframe]{amend_sframe()}},
 \code{\link[=sframe_drop_items]{sframe_drop_items()}},
-\code{\link[=sframe_get_amendments]{sframe_get_amendments()}}
+\code{\link[=sframe_get_amendments]{sframe_get_amendments()}},
+\code{\link[=sframe_item_flags]{sframe_item_flags()}}
 }
 \concept{Amendments functions}

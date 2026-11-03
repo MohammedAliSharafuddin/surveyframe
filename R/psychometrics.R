@@ -73,6 +73,8 @@ sframe_reliability_results <- function(
       ))
       result$alpha      <- a$total$raw_alpha
       result$alpha_std  <- a$total$std.alpha
+      # Alpha with each item left out, for sframe_item_flags().
+      result$alpha_if_deleted <- stats::setNames(a$alpha.drop$raw_alpha, rownames(a$alpha.drop))
     }
     if (omega) {
       if (ncol(scale_data) < 3L) {

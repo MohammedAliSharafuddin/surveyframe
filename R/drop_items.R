@@ -27,7 +27,8 @@
 #' @return The changed `sframe` object, with a message of class
 #'   `sframe_drop_items_message` saying what changed.
 #' @export
-#' @seealso [amend_sframe()] to record the drop.
+#' @seealso [sframe_item_flags()] to find the items past the usual cut-offs,
+#'   [amend_sframe()] to record the drop.
 #' @family Amendments functions
 #'
 #' @examples
