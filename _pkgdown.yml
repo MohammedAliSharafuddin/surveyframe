@@ -237,6 +237,7 @@ reference:
     contents:
       - amend_sframe
       - sframe_get_amendments
+      - sframe_drop_items
       - sframe_link_git_commit
 
   - title: "Inspect"
