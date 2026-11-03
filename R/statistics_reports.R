@@ -73,7 +73,7 @@ sframe_method_option_keys <- list(
   reliability_alpha = character(0), reliability_omega = character(0),
   item_diagnostics = character(0), efa_readiness = "nfactors",
   efa_solution = "nfactors", cfa_lavaan_syntax = "ordered",
-  crosstab = "simulate_p_value", chi_square = "simulate_p_value",
+  crosstab = c("simulate_p_value", "percent"), chi_square = c("simulate_p_value", "percent"),
   fisher_exact = "simulate_p_value", mcnemar = "correct",
   cochran_q = character(0), mann_whitney = character(0),
   t_test_ind = "var_equal", t_test_pair = character(0),

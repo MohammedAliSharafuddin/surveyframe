@@ -338,6 +338,13 @@ style.
 
 ## Analysis
 
+* **Cross-tab percentages and totals.** A `crosstab` or `chi_square`
+  result carries `$totals`, the counts with a Total row and column. With
+  `options$percent = "row"`, `"column"` or `"total"` it also carries
+  `$percent_table`, the percentages over that denominator, the report shows
+  each count with its percentage beside it, and `sframe_plot_crosstab()`
+  draws the percentages. Checked against `prop.table()` and `addmargins()`
+  on 3 demo pairs, a zero cell among them.
 * **Multinomial logistic regression has a full table.** It gives b, SE, z,
   p, the odds ratio and its 95% interval for each outcome category against
   a named reference category, and the result text names the reference.
