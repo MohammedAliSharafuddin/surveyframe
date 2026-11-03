@@ -250,6 +250,35 @@ sframe_scale_scoring <- function(scales) {
   out[order(names(out))]
 }
 
+# The version an amendment suggests, and why, from 1 place so the console,
+# Studio's amendment dialog and the builder say the same. A design amendment
+# changes what is measured or analysed, so the minor number moves (1.0.0 to
+# 1.1.0). A pipeline amendment corrects data or wording, so the patch number
+# moves (1.0.0 to 1.0.1). A version that is not numbers and dots gets no
+# suggestion.
+sframe_suggest_version <- function(version, tier = c("design", "pipeline")) {
+  tier <- match.arg(tier)
+  v <- trimws(as.character(version %||% "")[1])
+  if (is.na(v) || !nzchar(v)) v <- "1.0.0"
+  if (!grepl("^[0-9]+(\\.[0-9]+){0,2}$", v)) {
+    return(list(version = NULL, reason = sprintf(paste0(
+      "The version \"%s\" is not of the form 1.0.0, so no next version is ",
+      "suggested."), v)))
+  }
+  n <- as.integer(strsplit(v, ".", fixed = TRUE)[[1]])
+  n <- c(n, rep(0L, 3L - length(n)))
+  if (identical(tier, "design")) {
+    n <- c(n[1], n[2] + 1L, 0L)
+    why <- paste0("A design amendment changes what is measured or analysed, ",
+                  "so the minor number moves.")
+  } else {
+    n <- c(n[1], n[2], n[3] + 1L)
+    why <- paste0("A pipeline amendment corrects data or wording, so the ",
+                  "patch number moves.")
+  }
+  list(version = paste(n, collapse = "."), reason = why)
+}
+
 #' Record a disclosed amendment to an instrument
 #'
 #' Appends a structured, disclosed-revision entry to an instrument's
@@ -324,6 +353,13 @@ sframe_scale_scoring <- function(scales) {
 #' @param second_signoff Character or `NULL`. A second reviewer's name or
 #'   identifier (an ethics board reference, a co-author). When omitted, the
 #'   entry records `signoff = "none"`.
+#' @param version Character or `NULL`. The instrument's version after the
+#'   amendment, written to `meta$version` and covered by the recorded
+#'   content. `NULL` keeps the version `instrument` has. When that is still
+#'   the version of `previous`, a message of class
+#'   `sframe_version_suggestion` suggests the next one: the minor number for a
+#'   design amendment (1.0.0 to 1.1.0), the patch number for a pipeline
+#'   amendment (1.0.0 to 1.0.1).
 #'
 #' @return The amended `sframe` object, with the new entry appended to its
 #'   amendment log. Call [write_sframe()] to persist it.
@@ -345,7 +381,7 @@ sframe_scale_scoring <- function(scales) {
 #' @family Amendments functions
 amend_sframe <- function(previous, instrument, reason_code, reason_text,
                          tier = NULL, author = NULL, deviation_report = NULL,
-                         second_signoff = NULL) {
+                         second_signoff = NULL, version = NULL) {
   sframe_check_instrument(previous, arg = "previous")
   sframe_check_instrument(instrument, arg = "instrument")
 
@@ -421,6 +457,29 @@ amend_sframe <- function(previous, instrument, reason_code, reason_text,
       ),
       class = c("sframe_validation_error", "sframe_error")
     )
+  }
+
+  if (!is.null(version)) {
+    if (!is.character(version) || length(version) != 1 || is.na(version) ||
+        !nzchar(trimws(version))) {
+      rlang::abort("`version` must be a single non-empty string, or NULL.",
+                   class = c("sframe_validation_error", "sframe_error"))
+    }
+    instrument$meta$version <- trimws(version)
+    instrument_v <- as_sframe(validate_sframe(instrument, strict = TRUE))
+    new_payload <- sframe_serialization_payload(instrument_v)
+    changed_fields <- Filter(
+      function(k) !identical(prev_payload[[k]], new_payload[[k]]),
+      setdiff(union(names(prev_payload), names(new_payload)), c("hash", "amendments"))
+    )
+  } else if (identical(instrument$meta$version %||% "", previous$meta$version %||% "")) {
+    sug <- sframe_suggest_version(previous$meta$version, tier)
+    if (!is.null(sug$version)) {
+      rlang::inform(sprintf(paste0(
+        "The version stays %s. Suggested next version: %s. %s Set it with ",
+        "`version = \"%s\"`."), previous$meta$version %||% "", sug$version,
+        sug$reason, sug$version), class = "sframe_version_suggestion")
+    }
   }
 
   signoff <- if (!is.null(second_signoff) && nzchar(trimws(second_signoff))) {

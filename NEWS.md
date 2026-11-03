@@ -287,6 +287,14 @@ style.
   "RQ3 (McNemar test): ". Code that matched the start of an error message
   needs to allow for it.
 
+## Amendments and versions
+
+* **`amend_sframe(version = )` sets the version an amendment writes.** `NULL`,
+  the default, keeps the version, and when it is unchanged a message
+  suggests the next: the minor number for a design amendment (1.0.0 to
+  1.1.0), the patch number for a pipeline amendment (1.0.0 to 1.0.1), with
+  the reason. The version set is inside the recorded content.
+
 ## Analysis
 
 * **Multinomial logistic regression has a full table.** It gives b, SE, z,
