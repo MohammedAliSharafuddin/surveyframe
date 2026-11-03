@@ -39,6 +39,12 @@ can be written again, and every plan result can be serialised by a host.
   check, and `write_sframe()` refuses any entry appended to the log of an
   unverified read. Restore the original file, or write the content as a new
   instrument with `new_instrument = TRUE`.
+* **A change to how a scale is scored is a design-tier amendment.** Dropping
+  an item from a scale, reverse keying one, or changing its weights, method
+  or minimum answered changes every score the plan analyses, so
+  `amend_sframe()` now treats it as it treats a plan or model change: it
+  needs a `deviation_report` and cannot be recorded as `"pipeline"`. A
+  scale's label alone stays a pipeline change.
 * **A frequency table now shows choice labels, with the code in its own
   column.** The table's columns are `Value` (the label), `Code`, `Frequency`
   and `Percent`. Code reading `Value` for the stored code should read `Code`.
