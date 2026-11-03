@@ -129,6 +129,7 @@ nrow(sframe_get_amendments(amended))
 \code{\link[=sframe_get_amendments]{sframe_get_amendments()}}, \code{\link[=write_sframe]{write_sframe()}}, \code{\link[=read_sframe]{read_sframe()}}
 
 Other Amendments functions:
+\code{\link[=sframe_drop_items]{sframe_drop_items()}},
 \code{\link[=sframe_get_amendments]{sframe_get_amendments()}},
 \code{\link[=sframe_link_git_commit]{sframe_link_git_commit()}}
 }

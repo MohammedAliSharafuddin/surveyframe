@@ -30,6 +30,7 @@ sframe_get_amendments(instr)
 
 Other Amendments functions:
 \code{\link[=amend_sframe]{amend_sframe()}},
+\code{\link[=sframe_drop_items]{sframe_drop_items()}},
 \code{\link[=sframe_link_git_commit]{sframe_link_git_commit()}}
 }
 \concept{Amendments functions}

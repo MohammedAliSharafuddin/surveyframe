@@ -294,6 +294,12 @@ style.
   suggests the next: the minor number for a design amendment (1.0.0 to
   1.1.0), the patch number for a pipeline amendment (1.0.0 to 1.0.1), with
   the reason. The version set is inside the recorded content.
+* **`sframe_drop_items(instrument, items, from)` drops items from scales or
+  models.** It takes them out of the named scales (with their reverse keys
+  and weights) or every construct of a named model, and out of any plan
+  block role that lists them with other variables. A role naming only that
+  item keeps it. The questions and their answers stay, and nothing is
+  recorded: `amend_sframe()` records the drop as a design amendment.
 
 ## Analysis
 
