@@ -687,3 +687,24 @@ sframe_get_amendments <- function(instrument) {
   )
 }
 
+# The amendment list a report prints, oldest first, as a display table, or
+# NULL when nothing is recorded. Both report engines print this table.
+sframe_report_amendments <- function(instrument) {
+  log <- sframe_get_amendments(instrument)
+  if (nrow(log) == 0) return(NULL)
+  labels <- c(data_correction = "Data correction", bot_removal = "Bot removal",
+              model_respecification = "Model respecification",
+              instrument_revision = "Instrument revision", other = "Other")
+  code <- ifelse(log$reason_code %in% names(labels), labels[log$reason_code], log$reason_code)
+  blank <- function(x) ifelse(is.na(x), "", x)
+  data.frame(
+    Date = substr(log$timestamp, 1, 10),
+    Tier = log$tier,
+    Reason = paste0(code, ": ", log$reason_text),
+    `What changed` = log$changed_fields,
+    `Deviation report` = blank(log$deviation_report),
+    Author = blank(log$author),
+    `Sign-off` = log$signoff,
+    check.names = FALSE, stringsAsFactors = FALSE
+  )
+}
