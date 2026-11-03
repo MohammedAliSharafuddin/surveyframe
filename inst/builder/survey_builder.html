@@ -988,6 +988,39 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
 </div>
 </div>
 
+<!-- Amendment: a changed save of an opened file (CX-12) -->
+<div class="mov" id="m-amend">
+<div class="modal wide" role="dialog" aria-modal="true" aria-labelledby="am-title">
+  <div class="mhdr"><span class="mtitle" id="am-title">This survey has changed since it was opened</span><button type="button" class="mx" aria-label="Cancel" onclick="resAmend(false)">&#215;</button></div>
+  <div class="mbody">
+    <div class="alert-i">It was opened from a file with an integrity hash. Saved as it is, it would claim to be that file. Record the change as an amendment, which keeps the file's history, or save it as a new instrument.</div>
+    <div class="plan-msg" id="am-changed"></div>
+    <div class="field" role="radiogroup" aria-label="How to save">
+      <label id="am-opt-amend" style="display:flex;align-items:center;gap:6px;font-weight:400"><input type="radio" name="am-mode" id="am-mode-amend" onchange="amendModeSync()"> Record an amendment</label>
+      <label style="display:flex;align-items:center;gap:6px;font-weight:400"><input type="radio" name="am-mode" id="am-mode-new" onchange="amendModeSync()"> Save as a new instrument</label>
+      <div class="plan-msg" id="am-noamend" hidden>The file did not pass its integrity check when opened, so no amendment can start from it.</div>
+    </div>
+    <div id="am-fields">
+      <div class="frow">
+        <div class="field"><label class="fl" for="am-code">Reason</label><div class="fc"><select id="am-code" onchange="amendTierSync()"><option value="data_correction">Data correction</option><option value="bot_removal">Bot or fraud removal</option><option value="model_respecification">Model respecification</option><option value="instrument_revision">Instrument revision</option><option value="other">Other</option></select></div></div>
+        <div class="field"><label class="fl" for="am-tier">Tier</label><div class="fc"><select id="am-tier" onchange="amendTierChg()"><option value="pipeline">Pipeline (data or wording)</option><option value="design">Design (what is measured or analysed)</option></select></div></div>
+      </div>
+      <div class="field"><label class="fl" for="am-text">What changed and why <span class="fr">*</span></label><div class="fc"><textarea id="am-text" rows="2" placeholder="Reworded item q3 after the pilot."></textarea></div></div>
+      <div class="field" id="am-dev-field"><label class="fl" for="am-dev">Deviation report <span class="fr">*</span></label><div class="fc"><textarea id="am-dev" rows="3" placeholder="What changed in the research question, method or model, and why."></textarea></div></div>
+      <div class="frow">
+        <div class="field"><label class="fl" for="am-author">Author</label><div class="fc"><input type="text" id="am-author"></div></div>
+        <div class="field"><label class="fl" for="am-signoff">Second sign-off</label><div class="fc"><input type="text" id="am-signoff" placeholder="none"></div></div>
+      </div>
+      <div class="field"><label class="fl" for="am-version">Version after the amendment</label><div class="fc"><input type="text" id="am-version" oninput="this.dataset.touched='1'"></div><div class="plan-msg" id="am-why"></div></div>
+    </div>
+    <div id="am-newfields" hidden>
+      <div class="field"><label class="fl" for="am-newver">Version of the new instrument</label><div class="fc"><input type="text" id="am-newver"></div><div class="plan-msg">A new instrument carries no amendment log. The log stays with the file opened.</div></div>
+    </div>
+  </div>
+  <div class="mfoot"><button type="button" class="btn btn-s" onclick="resAmend(false)">Cancel</button><div class="sp"></div><button type="button" class="btn btn-p" id="am-ok" onclick="resAmend(true)">Record amendment</button></div>
+</div>
+</div>
+
 <!-- Confirm -->
 <div class="conf-ov" id="confOv">
   <div class="conf-box">
@@ -3133,12 +3166,13 @@ function openSframeText(text){
     // save of changed content is never rehashed as if it were that file.
     // A file whose own hash does not match keeps no baseline, so any save
     // of it asks.
-    S._origin=fileHash?{title:S.meta.title,version:S.meta.version,baseline:sframeHashSync(sframePayload())}:null;
+    S._origin=fileHash?sframeOriginOf(sframePayload()):null;
     if(fileHash){
       var vp=JSON.parse(text);
       vp.hash.value='';
       sframeHash(vp).then(function(h){
-        if(h!==fileHash&&S._origin)S._origin.baseline='';
+        // No file vouches for this content, so no amendment can start from it.
+        if(h!==fileHash&&S._origin){S._origin.baseline='';S._origin.anchor='';}
         if(h===fileHash)toast('Loaded: '+S.meta.title+' — integrity verified (sha256 '+fileHash.slice(0,8)+')','ok');
         else toast('Loaded: '+S.meta.title+' — integrity hash mismatch; the file was changed outside surveyframe','err');
       });
@@ -3169,26 +3203,187 @@ function sframeNextVersion(v){
   v=String(v||'');var m=/^(.*?)(\d+)$/.exec(v);
   return m?m[1]+(parseInt(m[2],10)+1):(v?v+'.1':'1.0.0');
 }
-// Changed content of an opened file is saved only as a new instrument: a new
-// title or version, with no amendment log, since the log belongs to the file
-// opened. Resolves true when the save may go ahead.
+// -- Amendments, as amend_sframe() in R records them (CX-12) ----------------
+// The content fingerprint R's sframe_content_hash() takes: the payload with
+// its hash, amendment log and references left out.
+function sframeContentHash(payload){
+  var q=JSON.parse(JSON.stringify(payload));
+  delete q.hash;delete q.amendments;delete q.references;
+  return sframeHashSync(q);
+}
+// What the builder remembers of a file it opened or saved: its title and
+// version, the hash it would save it with, the state the next amendment
+// starts from (the last entry's new_hash, else the content), and each field
+// as it was, to name the fields an amendment changes.
+function sframeOriginOf(payload){
+  payload=JSON.parse(JSON.stringify(payload));if(payload.hash)payload.hash.value='';
+  var am=payload.amendments||[],fields={},order=[];
+  Object.keys(payload).forEach(function(k){
+    if(k==='hash'||k==='amendments')return;
+    order.push(k);fields[k]=JSON.stringify(sframeCanon(payload[k]));
+  });
+  return {title:S.meta.title,version:S.meta.version,
+    baseline:sframeHashSync(payload),
+    anchor:am.length?(am[am.length-1].new_hash||''):sframeContentHash(payload),
+    order:order,fields:fields,scales:JSON.parse(JSON.stringify(payload.scales||[]))};
+}
+// The fields that differ from the state opened, in R's order.
+function sframeChangedFields(o,payload){
+  var keys=o.order.slice();
+  Object.keys(payload).forEach(function(k){if(k!=='hash'&&k!=='amendments'&&keys.indexOf(k)<0)keys.push(k);});
+  return keys.filter(function(k){
+    var now=payload[k]===undefined?undefined:JSON.stringify(sframeCanon(payload[k]));
+    return now!==o.fields[k];
+  });
+}
+// How each scale is scored, as sframe_scale_scoring() in R reads it.
+function sframeScaleScoring(scales){
+  var out={};
+  (scales||[]).forEach(function(s){
+    var arr=function(v){return v===undefined||v===null?[]:[].concat(v);};
+    out[String(s.id||'')]={items:arr(s.items).map(String),
+      reverse_items:arr(s.reverse_items).map(String).sort(),
+      weights:arr(s.weights).map(Number),method:String(s.method||'mean'),
+      min_valid:arr(s.min_valid).map(Number)};
+  });
+  return JSON.stringify(sframeCanon(out));
+}
+var SFRAME_REASON_CODES=['data_correction','bot_removal','model_respecification','instrument_revision','other'];
+function sframeDefaultTier(code){return(code==='data_correction'||code==='bot_removal')?'pipeline':'design';}
+// The changes that make an amendment design tier, whatever was asked for.
+function sframeDesignChanges(o,payload,changed){
+  var out=changed.filter(function(k){return k==='analysis_plan'||k==='models'||k==='designs';});
+  if(sframeScaleScoring(o.scales)!==sframeScaleScoring(payload.scales))out.unshift('the scales scored');
+  return out;
+}
+// The next version and why, as sframe_suggest_version() in R gives them.
+function sframeSuggestVersion(version,tier){
+  var v=String(version===undefined||version===null?'':version).trim();
+  if(!v)v='1.0.0';
+  if(!/^[0-9]+(\.[0-9]+){0,2}$/.test(v)){
+    return {version:null,reason:'The version "'+v+'" is not of the form 1.0.0, so no next version is suggested.'};
+  }
+  var n=v.split('.').map(function(x){return parseInt(x,10);});
+  while(n.length<3)n.push(0);
+  if(tier==='design')return {version:n[0]+'.'+(n[1]+1)+'.0',
+    reason:'A design amendment changes what is measured or analysed, so the minor number moves.'};
+  return {version:n[0]+'.'+n[1]+'.'+(n[2]+1),
+    reason:'A pipeline amendment corrects data or wording, so the patch number moves.'};
+}
+// What the amendment dialog is told about a changed save.
+function sframeAmendInfo(o,payload){
+  var changed=sframeChangedFields(o,payload),design=sframeDesignChanges(o,payload,changed);
+  return {title:S.meta.title,version:o.version,changed_fields:changed,
+    design_changes:design,design_forced:design.length>0,
+    can_amend:!!(o.baseline&&o.anchor),
+    suggest_design:sframeSuggestVersion(o.version,'design'),
+    suggest_pipeline:sframeSuggestVersion(o.version,'pipeline'),
+    new_version:sframeNextVersion(o.version)};
+}
+// Appends the entry amend_sframe() would append. Resolves false, with a
+// message, when the answer is incomplete, and nothing is changed.
+function sframeRecordAmendment(o,ans,info){
+  var code=String(ans.reason_code||''),text=String(ans.reason_text||'').trim();
+  if(SFRAME_REASON_CODES.indexOf(code)<0){toast('Choose a reason for the amendment. Nothing was saved.','err');return false;}
+  if(!text){toast('Say why the survey changed. Nothing was saved.','err');return false;}
+  var tier=(ans.tier==='pipeline'||ans.tier==='design')?ans.tier:sframeDefaultTier(code);
+  if(info.design_forced)tier='design';
+  var dev=ans.deviation_report===undefined||ans.deviation_report===null?'':String(ans.deviation_report);
+  if(tier==='design'&&!dev.trim()){
+    toast('A design amendment needs a deviation report: what changed in the question, method or model, and why. Nothing was saved.','err');return false;
+  }
+  var ver=String(ans.version||'').trim();
+  if(ver)S.meta.version=ver;
+  var payload=sframePayload(),entry={
+    timestamp:new Date().toISOString().replace(/\.\d{3}Z$/,'Z'),
+    reason_code:code,reason_text:text,tier:tier};
+  var author=String(ans.author||'').trim();
+  if(author)entry.author=author;
+  if(dev.trim())entry.deviation_report=dev;
+  var sig=String(ans.signoff||'').trim();
+  entry.signoff=sig||'none';
+  entry.previous_hash=o.anchor;
+  entry.new_hash=sframeContentHash(payload);
+  entry.changed_fields=sframeChangedFields(o,payload);
+  if(!S._carry)S._carry={};
+  S._carry.amendments=(S._carry.amendments||[]).concat([entry]);
+  return true;
+}
+// Changed content of an opened file is saved as a recorded amendment, or as
+// a new instrument (a new title or version, with no amendment log, since the
+// log belongs to the file opened). Never as the file opened. Resolves true
+// when the save may go ahead.
 async function sframeRevisionGate(){
   var o=S._origin;if(!o)return true;
-  var h=await sframeHash(sframePayload());
+  var payload=sframePayload();
+  var h=await sframeHash(payload);
   if(o.baseline&&h===o.baseline)return true;
-  var v=await conf2('Save as a new instrument?',
-    'This survey was opened from a file with an integrity hash, and its content has changed since. '
-    +'Saved under the same title and version, it would claim to be the file you opened. '
-    +'Give it a new version to save it as a new instrument. Its amendment log stays with the original.',
-    'Save as a new instrument',sframeNextVersion(o.version));
-  if(v===false||v===null||v===undefined)return false;
-  v=String(v).trim();
+  var info=sframeAmendInfo(o,payload);
+  var ans=await amendDialog(info);
+  if(!ans||!ans.mode)return false;
+  if(ans.mode==='amend'){
+    if(!info.can_amend){toast('This file did not pass its integrity check, so no amendment can start from it. Save it as a new instrument.','err');return false;}
+    return sframeRecordAmendment(o,ans,info);
+  }
+  var v=String(ans.version||'').trim();
   if(!v||(v===o.version&&S.meta.title===o.title)){
     toast('A new instrument needs a new version or title. Nothing was saved.','err');return false;
   }
   S.meta.version=v;
   if(S._carry)delete S._carry.amendments;
   return true;
+}
+// The amendment dialog. Resolves with {mode:'amend', reason_code,
+// reason_text, tier, deviation_report, author, signoff, version}, with
+// {mode:'new', version}, or with null for Cancel.
+var _amRes=null,_amInfo=null;
+var SFRAME_REASON_LABELS={data_correction:'Data correction',bot_removal:'Bot or fraud removal',
+  model_respecification:'Model respecification',instrument_revision:'Instrument revision',other:'Other'};
+function amendDialog(info){
+  _amInfo=info;
+  var g=function(id){return document.getElementById(id);};
+  g('am-changed').textContent='Changed: '+(info.changed_fields.length?info.changed_fields.join(', '):'nothing that is recorded')+'.'
+    +(info.design_forced?' This changes '+info.design_changes.join(' and ')+', so it is a design amendment.':'');
+  g('am-opt-amend').hidden=!info.can_amend;
+  g('am-noamend').hidden=info.can_amend;
+  g('am-mode-amend').checked=info.can_amend;g('am-mode-new').checked=!info.can_amend;
+  g('am-code').value='instrument_revision';g('am-text').value='';g('am-dev').value='';
+  g('am-author').value='';g('am-signoff').value='';
+  g('am-newver').value=info.new_version;
+  g('am-version').dataset.touched='';
+  amendTierSync();amendModeSync();
+  openModal('m-amend');
+  return new Promise(function(res){_amRes=res;});
+}
+function amendModeSync(){
+  var amend=document.getElementById('am-mode-amend').checked;
+  document.getElementById('am-fields').hidden=!amend;
+  document.getElementById('am-newfields').hidden=amend;
+  document.getElementById('am-ok').textContent=amend?'Record amendment':'Save as a new instrument';
+}
+function amendTierSync(){
+  var g=function(id){return document.getElementById(id);},info=_amInfo||{};
+  var tier=info.design_forced?'design':sframeDefaultTier(g('am-code').value);
+  g('am-tier').value=tier;g('am-tier').disabled=!!info.design_forced;
+  amendTierChg();
+}
+function amendTierChg(){
+  var g=function(id){return document.getElementById(id);},info=_amInfo||{};
+  var tier=g('am-tier').value,s=tier==='design'?info.suggest_design:info.suggest_pipeline;
+  g('am-dev-field').hidden=tier!=='design';
+  if(!g('am-version').dataset.touched)g('am-version').value=(s&&s.version)||'';
+  g('am-why').textContent=(s&&s.reason)||'';
+}
+function resAmend(ok){
+  var g=function(id){return document.getElementById(id);},v=null;
+  if(ok){
+    v=g('am-mode-amend').checked?{mode:'amend',reason_code:g('am-code').value,reason_text:g('am-text').value,
+      tier:g('am-tier').value,deviation_report:g('am-dev').value,author:g('am-author').value,
+      signoff:g('am-signoff').value,version:g('am-version').value}
+      :{mode:'new',version:g('am-newver').value};
+  }
+  closeModal('m-amend');
+  if(_amRes){_amRes(v);_amRes=null;}
 }
 // The .sframe format version, SFRAME_FORMAT_VERSION in R. Every file carries
 // it, as write_sframe() writes it, and sframe-schema's instrument profile
@@ -3209,12 +3404,12 @@ async function saveSframe(){
   // In Studio the save goes to Studio, which answers with sframe-saved.
   if(STUDIO_HOST){
     if(document.getElementById('saveBtn').disabled){toast('Studio cannot take a save of this survey now. See the message above the builder.','err');return;}
-    studioPendingOrigin={title:S.meta.title,version:S.meta.version,baseline:payload.hash.value};
+    studioPendingOrigin=sframeOriginOf(payload);
     window.parent.postMessage({type:'sframe',text:JSON.stringify(payload,null,2)},location.origin);
     toast('Saving to Studio','ok');return;
   }
   // The saved file is now the instrument this builder holds.
-  S._origin={title:S.meta.title,version:S.meta.version,baseline:payload.hash.value};
+  S._origin=sframeOriginOf(payload);
   var blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
   var a=document.createElement('a');a.href=URL.createObjectURL(blob);
   a.download=(S.meta.title||'survey').replace(/[^a-zA-Z0-9]/g,'_')+'.sframe';a.click();

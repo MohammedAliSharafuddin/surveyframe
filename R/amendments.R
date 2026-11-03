@@ -208,6 +208,33 @@ sframe_check_amendment_boundary <- function(instrument, new_instrument = FALSE) 
   invisible(TRUE)
 }
 
+# The read-time check of an amendment log, as a warning: the file is
+# self-consistent, and write_sframe() refuses to write it on until the log
+# and content agree.
+sframe_check_amendment_log_read <- function(instrument, path) {
+  am <- instrument$amendments
+  warn <- function(msg) rlang::warn(msg, class = c("sframe_amendment_warning", "sframe_warning"))
+  if (length(am) > 1) {
+    for (k in 2:length(am)) {
+      if (!identical(am[[k]]$previous_hash, am[[k - 1]]$new_hash)) {
+        warn(sprintf(paste0(
+          "The amendment log in '%s' is out of sequence at entry %d: it records ",
+          "a previous state that entry %d did not produce."), path, k, k - 1))
+        return(invisible(FALSE))
+      }
+    }
+  }
+  last <- am[[length(am)]]$new_hash %||% ""
+  if (!last %in% sframe_content_hash_candidates(instrument)) {
+    warn(sprintf(paste0(
+      "The amendment log in '%s' does not end at the content the file holds. ",
+      "Its last entry records a different state, so the log does not describe ",
+      "this content."), path))
+    return(invisible(FALSE))
+  }
+  invisible(TRUE)
+}
+
 sframe_restore_amendment <- function(a) {
   a$timestamp <- as.character(a$timestamp %||% "")
   a$reason_code <- as.character(a$reason_code %||% "other")

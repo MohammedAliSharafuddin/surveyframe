@@ -751,13 +751,24 @@ style.
   the rule counts as unwritten, and a file holding only `interpretation`
   still opens with it as the rule.
 
-* **Changed content of an opened file saves only as a new instrument.** The
-  builder checked a file's hash when it opened and then forgot it, so an
-  edited instrument saved as verified, with no amendment. It now keeps the
-  title, version and content it opened. Saving changed content of a file
-  that had a hash asks for a new version, offering the next one, or cancels.
-  A new instrument needs a new title or version, and the amendment log stays
-  with the original. A file opened without a matching hash asks on every save.
+* **Changed content of an opened file is recorded as an amendment, or saved
+  as a new instrument.** The builder checked a file's hash when it opened
+  and then forgot it, so an edited instrument saved as verified, with no
+  amendment. It now keeps the title, version and content it opened. Saving
+  changed content of a file that had a hash opens 1 dialog: record an
+  amendment (reason, tier, deviation report for a design change, author,
+  second sign-off and the version, with the next one suggested), save as a
+  new instrument (a new title or version, the amendment log staying with the
+  original), or cancel. The entry is built as `amend_sframe()` builds it,
+  with the same content fingerprints, changed fields and tier rule, so the
+  file reads back in R with its log verified and writes again with no flag.
+  A file opened without a matching hash can only be saved as a new
+  instrument.
+* **`read_sframe()` checks an amendment log against the content.** A file's
+  hash vouches for the file, not for whether its log describes the content.
+  A log whose entries do not follow one another, or whose last entry ends at
+  a different state, now reads with a warning of class
+  `sframe_amendment_warning`.
 * **A choice set can be declared ordered.** `sf_choices(ordered = TRUE)`
   marks options that run in a meaningful order, such as a frequency or an
   education level, and SurveyBuilder has the same switch in the choice set

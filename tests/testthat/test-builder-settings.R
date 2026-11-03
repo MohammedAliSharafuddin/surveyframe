@@ -58,7 +58,10 @@ test_that("Save settings writes the field the user changed and only that", {
   ctx <- builder_context()
   builder_open(ctx, ins)
   settings_save(ctx, list(`s-authors` = "Rahman, A."))
-  back <- read_sframe(builder_save(ctx), validate = FALSE)
+  # builder_save() skips the amendment dialog, so the log no longer ends at
+  # the content saved, and read_sframe() says so (8a).
+  expect_warning(back <- read_sframe(builder_save(ctx), validate = FALSE),
+                 class = "sframe_amendment_warning")
   expect_identical(back$meta$authors, "Rahman, A.")
   expect_identical(names(back$render), "theme")
   expect_identical(back$meta$description, ins$meta$description)
