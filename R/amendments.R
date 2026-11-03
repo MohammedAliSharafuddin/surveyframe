@@ -232,6 +232,24 @@ sframe_amendment_plain <- function(a) {
   out
 }
 
+# The scoring a scale declares: which items it takes, which are reverse keyed,
+# their weights, the method and the minimum answered. A change to any of them
+# changes every score the plan analyses, so it is a design-tier change, as a
+# plan change is. A scale's label is wording and stays out.
+sframe_scale_scoring <- function(scales) {
+  scales <- scales %||% list()
+  ids <- vapply(scales, function(s) as.character(s$id %||% "")[1], character(1))
+  out <- lapply(scales, function(s) {
+    list(items = as.character(unlist(s$items %||% list())),
+         reverse_items = sort(as.character(unlist(s$reverse_items %||% list()))),
+         weights = as.numeric(unlist(s$weights %||% list())),
+         method = as.character(s$method %||% "mean")[1],
+         min_valid = as.numeric(unlist(s$min_valid %||% list())))
+  })
+  out <- stats::setNames(out, ids)
+  out[order(names(out))]
+}
+
 #' Record a disclosed amendment to an instrument
 #'
 #' Appends a structured, disclosed-revision entry to an instrument's
@@ -252,8 +270,9 @@ sframe_amendment_plain <- function(a) {
 #' bot removal) needs only a reason. A `"design"` amendment also requires a
 #' `deviation_report` describing what changed in the research question,
 #' method or model, and why. The tier follows the change itself: an amendment
-#' that changes the analysis plan, a model or a conjoint design is always
-#' design tier, whatever `reason_code` or `tier` says. `second_signoff` is
+#' that changes the analysis plan, a model, a conjoint design or how a scale
+#' is scored (its items, reverse keys, weights, method or minimum answered)
+#' is always design tier, whatever `reason_code` or `tier` says. `second_signoff` is
 #' optional. When omitted, the entry records `signoff = "none"`, so the
 #' absence of a named reviewer is visible. The tier, report and signoff are
 #' what the author records. None of them is independent approval.
@@ -296,7 +315,7 @@ sframe_amendment_plain <- function(a) {
 #' @param tier `"pipeline"` or `"design"`. When `NULL` (the default), inferred
 #'   from `reason_code`: `data_correction` and `bot_removal` default to
 #'   `"pipeline"`, and everything else to `"design"`. A change to the
-#'   analysis plan, a model or a conjoint design is always `"design"`, and
+#'   analysis plan, a model, a conjoint design or a scale's scoring is always `"design"`, and
 #'   asking for `"pipeline"` on one is an error.
 #' @param author Character or `NULL`. Who made the change.
 #' @param deviation_report Character or `NULL`. Required when `tier` is
@@ -372,10 +391,14 @@ amend_sframe <- function(previous, instrument, reason_code, reason_text,
     compare_keys
   )
 
-  # The tier follows what changed. A plan, model or design change is design
-  # tier, whatever the caller asked for, since that is the change the
-  # declared-before-collection contract exists to expose.
+  # The tier follows what changed. A plan, model, design or scale scoring
+  # change is design tier, whatever the caller asked for, since that is the
+  # change the declared-before-collection contract exists to expose.
   design_changes <- intersect(unlist(changed_fields), c("analysis_plan", "models", "designs"))
+  if (!identical(sframe_scale_scoring(prev_payload$scales),
+                 sframe_scale_scoring(new_payload$scales))) {
+    design_changes <- c("the scales scored", design_changes)
+  }
   if (length(design_changes) > 0) {
     if (tier_requested && identical(tier, "pipeline")) {
       rlang::abort(
