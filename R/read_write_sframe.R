@@ -759,5 +759,13 @@ read_sframe <- function(path = NULL, validate = TRUE, text = NULL, verify = TRUE
       instrument$amendments %||% list())
   )
 
+  # A file's hash vouches for the file, and says nothing of whether its
+  # amendment log describes the content it holds. A log written by another
+  # tool, SurveyBuilder among them, is checked here: each entry follows the
+  # one before, and the last ends at this content.
+  if (isTRUE(hash_ok) && length(instrument$amendments) > 0) {
+    sframe_check_amendment_log_read(instrument, path)
+  }
+
   instrument
 }

@@ -5,13 +5,17 @@
 # builder held, so an edited instrument saved as verified with no amendment.
 # The builder now keeps the content it opened. Saving changed content of a
 # file that had a hash asks for a new instrument, a new version with no
-# amendment log, or cancels.
+# amendment log, or cancels. Session 8a adds the third way, an amendment,
+# tested in test-builder-amend.R.
 
+# The amendment dialog (8a) answers "Save as a new instrument" with the
+# version `answer`, or Cancel when `answer` is "false". `value` records the
+# version the dialog offered.
 gate_context <- function(answer = "false") {
   ctx <- builder_context()
   ctx$eval(sprintf("var __dialogs = [];
-    conf2 = function(t, m, ok, val){ __dialogs.push({ title:t, value:val });
-      return Promise.resolve(%s); };", answer))
+    amendDialog = function(info){ __dialogs.push({ title:info.title, value:info.new_version });
+      var v = %s; return Promise.resolve(v === false ? null : { mode:'new', version:v }); };", answer))
   ctx
 }
 gate <- function(ctx) {
