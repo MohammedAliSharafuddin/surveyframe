@@ -293,7 +293,9 @@ style.
   (D13). `sframe_instrument(study = list(problem = , objectives = ,
   sampling = ))`: the problem in 1 short paragraph, objectives each with an
   id such as `O1` and its text, and the sampling plan's population, method
-  (from `sframe_sampling_methods()`) and planned n. A plan block names the
+  (from `sframe_sampling_methods()`, which groups the probability and
+  non-probability methods, with `method_other` describing an "other" one)
+  and planned n. A plan block names the
   objective it serves in `objective`. Read it with `sframe_get_study()`. It is
   written only when declared, so an instrument without one hashes as before.
   It is inside the content hash, never on the respondent's page, and a change

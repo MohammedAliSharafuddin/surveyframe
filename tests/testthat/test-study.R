@@ -115,3 +115,19 @@ test_that("D13: SurveyBuilder and Studio carry the study through a save", {
   again <- do.call(sframe_builder_compose_instrument, state)
   expect_identical(again$study, roundtrip(ins)$study)
 })
+
+test_that("D13: an other method is described, and the methods are grouped", {
+  v <- validate_sframe(study_instr(list(sampling = list(method = "other")), plan_objective = NULL),
+                       strict = FALSE)
+  expect_match(paste(sframe_problems(v), collapse = "\n"), "method_other", fixed = TRUE)
+  ok <- study_instr(list(sampling = list(method = "other", method_other = "Intercept at the exit.")),
+                    plan_objective = NULL)
+  expect_true(sframe_is_valid(validate_sframe(ok, strict = FALSE)))
+  expect_identical(roundtrip(ok)$study$sampling$method_other, "Intercept at the exit.")
+  stray <- study_instr(list(sampling = list(method = "census", method_other = "x")), plan_objective = NULL)
+  expect_false(sframe_is_valid(validate_sframe(stray, strict = FALSE)))
+  expect_identical(sframe_sampling_methods("non_probability"),
+                   c("convenience", "purposive", "quota", "snowball"))
+  expect_setequal(sframe_sampling_methods(), c(sframe_sampling_methods("probability"),
+    sframe_sampling_methods("non_probability"), "census", "other"))
+})
