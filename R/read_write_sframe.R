@@ -142,6 +142,10 @@ sframe_serialization_payload <- function(instrument, hash_value = "", box = TRUE
   # `references` (0.4.3) follows the same rule again: an instrument that cites
   # nothing hashes exactly as it did before references existed. See
   # R/references.R for why the cite links live on the reference.
+  # `study` (D13, 0.4.3), the same rule: written only when declared.
+  study <- sframe_study_plain(instrument$study)
+  if (!is.null(study)) payload$study <- study
+
   references <- instrument$references %||% list()
   if (length(references) > 0) {
     payload$references <- unname(lapply(references, sframe_reference_plain))
@@ -732,7 +736,9 @@ read_sframe <- function(path = NULL, validate = TRUE, text = NULL, verify = TRUE
       # precedent as `designs` above.
       amendments = lapply(parsed$amendments %||% list(), sframe_restore_amendment),
       # Absent in every file written before 0.4.3, same precedent again.
-      references = lapply(parsed$references %||% list(), sframe_restore_reference)
+      references = lapply(parsed$references %||% list(), sframe_restore_reference),
+      # D13, 0.4.3. Absent in older files.
+      study = sframe_restore_study(parsed$study)
     ),
     class = "sframe"
   )

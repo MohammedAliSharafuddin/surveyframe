@@ -3154,7 +3154,7 @@ function openSframeText(text){
     // save. Until 0.4.3 they were dropped, so opening and saving an
     // amended instrument lost its disclosed amendment log.
     if(src.references&&src.references.length)S.references=src.references;else delete S.references;
-    S._carry={};['designs','amendments'].forEach(function(k){if(src[k]!==undefined)S._carry[k]=src[k];});
+    S._carry={};['designs','amendments','study'].forEach(function(k){if(src[k]!==undefined)S._carry[k]=src[k];});
       // The inspector showed an item from the survey being replaced.
     closeInsp();ra();dirty=false;lastSaved=null;openedAt=Date.now();updSave();
     // Surface the SHA-256 integrity status instead of loading silently.
@@ -3252,7 +3252,7 @@ var SFRAME_REASON_CODES=['data_correction','bot_removal','model_respecification'
 function sframeDefaultTier(code){return(code==='data_correction'||code==='bot_removal')?'pipeline':'design';}
 // The changes that make an amendment design tier, whatever was asked for.
 function sframeDesignChanges(o,payload,changed){
-  var out=changed.filter(function(k){return k==='analysis_plan'||k==='models'||k==='designs';});
+  var out=changed.filter(function(k){return k==='analysis_plan'||k==='models'||k==='designs'||k==='study';});
   if(sframeScaleScoring(o.scales)!==sframeScaleScoring(payload.scales))out.unshift('the scales scored');
   return out;
 }

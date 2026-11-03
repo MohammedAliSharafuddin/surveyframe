@@ -195,6 +195,8 @@ sframe_builder_state_from_instrument <- function(instrument = NULL) {
     # dropped them, and since the amendment hash leaves references out,
     # nothing refused the export that lost them.
     references = instrument$references %||% list(),
+    # The study (D13) is edited in the builder, and kept through a rebuild.
+    study = instrument$study,
     # What the instrument was when read from a file, reattached on compose, so
     # a Studio edit of a loaded file is still recognised as a revision.
     origin = attr(instrument, "sframe_origin")
@@ -214,6 +216,7 @@ sframe_builder_compose_instrument <- function(
     amendments = list(),
     designs = list(),
     references = list(),
+    study = NULL,
     origin = NULL
 ) {
   choices <- lapply(choices, sframe_builder_as_choice)
@@ -256,7 +259,8 @@ sframe_builder_compose_instrument <- function(
                    sframe_flatten_references(list(references %||% list()))),
     analysis_plan = analysis_plan,
     models = models,
-    render = render %||% list()
+    render = render %||% list(),
+    study = study
   )
 
   # sframe_instrument() stamps a fresh created_at, which is right for a new
@@ -335,6 +339,7 @@ sframe_builder_validate_draft <- function(
     amendments = list(),
     designs = list(),
     references = list(),
+    study = NULL,
     origin = NULL
 ) {
   instrument <- sframe_builder_compose_instrument(
@@ -350,6 +355,7 @@ sframe_builder_validate_draft <- function(
     amendments = amendments,
     designs = designs,
     references = references,
+    study = study,
     origin = origin
   )
 

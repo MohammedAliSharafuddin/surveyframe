@@ -74,8 +74,10 @@ Other Design functions:
 \code{\link[=sframe_branch]{sframe_branch()}},
 \code{\link[=sframe_choice_set]{sframe_choice_set()}},
 \code{\link[=sframe_conjoint_design]{sframe_conjoint_design()}},
+\code{\link[=sframe_get_study]{sframe_get_study()}},
 \code{\link[=sframe_instrument]{sframe_instrument()}},
 \code{\link[=sframe_item]{sframe_item()}},
+\code{\link[=sframe_sampling_methods]{sframe_sampling_methods()}},
 \code{\link[=sframe_scale]{sframe_scale()}},
 \code{\link{sframe_validation}},
 \code{\link[=validate_sframe]{validate_sframe()}}
