@@ -12,7 +12,8 @@ amend_sframe(
   tier = NULL,
   author = NULL,
   deviation_report = NULL,
-  second_signoff = NULL
+  second_signoff = NULL,
+  version = NULL
 )
 }
 \arguments{
@@ -34,7 +35,7 @@ be non-empty regardless of \code{reason_code}.}
 \item{tier}{\code{"pipeline"} or \code{"design"}. When \code{NULL} (the default), inferred
 from \code{reason_code}: \code{data_correction} and \code{bot_removal} default to
 \code{"pipeline"}, and everything else to \code{"design"}. A change to the
-analysis plan, a model or a conjoint design is always \code{"design"}, and
+analysis plan, a model, a conjoint design or a scale's scoring is always \code{"design"}, and
 asking for \code{"pipeline"} on one is an error.}
 
 \item{author}{Character or \code{NULL}. Who made the change.}
@@ -46,6 +47,14 @@ why. Ignored (may be \code{NULL}) for \code{"pipeline"} amendments.}
 \item{second_signoff}{Character or \code{NULL}. A second reviewer's name or
 identifier (an ethics board reference, a co-author). When omitted, the
 entry records \code{signoff = "none"}.}
+
+\item{version}{Character or \code{NULL}. The instrument's version after the
+amendment, written to \code{meta$version} and covered by the recorded
+content. \code{NULL} keeps the version \code{instrument} has. When that is still
+the version of \code{previous}, a message of class
+\code{sframe_version_suggestion} suggests the next one: the minor number for a
+design amendment (1.0.0 to 1.1.0), the patch number for a pipeline
+amendment (1.0.0 to 1.0.1).}
 }
 \value{
 The amended \code{sframe} object, with the new entry appended to its
@@ -71,8 +80,9 @@ Amendments come in two tiers. A \code{"pipeline"} amendment (data corrections,
 bot removal) needs only a reason. A \code{"design"} amendment also requires a
 \code{deviation_report} describing what changed in the research question,
 method or model, and why. The tier follows the change itself: an amendment
-that changes the analysis plan, a model or a conjoint design is always
-design tier, whatever \code{reason_code} or \code{tier} says. \code{second_signoff} is
+that changes the analysis plan, a model, a conjoint design or how a scale
+is scored (its items, reverse keys, weights, method or minimum answered)
+is always design tier, whatever \code{reason_code} or \code{tier} says. \code{second_signoff} is
 optional. When omitted, the entry records \code{signoff = "none"}, so the
 absence of a named reviewer is visible. The tier, report and signoff are
 what the author records. None of them is independent approval.
