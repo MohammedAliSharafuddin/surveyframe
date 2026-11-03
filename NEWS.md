@@ -300,6 +300,15 @@ style.
   block role that lists them with other variables. A role naming only that
   item keeps it. The questions and their answers stay, and nothing is
   recorded: `amend_sframe()` records the drop as a design amendment.
+* **`sframe_item_flags(result)` lists the items past the usual cut-offs.**
+  For a reliability, item, EFA readiness, EFA or validity result, a plan
+  result for one of them, a lavaan CFA or a seminr PLS model, it gives each
+  statistic, its cut-off and source in APA 7 form, and a ready reason such as
+  "org_4: loading .21 in RQ3, below .40". EFA low loading and cross-loading
+  are 2 reasons, alpha if deleted asks for the item-total correlation and
+  wording to be checked, HTMT takes .85 or .90 and keeps the value applied,
+  and PLS keeps .708. Checked against psych, lavaan and seminr. A reliability
+  result now carries `alpha_if_deleted` for each item.
 
 ## Analysis
 
