@@ -437,7 +437,8 @@ validate_sframe <- function(instrument, strict = TRUE) {
 
   # A choice set's contents, which validation used to read past entirely.
   choice_content <- unlist(lapply(instrument$choices %||% list(), function(cs) {
-    p <- sframe_choice_content_problems(cs$values, cs$labels)
+    p <- c(sframe_choice_content_problems(cs$values, cs$labels),
+           sframe_choice_other_problems(cs$values, cs$allow_other, cs$ordered))
     if (!is.null(cs$ordered) && !(is.logical(cs$ordered) && length(cs$ordered) == 1 &&
                                   !is.na(cs$ordered))) {
       p <- c(p, "`ordered` has to be TRUE or FALSE.")

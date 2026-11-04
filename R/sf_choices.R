@@ -2,6 +2,27 @@
 # What a choice set has to carry before it can be answered. A duplicate code
 # gives 2 answers the same stored value, and an empty set gives a respondent
 # nothing to pick, both of which used to reach a collection engine unchecked.
+# What allow_other ("Other, please specify") cannot be combined with. Other
+# is submitted as the code "other", in <id>__other and in <id>__other_text,
+# so a set already holding the value "other" or "other_text" would share a
+# code or a column with it. An ordered set has no place for Other on its
+# scale, and SurveyBuilder turns the option off for one.
+sframe_choice_other_problems <- function(values, allow_other, ordered) {
+  if (!isTRUE(allow_other)) return(character(0))
+  out <- character(0)
+  taken <- intersect(c("other", "other_text"), as.character(values))
+  if (length(taken) > 0) {
+    out <- c(out, paste0("`allow_other` reserves the value(s) ",
+                         paste0("\"", taken, "\"", collapse = " and "),
+                         ", which the set already holds. Recode that option or set allow_other = FALSE."))
+  }
+  if (isTRUE(ordered)) {
+    out <- c(out, paste0("`allow_other` cannot be used on an ordered set, since Other has no ",
+                         "place on its scale. Add a coded option instead or set allow_other = FALSE."))
+  }
+  out
+}
+
 sframe_choice_content_problems <- function(values, labels) {
   out <- character(0)
   vals <- as.character(values)
@@ -52,8 +73,10 @@ sframe_choice_content_problems <- function(values, labels) {
 #'   to each response option. Must have the same length as `labels`.
 #' @param labels Character vector. The display labels shown to respondents.
 #'   Must have the same length as `values`.
-#' @param allow_other Logical. Whether to append an open-text "Other" option
-#'   at the end of the choice list. Defaults to `FALSE`.
+#' @param allow_other Logical. Whether to append an open-text "Other, please
+#'   specify" option at the end of the choice list. Defaults to `FALSE`. It
+#'   is submitted as the code `"other"`, so a set holding the value
+#'   `"other"` or `"other_text"` cannot allow it, and nor can an ordered set.
 #' @param randomise Logical. Whether to randomise the display order of options
 #'   at render time. Defaults to `FALSE`.
 #' @param ordered Logical. Whether the options run in a meaningful order, from
@@ -102,7 +125,8 @@ sframe_choice_set <- function(
       class = c("sframe_validation_error", "sframe_error")
     )
   }
-  problems <- sframe_choice_content_problems(values, labels)
+  problems <- c(sframe_choice_content_problems(values, labels),
+                sframe_choice_other_problems(values, allow_other, ordered))
   if (length(problems) > 0) {
     rlang::abort(
       paste0("Choice set '", as.character(id)[1], "': ",

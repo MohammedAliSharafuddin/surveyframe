@@ -434,6 +434,10 @@ style.
   the set's codes look like, since a numeric set with Other would otherwise
   turn on whether anyone chose Other. Every `<id>__other_text` column is read
   as text, and `<id>__other` as a number like the other option columns.
+* **`allow_other` is refused where it cannot work.** `sframe_choice_set()` and
+  `validate_sframe()` refuse it on a set holding the value `other` or
+  `other_text`, which would share a code or a column with Other, and on an
+  ordered set, where Other has no place on the scale.
 * **SurveyBuilder's welcome and thank-you pages are entries in the question
   list**, "Welcome page" first and "Thank-you page" last. Selecting one opens
   its editor on the right and its preview in the centre, and the Survey

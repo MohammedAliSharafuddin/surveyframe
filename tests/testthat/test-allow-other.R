@@ -102,3 +102,35 @@ test_that("read_responses() accepts the code other and reads the Other text as t
   expect_identical(names(got), c("one", "one__other_text", "many__1", "many__2",
                                  "many__other", "many__other_text", "plain"))
 })
+
+test_that("allow_other is refused on a set holding the value other or other_text", {
+  for (v in c("other", "other_text")) {
+    expect_error(sframe_choice_set("src", c("web", v), c("Website", "Something"),
+                                   allow_other = TRUE),
+                 paste0('reserves the value\\(s\\) "', v, '"'),
+                 class = "sframe_validation_error")
+  }
+  expect_s3_class(sframe_choice_set("src", c("web", "other"), c("Website", "Other")),
+                  "sf_choices")
+  inst <- ao_instrument()
+  inst$choices[[1]]$values <- c("web", "other")
+  res <- validate_sframe(inst, strict = FALSE)
+  expect_false(res$valid)
+  expect_true(any(grepl('reserves the value(s) "other"', unlist(res$problems), fixed = TRUE)))
+})
+
+test_that("allow_other is refused on an ordered set", {
+  expect_error(sframe_choice_set("often", 1:3, c("Rarely", "Sometimes", "Often"),
+                                 allow_other = TRUE, ordered = TRUE),
+               "cannot be used on an ordered set", class = "sframe_validation_error")
+  inst <- ao_instrument()
+  inst$choices[[1]]$ordered <- TRUE
+  res <- validate_sframe(inst, strict = FALSE)
+  expect_false(res$valid)
+  expect_true(any(grepl("cannot be used on an ordered set", unlist(res$problems), fixed = TRUE)))
+  expect_error(validate_sframe(inst), "ordered set")
+})
+
+test_that("a set with allow_other on unordered free codes validates", {
+  expect_true(validate_sframe(ao_instrument(), strict = FALSE)$valid)
+})
