@@ -9,6 +9,8 @@ format:
     embed-resources: true
     theme: [cosmo, report.scss]
     code-fold: true
+    # Equations as MathML: no script, so an offline report shows them (8b-R).
+    html-math-method: mathml
     grid:
       sidebar-width: 280px
       body-width: 900px
@@ -447,7 +449,10 @@ if (is.null(rr)) {
 # render_report() built it for both engines.
 s <- content$study
 cat("### Study\n\n")
-if (length(s$problem)) cat("**Problem:** ", s$problem, "\n\n", sep = "")
+if (length(s$problem_md) && nzchar(s$problem_md)) {
+  if (grepl("\n", s$problem_md, fixed = TRUE)) cat("**Problem:**\n\n", s$problem_md, "\n\n", sep = "")
+  else cat("**Problem:** ", s$problem_md, "\n\n", sep = "")
+}
 if (use_citations && length(cited_keys("study")))
   cat(sprintf("**Sources:** %s\n\n", cite(cited_keys("study"))))
 if (!is.null(s$trace))
@@ -472,23 +477,26 @@ decl_for <- function(b) {
   id <- as.character(b$block_id %||% b$id %||% "")[1]
   if (nzchar(id) && id %in% names(decls$blocks)) decls$blocks[[id]] else list()
 }
+# The fields as safe Markdown, built in R (8b-R): Markdown, math and
+# footnotes kept, shortcodes, raw blocks, fences, headings and HTML printed
+# as typed. Printed here as data, so nothing in them is ever run.
 declare_md <- function(b) {
-  d <- decl_for(b)$declaration
-  if (length(d) > 0) cat(sprintf("**%s:** %s\n\n", names(d), d), sep = "")
+  d <- decl_for(b)$declaration_md
+  if (length(d) > 0) cat(d, sep = "")
   # The sources of the hypotheses, beside them (8b-R).
   keys <- cited_keys(paste0("hypothesis:", as.character(b$block_id %||% b$id %||% "")[1]))
   if (use_citations && length(keys))
     cat(sprintf("**Sources for the hypotheses:** %s\n\n", cite(keys)))
 }
 interp_md <- function(b) {
-  text <- decl_for(b)$interpretation %||% ""
-  if (nzchar(text))
-    cat(sprintf("\n**%s:** %s\n\n", decls$interpretation_label, text))
+  text <- decl_for(b)$interpretation_md %||% ""
+  if (nzchar(text)) cat("\n", text, sep = "")
 }
 if (!has_data) {
   for (i in seq_along(instrument$analysis_plan)) {
     rq <- instrument$analysis_plan[[i]]
-    cat(sprintf("### RQ %d: %s\n\n", i, rq$research_question %||% "(untitled)"))
+    rq_md <- content$research_questions_md[i] %||% ""
+    cat(sprintf("### RQ %d: %s\n\n", i, if (!is.na(rq_md) && nzchar(rq_md)) rq_md else "(untitled)"))
     cat(sprintf("**Planned test:** %s\n\n", rq$test %||% ""))
     if (length(rq$variables %||% character(0)) > 0)
       cat(sprintf("**Variables:** %s\n\n", paste(rq$variables, collapse = ", ")))
@@ -504,7 +512,7 @@ if (!has_data) {
   } else {
     for (i in seq_along(results)) {
       r <- results[[i]]
-      cat(sprintf("### RQ %d: %s\n\n", i, r$research_question %||% "(untitled)"))
+      cat(sprintf("### RQ %d: %s\n\n", i, if (nzchar(r$research_question_md %||% "")) r$research_question_md else "(untitled)"))
       if (!is.null(r$error)) {
         cat(sprintf("> **Error:** %s\n\n", r$error))
       } else {
@@ -659,6 +667,8 @@ if (is.null(content$amendments)) {
   cat(sprintf("**Amendments (%d)**, oldest first:\n\n", nrow(content$amendments)))
   cat(paste(apa_kable(content$amendments), collapse = "\n"))
   cat("\n\n")
+  # Each deviation report formatted, below the table that keeps it as typed.
+  if (length(content$amendment_notes_md)) cat(content$amendment_notes_md, sep = "")
 }
 cat("**To reproduce:**\n\n")
 cat("```r\nlibrary(surveyframe)\n")

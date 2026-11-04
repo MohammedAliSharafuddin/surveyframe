@@ -344,6 +344,20 @@ print.sframe_codebook <- function(x, ...) {
 #'   when another style is asked for. An unknown name stops with the list of
 #'   the 5.
 #'
+#' @section Markdown in text fields:
+#' A research question, H0, H1, decision rule, interpretation, study problem
+#' or deviation report may hold Markdown: bold, italic, bulleted and numbered
+#' lists, links, `[@key]` citations, `~sub~`, `^sup^`, footnotes `^[...]` and
+#' equations, `$...$` inline and `$$...$$` display (an opening `$` needs a
+#' non-space on its right and a closing `$` a non-space on its left and no
+#' digit after it, so "costs $5 and $10" stays prose). The `.sframe` keeps
+#' the text as typed. The Quarto report renders it, with equations as
+#' MathML, which needs no script or network. The built-in page renders it
+#' with commonmark and prints each equation's TeX in monospace. Shortcodes,
+#' raw blocks, `:::` fences, heading lines, a `---` line and HTML tags print
+#' as typed, R code in a field is never run, and `@word` is a citation only
+#' when `word` is the key of a reference the report holds.
+#'
 #' @section Results record, manifest and provenance:
 #' Beside every report `render_report()` writes 2 files named after it. For
 #' `report.html` they are `report_results.json`, the plan results as
@@ -670,14 +684,15 @@ render_report <- function(
     # (D12). Quarto renders against the installed package, so the template
     # calls exported functions only and reads these as data.
     tmp_decl <- tempfile(fileext = ".rds")
-    saveRDS(sframe_plan_declarations(instrument, interpretations), tmp_decl)
+    saveRDS(sframe_plan_declarations(instrument, interpretations,
+                                     sframe_md_keys(instrument, references)), tmp_decl)
     temp_rds <- c(temp_rds, tmp_decl)
     # The codebook table, charts and plan results, computed once here so the
     # template only prints them (naming decision 6).
     tmp_content <- tempfile(fileext = ".rds")
     saveRDS(sframe_report_content(instrument, data, plot_palette,
                                   include_analysis = include_analysis,
-                                  results = plan_results), tmp_content)
+                                  results = plan_results, references = references), tmp_content)
     temp_rds <- c(temp_rds, tmp_content)
     tmp_prov <- tempfile(fileext = ".rds")
     saveRDS(provenance, tmp_prov)
@@ -1146,7 +1161,8 @@ sframe_clean_interpretations <- function(interpretations) {
                                                      plot_palette = plot_palette,
                                                      interpretations = interpretations,
                                                      show_code = show_code,
-                                                     results = plan_results)
+                                                     results = plan_results,
+                                                     keys = sframe_md_keys(instrument, references))
     sections <- c(sections, sprintf("<section>%s</section>", analysis_html))
   }
 
@@ -1178,7 +1194,7 @@ sframe_clean_interpretations <- function(interpretations) {
     sprintf(
       "<section><h2>Reproducibility</h2>%s%s</section>",
       .render_report_table(repro_tbl, "Reproducibility details"),
-      .render_report_amendments(instrument)
+      .render_report_amendments(instrument, sframe_md_keys(instrument, references))
     )
   )
 
@@ -1283,7 +1299,8 @@ sframe_clean_interpretations <- function(interpretations) {
                                             plot_palette = "web",
                                             interpretations = list(),
                                             show_code = TRUE,
-                                            results = NULL) {
+                                            results = NULL,
+                                            keys = sframe_md_keys(instrument)) {
   plan <- instrument$analysis_plan %||% list()
   if (length(plan) == 0) {
     return("")
@@ -1295,15 +1312,17 @@ sframe_clean_interpretations <- function(interpretations) {
   # The sources of the hypotheses beside them, then the block's own (8b-R).
   declaration_html <- function(b) {
     id <- as.character(b$block_id %||% b$id %||% "")[1]
-    paste0(sframe_declaration_html(b),
+    paste0(sframe_declaration_html(b, keys),
            sframe_sources_html(instrument, paste0("hypothesis:", id), "Sources for the hypotheses"),
            sframe_sources_html(instrument, paste0("plan:", id)))
   }
   interp_html <- function(block) {
-    text <- sframe_written_interpretation(block, interpretations)
-    if (!nzchar(text)) return("")
-    sprintf("<p><strong>%s:</strong> %s</p>", sframe_interpretation_label,
-            htmltools_escape(text))
+    sframe_labelled_html(sframe_interpretation_label,
+                         sframe_written_interpretation(block, interpretations), keys)
+  }
+  rq_html <- function(q, i) {
+    sframe_field_html(gsub("\\s*\n\\s*", " ", q %||% paste("Research Question", i)), keys,
+                      inline = TRUE)
   }
 
   blocks <- if (is.null(data)) {
@@ -1315,7 +1334,7 @@ sframe_clean_interpretations <- function(interpretations) {
         c(
           "<div class=\"rq-block\">",
           sprintf("<h3>RQ %d: %s</h3>", i,
-                  htmltools_escape(rq$research_question %||% paste("Research Question", i))),
+                  rq_html(rq$research_question, i)),
           sprintf("<p><strong>Planned test:</strong> %s</p>",
                   htmltools_escape(sframe_analysis_method(rq))),
           sprintf("<p><strong>Variables:</strong> %s</p>",
@@ -1419,7 +1438,7 @@ sframe_clean_interpretations <- function(interpretations) {
         c(
           "<div class=\"rq-block\">",
           sprintf("<h3>RQ %d: %s</h3>", i,
-                  htmltools_escape(result$research_question %||% paste("Research Question", i))),
+                  rq_html(result$research_question, i)),
           if (nzchar(declared)) declared,
           if (sframe_result_exploratory(result))
             sprintf("<p class=\"sf-exploratory\"><strong>%s</strong></p>", sframe_exploratory_label),
@@ -1440,17 +1459,17 @@ sframe_clean_interpretations <- function(interpretations) {
     }, character(1))
   }
 
-  paste(c("<h2>Analysis Plan</h2>", sframe_study_html(instrument), blocks), collapse = "\n")
+  paste(c("<h2>Analysis Plan</h2>", sframe_study_html(instrument, keys), blocks), collapse = "\n")
 }
 
 # The study at the head of the plan section (D13 in the report, 8b-R): the
 # problem, its sources, and the trace from objectives to research questions.
-sframe_study_html <- function(instrument) {
+sframe_study_html <- function(instrument, keys = sframe_md_keys(instrument)) {
   s <- sframe_report_study(instrument)
   if (is.null(s)) return("")
   paste(c(
     "<div class=\"sf-study\">", "<h3>Study</h3>",
-    if (length(s$problem)) sprintf("<p><strong>Problem:</strong> %s</p>", htmltools_escape(s$problem)),
+    if (length(s$problem)) sframe_labelled_html("Problem", s$problem, keys),
     sframe_sources_html(instrument, "study"),
     if (!is.null(s$trace)) .render_report_table(s$trace, "Objectives and the research questions that serve them"),
     if (length(s$unlinked)) sprintf("<p class=\"tbl-note\">Research questions that name no objective: %s.</p>",
@@ -1543,7 +1562,9 @@ sframe_study_html <- function(instrument) {
 # 2 engines report the same numbers. `results` is a character string when
 # the plan could not run, and NULL when there is no data or no plan.
 sframe_report_content <- function(instrument, data = NULL, plot_palette = "web",
-                                  include_analysis = TRUE, results = NULL) {
+                                  include_analysis = TRUE, results = NULL,
+                                  references = NULL) {
+  keys <- sframe_md_keys(instrument, references)
   items_d <- sframe_codebook_items_display(sframe_codebook(instrument))
   items_d$reverse  <- ifelse(items_d$reverse,  "Yes", "")
   items_d$required <- ifelse(items_d$required, "Yes", "")
@@ -1569,6 +1590,7 @@ sframe_report_content <- function(instrument, data = NULL, plot_palette = "web",
       title <- sframe_result_float_title(r, i)
       r$caption_html <- htmltools_escape(title)
       r$caption_text <- title
+      r$research_question_md <- sframe_field_md_line(r$research_question, keys)
       r$exploratory <- sframe_result_exploratory(r)
       r$exploratory_label <- sframe_exploratory_label
       r$figure_open <- sframe_apa_figure_open(title, paste("Chart of the result for", title))
@@ -1587,18 +1609,37 @@ sframe_report_content <- function(instrument, data = NULL, plot_palette = "web",
     if (!is.null(note)) quality_note <- htmltools_escape(note)
   }
   list(codebook_items = items_d, charts = charts, results = results,
-       study = sframe_report_study(instrument),
+       study = sframe_report_study(instrument, keys),
+       research_questions_md = vapply(instrument$analysis_plan %||% list(), function(b)
+         sframe_field_md_line(b$research_question, keys), character(1)),
+       amendment_notes_md = sframe_amendment_notes_md(instrument, keys),
        amendments = sframe_report_amendments(instrument),
        quality_note = quality_note)
 }
 
 # The amendment list in the built-in report, under Reproducibility: the
 # version a reader holds and how it got there.
-.render_report_amendments <- function(instrument) {
+.render_report_amendments <- function(instrument, keys = sframe_md_keys(instrument)) {
   tab <- sframe_report_amendments(instrument)
   if (is.null(tab)) return("<p>No amendments are recorded.</p>")
+  # Each deviation report formatted below the table, which keeps it as typed.
+  notes <- vapply(seq_len(nrow(tab)), function(k) {
+    sframe_labelled_html(sprintf("Deviation report, amendment %d", k), tab$`Deviation report`[k], keys)
+  }, character(1))
   paste0(sprintf("<h3>Amendments (%d)</h3>", nrow(tab)),
-         .render_report_table(tab, "Amendments, oldest first"))
+         .render_report_table(tab, "Amendments, oldest first"),
+         paste(notes[nzchar(notes)], collapse = "\n"))
+}
+
+# The deviation reports as Markdown for the Quarto template.
+sframe_amendment_notes_md <- function(instrument, keys = sframe_md_keys(instrument)) {
+  tab <- sframe_report_amendments(instrument)
+  if (is.null(tab)) return(character(0))
+  out <- vapply(seq_len(nrow(tab)), function(k) {
+    sframe_labelled_md(sprintf("Deviation report, amendment %d", k),
+                       sframe_field_md(tab$`Deviation report`[k], keys))
+  }, character(1))
+  out[nzchar(out)]
 }
 
 # Distribution charts (item bars, grouped Likert scales, matrix questions,

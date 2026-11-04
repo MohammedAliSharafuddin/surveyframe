@@ -43,21 +43,47 @@ sframe_written_interpretation <- function(block, interpretations = list()) {
   if (identical(text, sframe_written_text(block$decision_rule))) "" else text
 }
 
+# A labelled field as HTML: the label and the text on 1 line when the text
+# is 1 paragraph, else the label above it. The text may hold Markdown (8b-R).
+sframe_labelled_html <- function(label, text, keys = character(0)) {
+  html <- sframe_field_html(text, keys)
+  if (!nzchar(html)) return("")
+  if (grepl("^<p>", html) && !grepl("</p>\\s*<", html)) {
+    sub("^<p>", sprintf("<p><strong>%s:</strong> ", label), html)
+  } else {
+    paste0(sprintf("<p><strong>%s:</strong></p>", label), html)
+  }
+}
+
+# The same for the Quarto template, as Markdown.
+sframe_labelled_md <- function(label, md) {
+  if (!nzchar(md)) return("")
+  if (grepl("\n", md, fixed = TRUE)) sprintf("**%s:**\n\n%s\n\n", label, md)
+  else sprintf("**%s:** %s\n\n", label, md)
+}
+
 # The declaration as HTML paragraphs, one per field written, or "".
-sframe_declaration_html <- function(block) {
+sframe_declaration_html <- function(block, keys = character(0)) {
   d <- sframe_plan_declaration(block)
   if (length(d) == 0) return("")
-  paste(sprintf("<p><strong>%s:</strong> %s</p>", names(d),
-                vapply(d, htmltools_escape, character(1))), collapse = "\n")
+  paste(vapply(names(d), function(l) sframe_labelled_html(l, d[[l]], keys), character(1)),
+        collapse = "\n")
 }
 
 # Every block's declaration and written interpretation, keyed by block id,
 # for the Quarto template, with the label the interpretation prints under.
-sframe_plan_declarations <- function(instrument, interpretations = list()) {
+sframe_plan_declarations <- function(instrument, interpretations = list(),
+                                     keys = sframe_md_keys(instrument)) {
   plan <- instrument$analysis_plan %||% list()
   blocks <- lapply(plan, function(b) {
-    list(declaration = sframe_plan_declaration(b),
-         interpretation = sframe_written_interpretation(b, interpretations))
+    d <- sframe_plan_declaration(b)
+    interp <- sframe_written_interpretation(b, interpretations)
+    # The same fields as safe Markdown, printed by the template (8b-R).
+    list(declaration = d,
+         interpretation = interp,
+         declaration_md = vapply(names(d), function(l) sframe_labelled_md(l, sframe_field_md(d[[l]], keys)),
+                                 character(1)),
+         interpretation_md = sframe_labelled_md(sframe_interpretation_label, sframe_field_md(interp, keys)))
   })
   names(blocks) <- vapply(plan, function(b) as.character(b$id %||% "")[1], character(1))
   list(interpretation_label = sframe_interpretation_label, blocks = blocks)

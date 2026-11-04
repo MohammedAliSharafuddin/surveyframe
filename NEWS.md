@@ -308,6 +308,20 @@ style.
 
 ## The study an instrument serves
 
+* **Text fields may hold Markdown and equations.** A research question,
+  H0, H1, decision rule, interpretation, study problem or deviation report
+  may use bold, italic, lists, links, `[@key]` citations, `~sub~`, `^sup^`,
+  footnotes and equations (`$...$`, `$$...$$`, by Pandoc's rule, so
+  "$5 and $10" stays prose). The `.sframe` keeps the text as typed. The
+  Quarto report renders equations as MathML in HTML, so an offline report
+  shows them, and as native equations in Word, OpenDocument and PDF. The
+  built-in page renders the Markdown with commonmark, now in Imports, and
+  prints each equation's TeX in monospace. Plain prose holding @, #, $ or *
+  prints exactly as typed. Shortcodes, raw blocks, `:::` fences, heading
+  lines, a `---` line and HTML tags print as typed in both engines, R code
+  in a field never runs, and `@word` is a citation only for a known key, so
+  an email address or a handle never becomes a missing citation. A
+  deviation report is formatted below the amendments table.
 * **A tested result with no hypothesis declared is labelled exploratory.**
   A block whose result gives a p value and that declared no H0 and no H1
   prints "Exploratory: no hypothesis declared before the data" before its
