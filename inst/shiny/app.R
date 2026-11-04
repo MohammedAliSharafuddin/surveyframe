@@ -2971,6 +2971,13 @@ server <- function(input, output, session) {
   })
 
   output$open_status <- renderUI({
+    tagList(studio_open_badge(),
+      if (!is.null(rv$instrument)) tags$a(class = "open-version", href = "#", `data-tab` = "amendments",
+        id = "open_status_version", sframe_studio_version_label(rv$instrument)))
+  })
+
+  # The integrity badge (UX-12), with the version and count beside it.
+  studio_open_badge <- function() {
     message <- rv$open_verification
     if (is.null(message)) {
       status_badge(FALSE, "Integrity verified", "No file checked")
@@ -2984,10 +2991,12 @@ server <- function(input, output, session) {
     } else {
       tags$div(
         tags$span(class = "badge badge-warn", "Not verified"),
-        tags$p(class = "hint", message)
+        tags$p(class = "hint", message),
+        tags$a(href = "#", `data-tab` = "amendments", id = "open_verify_link",
+               "Record the change on Amendments, or open the file again")
       )
     }
-  })
+  }
 
   output$instrument_summary_card <- renderUI({
     req(rv$instrument)
@@ -3009,11 +3018,12 @@ server <- function(input, output, session) {
           tags$div(class = "stat-lbl", "Models")),
         tags$div(class = "stat-box",
           tags$div(class = "stat-val", id = "open_version", sframe_studio_version_label(instr)),
-          tags$div(class = "stat-lbl", "Version")),
+          tags$a(class = "stat-lbl", href = "#", `data-tab` = "amendments", id = "open_version_link", "Version: see Amendments")),
         tags$div(class = "stat-box",
-          tags$div(class = "stat-val",
-                   if (isTRUE(instr$meta$validated)) "Valid" else "Draft"),
-          tags$div(class = "stat-lbl", "Status"))
+          tags$div(class = "stat-val", id = "open_schema_status",
+                   if (isTRUE(instr$meta$validated)) "Schema valid" else "Draft"),
+          if (isTRUE(instr$meta$validated)) tags$div(class = "stat-lbl", "Status")
+          else tags$a(class = "stat-lbl", href = "#", `data-tab` = "design", id = "open_status_link", "Status: fix in Design"))
       )
     )
   })
