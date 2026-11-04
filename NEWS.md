@@ -1088,6 +1088,13 @@ style.
 
 ## SurveyStudio
 
+* **Analyse runs the declared plan** (UX-02). It shows the plan read-only,
+  with the method, variables, declared hypotheses and a cross-tab's
+  percentages, and runs it. Its Plan and Report outline tabs, its plan
+  editor and its model builder are gone: "Change plan" opens Plan, the only
+  plan editor. A plan changed once responses are loaded opens the amendment
+  dialog as a design amendment, with the changed blocks in the deviation
+  report, so the report's amendment list discloses them.
 * **Studio finds Quarto where `render_report()` does**, including the copy
   bundled with RStudio or Positron, and its status line gives the version
   and where it was found, such as "Quarto 1.8.24, found on the PATH".

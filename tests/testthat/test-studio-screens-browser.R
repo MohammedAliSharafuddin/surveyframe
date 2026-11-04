@@ -51,7 +51,7 @@ test_that("every Studio screen draws its content when opened", {
   screens <- c(
     open = "instrument_summary_card", preview = "survey_preview_items",
     responses = "responses_summary_card", quality = "studio_quality_chart",
-    reliability = "reliability_output", analysis = "analysis_left_panel",
+    reliability = "reliability_output", analysis = "analysis_declared_plan",
     dashboard = "studio_dashboard_content", export = "export_sframe_ui")
   for (tab in names(screens)) {
     js(sprintf("document.querySelector('[data-tab=\"%s\"]').click(); true", tab))

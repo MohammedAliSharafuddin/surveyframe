@@ -34,3 +34,82 @@ test_that("Studio asks sframe_quarto_find(), never Sys.which()", {
   expect_false(any(grepl('Sys.which("quarto")', src, fixed = TRUE)))
   expect_true(any(grepl("sframe_studio_quarto_note()", src, fixed = TRUE)))
 })
+
+# UI-1 item 3 (UX-02): Analyse shows the declared plan read-only and runs it.
+
+test_that("the declared plan names each method, or says what is missing", {
+  ins <- sframe_demo("factor_structure")$instrument
+  ins$analysis_plan[[1]]$method <- NULL
+  ins$analysis_plan[[1]]$test <- NULL
+  ins$analysis_plan[[2]]$method <- "made_up_test"
+  tbl <- surveyframe:::sframe_studio_declared_plan(ins, c(efa_readiness = "EFA readiness"))
+  expect_identical(names(tbl), c("ID", "Research question", "Method", "Variables",
+                                 "Percentages", "Hypotheses", "Runs"))
+  expect_identical(tbl$Method, c("No method declared",
+                                 "made_up_test (not a method Studio knows)"))
+
+  ins2 <- sframe_demo("factor_structure")$instrument
+  m <- ins2$analysis_plan[[1]]$method
+  tbl2 <- surveyframe:::sframe_studio_declared_plan(ins2, stats::setNames("Known label", m))
+  expect_identical(tbl2$Method[1], "Known label")
+  expect_null(surveyframe:::sframe_studio_declared_plan(
+    sframe_instrument("Empty", components = list(sframe_item("q", "Q", "text")))))
+})
+
+test_that("a cross-tab shows its declared percentages, and syntax blocks say so", {
+  ins <- sframe_demo("factor_structure")$instrument
+  ins$analysis_plan[[1]]$method <- "crosstab"
+  ins$analysis_plan[[1]]$options <- list(percent = "row")
+  ins$analysis_plan[[2]]$method <- "chi_square"
+  ins$analysis_plan[[2]]$requires_data <- FALSE
+  ins$analysis_plan[[2]]$hypotheses <- list(null = "No association.")
+  tbl <- surveyframe:::sframe_studio_declared_plan(ins)
+  expect_identical(tbl$Percentages, c("Row percentages", "Counts only"))
+  expect_identical(tbl$Runs, c("Yes", "Syntax only"))
+  expect_identical(tbl$Hypotheses, c("None", "Declared"))
+})
+
+plan_changed_instr <- function() {
+  path <- tempfile(fileext = ".sframe")
+  write_sframe(sframe_demo("factor_structure")$instrument, path)
+  before <- read_sframe(path)
+  after <- before
+  after$analysis_plan[[2]]$research_question <- "A narrower question."
+  report <- surveyframe:::sframe_studio_plan_change_report(before, after)
+  list(report = report, instrument = suppressMessages(amend_sframe(before, after,
+    "model_respecification", "Narrowed RQ2.", tier = "design",
+    deviation_report = paste0(report, "the first wording was too broad."),
+    version = "1.1.0")))
+}
+
+test_that("a plan change after the data pre-fills the blocks it changed", {
+  x <- plan_changed_instr()
+  expect_identical(x$report,
+    "Plan changed after the responses were loaded: RQ2 changed. Reason: ")
+  ins <- sframe_demo("factor_structure")$instrument
+  expect_null(surveyframe:::sframe_studio_plan_change_report(ins, ins))
+  more <- ins
+  more$analysis_plan <- more$analysis_plan[1]
+  expect_match(surveyframe:::sframe_studio_plan_change_report(ins, more),
+               "RQ2 removed", fixed = TRUE)
+})
+
+test_that("the built-in report's amendment list carries the plan change text", {
+  f <- tempfile(fileext = ".html")
+  surveyframe:::.render_report_html(plan_changed_instr()$instrument, NULL,
+                                    output_path = f, include_analysis = FALSE)
+  doc <- paste(readLines(f, warn = FALSE), collapse = "\n")
+  expect_match(doc, "Plan changed after the responses were loaded: RQ2 changed. Reason: the first wording was too broad.", fixed = TRUE)
+})
+
+test_that("the Quarto report's amendment list carries the plan change text", {
+  skip_on_cran()
+  skip_if_not_slow()
+  skip_if(is.na(surveyframe:::sframe_quarto_find()$path), "Quarto is not installed")
+  old <- options(surveyframe.use_quarto = TRUE)
+  on.exit(options(old), add = TRUE)
+  out <- tempfile(fileext = ".html")
+  render_report(plan_changed_instr()$instrument, output_file = out, open = FALSE)
+  doc <- paste(readLines(out, warn = FALSE), collapse = "\n")
+  expect_match(doc, "Plan changed after the responses were loaded: RQ2 changed. Reason: the first wording was too broad.", fixed = TRUE)
+})
