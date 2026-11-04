@@ -763,6 +763,7 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
   <div class="mbody">
     <div class="stabs">
       <div class="stab active" onclick="showST('meta')"     id="st-meta">General</div>
+      <div class="stab"        onclick="showST('study')"    id="st-study">Study</div>
       <div class="stab"        onclick="showST('welcome')"  id="st-welcome">Welcome</div>
       <div class="stab"        onclick="showST('thankyou')" id="st-thankyou">Thank You</div>
       <div class="stab"        onclick="showST('header')"   id="st-header">Header</div>
@@ -784,6 +785,17 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
         <div class="field"><label class="fl" for="s-submit">Submit label</label><div class="fc"><input type="text" id="s-submit"></div></div>
         <div class="field"><label class="fl" for="s-theme">Theme colour</label><div class="fc color-row"><input type="color" id="s-theme-picker" value="#2563eb" aria-label="Theme colour picker" oninput="syncThemeFromPicker()"><input type="text" id="s-theme" placeholder="#2563eb" oninput="syncThemeFromText()"></div></div>
       </div>
+    </div>
+    <div class="stp" id="sp-study">
+      <div class="alert-i">The study this instrument serves: the problem, the objectives and the sampling plan. It is saved in the .sframe file and printed in the report, and never shown to respondents, since telling them the aims can bias their answers. A change to it after data collection is a design amendment.</div>
+      <div class="field"><label class="fl" for="s-problem">Problem statement</label><div class="fc"><textarea id="s-problem" rows="4" placeholder="1 short paragraph: what is not yet known, and why it matters."></textarea></div></div>
+      <div class="field"><span class="fl" id="s-objs-l">Objectives</span><div id="s-objs" role="group" aria-labelledby="s-objs-l"></div><button type="button" class="btn btn-s btn-sm" onclick="studyAddObjective()">+ Add objective</button><span class="fhint">Each has an id such as O1, and a research question names the objective it serves.</span></div>
+      <div class="field"><label class="fl" for="s-pop">Population</label><div class="fc"><input type="text" id="s-pop" placeholder="Delegates registered for the 2026 conference"></div></div>
+      <div class="frow">
+        <div class="field"><label class="fl" for="s-method">Sampling method</label><div class="fc"><select id="s-method" onchange="studyMethodSync()"><option value="">Not stated</option><optgroup label="Probability"><option value="simple_random">Simple random</option><option value="systematic">Systematic</option><option value="stratified">Stratified</option><option value="cluster">Cluster</option></optgroup><optgroup label="Non-probability"><option value="convenience">Convenience</option><option value="purposive">Purposive</option><option value="quota">Quota</option><option value="snowball">Snowball</option></optgroup><optgroup label="Whole population"><option value="census">Census</option></optgroup><option value="other">Other</option></select></div></div>
+        <div class="field"><label class="fl" for="s-n">Planned sample size</label><div class="fc"><input type="number" id="s-n" min="1" step="1"></div></div>
+      </div>
+      <div class="field" id="s-other-f" hidden><label class="fl" for="s-other">Describe the method <span class="fr">*</span></label><div class="fc"><input type="text" id="s-other"></div></div>
     </div>
     <div class="stp" id="sp-welcome">
       <div class="alert-i">The welcome page is shown before the first question. Use it to introduce the study and collect informed consent.</div>
@@ -3596,6 +3608,7 @@ function openSettings(tab){
   sv('s-gsu',r.google_sheets_url||'');sv('s-gsep',r.google_sheets_endpoint||'');
   if(h.logo_base64){var lp=document.getElementById('logoPrev');if(lp){var lMtype=h.logo_media_type||'image/png';lp.src='data:'+lMtype+';base64,'+h.logo_base64;lp.style.display='block';}document.getElementById('logoName').textContent='Logo loaded';var rb=document.getElementById('logoRmBtn');if(rb)rb.style.display='inline-flex';}
   renderRefs();
+  studyFill(S._carry&&S._carry.study);
   settingsShown=settingsInputs();
   showST(tab||'meta');openModal('m-settings');
 }
@@ -3630,8 +3643,13 @@ function syncThemeFromText(){
 function saveSettings(){
   var now=settingsInputs(),was=settingsShown||{};
   function changed(id){return now[id]!==was[id];}
-  if(!SETTINGS_TEXT.concat(SETTINGS_CHECK).some(changed)){closeModal('m-settings');toast('No settings changed','inf');return;}
+  var st=studyRead(),stChanged=JSON.stringify(st)!==studyShown;
+  if(stChanged){var sp=studyProblems(st);if(sp.length){showST('study');toast(sp[0],'err');return;}}
+  if(!stChanged&&!SETTINGS_TEXT.concat(SETTINGS_CHECK).some(changed)){closeModal('m-settings');toast('No settings changed','inf');return;}
   snap();
+  // The study is written only when its fields changed, so a study the user
+  // left alone keeps its exact form and the content hash it had.
+  if(stChanged){if(!S._carry)S._carry={};if(st)S._carry.study=st;else delete S._carry.study;studyShown=JSON.stringify(st);}
   if(!S.render||Array.isArray(S.render))S.render={};
   var R=S.render;
   // A screen's object is created only when one of its fields changes.
@@ -3660,6 +3678,70 @@ function saveSettings(){
   if(changed('s-gsep'))R.google_sheets_endpoint=now['s-gsep'];
   settingsShown=now;
   closeModal('m-settings');ra();toast('Settings saved','ok');
+}
+
+// -- Study (D13) ----------------------------------------------------------------
+// The problem, the objectives and the sampling plan, read back from the Study
+// tab in the shape write_sframe() writes: only what is declared, and no study
+// at all when nothing is.
+var studyShown=null,studyObjs=[];
+var STUDY_ID=/^[A-Za-z][A-Za-z0-9_]*$/;
+function studyFill(s){
+  s=(s&&typeof s==='object'&&!Array.isArray(s))?s:{};
+  var sp=(s.sampling&&typeof s.sampling==='object')?s.sampling:{};
+  sv('s-problem',typeof s.problem==='string'?s.problem:'');
+  studyObjs=(Array.isArray(s.objectives)?s.objectives:[]).map(function(o){return {id:String((o&&o.id)||''),text:String((o&&o.text)||'')};});
+  sv('s-pop',typeof sp.population==='string'?sp.population:'');
+  sv('s-method',typeof sp.method==='string'?sp.method:'');
+  sv('s-other',typeof sp.method_other==='string'?sp.method_other:'');
+  sv('s-n',sp.planned_n!=null?String(sp.planned_n):'');
+  renderStudyObjs();studyMethodSync();
+  studyShown=JSON.stringify(studyRead());
+}
+function renderStudyObjs(){
+  var box=document.getElementById('s-objs');if(!box)return;
+  box.innerHTML=studyObjs.length?studyObjs.map(function(o,i){var n=i+1;
+    return '<div class="frow" style="align-items:center;margin:0 0 6px"><input type="text" style="max-width:70px" aria-label="Objective '+n+' id" value="'+esc(o.id)+'" oninput="studyObjs['+i+'].id=this.value">'
+      +'<input type="text" aria-label="Objective '+n+' text" value="'+esc(o.text)+'" oninput="studyObjs['+i+'].text=this.value">'
+      +'<button type="button" class="btn btn-g btn-sm" style="color:var(--cd)" aria-label="Remove objective '+n+'" onclick="studyRemoveObjective('+i+')">Remove</button></div>';
+  }).join(''):'<p class="fhint" style="margin:0 0 6px">No objectives yet.</p>';
+}
+function studyAddObjective(){
+  var used={},k=1;studyObjs.forEach(function(o){used[o.id]=true;});while(used['O'+k])k++;
+  studyObjs.push({id:'O'+k,text:''});renderStudyObjs();
+  var box=document.getElementById('s-objs'),ins=box?box.querySelectorAll('input'):[];
+  if(ins.length)ins[ins.length-1].focus();
+}
+function studyRemoveObjective(i){studyObjs.splice(i,1);renderStudyObjs();}
+function studyMethodSync(){var f=document.getElementById('s-other-f');if(f)f.hidden=gv('s-method')!=='other';}
+function studyRead(){
+  var s={},sp={},p=gv('s-problem').trim(),pop=gv('s-pop').trim(),m=gv('s-method'),n=gv('s-n').trim();
+  if(p)s.problem=p;
+  var objs=studyObjs.map(function(o){return {id:o.id.trim(),text:o.text.trim()};}).filter(function(o){return o.id||o.text;});
+  if(objs.length)s.objectives=objs;
+  if(pop)sp.population=pop;
+  if(m)sp.method=m;
+  if(m==='other'&&gv('s-other').trim())sp.method_other=gv('s-other').trim();
+  if(n)sp.planned_n=Number(n);
+  if(Object.keys(sp).length)s.sampling=sp;
+  return Object.keys(s).length?s:null;
+}
+// What validate_sframe() would refuse, said before the study is saved.
+function studyProblems(s){
+  var out=[],ids={};s=s||{};
+  (s.objectives||[]).forEach(function(o,i){
+    if(!STUDY_ID.test(o.id))out.push('Objective '+(i+1)+' needs an id of letters, digits and underscores, starting with a letter, such as O1.');
+    else if(ids[o.id])out.push('Objective id '+o.id+' is used more than once.');
+    else if(!o.text)out.push('Objective '+o.id+' needs its text.');
+    ids[o.id]=true;
+  });
+  var sp=s.sampling||{};
+  if(sp.method==='other'&&!sp.method_other)out.push('The sampling method is Other, so describe it.');
+  if(sp.planned_n!=null&&!(sp.planned_n>=1&&Math.round(sp.planned_n)===sp.planned_n))out.push('The planned sample size must be a whole number of 1 or more.');
+  (S.analysis_plan||[]).forEach(function(b){
+    if(b&&b.objective&&!ids[b.objective])out.push('Plan '+(b.id||'')+' names objective '+b.objective+'. Keep that objective, or change the plan first.');
+  });
+  return out;
 }
 
 // -- References (0.4.3) -------------------------------------------------------
@@ -5281,7 +5363,8 @@ function studioHostInit(){
 // -- Citation picker (0.4.3) ----------------------------------------------------
 // The shared picker (field_tools.js, inlined above, the same file Studio
 // loads) on the free-text fields where a plan cites literature: the research
-// question, H0, H1, the decision rule and the interpretation. It reads the
+// question, H0, H1, the decision rule, the interpretation and the study
+// problem. It reads the
 // instrument's references as they stand, so nothing is stored twice, and a
 // built-in method reference (CSHORT) counts as a known key.
 var citeHandles={};
@@ -5298,7 +5381,7 @@ function citeCheckAll(){var P=window.SurveyframeCitationPicker;if(P)P.checkAll()
 // Settings opens on its References tab, above the plan dialog when one is open.
 function manageRefs(){openSettings('refs');}
 [['rq-q','Research question'],['rq-h0','Null hypothesis'],['rq-h1','Alternative hypothesis'],
- ['rq-interp','Decision rule']].forEach(function(f){citeAttach(f[0],f[1]);});
+ ['rq-interp','Decision rule'],['s-problem','Problem statement']].forEach(function(f){citeAttach(f[0],f[1]);});
 
 if(STUDIO_HOST)studioHostInit();
 </script>
