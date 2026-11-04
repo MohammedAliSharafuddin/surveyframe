@@ -1,0 +1,197 @@
+# tests/testthat/test-builder-study.R
+#
+# D13 in SurveyBuilder: the Study tab of Survey settings edits the study an
+# instrument serves, the problem, the objectives and the sampling plan, run
+# under V8 (helper-v8-builder.R). What it saves goes back through
+# read_sframe() and validate_sframe(). A study left alone keeps its content
+# hash, and the builder refuses what the validator would.
+
+study_instrument <- function(study = NULL, objective = NULL) {
+  block <- list(id = "rq1", research_question = "Does satisfaction differ by group?",
+                family = "group_comparison", method = "t_test_ind", test = "t_test_ind",
+                roles = list(outcome = "sat", group = "group"),
+                variables = c("sat", "group"))
+  if (!is.null(objective)) block$objective <- objective
+  sframe_instrument(
+    "Study tab", version = "1.0.0",
+    components = list(
+      sframe_item("sat", "Satisfaction", type = "numeric"),
+      sframe_item("group", "Group", type = "single_choice", choice_set = "yn"),
+      sframe_choice_set("yn", c("0", "1"), c("No", "Yes"))),
+    analysis_plan = list(block), study = study)
+}
+
+a_study <- list(
+  problem = "Why do delegates not return?",
+  objectives = list(list(id = "O1", text = "Describe the reasons for not returning.")),
+  sampling = list(population = "Delegates of 2026", method = "convenience", planned_n = 120L))
+
+study_save <- function(ctx, inputs = list(), objs = NULL) {
+  ctx$call("openSettings", "study")
+  for (id in names(inputs)) {
+    ctx$eval(sprintf("document.getElementById(%s).value = %s;",
+                     jsonlite::toJSON(id, auto_unbox = TRUE),
+                     jsonlite::toJSON(inputs[[id]], auto_unbox = TRUE)))
+  }
+  if (!is.null(objs)) ctx$eval(sprintf("studyObjs = %s;", jsonlite::toJSON(objs, auto_unbox = TRUE)))
+  ctx$call("saveSettings")
+}
+
+test_that("a study opened and saved untouched keeps the content hash", {
+  # The file as written is the reference: a plan block built by hand is
+  # normalised on writing, so the object in memory hashes differently.
+  src <- tempfile(fileext = ".sframe")
+  write_sframe(study_instrument(a_study, objective = "O1"), src)
+  ins <- read_sframe(src)
+  ctx <- builder_context()
+  builder_open(ctx, ins)
+  study_save(ctx)
+  back <- read_sframe(builder_save(ctx))
+  expect_identical(sframe_content_hash(back), sframe_content_hash(ins))
+  expect_match(builder_toasts(ctx)$msg, "No settings changed", fixed = TRUE, all = FALSE)
+})
+
+test_that("the Study tab shows the study as saved", {
+  ctx <- builder_context()
+  builder_open(ctx, study_instrument(a_study))
+  ctx$call("openSettings", "study")
+  expect_identical(ctx$get("document.getElementById('s-problem').value"), a_study$problem)
+  expect_identical(ctx$get("document.getElementById('s-method').value"), "convenience")
+  expect_identical(ctx$get("document.getElementById('s-n').value"), "120")
+  expect_identical(ctx$get("studyObjs")$id, "O1")
+})
+
+test_that("a study typed in saves in the shape write_sframe() writes", {
+  ctx <- builder_context()
+  builder_open(ctx, study_instrument(), new_instrument = TRUE)
+  study_save(ctx,
+             list(`s-problem` = "  Why do delegates not return?  ", `s-pop` = "Delegates of 2026",
+                  `s-method` = "other", `s-other` = "Intercept at the exit", `s-n` = "120"),
+             objs = list(list(id = "O1", text = "Describe the reasons."),
+                         list(id = "O2", text = "Compare first-time and repeat delegates."),
+                         list(id = "", text = "")))
+  back <- read_sframe(builder_save(ctx))
+  st <- sframe_get_study(back)
+  expect_identical(st$problem, "Why do delegates not return?")
+  expect_identical(vapply(st$objectives, function(o) o$id, ""), c("O1", "O2"))
+  expect_identical(st$sampling$method_other, "Intercept at the exit")
+  expect_identical(st$sampling$planned_n, 120L)
+  expect_true(validate_sframe(back)$valid)
+})
+
+test_that("method_other is dropped when the method is not Other", {
+  ctx <- builder_context()
+  builder_open(ctx, study_instrument(), new_instrument = TRUE)
+  study_save(ctx, list(`s-method` = "quota", `s-other` = "left over"))
+  back <- read_sframe(builder_save(ctx))
+  expect_identical(back$study$sampling, list(method = "quota"))
+})
+
+test_that("the builder refuses what the validator refuses, and saves nothing", {
+  cases <- list(
+    list(inputs = list(`s-method` = "other"), msg = "The sampling method is Other, so describe it."),
+    list(inputs = list(`s-n` = "2.5"), msg = "The planned sample size must be a whole number of 1 or more."),
+    list(objs = list(list(id = "1st", text = "x")), msg = "Objective 1 needs an id"),
+    list(objs = list(list(id = "O1", text = "a"), list(id = "O1", text = "b")),
+         msg = "Objective id O1 is used more than once."),
+    list(objs = list(list(id = "O1", text = "")), msg = "Objective O1 needs its text."))
+  for (case in cases) {
+    ctx <- builder_context()
+    builder_open(ctx, study_instrument(), new_instrument = TRUE)
+    study_save(ctx, if (is.null(case$inputs)) list() else case$inputs, case$objs)
+    expect_match(builder_toasts(ctx)$msg, case$msg, fixed = TRUE, all = FALSE)
+    expect_null(read_sframe(builder_save(ctx))$study)
+  }
+})
+
+test_that("an objective a plan names cannot be removed", {
+  ctx <- builder_context()
+  builder_open(ctx, study_instrument(a_study, objective = "O1"))
+  study_save(ctx, objs = list(list(id = "O2", text = "Another aim.")))
+  expect_match(builder_toasts(ctx)$msg, "Plan rq1 names objective O1.", fixed = TRUE, all = FALSE)
+  expect_identical(read_sframe(builder_save(ctx))$study$objectives[[1]]$id, "O1")
+})
+
+test_that("clearing every field drops the study", {
+  ctx <- builder_context()
+  builder_open(ctx, study_instrument(a_study), new_instrument = TRUE)
+  study_save(ctx, list(`s-problem` = "", `s-pop` = "", `s-method` = "", `s-n` = ""), objs = list())
+  path <- builder_save(ctx)
+  expect_false(grepl("\"study\"", paste(readLines(path), collapse = "\n"), fixed = TRUE))
+})
+
+# -- The objective a plan block serves ------------------------------------------
+
+# The objective as the builder holds it. The V8 page has no role selects, so a
+# plan saved here has no roles and could not pass read_sframe().
+plan_objective <- function(ctx) ctx$get("S.analysis_plan[0].objective")
+
+plan_context <- function() {
+  ctx <- builder_context()
+  ctx$eval("function clearInterval(){} function clearTimeout(){}
+            function setTimeout(){ return 0; }")
+  ctx
+}
+
+two_objectives <- list(
+  problem = "Why do delegates not return?",
+  objectives = list(list(id = "O1", text = "Describe the reasons."),
+                    list(id = "O2", text = "Compare the groups.")))
+
+test_that("editing a plan keeps the objective it serves", {
+  ctx <- plan_context()
+  builder_open(ctx, study_instrument(two_objectives, objective = "O1"))
+  ctx$call("openRQModal", "rq1")
+  expect_identical(ctx$get("document.getElementById('rq-obj').value"), "O1")
+  expect_false(ctx$get("document.getElementById('rq-obj-field').hidden"))
+  ctx$call("saveRQ")
+  expect_identical(plan_objective(ctx), "O1")
+})
+
+test_that("the plan dialog sets and clears the objective", {
+  ctx <- plan_context()
+  builder_open(ctx, study_instrument(two_objectives, objective = "O1"))
+  ctx$call("openRQModal", "rq1")
+  ctx$eval("document.getElementById('rq-obj').value = 'O2';")
+  ctx$call("saveRQ")
+  expect_identical(plan_objective(ctx), "O2")
+  ctx$call("openRQModal", "rq1")
+  ctx$eval("document.getElementById('rq-obj').value = '';")
+  ctx$call("saveRQ")
+  expect_null(plan_objective(ctx))
+})
+
+test_that("with no study objectives the field is hidden and nothing is written", {
+  ctx <- plan_context()
+  builder_open(ctx, study_instrument())
+  ctx$call("openRQModal", "rq1")
+  expect_true(ctx$get("document.getElementById('rq-obj-field').hidden"))
+  ctx$call("saveRQ")
+  expect_null(plan_objective(ctx))
+})
+
+# -- An empty study on save (found by session V, 2026-11-04) -----------------
+
+empty_study_ctx <- function(study_json) {
+  src <- tempfile(fileext = ".sframe")
+  write_sframe(study_instrument(), src)
+  txt <- paste(readLines(src, warn = FALSE), collapse = "\n")
+  # The study is put in by hand, as a file from elsewhere could hold it.
+  txt <- sub("^\\{", paste0("{\n  \"study\": ", study_json, ","), txt)
+  ctx <- builder_context()
+  ctx$call("openSframeText", txt)
+  ctx
+}
+saved_study <- function(ctx) {
+  ctx$get("(function(){var p=sframePayload();return p.hasOwnProperty('study')?p.study:'absent';})()")
+}
+
+test_that("a study opened as {} is saved without a study", {
+  expect_identical(saved_study(empty_study_ctx("{}")), "absent")
+})
+
+test_that("empty objectives and sampling are left out, and the rest kept", {
+  ctx <- empty_study_ctx('{"problem": "Why?", "objectives": [], "sampling": {}}')
+  expect_identical(saved_study(ctx), list(problem = "Why?"))
+  expect_identical(saved_study(empty_study_ctx('{"objectives": [], "sampling": {}}')), "absent")
+})

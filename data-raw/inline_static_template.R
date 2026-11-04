@@ -1,9 +1,12 @@
 # data-raw/inline_static_template.R
-# Re-inlines inst/static_survey/template.html and collector_template.gs into
+# Re-inlines inst/static_survey/template.html, collector_template.gs and
+# inst/builder/field_tools.js into
 # inst/builder/survey_builder.html between the STATIC_TEMPLATE_START/END and
-# COLLECTOR_TEMPLATE_START/END markers. The builder's Export survey and
-# Generate collector features stay single-sourced with the R export path.
-# Run after any edit to template.html or collector_template.gs.
+# COLLECTOR_TEMPLATE_START/END and FIELD_TOOLS_START/END markers. The
+# builder's Export survey and Generate collector features stay single-sourced
+# with the R export path, and its citation picker with Studio's.
+# Run after any edit to template.html, collector_template.gs or
+# field_tools.js.
 # Recreated 2026-07-08 from the marker format in survey_builder.html; the
 # original script was gitignored on main and lost.
 # Tracked on main since 2026-09-17 (0.4.2), where the release is built.
@@ -11,11 +14,13 @@
 # copies and these templates differ, so run this after editing either.
 
 builder_path   <- file.path("inst", "builder", "survey_builder.html")
+tools_path    <- file.path("inst", "builder", "field_tools.js")
 template_path  <- file.path("inst", "static_survey", "template.html")
 collector_path <- file.path("inst", "static_survey", "collector_template.gs")
 
 stopifnot(file.exists(builder_path), file.exists(template_path),
-          file.exists(collector_path))
+          file.exists(collector_path),
+          file.exists(tools_path))
 
 read_utf8 <- function(path) readLines(path, encoding = "UTF-8", warn = FALSE)
 
@@ -54,6 +59,16 @@ builder <- replace_block(
   "<!-- COLLECTOR_TEMPLATE_START:",
   "<!-- COLLECTOR_TEMPLATE_END -->",
   collector_block
+)
+
+# The shared citation picker, a plain script, so the builder still opens
+# from a copied file with no sibling files beside it.
+tools_block <- c("<script>", escape_script(read_utf8(tools_path)), "</script>")
+builder <- replace_block(
+  builder,
+  "<!-- FIELD_TOOLS_START:",
+  "<!-- FIELD_TOOLS_END -->",
+  tools_block
 )
 
 writeLines(builder, builder_path, useBytes = TRUE)
