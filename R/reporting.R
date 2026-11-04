@@ -1421,6 +1421,8 @@ sframe_clean_interpretations <- function(interpretations) {
           sprintf("<h3>RQ %d: %s</h3>", i,
                   htmltools_escape(result$research_question %||% paste("Research Question", i))),
           if (nzchar(declared)) declared,
+          if (sframe_result_exploratory(result))
+            sprintf("<p class=\"sf-exploratory\"><strong>%s</strong></p>", sframe_exploratory_label),
           sprintf("<p class=\"apa\"><strong>Result:</strong> %s</p>",
                   if (!is.null(result$apa)) sframe_apa_html(result$apa)
                   else htmltools_escape(result$error %||% "")),
@@ -1567,6 +1569,8 @@ sframe_report_content <- function(instrument, data = NULL, plot_palette = "web",
       title <- sframe_result_float_title(r, i)
       r$caption_html <- htmltools_escape(title)
       r$caption_text <- title
+      r$exploratory <- sframe_result_exploratory(r)
+      r$exploratory_label <- sframe_exploratory_label
       r$figure_open <- sframe_apa_figure_open(title, paste("Chart of the result for", title))
       r
     }, results, seq_along(results))

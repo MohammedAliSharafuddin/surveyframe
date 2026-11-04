@@ -62,3 +62,25 @@ sframe_plan_declarations <- function(instrument, interpretations = list()) {
   names(blocks) <- vapply(plan, function(b) as.character(b$id %||% "")[1], character(1))
   list(interpretation_label = sframe_interpretation_label, blocks = blocks)
 }
+
+# Planned or exploratory (owner 2026-11-04). A result carries a significance
+# test when its APA line gives a p value or its table has a p column. One
+# that does, from a block that declared no H0 and no H1 before the data, is
+# exploratory, and both reports say so before the result. The 2 placeholder
+# sentences count as not declared. A missing hypothesis stays valid.
+sframe_exploratory_label <- "Exploratory: no hypothesis declared before the data"
+
+sframe_result_has_p <- function(result) {
+  apa <- paste(as.character(result$apa %||% ""), collapse = " ")
+  if (grepl("(^|[^A-Za-z])p [<=>]", apa)) return(TRUE)
+  tbl <- result$table
+  is.data.frame(tbl) && any(grepl("^p$|^p\\.value$|^p_value$|^Pr\\(>", names(tbl), ignore.case = TRUE))
+}
+
+sframe_result_exploratory <- function(result) {
+  if (!is.list(result) || !is.null(result$error)) return(FALSE)
+  d <- sframe_plan_declaration(result)
+  declared <- any(c("Null hypothesis (H0)", "Alternative hypothesis (H1)") %in% names(d))
+  sframe_result_has_p(result) && !declared
+}
+
