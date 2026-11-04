@@ -526,9 +526,16 @@ if (!has_data) {
         if (show_code) {
           code <- sframe_syntax_result(r)
           if (!is.null(code)) {
-            cat("\n::: {.callout-note collapse=\"true\" title=\"Show R code\"}\n")
+            # Folded in HTML. Elsewhere a fold means nothing, and a callout in
+            # Typst makes Quarto import a Typst package from the network, so
+            # the code prints as a plain labelled block.
+            if (out_html) {
+              cat("\n::: {.callout-note collapse=\"true\" title=\"Show R code\"}\n")
+            } else {
+              cat("\n*R code:*\n\n")
+            }
             cat("```r\n", paste(code, collapse = "\n"), "\n```\n", sep = "")
-            cat(":::\n\n")
+            if (out_html) cat(":::\n\n") else cat("\n")
           }
         }
         # The chart for this result sits directly under its table, as one

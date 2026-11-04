@@ -52,8 +52,7 @@ built-in HTML page through \code{\link[pagedown:chrome_print]{pagedown::chrome_p
 pagedown package (in Suggests) and a local Chrome or Chromium. The
 returned path's \code{"converter"} attribute names the route:
 \code{"quarto-latex"}, \code{"quarto-typst"}, \code{"pagedown"}, or \code{"quarto"} for
-Word and OpenDocument. The first Typst render of a session downloads a
-Typst package Quarto's template imports, unless it is already cached.
+Word and OpenDocument. Every route renders offline.
 \code{"qmd"} writes the Quarto source of the report as a folder, named by
 \code{output_file} (a trailing \code{.qmd} is dropped), which must be new or empty:
 \code{report.qmd}, the \code{.sframe}, \code{responses.csv}, the bibliography and its
