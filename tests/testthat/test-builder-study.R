@@ -169,3 +169,29 @@ test_that("with no study objectives the field is hidden and nothing is written",
   ctx$call("saveRQ")
   expect_null(plan_objective(ctx))
 })
+
+# -- An empty study on save (found by session V, 2026-11-04) -----------------
+
+empty_study_ctx <- function(study_json) {
+  src <- tempfile(fileext = ".sframe")
+  write_sframe(study_instrument(), src)
+  txt <- paste(readLines(src, warn = FALSE), collapse = "\n")
+  # The study is put in by hand, as a file from elsewhere could hold it.
+  txt <- sub("^\\{", paste0("{\n  \"study\": ", study_json, ","), txt)
+  ctx <- builder_context()
+  ctx$call("openSframeText", txt)
+  ctx
+}
+saved_study <- function(ctx) {
+  ctx$get("(function(){var p=sframePayload();return p.hasOwnProperty('study')?p.study:'absent';})()")
+}
+
+test_that("a study opened as {} is saved without a study", {
+  expect_identical(saved_study(empty_study_ctx("{}")), "absent")
+})
+
+test_that("empty objectives and sampling are left out, and the rest kept", {
+  ctx <- empty_study_ctx('{"problem": "Why?", "objectives": [], "sampling": {}}')
+  expect_identical(saved_study(ctx), list(problem = "Why?"))
+  expect_identical(saved_study(empty_study_ctx('{"objectives": [], "sampling": {}}')), "absent")
+})

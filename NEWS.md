@@ -392,6 +392,10 @@ style.
 * **SurveyBuilder sets a cross-tab's percentages.** A cross-tab or
   chi-square plan has a "Percentages in the table" choice: counts only, row,
   column or percent of the total, saved as `options$percent` (UX-02).
+* **SurveyBuilder drops an empty study on save.** A file holding
+  `"study": {}` was saved with `{}` again, which `validate_sframe()` and the
+  sframe-schema profile refuse. Empty objectives and an empty sampling plan
+  are left out the same way, as `write_sframe()` does.
 * **SurveyBuilder keeps the objective a plan block serves.** Saving the plan
   dialog built the block afresh, so any edit there dropped an `objective` set
   in R. The dialog now has an "Objective served" choice listing the study's
