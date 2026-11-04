@@ -1902,6 +1902,22 @@ ui <- fluidPage(
       tags$div(id = "screen-responses", class = screen_class("responses"),
         tags$div(class = "screen-head", tags$h2(class = "screen-title", "Responses")),
         uiOutput("responses_gate"),
+        # The planned workflow first (item 12f): the Google Sheet the survey
+        # submits to, then a CSV file, then help for files from other tools.
+        tags$div(class = "card",
+          tags$div(class = "card-title", "Read responses from a deployed Google Sheet"),
+          tags$p(class = "hint",
+            "If the survey was deployed with the surveyframe Google Sheets collector, read the live responses straight from the sheet. This needs the googlesheets4 package and access to the sheet."),
+          uiOutput("sheet_pkg_note"),
+          textInput("sheet_url", "Google Sheet ID or URL",
+                    placeholder = "https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID"),
+          fluidRow(
+            column(4, textInput("sheet_tab", "Sheet tab", value = "Responses")),
+            column(4, textInput("sheet_id_col", "Column holding each response's ID", value = "respondent_id")),
+            column(4, textInput("sheet_time_col", "Column holding the submission time", value = "submitted_at"))
+          ),
+          actionButton("load_sheet_btn", "Read from Google Sheet", class = "btn-primary sf-primary")
+        ),
         tags$div(class = "card",
           tags$div(class = "card-title", "Response data"),
           fileInput("resp_file", NULL,
@@ -1913,7 +1929,7 @@ ui <- fluidPage(
             column(4, textInput("resp_time_col", "Column holding the submission time", placeholder = "e.g. submitted_at")),
             column(4, checkboxInput("resp_strict", "Refuse a file with missing or unexpected columns (strict column check)", value = TRUE))
           ),
-          actionButton("load_responses_btn", "Load responses", class = "btn-primary sf-primary")
+          actionButton("load_responses_btn", "Load responses", class = "btn-outline")
         ),
         tags$div(class = "card",
           tags$div(class = "card-title", "Loading responses collected elsewhere"),
@@ -1926,19 +1942,6 @@ ui <- fluidPage(
           ),
           downloadButton("download_sample_csv", "Download sample CSV format", class = "btn-outline"),
           actionButton("load_sample_btn", "Or load the bundled demo", class = "btn-outline")
-        ),
-        tags$div(class = "card",
-          tags$div(class = "card-title", "Read responses from a deployed Google Sheet"),
-          tags$p(class = "hint",
-            "If the survey was deployed with the surveyframe Google Sheets collector, read the live responses straight from the sheet. This needs the googlesheets4 package and access to the sheet."),
-          textInput("sheet_url", "Google Sheet ID or URL",
-                    placeholder = "https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID"),
-          fluidRow(
-            column(4, textInput("sheet_tab", "Sheet tab", value = "Responses")),
-            column(4, textInput("sheet_id_col", "Column holding each response's ID", value = "respondent_id")),
-            column(4, textInput("sheet_time_col", "Column holding the submission time", value = "submitted_at"))
-          ),
-          actionButton("load_sheet_btn", "Read from Google Sheet", class = "btn-outline")
         ),
         uiOutput("responses_summary_card"),
         uiOutput("responses_amend_card")
@@ -3196,6 +3199,13 @@ server <- function(input, output, session) {
         title = "Survey preview"
       )
     )
+  })
+
+  # Reading a sheet needs googlesheets4, so without it the card says so.
+  output$sheet_pkg_note <- renderUI({
+    if (requireNamespace("googlesheets4", quietly = TRUE)) return(NULL)
+    tags$p(class = "plan-msg", id = "sheet_pkg_missing",
+      "The googlesheets4 package is not installed, so Studio cannot read a sheet yet. Install it with install.packages(\"googlesheets4\"), or download the sheet as a CSV file and load it below.")
   })
 
   output$responses_gate <- renderUI({

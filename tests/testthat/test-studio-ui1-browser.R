@@ -348,6 +348,17 @@ test_that("each screen has exactly 1 primary action, visible without scrolling a
   expect_true(ui2_wait(b, paste0("parseInt(getComputedStyle(", doc, ".getElementById('saveBtn')).fontSize) >= 15"), 10))
 })
 
+test_that("Responses puts the Google Sheet card first, with Read from Google Sheet as its primary (item 12f)", {
+  b <- ui1_studio("factor_structure")
+  expect_true(ui1_screen(b, "responses"))
+  titles <- ui2_js(b, "$('#screen-responses > .card > .card-title').map(function(){ return $(this).text(); }).get().join('|')")
+  expect_match(titles, "^Read responses from a deployed Google Sheet\\|Response data\\|Loading responses collected elsewhere")
+  expect_identical(ui2_js(b, "$('#screen-responses .sf-primary:visible').attr('id')"), "load_sheet_btn")
+  expect_true(ui2_js(b, "$('#load_responses_btn').hasClass('btn-outline')"))
+  has_gs <- requireNamespace("googlesheets4", quietly = TRUE)
+  expect_identical(ui2_js(b, "$('#sheet_pkg_missing').is(':visible')"), !has_gs)
+})
+
 # Last, since it loads the page again, which starts Studio's session again.
 test_that("sidebar groups fold, stay folded after a reload, and a fragment into a folded group opens it", {
   b <- ui1_studio("factor_structure")
