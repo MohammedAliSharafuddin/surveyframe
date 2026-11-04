@@ -307,6 +307,13 @@ style.
   objective no research question serves, a research question that names no
   objective, and a problem over 150 words. `sframe_notes()` reads the notes,
   and the diagnostic prints them.
+* **`validate_sframe()` refuses what the sframe-schema instrument profile
+  refuses in these fields**, so nothing surveyframe writes fails it. A plan
+  block's `objective` is checked with or without a study: it is `""` or 1
+  objective id such as `O1`, and an id with no study to declare it fails. A
+  hypothesis that is `NA`, written as JSON null, is refused. A study,
+  objectives or sampling that is present and empty is refused, with a message
+  to drop it. A block with no hypotheses stays valid.
 
 ## Amendments and versions
 
