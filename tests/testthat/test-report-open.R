@@ -15,6 +15,7 @@ test_that("the report's message names its full path", {
 })
 
 test_that("open = TRUE shows the report, and a script leaves it alone", {
+  rlang::local_options(surveyframe.use_quarto = FALSE)  # not a Quarto test (session T)
   shown <- NULL
   local_mocked_bindings(sframe_show = function(path, ...) shown <<- path)
   out <- tempfile(fileext = ".html"); writeLines("<html></html>", out)

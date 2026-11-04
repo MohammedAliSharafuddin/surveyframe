@@ -384,6 +384,7 @@ test_that("write_sframe/read_sframe preserve analysis plans and extended item fi
 
 # ---- render_report ----------------------------------------------------------
 test_that("render_report produces an HTML file", {
+  rlang::local_options(surveyframe.use_quarto = FALSE)  # not a Quarto test (session T)
   skip_on_cran()
   tmp <- tempfile(fileext = ".html")
   render_report(make_instr(), output_file = tmp)
@@ -394,6 +395,7 @@ test_that("render_report produces an HTML file", {
 })
 
 test_that("render_report codebook includes all item IDs", {
+  rlang::local_options(surveyframe.use_quarto = FALSE)  # not a Quarto test (session T)
   skip_on_cran()
   tmp <- tempfile(fileext = ".html")
   render_report(make_instr(), output_file = tmp, include_codebook = TRUE)
@@ -405,6 +407,7 @@ test_that("render_report codebook includes all item IDs", {
 })
 
 test_that("render_report accepts output_path alias", {
+  rlang::local_options(surveyframe.use_quarto = FALSE)  # not a Quarto test (session T)
   skip_on_cran()
   tmp <- tempfile(fileext = ".html")
   render_report(make_instr(), output_path = tmp)
@@ -413,6 +416,7 @@ test_that("render_report accepts output_path alias", {
 })
 
 test_that("render_report includes analysis plan questions", {
+  rlang::local_options(surveyframe.use_quarto = FALSE)  # not a Quarto test (session T)
   skip_on_cran()
   instr <- add_rq(make_instr(), "r1",
                   "Does age predict satisfaction?",
@@ -425,6 +429,7 @@ test_that("render_report includes analysis plan questions", {
 })
 
 test_that("render_report includes reliability when data supplied", {
+  rlang::local_options(surveyframe.use_quarto = FALSE)  # not a Quarto test (session T)
   skip_on_cran()
   tmp  <- tempfile(fileext = ".html")
   suppressWarnings(render_report(
