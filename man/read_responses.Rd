@@ -67,6 +67,11 @@ multiple-choice or decision item has one column per row, option, pair or
 criterion, named \code{item__sub}, and each is checked: a battery with some of its
 columns absent is reported by name. Two columns with the same name are
 refused, since one would otherwise be lost.
+
+A choice set with \code{allow_other} ("Other, please specify") adds
+\verb{<id>__other_text} to a single choice item, whose own column then holds
+the code \code{"other"} when Other is chosen, and \verb{<id>__other} (1 or 0) and
+\verb{<id>__other_text} to a multiple choice item.
 }
 
 \section{Values}{
@@ -75,7 +80,9 @@ answers arrive exactly as written, a literal \code{NA} included. Columns of item
 with numeric responses (numeric, slider and rating items, choice items whose
 codes are all numbers, and ranking, multiple-choice and decision expansion
 columns) are then converted to numbers, with an empty cell or \code{NA} read as
-missing. A column that does not convert cleanly is kept as text. Data frames
+missing. A column that does not convert cleanly is kept as text. The column
+of a single choice item that allows Other, and every \verb{<id>__other_text}
+column, stay text. Data frames
 go through the same conversion, so a CSV file and a data frame holding the
 same responses read the same.
 }

@@ -429,6 +429,11 @@ style.
   Google Sheets header, the Shiny row and the quality report all list them.
   The Shiny survey fills them as the static survey does, and the text of an
   Other does not count as a missing answer.
+* **`read_responses()` reads an Other answer.** A single choice item whose set
+  allows Other accepts the code `other`, and its column stays text whatever
+  the set's codes look like, since a numeric set with Other would otherwise
+  turn on whether anyone chose Other. Every `<id>__other_text` column is read
+  as text, and `<id>__other` as a number like the other option columns.
 * **SurveyBuilder's welcome and thank-you pages are entries in the question
   list**, "Welcome page" first and "Thank-you page" last. Selecting one opens
   its editor on the right and its preview in the centre, and the Survey

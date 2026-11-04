@@ -76,3 +76,29 @@ test_that("the text of an Other does not count as a missing answer", {
   expect_true("one" %in% q$missing$expected_columns)
   expect_identical(unname(q$missing$respondent_miss), c(0, 0))
 })
+
+test_that("read_responses() accepts the code other and reads the Other text as text", {
+  inst <- sframe_instrument(
+    "Other numeric", version = "1.0.0",
+    components = list(
+      sframe_item("one", "Source", type = "single_choice", choice_set = "src"),
+      sframe_item("many", "Used", type = "multiple_choice", choice_set = "src"),
+      sframe_item("plain", "Plain", type = "single_choice", choice_set = "num"),
+      sframe_choice_set("src", 1:2, c("Website", "A friend"), allow_other = TRUE),
+      sframe_choice_set("num", 1:2, c("Yes", "No"))))
+  data <- data.frame(one = c("1", "other", "2"), one__other_text = c("", "123", ""),
+                     many__1 = c("1", "0", "1"), many__2 = c("0", "0", "1"),
+                     many__other = c("0", "1", "0"), many__other_text = c("", "007", ""),
+                     plain = c("1", "2", "1"), stringsAsFactors = FALSE)
+  path <- tempfile(fileext = ".csv")
+  utils::write.csv(data, path, row.names = FALSE)
+  got <- read_responses(path, inst)
+  unlink(path)
+  expect_identical(got$one, c("1", "other", "2"))
+  expect_identical(got$one__other_text, c(NA, "123", NA))
+  expect_identical(got$many__other, c(0, 1, 0))
+  expect_identical(got$many__other_text, c(NA, "007", NA))
+  expect_identical(got$plain, c(1, 2, 1))
+  expect_identical(names(got), c("one", "one__other_text", "many__1", "many__2",
+                                 "many__other", "many__other_text", "plain"))
+})
