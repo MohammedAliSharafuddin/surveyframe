@@ -109,11 +109,49 @@ Design holds the SurveyBuilder, and Plan opens it in its Plan mode.
 knitr::include_graphics("figures/gui-studio-responses.png")
 ```
 
-The Amendments screen discloses a change to the open instrument: upload a
-revised `.sframe`, give a reason and an explanation, and `amend_sframe()`
-appends the change to the instrument's amendment log, where every earlier
-entry stays as it was written. Exporting the amended instrument keeps that log inside the
-`.sframe` file, readable later with `sframe_get_amendments()`.
+Every change Studio records as an amendment goes through 1 dialog. It shows
+the scales, models and plan blocks the change touches, suggests the next
+version and says why (a design amendment moves the minor number, a pipeline
+amendment the patch number), then records it with `amend_sframe()` or
+cancels. Studio opens it from 5 places: a save from Design of an instrument
+with a history, a revised `.sframe` imported on the Amendments screen,
+"Drop from scale" under a result that flags an item, "Put back" for an
+item dropped in the session, and "Record as amendment" on Quality and
+Responses after removing bots or correcting data. Put back is a second
+amendment, so the history keeps both. The Amendments screen lists that
+history oldest first, with the date, tier, reason, what changed and the
+content hashes before and after, and the status line gives the version and
+the count, such as "1.1.0, 2 amendments". Exporting the amended instrument
+keeps the log inside the `.sframe` file, readable later with
+`sframe_get_amendments()`.
+
+### The same amendment in a script
+
+The script route takes the same steps: read the instrument, find the flagged
+items, drop one, record the drop, write the file, run the plan again and
+report.
+
+```{r amend-script, eval = requireNamespace("psych", quietly = TRUE)}
+d <- sframe_demo("factor_structure")
+results <- run_analysis_plan(d$responses, d$instrument)
+flags <- sframe_item_flags(results[[2]])
+flags[, c("item", "reason")]
+
+revised <- sframe_drop_items(d$instrument, "con_4", from = "content")
+amended <- amend_sframe(d$instrument, revised,
+  reason_code = "model_respecification",
+  reason_text = flags$reason[1], tier = "design",
+  deviation_report = "con_4 dropped from content after the EFA flagged it.",
+  version = "1.1.0")
+sframe_get_amendments(amended)[, c("tier", "reason_text", "changed_fields")]
+
+path <- tempfile(fileext = ".sframe")
+write_sframe(amended, path)
+rerun <- run_analysis_plan(d$responses, read_sframe(path))
+```
+
+`render_report(read_sframe(path), d$responses)` then writes the report, whose
+Reproducibility block gives the version and the amendment list.
 
 The References screen lists the works the instrument cites and adds more from
 pasted BibTeX, each with where the instrument cites it. Citing a source needs

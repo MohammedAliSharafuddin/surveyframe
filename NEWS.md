@@ -1088,6 +1088,21 @@ style.
 
 ## SurveyStudio
 
+* **Drop from scale and Put back under a result.** Under a reliability,
+  item, EFA readiness, EFA, CFA or PLS result, each item past the usual
+  cut-offs has "Drop from scale", which opens the amendment dialog with the
+  reason from `sframe_item_flags()` filled in, records the drop and runs the
+  plan again. An item dropped in the session has "Put back", a second
+  amendment that restores the item's place in its scales and models with its
+  reverse key, so the history keeps both. After the file is opened again the
+  item goes back through Design.
+* **Quality and Responses record a change to the data.** "Record as
+  amendment" opens the same dialog for a bot removal or a data correction,
+  as a pipeline amendment.
+* **The Amendments screen gives the whole history**, oldest first: date,
+  tier, reason, what changed, the deviation report and the content hashes
+  before and after. The status line, the Amendments screen and the Open
+  card give the version and the count, such as "1.1.0, 2 amendments".
 * **1 amendment dialog, and "Edit in Design" on Amendments.** A Design save
   that changes an instrument with a history (read from a file, or amended)
   opens 1 dialog. It shows what the change touches (the fields, the scales
