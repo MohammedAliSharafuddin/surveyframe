@@ -31,7 +31,7 @@ ui1_studio <- function(demo = "factor_structure", screen = "open",
       Sys.sleep(0.5)
     }
     if (!up) {
-      proc$kill()
+      proc$kill_tree()
       testthat::skip("Studio did not start")
     }
     b <- sframe_chrome_session(width = width, height = height)
@@ -48,10 +48,12 @@ ui1_studio <- function(demo = "factor_structure", screen = "open",
   s$b
 }
 
+# kill_tree(), since kill() left a Studio child alive twice, holding its
+# memory scope and the shared test lock.
 ui1_close <- function() {
   for (demo in ls(ui1_apps)) {
     try(ui1_apps[[demo]]$b$close(), silent = TRUE)
-    try(ui1_apps[[demo]]$proc$kill(), silent = TRUE)
+    try(ui1_apps[[demo]]$proc$kill_tree(), silent = TRUE)
     rm(list = demo, envir = ui1_apps)
   }
   invisible(NULL)
