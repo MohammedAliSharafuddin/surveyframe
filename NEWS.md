@@ -1088,6 +1088,10 @@ style.
 
 ## SurveyStudio
 
+* **The Report screen has 4 tabs**, Interpret, Configure, Export report and
+  Reproduce, in place of 1 long page of 5 jobs (UX-07). A choice made in 1
+  tab stays when you switch, the arrow keys move along the tabs, and the
+  `.sframe` download is "Download copy" beside the screen title.
 * **Analyse runs the declared plan** (UX-02). It shows the plan read-only,
   with the method, variables, declared hypotheses and a cross-tab's
   percentages, and runs it. Its Plan and Report outline tabs, its plan

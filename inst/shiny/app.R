@@ -1219,6 +1219,19 @@ studio_nav_heading <- function(label) {
   tags$li(class = "studio-nav-heading", label)
 }
 
+# The Report screen's local tabs (UX-07): a tab button and its pane. The
+# panes are hidden, never redrawn, so their inputs keep their values.
+studio_report_tab <- function(id, label, on = FALSE) {
+  tags$button(type = "button", id = paste0("rtab-", id),
+    class = paste("report-tab", if (on) "active"), role = "tab",
+    `aria-selected` = if (on) "true" else "false",
+    `aria-controls` = paste0("rpane-", id), `data-rtab` = id, label)
+}
+studio_report_pane <- function(id, on, ...) {
+  tags$div(id = paste0("rpane-", id), class = paste("report-pane", if (on) "active"),
+    role = "tabpanel", `aria-labelledby` = paste0("rtab-", id), ...)
+}
+
 ui <- fluidPage(
   tags$head(
     tags$title("SurveyStudio"),
@@ -1257,6 +1270,12 @@ ui <- fluidPage(
         letter-spacing: 0.08em; text-transform: uppercase; color: #6b7190;
         cursor: default; user-select: none;
       }
+      .screen-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+      .report-tabs { display: flex; gap: 4px; border-bottom: 1px solid #d9dce6; margin-bottom: 16px; flex-wrap: wrap; }
+      .report-tab { background: none; border: none; border-bottom: 3px solid transparent; padding: 8px 14px; font-weight: 600; color: #3d4256; }
+      .report-tab.active { border-bottom-color: #1a1a2e; color: #1a1a2e; }
+      .report-pane { display: none; }
+      .report-pane.active { display: block; }
       .flag-list { margin-top: 12px; border-top: 1px solid #e3e5ee; padding-top: 8px; }
       .flag-head { font-weight: 600; margin-bottom: 4px; }
       .flag-row { display: flex; gap: 12px; align-items: center; justify-content: space-between; padding: 4px 0; }
@@ -1473,6 +1492,25 @@ ui <- fluidPage(
           e.preventDefault();
           studioPicked = true;
           studioShowScreen($(this), 'design', 'plan');
+        });
+
+        // The Report screen's local tabs: arrows move between them, as a
+        // tablist does, and a pane is only hidden, so its choices stay.
+        function studioReportTab(id) {
+          $('.report-tab').each(function() {
+            var on = $(this).data('rtab') === id;
+            $(this).toggleClass('active', on).attr('aria-selected', on ? 'true' : 'false')
+              .attr('tabindex', on ? '0' : '-1');
+          });
+          $('.report-pane').each(function() { $(this).toggleClass('active', this.id === 'rpane-' + id); });
+          $(window).trigger('resize');
+        }
+        $(document).on('click', '[data-rtab]', function() { studioReportTab($(this).data('rtab')); });
+        $(document).on('keydown', '.report-tab', function(e) {
+          if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+          var tabs = $('.report-tab'), k = tabs.index(this) + (e.key === 'ArrowRight' ? 1 : -1);
+          var next = tabs.eq((k + tabs.length) % tabs.length);
+          studioReportTab(next.data('rtab')); next.focus(); e.preventDefault();
         });
 
         Shiny.addCustomMessageHandler('surveyframe-launch-tab', studioLaunchScreen);
@@ -1782,81 +1820,92 @@ ui <- fluidPage(
       ),
 
       tags$div(id = "screen-export", class = screen_class("export"),
-        tags$h2(class = "screen-title", "Report"),
+        # Report (UX-07): 4 local tabs. Every pane stays in the page and is
+        # only hidden, so a choice made in 1 survives a switch to another.
+        # The .sframe download sits beside the title as "Download copy".
+        tags$div(class = "screen-head",
+          tags$h2(class = "screen-title", "Report"),
+          uiOutput("export_sframe_ui", inline = TRUE)),
         uiOutput("export_gate"),
-        tags$div(class = "card",
-          tags$div(class = "card-title", "Instrument file"),
-          tags$p(class = "hint",
-            "Download the current validated draft as a .sframe file."),
-          uiOutput("export_sframe_ui")
-        ),
-        tags$div(class = "card",
-          tags$div(class = "card-title", "Interpretations"),
-          tags$p(class = "hint",
-            "Open a research question to read its result and write what it means. The report shows each interpretation beside the pre-declared decision rule. Interpretations go into the report only, never into the instrument file."),
-          uiOutput("export_interpretations_ui")
-        ),
+        tags$div(class = "report-tabs", role = "tablist", `aria-label` = "Report",
+          studio_report_tab("interpret", "Interpret", TRUE),
+          studio_report_tab("configure", "Configure"),
+          studio_report_tab("export", "Export report"),
+          studio_report_tab("reproduce", "Reproduce")),
+        studio_report_pane("interpret", TRUE,
+          tags$div(class = "card",
+            tags$div(class = "card-title", "Interpretations"),
+            tags$p(class = "hint",
+              "Open a research question to read its result and write what it means. The report shows each interpretation beside the pre-declared decision rule. Interpretations go into the report only, never into the instrument file."),
+            uiOutput("export_interpretations_ui")
+          )),
         # The options render_report() takes from a host (owner 2026-10-30).
-        tags$div(class = "card",
-          tags$div(class = "card-title", "Report"),
-          uiOutput("export_engine_note"),
-          tags$div(class = "opt-row",
-            textInput("rpt_title", "Title", placeholder = "The instrument's title"),
-            textInput("rpt_authors", "Authors",
-                      placeholder = "Separated by commas. The instrument's authors")
-          ),
-          tags$div(class = "opt-row",
+        studio_report_pane("configure", FALSE,
+          tags$div(class = "card",
+            tags$div(class = "card-title", "Report options"),
+            tags$div(class = "opt-row",
+              textInput("rpt_title", "Title", placeholder = "The instrument's title"),
+              textInput("rpt_authors", "Authors",
+                        placeholder = "Separated by commas. The instrument's authors")
+            ),
+            tags$div(class = "opt-row",
+              shiny::radioButtons(
+                "rpt_palette", "Chart theme",
+                choices = c(
+                  "Colour (on-screen reading)" = "web",
+                  "Black and white (print and journal submission)" = "print"
+                ),
+                selected = "web"
+              ),
+              tags$div(tags$label(class = "control-label", "Code"),
+                checkboxInput("rpt_show_code", "Show the R code for each result", value = TRUE))
+            ),
+            tags$label(class = "control-label", "Sections"),
+            tags$div(class = "opt-grid",
+              checkboxInput("rpt_codebook", "Codebook", value = TRUE),
+              checkboxInput("rpt_quality", "Quality report", value = TRUE),
+              checkboxInput("rpt_missing", "Missing-data report", value = TRUE),
+              checkboxInput("rpt_descriptives", "Descriptives", value = TRUE),
+              checkboxInput("rpt_reliability", "Reliability", value = TRUE),
+              checkboxInput("rpt_analysis", "Analysis-plan results", value = TRUE),
+              checkboxInput("rpt_models", "Saved models and syntax", value = TRUE)
+            ),
+            tags$details(class = "opt-more",
+              tags$summary("More options: figures, citation style and further references"),
+              tags$div(class = "opt-row",
+                numericInput("rpt_fig_width", "Figure width (inches)", value = NA, min = 1, step = 0.5),
+                numericInput("rpt_fig_height", "Figure height (inches)", value = NA, min = 1, step = 0.5),
+                numericInput("rpt_fig_dpi", "Resolution (dpi)", value = NA, min = 72, step = 50),
+                selectInput("rpt_fig_format", "Figure format",
+                  choices = c("Each engine's own" = "default", "PNG" = "png", "SVG" = "svg"))
+              ),
+              tags$p(class = "hint", "Empty fields keep each engine's own figure size and resolution."),
+              fileInput("rpt_csl", "Citation style (.csl)", accept = ".csl"),
+              tags$p(class = "hint",
+                "APA 7 unless you give a style. Any style from the Zotero style repository works with Quarto."),
+              textAreaInput("rpt_bibtex", "Further references (BibTeX)", rows = 4, width = "100%",
+                placeholder = "Works your interpretations cite as [@key]. The instrument's own references are always included.")
+            )
+          )),
+        studio_report_pane("export", FALSE,
+          tags$div(class = "card",
+            tags$div(class = "card-title", "Finished report"),
+            uiOutput("export_engine_note"),
             shiny::radioButtons("rpt_format", "Format",
               choices = c("HTML" = "html", "PDF (needs pagedown and Chrome)" = "pdf"),
               selected = "html"),
-            shiny::radioButtons(
-              "rpt_palette", "Chart theme",
-              choices = c(
-                "Colour (on-screen reading)" = "web",
-                "Black and white (print and journal submission)" = "print"
-              ),
-              selected = "web"
-            ),
-            tags$div(tags$label(class = "control-label", "Code"),
-              checkboxInput("rpt_show_code", "Show the R code for each result", value = TRUE))
-          ),
-          tags$label(class = "control-label", "Sections"),
-          tags$div(class = "opt-grid",
-            checkboxInput("rpt_codebook", "Codebook", value = TRUE),
-            checkboxInput("rpt_quality", "Quality report", value = TRUE),
-            checkboxInput("rpt_missing", "Missing-data report", value = TRUE),
-            checkboxInput("rpt_descriptives", "Descriptives", value = TRUE),
-            checkboxInput("rpt_reliability", "Reliability", value = TRUE),
-            checkboxInput("rpt_analysis", "Analysis-plan results", value = TRUE),
-            checkboxInput("rpt_models", "Saved models and syntax", value = TRUE)
-          ),
-          tags$details(class = "opt-more",
-            tags$summary("More options: figures, citation style and further references"),
-            tags$div(class = "opt-row",
-              numericInput("rpt_fig_width", "Figure width (inches)", value = NA, min = 1, step = 0.5),
-              numericInput("rpt_fig_height", "Figure height (inches)", value = NA, min = 1, step = 0.5),
-              numericInput("rpt_fig_dpi", "Resolution (dpi)", value = NA, min = 72, step = 50),
-              selectInput("rpt_fig_format", "Figure format",
-                choices = c("Each engine's own" = "default", "PNG" = "png", "SVG" = "svg"))
-            ),
-            tags$p(class = "hint", "Empty fields keep each engine's own figure size and resolution."),
-            fileInput("rpt_csl", "Citation style (.csl)", accept = ".csl"),
+            uiOutput("export_report_ui"),
             tags$p(class = "hint",
-              "APA 7 unless you give a style. Any style from the Zotero style repository works with Quarto."),
-            textAreaInput("rpt_bibtex", "Further references (BibTeX)", rows = 4, width = "100%",
-              placeholder = "Works your interpretations cite as [@key]. The instrument's own references are always included.")
-          ),
-          uiOutput("export_report_ui"),
-          tags$p(class = "hint",
-            "The survey file and the Google Sheets collector are on the Collect screen.")
-        ),
-        tags$div(class = "card",
-          tags$div(class = "card-title", "Analysis notebook"),
-          tags$p(class = "hint",
-            "Writes a runnable Quarto notebook that loads the instrument and its responses, runs the pre-declared plan, and renders a report, yours to edit and re-run outside SurveyStudio."),
-          uiOutput("qmd_prepare_ui"),
-          uiOutput("qmd_downloads_ui")
-        )
+              "The survey file and the Google Sheets collector are on the Collect screen.")
+          )),
+        studio_report_pane("reproduce", FALSE,
+          tags$div(class = "card",
+            tags$div(class = "card-title", "Analysis notebook"),
+            tags$p(class = "hint",
+              "Writes a runnable Quarto notebook that loads the instrument and its responses, runs the pre-declared plan, and renders a report, yours to edit and re-run outside SurveyStudio."),
+            uiOutput("qmd_prepare_ui"),
+            uiOutput("qmd_downloads_ui")
+          ))
       )
     )
   )
@@ -3717,13 +3766,13 @@ server <- function(input, output, session) {
         tags$p(class = "hint", draft_result()$revision_problem),
         checkboxInput("export_as_new",
           "Save as a new instrument, without the previous amendment log", value = FALSE),
-        downloadButton("download_sframe_btn", "Download .sframe", class = "btn-primary")
+        downloadButton("download_sframe_btn", "Download copy", class = "btn-outline")
       )
     } else if (isTRUE(draft_result()$valid)) {
-      downloadButton("download_sframe_btn", "Download .sframe", class = "btn-primary")
+      downloadButton("download_sframe_btn", "Download copy", class = "btn-outline")
     } else {
       export_disabled_btn(
-        "Download .sframe",
+        "Download copy",
         "Open or build a valid instrument before downloading the .sframe file.")
     }
   })
@@ -3935,6 +3984,10 @@ server <- function(input, output, session) {
     tags$p(id = "quarto_status", class = paste("plan-msg", if (note$ok) "ok"), note$text)
   })
 
+  # The Export report pane is hidden until it is opened, and its link must
+  # be ready before, as a hidden output is otherwise not drawn.
+  for (o in c("export_report_ui", "export_engine_note", "qmd_prepare_ui", "qmd_downloads_ui"))
+    outputOptions(output, o, suspendWhenHidden = FALSE)
   output$download_report_btn <- downloadHandler(
     filename = function() {
       paste0(
@@ -3971,6 +4024,7 @@ server <- function(input, output, session) {
       })
     }
   )
+  outputOptions(output, "download_report_btn", suspendWhenHidden = FALSE)
 }
 
 shinyApp(ui = ui, server = server)
