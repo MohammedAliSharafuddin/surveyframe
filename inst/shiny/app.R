@@ -1795,8 +1795,9 @@ ui <- fluidPage(
             "Paste BibTeX from Google Scholar (Cite, then BibTeX), Zotero, Mendeley or a journal page. Citing a source needs no amendment, and each change applies to the open instrument at once. Export it to keep the references in the .sframe file."),
           textAreaInput("refs_bibtex", "BibTeX", rows = 6, width = "100%",
             placeholder = "@article{key, author = {Family, Given}, title = {...}, journal = {...}, year = {...}}"),
-          selectizeInput("refs_cited_by", "Cited by", choices = NULL, multiple = TRUE,
+          selectizeInput("refs_cited_by", "Where is this source used?", choices = NULL, multiple = TRUE,
             options = list(placeholder = "The instrument as a whole")),
+          tags$p(class = "hint", "Stored as the reference's cited by list in the .sframe file."),
           actionButton("refs_add_btn", "Add from BibTeX", class = "btn-primary")
         ),
         tags$div(class = "card",
@@ -1837,7 +1838,7 @@ ui <- fluidPage(
           tags$div(class = "card-title", "2. The survey file"),
           tags$p(class = "hint",
             "One HTML file holds the whole survey. Put it on any web host, such as GitHub Pages or Netlify, or send the file itself. With a collector URL, each submission goes to your sheet. Without one, the survey runs but stores nothing."),
-          textInput("collect_endpoint", "Collector web app URL", width = "100%",
+          textInput("collect_endpoint", "Web app address that receives the responses", width = "100%",
                     placeholder = "https://script.google.com/macros/s/.../exec"),
           downloadButton("collect_survey_dl", "Download survey (.html)", class = "btn-primary")
         ),
@@ -1860,9 +1861,9 @@ ui <- fluidPage(
                     buttonLabel = "Browse CSV file",
                     placeholder = "No file selected"),
           fluidRow(
-            column(4, textInput("resp_id_col", "Respondent ID column", placeholder = "e.g. id")),
-            column(4, textInput("resp_time_col", "Submitted-at column", placeholder = "e.g. submitted_at")),
-            column(4, checkboxInput("resp_strict", "Strict column check", value = TRUE))
+            column(4, textInput("resp_id_col", "Column holding each response's ID", placeholder = "e.g. id")),
+            column(4, textInput("resp_time_col", "Column holding the submission time", placeholder = "e.g. submitted_at")),
+            column(4, checkboxInput("resp_strict", "Refuse a file with missing or unexpected columns (strict column check)", value = TRUE))
           ),
           actionButton("load_responses_btn", "Load responses", class = "btn-primary")
         ),
@@ -1886,8 +1887,8 @@ ui <- fluidPage(
                     placeholder = "https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID"),
           fluidRow(
             column(4, textInput("sheet_tab", "Sheet tab", value = "Responses")),
-            column(4, textInput("sheet_id_col", "Respondent ID column", value = "respondent_id")),
-            column(4, textInput("sheet_time_col", "Submitted-at column", value = "submitted_at"))
+            column(4, textInput("sheet_id_col", "Column holding each response's ID", value = "respondent_id")),
+            column(4, textInput("sheet_time_col", "Column holding the submission time", value = "submitted_at"))
           ),
           actionButton("load_sheet_btn", "Read from Google Sheet", class = "btn-primary")
         ),
@@ -1994,8 +1995,8 @@ ui <- fluidPage(
               checkboxInput("rpt_missing", "Missing-data report", value = TRUE),
               checkboxInput("rpt_descriptives", "Descriptives", value = TRUE),
               checkboxInput("rpt_reliability", "Reliability", value = TRUE),
-              checkboxInput("rpt_analysis", "Analysis-plan results", value = TRUE),
-              checkboxInput("rpt_models", "Saved models and syntax", value = TRUE)
+              checkboxInput("rpt_analysis", "Results of the declared analyses", value = TRUE),
+              checkboxInput("rpt_models", "Saved models and the R code that fits them", value = TRUE)
             ),
             tags$details(class = "opt-more",
               tags$summary("More options: figures"),
@@ -2024,7 +2025,7 @@ ui <- fluidPage(
           tags$div(class = "card",
             tags$div(class = "card-title", "Reproducible source"),
             tags$p(class = "hint",
-              "A folder holding report.qmd, the .sframe file, the responses, the references and their style, the results record and a manifest. Open report.qmd in RStudio or Positron and render it: it recomputes every number from the folder's files and checks them. Writing the folder needs no Quarto, and it uses the options on Configure."),
+              "A folder holding report.qmd, the .sframe file, the responses, the references and their style, the results record and a manifest, which lists every file with its checksum. Open report.qmd in RStudio or Positron and render it: it recomputes every number from the folder's files and checks them. Writing the folder needs no Quarto, and it uses the options on Configure."),
             uiOutput("export_source_ui")
           ))
       )
@@ -3136,7 +3137,7 @@ server <- function(input, output, session) {
       tags$p(class = "hint", style = "margin-bottom: 12px;",
         paste0("This is the deployable survey, exported with collection ",
                "switched off. Anything entered here goes nowhere: the ",
-               "collector endpoint and the completion redirect are both ",
+               "address that receives responses (the collector endpoint) and the completion redirect are both ",
                "removed from the preview.")),
       tags$iframe(
         srcdoc = html,

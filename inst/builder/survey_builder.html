@@ -747,7 +747,7 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
     <div class="pv-note" id="pvNote" role="note">
       <strong>The deployable survey, with collection switched off.</strong>
       Answering, required checks and branching run as a respondent sees them.
-      Anything entered here goes nowhere: the collector endpoint and the
+      Anything entered here goes nowhere: the address that receives responses (the collector endpoint) and the
       completion redirect are both removed from the preview.
     </div>
     <div class="pv-frame" id="pvFrame"></div>
@@ -773,7 +773,7 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
           <div class="preview-card" style="margin:0 8px 10px">
             <strong>Model Builder</strong>
             <p style="margin:6px 0 10px">Create constructs from scales, choose lavaan or seminr syntax, and save model JSON into the .sframe file.</p>
-            <div class="field"><label class="fl" for="mb-type">Output engine</label><div class="fc"><select id="mb-type"><option value="cfa">lavaan CFA</option><option value="cb_sem">lavaan CB-SEM</option><option value="pls_sem">seminr PLS-SEM</option></select></div></div>
+            <div class="field"><label class="fl" for="mb-type">R package that fits the model</label><div class="fc"><select id="mb-type"><option value="cfa">lavaan CFA</option><option value="cb_sem">lavaan CB-SEM</option><option value="pls_sem">seminr PLS-SEM</option></select></div><span class="fhint">The output engine.</span></div>
             <button type="button" class="btn btn-s btn-sm" onclick="modelFromScales()">Create model from scales</button>
             <div class="field"><label class="fl" for="mb-model">Saved model</label><div class="fc"><select id="mb-model" onchange="renderAnalyse()"></select></div></div>
             <div class="frow">
@@ -870,7 +870,7 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
       <div class="alert-i">The works this instrument draws on: where a scale or an item comes from, and what supports a planned analysis. Each change applies at once. They are saved in the .sframe file, and the report cites them in text and lists them once, in its References section at the end.</div>
       <div id="refList" aria-live="polite"></div>
       <div class="field"><label class="fl" for="r-bib">Paste BibTeX</label><div class="fc"><textarea id="r-bib" rows="4" placeholder="From Google Scholar (Cite, then BibTeX), Zotero, Mendeley or a journal page"></textarea></div></div>
-      <div class="field"><label class="fl" for="r-cite">Cited by</label><div class="fc"><select id="r-cite" multiple size="4"></select></div><span class="fhint">Ctrl-click or Cmd-click to choose more than one. Leave empty to cite it from the instrument as a whole.</span></div>
+      <div class="field"><label class="fl" for="r-cite">Where is this source used?</label><div class="fc"><select id="r-cite" multiple size="4"></select></div><span class="fhint">Stored as the reference's cited by list. Ctrl-click or Cmd-click to choose more than one. Leave empty to cite it from the instrument as a whole.</span></div>
       <div style="display:flex;gap:8px;margin:4px 0 12px"><button type="button" class="btn btn-p btn-sm" onclick="addRefsFromBib()">Add from BibTeX</button></div>
       <details><summary class="fl" style="cursor:pointer">Or type one in</summary>
         <div class="frow">
@@ -1058,8 +1058,8 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
     </div>
     <div id="am-fields">
       <div class="frow">
-        <div class="field"><label class="fl" for="am-code">Reason</label><div class="fc"><select id="am-code" onchange="amendTierSync()"><option value="data_correction">Data correction</option><option value="bot_removal">Bot or fraud removal</option><option value="model_respecification">Model respecification</option><option value="instrument_revision">Instrument revision</option><option value="other">Other</option></select></div></div>
-        <div class="field"><label class="fl" for="am-tier">Tier</label><div class="fc"><select id="am-tier" onchange="amendTierChg()"><option value="pipeline">Pipeline (data or wording)</option><option value="design">Design (what is measured or analysed)</option></select></div></div>
+        <div class="field"><label class="fl" for="am-code">Why was this change made?</label><div class="fc"><select id="am-code" onchange="amendTierSync()"><option value="data_correction">Data correction</option><option value="bot_removal">Bot or fraud removal</option><option value="model_respecification">Model respecification</option><option value="instrument_revision">Instrument revision</option><option value="other">Other</option></select></div></div>
+        <div class="field"><label class="fl" for="am-tier">Type of change</label><div class="fc"><select id="am-tier" onchange="amendTierChg()"><option value="pipeline">Data or wording correction (pipeline)</option><option value="design">Change to what is measured or analysed (design)</option></select></div><span class="fhint">The tier. A pipeline amendment corrects data or wording. A design amendment changes what is measured or analysed, and needs a deviation report.</span></div>
       </div>
       <div class="field"><label class="fl" for="am-text">What changed and why <span class="fr">*</span></label><div class="fc"><textarea id="am-text" rows="2" placeholder="Reworded item q3 after the pilot."></textarea></div></div>
       <div class="field" id="am-dev-field"><label class="fl" for="am-dev">Deviation report <span class="fr">*</span></label><div class="fc"><textarea id="am-dev" rows="3" placeholder="What changed in the research question, method or model, and why."></textarea></div></div>

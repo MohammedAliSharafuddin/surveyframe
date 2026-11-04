@@ -78,7 +78,7 @@ sframe_studio_report_formats <- function(quarto_ok) {
     c("HTML" = "html", "PDF" = "pdf", "Word (.docx)" = "docx",
       "OpenDocument (.odt)" = "odt")
   } else {
-    c("HTML" = "html", "PDF (needs pagedown and Chrome)" = "pdf")
+    c("HTML" = "html", "PDF (needs the pagedown package and Chrome)" = "pdf")
   }
 }
 
