@@ -3952,11 +3952,20 @@ function rqObjectiveKeep(rq,was){
 function refsList(){return S.references||[];}
 function refsCommit(list){if(list.length)S.references=list;else delete S.references;setDirty();citeCheckAll();}
 var REF_ID=/^[A-Za-z0-9_]([A-Za-z0-9_:.#$%&+?<>~\/-]*[A-Za-z0-9_])?$/;
+// Where a reference can be cited, as R's cited_by pattern allows:
+// ^(instrument|study|(item|scale|plan|model|hypothesis):.+)$. The study is
+// offered only while there is one, and a plan block's hypotheses only while
+// it declares one, since validate_sframe() reports a target that is not
+// there (8b-R).
+function planDeclaresHyp(b){var h=b&&b.hypotheses;if(!h||typeof h!=='object')return false;
+  return [h.null,h.alternative].some(function(v){return typeof v==='string'&&v.trim();});}
 function refTargets(){
   var t=[{v:'instrument',l:'The instrument as a whole'}];
+  if(studyPlain(S._carry&&S._carry.study))t.push({v:'study',l:'The study: problem and objectives'});
   (S.scales||[]).forEach(function(x){t.push({v:'scale:'+x.id,l:'Scale: '+(x.label||x.id)});});
   (S.items||[]).forEach(function(x){if(x.type!=='section_break'&&x.type!=='text_block')t.push({v:'item:'+x.id,l:'Item: '+x.id});});
   (S.analysis_plan||[]).forEach(function(x){t.push({v:'plan:'+x.id,l:'Plan: '+x.id+(x.research_question?' '+x.research_question:'')});});
+  (S.analysis_plan||[]).forEach(function(x){if(planDeclaresHyp(x))t.push({v:'hypothesis:'+x.id,l:'Hypotheses of plan '+x.id});});
   return t;
 }
 function refShort(r){
@@ -3974,7 +3983,11 @@ function renderRefs(){
   if(!refsDraft.length){box.innerHTML='<p class="fhint" style="margin:8px 0 12px">No references yet.</p>';return;}
   box.innerHTML=refsDraft.map(function(r,i){
     var cited=r.cited_by||[];
-    var checks=targets.map(function(t){return '<label class="fcheck"><input type="checkbox" '+(cited.indexOf(t.v)>=0?'checked ':'')+'onchange="toggleCite('+i+',this.value,this.checked)" value="'+esc(t.v)+'"><span>'+esc(t.l)+'</span></label>';}).join('');
+    // A target cited but no longer offered (a study cleared, a hypothesis
+    // removed) still shows, ticked, so it can be taken off.
+    var here={};targets.forEach(function(t){here[t.v]=true;});
+    var stale=cited.filter(function(v){return !here[v];}).map(function(v){return {v:v,l:v+' (no longer declared)'};});
+    var checks=targets.concat(stale).map(function(t){return '<label class="fcheck"><input type="checkbox" '+(cited.indexOf(t.v)>=0?'checked ':'')+'onchange="toggleCite('+i+',this.value,this.checked)" value="'+esc(t.v)+'"><span>'+esc(t.l)+'</span></label>';}).join('');
     return '<div style="border:1px solid var(--bd);border-radius:6px;padding:8px 10px;margin:0 0 8px">'
       +'<div style="display:flex;gap:8px;align-items:flex-start"><div style="flex:1;font-size:12px"><code>@'+esc(r.id)+'</code> '+esc(refShort(r))+'</div>'
       +'<button type="button" class="btn btn-g btn-sm" style="color:var(--cd)" onclick="removeRef('+i+')" aria-label="Remove '+esc(r.id)+'">Remove</button></div>'

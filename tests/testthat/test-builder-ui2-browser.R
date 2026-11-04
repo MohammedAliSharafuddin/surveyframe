@@ -421,4 +421,22 @@ test_that("inside Studio at 390 wide the builder shows 1 pane at a time", {
 })
 
 
+# -- Reference targets (8b-R) -------------------------------------------------------
+
+test_that("References offers the study and a block's hypotheses as cited-by targets", {
+  ins <- sframe_references_fixture()
+  ins$study <- list(problem = "Why do delegates not return?")
+  ins$analysis_plan[[1]]$hypotheses <- list(alternative = "Satisfaction differs by group.")
+  s <- ui2_builder(ins)
+  js(s, "openSettings('refs');1")
+  opts <- unlist(js(s, "Array.prototype.map.call(document.querySelectorAll('#r-cite option'),function(o){return o.value;})"))
+  expect_true(all(c("study", "hypothesis:rq1") %in% opts))
+  # Cleared from the plan, the hypothesis is no longer offered.
+  js(s, "closeModal('m-settings');S.analysis_plan[0].hypotheses=null;openSettings('refs');1")
+  opts <- unlist(js(s, "Array.prototype.map.call(document.querySelectorAll('#r-cite option'),function(o){return o.value;})"))
+  expect_false("hypothesis:rq1" %in% opts)
+  expect_true("study" %in% opts)
+})
+
+
 ui2_close()
