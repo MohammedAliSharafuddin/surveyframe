@@ -2,7 +2,8 @@
 #
 # Session UI-1's Studio browser tests share 1 Studio process and 1 Chrome tab
 # per demo, started the first time a test asks for it and closed by
-# ui1_close() at the end of test-studio-ui1-browser.R. Studio takes about
+# ui1_close() at the end of test-studio-ui1-browser.R ("none" opens Studio
+# with no instrument). Studio takes about
 # 35 s to start, and a page load starts it again, so tests move between
 # screens through the sidebar and never reload. The JavaScript helpers are
 # ui2_js() and ui2_wait() from helper-ui2-browser.R.
@@ -17,7 +18,8 @@ ui1_studio <- function(demo = "factor_structure", screen = "open",
     port <- httpuv::randomPort()
     proc <- callr::r_bg(function(demo, screen, port) {
       library(surveyframe)
-      launch_studio(demo = demo, screen = screen, port = port,
+      launch_studio(demo = if (identical(demo, "none")) NULL else demo,
+                    screen = screen, port = port,
                     launch.browser = FALSE)
     }, args = list(demo, screen, port), libpath = libpath)
     url <- paste0("http://127.0.0.1:", port)
