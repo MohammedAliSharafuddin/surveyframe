@@ -181,10 +181,13 @@ when you switch to another, and "Download copy" beside the title saves the
 options include the codebook, quality, missing data, descriptives, reliability,
 the saved analysis-plan results, and the model appendices. The per-question
 report produced by `render_results()` in an R session is a separate route to a
-written report and is covered in the main vignette. The same screen's
-"Analysis notebook" card writes a Quarto notebook alongside the instrument
-and its responses, via `sframe_analysis_qmd()`, so the same analysis can be
-run and edited outside SurveyStudio.
+written report and is covered in the main vignette. The screen makes 2
+products. Export report writes the finished report, in HTML or PDF, and in
+Word or OpenDocument when Quarto is found. Reproduce writes the reproducible
+source: a zipped folder holding `report.qmd`, the `.sframe` file, the
+responses, the references and a manifest, from
+`render_report(format = "qmd")`. Open `report.qmd` in RStudio or Positron
+and render it, and it recomputes every number and checks it.
 
 ## Recommended workflow
 
