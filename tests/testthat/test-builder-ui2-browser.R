@@ -41,10 +41,10 @@ test_that("typing @ in a plan field lists the references and inserts the pick", 
   expect_identical(js(s, "document.activeElement.id"), "rq-q")
 })
 
-test_that("the Cite button inside an open bracket adds ; @key without asking", {
+test_that("Cite on the toolbar inside an open bracket adds ; @key without asking", {
   s <- ui2_builder(sframe_references_fixture())
   js(s, "openRQModal('rq1');var e=document.getElementById('rq-h1');e.value='As found [@likert_1932]';e.focus();e.setSelectionRange(22,22);1")
-  js(s, "document.getElementById('rq-h1').parentNode.querySelector('.sfcp-btn').click();1")
+  js(s, "document.getElementById('rq-h1').parentNode.querySelector('.sfcp-tb[data-tool=cite]').click();1")
   expect_true(ui2_wait(s, "!document.querySelector('.sfcp').hidden"))
   js(s, "var i=document.getElementById('sfcp-q');i.value='working paper';i.dispatchEvent(new Event('input',{bubbles:true}));1")
   js(s, "document.querySelector('#sfcp-list .sfcp-o').click();1")
@@ -92,7 +92,71 @@ test_that("the report outline's interpretation takes the picker too", {
   # A block with a result, as one returned from R would carry.
   js(s, "S.analysis_plan[0].result={summary:'t(58) = 2.1'};setMode('analyse');setAnalyseTab('report');1")
   expect_true(ui2_wait(s, "document.getElementById('rsInterp_0')"))
-  expect_true(js(s, "!!document.getElementById('rsInterp_0').parentNode.querySelector('.sfcp-btn')"))
+  expect_true(js(s, "!!document.getElementById('rsInterp_0').parentNode.querySelector('.sfcp-bar')"))
+})
+
+
+# -- Format toolbar ------------------------------------------------------------
+
+bar_of <- function(id) sprintf("document.getElementById('%s').parentNode.querySelector('.sfcp-bar')", id)
+
+test_that("the toolbar shows on focus, hides on blur and stays while in use", {
+  s <- ui2_builder(sframe_references_fixture())
+  js(s, "openRQModal('rq1');document.getElementById('rq-alpha').focus();1")
+  expect_true(js(s, paste0(bar_of("rq-q"), ".hidden")))
+  js(s, "document.getElementById('rq-q').focus();1")
+  expect_false(js(s, paste0(bar_of("rq-q"), ".hidden")))
+  expect_identical(js(s, paste0(bar_of("rq-q"), ".getAttribute('role')")), "toolbar")
+  expect_identical(js(s, paste0(bar_of("rq-q"), ".getAttribute('aria-label')")),
+                   "Format Research question")
+  # Focus moving into the toolbar keeps it, arrow keys move along it, and
+  # Escape returns to the field.
+  js(s, paste0(bar_of("rq-q"), ".querySelector('.sfcp-tb').focus();1"))
+  Sys.sleep(0.1)
+  expect_false(js(s, paste0(bar_of("rq-q"), ".hidden")))
+  ui2_key(s, "", "ArrowRight")
+  expect_identical(js(s, "document.activeElement.getAttribute('data-tool')"), "italic")
+  ui2_key(s, "", "End")
+  expect_identical(js(s, "document.activeElement.getAttribute('data-tool')"), "math")
+  ui2_key(s, "", "Escape")
+  expect_identical(js(s, "document.activeElement.id"), "rq-q")
+  expect_true(js(s, "document.getElementById('m-rq').classList.contains('open')"))
+  # Cite keeps it while the picker is open.
+  js(s, paste0(bar_of("rq-q"), ".querySelector('[data-tool=cite]').click();1"))
+  expect_true(ui2_wait(s, "!document.querySelector('.sfcp').hidden"))
+  Sys.sleep(0.1)
+  expect_false(js(s, paste0(bar_of("rq-q"), ".hidden")))
+  ui2_key(s, "#sfcp-q", "Escape")
+  js(s, "document.getElementById('rq-alpha').focus();1")
+  expect_true(ui2_wait(s, paste0(bar_of("rq-q"), ".hidden")))
+})
+
+test_that("bold wraps the selection and the saved plan holds the Markdown", {
+  s <- ui2_builder(sframe_references_fixture())
+  js(s, "openRQModal('rq1');var e=document.getElementById('rq-q');e.value='Does satisfaction differ by group?';e.focus();e.setSelectionRange(5,17);1")
+  js(s, paste0(bar_of("rq-q"), ".querySelector('[data-tool=bold]').click();1"))
+  expect_identical(js(s, "document.getElementById('rq-q').value"),
+                   "Does **satisfaction** differ by group?")
+  expect_identical(js(s, "document.activeElement.id"), "rq-q")
+  # Ctrl+I in the field, on the word "group".
+  js(s, "document.getElementById('rq-q').setSelectionRange(32,37);1")
+  ui2_key(s, "#rq-q", "i", ctrl = TRUE)
+  expect_identical(js(s, "document.getElementById('rq-q').value"),
+                   "Does **satisfaction** differ by *group*?")
+  pv <- js(s, "document.getElementById('rq-q').parentNode.querySelector('.sfcp-pv').innerHTML")
+  expect_match(pv, "<strong>satisfaction</strong> differ by <em>group</em>?", fixed = TRUE)
+  js(s, "saveRQ();1")
+  expect_identical(js(s, "sframePayload().analysis_plan[0].research_question"),
+                   "Does **satisfaction** differ by *group*?")
+})
+
+test_that("the equation button writes $...$ and the preview shows TeX as typed", {
+  s <- ui2_builder(sframe_references_fixture())
+  js(s, "openRQModal('rq1');var e=document.getElementById('rq-interp');e.value='Retain if r > 0.3';e.focus();e.setSelectionRange(10,17);1")
+  js(s, paste0(bar_of("rq-interp"), ".querySelector('[data-tool=math]').click();1"))
+  expect_identical(js(s, "document.getElementById('rq-interp').value"), "Retain if $r > 0.3$")
+  expect_match(js(s, "document.getElementById('rq-interp').parentNode.querySelector('.sfcp-pv').innerHTML"),
+               "<code>r &gt; 0.3</code>", fixed = TRUE)
 })
 
 ui2_close()

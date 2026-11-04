@@ -43,11 +43,11 @@ test_that("the builder's collector matches collector_template.gs", {
                    info = "Run data-raw/inline_static_template.R to regenerate the builder.")
 })
 
-test_that("the builder's citation picker matches citation_picker.js", {
+test_that("the builder's field tools match field_tools.js", {
   builder <- asset("builder", "survey_builder.html")
-  inlined <- inlined_block(builder, "<!-- CITATION_PICKER_START:",
-                           "<!-- CITATION_PICKER_END -->")
+  inlined <- inlined_block(builder, "<!-- FIELD_TOOLS_START:",
+                           "<!-- FIELD_TOOLS_END -->")
   expect_identical(unescape_script(inlined),
-                   asset("builder", "citation_picker.js"),
+                   asset("builder", "field_tools.js"),
                    info = "Run data-raw/inline_static_template.R to regenerate the builder.")
 })

@@ -246,13 +246,23 @@ style.
   apply at once, ahead of Save settings.
 * **SurveyBuilder has a citation picker on the plan fields.** Type `@` or
   `/cite` in a research question, a hypothesis, a decision rule or an
-  interpretation, or press the field's Cite button, to list the instrument's
+  interpretation, or press Cite on its format toolbar, to list the instrument's
   references by key, author, year and title, filtered as you type. A pick
   asks for "Max (2000)", written `@key`, or "(Max, 2000)", written `[@key]`,
   and inside an open `[...]` adds `; @key`. A key with no reference is
   shown under the field with "No reference with this key. Add it under
   References.", and "Manage references" opens that tab. The picker is 1 file,
-  `citation_picker.js`, which SurveyStudio will share.
+  `field_tools.js`, which SurveyStudio will share.
+* **SurveyBuilder's long text fields have a format toolbar.** It appears
+  while a research question, hypothesis, decision rule or interpretation
+  has focus, with bold, italic, bulleted and numbered lists, link, cite,
+  subscript, superscript and equation. Each writes Markdown around the
+  selection (`**x**`, `*x*`, `- `, `1. `, `[x](url)`, `[@key]`, `~x~`,
+  `^x^`, `$x$`, or `$$` on lines of their own for a display equation), and
+  the `.sframe` file stores the text as typed. A preview line under the field
+  shows it formatted, with an equation as its TeX. Ctrl+B and Ctrl+I work in
+  the field, arrow keys move along the toolbar, and Escape returns to the
+  field. The toolbar is part of `field_tools.js`.
 * **`read_bibtex()` reads entries written with parentheses.** BibTeX allows
   `@article(key, ...)` as well as `@article{key, ...}`, and a file may mix the
   2. A closing bracket inside a braced or quoted value ended a parenthesised
