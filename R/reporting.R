@@ -323,6 +323,20 @@ print.sframe_codebook <- function(x, ...) {
 #'   References section. Defaults to APA 7th edition, bundled with the
 #'   package. Any style from the Zotero style repository works.
 #'
+#' @section Results record, manifest and provenance:
+#' Beside every report `render_report()` writes 2 files named after it. For
+#' `report.html` they are `report_results.json`, the plan results as
+#' canonical JSON (sorted keys, full precision, no timestamp, so the same
+#' instrument and responses give the same file), and `report_manifest.json`,
+#' the sha256 of the instrument content, the responses, the results record and
+#' the report as generated, with the surveyframe and R versions and the time.
+#' A report edited later, as a Word copy is meant to be, no longer matches
+#' its recorded hash, while the results record still does. The Provenance
+#' section at the top of the report gives the instrument hash and whether
+#' [read_sframe()] verified it, the number of amendments, the responses sha256
+#' and the results record's sha256. The responses are hashed as JSON by
+#' column, so the hash belongs to the values, not to a file.
+#'
 #' @section References:
 #' The Quarto report cites in text, author and year, and lists every work it
 #' cites once, in a References section at the end, formatted by pandoc's
@@ -442,7 +456,7 @@ render_report <- function(
       )
     }
     html_tmp <- tempfile(fileext = ".html")
-    on.exit(unlink(html_tmp, force = TRUE), add = TRUE)
+    on.exit(unlink(c(html_tmp, unlist(sframe_record_paths(html_tmp))), force = TRUE), add = TRUE)
     # The HTML render's return carries which engine built the content, and it
     # used to be discarded, so a PDF said nothing about how it was produced.
     # Its own message named the intermediate HTML file too, which is a path the
@@ -483,6 +497,11 @@ render_report <- function(
         )
       }
     )
+    # The results record the HTML render wrote goes beside the PDF, and the
+    # manifest records the PDF as generated.
+    record_paths <- sframe_record_paths(dest)
+    file.copy(sframe_record_paths(html_tmp)$results, record_paths$results, overwrite = TRUE)
+    sframe_write_manifest(dest, instrument, data, record_paths$results)
     attr(dest, "engine") <- content_engine
     attr(dest, "converter") <- "pagedown"
     rlang::inform(
@@ -501,6 +520,26 @@ render_report <- function(
   }
   output_dir <- normalizePath(output_dir, mustWork = FALSE)
   output_name <- basename(dest)
+
+  # The plan results, computed once for both engines and the results record
+  # (8b-R, NAMING decision 6). The record holds the numbers a reviewer
+  # verifies, and the provenance block in the report gives its sha256.
+  plan_results <- NULL
+  if (!is.null(data) && isTRUE(include_analysis) &&
+      length(instrument$analysis_plan %||% list()) > 0) {
+    plan_results <- tryCatch(
+      run_analysis_plan(data, instrument,
+                        plots = requireNamespace("ggplot2", quietly = TRUE),
+                        plot_palette = plot_palette),
+      error = function(e) e)
+  }
+  record_paths <- sframe_record_paths(dest)
+  writeLines(sframe_results_record_json(
+               if (is.list(plan_results) && !inherits(plan_results, "error")) plan_results else list(),
+               instrument, sframe_report_seed(data, instrument, include_analysis)),
+             record_paths$results, useBytes = TRUE)
+  provenance <- sframe_report_provenance(instrument, data,
+                                         sframe_sha256_file(record_paths$results))
 
   # QUARTO_PATH, the PATH, then RStudio's and Positron's bundled copies (T3).
   use_quarto <- isTRUE(getOption("surveyframe.use_quarto", TRUE))
@@ -552,8 +591,12 @@ render_report <- function(
     # template only prints them (naming decision 6).
     tmp_content <- tempfile(fileext = ".rds")
     saveRDS(sframe_report_content(instrument, data, plot_palette,
-                                  include_analysis = include_analysis), tmp_content)
+                                  include_analysis = include_analysis,
+                                  results = plan_results), tmp_content)
     temp_rds <- c(temp_rds, tmp_content)
+    tmp_prov <- tempfile(fileext = ".rds")
+    saveRDS(provenance, tmp_prov)
+    temp_rds <- c(temp_rds, tmp_prov)
     on.exit(unlink(temp_rds, force = TRUE), add = TRUE)
 
     params <- list(
@@ -562,6 +605,7 @@ render_report <- function(
       interpretations_path = tmp_interp,
       declarations_path   = tmp_decl,
       content_path        = tmp_content,
+      provenance_path     = tmp_prov,
       include_quality     = include_quality && !is.null(data),
       include_reliability = include_reliability && !is.null(data),
       include_codebook    = include_codebook,
@@ -655,6 +699,7 @@ render_report <- function(
       html <- readLines(rendered, warn = FALSE, encoding = "UTF-8")
       writeLines(sframe_quarto_apa_floats(html), rendered, useBytes = TRUE)
       if (file.copy(rendered, dest, overwrite = TRUE)) {
+        sframe_write_manifest(dest, instrument, data, record_paths$results)
         res <- sframe_report_result(dest, "quarto", open)
         attr(res, "quarto") <- quarto_bin
         return(invisible(res))
@@ -679,8 +724,11 @@ render_report <- function(
     title               = report_title,
     authors             = report_authors,
     references          = references,
-    csl                 = csl
+    csl                 = csl,
+    plan_results        = plan_results,
+    provenance          = provenance
   )
+  sframe_write_manifest(dest, instrument, data, record_paths$results)
 
   sframe_report_result(dest, "html", open)
 }
@@ -706,7 +754,7 @@ sframe_builtin_banner <- function() {
 # plan run" was rewritten as an absolute path under the working directory.
 sframe_quarto_param_names_path <- c("instrument_path", "data_path",
                                     "interpretations_path", "declarations_path",
-                                    "content_path")
+                                    "content_path", "provenance_path")
 
 sframe_quarto_param_args <- function(params) {
   unlist(lapply(names(params), function(name) {
@@ -799,10 +847,18 @@ sframe_clean_interpretations <- function(interpretations) {
     title = NULL,
     authors = character(0),
     references = NULL,
-    csl = NULL
+    csl = NULL,
+    plan_results = NULL,
+    provenance = NULL
 ) {
   meta <- instrument$meta %||% list()
   sections <- character(0)
+
+  # What the report was built from, first (NAMING decision 6).
+  if (!is.null(provenance)) {
+    sections <- c(sections, sprintf("<section><h2>Provenance</h2>%s</section>",
+                                    .render_report_table(provenance, "Provenance")))
+  }
 
   if (isTRUE(include_codebook)) {
     cb <- sframe_codebook(instrument)
@@ -947,7 +1003,8 @@ sframe_clean_interpretations <- function(interpretations) {
     analysis_html <- .render_report_analysis_section(instrument, data,
                                                      plot_palette = plot_palette,
                                                      interpretations = interpretations,
-                                                     show_code = show_code)
+                                                     show_code = show_code,
+                                                     results = plan_results)
     sections <- c(sections, sprintf("<section>%s</section>", analysis_html))
   }
 
@@ -1080,7 +1137,8 @@ sframe_clean_interpretations <- function(interpretations) {
 .render_report_analysis_section <- function(instrument, data = NULL,
                                             plot_palette = "web",
                                             interpretations = list(),
-                                            show_code = TRUE) {
+                                            show_code = TRUE,
+                                            results = NULL) {
   plan <- instrument$analysis_plan %||% list()
   if (length(plan) == 0) {
     return("")
@@ -1119,12 +1177,15 @@ sframe_clean_interpretations <- function(interpretations) {
       )
     }, character(1))
   } else {
-    results <- tryCatch(
-      run_analysis_plan(data, instrument,
-                        plots = requireNamespace("ggplot2", quietly = TRUE),
-                        plot_palette = plot_palette),
-      error = function(e) e
-    )
+    # render_report() passes the results it computed once for both engines.
+    if (is.null(results)) {
+      results <- tryCatch(
+        run_analysis_plan(data, instrument,
+                          plots = requireNamespace("ggplot2", quietly = TRUE),
+                          plot_palette = plot_palette),
+        error = function(e) e
+      )
+    }
     if (inherits(results, "error")) {
       return(sprintf(
         "<h2>Analysis Plan</h2><p>%s</p>",
@@ -1313,33 +1374,34 @@ sframe_clean_interpretations <- function(interpretations) {
 # 2 engines report the same numbers. `results` is a character string when
 # the plan could not run, and NULL when there is no data or no plan.
 sframe_report_content <- function(instrument, data = NULL, plot_palette = "web",
-                                  include_analysis = TRUE) {
+                                  include_analysis = TRUE, results = NULL) {
   items_d <- sframe_codebook_items_display(sframe_codebook(instrument))
   items_d$reverse  <- ifelse(items_d$reverse,  "Yes", "")
   items_d$required <- ifelse(items_d$required, "Yes", "")
   names(items_d) <- c("ID", "Label", "Type", "Response options", "Scale",
                       "Reverse", "Required")
-  results <- NULL
-  if (!is.null(data) && isTRUE(include_analysis) &&
+  # render_report() passes the results it computed once for both engines.
+  if (inherits(results, "error")) results <- conditionMessage(results)
+  if (is.null(results) && !is.null(data) && isTRUE(include_analysis) &&
       length(instrument$analysis_plan) > 0) {
     results <- tryCatch(
       run_analysis_plan(data, instrument,
                         plots = requireNamespace("ggplot2", quietly = TRUE),
                         plot_palette = plot_palette),
       error = function(e) conditionMessage(e))
-    if (is.list(results)) {
-      # The table and chart titles, escaped for the template's HTML, as
-      # the built-in engine titles them (CX-22).
-      results <- Map(function(r, i) {
-        sup <- sframe_result_supplement(r)
-        if (!is.null(sup)) sup$caption_html <- htmltools_escape(sup$caption)
-        r["supplement"] <- list(sup)
-        title <- sframe_result_float_title(r, i)
-        r$caption_html <- htmltools_escape(title)
-        r$figure_open <- sframe_apa_figure_open(title, paste("Chart of the result for", title))
-        r
-      }, results, seq_along(results))
-    }
+  }
+  if (is.list(results)) {
+    # The table and chart titles, escaped for the template's HTML, as
+    # the built-in engine titles them (CX-22).
+    results <- Map(function(r, i) {
+      sup <- sframe_result_supplement(r)
+      if (!is.null(sup)) sup$caption_html <- htmltools_escape(sup$caption)
+      r["supplement"] <- list(sup)
+      title <- sframe_result_float_title(r, i)
+      r$caption_html <- htmltools_escape(title)
+      r$figure_open <- sframe_apa_figure_open(title, paste("Chart of the result for", title))
+      r
+    }, results, seq_along(results))
   }
   charts <- sframe_report_charts(instrument, data, plot_palette)
   for (k in seq_along(charts)) {

@@ -28,6 +28,7 @@ params:
   interpretations_path: ""
   declarations_path: ""
   content_path:      ""
+  provenance_path:   ""
   instrument_hash:     ""
   analysis_seed:       ""
   use_citations:       false
@@ -169,6 +170,24 @@ if (use_citations && length(cited_keys("instrument")) > 0)
   cat(sprintf("**Draws on:** %s\n\n", cite(cited_keys("instrument"))))
 cat(sprintf("**Validation status:** %s\n\n",
   if (isTRUE(m$validated)) "Valid" else "Not validated"))
+```
+
+---
+
+## Provenance {#sec-provenance .unnumbered}
+
+```{r provenance}
+#| output: asis
+# What the report was built from: the instrument hash and its check, the
+# amendment count, the responses sha256 and the results record sha256, from
+# the table render_report() builds for both engines (NAMING decision 6).
+prov <- if (nzchar(params$provenance_path %||% "") && file.exists(params$provenance_path))
+  readRDS(params$provenance_path) else NULL
+if (is.null(prov)) {
+  cat("No provenance was recorded for this render.\n\n")
+} else {
+  print(kable(format = "html", prov, align = c("l", "l"), caption = "Provenance"))
+}
 ```
 
 ---

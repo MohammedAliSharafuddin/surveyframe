@@ -532,6 +532,17 @@ style.
   gets no new features and is not promised to match the Quarto report.
   The Quality summary table and Respondent-wise missingness, which only
   the built-in page had, are in the Quarto report too.
+* **Every report has a results record and a manifest beside it.**
+  `render_report()` writes `<name>_results.json`, the plan results as
+  canonical JSON, and `<name>_manifest.json`, the sha256 of the instrument
+  content, the responses, the results record and the output as generated,
+  with the surveyframe version and the time. The field names follow the SSR
+  6.0 hash manifest. A Provenance section at the top of the report, in both
+  engines and every format, gives the instrument hash and whether
+  `read_sframe()` verified it, the amendment count, the responses sha256 and
+  the results record's sha256. An edited copy of a report then no longer
+  matches its recorded hash, while the numbers it presents still verify.
+  The plan runs once per report and feeds both engines and the record.
 * **A Quarto report renders offline.** The report theme imported a Google
   web font the report never used, so every render needed the internet, sent
   Google a request, and hung with no timeout when the connection stalled.
