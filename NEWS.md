@@ -1088,6 +1088,10 @@ style.
 
 ## SurveyStudio
 
+* **The Open card's status says what it means** (UX-12). "Valid" is
+  "Schema valid", the version and amendment count sit beside the integrity
+  badge, and each links on: the version to Amendments, Draft to Design, and
+  a failed check to Amendments.
 * **A gate replaces the screen it guards** (UX-13). When a screen's
   prerequisite is missing, such as an open instrument, its next-stage card
   takes the place of the screen's body, so References, Amendments and
