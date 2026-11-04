@@ -1088,6 +1088,12 @@ style.
 
 ## SurveyStudio
 
+* **The Report screen makes 2 products** (UX-20). Export report writes the
+  finished report in HTML or PDF, and in Word or OpenDocument when Quarto is
+  found. Reproduce downloads the reproducible source, the `.qmd` folder of
+  `render_report(format = "qmd")` as 1 zip, for RStudio or Positron. The
+  separate analysis notebook card is gone, and without Quarto the engine
+  line names the remedy instead of offering a third engine.
 * **The Report screen has 4 tabs**, Interpret, Configure, Export report and
   Reproduce, in place of 1 long page of 5 jobs (UX-07). A choice made in 1
   tab stays when you switch, the arrow keys move along the tabs, and the

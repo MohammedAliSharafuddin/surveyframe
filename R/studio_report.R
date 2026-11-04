@@ -68,3 +68,16 @@ sframe_studio_plan_change_report <- function(before, after) {
          paste(sprintf("%s %s", names(ch), unlist(ch)), collapse = ", "),
          ". Reason: ")
 }
+
+# The formats the Finished report offers (UX-20). Word and OpenDocument go
+# through Quarto, so without it the choice is HTML and PDF, and the engine
+# line names the remedy. The reproducible source is the Reproduce tab's job,
+# so the .qmd folder is not a format here.
+sframe_studio_report_formats <- function(quarto_ok) {
+  if (isTRUE(quarto_ok)) {
+    c("HTML" = "html", "PDF" = "pdf", "Word (.docx)" = "docx",
+      "OpenDocument (.odt)" = "odt")
+  } else {
+    c("HTML" = "html", "PDF (needs pagedown and Chrome)" = "pdf")
+  }
+}

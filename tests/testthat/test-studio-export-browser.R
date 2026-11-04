@@ -70,12 +70,16 @@ test_that("the Export screen offers the report options and stays short", {
   expect_match(report, "A title set on the Export screen", fixed = TRUE)
   expect_false(grepl("Show R code", report, fixed = TRUE))
 
-  # The notebook's 3 files come as one zip.
-  js("$('#qmd_prepare_btn').click(); true")
-  expect_true(wait("!!$('#qmd_dl_zip').attr('href') && $('#qmd_dl_zip').attr('href') !== '#'"))
-  head <- js(paste0(
-    "fetch($('#qmd_dl_zip').attr('href')).then(function(r) { return r.arrayBuffer(); })",
-    ".then(function(b) { var u = new Uint8Array(b); return String.fromCharCode(u[0], u[1]) + ':' + u.length; })"))
-  expect_match(head, "^PK:")
-  expect_gt(as.numeric(sub("^PK:", "", head)), 1000)
+  # The reproducible source comes as 1 zip holding the .qmd folder (UI-1,
+  # UX-20: it replaced the analysis notebook card, whose zip this checked).
+  expect_true(wait("!!$('#download_source_btn').attr('href') && $('#download_source_btn').attr('href') !== '#'"))
+  zip_b64 <- js(paste0(
+    "fetch($('#download_source_btn').attr('href')).then(function(r) { return r.arrayBuffer(); })",
+    ".then(function(b) { var u = new Uint8Array(b), s = ''; for (var i = 0; i < u.length; i++) s += String.fromCharCode(u[i]); return btoa(s); })"))
+  zf <- tempfile(fileext = ".zip")
+  writeBin(jsonlite::base64_dec(zip_b64), zf)
+  listed <- utils::unzip(zf, list = TRUE)$Name
+  expect_true("report_source/report.qmd" %in% listed)
+  expect_true(any(grepl("^report_source/.*\\.sframe$", listed)))
+  expect_true("report_source/manifest.json" %in% listed)
 })

@@ -113,3 +113,22 @@ test_that("the Quarto report's amendment list carries the plan change text", {
   doc <- paste(readLines(out, warn = FALSE), collapse = "\n")
   expect_match(doc, "Plan changed after the responses were loaded: RQ2 changed. Reason: the first wording was too broad.", fixed = TRUE)
 })
+
+# UI-1 item 4 (UX-20): 2 products. The Finished report offers Word and
+# OpenDocument only with Quarto, and the .qmd folder is the Reproduce tab's.
+test_that("the finished report's formats follow Quarto", {
+  with_q <- surveyframe:::sframe_studio_report_formats(TRUE)
+  expect_identical(unname(with_q), c("html", "pdf", "docx", "odt"))
+  without <- surveyframe:::sframe_studio_report_formats(FALSE)
+  expect_identical(unname(without), c("html", "pdf"))
+  expect_false("qmd" %in% c(with_q, without))
+})
+
+test_that("Studio offers the report and its source, and no separate notebook", {
+  src <- paste(readLines(system.file("shiny", "app.R", package = "surveyframe")),
+               collapse = "\n")
+  expect_match(src, '"Finished report"', fixed = TRUE)
+  expect_match(src, '"Reproducible source"', fixed = TRUE)
+  expect_match(src, 'list(format = "qmd", output_file = dir)', fixed = TRUE)
+  expect_false(grepl("sframe_analysis_qmd(", src, fixed = TRUE))
+})

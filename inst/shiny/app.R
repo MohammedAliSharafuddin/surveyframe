@@ -1892,7 +1892,7 @@ ui <- fluidPage(
             tags$div(class = "card-title", "Finished report"),
             uiOutput("export_engine_note"),
             shiny::radioButtons("rpt_format", "Format",
-              choices = c("HTML" = "html", "PDF (needs pagedown and Chrome)" = "pdf"),
+              choices = sframe_studio_report_formats(sframe_studio_quarto_note()$ok),
               selected = "html"),
             uiOutput("export_report_ui"),
             tags$p(class = "hint",
@@ -1900,11 +1900,10 @@ ui <- fluidPage(
           )),
         studio_report_pane("reproduce", FALSE,
           tags$div(class = "card",
-            tags$div(class = "card-title", "Analysis notebook"),
+            tags$div(class = "card-title", "Reproducible source"),
             tags$p(class = "hint",
-              "Writes a runnable Quarto notebook that loads the instrument and its responses, runs the pre-declared plan, and renders a report, yours to edit and re-run outside SurveyStudio."),
-            uiOutput("qmd_prepare_ui"),
-            uiOutput("qmd_downloads_ui")
+              "A folder holding report.qmd, the .sframe file, the responses, the references and their style, the results record and a manifest. Open report.qmd in RStudio or Positron and render it: it recomputes every number from the folder's files and checks them. Writing the folder needs no Quarto, and it uses the options on Configure."),
+            uiOutput("export_source_ui")
           ))
       )
     )
@@ -3812,53 +3811,31 @@ server <- function(input, output, session) {
     }
   )
 
-  # sframe_analysis_qmd() writes 3 files (qmd, sframe, csv) whose names must
-  # match for the notebook's own read_sframe()/read_responses() calls to
-  # find them. A downloadHandler can only serve 1 file per button, so rather
-  # than 3 independent handlers each re-deriving a file name (which could
-  # drift out of sync), write the bundle once into its own directory on
-  # demand and have every download button just copy out of it.
-  qmd_bundle <- reactiveValues(paths = NULL)
-
-  output$qmd_prepare_ui <- renderUI({
-    if (!is.null(rv$instrument) && !is.null(rv$responses)) {
-      actionButton("qmd_prepare_btn", "Prepare analysis notebook", class = "btn-outline")
+  output$export_source_ui <- renderUI({
+    if (!is.null(rv$instrument)) {
+      downloadButton("download_source_btn", "Download source (.zip)", class = "btn-primary")
     } else {
-      export_disabled_btn(
-        "Prepare analysis notebook",
-        "Open or build a valid instrument and load responses first.")
+      export_disabled_btn("Download source (.zip)",
+        "Open or build a valid instrument before writing the source.")
     }
   })
 
-  observeEvent(input$qmd_prepare_btn, {
-    req(rv$instrument, rv$responses)
-    tryCatch({
-      dir <- tempfile("qmd-")
-      qmd_bundle$paths <- sframe_analysis_qmd(
-        rv$instrument, rv$responses, dir = dir, overwrite = TRUE)
-      showNotification("Analysis notebook prepared. Download it below as 1 zip.",
-                       type = "message")
-    }, error = function(e) {
-      showNotification(paste("Error:", conditionMessage(e)), type = "error")
-    })
-  })
-
-  output$qmd_downloads_ui <- renderUI({
-    p <- qmd_bundle$paths
-    if (is.null(p)) return(NULL)
-    downloadButton("qmd_dl_zip", "Download notebook (.zip)", class = "btn-primary")
-  })
-
-  # The notebook, its instrument and its responses in 1 zip, unpacked into
-  # 1 folder, as the notebook reads them.
-  output$qmd_dl_zip <- downloadHandler(
-    filename = function() sub("\\.qmd$", ".zip", basename(qmd_bundle$paths$qmd)),
+  # The .qmd folder from render_report(format = "qmd"), zipped with the
+  # folder at its root, so it unpacks as 1 folder for RStudio or Positron.
+  output$download_source_btn <- downloadHandler(
+    filename = function() paste0(
+      gsub("[^a-zA-Z0-9]", "_", (rv$instrument$meta$title %||% "survey")), "_report_source.zip"),
     content = function(file) {
-      p <- qmd_bundle$paths
-      files <- c(p$qmd, p$sframe, p$csv)
-      zip_path <- tempfile(fileext = ".zip")
-      utils::zip(zip_path, files = files, flags = "-j9Xq")
-      file.copy(zip_path, file, overwrite = TRUE)
+      tryCatch({
+        dir <- file.path(tempfile("src-"), "report_source")
+        dir.create(dirname(dir))
+        do.call(render_report, c(studio_report_args(), list(format = "qmd", output_file = dir)))
+        old <- setwd(dirname(dir))
+        on.exit(setwd(old), add = TRUE)
+        utils::zip(file, basename(dir), flags = "-r9Xq")
+      }, error = function(e) {
+        showNotification(paste("Source error:", conditionMessage(e)), type = "error")
+      })
     }
   )
 
@@ -3986,45 +3963,47 @@ server <- function(input, output, session) {
 
   # The Export report pane is hidden until it is opened, and its link must
   # be ready before, as a hidden output is otherwise not drawn.
-  for (o in c("export_report_ui", "export_engine_note", "qmd_prepare_ui", "qmd_downloads_ui"))
+  for (o in c("export_report_ui", "export_engine_note", "export_source_ui"))
     outputOptions(output, o, suspendWhenHidden = FALSE)
+  # The options on Configure, shared by the finished report and the source.
+  studio_report_args <- function() list(
+    instrument = rv$instrument,
+    data = rv$responses,
+    open = FALSE,
+    include_codebook = isTRUE(input$rpt_codebook),
+    include_quality = isTRUE(input$rpt_quality),
+    include_missing = isTRUE(input$rpt_missing),
+    include_descriptives = isTRUE(input$rpt_descriptives),
+    include_reliability = isTRUE(input$rpt_reliability),
+    include_analysis = isTRUE(input$rpt_analysis),
+    include_models = isTRUE(input$rpt_models),
+    plot_palette = input$rpt_palette %||% "web",
+    interpretations = studio_collect_interpretations(),
+    show_code = !isFALSE(input$rpt_show_code),
+    title = trim_or_null(input$rpt_title),
+    authors = studio_report_authors(),
+    references = studio_report_references(),
+    csl = input$rpt_csl$datapath,
+    figures = studio_report_figures() %||% getOption("surveyframe.figures")
+  )
+
   output$download_report_btn <- downloadHandler(
     filename = function() {
       paste0(
         gsub("[^a-zA-Z0-9]", "_", (rv$instrument$meta$title %||% "survey")),
-        "_report.", if (identical(input$rpt_format, "pdf")) "pdf" else "html"
+        "_report.", input$rpt_format %||% "html"
       )
     },
     content = function(file) {
       tryCatch({
-        render_report(
-          instrument = rv$instrument,
-          data = rv$responses,
-          output_file = file,
-          open = FALSE,
-          include_codebook = isTRUE(input$rpt_codebook),
-          include_quality = isTRUE(input$rpt_quality),
-          include_missing = isTRUE(input$rpt_missing),
-          include_descriptives = isTRUE(input$rpt_descriptives),
-          include_reliability = isTRUE(input$rpt_reliability),
-          include_analysis = isTRUE(input$rpt_analysis),
-          include_models = isTRUE(input$rpt_models),
-          plot_palette = input$rpt_palette %||% "web",
-          interpretations = studio_collect_interpretations(),
-          format = if (identical(input$rpt_format, "pdf")) "pdf" else "html",
-          show_code = !isFALSE(input$rpt_show_code),
-          title = trim_or_null(input$rpt_title),
-          authors = studio_report_authors(),
-          references = studio_report_references(),
-          csl = input$rpt_csl$datapath,
-          figures = studio_report_figures() %||% getOption("surveyframe.figures")
-        )
+        do.call(render_report, c(studio_report_args(), list(format = input$rpt_format %||% "html", output_file = file)))
       }, error = function(e) {
         showNotification(paste("Report error:", conditionMessage(e)), type = "error")
       })
     }
   )
   outputOptions(output, "download_report_btn", suspendWhenHidden = FALSE)
+  outputOptions(output, "download_source_btn", suspendWhenHidden = FALSE)
 }
 
 shinyApp(ui = ui, server = server)
