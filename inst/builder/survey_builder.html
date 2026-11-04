@@ -470,7 +470,7 @@ input,textarea,select{font-family:inherit;font-size:13px}
 .an-empty-ic{font-size:32px;margin-bottom:12px;opacity:.4}
 .an-empty-t{font-size:13px;font-weight:600;color:var(--t2);margin-bottom:5px}
 .an-empty-b{font-size:12px}
-/* Report outline: a document-shaped skeleton of the render_report() output,
+/* Expected outputs: a document-shaped skeleton of the render_report() output,
    with an empty table and a figure placeholder per plan (the table+plot
    pairing the R report produces), not a repeat of the plan cards. */
 .rs-doc{background:var(--cf);border:1px solid var(--cb);border-radius:8px;
@@ -709,8 +709,8 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
   <div class="mp an-mode" id="mp-analyse">
     <div class="an-tabs">
       <button type="button" class="an-tab active" data-an-tab="plan" onclick="setAnalyseTab('plan')">Plan</button>
-      <button type="button" class="an-tab" data-an-tab="run" onclick="setAnalyseTab('run')">Run preview</button>
-      <button type="button" class="an-tab" data-an-tab="report" onclick="setAnalyseTab('report')">Report outline</button>
+      <button type="button" class="an-tab" data-an-tab="run" onclick="setAnalyseTab('run')">Declared analyses</button>
+      <button type="button" class="an-tab" data-an-tab="report" onclick="setAnalyseTab('report')">Expected outputs</button>
     </div>
     <!-- Two-pane split (owner feedback 2026-07-16): the former right-hand
          "Output preview and model builder" column is removed so the plans
@@ -4339,7 +4339,7 @@ function dOver(e,idx,ev){e.preventDefault();document.querySelectorAll('.ic').for
 function dDrop(e,idx){e.preventDefault();document.querySelectorAll('.ic').forEach(function(c){c.classList.remove('drag-t','drag-b','dragging');});if(dragSrc===null||dragSrc===idx){dragSrc=null;return;}snap();var moved=S.items.splice(dragSrc,1)[0];var tgt=dragSrc<idx?idx-1:idx;S.items.splice(tgt,0,moved);dragSrc=null;renderItemList();}
 // Plan reorder (Plan tab only; index maps 1:1 to S.analysis_plan)
 // Plan-card drag-reorder is id-based (not index-based) so it works on both
-// the Plan tab (all plans) and the Run preview queue (data-requiring plans
+// the Plan tab (all plans) and the Declared analyses tab (data-requiring plans
 // only, where display indices differ from S.analysis_plan indices).
 var planDragSrc=null;
 function pStart(e,id){planDragSrc=id;e.currentTarget.classList.add('dragging');e.stopPropagation();}
@@ -5219,7 +5219,7 @@ function renderModelBuilder(){
   from.innerHTML=opts;to.innerHTML=opts;
   list.innerHTML=models.length?models.map(function(m){var paths=(m.structural&&m.structural.paths)||[];return'<div class="model-row"><strong>'+esc(m.id)+'</strong> <span class="vbadge">'+esc(m.type||'model')+'</span><div>'+esc((m.measurement&&m.measurement.constructs||[]).length)+' construct(s), '+esc(paths.length)+' path(s)</div><div class="model-paths">'+(paths.length?paths.map(function(p){return'<span class="vchip">'+esc(p.from+' -> '+p.to)+'</span>';}).join(''):'<span class="rq-no-int">No paths yet.</span>')+'</div></div>';}).join(''):'<div class="rq-no-int">No saved models yet.</div>';
 }
-// Inline interpretation editing in the Report outline. The decision rule is
+// Inline interpretation editing in Expected outputs. The decision rule is
 // declared in the RQ modal and shown here read-only. This writes the
 // interpretation field only, so the two never overwrite each other. No
 // re-render here: the textarea already shows the value, and re-rendering
@@ -5230,7 +5230,7 @@ function updatePlanInterp(id,val){
   rq.interpretation=val.trim();
   setDirty();
 }
-// Report outline tab: a skeleton of the eventual render_report() document:
+// Expected outputs tab: a skeleton of the eventual render_report() document:
 // study header, quality and descriptives stubs, then one section per plan
 // with an empty results table and a figure placeholder (the table+plot
 // pairing the R report emits), then models and references.
@@ -5273,14 +5273,14 @@ function renderAnalyse(){
   var vars=getAllVars();
   vl.innerHTML=vars.length?vars.map(function(v){var i=v.item||{},m=v.meta||varLevel(v.id),cs=i.choice_set||'',sc=i.scale_id||'';return'<div class="vmeta"><div class="vmeta-id">'+esc(v.id)+'</div><div class="vmeta-lbl">'+esc((i.label||v.label||'').slice(0,90))+'</div><div class="vmeta-badges"><span class="vbadge '+esc(m.cls)+'">'+esc(m.code)+'</span><span class="vbadge">'+esc(m.type||v.kind)+'</span>'+(cs?'<span class="vbadge">choice: '+esc(cs)+'</span>':'')+(sc?'<span class="vbadge">scale: '+esc(sc)+'</span>':'')+(i.required?'<span class="vbadge">required</span>':'<span class="vbadge">missing allowed</span>')+'</div></div>';}).join(''):'<p style="font-size:11px;color:var(--t3);padding:8px">Define items and scales to see variables here.</p>';
   var rb=document.getElementById('rqsBody');if(!rb)return;
-  document.getElementById('anMidTitle').textContent=anTab==='plan'?'Analysis plans':anTab==='run'?'Run queue':'Report outline';
-  var capEl=document.getElementById('anMidCaption');if(capEl){capEl.innerHTML=anTab==='plan'?'Design stage. Declare each analysis before collecting data. Plans are saved into the <code>.sframe</code> file.':anTab==='run'?'Preview only. These plans execute in R via <code>run_analysis_plan(instr, responses)</code> once responses are collected. Nothing runs in this browser.':'Preview only. This outline shows the sections <code>render_report()</code> will produce in R. No report is generated in this browser.';}
+  document.getElementById('anMidTitle').textContent=anTab==='plan'?'Analysis plans':anTab==='run'?'Declared analyses':'Expected outputs';
+  var capEl=document.getElementById('anMidCaption');if(capEl){capEl.innerHTML=anTab==='plan'?'Design stage. Declare each analysis before collecting data. Plans are saved into the <code>.sframe</code> file.':anTab==='run'?'The analyses that need data, declared before any is collected. Nothing runs in this browser: they run in R via <code>run_analysis_plan(instr, responses)</code> once responses are collected.':'The sections <code>render_report()</code> will produce in R, and where each analysis puts its table, chart and interpretation. No report is made in this browser.';}
   var allPlans=S.analysis_plan;
   var runPlans=allPlans.filter(function(r){return r.requires_data!==false;});
   var syntaxOnly=allPlans.filter(function(r){return r.requires_data===false;});
   var displayPlans=anTab==='run'?runPlans:allPlans;
   if(!allPlans.length){rb.innerHTML='<div class="an-empty"><div class="an-empty-ic">&#128300;</div><div class="an-empty-t">No analysis plans yet</div><div class="an-empty-b">Declare each analysis before collecting data: method, roles, assumptions, and planned outputs.</div><div style="margin-top:14px"><button type="button" class="btn btn-p" onclick="openRQModal()">+ Add plan</button></div></div>';return;}
-  // Plan and Run preview both show draggable plan cards. Run preview is the
+  // Plan and Declared analyses both show draggable plan cards. Declared analyses is the
   // execution queue: the same cards, minus syntax-only methods, reorderable
   // in place (drag order writes back to S.analysis_plan by id).
   var draggable=anTab==='plan'||anTab==='run';
