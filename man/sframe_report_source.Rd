@@ -39,6 +39,18 @@ Someone can delete the provenance chunk, as they can edit any document.
 The tamper evidence a reviewer can check lives in the \code{.sframe}, the
 responses hash and the results record, all checkable without the report.
 }
+\examples{
+\donttest{
+d <- sframe_demo("likert_scale")
+dir <- file.path(tempdir(), "report-source-example")
+render_report(d$instrument, d$responses, output_file = dir, format = "qmd",
+              open = FALSE)
+src <- sframe_report_source(dir)
+src$check$numbers_match
+src$check$source_edited
+unlink(dir, recursive = TRUE)
+}
+}
 \seealso{
 \code{\link[=render_report]{render_report()}}
 
