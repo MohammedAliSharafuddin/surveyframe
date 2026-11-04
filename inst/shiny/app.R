@@ -4623,20 +4623,8 @@ server <- function(input, output, session) {
 
   # Which engine will write the report, and what the built-in one cannot do.
   output$export_engine_note <- renderUI({
-    use_quarto <- isTRUE(getOption("surveyframe.use_quarto", TRUE))
-    quarto <- Sys.which("quarto")
-    builtin <- paste(
-      "the built-in engine writes the report. It formats references in APA 7",
-      "only, so another citation style needs Quarto, from quarto.org.")
-    if (use_quarto && nzchar(quarto)) {
-      tags$p(class = "plan-msg ok", paste0(
-        "Quarto found at ", unname(quarto), ". It writes the report, in any citation style."))
-    } else if (!use_quarto) {
-      tags$p(class = "plan-msg", paste0(
-        "Quarto is turned off by options(surveyframe.use_quarto = FALSE), so ", builtin))
-    } else {
-      tags$p(class = "plan-msg", paste0("Quarto was not found, so ", builtin))
-    }
+    note <- sframe_studio_quarto_note()
+    tags$p(id = "quarto_status", class = paste("plan-msg", if (note$ok) "ok"), note$text)
   })
 
   output$download_report_btn <- downloadHandler(

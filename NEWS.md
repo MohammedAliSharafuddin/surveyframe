@@ -1088,6 +1088,11 @@ style.
 
 ## SurveyStudio
 
+* **Studio finds Quarto where `render_report()` does**, including the copy
+  bundled with RStudio or Positron, and its status line gives the version
+  and where it was found, such as "Quarto 1.8.24, found on the PATH".
+  Without Quarto the line names the remedy. It asked `Sys.which("quarto")`
+  and said Quarto was not found where the report would use it.
 * **Drop from scale and Put back under a result.** Under a reliability,
   item, EFA readiness, EFA, CFA or PLS result, each item past the usual
   cut-offs has "Drop from scale", which opens the amendment dialog with the
