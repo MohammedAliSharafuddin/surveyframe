@@ -1233,6 +1233,20 @@ studio_primary_file <- function(tag) {
   htmltools::tagQuery(tag)$find(".btn")$addClass("btn-primary sf-primary")$allTags()
 }
 
+# A version token for a file under sfbuilder/, from the package version and
+# the first 8 characters of the file's MD5, so a browser that cached an
+# older builder or field_tools.js fetches the new one after an upgrade or an
+# edit (item 12g).
+studio_asset_token <- function(file) {
+  path <- system.file("builder", file, package = "surveyframe")
+  hash <- if (nzchar(path)) substr(unname(tools::md5sum(path)), 1L, 8L) else "0"
+  paste0(utils::packageVersion("surveyframe"), "-", hash)
+}
+studio_asset_src <- function(file, query = NULL) {
+  paste0("sfbuilder/", file, "?", paste(c(query, paste0("v=", studio_asset_token(file))),
+                                        collapse = "&"))
+}
+
 studio_report_tab <- function(id, label, on = FALSE) {
   tags$button(type = "button", id = paste0("rtab-", id),
     class = paste("report-tab", if (on) "active"), role = "tab",
@@ -1247,7 +1261,7 @@ studio_report_pane <- function(id, on, ...) {
 ui <- fluidPage(
   tags$head(
     tags$title("SurveyStudio"),
-    tags$script(src = "sfbuilder/field_tools.js"),
+    tags$script(src = studio_asset_src("field_tools.js")),
     tags$link(rel = "stylesheet", href = "sfstudio/studio-actions.css"),
     tags$style(HTML("
       body { font-family: 'Helvetica Neue', Arial, sans-serif;
@@ -1783,7 +1797,7 @@ ui <- fluidPage(
           tags$span(id = "design_unsaved", class = "hint", style = "display: none;",
                  "Unsaved changes. Save to Studio to keep them.")),
         tags$iframe(id = "design_frame", title = "SurveyBuilder",
-          src = "sfbuilder/survey_builder.html?host=studio",
+          src = studio_asset_src("survey_builder.html", "host=studio"),
           style = paste("width: 100%; height: calc(100vh - 150px); min-height: 600px;",
                         "border: 1px solid #e0e3ea; border-radius: 8px; background: #fff;"))
       ),

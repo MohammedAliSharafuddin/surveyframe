@@ -359,6 +359,23 @@ test_that("Responses puts the Google Sheet card first, with Read from Google She
   expect_identical(ui2_js(b, "$('#sheet_pkg_missing').is(':visible')"), !has_gs)
 })
 
+test_that("the builder iframe and field_tools.js carry a version token (item 12g)", {
+  b <- ui1_studio("factor_structure")
+  token <- function(file) {
+    path <- sframe_installed_path("inst", "builder", file)
+    paste0(utils::packageVersion("surveyframe"), "-",
+           substr(unname(tools::md5sum(path)), 1L, 8L))
+  }
+  frame <- ui2_js(b, "document.getElementById('design_frame').getAttribute('src')")
+  expect_identical(frame, paste0("sfbuilder/survey_builder.html?host=studio&v=",
+                                 token("survey_builder.html")))
+  script <- ui2_js(b, "$('script[src^=\"sfbuilder/field_tools.js\"]').attr('src')")
+  expect_identical(script, paste0("sfbuilder/field_tools.js?v=", token("field_tools.js")))
+  # The token leaves the builder's Studio route on, which reads ?host=studio.
+  expect_true(ui1_screen(b, "design"))
+  expect_true(ui2_wait(b, "(function(){ var w = document.getElementById('design_frame').contentWindow; return !!(w && w.STUDIO_HOST); })()", 60))
+})
+
 # Last, since it loads the page again, which starts Studio's session again.
 test_that("sidebar groups fold, stay folded after a reload, and a fragment into a folded group opens it", {
   b <- ui1_studio("factor_structure")

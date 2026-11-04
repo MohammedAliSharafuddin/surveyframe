@@ -157,7 +157,7 @@ test_that("the Report screen has no BibTeX box and cites through the shared pick
                collapse = "\n")
   expect_false(grepl("rpt_bibtex", src, fixed = TRUE))
   expect_false(grepl("Further references", src, fixed = TRUE))
-  expect_match(src, 'tags$script(src = "sfbuilder/field_tools.js")', fixed = TRUE)
+  expect_match(src, 'tags$script(src = studio_asset_src("field_tools.js"))', fixed = TRUE)
   expect_match(src, "studio_cite_field(textAreaInput(fld, NULL,", fixed = TRUE)
   expect_match(src, 'id = "rpt_manage_refs", "Manage references"', fixed = TRUE)
   expect_match(src, 'paste0("hypothesis:", hyp)', fixed = TRUE)
