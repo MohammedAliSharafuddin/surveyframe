@@ -3486,7 +3486,7 @@ server <- function(input, output, session) {
         else "The analyses declared in Plan, run as declared against the loaded responses. A change to the plan now is recorded as a design amendment."),
       if (is.null(tbl)) tags$p(class = "hint", "No analyses are declared yet.")
       else tags$div(style = "overflow-x:auto",
-        shiny::renderTable(tbl, rownames = FALSE)()),
+        shiny::HTML(shiny::renderTable(tbl, rownames = FALSE)())),
       tags$a(href = "#", id = "analysis_change_plan", `data-nav` = "plan", class = "btn btn-outline", "Change plan"))
   })
 
