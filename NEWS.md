@@ -1088,6 +1088,9 @@ style.
 
 ## SurveyStudio
 
+* **SurveyBuilder's Open Collect, Open References and Manage references open
+  Studio's screens** when the builder runs inside Studio. Studio handles the
+  builder's `goto` message for Collect and References.
 * **Studio's long text fields take SurveyBuilder's format toolbar**: the
   Report's interpretation boxes and the amendment dialog's deviation report
   show it on focus and hide it on blur, insert Markdown, and cite through

@@ -263,4 +263,20 @@ test_that("the format toolbar shows on an interpretation box's focus, inserts Ma
   expect_true(ui2_wait(b, paste0("!", ui1_modal_open), 20))
 })
 
+test_that("the builder's Open Collect and Manage references open Studio's screens", {
+  b <- ui1_studio("factor_structure")
+  expect_true(ui1_screen(b, "design"))
+  frame <- "document.getElementById('design_frame').contentWindow"
+  expect_true(ui2_wait(b, paste0(frame, ".S && typeof ", frame, ".studioGoto === 'function'"), 60))
+  ui2_js(b, paste0("var w = ", frame, "; var btn = w.document.querySelector('button[onclick=\"studioGoto(\\'collect\\')\"]'); btn.click(); true"))
+  expect_true(ui2_wait(b, "$('#screen-collect').hasClass('active') && location.hash === '#collect'", 10))
+  expect_true(ui1_screen(b, "design"))
+  ui2_js(b, paste0(frame, ".manageRefs(); true"))
+  expect_true(ui2_wait(b, "$('#screen-references').hasClass('active')", 10))
+  # A message from another window does nothing.
+  ui2_js(b, "window.postMessage({type: 'goto', screen: 'collect'}, location.origin); true")
+  Sys.sleep(1)
+  expect_true(ui2_js(b, "$('#screen-references').hasClass('active')"))
+})
+
 ui1_close()
