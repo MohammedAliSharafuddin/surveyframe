@@ -373,7 +373,7 @@ input,textarea,select{font-family:inherit;font-size:13px}
 /* -- Settings tabs -------------------------------------------------------- */
 .stabs{display:flex;gap:2px;background:var(--cg);border-radius:10px;
   padding:3px;margin-bottom:12px;flex-wrap:wrap}
-.stab{padding:5px 10px;border-radius:var(--r);font-size:11px;font-weight:500;
+.stab{border:0;background:none;font-family:inherit;cursor:pointer;color:inherit;padding:5px 10px;border-radius:var(--r);font-size:11px;font-weight:500;
   color:var(--t2);cursor:pointer;transition:all var(--d1);white-space:nowrap}
 .stab.active{background:var(--cf);color:var(--cp);font-weight:600;
   box-shadow:0 1px 3px rgba(0,0,0,.08)}
@@ -775,14 +775,14 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
 <div class="modal wide" role="dialog" aria-modal="true" aria-labelledby="set-title">
   <div class="mhdr"><span class="mtitle" id="set-title">Survey Settings</span><button type="button" class="mx" aria-label="Close" onclick="closeModal('m-settings')">&#215;</button></div>
   <div class="mbody">
-    <div class="stabs">
-      <div class="stab active" onclick="showST('meta')"     id="st-meta">General</div>
-      <div class="stab"        onclick="showST('study')"    id="st-study">Study</div>
-      <div class="stab"        onclick="showST('header')"   id="st-header">Header</div>
-      <div class="stab"        onclick="showST('gsheets')"  id="st-gsheets">Google Sheets</div>
-      <div class="stab"        onclick="showST('refs')"     id="st-refs">References</div>
+    <div class="stabs" role="tablist" aria-label="Survey settings sections" onkeydown="stabKey(event)">
+      <button type="button" role="tab" class="stab active" id="st-meta" aria-controls="sp-meta" aria-selected="true" tabindex="0" onclick="showST('meta')">General</button>
+      <button type="button" role="tab" class="stab" id="st-study" aria-controls="sp-study" aria-selected="false" tabindex="-1" onclick="showST('study')">Study</button>
+      <button type="button" role="tab" class="stab" id="st-header" aria-controls="sp-header" aria-selected="false" tabindex="-1" onclick="showST('header')">Header</button>
+      <button type="button" role="tab" class="stab" id="st-gsheets" aria-controls="sp-gsheets" aria-selected="false" tabindex="-1" onclick="showST('gsheets')">Google Sheets</button>
+      <button type="button" role="tab" class="stab" id="st-refs" aria-controls="sp-refs" aria-selected="false" tabindex="-1" onclick="showST('refs')">References</button>
     </div>
-    <div class="stp active" id="sp-meta">
+    <div class="stp active" id="sp-meta" role="tabpanel" aria-labelledby="st-meta">
       <div class="field"><label class="fl" for="s-title">Survey title <span class="fr">*</span></label><div class="fc"><input type="text" id="s-title"></div></div>
       <div class="frow">
         <div class="field"><label class="fl" for="s-ver">Version</label><div class="fc"><input type="text" id="s-ver"></div></div>
@@ -798,7 +798,7 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
         <div class="field"><label class="fl" for="s-theme">Theme colour</label><div class="fc color-row"><input type="color" id="s-theme-picker" value="#2563eb" aria-label="Theme colour picker" oninput="syncThemeFromPicker()"><input type="text" id="s-theme" placeholder="#2563eb" oninput="syncThemeFromText()"></div></div>
       </div>
     </div>
-    <div class="stp" id="sp-study">
+    <div class="stp" id="sp-study" role="tabpanel" aria-labelledby="st-study">
       <div class="alert-i">The study this instrument serves: the problem, the objectives and the sampling plan. It is saved in the .sframe file and printed in the report, and never shown to respondents, since telling them the aims can bias their answers. A change to it after data collection is a design amendment.</div>
       <div class="field"><label class="fl" for="s-problem">Problem statement</label><div class="fc"><textarea id="s-problem" rows="4" placeholder="1 short paragraph: what is not yet known, and why it matters."></textarea></div></div>
       <div class="field"><span class="fl" id="s-objs-l">Objectives</span><div id="s-objs" role="group" aria-labelledby="s-objs-l"></div><button type="button" class="btn btn-s btn-sm" onclick="studyAddObjective()">+ Add objective</button><span class="fhint">Each has an id such as O1, and a research question names the objective it serves.</span></div>
@@ -809,7 +809,7 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
       </div>
       <div class="field" id="s-other-f" hidden><label class="fl" for="s-other">Describe the method <span class="fr">*</span></label><div class="fc"><input type="text" id="s-other"></div></div>
     </div>
-    <div class="stp" id="sp-header">
+    <div class="stp" id="sp-header" role="tabpanel" aria-labelledby="st-header">
       <div class="field"><label class="fl" for="s-inst">Institution or study name</label><div class="fc"><input type="text" id="s-inst" placeholder="University: Department"></div></div>
       <div class="field"><label class="fl">Logo image</label>
         <div style="display:flex;align-items:center;gap:8px;margin-top:4px">
@@ -821,7 +821,7 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
       </div>
       <label class="fcheck"><input type="checkbox" id="s-prog" checked><span>Show progress bar during survey</span></label>
     </div>
-    <div class="stp" id="sp-gsheets">
+    <div class="stp" id="sp-gsheets" role="tabpanel" aria-labelledby="st-gsheets">
       <div class="alert-i studio-only" hidden>In SurveyStudio, responses are collected from its Collect screen. <button type="button" class="btn btn-p btn-sm" onclick="studioGoto('collect')">Open Collect</button></div>
       <div class="studio-not">
       <div class="alert-i"><strong>Collect responses in a Google Sheet, free and with no server.</strong> Do these steps in order:<ol style="margin:8px 0 0;padding-left:18px;line-height:1.6"><li>Create a blank Google Sheet and paste its link in the box below.</li><li>Click <strong>Generate collector (.gs)</strong> to download the script. In your Sheet, open <strong>Extensions &gt; Apps Script</strong>, delete any code there, and paste the downloaded file.</li><li>In Apps Script, click <strong>Deploy &gt; New deployment &gt; Web app</strong>, set <strong>Who has access</strong> to <strong>Anyone</strong>, and copy the Web App URL it gives you.</li><li>Paste that Web App URL in the last box, then click <strong>Export survey</strong>. Every response is now saved to your Sheet.</li></ol></div>
@@ -830,7 +830,7 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
       <div class="field"><label class="fl" for="s-gsep">Apps Script Web App URL</label><div class="fc"><input type="url" id="s-gsep" placeholder="https://script.google.com/macros/s/your-script-id/exec"></div><span class="fhint">Paste the deployed Web App URL here, then re-export the survey.</span></div>
       </div>
     </div>
-    <div class="stp" id="sp-refs">
+    <div class="stp" id="sp-refs" role="tabpanel" aria-labelledby="st-refs">
       <div class="alert-i studio-only" hidden>In SurveyStudio, references are managed on its References screen. <button type="button" class="btn btn-p btn-sm" onclick="studioGoto('references')">Open References</button></div>
       <div class="studio-not">
       <div class="alert-i">The works this instrument draws on: where a scale or an item comes from, and what supports a planned analysis. Each change applies at once. They are saved in the .sframe file, and the report cites them in text and lists them once, in its References section at the end.</div>
@@ -3746,7 +3746,20 @@ function settingsInputs(){
   SETTINGS_CHECK.forEach(function(id){var e=document.getElementById(id);o[id]=!!(e&&e.checked);});
   return o;
 }
-function showST(t){document.querySelectorAll('.stab').forEach(function(b){b.classList.remove('active');});document.querySelectorAll('.stp').forEach(function(p){p.classList.remove('active');});document.getElementById('st-'+t).classList.add('active');document.getElementById('sp-'+t).classList.add('active');}
+// The Settings sections are a tablist (UX-15): buttons with aria-selected and
+// aria-controls, 1 in the Tab order, and the arrow keys, Home and End move
+// between them. They were divs that answered a click alone.
+function showST(t){
+  document.querySelectorAll('.stab').forEach(function(b){var on=b.id==='st-'+t;b.classList.toggle('active',on);b.setAttribute('aria-selected',on?'true':'false');b.setAttribute('tabindex',on?'0':'-1');});
+  document.querySelectorAll('.stp').forEach(function(p){p.classList.toggle('active',p.id==='sp-'+t);});
+}
+function stabKey(e){
+  var tabs=Array.prototype.slice.call(document.querySelectorAll('.stabs .stab'));
+  var i=tabs.indexOf(document.activeElement);if(i<0)return;
+  var j=e.key==='ArrowRight'?(i+1)%tabs.length:e.key==='ArrowLeft'?(i-1+tabs.length)%tabs.length:e.key==='Home'?0:e.key==='End'?tabs.length-1:-1;
+  if(j<0)return;
+  e.preventDefault();showST(tabs[j].id.slice(3));tabs[j].focus();
+}
 function normHex(v){
   v=String(v||'').trim();
   if(/^#[0-9a-fA-F]{6}$/.test(v))return v.toLowerCase();
