@@ -107,7 +107,27 @@
     "checks": { "type": "array" },
     "analysis_plan": {
       "type": "array",
-      "description": "Pre-declared analyses. Present here is what makes the file a pre-registration rather than a description."
+      "description": "Pre-declared analyses. Present here is what makes the file a pre-registration rather than a description.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "objective": {
+            "type": "string",
+            "pattern": "^([A-Za-z][A-Za-z0-9_]*)?$",
+            "description": "Optional (surveyframe 0.4.3). The id of the study objective this block serves, one of study.objectives[].id. An empty string names no objective. A block naming an objective the study does not declare is invalid, a check this schema cannot express and surveyframe's validate_sframe() makes."
+          },
+          "hypotheses": {
+            "type": ["object", "null"],
+            "description": "Optional (surveyframe 0.4.3). The hypotheses the researcher declared before the data, printed by a report as written. A text null hypothesis, a text alternative, or both. SurveyBuilder writes null when none was written.",
+            "minProperties": 1,
+            "additionalProperties": false,
+            "properties": {
+              "null": { "type": "string" },
+              "alternative": { "type": "string" }
+            }
+          }
+        }
+      }
     },
     "models": { "type": "array" },
     "render": { "type": ["array", "object", "null"] },
@@ -132,6 +152,45 @@
           "previous_hash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
           "new_hash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
           "changed_fields": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    },
+    "study": {
+      "type": "object",
+      "description": "Optional (surveyframe 0.4.3). The study the instrument serves: the problem statement, the objectives and the sampling plan. Never shown to respondents, since telling them the aims can bias their answers. Inside the content hash and the amendment content hash, so a change to it after collection is a design amendment. Present only when something is declared, so an instrument without a study hashes as it did before this field existed. Objective ids are unique within the study, a check this schema cannot express and surveyframe's validate_sframe() makes.",
+      "minProperties": 1,
+      "additionalProperties": false,
+      "properties": {
+        "problem": { "type": "string", "description": "The problem statement, 1 short paragraph. surveyframe notes, without failing, a statement over 150 words." },
+        "objectives": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["id", "text"],
+            "properties": {
+              "id": { "type": "string", "pattern": "^[A-Za-z][A-Za-z0-9_]*$", "description": "Such as O1. A plan block names it in its objective field." },
+              "text": { "type": "string", "pattern": "\\S", "description": "The objective, not blank." }
+            }
+          }
+        },
+        "sampling": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": false,
+          "properties": {
+            "population": { "type": "string" },
+            "method": {
+              "type": "string",
+              "enum": ["simple_random", "systematic", "stratified", "cluster", "convenience", "purposive", "quota", "snowball", "census", "other"],
+              "description": "Probability methods: simple_random, systematic, stratified, cluster. Non-probability methods: convenience, purposive, quota, snowball. census asks the whole population. other is described in method_other."
+            },
+            "method_other": { "type": "string", "description": "Describes an other method. Required, and not blank, when method is other, and absent otherwise." },
+            "planned_n": { "type": "integer", "minimum": 1 }
+          },
+          "if": { "required": ["method"], "properties": { "method": { "const": "other" } } },
+          "then": { "required": ["method_other"], "properties": { "method_other": { "pattern": "\\S" } } },
+          "else": { "not": { "required": ["method_other"] } }
         }
       }
     },
