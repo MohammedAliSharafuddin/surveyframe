@@ -94,7 +94,7 @@ test_that("both engines print the provenance table built in R", {
                                  "Responses sha256", "Results record sha256", "surveyframe"))
   qmd <- paste(readLines(system.file("templates", "report.qmd", package = "surveyframe")),
                collapse = "\n")
-  expect_match(qmd, "params$provenance_path", fixed = TRUE)
+  expect_match(qmd, "input(\"provenance_path\")", fixed = TRUE)
   expect_match(qmd, "## Provenance", fixed = TRUE)
 })
 

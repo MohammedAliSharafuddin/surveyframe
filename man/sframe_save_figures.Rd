@@ -56,6 +56,7 @@ Other Report functions:
 \code{\link[=sframe_analysis_qmd]{sframe_analysis_qmd()}},
 \code{\link[=sframe_codebook]{sframe_codebook()}},
 \code{\link[=sframe_format_result]{sframe_format_result()}},
+\code{\link[=sframe_report_source]{sframe_report_source()}},
 \code{\link{sframe_reports}}
 }
 \concept{Report functions}

@@ -541,6 +541,18 @@ style.
   where none is, and only without Quarto through the built-in page printed
   by pagedown. The `"converter"` attribute and the manifest name the route.
   Outside HTML every table is numbered, and its title kept, in each format.
+* **The Quarto source of a report, which checks itself.**
+  `render_report(format = "qmd")` writes a folder: `report.qmd`, the
+  `.sframe`, `responses.csv`, the bibliography and its style, the results
+  record and `manifest.json`, with no `_quarto.yml`. Opened in RStudio or
+  Positron, `report.qmd` recomputes every number from the folder's own files
+  through the new `sframe_report_source()`, and its Provenance section says
+  "Numbers match the recorded results" or "Numbers differ from the
+  recorded results" with both hashes, and whether `report.qmd` was edited
+  after surveyframe wrote it. Editing stays allowed and is disclosed. The
+  instrument's text reaches the `.qmd` only as its JSON-quoted title and
+  authors, so a title holding quotes, a colon or a `---` line leaves the
+  front matter whole.
 * **Every report has a results record and a manifest beside it.**
   `render_report()` writes `<name>_results.json`, the plan results as
   canonical JSON, and `<name>_manifest.json`, the sha256 of the instrument

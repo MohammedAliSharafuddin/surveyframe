@@ -44,6 +44,7 @@ params:
   declarations_path: ""
   content_path:      ""
   provenance_path:   ""
+  source_dir:        ""
   instrument_hash:     ""
   analysis_seed:       ""
   use_citations:       false
@@ -63,6 +64,17 @@ library(surveyframe)
 library(knitr)
 
 `%||%` <- function(x, y) if (is.null(x)) y else x
+
+# A report source folder (render_report(format = "qmd")) names itself in
+# source_dir. sframe_report_source() then reads its .sframe, responses and
+# results record, recomputes every number, checks them against the record
+# and hands over the same inputs render_report() passes (NAMING decision
+# 6). Nothing from the folder's fields is ever written into this file.
+src <- if (nzchar(params$source_dir %||% "")) {
+  sframe_report_source(params$source_dir, include_analysis = isTRUE(params$include_analysis),
+                       plot_palette = params$plot_palette %||% "web")
+}
+input <- function(name) if (is.null(src)) params[[name]] else src[[name]] %||% ""
 
 # HTML, or Word, OpenDocument and PDF (8b-R). The HTML report keeps its HTML
 # tables, numbered figures and notes. Every other format gets pipe tables,
@@ -108,23 +120,23 @@ if (identical(params$fig_format %||% "", "svg")) {
 }
 if (length(fig_opts)) do.call(knitr::opts_chunk$set, fig_opts)
 
-instrument <- readRDS(params$instrument_path)
-has_data   <- nzchar(params$data_path) && file.exists(params$data_path)
-responses  <- if (has_data) readRDS(params$data_path) else NULL
+instrument <- readRDS(input("instrument_path"))
+has_data   <- nzchar(input("data_path")) && file.exists(input("data_path"))
+responses  <- if (has_data) readRDS(input("data_path")) else NULL
 # Written interpretations keyed by analysis-plan block id, supplied by
 # render_report(interpretations = ...). Empty when none were given.
-interps    <- if (nzchar(params$interpretations_path %||% "") &&
-                  file.exists(params$interpretations_path)) {
-  readRDS(params$interpretations_path)
+interps    <- if (nzchar(input("interpretations_path")) &&
+                  file.exists(input("interpretations_path"))) {
+  readRDS(input("interpretations_path"))
 } else {
   list()
 }
 # The codebook table, the distribution charts and the plan results,
 # computed by render_report() inside the package (naming decision 6). The
 # template prints them, so it and the built-in engine report the same.
-content <- if (nzchar(params$content_path %||% "") &&
-               file.exists(params$content_path)) {
-  readRDS(params$content_path)
+content_path <- if (is.null(src)) params$content_path else src$content_path
+content <- if (nzchar(content_path %||% "") && file.exists(content_path)) {
+  readRDS(content_path)
 } else {
   list(codebook_items = NULL, charts = list(), results = NULL)
 }
@@ -222,8 +234,8 @@ cat(sprintf("**Validation status:** %s\n\n",
 # What the report was built from: the instrument hash and its check, the
 # amendment count, the responses sha256 and the results record sha256, from
 # the table render_report() builds for both engines (NAMING decision 6).
-prov <- if (nzchar(params$provenance_path %||% "") && file.exists(params$provenance_path))
-  readRDS(params$provenance_path) else NULL
+prov <- if (nzchar(input("provenance_path")) && file.exists(input("provenance_path")))
+  readRDS(input("provenance_path")) else NULL
 if (is.null(prov)) {
   cat("No provenance was recorded for this render.\n\n")
 } else {
@@ -425,9 +437,9 @@ if (is.null(rr)) {
 # interpretation below it, labelled as written after the results (D12).
 # render_report() computes both with the helpers the built-in engine uses,
 # so the 2 reports say the same.
-decls <- if (nzchar(params$declarations_path %||% "") &&
-             file.exists(params$declarations_path)) {
-  readRDS(params$declarations_path)
+decls <- if (nzchar(input("declarations_path")) &&
+             file.exists(input("declarations_path"))) {
+  readRDS(input("declarations_path"))
 } else {
   list(blocks = list())
 }
@@ -578,7 +590,7 @@ for (model in instrument$models) {
 
 ```{r repro}
 #| output: asis
-hash_val <- params$instrument_hash
+hash_val <- input("instrument_hash")
 if (is.null(hash_val) || !nzchar(hash_val)) hash_val <- "see .sframe file"
 cat(sprintf("**Instrument version:** %s\n\n", instrument$meta$version %||% ""))
 cat(sprintf("**Instrument hash:** `%s`\n\n", hash_val))
@@ -597,7 +609,7 @@ cat(sprintf("**surveyframe:** %s%s\n\n", sf_desc$Version,
             if (nzchar(sf_sha)) {
               sprintf(", commit `%s`", sub("^([0-9a-f]{12})[0-9a-f]*", "\\1", sf_sha))
             } else ""))
-seed_val <- params$analysis_seed
+seed_val <- input("analysis_seed")
 if (is.null(seed_val) || !nzchar(seed_val)) seed_val <- "not recorded"
 cat(sprintf("**Analysis seed:** `%s`\n\n", seed_val))
 cat(sprintf("**Report generated:** %s\n\n", format(Sys.time(), "%Y-%m-%d %H:%M %Z")))

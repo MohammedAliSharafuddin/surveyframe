@@ -268,7 +268,7 @@ print.sframe_codebook <- function(x, ...) {
 #' @param output_path Character or NULL. Alias for `output_file`. If both are
 #'   supplied, `output_file` takes precedence.
 #' @param format Character. Output format: `"html"` (default), `"pdf"`,
-#'   `"docx"` (Word) or `"odt"` (OpenDocument). Word and OpenDocument go
+#'   `"docx"` (Word), `"odt"` (OpenDocument) or `"qmd"` (the Quarto source). Word and OpenDocument go
 #'   through Quarto, styled by bundled APA 7 reference documents (Times New
 #'   Roman 12, double spacing, APA headings), and stop with a message when
 #'   Quarto is not found. PDF goes through Quarto and LaTeX when a LaTeX
@@ -280,6 +280,13 @@ print.sframe_codebook <- function(x, ...) {
 #'   `"quarto-latex"`, `"quarto-typst"`, `"pagedown"`, or `"quarto"` for
 #'   Word and OpenDocument. The first Typst render of a session downloads a
 #'   Typst package Quarto's template imports, unless it is already cached.
+#'   `"qmd"` writes the Quarto source of the report as a folder, named by
+#'   `output_file` (a trailing `.qmd` is dropped), which must be new or empty:
+#'   `report.qmd`, the `.sframe`, `responses.csv`, the bibliography and its
+#'   style, the results record and `manifest.json`, and no `_quarto.yml`. Open
+#'   `report.qmd` in RStudio or Positron and render it. It recomputes every
+#'   number from the folder's files and checks them, through
+#'   [sframe_report_source()]. Writing the folder needs no Quarto.
 #' @param include_quality Logical. Whether to include the data quality report.
 #'   Requires `data`. Defaults to `TRUE`.
 #' @param include_reliability Logical. Whether to include reliability
@@ -397,7 +404,7 @@ render_report <- function(
     data              = NULL,
     output_file       = NULL,
     output_path       = NULL,
-    format            = c("html", "pdf", "docx", "odt"),
+    format            = c("html", "pdf", "docx", "odt", "qmd"),
     include_quality   = TRUE,
     include_reliability = TRUE,
     include_codebook  = TRUE,
@@ -570,11 +577,48 @@ render_report <- function(
                         plot_palette = plot_palette),
       error = function(e) e)
   }
+  record_json <- sframe_results_record_json(
+    if (is.list(plan_results) && !inherits(plan_results, "error")) plan_results else list(),
+    instrument, sframe_report_seed(data, instrument, include_analysis))
+  style <- csl %||% system.file("csl", "apa.csl", package = "surveyframe")
+  if (!is.null(csl) && !(nzchar(style) && file.exists(style))) {
+    rlang::abort(paste0("The citation style '", csl, "' was not found."), class = "sframe_error")
+  }
+  bibliography_extra <- c(sframe_flatten_references(list(references %||% list())),
+                          Filter(Negate(is.null), lapply(names(.sframe_citation_csl),
+                                                         sframe_builtin_reference)))
+
+  # The Quarto source (NAMING decision 6): a folder that renders the report
+  # again from its own .sframe and responses, and checks its numbers.
+  if (identical(format, "qmd")) {
+    folder <- sub("\\.qmd$", "", dest)
+    sframe_write_report_source(
+      folder, instrument, data, record_json,
+      front = sframe_report_front(report_title, report_authors, use_citations = TRUE),
+      params = list(
+        include_quality = include_quality && !is.null(data),
+        include_reliability = include_reliability && !is.null(data),
+        include_codebook = include_codebook,
+        include_missing = include_missing && !is.null(data),
+        include_descriptives = include_descriptives && !is.null(data),
+        include_analysis = include_analysis, include_models = include_models,
+        show_code = show_code, plot_palette = plot_palette, use_citations = TRUE,
+        fig_width = as.character(figures$width %||% ""),
+        fig_height = as.character(figures$height %||% ""),
+        fig_dpi = as.character(figures$dpi %||% ""),
+        fig_format = if (identical(figures$format, "svg")) "svg" else ""),
+      style = style, bibliography_extra = bibliography_extra,
+      interpretations = interpretations)
+    folder <- normalizePath(folder, mustWork = FALSE)
+    rlang::inform(paste0("Report source written to ", folder,
+                         ". Open report.qmd in RStudio or Positron and render it."),
+                  class = "sframe_report_engine")
+    attr(folder, "engine") <- "qmd"
+    return(invisible(folder))
+  }
+
   record_paths <- sframe_record_paths(dest)
-  writeLines(sframe_results_record_json(
-               if (is.list(plan_results) && !inherits(plan_results, "error")) plan_results else list(),
-               instrument, sframe_report_seed(data, instrument, include_analysis)),
-             record_paths$results, useBytes = TRUE)
+  sframe_write_text(record_json, record_paths$results)
   provenance <- sframe_report_provenance(instrument, data,
                                          sframe_sha256_file(record_paths$results))
 
@@ -667,18 +711,11 @@ render_report <- function(
     # The bibliography (0.4.3): every reference the instrument carries, the
     # host's, and all built-in method references. pandoc lists only those
     # actually cited, so carrying the full method set costs nothing.
-    style <- csl %||% system.file("csl", "apa.csl", package = "surveyframe")
     if (nzchar(style) && file.exists(style)) {
-      sframe_bibliography(
-        instrument,
-        extra = c(sframe_flatten_references(list(references %||% list())),
-                  Filter(Negate(is.null), lapply(names(.sframe_citation_csl), sframe_builtin_reference))),
-        file = file.path(render_dir, "references.json")
-      )
+      sframe_bibliography(instrument, extra = bibliography_extra,
+                          file = file.path(render_dir, "references.json"))
       file.copy(style, file.path(render_dir, "style.csl"), overwrite = TRUE)
       params$use_citations <- TRUE
-    } else if (!is.null(csl)) {
-      rlang::abort(paste0("The citation style '", csl, "' was not found."), class = "sframe_error")
     }
 
     param_args <- sframe_quarto_param_args(params)
@@ -687,14 +724,7 @@ render_report <- function(
     # as -M metadata on the command line. Quarto labels the date "Published"
     # by default, which a report that has not been published should not say.
     # JSON strings are valid YAML, so toJSON() quotes each value safely.
-    yaml_str <- function(s) as.character(jsonlite::toJSON(s, auto_unbox = TRUE))
-    front <- c(
-      paste0("title: ", yaml_str(report_title)),
-      if (length(report_authors)) c("author:", paste0("  - ", vapply(report_authors, yaml_str, character(1)))),
-      "language:", "  title-block-published: \"Rendered\"",
-      if (isTRUE(params$use_citations)) c("bibliography: references.json", "csl: style.csl",
-                                          "link-citations: true")
-    )
+    front <- sframe_report_front(report_title, report_authors, isTRUE(params$use_citations))
     qmd <- readLines(render_input, warn = FALSE)
     qmd <- qmd[!grepl("^title:", qmd) | seq_along(qmd) > grep("^---", qmd)[2]]
     qmd <- append(qmd, front, after = 1L)
@@ -794,6 +824,24 @@ sframe_builtin_banner <- function() {
          "surveyframe writes without Quarto. ",
          "<a href=\"https://quarto.org/docs/get-started/\" target=\"_blank\" rel=\"noopener\">",
          "Install Quarto for the full formatted report</a>.</div>")
+}
+
+# The front matter render_report() adds to a report.qmd: title, authors, the
+# date label and the bibliography. Quarto 1.8 ignores a bibliography given as
+# -M metadata on the command line, so it goes here. Quarto labels the date
+# "Published" by default, which a report that has not been published should
+# not say. JSON strings are valid YAML, so toJSON() quotes each value safely,
+# and a title holding a quote, a colon, a hash or a newline then --- stays a
+# single string and leaves the front matter whole.
+sframe_report_front <- function(title, authors, use_citations) {
+  yaml_str <- function(s) as.character(jsonlite::toJSON(s, auto_unbox = TRUE))
+  c(
+    paste0("title: ", yaml_str(title)),
+    if (length(authors)) c("author:", paste0("  - ", vapply(authors, yaml_str, character(1)))),
+    "language:", "  title-block-published: \"Rendered\"",
+    if (isTRUE(use_citations)) c("bibliography: references.json", "csl: style.csl",
+                                 "link-citations: true")
+  )
 }
 
 # The "-P name:value" arguments for a Quarto render.
