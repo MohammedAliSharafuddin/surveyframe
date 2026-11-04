@@ -175,7 +175,7 @@ knitr::include_graphics("figures/gui-studio-analysis.png")
 
 The Report screen produces the written report through `render_report()`, in
 4 tabs: Interpret (read each result and write what it means), Configure (the
-report's options), Export report and Reproduce. A choice made in 1 tab stays
+report's options, including the reference style), Export report and Reproduce. A choice made in 1 tab stays
 when you switch to another, and "Download copy" beside the title saves the
 `.sframe` file. Its
 options include the codebook, quality, missing data, descriptives, reliability,

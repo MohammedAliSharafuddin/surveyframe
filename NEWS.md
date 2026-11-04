@@ -1088,6 +1088,12 @@ style.
 
 ## SurveyStudio
 
+* **A Reference style select on the Report screen's Configure tab**: APA 7,
+  Chicago author-date, Harvard, IEEE and MLA, then "Other style (.csl
+  file)", which shows the upload and a link to zotero.org/styles. The
+  choice reaches `render_report(csl = )`, so the source folder holds the
+  style's file, such as `harvard.csl`. Without Quarto the select offers
+  APA 7 only and says why. The citation style upload left More options.
 * **The Report screen makes 2 products** (UX-20). Export report writes the
   finished report in HTML or PDF, and in Word or OpenDocument when Quarto is
   found. Reproduce downloads the reproducible source, the `.qmd` folder of

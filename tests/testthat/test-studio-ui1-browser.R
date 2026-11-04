@@ -119,4 +119,33 @@ test_that("Report has 4 local tabs, a choice survives a switch, and Download cop
   ui2_js(b, "$('#rtab-configure').click(); $('#rpt_codebook').prop('checked', true).trigger('change'); $('#rpt_title').val('').trigger('change'); $('#rtab-interpret').click(); true")
 })
 
+test_that("Harvard chosen as the reference style puts harvard.csl in the source folder", {
+  b <- ui1_studio("factor_structure")
+  expect_true(ui1_screen(b, "export"))
+  ui2_js(b, "$('#rtab-configure').click(); true")
+  expect_true(ui2_wait(b, "$('#rpane-configure').is(':visible') && !!document.getElementById('rpt_style')", 20))
+  opts <- ui2_js(b, "$('#rpt_style option').map(function(){ return $(this).text(); }).get().concat(document.getElementById('rpt_style').selectize ? Object.values(document.getElementById('rpt_style').selectize.options).map(function(o){ return o.label; }) : []).join('|')")
+  expect_match(opts, "^APA 7")
+  skip_if(is.na(surveyframe:::sframe_quarto_find()$path), "Quarto is not installed, so APA 7 is the only style")
+  expect_match(opts, "Harvard", fixed = TRUE)
+
+  ui1_set(b, "rpt_style", "other")
+  expect_true(ui2_wait(b, "$('#rpt_style_find').is(':visible') && $('#rpt_style_find').attr('target') === '_blank'"))
+  ui1_set(b, "rpt_style", "harvard")
+  expect_true(ui2_wait(b, "!$('#rpt_style_find').is(':visible')"))
+  Sys.sleep(1)
+  ui2_js(b, "$('#rtab-reproduce').click(); true")
+  expect_true(ui2_wait(b, "!!$('#download_source_btn').attr('href') && $('#download_source_btn').attr('href') !== '#'", 30))
+  zip_b64 <- ui2_js(b, paste0(
+    "fetch($('#download_source_btn').attr('href')).then(function(r) { return r.arrayBuffer(); })",
+    ".then(function(b) { var u = new Uint8Array(b), s = ''; for (var i = 0; i < u.length; i++) s += String.fromCharCode(u[i]); return btoa(s); })"),
+    await = TRUE)
+  zf <- tempfile(fileext = ".zip")
+  writeBin(jsonlite::base64_dec(zip_b64), zf)
+  listed <- utils::unzip(zf, list = TRUE)$Name
+  expect_true("report_source/harvard.csl" %in% listed)
+  expect_false("report_source/apa.csl" %in% listed)
+  ui1_set(b, "rpt_style", "apa")
+})
+
 ui1_close()
