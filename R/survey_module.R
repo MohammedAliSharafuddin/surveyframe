@@ -257,6 +257,13 @@ sframe_survey_server <- function(id, instrument, on_submit = NULL) {
         return()
       }
 
+      unspecified <- sframe_other_unspecified_items(instr, page_items, values, bl)
+      if (length(unspecified)) {
+        shiny::showNotification(sframe_other_unspecified_message(unspecified),
+                                type = "warning", duration = 6)
+        return()
+      }
+
       if (state$page >= length(pages)) {
         sframe_module_do_submit(state, instr, values, bl, on_submit)
       } else {
@@ -406,7 +413,8 @@ sf_mod_survey <- function(instr, page, values, ns, prefix) {
     shiny::div(class = "sf-item-wrap",
       id = paste0("sf_item_", drawn$id),
       style = if (!sframe_item_visible(item, values, bl)) "display:none",
-      sframe_render_input(drawn, choices_lookup, drawn_values))
+      sframe_render_input(drawn, choices_lookup, drawn_values,
+        sframe_item_allows_other(instr, item)))
   })
 
   rank_init <- lapply(

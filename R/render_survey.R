@@ -464,7 +464,49 @@ sframe_blank_date_input <- function(tag) {
 # every control is drawn with its answer restored. A control drawn at its
 # default reports that default to the server when it binds, so drawing a
 # page again without restoring would erase what the participant entered.
-sframe_render_input <- function(item, choices_lookup, values = list()) {
+# "Other, please specify" (UX-11), drawn as the static survey draws it: the
+# code "other" last in the options, outside any shuffle, and a text box under
+# them whose input is <id>__other_text. Typing in the box chooses Other.
+sframe_other_label <- "Other, please specify"
+
+sframe_other_choices <- function(cs, allow_other) {
+  cs <- cs %||% character(0)
+  if (isTRUE(allow_other)) c(cs, stats::setNames("other", sframe_other_label))
+  else cs
+}
+
+sframe_with_other <- function(item, values, allow_other, control) {
+  if (!isTRUE(allow_other)) return(control)
+  text_id <- paste0(item$id, "__other_text")
+  typed <- values[[text_id]]
+  shiny::tags$div(class = "sf-other-wrap", control,
+    shiny::tags$input(id = text_id, type = "text",
+      class = "form-control sf-other-txt",
+      `aria-label` = sframe_other_label,
+      value = if (sframe_has_answer(typed)) as.character(typed)[1] else "",
+      oninput = sprintf("sfOtherTyped(this, %s)", sframe_js_string(item$id))))
+}
+
+# The items of `items` shown to the respondent with Other chosen and nothing
+# typed, which says nothing, so the page or the submission stops there.
+sframe_other_unspecified_items <- function(instrument, items, input_values,
+                                           branch_lookup) {
+  Filter(function(i) {
+    sframe_item_allows_other(instrument, i) &&
+      sframe_item_visible(i, input_values, branch_lookup) &&
+      "other" %in% as.character(unlist(input_values[[i$id]])) &&
+      !sframe_has_answer(input_values[[paste0(i$id, "__other_text")]])
+  }, items)
+}
+
+sframe_other_unspecified_message <- function(items) {
+  paste0("Please say what \"Other\" is: ",
+         paste(vapply(items, function(i) i$label, character(1)),
+               collapse = "; "))
+}
+
+sframe_render_input <- function(item, choices_lookup, values = list(),
+                                allow_other = FALSE) {
   tags <- shiny::tags
   radioButtons <- shiny::radioButtons
   checkboxGroupInput <- shiny::checkboxGroupInput
@@ -501,13 +543,15 @@ sframe_render_input <- function(item, choices_lookup, values = list()) {
       choices = cs %||% character(0), inline = TRUE,
       selected = if (answered) as.character(current)[1] else character(0)),
 
-    single_choice = radioButtons(item$id, lbl,
-      choices = cs %||% character(0),
-      selected = if (answered) as.character(current)[1] else character(0)),
+    single_choice = sframe_with_other(item, values, allow_other,
+      radioButtons(item$id, lbl,
+        choices = sframe_other_choices(cs, allow_other),
+        selected = if (answered) as.character(current)[1] else character(0))),
 
-    multiple_choice = checkboxGroupInput(item$id, lbl,
-      choices = cs %||% character(0),
-      selected = if (answered) as.character(current) else NULL),
+    multiple_choice = sframe_with_other(item, values, allow_other,
+      checkboxGroupInput(item$id, lbl,
+        choices = sframe_other_choices(cs, allow_other),
+        selected = if (answered) as.character(current) else NULL)),
 
     numeric = numericInput(item$id, lbl,
       value = if (answered) current else NA),
@@ -860,6 +904,11 @@ sframe_survey_js <- function() {
     document.addEventListener('pointerdown', sfSliderTouched, true);
     document.addEventListener('keydown', sfSliderTouched, true);
   }
+  function sfOtherTyped(box, id) {
+    if (!box.value.trim()) return;
+    var opt = document.querySelector('input[name=\"' + id + '\"][value=\"other\"]');
+    if (opt && !opt.checked) { opt.checked = true; $(opt).trigger('change'); }
+  }
   function sfSetRating(id, val, max) {
     var btns = document.querySelectorAll('[id^=\"' + id + '_star_\"]');
     btns.forEach(function(b, i) { b.classList.toggle('active', i < val); });
@@ -1061,6 +1110,7 @@ run_survey <- function(
     .sf-conv-nav{display:flex;gap:10px;margin-top:20px}
     .sf-conv-hint{font-size:12px;color:#aaa;margin-top:8px}
     .sf-error-msg{color:#ef5350;font-size:13px;margin-top:6px}
+    .sf-other-txt{margin:-6px 0 12px;max-width:420px}
     .btn-primary{background:%s;color:#fff;border:none;border-radius:8px;
                   padding:12px 28px;font-size:15px;font-weight:600;
                   cursor:pointer;width:100%%;transition:opacity .15s}
@@ -1146,6 +1196,13 @@ run_survey <- function(
             paste("Please answer:", item$label), type = "warning", duration = 3)
           return()
         }
+        unspecified <- sframe_other_unspecified_items(instrument, list(item),
+                                                      iv, branch_lookup)
+        if (length(unspecified)) {
+          shiny::showNotification(sframe_other_unspecified_message(unspecified),
+                                  type = "warning", duration = 4)
+          return()
+        }
         if (cur < n) conv_idx(cur + 1L)
         else shiny::updateActionButton(session, "submit_btn",
                                        label = submit_label)
@@ -1166,6 +1223,13 @@ run_survey <- function(
         shiny::showNotification(
           paste("Please answer:", paste(missing_labels, collapse = "; ")),
           type = "error", duration = 6)
+        return()
+      }
+      unspecified <- sframe_other_unspecified_items(instrument, instrument$items,
+                                                    iv, bl)
+      if (length(unspecified)) {
+        shiny::showNotification(sframe_other_unspecified_message(unspecified),
+                                type = "error", duration = 6)
         return()
       }
       row <- submitted_row() %||% sframe_response_row(instrument, iv, bl,
@@ -1280,7 +1344,8 @@ run_survey <- function(
 
         item_ui <- tags$div(
           class = "sf-item-wrap",
-          sframe_render_input(item, choices_lookup, iv),
+          sframe_render_input(item, choices_lookup, iv,
+            sframe_item_allows_other(instrument, item)),
           tags$div(class = "sf-conv-hint",
             if (n > 1)
               sprintf("Question %d of %d", cur, n)
@@ -1321,7 +1386,8 @@ run_survey <- function(
         tags$div(class = "sf-item-wrap",
           id = paste0("sf_item_", item$id),
           style = if (!sframe_item_visible(item, iv, branch_lookup)) "display:none",
-          sframe_render_input(item, choices_lookup, iv))
+          sframe_render_input(item, choices_lookup, iv,
+            sframe_item_allows_other(instrument, item)))
       })
 
       # Initialise ranking JS after render
