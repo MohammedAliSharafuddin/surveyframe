@@ -438,6 +438,12 @@ style.
   `validate_sframe()` refuse it on a set holding the value `other` or
   `other_text`, which would share a code or a column with Other, and on an
   ordered set, where Other has no place on the scale.
+* **The codebook, the frequency tables and the report charts name Other.**
+  The choices table of `sframe_codebook()` and `as.data.frame()` lists
+  `other` with the label "Other" for a set with `allow_other`, and a frequency
+  table or chart shows "Other" for the code. The text typed for Other goes to
+  the text-analysis path: `sframe_clean_text()` and the text plans take
+  `<id>__other_text` as a text item, and the dashboard offers no filter on it.
 * **SurveyBuilder's welcome and thank-you pages are entries in the question
   list**, "Welcome page" first and "Thank-you page" last. Selecting one opens
   its editor on the right and its preview in the centre, and the Survey

@@ -14,6 +14,7 @@ dashboard_categorical_columns <- function(data, instrument = NULL) {
   if (inherits(instrument, "sframe")) {
     text_ids <- unlist(lapply(instrument$items, function(i)
       if (i$type %in% c("text", "textarea")) i$id))
+    text_ids <- c(text_ids, sframe_other_text_columns(instrument))
   }
   cols <- names(data)[vapply(data, function(x) {
     if (!(is.character(x) || is.factor(x) || is.logical(x))) return(FALSE)

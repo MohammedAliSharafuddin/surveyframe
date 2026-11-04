@@ -41,10 +41,12 @@ sframe_choices_table <- function(instrument) {
     ))
   }
   rows <- lapply(instrument$choices, function(cs) {
+    # A set with allow_other lists Other as the option respondents see last.
+    other <- isTRUE(cs$allow_other)
     data.frame(
       choice_set_id = cs$id,
-      value         = as.character(cs$values),
-      label         = cs$labels,
+      value         = c(as.character(cs$values), if (other) "other"),
+      label         = c(as.character(cs$labels), if (other) "Other"),
       stringsAsFactors = FALSE,
       check.names = FALSE
     )

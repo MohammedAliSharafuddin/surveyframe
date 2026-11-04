@@ -137,6 +137,11 @@ sframe_clean_text <- function(data, item_id, lowercase = TRUE,
   if (!is.null(instrument)) {
     sframe_check_instrument(instrument)
     item <- Find(function(i) identical(i$id, item_id), instrument$items %||% list())
+    # The text typed for "Other, please specify" (<id>__other_text) is free
+    # text from a choice item, and is analysed as a text item is.
+    if (is.null(item) && item_id %in% sframe_other_text_columns(instrument)) {
+      item <- list(id = item_id, type = "text")
+    }
     if (is.null(item)) {
       rlang::abort(paste0("No item '", item_id, "' found in the instrument."),
                    class = "sframe_error")
