@@ -986,6 +986,7 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
       <div class="field" id="rq-wordcloud-field" style="display:none"><label class="fl" for="rq-wordcloud">Word cloud</label><div class="fc"><label style="display:flex;align-items:center;gap:6px;font-weight:400"><input type="checkbox" id="rq-wordcloud"> Render as a word cloud instead of a bar chart</label></div></div>
       <div class="field" id="rq-seed-field" style="display:none"><label class="fl" for="rq-seed">Random seed</label><div class="fc"><input type="number" id="rq-seed" step="1" placeholder="42"></div></div>
       <div class="field" id="rq-topn-field" style="display:none"><label class="fl" for="rq-topn">Top N terms</label><div class="fc"><input type="number" id="rq-topn" step="1" min="1" placeholder="20"></div></div>
+      <div class="field" id="rq-pct-field" style="display:none"><label class="fl" for="rq-pct">Percentages in the table</label><div class="fc"><select id="rq-pct"><option value="">Counts only</option><option value="row">Row percentages</option><option value="column">Column percentages</option><option value="total">Percent of the total</option></select></div><span class="fhint">Each cell shows its count with the percentage over this denominator.</span></div>
       <div class="field" id="rq-k-field" style="display:none"><label class="fl" for="rq-k">Number of topics (k)</label><div class="fc"><input type="number" id="rq-k" step="1" min="2" placeholder="4"></div></div>
     </div>
     <div class="field" id="rqCitDiv"></div>
@@ -4977,6 +4978,7 @@ function openRQModal(id){
   document.getElementById('rq-seed').value=rq&&rq.options&&rq.options.seed!=null?String(rq.options.seed):'';
   document.getElementById('rq-topn').value=rq&&rq.options&&rq.options.top_n!=null?String(rq.options.top_n):'';
   document.getElementById('rq-k').value=rq&&rq.options&&rq.options.k!=null?String(rq.options.k):'';
+  sv('rq-pct',rq&&rq.options&&typeof rq.options.percent==='string'?rq.options.percent:'');
   document.getElementById('rqDelBtn').style.display=id?'inline-flex':'none';
   popRQVars(rolesFromLegacy(rq,method));onTestChg(false);
   // A fresh plan gets the same text-family nudge suggestTest() shows once a
@@ -5055,9 +5057,14 @@ function onTestChg(renderRoles){
   var sf=document.getElementById('rq-seed-field');if(sf)sf.style.display=reg.showSeed?'block':'none';
   var nf=document.getElementById('rq-topn-field');if(nf)nf.style.display=reg.showTopN?'block':'none';
   var kf=document.getElementById('rq-k-field');if(kf)kf.style.display=reg.showK?'block':'none';
+  var pf=document.getElementById('rq-pct-field');if(pf)pf.style.display=reg.showPercent?'block':'none';
   document.getElementById('rqCitDiv').innerHTML=cits.length?'<label class="fl">Reporting references</label><div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:4px">'+cits.map(function(k){return'<span class="cc">'+esc(CSHORT[k]||k)+'</span>';}).join('')+'</div>':'';
   validatePlanRoles();
 }
+// A cross-tab and a chi-square carry options$percent, the denominator of the
+// percentages shown beside each count (UX-02). Set only here, where plans are
+// edited.
+['crosstab','chi_square'].forEach(function(t){if(ANALYSIS_REGISTRY[t])ANALYSIS_REGISTRY[t].showPercent=true;});
 var TEXT_METHOD_IDS=['term_freq','ngram_freq','term_context','co_occurrence','co_occurrence_network','tidy_sentiment','quanteda_dfm','topic_model_lda','stm_topics'];
 function hasTextItems(){return S.items.some(function(i){return i.type==='text'||i.type==='textarea';});}
 function suggestTest(){
@@ -5130,6 +5137,7 @@ function saveRQ(){
   if(reg.showSeed&&gv('rq-seed').trim())opts.seed=parseInt(gv('rq-seed'),10);
   if(reg.showTopN&&gv('rq-topn').trim())opts.top_n=parseInt(gv('rq-topn'),10);
   if(reg.showK&&gv('rq-k').trim())opts.k=parseInt(gv('rq-k'),10);
+  if(reg.showPercent&&gv('rq-pct'))opts.percent=gv('rq-pct');
   // Only what the researcher wrote is saved. Placeholders are examples.
   var hyp=null;if(reg.showHypotheses){var h0=gv('rq-h0').trim(),h1=gv('rq-h1').trim();if(h0||h1){hyp={};if(h0)hyp.null=h0;if(h1)hyp.alternative=h1;}}
   var editRq=editRqId?S.analysis_plan.find(function(r){return r.id===editRqId;}):null;
