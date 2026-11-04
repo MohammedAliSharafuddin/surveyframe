@@ -350,6 +350,10 @@ style.
   choice or ranking item now shows its options in an order shuffled once per
   respondent and kept in a draft, and each option still submits its own
   value (UX-11).
+* **SurveyBuilder's Survey settings sections are a tablist**: buttons with
+  `aria-selected` and `aria-controls`, 1 of them in the Tab order, and the
+  arrow keys, Home and End move between them. They were divs that answered a
+  click alone (UX-15).
 * **SurveyBuilder's 7 dialogs are labelled modal dialogs** with
   `aria-modal` and `aria-labelledby`, and their close buttons have a name.
   Tab stays inside the open dialog, and Escape closes the top one through

@@ -359,4 +359,21 @@ test_that("Escape on a dialog opened over another closes the top one alone", {
 })
 
 
+test_that("the arrow keys move along the Settings tabs and select each", {
+  s <- ui2_builder(centre_instrument())
+  js(s, "openSettings('meta');document.getElementById('st-meta').focus();1")
+  ui2_key(s, "", "ArrowRight")
+  expect_identical(js(s, "document.activeElement.id"), "st-study")
+  expect_identical(js(s, "document.getElementById('st-study').getAttribute('aria-selected')"), "true")
+  expect_identical(js(s, "document.getElementById('st-meta').getAttribute('tabindex')"), "-1")
+  expect_true(js(s, "document.getElementById('sp-study').classList.contains('active')"))
+  ui2_key(s, "", "End")
+  expect_identical(js(s, "document.activeElement.id"), "st-refs")
+  ui2_key(s, "", "ArrowRight")
+  expect_identical(js(s, "document.activeElement.id"), "st-meta")
+  ui2_key(s, "", "ArrowLeft")
+  expect_identical(js(s, "document.activeElement.id"), "st-refs")
+})
+
+
 ui2_close()
