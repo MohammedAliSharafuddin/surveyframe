@@ -350,6 +350,14 @@ style.
   choice or ranking item now shows its options in an order shuffled once per
   respondent and kept in a draft, and each option still submits its own
   value (UX-11).
+* **The exported survey honours a choice set's `allow_other`.** A single or
+  multiple choice item adds "Other, please specify" last, with a text box,
+  and typing in the box chooses it. A single choice submits the code
+  `other` in its column, a multiple choice submits `<id>__other` as 1 or 0,
+  and both submit the text in `<id>__other_text`. Other chosen with nothing
+  typed blocks the page. SurveyBuilder turns the option off for an ordered
+  set (UX-11). `read_responses()` and the codebook take up the new columns
+  in a later session.
 * **SurveyBuilder's welcome and thank-you pages are entries in the question
   list**, "Welcome page" first and "Thank-you page" last. Selecting one opens
   its editor on the right and its preview in the centre, and the Survey

@@ -294,4 +294,32 @@ test_that("inside Studio, Google Sheets and References link to Studio's screens"
 })
 
 
+# -- allow_other and randomise on the exported page --------------------------------
+
+test_that("the exported page draws Other last and shuffles a randomised set once", {
+  ins <- sframe_instrument(
+    "Other", version = "1.0.0",
+    components = list(
+      sframe_item("one", "How did you hear of us?", type = "single_choice", choice_set = "src"),
+      sframe_choice_set("src", c("a", "b", "c", "d", "e", "f"),
+                        c("Web", "Friend", "Poster", "Radio", "Paper", "Email"),
+                        allow_other = TRUE, randomise = TRUE)))
+  path <- tempfile(fileext = ".html")
+  suppressMessages(export_survey(ins, output_path = path, open = FALSE, preview = TRUE))
+  p <- ui2_session("survey")
+  ui2_navigate(p, paste0("file://", normalizePath(path)))
+  expect_true(ui2_wait(p, "document.getElementById('item_one')"))
+  vals <- function() unlist(js(p, "Array.prototype.map.call(document.querySelectorAll('input[name=one]'),function(e){return e.value;})"))
+  first <- vals()
+  expect_identical(sort(first[-length(first)]), c("a", "b", "c", "d", "e", "f"))
+  expect_identical(first[length(first)], "other")
+  # Typing in the box chooses Other, and a redraw keeps the order.
+  js(p, "var t=document.getElementById('other_one');t.value='A podcast';t.dispatchEvent(new Event('input',{bubbles:true}));1")
+  expect_true(js(p, "document.querySelector('input[name=one][value=other]').checked"))
+  js(p, "renderSurvey();1")
+  expect_identical(vals(), first)
+  expect_identical(js(p, "document.getElementById('other_one').value"), "A podcast")
+})
+
+
 ui2_close()
