@@ -1088,6 +1088,10 @@ style.
 
 ## SurveyStudio
 
+* **The sidebar is a labelled navigation** (UX-16): a `nav` named "Studio
+  screens", `aria-current="page"` on the open screen, and a fragment link
+  for each screen, Plan included, so the browser's Back and Forward move
+  between screens and an address ending `#quality` opens Quality.
 * **The Open card's status says what it means** (UX-12). "Valid" is
   "Schema valid", the version and amendment count sit beside the integrity
   badge, and each links on: the version to Amendments, Draft to Design, and
