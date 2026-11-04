@@ -1299,6 +1299,27 @@ ui <- fluidPage(
         min-height: 100vh; box-sizing: border-box;
         min-width: 0;
       }
+      /* Narrow screens (UX-01, UX-08): below 800 px the sidebar is a drawer
+         behind a labelled Menu button, cards stack, and a wide table or code
+         block scrolls inside its own region, so no page is wider than the
+         viewport. */
+      .studio-menu-btn { display: none; }
+      @media (max-width: 799px) {
+        .studio-sidebar { transform: translateX(-100%); transition: transform .2s; visibility: hidden; }
+        .studio-shell.drawer-open .studio-sidebar { transform: none; visibility: visible; box-shadow: 2px 0 12px rgba(0,0,0,.3); }
+        .studio-main { margin-left: 0; padding: 12px; width: 100%; }
+        .studio-menu-btn { display: inline-flex; align-items: center; gap: 6px; position: sticky; top: 0; z-index: 90;
+          margin: 0 0 12px; padding: 8px 14px; border: none; border-radius: 6px; background: #1a1a2e; color: #fff; font-weight: 600; }
+        .studio-main .row { margin-left: 0; margin-right: 0; }
+        .studio-main .row > [class*='col-'] { width: 100%; float: none; padding-left: 0; padding-right: 0; }
+        .opt-row, .stat-row, .screen-head, .flag-row { flex-direction: column; align-items: stretch; }
+        .studio-main table { display: block; max-width: 100%; overflow-x: auto; }
+        .studio-main pre, .studio-main .sf-code { max-width: 100%; overflow-x: auto; }
+        .studio-main img, .studio-main iframe, .studio-main svg { max-width: 100%; }
+        .studio-main .form-group, .studio-main .shiny-input-container { width: 100% !important; max-width: 100%; }
+        .card { padding: 14px; }
+        .modal-dialog { width: auto; margin: 8px; }
+      }
       .screen { display: none; }
       .screen.active { display: block; }
       .card {
@@ -1430,7 +1451,7 @@ ui <- fluidPage(
     "))
   ),
   tags$div(class = "studio-shell",
-    tags$div(class = "studio-sidebar",
+    tags$div(class = "studio-sidebar", id = "studio_sidebar",
       tags$div(class = "studio-logo",
         tags$img(src = "sfstudio/surveyframe-shiny-square-icon.png", alt = "surveyframe"),
         "Survey", tags$span("Studio")
@@ -1463,6 +1484,9 @@ ui <- fluidPage(
       tags$div(class = "studio-status", uiOutput("sidebar_status"))
     ),
     tags$div(class = "studio-main",
+      tags$button(type = "button", id = "studio_menu_btn", class = "studio-menu-btn",
+        `aria-controls` = "studio_sidebar", `aria-expanded` = "false",
+        `aria-label` = "Menu: Studio screens", "Menu"),
       tags$script(HTML("
         // Screens are shown and hidden with CSS classes, which Shiny cannot
         // see. Shiny suspends an output while it is hidden, so the switch
@@ -1504,6 +1528,24 @@ ui <- fluidPage(
           e.preventDefault();
           studioPicked = true;
           studioShowScreen($(this), $(this).data('tab'));
+        });
+        // The drawer on narrow screens: the Menu button opens it, a choice
+        // or Escape closes it, and focus goes back to the button.
+        function studioDrawer(open) {
+          $('.studio-shell').toggleClass('drawer-open', open);
+          $('#studio_menu_btn').attr('aria-expanded', open ? 'true' : 'false');
+          if (open) $('#studio_sidebar a.active, #studio_sidebar a').first().focus();
+        }
+        $(document).on('click', '#studio_menu_btn', function() {
+          studioDrawer(!$('.studio-shell').hasClass('drawer-open'));
+        });
+        $(document).on('click', '#studio_sidebar a', function() {
+          if ($('.studio-shell').hasClass('drawer-open')) { studioDrawer(false); $('#studio_menu_btn').focus(); }
+        });
+        $(document).on('keydown', function(e) {
+          if (e.key === 'Escape' && $('.studio-shell').hasClass('drawer-open') && !$('.modal.in, .modal.show').length) {
+            studioDrawer(false); $('#studio_menu_btn').focus();
+          }
         });
         function studioFromHash() {
           var key = location.hash.replace(/^#/, '');
