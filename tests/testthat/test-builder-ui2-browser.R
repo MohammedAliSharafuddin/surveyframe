@@ -159,4 +159,25 @@ test_that("the equation button writes $...$ and the preview shows TeX as typed",
                "<code>r &gt; 0.3</code>", fixed = TRUE)
 })
 
+# -- Study (D13) ----------------------------------------------------------------
+
+test_that("the Study tab edits the study and Other asks for a description", {
+  s <- ui2_builder(sframe_references_fixture())
+  js(s, "openSettings('study');1")
+  expect_true(js(s, "document.getElementById('sp-study').classList.contains('active')"))
+  expect_true(js(s, "document.getElementById('s-other-f').hidden"))
+  js(s, "var m=document.getElementById('s-method');m.value='other';m.dispatchEvent(new Event('change',{bubbles:true}));1")
+  expect_false(js(s, "document.getElementById('s-other-f').hidden"))
+  # The problem statement takes the toolbar and the picker.
+  js(s, "document.getElementById('s-problem').focus();1")
+  expect_false(js(s, "document.getElementById('s-problem').parentNode.querySelector('.sfcp-bar').hidden"))
+  js(s, "document.querySelector('#sp-study .btn').click();1")
+  expect_identical(js(s, "document.activeElement.getAttribute('aria-label')"), "Objective 1 id")
+  js(s, "document.getElementById('s-problem').value='Why do delegates not return?';document.getElementById('s-other').value='Intercept at the exit';studyObjs[0].text='Describe the reasons.';saveSettings();1")
+  st <- js(s, "sframePayload().study")
+  expect_identical(st$problem, "Why do delegates not return?")
+  expect_identical(st$objectives[[1]]$id, "O1")
+  expect_identical(st$sampling, list(method = "other", method_other = "Intercept at the exit"))
+})
+
 ui2_close()

@@ -338,6 +338,13 @@ style.
   `study` (problem, objectives, sampling with `method_other`), the plan block
   `objective` and the `hypotheses` shape: a text `null`, a text `alternative`
   or both, or `null`. No field became required.
+* **SurveyBuilder edits the study in a Study tab of Survey settings**: the
+  problem statement, the objectives with their ids, the population, the
+  sampling method from the fixed list (with a description for Other) and
+  the planned sample size. The study is saved only when one of its fields
+  changes, in the shape `write_sframe()` writes, so a study left alone keeps
+  its content hash. The builder refuses what `validate_sframe()` refuses,
+  including the removal of an objective a plan block names.
 
 ## Amendments and versions
 
