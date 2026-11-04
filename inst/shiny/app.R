@@ -1212,7 +1212,8 @@ screen_class <- function(tab) {
 
 studio_nav_entry <- function(tab, label) {
   tags$li(class = "studio-nav-item",
-    tags$a(href = "#", `data-tab` = tab, class = tab_link_class(tab), label))
+    tags$a(href = paste0("#", tab), `data-tab` = tab, class = tab_link_class(tab),
+           `aria-current` = if (identical(initial_tab, tab)) "page", label))
 }
 
 studio_nav_heading <- function(label) {
@@ -1258,6 +1259,7 @@ ui <- fluidPage(
       .studio-logo span { color: #16B3B1; }
       .studio-logo img { height: 22px; margin-right: 8px; vertical-align: middle; }
       .studio-nav { list-style: none; margin: 0; padding: 12px 0; flex: 1; }
+      .studio-nav-wrap { flex: 1; display: flex; flex-direction: column; }
       .studio-nav-item a {
         display: flex; align-items: center; gap: 10px;
         padding: 10px 20px; color: #9aa0b8; text-decoration: none;
@@ -1436,12 +1438,13 @@ ui <- fluidPage(
       # The study's order, in groups under headings that cannot be clicked.
       # Plan is an entry, not a screen: it opens Design with the builder in
       # its Plan mode. The screen ids stay as they were for launch_studio().
+      tags$nav(class = "studio-nav-wrap", `aria-label` = "Studio screens",
       tags$ul(class = "studio-nav",
         studio_nav_entry("open", "Open Instrument"),
         studio_nav_heading("Build"),
         studio_nav_entry("design", "Design"),
         tags$li(class = "studio-nav-item",
-          tags$a(href = "#", `data-nav` = "plan", "Plan")),
+          tags$a(href = "#plan", `data-nav` = "plan", "Plan")),
         studio_nav_entry("preview", "Preview"),
         studio_nav_heading("Collect"),
         studio_nav_entry("collect", "Collect"),
@@ -1456,7 +1459,7 @@ ui <- fluidPage(
         studio_nav_heading("Record"),
         studio_nav_entry("references", "References"),
         studio_nav_entry("amendments", "Amendments")
-      ),
+      )),
       tags$div(class = "studio-status", uiOutput("sidebar_status"))
     ),
     tags$div(class = "studio-main",
@@ -1468,18 +1471,23 @@ ui <- fluidPage(
         // Plan is the Design screen with the builder in its Plan mode, and
         // the entry marked active is the one picked. Any other way to Design
         // opens the builder in Build mode.
-        function studioShowScreen(link, tab, nav) {
-          $('.studio-nav-item a').removeClass('active');
+        function studioShowScreen(link, tab, nav, fromHistory) {
+          $('.studio-nav-item a').removeClass('active').removeAttr('aria-current');
           if (nav === 'plan') {
-            $('.studio-nav-item a[data-nav=\"plan\"]').addClass('active');
+            $('.studio-nav-item a[data-nav=\"plan\"]').addClass('active').attr('aria-current', 'page');
           } else {
-            $('.studio-nav-item a[data-tab=\"' + tab + '\"]').addClass('active');
+            $('.studio-nav-item a[data-tab=\"' + tab + '\"]').addClass('active').attr('aria-current', 'page');
           }
           if (tab === 'design') studioDesignSetMode(nav === 'plan' ? 'analyse' : 'build');
           $('.screen.active').not('#screen-' + tab)
             .removeClass('active').trigger('hidden');
           $('#screen-' + tab).addClass('active').trigger('shown');
           Shiny.setInputValue('current_tab', tab, {priority: 'event'});
+          // Each screen is a fragment in the browser history, so Back and
+          // Forward move between screens (UX-16).
+          var key = nav === 'plan' ? 'plan' : tab;
+          if (!fromHistory && location.hash !== '#' + key)
+            history.pushState({tab: tab, nav: nav || null}, '', '#' + key);
         }
 
         // A screen the researcher picks wins over the launch screen, which
@@ -1496,6 +1504,20 @@ ui <- fluidPage(
           e.preventDefault();
           studioPicked = true;
           studioShowScreen($(this), $(this).data('tab'));
+        });
+        function studioFromHash() {
+          var key = location.hash.replace(/^#/, '');
+          if (key === 'plan') return {tab: 'design', nav: 'plan'};
+          return $('#screen-' + key).length ? {tab: key, nav: null} : null;
+        }
+        window.addEventListener('popstate', function(e) {
+          var s = (e.state && e.state.tab) ? e.state : studioFromHash();
+          if (s) studioShowScreen(null, s.tab, s.nav, true);
+        });
+        // A fragment in the address opens that screen, as a pick does.
+        $(document).on('shiny:connected', function() {
+          var s = studioFromHash();
+          if (s) { studioPicked = true; studioShowScreen(null, s.tab, s.nav, true); }
         });
         $(document).on('click', '[data-nav=\"plan\"]', function(e) {
           e.preventDefault();

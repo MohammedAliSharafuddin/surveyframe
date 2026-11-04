@@ -191,4 +191,26 @@ test_that("the Open card says Schema valid or Draft, with the version and count 
   expect_true(ui2_wait(b, "$('#screen-amendments').hasClass('active')", 20))
 })
 
+test_that("the sidebar is a labelled nav with aria-current, fragment links and browser history", {
+  b <- ui1_studio("factor_structure")
+  expect_identical(ui2_js(b, "$('nav.studio-nav-wrap').attr('aria-label')"), "Studio screens")
+  expect_identical(ui2_js(b, "$('.studio-nav a[href=\"#\"]').length"), 0L)
+  expect_true(ui1_screen(b, "quality"))
+  expect_true(ui1_screen(b, "reliability"))
+  expect_identical(ui2_js(b, "$('.studio-nav a[aria-current=\"page\"]').length"), 1L)
+  expect_identical(ui2_js(b, "$('.studio-nav a[aria-current=\"page\"]').data('tab')"), "reliability")
+  expect_identical(ui2_js(b, "location.hash"), "#reliability")
+
+  ui2_js(b, "history.back(); true")
+  expect_true(ui2_wait(b, "$('#screen-quality').hasClass('active') && $('.studio-nav a[aria-current=\"page\"]').data('tab') === 'quality'", 10))
+  ui2_js(b, "history.forward(); true")
+  expect_true(ui2_wait(b, "$('#screen-reliability').hasClass('active')", 10))
+
+  # Plan is an entry like the others.
+  expect_identical(ui2_js(b, "$('.studio-nav a[data-nav=\"plan\"]').attr('href')"), "#plan")
+  ui2_js(b, "$('.studio-nav a[data-nav=\"plan\"]').click(); true")
+  expect_true(ui2_wait(b, "location.hash === '#plan' && $('.studio-nav a[data-nav=\"plan\"]').attr('aria-current') === 'page'", 10))
+  expect_true(ui1_screen(b, "open"))
+})
+
 ui1_close()
