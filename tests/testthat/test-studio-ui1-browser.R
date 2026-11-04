@@ -148,4 +148,21 @@ test_that("Harvard chosen as the reference style puts harvard.csl in the source 
   ui1_set(b, "rpt_style", "apa")
 })
 
+test_that("an interpretation box cites through the shared picker, and Manage references opens References", {
+  b <- ui1_studio("factor_structure")
+  expect_true(ui1_screen(b, "export"))
+  ui2_js(b, "$('#rtab-interpret').click(); $('#export_interpretations_ui details').first().attr('open', true); true")
+  expect_true(ui2_wait(b, "!!document.querySelector('#export_interpretations_ui textarea[data-cite]')", 60))
+  expect_true(ui2_wait(b, "(function(){ var t = document.querySelector('#export_interpretations_ui textarea[data-cite]'); return !!window.studioPickers[t.id]; })()", 20))
+  expect_true(ui2_wait(b, "window.studioKnownKeys.indexOf('surveyframe') >= 0", 20))
+  expect_false(ui2_js(b, "!!document.getElementById('rpt_bibtex')"))
+
+  ui2_js(b, "$('#rtab-configure').click(); true")
+  expect_true(ui2_wait(b, "$('#rpt_manage_refs').is(':visible')"))
+  ui2_js(b, "$('#rpt_manage_refs').click(); true")
+  expect_true(ui2_wait(b, "$('#screen-references').hasClass('active')", 20))
+  opts <- ui2_js(b, "Object.keys((document.getElementById('refs_cited_by').selectize || {options: {}}).options).join('|')")
+  expect_match(opts, "plan:RQ2", fixed = TRUE)
+})
+
 ui1_close()

@@ -1221,6 +1221,12 @@ studio_nav_heading <- function(label) {
 
 # The Report screen's local tabs (UX-07): a tab button and its pane. The
 # panes are hidden, never redrawn, so their inputs keep their values.
+# A long text field that takes the shared citation picker: its textarea
+# carries data-cite, the field's name in the picker's accessible label.
+studio_cite_field <- function(tag, label) {
+  htmltools::tagQuery(tag)$find("textarea")$addAttrs(`data-cite` = label)$allTags()
+}
+
 studio_report_tab <- function(id, label, on = FALSE) {
   tags$button(type = "button", id = paste0("rtab-", id),
     class = paste("report-tab", if (on) "active"), role = "tab",
@@ -1235,6 +1241,7 @@ studio_report_pane <- function(id, on, ...) {
 ui <- fluidPage(
   tags$head(
     tags$title("SurveyStudio"),
+    tags$script(src = "sfbuilder/field_tools.js"),
     tags$style(HTML("
       body { font-family: 'Helvetica Neue', Arial, sans-serif;
              background: #f7f8fa; color: #1a1a2e; margin: 0; }
@@ -1512,6 +1519,33 @@ ui <- fluidPage(
           var next = tabs.eq((k + tabs.length) % tabs.length);
           studioReportTab(next.data('rtab')); next.focus(); e.preventDefault();
         });
+
+        // The shared citation picker (UI-2's field_tools.js) on Studio's long
+        // text fields. A field opts in with data-cite, its label. The
+        // references are the open instrument's only, sent by the server, so a
+        // report never cites a source the .sframe does not record (UX-03).
+        window.studioRefs = []; window.studioKnownKeys = []; window.studioPickers = {};
+        Shiny.addCustomMessageHandler('studio-refs', function(m) {
+          window.studioRefs = m.refs || []; window.studioKnownKeys = m.known || [];
+          if (window.SurveyframeCitationPicker) SurveyframeCitationPicker.updateReferences(window.studioRefs);
+        });
+        function studioAttachPickers(root) {
+          var P = window.SurveyframeCitationPicker;
+          if (!P || !root) return;
+          $(root).find('textarea[data-cite]').each(function() {
+            var old = window.studioPickers[this.id];
+            if (old) { if (old.element === this) return; old.destroy(); }
+            window.studioPickers[this.id] = P.attach(this, function() { return window.studioRefs; }, {
+              label: $(this).attr('data-cite'), toolbar: false,
+              knownKeys: function() { return window.studioKnownKeys; },
+              onManage: function() { $('.studio-nav-item [data-tab=\"references\"]').first().click(); }
+            });
+          });
+        }
+        $(document).on('shiny:value', function(e) {
+          setTimeout(function() { studioAttachPickers(document.getElementById(e.name)); }, 0);
+        });
+        $(function() { studioAttachPickers(document.body); });
 
         Shiny.addCustomMessageHandler('surveyframe-launch-tab', studioLaunchScreen);
 
@@ -1860,6 +1894,9 @@ ui <- fluidPage(
               tags$div(tags$label(class = "control-label", "Code"),
                 checkboxInput("rpt_show_code", "Show the R code for each result", value = TRUE))
             ),
+            tags$p(class = "hint", id = "rpt_refs_note",
+              "The report cites only the references the instrument records. Type @ in an interpretation to cite one. ",
+              tags$a(href = "#", `data-tab` = "references", id = "rpt_manage_refs", "Manage references")),
             tags$div(class = "ref-style",
               selectInput("rpt_style", "Reference style",
                 choices = sframe_studio_style_choices(sframe_studio_quarto_note()$ok), selected = "apa"),
@@ -1881,7 +1918,7 @@ ui <- fluidPage(
               checkboxInput("rpt_models", "Saved models and syntax", value = TRUE)
             ),
             tags$details(class = "opt-more",
-              tags$summary("More options: figures and further references"),
+              tags$summary("More options: figures"),
               tags$div(class = "opt-row",
                 numericInput("rpt_fig_width", "Figure width (inches)", value = NA, min = 1, step = 0.5),
                 numericInput("rpt_fig_height", "Figure height (inches)", value = NA, min = 1, step = 0.5),
@@ -1889,9 +1926,7 @@ ui <- fluidPage(
                 selectInput("rpt_fig_format", "Figure format",
                   choices = c("Each engine's own" = "default", "PNG" = "png", "SVG" = "svg"))
               ),
-              tags$p(class = "hint", "Empty fields keep each engine's own figure size and resolution."),
-              textAreaInput("rpt_bibtex", "Further references (BibTeX)", rows = 4, width = "100%",
-                placeholder = "Works your interpretations cite as [@key]. The instrument's own references are always included.")
+              tags$p(class = "hint", "Empty fields keep each engine's own figure size and resolution.")
             )
           )),
         studio_report_pane("export", FALSE,
@@ -2524,16 +2559,31 @@ server <- function(input, output, session) {
   # -- References -------------------------------------------------------------
   # Edits rv$builder$references, which the draft sync composes into the open
   # instrument, so a reference added here is in everything exported.
+  # The open instrument's references, for the citation picker in the page.
+  observe({
+    ins <- rv$instrument
+    refs <- if (is.null(ins)) list() else unname(ins$references %||% list())
+    session$sendCustomMessage("studio-refs", list(
+      refs = lapply(refs, unclass),
+      known = unname(vapply(.sframe_citations, function(c) c$key, character(1)))))
+  })
+
   refs_targets <- reactive({
     ins <- rv$instrument
     if (is.null(ins)) return(character(0))
     ids <- function(x) vapply(x %||% list(), function(c) as.character(c$id)[1], character(1))
     items <- Filter(function(i) !(i$type %in% c("section_break", "text_block")), ins$items %||% list())
+    # A block's hypotheses and the study are targets only once they are
+    # written, as validate_sframe() requires.
+    hyp <- ids(Filter(function(b) any(c("Null hypothesis (H0)", "Alternative hypothesis (H1)") %in%
+      names(sframe_plan_declaration(b))), ins$analysis_plan %||% list()))
     c("The instrument as a whole" = "instrument",
       stats::setNames(paste0("item:", ids(items)), paste("Item:", ids(items))),
       stats::setNames(paste0("scale:", ids(ins$scales)), paste("Scale:", ids(ins$scales))),
       stats::setNames(paste0("plan:", ids(ins$analysis_plan)), paste("Plan:", ids(ins$analysis_plan))),
-      stats::setNames(paste0("model:", ids(ins$models)), paste("Model:", ids(ins$models))))
+      stats::setNames(paste0("model:", ids(ins$models)), paste("Model:", ids(ins$models))),
+      stats::setNames(paste0("hypothesis:", hyp), paste("Hypotheses:", hyp)),
+      if (!is.null(ins$study)) c("The study (problem, objectives, sampling)" = "study"))
   })
 
   observe({
@@ -3917,10 +3967,10 @@ server <- function(input, output, session) {
             paste("Planned decision rule:", block$decision_rule))
         },
         tags$label(class = "vmeta-lbl", "Interpretation"),
-        textAreaInput(fld, NULL,
+        studio_cite_field(textAreaInput(fld, NULL,
           value = shiny::isolate(input[[fld]] %||% ""),
           rows = 6, width = "100%",
-          placeholder = "State what this result means for the research question.")
+          placeholder = "State what this result means for the research question."), sprintf("Interpretation of %s", block_id))
       )
     })
     do.call(tagList, fields)
@@ -3946,11 +3996,6 @@ server <- function(input, output, session) {
     a <- trimws(strsplit(input$rpt_authors %||% "", ",", fixed = TRUE)[[1]])
     a <- a[nzchar(a)]
     if (length(a) > 0) a else NULL
-  }
-
-  studio_report_references <- function() {
-    text <- trimws(input$rpt_bibtex %||% "")
-    if (nzchar(text)) read_bibtex(text = text) else NULL
   }
 
   # Only the figure settings given, so an empty field keeps the engine's own.
@@ -3989,7 +4034,6 @@ server <- function(input, output, session) {
     show_code = !isFALSE(input$rpt_show_code),
     title = trim_or_null(input$rpt_title),
     authors = studio_report_authors(),
-    references = studio_report_references(),
     csl = sframe_studio_csl(input$rpt_style, input$rpt_csl),
     figures = studio_report_figures() %||% getOption("surveyframe.figures")
   )

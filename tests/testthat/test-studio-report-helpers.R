@@ -150,3 +150,16 @@ test_that("the style select gives render_report() a style name or the file", {
   expect_identical(csl("other", NULL), "apa")
   expect_identical(csl("other", list(datapath = "/tmp/x.csl")), "/tmp/x.csl")
 })
+
+# UI-1 item 8 (UX-03): References is the only place a source is added.
+test_that("the Report screen has no BibTeX box and cites through the shared picker", {
+  src <- paste(readLines(system.file("shiny", "app.R", package = "surveyframe")),
+               collapse = "\n")
+  expect_false(grepl("rpt_bibtex", src, fixed = TRUE))
+  expect_false(grepl("Further references", src, fixed = TRUE))
+  expect_match(src, 'tags$script(src = "sfbuilder/field_tools.js")', fixed = TRUE)
+  expect_match(src, "studio_cite_field(textAreaInput(fld, NULL,", fixed = TRUE)
+  expect_match(src, 'id = "rpt_manage_refs", "Manage references"', fixed = TRUE)
+  expect_match(src, 'paste0("hypothesis:", hyp)', fixed = TRUE)
+  expect_match(src, '"study")', fixed = TRUE)
+})

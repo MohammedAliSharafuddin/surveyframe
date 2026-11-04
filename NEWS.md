@@ -1088,6 +1088,12 @@ style.
 
 ## SurveyStudio
 
+* **References are added in 1 place** (UX-03). The Report screen's Further
+  references (BibTeX) box is gone. The interpretation boxes take the shared
+  citation picker, which lists the instrument's references and the
+  built-in method references as you type @, and the Configure tab links to
+  References with "Manage references". The References screen offers a plan
+  block's hypotheses and the study as targets once they are written.
 * **A Reference style select on the Report screen's Configure tab**: APA 7,
   Chicago author-date, Harvard, IEEE and MLA, then "Other style (.csl
   file)", which shows the upload and a link to zotero.org/styles. The
