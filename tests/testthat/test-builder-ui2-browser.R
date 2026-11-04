@@ -322,4 +322,41 @@ test_that("the exported page draws Other last and shuffles a randomised set once
 })
 
 
+# -- Dialogs (UX-14) ----------------------------------------------------------------
+
+tab_key <- function(s, shift = FALSE) {
+  js(s, sprintf("document.activeElement.dispatchEvent(new KeyboardEvent('keydown',{key:'Tab',shiftKey:%s,bubbles:true,cancelable:true}));1",
+                if (shift) "true" else "false"))
+}
+
+test_that("Tab stays inside an open dialog, and Escape closes it back to its opener", {
+  s <- ui2_builder(centre_instrument())
+  js(s, "var b=document.getElementById('cfgMoreBtn');b.focus();openChoiceModal();1")
+  inside <- "document.getElementById('m-choice').contains(document.activeElement)"
+  expect_true(js(s, inside))
+  # The last control, then Tab, is the first. Shift+Tab from the first is the last.
+  js(s, "var f=document.querySelectorAll('#m-choice .mfoot button');f[f.length-1].focus();1")
+  tab_key(s)
+  expect_true(js(s, inside))
+  expect_identical(js(s, "document.activeElement.className"), "mx")
+  tab_key(s, shift = TRUE)
+  expect_true(js(s, inside))
+  expect_match(js(s, "document.activeElement.textContent"), "Save choice set", fixed = TRUE)
+  ui2_key(s, "", "Escape")
+  expect_false(js(s, "document.getElementById('m-choice').classList.contains('open')"))
+  expect_identical(js(s, "document.activeElement.id"), "cfgMoreBtn")
+})
+
+test_that("Escape on a dialog opened over another closes the top one alone", {
+  s <- ui2_builder(sframe_references_fixture())
+  js(s, "openRQModal('rq1');document.getElementById('rq-manage-refs').focus();manageRefs();1")
+  ui2_key(s, "", "Escape")
+  expect_false(js(s, "document.getElementById('m-settings').classList.contains('open')"))
+  expect_true(js(s, "document.getElementById('m-rq').classList.contains('open')"))
+  expect_identical(js(s, "document.activeElement.id"), "rq-manage-refs")
+  ui2_key(s, "", "Escape")
+  expect_false(js(s, "document.getElementById('m-rq').classList.contains('open')"))
+})
+
+
 ui2_close()
