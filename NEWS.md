@@ -1088,6 +1088,9 @@ style.
 
 ## SurveyStudio
 
+* **Each screen is 1 panel with its title inside.** The title and its
+  context line, such as Design's "Editing: <title> (<version>)", are 1
+  compact row at the top of the screen, in place of a band above its cards.
 * **1 Build and Plan control in Studio.** The sidebar's Design and Plan
   entries pick the builder's mode, and the builder inside Studio hides its
   own Build/Plan switch. The standalone SurveyBuilder keeps it.

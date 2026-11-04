@@ -1280,7 +1280,14 @@ ui <- fluidPage(
       .studio-nav-fold::after { content: '\\25BE'; float: right; }
       .studio-nav-fold[aria-expanded='false']::after { content: '\\25B8'; }
       .studio-nav-item.folded { display: none; }
-      .screen-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+      /* Item 12c: each screen is 1 panel, its title and context line 1
+         compact row at the top of it, in place of a band above the cards. */
+      .screen.active { background: #ffffff; border-radius: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); padding: 16px 20px; }
+      .screen .card { box-shadow: none; border: 1px solid #e3e5ee; }
+      .screen-head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+        padding-bottom: 10px; margin-bottom: 16px; border-bottom: 1px solid #e3e5ee; }
+      .screen-head > :last-child:not(:first-child) { margin-left: auto; }
+      .screen-head .hint { margin-top: 0; }
       .report-tabs { display: flex; gap: 4px; border-bottom: 1px solid #d9dce6; margin-bottom: 16px; flex-wrap: wrap; }
       .report-tab { background: none; border: none; border-bottom: 3px solid transparent; padding: 8px 14px; font-weight: 600; color: #3d4256; }
       .report-tab.active { border-bottom-color: #1a1a2e; color: #1a1a2e; }
@@ -1401,7 +1408,7 @@ ui <- fluidPage(
         background: #16B3B1; color: #fff;
       }
       h2.screen-title {
-        font-size: 22px; font-weight: 700; margin: 0 0 24px; color: #1a1a2e;
+        font-size: 18px; font-weight: 700; margin: 0; color: #1a1a2e;
       }
       .hint { font-size: 13px; color: #6b718e; margin-top: 6px; }
       .problem-list { margin: 0; padding-left: 18px; }
@@ -1759,11 +1766,12 @@ ui <- fluidPage(
       # Design (0.4.3): the SurveyBuilder, served from this origin, in an
       # iframe. A save in it becomes the open instrument.
       tags$div(id = "screen-design", class = screen_class("design"),
-        tags$h2(class = "screen-title", "Design"),
-        uiOutput("design_status"),
-        # Shown while the builder has unsaved changes, which it reports.
-        tags$p(id = "design_unsaved", class = "hint", style = "display: none;",
-               "Unsaved changes. Save to Studio to keep them."),
+        tags$div(class = "screen-head",
+          tags$h2(class = "screen-title", "Design"),
+          uiOutput("design_status", inline = TRUE),
+          # Shown while the builder has unsaved changes, which it reports.
+          tags$span(id = "design_unsaved", class = "hint", style = "display: none;",
+                 "Unsaved changes. Save to Studio to keep them.")),
         tags$iframe(id = "design_frame", title = "SurveyBuilder",
           src = "sfbuilder/survey_builder.html?host=studio",
           style = paste("width: 100%; height: calc(100vh - 150px); min-height: 600px;",
@@ -1771,7 +1779,7 @@ ui <- fluidPage(
       ),
 
       tags$div(id = "screen-open", class = screen_class("open"),
-        tags$h2(class = "screen-title", "Open Instrument"),
+        tags$div(class = "screen-head", tags$h2(class = "screen-title", "Open Instrument")),
         tags$div(class = "card",
           tags$div(class = "card-title", "Load an existing .sframe"),
           fileInput("instr_file", NULL,
@@ -1784,7 +1792,7 @@ ui <- fluidPage(
       ),
 
       tags$div(id = "screen-amendments", class = screen_class("amendments"),
-        tags$h2(class = "screen-title", "Amendments"),
+        tags$div(class = "screen-head", tags$h2(class = "screen-title", "Amendments")),
         uiOutput("amend_gate"),
         tags$div(class = "card",
           tags$div(class = "card-title", "Change the instrument"),
@@ -1815,7 +1823,7 @@ ui <- fluidPage(
       # References (0.4.3): the works the instrument cites, carried in the
       # .sframe file and listed once at the end of the report.
       tags$div(id = "screen-references", class = screen_class("references"),
-        tags$h2(class = "screen-title", "References"),
+        tags$div(class = "screen-head", tags$h2(class = "screen-title", "References")),
         uiOutput("refs_gate"),
         uiOutput("refs_table"),
         tags$div(class = "card",
@@ -1837,7 +1845,7 @@ ui <- fluidPage(
       ),
 
       tags$div(id = "screen-preview", class = screen_class("preview"),
-        tags$h2(class = "screen-title", "Preview"),
+        tags$div(class = "screen-head", tags$h2(class = "screen-title", "Preview")),
         uiOutput("preview_gate"),
         tags$div(id = "survey_preview_frame", uiOutput("survey_preview_items"))
       ),
@@ -1845,7 +1853,7 @@ ui <- fluidPage(
       # Collect (0.4.3): the Google Sheets collector, the survey file to
       # deploy, and the way on to reading the responses.
       tags$div(id = "screen-collect", class = screen_class("collect"),
-        tags$h2(class = "screen-title", "Collect"),
+        tags$div(class = "screen-head", tags$h2(class = "screen-title", "Collect")),
         uiOutput("collect_gate"),
         tags$div(class = "card",
           tags$div(class = "card-title", "1. The Google Sheet and its collector"),
@@ -1881,7 +1889,7 @@ ui <- fluidPage(
       ),
 
       tags$div(id = "screen-responses", class = screen_class("responses"),
-        tags$h2(class = "screen-title", "Responses"),
+        tags$div(class = "screen-head", tags$h2(class = "screen-title", "Responses")),
         uiOutput("responses_gate"),
         tags$div(class = "card",
           tags$div(class = "card-title", "Response data"),
@@ -1926,7 +1934,7 @@ ui <- fluidPage(
       ),
 
       tags$div(id = "screen-quality", class = screen_class("quality"),
-        tags$h2(class = "screen-title", "Quality"),
+        tags$div(class = "screen-head", tags$h2(class = "screen-title", "Quality")),
         uiOutput("quality_gate"),
         uiOutput("quality_output"),
         plotOutput("studio_quality_chart", height = "260px"),
@@ -1935,21 +1943,21 @@ ui <- fluidPage(
       ),
 
       tags$div(id = "screen-reliability", class = screen_class("reliability"),
-        tags$h2(class = "screen-title", "Reliability"),
+        tags$div(class = "screen-head", tags$h2(class = "screen-title", "Reliability")),
         uiOutput("reliability_gate"),
         uiOutput("reliability_output"),
         plotOutput("studio_reliability_chart", height = "300px")
       ),
 
       tags$div(id = "screen-analysis", class = screen_class("analysis"),
-        tags$h2(class = "screen-title", "Analyse"),
+        tags$div(class = "screen-head", tags$h2(class = "screen-title", "Analyse")),
         uiOutput("analysis_gate"),
         uiOutput("analysis_declared_plan"),
         uiOutput("analysis_results_row")
       ),
 
       tags$div(id = "screen-dashboard", class = screen_class("dashboard"),
-        tags$h2(class = "screen-title", "Explore"),
+        tags$div(class = "screen-head", tags$h2(class = "screen-title", "Explore")),
         uiOutput("dashboard_gate"),
         tags$div(class = "studio-tabs",
           radioButtons(
