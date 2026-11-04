@@ -188,8 +188,15 @@ sframe_plan_block_problems <- function(plan, known_methods) {
     if (!is.null(hyp)) {
       hyp_ok <- is.list(hyp) && length(hyp) > 0 && !is.null(names(hyp)) &&
         all(names(hyp) %in% c("null", "alternative")) &&
-        all(vapply(hyp, function(h) is.character(h) && length(h) == 1, logical(1)))
-      if (!hyp_ok) {
+        all(vapply(hyp, function(h) is.character(h) && length(h) == 1 && !is.na(h), logical(1)))
+      # A null or NA member is written as JSON null, which has no text to
+      # print and which the sframe-schema profile rejects.
+      hyp_empty <- is.list(hyp) && length(hyp) > 0 &&
+        any(vapply(hyp, function(h) is.null(h) || (is.atomic(h) && length(h) == 1 && is.na(h)), logical(1)))
+      if (hyp_empty) {
+        keep(paste0(where, "'s hypotheses hold a null or NA, which has no text to print. ",
+                    "Write the hypothesis, or drop that field."))
+      } else if (!hyp_ok) {
         keep(paste0(where, "'s hypotheses must be a list holding text fields ",
                     "named null and alternative."))
       }

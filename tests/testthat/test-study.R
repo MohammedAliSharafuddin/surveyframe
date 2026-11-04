@@ -168,3 +168,21 @@ test_that("Profile B1, B2: a plan objective is checked with no study, as \"\" or
     expect_true(sframe_is_valid(validate_sframe(codex_instr(json), strict = FALSE)))
   }
 })
+
+test_that("Profile B3: a hypothesis member that is null or NA is refused, and no hypotheses stay valid", {
+  json <- '{"analysis_plan":[{"id":"P1","method":"frequency","variables":"q1","hypotheses":{"null":null}}]}'
+  expect_match(codex_problems(json), "Analysis plan 'P1''s hypotheses hold a null or NA", fixed = TRUE)
+  # The same block built in R, where NA_character_ is written as JSON null.
+  ins <- codex_instr(json)
+  ins$analysis_plan[[1]]$hypotheses <- list(null = NA_character_, alternative = "A difference.")
+  v <- validate_sframe(ins, strict = FALSE)
+  expect_false(sframe_is_valid(v))
+  expect_match(paste(sframe_problems(v), collapse = "\n"), "hold a null or NA", fixed = TRUE)
+  expect_error(write_sframe(ins, tempfile(fileext = ".sframe")), "hold a null or NA", fixed = TRUE)
+  # A study without hypotheses is supported: absent, or null as SurveyBuilder writes it.
+  for (json in c('{"analysis_plan":[{"id":"P1","method":"frequency","variables":"q1"}]}',
+                 '{"analysis_plan":[{"id":"P1","method":"frequency","variables":"q1","hypotheses":null}]}',
+                 '{"analysis_plan":[{"id":"P1","method":"frequency","variables":"q1","hypotheses":{"null":"No difference."}}]}')) {
+    expect_true(sframe_is_valid(validate_sframe(codex_instr(json), strict = FALSE)))
+  }
+})
