@@ -242,4 +242,56 @@ test_that("the centre has a desktop and a mobile width, and closes with the edit
 })
 
 
+# -- Welcome and thank-you pages ----------------------------------------------
+
+test_that("the welcome page is the first list entry, edited on the right and shown in the centre", {
+  ins <- centre_instrument()
+  ins$render$welcome <- list(intro_text = "This study asks about your trip.")
+  s <- ui2_builder(ins)
+  expect_identical(js(s, "document.querySelector('#itemList .ic').getAttribute('data-id')"), "__welcome")
+  expect_identical(js(s, "Array.prototype.slice.call(document.querySelectorAll('#itemList .ic')).pop().getAttribute('data-id')"), "__thankyou")
+  js(s, "document.querySelector('#itemList .ic').click();1")
+  expect_identical(js(s, "document.getElementById('inspTypeLbl').textContent"), "Welcome page")
+  expect_true(js(s, "document.querySelector('.insp-foot').hidden"))
+  expect_true(ui2_wait(s, sprintf("%s&&%s.body.textContent.indexOf('about your trip')>=0", centre_doc, centre_doc)))
+  js(s, "var e=document.getElementById('s-wi');e.focus();e.value='This study asks about your journey.';e.blur();1")
+  expect_true(ui2_wait(s, sprintf("%s.body.textContent.indexOf('about your journey')>=0", centre_doc)))
+  expect_identical(js(s, "sframePayload().render.welcome.intro_text"), "This study asks about your journey.")
+})
+
+test_that("the thank-you page is the last entry, with its own editor", {
+  s <- ui2_builder(centre_instrument())
+  js(s, "selItem('__thankyou');1")
+  expect_identical(js(s, "document.getElementById('inspTypeLbl').textContent"), "Thank-you page")
+  expect_identical(js(s, "document.getElementById('s-tym').value"), "Thank you for participating.")
+  js(s, "var e=document.getElementById('s-tydl');e.click();1")
+  expect_true(js(s, "sframePayload().render.thankyou.show_download"))
+})
+
+test_that("Survey settings keeps General and Header, and the standalone builder keeps Google Sheets and References", {
+  s <- ui2_builder(centre_instrument())
+  js(s, "openSettings('meta');1")
+  tabs <- js(s, "Array.prototype.map.call(document.querySelectorAll('#m-settings .stab'),function(t){return t.textContent;})")
+  expect_identical(unlist(tabs), c("General", "Study", "Header", "Google Sheets", "References"))
+  js(s, "showST('gsheets');1")
+  expect_true(js(s, "document.querySelector('#sp-gsheets .studio-only').hidden"))
+  expect_false(js(s, "document.querySelector('#sp-gsheets .studio-not').hidden"))
+})
+
+test_that("inside Studio, Google Sheets and References link to Studio's screens", {
+  h <- ui2_studio_host()
+  on.exit(httpuv::stopServer(h$server), add = TRUE)
+  s <- h$session
+  b <- "document.getElementById('b').contentWindow"
+  js(s, paste0(b, ".openSettings('gsheets');1"))
+  expect_false(js(s, paste0(b, ".document.querySelector('#sp-gsheets .studio-only').hidden")))
+  expect_true(js(s, paste0(b, ".document.querySelector('#sp-gsheets .studio-not').hidden")))
+  js(s, paste0(b, ".document.querySelector('#sp-gsheets .studio-only button').click();1"))
+  expect_true(ui2_wait(s, "window.__msgs.some(function(m){return m&&m.type==='goto'&&m.screen==='collect';})"))
+  expect_false(js(s, paste0(b, ".document.getElementById('m-settings').classList.contains('open')")))
+  js(s, paste0(b, ".openSettings('refs');", b, ".document.querySelector('#sp-refs .studio-only button').click();1"))
+  expect_true(ui2_wait(s, "window.__msgs.some(function(m){return m&&m.type==='goto'&&m.screen==='references';})"))
+})
+
+
 ui2_close()
