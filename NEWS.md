@@ -1088,6 +1088,13 @@ style.
 
 ## SurveyStudio
 
+* **1 primary action per screen**, a full-size filled button from 1 shared
+  class in `inst/shiny/www/studio-actions.css`: Save to Studio on Design,
+  now first in the builder's bar, Download survey on Collect, Load
+  responses, Export report beside the Report title, Edit in Design, Add
+  from BibTeX, and the next step on the screens that only show results.
+  Every other action is an outline button or a link, and a disabled
+  primary says why in a visible hint.
 * **1 control per destination on each screen.** The Open card no longer
   links its version label and its status line to Amendments both, and the
   embedded builder shows none of the Open, Export survey, Build/Plan,

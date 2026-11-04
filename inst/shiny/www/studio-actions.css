@@ -1,0 +1,40 @@
+/* inst/shiny/www/studio-actions.css
+ *
+ * SurveyStudio's 1 primary action per screen (UI-1, item 12e). Exactly 1
+ * control on each screen carries .sf-primary, a full-size filled button.
+ * Every other action is an outline button or a text link. The embedded
+ * SurveyBuilder loads this file too, for its Save to Studio button.
+ */
+.sf-primary,
+a.sf-primary,
+.btn.sf-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 40px;
+  padding: 10px 22px;
+  border: none;
+  border-radius: 6px;
+  background: #0a6f6d;
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.2;
+  text-decoration: none;
+  cursor: pointer;
+}
+.sf-primary:hover,
+.sf-primary:focus-visible {
+  background: #085957;
+  color: #ffffff;
+  text-decoration: none;
+}
+.sf-primary:focus-visible {
+  outline: 3px solid #1a1a2e;
+  outline-offset: 2px;
+}
+.sf-primary[disabled],
+.sf-primary.disabled {
+  background: #5b6475;
+  cursor: not-allowed;
+}
