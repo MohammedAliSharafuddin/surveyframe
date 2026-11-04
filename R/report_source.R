@@ -217,6 +217,11 @@ sframe_report_source <- function(dir = ".", include_analysis = TRUE, plot_palett
     stringsAsFactors = FALSE
   )
 
+  # Field text may cite any work in the folder's bibliography (8b-R).
+  bib <- file.path(dir, "references.json")
+  keys <- unique(c(sframe_md_keys(instrument), if (file.exists(bib)) {
+    vapply(jsonlite::fromJSON(bib, simplifyVector = FALSE), function(x) as.character(x$id %||% ""), character(1))
+  }))
   # The same inputs render_report() hands the template, as files.
   rds <- function(x) {
     f <- tempfile(fileext = ".rds")
@@ -227,7 +232,7 @@ sframe_report_source <- function(dir = ".", include_analysis = TRUE, plot_palett
     instrument_path = rds(instrument),
     data_path = if (is.null(data)) "" else rds(data),
     interpretations_path = if (length(interpretations)) rds(interpretations) else "",
-    declarations_path = rds(sframe_plan_declarations(instrument, interpretations)),
+    declarations_path = rds(sframe_plan_declarations(instrument, interpretations, keys)),
     content_path = rds(sframe_report_content(instrument, data, plot_palette,
                                              include_analysis = include_analysis,
                                              results = results)),

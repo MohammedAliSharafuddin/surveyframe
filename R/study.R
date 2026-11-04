@@ -267,7 +267,7 @@ sframe_notes <- function(x) {
 # problem, the objectives, and the trace from each objective to the research
 # questions that name it, built once for both engines. NULL when the
 # instrument describes no study.
-sframe_report_study <- function(instrument) {
+sframe_report_study <- function(instrument, keys = sframe_md_keys(instrument)) {
   s <- instrument$study %||% list()
   if (!length(s)) return(NULL)
   plan <- instrument$analysis_plan %||% list()
@@ -295,6 +295,7 @@ sframe_report_study <- function(instrument) {
   unlinked <- which(!nzchar(serves) | is.na(serves))
   list(
     problem = s$problem %||% NULL,
+    problem_md = if (length(s$problem)) sframe_field_md(s$problem, keys),
     objectives = obj_tab,
     trace = trace,
     unlinked = if (length(unlinked) && length(objectives)) {

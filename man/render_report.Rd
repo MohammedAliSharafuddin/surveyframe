@@ -166,6 +166,22 @@ version used and where it was found, and the returned path carries the
 executable as its \code{"quarto"} attribute. \code{options(surveyframe.use_quarto = FALSE)} uses the built-in engine whatever is installed.
 }
 
+\section{Markdown in text fields}{
+
+A research question, H0, H1, decision rule, interpretation, study problem
+or deviation report may hold Markdown: bold, italic, bulleted and numbered
+lists, links, \verb{[@key]} citations, \verb{~sub~}, \verb{^sup^}, footnotes \verb{^[...]} and
+equations, \verb{$...$} inline and \verb{$$...$$} display (an opening \code{$} needs a
+non-space on its right and a closing \code{$} a non-space on its left and no
+digit after it, so "costs $5 and $10" stays prose). The \code{.sframe} keeps
+the text as typed. The Quarto report renders it, with equations as
+MathML, which needs no script or network. The built-in page renders it
+with commonmark and prints each equation's TeX in monospace. Shortcodes,
+raw blocks, \code{:::} fences, heading lines, a \verb{---} line and HTML tags print
+as typed, R code in a field is never run, and \verb{@word} is a citation only
+when \code{word} is the key of a reference the report holds.
+}
+
 \section{Results record, manifest and provenance}{
 
 Beside every report \code{render_report()} writes 2 files named after it. For
