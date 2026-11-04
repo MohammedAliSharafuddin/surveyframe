@@ -36,7 +36,7 @@ ui1_studio <- function(demo = "factor_structure", screen = "open",
     }
     b <- sframe_chrome_session(width = width, height = height)
     ui2_navigate(b, url)
-    s <- list(b = b, proc = proc)
+    s <- list(b = b, proc = proc, url = url)
     ui1_apps[[demo]] <- s
     if (!ui2_wait(b, "window.Shiny && Shiny.shinyapp && Shiny.shinyapp.isConnected()", 120))
       stop("Studio did not connect")
@@ -74,3 +74,10 @@ ui1_text <- function(b, id) {
 }
 
 ui1_modal_open <- "($('#shiny-modal').is(':visible') && $('#shiny-modal').text().indexOf('Record an amendment') >= 0)"
+
+# Loads the page again, which starts Studio's session again, and waits for it.
+ui1_reload <- function(demo) {
+  s <- ui1_apps[[demo]]
+  ui2_navigate(s$b, s$url)
+  ui2_wait(s$b, "window.Shiny && Shiny.shinyapp && Shiny.shinyapp.isConnected()", 120)
+}

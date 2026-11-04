@@ -1088,6 +1088,11 @@ style.
 
 ## SurveyStudio
 
+* **The sidebar's groups fold.** Build, Collect, Analyse, Report and Record
+  are buttons that fold their entries, all open at first. Studio remembers
+  each choice in the browser, and the group holding the open screen always
+  stays open, including when a link or the address opens a screen in a
+  folded group.
 * **Plain words first** in Studio and SurveyBuilder (UX-18). A label says
   what a control does, and the technical term follows as help: "Type of
   change" with the pipeline and design tiers explained, "Where is this

@@ -72,7 +72,9 @@ test_that("the sidebar's groups, labels and screens follow the study's order", {
       paste0("entry:", names(g$entries)))
   }))
   expect_identical(shown, expected)
-  expect_identical(js("$('.studio-nav > li:not(:has(a))').filter(function() { return $(this).find('a, button').length > 0; }).length"), 0L)
+  # A heading links nowhere. Since UI-1 item 12a it is 1 fold button with
+  # aria-expanded, so it no longer has nothing to click.
+  expect_identical(js("$('.studio-nav > li:not(:has(a))').filter(function() { return $(this).find('a').length > 0 || $(this).find('button[aria-expanded]').length !== 1; }).length"), 0L)
 
   # Each label opens its screen, titled with the label, and is the only
   # entry marked active.

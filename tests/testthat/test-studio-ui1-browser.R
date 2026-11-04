@@ -279,4 +279,30 @@ test_that("the builder's Open Collect and Manage references open Studio's screen
   expect_true(ui2_js(b, "$('#screen-references').hasClass('active')"))
 })
 
+# Last, since it loads the page again, which starts Studio's session again.
+test_that("sidebar groups fold, stay folded after a reload, and a fragment into a folded group opens it", {
+  b <- ui1_studio("factor_structure")
+  expect_true(ui1_screen(b, "open"))
+  fold <- "$('.studio-nav-heading[data-group=\"collect\"] .studio-nav-fold')"
+  expect_identical(ui2_js(b, paste0(fold, ".attr('aria-expanded')")), "true")
+  ui2_js(b, paste0(fold, ".click(); true"))
+  expect_identical(ui2_js(b, paste0(fold, ".attr('aria-expanded')")), "false")
+  expect_false(ui2_js(b, "$('.studio-nav a[data-tab=\"responses\"]').is(':visible')"))
+  # The group holding the open screen does not fold.
+  expect_true(ui1_screen(b, "quality"))
+  ui2_js(b, "$('.studio-nav-heading[data-group=\"analyse\"] .studio-nav-fold').click(); true")
+  expect_identical(ui2_js(b, "$('.studio-nav-heading[data-group=\"analyse\"] .studio-nav-fold').attr('aria-expanded')"), "true")
+  expect_true(ui1_screen(b, "open"))
+
+  expect_true(ui1_reload("factor_structure"))
+  expect_true(ui2_wait(b, paste0(fold, ".attr('aria-expanded') === 'false'"), 20))
+  expect_false(ui2_js(b, "$('.studio-nav a[data-tab=\"responses\"]').is(':visible')"))
+
+  ui2_js(b, "location.hash = '#responses'; true")
+  expect_true(ui2_wait(b, paste0("$('#screen-responses').hasClass('active') && ", fold,
+                                 ".attr('aria-expanded') === 'true'"), 20))
+  expect_true(ui2_js(b, "$('.studio-nav a[data-tab=\"responses\"]').is(':visible')"))
+  ui2_js(b, "localStorage.removeItem('sfstudio-fold-collect'); true")
+})
+
 ui1_close()
