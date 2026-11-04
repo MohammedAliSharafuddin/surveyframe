@@ -92,7 +92,7 @@ test_that("a Design save keeps or clears the loaded responses in Studio", {
     Sys.sleep(0.5)
   }
   skip_if(!up, "Studio did not start")
-  b <- chromote::ChromoteSession$new(width = 1280, height = 900)
+  b <- sframe_chrome_session(width = 1280, height = 900)
   on.exit(b$close(), add = TRUE)
   b$Page$navigate(url)
   js <- function(code) b$Runtime$evaluate(code, returnByValue = TRUE)$result$value
