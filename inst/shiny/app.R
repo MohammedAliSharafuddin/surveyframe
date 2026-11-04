@@ -1217,7 +1217,9 @@ studio_nav_entry <- function(tab, label) {
 }
 
 studio_nav_heading <- function(label) {
-  tags$li(class = "studio-nav-heading", label)
+  # A group heading folds its entries (item 12a), so it is a button.
+  tags$li(class = "studio-nav-heading", `data-group` = tolower(label),
+    tags$button(type = "button", class = "studio-nav-fold", `aria-expanded` = "true", label))
 }
 
 # The Report screen's local tabs (UX-07): a tab button and its pane. The
@@ -1271,8 +1273,13 @@ ui <- fluidPage(
       .studio-nav-heading {
         padding: 14px 20px 4px; font-size: 11px; font-weight: 600;
         letter-spacing: 0.08em; text-transform: uppercase; color: #6b7190;
-        cursor: default; user-select: none;
+        user-select: none;
       }
+      .studio-nav-fold { background: none; border: none; padding: 0; width: 100%; text-align: left;
+        font: inherit; letter-spacing: inherit; text-transform: inherit; color: inherit; cursor: pointer; }
+      .studio-nav-fold::after { content: '\\25BE'; float: right; }
+      .studio-nav-fold[aria-expanded='false']::after { content: '\\25B8'; }
+      .studio-nav-item.folded { display: none; }
       .screen-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
       .report-tabs { display: flex; gap: 4px; border-bottom: 1px solid #d9dce6; margin-bottom: 16px; flex-wrap: wrap; }
       .report-tab { background: none; border: none; border-bottom: 3px solid transparent; padding: 8px 14px; font-weight: 600; color: #3d4256; }
@@ -1489,6 +1496,27 @@ ui <- fluidPage(
         // Plan is the Design screen with the builder in its Plan mode, and
         // the entry marked active is the one picked. Any other way to Design
         // opens the builder in Build mode.
+        // Sidebar groups fold (item 12a). Each choice is kept in localStorage,
+        // and the group holding the open screen always stays open.
+        function studioGroupOf(a) { return $(a).closest('li').prevAll('.studio-nav-heading').first(); }
+        function studioFold(h, open, save) {
+          h = $(h);
+          if (!open && h.nextUntil('.studio-nav-heading').find('a.active').length) open = true;
+          h.find('.studio-nav-fold').attr('aria-expanded', open ? 'true' : 'false');
+          h.nextUntil('.studio-nav-heading').toggleClass('folded', !open);
+          if (save) try { localStorage.setItem('sfstudio-fold-' + h.data('group'), open ? '1' : '0'); } catch (e) {}
+        }
+        $(document).on('click', '.studio-nav-fold', function() {
+          var h = $(this).closest('.studio-nav-heading');
+          studioFold(h, $(this).attr('aria-expanded') !== 'true', true);
+        });
+        $(function() {
+          $('.studio-nav-heading').each(function() {
+            var v = null; try { v = localStorage.getItem('sfstudio-fold-' + $(this).data('group')); } catch (e) {}
+            if (v === '0') studioFold(this, false, false);
+          });
+        });
+
         function studioShowScreen(link, tab, nav, fromHistory) {
           $('.studio-nav-item a').removeClass('active').removeAttr('aria-current');
           if (nav === 'plan') {
@@ -1496,6 +1524,7 @@ ui <- fluidPage(
           } else {
             $('.studio-nav-item a[data-tab=\"' + tab + '\"]').addClass('active').attr('aria-current', 'page');
           }
+          $('.studio-nav-item a.active').each(function() { var h = studioGroupOf(this); if (h.length) studioFold(h, true, false); });
           if (tab === 'design') studioDesignSetMode(nav === 'plan' ? 'analyse' : 'build');
           $('.screen.active').not('#screen-' + tab)
             .removeClass('active').trigger('hidden');
