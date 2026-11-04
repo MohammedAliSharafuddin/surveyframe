@@ -1377,6 +1377,11 @@ ui <- fluidPage(
       .filter-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; align-items: end; }
       .filter-grid label { font-size: 12px; font-weight: 600; color: #475569; }
       .filter-note { font-size: 11px; color: #94a3b8; margin-top: 8px; }
+      .filter-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 8px; }
+      .filter-head .card-title { margin-bottom: 0; }
+      .dash-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
+      .filter-head .dash-actions { margin-bottom: 0; }
+      .dash-actions .hint { margin-top: 0; }
       .stat-row { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 16px; }
       .stat-box {
         flex: 1; min-width: 120px; background: #f7f8fa; border-radius: 8px;
@@ -3690,10 +3695,13 @@ server <- function(input, output, session) {
     instr <- rv$instrument
     date_col <- dash_date_col()
     cat_cols <- dash_filter_cols()
-    if (is.null(responses) || nrow(responses) == 0 ||
-        (!length(cat_cols) && is.null(date_col))) {
-      return(NULL)
-    }
+    if (is.null(responses) || nrow(responses) == 0) return(NULL)
+    # Explore's 1 primary action (item 12e), on all 4 views. The CSV holds
+    # the responses the filters keep.
+    csv_btn <- tags$div(class = "dash-actions",
+      downloadButton("dash_dl_csv", "Download CSV", class = "btn-primary sf-primary"),
+      tags$span(class = "hint", "The CSV holds the responses the filters keep."))
+    if (!length(cat_cols) && is.null(date_col)) return(csv_btn)
     labels <- sframe_label_lookup(instr)
     cats <- lapply(cat_cols, function(nm) {
       vals <- sort(unique(as.character(responses[[nm]][!is.na(responses[[nm]])])))
@@ -3729,11 +3737,15 @@ server <- function(input, output, session) {
 
     tags$div(
       class = "filter-bar",
-      tags$div(class = "card-title", "Filters"),
+      tags$div(class = "filter-head", tags$div(class = "card-title", "Filters"), csv_btn),
       tags$div(class = "filter-grid", c(cats, list(date_ui))),
       tags$div(class = "filter-note", "Leave a filter blank to include all responses.")
     )
   })
+
+  # Drawn while Explore is hidden, so its 1 primary action is there the
+  # moment the screen opens.
+  shiny::outputOptions(output, "dash_filter_bar", suspendWhenHidden = FALSE)
 
   dash_filtered_responses <- reactive({
     out <- rv$responses
@@ -3843,7 +3855,6 @@ server <- function(input, output, session) {
 
     tags$div(class = "card",
       tags$div(class = "card-title", "Raw responses"),
-      downloadButton("dash_dl_csv", "Download CSV", class = "btn-primary sf-primary"),
       tags$p(class = "hint", paste0("Showing the first 200 of ", nrow(resp), " rows.")),
       tags$div(style = "overflow-x:auto", shiny::tableOutput("studio_raw_table"))
     )

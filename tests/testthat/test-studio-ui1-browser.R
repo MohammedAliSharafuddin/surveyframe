@@ -371,6 +371,36 @@ test_that("each screen has exactly 1 primary action, visible without scrolling a
   expect_true(ui2_wait(b, paste0("parseInt(getComputedStyle(", doc, ".getElementById('saveBtn')).fontSize) >= 15"), 10))
 })
 
+test_that("Explore's Download CSV shows on every view and holds the responses the filters keep (12e gap)", {
+  resp <- sframe_demo("input_types")$responses
+  chosen <- sort(unique(as.character(resp$visit_type[!is.na(resp$visit_type)])))[1]
+  expected <- sum(as.character(resp$visit_type) == chosen, na.rm = TRUE)
+  expect_lt(expected, nrow(resp))
+
+  b <- ui1_studio("input_types")
+  expect_true(ui1_screen(b, "dashboard"))
+  for (view in c("Overview", "Items", "Scales", "Data")) {
+    ui2_js(b, sprintf("Shiny.setInputValue('dashboard_view', '%s'); $('input[name=dashboard_view][value=%s]').prop('checked', true); true", view, view))
+    expect_true(ui2_wait(b, "$('#screen-dashboard .sf-primary:visible').length === 1 && $('#screen-dashboard .sf-primary:visible').attr('id') === 'dash_dl_csv'", 20), label = view)
+  }
+  # The Data view keeps its row hint.
+  expect_true(ui2_wait(b, "$('#screen-dashboard').text().indexOf('Showing the first 200 of') >= 0", 20))
+
+  ui2_js(b, "Shiny.setInputValue('dashboard_view', 'Overview'); $('input[name=dashboard_view][value=Overview]').prop('checked', true); true")
+  expect_true(ui2_wait(b, "$('#dash_dl_csv').is(':visible') && $('#screen-dashboard').text().indexOf('Showing the first 200 of') < 0", 20))
+  csv_rows <- function() {
+    got <- b$Runtime$evaluate(
+      "fetch($('#dash_dl_csv').attr('href')).then(function(r){ return r.text(); })",
+      awaitPromise = TRUE, returnByValue = TRUE)$result$value
+    nrow(utils::read.csv(text = got, check.names = FALSE))
+  }
+  expect_identical(csv_rows(), nrow(resp))
+  ui2_js(b, sprintf("Shiny.setInputValue('dash_filter_visit_type', ['%s']); true", chosen))
+  Sys.sleep(2)
+  expect_identical(csv_rows(), expected)
+  ui2_js(b, "Shiny.setInputValue('dash_filter_visit_type', []); true")
+})
+
 test_that("Responses puts the Google Sheet card first, with Read from Google Sheet as its primary (item 12f)", {
   b <- ui1_studio("factor_structure")
   expect_true(ui1_screen(b, "responses"))
