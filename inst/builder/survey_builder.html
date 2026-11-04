@@ -957,6 +957,7 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
   <div class="mhdr"><span class="mtitle" id="rq-modal-title">Add Research Question</span><button type="button" class="mx" onclick="closeModal('m-rq')">&#215;</button></div>
   <div class="mbody">
     <div class="field"><label class="fl" for="rq-q">Research question <span class="fr">*</span></label><div class="fc"><textarea id="rq-q" rows="3" placeholder="Is there a significant difference in satisfaction between groups?"></textarea></div></div>
+    <div class="field" id="rq-obj-field" hidden><label class="fl" for="rq-obj">Objective served</label><div class="fc"><select id="rq-obj"></select></div><span class="fhint">The study objective this research question answers. Objectives are set in Survey settings, Study.</span></div>
     <div class="field"><label class="fl">Variables and roles</label><div class="vcbs" id="rqVarCBs"></div><div class="role-grid" id="rqRoleFields"></div></div>
     <!-- Suggestion box: populated and shown by JS when variables are selected -->
     <div id="rqSuggest" class="suggest-box" style="display:none">
@@ -3743,6 +3744,25 @@ function studyProblems(s){
   });
   return out;
 }
+// The objective a plan block serves (D13). saveRQ() builds the block afresh,
+// so an objective set in R was dropped by any edit here. The select lists the
+// study's objectives, and the block's own objective even when the study no
+// longer declares it, so an edit never changes it unasked.
+function studyObjectiveIds(){var s=S._carry&&S._carry.study;return (s&&Array.isArray(s.objectives)?s.objectives:[]).map(function(o){return o&&o.id;}).filter(function(i){return i;});}
+function rqObjectiveFill(rq){
+  var ids=studyObjectiveIds(),cur=rq&&typeof rq.objective==='string'?rq.objective:'';
+  if(cur&&ids.indexOf(cur)<0)ids.push(cur);
+  var texts={};var s=S._carry&&S._carry.study;(s&&Array.isArray(s.objectives)?s.objectives:[]).forEach(function(o){if(o&&o.id)texts[o.id]=o.text||'';});
+  var sel=document.getElementById('rq-obj');
+  if(sel)sel.innerHTML='<option value="">None</option>'+ids.map(function(i){return '<option value="'+esc(i)+'">'+esc(i+(texts[i]?': '+texts[i]:''))+'</option>';}).join('');
+  sv('rq-obj',cur);
+  var f=document.getElementById('rq-obj-field');if(f)f.hidden=!ids.length;
+}
+function rqObjectiveKeep(rq,was){
+  var o=gv('rq-obj');
+  if(o)rq.objective=o;
+  else if(was&&was.objective==='')rq.objective='';
+}
 
 // -- References (0.4.3) -------------------------------------------------------
 // CSL-JSON records, the format read_bibtex() and sframe_reference() produce in R.
@@ -4950,6 +4970,7 @@ function openRQModal(id){
   sv('rq-q',rq?rq.research_question||'':'');sv('rq-interp',rq?ruleOf(rq):'');
   sv('rq-h0',rq&&rq.hypotheses?writtenHyp(rq.hypotheses.null):'');sv('rq-h1',rq&&rq.hypotheses?writtenHyp(rq.hypotheses.alternative):'');
   document.getElementById('rq-test').value=method;
+  rqObjectiveFill(rq);
   document.getElementById('rq-alpha').value=rq?String((rq.options&&rq.options.alpha)||rq.alpha||0.05):'0.05';
   document.getElementById('rq-term').value=rq&&rq.options&&rq.options.term?String(rq.options.term):'';
   document.getElementById('rq-wordcloud').checked=!!(rq&&rq.options&&rq.options.wordcloud);
@@ -5113,6 +5134,7 @@ function saveRQ(){
   var hyp=null;if(reg.showHypotheses){var h0=gv('rq-h0').trim(),h1=gv('rq-h1').trim();if(h0||h1){hyp={};if(h0)hyp.null=h0;if(h1)hyp.alternative=h1;}}
   var editRq=editRqId?S.analysis_plan.find(function(r){return r.id===editRqId;}):null;
   var rq={id:editRqId||uid(),research_question:q,family:reg.family||'',method:t,test:t,roles:roles,variables:vars,options:opts,hypotheses:hyp,decision_rule:gv('rq-interp').trim(),interpretation:editRq?interpOf(editRq):'',reporting_references:reg.refs||[],citations:reg.refs||[],status:'valid_plan',requires_data:!['cfa_lavaan_syntax','sem_lavaan_syntax','seminr_syntax'].includes(t),result:null};
+  rqObjectiveKeep(rq,editRq);
   snap();
   if(editRqId){var i=S.analysis_plan.findIndex(function(r){return r.id===editRqId;});if(i>=0)S.analysis_plan[i]=rq;}
   else S.analysis_plan.push(rq);
