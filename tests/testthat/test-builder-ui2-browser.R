@@ -180,4 +180,66 @@ test_that("the Study tab edits the study and Other asks for a description", {
   expect_identical(st$sampling, list(method = "other", method_other = "Intercept at the exit"))
 })
 
+# -- Centre pane -----------------------------------------------------------------
+
+centre_instrument <- function() {
+  sframe_instrument(
+    "Centre", version = "1.0.0",
+    components = list(
+      sframe_item("q1", "How did you travel?", type = "single_choice", choice_set = "mode",
+                  required = TRUE),
+      sframe_item("sec", "About the venue", type = "section_break"),
+      sframe_choice_set("mode", c("1", "2"), c("By train", "By car"))))
+}
+centre_doc <- "document.querySelector('#cvPvFrame iframe').contentDocument"
+centre_item <- function(s, id) {
+  ui2_wait(s, sprintf("%s&&%s.getElementById('item_%s')", centre_doc, centre_doc, id))
+  js(s, sprintf("%s.getElementById('item_%s').outerHTML", centre_doc, id))
+}
+
+test_that("the centre draws the selected item as export_survey(preview = TRUE) does", {
+  ins <- centre_instrument()
+  s <- ui2_builder(ins)
+  js(s, "selItem('q1');1")
+  expect_true(js(s, "document.getElementById('cvPv').classList.contains('on')"))
+  centre <- centre_item(s, "q1")
+  expect_true(js(s, paste0(centre_doc, ".getElementById('app').hasAttribute('inert')")))
+  # The same item on the exported preview page.
+  path <- tempfile(fileext = ".html")
+  suppressMessages(export_survey(ins, output_path = path, open = FALSE, preview = TRUE))
+  p <- ui2_session("survey")
+  ui2_navigate(p, paste0("file://", normalizePath(path)))
+  expect_true(ui2_wait(p, "document.getElementById('item_q1')"))
+  expect_identical(centre, js(p, "document.getElementById('item_q1').outerHTML"))
+  # A section break shows as on its page.
+  js(s, "selItem('sec');1")
+  expect_match(centre_item(s, "sec"), "About the venue", fixed = TRUE)
+})
+
+test_that("an edit to a label and a choice appears in the centre", {
+  s <- ui2_builder(centre_instrument())
+  js(s, "selItem('q1');1")
+  centre_item(s, "q1")
+  js(s, "var e=document.getElementById('fi-lbl');e.value='How did you get here?';e.dispatchEvent(new Event('input',{bubbles:true}));updF('fi-lbl');1")
+  js(s, "snap();S.choices[0].labels[1]='By coach';setDirty();1")
+  expect_true(ui2_wait(s, sprintf("%s.body.textContent.indexOf('By coach')>=0", centre_doc)))
+  txt <- js(s, paste0(centre_doc, ".body.textContent"))
+  expect_match(txt, "How did you get here?", fixed = TRUE)
+  expect_false(grepl("By car", txt, fixed = TRUE))
+})
+
+test_that("the centre has a desktop and a mobile width, and closes with the editor", {
+  s <- ui2_builder(centre_instrument())
+  js(s, "selItem('q1');1")
+  centre_item(s, "q1")
+  js(s, "document.getElementById('cvW-mobile').click();1")
+  expect_identical(js(s, "document.getElementById('cvW-mobile').getAttribute('aria-pressed')"), "true")
+  expect_identical(js(s, "Math.round(document.querySelector('#cvPvFrame iframe').getBoundingClientRect().width)"), 390L)
+  js(s, "document.getElementById('cvW-desktop').click();1")
+  expect_gt(js(s, "document.querySelector('#cvPvFrame iframe').getBoundingClientRect().width"), 390)
+  js(s, "closeInsp();1")
+  expect_false(js(s, "document.getElementById('cvPv').classList.contains('on')"))
+})
+
+
 ui2_close()
