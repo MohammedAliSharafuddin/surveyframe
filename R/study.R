@@ -262,3 +262,44 @@ sframe_notes <- function(x) {
   }
   as.character(x$notes %||% character(0))
 }
+
+# The study for a report's plan section (D13 in the report, 8b-R): the
+# problem, the objectives, and the trace from each objective to the research
+# questions that name it, built once for both engines. NULL when the
+# instrument describes no study.
+sframe_report_study <- function(instrument) {
+  s <- instrument$study %||% list()
+  if (!length(s)) return(NULL)
+  plan <- instrument$analysis_plan %||% list()
+  rq_label <- function(b, i) {
+    id <- as.character(b$id %||% paste0("RQ", i))
+    q <- as.character(b$research_question %||% "")
+    if (nzchar(q)) paste0(id, " (", q, ")") else id
+  }
+  serves <- vapply(plan, function(b) as.character(b$objective %||% "")[1], character(1))
+  objectives <- s$objectives %||% list()
+  obj_tab <- NULL
+  trace <- NULL
+  if (length(objectives)) {
+    ids <- vapply(objectives, function(o) as.character(o$id %||% ""), character(1))
+    texts <- vapply(objectives, function(o) as.character(o$text %||% ""), character(1))
+    obj_tab <- data.frame(ID = ids, Objective = texts, stringsAsFactors = FALSE)
+    rqs <- vapply(ids, function(id) {
+      hit <- which(serves == id)
+      if (!length(hit)) "none yet" else
+        paste(vapply(hit, function(i) rq_label(plan[[i]], i), character(1)), collapse = "; ")
+    }, character(1))
+    trace <- data.frame(Objective = paste0(ids, ": ", texts), `Research questions` = unname(rqs),
+                        stringsAsFactors = FALSE, check.names = FALSE)
+  }
+  unlinked <- which(!nzchar(serves) | is.na(serves))
+  list(
+    problem = s$problem %||% NULL,
+    objectives = obj_tab,
+    trace = trace,
+    unlinked = if (length(unlinked) && length(objectives)) {
+      paste(vapply(unlinked, function(i) as.character(plan[[i]]$id %||% paste0("RQ", i)), character(1)),
+            collapse = ", ")
+    }
+  )
+}

@@ -440,6 +440,22 @@ if (is.null(rr)) {
 
 ## Analysis Plan {#sec-analysis .unnumbered}
 
+```{r study, eval=params$include_analysis && !is.null(content$study)}
+#| output: asis
+# The study the plan serves (D13 in the report, 8b-R): the problem, its
+# sources, and the trace from objectives to research questions, as
+# render_report() built it for both engines.
+s <- content$study
+cat("### Study\n\n")
+if (length(s$problem)) cat("**Problem:** ", s$problem, "\n\n", sep = "")
+if (use_citations && length(cited_keys("study")))
+  cat(sprintf("**Sources:** %s\n\n", cite(cited_keys("study"))))
+if (!is.null(s$trace))
+  print(apa_kable(s$trace, caption = "Objectives and the research questions that serve them"))
+if (length(s$unlinked))
+  cat(sprintf("\n*Research questions that name no objective: %s.*\n\n", s$unlinked))
+```
+
 ```{r analysis, eval=params$include_analysis && length(instrument$analysis_plan) > 0}
 #| output: asis
 # What each block declared before the data prints above its result, and the

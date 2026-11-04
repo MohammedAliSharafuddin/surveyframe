@@ -308,6 +308,11 @@ style.
 
 ## The study an instrument serves
 
+* **Every report prints the study in its plan section.** The problem
+  statement, its sources, and a table tracing each objective to the
+  research questions that serve it, with "none yet" for an objective no
+  question serves and a note naming any question that serves none, in both
+  engines.
 * **A `study` field holds the problem, the objectives and the sampling plan**
   (D13). `sframe_instrument(study = list(problem = , objectives = ,
   sampling = ))`: the problem in 1 short paragraph, objectives each with an
