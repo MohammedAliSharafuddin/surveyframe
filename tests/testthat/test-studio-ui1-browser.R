@@ -307,12 +307,15 @@ test_that("each screen's title and context line are 1 row at the top of its pane
 test_that("Design's head holds the instrument's title and version, in Build and Plan and with unsaved changes (item 12h)", {
   b <- ui1_studio("factor_structure")
   ins <- surveyframe::sframe_demo("factor_structure")$instrument
-  want <- paste0("Editing: ", ins$meta$title, " (", ins$meta$version, ")")
+  # The title, then the version as it stands: earlier tests in this file
+  # record amendments, which raise it from the demo's.
+  want <- paste0("Editing: ", ins$meta$title, " (")
   head_has <- function() {
     ui2_wait(b, sprintf(paste0(
       "(function(){ var h = $('#screen-design > .screen-head'), s = document.getElementById('design_status');",
-      "  return h.text().indexOf(%s) >= 0 && s.offsetWidth > 0 && s.offsetHeight > 0; })()"),
-      jsonlite::toJSON(want, auto_unbox = TRUE)), 20)
+      "  var t = h.text(), i = t.indexOf(%s);",
+      "  return i >= 0 && /^\\d+\\.\\d+\\.\\d+\\)/.test(t.slice(i + %d)) && s.offsetWidth > 0 && s.offsetHeight > 0; })()"),
+      jsonlite::toJSON(want, auto_unbox = TRUE), nchar(want)), 20)
   }
   expect_true(ui1_screen(b, "design"))
   expect_true(head_has(), label = "Build")
