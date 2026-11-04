@@ -203,6 +203,11 @@ can be written again, and every plan result can be serialised by a host.
 
 ## References, cited where they are used and listed once at the end
 
+* **A report cites each source where it is used, in both engines.** Under
+  the title for the instrument, in the codebook for an item or a scale,
+  under the reliability table for a scale, in a plan block's section, beside
+  the hypotheses they support, and in the model appendix, as well as once in
+  the References list. The built-in page cited only what its text named.
 * **Hypotheses and the study can cite sources.** `cited_by` takes
   `"hypothesis:<block id>"`, the hypotheses a plan block declares, and
   `"study"`, the study's problem, objectives and sampling.

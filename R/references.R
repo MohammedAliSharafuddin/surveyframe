@@ -606,6 +606,32 @@ sframe_restore_reference <- function(r) {
   structure(r, class = "sf_reference")
 }
 
+# The keys of the references a target cites (8b-R): "instrument", "study",
+# "item:<id>" and so on. A reference linked to nothing counts as cited by
+# the instrument as a whole, so every reference reaches a site. The Quarto
+# template's cited_keys() applies the same rule.
+sframe_cited_keys <- function(instrument, target) {
+  refs <- Filter(function(r) target %in% (r$cited_by %||% character(0)) ||
+                   (identical(target, "instrument") && !length(r$cited_by)),
+                 instrument$references %||% list())
+  vapply(refs, function(r) as.character(r$id), character(1))
+}
+
+# "[@a; @b]", which both engines resolve, or "" for no keys.
+sframe_cite_text <- function(keys) {
+  keys <- unique(keys[nzchar(keys)])
+  if (!length(keys)) return("")
+  paste0("[", paste0("@", keys, collapse = "; "), "]")
+}
+
+# A line naming the sources at a site, as HTML for the built-in engine, or
+# "" when the target cites none.
+sframe_sources_html <- function(instrument, target, label = "Sources") {
+  cite <- sframe_cite_text(sframe_cited_keys(instrument, target))
+  if (!nzchar(cite)) return("")
+  sprintf("<p><strong>%s:</strong> %s</p>", label, cite)
+}
+
 # Every problem with an instrument's references, as messages for
 # validate_sframe()'s "references" check.
 sframe_reference_problems <- function(instrument) {
