@@ -147,7 +147,12 @@ sframe_study_problems <- function(instrument) {
     }
     out
   }
-  if (is.null(s) || length(s) == 0) {
+  if (is.null(s)) return(list(problems = c(problems, trace(character(0))), notes = notes))
+  # Present means declared: the profile has no empty study, objectives or
+  # sampling, and the writer leaves out what is empty.
+  if (length(s) == 0) {
+    problems <- c(problems, paste0("`study` is present and empty. Drop it: an instrument with no ",
+                                   "study has no `study` field."))
     return(list(problems = c(problems, trace(character(0))), notes = notes))
   }
   if (!is.list(s) || is.null(names(s))) {
@@ -169,7 +174,9 @@ sframe_study_problems <- function(instrument) {
   }
   ids <- character(0)
   if (!is.null(s$objectives)) {
-    if (!is.list(s$objectives)) {
+    if (length(s$objectives) == 0) {
+      problems <- c(problems, "`study$objectives` is present and empty. Drop it, or declare at least 1 objective.")
+    } else if (!is.list(s$objectives)) {
       problems <- c(problems, "`study$objectives` must be a list of objectives, each with an id and text.")
     } else {
       for (k in seq_along(s$objectives)) {
@@ -193,7 +200,9 @@ sframe_study_problems <- function(instrument) {
   }
   if (!is.null(s$sampling)) {
     sp <- s$sampling
-    if (!is.list(sp)) {
+    if (length(sp) == 0) {
+      problems <- c(problems, "`study$sampling` is present and empty. Drop it, or declare the sampling plan.")
+    } else if (!is.list(sp)) {
       problems <- c(problems, "`study$sampling` must be a list with population, method and planned_n.")
     } else {
       extra <- setdiff(names(sp) %||% character(0), sframe_sampling_fields)

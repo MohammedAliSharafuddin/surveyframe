@@ -186,3 +186,19 @@ test_that("Profile B3: a hypothesis member that is null or NA is refused, and no
     expect_true(sframe_is_valid(validate_sframe(codex_instr(json), strict = FALSE)))
   }
 })
+
+test_that("Profile S1 to S3: a study, objectives or sampling present and empty is refused, with a message to drop it", {
+  expect_match(codex_problems('{"study":{}}'),
+               "`study` is present and empty. Drop it", fixed = TRUE)
+  expect_match(codex_problems('{"study":{"objectives":[]}}'),
+               "`study$objectives` is present and empty. Drop it", fixed = TRUE)
+  expect_match(codex_problems('{"study":{"sampling":{}}}'),
+               "`study$sampling` is present and empty. Drop it", fixed = TRUE)
+  # An empty objectives list built in R.
+  ins <- codex_instr('{"study":{"problem":"Why?"}}')
+  ins$study$objectives <- list()
+  expect_match(paste(sframe_problems(validate_sframe(ins, strict = FALSE)), collapse = "\n"),
+               "`study$objectives` is present and empty", fixed = TRUE)
+  # No study at all stays valid.
+  expect_true(sframe_is_valid(validate_sframe(codex_instr('{"analysis_plan":[]}'), strict = FALSE)))
+})
