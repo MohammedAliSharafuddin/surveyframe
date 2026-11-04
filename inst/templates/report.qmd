@@ -424,6 +424,15 @@ if (is.null(rr)) {
     col.names=c("Scale","Items","N","Alpha","Omega h","Omega total"),
     align=c("l","c","c","r","r","r"),
     caption="Scale reliability statistics"))
+  # The sources of each scale, under its table (8b-R).
+  if (use_citations) {
+    src_parts <- vapply(rr, function(s) {
+      keys <- cited_keys(paste0("scale:", s$scale_id))
+      if (length(keys)) paste0(s$label %||% s$scale_id, " ", cite(keys)) else ""
+    }, character(1))
+    src_parts <- src_parts[nzchar(src_parts)]
+    if (length(src_parts)) cat(sprintf("\n*Sources.* %s.\n\n", paste(src_parts, collapse = "; ")))
+  }
 }
 ```
 
@@ -450,6 +459,10 @@ decl_for <- function(b) {
 declare_md <- function(b) {
   d <- decl_for(b)$declaration
   if (length(d) > 0) cat(sprintf("**%s:** %s\n\n", names(d), d), sep = "")
+  # The sources of the hypotheses, beside them (8b-R).
+  keys <- cited_keys(paste0("hypothesis:", as.character(b$block_id %||% b$id %||% "")[1]))
+  if (use_citations && length(keys))
+    cat(sprintf("**Sources for the hypotheses:** %s\n\n", cite(keys)))
 }
 interp_md <- function(b) {
   text <- decl_for(b)$interpretation %||% ""

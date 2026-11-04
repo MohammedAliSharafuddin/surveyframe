@@ -815,6 +815,21 @@ render_report <- function(
   sframe_report_result(dest, "html", open)
 }
 
+# The sources of the scales in a table, under it, or "" when none cites any.
+sframe_scale_sources_html <- function(instrument, scale_ids) {
+  scales <- instrument$scales %||% list()
+  parts <- vapply(scale_ids, function(id) {
+    sc <- Filter(function(s) identical(s$id, id), scales)
+    cite <- sframe_cite_text(sframe_cited_keys(instrument, paste0("scale:", id)))
+    if (!nzchar(cite)) return("")
+    label <- if (length(sc)) sc[[1]]$label %||% id else id
+    paste0(htmltools_escape(label), " ", cite)
+  }, character(1))
+  parts <- parts[nzchar(parts)]
+  if (!length(parts)) return("")
+  sprintf("<p class=\"tbl-note\"><em>Sources.</em> %s.</p>", paste(parts, collapse = "; "))
+}
+
 # The banner at the top of a built-in report (owner 2026-10-31). Quarto is the
 # report engine, and the built-in engine writes a short plain results page
 # with no parity promise, so the page says so and where to get Quarto.
@@ -990,6 +1005,24 @@ sframe_clean_interpretations <- function(interpretations) {
           col.names = c("ID", "Label", "Type", "Engine", "Constructs", "Paths"))
       )
     }
+    # Where each scale and item comes from, cited in text, as the Quarto
+    # report lists them (8b-R).
+    sources <- c(
+      vapply(instrument$scales %||% list(), function(sc) {
+        cite <- sframe_cite_text(sframe_cited_keys(instrument, paste0("scale:", sc$id)))
+        if (nzchar(cite)) sprintf("<li>Scale <em>%s</em>: %s</li>",
+                                  htmltools_escape(sc$label %||% sc$id), cite) else ""
+      }, character(1)),
+      vapply(instrument$items %||% list(), function(it) {
+        cite <- sframe_cite_text(sframe_cited_keys(instrument, paste0("item:", it$id)))
+        if (nzchar(cite)) sprintf("<li>Item <code>%s</code>: %s</li>",
+                                  htmltools_escape(it$id), cite) else ""
+      }, character(1)))
+    sources <- sources[nzchar(sources)]
+    if (length(sources)) {
+      codebook_parts <- c(codebook_parts, "<p><strong>Sources</strong></p>",
+                          paste0("<ul>", paste(sources, collapse = ""), "</ul>"))
+    }
     sections <- c(sections, sprintf("<section>%s</section>", paste(codebook_parts, collapse = "\n")))
   }
 
@@ -1093,6 +1126,7 @@ sframe_clean_interpretations <- function(interpretations) {
         "<h2>Reliability</h2>",
         "<p>Cronbach alpha and McDonald's omega by scale.</p>",
         .render_report_table(rel_tbl, "Scale reliability"),
+        sframe_scale_sources_html(instrument, vapply(rr, function(s) s$scale_id, character(1))),
         collapse = "\n"
       )
     }
@@ -1225,7 +1259,10 @@ sframe_clean_interpretations <- function(interpretations) {
     title,
     title,
     subtitle,
-    sframe_builtin_banner(),
+    paste0(sframe_resolve_citations(
+      sframe_sources_html(instrument, "instrument", "Draws on") |>
+        sub(pattern = "^<p>", replacement = "<p class=\"meta\">"), ref_index),
+      sframe_builtin_banner()),
     paste(sections, collapse = "\n")
   )
 
@@ -1247,7 +1284,13 @@ sframe_clean_interpretations <- function(interpretations) {
   # What the block declared before the data prints above its result, and
   # the interpretation below it, labelled as written after the results. An
   # interpretation never stands in for an empty decision rule (D12).
-  declaration_html <- sframe_declaration_html
+  # The sources of the hypotheses beside them, then the block's own (8b-R).
+  declaration_html <- function(b) {
+    id <- as.character(b$block_id %||% b$id %||% "")[1]
+    paste0(sframe_declaration_html(b),
+           sframe_sources_html(instrument, paste0("hypothesis:", id), "Sources for the hypotheses"),
+           sframe_sources_html(instrument, paste0("plan:", id)))
+  }
   interp_html <- function(block) {
     text <- sframe_written_interpretation(block, interpretations)
     if (!nzchar(text)) return("")
@@ -1409,7 +1452,7 @@ sframe_clean_interpretations <- function(interpretations) {
       paste(
         "<div class=\"rq-block\">",
         "<h3>%s</h3>",
-        "<p><strong>Type:</strong> %s &nbsp; <strong>Engine:</strong> %s</p>",
+        "<p><strong>Type:</strong> %s &nbsp; <strong>Engine:</strong> %s</p>%s",
         "<h4>Syntax</h4><pre>%s</pre>",
         "<h4>Model JSON</h4><pre>%s</pre>",
         "</div>",
@@ -1418,6 +1461,7 @@ sframe_clean_interpretations <- function(interpretations) {
       htmltools_escape(model$label %||% model$id),
       htmltools_escape(model$type %||% ""),
       htmltools_escape(model$engine %||% ""),
+      sframe_sources_html(instrument, paste0("model:", model$id %||% "")),
       htmltools_escape(syntax),
       json
     )
