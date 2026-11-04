@@ -13,6 +13,21 @@ format:
       sidebar-width: 280px
       body-width: 900px
       margin-width: 160px
+  docx:
+    reference-doc: apa-reference.docx
+    toc: true
+  odt:
+    reference-doc: apa-reference.odt
+    toc: true
+  pdf:
+    toc: true
+    fontsize: 12pt
+    linestretch: 2
+    geometry: margin=1in
+  typst:
+    toc: true
+    fontsize: 12pt
+    citeproc: true
 params:
   instrument_path:     ""
   data_path:           ""
@@ -48,6 +63,32 @@ library(surveyframe)
 library(knitr)
 
 `%||%` <- function(x, y) if (is.null(x)) y else x
+
+# HTML, or Word, OpenDocument and PDF (8b-R). The HTML report keeps its HTML
+# tables, numbered figures and notes. Every other format gets pipe tables,
+# which pandoc writes as native tables, and a bold title above each figure.
+out_html <- knitr::is_html_output()
+# Outside HTML every table caption carries a cross-reference label, which
+# numbers it ("Table 1") in Word, OpenDocument and PDF, and without which
+# Typst drops the caption. `cap` is the caption a chunk gives through
+# tbl-cap in HTML. Row names repeat the first column, so they are left out.
+tbl_n <- 0L
+apa_kable <- function(x, ..., caption = NULL, cap = NULL) {
+  if (out_html) return(kable(x, format = "html", caption = caption, ...))
+  caption <- caption %||% cap
+  if (!is.null(caption)) {
+    tbl_n <<- tbl_n + 1L
+    caption <- sprintf("%s {#tbl-sf%d}", caption, tbl_n)
+  }
+  args <- list(...)
+  if (is.null(args$row.names)) args$row.names <- FALSE
+  do.call(kable, c(list(x, format = "pipe", caption = caption), args))
+}
+figure_start <- function(html, title) {
+  if (out_html) cat("\n", html, "\n\n", sep = "")
+  else cat("\n**", title, "**\n\n", sep = "")
+}
+figure_end <- function() if (out_html) cat("\n\n</figure>\n\n") else cat("\n\n")
 
 # Figure size, resolution and format from render_report(figures = ) (Ethos
 # request 19). Empty keeps the defaults. A stated dpi is the pixel density
@@ -186,7 +227,7 @@ prov <- if (nzchar(params$provenance_path %||% "") && file.exists(params$provena
 if (is.null(prov)) {
   cat("No provenance was recorded for this render.\n\n")
 } else {
-  print(kable(format = "html", prov, align = c("l", "l"), caption = "Provenance"))
+  print(apa_kable(prov, align = c("l", "l"), caption = "Provenance"))
 }
 ```
 
@@ -195,22 +236,22 @@ if (is.null(prov)) {
 ## Codebook {#sec-codebook .unnumbered}
 
 ```{r codebook, eval=params$include_codebook}
-#| tbl-cap: "Survey items"
+#| tbl-cap: !expr if (out_html) "Survey items"
 cb <- sframe_codebook(instrument)
-kable(format = "html", content$codebook_items,
+apa_kable(content$codebook_items, cap = "Survey items",
   align = c("l","l","l","l","l","c","c"))
 ```
 
 ```{r codebook-scales, eval=params$include_codebook && nrow(cb$scales_table) > 0}
-#| tbl-cap: "Scale definitions"
-kable(format = "html", cb$scales_table,
+#| tbl-cap: !expr if (out_html) "Scale definitions"
+apa_kable(cb$scales_table, cap = "Scale definitions",
   col.names = c("ID","Label","Method","Items (n)","Item IDs"),
   align = c("l","l","l","c","l"))
 ```
 
 ```{r codebook-plan, eval=params$include_codebook && !is.null(cb$plan_table) && nrow(cb$plan_table) > 0}
-#| tbl-cap: "Pre-declared analysis plan"
-kable(format = "html", cb$plan_table,
+#| tbl-cap: !expr if (out_html) "Pre-declared analysis plan"
+apa_kable(cb$plan_table, cap = "Pre-declared analysis plan",
   col.names = c("ID","Research question","Method","Variables","Decision rule"),
   align = c("l","l","l","l","l"))
 ```
@@ -232,8 +273,8 @@ if (length(sources)) cat("**Sources of items and scales**\n\n", paste(unlist(sou
 ```
 
 ```{r codebook-models, eval=params$include_codebook && !is.null(cb$models_table) && nrow(cb$models_table) > 0}
-#| tbl-cap: "Measurement and structural models"
-kable(format = "html", cb$models_table,
+#| tbl-cap: !expr if (out_html) "Measurement and structural models"
+apa_kable(cb$models_table, cap = "Measurement and structural models",
   col.names = c("ID","Label","Type","Engine","Constructs","Paths"),
   align = c("l","l","l","l","c","c"))
 ```
@@ -255,19 +296,20 @@ qs_df <- data.frame(
   Value = c(qr$summary$n_respondents, qr$summary$n_items, qr$summary$n_flagged,
             sprintf("%.1f%%", qr$summary$flag_rate * 100)),
   stringsAsFactors = FALSE)
-print(kable(format = "html", qs_df, align = c("l", "r"), caption = "Quality summary"))
+print(apa_kable(qs_df, align = c("l", "r"), caption = "Quality summary"))
 if (!is.null(content$quality_note))
-  cat(sprintf("\n\n<p class=\"sf-note\">%s</p>\n\n", content$quality_note))
+  cat(if (out_html) sprintf("\n\n<p class=\"sf-note\">%s</p>\n\n", content$quality_note)
+      else sprintf("\n\n*%s*\n\n", content$quality_note))
 ```
 
 ```{r quality-attention, eval=params$include_quality && has_data && length(qr$attention) > 0}
-#| tbl-cap: "Attention check results"
+#| tbl-cap: !expr if (out_html) "Attention check results"
 attn_df <- do.call(rbind, lapply(qr$attention, function(a)
   data.frame(Check=a$check_id, Type=a$type,
     Pass_rate=sprintf("%.1f%%", a$pass_rate*100),
     Failures=a$n_fail, Action=a$fail_action,
     stringsAsFactors=FALSE)))
-kable(format = "html", attn_df, align=c("l","l","r","r","l"))
+apa_kable(attn_df, cap = "Attention check results", align=c("l","l","r","r","l"))
 ```
 
 ```{r quality-missing, eval=params$include_quality && has_data}
@@ -277,18 +319,18 @@ cat(sprintf("**Respondent missingness:** %.1f%% exceed the %.0f%% threshold.\n\n
   miss_pct, qr$missing$flagged_threshold*100))
 high_miss <- qr$missing$item_miss_rate[qr$missing$item_miss_rate > 0.10]
 if (length(high_miss) > 0) {
-  print(kable(format = "html", data.frame(Item=names(high_miss),
+  print(apa_kable(data.frame(Item=names(high_miss),
     Missing=sprintf("%.1f%%", high_miss*100), stringsAsFactors=FALSE),
     align=c("l","r"), caption = "Items with more than 10% missing"))
 } else { cat("No items exceed 10% missing values.\n\n") }
 ```
 
 ```{r quality-sl, eval=params$include_quality && has_data && length(qr$straightline) > 0}
-#| tbl-cap: "Straight-lining by scale"
+#| tbl-cap: !expr if (out_html) "Straight-lining by scale"
 sl_df <- do.call(rbind, lapply(qr$straightline, function(s)
   data.frame(Scale=s$scale_id, Items=s$n_items,
     Flagged=sprintf("%.1f%%", s$flag_rate*100), stringsAsFactors=FALSE)))
-kable(format = "html", sl_df, align=c("l","c","r"))
+apa_kable(sl_df, cap = "Straight-lining by scale", align=c("l","c","r"))
 ```
 
 ---
@@ -301,13 +343,13 @@ mr <- tryCatch(sframe_missing_data_results(responses, instrument), error = funct
 if (is.null(mr)) {
   cat("Missing-data diagnostics could not be computed from the supplied data.\n\n")
 } else {
-  print(kable(format = "html", sframe_apa_cells(mr$item_missing), caption = "Item-wise missingness"))
-  print(kable(format = "html", sframe_apa_cells(mr$respondent_missing), caption = "Respondent-wise missingness"))
+  print(apa_kable(sframe_apa_cells(mr$item_missing), caption = "Item-wise missingness"))
+  print(apa_kable(sframe_apa_cells(mr$respondent_missing), caption = "Respondent-wise missingness"))
   patterns_display <- mr$patterns[, intersect(c("description", "n", "percent"), names(mr$patterns)), drop = FALSE]
-  print(kable(format = "html", sframe_apa_cells(patterns_display), caption = "Missing-data patterns",
+  print(apa_kable(sframe_apa_cells(patterns_display), caption = "Missing-data patterns",
               col.names = c("Pattern", "n", "Percent")))
   if (!is.null(mr$scale_missing_rules) && nrow(mr$scale_missing_rules) > 0)
-    print(kable(format = "html", sframe_apa_cells(mr$scale_missing_rules), caption = "Scale missing rules"))
+    print(apa_kable(sframe_apa_cells(mr$scale_missing_rules), caption = "Scale missing rules"))
 }
 ```
 
@@ -321,7 +363,7 @@ dr <- tryCatch(sframe_descriptives_results(responses), error = function(e) NULL)
 if (is.null(dr)) {
   cat("Descriptive statistics could not be computed from the supplied data.\n\n")
 } else {
-  print(kable(format = "html", sframe_apa_cells(dr$table), caption = "Descriptive statistics"))
+  print(apa_kable(sframe_apa_cells(dr$table), caption = "Descriptive statistics"))
 }
 ```
 
@@ -341,9 +383,9 @@ for (chart in content$charts) {
   cat(sprintf("\n**%s**\n\n", chart$heading))
   if (!is.null(chart$note)) cat(chart$note, "\n\n")
   # Numbered and titled after rendering, as the built-in engine's are (CX-22).
-  cat("\n", chart$figure_open, "\n\n", sep = "")
+  figure_start(chart$figure_open, chart$title)
   if (!is.null(chart$plot)) print(chart$plot) else chart$draw()
-  cat("\n\n</figure>\n\n")
+  figure_end()
 }
 ```
 
@@ -366,7 +408,7 @@ if (is.null(rr)) {
       Omega_h = if (!is.null(s$omega_h)) sprintf("%.2f", s$omega_h) else "n/a",
       Omega_t = if (!is.null(s$omega_t)) sprintf("%.2f", s$omega_t) else "n/a",
       stringsAsFactors=FALSE)))
-  print(kable(format = "html", rel_df,
+  print(apa_kable(rel_df,
     col.names=c("Scale","Items","N","Alpha","Omega h","Omega total"),
     align=c("l","c","c","r","r","r"),
     caption="Scale reliability statistics"))
@@ -446,14 +488,14 @@ if (!has_data) {
               Items = s$n_items %||% NA,
               Alpha = if (!is.null(s$alpha)) sprintf("%.2f", s$alpha) else "n/a",
               stringsAsFactors = FALSE)))
-          print(kable(format = "html", rel_tab, align = c("l", "c", "r"), row.names = FALSE,
-                      caption = r$caption_html))
+          print(apa_kable(rel_tab, align = c("l", "c", "r"), row.names = FALSE,
+                      caption = if (out_html) r$caption_html else r$caption_text))
           cat("\n")
         }
         if (!is.null(r$effect_label))
           cat(sprintf("**Effect size:** %s\n\n", r$effect_label))
         if (!is.null(r$table) && is.data.frame(r$table))
-          print(kable(format = "html", sframe_apa_cells(r$table), caption = r$caption_html))
+          print(apa_kable(sframe_apa_cells(r$table), caption = if (out_html) r$caption_html else r$caption_text))
         # A second table the result carries: the quanteda runner's leading
         # features, or a moderation's conditional slopes at the moderator's own
         # values. Both were retained by their runner and rendered by neither
@@ -462,8 +504,8 @@ if (!has_data) {
         sup <- r$supplement
         if (!is.null(sup)) {
           cat("\n")
-          print(kable(format = "html", sframe_apa_cells(sup$table),
-                      caption = sup$caption_html, row.names = FALSE))
+          print(apa_kable(sframe_apa_cells(sup$table),
+                      caption = if (out_html) sup$caption_html else sup$caption, row.names = FALSE))
           cat("\n")
         }
         # The statistical call behind the numbers, folded away. Showing this
@@ -480,9 +522,9 @@ if (!has_data) {
         # The chart for this result sits directly under its table, as one
         # unit per research question, rather than in a separate section.
         if (!is.null(r$plot)) {
-          cat("\n", r$figure_open, "\n\n", sep = "")
+          figure_start(r$figure_open, r$caption_text)
           print(r$plot)
-          cat("\n\n</figure>\n\n")
+          figure_end()
         }
         interp_md(r)
         # Cited in text. The references themselves are listed once, in the
@@ -565,7 +607,7 @@ if (is.null(content$amendments)) {
   cat("No amendments are recorded.\n\n")
 } else {
   cat(sprintf("**Amendments (%d)**, oldest first:\n\n", nrow(content$amendments)))
-  cat(paste(kable(format = "html", content$amendments), collapse = "\n"))
+  cat(paste(apa_kable(content$amendments), collapse = "\n"))
   cat("\n\n")
 }
 cat("**To reproduce:**\n\n")

@@ -532,6 +532,15 @@ style.
   gets no new features and is not promised to match the Quarto report.
   The Quality summary table and Respondent-wise missingness, which only
   the built-in page had, are in the Quarto report too.
+* **Word, OpenDocument and a Quarto PDF.** `render_report(format =)` takes
+  `"docx"` and `"odt"`, written by Quarto and styled by 2 bundled APA 7
+  reference documents: Times New Roman 12, double spacing, a half-inch
+  first-line indent, level 1 headings centred and bold. Without Quarto they
+  stop with a message that names it. A PDF now goes through Quarto and
+  LaTeX where a LaTeX engine is found, through the Typst Quarto bundles
+  where none is, and only without Quarto through the built-in page printed
+  by pagedown. The `"converter"` attribute and the manifest name the route.
+  Outside HTML every table is numbered, and its title kept, in each format.
 * **Every report has a results record and a manifest beside it.**
   `render_report()` writes `<name>_results.json`, the plan results as
   canonical JSON, and `<name>_manifest.json`, the sha256 of the instrument

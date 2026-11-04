@@ -123,7 +123,8 @@ sframe_report_provenance <- function(instrument, data, record_sha) {
 }
 
 # Write the manifest for an output file, its results record beside it.
-sframe_write_manifest <- function(dest, instrument, data, record_path, extra = list()) {
+sframe_write_manifest <- function(dest, instrument, data, record_path, extra = list(),
+                                  rendering = NULL) {
   if (!file.exists(dest) || !file.exists(record_path)) return(invisible(NULL))
   paths <- sframe_record_paths(dest)
   obj <- function(id, type, file, hash, ...) {
@@ -153,6 +154,9 @@ sframe_write_manifest <- function(dest, instrument, data, record_path, extra = l
                       utils::packageVersion("surveyframe")),
     objects = objects
   )
+  # Which engine wrote the report and what converted it, kept out of the
+  # results record so the record is the same whichever engine ran.
+  if (!is.null(rendering)) manifest$rendering <- Filter(Negate(is.null), rendering)
   writeLines(jsonlite::toJSON(manifest, auto_unbox = TRUE, pretty = TRUE, null = "null",
                               digits = NA),
              paths$manifest, useBytes = TRUE)

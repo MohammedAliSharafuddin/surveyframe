@@ -9,7 +9,7 @@ render_report(
   data = NULL,
   output_file = NULL,
   output_path = NULL,
-  format = c("html", "pdf"),
+  format = c("html", "pdf", "docx", "odt"),
   include_quality = TRUE,
   include_reliability = TRUE,
   include_codebook = TRUE,
@@ -41,11 +41,19 @@ temporary file is written and its path returned.}
 \item{output_path}{Character or NULL. Alias for \code{output_file}. If both are
 supplied, \code{output_file} takes precedence.}
 
-\item{format}{Character. Output format: \code{"html"} (default) or \code{"pdf"}.
-PDF output renders the HTML report and prints it through
-\code{\link[pagedown:chrome_print]{pagedown::chrome_print()}}, which requires the pagedown package (in
-Suggests) and a local Chrome or Chromium installation. The HTML path
-is unchanged.}
+\item{format}{Character. Output format: \code{"html"} (default), \code{"pdf"},
+\code{"docx"} (Word) or \code{"odt"} (OpenDocument). Word and OpenDocument go
+through Quarto, styled by bundled APA 7 reference documents (Times New
+Roman 12, double spacing, APA headings), and stop with a message when
+Quarto is not found. PDF goes through Quarto and LaTeX when a LaTeX
+engine is found (TinyTeX, or xelatex, lualatex or pdflatex on the PATH),
+through the Typst Quarto bundles otherwise, and without Quarto prints the
+built-in HTML page through \code{\link[pagedown:chrome_print]{pagedown::chrome_print()}}, which needs the
+pagedown package (in Suggests) and a local Chrome or Chromium. The
+returned path's \code{"converter"} attribute names the route:
+\code{"quarto-latex"}, \code{"quarto-typst"}, \code{"pagedown"}, or \code{"quarto"} for
+Word and OpenDocument. The first Typst render of a session downloads a
+Typst package Quarto's template imports, unless it is already cached.}
 
 \item{include_quality}{Logical. Whether to include the data quality report.
 Requires \code{data}. Defaults to \code{TRUE}.}

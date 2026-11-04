@@ -267,11 +267,19 @@ print.sframe_codebook <- function(x, ...) {
 #'   temporary file is written and its path returned.
 #' @param output_path Character or NULL. Alias for `output_file`. If both are
 #'   supplied, `output_file` takes precedence.
-#' @param format Character. Output format: `"html"` (default) or `"pdf"`.
-#'   PDF output renders the HTML report and prints it through
-#'   [pagedown::chrome_print()], which requires the pagedown package (in
-#'   Suggests) and a local Chrome or Chromium installation. The HTML path
-#'   is unchanged.
+#' @param format Character. Output format: `"html"` (default), `"pdf"`,
+#'   `"docx"` (Word) or `"odt"` (OpenDocument). Word and OpenDocument go
+#'   through Quarto, styled by bundled APA 7 reference documents (Times New
+#'   Roman 12, double spacing, APA headings), and stop with a message when
+#'   Quarto is not found. PDF goes through Quarto and LaTeX when a LaTeX
+#'   engine is found (TinyTeX, or xelatex, lualatex or pdflatex on the PATH),
+#'   through the Typst Quarto bundles otherwise, and without Quarto prints the
+#'   built-in HTML page through [pagedown::chrome_print()], which needs the
+#'   pagedown package (in Suggests) and a local Chrome or Chromium. The
+#'   returned path's `"converter"` attribute names the route:
+#'   `"quarto-latex"`, `"quarto-typst"`, `"pagedown"`, or `"quarto"` for
+#'   Word and OpenDocument. The first Typst render of a session downloads a
+#'   Typst package Quarto's template imports, unless it is already cached.
 #' @param include_quality Logical. Whether to include the data quality report.
 #'   Requires `data`. Defaults to `TRUE`.
 #' @param include_reliability Logical. Whether to include reliability
@@ -389,7 +397,7 @@ render_report <- function(
     data              = NULL,
     output_file       = NULL,
     output_path       = NULL,
-    format            = c("html", "pdf"),
+    format            = c("html", "pdf", "docx", "odt"),
     include_quality   = TRUE,
     include_reliability = TRUE,
     include_codebook  = TRUE,
@@ -445,10 +453,38 @@ render_report <- function(
     tempfile(fileext = paste0(".", format))
   dest <- path.expand(dest)
 
-  # PDF is strictly additive: build the HTML report exactly as the html
-  # path does, then print it through Chrome. Requires pagedown (Suggests)
+  # QUARTO_PATH, the PATH, then RStudio's and Positron's bundled copies (T3).
+  use_quarto <- isTRUE(getOption("surveyframe.use_quarto", TRUE))
+  quarto <- if (use_quarto) sframe_quarto_find() else list(path = NA_character_)
+  quarto_bin <- quarto$path
+  template <- system.file("templates", "report.qmd", package = "surveyframe")
+  has_quarto <- use_quarto && !is.na(quarto_bin) && file.exists(template)
+  # Word and OpenDocument are written by pandoc inside Quarto, so they need it.
+  if (format %in% c("docx", "odt") && !has_quarto) {
+    rlang::abort(
+      paste0(if (identical(format, "docx")) "A Word" else "An OpenDocument",
+             " report needs Quarto, which was not found. Install it from ",
+             "https://quarto.org/docs/get-started/ or use format = 'html'."),
+      class = c("sframe_missing_quarto", "sframe_error"))
+  }
+  # PDF (owner 2026-10-31, coordinator 2026-11-04): Quarto through LaTeX when
+  # a LaTeX engine is found, else through the Typst Quarto bundles, and
+  # without Quarto the built-in page printed by pagedown.
+  quarto_to <- format
+  converter <- if (format %in% c("docx", "odt")) "quarto" else NULL
+  if (identical(format, "pdf") && has_quarto) {
+    if (sframe_latex_available()) {
+      converter <- "quarto-latex"
+    } else {
+      quarto_to <- "typst"
+      converter <- "quarto-typst"
+    }
+  }
+
+  # Without Quarto, PDF builds the built-in HTML page exactly as the html
+  # path does, then prints it through Chrome. Requires pagedown (Suggests)
   # and a local Chrome or Chromium.
-  if (identical(format, "pdf")) {
+  if (identical(format, "pdf") && !has_quarto) {
     if (!requireNamespace("pagedown", quietly = TRUE)) {
       rlang::abort(
         "Package 'pagedown' is needed for PDF output. Install it, or use format = 'html'.",
@@ -501,7 +537,8 @@ render_report <- function(
     # manifest records the PDF as generated.
     record_paths <- sframe_record_paths(dest)
     file.copy(sframe_record_paths(html_tmp)$results, record_paths$results, overwrite = TRUE)
-    sframe_write_manifest(dest, instrument, data, record_paths$results)
+    sframe_write_manifest(dest, instrument, data, record_paths$results,
+                          rendering = list(engine = content_engine, converter = "pagedown"))
     attr(dest, "engine") <- content_engine
     attr(dest, "converter") <- "pagedown"
     rlang::inform(
@@ -541,13 +578,7 @@ render_report <- function(
   provenance <- sframe_report_provenance(instrument, data,
                                          sframe_sha256_file(record_paths$results))
 
-  # QUARTO_PATH, the PATH, then RStudio's and Positron's bundled copies (T3).
-  use_quarto <- isTRUE(getOption("surveyframe.use_quarto", TRUE))
-  quarto <- if (use_quarto) sframe_quarto_find() else list(path = NA_character_)
-  quarto_bin <- quarto$path
-  has_quarto <- use_quarto && !is.na(quarto_bin)
-  template <- system.file("templates", "report.qmd", package = "surveyframe")
-  if (has_quarto && file.exists(template)) {
+  if (has_quarto) {
     render_dir <- tempfile("surveyframe-report-")
     dir.create(render_dir, recursive = TRUE, showWarnings = FALSE)
     on.exit(unlink(render_dir, recursive = TRUE, force = TRUE), add = TRUE)
@@ -555,8 +586,11 @@ render_report <- function(
     # report.scss turns off the theme's web font, so the render fetches
     # nothing from the network.
     theme_scss <- file.path(dirname(template), "report.scss")
+    # The APA 7 reference documents style the Word and OpenDocument reports.
+    ref_docs <- file.path(dirname(template), c("apa-reference.docx", "apa-reference.odt"))
     if (!file.copy(template, render_input, overwrite = TRUE) ||
-        !file.copy(theme_scss, file.path(render_dir, "report.scss"), overwrite = TRUE)) {
+        !file.copy(theme_scss, file.path(render_dir, "report.scss"), overwrite = TRUE) ||
+        !all(file.copy(ref_docs, render_dir, overwrite = TRUE))) {
       rlang::abort(
         "Could not prepare the Quarto report template for rendering.",
         class = "sframe_error"
@@ -670,10 +704,12 @@ render_report <- function(
     # embed-resources. Output next to the input, then copy to the destination.
     # Using --output-dir elsewhere makes the self-contained bundling fail to
     # find quarto.js (it is created relative to the working directory).
-    rendered <- file.path(render_dir, "report.html")
+    out_ext <- if (identical(format, "html")) "html" else format
+    rendered <- file.path(render_dir, paste0("report.", out_ext))
     # Quarto prints nothing while it works, which for a minute looks like a hang.
     rlang::inform("Rendering the report with Quarto. This usually takes under a minute.",
                   class = "sframe_report_progress")
+    quarto_log <- character(0)
     quarto_ok <- tryCatch({
       old_wd <- getwd()
       on.exit(setwd(old_wd), add = TRUE)
@@ -682,13 +718,15 @@ render_report <- function(
         quarto_bin,
         args = c(
           "render", "report.qmd",
-          "--output", "report.html",
+          "--to", quarto_to,
+          "--output", basename(rendered),
           param_args
         ),
         stdout = TRUE,
         stderr = TRUE
       ))
       setwd(old_wd)
+      quarto_log <- status
       (is.null(attr(status, "status")) || identical(attr(status, "status"), 0L)) &&
         file.exists(rendered)
     }, error = function(e) FALSE)
@@ -696,14 +734,28 @@ render_report <- function(
     if (isTRUE(quarto_ok)) {
       # Numbered tables and figures with titles and alt text, as the
       # built-in engine writes them (CX-22).
-      html <- readLines(rendered, warn = FALSE, encoding = "UTF-8")
-      writeLines(sframe_quarto_apa_floats(html), rendered, useBytes = TRUE)
+      if (identical(format, "html")) {
+        html <- readLines(rendered, warn = FALSE, encoding = "UTF-8")
+        writeLines(sframe_quarto_apa_floats(html), rendered, useBytes = TRUE)
+      }
       if (file.copy(rendered, dest, overwrite = TRUE)) {
-        sframe_write_manifest(dest, instrument, data, record_paths$results)
+        sframe_write_manifest(dest, instrument, data, record_paths$results,
+                              rendering = list(engine = "quarto", converter = converter,
+                                               quarto = quarto$version))
         res <- sframe_report_result(dest, "quarto", open)
         attr(res, "quarto") <- quarto_bin
+        if (!is.null(converter)) attr(res, "converter") <- converter
         return(invisible(res))
       }
+    }
+    # The built-in engine writes HTML only, so a failed Word, OpenDocument or
+    # PDF render stops with what Quarto said.
+    if (!identical(format, "html")) {
+      tail_log <- utils::tail(as.character(quarto_log), 40)
+      rlang::abort(
+        c(paste0("Quarto could not render the ", format, " report."),
+          i = paste(tail_log, collapse = "\n")),
+        class = c("sframe_quarto_failed", "sframe_error"))
     }
   }
 
@@ -728,7 +780,8 @@ render_report <- function(
     plan_results        = plan_results,
     provenance          = provenance
   )
-  sframe_write_manifest(dest, instrument, data, record_paths$results)
+  sframe_write_manifest(dest, instrument, data, record_paths$results,
+                        rendering = list(engine = "html", converter = NULL))
 
   sframe_report_result(dest, "html", open)
 }
@@ -1399,6 +1452,7 @@ sframe_report_content <- function(instrument, data = NULL, plot_palette = "web",
       r["supplement"] <- list(sup)
       title <- sframe_result_float_title(r, i)
       r$caption_html <- htmltools_escape(title)
+      r$caption_text <- title
       r$figure_open <- sframe_apa_figure_open(title, paste("Chart of the result for", title))
       r
     }, results, seq_along(results))

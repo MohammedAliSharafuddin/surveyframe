@@ -133,3 +133,17 @@ sframe_quarto_label <- function(found) {
                   found$source)
   paste0(found$version, ", ", where)
 }
+
+# Whether a LaTeX engine is at hand for a Quarto PDF: xelatex, lualatex or
+# pdflatex on the PATH, or a TinyTeX install, where Quarto looks for one.
+# options(surveyframe.latex = FALSE) hides LaTeX, so the Typst route can be
+# tested on a machine that has it.
+sframe_latex_available <- function() {
+  if (identical(getOption("surveyframe.latex"), FALSE)) return(FALSE)
+  if (any(nzchar(Sys.which(c("xelatex", "lualatex", "pdflatex"))))) return(TRUE)
+  tinytex <- c(file.path(path.expand("~"), ".TinyTeX", "bin"),
+               file.path(path.expand("~"), "Library", "TinyTeX", "bin"),
+               file.path(Sys.getenv("APPDATA", ""), "TinyTeX", "bin"))
+  any(dir.exists(tinytex[nzchar(tinytex)]))
+}
+

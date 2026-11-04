@@ -26,6 +26,8 @@ test_that("14: a PDF records the engine that built its content, and the print st
           !nzchar(Sys.which("chromium")) &&
           !nzchar(Sys.which("chromium-browser")),
           "no local Chrome")
+  # The pagedown route is the PDF route without Quarto (8b-R item 3).
+  rlang::local_options(surveyframe.use_quarto = FALSE)
 
   out <- tempfile(fileext = ".pdf")
   res <- suppressMessages(render_report(pdf_instrument(), output_file = out,
@@ -46,6 +48,8 @@ test_that("14: the announced path is the one that was asked for", {
           !nzchar(Sys.which("chromium")) &&
           !nzchar(Sys.which("chromium-browser")),
           "no local Chrome")
+  # The pagedown route is the PDF route without Quarto (8b-R item 3).
+  rlang::local_options(surveyframe.use_quarto = FALSE)
 
   out <- tempfile(fileext = ".pdf")
   msgs <- character(0)
