@@ -132,3 +132,21 @@ test_that("Studio offers the report and its source, and no separate notebook", {
   expect_match(src, 'list(format = "qmd", output_file = dir)', fixed = TRUE)
   expect_false(grepl("sframe_analysis_qmd(", src, fixed = TRUE))
 })
+
+# UI-1 item 6 (owner 2026-11-03): the Reference style select.
+test_that("the style select lists APA 7 first, the bundled styles, then a file", {
+  ch <- surveyframe:::sframe_studio_style_choices(TRUE)
+  expect_identical(names(ch), c("APA 7", "Chicago author-date", "Harvard", "IEEE",
+                                "MLA", "Other style (.csl file)"))
+  expect_identical(unname(ch), c(names(surveyframe:::sframe_csl_styles), "other"))
+  expect_identical(surveyframe:::sframe_studio_style_choices(FALSE), c("APA 7" = "apa"))
+})
+
+test_that("the style select gives render_report() a style name or the file", {
+  csl <- surveyframe:::sframe_studio_csl
+  expect_identical(csl("harvard"), "harvard")
+  expect_identical(csl(NULL), "apa")
+  expect_identical(csl("unknown"), "apa")
+  expect_identical(csl("other", NULL), "apa")
+  expect_identical(csl("other", list(datapath = "/tmp/x.csl")), "/tmp/x.csl")
+})

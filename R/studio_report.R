@@ -81,3 +81,22 @@ sframe_studio_report_formats <- function(quarto_ok) {
     c("HTML" = "html", "PDF (needs pagedown and Chrome)" = "pdf")
   }
 }
+
+# The Reference style select on Configure (owner 2026-11-03): APA 7 first,
+# then the other bundled styles, then a .csl file of one's own. Every style
+# but APA 7 needs Quarto, so without it the select offers APA 7 only.
+sframe_studio_style_choices <- function(quarto_ok) {
+  labels <- c(apa = "APA 7", "chicago-author-date" = "Chicago author-date",
+              harvard = "Harvard", ieee = "IEEE", mla = "MLA")
+  if (!isTRUE(quarto_ok)) return(c("APA 7" = "apa"))
+  ids <- names(sframe_csl_styles)
+  c(stats::setNames(ids, labels[ids]), "Other style (.csl file)" = "other")
+}
+
+# What render_report(csl = ) gets from the select and the upload: a bundled
+# style name, or the uploaded file's path. Other with no file is APA 7.
+sframe_studio_csl <- function(style, upload = NULL) {
+  style <- as.character(style %||% "apa")[1]
+  if (identical(style, "other")) return(upload$datapath %||% "apa")
+  if (style %in% names(sframe_csl_styles)) style else "apa"
+}

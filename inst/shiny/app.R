@@ -1860,6 +1860,16 @@ ui <- fluidPage(
               tags$div(tags$label(class = "control-label", "Code"),
                 checkboxInput("rpt_show_code", "Show the R code for each result", value = TRUE))
             ),
+            tags$div(class = "ref-style",
+              selectInput("rpt_style", "Reference style",
+                choices = sframe_studio_style_choices(sframe_studio_quarto_note()$ok), selected = "apa"),
+              if (!sframe_studio_quarto_note()$ok)
+                tags$p(class = "hint", id = "rpt_style_note", "Other reference styles need Quarto."),
+              shiny::conditionalPanel("input.rpt_style == 'other'",
+                fileInput("rpt_csl", "Style file (.csl)", accept = ".csl"),
+                tags$a(href = "https://www.zotero.org/styles", target = "_blank",
+                       rel = "noopener noreferrer", id = "rpt_style_find",
+                       "Find a style at zotero.org/styles"))),
             tags$label(class = "control-label", "Sections"),
             tags$div(class = "opt-grid",
               checkboxInput("rpt_codebook", "Codebook", value = TRUE),
@@ -1871,7 +1881,7 @@ ui <- fluidPage(
               checkboxInput("rpt_models", "Saved models and syntax", value = TRUE)
             ),
             tags$details(class = "opt-more",
-              tags$summary("More options: figures, citation style and further references"),
+              tags$summary("More options: figures and further references"),
               tags$div(class = "opt-row",
                 numericInput("rpt_fig_width", "Figure width (inches)", value = NA, min = 1, step = 0.5),
                 numericInput("rpt_fig_height", "Figure height (inches)", value = NA, min = 1, step = 0.5),
@@ -1880,9 +1890,6 @@ ui <- fluidPage(
                   choices = c("Each engine's own" = "default", "PNG" = "png", "SVG" = "svg"))
               ),
               tags$p(class = "hint", "Empty fields keep each engine's own figure size and resolution."),
-              fileInput("rpt_csl", "Citation style (.csl)", accept = ".csl"),
-              tags$p(class = "hint",
-                "APA 7 unless you give a style. Any style from the Zotero style repository works with Quarto."),
               textAreaInput("rpt_bibtex", "Further references (BibTeX)", rows = 4, width = "100%",
                 placeholder = "Works your interpretations cite as [@key]. The instrument's own references are always included.")
             )
@@ -3983,7 +3990,7 @@ server <- function(input, output, session) {
     title = trim_or_null(input$rpt_title),
     authors = studio_report_authors(),
     references = studio_report_references(),
-    csl = input$rpt_csl$datapath,
+    csl = sframe_studio_csl(input$rpt_style, input$rpt_csl),
     figures = studio_report_figures() %||% getOption("surveyframe.figures")
   )
 
