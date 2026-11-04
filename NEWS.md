@@ -314,6 +314,11 @@ style.
   hypothesis that is `NA`, written as JSON null, is refused. A study,
   objectives or sampling that is present and empty is refused, with a message
   to drop it. A block with no hypotheses stays valid.
+* **The bundled schema documents the study.** `inst/schema/sframe_schema.json`
+  is re-synced from sframe-schema v0.3-draft, whose instrument profile gains
+  `study` (problem, objectives, sampling with `method_other`), the plan block
+  `objective` and the `hypotheses` shape: a text `null`, a text `alternative`
+  or both, or `null`. No field became required.
 
 ## Amendments and versions
 
