@@ -450,6 +450,57 @@ test_that("at 1920 px every primary action, Save to Studio included, sizes to it
   }
 })
 
+# Contrast (UX-21): every visible text and background pair, measured from
+# computed colours, meets WCAG 2.2 AA on every Studio screen and Report tab,
+# in the hosted builder's Build and Plan, and in the survey template at the
+# default, darkest, lightest and Studio's teal theme. Last but one, since
+# the template pages replace Studio in the tab.
+test_that("every Studio screen, the hosted builder and the template meet AA contrast (UX-21)", {
+  fails <- list()
+  measure <- function(where, d) {
+    if (nrow(d)) fails[[where]] <<- d
+    expect_identical(nrow(d), 0L, label = paste("pairs below AA on", where))
+  }
+  b <- ui1_studio("factor_structure", width = 1280, height = 900)
+  for (s in sframe_studio_screens()) {
+    expect_true(ui1_screen(b, s), info = s)
+    Sys.sleep(2)
+    measure(paste("Studio", s), ui1_contrast(b))
+  }
+  for (t in c("configure", "interpret", "preview", "reproduce")) {
+    ui2_js(b, sprintf("$('#rtab-%s').click(); true", t))
+    Sys.sleep(1.5)
+    measure(paste("Report tab", t), ui1_contrast(b))
+  }
+  expect_true(ui1_screen(b, "design"))
+  doc <- "document.getElementById('design_frame').contentWindow.document"
+  expect_true(ui2_wait(b, paste0("(function(){ try { return !!", doc, ".getElementById('saveBtn'); } catch (e) { return false; } })()"), 60))
+  Sys.sleep(2)
+  measure("builder Build", ui1_contrast(b, doc))
+  ui2_js(b, "$('.studio-nav a[data-nav=\"plan\"]').click(); true")
+  Sys.sleep(3)
+  measure("builder Plan", ui1_contrast(b, doc))
+
+  ins <- sframe_demo("factor_structure")$instrument
+  for (col in c("#2563eb", "#000000", "#ffffff", "#16B3B1")) {
+    ins$render$theme <- col
+    f <- file.path(tempdir(), paste0("ui1-contrast-", substr(col, 2, 7), ".html"))
+    suppressMessages(export_survey(ins, f, open = FALSE, overwrite = TRUE))
+    ui2_navigate(b, paste0("file://", f))
+    Sys.sleep(1.5)
+    measure(paste("template", col, "welcome"), ui1_contrast(b))
+    # The first page, with its first option chosen, so the checked state shows.
+    ui2_js(b, "var c = document.getElementById('consent-chk'); if (c) c.checked = true; startSurvey(); true")
+    Sys.sleep(1)
+    ui2_js(b, "var i = document.querySelector('.likert-opt input, .choice-opt input'); if (i) i.click(); true")
+    Sys.sleep(0.5)
+    measure(paste("template", col, "page 1"), ui1_contrast(b))
+    unlink(f)
+  }
+  if (length(fails)) print(fails)
+  expect_true(ui1_reload("factor_structure"))
+})
+
 # Last, since it loads the page again, which starts Studio's session again.
 test_that("sidebar groups fold, stay folded after a reload, and a fragment into a folded group opens it", {
   b <- ui1_studio("factor_structure")
