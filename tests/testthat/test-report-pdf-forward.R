@@ -3,10 +3,13 @@
 # CX-04. The PDF path of render_report() builds an HTML report and prints it.
 # That inner render dropped title, authors, references, csl and the figure
 # settings, so a PDF differed from the HTML report built from the same call.
-# The inner render is mocked so no Chrome is needed.
+# The inner render is mocked so no Chrome is needed. With Quarto a PDF goes
+# through Quarto, so the test pins the pagedown route (8b-R item 3).
 
 test_that("CX-04: the PDF path forwards title, authors, references, csl and figures", {
   skip_if_not_installed("pagedown")
+  # The pagedown route is the PDF route without Quarto (8b-R item 3).
+  rlang::local_options(surveyframe.use_quarto = FALSE)
   ins <- sframe_demo("two_group")$instrument
   orig <- render_report
   seen <- NULL
