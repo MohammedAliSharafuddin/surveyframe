@@ -145,6 +145,22 @@ version used and where it was found, and the returned path carries the
 executable as its \code{"quarto"} attribute. \code{options(surveyframe.use_quarto = FALSE)} uses the built-in engine whatever is installed.
 }
 
+\section{Results record, manifest and provenance}{
+
+Beside every report \code{render_report()} writes 2 files named after it. For
+\code{report.html} they are \code{report_results.json}, the plan results as
+canonical JSON (sorted keys, full precision, no timestamp, so the same
+instrument and responses give the same file), and \code{report_manifest.json},
+the sha256 of the instrument content, the responses, the results record and
+the report as generated, with the surveyframe and R versions and the time.
+A report edited later, as a Word copy is meant to be, no longer matches
+its recorded hash, while the results record still does. The Provenance
+section at the top of the report gives the instrument hash and whether
+\code{\link[=read_sframe]{read_sframe()}} verified it, the number of amendments, the responses sha256
+and the results record's sha256. The responses are hashed as JSON by
+column, so the hash belongs to the values, not to a file.
+}
+
 \section{References}{
 
 The Quarto report cites in text, author and year, and lists every work it
