@@ -244,6 +244,11 @@ style.
 * **SurveyBuilder has a References tab in Survey settings.** Paste BibTeX or
   type a reference in, and choose where the instrument cites it. Changes
   apply at once, ahead of Save settings.
+* **SurveyBuilder cites a reference from the study and from a plan block's
+  hypotheses**, as the `cited_by` targets `study` and `hypothesis:<block id>`.
+  Each is offered only while it is there: the study once it is declared, and
+  a block's hypotheses while it states 1. A target cited and no longer there
+  still shows, ticked, so it can be taken off.
 * **SurveyBuilder has a citation picker on the plan fields.** Type `@` or
   `/cite` in a research question, a hypothesis, a decision rule or an
   interpretation, or press Cite on its format toolbar, to list the instrument's
