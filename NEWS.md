@@ -1088,6 +1088,10 @@ style.
 
 ## SurveyStudio
 
+* **Studio fits a phone** (UX-01, UX-08). Below 800 px the sidebar becomes a
+  drawer behind a labelled Menu button, which closes after a choice or on
+  Escape, cards stack, and a wide table or code block scrolls inside its
+  own region. At 390 px the sidebar took 240 px and pages ran to 1233 px.
 * **The sidebar is a labelled navigation** (UX-16): a `nav` named "Studio
   screens", `aria-current="page"` on the open screen, and a fragment link
   for each screen, Plan included, so the browser's Back and Forward move

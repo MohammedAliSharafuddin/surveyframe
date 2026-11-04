@@ -213,4 +213,28 @@ test_that("the sidebar is a labelled nav with aria-current, fragment links and b
   expect_true(ui1_screen(b, "open"))
 })
 
+test_that("at 390 x 844 the sidebar is a drawer and no screen is wider than the viewport", {
+  b <- ui1_studio("factor_structure", width = 390, height = 844)
+  on.exit(ui1_studio("factor_structure", width = 1280, height = 900), add = TRUE)
+  expect_true(ui2_wait(b, "window.innerWidth === 390 && $('#studio_menu_btn').is(':visible')", 10))
+  expect_identical(ui2_js(b, "$('#studio_menu_btn').attr('aria-expanded')"), "false")
+  expect_false(ui2_js(b, "$('#studio_sidebar').css('visibility') === 'visible' && document.getElementById('studio_sidebar').getBoundingClientRect().right > 0"))
+
+  ui2_js(b, "$('#studio_menu_btn').click(); true")
+  expect_true(ui2_wait(b, "$('#studio_menu_btn').attr('aria-expanded') === 'true' && document.getElementById('studio_sidebar').getBoundingClientRect().left >= 0", 5))
+  ui2_js(b, "$('#studio_sidebar a[data-tab=\"quality\"]').click(); true")
+  expect_true(ui2_wait(b, "$('#screen-quality').hasClass('active') && $('#studio_menu_btn').attr('aria-expanded') === 'false'", 10))
+
+  for (screen in sframe_studio_screens()) {
+    expect_true(ui1_screen(b, screen), info = screen)
+    Sys.sleep(2)
+    w <- ui2_js(b, "Math.max(document.documentElement.scrollWidth, document.body.scrollWidth)")
+    expect_lte(w, 390, label = paste("page width on", screen))
+  }
+  ui2_js(b, "$('#rtab-configure').click(); true")
+  Sys.sleep(1)
+  expect_lte(ui2_js(b, "document.documentElement.scrollWidth"), 390, label = "Report Configure tab width")
+  ui2_js(b, "$('#rtab-interpret').click(); true")
+})
+
 ui1_close()
