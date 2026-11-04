@@ -226,8 +226,8 @@
           "language": { "type": "string", "description": "The work's language code, for example fr. A citation style title-cases English titles only." },
           "cited_by": {
             "type": "array",
-            "description": "Where the instrument cites this work: \"instrument\", or \"item:<id>\", \"scale:<id>\", \"plan:<block id>\" or \"model:<id>\". Each target must exist in the instrument. A reference with none is read as cited by the instrument as a whole. surveyframe drops this field when it hands the record to a citation processor.",
-            "items": { "type": "string", "pattern": "^(instrument|(item|scale|plan|model):.+)$" }
+            "description": "Where the instrument cites this work: \"instrument\", or \"item:<id>\", \"scale:<id>\", \"plan:<block id>\", \"model:<id>\", \"hypothesis:<block id>\" (the hypotheses that plan block declares) or \"study\". Each target must exist in the instrument: a hypothesis target names a block that declares a null or alternative hypothesis, and \"study\" needs a study. A reference with none is read as cited by the instrument as a whole. surveyframe drops this field when it hands the record to a citation processor.",
+            "items": { "type": "string", "pattern": "^(instrument|study|(item|scale|plan|model|hypothesis):.+)$" }
           }
         }
       }
