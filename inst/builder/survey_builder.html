@@ -1444,6 +1444,23 @@ const respId='R'+Math.random().toString(36).slice(2,10).toUpperCase();
 let screen='welcome';
 let currentPage=1;
 let rankOrders={};
+// Display order (UX-11). A choice set with randomise shows a single choice,
+// multiple choice or ranking item's options in an order shuffled once per
+// respondent and item, kept for the visit and in a draft. Only the display
+// moves: each option submits its own value, so the codes are the set's
+// whatever the order. The builder's centre pane shows the set's own order.
+let displayOrders={};
+function choiceOrder(item,cs){
+  var n=cs.values.length,idx=[];for(var i=0;i<n;i++)idx.push(i);
+  if(!cs.randomise||ONLY_ID)return idx;
+  var o=displayOrders[item.id];
+  if(!o||o.length!==n||o.slice().sort(function(a,b){return a-b;}).join()!==idx.join()){
+    o=idx.slice();
+    for(var j=n-1;j>0;j--){var k=Math.floor(Math.random()*(j+1));var t=o[j];o[j]=o[k];o[k]=t;}
+    displayOrders[item.id]=o;
+  }
+  return o;
+}
 let starValues={};
 
 // ── Page builder ───────────────────────────────────────────────────────────
@@ -1587,7 +1604,8 @@ function renderSingle(item,cs){
   // A named radiogroup, so an option is announced with its question. Without
   // it a screen reader read "Low" with nothing to say what was being asked.
   return'<div class="choice-list" role="radiogroup" aria-labelledby="q_'+esc(item.id)+'"'
-    +' aria-describedby="err_'+esc(item.id)+'">'+cs.values.map(function(v,i){
+    +' aria-describedby="err_'+esc(item.id)+'">'+choiceOrder(item,cs).map(function(i){
+    var v=cs.values[i];
     var checked=String(saved)===String(v);
     return'<label class="choice-opt"><input type="radio" name="'+esc(item.id)+'" value="'+esc(v)+'"'
       +(checked?' checked':'')+(item.required?' aria-required="true"':'')
@@ -1599,7 +1617,8 @@ function renderMulti(item,cs){
   var saved=(responses[item.id]||'').split(',').filter(Boolean);
   // A group, not a radiogroup: several answers are allowed here.
   return'<div class="choice-list" role="group" aria-labelledby="q_'+esc(item.id)+'"'
-    +' aria-describedby="err_'+esc(item.id)+'">'+cs.values.map(function(v,i){
+    +' aria-describedby="err_'+esc(item.id)+'">'+choiceOrder(item,cs).map(function(i){
+    var v=cs.values[i];
     var chk=saved.includes(String(v));
     return'<label class="choice-opt"><input type="checkbox" name="'+esc(item.id)+'" value="'+esc(v)+'"'
       +(chk?' checked':'')+(item.required?' aria-required="true"':'')
@@ -1831,7 +1850,7 @@ function renderRating(item){
 }
 function renderRanking(item,cs){
   if(!rankOrders[item.id]){
-    rankOrders[item.id]=cs.values.map(function(v,i){return{v:String(v),l:cs.labels[i]||String(v)};});
+    rankOrders[item.id]=choiceOrder(item,cs).map(function(i){var v=cs.values[i];return{v:String(v),l:cs.labels[i]||String(v)};});
   }
   var order=rankOrders[item.id];
   var confirmed=!!responses[item.id];
@@ -2258,7 +2277,7 @@ function draftStore(){
 }
 function saveDraft(){
   var st=draftStore();if(!st||screen!=='survey')return;
-  try{st.setItem(draftKey(),JSON.stringify({responses:responses,page:currentPage,consented:consentGiven,saved:Date.now()}));}catch(e){}
+  try{st.setItem(draftKey(),JSON.stringify({responses:responses,page:currentPage,consented:consentGiven,order:displayOrders,saved:Date.now()}));}catch(e){}
 }
 function loadDraft(){
   var st=draftStore();if(!st)return null;
@@ -2285,6 +2304,7 @@ function resumeDraft(){
   }
   consentGiven=true;
   Object.keys(d.responses).forEach(function(k){responses[k]=d.responses[k];});
+  if(d.order&&typeof d.order==='object')displayOrders=d.order;
   screen='survey';
   currentPage=Math.min(Math.max(1,parseInt(d.page,10)||1),maxPage);
   renderScreen();
