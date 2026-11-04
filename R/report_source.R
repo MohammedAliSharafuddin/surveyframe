@@ -132,6 +132,17 @@ sframe_write_report_source <- function(dir, instrument, data, record_json, front
 #' @seealso [render_report()]
 #' @family Report functions
 #' @export
+#' @examples
+#' \donttest{
+#' d <- sframe_demo("likert_scale")
+#' dir <- file.path(tempdir(), "report-source-example")
+#' render_report(d$instrument, d$responses, output_file = dir, format = "qmd",
+#'               open = FALSE)
+#' src <- sframe_report_source(dir)
+#' src$check$numbers_match
+#' src$check$source_edited
+#' unlink(dir, recursive = TRUE)
+#' }
 sframe_report_source <- function(dir = ".", include_analysis = TRUE, plot_palette = "web") {
   path <- function(key) file.path(dir, sframe_source_files[[key]])
   if (!file.exists(path("instrument")) || !file.exists(path("manifest"))) {
