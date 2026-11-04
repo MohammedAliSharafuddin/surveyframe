@@ -203,6 +203,14 @@ can be written again, and every plan result can be serialised by a host.
 
 ## References, cited where they are used and listed once at the end
 
+* **5 reference styles by name.** `render_report(csl = )` takes `"apa"`
+  (the default), `"chicago-author-date"`, `"harvard"`, `"ieee"` or `"mla"`,
+  bundled with the package under CC BY-SA 3.0 (see `inst/COPYRIGHTS`), or
+  the path to a `.csl` file. No style is fetched from the network. The
+  results record and the manifest give the style's name and sha256, and a
+  `.qmd` report folder holds the style as `<name>.csl`, so a rerun formats
+  with that copy. An unknown name stops with the list of the 5. The
+  built-in page stays APA 7 only and says so.
 * **A report cites each source where it is used, in both engines.** Under
   the title for the instrument, in the codebook for an item or a scale,
   under the reliability table for a scale, in a plan block's section, beside

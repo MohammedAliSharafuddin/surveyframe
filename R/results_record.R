@@ -38,7 +38,7 @@ sframe_record_plain <- function(x) {
 
 # The results record as a JSON string: canonical (keys sorted, compact,
 # full precision), so its sha256 is a fingerprint of the numbers.
-sframe_results_record_json <- function(results, instrument, seed) {
+sframe_results_record_json <- function(results, instrument, seed, style = NULL) {
   blocks <- if (is.list(results)) lapply(unclass(results), sframe_record_plain) else list()
   names(blocks) <- NULL
   record <- list(
@@ -49,6 +49,9 @@ sframe_results_record_json <- function(results, instrument, seed) {
     analysis_seed = as.character(seed),
     results = blocks
   )
+  # The citation style the report formats its references in (owner
+  # 2026-11-03): its name and the sha256 of the file used.
+  if (!is.null(style)) record$citation_style <- list(name = style$name, sha256 = style$sha256)
   # An empty list would serialise as {} after canonicalisation, so the result
   # list is kept an array.
   payload <- sframe_canonical_payload(record[setdiff(names(record), "results")])
@@ -169,3 +172,41 @@ sframe_write_manifest <- function(dest, instrument, data, record_path, extra = l
              paths$manifest, useBytes = TRUE)
   invisible(paths$manifest)
 }
+
+# The citation styles bundled in inst/csl, by the name render_report(csl = )
+# takes (owner 2026-11-03).
+sframe_csl_styles <- c(
+  apa = "apa.csl",
+  "chicago-author-date" = "chicago-author-date.csl",
+  harvard = "harvard-cite-them-right.csl",
+  ieee = "ieee.csl",
+  mla = "modern-language-association.csl"
+)
+
+# A style name or a path to a .csl file, as a list of name, path and sha256.
+# Unknown names stop with the list of the 5. A style is never fetched.
+sframe_resolve_csl <- function(csl = NULL) {
+  csl <- csl %||% "apa"
+  if (!is.character(csl) || length(csl) != 1 || is.na(csl) || !nzchar(csl)) {
+    rlang::abort("`csl` must be a style name or the path to a .csl file.", class = "sframe_error")
+  }
+  names_list <- paste0("\"", names(sframe_csl_styles), "\"", collapse = ", ")
+  if (csl %in% names(sframe_csl_styles)) {
+    path <- system.file("csl", sframe_csl_styles[[csl]], package = "surveyframe")
+    name <- csl
+  } else if (file.exists(csl) && !dir.exists(csl)) {
+    path <- normalizePath(csl)
+    name <- sub("\\.csl$", "", basename(path), ignore.case = TRUE)
+  } else {
+    rlang::abort(paste0("The citation style '", csl, "' is neither a bundled style nor a ",
+                        ".csl file that exists. Use one of ", names_list,
+                        ", or the path to a .csl file."), class = "sframe_error")
+  }
+  list(name = name, path = path, sha256 = sframe_sha256_file(path))
+}
+
+sframe_style_manifest_object <- function(style, file_name = "") {
+  list(object_id = "citation_style", object_type = "csl_style", file_name = file_name,
+       hash_algorithm = "SHA-256", hash_value = style$sha256, name = style$name)
+}
+

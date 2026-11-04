@@ -333,9 +333,16 @@ print.sframe_codebook <- function(x, ...) {
 #'   pane of RStudio, Positron or VS Code, and in the web browser otherwise.
 #'   Defaults to `TRUE` in an interactive session and `FALSE` in a script.
 #'   Nothing opens during a knitr or Quarto render.
-#' @param csl Optional path to a Citation Style Language file for the
-#'   References section. Defaults to APA 7th edition, bundled with the
-#'   package. Any style from the Zotero style repository works.
+#' @param csl The citation style of the references: a bundled style name,
+#'   `"apa"` (APA 7, the default), `"chicago-author-date"`, `"harvard"`
+#'   (Cite Them Right), `"ieee"` or `"mla"`, or the path to a Citation
+#'   Style Language (`.csl`) file, such as one saved from
+#'   https://www.zotero.org/styles. Styles are never fetched from the network.
+#'   The style's name and sha256 go into the results record and the
+#'   manifest, and a `.qmd` report folder holds a copy named for it, so a
+#'   rerun uses that copy. The built-in engine formats APA 7 only and says so
+#'   when another style is asked for. An unknown name stops with the list of
+#'   the 5.
 #'
 #' @section Results record, manifest and provenance:
 #' Beside every report `render_report()` writes 2 files named after it. For
@@ -458,6 +465,9 @@ render_report <- function(
   dest <- output_file %||% output_path %||%
     tempfile(fileext = paste0(".", format))
   dest <- path.expand(dest)
+  # The citation style: a bundled name or a .csl file, never fetched (8b-R).
+  csl_style <- sframe_resolve_csl(csl)
+  style_obj <- list(sframe_style_manifest_object(csl_style))
 
   # QUARTO_PATH, the PATH, then RStudio's and Positron's bundled copies (T3).
   use_quarto <- isTRUE(getOption("surveyframe.use_quarto", TRUE))
@@ -543,7 +553,7 @@ render_report <- function(
     # manifest records the PDF as generated.
     record_paths <- sframe_record_paths(dest)
     file.copy(sframe_record_paths(html_tmp)$results, record_paths$results, overwrite = TRUE)
-    sframe_write_manifest(dest, instrument, data, record_paths$results,
+    sframe_write_manifest(dest, instrument, data, record_paths$results, extra = style_obj,
                           rendering = list(engine = content_engine, converter = "pagedown"))
     attr(dest, "engine") <- content_engine
     attr(dest, "converter") <- "pagedown"
@@ -578,11 +588,8 @@ render_report <- function(
   }
   record_json <- sframe_results_record_json(
     if (is.list(plan_results) && !inherits(plan_results, "error")) plan_results else list(),
-    instrument, sframe_report_seed(data, instrument, include_analysis))
-  style <- csl %||% system.file("csl", "apa.csl", package = "surveyframe")
-  if (!is.null(csl) && !(nzchar(style) && file.exists(style))) {
-    rlang::abort(paste0("The citation style '", csl, "' was not found."), class = "sframe_error")
-  }
+    instrument, sframe_report_seed(data, instrument, include_analysis), style = csl_style)
+  style <- csl_style$path
   bibliography_extra <- c(sframe_flatten_references(list(references %||% list())),
                           Filter(Negate(is.null), lapply(names(.sframe_citation_csl),
                                                          sframe_builtin_reference)))
@@ -593,7 +600,8 @@ render_report <- function(
     folder <- sub("\\.qmd$", "", dest)
     sframe_write_report_source(
       folder, instrument, data, record_json,
-      front = sframe_report_front(report_title, report_authors, use_citations = TRUE),
+      front = sframe_report_front(report_title, report_authors, use_citations = TRUE,
+                                  csl_file = paste0(csl_style$name, ".csl")),
       params = list(
         include_quality = include_quality && !is.null(data),
         include_reliability = include_reliability && !is.null(data),
@@ -606,7 +614,7 @@ render_report <- function(
         fig_height = as.character(figures$height %||% ""),
         fig_dpi = as.character(figures$dpi %||% ""),
         fig_format = if (identical(figures$format, "svg")) "svg" else ""),
-      style = style, bibliography_extra = bibliography_extra,
+      style = csl_style, bibliography_extra = bibliography_extra,
       interpretations = interpretations)
     folder <- normalizePath(folder, mustWork = FALSE)
     rlang::inform(paste0("Report source written to ", folder,
@@ -768,7 +776,7 @@ render_report <- function(
         writeLines(sframe_quarto_apa_floats(html), rendered, useBytes = TRUE)
       }
       if (file.copy(rendered, dest, overwrite = TRUE)) {
-        sframe_write_manifest(dest, instrument, data, record_paths$results,
+        sframe_write_manifest(dest, instrument, data, record_paths$results, extra = style_obj,
                               rendering = list(engine = "quarto", converter = converter,
                                                quarto = quarto$version))
         res <- sframe_report_result(dest, "quarto", open)
@@ -805,11 +813,11 @@ render_report <- function(
     title               = report_title,
     authors             = report_authors,
     references          = references,
-    csl                 = csl,
+    csl                 = csl_style$path,
     plan_results        = plan_results,
     provenance          = provenance
   )
-  sframe_write_manifest(dest, instrument, data, record_paths$results,
+  sframe_write_manifest(dest, instrument, data, record_paths$results, extra = style_obj,
                         rendering = list(engine = "html", converter = NULL))
 
   sframe_report_result(dest, "html", open)
@@ -847,13 +855,13 @@ sframe_builtin_banner <- function() {
 # not say. JSON strings are valid YAML, so toJSON() quotes each value safely,
 # and a title holding a quote, a colon, a hash or a newline then --- stays a
 # single string and leaves the front matter whole.
-sframe_report_front <- function(title, authors, use_citations) {
+sframe_report_front <- function(title, authors, use_citations, csl_file = "style.csl") {
   yaml_str <- function(s) as.character(jsonlite::toJSON(s, auto_unbox = TRUE))
   c(
     paste0("title: ", yaml_str(title)),
     if (length(authors)) c("author:", paste0("  - ", vapply(authors, yaml_str, character(1)))),
     "language:", "  title-block-published: \"Rendered\"",
-    if (isTRUE(use_citations)) c("bibliography: references.json", "csl: style.csl",
+    if (isTRUE(use_citations)) c("bibliography: references.json", paste0("csl: ", yaml_str(csl_file)),
                                  "link-citations: true")
   )
 }

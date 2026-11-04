@@ -106,9 +106,16 @@ the works a host cites in the written interpretations, which are cited
 in text as \verb{[@id]}. The instrument's own references
 (\code{\link[=sframe_add_references]{sframe_add_references()}}) and the methods' references are always included.}
 
-\item{csl}{Optional path to a Citation Style Language file for the
-References section. Defaults to APA 7th edition, bundled with the
-package. Any style from the Zotero style repository works.}
+\item{csl}{The citation style of the references: a bundled style name,
+\code{"apa"} (APA 7, the default), \code{"chicago-author-date"}, \code{"harvard"}
+(Cite Them Right), \code{"ieee"} or \code{"mla"}, or the path to a Citation
+Style Language (\code{.csl}) file, such as one saved from
+https://www.zotero.org/styles. Styles are never fetched from the network.
+The style's name and sha256 go into the results record and the
+manifest, and a \code{.qmd} report folder holds a copy named for it, so a
+rerun uses that copy. The built-in engine formats APA 7 only and says so
+when another style is asked for. An unknown name stops with the list of
+the 5.}
 
 \item{title}{Character or \code{NULL}. The report's title. Defaults to the
 instrument's title.}

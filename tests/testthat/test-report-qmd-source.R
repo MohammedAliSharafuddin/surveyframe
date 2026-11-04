@@ -42,7 +42,7 @@ test_that("the report source folder holds its files and no _quarto.yml", {
   expect_identical(attr(s$res, "engine"), "qmd")
   files <- list.files(s$dir)
   expect_true(all(c("report.qmd", "instrument.sframe", "responses.csv", "references.json",
-                    "style.csl", "report_results.json", "manifest.json", "report.scss",
+                    "apa.csl", "report_results.json", "manifest.json", "report.scss",
                     "apa-reference.docx", "apa-reference.odt") %in% files))
   expect_false(file.exists(file.path(s$dir, "_quarto.yml")))
   qmd <- file.path(s$dir, "report.qmd")
