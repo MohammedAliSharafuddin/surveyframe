@@ -95,6 +95,9 @@ test_that("nothing found gives a result that lists every path checked", {
 
 test_that("render_report() renders with the Quarto the finder selects", {
   skip_on_os("windows")
+  # It sets use_quarto = TRUE, so it belongs to the slow tier with the other
+  # renders, though the fake Quarto it selects never renders.
+  skip_if_not_slow()
   marker <- tempfile("quarto-called-")
   fake <- fake_quarto("9.9.9", marker = marker)
   old <- set_env(QUARTO_PATH = fake)
