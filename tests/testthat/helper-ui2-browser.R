@@ -93,3 +93,26 @@ ui2_key <- function(session, selector, key, shift = FALSE, ctrl = FALSE) {
     if (shift) "true" else "false", if (ctrl) "true" else "false"))
 }
 
+
+# The builder inside an iframe served over http, as Studio hosts it
+# (?host=studio), so the builder's Studio route runs and its messages to the
+# parent are kept in window.__msgs. Returns the session and the server.
+ui2_studio_host <- function() {
+  testthat::skip_if_not_installed("httpuv")
+  dir <- tempfile("ui2host")
+  dir.create(dir)
+  file.copy(system.file("builder", "survey_builder.html", package = "surveyframe"),
+            file.path(dir, "survey_builder.html"))
+  writeLines(paste0(
+    "<!DOCTYPE html><html><body><script>window.__msgs=[];",
+    "window.addEventListener('message',function(e){window.__msgs.push(e.data);});</script>",
+    "<iframe id='b' src='survey_builder.html?host=studio' style='width:1200px;height:850px'></iframe>",
+    "</body></html>"), file.path(dir, "index.html"))
+  port <- httpuv::randomPort()
+  server <- httpuv::startServer("127.0.0.1", port,
+                                list(staticPaths = list("/" = httpuv::staticPath(dir))))
+  session <- ui2_session("studio-host")
+  ui2_navigate(session, sprintf("http://127.0.0.1:%d/index.html", port))
+  ui2_wait(session, "document.getElementById('b').contentWindow.STUDIO_HOST===true", timeout = 10)
+  list(session = session, server = server)
+}

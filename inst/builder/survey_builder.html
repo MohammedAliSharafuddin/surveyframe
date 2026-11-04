@@ -778,8 +778,6 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
     <div class="stabs">
       <div class="stab active" onclick="showST('meta')"     id="st-meta">General</div>
       <div class="stab"        onclick="showST('study')"    id="st-study">Study</div>
-      <div class="stab"        onclick="showST('welcome')"  id="st-welcome">Welcome</div>
-      <div class="stab"        onclick="showST('thankyou')" id="st-thankyou">Thank You</div>
       <div class="stab"        onclick="showST('header')"   id="st-header">Header</div>
       <div class="stab"        onclick="showST('gsheets')"  id="st-gsheets">Google Sheets</div>
       <div class="stab"        onclick="showST('refs')"     id="st-refs">References</div>
@@ -811,19 +809,6 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
       </div>
       <div class="field" id="s-other-f" hidden><label class="fl" for="s-other">Describe the method <span class="fr">*</span></label><div class="fc"><input type="text" id="s-other"></div></div>
     </div>
-    <div class="stp" id="sp-welcome">
-      <div class="alert-i">The welcome page is shown before the first question. Use it to introduce the study and collect informed consent.</div>
-      <div class="field"><label class="fl" for="s-wt">Welcome title</label><div class="fc"><input type="text" id="s-wt" placeholder="Welcome to our survey"></div></div>
-      <div class="field"><label class="fl" for="s-wi">Introduction text</label><div class="fc"><textarea id="s-wi" rows="5"></textarea></div></div>
-      <div class="field"><label class="fl" for="s-wc">Consent statement (leave blank to skip)</label><div class="fc"><textarea id="s-wc" rows="4"></textarea></div></div>
-      <label class="fcheck"><input type="checkbox" id="s-wreq"><span>Require consent checkbox before starting</span></label>
-      <div class="field"><label class="fl" for="s-wsl">Start button label</label><div class="fc"><input type="text" id="s-wsl"></div></div>
-    </div>
-    <div class="stp" id="sp-thankyou">
-      <div class="field"><label class="fl" for="s-tym">Thank-you message</label><div class="fc"><textarea id="s-tym" rows="4"></textarea></div></div>
-      <div class="field"><label class="fl" for="s-tyu">Redirect URL (optional)</label><div class="fc"><input type="url" id="s-tyu" placeholder="https://example.com/thank-you"></div><span class="fhint">After submission, respondents are redirected to this URL.</span></div>
-      <label class="fcheck"><input type="checkbox" id="s-tydl"><span>Show "Download my response" button</span></label>
-    </div>
     <div class="stp" id="sp-header">
       <div class="field"><label class="fl" for="s-inst">Institution or study name</label><div class="fc"><input type="text" id="s-inst" placeholder="University: Department"></div></div>
       <div class="field"><label class="fl">Logo image</label>
@@ -837,12 +822,17 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
       <label class="fcheck"><input type="checkbox" id="s-prog" checked><span>Show progress bar during survey</span></label>
     </div>
     <div class="stp" id="sp-gsheets">
+      <div class="alert-i studio-only" hidden>In SurveyStudio, responses are collected from its Collect screen. <button type="button" class="btn btn-p btn-sm" onclick="studioGoto('collect')">Open Collect</button></div>
+      <div class="studio-not">
       <div class="alert-i"><strong>Collect responses in a Google Sheet, free and with no server.</strong> Do these steps in order:<ol style="margin:8px 0 0;padding-left:18px;line-height:1.6"><li>Create a blank Google Sheet and paste its link in the box below.</li><li>Click <strong>Generate collector (.gs)</strong> to download the script. In your Sheet, open <strong>Extensions &gt; Apps Script</strong>, delete any code there, and paste the downloaded file.</li><li>In Apps Script, click <strong>Deploy &gt; New deployment &gt; Web app</strong>, set <strong>Who has access</strong> to <strong>Anyone</strong>, and copy the Web App URL it gives you.</li><li>Paste that Web App URL in the last box, then click <strong>Export survey</strong>. Every response is now saved to your Sheet.</li></ol></div>
       <div class="field"><label class="fl" for="s-gsu">Google Sheet URL</label><div class="fc"><input type="url" id="s-gsu" placeholder="https://docs.google.com/spreadsheets/d/your-sheet-id"></div></div>
       <div class="field"><label class="fl">Apps Script collector</label><div class="fc"><button type="button" class="btn btn-s btn-sm" onclick="exportSheetsCollector()">Generate collector (.gs)</button></div><span class="fhint">Click to build and download the .gs file from your questions. No URL needed for this step.</span></div>
       <div class="field"><label class="fl" for="s-gsep">Apps Script Web App URL</label><div class="fc"><input type="url" id="s-gsep" placeholder="https://script.google.com/macros/s/your-script-id/exec"></div><span class="fhint">Paste the deployed Web App URL here, then re-export the survey.</span></div>
+      </div>
     </div>
     <div class="stp" id="sp-refs">
+      <div class="alert-i studio-only" hidden>In SurveyStudio, references are managed on its References screen. <button type="button" class="btn btn-p btn-sm" onclick="studioGoto('references')">Open References</button></div>
+      <div class="studio-not">
       <div class="alert-i">The works this instrument draws on: where a scale or an item comes from, and what supports a planned analysis. Each change applies at once. They are saved in the .sframe file, and the report cites them in text and lists them once, in its References section at the end.</div>
       <div id="refList" aria-live="polite"></div>
       <div class="field"><label class="fl" for="r-bib">Paste BibTeX</label><div class="fc"><textarea id="r-bib" rows="4" placeholder="From Google Scholar (Cite, then BibTeX), Zotero, Mendeley or a journal page"></textarea></div></div>
@@ -870,6 +860,7 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
         </div>
         <button type="button" class="btn btn-p btn-sm" onclick="addRefFromForm()">Add reference</button>
       </details>
+      </div>
     </div>
   </div>
   <div class="mfoot">
@@ -4315,7 +4306,7 @@ function renderItemList(){
   if(!items.length){el.removeAttribute('role');}else{el.setAttribute('role','listbox');}
   if(!items.length){el.innerHTML='<div class="sb-empty"><div class="sb-empty-ic">&#128196;</div><div class="sb-empty-t">No questions yet</div><div class="sb-empty-b">Use "+ Add question" below to choose a question type, or start from an existing file.</div><div class="sb-empty-cta"><button type="button" class="sb-cta-s" onclick="openFile()">Open an existing .sframe</button><button type="button" class="sb-cta-s" onclick="openSettings()">Set up survey settings</button></div></div>';return;}
   var cp=null;
-  el.innerHTML=items.map(function(item){
+  el.innerHTML=screenRow('__welcome')+items.map(function(item){
     var ri=S.items.indexOf(item);
     var sc=S.scales.find(function(s){return s.items&&s.items.includes(item.id);});
     var ck=S.checks.find(function(c){return c.item_id===item.id;});
@@ -4333,7 +4324,7 @@ function renderItemList(){
     // selecting a question for editing. Ordering gains explicit named buttons,
     // since drag handlers alone leave a keyboard user with no way to reorder.
     return pd+'<div class="ic'+(selId===item.id?' sel':'')+'" role="option" tabindex="0" aria-selected="'+(selId===item.id?'true':'false')+'" draggable="true" data-idx="'+ri+'" data-id="'+esc(item.id)+'" onclick="selItem(\''+item.id+'\')" onkeydown="itemRowKey(event,\''+item.id+'\','+ri+')" ondragstart="dStart(event,'+ri+')" ondragover="dOver(event,'+ri+',event)" ondrop="dDrop(event,'+ri+')" ondragleave="this.classList.remove(\'drag-t\',\'drag-b\')"><div class="ic-h" title="Drag to reorder" aria-hidden="true">&#8942;</div><div class="ic-body"><div class="'+lc+'">'+esc(item.label||'(no label)')+'</div><div class="ic-meta">'+bgs.join('')+'</div></div><div class="ic-acts"><button type="button" class="ib" title="Move up" aria-label="Move question up" onclick="event.stopPropagation();moveItemBy('+ri+',-1)">&#8593;</button><button type="button" class="ib" title="Move down" aria-label="Move question down" onclick="event.stopPropagation();moveItemBy('+ri+',1)">&#8595;</button><button type="button" class="ib" title="Duplicate" aria-label="Duplicate question" onclick="event.stopPropagation();dupItem(\''+item.id+'\')">&#10697;</button><button type="button" class="ib del" title="Delete" aria-label="Delete question" onclick="event.stopPropagation();delItem(\''+item.id+'\')">&#128465;</button></div></div>';
-  }).join('');
+  }).join('')+screenRow('__thankyou');
 }
 function selItem(id){selId=id;renderItemList();openInsp(id);}
 // Enter or Space opens a question for editing; Alt with an arrow moves it, so
@@ -4349,8 +4340,9 @@ function itemRowKey(e,id,idx){
   }
   if(k==='ArrowUp'||k==='ArrowDown'){
     e.preventDefault();
-    var rows=document.querySelectorAll('.ic');
-    var next=idx+(k==='ArrowUp'?-1:1);
+    var rows=Array.prototype.slice.call(document.querySelectorAll('.ic'));
+    var at=rows.indexOf(e.currentTarget);
+    var next=(at>=0?at:idx)+(k==='ArrowUp'?-1:1);
     if(next<0||next>=rows.length)return;
     if(rows[next]&&rows[next].focus)rows[next].focus();
   }
@@ -4366,7 +4358,7 @@ function moveItemBy(idx,delta){
   renderItemList();
   // Focus follows the question that moved, so a run of moves needs no
   // reaching for the mouse.
-  var rows=document.querySelectorAll('.ic');
+  var rows=document.querySelectorAll('.ic[data-idx]');
   if(rows[to]&&rows[to].focus)rows[to].focus();
 }
 
@@ -4387,6 +4379,8 @@ function pEnd(e){planDragSrc=null;document.querySelectorAll('#rqsBody .rq-card')
 // -- Inspector --------------------------------------------------------------
 var NCS=['likert','single_choice','multiple_choice','matrix','ranking'];
 function openInsp(id){
+  if(SCREENS[id]){openScreenInsp(id);return;}
+  var foot=document.querySelector('.insp-foot');if(foot)foot.hidden=false;
   var item=S.items.find(function(i){return i.id===id;});if(!item)return;
   document.getElementById('inspId').textContent=item.id;
   document.getElementById('inspTypeLbl').textContent=TL[item.type]||item.type;
@@ -4396,6 +4390,77 @@ function openInsp(id){
   renderCentre();
 }
 function closeInsp(){document.getElementById('inspector').classList.remove('open');document.getElementById('cPrompt').style.display='flex';selId=null;renderItemList();renderCentre();}
+// -- Welcome and thank-you pages ---------------------------------------------
+// The pages before the first question and after the last, as entries at the
+// ends of the question list (UX-10), with their editor on the right and
+// their preview in the centre. The fields keep the ids the Settings dialog
+// gave them. A field is written only when its value moves from what was
+// shown, so a page left alone keeps the content hash, and a page's object is
+// created only when 1 of its fields changes.
+var SCREENS={__welcome:{key:'welcome',label:'Welcome page',hint:'Before the first question'},
+  __thankyou:{key:'thankyou',label:'Thank-you page',hint:'After the last question'}};
+var SCREEN_FIELDS={'s-wt':['welcome','title'],'s-wi':['welcome','intro_text'],'s-wc':['welcome','consent_text'],
+  's-wreq':['welcome','consent_required'],'s-wsl':['welcome','start_label'],
+  's-tym':['thankyou','message'],'s-tyu':['thankyou','redirect_url'],'s-tydl':['thankyou','show_download']};
+var SCREEN_CHECK={'s-wreq':true,'s-tydl':true};
+var screenShown={};
+function screenRow(id){
+  var s=SCREENS[id],on=selId===id;
+  return '<div class="ic ic-screen'+(on?' sel':'')+'" role="option" tabindex="0" aria-selected="'+(on?'true':'false')+'" data-id="'+id+'" onclick="selItem(\''+id+'\')" onkeydown="itemRowKey(event,\''+id+'\',-1)">'
+    +'<div class="ic-body"><div class="ic-lbl blk">'+s.label+'</div><div class="ic-meta"><span class="badge b-nu">'+s.hint+'</span></div></div></div>';
+}
+function screenVal(fid){
+  var m=SCREEN_FIELDS[fid],R0=(S.render&&!Array.isArray(S.render))?S.render:{},p=R0[m[0]]||{},v=p[m[1]];
+  if(SCREEN_CHECK[fid])return !!v;
+  if(fid==='s-wsl')return v||'Start Survey';
+  if(fid==='s-tym')return v||'Thank you for participating.';
+  return v||'';
+}
+function openScreenInsp(id){
+  var welcome=id==='__welcome';
+  document.getElementById('inspId').textContent=welcome?'welcome':'thankyou';
+  document.getElementById('inspTypeLbl').textContent=SCREENS[id].label;
+  var foot=document.querySelector('.insp-foot');if(foot)foot.hidden=true;
+  function txt(fid,lbl,ph,type){return '<div class="field"><label class="fl" for="'+fid+'">'+lbl+'</label><div class="fc"><input type="'+(type||'text')+'" id="'+fid+'" value="'+esc(screenVal(fid))+'" placeholder="'+esc(ph||'')+'" onblur="updScreen(\''+fid+'\')"></div></div>';}
+  function area(fid,lbl,rows){return '<div class="field"><label class="fl" for="'+fid+'">'+lbl+'</label><div class="fc"><textarea id="'+fid+'" rows="'+rows+'" onblur="updScreen(\''+fid+'\')">'+esc(screenVal(fid))+'</textarea></div></div>';}
+  function box(fid,lbl){return '<label class="fcheck"><input type="checkbox" id="'+fid+'"'+(screenVal(fid)?' checked':'')+' onchange="updScreen(\''+fid+'\')"><span>'+lbl+'</span></label>';}
+  document.getElementById('inspBody').innerHTML=welcome
+    ?'<div class="alert-i">Shown before the first question. Introduce the study and ask for informed consent. With no introduction, consent or description, the survey opens at its first question.</div>'
+      +txt('s-wt','Welcome title','Welcome to our survey')+area('s-wi','Introduction text',5)
+      +area('s-wc','Consent statement (leave blank to skip)',4)+box('s-wreq','Require consent checkbox before starting')
+      +txt('s-wsl','Start button label')
+    :'<div class="alert-i">Shown after the last question is submitted.</div>'
+      +area('s-tym','Thank-you message',4)+txt('s-tyu','Redirect URL (optional)','https://example.com/thank-you','url')
+      +'<span class="fhint">After submission, respondents are redirected to this URL.</span>'
+      +box('s-tydl','Show "Download my response" button');
+  screenShown={};Object.keys(SCREEN_FIELDS).forEach(function(fid){
+    if(SCREEN_FIELDS[fid][0]!==SCREENS[id].key)return;
+    var v=screenVal(fid),e=document.getElementById(fid);screenShown[fid]=v;
+    if(e){if(SCREEN_CHECK[fid])e.checked=v;else e.value=v;}
+  });
+  document.getElementById('inspector').classList.add('open');
+  document.getElementById('cPrompt').style.display='none';
+  renderCentre();
+}
+function updScreen(fid){
+  var m=SCREEN_FIELDS[fid],el=document.getElementById(fid);if(!m||!el)return;
+  if(!screenShown.hasOwnProperty(fid))return;
+  var v=SCREEN_CHECK[fid]?!!el.checked:(el.value||'');
+  if(v===screenShown[fid])return;
+  snap();
+  if(!S.render||Array.isArray(S.render))S.render={};
+  if(!S.render[m[0]]||typeof S.render[m[0]]!=='object')S.render[m[0]]={};
+  S.render[m[0]][m[1]]=fid==='s-wsl'?(v||'Start Survey'):v;
+  screenShown[fid]=v;
+}
+// Inside Studio, Collect and References are Studio screens. The builder asks
+// Studio to open one, and Studio's handler is UI-1's.
+function studioGoto(screen){
+  if(typeof STUDIO_HOST==='undefined'||!STUDIO_HOST)return;
+  closeModal('m-settings');
+  window.parent.postMessage({type:'goto',screen:screen},location.origin);
+}
+
 // -- Centre pane -------------------------------------------------------------
 // The selected item as a respondent sees it, drawn by the survey template's
 // own show-only mode, so there is 1 renderer. Read-only: the editor is on
@@ -5427,6 +5492,9 @@ function studioHostInit(){
   document.getElementById('exportBtn').style.display='none';
   document.querySelector('.tb-brand').style.display='none';
   document.querySelector(".m-btn[data-mode='preview']").style.display='none';
+  // Studio's own Collect and References screens hold these, so the tabs link there.
+  document.querySelectorAll('.studio-only').forEach(function(e){e.hidden=false;});
+  document.querySelectorAll('.studio-not').forEach(function(e){e.hidden=true;});
   updSave();
   var sb=document.getElementById('saveBtn');
   sb.textContent='Save to Studio';sb.title='Make this survey the instrument Studio has open (Ctrl+S)';
@@ -5475,7 +5543,7 @@ function citeAttach(id,label){
 }
 function citeCheckAll(){var P=window.SurveyframeCitationPicker;if(P)P.checkAll();}
 // Settings opens on its References tab, above the plan dialog when one is open.
-function manageRefs(){openSettings('refs');}
+function manageRefs(){if(typeof STUDIO_HOST!=='undefined'&&STUDIO_HOST){studioGoto('references');return;}openSettings('refs');}
 [['rq-q','Research question'],['rq-h0','Null hypothesis'],['rq-h1','Alternative hypothesis'],
  ['rq-interp','Decision rule'],['s-problem','Problem statement']].forEach(function(f){citeAttach(f[0],f[1]);});
 

@@ -345,6 +345,13 @@ style.
   changes, in the shape `write_sframe()` writes, so a study left alone keeps
   its content hash. The builder refuses what `validate_sframe()` refuses,
   including the removal of an objective a plan block names.
+* **SurveyBuilder's welcome and thank-you pages are entries in the question
+  list**, "Welcome page" first and "Thank-you page" last. Selecting one opens
+  its editor on the right and its preview in the centre, and the Survey
+  settings dialog loses its Welcome and Thank You tabs (UX-10). A page left
+  alone keeps the content hash. Inside SurveyStudio, the dialog's Google
+  Sheets and References tabs link to Studio's Collect and References
+  screens, and the standalone builder keeps both tabs.
 * **SurveyBuilder shows the selected question in its centre pane** as a
   respondent sees it, drawn by the survey template itself through a
   preview-only "show only this item" mode, so there is 1 renderer. It is
