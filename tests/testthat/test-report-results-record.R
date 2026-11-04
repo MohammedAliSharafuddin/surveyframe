@@ -35,7 +35,7 @@ test_that("a report has a results record and a manifest beside it", {
 
   man <- jsonlite::fromJSON(p[["manifest"]], simplifyVector = FALSE)
   objs <- stats::setNames(man$objects, vapply(man$objects, `[[`, "", "object_id"))
-  expect_setequal(names(objs), c("instrument", "responses", "results", "report"))
+  expect_setequal(names(objs), c("instrument", "responses", "results", "report", "citation_style"))
   expect_identical(objs$instrument$hash_value, sframe_hash_value(d$instrument))
   expect_identical(objs$responses$hash_value, surveyframe:::sframe_responses_sha256(d$responses))
   expect_identical(objs$results$hash_value, sha_file(p[["results"]]))

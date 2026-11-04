@@ -1,10 +1,36 @@
-surveyframe is distributed under the MIT licence (see LICENSE). One bundled
-file is a third-party work under its own licence:
+surveyframe is distributed under the MIT licence (see LICENSE). Five bundled
+files are third-party works under their own licence.
+
+They are Citation Style Language styles from the Zotero Style Repository,
+https://www.zotero.org/styles. Each is licensed under the Creative Commons
+Attribution-ShareAlike 3.0 License,
+http://creativecommons.org/licenses/by-sa/3.0/. Their authors and
+contributors are listed in each file. They are shipped unmodified and are
+used by render_report() to format the References section, chosen by
+render_report(csl = ). surveyframe never fetches a style from the network.
 
 inst/csl/apa.csl
-  "APA Style 7th edition", a Citation Style Language style from the Zotero
-  Style Repository, http://www.zotero.org/styles/apa, last updated
-  2026-02-07. Licensed under the Creative Commons Attribution-ShareAlike 3.0
-  License, http://creativecommons.org/licenses/by-sa/3.0/. Its authors and
-  contributors are listed in the file itself. It is shipped unmodified and is
-  used by render_report() to format the References section.
+  "APA Style 7th edition", http://www.zotero.org/styles/apa, last updated
+  2026-02-07. The default, csl = "apa".
+
+inst/csl/chicago-author-date.csl
+  "Chicago Manual of Style 18th edition (author-date)",
+  http://www.zotero.org/styles/chicago-author-date, last updated 2025-02-09.
+  csl = "chicago-author-date".
+
+inst/csl/harvard-cite-them-right.csl
+  "Cite Them Right 12th edition (author-date/Harvard)",
+  http://www.zotero.org/styles/harvard-cite-them-right, last updated
+  2026-02-12. csl = "harvard".
+
+inst/csl/ieee.csl
+  "IEEE Reference Guide version 11.29.2023", http://www.zotero.org/styles/ieee,
+  last updated 2024-03-27. csl = "ieee".
+
+inst/csl/modern-language-association.csl
+  "MLA Handbook 9th edition (in-text citations)",
+  http://www.zotero.org/styles/modern-language-association, last updated
+  2026-02-03. csl = "mla".
+
+The 4 styles other than APA were copied from QuartoPad's inst/csl/ at commit
+5a5e30095b0659149d57d0891ebeb5aaa8b723b8.

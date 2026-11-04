@@ -64,11 +64,12 @@ sframe_write_report_source <- function(dir, instrument, data, record_json, front
   sframe_write_text(record_json, path("results"))
   file.copy(file.path(template_dir, c("report.scss", "apa-reference.docx", "apa-reference.odt")),
             dir, overwrite = TRUE)
-  if (!is.null(style)) {
-    sframe_bibliography(instrument, extra = bibliography_extra,
-                        file = file.path(dir, "references.json"))
-    file.copy(style, file.path(dir, "style.csl"), overwrite = TRUE)
-  }
+  # The style used, bundled or the researcher's own, named for it, so a rerun
+  # formats with that copy (owner 2026-11-03).
+  style_file <- paste0(style$name, ".csl")
+  sframe_bibliography(instrument, extra = bibliography_extra,
+                      file = file.path(dir, "references.json"))
+  file.copy(style$path, file.path(dir, style_file), overwrite = TRUE)
 
   qmd <- readLines(file.path(template_dir, "report.qmd"), warn = FALSE)
   qmd <- qmd[!grepl("^title:", qmd) | seq_along(qmd) > grep("^---", qmd)[2]]
@@ -86,7 +87,8 @@ sframe_write_report_source <- function(dir, instrument, data, record_json, front
                   c(obj("instrument", "sframe_instrument", "instrument"),
                     list(content_hash = sframe_hex(sframe_hash_value(instrument)))))
   if (!is.null(data)) objects <- c(objects, list(obj("responses", "responses_csv", "responses")))
-  objects <- c(objects, list(obj("results", "results_record", "results")))
+  objects <- c(objects, list(obj("results", "results_record", "results"),
+                             sframe_style_manifest_object(style, style_file)))
   manifest <- list(
     manifest_version = 1L,
     study_id = as.character(instrument$meta$id %||% instrument$meta$title %||% ""),
@@ -158,8 +160,15 @@ sframe_report_source <- function(dir = ".", include_analysis = TRUE, plot_palett
       error = function(e) e)
   }
   seed <- sframe_report_seed(data, instrument, include_analysis)
+  # The style as exported, so a changed style is reported apart from the numbers.
+  style_rec <- Filter(function(o) identical(o$object_id, "citation_style"), manifest$objects)
+  style_rec <- if (length(style_rec)) style_rec[[1]] else NULL
+  style_now <- if (!is.null(style_rec) && file.exists(file.path(dir, style_rec$file_name))) {
+    sframe_sha256_file(file.path(dir, style_rec$file_name))
+  } else NA_character_
   now_record <- sframe_sha256_text(sframe_results_record_json(
-    if (is.list(results) && !inherits(results, "error")) results else list(), instrument, seed))
+    if (is.list(results) && !inherits(results, "error")) results else list(), instrument, seed,
+    style = if (!is.null(style_rec)) list(name = style_rec$name, sha256 = style_rec$hash_value)))
   rec_results <- recorded$results %||% ""
   now_qmd <- sframe_sha256_file(path("qmd"))
   now_resp <- if (file.exists(path("responses"))) sframe_sha256_file(path("responses")) else NA_character_
@@ -177,7 +186,7 @@ sframe_report_source <- function(dir = ".", include_analysis = TRUE, plot_palett
   reported <- isTRUE(include_analysis) && !is.null(data)
   provenance <- data.frame(
     Field = c("Instrument hash", "Instrument check", "Amendments disclosed", "Responses sha256",
-              "Results", "Report source", "Declared plan blocks", "surveyframe"),
+              "Results", "Report source", "Citation style", "Declared plan blocks", "surveyframe"),
     Value = c(
       sframe_hex(sframe_hash_value(instrument)),
       sframe_instrument_verification(instrument),
@@ -194,6 +203,11 @@ sframe_report_source <- function(dir = ".", include_analysis = TRUE, plot_palett
         sprintf("The report source was edited after surveyframe generated it on %s.", check$exported_on)
       } else {
         sprintf("Unchanged since surveyframe generated it on %s.", check$exported_on)
+      },
+      if (is.null(style_rec)) "not recorded" else if (identical(style_now, style_rec$hash_value)) {
+        paste0(style_rec$name, ", the style exported")
+      } else {
+        paste0(style_rec$name, ", changed since export")
       },
       if (length(block_ids)) {
         paste0(block_ids, if (reported) " (reported)" else " (not reported)", collapse = ", ")
