@@ -81,3 +81,45 @@ ui1_reload <- function(demo) {
   ui2_navigate(s$b, s$url)
   ui2_wait(s$b, "window.Shiny && Shiny.shinyapp && Shiny.shinyapp.isConnected()", 120)
 }
+
+# The text and background pairs below WCAG 2.2 AA in a document, measured
+# from computed colours (UX-21). Each element with its own visible text is
+# measured against its background, laid over its ancestors' backgrounds down
+# to white, so a translucent colour is measured as it shows. Large text
+# (24 px, or 18.66 px bold) needs 3 to 1, other text 4.5 to 1. Disabled
+# controls are exempt. Returns a data frame of the failures.
+ui1_contrast_js <- "(function(doc){
+  function parse(c){ var m = /rgba?\\(([^)]+)\\)/.exec(c || ''); if (!m) return null;
+    var p = m[1].split(',').map(parseFloat); return {r:p[0], g:p[1], b:p[2], a: p.length > 3 ? p[3] : 1}; }
+  function over(t, u){ var a = t.a; return {r:t.r*a+u.r*(1-a), g:t.g*a+u.g*(1-a), b:t.b*a+u.b*(1-a), a:1}; }
+  function back(el){ var s = []; for (var e = el; e; e = e.parentElement) {
+      var c = parse(doc.defaultView.getComputedStyle(e).backgroundColor);
+      if (c && c.a > 0) { s.push(c); if (c.a >= 1) break; } }
+    var o = {r:255, g:255, b:255, a:1}; for (var i = s.length - 1; i >= 0; i--) o = over(s[i], o); return o; }
+  function lum(c){ function f(v){ v /= 255; return v <= 0.03928 ? v/12.92 : Math.pow((v+0.055)/1.055, 2.4); }
+    return 0.2126*f(c.r) + 0.7152*f(c.g) + 0.0722*f(c.b); }
+  var out = [], seen = [], w = doc.createTreeWalker(doc.body, NodeFilter.SHOW_TEXT);
+  while (w.nextNode()) {
+    var t = w.currentNode, el = t.parentElement;
+    if (!el || !t.nodeValue.trim() || seen.indexOf(el) >= 0) continue; seen.push(el);
+    if (['SCRIPT','STYLE','NOSCRIPT','OPTION','TITLE'].indexOf(el.tagName) >= 0) continue;
+    var r = el.getBoundingClientRect(), cs = doc.defaultView.getComputedStyle(el);
+    if (!r.width || !r.height || cs.visibility === 'hidden' || el.closest('[hidden]')) continue;
+    if (el.closest('[disabled], .disabled, [aria-hidden=\"true\"]')) continue;
+    var b = back(el), fg = over(parse(cs.color), b), L1 = lum(fg), L2 = lum(b);
+    var ratio = (Math.max(L1, L2) + 0.05) / (Math.min(L1, L2) + 0.05);
+    var size = parseFloat(cs.fontSize), bold = parseInt(cs.fontWeight, 10) >= 700;
+    var need = (size >= 24 || (bold && size >= 18.66)) ? 3 : 4.5;
+    if (ratio + 1e-9 < need) out.push({text: t.nodeValue.trim().slice(0, 40),
+      sel: el.tagName.toLowerCase() + (el.id ? '#' + el.id : '') +
+        (typeof el.className === 'string' && el.className.trim() ? '.' + el.className.trim().split(/\\s+/).join('.') : ''),
+      fg: cs.color, bg: 'rgb(' + Math.round(b.r) + ', ' + Math.round(b.g) + ', ' + Math.round(b.b) + ')',
+      ratio: Math.round(ratio * 100) / 100, need: need});
+  }
+  return JSON.stringify(out);
+})(%s)"
+
+ui1_contrast <- function(b, doc = "document") {
+  out <- jsonlite::fromJSON(ui2_js(b, sprintf(ui1_contrast_js, doc)))
+  if (!length(out)) data.frame() else as.data.frame(out)
+}

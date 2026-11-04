@@ -1088,6 +1088,10 @@ style.
 
 ## SurveyStudio
 
+* **Responses starts with the Google Sheet**, the planned route: the sheet
+  card comes first with Read from Google Sheet as the screen's primary
+  action, then the CSV file, then help for files from other tools. Without
+  googlesheets4 the card stays first and says how to install it.
 * **1 primary action per screen**, a full-size filled button from 1 shared
   class in `inst/shiny/www/studio-actions.css`: Save to Studio on Design,
   now first in the builder's bar, Download survey on Collect, Load
