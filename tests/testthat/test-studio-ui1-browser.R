@@ -165,4 +165,19 @@ test_that("an interpretation box cites through the shared picker, and Manage ref
   expect_match(opts, "plan:RQ2", fixed = TRUE)
 })
 
+test_that("with no instrument the gate replaces the body of References, Amendments and Report", {
+  b <- ui1_studio("none", "design")
+  editors <- c(references = "refs_bibtex", amendments = "amend_edit_design",
+               export = "rpt_title")
+  for (screen in names(editors)) {
+    expect_true(ui1_screen(b, screen), info = screen)
+    expect_true(ui2_wait(b, sprintf("$('#screen-%s').hasClass('screen-gated') && $('#screen-%s .next-stage').is(':visible')",
+                                    screen, screen), 20), info = screen)
+    expect_false(ui2_js(b, sprintf("$('#%s').is(':visible')", editors[[screen]])), info = screen)
+    expect_true(ui2_js(b, sprintf("$('#screen-%s .screen-title').is(':visible')", screen)), info = screen)
+  }
+  expect_false(ui2_js(b, "$('#screen-export .report-tabs').is(':visible')"))
+  expect_false(ui2_js(b, "$('#download_sframe_btn').is(':visible')"))
+})
+
 ui1_close()

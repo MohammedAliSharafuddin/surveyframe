@@ -1281,6 +1281,8 @@ ui <- fluidPage(
       .report-tabs { display: flex; gap: 4px; border-bottom: 1px solid #d9dce6; margin-bottom: 16px; flex-wrap: wrap; }
       .report-tab { background: none; border: none; border-bottom: 3px solid transparent; padding: 8px 14px; font-weight: 600; color: #3d4256; }
       .report-tab.active { border-bottom-color: #1a1a2e; color: #1a1a2e; }
+      .screen.screen-gated > :not(.screen-title):not(.screen-head):not(.screen-gate) { display: none !important; }
+      .screen.screen-gated > .screen-head > :not(.screen-title) { display: none !important; }
       .report-pane { display: none; }
       .report-pane.active { display: block; }
       .flag-list { margin-top: 12px; border-top: 1px solid #e3e5ee; padding-top: 8px; }
@@ -1518,6 +1520,18 @@ ui <- fluidPage(
           var tabs = $('.report-tab'), k = tabs.index(this) + (e.key === 'ArrowRight' ? 1 : -1);
           var next = tabs.eq((k + tabs.length) % tabs.length);
           studioReportTab(next.data('rtab')); next.focus(); e.preventDefault();
+        });
+
+        // A gate that names the next stage replaces the screen's body, so no
+        // editor sits live under it (UX-13). A gate that only warns, such as
+        // Preview's validation list, leaves the body shown.
+        function studioGate(el) {
+          if (!el) return;
+          var scr = $(el).addClass('screen-gate').closest('.screen');
+          scr.toggleClass('screen-gated', $(el).find('.next-stage').length > 0);
+        }
+        $(document).on('shiny:value', function(e) {
+          if (/_gate$/.test(e.name)) setTimeout(function() { studioGate(document.getElementById(e.name)); }, 0);
         });
 
         // The shared citation picker (UI-2's field_tools.js) on Studio's long

@@ -1088,6 +1088,11 @@ style.
 
 ## SurveyStudio
 
+* **A gate replaces the screen it guards** (UX-13). When a screen's
+  prerequisite is missing, such as an open instrument, its next-stage card
+  takes the place of the screen's body, so References, Amendments and
+  Report no longer show live editors under it. A gate that only warns, such
+  as Preview's validation list, leaves the screen shown.
 * **References are added in 1 place** (UX-03). The Report screen's Further
   references (BibTeX) box is gone. The interpretation boxes take the shared
   citation picker, which lists the instrument's references and the
