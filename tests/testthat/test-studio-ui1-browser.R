@@ -279,6 +279,19 @@ test_that("the builder's Open Collect and Manage references open Studio's screen
   expect_true(ui2_js(b, "$('#screen-references').hasClass('active')"))
 })
 
+test_that("inside Studio only the sidebar picks Build or Plan, and the builder's switch is hidden", {
+  b <- ui1_studio("factor_structure")
+  expect_true(ui1_screen(b, "design"))
+  doc <- "document.getElementById('design_frame').contentWindow.document"
+  expect_true(ui2_wait(b, paste0("!!", doc, ".querySelector('.tb-modes')"), 60))
+  expect_true(ui2_js(b, paste0(doc, ".querySelector('.tb-modes').offsetParent === null")))
+  mode <- paste0("(", doc, ".querySelector('.m-btn[aria-pressed=\"true\"]') || {dataset: {}}).dataset.mode")
+  ui2_js(b, "$('.studio-nav a[data-nav=\"plan\"]').click(); true")
+  expect_true(ui2_wait(b, paste0(mode, " === 'analyse'"), 30))
+  expect_true(ui1_screen(b, "design"))
+  expect_true(ui2_wait(b, paste0(mode, " === 'build'"), 30))
+})
+
 # Last, since it loads the page again, which starts Studio's session again.
 test_that("sidebar groups fold, stay folded after a reload, and a fragment into a folded group opens it", {
   b <- ui1_studio("factor_structure")

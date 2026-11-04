@@ -1088,6 +1088,9 @@ style.
 
 ## SurveyStudio
 
+* **1 Build and Plan control in Studio.** The sidebar's Design and Plan
+  entries pick the builder's mode, and the builder inside Studio hides its
+  own Build/Plan switch. The standalone SurveyBuilder keeps it.
 * **The sidebar's groups fold.** Build, Collect, Analyse, Report and Record
   are buttons that fold their entries, all open at first. Studio remembers
   each choice in the browser, and the group holding the open screen always
