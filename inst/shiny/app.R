@@ -1655,6 +1655,11 @@ ui <- fluidPage(
             Shiny.setInputValue('builder_sframe', d.text, {priority: 'event'});
           } else if (d.type === 'dirty') {
             $('#design_unsaved').toggle(d.dirty === true);
+          } else if (d.type === 'goto' && (d.screen === 'collect' || d.screen === 'references')) {
+            // The builder's Google Sheets and References tabs and the picker's
+            // Manage references open Studio's own screen (UI-2, 4949b18).
+            studioPicked = true;
+            studioShowScreen(null, d.screen);
           }
         });
         // An instrument Studio cannot send leaves the builder unable to save,

@@ -68,7 +68,7 @@ dim(responses)
 ## SurveyBuilder: the Plan mode
 
 SurveyBuilder runs entirely in the browser, so it is an authoring tool. Its
-Plan mode has three tabs, Plan, Run, and Report, with a three-panel layout
+Plan mode has three tabs, Plan, Declared analyses and Expected outputs, with a three-panel layout
 underneath: a list of variables and constructs on the left, the analysis plans
 in the middle, and an output preview with the model builder on the right.
 
@@ -82,8 +82,8 @@ level of each variable, so a saved plan is coherent.
 knitr::include_graphics("figures/gui-builder-analyse-plan.png")
 ```
 
-The Run and Report tabs relabel the same plan list as a "run queue" and a
-"report outline". They do not compute anything. SurveyBuilder stores each plan
+The Declared analyses tab lists the plans that need data, and Expected outputs
+sketches the report they will fill. Neither computes anything. SurveyBuilder stores each plan
 with an empty result, because the browser cannot run R. The statistics are
 produced later, either in an R session with `run_analysis_plan()` or in
 SurveyStudio. The output preview on the right shows counts, such as the number
