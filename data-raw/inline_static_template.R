@@ -1,9 +1,12 @@
 # data-raw/inline_static_template.R
-# Re-inlines inst/static_survey/template.html and collector_template.gs into
+# Re-inlines inst/static_survey/template.html, collector_template.gs and
+# inst/builder/citation_picker.js into
 # inst/builder/survey_builder.html between the STATIC_TEMPLATE_START/END and
-# COLLECTOR_TEMPLATE_START/END markers. The builder's Export survey and
-# Generate collector features stay single-sourced with the R export path.
-# Run after any edit to template.html or collector_template.gs.
+# COLLECTOR_TEMPLATE_START/END and CITATION_PICKER_START/END markers. The
+# builder's Export survey and Generate collector features stay single-sourced
+# with the R export path, and its citation picker with Studio's.
+# Run after any edit to template.html, collector_template.gs or
+# citation_picker.js.
 # Recreated 2026-07-08 from the marker format in survey_builder.html; the
 # original script was gitignored on main and lost.
 # Tracked on main since 2026-09-17 (0.4.2), where the release is built.
@@ -11,11 +14,13 @@
 # copies and these templates differ, so run this after editing either.
 
 builder_path   <- file.path("inst", "builder", "survey_builder.html")
+picker_path    <- file.path("inst", "builder", "citation_picker.js")
 template_path  <- file.path("inst", "static_survey", "template.html")
 collector_path <- file.path("inst", "static_survey", "collector_template.gs")
 
 stopifnot(file.exists(builder_path), file.exists(template_path),
-          file.exists(collector_path))
+          file.exists(collector_path),
+          file.exists(picker_path))
 
 read_utf8 <- function(path) readLines(path, encoding = "UTF-8", warn = FALSE)
 
@@ -54,6 +59,16 @@ builder <- replace_block(
   "<!-- COLLECTOR_TEMPLATE_START:",
   "<!-- COLLECTOR_TEMPLATE_END -->",
   collector_block
+)
+
+# The shared citation picker, a plain script, so the builder still opens
+# from a copied file with no sibling files beside it.
+picker_block <- c("<script>", escape_script(read_utf8(picker_path)), "</script>")
+builder <- replace_block(
+  builder,
+  "<!-- CITATION_PICKER_START:",
+  "<!-- CITATION_PICKER_END -->",
+  picker_block
 )
 
 writeLines(builder, builder_path, useBytes = TRUE)

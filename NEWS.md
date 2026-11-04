@@ -244,6 +244,15 @@ style.
 * **SurveyBuilder has a References tab in Survey settings.** Paste BibTeX or
   type a reference in, and choose where the instrument cites it. Changes
   apply at once, ahead of Save settings.
+* **SurveyBuilder has a citation picker on the plan fields.** Type `@` or
+  `/cite` in a research question, a hypothesis, a decision rule or an
+  interpretation, or press the field's Cite button, to list the instrument's
+  references by key, author, year and title, filtered as you type. A pick
+  asks for "Max (2000)", written `@key`, or "(Max, 2000)", written `[@key]`,
+  and inside an open `[...]` adds `; @key`. A key with no reference is
+  shown under the field with "No reference with this key. Add it under
+  References.", and "Manage references" opens that tab. The picker is 1 file,
+  `citation_picker.js`, which SurveyStudio will share.
 * **`read_bibtex()` reads entries written with parentheses.** BibTeX allows
   `@article(key, ...)` as well as `@article{key, ...}`, and a file may mix the
   2. A closing bracket inside a braced or quoted value ended a parenthesised
