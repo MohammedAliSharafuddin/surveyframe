@@ -350,6 +350,11 @@ style.
   choice or ranking item now shows its options in an order shuffled once per
   respondent and kept in a draft, and each option still submits its own
   value (UX-11).
+* **SurveyBuilder works on a narrow screen.** Below 760 px Design shows 1
+  pane at a time, the question list, then the editor with its live preview
+  and a Back control, in the standalone builder and inside SurveyStudio.
+  Preview and Plan take the whole width, and at 390 x 844 no page is wider
+  than the viewport (UX-01, UX-08).
 * **SurveyBuilder's Survey settings sections are a tablist**: buttons with
   `aria-selected` and `aria-controls`, 1 of them in the Tab order, and the
   arrow keys, Home and End move between them. They were divs that answered a

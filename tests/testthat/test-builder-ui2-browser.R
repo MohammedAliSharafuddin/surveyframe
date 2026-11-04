@@ -376,4 +376,49 @@ test_that("the arrow keys move along the Settings tabs and select each", {
 })
 
 
+# -- Narrow screens (UX-01, UX-08) ---------------------------------------------------
+
+narrow_overflow <- "(function(){var w=innerWidth,n=0;document.querySelectorAll('body *').forEach(function(e){var r=e.getBoundingClientRect();if(r.width>0&&r.right>w+1&&getComputedStyle(e).visibility!=='hidden')n++;});return [document.documentElement.scrollWidth<=w,n];})()"
+
+test_that("at 390 x 844 Design shows 1 pane at a time, and no page is wider than the viewport", {
+  s <- ui2_builder(centre_instrument(), width = 390, height = 844)
+  shown <- function(sel) js(s, sprintf("getComputedStyle(document.querySelector('%s')).display!=='none'", sel))
+  wide <- function() unlist(js(s, narrow_overflow))
+  expect_true(shown(".sidebar"))
+  expect_false(shown(".main"))
+  expect_identical(wide(), c(1, 0))
+  js(s, "selItem('q1');1")
+  expect_false(shown(".sidebar"))
+  expect_true(shown(".inspector"))
+  expect_true(shown(".insp-back"))
+  expect_true(ui2_wait(s, "document.getElementById('cvPv').classList.contains('on')"))
+  expect_identical(wide(), c(1, 0))
+  js(s, "document.querySelector('.insp-back').click();1")
+  expect_true(shown(".sidebar"))
+  expect_identical(js(s, "document.activeElement.getAttribute('data-id')"), "q1")
+  for (mode in c("preview", "analyse")) {
+    js(s, sprintf("setMode('%s');1", mode))
+    expect_false(shown(".sidebar"))
+    expect_identical(wide(), c(1, 0), info = mode)
+  }
+  js(s, "setMode('build');openSettings('meta');1")
+  expect_identical(wide(), c(1, 0))
+  # The wide layout comes back at a desktop width.
+  ui2_session("builder", width = 1280, height = 900)
+  expect_true(shown(".main"))
+})
+
+test_that("inside Studio at 390 wide the builder shows 1 pane at a time", {
+  h <- ui2_studio_host()
+  on.exit(httpuv::stopServer(h$server), add = TRUE)
+  s <- h$session
+  js(s, "var f=document.getElementById('b');f.style.width='390px';f.style.height='844px';1")
+  b <- "document.getElementById('b').contentWindow"
+  Sys.sleep(0.3)
+  expect_identical(js(s, paste0(b, ".innerWidth")), 390L)
+  expect_true(js(s, paste0(b, ".getComputedStyle(", b, ".document.querySelector('.main')).display==='none'")))
+  expect_true(js(s, paste0(b, ".document.documentElement.scrollWidth<=390")))
+})
+
+
 ui2_close()
