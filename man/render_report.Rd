@@ -127,10 +127,24 @@ The output file path, invisibly.
 \description{
 Generates an HTML report that includes the instrument codebook, data
 quality summary, reliability diagnostics, and analysis-plan content.
-When Quarto and the bundled template are available, the report is rendered
-through Quarto. Otherwise, surveyframe writes an internal HTML fallback so
-the reporting workflow still runs on machines without Quarto.
+Quarto is the report engine. Without Quarto, surveyframe writes a short
+plain results page with the numbers, tables, charts and APA result lines,
+under a banner that links to the Quarto installation page. That page gets
+no new features and is not promised to match the Quarto report.
 }
+\section{Which Quarto}{
+
+The first copy of Quarto that runs \code{quarto --version} is used, searched in
+this order: the executable named by the \code{QUARTO_PATH} environment
+variable, \code{quarto} on the PATH, \code{RSTUDIO_QUARTO} (set inside RStudio), the
+copy bundled with RStudio, then the copy bundled with Positron. RStudio and
+Positron do not put their copies on the PATH, so a report rendered outside
+them found none before 0.4.3. \code{QUARTO_PATH} takes the path of the
+executable itself, as in the quarto package. The Quarto report gives the
+version used and where it was found, and the returned path carries the
+executable as its \code{"quarto"} attribute. \code{options(surveyframe.use_quarto = FALSE)} uses the built-in engine whatever is installed.
+}
+
 \section{References}{
 
 The Quarto report cites in text, author and year, and lists every work it

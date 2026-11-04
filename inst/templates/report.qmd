@@ -35,6 +35,7 @@ params:
   fig_height:          ""
   fig_dpi:             ""
   fig_format:          ""
+  quarto_found:        ""
 execute:
   echo:    false
   warning: false
@@ -228,9 +229,16 @@ qr <- sframe_quality_results(responses, instrument)
 
 ```{r quality-summary, eval=params$include_quality && has_data}
 #| output: asis
-cat(sprintf("**Respondents:** %d | **Items:** %d | **Flagged:** %d (%.1f%%)\n\n",
-  qr$summary$n_respondents, qr$summary$n_items,
-  qr$summary$n_flagged, qr$summary$flag_rate * 100))
+# The same table and note as the built-in engine (8b-R): the note says why a
+# straight-lining chart is absent, computed by render_report().
+qs_df <- data.frame(
+  Metric = c("Respondents", "Items", "Flagged", "Flag rate"),
+  Value = c(qr$summary$n_respondents, qr$summary$n_items, qr$summary$n_flagged,
+            sprintf("%.1f%%", qr$summary$flag_rate * 100)),
+  stringsAsFactors = FALSE)
+print(kable(format = "html", qs_df, align = c("l", "r"), caption = "Quality summary"))
+if (!is.null(content$quality_note))
+  cat(sprintf("\n\n<p class=\"sf-note\">%s</p>\n\n", content$quality_note))
 ```
 
 ```{r quality-attention, eval=params$include_quality && has_data && length(qr$attention) > 0}
@@ -275,6 +283,7 @@ if (is.null(mr)) {
   cat("Missing-data diagnostics could not be computed from the supplied data.\n\n")
 } else {
   print(kable(format = "html", sframe_apa_cells(mr$item_missing), caption = "Item-wise missingness"))
+  print(kable(format = "html", sframe_apa_cells(mr$respondent_missing), caption = "Respondent-wise missingness"))
   patterns_display <- mr$patterns[, intersect(c("description", "n", "percent"), names(mr$patterns)), drop = FALSE]
   print(kable(format = "html", sframe_apa_cells(patterns_display), caption = "Missing-data patterns",
               col.names = c("Pattern", "n", "Percent")))
@@ -516,6 +525,9 @@ cat(sprintf("**Instrument hash:** `%s`\n\n", hash_val))
 # instrument this describes, the engine says which of surveyframe's 2
 # renderers produced it, and the seed says what reproducing the numbers takes.
 cat("**Rendering engine:** Quarto\n\n")
+# The Quarto copy that rendered it and where it was found: on the PATH, from
+# QUARTO_PATH, or bundled with RStudio or Positron.
+if (nzchar(params$quarto_found %||% "")) cat(sprintf("**Quarto:** %s\n\n", params$quarto_found))
 # Quarto renders in its own R process, so the version and commit name the
 # surveyframe that process loaded. RemoteSha is written by remotes and pak.
 sf_desc <- utils::packageDescription("surveyframe")
