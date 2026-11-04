@@ -1222,12 +1222,6 @@ studio_nav_heading <- function(label) {
 
 # The Report screen's local tabs (UX-07): a tab button and its pane. The
 # panes are hidden, never redrawn, so their inputs keep their values.
-# A long text field that takes the shared citation picker: its textarea
-# carries data-cite, the field's name in the picker's accessible label.
-studio_cite_field <- function(tag, label) {
-  htmltools::tagQuery(tag)$find("textarea")$addAttrs(`data-cite` = label)$allTags()
-}
-
 studio_report_tab <- function(id, label, on = FALSE) {
   tags$button(type = "button", id = paste0("rtab-", id),
     class = paste("report-tab", if (on) "active"), role = "tab",
@@ -1598,8 +1592,9 @@ ui <- fluidPage(
           if (/_gate$/.test(e.name)) setTimeout(function() { studioGate(document.getElementById(e.name)); }, 0);
         });
 
-        // The shared citation picker (UI-2's field_tools.js) on Studio's long
-        // text fields. A field opts in with data-cite, its label. The
+        // The shared format toolbar and citation picker (UI-2's field_tools.js)
+        // on Studio's long text fields, shown on focus and hidden on blur. Each
+        // field opts in with data-cite, its label. The
         // references are the open instrument's only, sent by the server, so a
         // report never cites a source the .sframe does not record (UX-03).
         window.studioRefs = []; window.studioKnownKeys = []; window.studioPickers = {};
@@ -1614,7 +1609,7 @@ ui <- fluidPage(
             var old = window.studioPickers[this.id];
             if (old) { if (old.element === this) return; old.destroy(); }
             window.studioPickers[this.id] = P.attach(this, function() { return window.studioRefs; }, {
-              label: $(this).attr('data-cite'), toolbar: false,
+              label: $(this).attr('data-cite'),
               knownKeys: function() { return window.studioKnownKeys; },
               onManage: function() { $('.studio-nav-item [data-tab=\"references\"]').first().click(); }
             });
@@ -1624,6 +1619,8 @@ ui <- fluidPage(
           setTimeout(function() { studioAttachPickers(document.getElementById(e.name)); }, 0);
         });
         $(function() { studioAttachPickers(document.body); });
+        // A dialog is not an output, so its fields attach when it opens.
+        $(document).on('shown.bs.modal', function(e) { studioAttachPickers(e.target); });
 
         Shiny.addCustomMessageHandler('surveyframe-launch-tab', studioLaunchScreen);
 
@@ -4055,7 +4052,7 @@ server <- function(input, output, session) {
             paste("Planned decision rule:", block$decision_rule))
         },
         tags$label(class = "vmeta-lbl", "Interpretation"),
-        studio_cite_field(textAreaInput(fld, NULL,
+        sframe_studio_cite_field(textAreaInput(fld, NULL,
           value = shiny::isolate(input[[fld]] %||% ""),
           rows = 6, width = "100%",
           placeholder = "State what this result means for the research question."), sprintf("Interpretation of %s", block_id))

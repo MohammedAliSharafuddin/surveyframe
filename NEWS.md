@@ -1088,6 +1088,10 @@ style.
 
 ## SurveyStudio
 
+* **Studio's long text fields take SurveyBuilder's format toolbar**: the
+  Report's interpretation boxes and the amendment dialog's deviation report
+  show it on focus and hide it on blur, insert Markdown, and cite through
+  the same picker.
 * **Studio fits a phone** (UX-01, UX-08). Below 800 px the sidebar becomes a
   drawer behind a labelled Menu button, which closes after a choice or on
   Escape, cards stack, and a wide table or code block scrolls inside its

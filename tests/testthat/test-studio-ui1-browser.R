@@ -237,4 +237,30 @@ test_that("at 390 x 844 the sidebar is a drawer and no screen is wider than the 
   ui2_js(b, "$('#rtab-interpret').click(); true")
 })
 
+test_that("the format toolbar shows on an interpretation box's focus, inserts Markdown and hides on blur", {
+  b <- ui1_studio("factor_structure")
+  expect_true(ui1_screen(b, "export"))
+  ui2_js(b, "$('#rtab-interpret').click(); $('#export_interpretations_ui details').first().attr('open', true); true")
+  ta <- "document.querySelector('#export_interpretations_ui textarea[data-cite]')"
+  expect_true(ui2_wait(b, paste0("!!", ta, " && !!window.studioPickers[", ta, ".id]"), 60))
+  bar <- paste0("(", ta, ".parentNode.querySelector('.sfcp-bar') || document.querySelector('.sfcp-bar'))")
+  ui2_js(b, paste0("var t = ", ta, "; t.focus(); t.value = 'clear'; t.setSelectionRange(0, 5); true"))
+  expect_true(ui2_wait(b, paste0("!", bar, ".hidden"), 5))
+  ui2_key(b, "", "b", ctrl = TRUE)
+  expect_true(ui2_wait(b, paste0(ta, ".value === '**clear**'"), 5))
+  id <- ui2_js(b, paste0(ta, ".id"))
+  ui2_js(b, paste0(ta, ".blur(); document.body.focus(); true"))
+  expect_true(ui2_wait(b, paste0(bar, ".hidden"), 5))
+  expect_true(ui2_wait(b, sprintf("Shiny.shinyapp.$inputValues['%s'] === '**clear**'", id), 10))
+  ui2_js(b, paste0("var t = ", ta, "; t.value = ''; $(t).trigger('change'); true"))
+
+  # The amendment dialog's deviation report takes the same toolbar.
+  expect_true(ui1_screen(b, "quality"))
+  ui2_js(b, "$('#quality_amend_btn').click(); true")
+  expect_true(ui2_wait(b, ui1_modal_open, 20))
+  expect_true(ui2_wait(b, "!!window.studioPickers['amend_dlg-deviation_report']", 10))
+  ui2_js(b, "$('#amend_dlg-cancel').click(); true")
+  expect_true(ui2_wait(b, paste0("!", ui1_modal_open), 20))
+})
+
 ui1_close()

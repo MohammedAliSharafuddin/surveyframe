@@ -56,6 +56,12 @@ sframe_studio_amend_summary <- function(preview) {
   lines
 }
 
+# A long text field that takes the shared format toolbar and citation
+# picker in Studio: its textarea carries data-cite, the field's name.
+sframe_studio_cite_field <- function(tag, label) {
+  htmltools::tagQuery(tag)$find("textarea")$addAttrs(`data-cite` = label)$allTags()
+}
+
 # The dialog itself. `defaults` may hold reason_code, reason_text and
 # deviation_report, which a start fills in (Drop from scale fills the reason
 # from sframe_item_flags()).
@@ -86,9 +92,9 @@ sframe_studio_amend_modal <- function(ns, preview, start_label, defaults = list(
     shiny::selectInput(ns("tier"), "Tier", choices = tiers, selected = tier),
     shiny::conditionalPanel(
       condition = "input.tier == 'design'", ns = ns,
-      shiny::textAreaInput(ns("deviation_report"), "Deviation report", rows = 3,
+      sframe_studio_cite_field(shiny::textAreaInput(ns("deviation_report"), "Deviation report", rows = 3,
         value = defaults$deviation_report %||% "",
-        placeholder = "What changed in the research question, method or model, and why.")),
+        placeholder = "What changed in the research question, method or model, and why."), "Deviation report")),
     shiny::fluidRow(
       shiny::column(6, shiny::textInput(ns("author"), "Author (optional)")),
       shiny::column(6, shiny::textInput(ns("signoff"), "Second reviewer sign-off (optional)"))
