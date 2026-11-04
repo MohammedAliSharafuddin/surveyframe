@@ -292,6 +292,18 @@ test_that("inside Studio only the sidebar picks Build or Plan, and the builder's
   expect_true(ui2_wait(b, paste0(mode, " === 'build'"), 30))
 })
 
+test_that("each screen's title and context line are 1 row at the top of its panel", {
+  b <- ui1_studio("factor_structure")
+  for (screen in sframe_studio_screens()) {
+    expect_true(ui1_screen(b, screen), info = screen)
+    expect_true(ui2_js(b, sprintf("$('#screen-%s').children().first().is('.screen-head') && $('#screen-%s > .screen-head h2.screen-title').length === 1", screen, screen)), info = screen)
+    # The head is 1 compact row: at most 2 lines of the title's height.
+    expect_lt(ui2_js(b, sprintf("$('#screen-%s > .screen-head').outerHeight()", screen)), 90, label = screen)
+  }
+  expect_true(ui1_screen(b, "design"))
+  expect_true(ui2_wait(b, "$('#screen-design > .screen-head').text().indexOf('Editing: ') >= 0", 20))
+})
+
 # Last, since it loads the page again, which starts Studio's session again.
 test_that("sidebar groups fold, stay folded after a reload, and a fragment into a folded group opens it", {
   b <- ui1_studio("factor_structure")
