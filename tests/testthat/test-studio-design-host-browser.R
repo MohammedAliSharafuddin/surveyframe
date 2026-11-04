@@ -103,6 +103,8 @@ test_that("the builder on its own keeps its brand, Preview and Export survey", {
                                    "\"); return !!e && e.offsetParent !== null; })()"))
   expect_true(shown(".tb-brand"))
   expect_true(shown(".m-btn[data-mode='preview']"))
+  # UI-1 item 12b: the standalone builder keeps its Build/Plan switch.
+  expect_true(shown(".tb-modes"))
   expect_true(shown("#exportBtn"))
   expect_true(shown("#openBtn"))
   expect_identical(js("document.querySelector(\".m-btn[data-mode='analyse']\").textContent"), "Plan")

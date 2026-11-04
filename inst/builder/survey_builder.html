@@ -5673,7 +5673,9 @@ function studioHostInit(){
   document.getElementById('openBtn').style.display='none';
   document.getElementById('exportBtn').style.display='none';
   document.querySelector('.tb-brand').style.display='none';
-  document.querySelector(".m-btn[data-mode='preview']").style.display='none';
+  // Studio's sidebar Design and Plan entries pick the mode (item 12b), so
+  // the builder's own switch is hidden there. The standalone builder keeps it.
+  document.querySelector('.tb-modes').style.display='none';
   // Studio's own Collect and References screens hold these, so the tabs link there.
   document.querySelectorAll('.studio-only').forEach(function(e){e.hidden=false;});
   document.querySelectorAll('.studio-not').forEach(function(e){e.hidden=true;});
