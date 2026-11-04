@@ -1438,7 +1438,22 @@ sframe_clean_interpretations <- function(interpretations) {
     }, character(1))
   }
 
-  paste(c("<h2>Analysis Plan</h2>", blocks), collapse = "\n")
+  paste(c("<h2>Analysis Plan</h2>", sframe_study_html(instrument), blocks), collapse = "\n")
+}
+
+# The study at the head of the plan section (D13 in the report, 8b-R): the
+# problem, its sources, and the trace from objectives to research questions.
+sframe_study_html <- function(instrument) {
+  s <- sframe_report_study(instrument)
+  if (is.null(s)) return("")
+  paste(c(
+    "<div class=\"sf-study\">", "<h3>Study</h3>",
+    if (length(s$problem)) sprintf("<p><strong>Problem:</strong> %s</p>", htmltools_escape(s$problem)),
+    sframe_sources_html(instrument, "study"),
+    if (!is.null(s$trace)) .render_report_table(s$trace, "Objectives and the research questions that serve them"),
+    if (length(s$unlinked)) sprintf("<p class=\"tbl-note\">Research questions that name no objective: %s.</p>",
+                                    htmltools_escape(s$unlinked)),
+    "</div>"), collapse = "\n")
 }
 
 .render_report_model_section <- function(instrument) {
@@ -1568,6 +1583,7 @@ sframe_report_content <- function(instrument, data = NULL, plot_palette = "web",
     if (!is.null(note)) quality_note <- htmltools_escape(note)
   }
   list(codebook_items = items_d, charts = charts, results = results,
+       study = sframe_report_study(instrument),
        amendments = sframe_report_amendments(instrument),
        quality_note = quality_note)
 }
