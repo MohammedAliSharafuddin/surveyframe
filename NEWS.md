@@ -345,6 +345,9 @@ style.
   changes, in the shape `write_sframe()` writes, so a study left alone keeps
   its content hash. The builder refuses what `validate_sframe()` refuses,
   including the removal of an objective a plan block names.
+* **SurveyBuilder's Plan tabs are "Declared analyses" and "Expected
+  outputs"**, where they were "Run preview" and "Report outline", so Preview
+  in the builder means the respondent's survey alone (UX-17).
 * **SurveyBuilder sets a cross-tab's percentages.** A cross-tab or
   chi-square plan has a "Percentages in the table" choice: counts only, row,
   column or percent of the total, saved as `options$percent` (UX-02).
