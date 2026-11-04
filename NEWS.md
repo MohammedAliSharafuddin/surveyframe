@@ -345,6 +345,12 @@ style.
   changes, in the shape `write_sframe()` writes, so a study left alone keeps
   its content hash. The builder refuses what `validate_sframe()` refuses,
   including the removal of an objective a plan block names.
+* **SurveyBuilder shows the selected question in its centre pane** as a
+  respondent sees it, drawn by the survey template itself through a
+  preview-only "show only this item" mode, so there is 1 renderer. It is
+  redrawn a moment after each edit, has a desktop and a mobile width, and is
+  read-only: the editor stays on the right (UX-09). Section breaks and text
+  blocks show as on their page.
 * **SurveyBuilder's Plan tabs are "Declared analyses" and "Expected
   outputs"**, where they were "Run preview" and "Report outline", so Preview
   in the builder means the respondent's survey alone (UX-17).

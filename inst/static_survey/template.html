@@ -31,6 +31,7 @@ input,textarea,select{font-family:inherit;font-size:15px}
 .sf-hdr-inst{font-size:13px;font-weight:650;color:var(--t2);letter-spacing:.5px;text-transform:uppercase}
 
 /* Progress */
+body[data-only] .prog-bar-wrap,body[data-only] .sf-hdr{display:none!important}
 .prog-bar-wrap{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--cg) 92%,transparent);backdrop-filter:blur(4px);border-bottom:1px solid var(--cb);padding:0}
 .prog-bar-inner{height:3px;background:var(--cp);transition:width .3s ease;min-width:0}
 .prog-hdr{display:flex;align-items:center;gap:10px;padding:9px 20px}
@@ -1440,7 +1441,29 @@ function restartSurvey(){
 }
 
 // ── Init ───────────────────────────────────────────────────────────────────
+// Show only 1 item (owner 2026-11-01, UX-09). SurveyBuilder's centre pane
+// draws the selected question with this page's own renderer, so there is 1
+// renderer. The builder asks for it with data-only on the body of a preview
+// it writes, and a live survey never takes this mode. The item shows as on
+// its page, branching aside, and nothing in it can be answered.
+const ONLY_ID=PREVIEW?((document.body.dataset&&document.body.dataset.only)||''):'';
+function renderOnly(){
+  var el=document.getElementById('app');
+  if(ONLY_ID==='__welcome'){
+    if(!WL.intro_text&&!WL.consent_text&&!SF.meta.description)
+      el.innerHTML='<div class="card"><div class="card-body"><p class="wl-intro">No welcome page: the survey opens at its first question. Add an introduction or a consent statement to show one.</p></div></div>';
+    else renderWelcome();
+  }else if(ONLY_ID==='__thankyou'){
+    screen='thankyou';renderThankyou();
+  }else{
+    var item=(SF.items||[]).filter(function(i){return i.id===ONLY_ID;})[0];
+    el.innerHTML=item?'<div class="card"><div class="card-body">'+renderItem(item)+'</div></div>':'';
+    Array.prototype.forEach.call(el.querySelectorAll('.blk.hidden'),function(b){b.classList.remove('hidden');});
+  }
+  el.setAttribute('inert','');
+}
 document.addEventListener('DOMContentLoaded',function(){
+  if(ONLY_ID){renderOnly();return;}
   renderScreen();
 });
 </script>
