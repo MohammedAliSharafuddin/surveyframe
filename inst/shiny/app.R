@@ -1218,8 +1218,9 @@ studio_nav_entry <- function(tab, label) {
 
 studio_nav_heading <- function(label) {
   # A group heading folds its entries (item 12a), so it is a button.
+  # No whitespace around the button, so the heading's text is its label.
   tags$li(class = "studio-nav-heading", `data-group` = tolower(label),
-    tags$button(type = "button", class = "studio-nav-fold", `aria-expanded` = "true", label))
+    tags$button(type = "button", class = "studio-nav-fold", `aria-expanded` = "true", label), .noWS = c("after-begin", "before-end"))
 }
 
 # The Report screen's local tabs (UX-07): a tab button and its pane. The
