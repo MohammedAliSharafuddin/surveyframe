@@ -21,7 +21,9 @@
 sframe_reference_id_pattern <- "^[A-Za-z0-9_]([A-Za-z0-9_:.#$%&+?<>~/-]*[A-Za-z0-9_])?$"
 
 # Where an instrument can cite a reference.
-sframe_reference_target_pattern <- "^(instrument|(item|scale|plan|model):.+)$"
+# hypothesis:<block id> names the hypotheses a plan block declares, and study
+# the study description (8b-R), so both can cite sources.
+sframe_reference_target_pattern <- "^(instrument|study|(item|scale|plan|model|hypothesis):.+)$"
 
 # CSL item types a reference may take. A subset of CSL 1.0.2, the ones a
 # survey instrument plausibly cites.
@@ -63,7 +65,9 @@ sframe_reference_types <- c(
 #'   French or Lithuanian journal name.
 #' @param cited_by Character vector. Where the instrument cites this
 #'   reference: `"instrument"`, `"item:<id>"`, `"scale:<id>"`,
-#'   `"plan:<block id>"` or `"model:<id>"`. Optional.
+#'   `"plan:<block id>"`, `"model:<id>"`, `"hypothesis:<block id>"` (the
+#'   hypotheses that plan block declares) or `"study"` (the study's problem,
+#'   objectives and sampling). Optional.
 #'
 #' @return An object of class `sf_reference`.
 #' @seealso [read_bibtex()], [sframe_add_references()], [sframe_get_references()]
@@ -189,7 +193,8 @@ sframe_reference_targets <- function(x, id) {
   if (length(bad)) {
     sframe_abort_validation(paste0(
       "Reference '", id, "' has cited_by target(s) ", paste0("'", bad, "'", collapse = ", "),
-      ". Use 'instrument', 'item:<id>', 'scale:<id>', 'plan:<block id>' or 'model:<id>'."
+      ". Use 'instrument', 'item:<id>', 'scale:<id>', 'plan:<block id>', 'model:<id>', ",
+      "'hypothesis:<block id>' or 'study'."
     ))
   }
   x
@@ -619,17 +624,32 @@ sframe_reference_problems <- function(instrument) {
     item = vapply(instrument$items %||% list(), function(x) as.character(x$id %||% ""), character(1)),
     scale = vapply(instrument$scales %||% list(), function(x) as.character(x$id %||% ""), character(1)),
     plan = vapply(instrument$analysis_plan %||% list(), function(x) as.character(x$id %||% ""), character(1)),
-    model = vapply(instrument$models %||% list(), function(x) as.character(x$id %||% ""), character(1))
+    model = vapply(instrument$models %||% list(), function(x) as.character(x$id %||% ""), character(1)),
+    hypothesis = vapply(instrument$analysis_plan %||% list(), function(x) as.character(x$id %||% ""), character(1))
   )
+  # The plan blocks whose hypotheses hold text a source can be cited for.
+  with_hyp <- vapply(instrument$analysis_plan %||% list(), function(x) {
+    h <- x$hypotheses
+    is.list(h) && any(nzchar(trimws(as.character(unlist(h)))))
+  }, logical(1))
   for (r in refs) {
     for (target in r$cited_by %||% character(0)) {
       if (identical(target, "instrument")) next
+      if (identical(target, "study")) {
+        if (!length(instrument$study %||% list())) {
+          problems <- c(problems, paste0("Reference '", r$id, "' is cited by the study, which the instrument does not describe."))
+        }
+        next
+      }
       kind <- sub(":.*$", "", target)
       id <- sub("^[a-z]+:", "", target)
       if (!grepl(sframe_reference_target_pattern, target) || !kind %in% names(known)) {
         problems <- c(problems, paste0("Reference '", r$id, "' is cited by '", target, "', which is not a target surveyframe knows."))
       } else if (!id %in% known[[kind]]) {
         problems <- c(problems, paste0("Reference '", r$id, "' is cited by ", kind, " '", id, "', which is missing from the instrument."))
+      } else if (identical(kind, "hypothesis") && !with_hyp[match(id, known$hypothesis)]) {
+        problems <- c(problems, paste0("Reference '", r$id, "' is cited by the hypotheses of plan block '", id,
+                                       "', but plan block '", id, "' declares no hypotheses."))
       }
     }
   }
