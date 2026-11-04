@@ -326,6 +326,28 @@ test_that("no screen offers 2 controls for the same destination (item 12d)", {
   }
 })
 
+test_that("each screen has exactly 1 primary action, visible without scrolling at 1280 px (item 12e)", {
+  b <- ui1_studio("factor_structure", width = 1280, height = 900)
+  for (screen in setdiff(sframe_studio_screens(), "design")) {
+    expect_true(ui1_screen(b, screen), info = screen)
+    Sys.sleep(1.5)
+    ui2_js(b, "window.scrollTo(0, 0); true")
+    got <- ui2_js(b, sprintf(paste0(
+      "(function(){ var p = $('#screen-%s .sf-primary:visible');",
+      "  var r = p.length ? p[0].getBoundingClientRect() : null;",
+      "  return p.length + ':' + $('#screen-%s .btn-primary:visible').length + ':' + (r && r.top >= 0 && r.bottom <= window.innerHeight); })()"),
+      screen, screen))
+    expect_identical(got, "1:1:true", info = screen)
+  }
+  expect_true(ui1_screen(b, "design"))
+  doc <- "document.getElementById('design_frame').contentWindow.document"
+  expect_true(ui2_wait(b, paste0("!!", doc, ".querySelector('#saveBtn.sf-primary')"), 60))
+  expect_identical(ui2_js(b, paste0(doc, ".querySelectorAll('.sf-primary').length")), 1L)
+  expect_true(ui2_js(b, paste0("(function(){ var s = ", doc, ".getElementById('saveBtn'), t = ", doc,
+    ".querySelector('.topbar'); return t.firstElementChild === s && s.getBoundingClientRect().bottom <= window.innerHeight; })()")))
+  expect_true(ui2_wait(b, paste0("parseInt(getComputedStyle(", doc, ".getElementById('saveBtn')).fontSize) >= 15"), 10))
+})
+
 # Last, since it loads the page again, which starts Studio's session again.
 test_that("sidebar groups fold, stay folded after a reload, and a fragment into a folded group opens it", {
   b <- ui1_studio("factor_structure")

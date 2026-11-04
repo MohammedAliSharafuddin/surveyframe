@@ -1224,6 +1224,15 @@ studio_nav_heading <- function(label) {
 
 # The Report screen's local tabs (UX-07): a tab button and its pane. The
 # panes are hidden, never redrawn, so their inputs keep their values.
+# A screen's 1 primary action (item 12e): a link to its next step, drawn
+# with the shared .sf-primary class in www/studio-actions.css.
+studio_next_primary <- function(tab, label) {
+  tags$a(href = paste0("#", tab), `data-tab` = tab, class = "btn btn-primary sf-primary", label)
+}
+studio_primary_file <- function(tag) {
+  htmltools::tagQuery(tag)$find(".btn")$addClass("btn-primary sf-primary")$allTags()
+}
+
 studio_report_tab <- function(id, label, on = FALSE) {
   tags$button(type = "button", id = paste0("rtab-", id),
     class = paste("report-tab", if (on) "active"), role = "tab",
@@ -1239,6 +1248,7 @@ ui <- fluidPage(
   tags$head(
     tags$title("SurveyStudio"),
     tags$script(src = "sfbuilder/field_tools.js"),
+    tags$link(rel = "stylesheet", href = "sfstudio/studio-actions.css"),
     tags$style(HTML("
       body { font-family: 'Helvetica Neue', Arial, sans-serif;
              background: #f7f8fa; color: #1a1a2e; margin: 0; }
@@ -1782,10 +1792,10 @@ ui <- fluidPage(
         tags$div(class = "screen-head", tags$h2(class = "screen-title", "Open Instrument")),
         tags$div(class = "card",
           tags$div(class = "card-title", "Load an existing .sframe"),
-          fileInput("instr_file", NULL,
+          studio_primary_file(fileInput("instr_file", NULL,
                     accept = ".sframe",
                     buttonLabel = "Browse .sframe file",
-                    placeholder = "No file selected"),
+                    placeholder = "No file selected")),
           uiOutput("open_status")
         ),
         uiOutput("instrument_summary_card")
@@ -1798,7 +1808,7 @@ ui <- fluidPage(
           tags$div(class = "card-title", "Change the instrument"),
           tags$p(class = "hint",
             "Studio keeps the open instrument as the version before. Edit it in Design and save, and Studio asks what changed and why before it records the amendment."),
-          actionButton("amend_edit_design", "Edit in Design", class = "btn-primary"),
+          actionButton("amend_edit_design", "Edit in Design", class = "btn-primary sf-primary"),
           tags$details(class = "amend-import",
             tags$summary("Import an externally revised version"),
             tags$p(class = "hint",
@@ -1835,7 +1845,7 @@ ui <- fluidPage(
           selectizeInput("refs_cited_by", "Where is this source used?", choices = NULL, multiple = TRUE,
             options = list(placeholder = "The instrument as a whole")),
           tags$p(class = "hint", "Stored as the reference's cited by list in the .sframe file."),
-          actionButton("refs_add_btn", "Add from BibTeX", class = "btn-primary")
+          actionButton("refs_add_btn", "Add from BibTeX", class = "btn-primary sf-primary")
         ),
         tags$div(class = "card",
           tags$div(class = "card-title", "Remove a reference"),
@@ -1845,7 +1855,8 @@ ui <- fluidPage(
       ),
 
       tags$div(id = "screen-preview", class = screen_class("preview"),
-        tags$div(class = "screen-head", tags$h2(class = "screen-title", "Preview")),
+        tags$div(class = "screen-head", tags$h2(class = "screen-title", "Preview"),
+          studio_next_primary("collect", "Share this survey")),
         uiOutput("preview_gate"),
         tags$div(id = "survey_preview_frame", uiOutput("survey_preview_items"))
       ),
@@ -1877,7 +1888,7 @@ ui <- fluidPage(
             "One HTML file holds the whole survey. Put it on any web host, such as GitHub Pages or Netlify, or send the file itself. With a collector URL, each submission goes to your sheet. Without one, the survey runs but stores nothing."),
           textInput("collect_endpoint", "Web app address that receives the responses", width = "100%",
                     placeholder = "https://script.google.com/macros/s/.../exec"),
-          downloadButton("collect_survey_dl", "Download survey (.html)", class = "btn-primary")
+          downloadButton("collect_survey_dl", "Download survey (.html)", class = "btn-primary sf-primary")
         ),
         tags$div(class = "card",
           tags$div(class = "card-title", "3. Read the responses"),
@@ -1902,7 +1913,7 @@ ui <- fluidPage(
             column(4, textInput("resp_time_col", "Column holding the submission time", placeholder = "e.g. submitted_at")),
             column(4, checkboxInput("resp_strict", "Refuse a file with missing or unexpected columns (strict column check)", value = TRUE))
           ),
-          actionButton("load_responses_btn", "Load responses", class = "btn-primary")
+          actionButton("load_responses_btn", "Load responses", class = "btn-primary sf-primary")
         ),
         tags$div(class = "card",
           tags$div(class = "card-title", "Loading responses collected elsewhere"),
@@ -1927,14 +1938,15 @@ ui <- fluidPage(
             column(4, textInput("sheet_id_col", "Column holding each response's ID", value = "respondent_id")),
             column(4, textInput("sheet_time_col", "Column holding the submission time", value = "submitted_at"))
           ),
-          actionButton("load_sheet_btn", "Read from Google Sheet", class = "btn-primary")
+          actionButton("load_sheet_btn", "Read from Google Sheet", class = "btn-outline")
         ),
         uiOutput("responses_summary_card"),
         uiOutput("responses_amend_card")
       ),
 
       tags$div(id = "screen-quality", class = screen_class("quality"),
-        tags$div(class = "screen-head", tags$h2(class = "screen-title", "Quality")),
+        tags$div(class = "screen-head", tags$h2(class = "screen-title", "Quality"),
+          studio_next_primary("reliability", "Check reliability")),
         uiOutput("quality_gate"),
         uiOutput("quality_output"),
         plotOutput("studio_quality_chart", height = "260px"),
@@ -1943,14 +1955,16 @@ ui <- fluidPage(
       ),
 
       tags$div(id = "screen-reliability", class = screen_class("reliability"),
-        tags$div(class = "screen-head", tags$h2(class = "screen-title", "Reliability")),
+        tags$div(class = "screen-head", tags$h2(class = "screen-title", "Reliability"),
+          studio_next_primary("analysis", "Run the declared analyses")),
         uiOutput("reliability_gate"),
         uiOutput("reliability_output"),
         plotOutput("studio_reliability_chart", height = "300px")
       ),
 
       tags$div(id = "screen-analysis", class = screen_class("analysis"),
-        tags$div(class = "screen-head", tags$h2(class = "screen-title", "Analyse")),
+        tags$div(class = "screen-head", tags$h2(class = "screen-title", "Analyse"),
+          studio_next_primary("export", "Interpret and report")),
         uiOutput("analysis_gate"),
         uiOutput("analysis_declared_plan"),
         uiOutput("analysis_results_row")
@@ -1977,7 +1991,8 @@ ui <- fluidPage(
         # The .sframe download sits beside the title as "Download copy".
         tags$div(class = "screen-head",
           tags$h2(class = "screen-title", "Report"),
-          uiOutput("export_sframe_ui", inline = TRUE)),
+          tags$span(class = "screen-head-actions", uiOutput("export_sframe_ui", inline = TRUE),
+            uiOutput("export_report_ui", inline = TRUE))),
         uiOutput("export_gate"),
         tags$div(class = "report-tabs", role = "tablist", `aria-label` = "Report",
           studio_report_tab("interpret", "Interpret", TRUE),
@@ -2054,7 +2069,6 @@ ui <- fluidPage(
             shiny::radioButtons("rpt_format", "Format",
               choices = sframe_studio_report_formats(sframe_studio_quarto_note()$ok),
               selected = "html"),
-            uiOutput("export_report_ui"),
             tags$p(class = "hint",
               "The survey file and the Google Sheets collector are on the Collect screen.")
           )),
@@ -3805,7 +3819,7 @@ server <- function(input, output, session) {
 
     tags$div(class = "card",
       tags$div(class = "card-title", "Raw responses"),
-      downloadButton("dash_dl_csv", "Download CSV", class = "btn-outline"),
+      downloadButton("dash_dl_csv", "Download CSV", class = "btn-primary sf-primary"),
       tags$p(class = "hint", paste0("Showing the first 200 of ", nrow(resp), " rows.")),
       tags$div(style = "overflow-x:auto", shiny::tableOutput("studio_raw_table"))
     )
@@ -3933,9 +3947,9 @@ server <- function(input, output, session) {
 
   # A non-clickable placeholder shown when an export is not yet possible, so the
   # user cannot trigger a download that would error.
-  export_disabled_btn <- function(label, hint) {
+  export_disabled_btn <- function(label, hint, primary = FALSE) {
     tagList(
-      tags$button(type = "button", class = "btn btn-primary", disabled = NA,
+      tags$button(type = "button", class = if (primary) "btn btn-primary sf-primary" else "btn btn-outline", disabled = NA,
         style = "opacity: .5; cursor: not-allowed;",
         shiny::icon("download"), " ", label),
       tags$p(class = "hint", hint)
@@ -3963,11 +3977,11 @@ server <- function(input, output, session) {
 
   output$export_report_ui <- renderUI({
     if (!is.null(rv$instrument)) {
-      downloadButton("download_report_btn", "Generate report", class = "btn-primary")
+      downloadButton("download_report_btn", "Export report", class = "btn-primary sf-primary")
     } else {
       export_disabled_btn(
-        "Generate report",
-        "Open or build a valid instrument before generating the report.")
+        "Export report",
+        "Open or build a valid instrument before generating the report.", primary = TRUE)
     }
   })
 
@@ -3998,7 +4012,7 @@ server <- function(input, output, session) {
 
   output$export_source_ui <- renderUI({
     if (!is.null(rv$instrument)) {
-      downloadButton("download_source_btn", "Download source (.zip)", class = "btn-primary")
+      downloadButton("download_source_btn", "Download source (.zip)", class = "btn-outline")
     } else {
       export_disabled_btn("Download source (.zip)",
         "Open or build a valid instrument before writing the source.")

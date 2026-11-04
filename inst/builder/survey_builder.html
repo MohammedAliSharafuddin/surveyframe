@@ -5682,6 +5682,12 @@ function studioHostInit(){
   updSave();
   var sb=document.getElementById('saveBtn');
   sb.textContent='Save to Studio';sb.title='Make this survey the instrument Studio has open (Ctrl+S)';
+  // Save to Studio is the Design screen's 1 primary action (item 12e): full
+  // size, Studio's shared .sf-primary class, and first in the bar.
+  var css=document.createElement('link');css.rel='stylesheet';css.href='../sfstudio/studio-actions.css';
+  document.head.appendChild(css);
+  sb.classList.remove('btn-sm','btn-p');sb.classList.add('sf-primary');
+  var tb=document.querySelector('.topbar');tb.insertBefore(sb,tb.firstChild);
   window.addEventListener('message',function(e){
     if(e.source!==window.parent||e.origin!==location.origin)return;
     var d=e.data||{};
