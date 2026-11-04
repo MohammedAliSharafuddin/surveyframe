@@ -1,7 +1,18 @@
-/* inst/builder/citation_picker.js
+/* inst/builder/field_tools.js
  *
- * SurveyframeCitationPicker: 1 citation picker for SurveyBuilder and
- * SurveyStudio, with no server, no editor library and no new package.
+ * The tools on SurveyBuilder's and SurveyStudio's long free-text fields: a
+ * citation picker and a format toolbar, with no server, no editor library
+ * and no new package. The field stores Markdown as typed, which the report
+ * renders.
+ *
+ * The format toolbar appears when the field has focus and hides when focus
+ * leaves both. Bold, italic, bulleted list, numbered list, link, cite,
+ * subscript and superscript write **x**, *x*, "- ", "1. ", [x](url), the
+ * picker's citation, ~x~ and ^x^ around the selection, and a preview line
+ * under the field shows the result. Ctrl+B and Ctrl+I work in the field. The
+ * toolbar is a labelled role=toolbar: arrow keys move along it, and Escape
+ * returns to the field. Set options.toolbar to false for the picker alone,
+ * which then adds a Cite button after the field instead.
  *
  *   var h = SurveyframeCitationPicker.attach(textarea, references, options);
  *   SurveyframeCitationPicker.updateReferences(references);
@@ -171,6 +182,130 @@ function unknownKeys(text,known){
   return out;
 }
 
+// -- Markdown -----------------------------------------------------------------
+// Each edit returns {text, start, end}: the new text and the selection after.
+function trimSel(text,start,end){
+  while(start<end&&/\s/.test(text.charAt(start)))start++;
+  while(end>start&&/\s/.test(text.charAt(end-1)))end--;
+  return [start,end];
+}
+var PLACEHOLDER={'**':'bold text','*':'italic text','~':'sub','^':'sup'};
+// **x**, *x*, ~x~ or ^x^ around the selection, or around a placeholder that
+// is left selected. Pressed again on marked text, the marks come off.
+function wrap(text,start,end,mark){
+  text=String(text||'');
+  var t=trimSel(text,start,end);start=t[0];end=t[1];
+  var m=mark.length,before=text.slice(0,start),after=text.slice(end);
+  var on=start<end&&before.slice(-m)===mark&&after.slice(0,m)===mark;
+  // The * of a ** is bold, so italic on bold text adds its own marks.
+  if(on&&mark==='*'&&((before.slice(-2)==='**'&&before.slice(-3)!=='***')||(after.slice(0,2)==='**'&&after.slice(0,3)!=='***')))on=false;
+  if(on)return {text:before.slice(0,-m)+text.slice(start,end)+after.slice(m),start:start-m,end:end-m};
+  var inner=start<end?text.slice(start,end):PLACEHOLDER[mark];
+  // Pandoc's ~sub~ and ^sup^ hold no bare space.
+  if(mark==='~'||mark==='^')inner=inner.replace(/\\?[ \t]/g,'\\ ');
+  return {text:before+mark+inner+mark+after,start:start+m,end:start+m+inner.length};
+}
+// "- " or "1. " before every line the selection touches, or off again when
+// every one has it. Pandoc starts a list only after a blank line, so 1 is
+// added after a paragraph.
+function list(text,start,end,kind){
+  text=String(text||'');
+  var ls=text.lastIndexOf('\n',start-1)+1;
+  var le=text.indexOf('\n',(end>start&&text.charAt(end-1)==='\n')?end-1:end);
+  if(le<0)le=text.length;
+  var lines=text.slice(ls,le).split('\n');
+  var re=kind==='numbered'?/^\d+\.[ \t]/:/^[-*+][ \t]/;
+  var filled=lines.filter(function(l){return l.trim();});
+  var all=filled.length>0&&filled.every(function(l){return re.test(l);});
+  var k=0,block;
+  if(!filled.length){block=kind==='numbered'?'1. ':'- ';}
+  else block=lines.map(function(l){
+    if(all)return l.replace(re,'');
+    if(!l.trim())return l;
+    k++;return (kind==='numbered'?k+'. ':'- ')+l.replace(/^(\d+\.|[-*+])[ \t]/,'');
+  }).join('\n');
+  var before=text.slice(0,ls),after=text.slice(le);
+  if(!all&&before&&!/\n[ \t]*\n$/.test(before))before+='\n';
+  var at=before.length+block.length;
+  return {text:before+block+after,start:at,end:at};
+}
+// [selection](https://), with the address selected to be typed over.
+function link(text,start,end){
+  text=String(text||'');
+  var t=trimSel(text,start,end);start=t[0];end=t[1];
+  var label=start<end?text.slice(start,end):'link text',url='https://';
+  var s=start+label.length+3;
+  return {text:text.slice(0,start)+'['+label+']('+url+')'+text.slice(end),start:s,end:s+url.length};
+}
+// $x$ around the selection, or $$ on lines of their own when it spans whole
+// lines. Pandoc's inline $ takes no space just inside it.
+function math(text,start,end){
+  text=String(text||'');
+  var whole=start<end&&(start===0||text.charAt(start-1)==='\n')&&(end===text.length||text.charAt(end)==='\n');
+  if(whole){
+    var body=text.slice(start,end).replace(/\n+$/,'');
+    var ins='$$\n'+body+'\n$$';
+    return {text:text.slice(0,start)+ins+text.slice(start+body.length),start:start+3,end:start+3+body.length};
+  }
+  var t=trimSel(text,start,end);start=t[0];end=t[1];
+  var inner=start<end?text.slice(start,end):'x^2';
+  return {text:text.slice(0,start)+'$'+inner+'$'+text.slice(end),start:start+1,end:start+1+inner.length};
+}
+// The field's Markdown as HTML, for the preview line: emphasis, sub and
+// superscript, links, lists, paragraphs and citations, shown as the report
+// shows them where the reference is known. Everything is escaped first.
+function preview(text,refs){
+  var known={};asArr(refs).forEach(function(r){if(r&&r.id)known[r.id]=r;});
+  var seg=new RegExp('^(.*?)(-?)@('+KEY+')(.*)$');
+  // Code and equations are shown as typed, in monospace, so nothing inside
+  // them is formatted. The builder has no math library, so TeX stays TeX.
+  function inline(s){
+    var held=[];
+    function hold(html){held.push(html);return '\u0001'+(held.length-1)+'\u0001';}
+    s=String(s).replace(/`([^`]+)`/g,function(a,c){return hold('<code>'+esc(c)+'</code>');});
+    s=s.replace(/\$\$([^$]+)\$\$/g,function(a,c){return hold('<code>'+esc(c.trim())+'</code>');});
+    s=s.replace(/\$(?=\S)([^$]*?\S)\$(?!\d)/g,function(a,c){return hold('<code>'+esc(c)+'</code>');});
+    s=esc(s);
+    s=s.replace(/\[([^\[\]]*@[^\[\]]*)\]/g,function(all,inner){
+      var hit=0,parts=inner.split(';').map(function(p){
+        var m=p.trim().match(seg);var r=m&&known[m[3]];
+        if(!r)return p.trim();
+        hit++;
+        var body=esc(m[2]==='-'?yearOf(r):who(r,'&')+', '+yearOf(r));
+        return (m[1].trim()?m[1].trim()+' ':'')+body+m[4];
+      });
+      return hit?'('+parts.join('; ')+')':all;
+    });
+    s=s.replace(new RegExp('(^|[^A-Za-z0-9_;&])@('+KEY+')','g'),function(all,p,k){
+      return known[k]?p+esc(narrativeText(known[k])):all;
+    });
+    s=s.replace(/\[([^\[\]]+)\]\(((?:https?:\/\/|mailto:)[^\s()]+)\)/g,'<a href="$2" target="_blank" rel="noopener">$1</a>');
+    s=s.replace(/\*\*(?=\S)([^*]*?\S)\*\*/g,'<strong>$1</strong>');
+    s=s.replace(/\*(?=\S)([^*]*?\S)\*/g,'<em>$1</em>');
+    s=s.replace(/~((?:\\ |[^~\s])+)~/g,function(a,x){return '<sub>'+x.replace(/\\ /g,' ')+'</sub>';});
+    s=s.replace(/\^((?:\\ |[^\^\s])+)\^/g,function(a,x){return '<sup>'+x.replace(/\\ /g,' ')+'</sup>';});
+    return s.replace(/\u0001(\d+)\u0001/g,function(a,i){return held[+i];});
+  }
+  var out=[],para=[],items=[],kind=null,eq=null;
+  function flushPara(){if(para.length)out.push('<p>'+para.map(inline).join(' ')+'</p>');para=[];}
+  function flushList(){if(items.length)out.push('<'+kind+'>'+items.map(function(x){return '<li>'+inline(x)+'</li>';}).join('')+'</'+kind+'>');items=[];kind=null;}
+  String(text||'').split('\n').forEach(function(l){
+    // A display equation, $$ on lines of their own.
+    if(eq){if(l.trim()==='$$'){out.push('<pre>'+esc(eq.join('\n'))+'</pre>');eq=null;}else eq.push(l);return;}
+    if(l.trim()==='$$'){flushPara();flushList();eq=[];return;}
+    var b=l.match(/^[ \t]*[-*+][ \t]+(.*)$/),n=l.match(/^[ \t]*\d+\.[ \t]+(.*)$/);
+    if(b||n){var k2=b?'ul':'ol';flushPara();if(kind&&kind!==k2)flushList();kind=k2;items.push((b||n)[1]);return;}
+    flushList();
+    if(!l.trim()){flushPara();return;}
+    para.push(l.trim());
+  });
+  flushPara();flushList();
+  if(eq)out.push('<p>$$</p>'+(eq.length?'<pre>'+esc(eq.join('\n'))+'</pre>':''));
+  return out.join('');
+}
+// Whether the text holds anything the preview would format.
+function hasMarkdown(text){return /[*~^\[`$]|(^|\s)@[A-Za-z0-9_]|^[ \t]*([-+]|\d+\.)[ \t]/m.test(String(text||''));}
+
 // -- Fields -------------------------------------------------------------------
 // The default adapter, for an input or a textarea. After an insertion it
 // sends input and change events, so a Shiny input sees the new value.
@@ -198,6 +333,18 @@ function fieldAdapter(el){
   };
 }
 
+var TOOLS=[
+  {id:'bold',label:'Bold',keys:'Ctrl+B',html:'<b>B</b>'},
+  {id:'italic',label:'Italic',keys:'Ctrl+I',html:'<i>I</i>'},
+  {id:'bullets',label:'Bulleted list',html:'&#8226; List'},
+  {id:'numbers',label:'Numbered list',html:'1. List'},
+  {id:'link',label:'Link',html:'Link'},
+  {id:'cite',label:'Cite a reference',html:'@ Cite'},
+  {id:'sub',label:'Subscript',html:'x<sub>2</sub>'},
+  {id:'sup',label:'Superscript',html:'x<sup>2</sup>'},
+  {id:'math',label:'Equation',html:'<i>f</i>(x)'}
+];
+
 var STYLE='.sfcp{position:fixed;z-index:10000;width:360px;max-width:calc(100vw - 16px);background:#fff;color:#1f2937;border:1px solid #cbd5e1;border-radius:8px;box-shadow:0 8px 24px rgba(15,23,42,.18);padding:10px;font:13px/1.4 system-ui,-apple-system,"Segoe UI",sans-serif}'
   +'.sfcp[hidden]{display:none}'
   +'.sfcp-h{font-weight:600;margin:0 0 6px}'
@@ -214,6 +361,12 @@ var STYLE='.sfcp{position:fixed;z-index:10000;width:360px;max-width:calc(100vw -
   +'.sfcp-m{display:inline-block;margin-top:8px;font-size:12px;color:#1d4ed8}'
   +'.sfcp-btn{margin:4px 0 0;padding:2px 8px;border:1px solid #cbd5e1;border-radius:5px;background:#f8fafc;font:12px system-ui,sans-serif;cursor:pointer}'
   +'.sfcp-msg{font-size:12px;color:#b91c1c;margin:3px 0 0}.sfcp-msg:empty{display:none}'
+  +'.sfcp-bar{display:flex;flex-wrap:wrap;gap:3px;margin:3px 0 0}.sfcp-bar[hidden]{display:none}'
+  +'.sfcp-tb{min-width:28px;height:24px;padding:0 7px;border:1px solid #cbd5e1;border-radius:4px;background:#f8fafc;color:#1f2937;font:12px system-ui,sans-serif;cursor:pointer}'
+  +'.sfcp-tb:hover,.sfcp-tb:focus{background:#e0e7ff;outline:2px solid #6366f1;outline-offset:0}'
+  +'.sfcp-pv{font-size:12px;color:#334155;background:#f8fafc;border-left:3px solid #c7d2fe;padding:4px 8px;margin:3px 0 0}.sfcp-pv:empty{display:none}'
+  +'.sfcp-pv p{margin:0 0 3px}.sfcp-pv ul,.sfcp-pv ol{margin:0 0 3px;padding-left:18px}.sfcp-pv code,.sfcp-pv pre{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px}.sfcp-pv pre{margin:0 0 3px;white-space:pre-wrap}'
+  +'.sfcp-pv-l{display:block;font-size:10px;text-transform:uppercase;letter-spacing:.04em;color:#64748b}'
   +'.sfcp-bad{text-decoration:underline wavy #dc2626;text-underline-offset:3px;font-family:ui-monospace,Menlo,Consolas,monospace}';
 function addStyle(){
   if(document.getElementById('sfcp-style'))return;
@@ -241,8 +394,42 @@ function attach(el,references,options){
   // The message under the field, for keys with no reference.
   var msg=document.createElement('div');
   msg.className='sfcp-msg';msg.id='sfcp-msg-'+n;msg.setAttribute('aria-live','polite');
-  var after=el.nextSibling;
-  if(options.button!==false){
+  var after=el.nextSibling,bar=null,pv=null,useBar=options.toolbar!==false;
+  if(useBar){
+    bar=document.createElement('div');bar.className='sfcp-bar';bar.hidden=true;
+    bar.setAttribute('role','toolbar');
+    bar.setAttribute('aria-label','Format '+(options.label||'text'));
+    if(el.id)bar.setAttribute('aria-controls',el.id);
+    bar.innerHTML=TOOLS.map(function(t,i){
+      var name=t.label+(t.keys?' ('+t.keys+')':'');
+      return '<button type="button" class="sfcp-tb" data-tool="'+t.id+'" tabindex="'+(i?'-1':'0')+'" aria-label="'+esc(name)+'" title="'+esc(name)+'"'
+        +(t.id==='cite'?' aria-haspopup="dialog"':'')+'>'+t.html+'</button>';
+    }).join('');
+    el.parentNode.insertBefore(bar,after);
+    // The field keeps focus and its selection while a button is pressed.
+    bar.addEventListener('mousedown',function(e){if(e.target.closest&&e.target.closest('.sfcp-tb'))e.preventDefault();});
+    bar.addEventListener('click',function(e){
+      var b=e.target.closest?e.target.closest('.sfcp-tb'):null;
+      if(b)tool(b.getAttribute('data-tool'),b);
+    });
+    bar.addEventListener('keydown',function(e){
+      var bs=Array.prototype.slice.call(bar.querySelectorAll('.sfcp-tb'));
+      var i=bs.indexOf(document.activeElement),j=-1;
+      if(e.key==='ArrowRight')j=(i+1)%bs.length;
+      else if(e.key==='ArrowLeft')j=(i-1+bs.length)%bs.length;
+      else if(e.key==='Home')j=0;
+      else if(e.key==='End')j=bs.length-1;
+      else if(e.key==='Escape'){e.preventDefault();e.stopPropagation();a.focus();return;}
+      if(j<0)return;
+      e.preventDefault();
+      bs.forEach(function(b,k){b.setAttribute('tabindex',k===j?'0':'-1');});
+      bs[j].focus();
+    });
+    bar.addEventListener('focusout',hideLater);
+    el.addEventListener('focus',showBar);
+    el.addEventListener('blur',hideLater);
+    el.addEventListener('keydown',onKey);
+  }else if(options.button!==false){
     btn=document.createElement('button');btn.type='button';btn.className='sfcp-btn';
     btn.textContent='Cite';
     btn.setAttribute('aria-label','Cite a reference'+(options.label?' in '+options.label:''));
@@ -250,11 +437,59 @@ function attach(el,references,options){
     btn.addEventListener('click',function(){var s=a.getSelection();open({start:s.start,end:s.end},btn);});
     el.parentNode.insertBefore(btn,after);
   }
-  el.parentNode.insertBefore(msg,btn?btn.nextSibling:after);
+  var anchor=bar||btn;
+  el.parentNode.insertBefore(msg,anchor?anchor.nextSibling:after);
+  if(useBar){
+    pv=document.createElement('div');pv.className='sfcp-pv';pv.id='sfcp-pv-'+n;
+    el.parentNode.insertBefore(pv,msg.nextSibling);
+  }
   var described=(el.getAttribute('aria-describedby')||'').split(/\s+/).filter(function(x){return x;});
   if(described.indexOf(msg.id)<0){described.push(msg.id);el.setAttribute('aria-describedby',described.join(' '));}
 
+  function showBar(){if(bar)bar.hidden=false;}
+  function inside(x){return !!x&&(x===el||(bar&&bar.contains(x))||(shared&&shared.el.contains(x)));}
+  // Hidden once focus has left the field, its toolbar and its picker.
+  function hideLater(){
+    if(!bar)return;
+    setTimeout(function(){
+      if(shared&&shared.owner===h)return;
+      if(!inside(document.activeElement))bar.hidden=true;
+    },0);
+  }
+  h._afterClose=hideLater;
+  function apply(res){
+    busy=true;
+    a.replaceRange(0,a.getText().length,res.text,res.end);
+    busy=false;
+    if(el.setSelectionRange){try{el.setSelectionRange(res.start,res.end);}catch(e){}}
+    a.focus();check();showPreview();
+  }
+  function tool(id,from){
+    var s=a.getSelection(),t=a.getText();
+    if(id==='bold')apply(wrap(t,s.start,s.end,'**'));
+    else if(id==='italic')apply(wrap(t,s.start,s.end,'*'));
+    else if(id==='sub')apply(wrap(t,s.start,s.end,'~'));
+    else if(id==='sup')apply(wrap(t,s.start,s.end,'^'));
+    else if(id==='bullets')apply(list(t,s.start,s.end,'bulleted'));
+    else if(id==='numbers')apply(list(t,s.start,s.end,'numbered'));
+    else if(id==='link')apply(link(t,s.start,s.end));
+    else if(id==='math')apply(math(t,s.start,s.end));
+    // A citation goes after the selection, which it leaves in place.
+    else if(id==='cite')open({start:s.end,end:s.end},el);
+  }
+  function onKey(e){
+    if(!(e.ctrlKey||e.metaKey)||e.altKey||e.shiftKey)return;
+    var k=String(e.key||'').toLowerCase();
+    if(k==='b'||k==='i'){e.preventDefault();e.stopPropagation();tool(k==='b'?'bold':'italic');}
+  }
+  function showPreview(){
+    if(!pv)return;
+    var t=a.getText();
+    pv.innerHTML=hasMarkdown(t)?'<span class="sfcp-pv-l">Preview</span>'+preview(t,refs()):'';
+  }
+
   function check(){
+    showPreview();
     var bad=unknownKeys(a.getText(),known());
     if(!bad.length){msg.innerHTML='';el.removeAttribute('aria-invalid');return bad;}
     msg.innerHTML=bad.map(function(k){return '<span class="sfcp-bad">@'+esc(k)+'</span> '+esc(MSG_UNKNOWN);}).join('<br>');
@@ -364,6 +599,7 @@ function attach(el,references,options){
     P.el.hidden=true;P.owner=null;
     var back=focusField?el:P.returnTo;P.returnTo=null;
     if(back&&back.focus)back.focus();
+    if(h._afterClose)h._afterClose();
   };
   h._key=function(e){
     var k=e.key;
@@ -401,6 +637,8 @@ function attach(el,references,options){
     el.removeEventListener('input',onInput);el.removeEventListener('focus',check);
     clearTimeout(timer);
     if(btn&&btn.parentNode)btn.parentNode.removeChild(btn);
+    if(bar){el.removeEventListener('focus',showBar);el.removeEventListener('blur',hideLater);el.removeEventListener('keydown',onKey);if(bar.parentNode)bar.parentNode.removeChild(bar);}
+    if(pv&&pv.parentNode)pv.parentNode.removeChild(pv);
     if(msg.parentNode)msg.parentNode.removeChild(msg);
     el.removeAttribute('aria-invalid');
     var d=(el.getAttribute('aria-describedby')||'').split(/\s+/).filter(function(x){return x&&x!==msg.id;});
@@ -419,7 +657,8 @@ root.SurveyframeCitationPicker={
   destroy:function(){handles.slice().forEach(function(h){h.destroy();});},
   // Pure helpers, for tests and for hosts that need them.
   normalise:normalise,filter:filter,trigger:trigger,insertion:insertion,
-  unknownKeys:unknownKeys,narrativeText:narrativeText,parentheticalText:parentheticalText,
+  unknownKeys:unknownKeys,wrap:wrap,list:list,link:link,math:math,preview:preview,hasMarkdown:hasMarkdown,
+  narrativeText:narrativeText,parentheticalText:parentheticalText,
   message:MSG_UNKNOWN
 };
 })(typeof window!=='undefined'?window:this);

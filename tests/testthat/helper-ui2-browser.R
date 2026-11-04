@@ -84,10 +84,12 @@ ui2_type <- function(session, id, text) {
     jsonlite::toJSON(id, auto_unbox = TRUE), jsonlite::toJSON(text, auto_unbox = TRUE)))
 }
 
-ui2_key <- function(session, selector, key, shift = FALSE) {
+ui2_key <- function(session, selector, key, shift = FALSE, ctrl = FALSE) {
+  # An empty selector sends the key to the element with focus.
   ui2_js(session, sprintf(
-    "(function(){var e=document.querySelector(%s)||document.activeElement;
-      e.dispatchEvent(new KeyboardEvent('keydown',{key:%s,shiftKey:%s,bubbles:true,cancelable:true}));return 1;})()",
+    "(function(){var s=%s;var e=s?document.querySelector(s):document.activeElement;
+      e.dispatchEvent(new KeyboardEvent('keydown',{key:%s,shiftKey:%s,ctrlKey:%s,bubbles:true,cancelable:true}));return 1;})()",
     jsonlite::toJSON(selector, auto_unbox = TRUE), jsonlite::toJSON(key, auto_unbox = TRUE),
-    if (shift) "true" else "false"))
+    if (shift) "true" else "false", if (ctrl) "true" else "false"))
 }
+
