@@ -36,11 +36,14 @@ test_that("an interpretation identical to the decision rule counts as unwritten"
   expect_identical(env$studio_saved_interpretation(block), "")
 })
 
+# UI-1 (UX-02): the plan editor is the builder's Plan only, so the label is
+# checked there, and Studio holds no decision rule box of its own.
 test_that("the plan editor labels its box as the declared decision rule", {
   app <- system.file("shiny", "app.R", package = "surveyframe")
+  builder <- system.file("builder", "survey_builder.html", package = "surveyframe")
   skip_if(!nzchar(app) || !file.exists(app), "studio app not available")
+  html <- paste(readLines(builder, warn = FALSE), collapse = "\n")
+  expect_match(html, "Decision rule (declared now)", fixed = TRUE)
   txt <- paste(readLines(app, warn = FALSE), collapse = "\n")
-  expect_match(txt, "Decision rule (declared now)", fixed = TRUE)
-  expect_false(grepl("interpretation = trim_or_null(input$analysis_decision_rule)",
-                     txt, fixed = TRUE))
+  expect_false(grepl("analysis_decision_rule", txt, fixed = TRUE))
 })

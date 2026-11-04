@@ -88,34 +88,10 @@ d12_open_export <- function(js) {
   testthat::expect_true(js(open))
 }
 
-test_that("typed H0, H1 and decision rule reach the saved .sframe", {
-  d12_with_studio(d12_instrument(), function(js, wait, download) {
-    expect_true(wait("!!document.getElementById('analysis_method')"))
-    js("document.getElementById('analysis_method').selectize.setValue('t_test_ind'); true")
-    expect_true(wait("!!document.getElementById('analysis_hyp_null') && !!document.getElementById('analysis_role_group')"))
-    js("document.getElementById('analysis_role_group').selectize.setValue('grp'); true")
-    js("document.getElementById('analysis_role_outcome').selectize.setValue('score'); true")
-    d12_type(js, "analysis_hyp_null", "Mean score does not differ by group.")
-    d12_type(js, "analysis_hyp_alt", "")
-    d12_type(js, "analysis_decision_rule", "Reject H0 if p < .05.")
-    Sys.sleep(1)
-    expect_true(wait("!!document.getElementById('save_analysis_plan_btn')"))
-    js("document.getElementById('save_analysis_plan_btn').click(); true")
-    expect_true(wait("(document.getElementById('shiny-notification-panel')||{}).innerText.indexOf('Analysis plan saved') >= 0"))
-
-    d12_open_export(js)
-    expect_true(wait("!!document.getElementById('download_sframe_btn') && !!document.getElementById('download_sframe_btn').getAttribute('href')"))
-    out <- download(tempfile(fileext = ".sframe"))
-    block <- read_sframe(out)$analysis_plan[[1]]
-    expect_identical(block$method, "t_test_ind")
-    expect_identical(block$hypotheses$null, "Mean score does not differ by group.")
-    expect_null(block$hypotheses$alternative)
-    expect_identical(block$decision_rule, "Reject H0 if p < .05.")
-    expect_true(is.null(block$interpretation) || !nzchar(block$interpretation))
-    # The empty H1 field was left to its placeholder, which is never saved.
-    expect_identical(names(block$hypotheses), "null")
-  })
-})
+# UI-1 (UX-02): Studio's Analyse no longer edits the plan, so the test that
+# typed H0, H1 and the decision rule there went. The builder's Plan is the
+# only plan editor, and test-builder-d12-browser.R checks those fields reach
+# the saved block.
 
 test_that("a file with the old fixed hypotheses saves untouched with the same hash", {
   old <- list(list(

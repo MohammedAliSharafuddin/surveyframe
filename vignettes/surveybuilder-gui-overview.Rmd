@@ -160,15 +160,16 @@ no amendment, and the references travel in the exported `.sframe` file.
 The Preview screen renders the exact deployable survey, identical to the
 exported HTML.
 
-The Analyse screen does two jobs. It edits the plan, with the same
-research question, method, significance level, and role fields as the builder.
-It also runs the plan. When response data have been uploaded, the Run preview
-tab calls `run_analysis_plan()` and shows a card for each research question:
-the APA result, the effect size, a formatted table and the chart, across the
-width of the screen. Without responses, it asks you to upload data before
-running.
+The Analyse screen runs the declared plan. It shows the plan read-only, with
+each block's method, variables, declared hypotheses and, for a cross-tab,
+the percentages, and "Change plan" opens Plan, the only plan editor. When
+response data have been loaded, it calls `run_analysis_plan()` and shows a
+card for each research question: the APA result, the effect size, a
+formatted table and the chart, across the width of the screen. A plan
+changed once responses are loaded is a design amendment, so the save opens
+the amendment dialog with the changed blocks in the deviation report.
 
-```{r fig-studio-analysis, echo = FALSE, out.width = "100%", fig.alt = "A SurveyStudio result card on the Analyse screen's Run preview tab: research question 1 asks whether digital experience is associated with behavioural intention, with the result r(118) = 0.60, 95% CI 0.48 to 0.71, p below .001, a one-row table of the statistic, and a scatter plot with a fitted line."}
+```{r fig-studio-analysis, echo = FALSE, out.width = "100%", fig.alt = "A SurveyStudio result card on the Analyse screen: research question 1 asks whether digital experience is associated with behavioural intention, with the result r(118) = 0.60, 95% CI 0.48 to 0.71, p below .001, a one-row table of the statistic, and a scatter plot with a fitted line."}
 knitr::include_graphics("figures/gui-studio-analysis.png")
 ```
 

@@ -67,4 +67,27 @@ test_that("Quality records a bot removal as a pipeline amendment", {
   expect_true(ui2_wait(b, "document.getElementById('status_instrument').innerText.indexOf('3 amendments') >= 0", 20))
 })
 
+test_that("Analyse shows the declared plan, and a plan change after the data is a design amendment", {
+  b <- ui1_studio("factor_structure")
+  expect_true(ui1_screen(b, "analysis"))
+  expect_true(ui2_wait(b, "!!document.querySelector('#declared_plan_card table')", 30))
+  plan <- ui1_text(b, "declared_plan_card")
+  expect_match(plan, "RQ2", fixed = TRUE)
+  expect_match(plan, "Research question", fixed = TRUE)
+  expect_false(ui2_js(b, "!!document.querySelector('input[name=analysis_stage]')"))
+  expect_false(ui2_js(b, "!!document.getElementById('analysis_method')"))
+
+  ui2_js(b, "$('#analysis_change_plan').click(); true")
+  expect_true(ui2_wait(b, "$('#screen-plan').hasClass('active') || $('#screen-design').hasClass('active')", 20))
+  frame <- "document.getElementById('design_frame').contentWindow"
+  expect_true(ui2_wait(b, paste0(frame, ".S && ", frame, ".S.analysis_plan.length > 1"), 60))
+  ui2_js(b, paste0("var w=", frame, "; w.S.analysis_plan[1].research_question = 'A narrower question.'; w.setDirty(); w.saveSframe(); true"))
+  expect_true(ui2_wait(b, ui1_modal_open, 30))
+  expect_match(ui1_text(b, "shiny-modal"), "The plan changed after the responses were loaded", fixed = TRUE)
+  expect_match(ui2_js(b, "$('#amend_dlg-deviation_report').val()"),
+               "Plan changed after the responses were loaded: RQ2 changed. Reason: ", fixed = TRUE)
+  ui2_js(b, "$('#amend_dlg-cancel').click(); true")
+  expect_true(ui2_wait(b, paste0("!", ui1_modal_open), 20))
+})
+
 ui1_close()
