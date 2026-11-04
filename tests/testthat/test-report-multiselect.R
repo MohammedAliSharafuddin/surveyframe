@@ -24,6 +24,7 @@ multi_responses <- function() {
 }
 
 rendered <- function(instr, data) {
+  rlang::local_options(surveyframe.use_quarto = FALSE)  # not a Quarto test (session T)
   out <- tempfile(fileext = ".html")
   suppressMessages(render_report(instr, data = data, output_file = out,
                                  include_analysis = FALSE,
