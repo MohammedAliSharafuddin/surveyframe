@@ -42,3 +42,12 @@ test_that("the builder's collector matches collector_template.gs", {
                    asset("static_survey", "collector_template.gs"),
                    info = "Run data-raw/inline_static_template.R to regenerate the builder.")
 })
+
+test_that("the builder's field tools match field_tools.js", {
+  builder <- asset("builder", "survey_builder.html")
+  inlined <- inlined_block(builder, "<!-- FIELD_TOOLS_START:",
+                           "<!-- FIELD_TOOLS_END -->")
+  expect_identical(unescape_script(inlined),
+                   asset("builder", "field_tools.js"),
+                   info = "Run data-raw/inline_static_template.R to regenerate the builder.")
+})

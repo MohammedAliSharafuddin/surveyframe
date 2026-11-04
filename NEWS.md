@@ -263,6 +263,30 @@ style.
 * **SurveyBuilder has a References tab in Survey settings.** Paste BibTeX or
   type a reference in, and choose where the instrument cites it. Changes
   apply at once, ahead of Save settings.
+* **SurveyBuilder cites a reference from the study and from a plan block's
+  hypotheses**, as the `cited_by` targets `study` and `hypothesis:<block id>`.
+  Each is offered only while it is there: the study once it is declared, and
+  a block's hypotheses while it states 1. A target cited and no longer there
+  still shows, ticked, so it can be taken off.
+* **SurveyBuilder has a citation picker on the plan fields.** Type `@` or
+  `/cite` in a research question, a hypothesis, a decision rule or an
+  interpretation, or press Cite on its format toolbar, to list the instrument's
+  references by key, author, year and title, filtered as you type. A pick
+  asks for "Max (2000)", written `@key`, or "(Max, 2000)", written `[@key]`,
+  and inside an open `[...]` adds `; @key`. A key with no reference is
+  shown under the field with "No reference with this key. Add it under
+  References.", and "Manage references" opens that tab. The picker is 1 file,
+  `field_tools.js`, which SurveyStudio will share.
+* **SurveyBuilder's long text fields have a format toolbar.** It appears
+  while a research question, hypothesis, decision rule or interpretation
+  has focus, with bold, italic, bulleted and numbered lists, link, cite,
+  subscript, superscript and equation. Each writes Markdown around the
+  selection (`**x**`, `*x*`, `- `, `1. `, `[x](url)`, `[@key]`, `~x~`,
+  `^x^`, `$x$`, or `$$` on lines of their own for a display equation), and
+  the `.sframe` file stores the text as typed. A preview line under the field
+  shows it formatted, with an equation as its TeX. Ctrl+B and Ctrl+I work in
+  the field, arrow keys move along the toolbar, and Escape returns to the
+  field. The toolbar is part of `field_tools.js`.
 * **`read_bibtex()` reads entries written with parentheses.** BibTeX allows
   `@article(key, ...)` as well as `@article{key, ...}`, and a file may mix the
   2. A closing bracket inside a braced or quoted value ended a parenthesised
@@ -364,6 +388,69 @@ style.
   `study` (problem, objectives, sampling with `method_other`), the plan block
   `objective` and the `hypotheses` shape: a text `null`, a text `alternative`
   or both, or `null`. No field became required.
+* **SurveyBuilder edits the study in a Study tab of Survey settings**: the
+  problem statement, the objectives with their ids, the population, the
+  sampling method from the fixed list (with a description for Other) and
+  the planned sample size. The study is saved only when one of its fields
+  changes, in the shape `write_sframe()` writes, so a study left alone keeps
+  its content hash. The builder refuses what `validate_sframe()` refuses,
+  including the removal of an objective a plan block names.
+* **The exported survey honours a choice set's `randomise`.** It was set in R
+  and the builder, and the page never read it. A single choice, multiple
+  choice or ranking item now shows its options in an order shuffled once per
+  respondent and kept in a draft, and each option still submits its own
+  value (UX-11).
+* **SurveyBuilder works on a narrow screen.** Below 760 px Design shows 1
+  pane at a time, the question list, then the editor with its live preview
+  and a Back control, in the standalone builder and inside SurveyStudio.
+  Preview and Plan take the whole width, and at 390 x 844 no page is wider
+  than the viewport (UX-01, UX-08).
+* **SurveyBuilder's Survey settings sections are a tablist**: buttons with
+  `aria-selected` and `aria-controls`, 1 of them in the Tab order, and the
+  arrow keys, Home and End move between them. They were divs that answered a
+  click alone (UX-15).
+* **SurveyBuilder's 7 dialogs are labelled modal dialogs** with
+  `aria-modal` and `aria-labelledby`, and their close buttons have a name.
+  Tab stays inside the open dialog, and Escape closes the top one through
+  the same route as its close button, so focus returns to what opened it.
+  Escape used to drop every open dialog at once and leave focus behind
+  (UX-14).
+* **The exported survey honours a choice set's `allow_other`.** A single or
+  multiple choice item adds "Other, please specify" last, with a text box,
+  and typing in the box chooses it. A single choice submits the code
+  `other` in its column, a multiple choice submits `<id>__other` as 1 or 0,
+  and both submit the text in `<id>__other_text`. Other chosen with nothing
+  typed blocks the page. SurveyBuilder turns the option off for an ordered
+  set (UX-11). `read_responses()` and the codebook take up the new columns
+  in a later session.
+* **SurveyBuilder's welcome and thank-you pages are entries in the question
+  list**, "Welcome page" first and "Thank-you page" last. Selecting one opens
+  its editor on the right and its preview in the centre, and the Survey
+  settings dialog loses its Welcome and Thank You tabs (UX-10). A page left
+  alone keeps the content hash. Inside SurveyStudio, the dialog's Google
+  Sheets and References tabs link to Studio's Collect and References
+  screens, and the standalone builder keeps both tabs.
+* **SurveyBuilder shows the selected question in its centre pane** as a
+  respondent sees it, drawn by the survey template itself through a
+  preview-only "show only this item" mode, so there is 1 renderer. It is
+  redrawn a moment after each edit, has a desktop and a mobile width, and is
+  read-only: the editor stays on the right (UX-09). Section breaks and text
+  blocks show as on their page.
+* **SurveyBuilder's Plan tabs are "Declared analyses" and "Expected
+  outputs"**, where they were "Run preview" and "Report outline", so Preview
+  in the builder means the respondent's survey alone (UX-17).
+* **SurveyBuilder sets a cross-tab's percentages.** A cross-tab or
+  chi-square plan has a "Percentages in the table" choice: counts only, row,
+  column or percent of the total, saved as `options$percent` (UX-02).
+* **SurveyBuilder drops an empty study on save.** A file holding
+  `"study": {}` was saved with `{}` again, which `validate_sframe()` and the
+  sframe-schema profile refuse. Empty objectives and an empty sampling plan
+  are left out the same way, as `write_sframe()` does.
+* **SurveyBuilder keeps the objective a plan block serves.** Saving the plan
+  dialog built the block afresh, so any edit there dropped an `objective` set
+  in R. The dialog now has an "Objective served" choice listing the study's
+  objectives, and keeps the block's own objective even when the study no
+  longer declares it.
 
 ## Amendments and versions
 

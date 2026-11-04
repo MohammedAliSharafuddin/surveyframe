@@ -248,6 +248,15 @@ input,textarea,select{font-family:inherit;font-size:13px}
   text-align:center;gap:10px;padding:48px 24px;color:var(--t3);
   max-width:300px;margin:auto}
 .c-prompt-ic{font-size:36px;opacity:.25}
+/* Centre pane: the selected item drawn by the survey template itself. */
+.cv-pv{display:none;flex-direction:column;width:100%;max-width:900px;flex:1;min-height:0}
+.cv-pv.on{display:flex}
+.cv-pv-bar{display:flex;align-items:center;gap:6px;margin:0 0 8px;font-size:12px;color:var(--t2)}
+.cv-pv-bar .sp{flex:1}
+.cv-pv-bar [aria-pressed="true"]{background:var(--cp);color:#fff;border-color:var(--cp)}
+.cv-pv-frame{flex:1;display:flex;justify-content:center;min-height:320px}
+.cv-pv-frame iframe{border:1px solid var(--cb);border-radius:8px;background:#fff;height:100%;min-height:320px;width:100%;max-width:100%}
+.cv-pv-frame.mobile iframe{width:390px}
 .c-prompt-t{font-size:14px;font-weight:600;color:var(--t2)}
 .c-prompt-b{font-size:13px;line-height:1.6}
 
@@ -338,6 +347,7 @@ input,textarea,select{font-family:inherit;font-size:13px}
 .mov{display:none;position:fixed;inset:0;background:rgba(15,23,42,.45);z-index:200;
   align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(2px)}
 .mov.open{display:flex}
+.mov.stack{z-index:210}
 .modal{background:var(--cf);border-radius:12px;
   box-shadow:0 20px 60px rgba(0,0,0,.2);width:100%;max-width:500px;
   max-height:88vh;display:flex;flex-direction:column;
@@ -363,7 +373,7 @@ input,textarea,select{font-family:inherit;font-size:13px}
 /* -- Settings tabs -------------------------------------------------------- */
 .stabs{display:flex;gap:2px;background:var(--cg);border-radius:10px;
   padding:3px;margin-bottom:12px;flex-wrap:wrap}
-.stab{padding:5px 10px;border-radius:var(--r);font-size:11px;font-weight:500;
+.stab{border:0;background:none;font-family:inherit;cursor:pointer;color:inherit;padding:5px 10px;border-radius:var(--r);font-size:11px;font-weight:500;
   color:var(--t2);cursor:pointer;transition:all var(--d1);white-space:nowrap}
 .stab.active{background:var(--cf);color:var(--cp);font-weight:600;
   box-shadow:0 1px 3px rgba(0,0,0,.08)}
@@ -469,7 +479,7 @@ input,textarea,select{font-family:inherit;font-size:13px}
 .an-empty-ic{font-size:32px;margin-bottom:12px;opacity:.4}
 .an-empty-t{font-size:13px;font-weight:600;color:var(--t2);margin-bottom:5px}
 .an-empty-b{font-size:12px}
-/* Report outline: a document-shaped skeleton of the render_report() output,
+/* Expected outputs: a document-shaped skeleton of the render_report() output,
    with an empty table and a figure placeholder per plan (the table+plot
    pairing the R report produces), not a repeat of the plan cards. */
 .rs-doc{background:var(--cf);border:1px solid var(--cb);border-radius:8px;
@@ -545,12 +555,45 @@ input,textarea,select{font-family:inherit;font-size:13px}
 .rec-msg{flex:1}
 
 /* -- Keyboard hint -------------------------------------------------------- */
+/* -- Narrow screens (UX-01, UX-08) -----------------------------------------
+   Design shows 1 pane at a time: the question list, then the editor with
+   its live preview below it and a Back control. Preview and Plan take the
+   whole width. Nothing is wider than the viewport. */
+.insp-back{display:none}
+@media (max-width:760px){
+  .topbar{display:flex;flex-wrap:wrap;height:auto;padding:6px 10px;gap:6px}
+  .tb-brand{display:none}
+  .tb-modes{width:100%;justify-content:center}
+  .tb-r{width:100%;flex-wrap:wrap;justify-content:flex-end;gap:6px}
+  .tb-sep{display:none}
+  .shell{flex-direction:column;min-width:0}
+  .sidebar{width:100%;flex:1;min-height:0}
+  .main{min-width:0;flex:1}
+  body:not([data-mode="build"]) .sidebar,body.editing .sidebar{display:none}
+  body[data-mode="build"]:not(.editing) .main{display:none}
+  .build-shell{flex-direction:column;overflow-y:auto;min-width:0}
+  .inspector{order:1;width:100%;transform:none;transition:none;border-left:0;flex:none;overflow:visible}
+  .inspector:not(.open){display:none}
+  .insp-body{overflow:visible}
+  .canvas{order:2;flex:none;padding:12px;overflow:visible;min-width:0}
+  .cv-pv-frame.mobile iframe{width:100%}
+  .insp-back{display:inline-flex}
+  .an-split{display:flex;flex-direction:column;height:auto;overflow-y:auto}
+  .an-vars{border-right:0;border-bottom:1px solid var(--cb)}
+  .an-tabs{flex-wrap:wrap}
+  .frow{grid-template-columns:minmax(0,1fr)}
+  .mov{padding:6px}
+  .modal,.modal.wide{max-width:100%;width:100%}
+  .stabs{flex-wrap:wrap}
+  .stab{white-space:normal}
+}
+
 kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
   border-radius:3px;font-size:10px;font-family:monospace;color:var(--t2);
   background:var(--cg)}
 </style>
 </head>
-<body>
+<body data-mode="build">
 
 <!-- Recovery banner -->
 <div class="rec-ban" id="recBan" hidden>
@@ -673,9 +716,15 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
           <div class="c-prompt-t">Select a question to edit</div>
           <div class="c-prompt-b">Click any question in the sidebar, or add one using the panel on the left. Keyboard: <kbd>Ctrl+Z</kbd> undo, <kbd>Ctrl+S</kbd> save.</div>
         </div>
+        <div class="cv-pv" id="cvPv">
+          <div class="cv-pv-bar"><span id="cvPvT">As respondents see it. Edit it on the right.</span><div class="sp"></div>
+            <div role="group" aria-label="Preview width"><button type="button" class="btn btn-s btn-sm" id="cvW-desktop" aria-pressed="true" onclick="centreWidth('desktop')">Desktop</button> <button type="button" class="btn btn-s btn-sm" id="cvW-mobile" aria-pressed="false" onclick="centreWidth('mobile')">Mobile</button></div></div>
+          <div class="cv-pv-frame" id="cvPvFrame"></div>
+        </div>
       </div>
       <aside class="inspector" id="inspector" aria-label="Item editor">
         <div class="insp-hdr">
+          <button type="button" class="btn btn-s btn-sm insp-back" onclick="inspBack()">&#8592; Questions</button>
           <code class="insp-id" id="inspId"></code>
           <span class="insp-type-lbl" id="inspTypeLbl"></span>
           <button type="button" class="insp-x" onclick="closeInsp()" aria-label="Close editor">&#215;</button>
@@ -708,8 +757,8 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
   <div class="mp an-mode" id="mp-analyse">
     <div class="an-tabs">
       <button type="button" class="an-tab active" data-an-tab="plan" onclick="setAnalyseTab('plan')">Plan</button>
-      <button type="button" class="an-tab" data-an-tab="run" onclick="setAnalyseTab('run')">Run preview</button>
-      <button type="button" class="an-tab" data-an-tab="report" onclick="setAnalyseTab('report')">Report outline</button>
+      <button type="button" class="an-tab" data-an-tab="run" onclick="setAnalyseTab('run')">Declared analyses</button>
+      <button type="button" class="an-tab" data-an-tab="report" onclick="setAnalyseTab('report')">Expected outputs</button>
     </div>
     <!-- Two-pane split (owner feedback 2026-07-16): the former right-hand
          "Output preview and model builder" column is removed so the plans
@@ -757,18 +806,17 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
 
 <!-- Settings -->
 <div class="mov" id="m-settings" onclick="if(event.target===this)closeModal('m-settings')">
-<div class="modal wide" role="dialog" aria-labelledby="set-title">
-  <div class="mhdr"><span class="mtitle" id="set-title">Survey Settings</span><button type="button" class="mx" onclick="closeModal('m-settings')">&#215;</button></div>
+<div class="modal wide" role="dialog" aria-modal="true" aria-labelledby="set-title">
+  <div class="mhdr"><span class="mtitle" id="set-title">Survey Settings</span><button type="button" class="mx" aria-label="Close" onclick="closeModal('m-settings')">&#215;</button></div>
   <div class="mbody">
-    <div class="stabs">
-      <div class="stab active" onclick="showST('meta')"     id="st-meta">General</div>
-      <div class="stab"        onclick="showST('welcome')"  id="st-welcome">Welcome</div>
-      <div class="stab"        onclick="showST('thankyou')" id="st-thankyou">Thank You</div>
-      <div class="stab"        onclick="showST('header')"   id="st-header">Header</div>
-      <div class="stab"        onclick="showST('gsheets')"  id="st-gsheets">Google Sheets</div>
-      <div class="stab"        onclick="showST('refs')"     id="st-refs">References</div>
+    <div class="stabs" role="tablist" aria-label="Survey settings sections" onkeydown="stabKey(event)">
+      <button type="button" role="tab" class="stab active" id="st-meta" aria-controls="sp-meta" aria-selected="true" tabindex="0" onclick="showST('meta')">General</button>
+      <button type="button" role="tab" class="stab" id="st-study" aria-controls="sp-study" aria-selected="false" tabindex="-1" onclick="showST('study')">Study</button>
+      <button type="button" role="tab" class="stab" id="st-header" aria-controls="sp-header" aria-selected="false" tabindex="-1" onclick="showST('header')">Header</button>
+      <button type="button" role="tab" class="stab" id="st-gsheets" aria-controls="sp-gsheets" aria-selected="false" tabindex="-1" onclick="showST('gsheets')">Google Sheets</button>
+      <button type="button" role="tab" class="stab" id="st-refs" aria-controls="sp-refs" aria-selected="false" tabindex="-1" onclick="showST('refs')">References</button>
     </div>
-    <div class="stp active" id="sp-meta">
+    <div class="stp active" id="sp-meta" role="tabpanel" aria-labelledby="st-meta">
       <div class="field"><label class="fl" for="s-title">Survey title <span class="fr">*</span></label><div class="fc"><input type="text" id="s-title"></div></div>
       <div class="frow">
         <div class="field"><label class="fl" for="s-ver">Version</label><div class="fc"><input type="text" id="s-ver"></div></div>
@@ -784,20 +832,18 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
         <div class="field"><label class="fl" for="s-theme">Theme colour</label><div class="fc color-row"><input type="color" id="s-theme-picker" value="#2563eb" aria-label="Theme colour picker" oninput="syncThemeFromPicker()"><input type="text" id="s-theme" placeholder="#2563eb" oninput="syncThemeFromText()"></div></div>
       </div>
     </div>
-    <div class="stp" id="sp-welcome">
-      <div class="alert-i">The welcome page is shown before the first question. Use it to introduce the study and collect informed consent.</div>
-      <div class="field"><label class="fl" for="s-wt">Welcome title</label><div class="fc"><input type="text" id="s-wt" placeholder="Welcome to our survey"></div></div>
-      <div class="field"><label class="fl" for="s-wi">Introduction text</label><div class="fc"><textarea id="s-wi" rows="5"></textarea></div></div>
-      <div class="field"><label class="fl" for="s-wc">Consent statement (leave blank to skip)</label><div class="fc"><textarea id="s-wc" rows="4"></textarea></div></div>
-      <label class="fcheck"><input type="checkbox" id="s-wreq"><span>Require consent checkbox before starting</span></label>
-      <div class="field"><label class="fl" for="s-wsl">Start button label</label><div class="fc"><input type="text" id="s-wsl"></div></div>
+    <div class="stp" id="sp-study" role="tabpanel" aria-labelledby="st-study">
+      <div class="alert-i">The study this instrument serves: the problem, the objectives and the sampling plan. It is saved in the .sframe file and printed in the report, and never shown to respondents, since telling them the aims can bias their answers. A change to it after data collection is a design amendment.</div>
+      <div class="field"><label class="fl" for="s-problem">Problem statement</label><div class="fc"><textarea id="s-problem" rows="4" placeholder="1 short paragraph: what is not yet known, and why it matters."></textarea></div></div>
+      <div class="field"><span class="fl" id="s-objs-l">Objectives</span><div id="s-objs" role="group" aria-labelledby="s-objs-l"></div><button type="button" class="btn btn-s btn-sm" onclick="studyAddObjective()">+ Add objective</button><span class="fhint">Each has an id such as O1, and a research question names the objective it serves.</span></div>
+      <div class="field"><label class="fl" for="s-pop">Population</label><div class="fc"><input type="text" id="s-pop" placeholder="Delegates registered for the 2026 conference"></div></div>
+      <div class="frow">
+        <div class="field"><label class="fl" for="s-method">Sampling method</label><div class="fc"><select id="s-method" onchange="studyMethodSync()"><option value="">Not stated</option><optgroup label="Probability"><option value="simple_random">Simple random</option><option value="systematic">Systematic</option><option value="stratified">Stratified</option><option value="cluster">Cluster</option></optgroup><optgroup label="Non-probability"><option value="convenience">Convenience</option><option value="purposive">Purposive</option><option value="quota">Quota</option><option value="snowball">Snowball</option></optgroup><optgroup label="Whole population"><option value="census">Census</option></optgroup><option value="other">Other</option></select></div></div>
+        <div class="field"><label class="fl" for="s-n">Planned sample size</label><div class="fc"><input type="number" id="s-n" min="1" step="1"></div></div>
+      </div>
+      <div class="field" id="s-other-f" hidden><label class="fl" for="s-other">Describe the method <span class="fr">*</span></label><div class="fc"><input type="text" id="s-other"></div></div>
     </div>
-    <div class="stp" id="sp-thankyou">
-      <div class="field"><label class="fl" for="s-tym">Thank-you message</label><div class="fc"><textarea id="s-tym" rows="4"></textarea></div></div>
-      <div class="field"><label class="fl" for="s-tyu">Redirect URL (optional)</label><div class="fc"><input type="url" id="s-tyu" placeholder="https://example.com/thank-you"></div><span class="fhint">After submission, respondents are redirected to this URL.</span></div>
-      <label class="fcheck"><input type="checkbox" id="s-tydl"><span>Show "Download my response" button</span></label>
-    </div>
-    <div class="stp" id="sp-header">
+    <div class="stp" id="sp-header" role="tabpanel" aria-labelledby="st-header">
       <div class="field"><label class="fl" for="s-inst">Institution or study name</label><div class="fc"><input type="text" id="s-inst" placeholder="University: Department"></div></div>
       <div class="field"><label class="fl">Logo image</label>
         <div style="display:flex;align-items:center;gap:8px;margin-top:4px">
@@ -809,13 +855,18 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
       </div>
       <label class="fcheck"><input type="checkbox" id="s-prog" checked><span>Show progress bar during survey</span></label>
     </div>
-    <div class="stp" id="sp-gsheets">
+    <div class="stp" id="sp-gsheets" role="tabpanel" aria-labelledby="st-gsheets">
+      <div class="alert-i studio-only" hidden>In SurveyStudio, responses are collected from its Collect screen. <button type="button" class="btn btn-p btn-sm" onclick="studioGoto('collect')">Open Collect</button></div>
+      <div class="studio-not">
       <div class="alert-i"><strong>Collect responses in a Google Sheet, free and with no server.</strong> Do these steps in order:<ol style="margin:8px 0 0;padding-left:18px;line-height:1.6"><li>Create a blank Google Sheet and paste its link in the box below.</li><li>Click <strong>Generate collector (.gs)</strong> to download the script. In your Sheet, open <strong>Extensions &gt; Apps Script</strong>, delete any code there, and paste the downloaded file.</li><li>In Apps Script, click <strong>Deploy &gt; New deployment &gt; Web app</strong>, set <strong>Who has access</strong> to <strong>Anyone</strong>, and copy the Web App URL it gives you.</li><li>Paste that Web App URL in the last box, then click <strong>Export survey</strong>. Every response is now saved to your Sheet.</li></ol></div>
       <div class="field"><label class="fl" for="s-gsu">Google Sheet URL</label><div class="fc"><input type="url" id="s-gsu" placeholder="https://docs.google.com/spreadsheets/d/your-sheet-id"></div></div>
       <div class="field"><label class="fl">Apps Script collector</label><div class="fc"><button type="button" class="btn btn-s btn-sm" onclick="exportSheetsCollector()">Generate collector (.gs)</button></div><span class="fhint">Click to build and download the .gs file from your questions. No URL needed for this step.</span></div>
       <div class="field"><label class="fl" for="s-gsep">Apps Script Web App URL</label><div class="fc"><input type="url" id="s-gsep" placeholder="https://script.google.com/macros/s/your-script-id/exec"></div><span class="fhint">Paste the deployed Web App URL here, then re-export the survey.</span></div>
+      </div>
     </div>
-    <div class="stp" id="sp-refs">
+    <div class="stp" id="sp-refs" role="tabpanel" aria-labelledby="st-refs">
+      <div class="alert-i studio-only" hidden>In SurveyStudio, references are managed on its References screen. <button type="button" class="btn btn-p btn-sm" onclick="studioGoto('references')">Open References</button></div>
+      <div class="studio-not">
       <div class="alert-i">The works this instrument draws on: where a scale or an item comes from, and what supports a planned analysis. Each change applies at once. They are saved in the .sframe file, and the report cites them in text and lists them once, in its References section at the end.</div>
       <div id="refList" aria-live="polite"></div>
       <div class="field"><label class="fl" for="r-bib">Paste BibTeX</label><div class="fc"><textarea id="r-bib" rows="4" placeholder="From Google Scholar (Cite, then BibTeX), Zotero, Mendeley or a journal page"></textarea></div></div>
@@ -843,6 +894,7 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
         </div>
         <button type="button" class="btn btn-p btn-sm" onclick="addRefFromForm()">Add reference</button>
       </details>
+      </div>
     </div>
   </div>
   <div class="mfoot">
@@ -855,8 +907,8 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
 
 <!-- Choice modal -->
 <div class="mov" id="m-choice" onclick="if(event.target===this)closeModal('m-choice')">
-<div class="modal" role="dialog">
-  <div class="mhdr"><span class="mtitle">Define Choice Set</span><button type="button" class="mx" onclick="closeModal('m-choice')">&#215;</button></div>
+<div class="modal" role="dialog" aria-modal="true" aria-labelledby="ch-title">
+  <div class="mhdr"><span class="mtitle" id="ch-title">Define Choice Set</span><button type="button" class="mx" aria-label="Close" onclick="closeModal('m-choice')">&#215;</button></div>
   <div class="mbody">
     <div class="field"><label class="fl" for="c-id">Choice set ID <span class="fr">*</span></label><div class="fc"><input type="text" id="c-id" placeholder="agree5"></div></div>
     <div>
@@ -871,9 +923,10 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
       </div>
     </div>
     <div style="display:flex;gap:14px">
-      <label class="fcheck"><input type="checkbox" id="c-other"><span>Include "Other" option</span></label>
+      <label class="fcheck" id="c-other-l"><input type="checkbox" id="c-other"><span>Include "Other, please specify"</span></label>
       <label class="fcheck"><input type="checkbox" id="c-rand"><span>Randomise order</span></label>
-      <label class="fcheck"><input type="checkbox" id="c-ord"><span>Options run in order (ordinal)</span></label>
+      <label class="fcheck"><input type="checkbox" id="c-ord" onchange="choiceOrdSync()"><span>Options run in order (ordinal)</span></label>
+      <span class="fhint" id="c-other-h" hidden>An ordered set has no place for "Other", so it is off.</span>
     </div>
   </div>
   <div class="mfoot"><button type="button" class="btn btn-s" onclick="closeModal('m-choice')">Cancel</button><div class="sp"></div><button type="button" class="btn btn-p" onclick="saveChoice()">Save choice set</button></div>
@@ -882,8 +935,8 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
 
 <!-- Scale modal -->
 <div class="mov" id="m-scale" onclick="if(event.target===this)closeModal('m-scale')">
-<div class="modal" role="dialog">
-  <div class="mhdr"><span class="mtitle">Define Scale</span><button type="button" class="mx" onclick="closeModal('m-scale')">&#215;</button></div>
+<div class="modal" role="dialog" aria-modal="true" aria-labelledby="sc-title">
+  <div class="mhdr"><span class="mtitle" id="sc-title">Define Scale</span><button type="button" class="mx" aria-label="Close" onclick="closeModal('m-scale')">&#215;</button></div>
   <div class="mbody">
     <div class="frow">
       <div class="field"><label class="fl" for="sc-id">Scale ID <span class="fr">*</span></label><div class="fc"><input type="text" id="sc-id" placeholder="satisfaction"></div></div>
@@ -902,8 +955,8 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
 
 <!-- Branch modal -->
 <div class="mov" id="m-branch" onclick="if(event.target===this)closeModal('m-branch')">
-<div class="modal" role="dialog">
-  <div class="mhdr"><span class="mtitle">Add Branching Rule</span><button type="button" class="mx" onclick="closeModal('m-branch')">&#215;</button></div>
+<div class="modal" role="dialog" aria-modal="true" aria-labelledby="br-title">
+  <div class="mhdr"><span class="mtitle" id="br-title">Add Branching Rule</span><button type="button" class="mx" aria-label="Close" onclick="closeModal('m-branch')">&#215;</button></div>
   <div class="mbody">
     <div class="alert-i">Show or hide a question based on the answer to a preceding question.</div>
     <div class="field"><label class="fl" for="br-tgt">Target question (will be shown or hidden)</label><div class="fc"><select id="br-tgt"></select></div></div>
@@ -920,8 +973,8 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
 
 <!-- Check modal -->
 <div class="mov" id="m-check" onclick="if(event.target===this)closeModal('m-check')">
-<div class="modal" role="dialog">
-  <div class="mhdr"><span class="mtitle">Add Attention Check</span><button type="button" class="mx" onclick="closeModal('m-check')">&#215;</button></div>
+<div class="modal" role="dialog" aria-modal="true" aria-labelledby="ck-title">
+  <div class="mhdr"><span class="mtitle" id="ck-title">Add Attention Check</span><button type="button" class="mx" aria-label="Close" onclick="closeModal('m-check')">&#215;</button></div>
   <div class="mbody">
     <div class="frow">
       <div class="field"><label class="fl" for="ck-id">Check ID <span class="fr">*</span></label><div class="fc"><input type="text" id="ck-id" placeholder="attn_1"></div></div>
@@ -940,10 +993,11 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
 
 <!-- RQ modal -->
 <div class="mov" id="m-rq" onclick="if(event.target===this)closeModal('m-rq')">
-<div class="modal wide" role="dialog">
-  <div class="mhdr"><span class="mtitle" id="rq-modal-title">Add Research Question</span><button type="button" class="mx" onclick="closeModal('m-rq')">&#215;</button></div>
+<div class="modal wide" role="dialog" aria-modal="true" aria-labelledby="rq-modal-title">
+  <div class="mhdr"><span class="mtitle" id="rq-modal-title">Add Research Question</span><button type="button" class="mx" aria-label="Close" onclick="closeModal('m-rq')">&#215;</button></div>
   <div class="mbody">
     <div class="field"><label class="fl" for="rq-q">Research question <span class="fr">*</span></label><div class="fc"><textarea id="rq-q" rows="3" placeholder="Is there a significant difference in satisfaction between groups?"></textarea></div></div>
+    <div class="field" id="rq-obj-field" hidden><label class="fl" for="rq-obj">Objective served</label><div class="fc"><select id="rq-obj"></select></div><span class="fhint">The study objective this research question answers. Objectives are set in Survey settings, Study.</span></div>
     <div class="field"><label class="fl">Variables and roles</label><div class="vcbs" id="rqVarCBs"></div><div class="role-grid" id="rqRoleFields"></div></div>
     <!-- Suggestion box: populated and shown by JS when variables are selected -->
     <div id="rqSuggest" class="suggest-box" style="display:none">
@@ -972,12 +1026,14 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
       <div class="field" id="rq-wordcloud-field" style="display:none"><label class="fl" for="rq-wordcloud">Word cloud</label><div class="fc"><label style="display:flex;align-items:center;gap:6px;font-weight:400"><input type="checkbox" id="rq-wordcloud"> Render as a word cloud instead of a bar chart</label></div></div>
       <div class="field" id="rq-seed-field" style="display:none"><label class="fl" for="rq-seed">Random seed</label><div class="fc"><input type="number" id="rq-seed" step="1" placeholder="42"></div></div>
       <div class="field" id="rq-topn-field" style="display:none"><label class="fl" for="rq-topn">Top N terms</label><div class="fc"><input type="number" id="rq-topn" step="1" min="1" placeholder="20"></div></div>
+      <div class="field" id="rq-pct-field" style="display:none"><label class="fl" for="rq-pct">Percentages in the table</label><div class="fc"><select id="rq-pct"><option value="">Counts only</option><option value="row">Row percentages</option><option value="column">Column percentages</option><option value="total">Percent of the total</option></select></div><span class="fhint">Each cell shows its count with the percentage over this denominator.</span></div>
       <div class="field" id="rq-k-field" style="display:none"><label class="fl" for="rq-k">Number of topics (k)</label><div class="fc"><input type="number" id="rq-k" step="1" min="2" placeholder="4"></div></div>
     </div>
     <div class="field" id="rqCitDiv"></div>
     <div id="rqPreview" class="preview-card"></div>
     <div id="rqValidMsg" class="plan-msg"></div>
     <div class="field"><label class="fl" for="rq-interp">Decision rule (declared now)</label><div class="fc"><textarea id="rq-interp" rows="3" placeholder="State how the result will answer the research question."></textarea></div></div>
+    <p class="fhint" style="margin:-4px 0 0">Type @ or /cite in a field above, or use Cite on its format toolbar, to cite one of the instrument's references. <a href="#" id="rq-manage-refs" onclick="event.preventDefault();manageRefs()">Manage references</a></p>
   </div>
   <div class="mfoot">
     <button type="button" class="btn btn-d btn-sm" id="rqDelBtn" style="display:none" onclick="deleteRQ()">Delete</button>
@@ -1073,6 +1129,7 @@ input,textarea,select{font-family:inherit;font-size:15px}
 .sf-hdr-inst{font-size:13px;font-weight:650;color:var(--t2);letter-spacing:.5px;text-transform:uppercase}
 
 /* Progress */
+body[data-only] .prog-bar-wrap,body[data-only] .sf-hdr{display:none!important}
 .prog-bar-wrap{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--cg) 92%,transparent);backdrop-filter:blur(4px);border-bottom:1px solid var(--cb);padding:0}
 .prog-bar-inner{height:3px;background:var(--cp);transition:width .3s ease;min-width:0}
 .prog-hdr{display:flex;align-items:center;gap:10px;padding:9px 20px}
@@ -1172,6 +1229,7 @@ input,textarea,select{font-family:inherit;font-size:15px}
 .choice-opt:has(input:checked)::before{background:var(--cp);border-color:var(--cp);color:#fff}
 .choice-opt::after{content:"\2713";margin-left:auto;color:var(--cp);font-weight:700;visibility:hidden}
 .choice-opt:has(input:checked)::after{visibility:visible}
+.other-txt{display:block;width:100%;box-sizing:border-box;margin:6px 0 0;padding:9px 12px;border:1.5px solid var(--cb);border-radius:8px;font:inherit}
 .choice-opt input{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
 
 /* Short text / number / date: editorial underline inputs */
@@ -1422,6 +1480,23 @@ const respId='R'+Math.random().toString(36).slice(2,10).toUpperCase();
 let screen='welcome';
 let currentPage=1;
 let rankOrders={};
+// Display order (UX-11). A choice set with randomise shows a single choice,
+// multiple choice or ranking item's options in an order shuffled once per
+// respondent and item, kept for the visit and in a draft. Only the display
+// moves: each option submits its own value, so the codes are the set's
+// whatever the order. The builder's centre pane shows the set's own order.
+let displayOrders={};
+function choiceOrder(item,cs){
+  var n=cs.values.length,idx=[];for(var i=0;i<n;i++)idx.push(i);
+  if(!cs.randomise||ONLY_ID)return idx;
+  var o=displayOrders[item.id];
+  if(!o||o.length!==n||o.slice().sort(function(a,b){return a-b;}).join()!==idx.join()){
+    o=idx.slice();
+    for(var j=n-1;j>0;j--){var k=Math.floor(Math.random()*(j+1));var t=o[j];o[j]=o[k];o[k]=t;}
+    displayOrders[item.id]=o;
+  }
+  return o;
+}
 let starValues={};
 
 // ── Page builder ───────────────────────────────────────────────────────────
@@ -1565,25 +1640,27 @@ function renderSingle(item,cs){
   // A named radiogroup, so an option is announced with its question. Without
   // it a screen reader read "Low" with nothing to say what was being asked.
   return'<div class="choice-list" role="radiogroup" aria-labelledby="q_'+esc(item.id)+'"'
-    +' aria-describedby="err_'+esc(item.id)+'">'+cs.values.map(function(v,i){
+    +' aria-describedby="err_'+esc(item.id)+'">'+choiceOrder(item,cs).map(function(i){
+    var v=cs.values[i];
     var checked=String(saved)===String(v);
     return'<label class="choice-opt"><input type="radio" name="'+esc(item.id)+'" value="'+esc(v)+'"'
       +(checked?' checked':'')+(item.required?' aria-required="true"':'')
       +' onchange="setResp(\''+esc(item.id)+'\',this.value)">'
       +'<span class="opt-txt">'+esc(cs.labels[i]||v)+'</span></label>';
-  }).join('')+'</div>';
+  }).join('')+otherOption(item,cs,false)+'</div>';
 }
 function renderMulti(item,cs){
   var saved=(responses[item.id]||'').split(',').filter(Boolean);
   // A group, not a radiogroup: several answers are allowed here.
   return'<div class="choice-list" role="group" aria-labelledby="q_'+esc(item.id)+'"'
-    +' aria-describedby="err_'+esc(item.id)+'">'+cs.values.map(function(v,i){
+    +' aria-describedby="err_'+esc(item.id)+'">'+choiceOrder(item,cs).map(function(i){
+    var v=cs.values[i];
     var chk=saved.includes(String(v));
     return'<label class="choice-opt"><input type="checkbox" name="'+esc(item.id)+'" value="'+esc(v)+'"'
       +(chk?' checked':'')+(item.required?' aria-required="true"':'')
       +' onchange="toggleMulti(\''+esc(item.id)+'\',this)">'
       +'<span class="opt-txt">'+esc(cs.labels[i]||v)+'</span></label>';
-  }).join('')+'</div>';
+  }).join('')+otherOption(item,cs,true)+'</div>';
 }
 function renderMatrix(item,cs){
   var rows=item.matrix_items||[];
@@ -1809,7 +1886,7 @@ function renderRating(item){
 }
 function renderRanking(item,cs){
   if(!rankOrders[item.id]){
-    rankOrders[item.id]=cs.values.map(function(v,i){return{v:String(v),l:cs.labels[i]||String(v)};});
+    rankOrders[item.id]=choiceOrder(item,cs).map(function(i){var v=cs.values[i];return{v:String(v),l:cs.labels[i]||String(v)};});
   }
   var order=rankOrders[item.id];
   var confirmed=!!responses[item.id];
@@ -1840,6 +1917,37 @@ function setResp(id,val){
   var err=document.getElementById('err_'+id);
   if(err)err.classList.remove('show');
   updateBranching();
+}
+// "Other, please specify" (UX-11). A choice set with allow_other adds it
+// last, outside any shuffle. A single choice submits the code "other" in
+// <id>, a multiple choice submits <id>__other as 1 or 0, and both submit the
+// typed text in <id>__other_text. Typing in the box chooses Other.
+function otherOption(item,cs,multi){
+  if(!cs.allow_other)return '';
+  var id=esc(item.id),on=multi?(responses[item.id]||'').split(',').indexOf('other')>=0:String(responses[item.id])==='other';
+  return '<label class="choice-opt choice-other"><input type="'+(multi?'checkbox':'radio')+'" name="'+id+'" value="other"'
+    +(on?' checked':'')+(item.required?' aria-required="true"':'')
+    +' onchange="'+(multi?'toggleMulti(\''+id+'\',this)':'setResp(\''+id+'\',this.value)')+'">'
+    +'<span class="opt-txt">Other, please specify</span></label>'
+    +'<input type="text" class="other-txt" id="other_'+id+'" aria-label="Other, please specify"'
+    +' value="'+esc(responses[item.id+'__other_text']||'')+'" oninput="setOther(\''+id+'\',this.value,'+(multi?'true':'false')+')">';
+}
+function setOther(id,val,multi){
+  responses[id+'__other_text']=val;
+  if(String(val).trim()){
+    if(multi){var cur=(responses[id]||'').split(',').filter(Boolean);if(cur.indexOf('other')<0){cur.push('other');responses[id]=cur.join(',');}}
+    else responses[id]='other';
+    var box=document.querySelector('input[name="'+id+'"][value="other"]');if(box)box.checked=true;
+  }
+  var err=document.getElementById('err_'+id);
+  if(err)err.classList.remove('show');
+  updateBranching();
+}
+function otherChosen(item){
+  var cs=choiceMap[item.choice_set||'']||{};
+  if(!cs.allow_other)return false;
+  if(item.type==='multiple_choice')return (responses[item.id]||'').split(',').indexOf('other')>=0;
+  return item.type==='single_choice'&&String(responses[item.id])==='other';
 }
 function toggleMulti(id,cb){
   var current=(responses[id]||'').split(',').filter(Boolean);
@@ -1939,6 +2047,15 @@ function rankMove(itemId,v,dir){
 // ── Validation ─────────────────────────────────────────────────────────────
 function validatePage(items){
   var ok=true;
+  // Other chosen with nothing typed says nothing, so it blocks the page.
+  items.forEach(function(item){
+    if(!isVisible(item.id)||!otherChosen(item))return;
+    if(String(responses[item.id+'__other_text']||'').trim())return;
+    var err=document.getElementById('err_'+item.id);
+    if(err){err.textContent='Please say what "Other" is.';err.classList.add('show');}
+    if(ok)focusProblem(item.id);
+    ok=false;
+  });
   // An answered date outside its declared bounds is an error even on a
   // non-required item, because manual typing bypasses the picker limits.
   items.forEach(function(item){
@@ -2105,6 +2222,10 @@ function doSubmit(){
       (csM.values||[]).forEach(function(v){
         row[item.id+'__'+String(v)]=sel.includes(String(v))?'1':'0';
       });
+      if(csM.allow_other){
+        row[item.id+'__other']=sel.includes('other')?'1':'0';
+        row[item.id+'__other_text']=sel.includes('other')?(responses[item.id+'__other_text']||''):'';
+      }
     } else if(item.type==='pairwise_comparison'){
       // Column conventions match R/read_responses.R's expansion whitelist:
       // item__a__vs__b (signed Saaty degree) for unordered pairs, or
@@ -2131,6 +2252,9 @@ function doSubmit(){
       });
     } else {
       row[item.id]=responses[item.id]!=null?responses[item.id]:'';
+      var csO=choiceMap[item.choice_set||'']||{};
+      if(item.type==='single_choice'&&csO.allow_other)
+        row[item.id+'__other_text']=String(responses[item.id])==='other'?(responses[item.id+'__other_text']||''):'';
     }
   });
   var csvStr=toCsv([row]);
@@ -2236,7 +2360,7 @@ function draftStore(){
 }
 function saveDraft(){
   var st=draftStore();if(!st||screen!=='survey')return;
-  try{st.setItem(draftKey(),JSON.stringify({responses:responses,page:currentPage,consented:consentGiven,saved:Date.now()}));}catch(e){}
+  try{st.setItem(draftKey(),JSON.stringify({responses:responses,page:currentPage,consented:consentGiven,order:displayOrders,saved:Date.now()}));}catch(e){}
 }
 function loadDraft(){
   var st=draftStore();if(!st)return null;
@@ -2263,6 +2387,7 @@ function resumeDraft(){
   }
   consentGiven=true;
   Object.keys(d.responses).forEach(function(k){responses[k]=d.responses[k];});
+  if(d.order&&typeof d.order==='object')displayOrders=d.order;
   screen='survey';
   currentPage=Math.min(Math.max(1,parseInt(d.page,10)||1),maxPage);
   renderScreen();
@@ -2482,7 +2607,29 @@ function restartSurvey(){
 }
 
 // ── Init ───────────────────────────────────────────────────────────────────
+// Show only 1 item (owner 2026-11-01, UX-09). SurveyBuilder's centre pane
+// draws the selected question with this page's own renderer, so there is 1
+// renderer. The builder asks for it with data-only on the body of a preview
+// it writes, and a live survey never takes this mode. The item shows as on
+// its page, branching aside, and nothing in it can be answered.
+const ONLY_ID=PREVIEW?((document.body.dataset&&document.body.dataset.only)||''):'';
+function renderOnly(){
+  var el=document.getElementById('app');
+  if(ONLY_ID==='__welcome'){
+    if(!WL.intro_text&&!WL.consent_text&&!SF.meta.description)
+      el.innerHTML='<div class="card"><div class="card-body"><p class="wl-intro">No welcome page: the survey opens at its first question. Add an introduction or a consent statement to show one.</p></div></div>';
+    else renderWelcome();
+  }else if(ONLY_ID==='__thankyou'){
+    screen='thankyou';renderThankyou();
+  }else{
+    var item=(SF.items||[]).filter(function(i){return i.id===ONLY_ID;})[0];
+    el.innerHTML=item?'<div class="card"><div class="card-body">'+renderItem(item)+'</div></div>':'';
+    Array.prototype.forEach.call(el.querySelectorAll('.blk.hidden'),function(b){b.classList.remove('hidden');});
+  }
+  el.setAttribute('inert','');
+}
 document.addEventListener('DOMContentLoaded',function(){
+  if(ONLY_ID){renderOnly();return;}
   renderScreen();
 });
 <\/script>
@@ -2715,6 +2862,675 @@ function doGet(e) {
 </script>
 <!-- COLLECTOR_TEMPLATE_END -->
 
+<!-- FIELD_TOOLS_START: inlined from inst/builder/field_tools.js by data-raw/inline_static_template.R. Do not edit by hand. -->
+<script>
+/* inst/builder/field_tools.js
+ *
+ * The tools on SurveyBuilder's and SurveyStudio's long free-text fields: a
+ * citation picker and a format toolbar, with no server, no editor library
+ * and no new package. The field stores Markdown as typed, which the report
+ * renders.
+ *
+ * The format toolbar appears when the field has focus and hides when focus
+ * leaves both. Bold, italic, bulleted list, numbered list, link, cite,
+ * subscript and superscript write **x**, *x*, "- ", "1. ", [x](url), the
+ * picker's citation, ~x~ and ^x^ around the selection, and a preview line
+ * under the field shows the result. Ctrl+B and Ctrl+I work in the field. The
+ * toolbar is a labelled role=toolbar: arrow keys move along it, and Escape
+ * returns to the field. Set options.toolbar to false for the picker alone,
+ * which then adds a Cite button after the field instead.
+ *
+ *   var h = SurveyframeCitationPicker.attach(textarea, references, options);
+ *   SurveyframeCitationPicker.updateReferences(references);
+ *   h.destroy();
+ *
+ * `references` is the instrument's references as saved (CSL-JSON with
+ * cited_by), or a function returning them, so no second store is kept.
+ * Typing @ or /cite in the field, or pressing its Cite button, lists them
+ * filtered as you type. Picking one asks for "Max (2000)" (@key) or
+ * "(Max, 2000)" ([@key]). Inside an open [...] it adds "; @key". A key with
+ * no reference is shown under the field with a message.
+ *
+ * Options: button (true, adds a Cite button after the field), label (the
+ * field's name, for the button's accessible name), knownKeys (keys that
+ * resolve without a record, such as built-in method references), onManage
+ * (a function, shows a "Manage references" link), adapter (an object with
+ * getText, getSelection, replaceRange and focus, for a field that is not a
+ * plain input or textarea).
+ *
+ * The result list, the debounce and the cursor insertion are adapted from
+ * QuartoPad (inst/www/js/citations.js and inst/www/js/editor.js at 5a5e300).
+ * QuartoPad is MIT licensed:
+ *   Copyright (c) 2026 Mohammed Ali Sharafuddin
+ *   Permission is hereby granted, free of charge, to any person obtaining a
+ *   copy of this software and associated documentation files (the
+ *   "Software"), to deal in the Software without restriction, including
+ *   without limitation the rights to use, copy, modify, merge, publish,
+ *   distribute, sublicense, and/or sell copies of the Software, and to
+ *   permit persons to whom the Software is furnished to do so, subject to
+ *   the following conditions: The above copyright notice and this
+ *   permission notice shall be included in all copies or substantial
+ *   portions of the Software. THE SOFTWARE IS PROVIDED "AS IS", WITHOUT
+ *   WARRANTY OF ANY KIND.
+ *
+ * Keep this file ASCII. data-raw/inline_static_template.R copies it into
+ * survey_builder.html, so run that script after any edit here.
+ */
+(function(root){
+'use strict';
+
+var KEY='[A-Za-z0-9_](?:[A-Za-z0-9_:.#$%&+?<>~/-]*[A-Za-z0-9_])?';
+var DEBOUNCE_MS=320;
+var MSG_UNKNOWN='No reference with this key. Add it under References.';
+
+function esc(s){
+  return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+// -- Display ------------------------------------------------------------------
+function asArr(x){return Array.isArray(x)?x:(x==null?[]:[x]);}
+function families(r){
+  return asArr(r&&r.author).map(function(a){return a?(a.family||a.literal||''):'';})
+    .filter(function(s){return s;});
+}
+function yearOf(r){
+  var i=r&&r.issued;
+  var d=i&&i['date-parts']&&i['date-parts'][0]&&i['date-parts'][0][0];
+  if(d!=null&&d!=='')return String(d);
+  if(i&&i.literal)return String(i.literal);
+  return 'n.d.';
+}
+// 1 or 2 authors are named, 3 or more become "et al.", as R's in-text
+// citations do. A work with no author is named by its title.
+function who(r,and){
+  var f=families(r);
+  if(!f.length)return (r&&(r.title||r.id))||'';
+  if(f.length===1)return f[0];
+  if(f.length===2)return f[0]+' '+and+' '+f[1];
+  return f[0]+' et al.';
+}
+function normalise(r){
+  return {key:r.id,title:r.title||'',authorText:who(r,'&'),year:yearOf(r)};
+}
+function narrativeText(r){return who(r,'and')+' ('+yearOf(r)+')';}
+function parentheticalText(r){return '('+who(r,'&')+', '+yearOf(r)+')';}
+
+// Every word typed must appear in the key, the authors, the year or the title.
+function filter(refs,query){
+  var words=String(query||'').toLowerCase().split(/\s+/).filter(function(w){return w;});
+  return asArr(refs).filter(function(r){return r&&r.id;}).filter(function(r){
+    var n=normalise(r);
+    var hay=[n.key,families(r).join(' '),n.year,n.title].join(' ').toLowerCase();
+    return words.every(function(w){return hay.indexOf(w)>=0;});
+  }).map(normalise);
+}
+
+// -- Text ---------------------------------------------------------------------
+// Code blocks and code spans, as [start, end) ranges. Nothing inside them is
+// a citation, and the picker never opens or inserts there.
+function codeRanges(text){
+  var out=[],m,re=/```[\s\S]*?(```|$)|`[^`\n]*`/g;
+  text=String(text||'');
+  while((m=re.exec(text))){out.push([m.index,m.index+m[0].length]);if(!m[0].length)re.lastIndex++;}
+  return out;
+}
+function inCode(text,pos){
+  text=String(text||'');
+  if(codeRanges(text).some(function(r){return pos>r[0]&&pos<r[1];}))return true;
+  // A code span still being typed has no closing backtick yet.
+  var line=text.slice(text.lastIndexOf('\n',pos-1)+1,pos);
+  return (line.match(/`/g)||[]).length%2===1;
+}
+// Whether `pos` sits inside an open [...], and whether that bracket already
+// holds a citation.
+function bracketAt(text,pos){
+  for(var i=pos-1;i>=0;i--){
+    var c=text.charAt(i);
+    if(c===']')return {open:false};
+    if(c==='['){
+      var inner=text.slice(i+1,pos);
+      return {open:true,hasCite:new RegExp('(^|[^A-Za-z0-9_])-?@'+KEY).test(inner)};
+    }
+  }
+  return {open:false};
+}
+// What typing at `pos` opens: an @ after a space, a bracket, a semicolon or
+// the start, or /cite after a space or the start. Returns the range the
+// citation replaces, or null.
+function trigger(text,pos){
+  text=String(text||'');
+  if(inCode(text,pos))return null;
+  if(text.charAt(pos-1)==='@'){
+    var b=pos>=2?text.charAt(pos-2):'';
+    if(b===''||/[\s\[;(]/.test(b))return {start:pos-1,end:pos};
+  }
+  if(pos>=5&&text.slice(pos-5,pos)==='/cite'){
+    var c=pos>=6?text.charAt(pos-6):'';
+    if(c===''||/\s/.test(c))return {start:pos-5,end:pos};
+  }
+  return null;
+}
+// The text after a citation of `key` replaces [start, end). `style` is
+// "narrative" (@key) or "parenthetical" ([@key]), and is not asked for
+// inside an open bracket.
+function insertion(text,start,end,key,style){
+  text=String(text||'');
+  var before=text.slice(0,start),after=text.slice(end),ins;
+  var br=bracketAt(text,start);
+  if(br.open&&br.hasCite){
+    var trimmed=before.replace(/\s+$/,'');
+    if(/;$/.test(trimmed)){before=trimmed+' ';ins='@'+key;}
+    else{before=trimmed;ins='; @'+key;}
+  }else if(br.open){
+    ins='@'+key;
+  }else{
+    ins=style==='parenthetical'?'[@'+key+']':'@'+key;
+  }
+  if(/[A-Za-z0-9_]$/.test(before)&&!br.open)before+=' ';
+  var out=before+ins+after;
+  return {text:out,cursor:(before+ins).length,inserted:ins};
+}
+function needsStyle(text,start){return !bracketAt(String(text||''),start).open;}
+// The cited keys in `text` with no reference among `known`, in order, once
+// each. Code is skipped, and an address such as a@b.org is no citation.
+function unknownKeys(text,known){
+  text=String(text||'');
+  var ranges=codeRanges(text),seen={},out=[],m;
+  var set={};asArr(known).forEach(function(k){set[k]=true;});
+  var re=new RegExp('(^|[^A-Za-z0-9_])-?@('+KEY+')','g');
+  while((m=re.exec(text))){
+    var at=m.index+m[1].length;
+    var code=ranges.some(function(r){return at>=r[0]&&at<r[1];});
+    var k=m[2];
+    if(!code&&!set[k]&&!seen[k]){seen[k]=true;out.push(k);}
+  }
+  return out;
+}
+
+// -- Markdown -----------------------------------------------------------------
+// Each edit returns {text, start, end}: the new text and the selection after.
+function trimSel(text,start,end){
+  while(start<end&&/\s/.test(text.charAt(start)))start++;
+  while(end>start&&/\s/.test(text.charAt(end-1)))end--;
+  return [start,end];
+}
+var PLACEHOLDER={'**':'bold text','*':'italic text','~':'sub','^':'sup'};
+// **x**, *x*, ~x~ or ^x^ around the selection, or around a placeholder that
+// is left selected. Pressed again on marked text, the marks come off.
+function wrap(text,start,end,mark){
+  text=String(text||'');
+  var t=trimSel(text,start,end);start=t[0];end=t[1];
+  var m=mark.length,before=text.slice(0,start),after=text.slice(end);
+  var on=start<end&&before.slice(-m)===mark&&after.slice(0,m)===mark;
+  // The * of a ** is bold, so italic on bold text adds its own marks.
+  if(on&&mark==='*'&&((before.slice(-2)==='**'&&before.slice(-3)!=='***')||(after.slice(0,2)==='**'&&after.slice(0,3)!=='***')))on=false;
+  if(on)return {text:before.slice(0,-m)+text.slice(start,end)+after.slice(m),start:start-m,end:end-m};
+  var inner=start<end?text.slice(start,end):PLACEHOLDER[mark];
+  // Pandoc's ~sub~ and ^sup^ hold no bare space.
+  if(mark==='~'||mark==='^')inner=inner.replace(/\\?[ \t]/g,'\\ ');
+  return {text:before+mark+inner+mark+after,start:start+m,end:start+m+inner.length};
+}
+// "- " or "1. " before every line the selection touches, or off again when
+// every one has it. Pandoc starts a list only after a blank line, so 1 is
+// added after a paragraph.
+function list(text,start,end,kind){
+  text=String(text||'');
+  var ls=text.lastIndexOf('\n',start-1)+1;
+  var le=text.indexOf('\n',(end>start&&text.charAt(end-1)==='\n')?end-1:end);
+  if(le<0)le=text.length;
+  var lines=text.slice(ls,le).split('\n');
+  var re=kind==='numbered'?/^\d+\.[ \t]/:/^[-*+][ \t]/;
+  var filled=lines.filter(function(l){return l.trim();});
+  var all=filled.length>0&&filled.every(function(l){return re.test(l);});
+  var k=0,block;
+  if(!filled.length){block=kind==='numbered'?'1. ':'- ';}
+  else block=lines.map(function(l){
+    if(all)return l.replace(re,'');
+    if(!l.trim())return l;
+    k++;return (kind==='numbered'?k+'. ':'- ')+l.replace(/^(\d+\.|[-*+])[ \t]/,'');
+  }).join('\n');
+  var before=text.slice(0,ls),after=text.slice(le);
+  if(!all&&before&&!/\n[ \t]*\n$/.test(before))before+='\n';
+  var at=before.length+block.length;
+  return {text:before+block+after,start:at,end:at};
+}
+// [selection](https://), with the address selected to be typed over.
+function link(text,start,end){
+  text=String(text||'');
+  var t=trimSel(text,start,end);start=t[0];end=t[1];
+  var label=start<end?text.slice(start,end):'link text',url='https://';
+  var s=start+label.length+3;
+  return {text:text.slice(0,start)+'['+label+']('+url+')'+text.slice(end),start:s,end:s+url.length};
+}
+// $x$ around the selection, or $$ on lines of their own when it spans whole
+// lines. Pandoc's inline $ takes no space just inside it.
+function math(text,start,end){
+  text=String(text||'');
+  var whole=start<end&&(start===0||text.charAt(start-1)==='\n')&&(end===text.length||text.charAt(end)==='\n');
+  if(whole){
+    var body=text.slice(start,end).replace(/\n+$/,'');
+    var ins='$$\n'+body+'\n$$';
+    return {text:text.slice(0,start)+ins+text.slice(start+body.length),start:start+3,end:start+3+body.length};
+  }
+  var t=trimSel(text,start,end);start=t[0];end=t[1];
+  var inner=start<end?text.slice(start,end):'x^2';
+  return {text:text.slice(0,start)+'$'+inner+'$'+text.slice(end),start:start+1,end:start+1+inner.length};
+}
+// The field's Markdown as HTML, for the preview line: emphasis, sub and
+// superscript, links, lists, paragraphs and citations, shown as the report
+// shows them where the reference is known. Everything is escaped first.
+function preview(text,refs){
+  var known={};asArr(refs).forEach(function(r){if(r&&r.id)known[r.id]=r;});
+  var seg=new RegExp('^(.*?)(-?)@('+KEY+')(.*)$');
+  // Code and equations are shown as typed, in monospace, so nothing inside
+  // them is formatted. The builder has no math library, so TeX stays TeX.
+  function inline(s){
+    var held=[];
+    function hold(html){held.push(html);return '\u0001'+(held.length-1)+'\u0001';}
+    s=String(s).replace(/`([^`]+)`/g,function(a,c){return hold('<code>'+esc(c)+'</code>');});
+    s=s.replace(/\$\$([^$]+)\$\$/g,function(a,c){return hold('<code>'+esc(c.trim())+'</code>');});
+    s=s.replace(/\$(?=\S)([^$]*?\S)\$(?!\d)/g,function(a,c){return hold('<code>'+esc(c)+'</code>');});
+    s=esc(s);
+    s=s.replace(/\[([^\[\]]*@[^\[\]]*)\]/g,function(all,inner){
+      var hit=0,parts=inner.split(';').map(function(p){
+        var m=p.trim().match(seg);var r=m&&known[m[3]];
+        if(!r)return p.trim();
+        hit++;
+        var body=esc(m[2]==='-'?yearOf(r):who(r,'&')+', '+yearOf(r));
+        return (m[1].trim()?m[1].trim()+' ':'')+body+m[4];
+      });
+      return hit?'('+parts.join('; ')+')':all;
+    });
+    s=s.replace(new RegExp('(^|[^A-Za-z0-9_;&])@('+KEY+')','g'),function(all,p,k){
+      return known[k]?p+esc(narrativeText(known[k])):all;
+    });
+    s=s.replace(/\[([^\[\]]+)\]\(((?:https?:\/\/|mailto:)[^\s()]+)\)/g,'<a href="$2" target="_blank" rel="noopener">$1</a>');
+    s=s.replace(/\*\*(?=\S)([^*]*?\S)\*\*/g,'<strong>$1</strong>');
+    s=s.replace(/\*(?=\S)([^*]*?\S)\*/g,'<em>$1</em>');
+    s=s.replace(/~((?:\\ |[^~\s])+)~/g,function(a,x){return '<sub>'+x.replace(/\\ /g,' ')+'</sub>';});
+    s=s.replace(/\^((?:\\ |[^\^\s])+)\^/g,function(a,x){return '<sup>'+x.replace(/\\ /g,' ')+'</sup>';});
+    return s.replace(/\u0001(\d+)\u0001/g,function(a,i){return held[+i];});
+  }
+  var out=[],para=[],items=[],kind=null,eq=null;
+  function flushPara(){if(para.length)out.push('<p>'+para.map(inline).join(' ')+'</p>');para=[];}
+  function flushList(){if(items.length)out.push('<'+kind+'>'+items.map(function(x){return '<li>'+inline(x)+'</li>';}).join('')+'</'+kind+'>');items=[];kind=null;}
+  String(text||'').split('\n').forEach(function(l){
+    // A display equation, $$ on lines of their own.
+    if(eq){if(l.trim()==='$$'){out.push('<pre>'+esc(eq.join('\n'))+'</pre>');eq=null;}else eq.push(l);return;}
+    if(l.trim()==='$$'){flushPara();flushList();eq=[];return;}
+    var b=l.match(/^[ \t]*[-*+][ \t]+(.*)$/),n=l.match(/^[ \t]*\d+\.[ \t]+(.*)$/);
+    if(b||n){var k2=b?'ul':'ol';flushPara();if(kind&&kind!==k2)flushList();kind=k2;items.push((b||n)[1]);return;}
+    flushList();
+    if(!l.trim()){flushPara();return;}
+    para.push(l.trim());
+  });
+  flushPara();flushList();
+  if(eq)out.push('<p>$$</p>'+(eq.length?'<pre>'+esc(eq.join('\n'))+'</pre>':''));
+  return out.join('');
+}
+// Whether the text holds anything the preview would format.
+function hasMarkdown(text){return /[*~^\[`$]|(^|\s)@[A-Za-z0-9_]|^[ \t]*([-+]|\d+\.)[ \t]/m.test(String(text||''));}
+
+// -- Fields -------------------------------------------------------------------
+// The default adapter, for an input or a textarea. After an insertion it
+// sends input and change events, so a Shiny input sees the new value.
+function fieldAdapter(el){
+  return {
+    element:el,
+    getText:function(){return el.value||'';},
+    getSelection:function(){
+      var s=typeof el.selectionStart==='number'?el.selectionStart:(el.value||'').length;
+      var e=typeof el.selectionEnd==='number'?el.selectionEnd:s;
+      return {start:s,end:e};
+    },
+    replaceRange:function(start,end,str,cursor){
+      var v=el.value||'';
+      el.value=v.slice(0,start)+str+v.slice(end);
+      if(el.setSelectionRange){try{el.setSelectionRange(cursor,cursor);}catch(e){}}
+      ['input','change'].forEach(function(t){
+        var ev;
+        try{ev=new Event(t,{bubbles:true});}
+        catch(e){ev=document.createEvent('Event');ev.initEvent(t,true,true);}
+        el.dispatchEvent(ev);
+      });
+    },
+    focus:function(){if(el.focus)el.focus();}
+  };
+}
+
+var TOOLS=[
+  {id:'bold',label:'Bold',keys:'Ctrl+B',html:'<b>B</b>'},
+  {id:'italic',label:'Italic',keys:'Ctrl+I',html:'<i>I</i>'},
+  {id:'bullets',label:'Bulleted list',html:'&#8226; List'},
+  {id:'numbers',label:'Numbered list',html:'1. List'},
+  {id:'link',label:'Link',html:'Link'},
+  {id:'cite',label:'Cite a reference',html:'@ Cite'},
+  {id:'sub',label:'Subscript',html:'x<sub>2</sub>'},
+  {id:'sup',label:'Superscript',html:'x<sup>2</sup>'},
+  {id:'math',label:'Equation',html:'<i>f</i>(x)'}
+];
+
+var STYLE='.sfcp{position:fixed;z-index:10000;width:360px;max-width:calc(100vw - 16px);background:#fff;color:#1f2937;border:1px solid #cbd5e1;border-radius:8px;box-shadow:0 8px 24px rgba(15,23,42,.18);padding:10px;font:13px/1.4 system-ui,-apple-system,"Segoe UI",sans-serif}'
+  +'.sfcp[hidden]{display:none}'
+  +'.sfcp-h{font-weight:600;margin:0 0 6px}'
+  +'.sfcp-l{display:block;font-size:12px;color:#475569;margin:0 0 3px}'
+  +'.sfcp-q{width:100%;box-sizing:border-box;padding:5px 8px;border:1px solid #cbd5e1;border-radius:6px;font:inherit}'
+  +'.sfcp-list{list-style:none;margin:6px 0 0;padding:0;max-height:220px;overflow:auto}'
+  +'.sfcp-o{padding:5px 7px;border-radius:5px;cursor:pointer}'
+  +'.sfcp-o[aria-selected="true"],.sfcp-o:hover{background:#e0e7ff}'
+  +'.sfcp-k{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;color:#3730a3}'
+  +'.sfcp-a{margin-left:6px}.sfcp-t{display:block;font-size:12px;color:#475569}'
+  +'.sfcp-empty{margin:8px 0 2px;color:#475569}'
+  +'.sfcp-st p{margin:8px 0 6px}.sfcp-st button{margin:0 6px 0 0;padding:5px 10px;border:1px solid #94a3b8;border-radius:6px;background:#f8fafc;font:inherit;cursor:pointer}'
+  +'.sfcp-st button:focus,.sfcp-st button:hover{background:#e0e7ff}'
+  +'.sfcp-m{display:inline-block;margin-top:8px;font-size:12px;color:#1d4ed8}'
+  +'.sfcp-btn{margin:4px 0 0;padding:2px 8px;border:1px solid #cbd5e1;border-radius:5px;background:#f8fafc;font:12px system-ui,sans-serif;cursor:pointer}'
+  +'.sfcp-msg{font-size:12px;color:#b91c1c;margin:3px 0 0}.sfcp-msg:empty{display:none}'
+  +'.sfcp-bar{display:flex;flex-wrap:wrap;gap:3px;margin:3px 0 0}.sfcp-bar[hidden]{display:none}'
+  +'.sfcp-tb{min-width:28px;height:24px;padding:0 7px;border:1px solid #cbd5e1;border-radius:4px;background:#f8fafc;color:#1f2937;font:12px system-ui,sans-serif;cursor:pointer}'
+  +'.sfcp-tb:hover,.sfcp-tb:focus{background:#e0e7ff;outline:2px solid #6366f1;outline-offset:0}'
+  +'.sfcp-pv{font-size:12px;color:#334155;background:#f8fafc;border-left:3px solid #c7d2fe;padding:4px 8px;margin:3px 0 0}.sfcp-pv:empty{display:none}'
+  +'.sfcp-pv p{margin:0 0 3px}.sfcp-pv ul,.sfcp-pv ol{margin:0 0 3px;padding-left:18px}.sfcp-pv code,.sfcp-pv pre{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px}.sfcp-pv pre{margin:0 0 3px;white-space:pre-wrap}'
+  +'.sfcp-pv-l{display:block;font-size:10px;text-transform:uppercase;letter-spacing:.04em;color:#64748b}'
+  +'.sfcp-bad{text-decoration:underline wavy #dc2626;text-underline-offset:3px;font-family:ui-monospace,Menlo,Consolas,monospace}';
+function addStyle(){
+  if(document.getElementById('sfcp-style'))return;
+  var s=document.createElement('style');s.id='sfcp-style';s.textContent=STYLE;
+  (document.head||document.body).appendChild(s);
+}
+
+var handles=[],seq=0,shared=null;
+
+function attach(el,references,options){
+  if(!el)return null;
+  options=options||{};
+  var n=++seq,a=options.adapter||fieldAdapter(el);
+  var h={element:el,refs:references,options:options,n:n};
+  var range=null,activeIdx=0,shown=[],picked=null,timer=null,busy=false,btn=null;
+  addStyle();
+
+  function refs(){var r=typeof h.refs==='function'?h.refs():h.refs;return asArr(r);}
+  function known(){
+    var k=refs().map(function(r){return r&&r.id;});
+    var extra=typeof options.knownKeys==='function'?options.knownKeys():options.knownKeys;
+    return k.concat(asArr(extra));
+  }
+
+  // The message under the field, for keys with no reference.
+  var msg=document.createElement('div');
+  msg.className='sfcp-msg';msg.id='sfcp-msg-'+n;msg.setAttribute('aria-live','polite');
+  var after=el.nextSibling,bar=null,pv=null,useBar=options.toolbar!==false;
+  if(useBar){
+    bar=document.createElement('div');bar.className='sfcp-bar';bar.hidden=true;
+    bar.setAttribute('role','toolbar');
+    bar.setAttribute('aria-label','Format '+(options.label||'text'));
+    if(el.id)bar.setAttribute('aria-controls',el.id);
+    bar.innerHTML=TOOLS.map(function(t,i){
+      var name=t.label+(t.keys?' ('+t.keys+')':'');
+      return '<button type="button" class="sfcp-tb" data-tool="'+t.id+'" tabindex="'+(i?'-1':'0')+'" aria-label="'+esc(name)+'" title="'+esc(name)+'"'
+        +(t.id==='cite'?' aria-haspopup="dialog"':'')+'>'+t.html+'</button>';
+    }).join('');
+    el.parentNode.insertBefore(bar,after);
+    // The field keeps focus and its selection while a button is pressed.
+    bar.addEventListener('mousedown',function(e){if(e.target.closest&&e.target.closest('.sfcp-tb'))e.preventDefault();});
+    bar.addEventListener('click',function(e){
+      var b=e.target.closest?e.target.closest('.sfcp-tb'):null;
+      if(b)tool(b.getAttribute('data-tool'),b);
+    });
+    bar.addEventListener('keydown',function(e){
+      var bs=Array.prototype.slice.call(bar.querySelectorAll('.sfcp-tb'));
+      var i=bs.indexOf(document.activeElement),j=-1;
+      if(e.key==='ArrowRight')j=(i+1)%bs.length;
+      else if(e.key==='ArrowLeft')j=(i-1+bs.length)%bs.length;
+      else if(e.key==='Home')j=0;
+      else if(e.key==='End')j=bs.length-1;
+      else if(e.key==='Escape'){e.preventDefault();e.stopPropagation();a.focus();return;}
+      if(j<0)return;
+      e.preventDefault();
+      bs.forEach(function(b,k){b.setAttribute('tabindex',k===j?'0':'-1');});
+      bs[j].focus();
+    });
+    bar.addEventListener('focusout',hideLater);
+    el.addEventListener('focus',showBar);
+    el.addEventListener('blur',hideLater);
+    el.addEventListener('keydown',onKey);
+  }else if(options.button!==false){
+    btn=document.createElement('button');btn.type='button';btn.className='sfcp-btn';
+    btn.textContent='Cite';
+    btn.setAttribute('aria-label','Cite a reference'+(options.label?' in '+options.label:''));
+    btn.setAttribute('aria-haspopup','dialog');
+    btn.addEventListener('click',function(){var s=a.getSelection();open({start:s.start,end:s.end},btn);});
+    el.parentNode.insertBefore(btn,after);
+  }
+  var anchor=bar||btn;
+  el.parentNode.insertBefore(msg,anchor?anchor.nextSibling:after);
+  if(useBar){
+    pv=document.createElement('div');pv.className='sfcp-pv';pv.id='sfcp-pv-'+n;
+    el.parentNode.insertBefore(pv,msg.nextSibling);
+  }
+  var described=(el.getAttribute('aria-describedby')||'').split(/\s+/).filter(function(x){return x;});
+  if(described.indexOf(msg.id)<0){described.push(msg.id);el.setAttribute('aria-describedby',described.join(' '));}
+
+  function showBar(){if(bar)bar.hidden=false;}
+  function inside(x){return !!x&&(x===el||(bar&&bar.contains(x))||(shared&&shared.el.contains(x)));}
+  // Hidden once focus has left the field, its toolbar and its picker.
+  function hideLater(){
+    if(!bar)return;
+    setTimeout(function(){
+      if(shared&&shared.owner===h)return;
+      if(!inside(document.activeElement))bar.hidden=true;
+    },0);
+  }
+  h._afterClose=hideLater;
+  function apply(res){
+    busy=true;
+    a.replaceRange(0,a.getText().length,res.text,res.end);
+    busy=false;
+    if(el.setSelectionRange){try{el.setSelectionRange(res.start,res.end);}catch(e){}}
+    a.focus();check();showPreview();
+  }
+  function tool(id,from){
+    var s=a.getSelection(),t=a.getText();
+    if(id==='bold')apply(wrap(t,s.start,s.end,'**'));
+    else if(id==='italic')apply(wrap(t,s.start,s.end,'*'));
+    else if(id==='sub')apply(wrap(t,s.start,s.end,'~'));
+    else if(id==='sup')apply(wrap(t,s.start,s.end,'^'));
+    else if(id==='bullets')apply(list(t,s.start,s.end,'bulleted'));
+    else if(id==='numbers')apply(list(t,s.start,s.end,'numbered'));
+    else if(id==='link')apply(link(t,s.start,s.end));
+    else if(id==='math')apply(math(t,s.start,s.end));
+    // A citation goes after the selection, which it leaves in place.
+    else if(id==='cite')open({start:s.end,end:s.end},el);
+  }
+  function onKey(e){
+    if(!(e.ctrlKey||e.metaKey)||e.altKey||e.shiftKey)return;
+    var k=String(e.key||'').toLowerCase();
+    if(k==='b'||k==='i'){e.preventDefault();e.stopPropagation();tool(k==='b'?'bold':'italic');}
+  }
+  function showPreview(){
+    if(!pv)return;
+    var t=a.getText();
+    pv.innerHTML=hasMarkdown(t)?'<span class="sfcp-pv-l">Preview</span>'+preview(t,refs()):'';
+  }
+
+  function check(){
+    showPreview();
+    var bad=unknownKeys(a.getText(),known());
+    if(!bad.length){msg.innerHTML='';el.removeAttribute('aria-invalid');return bad;}
+    msg.innerHTML=bad.map(function(k){return '<span class="sfcp-bad">@'+esc(k)+'</span> '+esc(MSG_UNKNOWN);}).join('<br>');
+    el.setAttribute('aria-invalid','true');
+    return bad;
+  }
+  function later(){clearTimeout(timer);timer=setTimeout(check,DEBOUNCE_MS);}
+
+  // -- The popover, 1 per page, shared by every field --------------------------
+  function pop(){
+    if(shared)return shared;
+    var p=document.createElement('div');
+    p.className='sfcp';p.hidden=true;p.setAttribute('role','dialog');
+    p.setAttribute('aria-labelledby','sfcp-t');
+    p.innerHTML='<div class="sfcp-h" id="sfcp-t">Cite a reference</div>'
+      +'<div class="sfcp-pick" id="sfcp-pick"><label class="sfcp-l" for="sfcp-q">Search by key, author, year or title</label>'
+      +'<input type="search" class="sfcp-q" id="sfcp-q" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="true" aria-controls="sfcp-list">'
+      +'<ul class="sfcp-list" id="sfcp-list" role="listbox" aria-label="References"></ul>'
+      +'<p class="sfcp-empty" id="sfcp-empty" hidden></p></div>'
+      +'<div class="sfcp-st" id="sfcp-st" hidden><p id="sfcp-st-q">How should the citation read?</p>'
+      +'<div role="group" aria-labelledby="sfcp-st-q"><button type="button" id="sfcp-narr" data-style="narrative"></button>'
+      +'<button type="button" id="sfcp-paren" data-style="parenthetical"></button></div></div>'
+      +'<a href="#" class="sfcp-m" id="sfcp-m" hidden>Manage references</a>';
+    document.body.appendChild(p);
+    shared={el:p,owner:null,returnTo:null};
+    p.querySelector('#sfcp-q').addEventListener('input',function(){if(shared.owner)shared.owner._list();});
+    p.addEventListener('keydown',function(e){if(shared.owner)shared.owner._key(e);});
+    p.querySelector('#sfcp-list').addEventListener('mousedown',function(e){e.preventDefault();});
+    p.querySelector('#sfcp-list').addEventListener('click',function(e){
+      var li=e.target.closest?e.target.closest('.sfcp-o'):null;
+      if(li&&shared.owner)shared.owner._pick(+li.getAttribute('data-i'));
+    });
+    p.querySelector('#sfcp-narr').addEventListener('click',function(){if(shared.owner)shared.owner._insert('narrative');});
+    p.querySelector('#sfcp-paren').addEventListener('click',function(){if(shared.owner)shared.owner._insert('parenthetical');});
+    p.querySelector('#sfcp-m').addEventListener('click',function(e){
+      e.preventDefault();var o=shared.owner;if(!o)return;
+      o._close(false);if(typeof o.options.onManage==='function')o.options.onManage();
+    });
+    document.addEventListener('mousedown',function(e){
+      if(shared.owner&&!p.contains(e.target))shared.owner._close(false);
+    },true);
+    return shared;
+  }
+  function q(id){return pop().el.querySelector('#'+id);}
+
+  function open(r,from){
+    var P=pop();
+    if(P.owner&&P.owner!==h)P.owner._close(false);
+    if(inCode(a.getText(),r.start))return;
+    range=r;picked=null;activeIdx=0;P.owner=h;P.returnTo=from||el;
+    q('sfcp-st').hidden=true;q('sfcp-pick').hidden=false;
+    q('sfcp-m').hidden=typeof options.onManage!=='function';
+    q('sfcp-q').value='';
+    var rect=el.getBoundingClientRect?el.getBoundingClientRect():{left:8,bottom:8};
+    var vw=window.innerWidth||document.documentElement.clientWidth||800;
+    var vh=window.innerHeight||document.documentElement.clientHeight||600;
+    var left=Math.max(8,Math.min(rect.left,vw-368)),top=rect.bottom+4;
+    if(top>vh-200)top=Math.max(8,(rect.top||top)-300);
+    P.el.style.left=left+'px';P.el.style.top=top+'px';
+    P.el.hidden=false;
+    h._list();
+    q('sfcp-q').focus();
+  }
+  h._list=function(){
+    shown=filter(refs(),q('sfcp-q').value);
+    if(activeIdx>=shown.length)activeIdx=0;
+    var list=q('sfcp-list'),empty=q('sfcp-empty');
+    list.innerHTML=shown.map(function(x,i){
+      return '<li class="sfcp-o" role="option" id="sfcp-o-'+i+'" data-i="'+i+'" aria-selected="'+(i===activeIdx?'true':'false')+'">'
+        +'<span class="sfcp-k">@'+esc(x.key)+'</span><span class="sfcp-a">'+esc(x.authorText)+' ('+esc(x.year)+')</span>'
+        +'<span class="sfcp-t">'+esc(x.title)+'</span></li>';
+    }).join('');
+    var none=!refs().length;
+    empty.hidden=shown.length>0;
+    empty.textContent=none?'No references yet. Add them under References.':'No reference matches.';
+    var input=q('sfcp-q');
+    if(shown.length)input.setAttribute('aria-activedescendant','sfcp-o-'+activeIdx);
+    else input.removeAttribute('aria-activedescendant');
+  };
+  function move(d){
+    if(!shown.length)return;
+    activeIdx=(activeIdx+d+shown.length)%shown.length;h._list();
+    var li=q('sfcp-o-'+activeIdx);if(li&&li.scrollIntoView)li.scrollIntoView({block:'nearest'});
+  }
+  h._pick=function(i){
+    var x=shown[i];if(!x)return;
+    picked=refs().filter(function(r){return r.id===x.key;})[0];if(!picked)return;
+    if(!needsStyle(a.getText(),range.start)){h._insert('narrative');return;}
+    q('sfcp-narr').textContent=narrativeText(picked);
+    q('sfcp-paren').textContent=parentheticalText(picked);
+    q('sfcp-narr').setAttribute('aria-label','Narrative, '+narrativeText(picked)+', inserts @'+picked.id);
+    q('sfcp-paren').setAttribute('aria-label','In brackets, '+parentheticalText(picked)+', inserts [@'+picked.id+']');
+    q('sfcp-pick').hidden=true;q('sfcp-st').hidden=false;q('sfcp-narr').focus();
+  };
+  h._insert=function(style){
+    if(!picked||!range)return;
+    var res=insertion(a.getText(),range.start,range.end,picked.id,style);
+    var cur=a.getText(),start=0,end=cur.length;
+    h._close(true);
+    busy=true;
+    a.replaceRange(start,end,res.text,res.cursor);
+    busy=false;
+    check();
+  };
+  h._close=function(focusField){
+    var P=shared;if(!P||P.owner!==h)return;
+    P.el.hidden=true;P.owner=null;
+    var back=focusField?el:P.returnTo;P.returnTo=null;
+    if(back&&back.focus)back.focus();
+    if(h._afterClose)h._afterClose();
+  };
+  h._key=function(e){
+    var k=e.key;
+    if(k==='Escape'){e.preventDefault();e.stopPropagation();h._close(false);return;}
+    if(!q('sfcp-pick').hidden){
+      if(k==='ArrowDown'){e.preventDefault();move(1);return;}
+      if(k==='ArrowUp'){e.preventDefault();move(-1);return;}
+      if(k==='Enter'){e.preventDefault();h._pick(activeIdx);return;}
+    }
+    if(k==='Tab'){
+      var f=Array.prototype.filter.call(shared.el.querySelectorAll('input,button,a[href]'),function(x){
+        for(var p=x;p&&p!==shared.el;p=p.parentNode)if(p.hidden)return false;return true;});
+      if(!f.length)return;
+      var i=f.indexOf(document.activeElement);
+      if(e.shiftKey&&i<=0){e.preventDefault();f[f.length-1].focus();}
+      else if(!e.shiftKey&&i===f.length-1){e.preventDefault();f[0].focus();}
+    }
+  };
+
+  function onInput(){
+    if(busy)return;
+    later();
+    var s=a.getSelection();
+    if(s.start!==s.end)return;
+    var t=trigger(a.getText(),s.start);
+    if(t)open(t,el);
+  }
+  el.addEventListener('input',onInput);
+  el.addEventListener('focus',check);
+  h.check=check;
+  h.open=function(){var s=a.getSelection();open({start:s.start,end:s.end},el);};
+  h.updateReferences=function(r){h.refs=r;check();if(shared&&shared.owner===h)h._list();};
+  h.destroy=function(){
+    if(shared&&shared.owner===h)h._close(false);
+    el.removeEventListener('input',onInput);el.removeEventListener('focus',check);
+    clearTimeout(timer);
+    if(btn&&btn.parentNode)btn.parentNode.removeChild(btn);
+    if(bar){el.removeEventListener('focus',showBar);el.removeEventListener('blur',hideLater);el.removeEventListener('keydown',onKey);if(bar.parentNode)bar.parentNode.removeChild(bar);}
+    if(pv&&pv.parentNode)pv.parentNode.removeChild(pv);
+    if(msg.parentNode)msg.parentNode.removeChild(msg);
+    el.removeAttribute('aria-invalid');
+    var d=(el.getAttribute('aria-describedby')||'').split(/\s+/).filter(function(x){return x&&x!==msg.id;});
+    if(d.length)el.setAttribute('aria-describedby',d.join(' '));else el.removeAttribute('aria-describedby');
+    handles=handles.filter(function(x){return x!==h;});
+  };
+  handles.push(h);
+  check();
+  return h;
+}
+
+root.SurveyframeCitationPicker={
+  attach:attach,
+  updateReferences:function(r){handles.slice().forEach(function(h){h.updateReferences(r);});},
+  checkAll:function(){handles.forEach(function(h){h.check();});},
+  destroy:function(){handles.slice().forEach(function(h){h.destroy();});},
+  // Pure helpers, for tests and for hosts that need them.
+  normalise:normalise,filter:filter,trigger:trigger,insertion:insertion,
+  unknownKeys:unknownKeys,wrap:wrap,list:list,link:link,math:math,preview:preview,hasMarkdown:hasMarkdown,
+  narrativeText:narrativeText,parentheticalText:parentheticalText,
+  message:MSG_UNKNOWN
+};
+})(typeof window!=='undefined'?window:this);
+</script>
+<!-- FIELD_TOOLS_END -->
+
 <script>
 'use strict';
 
@@ -2749,7 +3565,7 @@ function snap(){hist.push(JSON.stringify(S));if(hist.length>60)hist.shift();fut=
 function undo(){if(!hist.length)return;fut.push(JSON.stringify(S));S=JSON.parse(hist.pop());selId=null;ra();updHistBtns();}
 function redo(){if(!fut.length)return;hist.push(JSON.stringify(S));S=JSON.parse(fut.pop());selId=null;ra();updHistBtns();}
 function updHistBtns(){var u=document.getElementById('undoBtn'),r=document.getElementById('redoBtn');if(u)u.disabled=!hist.length;if(r)r.disabled=!fut.length;}
-function setDirty(){dirty=true;updSave();}
+function setDirty(){dirty=true;updSave();centreLater();}
 // Opened is its own state: inside a host such as Ethos, "Saved" after
 // opening a file reads as saved in the host, and nothing has been saved.
 function updSave(){var e=document.getElementById('saveSt');
@@ -2828,25 +3644,52 @@ function closeCfgMenu(){document.getElementById('cfgMenu').classList.remove('ope
 document.addEventListener('click',function(e){var m=document.getElementById('fabMenu'),b=document.getElementById('fabMoreBtn');if(m&&m.classList.contains('open')&&!m.contains(e.target)&&!b.contains(e.target))closeFabMenu();});
 
 // -- Modes ------------------------------------------------------------------
-function setMode(m){document.querySelectorAll('.m-btn').forEach(function(b){b.setAttribute('aria-pressed',b.dataset.mode===m?'true':'false');});document.querySelectorAll('.mp').forEach(function(p){p.classList.remove('active');});document.getElementById('mp-'+m).classList.add('active');if(m==='preview')renderPreview();if(m==='analyse')renderAnalyse();}
+function setMode(m){if(document.body&&document.body.dataset)document.body.dataset.mode=m;document.querySelectorAll('.m-btn').forEach(function(b){b.setAttribute('aria-pressed',b.dataset.mode===m?'true':'false');});document.querySelectorAll('.mp').forEach(function(p){p.classList.remove('active');});document.getElementById('mp-'+m).classList.add('active');if(m==='preview')renderPreview();if(m==='analyse')renderAnalyse();}
 
 // -- Modals -----------------------------------------------------------------
 // What had focus before a dialog opened, so closing it returns the keyboard
 // user where they were. Opening used to add a class and nothing else, leaving
-// focus behind the dialog entirely.
-var __modalReturn=null;
+// focus behind the dialog entirely. A dialog opened over another (Manage
+// references from a plan) is stacked above it, and closing it returns focus
+// into the one below, so the returns are kept as a stack.
+var __modalReturn=[];
 function openModal(id){
-  __modalReturn=document.activeElement;
   var m=document.getElementById(id);
+  if(m.classList.contains('open'))return;
+  __modalReturn.push(document.activeElement);
+  __modalOpen.push(id);
+  m.classList.toggle('stack',!!document.querySelector('.mov.open'));
   m.classList.add('open');
   var first=m.querySelector('input,select,textarea,button');
   if(first&&first.focus)first.focus();
 }
+// The dialog on top: the one opened last that is still open. Escape closes
+// it through closeModal(), so focus returns where it was, and Tab stays in
+// it (UX-14). Escape used to remove every open dialog's class directly, and
+// Tab walked out to the page behind.
+var __modalOpen=[];
+function topModal(){
+  __modalOpen=__modalOpen.filter(function(id){var m=document.getElementById(id);return m&&m.classList.contains('open');});
+  var id=__modalOpen[__modalOpen.length-1];return id?document.getElementById(id):null;
+}
+function trapTab(e,mov){
+  var f=Array.prototype.filter.call(mov.querySelectorAll('a[href],button,input,select,textarea,[tabindex]'),function(el){
+    if(el.disabled||el.getAttribute('tabindex')==='-1'||el.type==='hidden')return false;
+    return !!(el.offsetWidth||el.offsetHeight||el.getClientRects().length);
+  });
+  if(!f.length){e.preventDefault();return;}
+  var i=f.indexOf(document.activeElement);
+  if(e.shiftKey&&(i<=0)){e.preventDefault();f[f.length-1].focus();}
+  else if(!e.shiftKey&&(i<0||i===f.length-1)){e.preventDefault();f[0].focus();}
+}
 function closeModal(id){
-  document.getElementById(id).classList.remove('open');
+  var m=document.getElementById(id);
+  var was=m.classList.contains('open');
+  m.classList.remove('open','stack');
   if(id==='m-rq')stopRQPlaceholders();
-  if(__modalReturn&&__modalReturn.focus)__modalReturn.focus();
-  __modalReturn=null;
+  if(!was)return;
+  var back=__modalReturn.pop();
+  if(back&&back.focus)back.focus();
 }
 
 // -- Animated sample placeholders (Add Analysis Plan modal) -----------------
@@ -2892,7 +3735,8 @@ function startRQPlaceholders(){
 }
 function stopRQPlaceholders(){rqPhTimers.forEach(clearInterval);rqPhTimers=[];}
 document.addEventListener('keydown',function(e){
-  if(e.key==='Escape'){document.querySelectorAll('.mov.open').forEach(function(m){m.classList.remove('open');});stopRQPlaceholders();}
+  if(e.key==='Escape'){var top=topModal();if(top){e.preventDefault();if(top.id==='m-amend')resAmend(false);else closeModal(top.id);}}
+  if(e.key==='Tab'){var tm=topModal();if(tm)trapTab(e,tm);}
   if((e.ctrlKey||e.metaKey)&&e.key==='s'){e.preventDefault();saveSframe();}
   if((e.ctrlKey||e.metaKey)&&e.key==='z'){e.preventDefault();undo();}
   if((e.ctrlKey||e.metaKey)&&(e.key==='y'||e.key==='Z')){e.preventDefault();redo();}
@@ -2918,6 +3762,7 @@ function openSettings(tab){
   sv('s-gsu',r.google_sheets_url||'');sv('s-gsep',r.google_sheets_endpoint||'');
   if(h.logo_base64){var lp=document.getElementById('logoPrev');if(lp){var lMtype=h.logo_media_type||'image/png';lp.src='data:'+lMtype+';base64,'+h.logo_base64;lp.style.display='block';}document.getElementById('logoName').textContent='Logo loaded';var rb=document.getElementById('logoRmBtn');if(rb)rb.style.display='inline-flex';}
   renderRefs();
+  studyFill(S._carry&&S._carry.study);
   settingsShown=settingsInputs();
   showST(tab||'meta');openModal('m-settings');
 }
@@ -2935,7 +3780,20 @@ function settingsInputs(){
   SETTINGS_CHECK.forEach(function(id){var e=document.getElementById(id);o[id]=!!(e&&e.checked);});
   return o;
 }
-function showST(t){document.querySelectorAll('.stab').forEach(function(b){b.classList.remove('active');});document.querySelectorAll('.stp').forEach(function(p){p.classList.remove('active');});document.getElementById('st-'+t).classList.add('active');document.getElementById('sp-'+t).classList.add('active');}
+// The Settings sections are a tablist (UX-15): buttons with aria-selected and
+// aria-controls, 1 in the Tab order, and the arrow keys, Home and End move
+// between them. They were divs that answered a click alone.
+function showST(t){
+  document.querySelectorAll('.stab').forEach(function(b){var on=b.id==='st-'+t;b.classList.toggle('active',on);b.setAttribute('aria-selected',on?'true':'false');b.setAttribute('tabindex',on?'0':'-1');});
+  document.querySelectorAll('.stp').forEach(function(p){p.classList.toggle('active',p.id==='sp-'+t);});
+}
+function stabKey(e){
+  var tabs=Array.prototype.slice.call(document.querySelectorAll('.stabs .stab'));
+  var i=tabs.indexOf(document.activeElement);if(i<0)return;
+  var j=e.key==='ArrowRight'?(i+1)%tabs.length:e.key==='ArrowLeft'?(i-1+tabs.length)%tabs.length:e.key==='Home'?0:e.key==='End'?tabs.length-1:-1;
+  if(j<0)return;
+  e.preventDefault();showST(tabs[j].id.slice(3));tabs[j].focus();
+}
 function normHex(v){
   v=String(v||'').trim();
   if(/^#[0-9a-fA-F]{6}$/.test(v))return v.toLowerCase();
@@ -2952,8 +3810,13 @@ function syncThemeFromText(){
 function saveSettings(){
   var now=settingsInputs(),was=settingsShown||{};
   function changed(id){return now[id]!==was[id];}
-  if(!SETTINGS_TEXT.concat(SETTINGS_CHECK).some(changed)){closeModal('m-settings');toast('No settings changed','inf');return;}
+  var st=studyRead(),stChanged=JSON.stringify(st)!==studyShown;
+  if(stChanged){var sp=studyProblems(st);if(sp.length){showST('study');toast(sp[0],'err');return;}}
+  if(!stChanged&&!SETTINGS_TEXT.concat(SETTINGS_CHECK).some(changed)){closeModal('m-settings');toast('No settings changed','inf');return;}
   snap();
+  // The study is written only when its fields changed, so a study the user
+  // left alone keeps its exact form and the content hash it had.
+  if(stChanged){if(!S._carry)S._carry={};if(st)S._carry.study=st;else delete S._carry.study;studyShown=JSON.stringify(st);}
   if(!S.render||Array.isArray(S.render))S.render={};
   var R=S.render;
   // A screen's object is created only when one of its fields changes.
@@ -2984,6 +3847,98 @@ function saveSettings(){
   closeModal('m-settings');ra();toast('Settings saved','ok');
 }
 
+// -- Study (D13) ----------------------------------------------------------------
+// The problem, the objectives and the sampling plan, read back from the Study
+// tab in the shape write_sframe() writes: only what is declared, and no study
+// at all when nothing is.
+var studyShown=null,studyObjs=[];
+var STUDY_ID=/^[A-Za-z][A-Za-z0-9_]*$/;
+function studyFill(s){
+  s=(s&&typeof s==='object'&&!Array.isArray(s))?s:{};
+  var sp=(s.sampling&&typeof s.sampling==='object')?s.sampling:{};
+  sv('s-problem',typeof s.problem==='string'?s.problem:'');
+  studyObjs=(Array.isArray(s.objectives)?s.objectives:[]).map(function(o){return {id:String((o&&o.id)||''),text:String((o&&o.text)||'')};});
+  sv('s-pop',typeof sp.population==='string'?sp.population:'');
+  sv('s-method',typeof sp.method==='string'?sp.method:'');
+  sv('s-other',typeof sp.method_other==='string'?sp.method_other:'');
+  sv('s-n',sp.planned_n!=null?String(sp.planned_n):'');
+  renderStudyObjs();studyMethodSync();
+  studyShown=JSON.stringify(studyRead());
+}
+function renderStudyObjs(){
+  var box=document.getElementById('s-objs');if(!box)return;
+  box.innerHTML=studyObjs.length?studyObjs.map(function(o,i){var n=i+1;
+    return '<div class="frow" style="align-items:center;margin:0 0 6px"><input type="text" style="max-width:70px" aria-label="Objective '+n+' id" value="'+esc(o.id)+'" oninput="studyObjs['+i+'].id=this.value">'
+      +'<input type="text" aria-label="Objective '+n+' text" value="'+esc(o.text)+'" oninput="studyObjs['+i+'].text=this.value">'
+      +'<button type="button" class="btn btn-g btn-sm" style="color:var(--cd)" aria-label="Remove objective '+n+'" onclick="studyRemoveObjective('+i+')">Remove</button></div>';
+  }).join(''):'<p class="fhint" style="margin:0 0 6px">No objectives yet.</p>';
+}
+function studyAddObjective(){
+  var used={},k=1;studyObjs.forEach(function(o){used[o.id]=true;});while(used['O'+k])k++;
+  studyObjs.push({id:'O'+k,text:''});renderStudyObjs();
+  var box=document.getElementById('s-objs'),ins=box?box.querySelectorAll('input'):[];
+  if(ins.length>1)ins[ins.length-2].focus();
+}
+function studyRemoveObjective(i){studyObjs.splice(i,1);renderStudyObjs();}
+function studyMethodSync(){var f=document.getElementById('s-other-f');if(f)f.hidden=gv('s-method')!=='other';}
+function studyRead(){
+  var s={},sp={},p=gv('s-problem').trim(),pop=gv('s-pop').trim(),m=gv('s-method'),n=gv('s-n').trim();
+  if(p)s.problem=p;
+  var objs=studyObjs.map(function(o){return {id:o.id.trim(),text:o.text.trim()};}).filter(function(o){return o.id||o.text;});
+  if(objs.length)s.objectives=objs;
+  if(pop)sp.population=pop;
+  if(m)sp.method=m;
+  if(m==='other'&&gv('s-other').trim())sp.method_other=gv('s-other').trim();
+  if(n)sp.planned_n=Number(n);
+  if(Object.keys(sp).length)s.sampling=sp;
+  return Object.keys(s).length?s:null;
+}
+// The study as write_sframe() writes it: an empty sampling or objectives
+// left out, and nothing when the study is then empty.
+function studyPlain(s){
+  if(!s||typeof s!=='object'||Array.isArray(s))return s==null?null:s;
+  var o={};Object.keys(s).forEach(function(k){o[k]=s[k];});
+  if(Array.isArray(o.objectives)&&!o.objectives.length)delete o.objectives;
+  if(o.sampling&&typeof o.sampling==='object'&&!Array.isArray(o.sampling)&&!Object.keys(o.sampling).length)delete o.sampling;
+  return Object.keys(o).length?o:null;
+}
+// What validate_sframe() would refuse, said before the study is saved.
+function studyProblems(s){
+  var out=[],ids={};s=s||{};
+  (s.objectives||[]).forEach(function(o,i){
+    if(!STUDY_ID.test(o.id))out.push('Objective '+(i+1)+' needs an id of letters, digits and underscores, starting with a letter, such as O1.');
+    else if(ids[o.id])out.push('Objective id '+o.id+' is used more than once.');
+    else if(!o.text)out.push('Objective '+o.id+' needs its text.');
+    ids[o.id]=true;
+  });
+  var sp=s.sampling||{};
+  if(sp.method==='other'&&!sp.method_other)out.push('The sampling method is Other, so describe it.');
+  if(sp.planned_n!=null&&!(sp.planned_n>=1&&Math.round(sp.planned_n)===sp.planned_n))out.push('The planned sample size must be a whole number of 1 or more.');
+  (S.analysis_plan||[]).forEach(function(b){
+    if(b&&b.objective&&!ids[b.objective])out.push('Plan '+(b.id||'')+' names objective '+b.objective+'. Keep that objective, or change the plan first.');
+  });
+  return out;
+}
+// The objective a plan block serves (D13). saveRQ() builds the block afresh,
+// so an objective set in R was dropped by any edit here. The select lists the
+// study's objectives, and the block's own objective even when the study no
+// longer declares it, so an edit never changes it unasked.
+function studyObjectiveIds(){var s=S._carry&&S._carry.study;return (s&&Array.isArray(s.objectives)?s.objectives:[]).map(function(o){return o&&o.id;}).filter(function(i){return i;});}
+function rqObjectiveFill(rq){
+  var ids=studyObjectiveIds(),cur=rq&&typeof rq.objective==='string'?rq.objective:'';
+  if(cur&&ids.indexOf(cur)<0)ids.push(cur);
+  var texts={};var s=S._carry&&S._carry.study;(s&&Array.isArray(s.objectives)?s.objectives:[]).forEach(function(o){if(o&&o.id)texts[o.id]=o.text||'';});
+  var sel=document.getElementById('rq-obj');
+  if(sel)sel.innerHTML='<option value="">None</option>'+ids.map(function(i){return '<option value="'+esc(i)+'">'+esc(i+(texts[i]?': '+texts[i]:''))+'</option>';}).join('');
+  sv('rq-obj',cur);
+  var f=document.getElementById('rq-obj-field');if(f)f.hidden=!ids.length;
+}
+function rqObjectiveKeep(rq,was){
+  var o=gv('rq-obj');
+  if(o)rq.objective=o;
+  else if(was&&was.objective==='')rq.objective='';
+}
+
 // -- References (0.4.3) -------------------------------------------------------
 // CSL-JSON records, the format read_bibtex() and sframe_reference() produce in R.
 // Each may say where the instrument cites it, in cited_by.
@@ -2995,13 +3950,22 @@ function saveSettings(){
 // else. S.references is written only when it holds one, as write_sframe()
 // writes it, so a file that cites nothing keeps the hash it had before.
 function refsList(){return S.references||[];}
-function refsCommit(list){if(list.length)S.references=list;else delete S.references;setDirty();}
+function refsCommit(list){if(list.length)S.references=list;else delete S.references;setDirty();citeCheckAll();}
 var REF_ID=/^[A-Za-z0-9_]([A-Za-z0-9_:.#$%&+?<>~\/-]*[A-Za-z0-9_])?$/;
+// Where a reference can be cited, as R's cited_by pattern allows:
+// ^(instrument|study|(item|scale|plan|model|hypothesis):.+)$. The study is
+// offered only while there is one, and a plan block's hypotheses only while
+// it declares one, since validate_sframe() reports a target that is not
+// there (8b-R).
+function planDeclaresHyp(b){var h=b&&b.hypotheses;if(!h||typeof h!=='object')return false;
+  return [h.null,h.alternative].some(function(v){return typeof v==='string'&&v.trim();});}
 function refTargets(){
   var t=[{v:'instrument',l:'The instrument as a whole'}];
+  if(studyPlain(S._carry&&S._carry.study))t.push({v:'study',l:'The study: problem and objectives'});
   (S.scales||[]).forEach(function(x){t.push({v:'scale:'+x.id,l:'Scale: '+(x.label||x.id)});});
   (S.items||[]).forEach(function(x){if(x.type!=='section_break'&&x.type!=='text_block')t.push({v:'item:'+x.id,l:'Item: '+x.id});});
   (S.analysis_plan||[]).forEach(function(x){t.push({v:'plan:'+x.id,l:'Plan: '+x.id+(x.research_question?' '+x.research_question:'')});});
+  (S.analysis_plan||[]).forEach(function(x){if(planDeclaresHyp(x))t.push({v:'hypothesis:'+x.id,l:'Hypotheses of plan '+x.id});});
   return t;
 }
 function refShort(r){
@@ -3019,7 +3983,11 @@ function renderRefs(){
   if(!refsDraft.length){box.innerHTML='<p class="fhint" style="margin:8px 0 12px">No references yet.</p>';return;}
   box.innerHTML=refsDraft.map(function(r,i){
     var cited=r.cited_by||[];
-    var checks=targets.map(function(t){return '<label class="fcheck"><input type="checkbox" '+(cited.indexOf(t.v)>=0?'checked ':'')+'onchange="toggleCite('+i+',this.value,this.checked)" value="'+esc(t.v)+'"><span>'+esc(t.l)+'</span></label>';}).join('');
+    // A target cited but no longer offered (a study cleared, a hypothesis
+    // removed) still shows, ticked, so it can be taken off.
+    var here={};targets.forEach(function(t){here[t.v]=true;});
+    var stale=cited.filter(function(v){return !here[v];}).map(function(v){return {v:v,l:v+' (no longer declared)'};});
+    var checks=targets.concat(stale).map(function(t){return '<label class="fcheck"><input type="checkbox" '+(cited.indexOf(t.v)>=0?'checked ':'')+'onchange="toggleCite('+i+',this.value,this.checked)" value="'+esc(t.v)+'"><span>'+esc(t.l)+'</span></label>';}).join('');
     return '<div style="border:1px solid var(--bd);border-radius:6px;padding:8px 10px;margin:0 0 8px">'
       +'<div style="display:flex;gap:8px;align-items:flex-start"><div style="flex:1;font-size:12px"><code>@'+esc(r.id)+'</code> '+esc(refShort(r))+'</div>'
       +'<button type="button" class="btn btn-g btn-sm" style="color:var(--cd)" onclick="removeRef('+i+')" aria-label="Remove '+esc(r.id)+'">Remove</button></div>'
@@ -3394,6 +4362,10 @@ var SFRAME_FORMAT='1.0';
 function sframePayload(){
   var payload={sframe_format:SFRAME_FORMAT,hash:{algo:'sha256',value:''},version:S.meta.version,meta:S.meta,items:S.items,choices:S.choices,scales:S.scales,branching:S.branching,checks:S.checks,analysis_plan:S.analysis_plan,models:S.models||[],render:S.render||{}};
   var carry=S._carry||{};Object.keys(carry).forEach(function(k){payload[k]=carry[k];});
+  // An empty study, objectives or sampling is refused by the sframe-schema
+  // profile and by validate_sframe(), and an instrument with no study has no
+  // study field. One opened as {} was saved as {} again (found by session V).
+  if(payload.hasOwnProperty('study')){var st=studyPlain(payload.study);if(st)payload.study=st;else delete payload.study;}
   if(S.references&&S.references.length)payload.references=S.references;
   return payload;
 }
@@ -3497,7 +4469,7 @@ function renderItemList(){
   if(!items.length){el.removeAttribute('role');}else{el.setAttribute('role','listbox');}
   if(!items.length){el.innerHTML='<div class="sb-empty"><div class="sb-empty-ic">&#128196;</div><div class="sb-empty-t">No questions yet</div><div class="sb-empty-b">Use "+ Add question" below to choose a question type, or start from an existing file.</div><div class="sb-empty-cta"><button type="button" class="sb-cta-s" onclick="openFile()">Open an existing .sframe</button><button type="button" class="sb-cta-s" onclick="openSettings()">Set up survey settings</button></div></div>';return;}
   var cp=null;
-  el.innerHTML=items.map(function(item){
+  el.innerHTML=screenRow('__welcome')+items.map(function(item){
     var ri=S.items.indexOf(item);
     var sc=S.scales.find(function(s){return s.items&&s.items.includes(item.id);});
     var ck=S.checks.find(function(c){return c.item_id===item.id;});
@@ -3515,7 +4487,7 @@ function renderItemList(){
     // selecting a question for editing. Ordering gains explicit named buttons,
     // since drag handlers alone leave a keyboard user with no way to reorder.
     return pd+'<div class="ic'+(selId===item.id?' sel':'')+'" role="option" tabindex="0" aria-selected="'+(selId===item.id?'true':'false')+'" draggable="true" data-idx="'+ri+'" data-id="'+esc(item.id)+'" onclick="selItem(\''+item.id+'\')" onkeydown="itemRowKey(event,\''+item.id+'\','+ri+')" ondragstart="dStart(event,'+ri+')" ondragover="dOver(event,'+ri+',event)" ondrop="dDrop(event,'+ri+')" ondragleave="this.classList.remove(\'drag-t\',\'drag-b\')"><div class="ic-h" title="Drag to reorder" aria-hidden="true">&#8942;</div><div class="ic-body"><div class="'+lc+'">'+esc(item.label||'(no label)')+'</div><div class="ic-meta">'+bgs.join('')+'</div></div><div class="ic-acts"><button type="button" class="ib" title="Move up" aria-label="Move question up" onclick="event.stopPropagation();moveItemBy('+ri+',-1)">&#8593;</button><button type="button" class="ib" title="Move down" aria-label="Move question down" onclick="event.stopPropagation();moveItemBy('+ri+',1)">&#8595;</button><button type="button" class="ib" title="Duplicate" aria-label="Duplicate question" onclick="event.stopPropagation();dupItem(\''+item.id+'\')">&#10697;</button><button type="button" class="ib del" title="Delete" aria-label="Delete question" onclick="event.stopPropagation();delItem(\''+item.id+'\')">&#128465;</button></div></div>';
-  }).join('');
+  }).join('')+screenRow('__thankyou');
 }
 function selItem(id){selId=id;renderItemList();openInsp(id);}
 // Enter or Space opens a question for editing; Alt with an arrow moves it, so
@@ -3531,8 +4503,9 @@ function itemRowKey(e,id,idx){
   }
   if(k==='ArrowUp'||k==='ArrowDown'){
     e.preventDefault();
-    var rows=document.querySelectorAll('.ic');
-    var next=idx+(k==='ArrowUp'?-1:1);
+    var rows=Array.prototype.slice.call(document.querySelectorAll('.ic'));
+    var at=rows.indexOf(e.currentTarget);
+    var next=(at>=0?at:idx)+(k==='ArrowUp'?-1:1);
     if(next<0||next>=rows.length)return;
     if(rows[next]&&rows[next].focus)rows[next].focus();
   }
@@ -3548,7 +4521,7 @@ function moveItemBy(idx,delta){
   renderItemList();
   // Focus follows the question that moved, so a run of moves needs no
   // reaching for the mouse.
-  var rows=document.querySelectorAll('.ic');
+  var rows=document.querySelectorAll('.ic[data-idx]');
   if(rows[to]&&rows[to].focus)rows[to].focus();
 }
 
@@ -3558,7 +4531,7 @@ function dOver(e,idx,ev){e.preventDefault();document.querySelectorAll('.ic').for
 function dDrop(e,idx){e.preventDefault();document.querySelectorAll('.ic').forEach(function(c){c.classList.remove('drag-t','drag-b','dragging');});if(dragSrc===null||dragSrc===idx){dragSrc=null;return;}snap();var moved=S.items.splice(dragSrc,1)[0];var tgt=dragSrc<idx?idx-1:idx;S.items.splice(tgt,0,moved);dragSrc=null;renderItemList();}
 // Plan reorder (Plan tab only; index maps 1:1 to S.analysis_plan)
 // Plan-card drag-reorder is id-based (not index-based) so it works on both
-// the Plan tab (all plans) and the Run preview queue (data-requiring plans
+// the Plan tab (all plans) and the Declared analyses tab (data-requiring plans
 // only, where display indices differ from S.analysis_plan indices).
 var planDragSrc=null;
 function pStart(e,id){planDragSrc=id;e.currentTarget.classList.add('dragging');e.stopPropagation();}
@@ -3569,14 +4542,127 @@ function pEnd(e){planDragSrc=null;document.querySelectorAll('#rqsBody .rq-card')
 // -- Inspector --------------------------------------------------------------
 var NCS=['likert','single_choice','multiple_choice','matrix','ranking'];
 function openInsp(id){
+  if(SCREENS[id]){openScreenInsp(id);return;}
+  var foot=document.querySelector('.insp-foot');if(foot)foot.hidden=false;
   var item=S.items.find(function(i){return i.id===id;});if(!item)return;
   document.getElementById('inspId').textContent=item.id;
   document.getElementById('inspTypeLbl').textContent=TL[item.type]||item.type;
   renderInspBody(item);
   document.getElementById('inspector').classList.add('open');
   document.getElementById('cPrompt').style.display='none';
+  narrowEditing(true);
+  renderCentre();
 }
-function closeInsp(){document.getElementById('inspector').classList.remove('open');document.getElementById('cPrompt').style.display='flex';selId=null;renderItemList();}
+function closeInsp(){narrowEditing(false);document.getElementById('inspector').classList.remove('open');document.getElementById('cPrompt').style.display='flex';selId=null;renderItemList();renderCentre();}
+// -- Welcome and thank-you pages ---------------------------------------------
+// The pages before the first question and after the last, as entries at the
+// ends of the question list (UX-10), with their editor on the right and
+// their preview in the centre. The fields keep the ids the Settings dialog
+// gave them. A field is written only when its value moves from what was
+// shown, so a page left alone keeps the content hash, and a page's object is
+// created only when 1 of its fields changes.
+var SCREENS={__welcome:{key:'welcome',label:'Welcome page',hint:'Before the first question'},
+  __thankyou:{key:'thankyou',label:'Thank-you page',hint:'After the last question'}};
+var SCREEN_FIELDS={'s-wt':['welcome','title'],'s-wi':['welcome','intro_text'],'s-wc':['welcome','consent_text'],
+  's-wreq':['welcome','consent_required'],'s-wsl':['welcome','start_label'],
+  's-tym':['thankyou','message'],'s-tyu':['thankyou','redirect_url'],'s-tydl':['thankyou','show_download']};
+var SCREEN_CHECK={'s-wreq':true,'s-tydl':true};
+var screenShown={};
+function screenRow(id){
+  var s=SCREENS[id],on=selId===id;
+  return '<div class="ic ic-screen'+(on?' sel':'')+'" role="option" tabindex="0" aria-selected="'+(on?'true':'false')+'" data-id="'+id+'" onclick="selItem(\''+id+'\')" onkeydown="itemRowKey(event,\''+id+'\',-1)">'
+    +'<div class="ic-body"><div class="ic-lbl blk">'+s.label+'</div><div class="ic-meta"><span class="badge b-nu">'+s.hint+'</span></div></div></div>';
+}
+function screenVal(fid){
+  var m=SCREEN_FIELDS[fid],R0=(S.render&&!Array.isArray(S.render))?S.render:{},p=R0[m[0]]||{},v=p[m[1]];
+  if(SCREEN_CHECK[fid])return !!v;
+  if(fid==='s-wsl')return v||'Start Survey';
+  if(fid==='s-tym')return v||'Thank you for participating.';
+  return v||'';
+}
+function openScreenInsp(id){
+  var welcome=id==='__welcome';
+  document.getElementById('inspId').textContent=welcome?'welcome':'thankyou';
+  document.getElementById('inspTypeLbl').textContent=SCREENS[id].label;
+  var foot=document.querySelector('.insp-foot');if(foot)foot.hidden=true;
+  function txt(fid,lbl,ph,type){return '<div class="field"><label class="fl" for="'+fid+'">'+lbl+'</label><div class="fc"><input type="'+(type||'text')+'" id="'+fid+'" value="'+esc(screenVal(fid))+'" placeholder="'+esc(ph||'')+'" onblur="updScreen(\''+fid+'\')"></div></div>';}
+  function area(fid,lbl,rows){return '<div class="field"><label class="fl" for="'+fid+'">'+lbl+'</label><div class="fc"><textarea id="'+fid+'" rows="'+rows+'" onblur="updScreen(\''+fid+'\')">'+esc(screenVal(fid))+'</textarea></div></div>';}
+  function box(fid,lbl){return '<label class="fcheck"><input type="checkbox" id="'+fid+'"'+(screenVal(fid)?' checked':'')+' onchange="updScreen(\''+fid+'\')"><span>'+lbl+'</span></label>';}
+  document.getElementById('inspBody').innerHTML=welcome
+    ?'<div class="alert-i">Shown before the first question. Introduce the study and ask for informed consent. With no introduction, consent or description, the survey opens at its first question.</div>'
+      +txt('s-wt','Welcome title','Welcome to our survey')+area('s-wi','Introduction text',5)
+      +area('s-wc','Consent statement (leave blank to skip)',4)+box('s-wreq','Require consent checkbox before starting')
+      +txt('s-wsl','Start button label')
+    :'<div class="alert-i">Shown after the last question is submitted.</div>'
+      +area('s-tym','Thank-you message',4)+txt('s-tyu','Redirect URL (optional)','https://example.com/thank-you','url')
+      +'<span class="fhint">After submission, respondents are redirected to this URL.</span>'
+      +box('s-tydl','Show "Download my response" button');
+  screenShown={};Object.keys(SCREEN_FIELDS).forEach(function(fid){
+    if(SCREEN_FIELDS[fid][0]!==SCREENS[id].key)return;
+    var v=screenVal(fid),e=document.getElementById(fid);screenShown[fid]=v;
+    if(e){if(SCREEN_CHECK[fid])e.checked=v;else e.value=v;}
+  });
+  document.getElementById('inspector').classList.add('open');
+  document.getElementById('cPrompt').style.display='none';
+  narrowEditing(true);
+  renderCentre();
+}
+function updScreen(fid){
+  var m=SCREEN_FIELDS[fid],el=document.getElementById(fid);if(!m||!el)return;
+  if(!screenShown.hasOwnProperty(fid))return;
+  var v=SCREEN_CHECK[fid]?!!el.checked:(el.value||'');
+  if(v===screenShown[fid])return;
+  snap();
+  if(!S.render||Array.isArray(S.render))S.render={};
+  if(!S.render[m[0]]||typeof S.render[m[0]]!=='object')S.render[m[0]]={};
+  S.render[m[0]][m[1]]=fid==='s-wsl'?(v||'Start Survey'):v;
+  screenShown[fid]=v;
+}
+// Inside Studio, Collect and References are Studio screens. The builder asks
+// Studio to open one, and Studio's handler is UI-1's.
+function studioGoto(screen){
+  if(typeof STUDIO_HOST==='undefined'||!STUDIO_HOST)return;
+  closeModal('m-settings');
+  window.parent.postMessage({type:'goto',screen:screen},location.origin);
+}
+
+// On a narrow screen the list and the editor take turns (UX-01, UX-08).
+// body.editing shows the editor, and Back returns to the list, to the row of
+// the question that was open.
+function narrowEditing(on){var b=document.body;if(b&&b.classList){if(on)b.classList.add('editing');else b.classList.remove('editing');}}
+function inspBack(){
+  var id=selId;closeInsp();
+  var row=id&&document.querySelector('#itemList .ic[data-id="'+String(id).replace(/"/g,'')+'"]');
+  if(row&&row.focus)row.focus();
+}
+// -- Centre pane -------------------------------------------------------------
+// The selected item as a respondent sees it, drawn by the survey template's
+// own show-only mode, so there is 1 renderer. Read-only: the editor is on
+// the right. Redrawn a moment after each edit, at desktop or mobile width.
+var centreTimer=null,centreW='desktop';
+function centreItemId(){return selId;}
+function renderCentre(){
+  var box=document.getElementById('cvPv'),fr=document.getElementById('cvPvFrame');
+  if(!box||!fr||!fr.appendChild||!box.classList)return;
+  var id=centreItemId(),ins=document.getElementById('inspector');
+  var on=!!id&&!!ins&&ins.classList.contains('open');
+  if(on)box.classList.add('on');else box.classList.remove('on');
+  if(!on)return;
+  var html=surveyHtml(true);if(html===null)return;
+  html=html.replace('<body data-endpoint=','<body data-only="'+esc(id)+'" data-endpoint=');
+  var f=fr.querySelector&&fr.querySelector('iframe');
+  if(!f){f=document.createElement('iframe');f.title='Preview of the selected item';fr.appendChild(f);}
+  f.srcdoc=html;
+}
+function centreLater(){
+  if(typeof setTimeout!=='function'||typeof clearTimeout!=='function')return;
+  clearTimeout(centreTimer);centreTimer=setTimeout(renderCentre,300);
+}
+function centreWidth(w){
+  centreW=w;
+  ['desktop','mobile'].forEach(function(k){var b=document.getElementById('cvW-'+k);if(b)b.setAttribute('aria-pressed',k===w?'true':'false');});
+  var fr=document.getElementById('cvPvFrame');if(fr&&fr.classList){if(w==='mobile')fr.classList.add('mobile');else fr.classList.remove('mobile');}
+}
 function fgs(title,body){return'<div class="fgs"><div class="fgs-hdr" onclick="this.parentElement.classList.toggle(\'col\')"><span class="fgs-t">'+title+'</span><span class="fgs-tog">&#9660;</span></div><div class="fgs-body">'+body+'</div></div>';}
 function safeId(s){return String(s||'choice').toLowerCase().replace(/[^a-z0-9_]+/g,'_').replace(/^_+|_+$/g,'')||'choice';}
 function itemChoiceLines(item){
@@ -3908,13 +4994,21 @@ function rmItem(id){
 }
 
 // -- Choices ----------------------------------------------------------------
-function openChoiceModal(){sv('c-id','');document.getElementById('cRows').innerHTML='';document.getElementById('c-other').checked=false;document.getElementById('c-rand').checked=false;document.getElementById('c-ord').checked=false;openModal('m-choice');}
+function openChoiceModal(){sv('c-id','');document.getElementById('cRows').innerHTML='';document.getElementById('c-other').checked=false;document.getElementById('c-rand').checked=false;document.getElementById('c-ord').checked=false;choiceOrdSync();openModal('m-choice');}
 function addCRow(v,l){v=v||'';l=l||'';var d=document.createElement('div');d.className='crow';d.innerHTML='<span class="crow-dh">&#8942;</span><div style="display:flex;gap:4px;flex:1"><input type="text" placeholder="Value" value="'+esc(String(v))+'" style="flex:.35;border:none;font-size:11px;padding:3px 4px"><input type="text" placeholder="Label" value="'+esc(String(l))+'" style="flex:.65;border:none;font-size:11px;padding:3px 4px"></div><button type="button" class="crow-rm" onclick="this.parentElement.remove()">&#215;</button>';document.getElementById('cRows').appendChild(d);}
 function fillL5(){document.getElementById('cRows').innerHTML='';[[1,'Strongly disagree'],[2,'Disagree'],[3,'Neutral'],[4,'Agree'],[5,'Strongly agree']].forEach(function(p){addCRow(p[0],p[1]);});}
 function fillL7(){document.getElementById('cRows').innerHTML='';[[1,'Strongly disagree'],[2,'Disagree'],[3,'Somewhat disagree'],[4,'Neutral'],[5,'Somewhat agree'],[6,'Agree'],[7,'Strongly agree']].forEach(function(p){addCRow(p[0],p[1]);});}
 function fillYN(){document.getElementById('cRows').innerHTML='';[['yes','Yes'],['no','No']].forEach(function(p){addCRow(p[0],p[1]);});}
 function fillFr(){document.getElementById('cRows').innerHTML='';[[1,'Never'],[2,'Rarely'],[3,'Sometimes'],[4,'Often'],[5,'Always']].forEach(function(p){addCRow(p[0],p[1]);});}
 function fillIm(){document.getElementById('cRows').innerHTML='';[[1,'Not important'],[2,'Slightly'],[3,'Moderately'],[4,'Very'],[5,'Extremely']].forEach(function(p){addCRow(p[0],p[1]);});}
+// "Other" has no place on a scale, and R refuses allow_other on an ordered
+// set, so ordering the set turns it off.
+function choiceOrdSync(){
+  var ord=document.getElementById('c-ord'),oth=document.getElementById('c-other'),h=document.getElementById('c-other-h');
+  var on=!!(ord&&ord.checked);
+  if(oth){if(on)oth.checked=false;oth.disabled=on;}
+  if(h)h.hidden=!on;
+}
 function saveChoice(){
   var id=gv('c-id').trim();if(!id){toast('Choice set ID required','err');return;}
   var rows=Array.from(document.querySelectorAll('#cRows .crow'));
@@ -3922,7 +5016,7 @@ function saveChoice(){
   rows.forEach(function(r){var ins=r.querySelectorAll('input');var v=ins[0].value.trim(),l=ins[1].value.trim();if(v&&l){vals.push(isNaN(v)?v:Number(v));lbls.push(l);}});
   if(!vals.length){toast('Add at least one option','err');return;}
   snap();
-  var cs={id:id,values:vals,labels:lbls,allow_other:document.getElementById('c-other').checked,randomise:document.getElementById('c-rand').checked};
+  var cs={id:id,values:vals,labels:lbls,allow_other:document.getElementById('c-other').checked&&!document.getElementById('c-ord').checked,randomise:document.getElementById('c-rand').checked};
   // Written only when set, as sframe_choice_set() writes it, so a set without it
   // keeps the hash it had.
   if(document.getElementById('c-ord').checked)cs.ordered=true;
@@ -4190,12 +5284,14 @@ function openRQModal(id){
   sv('rq-q',rq?rq.research_question||'':'');sv('rq-interp',rq?ruleOf(rq):'');
   sv('rq-h0',rq&&rq.hypotheses?writtenHyp(rq.hypotheses.null):'');sv('rq-h1',rq&&rq.hypotheses?writtenHyp(rq.hypotheses.alternative):'');
   document.getElementById('rq-test').value=method;
+  rqObjectiveFill(rq);
   document.getElementById('rq-alpha').value=rq?String((rq.options&&rq.options.alpha)||rq.alpha||0.05):'0.05';
   document.getElementById('rq-term').value=rq&&rq.options&&rq.options.term?String(rq.options.term):'';
   document.getElementById('rq-wordcloud').checked=!!(rq&&rq.options&&rq.options.wordcloud);
   document.getElementById('rq-seed').value=rq&&rq.options&&rq.options.seed!=null?String(rq.options.seed):'';
   document.getElementById('rq-topn').value=rq&&rq.options&&rq.options.top_n!=null?String(rq.options.top_n):'';
   document.getElementById('rq-k').value=rq&&rq.options&&rq.options.k!=null?String(rq.options.k):'';
+  sv('rq-pct',rq&&rq.options&&typeof rq.options.percent==='string'?rq.options.percent:'');
   document.getElementById('rqDelBtn').style.display=id?'inline-flex':'none';
   popRQVars(rolesFromLegacy(rq,method));onTestChg(false);
   // A fresh plan gets the same text-family nudge suggestTest() shows once a
@@ -4204,6 +5300,7 @@ function openRQModal(id){
   // suggestTest()). Editing an existing plan always hides it, unchanged.
   if(id){document.getElementById('rqSuggest').style.display='none';}else{suggestTest();}
   openModal('m-rq');startRQPlaceholders();
+  citeCheckAll();
 }
 function popRQVars(roleValues){
   var vars=getAllVars();
@@ -4273,9 +5370,14 @@ function onTestChg(renderRoles){
   var sf=document.getElementById('rq-seed-field');if(sf)sf.style.display=reg.showSeed?'block':'none';
   var nf=document.getElementById('rq-topn-field');if(nf)nf.style.display=reg.showTopN?'block':'none';
   var kf=document.getElementById('rq-k-field');if(kf)kf.style.display=reg.showK?'block':'none';
+  var pf=document.getElementById('rq-pct-field');if(pf)pf.style.display=reg.showPercent?'block':'none';
   document.getElementById('rqCitDiv').innerHTML=cits.length?'<label class="fl">Reporting references</label><div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:4px">'+cits.map(function(k){return'<span class="cc">'+esc(CSHORT[k]||k)+'</span>';}).join('')+'</div>':'';
   validatePlanRoles();
 }
+// A cross-tab and a chi-square carry options$percent, the denominator of the
+// percentages shown beside each count (UX-02). Set only here, where plans are
+// edited.
+['crosstab','chi_square'].forEach(function(t){if(ANALYSIS_REGISTRY[t])ANALYSIS_REGISTRY[t].showPercent=true;});
 var TEXT_METHOD_IDS=['term_freq','ngram_freq','term_context','co_occurrence','co_occurrence_network','tidy_sentiment','quanteda_dfm','topic_model_lda','stm_topics'];
 function hasTextItems(){return S.items.some(function(i){return i.type==='text'||i.type==='textarea';});}
 function suggestTest(){
@@ -4348,10 +5450,12 @@ function saveRQ(){
   if(reg.showSeed&&gv('rq-seed').trim())opts.seed=parseInt(gv('rq-seed'),10);
   if(reg.showTopN&&gv('rq-topn').trim())opts.top_n=parseInt(gv('rq-topn'),10);
   if(reg.showK&&gv('rq-k').trim())opts.k=parseInt(gv('rq-k'),10);
+  if(reg.showPercent&&gv('rq-pct'))opts.percent=gv('rq-pct');
   // Only what the researcher wrote is saved. Placeholders are examples.
   var hyp=null;if(reg.showHypotheses){var h0=gv('rq-h0').trim(),h1=gv('rq-h1').trim();if(h0||h1){hyp={};if(h0)hyp.null=h0;if(h1)hyp.alternative=h1;}}
   var editRq=editRqId?S.analysis_plan.find(function(r){return r.id===editRqId;}):null;
   var rq={id:editRqId||uid(),research_question:q,family:reg.family||'',method:t,test:t,roles:roles,variables:vars,options:opts,hypotheses:hyp,decision_rule:gv('rq-interp').trim(),interpretation:editRq?interpOf(editRq):'',reporting_references:reg.refs||[],citations:reg.refs||[],status:'valid_plan',requires_data:!['cfa_lavaan_syntax','sem_lavaan_syntax','seminr_syntax'].includes(t),result:null};
+  rqObjectiveKeep(rq,editRq);
   snap();
   if(editRqId){var i=S.analysis_plan.findIndex(function(r){return r.id===editRqId;});if(i>=0)S.analysis_plan[i]=rq;}
   else S.analysis_plan.push(rq);
@@ -4428,7 +5532,7 @@ function renderModelBuilder(){
   from.innerHTML=opts;to.innerHTML=opts;
   list.innerHTML=models.length?models.map(function(m){var paths=(m.structural&&m.structural.paths)||[];return'<div class="model-row"><strong>'+esc(m.id)+'</strong> <span class="vbadge">'+esc(m.type||'model')+'</span><div>'+esc((m.measurement&&m.measurement.constructs||[]).length)+' construct(s), '+esc(paths.length)+' path(s)</div><div class="model-paths">'+(paths.length?paths.map(function(p){return'<span class="vchip">'+esc(p.from+' -> '+p.to)+'</span>';}).join(''):'<span class="rq-no-int">No paths yet.</span>')+'</div></div>';}).join(''):'<div class="rq-no-int">No saved models yet.</div>';
 }
-// Inline interpretation editing in the Report outline. The decision rule is
+// Inline interpretation editing in Expected outputs. The decision rule is
 // declared in the RQ modal and shown here read-only. This writes the
 // interpretation field only, so the two never overwrite each other. No
 // re-render here: the textarea already shows the value, and re-rendering
@@ -4439,7 +5543,7 @@ function updatePlanInterp(id,val){
   rq.interpretation=val.trim();
   setDirty();
 }
-// Report outline tab: a skeleton of the eventual render_report() document:
+// Expected outputs tab: a skeleton of the eventual render_report() document:
 // study header, quality and descriptives stubs, then one section per plan
 // with an empty results table and a figure placeholder (the table+plot
 // pairing the R report emits), then models and references.
@@ -4482,14 +5586,14 @@ function renderAnalyse(){
   var vars=getAllVars();
   vl.innerHTML=vars.length?vars.map(function(v){var i=v.item||{},m=v.meta||varLevel(v.id),cs=i.choice_set||'',sc=i.scale_id||'';return'<div class="vmeta"><div class="vmeta-id">'+esc(v.id)+'</div><div class="vmeta-lbl">'+esc((i.label||v.label||'').slice(0,90))+'</div><div class="vmeta-badges"><span class="vbadge '+esc(m.cls)+'">'+esc(m.code)+'</span><span class="vbadge">'+esc(m.type||v.kind)+'</span>'+(cs?'<span class="vbadge">choice: '+esc(cs)+'</span>':'')+(sc?'<span class="vbadge">scale: '+esc(sc)+'</span>':'')+(i.required?'<span class="vbadge">required</span>':'<span class="vbadge">missing allowed</span>')+'</div></div>';}).join(''):'<p style="font-size:11px;color:var(--t3);padding:8px">Define items and scales to see variables here.</p>';
   var rb=document.getElementById('rqsBody');if(!rb)return;
-  document.getElementById('anMidTitle').textContent=anTab==='plan'?'Analysis plans':anTab==='run'?'Run queue':'Report outline';
-  var capEl=document.getElementById('anMidCaption');if(capEl){capEl.innerHTML=anTab==='plan'?'Design stage. Declare each analysis before collecting data. Plans are saved into the <code>.sframe</code> file.':anTab==='run'?'Preview only. These plans execute in R via <code>run_analysis_plan(instr, responses)</code> once responses are collected. Nothing runs in this browser.':'Preview only. This outline shows the sections <code>render_report()</code> will produce in R. No report is generated in this browser.';}
+  document.getElementById('anMidTitle').textContent=anTab==='plan'?'Analysis plans':anTab==='run'?'Declared analyses':'Expected outputs';
+  var capEl=document.getElementById('anMidCaption');if(capEl){capEl.innerHTML=anTab==='plan'?'Design stage. Declare each analysis before collecting data. Plans are saved into the <code>.sframe</code> file.':anTab==='run'?'The analyses that need data, declared before any is collected. Nothing runs in this browser: they run in R via <code>run_analysis_plan(instr, responses)</code> once responses are collected.':'The sections <code>render_report()</code> will produce in R, and where each analysis puts its table, chart and interpretation. No report is made in this browser.';}
   var allPlans=S.analysis_plan;
   var runPlans=allPlans.filter(function(r){return r.requires_data!==false;});
   var syntaxOnly=allPlans.filter(function(r){return r.requires_data===false;});
   var displayPlans=anTab==='run'?runPlans:allPlans;
   if(!allPlans.length){rb.innerHTML='<div class="an-empty"><div class="an-empty-ic">&#128300;</div><div class="an-empty-t">No analysis plans yet</div><div class="an-empty-b">Declare each analysis before collecting data: method, roles, assumptions, and planned outputs.</div><div style="margin-top:14px"><button type="button" class="btn btn-p" onclick="openRQModal()">+ Add plan</button></div></div>';return;}
-  // Plan and Run preview both show draggable plan cards. Run preview is the
+  // Plan and Declared analyses both show draggable plan cards. Declared analyses is the
   // execution queue: the same cards, minus syntax-only methods, reorderable
   // in place (drag order writes back to S.analysis_plan by id).
   var draggable=anTab==='plan'||anTab==='run';
@@ -4499,6 +5603,7 @@ function renderAnalyse(){
     if(syntaxOnly.length)rb.innerHTML+='<div style="padding:8px 12px;font-size:11px;color:var(--t3);border-top:1px solid var(--bdr);margin-top:4px">'+syntaxOnly.length+' syntax-only method(s) excluded. These generate lavaan or seminr strings without requiring response data.</div>';
   }else if(anTab==='report'){
     rb.innerHTML=reportSkeletonHtml(allPlans);
+    allPlans.forEach(function(rq,i){citeAttach('rsInterp_'+i,'Interpretation');});
   }else{
     rb.innerHTML=cardHtml(allPlans);
   }
@@ -4569,6 +5674,9 @@ function studioHostInit(){
   document.getElementById('exportBtn').style.display='none';
   document.querySelector('.tb-brand').style.display='none';
   document.querySelector(".m-btn[data-mode='preview']").style.display='none';
+  // Studio's own Collect and References screens hold these, so the tabs link there.
+  document.querySelectorAll('.studio-only').forEach(function(e){e.hidden=false;});
+  document.querySelectorAll('.studio-not').forEach(function(e){e.hidden=true;});
   updSave();
   var sb=document.getElementById('saveBtn');
   sb.textContent='Save to Studio';sb.title='Make this survey the instrument Studio has open (Ctrl+S)';
@@ -4598,6 +5706,29 @@ function studioHostInit(){
   });
   window.parent.postMessage({type:'need-sframe'},location.origin);
 }
+// -- Citation picker (0.4.3) ----------------------------------------------------
+// The shared picker (field_tools.js, inlined above, the same file Studio
+// loads) on the free-text fields where a plan cites literature: the research
+// question, H0, H1, the decision rule, the interpretation and the study
+// problem. It reads the
+// instrument's references as they stand, so nothing is stored twice, and a
+// built-in method reference (CSHORT) counts as a known key.
+var citeHandles={};
+function citeAttach(id,label){
+  var P=window.SurveyframeCitationPicker,el=document.getElementById(id);
+  if(!P||!el)return null;
+  var old=citeHandles[id];
+  if(old){if(old.element===el)return old;old.destroy();}
+  citeHandles[id]=P.attach(el,refsList,{label:label,onManage:manageRefs,
+    knownKeys:function(){return Object.keys(CSHORT);}});
+  return citeHandles[id];
+}
+function citeCheckAll(){var P=window.SurveyframeCitationPicker;if(P)P.checkAll();}
+// Settings opens on its References tab, above the plan dialog when one is open.
+function manageRefs(){if(typeof STUDIO_HOST!=='undefined'&&STUDIO_HOST){studioGoto('references');return;}openSettings('refs');}
+[['rq-q','Research question'],['rq-h0','Null hypothesis'],['rq-h1','Alternative hypothesis'],
+ ['rq-interp','Decision rule'],['s-problem','Problem statement']].forEach(function(f){citeAttach(f[0],f[1]);});
+
 if(STUDIO_HOST)studioHostInit();
 </script>
 </body>
