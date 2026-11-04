@@ -9,6 +9,13 @@
 a.sf-primary,
 .btn.sf-primary {
   display: inline-flex;
+  /* Sized to its label wherever it sits: a grid cell or a flex row would
+     otherwise stretch it, as the builder's top bar did (item 12h). */
+  flex: 0 0 auto;
+  justify-self: start;
+  align-self: center;
+  width: auto;
+  max-width: max-content;
   align-items: center;
   gap: 6px;
   min-height: 40px;
