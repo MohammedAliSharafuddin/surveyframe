@@ -1131,7 +1131,8 @@ sframe_choice_column_kind <- function(instrument, column) {
   if (grepl("__", column, fixed = TRUE)) {
     base <- sub("__.*$", "", column)
     hit <- match(base, ids)
-    if (!is.na(hit) && identical(items[[hit]]$type, "multiple_choice")) {
+    if (!is.na(hit) && identical(items[[hit]]$type, "multiple_choice") &&
+        !column %in% sframe_other_text_columns(instrument, items[hit])) {
       return("option")
     }
   }

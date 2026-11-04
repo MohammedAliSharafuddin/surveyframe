@@ -134,3 +134,63 @@ test_that("allow_other is refused on an ordered set", {
 test_that("a set with allow_other on unordered free codes validates", {
   expect_true(validate_sframe(ao_instrument(), strict = FALSE)$valid)
 })
+
+test_that("the codebook and the frequency table name the option Other", {
+  inst <- ao_instrument()
+  cb <- sframe_codebook(inst)
+  expect_identical(cb$choices_table$value, c("web", "friend", "other"))
+  expect_identical(cb$choices_table$label, c("Website", "A friend", "Other"))
+  expect_identical(nrow(sframe_codebook(ao_instrument(FALSE))$choices_table), 2L)
+  data <- data.frame(one = c("web", "other", "other", "friend"), stringsAsFactors = FALSE)
+  fr <- surveyframe:::sframe_frequency_one(data, "one", instrument = inst)
+  expect_identical(fr$table$Value, c("Website", "A friend", "Other"))
+  expect_identical(fr$table$Code, c("web", "friend", "other"))
+  expect_identical(fr$table$Frequency, c(1L, 1L, 2L))
+  expect_identical(surveyframe:::sframe_choice_column_kind(inst, "many__other"), "option")
+  expect_identical(surveyframe:::sframe_choice_column_kind(inst, "many__other_text"), "other")
+})
+
+test_that("the Other text goes to the text-analysis path", {
+  inst <- ao_instrument()
+  txt <- c("a radio advert", "the radio", "", "a local radio show", "radio again",
+           "poster on a wall", rep("radio", 6))
+  data <- data.frame(one = ifelse(nzchar(txt), "other", "web"), one__other_text = txt,
+                     stringsAsFactors = FALSE)
+  cleaned <- sframe_clean_text(data, "one__other_text", instrument = inst)
+  expect_identical(attr(cleaned, "respondent"), c(1L, 2L, 4:12))
+  expect_error(sframe_clean_text(data, "one", instrument = inst), "not 'text' or 'textarea'")
+  tf <- surveyframe:::sframe_run_term_freq(data, list(item = "one__other_text"), list(), inst)
+  expect_null(tf$error)
+  expect_identical(tf$table$term[1], "radio")
+  expect_false("one__other_text" %in%
+                 surveyframe:::dashboard_categorical_columns(data, inst))
+})
+
+test_that("a static survey row reads back through read_responses() for both types", {
+  inst <- ao_instrument()
+  ctx <- static_survey_context(inst)
+  ctx$eval("setOther('one', 'A poster', false); setResp('many', 'web'); setOther('many', 'Radio', true);")
+  ctx$eval("doSubmit();")
+  path <- tempfile(fileext = ".csv")
+  writeLines(ctx$get("window._lastCsv.csv"), path, useBytes = TRUE)
+  got <- read_responses(path, inst)
+  unlink(path)
+  expect_identical(got$one, "other")
+  expect_identical(got$one__other_text, "A poster")
+  expect_identical(c(got$many__web, got$many__friend, got$many__other), c(1, 0, 1))
+  expect_identical(got$many__other_text, "Radio")
+  fr <- surveyframe:::sframe_frequency_one(got, "one", instrument = inst)
+  expect_identical(fr$table$Value[fr$table$Frequency > 0], "Other")
+
+  ctx <- static_survey_context(inst)
+  ctx$eval("setResp('one', 'web'); setResp('many', 'friend');")
+  ctx$eval("doSubmit();")
+  path <- tempfile(fileext = ".csv")
+  writeLines(ctx$get("window._lastCsv.csv"), path, useBytes = TRUE)
+  got <- read_responses(path, inst)
+  unlink(path)
+  expect_identical(got$one, "web")
+  expect_true(is.na(got$one__other_text))
+  expect_identical(got$many__other, 0)
+  expect_true(is.na(got$many__other_text))
+})

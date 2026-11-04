@@ -91,6 +91,11 @@ sframe_item_value_labels <- function(instrument, item_id) {
     vals <- as.character(cs$values %||% character(0))
     labs <- as.character(cs$labels %||% character(0))
     if (length(vals) != length(labs)) return(character(0))
+    # "Other, please specify" is coded "other" and named Other.
+    if (sframe_item_allows_other(instrument, instrument$items[[hit]])) {
+      vals <- c(vals, "other")
+      labs <- c(labs, "Other")
+    }
     return(stats::setNames(labs, vals))
   }
   character(0)

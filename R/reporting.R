@@ -1741,6 +1741,7 @@ sframe_report_charts <- function(instrument, data, plot_palette = "web") {
       if (!is.null(cs)) {
         hit <- match(labels, as.character(cs$values))
         labels[!is.na(hit)] <- cs$labels[hit[!is.na(hit)]]
+        if (isTRUE(cs$allow_other)) labels[is.na(hit) & labels == "other"] <- "Other"
       }
       names(picked) <- labels
       if (!sum(picked)) next
