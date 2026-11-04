@@ -304,6 +304,29 @@ test_that("each screen's title and context line are 1 row at the top of its pane
   expect_true(ui2_wait(b, "$('#screen-design > .screen-head').text().indexOf('Editing: ') >= 0", 20))
 })
 
+test_that("Design's head holds the instrument's title and version, in Build and Plan and with unsaved changes (item 12h)", {
+  b <- ui1_studio("factor_structure")
+  ins <- surveyframe::sframe_demo("factor_structure")$instrument
+  want <- paste0("Editing: ", ins$meta$title, " (", ins$meta$version, ")")
+  head_has <- function() {
+    ui2_wait(b, sprintf(paste0(
+      "(function(){ var h = $('#screen-design > .screen-head'), s = document.getElementById('design_status');",
+      "  return h.text().indexOf(%s) >= 0 && s.offsetWidth > 0 && s.offsetHeight > 0; })()"),
+      jsonlite::toJSON(want, auto_unbox = TRUE)), 20)
+  }
+  expect_true(ui1_screen(b, "design"))
+  expect_true(head_has(), label = "Build")
+  ui2_js(b, "$('.studio-nav a[data-nav=\"plan\"]').click(); true")
+  expect_true(ui2_wait(b, "$('#screen-design').hasClass('active')", 20))
+  expect_true(head_has(), label = "Plan")
+  # The unsaved note joins the line and does not replace it.
+  ui2_js(b, "$('#design_unsaved').show(); true")
+  expect_true(head_has(), label = "unsaved")
+  expect_lt(ui2_js(b, "$('#screen-design > .screen-head').outerHeight()"), 90)
+  ui2_js(b, "$('#design_unsaved').hide(); true")
+  expect_true(ui1_screen(b, "design"))
+})
+
 test_that("no screen offers 2 controls for the same destination (item 12d)", {
   b <- ui1_studio("factor_structure")
   for (screen in sframe_studio_screens()) {
