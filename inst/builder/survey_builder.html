@@ -889,9 +889,10 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
       </div>
     </div>
     <div style="display:flex;gap:14px">
-      <label class="fcheck"><input type="checkbox" id="c-other"><span>Include "Other" option</span></label>
+      <label class="fcheck" id="c-other-l"><input type="checkbox" id="c-other"><span>Include "Other, please specify"</span></label>
       <label class="fcheck"><input type="checkbox" id="c-rand"><span>Randomise order</span></label>
-      <label class="fcheck"><input type="checkbox" id="c-ord"><span>Options run in order (ordinal)</span></label>
+      <label class="fcheck"><input type="checkbox" id="c-ord" onchange="choiceOrdSync()"><span>Options run in order (ordinal)</span></label>
+      <span class="fhint" id="c-other-h" hidden>An ordered set has no place for "Other", so it is off.</span>
     </div>
   </div>
   <div class="mfoot"><button type="button" class="btn btn-s" onclick="closeModal('m-choice')">Cancel</button><div class="sp"></div><button type="button" class="btn btn-p" onclick="saveChoice()">Save choice set</button></div>
@@ -1194,6 +1195,7 @@ body[data-only] .prog-bar-wrap,body[data-only] .sf-hdr{display:none!important}
 .choice-opt:has(input:checked)::before{background:var(--cp);border-color:var(--cp);color:#fff}
 .choice-opt::after{content:"\2713";margin-left:auto;color:var(--cp);font-weight:700;visibility:hidden}
 .choice-opt:has(input:checked)::after{visibility:visible}
+.other-txt{display:block;width:100%;box-sizing:border-box;margin:6px 0 0;padding:9px 12px;border:1.5px solid var(--cb);border-radius:8px;font:inherit}
 .choice-opt input{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
 
 /* Short text / number / date: editorial underline inputs */
@@ -1611,7 +1613,7 @@ function renderSingle(item,cs){
       +(checked?' checked':'')+(item.required?' aria-required="true"':'')
       +' onchange="setResp(\''+esc(item.id)+'\',this.value)">'
       +'<span class="opt-txt">'+esc(cs.labels[i]||v)+'</span></label>';
-  }).join('')+'</div>';
+  }).join('')+otherOption(item,cs,false)+'</div>';
 }
 function renderMulti(item,cs){
   var saved=(responses[item.id]||'').split(',').filter(Boolean);
@@ -1624,7 +1626,7 @@ function renderMulti(item,cs){
       +(chk?' checked':'')+(item.required?' aria-required="true"':'')
       +' onchange="toggleMulti(\''+esc(item.id)+'\',this)">'
       +'<span class="opt-txt">'+esc(cs.labels[i]||v)+'</span></label>';
-  }).join('')+'</div>';
+  }).join('')+otherOption(item,cs,true)+'</div>';
 }
 function renderMatrix(item,cs){
   var rows=item.matrix_items||[];
@@ -1882,6 +1884,37 @@ function setResp(id,val){
   if(err)err.classList.remove('show');
   updateBranching();
 }
+// "Other, please specify" (UX-11). A choice set with allow_other adds it
+// last, outside any shuffle. A single choice submits the code "other" in
+// <id>, a multiple choice submits <id>__other as 1 or 0, and both submit the
+// typed text in <id>__other_text. Typing in the box chooses Other.
+function otherOption(item,cs,multi){
+  if(!cs.allow_other)return '';
+  var id=esc(item.id),on=multi?(responses[item.id]||'').split(',').indexOf('other')>=0:String(responses[item.id])==='other';
+  return '<label class="choice-opt choice-other"><input type="'+(multi?'checkbox':'radio')+'" name="'+id+'" value="other"'
+    +(on?' checked':'')+(item.required?' aria-required="true"':'')
+    +' onchange="'+(multi?'toggleMulti(\''+id+'\',this)':'setResp(\''+id+'\',this.value)')+'">'
+    +'<span class="opt-txt">Other, please specify</span></label>'
+    +'<input type="text" class="other-txt" id="other_'+id+'" aria-label="Other, please specify"'
+    +' value="'+esc(responses[item.id+'__other_text']||'')+'" oninput="setOther(\''+id+'\',this.value,'+(multi?'true':'false')+')">';
+}
+function setOther(id,val,multi){
+  responses[id+'__other_text']=val;
+  if(String(val).trim()){
+    if(multi){var cur=(responses[id]||'').split(',').filter(Boolean);if(cur.indexOf('other')<0){cur.push('other');responses[id]=cur.join(',');}}
+    else responses[id]='other';
+    var box=document.querySelector('input[name="'+id+'"][value="other"]');if(box)box.checked=true;
+  }
+  var err=document.getElementById('err_'+id);
+  if(err)err.classList.remove('show');
+  updateBranching();
+}
+function otherChosen(item){
+  var cs=choiceMap[item.choice_set||'']||{};
+  if(!cs.allow_other)return false;
+  if(item.type==='multiple_choice')return (responses[item.id]||'').split(',').indexOf('other')>=0;
+  return item.type==='single_choice'&&String(responses[item.id])==='other';
+}
 function toggleMulti(id,cb){
   var current=(responses[id]||'').split(',').filter(Boolean);
   if(cb.checked){if(!current.includes(cb.value))current.push(cb.value);}
@@ -1980,6 +2013,15 @@ function rankMove(itemId,v,dir){
 // ── Validation ─────────────────────────────────────────────────────────────
 function validatePage(items){
   var ok=true;
+  // Other chosen with nothing typed says nothing, so it blocks the page.
+  items.forEach(function(item){
+    if(!isVisible(item.id)||!otherChosen(item))return;
+    if(String(responses[item.id+'__other_text']||'').trim())return;
+    var err=document.getElementById('err_'+item.id);
+    if(err){err.textContent='Please say what "Other" is.';err.classList.add('show');}
+    if(ok)focusProblem(item.id);
+    ok=false;
+  });
   // An answered date outside its declared bounds is an error even on a
   // non-required item, because manual typing bypasses the picker limits.
   items.forEach(function(item){
@@ -2146,6 +2188,10 @@ function doSubmit(){
       (csM.values||[]).forEach(function(v){
         row[item.id+'__'+String(v)]=sel.includes(String(v))?'1':'0';
       });
+      if(csM.allow_other){
+        row[item.id+'__other']=sel.includes('other')?'1':'0';
+        row[item.id+'__other_text']=sel.includes('other')?(responses[item.id+'__other_text']||''):'';
+      }
     } else if(item.type==='pairwise_comparison'){
       // Column conventions match R/read_responses.R's expansion whitelist:
       // item__a__vs__b (signed Saaty degree) for unordered pairs, or
@@ -2172,6 +2218,9 @@ function doSubmit(){
       });
     } else {
       row[item.id]=responses[item.id]!=null?responses[item.id]:'';
+      var csO=choiceMap[item.choice_set||'']||{};
+      if(item.type==='single_choice'&&csO.allow_other)
+        row[item.id+'__other_text']=String(responses[item.id])==='other'?(responses[item.id+'__other_text']||''):'';
     }
   });
   var csvStr=toCsv([row]);
@@ -4840,13 +4889,21 @@ function rmItem(id){
 }
 
 // -- Choices ----------------------------------------------------------------
-function openChoiceModal(){sv('c-id','');document.getElementById('cRows').innerHTML='';document.getElementById('c-other').checked=false;document.getElementById('c-rand').checked=false;document.getElementById('c-ord').checked=false;openModal('m-choice');}
+function openChoiceModal(){sv('c-id','');document.getElementById('cRows').innerHTML='';document.getElementById('c-other').checked=false;document.getElementById('c-rand').checked=false;document.getElementById('c-ord').checked=false;choiceOrdSync();openModal('m-choice');}
 function addCRow(v,l){v=v||'';l=l||'';var d=document.createElement('div');d.className='crow';d.innerHTML='<span class="crow-dh">&#8942;</span><div style="display:flex;gap:4px;flex:1"><input type="text" placeholder="Value" value="'+esc(String(v))+'" style="flex:.35;border:none;font-size:11px;padding:3px 4px"><input type="text" placeholder="Label" value="'+esc(String(l))+'" style="flex:.65;border:none;font-size:11px;padding:3px 4px"></div><button type="button" class="crow-rm" onclick="this.parentElement.remove()">&#215;</button>';document.getElementById('cRows').appendChild(d);}
 function fillL5(){document.getElementById('cRows').innerHTML='';[[1,'Strongly disagree'],[2,'Disagree'],[3,'Neutral'],[4,'Agree'],[5,'Strongly agree']].forEach(function(p){addCRow(p[0],p[1]);});}
 function fillL7(){document.getElementById('cRows').innerHTML='';[[1,'Strongly disagree'],[2,'Disagree'],[3,'Somewhat disagree'],[4,'Neutral'],[5,'Somewhat agree'],[6,'Agree'],[7,'Strongly agree']].forEach(function(p){addCRow(p[0],p[1]);});}
 function fillYN(){document.getElementById('cRows').innerHTML='';[['yes','Yes'],['no','No']].forEach(function(p){addCRow(p[0],p[1]);});}
 function fillFr(){document.getElementById('cRows').innerHTML='';[[1,'Never'],[2,'Rarely'],[3,'Sometimes'],[4,'Often'],[5,'Always']].forEach(function(p){addCRow(p[0],p[1]);});}
 function fillIm(){document.getElementById('cRows').innerHTML='';[[1,'Not important'],[2,'Slightly'],[3,'Moderately'],[4,'Very'],[5,'Extremely']].forEach(function(p){addCRow(p[0],p[1]);});}
+// "Other" has no place on a scale, and R refuses allow_other on an ordered
+// set, so ordering the set turns it off.
+function choiceOrdSync(){
+  var ord=document.getElementById('c-ord'),oth=document.getElementById('c-other'),h=document.getElementById('c-other-h');
+  var on=!!(ord&&ord.checked);
+  if(oth){if(on)oth.checked=false;oth.disabled=on;}
+  if(h)h.hidden=!on;
+}
 function saveChoice(){
   var id=gv('c-id').trim();if(!id){toast('Choice set ID required','err');return;}
   var rows=Array.from(document.querySelectorAll('#cRows .crow'));
@@ -4854,7 +4911,7 @@ function saveChoice(){
   rows.forEach(function(r){var ins=r.querySelectorAll('input');var v=ins[0].value.trim(),l=ins[1].value.trim();if(v&&l){vals.push(isNaN(v)?v:Number(v));lbls.push(l);}});
   if(!vals.length){toast('Add at least one option','err');return;}
   snap();
-  var cs={id:id,values:vals,labels:lbls,allow_other:document.getElementById('c-other').checked,randomise:document.getElementById('c-rand').checked};
+  var cs={id:id,values:vals,labels:lbls,allow_other:document.getElementById('c-other').checked&&!document.getElementById('c-ord').checked,randomise:document.getElementById('c-rand').checked};
   // Written only when set, as sframe_choice_set() writes it, so a set without it
   // keeps the hash it had.
   if(document.getElementById('c-ord').checked)cs.ordered=true;

@@ -131,6 +131,7 @@ body[data-only] .prog-bar-wrap,body[data-only] .sf-hdr{display:none!important}
 .choice-opt:has(input:checked)::before{background:var(--cp);border-color:var(--cp);color:#fff}
 .choice-opt::after{content:"\2713";margin-left:auto;color:var(--cp);font-weight:700;visibility:hidden}
 .choice-opt:has(input:checked)::after{visibility:visible}
+.other-txt{display:block;width:100%;box-sizing:border-box;margin:6px 0 0;padding:9px 12px;border:1.5px solid var(--cb);border-radius:8px;font:inherit}
 .choice-opt input{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
 
 /* Short text / number / date: editorial underline inputs */
@@ -548,7 +549,7 @@ function renderSingle(item,cs){
       +(checked?' checked':'')+(item.required?' aria-required="true"':'')
       +' onchange="setResp(\''+esc(item.id)+'\',this.value)">'
       +'<span class="opt-txt">'+esc(cs.labels[i]||v)+'</span></label>';
-  }).join('')+'</div>';
+  }).join('')+otherOption(item,cs,false)+'</div>';
 }
 function renderMulti(item,cs){
   var saved=(responses[item.id]||'').split(',').filter(Boolean);
@@ -561,7 +562,7 @@ function renderMulti(item,cs){
       +(chk?' checked':'')+(item.required?' aria-required="true"':'')
       +' onchange="toggleMulti(\''+esc(item.id)+'\',this)">'
       +'<span class="opt-txt">'+esc(cs.labels[i]||v)+'</span></label>';
-  }).join('')+'</div>';
+  }).join('')+otherOption(item,cs,true)+'</div>';
 }
 function renderMatrix(item,cs){
   var rows=item.matrix_items||[];
@@ -819,6 +820,37 @@ function setResp(id,val){
   if(err)err.classList.remove('show');
   updateBranching();
 }
+// "Other, please specify" (UX-11). A choice set with allow_other adds it
+// last, outside any shuffle. A single choice submits the code "other" in
+// <id>, a multiple choice submits <id>__other as 1 or 0, and both submit the
+// typed text in <id>__other_text. Typing in the box chooses Other.
+function otherOption(item,cs,multi){
+  if(!cs.allow_other)return '';
+  var id=esc(item.id),on=multi?(responses[item.id]||'').split(',').indexOf('other')>=0:String(responses[item.id])==='other';
+  return '<label class="choice-opt choice-other"><input type="'+(multi?'checkbox':'radio')+'" name="'+id+'" value="other"'
+    +(on?' checked':'')+(item.required?' aria-required="true"':'')
+    +' onchange="'+(multi?'toggleMulti(\''+id+'\',this)':'setResp(\''+id+'\',this.value)')+'">'
+    +'<span class="opt-txt">Other, please specify</span></label>'
+    +'<input type="text" class="other-txt" id="other_'+id+'" aria-label="Other, please specify"'
+    +' value="'+esc(responses[item.id+'__other_text']||'')+'" oninput="setOther(\''+id+'\',this.value,'+(multi?'true':'false')+')">';
+}
+function setOther(id,val,multi){
+  responses[id+'__other_text']=val;
+  if(String(val).trim()){
+    if(multi){var cur=(responses[id]||'').split(',').filter(Boolean);if(cur.indexOf('other')<0){cur.push('other');responses[id]=cur.join(',');}}
+    else responses[id]='other';
+    var box=document.querySelector('input[name="'+id+'"][value="other"]');if(box)box.checked=true;
+  }
+  var err=document.getElementById('err_'+id);
+  if(err)err.classList.remove('show');
+  updateBranching();
+}
+function otherChosen(item){
+  var cs=choiceMap[item.choice_set||'']||{};
+  if(!cs.allow_other)return false;
+  if(item.type==='multiple_choice')return (responses[item.id]||'').split(',').indexOf('other')>=0;
+  return item.type==='single_choice'&&String(responses[item.id])==='other';
+}
 function toggleMulti(id,cb){
   var current=(responses[id]||'').split(',').filter(Boolean);
   if(cb.checked){if(!current.includes(cb.value))current.push(cb.value);}
@@ -917,6 +949,15 @@ function rankMove(itemId,v,dir){
 // ── Validation ─────────────────────────────────────────────────────────────
 function validatePage(items){
   var ok=true;
+  // Other chosen with nothing typed says nothing, so it blocks the page.
+  items.forEach(function(item){
+    if(!isVisible(item.id)||!otherChosen(item))return;
+    if(String(responses[item.id+'__other_text']||'').trim())return;
+    var err=document.getElementById('err_'+item.id);
+    if(err){err.textContent='Please say what "Other" is.';err.classList.add('show');}
+    if(ok)focusProblem(item.id);
+    ok=false;
+  });
   // An answered date outside its declared bounds is an error even on a
   // non-required item, because manual typing bypasses the picker limits.
   items.forEach(function(item){
@@ -1083,6 +1124,10 @@ function doSubmit(){
       (csM.values||[]).forEach(function(v){
         row[item.id+'__'+String(v)]=sel.includes(String(v))?'1':'0';
       });
+      if(csM.allow_other){
+        row[item.id+'__other']=sel.includes('other')?'1':'0';
+        row[item.id+'__other_text']=sel.includes('other')?(responses[item.id+'__other_text']||''):'';
+      }
     } else if(item.type==='pairwise_comparison'){
       // Column conventions match R/read_responses.R's expansion whitelist:
       // item__a__vs__b (signed Saaty degree) for unordered pairs, or
@@ -1109,6 +1154,9 @@ function doSubmit(){
       });
     } else {
       row[item.id]=responses[item.id]!=null?responses[item.id]:'';
+      var csO=choiceMap[item.choice_set||'']||{};
+      if(item.type==='single_choice'&&csO.allow_other)
+        row[item.id+'__other_text']=String(responses[item.id])==='other'?(responses[item.id+'__other_text']||''):'';
     }
   });
   var csvStr=toCsv([row]);
