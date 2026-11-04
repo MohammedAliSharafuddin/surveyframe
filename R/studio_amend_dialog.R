@@ -69,9 +69,9 @@ sframe_studio_amend_modal <- function(ns, preview, start_label, defaults = list(
                                       allow_new = FALSE) {
   code <- defaults$reason_code %||% "instrument_revision"
   tier <- if (isTRUE(preview$design_forced)) "design" else sframe_amendment_default_tier(code)
-  tiers <- c("Pipeline (data or wording)" = "pipeline",
-             "Design (what is measured or analysed)" = "design")
-  if (isTRUE(preview$design_forced)) tiers <- tiers["Design (what is measured or analysed)"]
+  tiers <- c("Data or wording correction (pipeline)" = "pipeline",
+             "Change to what is measured or analysed (design)" = "design")
+  if (isTRUE(preview$design_forced)) tiers <- tiers[tiers == "design"]
   sug <- preview$suggest[[tier]]
   why <- vapply(c("design", "pipeline"), function(t) {
     s <- preview$suggest[[t]]
@@ -84,12 +84,13 @@ sframe_studio_amend_modal <- function(ns, preview, start_label, defaults = list(
     shiny::tags$p(class = "hint", start_label),
     shiny::tags$div(class = "plan-msg", id = ns("summary"),
                     lapply(sframe_studio_amend_summary(preview), shiny::tags$div)),
-    shiny::selectInput(ns("reason_code"), "Reason", choices = sframe_studio_reason_choices,
+    shiny::selectInput(ns("reason_code"), "Why was this change made?", choices = sframe_studio_reason_choices,
                        selected = code),
     shiny::textAreaInput(ns("reason_text"), "What changed and why", rows = 2,
                          value = defaults$reason_text %||% "",
                          placeholder = "Required."),
-    shiny::selectInput(ns("tier"), "Tier", choices = tiers, selected = tier),
+    shiny::selectInput(ns("tier"), "Type of change", choices = tiers, selected = tier),
+    shiny::tags$p(class = "hint", "The tier. A pipeline amendment corrects data or wording. A design amendment changes what is measured or analysed, and needs a deviation report."),
     shiny::conditionalPanel(
       condition = "input.tier == 'design'", ns = ns,
       sframe_studio_cite_field(shiny::textAreaInput(ns("deviation_report"), "Deviation report", rows = 3,
@@ -97,7 +98,7 @@ sframe_studio_amend_modal <- function(ns, preview, start_label, defaults = list(
         placeholder = "What changed in the research question, method or model, and why."), "Deviation report")),
     shiny::fluidRow(
       shiny::column(6, shiny::textInput(ns("author"), "Author (optional)")),
-      shiny::column(6, shiny::textInput(ns("signoff"), "Second reviewer sign-off (optional)"))
+      shiny::column(6, shiny::textInput(ns("signoff"), "Second reviewer's name, as sign-off (optional)"))
     ),
     shiny::textInput(ns("version"), "Version after the amendment",
                      value = sug$version %||% (preview$version %||% "")),

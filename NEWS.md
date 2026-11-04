@@ -1088,6 +1088,14 @@ style.
 
 ## SurveyStudio
 
+* **Plain words first** in Studio and SurveyBuilder (UX-18). A label says
+  what a control does, and the technical term follows as help: "Type of
+  change" with the pipeline and design tiers explained, "Where is this
+  source used?" for cited by, "R package that fits the model" for the
+  output engine, "Web app address that receives the responses" for the
+  collector endpoint, "Refuse a file with missing or unexpected columns" for
+  the strict column check, and the manifest described as a list of every
+  file with its checksum.
 * **SurveyBuilder's Open Collect, Open References and Manage references open
   Studio's screens** when the builder runs inside Studio. Studio handles the
   builder's `goto` message for Collect and References.
