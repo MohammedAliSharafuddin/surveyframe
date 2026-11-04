@@ -9,7 +9,7 @@ render_report(
   data = NULL,
   output_file = NULL,
   output_path = NULL,
-  format = c("html", "pdf", "docx", "odt"),
+  format = c("html", "pdf", "docx", "odt", "qmd"),
   include_quality = TRUE,
   include_reliability = TRUE,
   include_codebook = TRUE,
@@ -42,7 +42,7 @@ temporary file is written and its path returned.}
 supplied, \code{output_file} takes precedence.}
 
 \item{format}{Character. Output format: \code{"html"} (default), \code{"pdf"},
-\code{"docx"} (Word) or \code{"odt"} (OpenDocument). Word and OpenDocument go
+\code{"docx"} (Word), \code{"odt"} (OpenDocument) or \code{"qmd"} (the Quarto source). Word and OpenDocument go
 through Quarto, styled by bundled APA 7 reference documents (Times New
 Roman 12, double spacing, APA headings), and stop with a message when
 Quarto is not found. PDF goes through Quarto and LaTeX when a LaTeX
@@ -53,7 +53,14 @@ pagedown package (in Suggests) and a local Chrome or Chromium. The
 returned path's \code{"converter"} attribute names the route:
 \code{"quarto-latex"}, \code{"quarto-typst"}, \code{"pagedown"}, or \code{"quarto"} for
 Word and OpenDocument. The first Typst render of a session downloads a
-Typst package Quarto's template imports, unless it is already cached.}
+Typst package Quarto's template imports, unless it is already cached.
+\code{"qmd"} writes the Quarto source of the report as a folder, named by
+\code{output_file} (a trailing \code{.qmd} is dropped), which must be new or empty:
+\code{report.qmd}, the \code{.sframe}, \code{responses.csv}, the bibliography and its
+style, the results record and \code{manifest.json}, and no \verb{_quarto.yml}. Open
+\code{report.qmd} in RStudio or Positron and render it. It recomputes every
+number from the folder's files and checks them, through
+\code{\link[=sframe_report_source]{sframe_report_source()}}. Writing the folder needs no Quarto.}
 
 \item{include_quality}{Logical. Whether to include the data quality report.
 Requires \code{data}. Defaults to \code{TRUE}.}
@@ -215,6 +222,7 @@ Other Report functions:
 \code{\link[=sframe_analysis_qmd]{sframe_analysis_qmd()}},
 \code{\link[=sframe_codebook]{sframe_codebook()}},
 \code{\link[=sframe_format_result]{sframe_format_result()}},
+\code{\link[=sframe_report_source]{sframe_report_source()}},
 \code{\link{sframe_reports}},
 \code{\link[=sframe_save_figures]{sframe_save_figures()}}
 }

@@ -70,6 +70,13 @@ sframe_sha256_text <- function(text) {
   sframe_hex(openssl::sha256(charToRaw(enc2utf8(text))))
 }
 
+# Text written byte for byte, with no newline added, so the file's sha256 is
+# the sha256 of the text.
+sframe_write_text <- function(text, path) {
+  writeBin(charToRaw(enc2utf8(text)), path)
+  invisible(path)
+}
+
 sframe_sha256_file <- function(path) {
   con <- file(path, open = "rb")
   on.exit(close(con), add = TRUE)

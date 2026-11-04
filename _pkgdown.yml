@@ -206,11 +206,13 @@ reference:
 
   - title: "Report"
     desc: >
-      Write up what was run: an HTML or PDF report, a codebook, the figures,
+      Write up what was run: an HTML, PDF, Word or OpenDocument report or its
+      Quarto source, a codebook, the figures,
       and the R code behind each result. In SurveyStudio: the Report screen.
       In code: `render_report()`.
     contents:
       - render_report
+      - sframe_report_source
       - render_results
       - sframe_reports
       - sframe_format_result
