@@ -131,3 +131,40 @@ test_that("D13: an other method is described, and the methods are grouped", {
   expect_setequal(sframe_sampling_methods(), c(sframe_sampling_methods("probability"),
     sframe_sampling_methods("non_probability"), "census", "other"))
 })
+
+# The Codex review of the sframe-schema study profile (2026-11), each example
+# JSON applied to a 1-item instrument, so the problem under test is the only one.
+codex_instr <- function(json) {
+  ins <- sframe_instrument("S", components = list(sframe_item("q1", "Q?", "text")))
+  f <- jsonlite::fromJSON(json, simplifyVector = FALSE)
+  for (n in names(f)) ins[[n]] <- f[[n]]
+  ins
+}
+codex_problems <- function(json) {
+  v <- validate_sframe(codex_instr(json), strict = FALSE)
+  expect_false(sframe_is_valid(v))
+  paste(sframe_problems(v), collapse = "\n")
+}
+
+test_that("Profile B1, B2: a plan objective is checked with no study, as \"\" or an objective id", {
+  expect_match(codex_problems(
+    '{"analysis_plan":[{"id":"P1","method":"frequency","variables":"q1","objective":"bad id"}]}'),
+    "Plan block P1's objective 'bad id' is not an objective id", fixed = TRUE)
+  expect_match(codex_problems(
+    '{"analysis_plan":[{"id":"P1","method":"frequency","variables":"q1","objective":1}]}'),
+    "Plan block P1's objective must be 1 objective id", fixed = TRUE)
+  expect_match(codex_problems('{"analysis_plan":[{"objective":1}]}'),
+               "Plan block 1's objective must be 1 objective id", fixed = TRUE)
+  # A well formed id with no study, or a study with no objectives, is undeclared.
+  expect_match(codex_problems(
+    '{"analysis_plan":[{"id":"P1","method":"frequency","variables":"q1","objective":"O1"}]}'),
+    "Plan block(s) P1 name objective 'O1', which the study does not declare.", fixed = TRUE)
+  expect_match(codex_problems(
+    '{"study":{"problem":"Why?"},"analysis_plan":[{"id":"P1","method":"frequency","variables":"q1","objective":"O1"}]}'),
+    "which the study does not declare", fixed = TRUE)
+  # "" names no objective, and a block without one stays valid.
+  for (json in c('{"analysis_plan":[{"id":"P1","method":"frequency","variables":"q1","objective":""}]}',
+                 '{"analysis_plan":[{"id":"P1","method":"frequency","variables":"q1"}]}')) {
+    expect_true(sframe_is_valid(validate_sframe(codex_instr(json), strict = FALSE)))
+  }
+})
