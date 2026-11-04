@@ -155,7 +155,12 @@ Reproducibility block gives the version and the amendment list.
 
 The References screen lists the works the instrument cites and adds more from
 pasted BibTeX, each with where the instrument cites it. Citing a source needs
-no amendment, and the references travel in the exported `.sframe` file.
+no amendment, and the references travel in the exported `.sframe` file. It is
+the only place a source is added: on the Report screen, type @ in an
+interpretation to cite one of them, and "Manage references" leads back here,
+so a report never cites a source the `.sframe` file does not record. A
+reference can be cited by a plan block's hypotheses or by the study once
+they are written.
 
 The Preview screen renders the exact deployable survey, identical to the
 exported HTML.

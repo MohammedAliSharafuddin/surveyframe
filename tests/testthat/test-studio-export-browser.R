@@ -57,9 +57,12 @@ test_that("the Export screen offers the report options and stays short", {
   # Every option render_report() takes from a host is on the screen.
   for (id in c("rpt_title", "rpt_authors", "rpt_format", "rpt_show_code",
                "rpt_fig_width", "rpt_fig_height", "rpt_fig_dpi", "rpt_fig_format",
-               "rpt_csl", "rpt_bibtex")) {
+               "rpt_csl", "rpt_style")) {
     expect_true(js(paste0("document.getElementById('", id, "') !== null")), info = id)
   }
+  # UI-1 (UX-03): the Further references box went, so a source is added under
+  # References only. It was in the list above until then.
+  expect_false(js("document.getElementById('rpt_bibtex') !== null"))
   expect_true(wait("$('#export_engine_note').text().indexOf('built-in engine') >= 0"))
 
   # The options reach the report.
