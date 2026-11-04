@@ -376,6 +376,27 @@ test_that("the builder iframe and field_tools.js carry a version token (item 12g
   expect_true(ui2_wait(b, "(function(){ var w = document.getElementById('design_frame').contentWindow; return !!(w && w.STUDIO_HOST); })()", 60))
 })
 
+test_that("at 1920 px every primary action, Save to Studio included, sizes to its label (item 12h)", {
+  b <- ui1_studio("factor_structure", width = 1920, height = 1080)
+  on.exit(ui1_studio("factor_structure", width = 1280, height = 900), add = TRUE)
+  expect_true(ui2_wait(b, "window.innerWidth === 1920", 10))
+  expect_true(ui1_screen(b, "design"))
+  doc <- "document.getElementById('design_frame').contentWindow.document"
+  save <- paste0(doc, ".getElementById('saveBtn')")
+  expect_true(ui2_wait(b, paste0("(function(){ try { var s = ", save,
+                                 "; return !!s && s.classList.contains('sf-primary') && s.offsetWidth > 0; } catch (e) { return false; } })()"), 60))
+  # The stylesheet loads after the class is set, so wait for its rules.
+  expect_true(ui2_wait(b, paste0("getComputedStyle(", save, ").justifySelf === 'start'"), 20))
+  w <- ui2_js(b, paste0(save, ".getBoundingClientRect().width"))
+  expect_lt(w, 300, label = "Save to Studio width")
+  expect_gt(w, 60, label = "Save to Studio width")
+  for (screen in sframe_studio_screens()) {
+    expect_true(ui1_screen(b, screen), info = screen)
+    widths <- ui2_js(b, sprintf("$('#screen-%s .sf-primary:visible').map(function(){ return this.getBoundingClientRect().width; }).get()", screen))
+    for (x in unlist(widths)) expect_lt(x, 300, label = paste("primary width on", screen))
+  }
+})
+
 # Last, since it loads the page again, which starts Studio's session again.
 test_that("sidebar groups fold, stay folded after a reload, and a fragment into a folded group opens it", {
   b <- ui1_studio("factor_structure")
