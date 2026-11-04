@@ -188,3 +188,36 @@ sframe_studio_amend_server <- function(id) {
     list(open = open)
   })
 }
+
+# The version and the amendment count, as Studio's status line and Open card
+# show them: "1.1.0, 2 amendments".
+sframe_studio_version_label <- function(instrument) {
+  n <- length(instrument$amendments %||% list())
+  paste0(instrument$meta$version %||% "no version", ", ",
+         if (n == 0) "no amendments" else if (n == 1) "1 amendment"
+         else paste(n, "amendments"))
+}
+
+# The full amendment history for the Amendments screen, oldest first: date,
+# tier, reason, what changed, and the content hashes before and after. An
+# entry records no version, so the screen gives the current version in its
+# heading instead.
+sframe_studio_amendment_history <- function(instrument) {
+  log <- sframe_get_amendments(instrument)
+  if (nrow(log) == 0) return(NULL)
+  codes <- stats::setNames(names(sframe_studio_reason_choices),
+                           unname(sframe_studio_reason_choices))
+  reason <- ifelse(log$reason_code %in% names(codes), codes[log$reason_code],
+                   log$reason_code)
+  short <- function(h) ifelse(is.na(h) | !nzchar(h), "", substr(h, 1, 12))
+  data.frame(
+    Date = substr(log$timestamp, 1, 10),
+    Tier = tools::toTitleCase(log$tier),
+    Reason = paste0(reason, ": ", log$reason_text),
+    `What changed` = log$changed_fields,
+    `Deviation report` = ifelse(is.na(log$deviation_report), "", log$deviation_report),
+    `Hash before` = short(log$previous_hash),
+    `Hash after` = short(log$new_hash),
+    check.names = FALSE, stringsAsFactors = FALSE
+  )
+}

@@ -1257,6 +1257,9 @@ ui <- fluidPage(
         letter-spacing: 0.08em; text-transform: uppercase; color: #6b7190;
         cursor: default; user-select: none;
       }
+      .flag-list { margin-top: 12px; border-top: 1px solid #e3e5ee; padding-top: 8px; }
+      .flag-head { font-weight: 600; margin-bottom: 4px; }
+      .flag-row { display: flex; gap: 12px; align-items: center; justify-content: space-between; padding: 4px 0; }
       .studio-status {
         padding: 16px 20px; font-size: 12px;
         border-top: 1px solid #2e3250; color: #9aa0b8;
@@ -1619,8 +1622,11 @@ ui <- fluidPage(
         ),
         tags$div(class = "card",
           tags$div(class = "card-title", "Amendment log"),
+          uiOutput("amendment_version_line"),
           tags$p(class = "hint",
             "Every disclosed change to this instrument, oldest first. Saved into the .sframe file itself once you export it."),
+          tags$p(class = "hint", id = "amend_put_back_note",
+            "An item dropped under a result can be put back there while this session lasts. After the file is opened again, put the item back in Design, which records it as an amendment."),
           tags$div(style = "overflow-x:auto", shiny::tableOutput("amendment_log_table"))
         )
       ),
@@ -1733,7 +1739,8 @@ ui <- fluidPage(
           ),
           actionButton("load_sheet_btn", "Read from Google Sheet", class = "btn-primary")
         ),
-        uiOutput("responses_summary_card")
+        uiOutput("responses_summary_card"),
+        uiOutput("responses_amend_card")
       ),
 
       tags$div(id = "screen-quality", class = screen_class("quality"),
@@ -1741,7 +1748,8 @@ ui <- fluidPage(
         uiOutput("quality_gate"),
         uiOutput("quality_output"),
         plotOutput("studio_quality_chart", height = "260px"),
-        plotOutput("studio_missing_chart", height = "260px")
+        plotOutput("studio_missing_chart", height = "260px"),
+        uiOutput("quality_amend_card")
       ),
 
       tags$div(id = "screen-reliability", class = screen_class("reliability"),
@@ -1900,7 +1908,10 @@ server <- function(input, output, session) {
     active_screen = initial_tab,
     # Where the open instrument came from: "r", "file", "design", or the
     # message of a failed check.
-    open_verification = if (is.null(INITIAL_INSTRUMENT)) NULL else "r"
+    open_verification = if (is.null(INITIAL_INSTRUMENT)) NULL else "r",
+    # The instruments from before and after each Drop from scale recorded
+    # in this session, keyed by the amendment's new hash, for Put back.
+    drops = list()
   )
 
   set_builder_state <- function(state) {
@@ -2576,6 +2587,31 @@ server <- function(input, output, session) {
     msg
   }
 
+  # Quality and Responses: a bot removal or a data correction changes the
+  # responses, not the instrument, and is recorded as a pipeline amendment
+  # through the same dialog, so the log says what was done to the data.
+  studio_data_amend_card <- function(button, lead) {
+    if (is.null(rv$instrument) || is.null(rv$responses)) return(NULL)
+    tags$div(class = "card",
+      tags$div(class = "card-title", "Record a change to the data"),
+      tags$p(class = "hint", lead),
+      actionButton(button, "Record as amendment", class = "btn-outline"))
+  }
+  output$quality_amend_card <- renderUI(studio_data_amend_card("quality_amend_btn",
+    "Removed bot or fraudulent responses after this check? Record what was removed and why, so the report discloses it."))
+  output$responses_amend_card <- renderUI(studio_data_amend_card("responses_amend_btn",
+    "Corrected or removed responses before loading them? Record what changed and why, so the report discloses it."))
+  studio_open_data_amend <- function(code, label) {
+    req(rv$instrument)
+    amend_dlg$open(rv$instrument, rv$instrument, start_label = label,
+      defaults = list(reason_code = code),
+      on_apply = function(new, how) studio_apply_amended(new, how))
+  }
+  observeEvent(input$quality_amend_btn, studio_open_data_amend("bot_removal",
+    "The responses change and the instrument does not. Say which responses were removed and why."))
+  observeEvent(input$responses_amend_btn, studio_open_data_amend("data_correction",
+    "The responses change and the instrument does not. Say which responses were corrected or removed and why."))
+
   observeEvent(input$amend_edit_design, {
     session$sendCustomMessage("surveyframe-switch-tab", "design")
   })
@@ -2594,21 +2630,16 @@ server <- function(input, output, session) {
     })
   })
 
+  output$amendment_version_line <- renderUI({
+    req(rv$instrument)
+    tags$p(class = "amend-version", id = "amend_version_line",
+           paste0("Version ", sframe_studio_version_label(rv$instrument), "."))
+  })
+
   output$amendment_log_table <- shiny::renderTable({
     req(rv$instrument)
-    log <- sframe_get_amendments(rv$instrument)
-    if (nrow(log) == 0) {
-      return(data.frame(Status = "No amendments disclosed yet."))
-    }
-    data.frame(
-      Timestamp = log$timestamp,
-      Tier = log$tier,
-      Reason = log$reason_code,
-      Explanation = log$reason_text,
-      Author = ifelse(is.na(log$author), "", log$author),
-      `Sign-off` = log$signoff,
-      check.names = FALSE
-    )
+    sframe_studio_amendment_history(rv$instrument) %||%
+      data.frame(Status = "No amendments disclosed yet.")
   })
 
   observeEvent(input$load_responses_btn, {
@@ -2691,7 +2722,9 @@ server <- function(input, output, session) {
     draft <- draft_result()
     tagList(
       tags$div(if (draft$valid) "Draft ready" else "Draft needs fixes"),
-      tags$div(if (!is.null(rv$instrument)) "Instrument ready" else "No valid instrument"),
+      tags$div(id = "status_instrument", if (!is.null(rv$instrument))
+        paste0("Instrument ", sframe_studio_version_label(rv$instrument))
+        else "No valid instrument"),
       tags$div(if (!is.null(rv$responses)) "Responses loaded" else "No responses")
     )
   })
@@ -2863,7 +2896,7 @@ server <- function(input, output, session) {
           tags$div(class = "stat-val", length(instr$models %||% list())),
           tags$div(class = "stat-lbl", "Models")),
         tags$div(class = "stat-box",
-          tags$div(class = "stat-val", instr$meta$version),
+          tags$div(class = "stat-val", id = "open_version", sframe_studio_version_label(instr)),
           tags$div(class = "stat-lbl", "Version")),
         tags$div(class = "stat-box",
           tags$div(class = "stat-val",
@@ -3719,6 +3752,87 @@ server <- function(input, output, session) {
     fluidRow(column(12, uiOutput("analysis_results_output")))
   })
 
+  # Drop from scale and Put back under a result (UI-1). Each button sends 1
+  # event input, as the amendment dialog's buttons do.
+  studio_event_button <- function(input_id, label, value, cls = "btn-default btn-sm") {
+    tags$button(type = "button", class = paste("btn", cls),
+      onclick = sprintf("Shiny.setInputValue('%s', %s, {priority: 'event'})",
+        input_id, jsonlite::toJSON(c(value, at = "now"), auto_unbox = TRUE)),
+      label)
+  }
+  studio_flag_section <- function(result) {
+    flags <- sframe_studio_result_flags(result)
+    block <- as.character(result$block_id %||% "")[1]
+    hashes <- vapply(rv$instrument$amendments %||% list(),
+                     function(a) as.character(a$new_hash %||% "")[1], character(1))
+    dropped <- Filter(function(d) identical(d$block, block) && d$hash %in% hashes, rv$drops)
+    if (!nrow(flags) && !length(dropped)) return(NULL)
+    tags$div(class = "flag-list", `data-block` = block,
+      if (nrow(flags)) tagList(
+        tags$div(class = "flag-head", "Items past the usual cut-offs"),
+        lapply(seq_len(nrow(flags)), function(k) tags$div(class = "flag-row",
+          tags$span(flags$reason[k]),
+          if (length(sframe_studio_drop_targets(rv$instrument, flags[k, ])))
+            studio_event_button("flag_drop", "Drop from scale",
+              list(block = block, item = flags$item[k]))))),
+      lapply(dropped, function(d) tags$div(class = "flag-row",
+        tags$span(sprintf("%s was dropped from %s in this session.", d$item,
+                          paste(d$from, collapse = ", "))),
+        studio_event_button("flag_put_back", "Put back", list(hash = d$hash)))))
+  }
+
+  observeEvent(input$flag_drop, {
+    req(rv$instrument)
+    results <- analysis_results_r()
+    req(!is.null(results), !inherits(results, "error"))
+    hit <- Filter(function(r) identical(as.character(r$block_id %||% "")[1],
+                                        input$flag_drop$block), results)
+    req(length(hit) > 0)
+    flags <- sframe_studio_result_flags(hit[[1]])
+    flag <- flags[flags$item == input$flag_drop$item, , drop = FALSE]
+    req(nrow(flag) == 1)
+    p <- tryCatch(sframe_studio_drop_proposal(rv$instrument, flag),
+                  error = function(e) e)
+    if (inherits(p, "error") || is.null(p)) {
+      showNotification(if (inherits(p, "error")) conditionMessage(p) else
+        paste(flag$item, "is in no scale or model, so there is nothing to drop."),
+        type = "error", duration = 10)
+      return()
+    }
+    before <- rv$instrument
+    amend_dlg$open(before, p$after, start_label = p$start_label,
+      defaults = p$defaults,
+      on_apply = function(new, how) {
+        h <- new$amendments[[length(new$amendments)]]$new_hash
+        rv$drops[[h]] <- list(hash = h, item = p$item, from = p$from,
+                              block = p$block, before = before, after = new)
+        studio_apply_amended(new, how)
+      })
+  })
+
+  observeEvent(input$flag_put_back, {
+    req(rv$instrument)
+    d <- rv$drops[[input$flag_put_back$hash]]
+    req(!is.null(d))
+    restored <- tryCatch(sframe_studio_put_back(rv$instrument, d),
+                         error = function(e) e)
+    if (inherits(restored, "error")) {
+      showNotification(conditionMessage(restored), type = "error", duration = 10)
+      return()
+    }
+    amend_dlg$open(rv$instrument, restored,
+      start_label = sprintf("Put %s back in %s, as it was before the drop.",
+                            d$item, paste(d$from, collapse = ", ")),
+      defaults = list(reason_code = "model_respecification",
+        reason_text = sprintf("Put %s back in %s.", d$item, paste(d$from, collapse = ", ")),
+        deviation_report = sprintf("%s returned to %s, undoing the drop recorded earlier.",
+                                   d$item, paste(d$from, collapse = ", "))),
+      on_apply = function(new, how) {
+        rv$drops[[d$hash]] <- NULL
+        studio_apply_amended(new, how)
+      })
+  })
+
   output$analysis_results_output <- renderUI({
     req(rv$instrument)
     if (length(rv$instrument$analysis_plan %||% list()) == 0) {
@@ -3763,7 +3877,8 @@ server <- function(input, output, session) {
             studio_result_table_tag(result$table),
             # A CFA/SEM/PLS-SEM syntax block has no table or chart: its
             # whole output is the generated syntax text.
-            if (!is.null(result$syntax)) tags$pre(class = "sf-code", result$syntax)
+            if (!is.null(result$syntax)) tags$pre(class = "sf-code", result$syntax),
+            studio_flag_section(result)
           )
         },
         if (length(plot_tags) > 0) do.call(tagList, plot_tags)
