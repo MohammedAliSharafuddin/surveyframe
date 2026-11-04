@@ -1296,7 +1296,7 @@ ui <- fluidPage(
       /* A group heading is a label, with nothing to click. */
       .studio-nav-heading {
         padding: 14px 20px 4px; font-size: 11px; font-weight: 600;
-        letter-spacing: 0.08em; text-transform: uppercase; color: #6b7190;
+        letter-spacing: 0.08em; text-transform: uppercase; color: #9aa0b8;
         user-select: none;
       }
       .studio-nav-fold { background: none; border: none; padding: 0; width: 100%; text-align: left;
@@ -1376,7 +1376,7 @@ ui <- fluidPage(
       .filter-bar { background: #fff; border-radius: 10px; padding: 14px 16px; box-shadow: 0 1px 4px rgba(0,0,0,.07); margin-bottom: 16px; }
       .filter-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; align-items: end; }
       .filter-grid label { font-size: 12px; font-weight: 600; color: #475569; }
-      .filter-note { font-size: 11px; color: #94a3b8; margin-top: 8px; }
+      .filter-note { font-size: 11px; color: #5b6475; margin-top: 8px; }
       .filter-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 8px; }
       .filter-head .card-title { margin-bottom: 0; }
       .dash-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
@@ -1405,12 +1405,12 @@ ui <- fluidPage(
       .sf-table-wide td { overflow-wrap: break-word; min-width: 4em; }
       .sf-table-wide td:first-child { white-space: nowrap; min-width: 0; }
       .btn-primary {
-        background: #16B3B1; color: #fff; border: none; border-radius: 6px;
+        background: #0a6f6d; color: #fff; border: none; border-radius: 6px;
         padding: 9px 20px; font-size: 14px; cursor: pointer; font-weight: 600;
       }
-      .btn-primary:hover { background: #129a98; }
+      .btn-primary:hover { background: #085957; }
       .btn-outline {
-        background: transparent; color: #16B3B1; border: 1.5px solid #16B3B1;
+        background: transparent; color: #0a6f6d; border: 1.5px solid #0a6f6d;
         border-radius: 6px; padding: 8px 18px; font-size: 14px;
         cursor: pointer; font-weight: 600;
       }
@@ -1434,7 +1434,7 @@ ui <- fluidPage(
         background: rgba(255,255,255,.06); color: rgba(255,255,255,.85);
       }
       .studio-tabs .radio-inline input[type=radio]:checked + span {
-        background: #16B3B1; color: #fff;
+        background: #0a6f6d; color: #fff;
       }
       h2.screen-title {
         font-size: 18px; font-weight: 700; margin: 0; color: #1a1a2e;

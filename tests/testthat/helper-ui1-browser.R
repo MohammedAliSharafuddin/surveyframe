@@ -89,8 +89,12 @@ ui1_reload <- function(demo) {
 # (24 px, or 18.66 px bold) needs 3 to 1, other text 4.5 to 1. Disabled
 # controls are exempt. Returns a data frame of the failures.
 ui1_contrast_js <- "(function(doc){
-  function parse(c){ var m = /rgba?\\(([^)]+)\\)/.exec(c || ''); if (!m) return null;
-    var p = m[1].split(',').map(parseFloat); return {r:p[0], g:p[1], b:p[2], a: p.length > 3 ? p[3] : 1}; }
+  function parse(c){ var m = /rgba?\\(([^)]+)\\)/.exec(c || '');
+    if (m) { var p = m[1].split(',').map(parseFloat); return {r:p[0], g:p[1], b:p[2], a: p.length > 3 ? p[3] : 1}; }
+    // color-mix() computes to color(srgb r g b / a), each channel 0 to 1.
+    m = /color\\(srgb ([^)]+)\\)/.exec(c || ''); if (!m) return null;
+    var q = m[1].replace('/', ' ').trim().split(/\\s+/).map(parseFloat);
+    return {r:q[0]*255, g:q[1]*255, b:q[2]*255, a: q.length > 3 ? q[3] : 1}; }
   function over(t, u){ var a = t.a; return {r:t.r*a+u.r*(1-a), g:t.g*a+u.g*(1-a), b:t.b*a+u.b*(1-a), a:1}; }
   function back(el){ var s = []; for (var e = el; e; e = e.parentElement) {
       var c = parse(doc.defaultView.getComputedStyle(e).backgroundColor);
@@ -106,7 +110,8 @@ ui1_contrast_js <- "(function(doc){
     var r = el.getBoundingClientRect(), cs = doc.defaultView.getComputedStyle(el);
     if (!r.width || !r.height || cs.visibility === 'hidden' || el.closest('[hidden]')) continue;
     if (el.closest('[disabled], .disabled, [aria-hidden=\"true\"]')) continue;
-    var b = back(el), fg = over(parse(cs.color), b), L1 = lum(fg), L2 = lum(b);
+    var fc = parse(cs.color); if (!fc) { out.push({text: t.nodeValue.trim().slice(0, 40), sel: el.tagName.toLowerCase(), fg: cs.color, bg: 'unread', ratio: 0, need: 0}); continue; }
+    var b = back(el), fg = over(fc, b), L1 = lum(fg), L2 = lum(b);
     var ratio = (Math.max(L1, L2) + 0.05) / (Math.min(L1, L2) + 0.05);
     var size = parseFloat(cs.fontSize), bold = parseInt(cs.fontWeight, 10) >= 700;
     var need = (size >= 24 || (bold && size >= 18.66)) ? 3 : 4.5;
