@@ -12,6 +12,9 @@
   --tint:color-mix(in srgb,var(--cp) 8%,#ffffff);
   --tint-bd:color-mix(in srgb,var(--cp) 30%,#dbe3e6);
   --deep:color-mix(in srgb,var(--cp) 78%,#0c1a1a);
+  /* Text on the theme colour, the theme colour as text, and its hover. A
+     light theme switches them at start (UX-21), so text keeps 4.5 to 1. */
+  --on-cp:#ffffff;--cp-ink:var(--cp);--cp-hover:var(--deep);
   --cf:#ffffff;--cg:#fbfdfd;--cb:#dfe7ea;
   --t1:#12212b;--t2:#51636f;--t3:#9ab0ba;
   --cd:#dc2626;--cs:#16a34a;
@@ -49,7 +52,7 @@ body[data-only] .prog-bar-wrap,body[data-only] .sf-hdr{display:none!important}
 .consent-box{background:var(--tint);border:1px solid var(--tint-bd);border-radius:6px;padding:14px 16px;font-size:14px;color:var(--deep);margin-bottom:16px;white-space:pre-wrap}
 .consent-chk{display:flex;align-items:flex-start;gap:9px;font-size:14px;margin-bottom:20px;cursor:pointer}
 .consent-chk input{margin-top:3px;accent-color:var(--cp);width:17px;height:17px}
-.ty-ic{font-size:52px;text-align:center;margin-bottom:14px;color:var(--cp)}
+.ty-ic{font-size:52px;text-align:center;margin-bottom:14px;color:var(--cp-ink)}
 .ty-title{font-family:var(--serif);font-size:27px;font-weight:500;text-align:center;margin-bottom:8px}
 .ty-msg{color:var(--t2);text-align:center;font-size:15px;margin-bottom:22px;white-space:pre-wrap}
 .ty-status{font-weight:600;margin-bottom:10px}
@@ -62,8 +65,8 @@ body[data-only] .prog-bar-wrap,body[data-only] .sf-hdr{display:none!important}
   padding:10px 28px;min-height:48px;border-radius:6px;font-size:15px;font-weight:650;
   transition:all .15s;border:1.5px solid transparent;cursor:pointer}
 .btn:disabled{opacity:.4;cursor:not-allowed}
-.btn-p{background:var(--cp);color:#fff;border-color:var(--cp)}
-.btn-p:hover:not(:disabled){background:var(--deep);border-color:var(--deep)}
+.btn-p{background:var(--cp);color:var(--on-cp);border-color:var(--cp)}
+.btn-p:hover:not(:disabled){background:var(--cp-hover);border-color:var(--cp-hover)}
 .btn-s{background:var(--cf);color:var(--t2);border-color:var(--cb)}
 .btn-s:hover:not(:disabled){border-color:var(--tint-bd);background:var(--tint)}
 .btn-lg{padding:13px 30px;font-size:16px;width:100%;margin-top:24px}
@@ -85,11 +88,11 @@ body[data-only] .prog-bar-wrap,body[data-only] .sf-hdr{display:none!important}
 .item-q{font-family:var(--serif);font-weight:500;margin-bottom:8px;display:flex;gap:7px;
   font-size:19px;line-height:1.45;letter-spacing:-.1px}
 .mode-conversational .item-q{font-size:25px}
-.req-mk{color:var(--cp);font-size:13px;margin-top:2px;flex-shrink:0}
+.req-mk{color:var(--cp-ink);font-size:13px;margin-top:2px;flex-shrink:0}
 .item-help{font-size:14px;color:var(--t2);margin-bottom:10px;margin-top:-2px;font-style:italic}
 .item-err{font-size:13px;color:var(--cd);margin-top:6px;display:none}
 .item-err.show{display:block}
-.q-eyebrow{font-size:13px;color:var(--cp);margin-bottom:10px;font-weight:600}
+.q-eyebrow{font-size:13px;color:var(--cp-ink);margin-bottom:10px;font-weight:600}
 
 /* Focus visibility: hidden native inputs surface focus on their card */
 .choice-opt:has(input:focus-visible),
@@ -113,9 +116,9 @@ body[data-only] .prog-bar-wrap,body[data-only] .sf-hdr{display:none!important}
 .likert-opt:has(input:checked){background:var(--cp);border-color:var(--cp)}
 .likert-opt input{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
 .likert-num{font-size:18px;font-weight:600;color:var(--t2);line-height:1.2}
-.likert-opt:has(input:checked) .likert-num{color:#fff}
+.likert-opt:has(input:checked) .likert-num{color:var(--on-cp)}
 .likert-lbl{font-size:11px;color:var(--t2);line-height:1.25;max-width:76px}
-.likert-opt:has(input:checked) .likert-lbl{color:color-mix(in srgb,#ffffff 82%,var(--cp))}
+.likert-opt:has(input:checked) .likert-lbl{color:var(--on-cp)}
 
 /* Choice: bordered option cards with key chips and a tick */
 .choice-list{display:flex;flex-direction:column;gap:9px;counter-reset:opt}
@@ -128,8 +131,8 @@ body[data-only] .prog-bar-wrap,body[data-only] .sf-hdr{display:none!important}
 .choice-opt:hover{border-color:var(--cp);background:var(--tint)}
 .choice-opt:has(input:checked){border-color:var(--cp);background:var(--tint);
   box-shadow:inset 0 0 0 1px var(--cp)}
-.choice-opt:has(input:checked)::before{background:var(--cp);border-color:var(--cp);color:#fff}
-.choice-opt::after{content:"\2713";margin-left:auto;color:var(--cp);font-weight:700;visibility:hidden}
+.choice-opt:has(input:checked)::before{background:var(--cp);border-color:var(--cp);color:var(--on-cp)}
+.choice-opt::after{content:"\2713";margin-left:auto;color:var(--cp-ink);font-weight:700;visibility:hidden}
 .choice-opt:has(input:checked)::after{visibility:visible}
 .other-txt{display:block;width:100%;box-sizing:border-box;margin:6px 0 0;padding:9px 12px;border:1.5px solid var(--cb);border-radius:8px;font:inherit}
 .choice-opt input{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
@@ -153,14 +156,14 @@ textarea.inp-std:focus{border-color:var(--cp);box-shadow:0 0 0 3px color-mix(in 
 .slider-inp::-webkit-slider-thumb{width:24px;height:24px}
 .slider-inp::-moz-range-thumb{width:22px;height:22px}
 .slider-lbls{display:flex;justify-content:space-between;font-size:12.5px;color:var(--t2)}
-.slider-val{font-size:22px;font-weight:600;font-family:var(--serif);color:var(--cp);text-align:center}
+.slider-val{font-size:22px;font-weight:600;font-family:var(--serif);color:var(--cp-ink);text-align:center}
 
 /* Rating */
 .star-row{display:flex;gap:10px}
 .star-btn{font-size:36px;background:none;border:none;cursor:pointer;
   color:color-mix(in srgb,var(--cb) 80%,#ffffff);transition:color .12s,transform .1s;line-height:1}
 .star-btn:hover{transform:scale(1.1)}
-.star-btn.active{color:var(--cp)}
+.star-btn.active{color:var(--cp-ink)}
 
 /* Matrix: horizontal rules only, theme accents, no vertical grid */
 .matrix-wrap{overflow-x:auto;margin-top:8px;border:1px solid var(--cb);
@@ -185,14 +188,14 @@ textarea.inp-std:focus{border-color:var(--cp);box-shadow:0 0 0 3px color-mix(in 
 .rank-item.drag-over{border-top:2px solid var(--cp)}
 .rank-item.dragging{opacity:.4}
 .rank-num{width:26px;height:26px;border-radius:6px;background:var(--cp);
-  color:#fff;font-size:12.5px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  color:var(--on-cp);font-size:12.5px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .rank-handle{color:var(--t3);font-size:14px;flex-shrink:0;cursor:grab}
 .rank-lbl{flex:1;font-size:15px}
 .rank-kbd{display:flex;gap:4px;flex-shrink:0}
 .rank-mv{width:30px;height:30px;border-radius:6px;border:1px solid var(--cb);
   background:var(--cf);color:var(--t2);font-size:11px;display:flex;
   align-items:center;justify-content:center;cursor:pointer}
-.rank-mv:hover{border-color:var(--cp);color:var(--cp);background:var(--tint)}
+.rank-mv:hover{border-color:var(--cp);color:var(--cp-ink);background:var(--tint)}
 .rank-confirm{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:10px}
 .rank-status{font-size:13px;color:var(--t2)}
 
@@ -219,12 +222,12 @@ textarea.inp-std:focus{border-color:var(--cp);box-shadow:0 0 0 3px color-mix(in 
 .pw-opt:has(input:focus-visible){outline:3px solid var(--deep);outline-offset:2px}
 .pw-opt input{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
 .pw-num{font-size:11px;font-weight:700;color:var(--t2)}
-.pw-opt:has(input:checked) .pw-num{color:#fff}
+.pw-opt:has(input:checked) .pw-num{color:var(--on-cp)}
 .pw-opt.pw-equal{border-color:var(--t3)}
 .pw-influence{display:flex;gap:8px;overflow-x:auto;padding-bottom:2px}
 .pw-influence .pw-opt{flex:0 0 auto;min-width:64px}
 .pw-influence .pw-lbl{font-size:10px;color:var(--t2);text-align:center}
-.pw-influence .pw-opt:has(input:checked) .pw-lbl{color:color-mix(in srgb,#ffffff 82%,var(--cp))}
+.pw-influence .pw-opt:has(input:checked) .pw-lbl{color:var(--on-cp)}
 /* Mobile-only dropdown, hidden on desktop where the button strip has room.
    min-height 44px meets the WCAG 2.2 touch-target size the rest of the
    survey already holds itself to (see the matrix reflow's own note). */
@@ -342,6 +345,21 @@ const TY       = R.thankyou||{};
 
 // Apply theme color
 document.documentElement.style.setProperty('--cp', THEME);
+// A light theme cannot carry white text, nor serve as text on white, at
+// 4.5 to 1 (UX-21). Then text on it is dark, and its text and hover
+// shades are mixed towards the dark ink. Other themes keep their colours.
+(function(){
+  var m=/^#([0-9a-f]{3}|[0-9a-f]{6})$/i.exec(String(THEME).trim());if(!m)return;
+  var h=m[1].length===3?m[1].split('').map(function(d){return d+d;}).join(''):m[1];
+  var c=[0,2,4].map(function(i){var x=parseInt(h.substr(i,2),16)/255;return x<=0.03928?x/12.92:Math.pow((x+0.055)/1.055,2.4);});
+  var L=0.2126*c[0]+0.7152*c[1]+0.0722*c[2];
+  if(1.05/(L+0.05)>=4.5)return;
+  var s=document.documentElement.style;
+  s.setProperty('--on-cp','#0c1a1a');
+  s.setProperty('--cp-ink','color-mix(in srgb,var(--cp) 35%,#0c1a1a)');
+  s.setProperty('--cp-hover','color-mix(in srgb,var(--cp) 85%,#0c1a1a)');
+  s.setProperty('--deep','color-mix(in srgb,var(--cp) 30%,#0c1a1a)');
+})();
 document.body.classList.add('mode-'+MODE);
 
 // Fix A: render header (logo + institution) from R.header
