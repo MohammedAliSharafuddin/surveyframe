@@ -115,9 +115,43 @@ sframe_study_problems <- function(instrument) {
   problems <- character(0)
   notes <- character(0)
   s <- instrument$study
-  if (is.null(s) || length(s) == 0) return(list(problems = problems, notes = notes))
+  one_string <- function(x) is.character(x) && length(x) == 1 && !is.na(x)
+  # The trace from objective to research question. A plan block's objective
+  # is checked whether or not there is a study: it is "" or an objective id,
+  # and an id the study does not declare, or with no study at all, fails.
+  plan <- instrument$analysis_plan %||% list()
+  block_ids <- vapply(seq_along(plan), function(k) {
+    id <- plan[[k]]$id
+    if (one_string(id) && nzchar(id)) id else sprintf("%d", k)
+  }, character(1))
+  named <- character(length(plan))
+  for (k in seq_along(plan)) {
+    o <- plan[[k]]$objective
+    if (is.null(o)) next
+    if (!one_string(o)) {
+      problems <- c(problems, sprintf(paste0("Plan block %s's objective must be 1 objective id, such as O1, ",
+                                             "or \"\" for none."), block_ids[k]))
+    } else if (nzchar(o) && !grepl("^[A-Za-z][A-Za-z0-9_]*$", o)) {
+      problems <- c(problems, sprintf(paste0("Plan block %s's objective '%s' is not an objective id: ",
+                                             "use letters, digits and underscores, starting with a letter, ",
+                                             "such as O1, or \"\" for none."), block_ids[k], o))
+    } else {
+      named[k] <- o
+    }
+  }
+  trace <- function(ids) {
+    out <- character(0)
+    for (u in setdiff(unique(named[nzchar(named)]), ids)) {
+      out <- c(out, sprintf("Plan block(s) %s name objective '%s', which the study does not declare.",
+                            paste(block_ids[named == u], collapse = ", "), u))
+    }
+    out
+  }
+  if (is.null(s) || length(s) == 0) {
+    return(list(problems = c(problems, trace(character(0))), notes = notes))
+  }
   if (!is.list(s) || is.null(names(s))) {
-    return(list(problems = "`study` must be a named list with problem, objectives and sampling.",
+    return(list(problems = c(problems, "`study` must be a named list with problem, objectives and sampling."),
                 notes = notes))
   }
   extra <- setdiff(names(s), sframe_study_fields)
@@ -125,7 +159,6 @@ sframe_study_problems <- function(instrument) {
     problems <- c(problems, sprintf("`study` has unknown field(s): %s. It holds problem, objectives and sampling.",
                                     paste(extra, collapse = ", ")))
   }
-  one_string <- function(x) is.character(x) && length(x) == 1 && !is.na(x)
   if (!is.null(s$problem)) {
     if (!one_string(s$problem)) {
       problems <- c(problems, "`study$problem` must be 1 paragraph of text.")
@@ -189,15 +222,7 @@ sframe_study_problems <- function(instrument) {
       }
     }
   }
-  # The trace from objective to research question.
-  plan <- instrument$analysis_plan %||% list()
-  named <- vapply(plan, function(b) as.character(b$objective %||% "")[1], character(1))
-  block_ids <- vapply(plan, function(b) as.character(b$id %||% "")[1], character(1))
-  unknown <- setdiff(unique(named[nzchar(named)]), ids)
-  for (u in unknown) {
-    problems <- c(problems, sprintf("Plan block(s) %s name objective '%s', which the study does not declare.",
-                                    paste(block_ids[named == u], collapse = ", "), u))
-  }
+  problems <- c(problems, trace(ids))
   if (length(ids)) {
     for (id in setdiff(ids, named)) {
       notes <- c(notes, sprintf("Objective '%s' is served by no research question.", id))
