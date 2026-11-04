@@ -694,7 +694,9 @@ render_report <- function(
                                   include_analysis = include_analysis,
                                   results = plan_results, references = references), tmp_content)
     temp_rds <- c(temp_rds, tmp_content)
-    tmp_prov <- tempfile(fileext = ".rds")
+    # Normalised here, as sframe_quarto_param_args() normalises the other
+    # paths, so a Windows path reaches Quarto with forward slashes.
+    tmp_prov <- normalizePath(tempfile(fileext = ".rds"), winslash = "/", mustWork = FALSE)
     saveRDS(provenance, tmp_prov)
     temp_rds <- c(temp_rds, tmp_prov)
     on.exit(unlink(temp_rds, force = TRUE), add = TRUE)
@@ -892,7 +894,7 @@ sframe_report_front <- function(title, authors, use_citations, csl_file = "style
 # plan run" was rewritten as an absolute path under the working directory.
 sframe_quarto_param_names_path <- c("instrument_path", "data_path",
                                     "interpretations_path", "declarations_path",
-                                    "content_path", "provenance_path")
+                                    "content_path")
 
 sframe_quarto_param_args <- function(params) {
   unlist(lapply(names(params), function(name) {
