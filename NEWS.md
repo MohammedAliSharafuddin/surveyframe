@@ -520,6 +520,18 @@ style.
 
 ## Reports
 
+* **Quarto is the report engine, and `render_report()` finds the copy
+  RStudio or Positron bundles.** It looked only for `quarto` on the PATH,
+  where neither IDE puts its copy, so a machine with RStudio and no separate
+  Quarto got the built-in page. It now tries, in order, `QUARTO_PATH` (the
+  path of the executable), the PATH, `RSTUDIO_QUARTO`, RStudio's bundled
+  copy and Positron's, and uses the first that runs `quarto --version`. The
+  report names the version used and where it was found. Without Quarto the
+  built-in engine writes a short plain results page under the banner
+  "Install Quarto for the full formatted report", with a link. That page
+  gets no new features and is not promised to match the Quarto report.
+  The Quality summary table and Respondent-wise missingness, which only
+  the built-in page had, are in the Quarto report too.
 * **A Quarto report renders offline.** The report theme imported a Google
   web font the report never used, so every render needed the internet, sent
   Google a request, and hung with no timeout when the connection stalled.

@@ -243,9 +243,22 @@ print.sframe_codebook <- function(x, ...) {
 #'
 #' Generates an HTML report that includes the instrument codebook, data
 #' quality summary, reliability diagnostics, and analysis-plan content.
-#' When Quarto and the bundled template are available, the report is rendered
-#' through Quarto. Otherwise, surveyframe writes an internal HTML fallback so
-#' the reporting workflow still runs on machines without Quarto.
+#' Quarto is the report engine. Without Quarto, surveyframe writes a short
+#' plain results page with the numbers, tables, charts and APA result lines,
+#' under a banner that links to the Quarto installation page. That page gets
+#' no new features and is not promised to match the Quarto report.
+#'
+#' @section Which Quarto:
+#' The first copy of Quarto that runs `quarto --version` is used, searched in
+#' this order: the executable named by the `QUARTO_PATH` environment
+#' variable, `quarto` on the PATH, `RSTUDIO_QUARTO` (set inside RStudio), the
+#' copy bundled with RStudio, then the copy bundled with Positron. RStudio and
+#' Positron do not put their copies on the PATH, so a report rendered outside
+#' them found none before 0.4.3. `QUARTO_PATH` takes the path of the
+#' executable itself, as in the quarto package. The Quarto report gives the
+#' version used and where it was found, and the returned path carries the
+#' executable as its `"quarto"` attribute. `options(surveyframe.use_quarto =
+#' FALSE)` uses the built-in engine whatever is installed.
 #'
 #' @param instrument An `sframe` object.
 #' @param data A `tibble` or `data.frame` of responses, or NULL to generate a
@@ -489,9 +502,11 @@ render_report <- function(
   output_dir <- normalizePath(output_dir, mustWork = FALSE)
   output_name <- basename(dest)
 
+  # QUARTO_PATH, the PATH, then RStudio's and Positron's bundled copies (T3).
   use_quarto <- isTRUE(getOption("surveyframe.use_quarto", TRUE))
-  quarto_bin <- Sys.which("quarto")
-  has_quarto <- use_quarto && nzchar(quarto_bin)
+  quarto <- if (use_quarto) sframe_quarto_find() else list(path = NA_character_)
+  quarto_bin <- quarto$path
+  has_quarto <- use_quarto && !is.na(quarto_bin)
   template <- system.file("templates", "report.qmd", package = "surveyframe")
   if (has_quarto && file.exists(template)) {
     render_dir <- tempfile("surveyframe-report-")
@@ -566,7 +581,9 @@ render_report <- function(
       fig_width           = as.character(figures$width %||% ""),
       fig_height          = as.character(figures$height %||% ""),
       fig_dpi             = as.character(figures$dpi %||% ""),
-      fig_format          = if (identical(figures$format, "svg")) "svg" else ""
+      fig_format          = if (identical(figures$format, "svg")) "svg" else "",
+      # Which Quarto rendered the report, and where it was found (T3).
+      quarto_found        = sframe_quarto_label(quarto)
     )
 
     # The bibliography (0.4.3): every reference the instrument carries, the
@@ -638,7 +655,9 @@ render_report <- function(
       html <- readLines(rendered, warn = FALSE, encoding = "UTF-8")
       writeLines(sframe_quarto_apa_floats(html), rendered, useBytes = TRUE)
       if (file.copy(rendered, dest, overwrite = TRUE)) {
-        return(sframe_report_result(dest, "quarto", open))
+        res <- sframe_report_result(dest, "quarto", open)
+        attr(res, "quarto") <- quarto_bin
+        return(invisible(res))
       }
     }
   }
@@ -664,6 +683,16 @@ render_report <- function(
   )
 
   sframe_report_result(dest, "html", open)
+}
+
+# The banner at the top of a built-in report (owner 2026-10-31). Quarto is the
+# report engine, and the built-in engine writes a short plain results page
+# with no parity promise, so the page says so and where to get Quarto.
+sframe_builtin_banner <- function() {
+  paste0("<div class=\"sf-banner\" role=\"note\">This is the short results page ",
+         "surveyframe writes without Quarto. ",
+         "<a href=\"https://quarto.org/docs/get-started/\" target=\"_blank\" rel=\"noopener\">",
+         "Install Quarto for the full formatted report</a>.</div>")
 }
 
 # The "-P name:value" arguments for a Quarto render.
@@ -1009,6 +1038,7 @@ sframe_clean_interpretations <- function(interpretations) {
       ".apa { color: var(--sf-ink); }",
       ".references .csl-entry { padding-left: 2em; text-indent: -2em; margin-bottom: 8px; }",
       ".csl-entry.sf-note { color: var(--sf-muted); font-style: italic; }",
+      ".sf-banner { margin: 0 0 24px; padding: 10px 14px; border: 1px solid var(--sf-line); border-left: 4px solid var(--sf-accent); background: var(--sf-panel); }",
       ".sf-foot { text-align: center; font-size: 12px; color: var(--sf-faint); margin-top: 48px; padding-top: 16px; border-top: 1px solid #eee; }",
       ".sf-foot a { color: var(--sf-accent); font-weight: 600; text-decoration: none; }",
       "/* Print (and PDF via pagedown): paginate cleanly, keep a result",
@@ -1029,6 +1059,7 @@ sframe_clean_interpretations <- function(interpretations) {
       "<h1>%s</h1>",
       "<p class=\"meta\">%s</p>",
       "%s",
+      "%s",
       "<div class=\"sf-foot\">Built with <a href=\"https://cran.r-project.org/package=surveyframe\" target=\"_blank\" rel=\"noopener\">surveyframe</a></div>",
       "</body>",
       "</html>",
@@ -1037,6 +1068,7 @@ sframe_clean_interpretations <- function(interpretations) {
     title,
     title,
     subtitle,
+    sframe_builtin_banner(),
     paste(sections, collapse = "\n")
   )
 
@@ -1313,8 +1345,16 @@ sframe_report_content <- function(instrument, data = NULL, plot_palette = "web",
   for (k in seq_along(charts)) {
     charts[[k]]$figure_open <- sframe_apa_figure_open(charts[[k]]$title, charts[[k]]$alt)
   }
+  # Why a straight-lining chart is absent, escaped for the template (8b-R).
+  quality_note <- NULL
+  if (!is.null(data)) {
+    qr <- tryCatch(sframe_quality_results(data, instrument), error = function(e) NULL)
+    note <- if (!is.null(qr)) sframe_quality_plot_note(qr)
+    if (!is.null(note)) quality_note <- htmltools_escape(note)
+  }
   list(codebook_items = items_d, charts = charts, results = results,
-       amendments = sframe_report_amendments(instrument))
+       amendments = sframe_report_amendments(instrument),
+       quality_note = quality_note)
 }
 
 # The amendment list in the built-in report, under Reproducibility: the
