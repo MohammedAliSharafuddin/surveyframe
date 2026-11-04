@@ -81,8 +81,8 @@
     one <- tolower(one)
     # (*UCP) makes PCRE read [:alnum:] as every Unicode letter and digit. The
     # old class was [^a-z0-9' ], which deleted every non-ASCII letter:
-    # "café" became "caf", "naïve" became 2 fragments, and a response in
-    # another script could come out empty. Without (*UCP) the POSIX class
+    # "cafe" with an acute e became "caf", "naive" with a diaeresis became 2
+    # fragments, and a response in another script could come out empty. Without (*UCP) the POSIX class
     # stays ASCII-only even under perl = TRUE.
     one <- gsub("(*UCP)[^[:alnum:]' ]+", " ", one, perl = TRUE)
     toks <- strsplit(one, "\\s+")[[1]]

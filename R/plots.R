@@ -298,7 +298,7 @@ sframe_plot_frequency <- function(result, palette = c("web", "print")) {
 # ggplot2 draws `geom_text()` through the grid graphics system, so
 # measuring through grid tracks the actual rendered glyph size far more
 # closely than base graphics' `pdf(NULL)` + `strwidth()`/`strheight()`
-# trick did — that mismatch was exactly why the first fix needed a huge
+# trick did. That mismatch was exactly why the first fix needed a huge
 # (85%) padding buffer to avoid overlap, which produced the "still looks
 # scattered" complaint: most of the visible whitespace was safety margin
 # against a measurement the algorithm didn't actually trust. `padding`
@@ -325,7 +325,7 @@ sframe_plot_frequency <- function(result, palette = c("web", "print")) {
 # packing-inefficiency factor, since rectangular bounding boxes and a
 # spiral search never tile perfectly), and wraps the search back toward
 # the centre instead of growing past that radius once a word's natural
-# spiral would exceed it — so a smaller word placed later fills a real
+# spiral would exceed it, so a smaller word placed later fills a real
 # interior gap near the centre rather than spilling out past a ragged
 # organic edge. `shape = "organic"` (default) is uncapped, the original
 # freeform behaviour.
@@ -2812,7 +2812,7 @@ sframe_plot_cooccurrence_network <- function(result, palette = c("web", "print")
 # tidytext comparison cloud (bookdown.org/jdholster1/idsr/text-analysis.html
 # section 8.4: count(word, sentiment) %>% acast() %>% comparison.cloud()),
 # without adding the wordcloud/reshape2 dependency that reference code
-# uses — consistent with todo_text_analysis.md's "no wordcloud/ggwordcloud package"
+# uses, consistent with todo_text_analysis.md's "no wordcloud/ggwordcloud package"
 # rule for the plain term-frequency cloud.
 .sframe_sentiment_cloud_layout <- function(word_sentiment, max_per_side = 25) {
   neg <- utils::head(word_sentiment[word_sentiment$sentiment == "negative", , drop = FALSE], max_per_side)
