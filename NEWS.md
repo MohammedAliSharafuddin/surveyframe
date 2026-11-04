@@ -429,6 +429,11 @@ style.
   Google Sheets header, the Shiny row and the quality report all list them.
   The Shiny survey fills them as the static survey does, and the text of an
   Other does not count as a missing answer.
+* **The Shiny survey draws "Other, please specify"** for a choice set with
+  `allow_other`, as the exported survey does: the option last, a text box
+  under it, and typing in the box chooses it. `run_survey()` and
+  `sframe_survey_server()` submit the same columns as the exported survey,
+  and Other chosen with nothing typed stops the page or the submission.
 * **`read_responses()` reads an Other answer.** A single choice item whose set
   allows Other accepts the code `other`, and its column stays text whatever
   the set's codes look like, since a numeric set with Other would otherwise

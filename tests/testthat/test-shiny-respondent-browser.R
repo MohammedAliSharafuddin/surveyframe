@@ -274,3 +274,46 @@ test_that("A7: the embedded module collects advanced items in a real browser", {
   expect_false(is.na(row$sl))
   expect_match(page_js(s, "document.body.innerText"), "Thank You")
 })
+
+test_that("UX-11: Other, please specify in the Shiny survey reaches the row", {
+  instr <- sframe_instrument(title = "Other", components = list(
+    sframe_choice_set("src", 1:2, c("Website", "A friend"), allow_other = TRUE),
+    sframe_item("heard", "Where did you hear of us?", "single_choice",
+                choice_set = "src"),
+    sframe_item("used", "Which have you used?", "multiple_choice",
+                choice_set = "src")
+  ))
+  csv <- tempfile(fileext = ".csv")
+  s <- serve_survey(instr, csv)
+  on.exit(stop_survey(s))
+
+  # The option is drawn last, with its text box.
+  expect_identical(page_js(s,
+    "var o=document.querySelectorAll('input[name=heard]'); o[o.length-1].value"),
+    "other")
+  expect_identical(page_js(s,
+    "document.getElementById('heard__other_text').getAttribute('aria-label')"),
+    "Other, please specify")
+
+  # Typing in the box chooses Other.
+  page_js(s, "document.getElementById('heard__other_text').focus(); 'ok'")
+  s$b$Input$insertText(text = "A podcast")
+  Sys.sleep(2)
+  expect_identical(page_js(s,
+    "(document.querySelector('input[name=heard]:checked')||{}).value||'NONE'"),
+    "other")
+
+  click_at(s, "input[name=used][value='other']")
+  Sys.sleep(1)
+  page_js(s, "document.getElementById('used__other_text').focus(); 'ok'")
+  s$b$Input$insertText(text = "A newsletter")
+  Sys.sleep(2)
+
+  click_at(s, "#submit_btn")
+  Sys.sleep(3)
+  row <- utils::read.csv(csv, colClasses = "character", check.names = FALSE)
+  expect_identical(row$heard, "other")
+  expect_identical(row$heard__other_text, "A podcast")
+  expect_identical(row$used__other, "1")
+  expect_identical(row$used__other_text, "A newsletter")
+})
