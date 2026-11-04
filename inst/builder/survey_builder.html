@@ -3371,7 +3371,7 @@ function attach(el,references,options){
     p.className='sfcp';p.hidden=true;p.setAttribute('role','dialog');
     p.setAttribute('aria-labelledby','sfcp-t');
     p.innerHTML='<div class="sfcp-h" id="sfcp-t">Cite a reference</div>'
-      +'<div class="sfcp-pick"><label class="sfcp-l" for="sfcp-q">Search by key, author, year or title</label>'
+      +'<div class="sfcp-pick" id="sfcp-pick"><label class="sfcp-l" for="sfcp-q">Search by key, author, year or title</label>'
       +'<input type="search" class="sfcp-q" id="sfcp-q" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="true" aria-controls="sfcp-list">'
       +'<ul class="sfcp-list" id="sfcp-list" role="listbox" aria-label="References"></ul>'
       +'<p class="sfcp-empty" id="sfcp-empty" hidden></p></div>'
@@ -3877,7 +3877,7 @@ function studyAddObjective(){
   var used={},k=1;studyObjs.forEach(function(o){used[o.id]=true;});while(used['O'+k])k++;
   studyObjs.push({id:'O'+k,text:''});renderStudyObjs();
   var box=document.getElementById('s-objs'),ins=box?box.querySelectorAll('input'):[];
-  if(ins.length)ins[ins.length-1].focus();
+  if(ins.length>1)ins[ins.length-2].focus();
 }
 function studyRemoveObjective(i){studyObjs.splice(i,1);renderStudyObjs();}
 function studyMethodSync(){var f=document.getElementById('s-other-f');if(f)f.hidden=gv('s-method')!=='other';}

@@ -17,6 +17,9 @@ ui2_session <- function(app, width = 1280, height = 900) {
     s$Emulation$setDeviceMetricsOverride(width = width, height = height,
                                          deviceScaleFactor = 1, mobile = FALSE)
   }
+  # Focus and blur events reach only the tab in front, and a test may have
+  # opened another app's tab since.
+  try(s$Page$bringToFront(), silent = TRUE)
   s
 }
 

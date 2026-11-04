@@ -505,7 +505,7 @@ function attach(el,references,options){
     p.className='sfcp';p.hidden=true;p.setAttribute('role','dialog');
     p.setAttribute('aria-labelledby','sfcp-t');
     p.innerHTML='<div class="sfcp-h" id="sfcp-t">Cite a reference</div>'
-      +'<div class="sfcp-pick"><label class="sfcp-l" for="sfcp-q">Search by key, author, year or title</label>'
+      +'<div class="sfcp-pick" id="sfcp-pick"><label class="sfcp-l" for="sfcp-q">Search by key, author, year or title</label>'
       +'<input type="search" class="sfcp-q" id="sfcp-q" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="true" aria-controls="sfcp-list">'
       +'<ul class="sfcp-list" id="sfcp-list" role="listbox" aria-label="References"></ul>'
       +'<p class="sfcp-empty" id="sfcp-empty" hidden></p></div>'
