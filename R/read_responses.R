@@ -15,6 +15,11 @@
 #' columns absent is reported by name. Two columns with the same name are
 #' refused, since one would otherwise be lost.
 #'
+#' A choice set with `allow_other` ("Other, please specify") adds
+#' `<id>__other_text` to a single choice item, whose own column then holds
+#' the code `"other"` when Other is chosen, and `<id>__other` (1 or 0) and
+#' `<id>__other_text` to a multiple choice item.
+#'
 #' # Values
 #'
 #' A CSV file is read as text, so identifiers such as `001`, dates and text
@@ -22,7 +27,9 @@
 #' with numeric responses (numeric, slider and rating items, choice items whose
 #' codes are all numbers, and ranking, multiple-choice and decision expansion
 #' columns) are then converted to numbers, with an empty cell or `NA` read as
-#' missing. A column that does not convert cleanly is kept as text. Data frames
+#' missing. A column that does not convert cleanly is kept as text. The column
+#' of a single choice item that allows Other, and every `<id>__other_text`
+#' column, stay text. Data frames
 #' go through the same conversion, so a CSV file and a data frame holding the
 #' same responses read the same.
 #'
@@ -296,15 +303,20 @@ sframe_numeric_response_columns <- function(instrument, response_items) {
   cols <- character(0)
   for (item in response_items) {
     type <- item$type
+    # A single choice that allows Other holds the code "other" beside the
+    # set's own codes, so its column stays text whatever the codes look like.
+    other_code <- identical(type, "single_choice") &&
+      sframe_item_allows_other(instrument, item)
     if (type %in% c("numeric", "slider", "rating") ||
-        (type %in% c("likert", "single_choice") && numeric_codes(item))) {
+        (type %in% c("likert", "single_choice") && !other_code && numeric_codes(item))) {
       cols <- c(cols, item$id)
     }
     if (identical(type, "matrix") && numeric_codes(item)) {
       cols <- c(cols, sframe_item_expansion_columns(instrument, list(item)))
     }
     if (type %in% c("ranking", "multiple_choice", sframe_expanded_comparison_types)) {
-      cols <- c(cols, sframe_item_expansion_columns(instrument, list(item)))
+      cols <- c(cols, setdiff(sframe_item_expansion_columns(instrument, list(item)),
+                           sframe_other_text_columns(instrument, list(item))))
     }
   }
   unique(cols)
