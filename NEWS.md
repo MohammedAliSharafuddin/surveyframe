@@ -422,8 +422,13 @@ style.
   `other` in its column, a multiple choice submits `<id>__other` as 1 or 0,
   and both submit the text in `<id>__other_text`. Other chosen with nothing
   typed blocks the page. SurveyBuilder turns the option off for an ordered
-  set (UX-11). `read_responses()` and the codebook take up the new columns
-  in a later session.
+  set (UX-11).
+* **The "Other, please specify" columns are known to R.** A choice set with
+  `allow_other` gives a single choice item `<id>__other_text` and a multiple
+  choice item `<id>__other` and `<id>__other_text`, so validation, the
+  Google Sheets header, the Shiny row and the quality report all list them.
+  The Shiny survey fills them as the static survey does, and the text of an
+  Other does not count as a missing answer.
 * **SurveyBuilder's welcome and thank-you pages are entries in the question
   list**, "Welcome page" first and "Thank-you page" last. Selecting one opens
   its editor on the right and its preview in the centre, and the Survey

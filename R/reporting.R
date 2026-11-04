@@ -1730,6 +1730,7 @@ sframe_report_charts <- function(instrument, data, plot_palette = "web") {
     if (identical(t, "multiple_choice") && !item$id %in% names(data)) {
       cs <- choice_by(item$choice_set %||% "")
       cols <- sframe_item_expansion_columns(instrument, list(item))
+      cols <- setdiff(cols, sframe_other_text_columns(instrument, list(item)))
       present <- intersect(cols, names(data))
       if (length(present) == 0) next
       picked <- vapply(present, function(cn) {
