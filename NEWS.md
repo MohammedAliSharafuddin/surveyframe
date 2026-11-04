@@ -203,6 +203,12 @@ can be written again, and every plan result can be serialised by a host.
 
 ## References, cited where they are used and listed once at the end
 
+* **Hypotheses and the study can cite sources.** `cited_by` takes
+  `"hypothesis:<block id>"`, the hypotheses a plan block declares, and
+  `"study"`, the study's problem, objectives and sampling.
+  `validate_sframe()` reports a hypothesis target whose block is missing or
+  declares no hypotheses, and a `study` target on an instrument with no
+  study. The sframe-schema pattern for `cited_by` needs the same 2 targets.
 An instrument can now carry the works it draws on, and every report lists
 them once, in a References section at the end, in a standard bibliography
 style.

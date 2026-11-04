@@ -64,7 +64,9 @@ French or Lithuanian journal name.}
 
 \item{cited_by}{Character vector. Where the instrument cites this
 reference: \code{"instrument"}, \code{"item:<id>"}, \code{"scale:<id>"},
-\code{"plan:<block id>"} or \code{"model:<id>"}. Optional.}
+\code{"plan:<block id>"}, \code{"model:<id>"}, \code{"hypothesis:<block id>"} (the
+hypotheses that plan block declares) or \code{"study"} (the study's problem,
+objectives and sampling). Optional.}
 }
 \value{
 An object of class \code{sf_reference}.
