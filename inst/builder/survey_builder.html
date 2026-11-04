@@ -555,12 +555,45 @@ input,textarea,select{font-family:inherit;font-size:13px}
 .rec-msg{flex:1}
 
 /* -- Keyboard hint -------------------------------------------------------- */
+/* -- Narrow screens (UX-01, UX-08) -----------------------------------------
+   Design shows 1 pane at a time: the question list, then the editor with
+   its live preview below it and a Back control. Preview and Plan take the
+   whole width. Nothing is wider than the viewport. */
+.insp-back{display:none}
+@media (max-width:760px){
+  .topbar{display:flex;flex-wrap:wrap;height:auto;padding:6px 10px;gap:6px}
+  .tb-brand{display:none}
+  .tb-modes{width:100%;justify-content:center}
+  .tb-r{width:100%;flex-wrap:wrap;justify-content:flex-end;gap:6px}
+  .tb-sep{display:none}
+  .shell{flex-direction:column;min-width:0}
+  .sidebar{width:100%;flex:1;min-height:0}
+  .main{min-width:0;flex:1}
+  body:not([data-mode="build"]) .sidebar,body.editing .sidebar{display:none}
+  body[data-mode="build"]:not(.editing) .main{display:none}
+  .build-shell{flex-direction:column;overflow-y:auto;min-width:0}
+  .inspector{order:1;width:100%;transform:none;transition:none;border-left:0;flex:none;overflow:visible}
+  .inspector:not(.open){display:none}
+  .insp-body{overflow:visible}
+  .canvas{order:2;flex:none;padding:12px;overflow:visible;min-width:0}
+  .cv-pv-frame.mobile iframe{width:100%}
+  .insp-back{display:inline-flex}
+  .an-split{display:flex;flex-direction:column;height:auto;overflow-y:auto}
+  .an-vars{border-right:0;border-bottom:1px solid var(--cb)}
+  .an-tabs{flex-wrap:wrap}
+  .frow{grid-template-columns:minmax(0,1fr)}
+  .mov{padding:6px}
+  .modal,.modal.wide{max-width:100%;width:100%}
+  .stabs{flex-wrap:wrap}
+  .stab{white-space:normal}
+}
+
 kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
   border-radius:3px;font-size:10px;font-family:monospace;color:var(--t2);
   background:var(--cg)}
 </style>
 </head>
-<body>
+<body data-mode="build">
 
 <!-- Recovery banner -->
 <div class="rec-ban" id="recBan" hidden>
@@ -691,6 +724,7 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
       </div>
       <aside class="inspector" id="inspector" aria-label="Item editor">
         <div class="insp-hdr">
+          <button type="button" class="btn btn-s btn-sm insp-back" onclick="inspBack()">&#8592; Questions</button>
           <code class="insp-id" id="inspId"></code>
           <span class="insp-type-lbl" id="inspTypeLbl"></span>
           <button type="button" class="insp-x" onclick="closeInsp()" aria-label="Close editor">&#215;</button>
@@ -3610,7 +3644,7 @@ function closeCfgMenu(){document.getElementById('cfgMenu').classList.remove('ope
 document.addEventListener('click',function(e){var m=document.getElementById('fabMenu'),b=document.getElementById('fabMoreBtn');if(m&&m.classList.contains('open')&&!m.contains(e.target)&&!b.contains(e.target))closeFabMenu();});
 
 // -- Modes ------------------------------------------------------------------
-function setMode(m){document.querySelectorAll('.m-btn').forEach(function(b){b.setAttribute('aria-pressed',b.dataset.mode===m?'true':'false');});document.querySelectorAll('.mp').forEach(function(p){p.classList.remove('active');});document.getElementById('mp-'+m).classList.add('active');if(m==='preview')renderPreview();if(m==='analyse')renderAnalyse();}
+function setMode(m){if(document.body&&document.body.dataset)document.body.dataset.mode=m;document.querySelectorAll('.m-btn').forEach(function(b){b.setAttribute('aria-pressed',b.dataset.mode===m?'true':'false');});document.querySelectorAll('.mp').forEach(function(p){p.classList.remove('active');});document.getElementById('mp-'+m).classList.add('active');if(m==='preview')renderPreview();if(m==='analyse')renderAnalyse();}
 
 // -- Modals -----------------------------------------------------------------
 // What had focus before a dialog opened, so closing it returns the keyboard
@@ -4490,9 +4524,10 @@ function openInsp(id){
   renderInspBody(item);
   document.getElementById('inspector').classList.add('open');
   document.getElementById('cPrompt').style.display='none';
+  narrowEditing(true);
   renderCentre();
 }
-function closeInsp(){document.getElementById('inspector').classList.remove('open');document.getElementById('cPrompt').style.display='flex';selId=null;renderItemList();renderCentre();}
+function closeInsp(){narrowEditing(false);document.getElementById('inspector').classList.remove('open');document.getElementById('cPrompt').style.display='flex';selId=null;renderItemList();renderCentre();}
 // -- Welcome and thank-you pages ---------------------------------------------
 // The pages before the first question and after the last, as entries at the
 // ends of the question list (UX-10), with their editor on the right and
@@ -4543,6 +4578,7 @@ function openScreenInsp(id){
   });
   document.getElementById('inspector').classList.add('open');
   document.getElementById('cPrompt').style.display='none';
+  narrowEditing(true);
   renderCentre();
 }
 function updScreen(fid){
@@ -4564,6 +4600,15 @@ function studioGoto(screen){
   window.parent.postMessage({type:'goto',screen:screen},location.origin);
 }
 
+// On a narrow screen the list and the editor take turns (UX-01, UX-08).
+// body.editing shows the editor, and Back returns to the list, to the row of
+// the question that was open.
+function narrowEditing(on){var b=document.body;if(b&&b.classList){if(on)b.classList.add('editing');else b.classList.remove('editing');}}
+function inspBack(){
+  var id=selId;closeInsp();
+  var row=id&&document.querySelector('#itemList .ic[data-id="'+String(id).replace(/"/g,'')+'"]');
+  if(row&&row.focus)row.focus();
+}
 // -- Centre pane -------------------------------------------------------------
 // The selected item as a respondent sees it, drawn by the survey template's
 // own show-only mode, so there is 1 renderer. Read-only: the editor is on
