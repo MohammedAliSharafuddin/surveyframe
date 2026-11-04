@@ -304,6 +304,28 @@ test_that("each screen's title and context line are 1 row at the top of its pane
   expect_true(ui2_wait(b, "$('#screen-design > .screen-head').text().indexOf('Editing: ') >= 0", 20))
 })
 
+test_that("no screen offers 2 controls for the same destination (item 12d)", {
+  b <- ui1_studio("factor_structure")
+  for (screen in sframe_studio_screens()) {
+    expect_true(ui1_screen(b, screen), info = screen)
+    Sys.sleep(1)
+    dup <- ui2_js(b, sprintf(paste0(
+      "(function(){ var seen = {}, d = [];",
+      "  $('#screen-%s a[data-tab]:visible, #screen-%s a[data-nav]:visible').each(function() {",
+      "    var k = $(this).attr('data-tab') || 'plan';",
+      "    if (seen[k]) d.push(k); seen[k] = true; });",
+      "  return d.join(','); })()"), screen, screen))
+    expect_identical(dup, "", info = screen)
+  }
+  # The builder inside Studio shows no switch, Open, Export survey or Collect
+  # and References controls of its own.
+  expect_true(ui1_screen(b, "design"))
+  doc <- "document.getElementById('design_frame').contentWindow.document"
+  for (sel in c(".tb-modes", "#openBtn", "#exportBtn")) {
+    expect_true(ui2_js(b, sprintf("(function(){ var e = %s.querySelector('%s'); return !e || e.offsetParent === null; })()", doc, sel)), info = sel)
+  }
+})
+
 # Last, since it loads the page again, which starts Studio's session again.
 test_that("sidebar groups fold, stay folded after a reload, and a fragment into a folded group opens it", {
   b <- ui1_studio("factor_structure")

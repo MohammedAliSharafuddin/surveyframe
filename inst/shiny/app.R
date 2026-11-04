@@ -3096,8 +3096,8 @@ server <- function(input, output, session) {
       tags$div(
         tags$span(class = "badge badge-warn", "Not verified"),
         tags$p(class = "hint", message),
-        tags$a(href = "#", `data-tab` = "amendments", id = "open_verify_link",
-               "Record the change on Amendments, or open the file again")
+        tags$p(class = "hint", id = "open_verify_remedy",
+               "Record the change on Amendments, or open the file again.")
       )
     }
   }
@@ -3122,7 +3122,7 @@ server <- function(input, output, session) {
           tags$div(class = "stat-lbl", "Models")),
         tags$div(class = "stat-box",
           tags$div(class = "stat-val", id = "open_version", sframe_studio_version_label(instr)),
-          tags$a(class = "stat-lbl", href = "#", `data-tab` = "amendments", id = "open_version_link", "Version: see Amendments")),
+          tags$div(class = "stat-lbl", "Version")),
         tags$div(class = "stat-box",
           tags$div(class = "stat-val", id = "open_schema_status",
                    if (isTRUE(instr$meta$validated)) "Schema valid" else "Draft"),

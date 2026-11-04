@@ -1088,6 +1088,10 @@ style.
 
 ## SurveyStudio
 
+* **1 control per destination on each screen.** The Open card no longer
+  links its version label and its status line to Amendments both, and the
+  embedded builder shows none of the Open, Export survey, Build/Plan,
+  Google Sheets or References controls that Studio's own screens hold.
 * **Each screen is 1 panel with its title inside.** The title and its
   context line, such as Design's "Editing: <title> (<version>)", are 1
   compact row at the top of the screen, in place of a band above its cards.
@@ -1124,8 +1128,8 @@ style.
   between screens and an address ending `#quality` opens Quality.
 * **The Open card's status says what it means** (UX-12). "Valid" is
   "Schema valid", the version and amendment count sit beside the integrity
-  badge, and each links on: the version to Amendments, Draft to Design, and
-  a failed check to Amendments.
+  badge and link to Amendments, Draft links to Design, and a failed check
+  names its remedy.
 * **A gate replaces the screen it guards** (UX-13). When a screen's
   prerequisite is missing, such as an open instrument, its next-stage card
   takes the place of the screen's body, so References, Amendments and
