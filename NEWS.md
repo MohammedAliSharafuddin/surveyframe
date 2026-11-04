@@ -345,6 +345,11 @@ style.
   changes, in the shape `write_sframe()` writes, so a study left alone keeps
   its content hash. The builder refuses what `validate_sframe()` refuses,
   including the removal of an objective a plan block names.
+* **The exported survey honours a choice set's `randomise`.** It was set in R
+  and the builder, and the page never read it. A single choice, multiple
+  choice or ranking item now shows its options in an order shuffled once per
+  respondent and kept in a draft, and each option still submits its own
+  value (UX-11).
 * **SurveyBuilder's welcome and thank-you pages are entries in the question
   list**, "Welcome page" first and "Thank-you page" last. Selecting one opens
   its editor on the right and its preview in the centre, and the Survey
