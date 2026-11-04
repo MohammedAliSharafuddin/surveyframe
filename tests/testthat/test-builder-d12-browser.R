@@ -25,7 +25,7 @@ d12_js <- function(session, code, await = FALSE) {
 
 # Opens the shipped builder, then opens `path` in it as the Open button would.
 d12_open <- function(path) {
-  session <- chromote::ChromoteSession$new(width = 1280, height = 900)
+  session <- sframe_chrome_session(width = 1280, height = 900)
   loaded <- session$Page$loadEventFired(wait_ = FALSE)
   session$Page$navigate(paste0("file://", normalizePath(d12_builder_path())),
                         wait_ = FALSE)

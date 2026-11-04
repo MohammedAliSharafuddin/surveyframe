@@ -69,7 +69,7 @@ serve_survey <- function(instrument, csv) {
   if (!up) {
     stop(start_failure(proc, "survey"))
   }
-  b <- chromote::ChromoteSession$new(width = 1000, height = 2000)
+  b <- sframe_chrome_session(width = 1000, height = 2000)
   b$Page$navigate(url)
   # Wait for the survey page itself to be drawn and bound, not a fixed time.
   ready <- "!!(document.getElementById('submit_btn') && window.Shiny && Shiny.shinyapp && Shiny.shinyapp.isConnected())"
@@ -218,7 +218,7 @@ serve_module <- function(instrument, csv) {
     Sys.sleep(0.5)
   }
   if (!up) stop(start_failure(proc, "module"))
-  b <- chromote::ChromoteSession$new(width = 1000, height = 2400)
+  b <- sframe_chrome_session(width = 1000, height = 2400)
   b$Page$navigate(url)
   ready <- "!!(document.getElementById('embedded-sf_start') && window.Shiny && Shiny.shinyapp && Shiny.shinyapp.isConnected())"
   for (i in seq_len(.browser_start_attempts)) {

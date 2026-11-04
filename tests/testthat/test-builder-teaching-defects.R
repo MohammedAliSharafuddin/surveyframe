@@ -21,7 +21,7 @@ skip_if(length(chrome) != 1L || is.na(chrome) || !nzchar(chrome),
 
 open_demo_builder <- function() {
   path <- launch_builder(demo = "input_types", open = FALSE)
-  session <- chromote::ChromoteSession$new(width = 1280, height = 900)
+  session <- sframe_chrome_session(width = 1280, height = 900)
   loaded <- session$Page$loadEventFired(wait_ = FALSE)
   session$Page$navigate(paste0("file://", normalizePath(path)),
                         wait_ = FALSE)

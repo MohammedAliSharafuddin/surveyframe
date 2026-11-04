@@ -35,7 +35,7 @@ test_that("inside Studio the builder is a Design screen, not a second app", {
     Sys.sleep(0.5)
   }
   skip_if(!up, "Studio did not start")
-  b <- chromote::ChromoteSession$new(width = 1280, height = 900)
+  b <- sframe_chrome_session(width = 1280, height = 900)
   on.exit(b$close(), add = TRUE)
   b$Page$navigate(url)
   js <- function(code) b$Runtime$evaluate(code, returnByValue = TRUE)$result$value
@@ -93,7 +93,7 @@ test_that("the builder on its own keeps its brand, Preview and Export survey", {
   builder <- Filter(file.exists, file.path(sframe_build_libpath(), "surveyframe",
                                           "builder", "survey_builder.html"))[1]
   skip_if(is.na(builder), "the build under test has no builder")
-  b <- chromote::ChromoteSession$new(width = 1280, height = 900)
+  b <- sframe_chrome_session(width = 1280, height = 900)
   on.exit(b$close(), add = TRUE)
   loaded <- b$Page$loadEventFired(wait_ = FALSE)
   b$Page$navigate(paste0("file://", normalizePath(builder)), wait_ = FALSE)

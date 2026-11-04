@@ -28,7 +28,7 @@ next_stage_session <- function(launch) {
     proc$kill()
     return(NULL)
   }
-  b <- chromote::ChromoteSession$new(width = 1280, height = 900)
+  b <- sframe_chrome_session(width = 1280, height = 900)
   b$Page$navigate(url)
   js <- function(code) b$Runtime$evaluate(code, returnByValue = TRUE)$result$value
   wait <- function(cond, n = 120) {

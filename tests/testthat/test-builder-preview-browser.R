@@ -25,7 +25,7 @@ test_that("the builder's Preview is the survey export_survey(preview = TRUE) wri
   path <- tempfile(fileext = ".sframe")
   write_sframe(instr, path, new_instrument = TRUE)
 
-  b <- chromote::ChromoteSession$new(width = 1280, height = 900)
+  b <- sframe_chrome_session(width = 1280, height = 900)
   on.exit(b$close(), add = TRUE)
   loaded <- b$Page$loadEventFired(wait_ = FALSE)
   b$Page$navigate(paste0("file://", normalizePath(builder)), wait_ = FALSE)
