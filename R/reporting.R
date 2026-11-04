@@ -278,8 +278,7 @@ print.sframe_codebook <- function(x, ...) {
 #'   pagedown package (in Suggests) and a local Chrome or Chromium. The
 #'   returned path's `"converter"` attribute names the route:
 #'   `"quarto-latex"`, `"quarto-typst"`, `"pagedown"`, or `"quarto"` for
-#'   Word and OpenDocument. The first Typst render of a session downloads a
-#'   Typst package Quarto's template imports, unless it is already cached.
+#'   Word and OpenDocument. Every route renders offline.
 #'   `"qmd"` writes the Quarto source of the report as a folder, named by
 #'   `output_file` (a trailing `.qmd` is dropped), which must be new or empty:
 #'   `report.qmd`, the `.sframe`, `responses.csv`, the bibliography and its

@@ -140,3 +140,26 @@ test_that("every format's results record is the same", {
   docx <- render_format("docx")
   expect_identical(rec(html$out), rec(docx$out))
 })
+
+test_that("the Typst route renders offline, importing no Typst package", {
+  skip_on_cran()
+  skip_if_not_slow()
+  skip_if(!nzchar(Sys.which("quarto")), "Quarto is not installed")
+  # Quarto imports @preview/fontawesome for a callout in Typst. The template
+  # writes none there, so a render with an empty package cache leaves it
+  # empty: nothing was fetched.
+  qmd <- paste(readLines(system.file("templates", "report.qmd", package = "surveyframe")),
+               collapse = "\n")
+  expect_match(qmd, "if (out_html) {\n              cat(\"\\n::: {.callout-note", fixed = TRUE)
+  cache <- tempfile("typst-cache-")
+  dir.create(cache)
+  old <- Sys.getenv("TYPST_PACKAGE_CACHE_PATH", unset = NA)
+  Sys.setenv(TYPST_PACKAGE_CACHE_PATH = cache)
+  on.exit(if (is.na(old)) Sys.unsetenv("TYPST_PACKAGE_CACHE_PATH")
+          else Sys.setenv(TYPST_PACKAGE_CACHE_PATH = old), add = TRUE)
+  r <- render_format("pdf", latex = FALSE, show_code = TRUE)
+  expect_identical(attr(r$res, "converter"), "quarto-typst")
+  expect_identical(readBin(r$out, "raw", 4), charToRaw("%PDF"))
+  expect_identical(list.files(cache, recursive = TRUE, all.files = TRUE), character(0))
+})
+
