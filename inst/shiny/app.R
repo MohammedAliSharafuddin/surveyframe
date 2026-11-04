@@ -1293,6 +1293,7 @@ ui <- fluidPage(
       .studio-nav-item a:hover { background: #1d2140; color: #c8ccdc; }
       .studio-nav-item a.active {
         background: #22274a; color: #ffffff; border-left-color: #16B3B1;
+        font-weight: 700;
       }
       /* A group heading is a label, with nothing to click. */
       .studio-nav-heading {

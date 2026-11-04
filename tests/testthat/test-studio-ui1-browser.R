@@ -467,6 +467,8 @@ test_that("every Studio screen, the hosted builder and the template meet AA cont
     Sys.sleep(2)
     measure(paste("Studio", s), ui1_contrast(b))
   }
+  # The open screen is marked by more than colour: a bar and a bold label.
+  expect_identical(ui2_js(b, "(function(){ var a = $('.studio-nav-item a.active'), o = $('.studio-nav-item a:not(.active)').first(); return a.length === 1 && parseInt(a.css('font-weight'), 10) >= 700 && parseInt(o.css('font-weight'), 10) < 700 && a.css('border-left-width') === '3px'; })()"), TRUE)
   for (t in c("configure", "interpret", "preview", "reproduce")) {
     ui2_js(b, sprintf("$('#rtab-%s').click(); true", t))
     Sys.sleep(1.5)
