@@ -772,8 +772,8 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
 
 <!-- Settings -->
 <div class="mov" id="m-settings" onclick="if(event.target===this)closeModal('m-settings')">
-<div class="modal wide" role="dialog" aria-labelledby="set-title">
-  <div class="mhdr"><span class="mtitle" id="set-title">Survey Settings</span><button type="button" class="mx" onclick="closeModal('m-settings')">&#215;</button></div>
+<div class="modal wide" role="dialog" aria-modal="true" aria-labelledby="set-title">
+  <div class="mhdr"><span class="mtitle" id="set-title">Survey Settings</span><button type="button" class="mx" aria-label="Close" onclick="closeModal('m-settings')">&#215;</button></div>
   <div class="mbody">
     <div class="stabs">
       <div class="stab active" onclick="showST('meta')"     id="st-meta">General</div>
@@ -873,8 +873,8 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
 
 <!-- Choice modal -->
 <div class="mov" id="m-choice" onclick="if(event.target===this)closeModal('m-choice')">
-<div class="modal" role="dialog">
-  <div class="mhdr"><span class="mtitle">Define Choice Set</span><button type="button" class="mx" onclick="closeModal('m-choice')">&#215;</button></div>
+<div class="modal" role="dialog" aria-modal="true" aria-labelledby="ch-title">
+  <div class="mhdr"><span class="mtitle" id="ch-title">Define Choice Set</span><button type="button" class="mx" aria-label="Close" onclick="closeModal('m-choice')">&#215;</button></div>
   <div class="mbody">
     <div class="field"><label class="fl" for="c-id">Choice set ID <span class="fr">*</span></label><div class="fc"><input type="text" id="c-id" placeholder="agree5"></div></div>
     <div>
@@ -901,8 +901,8 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
 
 <!-- Scale modal -->
 <div class="mov" id="m-scale" onclick="if(event.target===this)closeModal('m-scale')">
-<div class="modal" role="dialog">
-  <div class="mhdr"><span class="mtitle">Define Scale</span><button type="button" class="mx" onclick="closeModal('m-scale')">&#215;</button></div>
+<div class="modal" role="dialog" aria-modal="true" aria-labelledby="sc-title">
+  <div class="mhdr"><span class="mtitle" id="sc-title">Define Scale</span><button type="button" class="mx" aria-label="Close" onclick="closeModal('m-scale')">&#215;</button></div>
   <div class="mbody">
     <div class="frow">
       <div class="field"><label class="fl" for="sc-id">Scale ID <span class="fr">*</span></label><div class="fc"><input type="text" id="sc-id" placeholder="satisfaction"></div></div>
@@ -921,8 +921,8 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
 
 <!-- Branch modal -->
 <div class="mov" id="m-branch" onclick="if(event.target===this)closeModal('m-branch')">
-<div class="modal" role="dialog">
-  <div class="mhdr"><span class="mtitle">Add Branching Rule</span><button type="button" class="mx" onclick="closeModal('m-branch')">&#215;</button></div>
+<div class="modal" role="dialog" aria-modal="true" aria-labelledby="br-title">
+  <div class="mhdr"><span class="mtitle" id="br-title">Add Branching Rule</span><button type="button" class="mx" aria-label="Close" onclick="closeModal('m-branch')">&#215;</button></div>
   <div class="mbody">
     <div class="alert-i">Show or hide a question based on the answer to a preceding question.</div>
     <div class="field"><label class="fl" for="br-tgt">Target question (will be shown or hidden)</label><div class="fc"><select id="br-tgt"></select></div></div>
@@ -939,8 +939,8 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
 
 <!-- Check modal -->
 <div class="mov" id="m-check" onclick="if(event.target===this)closeModal('m-check')">
-<div class="modal" role="dialog">
-  <div class="mhdr"><span class="mtitle">Add Attention Check</span><button type="button" class="mx" onclick="closeModal('m-check')">&#215;</button></div>
+<div class="modal" role="dialog" aria-modal="true" aria-labelledby="ck-title">
+  <div class="mhdr"><span class="mtitle" id="ck-title">Add Attention Check</span><button type="button" class="mx" aria-label="Close" onclick="closeModal('m-check')">&#215;</button></div>
   <div class="mbody">
     <div class="frow">
       <div class="field"><label class="fl" for="ck-id">Check ID <span class="fr">*</span></label><div class="fc"><input type="text" id="ck-id" placeholder="attn_1"></div></div>
@@ -959,8 +959,8 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
 
 <!-- RQ modal -->
 <div class="mov" id="m-rq" onclick="if(event.target===this)closeModal('m-rq')">
-<div class="modal wide" role="dialog">
-  <div class="mhdr"><span class="mtitle" id="rq-modal-title">Add Research Question</span><button type="button" class="mx" onclick="closeModal('m-rq')">&#215;</button></div>
+<div class="modal wide" role="dialog" aria-modal="true" aria-labelledby="rq-modal-title">
+  <div class="mhdr"><span class="mtitle" id="rq-modal-title">Add Research Question</span><button type="button" class="mx" aria-label="Close" onclick="closeModal('m-rq')">&#215;</button></div>
   <div class="mbody">
     <div class="field"><label class="fl" for="rq-q">Research question <span class="fr">*</span></label><div class="fc"><textarea id="rq-q" rows="3" placeholder="Is there a significant difference in satisfaction between groups?"></textarea></div></div>
     <div class="field" id="rq-obj-field" hidden><label class="fl" for="rq-obj">Objective served</label><div class="fc"><select id="rq-obj"></select></div><span class="fhint">The study objective this research question answers. Objectives are set in Survey settings, Study.</span></div>
@@ -3623,10 +3623,30 @@ function openModal(id){
   var m=document.getElementById(id);
   if(m.classList.contains('open'))return;
   __modalReturn.push(document.activeElement);
+  __modalOpen.push(id);
   m.classList.toggle('stack',!!document.querySelector('.mov.open'));
   m.classList.add('open');
   var first=m.querySelector('input,select,textarea,button');
   if(first&&first.focus)first.focus();
+}
+// The dialog on top: the one opened last that is still open. Escape closes
+// it through closeModal(), so focus returns where it was, and Tab stays in
+// it (UX-14). Escape used to remove every open dialog's class directly, and
+// Tab walked out to the page behind.
+var __modalOpen=[];
+function topModal(){
+  __modalOpen=__modalOpen.filter(function(id){var m=document.getElementById(id);return m&&m.classList.contains('open');});
+  var id=__modalOpen[__modalOpen.length-1];return id?document.getElementById(id):null;
+}
+function trapTab(e,mov){
+  var f=Array.prototype.filter.call(mov.querySelectorAll('a[href],button,input,select,textarea,[tabindex]'),function(el){
+    if(el.disabled||el.getAttribute('tabindex')==='-1'||el.type==='hidden')return false;
+    return !!(el.offsetWidth||el.offsetHeight||el.getClientRects().length);
+  });
+  if(!f.length){e.preventDefault();return;}
+  var i=f.indexOf(document.activeElement);
+  if(e.shiftKey&&(i<=0)){e.preventDefault();f[f.length-1].focus();}
+  else if(!e.shiftKey&&(i<0||i===f.length-1)){e.preventDefault();f[0].focus();}
 }
 function closeModal(id){
   var m=document.getElementById(id);
@@ -3681,7 +3701,8 @@ function startRQPlaceholders(){
 }
 function stopRQPlaceholders(){rqPhTimers.forEach(clearInterval);rqPhTimers=[];}
 document.addEventListener('keydown',function(e){
-  if(e.key==='Escape'){document.querySelectorAll('.mov.open').forEach(function(m){m.classList.remove('open');});stopRQPlaceholders();}
+  if(e.key==='Escape'){var top=topModal();if(top){e.preventDefault();if(top.id==='m-amend')resAmend(false);else closeModal(top.id);}}
+  if(e.key==='Tab'){var tm=topModal();if(tm)trapTab(e,tm);}
   if((e.ctrlKey||e.metaKey)&&e.key==='s'){e.preventDefault();saveSframe();}
   if((e.ctrlKey||e.metaKey)&&e.key==='z'){e.preventDefault();undo();}
   if((e.ctrlKey||e.metaKey)&&(e.key==='y'||e.key==='Z')){e.preventDefault();redo();}

@@ -350,6 +350,12 @@ style.
   choice or ranking item now shows its options in an order shuffled once per
   respondent and kept in a draft, and each option still submits its own
   value (UX-11).
+* **SurveyBuilder's 7 dialogs are labelled modal dialogs** with
+  `aria-modal` and `aria-labelledby`, and their close buttons have a name.
+  Tab stays inside the open dialog, and Escape closes the top one through
+  the same route as its close button, so focus returns to what opened it.
+  Escape used to drop every open dialog at once and leave focus behind
+  (UX-14).
 * **The exported survey honours a choice set's `allow_other`.** A single or
   multiple choice item adds "Other, please specify" last, with a text box,
   and typing in the box chooses it. A single choice submits the code
