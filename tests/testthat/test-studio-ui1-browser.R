@@ -90,4 +90,33 @@ test_that("Analyse shows the declared plan, and a plan change after the data is 
   expect_true(ui2_wait(b, paste0("!", ui1_modal_open), 20))
 })
 
+test_that("Report has 4 local tabs, a choice survives a switch, and Download copy sits by the title", {
+  b <- ui1_studio("factor_structure")
+  expect_true(ui1_screen(b, "export"))
+  expect_identical(ui2_js(b, "$('#screen-export .report-tab').map(function(){ return $(this).text(); }).get().join('|')"),
+                   "Interpret|Configure|Export report|Reproduce")
+  expect_true(ui2_wait(b, "$('.screen-head #download_sframe_btn').text().indexOf('Download copy') >= 0", 30))
+  expect_identical(ui2_js(b, "$('#rtab-interpret').attr('aria-selected')"), "true")
+
+  ui2_js(b, "$('#rtab-configure').click(); true")
+  expect_true(ui2_wait(b, "$('#rpane-configure').is(':visible') && !$('#rpane-interpret').is(':visible')"))
+  ui1_set(b, "rpt_title", "Kept across tabs")
+  ui2_js(b, "$('#rpt_codebook').prop('checked', false).trigger('change'); true")
+  ui2_js(b, "$('#rtab-interpret').click(); true")
+  expect_true(ui2_wait(b, "$('#rpane-interpret').is(':visible')"))
+  ui2_js(b, "$('#rtab-configure').click(); true")
+  expect_true(ui2_wait(b, "$('#rpane-configure').is(':visible')"))
+  expect_identical(ui2_js(b, "$('#rpt_title').val()"), "Kept across tabs")
+  expect_false(ui2_js(b, "$('#rpt_codebook').prop('checked')"))
+
+  # Arrow keys move along the tabs.
+  ui2_js(b, "$('#rtab-configure').focus(); true")
+  ui2_key(b, "#rtab-configure", "ArrowRight")
+  expect_true(ui2_wait(b, "$('#rpane-export').is(':visible') && document.activeElement.id === 'rtab-export'"))
+
+  # Item 5: the Quarto line comes from sframe_quarto_find().
+  expect_true(ui2_wait(b, "/^Quarto (was not found|is turned off|[0-9])/.test($('#quarto_status').text())", 20))
+  ui2_js(b, "$('#rtab-configure').click(); $('#rpt_codebook').prop('checked', true).trigger('change'); $('#rpt_title').val('').trigger('change'); $('#rtab-interpret').click(); true")
+})
+
 ui1_close()
