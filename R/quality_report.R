@@ -283,10 +283,13 @@ sframe_quality_results <- function(
   # expansion columns and never its bare id, so counting the bare id as a
   # dropped column would inflate the denominator for every respondent.
   expected_cols <- unique(unlist(lapply(instrument$items, function(it) {
-    expanded <- sframe_item_expansion_columns(instrument, list(it))
-    if (length(expanded) > 0) expanded else as.character(it$id %||% "")[1]
+    if (is.null(it$id)) return("")
+    sframe_item_response_columns(instrument, it)
   }), use.names = FALSE))
   expected_cols <- expected_cols[nzchar(expected_cols)]
+  # The text of an "Other, please specify" is empty unless Other was chosen,
+  # so it is not an answer the respondent could have skipped.
+  expected_cols <- setdiff(expected_cols, sframe_other_text_columns(instrument))
   # A display-only item collects nothing, so it belongs in neither total.
   display_only <- vapply(instrument$items, function(it) {
     as.character(it$type %||% "")[1] %in% c("section_break", "text_block")

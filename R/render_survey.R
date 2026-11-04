@@ -202,8 +202,13 @@ sframe_expansion_values <- function(item, instrument, input_values) {
     }), cols))
   }
 
+  # An Other text column carries the typed text when Other is chosen, as the
+  # static survey does, and an indicator column for every other option.
   stats::setNames(lapply(opts, function(o) {
-    if (o %in% chosen) "1" else "0"
+    if (identical(o, "other_text") && sframe_item_allows_other(instrument, item)) {
+      if (!"other" %in% chosen) return(NA_character_)
+      sframe_serialise_response_value(input_values[[paste0(item$id, "__other_text")]])
+    } else if (o %in% chosen) "1" else "0"
   }), cols)
 }
 
@@ -240,6 +245,17 @@ sframe_response_row <- function(instrument, input_values, branch_lookup,
     sframe_serialise_response_value(sframe_item_input_value(item, input_values))
   })
   names(item_values) <- vapply(plain_items, function(i) i$id, character(1))
+  # A single choice that allows Other posts <id>__other_text beside its code,
+  # as the static survey does, so both routes give the same columns.
+  for (item in Filter(function(i) identical(i$type, "single_choice") &&
+                        sframe_item_allows_other(instrument, i), plain_items)) {
+    chosen_other <- identical(as.character(item_values[[item$id]]), "other")
+    item_values[[paste0(item$id, "__other_text")]] <- if (chosen_other) {
+      sframe_serialise_response_value(input_values[[paste0(item$id, "__other_text")]])
+    } else {
+      NA_character_
+    }
+  }
 
   for (item in expanded_items) {
     visible <- sframe_item_visible(item, input_values, branch_lookup)

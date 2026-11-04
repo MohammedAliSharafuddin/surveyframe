@@ -96,8 +96,7 @@ export_google_sheet <- function(instrument, sheet_url, output_dir = ".") {
   # The fallback to the bare item id is kept. An expandable item with no
   # usable choice set still needs one column rather than none.
   item_headers <- unlist(lapply(response_items, function(i) {
-    cols <- sframe_item_expansion_columns(instrument, list(i))
-    if (length(cols) > 0L) cols else i$id
+    sframe_item_response_columns(instrument, i)
   }), use.names = FALSE)
   col_headers <- c("respondent_id", "started_at", "submitted_at", item_headers)
   headers_js <- jsonlite::toJSON(col_headers, auto_unbox = TRUE)

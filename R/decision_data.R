@@ -53,7 +53,8 @@ sframe_comparison_columns <- function(item) {
 
 # Every expansion column an instrument's items produce in collected data,
 # following the item__sub convention: matrix sub-items, ranking and
-# multiple-choice options, and decision pairs and criteria.
+# multiple-choice options, decision pairs and criteria, and the "Other, please
+# specify" columns of a choice set with allow_other.
 #
 # read_responses() and validate_sframe() both need this. They used to derive
 # it separately, and validate_sframe()'s copy was never extended past the base
@@ -63,10 +64,8 @@ sframe_comparison_columns <- function(item) {
 sframe_item_expansion_columns <- function(instrument, items = NULL) {
   items <- items %||% (instrument$items %||% list())
   choice_values_for <- function(id) {
-    for (cs in instrument$choices %||% list()) {
-      if (identical(cs$id, id)) return(as.character(cs$values))
-    }
-    character(0)
+    cs <- sframe_choice_set_by_id(instrument, id)
+    if (is.null(cs)) character(0) else as.character(cs$values)
   }
   out <- lapply(items, function(i) {
     if (identical(i$type, "matrix") && length(i$matrix_items) > 0L) {
@@ -76,7 +75,15 @@ sframe_item_expansion_columns <- function(instrument, items = NULL) {
       if (length(vals) > 0L) paste0(i$id, "__", vals) else character(0)
     } else if (identical(i$type, "multiple_choice") && !is.null(i$choice_set)) {
       vals <- choice_values_for(i$choice_set)
-      if (length(vals) > 0L) paste0(i$id, "__", vals) else character(0)
+      if (length(vals) == 0L) return(character(0))
+      # "Other, please specify": an indicator beside the option columns, and
+      # the typed text, as the static survey submits them.
+      c(paste0(i$id, "__", vals),
+        if (sframe_item_allows_other(instrument, i)) paste0(i$id, c("__other", "__other_text")))
+    } else if (identical(i$type, "single_choice")) {
+      # The code "other" arrives in the item's own column, and the typed text
+      # in this one. The base column is not an expansion, so it is not listed.
+      if (sframe_item_allows_other(instrument, i)) paste0(i$id, "__other_text") else character(0)
     } else if (i$type %in% sframe_expanded_comparison_types) {
       sframe_comparison_columns(i)
     } else {
@@ -85,6 +92,41 @@ sframe_item_expansion_columns <- function(instrument, items = NULL) {
   })
   as.character(unlist(out, use.names = FALSE))
 }
+
+# Every column an item posts: its expansion columns for an item that expands
+# (matrix, ranking, multiple choice, decision items), and otherwise its own
+# id followed by any expansion, which for a single choice that allows Other
+# is <id>__other_text. An expandable item with nothing to expand keeps its id.
+sframe_item_response_columns <- function(instrument, item) {
+  cols <- sframe_item_expansion_columns(instrument, list(item))
+  if (length(cols) > 0L && !identical(item$type, "single_choice")) cols else c(item$id, cols)
+}
+
+# The choice set with id `id`, or NULL.
+sframe_choice_set_by_id <- function(instrument, id) {
+  if (is.null(id)) return(NULL)
+  for (cs in instrument$choices %||% list()) {
+    if (identical(as.character(cs$id)[1], as.character(id)[1])) return(cs)
+  }
+  NULL
+}
+
+# Whether a single or multiple choice item offers "Other, please specify",
+# which is set on its choice set (allow_other).
+sframe_item_allows_other <- function(instrument, item) {
+  isTRUE(item$type %in% c("single_choice", "multiple_choice")) &&
+    isTRUE(sframe_choice_set_by_id(instrument, item$choice_set)$allow_other)
+}
+
+# The <id>__other_text columns of the items given, which hold free text.
+sframe_other_text_columns <- function(instrument, items = NULL) {
+  items <- items %||% (instrument$items %||% list())
+  ids <- unlist(lapply(items, function(i) {
+    if (sframe_item_allows_other(instrument, i)) i$id
+  }), use.names = FALSE)
+  if (length(ids) == 0L) character(0) else paste0(ids, "__other_text")
+}
+
 
 sframe_decision_item <- function(instrument, item_id, types) {
   items <- instrument$items %||% list()
