@@ -3893,6 +3893,15 @@ function studyRead(){
   if(Object.keys(sp).length)s.sampling=sp;
   return Object.keys(s).length?s:null;
 }
+// The study as write_sframe() writes it: an empty sampling or objectives
+// left out, and nothing when the study is then empty.
+function studyPlain(s){
+  if(!s||typeof s!=='object'||Array.isArray(s))return s==null?null:s;
+  var o={};Object.keys(s).forEach(function(k){o[k]=s[k];});
+  if(Array.isArray(o.objectives)&&!o.objectives.length)delete o.objectives;
+  if(o.sampling&&typeof o.sampling==='object'&&!Array.isArray(o.sampling)&&!Object.keys(o.sampling).length)delete o.sampling;
+  return Object.keys(o).length?o:null;
+}
 // What validate_sframe() would refuse, said before the study is saved.
 function studyProblems(s){
   var out=[],ids={};s=s||{};
@@ -4340,6 +4349,10 @@ var SFRAME_FORMAT='1.0';
 function sframePayload(){
   var payload={sframe_format:SFRAME_FORMAT,hash:{algo:'sha256',value:''},version:S.meta.version,meta:S.meta,items:S.items,choices:S.choices,scales:S.scales,branching:S.branching,checks:S.checks,analysis_plan:S.analysis_plan,models:S.models||[],render:S.render||{}};
   var carry=S._carry||{};Object.keys(carry).forEach(function(k){payload[k]=carry[k];});
+  // An empty study, objectives or sampling is refused by the sframe-schema
+  // profile and by validate_sframe(), and an instrument with no study has no
+  // study field. One opened as {} was saved as {} again (found by session V).
+  if(payload.hasOwnProperty('study')){var st=studyPlain(payload.study);if(st)payload.study=st;else delete payload.study;}
   if(S.references&&S.references.length)payload.references=S.references;
   return payload;
 }
