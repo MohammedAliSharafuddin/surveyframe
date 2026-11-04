@@ -308,6 +308,13 @@ style.
 
 ## The study an instrument serves
 
+* **A tested result with no hypothesis declared is labelled exploratory.**
+  A block whose result gives a p value and that declared no H0 and no H1
+  prints "Exploratory: no hypothesis declared before the data" before its
+  result, in both engines, and its entry in the results record carries
+  `exploratory: true`. The 2 placeholder sentences earlier interfaces saved
+  count as not declared. Descriptive blocks print nothing extra, and a
+  block with no hypothesis stays valid.
 * **Every report prints the study in its plan section.** The problem
   statement, its sources, and a table tracing each objective to the
   research questions that serve it, with "none yet" for an objective no

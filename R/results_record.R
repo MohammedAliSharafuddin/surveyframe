@@ -39,7 +39,14 @@ sframe_record_plain <- function(x) {
 # The results record as a JSON string: canonical (keys sorted, compact,
 # full precision), so its sha256 is a fingerprint of the numbers.
 sframe_results_record_json <- function(results, instrument, seed, style = NULL) {
-  blocks <- if (is.list(results)) lapply(unclass(results), sframe_record_plain) else list()
+  # Each block with whether it is exploratory (owner 2026-11-04).
+  blocks <- if (is.list(results)) {
+    lapply(unclass(results), function(r) {
+      b <- sframe_record_plain(r)
+      if (is.list(b)) b$exploratory <- sframe_result_exploratory(r)
+      b
+    })
+  } else list()
   names(blocks) <- NULL
   record <- list(
     record = "surveyframe results record",

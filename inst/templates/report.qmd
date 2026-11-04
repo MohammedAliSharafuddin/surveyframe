@@ -510,6 +510,8 @@ if (!has_data) {
       } else {
         declare_md(r)
         scale_entries <- Filter(function(e) is.list(e) && !is.null(e$scale_id), r)
+        # Planned or exploratory, decided by render_report() (owner 2026-11-04).
+        if (isTRUE(r$exploratory)) cat(sprintf("**%s**\n\n", r$exploratory_label))
         if (!is.null(r$apa)) {
           cat(sprintf("**Result:** %s\n\n", r$apa))
         } else if (length(scale_entries) == 0) {
