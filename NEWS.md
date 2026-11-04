@@ -387,7 +387,8 @@ style.
   is re-synced from sframe-schema v0.3-draft, whose instrument profile gains
   `study` (problem, objectives, sampling with `method_other`), the plan block
   `objective` and the `hypotheses` shape: a text `null`, a text `alternative`
-  or both, or `null`. No field became required.
+  or both, or `null`. A reference's `cited_by` may also name
+  `hypothesis:<block id>` and `study`. No field became required.
 * **SurveyBuilder edits the study in a Study tab of Survey settings**: the
   problem statement, the objectives with their ids, the population, the
   sampling method from the fixed list (with a description for Other) and
