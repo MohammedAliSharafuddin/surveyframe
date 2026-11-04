@@ -119,3 +119,53 @@ test_that("clearing every field drops the study", {
   path <- builder_save(ctx)
   expect_false(grepl("\"study\"", paste(readLines(path), collapse = "\n"), fixed = TRUE))
 })
+
+# -- The objective a plan block serves ------------------------------------------
+
+# The objective as the builder holds it. The V8 page has no role selects, so a
+# plan saved here has no roles and could not pass read_sframe().
+plan_objective <- function(ctx) ctx$get("S.analysis_plan[0].objective")
+
+plan_context <- function() {
+  ctx <- builder_context()
+  ctx$eval("function clearInterval(){} function clearTimeout(){}
+            function setTimeout(){ return 0; }")
+  ctx
+}
+
+two_objectives <- list(
+  problem = "Why do delegates not return?",
+  objectives = list(list(id = "O1", text = "Describe the reasons."),
+                    list(id = "O2", text = "Compare the groups.")))
+
+test_that("editing a plan keeps the objective it serves", {
+  ctx <- plan_context()
+  builder_open(ctx, study_instrument(two_objectives, objective = "O1"))
+  ctx$call("openRQModal", "rq1")
+  expect_identical(ctx$get("document.getElementById('rq-obj').value"), "O1")
+  expect_false(ctx$get("document.getElementById('rq-obj-field').hidden"))
+  ctx$call("saveRQ")
+  expect_identical(plan_objective(ctx), "O1")
+})
+
+test_that("the plan dialog sets and clears the objective", {
+  ctx <- plan_context()
+  builder_open(ctx, study_instrument(two_objectives, objective = "O1"))
+  ctx$call("openRQModal", "rq1")
+  ctx$eval("document.getElementById('rq-obj').value = 'O2';")
+  ctx$call("saveRQ")
+  expect_identical(plan_objective(ctx), "O2")
+  ctx$call("openRQModal", "rq1")
+  ctx$eval("document.getElementById('rq-obj').value = '';")
+  ctx$call("saveRQ")
+  expect_null(plan_objective(ctx))
+})
+
+test_that("with no study objectives the field is hidden and nothing is written", {
+  ctx <- plan_context()
+  builder_open(ctx, study_instrument())
+  ctx$call("openRQModal", "rq1")
+  expect_true(ctx$get("document.getElementById('rq-obj-field').hidden"))
+  ctx$call("saveRQ")
+  expect_null(plan_objective(ctx))
+})

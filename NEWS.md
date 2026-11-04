@@ -345,6 +345,11 @@ style.
   changes, in the shape `write_sframe()` writes, so a study left alone keeps
   its content hash. The builder refuses what `validate_sframe()` refuses,
   including the removal of an objective a plan block names.
+* **SurveyBuilder keeps the objective a plan block serves.** Saving the plan
+  dialog built the block afresh, so any edit there dropped an `objective` set
+  in R. The dialog now has an "Objective served" choice listing the study's
+  objectives, and keeps the block's own objective even when the study no
+  longer declares it.
 
 ## Amendments and versions
 
