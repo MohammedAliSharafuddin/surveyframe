@@ -15,14 +15,16 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - { os: ubuntu-latest,  r: "release" }
-          - { os: ubuntu-latest,  r: "devel"   }
-          - { os: windows-latest, r: "release" }
-          - { os: macos-latest,   r: "release" }
+          # Browser tests run on Ubuntu release alone (owner, 2026-11-05).
+          - { os: ubuntu-latest,  r: "release", browser: "true"  }
+          - { os: ubuntu-latest,  r: "devel",   browser: "false" }
+          - { os: windows-latest, r: "release", browser: "false" }
+          - { os: macos-latest,   r: "release", browser: "false" }
 
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       R_KEEP_PKG_SOURCE: yes
+      SURVEYFRAME_CI_BROWSER: ${{ matrix.config.browser }}
 
     steps:
       - uses: actions/checkout@v5
