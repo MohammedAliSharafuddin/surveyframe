@@ -101,7 +101,9 @@ dim(responses)
 
 ```{r screening}
 mr <- sframe_missing_data_results(responses, instr)
-kable(as.data.frame(mr), digits = 2,
+mr_items <- as.data.frame(mr)[, c("variable", "missing_n", "missing_prop", "valid_n")]
+mr_items$missing_prop <- 100 * mr_items$missing_prop
+kable(mr_items, digits = 1, row.names = FALSE,
       col.names = c("Variable", "Missing (n)", "Missing (%)", "Valid (n)"),
       caption = "Item-level missingness")
 

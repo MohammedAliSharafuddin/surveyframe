@@ -802,7 +802,9 @@ not automatic exclusion.
 mr <- sframe_missing_data_results(responses, study)
 # as.data.frame() returns the item-level table, which is what the report is
 # mainly about.
-kable(as.data.frame(mr), digits = 2,
+mr_items <- as.data.frame(mr)[, c("variable", "missing_n", "missing_prop", "valid_n")]
+mr_items$missing_prop <- 100 * mr_items$missing_prop
+kable(mr_items, digits = 1, row.names = FALSE,
       col.names = c("Variable", "Missing (n)", "Missing (%)", "Valid (n)"),
       caption = "Item-level missingness")
 # sframe_apa() gives a plain-language summary suitable for a methods section.
