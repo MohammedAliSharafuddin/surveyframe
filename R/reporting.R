@@ -42,19 +42,37 @@ NULL
 
 # codebook_report.R
 
-# Remove the scratch directories Chrome leaves in tempdir() after a
-# chrome_print() call. `before` is the listing taken immediately before the
-# call, so only entries created during it are considered, and of those only
-# the ones matching Chrome's own naming are removed.
-sframe_clean_chrome_detritus <- function(before) {
-  after <- list.files(tempdir(), all.files = TRUE, no.. = TRUE)
-  new   <- setdiff(after, before)
-  chrome <- grep("^(com\\.google\\.Chrome\\.|scoped_dir|\\.com\\.google\\.Chrome\\.)",
-                 new, value = TRUE)
-  if (length(chrome)) {
-    unlink(file.path(tempdir(), chrome), recursive = TRUE, force = TRUE)
-  }
-  invisible(chrome)
+# Removes a folder Chrome wrote in. Chrome's SingletonSocket reads as a
+# directory to file.info(), so unlink(recursive = TRUE) tried rmdir() on it,
+# failed, and kept the folder. Files go first through file.remove().
+sframe_remove_dir <- function(dir) {
+  files <- list.files(dir, recursive = TRUE, all.files = TRUE, full.names = TRUE,
+                      include.dirs = FALSE, no.. = TRUE)
+  if (length(files)) suppressWarnings(file.remove(files))
+  unlink(dir, recursive = TRUE, force = TRUE)
+  invisible(!dir.exists(dir))
+}
+
+# Runs `code`, which starts Chrome, with TMPDIR (and TMP and TEMP, which
+# Chrome reads on Windows) set to a new folder of its own, then removes that
+# folder. Chrome writes its com.google.Chrome.* and scoped_dir* folders in
+# TMPDIR, not in tempdir(), and left them there after each PDF. Chrome's
+# socket path must stay under the Unix limit (104 bytes on macOS), so a long
+# tempdir() gives way to a folder under /tmp.
+sframe_with_chrome_tmp <- function(code) {
+  base <- if (nchar(tempdir()) + 60L < 100L || .Platform$OS.type == "windows" ||
+              !dir.exists("/tmp")) tempdir() else "/tmp"
+  dir <- tempfile("sfc", tmpdir = base)
+  dir.create(dir, showWarnings = FALSE)
+  vars <- c("TMPDIR", "TMP", "TEMP")
+  old <- Sys.getenv(vars, unset = NA, names = TRUE)
+  on.exit({
+    for (v in vars) if (is.na(old[[v]])) Sys.unsetenv(v) else do.call(Sys.setenv, as.list(old[v]))
+    sframe_remove_dir(dir)
+  }, add = TRUE)
+  do.call(Sys.setenv, stats::setNames(as.list(rep(dir, length(vars))), vars))
+  .sframe_figure_env$chrome_tmp <- dir
+  force(code)
 }
 
 #' Generate a survey codebook from an instrument object
@@ -546,15 +564,10 @@ render_report <- function(
       sframe_report_engine = function(m) invokeRestart("muffleMessage")
     )
     content_engine <- attr(html_res, "engine") %||% "html"
-    # Chrome writes its own scratch directories into tempdir() and does not
-    # remove them, which R CMD check reports as detritus in the temp
-    # directory. Only entries that appear during this call and match Chrome's
-    # own naming are removed, so nothing else in tempdir() is touched.
-    before <- list.files(tempdir(), all.files = TRUE, no.. = TRUE)
-    on.exit(sframe_clean_chrome_detritus(before), add = TRUE)
-
+    # Chrome writes its scratch folders in TMPDIR and leaves them, so it runs
+    # with a TMPDIR of its own that goes when it is done.
     printed <- tryCatch(
-      pagedown::chrome_print(input = html_tmp, output = dest),
+      sframe_with_chrome_tmp(pagedown::chrome_print(input = html_tmp, output = dest)),
       error = function(e) {
         rlang::abort(
           paste0("PDF printing failed: ", conditionMessage(e),

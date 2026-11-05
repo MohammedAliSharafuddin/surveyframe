@@ -710,6 +710,11 @@ style.
   Charts saved as SVG with `sframe_save_figures()` or
   `sframe_format_result()` need svglite, and now say so before drawing, also
   where Cairo is present.
+* **A PDF printed without Quarto left Chrome's scratch folders behind.**
+  Each `render_report(format = "pdf")` through `pagedown::chrome_print()`
+  left `com.google.Chrome.*` and `scoped_dir*` folders in the temp folder,
+  since the cleanup looked in R's session folder and Chrome writes beside
+  it. Chrome now runs with a temp folder of its own, removed afterwards.
 * **The Quarto source of a report, which checks itself.**
   `render_report(format = "qmd")` writes a folder: `report.qmd`, the
   `.sframe`, `responses.csv`, the bibliography and its style, the results
