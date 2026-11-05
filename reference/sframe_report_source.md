@@ -69,7 +69,7 @@ d <- sframe_demo("likert_scale")
 dir <- file.path(tempdir(), "report-source-example")
 render_report(d$instrument, d$responses, output_file = dir, format = "qmd",
               open = FALSE)
-#> Report source written to /tmp/RtmpbhdiJG/report-source-example. Open report.qmd in RStudio or Positron and render it.
+#> Report source written to /tmp/RtmppB03Io/report-source-example. Open report.qmd in RStudio or Positron and render it.
 src <- sframe_report_source(dir)
 src$check$numbers_match
 #> [1] TRUE

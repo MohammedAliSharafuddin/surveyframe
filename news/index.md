@@ -881,6 +881,45 @@ serialised by a host.
   the manifest name the route. Outside HTML every table is numbered, and
   its title kept, in each format.
 
+- **On a Mac without XQuartz, a PDF report through Typst had no
+  figures.** Quarto stopped with “file not found” and no PDF was
+  written. R’s own [`svg()`](https://rdrr.io/r/grDevices/cairo.html)
+  device needs the Cairo that XQuartz installs, and without it R still
+  reports Cairo as present but draws nothing.
+  [`render_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_report.md)
+  now checks that [`svg()`](https://rdrr.io/r/grDevices/cairo.html)
+  opens, and where it does not, draws the figures with svglite when
+  installed, else as PNG, and says which. The same check makes
+  `figures = list(format = "svg")` work there, and runs in the
+  `report.qmd` that `render_report(format = "qmd")` writes, for a Mac
+  user rendering it. Charts saved as SVG with
+  [`sframe_save_figures()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_save_figures.md)
+  or
+  [`sframe_format_result()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_format_result.md)
+  need svglite, and now say so before drawing, also where Cairo is
+  present.
+
+- **A PDF printed without Quarto left Chrome’s scratch folders behind.**
+  Each `render_report(format = "pdf")` through
+  [`pagedown::chrome_print()`](https://rdrr.io/pkg/pagedown/man/chrome_print.html)
+  left `com.google.Chrome.*` and `scoped_dir*` folders in the temp
+  folder, since the cleanup looked in R’s session folder and Chrome
+  writes beside it. Chrome now runs with a temp folder of its own,
+  removed afterwards.
+
+- **A report source could say its numbers differ when they did not.**
+  The canonical JSON behind the results record, the instrument hash and
+  the amendment fingerprints sorted its keys in the session’s collation
+  order, so a session in an English locale and one in the C locale put
+  “Scale” and “ceiling_pct” in opposite orders and hashed the same
+  numbers differently. Keys now sort by code point in every locale, as
+  SurveyBuilder does. None of the 22 demo instruments’ hashes change. A
+  file, results record or committed instrument hashed in the old order
+  is still accepted, with a message that it was hashed in the order used
+  before 0.4.3 and should be saved again to update the hash. New hashes
+  are always written in code point order, and a changed file still
+  fails.
+
 - **The Quarto source of a report, which checks itself.**
   `render_report(format = "qmd")` writes a folder: `report.qmd`, the
   `.sframe`, `responses.csv`, the bibliography and its style, the
@@ -1389,6 +1428,64 @@ serialised by a host.
 
 ### SurveyStudio
 
+- **1 design system for Studio and the builder.** Both apps take every
+  colour, size and radius from 1 shared stylesheet of design tokens,
+  `inst/builder/design_tokens.css`, which Studio links and the builder
+  carries inline, so a builder copied on its own still opens. Studio’s
+  teal and the builder’s blue become 1 primary colour, and the 2 dark
+  sidebars 1 navigation colour. The Explore charts take their colours
+  from the same file.
+
+- **3 button levels in both apps**: a filled primary, 40 px high and
+  sized to its label, at most 1 per screen, panel or dialog, an outline
+  secondary, 36 px high, and a text link for small actions. Shiny’s own
+  buttons and the builder’s dialogs take the same levels. In the
+  builder, the 2 add buttons on Settings’ References tab and Export
+  syntax become secondary, and the Open Collect and Open References
+  links in Studio text links.
+
+- **1 header row on Design and Plan.** The title (Design or Plan), the
+  instrument’s title and version and the save state (“Saved”, “Unsaved
+  changes”) sit on the left, and undo, redo and Save to Studio at the
+  far right. Inside Studio the builder’s own bar is merged into this
+  row. The standalone builder has the same row, with its title, version
+  and save state on the left, its Build, Preview and Plan switch in the
+  centre, and Save .sframe last on the right.
+
+- **The builder’s left panel has 1 filled button.** Until the survey’s
+  settings are saved once, it is Survey settings, then “+ Add question”,
+  whose menu now also holds Section break and Branching rule. An opened
+  instrument counts as set up, and the empty question list points to
+  Survey settings first until then. Survey settings is always a strong
+  row at the top of the panel, with the line “Title, welcome and
+  thank-you pages”. Configure is a text link named “Answer sets, scales
+  and checks”. Both menus follow the menu button pattern: the arrow
+  keys, Home and End move through them, and Escape closes them back to
+  their button.
+
+- **A guided start in the builder.** With no questions, the canvas shows
+  3 steps, Survey settings, Add your first question and Save to Studio
+  (Save .sframe on its own), each ticked once done, with the next step’s
+  button in its row. Once all 3 are done, the canvas names the next
+  useful step: Plan when the survey has no analysis plan, otherwise
+  another question. The empty question list no longer repeats the Survey
+  settings and Open buttons.
+
+- **The same rules on every Studio screen.** Explore’s Overview, Items,
+  Scales and Data tabs look like the Report screen’s tabs, the open one
+  underlined. A long value in a summary tile, such as the version or a
+  date range, takes a smaller size and stays inside its tile. A disabled
+  download keeps its button level and the hint beside it says why. The
+  builder’s Plan tabs take the same underlined style, in Plan the
+  panel’s Add question steps down to an outline beside + Add plan, and
+  with no instrument open Design’s head says “No changes” in place of
+  “Saved”.
+
+- **Contrast on the final colours.** Every Studio screen, the builder in
+  Studio and on its own, with its menus open, meets WCAG 2.2 AA. The
+  builder’s menu group headings were white at 30 percent, 2.41 to 1, and
+  now take the panel’s text colour.
+
 - **Responses starts with the Google Sheet**, the planned route: the
   sheet card comes first with Read from Google Sheet as the screen’s
   primary action, then the CSV file, then help for files from other
@@ -1396,7 +1493,7 @@ serialised by a host.
   install it.
 
 - **1 primary action per screen**, a full-size filled button from 1
-  shared class in `inst/shiny/www/studio-actions.css`: Save to Studio on
+  shared level in `inst/builder/design_tokens.css`: Save to Studio on
   Design, now first in the builder’s bar, Download survey on Collect,
   Load responses, Export report beside the Report title, Edit in Design,
   Add from BibTeX, and the next step on the screens that only show

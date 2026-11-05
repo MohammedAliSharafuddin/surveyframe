@@ -531,15 +531,15 @@ study_amended <- amend_sframe(
 
 sframe_get_amendments(study_amended)
 #>              timestamp         reason_code
-#> 1 2026-11-05T05:30:29Z instrument_revision
+#> 1 2026-11-05T13:52:22Z instrument_revision
 #>                                    reason_text   tier author
 #> 1 Clarified item wording after pilot feedback. design   <NA>
 #>                                     deviation_report signoff
 #> 1 Wording only; the construct measured is unchanged.    none
 #>                                                      previous_hash
-#> 1 6564ab576eced844c103712b0669aa1c27b7487203f7adccfdb48677198f481b
+#> 1 72e5757a5ac021bba2ed856148b728282313ce995f149afe1f6206191cb13b84
 #>                                                           new_hash
-#> 1 3781244c4288cc43fe13a248c813a035c1be43bfe7c99b1f6e45c20028988263
+#> 1 c696d9911aae54ba5f8a62642d38e62e709c1862f87ab60d5bb3c72e04d6d848
 #>   changed_fields
 #> 1          items
 ```
@@ -634,7 +634,7 @@ html_path <- export_survey(
   output_path = file.path(tempdir(), "tourism_services_survey.html"),
   open        = FALSE
 )
-#> Static survey written to '/tmp/RtmpN5iLta/tourism_services_survey.html' (103.3
+#> Static survey written to '/tmp/RtmpjtsOGA/tourism_services_survey.html' (103.3
 #> KB).
 file.exists(html_path)
 #> [1] TRUE
@@ -687,7 +687,7 @@ script_path <- export_google_sheet(
   sheet_url  = "https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID",
   output_dir = tempdir()
 )
-#> Apps Script written to: /tmp/RtmpN5iLta/surveyframe_collector.gs
+#> Apps Script written to: /tmp/RtmpjtsOGA/surveyframe_collector.gs
 #> Follow the setup instructions inside the file to deploy it.
 file.exists(script_path)
 #> [1] TRUE
@@ -1274,7 +1274,7 @@ results_path <- render_results(
   output_file = file.path(tempdir(), "tourism_results.html")
 )
 cat("Results report written:", results_path, "\n")
-#> Results report written: /tmp/RtmpN5iLta/tourism_results.html
+#> Results report written: /tmp/RtmpjtsOGA/tourism_results.html
 cat("Size:", round(file.size(results_path) / 1024, 1), "KB\n")
 #> Size: 13.2 KB
 ```
@@ -1305,7 +1305,7 @@ render_report(
 #> Warning: Scale scoring failed before analysis, so blocks run on unscored data: The responses already hold a column named 'DMRE', 'DMAU', 'DMEU', 'DMPV', 'DSQA', 'DSQT', 'DSUQ', 'TS', 'BI', which is also a scale ID.
 #> ℹ score_scales() stores each score in a column named by its scale ID, so scoring would replace that data. Rename the scale, or drop the column first where it holds scores from an earlier run.
 #> Rendering the report with Quarto. This usually takes under a minute.
-#> Report rendered with the Quarto engine: /tmp/RtmpN5iLta/tourism_report.html
+#> Report rendered with the Quarto engine: /tmp/RtmpjtsOGA/tourism_report.html
 ```
 
 ------------------------------------------------------------------------
