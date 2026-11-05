@@ -181,6 +181,7 @@ test_that("equations render in Word, OpenDocument and PDF", {
                "<m:oMath", fixed = TRUE)
   odt <- quarto(ins, "odt")
   expect_true(any(grepl("^Formula", utils::unzip(odt, list = TRUE)$Name)))
+  skip_if_latex_broken()
   pdf <- quarto(ins, "pdf")
   expect_identical(readBin(pdf, "raw", 4), charToRaw("%PDF"))
   if (nzchar(Sys.which("pdftotext"))) {
