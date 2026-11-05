@@ -184,7 +184,8 @@ test_that("in Studio the canvas step Open Plan opens Plan through the sidebar (U
   expect_true(ui1_screen(b, "design"))
   frame <- "document.getElementById('design_frame').contentWindow"
   expect_true(ui2_wait(b, paste0("(function(){ try { return ", frame, ".S.items.length > 0 && !!", frame, ".document.getElementById('cStepGo'); } catch (e) { return false; } })()"), 60))
-  ui2_js(b, paste0("var w = ", frame, "; w.__plan = w.S.analysis_plan; w.S.analysis_plan = []; w.renderPrompt(); true"))
+  # Earlier tests leave unsaved changes, which make Save the next step.
+  ui2_js(b, paste0("var w = ", frame, "; w.dirty = false; w.updSave(); w.__plan = w.S.analysis_plan; w.S.analysis_plan = []; w.renderPrompt(); true"))
   expect_identical(ui2_js(b, paste0(frame, ".document.getElementById('cStepGo').textContent")), "Open Plan")
   ui2_js(b, paste0(frame, ".document.getElementById('cStepGo').click(); true"))
   expect_true(ui2_wait(b, "$('#design_title').text() === 'Plan' && $('.studio-nav a[data-nav=\"plan\"]').attr('aria-current') === 'page'", 20))
