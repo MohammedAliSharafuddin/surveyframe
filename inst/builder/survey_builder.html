@@ -3822,8 +3822,8 @@ function promptSteps(){
   var qs=S.items.filter(function(i){return i.type!=='section_break'&&i.type!=='text_block';});
   return [
     {t:'Survey settings',b:'Give the survey its title, welcome page and thank-you page.',done:!!S.meta.title&&S.meta.title!=='Untitled Survey',btn:'Open survey settings',go:"openSettings('meta')"},
-    {t:'Add your first question',b:'Pick a question type from the list.',done:qs.length>0,btn:'Add a question',go:"closeCfgMenu();openMenu('fabMenu','fabMoreBtn')"},
-    {t:save,b:studio?'Make this survey the instrument Studio has open.':'Download the survey as a .sframe file.',done:!dirty&&(!!lastSaved||!!openedAt),btn:save,go:'saveSframe()'}];
+    {t:'Add your first question',b:'Pick a question type from the list.',done:qs.length>0,btn:'Add a question',go:"event.stopPropagation();closeCfgMenu();openMenu('fabMenu','fabMoreBtn')"},
+    {t:save,b:studio?'Make this survey the instrument Studio has open.':'Download the survey as a .sframe file.',done:!dirty&&(!!lastSaved||!!openedAt||(studio&&qs.length>0)),btn:save,go:'saveSframe()'}];
 }
 function renderPrompt(){
   var el=document.getElementById('cPrompt');if(!el)return;
@@ -3841,7 +3841,7 @@ function renderPrompt(){
   el.innerHTML='<div class="c-prompt-ic" aria-hidden="true">&#128196;</div><div class="c-prompt-t">Select a question to edit</div>'
     +'<div class="c-prompt-b">Click any question in the panel on the left. Keyboard: <kbd>Ctrl+Z</kbd> undo, <kbd>Ctrl+S</kbd> save.</div>'
     +'<div class="c-next"><div class="c-next-t">'+(plan?'Next: add another question':'Next: declare how you will analyse the data')+'</div>'
-    +'<button type="button" class="btn sf-secondary" id="cStepGo" onclick="'+(plan?"closeCfgMenu();openMenu('fabMenu','fabMoreBtn')":'openPlan()')+'">'+(plan?'Add a question':'Open Plan')+'</button></div>';
+    +'<button type="button" class="btn sf-secondary" id="cStepGo" onclick="'+(plan?"event.stopPropagation();closeCfgMenu();openMenu('fabMenu','fabMoreBtn')":'openPlan()')+'">'+(plan?'Add a question':'Open Plan')+'</button></div>';
 }
 // Plan: in Studio its sidebar entry picks the mode, so ask Studio.
 function openPlan(){if(typeof STUDIO_HOST!=='undefined'&&STUDIO_HOST){window.parent.postMessage({type:'goto',screen:'plan'},location.origin);return;}setMode('analyse');}
@@ -4844,7 +4844,7 @@ function openInsp(id){
   narrowEditing(true);
   renderCentre();
 }
-function closeInsp(){narrowEditing(false);document.getElementById('inspector').classList.remove('open');document.getElementById('cPrompt').style.display='flex';selId=null;renderItemList();renderCentre();}
+function closeInsp(){narrowEditing(false);document.getElementById('inspector').classList.remove('open');document.getElementById('cPrompt').style.display='flex';selId=null;renderItemList();renderCentre();renderPrompt();}
 // -- Welcome and thank-you pages ---------------------------------------------
 // The pages before the first question and after the last, as entries at the
 // ends of the question list (UX-10), with their editor on the right and
