@@ -189,5 +189,25 @@ test_that("in Studio the canvas step Open Plan opens Plan through the sidebar (U
   expect_true(ui1_screen(b, "design"))
 })
 
+test_that("every Studio screen follows the same rules: 1 tab style, tiles that fit, a disabled primary with a visible reason (UI-3 item 6)", {
+  b <- ui1_studio("factor_structure", width = 1280, height = 900)
+  # Explore's view tabs are underlined as the Report's are, not filled.
+  expect_true(ui1_screen(b, "dashboard"))
+  tab <- "$('#screen-dashboard .studio-tabs input:checked + span')[0]"
+  expect_true(ui2_wait(b, paste0("!!", tab), 20))
+  expect_identical(ui2_js(b, paste0("getComputedStyle(", tab, ").borderBottomWidth")), "3px")
+  expect_identical(ui2_js(b, paste0("getComputedStyle(", tab, ").backgroundColor")), "rgba(0, 0, 0, 0)")
+  for (screen in sframe_studio_screens()) {
+    expect_true(ui1_screen(b, screen), info = screen)
+    Sys.sleep(1)
+    # Every tile value stays inside its tile.
+    over <- ui2_js(b, sprintf("$('#screen-%s .stat-val:visible').filter(function(){ return this.scrollWidth > this.clientWidth + 1; }).map(function(){ return this.innerText; }).get().join('|')", screen))
+    expect_identical(over, "", info = screen)
+    # A disabled primary has a visible hint beside it.
+    bare <- ui2_js(b, sprintf("$('#screen-%s .sf-primary:disabled:visible, #screen-%s .sf-primary.disabled:visible').filter(function(){ var h = $(this).nextAll('.hint:visible').add($(this).parent().nextAll('.hint:visible')); return !h.length && !$('#screen-%s .plan-msg:visible').length; }).length", screen, screen, screen))
+    expect_identical(bare, 0L, info = screen)
+  }
+})
+
 ui2_close()
 ui1_close()

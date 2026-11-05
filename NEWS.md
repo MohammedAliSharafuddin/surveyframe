@@ -1122,6 +1122,11 @@ style.
   Plan when the survey has no analysis plan, otherwise another question.
   The empty question list no longer repeats the Survey settings and Open
   buttons.
+* **The same rules on every Studio screen.** Explore's Overview, Items,
+  Scales and Data tabs look like the Report screen's tabs, the open one
+  underlined. A long value in a summary tile, such as the version or a
+  date range, takes a smaller size and stays inside its tile. A disabled
+  download keeps its button level and the hint beside it says why.
 * **Responses starts with the Google Sheet**, the planned route: the sheet
   card comes first with Read from Google Sheet as the screen's primary
   action, then the CSV file, then help for files from other tools. Without
