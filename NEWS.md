@@ -705,9 +705,11 @@ style.
   still reports Cairo as present but draws nothing. `render_report()` now
   checks that `svg()` opens, and where it does not, draws the figures with
   svglite when installed, else as PNG, and says which. The same check makes
-  `figures = list(format = "svg")` work there. Charts saved as SVG with
-  `sframe_save_figures()` or `sframe_format_result()` need svglite, and now
-  say so before drawing, also where Cairo is present.
+  `figures = list(format = "svg")` work there, and runs in the `report.qmd`
+  that `render_report(format = "qmd")` writes, for a Mac user rendering it.
+  Charts saved as SVG with `sframe_save_figures()` or
+  `sframe_format_result()` need svglite, and now say so before drawing, also
+  where Cairo is present.
 * **The Quarto source of a report, which checks itself.**
   `render_report(format = "qmd")` writes a folder: `report.qmd`, the
   `.sframe`, `responses.csv`, the bibliography and its style, the results
