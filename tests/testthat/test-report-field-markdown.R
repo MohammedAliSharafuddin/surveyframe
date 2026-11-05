@@ -181,10 +181,13 @@ test_that("equations render in Word, OpenDocument and PDF", {
                "<m:oMath", fixed = TRUE)
   odt <- quarto(ins, "odt")
   expect_true(any(grepl("^Formula", utils::unzip(odt, list = TRUE)$Name)))
+  skip_if_latex_broken()
   pdf <- quarto(ins, "pdf")
   expect_identical(readBin(pdf, "raw", 4), charToRaw("%PDF"))
   if (nzchar(Sys.which("pdftotext"))) {
-    txt <- paste(system2("pdftotext", c(shQuote(pdf), "-"), stdout = TRUE), collapse = "\n")
+    txt <- paste(system2("pdftotext", c("-enc", "UTF-8", shQuote(pdf), "-"), stdout = TRUE),
+                 collapse = "\n")
+    Encoding(txt) <- "UTF-8"
     expect_match(txt, "4.21", fixed = TRUE)
   }
 })

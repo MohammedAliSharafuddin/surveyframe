@@ -56,7 +56,7 @@ sframe_amendment_default_tier <- function(reason_code) {
 # and the log still passed as intact.
 sframe_amendment_entry_hash <- function(entry) {
   if (!is.list(entry)) return("")
-  entry <- entry[order(names(entry))]
+  entry <- entry[sframe_key_order(names(entry))]
   as.character(openssl::sha256(sframe_hash_json(entry, canonical = TRUE)))
 }
 
@@ -80,19 +80,24 @@ sframe_content_hash <- function(instrument, box = TRUE, empty_render_array = FAL
 # The content fingerprints an earlier version could have recorded for the same
 # content: before 0.4.2 one-member collections were serialised as scalars, and
 # a fingerprint could be taken before validation set meta$validated. Used only
-# to recognise an existing log, so older files are not refused.
+# to recognise an existing log, so older files are not refused. Before 0.4.3
+# the keys also sorted in the session locale's order, so each form is also
+# taken in that order.
 sframe_content_hash_candidates <- function(instrument) {
-  out <- character(0)
-  for (box in c(TRUE, FALSE)) {
-    for (v in list("keep", "absent", FALSE, TRUE)) {
-      ins <- instrument
-      if (identical(v, "absent")) ins$meta$validated <- NULL
-      else if (!identical(v, "keep")) ins$meta$validated <- v
-      out <- c(out, sframe_content_hash(ins, box = box),
-               sframe_content_hash(ins, box = box, empty_render_array = TRUE))
+  forms <- function() {
+    out <- character(0)
+    for (box in c(TRUE, FALSE)) {
+      for (v in list("keep", "absent", FALSE, TRUE)) {
+        ins <- instrument
+        if (identical(v, "absent")) ins$meta$validated <- NULL
+        else if (!identical(v, "keep")) ins$meta$validated <- v
+        out <- c(out, sframe_content_hash(ins, box = box),
+                 sframe_content_hash(ins, box = box, empty_render_array = TRUE))
+      }
     }
+    out
   }
-  unique(out)
+  unique(c(forms(), sframe_with_locale_order(forms())))
 }
 
 # The amendment checks write_sframe() applies. An amendment log is only worth
@@ -268,13 +273,13 @@ sframe_scale_scoring <- function(scales) {
   ids <- vapply(scales, function(s) as.character(s$id %||% "")[1], character(1))
   out <- lapply(scales, function(s) {
     list(items = as.character(unlist(s$items %||% list())),
-         reverse_items = sort(as.character(unlist(s$reverse_items %||% list()))),
+         reverse_items = sframe_key_sort(as.character(unlist(s$reverse_items %||% list()))),
          weights = as.numeric(unlist(s$weights %||% list())),
          method = as.character(s$method %||% "mean")[1],
          min_valid = as.numeric(unlist(s$min_valid %||% list())))
   })
   out <- stats::setNames(out, ids)
-  out[order(names(out))]
+  out[sframe_key_order(names(out))]
 }
 
 # The version an amendment suggests, and why, from 1 place so the console,

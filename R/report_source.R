@@ -177,10 +177,17 @@ sframe_report_source <- function(dir = ".", include_analysis = TRUE, plot_palett
   style_now <- if (!is.null(style_rec) && file.exists(file.path(dir, style_rec$file_name))) {
     sframe_sha256_file(file.path(dir, style_rec$file_name))
   } else NA_character_
-  now_record <- sframe_sha256_text(sframe_results_record_json(
+  record_now <- function() sframe_sha256_text(sframe_results_record_json(
     if (is.list(results) && !inherits(results, "error")) results else list(), instrument, seed,
     style = if (!is.null(style_rec)) list(name = style_rec$name, sha256 = style_rec$hash_value)))
+  now_record <- record_now()
   rec_results <- recorded$results %||% ""
+  # A record written before 0.4.3 sorted its keys in the session locale's order.
+  if (!identical(now_record, rec_results) &&
+      identical(sframe_with_locale_order(record_now()), rec_results)) {
+    now_record <- rec_results
+    sframe_inform_locale_order("The results record in this folder")
+  }
   now_qmd <- sframe_sha256_file(path("qmd"))
   now_resp <- if (file.exists(path("responses"))) sframe_sha256_file(path("responses")) else NA_character_
   check <- list(

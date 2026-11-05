@@ -62,6 +62,9 @@ execute:
 ---
 
 ```{r setup}
+#| dev: png
+# PNG for this chunk alone, which draws nothing: knitr opens its device
+# before the svg() check below can run.
 library(surveyframe)
 library(knitr)
 
@@ -114,11 +117,38 @@ if (nzchar(params$fig_dpi %||% "")) {
   fig_opts$dpi <- as.numeric(params$fig_dpi)
   fig_opts$fig.retina <- 1
 }
-# svglite writes SVG anywhere. R's own svg() needs Cairo, absent from the
-# macOS build, and with neither the figures stay PNG.
-if (identical(params$fig_format %||% "", "svg")) {
-  if (requireNamespace("svglite", quietly = TRUE)) fig_opts$dev <- "svglite"
-  else if (isTRUE(capabilities("cairo"))) fig_opts$dev <- "svg"
+# svglite writes SVG anywhere. R's own svg() needs Cairo, which on a Mac
+# comes with XQuartz: without it capabilities("cairo") still says TRUE, but
+# svg() opens nothing and no figure is written. Typst draws SVG by default.
+# So where SVG is due and svg() opens no device, svglite draws the figures,
+# else PNG.
+svg_opens <- function() {
+  before <- grDevices::dev.list()
+  current <- grDevices::dev.cur()
+  f <- tempfile(fileext = ".svg")
+  ok <- tryCatch(suppressWarnings({
+    grDevices::svg(f)
+    opened <- setdiff(grDevices::dev.list(), before)
+    if (length(opened)) grDevices::dev.off(opened[[1]])
+    length(opened) > 0
+  }), error = function(e) FALSE)
+  if (current > 1) grDevices::dev.set(current)
+  unlink(f)
+  isTRUE(ok)
+}
+svg_due <- identical(params$fig_format %||% "", "svg") ||
+  identical(knitr::pandoc_to(), "typst")
+if (svg_due) {
+  if (identical(params$fig_format %||% "", "svg") && requireNamespace("svglite", quietly = TRUE)) {
+    fig_opts$dev <- "svglite"
+  } else if (!svg_opens()) {
+    if (requireNamespace("svglite", quietly = TRUE)) {
+      fig_opts$dev <- "svglite"
+    } else {
+      fig_opts$dev <- "png"
+      fig_opts$fig.ext <- "png"
+    }
+  }
 }
 if (length(fig_opts)) do.call(knitr::opts_chunk$set, fig_opts)
 

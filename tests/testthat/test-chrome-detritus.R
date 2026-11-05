@@ -1,48 +1,48 @@
 # tests/testthat/test-chrome-detritus.R
-# pagedown::chrome_print() leaves Chrome's own scratch directories in
-# tempdir(), which R CMD check reports as "detritus in the temp directory".
-# render_report(format = "pdf") clears them, and must clear only those.
+# pagedown::chrome_print() starts Chrome, which leaves its scratch folders
+# (com.google.Chrome.*, scoped_dir*) in TMPDIR, which R CMD check reports as
+# "detritus in the temp directory" and which fills a user's temp folder.
+# render_report(format = "pdf") runs Chrome with a TMPDIR of its own and
+# removes it. These tests used to look in tempdir(), where Chrome never
+# writes, so they passed either way (Session CI).
 
-test_that("the cleaner removes Chrome's scratch directories and nothing else", {
-  before <- list.files(tempdir(), all.files = TRUE, no.. = TRUE)
-
-  # Stand-ins for what Chrome leaves behind, plus one file that must survive.
-  chrome_dir <- file.path(tempdir(), "com.google.Chrome.testXY")
-  scoped_dir <- file.path(tempdir(), "scoped_dirTESTXY")
-  keeper     <- file.path(tempdir(), "sframe_keeper_testXY.txt")
-  dir.create(chrome_dir, showWarnings = FALSE)
-  dir.create(scoped_dir, showWarnings = FALSE)
-  writeLines("keep me", keeper)
-  on.exit(unlink(c(chrome_dir, scoped_dir, keeper), recursive = TRUE,
-                 force = TRUE), add = TRUE)
-
-  removed <- sframe_clean_chrome_detritus(before)
-
-  expect_false(dir.exists(chrome_dir))
-  expect_false(dir.exists(scoped_dir))
-  expect_true(file.exists(keeper))
-  expect_setequal(removed, c("com.google.Chrome.testXY", "scoped_dirTESTXY"))
+test_that("Chrome's own TMPDIR is set for the call, then removed and restored", {
+  vars <- c("TMPDIR", "TMP", "TEMP")
+  before <- Sys.getenv(vars, unset = NA)
+  seen <- surveyframe:::sframe_with_chrome_tmp({
+    dir <- Sys.getenv("TMPDIR")
+    dir.create(file.path(dir, "com.google.Chrome.testXY"))
+    dir.create(file.path(dir, "scoped_dirTESTXY"))
+    list(dir = dir, tmp = Sys.getenv("TMP"), temp = Sys.getenv("TEMP"))
+  })
+  expect_true(nzchar(seen$dir))
+  expect_identical(seen$tmp, seen$dir)
+  expect_identical(seen$temp, seen$dir)
+  expect_false(identical(seen$dir, unname(before[["TMPDIR"]])))
+  expect_false(dir.exists(seen$dir))
+  expect_identical(Sys.getenv(vars, unset = NA), before)
+  # Chrome's socket path in it stays under the Unix limit, 104 bytes on
+  # macOS. Windows Chrome makes no Unix socket.
+  if (.Platform$OS.type != "windows") {
+    socket <- file.path(seen$dir, "com.google.Chrome.XXXXXX", "SingletonSocket")
+    expect_lt(nchar(socket, type = "bytes"), 104L)
+  }
 })
 
-test_that("the cleaner leaves entries that already existed before the call", {
-  # A Chrome-named directory that predates the call is somebody else's, so
-  # passing a `before` listing that already contains it must spare it.
-  pre <- file.path(tempdir(), "com.google.Chrome.preexisting")
-  dir.create(pre, showWarnings = FALSE)
-  on.exit(unlink(pre, recursive = TRUE, force = TRUE), add = TRUE)
-
-  before <- list.files(tempdir(), all.files = TRUE, no.. = TRUE)
-  removed <- sframe_clean_chrome_detritus(before)
-
-  expect_true(dir.exists(pre))
-  expect_false("com.google.Chrome.preexisting" %in% removed)
+test_that("Chrome's TMPDIR goes and TMPDIR is restored when the call fails", {
+  before <- Sys.getenv("TMPDIR", unset = NA)
+  dir <- NULL
+  expect_error(surveyframe:::sframe_with_chrome_tmp({
+    dir <- Sys.getenv("TMPDIR")
+    stop("Chrome failed")
+  }), "Chrome failed")
+  expect_false(dir.exists(dir))
+  expect_identical(Sys.getenv("TMPDIR", unset = NA), before)
 })
 
-# End-to-end check. Note this one only has teeth where Chrome actually
-# leaves detritus, which varies by Chrome build and platform. It passed on a
-# local Linux machine with the cleaner disabled, because that Chrome left
-# nothing behind, and fails on the GitHub Actions image, which does. The 2
-# tests above are the real guard on the cleaner and fail under mutation.
+# End-to-end: Chrome printed with a TMPDIR of its own, which is gone after.
+# The shared TMPDIR is not listed before and after, since parallel browser
+# tests start their own Chrome there. The 2 tests above guard the wrapper.
 test_that("render_report(format = 'pdf') leaves no Chrome detritus behind", {
   skip_on_cran()
   skip_if_not_slow()
@@ -66,7 +66,11 @@ test_that("render_report(format = 'pdf') leaves no Chrome detritus behind", {
   old <- options(surveyframe.use_quarto = FALSE)
   on.exit(options(old), add = TRUE)
 
+  env <- surveyframe:::.sframe_figure_env
+  env$chrome_tmp <- NULL
   render_report(instr, output_file = out, format = "pdf")
+  expect_true(is.character(env$chrome_tmp) && nzchar(env$chrome_tmp))
+  expect_false(dir.exists(env$chrome_tmp))
 
   leftover <- grep("^(com\\.google\\.Chrome\\.|scoped_dir)",
                    setdiff(list.files(tempdir(), all.files = TRUE, no.. = TRUE),

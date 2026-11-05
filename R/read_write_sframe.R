@@ -168,6 +168,36 @@ sframe_json_object <- function() {
   structure(list(), names = character())
 }
 
+# The order hashed keys sort in. Code point order (radix, the C locale
+# whatever LC_COLLATE says) from 0.4.3, as SurveyBuilder's sframeCanon()
+# sorts with JavaScript's sort(). Before 0.4.3 order() followed LC_COLLATE,
+# so a file hashed in an English locale holds a hash of the keys in that
+# order. sframe_with_locale_order() recomputes a hash the old way, only to
+# recognise such a file when its hash does not match. New hashes are always
+# written in code point order.
+.sframe_order_env <- new.env(parent = emptyenv())
+
+sframe_key_order <- function(x) {
+  if (isTRUE(.sframe_order_env$locale)) order(x) else order(x, method = "radix")
+}
+
+sframe_key_sort <- function(x) x[sframe_key_order(x)]
+
+sframe_with_locale_order <- function(code) {
+  old <- .sframe_order_env$locale
+  .sframe_order_env$locale <- TRUE
+  on.exit(.sframe_order_env$locale <- old, add = TRUE)
+  force(code)
+}
+
+# Said when a hash matched only in the order used before 0.4.3.
+sframe_inform_locale_order <- function(what) {
+  rlang::inform(paste0(
+    what, " was hashed in the key order surveyframe used before 0.4.3, which ",
+    "followed the session's locale. It is accepted. Save it again to update the hash."),
+    class = c("sframe_locale_order_hash", "sframe_message"))
+}
+
 sframe_canonical_payload <- function(x) {
   if (is.null(x)) {
     return(sframe_json_object())
@@ -175,11 +205,15 @@ sframe_canonical_payload <- function(x) {
 
   if (is.list(x)) {
     # Keep this in sync with the SurveyBuilder sframeCanon() implementation:
-    # recurse into arrays/objects and sort object keys alphabetically.
+    # recurse into arrays/objects and sort object keys alphabetically, by
+    # code point as JavaScript's sort() does (sframe_key_order()). order()
+    # alone followed the locale, so "Scale" and "ceiling_pct" swapped between
+    # a C and an en_US session, and a report source rendered on macOS said its
+    # numbers differ.
     x <- lapply(x, sframe_canonical_payload)
     nm <- names(x)
     if (!is.null(nm)) {
-      x <- x[order(nm)]
+      x <- x[sframe_key_order(nm)]
     }
   }
 
@@ -687,6 +721,12 @@ read_sframe <- function(path = NULL, validate = TRUE, text = NULL, verify = TRUE
     computed_hash <- sframe_hash_payload(parsed)
     legacy_hash   <- sframe_legacy_hash_payload(parsed)
     hash_ok <- identical(stored_hash, computed_hash) || identical(stored_hash, legacy_hash)
+    # Hashed before 0.4.3, in the session locale's key order.
+    if (!hash_ok &&
+        identical(stored_hash, sframe_with_locale_order(sframe_hash_payload(parsed)))) {
+      hash_ok <- TRUE
+      sframe_inform_locale_order(paste0("'", path, "'"))
+    }
   }
 
   if (!hash_ok && !verify) {
