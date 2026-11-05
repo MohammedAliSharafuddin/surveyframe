@@ -1126,7 +1126,10 @@ style.
   Scales and Data tabs look like the Report screen's tabs, the open one
   underlined. A long value in a summary tile, such as the version or a
   date range, takes a smaller size and stays inside its tile. A disabled
-  download keeps its button level and the hint beside it says why.
+  download keeps its button level and the hint beside it says why. The
+  builder's Plan tabs take the same underlined style, in Plan the panel's
+  Add question steps down to an outline beside + Add plan, and with no
+  instrument open Design's head says "No changes" in place of "Saved".
 * **Contrast on the final colours.** Every Studio screen, the builder in
   Studio and on its own, with its menus open, meets WCAG 2.2 AA. The
   builder's menu group headings were white at 30 percent, 2.41 to 1, and

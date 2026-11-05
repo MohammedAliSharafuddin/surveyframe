@@ -88,6 +88,9 @@ test_that("Design and Plan have 1 header row, with undo, redo and Save to Studio
   # Plan: the same row, titled Plan.
   ui2_js(b, "$('.studio-nav a[data-nav=\"plan\"]').click(); true")
   expect_true(ui2_wait(b, "$('#design_title').text() === 'Plan' && $('#design_save').is(':visible')", 20))
+  # In Plan, + Add plan is the primary and Add question steps down to outline.
+  expect_true(ui2_wait(b, paste0("getComputedStyle(", doc, ".getElementById('fabMoreBtn')).backgroundColor === 'rgba(0, 0, 0, 0)'"), 20))
+  expect_true(ui2_js(b, paste0("getComputedStyle(", doc, ".querySelector('.an-tab.active')).borderBottomWidth === '3px'")))
   expect_true(ui1_screen(b, "design"))
   expect_true(ui2_wait(b, "$('#design_title').text() === 'Design'", 20))
 })

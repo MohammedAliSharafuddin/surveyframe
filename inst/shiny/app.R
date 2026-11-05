@@ -1749,6 +1749,7 @@ ui <- fluidPage(
             $('#design_undo').prop('disabled', d.undo !== true);
             $('#design_redo').prop('disabled', d.redo !== true);
             $('#design_save').prop('disabled', d.saveDisabled === true);
+            if (d.dirty !== true && typeof d.label === 'string' && d.label) $('#design_saved').text(d.label);
           } else if (d.type === 'goto' && (d.screen === 'collect' || d.screen === 'references')) {
             // The builder's Google Sheets and References tabs and the picker's
             // Manage references open Studio's own screen (UI-2, 4949b18).
