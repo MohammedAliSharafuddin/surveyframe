@@ -98,10 +98,7 @@ test_that("the report source renders a Typst PDF where svg() opens nothing", {
   dir <- tempfile("svg-source-")
   suppressMessages(render_report(d$instrument, data = d$responses, output_file = dir,
                                  format = "qmd", open = FALSE))
-  old <- setwd(dir)
-  on.exit(setwd(old), add = TRUE)
-  out <- suppressWarnings(system2("quarto", c("render", "report.qmd", "--to", "typst"),
-                                  stdout = TRUE, stderr = TRUE,
-                                  env = paste0("R_PROFILE_USER=", shQuote(profile))))
-  expect_true(file.exists("report.pdf"), info = paste(utils::tail(out, 20), collapse = "\n"))
+  out <- quarto_render_in(dir, "typst", c(R_PROFILE_USER = profile))
+  expect_true(file.exists(file.path(dir, "report.pdf")),
+              info = paste(utils::tail(out, 20), collapse = "\n"))
 })
