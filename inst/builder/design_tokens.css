@@ -88,3 +88,117 @@
   --sf-fs-lg: 16px;
   --sf-fs-xl: 18px;
 }
+
+/* -- 3 button levels (UI-3 item 2), the same in both apps -----------------
+ * Primary: filled, 40 px high, sized to its label, at most 1 per screen,
+ *   panel or dialog. It takes over .sf-primary from UI-1 item 12e.
+ * Secondary: outline, 36 px high, for every other action beside it.
+ * Tertiary: a text link, for small or rare actions.
+ * Shiny's own buttons (.btn-default, a dialog's .btn-primary) and Studio's
+ * .btn-outline take the matching level, so a button an R module draws looks
+ * the same as one the app draws. A disabled button keeps its level and says
+ * why in a visible hint beside it. */
+.sf-primary, .btn.sf-primary,
+.sf-secondary, .btn.sf-secondary, .btn.btn-outline, .btn-outline, .btn.btn-default,
+.sf-tertiary, .btn.sf-tertiary,
+.modal-footer .btn.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  /* Sized to its label wherever it sits: a grid cell or a flex row would
+     otherwise stretch it (item 12h). */
+  flex: 0 0 auto;
+  justify-self: start;
+  align-self: center;
+  width: auto;
+  max-width: max-content;
+  box-sizing: border-box;
+  border-radius: var(--sf-radius);
+  font-family: inherit;
+  font-size: var(--sf-fs-md);
+  font-weight: 600;
+  line-height: 1.2;
+  white-space: nowrap;
+  text-decoration: none;
+  cursor: pointer;
+  background-image: none;
+  box-shadow: none;
+  text-shadow: none;
+}
+.sf-secondary, .btn.sf-secondary, .btn.btn-outline, .btn-outline, .btn.btn-default {
+  min-height: 36px;
+  padding: 0 var(--sf-space-4);
+  border: 1px solid var(--sf-primary);
+  background: var(--sf-surface);
+  color: var(--sf-primary);
+}
+.sf-secondary:hover, .btn.sf-secondary:hover, .btn.btn-outline:hover, .btn-outline:hover, .btn.btn-default:hover,
+.sf-secondary:focus-visible, .btn.sf-secondary:focus-visible, .btn.btn-outline:focus-visible, .btn.btn-default:focus-visible {
+  background: var(--sf-primary-tint);
+  border-color: var(--sf-primary-hover);
+  color: var(--sf-primary-hover);
+  text-decoration: none;
+}
+.sf-secondary.sf-danger, .btn.sf-secondary.sf-danger {
+  border-color: var(--sf-danger-hover);
+  color: var(--sf-danger-hover);
+}
+.sf-secondary.sf-danger:hover, .btn.sf-secondary.sf-danger:hover {
+  background: var(--sf-danger-tint);
+  color: var(--sf-danger-ink);
+  border-color: var(--sf-danger-ink);
+}
+.sf-tertiary, .btn.sf-tertiary {
+  min-height: 0;
+  padding: 2px 2px;
+  border: none;
+  background: none;
+  color: var(--sf-primary);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.sf-tertiary:hover, .btn.sf-tertiary:hover, .sf-tertiary:focus-visible {
+  background: none;
+  color: var(--sf-primary-hover);
+  text-decoration-thickness: 2px;
+}
+.sf-primary, .btn.sf-primary, .modal-footer .btn.btn-primary {
+  min-height: 40px;
+  padding: 0 20px;
+  border: 1px solid var(--sf-primary);
+  background: var(--sf-primary);
+  color: var(--sf-on-primary);
+  font-size: 15px;
+  font-weight: 700;
+}
+.sf-primary:hover, .btn.sf-primary:hover, .modal-footer .btn.btn-primary:hover,
+.sf-primary:focus-visible, .btn.sf-primary:focus-visible, .modal-footer .btn.btn-primary:focus-visible {
+  background: var(--sf-primary-hover);
+  border-color: var(--sf-primary-hover);
+  color: var(--sf-on-primary);
+  text-decoration: none;
+}
+.sf-primary:focus-visible, .sf-secondary:focus-visible, .sf-tertiary:focus-visible,
+.btn.btn-outline:focus-visible, .btn.btn-default:focus-visible, .modal-footer .btn.btn-primary:focus-visible {
+  outline: var(--sf-focus-ring);
+  outline-offset: var(--sf-focus-offset);
+}
+.sf-primary[disabled], .sf-primary.disabled, .sf-primary:disabled {
+  background: var(--sf-text-3);
+  border-color: var(--sf-text-3);
+  cursor: not-allowed;
+}
+.sf-secondary[disabled], .sf-secondary:disabled, .btn.btn-outline[disabled], .btn.btn-default[disabled] {
+  border-color: var(--sf-border-strong);
+  color: var(--sf-text-3);
+  background: var(--sf-surface-2);
+  cursor: not-allowed;
+}
+.sf-tertiary[disabled], .sf-tertiary:disabled { color: var(--sf-text-3); cursor: not-allowed; }
+/* The same icon size and spacing in every level. */
+.sf-primary > .fa, .sf-secondary > .fa, .sf-tertiary > .fa,
+.sf-primary > [aria-hidden="true"], .sf-secondary > [aria-hidden="true"] {
+  font-size: 1em;
+  line-height: 1;
+}

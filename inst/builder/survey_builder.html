@@ -96,6 +96,120 @@
   --sf-fs-lg: 16px;
   --sf-fs-xl: 18px;
 }
+
+/* -- 3 button levels (UI-3 item 2), the same in both apps -----------------
+ * Primary: filled, 40 px high, sized to its label, at most 1 per screen,
+ *   panel or dialog. It takes over .sf-primary from UI-1 item 12e.
+ * Secondary: outline, 36 px high, for every other action beside it.
+ * Tertiary: a text link, for small or rare actions.
+ * Shiny's own buttons (.btn-default, a dialog's .btn-primary) and Studio's
+ * .btn-outline take the matching level, so a button an R module draws looks
+ * the same as one the app draws. A disabled button keeps its level and says
+ * why in a visible hint beside it. */
+.sf-primary, .btn.sf-primary,
+.sf-secondary, .btn.sf-secondary, .btn.btn-outline, .btn-outline, .btn.btn-default,
+.sf-tertiary, .btn.sf-tertiary,
+.modal-footer .btn.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  /* Sized to its label wherever it sits: a grid cell or a flex row would
+     otherwise stretch it (item 12h). */
+  flex: 0 0 auto;
+  justify-self: start;
+  align-self: center;
+  width: auto;
+  max-width: max-content;
+  box-sizing: border-box;
+  border-radius: var(--sf-radius);
+  font-family: inherit;
+  font-size: var(--sf-fs-md);
+  font-weight: 600;
+  line-height: 1.2;
+  white-space: nowrap;
+  text-decoration: none;
+  cursor: pointer;
+  background-image: none;
+  box-shadow: none;
+  text-shadow: none;
+}
+.sf-secondary, .btn.sf-secondary, .btn.btn-outline, .btn-outline, .btn.btn-default {
+  min-height: 36px;
+  padding: 0 var(--sf-space-4);
+  border: 1px solid var(--sf-primary);
+  background: var(--sf-surface);
+  color: var(--sf-primary);
+}
+.sf-secondary:hover, .btn.sf-secondary:hover, .btn.btn-outline:hover, .btn-outline:hover, .btn.btn-default:hover,
+.sf-secondary:focus-visible, .btn.sf-secondary:focus-visible, .btn.btn-outline:focus-visible, .btn.btn-default:focus-visible {
+  background: var(--sf-primary-tint);
+  border-color: var(--sf-primary-hover);
+  color: var(--sf-primary-hover);
+  text-decoration: none;
+}
+.sf-secondary.sf-danger, .btn.sf-secondary.sf-danger {
+  border-color: var(--sf-danger-hover);
+  color: var(--sf-danger-hover);
+}
+.sf-secondary.sf-danger:hover, .btn.sf-secondary.sf-danger:hover {
+  background: var(--sf-danger-tint);
+  color: var(--sf-danger-ink);
+  border-color: var(--sf-danger-ink);
+}
+.sf-tertiary, .btn.sf-tertiary {
+  min-height: 0;
+  padding: 2px 2px;
+  border: none;
+  background: none;
+  color: var(--sf-primary);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.sf-tertiary:hover, .btn.sf-tertiary:hover, .sf-tertiary:focus-visible {
+  background: none;
+  color: var(--sf-primary-hover);
+  text-decoration-thickness: 2px;
+}
+.sf-primary, .btn.sf-primary, .modal-footer .btn.btn-primary {
+  min-height: 40px;
+  padding: 0 20px;
+  border: 1px solid var(--sf-primary);
+  background: var(--sf-primary);
+  color: var(--sf-on-primary);
+  font-size: 15px;
+  font-weight: 700;
+}
+.sf-primary:hover, .btn.sf-primary:hover, .modal-footer .btn.btn-primary:hover,
+.sf-primary:focus-visible, .btn.sf-primary:focus-visible, .modal-footer .btn.btn-primary:focus-visible {
+  background: var(--sf-primary-hover);
+  border-color: var(--sf-primary-hover);
+  color: var(--sf-on-primary);
+  text-decoration: none;
+}
+.sf-primary:focus-visible, .sf-secondary:focus-visible, .sf-tertiary:focus-visible,
+.btn.btn-outline:focus-visible, .btn.btn-default:focus-visible, .modal-footer .btn.btn-primary:focus-visible {
+  outline: var(--sf-focus-ring);
+  outline-offset: var(--sf-focus-offset);
+}
+.sf-primary[disabled], .sf-primary.disabled, .sf-primary:disabled {
+  background: var(--sf-text-3);
+  border-color: var(--sf-text-3);
+  cursor: not-allowed;
+}
+.sf-secondary[disabled], .sf-secondary:disabled, .btn.btn-outline[disabled], .btn.btn-default[disabled] {
+  border-color: var(--sf-border-strong);
+  color: var(--sf-text-3);
+  background: var(--sf-surface-2);
+  cursor: not-allowed;
+}
+.sf-tertiary[disabled], .sf-tertiary:disabled { color: var(--sf-text-3); cursor: not-allowed; }
+/* The same icon size and spacing in every level. */
+.sf-primary > .fa, .sf-secondary > .fa, .sf-tertiary > .fa,
+.sf-primary > [aria-hidden="true"], .sf-secondary > [aria-hidden="true"] {
+  font-size: 1em;
+  line-height: 1;
+}
 </style>
 <!-- DESIGN_TOKENS_END -->
 <style>
@@ -207,16 +321,7 @@ input,textarea,select{font-family:inherit;font-size:13px}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:5px;
   padding:6px 14px;border-radius:var(--r);font-size:12px;font-weight:500;
   transition:all var(--d1);white-space:nowrap;border:1.5px solid transparent;cursor:pointer}
-.btn:disabled{opacity:.4;cursor:not-allowed}
-.btn-p{background:var(--cp);color:var(--cf);border-color:var(--cp)}
-.btn-p:hover:not(:disabled){background:var(--cp-d)}
-.btn-s{background:var(--cf);color:var(--t1);border-color:var(--cb)}
-.btn-s:hover:not(:disabled){background:var(--cg)}
-.btn-d{background:var(--cd);color:var(--cf);border-color:var(--cd)}
-.btn-d:hover:not(:disabled){background:var(--cd-d)}
-.btn-g{background:transparent;color:var(--t2);border-color:transparent}
-.btn-g:hover:not(:disabled){background:var(--cg);color:var(--t1)}
-.btn-sm{padding:4px 10px;font-size:11px}
+.btn:disabled{cursor:not-allowed}
 .btn-gear .gear-ic{font-size:15px;line-height:1;display:inline-block}
 .btn-gear:hover .gear-ic{transform:rotate(45deg);transition:transform var(--d1)}
 
@@ -697,8 +802,8 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
 <!-- Recovery banner -->
 <div class="rec-ban" id="recBan" hidden>
   <span class="rec-msg">Autosaved session found from <strong id="recTime"></strong> ago.</span>
-  <button type="button" class="btn btn-s btn-sm" onclick="restoreAuto()">Restore</button>
-  <button type="button" class="btn btn-g btn-sm" onclick="dismissRec()">Dismiss</button>
+  <button type="button" class="btn sf-secondary" onclick="restoreAuto()">Restore</button>
+  <button type="button" class="btn sf-tertiary" onclick="dismissRec()">Dismiss</button>
 </div>
 
 <div class="app">
@@ -721,9 +826,9 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
     <!-- Survey settings lives only in the sidebar CTA (below) to avoid a
          duplicate entry point; the top bar is reserved for document
          actions (Open, Export, Save). -->
-    <button type="button" class="btn btn-s btn-sm" id="openBtn" onclick="openFile()">Open</button>
-    <button type="button" class="btn btn-s btn-sm" id="exportBtn" onclick="exportSurveyHtml()" title="Export a deployable, self-contained survey HTML">Export survey</button>
-    <button type="button" class="btn btn-p btn-sm" id="saveBtn" onclick="saveSframe()">Save .sframe</button>
+    <button type="button" class="btn sf-secondary" id="openBtn" onclick="openFile()">Open</button>
+    <button type="button" class="btn sf-secondary" id="exportBtn" onclick="exportSurveyHtml()" title="Export a deployable, self-contained survey HTML">Export survey</button>
+    <button type="button" class="btn sf-primary" id="saveBtn" onclick="saveSframe()">Save .sframe</button>
   </div>
 </header>
 
@@ -817,22 +922,22 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
         </div>
         <div class="cv-pv" id="cvPv">
           <div class="cv-pv-bar"><span id="cvPvT">As respondents see it. Edit it on the right.</span><div class="sp"></div>
-            <div role="group" aria-label="Preview width"><button type="button" class="btn btn-s btn-sm" id="cvW-desktop" aria-pressed="true" onclick="centreWidth('desktop')">Desktop</button> <button type="button" class="btn btn-s btn-sm" id="cvW-mobile" aria-pressed="false" onclick="centreWidth('mobile')">Mobile</button></div></div>
+            <div role="group" aria-label="Preview width"><button type="button" class="btn sf-secondary" id="cvW-desktop" aria-pressed="true" onclick="centreWidth('desktop')">Desktop</button> <button type="button" class="btn sf-secondary" id="cvW-mobile" aria-pressed="false" onclick="centreWidth('mobile')">Mobile</button></div></div>
           <div class="cv-pv-frame" id="cvPvFrame"></div>
         </div>
       </div>
       <aside class="inspector" id="inspector" aria-label="Item editor">
         <div class="insp-hdr">
-          <button type="button" class="btn btn-s btn-sm insp-back" onclick="inspBack()">&#8592; Questions</button>
+          <button type="button" class="btn sf-secondary insp-back" onclick="inspBack()">&#8592; Questions</button>
           <code class="insp-id" id="inspId"></code>
           <span class="insp-type-lbl" id="inspTypeLbl"></span>
           <button type="button" class="insp-x" onclick="closeInsp()" aria-label="Close editor">&#215;</button>
         </div>
         <div class="insp-body" id="inspBody"></div>
         <div class="insp-foot">
-          <button type="button" class="btn btn-g btn-sm" onclick="dupSelItem()">Duplicate</button>
+          <button type="button" class="btn sf-tertiary" onclick="dupSelItem()">Duplicate</button>
           <div style="flex:1"></div>
-          <button type="button" class="btn btn-d btn-sm" onclick="delSelItem()">Delete</button>
+          <button type="button" class="btn sf-secondary sf-danger" onclick="delSelItem()">Delete</button>
         </div>
       </aside>
     </div>
@@ -873,14 +978,14 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
             <strong>Model Builder</strong>
             <p style="margin:6px 0 10px">Create constructs from scales, choose lavaan or seminr syntax, and save model JSON into the .sframe file.</p>
             <div class="field"><label class="fl" for="mb-type">R package that fits the model</label><div class="fc"><select id="mb-type"><option value="cfa">lavaan CFA</option><option value="cb_sem">lavaan CB-SEM</option><option value="pls_sem">seminr PLS-SEM</option></select></div><span class="fhint">The output engine.</span></div>
-            <button type="button" class="btn btn-s btn-sm" onclick="modelFromScales()">Create model from scales</button>
+            <button type="button" class="btn sf-secondary" onclick="modelFromScales()">Create model from scales</button>
             <div class="field"><label class="fl" for="mb-model">Saved model</label><div class="fc"><select id="mb-model" onchange="renderAnalyse()"></select></div></div>
             <div class="frow">
               <div class="field"><label class="fl" for="mb-from">Path from</label><div class="fc"><select id="mb-from"></select></div></div>
               <div class="field"><label class="fl" for="mb-to">Path to</label><div class="fc"><select id="mb-to"></select></div></div>
             </div>
-            <button type="button" class="btn btn-g btn-sm" onclick="addModelPath()">Add path</button>
-            <button type="button" class="btn btn-p btn-sm" onclick="exportModelSyntax()">Export syntax</button>
+            <button type="button" class="btn sf-tertiary" onclick="addModelPath()">Add path</button>
+            <button type="button" class="btn sf-secondary" onclick="exportModelSyntax()">Export syntax</button>
             <div id="modelList" class="model-list"></div>
             <textarea id="modelSyntaxOut" class="syntax-box" readonly placeholder="Model syntax or JSON appears here."></textarea>
           </div>
@@ -889,7 +994,7 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
       <div class="an-rqs">
         <div class="pan-hdr">
           <span class="pan-hdr-t" id="anMidTitle">Analysis plans</span>
-          <button type="button" class="btn btn-p" onclick="openRQModal()">+ Add plan</button>
+          <button type="button" class="btn sf-primary" onclick="openRQModal()">+ Add plan</button>
         </div>
         <div class="an-mid-caption" id="anMidCaption"></div>
         <div class="rqs-body" id="rqsBody"></div>
@@ -934,7 +1039,7 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
     <div class="stp" id="sp-study" role="tabpanel" aria-labelledby="st-study">
       <div class="alert-i">The study this instrument serves: the problem, the objectives and the sampling plan. It is saved in the .sframe file and printed in the report, and never shown to respondents, since telling them the aims can bias their answers. A change to it after data collection is a design amendment.</div>
       <div class="field"><label class="fl" for="s-problem">Problem statement</label><div class="fc"><textarea id="s-problem" rows="4" placeholder="1 short paragraph: what is not yet known, and why it matters."></textarea></div></div>
-      <div class="field"><span class="fl" id="s-objs-l">Objectives</span><div id="s-objs" role="group" aria-labelledby="s-objs-l"></div><button type="button" class="btn btn-s btn-sm" onclick="studyAddObjective()">+ Add objective</button><span class="fhint">Each has an id such as O1, and a research question names the objective it serves.</span></div>
+      <div class="field"><span class="fl" id="s-objs-l">Objectives</span><div id="s-objs" role="group" aria-labelledby="s-objs-l"></div><button type="button" class="btn sf-secondary" onclick="studyAddObjective()">+ Add objective</button><span class="fhint">Each has an id such as O1, and a research question names the objective it serves.</span></div>
       <div class="field"><label class="fl" for="s-pop">Population</label><div class="fc"><input type="text" id="s-pop" placeholder="Delegates registered for the 2026 conference"></div></div>
       <div class="frow">
         <div class="field"><label class="fl" for="s-method">Sampling method</label><div class="fc"><select id="s-method" onchange="studyMethodSync()"><option value="">Not stated</option><optgroup label="Probability"><option value="simple_random">Simple random</option><option value="systematic">Systematic</option><option value="stratified">Stratified</option><option value="cluster">Cluster</option></optgroup><optgroup label="Non-probability"><option value="convenience">Convenience</option><option value="purposive">Purposive</option><option value="quota">Quota</option><option value="snowball">Snowball</option></optgroup><optgroup label="Whole population"><option value="census">Census</option></optgroup><option value="other">Other</option></select></div></div>
@@ -946,31 +1051,31 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
       <div class="field"><label class="fl" for="s-inst">Institution or study name</label><div class="fc"><input type="text" id="s-inst" placeholder="University: Department"></div></div>
       <div class="field"><label class="fl">Logo image</label>
         <div style="display:flex;align-items:center;gap:8px;margin-top:4px">
-          <button type="button" class="btn btn-s btn-sm" onclick="document.getElementById('logoInput').click()">Upload image</button>
+          <button type="button" class="btn sf-secondary" onclick="document.getElementById('logoInput').click()">Upload image</button>
           <span id="logoName" style="font-size:11px;color:var(--t3)">No logo</span>
-          <button type="button" class="btn btn-g btn-sm" id="logoRmBtn" style="display:none;color:var(--cd)" onclick="removeLogo()">Remove</button>
+          <button type="button" class="btn sf-tertiary" id="logoRmBtn" style="display:none;color:var(--cd)" onclick="removeLogo()">Remove</button>
         </div>
         <img id="logoPrev" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" style="height:40px;width:auto;max-width:200px;object-fit:contain;margin-top:6px;display:none" alt="Logo preview">
       </div>
       <label class="fcheck"><input type="checkbox" id="s-prog" checked><span>Show progress bar during survey</span></label>
     </div>
     <div class="stp" id="sp-gsheets" role="tabpanel" aria-labelledby="st-gsheets">
-      <div class="alert-i studio-only" hidden>In SurveyStudio, responses are collected from its Collect screen. <button type="button" class="btn btn-p btn-sm" onclick="studioGoto('collect')">Open Collect</button></div>
+      <div class="alert-i studio-only" hidden>In SurveyStudio, responses are collected from its Collect screen. <button type="button" class="btn sf-tertiary" onclick="studioGoto('collect')">Open Collect</button></div>
       <div class="studio-not">
       <div class="alert-i"><strong>Collect responses in a Google Sheet, free and with no server.</strong> Do these steps in order:<ol style="margin:8px 0 0;padding-left:18px;line-height:1.6"><li>Create a blank Google Sheet and paste its link in the box below.</li><li>Click <strong>Generate collector (.gs)</strong> to download the script. In your Sheet, open <strong>Extensions &gt; Apps Script</strong>, delete any code there, and paste the downloaded file.</li><li>In Apps Script, click <strong>Deploy &gt; New deployment &gt; Web app</strong>, set <strong>Who has access</strong> to <strong>Anyone</strong>, and copy the Web App URL it gives you.</li><li>Paste that Web App URL in the last box, then click <strong>Export survey</strong>. Every response is now saved to your Sheet.</li></ol></div>
       <div class="field"><label class="fl" for="s-gsu">Google Sheet URL</label><div class="fc"><input type="url" id="s-gsu" placeholder="https://docs.google.com/spreadsheets/d/your-sheet-id"></div></div>
-      <div class="field"><label class="fl">Apps Script collector</label><div class="fc"><button type="button" class="btn btn-s btn-sm" onclick="exportSheetsCollector()">Generate collector (.gs)</button></div><span class="fhint">Click to build and download the .gs file from your questions. No URL needed for this step.</span></div>
+      <div class="field"><label class="fl">Apps Script collector</label><div class="fc"><button type="button" class="btn sf-secondary" onclick="exportSheetsCollector()">Generate collector (.gs)</button></div><span class="fhint">Click to build and download the .gs file from your questions. No URL needed for this step.</span></div>
       <div class="field"><label class="fl" for="s-gsep">Apps Script Web App URL</label><div class="fc"><input type="url" id="s-gsep" placeholder="https://script.google.com/macros/s/your-script-id/exec"></div><span class="fhint">Paste the deployed Web App URL here, then re-export the survey.</span></div>
       </div>
     </div>
     <div class="stp" id="sp-refs" role="tabpanel" aria-labelledby="st-refs">
-      <div class="alert-i studio-only" hidden>In SurveyStudio, references are managed on its References screen. <button type="button" class="btn btn-p btn-sm" onclick="studioGoto('references')">Open References</button></div>
+      <div class="alert-i studio-only" hidden>In SurveyStudio, references are managed on its References screen. <button type="button" class="btn sf-tertiary" onclick="studioGoto('references')">Open References</button></div>
       <div class="studio-not">
       <div class="alert-i">The works this instrument draws on: where a scale or an item comes from, and what supports a planned analysis. Each change applies at once. They are saved in the .sframe file, and the report cites them in text and lists them once, in its References section at the end.</div>
       <div id="refList" aria-live="polite"></div>
       <div class="field"><label class="fl" for="r-bib">Paste BibTeX</label><div class="fc"><textarea id="r-bib" rows="4" placeholder="From Google Scholar (Cite, then BibTeX), Zotero, Mendeley or a journal page"></textarea></div></div>
       <div class="field"><label class="fl" for="r-cite">Where is this source used?</label><div class="fc"><select id="r-cite" multiple size="4"></select></div><span class="fhint">Stored as the reference's cited by list. Ctrl-click or Cmd-click to choose more than one. Leave empty to cite it from the instrument as a whole.</span></div>
-      <div style="display:flex;gap:8px;margin:4px 0 12px"><button type="button" class="btn btn-p btn-sm" onclick="addRefsFromBib()">Add from BibTeX</button></div>
+      <div style="display:flex;gap:8px;margin:4px 0 12px"><button type="button" class="btn sf-secondary" onclick="addRefsFromBib()">Add from BibTeX</button></div>
       <details><summary class="fl" style="cursor:pointer">Or type one in</summary>
         <div class="frow">
           <div class="field"><label class="fl" for="r-id">Citation key</label><div class="fc"><input type="text" id="r-id" placeholder="likert_1932"></div></div>
@@ -991,15 +1096,15 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
           <div class="field"><label class="fl" for="r-pub">Publisher</label><div class="fc"><input type="text" id="r-pub"></div></div>
           <div class="field"><label class="fl" for="r-doi">DOI</label><div class="fc"><input type="text" id="r-doi" placeholder="10.1037/..."></div></div>
         </div>
-        <button type="button" class="btn btn-p btn-sm" onclick="addRefFromForm()">Add reference</button>
+        <button type="button" class="btn sf-secondary" onclick="addRefFromForm()">Add reference</button>
       </details>
       </div>
     </div>
   </div>
   <div class="mfoot">
-    <button type="button" class="btn btn-s" onclick="closeModal('m-settings')">Cancel</button>
+    <button type="button" class="btn sf-secondary" onclick="closeModal('m-settings')">Cancel</button>
     <div class="sp"></div>
-    <button type="button" class="btn btn-p" onclick="saveSettings()">Save settings</button>
+    <button type="button" class="btn sf-primary" onclick="saveSettings()">Save settings</button>
   </div>
 </div>
 </div>
@@ -1012,7 +1117,7 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
     <div class="field"><label class="fl" for="c-id">Choice set ID <span class="fr">*</span></label><div class="fc"><input type="text" id="c-id" placeholder="agree5"></div></div>
     <div>
       <div class="crow-wrap" id="cRows"></div>
-      <div style="margin-bottom:6px"><button type="button" class="btn btn-g btn-sm" onclick="addCRow()">+ Add option</button></div>
+      <div style="margin-bottom:6px"><button type="button" class="btn sf-tertiary" onclick="addCRow()">+ Add option</button></div>
       <div class="cq">
         <button type="button" onclick="fillL5()">5-pt agree</button>
         <button type="button" onclick="fillL7()">7-pt agree</button>
@@ -1028,7 +1133,7 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
       <span class="fhint" id="c-other-h" hidden>An ordered set has no place for "Other", so it is off.</span>
     </div>
   </div>
-  <div class="mfoot"><button type="button" class="btn btn-s" onclick="closeModal('m-choice')">Cancel</button><div class="sp"></div><button type="button" class="btn btn-p" onclick="saveChoice()">Save choice set</button></div>
+  <div class="mfoot"><button type="button" class="btn sf-secondary" onclick="closeModal('m-choice')">Cancel</button><div class="sp"></div><button type="button" class="btn sf-primary" onclick="saveChoice()">Save choice set</button></div>
 </div>
 </div>
 
@@ -1048,7 +1153,7 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
     <div class="field"><label class="fl">Items to include</label><div class="vcbs" id="scItemCBs"></div></div>
     <div class="field"><label class="fl">Reverse-coded items within this scale</label><div class="vcbs" id="scRevCBs"><span style="font-size:11px;color:var(--t3)">Select items above first.</span></div></div>
   </div>
-  <div class="mfoot"><button type="button" class="btn btn-s" onclick="closeModal('m-scale')">Cancel</button><div class="sp"></div><button type="button" class="btn btn-p" onclick="saveScale()">Save scale</button></div>
+  <div class="mfoot"><button type="button" class="btn sf-secondary" onclick="closeModal('m-scale')">Cancel</button><div class="sp"></div><button type="button" class="btn sf-primary" onclick="saveScale()">Save scale</button></div>
 </div>
 </div>
 
@@ -1066,7 +1171,7 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
     </div>
     <div class="field"><label class="fl" for="br-act">Action</label><div class="fc"><select id="br-act"><option value="show">Show target question</option><option value="hide">Hide target question</option></select></div></div>
   </div>
-  <div class="mfoot"><button type="button" class="btn btn-s" onclick="closeModal('m-branch')">Cancel</button><div class="sp"></div><button type="button" class="btn btn-p" onclick="saveBranch()">Save rule</button></div>
+  <div class="mfoot"><button type="button" class="btn sf-secondary" onclick="closeModal('m-branch')">Cancel</button><div class="sp"></div><button type="button" class="btn sf-primary" onclick="saveBranch()">Save rule</button></div>
 </div>
 </div>
 
@@ -1086,7 +1191,7 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
     <div class="field"><label class="fl" for="ck-pass">Correct answer(s), comma-separated</label><div class="fc"><input type="text" id="ck-pass" placeholder="e.g. 4 or yes"></div></div>
     <div class="field"><label class="fl" for="ck-lbl">Label</label><div class="fc"><input type="text" id="ck-lbl" placeholder="Attention check 1"></div></div>
   </div>
-  <div class="mfoot"><button type="button" class="btn btn-s" onclick="closeModal('m-check')">Cancel</button><div class="sp"></div><button type="button" class="btn btn-p" onclick="saveCheck()">Save check</button></div>
+  <div class="mfoot"><button type="button" class="btn sf-secondary" onclick="closeModal('m-check')">Cancel</button><div class="sp"></div><button type="button" class="btn sf-primary" onclick="saveCheck()">Save check</button></div>
 </div>
 </div>
 
@@ -1135,10 +1240,10 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
     <p class="fhint" style="margin:-4px 0 0">Type @ or /cite in a field above, or use Cite on its format toolbar, to cite one of the instrument's references. <a href="#" id="rq-manage-refs" onclick="event.preventDefault();manageRefs()">Manage references</a></p>
   </div>
   <div class="mfoot">
-    <button type="button" class="btn btn-d btn-sm" id="rqDelBtn" style="display:none" onclick="deleteRQ()">Delete</button>
+    <button type="button" class="btn sf-secondary sf-danger" id="rqDelBtn" style="display:none" onclick="deleteRQ()">Delete</button>
     <div class="sp"></div>
-    <button type="button" class="btn btn-s" onclick="closeModal('m-rq')">Cancel</button>
-    <button type="button" class="btn btn-p" id="rqSaveBtn" onclick="saveRQ()">Save analysis plan</button>
+    <button type="button" class="btn sf-secondary" onclick="closeModal('m-rq')">Cancel</button>
+    <button type="button" class="btn sf-primary" id="rqSaveBtn" onclick="saveRQ()">Save analysis plan</button>
   </div>
 </div>
 </div>
@@ -1172,7 +1277,7 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
       <div class="field"><label class="fl" for="am-newver">Version of the new instrument</label><div class="fc"><input type="text" id="am-newver"></div><div class="plan-msg">A new instrument carries no amendment log. The log stays with the file opened.</div></div>
     </div>
   </div>
-  <div class="mfoot"><button type="button" class="btn btn-s" onclick="resAmend(false)">Cancel</button><div class="sp"></div><button type="button" class="btn btn-p" id="am-ok" onclick="resAmend(true)">Record amendment</button></div>
+  <div class="mfoot"><button type="button" class="btn sf-secondary" onclick="resAmend(false)">Cancel</button><div class="sp"></div><button type="button" class="btn sf-primary" id="am-ok" onclick="resAmend(true)">Record amendment</button></div>
 </div>
 </div>
 
@@ -1183,8 +1288,8 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
     <div class="conf-m" id="confM"></div>
     <input type="text" class="conf-in" id="confIn" aria-labelledby="confT" hidden>
     <div class="conf-acts">
-      <button type="button" class="btn btn-s btn-sm" onclick="resConf(false)">Cancel</button>
-      <button type="button" class="btn btn-d btn-sm" id="confOkBtn" onclick="resConf(true)">Delete</button>
+      <button type="button" class="btn sf-secondary" onclick="resConf(false)">Cancel</button>
+      <button type="button" class="btn sf-secondary sf-danger" id="confOkBtn" onclick="resConf(true)">Delete</button>
     </div>
   </div>
 </div>
@@ -3987,7 +4092,7 @@ function renderStudyObjs(){
   box.innerHTML=studyObjs.length?studyObjs.map(function(o,i){var n=i+1;
     return '<div class="frow" style="align-items:center;margin:0 0 6px"><input type="text" style="max-width:70px" aria-label="Objective '+n+' id" value="'+esc(o.id)+'" oninput="studyObjs['+i+'].id=this.value">'
       +'<input type="text" aria-label="Objective '+n+' text" value="'+esc(o.text)+'" oninput="studyObjs['+i+'].text=this.value">'
-      +'<button type="button" class="btn btn-g btn-sm" style="color:var(--cd)" aria-label="Remove objective '+n+'" onclick="studyRemoveObjective('+i+')">Remove</button></div>';
+      +'<button type="button" class="btn sf-tertiary" style="color:var(--cd)" aria-label="Remove objective '+n+'" onclick="studyRemoveObjective('+i+')">Remove</button></div>';
   }).join(''):'<p class="fhint" style="margin:0 0 6px">No objectives yet.</p>';
 }
 function studyAddObjective(){
@@ -4107,7 +4212,7 @@ function renderRefs(){
     var checks=targets.concat(stale).map(function(t){return '<label class="fcheck"><input type="checkbox" '+(cited.indexOf(t.v)>=0?'checked ':'')+'onchange="toggleCite('+i+',this.value,this.checked)" value="'+esc(t.v)+'"><span>'+esc(t.l)+'</span></label>';}).join('');
     return '<div style="border:1px solid var(--bd);border-radius:6px;padding:8px 10px;margin:0 0 8px">'
       +'<div style="display:flex;gap:8px;align-items:flex-start"><div style="flex:1;font-size:12px"><code>@'+esc(r.id)+'</code> '+esc(refShort(r))+'</div>'
-      +'<button type="button" class="btn btn-g btn-sm" style="color:var(--cd)" onclick="removeRef('+i+')" aria-label="Remove '+esc(r.id)+'">Remove</button></div>'
+      +'<button type="button" class="btn sf-tertiary" style="color:var(--cd)" onclick="removeRef('+i+')" aria-label="Remove '+esc(r.id)+'">Remove</button></div>'
       +'<details style="margin-top:4px"><summary class="fhint" style="cursor:pointer">Cited by: '+(cited.length?esc(cited.join(', ')):'not linked yet')+'</summary>'+checks+'</details></div>';
   }).join('');
 }
@@ -5709,7 +5814,7 @@ function renderAnalyse(){
   var runPlans=allPlans.filter(function(r){return r.requires_data!==false;});
   var syntaxOnly=allPlans.filter(function(r){return r.requires_data===false;});
   var displayPlans=anTab==='run'?runPlans:allPlans;
-  if(!allPlans.length){rb.innerHTML='<div class="an-empty"><div class="an-empty-ic">&#128300;</div><div class="an-empty-t">No analysis plans yet</div><div class="an-empty-b">Declare each analysis before collecting data: method, roles, assumptions, and planned outputs.</div><div style="margin-top:14px"><button type="button" class="btn btn-p" onclick="openRQModal()">+ Add plan</button></div></div>';return;}
+  if(!allPlans.length){rb.innerHTML='<div class="an-empty"><div class="an-empty-ic">&#128300;</div><div class="an-empty-t">No analysis plans yet</div><div class="an-empty-b">Declare each analysis before collecting data: method, roles, assumptions, and planned outputs.</div><div style="margin-top:14px"><button type="button" class="btn sf-primary" onclick="openRQModal()">+ Add plan</button></div></div>';return;}
   // Plan and Declared analyses both show draggable plan cards. Declared analyses is the
   // execution queue: the same cards, minus syntax-only methods, reorderable
   // in place (drag order writes back to S.analysis_plan by id).
@@ -5800,10 +5905,8 @@ function studioHostInit(){
   var sb=document.getElementById('saveBtn');
   sb.textContent='Save to Studio';sb.title='Make this survey the instrument Studio has open (Ctrl+S)';
   // Save to Studio is the Design screen's 1 primary action (item 12e): full
-  // size, Studio's shared .sf-primary class, and first in the bar.
-  var css=document.createElement('link');css.rel='stylesheet';css.href='../sfstudio/studio-actions.css';
-  document.head.appendChild(css);
-  sb.classList.remove('btn-sm','btn-p');sb.classList.add('sf-primary');
+  // size, the shared .sf-primary level (design_tokens.css), and first in the bar.
+
   var tb=document.querySelector('.topbar');tb.insertBefore(sb,tb.firstChild);
   window.addEventListener('message',function(e){
     if(e.source!==window.parent||e.origin!==location.origin)return;
