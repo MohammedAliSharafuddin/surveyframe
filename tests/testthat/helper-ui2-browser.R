@@ -49,11 +49,14 @@ ui2_navigate <- function(session, url) {
   invisible(session)
 }
 
-# Waits until `cond` (JavaScript) is true, for up to `timeout` seconds.
+# Waits until `cond` (JavaScript) is true, for up to `timeout` seconds. A
+# condition that throws counts as not yet true: the centre preview reloads
+# after an edit and its body is null for a moment (Windows CI, ui2:258).
 ui2_wait <- function(session, cond, timeout = 5) {
   end <- Sys.time() + timeout
   repeat {
-    if (isTRUE(ui2_js(session, paste0("!!(", cond, ")")))) return(TRUE)
+    probe <- paste0("(function(){try{return !!(", cond, ")}catch(e){return false}})()")
+    if (isTRUE(ui2_js(session, probe))) return(TRUE)
     if (Sys.time() > end) return(FALSE)
     Sys.sleep(0.1)
   }

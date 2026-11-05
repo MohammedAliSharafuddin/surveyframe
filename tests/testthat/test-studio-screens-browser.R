@@ -106,9 +106,17 @@ test_that("the launch screen does not override a screen picked before it", {
     Sys.sleep(0.5)
   }
   expect_identical(js("typeof studioLaunchScreen"), "function")
-  # With nothing picked, the launch switch still applies.
-  js("studioLaunchScreen('reliability'); true")
-  expect_true(js("$('#screen-reliability').hasClass('active')"))
+  # With nothing picked, the launch switch still applies. The server's own
+  # launch screen ("open") follows the first flush and can land after this
+  # call (seen once on macOS), so the switch is applied until it holds.
+  shown <- FALSE
+  for (i in 1:40) {
+    js("studioLaunchScreen('reliability'); true")
+    shown <- isTRUE(js("$('#screen-reliability').hasClass('active')"))
+    if (shown) break
+    Sys.sleep(0.25)
+  }
+  expect_true(shown)
   # The researcher opens Preview, then the start-up switch to the launch
   # screen arrives late, as it does after a slow first flush.
   js("document.querySelector('[data-tab=\"preview\"]').click(); true")
