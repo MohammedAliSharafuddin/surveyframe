@@ -1248,6 +1248,21 @@ studio_asset_src <- function(file, query = NULL) {
                                         collapse = "&"))
 }
 
+# A colour from the shared design tokens (UI-3, inst/builder/design_tokens.css),
+# for the charts R draws, which cannot read a CSS variable. A token defined
+# as another variable or a mix falls back to its plain hex value given here.
+studio_token <- function(name, fallback) {
+  path <- system.file("builder", "design_tokens.css", package = "surveyframe")
+  css <- if (nzchar(path)) readLines(path, warn = FALSE) else character(0)
+  hit <- regmatches(css, regexpr(paste0("^\\s*", name, ":\\s*#[0-9a-fA-F]{6}"), css))
+  if (length(hit)) sub(".*(#[0-9a-fA-F]{6}).*", "\\1", hit[1]) else fallback
+}
+# The chart colours, from the tokens.
+dash_theme <- studio_token("--sf-primary", "#0a6f6d")
+dash_muted <- studio_token("--sf-text-3", "#5b6b80")
+dash_danger <- studio_token("--sf-danger", "#dc2626")
+dash_surface <- studio_token("--sf-surface", "#ffffff")
+
 studio_report_tab <- function(id, label, on = FALSE) {
   tags$button(type = "button", id = paste0("rtab-", id),
     class = paste("report-tab", if (on) "active"), role = "tab",
@@ -1263,42 +1278,43 @@ ui <- fluidPage(
   tags$head(
     tags$title("SurveyStudio"),
     tags$script(src = studio_asset_src("field_tools.js")),
+    tags$link(rel = "stylesheet", href = studio_asset_src("design_tokens.css")),
     tags$link(rel = "stylesheet", href = "sfstudio/studio-actions.css"),
     tags$style(HTML("
-      body { font-family: 'Helvetica Neue', Arial, sans-serif;
-             background: #f7f8fa; color: #1a1a2e; margin: 0; }
+      body { font-family: var(--sf-font);
+             background: var(--sf-canvas); color: var(--sf-ink); margin: 0; }
       .studio-shell { display: flex; min-height: 100vh; }
       .studio-sidebar {
-        width: 240px; min-width: 240px; background: #1a1a2e;
-        color: #c8ccd8; padding: 0; display: flex; flex-direction: column;
+        width: 240px; min-width: 240px; background: var(--sf-nav);
+        color: var(--sf-nav-text); padding: 0; display: flex; flex-direction: column;
         position: fixed; top: 0; bottom: 0; left: 0; overflow-y: auto; z-index: 100;
       }
       .studio-logo {
         padding: 24px 20px 16px; font-size: 18px; font-weight: 700;
-        color: #ffffff; letter-spacing: 0.02em; border-bottom: 1px solid #2e3250;
+        color: var(--sf-surface); letter-spacing: 0.02em; border-bottom: 1px solid var(--sf-nav-line);
       }
-      .studio-logo span { color: #16B3B1; }
+      .studio-logo span { color: var(--sf-primary-on-dark); }
       .studio-logo img { height: 22px; margin-right: 8px; vertical-align: middle; }
       .studio-nav { list-style: none; margin: 0; padding: 12px 0; flex: 1; }
       .studio-nav-wrap { flex: 1; display: flex; flex-direction: column; }
       .studio-nav-item a {
         display: flex; align-items: center; gap: 10px;
-        padding: 10px 20px; color: #9aa0b8; text-decoration: none;
+        padding: 10px 20px; color: var(--sf-nav-muted); text-decoration: none;
         font-size: 14px; border-left: 3px solid transparent;
         transition: background 0.15s, color 0.15s;
       }
       /* Only the open screen has the teal bar and white text. Hover is a
          lighter tint, so the entry under the mouse is never mistaken for
          the selected one. */
-      .studio-nav-item a:hover { background: #1d2140; color: #c8ccdc; }
+      .studio-nav-item a:hover { background: color-mix(in srgb, var(--sf-nav-hover) 45%, var(--sf-nav)); color: var(--sf-nav-text); }
       .studio-nav-item a.active {
-        background: #22274a; color: #ffffff; border-left-color: #16B3B1;
+        background: var(--sf-nav-hover); color: var(--sf-white); border-left-color: var(--sf-primary-on-dark);
         font-weight: 700;
       }
       /* A group heading is a label, with nothing to click. */
       .studio-nav-heading {
         padding: 14px 20px 4px; font-size: 11px; font-weight: 600;
-        letter-spacing: 0.08em; text-transform: uppercase; color: #9aa0b8;
+        letter-spacing: 0.08em; text-transform: uppercase; color: var(--sf-nav-muted);
         user-select: none;
       }
       .studio-nav-fold { background: none; border: none; padding: 0; width: 100%; text-align: left;
@@ -1308,25 +1324,25 @@ ui <- fluidPage(
       .studio-nav-item.folded { display: none; }
       /* Item 12c: each screen is 1 panel, its title and context line 1
          compact row at the top of it, in place of a band above the cards. */
-      .screen.active { background: #ffffff; border-radius: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); padding: 16px 20px; }
-      .screen .card { box-shadow: none; border: 1px solid #e3e5ee; }
+      .screen.active { background: var(--sf-surface); border-radius: 10px; box-shadow: var(--sf-shadow-1); padding: 16px 20px; }
+      .screen .card { box-shadow: none; border: 1px solid var(--sf-border); }
       .screen-head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
-        padding-bottom: 10px; margin-bottom: 16px; border-bottom: 1px solid #e3e5ee; }
+        padding-bottom: 10px; margin-bottom: 16px; border-bottom: 1px solid var(--sf-border); }
       .screen-head > :last-child:not(:first-child) { margin-left: auto; }
       .screen-head .hint { margin-top: 0; }
-      .report-tabs { display: flex; gap: 4px; border-bottom: 1px solid #d9dce6; margin-bottom: 16px; flex-wrap: wrap; }
-      .report-tab { background: none; border: none; border-bottom: 3px solid transparent; padding: 8px 14px; font-weight: 600; color: #3d4256; }
-      .report-tab.active { border-bottom-color: #1a1a2e; color: #1a1a2e; }
+      .report-tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--sf-border); margin-bottom: 16px; flex-wrap: wrap; }
+      .report-tab { background: none; border: none; border-bottom: 3px solid transparent; padding: 8px 14px; font-weight: 600; color: var(--sf-text-2); }
+      .report-tab.active { border-bottom-color: var(--sf-ink); color: var(--sf-ink); }
       .screen.screen-gated > :not(.screen-title):not(.screen-head):not(.screen-gate) { display: none !important; }
       .screen.screen-gated > .screen-head > :not(.screen-title) { display: none !important; }
       .report-pane { display: none; }
       .report-pane.active { display: block; }
-      .flag-list { margin-top: 12px; border-top: 1px solid #e3e5ee; padding-top: 8px; }
+      .flag-list { margin-top: 12px; border-top: 1px solid var(--sf-border); padding-top: 8px; }
       .flag-head { font-weight: 600; margin-bottom: 4px; }
       .flag-row { display: flex; gap: 12px; align-items: center; justify-content: space-between; padding: 4px 0; }
       .studio-status {
         padding: 16px 20px; font-size: 12px;
-        border-top: 1px solid #2e3250; color: #9aa0b8;
+        border-top: 1px solid var(--sf-nav-line); color: var(--sf-nav-muted);
       }
       .studio-main {
         margin-left: 240px; flex: 1; padding: 32px;
@@ -1340,10 +1356,10 @@ ui <- fluidPage(
       .studio-menu-btn { display: none; }
       @media (max-width: 799px) {
         .studio-sidebar { transform: translateX(-100%); transition: transform .2s; visibility: hidden; }
-        .studio-shell.drawer-open .studio-sidebar { transform: none; visibility: visible; box-shadow: 2px 0 12px rgba(0,0,0,.3); }
+        .studio-shell.drawer-open .studio-sidebar { transform: none; visibility: visible; box-shadow: var(--sf-shadow-2); }
         .studio-main { margin-left: 0; padding: 12px; width: 100%; }
         .studio-menu-btn { display: inline-flex; align-items: center; gap: 6px; position: sticky; top: 0; z-index: 90;
-          margin: 0 0 12px; padding: 8px 14px; border: none; border-radius: 6px; background: #1a1a2e; color: #fff; font-weight: 600; }
+          margin: 0 0 12px; padding: 8px 14px; border: none; border-radius: 6px; background: var(--sf-nav); color: var(--sf-white); font-weight: 600; }
         .studio-main .row { margin-left: 0; margin-right: 0; }
         .studio-main .row > [class*='col-'] { width: 100%; float: none; padding-left: 0; padding-right: 0; }
         .opt-row, .stat-row, .screen-head, .flag-row { flex-direction: column; align-items: stretch; }
@@ -1357,13 +1373,13 @@ ui <- fluidPage(
       .screen { display: none; }
       .screen.active { display: block; }
       .card {
-        background: #ffffff; border-radius: 8px;
-        box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+        background: var(--sf-surface); border-radius: 8px;
+        box-shadow: var(--sf-shadow-1);
         padding: 24px; margin-bottom: 20px;
       }
       .card-title {
         font-size: 16px; font-weight: 600; margin: 0 0 16px;
-        color: #1a1a2e;
+        color: var(--sf-ink);
       }
       .card-actions {
         display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px;
@@ -1372,13 +1388,13 @@ ui <- fluidPage(
         display: inline-block; padding: 3px 10px; border-radius: 12px;
         font-size: 12px; font-weight: 600;
       }
-      .badge-ok { background: #e6f4ea; color: #2e7d32; }
-      .badge-wait { background: #fef3cd; color: #856404; }
-      .badge-warn { background: #fde8e8; color: #b91c1c; }
-      .filter-bar { background: #fff; border-radius: 10px; padding: 14px 16px; box-shadow: 0 1px 4px rgba(0,0,0,.07); margin-bottom: 16px; }
+      .badge-ok { background: var(--sf-success-tint); color: var(--sf-success-ink); }
+      .badge-wait { background: var(--sf-warning-tint); color: var(--sf-warning-ink); }
+      .badge-warn { background: var(--sf-danger-tint); color: var(--sf-danger-ink); }
+      .filter-bar { background: var(--sf-surface); border-radius: 10px; padding: 14px 16px; box-shadow: var(--sf-shadow-1); margin-bottom: 16px; }
       .filter-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; align-items: end; }
-      .filter-grid label { font-size: 12px; font-weight: 600; color: #475569; }
-      .filter-note { font-size: 11px; color: #5b6475; margin-top: 8px; }
+      .filter-grid label { font-size: 12px; font-weight: 600; color: var(--sf-text-2); }
+      .filter-note { font-size: 11px; color: var(--sf-text-3); margin-top: 8px; }
       .filter-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 8px; }
       .filter-head .card-title { margin-bottom: 0; }
       .dash-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
@@ -1386,40 +1402,40 @@ ui <- fluidPage(
       .dash-actions .hint { margin-top: 0; }
       .stat-row { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 16px; }
       .stat-box {
-        flex: 1; min-width: 120px; background: #f7f8fa; border-radius: 8px;
+        flex: 1; min-width: 120px; background: var(--sf-surface-2); border-radius: 8px;
         padding: 16px; text-align: center;
       }
-      .stat-box .stat-val { font-size: 28px; font-weight: 700; color: #1a1a2e; }
-      .stat-box .stat-lbl { font-size: 12px; color: #6b718e; margin-top: 4px; }
+      .stat-box .stat-val { font-size: 28px; font-weight: 700; color: var(--sf-ink); }
+      .stat-box .stat-lbl { font-size: 12px; color: var(--sf-text-3); margin-top: 4px; }
       table.sf-table { width: 100%; border-collapse: collapse; font-size: 14px;
         display: block; overflow-x: auto; max-width: 100%; }
       /* Academic (APA) tables: horizontal rules only, no shading, no vertical lines */
       .sf-table th {
         background: none; text-align: left; padding: 8px 12px;
-        font-weight: 700; color: #1a1a2e;
-        border-top: 2px solid #1a1a2e; border-bottom: 1px solid #1a1a2e;
+        font-weight: 700; color: var(--sf-ink);
+        border-top: 2px solid var(--sf-ink); border-bottom: 1px solid var(--sf-ink);
       }
       .sf-table td { padding: 8px 12px; border: none; vertical-align: top; overflow-wrap: anywhere; }
-      .sf-table tbody tr:last-child td { border-bottom: 2px solid #1a1a2e; }
+      .sf-table tbody tr:last-child td { border-bottom: 2px solid var(--sf-ink); }
       /* A table of short ids beside long text, such as the saved analysis
          plans: words never break mid-word, so a narrow screen scrolls the
          table sideways and RQ1 stays on one line */
       .sf-table-wide td { overflow-wrap: break-word; min-width: 4em; }
       .sf-table-wide td:first-child { white-space: nowrap; min-width: 0; }
       .btn-primary {
-        background: #0a6f6d; color: #fff; border: none; border-radius: 6px;
+        background: var(--sf-primary); color: var(--sf-surface); border: none; border-radius: 6px;
         padding: 9px 20px; font-size: 14px; cursor: pointer; font-weight: 600;
       }
-      .btn-primary:hover { background: #085957; }
+      .btn-primary:hover { background: var(--sf-primary-hover); }
       .btn-outline {
-        background: transparent; color: #0a6f6d; border: 1.5px solid #0a6f6d;
+        background: transparent; color: var(--sf-primary); border: 1.5px solid var(--sf-primary);
         border-radius: 6px; padding: 8px 18px; font-size: 14px;
         cursor: pointer; font-weight: 600;
       }
-      .btn-outline:hover { background: #e6f7f7; }
+      .btn-outline:hover { background: var(--sf-primary-tint); }
       /* Brand pill tabs (match the dashboard nav), used for the studio sub-tabs */
       .studio-tabs .shiny-options-group {
-        display: flex; gap: 2px; flex-wrap: wrap; background: #1e293b;
+        display: flex; gap: 2px; flex-wrap: wrap; background: var(--sf-nav);
         padding: 6px; border-radius: 8px; margin: 4px 0 18px;
       }
       .studio-tabs .control-label { display: none; }
@@ -1429,33 +1445,33 @@ ui <- fluidPage(
       }
       .studio-tabs .radio-inline span {
         display: inline-block; padding: 7px 16px; border-radius: 6px;
-        font-size: 12px; font-weight: 600; color: rgba(255,255,255,.6);
+        font-size: 12px; font-weight: 600; color: color-mix(in srgb, var(--sf-white) 60%, transparent);
         cursor: pointer; transition: all .15s;
       }
       .studio-tabs .radio-inline:hover span {
-        background: rgba(255,255,255,.06); color: rgba(255,255,255,.85);
+        background: color-mix(in srgb, var(--sf-white) 6%, transparent); color: color-mix(in srgb, var(--sf-white) 85%, transparent);
       }
       .studio-tabs .radio-inline input[type=radio]:checked + span {
-        background: #0a6f6d; color: #fff;
+        background: var(--sf-primary); color: var(--sf-surface);
       }
       h2.screen-title {
-        font-size: 18px; font-weight: 700; margin: 0; color: #1a1a2e;
+        font-size: 18px; font-weight: 700; margin: 0; color: var(--sf-ink);
       }
-      .hint { font-size: 13px; color: #6b718e; margin-top: 6px; }
+      .hint { font-size: 13px; color: var(--sf-text-3); margin-top: 6px; }
       .problem-list { margin: 0; padding-left: 18px; }
       .problem-list li { margin-bottom: 6px; }
       .sf-code {
-        white-space: pre-wrap; background: #f7f8fa; border: 1px solid #e0e3ea;
+        white-space: pre-wrap; background: var(--sf-surface-2); border: 1px solid var(--sf-border);
         border-radius: 6px; padding: 12px; overflow-x: auto;
       }
-      .role-card { border: 1px solid #e0e3ea; border-radius: 8px; padding: 12px; margin-bottom: 12px; }
-      .role-card label { font-size: 13px; font-weight: 600; color: #1a1a2e; }
-      .vmeta { border-bottom: 1px solid #f0f1f4; padding: 10px 0; }
+      .role-card { border: 1px solid var(--sf-border); border-radius: 8px; padding: 12px; margin-bottom: 12px; }
+      .role-card label { font-size: 13px; font-weight: 600; color: var(--sf-ink); }
+      .vmeta { border-bottom: 1px solid var(--sf-border); padding: 10px 0; }
       .vmeta:last-child { border-bottom: none; }
-      .vmeta-id { font-size: 13px; font-weight: 700; color: #1a1a2e; }
-      .vmeta-lbl { font-size: 12px; color: #4b5563; margin: 2px 0 5px; display: block; }
+      .vmeta-id { font-size: 13px; font-weight: 700; color: var(--sf-ink); }
+      .vmeta-lbl { font-size: 12px; color: var(--sf-text-2); margin: 2px 0 5px; display: block; }
       .result-canvas-block .sf-table { margin: 10px 0; }
-      .result-canvas-block img { margin: 8px 0; border: 1px solid #f0f1f4; border-radius: 6px; }
+      .result-canvas-block img { margin: 8px 0; border: 1px solid var(--sf-border); border-radius: 6px; }
       .result-canvas-block textarea {
         min-height: 160px; resize: vertical; font-size: 14px; line-height: 1.5;
       }
@@ -1463,7 +1479,7 @@ ui <- fluidPage(
       details.result-canvas-block > summary { cursor: pointer; list-style: none; padding-left: 18px; position: relative; }
       details.result-canvas-block > summary::-webkit-details-marker { display: none; }
       details.result-canvas-block > summary::before {
-        content: '\\25B8'; position: absolute; left: 0; top: 0; color: #0f9d9a;
+        content: '\\25B8'; position: absolute; left: 0; top: 0; color: var(--sf-primary);
       }
       details.result-canvas-block[open] > summary::before { content: '\\25BE'; }
       details.result-canvas-block > summary .card-title { display: inline; margin: 0; }
@@ -1475,17 +1491,17 @@ ui <- fluidPage(
       .opt-grid .checkbox, .opt-grid .form-group { margin: 2px 0; }
       details.opt-more > summary { cursor: pointer; font-weight: 600; margin: 10px 0; list-style: none; }
       details.opt-more > summary::-webkit-details-marker { display: none; }
-      details.opt-more > summary::before { content: '\\25B8 '; color: #0f9d9a; }
+      details.opt-more > summary::before { content: '\\25B8 '; color: var(--sf-primary); }
       details.opt-more[open] > summary::before { content: '\\25BE '; }
       .vbadge {
-        display: inline-block; border: 1px solid #d9e2ec; border-radius: 999px;
+        display: inline-block; border: 1px solid var(--sf-border); border-radius: 999px;
         padding: 2px 7px; margin: 2px 3px 2px 0; font-size: 11px;
-        color: #334155; background: #f8fafc;
+        color: var(--sf-text-2); background: var(--sf-surface-2);
       }
-      .plan-msg { border-radius: 6px; padding: 10px; background: #fef3cd; color: #856404; }
-      .plan-msg.ok { background: #e6f4ea; color: #2e7d32; }
+      .plan-msg { border-radius: 6px; padding: 10px; background: var(--sf-warning-tint); color: var(--sf-warning-ink); }
+      .plan-msg.ok { background: var(--sf-success-tint); color: var(--sf-success-ink); }
       #survey_preview_frame {
-        border: 1px solid #e0e3ea; border-radius: 8px; padding: 24px; background: #fff;
+        border: 1px solid var(--sf-border); border-radius: 8px; padding: 24px; background: var(--sf-surface);
       }
     "))
   ),
@@ -1806,7 +1822,7 @@ ui <- fluidPage(
         tags$iframe(id = "design_frame", title = "SurveyBuilder",
           src = studio_asset_src("survey_builder.html", "host=studio"),
           style = paste("width: 100%; height: calc(100vh - 150px); min-height: 600px;",
-                        "border: 1px solid #e0e3ea; border-radius: 8px; background: #fff;"))
+                        "border: 1px solid var(--sf-border); border-radius: 8px; background: var(--sf-surface);"))
       ),
 
       tags$div(id = "screen-open", class = screen_class("open"),
@@ -3216,7 +3232,7 @@ server <- function(input, output, session) {
                "removed from the preview.")),
       tags$iframe(
         srcdoc = html,
-        style = "width:100%;height:78vh;border:1px solid var(--cb);border-radius:10px;background:#fff;",
+        style = "width:100%;height:78vh;border:1px solid var(--sf-border);border-radius:10px;background:var(--sf-surface);",
         title = "Survey preview"
       )
     )
@@ -3384,7 +3400,7 @@ server <- function(input, output, session) {
     req(rv$instrument, rv$responses)
     gg <- tryCatch(graphics::plot(quality_result()), error = function(e) NULL)
     if (!is.null(gg)) print(gg)
-  }, bg = "white")
+  }, bg = dash_surface)
 
   output$studio_missing_chart <- shiny::renderPlot({
     req(rv$instrument, rv$responses)
@@ -3395,18 +3411,18 @@ server <- function(input, output, session) {
     if (is.null(mr)) return()
     gg <- tryCatch(graphics::plot(mr), error = function(e) NULL)
     if (!is.null(gg)) print(gg)
-  }, bg = "white")
+  }, bg = dash_surface)
 
   # Scale-score correlation heatmap for the Dashboard tab's Scales view.
   # Scores are local row means per scale, on the filtered rows.
   output$studio_scale_cor_chart <- shiny::renderPlot({
     req(rv$instrument, rv$responses)
     resp <- dash_filtered_responses()
-    if (!nrow(resp)) { plot.new(); text(.5, .5, "No responses match the filters.", col = "#94a3b8"); return() }
+    if (!nrow(resp)) { plot.new(); text(.5, .5, "No responses match the filters.", col = dash_muted); return() }
     scs <- Filter(function(s) length(intersect(s$items, names(resp))) > 0,
                   rv$instrument$scales %||% list())
     if (length(scs) < 2) {
-      plot.new(); text(.5, .5, "Define at least two scales to see correlations.", col = "#94a3b8")
+      plot.new(); text(.5, .5, "Define at least two scales to see correlations.", col = dash_muted)
       return()
     }
     scored <- as.data.frame(lapply(scs, function(sc) {
@@ -3420,8 +3436,8 @@ server <- function(input, output, session) {
       error = function(e) NULL
     )
     if (!is.null(gg)) { print(gg); return() }
-    plot.new(); text(.5, .5, "Install ggplot2 to see the correlation heatmap.", col = "#94a3b8")
-  }, bg = "white")
+    plot.new(); text(.5, .5, "Install ggplot2 to see the correlation heatmap.", col = dash_muted)
+  }, bg = dash_surface)
 
   output$studio_reliability_chart <- shiny::renderPlot({
     req(rv$instrument, rv$responses)
@@ -3429,7 +3445,7 @@ server <- function(input, output, session) {
     if (is.null(rr) || length(rr) == 0) return()
     gg <- tryCatch(graphics::plot(rr), error = function(e) NULL)
     if (!is.null(gg)) print(gg)
-  }, bg = "white")
+  }, bg = dash_surface)
 
   output$reliability_output <- renderUI({
     req(rv$instrument, rv$responses)
@@ -3675,7 +3691,6 @@ server <- function(input, output, session) {
 
   # Inline response dashboard, ported from launch_dashboard() and wired to the
   # studio's reactive instrument and responses (base-R charts, no new imports).
-  dash_theme <- "#16B3B1"
   dash_q_items <- reactive({
     Filter(function(i) !(i$type %in% c("section_break", "text_block")),
            rv$instrument$items %||% list())
@@ -3865,17 +3880,17 @@ server <- function(input, output, session) {
   output$studio_item_chart <- shiny::renderPlot({
     req(rv$instrument, rv$responses, input$dash_item_sel)
     resp <- dash_filtered_responses()
-    if (!nrow(resp)) { plot.new(); text(.5, .5, "No responses match the filters.", col = "#94a3b8"); return() }
+    if (!nrow(resp)) { plot.new(); text(.5, .5, "No responses match the filters.", col = dash_muted); return() }
     item <- dash_find(rv$instrument$items, input$dash_item_sel)
     if (is.null(item) || !input$dash_item_sel %in% names(resp)) {
-      plot.new(); text(.5, .5, "No data for this item.", col = "#94a3b8"); return()
+      plot.new(); text(.5, .5, "No data for this item.", col = dash_muted); return()
     }
     col_data <- resp[[input$dash_item_sel]]
     t <- item$type
     cs <- dash_find(rv$instrument$choices, item$choice_set %||% "")
     gg <- tryCatch(sframe_plot_item_chart(item, col_data, cs), error = function(e) NULL)
     if (!is.null(gg)) { print(gg); return() }
-    op <- par(mar = c(4, 9, 2, 1), bg = "white"); on.exit(par(op))
+    op <- par(mar = c(4, 9, 2, 1), bg = dash_surface); on.exit(par(op))
     if (t %in% c("likert", "single_choice", "multiple_choice")) {
       if (!is.null(cs)) {
         freq <- table(factor(col_data, levels = as.character(cs$values)))
@@ -3888,13 +3903,13 @@ server <- function(input, output, session) {
     } else if (t %in% c("numeric", "slider", "rating")) {
       num <- suppressWarnings(as.numeric(col_data)); num <- num[!is.na(num)]
       if (!length(num)) { plot.new(); text(.5, .5, "No numeric data."); return() }
-      hist(num, col = dash_theme, border = "white", main = NULL,
+      hist(num, col = dash_theme, border = dash_surface, main = NULL,
            xlab = item$label, ylab = "Count", las = 1, cex.axis = .8)
     } else {
       plot.new()
-      text(.5, .5, paste0("Chart unavailable for type '", t, "'."), col = "#94a3b8")
+      text(.5, .5, paste0("Chart unavailable for type '", t, "'."), col = dash_muted)
     }
-  }, bg = "white")
+  }, bg = dash_surface)
   shiny::outputOptions(output, "studio_item_chart", suspendWhenHidden = FALSE)
 
   output$studio_item_table <- renderUI({
@@ -3940,25 +3955,25 @@ server <- function(input, output, session) {
   output$studio_scale_chart <- shiny::renderPlot({
     req(rv$instrument, rv$responses, input$dash_scale_sel)
     resp <- dash_filtered_responses()
-    if (!nrow(resp)) { plot.new(); text(.5, .5, "No responses match the filters.", col = "#94a3b8"); return() }
+    if (!nrow(resp)) { plot.new(); text(.5, .5, "No responses match the filters.", col = dash_muted); return() }
     sc <- dash_find(rv$instrument$scales, input$dash_scale_sel)
     if (is.null(sc)) return()
     cols <- intersect(sc$items, names(resp))
     if (!length(cols)) {
-      plot.new(); text(.5, .5, "Scale items not in responses.", col = "#94a3b8"); return()
+      plot.new(); text(.5, .5, "Scale items not in responses.", col = dash_muted); return()
     }
     nums <- lapply(resp[cols], function(x) suppressWarnings(as.numeric(x)))
     scores <- rowMeans(do.call(cbind, nums), na.rm = TRUE); scores <- scores[!is.na(scores)]
     if (!length(scores)) {
-      plot.new(); text(.5, .5, "No valid scale scores.", col = "#94a3b8"); return()
+      plot.new(); text(.5, .5, "No valid scale scores.", col = dash_muted); return()
     }
     gg <- tryCatch(sframe_plot_scale_chart(scores, sc$label), error = function(e) NULL)
     if (!is.null(gg)) { print(gg); return() }
-    op <- par(mar = c(4, 4, 2, 1), bg = "white"); on.exit(par(op))
-    hist(scores, col = dash_theme, border = "white", main = NULL,
+    op <- par(mar = c(4, 4, 2, 1), bg = dash_surface); on.exit(par(op))
+    hist(scores, col = dash_theme, border = dash_surface, main = NULL,
          xlab = paste0(sc$label, " score"), ylab = "Count", las = 1, cex.axis = .8)
-    abline(v = mean(scores), col = "#dc2626", lwd = 2, lty = 2)
-  }, bg = "white")
+    abline(v = mean(scores), col = dash_danger, lwd = 2, lty = 2)
+  }, bg = dash_surface)
   shiny::outputOptions(output, "studio_scale_chart", suspendWhenHidden = FALSE)
 
   output$studio_raw_table <- shiny::renderTable({

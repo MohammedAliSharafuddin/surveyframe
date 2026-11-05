@@ -1,12 +1,13 @@
 # data-raw/inline_static_template.R
 # Re-inlines inst/static_survey/template.html, collector_template.gs and
-# inst/builder/field_tools.js into
+# inst/builder/field_tools.js and inst/builder/design_tokens.css into
 # inst/builder/survey_builder.html between the STATIC_TEMPLATE_START/END and
-# COLLECTOR_TEMPLATE_START/END and FIELD_TOOLS_START/END markers. The
+# COLLECTOR_TEMPLATE_START/END, FIELD_TOOLS_START/END and
+# DESIGN_TOKENS_START/END markers. The
 # builder's Export survey and Generate collector features stay single-sourced
 # with the R export path, and its citation picker with Studio's.
 # Run after any edit to template.html, collector_template.gs or
-# field_tools.js.
+# field_tools.js or design_tokens.css.
 # Recreated 2026-07-08 from the marker format in survey_builder.html; the
 # original script was gitignored on main and lost.
 # Tracked on main since 2026-09-17 (0.4.2), where the release is built.
@@ -15,12 +16,13 @@
 
 builder_path   <- file.path("inst", "builder", "survey_builder.html")
 tools_path    <- file.path("inst", "builder", "field_tools.js")
+tokens_path   <- file.path("inst", "builder", "design_tokens.css")
 template_path  <- file.path("inst", "static_survey", "template.html")
 collector_path <- file.path("inst", "static_survey", "collector_template.gs")
 
 stopifnot(file.exists(builder_path), file.exists(template_path),
           file.exists(collector_path),
-          file.exists(tools_path))
+          file.exists(tools_path), file.exists(tokens_path))
 
 read_utf8 <- function(path) readLines(path, encoding = "UTF-8", warn = FALSE)
 
@@ -69,6 +71,15 @@ builder <- replace_block(
   "<!-- FIELD_TOOLS_START:",
   "<!-- FIELD_TOOLS_END -->",
   tools_block
+)
+
+# The shared design tokens (UI-3), the same file Studio links.
+tokens_block <- c("<style>", read_utf8(tokens_path), "</style>")
+builder <- replace_block(
+  builder,
+  "<!-- DESIGN_TOKENS_START:",
+  "<!-- DESIGN_TOKENS_END -->",
+  tokens_block
 )
 
 writeLines(builder, builder_path, useBytes = TRUE)

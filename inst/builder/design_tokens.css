@@ -1,0 +1,90 @@
+/* inst/builder/design_tokens.css
+ *
+ * The 1 design system for SurveyStudio and SurveyBuilder (UI-3). Both apps
+ * take every colour, size and radius from these variables. Studio links this
+ * file as sfbuilder/design_tokens.css. The builder carries a copy inlined
+ * between its DESIGN_TOKENS_START and DESIGN_TOKENS_END markers, so it still
+ * opens from a copied file with nothing beside it. Run
+ * data-raw/inline_static_template.R after an edit here, or
+ * test-builder-template-sync.R fails.
+ *
+ * Every text and background pair below meets WCAG 2.2 AA (4.5 to 1 for
+ * small text), measured in the browser by the UX-21 contrast test.
+ */
+:root {
+  /* Brand: the 1 primary colour, its hover, a tint for selected and
+     hovered surfaces, and its text on that tint. */
+  --sf-primary: #0a6f6d;
+  --sf-primary-hover: #085957;
+  --sf-on-primary: #ffffff;
+  --sf-primary-tint: color-mix(in srgb, var(--sf-primary) 10%, #ffffff);
+  --sf-primary-tint-2: color-mix(in srgb, var(--sf-primary) 5%, #ffffff);
+  --sf-primary-border: color-mix(in srgb, var(--sf-primary) 32%, #ffffff);
+  --sf-primary-ink: color-mix(in srgb, var(--sf-primary) 75%, #000000);
+  /* The primary on the dark navigation: a lighter step that still meets
+     3 to 1 as a marker. */
+  --sf-primary-on-dark: color-mix(in srgb, var(--sf-primary) 55%, #ffffff);
+
+  /* Neutral greys (slate), from text to canvas. */
+  --sf-white: #ffffff;
+  --sf-black: #000000;
+  --sf-ink: #0f172a;
+  --sf-text-2: #475569;
+  --sf-text-3: #5b6b80;
+  --sf-border-strong: #cbd5e1;
+  --sf-border: #e2e8f0;
+  --sf-surface: #ffffff;
+  --sf-surface-2: #f8fafc;
+  --sf-canvas: #f1f5f9;
+  /* The dark navigation (Studio's sidebar and the builder's item list). */
+  --sf-nav: #1e293b;
+  --sf-nav-deep: #0f172a;
+  --sf-nav-hover: #2d3f57;
+  --sf-nav-line: #334155;
+  --sf-nav-text: #cbd5e1;
+  --sf-nav-muted: #94a3b8;
+
+  /* Status: a strong colour, its hover, a tint and the text on the tint. */
+  --sf-danger: #dc2626;
+  --sf-danger-hover: #b91c1c;
+  --sf-danger-tint: #fee2e2;
+  --sf-danger-ink: #991b1b;
+  --sf-success: #16a34a;
+  --sf-success-hover: #15803d;
+  --sf-success-tint: #dcfce7;
+  --sf-success-ink: #166534;
+  --sf-warning: #d97706;
+  --sf-warning-hover: #b45309;
+  --sf-warning-tint: #fef3c7;
+  --sf-warning-ink: #78350f;
+  --sf-info-tint: #e0e7ff;
+  --sf-info-ink: #3730a3;
+
+  /* Focus ring, the same on every control. */
+  --sf-focus: var(--sf-ink);
+  --sf-focus-ring: 3px solid var(--sf-focus);
+  --sf-focus-offset: 2px;
+
+  /* Shadows. */
+  --sf-shadow-1: 0 1px 4px color-mix(in srgb, var(--sf-black) 8%, transparent);
+  --sf-shadow-2: 0 4px 16px color-mix(in srgb, var(--sf-black) 15%, transparent);
+  --sf-scrim: color-mix(in srgb, var(--sf-ink) 45%, transparent);
+
+  /* Spacing scale, radius and type. */
+  --sf-space-1: 4px;
+  --sf-space-2: 8px;
+  --sf-space-3: 12px;
+  --sf-space-4: 16px;
+  --sf-space-5: 24px;
+  --sf-space-6: 32px;
+  --sf-radius: 6px;
+  --sf-radius-lg: 10px;
+  --sf-radius-pill: 9999px;
+  --sf-font: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --sf-mono: ui-monospace, Menlo, Consolas, monospace;
+  --sf-fs-xs: 11px;
+  --sf-fs-sm: 12px;
+  --sf-fs-md: 14px;
+  --sf-fs-lg: 16px;
+  --sf-fs-xl: 18px;
+}
