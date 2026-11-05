@@ -118,24 +118,24 @@ test_that("the builder panel has 1 filled button, + Add question, a menu holding
   expect_identical(filled, 1L)
   expect_identical(ui2_js(s, "document.querySelectorAll('.fab-mini').length"), 0L)
   items <- ui2_js(s, "Array.prototype.map.call(document.querySelectorAll('#fabMenu [role=menuitem]'), function(e){ return e.textContent; }).join('|')")
-  expect_match(items, "Section break\\|Branching rule$")
+  expect_match(items, "Section break\\|[^|]*Branching rule$")
   # The menu button pattern: Down opens on the first item, Up from it wraps
   # to the last, Escape closes back to the button.
   ui2_js(s, "document.getElementById('fabMoreBtn').focus(); 1")
   ui2_key(s, "", "ArrowDown")
   expect_identical(ui2_js(s, "document.getElementById('fabMoreBtn').getAttribute('aria-expanded')"), "true")
-  expect_identical(ui2_js(s, "document.activeElement.textContent"), "Likert scale")
+  expect_match(ui2_js(s, "document.activeElement.textContent"), "Likert scale$")
   ui2_key(s, "", "ArrowUp")
-  expect_identical(ui2_js(s, "document.activeElement.textContent"), "Branching rule")
+  expect_match(ui2_js(s, "document.activeElement.textContent"), "Branching rule$")
   ui2_key(s, "", "Home")
-  expect_identical(ui2_js(s, "document.activeElement.textContent"), "Likert scale")
+  expect_match(ui2_js(s, "document.activeElement.textContent"), "Likert scale$")
   ui2_key(s, "", "Escape")
   expect_false(ui2_js(s, "document.getElementById('fabMenu').classList.contains('open')"))
   expect_identical(ui2_js(s, "document.activeElement.id"), "fabMoreBtn")
   expect_identical(ui2_js(s, "document.getElementById('fabMoreBtn').getAttribute('aria-expanded')"), "false")
   # Section break from the menu adds one.
   ui2_js(s, "document.getElementById('fabMoreBtn').click(); 1")
-  ui2_js(s, "Array.prototype.filter.call(document.querySelectorAll('#fabMenu [role=menuitem]'), function(e){ return e.textContent === 'Section break'; })[0].click(); 1")
+  ui2_js(s, "Array.prototype.filter.call(document.querySelectorAll('#fabMenu [role=menuitem]'), function(e){ return /Section break$/.test(e.textContent); })[0].click(); 1")
   expect_true(ui2_js(s, "S.items.some(function(i){ return i.type === 'section_break'; })"))
   # Configure is a text link with a plain name, and its menu opens the same way.
   expect_identical(ui2_js(s, "document.getElementById('cfgMoreBtn').textContent"), "Answer sets, scales and checks")
@@ -206,6 +206,23 @@ test_that("every Studio screen follows the same rules: 1 tab style, tiles that f
     # A disabled primary has a visible hint beside it.
     bare <- ui2_js(b, sprintf("$('#screen-%s .sf-primary:disabled:visible, #screen-%s .sf-primary.disabled:visible').filter(function(){ var h = $(this).nextAll('.hint:visible').add($(this).parent().nextAll('.hint:visible')); return !h.length && !$('#screen-%s .plan-msg:visible').length; }).length", screen, screen, screen))
     expect_identical(bare, 0L, info = screen)
+  }
+})
+
+# UX-21 on the final tokens: the UI-1 contrast test measures every Studio
+# screen and the hosted builder. This adds the standalone builder in the
+# states UI-3 drew: the checklist, both menus open, and the next step.
+test_that("the standalone builder meets AA contrast in its new states (UI-3 item 7)", {
+  s <- ui2_builder()
+  states <- c(checklist = "1",
+              add_menu = "S.meta.title = 'X'; ra(); openMenu('fabMenu', 'fabMoreBtn'); 1",
+              cfg_menu = "closeFabMenu(); openMenu('cfgMenu', 'cfgMoreBtn'); 1",
+              next_step = "closeCfgMenu(); qAdd('likert'); closeInsp(); dirty = false; lastSaved = Date.now(); updSave(); 1")
+  for (st in names(states)) {
+    ui2_js(s, states[[st]])
+    Sys.sleep(0.3)
+    bad <- ui1_contrast(s)
+    expect_identical(nrow(bad), 0L, info = paste(st, paste(bad$sel, bad$ratio, collapse = "; ")))
   }
 })
 

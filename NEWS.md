@@ -1127,6 +1127,10 @@ style.
   underlined. A long value in a summary tile, such as the version or a
   date range, takes a smaller size and stays inside its tile. A disabled
   download keeps its button level and the hint beside it says why.
+* **Contrast on the final colours.** Every Studio screen, the builder in
+  Studio and on its own, with its menus open, meets WCAG 2.2 AA. The
+  builder's menu group headings were white at 30 percent, 2.41 to 1, and
+  now take the panel's text colour.
 * **Responses starts with the Google Sheet**, the planned route: the sheet
   card comes first with Read from Google Sheet as the screen's primary
   action, then the CSV file, then help for files from other tools. Without
