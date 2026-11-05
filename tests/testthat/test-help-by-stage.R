@@ -83,7 +83,9 @@ test_that("every help page in a section links to the rest of its section", {
 })
 
 test_that("?surveyframe opens with Start here, then the stages in order", {
-  rd <- paste(readLines(sframe_source_path("man", "surveyframe-package.Rd"),
+  path <- sframe_source_path("man", "surveyframe-package.Rd")
+  skip_if(is.na(path), "no source tree here: man")
+  rd <- paste(readLines(path,
                         warn = FALSE), collapse = "\n")
   at <- function(x) regexpr(x, rd, fixed = TRUE)[[1]]
   expect_gt(at("Start here"), 0)
