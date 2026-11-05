@@ -63,7 +63,7 @@ sframe_results_record_json <- function(results, instrument, seed, style = NULL) 
   # list is kept an array.
   payload <- sframe_canonical_payload(record[setdiff(names(record), "results")])
   payload$results <- lapply(blocks, sframe_canonical_payload)
-  payload <- payload[order(names(payload), method = "radix")]
+  payload <- payload[sframe_key_order(names(payload))]
   json <- jsonlite::toJSON(payload, auto_unbox = TRUE, pretty = FALSE, null = "null",
                            na = "null", digits = NA)
   sub("\"results\":\\{\\}", "\"results\":[]", as.character(json))

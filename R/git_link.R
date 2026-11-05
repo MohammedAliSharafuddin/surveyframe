@@ -108,9 +108,14 @@ sframe_link_git_commit <- function(instrument, repo_path = ".", path = NULL) {
   stored <- tryCatch(
     jsonlite::fromJSON(committed$output, simplifyVector = FALSE)$hash$value,
     error = function(e) NULL)
-  current <- sframe_hash_value(as_sframe(validate_sframe(instrument, strict = TRUE)))
+  checked <- as_sframe(validate_sframe(instrument, strict = TRUE))
+  current <- sframe_hash_value(checked)
   if (identical(stored, current)) {
     out$verified <- TRUE
+  } else if (identical(stored, sframe_with_locale_order(sframe_hash_value(checked)))) {
+    # Committed before 0.4.3, hashed in the session locale's key order.
+    out$verified <- TRUE
+    sframe_inform_locale_order(paste0("'", path, "' as committed at HEAD"))
   } else {
     out$reason <- sprintf("the instrument differs from '%s' as committed at HEAD", path)
   }

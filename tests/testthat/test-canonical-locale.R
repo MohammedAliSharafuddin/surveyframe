@@ -43,3 +43,64 @@ test_that("a results record and an instrument hash are the same in every locale"
   expect_identical(with_collate(loc, record()), with_collate("C", record()))
   expect_identical(with_collate(loc, hash()), with_collate("C", hash()))
 })
+
+# Files hashed before 0.4.3, in the locale's key order (owner, 2026-11-05):
+# accepted with a message to save them again, while a tampered file fails.
+locale_instrument <- function() {
+  ins <- sframe_demo("likert_scale")$instrument
+  # Keys whose order differs between the C locale and an English one.
+  ins$render$Theme_note <- "x"
+  ins$render$accent <- "y"
+  ins$meta$title <- "Locale order check"
+  ins$amendments <- list()
+  ins
+}
+
+test_that("a .sframe hashed in the old locale order verifies, with a message", {
+  loc <- natural_locale()
+  skip_if(is.na(loc), "no en_US or en_GB locale installed")
+  ins <- locale_instrument()
+  f <- tempfile(fileext = ".sframe")
+  with_collate(loc, {
+    expect_false(identical(surveyframe:::sframe_hash_value(ins),
+                           surveyframe:::sframe_with_locale_order(surveyframe:::sframe_hash_value(ins))))
+    surveyframe:::sframe_with_locale_order(write_sframe(ins, f, new_instrument = TRUE))
+    expect_message(r <- read_sframe(f), "used before 0.4.3", class = "sframe_locale_order_hash")
+    expect_true(attr(r, "sframe_verified"))
+    # Saved again, it is hashed in code point order and reads silently.
+    g <- tempfile(fileext = ".sframe")
+    write_sframe(r, g)
+    expect_no_message(read_sframe(g), class = "sframe_locale_order_hash")
+    # A tampered copy still fails.
+    txt <- sub("(\"accent\": *)\"y\"", "\\1\"z\"", readLines(f))
+    h <- tempfile(fileext = ".sframe")
+    writeLines(txt, h)
+    expect_error(read_sframe(h), "Integrity check failed")
+  })
+})
+
+test_that("a results record written in the old locale order still matches, with a message", {
+  loc <- natural_locale()
+  skip_if(is.na(loc), "no en_US or en_GB locale installed")
+  d <- sframe_demo("likert_scale")
+  dir <- tempfile("locale-source-")
+  with_collate(loc, {
+    surveyframe:::sframe_with_locale_order(suppressMessages(
+      render_report(d$instrument, data = d$responses, output_file = dir, format = "qmd",
+                    open = FALSE)))
+    msgs <- character(0)
+    src <- withCallingHandlers(sframe_report_source(dir), sframe_locale_order_hash = function(m) {
+      msgs <<- c(msgs, conditionMessage(m))
+      invokeRestart("muffleMessage")
+    })
+    expect_true(src$check$numbers_match)
+    expect_true(any(grepl("results record", msgs, fixed = TRUE)))
+    # Changed numbers still differ.
+    resp <- utils::read.csv(file.path(dir, "responses.csv"))
+    # Within the 1 to 5 scale, so the file still reads.
+    resp$org_1[1:5] <- ifelse(resp$org_1[1:5] == 1, 2, 1)
+    utils::write.csv(resp, file.path(dir, "responses.csv"), row.names = FALSE)
+    src2 <- suppressMessages(sframe_report_source(dir))
+    expect_false(src2$check$numbers_match)
+  })
+})

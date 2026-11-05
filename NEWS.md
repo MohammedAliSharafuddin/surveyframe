@@ -721,7 +721,11 @@ style.
   so a session in an English locale and one in the C locale put "Scale"
   and "ceiling_pct" in opposite orders and hashed the same numbers
   differently. Keys now sort by code point in every locale, as
-  SurveyBuilder does. None of the 22 demo instruments' hashes change.
+  SurveyBuilder does. None of the 22 demo instruments' hashes change. A
+  file, results record or committed instrument hashed in the old order is
+  still accepted, with a message that it was hashed in the order used
+  before 0.4.3 and should be saved again to update the hash. New hashes
+  are always written in code point order, and a changed file still fails.
 * **The Quarto source of a report, which checks itself.**
   `render_report(format = "qmd")` writes a folder: `report.qmd`, the
   `.sframe`, `responses.csv`, the bibliography and its style, the results
