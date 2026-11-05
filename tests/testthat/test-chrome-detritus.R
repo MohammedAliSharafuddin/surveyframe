@@ -21,8 +21,12 @@ test_that("Chrome's own TMPDIR is set for the call, then removed and restored", 
   expect_false(identical(seen$dir, unname(before[["TMPDIR"]])))
   expect_false(dir.exists(seen$dir))
   expect_identical(Sys.getenv(vars, unset = NA), before)
-  # Short enough for Chrome's socket path (104 bytes on macOS).
-  expect_lt(nchar(seen$dir) + 50L, 104L)
+  # Chrome's socket path in it stays under the Unix limit, 104 bytes on
+  # macOS. Windows Chrome makes no Unix socket.
+  if (.Platform$OS.type != "windows") {
+    socket <- file.path(seen$dir, "com.google.Chrome.XXXXXX", "SingletonSocket")
+    expect_lt(nchar(socket, type = "bytes"), 104L)
+  }
 })
 
 test_that("Chrome's TMPDIR goes and TMPDIR is restored when the call fails", {
