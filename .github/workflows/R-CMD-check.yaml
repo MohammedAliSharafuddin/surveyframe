@@ -42,6 +42,28 @@ jobs:
           extra-packages: any::rcmdcheck
           needs: check
 
+      # macOS only, never fails the job: the Typst PDF tests found no figure
+      # there (run 41973734890) after knitr raised 28 warnings that Linux
+      # does not. This prints them, the graphics capabilities, and whether
+      # the SVG figure exists, from a temp folder under /var as the tests use.
+      - name: Diagnose Typst figures (macOS)
+        if: runner.os == 'macOS'
+        continue-on-error: true
+        shell: bash
+        run: |
+          d=$(mktemp -d)
+          cd "$d"
+          printf '%s\n' '---' 'format: typst' '---' '```{r}' 'options(warn = 1)' \
+            'print(capabilities()[c("cairo", "png", "aqua")])' 'print(getwd())' \
+            'plot(1:10)' 'library(ggplot2)' 'print(ggplot(data.frame(x = 1:10), aes(x, x)) + geom_point())' '```' > t.qmd
+          quarto render t.qmd --to typst -M keep-typ:true 2>&1 | tail -40 || true
+          pwd -P
+          find . -name '*.svg' -o -name '*.png'
+          Rscript -e 'print(capabilities("cairo"))' \
+            -e 'r <- tryCatch(withCallingHandlers({ svg(tempfile(fileext = ".svg")); plot(1); dev.off(); "svg() ran" }, warning = function(w) { message("svg() warning: ", conditionMessage(w)); invokeRestart("muffleWarning") }), error = function(e) paste("svg() error:", conditionMessage(e))); print(r)' \
+            -e 'print(requireNamespace("svglite", quietly = TRUE))' \
+            -e 'print(.libPaths()); print(Sys.which("Rscript"))'
+
       - uses: r-lib/actions/check-r-package@v2
         with:
           upload-snapshots: true
