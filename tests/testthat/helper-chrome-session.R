@@ -9,7 +9,10 @@
 
 sframe_chrome_session <- function(...) {
   tryCatch(
-    chromote::ChromoteSession$new(...),
+    {
+      sframe_chrome_start()
+      chromote::ChromoteSession$new(...)
+    },
     error = function(e) {
       timeout <- getOption("chromote.timeout", 10)
       msg <- conditionMessage(e)
@@ -28,4 +31,31 @@ sframe_chrome_session <- function(...) {
         msg), call. = FALSE)
     }
   )
+}
+
+# Chrome writes com.google.Chrome.* and scoped_dir* folders into TMPDIR and
+# leaves them when its process is killed, which R CMD check reports as
+# detritus in the temp directory (Ubuntu runners, CI 41973734890). The
+# shared Chrome starts here with TMPDIR in a folder of this test process's
+# own. Chrome's SingletonSocket path must stay under the Unix socket limit
+# (104 bytes on macOS), which the check's temp folder there exceeds, so a
+# long temp folder gives way to a short one under /tmp. At exit Chrome is
+# closed first and the folder removed. TMPDIR is restored at once, so later
+# child processes are unaffected. Windows Chrome does not read TMPDIR.
+sframe_chrome_start <- function() {
+  if (chromote::has_default_chromote_object() || .Platform$OS.type == "windows") {
+    return(invisible())
+  }
+  base <- if (nchar(tempdir()) + 60L < 100L || !dir.exists("/tmp")) tempdir() else "/tmp"
+  chrome_tmp <- tempfile("sfc", tmpdir = base)
+  dir.create(chrome_tmp, showWarnings = FALSE)
+  old <- Sys.getenv("TMPDIR", unset = NA)
+  Sys.setenv(TMPDIR = chrome_tmp)
+  on.exit(if (is.na(old)) Sys.unsetenv("TMPDIR") else Sys.setenv(TMPDIR = old), add = TRUE)
+  chromote::set_default_chromote_object(chromote::Chromote$new())
+  reg.finalizer(environment(), function(e) {
+    try(chromote::default_chromote_object()$close(), silent = TRUE)
+    unlink(chrome_tmp, recursive = TRUE, force = TRUE)
+  }, onexit = TRUE)
+  invisible()
 }
