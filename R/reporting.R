@@ -732,6 +732,25 @@ render_report <- function(
       quarto_found        = sframe_quarto_label(quarto)
     )
 
+    # Quarto's Typst route draws SVG figures by default, as does an SVG
+    # request. knitr draws them with R's own svg(), which on a Mac without
+    # XQuartz opens nothing, so the PDF came out of Typst with no figures.
+    # Where svg() fails, svglite draws them when installed, else PNG.
+    fig_args <- character(0)
+    if (identical(quarto_to, "typst") || identical(figures$format, "svg")) {
+      fig_device <- sframe_report_svg_device()
+      if (!identical(fig_device, "svg")) {
+        params$fig_format <- if (identical(fig_device, "svglite")) "svg" else ""
+        if (identical(fig_device, "png")) fig_args <- c("-M", "fig-format:png")
+        rlang::inform(paste0(
+          "R's svg() device cannot open here (on macOS it needs XQuartz), so the ",
+          "report's figures are drawn with ",
+          if (identical(fig_device, "svglite")) "svglite." else
+            "PNG. install.packages(\"svglite\") gives SVG figures."),
+          class = "sframe_report_progress")
+      }
+    }
+
     # The bibliography (0.4.3): every reference the instrument carries, the
     # host's, and all built-in method references. pandoc lists only those
     # actually cited, so carrying the full method set costs nothing.
@@ -774,7 +793,7 @@ render_report <- function(
           "render", "report.qmd",
           "--to", quarto_to,
           "--output", basename(rendered),
-          param_args
+          param_args, fig_args
         ),
         stdout = TRUE,
         stderr = TRUE
