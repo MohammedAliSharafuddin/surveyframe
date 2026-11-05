@@ -1263,6 +1263,11 @@ dash_muted <- studio_token("--sf-text-3", "#5b6b80")
 dash_danger <- studio_token("--sf-danger", "#dc2626")
 dash_surface <- studio_token("--sf-surface", "#ffffff")
 
+# The class of a tile's value: a long one takes a smaller size (UI-3 item 6).
+studio_stat_class <- function(v) {
+  if (nchar(paste(as.character(v), collapse = " ")) > 10) "stat-val stat-val-long" else "stat-val"
+}
+
 studio_report_tab <- function(id, label, on = FALSE) {
   tags$button(type = "button", id = paste0("rtab-", id),
     class = paste("report-tab", if (on) "active"), role = "tab",
@@ -1410,6 +1415,9 @@ ui <- fluidPage(
         padding: 16px; text-align: center;
       }
       .stat-box .stat-val { font-size: 28px; font-weight: 700; color: var(--sf-ink); }
+      /* A value longer than a number, such as a version or a date range,
+         takes a smaller size, so it stays inside its tile (UI-3 item 6). */
+      .stat-box .stat-val.stat-val-long { font-size: 17px; line-height: 1.3; padding-top: 6px; overflow-wrap: anywhere; }
       .stat-box .stat-lbl { font-size: 12px; color: var(--sf-text-3); margin-top: 4px; }
       table.sf-table { width: 100%; border-collapse: collapse; font-size: 14px;
         display: block; overflow-x: auto; max-width: 100%; }
@@ -1426,10 +1434,11 @@ ui <- fluidPage(
          table sideways and RQ1 stays on one line */
       .sf-table-wide td { overflow-wrap: break-word; min-width: 4em; }
       .sf-table-wide td:first-child { white-space: nowrap; min-width: 0; }
-      /* Brand pill tabs (match the dashboard nav), used for the studio sub-tabs */
+      /* Explore's view tabs look like the Report's local tabs (UI-3 item 6):
+         1 tab style in Studio, the open tab underlined, not shown by colour alone. */
       .studio-tabs .shiny-options-group {
-        display: flex; gap: 2px; flex-wrap: wrap; background: var(--sf-nav);
-        padding: 6px; border-radius: 8px; margin: 4px 0 18px;
+        display: flex; gap: 4px; flex-wrap: wrap; border-bottom: 1px solid var(--sf-border);
+        margin: 4px 0 16px;
       }
       .studio-tabs .control-label { display: none; }
       .studio-tabs .radio-inline { margin: 0; padding: 0; }
@@ -1437,16 +1446,15 @@ ui <- fluidPage(
         position: absolute; opacity: 0; pointer-events: none;
       }
       .studio-tabs .radio-inline span {
-        display: inline-block; padding: 7px 16px; border-radius: 6px;
-        font-size: 12px; font-weight: 600; color: color-mix(in srgb, var(--sf-white) 60%, transparent);
-        cursor: pointer; transition: all .15s;
+        display: inline-block; padding: 8px 14px; border-bottom: 3px solid transparent;
+        font-weight: 600; color: var(--sf-text-2); cursor: pointer;
       }
-      .studio-tabs .radio-inline:hover span {
-        background: color-mix(in srgb, var(--sf-white) 6%, transparent); color: color-mix(in srgb, var(--sf-white) 85%, transparent);
-      }
+      .studio-tabs .radio-inline:hover span { color: var(--sf-ink); }
       .studio-tabs .radio-inline input[type=radio]:checked + span {
-        background: var(--sf-primary); color: var(--sf-surface);
+        border-bottom-color: var(--sf-ink); color: var(--sf-ink);
       }
+      .studio-tabs .radio-inline input[type=radio]:focus-visible + span,
+      .report-tab:focus-visible { outline: var(--sf-focus-ring); outline-offset: var(--sf-focus-offset); }
       h2.screen-title {
         font-size: 18px; font-weight: 700; margin: 0; color: var(--sf-ink);
       }
@@ -3192,10 +3200,10 @@ server <- function(input, output, session) {
           tags$div(class = "stat-val", length(instr$models %||% list())),
           tags$div(class = "stat-lbl", "Models")),
         tags$div(class = "stat-box",
-          tags$div(class = "stat-val", id = "open_version", sframe_studio_version_label(instr)),
+          tags$div(class = studio_stat_class(sframe_studio_version_label(instr)), id = "open_version", sframe_studio_version_label(instr)),
           tags$div(class = "stat-lbl", "Version")),
         tags$div(class = "stat-box",
-          tags$div(class = "stat-val", id = "open_schema_status",
+          tags$div(class = "stat-val stat-val-long", id = "open_schema_status",
                    if (isTRUE(instr$meta$validated)) "Schema valid" else "Draft"),
           if (isTRUE(instr$meta$validated)) tags$div(class = "stat-lbl", "Status")
           else tags$a(class = "stat-lbl", href = "#", `data-tab` = "design", id = "open_status_link", "Status: fix in Design"))
@@ -3315,7 +3323,7 @@ server <- function(input, output, session) {
     n <- qr$summary$n_respondents
     n_flag <- qr$summary$n_flagged %||% 0L
     stat_box <- function(v, l) tags$div(class = "stat-box",
-      tags$div(class = "stat-val", v), tags$div(class = "stat-lbl", l))
+      tags$div(class = studio_stat_class(v), v), tags$div(class = "stat-lbl", l))
 
     tagList(
       tags$div(class = "card",
@@ -3818,7 +3826,7 @@ server <- function(input, output, session) {
         }
       }
       kpi <- function(v, l) tags$div(class = "stat-box",
-        tags$div(class = "stat-val", v), tags$div(class = "stat-lbl", l))
+        tags$div(class = studio_stat_class(v), v), tags$div(class = "stat-lbl", l))
       return(tagList(
         tags$div(class = "stat-row",
           kpi(nrow(rv$responses), "Responses"),
@@ -4018,8 +4026,7 @@ server <- function(input, output, session) {
   # user cannot trigger a download that would error.
   export_disabled_btn <- function(label, hint, primary = FALSE) {
     tagList(
-      tags$button(type = "button", class = if (primary) "btn btn-primary sf-primary" else "btn btn-outline", disabled = NA,
-        style = "opacity: .5; cursor: not-allowed;",
+      tags$button(type = "button", class = if (primary) "btn btn-primary sf-primary" else "btn btn-outline sf-secondary", disabled = NA,
         shiny::icon("download"), " ", label),
       tags$p(class = "hint", hint)
     )
