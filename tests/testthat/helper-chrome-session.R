@@ -53,9 +53,23 @@ sframe_chrome_start <- function() {
   Sys.setenv(TMPDIR = chrome_tmp)
   on.exit(if (is.na(old)) Sys.unsetenv("TMPDIR") else Sys.setenv(TMPDIR = old), add = TRUE)
   chromote::set_default_chromote_object(chromote::Chromote$new())
-  reg.finalizer(environment(), function(e) {
-    try(chromote::default_chromote_object()$close(), silent = TRUE)
-    unlink(chrome_tmp, recursive = TRUE, force = TRUE)
-  }, onexit = TRUE)
+  sframe_chrome_keep$dirs <- c(sframe_chrome_keep$dirs, chrome_tmp)
   invisible()
+}
+
+# Lives as long as the test process, so its finalizer runs only at exit. A
+# finalizer on a function's own environment ran at the next garbage
+# collection and closed Chrome mid-run (CI run 41984181153, macOS).
+# Held in an option, so sourcing the helpers again reuses it rather than
+# leaving the first one to be collected.
+sframe_chrome_keep <- getOption("surveyframe.test_chrome_keep")
+if (is.null(sframe_chrome_keep)) {
+  sframe_chrome_keep <- new.env()
+  reg.finalizer(sframe_chrome_keep, function(e) {
+    if (chromote::has_default_chromote_object()) {
+      try(chromote::default_chromote_object()$close(), silent = TRUE)
+    }
+    unlink(e$dirs, recursive = TRUE, force = TRUE)
+  }, onexit = TRUE)
+  options(surveyframe.test_chrome_keep = sframe_chrome_keep)
 }
