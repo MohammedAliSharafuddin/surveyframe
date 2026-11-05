@@ -89,7 +89,8 @@ test_that("the sidebar's groups, labels and screens follow the study's order", {
     expect_true(wait(paste0("$('#screen-", screen, "').hasClass('active')"), n = 20), info = label)
     expect_identical(js("$('.studio-nav a.active').length"), 1L, info = label)
     expect_identical(js("$('.studio-nav a.active').text().trim()"), label, info = label)
-    title <- if (label == "Plan") "Design" else label
+    # Since UI-3 item 3 the head is titled by the mode, so Plan reads Plan.
+    title <- label
     expect_identical(js(paste0("$('#screen-", screen, " h2.screen-title').text().trim()")),
                      title, info = label)
     if (label == "Design") {
