@@ -7,7 +7,20 @@
 # did not open its debugging port within chromote.timeout, or the process
 # exited first. The test still fails, so nothing that was checked is skipped.
 
+# On GitHub Actions the browser tests run on Ubuntu release alone, where
+# R-CMD-check.yaml sets SURVEYFRAME_CI_BROWSER=true (owner, 2026-11-05).
+# They check the builder's and Studio's JavaScript, which does not depend on
+# the OS, and Chrome timed out on the other runners (Windows d12:105, CI run
+# 42014288465). Everywhere else, this machine included, they all run.
+skip_if_browser_off_ci <- function() {
+  if (identical(Sys.getenv("GITHUB_ACTIONS"), "true") &&
+      !identical(Sys.getenv("SURVEYFRAME_CI_BROWSER"), "true")) {
+    testthat::skip("browser tests run on the Ubuntu release CI job only")
+  }
+}
+
 sframe_chrome_session <- function(...) {
+  skip_if_browser_off_ci()
   tryCatch(
     {
       sframe_chrome_start()
