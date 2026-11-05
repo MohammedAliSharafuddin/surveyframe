@@ -113,6 +113,7 @@ test_that("a PDF renders through Quarto and LaTeX when LaTeX is found", {
   skip_if_not_slow()
   skip_if(!nzchar(Sys.which("quarto")), "Quarto is not installed")
   skip_if(!surveyframe:::sframe_latex_available(), "no LaTeX engine")
+  skip_if_latex_broken()
   r <- render_format("pdf")
   expect_identical(attr(r$res, "converter"), "quarto-latex")
   expect_identical(readBin(r$out, "raw", 4), charToRaw("%PDF"))
