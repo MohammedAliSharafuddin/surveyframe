@@ -1112,7 +1112,8 @@ style.
 * **The builder's left panel has 1 filled button.** Until the survey's
   settings are saved once, it is Survey settings, then "+ Add question",
   whose menu now also holds Section break and Branching rule. An opened
-  instrument counts as set up. Survey settings is always a strong row at
+  instrument counts as set up, and the empty question list points to
+  Survey settings first until then. Survey settings is always a strong row at
   the top of the panel, with the line "Title, welcome and thank-you
   pages". Configure is a text link named "Answer sets, scales and
   checks". Both menus follow the menu button pattern: the arrow keys, Home
