@@ -434,14 +434,6 @@ input,textarea,select{font-family:inherit;font-size:13px}
 .sb-empty-ic{font-size:28px;opacity:.5}
 .sb-empty-t{font-size:14px;font-weight:650;color:color-mix(in srgb,var(--sf-white) 92%,transparent)}
 .sb-empty-b{font-size:12px;color:color-mix(in srgb,var(--sf-white) 65%,transparent);line-height:1.55}
-.sb-empty-cta{display:flex;flex-direction:column;gap:8px;width:100%;margin-top:10px}
-.sb-empty-cta button{min-height:44px;width:100%;border-radius:8px;font-size:13px;
-  font-weight:650;cursor:pointer;font-family:inherit;border:1.5px solid transparent}
-.sb-cta-p{background:var(--acc,var(--cp));color:var(--cf)}
-.sb-cta-p:hover{filter:brightness(1.1)}
-.sb-cta-s{background:transparent;color:color-mix(in srgb,var(--sf-white) 92%,transparent);
-  border-color:color-mix(in srgb,var(--sf-white) 45%,transparent)}
-.sb-cta-s:hover{background:color-mix(in srgb,var(--sf-white) 10%,transparent)}
 
 /* -- Main panels ---------------------------------------------------------- */
 .main{flex:1;display:flex;overflow:hidden}
@@ -469,6 +461,20 @@ input,textarea,select{font-family:inherit;font-size:13px}
 .cv-pv-frame.mobile iframe{width:390px}
 .c-prompt-t{font-size:14px;font-weight:600;color:var(--t2)}
 .c-prompt-b{font-size:13px;line-height:1.6}
+.c-steps-t{font-size:15px;font-weight:700;color:var(--t1);margin-bottom:12px}
+.c-prompt:has(.c-steps){max-width:480px}
+.c-steps{list-style:none;display:flex;flex-direction:column;gap:10px;text-align:left;width:100%}
+.c-step{display:flex;gap:12px;align-items:flex-start;padding:12px 14px;border:1px solid var(--cb);border-radius:var(--r);background:var(--cf)}
+.c-step.next{border-color:var(--sf-primary-border);background:var(--sf-primary-tint-2)}
+.c-step-n{flex:0 0 24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;border:1px solid var(--sf-border-strong);color:var(--t2);background:var(--cf)}
+.c-step.done .c-step-n{background:var(--sf-success-ink);border-color:var(--sf-success-ink);color:var(--sf-white)}
+.c-step.done .c-step-t{color:var(--t2)}
+.c-step-t{font-size:13px;font-weight:600;color:var(--t1)}
+.c-step-b{font-size:12px;color:var(--t2);margin-top:2px}
+.c-step .btn{margin-top:8px}
+.c-next{margin-top:14px;display:flex;flex-direction:column;align-items:center;gap:8px}
+.c-next-t{font-size:13px;font-weight:600;color:var(--t1)}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 
 /* -- Inspector ------------------------------------------------------------ */
 .inspector{width:var(--iw);flex-shrink:0;background:var(--cf);
@@ -921,11 +927,10 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
       <!-- A scroll region, so keyboard users can reach and scroll it (axe
            scrollable-region-focusable, Ethos request 8, at 390 px). -->
       <div class="canvas" id="canvas" tabindex="0" role="region" aria-label="Question editing area">
-        <div class="c-prompt" id="cPrompt">
-          <div class="c-prompt-ic">&#128196;</div>
-          <div class="c-prompt-t">Select a question to edit</div>
-          <div class="c-prompt-b">Click any question in the sidebar, or add one using the panel on the left. Keyboard: <kbd>Ctrl+Z</kbd> undo, <kbd>Ctrl+S</kbd> save.</div>
-        </div>
+        <!-- Drawn by renderPrompt(): a 3-step checklist until the survey has
+             settings, a question and a save, then the next useful step (UI-3
+             item 5). -->
+        <div class="c-prompt" id="cPrompt" aria-live="polite"></div>
         <div class="cv-pv" id="cvPv">
           <div class="cv-pv-bar"><span id="cvPvT">As respondents see it. Edit it on the right.</span><div class="sp"></div>
             <div role="group" aria-label="Preview width"><button type="button" class="btn sf-secondary" id="cvW-desktop" aria-pressed="true" onclick="centreWidth('desktop')">Desktop</button> <button type="button" class="btn sf-secondary" id="cvW-mobile" aria-pressed="false" onclick="centreWidth('mobile')">Mobile</button></div></div>
@@ -3798,11 +3803,43 @@ function setDirty(){dirty=true;updSave();centreLater();}
 // opening a file reads as saved in the host, and nothing has been saved.
 function updSave(){var e=document.getElementById('saveSt');
   // In Studio the save goes to Studio, so the state is Saved or not.
-  if(typeof STUDIO_HOST!=='undefined'&&STUDIO_HOST){e.textContent=dirty?'Unsaved changes':'Saved';e.className='save-st '+(dirty?'dirty':'saved');studioPostDirty();studioPostState();return;}
-  if(!dirty&&lastSaved){e.textContent='Saved '+tAgo(lastSaved);e.className='save-st saved';}else if(!dirty&&openedAt){e.textContent='Opened '+tAgo(openedAt);e.className='save-st';}else if(dirty){e.textContent='Unsaved changes';e.className='save-st dirty';}else{e.textContent='No changes';e.className='save-st';}}
+  if(typeof STUDIO_HOST!=='undefined'&&STUDIO_HOST){e.textContent=dirty?'Unsaved changes':'Saved';e.className='save-st '+(dirty?'dirty':'saved');studioPostDirty();studioPostState();renderPrompt();return;}
+  if(!dirty&&lastSaved){e.textContent='Saved '+tAgo(lastSaved);e.className='save-st saved';}else if(!dirty&&openedAt){e.textContent='Opened '+tAgo(openedAt);e.className='save-st';}else if(dirty){e.textContent='Unsaved changes';e.className='save-st dirty';}else{e.textContent='No changes';e.className='save-st';}renderPrompt();}
 function tAgo(d){var s=Math.round((Date.now()-d)/1000);if(s<10)return'just now';if(s<60)return s+'s ago';return Math.round(s/60)+'m ago';}
+// The canvas prompt (UI-3 item 5). A checklist of the 3 first steps, each
+// ticked once done, with the next step's button in its row, until all 3
+// are done. Then, with no question selected, the next useful step: the
+// analysis plan if there is none, otherwise another question.
+function promptSteps(){
+  var studio=typeof STUDIO_HOST!=='undefined'&&STUDIO_HOST,save=studio?'Save to Studio':'Save .sframe';
+  var qs=S.items.filter(function(i){return i.type!=='section_break'&&i.type!=='text_block';});
+  return [
+    {t:'Survey settings',b:'Give the survey its title, welcome page and thank-you page.',done:!!S.meta.title&&S.meta.title!=='Untitled Survey',btn:'Open survey settings',go:"openSettings('meta')"},
+    {t:'Add your first question',b:'Pick a question type from the list.',done:qs.length>0,btn:'Add a question',go:"closeCfgMenu();openMenu('fabMenu','fabMoreBtn')"},
+    {t:save,b:studio?'Make this survey the instrument Studio has open.':'Download the survey as a .sframe file.',done:!dirty&&(!!lastSaved||!!openedAt),btn:save,go:'saveSframe()'}];
+}
+function renderPrompt(){
+  var el=document.getElementById('cPrompt');if(!el)return;
+  var st=promptSteps(),next=-1;
+  for(var i=0;i<st.length;i++)if(!st[i].done){next=i;break;}
+  if(next>=0){
+    el.innerHTML='<div class="c-steps-t">Build your survey in 3 steps</div><ol class="c-steps">'+st.map(function(s,i){
+      return '<li class="c-step'+(s.done?' done':'')+(i===next?' next':'')+'"><span class="c-step-n" aria-hidden="true">'+(s.done?'&#10003;':(i+1))+'</span><div>'
+        +'<div class="c-step-t">'+esc(s.t)+(s.done?'<span class="sr-only"> (done)</span>':'')+'</div><div class="c-step-b">'+esc(s.b)+'</div>'
+        +(i===next?'<button type="button" class="btn sf-secondary" id="cStepGo" onclick="'+s.go+'">'+esc(s.btn)+'</button>':'')+'</div></li>';
+    }).join('')+'</ol>';
+    return;
+  }
+  var plan=(S.analysis_plan||[]).length>0;
+  el.innerHTML='<div class="c-prompt-ic">&#128196;</div><div class="c-prompt-t">Select a question to edit</div>'
+    +'<div class="c-prompt-b">Click any question in the panel on the left. Keyboard: <kbd>Ctrl+Z</kbd> undo, <kbd>Ctrl+S</kbd> save.</div>'
+    +'<div class="c-next"><div class="c-next-t">'+(plan?'Next: add another question':'Next: declare how you will analyse the data')+'</div>'
+    +'<button type="button" class="btn sf-secondary" id="cStepGo" onclick="'+(plan?"closeCfgMenu();openMenu('fabMenu','fabMoreBtn')":'openPlan()')+'">'+(plan?'Add a question':'Open Plan')+'</button></div>';
+}
+// Plan: in Studio its sidebar entry picks the mode, so ask Studio.
+function openPlan(){if(typeof STUDIO_HOST!=='undefined'&&STUDIO_HOST){window.parent.postMessage({type:'goto',screen:'plan'},location.origin);return;}setMode('analyse');}
 function uid(){return Math.random().toString(36).slice(2,9);}
-function ra(){renderItemList();renderAnalyse();updSave();document.getElementById('sbTitle').textContent=S.meta.title||'Untitled Survey';updDoc();}
+function ra(){renderItemList();renderAnalyse();updSave();document.getElementById('sbTitle').textContent=S.meta.title||'Untitled Survey';updDoc();renderPrompt();}
 // The header row's document line: the title and the version.
 function updDoc(){var d=document.getElementById('tbDoc');if(d)d.textContent=(S.meta.title||'Untitled Survey')+(S.meta.version?' ('+S.meta.version+')':'');}
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
@@ -4714,7 +4751,7 @@ function renderItemList(){
   // aria-required-children, which axe rates critical, and a screen reader
   // announces a list containing nothing it can describe.
   if(!items.length){el.removeAttribute('role');}else{el.setAttribute('role','listbox');}
-  if(!items.length){el.innerHTML='<div class="sb-empty"><div class="sb-empty-ic">&#128196;</div><div class="sb-empty-t">No questions yet</div><div class="sb-empty-b">Use "+ Add question" below to choose a question type, or start from an existing file.</div><div class="sb-empty-cta"><button type="button" class="sb-cta-s" onclick="openFile()">Open an existing .sframe</button><button type="button" class="sb-cta-s" onclick="openSettings()">Set up survey settings</button></div></div>';return;}
+  if(!items.length){el.innerHTML='<div class="sb-empty"><div class="sb-empty-ic">&#128196;</div><div class="sb-empty-t">No questions yet</div><div class="sb-empty-b">Use "+ Add question" below to choose a question type. The steps on the right show what comes next.</div></div>';return;}
   var cp=null;
   el.innerHTML=screenRow('__welcome')+items.map(function(item){
     var ri=S.items.indexOf(item);
