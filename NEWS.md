@@ -699,6 +699,15 @@ style.
   where none is, and only without Quarto through the built-in page printed
   by pagedown. The `"converter"` attribute and the manifest name the route.
   Outside HTML every table is numbered, and its title kept, in each format.
+* **On a Mac without XQuartz, a PDF report through Typst had no figures.**
+  Quarto stopped with "file not found" and no PDF was written. R's own
+  `svg()` device needs the Cairo that XQuartz installs, and without it R
+  still reports Cairo as present but draws nothing. `render_report()` now
+  checks that `svg()` opens, and where it does not, draws the figures with
+  svglite when installed, else as PNG, and says which. The same check makes
+  `figures = list(format = "svg")` work there. Charts saved as SVG with
+  `sframe_save_figures()` or `sframe_format_result()` need svglite, and now
+  say so before drawing, also where Cairo is present.
 * **The Quarto source of a report, which checks itself.**
   `render_report(format = "qmd")` writes a folder: `report.qmd`, the
   `.sframe`, `responses.csv`, the bibliography and its style, the results

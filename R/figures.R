@@ -35,11 +35,41 @@ sframe_figure_settings <- function(figures) {
   figures
 }
 
-# Whether this R can write SVG. svglite writes it anywhere, and R's own svg()
-# device needs Cairo, which the macOS build of R lacks, so an SVG request
-# failed there with no chart at all.
+# Whether ggsave() can write SVG here. It writes SVG only through svglite, so
+# R's own Cairo device does not count: with Cairo and no svglite, ggsave()
+# stopped and the built-in engine's chart was left out.
 sframe_svg_available <- function() {
-  requireNamespace("svglite", quietly = TRUE) || isTRUE(capabilities("cairo"))
+  sframe_has_svglite()
+}
+
+sframe_has_svglite <- function() requireNamespace("svglite", quietly = TRUE)
+
+# Whether R's own svg() device opens a file here. On macOS it needs the Cairo
+# that XQuartz installs. Without XQuartz, capabilities("cairo") still says
+# TRUE, svg() only warns "failed to load cairo DLL" and opens nothing, and
+# knitr then wrote no figure (CI run 41984181153). Probed once per session.
+# The probe closes only the device it opened and sets back the current one.
+sframe_cairo_svg_works <- function() {
+  if (!is.null(.sframe_figure_env$cairo_svg)) return(.sframe_figure_env$cairo_svg)
+  before <- grDevices::dev.list()
+  current <- grDevices::dev.cur()
+  file <- tempfile(fileext = ".svg")
+  ok <- tryCatch(suppressWarnings({
+    grDevices::svg(file)
+    opened <- setdiff(grDevices::dev.list(), before)
+    if (length(opened)) grDevices::dev.off(opened[[1]])
+    length(opened) > 0
+  }), error = function(e) FALSE)
+  if (current > 1) grDevices::dev.set(current)
+  unlink(file)
+  .sframe_figure_env$cairo_svg <- isTRUE(ok)
+  .sframe_figure_env$cairo_svg
+}
+
+# The device a Quarto report draws an SVG figure with: R's own svg() where
+# Cairo opens, as before, else svglite when installed, else PNG.
+sframe_report_svg_device <- function() {
+  if (sframe_cairo_svg_works()) "svg" else if (sframe_has_svglite()) "svglite" else "png"
 }
 
 sframe_check_svg <- function() {
