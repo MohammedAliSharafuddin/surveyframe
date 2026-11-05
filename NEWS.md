@@ -715,6 +715,13 @@ style.
   left `com.google.Chrome.*` and `scoped_dir*` folders in the temp folder,
   since the cleanup looked in R's session folder and Chrome writes beside
   it. Chrome now runs with a temp folder of its own, removed afterwards.
+* **A report source could say its numbers differ when they did not.** The
+  canonical JSON behind the results record, the instrument hash and the
+  amendment fingerprints sorted its keys in the session's collation order,
+  so a session in an English locale and one in the C locale put "Scale"
+  and "ceiling_pct" in opposite orders and hashed the same numbers
+  differently. Keys now sort by code point in every locale, as
+  SurveyBuilder does. None of the 22 demo instruments' hashes change.
 * **The Quarto source of a report, which checks itself.**
   `render_report(format = "qmd")` writes a folder: `report.qmd`, the
   `.sframe`, `responses.csv`, the bibliography and its style, the results
