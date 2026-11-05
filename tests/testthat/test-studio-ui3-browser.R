@@ -117,6 +117,7 @@ test_that("the builder panel has 1 filled button, Survey settings until saved on
   expect_identical(ui2_js(s, "document.querySelector('.sb-top').children[1].id"), "settingsBtn")
   expect_identical(ui2_js(s, "document.querySelector('#settingsBtn .sb-row-sub').textContent"), "Title, welcome and thank-you pages")
   expect_identical(ui2_js(s, "getComputedStyle(document.getElementById('fabMoreBtn')).backgroundColor"), "rgba(0, 0, 0, 0)")
+  expect_match(ui2_js(s, "document.querySelector('.sb-empty-b').textContent"), "^Start with Survey settings above")
   filled <- function() ui2_js(s, paste0("(function(){ var p = getComputedStyle(document.getElementById('saveBtn')).backgroundColor, n = 0;",
     " document.querySelectorAll('.sidebar button, .sidebar .btn').forEach(function(e){ if (e.offsetParent && getComputedStyle(e).backgroundColor === p) n++; }); return n; })()"))
   expect_identical(filled(), 1L)
@@ -125,6 +126,7 @@ test_that("the builder panel has 1 filled button, Survey settings until saved on
   Sys.sleep(0.5)  # the builder's buttons fade their colour over 100 ms
   lv <- ui3_levels(s, "document.querySelector('.sidebar')")
   expect_identical(lv$id[lv$level == "primary"], "fabMoreBtn")
+  expect_match(ui2_js(s, "document.querySelector('.sb-empty-b').textContent"), "Add question", fixed = TRUE)
   expect_identical(filled(), 1L)
   # Settings stays a strong secondary row: a teal ground, 40 px, its line.
   expect_false(identical(ui2_js(s, "getComputedStyle(document.getElementById('settingsBtn')).backgroundColor"), "rgba(0, 0, 0, 0)"))

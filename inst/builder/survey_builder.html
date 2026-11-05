@@ -3839,7 +3839,7 @@ function updPanelLead(){
   s.classList.toggle('btn',!settingsSaved);s.classList.toggle('sf-primary',!settingsSaved);
   a.classList.toggle('sf-primary',settingsSaved);a.classList.toggle('sf-secondary',!settingsSaved);
 }
-function settingsDone(){settingsSaved=true;updPanelLead();renderPrompt();}
+function settingsDone(){settingsSaved=true;updPanelLead();renderItemList();renderPrompt();}
 function promptSteps(){
   var studio=typeof STUDIO_HOST!=='undefined'&&STUDIO_HOST,save=studio?'Save to Studio':'Save .sframe';
   var qs=S.items.filter(function(i){return i.type!=='section_break'&&i.type!=='text_block';});
@@ -4782,7 +4782,7 @@ function renderItemList(){
   // aria-required-children, which axe rates critical, and a screen reader
   // announces a list containing nothing it can describe.
   if(!items.length){el.removeAttribute('role');}else{el.setAttribute('role','listbox');}
-  if(!items.length){el.innerHTML='<div class="sb-empty"><div class="sb-empty-ic" aria-hidden="true">&#128196;</div><div class="sb-empty-t">No questions yet</div><div class="sb-empty-b">Use "+ Add question" below to choose a question type. The steps on the right show what comes next.</div></div>';return;}
+  if(!items.length){el.innerHTML='<div class="sb-empty"><div class="sb-empty-ic" aria-hidden="true">&#128196;</div><div class="sb-empty-t">No questions yet</div><div class="sb-empty-b">'+(settingsSaved?'Use "+ Add question" below to choose a question type.':'Start with Survey settings above, then add your first question.')+'</div></div>';return;}
   var cp=null;
   el.innerHTML=screenRow('__welcome')+items.map(function(item){
     var ri=S.items.indexOf(item);

@@ -2695,9 +2695,8 @@ server <- function(input, output, session) {
     if (!is.null(problem)) {
       tags$div(class = "plan-msg", problem)
     } else if (is.null(ins)) {
-      tags$p(class = "hint", paste(
-        "No instrument is open. Build one here and save it to Studio, or open",
-        "a file on the Open Instrument screen."))
+      # Short, so the head stays 1 row with Save to Studio at 1280 px.
+      tags$p(class = "hint", "No instrument open. Build one here or open a file.")
     } else {
       tags$p(class = "hint", paste0(
         "Editing: ", ins$meta$title %||% "Untitled", " (",
