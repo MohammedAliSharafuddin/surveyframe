@@ -1066,9 +1066,10 @@ sframe_plot_likert_matrix <- function(item, data, choice_set, palette = c("web",
 #' \donttest{
 #' if (requireNamespace("ggplot2", quietly = TRUE)) {
 #'   demo <- sframe_demo("likert_scale")
-#'   groups <- sframe_likert_scale_groups(demo$instrument)
-#'   g <- groups[["organisation"]]
-#'   sframe_plot_likert_scale(g$items, demo$responses, g$choice_set, g$title)
+#'   scale <- sframe_get_scales(demo$instrument)[["organisation"]]
+#'   items <- sframe_get_items(demo$instrument)[scale$items]
+#'   agree <- sframe_get_choice_sets(demo$instrument)[["agree5"]]
+#'   sframe_plot_likert_scale(items, demo$responses, agree, scale$label)
 #' }
 #' }
 #' @family Chart functions
