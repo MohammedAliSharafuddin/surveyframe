@@ -136,26 +136,26 @@ section below knits cleanly on either kind of machine.</p>
 satisfaction scale, a branch (region) respondents visited, and one
 open-ended comments item asking what stood out about their visit.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">satisfaction_cs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sf_choices.html">sf_choices</a></span><span class="op">(</span></span>
+<code class="sourceCode R"><span><span class="va">satisfaction_cs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sframe_choice_set.html">sframe_choice_set</a></span><span class="op">(</span></span>
 <span>  <span class="st">"agree5"</span>, values <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">5</span>,</span>
 <span>  labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Strongly disagree"</span>, <span class="st">"Disagree"</span>, <span class="st">"Neutral"</span>,</span>
 <span>             <span class="st">"Agree"</span>, <span class="st">"Strongly agree"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
-<span><span class="va">branch_cs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sf_choices.html">sf_choices</a></span><span class="op">(</span></span>
+<span><span class="va">branch_cs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sframe_choice_set.html">sframe_choice_set</a></span><span class="op">(</span></span>
 <span>  <span class="st">"branch"</span>, values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"north"</span>, <span class="st">"south"</span><span class="op">)</span>,</span>
 <span>  labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"North branch"</span>, <span class="st">"South branch"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">instr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sf_instrument.html">sf_instrument</a></span><span class="op">(</span></span>
+<span><span class="va">instr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sframe_instrument.html">sframe_instrument</a></span><span class="op">(</span></span>
 <span>  title <span class="op">=</span> <span class="st">"Hospitality feedback"</span>,</span>
 <span>  version <span class="op">=</span> <span class="st">"1.0.0"</span>,</span>
 <span>  components <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>    <span class="va">satisfaction_cs</span>, <span class="va">branch_cs</span>,</span>
-<span>    <span class="fu"><a href="../reference/sf_item.html">sf_item</a></span><span class="op">(</span><span class="st">"satisfaction"</span>, <span class="st">"Overall, I was satisfied with my visit."</span>,</span>
+<span>    <span class="fu"><a href="../reference/sframe_item.html">sframe_item</a></span><span class="op">(</span><span class="st">"satisfaction"</span>, <span class="st">"Overall, I was satisfied with my visit."</span>,</span>
 <span>            type <span class="op">=</span> <span class="st">"likert"</span>, choice_set <span class="op">=</span> <span class="st">"agree5"</span><span class="op">)</span>,</span>
-<span>    <span class="fu"><a href="../reference/sf_item.html">sf_item</a></span><span class="op">(</span><span class="st">"branch"</span>, <span class="st">"Which branch did you visit?"</span>,</span>
+<span>    <span class="fu"><a href="../reference/sframe_item.html">sframe_item</a></span><span class="op">(</span><span class="st">"branch"</span>, <span class="st">"Which branch did you visit?"</span>,</span>
 <span>            type <span class="op">=</span> <span class="st">"single_choice"</span>, choice_set <span class="op">=</span> <span class="st">"branch_cs"</span><span class="op">)</span>,</span>
-<span>    <span class="fu"><a href="../reference/sf_item.html">sf_item</a></span><span class="op">(</span><span class="st">"comments"</span>, <span class="st">"What stood out about your visit, good or bad?"</span>,</span>
+<span>    <span class="fu"><a href="../reference/sframe_item.html">sframe_item</a></span><span class="op">(</span><span class="st">"comments"</span>, <span class="st">"What stood out about your visit, good or bad?"</span>,</span>
 <span>            type <span class="op">=</span> <span class="st">"textarea"</span><span class="op">)</span></span>
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -257,14 +257,14 @@ fast.</td>
 <div class="section level2">
 <h2 id="cleaning-a-text-item">Cleaning a text item<a class="anchor" aria-label="anchor" href="#cleaning-a-text-item"></a>
 </h2>
-<p><code><a href="../reference/clean_text_responses.html">clean_text_responses()</a></code> pulls one item’s responses out of
+<p><code><a href="../reference/sframe_clean_text.html">sframe_clean_text()</a></code> pulls one item’s responses out of
 the data, drops blank and missing entries, and applies light,
 configurable cleaning. It keeps a <code>respondent</code> attribute
 mapping each cleaned entry back to its original row, so anything built
 on top (a concordance, a representative quote) can still cite where a
 response came from.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">cleaned</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/clean_text_responses.html">clean_text_responses</a></span><span class="op">(</span><span class="va">responses</span>, <span class="st">"comments"</span>, instrument <span class="op">=</span> <span class="va">instr</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">cleaned</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sframe_clean_text.html">sframe_clean_text</a></span><span class="op">(</span><span class="va">responses</span>, <span class="st">"comments"</span>, instrument <span class="op">=</span> <span class="va">instr</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">cleaned</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 60</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">cleaned</span>, <span class="st">"respondent"</span><span class="op">)</span><span class="op">)</span></span>
@@ -273,14 +273,14 @@ response came from.</p>
 <div class="section level2">
 <h2 id="term-and-n-gram-frequency">Term and n-gram frequency<a class="anchor" aria-label="anchor" href="#term-and-n-gram-frequency"></a>
 </h2>
-<p><code><a href="../reference/term_frequency.html">term_frequency()</a></code> tokenises, lower-cases, strips
+<p><code><a href="../reference/sframe_term_frequency.html">sframe_term_frequency()</a></code> tokenises, lower-cases, strips
 punctuation, removes stop words (a built-in English list ships with the
 package, so this stage runs on base surveyframe), and counts.
-<code><a href="../reference/ngram_frequency.html">ngram_frequency()</a></code> does the same for 2-word and 3-word
-phrases, which surface a complaint like “long wait” that single-word
-counts would split apart.</p>
+<code><a href="../reference/sframe_ngram_frequency.html">sframe_ngram_frequency()</a></code> does the same for 2-word and
+3-word phrases, which surface a complaint like “long wait” that
+single-word counts would split apart.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">terms</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/term_frequency.html">term_frequency</a></span><span class="op">(</span><span class="va">cleaned</span>, top_n <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">terms</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sframe_term_frequency.html">sframe_term_frequency</a></span><span class="op">(</span><span class="va">cleaned</span>, top_n <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span>
 <span><span class="fu">kable</span><span class="op">(</span><span class="va">terms</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span>, caption <span class="op">=</span> <span class="st">"The 10 most frequent terms."</span><span class="op">)</span></span></code></pre></div>
 <table class="table">
 <caption>The 10 most frequent terms.</caption>
@@ -343,7 +343,7 @@ counts would split apart.</p>
 </tbody>
 </table>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">bigrams</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ngram_frequency.html">ngram_frequency</a></span><span class="op">(</span><span class="va">cleaned</span>, n <span class="op">=</span> <span class="fl">2</span>, top_n <span class="op">=</span> <span class="fl">8</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">bigrams</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sframe_ngram_frequency.html">sframe_ngram_frequency</a></span><span class="op">(</span><span class="va">cleaned</span>, n <span class="op">=</span> <span class="fl">2</span>, top_n <span class="op">=</span> <span class="fl">8</span><span class="op">)</span></span>
 <span><span class="fu">kable</span><span class="op">(</span><span class="va">bigrams</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span>, caption <span class="op">=</span> <span class="st">"The 8 most frequent bigrams."</span><span class="op">)</span></span></code></pre></div>
 <table class="table">
 <caption>The 8 most frequent bigrams.</caption>
@@ -400,7 +400,7 @@ does. Here, <code>term_freq</code> also takes an optional
 <code>group</code> role (covered below), which splits the table and
 facets the chart by a nominal or ordinal covariate.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/sf_plan.html">sf_plan</a></span><span class="op">(</span><span class="va">instr</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/sframe_plan.html">sframe_plan</a></span><span class="op">(</span><span class="va">instr</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>id <span class="op">=</span> <span class="st">"RQ1"</span>,</span>
 <span>       research_question <span class="op">=</span> <span class="st">"What themes recur in the open-ended comments?"</span>,</span>
 <span>       family <span class="op">=</span> <span class="st">"text"</span>, method <span class="op">=</span> <span class="st">"term_freq"</span>,</span>
@@ -1047,12 +1047,13 @@ of comments from reading as a trend.</p>
 <div class="section level2">
 <h2 id="keyword-in-context">Keyword in context<a class="anchor" aria-label="anchor" href="#keyword-in-context"></a>
 </h2>
-<p><code><a href="../reference/term_context.html">term_context()</a></code> builds a concordance for one keyword:
-every place it appears, with a window of surrounding words on each side.
-It is the fastest way to read what a keyword actually means in context,
-and it settles whether a frequent term keeps one sense throughout.</p>
+<p><code><a href="../reference/sframe_term_context.html">sframe_term_context()</a></code> builds a concordance for one
+keyword: every place it appears, with a window of surrounding words on
+each side. It is the fastest way to read what a keyword actually means
+in context, and it settles whether a frequent term keeps one sense
+throughout.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">kwic</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/term_context.html">term_context</a></span><span class="op">(</span><span class="va">cleaned</span>, term <span class="op">=</span> <span class="st">"wait"</span>, window <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">kwic</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sframe_term_context.html">sframe_term_context</a></span><span class="op">(</span><span class="va">cleaned</span>, term <span class="op">=</span> <span class="st">"wait"</span>, window <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span>
 <span><span class="fu">kable</span><span class="op">(</span><span class="va">kwic</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span>, caption <span class="op">=</span> <span class="st">'Every occurrence of "wait" in context.'</span><span class="op">)</span></span></code></pre></div>
 <table class="table">
 <caption>Every occurrence of “wait” in context.</caption>
@@ -1169,7 +1170,7 @@ and it settles whether a frequent term keeps one sense throughout.</p>
 pairs of frequent terms appear together within the same response, and
 renders as a heatmap.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/sf_plan.html">sf_plan</a></span><span class="op">(</span><span class="va">instr</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="../reference/sf_plan.html">sf_plan</a></span><span class="op">(</span><span class="va">instr</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/sframe_plan.html">sframe_plan</a></span><span class="op">(</span><span class="va">instr</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="../reference/sframe_plan.html">sframe_plan</a></span><span class="op">(</span><span class="va">instr</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>  id <span class="op">=</span> <span class="st">"RQ3"</span>,</span>
 <span>  research_question <span class="op">=</span> <span class="st">"Which terms tend to appear together in the same comment?"</span>,</span>
 <span>  family <span class="op">=</span> <span class="st">"text"</span>, method <span class="op">=</span> <span class="st">"co_occurrence"</span>,</span>
@@ -1245,7 +1246,7 @@ force-directed layout. Both are seeded, so the same
 <code>options$seed</code> always produces the same clusters and the same
 layout.</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/sf_plan.html">sf_plan</a></span><span class="op">(</span><span class="va">instr</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="../reference/sf_plan.html">sf_plan</a></span><span class="op">(</span><span class="va">instr</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/sframe_plan.html">sframe_plan</a></span><span class="op">(</span><span class="va">instr</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="../reference/sframe_plan.html">sframe_plan</a></span><span class="op">(</span><span class="va">instr</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>  id <span class="op">=</span> <span class="st">"RQ4"</span>,</span>
 <span>  research_question <span class="op">=</span> <span class="st">"Do the frequent terms form distinct thematic clusters?"</span>,</span>
 <span>  family <span class="op">=</span> <span class="st">"text"</span>, method <span class="op">=</span> <span class="st">"co_occurrence_network"</span>,</span>
@@ -1424,7 +1425,7 @@ lexicon, which arrives with tidytext itself. Like
 <code>term_freq</code>, it accepts an optional <code>group</code>
 role.</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/sf_plan.html">sf_plan</a></span><span class="op">(</span><span class="va">instr</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="../reference/sf_plan.html">sf_plan</a></span><span class="op">(</span><span class="va">instr</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/sframe_plan.html">sframe_plan</a></span><span class="op">(</span><span class="va">instr</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="../reference/sframe_plan.html">sframe_plan</a></span><span class="op">(</span><span class="va">instr</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>  id <span class="op">=</span> <span class="st">"RQ5"</span>,</span>
 <span>  research_question <span class="op">=</span> <span class="st">"Is sentiment in the comments more positive or negative, and does it differ by branch?"</span>,</span>
 <span>  family <span class="op">=</span> <span class="st">"text"</span>, method <span class="op">=</span> <span class="st">"tidy_sentiment"</span>,</span>
@@ -1505,9 +1506,9 @@ left-negative/right-positive convention, each sized and shaded (dark for
 frequent, light for rare) by how often it occurred.</p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">instr_cloud</span> <span class="op">&lt;-</span> <span class="va">instr</span></span>
-<span><span class="va">plan</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sf_plan.html">sf_plan</a></span><span class="op">(</span><span class="va">instr_cloud</span><span class="op">)</span></span>
+<span><span class="va">plan</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sframe_plan.html">sframe_plan</a></span><span class="op">(</span><span class="va">instr_cloud</span><span class="op">)</span></span>
 <span><span class="va">plan</span><span class="op">[[</span><span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">vapply</a></span><span class="op">(</span><span class="va">plan</span>, <span class="va">`[[`</span>, <span class="st">""</span>, <span class="st">"id"</span><span class="op">)</span> <span class="op">==</span> <span class="st">"RQ5"</span><span class="op">)</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">options</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>wordcloud <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/sf_plan.html">sf_plan</a></span><span class="op">(</span><span class="va">instr_cloud</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">plan</span></span>
+<span><span class="fu"><a href="../reference/sframe_plan.html">sframe_plan</a></span><span class="op">(</span><span class="va">instr_cloud</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">plan</span></span>
 <span></span>
 <span><span class="va">result_cloud</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/run_analysis_plan.html">run_analysis_plan</a></span><span class="op">(</span><span class="va">responses</span>, <span class="va">instr_cloud</span>, plots <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="va">result_cloud</span><span class="op">[[</span><span class="st">"RQ5"</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">plot</span></span></code></pre></div>
@@ -1521,7 +1522,7 @@ package. It is a descriptive summary ahead of an analysis: feature
 count, sparsity, and the leading features provide a sanity check before
 a heavier method.</p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/sf_plan.html">sf_plan</a></span><span class="op">(</span><span class="va">instr</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="../reference/sf_plan.html">sf_plan</a></span><span class="op">(</span><span class="va">instr</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/sframe_plan.html">sframe_plan</a></span><span class="op">(</span><span class="va">instr</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="../reference/sframe_plan.html">sframe_plan</a></span><span class="op">(</span><span class="va">instr</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>  id <span class="op">=</span> <span class="st">"RQ6"</span>,</span>
 <span>  research_question <span class="op">=</span> <span class="st">"What does the document-feature matrix of the comments look like?"</span>,</span>
 <span>  family <span class="op">=</span> <span class="st">"text"</span>, method <span class="op">=</span> <span class="st">"quanteda_dfm"</span>,</span>
@@ -1611,7 +1612,7 @@ same purpose for <code>topic_model_lda</code>. Both stay in their own
 packages. <code>k</code> selection is a modelling decision for the
 researcher to make and report, not a default to trust unexamined.</p>
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/sf_plan.html">sf_plan</a></span><span class="op">(</span><span class="va">instr</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="../reference/sf_plan.html">sf_plan</a></span><span class="op">(</span><span class="va">instr</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/sframe_plan.html">sframe_plan</a></span><span class="op">(</span><span class="va">instr</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="../reference/sframe_plan.html">sframe_plan</a></span><span class="op">(</span><span class="va">instr</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>  id <span class="op">=</span> <span class="st">"RQ7"</span>,</span>
 <span>  research_question <span class="op">=</span> <span class="st">"What topics organise the open-ended comments?"</span>,</span>
 <span>  family <span class="op">=</span> <span class="st">"text"</span>, method <span class="op">=</span> <span class="st">"stm_topics"</span>,</span>
@@ -1850,13 +1851,13 @@ researcher to make and report, not a default to trust unexamined.</p>
 <div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">results</span><span class="op">[[</span><span class="st">"RQ7"</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">plot</span></span></code></pre></div>
 <p><img src="text-analysis_files/figure-html/stm-plot-1.png" class="r-plt" alt="Faceted bar chart of the top terms for each of the 3 topics." width="672"></p>
-<p><code><a href="../reference/extract_quotes.html">extract_quotes()</a></code> reads the fitted model back off the
-result and returns the most representative response for each topic, with
-the <strong>original</strong> respondent index (not a document or matrix
-row number), so a quote can be traced back to the response that produced
-it.</p>
+<p><code><a href="../reference/sframe_extract_quotes.html">sframe_extract_quotes()</a></code> reads the fitted model back off
+the result and returns the most representative response for each topic,
+with the <strong>original</strong> respondent index (not a document or
+matrix row number), so a quote can be traced back to the response that
+produced it.</p>
 <div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">quotes</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/extract_quotes.html">extract_quotes</a></span><span class="op">(</span><span class="va">results</span><span class="op">[[</span><span class="st">"RQ7"</span><span class="op">]</span><span class="op">]</span>, text <span class="op">=</span> <span class="va">cleaned</span>, n_quotes <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">quotes</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sframe_extract_quotes.html">sframe_extract_quotes</a></span><span class="op">(</span><span class="va">results</span><span class="op">[[</span><span class="st">"RQ7"</span><span class="op">]</span><span class="op">]</span>, text <span class="op">=</span> <span class="va">cleaned</span>, n_quotes <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
 <span><span class="fu">kable</span><span class="op">(</span><span class="va">quotes</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>      caption <span class="op">=</span> <span class="st">"The 2 most representative comments per topic."</span><span class="op">)</span></span></code></pre></div>
 <table class="table">
@@ -1943,8 +1944,8 @@ Manual, inductive coding (code-and-retrieve, memos, a hierarchical code
 scheme, the qcoder or RQDA style of analysis) is a different paradigm
 from the algorithmic methods here, resting on human interpretation where
 these methods count and cluster, and is out of scope by design.
-<code><a href="../reference/extract_quotes.html">extract_quotes()</a></code>’s output is deliberately a plain data
-frame, clean enough to export and take into a dedicated qualitative
+<code><a href="../reference/sframe_extract_quotes.html">sframe_extract_quotes()</a></code>’s output is deliberately a plain
+data frame, clean enough to export and take into a dedicated qualitative
 coding tool for that next step, which surveyframe leaves to the tools
 built for it.</p>
 </div>

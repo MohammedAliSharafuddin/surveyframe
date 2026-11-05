@@ -58,7 +58,7 @@ nothing stops a contributor from reconstructing an instrument and
 writing it fresh instead of calling
 [`amend_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/amend_sframe.md)
 first. Do not describe the hash, the amendment log, or
-[`link_git_commit()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/link_git_commit.md)
+[`link_git_commit()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md)
 in documentation as detecting or preventing undisclosed change beyond
 what they actually do – the hash detects that a file changed; the
 amendment log records a change the researcher chose to disclose. Neither

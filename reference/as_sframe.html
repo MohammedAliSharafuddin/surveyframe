@@ -85,16 +85,31 @@ migration path for code that used the <code>strict = TRUE</code> return of
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
-    <div class="dont-index"><p><code><a href="validate_sframe.html">validate_sframe()</a></code>, <a href="sframe_validation.html">sframe_validation</a></p></div>
+    <div class="dont-index"><p><code><a href="validate_sframe.html">validate_sframe()</a></code>, <a href="sframe_validation.html">sframe_validation</a></p>
+<p>Other Design functions:
+<code><a href="launch_builder.html">launch_builder()</a></code>,
+<code><a href="read_sframe.html">read_sframe()</a></code>,
+<code><a href="sframe_attention_check.html">sframe_attention_check()</a></code>,
+<code><a href="sframe_branch.html">sframe_branch()</a></code>,
+<code><a href="sframe_choice_set.html">sframe_choice_set()</a></code>,
+<code><a href="sframe_conjoint_design.html">sframe_conjoint_design()</a></code>,
+<code><a href="sframe_get_study.html">sframe_get_study()</a></code>,
+<code><a href="sframe_instrument.html">sframe_instrument()</a></code>,
+<code><a href="sframe_item.html">sframe_item()</a></code>,
+<code><a href="sframe_sampling_methods.html">sframe_sampling_methods()</a></code>,
+<code><a href="sframe_scale.html">sframe_scale()</a></code>,
+<code><a href="sframe_validation.html">sframe_validation</a></code>,
+<code><a href="validate_sframe.html">validate_sframe()</a></code>,
+<code><a href="write_sframe.html">write_sframe()</a></code></p></div>
     </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">item</span>  <span class="op">&lt;-</span> <span class="fu"><a href="sf_item.html">sf_item</a></span><span class="op">(</span><span class="st">"q1"</span>, <span class="st">"How satisfied are you?"</span>, type <span class="op">=</span> <span class="st">"text"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">instr</span> <span class="op">&lt;-</span> <span class="fu"><a href="sf_instrument.html">sf_instrument</a></span><span class="op">(</span><span class="st">"Demo"</span>, components <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">item</span><span class="op">)</span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">item</span>  <span class="op">&lt;-</span> <span class="fu"><a href="sframe_item.html">sframe_item</a></span><span class="op">(</span><span class="st">"q1"</span>, <span class="st">"How satisfied are you?"</span>, type <span class="op">=</span> <span class="st">"text"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">instr</span> <span class="op">&lt;-</span> <span class="fu"><a href="sframe_instrument.html">sframe_instrument</a></span><span class="op">(</span><span class="st">"Demo"</span>, components <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">item</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">validated</span> <span class="op">&lt;-</span> <span class="fu">as_sframe</span><span class="op">(</span><span class="fu"><a href="validate_sframe.html">validate_sframe</a></span><span class="op">(</span><span class="va">instr</span>, strict <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Logic.html" class="external-link">isTRUE</a></span><span class="op">(</span><span class="fu"><a href="sf_meta.html">sf_meta</a></span><span class="op">(</span><span class="va">validated</span><span class="op">)</span><span class="op">$</span><span class="va">validated</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Logic.html" class="external-link">isTRUE</a></span><span class="op">(</span><span class="fu"><a href="sframe_meta.html">sframe_meta</a></span><span class="op">(</span><span class="va">validated</span><span class="op">)</span><span class="op">$</span><span class="va">validated</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] TRUE</span>
 </code></pre></div>
     </div>

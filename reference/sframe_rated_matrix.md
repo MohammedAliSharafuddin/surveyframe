@@ -44,15 +44,23 @@ A list with `matrix` (alternatives x criteria, with dimnames), `n`,
 
 [`sframe_collected_weights()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_collected_weights.md)
 
+Other Decision analysis functions:
+[`sframe_aggregate_judgements()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_aggregate_judgements.md),
+[`sframe_assemble_pairwise()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_assemble_pairwise.md),
+[`sframe_collected_weights()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_collected_weights.md),
+[`sframe_decision_options()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_decision_options.md),
+[`sframe_dematel_compute()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_dematel_compute.md),
+[`sframe_sensitivity_analysis()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_sensitivity_analysis.md)
+
 ## Examples
 
 ``` r
-q5    <- sf_choices("q5", 1:5,
+q5    <- sframe_choice_set("q5", 1:5,
            c("Very poor", "Poor", "Fair", "Good", "Excellent"))
-price <- sf_item("rate_price", "Rate each supplier: value",
+price <- sframe_item("rate_price", "Rate each supplier: value",
                  type = "matrix", matrix_items = c("Alpha", "Basilica"),
                  choice_set = "q5")
-study <- sf_instrument("Supplier selection", components = list(q5, price))
+study <- sframe_instrument("Supplier selection", components = list(q5, price))
 responses <- data.frame(rate_price__Alpha = c(3, 4), rate_price__Basilica = c(5, 5))
 rm <- sframe_rated_matrix(responses, study, "rate_price")
 rm$matrix

@@ -19,7 +19,7 @@ sframe_demo_qmd(name, dir = ".", overwrite = FALSE)
 - name:
 
   Character. A demo name, as listed by
-  [`sframe_demos()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_demos.md).
+  [`sframe_list_demos()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_list_demos.md).
 
 - dir:
 
@@ -36,13 +36,17 @@ The path written, invisibly.
 ## See also
 
 [`sframe_demo()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_demo.md),
-[`sframe_demos()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_demos.md)
+[`sframe_list_demos()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_list_demos.md)
+
+Other Demo functions:
+[`sframe_demo()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_demo.md),
+[`sframe_list_demos()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_list_demos.md)
 
 ## Examples
 
 ``` r
 out <- sframe_demo_qmd("two_group", dir = tempdir())
-#> Notebook written to: /tmp/RtmpMjSSLY/two_group.qmd
+#> Notebook written to: /tmp/RtmpbhdiJG/two_group.qmd
 basename(out)
 #> [1] "two_group.qmd"
 ```

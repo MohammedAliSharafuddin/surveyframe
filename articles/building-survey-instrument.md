@@ -14,14 +14,14 @@ through `choice_set`.
 
 ``` r
 
-likert5 <- sf_choices(
+likert5 <- sframe_choice_set(
   "likert5",
   values = 1:5,
   labels = c("Strongly disagree", "Disagree",
              "Neither agree nor disagree", "Agree", "Strongly agree")
 )
 
-visitor <- sf_choices("visitor", c("first_time", "repeat"),
+visitor <- sframe_choice_set("visitor", c("first_time", "repeat"),
                       c("First-time visitor", "Repeat visitor"))
 ```
 
@@ -35,37 +35,37 @@ satisfaction (TS).
 
 ``` r
 
-intro <- sf_item(
+intro <- sframe_item(
   "intro", "About your trip",
   type          = "section_break",
   section_intro = "Please rate your experience of digital booking and your visit."
 )
 
-dmpv_1 <- sf_item("dmpv_1", "The destination's online content was trustworthy.",
+dmpv_1 <- sframe_item("dmpv_1", "The destination's online content was trustworthy.",
   type = "likert", required = TRUE, choice_set = "likert5", scale_id = "DMPV")
-dmpv_2 <- sf_item("dmpv_2", "The online information was consistent across platforms.",
+dmpv_2 <- sframe_item("dmpv_2", "The online information was consistent across platforms.",
   type = "likert", required = TRUE, choice_set = "likert5", scale_id = "DMPV")
-dmpv_3 <- sf_item("dmpv_3", "The digital channels offered good value for money.",
+dmpv_3 <- sframe_item("dmpv_3", "The digital channels offered good value for money.",
   type = "likert", required = TRUE, choice_set = "likert5", scale_id = "DMPV")
-dmpv_4 <- sf_item("dmpv_4", "I was aware of the destination through digital channels.",
+dmpv_4 <- sframe_item("dmpv_4", "I was aware of the destination through digital channels.",
   type = "likert", required = TRUE, choice_set = "likert5", scale_id = "DMPV")
 
-ts_1 <- sf_item("ts_1", "The trip met my expectations.",
+ts_1 <- sframe_item("ts_1", "The trip met my expectations.",
   type = "likert", required = TRUE, choice_set = "likert5", scale_id = "TS")
-ts_2 <- sf_item("ts_2", "My overall travel experience was satisfying.",
+ts_2 <- sframe_item("ts_2", "My overall travel experience was satisfying.",
   type = "likert", required = TRUE, choice_set = "likert5", scale_id = "TS")
-ts_3 <- sf_item("ts_3", "I felt comfortable at the destination.",
+ts_3 <- sframe_item("ts_3", "I felt comfortable at the destination.",
   type = "likert", required = TRUE, choice_set = "likert5", scale_id = "TS")
 
-visitor_type <- sf_item("visitor_type", "I am a",
+visitor_type <- sframe_item("visitor_type", "I am a",
   type = "single_choice", required = TRUE, choice_set = "visitor")
 
-repeat_change <- sf_item(
+repeat_change <- sframe_item(
   "repeat_change", "What changed most since your previous visit?",
   type = "textarea", required = FALSE
 )
 
-attention <- sf_item("attention", "For quality control, please select Agree.",
+attention <- sframe_item("attention", "For quality control, please select Agree.",
   type = "single_choice", required = TRUE, choice_set = "likert5")
 ```
 
@@ -76,10 +76,10 @@ items, and the minimum number of valid items needed to compute a score.
 
 ``` r
 
-dmpv <- sf_scale("DMPV", "Digital marketing perceived value",
+dmpv <- sframe_scale("DMPV", "Digital marketing perceived value",
   items = c("dmpv_1", "dmpv_2", "dmpv_3", "dmpv_4"), method = "mean", min_valid = 3)
 
-ts <- sf_scale("TS", "Tourist satisfaction",
+ts <- sframe_scale("TS", "Tourist satisfaction",
   items = c("ts_1", "ts_2", "ts_3"), method = "mean", min_valid = 2)
 ```
 
@@ -89,7 +89,7 @@ Checks keep the quality-control logic with the instrument.
 
 ``` r
 
-attention_check <- sf_check(
+attention_check <- sframe_attention_check(
   id = "attention_agree", item_id = "attention", type = "attention",
   pass_values = 4, fail_action = "flag", label = "Instructional attention check"
 )
@@ -103,7 +103,7 @@ receive different versions of the scale being compared.
 
 ``` r
 
-repeat_branch <- sf_branch(
+repeat_branch <- sframe_branch(
   item_id    = "repeat_change",
   depends_on = "visitor_type",
   operator   = "==",
@@ -133,15 +133,15 @@ analysis_plan <- list(
 
 ## Assemble the instrument
 
-[`sf_instrument()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_instrument.md)
+[`sframe_instrument()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_instrument.md)
 takes the questions through `components` and the research design through
 `analysis_plan` and `models`. The model is added with
-[`add_model()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/add_model.md),
+[`sframe_add_model()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_add_model.md),
 which checks each indicator against the instrument items.
 
 ``` r
 
-instr <- sf_instrument(
+instr <- sframe_instrument(
   title       = "Digital marketing study (teaching slice)",
   version     = "1.0.0",
   description = "A slice of the published Thailand study for teaching the constructors.",
@@ -156,17 +156,17 @@ instr <- sf_instrument(
   analysis_plan = analysis_plan
 )
 
-ts_model <- sf_model(
+ts_model <- sframe_model_spec(
   id    = "ts_cfa",
   label = "Satisfaction measurement model",
   type  = "cfa",
   constructs = list(
-    sf_construct("DMPV", "Perceived value", c("dmpv_1", "dmpv_2", "dmpv_3", "dmpv_4")),
-    sf_construct("TS",   "Tourist satisfaction", c("ts_1", "ts_2", "ts_3"))
+    sframe_construct("DMPV", "Perceived value", c("dmpv_1", "dmpv_2", "dmpv_3", "dmpv_4")),
+    sframe_construct("TS",   "Tourist satisfaction", c("ts_1", "ts_2", "ts_3"))
   )
 )
 
-instr <- add_model(instr, ts_model)
+instr <- sframe_add_model(instr, ts_model)
 ```
 
 ## Validate the instrument
@@ -181,15 +181,15 @@ validate_sframe(instr, strict = FALSE)
 #> <sframe validation>
 #>   Instrument:  Digital marketing study (teaching slice) (1.0.0)
 #>   Status:      valid
-#>   Checks:      29 run, 0 with problems
+#>   Checks:      30 run, 0 with problems
 ```
 
 ``` r
 
 validation <- validate_sframe(instr, strict = FALSE)
-sf_is_valid(validation)
+sframe_is_valid(validation)
 #> [1] TRUE
-sf_problems(validation)
+sframe_problems(validation)
 #> character(0)
 ```
 
@@ -201,7 +201,7 @@ recovers the instrument with its validated stamp set.
 ``` r
 
 instr <- as_sframe(validate_sframe(instr))
-sf_meta(instr)$validated
+sframe_meta(instr)$validated
 #> [1] TRUE
 ```
 
@@ -209,7 +209,7 @@ sf_meta(instr)$validated
 
 An instrument rests on published work: the source of each scale, and the
 method behind each plan block.
-[`sf_reference()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_reference.md)
+[`sframe_reference()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_reference.md)
 records a work as CSL-JSON, the format Zotero, Mendeley and pandoc
 share, and `cited_by` says where the instrument cites it: `"instrument"`
 as a whole, or `"item:<id>"`, `"scale:<id>"`, `"plan:<block id>"` or
@@ -217,7 +217,7 @@ as a whole, or `"item:<id>"`, `"scale:<id>"`, `"plan:<block id>"` or
 
 ``` r
 
-cronbach <- sf_reference(
+cronbach <- sframe_reference(
   id = "cronbach_1951",
   title = "Coefficient alpha and the internal structure of tests",
   author = "Cronbach, L. J.", year = 1951,
@@ -240,10 +240,10 @@ likert <- read_bibtex(text = "@article{likert_1932,
   year    = {1932}, volume = {22}, number = {140}, pages = {1--55}
 }", cited_by = "instrument")
 
-instr <- add_references(instr, cronbach, likert)
-names(sframe_references(instr))
+instr <- sframe_add_references(instr, cronbach, likert)
+names(sframe_get_references(instr))
 #> [1] "cronbach_1951" "likert_1932"
-names(sframe_references(instr, cited_by = "plan:M1"))
+names(sframe_get_references(instr, cited_by = "plan:M1"))
 #> [1] "cronbach_1951"
 ```
 
@@ -280,13 +280,13 @@ write_sframe(instr, path, overwrite = TRUE)
 loaded <- read_sframe(path)
 inherits(loaded, "sframe")
 #> [1] TRUE
-sf_meta(loaded)$title
+sframe_meta(loaded)$title
 #> [1] "Digital marketing study (teaching slice)"
-length(sf_plan(loaded))
+length(sframe_plan(loaded))
 #> [1] 2
 length(loaded$models)
 #> [1] 1
-length(sframe_references(loaded))
+length(sframe_get_references(loaded))
 #> [1] 2
 ```
 
@@ -298,5 +298,5 @@ which saves a `.sframe` file for use in R.
 ``` r
 
 launch_builder()
-launch_builder_demo(open = FALSE)
+launch_builder(demo = "input_types", open = FALSE)
 ```

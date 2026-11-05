@@ -1,7 +1,7 @@
 # Fit a structural topic model (STM) on open-ended text
 
 Cleans the text item via
-[`clean_text_responses()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/clean_text_responses.md),
+[`sframe_clean_text()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_clean_text.md),
 tokenises with
 [`tidytext::unnest_tokens()`](https://juliasilge.github.io/tidytext/reference/unnest_tokens.html)
 (tidyeval column names via
@@ -43,7 +43,7 @@ sframe_run_stm_topics(data, roles, options, instrument)
 - instrument:
 
   Optional `sframe` instrument, passed to
-  [`clean_text_responses()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/clean_text_responses.md)
+  [`sframe_clean_text()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_clean_text.md)
   for item-type validation.
 
 ## Value
@@ -53,6 +53,6 @@ A runner-contract result list: `test = "stm_topics"`, `table`
 document weight, beta its per-term probability, both from the fitted
 `stm` object), `fit` (a runtime-only list holding the `stm` model object
 and the document-to-respondent mapping needed by
-[`extract_quotes()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/extract_quotes.md)),
+[`sframe_extract_quotes()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_extract_quotes.md)),
 `apa`, `prompt`. On failure:
 `list(test = "stm_topics", error = <message>)`.

@@ -12,6 +12,14 @@ serialised by a host.
 
 ### What you need to change
 
+- **11 helpers for SurveyStudio and the report template are internal.**
+  `sframe_plot_item_chart()`, `sframe_plot_scale_chart()`,
+  `sframe_draw_likert_diverging()`, `sframe_draw_mosaic()`,
+  `sframe_likert_scale_groups()`, `sframe_codebook_items_display()`, the
+  3 `sframe_builder_*()` state helpers, `sframe_result_supplement()` and
+  `sframe_demo_branding()` were exported only because Studio and the
+  template ran outside the package. `sframe_demo(name, branded = TRUE)`
+  applies the demo branding.
 - **`write_sframe(new_instrument = TRUE)` needs a new title or version**
   on an instrument read with
   [`read_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_sframe.md).
@@ -41,6 +49,14 @@ serialised by a host.
   refuses any entry appended to the log of an unverified read. Restore
   the original file, or write the content as a new instrument with
   `new_instrument = TRUE`.
+- **A change to how a scale is scored is a design-tier amendment.**
+  Dropping an item from a scale, reverse keying one, or changing its
+  weights, method or minimum answered changes every score the plan
+  analyses, so
+  [`amend_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/amend_sframe.md)
+  now treats it as it treats a plan or model change: it needs a
+  `deviation_report` and cannot be recorded as `"pipeline"`. A scale’s
+  label alone stays a pipeline change.
 - **A frequency table now shows choice labels, with the code in its own
   column.** The table’s columns are `Value` (the label), `Code`,
   `Frequency` and `Percent`. Code reading `Value` for the stored code
@@ -56,7 +72,7 @@ serialised by a host.
   topic model, now sit in an attribute for the current R session, which
   `toJSON()` leaves out. Code reading `result$report_obj` or
   `result$fit$model` should stop doing so:
-  [`extract_quotes()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/extract_quotes.md)
+  [`extract_quotes()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md)
   finds the model itself, and the charts
   `run_analysis_plan(plots = TRUE)` draws are unchanged. The KMO and
   parallel-analysis parts of an EFA readiness result are now plain lists
@@ -71,11 +87,203 @@ serialised by a host.
   verifies, and an amendment log recorded with `[]` still matches its
   content, so such a file takes further amendments as before.
 
+### One prefix for every function, and the old names still work
+
+- **Old names keep working, silently.** Set
+  `options(surveyframe.warn_superseded = TRUE)` to get 1 warning per old
+  name per session, naming its replacement, so a script or a host can
+  find every old call before the old names start warning by default.
+
+- **Every exported function takes the `sframe_` prefix or a stage
+  verb.** The stage verbs keep their names
+  ([`read_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_sframe.md),
+  [`write_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/write_sframe.md),
+  [`validate_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/validate_sframe.md),
+  [`amend_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/amend_sframe.md),
+  [`read_responses()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_responses.md),
+  [`score_scales()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/score_scales.md),
+  [`run_analysis_plan()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/run_analysis_plan.md),
+  [`render_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_report.md),
+  [`launch_builder()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/launch_builder.md)
+  and
+  [`launch_studio()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/launch_studio.md)),
+  and 3 change:
+  [`run_survey()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/run_survey.md),
+  [`export_survey()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/export_survey.md)
+  and
+  [`export_responses()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/export_responses.md).
+  The 7 listers 1 letter from a maker become `sframe_get_*()`, so
+  [`sframe_get_items()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_get_items.md)
+  lists what
+  [`sframe_item()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_item.md)
+  makes. Functions that return results and write no file end in
+  `_results`, and the syntax generators start `sframe_syntax_`.
+  [`cfa_syntax()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md)
+  and
+  [`cfa_lavaan_syntax()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md)
+  become 1 function,
+  [`sframe_syntax_cfa()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_syntax_cfa.md).
+  The R code SurveyStudio, the report template and
+  [`sframe_syntax_result()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_syntax_result.md)
+  write uses the new names.
+  [`?superseded`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md)
+  lists the old names:
+
+  | Old name | New name |
+  |----|----|
+  | [`sf_instrument()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md) | [`sframe_instrument()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_instrument.md) |
+  | [`sf_item()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md) | [`sframe_item()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_item.md) |
+  | [`sf_choices()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md) | [`sframe_choice_set()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_choice_set.md) |
+  | [`sf_scale()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md) | [`sframe_scale()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_scale.md) |
+  | [`sf_branch()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md) | [`sframe_branch()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_branch.md) |
+  | [`sf_check()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md) | [`sframe_attention_check()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_attention_check.md) |
+  | [`sf_conjoint_design()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md) | [`sframe_conjoint_design()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_conjoint_design.md) |
+  | [`sf_construct()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md) | [`sframe_construct()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_construct.md) |
+  | [`sf_path()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md) | [`sframe_path()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_path.md) |
+  | [`sf_covariance()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md) | [`sframe_covariance()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_covariance.md) |
+  | [`sf_indirect()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md) | [`sframe_indirect_effect()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_indirect_effect.md) |
+  | [`sf_model()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md) | [`sframe_model_spec()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_model_spec.md) |
+  | [`add_model()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md) | [`sframe_add_model()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_add_model.md) |
+  | [`validate_model()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md) | [`sframe_validate_model()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_validate_model.md) |
+  | [`model_json()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md) | [`sframe_model_json()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_model_json.md) |
+  | [`model_report_template()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md) | [`sframe_model_outline()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_model_outline.md) |
+  | [`sf_items()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md) | [`sframe_get_items()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_get_items.md) |
+  | [`sf_scales()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md) | [`sframe_get_scales()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_get_scales.md) |
+  | [`sf_checks()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md) | [`sframe_get_attention_checks()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_get_attention_checks.md) |
+  | [`sf_models()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md) | [`sframe_get_models()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_get_models.md) |
+  | [`sf_branches()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md) | [`sframe_get_branches()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_get_branches.md) |
+  | [`sf_choice_sets()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md) | [`sframe_get_choice_sets()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_get_choice_sets.md) |
+  | [`sf_meta()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md) | [`sframe_meta()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_meta.md) |
+  | [`sf_plan()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md) | [`sframe_plan()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_plan.md) |
+  | [`sf_id()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md) | [`sframe_id()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_id.md) |
+  | [`sf_label()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md) | [`sframe_label()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_label.md) |
+  | [`sf_apa()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md) | [`sframe_apa()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_apa.md) |
+  | [`sf_flagged()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md) | [`sframe_flagged()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_flagged.md) |
+  | [`sf_problems()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md) | [`sframe_problems()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_problems.md) |
+  | [`sf_is_valid()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md) | [`sframe_is_valid()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_is_valid.md) |
+  | [`sf_object()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md) | [`sframe_object()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_object.md) |
+  | [`sf_missing_columns()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md) | [`sframe_missing_columns()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_missing_columns.md) |
+  | [`sample_size_plan()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md) | [`sframe_sample_size_plan()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_sample_size_plan.md) |
+  | [`sf_reference()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md) | [`sframe_reference()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_reference.md) |
+  | [`add_references()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md) | [`sframe_add_references()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_add_references.md) |
+  | [`sframe_references()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md) | [`sframe_get_references()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_get_references.md) |
+  | [`link_git_commit()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md) | [`sframe_link_git_commit()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_link_git_commit.md) |
+  | [`amendment_log()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md) | [`sframe_get_amendments()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_get_amendments.md) |
+  | [`render_survey()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md) | [`run_survey()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/run_survey.md) |
+  | [`export_static_survey()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md) | [`export_survey()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/export_survey.md) |
+  | [`survey_module_ui()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md) | [`sframe_survey_ui()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_survey_ui.md) |
+  | [`survey_module_server()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md) | [`sframe_survey_server()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_survey_server.md) |
+  | [`sframe_export_labelled()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md) | [`export_responses()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/export_responses.md) |
+  | [`quality_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md) | [`sframe_quality_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_quality_results.md) |
+  | [`missing_data_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md) | [`sframe_missing_data_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_missing_data_results.md) |
+  | [`outlier_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md) | [`sframe_outlier_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_outlier_results.md) |
+  | [`reliability_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md) | [`sframe_reliability_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_reliability_results.md) |
+  | [`item_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md) | [`sframe_item_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_item_results.md) |
+  | [`efa_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md) | [`sframe_efa_readiness_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_efa_readiness_results.md) |
+  | [`efa_solution()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md) | [`sframe_efa_solution()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_efa_solution.md) |
+  | [`validity_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md) | [`sframe_validity_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_validity_results.md) |
+  | [`descriptives_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md) | [`sframe_descriptives_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_descriptives_results.md) |
+  | [`assumption_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md) | [`sframe_assumption_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_assumption_results.md) |
+  | [`posthoc_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md) | [`sframe_posthoc_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_posthoc_results.md) |
+  | [`bootstrap_ci()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md) | [`sframe_bootstrap_ci()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_bootstrap_ci.md) |
+  | [`cohens_d_ci()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md) | [`sframe_cohens_d_ci()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_cohens_d_ci.md) |
+  | [`cramers_v_ci()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md) | [`sframe_cramers_v_ci()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_cramers_v_ci.md) |
+  | [`eta_sq_ci()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md) | [`sframe_eta_sq_ci()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_eta_sq_ci.md) |
+  | [`cfa_lavaan_syntax()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md) | [`sframe_syntax_cfa()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_syntax_cfa.md) |
+  | [`cfa_syntax()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md) | [`sframe_syntax_cfa()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_syntax_cfa.md) |
+  | [`sem_lavaan_syntax()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md) | [`sframe_syntax_sem()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_syntax_sem.md) |
+  | [`seminr_syntax()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md) | [`sframe_syntax_pls()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_syntax_pls.md) |
+  | [`efa_syntax()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md) | [`sframe_syntax_efa()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_syntax_efa.md) |
+  | [`analysis_syntax()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md) | [`sframe_syntax_result()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_syntax_result.md) |
+  | [`clean_text_responses()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md) | [`sframe_clean_text()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_clean_text.md) |
+  | [`term_frequency()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md) | [`sframe_term_frequency()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_term_frequency.md) |
+  | [`ngram_frequency()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md) | [`sframe_ngram_frequency()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_ngram_frequency.md) |
+  | [`term_context()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md) | [`sframe_term_context()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_term_context.md) |
+  | [`extract_quotes()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md) | [`sframe_extract_quotes()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_extract_quotes.md) |
+  | [`sensitivity_analysis()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md) | [`sframe_sensitivity_analysis()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_sensitivity_analysis.md) |
+  | [`render_result()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md) | [`sframe_format_result()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_format_result.md) |
+  | [`codebook_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md) | [`sframe_codebook()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_codebook.md) |
+  | [`sframe_demos()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md) | [`sframe_list_demos()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_list_demos.md) |
+  | `sf_plan(x) <- value` | `sframe_plan(x) <- value` |
+
+- **The 2 larger demo datasets load through
+  [`sframe_demo()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_demo.md).**
+  `sframe_demo("tourism_services")` replaces
+  [`sframe_demo_data()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md),
+  and `sframe_demo("input_types")` replaces
+  [`sframe_input_types_demo_data()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md),
+  with the same fields and the same reading of `submitted_at`.
+  [`sframe_list_demos()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_list_demos.md)
+  lists them last, with focus `"reference"`, apart from the 22 teaching
+  demos. The old names still work.
+
+- **`launch_builder(demo =)` opens SurveyBuilder with any demo
+  preloaded.** It replaces
+  [`launch_builder_demo()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md),
+  which loaded only the input-types demo.
+  [`launch_builder()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/launch_builder.md)
+  now always returns the path of the page it opens, and the old name
+  still returns its list.
+
+- **`launch_studio(demo =)` opens SurveyStudio with any demo loaded.**
+  It replaces
+  [`launch_studio_demo()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md),
+  which loaded only the input-types demo. `demo` cannot be combined with
+  `instrument` or `responses`.
+
+- **[`preview_survey()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/preview_survey.md)
+  is the Preview stage verb.** `preview_survey(x)` shows a survey as a
+  respondent meets it, with the collector removed, in the browser or on
+  SurveyStudio’s preview screen. `x` is an instrument or a demo name, so
+  it previews your own survey as well as a demo. It replaces
+  [`preview_demo()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md),
+  which still works and still defaults to `"two_group"`.
+
+- **Help is organised by stage.** The reference index runs Design, Plan,
+  Preview, Collect, Responses, Analyse, Report, References and
+  Amendments, each saying where the stage lives in SurveyStudio or
+  SurveyBuilder and which function does it in code, then the toolboxes.
+  [`?surveyframe`](https://mohammedalisharafuddin.github.io/surveyframe/reference/surveyframe-package.md)
+  opens with “Start here” and the same stages, and every help page ends
+  with links to the rest of its section.
+
+- **Proportion columns end in `_prop`.**
+  [`sframe_item_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_item_results.md)
+  reports `floor_prop` and `ceiling_prop`, and
+  [`sframe_missing_data_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_missing_data_results.md)
+  reports `missing_prop`, since each holds a proportion between 0 and 1.
+  The `_pct` columns stay as copies for 1 release, and tables show the
+  `_prop` column alone. The demo results files use the new names.
+
 ### References, cited where they are used and listed once at the end
 
-An instrument can now carry the works it draws on, and every report
-lists them once, in a References section at the end, in a standard
-bibliography style.
+- **5 reference styles by name.** `render_report(csl = )` takes `"apa"`
+  (the default), `"chicago-author-date"`, `"harvard"`, `"ieee"` or
+  `"mla"`, bundled with the package under CC BY-SA 3.0 (see
+  `inst/COPYRIGHTS`), or the path to a `.csl` file. No style is fetched
+  from the network. The results record and the manifest give the style’s
+  name and sha256, and a `.qmd` report folder holds the style as
+  `<name>.csl`, so a rerun formats with that copy. An unknown name stops
+  with the list of the 5. The built-in page stays APA 7 only and says
+  so.
+
+- **A report cites each source where it is used, in both engines.**
+  Under the title for the instrument, in the codebook for an item or a
+  scale, under the reliability table for a scale, in a plan block’s
+  section, beside the hypotheses they support, and in the model
+  appendix, as well as once in the References list. The built-in page
+  cited only what its text named.
+
+- **Hypotheses and the study can cite sources.** `cited_by` takes
+  `"hypothesis:<block id>"`, the hypotheses a plan block declares, and
+  `"study"`, the study’s problem, objectives and sampling.
+  [`validate_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/validate_sframe.md)
+  reports a hypothesis target whose block is missing or declares no
+  hypotheses, and a `study` target on an instrument with no study. The
+  sframe-schema pattern for `cited_by` needs the same 2 targets. An
+  instrument can now carry the works it draws on, and every report lists
+  them once, in a References section at the end, in a standard
+  bibliography style.
 
 - **The built-in report engine cites and lists references.** Without
   Quarto,
@@ -86,25 +294,28 @@ bibliography style.
   reports, web pages and software. An entry of another type shows a
   visible note, and a `csl` other than APA 7 gets a message that this
   engine formats APA 7 only (D8, CX-10).
-- **[`sf_reference()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_reference.md)**
+
+- **[`sf_reference()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md)**
   creates a reference as a CSL-JSON record, the format Zotero, Mendeley
   and pandoc share.
   **[`read_bibtex()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_bibtex.md)**
   reads BibTeX, as exported by Google Scholar, Zotero, Mendeley and most
   journal pages, using base R alone.
-  **[`add_references()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/add_references.md)**
+  **[`add_references()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md)**
   attaches references to an instrument, and
   `sf_instrument(components = )` takes them too.
-  **[`sframe_references()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_references.md)**
+  **[`sframe_references()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md)**
   lists them, and
   **[`sframe_bibliography()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_bibliography.md)**
   writes the CSL-JSON a citation processor reads.
+
 - **Each reference says where it is cited**: the instrument as a whole,
   an item, a scale, a plan block or a model, in its `cited_by` field.
   [`validate_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/validate_sframe.md)
   gains a `references` check that every target exists and every key is
   unique. A work in another language can carry `language`, which keeps a
   style from title-casing its journal name.
+
 - **[`render_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_report.md)
   cites in text and lists each work once, at the end.** Each result used
   to carry its own reference list, so the same works repeated through
@@ -116,31 +327,66 @@ bibliography style.
   `references =` argument adds works a host cites in the write-up.
   [`render_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_results.md)
   lists its references once at the end in the same way.
+
 - **The 30 built-in method references are also held as CSL-JSON.** A
   test formats each one through pandoc in APA 7 and compares it with the
   APA text the package already shipped, which holds the 2 forms
   together.
+
 - The building-survey-instrument vignette has a section on citing
   sources:
-  [`sf_reference()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_reference.md),
+  [`sf_reference()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md),
   [`read_bibtex()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_bibtex.md),
   where a work is cited, and what
   [`render_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_report.md)
   does with the list.
+
 - **SurveyBuilder has a References tab in Survey settings.** Paste
   BibTeX or type a reference in, and choose where the instrument cites
   it. Changes apply at once, ahead of Save settings.
+
+- **SurveyBuilder cites a reference from the study and from a plan
+  block’s hypotheses**, as the `cited_by` targets `study` and
+  `hypothesis:<block id>`. Each is offered only while it is there: the
+  study once it is declared, and a block’s hypotheses while it states 1.
+  A target cited and no longer there still shows, ticked, so it can be
+  taken off.
+
+- **SurveyBuilder has a citation picker on the plan fields.** Type `@`
+  or `/cite` in a research question, a hypothesis, a decision rule or an
+  interpretation, or press Cite on its format toolbar, to list the
+  instrument’s references by key, author, year and title, filtered as
+  you type. A pick asks for “Max (2000)”, written `@key`, or “(Max,
+  2000)”, written `[@key]`, and inside an open `[...]` adds
+  `; `[`@key`](https://github.com/key). A key with no reference is shown
+  under the field with “No reference with this key. Add it under
+  References.”, and “Manage references” opens that tab. The picker is 1
+  file, `field_tools.js`, which SurveyStudio will share.
+
+- **SurveyBuilder’s long text fields have a format toolbar.** It appears
+  while a research question, hypothesis, decision rule or interpretation
+  has focus, with bold, italic, bulleted and numbered lists, link, cite,
+  subscript, superscript and equation. Each writes Markdown around the
+  selection (`**x**`, `*x*`, `-`, `1.`, `[x](url)`, `[@key]`, `~x~`,
+  `^x^`, `$x$`, or `$$` on lines of their own for a display equation),
+  and the `.sframe` file stores the text as typed. A preview line under
+  the field shows it formatted, with an equation as its TeX. Ctrl+B and
+  Ctrl+I work in the field, arrow keys move along the toolbar, and
+  Escape returns to the field. The toolbar is part of `field_tools.js`.
+
 - **[`read_bibtex()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_bibtex.md)
   reads entries written with parentheses.** BibTeX allows
   `@article(key, ...)` as well as `@article{key, ...}`, and a file may
   mix the
+
   2.  A closing bracket inside a braced or quoted value ended a
       parenthesised entry early.
+
 - **[`read_bibtex()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_bibtex.md)
   refuses a key used by more than 1 entry.** The later entry replaced
   the earlier without a word. It is now an error naming every repeated
   key, as
-  [`add_references()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/add_references.md)
+  [`add_references()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md)
   does for an id the instrument holds.
 
 #### The file format
@@ -185,18 +431,235 @@ bibliography style.
   “RQ3 (McNemar test):”. Code that matched the start of an error message
   needs to allow for it.
 
+### The study an instrument serves
+
+- **Text fields may hold Markdown and equations.** A research question,
+  H0, H1, decision rule, interpretation, study problem or deviation
+  report may use bold, italic, lists, links, `[@key]` citations,
+  `~sub~`, `^sup^`, footnotes and equations (`$...$`, `$$...$$`, by
+  Pandoc’s rule, so “\$5 and \$10” stays prose). The `.sframe` keeps the
+  text as typed. The Quarto report renders equations as MathML in HTML,
+  so an offline report shows them, and as native equations in Word,
+  OpenDocument and PDF. The built-in page renders the Markdown with
+  commonmark, now in Imports, and prints each equation’s TeX in
+  monospace. Plain prose holding @, \#, \$ or \* prints exactly as
+  typed. Shortcodes, raw blocks, `:::` fences, heading lines, a `---`
+  line and HTML tags print as typed in both engines, R code in a field
+  never runs, and `@word` is a citation only for a known key, so an
+  email address or a handle never becomes a missing citation. A
+  deviation report is formatted below the amendments table.
+- **A tested result with no hypothesis declared is labelled
+  exploratory.** A block whose result gives a p value and that declared
+  no H0 and no H1 prints “Exploratory: no hypothesis declared before the
+  data” before its result, in both engines, and its entry in the results
+  record carries `exploratory: true`. The 2 placeholder sentences
+  earlier interfaces saved count as not declared. Descriptive blocks
+  print nothing extra, and a block with no hypothesis stays valid.
+- **Every report prints the study in its plan section.** The problem
+  statement, its sources, and a table tracing each objective to the
+  research questions that serve it, with “none yet” for an objective no
+  question serves and a note naming any question that serves none, in
+  both engines.
+- **A `study` field holds the problem, the objectives and the sampling
+  plan** (D13).
+  `sframe_instrument(study = list(problem = , objectives = , sampling = ))`:
+  the problem in 1 short paragraph, objectives each with an id such as
+  `O1` and its text, and the sampling plan’s population, method (from
+  [`sframe_sampling_methods()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_sampling_methods.md),
+  which groups the probability and non-probability methods, with
+  `method_other` describing an “other” one) and planned n. A plan block
+  names the objective it serves in `objective`. Read it with
+  [`sframe_get_study()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_get_study.md).
+  It is written only when declared, so an instrument without one hashes
+  as before. It is inside the content hash, never on the respondent’s
+  page, and a change to it after collection is a design amendment.
+  SurveyBuilder and SurveyStudio carry it through a save.
+- **[`validate_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/validate_sframe.md)
+  checks the study and notes the trace.** It refuses a malformed study,
+  an objective id used twice and a plan block naming an objective the
+  study does not declare. It notes, without failing, an objective no
+  research question serves, a research question that names no objective,
+  and a problem over 150 words.
+  [`sframe_notes()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_notes.md)
+  reads the notes, and the diagnostic prints them.
+- **[`validate_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/validate_sframe.md)
+  refuses what the sframe-schema instrument profile refuses in these
+  fields**, so nothing surveyframe writes fails it. A plan block’s
+  `objective` is checked with or without a study: it is `""` or 1
+  objective id such as `O1`, and an id with no study to declare it
+  fails. A hypothesis that is `NA`, written as JSON null, is refused. A
+  study, objectives or sampling that is present and empty is refused,
+  with a message to drop it. A block with no hypotheses stays valid.
+- **The bundled schema documents the study.**
+  `inst/schema/sframe_schema.json` is re-synced from sframe-schema
+  v0.3-draft, whose instrument profile gains `study` (problem,
+  objectives, sampling with `method_other`), the plan block `objective`
+  and the `hypotheses` shape: a text `null`, a text `alternative` or
+  both, or `null`. A reference’s `cited_by` may also name
+  `hypothesis:<block id>` and `study`. No field became required.
+- **SurveyBuilder edits the study in a Study tab of Survey settings**:
+  the problem statement, the objectives with their ids, the population,
+  the sampling method from the fixed list (with a description for Other)
+  and the planned sample size. The study is saved only when one of its
+  fields changes, in the shape
+  [`write_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/write_sframe.md)
+  writes, so a study left alone keeps its content hash. The builder
+  refuses what
+  [`validate_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/validate_sframe.md)
+  refuses, including the removal of an objective a plan block names.
+- **The exported survey honours a choice set’s `randomise`.** It was set
+  in R and the builder, and the page never read it. A single choice,
+  multiple choice or ranking item now shows its options in an order
+  shuffled once per respondent and kept in a draft, and each option
+  still submits its own value (UX-11).
+- **SurveyBuilder works on a narrow screen.** Below 760 px Design shows
+  1 pane at a time, the question list, then the editor with its live
+  preview and a Back control, in the standalone builder and inside
+  SurveyStudio. Preview and Plan take the whole width, and at 390 x 844
+  no page is wider than the viewport (UX-01, UX-08).
+- **SurveyBuilder’s Survey settings sections are a tablist**: buttons
+  with `aria-selected` and `aria-controls`, 1 of them in the Tab order,
+  and the arrow keys, Home and End move between them. They were divs
+  that answered a click alone (UX-15).
+- **SurveyBuilder’s 7 dialogs are labelled modal dialogs** with
+  `aria-modal` and `aria-labelledby`, and their close buttons have a
+  name. Tab stays inside the open dialog, and Escape closes the top one
+  through the same route as its close button, so focus returns to what
+  opened it. Escape used to drop every open dialog at once and leave
+  focus behind (UX-14).
+- **The exported survey honours a choice set’s `allow_other`.** A single
+  or multiple choice item adds “Other, please specify” last, with a text
+  box, and typing in the box chooses it. A single choice submits the
+  code `other` in its column, a multiple choice submits `<id>__other` as
+  1 or 0, and both submit the text in `<id>__other_text`. Other chosen
+  with nothing typed blocks the page. SurveyBuilder turns the option off
+  for an ordered set (UX-11).
+- **The “Other, please specify” columns are known to R.** A choice set
+  with `allow_other` gives a single choice item `<id>__other_text` and a
+  multiple choice item `<id>__other` and `<id>__other_text`, so
+  validation, the Google Sheets header, the Shiny row and the quality
+  report all list them. The Shiny survey fills them as the static survey
+  does, and the text of an Other does not count as a missing answer.
+- **The Shiny survey draws “Other, please specify”** for a choice set
+  with `allow_other`, as the exported survey does: the option last, a
+  text box under it, and typing in the box chooses it.
+  [`run_survey()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/run_survey.md)
+  and
+  [`sframe_survey_server()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_survey_server.md)
+  submit the same columns as the exported survey, and Other chosen with
+  nothing typed stops the page or the submission.
+- **[`read_responses()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_responses.md)
+  reads an Other answer.** A single choice item whose set allows Other
+  accepts the code `other`, and its column stays text whatever the set’s
+  codes look like, since a numeric set with Other would otherwise turn
+  on whether anyone chose Other. Every `<id>__other_text` column is read
+  as text, and `<id>__other` as a number like the other option columns.
+- **`allow_other` is refused where it cannot work.**
+  [`sframe_choice_set()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_choice_set.md)
+  and
+  [`validate_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/validate_sframe.md)
+  refuse it on a set holding the value `other` or `other_text`, which
+  would share a code or a column with Other, and on an ordered set,
+  where Other has no place on the scale.
+- **The codebook, the frequency tables and the report charts name
+  Other.** The choices table of
+  [`sframe_codebook()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_codebook.md)
+  and [`as.data.frame()`](https://rdrr.io/r/base/as.data.frame.html)
+  lists `other` with the label “Other” for a set with `allow_other`, and
+  a frequency table or chart shows “Other” for the code. The text typed
+  for Other goes to the text-analysis path:
+  [`sframe_clean_text()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_clean_text.md)
+  and the text plans take `<id>__other_text` as a text item, and the
+  dashboard offers no filter on it.
+- **SurveyBuilder’s welcome and thank-you pages are entries in the
+  question list**, “Welcome page” first and “Thank-you page” last.
+  Selecting one opens its editor on the right and its preview in the
+  centre, and the Survey settings dialog loses its Welcome and Thank You
+  tabs (UX-10). A page left alone keeps the content hash. Inside
+  SurveyStudio, the dialog’s Google Sheets and References tabs link to
+  Studio’s Collect and References screens, and the standalone builder
+  keeps both tabs.
+- **SurveyBuilder shows the selected question in its centre pane** as a
+  respondent sees it, drawn by the survey template itself through a
+  preview-only “show only this item” mode, so there is 1 renderer. It is
+  redrawn a moment after each edit, has a desktop and a mobile width,
+  and is read-only: the editor stays on the right (UX-09). Section
+  breaks and text blocks show as on their page.
+- **SurveyBuilder’s Plan tabs are “Declared analyses” and “Expected
+  outputs”**, where they were “Run preview” and “Report outline”, so
+  Preview in the builder means the respondent’s survey alone (UX-17).
+- **SurveyBuilder sets a cross-tab’s percentages.** A cross-tab or
+  chi-square plan has a “Percentages in the table” choice: counts only,
+  row, column or percent of the total, saved as `options$percent`
+  (UX-02).
+- **SurveyBuilder drops an empty study on save.** A file holding
+  `"study": {}` was saved with [`{}`](https://rdrr.io/r/base/Paren.html)
+  again, which
+  [`validate_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/validate_sframe.md)
+  and the sframe-schema profile refuse. Empty objectives and an empty
+  sampling plan are left out the same way, as
+  [`write_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/write_sframe.md)
+  does.
+- **SurveyBuilder keeps the objective a plan block serves.** Saving the
+  plan dialog built the block afresh, so any edit there dropped an
+  `objective` set in R. The dialog now has an “Objective served” choice
+  listing the study’s objectives, and keeps the block’s own objective
+  even when the study no longer declares it.
+
+### Amendments and versions
+
+- **`amend_sframe(version = )` sets the version an amendment writes.**
+  `NULL`, the default, keeps the version, and when it is unchanged a
+  message suggests the next: the minor number for a design amendment
+  (1.0.0 to 1.1.0), the patch number for a pipeline amendment (1.0.0 to
+  1.0.1), with the reason. The version set is inside the recorded
+  content.
+- **`sframe_drop_items(instrument, items, from)` drops items from scales
+  or models.** It takes them out of the named scales (with their reverse
+  keys and weights) or every construct of a named model, and out of any
+  plan block role that lists them with other variables. A role naming
+  only that item keeps it. The questions and their answers stay, and
+  nothing is recorded:
+  [`amend_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/amend_sframe.md)
+  records the drop as a design amendment.
+- **`sframe_item_flags(result)` lists the items past the usual
+  cut-offs.** For a reliability, item, EFA readiness, EFA or validity
+  result, a plan result for one of them, a lavaan CFA or a seminr PLS
+  model, it gives each statistic, its cut-off and source in APA 7 form,
+  and a ready reason such as “org_4: loading .21 in RQ3, below .40”. EFA
+  low loading and cross-loading are 2 reasons, alpha if deleted asks for
+  the item-total correlation and wording to be checked, HTMT takes .85
+  or .90 and keeps the value applied, and PLS keeps .708. Checked
+  against psych, lavaan and seminr. A reliability result now carries
+  `alpha_if_deleted` for each item.
+- **The report gives the instrument version and its amendment list.**
+  Under Reproducibility, both engines print the version beside the hash,
+  then every recorded amendment, oldest first: date, tier, reason, what
+  changed, deviation report, author and sign-off. An instrument with no
+  log says “No amendments are recorded.”
+
 ### Analysis
+
+- **Cross-tab percentages and totals.** A `crosstab` or `chi_square`
+  result carries `$totals`, the counts with a Total row and column. With
+  `options$percent = "row"`, `"column"` or `"total"` it also carries
+  `$percent_table`, the percentages over that denominator, the report
+  shows each count with its percentage beside it, and
+  `sframe_plot_crosstab()` draws the percentages. Checked against
+  [`prop.table()`](https://rdrr.io/r/base/proportions.html) and
+  [`addmargins()`](https://rdrr.io/r/stats/addmargins.html) on 3 demo
+  pairs, a zero cell among them.
 
 - **Multinomial logistic regression has a full table.** It gives b, SE,
   z, p, the odds ratio and its 95% interval for each outcome category
   against a named reference category, and the result text names the
   reference.
-  [`render_result()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_result.md)
+  [`render_result()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md)
   also returns a result’s `syntax` where it has one. The logistic demo
   results are regenerated (CX-14).
 
 - **Model outlines give the notes for their own model type.**
-  [`model_report_template()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/model_report_template.md)
+  [`model_report_template()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md)
   gave every model the same notes, asking an EFA for structural paths
   and a PLS-SEM model for fit indices. EFA, CFA, CB-SEM and PLS-SEM now
   each get their own list. PLS-SEM follows Hair, Hult, Ringle, Sarstedt,
@@ -206,21 +669,21 @@ bibliography style.
   script’s assessment section follows the same checks.
 
 - **The seminr script tests every declared indirect effect.**
-  [`seminr_syntax()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/seminr_syntax.md)
+  [`seminr_syntax()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md)
   writes one `specific_effect_significance()` call per
-  [`sf_indirect()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_indirect.md),
+  [`sf_indirect()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md),
   as the lavaan syntax already defined each one.
 
 - **EFA reads factor item columns by their labels.**
-  [`efa_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/efa_report.md)
+  [`efa_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md)
   and
-  [`efa_solution()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/efa_solution.md)
+  [`efa_solution()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md)
   read item columns with the same rule as every other numeric method, so
   a factor holding 10 to 50 counts as those values, where its level
   positions had been used (CX-06).
 
 - **Regression syntax codes predictors as the analysis does.** The code
-  [`analysis_syntax()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/analysis_syntax.md)
+  [`analysis_syntax()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md)
   writes for linear, binary, ordinal and multinomial logistic regression
   and ANCOVA codes each predictor the way the package does: a number
   when every value reads as a number, a category otherwise. “1” to “5”
@@ -228,7 +691,7 @@ bibliography style.
   different model. The ordinal, multinomial and ANCOVA runners now code
   predictors and covariates by the same rule, so a text covariate that
   is not a number enters as a category, where it had become missing.
-  [`analysis_syntax()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/analysis_syntax.md)
+  [`analysis_syntax()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md)
   now covers ordinal and multinomial logistic regression.
 
 - **Choice descriptives honour `split_by` and weights.** A descriptives
@@ -254,21 +717,21 @@ bibliography style.
   already did (D1 follow-up).
 
 - **Named weights in
-  [`sensitivity_analysis()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sensitivity_analysis.md)
+  [`sensitivity_analysis()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md)
   match criteria by name.** Named weights are matched to the criteria in
   any order, as the ranking blocks already do, and a name that is not a
   criterion or a criterion with no weight is an error. Unnamed weights
   keep the order of the criteria.
 
 - **Logistic syntax codes the outcome as the analysis does.** The code
-  [`analysis_syntax()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/analysis_syntax.md)
+  [`analysis_syntax()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md)
   writes for a binary logistic regression recodes the outcome to 0 and 1
   the way the runner does before
   [`glm()`](https://rdrr.io/r/stats/glm.html), so a text outcome runs
   and the coefficients match the result.
 
 - **ANCOVA syntax writes every covariate.**
-  [`analysis_syntax()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/analysis_syntax.md)
+  [`analysis_syntax()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md)
   for an ANCOVA wrote only the first declared covariate, so its F
   differed from the result. It now writes each one (CX-02).
 
@@ -279,7 +742,7 @@ bibliography style.
   now signed, first group minus second in the declared order, as the
   paired d_z already was. Size labels read the magnitude, and the APA
   line and prompt name the higher group.
-  [`cohens_d_ci()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/cohens_d_ci.md)
+  [`cohens_d_ci()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md)
   returns the signed interval. The `two_group`, `paired` and
   `small_sample` demo results are regenerated: their r values can print
   with a minus sign, and the `small_sample` r interval now starts at
@@ -290,7 +753,7 @@ bibliography style.
   appearance in the data, so re-sorting the responses flipped the sign
   of t and z. The order is now the grouping item’s choice set as the
   instrument lists it, then factor levels, then sorted values. The code
-  [`analysis_syntax()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/analysis_syntax.md)
+  [`analysis_syntax()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md)
   writes names the same order.
 
 - **A statistic is never replaced by a choice label.** A result table
@@ -306,7 +769,7 @@ bibliography style.
   as the other plan tables have. It showed `valid_n`, `missing_n` and
   `sd`. The group column is left out when there is no split, and the
   weighted mean when there are no weights.
-  [`descriptives_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/descriptives_report.md)
+  [`descriptives_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md)
   keeps its own column names, and the demo reference results keep
   theirs.
 
@@ -367,10 +830,8 @@ bibliography style.
   percentage, and keeps the mean and SD for numeric items. A nominal
   code has no meaningful mean, and a mean gender of 1.59 was being
   reported. The result carries the counts in `$categorical`, the APA
-  line names the items counted, and
-  [`sframe_result_supplement()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_result_supplement.md)
-  returns the counts so both report engines show them beside the numeric
-  table.
+  line names the items counted, and `sframe_result_supplement()` returns
+  the counts so both report engines show them beside the numeric table.
   [`render_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_results.md)
   now shows that second table for every result that has one.
 
@@ -394,6 +855,73 @@ bibliography style.
 
 ### Reports
 
+- **Quarto is the report engine, and
+  [`render_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_report.md)
+  finds the copy RStudio or Positron bundles.** It looked only for
+  `quarto` on the PATH, where neither IDE puts its copy, so a machine
+  with RStudio and no separate Quarto got the built-in page. It now
+  tries, in order, `QUARTO_PATH` (the path of the executable), the PATH,
+  `RSTUDIO_QUARTO`, RStudio’s bundled copy and Positron’s, and uses the
+  first that runs `quarto --version`. The report names the version used
+  and where it was found. Without Quarto the built-in engine writes a
+  short plain results page under the banner “Install Quarto for the full
+  formatted report”, with a link. That page gets no new features and is
+  not promised to match the Quarto report. The Quality summary table and
+  Respondent-wise missingness, which only the built-in page had, are in
+  the Quarto report too.
+
+- **Word, OpenDocument and a Quarto PDF.** `render_report(format =)`
+  takes `"docx"` and `"odt"`, written by Quarto and styled by 2 bundled
+  APA 7 reference documents: Times New Roman 12, double spacing, a
+  half-inch first-line indent, level 1 headings centred and bold.
+  Without Quarto they stop with a message that names it. A PDF now goes
+  through Quarto and LaTeX where a LaTeX engine is found, through the
+  Typst Quarto bundles where none is, and only without Quarto through
+  the built-in page printed by pagedown. The `"converter"` attribute and
+  the manifest name the route. Outside HTML every table is numbered, and
+  its title kept, in each format.
+
+- **The Quarto source of a report, which checks itself.**
+  `render_report(format = "qmd")` writes a folder: `report.qmd`, the
+  `.sframe`, `responses.csv`, the bibliography and its style, the
+  results record and `manifest.json`, with no `_quarto.yml`. Opened in
+  RStudio or Positron, `report.qmd` recomputes every number from the
+  folder’s own files through the new
+  [`sframe_report_source()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_report_source.md),
+  and its Provenance section says “Numbers match the recorded results”
+  or “Numbers differ from the recorded results” with both hashes, and
+  whether `report.qmd` was edited after surveyframe wrote it. Editing
+  stays allowed and is disclosed. The instrument’s text reaches the
+  `.qmd` only as its JSON-quoted title and authors, so a title holding
+  quotes, a colon or a `---` line leaves the front matter whole.
+
+- **Every report has a results record and a manifest beside it.**
+  [`render_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_report.md)
+  writes `<name>_results.json`, the plan results as canonical JSON, and
+  `<name>_manifest.json`, the sha256 of the instrument content, the
+  responses, the results record and the output as generated, with the
+  surveyframe version and the time. The field names follow the SSR 6.0
+  hash manifest. A Provenance section at the top of the report, in both
+  engines and every format, gives the instrument hash and whether
+  [`read_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_sframe.md)
+  verified it, the amendment count, the responses sha256 and the results
+  record’s sha256. An edited copy of a report then no longer matches its
+  recorded hash, while the numbers it presents still verify. The plan
+  runs once per report and feeds both engines and the record.
+
+- **A Quarto report renders offline.** The report theme imported a
+  Google web font the report never used, so every render needed the
+  internet, sent Google a request, and hung with no timeout when the
+  connection stalled. The theme’s web font is off, and a render fetches
+  nothing.
+
+- **One computation feeds both report engines.**
+  [`render_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_report.md)
+  now computes the codebook table, every distribution chart and the plan
+  results inside the package and hands them to the Quarto template,
+  which only prints them. The template used to run the analysis plan and
+  draw the charts itself, so the 2 engines could disagree.
+
 - **A statistic that cannot exceed 1 has no leading zero.** Result text
   and prompts write r, r_s, tau, phi, Cramer’s V, R squared, eta squared
   and their intervals as APA 7 does, `r(58) = .53, 95% CI [.33, .69]`,
@@ -410,7 +938,7 @@ bibliography style.
   [`render_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_report.md),
   [`render_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_results.md)
   and
-  [`render_result()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_result.md)
+  [`render_result()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md)
   alike. The new
   [`sframe_apa_cells()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_apa_cells.md)
   does it (CX-15).
@@ -424,9 +952,9 @@ bibliography style.
   “P”, `t` “T” and `df` “Df”, and
   [`render_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_results.md)
   printed raw names such as `missing_pct`. Symbols are now italic, `r_s`
-  has its subscript, a `_pct` column (a proportion) is headed
-  “(proportion)” and drops its leading zero, and other names read as
-  words, in both report engines (CX-24).
+  has its subscript, a proportion column such as `missing_prop` reads
+  “Missing proportion” and drops its leading zero, and other names read
+  as words, in both report engines (CX-24).
 
 - **Result text counts with real plurals.** “7 power-iteration step(s)”,
   “5 choice column(s)” and the decision methods’ notes and errors now
@@ -442,13 +970,19 @@ bibliography style.
   built-in report,
   [`render_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_results.md)
   and
-  [`render_result()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_result.md)
+  [`render_result()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md)
   number every table and figure in reading order as APA 7 does, with the
   number in bold and an italic title below it. A result’s table and
   chart are titled by the block and its research question instead of
   “Results table”, each chart sits in a figure with a caption, and base
   graphics charts carry real alt text where every one read
   “distribution” (CX-22).
+
+- **The Quarto report numbers its tables and figures too.** Its tables
+  and figures take the same numbers and titles as the built-in report’s,
+  every chart image carries alt text where it had none, and a
+  reliability result no longer prints a second table under the same
+  title (CX-22).
 
 - **The built-in report prints each research question’s hypotheses and
   decision rule before its result.** H0 and H1 print where written, then
@@ -462,7 +996,7 @@ bibliography style.
 
 - **[`render_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_results.md)
   and
-  [`render_result()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_result.md)
+  [`render_result()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md)
   print the same declaration.** H0, H1 and the decision rule print above
   the result, and the interpretation below it under the same label.
   [`render_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_results.md)
@@ -521,7 +1055,7 @@ bibliography style.
   files went.
 
 - **New
-  [`render_result()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_result.md)
+  [`render_result()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md)
   renders one analysis result as the report does**: the formatted table
   with its caption and note, any second table, the APA line, and the
   chart the report picks for that method, with the instrument’s labels,
@@ -584,12 +1118,12 @@ bibliography style.
   and a test that fails says which variable holds no numbers, or that
   too few responses had a value, or else passes on R’s own reason.
 - **A choice set whose codes read as the same number is refused**, by
-  [`sf_choices()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_choices.md)
+  [`sf_choices()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md)
   and by
   [`validate_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/validate_sframe.md).
   Responses to a set whose codes are all numbers are read as numbers, so
   the codes 1 and 1.0, or 2 and 02, became one option, and
-  [`sframe_export_labelled()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_export_labelled.md)
+  [`sframe_export_labelled()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md)
   then failed on duplicate labels.
 
 ### Documentation
@@ -615,12 +1149,12 @@ bibliography style.
 - **Text-coded choices keep their labels in Stata.** Stata attaches
   value labels to numbers alone, so a choice set coded `a` and `b` with
   labels A and B read back from
-  [`sframe_export_labelled()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_export_labelled.md)
+  [`sframe_export_labelled()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md)
   as A = 0 and B = 0. A `.dta` now holds such codes as 1, 2, 3 in the
   set’s order, each with its label. A `.sav` keeps the text codes, which
   SPSS labels directly.
 - **Names and labels fit SPSS and Stata.**
-  [`sframe_export_labelled()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_export_labelled.md)
+  [`sframe_export_labelled()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md)
   failed on matrix row columns such as `session__Opening keynote` and on
   long MCDA pair names, and sent long labels to Stata uncut. Such names
   are now made valid for the format, with a number where 2 would match,
@@ -629,6 +1163,19 @@ bibliography style.
   as `attr(path, "renamed")` (D10, CX-18).
 
 ### The exported survey
+
+- **A shared survey no longer carries the instrument’s references,
+  analysis plan or amendment history, or the answers to its attention
+  checks.**
+  [`export_survey()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/export_survey.md)
+  embedded the whole instrument in the page, so anyone given the link
+  could read the research questions, hypotheses, references, amendment
+  notes and authors from the page source. A bot or a respondent who
+  opened the source could read every check’s passing answer, and which
+  items are reverse-keyed in which scale. The page now carries the
+  title, description, choice sets, branching, the 7 display settings it
+  reads, the item fields it draws and which items are checks.
+  SurveyBuilder’s Preview embeds the same fields.
 
 - **The thank-you screen states delivery, and the message is only
   thanks.** The screen now opens with a status line the package writes,
@@ -642,32 +1189,38 @@ bibliography style.
   feedback was recorded. A preview export keeps the study’s message too,
   so a researcher sees the text respondents will read, under the status
   line that says nothing was sent.
+
 - **The Shiny surveys state delivery on their thank-you screen too.**
-  [`survey_module_server()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/survey_module_server.md)
+  [`survey_module_server()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md)
   said “Your response has been recorded.” and
-  [`render_survey()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_survey.md)
+  [`render_survey()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md)
   said “Submitted successfully” whether or not anything stored the
   answers. A module with no `on_submit`, or
-  [`render_survey()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_survey.md)
+  [`render_survey()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md)
   with `save_responses = "none"`, stores nothing. A status line now says
   what happened: recorded to the CSV, submitted to `on_submit`, or not
   saved. The study’s message sits below it, and the module’s default
   message is “Thank you for participating.”
+
 - **A sending screen while the answers are in flight.** The thank-you
   screen said the response had been recorded while it was still being
   sent.
+
 - **Confirmed delivery for a host.** A page that defines
   `window.sframeSendResponse(row)`, returning a Promise, takes over the
   send. Resolving to `true` or `{confirmed: true}` shows the response as
   recorded, in place of the note that the page cannot confirm storage,
   which every respondent saw, even on a host that confirms.
+
 - `render$thankyou$show_restart = FALSE` hides “Submit another
   response”.
+
 - **Drafts.** `render$save_draft = TRUE` keeps the answers in the
   browser as the respondent goes, so a closed tab can be resumed from
   the welcome screen. The draft is cleared once the response is
   submitted, and kept when delivery fails. SurveyBuilder’s exported
   survey carries the same template.
+
 - **A draft belongs to the whole instrument, and to a given consent.**
   The draft’s key covers the instrument as exported, less its hash, so a
   changed choice set or consent text starts afresh. It covered the
@@ -676,6 +1229,7 @@ bibliography style.
   Otherwise the welcome screen asks for consent first. Drafts held in
   browsers for a survey already in the field are dropped once it is
   exported again with this template.
+
 - **A preview sends nothing to a host either.**
   `export_static_survey(preview = TRUE)` removed the endpoint and the
   redirect, but a page defining `window.sframeSendResponse()` still
@@ -685,7 +1239,7 @@ bibliography style.
 
 ### Charts
 
-- **[`render_result()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_result.md)
+- **[`render_result()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md)
   draws the chart in the palette you ask for.** It used the chart
   attached to the result whatever `palette` said. A palette given
   explicitly now rebuilds the chart with it. Left out, the attached
@@ -714,6 +1268,14 @@ bibliography style.
 
 ### SurveyBuilder
 
+- **One preview.** The builder’s Preview shows the deployable survey,
+  the page `export_survey(preview = TRUE)` writes and SurveyStudio’s
+  Preview Survey screen shows. Answering, required checks and branching
+  run as a respondent sees them, and nothing is collected. The builder
+  drew its own copy of the layout, which ran none of them and could
+  drift from the survey. Its Welcome, Survey and Thank You tabs go,
+  since the survey shows its own welcome and thank-you pages.
+
 - **The Plan editor has fields for the hypotheses.** Methods that test a
   hypothesis show optional “Null hypothesis (H0)” and “Alternative
   hypothesis (H1)” fields, with a method-appropriate example as
@@ -730,14 +1292,28 @@ bibliography style.
   interpretation identical to the rule counts as unwritten, and a file
   holding only `interpretation` still opens with it as the rule.
 
-- **Changed content of an opened file saves only as a new instrument.**
-  The builder checked a file’s hash when it opened and then forgot it,
-  so an edited instrument saved as verified, with no amendment. It now
-  keeps the title, version and content it opened. Saving changed content
-  of a file that had a hash asks for a new version, offering the next
-  one, or cancels. A new instrument needs a new title or version, and
-  the amendment log stays with the original. A file opened without a
-  matching hash asks on every save.
+- **Changed content of an opened file is recorded as an amendment, or
+  saved as a new instrument.** The builder checked a file’s hash when it
+  opened and then forgot it, so an edited instrument saved as verified,
+  with no amendment. It now keeps the title, version and content it
+  opened. Saving changed content of a file that had a hash opens 1
+  dialog: record an amendment (reason, tier, deviation report for a
+  design change, author, second sign-off and the version, with the next
+  one suggested), save as a new instrument (a new title or version, the
+  amendment log staying with the original), or cancel. The entry is
+  built as
+  [`amend_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/amend_sframe.md)
+  builds it, with the same content fingerprints, changed fields and tier
+  rule, so the file reads back in R with its log verified and writes
+  again with no flag. A file opened without a matching hash can only be
+  saved as a new instrument.
+
+- **[`read_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_sframe.md)
+  checks an amendment log against the content.** A file’s hash vouches
+  for the file, not for whether its log describes the content. A log
+  whose entries do not follow one another, or whose last entry ends at a
+  different state, now reads with a warning of class
+  `sframe_amendment_warning`.
 
 - **A choice set can be declared ordered.** `sf_choices(ordered = TRUE)`
   marks options that run in a meaningful order, such as a frequency or
@@ -763,7 +1339,7 @@ bibliography style.
   first variable.
 
 - The sidebar shows the instrument’s title on first load. A title set by
-  [`launch_builder_demo()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/launch_builder_demo.md)
+  [`launch_builder_demo()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md)
   read “Untitled Survey” until the first edit.
 
 - The Outcome and other role dropdowns stay inside the Add or Edit
@@ -812,6 +1388,276 @@ bibliography style.
   reach. The dialog body now shrinks to fit and scrolls.
 
 ### SurveyStudio
+
+- **Responses starts with the Google Sheet**, the planned route: the
+  sheet card comes first with Read from Google Sheet as the screen’s
+  primary action, then the CSV file, then help for files from other
+  tools. Without googlesheets4 the card stays first and says how to
+  install it.
+
+- **1 primary action per screen**, a full-size filled button from 1
+  shared class in `inst/shiny/www/studio-actions.css`: Save to Studio on
+  Design, now first in the builder’s bar, Download survey on Collect,
+  Load responses, Export report beside the Report title, Edit in Design,
+  Add from BibTeX, and the next step on the screens that only show
+  results. Every other action is an outline button or a link, and a
+  disabled primary says why in a visible hint.
+
+- **1 control per destination on each screen.** The Open card no longer
+  links its version label and its status line to Amendments both, and
+  the embedded builder shows none of the Open, Export survey,
+  Build/Plan, Google Sheets or References controls that Studio’s own
+  screens hold.
+
+- **Each screen is 1 panel with its title inside.** The title and its
+  context line, such as Design’s “Editing:
+
+  ()“, are 1 compact row at the top of the screen, in place of a band
+  above its cards.
+
+- **1 Build and Plan control in Studio.** The sidebar’s Design and Plan
+  entries pick the builder’s mode, and the builder inside Studio hides
+  its own Build/Plan switch. The standalone SurveyBuilder keeps it.
+
+- **The sidebar’s groups fold.** Build, Collect, Analyse, Report and
+  Record are buttons that fold their entries, all open at first. Studio
+  remembers each choice in the browser, and the group holding the open
+  screen always stays open, including when a link or the address opens a
+  screen in a folded group.
+
+- **Plain words first** in Studio and SurveyBuilder (UX-18). A label
+  says what a control does, and the technical term follows as help:
+  “Type of change” with the pipeline and design tiers explained, “Where
+  is this source used?” for cited by, “R package that fits the model”
+  for the output engine, “Web app address that receives the responses”
+  for the collector endpoint, “Refuse a file with missing or unexpected
+  columns” for the strict column check, and the manifest described as a
+  list of every file with its checksum.
+
+- **SurveyBuilder’s Open Collect, Open References and Manage references
+  open Studio’s screens** when the builder runs inside Studio. Studio
+  handles the builder’s `goto` message for Collect and References.
+
+- **Studio’s long text fields take SurveyBuilder’s format toolbar**: the
+  Report’s interpretation boxes and the amendment dialog’s deviation
+  report show it on focus and hide it on blur, insert Markdown, and cite
+  through the same picker.
+
+- **Studio fits a phone** (UX-01, UX-08). Below 800 px the sidebar
+  becomes a drawer behind a labelled Menu button, which closes after a
+  choice or on Escape, cards stack, and a wide table or code block
+  scrolls inside its own region. At 390 px the sidebar took 240 px and
+  pages ran to 1233 px.
+
+- **The sidebar is a labelled navigation** (UX-16): a `nav` named
+  “Studio screens”, `aria-current="page"` on the open screen, and a
+  fragment link for each screen, Plan included, so the browser’s Back
+  and Forward move between screens and an address ending `#quality`
+  opens Quality.
+
+- **The Open card’s status says what it means** (UX-12). “Valid” is
+  “Schema valid”, the version and amendment count sit beside the
+  integrity badge and link to Amendments, Draft links to Design, and a
+  failed check names its remedy.
+
+- **A gate replaces the screen it guards** (UX-13). When a screen’s
+  prerequisite is missing, such as an open instrument, its next-stage
+  card takes the place of the screen’s body, so References, Amendments
+  and Report no longer show live editors under it. A gate that only
+  warns, such as Preview’s validation list, leaves the screen shown.
+
+- **References are added in 1 place** (UX-03). The Report screen’s
+  Further references (BibTeX) box is gone. The interpretation boxes take
+  the shared citation picker, which lists the instrument’s references
+  and the built-in method references as you type @, and the Configure
+  tab links to References with “Manage references”. The References
+  screen offers a plan block’s hypotheses and the study as targets once
+  they are written.
+
+- **A Reference style select on the Report screen’s Configure tab**: APA
+  7, Chicago author-date, Harvard, IEEE and MLA, then “Other style (.csl
+  file)”, which shows the upload and a link to zotero.org/styles. The
+  choice reaches `render_report(csl = )`, so the source folder holds the
+  style’s file, such as `harvard.csl`. Without Quarto the select offers
+  APA 7 only and says why. The citation style upload left More options.
+
+- **The Report screen makes 2 products** (UX-20). Export report writes
+  the finished report in HTML or PDF, and in Word or OpenDocument when
+  Quarto is found. Reproduce downloads the reproducible source, the
+  `.qmd` folder of `render_report(format = "qmd")` as 1 zip, for RStudio
+  or Positron. The separate analysis notebook card is gone, and without
+  Quarto the engine line names the remedy instead of offering a third
+  engine.
+
+- **The Report screen has 4 tabs**, Interpret, Configure, Export report
+  and Reproduce, in place of 1 long page of 5 jobs (UX-07). A choice
+  made in 1 tab stays when you switch, the arrow keys move along the
+  tabs, and the `.sframe` download is “Download copy” beside the screen
+  title.
+
+- **Analyse runs the declared plan** (UX-02). It shows the plan
+  read-only, with the method, variables, declared hypotheses and a
+  cross-tab’s percentages, and runs it. Its Plan and Report outline
+  tabs, its plan editor and its model builder are gone: “Change plan”
+  opens Plan, the only plan editor. A plan changed once responses are
+  loaded opens the amendment dialog as a design amendment, with the
+  changed blocks in the deviation report, so the report’s amendment list
+  discloses them.
+
+- **Studio finds Quarto where
+  [`render_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_report.md)
+  does**, including the copy bundled with RStudio or Positron, and its
+  status line gives the version and where it was found, such as “Quarto
+  1.8.24, found on the PATH”. Without Quarto the line names the remedy.
+  It asked `Sys.which("quarto")` and said Quarto was not found where the
+  report would use it.
+
+- **Drop from scale and Put back under a result.** Under a reliability,
+  item, EFA readiness, EFA, CFA or PLS result, each item past the usual
+  cut-offs has “Drop from scale”, which opens the amendment dialog with
+  the reason from
+  [`sframe_item_flags()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_item_flags.md)
+  filled in, records the drop and runs the plan again. An item dropped
+  in the session has “Put back”, a second amendment that restores the
+  item’s place in its scales and models with its reverse key, so the
+  history keeps both. After the file is opened again the item goes back
+  through Design.
+
+- **Quality and Responses record a change to the data.** “Record as
+  amendment” opens the same dialog for a bot removal or a data
+  correction, as a pipeline amendment.
+
+- **The Amendments screen gives the whole history**, oldest first: date,
+  tier, reason, what changed, the deviation report and the content
+  hashes before and after. The status line, the Amendments screen and
+  the Open card give the version and the count, such as “1.1.0, 2
+  amendments”.
+
+- **1 amendment dialog, and “Edit in Design” on Amendments.** A Design
+  save that changes an instrument with a history (read from a file, or
+  amended) opens 1 dialog. It shows what the change touches (the fields,
+  the scales whose scoring changes, the models and plan blocks), the
+  reason, the tier, a deviation report for a design change, and the
+  version suggested for each tier with the reason, then records the
+  amendment with
+  [`amend_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/amend_sframe.md),
+  saves a new instrument, or cancels. The builder gets the recorded log
+  and version back. The Amendments screen says “Edit in Design” in place
+  of “edit it in SurveyBuilder and upload the after file”, and the
+  upload is folded under “Import an externally revised version”, which
+  opens the same dialog. Its own reason and tier form is gone.
+
+- **The sidebar follows the study.** Open Instrument comes first, then 5
+  groups under headings: Build (Design, Plan, Preview), Collect
+  (Collect, Responses), Analyse (Quality, Explore, Reliability,
+  Analyse), Report, and Record (References, Amendments). Plan opens
+  Design with SurveyBuilder in its Plan mode, and Design opens it in
+  Build mode. 6 screens have shorter names: Preview Survey is Preview,
+  Upload Responses is Responses, Quality Dashboard is Quality, Dashboard
+  is Explore, Analysis Plan is Analyse and Export is Report. The screen
+  names `launch_studio(screen =)` takes are unchanged.
+
+- **Studio runs inside the package.**
+  [`launch_studio()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/launch_studio.md)
+  now sources the app into an environment under the surveyframe
+  namespace, as
+  [`launch_dashboard()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md)
+  does, so the app calls internal helpers directly. The 2 helpers copied
+  into the app when the installed Studio failed to start are gone.
+
+- **A screen picked during start-up stays open.** Studio switched to its
+  launch screen after the first page update, so a click made before that
+  was undone. The launch screen now applies only if nothing was picked.
+
+- **The Dashboard screen has filters.** Every text, factor or logical
+  question with 2 to 12 values gets a filter named by its question, with
+  its choice labels, plus a date range on `submitted_at` or
+  `started_at`. The 4 views and the CSV download use the filtered rows,
+  and the Overview shows a “Filtered responses” tile. The Quality screen
+  still describes every response.
+
+- **Studio has a Design screen.** It holds the SurveyBuilder, which
+  opens the instrument Studio has open. Its Save button reads “Save to
+  Studio”, and a save becomes Studio’s open instrument, read and checked
+  as an opened file is. Studio and the builder each take a message only
+  from the other window, on the same origin. With no instrument,
+  [`launch_studio()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/launch_studio.md)
+  and the Addin open on Design. `screen = "build"` names `"design"` in
+  its error. An instrument changed with no amendment recorded does not
+  open in Design, and the screen says why. Rewriting it as a new
+  instrument would have dropped its amendment log, and a save would have
+  replaced Studio’s instrument with one that has no history. A save
+  keeps the loaded responses while each item keeps its id, its type, its
+  choice codes and, for a matrix, its rows, as after a label, wording,
+  help text or branding edit. When one of those changes, the responses
+  are cleared, and a message names what changed.
+
+- **The builder on the Design screen is part of Studio.** It drops its
+  SurveyBuilder name, its Preview mode and its Export survey button,
+  which Studio’s Preview Survey and Collect screens do. Its save state
+  reads “Saved” or “Unsaved changes”, and Studio’s line above it reads
+  “Editing:
+
+  ()“, with a reminder to save only while there are unsaved changes. The
+  builder’s Analyse mode is now Plan, in Studio and on its own, after
+  the stages Design, Plan, Preview and Collect.
+
+- **The Open Instrument screen says where the instrument came from.** It
+  reads “Loaded from R”, “File checked: hash verified” or “Saved from
+  Design: hash verified”, or names the failed check. A Design save
+  showed “Not verified”, though its hash was checked. The screen no
+  longer sends you to the SurveyBuilder to design, and the plan’s count
+  is labelled “Research questions” on the Open and Analysis screens.
+
+- **The sidebar shows 1 selected screen.** The entry under the mouse
+  took the selected look, so with Design open, Design and the entry the
+  mouse rested on both looked selected. Hover is now a lighter tint.
+
+- **Every empty Studio screen names the next stage.** With no
+  instrument, each screen past Design and Open Instrument links to
+  those 2. With no responses, Quality, Reliability and the Dashboard
+  link to Collect and Upload Responses. Preview with no questions sent
+  you to
+  [`launch_builder()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/launch_builder.md)
+  and back through a file, where Design now does it.
+
+- **Studio has a Collect screen.** It downloads the Google Sheets Apps
+  Script collector for a sheet you name, with the steps to deploy it,
+  and the survey file, sending to the collector URL you give. The last
+  step opens the Upload Responses screen, with that sheet ready to read.
+  The Export screen pointed to the SurveyBuilder for both files.
+
+- **The Export screen takes the report options, and is shorter.** It
+  sets the report’s title, authors, format (HTML or PDF), whether each
+  result shows its R code, figure size, resolution and format, a
+  citation style, and further references as BibTeX, as
+  [`render_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_report.md)
+  takes them. A line says whether Quarto or the built-in engine will
+  write the report, and what the built-in one cannot do. Each research
+  question folds to its heading and question, so the screen for the
+  `input_types` demo is 5,302 px tall in place of 43,730. The analysis
+  notebook downloads as 1 zip in place of 3 files.
+
+- **A free-text question no longer becomes a Dashboard filter.** A text
+  or textarea question with 12 or fewer distinct answers was offered as
+  a filter, as `open_comment` in the `input_types` demo was.
+
+- **The SurveyStudio guide shows Studio’s Dashboard screen**, with its
+  filters, in place of the retired dashboard app.
+
+- **`data-raw/rename_0.4.3.R` writes the 2 dashboard wrappers.**
+  [`launch_dashboard()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md)
+  and
+  [`launch_dashboard_demo()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md)
+  were added to `R/superseded.R` by hand, so a rerun of the generator
+  dropped them. A test reruns it on a copy of the source and expects no
+  file to change.
+
+- **[`launch_dashboard()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md)
+  opens Studio’s Dashboard screen.** It and
+  [`launch_dashboard_demo()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md)
+  are superseded by `launch_studio(screen = "dashboard")`, and the
+  separate dashboard app is removed.
 
 - **Each screen draws when it is opened.** Studio kept 28 outputs on
   every screen computing from start-up, because its screens are hidden
@@ -878,12 +1724,12 @@ bibliography style.
   consent required, and `branded = TRUE` still replaces the whole block.
   `instrument_revision` is rebuilt on the updated `first_survey`, and
   the learn-by-example screenshots are recaptured.
-- [`sframe_demo_branding()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_demo_branding.md)
-  prints each setting as a respondent meets it, with a pointer to
-  [`preview_demo()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/preview_demo.md).
+- `sframe_demo_branding()` prints each setting as a respondent meets it,
+  with a pointer to
+  [`preview_demo()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md).
   It printed a raw nested list, which read as a failed demo. It returns
   a list of class `sframe_branding`, and
-  [`sf_instrument()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_instrument.md)
+  [`sf_instrument()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md)
   stores it as a plain list.
 - `sframe_demo("instrument_revision")` takes a further amendment. Its
   amendment log recorded hashes from code that predates the settled
@@ -894,7 +1740,7 @@ bibliography style.
   [`write_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/write_sframe.md)
   after any change. The demo is regenerated, its content unchanged, and
   a test now amends and writes every shipped demo.
-- [`preview_demo()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/preview_demo.md)
+- [`preview_demo()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md)
   opens a branded demo as a respondent sees it in one line, in the
   browser or on SurveyStudio’s preview screen. The start-up note now
   shows it.
@@ -920,13 +1766,13 @@ This section grows as each group of fixes lands.
   instrument, leaving the duplicate check and a retry to work from
   whatever they could find. **If you are collecting to a CSV written by
   0.4.1 or earlier**, that file predates the column:
-  [`render_survey()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_survey.md)
+  [`render_survey()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md)
   keeps appending to it and says once that the response went in
   unidentified. Collect into a new file to record an identifier for
   every response. Anything reading these files by column position needs
   updating to read by name.
 
-- **[`survey_module_server()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/survey_module_server.md)
+- **[`survey_module_server()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md)
   returns a different response shape.** The response is now the
   collection row, as a list: `response_id`, `started_at`,
   `submitted_at`, then one element per response column, named as
@@ -939,7 +1785,7 @@ This section grows as each group of fixes lands.
   lacked controls for matrix, ranking, rating and decision questions.
 
 - **Untouched sliders, rankings and dates are now unanswered** in
-  [`render_survey()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_survey.md)
+  [`render_survey()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md)
   and the survey module. A slider counts once the respondent moves it,
   and a ranking once it is reordered or confirmed with “Keep this
   order”. Previously a slider stored its starting position, a ranking
@@ -980,7 +1826,7 @@ This section grows as each group of fixes lands.
   weights that are zero, negative or infinite are all reported by
   [`validate_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/validate_sframe.md),
   and
-  [`sf_scale()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_scale.md)
+  [`sf_scale()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md)
   refuses the scale parameters directly. Rename or correct the
   declaration.
 
@@ -1008,7 +1854,7 @@ This section grows as each group of fixes lands.
 - **ANCOVA tables hold adjusted tests**, each term tested after all
   others, with columns `effect`, `df`, `sum_sq`, `mean_sq`, `F` and `p`.
 
-- **[`sample_size_plan()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sample_size_plan.md)
+- **[`sample_size_plan()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md)
   now calculates power** for t tests, ANOVA and, with the new `f2`,
   regression. The new `d` and `f` arguments give the expected effect,
   and a medium effect is assumed, with a warning, when they are left
@@ -1020,11 +1866,11 @@ This section grows as each group of fixes lands.
   `strict = TRUE`, before treating a returned object as success.
 
 - **Bootstrap intervals can be withheld.**
-  [`bootstrap_ci()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/bootstrap_ci.md),
-  [`cohens_d_ci()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/cohens_d_ci.md),
-  [`cramers_v_ci()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/cramers_v_ci.md)
+  [`bootstrap_ci()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md),
+  [`cohens_d_ci()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md),
+  [`cramers_v_ci()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md)
   and
-  [`eta_sq_ci()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/eta_sq_ci.md)
+  [`eta_sq_ci()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md)
   return `NA` bounds with a `reason` attribute when fewer than 90% of
   resamples give a value or all give the same value, and every result
   records its resample counts.
@@ -1048,7 +1894,7 @@ This section grows as each group of fixes lands.
   alternatives than before, and is reported as undefined when the
   outranking relation has a cycle.
 
-- **[`sensitivity_analysis()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sensitivity_analysis.md)
+- **[`sensitivity_analysis()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md)
   results gain `n_perturbations`, `n_effective` and `n_failed`**, and
   `stable` is `FALSE` when no perturbation moved the weights. A
   requested sensitivity run that could not be made is recorded in the
@@ -1080,7 +1926,7 @@ This section grows as each group of fixes lands.
   arrive as text, and numeric answers as doubles. A response file with 2
   columns of the same name is refused.
 
-- **[`link_git_commit()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/link_git_commit.md)
+- **[`link_git_commit()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md)
   gains `path` and returns `verified`**, which is `TRUE` only when the
   instrument matches that file as committed. `linked` alone confirms a
   repository and a commit.
@@ -1092,12 +1938,12 @@ This section grows as each group of fixes lands.
 ### Collection fixes
 
 - **The Shiny survey erased every answer.** In
-  [`render_survey()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_survey.md),
+  [`render_survey()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md),
   each answer re-drew the survey page, and the re-drawn questions
   reported themselves empty, so every answer was wiped about a second
   after it was given. A submitted response came back blank. This
   affected every standard-mode survey run with
-  [`render_survey()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_survey.md)
+  [`render_survey()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md)
   in 0.4.1 and earlier. Answers now stay put, and the page stays as it
   is when a question is answered.
 
@@ -1169,7 +2015,7 @@ This section grows as each group of fixes lands.
   pairwise comparison and criteria weight showed only a placeholder, and
   a required one made the survey impossible to finish. The module now
   uses the same questions as
-  [`render_survey()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_survey.md).
+  [`render_survey()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md).
 
 - **The survey module submitted answers the respondent had removed.** A
   cleared answer, and an answer to a question branching later hid, were
@@ -1253,7 +2099,7 @@ This section grows as each group of fixes lands.
   to the instrument’s configured Google Sheets endpoint, so a test
   response could land in a running study’s sheet beside real
   participants’. The preview now exports with `preview = TRUE`, a new
-  [`export_static_survey()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/export_static_survey.md)
+  [`export_static_survey()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md)
   argument that removes the collector and the completion redirect. **If
   you previewed a configured instrument in Studio on 0.4.1 or earlier,
   check the collecting sheet for test rows.**
@@ -1328,7 +2174,7 @@ This section grows as each group of fixes lands.
   declared limits.
 - **A factor was scored on its level positions**, so a factor holding 10
   and 20 was scored as 1 and 2.
-- **[`item_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/item_report.md)
+- **[`item_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md)
   diagnostics now match the scale’s scoring.** Item-rest correlations
   use the reversed orientation, where a reverse-keyed item used to come
   out strongly negative beside a high alpha. They use respondents who
@@ -1336,7 +2182,7 @@ This section grows as each group of fixes lands.
   ceiling use the item’s declared lowest and highest response, where
   they used the sample’s extremes, and are `NA` for an item that
   declares no bounds.
-- [`sf_scale()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_scale.md)
+- [`sf_scale()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md)
   now checks its parameters, and refuses a constructed item passed
   inside a scale’s `items`, which was silently dropped from the
   instrument.
@@ -1359,7 +2205,7 @@ This section grows as each group of fixes lands.
 - **Partial correlation p values used the wrong degrees of freedom**,
   and partial Spearman ranked the residuals where it must rank the
   variables.
-- **[`sample_size_plan()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sample_size_plan.md)
+- **[`sample_size_plan()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md)
   returned 64 or 50 per group for t tests and ANOVA** whatever alpha and
   power were requested, while printing both.
 - **The Firth likelihood-ratio statistic was half its true value.**
@@ -1464,7 +2310,7 @@ This section grows as each group of fixes lands.
   `cor.test(x, y, method = "pearson")` where the wrapper call was all
   that showed before. Both report engines show it, and
   `render_report(show_code = FALSE)` leaves it out.
-- **[`analysis_syntax()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/analysis_syntax.md)
+- **[`analysis_syntax()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md)
   returns that code**, for one result or a whole set. `header = TRUE`
   prepends the lines that load the instrument, read the responses and
   score the scales, giving a script that runs on its own.
@@ -1474,7 +2320,7 @@ This section grows as each group of fixes lands.
   outside its coverage the block is omitted, which keeps the report
   honest about what it can show. The model families already carried
   their syntax, through
-  [`cfa_syntax()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/cfa_syntax.md)
+  [`cfa_syntax()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md)
   and its neighbours.
 
 ### Figure fixes
@@ -1533,7 +2379,7 @@ This section grows as each group of fixes lands.
   as `p = .032`, and an interval says its level, as
   `95% CI [0.12, 0.48]`. The sentence is plain text, so italicising the
   symbols stays the author’s step, and
-  [`?sf_apa`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_apa.md)
+  [`?sf_apa`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md)
   now says so.
 - **A report claimed an analysis seed when analysis was switched off.**
   `render_report(include_analysis = FALSE)` still printed a seed beside
@@ -1567,7 +2413,7 @@ This section grows as each group of fixes lands.
   header was being extended. Submissions now run inside a lock, and an
   ambiguous header sends the raw submission to an “Unmapped submissions”
   sheet.
-- **[`sframe_export_labelled()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_export_labelled.md)
+- **[`sframe_export_labelled()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md)
   left matrix cells, option columns and text-held codes unlabelled.**
   Every response column now carries its row, option or criterion
   wording, and every column of choice codes carries value labels.
@@ -1622,24 +2468,24 @@ This section grows as each group of fixes lands.
   of evidence are recorded per method in
   [`vignette("mcdm-analysis")`](https://mohammedalisharafuddin.github.io/surveyframe/articles/mcdm-analysis.md).
 - The
-  [`survey_module_ui()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/survey_module_ui.md)
+  [`survey_module_ui()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md)
   and
-  [`survey_module_server()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/survey_module_server.md)
+  [`survey_module_server()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md)
   help is rewritten, covering supported item types, what is submitted, a
   failed save, and changing the instrument, with a complete example that
   stores responses.
 - The
-  [`item_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/item_report.md)
+  [`item_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md)
   help describes item-rest correlations, where it said item-total, and
   the nested result it returns, with both ways to extract it. The
-  [`sf_scale()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_scale.md)
+  [`sf_scale()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md)
   help states the rules for `min_valid`, `weights` and `reverse_items`.
 - The
-  [`sample_size_plan()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sample_size_plan.md)
+  [`sample_size_plan()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md)
   help separates power calculations from precision targets and rules of
   thumb, and states which arguments each one uses.
 - The
-  [`sensitivity_analysis()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sensitivity_analysis.md),
+  [`sensitivity_analysis()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md),
   [`sframe_dematel_compute()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_dematel_compute.md)
   and
   [`sframe_rated_matrix()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_rated_matrix.md)
@@ -1647,7 +2493,7 @@ This section grows as each group of fixes lands.
   rated items pair with a weight item.
 - The provenance help for
   [`amend_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/amend_sframe.md),
-  [`link_git_commit()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/link_git_commit.md),
+  [`link_git_commit()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md),
   [`read_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_sframe.md)
   and
   [`write_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/write_sframe.md)
@@ -1664,7 +2510,7 @@ This section grows as each group of fixes lands.
   `htmt_method = "correlation_fallback"` to say which it computed. The
   Henseler heterotrait-monotrait ratio needs `items_by_construct`, which
   records `htmt_method = "henseler"`.
-  [`validity_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/validity_report.md)’s
+  [`validity_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md)’s
   own help was already accurate, and the vignette overstated it in an
   unevaluated chunk. The section now names what each argument gives, and
   its examples run, so a build would contradict the claim if it drifted
@@ -1682,9 +2528,9 @@ This section grows as each group of fixes lands.
   and
   [`?sframe_as_data_frame`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_as_data_frame.md),
   and the Usage of
-  [`sf_item()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_item.md)
+  [`sf_item()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md)
   and
-  [`sample_size_plan()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sample_size_plan.md)
+  [`sample_size_plan()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md)
   ran past the right margin in 83 places. The tables are now lists, the
   Usage lines wrap, and the manual lets a line stretch its spaces before
   letting a name overflow.
@@ -1705,14 +2551,14 @@ CRAN release: 2026-09-03
 ### New
 
 - **A demo library.** Twenty-two small demos, each showing one thing, in
-  [`sframe_demos()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_demos.md).
+  [`sframe_demos()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md).
   Load one with `sframe_demo("two_group")`, or get a Quarto notebook to
   edit with `sframe_demo_qmd("two_group")`. Together they cover every
   analysis method and every question type.
 - **[`vignette("learn-by-example")`](https://mohammedalisharafuddin.github.io/surveyframe/articles/learn-by-example.md).**
   Pick the demo that matches the data you have, and follow it from
   questionnaire to report.
-- **[`sframe_export_labelled()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_export_labelled.md)**
+- **[`sframe_export_labelled()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md)**
   writes SPSS `.sav` or Stata `.dta` with the question wording and
   response options attached, so variables arrive labelled rather than as
   codes.
@@ -1746,12 +2592,12 @@ the instrument hash and the seed.
 - **Branching rules using `%in%` with more than one value never worked
   in an exported survey.** The question stayed hidden whatever the
   respondent answered. Present since 0.3.0.
-- **[`sem_lavaan_syntax()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sem_lavaan_syntax.md)
+- **[`sem_lavaan_syntax()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md)
   produced a mediation model lavaan could not fit.** Indirect effects
   referred to path labels that were never written.
 - Straight-lining no longer flags scales shorter than four items, where
   identical answers are normal rather than careless.
-  [`quality_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/quality_report.md)
+  [`quality_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md)
   gains `straightline_min_items`. When no scale is long enough to check,
   the report now says so instead of omitting the chart silently.
 - Reading a response file with
@@ -1806,7 +2652,7 @@ has no concept of a decision method at all.
   order (a researcher-supplied override, then a collected item, then a
   typed error naming what is missing) and records where each input came
   from, so a results table states the provenance of every number.
-- [`sensitivity_analysis()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sensitivity_analysis.md)
+- [`sensitivity_analysis()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md)
   reports how far a ranking moves under a declared perturbation of the
   weights, and carries a `degenerate` flag so a ranking that never
   separated its alternatives cannot report false stability (see
@@ -1839,9 +2685,9 @@ from data whose true difference never changed.
 - Firth’s bias-reduced logistic regression (`logistf` in Suggests) for
   regression prone to separation at small n.
 - A small-sample advisory surfaced on
-  [`assumption_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/assumption_report.md)
+  [`assumption_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md)
   and
-  [`sample_size_plan()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sample_size_plan.md),
+  [`sample_size_plan()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md),
   flagging when a study’s sample size falls in the range where these
   corrections are worth considering.
 - `vignettes/small-sample.Rmd` walks through when to prefer each
@@ -1875,7 +2721,7 @@ role-resolution, and reporting pipeline every other method family uses.
 - `stm_topics`: structural topic modelling, the same top-terms-per-topic
   output; requires the optional stm and tidytext packages.
 - A shared cleaning step
-  ([`clean_text_responses()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/clean_text_responses.md))
+  ([`clean_text_responses()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md))
   and a 174-word Snowball-based English stopword list, both exported so
   a study can reuse or override them outside a runner.
 - Both the visual builder and SurveyStudio support all 9 methods,
@@ -1910,7 +2756,7 @@ without weakening it.
   preregistration deviation is normally handled. `signoff` is never left
   blank – it records a reviewer’s name or the literal `"none"`, so an
   unreviewed design change stays visible to an auditor.
-- [`amendment_log()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/amendment_log.md)
+- [`amendment_log()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md)
   returns the full history as a data frame, one row per disclosed
   amendment, exportable with
   [`write.csv()`](https://rdrr.io/r/utils/write.table.html).
@@ -1920,7 +2766,7 @@ without weakening it.
   [`read_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_sframe.md)’s
   integrity check exactly as before. The amendment log adds a disclosed
   path alongside the existing hash check.
-- [`link_git_commit()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/link_git_commit.md)
+- [`link_git_commit()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md)
   records the current Git commit SHA and subject line alongside an
   instrument. This ties the SHA-256 hash to a specific,
   already-explained commit. It returns an informative message when Git
@@ -1945,7 +2791,7 @@ Four defects found by independent cross-validation are fixed. Each
 produced normal-looking numbers with no error or warning, so re-run any
 results computed with an earlier version.
 
-- [`item_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/item_report.md)
+- [`item_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md)
   returned the wrong item-rest correlation. It subtracted each item from
   a [`rowMeans()`](https://rdrr.io/r/base/colSums.html) total, which
   leaves roughly noise carrying the item negatively, so a highly
@@ -1973,10 +2819,10 @@ results computed with an earlier version.
   already accepted those columns. Both now derive the list from one
   shared helper.
 - The SEM syntax generators ignored the model type.
-  [`seminr_syntax()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/seminr_syntax.md),
-  [`sem_lavaan_syntax()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sem_lavaan_syntax.md),
+  [`seminr_syntax()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md),
+  [`sem_lavaan_syntax()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md),
   and
-  [`cfa_lavaan_syntax()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/cfa_lavaan_syntax.md)
+  [`cfa_lavaan_syntax()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md)
   never checked `model$type`, and the builder offered every saved model
   to all 3 generators, so a covariance-based model produced PLS-SEM
   syntax with no complaint. That is a runnable script estimating a model
@@ -2002,9 +2848,9 @@ shows the user what it found.
   [`summary()`](https://rdrr.io/r/base/summary.html) for the check
   roster, [`as.data.frame()`](https://rdrr.io/r/base/as.data.frame.html)
   for one row per problem,
-  [`sf_is_valid()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_is_valid.md),
+  [`sf_is_valid()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md),
   and
-  [`sf_problems()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_problems.md).
+  [`sf_problems()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md).
 - `strict = TRUE` still aborts with `sframe_validation_error` when
   anything is wrong. That has not changed.
 - **`$valid` and `$problems` keep working**, so the common reading
@@ -2040,26 +2886,26 @@ silently degraded to a bare list and lost its print method.
 - `[` keeps the class on `sframe_analysis_results`,
   `sframe_reliability_report` and `sframe_item_report`.
 - Instrument accessors:
-  [`sf_meta()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_meta.md),
-  [`sf_items()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_items.md),
-  [`sf_scales()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_scales.md),
-  [`sf_choice_sets()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_choice_sets.md),
-  [`sf_branches()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_branches.md),
-  [`sf_checks()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_checks.md),
-  [`sf_models()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_models.md)
+  [`sf_meta()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md),
+  [`sf_items()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md),
+  [`sf_scales()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md),
+  [`sf_choice_sets()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md),
+  [`sf_branches()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md),
+  [`sf_checks()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md),
+  [`sf_models()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md)
   and
-  [`sf_plan()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_plan.md),
+  [`sf_plan()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md),
   with `sf_plan<-` for declaring the plan. The component accessors
   return an `sf_component_list` named by ID, so
   `sf_items(instrument)[["sat_1"]]` reaches one item.
 - Component accessors:
-  [`sf_id()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_id.md)
+  [`sf_id()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md)
   and
-  [`sf_label()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_label.md).
+  [`sf_label()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md).
 - Report accessors:
-  [`sf_apa()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_apa.md)
+  [`sf_apa()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md)
   and
-  [`sf_flagged()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_flagged.md).
+  [`sf_flagged()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md).
 - Coercion:
   [`as_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/as_sframe.md).
 
@@ -2068,7 +2914,7 @@ registered S3 method count goes from 41 to 103.
 
 ### Breaking: the Shiny collector now emits expansion columns
 
-- [`render_survey()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_survey.md)
+- [`render_survey()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md)
   pipe-joined a matrix item’s cells into a single column, so a matrix
   question answered in the Shiny survey arrived as `mx = "4|5"` where
   [`read_responses()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_responses.md)
@@ -2082,7 +2928,7 @@ registered S3 method count goes from 41 to 103.
   position, and one per multi-select option carrying 0 or 1.
 - **This changes the output shape of the Shiny collector.** A study
   mid-collection through
-  [`render_survey()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_survey.md)
+  [`render_survey()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md)
   will see its matrix, ranking, and multi-select columns change name and
   layout between versions. Responses already gathered under the old
   shape need re-shaping before they can be read, and the decision item
@@ -2112,7 +2958,7 @@ registered S3 method count goes from 41 to 103.
   best” and the APA sentence reported a kernel containing every
   alternative. A note now explains the equal ranks as an absence of
   evidence.
-- [`sensitivity_analysis()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sensitivity_analysis.md)
+- [`sensitivity_analysis()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md)
   gains a `degenerate` flag for the same reason. A ranking that never
   separated the alternatives cannot be changed by perturbing a weight,
   so every check passed and `stable` came back `TRUE`: the strongest
@@ -2123,7 +2969,7 @@ registered S3 method count goes from 41 to 103.
 
 ### Data quality
 
-- [`quality_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/quality_report.md)
+- [`quality_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md)
   counted only columns matching a bare item id, and multi-column items
   never post under those, so every expansion column was invisible to the
   missingness check. A respondent who skipped an entire pairwise battery
@@ -2139,7 +2985,7 @@ registered S3 method count goes from 41 to 103.
 
 - Both bundled demo instruments wired their seminr block to a `cb_sem`
   model, so
-  [`sframe_demo_data()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_demo_data.md)
+  [`sframe_demo_data()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md)
   generated PLS-SEM syntax from a covariance-based model, and every
   vignette and example loading it inherited the same mismatch. Each demo
   now carries a real `pls_sem` model with composite constructs. The
@@ -2172,12 +3018,12 @@ unchanged. naniar and pagedown join Suggests.
 ### Effect sizes and intervals
 
 - Four new exported helpers, all base R:
-  [`bootstrap_ci()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/bootstrap_ci.md)
+  [`bootstrap_ci()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md)
   (percentile bootstrap for any statistic),
-  [`cohens_d_ci()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/cohens_d_ci.md),
-  [`cramers_v_ci()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/cramers_v_ci.md),
+  [`cohens_d_ci()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md),
+  [`cramers_v_ci()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md),
   and
-  [`eta_sq_ci()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/eta_sq_ci.md).
+  [`eta_sq_ci()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md).
 - Analysis-plan runners attach a confidence interval to their effect
   size as a new result key: `d_ci` on the t-tests, `r_ci` on
   Mann-Whitney and Wilcoxon, `eta_ci` on ANOVA and Kruskal-Wallis, `ci`
@@ -2189,18 +3035,18 @@ unchanged. naniar and pagedown join Suggests.
 
 ### Psychometrics
 
-- [`validity_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/validity_report.md)
+- [`validity_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md)
   computes the Henseler heterotrait-monotrait ratio when item-level data
   is supplied through the new `items_by_construct` argument. Without it,
   the previous correlation-based fallback applies and the `htmt_method`
   element records which was used.
-- [`missing_data_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/missing_data_report.md)
+- [`missing_data_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md)
   runs Little’s MCAR test when naniar is installed. Without naniar the
   result is unchanged.
-- [`reliability_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/reliability_report.md)
+- [`reliability_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md)
   records why omega is unavailable for a scale in an `omega_note`, and
   the reliability chart names those scales in its subtitle.
-- [`efa_solution()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/efa_solution.md)
+- [`efa_solution()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md)
   adds three tidy data frames ready for plotting and reporting:
   `loadings_long`, `communalities_table`, and `variance_table`.
 
@@ -2286,7 +3132,7 @@ unchanged. naniar and pagedown join Suggests.
 ### Survey design
 
 - Date questions accept `date_min` and `date_max` bounds in
-  [`sf_item()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_item.md),
+  [`sf_item()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md),
   the SurveyBuilder, and the exported survey. The date picker enforces
   the bounds and typed dates outside them show a clear message.
 - The SurveyBuilder ships a library of 14 preset choice sets,
@@ -2309,16 +3155,16 @@ unchanged. naniar and pagedown join Suggests.
 
 ### Bug fixes
 
-- [`sf_item()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_item.md)’s
+- [`sf_item()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md)’s
   `date_min` and `date_max` accept only `"YYYY-MM-DD"` or a `Date`
   object now (an ambiguous string such as `"01/02/2024"` used to parse
   silently into a specific date depending on locale). Anything else
   raises a validation error.
-- [`bootstrap_ci()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/bootstrap_ci.md),
-  [`cohens_d_ci()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/cohens_d_ci.md),
-  [`cramers_v_ci()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/cramers_v_ci.md),
+- [`bootstrap_ci()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md),
+  [`cohens_d_ci()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md),
+  [`cramers_v_ci()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md),
   and
-  [`eta_sq_ci()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/eta_sq_ci.md)
+  [`eta_sq_ci()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md)
   no longer alter the random-number seed for code that runs after a
   reproducible, seeded call.
 
@@ -2403,10 +3249,10 @@ experience. ggplot2 joins Suggests; hard dependencies are unchanged.
 
 ### Model syntax
 
-- [`sem_lavaan_syntax()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sem_lavaan_syntax.md)
+- [`sem_lavaan_syntax()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md)
   turns free-text path labels into valid lavaan parameter names (a label
   starting “H1:” becomes the parameter `H1`).
-- [`seminr_syntax()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/seminr_syntax.md)
+- [`seminr_syntax()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md)
   output loads seminr and uses
   [`summary()`](https://rdrr.io/r/base/summary.html) accessors, so the
   generated code runs as pasted.
@@ -2450,7 +3296,7 @@ methods, and no new bundled datasets.
   documented S3 surface.
 - `lavaan` is declared in `Suggests`. It is used only to fit the syntax
   produced by
-  [`cfa_syntax()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/cfa_syntax.md).
+  [`cfa_syntax()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md).
   The package itself generates syntax and never requires `lavaan` to be
   installed.
 
@@ -2460,7 +3306,7 @@ methods, and no new bundled datasets.
   Export survey button, and generates the Google Sheets Apps Script
   collector through a Generate collector button. Both reuse the same
   templates the R functions use, so the output matches
-  [`export_static_survey()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/export_static_survey.md)
+  [`export_static_survey()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md)
   and
   [`export_google_sheet()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/export_google_sheet.md).
 - The builder Analyse tab shows three distinct stages: Plan, Run preview
@@ -2508,10 +3354,10 @@ statistical methods, and no new bundled datasets.
 
 #### Data collection round-trip
 
-- [`export_static_survey()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/export_static_survey.md)
+- [`export_static_survey()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md)
   now renders the header logo and institution name from `render$header`,
   so exported surveys match the Shiny renderer and the builder preview.
-- [`export_static_survey()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/export_static_survey.md)
+- [`export_static_survey()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md)
   now falls back to the instrument’s `render$google_sheets_endpoint`
   when `endpoint_url` is not supplied, so a Google Sheets endpoint set
   in the builder is honoured on export.
@@ -2547,12 +3393,12 @@ statistical methods, and no new bundled datasets.
 - Every exported function that takes an instrument now reports a clear,
   actionable message when passed something that is not an `sframe`
   object. The message points the user to
-  [`sf_instrument()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_instrument.md)
+  [`sf_instrument()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md)
   and
   [`read_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_sframe.md)
   instead of showing a raw
   [`inherits()`](https://rdrr.io/r/base/class.html) assertion failure.
-- [`reliability_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/reliability_report.md)
+- [`reliability_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md)
   no longer prints `psych` internal warnings to the console. McDonald’s
   omega is skipped silently for scales with fewer than three items,
   where the statistic is not meaningful.
@@ -2577,7 +3423,7 @@ statistical methods, and no new bundled datasets.
 - Updated the supporting vignettes to reflect the research-design-first
   workflow where the instrument holds the questions, the analysis plan,
   and the measurement model.
-- [`sf_instrument()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_instrument.md)
+- [`sf_instrument()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md)
   examples now include a complete `analysis_plan` block.
 - The README now leads with `install.packages("surveyframe")`, adds a
   short path for users who already have a response CSV, and points to
@@ -2600,13 +3446,13 @@ with deployment, collection, analysis, and reporting built around it.
   `method`, `roles`, `options`, `hypotheses`, `decision_rule`,
   `reporting_references`, `status`, and `requires_data`.
 - Added common survey analysis helpers:
-  [`descriptives_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/descriptives_report.md),
-  [`missing_data_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/missing_data_report.md),
-  [`assumption_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/assumption_report.md),
-  [`posthoc_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/posthoc_report.md),
-  [`validity_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/validity_report.md),
+  [`descriptives_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md),
+  [`missing_data_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md),
+  [`assumption_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md),
+  [`posthoc_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md),
+  [`validity_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md),
   and
-  [`sample_size_plan()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sample_size_plan.md).
+  [`sample_size_plan()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md).
 - Expanded
   [`run_analysis_plan()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/run_analysis_plan.md)
   to dispatch the v0.3 method registry, including descriptives, missing
@@ -2615,25 +3461,25 @@ with deployment, collection, analysis, and reporting built around it.
   multinomial logistic regression, mediation, moderation, and
   model-syntax output.
 - Added a model specification layer:
-  [`sf_construct()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_construct.md),
-  [`sf_path()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_path.md),
-  [`sf_covariance()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_covariance.md),
-  [`sf_indirect()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_indirect.md),
-  [`sf_model()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_model.md),
-  [`validate_model()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/validate_model.md),
-  [`model_json()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/model_json.md),
-  [`add_model()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/add_model.md),
-  [`efa_solution()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/efa_solution.md),
-  [`efa_syntax()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/efa_syntax.md),
-  [`cfa_lavaan_syntax()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/cfa_lavaan_syntax.md),
-  [`sem_lavaan_syntax()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sem_lavaan_syntax.md),
-  [`seminr_syntax()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/seminr_syntax.md),
+  [`sf_construct()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md),
+  [`sf_path()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md),
+  [`sf_covariance()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md),
+  [`sf_indirect()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md),
+  [`sf_model()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md),
+  [`validate_model()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md),
+  [`model_json()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md),
+  [`add_model()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md),
+  [`efa_solution()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md),
+  [`efa_syntax()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md),
+  [`cfa_lavaan_syntax()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md),
+  [`sem_lavaan_syntax()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md),
+  [`seminr_syntax()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md),
   and
-  [`model_report_template()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/model_report_template.md).
+  [`model_report_template()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md).
   Syntax generation does not require `lavaan` or `seminr`.
-- [`cfa_syntax()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/cfa_syntax.md)
+- [`cfa_syntax()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md)
   remains available as a backward-compatible wrapper around
-  [`cfa_lavaan_syntax()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/cfa_lavaan_syntax.md).
+  [`cfa_lavaan_syntax()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md).
 - SurveyBuilder Analyse mode now uses a three-panel Plan/Run/Report
   workspace with variable metadata badges, role-based variable
   assignment, method options, output preview, reporting references, and
@@ -2643,7 +3489,7 @@ with deployment, collection, analysis, and reporting built around it.
 #### Static HTML survey export
 
 - Added
-  [`export_static_survey()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/export_static_survey.md).
+  [`export_static_survey()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md).
   This produces a single, self-contained HTML file that runs the survey
   in any modern browser without a Shiny server or an internet
   connection. All thirteen item types are fully rendered (Likert, single
@@ -2668,7 +3514,7 @@ with deployment, collection, analysis, and reporting built around it.
 #### Interactive response dashboard
 
 - Added
-  [`launch_dashboard()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/launch_dashboard.md).
+  [`launch_dashboard()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md).
   Opens a five-panel Shiny dashboard for exploring collected response
   data alongside the instrument definition, without modifying either.
   The panels are: Overview (response count, date range, instrument
@@ -2683,12 +3529,12 @@ with deployment, collection, analysis, and reporting built around it.
   instrument structure.
 
 - Added
-  [`sframe_demo_data()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_demo_data.md),
-  [`sframe_input_types_demo_data()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_input_types_demo_data.md),
-  [`launch_builder_demo()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/launch_builder_demo.md),
-  [`launch_studio_demo()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/launch_studio_demo.md),
+  [`sframe_demo_data()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md),
+  [`sframe_input_types_demo_data()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md),
+  [`launch_builder_demo()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md),
+  [`launch_studio_demo()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md),
   and
-  [`launch_dashboard_demo()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/launch_dashboard_demo.md)
+  [`launch_dashboard_demo()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md)
   for CRAN-safe examples, training, and local GUI testing.
 
 - Added a bundled input-types demo instrument and simulated response
@@ -2703,12 +3549,12 @@ with deployment, collection, analysis, and reporting built around it.
 #### Shiny survey module
 
 - Added
-  [`survey_module_ui()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/survey_module_ui.md)
+  [`survey_module_ui()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md)
   and
-  [`survey_module_server()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/survey_module_server.md).
+  [`survey_module_server()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md).
   These allow a survey to be embedded inside a larger Shiny application
   as a first-class module.
-  [`survey_module_server()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/survey_module_server.md)
+  [`survey_module_server()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md)
   returns a `reactive` that holds `NULL` until the form is submitted,
   then returns the response as a named list keyed by item ID.
 
@@ -2806,17 +3652,17 @@ interpretation `prompt` field to guide write-up.
 
 - [`validate_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/validate_sframe.md),
   [`score_scales()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/score_scales.md),
-  [`codebook_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/codebook_report.md),
-  [`cfa_syntax()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/cfa_syntax.md),
+  [`codebook_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md),
+  [`cfa_syntax()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md),
   and `launch_builder(open = FALSE)` have fully runnable examples.
 - Reworked the vignette set into a coherent workflow covering instrument
   building, response analysis, reliability and validity, EFA/CFA/SEM/PLS
   syntax generation, and GUI usage.
 - The demo launchers
-  ([`launch_builder_demo()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/launch_builder_demo.md),
-  [`launch_studio_demo()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/launch_studio_demo.md),
+  ([`launch_builder_demo()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md),
+  [`launch_studio_demo()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md),
   and
-  [`launch_dashboard_demo()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/launch_dashboard_demo.md))
+  [`launch_dashboard_demo()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md))
   open in the browser with the demo instrument, scales, and analysis
   plan preloaded, so no manual file loading is needed.
 - The interactive package demo (`demo("survey")`) walks through the
@@ -2837,16 +3683,16 @@ interpretation `prompt` field to guide write-up.
 
 - Initial release.
 - Core S3 object system:
-  [`sf_instrument()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_instrument.md),
-  [`sf_item()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_item.md),
-  [`sf_choices()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_choices.md),
-  [`sf_scale()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_scale.md).
+  [`sf_instrument()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md),
+  [`sf_item()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md),
+  [`sf_choices()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md),
+  [`sf_scale()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md).
 - Serialisation:
   [`write_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/write_sframe.md),
   [`read_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_sframe.md)
   with SHA-256 integrity checking.
 - Shiny survey renderer:
-  [`render_survey()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_survey.md).
+  [`render_survey()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md).
 - Static SurveyBuilder HTML:
   [`launch_builder()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/launch_builder.md).
 - Response reader:

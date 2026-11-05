@@ -79,6 +79,11 @@ sheet is readable with no sharing change.
 [`read_responses()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_responses.md),
 [`write_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/write_sframe.md)
 
+Other Collect functions:
+[`export_survey()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/export_survey.md),
+[`sframe_survey_server()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_survey_server.md),
+[`sframe_survey_ui()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_survey_ui.md)
+
 ## Examples
 
 ``` r
@@ -91,7 +96,7 @@ script <- export_google_sheet(
   sheet_url = "https://docs.google.com/spreadsheets/d/demo",
   output_dir = tempdir()
 )
-#> Apps Script written to: /tmp/RtmpMjSSLY/surveyframe_collector.gs
+#> Apps Script written to: /tmp/RtmpbhdiJG/surveyframe_collector.gs
 #> Follow the setup instructions inside the file to deploy it.
 file.exists(script)
 #> [1] TRUE

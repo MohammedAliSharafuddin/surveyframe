@@ -38,24 +38,35 @@ named using the scale `id`.
 
 ## See also
 
-[`sf_scale()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_scale.md),
-[`reliability_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/reliability_report.md)
+[`sframe_scale()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_scale.md),
+[`sframe_reliability_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_reliability_results.md)
+
+Other Analyse functions:
+[`run_analysis_plan()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/run_analysis_plan.md),
+[`sframe_assumption_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_assumption_results.md),
+[`sframe_descriptives_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_descriptives_results.md),
+[`sframe_efa_readiness_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_efa_readiness_results.md),
+[`sframe_efa_solution()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_efa_solution.md),
+[`sframe_item_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_item_results.md),
+[`sframe_posthoc_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_posthoc_results.md),
+[`sframe_reliability_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_reliability_results.md),
+[`sframe_validity_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_validity_results.md)
 
 ## Examples
 
 ``` r
-cs    <- sf_choices("ag5", 1:5,
+cs    <- sframe_choice_set("ag5", 1:5,
            c("Strongly disagree", "Disagree", "Neutral",
              "Agree", "Strongly agree"))
-i1    <- sf_item("sat_1", "Item 1", type = "likert",
+i1    <- sframe_item("sat_1", "Item 1", type = "likert",
                  choice_set = "ag5", scale_id = "sat")
-i2    <- sf_item("sat_2", "Item 2", type = "likert",
+i2    <- sframe_item("sat_2", "Item 2", type = "likert",
                  choice_set = "ag5", scale_id = "sat")
-i3    <- sf_item("sat_3", "Item 3 (reverse)", type = "likert",
+i3    <- sframe_item("sat_3", "Item 3 (reverse)", type = "likert",
                  choice_set = "ag5", scale_id = "sat", reverse = TRUE)
-scale <- sf_scale("sat", "Satisfaction",
+scale <- sframe_scale("sat", "Satisfaction",
                   items = c("sat_1", "sat_2", "sat_3"), min_valid = 2L)
-instr <- sf_instrument("Demo", components = list(cs, i1, i2, i3, scale))
+instr <- sframe_instrument("Demo", components = list(cs, i1, i2, i3, scale))
 
 responses <- data.frame(
   sat_1 = c(4, 5, 3),

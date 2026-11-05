@@ -122,7 +122,7 @@ data.</p>
 <h2 id="load-the-demo">Load the demo<a class="anchor" aria-label="anchor" href="#load-the-demo"></a>
 </h2>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">demo</span>      <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sframe_demo_data.html">sframe_demo_data</a></span><span class="op">(</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">demo</span>      <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sframe_demo.html">sframe_demo</a></span><span class="op">(</span><span class="st">"tourism_services"</span><span class="op">)</span></span>
 <span><span class="va">instr</span>     <span class="op">&lt;-</span> <span class="va">demo</span><span class="op">$</span><span class="va">instrument</span></span>
 <span><span class="va">responses</span> <span class="op">&lt;-</span> <span class="va">demo</span><span class="op">$</span><span class="va">responses</span></span>
 <span></span>
@@ -154,14 +154,15 @@ export instead of silently discarding columns.</p>
 <h2 id="missing-data-and-quality">Missing data and quality<a class="anchor" aria-label="anchor" href="#missing-data-and-quality"></a>
 </h2>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">mr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/missing_data_report.html">missing_data_report</a></span><span class="op">(</span><span class="va">responses</span>, <span class="va">instr</span><span class="op">)</span></span>
-<span><span class="fu">kable</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">mr</span><span class="op">)</span>, digits <span class="op">=</span> <span class="fl">2</span>,</span>
+<code class="sourceCode R"><span><span class="va">mr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sframe_missing_data_results.html">sframe_missing_data_results</a></span><span class="op">(</span><span class="va">responses</span>, <span class="va">instr</span><span class="op">)</span></span>
+<span><span class="va">mr_items</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">mr</span><span class="op">)</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"variable"</span>, <span class="st">"missing_n"</span>, <span class="st">"missing_prop"</span>, <span class="st">"valid_n"</span><span class="op">)</span><span class="op">]</span></span>
+<span><span class="va">mr_items</span><span class="op">$</span><span class="va">missing_prop</span> <span class="op">&lt;-</span> <span class="fl">100</span> <span class="op">*</span> <span class="va">mr_items</span><span class="op">$</span><span class="va">missing_prop</span></span>
+<span><span class="fu">kable</span><span class="op">(</span><span class="va">mr_items</span>, digits <span class="op">=</span> <span class="fl">1</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>      col.names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Variable"</span>, <span class="st">"Missing (n)"</span>, <span class="st">"Missing (%)"</span>, <span class="st">"Valid (n)"</span><span class="op">)</span>,</span>
 <span>      caption <span class="op">=</span> <span class="st">"Item-level missingness"</span><span class="op">)</span></span></code></pre></div>
 <table class="table">
 <caption>Item-level missingness</caption>
 <thead><tr class="header">
-<th align="left"></th>
 <th align="left">Variable</th>
 <th align="right">Missing (n)</th>
 <th align="right">Missing (%)</th>
@@ -170,114 +171,99 @@ export instead of silently discarding columns.</p>
 <tbody>
 <tr class="odd">
 <td align="left">visit_type</td>
-<td align="left">visit_type</td>
 <td align="right">0</td>
-<td align="right">0.00</td>
+<td align="right">0</td>
 <td align="right">120</td>
 </tr>
 <tr class="even">
 <td align="left">dm_1</td>
-<td align="left">dm_1</td>
 <td align="right">0</td>
-<td align="right">0.00</td>
+<td align="right">0</td>
 <td align="right">120</td>
 </tr>
 <tr class="odd">
 <td align="left">dm_2</td>
-<td align="left">dm_2</td>
 <td align="right">0</td>
-<td align="right">0.00</td>
+<td align="right">0</td>
 <td align="right">120</td>
 </tr>
 <tr class="even">
 <td align="left">dm_3</td>
-<td align="left">dm_3</td>
 <td align="right">0</td>
-<td align="right">0.00</td>
+<td align="right">0</td>
 <td align="right">120</td>
 </tr>
 <tr class="odd">
 <td align="left">sq_1</td>
-<td align="left">sq_1</td>
 <td align="right">0</td>
-<td align="right">0.00</td>
+<td align="right">0</td>
 <td align="right">120</td>
 </tr>
 <tr class="even">
 <td align="left">sq_2</td>
-<td align="left">sq_2</td>
 <td align="right">0</td>
-<td align="right">0.00</td>
+<td align="right">0</td>
 <td align="right">120</td>
 </tr>
 <tr class="odd">
 <td align="left">sq_3</td>
-<td align="left">sq_3</td>
 <td align="right">0</td>
-<td align="right">0.00</td>
+<td align="right">0</td>
 <td align="right">120</td>
 </tr>
 <tr class="even">
 <td align="left">sus_1</td>
-<td align="left">sus_1</td>
 <td align="right">0</td>
-<td align="right">0.00</td>
+<td align="right">0</td>
 <td align="right">120</td>
 </tr>
 <tr class="odd">
 <td align="left">sus_2</td>
-<td align="left">sus_2</td>
 <td align="right">0</td>
-<td align="right">0.00</td>
+<td align="right">0</td>
 <td align="right">120</td>
 </tr>
 <tr class="even">
 <td align="left">sat_1</td>
-<td align="left">sat_1</td>
 <td align="right">0</td>
-<td align="right">0.00</td>
+<td align="right">0</td>
 <td align="right">120</td>
 </tr>
 <tr class="odd">
 <td align="left">sat_2</td>
-<td align="left">sat_2</td>
 <td align="right">0</td>
-<td align="right">0.00</td>
+<td align="right">0</td>
 <td align="right">120</td>
 </tr>
 <tr class="even">
 <td align="left">bi_1</td>
-<td align="left">bi_1</td>
 <td align="right">0</td>
-<td align="right">0.00</td>
+<td align="right">0</td>
 <td align="right">120</td>
 </tr>
 <tr class="odd">
 <td align="left">bi_2</td>
-<td align="left">bi_2</td>
 <td align="right">0</td>
-<td align="right">0.00</td>
+<td align="right">0</td>
 <td align="right">120</td>
 </tr>
 <tr class="even">
 <td align="left">attention</td>
-<td align="left">attention</td>
 <td align="right">0</td>
-<td align="right">0.00</td>
+<td align="right">0</td>
 <td align="right">120</td>
 </tr>
 <tr class="odd">
-<td align="left">comments</td>
 <td align="left">comments</td>
 <td align="right">30</td>
-<td align="right">0.25</td>
+<td align="right">25</td>
 <td align="right">90</td>
 </tr>
 </tbody>
 </table>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
-<span><span class="va">qr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/quality_report.html">quality_report</a></span><span class="op">(</span></span>
+<span><span class="va">qr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sframe_quality_results.html">sframe_quality_results</a></span><span class="op">(</span></span>
 <span>  <span class="va">responses</span>, <span class="va">instr</span>,</span>
 <span>  respondent_id <span class="op">=</span> <span class="st">"respondent_id"</span>,</span>
 <span>  submitted_at  <span class="op">=</span> <span class="st">"submitted_at"</span>,</span>
@@ -408,11 +394,11 @@ the plan runs.</p>
 <div class="section level2">
 <h2 id="check-assumptions-before-the-plan">Check assumptions before the plan<a class="anchor" aria-label="anchor" href="#check-assumptions-before-the-plan"></a>
 </h2>
-<p><code><a href="../reference/assumption_report.html">assumption_report()</a></code> reports the checks a technique
-relies on, such as residual normality, variance inflation, and influence
-for a regression.</p>
+<p><code><a href="../reference/sframe_assumption_results.html">sframe_assumption_results()</a></code> reports the checks a
+technique relies on, such as residual normality, variance inflation, and
+influence for a regression.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/assumption_report.html">assumption_report</a></span><span class="op">(</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/sframe_assumption_results.html">sframe_assumption_results</a></span><span class="op">(</span></span>
 <span>  <span class="va">scored</span>,</span>
 <span>  predictors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"digital_marketing"</span>, <span class="st">"service_quality"</span>, <span class="st">"sustainability"</span><span class="op">)</span>,</span>
 <span>  outcome    <span class="op">=</span> <span class="st">"satisfaction"</span></span>
@@ -430,7 +416,7 @@ variables that fill each role. A correlation expects <code>x</code> and
 <code>dependent</code> variable. A group comparison expects a
 <code>group</code> and an <code>outcome</code>.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/sf_plan.html">sf_plan</a></span><span class="op">(</span><span class="va">instr</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/sframe_plan.html">sframe_plan</a></span><span class="op">(</span><span class="va">instr</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>id <span class="op">=</span> <span class="st">"RQ1"</span>,</span>
 <span>       research_question <span class="op">=</span> <span class="st">"Is digital marketing perception associated with satisfaction?"</span>,</span>
 <span>       family <span class="op">=</span> <span class="st">"association"</span>, method <span class="op">=</span> <span class="st">"correlation_pearson"</span>,</span>
@@ -548,9 +534,9 @@ compiled from the techniques used.</p>
 <h2 id="in-surveystudio">In SurveyStudio<a class="anchor" aria-label="anchor" href="#in-surveystudio"></a>
 </h2>
 <p>SurveyStudio runs the same plan. Open it on the analysis screen,
-upload the responses, and the Analysis Plan screen runs the saved plan
-and shows a table of each question with its method and APA result. The
-full report is produced on the Export screen.</p>
+upload the responses, and the Analyse screen runs the saved plan and
+shows a table of each question with its method and APA result. The full
+report is produced on the Report screen.</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/launch_studio.html">launch_studio</a></span><span class="op">(</span></span>
 <span>  instrument     <span class="op">=</span> <span class="va">instr</span>,</span>

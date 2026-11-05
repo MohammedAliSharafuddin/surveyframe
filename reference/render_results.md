@@ -69,6 +69,15 @@ The output file path, invisibly.
 [`run_analysis_plan()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/run_analysis_plan.md),
 [`render_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_report.md)
 
+Other Report functions:
+[`render_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_report.md),
+[`sframe_analysis_qmd()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_analysis_qmd.md),
+[`sframe_codebook()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_codebook.md),
+[`sframe_format_result()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_format_result.md),
+[`sframe_report_source()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_report_source.md),
+[`sframe_reports`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_reports.md),
+[`sframe_save_figures()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_save_figures.md)
+
 ## Examples
 
 ``` r

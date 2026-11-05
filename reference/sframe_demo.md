@@ -1,10 +1,10 @@
 # Load one bundled demo
 
-One of the 22-item teaching library: 17 analysis examples, three
-presentation examples, and two provenance examples. For the demo that
-instead exercises every input type SurveyBuilder and SurveyStudio
-support in a single instrument, see
-[`sframe_input_types_demo_data()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_input_types_demo_data.md).
+One of the 22-item teaching library: 17 analysis examples, 3
+presentation examples, and 2 provenance examples. Or 1 of the 2
+reference datasets: `"tourism_services"`, a realistic multi-scale
+instrument, and `"input_types"`, which uses every input type
+SurveyBuilder and SurveyStudio support in a single instrument.
 
 ## Usage
 
@@ -17,7 +17,7 @@ sframe_demo(name, branded = FALSE)
 - name:
 
   Character. A demo name, as listed by
-  [`sframe_demos()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_demos.md).
+  [`sframe_list_demos()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_list_demos.md).
 
 - branded:
 
@@ -25,8 +25,6 @@ sframe_demo(name, branded = FALSE)
   welcome page, logo, theme colour and thank you page spliced into its
   `render` block. The bundled file on disk is left unchanged, so the
   same branding can be shown on whichever demo matches your own survey.
-  See
-  [`sframe_demo_branding()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_demo_branding.md).
 
 ## Value
 
@@ -35,13 +33,17 @@ A list with `instrument`, `responses`, and the paths behind them:
 The codebook carries variable and value labels, so the data means
 something outside R. The results table is what surveyframe reports for
 this demo, which is the reference to compare against when you run the
-same data through another package.
+same data through another package. The 2 reference datasets have no
+codebook or results table, so those 2 paths are `NA`.
 
 ## See also
 
-[`sframe_demos()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_demos.md),
-[`sframe_export_labelled()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_export_labelled.md),
-[`sframe_input_types_demo_data()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_input_types_demo_data.md)
+[`sframe_list_demos()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_list_demos.md),
+[`export_responses()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/export_responses.md)
+
+Other Demo functions:
+[`sframe_demo_qmd()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_demo_qmd.md),
+[`sframe_list_demos()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_list_demos.md)
 
 ## Examples
 

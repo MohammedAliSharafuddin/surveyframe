@@ -111,15 +111,22 @@ declared scale, are dropped whole and counted. Completing partial matrices
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
-    <div class="dont-index"><p><code><a href="sframe_aggregate_judgements.html">sframe_aggregate_judgements()</a></code>, <code><a href="sframe_collected_weights.html">sframe_collected_weights()</a></code></p></div>
+    <div class="dont-index"><p><code><a href="sframe_aggregate_judgements.html">sframe_aggregate_judgements()</a></code>, <code><a href="sframe_collected_weights.html">sframe_collected_weights()</a></code></p>
+<p>Other Decision analysis functions:
+<code><a href="sframe_aggregate_judgements.html">sframe_aggregate_judgements()</a></code>,
+<code><a href="sframe_collected_weights.html">sframe_collected_weights()</a></code>,
+<code><a href="sframe_decision_options.html">sframe_decision_options()</a></code>,
+<code><a href="sframe_dematel_compute.html">sframe_dematel_compute()</a></code>,
+<code><a href="sframe_rated_matrix.html">sframe_rated_matrix()</a></code>,
+<code><a href="sframe_sensitivity_analysis.html">sframe_sensitivity_analysis()</a></code></p></div>
     </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">crits</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"price"</span>, <span class="st">"speed"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">study</span> <span class="op">&lt;-</span> <span class="fu"><a href="sf_instrument.html">sf_instrument</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span><span class="va">study</span> <span class="op">&lt;-</span> <span class="fu"><a href="sframe_instrument.html">sframe_instrument</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>  title <span class="op">=</span> <span class="st">"Demo"</span>, components <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>    <span class="fu"><a href="sf_item.html">sf_item</a></span><span class="op">(</span><span class="st">"pairs"</span>, <span class="st">"Compare the criteria"</span>, type <span class="op">=</span> <span class="st">"pairwise_comparison"</span>,</span></span>
+<span class="r-in"><span>    <span class="fu"><a href="sframe_item.html">sframe_item</a></span><span class="op">(</span><span class="st">"pairs"</span>, <span class="st">"Compare the criteria"</span>, type <span class="op">=</span> <span class="st">"pairwise_comparison"</span>,</span></span>
 <span class="r-in"><span>            comparison_items <span class="op">=</span> <span class="va">crits</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>

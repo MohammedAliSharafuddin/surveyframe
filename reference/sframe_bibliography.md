@@ -44,6 +44,14 @@ sframe_bibliography(
 
 The path, invisibly, or the JSON string when `file` is `NULL`.
 
+## See also
+
+Other References functions:
+[`read_bibtex()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_bibtex.md),
+[`sframe_add_references()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_add_references.md),
+[`sframe_get_references()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_get_references.md),
+[`sframe_reference()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_reference.md)
+
 ## Examples
 
 ``` r

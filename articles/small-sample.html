@@ -131,11 +131,11 @@ the study design and estimand, and report the limited precision.</p>
 <div class="section level2">
 <h2 id="planning-a-small-sample-study">Planning a small-sample study<a class="anchor" aria-label="anchor" href="#planning-a-small-sample-study"></a>
 </h2>
-<p><code><a href="../reference/sample_size_plan.html">sample_size_plan()</a></code> estimates a required sample size for
-a design and attaches the same small-sample advisory used elsewhere in
-the package when the estimate itself falls below 30.</p>
+<p><code><a href="../reference/sframe_sample_size_plan.html">sframe_sample_size_plan()</a></code> estimates a required sample
+size for a design and attaches the same small-sample advisory used
+elsewhere in the package when the estimate itself falls below 30.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/sample_size_plan.html">sample_size_plan</a></span><span class="op">(</span>type <span class="op">=</span> <span class="st">"t_test"</span>, groups <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/sframe_sample_size_plan.html">sframe_sample_size_plan</a></span><span class="op">(</span>type <span class="op">=</span> <span class="st">"t_test"</span>, groups <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Sample-Size Plan</span></span>
 <span><span class="co">#&gt;   Target:      t_test</span></span>
 <span><span class="co">#&gt;   Estimated n: 128</span></span>
@@ -149,19 +149,19 @@ responses, well below that planning estimate. The instrument below has a
 two-level grouping question, a numeric outcome, and a binary outcome for
 the logistic example later in this vignette.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">group_cs</span>     <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sf_choices.html">sf_choices</a></span><span class="op">(</span>id <span class="op">=</span> <span class="st">"grp_cs"</span>, values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"control"</span>, <span class="st">"treatment"</span><span class="op">)</span>,</span>
+<code class="sourceCode R"><span><span class="va">group_cs</span>     <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sframe_choice_set.html">sframe_choice_set</a></span><span class="op">(</span>id <span class="op">=</span> <span class="st">"grp_cs"</span>, values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"control"</span>, <span class="st">"treatment"</span><span class="op">)</span>,</span>
 <span>                            labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Control"</span>, <span class="st">"Treatment"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">converted_cs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sf_choices.html">sf_choices</a></span><span class="op">(</span>id <span class="op">=</span> <span class="st">"conv_cs"</span>, values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"no"</span>, <span class="st">"yes"</span><span class="op">)</span>,</span>
+<span><span class="va">converted_cs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sframe_choice_set.html">sframe_choice_set</a></span><span class="op">(</span>id <span class="op">=</span> <span class="st">"conv_cs"</span>, values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"no"</span>, <span class="st">"yes"</span><span class="op">)</span>,</span>
 <span>                            labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"No"</span>, <span class="st">"Yes"</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">items</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>  <span class="fu"><a href="../reference/sf_item.html">sf_item</a></span><span class="op">(</span>id <span class="op">=</span> <span class="st">"group"</span>, label <span class="op">=</span> <span class="st">"Study arm"</span>, type <span class="op">=</span> <span class="st">"single_choice"</span>, choice_set <span class="op">=</span> <span class="st">"grp_cs"</span><span class="op">)</span>,</span>
-<span>  <span class="fu"><a href="../reference/sf_item.html">sf_item</a></span><span class="op">(</span>id <span class="op">=</span> <span class="st">"outcome"</span>, label <span class="op">=</span> <span class="st">"Outcome score"</span>, type <span class="op">=</span> <span class="st">"numeric"</span><span class="op">)</span>,</span>
-<span>  <span class="fu"><a href="../reference/sf_item.html">sf_item</a></span><span class="op">(</span>id <span class="op">=</span> <span class="st">"converted"</span>, label <span class="op">=</span> <span class="st">"Converted (yes/no)"</span>, type <span class="op">=</span> <span class="st">"single_choice"</span>,</span>
+<span>  <span class="fu"><a href="../reference/sframe_item.html">sframe_item</a></span><span class="op">(</span>id <span class="op">=</span> <span class="st">"group"</span>, label <span class="op">=</span> <span class="st">"Study arm"</span>, type <span class="op">=</span> <span class="st">"single_choice"</span>, choice_set <span class="op">=</span> <span class="st">"grp_cs"</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="../reference/sframe_item.html">sframe_item</a></span><span class="op">(</span>id <span class="op">=</span> <span class="st">"outcome"</span>, label <span class="op">=</span> <span class="st">"Outcome score"</span>, type <span class="op">=</span> <span class="st">"numeric"</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="../reference/sframe_item.html">sframe_item</a></span><span class="op">(</span>id <span class="op">=</span> <span class="st">"converted"</span>, label <span class="op">=</span> <span class="st">"Converted (yes/no)"</span>, type <span class="op">=</span> <span class="st">"single_choice"</span>,</span>
 <span>          choice_set <span class="op">=</span> <span class="st">"conv_cs"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">study</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sf_instrument.html">sf_instrument</a></span><span class="op">(</span></span>
+<span><span class="va">study</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sframe_instrument.html">sframe_instrument</a></span><span class="op">(</span></span>
 <span>  title      <span class="op">=</span> <span class="st">"Small-sample pilot"</span>,</span>
 <span>  version    <span class="op">=</span> <span class="st">"0.1.0"</span>,</span>
 <span>  authors    <span class="op">=</span> <span class="st">"surveyframe"</span>,</span>
@@ -180,19 +180,20 @@ the logistic example later in this vignette.</p>
 <div class="section level2">
 <h2 id="reading-the-advisory">Reading the advisory<a class="anchor" aria-label="anchor" href="#reading-the-advisory"></a>
 </h2>
-<p><code><a href="../reference/assumption_report.html">assumption_report()</a></code> and <code><a href="../reference/sample_size_plan.html">sample_size_plan()</a></code>
-both attach an <code>advisory</code> element once a relevant n drops
-below 30. It prints automatically and is also available as a field for
-programmatic checks.</p>
+<p><code><a href="../reference/sframe_assumption_results.html">sframe_assumption_results()</a></code> and
+<code><a href="../reference/sframe_sample_size_plan.html">sframe_sample_size_plan()</a></code> both attach an
+<code>advisory</code> element once a relevant n drops below 30. It
+prints automatically and is also available as a field for programmatic
+checks.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">n20</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>score <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">20</span>, mean <span class="op">=</span> <span class="fl">50</span>, sd <span class="op">=</span> <span class="fl">10</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">n50</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>score <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">50</span>, mean <span class="op">=</span> <span class="fl">50</span>, sd <span class="op">=</span> <span class="fl">10</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">ar_small</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/assumption_report.html">assumption_report</a></span><span class="op">(</span><span class="va">n20</span>, variables <span class="op">=</span> <span class="st">"score"</span><span class="op">)</span></span>
+<span><span class="va">ar_small</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sframe_assumption_results.html">sframe_assumption_results</a></span><span class="op">(</span><span class="va">n20</span>, variables <span class="op">=</span> <span class="st">"score"</span><span class="op">)</span></span>
 <span><span class="va">ar_small</span><span class="op">$</span><span class="va">advisory</span></span>
 <span><span class="co">#&gt; [1] "Small sample detected (n = 20). For these assumption checks, consider non-parametric alternatives. Asymptotic p-values may be unreliable. Bootstrap or exact confidence intervals are provided where available."</span></span>
 <span></span>
-<span><span class="va">ar_large</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/assumption_report.html">assumption_report</a></span><span class="op">(</span><span class="va">n50</span>, variables <span class="op">=</span> <span class="st">"score"</span><span class="op">)</span></span>
+<span><span class="va">ar_large</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sframe_assumption_results.html">sframe_assumption_results</a></span><span class="op">(</span><span class="va">n50</span>, variables <span class="op">=</span> <span class="st">"score"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">ar_large</span><span class="op">$</span><span class="va">advisory</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
 </div>
@@ -210,7 +211,7 @@ the shift, which a point estimate alone leaves out.</p>
 <span>  covariate <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">20</span>, <span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="../reference/sf_plan.html">sf_plan</a></span><span class="op">(</span><span class="va">study</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span><span class="fu"><a href="../reference/sframe_plan.html">sframe_plan</a></span><span class="op">(</span><span class="va">study</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>id <span class="op">=</span> <span class="st">"RQ1"</span>,</span>
 <span>       research_question <span class="op">=</span> <span class="st">"Does the treatment arm score higher than control?"</span>,</span>
 <span>       family <span class="op">=</span> <span class="st">"group_comparison"</span>, method <span class="op">=</span> <span class="st">"mann_whitney"</span>,</span>
@@ -257,7 +258,7 @@ within-pair shift, again with an interval in place of a point value.</p>
 <code class="sourceCode R"><span><span class="va">before</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">8</span>, <span class="fl">50</span>, <span class="fl">6</span><span class="op">)</span></span>
 <span><span class="va">after</span>  <span class="op">&lt;-</span> <span class="va">before</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">8</span>, <span class="fl">4</span>, <span class="fl">5</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="../reference/sf_plan.html">sf_plan</a></span><span class="op">(</span><span class="va">study</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span><span class="fu"><a href="../reference/sframe_plan.html">sframe_plan</a></span><span class="op">(</span><span class="va">study</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>id <span class="op">=</span> <span class="st">"RQ2"</span>,</span>
 <span>       research_question <span class="op">=</span> <span class="st">"Did scores change from before to after?"</span>,</span>
 <span>       family <span class="op">=</span> <span class="st">"group_comparison"</span>, method <span class="op">=</span> <span class="st">"wilcoxon_pair"</span>,</span>
@@ -304,7 +305,7 @@ interval is only defined for a 2x2 table, and is dropped (not
 approximated) when <code>simulate_p_value</code> is requested, since
 base R’s <code><a href="https://rdrr.io/r/stats/fisher.test.html" class="external-link">fisher.test()</a></code> cannot return both together.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/sf_plan.html">sf_plan</a></span><span class="op">(</span><span class="va">study</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/sframe_plan.html">sframe_plan</a></span><span class="op">(</span><span class="va">study</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>id <span class="op">=</span> <span class="st">"RQ3"</span>,</span>
 <span>       research_question <span class="op">=</span> <span class="st">"Is conversion associated with study arm?"</span>,</span>
 <span>       family <span class="op">=</span> <span class="st">"association"</span>, method <span class="op">=</span> <span class="st">"fisher_exact"</span>,</span>
@@ -343,12 +344,12 @@ base R’s <code><a href="https://rdrr.io/r/stats/fisher.test.html" class="exter
 <div class="section level2">
 <h2 id="bootstrap-confidence-interval-on-a-median">Bootstrap confidence interval on a median<a class="anchor" aria-label="anchor" href="#bootstrap-confidence-interval-on-a-median"></a>
 </h2>
-<p><code><a href="../reference/bootstrap_ci.html">bootstrap_ci()</a></code> computes a bootstrap interval for an
-arbitrary statistic, useful when no exact interval exists for the
+<p><code><a href="../reference/sframe_bootstrap_ci.html">sframe_bootstrap_ci()</a></code> computes a bootstrap interval for
+an arbitrary statistic, useful when no exact interval exists for the
 estimator you need. It is already exported and used elsewhere in the
 package, applied here to the median of the pilot outcome scores.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/bootstrap_ci.html">bootstrap_ci</a></span><span class="op">(</span><span class="va">pilot</span><span class="op">$</span><span class="va">outcome</span>, FUN <span class="op">=</span> <span class="fu">stats</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/r/stats/median.html" class="external-link">median</a></span>, R <span class="op">=</span> <span class="fl">999</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/sframe_bootstrap_ci.html">sframe_bootstrap_ci</a></span><span class="op">(</span><span class="va">pilot</span><span class="op">$</span><span class="va">outcome</span>, FUN <span class="op">=</span> <span class="fu">stats</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/r/stats/median.html" class="external-link">median</a></span>, R <span class="op">=</span> <span class="fl">999</span><span class="op">)</span></span>
 <span><span class="co">#&gt; estimate    lower    upper </span></span>
 <span><span class="co">#&gt; 52.82878 47.33676 56.66709 </span></span>
 <span><span class="co">#&gt; attr(,"resamples")</span></span>
@@ -365,7 +366,7 @@ penalised-likelihood correction (Firth, 1993) addresses both.
 surveyframe’s <code>firth_logistic</code> runner needs the optional
 <code>logistf</code> package.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/sf_plan.html">sf_plan</a></span><span class="op">(</span><span class="va">study</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/sframe_plan.html">sframe_plan</a></span><span class="op">(</span><span class="va">study</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>id <span class="op">=</span> <span class="st">"RQ4"</span>,</span>
 <span>       research_question <span class="op">=</span> <span class="st">"Does the covariate predict conversion?"</span>,</span>
 <span>       family <span class="op">=</span> <span class="st">"regression"</span>, method <span class="op">=</span> <span class="st">"firth_logistic"</span>,</span>
@@ -408,12 +409,12 @@ surveyframe’s <code>firth_logistic</code> runner needs the optional
 <div class="section level2">
 <h2 id="cohens-d-with-a-bootstrap-interval">Cohen’s d with a bootstrap interval<a class="anchor" aria-label="anchor" href="#cohens-d-with-a-bootstrap-interval"></a>
 </h2>
-<p><code><a href="../reference/cohens_d_ci.html">cohens_d_ci()</a></code> pairs Cohen’s d with a bootstrap interval,
-which is informative precisely where it matters most: interval width
-grows visibly as n falls, making the extra uncertainty at small n
+<p><code><a href="../reference/sframe_cohens_d_ci.html">sframe_cohens_d_ci()</a></code> pairs Cohen’s d with a bootstrap
+interval, which is informative precisely where it matters most: interval
+width grows visibly as n falls, making the extra uncertainty at small n
 explicit, where a single point estimate leaves it implicit.</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/cohens_d_ci.html">cohens_d_ci</a></span><span class="op">(</span><span class="va">pilot</span><span class="op">$</span><span class="va">outcome</span><span class="op">[</span><span class="va">pilot</span><span class="op">$</span><span class="va">group</span> <span class="op">==</span> <span class="st">"treatment"</span><span class="op">]</span>,</span>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/sframe_cohens_d_ci.html">sframe_cohens_d_ci</a></span><span class="op">(</span><span class="va">pilot</span><span class="op">$</span><span class="va">outcome</span><span class="op">[</span><span class="va">pilot</span><span class="op">$</span><span class="va">group</span> <span class="op">==</span> <span class="st">"treatment"</span><span class="op">]</span>,</span>
 <span>            <span class="va">pilot</span><span class="op">$</span><span class="va">outcome</span><span class="op">[</span><span class="va">pilot</span><span class="op">$</span><span class="va">group</span> <span class="op">==</span> <span class="st">"control"</span><span class="op">]</span>, R <span class="op">=</span> <span class="fl">999</span><span class="op">)</span></span>
 <span><span class="co">#&gt;   estimate      lower      upper </span></span>
 <span><span class="co">#&gt;  0.5420188 -0.3636638  1.5240611 </span></span>

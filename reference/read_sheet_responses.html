@@ -110,11 +110,17 @@ included.</p></dd>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>A <code>data.frame</code> validated against the instrument, ready for
-<code><a href="quality_report.html">quality_report()</a></code>, <code><a href="score_scales.html">score_scales()</a></code>, and <code><a href="reliability_report.html">reliability_report()</a></code>.</p>
+<code><a href="sframe_quality_results.html">sframe_quality_results()</a></code>, <code><a href="score_scales.html">score_scales()</a></code>, and <code><a href="sframe_reliability_results.html">sframe_reliability_results()</a></code>.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
-    <div class="dont-index"><p><code><a href="export_google_sheet.html">export_google_sheet()</a></code>, <code><a href="read_responses.html">read_responses()</a></code>, <code><a href="quality_report.html">quality_report()</a></code></p></div>
+    <div class="dont-index"><p><code><a href="export_google_sheet.html">export_google_sheet()</a></code>, <code><a href="read_responses.html">read_responses()</a></code>, <code><a href="sframe_quality_results.html">sframe_quality_results()</a></code></p>
+<p>Other Responses functions:
+<code><a href="export_responses.html">export_responses()</a></code>,
+<code><a href="read_responses.html">read_responses()</a></code>,
+<code><a href="sframe_missing_data_results.html">sframe_missing_data_results()</a></code>,
+<code><a href="sframe_outlier_results.html">sframe_outlier_results()</a></code>,
+<code><a href="sframe_quality_results.html">sframe_quality_results()</a></code></p></div>
     </div>
 
     <div class="section level2">
@@ -124,7 +130,7 @@ included.</p></dd>
 <span class="r-in"><span>  sheet_id   <span class="op">=</span> <span class="st">"your-sheet-id"</span>,</span></span>
 <span class="r-in"><span>  instrument <span class="op">=</span> <span class="va">instr</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">qr</span> <span class="op">&lt;-</span> <span class="fu"><a href="quality_report.html">quality_report</a></span><span class="op">(</span><span class="va">responses</span>, <span class="va">instr</span>, respondent_id <span class="op">=</span> <span class="st">"respondent_id"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">qr</span> <span class="op">&lt;-</span> <span class="fu"><a href="sframe_quality_results.html">sframe_quality_results</a></span><span class="op">(</span><span class="va">responses</span>, <span class="va">instr</span>, respondent_id <span class="op">=</span> <span class="st">"respondent_id"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
 </code></pre></div>
     </div>

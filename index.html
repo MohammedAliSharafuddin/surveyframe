@@ -128,12 +128,12 @@
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://mohammedalisharafuddin.github.io/surveyframe/">surveyframe</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># 1. Describe the items you already collected</span></span>
-<span><span class="va">cs</span>  <span class="op">&lt;-</span> <span class="fu"><a href="reference/sf_choices.html">sf_choices</a></span><span class="op">(</span><span class="st">"agree5"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">5</span>,</span>
+<span><span class="va">cs</span>  <span class="op">&lt;-</span> <span class="fu"><a href="reference/sframe_choice_set.html">sframe_choice_set</a></span><span class="op">(</span><span class="st">"agree5"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">5</span>,</span>
 <span>        <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Strongly disagree"</span>, <span class="st">"Disagree"</span>, <span class="st">"Neutral"</span>, <span class="st">"Agree"</span>, <span class="st">"Strongly agree"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">i1</span>  <span class="op">&lt;-</span> <span class="fu"><a href="reference/sf_item.html">sf_item</a></span><span class="op">(</span><span class="st">"q1"</span>, <span class="st">"Item 1"</span>, type <span class="op">=</span> <span class="st">"likert"</span>, choice_set <span class="op">=</span> <span class="st">"agree5"</span>, scale_id <span class="op">=</span> <span class="st">"S"</span><span class="op">)</span></span>
-<span><span class="va">i2</span>  <span class="op">&lt;-</span> <span class="fu"><a href="reference/sf_item.html">sf_item</a></span><span class="op">(</span><span class="st">"q2"</span>, <span class="st">"Item 2"</span>, type <span class="op">=</span> <span class="st">"likert"</span>, choice_set <span class="op">=</span> <span class="st">"agree5"</span>, scale_id <span class="op">=</span> <span class="st">"S"</span><span class="op">)</span></span>
-<span><span class="va">sc</span>  <span class="op">&lt;-</span> <span class="fu"><a href="reference/sf_scale.html">sf_scale</a></span><span class="op">(</span><span class="st">"S"</span>, <span class="st">"My scale"</span>, items <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"q1"</span>, <span class="st">"q2"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">instr</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/sf_instrument.html">sf_instrument</a></span><span class="op">(</span><span class="st">"My study"</span>, components <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">cs</span>, <span class="va">i1</span>, <span class="va">i2</span>, <span class="va">sc</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">i1</span>  <span class="op">&lt;-</span> <span class="fu"><a href="reference/sframe_item.html">sframe_item</a></span><span class="op">(</span><span class="st">"q1"</span>, <span class="st">"Item 1"</span>, type <span class="op">=</span> <span class="st">"likert"</span>, choice_set <span class="op">=</span> <span class="st">"agree5"</span>, scale_id <span class="op">=</span> <span class="st">"S"</span><span class="op">)</span></span>
+<span><span class="va">i2</span>  <span class="op">&lt;-</span> <span class="fu"><a href="reference/sframe_item.html">sframe_item</a></span><span class="op">(</span><span class="st">"q2"</span>, <span class="st">"Item 2"</span>, type <span class="op">=</span> <span class="st">"likert"</span>, choice_set <span class="op">=</span> <span class="st">"agree5"</span>, scale_id <span class="op">=</span> <span class="st">"S"</span><span class="op">)</span></span>
+<span><span class="va">sc</span>  <span class="op">&lt;-</span> <span class="fu"><a href="reference/sframe_scale.html">sframe_scale</a></span><span class="op">(</span><span class="st">"S"</span>, <span class="st">"My scale"</span>, items <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"q1"</span>, <span class="st">"q2"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">instr</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/sframe_instrument.html">sframe_instrument</a></span><span class="op">(</span><span class="st">"My study"</span>, components <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">cs</span>, <span class="va">i1</span>, <span class="va">i2</span>, <span class="va">sc</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># 2. Load your CSV</span></span>
 <span><span class="va">responses</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/read_responses.html">read_responses</a></span><span class="op">(</span><span class="st">"my_data.csv"</span>, <span class="va">instr</span>, strict <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
@@ -176,30 +176,30 @@
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://mohammedalisharafuddin.github.io/surveyframe/">surveyframe</a></span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">agree5</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/sf_choices.html">sf_choices</a></span><span class="op">(</span></span>
+<span><span class="va">agree5</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/sframe_choice_set.html">sframe_choice_set</a></span><span class="op">(</span></span>
 <span>  <span class="st">"agree5"</span>,</span>
 <span>  values <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">5</span>,</span>
 <span>  labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Strongly disagree"</span>, <span class="st">"Disagree"</span>, <span class="st">"Neutral"</span>, <span class="st">"Agree"</span>, <span class="st">"Strongly agree"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">visitor_type_choices</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/sf_choices.html">sf_choices</a></span><span class="op">(</span></span>
+<span><span class="va">visitor_type_choices</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/sframe_choice_set.html">sframe_choice_set</a></span><span class="op">(</span></span>
 <span>  <span class="st">"visitor_type"</span>,</span>
 <span>  values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"first_time"</span>, <span class="st">"repeat"</span><span class="op">)</span>,</span>
 <span>  labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"First-time visitor"</span>, <span class="st">"Repeat visitor"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">sat_1</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/sf_item.html">sf_item</a></span><span class="op">(</span><span class="st">"sat_1"</span>, <span class="st">"The service was reliable."</span>,</span>
+<span><span class="va">sat_1</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/sframe_item.html">sframe_item</a></span><span class="op">(</span><span class="st">"sat_1"</span>, <span class="st">"The service was reliable."</span>,</span>
 <span>  type <span class="op">=</span> <span class="st">"likert"</span>, choice_set <span class="op">=</span> <span class="st">"agree5"</span>, scale_id <span class="op">=</span> <span class="st">"sat"</span><span class="op">)</span></span>
-<span><span class="va">sat_2</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/sf_item.html">sf_item</a></span><span class="op">(</span><span class="st">"sat_2"</span>, <span class="st">"The service was responsive."</span>,</span>
+<span><span class="va">sat_2</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/sframe_item.html">sframe_item</a></span><span class="op">(</span><span class="st">"sat_2"</span>, <span class="st">"The service was responsive."</span>,</span>
 <span>  type <span class="op">=</span> <span class="st">"likert"</span>, choice_set <span class="op">=</span> <span class="st">"agree5"</span>, scale_id <span class="op">=</span> <span class="st">"sat"</span><span class="op">)</span></span>
-<span><span class="va">sat_3</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/sf_item.html">sf_item</a></span><span class="op">(</span><span class="st">"sat_3"</span>, <span class="st">"I would recommend the service."</span>,</span>
+<span><span class="va">sat_3</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/sframe_item.html">sframe_item</a></span><span class="op">(</span><span class="st">"sat_3"</span>, <span class="st">"I would recommend the service."</span>,</span>
 <span>  type <span class="op">=</span> <span class="st">"likert"</span>, choice_set <span class="op">=</span> <span class="st">"agree5"</span>, scale_id <span class="op">=</span> <span class="st">"sat"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">visitor_type</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/sf_item.html">sf_item</a></span><span class="op">(</span><span class="st">"visitor_type"</span>, <span class="st">"Visitor type"</span>, type <span class="op">=</span> <span class="st">"single_choice"</span>,</span>
+<span><span class="va">visitor_type</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/sframe_item.html">sframe_item</a></span><span class="op">(</span><span class="st">"visitor_type"</span>, <span class="st">"Visitor type"</span>, type <span class="op">=</span> <span class="st">"single_choice"</span>,</span>
 <span>  choice_set <span class="op">=</span> <span class="st">"visitor_type"</span><span class="op">)</span></span>
-<span><span class="va">sat</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/sf_scale.html">sf_scale</a></span><span class="op">(</span><span class="st">"sat"</span>, <span class="st">"Satisfaction"</span>, items <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"sat_1"</span>, <span class="st">"sat_2"</span>, <span class="st">"sat_3"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">sat</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/sframe_scale.html">sframe_scale</a></span><span class="op">(</span><span class="st">"sat"</span>, <span class="st">"Satisfaction"</span>, items <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"sat_1"</span>, <span class="st">"sat_2"</span>, <span class="st">"sat_3"</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">instr</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/sf_instrument.html">sf_instrument</a></span><span class="op">(</span></span>
+<span><span class="va">instr</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/sframe_instrument.html">sframe_instrument</a></span><span class="op">(</span></span>
 <span>  <span class="st">"Service Survey"</span>,</span>
 <span>  components <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>    <span class="va">agree5</span>, <span class="va">visitor_type_choices</span>, <span class="va">sat_1</span>, <span class="va">sat_2</span>, <span class="va">sat_3</span>, <span class="va">visitor_type</span>, <span class="va">sat</span></span>
@@ -219,8 +219,8 @@
 <span><span class="fu"><a href="reference/write_sframe.html">write_sframe</a></span><span class="op">(</span><span class="va">instr</span>, <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>fileext <span class="op">=</span> <span class="st">".sframe"</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># See the instrument as a survey a respondent would fill in:</span></span>
-<span><span class="fu"><a href="reference/export_static_survey.html">export_static_survey</a></span><span class="op">(</span><span class="va">instr</span>, open <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
-<p><code><a href="reference/write_sframe.html">write_sframe()</a></code> validates the instrument and writes the validated object, including the validation flag, the analysis plan, and any saved model specifications. <code><a href="reference/export_static_survey.html">export_static_survey()</a></code> renders it as a self-contained HTML survey, the same function covered in “Visual tools” below.</p>
+<span><span class="fu"><a href="reference/export_survey.html">export_survey</a></span><span class="op">(</span><span class="va">instr</span>, open <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+<p><code><a href="reference/write_sframe.html">write_sframe()</a></code> validates the instrument and writes the validated object, including the validation flag, the analysis plan, and any saved model specifications. <code><a href="reference/export_survey.html">export_survey()</a></code> renders it as a self-contained HTML survey, the same function covered in “Visual tools” below.</p>
 </div>
 <div class="section level2">
 <h2 id="import-and-score">Import and score<a class="anchor" aria-label="anchor" href="#import-and-score"></a>
@@ -237,7 +237,7 @@
 <span><span class="va">resp</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/read_responses.html">read_responses</a></span><span class="op">(</span><span class="va">responses</span>, <span class="va">instr</span>, respondent_id <span class="op">=</span> <span class="st">"respondent_id"</span>, strict <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="reference/score_scales.html">score_scales</a></span><span class="op">(</span><span class="va">resp</span>, <span class="va">instr</span><span class="op">)</span></span>
-<span><span class="fu"><a href="reference/missing_data_report.html">missing_data_report</a></span><span class="op">(</span><span class="va">resp</span>, <span class="va">instr</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="reference/sframe_missing_data_results.html">sframe_missing_data_results</a></span><span class="op">(</span><span class="va">resp</span>, <span class="va">instr</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="run-the-analysis-plan">Run the analysis plan<a class="anchor" aria-label="anchor" href="#run-the-analysis-plan"></a>
@@ -260,47 +260,47 @@
 </h2>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"psych"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="fu"><a href="reference/reliability_report.html">reliability_report</a></span><span class="op">(</span><span class="va">resp</span>, <span class="va">instr</span>, omega <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span>  <span class="fu"><a href="reference/efa_report.html">efa_report</a></span><span class="op">(</span><span class="va">resp</span>, <span class="va">instr</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="reference/sframe_reliability_results.html">sframe_reliability_results</a></span><span class="op">(</span><span class="va">resp</span>, <span class="va">instr</span>, omega <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="reference/sframe_efa_readiness_results.html">sframe_efa_readiness_results</a></span><span class="op">(</span><span class="va">resp</span>, <span class="va">instr</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
 <span></span>
-<span><span class="fu"><a href="reference/cfa_syntax.html">cfa_syntax</a></span><span class="op">(</span><span class="va">instr</span><span class="op">)</span></span>
-<span><span class="fu"><a href="reference/cfa_lavaan_syntax.html">cfa_lavaan_syntax</a></span><span class="op">(</span><span class="va">instr</span>, ordered <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="reference/sframe_syntax_cfa.html">sframe_syntax_cfa</a></span><span class="op">(</span><span class="va">instr</span><span class="op">)</span></span>
+<span><span class="fu"><a href="reference/sframe_syntax_cfa.html">sframe_syntax_cfa</a></span><span class="op">(</span><span class="va">instr</span>, ordered <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="model-layer">Model layer<a class="anchor" aria-label="anchor" href="#model-layer"></a>
 </h2>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">model</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/sf_model.html">sf_model</a></span><span class="op">(</span></span>
+<code class="sourceCode R"><span><span class="va">model</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/sframe_model_spec.html">sframe_model_spec</a></span><span class="op">(</span></span>
 <span>  <span class="st">"model_1"</span>,</span>
 <span>  <span class="st">"Satisfaction model"</span>,</span>
 <span>  type <span class="op">=</span> <span class="st">"cb_sem"</span>,</span>
 <span>  constructs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>    <span class="fu"><a href="reference/sf_construct.html">sf_construct</a></span><span class="op">(</span><span class="st">"SAT"</span>, <span class="st">"Satisfaction"</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"sat_1"</span>, <span class="st">"sat_2"</span>, <span class="st">"sat_3"</span><span class="op">)</span><span class="op">)</span></span>
+<span>    <span class="fu"><a href="reference/sframe_construct.html">sframe_construct</a></span><span class="op">(</span><span class="st">"SAT"</span>, <span class="st">"Satisfaction"</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"sat_1"</span>, <span class="st">"sat_2"</span>, <span class="st">"sat_3"</span><span class="op">)</span><span class="op">)</span></span>
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">instr</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/add_model.html">add_model</a></span><span class="op">(</span><span class="va">instr</span>, <span class="va">model</span><span class="op">)</span></span>
-<span><span class="fu"><a href="reference/model_json.html">model_json</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span></span>
-<span><span class="fu"><a href="reference/sem_lavaan_syntax.html">sem_lavaan_syntax</a></span><span class="op">(</span><span class="va">model</span>, <span class="va">instr</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">instr</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/sframe_add_model.html">sframe_add_model</a></span><span class="op">(</span><span class="va">instr</span>, <span class="va">model</span><span class="op">)</span></span>
+<span><span class="fu"><a href="reference/sframe_model_json.html">sframe_model_json</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span></span>
+<span><span class="fu"><a href="reference/sframe_syntax_sem.html">sframe_syntax_sem</a></span><span class="op">(</span><span class="va">model</span>, <span class="va">instr</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="pls-sem-syntax">PLS-SEM syntax<a class="anchor" aria-label="anchor" href="#pls-sem-syntax"></a>
 </h2>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">pls_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/sf_model.html">sf_model</a></span><span class="op">(</span></span>
+<code class="sourceCode R"><span><span class="va">pls_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/sframe_model_spec.html">sframe_model_spec</a></span><span class="op">(</span></span>
 <span>  <span class="st">"pls_1"</span>,</span>
 <span>  <span class="st">"Satisfaction and loyalty PLS model"</span>,</span>
 <span>  type <span class="op">=</span> <span class="st">"pls_sem"</span>,</span>
 <span>  constructs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>    <span class="fu"><a href="reference/sf_construct.html">sf_construct</a></span><span class="op">(</span><span class="st">"SAT"</span>, <span class="st">"Satisfaction"</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"sat_1"</span>, <span class="st">"sat_2"</span><span class="op">)</span>, mode <span class="op">=</span> <span class="st">"composite"</span><span class="op">)</span>,</span>
-<span>    <span class="fu"><a href="reference/sf_construct.html">sf_construct</a></span><span class="op">(</span><span class="st">"LOY"</span>, <span class="st">"Loyalty"</span>, <span class="st">"sat_3"</span>, mode <span class="op">=</span> <span class="st">"single_item"</span><span class="op">)</span></span>
+<span>    <span class="fu"><a href="reference/sframe_construct.html">sframe_construct</a></span><span class="op">(</span><span class="st">"SAT"</span>, <span class="st">"Satisfaction"</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"sat_1"</span>, <span class="st">"sat_2"</span><span class="op">)</span>, mode <span class="op">=</span> <span class="st">"composite"</span><span class="op">)</span>,</span>
+<span>    <span class="fu"><a href="reference/sframe_construct.html">sframe_construct</a></span><span class="op">(</span><span class="st">"LOY"</span>, <span class="st">"Loyalty"</span>, <span class="st">"sat_3"</span>, mode <span class="op">=</span> <span class="st">"single_item"</span><span class="op">)</span></span>
 <span>  <span class="op">)</span>,</span>
-<span>  paths <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="reference/sf_path.html">sf_path</a></span><span class="op">(</span><span class="st">"SAT"</span>, <span class="st">"LOY"</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  paths <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="reference/sframe_path.html">sframe_path</a></span><span class="op">(</span><span class="st">"SAT"</span>, <span class="st">"LOY"</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>  options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>bootstrap <span class="op">=</span> <span class="fl">5000</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="reference/seminr_syntax.html">seminr_syntax</a></span><span class="op">(</span><span class="va">pls_model</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="reference/sframe_syntax_pls.html">sframe_syntax_pls</a></span><span class="op">(</span><span class="va">pls_model</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="a-full-study-report">A full study report<a class="anchor" aria-label="anchor" href="#a-full-study-report"></a>
@@ -324,13 +324,13 @@
 </h2>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="reference/launch_builder.html">launch_builder</a></span><span class="op">(</span>open <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span><span class="fu"><a href="reference/export_static_survey.html">export_static_survey</a></span><span class="op">(</span><span class="va">instr</span>, open <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
-<p>Use <code><a href="reference/launch_builder.html">launch_builder()</a></code> to author the questionnaire, the plan, and the model and to export the <code>.sframe</code> file and model syntax. It runs no statistics. <code><a href="reference/launch_studio.html">launch_studio()</a></code> uploads responses, runs the plan on its Analysis Plan screen, and renders the report on its Export screen. <code><a href="reference/launch_dashboard.html">launch_dashboard()</a></code> is a read-only response explorer. Demo launchers are available for training:</p>
+<span><span class="fu"><a href="reference/export_survey.html">export_survey</a></span><span class="op">(</span><span class="va">instr</span>, open <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+<p>Use <code><a href="reference/launch_builder.html">launch_builder()</a></code> to author the questionnaire, the plan, and the model and to export the <code>.sframe</code> file and model syntax. It runs no statistics. <code><a href="reference/launch_studio.html">launch_studio()</a></code> uploads responses, runs the plan on its Analysis Plan screen, and renders the report on its Export screen. Its Dashboard screen explores responses with filters. Demo launchers are available for training:</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="reference/launch_builder_demo.html">launch_builder_demo</a></span><span class="op">(</span>open <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span><span class="co"># launch_studio_demo()</span></span>
-<span><span class="co"># launch_dashboard_demo()</span></span></code></pre></div>
-<p>Interactive functions such as <code>launch_builder(open = TRUE)</code>, <code><a href="reference/launch_studio.html">launch_studio()</a></code>, <code><a href="reference/render_survey.html">render_survey()</a></code>, and <code><a href="reference/launch_dashboard.html">launch_dashboard()</a></code> are available for manual use. Tests and examples avoid opening browsers.</p>
+<code class="sourceCode R"><span><span class="fu"><a href="reference/launch_builder.html">launch_builder</a></span><span class="op">(</span>demo <span class="op">=</span> <span class="st">"input_types"</span>, open <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="co"># launch_studio(demo = "input_types", screen = "preview")</span></span>
+<span><span class="co"># launch_studio(demo = "input_types", screen = "dashboard")</span></span></code></pre></div>
+<p>Interactive functions such as <code>launch_builder(open = TRUE)</code>, <code><a href="reference/launch_studio.html">launch_studio()</a></code>, and <code><a href="reference/run_survey.html">run_survey()</a></code> are available for manual use. Tests and examples avoid opening browsers.</p>
 </div>
 <div class="section level2">
 <h2 id="roadmap">Roadmap<a class="anchor" aria-label="anchor" href="#roadmap"></a>
@@ -346,7 +346,7 @@
 </ul>
 <p>A disclosed-amendment and Git-linked provenance mechanism shipped alongside, on top of the existing <code>.sframe</code> integrity hash. Full detail in <code>NEWS.md</code>.</p>
 <p>0.4.1 focuses on stability: fixes found by using surveyframe on real instruments, no new capability theme.</p>
-<p>0.4.2 is a defect-fix release, correcting what an external review of 0.4.1 found across 8 batches: 171 findings, 154 fixed here and 17 deferred with a stated reason. The ones that matter most to a live study are in collection, where a participant’s answer could be altered or lost with no signal, and in scoring, where the report path recomputed scale scores by a second method that ignored reverse coding and the declared minimum. Some numbers therefore move between 0.4.1 and 0.4.2, and <code>NEWS.md</code> says which, under “What you need to change”. Reports also gained a folded “Show R code” block, and <code><a href="reference/analysis_syntax.html">analysis_syntax()</a></code> returns the statistical call behind a result with its variables and options resolved, so a reader can copy the code and reproduce the number.</p>
+<p>0.4.2 is a defect-fix release, correcting what an external review of 0.4.1 found across 8 batches: 171 findings, 154 fixed here and 17 deferred with a stated reason. The ones that matter most to a live study are in collection, where a participant’s answer could be altered or lost with no signal, and in scoring, where the report path recomputed scale scores by a second method that ignored reverse coding and the declared minimum. Some numbers therefore move between 0.4.1 and 0.4.2, and <code>NEWS.md</code> says which, under “What you need to change”. Reports also gained a folded “Show R code” block, and <code><a href="reference/sframe_syntax_result.html">sframe_syntax_result()</a></code> returns the statistical call behind a result with its variables and options resolved, so a reader can copy the code and reproduce the number.</p>
 <p>0.4.3, a GitHub release, fixes what a teaching session found in 0.4.2: frequency and descriptives blocks now handle choice items as categories, and SurveyBuilder reads a plan written in R as R does.</p>
 </div>
 <div class="section level2">

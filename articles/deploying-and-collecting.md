@@ -77,14 +77,14 @@ Set the endpoint before you export.
 From the SurveyBuilder, paste the Web App URL into the Apps Script Web
 App URL field on the Google Sheets settings tab, then click **Export
 survey**. From R, store the URL on the instrument and call
-[`export_static_survey()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/export_static_survey.md).
+[`export_survey()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/export_survey.md).
 
 ``` r
 
 study$render$google_sheets_endpoint <-
   "https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec"
 
-export_static_survey(
+export_survey(
   study,
   output_path = "index.html",
   open        = FALSE
@@ -152,14 +152,14 @@ responses <- read_sheet_responses(
   instrument = study
 )
 
-qr <- quality_report(responses, study, respondent_id = "respondent_id")
+qr <- sframe_quality_results(responses, study, respondent_id = "respondent_id")
 ```
 
 The returned data frame is validated against the instrument and is ready
 for
-[`quality_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/quality_report.md),
+[`sframe_quality_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_quality_results.md),
 [`score_scales()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/score_scales.md),
-[`reliability_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/reliability_report.md),
+[`sframe_reliability_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_reliability_results.md),
 and
 [`run_analysis_plan()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/run_analysis_plan.md).
 

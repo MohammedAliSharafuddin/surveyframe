@@ -55,6 +55,15 @@ chart write a file.
 [`render_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_report.md),
 which takes the same settings as `figures`.
 
+Other Report functions:
+[`render_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_report.md),
+[`render_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_results.md),
+[`sframe_analysis_qmd()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_analysis_qmd.md),
+[`sframe_codebook()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_codebook.md),
+[`sframe_format_result()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_format_result.md),
+[`sframe_report_source()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_report_source.md),
+[`sframe_reports`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_reports.md)
+
 ## Examples
 
 ``` r

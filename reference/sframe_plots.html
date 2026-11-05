@@ -62,7 +62,7 @@ hold.</p>
     <div class="section level2">
     <h2 id="from-a-report-or-a-set-of-results">From a report or a set of results<a class="anchor" aria-label="anchor" href="#from-a-report-or-a-set-of-results"></a></h2>
     <p>Every report that has a natural chart carries a <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> method, so a
-report draws without naming a helper:</p><ul><li><p><code>plot(reliability_report(...))</code> draws one report.</p></li>
+report draws without naming a helper:</p><ul><li><p><code>plot(sframe_reliability_results(...))</code> draws one report.</p></li>
 <li><p><code>plot(results)</code> draws each block of an analysis that has a chart.</p></li>
 <li><p><code>plot(results, which = "RQ1")</code> selects one block by its ID.</p></li>
 </ul><p>This is the shortest route, and it is the one to reach for first.</p>
@@ -77,9 +77,7 @@ on its own terms. They differ in what they accept and in what comes back.</p><ul
 <li><p><code><a href="sframe_plot_efa_scree.html">sframe_plot_efa_scree()</a></code></p></li>
 <li><p><code><a href="sframe_plot_efa_loadings.html">sframe_plot_efa_loadings()</a></code></p></li>
 </ul></li>
-<li><p><strong>Responses with the instrument, giving 1 plot:</strong></p><ul><li><p><code><a href="sframe_plot_item_chart.html">sframe_plot_item_chart()</a></code></p></li>
-<li><p><code><a href="sframe_plot_scale_chart.html">sframe_plot_scale_chart()</a></code></p></li>
-<li><p><code><a href="sframe_plot_likert_matrix.html">sframe_plot_likert_matrix()</a></code></p></li>
+<li><p><strong>Responses with the instrument, giving 1 plot:</strong></p><ul><li><p><code><a href="sframe_plot_likert_matrix.html">sframe_plot_likert_matrix()</a></code></p></li>
 <li><p><code><a href="sframe_plot_likert_scale.html">sframe_plot_likert_scale()</a></code></p></li>
 <li><p><code><a href="sframe_plot_correlation_matrix.html">sframe_plot_correlation_matrix()</a></code></p></li>
 <li><p><code><a href="sframe_plot_descriptives.html">sframe_plot_descriptives()</a></code></p></li>
@@ -104,16 +102,33 @@ on its own terms. They differ in what they accept and in what comes back.</p><ul
 where a report has to keep rendering.</p>
     </div>
     <div class="section level2">
-    <h2 id="integration-helpers">Integration helpers<a class="anchor" aria-label="anchor" href="#integration-helpers"></a></h2>
-    <p><code><a href="sframe_draw_mosaic.html">sframe_draw_mosaic()</a></code> and <code><a href="sframe_draw_likert_diverging.html">sframe_draw_likert_diverging()</a></code> draw into an
-open device for the generated reports, and stay exported so those reports
-keep working. <code><a href="sframe_likert_scale_groups.html">sframe_likert_scale_groups()</a></code> finds the scales whose items
-share a choice set, which is how a report groups them. Take the results
-they draw from <code><a href="run_analysis_plan.html">run_analysis_plan()</a></code>.</p>
-    </div>
-    <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
-    <div class="dont-index"><p><code><a href="run_analysis_plan.html">run_analysis_plan()</a></code>, <code><a href="render_report.html">render_report()</a></code></p></div>
+    <div class="dont-index"><p><code><a href="run_analysis_plan.html">run_analysis_plan()</a></code>, <code><a href="render_report.html">render_report()</a></code></p>
+<p>Other Chart functions:
+<code><a href="plot.sframe_analysis_results.html">plot.sframe_analysis_results()</a></code>,
+<code><a href="sframe_plot_cooccurrence.html">sframe_plot_cooccurrence()</a></code>,
+<code><a href="sframe_plot_cooccurrence_network.html">sframe_plot_cooccurrence_network()</a></code>,
+<code><a href="sframe_plot_correlation_matrix.html">sframe_plot_correlation_matrix()</a></code>,
+<code><a href="sframe_plot_decision_ranking.html">sframe_plot_decision_ranking()</a></code>,
+<code><a href="sframe_plot_dematel_influence.html">sframe_plot_dematel_influence()</a></code>,
+<code><a href="sframe_plot_descriptives.html">sframe_plot_descriptives()</a></code>,
+<code><a href="sframe_plot_efa_loadings.html">sframe_plot_efa_loadings()</a></code>,
+<code><a href="sframe_plot_efa_scree.html">sframe_plot_efa_scree()</a></code>,
+<code><a href="sframe_plot_group_comparison.html">sframe_plot_group_comparison()</a></code>,
+<code><a href="sframe_plot_likert_matrix.html">sframe_plot_likert_matrix()</a></code>,
+<code><a href="sframe_plot_likert_scale.html">sframe_plot_likert_scale()</a></code>,
+<code><a href="sframe_plot_missingness.html">sframe_plot_missingness()</a></code>,
+<code><a href="sframe_plot_ngram_frequency.html">sframe_plot_ngram_frequency()</a></code>,
+<code><a href="sframe_plot_paired_comparison.html">sframe_plot_paired_comparison()</a></code>,
+<code><a href="sframe_plot_quality.html">sframe_plot_quality()</a></code>,
+<code><a href="sframe_plot_regression_diagnostics.html">sframe_plot_regression_diagnostics()</a></code>,
+<code><a href="sframe_plot_reliability.html">sframe_plot_reliability()</a></code>,
+<code><a href="sframe_plot_sentiment.html">sframe_plot_sentiment()</a></code>,
+<code><a href="sframe_plot_term_frequency.html">sframe_plot_term_frequency()</a></code>,
+<code><a href="sframe_plot_topics.html">sframe_plot_topics()</a></code>,
+<code><a href="sframe_plot_validity.html">sframe_plot_validity()</a></code>,
+<code><a href="sframe_plot_variable_distribution.html">sframe_plot_variable_distribution()</a></code>,
+<code><a href="theme_surveyframe.html">theme_surveyframe()</a></code></p></div>
     </div>
 
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

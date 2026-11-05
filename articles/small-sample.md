@@ -21,14 +21,14 @@ the study design and estimand, and report the limited precision.
 
 ## Planning a small-sample study
 
-[`sample_size_plan()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sample_size_plan.md)
+[`sframe_sample_size_plan()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_sample_size_plan.md)
 estimates a required sample size for a design and attaches the same
 small-sample advisory used elsewhere in the package when the estimate
 itself falls below 30.
 
 ``` r
 
-sample_size_plan(type = "t_test", groups = 2)
+sframe_sample_size_plan(type = "t_test", groups = 2)
 #> Sample-Size Plan
 #>   Target:      t_test
 #>   Estimated n: 128
@@ -46,19 +46,19 @@ logistic example later in this vignette.
 
 ``` r
 
-group_cs     <- sf_choices(id = "grp_cs", values = c("control", "treatment"),
+group_cs     <- sframe_choice_set(id = "grp_cs", values = c("control", "treatment"),
                             labels = c("Control", "Treatment"))
-converted_cs <- sf_choices(id = "conv_cs", values = c("no", "yes"),
+converted_cs <- sframe_choice_set(id = "conv_cs", values = c("no", "yes"),
                             labels = c("No", "Yes"))
 
 items <- list(
-  sf_item(id = "group", label = "Study arm", type = "single_choice", choice_set = "grp_cs"),
-  sf_item(id = "outcome", label = "Outcome score", type = "numeric"),
-  sf_item(id = "converted", label = "Converted (yes/no)", type = "single_choice",
+  sframe_item(id = "group", label = "Study arm", type = "single_choice", choice_set = "grp_cs"),
+  sframe_item(id = "outcome", label = "Outcome score", type = "numeric"),
+  sframe_item(id = "converted", label = "Converted (yes/no)", type = "single_choice",
           choice_set = "conv_cs")
 )
 
-study <- sf_instrument(
+study <- sframe_instrument(
   title      = "Small-sample pilot",
   version    = "0.1.0",
   authors    = "surveyframe",
@@ -77,9 +77,9 @@ study
 
 ## Reading the advisory
 
-[`assumption_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/assumption_report.md)
+[`sframe_assumption_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_assumption_results.md)
 and
-[`sample_size_plan()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sample_size_plan.md)
+[`sframe_sample_size_plan()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_sample_size_plan.md)
 both attach an `advisory` element once a relevant n drops below 30. It
 prints automatically and is also available as a field for programmatic
 checks.
@@ -89,11 +89,11 @@ checks.
 n20 <- data.frame(score = rnorm(20, mean = 50, sd = 10))
 n50 <- data.frame(score = rnorm(50, mean = 50, sd = 10))
 
-ar_small <- assumption_report(n20, variables = "score")
+ar_small <- sframe_assumption_results(n20, variables = "score")
 ar_small$advisory
 #> [1] "Small sample detected (n = 20). For these assumption checks, consider non-parametric alternatives. Asymptotic p-values may be unreliable. Bootstrap or exact confidence intervals are provided where available."
 
-ar_large <- assumption_report(n50, variables = "score")
+ar_large <- sframe_assumption_results(n50, variables = "score")
 is.null(ar_large$advisory)
 #> [1] TRUE
 ```
@@ -113,7 +113,7 @@ pilot <- data.frame(
   covariate = rnorm(20, 0, 1)
 )
 
-sf_plan(study) <- list(
+sframe_plan(study) <- list(
   list(id = "RQ1",
        research_question = "Does the treatment arm score higher than control?",
        family = "group_comparison", method = "mann_whitney",
@@ -147,7 +147,7 @@ within-pair shift, again with an interval in place of a point value.
 before <- rnorm(8, 50, 6)
 after  <- before + rnorm(8, 4, 5)
 
-sf_plan(study) <- list(
+sframe_plan(study) <- list(
   list(id = "RQ2",
        research_question = "Did scores change from before to after?",
        family = "group_comparison", method = "wilcoxon_pair",
@@ -182,7 +182,7 @@ return both together.
 
 ``` r
 
-sf_plan(study) <- list(
+sframe_plan(study) <- list(
   list(id = "RQ3",
        research_question = "Is conversion associated with study arm?",
        family = "association", method = "fisher_exact",
@@ -208,7 +208,7 @@ fe_results[[1]]$odds_ratio_conf_int
 
 ## Bootstrap confidence interval on a median
 
-[`bootstrap_ci()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/bootstrap_ci.md)
+[`sframe_bootstrap_ci()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_bootstrap_ci.md)
 computes a bootstrap interval for an arbitrary statistic, useful when no
 exact interval exists for the estimator you need. It is already exported
 and used elsewhere in the package, applied here to the median of the
@@ -216,7 +216,7 @@ pilot outcome scores.
 
 ``` r
 
-bootstrap_ci(pilot$outcome, FUN = stats::median, R = 999)
+sframe_bootstrap_ci(pilot$outcome, FUN = stats::median, R = 999)
 #> estimate    lower    upper 
 #> 52.82878 47.33676 56.66709 
 #> attr(,"resamples")
@@ -235,7 +235,7 @@ package.
 
 ``` r
 
-sf_plan(study) <- list(
+sframe_plan(study) <- list(
   list(id = "RQ4",
        research_question = "Does the covariate predict conversion?",
        family = "regression", method = "firth_logistic",
@@ -264,7 +264,7 @@ firth_results[[1]]$coefficients
 
 ## Cohen’s d with a bootstrap interval
 
-[`cohens_d_ci()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/cohens_d_ci.md)
+[`sframe_cohens_d_ci()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_cohens_d_ci.md)
 pairs Cohen’s d with a bootstrap interval, which is informative
 precisely where it matters most: interval width grows visibly as n
 falls, making the extra uncertainty at small n explicit, where a single
@@ -272,7 +272,7 @@ point estimate leaves it implicit.
 
 ``` r
 
-cohens_d_ci(pilot$outcome[pilot$group == "treatment"],
+sframe_cohens_d_ci(pilot$outcome[pilot$group == "treatment"],
             pilot$outcome[pilot$group == "control"], R = 999)
 #>   estimate      lower      upper 
 #>  0.5420188 -0.3636638  1.5240611 

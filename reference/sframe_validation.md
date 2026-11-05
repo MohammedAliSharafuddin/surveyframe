@@ -3,7 +3,7 @@
 `sframe_validation` is the diagnostic object returned by
 [`validate_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/validate_sframe.md)
 and
-[`validate_model()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/validate_model.md).
+[`sframe_validate_model()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_validate_model.md).
 It records whether the object passed, every problem found, and every
 check that ran, including the checks that found nothing.
 
@@ -19,9 +19,9 @@ one row per problem.
 ## Details
 
 Use
-[`sf_is_valid()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_is_valid.md)
+[`sframe_is_valid()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_is_valid.md)
 for the pass or fail flag,
-[`sf_problems()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_problems.md)
+[`sframe_problems()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_problems.md)
 for the messages,
 [`as.data.frame()`](https://rdrr.io/r/base/as.data.frame.html) for a
 problem-per-row table,
@@ -33,31 +33,47 @@ to recover the validated instrument.
 ## See also
 
 [`validate_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/validate_sframe.md),
-[`validate_model()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/validate_model.md),
-[`sf_problems()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_problems.md),
-[`sf_is_valid()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_is_valid.md),
+[`sframe_validate_model()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_validate_model.md),
+[`sframe_problems()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_problems.md),
+[`sframe_is_valid()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_is_valid.md),
 [`as_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/as_sframe.md)
+
+Other Design functions:
+[`as_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/as_sframe.md),
+[`launch_builder()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/launch_builder.md),
+[`read_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_sframe.md),
+[`sframe_attention_check()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_attention_check.md),
+[`sframe_branch()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_branch.md),
+[`sframe_choice_set()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_choice_set.md),
+[`sframe_conjoint_design()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_conjoint_design.md),
+[`sframe_get_study()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_get_study.md),
+[`sframe_instrument()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_instrument.md),
+[`sframe_item()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_item.md),
+[`sframe_sampling_methods()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_sampling_methods.md),
+[`sframe_scale()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_scale.md),
+[`validate_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/validate_sframe.md),
+[`write_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/write_sframe.md)
 
 ## Examples
 
 ``` r
-cs    <- sf_choices("ag5", 1:5,
+cs    <- sframe_choice_set("ag5", 1:5,
            c("Strongly disagree", "Disagree", "Neutral",
              "Agree", "Strongly agree"))
-item  <- sf_item("sat_1", "The service met my expectations.",
+item  <- sframe_item("sat_1", "The service met my expectations.",
                  type = "likert", choice_set = "ag5", scale_id = "sat")
-scale <- sf_scale("sat", "Satisfaction", items = "sat_1")
-instr <- sf_instrument("Demo Survey", components = list(cs, item, scale))
+scale <- sframe_scale("sat", "Satisfaction", items = "sat_1")
+instr <- sframe_instrument("Demo Survey", components = list(cs, item, scale))
 
 v <- validate_sframe(instr, strict = FALSE)
 v
 #> <sframe validation>
 #>   Instrument:  Demo Survey (0.1.0)
 #>   Status:      valid
-#>   Checks:      29 run, 0 with problems
-sf_is_valid(v)
+#>   Checks:      30 run, 0 with problems
+sframe_is_valid(v)
 #> [1] TRUE
-sf_problems(v)
+sframe_problems(v)
 #> character(0)
 as.data.frame(v)
 #> [1] check   problem
@@ -93,4 +109,5 @@ summary(v)
 #> 27                    model_ids     ok          0
 #> 28                  model_specs     ok          0
 #> 29                   references     ok          0
+#> 30                        study     ok          0
 ```

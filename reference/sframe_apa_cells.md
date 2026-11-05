@@ -3,7 +3,7 @@
 The cells of a table from
 [`run_analysis_plan()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/run_analysis_plan.md)
 as both report engines and
-[`render_result()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_result.md)
+[`sframe_format_result()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_format_result.md)
 print them, so a table shows the same numbers wherever it appears. A p
 value column shows 3 decimals with no leading zero, or `<.001`. A column
 that cannot exceed 1, such as `r`, `tau` or `alpha`, drops its leading

@@ -13,9 +13,9 @@ purpose, each mapping onto a part of the research-design workflow.
   responses, runs quality and reliability checks, runs the analysis
   plan, and exports the report, the deployable survey, and the Sheets
   collector. Survey design itself stays in the SurveyBuilder.
-- [`launch_dashboard()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/launch_dashboard.md)
-  opens a read-only response explorer for an instrument and response
-  data that already exist.
+- `launch_studio(screen = "dashboard")` opens the Explore screen, a
+  response explorer with filters, for an instrument and response data
+  that already exist.
 
 ## Input-types demo
 
@@ -27,7 +27,7 @@ declared decision method and a set of alternatives.
 
 ``` r
 
-demo      <- sframe_input_types_demo_data()
+demo      <- sframe_demo("input_types")
 instr     <- demo$instrument
 responses <- demo$responses
 
@@ -43,13 +43,13 @@ dim(responses)
 #> [1] 120  22
 ```
 
-## SurveyBuilder: the Analyse mode
+## SurveyBuilder: the Plan mode
 
 SurveyBuilder runs entirely in the browser, so it is an authoring tool.
-Its Analyse mode has three tabs, Plan, Run, and Report, with a
-three-panel layout underneath: a list of variables and constructs on the
-left, the analysis plans in the middle, and an output preview with the
-model builder on the right.
+Its Plan mode has three tabs, Plan, Declared analyses and Expected
+outputs, with a three-panel layout underneath: a list of variables and
+constructs on the left, the analysis plans in the middle, and an output
+preview with the model builder on the right.
 
 The Plan tab is where the research design is written. The “+ Add plan”
 button opens a form that records the research question, the family and
@@ -58,16 +58,18 @@ the decision rule. The form offers only the role set a method needs and
 reads the measurement level of each variable, so a saved plan is
 coherent.
 
-![SurveyBuilder in Analyse mode with the Edit Analysis Plan dialog open.
+![SurveyBuilder in Plan mode with the Edit Analysis Plan dialog open.
 The dialog shows the research question, Variable X and Variable Y role
 dropdowns, Pearson correlation as the method, a significance level of
-0.05, the reporting references, the planned output and assumptions, and
-the decision rule.](figures/gui-builder-analyse-plan.png)
+0.05, the null and alternative hypotheses, the reporting references, the
+planned output and assumptions, and the decision
+rule.](figures/gui-builder-analyse-plan.png)
 
-The Run and Report tabs relabel the same plan list as a “run queue” and
-a “report outline”. They do not compute anything. SurveyBuilder stores
-each plan with an empty result, because the browser cannot run R. The
-statistics are produced later, either in an R session with
+The Declared analyses tab lists the plans that need data, and Expected
+outputs sketches the report they will fill. Neither computes anything.
+SurveyBuilder stores each plan with an empty result, because the browser
+cannot run R. The statistics are produced later, either in an R session
+with
 [`run_analysis_plan()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/run_analysis_plan.md)
 or in SurveyStudio. The output preview on the right shows counts, such
 as the number of plans, the number of data-dependent run items, and the
@@ -84,59 +86,120 @@ Apps Script collector.
 ## SurveyStudio: the screens
 
 SurveyStudio is a Shiny application, so it can run R. Its left
-navigation lists ten screens in this order: Open Instrument, Amendments,
-References, Preview Survey, Upload Responses, Quality Dashboard,
-Reliability, Analysis Plan, Dashboard, and Export. Survey design is done
-in the SurveyBuilder, and the studio opens the resulting `.sframe`.
+navigation follows the study. Open Instrument comes first, then 5
+groups: Build (Design, Plan and Preview), Collect (Collect and
+Responses), Analyse (Quality, Explore, Reliability and Analyse), Report,
+and Record (References and Amendments). Design holds the SurveyBuilder,
+and Plan opens it in its Plan mode.
 
-![SurveyStudio's Upload Responses screen. The left navigation lists the
-ten screens. The main panel has a CSV file chooser, respondent ID and
-submitted-at column fields, a strict column check, and help on loading
-responses collected elsewhere or from a Google
+![SurveyStudio's Responses screen. The left navigation lists the screens
+in their groups. The main panel has a CSV file chooser, respondent ID
+and submitted-at column fields, a strict column check, and help on
+loading responses collected elsewhere or from a Google
 Sheet.](figures/gui-studio-responses.png)
 
-The Amendments screen discloses a change to the open instrument: upload
-a revised `.sframe`, give a reason and an explanation, and
+Every change Studio records as an amendment goes through 1 dialog. It
+shows the scales, models and plan blocks the change touches, suggests
+the next version and says why (a design amendment moves the minor
+number, a pipeline amendment the patch number), then records it with
 [`amend_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/amend_sframe.md)
-appends the change to the instrument’s amendment log, where every
-earlier entry stays as it was written. Exporting the amended instrument
-keeps that log inside the `.sframe` file, readable later with
-[`amendment_log()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/amendment_log.md).
+or cancels. Studio opens it from 5 places: a save from Design of an
+instrument with a history, a revised `.sframe` imported on the
+Amendments screen, “Drop from scale” under a result that flags an item,
+“Put back” for an item dropped in the session, and “Record as amendment”
+on Quality and Responses after removing bots or correcting data. Put
+back is a second amendment, so the history keeps both. The Amendments
+screen lists that history oldest first, with the date, tier, reason,
+what changed and the content hashes before and after, and the status
+line gives the version and the count, such as “1.1.0, 2 amendments”.
+Exporting the amended instrument keeps the log inside the `.sframe`
+file, readable later with
+[`sframe_get_amendments()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_get_amendments.md).
+
+### The same amendment in a script
+
+The script route takes the same steps: read the instrument, find the
+flagged items, drop one, record the drop, write the file, run the plan
+again and report.
+
+``` r
+
+d <- sframe_demo("factor_structure")
+results <- run_analysis_plan(d$responses, d$instrument)
+flags <- sframe_item_flags(results[[2]])
+flags[, c("item", "reason")]
+#>    item                               reason
+#> 1 con_4 con_4: loading .39 in RQ2, below .40
+
+revised <- sframe_drop_items(d$instrument, "con_4", from = "content")
+#> Dropped con_4 from scale content, plan block RQ1, plan block RQ2. The questions
+#> and their answers stay. Record it with amend_sframe().
+amended <- amend_sframe(d$instrument, revised,
+  reason_code = "model_respecification",
+  reason_text = flags$reason[1], tier = "design",
+  deviation_report = "con_4 dropped from content after the EFA flagged it.",
+  version = "1.1.0")
+sframe_get_amendments(amended)[, c("tier", "reason_text", "changed_fields")]
+#>     tier                          reason_text
+#> 1 design con_4: loading .39 in RQ2, below .40
+#>                                changed_fields
+#> 1 version, meta, items, scales, analysis_plan
+
+path <- tempfile(fileext = ".sframe")
+write_sframe(amended, path)
+rerun <- run_analysis_plan(d$responses, read_sframe(path))
+```
+
+`render_report(read_sframe(path), d$responses)` then writes the report,
+whose Reproducibility block gives the version and the amendment list.
 
 The References screen lists the works the instrument cites and adds more
 from pasted BibTeX, each with where the instrument cites it. Citing a
 source needs no amendment, and the references travel in the exported
-`.sframe` file.
+`.sframe` file. It is the only place a source is added: on the Report
+screen, type @ in an interpretation to cite one of them, and “Manage
+references” leads back here, so a report never cites a source the
+`.sframe` file does not record. A reference can be cited by a plan
+block’s hypotheses or by the study once they are written.
 
-The Preview Survey screen renders the exact deployable survey, identical
-to the exported HTML.
+The Preview screen renders the exact deployable survey, identical to the
+exported HTML.
 
-The Analysis Plan screen does two jobs. It edits the plan, with the same
-research question, method, significance level, and role fields as the
-builder. It also runs the plan. When response data have been uploaded,
-the Run preview tab calls
+The Analyse screen runs the declared plan. It shows the plan read-only,
+with each block’s method, variables, declared hypotheses and, for a
+cross-tab, the percentages, and “Change plan” opens Plan, the only plan
+editor. When response data have been loaded, it calls
 [`run_analysis_plan()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/run_analysis_plan.md)
 and shows a card for each research question: the APA result, the effect
-size, a formatted table and the chart, across the width of the screen.
-Without responses, it asks you to upload data before running.
+size, a formatted table and the chart, across the width of the screen. A
+plan changed once responses are loaded is a design amendment, so the
+save opens the amendment dialog with the changed blocks in the deviation
+report.
 
-![A SurveyStudio result card on the Analysis Plan screen's Run preview
-tab: research question 1 asks whether digital experience is associated
-with behavioural intention, with the result r(118) = 0.60, 95% CI 0.48
-to 0.71, p below .001, a one-row table of the statistic, and a scatter
-plot with a fitted line.](figures/gui-studio-analysis.png)
+![A SurveyStudio result card on the Analyse screen: research question 1
+asks whether digital experience is associated with behavioural
+intention, with the result r(118) = 0.60, 95% CI 0.48 to 0.71, p below
+.001, a one-row table of the statistic, and a scatter plot with a fitted
+line.](figures/gui-studio-analysis.png)
 
-The Export screen produces the written report through
-[`render_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_report.md).
+The Report screen produces the written report through
+[`render_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_report.md),
+in 4 tabs: Interpret (read each result and write what it means),
+Configure (the report’s options, including the reference style), Export
+report and Reproduce. A choice made in 1 tab stays when you switch to
+another, and “Download copy” beside the title saves the `.sframe` file.
 Its options include the codebook, quality, missing data, descriptives,
 reliability, the saved analysis-plan results, and the model appendices.
 The per-question report produced by
 [`render_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_results.md)
 in an R session is a separate route to a written report and is covered
-in the main vignette. The same screen’s “Analysis notebook” card writes
-a Quarto notebook alongside the instrument and its responses, via
-[`sframe_analysis_qmd()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_analysis_qmd.md),
-so the same analysis can be run and edited outside SurveyStudio.
+in the main vignette. The screen makes 2 products. Export report writes
+the finished report, in HTML or PDF, and in Word or OpenDocument when
+Quarto is found. Reproduce writes the reproducible source: a zipped
+folder holding `report.qmd`, the `.sframe` file, the responses, the
+references and a manifest, from `render_report(format = "qmd")`. Open
+`report.qmd` in RStudio or Positron and render it, and it recomputes
+every number and checks it.
 
 ## Recommended workflow
 
@@ -153,10 +216,9 @@ so the same analysis can be run and edited outside SurveyStudio.
 5.  Use
     [`launch_studio()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/launch_studio.md)
     to inspect the instrument and responses together, to run the plan on
-    the Analysis Plan screen, and to export the report.
-6.  Use
-    [`launch_dashboard()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/launch_dashboard.md)
-    for read-only response exploration.
+    the Analyse screen, and to write the report on Report.
+6.  Use `launch_studio(screen = "dashboard")` for response exploration
+    with filters.
 
 ## RStudio Addins
 
@@ -174,7 +236,7 @@ instrument.](figures/gui-rstudio-addins.png)
 |----|----|----|
 | surveyframe: Design an instrument | SurveyBuilder in the browser | RStudio alone |
 | surveyframe: Open analysis workspace | SurveyStudio, on Open Instrument | RStudio alone, open a `.sframe` there |
-| surveyframe: Analyse an existing instrument | SurveyStudio, on Upload Responses, with the instrument loaded | a `.sframe` file, chosen in a dialog |
+| surveyframe: Analyse an existing instrument | SurveyStudio, on Responses, with the instrument loaded | a `.sframe` file, chosen in a dialog |
 | surveyframe: Insert starter instrument | a template in the active R script, at the cursor | an open R script |
 
 The commands follow the workflow above:
@@ -199,19 +261,20 @@ examples and vignettes leave browsers closed.
 
 ``` r
 
-launch_builder_demo()
-launch_studio_demo()
-launch_dashboard_demo()
+launch_builder(demo = "input_types")
+launch_studio(demo = "input_types", screen = "preview")
+launch_studio(demo = "input_types", screen = "dashboard")
 ```
 
-[`launch_builder_demo()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/launch_builder_demo.md)
-injects the demo state into a temporary copy of `survey_builder.html`
-and opens it, so the demo questions, scales, and analysis plan are
-visible at once.
-[`launch_studio_demo()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/launch_studio_demo.md)
-opens the studio with an instrument and response data already loaded.
-[`launch_dashboard_demo()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/launch_dashboard_demo.md)
-opens the dashboard with the same demo data.
+`launch_builder(demo = "input_types")` injects the demo state into a
+temporary copy of `survey_builder.html` and opens it, so the demo
+questions, scales, and analysis plan are visible at once.
+`launch_studio(demo = "input_types", screen = "preview")` opens the
+studio with an instrument and response data already loaded. Any name
+from
+[`sframe_list_demos()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_list_demos.md)
+works as `demo`. Setting `screen = "dashboard"` opens the Explore screen
+with the same demo data.
 
 ## Standalone builder
 
@@ -222,7 +285,7 @@ builder_file
 ```
 
 Use SurveyBuilder for questionnaire, plan, and model authoring. Response
-exploration and plan execution belong in SurveyStudio or the dashboard.
+exploration and plan execution belong in SurveyStudio.
 
 ## Studio workflow hub
 
@@ -238,28 +301,30 @@ launch_studio(
 
 SurveyStudio reads the objects passed by
 [`launch_studio()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/launch_studio.md).
-With response data present, `screen = "auto"` opens the Dashboard. With
-an instrument alone it opens Preview Survey, and with neither it opens
-Open Instrument. `screen = "analysis"` opens the Analysis Plan screen
-explicitly.
+With response data present, `screen = "auto"` opens Explore. With an
+instrument alone it opens Preview, and with neither it opens Open
+Instrument. `screen = "analysis"` opens the Analyse screen explicitly.
 
-## Dashboard
+## Explore
 
 ``` r
 
-launch_dashboard(
+launch_studio(
   instrument     = instr,
   responses      = responses,
+  screen         = "dashboard",
   launch.browser = FALSE
 )
 ```
 
-Use the dashboard after data collection for read-only exploration.
+Use the Explore screen after data collection to explore responses. Each
+filter takes the question’s label and choice labels, and the date range
+follows `submitted_at`.
 
-![The response dashboard's Overview tab: filters named by their
-questions and a date range, tiles for 120 filtered responses, 19 survey
-items, 2 scales, 1 attention check and the date range, and an instrument
-summary table.](figures/gui-dashboard.png)
+![SurveyStudio's Explore screen on its Overview tab: 3 filters named by
+their questions and a date range on submitted_at, tiles for 120
+responses, 120 filtered responses, 19 items, 2 scales, 1 check and the
+date range, and the instrument summary.](figures/gui-dashboard.png)
 
 ## Known limitations
 

@@ -12,7 +12,7 @@ provenance demos reuse the matching analysis data where appropriate.
 
 ``` r
 
-head(sframe_demos()[, c("name", "teaches")], 5)
+head(sframe_list_demos()[, c("name", "teaches")], 5)
 #>            name                                       teaches
 #> 1  first_survey             Design, export, collect, describe
 #> 2  likert_scale         A scale and whether it holds together
@@ -95,8 +95,8 @@ The path is the same each time, and surveyframe holds the questionnaire,
 the plan, the data contract and the report together as one object.
 
         design ->  export  ->  collect  ->  read  ->  analyse  ->  report
-      sf_instrument()   export_static_survey()   read_responses()   render_report()
-                        render_survey(mode = "shiny")   run_analysis_plan()
+      sframe_instrument()   export_survey()   read_responses()   render_report()
+                        run_survey(mode = "shiny")   run_analysis_plan()
 
 The step that matters is the first one. The analysis plan is declared
 **inside the instrument, before any data exists**, so running it later
@@ -127,7 +127,7 @@ The plan was written at design time:
 
 ``` r
 
-do.call(rbind, lapply(sf_plan(demo$instrument), function(b) {
+do.call(rbind, lapply(sframe_plan(demo$instrument), function(b) {
   data.frame(id = b$id, question = b$research_question, method = b$method)
 }))
 #>    id                         question       method
@@ -213,7 +213,7 @@ for (b in run_analysis_plan(mg$responses, mg$instrument)[1:2]) {
 ``` r
 
 ls_demo <- sframe_demo("likert_scale")
-rel <- reliability_report(ls_demo$responses, ls_demo$instrument)
+rel <- sframe_reliability_results(ls_demo$responses, ls_demo$instrument)
 as.data.frame(rel)[, c("scale_id", "n_items", "alpha")]
 #>       scale_id n_items     alpha
 #> 1 organisation       4 0.8473312
@@ -233,7 +233,7 @@ because it would estimate a different model from the one you declared.
 ``` r
 
 sem <- sframe_demo("sem_pls")
-vapply(sf_models(sem$instrument), function(m) m$type, character(1))
+vapply(sframe_get_models(sem$instrument), function(m) m$type, character(1))
 #>        m1        m2        m3 
 #>  "cb_sem" "pls_sem"     "cfa"
 ```
@@ -272,7 +272,7 @@ no longer matches the contract the instrument declares. Read with
 ``` r
 
 br <- sframe_demo("branching")
-sf_branches(br$instrument)[[1]]
+sframe_get_branches(br$instrument)[[1]]
 #> <sf_branch: sessions_attended>
 #>   Rule: show when attendee_type %in% delegate, speaker
 ```
@@ -307,20 +307,53 @@ instrument:
 
 ``` r
 
-sframe_demo_branding()
-#> <sframe demo branding>
-#>   Theme:         #2563eb
-#>   Mode:          standard
-#>   Header:        Riverside Conference Centre, progress bar shown
-#>   Welcome:       "Thank you for coming"
-#>                  This takes about 3 minutes. Your answers help us plan next year's event.
-#>   Consent:       "I am happy for my answers to be used in the event report.", required
-#>   Start button:  "Start"
-#>   Submit button: "Send my feedback"
-#>   Thank you:     "Thank you for your feedback."
+sframe_demo("two_group", branded = TRUE)$instrument$render
+#> $mode
+#> [1] "standard"
 #> 
-#> A render block for sf_instrument(render = ). See it applied with
-#> preview_demo("two_group"), or use sframe_demo(name, branded = TRUE).
+#> $theme
+#> [1] "#2563eb"
+#> 
+#> $submit_label
+#> [1] "Send my feedback"
+#> 
+#> $welcome
+#> $welcome$title
+#> [1] "Thank you for coming"
+#> 
+#> $welcome$intro_text
+#> [1] "This takes about 3 minutes. Your answers help us plan next year's event."
+#> 
+#> $welcome$consent_text
+#> [1] "I am happy for my answers to be used in the event report."
+#> 
+#> $welcome$consent_required
+#> [1] TRUE
+#> 
+#> $welcome$start_label
+#> [1] "Start"
+#> 
+#> 
+#> $thankyou
+#> $thankyou$message
+#> [1] "Thank you for your feedback."
+#> 
+#> $thankyou$redirect_url
+#> [1] ""
+#> 
+#> $thankyou$show_download
+#> [1] TRUE
+#> 
+#> 
+#> $header
+#> $header$institution
+#> [1] "Riverside Conference Centre"
+#> 
+#> $header$logo_base64
+#> [1] ""
+#> 
+#> $header$show_progress
+#> [1] TRUE
 ```
 
 Applied to any demo with `branded = TRUE`, which leaves the files on
@@ -363,10 +396,10 @@ Three routes, and the same instrument serves all three.
 ``` r
 
 # 1. One self-contained HTML file you can host or email
-export_static_survey(demo$instrument, "survey.html")
+export_survey(demo$instrument, "survey.html")
 
 # 2. A Shiny app
-render_survey(demo$instrument, mode = "shiny")
+run_survey(demo$instrument, mode = "shiny")
 
 # 3. A Google Sheets collector, generated as an Apps Script
 export_google_sheet(demo$instrument, sheet_url = "https://...")
@@ -399,7 +432,7 @@ leaves nobody able to tell which version a respondent saw.
 ``` r
 
 rev <- sframe_demo("instrument_revision")
-log <- as.data.frame(amendment_log(rev$instrument))
+log <- as.data.frame(sframe_get_amendments(rev$instrument))
 log[, c("reason_code", "tier", "reason_text")]
 #>           reason_code   tier
 #> 1 instrument_revision design
@@ -453,7 +486,7 @@ and compare.
 
 ``` r
 
-sframe_export_labelled(d$responses, d$instrument, "two_group.sav")
+export_responses(d$responses, d$instrument, "two_group.sav")
 ```
 
 The `.sav` arrives with the question wording and the response options

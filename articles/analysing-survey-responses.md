@@ -15,7 +15,7 @@ analysis runs end to end without internet access or private data.
 
 ``` r
 
-demo      <- sframe_demo_data()
+demo      <- sframe_demo("tourism_services")
 instr     <- demo$instrument
 responses <- demo$responses
 
@@ -50,36 +50,38 @@ dim(responses)
 
 ``` r
 
-mr <- missing_data_report(responses, instr)
-kable(as.data.frame(mr), digits = 2,
+mr <- sframe_missing_data_results(responses, instr)
+mr_items <- as.data.frame(mr)[, c("variable", "missing_n", "missing_prop", "valid_n")]
+mr_items$missing_prop <- 100 * mr_items$missing_prop
+kable(mr_items, digits = 1, row.names = FALSE,
       col.names = c("Variable", "Missing (n)", "Missing (%)", "Valid (n)"),
       caption = "Item-level missingness")
 ```
 
-|            | Variable   | Missing (n) | Missing (%) | Valid (n) |
-|:-----------|:-----------|------------:|------------:|----------:|
-| visit_type | visit_type |           0 |        0.00 |       120 |
-| dm_1       | dm_1       |           0 |        0.00 |       120 |
-| dm_2       | dm_2       |           0 |        0.00 |       120 |
-| dm_3       | dm_3       |           0 |        0.00 |       120 |
-| sq_1       | sq_1       |           0 |        0.00 |       120 |
-| sq_2       | sq_2       |           0 |        0.00 |       120 |
-| sq_3       | sq_3       |           0 |        0.00 |       120 |
-| sus_1      | sus_1      |           0 |        0.00 |       120 |
-| sus_2      | sus_2      |           0 |        0.00 |       120 |
-| sat_1      | sat_1      |           0 |        0.00 |       120 |
-| sat_2      | sat_2      |           0 |        0.00 |       120 |
-| bi_1       | bi_1       |           0 |        0.00 |       120 |
-| bi_2       | bi_2       |           0 |        0.00 |       120 |
-| attention  | attention  |           0 |        0.00 |       120 |
-| comments   | comments   |          30 |        0.25 |        90 |
+| Variable   | Missing (n) | Missing (%) | Valid (n) |
+|:-----------|------------:|------------:|----------:|
+| visit_type |           0 |           0 |       120 |
+| dm_1       |           0 |           0 |       120 |
+| dm_2       |           0 |           0 |       120 |
+| dm_3       |           0 |           0 |       120 |
+| sq_1       |           0 |           0 |       120 |
+| sq_2       |           0 |           0 |       120 |
+| sq_3       |           0 |           0 |       120 |
+| sus_1      |           0 |           0 |       120 |
+| sus_2      |           0 |           0 |       120 |
+| sat_1      |           0 |           0 |       120 |
+| sat_2      |           0 |           0 |       120 |
+| bi_1       |           0 |           0 |       120 |
+| bi_2       |           0 |           0 |       120 |
+| attention  |           0 |           0 |       120 |
+| comments   |          30 |          25 |        90 |
 
 Item-level missingness {.table}
 
 ``` r
 
 
-qr <- quality_report(
+qr <- sframe_quality_results(
   responses, instr,
   respondent_id = "respondent_id",
   submitted_at  = "submitted_at",
@@ -155,13 +157,13 @@ par(op)
 
 ## Check assumptions before the plan
 
-[`assumption_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/assumption_report.md)
+[`sframe_assumption_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_assumption_results.md)
 reports the checks a technique relies on, such as residual normality,
 variance inflation, and influence for a regression.
 
 ``` r
 
-assumption_report(
+sframe_assumption_results(
   scored,
   predictors = c("digital_marketing", "service_quality", "sustainability"),
   outcome    = "satisfaction"
@@ -180,7 +182,7 @@ expects a `group` and an `outcome`.
 
 ``` r
 
-sf_plan(instr) <- list(
+sframe_plan(instr) <- list(
   list(id = "RQ1",
        research_question = "Is digital marketing perception associated with satisfaction?",
        family = "association", method = "correlation_pearson",
@@ -272,9 +274,9 @@ render_results(results, instr, output_file = "results.html", citation_format = "
 ## In SurveyStudio
 
 SurveyStudio runs the same plan. Open it on the analysis screen, upload
-the responses, and the Analysis Plan screen runs the saved plan and
-shows a table of each question with its method and APA result. The full
-report is produced on the Export screen.
+the responses, and the Analyse screen runs the saved plan and shows a
+table of each question with its method and APA result. The full report
+is produced on the Report screen.
 
 ``` r
 

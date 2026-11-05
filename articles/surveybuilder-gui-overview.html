@@ -119,8 +119,9 @@ the analysis plan, and exports the report, the deployable survey, and
 the Sheets collector. Survey design itself stays in the
 SurveyBuilder.</li>
 <li>
-<code><a href="../reference/launch_dashboard.html">launch_dashboard()</a></code> opens a read-only response explorer
-for an instrument and response data that already exist.</li>
+<code>launch_studio(screen = "dashboard")</code> opens the Explore
+screen, a response explorer with filters, for an instrument and response
+data that already exist.</li>
 </ul>
 <div class="section level2">
 <h2 id="input-types-demo">Input-types demo<a class="anchor" aria-label="anchor" href="#input-types-demo"></a>
@@ -132,7 +133,7 @@ outside this demo. They get their own worked example in the MCDM
 vignette, because they only make sense alongside a declared decision
 method and a set of alternatives.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">demo</span>      <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sframe_input_types_demo_data.html">sframe_input_types_demo_data</a></span><span class="op">(</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">demo</span>      <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sframe_demo.html">sframe_demo</a></span><span class="op">(</span><span class="st">"input_types"</span><span class="op">)</span></span>
 <span><span class="va">instr</span>     <span class="op">&lt;-</span> <span class="va">demo</span><span class="op">$</span><span class="va">instrument</span></span>
 <span><span class="va">responses</span> <span class="op">&lt;-</span> <span class="va">demo</span><span class="op">$</span><span class="va">responses</span></span>
 <span></span>
@@ -148,27 +149,28 @@ method and a set of alternatives.</p>
 <span><span class="co">#&gt; [1] 120  22</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="surveybuilder-the-analyse-mode">SurveyBuilder: the Analyse mode<a class="anchor" aria-label="anchor" href="#surveybuilder-the-analyse-mode"></a>
+<h2 id="surveybuilder-the-plan-mode">SurveyBuilder: the Plan mode<a class="anchor" aria-label="anchor" href="#surveybuilder-the-plan-mode"></a>
 </h2>
 <p>SurveyBuilder runs entirely in the browser, so it is an authoring
-tool. Its Analyse mode has three tabs, Plan, Run, and Report, with a
-three-panel layout underneath: a list of variables and constructs on the
-left, the analysis plans in the middle, and an output preview with the
-model builder on the right.</p>
+tool. Its Plan mode has three tabs, Plan, Declared analyses and Expected
+outputs, with a three-panel layout underneath: a list of variables and
+constructs on the left, the analysis plans in the middle, and an output
+preview with the model builder on the right.</p>
 <p>The Plan tab is where the research design is written. The “+ Add
 plan” button opens a form that records the research question, the family
 and method, the significance level, the variables that fill each role,
 and the decision rule. The form offers only the role set a method needs
 and reads the measurement level of each variable, so a saved plan is
 coherent.</p>
-<p><img src="figures/gui-builder-analyse-plan.png" class="r-plt" alt="SurveyBuilder in Analyse mode with the Edit Analysis Plan dialog open. The dialog shows the research question, Variable X and Variable Y role dropdowns, Pearson correlation as the method, a significance level of 0.05, the reporting references, the planned output and assumptions, and the decision rule." width="100%"></p>
-<p>The Run and Report tabs relabel the same plan list as a “run queue”
-and a “report outline”. They do not compute anything. SurveyBuilder
-stores each plan with an empty result, because the browser cannot run R.
-The statistics are produced later, either in an R session with
-<code><a href="../reference/run_analysis_plan.html">run_analysis_plan()</a></code> or in SurveyStudio. The output preview
-on the right shows counts, such as the number of plans, the number of
-data-dependent run items, and the number of saved models.</p>
+<p><img src="figures/gui-builder-analyse-plan.png" class="r-plt" alt="SurveyBuilder in Plan mode with the Edit Analysis Plan dialog open. The dialog shows the research question, Variable X and Variable Y role dropdowns, Pearson correlation as the method, a significance level of 0.05, the null and alternative hypotheses, the reporting references, the planned output and assumptions, and the decision rule." width="100%"></p>
+<p>The Declared analyses tab lists the plans that need data, and
+Expected outputs sketches the report they will fill. Neither computes
+anything. SurveyBuilder stores each plan with an empty result, because
+the browser cannot run R. The statistics are produced later, either in
+an R session with <code><a href="../reference/run_analysis_plan.html">run_analysis_plan()</a></code> or in SurveyStudio.
+The output preview on the right shows counts, such as the number of
+plans, the number of data-dependent run items, and the number of saved
+models.</p>
 <p>The model builder, also on the right, creates constructs from the
 scales and adds structural paths. The <code>.sframe</code> stores that
 model specification, and surveyframe can generate lavaan or seminr
@@ -181,42 +183,101 @@ generate the Apps Script collector.</p>
 <h2 id="surveystudio-the-screens">SurveyStudio: the screens<a class="anchor" aria-label="anchor" href="#surveystudio-the-screens"></a>
 </h2>
 <p>SurveyStudio is a Shiny application, so it can run R. Its left
-navigation lists ten screens in this order: Open Instrument, Amendments,
-References, Preview Survey, Upload Responses, Quality Dashboard,
-Reliability, Analysis Plan, Dashboard, and Export. Survey design is done
-in the SurveyBuilder, and the studio opens the resulting
-<code>.sframe</code>.</p>
-<p><img src="figures/gui-studio-responses.png" class="r-plt" alt="SurveyStudio's Upload Responses screen. The left navigation lists the ten screens. The main panel has a CSV file chooser, respondent ID and submitted-at column fields, a strict column check, and help on loading responses collected elsewhere or from a Google Sheet." width="100%"></p>
-<p>The Amendments screen discloses a change to the open instrument:
-upload a revised <code>.sframe</code>, give a reason and an explanation,
-and <code><a href="../reference/amend_sframe.html">amend_sframe()</a></code> appends the change to the instrument’s
-amendment log, where every earlier entry stays as it was written.
-Exporting the amended instrument keeps that log inside the
-<code>.sframe</code> file, readable later with
-<code><a href="../reference/amendment_log.html">amendment_log()</a></code>.</p>
+navigation follows the study. Open Instrument comes first, then 5
+groups: Build (Design, Plan and Preview), Collect (Collect and
+Responses), Analyse (Quality, Explore, Reliability and Analyse), Report,
+and Record (References and Amendments). Design holds the SurveyBuilder,
+and Plan opens it in its Plan mode.</p>
+<p><img src="figures/gui-studio-responses.png" class="r-plt" alt="SurveyStudio's Responses screen. The left navigation lists the screens in their groups. The main panel has a CSV file chooser, respondent ID and submitted-at column fields, a strict column check, and help on loading responses collected elsewhere or from a Google Sheet." width="100%"></p>
+<p>Every change Studio records as an amendment goes through 1 dialog. It
+shows the scales, models and plan blocks the change touches, suggests
+the next version and says why (a design amendment moves the minor
+number, a pipeline amendment the patch number), then records it with
+<code><a href="../reference/amend_sframe.html">amend_sframe()</a></code> or cancels. Studio opens it from 5 places: a
+save from Design of an instrument with a history, a revised
+<code>.sframe</code> imported on the Amendments screen, “Drop from
+scale” under a result that flags an item, “Put back” for an item dropped
+in the session, and “Record as amendment” on Quality and Responses after
+removing bots or correcting data. Put back is a second amendment, so the
+history keeps both. The Amendments screen lists that history oldest
+first, with the date, tier, reason, what changed and the content hashes
+before and after, and the status line gives the version and the count,
+such as “1.1.0, 2 amendments”. Exporting the amended instrument keeps
+the log inside the <code>.sframe</code> file, readable later with
+<code><a href="../reference/sframe_get_amendments.html">sframe_get_amendments()</a></code>.</p>
+<div class="section level3">
+<h3 id="the-same-amendment-in-a-script">The same amendment in a script<a class="anchor" aria-label="anchor" href="#the-same-amendment-in-a-script"></a>
+</h3>
+<p>The script route takes the same steps: read the instrument, find the
+flagged items, drop one, record the drop, write the file, run the plan
+again and report.</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">d</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sframe_demo.html">sframe_demo</a></span><span class="op">(</span><span class="st">"factor_structure"</span><span class="op">)</span></span>
+<span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/run_analysis_plan.html">run_analysis_plan</a></span><span class="op">(</span><span class="va">d</span><span class="op">$</span><span class="va">responses</span>, <span class="va">d</span><span class="op">$</span><span class="va">instrument</span><span class="op">)</span></span>
+<span><span class="va">flags</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sframe_item_flags.html">sframe_item_flags</a></span><span class="op">(</span><span class="va">results</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="va">flags</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"item"</span>, <span class="st">"reason"</span><span class="op">)</span><span class="op">]</span></span>
+<span><span class="co">#&gt;    item                               reason</span></span>
+<span><span class="co">#&gt; 1 con_4 con_4: loading .39 in RQ2, below .40</span></span>
+<span></span>
+<span><span class="va">revised</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sframe_drop_items.html">sframe_drop_items</a></span><span class="op">(</span><span class="va">d</span><span class="op">$</span><span class="va">instrument</span>, <span class="st">"con_4"</span>, from <span class="op">=</span> <span class="st">"content"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Dropped con_4 from scale content, plan block RQ1, plan block RQ2. The questions</span></span>
+<span><span class="co">#&gt; and their answers stay. Record it with amend_sframe().</span></span>
+<span><span class="va">amended</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/amend_sframe.html">amend_sframe</a></span><span class="op">(</span><span class="va">d</span><span class="op">$</span><span class="va">instrument</span>, <span class="va">revised</span>,</span>
+<span>  reason_code <span class="op">=</span> <span class="st">"model_respecification"</span>,</span>
+<span>  reason_text <span class="op">=</span> <span class="va">flags</span><span class="op">$</span><span class="va">reason</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>, tier <span class="op">=</span> <span class="st">"design"</span>,</span>
+<span>  deviation_report <span class="op">=</span> <span class="st">"con_4 dropped from content after the EFA flagged it."</span>,</span>
+<span>  version <span class="op">=</span> <span class="st">"1.1.0"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/sframe_get_amendments.html">sframe_get_amendments</a></span><span class="op">(</span><span class="va">amended</span><span class="op">)</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"tier"</span>, <span class="st">"reason_text"</span>, <span class="st">"changed_fields"</span><span class="op">)</span><span class="op">]</span></span>
+<span><span class="co">#&gt;     tier                          reason_text</span></span>
+<span><span class="co">#&gt; 1 design con_4: loading .39 in RQ2, below .40</span></span>
+<span><span class="co">#&gt;                                changed_fields</span></span>
+<span><span class="co">#&gt; 1 version, meta, items, scales, analysis_plan</span></span>
+<span></span>
+<span><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>fileext <span class="op">=</span> <span class="st">".sframe"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/write_sframe.html">write_sframe</a></span><span class="op">(</span><span class="va">amended</span>, <span class="va">path</span><span class="op">)</span></span>
+<span><span class="va">rerun</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/run_analysis_plan.html">run_analysis_plan</a></span><span class="op">(</span><span class="va">d</span><span class="op">$</span><span class="va">responses</span>, <span class="fu"><a href="../reference/read_sframe.html">read_sframe</a></span><span class="op">(</span><span class="va">path</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p><code>render_report(read_sframe(path), d$responses)</code> then
+writes the report, whose Reproducibility block gives the version and the
+amendment list.</p>
 <p>The References screen lists the works the instrument cites and adds
 more from pasted BibTeX, each with where the instrument cites it. Citing
 a source needs no amendment, and the references travel in the exported
-<code>.sframe</code> file.</p>
-<p>The Preview Survey screen renders the exact deployable survey,
-identical to the exported HTML.</p>
-<p>The Analysis Plan screen does two jobs. It edits the plan, with the
-same research question, method, significance level, and role fields as
-the builder. It also runs the plan. When response data have been
-uploaded, the Run preview tab calls <code><a href="../reference/run_analysis_plan.html">run_analysis_plan()</a></code> and
-shows a card for each research question: the APA result, the effect
-size, a formatted table and the chart, across the width of the screen.
-Without responses, it asks you to upload data before running.</p>
-<p><img src="figures/gui-studio-analysis.png" class="r-plt" alt="A SurveyStudio result card on the Analysis Plan screen's Run preview tab: research question 1 asks whether digital experience is associated with behavioural intention, with the result r(118) = 0.60, 95% CI 0.48 to 0.71, p below .001, a one-row table of the statistic, and a scatter plot with a fitted line." width="100%"></p>
-<p>The Export screen produces the written report through
-<code><a href="../reference/render_report.html">render_report()</a></code>. Its options include the codebook, quality,
-missing data, descriptives, reliability, the saved analysis-plan
-results, and the model appendices. The per-question report produced by
-<code><a href="../reference/render_results.html">render_results()</a></code> in an R session is a separate route to a
-written report and is covered in the main vignette. The same screen’s
-“Analysis notebook” card writes a Quarto notebook alongside the
-instrument and its responses, via <code><a href="../reference/sframe_analysis_qmd.html">sframe_analysis_qmd()</a></code>, so
-the same analysis can be run and edited outside SurveyStudio.</p>
+<code>.sframe</code> file. It is the only place a source is added: on
+the Report screen, type @ in an interpretation to cite one of them, and
+“Manage references” leads back here, so a report never cites a source
+the <code>.sframe</code> file does not record. A reference can be cited
+by a plan block’s hypotheses or by the study once they are written.</p>
+<p>The Preview screen renders the exact deployable survey, identical to
+the exported HTML.</p>
+<p>The Analyse screen runs the declared plan. It shows the plan
+read-only, with each block’s method, variables, declared hypotheses and,
+for a cross-tab, the percentages, and “Change plan” opens Plan, the only
+plan editor. When response data have been loaded, it calls
+<code><a href="../reference/run_analysis_plan.html">run_analysis_plan()</a></code> and shows a card for each research
+question: the APA result, the effect size, a formatted table and the
+chart, across the width of the screen. A plan changed once responses are
+loaded is a design amendment, so the save opens the amendment dialog
+with the changed blocks in the deviation report.</p>
+<p><img src="figures/gui-studio-analysis.png" class="r-plt" alt="A SurveyStudio result card on the Analyse screen: research question 1 asks whether digital experience is associated with behavioural intention, with the result r(118) = 0.60, 95% CI 0.48 to 0.71, p below .001, a one-row table of the statistic, and a scatter plot with a fitted line." width="100%"></p>
+<p>The Report screen produces the written report through
+<code><a href="../reference/render_report.html">render_report()</a></code>, in 4 tabs: Interpret (read each result and
+write what it means), Configure (the report’s options, including the
+reference style), Export report and Reproduce. A choice made in 1 tab
+stays when you switch to another, and “Download copy” beside the title
+saves the <code>.sframe</code> file. Its options include the codebook,
+quality, missing data, descriptives, reliability, the saved
+analysis-plan results, and the model appendices. The per-question report
+produced by <code><a href="../reference/render_results.html">render_results()</a></code> in an R session is a separate
+route to a written report and is covered in the main vignette. The
+screen makes 2 products. Export report writes the finished report, in
+HTML or PDF, and in Word or OpenDocument when Quarto is found. Reproduce
+writes the reproducible source: a zipped folder holding
+<code>report.qmd</code>, the <code>.sframe</code> file, the responses,
+the references and a manifest, from
+<code>render_report(format = "qmd")</code>. Open <code>report.qmd</code>
+in RStudio or Positron and render it, and it recomputes every number and
+checks it.</p>
+</div>
 </div>
 <div class="section level2">
 <h2 id="recommended-workflow">Recommended workflow<a class="anchor" aria-label="anchor" href="#recommended-workflow"></a>
@@ -229,10 +290,10 @@ questionnaire, the plan, and the model.</li>
 R.</li>
 <li>Use <code><a href="../reference/read_responses.html">read_responses()</a></code> to import collected data.</li>
 <li>Use <code><a href="../reference/launch_studio.html">launch_studio()</a></code> to inspect the instrument and
-responses together, to run the plan on the Analysis Plan screen, and to
-export the report.</li>
-<li>Use <code><a href="../reference/launch_dashboard.html">launch_dashboard()</a></code> for read-only response
-exploration.</li>
+responses together, to run the plan on the Analyse screen, and to write
+the report on Report.</li>
+<li>Use <code>launch_studio(screen = "dashboard")</code> for response
+exploration with filters.</li>
 </ol>
 </div>
 <div class="section level2">
@@ -267,7 +328,7 @@ command palette. Each one needs the rstudioapi package.</p>
 </tr>
 <tr class="odd">
 <td>surveyframe: Analyse an existing instrument</td>
-<td>SurveyStudio, on Upload Responses, with the instrument loaded</td>
+<td>SurveyStudio, on Responses, with the instrument loaded</td>
 <td>a <code>.sframe</code> file, chosen in a dialog</td>
 </tr>
 <tr class="even">
@@ -292,31 +353,33 @@ next.</p>
 </h2>
 <p>This vignette leaves the demo launchers unevaluated, because CRAN
 examples and vignettes leave browsers closed.</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/launch_builder_demo.html">launch_builder_demo</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/launch_studio_demo.html">launch_studio_demo</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/launch_dashboard_demo.html">launch_dashboard_demo</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p><code><a href="../reference/launch_builder_demo.html">launch_builder_demo()</a></code> injects the demo state into a
-temporary copy of <code>survey_builder.html</code> and opens it, so the
-demo questions, scales, and analysis plan are visible at once.
-<code><a href="../reference/launch_studio_demo.html">launch_studio_demo()</a></code> opens the studio with an instrument
-and response data already loaded. <code><a href="../reference/launch_dashboard_demo.html">launch_dashboard_demo()</a></code>
-opens the dashboard with the same demo data.</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/launch_builder.html">launch_builder</a></span><span class="op">(</span>demo <span class="op">=</span> <span class="st">"input_types"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/launch_studio.html">launch_studio</a></span><span class="op">(</span>demo <span class="op">=</span> <span class="st">"input_types"</span>, screen <span class="op">=</span> <span class="st">"preview"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/launch_studio.html">launch_studio</a></span><span class="op">(</span>demo <span class="op">=</span> <span class="st">"input_types"</span>, screen <span class="op">=</span> <span class="st">"dashboard"</span><span class="op">)</span></span></code></pre></div>
+<p><code>launch_builder(demo = "input_types")</code> injects the demo
+state into a temporary copy of <code>survey_builder.html</code> and
+opens it, so the demo questions, scales, and analysis plan are visible
+at once.
+<code>launch_studio(demo = "input_types", screen = "preview")</code>
+opens the studio with an instrument and response data already loaded.
+Any name from <code><a href="../reference/sframe_list_demos.html">sframe_list_demos()</a></code> works as
+<code>demo</code>. Setting <code>screen = "dashboard"</code> opens the
+Explore screen with the same demo data.</p>
 </div>
 <div class="section level2">
 <h2 id="standalone-builder">Standalone builder<a class="anchor" aria-label="anchor" href="#standalone-builder"></a>
 </h2>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">builder_file</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/launch_builder.html">launch_builder</a></span><span class="op">(</span>open <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="va">builder_file</span></span></code></pre></div>
 <p>Use SurveyBuilder for questionnaire, plan, and model authoring.
-Response exploration and plan execution belong in SurveyStudio or the
-dashboard.</p>
+Response exploration and plan execution belong in SurveyStudio.</p>
 </div>
 <div class="section level2">
 <h2 id="studio-workflow-hub">Studio workflow hub<a class="anchor" aria-label="anchor" href="#studio-workflow-hub"></a>
 </h2>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/launch_studio.html">launch_studio</a></span><span class="op">(</span></span>
 <span>  instrument     <span class="op">=</span> <span class="va">instr</span>,</span>
 <span>  responses      <span class="op">=</span> <span class="va">responses</span>,</span>
@@ -325,23 +388,25 @@ dashboard.</p>
 <span><span class="op">)</span></span></code></pre></div>
 <p>SurveyStudio reads the objects passed by
 <code><a href="../reference/launch_studio.html">launch_studio()</a></code>. With response data present,
-<code>screen = "auto"</code> opens the Dashboard. With an instrument
-alone it opens Preview Survey, and with neither it opens Open
-Instrument. <code>screen = "analysis"</code> opens the Analysis Plan
-screen explicitly.</p>
+<code>screen = "auto"</code> opens Explore. With an instrument alone it
+opens Preview, and with neither it opens Open Instrument.
+<code>screen = "analysis"</code> opens the Analyse screen
+explicitly.</p>
 </div>
 <div class="section level2">
-<h2 id="dashboard">Dashboard<a class="anchor" aria-label="anchor" href="#dashboard"></a>
+<h2 id="explore">Explore<a class="anchor" aria-label="anchor" href="#explore"></a>
 </h2>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/launch_dashboard.html">launch_dashboard</a></span><span class="op">(</span></span>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/launch_studio.html">launch_studio</a></span><span class="op">(</span></span>
 <span>  instrument     <span class="op">=</span> <span class="va">instr</span>,</span>
 <span>  responses      <span class="op">=</span> <span class="va">responses</span>,</span>
+<span>  screen         <span class="op">=</span> <span class="st">"dashboard"</span>,</span>
 <span>  launch.browser <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p>Use the dashboard after data collection for read-only
-exploration.</p>
-<p><img src="figures/gui-dashboard.png" class="r-plt" alt="The response dashboard's Overview tab: filters named by their questions and a date range, tiles for 120 filtered responses, 19 survey items, 2 scales, 1 attention check and the date range, and an instrument summary table." width="100%"></p>
+<p>Use the Explore screen after data collection to explore responses.
+Each filter takes the question’s label and choice labels, and the date
+range follows <code>submitted_at</code>.</p>
+<p><img src="figures/gui-dashboard.png" class="r-plt" alt="SurveyStudio's Explore screen on its Overview tab: 3 filters named by their questions and a date range on submitted_at, tiles for 120 responses, 120 filtered responses, 19 items, 2 scales, 1 check and the date range, and the instrument summary." width="100%"></p>
 </div>
 <div class="section level2">
 <h2 id="known-limitations">Known limitations<a class="anchor" aria-label="anchor" href="#known-limitations"></a>

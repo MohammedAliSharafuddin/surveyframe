@@ -44,7 +44,7 @@ All rated items use a five-point agreement scale.
 
 ``` r
 
-likert5 <- sf_choices(
+likert5 <- sframe_choice_set(
   "likert5",
   values = 1:5,
   labels = c("Strongly disagree", "Disagree",
@@ -57,14 +57,14 @@ likert5 <- sf_choices(
 `stem_items()` builds items that share a common sentence stem. Each item
 is the stem followed by a unique completion. `solo_items()` builds
 standalone items. Neither function is exported, and both use only
-[`sf_item()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_item.md).
+[`sframe_item()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_item.md).
 
 ``` r
 
 stem_items <- function(ids, stem, completions, scale_id) {
   Map(
     function(id, comp)
-      sf_item(id, paste(stem, comp),
+      sframe_item(id, paste(stem, comp),
               type = "likert", required = TRUE,
               choice_set = "likert5", scale_id = scale_id),
     ids, completions
@@ -74,7 +74,7 @@ stem_items <- function(ids, stem, completions, scale_id) {
 solo_items <- function(ids, labels, scale_id) {
   Map(
     function(id, lab)
-      sf_item(id, lab,
+      sframe_item(id, lab,
               type = "likert", required = TRUE,
               choice_set = "likert5", scale_id = scale_id),
     ids, labels
@@ -245,63 +245,63 @@ bi_items <- solo_items(
 
 ``` r
 
-gender_cs    <- sf_choices("gender",
+gender_cs    <- sframe_choice_set("gender",
   c("male", "female", "transgender"), c("Male", "Female", "Transgender"))
 
-age_cs       <- sf_choices("age",
+age_cs       <- sframe_choice_set("age",
   c("18_25", "26_40", "41_50", "51_60", "60_plus"),
   c("18-25", "26-40", "41-50", "51-60", "60 and above"))
 
-visitor_cs   <- sf_choices("visitor",
+visitor_cs   <- sframe_choice_set("visitor",
   c("first_time", "repeat"),
   c("First-time visitor", "Repeated visitor"))
 
-freq_cs      <- sf_choices("freq_visit",
+freq_cs      <- sframe_choice_set("freq_visit",
   c("lt_1", "once", "2_3", "gt_3"),
   c("Less than 1 time in a year", "Once in a year",
     "2-3 times in a year", "More than 3 times in a year"))
 
-nationality_cs <- sf_choices("nationality",
+nationality_cs <- sframe_choice_set("nationality",
   c("thai", "chinese", "japanese", "korean", "indian", "australian",
     "british", "german", "american", "other"),
   c("Thai", "Chinese", "Japanese", "Korean", "Indian", "Australian",
     "British", "German", "American", "Other"))
 
-education_cs <- sf_choices("education",
+education_cs <- sframe_choice_set("education",
   c("high_school", "diploma", "undergraduate", "post_graduate"),
   c("High school", "Diploma", "Undergraduate", "Post graduate"))
 
-profession_cs <- sf_choices("profession",
+profession_cs <- sframe_choice_set("profession",
   c("student", "business", "salaried", "freelancer", "not_working"),
   c("Student", "Business", "Salaried and working", "Freelancer",
     "Not working (housewife or retired)"))
 
-companion_cs <- sf_choices("companion",
+companion_cs <- sframe_choice_set("companion",
   c("friends", "family", "other"),
   c("Friends", "Family members", "Other"))
 
-group_cs     <- sf_choices("group_size",
+group_cs     <- sframe_choice_set("group_size",
   c("lt_3", "3_5", "gt_5"),
   c("Less than 3", "3-5", "More than 5"))
 
 demo_items <- list(
-  sf_item("gender",        "Gender",                type = "single_choice",
+  sframe_item("gender",        "Gender",                type = "single_choice",
           required = TRUE, choice_set = "gender"),
-  sf_item("age_band",      "Age",                   type = "single_choice",
+  sframe_item("age_band",      "Age",                   type = "single_choice",
           required = TRUE, choice_set = "age"),
-  sf_item("visitor_type",  "I am",                  type = "single_choice",
+  sframe_item("visitor_type",  "I am",                  type = "single_choice",
           required = TRUE, choice_set = "visitor"),
-  sf_item("freq_visit",    "Frequency of visit",    type = "single_choice",
+  sframe_item("freq_visit",    "Frequency of visit",    type = "single_choice",
           required = TRUE, choice_set = "freq_visit"),
-  sf_item("nationality",   "Nationality",           type = "single_choice",
+  sframe_item("nationality",   "Nationality",           type = "single_choice",
           required = TRUE, choice_set = "nationality"),
-  sf_item("education",     "Education level",       type = "single_choice",
+  sframe_item("education",     "Education level",       type = "single_choice",
           required = TRUE, choice_set = "education"),
-  sf_item("profession",    "Profession",            type = "single_choice",
+  sframe_item("profession",    "Profession",            type = "single_choice",
           required = TRUE, choice_set = "profession"),
-  sf_item("companion",     "I visit with my",       type = "single_choice",
+  sframe_item("companion",     "I visit with my",       type = "single_choice",
           required = TRUE, choice_set = "companion"),
-  sf_item("group_size",    "My travel group size is", type = "single_choice",
+  sframe_item("group_size",    "My travel group size is", type = "single_choice",
           required = TRUE, choice_set = "group_size")
 )
 ```
@@ -311,7 +311,7 @@ demo_items <- list(
 ``` r
 
 make_scale <- function(id, label, ids) {
-  sf_scale(id, label, items = ids, method = "mean")
+  sframe_scale(id, label, items = ids, method = "mean")
 }
 
 scales <- list(
@@ -339,7 +339,7 @@ choice_sets <- list(
 rated_items <- c(dmre_items, dmau_items, dmeu_items, dmpv_items,
                  dsqa_items, dsqt_items, dsuq_items, ts_items, bi_items)
 
-study <- sf_instrument(
+study <- sframe_instrument(
   title       = "Digital Marketing Effectiveness of Tourism Services",
   version     = "1.0.0",
   description = paste(
@@ -383,7 +383,7 @@ validate_sframe(study, strict = FALSE)
 #> <sframe validation>
 #>   Instrument:  Digital Marketing Effectiveness of Tourism Services (1.0.0)
 #>   Status:      valid
-#>   Checks:      29 run, 0 with problems
+#>   Checks:      30 run, 0 with problems
 ```
 
 Read the parts of the diagnostic with the accessors, which saves
@@ -394,9 +394,9 @@ is how you tell a check that passed from a check that was never reached.
 ``` r
 
 v <- validate_sframe(study, strict = FALSE)
-sf_is_valid(v)
+sframe_is_valid(v)
 #> [1] TRUE
-sf_problems(v)
+sframe_problems(v)
 #> character(0)
 head(summary(v), 5)
 #>                  check status n_problems
@@ -415,7 +415,7 @@ sframe_path <- write_sframe(study, file.path(tempdir(), "tourism_services_v1.sfr
 
 # Reload the instrument from disk at any time with:
 study2 <- read_sframe(sframe_path)
-identical(sf_meta(study)$title, sf_meta(study2)$title)
+identical(sframe_meta(study)$title, sframe_meta(study2)$title)
 #> [1] TRUE
 ```
 
@@ -510,7 +510,7 @@ risk to the plan’s design-time-binding logic:
 ``` r
 
 # Suppose a pilot round surfaces an ambiguous item and it needs rewording.
-dmre_1_revised <- sf_item(
+dmre_1_revised <- sframe_item(
   "dmre_1", paste(dmre_stem, "relevant to my personal travel interests."),
   type = "likert", required = TRUE, choice_set = "likert5", scale_id = "DMRE"
 )
@@ -525,23 +525,26 @@ study_amended <- amend_sframe(
   reason_text = "Clarified item wording after pilot feedback.",
   deviation_report = "Wording only; the construct measured is unchanged."
 )
+#> The version stays 1.0.0. Suggested next version: 1.1.0. A design amendment
+#> changes what is measured or analysed, so the minor number moves. Set it with
+#> `version = "1.1.0"`.
 
-amendment_log(study_amended)
+sframe_get_amendments(study_amended)
 #>              timestamp         reason_code
-#> 1 2026-10-30T19:50:49Z instrument_revision
+#> 1 2026-11-05T05:30:29Z instrument_revision
 #>                                    reason_text   tier author
 #> 1 Clarified item wording after pilot feedback. design   <NA>
 #>                                     deviation_report signoff
 #> 1 Wording only; the construct measured is unchanged.    none
 #>                                                      previous_hash
-#> 1 7a404899473ee96b97542c8974f0303de4d354d17565078a1e40f70143835ec1
+#> 1 6564ab576eced844c103712b0669aa1c27b7487203f7adccfdb48677198f481b
 #>                                                           new_hash
-#> 1 df96fec69aacc935c23367f51670d3faea28d02f0fc1e41737fced5201b1c280
+#> 1 3781244c4288cc43fe13a248c813a035c1be43bfe7c99b1f6e45c20028988263
 #>   changed_fields
 #> 1          items
 ```
 
-[`amendment_log()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/amendment_log.md)
+[`sframe_get_amendments()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_get_amendments.md)
 returns the full history as a data frame, one row per disclosed change,
 printable or exported with
 [`write.csv()`](https://rdrr.io/r/utils/write.table.html) for an
@@ -575,7 +578,7 @@ does not guarantee that every change is disclosed in the first place.
 
 A bare hash carries the file’s identity alone. A diff, an author and an
 explanation come from Git, which already provides all three.
-[`link_git_commit()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/link_git_commit.md)
+[`sframe_link_git_commit()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_link_git_commit.md)
 points the instrument at Git and leaves the history there: it records
 the current commit’s SHA and subject line, so the SHA-256 hash’s role
 narrows to confirming that the file on disk matches what that specific,
@@ -585,7 +588,7 @@ optional, and the rest of the package runs on its own.
 
 ``` r
 
-link_git_commit(study_amended, repo_path = tempdir())
+sframe_link_git_commit(study_amended, repo_path = tempdir())
 #> $linked
 #> [1] FALSE
 #> 
@@ -600,7 +603,7 @@ link_git_commit(study_amended, repo_path = tempdir())
 ### Store the Google Sheets endpoint in the instrument
 
 When an endpoint URL is set on the instrument,
-[`export_static_survey()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/export_static_survey.md)
+[`export_survey()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/export_survey.md)
 reads it automatically. Set the URL once, and every later export reuses
 it.
 
@@ -613,7 +616,7 @@ study$render$google_sheets_endpoint <-
 
 ### Export the static HTML survey
 
-[`export_static_survey()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/export_static_survey.md)
+[`export_survey()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/export_survey.md)
 produces a single self-contained HTML file. Respondents open it in any
 browser and, if an endpoint is configured, the browser sends the
 submission to Google Sheets. The cross-origin request confirms only that
@@ -626,12 +629,12 @@ disk.
 
 ``` r
 
-html_path <- export_static_survey(
+html_path <- export_survey(
   study,
   output_path = file.path(tempdir(), "tourism_services_survey.html"),
   open        = FALSE
 )
-#> Static survey written to '/tmp/RtmpvjTzD2/tourism_services_survey.html' (100.7
+#> Static survey written to '/tmp/RtmpN5iLta/tourism_services_survey.html' (103.3
 #> KB).
 file.exists(html_path)
 #> [1] TRUE
@@ -684,7 +687,7 @@ script_path <- export_google_sheet(
   sheet_url  = "https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID",
   output_dir = tempdir()
 )
-#> Apps Script written to: /tmp/RtmpvjTzD2/surveyframe_collector.gs
+#> Apps Script written to: /tmp/RtmpN5iLta/surveyframe_collector.gs
 #> Follow the setup instructions inside the file to deploy it.
 file.exists(script_path)
 #> [1] TRUE
@@ -835,7 +838,7 @@ cat("Columns:    ", ncol(responses), "\n")
 
 ``` r
 
-qr <- quality_report(responses, study, respondent_id = "respondent_id")
+qr <- sframe_quality_results(responses, study, respondent_id = "respondent_id")
 # as.data.frame() gives the summary row, so no reaching into the object.
 qr_summary <- as.data.frame(qr)
 quality_summary <- data.frame(
@@ -863,78 +866,80 @@ for researcher review, not automatic exclusion.
 
 ``` r
 
-mr <- missing_data_report(responses, study)
+mr <- sframe_missing_data_results(responses, study)
 # as.data.frame() returns the item-level table, which is what the report is
 # mainly about.
-kable(as.data.frame(mr), digits = 2,
+mr_items <- as.data.frame(mr)[, c("variable", "missing_n", "missing_prop", "valid_n")]
+mr_items$missing_prop <- 100 * mr_items$missing_prop
+kable(mr_items, digits = 1, row.names = FALSE,
       col.names = c("Variable", "Missing (n)", "Missing (%)", "Valid (n)"),
       caption = "Item-level missingness")
 ```
 
-|              | Variable     | Missing (n) | Missing (%) | Valid (n) |
-|:-------------|:-------------|------------:|------------:|----------:|
-| dmre_1       | dmre_1       |           0 |           0 |        60 |
-| dmre_2       | dmre_2       |           0 |           0 |        60 |
-| dmre_3       | dmre_3       |           0 |           0 |        60 |
-| dmre_4       | dmre_4       |           0 |           0 |        60 |
-| dmre_5       | dmre_5       |           0 |           0 |        60 |
-| dmau_1       | dmau_1       |           0 |           0 |        60 |
-| dmau_2       | dmau_2       |           0 |           0 |        60 |
-| dmau_3       | dmau_3       |           0 |           0 |        60 |
-| dmau_4       | dmau_4       |           0 |           0 |        60 |
-| dmau_5       | dmau_5       |           0 |           0 |        60 |
-| dmeu_1       | dmeu_1       |           0 |           0 |        60 |
-| dmeu_2       | dmeu_2       |           0 |           0 |        60 |
-| dmeu_3       | dmeu_3       |           0 |           0 |        60 |
-| dmeu_4       | dmeu_4       |           0 |           0 |        60 |
-| dmeu_5       | dmeu_5       |           0 |           0 |        60 |
-| dmpv_1       | dmpv_1       |           0 |           0 |        60 |
-| dmpv_2       | dmpv_2       |           0 |           0 |        60 |
-| dmpv_3       | dmpv_3       |           0 |           0 |        60 |
-| dmpv_4       | dmpv_4       |           0 |           0 |        60 |
-| dmpv_5       | dmpv_5       |           0 |           0 |        60 |
-| dsqa_1       | dsqa_1       |           0 |           0 |        60 |
-| dsqa_2       | dsqa_2       |           0 |           0 |        60 |
-| dsqa_3       | dsqa_3       |           0 |           0 |        60 |
-| dsqa_4       | dsqa_4       |           0 |           0 |        60 |
-| dsqt_1       | dsqt_1       |           0 |           0 |        60 |
-| dsqt_2       | dsqt_2       |           0 |           0 |        60 |
-| dsqt_3       | dsqt_3       |           0 |           0 |        60 |
-| dsqt_4       | dsqt_4       |           0 |           0 |        60 |
-| dsqt_5       | dsqt_5       |           0 |           0 |        60 |
-| dsuq_1       | dsuq_1       |           0 |           0 |        60 |
-| dsuq_2       | dsuq_2       |           0 |           0 |        60 |
-| dsuq_3       | dsuq_3       |           0 |           0 |        60 |
-| dsuq_4       | dsuq_4       |           0 |           0 |        60 |
-| dsuq_5       | dsuq_5       |           0 |           0 |        60 |
-| dsuq_6       | dsuq_6       |           0 |           0 |        60 |
-| dsuq_7       | dsuq_7       |           0 |           0 |        60 |
-| dsuq_8       | dsuq_8       |           0 |           0 |        60 |
-| dsuq_9       | dsuq_9       |           0 |           0 |        60 |
-| dsuq_10      | dsuq_10      |           0 |           0 |        60 |
-| dsuq_11      | dsuq_11      |           0 |           0 |        60 |
-| ts_1         | ts_1         |           0 |           0 |        60 |
-| ts_2         | ts_2         |           0 |           0 |        60 |
-| ts_3         | ts_3         |           0 |           0 |        60 |
-| bi_1         | bi_1         |           0 |           0 |        60 |
-| bi_2         | bi_2         |           0 |           0 |        60 |
-| bi_3         | bi_3         |           0 |           0 |        60 |
-| gender       | gender       |           0 |           0 |        60 |
-| age_band     | age_band     |           0 |           0 |        60 |
-| visitor_type | visitor_type |           0 |           0 |        60 |
-| freq_visit   | freq_visit   |           0 |           0 |        60 |
-| nationality  | nationality  |           0 |           0 |        60 |
-| education    | education    |           0 |           0 |        60 |
-| profession   | profession   |           0 |           0 |        60 |
-| companion    | companion    |           0 |           0 |        60 |
-| group_size   | group_size   |           0 |           0 |        60 |
+| Variable     | Missing (n) | Missing (%) | Valid (n) |
+|:-------------|------------:|------------:|----------:|
+| dmre_1       |           0 |           0 |        60 |
+| dmre_2       |           0 |           0 |        60 |
+| dmre_3       |           0 |           0 |        60 |
+| dmre_4       |           0 |           0 |        60 |
+| dmre_5       |           0 |           0 |        60 |
+| dmau_1       |           0 |           0 |        60 |
+| dmau_2       |           0 |           0 |        60 |
+| dmau_3       |           0 |           0 |        60 |
+| dmau_4       |           0 |           0 |        60 |
+| dmau_5       |           0 |           0 |        60 |
+| dmeu_1       |           0 |           0 |        60 |
+| dmeu_2       |           0 |           0 |        60 |
+| dmeu_3       |           0 |           0 |        60 |
+| dmeu_4       |           0 |           0 |        60 |
+| dmeu_5       |           0 |           0 |        60 |
+| dmpv_1       |           0 |           0 |        60 |
+| dmpv_2       |           0 |           0 |        60 |
+| dmpv_3       |           0 |           0 |        60 |
+| dmpv_4       |           0 |           0 |        60 |
+| dmpv_5       |           0 |           0 |        60 |
+| dsqa_1       |           0 |           0 |        60 |
+| dsqa_2       |           0 |           0 |        60 |
+| dsqa_3       |           0 |           0 |        60 |
+| dsqa_4       |           0 |           0 |        60 |
+| dsqt_1       |           0 |           0 |        60 |
+| dsqt_2       |           0 |           0 |        60 |
+| dsqt_3       |           0 |           0 |        60 |
+| dsqt_4       |           0 |           0 |        60 |
+| dsqt_5       |           0 |           0 |        60 |
+| dsuq_1       |           0 |           0 |        60 |
+| dsuq_2       |           0 |           0 |        60 |
+| dsuq_3       |           0 |           0 |        60 |
+| dsuq_4       |           0 |           0 |        60 |
+| dsuq_5       |           0 |           0 |        60 |
+| dsuq_6       |           0 |           0 |        60 |
+| dsuq_7       |           0 |           0 |        60 |
+| dsuq_8       |           0 |           0 |        60 |
+| dsuq_9       |           0 |           0 |        60 |
+| dsuq_10      |           0 |           0 |        60 |
+| dsuq_11      |           0 |           0 |        60 |
+| ts_1         |           0 |           0 |        60 |
+| ts_2         |           0 |           0 |        60 |
+| ts_3         |           0 |           0 |        60 |
+| bi_1         |           0 |           0 |        60 |
+| bi_2         |           0 |           0 |        60 |
+| bi_3         |           0 |           0 |        60 |
+| gender       |           0 |           0 |        60 |
+| age_band     |           0 |           0 |        60 |
+| visitor_type |           0 |           0 |        60 |
+| freq_visit   |           0 |           0 |        60 |
+| nationality  |           0 |           0 |        60 |
+| education    |           0 |           0 |        60 |
+| profession   |           0 |           0 |        60 |
+| companion    |           0 |           0 |        60 |
+| group_size   |           0 |           0 |        60 |
 
 Item-level missingness {.table}
 
 ``` r
 
-# sf_apa() gives a plain-language summary suitable for a methods section.
-cat(sf_apa(mr), "\n")
+# sframe_apa() gives a plain-language summary suitable for a methods section.
+cat(sframe_apa(mr), "\n")
 #> Missing-data diagnostics were computed for 55 variables.
 ```
 
@@ -1004,7 +1009,7 @@ par(op)
 ``` r
 
 if (requireNamespace("psych", quietly = TRUE)) {
-  rr <- reliability_report(scored, study, omega = FALSE)
+  rr <- sframe_reliability_results(scored, study, omega = FALSE)
   # One row per scale, with NA where a statistic could not be computed.
   rr_df <- as.data.frame(rr)
   rel_df <- data.frame(
@@ -1041,21 +1046,21 @@ treat them as distinct estimates. Decide which quantity answers the
 study’s question, and report that one on its own merits. Pass
 `omega = TRUE` to report the available omega estimates alongside alpha,
 and name the estimate and assumptions in the write-up. See
-[`?reliability_report`](https://mohammedalisharafuddin.github.io/surveyframe/reference/reliability_report.md)
+[`?sframe_reliability_results`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_reliability_results.md)
 for details.
 
 ## EFA readiness
 
 Before a confirmatory factor analysis, it is useful to screen whether
 the item correlations appear suitable for exploratory factoring.
-[`efa_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/efa_report.md)
+[`sframe_efa_readiness_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_efa_readiness_results.md)
 runs the KMO measure of sampling adequacy and Bartlett’s test of
 sphericity, and uses parallel analysis to suggest the number of factors.
 
 ``` r
 
 if (requireNamespace("psych", quietly = TRUE)) {
-  er <- efa_report(scored, study)
+  er <- sframe_efa_readiness_results(scored, study)
   print(er)
 }
 ```
@@ -1068,7 +1073,7 @@ theory, design, loadings, residuals, and model fit.
 
 ## Construct validity
 
-[`validity_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/validity_report.md)
+[`sframe_validity_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_validity_results.md)
 computes composite reliability (CR) and average variance extracted (AVE)
 from supplied factor loadings. Discriminant validity is assessed via the
 Fornell-Larcker criterion and HTMT when construct scores are supplied.
@@ -1080,7 +1085,7 @@ loadings_list <- list(
   DMRE = c(dm_1 = 0.78, dm_2 = 0.82, dm_3 = 0.75),
   TS   = c(ts_1 = 0.84, ts_2 = 0.80)
 )
-vr <- validity_report(loadings_list)
+vr <- sframe_validity_results(loadings_list)
 print(as.data.frame(vr))
 ```
 
@@ -1100,7 +1105,7 @@ executes every block and returns one result per question.
 
 ``` r
 
-sf_plan(study) <- list(
+sframe_plan(study) <- list(
   list(
     id               = "RQ1",
     research_question = "Are digital marketing perceptions associated with tourist satisfaction?",
@@ -1144,7 +1149,7 @@ sf_plan(study) <- list(
   )
 )
 
-length(sf_plan(study))
+length(sframe_plan(study))
 #> [1] 5
 ```
 
@@ -1154,14 +1159,14 @@ length(sf_plan(study))
 
 Before running the analysis plan, check statistical assumptions for the
 variables involved.
-[`assumption_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/assumption_report.md)
+[`sframe_assumption_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_assumption_results.md)
 tests normality (Shapiro-Wilk for samples below 5,000), homogeneity of
 variance (Levene) for grouped tests, and linearity for regression pairs.
 
 ``` r
 
 if (requireNamespace("psych", quietly = TRUE)) {
-  ar <- assumption_report(scored, variables = scale_cols)
+  ar <- sframe_assumption_results(scored, variables = scale_cols)
   print(ar)
 }
 #> Assumption Report
@@ -1269,7 +1274,7 @@ results_path <- render_results(
   output_file = file.path(tempdir(), "tourism_results.html")
 )
 cat("Results report written:", results_path, "\n")
-#> Results report written: /tmp/RtmpvjTzD2/tourism_results.html
+#> Results report written: /tmp/RtmpN5iLta/tourism_results.html
 cat("Size:", round(file.size(results_path) / 1024, 1), "KB\n")
 #> Size: 13.2 KB
 ```
@@ -1297,8 +1302,10 @@ render_report(
   include_analysis = TRUE,
   include_models   = FALSE
 )
+#> Warning: Scale scoring failed before analysis, so blocks run on unscored data: The responses already hold a column named 'DMRE', 'DMAU', 'DMEU', 'DMPV', 'DSQA', 'DSQT', 'DSUQ', 'TS', 'BI', which is also a scale ID.
+#> ℹ score_scales() stores each score in a column named by its scale ID, so scoring would replace that data. Rename the scale, or drop the column first where it holds scores from an earlier run.
 #> Rendering the report with Quarto. This usually takes under a minute.
-#> Report rendered with the Quarto engine: /tmp/RtmpvjTzD2/tourism_report.html
+#> Report rendered with the Quarto engine: /tmp/RtmpN5iLta/tourism_report.html
 ```
 
 ------------------------------------------------------------------------
@@ -1320,7 +1327,7 @@ responses <- read_sheet_responses(
 )
 
 # 2. Run quality checks on the new data.
-quality_report(responses, study, respondent_id = "respondent_id")
+sframe_quality_results(responses, study, respondent_id = "respondent_id")
 
 # 3. Score the scales.
 scored <- score_scales(responses, study)

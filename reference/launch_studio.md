@@ -1,10 +1,11 @@
 # Launch the SurveyStudio interface
 
 Opens the SurveyStudio Shiny application, the visual interface for
-working with an instrument that already exists. Its screens open an
-instrument, record and read amendments, preview the survey, upload
-responses, review data quality, inspect reliability, work on the
-analysis plan, read the dashboard, and export.
+working with an instrument. Its sidebar follows the study: open an
+instrument, then Build (design it, plan its analysis and preview it),
+Collect (set up collection and load the responses), Analyse (check their
+quality, explore them, inspect reliability and run the plan), Report,
+and Record (its references and amendments).
 
 ## Usage
 
@@ -19,7 +20,8 @@ launch_studio(
   screen = "auto",
   port = NULL,
   host = "127.0.0.1",
-  launch.browser = interactive()
+  launch.browser = interactive(),
+  demo = NULL
 )
 ```
 
@@ -56,9 +58,12 @@ launch_studio(
 - screen:
 
   The screen to open on. One of `"auto"`, which picks by what you
-  supply, or a screen name: `"open"`, `"amendments"`, `"references"`,
-  `"preview"`, `"responses"`, `"quality"`, `"reliability"`,
-  `"analysis"`, `"dashboard"` or `"export"`. `"data"` is accepted for
+  supply, or a screen name, given here with its sidebar label: `"open"`
+  (Open Instrument), `"design"` (Design), `"preview"` (Preview),
+  `"collect"` (Collect), `"responses"` (Responses), `"quality"`
+  (Quality), `"dashboard"` (Explore), `"reliability"` (Reliability),
+  `"analysis"` (Analyse), `"export"` (Report), `"references"`
+  (References) or `"amendments"` (Amendments). `"data"` is accepted for
   `"responses"`.
 
 - port:
@@ -74,23 +79,33 @@ launch_studio(
 
   Whether to open the browser automatically.
 
+- demo:
+
+  Optional. A demo name from
+  [`sframe_list_demos()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_list_demos.md).
+  Studio then opens with that demo's instrument and responses loaded, in
+  place of `instrument` and `responses`, which must be left out.
+  `"input_types"` uses every input type Studio supports.
+
 ## Value
 
 Called for its side effect.
 
 ## Details
 
-Studio reads and analyses an instrument. To author one, question by
-question, use
-[`launch_builder()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/launch_builder.md),
-and open the result here.
+The Design screen holds the SurveyBuilder, and a save there becomes the
+instrument Studio has open.
+[`launch_builder()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/launch_builder.md)
+opens the builder on its own.
 
 ## See also
 
 [`launch_builder()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/launch_builder.md),
-[`launch_dashboard()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/launch_dashboard.md),
 [`read_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_sframe.md),
 [`read_responses()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_responses.md)
+
+Other entry points:
+[`surveyframe-package`](https://mohammedalisharafuddin.github.io/surveyframe/reference/surveyframe-package.md)
 
 ## Examples
 
@@ -98,7 +113,10 @@ and open the result here.
 if (FALSE) { # \dontrun{
 launch_studio()
 
-demo <- sframe_demo_data()
+# A demo, opened on the preview screen
+launch_studio(demo = "two_group", screen = "preview")
+
+demo <- sframe_demo("tourism_services")
 launch_studio(instrument = demo$instrument, launch.browser = FALSE)
 
 launch_studio(

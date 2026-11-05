@@ -52,16 +52,23 @@ read_sheet_responses(
 ## Value
 
 A `data.frame` validated against the instrument, ready for
-[`quality_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/quality_report.md),
+[`sframe_quality_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_quality_results.md),
 [`score_scales()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/score_scales.md),
 and
-[`reliability_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/reliability_report.md).
+[`sframe_reliability_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_reliability_results.md).
 
 ## See also
 
 [`export_google_sheet()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/export_google_sheet.md),
 [`read_responses()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_responses.md),
-[`quality_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/quality_report.md)
+[`sframe_quality_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_quality_results.md)
+
+Other Responses functions:
+[`export_responses()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/export_responses.md),
+[`read_responses()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_responses.md),
+[`sframe_missing_data_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_missing_data_results.md),
+[`sframe_outlier_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_outlier_results.md),
+[`sframe_quality_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_quality_results.md)
 
 ## Examples
 
@@ -71,6 +78,6 @@ responses <- read_sheet_responses(
   sheet_id   = "your-sheet-id",
   instrument = instr
 )
-qr <- quality_report(responses, instr, respondent_id = "respondent_id")
+qr <- sframe_quality_results(responses, instr, respondent_id = "respondent_id")
 } # }
 ```

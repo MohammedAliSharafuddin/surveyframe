@@ -28,7 +28,7 @@ read_responses(
 - instrument:
 
   An `sframe` object created by
-  [`sf_instrument()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_instrument.md).
+  [`sframe_instrument()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_instrument.md).
 
 - respondent_id:
 
@@ -82,6 +82,11 @@ criterion, named `item__sub`, and each is checked: a battery with some
 of its columns absent is reported by name. Two columns with the same
 name are refused, since one would otherwise be lost.
 
+A choice set with `allow_other` ("Other, please specify") adds
+`<id>__other_text` to a single choice item, whose own column then holds
+the code `"other"` when Other is chosen, and `<id>__other` (1 or 0) and
+`<id>__other_text` to a multiple choice item.
+
 ## Values
 
 A CSV file is read as text, so identifiers such as `001`, dates and text
@@ -90,13 +95,22 @@ items with numeric responses (numeric, slider and rating items, choice
 items whose codes are all numbers, and ranking, multiple-choice and
 decision expansion columns) are then converted to numbers, with an empty
 cell or `NA` read as missing. A column that does not convert cleanly is
-kept as text. Data frames go through the same conversion, so a CSV file
-and a data frame holding the same responses read the same.
+kept as text. The column of a single choice item that allows Other, and
+every `<id>__other_text` column, stay text. Data frames go through the
+same conversion, so a CSV file and a data frame holding the same
+responses read the same.
 
 ## See also
 
-[`quality_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/quality_report.md),
+[`sframe_quality_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_quality_results.md),
 [`score_scales()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/score_scales.md)
+
+Other Responses functions:
+[`export_responses()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/export_responses.md),
+[`read_sheet_responses()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_sheet_responses.md),
+[`sframe_missing_data_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_missing_data_results.md),
+[`sframe_outlier_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_outlier_results.md),
+[`sframe_quality_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_quality_results.md)
 
 ## Examples
 

@@ -66,7 +66,7 @@ with <code><a href="read_sframe.html">read_sframe()</a></code>.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">launch_builder</span><span class="op">(</span>open <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">launch_builder</span><span class="op">(</span>open <span class="op">=</span> <span class="cn">TRUE</span>, demo <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -79,10 +79,18 @@ opened in the system's default web browser with <code><a href="https://rdrr.io/r
 Set to <code>FALSE</code> to return the file path without opening it, which is
 useful for automated testing.</p></dd>
 
+
+<dt id="arg-demo">demo<a class="anchor" aria-label="anchor" href="#arg-demo"></a></dt>
+<dd><p>Optional. A demo name from <code><a href="sframe_list_demos.html">sframe_list_demos()</a></code>. The builder
+then opens from a temporary copy with that demo's questions, scales and
+analysis plan already loaded. <code>"input_types"</code> shows every input type
+the builder supports.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>The path to the bundled builder HTML file, invisibly.</p>
+    <p>The path to the builder HTML file, invisibly: the bundled file, or
+the temporary copy when <code>demo</code> is given.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
@@ -92,14 +100,13 @@ useful for automated testing.</p></dd>
 drag-to-reorder, undo/redo, and autosave to browser localStorage.</p></dd>
 
 <dt>Preview</dt>
-<dd><p>A layout preview of the welcome, body and thank-you
-pages, showing wording, order and branding. It renders from the
-builder's own markup, so answering, required checks and branching are
-left out. Use <code><a href="export_static_survey.html">export_static_survey()</a></code> and open the file to test the
-respondent's path, or SurveyStudio's Preview screen, which exports the
-real survey with collection switched off.</p></dd>
+<dd><p>The deployable survey, the page <code><a href="export_survey.html">export_survey()</a></code> writes
+with <code>preview = TRUE</code> and SurveyStudio's Preview screen shows.
+Answering, required checks and branching run as a respondent sees
+them, and nothing is collected: the collector endpoint and the
+completion redirect are removed.</p></dd>
 
-<dt>Analyse</dt>
+<dt>Plan</dt>
 <dd><p>A role-based analysis planner with method-specific
 options, planned outputs, reporting references, and decision rules.</p></dd>
 
@@ -111,13 +118,33 @@ origins. Saved <code>.sframe</code> files can be loaded and validated with
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
-    <div class="dont-index"><p><code><a href="launch_studio.html">launch_studio()</a></code>, <code><a href="read_sframe.html">read_sframe()</a></code>, <code><a href="run_analysis_plan.html">run_analysis_plan()</a></code></p></div>
+    <div class="dont-index"><p><code><a href="launch_studio.html">launch_studio()</a></code>, <code><a href="read_sframe.html">read_sframe()</a></code>, <code><a href="run_analysis_plan.html">run_analysis_plan()</a></code></p>
+<p>Other Design functions:
+<code><a href="as_sframe.html">as_sframe()</a></code>,
+<code><a href="read_sframe.html">read_sframe()</a></code>,
+<code><a href="sframe_attention_check.html">sframe_attention_check()</a></code>,
+<code><a href="sframe_branch.html">sframe_branch()</a></code>,
+<code><a href="sframe_choice_set.html">sframe_choice_set()</a></code>,
+<code><a href="sframe_conjoint_design.html">sframe_conjoint_design()</a></code>,
+<code><a href="sframe_get_study.html">sframe_get_study()</a></code>,
+<code><a href="sframe_instrument.html">sframe_instrument()</a></code>,
+<code><a href="sframe_item.html">sframe_item()</a></code>,
+<code><a href="sframe_sampling_methods.html">sframe_sampling_methods()</a></code>,
+<code><a href="sframe_scale.html">sframe_scale()</a></code>,
+<code><a href="sframe_validation.html">sframe_validation</a></code>,
+<code><a href="validate_sframe.html">validate_sframe()</a></code>,
+<code><a href="write_sframe.html">write_sframe()</a></code></p></div>
     </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Retrieve the builder path for inspection without opening the browser</span></span></span>
 <span class="r-in"><span><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu">launch_builder</span><span class="op">(</span>open <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/files.html" class="external-link">file.exists</a></span><span class="op">(</span><span class="va">path</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] TRUE</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># The same builder with a demo preloaded</span></span></span>
+<span class="r-in"><span><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu">launch_builder</span><span class="op">(</span>demo <span class="op">=</span> <span class="st">"two_group"</span>, open <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/files.html" class="external-link">file.exists</a></span><span class="op">(</span><span class="va">path</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] TRUE</span>
 </code></pre></div>

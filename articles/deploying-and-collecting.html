@@ -180,12 +180,12 @@ carries. Set the endpoint before you export.</p>
 <p>From the SurveyBuilder, paste the Web App URL into the Apps Script
 Web App URL field on the Google Sheets settings tab, then click
 <strong>Export survey</strong>. From R, store the URL on the instrument
-and call <code><a href="../reference/export_static_survey.html">export_static_survey()</a></code>.</p>
+and call <code><a href="../reference/export_survey.html">export_survey()</a></code>.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">study</span><span class="op">$</span><span class="va">render</span><span class="op">$</span><span class="va">google_sheets_endpoint</span> <span class="op">&lt;-</span></span>
 <span>  <span class="st">"https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec"</span></span>
 <span></span>
-<span><span class="fu"><a href="../reference/export_static_survey.html">export_static_survey</a></span><span class="op">(</span></span>
+<span><span class="fu"><a href="../reference/export_survey.html">export_survey</a></span><span class="op">(</span></span>
 <span>  <span class="va">study</span>,</span>
 <span>  output_path <span class="op">=</span> <span class="st">"index.html"</span>,</span>
 <span>  open        <span class="op">=</span> <span class="cn">FALSE</span></span>
@@ -252,11 +252,11 @@ Use the Sheet ID or full URL.</p>
 <span>  instrument <span class="op">=</span> <span class="va">study</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">qr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/quality_report.html">quality_report</a></span><span class="op">(</span><span class="va">responses</span>, <span class="va">study</span>, respondent_id <span class="op">=</span> <span class="st">"respondent_id"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">qr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sframe_quality_results.html">sframe_quality_results</a></span><span class="op">(</span><span class="va">responses</span>, <span class="va">study</span>, respondent_id <span class="op">=</span> <span class="st">"respondent_id"</span><span class="op">)</span></span></code></pre></div>
 <p>The returned data frame is validated against the instrument and is
-ready for <code><a href="../reference/quality_report.html">quality_report()</a></code>, <code><a href="../reference/score_scales.html">score_scales()</a></code>,
-<code><a href="../reference/reliability_report.html">reliability_report()</a></code>, and
-<code><a href="../reference/run_analysis_plan.html">run_analysis_plan()</a></code>.</p>
+ready for <code><a href="../reference/sframe_quality_results.html">sframe_quality_results()</a></code>,
+<code><a href="../reference/score_scales.html">score_scales()</a></code>, <code><a href="../reference/sframe_reliability_results.html">sframe_reliability_results()</a></code>,
+and <code><a href="../reference/run_analysis_plan.html">run_analysis_plan()</a></code>.</p>
 </div>
 <div class="section level2">
 <h2 id="updating-a-live-survey">Updating a live survey<a class="anchor" aria-label="anchor" href="#updating-a-live-survey"></a>

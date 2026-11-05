@@ -10,7 +10,7 @@ paper reported, which is all it needs.
 
 ## Reliability from the instrument
 
-[`reliability_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/reliability_report.md)
+[`sframe_reliability_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_reliability_results.md)
 reads the scale definitions and reports Cronbach’s alpha and, with the
 optional `psych` package, McDonald’s omega. The published study reported
 strong reliability for every construct. At the higher-order level the
@@ -21,11 +21,11 @@ marketing effectiveness, 0.792 and 0.906 for service quality, 0.769 and
 
 ``` r
 
-demo      <- sframe_demo_data()
+demo      <- sframe_demo("tourism_services")
 instr     <- demo$instrument
 responses <- demo$responses
 
-rr <- reliability_report(responses, instr, omega = TRUE)
+rr <- sframe_reliability_results(responses, instr, omega = TRUE)
 # as.data.frame() gives one row per scale, so no reaching into the object.
 rr_df <- as.data.frame(rr)
 rel_df <- data.frame(
@@ -60,34 +60,34 @@ retention decision.
 
 ``` r
 
-demo      <- sframe_demo_data()
+demo      <- sframe_demo("tourism_services")
 instr     <- demo$instrument
 responses <- demo$responses
 
-items <- item_report(responses, instr)
+items <- sframe_item_results(responses, instr)
 first  <- items[[1]]
 kable(first$diagnostics, digits = 2,
       caption = paste0("Item diagnostics: ", first$label, " (", first$scale_id, ")"))
 ```
 
-| item_id | mean |   sd | item_rest_r | floor_pct | ceiling_pct | n_missing |
-|:--------|-----:|-----:|------------:|----------:|------------:|----------:|
-| dm_1    | 3.14 | 1.00 |        0.69 |      0.05 |        0.10 |         0 |
-| dm_2    | 3.12 | 0.97 |        0.71 |      0.05 |        0.07 |         0 |
-| dm_3    | 3.19 | 1.00 |        0.70 |      0.06 |        0.08 |         0 |
+| item_id | mean | sd | item_rest_r | floor_prop | ceiling_prop | n_missing | floor_pct | ceiling_pct |
+|:---|---:|---:|---:|---:|---:|---:|---:|---:|
+| dm_1 | 3.14 | 1.00 | 0.69 | 0.05 | 0.10 | 0 | 0.05 | 0.10 |
+| dm_2 | 3.12 | 0.97 | 0.71 | 0.05 | 0.07 | 0 | 0.05 | 0.07 |
+| dm_3 | 3.19 | 1.00 | 0.70 | 0.06 | 0.08 | 0 | 0.06 | 0.08 |
 
 Item diagnostics: Digital marketing effectiveness (digital_marketing)
 {.table}
 
 ## EFA readiness
 
-[`efa_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/efa_report.md)
+[`sframe_efa_readiness_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_efa_readiness_results.md)
 reports the Kaiser-Meyer-Olkin measure and Bartlett’s test as a
 screening step before a confirmatory model.
 
 ``` r
 
-efa_report(responses, instr)
+sframe_efa_readiness_results(responses, instr)
 #> EFA Readiness Diagnostics
 #> 
 #>   Items:          12
@@ -103,7 +103,7 @@ efa_report(responses, instr)
 ## Convergent validity from the published loadings
 
 This step runs on the loadings alone.
-[`validity_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/validity_report.md)
+[`sframe_validity_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_validity_results.md)
 computes composite reliability and average variance extracted from
 standardised loadings. Feeding the outer loadings reported in the paper
 reproduces its convergent validity, which is a direct check of the
@@ -123,7 +123,7 @@ published_loadings <- list(
   BI   = c(bi_1 = .937, bi_2 = .911, bi_3 = .940)
 )
 
-validity <- validity_report(published_loadings)
+validity <- sframe_validity_results(published_loadings)
 kable(as.data.frame(validity), digits = 2,
       caption = "Composite reliability and average variance extracted")
 ```
@@ -160,7 +160,7 @@ Heterotrait-Monotrait ratios were all below the 0.90 threshold, the
 highest being 0.766 between ease of use and accessibility. Both results
 support discriminant validity.
 
-[`validity_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/validity_report.md)
+[`sframe_validity_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_validity_results.md)
 computes both, and which one you get depends on what you give it.
 Construct scores give the Fornell-Larcker matrix, and the `htmt` element
 then holds the absolute inter-construct correlations, which is a
@@ -171,17 +171,17 @@ it reports.
 
 ``` r
 
-demo <- sframe_demo_data()
+demo <- sframe_demo("tourism_services")
 scored <- score_scales(demo$responses, demo$instrument)
-scale_ids <- vapply(sf_scales(demo$instrument), sf_id, character(1))
+scale_ids <- vapply(sframe_get_scales(demo$instrument), sframe_id, character(1))
 construct_scores <- scored[, scale_ids, drop = FALSE]
 
-loadings <- lapply(sf_scales(demo$instrument), function(s) {
+loadings <- lapply(sframe_get_scales(demo$instrument), function(s) {
   stats::setNames(rep(0.8, length(s$items)), s$items)
 })
 names(loadings) <- scale_ids
 
-from_scores <- validity_report(loadings, construct_scores = construct_scores)
+from_scores <- sframe_validity_results(loadings, construct_scores = construct_scores)
 from_scores$htmt_method
 #> [1] "correlation_fallback"
 ```
@@ -190,12 +190,12 @@ Passing the items themselves is what asks for the Henseler ratio:
 
 ``` r
 
-items_by_construct <- lapply(sf_scales(demo$instrument), function(s) {
+items_by_construct <- lapply(sframe_get_scales(demo$instrument), function(s) {
   scored[, s$items, drop = FALSE]
 })
 names(items_by_construct) <- scale_ids
 
-real_htmt <- validity_report(loadings, construct_scores = construct_scores,
+real_htmt <- sframe_validity_results(loadings, construct_scores = construct_scores,
                              items_by_construct = items_by_construct)
 real_htmt$htmt_method
 #> [1] "henseler"
@@ -208,7 +208,7 @@ HTMT entries come back `NA`.
 
 The study reported variance inflation factors below 5 for every
 indicator, which indicates multicollinearity mild enough to proceed.
-[`assumption_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/assumption_report.md)
+[`sframe_assumption_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_assumption_results.md)
 returns variance inflation factors when a regression is specified, which
 is shown in the “Analysing survey responses” vignette.
 

@@ -3,9 +3,9 @@
 Every surveyframe class returns its primary table, and each class has
 its own columns. Where an object holds more than one table, the others
 are reachable through the named accessors in
-[sf_accessors](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_accessors.md),
+[sframe_accessors](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_accessors.md),
 or, for a full tabular record of an instrument, through
-[`codebook_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/codebook_report.md).
+[`sframe_codebook()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_codebook.md).
 
 ## Value
 
@@ -44,10 +44,10 @@ table leaves out help text, placeholder, matrix rows, comparison items
 and scale, slider and rating settings, date bounds, section introduction
 and page; the scale table leaves out `min_valid`, the reverse key and
 the weights. Read the stored declaration in full through
-[`sf_items()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_items.md),
-[`sf_scales()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_scales.md)
+[`sframe_get_items()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_get_items.md),
+[`sframe_get_scales()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_get_scales.md)
 and the rest of
-[sf_accessors](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_accessors.md),
+[sframe_accessors](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_accessors.md),
 each of which returns the component objects themselves, or through
 [`write_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/write_sframe.md)
 for the interchange record.
@@ -58,26 +58,66 @@ own row names and `row.names` has no effect. Pass `row.names` to
 the returned frame where you need to set them. The coercion gives one
 view of an object. An instrument, for example, returns its items, and
 its choice sets and scales come from
-[`sf_choice_sets()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_choice_sets.md),
-[`sf_scales()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_scales.md)
+[`sframe_get_choice_sets()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_get_choice_sets.md),
+[`sframe_get_scales()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_get_scales.md)
 or
-[`codebook_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/codebook_report.md).
+[`sframe_codebook()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_codebook.md).
 
 ## See also
 
-[sf_accessors](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_accessors.md),
-[`codebook_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/codebook_report.md)
+[sframe_accessors](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_accessors.md),
+[`sframe_codebook()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_codebook.md)
+
+Other Inspect functions:
+[`as.data.frame.sf_choices()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/as.data.frame.sf_choices.md),
+[`as.data.frame.sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/as.data.frame.sframe.md),
+[`as.data.frame.sframe_analysis_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/as.data.frame.sframe_analysis_results.md),
+[`as.data.frame.sframe_assumption_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/as.data.frame.sframe_assumption_report.md),
+[`as.data.frame.sframe_codebook()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/as.data.frame.sframe_codebook.md),
+[`as.data.frame.sframe_descriptives_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/as.data.frame.sframe_descriptives_report.md),
+[`as.data.frame.sframe_efa_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/as.data.frame.sframe_efa_report.md),
+[`as.data.frame.sframe_efa_solution()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/as.data.frame.sframe_efa_solution.md),
+[`as.data.frame.sframe_item_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/as.data.frame.sframe_item_report.md),
+[`as.data.frame.sframe_missing_data_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/as.data.frame.sframe_missing_data_report.md),
+[`as.data.frame.sframe_quality_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/as.data.frame.sframe_quality_report.md),
+[`as.data.frame.sframe_reliability_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/as.data.frame.sframe_reliability_report.md),
+[`as.data.frame.sframe_sample_size_plan()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/as.data.frame.sframe_sample_size_plan.md),
+[`as.data.frame.sframe_sensitivity()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/as.data.frame.sframe_sensitivity.md),
+[`as.data.frame.sframe_validation()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/as.data.frame.sframe_validation.md),
+[`as.data.frame.sframe_validity_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/as.data.frame.sframe_validity_report.md),
+[`sf_component_list`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sf_component_list.md),
+[`sframe_accessors`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_accessors.md),
+[`sframe_apa()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_apa.md),
+[`sframe_flagged()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_flagged.md),
+[`sframe_get_attention_checks()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_get_attention_checks.md),
+[`sframe_get_branches()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_get_branches.md),
+[`sframe_get_choice_sets()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_get_choice_sets.md),
+[`sframe_get_items()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_get_items.md),
+[`sframe_get_models()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_get_models.md),
+[`sframe_get_scales()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_get_scales.md),
+[`sframe_id()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_id.md),
+[`sframe_identity`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_identity.md),
+[`sframe_is_valid()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_is_valid.md),
+[`sframe_label()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_label.md),
+[`sframe_meta()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_meta.md),
+[`sframe_missing_columns()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_missing_columns.md),
+[`sframe_notes()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_notes.md),
+[`sframe_object()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_object.md),
+[`sframe_problems()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_problems.md),
+[`sframe_report_accessors`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_report_accessors.md),
+[`sframe_subset`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_subset.md),
+[`sframe_validation_accessors`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_validation_accessors.md)
 
 ## Examples
 
 ``` r
-cs    <- sf_choices("ag5", 1:5,
+cs    <- sframe_choice_set("ag5", 1:5,
            c("Strongly disagree", "Disagree", "Neutral",
              "Agree", "Strongly agree"))
-item  <- sf_item("sat_1", "The service met my expectations.",
+item  <- sframe_item("sat_1", "The service met my expectations.",
                  type = "likert", choice_set = "ag5", scale_id = "sat")
-scale <- sf_scale("sat", "Satisfaction", items = "sat_1")
-instr <- sf_instrument("Demo Survey", components = list(cs, item, scale))
+scale <- sframe_scale("sat", "Satisfaction", items = "sat_1")
+instr <- sframe_instrument("Demo Survey", components = list(cs, item, scale))
 
 as.data.frame(instr)
 #>      id                            label   type choice_set scale_id reverse

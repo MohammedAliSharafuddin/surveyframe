@@ -416,7 +416,7 @@ ranking.</p>
 Before reporting a winner, it is worth asking how much of that result
 survives a small change in the weights.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">sens</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sensitivity_analysis.html">sensitivity_analysis</a></span><span class="op">(</span></span>
+<code class="sourceCode R"><span><span class="va">sens</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sframe_sensitivity_analysis.html">sframe_sensitivity_analysis</a></span><span class="op">(</span></span>
 <span>  x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">4.1</span>, <span class="fl">3.0</span>, <span class="fl">210</span>, <span class="fl">36</span>,</span>
 <span>               <span class="fl">3.6</span>, <span class="fl">4.5</span>, <span class="fl">180</span>, <span class="fl">48</span>,</span>
 <span>               <span class="fl">4.8</span>, <span class="fl">2.5</span>, <span class="fl">260</span>, <span class="fl">24</span>,</span>
@@ -685,13 +685,14 @@ with the researcher, and it matters: the 10 available methods encode
 different assumptions about how criteria trade off against one
 another.</p>
 <p>Two limits are worth stating plainly. surveyframe does not estimate
-choice models, so <code><a href="../reference/sf_conjoint_design.html">sf_conjoint_design()</a></code> declares a conjoint
-design without analysing its responses. And PROMETHEE defaults to Brans
-and Vincke’s type I step function, where some implementations default to
-the linear function, because the linear function needs thresholds that
-are commonly derived from the data range, which makes a result depend on
-a choice nobody declared. See <code><a href="../reference/sframe_decision_options.html">?sframe_decision_options</a></code> for
-the detail, including how far rankings move between the two.</p>
+choice models, so <code><a href="../reference/sframe_conjoint_design.html">sframe_conjoint_design()</a></code> declares a
+conjoint design without analysing its responses. And PROMETHEE defaults
+to Brans and Vincke’s type I step function, where some implementations
+default to the linear function, because the linear function needs
+thresholds that are commonly derived from the data range, which makes a
+result depend on a choice nobody declared. See
+<code><a href="../reference/sframe_decision_options.html">?sframe_decision_options</a></code> for the detail, including how far
+rankings move between the two.</p>
 </div>
 <div class="section level2">
 <h2 id="how-each-method-was-checked">How each method was checked<a class="anchor" aria-label="anchor" href="#how-each-method-was-checked"></a>

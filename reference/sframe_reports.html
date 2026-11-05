@@ -62,8 +62,8 @@ them apart.</p>
     <div class="section level2">
     <h2 id="data-in-object-out">Data in, object out<a class="anchor" aria-label="anchor" href="#data-in-object-out"></a></h2>
     <p>These compute and return an object you can read, coerce with
-<code><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame()</a></code> and often plot.</p><table class="table table"><tr><td>Function</td><td>Answers</td></tr><tr><td><code><a href="codebook_report.html">codebook_report()</a></code></td><td>what the instrument declares, as tables</td></tr><tr><td><code><a href="descriptives_report.html">descriptives_report()</a></code></td><td>the distribution of each variable</td></tr><tr><td><code><a href="missing_data_report.html">missing_data_report()</a></code></td><td>what is missing, and in what pattern</td></tr><tr><td><code><a href="quality_report.html">quality_report()</a></code></td><td>which responses the declared checks flagged</td></tr><tr><td><code><a href="reliability_report.html">reliability_report()</a></code></td><td>alpha and omega per scale</td></tr><tr><td><code><a href="item_report.html">item_report()</a></code></td><td>how each item behaves inside its scale</td></tr><tr><td><code><a href="efa_report.html">efa_report()</a></code></td><td>whether the data suit a factor analysis</td></tr><tr><td><code><a href="validity_report.html">validity_report()</a></code></td><td>convergent and discriminant validity</td></tr><tr><td><code><a href="assumption_report.html">assumption_report()</a></code></td><td>whether a planned test's assumptions hold</td></tr><tr><td><code><a href="posthoc_report.html">posthoc_report()</a></code></td><td>which pairs differ after an omnibus test</td></tr></table><p>Each returns its primary table through <code><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame()</a></code>, with the rest
-reachable through the accessors in <a href="sf_accessors.html">sf_accessors</a>. A failure is carried in
+<code><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame()</a></code> and often plot.</p><table class="table table"><tr><td>Function</td><td>Answers</td></tr><tr><td><code><a href="sframe_codebook.html">sframe_codebook()</a></code></td><td>what the instrument declares, as tables</td></tr><tr><td><code><a href="sframe_descriptives_results.html">sframe_descriptives_results()</a></code></td><td>the distribution of each variable</td></tr><tr><td><code><a href="sframe_missing_data_results.html">sframe_missing_data_results()</a></code></td><td>what is missing, and in what pattern</td></tr><tr><td><code><a href="sframe_quality_results.html">sframe_quality_results()</a></code></td><td>which responses the declared checks flagged</td></tr><tr><td><code><a href="sframe_reliability_results.html">sframe_reliability_results()</a></code></td><td>alpha and omega per scale</td></tr><tr><td><code><a href="sframe_item_results.html">sframe_item_results()</a></code></td><td>how each item behaves inside its scale</td></tr><tr><td><code><a href="sframe_efa_readiness_results.html">sframe_efa_readiness_results()</a></code></td><td>whether the data suit a factor analysis</td></tr><tr><td><code><a href="sframe_validity_results.html">sframe_validity_results()</a></code></td><td>convergent and discriminant validity</td></tr><tr><td><code><a href="sframe_assumption_results.html">sframe_assumption_results()</a></code></td><td>whether a planned test's assumptions hold</td></tr><tr><td><code><a href="sframe_posthoc_results.html">sframe_posthoc_results()</a></code></td><td>which pairs differ after an omnibus test</td></tr></table><p>Each returns its primary table through <code><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame()</a></code>, with the rest
+reachable through the accessors in <a href="sframe_accessors.html">sframe_accessors</a>. A failure is carried in
 the object as an error field, so a report keeps rendering around it.</p>
     </div>
     <div class="section level2">
@@ -74,7 +74,15 @@ and <code><a href="render_report.html">render_report()</a></code> to go from res
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
-    <div class="dont-index"><p><code><a href="run_analysis_plan.html">run_analysis_plan()</a></code>, <a href="sframe_plots.html">sframe_plots</a></p></div>
+    <div class="dont-index"><p><code><a href="run_analysis_plan.html">run_analysis_plan()</a></code>, <a href="sframe_plots.html">sframe_plots</a></p>
+<p>Other Report functions:
+<code><a href="render_report.html">render_report()</a></code>,
+<code><a href="render_results.html">render_results()</a></code>,
+<code><a href="sframe_analysis_qmd.html">sframe_analysis_qmd()</a></code>,
+<code><a href="sframe_codebook.html">sframe_codebook()</a></code>,
+<code><a href="sframe_format_result.html">sframe_format_result()</a></code>,
+<code><a href="sframe_report_source.html">sframe_report_source()</a></code>,
+<code><a href="sframe_save_figures.html">sframe_save_figures()</a></code></p></div>
     </div>
 
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

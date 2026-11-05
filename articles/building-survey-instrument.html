@@ -114,14 +114,14 @@ worked-study vignette.</p>
 <p>Choice sets define reusable response options. Items reference them
 through <code>choice_set</code>.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">likert5</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sf_choices.html">sf_choices</a></span><span class="op">(</span></span>
+<code class="sourceCode R"><span><span class="va">likert5</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sframe_choice_set.html">sframe_choice_set</a></span><span class="op">(</span></span>
 <span>  <span class="st">"likert5"</span>,</span>
 <span>  values <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">5</span>,</span>
 <span>  labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Strongly disagree"</span>, <span class="st">"Disagree"</span>,</span>
 <span>             <span class="st">"Neither agree nor disagree"</span>, <span class="st">"Agree"</span>, <span class="st">"Strongly agree"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">visitor</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sf_choices.html">sf_choices</a></span><span class="op">(</span><span class="st">"visitor"</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"first_time"</span>, <span class="st">"repeat"</span><span class="op">)</span>,</span>
+<span><span class="va">visitor</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sframe_choice_set.html">sframe_choice_set</a></span><span class="op">(</span><span class="st">"visitor"</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"first_time"</span>, <span class="st">"repeat"</span><span class="op">)</span>,</span>
 <span>                      <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"First-time visitor"</span>, <span class="st">"Repeat visitor"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
@@ -133,37 +133,37 @@ carry <code>required = TRUE</code>. Item IDs should stay stable, because
 response columns reuse them and the analysis plan refers to them. These
 items measure perceived value (DMPV) and tourist satisfaction (TS).</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">intro</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sf_item.html">sf_item</a></span><span class="op">(</span></span>
+<code class="sourceCode R"><span><span class="va">intro</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sframe_item.html">sframe_item</a></span><span class="op">(</span></span>
 <span>  <span class="st">"intro"</span>, <span class="st">"About your trip"</span>,</span>
 <span>  type          <span class="op">=</span> <span class="st">"section_break"</span>,</span>
 <span>  section_intro <span class="op">=</span> <span class="st">"Please rate your experience of digital booking and your visit."</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">dmpv_1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sf_item.html">sf_item</a></span><span class="op">(</span><span class="st">"dmpv_1"</span>, <span class="st">"The destination's online content was trustworthy."</span>,</span>
+<span><span class="va">dmpv_1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sframe_item.html">sframe_item</a></span><span class="op">(</span><span class="st">"dmpv_1"</span>, <span class="st">"The destination's online content was trustworthy."</span>,</span>
 <span>  type <span class="op">=</span> <span class="st">"likert"</span>, required <span class="op">=</span> <span class="cn">TRUE</span>, choice_set <span class="op">=</span> <span class="st">"likert5"</span>, scale_id <span class="op">=</span> <span class="st">"DMPV"</span><span class="op">)</span></span>
-<span><span class="va">dmpv_2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sf_item.html">sf_item</a></span><span class="op">(</span><span class="st">"dmpv_2"</span>, <span class="st">"The online information was consistent across platforms."</span>,</span>
+<span><span class="va">dmpv_2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sframe_item.html">sframe_item</a></span><span class="op">(</span><span class="st">"dmpv_2"</span>, <span class="st">"The online information was consistent across platforms."</span>,</span>
 <span>  type <span class="op">=</span> <span class="st">"likert"</span>, required <span class="op">=</span> <span class="cn">TRUE</span>, choice_set <span class="op">=</span> <span class="st">"likert5"</span>, scale_id <span class="op">=</span> <span class="st">"DMPV"</span><span class="op">)</span></span>
-<span><span class="va">dmpv_3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sf_item.html">sf_item</a></span><span class="op">(</span><span class="st">"dmpv_3"</span>, <span class="st">"The digital channels offered good value for money."</span>,</span>
+<span><span class="va">dmpv_3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sframe_item.html">sframe_item</a></span><span class="op">(</span><span class="st">"dmpv_3"</span>, <span class="st">"The digital channels offered good value for money."</span>,</span>
 <span>  type <span class="op">=</span> <span class="st">"likert"</span>, required <span class="op">=</span> <span class="cn">TRUE</span>, choice_set <span class="op">=</span> <span class="st">"likert5"</span>, scale_id <span class="op">=</span> <span class="st">"DMPV"</span><span class="op">)</span></span>
-<span><span class="va">dmpv_4</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sf_item.html">sf_item</a></span><span class="op">(</span><span class="st">"dmpv_4"</span>, <span class="st">"I was aware of the destination through digital channels."</span>,</span>
+<span><span class="va">dmpv_4</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sframe_item.html">sframe_item</a></span><span class="op">(</span><span class="st">"dmpv_4"</span>, <span class="st">"I was aware of the destination through digital channels."</span>,</span>
 <span>  type <span class="op">=</span> <span class="st">"likert"</span>, required <span class="op">=</span> <span class="cn">TRUE</span>, choice_set <span class="op">=</span> <span class="st">"likert5"</span>, scale_id <span class="op">=</span> <span class="st">"DMPV"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">ts_1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sf_item.html">sf_item</a></span><span class="op">(</span><span class="st">"ts_1"</span>, <span class="st">"The trip met my expectations."</span>,</span>
+<span><span class="va">ts_1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sframe_item.html">sframe_item</a></span><span class="op">(</span><span class="st">"ts_1"</span>, <span class="st">"The trip met my expectations."</span>,</span>
 <span>  type <span class="op">=</span> <span class="st">"likert"</span>, required <span class="op">=</span> <span class="cn">TRUE</span>, choice_set <span class="op">=</span> <span class="st">"likert5"</span>, scale_id <span class="op">=</span> <span class="st">"TS"</span><span class="op">)</span></span>
-<span><span class="va">ts_2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sf_item.html">sf_item</a></span><span class="op">(</span><span class="st">"ts_2"</span>, <span class="st">"My overall travel experience was satisfying."</span>,</span>
+<span><span class="va">ts_2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sframe_item.html">sframe_item</a></span><span class="op">(</span><span class="st">"ts_2"</span>, <span class="st">"My overall travel experience was satisfying."</span>,</span>
 <span>  type <span class="op">=</span> <span class="st">"likert"</span>, required <span class="op">=</span> <span class="cn">TRUE</span>, choice_set <span class="op">=</span> <span class="st">"likert5"</span>, scale_id <span class="op">=</span> <span class="st">"TS"</span><span class="op">)</span></span>
-<span><span class="va">ts_3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sf_item.html">sf_item</a></span><span class="op">(</span><span class="st">"ts_3"</span>, <span class="st">"I felt comfortable at the destination."</span>,</span>
+<span><span class="va">ts_3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sframe_item.html">sframe_item</a></span><span class="op">(</span><span class="st">"ts_3"</span>, <span class="st">"I felt comfortable at the destination."</span>,</span>
 <span>  type <span class="op">=</span> <span class="st">"likert"</span>, required <span class="op">=</span> <span class="cn">TRUE</span>, choice_set <span class="op">=</span> <span class="st">"likert5"</span>, scale_id <span class="op">=</span> <span class="st">"TS"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">visitor_type</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sf_item.html">sf_item</a></span><span class="op">(</span><span class="st">"visitor_type"</span>, <span class="st">"I am a"</span>,</span>
+<span><span class="va">visitor_type</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sframe_item.html">sframe_item</a></span><span class="op">(</span><span class="st">"visitor_type"</span>, <span class="st">"I am a"</span>,</span>
 <span>  type <span class="op">=</span> <span class="st">"single_choice"</span>, required <span class="op">=</span> <span class="cn">TRUE</span>, choice_set <span class="op">=</span> <span class="st">"visitor"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">repeat_change</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sf_item.html">sf_item</a></span><span class="op">(</span></span>
+<span><span class="va">repeat_change</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sframe_item.html">sframe_item</a></span><span class="op">(</span></span>
 <span>  <span class="st">"repeat_change"</span>, <span class="st">"What changed most since your previous visit?"</span>,</span>
 <span>  type <span class="op">=</span> <span class="st">"textarea"</span>, required <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">attention</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sf_item.html">sf_item</a></span><span class="op">(</span><span class="st">"attention"</span>, <span class="st">"For quality control, please select Agree."</span>,</span>
+<span><span class="va">attention</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sframe_item.html">sframe_item</a></span><span class="op">(</span><span class="st">"attention"</span>, <span class="st">"For quality control, please select Agree."</span>,</span>
 <span>  type <span class="op">=</span> <span class="st">"single_choice"</span>, required <span class="op">=</span> <span class="cn">TRUE</span>, choice_set <span class="op">=</span> <span class="st">"likert5"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
@@ -173,10 +173,10 @@ items measure perceived value (DMPV) and tourist satisfaction (TS).</p>
 reverse-coded items, and the minimum number of valid items needed to
 compute a score.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">dmpv</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sf_scale.html">sf_scale</a></span><span class="op">(</span><span class="st">"DMPV"</span>, <span class="st">"Digital marketing perceived value"</span>,</span>
+<code class="sourceCode R"><span><span class="va">dmpv</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sframe_scale.html">sframe_scale</a></span><span class="op">(</span><span class="st">"DMPV"</span>, <span class="st">"Digital marketing perceived value"</span>,</span>
 <span>  items <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"dmpv_1"</span>, <span class="st">"dmpv_2"</span>, <span class="st">"dmpv_3"</span>, <span class="st">"dmpv_4"</span><span class="op">)</span>, method <span class="op">=</span> <span class="st">"mean"</span>, min_valid <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">ts</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sf_scale.html">sf_scale</a></span><span class="op">(</span><span class="st">"TS"</span>, <span class="st">"Tourist satisfaction"</span>,</span>
+<span><span class="va">ts</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sframe_scale.html">sframe_scale</a></span><span class="op">(</span><span class="st">"TS"</span>, <span class="st">"Tourist satisfaction"</span>,</span>
 <span>  items <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ts_1"</span>, <span class="st">"ts_2"</span>, <span class="st">"ts_3"</span><span class="op">)</span>, method <span class="op">=</span> <span class="st">"mean"</span>, min_valid <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
@@ -184,7 +184,7 @@ compute a score.</p>
 </h2>
 <p>Checks keep the quality-control logic with the instrument.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">attention_check</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sf_check.html">sf_check</a></span><span class="op">(</span></span>
+<code class="sourceCode R"><span><span class="va">attention_check</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sframe_attention_check.html">sframe_attention_check</a></span><span class="op">(</span></span>
 <span>  id <span class="op">=</span> <span class="st">"attention_agree"</span>, item_id <span class="op">=</span> <span class="st">"attention"</span>, type <span class="op">=</span> <span class="st">"attention"</span>,</span>
 <span>  pass_values <span class="op">=</span> <span class="fl">4</span>, fail_action <span class="op">=</span> <span class="st">"flag"</span>, label <span class="op">=</span> <span class="st">"Instructional attention check"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -196,7 +196,7 @@ compute a score.</p>
 dedicated follow-up, not an item from a shared scale, or groups may
 receive different versions of the scale being compared.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">repeat_branch</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sf_branch.html">sf_branch</a></span><span class="op">(</span></span>
+<code class="sourceCode R"><span><span class="va">repeat_branch</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sframe_branch.html">sframe_branch</a></span><span class="op">(</span></span>
 <span>  item_id    <span class="op">=</span> <span class="st">"repeat_change"</span>,</span>
 <span>  depends_on <span class="op">=</span> <span class="st">"visitor_type"</span>,</span>
 <span>  operator   <span class="op">=</span> <span class="st">"=="</span>,</span>
@@ -225,13 +225,13 @@ an <code>outcome</code>.</p>
 <div class="section level2">
 <h2 id="assemble-the-instrument">Assemble the instrument<a class="anchor" aria-label="anchor" href="#assemble-the-instrument"></a>
 </h2>
-<p><code><a href="../reference/sf_instrument.html">sf_instrument()</a></code> takes the questions through
+<p><code><a href="../reference/sframe_instrument.html">sframe_instrument()</a></code> takes the questions through
 <code>components</code> and the research design through
 <code>analysis_plan</code> and <code>models</code>. The model is added
-with <code><a href="../reference/add_model.html">add_model()</a></code>, which checks each indicator against the
-instrument items.</p>
+with <code><a href="../reference/sframe_add_model.html">sframe_add_model()</a></code>, which checks each indicator
+against the instrument items.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">instr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sf_instrument.html">sf_instrument</a></span><span class="op">(</span></span>
+<code class="sourceCode R"><span><span class="va">instr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sframe_instrument.html">sframe_instrument</a></span><span class="op">(</span></span>
 <span>  title       <span class="op">=</span> <span class="st">"Digital marketing study (teaching slice)"</span>,</span>
 <span>  version     <span class="op">=</span> <span class="st">"1.0.0"</span>,</span>
 <span>  description <span class="op">=</span> <span class="st">"A slice of the published Thailand study for teaching the constructors."</span>,</span>
@@ -246,17 +246,17 @@ instrument items.</p>
 <span>  analysis_plan <span class="op">=</span> <span class="va">analysis_plan</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">ts_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sf_model.html">sf_model</a></span><span class="op">(</span></span>
+<span><span class="va">ts_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sframe_model_spec.html">sframe_model_spec</a></span><span class="op">(</span></span>
 <span>  id    <span class="op">=</span> <span class="st">"ts_cfa"</span>,</span>
 <span>  label <span class="op">=</span> <span class="st">"Satisfaction measurement model"</span>,</span>
 <span>  type  <span class="op">=</span> <span class="st">"cfa"</span>,</span>
 <span>  constructs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>    <span class="fu"><a href="../reference/sf_construct.html">sf_construct</a></span><span class="op">(</span><span class="st">"DMPV"</span>, <span class="st">"Perceived value"</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"dmpv_1"</span>, <span class="st">"dmpv_2"</span>, <span class="st">"dmpv_3"</span>, <span class="st">"dmpv_4"</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>    <span class="fu"><a href="../reference/sf_construct.html">sf_construct</a></span><span class="op">(</span><span class="st">"TS"</span>,   <span class="st">"Tourist satisfaction"</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ts_1"</span>, <span class="st">"ts_2"</span>, <span class="st">"ts_3"</span><span class="op">)</span><span class="op">)</span></span>
+<span>    <span class="fu"><a href="../reference/sframe_construct.html">sframe_construct</a></span><span class="op">(</span><span class="st">"DMPV"</span>, <span class="st">"Perceived value"</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"dmpv_1"</span>, <span class="st">"dmpv_2"</span>, <span class="st">"dmpv_3"</span>, <span class="st">"dmpv_4"</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>    <span class="fu"><a href="../reference/sframe_construct.html">sframe_construct</a></span><span class="op">(</span><span class="st">"TS"</span>,   <span class="st">"Tourist satisfaction"</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ts_1"</span>, <span class="st">"ts_2"</span>, <span class="st">"ts_3"</span><span class="op">)</span><span class="op">)</span></span>
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">instr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/add_model.html">add_model</a></span><span class="op">(</span><span class="va">instr</span>, <span class="va">ts_model</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">instr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sframe_add_model.html">sframe_add_model</a></span><span class="op">(</span><span class="va">instr</span>, <span class="va">ts_model</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="validate-the-instrument">Validate the instrument<a class="anchor" aria-label="anchor" href="#validate-the-instrument"></a>
@@ -268,33 +268,33 @@ the result, and use the accessors to get at the parts.</p>
 <span><span class="co">#&gt; &lt;sframe validation&gt;</span></span>
 <span><span class="co">#&gt;   Instrument:  Digital marketing study (teaching slice) (1.0.0)</span></span>
 <span><span class="co">#&gt;   Status:      valid</span></span>
-<span><span class="co">#&gt;   Checks:      29 run, 0 with problems</span></span></code></pre></div>
+<span><span class="co">#&gt;   Checks:      30 run, 0 with problems</span></span></code></pre></div>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">validation</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/validate_sframe.html">validate_sframe</a></span><span class="op">(</span><span class="va">instr</span>, strict <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/sf_is_valid.html">sf_is_valid</a></span><span class="op">(</span><span class="va">validation</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/sframe_is_valid.html">sframe_is_valid</a></span><span class="op">(</span><span class="va">validation</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] TRUE</span></span>
-<span><span class="fu"><a href="../reference/sf_problems.html">sf_problems</a></span><span class="op">(</span><span class="va">validation</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/sframe_problems.html">sframe_problems</a></span><span class="op">(</span><span class="va">validation</span><span class="op">)</span></span>
 <span><span class="co">#&gt; character(0)</span></span></code></pre></div>
 <p>In production, strict validation stops with a structured error when
 anything is wrong. When it passes, <code><a href="../reference/as_sframe.html">as_sframe()</a></code> recovers the
 instrument with its validated stamp set.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">instr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/as_sframe.html">as_sframe</a></span><span class="op">(</span><span class="fu"><a href="../reference/validate_sframe.html">validate_sframe</a></span><span class="op">(</span><span class="va">instr</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/sf_meta.html">sf_meta</a></span><span class="op">(</span><span class="va">instr</span><span class="op">)</span><span class="op">$</span><span class="va">validated</span></span>
+<span><span class="fu"><a href="../reference/sframe_meta.html">sframe_meta</a></span><span class="op">(</span><span class="va">instr</span><span class="op">)</span><span class="op">$</span><span class="va">validated</span></span>
 <span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="cite-the-sources-the-instrument-draws-on">Cite the sources the instrument draws on<a class="anchor" aria-label="anchor" href="#cite-the-sources-the-instrument-draws-on"></a>
 </h2>
 <p>An instrument rests on published work: the source of each scale, and
-the method behind each plan block. <code><a href="../reference/sf_reference.html">sf_reference()</a></code> records a
-work as CSL-JSON, the format Zotero, Mendeley and pandoc share, and
-<code>cited_by</code> says where the instrument cites it:
+the method behind each plan block. <code><a href="../reference/sframe_reference.html">sframe_reference()</a></code>
+records a work as CSL-JSON, the format Zotero, Mendeley and pandoc
+share, and <code>cited_by</code> says where the instrument cites it:
 <code>"instrument"</code> as a whole, or <code>"item:&lt;id&gt;"</code>,
 <code>"scale:&lt;id&gt;"</code>, <code>"plan:&lt;block id&gt;"</code> or
 <code>"model:&lt;id&gt;"</code>.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">cronbach</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sf_reference.html">sf_reference</a></span><span class="op">(</span></span>
+<code class="sourceCode R"><span><span class="va">cronbach</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sframe_reference.html">sframe_reference</a></span><span class="op">(</span></span>
 <span>  id <span class="op">=</span> <span class="st">"cronbach_1951"</span>,</span>
 <span>  title <span class="op">=</span> <span class="st">"Coefficient alpha and the internal structure of tests"</span>,</span>
 <span>  author <span class="op">=</span> <span class="st">"Cronbach, L. J."</span>, year <span class="op">=</span> <span class="fl">1951</span>,</span>
@@ -312,10 +312,10 @@ alone.</p>
 <span><span class="st">  year    = {1932}, volume = {22}, number = {140}, pages = {1--55}</span></span>
 <span><span class="st">}"</span>, cited_by <span class="op">=</span> <span class="st">"instrument"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">instr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/add_references.html">add_references</a></span><span class="op">(</span><span class="va">instr</span>, <span class="va">cronbach</span>, <span class="va">likert</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="fu"><a href="../reference/sframe_references.html">sframe_references</a></span><span class="op">(</span><span class="va">instr</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">instr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sframe_add_references.html">sframe_add_references</a></span><span class="op">(</span><span class="va">instr</span>, <span class="va">cronbach</span>, <span class="va">likert</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="fu"><a href="../reference/sframe_get_references.html">sframe_get_references</a></span><span class="op">(</span><span class="va">instr</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "cronbach_1951" "likert_1932"</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="fu"><a href="../reference/sframe_references.html">sframe_references</a></span><span class="op">(</span><span class="va">instr</span>, cited_by <span class="op">=</span> <span class="st">"plan:M1"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="fu"><a href="../reference/sframe_get_references.html">sframe_get_references</a></span><span class="op">(</span><span class="va">instr</span>, cited_by <span class="op">=</span> <span class="st">"plan:M1"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "cronbach_1951"</span></span></code></pre></div>
 <p><code><a href="../reference/validate_sframe.html">validate_sframe()</a></code> checks that every key is unique and
 that each <code>cited_by</code> target exists. The references travel
@@ -348,13 +348,13 @@ place.</p>
 <span><span class="va">loaded</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_sframe.html">read_sframe</a></span><span class="op">(</span><span class="va">path</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">inherits</a></span><span class="op">(</span><span class="va">loaded</span>, <span class="st">"sframe"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] TRUE</span></span>
-<span><span class="fu"><a href="../reference/sf_meta.html">sf_meta</a></span><span class="op">(</span><span class="va">loaded</span><span class="op">)</span><span class="op">$</span><span class="va">title</span></span>
+<span><span class="fu"><a href="../reference/sframe_meta.html">sframe_meta</a></span><span class="op">(</span><span class="va">loaded</span><span class="op">)</span><span class="op">$</span><span class="va">title</span></span>
 <span><span class="co">#&gt; [1] "Digital marketing study (teaching slice)"</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="fu"><a href="../reference/sf_plan.html">sf_plan</a></span><span class="op">(</span><span class="va">loaded</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="fu"><a href="../reference/sframe_plan.html">sframe_plan</a></span><span class="op">(</span><span class="va">loaded</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 2</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">loaded</span><span class="op">$</span><span class="va">models</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 1</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="fu"><a href="../reference/sframe_references.html">sframe_references</a></span><span class="op">(</span><span class="va">loaded</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="fu"><a href="../reference/sframe_get_references.html">sframe_get_references</a></span><span class="op">(</span><span class="va">loaded</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 2</span></span></code></pre></div>
 </div>
 <div class="section level2">
@@ -364,7 +364,7 @@ place.</p>
 SurveyBuilder, which saves a <code>.sframe</code> file for use in R.</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/launch_builder.html">launch_builder</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/launch_builder_demo.html">launch_builder_demo</a></span><span class="op">(</span>open <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="../reference/launch_builder.html">launch_builder</a></span><span class="op">(</span>demo <span class="op">=</span> <span class="st">"input_types"</span>, open <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

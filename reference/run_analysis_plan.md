@@ -76,18 +76,39 @@ per analysis block, named by block id. Its `status` attribute holds
 `blocks`, `succeeded`, `failed`, `failed_blocks` and `scoring`, the
 outcome of scoring scales before analysis. A normal return can hold
 failed blocks, so check `attr(results, "status")$failed` or use
-`strict = TRUE`. Each block element Each element contains the test
-result, APA string, interpretation prompt, and reporting-reference
-metadata. Inferential blocks also carry a `$table` data frame suitable
-for [`knitr::kable()`](https://rdrr.io/pkg/knitr/man/kable.html). Pass
-to
+`strict = TRUE`. Each element contains the test result, APA string,
+interpretation prompt, and reporting-reference metadata. Inferential
+blocks also carry a `$table` data frame suitable for
+[`knitr::kable()`](https://rdrr.io/pkg/knitr/man/kable.html). Pass to
 [`render_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_results.md)
 to generate a formatted report.
+
+## Cross-tabulations
+
+A `crosstab` or `chi_square` block's result carries `$totals`, the
+counts with a Total row and column. Set
+`options = list(percent = "row")`, `"column"` or `"total"` for
+`$percent_table`, the percentages over that denominator. The Total row
+of row percentages is the column distribution, and the Total column of
+column percentages is the row distribution. The report then shows each
+count with its percentage beside it, and the chart draws the
+percentages.
 
 ## See also
 
 [`render_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_results.md),
 [`read_sheet_responses()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_sheet_responses.md)
+
+Other Analyse functions:
+[`score_scales()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/score_scales.md),
+[`sframe_assumption_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_assumption_results.md),
+[`sframe_descriptives_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_descriptives_results.md),
+[`sframe_efa_readiness_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_efa_readiness_results.md),
+[`sframe_efa_solution()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_efa_solution.md),
+[`sframe_item_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_item_results.md),
+[`sframe_posthoc_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_posthoc_results.md),
+[`sframe_reliability_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_reliability_results.md),
+[`sframe_validity_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_validity_results.md)
 
 ## Examples
 

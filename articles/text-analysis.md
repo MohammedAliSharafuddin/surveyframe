@@ -27,26 +27,26 @@ open-ended comments item asking what stood out about their visit.
 
 ``` r
 
-satisfaction_cs <- sf_choices(
+satisfaction_cs <- sframe_choice_set(
   "agree5", values = 1:5,
   labels = c("Strongly disagree", "Disagree", "Neutral",
              "Agree", "Strongly agree")
 )
-branch_cs <- sf_choices(
+branch_cs <- sframe_choice_set(
   "branch", values = c("north", "south"),
   labels = c("North branch", "South branch")
 )
 
-instr <- sf_instrument(
+instr <- sframe_instrument(
   title = "Hospitality feedback",
   version = "1.0.0",
   components = list(
     satisfaction_cs, branch_cs,
-    sf_item("satisfaction", "Overall, I was satisfied with my visit.",
+    sframe_item("satisfaction", "Overall, I was satisfied with my visit.",
             type = "likert", choice_set = "agree5"),
-    sf_item("branch", "Which branch did you visit?",
+    sframe_item("branch", "Which branch did you visit?",
             type = "single_choice", choice_set = "branch_cs"),
-    sf_item("comments", "What stood out about your visit, good or bad?",
+    sframe_item("comments", "What stood out about your visit, good or bad?",
             type = "textarea")
   )
 )
@@ -121,7 +121,7 @@ The first 4 simulated responses. {.table}
 
 ## Cleaning a text item
 
-[`clean_text_responses()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/clean_text_responses.md)
+[`sframe_clean_text()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_clean_text.md)
 pulls one item’s responses out of the data, drops blank and missing
 entries, and applies light, configurable cleaning. It keeps a
 `respondent` attribute mapping each cleaned entry back to its original
@@ -130,7 +130,7 @@ can still cite where a response came from.
 
 ``` r
 
-cleaned <- clean_text_responses(responses, "comments", instrument = instr)
+cleaned <- sframe_clean_text(responses, "comments", instrument = instr)
 length(cleaned)
 #> [1] 60
 head(attr(cleaned, "respondent"))
@@ -139,17 +139,17 @@ head(attr(cleaned, "respondent"))
 
 ## Term and n-gram frequency
 
-[`term_frequency()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/term_frequency.md)
+[`sframe_term_frequency()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_term_frequency.md)
 tokenises, lower-cases, strips punctuation, removes stop words (a
 built-in English list ships with the package, so this stage runs on base
 surveyframe), and counts.
-[`ngram_frequency()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/ngram_frequency.md)
+[`sframe_ngram_frequency()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_ngram_frequency.md)
 does the same for 2-word and 3-word phrases, which surface a complaint
 like “long wait” that single-word counts would split apart.
 
 ``` r
 
-terms <- term_frequency(cleaned, top_n = 10)
+terms <- sframe_term_frequency(cleaned, top_n = 10)
 kable(terms, row.names = FALSE, caption = "The 10 most frequent terms.")
 ```
 
@@ -170,7 +170,7 @@ The 10 most frequent terms. {.table}
 
 ``` r
 
-bigrams <- ngram_frequency(cleaned, n = 2, top_n = 8)
+bigrams <- sframe_ngram_frequency(cleaned, n = 2, top_n = 8)
 kable(bigrams, row.names = FALSE, caption = "The 8 most frequent bigrams.")
 ```
 
@@ -194,7 +194,7 @@ covariate.
 
 ``` r
 
-sf_plan(instr) <- list(
+sframe_plan(instr) <- list(
   list(id = "RQ1",
        research_question = "What themes recur in the open-ended comments?",
        family = "text", method = "term_freq",
@@ -370,7 +370,7 @@ a trend.
 
 ## Keyword in context
 
-[`term_context()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/term_context.md)
+[`sframe_term_context()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_term_context.md)
 builds a concordance for one keyword: every place it appears, with a
 window of surrounding words on each side. It is the fastest way to read
 what a keyword actually means in context, and it settles whether a
@@ -378,7 +378,7 @@ frequent term keeps one sense throughout.
 
 ``` r
 
-kwic <- term_context(cleaned, term = "wait", window = 5)
+kwic <- sframe_term_context(cleaned, term = "wait", window = 5)
 kable(kwic, row.names = FALSE, caption = 'Every occurrence of "wait" in context.')
 ```
 
@@ -410,7 +410,7 @@ a heatmap.
 
 ``` r
 
-sf_plan(instr) <- c(sf_plan(instr), list(list(
+sframe_plan(instr) <- c(sframe_plan(instr), list(list(
   id = "RQ3",
   research_question = "Which terms tend to appear together in the same comment?",
   family = "text", method = "co_occurrence",
@@ -457,7 +457,7 @@ layout.
 
 ``` r
 
-sf_plan(instr) <- c(sf_plan(instr), list(list(
+sframe_plan(instr) <- c(sframe_plan(instr), list(list(
   id = "RQ4",
   research_question = "Do the frequent terms form distinct thematic clusters?",
   family = "text", method = "co_occurrence_network",
@@ -518,7 +518,7 @@ itself. Like `term_freq`, it accepts an optional `group` role.
 
 ``` r
 
-sf_plan(instr) <- c(sf_plan(instr), list(list(
+sframe_plan(instr) <- c(sframe_plan(instr), list(list(
   id = "RQ5",
   research_question = "Is sentiment in the comments more positive or negative, and does it differ by branch?",
   family = "text", method = "tidy_sentiment",
@@ -567,9 +567,9 @@ bar’s own left-negative/right-positive convention, each sized and shaded
 ``` r
 
 instr_cloud <- instr
-plan <- sf_plan(instr_cloud)
+plan <- sframe_plan(instr_cloud)
 plan[[which(vapply(plan, `[[`, "", "id") == "RQ5")]]$options <- list(wordcloud = TRUE)
-sf_plan(instr_cloud) <- plan
+sframe_plan(instr_cloud) <- plan
 
 result_cloud <- run_analysis_plan(responses, instr_cloud, plots = TRUE)
 result_cloud[["RQ5"]]$plot
@@ -588,7 +588,7 @@ the leading features provide a sanity check before a heavier method.
 
 ``` r
 
-sf_plan(instr) <- c(sf_plan(instr), list(list(
+sframe_plan(instr) <- c(sframe_plan(instr), list(list(
   id = "RQ6",
   research_question = "What does the document-feature matrix of the comments look like?",
   family = "text", method = "quanteda_dfm",
@@ -648,7 +648,7 @@ the researcher to make and report, not a default to trust unexamined.
 
 ``` r
 
-sf_plan(instr) <- c(sf_plan(instr), list(list(
+sframe_plan(instr) <- c(sframe_plan(instr), list(list(
   id = "RQ7",
   research_question = "What topics organise the open-ended comments?",
   family = "text", method = "stm_topics",
@@ -710,7 +710,7 @@ results[["RQ7"]]$plot
 ![Faceted bar chart of the top terms for each of the 3
 topics.](text-analysis_files/figure-html/stm-plot-1.png)
 
-[`extract_quotes()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/extract_quotes.md)
+[`sframe_extract_quotes()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_extract_quotes.md)
 reads the fitted model back off the result and returns the most
 representative response for each topic, with the **original** respondent
 index (not a document or matrix row number), so a quote can be traced
@@ -718,7 +718,7 @@ back to the response that produced it.
 
 ``` r
 
-quotes <- extract_quotes(results[["RQ7"]], text = cleaned, n_quotes = 2)
+quotes <- sframe_extract_quotes(results[["RQ7"]], text = cleaned, n_quotes = 2)
 kable(quotes, row.names = FALSE,
       caption = "The 2 most representative comments per topic.")
 ```
@@ -760,7 +760,7 @@ inductive coding (code-and-retrieve, memos, a hierarchical code scheme,
 the qcoder or RQDA style of analysis) is a different paradigm from the
 algorithmic methods here, resting on human interpretation where these
 methods count and cluster, and is out of scope by design.
-[`extract_quotes()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/extract_quotes.md)’s
+[`sframe_extract_quotes()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_extract_quotes.md)’s
 output is deliberately a plain data frame, clean enough to export and
 take into a dedicated qualitative coding tool for that next step, which
 surveyframe leaves to the tools built for it.

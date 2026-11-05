@@ -44,12 +44,20 @@ A list with `weights` (a named numeric vector summing to 1), `criteria`,
 
 [`sframe_assemble_pairwise()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_assemble_pairwise.md)
 
+Other Decision analysis functions:
+[`sframe_aggregate_judgements()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_aggregate_judgements.md),
+[`sframe_assemble_pairwise()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_assemble_pairwise.md),
+[`sframe_decision_options()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_decision_options.md),
+[`sframe_dematel_compute()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_dematel_compute.md),
+[`sframe_rated_matrix()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_rated_matrix.md),
+[`sframe_sensitivity_analysis()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_sensitivity_analysis.md)
+
 ## Examples
 
 ``` r
-study <- sf_instrument(
+study <- sframe_instrument(
   title = "Demo", components = list(
-    sf_item("pts", "Divide 100 points", type = "criteria_weight",
+    sframe_item("pts", "Divide 100 points", type = "criteria_weight",
             comparison_items = c("price", "speed"))
   )
 )

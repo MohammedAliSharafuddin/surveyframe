@@ -104,17 +104,24 @@ the result notes each pairing.</p></dd>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
-    <div class="dont-index"><p><code><a href="sframe_collected_weights.html">sframe_collected_weights()</a></code></p></div>
+    <div class="dont-index"><p><code><a href="sframe_collected_weights.html">sframe_collected_weights()</a></code></p>
+<p>Other Decision analysis functions:
+<code><a href="sframe_aggregate_judgements.html">sframe_aggregate_judgements()</a></code>,
+<code><a href="sframe_assemble_pairwise.html">sframe_assemble_pairwise()</a></code>,
+<code><a href="sframe_collected_weights.html">sframe_collected_weights()</a></code>,
+<code><a href="sframe_decision_options.html">sframe_decision_options()</a></code>,
+<code><a href="sframe_dematel_compute.html">sframe_dematel_compute()</a></code>,
+<code><a href="sframe_sensitivity_analysis.html">sframe_sensitivity_analysis()</a></code></p></div>
     </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">q5</span>    <span class="op">&lt;-</span> <span class="fu"><a href="sf_choices.html">sf_choices</a></span><span class="op">(</span><span class="st">"q5"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">5</span>,</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">q5</span>    <span class="op">&lt;-</span> <span class="fu"><a href="sframe_choice_set.html">sframe_choice_set</a></span><span class="op">(</span><span class="st">"q5"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">5</span>,</span></span>
 <span class="r-in"><span>           <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Very poor"</span>, <span class="st">"Poor"</span>, <span class="st">"Fair"</span>, <span class="st">"Good"</span>, <span class="st">"Excellent"</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">price</span> <span class="op">&lt;-</span> <span class="fu"><a href="sf_item.html">sf_item</a></span><span class="op">(</span><span class="st">"rate_price"</span>, <span class="st">"Rate each supplier: value"</span>,</span></span>
+<span class="r-in"><span><span class="va">price</span> <span class="op">&lt;-</span> <span class="fu"><a href="sframe_item.html">sframe_item</a></span><span class="op">(</span><span class="st">"rate_price"</span>, <span class="st">"Rate each supplier: value"</span>,</span></span>
 <span class="r-in"><span>                 type <span class="op">=</span> <span class="st">"matrix"</span>, matrix_items <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Alpha"</span>, <span class="st">"Basilica"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>                 choice_set <span class="op">=</span> <span class="st">"q5"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">study</span> <span class="op">&lt;-</span> <span class="fu"><a href="sf_instrument.html">sf_instrument</a></span><span class="op">(</span><span class="st">"Supplier selection"</span>, components <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">q5</span>, <span class="va">price</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">study</span> <span class="op">&lt;-</span> <span class="fu"><a href="sframe_instrument.html">sframe_instrument</a></span><span class="op">(</span><span class="st">"Supplier selection"</span>, components <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">q5</span>, <span class="va">price</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">responses</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>rate_price__Alpha <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">4</span><span class="op">)</span>, rate_price__Basilica <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">5</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">rm</span> <span class="op">&lt;-</span> <span class="fu">sframe_rated_matrix</span><span class="op">(</span><span class="va">responses</span>, <span class="va">study</span>, <span class="st">"rate_price"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">rm</span><span class="op">$</span><span class="va">matrix</span></span></span>

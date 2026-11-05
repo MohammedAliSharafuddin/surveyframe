@@ -86,7 +86,7 @@ in the instrument. Non-item columns are allowed only when declared through
 
 
 <dt id="arg-instrument">instrument<a class="anchor" aria-label="anchor" href="#arg-instrument"></a></dt>
-<dd><p>An <code>sframe</code> object created by <code><a href="sf_instrument.html">sf_instrument()</a></code>.</p></dd>
+<dd><p>An <code>sframe</code> object created by <code><a href="sframe_instrument.html">sframe_instrument()</a></code>.</p></dd>
 
 
 <dt id="arg-respondent-id">respondent_id<a class="anchor" aria-label="anchor" href="#arg-respondent-id"></a></dt>
@@ -143,6 +143,10 @@ multiple-choice or decision item has one column per row, option, pair or
 criterion, named <code>item__sub</code>, and each is checked: a battery with some of its
 columns absent is reported by name. Two columns with the same name are
 refused, since one would otherwise be lost.</p>
+<p>A choice set with <code>allow_other</code> ("Other, please specify") adds
+<code>&lt;id&gt;__other_text</code> to a single choice item, whose own column then holds
+the code <code>"other"</code> when Other is chosen, and <code>&lt;id&gt;__other</code> (1 or 0) and
+<code>&lt;id&gt;__other_text</code> to a multiple choice item.</p>
     </div>
     <div class="section level2">
     <h2 id="values">Values<a class="anchor" aria-label="anchor" href="#values"></a></h2>
@@ -151,13 +155,21 @@ answers arrive exactly as written, a literal <code>NA</code> included. Columns o
 with numeric responses (numeric, slider and rating items, choice items whose
 codes are all numbers, and ranking, multiple-choice and decision expansion
 columns) are then converted to numbers, with an empty cell or <code>NA</code> read as
-missing. A column that does not convert cleanly is kept as text. Data frames
+missing. A column that does not convert cleanly is kept as text. The column
+of a single choice item that allows Other, and every <code>&lt;id&gt;__other_text</code>
+column, stay text. Data frames
 go through the same conversion, so a CSV file and a data frame holding the
 same responses read the same.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
-    <div class="dont-index"><p><code><a href="quality_report.html">quality_report()</a></code>, <code><a href="score_scales.html">score_scales()</a></code></p></div>
+    <div class="dont-index"><p><code><a href="sframe_quality_results.html">sframe_quality_results()</a></code>, <code><a href="score_scales.html">score_scales()</a></code></p>
+<p>Other Responses functions:
+<code><a href="export_responses.html">export_responses()</a></code>,
+<code><a href="read_sheet_responses.html">read_sheet_responses()</a></code>,
+<code><a href="sframe_missing_data_results.html">sframe_missing_data_results()</a></code>,
+<code><a href="sframe_outlier_results.html">sframe_outlier_results()</a></code>,
+<code><a href="sframe_quality_results.html">sframe_quality_results()</a></code></p></div>
     </div>
 
     <div class="section level2">

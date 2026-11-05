@@ -136,15 +136,37 @@ element per analysis block, named by block id. Its <code>status</code> attribute
 holds <code>blocks</code>, <code>succeeded</code>, <code>failed</code>, <code>failed_blocks</code> and <code>scoring</code>, the
 outcome of scoring scales before analysis. A normal return can hold
 failed blocks, so check <code>attr(results, "status")$failed</code> or use
-<code>strict = TRUE</code>. Each block element Each element contains the test result,
+<code>strict = TRUE</code>. Each element contains the test result,
 APA string, interpretation prompt, and reporting-reference metadata.
 Inferential blocks also carry a <code>$table</code> data frame suitable for
 <code><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">knitr::kable()</a></code>. Pass to <code><a href="render_results.html">render_results()</a></code> to generate a formatted
 report.</p>
     </div>
     <div class="section level2">
+    <h2 id="cross-tabulations">Cross-tabulations<a class="anchor" aria-label="anchor" href="#cross-tabulations"></a></h2>
+
+
+<p>A <code>crosstab</code> or <code>chi_square</code> block's result carries <code>$totals</code>, the
+counts with a Total row and column. Set <code>options = list(percent = "row")</code>,
+<code>"column"</code> or <code>"total"</code> for <code>$percent_table</code>, the percentages over that
+denominator. The Total row of row percentages is the column distribution,
+and the Total column of column percentages is the row distribution. The
+report then shows each count with its percentage beside it, and the chart
+draws the percentages.</p>
+    </div>
+    <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
-    <div class="dont-index"><p><code><a href="render_results.html">render_results()</a></code>, <code><a href="read_sheet_responses.html">read_sheet_responses()</a></code></p></div>
+    <div class="dont-index"><p><code><a href="render_results.html">render_results()</a></code>, <code><a href="read_sheet_responses.html">read_sheet_responses()</a></code></p>
+<p>Other Analyse functions:
+<code><a href="score_scales.html">score_scales()</a></code>,
+<code><a href="sframe_assumption_results.html">sframe_assumption_results()</a></code>,
+<code><a href="sframe_descriptives_results.html">sframe_descriptives_results()</a></code>,
+<code><a href="sframe_efa_readiness_results.html">sframe_efa_readiness_results()</a></code>,
+<code><a href="sframe_efa_solution.html">sframe_efa_solution()</a></code>,
+<code><a href="sframe_item_results.html">sframe_item_results()</a></code>,
+<code><a href="sframe_posthoc_results.html">sframe_posthoc_results()</a></code>,
+<code><a href="sframe_reliability_results.html">sframe_reliability_results()</a></code>,
+<code><a href="sframe_validity_results.html">sframe_validity_results()</a></code></p></div>
     </div>
 
     <div class="section level2">
