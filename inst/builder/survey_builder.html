@@ -622,11 +622,18 @@ input,textarea,select{font-family:inherit;font-size:13px}
    full-height rail beside the panes; .an-split's calc(100% - 44px) height
    always assumed a 44px strip on top). */
 .an-mode{overflow:hidden;flex-direction:column}
-.an-tabs{display:flex;gap:4px;padding:8px 10px;border-bottom:1px solid var(--cb);
+/* Plan's local tabs look like Studio's (UI-3 item 6): the open one underlined. */
+.an-tabs{display:flex;gap:4px;padding:0 10px;border-bottom:1px solid var(--cb);
   background:var(--cf);flex-shrink:0}
-.an-tab{border:1px solid var(--cb);background:var(--cg);border-radius:7px;
-  padding:6px 10px;font-size:11px;font-weight:600;color:var(--t2);cursor:pointer}
-.an-tab.active{background:var(--t1);color:var(--cf);border-color:var(--t1)}
+.an-tab{border:none;border-bottom:3px solid transparent;background:none;
+  padding:8px 10px;font-size:12px;font-weight:600;color:var(--t2);cursor:pointer}
+.an-tab:hover{color:var(--t1)}
+.an-tab.active{border-bottom-color:var(--t1);color:var(--t1)}
+.an-tab:focus-visible{outline:var(--sf-focus-ring);outline-offset:-3px}
+/* In Plan, + Add plan is the primary, so the item panel's Add question
+   steps down to an outlined button (UI-3 item 6). */
+body[data-mode=analyse] .sb-footer .btn.sf-primary{background:transparent;border-color:var(--sf-nav-text);color:var(--sf-nav-text);font-size:var(--sf-fs-md);min-height:36px}
+body[data-mode=analyse] .sb-footer .btn.sf-primary:hover{background:var(--sf-nav-hover);color:var(--sf-white)}
 /* Two panes: the left column carries variables, the output summary, and the
    Model Builder in one scroll; the plans pane takes the rest of the width
    so adding and reading plans is the dominant activity. */
@@ -3803,7 +3810,7 @@ function setDirty(){dirty=true;updSave();centreLater();}
 // opening a file reads as saved in the host, and nothing has been saved.
 function updSave(){var e=document.getElementById('saveSt');
   // In Studio the save goes to Studio, so the state is Saved or not.
-  if(typeof STUDIO_HOST!=='undefined'&&STUDIO_HOST){e.textContent=dirty?'Unsaved changes':'Saved';e.className='save-st '+(dirty?'dirty':'saved');studioPostDirty();studioPostState();renderPrompt();return;}
+  if(typeof STUDIO_HOST!=='undefined'&&STUDIO_HOST){e.textContent=dirty?'Unsaved changes':(S.items.length||lastSaved?'Saved':'No changes');e.className='save-st '+(dirty?'dirty':'saved');studioPostDirty();studioPostState();renderPrompt();return;}
   if(!dirty&&lastSaved){e.textContent='Saved '+tAgo(lastSaved);e.className='save-st saved';}else if(!dirty&&openedAt){e.textContent='Opened '+tAgo(openedAt);e.className='save-st';}else if(dirty){e.textContent='Unsaved changes';e.className='save-st dirty';}else{e.textContent='No changes';e.className='save-st';}renderPrompt();}
 function tAgo(d){var s=Math.round((Date.now()-d)/1000);if(s<10)return'just now';if(s<60)return s+'s ago';return Math.round(s/60)+'m ago';}
 // The canvas prompt (UI-3 item 5). A checklist of the 3 first steps, each
@@ -5957,7 +5964,7 @@ function studioPostDirty(){
 function studioPostState(){
   if(typeof STUDIO_HOST==='undefined'||!STUDIO_HOST)return;
   var sb=document.getElementById('saveBtn');
-  window.parent.postMessage({type:'state',undo:hist.length>0,redo:fut.length>0,saveDisabled:!!(sb&&sb.disabled),dirty:!!dirty},location.origin);
+  window.parent.postMessage({type:'state',undo:hist.length>0,redo:fut.length>0,saveDisabled:!!(sb&&sb.disabled),dirty:!!dirty,label:(document.getElementById('saveSt')||{}).textContent||''},location.origin);
 }
 function studioHostInit(){
   // Studio has its own name, Preview screen and Collect screen, and its
