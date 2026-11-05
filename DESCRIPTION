@@ -48,6 +48,7 @@ Suggests:
     ggplot2 (>= 3.4.0),
     googlesheets4 (>= 1.1.0),
     shiny (>= 1.7.0),
+    htmltools (>= 0.5.2),
     psych (>= 2.3.0),
     MASS,
     nnet,
