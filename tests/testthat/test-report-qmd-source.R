@@ -116,18 +116,58 @@ test_that("a folder that already holds files is not overwritten", {
   expect_identical(readLines(file.path(dir, "notes.txt")), "keep")
 })
 
+# Where two record strings first differ, with 120 characters of each from
+# a little before it, for a failure message.
+first_difference <- function(a, b) {
+  x <- strsplit(a, "", useBytes = TRUE)[[1]]
+  y <- strsplit(b, "", useBytes = TRUE)[[1]]
+  n <- min(length(x), length(y))
+  at <- which(x[seq_len(n)] != y[seq_len(n)])[1]
+  if (is.na(at) && length(x) == length(y)) return("the 2 records are identical")
+  if (is.na(at)) at <- n + 1L
+  from <- max(1L, at - 40L)
+  sprintf("first difference at character %d of %d and %d\nrecorded: %s\nnow:      %s",
+          at, length(x), length(y), substr(a, from, from + 119L), substr(b, from, from + 119L))
+}
+
 test_that("the report source renders with Quarto and checks itself", {
   skip_on_cran()
   skip_if_not_slow()
   skip_if(!nzchar(Sys.which("quarto")), "Quarto is not installed")
   s <- write_source()
-  old <- setwd(s$dir)
-  on.exit(setwd(old), add = TRUE)
-  out <- suppressWarnings(system2("quarto", c("render", "report.qmd", "--to", "html"),
-                                  stdout = TRUE, stderr = TRUE))
-  expect_true(file.exists("report.html"), info = paste(utils::tail(out, 20), collapse = "\n"))
-  doc <- paste(readLines("report.html", warn = FALSE), collapse = "\n")
-  expect_match(doc, "Numbers match the recorded results", fixed = TRUE)
+  # Quarto's own R session writes the record it recomputes, and its locale
+  # and library, so a mismatch names its cause (macOS, CI run 41994727848).
+  dump <- tempfile(fileext = ".json")
+  about <- tempfile(fileext = ".txt")
+  profile <- tempfile(fileext = ".R")
+  writeLines(c(
+    "setHook(packageEvent('surveyframe', 'onLoad'), function(...) {",
+    "  f <- get('sframe_results_record_json', envir = asNamespace('surveyframe'))",
+    "  g <- function(...) {",
+    "    j <- f(...)",
+    "    writeBin(charToRaw(enc2utf8(j)), Sys.getenv('SF_RECORD_DUMP'))",
+    "    j",
+    "  }",
+    "  utils::assignInNamespace('sframe_results_record_json', g, ns = 'surveyframe')",
+    "  writeLines(c(Sys.getlocale(), R.version.string, .libPaths(),",
+    "               as.character(utils::packageVersion('surveyframe'))),",
+    "             Sys.getenv('SF_ABOUT_DUMP'))",
+    "})"), profile)
+  out <- quarto_render_in(s$dir, "html", c(R_PROFILE_USER = profile, SF_RECORD_DUMP = dump,
+                                           SF_ABOUT_DUMP = about))
+  html <- file.path(s$dir, "report.html")
+  expect_true(file.exists(html), info = paste(utils::tail(out, 20), collapse = "\n"))
+  doc <- paste(readLines(html, warn = FALSE), collapse = "\n")
+  recorded <- file.path(s$dir, "report_results.json")
+  why <- paste(c(
+    if (file.exists(dump)) {
+      first_difference(readChar(recorded, file.size(recorded), useBytes = TRUE),
+                       readChar(dump, file.size(dump), useBytes = TRUE))
+    } else "Quarto's R wrote no record",
+    "Quarto's R:", if (file.exists(about)) readLines(about) else "(not written)",
+    "This R:", Sys.getlocale(), R.version.string, .libPaths(),
+    as.character(utils::packageVersion("surveyframe"))), collapse = "\n")
+  expect_match(doc, "Numbers match the recorded results", fixed = TRUE, info = why)
   expect_match(doc, "Unchanged since surveyframe generated it", fixed = TRUE)
   expect_match(doc, sframe_hash_value(s$d$instrument), fixed = TRUE)
 })
