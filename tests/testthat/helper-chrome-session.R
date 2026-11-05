@@ -69,7 +69,8 @@ if (is.null(sframe_chrome_keep)) {
     if (chromote::has_default_chromote_object()) {
       try(chromote::default_chromote_object()$close(), silent = TRUE)
     }
-    unlink(e$dirs, recursive = TRUE, force = TRUE)
+    # Chrome's SingletonSocket stops unlink(recursive = TRUE), so files go first.
+    for (d in e$dirs) try(surveyframe:::sframe_remove_dir(d), silent = TRUE)
   }, onexit = TRUE)
   options(surveyframe.test_chrome_keep = sframe_chrome_keep)
 }
