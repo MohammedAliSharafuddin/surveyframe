@@ -12,6 +12,7 @@ toolbox_sections <- c("Inspect", "Models and syntax", "Charts",
 reference_index <- function() {
   path <- sframe_source_path("_pkgdown.yml")
   skip_if(is.na(path), "no source tree here: _pkgdown.yml")
+  skip_if_not_installed("yaml")
   yaml::read_yaml(path)$reference
 }
 
