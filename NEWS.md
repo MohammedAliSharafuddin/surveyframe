@@ -1088,6 +1088,14 @@ style.
 
 ## SurveyStudio
 
+* **1 design system for Studio and the builder.** Both apps take every
+  colour, size and radius from 1 shared stylesheet of design tokens,
+  `inst/builder/design_tokens.css`, which Studio links and the builder
+  carries inline, so a builder copied on its own still opens. Studio's teal
+  and the builder's blue become 1 primary colour, and the 2 dark sidebars
+  1 navigation colour. The Explore charts take their colours from the same
+  file.
+
 * **Responses starts with the Google Sheet**, the planned route: the sheet
   card comes first with Read from Google Sheet as the screen's primary
   action, then the CSV file, then help for files from other tools. Without

@@ -21,9 +21,9 @@ a.sf-primary,
   min-height: 40px;
   padding: 10px 22px;
   border: none;
-  border-radius: 6px;
-  background: #0a6f6d;
-  color: #ffffff;
+  border-radius: var(--sf-radius);
+  background: var(--sf-primary);
+  color: var(--sf-on-primary);
   font-size: 15px;
   font-weight: 700;
   line-height: 1.2;
@@ -32,16 +32,16 @@ a.sf-primary,
 }
 .sf-primary:hover,
 .sf-primary:focus-visible {
-  background: #085957;
-  color: #ffffff;
+  background: var(--sf-primary-hover);
+  color: var(--sf-on-primary);
   text-decoration: none;
 }
 .sf-primary:focus-visible {
-  outline: 3px solid #1a1a2e;
-  outline-offset: 2px;
+  outline: var(--sf-focus-ring);
+  outline-offset: var(--sf-focus-offset);
 }
 .sf-primary[disabled],
 .sf-primary.disabled {
-  background: #5b6475;
+  background: var(--sf-text-3);
   cursor: not-allowed;
 }
