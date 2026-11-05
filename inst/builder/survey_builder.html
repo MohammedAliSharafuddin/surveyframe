@@ -306,6 +306,11 @@ input,textarea,select{font-family:inherit;font-size:13px}
   box-shadow:0 1px 3px color-mix(in srgb,var(--sf-black) 10%,transparent)}
 .m-btn:hover:not([aria-pressed=true]){color:var(--t1)}
 .tb-r{justify-self:end;display:flex;align-items:center;gap:8px}
+/* 1 header row (UI-3 item 3): the document and its save state on the left,
+   the mode switch in the centre, undo, redo and the document actions on the
+   right, with the primary Save last, at the far right. */
+.tb-l{justify-self:start;display:flex;align-items:center;gap:12px;min-width:0}
+.tb-doc{font-size:13px;font-weight:600;color:var(--t2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:32ch}
 .tb-sep{width:1px;height:18px;background:var(--cb)}
 .tb-hist{display:flex;gap:2px}
 .tb-hist button{padding:4px 7px;border-radius:5px;color:var(--t3);
@@ -810,7 +815,11 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
 
 <!-- Topbar -->
 <header class="topbar">
-  <div class="tb-brand">Survey<span>Builder</span></div>
+  <div class="tb-l">
+    <div class="tb-brand">Survey<span>Builder</span></div>
+    <span class="tb-doc" id="tbDoc">Untitled Survey</span>
+    <span class="save-st" id="saveSt" role="status">No changes</span>
+  </div>
   <div class="tb-modes" role="group" aria-label="Builder mode">
     <button type="button" class="m-btn" aria-pressed="true"  data-mode="build"   onclick="setMode('build')">Build</button>
     <button type="button" class="m-btn" aria-pressed="false" data-mode="preview" onclick="setMode('preview')">Preview</button>
@@ -821,9 +830,8 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
       <button type="button" id="undoBtn" title="Undo (Ctrl+Z)" aria-label="Undo" onclick="undo()" disabled>&#8630;</button>
       <button type="button" id="redoBtn" title="Redo (Ctrl+Y)" aria-label="Redo" onclick="redo()" disabled>&#8631;</button>
     </div>
-    <span class="save-st" id="saveSt">No changes</span>
     <span class="tb-sep" aria-hidden="true"></span>
-    <!-- Survey settings lives only in the sidebar CTA (below) to avoid a
+    <!-- Survey settings lives only in the sidebar (below) to avoid a
          duplicate entry point; the top bar is reserved for document
          actions (Open, Export, Save). -->
     <button type="button" class="btn sf-secondary" id="openBtn" onclick="openFile()">Open</button>
@@ -3786,17 +3794,19 @@ var hist=[],fut=[],selId=null,editRqId=null,dirty=false,lastSaved=null,openedAt=
 function snap(){hist.push(JSON.stringify(S));if(hist.length>60)hist.shift();fut=[];setDirty();updHistBtns();}
 function undo(){if(!hist.length)return;fut.push(JSON.stringify(S));S=JSON.parse(hist.pop());selId=null;ra();updHistBtns();}
 function redo(){if(!fut.length)return;hist.push(JSON.stringify(S));S=JSON.parse(fut.pop());selId=null;ra();updHistBtns();}
-function updHistBtns(){var u=document.getElementById('undoBtn'),r=document.getElementById('redoBtn');if(u)u.disabled=!hist.length;if(r)r.disabled=!fut.length;}
+function updHistBtns(){var u=document.getElementById('undoBtn'),r=document.getElementById('redoBtn');if(u)u.disabled=!hist.length;if(r)r.disabled=!fut.length;studioPostState();}
 function setDirty(){dirty=true;updSave();centreLater();}
 // Opened is its own state: inside a host such as Ethos, "Saved" after
 // opening a file reads as saved in the host, and nothing has been saved.
 function updSave(){var e=document.getElementById('saveSt');
   // In Studio the save goes to Studio, so the state is Saved or not.
-  if(typeof STUDIO_HOST!=='undefined'&&STUDIO_HOST){e.textContent=dirty?'Unsaved changes':'Saved';e.className='save-st '+(dirty?'dirty':'saved');studioPostDirty();return;}
+  if(typeof STUDIO_HOST!=='undefined'&&STUDIO_HOST){e.textContent=dirty?'Unsaved changes':'Saved';e.className='save-st '+(dirty?'dirty':'saved');studioPostDirty();studioPostState();return;}
   if(!dirty&&lastSaved){e.textContent='Saved '+tAgo(lastSaved);e.className='save-st saved';}else if(!dirty&&openedAt){e.textContent='Opened '+tAgo(openedAt);e.className='save-st';}else if(dirty){e.textContent='Unsaved changes';e.className='save-st dirty';}else{e.textContent='No changes';e.className='save-st';}}
 function tAgo(d){var s=Math.round((Date.now()-d)/1000);if(s<10)return'just now';if(s<60)return s+'s ago';return Math.round(s/60)+'m ago';}
 function uid(){return Math.random().toString(36).slice(2,9);}
-function ra(){renderItemList();renderAnalyse();updSave();document.getElementById('sbTitle').textContent=S.meta.title||'Untitled Survey';}
+function ra(){renderItemList();renderAnalyse();updSave();document.getElementById('sbTitle').textContent=S.meta.title||'Untitled Survey';updDoc();}
+// The header row's document line: the title and the version.
+function updDoc(){var d=document.getElementById('tbDoc');if(d)d.textContent=(S.meta.title||'Untitled Survey')+(S.meta.version?' ('+S.meta.version+')':'');}
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function gv(id){return(document.getElementById(id)||{}).value||'';}
 function sv(id,v){var e=document.getElementById(id);if(e)e.value=v||'';}
@@ -5890,8 +5900,17 @@ function studioPostDirty(){
   studioLastDirty=dirty;
   window.parent.postMessage({type:'dirty',dirty:dirty},location.origin);
 }
+// Studio's Design head holds this builder's undo, redo and Save to Studio
+// (UI-3 item 3), so the builder sends their state and takes them as commands.
+function studioPostState(){
+  if(typeof STUDIO_HOST==='undefined'||!STUDIO_HOST)return;
+  var sb=document.getElementById('saveBtn');
+  window.parent.postMessage({type:'state',undo:hist.length>0,redo:fut.length>0,saveDisabled:!!(sb&&sb.disabled),dirty:!!dirty},location.origin);
+}
 function studioHostInit(){
-  // Studio has its own name, Preview screen and Collect screen.
+  // Studio has its own name, Preview screen and Collect screen, and its
+  // Design head is this builder's header row (UI-3 item 3), so the bar hides.
+  document.querySelector('.topbar').style.display='none';
   document.getElementById('openBtn').style.display='none';
   document.getElementById('exportBtn').style.display='none';
   document.querySelector('.tb-brand').style.display='none';
@@ -5904,20 +5923,16 @@ function studioHostInit(){
   updSave();
   var sb=document.getElementById('saveBtn');
   sb.textContent='Save to Studio';sb.title='Make this survey the instrument Studio has open (Ctrl+S)';
-  // Save to Studio is the Design screen's 1 primary action (item 12e): full
-  // size, the shared .sf-primary level (design_tokens.css), and first in the bar.
-
-  var tb=document.querySelector('.topbar');tb.insertBefore(sb,tb.firstChild);
   window.addEventListener('message',function(e){
     if(e.source!==window.parent||e.origin!==location.origin)return;
     var d=e.data||{};
     if(d.type==='sframe-blocked'){
       // Studio holds an instrument it cannot send, so nothing here may
       // replace it until it sends one.
-      document.getElementById('saveBtn').disabled=true;
+      document.getElementById('saveBtn').disabled=true;studioPostState();
       toast(String(d.message||''),'err');
     }else if(d.type==='sframe'&&typeof d.text==='string'){
-      document.getElementById('saveBtn').disabled=false;
+      document.getElementById('saveBtn').disabled=false;studioPostState();
       if(!dirty){openSframeText(d.text);return;}
       conf2('Load the instrument Studio has open?','The instrument open in Studio has changed. Loading it replaces the survey here, and your unsaved changes will be lost.','Load it').then(function(ok){if(ok)openSframeText(d.text);});
     }else if(d.type==='sframe-saved'){
@@ -5927,6 +5942,11 @@ function studioHostInit(){
       }
       studioPendingOrigin=null;
       toast(String(d.message||''),d.ok?'ok':'err');
+    }else if(d.type==='command'){
+      // Undo, redo and Save to Studio from Studio's Design head.
+      if(d.command==='undo')undo();
+      else if(d.command==='redo')redo();
+      else if(d.command==='save'&&!document.getElementById('saveBtn').disabled)saveSframe();
     }else if(d.type==='mode'&&(d.mode==='build'||d.mode==='analyse')){
       // Studio's Design and Plan entries open this builder in their mode.
       setMode(d.mode);

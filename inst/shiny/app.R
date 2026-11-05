@@ -1329,6 +1329,11 @@ ui <- fluidPage(
         padding-bottom: 10px; margin-bottom: 16px; border-bottom: 1px solid var(--sf-border); }
       .screen-head > :last-child:not(:first-child) { margin-left: auto; }
       .screen-head .hint { margin-top: 0; }
+      .design-actions { display: flex; align-items: center; gap: 8px; }
+      .btn.sf-tertiary.design-hist { min-width: 36px; min-height: 36px; justify-content: center; font-size: 18px; text-decoration: none; color: var(--sf-text-2); }
+      .btn.sf-tertiary.design-hist:hover:not(:disabled) { background: var(--sf-canvas); color: var(--sf-ink); }
+      .btn.sf-tertiary.design-hist:disabled { color: var(--sf-border-strong); }
+      .design-save-state { font-size: 12px; }
       .report-tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--sf-border); margin-bottom: 16px; flex-wrap: wrap; }
       .report-tab { background: none; border: none; border-bottom: 3px solid transparent; padding: 8px 14px; font-weight: 600; color: var(--sf-text-2); }
       .report-tab.active { border-bottom-color: var(--sf-ink); color: var(--sf-ink); }
@@ -1705,8 +1710,13 @@ ui <- fluidPage(
         var studioDesignMode = 'build';
         function studioDesignSetMode(mode) {
           studioDesignMode = mode;
+          // The head's title names the mode, as the sidebar entry does.
+          $('#design_title').text(mode === 'analyse' ? 'Plan' : 'Design');
           studioDesignPost({type: 'mode', mode: mode});
         }
+        $(document).on('click', '#design_undo, #design_redo, #design_save', function() {
+          studioDesignPost({type: 'command', command: this.id.replace('design_', '')});
+        });
         function studioDesignPost(msg) {
           var f = document.getElementById('design_frame');
           if (f && f.contentWindow) f.contentWindow.postMessage(msg, location.origin);
@@ -1726,6 +1736,11 @@ ui <- fluidPage(
             Shiny.setInputValue('builder_sframe', d.text, {priority: 'event'});
           } else if (d.type === 'dirty') {
             $('#design_unsaved').toggle(d.dirty === true);
+            $('#design_saved').toggle(d.dirty !== true);
+          } else if (d.type === 'state') {
+            $('#design_undo').prop('disabled', d.undo !== true);
+            $('#design_redo').prop('disabled', d.redo !== true);
+            $('#design_save').prop('disabled', d.saveDisabled === true);
           } else if (d.type === 'goto' && (d.screen === 'collect' || d.screen === 'references')) {
             // The builder's Google Sheets and References tabs and the picker's
             // Manage references open Studio's own screen (UI-2, 4949b18).
@@ -1802,11 +1817,20 @@ ui <- fluidPage(
       # iframe. A save in it becomes the open instrument.
       tags$div(id = "screen-design", class = screen_class("design"),
         tags$div(class = "screen-head",
-          tags$h2(class = "screen-title", "Design"),
+          tags$h2(class = "screen-title", id = "design_title", "Design"),
           uiOutput("design_status", inline = TRUE),
-          # Shown while the builder has unsaved changes, which it reports.
-          tags$span(id = "design_unsaved", class = "hint", style = "display: none;",
-                 "Unsaved changes. Save to Studio to keep them.")),
+          # The builder reports its save state, undo and redo (UI-3 item 3),
+          # and this row holds them, with Save to Studio at the far right.
+          tags$span(id = "design_saved", class = "hint design-save-state", "Saved"),
+          tags$span(id = "design_unsaved", class = "hint design-save-state", style = "display: none;",
+                 "Unsaved changes"),
+          tags$div(class = "design-actions",
+            tags$button(type = "button", id = "design_undo", class = "btn sf-tertiary design-hist",
+              title = "Undo (Ctrl+Z)", `aria-label` = "Undo", disabled = NA, HTML("&#8630;")),
+            tags$button(type = "button", id = "design_redo", class = "btn sf-tertiary design-hist",
+              title = "Redo (Ctrl+Y)", `aria-label` = "Redo", disabled = NA, HTML("&#8631;")),
+            tags$button(type = "button", id = "design_save", class = "btn btn-primary sf-primary",
+              title = "Make this survey the instrument Studio has open (Ctrl+S)", "Save to Studio"))),
         tags$iframe(id = "design_frame", title = "SurveyBuilder",
           src = studio_asset_src("survey_builder.html", "host=studio"),
           style = paste("width: 100%; height: calc(100vh - 150px); min-height: 600px;",

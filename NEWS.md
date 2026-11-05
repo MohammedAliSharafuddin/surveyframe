@@ -1102,6 +1102,13 @@ style.
   the 2 add buttons on Settings' References tab and Export syntax become
   secondary, and the Open Collect and Open References links in Studio text
   links.
+* **1 header row on Design and Plan.** The title (Design or Plan), the
+  instrument's title and version and the save state ("Saved", "Unsaved
+  changes") sit on the left, and undo, redo and Save to Studio at the far
+  right. Inside Studio the builder's own bar is merged into this row. The
+  standalone builder has the same row, with its title, version and save
+  state on the left, its Build, Preview and Plan switch in the centre, and
+  Save .sframe last on the right.
 * **Responses starts with the Google Sheet**, the planned route: the sheet
   card comes first with Read from Google Sheet as the screen's primary
   action, then the CSV file, then help for files from other tools. Without
