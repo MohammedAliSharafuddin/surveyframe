@@ -1109,12 +1109,14 @@ style.
   standalone builder has the same row, with its title, version and save
   state on the left, its Build, Preview and Plan switch in the centre, and
   Save .sframe last on the right.
-* **The builder's left panel has 1 filled button**, "+ Add question",
-  whose menu now also holds Section break and Branching rule. Survey
-  settings is an outlined row at the top of the panel, and Configure is a
-  text link named "Answer sets, scales and checks". Both menus follow the
-  menu button pattern: the arrow keys, Home and End move through them, and
-  Escape closes them back to their button.
+* **The builder's left panel has 1 filled button.** Until the survey's
+  settings are saved once, it is Survey settings, then "+ Add question",
+  whose menu now also holds Section break and Branching rule. An opened
+  instrument counts as set up. Survey settings is always a strong row at
+  the top of the panel, with the line "Title, welcome and thank-you
+  pages". Configure is a text link named "Answer sets, scales and
+  checks". Both menus follow the menu button pattern: the arrow keys, Home
+  and End move through them, and Escape closes them back to their button.
 * **A guided start in the builder.** With no questions, the canvas shows 3
   steps, Survey settings, Add your first question and Save to Studio (Save
   .sframe on its own), each ticked once done, with the next step's button

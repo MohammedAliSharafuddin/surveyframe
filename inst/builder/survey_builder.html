@@ -336,16 +336,30 @@ input,textarea,select{font-family:inherit;font-size:13px}
 .sb-top{padding:10px;border-bottom:1px solid color-mix(in srgb,var(--sf-white) 7%,transparent)}
 .sb-title{padding:4px 8px 6px;color:var(--st);font-size:12px;font-weight:600;
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-/* The 1 settings entry point (owner decision 2026-07-11), a secondary row
-   at the top of the panel since UI-3 item 4: outlined on the dark panel,
-   so "+ Add question" is the panel's only filled button. */
+/* The 1 settings entry point (owner decision 2026-07-11). Owner 2026-11-05:
+   until settings are saved once it is the panel's filled primary and
+   + Add question an outline, then the 2 swap (updPanelLead()). As a
+   secondary it is still a strong row: a teal ground, 40 px, and a line
+   naming what it holds. */
 .sb-settings-cta{width:100%;display:flex;align-items:center;justify-content:space-between;
-  gap:7px;min-height:36px;padding:0 10px;border-radius:var(--r);background:transparent;color:var(--sf-nav-text);
-  font-size:12px;font-weight:600;border:1px solid var(--sf-nav-line);cursor:pointer;
+  gap:7px;min-height:40px;padding:6px 10px;border-radius:var(--r);text-align:left;
+  background:color-mix(in srgb,var(--sf-primary) 22%,var(--sf-nav));color:var(--sf-white);
+  font-size:12px;font-weight:600;border:1px solid var(--sf-primary-on-dark);cursor:pointer;
   transition:background var(--d1)}
-.sb-settings-cta:hover{background:var(--sf-nav-hover);color:var(--sf-white)}
+.sb-settings-cta:hover{background:color-mix(in srgb,var(--sf-primary) 40%,var(--sf-nav));color:var(--sf-white)}
 .sb-settings-cta:focus-visible{outline:2px solid var(--sf-white);outline-offset:2px}
-.sb-settings-cta .sb-row-go{color:var(--sf-nav-muted)}
+.sb-row-l{display:flex;flex-direction:column;gap:1px;min-width:0}
+.sb-row-sub{font-size:11px;font-weight:500;color:var(--sf-nav-text)}
+.sb-settings-cta .sb-row-go{color:var(--sf-nav-text);font-size:16px}
+.sb-top .btn.sf-primary.sb-settings-cta{width:100%;max-width:none;justify-content:space-between;justify-self:stretch;
+  min-height:44px;padding:6px 10px;font-size:13px;white-space:normal}
+.sb-top .btn.sf-primary.sb-settings-cta .sb-row-sub,.sb-top .btn.sf-primary.sb-settings-cta .sb-row-go{color:var(--sf-white)}
+.sb-top .btn.sf-primary.sb-settings-cta:focus-visible{outline-color:var(--sf-white)}
+/* + Add question while Settings leads: an outline on the dark panel. */
+.sb-footer .btn.sf-secondary.fab{width:100%;max-width:none;justify-content:center;background:transparent;
+  border-color:var(--sf-nav-text);color:var(--sf-nav-text)}
+.sb-footer .btn.sf-secondary.fab:hover{background:var(--sf-nav-hover);color:var(--sf-white)}
+.sb-footer .btn.sf-secondary.fab:focus-visible{outline-color:var(--sf-white)}
 .sb-search{position:relative;margin-top:7px}
 .sb-search input{width:100%;background:color-mix(in srgb,var(--sf-white) 8%,transparent);
   border:1px solid color-mix(in srgb,var(--sf-white) 10%,transparent);border-radius:var(--r);
@@ -632,7 +646,7 @@ input,textarea,select{font-family:inherit;font-size:13px}
 .an-tab:focus-visible{outline:var(--sf-focus-ring);outline-offset:-3px}
 /* In Plan, + Add plan is the primary, so the item panel's Add question
    steps down to an outlined button (UI-3 item 6). */
-body[data-mode=analyse] .sb-footer .btn.sf-primary{background:transparent;border-color:var(--sf-nav-text);color:var(--sf-nav-text);font-size:var(--sf-fs-md);min-height:36px}
+body[data-mode=analyse] .sb-footer .btn.sf-primary,body[data-mode=analyse] .sb-top .btn.sf-primary.sb-settings-cta{background:transparent;border-color:var(--sf-nav-text);color:var(--sf-nav-text);font-size:var(--sf-fs-md);min-height:36px}
 body[data-mode=analyse] .sb-footer .btn.sf-primary:hover{background:var(--sf-nav-hover);color:var(--sf-white)}
 /* Two panes: the left column carries variables, the output summary, and the
    Model Builder in one scroll; the plans pane takes the rest of the width
@@ -864,8 +878,8 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
          consolidated into this single primary CTA. Welcome, header/logo,
          and thank-you pages are tabs inside the settings dialog. -->
     <div class="sb-title" id="sbTitle">Untitled Survey</div>
-    <button type="button" class="sb-settings-cta" onclick="openSettings('meta')">
-      <span><span aria-hidden="true">&#9881;</span> Survey settings</span><span class="sb-row-go" aria-hidden="true">&#8250;</span>
+    <button type="button" class="sb-settings-cta btn sf-primary" id="settingsBtn" onclick="openSettings('meta')">
+      <span class="sb-row-l"><span class="sb-row-t"><span aria-hidden="true">&#9881;</span> Survey settings</span><span class="sb-row-sub">Title, welcome and thank-you pages</span></span><span class="sb-row-go" aria-hidden="true">&#8250;</span>
     </button>
     <div class="sb-search">
       <span class="sb-si">&#128269;</span>
@@ -917,7 +931,7 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
       </div>
     </div>
     <div class="fab-row">
-      <button type="button" class="btn sf-primary fab" id="fabMoreBtn" aria-haspopup="menu" aria-expanded="false" aria-controls="fabMenu"
+      <button type="button" class="btn sf-secondary fab" id="fabMoreBtn" aria-haspopup="menu" aria-expanded="false" aria-controls="fabMenu"
               title="Add a question, a section break or a branching rule" onclick="toggleFabMenu()">+ Add question <span aria-hidden="true">&#9662;</span></button>
     </div>
     <button type="button" class="btn sf-tertiary sb-cfg-link" id="cfgMoreBtn" aria-haspopup="menu" aria-expanded="false" aria-controls="cfgMenu"
@@ -3817,11 +3831,20 @@ function tAgo(d){var s=Math.round((Date.now()-d)/1000);if(s<10)return'just now';
 // ticked once done, with the next step's button in its row, until all 3
 // are done. Then, with no question selected, the next useful step: the
 // analysis plan if there is none, otherwise another question.
+// Survey settings leads the panel until they are saved once (owner
+// 2026-11-05). An opened instrument was set up before, so it counts.
+var settingsSaved=false;
+function updPanelLead(){
+  var s=document.getElementById('settingsBtn'),a=document.getElementById('fabMoreBtn');if(!s||!a)return;
+  s.classList.toggle('btn',!settingsSaved);s.classList.toggle('sf-primary',!settingsSaved);
+  a.classList.toggle('sf-primary',settingsSaved);a.classList.toggle('sf-secondary',!settingsSaved);
+}
+function settingsDone(){settingsSaved=true;updPanelLead();renderPrompt();}
 function promptSteps(){
   var studio=typeof STUDIO_HOST!=='undefined'&&STUDIO_HOST,save=studio?'Save to Studio':'Save .sframe';
   var qs=S.items.filter(function(i){return i.type!=='section_break'&&i.type!=='text_block';});
   return [
-    {t:'Survey settings',b:'Give the survey its title, welcome page and thank-you page.',done:!!S.meta.title&&S.meta.title!=='Untitled Survey',btn:'Open survey settings',go:"openSettings('meta')"},
+    {t:'Survey settings',b:'Give the survey its title, welcome page and thank-you page.',done:settingsSaved,btn:'Open survey settings',go:"openSettings('meta')"},
     {t:'Add your first question',b:'Pick a question type from the list.',done:qs.length>0,btn:'Add a question',go:"event.stopPropagation();closeCfgMenu();openMenu('fabMenu','fabMoreBtn')"},
     {t:save,b:studio?'Make this survey the instrument Studio has open.':'Download the survey as a .sframe file.',done:!dirty&&(!!lastSaved||!!openedAt||(studio&&qs.length>0)),btn:save,go:'saveSframe()'}];
 }
@@ -3861,7 +3884,7 @@ var autosaveUnavailable=false;
 function autoSave(){
   if(!dirty)return;
   try{
-    localStorage.setItem('sf_as',JSON.stringify({state:S,ts:Date.now()}));
+    localStorage.setItem('sf_as',JSON.stringify({state:S,ts:Date.now(),settingsSaved:settingsSaved}));
     autosaveUnavailable=false;
   }catch(e){
     if(!autosaveUnavailable){
@@ -3891,12 +3914,12 @@ function chkAutoSave(){
     if(!p||!p.state)return;
     document.getElementById('recTime').textContent=recoveryAge(Date.now()-(p.ts||Date.now()));
     document.getElementById('recBan').hidden=false;
-    window._as=p.state;
+    window._as=p.state;window._asSettings=!!p.settingsSaved;
   }catch(e){
     autosaveUnavailable=true;
   }
 }
-function restoreAuto(){if(window._as){S=window._as;ra();setDirty();toast('Session restored','ok');}dismissRec();}
+function restoreAuto(){if(window._as){S=window._as;settingsSaved=!!window._asSettings;updPanelLead();ra();setDirty();toast('Session restored','ok');}dismissRec();}
 function dismissRec(){document.getElementById('recBan').hidden=true;try{localStorage.removeItem('sf_as');}catch(e){}}
 setInterval(autoSave,30000);window.addEventListener('beforeunload',autoSave);
 
@@ -4103,7 +4126,7 @@ function saveSettings(){
   function changed(id){return now[id]!==was[id];}
   var st=studyRead(),stChanged=JSON.stringify(st)!==studyShown;
   if(stChanged){var sp=studyProblems(st);if(sp.length){showST('study');toast(sp[0],'err');return;}}
-  if(!stChanged&&!SETTINGS_TEXT.concat(SETTINGS_CHECK).some(changed)){closeModal('m-settings');toast('No settings changed','inf');return;}
+  if(!stChanged&&!SETTINGS_TEXT.concat(SETTINGS_CHECK).some(changed)){closeModal('m-settings');settingsDone();toast('No settings changed','inf');return;}
   snap();
   // The study is written only when its fields changed, so a study the user
   // left alone keeps its exact form and the content hash it had.
@@ -4135,7 +4158,7 @@ function saveSettings(){
   if(changed('s-gsu'))R.google_sheets_url=now['s-gsu'];
   if(changed('s-gsep'))R.google_sheets_endpoint=now['s-gsep'];
   settingsShown=now;
-  closeModal('m-settings');ra();toast('Settings saved','ok');
+  closeModal('m-settings');settingsSaved=true;updPanelLead();ra();toast('Settings saved','ok');
 }
 
 // -- Study (D13) ----------------------------------------------------------------
@@ -4415,6 +4438,7 @@ function openSframeText(text){
     if(src.references&&src.references.length)S.references=src.references;else delete S.references;
     S._carry={};['designs','amendments','study'].forEach(function(k){if(src[k]!==undefined)S._carry[k]=src[k];});
       // The inspector showed an item from the survey being replaced.
+    settingsSaved=true;updPanelLead();
     closeInsp();ra();dirty=false;lastSaved=null;openedAt=Date.now();updSave();
     // Surface the SHA-256 integrity status instead of loading silently.
     // The hash is recomputed over the file's own payload, which matches
