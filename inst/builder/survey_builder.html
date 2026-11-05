@@ -379,7 +379,7 @@ input,textarea,select{font-family:inherit;font-size:13px}
 .fab-menu::-webkit-scrollbar-thumb{background:color-mix(in srgb,var(--sf-white) 15%,transparent);border-radius:3px}
 .fg{padding:2px 0}.fg+.fg{border-top:1px solid color-mix(in srgb,var(--sf-white) 6%,transparent)}
 .fg-lbl{padding:4px 10px 2px;font-size:10px;font-weight:600;
-  color:color-mix(in srgb,var(--sf-white) 30%,transparent);text-transform:uppercase;letter-spacing:.05em}
+  color:var(--sf-nav-text);text-transform:uppercase;letter-spacing:.05em}
 .fi{width:100%;display:flex;align-items:center;gap:6px;padding:5px 10px;
   color:var(--st);font-size:12px;transition:background var(--d1);text-align:left}
 .fi:hover{background:color-mix(in srgb,var(--sf-white) 7%,transparent);color:var(--cf)}
@@ -874,18 +874,18 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
          Both follow the menu button pattern. -->
     <div class="fab-menu" id="fabMenu" role="menu" aria-label="Add to the survey">
       <div class="fg"><div class="fg-lbl">Questions</div>
-        <button type="button" class="fi" role="menuitem" tabindex="-1" onclick="qAdd('likert');closeFabMenu()"><span class="fi-ic">&#9679;</span>Likert scale</button>
-        <button type="button" class="fi" role="menuitem" tabindex="-1" onclick="qAdd('single_choice');closeFabMenu()"><span class="fi-ic">&#9900;</span>Single choice</button>
-        <button type="button" class="fi" role="menuitem" tabindex="-1" onclick="qAdd('multiple_choice');closeFabMenu()"><span class="fi-ic">&#9745;</span>Multiple choice</button>
-        <button type="button" class="fi" role="menuitem" tabindex="-1" onclick="qAdd('matrix');closeFabMenu()"><span class="fi-ic">&#9632;</span>Matrix / grid</button>
-        <button type="button" class="fi" role="menuitem" tabindex="-1" onclick="qAdd('numeric');closeFabMenu()"><span class="fi-ic">#</span>Numeric</button>
-        <button type="button" class="fi" role="menuitem" tabindex="-1" onclick="qAdd('text');closeFabMenu()"><span class="fi-ic">T</span>Short text</button>
-        <button type="button" class="fi" role="menuitem" tabindex="-1" onclick="qAdd('textarea');closeFabMenu()"><span class="fi-ic">&#182;</span>Long text</button>
-        <button type="button" class="fi" role="menuitem" tabindex="-1" onclick="qAdd('slider');closeFabMenu()"><span class="fi-ic">&#8212;</span>Slider</button>
-        <button type="button" class="fi" role="menuitem" tabindex="-1" onclick="qAdd('ranking');closeFabMenu()"><span class="fi-ic">&#8597;</span>Ranking</button>
-        <button type="button" class="fi" role="menuitem" tabindex="-1" onclick="qAdd('rating');closeFabMenu()"><span class="fi-ic">★</span>Rating</button>
-        <button type="button" class="fi" role="menuitem" tabindex="-1" onclick="qAdd('date');closeFabMenu()"><span class="fi-ic">&#128197;</span>Date</button>
-        <button type="button" class="fi" role="menuitem" tabindex="-1" onclick="qAdd('text_block');closeFabMenu()"><span class="fi-ic">&#128221;</span>Text block</button>
+        <button type="button" class="fi" role="menuitem" tabindex="-1" onclick="qAdd('likert');closeFabMenu()"><span class="fi-ic" aria-hidden="true">&#9679;</span>Likert scale</button>
+        <button type="button" class="fi" role="menuitem" tabindex="-1" onclick="qAdd('single_choice');closeFabMenu()"><span class="fi-ic" aria-hidden="true">&#9900;</span>Single choice</button>
+        <button type="button" class="fi" role="menuitem" tabindex="-1" onclick="qAdd('multiple_choice');closeFabMenu()"><span class="fi-ic" aria-hidden="true">&#9745;</span>Multiple choice</button>
+        <button type="button" class="fi" role="menuitem" tabindex="-1" onclick="qAdd('matrix');closeFabMenu()"><span class="fi-ic" aria-hidden="true">&#9632;</span>Matrix / grid</button>
+        <button type="button" class="fi" role="menuitem" tabindex="-1" onclick="qAdd('numeric');closeFabMenu()"><span class="fi-ic" aria-hidden="true">#</span>Numeric</button>
+        <button type="button" class="fi" role="menuitem" tabindex="-1" onclick="qAdd('text');closeFabMenu()"><span class="fi-ic" aria-hidden="true">T</span>Short text</button>
+        <button type="button" class="fi" role="menuitem" tabindex="-1" onclick="qAdd('textarea');closeFabMenu()"><span class="fi-ic" aria-hidden="true">&#182;</span>Long text</button>
+        <button type="button" class="fi" role="menuitem" tabindex="-1" onclick="qAdd('slider');closeFabMenu()"><span class="fi-ic" aria-hidden="true">&#8212;</span>Slider</button>
+        <button type="button" class="fi" role="menuitem" tabindex="-1" onclick="qAdd('ranking');closeFabMenu()"><span class="fi-ic" aria-hidden="true">&#8597;</span>Ranking</button>
+        <button type="button" class="fi" role="menuitem" tabindex="-1" onclick="qAdd('rating');closeFabMenu()"><span class="fi-ic" aria-hidden="true">★</span>Rating</button>
+        <button type="button" class="fi" role="menuitem" tabindex="-1" onclick="qAdd('date');closeFabMenu()"><span class="fi-ic" aria-hidden="true">&#128197;</span>Date</button>
+        <button type="button" class="fi" role="menuitem" tabindex="-1" onclick="qAdd('text_block');closeFabMenu()"><span class="fi-ic" aria-hidden="true">&#128221;</span>Text block</button>
       </div>
       <!-- Decision-family question types (v0.5 MCDM work, shipping as CRAN
            0.4.0). Three entries for two item types: pairwise_comparison
@@ -893,20 +893,20 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
            scale, chosen by comparison_scale, so each gets its own entry
            rather than making the researcher find a hidden switch. -->
       <div class="fg"><div class="fg-lbl">Decision (MCDM)</div>
-        <button type="button" class="fi" role="menuitem" tabindex="-1" onclick="qAdd('pairwise_comparison','saaty');closeFabMenu()"><span class="fi-ic">&#8646;</span>Pairwise comparison (AHP, ANP)</button>
-        <button type="button" class="fi" role="menuitem" tabindex="-1" onclick="qAdd('pairwise_comparison','influence');closeFabMenu()"><span class="fi-ic">&#8594;</span>Influence matrix (DEMATEL)</button>
-        <button type="button" class="fi" role="menuitem" tabindex="-1" onclick="qAdd('criteria_weight');closeFabMenu()"><span class="fi-ic">%</span>Criteria weights</button>
+        <button type="button" class="fi" role="menuitem" tabindex="-1" onclick="qAdd('pairwise_comparison','saaty');closeFabMenu()"><span class="fi-ic" aria-hidden="true">&#8646;</span>Pairwise comparison (AHP, ANP)</button>
+        <button type="button" class="fi" role="menuitem" tabindex="-1" onclick="qAdd('pairwise_comparison','influence');closeFabMenu()"><span class="fi-ic" aria-hidden="true">&#8594;</span>Influence matrix (DEMATEL)</button>
+        <button type="button" class="fi" role="menuitem" tabindex="-1" onclick="qAdd('criteria_weight');closeFabMenu()"><span class="fi-ic" aria-hidden="true">%</span>Criteria weights</button>
       </div>
       <div class="fg"><div class="fg-lbl">Structure</div>
-        <button type="button" class="fi" role="menuitem" tabindex="-1" onclick="closeFabMenu();qAdd('section_break')"><span class="fi-ic">&#8212;</span>Section break</button>
-        <button type="button" class="fi" role="menuitem" tabindex="-1" onclick="closeFabMenu(true);openBranchModal()"><span class="fi-ic">&#8627;</span>Branching rule</button>
+        <button type="button" class="fi" role="menuitem" tabindex="-1" onclick="closeFabMenu();qAdd('section_break')"><span class="fi-ic" aria-hidden="true">&#8212;</span>Section break</button>
+        <button type="button" class="fi" role="menuitem" tabindex="-1" onclick="closeFabMenu(true);openBranchModal()"><span class="fi-ic" aria-hidden="true">&#8627;</span>Branching rule</button>
       </div>
     </div>
     <div class="fab-menu" id="cfgMenu" role="menu" aria-label="Answer sets, scales and checks">
       <div class="fg"><div class="fg-lbl">Shared by questions</div>
-        <button type="button" class="fi" role="menuitem" tabindex="-1" onclick="closeCfgMenu(true);openChoiceModal()"><span class="fi-ic">&#9673;</span>Choice set</button>
-        <button type="button" class="fi" role="menuitem" tabindex="-1" onclick="closeCfgMenu(true);openScaleModal()"><span class="fi-ic">&#128208;</span>Scale</button>
-        <button type="button" class="fi" role="menuitem" tabindex="-1" onclick="closeCfgMenu(true);openCheckModal()"><span class="fi-ic">&#10003;</span>Attention check</button>
+        <button type="button" class="fi" role="menuitem" tabindex="-1" onclick="closeCfgMenu(true);openChoiceModal()"><span class="fi-ic" aria-hidden="true">&#9673;</span>Choice set</button>
+        <button type="button" class="fi" role="menuitem" tabindex="-1" onclick="closeCfgMenu(true);openScaleModal()"><span class="fi-ic" aria-hidden="true">&#128208;</span>Scale</button>
+        <button type="button" class="fi" role="menuitem" tabindex="-1" onclick="closeCfgMenu(true);openCheckModal()"><span class="fi-ic" aria-hidden="true">&#10003;</span>Attention check</button>
       </div>
     </div>
     <div class="fab-row">
@@ -3831,7 +3831,7 @@ function renderPrompt(){
     return;
   }
   var plan=(S.analysis_plan||[]).length>0;
-  el.innerHTML='<div class="c-prompt-ic">&#128196;</div><div class="c-prompt-t">Select a question to edit</div>'
+  el.innerHTML='<div class="c-prompt-ic" aria-hidden="true">&#128196;</div><div class="c-prompt-t">Select a question to edit</div>'
     +'<div class="c-prompt-b">Click any question in the panel on the left. Keyboard: <kbd>Ctrl+Z</kbd> undo, <kbd>Ctrl+S</kbd> save.</div>'
     +'<div class="c-next"><div class="c-next-t">'+(plan?'Next: add another question':'Next: declare how you will analyse the data')+'</div>'
     +'<button type="button" class="btn sf-secondary" id="cStepGo" onclick="'+(plan?"closeCfgMenu();openMenu('fabMenu','fabMoreBtn')":'openPlan()')+'">'+(plan?'Add a question':'Open Plan')+'</button></div>';
@@ -4751,7 +4751,7 @@ function renderItemList(){
   // aria-required-children, which axe rates critical, and a screen reader
   // announces a list containing nothing it can describe.
   if(!items.length){el.removeAttribute('role');}else{el.setAttribute('role','listbox');}
-  if(!items.length){el.innerHTML='<div class="sb-empty"><div class="sb-empty-ic">&#128196;</div><div class="sb-empty-t">No questions yet</div><div class="sb-empty-b">Use "+ Add question" below to choose a question type. The steps on the right show what comes next.</div></div>';return;}
+  if(!items.length){el.innerHTML='<div class="sb-empty"><div class="sb-empty-ic" aria-hidden="true">&#128196;</div><div class="sb-empty-t">No questions yet</div><div class="sb-empty-b">Use "+ Add question" below to choose a question type. The steps on the right show what comes next.</div></div>';return;}
   var cp=null;
   el.innerHTML=screenRow('__welcome')+items.map(function(item){
     var ri=S.items.indexOf(item);
