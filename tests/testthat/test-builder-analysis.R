@@ -456,7 +456,7 @@ test_that("0.3.3: SurveyBuilder has one settings entry point and one Add-questio
   expect_false(grepl("setup-strip", html, fixed = TRUE))
 
   # "+ Add question" opens the type picker instead of silently adding a
-  # Likert item, and the empty canvas offers exactly two secondary actions
+  # Likert item
   expect_match(html, 'id="fabMoreBtn"', fixed = TRUE)
   expect_match(html, 'onclick="toggleFabMenu()"', fixed = TRUE)
   # The primary "+ Add question" button opens the picker rather than
@@ -465,5 +465,8 @@ test_that("0.3.3: SurveyBuilder has one settings entry point and one Add-questio
   # fab-row button rather than the whole file).
   fab_row <- sub(".*(<div class=\"fab-row\">.*?</div>).*", "\\1", html)
   expect_false(grepl("qAdd('likert')", fab_row, fixed = TRUE))
-  expect_match(html, "sb-empty-cta", fixed = TRUE)
+  # Since UI-3 item 5 the empty item list holds text only, and the canvas
+  # checklist holds the next step, so no button repeats the Settings row.
+  expect_false(grepl("sb-empty-cta", html, fixed = TRUE))
+  expect_match(html, "function renderPrompt()", fixed = TRUE)
 })

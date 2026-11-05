@@ -1746,6 +1746,11 @@ ui <- fluidPage(
             // Manage references open Studio's own screen (UI-2, 4949b18).
             studioPicked = true;
             studioShowScreen(null, d.screen);
+          } else if (d.type === 'goto' && d.screen === 'plan') {
+            // The builder's canvas offers Plan as the next step (UI-3 item 5),
+            // and the sidebar's Plan entry picks the mode.
+            studioPicked = true;
+            $('.studio-nav a[data-nav=\"plan\"]').click();
           }
         });
         // An instrument Studio cannot send leaves the builder unable to save,

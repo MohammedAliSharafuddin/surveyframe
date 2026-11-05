@@ -1115,6 +1115,13 @@ style.
   text link named "Answer sets, scales and checks". Both menus follow the
   menu button pattern: the arrow keys, Home and End move through them, and
   Escape closes them back to their button.
+* **A guided start in the builder.** With no questions, the canvas shows 3
+  steps, Survey settings, Add your first question and Save to Studio (Save
+  .sframe on its own), each ticked once done, with the next step's button
+  in its row. Once all 3 are done, the canvas names the next useful step:
+  Plan when the survey has no analysis plan, otherwise another question.
+  The empty question list no longer repeats the Survey settings and Open
+  buttons.
 * **Responses starts with the Google Sheet**, the planned route: the sheet
   card comes first with Read from Google Sheet as the screen's primary
   action, then the CSV file, then help for files from other tools. Without

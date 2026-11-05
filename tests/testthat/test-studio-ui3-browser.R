@@ -148,5 +148,46 @@ test_that("the builder panel has 1 filled button, + Add question, a menu holding
   expect_identical(ui2_js(s, "document.activeElement.id"), "cfgMoreBtn")
 })
 
+test_that("the empty canvas is a 3-step checklist, then names the next useful step (UI-3 item 5)", {
+  s <- ui2_builder()
+  steps <- function() ui2_js(s, "Array.prototype.map.call(document.querySelectorAll('#cPrompt .c-step'), function(e){ return e.className.replace('c-step', '').trim() || 'todo'; }).join('|')")
+  go <- function() ui2_js(s, "(document.getElementById('cStepGo') || {}).textContent || ''")
+  expect_identical(steps(), "next|todo|todo")
+  expect_identical(go(), "Open survey settings")
+  # The step button is secondary: the panel and the head keep the only primaries.
+  expect_true(ui2_js(s, "document.getElementById('cStepGo').classList.contains('sf-secondary')"))
+  expect_identical(ui2_js(s, "document.querySelectorAll('.sb-empty-cta').length"), 0L)
+  ui2_js(s, "S.meta.title = 'Visitor survey'; ra(); 1")
+  expect_identical(steps(), "done|next|todo")
+  expect_identical(go(), "Add a question")
+  ui2_js(s, "document.getElementById('cStepGo').click(); 1")
+  expect_true(ui2_js(s, "document.getElementById('fabMenu').classList.contains('open')"))
+  ui2_js(s, "closeFabMenu(); qAdd('likert'); closeInsp(); 1")
+  expect_identical(steps(), "done|done|next")
+  expect_identical(go(), "Save .sframe")
+  # Once saved: no checklist, and with no analysis plan the next step is Plan.
+  ui2_js(s, "dirty = false; lastSaved = Date.now(); updSave(); 1")
+  expect_identical(steps(), "")
+  expect_match(ui2_js(s, "document.getElementById('cPrompt').textContent"), "Select a question to edit")
+  expect_identical(go(), "Open Plan")
+  ui2_js(s, "document.getElementById('cStepGo').click(); 1")
+  expect_identical(ui2_js(s, "document.querySelector('.m-btn[data-mode=analyse]').getAttribute('aria-pressed')"), "true")
+  ui2_js(s, "setMode('build'); S.analysis_plan = [{id: 'RQ1'}]; renderPrompt(); 1")
+  expect_identical(go(), "Add a question")
+})
+
+test_that("in Studio the canvas step Open Plan opens Plan through the sidebar (UI-3 item 5)", {
+  b <- ui1_studio("factor_structure", width = 1280, height = 900)
+  expect_true(ui1_screen(b, "design"))
+  frame <- "document.getElementById('design_frame').contentWindow"
+  expect_true(ui2_wait(b, paste0("(function(){ try { return ", frame, ".S.items.length > 0 && !!", frame, ".document.getElementById('cStepGo'); } catch (e) { return false; } })()"), 60))
+  ui2_js(b, paste0("var w = ", frame, "; w.__plan = w.S.analysis_plan; w.S.analysis_plan = []; w.renderPrompt(); true"))
+  expect_identical(ui2_js(b, paste0(frame, ".document.getElementById('cStepGo').textContent")), "Open Plan")
+  ui2_js(b, paste0(frame, ".document.getElementById('cStepGo').click(); true"))
+  expect_true(ui2_wait(b, "$('#design_title').text() === 'Plan' && $('.studio-nav a[data-nav=\"plan\"]').attr('aria-current') === 'page'", 20))
+  ui2_js(b, paste0("var w = ", frame, "; w.S.analysis_plan = w.__plan; w.renderPrompt(); true"))
+  expect_true(ui1_screen(b, "design"))
+})
+
 ui2_close()
 ui1_close()
