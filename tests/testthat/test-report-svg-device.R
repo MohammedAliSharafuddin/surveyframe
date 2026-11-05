@@ -79,3 +79,29 @@ test_that("a Typst PDF draws its figures with svglite where svg() cannot open", 
   expect_identical(readBin(r$out, "raw", 4), charToRaw("%PDF"))
   expect_true(any(grepl("figures are drawn with svglite", r$msgs, fixed = TRUE)))
 })
+
+test_that("the report source renders a Typst PDF where svg() opens nothing", {
+  skip_on_cran()
+  skip_if_not_slow()
+  skip_if(!nzchar(Sys.which("quarto")), "Quarto is not installed")
+  # Quarto's own R session starts with this profile, which makes svg() act
+  # as it does on a Mac without XQuartz: a warning and no device.
+  profile <- tempfile(fileext = ".R")
+  writeLines(c(
+    "local({",
+    "  ns <- asNamespace('grDevices')",
+    "  unlockBinding('svg', ns)",
+    "  assign('svg', function(...) { warning('failed to load cairo DLL'); invisible() }, envir = ns)",
+    "  lockBinding('svg', ns)",
+    "})"), profile)
+  d <- sframe_demo("likert_scale")
+  dir <- tempfile("svg-source-")
+  suppressMessages(render_report(d$instrument, data = d$responses, output_file = dir,
+                                 format = "qmd", open = FALSE))
+  old <- setwd(dir)
+  on.exit(setwd(old), add = TRUE)
+  out <- suppressWarnings(system2("quarto", c("render", "report.qmd", "--to", "typst"),
+                                  stdout = TRUE, stderr = TRUE,
+                                  env = paste0("R_PROFILE_USER=", shQuote(profile))))
+  expect_true(file.exists("report.pdf"), info = paste(utils::tail(out, 20), collapse = "\n"))
+})
