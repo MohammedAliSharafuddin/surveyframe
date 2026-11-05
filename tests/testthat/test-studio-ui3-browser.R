@@ -108,17 +108,28 @@ test_that("the standalone builder keeps its switch and has the same row, Save .s
   expect_true(all(lv$filled == (lv$level == "primary")))
 })
 
-test_that("the builder panel has 1 filled button, + Add question, a menu holding Section and Branch (UI-3 item 4)", {
+test_that("the builder panel has 1 filled button, Survey settings until saved once and then + Add question, whose menu holds Section and Branch (UI-3 item 4, owner 2026-11-05)", {
   s <- ui2_builder()
+  # A new survey: Survey settings is the panel's filled primary, with the line
+  # naming what it holds, and + Add question an outline.
+  lv <- ui3_levels(s, "document.querySelector('.sidebar')")
+  expect_identical(lv$id[lv$level == "primary"], "settingsBtn")
+  expect_identical(ui2_js(s, "document.querySelector('.sb-top').children[1].id"), "settingsBtn")
+  expect_identical(ui2_js(s, "document.querySelector('#settingsBtn .sb-row-sub').textContent"), "Title, welcome and thank-you pages")
+  expect_identical(ui2_js(s, "getComputedStyle(document.getElementById('fabMoreBtn')).backgroundColor"), "rgba(0, 0, 0, 0)")
+  filled <- function() ui2_js(s, paste0("(function(){ var p = getComputedStyle(document.getElementById('saveBtn')).backgroundColor, n = 0;",
+    " document.querySelectorAll('.sidebar button, .sidebar .btn').forEach(function(e){ if (e.offsetParent && getComputedStyle(e).backgroundColor === p) n++; }); return n; })()"))
+  expect_identical(filled(), 1L)
+  # Saved once, even with nothing changed: the 2 swap.
+  ui2_js(s, "openSettings('meta'); saveSettings(); 1")
+  Sys.sleep(0.5)  # the builder's buttons fade their colour over 100 ms
   lv <- ui3_levels(s, "document.querySelector('.sidebar')")
   expect_identical(lv$id[lv$level == "primary"], "fabMoreBtn")
-  # Survey settings is a secondary row at the top: outlined, not filled.
-  expect_identical(ui2_js(s, "getComputedStyle(document.querySelector('.sb-settings-cta')).backgroundColor"), "rgba(0, 0, 0, 0)")
-  expect_identical(ui2_js(s, "document.querySelector('.sb-top').children[1].className"), "sb-settings-cta")
-  # Nothing in the panel is filled with the primary colour but Add question.
-  filled <- ui2_js(s, paste0("(function(){ var p = getComputedStyle(document.getElementById('fabMoreBtn')).backgroundColor, n = 0;",
-    " document.querySelectorAll('.sidebar button, .sidebar .btn').forEach(function(e){ if (e.offsetParent && getComputedStyle(e).backgroundColor === p) n++; }); return n; })()"))
-  expect_identical(filled, 1L)
+  expect_identical(filled(), 1L)
+  # Settings stays a strong secondary row: a teal ground, 40 px, its line.
+  expect_false(identical(ui2_js(s, "getComputedStyle(document.getElementById('settingsBtn')).backgroundColor"), "rgba(0, 0, 0, 0)"))
+  expect_gte(ui2_js(s, "document.getElementById('settingsBtn').getBoundingClientRect().height"), 40)
+  expect_true(ui2_js(s, "document.querySelector('#settingsBtn .sb-row-sub').offsetParent !== null"))
   expect_identical(ui2_js(s, "document.querySelectorAll('.fab-mini').length"), 0L)
   items <- ui2_js(s, "Array.prototype.map.call(document.querySelectorAll('#fabMenu [role=menuitem]'), function(e){ return e.textContent; }).join('|')")
   expect_match(items, "Section break\\|[^|]*Branching rule$")
@@ -160,7 +171,7 @@ test_that("the empty canvas is a 3-step checklist, then names the next useful st
   # The step button is secondary: the panel and the head keep the only primaries.
   expect_true(ui2_js(s, "document.getElementById('cStepGo').classList.contains('sf-secondary')"))
   expect_identical(ui2_js(s, "document.querySelectorAll('.sb-empty-cta').length"), 0L)
-  ui2_js(s, "S.meta.title = 'Visitor survey'; ra(); 1")
+  ui2_js(s, "openSettings('meta'); saveSettings(); 1")
   expect_identical(steps(), "done|next|todo")
   expect_identical(go(), "Add a question")
   ui2_js(s, "document.getElementById('cStepGo').click(); 1")
