@@ -175,11 +175,15 @@ sframe_canonical_payload <- function(x) {
 
   if (is.list(x)) {
     # Keep this in sync with the SurveyBuilder sframeCanon() implementation:
-    # recurse into arrays/objects and sort object keys alphabetically.
+    # recurse into arrays/objects and sort object keys alphabetically, by
+    # code point as JavaScript's sort() does. The radix method sorts in the C
+    # locale whatever LC_COLLATE says. order() alone followed the locale, so
+    # "Scale" and "ceiling_pct" swapped between a C and an en_US session, and
+    # a report source rendered on macOS said its numbers differ.
     x <- lapply(x, sframe_canonical_payload)
     nm <- names(x)
     if (!is.null(nm)) {
-      x <- x[order(nm)]
+      x <- x[order(nm, method = "radix")]
     }
   }
 

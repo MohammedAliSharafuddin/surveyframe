@@ -56,7 +56,7 @@ sframe_amendment_default_tier <- function(reason_code) {
 # and the log still passed as intact.
 sframe_amendment_entry_hash <- function(entry) {
   if (!is.list(entry)) return("")
-  entry <- entry[order(names(entry))]
+  entry <- entry[order(names(entry), method = "radix")]
   as.character(openssl::sha256(sframe_hash_json(entry, canonical = TRUE)))
 }
 
@@ -268,13 +268,14 @@ sframe_scale_scoring <- function(scales) {
   ids <- vapply(scales, function(s) as.character(s$id %||% "")[1], character(1))
   out <- lapply(scales, function(s) {
     list(items = as.character(unlist(s$items %||% list())),
-         reverse_items = sort(as.character(unlist(s$reverse_items %||% list()))),
+         reverse_items = sort(as.character(unlist(s$reverse_items %||% list())),
+                              method = "radix"),
          weights = as.numeric(unlist(s$weights %||% list())),
          method = as.character(s$method %||% "mean")[1],
          min_valid = as.numeric(unlist(s$min_valid %||% list())))
   })
   out <- stats::setNames(out, ids)
-  out[order(names(out))]
+  out[order(names(out), method = "radix")]
 }
 
 # The version an amendment suggests, and why, from 1 place so the console,
