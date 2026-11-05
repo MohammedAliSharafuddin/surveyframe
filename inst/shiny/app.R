@@ -1116,7 +1116,7 @@ studio_result_plot_tags <- function(result) {
 # string, so it survives a paste into Word or LibreOffice as a rich block.
 studio_copy_result_btn <- function() {
   tags$button(
-    type = "button", class = "btn-outline studio-copy-btn",
+    type = "button", class = "btn sf-tertiary studio-copy-btn",
     onclick = "studioCopyResultBlock(this)",
     "Copy result"
   )
@@ -1226,7 +1226,7 @@ studio_nav_heading <- function(label) {
 # The Report screen's local tabs (UX-07): a tab button and its pane. The
 # panes are hidden, never redrawn, so their inputs keep their values.
 # A screen's 1 primary action (item 12e): a link to its next step, drawn
-# with the shared .sf-primary class in www/studio-actions.css.
+# with the shared .sf-primary level in inst/builder/design_tokens.css.
 studio_next_primary <- function(tab, label) {
   tags$a(href = paste0("#", tab), `data-tab` = tab, class = "btn btn-primary sf-primary", label)
 }
@@ -1279,7 +1279,6 @@ ui <- fluidPage(
     tags$title("SurveyStudio"),
     tags$script(src = studio_asset_src("field_tools.js")),
     tags$link(rel = "stylesheet", href = studio_asset_src("design_tokens.css")),
-    tags$link(rel = "stylesheet", href = "sfstudio/studio-actions.css"),
     tags$style(HTML("
       body { font-family: var(--sf-font);
              background: var(--sf-canvas); color: var(--sf-ink); margin: 0; }
@@ -1422,17 +1421,6 @@ ui <- fluidPage(
          table sideways and RQ1 stays on one line */
       .sf-table-wide td { overflow-wrap: break-word; min-width: 4em; }
       .sf-table-wide td:first-child { white-space: nowrap; min-width: 0; }
-      .btn-primary {
-        background: var(--sf-primary); color: var(--sf-surface); border: none; border-radius: 6px;
-        padding: 9px 20px; font-size: 14px; cursor: pointer; font-weight: 600;
-      }
-      .btn-primary:hover { background: var(--sf-primary-hover); }
-      .btn-outline {
-        background: transparent; color: var(--sf-primary); border: 1.5px solid var(--sf-primary);
-        border-radius: 6px; padding: 8px 18px; font-size: 14px;
-        cursor: pointer; font-weight: 600;
-      }
-      .btn-outline:hover { background: var(--sf-primary-tint); }
       /* Brand pill tabs (match the dashboard nav), used for the studio sub-tabs */
       .studio-tabs .shiny-options-group {
         display: flex; gap: 2px; flex-wrap: wrap; background: var(--sf-nav);
@@ -1475,7 +1463,7 @@ ui <- fluidPage(
       .result-canvas-block textarea {
         min-height: 160px; resize: vertical; font-size: 14px; line-height: 1.5;
       }
-      .studio-copy-btn { margin: 10px 0; padding: 5px 14px; font-size: 12px; }
+      .studio-copy-btn { margin: 10px 0; font-size: 13px; }
       details.result-canvas-block > summary { cursor: pointer; list-style: none; padding-left: 18px; position: relative; }
       details.result-canvas-block > summary::-webkit-details-marker { display: none; }
       details.result-canvas-block > summary::before {
@@ -1909,7 +1897,7 @@ ui <- fluidPage(
             "Responses go to a Google Sheet you own, through an Apps Script collector bound to it. Keep the sheet private. The collector writes with your access, so the sheet needs no sharing."),
           textInput("collect_sheet_url", "Google Sheet URL", width = "100%",
                     placeholder = "https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID"),
-          downloadButton("collect_gs_dl", "Download Apps Script (.gs)", class = "btn-outline"),
+          downloadButton("collect_gs_dl", "Download Apps Script (.gs)", class = "btn-outline sf-secondary"),
           tags$ol(
             tags$li("Create a Google Sheet, paste its URL above, and download the Apps Script."),
             tags$li("In the sheet, open Extensions, then Apps Script. Paste the whole file, replacing any code there."),
@@ -1931,7 +1919,7 @@ ui <- fluidPage(
           tags$div(class = "card-title", "3. Read the responses"),
           tags$p(class = "hint",
             "As responses arrive, read them from the sheet on the Responses screen, which takes the sheet URL from step 1."),
-          tags$a(href = "#", `data-tab` = "responses", class = "btn btn-outline",
+          tags$a(href = "#", `data-tab` = "responses", class = "btn btn-outline sf-secondary",
                  "Read from Google Sheet")
         )
       ),
@@ -1966,7 +1954,7 @@ ui <- fluidPage(
             column(4, textInput("resp_time_col", "Column holding the submission time", placeholder = "e.g. submitted_at")),
             column(4, checkboxInput("resp_strict", "Refuse a file with missing or unexpected columns (strict column check)", value = TRUE))
           ),
-          actionButton("load_responses_btn", "Load responses", class = "btn-outline")
+          actionButton("load_responses_btn", "Load responses", class = "btn-outline sf-secondary")
         ),
         tags$div(class = "card",
           tags$div(class = "card-title", "Loading responses collected elsewhere"),
@@ -1977,8 +1965,8 @@ ui <- fluidPage(
             tags$li("Make sure the CSV column names match the item IDs in that instrument (download the sample CSV below for the expected format)."),
             tags$li("Browse the CSV above, set the respondent-ID and submitted-at columns if present, then click Load responses.")
           ),
-          downloadButton("download_sample_csv", "Download sample CSV format", class = "btn-outline"),
-          actionButton("load_sample_btn", "Or load the bundled demo", class = "btn-outline")
+          downloadButton("download_sample_csv", "Download sample CSV format", class = "btn-outline sf-secondary"),
+          actionButton("load_sample_btn", "Or load the bundled demo", class = "btn-outline sf-secondary")
         ),
         uiOutput("responses_summary_card"),
         uiOutput("responses_amend_card")
@@ -2133,7 +2121,7 @@ studio_next_stage <- function(message, tabs) {
     tags$p(message),
     tags$p(class = "next-stage-links", tags$span(class = "hint", "Next:"),
       lapply(tabs, function(tab) {
-        tags$a(href = "#", `data-tab` = tab, class = "btn btn-outline",
+        tags$a(href = "#", `data-tab` = tab, class = "btn btn-outline sf-secondary",
                studio_stage_labels[[tab]])
       })))
 }
@@ -2865,7 +2853,7 @@ server <- function(input, output, session) {
     tags$div(class = "card",
       tags$div(class = "card-title", "Record a change to the data"),
       tags$p(class = "hint", lead),
-      actionButton(button, "Record as amendment", class = "btn-outline"))
+      actionButton(button, "Record as amendment", class = "btn-outline sf-secondary"))
   }
   output$quality_amend_card <- renderUI(studio_data_amend_card("quality_amend_btn",
     "Removed bot or fraudulent responses after this check? Record what was removed and why, so the report discloses it."))
@@ -3503,7 +3491,7 @@ server <- function(input, output, session) {
       if (is.null(tbl)) tags$p(class = "hint", "No analyses are declared yet.")
       else tags$div(style = "overflow-x:auto",
         shiny::HTML(shiny::renderTable(tbl, rownames = FALSE)())),
-      tags$a(href = "#", id = "analysis_change_plan", `data-nav` = "plan", class = "btn btn-outline", "Change plan"))
+      tags$a(href = "#", id = "analysis_change_plan", `data-nav` = "plan", class = "btn btn-outline sf-secondary", "Change plan"))
   })
 
   # One shared execution of the analysis plan (with charts when ggplot2 is
@@ -3546,7 +3534,7 @@ server <- function(input, output, session) {
 
   # Drop from scale and Put back under a result (UI-1). Each button sends 1
   # event input, as the amendment dialog's buttons do.
-  studio_event_button <- function(input_id, label, value, cls = "btn-default btn-sm") {
+  studio_event_button <- function(input_id, label, value, cls = "btn-default sf-secondary") {
     tags$button(type = "button", class = paste("btn", cls),
       onclick = sprintf("Shiny.setInputValue('%s', %s, {priority: 'event'})",
         input_id, jsonlite::toJSON(c(value, at = "now"), auto_unbox = TRUE)),
@@ -4016,10 +4004,10 @@ server <- function(input, output, session) {
         tags$p(class = "hint", draft_result()$revision_problem),
         checkboxInput("export_as_new",
           "Save as a new instrument, without the previous amendment log", value = FALSE),
-        downloadButton("download_sframe_btn", "Download copy", class = "btn-outline")
+        downloadButton("download_sframe_btn", "Download copy", class = "btn-outline sf-secondary")
       )
     } else if (isTRUE(draft_result()$valid)) {
-      downloadButton("download_sframe_btn", "Download copy", class = "btn-outline")
+      downloadButton("download_sframe_btn", "Download copy", class = "btn-outline sf-secondary")
     } else {
       export_disabled_btn(
         "Download copy",
@@ -4064,7 +4052,7 @@ server <- function(input, output, session) {
 
   output$export_source_ui <- renderUI({
     if (!is.null(rv$instrument)) {
-      downloadButton("download_source_btn", "Download source (.zip)", class = "btn-outline")
+      downloadButton("download_source_btn", "Download source (.zip)", class = "btn-outline sf-secondary")
     } else {
       export_disabled_btn("Download source (.zip)",
         "Open or build a valid instrument before writing the source.")

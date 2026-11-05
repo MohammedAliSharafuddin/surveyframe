@@ -46,8 +46,9 @@ test_that("Studio links the tokens and its styles hold no colour literal (UI-3)"
   a <- grep('tags$style(HTML("', src, fixed = TRUE)[1]
   b <- a + which(src[(a + 1):length(src)] == '    "))')[1]
   expect_identical(ui3_colour_literals(src[a:b]), character(0))
-  expect_identical(ui3_colour_literals(ui3_read("inst", "shiny", "www", "studio-actions.css")),
-                   character(0))
+  # The button levels live in the token file, so Studio's old stylesheet went.
+  expect_false(file.exists(file.path(dirname(sframe_installed_path("inst", "shiny", "app.R")),
+                                     "www", "studio-actions.css")))
   # The charts R draws take their colours from the token file too.
   expect_true(any(grepl('^dash_theme <- studio_token\\("--sf-primary"', src)))
   expect_false(any(grepl("#16B3B1", src, fixed = TRUE)))

@@ -1095,13 +1095,19 @@ style.
   and the builder's blue become 1 primary colour, and the 2 dark sidebars
   1 navigation colour. The Explore charts take their colours from the same
   file.
-
+* **3 button levels in both apps**: a filled primary, 40 px high and sized
+  to its label, at most 1 per screen, panel or dialog, an outline
+  secondary, 36 px high, and a text link for small actions. Shiny's own
+  buttons and the builder's dialogs take the same levels. In the builder,
+  the 2 add buttons on Settings' References tab and Export syntax become
+  secondary, and the Open Collect and Open References links in Studio text
+  links.
 * **Responses starts with the Google Sheet**, the planned route: the sheet
   card comes first with Read from Google Sheet as the screen's primary
   action, then the CSV file, then help for files from other tools. Without
   googlesheets4 the card stays first and says how to install it.
 * **1 primary action per screen**, a full-size filled button from 1 shared
-  class in `inst/shiny/www/studio-actions.css`: Save to Studio on Design,
+  level in `inst/builder/design_tokens.css`: Save to Studio on Design,
   now first in the builder's bar, Download survey on Collect, Load
   responses, Export report beside the Report title, Edit in Design, Add
   from BibTeX, and the next step on the screens that only show results.
