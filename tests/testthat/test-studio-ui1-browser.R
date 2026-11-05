@@ -369,11 +369,13 @@ test_that("each screen has exactly 1 primary action, visible without scrolling a
   }
   expect_true(ui1_screen(b, "design"))
   doc <- "document.getElementById('design_frame').contentWindow.document"
-  expect_true(ui2_wait(b, paste0("!!", doc, ".querySelector('#saveBtn.sf-primary')"), 60))
-  expect_identical(ui2_js(b, paste0(doc, ".querySelectorAll('.sf-primary').length")), 1L)
-  expect_true(ui2_js(b, paste0("(function(){ var s = ", doc, ".getElementById('saveBtn'), t = ", doc,
-    ".querySelector('.topbar'); return t.firstElementChild === s && s.getBoundingClientRect().bottom <= window.innerHeight; })()")))
-  expect_true(ui2_wait(b, paste0("parseInt(getComputedStyle(", doc, ".getElementById('saveBtn')).fontSize) >= 15"), 10))
+  # Save to Studio sits at the far right of Design's head row since UI-3
+  # item 3, where the builder's bar was merged in, and is its only primary.
+  expect_true(ui2_wait(b, paste0("(function(){ try { var t = ", doc, ".querySelector('.topbar'); return !!t && t.offsetParent === null; } catch (e) { return false; } })()"), 60))
+  expect_identical(ui2_js(b, "$('#screen-design .sf-primary:visible').attr('id')"), "design_save")
+  expect_identical(ui2_js(b, "$('#screen-design .sf-primary:visible').length"), 1L)
+  expect_true(ui2_js(b, "(function(){ var s = document.getElementById('design_save'), h = s.closest('.screen-head').getBoundingClientRect(), r = s.getBoundingClientRect(); return r.right >= h.right - 24 && r.bottom <= window.innerHeight; })()"))
+  expect_true(ui2_wait(b, "parseInt(getComputedStyle(document.getElementById('design_save')).fontSize) >= 15", 10))
 })
 
 test_that("Explore's Download CSV shows on every view and holds the responses the filters keep (12e gap)", {
@@ -440,7 +442,7 @@ test_that("at 1920 px every primary action, Save to Studio included, sizes to it
   expect_true(ui2_wait(b, "window.innerWidth === 1920", 10))
   expect_true(ui1_screen(b, "design"))
   doc <- "document.getElementById('design_frame').contentWindow.document"
-  save <- paste0(doc, ".getElementById('saveBtn')")
+  save <- "document.getElementById('design_save')"
   expect_true(ui2_wait(b, paste0("(function(){ try { var s = ", save,
                                  "; return !!s && s.classList.contains('sf-primary') && s.offsetWidth > 0; } catch (e) { return false; } })()"), 60))
   # The stylesheet loads after the class is set, so wait for its rules.
