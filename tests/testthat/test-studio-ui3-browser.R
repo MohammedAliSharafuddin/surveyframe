@@ -105,5 +105,48 @@ test_that("the standalone builder keeps its switch and has the same row, Save .s
   expect_true(all(lv$filled == (lv$level == "primary")))
 })
 
+test_that("the builder panel has 1 filled button, + Add question, a menu holding Section and Branch (UI-3 item 4)", {
+  s <- ui2_builder()
+  lv <- ui3_levels(s, "document.querySelector('.sidebar')")
+  expect_identical(lv$id[lv$level == "primary"], "fabMoreBtn")
+  # Survey settings is a secondary row at the top: outlined, not filled.
+  expect_identical(ui2_js(s, "getComputedStyle(document.querySelector('.sb-settings-cta')).backgroundColor"), "rgba(0, 0, 0, 0)")
+  expect_identical(ui2_js(s, "document.querySelector('.sb-top').children[1].className"), "sb-settings-cta")
+  # Nothing in the panel is filled with the primary colour but Add question.
+  filled <- ui2_js(s, paste0("(function(){ var p = getComputedStyle(document.getElementById('fabMoreBtn')).backgroundColor, n = 0;",
+    " document.querySelectorAll('.sidebar button, .sidebar .btn').forEach(function(e){ if (e.offsetParent && getComputedStyle(e).backgroundColor === p) n++; }); return n; })()"))
+  expect_identical(filled, 1L)
+  expect_identical(ui2_js(s, "document.querySelectorAll('.fab-mini').length"), 0L)
+  items <- ui2_js(s, "Array.prototype.map.call(document.querySelectorAll('#fabMenu [role=menuitem]'), function(e){ return e.textContent; }).join('|')")
+  expect_match(items, "Section break\\|Branching rule$")
+  # The menu button pattern: Down opens on the first item, Up from it wraps
+  # to the last, Escape closes back to the button.
+  ui2_js(s, "document.getElementById('fabMoreBtn').focus(); 1")
+  ui2_key(s, "", "ArrowDown")
+  expect_identical(ui2_js(s, "document.getElementById('fabMoreBtn').getAttribute('aria-expanded')"), "true")
+  expect_identical(ui2_js(s, "document.activeElement.textContent"), "Likert scale")
+  ui2_key(s, "", "ArrowUp")
+  expect_identical(ui2_js(s, "document.activeElement.textContent"), "Branching rule")
+  ui2_key(s, "", "Home")
+  expect_identical(ui2_js(s, "document.activeElement.textContent"), "Likert scale")
+  ui2_key(s, "", "Escape")
+  expect_false(ui2_js(s, "document.getElementById('fabMenu').classList.contains('open')"))
+  expect_identical(ui2_js(s, "document.activeElement.id"), "fabMoreBtn")
+  expect_identical(ui2_js(s, "document.getElementById('fabMoreBtn').getAttribute('aria-expanded')"), "false")
+  # Section break from the menu adds one.
+  ui2_js(s, "document.getElementById('fabMoreBtn').click(); 1")
+  ui2_js(s, "Array.prototype.filter.call(document.querySelectorAll('#fabMenu [role=menuitem]'), function(e){ return e.textContent === 'Section break'; })[0].click(); 1")
+  expect_true(ui2_js(s, "S.items.some(function(i){ return i.type === 'section_break'; })"))
+  # Configure is a text link with a plain name, and its menu opens the same way.
+  expect_identical(ui2_js(s, "document.getElementById('cfgMoreBtn').textContent"), "Answer sets, scales and checks")
+  expect_true(ui2_js(s, "document.getElementById('cfgMoreBtn').classList.contains('sf-tertiary')"))
+  ui2_js(s, "document.getElementById('cfgMoreBtn').focus(); 1")
+  ui2_key(s, "", "ArrowDown")
+  expect_identical(ui2_js(s, "document.querySelectorAll('#cfgMenu [role=menuitem]').length"), 3L)
+  expect_true(ui2_js(s, "document.getElementById('cfgMenu').contains(document.activeElement)"))
+  ui2_key(s, "", "Escape")
+  expect_identical(ui2_js(s, "document.activeElement.id"), "cfgMoreBtn")
+})
+
 ui2_close()
 ui1_close()

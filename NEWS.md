@@ -1109,6 +1109,12 @@ style.
   standalone builder has the same row, with its title, version and save
   state on the left, its Build, Preview and Plan switch in the centre, and
   Save .sframe last on the right.
+* **The builder's left panel has 1 filled button**, "+ Add question",
+  whose menu now also holds Section break and Branching rule. Survey
+  settings is an outlined row at the top of the panel, and Configure is a
+  text link named "Answer sets, scales and checks". Both menus follow the
+  menu button pattern: the arrow keys, Home and End move through them, and
+  Escape closes them back to their button.
 * **Responses starts with the Google Sheet**, the planned route: the sheet
   card comes first with Read from Google Sheet as the screen's primary
   action, then the CSV file, then help for files from other tools. Without
