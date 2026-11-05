@@ -336,14 +336,16 @@ input,textarea,select{font-family:inherit;font-size:13px}
 .sb-top{padding:10px;border-bottom:1px solid color-mix(in srgb,var(--sf-white) 7%,transparent)}
 .sb-title{padding:4px 8px 6px;color:var(--st);font-size:12px;font-weight:600;
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-/* The single, obviously-primary settings entry point (owner decision
-   2026-07-11): full-width, filled with the brand colour, above search. */
-.sb-settings-cta{width:100%;display:flex;align-items:center;justify-content:center;
-  gap:7px;padding:8px 10px;border-radius:var(--r);background:var(--cp);color:var(--cf);
-  font-size:12px;font-weight:600;border:none;cursor:pointer;
-  transition:filter var(--d1)}
-.sb-settings-cta:hover{filter:brightness(1.12)}
-.sb-settings-cta:focus-visible{outline:2px solid var(--cf);outline-offset:2px}
+/* The 1 settings entry point (owner decision 2026-07-11), a secondary row
+   at the top of the panel since UI-3 item 4: outlined on the dark panel,
+   so "+ Add question" is the panel's only filled button. */
+.sb-settings-cta{width:100%;display:flex;align-items:center;justify-content:space-between;
+  gap:7px;min-height:36px;padding:0 10px;border-radius:var(--r);background:transparent;color:var(--sf-nav-text);
+  font-size:12px;font-weight:600;border:1px solid var(--sf-nav-line);cursor:pointer;
+  transition:background var(--d1)}
+.sb-settings-cta:hover{background:var(--sf-nav-hover);color:var(--sf-white)}
+.sb-settings-cta:focus-visible{outline:2px solid var(--sf-white);outline-offset:2px}
+.sb-settings-cta .sb-row-go{color:var(--sf-nav-muted)}
 .sb-search{position:relative;margin-top:7px}
 .sb-search input{width:100%;background:color-mix(in srgb,var(--sf-white) 8%,transparent);
   border:1px solid color-mix(in srgb,var(--sf-white) 10%,transparent);border-radius:var(--r);
@@ -359,17 +361,16 @@ input,textarea,select{font-family:inherit;font-size:13px}
 /* -- Add-item footer ------------------------------------------------------ */
 .sb-footer{padding:10px;border-top:1px solid color-mix(in srgb,var(--sf-white) 7%,transparent)}
 .fab-row{display:flex;gap:6px}
-.fab{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;
-  padding:9px;min-height:38px;border-radius:var(--r);background:var(--cp);color:var(--cf);
-  font-size:12px;font-weight:600;transition:background var(--d1)}
-.fab:hover,.fab.active{background:var(--cp-d)}
-.fab-mini{flex:1;display:flex;align-items:center;justify-content:center;gap:5px;
-  padding:6px 4px;min-height:30px;border-radius:var(--r);
-  border:1px solid color-mix(in srgb,var(--sf-white) 12%,transparent);background:color-mix(in srgb,var(--sf-white) 5%,transparent);
-  color:color-mix(in srgb,var(--sf-white) 75%,transparent);font-size:11px;font-weight:600;
-  transition:all var(--d1)}
-.fab-mini:hover,.fab-mini.active{background:color-mix(in srgb,var(--sf-white) 12%,transparent);color:var(--cf);
-  border-color:color-mix(in srgb,var(--sf-white) 20%,transparent)}
+/* UI-3 item 4: "+ Add question" is the panel's 1 primary, a menu button
+   whose menu holds the question types, a section break and a branching
+   rule. The configuration menu opens from a text link below it. */
+.sb-footer .sf-primary{width:100%;max-width:none;justify-content:center}
+.sb-footer .sf-primary:focus-visible{outline-color:var(--sf-white)}
+.sb-cfg-link{margin-top:8px}
+.sb-footer .btn.sf-tertiary.sb-cfg-link{color:var(--sf-primary-on-dark);font-size:12px}
+.sb-footer .btn.sf-tertiary.sb-cfg-link:hover{color:var(--sf-white)}
+.sb-footer .btn.sf-tertiary.sb-cfg-link:focus-visible{outline-color:var(--sf-white)}
+.fi:focus-visible{outline:2px solid var(--sf-white);outline-offset:-2px;background:color-mix(in srgb,var(--sf-white) 7%,transparent);color:var(--cf)}
 .fab-menu{display:none;background:var(--sh);border-radius:var(--r);overflow:hidden;
   border:1px solid color-mix(in srgb,var(--sf-white) 8%,transparent);max-height:min(460px,58vh);
   overflow-y:auto;margin-bottom:6px}
@@ -851,7 +852,7 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
          and thank-you pages are tabs inside the settings dialog. -->
     <div class="sb-title" id="sbTitle">Untitled Survey</div>
     <button type="button" class="sb-settings-cta" onclick="openSettings('meta')">
-      <span aria-hidden="true">&#9881;</span> Survey settings
+      <span><span aria-hidden="true">&#9881;</span> Survey settings</span><span class="sb-row-go" aria-hidden="true">&#8250;</span>
     </button>
     <div class="sb-search">
       <span class="sb-si">&#128269;</span>
@@ -861,24 +862,24 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
   </div>
   <div class="sb-body" id="itemList" role="listbox" aria-label="Survey items"></div>
   <div class="sb-footer">
-    <!-- The former single Add-question menu is split into four controls
-         (v0.3.4 builder rework): question types, section break, branching,
-         and configuration each get their own entry so type-picking is not
-         conflated with structure or configuration. -->
-    <div class="fab-menu" id="fabMenu" aria-label="Question types">
+    <!-- 1 primary, "+ Add question", opens a menu of question types, a
+         section break and a branching rule (UI-3 item 4). Choice sets,
+         scales and attention checks open from the text link below it.
+         Both follow the menu button pattern. -->
+    <div class="fab-menu" id="fabMenu" role="menu" aria-label="Add to the survey">
       <div class="fg"><div class="fg-lbl">Questions</div>
-        <button type="button" class="fi" onclick="qAdd('likert');closeFabMenu()"><span class="fi-ic">&#9679;</span>Likert scale</button>
-        <button type="button" class="fi" onclick="qAdd('single_choice');closeFabMenu()"><span class="fi-ic">&#9900;</span>Single choice</button>
-        <button type="button" class="fi" onclick="qAdd('multiple_choice');closeFabMenu()"><span class="fi-ic">&#9745;</span>Multiple choice</button>
-        <button type="button" class="fi" onclick="qAdd('matrix');closeFabMenu()"><span class="fi-ic">&#9632;</span>Matrix / grid</button>
-        <button type="button" class="fi" onclick="qAdd('numeric');closeFabMenu()"><span class="fi-ic">#</span>Numeric</button>
-        <button type="button" class="fi" onclick="qAdd('text');closeFabMenu()"><span class="fi-ic">T</span>Short text</button>
-        <button type="button" class="fi" onclick="qAdd('textarea');closeFabMenu()"><span class="fi-ic">&#182;</span>Long text</button>
-        <button type="button" class="fi" onclick="qAdd('slider');closeFabMenu()"><span class="fi-ic">&#8212;</span>Slider</button>
-        <button type="button" class="fi" onclick="qAdd('ranking');closeFabMenu()"><span class="fi-ic">&#8597;</span>Ranking</button>
-        <button type="button" class="fi" onclick="qAdd('rating');closeFabMenu()"><span class="fi-ic">★</span>Rating</button>
-        <button type="button" class="fi" onclick="qAdd('date');closeFabMenu()"><span class="fi-ic">&#128197;</span>Date</button>
-        <button type="button" class="fi" onclick="qAdd('text_block');closeFabMenu()"><span class="fi-ic">&#128221;</span>Text block</button>
+        <button type="button" class="fi" role="menuitem" tabindex="-1" onclick="qAdd('likert');closeFabMenu()"><span class="fi-ic">&#9679;</span>Likert scale</button>
+        <button type="button" class="fi" role="menuitem" tabindex="-1" onclick="qAdd('single_choice');closeFabMenu()"><span class="fi-ic">&#9900;</span>Single choice</button>
+        <button type="button" class="fi" role="menuitem" tabindex="-1" onclick="qAdd('multiple_choice');closeFabMenu()"><span class="fi-ic">&#9745;</span>Multiple choice</button>
+        <button type="button" class="fi" role="menuitem" tabindex="-1" onclick="qAdd('matrix');closeFabMenu()"><span class="fi-ic">&#9632;</span>Matrix / grid</button>
+        <button type="button" class="fi" role="menuitem" tabindex="-1" onclick="qAdd('numeric');closeFabMenu()"><span class="fi-ic">#</span>Numeric</button>
+        <button type="button" class="fi" role="menuitem" tabindex="-1" onclick="qAdd('text');closeFabMenu()"><span class="fi-ic">T</span>Short text</button>
+        <button type="button" class="fi" role="menuitem" tabindex="-1" onclick="qAdd('textarea');closeFabMenu()"><span class="fi-ic">&#182;</span>Long text</button>
+        <button type="button" class="fi" role="menuitem" tabindex="-1" onclick="qAdd('slider');closeFabMenu()"><span class="fi-ic">&#8212;</span>Slider</button>
+        <button type="button" class="fi" role="menuitem" tabindex="-1" onclick="qAdd('ranking');closeFabMenu()"><span class="fi-ic">&#8597;</span>Ranking</button>
+        <button type="button" class="fi" role="menuitem" tabindex="-1" onclick="qAdd('rating');closeFabMenu()"><span class="fi-ic">★</span>Rating</button>
+        <button type="button" class="fi" role="menuitem" tabindex="-1" onclick="qAdd('date');closeFabMenu()"><span class="fi-ic">&#128197;</span>Date</button>
+        <button type="button" class="fi" role="menuitem" tabindex="-1" onclick="qAdd('text_block');closeFabMenu()"><span class="fi-ic">&#128221;</span>Text block</button>
       </div>
       <!-- Decision-family question types (v0.5 MCDM work, shipping as CRAN
            0.4.0). Three entries for two item types: pairwise_comparison
@@ -886,31 +887,28 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
            scale, chosen by comparison_scale, so each gets its own entry
            rather than making the researcher find a hidden switch. -->
       <div class="fg"><div class="fg-lbl">Decision (MCDM)</div>
-        <button type="button" class="fi" onclick="qAdd('pairwise_comparison','saaty');closeFabMenu()"><span class="fi-ic">&#8646;</span>Pairwise comparison (AHP, ANP)</button>
-        <button type="button" class="fi" onclick="qAdd('pairwise_comparison','influence');closeFabMenu()"><span class="fi-ic">&#8594;</span>Influence matrix (DEMATEL)</button>
-        <button type="button" class="fi" onclick="qAdd('criteria_weight');closeFabMenu()"><span class="fi-ic">%</span>Criteria weights</button>
+        <button type="button" class="fi" role="menuitem" tabindex="-1" onclick="qAdd('pairwise_comparison','saaty');closeFabMenu()"><span class="fi-ic">&#8646;</span>Pairwise comparison (AHP, ANP)</button>
+        <button type="button" class="fi" role="menuitem" tabindex="-1" onclick="qAdd('pairwise_comparison','influence');closeFabMenu()"><span class="fi-ic">&#8594;</span>Influence matrix (DEMATEL)</button>
+        <button type="button" class="fi" role="menuitem" tabindex="-1" onclick="qAdd('criteria_weight');closeFabMenu()"><span class="fi-ic">%</span>Criteria weights</button>
+      </div>
+      <div class="fg"><div class="fg-lbl">Structure</div>
+        <button type="button" class="fi" role="menuitem" tabindex="-1" onclick="closeFabMenu();qAdd('section_break')"><span class="fi-ic">&#8212;</span>Section break</button>
+        <button type="button" class="fi" role="menuitem" tabindex="-1" onclick="closeFabMenu(true);openBranchModal()"><span class="fi-ic">&#8627;</span>Branching rule</button>
       </div>
     </div>
-    <div class="fab-menu" id="cfgMenu" aria-label="Configuration">
-      <div class="fg"><div class="fg-lbl">Configure</div>
-        <button type="button" class="fi" onclick="openChoiceModal();closeCfgMenu()"><span class="fi-ic">&#9673;</span>Choice set</button>
-        <button type="button" class="fi" onclick="openScaleModal();closeCfgMenu()"><span class="fi-ic">&#128208;</span>Scale</button>
-        <button type="button" class="fi" onclick="openCheckModal();closeCfgMenu()"><span class="fi-ic">&#10003;</span>Attention check</button>
+    <div class="fab-menu" id="cfgMenu" role="menu" aria-label="Answer sets, scales and checks">
+      <div class="fg"><div class="fg-lbl">Shared by questions</div>
+        <button type="button" class="fi" role="menuitem" tabindex="-1" onclick="closeCfgMenu(true);openChoiceModal()"><span class="fi-ic">&#9673;</span>Choice set</button>
+        <button type="button" class="fi" role="menuitem" tabindex="-1" onclick="closeCfgMenu(true);openScaleModal()"><span class="fi-ic">&#128208;</span>Scale</button>
+        <button type="button" class="fi" role="menuitem" tabindex="-1" onclick="closeCfgMenu(true);openCheckModal()"><span class="fi-ic">&#10003;</span>Attention check</button>
       </div>
     </div>
     <div class="fab-row">
-      <button type="button" class="fab" id="fabMoreBtn" aria-haspopup="true" aria-controls="fabMenu"
-              title="Choose a question type" onclick="toggleFabMenu()">+ Add question</button>
+      <button type="button" class="btn sf-primary fab" id="fabMoreBtn" aria-haspopup="menu" aria-expanded="false" aria-controls="fabMenu"
+              title="Add a question, a section break or a branching rule" onclick="toggleFabMenu()">+ Add question <span aria-hidden="true">&#9662;</span></button>
     </div>
-    <div class="fab-row" style="margin-top:6px">
-      <button type="button" class="fab-mini" title="Insert a section break"
-              onclick="qAdd('section_break')"><span aria-hidden="true">&#8212;</span> Section</button>
-      <button type="button" class="fab-mini" title="Add a branching rule"
-              onclick="openBranchModal()"><span aria-hidden="true">&#8627;</span> Branch</button>
-      <button type="button" class="fab-mini" id="cfgMoreBtn" aria-haspopup="true" aria-controls="cfgMenu"
-              title="Choice sets, scales, and attention checks"
-              onclick="toggleCfgMenu()"><span aria-hidden="true">&#9881;</span> Configure</button>
-    </div>
+    <button type="button" class="btn sf-tertiary sb-cfg-link" id="cfgMoreBtn" aria-haspopup="menu" aria-expanded="false" aria-controls="cfgMenu"
+            onclick="toggleCfgMenu()">Answer sets, scales and checks</button>
   </div>
 </aside>
 
@@ -3868,12 +3866,29 @@ function conf2(title,msg,okLbl,val){okLbl=okLbl||'Delete';document.getElementByI
 function resConf(v){var inp=document.getElementById('confIn');if(v&&inp&&!inp.hidden)v=inp.value;document.getElementById('confOv').classList.remove('open');if(_cRes){_cRes(v);_cRes=null;}}
 
 // -- Fab menu toggle --------------------------------------------------------
-function toggleFabMenu(){closeCfgMenu();var m=document.getElementById('fabMenu'),b=document.getElementById('fabMoreBtn');m.classList.toggle('open');b.classList.toggle('active');}
-function closeFabMenu(){document.getElementById('fabMenu').classList.remove('open');document.getElementById('fabMoreBtn').classList.remove('active');}
-function toggleCfgMenu(){closeFabMenu();var m=document.getElementById('cfgMenu'),b=document.getElementById('cfgMoreBtn');m.classList.toggle('open');b.classList.toggle('active');}
-function closeCfgMenu(){document.getElementById('cfgMenu').classList.remove('open');document.getElementById('cfgMoreBtn').classList.remove('active');}
-// Close menu when clicking outside
-document.addEventListener('click',function(e){var m=document.getElementById('fabMenu'),b=document.getElementById('fabMoreBtn');if(m&&m.classList.contains('open')&&!m.contains(e.target)&&!b.contains(e.target))closeFabMenu();});
+// The menu button pattern (UI-3 item 4): Enter, Space or Down opens the
+// menu on its first item, Up on its last, the arrows, Home and End move
+// through it, and Escape or Tab closes it, Escape back to its button.
+function menuItems(m){return Array.prototype.slice.call(m.querySelectorAll('[role=menuitem]'));}
+function openMenu(mid,bid,last){var m=document.getElementById(mid),b=document.getElementById(bid);m.classList.add('open');b.classList.add('active');b.setAttribute('aria-expanded','true');var it=menuItems(m);if(it.length)it[last?it.length-1:0].focus();}
+function closeMenu(mid,bid,refocus){var m=document.getElementById(mid),b=document.getElementById(bid);if(!m||!b)return;var was=m.classList.contains('open');m.classList.remove('open');b.classList.remove('active');b.setAttribute('aria-expanded','false');if(was&&refocus)b.focus();}
+function toggleFabMenu(){closeCfgMenu();if(document.getElementById('fabMenu').classList.contains('open'))closeFabMenu(true);else openMenu('fabMenu','fabMoreBtn');}
+function closeFabMenu(refocus){closeMenu('fabMenu','fabMoreBtn',refocus);}
+function toggleCfgMenu(){closeFabMenu();if(document.getElementById('cfgMenu').classList.contains('open'))closeCfgMenu(true);else openMenu('cfgMenu','cfgMoreBtn');}
+function closeCfgMenu(refocus){closeMenu('cfgMenu','cfgMoreBtn',refocus);}
+[['fabMenu','fabMoreBtn'],['cfgMenu','cfgMoreBtn']].forEach(function(p){
+  var m=document.getElementById(p[0]),b=document.getElementById(p[1]);if(!m||!b)return;
+  b.addEventListener('keydown',function(e){if(e.key==='ArrowDown'||e.key==='ArrowUp'){e.preventDefault();if(p[0]==='fabMenu')closeCfgMenu();else closeFabMenu();openMenu(p[0],p[1],e.key==='ArrowUp');}});
+  m.addEventListener('keydown',function(e){var it=menuItems(m),i=it.indexOf(document.activeElement);
+    if(e.key==='Escape'){e.preventDefault();e.stopPropagation();closeMenu(p[0],p[1],true);}
+    else if(e.key==='Tab'){closeMenu(p[0],p[1],false);}
+    else if(e.key==='ArrowDown'){e.preventDefault();it[(i+1)%it.length].focus();}
+    else if(e.key==='ArrowUp'){e.preventDefault();it[(i-1+it.length)%it.length].focus();}
+    else if(e.key==='Home'){e.preventDefault();it[0].focus();}
+    else if(e.key==='End'){e.preventDefault();it[it.length-1].focus();}});
+});
+// Close a menu when clicking outside it
+document.addEventListener('click',function(e){[['fabMenu','fabMoreBtn'],['cfgMenu','cfgMoreBtn']].forEach(function(p){var m=document.getElementById(p[0]),b=document.getElementById(p[1]);if(m&&m.classList.contains('open')&&!m.contains(e.target)&&!b.contains(e.target))closeMenu(p[0],p[1],false);});});
 
 // -- Modes ------------------------------------------------------------------
 function setMode(m){if(document.body&&document.body.dataset)document.body.dataset.mode=m;document.querySelectorAll('.m-btn').forEach(function(b){b.setAttribute('aria-pressed',b.dataset.mode===m?'true':'false');});document.querySelectorAll('.mp').forEach(function(p){p.classList.remove('active');});document.getElementById('mp-'+m).classList.add('active');if(m==='preview')renderPreview();if(m==='analyse')renderAnalyse();}
