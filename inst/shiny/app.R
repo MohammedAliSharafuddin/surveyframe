@@ -2216,10 +2216,12 @@ no_instrument_next <- function(what) {
                           "one, to", paste0(what, ".")), c("open", "design"),
                     primary = "open")
 }
+# Collect first and filled, since it is the next stage in order, with
+# Responses beside it for a file collected elsewhere (UF follow-up 2).
 no_responses_next <- function(what) {
   studio_next_stage(paste("No responses are loaded. Collect them, or upload",
                           "a file of responses, to", paste0(what, ".")),
-                    c("collect", "responses"))
+                    c("collect", "responses"), primary = "collect")
 }
 
 server <- function(input, output, session) {

@@ -3,7 +3,8 @@
 # Session UF: the Studio minors from Codex pass 1 (P1-06 to P1-12), checked
 # at 1280 and 390 px in a real Chrome against the build under test. Studio
 # and its tab come from ui1_studio() (helper-ui1-browser.R): "none" opens
-# Studio with no instrument, "two_group" with that demo. The standalone
+# Studio with no instrument, "two_group" with that demo, and
+# "instrument:likert_scale" with an instrument and no responses. The standalone
 # builder (P1-11) comes from ui2_builder(). All are closed at the end of the
 # file.
 
@@ -105,6 +106,23 @@ test_that("with no instrument, the 9 empty screens offer Open Instrument filled 
       expect_identical(card$filled, c(TRUE, FALSE), info = paste(w, screen))
       expect_true(card$secondary[2], info = paste(w, screen))
       # 1 filled primary on the screen, the card's (UI-3).
+      expect_identical(sum(bt$filled), 1L, info = paste(w, screen))
+    }
+  }
+})
+
+test_that("with an instrument and no responses, Collect is filled and Responses secondary on the screens that need responses (UF follow-up 2)", {
+  for (w in uf_widths) {
+    b <- ui1_studio("instrument:likert_scale", width = w, height = 900)
+    for (screen in c("quality", "reliability", "dashboard")) {
+      expect_true(ui1_screen(b, screen), info = screen)
+      expect_true(ui2_wait(b, sprintf("$('#screen-%s .next-stage:visible').length > 0", screen), 20), info = screen)
+      bt <- jsonlite::fromJSON(ui2_js(b, sprintf(uf_buttons_js, screen)))
+      card <- bt[bt$card, ]
+      expect_identical(card$text, c("Collect", "Responses"), info = paste(w, screen))
+      expect_identical(card$primary, c(TRUE, FALSE), info = paste(w, screen))
+      expect_identical(card$filled, c(TRUE, FALSE), info = paste(w, screen))
+      expect_true(card$secondary[2], info = paste(w, screen))
       expect_identical(sum(bt$filled), 1L, info = paste(w, screen))
     }
   }
