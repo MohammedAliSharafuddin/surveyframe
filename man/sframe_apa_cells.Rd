@@ -2,14 +2,25 @@
 % Please edit documentation in R/apa_format.R
 \name{sframe_apa_cells}
 \alias{sframe_apa_cells}
+\alias{sframe_apa_col_labels}
 \title{Format a result table's cells as an APA 7 report prints them}
 \usage{
 sframe_apa_cells(x, digits = 2)
+
+sframe_apa_col_labels(names, format = c("html", "markdown"), conf_level = 0.95)
 }
 \arguments{
 \item{x}{A data frame, such as a result's \code{table}.}
 
 \item{digits}{Decimals for numbers other than p values.}
+
+\item{names}{Column names.}
+
+\item{format}{\code{"html"} for HTML headings, \code{"markdown"} for the pipe tables
+of Word, OpenDocument and PDF reports.}
+
+\item{conf_level}{The confidence level a \code{ci_low} or \code{ci_high} heading
+states.}
 }
 \value{
 A data frame of character columns with the same names.
@@ -25,6 +36,11 @@ missing value is a blank cell.
 \details{
 This is exported because the Quarto report template runs in a separate R
 session against the installed package.
+
+\code{sframe_apa_col_labels()} gives the headings both report engines
+print for a table's columns: words for a column such as \code{valid_n}
+("Valid \emph{n}"), statistic symbols in italics (\emph{M}, \emph{SD}, \emph{Mdn}, \emph{SE}) and
+the confidence level in an interval heading ("95\% CI lower").
 }
 \examples{
 sframe_apa_cells(data.frame(t = 2.345, p = 0.004, r = 0.53, n = 40L))

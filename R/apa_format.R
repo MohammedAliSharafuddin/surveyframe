@@ -116,6 +116,38 @@ sframe_apa_cells <- function(x, digits = 2) {
   x
 }
 
+#' @rdname sframe_apa_cells
+#' @param names Column names.
+#' @param format `"html"` for HTML headings, `"markdown"` for the pipe tables
+#'   of Word, OpenDocument and PDF reports.
+#' @param conf_level The confidence level a `ci_low` or `ci_high` heading
+#'   states.
+#' @details `sframe_apa_col_labels()` gives the headings both report engines
+#'   print for a table's columns: words for a column such as `valid_n`
+#'   ("Valid *n*"), statistic symbols in italics (*M*, *SD*, *Mdn*, *SE*) and
+#'   the confidence level in an interval heading ("95% CI lower").
+#' @export
+sframe_apa_col_labels <- function(names, format = c("html", "markdown"),
+                                  conf_level = 0.95) {
+  format <- match.arg(format)
+  html <- sframe_apa_headings(as.character(names), conf_level)
+  if (format == "html") return(html)
+  sframe_html_heading_md(html)
+}
+
+# An HTML heading as Markdown: italics between asterisks, a subscript
+# between tildes, entities decoded.
+sframe_html_heading_md <- function(x) {
+  x <- gsub("<em>([^<]*)</em>", "*\\1*", x)
+  x <- gsub("<sub>([^<]*)</sub>", "~\\1~", x)
+  x <- gsub("<[^>]+>", "", x)
+  x <- gsub("&lt;", "<", x, fixed = TRUE)
+  x <- gsub("&gt;", ">", x, fixed = TRUE)
+  x <- gsub("&quot;", "\"", x, fixed = TRUE)
+  x <- gsub("&#39;", "'", x, fixed = TRUE)
+  gsub("&amp;", "&", x, fixed = TRUE)
+}
+
 # Result text as HTML: escaped, Latin statistical symbols in italics, r_s and
 # d_z with subscripts, tau and phi as Greek letters, chi-square as its symbol
 # (CX-24). A symbol is marked only where a value follows it, so words in the
@@ -155,12 +187,41 @@ sframe_apa_html <- function(x) {
   odds_ratio = "<em>OR</em>"
 )
 
-# Column names as table headings in HTML: symbols from the map above, a p
-# column by its meaning, and anything else in words with its first letter
-# capitalised.
-sframe_apa_headings <- function(names) {
+# Headings in words for the descriptive and missing-data columns, the same
+# in every report engine and format (Codex P1-03). A statistic symbol is
+# between asterisks, set in italics. "{level}" is the confidence level.
+.sframe_apa_label_map <- c(
+  variable = "Variable", group = "Group", valid_n = "Valid *n*",
+  missing_n = "Missing *n*", missing_prop = "Missing proportion",
+  mean = "*M*", Mean = "*M*", median = "*Mdn*", Median = "*Mdn*", iqr = "IQR",
+  min = "Min", max = "Max",
+  skewness = "Skewness", kurtosis = "Kurtosis",
+  ci_low = "{level}% CI lower", ci_high = "{level}% CI upper",
+  weighted_mean = "Weighted *M*", row = "Respondent",
+  description = "Pattern", percent = "Percent", prop = "Proportion",
+  scale_id = "Scale", n_items = "Items", min_valid = "Minimum valid items",
+  missing_rule = "Missing rule"
+)
+
+# A heading from the label map as HTML.
+sframe_apa_label_html <- function(label, conf_level = 0.95) {
+  label <- gsub("{level}", sframe_conf_level_text(conf_level), label, fixed = TRUE)
+  gsub("\\*([^*]+)\\*", "<em>\\1</em>", htmltools_escape(label))
+}
+
+sframe_conf_level_text <- function(conf_level) {
+  format(round(100 * as.numeric(conf_level)[1], 1), trim = TRUE)
+}
+
+# Column names as table headings in HTML: the label map, symbols from the
+# map above, a p column by its meaning, and anything else in words with its
+# first letter capitalised.
+sframe_apa_headings <- function(names, conf_level = 0.95) {
   vapply(names, function(nm) {
     if (is.na(nm)) return("")
+    if (nm %in% names(.sframe_apa_label_map)) {
+      return(sframe_apa_label_html(.sframe_apa_label_map[[nm]], conf_level))
+    }
     if (nm %in% names(.sframe_apa_heading_map)) return(.sframe_apa_heading_map[[nm]])
     if (grepl(.sframe_apa_p_col_re, nm, ignore.case = TRUE)) return("<em>p</em>")
     htmltools_escape(.sframe_title_case_names(nm))

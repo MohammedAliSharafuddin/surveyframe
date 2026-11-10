@@ -104,7 +104,7 @@ test_that("table headings set symbols as APA 7 does and read as words (CX-24)", 
                           "Pr(>|z|)", "SD", "std.error", "n_items")),
     c("<em>p</em>", "<em>t</em>", "<em>df</em>", "Missing proportion",
       "<em>r</em><sub>s</sub>", "Research question", "<em>p</em>", "<em>SD</em>",
-      "<em>SE</em>", "N items"))
+      "<em>SE</em>", "Items"))
   expect_identical(sframe_apa_headings("a<b"), "A&lt;b")
   html <- surveyframe:::.render_report_table(data.frame(t = 2, p = .5, missing_prop = .25), "T")
   expect_match(html, "<th scope=\"col\"><em>p</em></th>", fixed = TRUE)
