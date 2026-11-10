@@ -678,6 +678,14 @@ style.
 
 ## Reports
 
+* **The missing-data patterns table gives a percentage under "Percent".**
+  `sframe_missing_data_results()` stored each pattern's share as a
+  proportion in `patterns$percent`, so both report engines printed "Complete
+  case | 60 | 1" under "Percent" for 60 complete cases. `percent` now runs
+  from 0 to 100 and a new `prop` column holds the proportion. The
+  `missing_pct` columns kept for 1 release hold a proportion, as their help
+  now says (Codex P1-01).
+
 * **Quarto is the report engine, and `render_report()` finds the copy
   RStudio or Positron bundles.** It looked only for `quarto` on the PATH,
   where neither IDE puts its copy, so a machine with RStudio and no separate

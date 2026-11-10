@@ -15,7 +15,12 @@ sframe_missing_data_results(data, instrument = NULL, variables = NULL)
 when an instrument is supplied, otherwise all columns.}
 }
 \value{
-An object of class \code{sframe_missing_data_report}.
+An object of class \code{sframe_missing_data_report}. Its
+\code{item_missing} and \code{respondent_missing} tables give \code{missing_prop}, a
+proportion between 0 and 1. Their \code{missing_pct} column, the name before
+0.4.3 kept for 1 release, is the same proportion, not a percentage. The
+\code{patterns} table gives each pattern's \code{n}, its \code{percent} from 0 to 100
+and its \code{prop} between 0 and 1.
 }
 \description{
 Reports item-wise missingness, respondent-wise missingness, missing-data

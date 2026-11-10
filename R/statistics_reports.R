@@ -363,7 +363,12 @@ sframe_descriptives_results <- function(
 #' @param variables Optional response columns. Defaults to instrument item IDs
 #'   when an instrument is supplied, otherwise all columns.
 #'
-#' @return An object of class `sframe_missing_data_report`.
+#' @return An object of class `sframe_missing_data_report`. Its
+#'   `item_missing` and `respondent_missing` tables give `missing_prop`, a
+#'   proportion between 0 and 1. Their `missing_pct` column, the name before
+#'   0.4.3 kept for 1 release, is the same proportion, not a percentage. The
+#'   `patterns` table gives each pattern's `n`, its `percent` from 0 to 100
+#'   and its `prop` between 0 and 1.
 #' @export
 #' @examples
 #' demo <- sframe_demo("tourism_services")
@@ -406,7 +411,10 @@ sframe_missing_data_results <- function(data, instrument = NULL, variables = NUL
     apply(is.na(item_data), 1, function(row) paste(ifelse(row, "1", "0"), collapse = ""))
   }
   pattern_table <- as.data.frame(table(pattern = pattern_key), stringsAsFactors = FALSE)
-  pattern_table$percent <- if (n == 0) numeric(0) else pattern_table$Freq / n
+  # percent is 0 to 100, as its "Percent" heading says, and prop is the
+  # same share as a proportion (Codex P1-01: percent held a proportion).
+  pattern_table$prop <- if (n == 0) numeric(0) else pattern_table$Freq / n
+  pattern_table$percent <- pattern_table$prop * 100
   names(pattern_table)[names(pattern_table) == "Freq"] <- "n"
   # The bit string itself ("000000000000000") is meaningless to read, so
   # decode each pattern into which variables are missing, in reader
