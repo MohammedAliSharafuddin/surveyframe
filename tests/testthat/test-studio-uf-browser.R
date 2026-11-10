@@ -73,4 +73,40 @@ test_that("with no instrument the sidebar says No instrument open, not a draft n
   expect_false(grepl("Draft needs fixes|No valid instrument", ui2_js(b, "$('.studio-status').text()")))
 })
 
+# Each visible button-styled control on a screen: its text, its level by
+# class, and whether it is filled with the primary colour.
+uf_buttons_js <- "(function(screen){
+  var root = document.getElementById('screen-' + screen), out = [];
+  var probe = document.createElement('span'); probe.style.color = getComputedStyle(document.documentElement).getPropertyValue('--sf-primary');
+  document.body.appendChild(probe); var primary = getComputedStyle(probe).color; probe.remove();
+  root.querySelectorAll('button, a.btn, .btn').forEach(function(el){
+    var r = el.getBoundingClientRect();
+    if (!r.width || !r.height || el.offsetParent === null) return;
+    out.push({text: (el.innerText || '').trim(), card: !!el.closest('.next-stage'),
+      primary: el.classList.contains('sf-primary'), secondary: el.classList.contains('sf-secondary'),
+      filled: getComputedStyle(el).backgroundColor === primary});
+  });
+  return JSON.stringify(out);
+})('%s')"
+
+test_that("with no instrument, the 9 empty screens offer Open Instrument filled and Design secondary (P1-10)", {
+  empty <- c("collect", "responses", "quality", "dashboard", "reliability",
+             "analysis", "export", "references", "amendments")
+  for (w in uf_widths) {
+    b <- ui1_studio("none", width = w, height = 900)
+    for (screen in empty) {
+      expect_true(ui1_screen(b, screen), info = screen)
+      expect_true(ui2_wait(b, sprintf("$('#screen-%s .next-stage:visible').length > 0", screen), 20), info = screen)
+      bt <- jsonlite::fromJSON(ui2_js(b, sprintf(uf_buttons_js, screen)))
+      card <- bt[bt$card, ]
+      expect_identical(card$text, c("Open Instrument", "Design"), info = paste(w, screen))
+      expect_identical(card$primary, c(TRUE, FALSE), info = paste(w, screen))
+      expect_identical(card$filled, c(TRUE, FALSE), info = paste(w, screen))
+      expect_true(card$secondary[2], info = paste(w, screen))
+      # 1 filled primary on the screen, the card's (UI-3).
+      expect_identical(sum(bt$filled), 1L, info = paste(w, screen))
+    }
+  }
+})
+
 ui1_close()

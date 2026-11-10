@@ -2180,18 +2180,25 @@ ui <- fluidPage(
 # stage, so the researcher is never left on an empty screen.
 studio_stage_labels <- c(design = "Design", open = "Open Instrument",
                          collect = "Collect", responses = "Responses")
-studio_next_stage <- function(message, tabs) {
+# `primary` names the 1 recommended next step, filled, and the others stay
+# secondary (UI-3, Codex P1-10).
+studio_next_stage <- function(message, tabs, primary = NULL) {
   tags$div(class = "card next-stage",
     tags$p(message),
     tags$p(class = "next-stage-links", tags$span(class = "hint", "Next:"),
       lapply(tabs, function(tab) {
-        tags$a(href = "#", `data-tab` = tab, class = "btn btn-outline sf-secondary",
+        tags$a(href = "#", `data-tab` = tab,
+               class = if (identical(tab, primary)) "btn btn-primary sf-primary"
+                       else "btn btn-outline sf-secondary",
                studio_stage_labels[[tab]])
       })))
 }
+# Open Instrument first and filled, since a demo or a saved file is the
+# quickest route, with Design beside it.
 no_instrument_next <- function(what) {
-  studio_next_stage(paste("No instrument is open. Design one, or open a",
-                          "file, to", paste0(what, ".")), c("design", "open"))
+  studio_next_stage(paste("No instrument is open. Open a file, or design",
+                          "one, to", paste0(what, ".")), c("open", "design"),
+                    primary = "open")
 }
 no_responses_next <- function(what) {
   studio_next_stage(paste("No responses are loaded. Collect them, or upload",
@@ -2876,7 +2883,7 @@ server <- function(input, output, session) {
     if (is.null(rv$instrument)) {
       studio_next_stage(paste(
         "Open the instrument to amend first. It becomes the \"previous\"",
-        "version disclosed against."), c("design", "open"))
+        "version disclosed against."), c("open", "design"), primary = "open")
     }
   })
 

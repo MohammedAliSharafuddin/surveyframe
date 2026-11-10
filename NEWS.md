@@ -1496,6 +1496,10 @@ style.
   reads "Schema valid", or "Fix in Design" with the number of problems and
   the first one named. With nothing open, the sidebar says "No instrument
   open", where it said "Draft needs fixes" (Codex P1-09).
+* With no instrument open, the 9 screens from Collect to Amendments offer
+  Open Instrument as the filled primary button and Design as the secondary
+  one beside it, where both were outlined and neither stood out as the next
+  step (Codex P1-10).
 
 ## Demos
 
