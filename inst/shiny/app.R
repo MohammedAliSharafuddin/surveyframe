@@ -1320,12 +1320,14 @@ ui <- fluidPage(
       }
       /* A group heading is a label, with nothing to click. */
       .studio-nav-heading {
-        padding: 14px 20px 4px; font-size: 11px; font-weight: 600;
+        padding: 10px 20px 0; font-size: 11px; font-weight: 600;
         letter-spacing: 0.08em; text-transform: uppercase; color: var(--sf-nav-muted);
         user-select: none;
       }
+      /* 24 px tall, the WCAG 2.5.8 target size (Codex P1-07), with the
+         heading's padding cut by as much so the sidebar keeps its height. */
       .studio-nav-fold { background: none; border: none; padding: 0; width: 100%; text-align: left;
-        font: inherit; letter-spacing: inherit; text-transform: inherit; color: inherit; cursor: pointer; }
+        min-height: 24px; font: inherit; line-height: 24px; letter-spacing: inherit; text-transform: inherit; color: inherit; cursor: pointer; }
       .studio-nav-fold::after { content: '\\25BE'; float: right; }
       .studio-nav-fold[aria-expanded='false']::after { content: '\\25B8'; }
       .studio-nav-item.folded { display: none; }
@@ -1480,6 +1482,9 @@ ui <- fluidPage(
         min-height: 160px; resize: vertical; font-size: 14px; line-height: 1.5;
       }
       .studio-copy-btn { margin: 10px 0; font-size: 13px; }
+      /* Every fold is a 24 px target at least (WCAG 2.5.8, Codex P1-07). */
+      details > summary { min-height: 24px; }
+      details.amend-import > summary { line-height: 24px; cursor: pointer; }
       details.result-canvas-block > summary { cursor: pointer; list-style: none; padding-left: 18px; position: relative; }
       details.result-canvas-block > summary::-webkit-details-marker { display: none; }
       details.result-canvas-block > summary::before {
