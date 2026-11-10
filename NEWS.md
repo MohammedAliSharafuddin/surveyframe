@@ -480,6 +480,10 @@ style.
 
 ## Amendments and versions
 
+* `?amend_sframe` says the amendment is sealed when the file is written:
+  `write_sframe()` hashes the object as it stands then, so a change made to
+  it before writing is part of the author's new version (Codex U-1).
+
 * **`amend_sframe(version = )` sets the version an amendment writes.** `NULL`,
   the default, keeps the version, and when it is unchanged a message
   suggests the next: the minor number for a design amendment (1.0.0 to

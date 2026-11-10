@@ -93,6 +93,11 @@ SHA-256 over a canonical serialisation of the instrument, with the \code{hash},
 the content that is written. It is distinct from the file's own integrity
 hash from \code{\link[=write_sframe]{write_sframe()}}, which also covers the amendment log. Both
 identify content. Neither is byte identity.
+
+The amendment is sealed when the file is written: \code{\link[=write_sframe]{write_sframe()}} hashes
+the object as it stands then, so a change made to the returned object
+before it is written is part of the author's new version, covered by the
+file's hash but not by this entry's \code{new_hash}.
 }
 \section{Wording on the participant's screens}{
 

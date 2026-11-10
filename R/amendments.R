@@ -405,6 +405,11 @@ sframe_amendment_preview <- function(previous, instrument) {
 #' hash from [write_sframe()], which also covers the amendment log. Both
 #' identify content. Neither is byte identity.
 #'
+#' The amendment is sealed when the file is written: [write_sframe()] hashes
+#' the object as it stands then, so a change made to the returned object
+#' before it is written is part of the author's new version, covered by the
+#' file's hash but not by this entry's `new_hash`.
+#'
 #' @section Wording on the participant's screens:
 #' The welcome, consent and thank-you wording lives in `render`, and both
 #' hashes cover `render`, so editing that wording changes the instrument as
