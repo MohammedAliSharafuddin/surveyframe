@@ -1480,6 +1480,10 @@ style.
 * Studio's page declares its language as English (`lang="en"`), so a
   screen reader reads it with English pronunciation (WCAG 3.1.1, Codex
   P1-06).
+* The sidebar's 5 group headings (Build, Collect, Analyse, Report,
+  Record) and every fold, such as Amendments' "Import an externally
+  revised version", are at least 24 px tall, the WCAG 2.5.8 target size.
+  The headings were 15.7 px and the import fold 20 px (Codex P1-07).
 
 ## Demos
 
