@@ -1477,6 +1477,9 @@ style.
 * A result card is headed "RQ 4" when its block id only repeats the number.
   It read "RQ 4: RQ4". A block id that says something more, such as "H2a",
   still shows beside the number.
+* Studio's page declares its language as English (`lang="en"`), so a
+  screen reader reads it with English pronunciation (WCAG 3.1.1, Codex
+  P1-06).
 
 ## Demos
 
