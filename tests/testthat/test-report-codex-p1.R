@@ -157,3 +157,121 @@ test_that("P1-03: the Quarto HTML report prints no raw column name or row-name c
   expect_false(any(h == ""))
   expect_true(all(c("M", "SD", "Mdn", "95% CI lower") %in% h))
 })
+
+# P1-04 and P1-05 read the report in Word, OpenDocument and PDF through Typst
+# and LaTeX. Each format renders once per test run.
+p1_files <- new.env()
+p1_quarto_file <- function(to) {
+  skip_on_cran()
+  skip_if_not_slow()
+  skip_if(!nzchar(Sys.which("quarto")), "Quarto is not installed")
+  if (to %in% c("typst", "latex")) skip_if(!nzchar(Sys.which("pdftotext")), "pdftotext is not installed")
+  if (to == "latex") skip_if(!surveyframe:::sframe_latex_available(), "LaTeX is not installed")
+  if (!is.null(p1_files[[to]])) return(p1_files[[to]])
+  old <- options(surveyframe.use_quarto = TRUE,
+                 surveyframe.latex = if (to == "typst") FALSE else NULL)
+  on.exit(options(old), add = TRUE)
+  format <- if (to %in% c("typst", "latex")) "pdf" else to
+  d <- p1_demo()
+  out <- tempfile(fileext = paste0(".", format))
+  res <- suppressMessages(render_report(d$instrument, data = d$data, output_file = out,
+                                        format = format, include_analysis = TRUE,
+                                        open = FALSE))
+  expect_identical(attr(res, "engine"), "quarto")
+  p1_files[[to]] <- out
+  out
+}
+
+p1_unxml <- function(x) {
+  x <- gsub("<[^>]+>", "", x)
+  x <- gsub("&lt;", "<", gsub("&gt;", ">", gsub("&quot;", "\"", x, fixed = TRUE), fixed = TRUE), fixed = TRUE)
+  gsub("&amp;", "&", x, fixed = TRUE)
+}
+
+# The paragraphs of a report, in order: their text and whether all of the
+# text is bold or italic. PDF text has no styles, so those are NA.
+p1_paragraphs <- function(to) {
+  path <- p1_quarto_file(to)
+  if (to %in% c("typst", "latex")) {
+    txt <- tempfile(fileext = ".txt")
+    system2("pdftotext", c("-enc", "UTF-8", shQuote(path), shQuote(txt)))
+    lines <- trimws(gsub("\f", "", readLines(txt, warn = FALSE, encoding = "UTF-8"), fixed = TRUE))
+    lines <- lines[nzchar(lines)]
+    return(data.frame(text = lines, bold = NA, italic = NA))
+  }
+  member <- if (to == "docx") "word/document.xml" else "content.xml"
+  dir <- tempfile()
+  utils::unzip(path, member, exdir = dir)
+  x <- paste(readLines(file.path(dir, member), warn = FALSE, encoding = "UTF-8"), collapse = "")
+  if (to == "docx") {
+    ps <- regmatches(x, gregexpr("(?s)<w:p[ >].*?</w:p>", x, perl = TRUE))[[1]]
+    run_of <- function(p) regmatches(p, gregexpr("(?s)<w:r[ >].*?</w:r>", p, perl = TRUE))[[1]]
+    text_of <- function(r) p1_unxml(paste(regmatches(r, gregexpr("(?s)<w:t[ >].*?</w:t>", r, perl = TRUE))[[1]], collapse = ""))
+    styled <- function(p, tag) {
+      runs <- run_of(p)
+      runs <- runs[nzchar(trimws(vapply(runs, text_of, "")))]
+      length(runs) > 0 && all(grepl(sprintf("<w:%s/>|<w:%s ", tag, tag), runs))
+    }
+    out <- data.frame(text = trimws(vapply(ps, function(p) paste(vapply(run_of(p), text_of, ""), collapse = ""), "")),
+                      bold = vapply(ps, styled, logical(1), tag = "b"),
+                      italic = vapply(ps, styled, logical(1), tag = "i"))
+  } else {
+    styles <- regmatches(x, gregexpr("(?s)<style:style style:name=\"[^\"]+\".*?</style:style>", x, perl = TRUE))[[1]]
+    style_name <- sub("(?s)^<style:style style:name=\"([^\"]+)\".*$", "\\1", styles, perl = TRUE)
+    bold_styles <- style_name[grepl("fo:font-weight=\"bold\"", styles)]
+    italic_styles <- style_name[grepl("fo:font-style=\"italic\"", styles)]
+    ps <- regmatches(x, gregexpr("(?s)<text:(p|h)[ >].*?</text:(p|h)>", x, perl = TRUE))[[1]]
+    styled <- function(p, set) {
+      spans <- regmatches(p, gregexpr("(?s)<text:span text:style-name=\"[^\"]+\">.*?</text:span>", p, perl = TRUE))[[1]]
+      if (!length(spans)) return(FALSE)
+      nm <- sub("(?s)^<text:span text:style-name=\"([^\"]+)\">.*$", "\\1", spans, perl = TRUE)
+      all(nm %in% set) && identical(trimws(p1_unxml(p)), trimws(p1_unxml(paste(spans, collapse = ""))))
+    }
+    out <- data.frame(text = trimws(p1_unxml(ps)),
+                      bold = vapply(ps, styled, logical(1), set = bold_styles),
+                      italic = vapply(ps, styled, logical(1), set = italic_styles))
+  }
+  out <- out[nzchar(out$text), ]
+  rownames(out) <- NULL
+  out
+}
+
+# APA 7 floats: "Table N" or "Figure N" in bold on its own line, the title
+# in italics on the next, numbered 1, 2, 3 in order.
+p1_expect_apa_floats <- function(to) {
+  p <- p1_paragraphs(to)
+  for (kind in c("Table", "Figure")) {
+    at <- grep(sprintf("^%s [0-9]+$", kind), p$text)
+    expect_gt(length(at), 0)
+    expect_identical(p$text[at], sprintf("%s %d", kind, seq_along(at)))
+    expect_false(any(grepl(sprintf("^%s [0-9]+[:.]", kind), p$text)))
+    if (!is.na(p$bold[1])) {
+      expect_true(all(p$bold[at]))
+      expect_true(all(p$italic[at + 1]))
+    }
+  }
+  tab1 <- grep("^Table 1$", p$text)
+  expect_identical(p$text[tab1 + 1], "Provenance")
+  # The not-applicable dash and its note print, and no raw column name does.
+  all_text <- paste(p$text, collapse = " ")
+  expect_true(grepl("—", all_text, fixed = TRUE))
+  expect_true(grepl(gsub(" ", "\\s+", surveyframe:::sframe_not_applicable_note, fixed = TRUE),
+                    all_text, perl = TRUE))
+  expect_false(any(grepl("missing_n|valid_n|ci_low|ci_high|missing_prop", p$text)))
+}
+
+test_that("P1-04: Word sets each table and figure number in bold above an italic title", {
+  p1_expect_apa_floats("docx")
+})
+
+test_that("P1-04: OpenDocument sets each table and figure number in bold above an italic title", {
+  p1_expect_apa_floats("odt")
+})
+
+test_that("P1-04: the Typst PDF sets each table and figure number above its title", {
+  p1_expect_apa_floats("typst")
+})
+
+test_that("P1-04: the LaTeX PDF sets each table and figure number above its title", {
+  p1_expect_apa_floats("latex")
+})
