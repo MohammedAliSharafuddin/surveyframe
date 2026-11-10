@@ -39,7 +39,40 @@ sframe_qmd_set_params <- function(lines, values) {
   lines
 }
 
-sframe_write_report_source <- function(dir, instrument, data, record_json, front,
+# The instrument, responses and plan results as the folder's files hold them.
+# Export computes the results record from this right after writing the files,
+# and sframe_report_source() computes it again from the same call, so the two
+# records come from the same objects. Computed from the objects in memory, the
+# record differed on an untouched folder (master review L4): the written
+# instrument gains normalised fields, so its hash changes, and write.csv()
+# keeps 15 significant digits, so a statistic moves in its last digit.
+sframe_source_state <- function(dir, include_analysis = TRUE, plot_palette = "web") {
+  path <- function(key) file.path(dir, sframe_source_files[[key]])
+  instrument <- tryCatch(read_sframe(path("instrument")), error = function(e) NULL)
+  if (is.null(instrument)) {
+    instrument <- suppressWarnings(read_sframe(path("instrument"), verify = FALSE))
+  }
+  data <- if (file.exists(path("responses"))) suppressMessages(read_responses(path("responses"), instrument))
+  results <- NULL
+  if (!is.null(data) && isTRUE(include_analysis) && length(instrument$analysis_plan %||% list())) {
+    results <- tryCatch(
+      run_analysis_plan(data, instrument, plots = requireNamespace("ggplot2", quietly = TRUE),
+                        plot_palette = plot_palette),
+      error = function(e) e)
+  }
+  list(instrument = instrument, data = data, results = results,
+       seed = sframe_report_seed(data, instrument, include_analysis))
+}
+
+# The results record of a source state as canonical JSON.
+sframe_source_record_json <- function(state, style = NULL) {
+  results <- state$results
+  sframe_results_record_json(
+    if (is.list(results) && !inherits(results, "error")) results else list(),
+    state$instrument, state$seed, style = style)
+}
+
+sframe_write_report_source <- function(dir, instrument, data, front,
                                        params, style, bibliography_extra,
                                        interpretations = list()) {
   if (dir.exists(dir) && length(list.files(dir, all.files = TRUE, no.. = TRUE))) {
@@ -61,7 +94,10 @@ sframe_write_report_source <- function(dir, instrument, data, record_json, front
     writeLines(jsonlite::toJSON(interpretations, auto_unbox = TRUE, pretty = TRUE),
                path("interpretations"), useBytes = TRUE)
   }
-  sframe_write_text(record_json, path("results"))
+  # The record from the files just written, read back, as the check reads them.
+  state <- suppressMessages(sframe_source_state(dir, include_analysis = params$include_analysis %||% TRUE,
+                                                plot_palette = params$plot_palette %||% "web"))
+  sframe_write_text(sframe_source_record_json(state, style = style), path("results"))
   file.copy(file.path(template_dir, c("report.scss", "apa-reference.docx", "apa-reference.odt")),
             dir, overwrite = TRUE)
   # The style used, bundled or the researcher's own, named for it, so a rerun
@@ -85,7 +121,7 @@ sframe_write_report_source <- function(dir, instrument, data, record_json, front
   }
   objects <- list(obj("report_source", "report_qmd", "qmd"),
                   c(obj("instrument", "sframe_instrument", "instrument"),
-                    list(content_hash = sframe_hex(sframe_hash_value(instrument)))))
+                    list(content_hash = sframe_hex(sframe_hash_value(state$instrument)))))
   if (!is.null(data)) objects <- c(objects, list(obj("responses", "responses_csv", "responses")))
   objects <- c(objects, list(obj("results", "results_record", "results"),
                              sframe_style_manifest_object(style, style_file)))
@@ -154,32 +190,23 @@ sframe_report_source <- function(dir = ".", include_analysis = TRUE, plot_palett
     lapply(manifest$objects, function(o) o$hash_value),
     vapply(manifest$objects, function(o) o$object_id, character(1)))
 
-  instrument <- tryCatch(read_sframe(path("instrument")), error = function(e) NULL)
-  if (is.null(instrument)) {
-    instrument <- suppressWarnings(read_sframe(path("instrument"), verify = FALSE))
-  }
-  data <- if (file.exists(path("responses"))) suppressMessages(read_responses(path("responses"), instrument))
+  state <- sframe_source_state(dir, include_analysis, plot_palette)
+  instrument <- state$instrument
+  data <- state$data
+  results <- state$results
+  seed <- state$seed
   interpretations <- if (file.exists(path("interpretations"))) {
     jsonlite::fromJSON(path("interpretations"), simplifyVector = FALSE)
   } else list()
 
-  results <- NULL
-  if (!is.null(data) && isTRUE(include_analysis) && length(instrument$analysis_plan %||% list())) {
-    results <- tryCatch(
-      run_analysis_plan(data, instrument, plots = requireNamespace("ggplot2", quietly = TRUE),
-                        plot_palette = plot_palette),
-      error = function(e) e)
-  }
-  seed <- sframe_report_seed(data, instrument, include_analysis)
   # The style as exported, so a changed style is reported apart from the numbers.
   style_rec <- Filter(function(o) identical(o$object_id, "citation_style"), manifest$objects)
   style_rec <- if (length(style_rec)) style_rec[[1]] else NULL
   style_now <- if (!is.null(style_rec) && file.exists(file.path(dir, style_rec$file_name))) {
     sframe_sha256_file(file.path(dir, style_rec$file_name))
   } else NA_character_
-  record_now <- function() sframe_sha256_text(sframe_results_record_json(
-    if (is.list(results) && !inherits(results, "error")) results else list(), instrument, seed,
-    style = if (!is.null(style_rec)) list(name = style_rec$name, sha256 = style_rec$hash_value)))
+  record_now <- function() sframe_sha256_text(sframe_source_record_json(
+    state, style = if (!is.null(style_rec)) list(name = style_rec$name, sha256 = style_rec$hash_value)))
   now_record <- record_now()
   rec_results <- recorded$results %||% ""
   # A record written before 0.4.3 sorted its keys in the session locale's order.

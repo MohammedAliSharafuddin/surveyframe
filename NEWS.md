@@ -796,6 +796,16 @@ style.
   instrument's text reaches the `.qmd` only as its JSON-quoted title and
   authors, so a title holding quotes, a colon or a `---` line leaves the
   front matter whole.
+* **An untouched report source says its numbers match.** The source folder
+  of an instrument built in memory and never saved, or of responses given
+  as a plain data frame, said "Numbers differ from the recorded results"
+  before anything was changed. The record was computed from the objects in
+  memory and the check from the folder's files, and the 2 differ: the
+  written instrument gains its normalised fields, so its hash changes, and
+  `responses.csv` keeps 15 significant digits, so a statistic moves in its
+  last digit. Export now writes the files, reads them back and computes the
+  record from those, as the check does. A changed response still turns the
+  check `FALSE`.
 * **Every report has a results record and a manifest beside it.**
   `render_report()` writes `<name>_results.json`, the plan results as
   canonical JSON, and `<name>_manifest.json`, the sha256 of the instrument
