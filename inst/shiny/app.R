@@ -1216,6 +1216,24 @@ studio_nav_entry <- function(tab, label) {
            `aria-current` = if (identical(initial_tab, tab)) "page", label))
 }
 
+# The open instrument's schema status, from validate_sframe() run on it now.
+# The stored meta$validated is a cache only, which Studio never trusts: a
+# valid demo read "Draft" from it and a changed file could read valid (owner
+# 2026-11-10, Codex P1-09). Returns valid, a label, the problem count and a
+# line naming the first problem, "" when valid.
+studio_schema_status <- function(instr) {
+  check <- tryCatch(validate_sframe(instr, strict = FALSE),
+                    error = function(e) list(valid = FALSE, problems = conditionMessage(e)))
+  problems <- as.character(check$problems %||% character(0))
+  valid <- isTRUE(check$valid) && length(problems) == 0
+  list(valid = valid,
+       label = if (valid) "Schema valid" else "Fix in Design",
+       n = length(problems),
+       detail = if (valid) "" else paste0(
+         sframe_count_noun(max(length(problems), 1L), "problem"),
+         ". The first: ", if (length(problems)) problems[1] else "the instrument could not be checked."))
+}
+
 studio_nav_heading <- function(label) {
   # A group heading folds its entries (item 12a), so it is a button.
   # No whitespace around the button, so the heading's text is its label.
@@ -3023,10 +3041,14 @@ server <- function(input, output, session) {
 
   output$sidebar_status <- renderUI({
     draft <- draft_result()
+    # Nothing open and nothing written in Design: no instrument, not a draft
+    # needing fixes (Codex P1-09).
+    empty <- is.null(rv$instrument) && length(draft$instrument$items) == 0
     tagList(
-      tags$div(if (draft$valid) "Draft ready" else "Draft needs fixes"),
+      if (!empty) tags$div(if (draft$valid) "Draft ready" else "Draft needs fixes"),
       tags$div(id = "status_instrument", if (!is.null(rv$instrument))
         paste0("Instrument ", sframe_studio_version_label(rv$instrument))
+        else if (empty) "No instrument open"
         else "No valid instrument"),
       tags$div(if (!is.null(rv$responses)) "Responses loaded" else "No responses")
     )
@@ -3192,6 +3214,7 @@ server <- function(input, output, session) {
   output$instrument_summary_card <- renderUI({
     req(rv$instrument)
     instr <- rv$instrument
+    status <- studio_schema_status(instr)
     tags$div(class = "card",
       tags$div(class = "card-title", instr$meta$title),
       tags$div(class = "stat-row",
@@ -3211,11 +3234,11 @@ server <- function(input, output, session) {
           tags$div(class = studio_stat_class(sframe_studio_version_label(instr)), id = "open_version", sframe_studio_version_label(instr)),
           tags$div(class = "stat-lbl", "Version")),
         tags$div(class = "stat-box",
-          tags$div(class = "stat-val stat-val-long", id = "open_schema_status",
-                   if (isTRUE(instr$meta$validated)) "Schema valid" else "Draft"),
-          if (isTRUE(instr$meta$validated)) tags$div(class = "stat-lbl", "Status")
-          else tags$a(class = "stat-lbl", href = "#", `data-tab` = "design", id = "open_status_link", "Status: fix in Design"))
-      )
+          tags$div(class = "stat-val stat-val-long", id = "open_schema_status", status$label),
+          if (status$valid) tags$div(class = "stat-lbl", "Status")
+          else tags$a(class = "stat-lbl", href = "#", `data-tab` = "design", id = "open_status_link", "Open Design"))
+      ),
+      if (!status$valid) tags$p(class = "hint", id = "open_status_problem", status$detail)
     )
   })
 

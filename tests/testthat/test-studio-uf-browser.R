@@ -57,4 +57,20 @@ test_that("Quality counts respondents and rows in words, and no screen shows '(s
   }
 })
 
+test_that("Open Instrument says Schema valid for the two_group demo, from a validation run (P1-09)", {
+  for (w in uf_widths) {
+    b <- ui1_studio("two_group", width = w, height = 900)
+    expect_true(ui1_screen(b, "open"))
+    expect_true(ui2_wait(b, "!!document.getElementById('open_schema_status')", 20))
+    expect_identical(ui1_text(b, "open_schema_status"), "Schema valid")
+    expect_false(grepl("Draft|fix in Design", ui2_js(b, "document.getElementById('screen-open').innerText")))
+  }
+})
+
+test_that("with no instrument the sidebar says No instrument open, not a draft needing fixes (P1-09)", {
+  b <- ui1_studio("none", width = 1280, height = 900)
+  expect_true(ui2_wait(b, "$('.studio-status').text().indexOf('No instrument open') >= 0", 20))
+  expect_false(grepl("Draft needs fixes|No valid instrument", ui2_js(b, "$('.studio-status').text()")))
+})
+
 ui1_close()
