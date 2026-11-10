@@ -603,9 +603,10 @@ render_report <- function(
 
   # The plan results, computed once for both engines and the results record
   # (8b-R, NAMING decision 6). The record holds the numbers a reviewer
-  # verifies, and the provenance block in the report gives its sha256.
+  # verifies, and the provenance block in the report gives its sha256. The
+  # report source computes its record from the files it writes, read back.
   plan_results <- NULL
-  if (!is.null(data) && isTRUE(include_analysis) &&
+  if (!identical(format, "qmd") && !is.null(data) && isTRUE(include_analysis) &&
       length(instrument$analysis_plan %||% list()) > 0) {
     plan_results <- tryCatch(
       run_analysis_plan(data, instrument,
@@ -626,7 +627,7 @@ render_report <- function(
   if (identical(format, "qmd")) {
     folder <- sub("\\.qmd$", "", dest)
     sframe_write_report_source(
-      folder, instrument, data, record_json,
+      folder, instrument, data,
       front = sframe_report_front(report_title, report_authors, use_citations = TRUE,
                                   csl_file = paste0(csl_style$name, ".csl")),
       params = list(
