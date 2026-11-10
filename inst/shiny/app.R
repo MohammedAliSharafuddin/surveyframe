@@ -1280,6 +1280,9 @@ studio_report_pane <- function(id, on, ...) {
 }
 
 ui <- fluidPage(
+  # The interface is in English, so assistive technology reads it as such
+  # (WCAG 3.1.1, Codex P1-06).
+  lang = "en",
   tags$head(
     tags$title("SurveyStudio"),
     tags$script(src = studio_asset_src("field_tools.js")),
