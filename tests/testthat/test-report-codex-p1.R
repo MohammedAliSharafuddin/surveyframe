@@ -169,7 +169,7 @@ p1_quarto_file <- function(to) {
   if (to == "latex") skip_if(!surveyframe:::sframe_latex_available(), "LaTeX is not installed")
   if (!is.null(p1_files[[to]])) return(p1_files[[to]])
   old <- options(surveyframe.use_quarto = TRUE,
-                 surveyframe.latex = if (to == "typst") FALSE else NULL)
+                 surveyframe.latex = if (to == "typst") FALSE)
   on.exit(options(old), add = TRUE)
   format <- if (to %in% c("typst", "latex")) "pdf" else to
   d <- p1_demo()
@@ -274,4 +274,99 @@ test_that("P1-04: the Typst PDF sets each table and figure number above its titl
 
 test_that("P1-04: the LaTeX PDF sets each table and figure number above its title", {
   p1_expect_apa_floats("latex")
+})
+
+# P1-05: the descriptives table splits in 2 in every format, and no table
+# in a PDF runs 1 column into the next or past the right margin.
+p1_centre <- c("variable", "n", "valid_n", "missing_n", "mean", "sd", "median",
+               "iqr", "min", "max")
+p1_shape <- c("variable", "skewness", "kurtosis", "se", "ci_low", "ci_high")
+p1_titles <- c("Descriptive statistics: centre and spread",
+               "Descriptive statistics: shape and interval")
+
+test_that("P1-05: descriptives split into centre and spread, and shape and interval", {
+  d <- p1_demo()
+  dr <- surveyframe:::sframe_report_descriptives(d$instrument, d$data)
+  expect_identical(names(dr$centre), p1_centre)
+  expect_identical(names(dr$shape), p1_shape)
+  expect_identical(dr$centre$variable, c("format", "sessions_attended"))
+  expect_identical(dr$centre$valid_n, c("60", "60"))
+  expect_identical(dr$shape$skewness[1], "—")
+  d$data$w <- seq_len(nrow(d$data))
+  dw <- surveyframe:::sframe_report_descriptives(d$instrument, d$data, weights = "w")
+  expect_identical(names(dw$shape), c(p1_shape, "weighted_mean"))
+  expect_identical(names(dw$centre), p1_centre)
+})
+
+p1_expect_split <- function(doc) {
+  centre <- p1_table(doc, p1_titles[1])
+  shape <- p1_table(doc, p1_titles[2])
+  expect_false(is.null(centre))
+  expect_false(is.null(shape))
+  expect_identical(centre$head, c("Variable", "n", "Valid n", "Missing n", "M", "SD",
+                                  "Mdn", "IQR", "Min", "Max"))
+  expect_identical(shape$head, c("Variable", "Skewness", "Kurtosis", "SE",
+                                 "95% CI lower", "95% CI upper"))
+  expect_false(grepl("Weighted", doc, fixed = TRUE))
+}
+
+test_that("P1-05: the built-in report prints the 2 descriptives tables", {
+  p1_expect_split(p1_builtin_html())
+})
+
+test_that("P1-05: the Quarto HTML report prints the 2 descriptives tables", {
+  p1_expect_split(p1_quarto_html())
+})
+
+# Every word of a PDF with its box, from pdftotext -bbox.
+p1_words <- function(to) {
+  path <- p1_quarto_file(to)
+  x <- system2("pdftotext", c("-bbox", shQuote(path), "-"), stdout = TRUE)
+  pages <- grep("<page ", x)
+  num <- function(line, key) as.numeric(sub(sprintf('.*%s="([0-9.]+)".*', key), "\\1", line))
+  w <- grep("<word ", x)
+  data.frame(page = findInterval(w, pages), width = num(x[pages][findInterval(w, pages)], "width"),
+             x0 = num(x[w], "xMin"), x1 = num(x[w], "xMax"),
+             y0 = num(x[w], "yMin"), y1 = num(x[w], "yMax"),
+             word = trimws(p1_unxml(x[w])))
+}
+
+p1_expect_no_overlap <- function(to) {
+  w <- p1_words(to)
+  # The margins are the same on both sides, so text ends where the left
+  # margin's width leaves off.
+  # A glyph's side bearing can reach 1 or 2 points past it.
+  right <- w$width - min(w$x0) + 4
+  expect_identical(w$word[w$x1 > right], character(0))
+  # Words on 1 line share a baseline, and none may cover another. The dot
+  # leaders of the contents page are left out, and so are the rotated labels
+  # of a chart, which LaTeX embeds as text: a box taller than any line.
+  w <- w[!grepl("^[.]+$", w$word) & w$y1 - w$y0 < 24, ]
+  clash <- character(0)
+  for (pg in unique(w$page)) {
+    p <- w[w$page == pg, ]
+    for (i in seq_len(nrow(p))) {
+      j <- which(seq_len(nrow(p)) > i & abs(p$y1 - p$y1[i]) < 1.5 &
+                   p$x0 < p$x1[i] - 0.5 & p$x1 > p$x0[i] + 0.5)
+      if (length(j)) clash <- c(clash, paste(p$word[i], p$word[j], sep = " / "))
+    }
+  }
+  expect_identical(clash, character(0))
+  # Glyphs that overlap come out as 1 word ("MdnIQRMin" in Table 8 before
+  # the fix), so each heading and identifier of Tables 2, 3 and the 2
+  # descriptives tables must come out as a word of its own.
+  own <- c("Scale", "Reverse", "Required", "sessions_attended", "single_choice",
+           "in_person", "t_test_ind", "mann_whitney", "Valid", "Missing", "Mdn",
+           "IQR", "Min", "Max", "Skewness", "Kurtosis")
+  expect_identical(setdiff(own, w$word), character(0))
+  txt <- paste(w$word, collapse = " ")
+  for (title in p1_titles) expect_true(grepl(title, txt, fixed = TRUE))
+}
+
+test_that("P1-05: no word in the Typst PDF overlaps another or crosses the margin", {
+  p1_expect_no_overlap("typst")
+})
+
+test_that("P1-05: no word in the LaTeX PDF overlaps another or crosses the margin", {
+  p1_expect_no_overlap("latex")
 })
