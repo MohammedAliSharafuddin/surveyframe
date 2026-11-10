@@ -20,7 +20,7 @@
 #' print(cs)
 #' @family print, format and summary methods
 print.sf_choices <- function(x, ...) {
-  cat(sprintf("<sf_choices: %s | %d option(s)>\n", x$id, length(x$values)))
+  cat(sprintf("<sf_choices: %s | %s>\n", x$id, sframe_count_noun(length(x$values), "option")))
   if (length(x$values) > 0) {
     df <- data.frame(value = x$values, label = x$labels,
                      stringsAsFactors = FALSE, check.names = FALSE)
@@ -38,7 +38,7 @@ print.sf_choices <- function(x, ...) {
 #' @exportS3Method format sf_choices
 #' @family print, format and summary methods
 format.sf_choices <- function(x, ...) {
-  sprintf("<sf_choices: %s | %d option(s)>", x$id, length(x$values))
+  sprintf("<sf_choices: %s | %s>", x$id, sframe_count_noun(length(x$values), "option"))
 }
 
 #' Summarise an sf_choices object
@@ -119,7 +119,7 @@ summary.sf_item <- function(object, ...) {
 #' print(sc)
 #' @family print, format and summary methods
 print.sf_scale <- function(x, ...) {
-  cat(sprintf("<sf_scale: %s | %d item(s)>\n", x$id, length(x$items)))
+  cat(sprintf("<sf_scale: %s | %s>\n", x$id, sframe_count_noun(length(x$items), "item")))
   cat(sprintf("  Label: %s\n", x$label))
   cat(sprintf("  Items: %s\n", paste(x$items, collapse = ", ")))
   cat(sprintf("  Scoring: %s\n", x$method %||% "mean"))
@@ -135,7 +135,7 @@ print.sf_scale <- function(x, ...) {
 #' @exportS3Method format sf_scale
 #' @family print, format and summary methods
 format.sf_scale <- function(x, ...) {
-  sprintf("<sf_scale: %s | %d item(s)>", x$id, length(x$items))
+  sprintf("<sf_scale: %s | %s>", x$id, sframe_count_noun(length(x$items), "item"))
 }
 
 #' Summarise an sf_scale object
@@ -265,8 +265,8 @@ summary.sf_check <- function(object, ...) {
 #' @family print, format and summary methods
 print.sf_model <- function(x, ...) {
   n_con <- length(x$measurement$constructs %||% list())
-  cat(sprintf("<sf_model: %s | type: %s | %d construct(s)>\n",
-              x$id, x$type, n_con))
+  cat(sprintf("<sf_model: %s | type: %s | %s>\n",
+              x$id, x$type, sframe_count_noun(n_con, "construct")))
   cat(sprintf("  Label: %s\n", x$label))
   cat(sprintf("  Engine: %s\n", x$engine %||% "lavaan"))
   invisible(x)
@@ -282,7 +282,7 @@ print.sf_model <- function(x, ...) {
 #' @family print, format and summary methods
 format.sf_model <- function(x, ...) {
   n_con <- length(x$measurement$constructs %||% list())
-  sprintf("<sf_model: %s | type: %s | %d construct(s)>", x$id, x$type, n_con)
+  sprintf("<sf_model: %s | type: %s | %s>", x$id, x$type, sframe_count_noun(n_con, "construct"))
 }
 
 #' Summarise an sf_model object

@@ -235,7 +235,7 @@ score_scales <- function(data, instrument, keep_items = TRUE, keep_meta = TRUE) 
     absent <- setdiff(scale$items, colnames(data))
     if (length(absent) > 0) {
       sframe_warn_scoring(
-        paste0("Scale '", scale$id, "' has no column for item(s) ",
+        paste0("Scale '", scale$id, "' has no column for ", sframe_plural(length(absent), "item"), " ",
                paste0("'", absent, "'", collapse = ", "),
                ". They count as unanswered toward min_valid."),
         scale_id = scale$id

@@ -12,7 +12,7 @@ sframe_choice_other_problems <- function(values, allow_other, ordered) {
   out <- character(0)
   taken <- intersect(c("other", "other_text"), as.character(values))
   if (length(taken) > 0) {
-    out <- c(out, paste0("`allow_other` reserves the value(s) ",
+    out <- c(out, paste0("`allow_other` reserves the ", sframe_plural(length(taken), "value"), " ",
                          paste0("\"", taken, "\"", collapse = " and "),
                          ", which the set already holds. Recode that option or set allow_other = FALSE."))
   }
@@ -39,8 +39,8 @@ sframe_choice_content_problems <- function(values, labels) {
   }
   dup <- unique(vals[duplicated(vals)])
   if (length(dup) > 0) {
-    out <- c(out, paste0("the value(s) ", paste(dup, collapse = ", "),
-                         " appear more than once, so 2 options share a code."))
+    out <- c(out, paste0("the ", sframe_plural(length(dup), "value"), " ", paste(dup, collapse = ", "),
+                         sframe_plural(length(dup), " appears", " appear"), " more than once, so 2 options share a code."))
   }
   # read_responses() reads a set whose codes are all numbers as numbers, so
   # codes that read as the same number (1 and 1.0, or 2 and 02) become one

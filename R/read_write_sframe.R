@@ -596,7 +596,7 @@ sframe_validate_parsed_payload <- function(parsed, path, require_hash = TRUE) {
   if (length(missing) > 0) {
     sframe_abort_import(
       paste0(
-        "Invalid .sframe file: missing required field(s): ",
+        "Invalid .sframe file: missing required ", sframe_plural(length(missing), "field"), ": ",
         paste(missing, collapse = ", "),
         "."
       ),

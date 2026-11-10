@@ -37,7 +37,9 @@ sframe_check_decision_input <- function(x, weights, criteria_types) {
   weights <- suppressWarnings(as.numeric(weights))
   if (length(weights) != ncol(x)) {
     return(list(error = sprintf(
-      "There are %d weight(s) for %d criteria.", length(weights), ncol(x)
+      "There %s %s for %s.", sframe_plural(length(weights), "is", "are"),
+      sframe_count_noun(length(weights), "weight"),
+      sframe_count_noun(ncol(x), "criterion", "criteria")
     )))
   }
   if (anyNA(weights) || any(weights < 0)) {
@@ -57,8 +59,9 @@ sframe_check_decision_input <- function(x, weights, criteria_types) {
   criteria_types <- as.character(criteria_types)
   if (length(criteria_types) != ncol(x)) {
     return(list(error = sprintf(
-      "There are %d criterion type(s) for %d criteria.",
-      length(criteria_types), ncol(x)
+      "There %s %s for %s.", sframe_plural(length(criteria_types), "is", "are"),
+      sframe_count_noun(length(criteria_types), "criterion type"),
+      sframe_count_noun(ncol(x), "criterion", "criteria")
     )))
   }
   bad <- setdiff(unique(criteria_types), c("benefit", "cost"))

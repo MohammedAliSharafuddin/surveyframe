@@ -380,12 +380,12 @@ sframe_validate_model <- function(model, instrument = NULL, strict = TRUE) {
   bad_construct_ids <- construct_ids[nzchar(construct_ids) & !grepl("^[A-Za-z][A-Za-z0-9_]*$", construct_ids)]
   if (length(bad_construct_ids) > 0) {
     add("construct_ids",
-      paste0("Invalid construct ID(s): ", paste(unique(bad_construct_ids), collapse = ", "), "."))
+      paste0("Invalid construct ", sframe_plural(length(unique(bad_construct_ids)), "ID"), ": ", paste(unique(bad_construct_ids), collapse = ", "), "."))
   }
   dup_constructs <- construct_ids[nzchar(construct_ids) & duplicated(construct_ids)]
   if (length(dup_constructs) > 0) {
     add("construct_ids",
-      paste0("Duplicate construct ID(s): ", paste(unique(dup_constructs), collapse = ", "), "."))
+      paste0("Duplicate construct ", sframe_plural(length(unique(dup_constructs)), "ID"), ": ", paste(unique(dup_constructs), collapse = ", "), "."))
   }
 
   item_ids <- if (!is.null(instrument) && inherits(instrument, "sframe")) {
@@ -408,7 +408,7 @@ sframe_validate_model <- function(model, instrument = NULL, strict = TRUE) {
       missing_items <- setdiff(indicators, item_ids)
       if (length(missing_items) > 0) {
         add("construct_indicators",
-          paste0("Construct '", con$id, "' references unknown item(s): ",
+          paste0("Construct '", con$id, "' references unknown ", sframe_plural(length(missing_items), "item"), ": ",
                  paste(missing_items, collapse = ", "), "."))
       }
     }
@@ -447,7 +447,7 @@ sframe_validate_model <- function(model, instrument = NULL, strict = TRUE) {
   dup_paths <- path_keys[duplicated(path_keys)]
   if (length(dup_paths) > 0) {
     add("structural_paths",
-      paste0("Duplicate structural path(s): ", paste(unique(dup_paths), collapse = ", "), "."))
+      paste0("Duplicate structural ", sframe_plural(length(unique(dup_paths)), "path"), ": ", paste(unique(dup_paths), collapse = ", "), "."))
   }
 
   for (cov in sframe_model_covariances(model)) {
@@ -467,7 +467,7 @@ sframe_validate_model <- function(model, instrument = NULL, strict = TRUE) {
     missing_refs <- setdiff(refs, construct_ids)
     if (length(missing_refs) > 0) {
       add("indirect_effects",
-        paste0("Indirect effect references unknown construct(s): ",
+        paste0("Indirect effect references unknown ", sframe_plural(length(missing_refs), "construct"), ": ",
                paste(missing_refs, collapse = ", "), "."))
     }
     if (length(ind$through %||% character(0)) == 0) {
@@ -502,7 +502,7 @@ sframe_validate_model <- function(model, instrument = NULL, strict = TRUE) {
   if (strict && length(log$problems) > 0) {
     sframe_abort_validation(
       paste0(
-        "Model validation failed with ", length(log$problems), " problem(s):\n",
+        "Model validation failed with ", sframe_count_noun(length(log$problems), "problem"), ":\n",
         paste0("  - ", log$problems, collapse = "\n")
       )
     )
@@ -760,7 +760,7 @@ print.sframe_efa_solution <- function(x, ...) {
   cat(sprintf("  Complete cases: %d   Items: %d\n\n", x$n, x$n_items))
   print(x$loadings)
   if (length(x$warnings) > 0) {
-    cat("\nReview item(s): ", paste(x$warnings, collapse = ", "), "\n", sep = "")
+    cat("\nReview ", sframe_plural(length(x$warnings), "item"), ": ", paste(x$warnings, collapse = ", "), "\n", sep = "")
   }
   invisible(x)
 }

@@ -142,8 +142,10 @@ sframe_study_problems <- function(instrument) {
   trace <- function(ids) {
     out <- character(0)
     for (u in setdiff(unique(named[nzchar(named)]), ids)) {
-      out <- c(out, sprintf("Plan block(s) %s name objective '%s', which the study does not declare.",
-                            paste(block_ids[named == u], collapse = ", "), u))
+      out <- c(out, sprintf("Plan %s %s %s objective '%s', which the study does not declare.",
+                            sframe_plural(sum(named == u), "block"),
+                            paste(block_ids[named == u], collapse = ", "),
+                            sframe_plural(sum(named == u), "names", "name"), u))
     }
     out
   }
@@ -161,8 +163,8 @@ sframe_study_problems <- function(instrument) {
   }
   extra <- setdiff(names(s), sframe_study_fields)
   if (length(extra)) {
-    problems <- c(problems, sprintf("`study` has unknown field(s): %s. It holds problem, objectives and sampling.",
-                                    paste(extra, collapse = ", ")))
+    problems <- c(problems, sprintf("`study` has unknown %s: %s. It holds problem, objectives and sampling.",
+                                    sframe_plural(length(extra), "field"), paste(extra, collapse = ", ")))
   }
   if (!is.null(s$problem)) {
     if (!one_string(s$problem)) {
@@ -194,7 +196,8 @@ sframe_study_problems <- function(instrument) {
       }
       dup <- unique(ids[duplicated(ids)])
       if (length(dup)) {
-        problems <- c(problems, sprintf("Objective id(s) used more than once: %s.", paste(dup, collapse = ", ")))
+        problems <- c(problems, sprintf("Objective %s used more than once: %s.", sframe_plural(length(dup), "id"),
+                                        paste(dup, collapse = ", ")))
       }
     }
   }
@@ -207,7 +210,8 @@ sframe_study_problems <- function(instrument) {
     } else {
       extra <- setdiff(names(sp) %||% character(0), sframe_sampling_fields)
       if (length(extra)) {
-        problems <- c(problems, sprintf("`study$sampling` has unknown field(s): %s.", paste(extra, collapse = ", ")))
+        problems <- c(problems, sprintf("`study$sampling` has unknown %s: %s.", sframe_plural(length(extra), "field"),
+                                        paste(extra, collapse = ", ")))
       }
       if (!is.null(sp$population) && !one_string(sp$population)) {
         problems <- c(problems, "`study$sampling$population` must be a single string.")

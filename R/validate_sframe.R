@@ -357,8 +357,8 @@ validate_sframe <- function(instrument, strict = TRUE) {
       sframe_abort_validation(
         paste0(
           "Instrument validation failed with ",
-          length(log$problems),
-          " problem(s):\n",
+          sframe_count_noun(length(log$problems), "problem"),
+          ":\n",
           paste0("  - ", log$problems, collapse = "\n")
         ),
         instrument_title = sframe_meta_display(instrument$meta$title,
@@ -422,7 +422,7 @@ validate_sframe <- function(instrument, strict = TRUE) {
     add(
       "item_id_format",
       paste0(
-        "Invalid item ID(s): ",
+        "Invalid item ", sframe_plural(length(unique(bad_item_ids)), "ID"), ": ",
         paste(unique(bad_item_ids), collapse = ", "),
         ". IDs must start with a letter and contain only letters, numbers, and `_` characters."
       )
@@ -466,7 +466,7 @@ validate_sframe <- function(instrument, strict = TRUE) {
                                          duplicated(branch_targets)])
   if (length(dup_targets) > 0) {
     add("branch_targets", paste0(
-      "More than one branching rule controls item(s): ",
+      "More than one branching rule controls ", sframe_plural(length(dup_targets), "item"), ": ",
       paste(dup_targets, collapse = ", "),
       ". A rule is identified by the item it controls, so declare one each."))
   }
@@ -581,7 +581,7 @@ validate_sframe <- function(instrument, strict = TRUE) {
     missing_items <- setdiff(scale$items, item_ids)
     if (length(missing_items) > 0) {
       add("scale_membership",
-        paste0("Scale '", scale$id, "' references unknown item(s): ",
+        paste0("Scale '", scale$id, "' references unknown ", sframe_plural(length(missing_items), "item"), ": ",
                paste(missing_items, collapse = ", ")))
     }
     add("scale_parameters", sframe_scale_parameter_problems(scale))
@@ -636,7 +636,7 @@ validate_sframe <- function(instrument, strict = TRUE) {
   missing_check_items <- setdiff(check_item_ids, item_ids)
   if (length(missing_check_items) > 0) {
     add("check_refs",
-      paste0("Check(s) reference unknown item(s): ",
+      paste0("Unknown ", sframe_plural(length(missing_check_items), "item"), " in the checks: ",
              paste(missing_check_items, collapse = ", ")))
   }
 
@@ -676,7 +676,7 @@ validate_sframe <- function(instrument, strict = TRUE) {
       add(
         "analysis_plan_models",
         paste0(
-          "Analysis plan '", block_id, "' references missing model(s): ",
+          "Analysis plan '", block_id, "' references missing ", sframe_plural(length(unique(missing_models)), "model"), ": ",
           paste(unique(missing_models), collapse = ", ")
         )
       )
@@ -687,7 +687,7 @@ validate_sframe <- function(instrument, strict = TRUE) {
       add(
         "analysis_plan_variables",
         paste0(
-          "Analysis plan '", block_id, "' references unknown variable(s): ",
+          "Analysis plan '", block_id, "' references unknown ", sframe_plural(length(missing_refs), "variable"), ": ",
           paste(missing_refs, collapse = ", ")
         )
       )
@@ -744,7 +744,7 @@ validate_sframe <- function(instrument, strict = TRUE) {
   if (length(bad_model_ids) > 0) {
     add(
       "model_ids",
-      paste0("Invalid model ID(s): ", paste(unique(bad_model_ids), collapse = ", "))
+      paste0("Invalid model ", sframe_plural(length(unique(bad_model_ids)), "ID"), ": ", paste(unique(bad_model_ids), collapse = ", "))
     )
   }
   for (model in instrument$models %||% list()) {

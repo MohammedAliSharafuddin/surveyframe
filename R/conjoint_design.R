@@ -267,8 +267,8 @@ sframe_conjoint_design <- function(id,
   }
   if (n_tasks > per_block) {
     sframe_abort_validation(sprintf(
-      "`n_tasks` is %d but %d profiles at %d alternatives per task supports at most %d whole task(s) per block.",
-      n_tasks, nrow(profiles), n_alternatives, per_block
+      "`n_tasks` is %d but %d profiles at %d alternatives per task supports at most %s per block.",
+      n_tasks, nrow(profiles), n_alternatives, sframe_count_noun(per_block, "whole task")
     ))
   }
 
@@ -333,8 +333,10 @@ print.sf_conjoint_design <- function(x, ...) {
   cat(sprintf("  Attributes: %d, full factorial %d profiles\n",
               length(x$attributes), x$balance$n_full_factorial))
   cat(sprintf("  Profiles declared: %d\n", nrow(x$profiles)))
-  cat(sprintf("  Tasks: %d block(s) x %d task(s) x %d alternative(s) = %d rows\n",
-              x$blocks, x$n_tasks, x$n_alternatives, nrow(x$tasks)))
+  cat(sprintf("  Tasks: %s x %s x %s = %s\n",
+              sframe_count_noun(x$blocks, "block"), sframe_count_noun(x$n_tasks, "task"),
+              sframe_count_noun(x$n_alternatives, "alternative"),
+              sframe_count_noun(nrow(x$tasks), "row")))
   if (!identical(x$method, "supplied")) {
     cat(sprintf("  Imbalance score: %.4f (0 is a perfectly even spread)\n",
                 x$balance$imbalance))

@@ -195,8 +195,8 @@ sframe_assemble_pairwise <- function(data, instrument, item_id) {
   missing_cols <- setdiff(cols, colnames(data))
   if (length(missing_cols) > 0) {
     sframe_abort_import(sprintf(
-      "Item '%s' is missing %d of its %d comparison column(s): %s.",
-      item_id, length(missing_cols), length(cols),
+      "Item '%s' is missing %d of its %s: %s.",
+      item_id, length(missing_cols), sframe_count_noun(length(cols), "comparison column"),
       paste(missing_cols, collapse = ", ")
     ))
   }
@@ -529,8 +529,8 @@ sframe_collected_weights <- function(data, instrument, item_id,
   missing_cols <- setdiff(cols, colnames(data))
   if (length(missing_cols) > 0) {
     sframe_abort_import(sprintf(
-      "Item '%s' is missing %d of its %d allocation column(s): %s.",
-      item_id, length(missing_cols), length(cols),
+      "Item '%s' is missing %d of its %s: %s.",
+      item_id, length(missing_cols), sframe_count_noun(length(cols), "allocation column"),
       paste(missing_cols, collapse = ", ")
     ))
   }
@@ -756,16 +756,16 @@ sframe_decision_options <- function(options) {
     }
     if (length(alternatives) > 0 && length(alternatives) != nrow(m)) {
       sframe_abort_validation(sprintf(
-        paste0("`options$alternatives` names %d alternative(s) but ",
-               "`options$matrix` has %d row(s)."),
-        length(alternatives), nrow(m)
+        paste0("`options$alternatives` names %s but ",
+               "`options$matrix` has %s."),
+        sframe_count_noun(length(alternatives), "alternative"), sframe_count_noun(nrow(m), "row")
       ))
     }
     if (length(criteria) > 0 && length(criteria) != ncol(m)) {
       sframe_abort_validation(sprintf(
-        paste0("`options$criteria` names %d criterion/criteria but ",
-               "`options$matrix` has %d column(s)."),
-        length(criteria), ncol(m)
+        paste0("`options$criteria` names %s but ",
+               "`options$matrix` has %s."),
+        sframe_count_noun(length(criteria), "criterion", "criteria"), sframe_count_noun(ncol(m), "column")
       ))
     }
     if (length(alternatives) == 0) {

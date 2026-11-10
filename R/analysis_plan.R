@@ -300,8 +300,8 @@ sframe_check_weights <- function(w, column) {
   out <- list(error = NULL, keep = keep, dropped = sum(missing), note = NULL)
   if (any(bad)) {
     out$error <- sprintf(
-      "The weight column '%s' has %d negative, non-finite or non-numeric value(s). Weights must be finite numbers of zero or more.",
-      column, sum(bad))
+      "The weight column '%s' has %s. Weights must be finite numbers of zero or more.",
+      column, sframe_count_noun(sum(bad), "negative, non-finite or non-numeric value"))
     return(out)
   }
   if (sum(w[keep]) <= 0) {
@@ -2078,7 +2078,7 @@ run_analysis_plan <- function(data, instrument, scored = TRUE, plots = FALSE,
   repeated <- unique(ids[nzchar(ids) & duplicated(ids)])
   if (length(repeated) > 0) {
     rlang::abort(
-      paste0("Analysis plan block id(s) used more than once: ",
+      paste0("Analysis plan block ", sframe_plural(length(repeated), "id"), " used more than once: ",
              paste0("'", repeated, "'", collapse = ", "),
              ". Give every block its own id."),
       class = "sframe_error"
@@ -2132,7 +2132,7 @@ run_analysis_plan <- function(data, instrument, scored = TRUE, plots = FALSE,
 
 #' @exportS3Method print sframe_analysis_results
 print.sframe_analysis_results <- function(x, ...) {
-  cat(sprintf("Analysis Results: %d research question(s)\n", length(x)))
+  cat(sprintf("Analysis Results: %s\n", sframe_count_noun(length(x), "research question")))
   status <- attr(x, "status")
   if (!is.null(status)) {
     if (status$failed > 0) {

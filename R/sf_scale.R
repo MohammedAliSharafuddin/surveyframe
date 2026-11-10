@@ -93,7 +93,7 @@ sframe_scale_parameter_problems <- function(scale) {
   }
   out <- character(0)
   if (anyDuplicated(items) > 0) {
-    out <- c(out, paste0("Scale '", id, "' lists item(s) more than once: ",
+    out <- c(out, paste0("Scale '", id, "' lists ", sframe_plural(length(unique(items[duplicated(items)])), "an item", "items"), " more than once: ",
                          paste(unique(items[duplicated(items)]), collapse = ", "),
                          "."))
   }

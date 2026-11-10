@@ -194,7 +194,8 @@ read_responses <- function(
   }, logical(1))]
   if (length(partial) > 0) {
     sframe_warn_missing(paste0(
-      length(partial), " expansion column(s) are absent from the response data ",
+      sframe_count_noun(length(partial), "expansion column"),
+      sframe_plural(length(partial), " is", " are"), " absent from the response data ",
       "for items whose other columns are present: ", paste(partial, collapse = ", ")))
   }
 
@@ -221,7 +222,7 @@ read_responses <- function(
   }
   if (strict && length(mangled) > 0) {
     sframe_abort_import(paste0(
-      length(undeclared), " undeclared column(s) found in response data: ",
+      sframe_count_noun(length(undeclared), "undeclared column"), " found in response data: ",
       paste(undeclared, collapse = ", "),
       ". Declare them in meta_cols or set strict = FALSE.", hint
     ))
@@ -232,8 +233,9 @@ read_responses <- function(
   if (length(missing_items) > 0) {
     sframe_warn_missing(
       paste0(
-        length(missing_items),
-        " item column(s) are absent from the response data: ",
+        sframe_count_noun(length(missing_items), "item column"),
+        sframe_plural(length(missing_items), " is", " are"),
+        " absent from the response data: ",
         paste(missing_items, collapse = ", ")
       )
     )
@@ -250,8 +252,8 @@ read_responses <- function(
     if (strict) {
       sframe_abort_import(
         paste0(
-          length(undeclared),
-          " undeclared column(s) found in response data: ",
+          sframe_count_noun(length(undeclared), "undeclared column"),
+          " found in response data: ",
           paste(undeclared, collapse = ", "),
           ". Declare them in meta_cols or set strict = FALSE.",
           hint
@@ -260,8 +262,8 @@ read_responses <- function(
     } else {
       sframe_warn_quality(
         paste0(
-          length(undeclared),
-          " undeclared column(s) retained with a warning: ",
+          sframe_count_noun(length(undeclared), "undeclared column"),
+          " retained with a warning: ",
           paste(undeclared, collapse = ", ")
         )
       )

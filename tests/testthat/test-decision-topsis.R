@@ -71,7 +71,7 @@ test_that("the shared validator reports each fault by name", {
                "missing values")
   expect_match(sframe_check_decision_input(x, c(0.5, 0.3, 0.2),
                                            c("benefit", "benefit"))$error,
-               "3 weight\\(s\\) for 2 criteria")
+               "There are 3 weights for 2 criteria")
   expect_match(sframe_check_decision_input(x, c(-1, 2),
                                            c("benefit", "benefit"))$error,
                "non-negative")
@@ -79,7 +79,7 @@ test_that("the shared validator reports each fault by name", {
                                            c("benefit", "maximise"))$error,
                "Found: maximise")
   expect_match(sframe_check_decision_input(x, c(0.5, 0.5), "benefit")$error,
-               "1 criterion type\\(s\\) for 2 criteria")
+               "There is 1 criterion type for 2 criteria")
 })
 
 test_that("weights that do not sum to 1 are renormalised with a note", {

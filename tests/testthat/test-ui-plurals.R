@@ -25,6 +25,33 @@ test_that("Studio and the builder hold no '(s)' plural in any string they show (
   expect_identical(unlist(lapply(files, ui_plural_sites)), character(0))
 })
 
+# Every string constant in the package's R functions, walked from the parsed
+# code so it runs on the installed package. A message counts in words, "1
+# item" and "2 items", never "item(s)" (Session LF, R plurals).
+r_plural_strings <- function() {
+  strings <- function(e) {
+    if (is.character(e)) return(e)
+    if (is.call(e) || is.pairlist(e) || is.expression(e)) {
+      return(unlist(lapply(as.list(e), function(x) if (missing(x)) NULL else strings(x))))
+    }
+    if (is.function(e)) return(c(strings(formals(e)), strings(body(e))))
+    NULL
+  }
+  ns <- asNamespace("surveyframe")
+  out <- character(0)
+  for (nm in ls(ns, all.names = TRUE)) {
+    f <- get(nm, envir = ns)
+    if (!is.function(f) || is.primitive(f)) next
+    hit <- grep("[A-Za-z]\\((s|es)\\)", strings(f), value = TRUE)
+    if (length(hit)) out <- c(out, paste0(nm, ": ", hit))
+  }
+  out
+}
+
+test_that("R messages hold no '(s)' plural (Session LF)", {
+  expect_identical(r_plural_strings(), character(0))
+})
+
 # studio_validate_plan_roles() from app.R, parsed without running the app,
 # against a registry of 1 method with a role of at most 1 and 1 of at most 3.
 ui_roles_env <- function() {

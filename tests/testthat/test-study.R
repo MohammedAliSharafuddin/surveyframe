@@ -158,7 +158,11 @@ test_that("Profile B1, B2: a plan objective is checked with no study, as \"\" or
   # A well formed id with no study, or a study with no objectives, is undeclared.
   expect_match(codex_problems(
     '{"analysis_plan":[{"id":"P1","method":"frequency","variables":"q1","objective":"O1"}]}'),
-    "Plan block(s) P1 name objective 'O1', which the study does not declare.", fixed = TRUE)
+    "Plan block P1 names objective 'O1', which the study does not declare.", fixed = TRUE)
+  expect_match(codex_problems(paste0(
+    '{"analysis_plan":[{"id":"P1","method":"frequency","variables":"q1","objective":"O1"},',
+    '{"id":"P2","method":"frequency","variables":"q1","objective":"O1"}]}')),
+    "Plan blocks P1, P2 name objective 'O1', which the study does not declare.", fixed = TRUE)
   expect_match(codex_problems(
     '{"study":{"problem":"Why?"},"analysis_plan":[{"id":"P1","method":"frequency","variables":"q1","objective":"O1"}]}'),
     "which the study does not declare", fixed = TRUE)

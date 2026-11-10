@@ -109,7 +109,7 @@ print.sframe_validation <- function(x, ...) {
               if (isTRUE(x$valid)) {
                 "valid"
               } else {
-                sprintf("%d problem(s) found", x$n_problems)
+                paste(sframe_count_noun(x$n_problems, "problem"), "found")
               }))
   n_checks <- nrow(x$checks)
   n_failed <- sum(x$checks$status == "problem")
@@ -134,11 +134,11 @@ print.sframe_validation <- function(x, ...) {
 #' @exportS3Method format sframe_validation
 format.sframe_validation <- function(x, ...) {
   sprintf(
-    "<sframe validation: %s | %s | %d problem(s) across %d check(s)>",
+    "<sframe validation: %s | %s | %s across %s>",
     x$title %||% "(untitled)",
     if (isTRUE(x$valid)) "valid" else "invalid",
-    x$n_problems,
-    nrow(x$checks)
+    sframe_count_noun(x$n_problems, "problem"),
+    sframe_count_noun(nrow(x$checks), "check")
   )
 }
 

@@ -192,7 +192,7 @@ sframe_reference_targets <- function(x, id) {
   bad <- x[!grepl(sframe_reference_target_pattern, x)]
   if (length(bad)) {
     sframe_abort_validation(paste0(
-      "Reference '", id, "' has cited_by target(s) ", paste0("'", bad, "'", collapse = ", "),
+      "Reference '", id, "' has cited_by ", sframe_plural(length(bad), "target"), " ", paste0("'", bad, "'", collapse = ", "),
       ". Use 'instrument', 'item:<id>', 'scale:<id>', 'plan:<block id>', 'model:<id>', ",
       "'hypothesis:<block id>' or 'study'."
     ))
@@ -640,9 +640,9 @@ sframe_reference_problems <- function(instrument) {
   problems <- character(0)
   ids <- vapply(refs, function(r) as.character(r$id %||% ""), character(1))
   bad <- ids[!grepl(sframe_reference_id_pattern, ids)]
-  if (length(bad)) problems <- c(problems, paste0("Invalid reference id(s): ", paste0("'", bad, "'", collapse = ", "), "."))
+  if (length(bad)) problems <- c(problems, paste0("Invalid reference ", sframe_plural(length(bad), "id"), ": ", paste0("'", bad, "'", collapse = ", "), "."))
   dup <- unique(ids[duplicated(ids)])
-  if (length(dup)) problems <- c(problems, paste0("Duplicate reference id(s): ", paste(dup, collapse = ", "), "."))
+  if (length(dup)) problems <- c(problems, paste0("Duplicate reference ", sframe_plural(length(dup), "id"), ": ", paste(dup, collapse = ", "), "."))
   for (r in refs) {
     if (!nzchar(trimws(as.character(r$title %||% "")))) problems <- c(problems, paste0("Reference '", r$id, "' has no title."))
   }

@@ -110,8 +110,8 @@ sframe_instrument <- function(
     sframe_abort_validation(
       paste0(
         "All components must be created by the sf_ constructor family. ",
-        length(unknown),
-        " unrecognised component(s) found."
+        sframe_count_noun(length(unknown), "unrecognised component"),
+        " found."
       ),
       instrument_title = title
     )
