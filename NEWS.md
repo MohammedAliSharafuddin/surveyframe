@@ -806,6 +806,13 @@ style.
   last digit. Export now writes the files, reads them back and computes the
   record from those, as the check does. A changed response still turns the
   check `FALSE`.
+* **Messages count in words.** Every message, warning, error and printed
+  summary from the R functions says "1 item" and "2 items", "There is 1
+  weight" and "There are 3 weights", where 68 places wrote "item(s)" or
+  "criterion/criteria". A list of ids takes the noun its length needs:
+  "Plan block P1 names objective 'O1'" and "Plan blocks P1, P2 name
+  objective 'O1'". A test walks every string in the package's functions and
+  fails on a new "(s)".
 * **Every report has a results record and a manifest beside it.**
   `render_report()` writes `<name>_results.json`, the plan results as
   canonical JSON, and `<name>_manifest.json`, the sha256 of the instrument

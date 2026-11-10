@@ -109,13 +109,15 @@ sframe_sensitivity_analysis <- function(x,
     weights, names(weights), criteria, "`weights`"))
   if (length(weights) != n_criteria) {
     sframe_abort_validation(sprintf(
-      "`weights` has %d value(s) for %d criteria.", length(weights), n_criteria
+      "`weights` has %s for %s.", sframe_count_noun(length(weights), "value"),
+      sframe_count_noun(n_criteria, "criterion", "criteria")
     ))
   }
   if (length(criteria_types) != n_criteria) {
     sframe_abort_validation(sprintf(
-      "`criteria_types` has %d value(s) for %d criteria.",
-      length(criteria_types), n_criteria
+      "`criteria_types` has %s for %s.",
+      sframe_count_noun(length(criteria_types), "value"),
+      sframe_count_noun(n_criteria, "criterion", "criteria")
     ))
   }
   if (!is.numeric(delta) || length(delta) != 1L || is.na(delta) ||

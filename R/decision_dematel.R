@@ -25,8 +25,8 @@ sframe_check_dematel_input <- function(x) {
   }
   if (nrow(x) != ncol(x)) {
     return(list(error = sprintf(
-      "The influence matrix must be square. Got %d row(s) and %d column(s).",
-      nrow(x), ncol(x)
+      "The influence matrix must be square. Got %s and %s.",
+      sframe_count_noun(nrow(x), "row"), sframe_count_noun(ncol(x), "column")
     )))
   }
   if (nrow(x) < 2) {
@@ -160,10 +160,10 @@ sframe_resolve_dematel_matrix <- function(data, roles, options, instrument) {
     if (length(criteria) == 0) criteria <- paste0("C", seq_len(ncol(m)))
     if (length(criteria) != nrow(m) || length(criteria) != ncol(m)) {
       return(list(error = sprintf(
-        paste0("`options$criteria` names %d criterion/criteria but ",
+        paste0("`options$criteria` names %s but ",
                "`options$matrix` is %d x %d. DEMATEL needs a square matrix ",
                "with one row and one column per criterion."),
-        length(criteria), nrow(m), ncol(m)
+        sframe_count_noun(length(criteria), "criterion", "criteria"), nrow(m), ncol(m)
       )))
     }
     dimnames(m) <- list(criteria, criteria)

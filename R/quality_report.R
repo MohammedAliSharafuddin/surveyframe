@@ -112,8 +112,8 @@ sframe_timing_report <- function(
     sframe_warn_quality(
       paste0(
         "Timing analysis could not parse timestamps for ",
-        length(parse_fail_rows),
-        " row(s)."
+        sframe_count_noun(length(parse_fail_rows), "row"),
+        "."
       )
     )
   }
@@ -122,8 +122,8 @@ sframe_timing_report <- function(
     sframe_warn_quality(
       paste0(
         "Timing analysis found ",
-        length(negative_rows),
-        " row(s) with negative completion times."
+        sframe_count_noun(length(negative_rows), "row"),
+        " with negative completion times."
       )
     )
   }

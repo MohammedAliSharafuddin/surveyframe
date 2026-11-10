@@ -107,7 +107,7 @@ test_that("allow_other is refused on a set holding the value other or other_text
   for (v in c("other", "other_text")) {
     expect_error(sframe_choice_set("src", c("web", v), c("Website", "Something"),
                                    allow_other = TRUE),
-                 paste0('reserves the value\\(s\\) "', v, '"'),
+                 paste0('reserves the value "', v, '"'),
                  class = "sframe_validation_error")
   }
   expect_s3_class(sframe_choice_set("src", c("web", "other"), c("Website", "Other")),
@@ -116,7 +116,7 @@ test_that("allow_other is refused on a set holding the value other or other_text
   inst$choices[[1]]$values <- c("web", "other")
   res <- validate_sframe(inst, strict = FALSE)
   expect_false(res$valid)
-  expect_true(any(grepl('reserves the value(s) "other"', unlist(res$problems), fixed = TRUE)))
+  expect_true(any(grepl('reserves the value "other"', unlist(res$problems), fixed = TRUE)))
 })
 
 test_that("allow_other is refused on an ordered set", {

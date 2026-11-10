@@ -257,7 +257,7 @@ sframe_require_columns <- function(data, cols, method) {
   cols <- cols[!is.na(cols) & nzchar(cols)]
   missing <- setdiff(cols, colnames(data))
   if (length(missing) > 0) {
-    return(paste0(method, " requires missing column(s): ",
+    return(paste0(method, " requires missing ", sframe_plural(length(missing), "column"), ": ",
                   paste(missing, collapse = ", "), "."))
   }
   NULL
@@ -485,7 +485,8 @@ sframe_missing_data_results <- function(data, instrument = NULL, variables = NUL
         scale_id = scale$id,
         n_items = length(scale$items),
         min_valid = min_valid,
-        missing_rule = paste0("Score when at least ", min_valid, " item(s) are valid."),
+        missing_rule = paste0("Score when at least ", sframe_count_noun(min_valid, "item"),
+                              sframe_plural(min_valid, " is", " are"), " valid."),
         stringsAsFactors = FALSE
       )
     }))
@@ -1030,7 +1031,13 @@ sframe_phi <- function(tbl, chi_sq = NULL) {
 # "1 variable", "3 variables": a count that agrees with its noun. Report
 # sentences read "1 variable(s)" (Ethos request 22).
 sframe_count_noun <- function(n, noun, plural = paste0(noun, "s")) {
-  paste(n, if (identical(as.integer(n), 1L)) noun else plural)
+  paste(n, sframe_plural(n, noun, plural))
+}
+
+# The noun alone, singular for 1, as a list of ids in a message needs it:
+# "unknown item: q1", "unknown items: q1, q2" (Session LF).
+sframe_plural <- function(n, noun, plural = paste0(noun, "s")) {
+  if (identical(as.integer(n), 1L)) noun else plural
 }
 
 # descriptive_stats()'s table with headings a reader expects, as the other

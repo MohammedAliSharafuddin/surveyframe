@@ -361,8 +361,8 @@ sframe_run_electre <- function(data, roles, options, instrument) {
               length(alternatives), ncol(checked$matrix), concordance_threshold,
               discordance_threshold),
       if (isTRUE(fit$kernel_defined)) {
-        sprintf("The kernel contains %d alternative(s): %s.",
-                length(kernel_members), paste(kernel_members, collapse = ", "))
+        sprintf("The kernel contains %s: %s.",
+                sframe_count_noun(length(kernel_members), "alternative"), paste(kernel_members, collapse = ", "))
       } else {
         "The relation contains a cycle, so no unique kernel is defined."
       }

@@ -424,12 +424,12 @@ test_that("every dimension mismatch is named exactly", {
   m <- list(c(1, 2), c(3, 4), c(5, 6))
   expect_error(
     sframe_decision_options(list(matrix = m, alternatives = c("a", "b"))),
-    "names 2 alternative\\(s\\) but `options\\$matrix` has 3 row\\(s\\)",
+    "names 2 alternatives but `options\\$matrix` has 3 rows",
     class = "sframe_validation_error"
   )
   expect_error(
     sframe_decision_options(list(matrix = m, criteria = c("x", "y", "z"))),
-    "names 3 criterion/criteria but `options\\$matrix` has 2 column\\(s\\)",
+    "names 3 criteria but `options\\$matrix` has 2 columns",
     class = "sframe_validation_error"
   )
   expect_error(
