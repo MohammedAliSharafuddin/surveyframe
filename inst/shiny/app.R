@@ -254,16 +254,25 @@ optional_choices <- function(ids, none_label = "(None)") {
   c(stats::setNames("", none_label), choices)
 }
 
+# A table that may be wider than its card scrolls sideways inside a region a
+# keyboard can focus, with a name for assistive technology (WCAG 2.1.1, Codex
+# P1-12). The table itself was the scroll box at 390 px, with nothing in it
+# to focus.
+studio_scroll <- function(table, label) {
+  tags$div(class = "sf-scroll", tabindex = "0", role = "region",
+           `aria-label` = label, table)
+}
+
 table_card <- function(title, headers, rows, empty_label, wide = FALSE) {
   tags$div(class = "card",
     tags$div(class = "card-title", title),
     if (length(rows) == 0) {
       tags$p(class = "hint", empty_label)
     } else {
-      tags$table(class = if (wide) "sf-table sf-table-wide" else "sf-table",
+      studio_scroll(tags$table(class = if (wide) "sf-table sf-table-wide" else "sf-table",
         tags$thead(tags$tr(do.call(tagList, lapply(headers, tags$th)))),
         tags$tbody(rows)
-      )
+      ), title)
     }
   )
 }
@@ -1067,7 +1076,7 @@ studio_ggplot_img <- function(gg, alt = "result chart") {
 # Render a result's $table data frame as the same APA-styled table used
 # elsewhere in the studio, so the results canvas shows the actual numbers
 # instead of just the prose APA string.
-studio_result_table_tag <- function(tbl) {
+studio_result_table_tag <- function(tbl, label = "Result table") {
   if (!is.data.frame(tbl) || nrow(tbl) == 0) {
     return(NULL)
   }
@@ -1081,7 +1090,8 @@ studio_result_table_tag <- function(tbl) {
       tags$td(as.character(cell))
     })))
   })
-  tags$table(class = "sf-table", tags$thead(header), tags$tbody(do.call(tagList, body_rows)))
+  studio_scroll(tags$table(class = "sf-table", tags$thead(header),
+                           tags$tbody(do.call(tagList, body_rows))), label)
 }
 
 # The chart(s) attached to one analysis-plan result: the main chart, plus a
@@ -1396,6 +1406,7 @@ ui <- fluidPage(
         .studio-main .row > [class*='col-'] { width: 100%; float: none; padding-left: 0; padding-right: 0; }
         .opt-row, .stat-row, .screen-head, .flag-row { flex-direction: column; align-items: stretch; }
         .studio-main table { display: block; max-width: 100%; overflow-x: auto; }
+        .studio-main .sf-scroll table { display: table; overflow: visible; }
         .studio-main pre, .studio-main .sf-code { max-width: 100%; overflow-x: auto; }
         .studio-main img, .studio-main iframe, .studio-main svg { max-width: 100%; }
         .studio-main .form-group, .studio-main .shiny-input-container { width: 100% !important; max-width: 100%; }
@@ -1444,6 +1455,11 @@ ui <- fluidPage(
       .stat-box .stat-lbl { font-size: 12px; color: var(--sf-text-3); margin-top: 4px; }
       table.sf-table { width: 100%; border-collapse: collapse; font-size: 14px;
         display: block; overflow-x: auto; max-width: 100%; }
+      /* The scroll region round a table (Codex P1-12): it scrolls, so the
+         table inside it is a table again. */
+      .sf-scroll { max-width: 100%; overflow-x: auto; }
+      .sf-scroll > table, .sf-scroll .shiny-html-output > table, .sf-scroll table.sf-table { display: table; overflow: visible; }
+      .sf-scroll:focus-visible { outline: 2px solid var(--sf-primary); outline-offset: 2px; }
       /* Academic (APA) tables: horizontal rules only, no shading, no vertical lines */
       .sf-table th {
         background: none; text-align: left; padding: 8px 12px;
@@ -1915,7 +1931,7 @@ ui <- fluidPage(
             "Every disclosed change to this instrument, oldest first. Saved into the .sframe file itself once you export it."),
           tags$p(class = "hint", id = "amend_put_back_note",
             "An item dropped under a result can be put back there while this session lasts. After the file is opened again, put the item back in Design, which records it as an amendment."),
-          tags$div(style = "overflow-x:auto", shiny::tableOutput("amendment_log_table"))
+          studio_scroll(shiny::tableOutput("amendment_log_table"), "Amendment log")
         )
       ),
 
@@ -3538,7 +3554,8 @@ server <- function(input, output, session) {
 
       tags$div(class = "card",
         tags$div(class = "card-title", paste0(scale$label, " (", scale$scale_id, ")")),
-        tags$table(class = "sf-table", tags$tbody(rows))
+        studio_scroll(tags$table(class = "sf-table", tags$tbody(rows)),
+                      paste0(scale$label, " reliability"))
       )
     })
 
@@ -3564,8 +3581,8 @@ server <- function(input, output, session) {
         "The analyses declared in Plan. Load responses and Analyse runs them as declared."
         else "The analyses declared in Plan, run as declared against the loaded responses. A change to the plan now is recorded as a design amendment."),
       if (is.null(tbl)) tags$p(class = "hint", "No analyses are declared yet.")
-      else tags$div(style = "overflow-x:auto",
-        shiny::HTML(shiny::renderTable(tbl, rownames = FALSE)())),
+      else studio_scroll(shiny::HTML(shiny::renderTable(tbl, rownames = FALSE)()),
+                         "Declared plan"),
       tags$a(href = "#", id = "analysis_change_plan", `data-nav` = "plan", class = "btn btn-outline sf-secondary", "Change plan"))
   })
 
@@ -3729,7 +3746,8 @@ server <- function(input, output, session) {
           tagList(
             tags$p(tags$strong("Result: "),
                    result$apa %||% "See the matching section of the report."),
-            studio_result_table_tag(result$table),
+            studio_result_table_tag(result$table,
+                                    paste(studio_rq_heading(i, result$block_id), "result table")),
             # A CFA/SEM/PLS-SEM syntax block has no table or chart: its
             # whole output is the generated syntax text.
             if (!is.null(result$syntax)) tags$pre(class = "sf-code", result$syntax),
@@ -3936,7 +3954,7 @@ server <- function(input, output, session) {
     tags$div(class = "card",
       tags$div(class = "card-title", "Raw responses"),
       tags$p(class = "hint", paste0("Showing the first 200 of ", nrow(resp), " rows.")),
-      tags$div(style = "overflow-x:auto", shiny::tableOutput("studio_raw_table"))
+      studio_scroll(shiny::tableOutput("studio_raw_table"), "Raw responses")
     )
   })
 
@@ -4212,7 +4230,8 @@ server <- function(input, output, session) {
         } else {
           tagList(
             tags$p(tags$strong("Result: "), result$apa %||% ""),
-            studio_result_table_tag(result$table),
+            studio_result_table_tag(result$table,
+                                    paste(studio_rq_heading(i, block_id), "result table")),
             if (!is.null(result$syntax)) tags$pre(class = "sf-code", result$syntax),
             do.call(tagList, plot_tags)
           )

@@ -1500,6 +1500,11 @@ style.
   Open Instrument as the filled primary button and Design as the secondary
   one beside it, where both were outlined and neither stood out as the next
   step (Codex P1-10).
+* A table wider than its card, such as Analyse's declared plan at 390 px,
+  scrolls inside a region a keyboard can focus and a screen reader names,
+  "Declared plan" or "RQ 1 result table". The table itself was the scroll
+  box, with nothing in it to focus, so a keyboard could not scroll it
+  (WCAG 2.1.1, Codex P1-12).
 
 ## Demos
 
