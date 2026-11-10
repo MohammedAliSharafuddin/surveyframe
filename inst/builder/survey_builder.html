@@ -887,7 +887,7 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
              aria-label="Search items" oninput="renderItemList()">
     </div>
   </div>
-  <div class="sb-body" id="itemList" role="listbox" aria-label="Survey items"></div>
+  <div class="sb-body" id="itemList" role="list" aria-label="Survey items"></div>
   <div class="sb-footer">
     <!-- 1 primary, "+ Add question", opens a menu of question types, a
          section break and a branching rule (UI-3 item 4). Choice sets,
@@ -4776,14 +4776,14 @@ var TB={likert:'b-li',single_choice:'b-si',multiple_choice:'b-mu',numeric:'b-nu'
 function renderItemList(){
   var el=document.getElementById('itemList'),q=(gv('itemSearch')||'').toLowerCase();
   var items=S.items.filter(function(i){return!q||(i.label||'').toLowerCase().includes(q)||(i.id||'').toLowerCase().includes(q);});
-  // role="listbox" requires every child to be an option, which is what a
-  // question row is: choosing one opens it for editing, so it reports
-  // aria-selected. The empty state is a panel of guidance and no list of
-  // anything, so the role is dropped while it is showing and restored once
-  // there are items. Without this, an empty survey fails WCAG's
-  // aria-required-children, which axe rates critical, and a screen reader
-  // announces a list containing nothing it can describe.
-  if(!items.length){el.removeAttribute('role');}else{el.setAttribute('role','listbox');}
+  // A list of listitems. Each row holds its own Move, Duplicate and Delete
+  // buttons, and an option's children are presentational, so a listbox of
+  // options hid them and axe reported nested-interactive (Codex P1-11). The
+  // row chosen for editing carries aria-current. The empty state is a panel
+  // of guidance and no list of anything, so the role is dropped while it is
+  // showing and restored once there are items. Without this, an empty survey
+  // fails WCAG's aria-required-children, which axe rates critical.
+  if(!items.length){el.removeAttribute('role');}else{el.setAttribute('role','list');}
   if(!items.length){el.innerHTML='<div class="sb-empty"><div class="sb-empty-ic" aria-hidden="true">&#128196;</div><div class="sb-empty-t">No questions yet</div><div class="sb-empty-b">'+(settingsSaved?'Use "+ Add question" below to choose a question type.':'Start with Survey settings above, then add your first question.')+'</div></div>';return;}
   var cp=null;
   el.innerHTML=screenRow('__welcome')+items.map(function(item){
@@ -4803,7 +4803,7 @@ function renderItemList(){
     // it used to be a plain div with a click handler and no keyboard route to
     // selecting a question for editing. Ordering gains explicit named buttons,
     // since drag handlers alone leave a keyboard user with no way to reorder.
-    return pd+'<div class="ic'+(selId===item.id?' sel':'')+'" role="option" tabindex="0" aria-selected="'+(selId===item.id?'true':'false')+'" draggable="true" data-idx="'+ri+'" data-id="'+esc(item.id)+'" onclick="selItem(\''+item.id+'\')" onkeydown="itemRowKey(event,\''+item.id+'\','+ri+')" ondragstart="dStart(event,'+ri+')" ondragover="dOver(event,'+ri+',event)" ondrop="dDrop(event,'+ri+')" ondragleave="this.classList.remove(\'drag-t\',\'drag-b\')"><div class="ic-h" title="Drag to reorder" aria-hidden="true">&#8942;</div><div class="ic-body"><div class="'+lc+'">'+esc(item.label||'(no label)')+'</div><div class="ic-meta">'+bgs.join('')+'</div></div><div class="ic-acts"><button type="button" class="ib" title="Move up" aria-label="Move question up" onclick="event.stopPropagation();moveItemBy('+ri+',-1)">&#8593;</button><button type="button" class="ib" title="Move down" aria-label="Move question down" onclick="event.stopPropagation();moveItemBy('+ri+',1)">&#8595;</button><button type="button" class="ib" title="Duplicate" aria-label="Duplicate question" onclick="event.stopPropagation();dupItem(\''+item.id+'\')">&#10697;</button><button type="button" class="ib del" title="Delete" aria-label="Delete question" onclick="event.stopPropagation();delItem(\''+item.id+'\')">&#128465;</button></div></div>';
+    return pd+'<div class="ic'+(selId===item.id?' sel':'')+'" role="listitem" tabindex="0"'+(selId===item.id?' aria-current="true"':'')+' draggable="true" data-idx="'+ri+'" data-id="'+esc(item.id)+'" onclick="selItem(\''+item.id+'\')" onkeydown="itemRowKey(event,\''+item.id+'\','+ri+')" ondragstart="dStart(event,'+ri+')" ondragover="dOver(event,'+ri+',event)" ondrop="dDrop(event,'+ri+')" ondragleave="this.classList.remove(\'drag-t\',\'drag-b\')"><div class="ic-h" title="Drag to reorder" aria-hidden="true">&#8942;</div><div class="ic-body"><div class="'+lc+'">'+esc(item.label||'(no label)')+'</div><div class="ic-meta">'+bgs.join('')+'</div></div><div class="ic-acts"><button type="button" class="ib" title="Move up" aria-label="Move question up" onclick="event.stopPropagation();moveItemBy('+ri+',-1)">&#8593;</button><button type="button" class="ib" title="Move down" aria-label="Move question down" onclick="event.stopPropagation();moveItemBy('+ri+',1)">&#8595;</button><button type="button" class="ib" title="Duplicate" aria-label="Duplicate question" onclick="event.stopPropagation();dupItem(\''+item.id+'\')">&#10697;</button><button type="button" class="ib del" title="Delete" aria-label="Delete question" onclick="event.stopPropagation();delItem(\''+item.id+'\')">&#128465;</button></div></div>';
   }).join('')+screenRow('__thankyou');
 }
 function selItem(id){selId=id;renderItemList();openInsp(id);}
@@ -4887,7 +4887,7 @@ var SCREEN_CHECK={'s-wreq':true,'s-tydl':true};
 var screenShown={};
 function screenRow(id){
   var s=SCREENS[id],on=selId===id;
-  return '<div class="ic ic-screen'+(on?' sel':'')+'" role="option" tabindex="0" aria-selected="'+(on?'true':'false')+'" data-id="'+id+'" onclick="selItem(\''+id+'\')" onkeydown="itemRowKey(event,\''+id+'\',-1)">'
+  return '<div class="ic ic-screen'+(on?' sel':'')+'" role="listitem" tabindex="0"'+(on?' aria-current="true"':'')+' data-id="'+id+'" onclick="selItem(\''+id+'\')" onkeydown="itemRowKey(event,\''+id+'\',-1)">'
     +'<div class="ic-body"><div class="ic-lbl blk">'+s.label+'</div><div class="ic-meta"><span class="badge b-nu">'+s.hint+'</span></div></div></div>';
 }
 function screenVal(fid){

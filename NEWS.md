@@ -1505,6 +1505,11 @@ style.
   "Declared plan" or "RQ 1 result table". The table itself was the scroll
   box, with nothing in it to focus, so a keyboard could not scroll it
   (WCAG 2.1.1, Codex P1-12).
+* The builder's question rows are list items in a list, and the question
+  open for editing is marked `aria-current`. Each row was a focusable
+  listbox option holding its own Move, Duplicate and Delete buttons, which
+  an option hides from assistive technology (WCAG 4.1.2, Codex P1-11).
+  Enter, Space, the arrow keys and Alt with an arrow work as before.
 
 ## Demos
 

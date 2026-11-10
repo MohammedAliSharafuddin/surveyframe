@@ -25,8 +25,10 @@ test_that("16: a question row can be reached and chosen by keyboard", {
   # focusable, and Enter or Space chooses it
   expect_match(row, 'tabindex="0"', fixed = TRUE)
   expect_match(row, "onkeydown=", fixed = TRUE)
-  # the chosen row says so, rather than relying on colour alone
-  expect_match(row, "aria-selected=", fixed = TRUE)
+  # the chosen row says so, rather than relying on colour alone, with
+  # aria-current, since a listitem takes no aria-selected (Codex P1-11)
+  expect_match(row, "aria-current", fixed = TRUE)
+  expect_false(grepl("aria-selected", row, fixed = TRUE))
 })
 
 test_that("16: the key handler selects on Enter and Space and moves with arrows", {
@@ -71,11 +73,13 @@ test_that("17: a modal takes focus and gives it back", {
 
 test_that("16: the list and its rows are a matching pair of roles", {
   src <- builder_source()
-  # a listbox of options, which is what aria-required-children wants and what
-  # aria-selected belongs to. The file already guarded this for role="list".
-  expect_match(src, 'id="itemList" role="listbox"', fixed = TRUE)
-  expect_match(src, "el.setAttribute('role','listbox')", fixed = TRUE)
-  expect_false(grepl('role="listitem"', src, fixed = TRUE))
+  # a list of listitems. A listbox of options held the rows' Move, Duplicate
+  # and Delete buttons inside each option, and an option's children are
+  # presentational, so axe reported nested-interactive (Codex P1-11).
+  expect_match(src, 'id="itemList" role="list"', fixed = TRUE)
+  expect_match(src, "el.setAttribute('role','list')", fixed = TRUE)
+  expect_false(grepl("role=\"option\" tabindex=\"0\"", src, fixed = TRUE))
+  expect_false(grepl("setAttribute('role','listbox')", src, fixed = TRUE))
   # and the empty state still drops the role, since it holds no options
   expect_match(src, "el.removeAttribute('role')", fixed = TRUE)
 })
