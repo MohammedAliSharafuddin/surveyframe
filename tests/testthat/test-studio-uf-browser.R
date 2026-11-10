@@ -109,4 +109,34 @@ test_that("with no instrument, the 9 empty screens offer Open Instrument filled 
   }
 })
 
+# Elements in Studio's document that scroll sideways (wider content than
+# box, overflow-x auto or scroll) with neither a tabindex of their own nor a
+# focusable child, so a keyboard cannot scroll them: axe's
+# scrollable-region-focusable rule (WCAG 2.1.1). A region that can be
+# focused must also have a role and a name.
+uf_scroll_js <- "(function(){
+  var out = [], foc = 'a[href], button, input, select, textarea, [tabindex]:not([tabindex=\\'-1\\'])';
+  document.querySelectorAll('#studio-main *, .studio-main *').forEach(function(el){
+    var cs = getComputedStyle(el);
+    if (el.offsetParent === null || !/(auto|scroll)/.test(cs.overflowX)) return;
+    if (el.scrollWidth <= el.clientWidth + 1) return;
+    var id = el.tagName.toLowerCase() + (el.id ? '#' + el.id : '') + '.' + String(el.className).trim().split(/\\s+/).join('.');
+    if (el.getAttribute('tabindex') === '0') {
+      if (el.getAttribute('role') !== 'region' || !el.getAttribute('aria-label')) out.push('unnamed ' + id);
+    } else if (!el.querySelector(foc)) out.push(id);
+  });
+  return Array.from(new Set(out)).join('|');
+})()"
+
+test_that("every sideways-scrolling region in Studio can take keyboard focus and is named, at 1280 and 390 px (P1-12)", {
+  for (w in uf_widths) {
+    b <- ui1_studio("two_group", width = w, height = 900)
+    for (screen in setdiff(sframe_studio_screens(), "design")) {
+      expect_true(ui1_screen(b, screen), info = screen)
+      Sys.sleep(if (screen == "analysis") 6 else 1)
+      expect_identical(ui2_js(b, uf_scroll_js), "", info = paste(w, screen))
+    }
+  }
+})
+
 ui1_close()
