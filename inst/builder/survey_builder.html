@@ -1220,7 +1220,7 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
       <div class="field"><label class="fl" for="ck-type">Type</label><div class="fc"><select id="ck-type"><option value="attention">Attention</option><option value="instructional">Instructional</option><option value="trap">Trap</option></select></div></div>
       <div class="field"><label class="fl" for="ck-fail">Fail action</label><div class="fc"><select id="ck-fail"><option value="flag">Flag respondent</option><option value="exclude">Exclude from analysis</option></select></div></div>
     </div>
-    <div class="field"><label class="fl" for="ck-pass">Correct answer(s), comma-separated</label><div class="fc"><input type="text" id="ck-pass" placeholder="e.g. 4 or yes"></div></div>
+    <div class="field"><label class="fl" for="ck-pass">Correct answers, comma-separated</label><div class="fc"><input type="text" id="ck-pass" placeholder="e.g. 4 or yes"></div></div>
     <div class="field"><label class="fl" for="ck-lbl">Label</label><div class="fc"><input type="text" id="ck-lbl" placeholder="Attention check 1"></div></div>
   </div>
   <div class="mfoot"><button type="button" class="btn sf-secondary" onclick="closeModal('m-check')">Cancel</button><div class="sp"></div><button type="button" class="btn sf-primary" onclick="saveCheck()">Save check</button></div>
@@ -3873,6 +3873,8 @@ function ra(){renderItemList();renderAnalyse();updSave();document.getElementById
 // The header row's document line: the title and the version.
 function updDoc(){var d=document.getElementById('tbDoc');if(d)d.textContent=(S.meta.title||'Untitled Survey')+(S.meta.version?' ('+S.meta.version+')':'');}
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+// "1 scale", "0 scales": a count and its noun, singular for 1 only (Codex P1-08).
+function countNoun(n,one,many){return n+' '+(Number(n)===1?one:(many||one+'s'));}
 function gv(id){return(document.getElementById(id)||{}).value||'';}
 function sv(id,v){var e=document.getElementById(id);if(e)e.value=v||'';}
 
@@ -5640,7 +5642,7 @@ function asArr(x){return x==null?[]:(Array.isArray(x)?x:[x]);}
 function flattenRoles(roles){if(roles&&!Array.isArray(roles)&&typeof roles==='object'){var out=[];Object.keys(roles).forEach(function(k){var v=roles[k];if(Array.isArray(v))out=out.concat(v);else if(v)out.push(v);});return Array.from(new Set(out));}return [];}
 function validatePlanRoles(){
   var method=document.getElementById('rq-test').value,reg=ANALYSIS_REGISTRY[method]||{},roles=collectRoles(),msgs=[];
-  (reg.roles||[]).forEach(function(role){var vals=roles[role.id];var n=Array.isArray(vals)?vals.filter(Boolean).length:(vals?1:0);if(n<role.min)msgs.push('Select '+role.min+' '+role.label.toLowerCase()+'.');if(role.max&&n>role.max)msgs.push(role.label+' allows at most '+role.max+' variable(s).');});
+  (reg.roles||[]).forEach(function(role){var vals=roles[role.id];var n=Array.isArray(vals)?vals.filter(Boolean).length:(vals?1:0);if(n<role.min)msgs.push('Select '+role.min+' '+role.label.toLowerCase()+'.');if(role.max&&n>role.max)msgs.push(role.label+' allows at most '+countNoun(role.max,'variable')+'.');});
   // A variable may fill only one role per plan: X = Y correlations, a
   // dependent variable reused as predictor, or grouping = outcome are all
   // meaningless analyses and are blocked here.
@@ -5845,7 +5847,7 @@ function renderModelBuilder(){
   var model=currentModel(),constructs=model&&model.measurement?model.measurement.constructs||[]:[];
   var opts=constructs.map(function(c){return'<option value="'+esc(c.id)+'">'+esc(c.id)+'</option>';}).join('');
   from.innerHTML=opts;to.innerHTML=opts;
-  list.innerHTML=models.length?models.map(function(m){var paths=(m.structural&&m.structural.paths)||[];return'<div class="model-row"><strong>'+esc(m.id)+'</strong> <span class="vbadge">'+esc(m.type||'model')+'</span><div>'+esc((m.measurement&&m.measurement.constructs||[]).length)+' construct(s), '+esc(paths.length)+' path(s)</div><div class="model-paths">'+(paths.length?paths.map(function(p){return'<span class="vchip">'+esc(p.from+' -> '+p.to)+'</span>';}).join(''):'<span class="rq-no-int">No paths yet.</span>')+'</div></div>';}).join(''):'<div class="rq-no-int">No saved models yet.</div>';
+  list.innerHTML=models.length?models.map(function(m){var paths=(m.structural&&m.structural.paths)||[];return'<div class="model-row"><strong>'+esc(m.id)+'</strong> <span class="vbadge">'+esc(m.type||'model')+'</span><div>'+countNoun((m.measurement&&m.measurement.constructs||[]).length,'construct')+', '+countNoun(paths.length,'path')+'</div><div class="model-paths">'+(paths.length?paths.map(function(p){return'<span class="vchip">'+esc(p.from+' -> '+p.to)+'</span>';}).join(''):'<span class="rq-no-int">No paths yet.</span>')+'</div></div>';}).join(''):'<div class="rq-no-int">No saved models yet.</div>';
 }
 // Inline interpretation editing in Expected outputs. The decision rule is
 // declared in the RQ modal and shown here read-only. This writes the
@@ -5868,7 +5870,7 @@ function reportSkeletonHtml(plans){
   out+='<div class="rs-title">'+esc(S.meta.title||'Untitled Survey')+'</div>';
   out+='<div class="rs-meta">Version '+esc(S.meta.version||'1.0.0')+(S.meta.authors?' · '+esc(S.meta.authors):'')+' · generated by <code>render_report()</code> in R</div>';
   out+='<div class="rs-h2">1. Data quality</div><div class="rs-p">Completion, straight-lining, attention checks, and missingness summaries appear here once responses are collected.</div>';
-  out+='<div class="rs-h2">2. Descriptives and reliability</div><div class="rs-p">'+(S.scales.length?S.scales.length+' scale(s): scale descriptives, Cronbach alpha, and McDonald omega tables with their charts.':'No scales defined yet. Scale descriptives and reliability appear here once items are grouped into scales.')+'</div>';
+  out+='<div class="rs-h2">2. Descriptives and reliability</div><div class="rs-p">'+(S.scales.length?countNoun(S.scales.length,'scale')+': scale descriptives, Cronbach alpha, and McDonald omega tables with their charts.':'No scales defined yet. Scale descriptives and reliability appear here once items are grouped into scales.')+'</div>';
   out+='<div class="rs-h2">3. Analysis plan results</div>';
   plans.forEach(function(rq,i){
     var method=rq.method||rq.test;
@@ -5886,7 +5888,7 @@ function reportSkeletonHtml(plans){
     if(rq.result)out+='<div class="rs-interp"><label class="rs-interp-lbl" for="rsInterp_'+i+'">Interpretation</label><textarea id="rsInterp_'+i+'" rows="2" placeholder="State what the result means for the research question." oninput="updatePlanInterp(\''+rq.id+'\',this.value)">'+esc(interpOf(rq))+'</textarea></div>';
   });
   out+='<div class="rs-h2">4. Measurement models</div>';
-  if(S.models&&S.models.length){S.models.forEach(function(m){out+='<div class="rs-p"><strong>'+esc(m.id||m.label||'Model')+'</strong> ('+esc(m.type||'model')+', '+((m.measurement&&m.measurement.constructs)?m.measurement.constructs.length:0)+' construct(s)): generated lavaan/seminr syntax is printed in this section.</div>';});}
+  if(S.models&&S.models.length){S.models.forEach(function(m){out+='<div class="rs-p"><strong>'+esc(m.id||m.label||'Model')+'</strong> ('+esc(m.type||'model')+', '+countNoun((m.measurement&&m.measurement.constructs)?m.measurement.constructs.length:0,'construct')+'): generated lavaan/seminr syntax is printed in this section.</div>';});}
   else{out+='<div class="rs-p">No models saved yet. Use the Model Builder on the right to add a CFA or SEM model.</div>';}
   var refs={};plans.forEach(function(rq){asArr(rq.reporting_references).concat(asArr(rq.citations)).forEach(function(k){if(CSHORT[k])refs[k]=CSHORT[k];});});
   var refKeys=Object.keys(refs);
@@ -5915,7 +5917,7 @@ function renderAnalyse(){
   var cardHtml=function(plans){return plans.map(function(rq,i){var method=rq.method||rq.test,reg=ANALYSIS_REGISTRY[method]||{},alpha=(rq.options&&rq.options.alpha)||rq.alpha,vars=asArr(rq.variables);if(!vars.length)vars=flattenRoles(rq.roles||{});var refs=asArr(rq.reporting_references);if(!refs.length)refs=asArr(rq.citations);var drg=draggable?' draggable="true" ondragstart="pStart(event,\''+rq.id+'\')" ondragover="pOver(event,\''+rq.id+'\')" ondrop="pDrop(event,\''+rq.id+'\')" ondragend="pEnd(event)" ondragleave="this.classList.remove(\'drag-t\',\'drag-b\')"':'';return'<div class="rq-card'+(draggable?' rq-drag':'')+'"'+drg+' onclick="openRQModal(\''+rq.id+'\')"><div style="display:flex;align-items:flex-start;gap:8px"><span class="rq-num"'+(draggable?' title="Drag to reorder"':'')+'>'+(i+1)+'</span><div style="flex:1"><div class="rq-q">'+esc(rq.research_question)+'</div><div class="rq-meta"><span class="tc">'+esc(TLBLS[method]||method)+'</span>'+(reg.showAlpha?'<span class="ac">significance='+esc(alpha||0.05)+'</span>':'')+(rq.status?'<span class="ac">'+esc(rq.status)+'</span>':'')+refs.map(function(k){return'<span class="cc">'+esc(CSHORT[k]||k)+'</span>';}).join('')+'</div>'+(vars.length?'<div style="margin-top:6px;display:flex;gap:3px;flex-wrap:wrap">'+vars.map(function(v){return'<span class="vchip">'+esc(v)+'</span>';}).join('')+'</div>':'')+(hypLines(rq)?'<div class="rq-interp">'+hypLines(rq)+'</div>':'')+(ruleOf(rq)?'<div class="rq-interp">'+esc(ruleOf(rq))+'</div>':'<div class="rq-no-int">Decision rule pending.</div>')+'</div></div></div>';}).join('');};
   if(anTab==='run'){
     rb.innerHTML=cardHtml(runPlans);
-    if(syntaxOnly.length)rb.innerHTML+='<div style="padding:8px 12px;font-size:11px;color:var(--t3);border-top:1px solid var(--bdr);margin-top:4px">'+syntaxOnly.length+' syntax-only method(s) excluded. These generate lavaan or seminr strings without requiring response data.</div>';
+    if(syntaxOnly.length)rb.innerHTML+='<div style="padding:8px 12px;font-size:11px;color:var(--t3);border-top:1px solid var(--bdr);margin-top:4px">'+countNoun(syntaxOnly.length,'syntax-only method')+' excluded. These generate lavaan or seminr strings without requiring response data.</div>';
   }else if(anTab==='report'){
     rb.innerHTML=reportSkeletonHtml(allPlans);
     allPlans.forEach(function(rq,i){citeAttach('rsInterp_'+i,'Interpretation');});
@@ -5923,9 +5925,9 @@ function renderAnalyse(){
     rb.innerHTML=cardHtml(allPlans);
   }
   var op=document.getElementById('anOutputPreview');if(op){
-    if(anTab==='plan')op.innerHTML='<strong>Plan</strong><br>'+allPlans.length+' research question(s) declared before data collection. '+runPlans.length+' require response data. '+syntaxOnly.length+' generate syntax only.';
-    else if(anTab==='run')op.innerHTML='<strong>Run</strong><br>'+runPlans.length+' item(s) will execute when you call <code>run_analysis_plan(instr,&nbsp;responses)</code> in R.'+(syntaxOnly.length?' '+syntaxOnly.length+' syntax-only item(s) skipped.':'');
-    else op.innerHTML='<strong>Report</strong><br>'+allPlans.length+' analysis section(s) and '+(S.models?S.models.length:0)+' model section(s) will appear in <code>render_report()</code> output.';
+    if(anTab==='plan')op.innerHTML='<strong>Plan</strong><br>'+countNoun(allPlans.length,'research question')+' declared before data collection. '+runPlans.length+(runPlans.length===1?' requires':' require')+' response data. '+syntaxOnly.length+(syntaxOnly.length===1?' generates':' generate')+' syntax only.';
+    else if(anTab==='run')op.innerHTML='<strong>Run</strong><br>'+countNoun(runPlans.length,'item')+' will execute when you call <code>run_analysis_plan(instr,&nbsp;responses)</code> in R.'+(syntaxOnly.length?' '+countNoun(syntaxOnly.length,'syntax-only item')+' skipped.':'');
+    else op.innerHTML='<strong>Report</strong><br>'+countNoun(allPlans.length,'analysis section')+' and '+countNoun(S.models?S.models.length:0,'model section')+' will appear in <code>render_report()</code> output.';
   }
 }
 
