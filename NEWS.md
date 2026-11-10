@@ -960,6 +960,14 @@ style.
   are all numbers are read as numbers, so the codes 1 and 1.0, or 2 and 02,
   became one option, and `sframe_export_labelled()` then failed on duplicate
   labels.
+* **`print()`, `format()` and `summary()` of an instrument check it before
+  they give its status**, as Studio's Open Instrument does. They read the
+  stored `validated` flag, which an edit after validation can leave stale,
+  so a valid instrument could print "not validated" and a broken one
+  "valid". The status is now "valid", or "invalid" with the number of
+  problems and a pointer to `validate_sframe(x, strict = FALSE)`. Counts are
+  in words, "1 block" and "2 analysis blocks", never "block(s)"
+  (coordinator, UF follow-up 1).
 
 ## Documentation
 

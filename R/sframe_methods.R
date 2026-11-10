@@ -1,10 +1,24 @@
 # sframe_methods.R
 # S3 methods for the sframe class.
 
+# The status print(), format() and summary() show, from validate_sframe()
+# run on the object as Studio's Open Instrument does, never the stored
+# meta$validated, which is a cache that a later edit can leave stale. short
+# = TRUE drops the pointer to the problem list, for format().
+sframe_status_text <- function(x, short = FALSE) {
+  check <- tryCatch(validate_sframe(x, strict = FALSE),
+                    error = function(e) list(valid = FALSE, problems = conditionMessage(e)))
+  n <- length(as.character(check$problems %||% character(0)))
+  if (isTRUE(check$valid) && n == 0) return("valid")
+  out <- paste0("invalid, ", sframe_count_noun(max(n, 1L), "problem"))
+  if (short) out else paste0(out, ". validate_sframe(x, strict = FALSE) lists them")
+}
+
 #' Print an sframe instrument object
 #'
 #' Displays a compact summary of an `sframe` instrument object, showing
-#' the title, version, item count, scale count, and validation status.
+#' the title, version, item count, scale count, and validation status. The
+#' status comes from [validate_sframe()] run on `x`, not from a stored flag.
 #'
 #' @param x An object of class `sframe`.
 #' @param ... Ignored. Present for S3 consistency.
@@ -21,16 +35,16 @@ print.sframe <- function(x, ...) {
   n_items  <- length(x$items)
   n_scales <- length(x$scales)
   n_plan   <- length(x$analysis_plan)
-  status   <- if (isTRUE(x$meta$validated)) "valid" else "not validated"
+  status   <- sframe_status_text(x)
 
   cat(
     sprintf(
-      "<sframe>\n  Title:      %s\n  Version:    %s\n  Items:      %d\n  Scales:     %d\n  Analysis:   %d block(s)\n  Status:     %s\n",
+      "<sframe>\n  Title:      %s\n  Version:    %s\n  Items:      %d\n  Scales:     %d\n  Analysis:   %s\n  Status:     %s\n",
       x$meta$title,
       x$meta$version,
       n_items,
       n_scales,
-      n_plan,
+      sframe_count_noun(n_plan, "block"),
       status
     )
   )
@@ -50,12 +64,13 @@ print.sframe <- function(x, ...) {
 #' @family print, format and summary methods
 format.sframe <- function(x, ...) {
   sprintf(
-    "<sframe: %s v%s | %d items | %d scales | %d analysis block(s)>",
+    "<sframe: %s v%s | %s | %s | %s | %s>",
     x$meta$title,
     x$meta$version,
-    length(x$items),
-    length(x$scales),
-    length(x$analysis_plan)
+    sframe_count_noun(length(x$items), "item"),
+    sframe_count_noun(length(x$scales), "scale"),
+    sframe_count_noun(length(x$analysis_plan), "analysis block"),
+    sframe_status_text(x, short = TRUE)
   )
 }
 
@@ -96,7 +111,7 @@ summary.sframe <- function(object, ...) {
   cat(sprintf("Branches:  %d\n", length(object$branching)))
   cat(sprintf("Checks:    %d\n", length(object$checks)))
   plan <- object$analysis_plan %||% list()
-  cat(sprintf("\nAnalysis plan: %d block(s)\n", length(plan)))
+  cat(sprintf("\nAnalysis plan: %s\n", sframe_count_noun(length(plan), "block")))
   if (length(plan) > 0) {
     methods <- vapply(plan, function(b) {
       as.character(b$method %||% b$test %||% "(unset)")
@@ -105,7 +120,6 @@ summary.sframe <- function(object, ...) {
       cat(sprintf("  %-8s %s\n", plan[[i]]$id %||% sprintf("[%d]", i), methods[i]))
     }
   }
-  cat(sprintf("\nStatus:    %s\n",
-              if (isTRUE(object$meta$validated)) "valid" else "not validated"))
+  cat(sprintf("\nStatus:    %s\n", sframe_status_text(object)))
   invisible(object)
 }
