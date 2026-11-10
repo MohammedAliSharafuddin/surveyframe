@@ -25,7 +25,11 @@ columns are used.}
 \item{weights}{Optional case-weight column.}
 }
 \value{
-An object of class \code{sframe_descriptives_report}.
+An object of class \code{sframe_descriptives_report}. Its \code{table} has
+1 row per variable and group. \code{valid_n} and \code{missing_n} count the
+responses as given. A variable whose responses are not all numbers, such
+as a choice item's category codes, keeps those counts and has \code{NA} in
+every numeric column, since a mean or standard deviation does not apply.
 }
 \description{
 Computes survey descriptives for numeric, Likert, and scale-score columns,

@@ -32,6 +32,31 @@ p1_quarto_html <- function() {
   paste(readLines(out, warn = FALSE), collapse = "\n")
 }
 
+# A table of an HTML report, found by its caption: the heading cells and
+# each body row's cells, as text.
+p1_table <- function(doc, caption) {
+  tables <- regmatches(doc, gregexpr("(?s)<table.*?</table>", doc, perl = TRUE))[[1]]
+  hit <- tables[grepl(caption, tables, fixed = TRUE)]
+  if (!length(hit)) return(NULL)
+  cells_of <- function(row, tag) {
+    m <- regmatches(row, gregexpr(sprintf("(?s)<%s[^>]*>.*?</%s>", tag, tag), row, perl = TRUE))[[1]]
+    trimws(gsub("<[^>]+>", "", m))
+  }
+  rows <- regmatches(hit[1], gregexpr("(?s)<tr.*?</tr>", hit[1], perl = TRUE))[[1]]
+  list(head = cells_of(rows[grepl("<th", rows)][1], "th"),
+       body = lapply(rows[!grepl("<th", rows)], cells_of, tag = "td"))
+}
+
+# The valid and missing counts a table gives one item.
+p1_counts <- function(doc, caption, item) {
+  t <- p1_table(doc, caption)
+  if (is.null(t)) return(NULL)
+  row <- Filter(function(r) item %in% r, t$body)[[1]]
+  valid <- grep("valid", t$head, ignore.case = TRUE)[1]
+  missing <- grep("missing", t$head, ignore.case = TRUE)[1]
+  c(valid = row[valid], missing = row[missing])
+}
+
 # The row of the missing-data patterns table: pattern, n and percent cells.
 p1_complete_row <- function(doc) {
   m <- regmatches(doc, regexpr(
@@ -57,4 +82,38 @@ test_that("P1-01: the built-in report prints Complete case | 60 | 100", {
 
 test_that("P1-01: the Quarto report prints Complete case | 60 | 100", {
   expect_identical(p1_complete_row(p1_quarto_html()), c("60", "100"))
+})
+
+test_that("P1-02: descriptives count a categorical item's answers as valid", {
+  d <- p1_demo()
+  dr <- sframe_descriptives_results(d$data, variables = c("format", "sessions_attended"))
+  fmt <- dr$table[dr$table$variable == "format", ]
+  expect_identical(fmt$valid_n, 60L)
+  expect_identical(fmt$missing_n, 0L)
+  expect_true(is.na(fmt$mean) && is.na(fmt$sd) && is.na(fmt$ci_low))
+  # A numeric item is unchanged.
+  ses <- dr$table[dr$table$variable == "sessions_attended", ]
+  expect_equal(ses$mean, mean(d$data$sessions_attended, na.rm = TRUE))
+  # Text that reads as numbers is still summarised, and a blank is missing.
+  dr2 <- sframe_descriptives_results(data.frame(x = c("1", "2", NA, "4")), "x")
+  expect_identical(dr2$table$valid_n, 3L)
+  expect_equal(dr2$table$mean, 7 / 3)
+})
+
+test_that("P1-02: the built-in report gives format 60 valid, 0 missing in both tables", {
+  doc <- p1_builtin_html()
+  expect_identical(p1_counts(doc, "Item-wise missingness", "format"),
+                   c(valid = "60", missing = "0"))
+  expect_identical(p1_counts(doc, "Descriptive statistics", "format"),
+                   c(valid = "60", missing = "0"))
+  expect_true(grepl("does not apply to an item answered with categories", doc, fixed = TRUE))
+})
+
+test_that("P1-02: the Quarto report gives format 60 valid, 0 missing in both tables", {
+  doc <- p1_quarto_html()
+  expect_identical(p1_counts(doc, "Item-wise missingness", "format"),
+                   c(valid = "60", missing = "0"))
+  expect_identical(p1_counts(doc, "Descriptive statistics", "format"),
+                   c(valid = "60", missing = "0"))
+  expect_true(grepl("does not apply to an item answered with categories", doc, fixed = TRUE))
 })

@@ -686,6 +686,17 @@ style.
   `missing_pct` columns kept for 1 release hold a proportion, as their help
   now says (Codex P1-01).
 
+* **Descriptives count a categorical item's answers as valid.**
+  `sframe_descriptives_results()` turned every value into a number before
+  counting, so category codes such as "online" counted as missing and the
+  report gave a choice item 60 missing and 0 valid beside a missing-data
+  table that said 0 missing. `valid_n` and `missing_n` now count the
+  responses as given. An item whose responses are not all numbers keeps
+  its counts with `NA` in every numeric column, and both report engines
+  print a dash there with a table note. The Quarto report now lists the
+  instrument's items, as the built-in report does, where it had listed
+  every column that held a number (Codex P1-02).
+
 * **Quarto is the report engine, and `render_report()` finds the copy
   RStudio or Positron bundles.** It looked only for `quarto` on the PATH,
   where neither IDE puts its copy, so a machine with RStudio and no separate

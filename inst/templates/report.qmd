@@ -101,6 +101,12 @@ apa_kable <- function(x, ..., caption = NULL, cap = NULL) {
   if (is.null(args$row.names)) args$row.names <- FALSE
   do.call(kable, c(list(x, format = "pipe", caption = caption), args))
 }
+# A table note, as APA 7 sets it: "Note." in italics, below the table.
+apa_note <- function(text) {
+  if (is.null(text) || !nzchar(text)) return(invisible())
+  if (out_html) cat(sprintf("\n<p class=\"tbl-note\"><em>Note.</em> %s</p>\n\n", text))
+  else cat(sprintf("\n*Note.* %s\n\n", text))
+}
 figure_start <- function(html, title) {
   if (out_html) cat("\n", html, "\n\n", sep = "")
   else cat("\n**", title, "**\n\n", sep = "")
@@ -403,11 +409,14 @@ if (is.null(mr)) {
 
 ```{r descriptives, eval=params$include_descriptives && has_data}
 #| output: asis
-dr <- tryCatch(sframe_descriptives_results(responses), error = function(e) NULL)
-if (is.null(dr)) {
+# The instrument's items, with the counts and dashes the built-in engine
+# prints (Codex P1-02), from render_report().
+dr <- content$descriptives
+if (!is.list(dr)) {
   cat("Descriptive statistics could not be computed from the supplied data.\n\n")
 } else {
-  print(apa_kable(sframe_apa_cells(dr$table), caption = "Descriptive statistics"))
+  print(apa_kable(dr$table, caption = "Descriptive statistics"))
+  apa_note(dr$note)
 }
 ```
 
