@@ -1484,6 +1484,11 @@ style.
   Record) and every fold, such as Amendments' "Import an externally
   revised version", are at least 24 px tall, the WCAG 2.5.8 target size.
   The headings were 15.7 px and the import fold 20 px (Codex P1-07).
+* Studio and the builder count in words, "1 respondent" and "0
+  respondents", where Quality printed "0 respondent(s) (0.0%) flagged as
+  too fast" and "0 duplicate response row(s) detected". The same holds for
+  a role's maximum on the Plan screens and the builder's counts of scales,
+  constructs, paths, research questions and report sections (Codex P1-08).
 
 ## Demos
 

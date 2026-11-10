@@ -998,7 +998,7 @@ studio_validate_plan_roles <- function(method, roles) {
       messages <- c(messages, paste0("Select ", role$min, " ", tolower(role$label), "."))
     }
     if (!is.null(role$max) && n > role$max) {
-      messages <- c(messages, paste0(role$label, " allows at most ", role$max, " selection(s)."))
+      messages <- c(messages, paste0(role$label, " allows at most ", sframe_count_noun(role$max, "selection"), "."))
     }
   }
   guidance <- switch(
@@ -3381,9 +3381,9 @@ server <- function(input, output, session) {
         tags$div(class = "card-title", "Completion time"),
         if (isTRUE(qr$timing$available)) {
           tags$p(sprintf(
-            "Median completion %.0f seconds. %d respondent(s) (%.1f%%) flagged as too fast.",
+            "Median completion %.0f seconds. %s (%.1f%%) flagged as too fast.",
             qr$timing$median_sec %||% NA_real_,
-            qr$timing$n_flagged %||% 0L,
+            sframe_count_noun(qr$timing$n_flagged %||% 0L, "respondent"),
             (qr$timing$flag_rate %||% 0) * 100))
         } else {
           tags$p(class = "hint",
@@ -3394,8 +3394,8 @@ server <- function(input, output, session) {
       tags$div(class = "card",
         tags$div(class = "card-title", "Duplicates and missingness"),
         if (isTRUE(qr$duplicates$checked)) {
-          tags$p(sprintf("%d duplicate response row(s) detected.",
-                         qr$duplicates$n_duplicates %||% 0L))
+          tags$p(paste0(sframe_count_noun(qr$duplicates$n_duplicates %||% 0L,
+                                           "duplicate response row"), " detected."))
         } else {
           tags$p(class = "hint",
             "Duplicates were not checked. Name the respondent ID column to check them.")

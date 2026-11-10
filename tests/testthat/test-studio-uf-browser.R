@@ -43,4 +43,18 @@ test_that("the sidebar's fold buttons and every fold summary are at least 24 px 
   }
 })
 
+test_that("Quality counts respondents and rows in words, and no screen shows '(s)' (P1-08)", {
+  b <- ui1_studio("two_group", width = 1280, height = 900)
+  expect_true(ui1_screen(b, "quality"))
+  expect_true(ui2_wait(b, "$('#screen-quality').text().indexOf('flagged as too fast') >= 0", 30))
+  q <- ui2_js(b, "document.getElementById('screen-quality').innerText")
+  expect_match(q, "\\d+ respondents? \\([0-9.]+%\\) flagged as too fast")
+  expect_match(q, "\\d+ duplicate response rows? detected")
+  for (screen in sframe_studio_screens()) {
+    expect_true(ui1_screen(b, screen), info = screen)
+    Sys.sleep(0.5)
+    expect_false(grepl("[a-z]\\(s\\)", ui2_js(b, "document.body.innerText")), info = screen)
+  }
+})
+
 ui1_close()
