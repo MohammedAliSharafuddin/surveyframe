@@ -370,3 +370,40 @@ test_that("P1-05: no word in the Typst PDF overlaps another or crosses the margi
 test_that("P1-05: no word in the LaTeX PDF overlaps another or crosses the margin", {
   p1_expect_no_overlap("latex")
 })
+
+# A float's "Table N" or "Figure N" line and its title share a page with the
+# float (Session UF, the RF follow-up): seen apart at a page foot, Figure 2
+# in Typst and Table 2 in LaTeX. On the head's page, something must follow
+# the title above the foot (the table's heading row, or the chart's own
+# text), or there must be at least 200 pt left below it for a chart drawn
+# as paths. A head whose float went over is the last text on its page.
+p1_expect_heads_kept <- function(to) {
+  w <- p1_words(to)
+  x <- system2("pdftotext", c("-bbox", shQuote(p1_quarto_file(to)), "-"), stdout = TRUE)
+  height <- as.numeric(sub('.*height="([0-9.]+)".*', "\\1", x[grep("<page ", x)][1]))
+  foot <- height - 72
+  w <- w[order(w$page, w$y1, w$x0), ]
+  w$line <- cumsum(c(TRUE, abs(diff(w$y1)) > 2 | diff(w$page) != 0))
+  lines <- do.call(rbind, lapply(split(w, w$line), function(l)
+    data.frame(page = l$page[1], y0 = min(l$y0), y1 = max(l$y1),
+               text = paste(l$word[order(l$x0)], collapse = " "))))
+  heads <- grep("^(Table|Figure) [0-9]+$", lines$text)
+  expect_gt(length(heads), 10)
+  stranded <- character(0)
+  for (i in heads) {
+    title <- i + 1
+    after <- lines[seq_len(nrow(lines)) > title & lines$page == lines$page[i] &
+                     lines$y0 < foot, ]
+    if (!nrow(after) && foot - lines$y1[title] < 200)
+      stranded <- c(stranded, sprintf("%s (page %d)", lines$text[i], lines$page[i]))
+  }
+  expect_identical(stranded, character(0))
+}
+
+test_that("UF: every table and figure number in the Typst PDF shares a page with its float", {
+  p1_expect_heads_kept("typst")
+})
+
+test_that("UF: every table and figure number in the LaTeX PDF shares a page with its float", {
+  p1_expect_heads_kept("latex")
+})
