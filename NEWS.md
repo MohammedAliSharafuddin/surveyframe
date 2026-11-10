@@ -697,6 +697,17 @@ style.
   instrument's items, as the built-in report does, where it had listed
   every column that held a number (Codex P1-02).
 
+* **Every report table heading is set as APA 7 sets it, in every format.**
+  The Quarto report printed raw column names (`missing_n`, `ci_low`,
+  `weighted_mean`) and, in HTML, an unlabelled column of row names. 1 label
+  map now gives both engines their headings: words for counts ("Valid
+  *n*", "Missing proportion"), statistic symbols in italics (*M*, *SD*,
+  *Mdn*, *SE*) and the confidence level in an interval heading ("95% CI
+  lower"). Row names are left out in every format.
+  `sframe_apa_col_labels()`, on the `sframe_apa_cells()` help page, gives
+  those headings for HTML or Markdown. The `n_items` heading reads "Items"
+  (Codex P1-03).
+
 * **Quarto is the report engine, and `render_report()` finds the copy
   RStudio or Positron bundles.** It looked only for `quarto` on the PATH,
   where neither IDE puts its copy, so a machine with RStudio and no separate

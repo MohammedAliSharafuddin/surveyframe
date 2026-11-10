@@ -117,3 +117,43 @@ test_that("P1-02: the Quarto report gives format 60 valid, 0 missing in both tab
                    c(valid = "60", missing = "0"))
   expect_true(grepl("does not apply to an item answered with categories", doc, fixed = TRUE))
 })
+
+# Column names a report must never print as a heading (Codex P1-03).
+p1_raw_names <- c("variable", "group", "valid_n", "missing_n", "missing_prop",
+                  "missing_pct", "sd", "se", "iqr", "ci_low", "ci_high",
+                  "weighted_mean", "scale_id", "n_items", "min_valid",
+                  "missing_rule", "description", "percent", "prop")
+
+p1_headings <- function(doc) {
+  th <- regmatches(doc, gregexpr("(?s)<th[^>]*>.*?</th>", doc, perl = TRUE))[[1]]
+  trimws(gsub("<[^>]+>", "", th))
+}
+
+test_that("P1-03: 1 label map gives the headings, with italic symbols and the CI level", {
+  nm <- c("n", "valid_n", "missing_n", "missing_prop", "mean", "sd", "median",
+          "iqr", "se", "ci_low", "ci_high", "weighted_mean")
+  html <- sframe_apa_col_labels(nm, "html")
+  md <- sframe_apa_col_labels(nm, "markdown")
+  expect_identical(html, c("<em>n</em>", "Valid <em>n</em>", "Missing <em>n</em>",
+                           "Missing proportion", "<em>M</em>", "<em>SD</em>",
+                           "<em>Mdn</em>", "IQR", "<em>SE</em>", "95% CI lower",
+                           "95% CI upper", "Weighted <em>M</em>"))
+  expect_identical(md[c(1, 5, 7, 10)], c("*n*", "*M*", "*Mdn*", "95% CI lower"))
+  expect_identical(sframe_apa_col_labels("ci_low", "markdown", conf_level = 0.9),
+                   "90% CI lower")
+  # The built-in engine's headings come from the same map.
+  expect_identical(surveyframe:::sframe_apa_headings(nm), html)
+})
+
+test_that("P1-03: the built-in report prints no raw column name", {
+  h <- p1_headings(p1_builtin_html())
+  expect_identical(intersect(h, p1_raw_names), character(0))
+  expect_false(any(h == ""))
+})
+
+test_that("P1-03: the Quarto HTML report prints no raw column name or row-name column", {
+  h <- p1_headings(p1_quarto_html())
+  expect_identical(intersect(h, p1_raw_names), character(0))
+  expect_false(any(h == ""))
+  expect_true(all(c("M", "SD", "Mdn", "95% CI lower") %in% h))
+})

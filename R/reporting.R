@@ -1123,8 +1123,7 @@ sframe_clean_interpretations <- function(interpretations) {
         "<h2>Missing Data</h2>",
         .render_report_table(mr$item_missing, "Item-wise missingness"),
         .render_report_table(mr$respondent_missing, "Respondent-wise missingness"),
-        .render_report_table(patterns_display, "Missing-data patterns",
-                             col.names = c("Pattern", "n", "Percent")),
+        .render_report_table(patterns_display, "Missing-data patterns"),
         .render_report_table(mr$scale_missing_rules, "Scale missing rules"),
         collapse = "\n"
       )

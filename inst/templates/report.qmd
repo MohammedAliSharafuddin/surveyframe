@@ -88,17 +88,37 @@ out_html <- knitr::is_html_output()
 # Outside HTML every table caption carries a cross-reference label, which
 # numbers it ("Table 1") in Word, OpenDocument and PDF, and without which
 # Typst drops the caption. `cap` is the caption a chunk gives through
-# tbl-cap in HTML. Row names repeat the first column, so they are left out.
+# tbl-cap in HTML. Row names repeat the first column, so they are left out
+# in every format. Headings come from the label map both engines use
+# (Codex P1-03): words, italic symbols and the confidence level. In HTML the
+# headings are HTML, so the cells and any given headings are escaped here.
 tbl_n <- 0L
+html_esc <- function(v) {
+  v <- gsub("&", "&amp;", v, fixed = TRUE)
+  v <- gsub("<", "&lt;", v, fixed = TRUE)
+  gsub(">", "&gt;", v, fixed = TRUE)
+}
 apa_kable <- function(x, ..., caption = NULL, cap = NULL) {
-  if (out_html) return(kable(x, format = "html", caption = caption, ...))
+  args <- list(...)
+  if (is.null(args$row.names)) args$row.names <- FALSE
+  if (is.data.frame(x) && is.null(args$col.names)) {
+    args$col.names <- sframe_apa_col_labels(names(x), if (out_html) "html" else "markdown")
+  } else if (out_html && !is.null(args$col.names)) {
+    args$col.names <- html_esc(args$col.names)
+  }
+  if (out_html) {
+    if (is.data.frame(x)) x[] <- lapply(x, function(v) {
+      v <- as.character(v)
+      ifelse(is.na(v), NA_character_, html_esc(v))
+    })
+    return(do.call(kable, c(list(x, format = "html", caption = caption,
+                                 escape = FALSE), args)))
+  }
   caption <- caption %||% cap
   if (!is.null(caption)) {
     tbl_n <<- tbl_n + 1L
     caption <- sprintf("%s {#tbl-sf%d}", caption, tbl_n)
   }
-  args <- list(...)
-  if (is.null(args$row.names)) args$row.names <- FALSE
   do.call(kable, c(list(x, format = "pipe", caption = caption), args))
 }
 # A table note, as APA 7 sets it: "Note." in italics, below the table.
@@ -396,8 +416,7 @@ if (is.null(mr)) {
   print(apa_kable(sframe_apa_cells(mr$item_missing), caption = "Item-wise missingness"))
   print(apa_kable(sframe_apa_cells(mr$respondent_missing), caption = "Respondent-wise missingness"))
   patterns_display <- mr$patterns[, intersect(c("description", "n", "percent"), names(mr$patterns)), drop = FALSE]
-  print(apa_kable(sframe_apa_cells(patterns_display), caption = "Missing-data patterns",
-              col.names = c("Pattern", "n", "Percent")))
+  print(apa_kable(sframe_apa_cells(patterns_display), caption = "Missing-data patterns"))
   if (!is.null(mr$scale_missing_rules) && nrow(mr$scale_missing_rules) > 0)
     print(apa_kable(sframe_apa_cells(mr$scale_missing_rules), caption = "Scale missing rules"))
 }
@@ -411,12 +430,12 @@ if (is.null(mr)) {
 #| output: asis
 # The instrument's items, with the counts and dashes the built-in engine
 # prints (Codex P1-02), from render_report().
-dr <- content$descriptives
-if (!is.list(dr)) {
+desc <- content$descriptives
+if (!is.list(desc)) {
   cat("Descriptive statistics could not be computed from the supplied data.\n\n")
 } else {
-  print(apa_kable(dr$table, caption = "Descriptive statistics"))
-  apa_note(dr$note)
+  print(apa_kable(desc[["table"]], caption = "Descriptive statistics"))
+  apa_note(desc$note)
 }
 ```
 
