@@ -708,6 +708,12 @@ style.
   those headings for HTML or Markdown. The `n_items` heading reads "Items"
   (Codex P1-03).
 
+* Quarto reports in Word, OpenDocument and PDF number tables and figures as
+  APA 7 does: "Table 1" or "Figure 1" in bold on its own line, and the title
+  in italics on the next, both above the table or figure. Tables printed
+  "Table 1: Provenance" on 1 line, and figures had a bold title with no
+  number (Codex P1-04).
+
 * **Quarto is the report engine, and `render_report()` finds the copy
   RStudio or Positron bundles.** It looked only for `quarto` on the PATH,
   where neither IDE puts its copy, so a machine with RStudio and no separate

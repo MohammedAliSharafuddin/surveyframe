@@ -85,14 +85,18 @@ input <- function(name) if (is.null(src)) params[[name]] else src[[name]] %||% "
 # tables, numbered figures and notes. Every other format gets pipe tables,
 # which pandoc writes as native tables, and a bold title above each figure.
 out_html <- knitr::is_html_output()
-# Outside HTML every table caption carries a cross-reference label, which
-# numbers it ("Table 1") in Word, OpenDocument and PDF, and without which
-# Typst drops the caption. `cap` is the caption a chunk gives through
-# tbl-cap in HTML. Row names repeat the first column, so they are left out
+# Outside HTML each table and figure is numbered as APA 7 sets it (Codex
+# P1-04): "Table 1" in bold on its own line, the title in italics on the
+# next, both above the float. Pandoc's own caption would put "Table 1:
+# Title" on 1 line, so the 2 lines are written here as paragraphs in Word,
+# OpenDocument, Typst and LaTeX alike. `cap` is the caption a chunk gives
+# through tbl-cap in HTML. Row names repeat the first column, so they are left out
 # in every format. Headings come from the label map both engines use
 # (Codex P1-03): words, italic symbols and the confidence level. In HTML the
 # headings are HTML, so the cells and any given headings are escaped here.
 tbl_n <- 0L
+fig_n <- 0L
+float_head <- function(kind, n, title) sprintf("\n**%s %d**\n\n*%s*\n\n", kind, n, title)
 html_esc <- function(v) {
   v <- gsub("&", "&amp;", v, fixed = TRUE)
   v <- gsub("<", "&lt;", v, fixed = TRUE)
@@ -115,11 +119,11 @@ apa_kable <- function(x, ..., caption = NULL, cap = NULL) {
                                  escape = FALSE), args)))
   }
   caption <- caption %||% cap
-  if (!is.null(caption)) {
-    tbl_n <<- tbl_n + 1L
-    caption <- sprintf("%s {#tbl-sf%d}", caption, tbl_n)
-  }
-  do.call(kable, c(list(x, format = "pipe", caption = caption), args))
+  out <- do.call(kable, c(list(x, format = "pipe"), args))
+  if (is.null(caption)) return(out)
+  tbl_n <<- tbl_n + 1L
+  structure(c(float_head("Table", tbl_n, caption), out), format = "pipe",
+            class = "knitr_kable")
 }
 # A table note, as APA 7 sets it: "Note." in italics, below the table.
 apa_note <- function(text) {
@@ -129,7 +133,10 @@ apa_note <- function(text) {
 }
 figure_start <- function(html, title) {
   if (out_html) cat("\n", html, "\n\n", sep = "")
-  else cat("\n**", title, "**\n\n", sep = "")
+  else {
+    fig_n <<- fig_n + 1L
+    cat(float_head("Figure", fig_n, title))
+  }
 }
 figure_end <- function() if (out_html) cat("\n\n</figure>\n\n") else cat("\n\n")
 
