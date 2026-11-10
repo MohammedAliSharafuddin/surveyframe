@@ -3,8 +3,9 @@
 # Session UF: the Studio minors from Codex pass 1 (P1-06 to P1-12), checked
 # at 1280 and 390 px in a real Chrome against the build under test. Studio
 # and its tab come from ui1_studio() (helper-ui1-browser.R): "none" opens
-# Studio with no instrument, "two_group" with that demo. Both are closed at
-# the end of the file.
+# Studio with no instrument, "two_group" with that demo. The standalone
+# builder (P1-11) comes from ui2_builder(). All are closed at the end of the
+# file.
 
 skip_if_not_slow()
 skip_on_cran()
@@ -139,4 +140,31 @@ test_that("every sideways-scrolling region in Studio can take keyboard focus and
   }
 })
 
+test_that("the builder's question rows are listitems in a list, the open one aria-current, and the keys work as before, at 1280 and 390 px (P1-11)", {
+  instr <- sframe_demo("two_group")$instrument
+  for (w in uf_widths) {
+    s <- ui2_builder(instr, width = w, height = 900)
+    expect_true(ui2_wait(s, "document.querySelectorAll('#itemList .ic').length > 2", 20))
+    expect_identical(ui2_js(s, "document.getElementById('itemList').getAttribute('role')"), "list")
+    roles <- ui2_js(s, "Array.from(document.querySelectorAll('#itemList > *')).map(function(e){ return e.getAttribute('role') || e.className; }).join('|')")
+    expect_false(grepl("option", roles), info = roles)
+    expect_true(all(strsplit(roles, "|", fixed = TRUE)[[1]] %in% c("listitem", "pg-div")), info = roles)
+    # No focusable widget whose children are presentational holds a control.
+    expect_identical(ui2_js(s, "document.querySelectorAll('[role=option] button, [role=button] button, button button').length"), 0L)
+    expect_identical(ui2_js(s, "document.querySelectorAll('#itemList [aria-selected]').length"), 0L)
+    # A bare arrow moves focus to the next row. Checked before Enter, since
+    # at 390 px an open question takes the screen and hides the list.
+    id <- ui2_js(s, "document.querySelectorAll('#itemList .ic')[1].getAttribute('data-id')")
+    ui2_js(s, sprintf("document.querySelector('#itemList .ic[data-id=\"%s\"]').focus(); 1", id))
+    ui2_key(s, "", "ArrowDown")
+    expect_identical(ui2_js(s, "document.activeElement.getAttribute('role')"), "listitem", info = w)
+    expect_false(identical(ui2_js(s, "document.activeElement.getAttribute('data-id')"), id))
+    # Enter opens a row for editing, which takes aria-current alone.
+    ui2_key(s, sprintf("#itemList .ic[data-id='%s']", id), "Enter")
+    expect_true(ui2_wait(s, sprintf("document.querySelector('#itemList .ic[data-id=\"%s\"]').getAttribute('aria-current') === 'true'", id), 5))
+    expect_identical(ui2_js(s, "document.querySelectorAll('#itemList [aria-current]').length"), 1L)
+  }
+})
+
+ui2_close()
 ui1_close()
