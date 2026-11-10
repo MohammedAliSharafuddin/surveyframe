@@ -10,6 +10,16 @@ sframe_num <- function(x) {
   suppressWarnings(as.numeric(x))
 }
 
+# TRUE where a column is numeric or logical, or text or a factor whose values all read
+# as numbers ("1", "2.5"), the rule regression predictors follow. Category
+# codes such as "online" do not.
+sframe_reads_as_numbers <- function(x) {
+  if (is.numeric(x) || is.logical(x)) return(TRUE)
+  labels <- as.character(x)
+  as_num <- suppressWarnings(as.numeric(labels))
+  all(is.na(labels) | !is.na(as_num))
+}
+
 # Regression predictors: numeric columns, and text or factor columns whose
 # values all read as numbers, enter as numbers. Any other text or factor column
 # enters as a categorical predictor, where it had been forced to numbers.
@@ -266,7 +276,11 @@ sframe_require_columns <- function(data, cols, method) {
 #' @param conf_level Confidence level for the mean interval.
 #' @param weights Optional case-weight column.
 #'
-#' @return An object of class `sframe_descriptives_report`.
+#' @return An object of class `sframe_descriptives_report`. Its `table` has
+#'   1 row per variable and group. `valid_n` and `missing_n` count the
+#'   responses as given. A variable whose responses are not all numbers, such
+#'   as a choice item's category codes, keeps those counts and has `NA` in
+#'   every numeric column, since a mean or standard deviation does not apply.
 #' @export
 #' @examples
 #' demo <- sframe_demo("tourism_services")
@@ -310,15 +324,20 @@ sframe_descriptives_results <- function(
     idx <- which(groups == group | (is.na(groups) & is.na(group)))
     if (length(idx) == 0) next
     for (var in variables) {
-      x <- sframe_num(data[[var]][idx])
+      # Missingness is counted on the responses as given, as the missing-data
+      # table counts it. Category codes such as "online" are answers, and
+      # turning them into numbers first made every one missing (Codex P1-02).
+      raw <- data[[var]][idx]
+      valid_raw <- !is.na(raw)
+      x <- if (sframe_reads_as_numbers(raw)) sframe_num(raw) else rep(NA_real_, length(raw))
       valid <- !is.na(x)
       ci <- sframe_ci_mean(x, conf_level)
       rows[[length(rows) + 1L]] <- data.frame(
         variable = var,
         group = group,
         n = length(x),
-        valid_n = sum(valid),
-        missing_n = sum(!valid),
+        valid_n = sum(valid_raw),
+        missing_n = sum(!valid_raw),
         mean = if (any(valid)) mean(x, na.rm = TRUE) else NA_real_,
         sd = if (sum(valid) > 1) stats::sd(x, na.rm = TRUE) else NA_real_,
         median = if (any(valid)) stats::median(x, na.rm = TRUE) else NA_real_,

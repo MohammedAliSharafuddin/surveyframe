@@ -1133,16 +1133,14 @@ sframe_clean_interpretations <- function(interpretations) {
   }
 
   if (isTRUE(include_descriptives)) {
-    dr <- tryCatch(
-      sframe_descriptives_results(data, variables = intersect(vapply(instrument$items, function(i) i$id, character(1)), colnames(data))),
-      error = function(e) e
-    )
+    dr <- tryCatch(sframe_report_descriptives(instrument, data),
+                   error = function(e) e)
     descriptives_html <- if (inherits(dr, "error")) {
       sprintf("<h2>Descriptives</h2><p>%s</p>", htmltools_escape(conditionMessage(dr)))
     } else {
       paste(
         "<h2>Descriptives</h2>",
-        .render_report_table(dr$table, "Descriptive statistics"),
+        .render_report_table(dr$table, "Descriptive statistics", note = dr$note),
         collapse = "\n"
       )
     }
@@ -1589,6 +1587,33 @@ sframe_study_html <- function(instrument, keys = sframe_md_keys(instrument)) {
   )
 }
 
+# The descriptives table as both report engines print it, for the
+# instrument's items in the data. An item answered with categories keeps its
+# counts, and its numeric cells show a dash, which the note explains (Codex
+# P1-02). A column empty in every row stays blank.
+sframe_report_descriptives <- function(instrument, data) {
+  ids <- intersect(vapply(instrument$items, function(i) i$id, character(1)),
+                   colnames(data))
+  dr <- sframe_descriptives_results(data, variables = ids)
+  tab <- dr$table
+  counts <- c("variable", "group", "n", "valid_n", "missing_n")
+  stat_cols <- setdiff(names(tab), counts)
+  stat_cols <- stat_cols[vapply(tab[stat_cols], function(v) any(!is.na(v)), logical(1))]
+  not_applicable <- tab$valid_n > 0 & is.na(tab$mean)
+  cells <- sframe_apa_cells(tab)
+  if (any(not_applicable) && length(stat_cols)) {
+    cells[not_applicable, stat_cols] <- sframe_not_applicable_cell
+  }
+  list(table = cells,
+       note = if (any(not_applicable)) sframe_not_applicable_note)
+}
+
+# An APA 7 table marks a cell that does not apply with a dash.
+sframe_not_applicable_cell <- "\u2014"
+sframe_not_applicable_note <- paste(
+  "A dash marks a statistic that does not apply to an item answered with",
+  "categories.")
+
 # What the Quarto template prints, computed here inside the namespace
 # (naming decision 6): the codebook's display table, the distribution
 # charts, and the plan results, each with its supplement table. The
@@ -1648,7 +1673,10 @@ sframe_report_content <- function(instrument, data = NULL, plot_palette = "web",
          sframe_field_md_line(b$research_question, keys), character(1)),
        amendment_notes_md = sframe_amendment_notes_md(instrument, keys),
        amendments = sframe_report_amendments(instrument),
-       quality_note = quality_note)
+       quality_note = quality_note,
+       descriptives = if (!is.null(data)) tryCatch(
+         sframe_report_descriptives(instrument, data),
+         error = function(e) conditionMessage(e)))
 }
 
 # The amendment list in the built-in report, under Reproducibility: the
