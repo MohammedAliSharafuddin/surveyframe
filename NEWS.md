@@ -714,6 +714,16 @@ style.
   "Table 1: Provenance" on 1 line, and figures had a bold title with no
   number (Codex P1-04).
 
+* The report's descriptives come in 2 tables in every format, centre and
+  spread (*n*, valid and missing *n*, *M*, *SD*, *Mdn*, IQR, minimum and
+  maximum), then shape and interval (skewness, kurtosis, *SE*, the CI and,
+  when weights are given, the weighted mean), where 1 table of 17 columns
+  ran together in the Typst PDF. In Typst and LaTeX, tables are set
+  single-spaced at 10 points, and each column is at least as wide as its
+  longest word, since item IDs such as `sessions_attended` ran into the next
+  column of the codebook and plan tables. Outside HTML the instrument hash
+  takes a line of its own, which it ran past the LaTeX margin (Codex P1-05).
+
 * **Quarto is the report engine, and `render_report()` finds the copy
   RStudio or Positron bundles.** It looked only for `quarto` on the PATH,
   where neither IDE puts its copy, so a machine with RStudio and no separate

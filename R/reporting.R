@@ -1139,7 +1139,8 @@ sframe_clean_interpretations <- function(interpretations) {
     } else {
       paste(
         "<h2>Descriptives</h2>",
-        .render_report_table(dr$table, "Descriptive statistics", note = dr$note),
+        .render_report_table(dr$centre, sframe_descriptives_titles[["centre"]], note = dr$note),
+        .render_report_table(dr$shape, sframe_descriptives_titles[["shape"]], note = dr$note),
         collapse = "\n"
       )
     }
@@ -1586,26 +1587,40 @@ sframe_study_html <- function(instrument, keys = sframe_md_keys(instrument)) {
   )
 }
 
-# The descriptives table as both report engines print it, for the
-# instrument's items in the data. An item answered with categories keeps its
+# The descriptives as both report engines print them, for the instrument's
+# items in the data, in 2 tables so that each fits a page in every format
+# (Codex P1-05, owner): centre and spread (counts, M, SD, Mdn, IQR, range),
+# then shape and interval (skewness, kurtosis, SE, the CI and, when weights
+# are given, the weighted mean). An item answered with categories keeps its
 # counts, and its numeric cells show a dash, which the note explains (Codex
-# P1-02). A column empty in every row stays blank.
-sframe_report_descriptives <- function(instrument, data) {
+# P1-02). The group column goes when there is no split.
+sframe_report_descriptives <- function(instrument, data, weights = NULL) {
   ids <- intersect(vapply(instrument$items, function(i) i$id, character(1)),
                    colnames(data))
-  dr <- sframe_descriptives_results(data, variables = ids)
+  dr <- sframe_descriptives_results(data, variables = ids, weights = weights)
   tab <- dr$table
-  counts <- c("variable", "group", "n", "valid_n", "missing_n")
-  stat_cols <- setdiff(names(tab), counts)
-  stat_cols <- stat_cols[vapply(tab[stat_cols], function(v) any(!is.na(v)), logical(1))]
+  if ("group" %in% names(tab) && all(tab$group == "All")) tab$group <- NULL
+  if ("weighted_mean" %in% names(tab) && all(is.na(tab$weighted_mean))) {
+    tab$weighted_mean <- NULL
+  }
+  keys <- intersect(c("variable", "group"), names(tab))
+  counts <- c(keys, "n", "valid_n", "missing_n")
   not_applicable <- tab$valid_n > 0 & is.na(tab$mean)
   cells <- sframe_apa_cells(tab)
+  stat_cols <- setdiff(names(tab), counts)
   if (any(not_applicable) && length(stat_cols)) {
     cells[not_applicable, stat_cols] <- sframe_not_applicable_cell
   }
-  list(table = cells,
+  centre <- intersect(c(counts, "mean", "sd", "median", "iqr", "min", "max"), names(cells))
+  shape <- setdiff(names(cells), centre)
+  list(centre = cells[, centre, drop = FALSE],
+       shape = cells[, c(keys, shape), drop = FALSE],
+       titles = sframe_descriptives_titles,
        note = if (any(not_applicable)) sframe_not_applicable_note)
 }
+sframe_descriptives_titles <- c(
+  centre = "Descriptive statistics: centre and spread",
+  shape = "Descriptive statistics: shape and interval")
 
 # An APA 7 table marks a cell that does not apply with a dash.
 sframe_not_applicable_cell <- "\u2014"

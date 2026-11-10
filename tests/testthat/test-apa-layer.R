@@ -211,7 +211,7 @@ test_that("the Quarto report numbers its tables and figures as the built-in one 
   expect_true(length(tabs) >= 3)
   expect_identical(as.integer(gsub("\\D", "", tabs)), seq_along(tabs))
   expect_match(doc, "<em>Survey items</em>", fixed = TRUE)
-  expect_match(doc, "<em>Descriptive statistics</em>", fixed = TRUE)
+  expect_match(doc, "<em>Descriptive statistics: centre and spread</em>", fixed = TRUE)
   expect_match(doc, "<em>RQ1: Is a related to b?</em>", fixed = TRUE)
   figs <- regmatches(doc, gregexpr("<strong>Figure [0-9]+</strong>", doc))[[1]]
   expect_true(length(figs) >= 2)
