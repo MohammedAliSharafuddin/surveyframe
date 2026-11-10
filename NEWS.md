@@ -1489,6 +1489,13 @@ style.
   too fast" and "0 duplicate response row(s) detected". The same holds for
   a role's maximum on the Plan screens and the builder's counts of scales,
   constructs, paths, research questions and report sections (Codex P1-08).
+* **Open Instrument's status comes from `validate_sframe()` run on the open
+  instrument.** It read the stored `meta$validated`, so the valid
+  `two_group` demo showed "Draft" and "Status: fix in Design" with no
+  reason. The stored flag is a cache that Studio never trusts. The status
+  reads "Schema valid", or "Fix in Design" with the number of problems and
+  the first one named. With nothing open, the sidebar says "No instrument
+  open", where it said "Draft needs fixes" (Codex P1-09).
 
 ## Demos
 

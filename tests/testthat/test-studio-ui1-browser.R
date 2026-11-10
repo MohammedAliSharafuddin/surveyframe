@@ -180,11 +180,11 @@ test_that("with no instrument the gate replaces the body of References, Amendmen
   expect_false(ui2_js(b, "$('#download_sframe_btn').is(':visible')"))
 })
 
-test_that("the Open card says Schema valid or Draft, with the version and count linked to Amendments", {
+test_that("the Open card says Schema valid for a valid demo, from a validation run, with the version and count linked to Amendments", {
   b <- ui1_studio("factor_structure")
   expect_true(ui1_screen(b, "open"))
   expect_true(ui2_wait(b, "!!document.getElementById('open_schema_status')", 20))
-  expect_match(ui1_text(b, "open_schema_status"), "^(Schema valid|Draft)$")
+  expect_identical(ui1_text(b, "open_schema_status"), "Schema valid")
   expect_match(ui1_text(b, "open_status_version"), ", ([0-9]+ amendments?|no amendments)$")
   expect_identical(ui1_text(b, "open_status_version"), ui1_text(b, "open_version"))
   ui2_js(b, "$('#open_status_version').click(); true")
