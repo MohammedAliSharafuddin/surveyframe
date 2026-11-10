@@ -29,6 +29,10 @@ format:
       text: |
         \usepackage{etoolbox}
         \AtBeginEnvironment{longtable}{\footnotesize\setlength{\tabcolsep}{4pt}\ifdefined\setstretch\setstretch{1}\fi}
+        % A new page when less than #1 is left on this one, so a table's
+        % number and title stay with it (the needspace package's test,
+        % written out so no extra package is needed).
+        \newcommand{\sfneedspace}[1]{\par\penalty-100\begingroup\dimen0=#1\relax\dimen2=\pagegoal\advance\dimen2 by -\pagetotal\ifdim\dimen0>\dimen2\vfill\penalty-10000\fi\endgroup}
     fontsize: 12pt
     linestretch: 2
     geometry: margin=1in
@@ -103,6 +107,52 @@ out_html <- knitr::is_html_output()
 tbl_n <- 0L
 fig_n <- 0L
 float_head <- function(kind, n, title) sprintf("\n**%s %d**\n\n*%s*\n\n", kind, n, title)
+# A float's number and title stay on the page of their table or figure
+# (Session UF, the RF follow-up). They could land at a page foot apart from
+# it: Figure 2 in Typst, Table 2 in LaTeX. A figure and its 2 lines go in 1
+# block that does not break, a minipage in LaTeX. A table may run over a
+# page, so in LaTeX it starts a new page when fewer than 5 lines are left,
+# and in Typst its 2 lines stick to it, which needs Typst 0.12 or later
+# (block's sticky). An older Typst keeps a table of up to 12 rows whole in 1
+# block instead, and a longer one as before.
+out_to <- knitr::pandoc_to() %||% ""
+typst_sticky <- identical(out_to, "typst") && local({
+  bin <- Sys.getenv("QUARTO_BIN_PATH")
+  q <- file.path(bin, if (.Platform$OS.type == "windows") "quarto.exe" else "quarto")
+  if (!nzchar(bin) || !file.exists(q)) q <- Sys.which("quarto")
+  v <- tryCatch(suppressWarnings(system2(q, c("typst", "--version"), stdout = TRUE, stderr = FALSE)),
+                error = function(e) character(0))
+  v <- regmatches(v, regexpr("[0-9]+\\.[0-9]+(\\.[0-9]+)?", v))
+  length(v) > 0 && utils::compareVersion(v[1], "0.12") >= 0
+})
+raw_out <- function(fmt, code) sprintf("\n\n```{=%s}\n%s\n```\n\n", fmt, code)
+# Whether a Typst table goes whole in 1 block that does not break.
+typst_whole <- function(kind, rows) kind == "Figure" || (!typst_sticky && rows <= 12L)
+keep_open <- function(kind, rows = 0L) {
+  if (identical(out_to, "typst")) {
+    if (typst_whole(kind, rows)) return(raw_out("typst", "#block(breakable: false, width: 100%)["))
+    if (typst_sticky) return(raw_out("typst", "#block(sticky: true, breakable: false)["))
+  } else if (identical(out_to, "latex")) {
+    # setspace sets a minipage single-spaced, so it takes the page's spacing.
+    if (kind == "Figure") return(raw_out("latex", paste0(
+      "\\edef\\sfstretch{\\baselinestretch}\\noindent\\begin{minipage}{\\linewidth}",
+      "\\ifdefined\\setstretch\\setstretch{\\sfstretch}\\fi")))
+    return(raw_out("latex", "\\sfneedspace{5\\baselineskip}"))
+  }
+  ""
+}
+# Closes keep_open(): `after_head` is TRUE straight after the 2 lines, where
+# a sticky Typst block ends, and FALSE after the float, where the others do.
+keep_close <- function(kind, rows = 0L, after_head = FALSE) {
+  if (identical(out_to, "typst")) {
+    whole <- typst_whole(kind, rows)
+    if ((after_head && !whole && typst_sticky) || (!after_head && whole))
+      return(raw_out("typst", "]"))
+  } else if (identical(out_to, "latex") && kind == "Figure" && !after_head) {
+    return(raw_out("latex", "\\end{minipage}\\par"))
+  }
+  ""
+}
 html_esc <- function(v) {
   v <- gsub("&", "&amp;", v, fixed = TRUE)
   v <- gsub("<", "&lt;", v, fixed = TRUE)
@@ -129,7 +179,10 @@ apa_kable <- function(x, ..., caption = NULL, cap = NULL) {
   if (is.data.frame(x)) out <- pipe_widths(out, x, args$col.names)
   if (is.null(caption)) return(out)
   tbl_n <<- tbl_n + 1L
-  structure(c(float_head("Table", tbl_n, caption), out), format = "pipe",
+  rows <- if (is.data.frame(x) || is.matrix(x)) nrow(x) else 0L
+  structure(c(keep_open("Table", rows), float_head("Table", tbl_n, caption),
+              keep_close("Table", rows, after_head = TRUE), out,
+              keep_close("Table", rows)), format = "pipe",
             class = "knitr_kable")
 }
 # Column widths outside HTML (Codex P1-05). Pandoc sizes the columns of a
@@ -164,10 +217,10 @@ figure_start <- function(html, title) {
   if (out_html) cat("\n", html, "\n\n", sep = "")
   else {
     fig_n <<- fig_n + 1L
-    cat(float_head("Figure", fig_n, title))
+    cat(keep_open("Figure"), float_head("Figure", fig_n, title), sep = "")
   }
 }
-figure_end <- function() if (out_html) cat("\n\n</figure>\n\n") else cat("\n\n")
+figure_end <- function() if (out_html) cat("\n\n</figure>\n\n") else cat("\n\n", keep_close("Figure"), sep = "")
 
 # Figure size, resolution and format from render_report(figures = ) (Ethos
 # request 19). Empty keeps the defaults. A stated dpi is the pixel density

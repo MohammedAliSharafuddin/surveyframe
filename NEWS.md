@@ -718,6 +718,14 @@ style.
   "Table 1: Provenance" on 1 line, and figures had a bold title with no
   number (Codex P1-04).
 
+* In the Typst and LaTeX PDFs a table's or figure's number and title stay
+  on the page of the table or figure, where they could land at a page foot
+  with the float on the next page (Figure 2 in Typst, Table 2 in LaTeX). A
+  figure goes with its 2 lines in 1 block that does not break. A table
+  starts a new page in LaTeX when fewer than 5 lines are left, and in Typst
+  its 2 lines stick to it (Typst 0.12 or later; with an older Typst a table
+  of up to 12 rows is kept whole).
+
 * The report's descriptives come in 2 tables in every format, centre and
   spread (*n*, valid and missing *n*, *M*, *SD*, *Mdn*, IQR, minimum and
   maximum), then shape and interval (skewness, kurtosis, *SE*, the CI and,
