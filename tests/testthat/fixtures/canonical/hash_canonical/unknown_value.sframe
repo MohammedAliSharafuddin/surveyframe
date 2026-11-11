@@ -1,0 +1,70 @@
+{
+  "sframe_format": "1.0",
+  "hash": {
+    "algo": "sha256",
+    "value": "7ef9872620acac42b21f602ddbe8f96ada45b2324f3a1cb608c84ec9d1a1dd74",
+    "canonical": "rfc9999"
+  },
+  "version": "0.1.0",
+  "meta": {
+    "title": "Canonical field",
+    "version": "0.1.0",
+    "description": null,
+    "authors": null,
+    "languages": "en",
+    "validated": true,
+    "created_at": "2026-11-11T00:00:00Z"
+  },
+  "items": [
+    {
+      "id": "s_1",
+      "label": "Item 1",
+      "type": "likert",
+      "required": false,
+      "choice_set": "ag5",
+      "scale_id": "sat",
+      "reverse": false
+    },
+    {
+      "id": "s_2",
+      "label": "Item 2",
+      "type": "likert",
+      "required": false,
+      "choice_set": "ag5",
+      "scale_id": "sat",
+      "reverse": false
+    },
+    {
+      "id": "s_3",
+      "label": "Item 3",
+      "type": "likert",
+      "required": false,
+      "choice_set": "ag5",
+      "scale_id": "sat",
+      "reverse": false
+    }
+  ],
+  "choices": [
+    {
+      "id": "ag5",
+      "values": [1, 2, 3, 4, 5],
+      "labels": ["SD", "D", "N", "A", "SA"],
+      "allow_other": false,
+      "randomise": false
+    }
+  ],
+  "scales": [
+    {
+      "id": "sat",
+      "label": "Satisfaction",
+      "items": ["s_1", "s_2", "s_3"],
+      "method": "mean",
+      "min_valid": null
+    }
+  ],
+  "branching": [],
+  "checks": [],
+  "analysis_plan": [],
+  "models": [],
+  "render": {}
+}
