@@ -182,6 +182,25 @@ p1_quarto_file <- function(to) {
   out
 }
 
+# The text of a PDF from pdftotext, read from a file it writes. On Windows a
+# temp path mixes / and \, and pdftotext -bbox writing to stdout exited 99
+# on such a path in CI, so both paths are normalised with / and the output
+# goes to a file. A missing pdftotext skips with that reason, and any other
+# failure stops the test with the exit status.
+p1_pdftotext <- function(path, bbox = FALSE) {
+  skip_if(!nzchar(Sys.which("pdftotext")), "pdftotext is not installed")
+  out <- tempfile(fileext = if (bbox) ".html" else ".txt")
+  file.create(out)
+  args <- c(if (bbox) "-bbox", "-enc", "UTF-8",
+            shQuote(normalizePath(path, winslash = "/", mustWork = TRUE)),
+            shQuote(normalizePath(out, winslash = "/", mustWork = TRUE)))
+  status <- system2("pdftotext", args, stdout = TRUE, stderr = TRUE)
+  code <- attr(status, "status")
+  if (!is.null(code) && code != 0)
+    stop(sprintf("pdftotext exited %s on %s: %s", code, path, paste(status, collapse = " ")))
+  readLines(out, warn = FALSE, encoding = "UTF-8")
+}
+
 p1_unxml <- function(x) {
   x <- gsub("<[^>]+>", "", x)
   x <- gsub("&lt;", "<", gsub("&gt;", ">", gsub("&quot;", "\"", x, fixed = TRUE), fixed = TRUE), fixed = TRUE)
@@ -193,16 +212,15 @@ p1_unxml <- function(x) {
 p1_paragraphs <- function(to) {
   path <- p1_quarto_file(to)
   if (to %in% c("typst", "latex")) {
-    txt <- tempfile(fileext = ".txt")
-    system2("pdftotext", c("-enc", "UTF-8", shQuote(path), shQuote(txt)))
-    lines <- trimws(gsub("\f", "", readLines(txt, warn = FALSE, encoding = "UTF-8"), fixed = TRUE))
+    lines <- trimws(gsub("\f", "", p1_pdftotext(path), fixed = TRUE))
     lines <- lines[nzchar(lines)]
     return(data.frame(text = lines, bold = NA, italic = NA))
   }
-  member <- if (to == "docx") "word/document.xml" else "content.xml"
+  member <- if (to == "docx") "word/document.xml" else c("content.xml", "styles.xml")
   dir <- tempfile()
   utils::unzip(path, member, exdir = dir)
-  x <- paste(readLines(file.path(dir, member), warn = FALSE, encoding = "UTF-8"), collapse = "")
+  read_member <- function(m) paste(readLines(file.path(dir, m), warn = FALSE, encoding = "UTF-8"), collapse = "")
+  x <- read_member(member[1])
   if (to == "docx") {
     ps <- regmatches(x, gregexpr("(?s)<w:p[ >].*?</w:p>", x, perl = TRUE))[[1]]
     run_of <- function(p) regmatches(p, gregexpr("(?s)<w:r[ >].*?</w:r>", p, perl = TRUE))[[1]]
@@ -216,8 +234,13 @@ p1_paragraphs <- function(to) {
                       bold = vapply(ps, styled, logical(1), tag = "b"),
                       italic = vapply(ps, styled, logical(1), tag = "i"))
   } else {
-    styles <- regmatches(x, gregexpr("(?s)<style:style style:name=\"[^\"]+\".*?</style:style>", x, perl = TRUE))[[1]]
-    style_name <- sub("(?s)^<style:style style:name=\"([^\"]+)\".*$", "\\1", styles, perl = TRUE)
+    # Pandoc in Quarto 1.8 writes automatic styles (T1, T2) into content.xml.
+    # Pandoc in Quarto 1.11 points at the named styles Emphasis and
+    # Strong_20_Emphasis, which styles.xml defines with style:family first.
+    # Both files are read, and the name is found in any attribute order.
+    defs <- paste(x, read_member(member[2]))
+    styles <- regmatches(defs, gregexpr("(?s)<style:style [^>]*style:name=\"[^\"]+\"[^>]*(?<!/)>.*?</style:style>", defs, perl = TRUE))[[1]]
+    style_name <- sub("(?s)^<style:style [^>]*style:name=\"([^\"]+)\".*$", "\\1", styles, perl = TRUE)
     bold_styles <- style_name[grepl("fo:font-weight=\"bold\"", styles)]
     italic_styles <- style_name[grepl("fo:font-style=\"italic\"", styles)]
     ps <- regmatches(x, gregexpr("(?s)<text:(p|h)[ >].*?</text:(p|h)>", x, perl = TRUE))[[1]]
@@ -321,7 +344,7 @@ test_that("P1-05: the Quarto HTML report prints the 2 descriptives tables", {
 # Every word of a PDF with its box, from pdftotext -bbox.
 p1_words <- function(to) {
   path <- p1_quarto_file(to)
-  x <- system2("pdftotext", c("-bbox", shQuote(path), "-"), stdout = TRUE)
+  x <- p1_pdftotext(path, bbox = TRUE)
   pages <- grep("<page ", x)
   num <- function(line, key) as.numeric(sub(sprintf('.*%s="([0-9.]+)".*', key), "\\1", line))
   w <- grep("<word ", x)
@@ -379,7 +402,7 @@ test_that("P1-05: no word in the LaTeX PDF overlaps another or crosses the margi
 # as paths. A head whose float went over is the last text on its page.
 p1_expect_heads_kept <- function(to) {
   w <- p1_words(to)
-  x <- system2("pdftotext", c("-bbox", shQuote(p1_quarto_file(to)), "-"), stdout = TRUE)
+  x <- p1_pdftotext(p1_quarto_file(to), bbox = TRUE)
   height <- as.numeric(sub('.*height="([0-9.]+)".*', "\\1", x[grep("<page ", x)][1]))
   foot <- height - 72
   w <- w[order(w$page, w$y1, w$x0), ]
