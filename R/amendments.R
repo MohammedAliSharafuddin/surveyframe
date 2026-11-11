@@ -316,6 +316,44 @@ sframe_suggest_version <- function(version, tier = c("design", "pipeline")) {
   list(version = paste(n, collapse = "."), reason = why)
 }
 
+# What else decides a score or a flag, outside the scales: the items reverse
+# keyed on the item (score_scales() reverses them as the scale's own
+# reverse_items), the scale each item names, the choice codes of every item a
+# scale scores, and what each attention check tests and passes. A change to
+# any of them moves scale scores or who is flagged, so it is design tier
+# (Fable sitting 1 FR-06). Each is a list named by id, so a component added
+# with none of them set changes nothing here.
+sframe_scoring_inputs <- function(payload) {
+  items <- payload$items %||% list()
+  id_of <- function(x) as.character(x$id %||% "")[1]
+  ids <- vapply(items, id_of, character(1))
+  sorted <- function(x) x[sframe_key_order(names(x))]
+  reverse <- ids[vapply(items, function(i) isTRUE(i$reverse), logical(1))]
+  scale_id <- lapply(items, function(i) as.character(unlist(i$scale_id %||% list())))
+  names(scale_id) <- ids
+  scale_id <- scale_id[lengths(scale_id) > 0]
+  scored <- unique(c(
+    unlist(lapply(payload$scales %||% list(), function(s) as.character(unlist(s$items %||% list())))),
+    names(scale_id)))
+  sets <- payload$choices %||% list()
+  names(sets) <- vapply(sets, id_of, character(1))
+  codes <- lapply(items[ids %in% scored], function(i) {
+    cs <- as.character(i$choice_set %||% "")[1]
+    as.character(unlist(sets[[cs]]$values %||% list()))
+  })
+  names(codes) <- ids[ids %in% scored]
+  checks <- lapply(payload$checks %||% list(), function(k) {
+    list(item_id = as.character(k$item_id %||% "")[1],
+         pass_values = as.character(unlist(k$pass_values %||% list())))
+  })
+  names(checks) <- vapply(payload$checks %||% list(), id_of, character(1))
+  list(
+    "the items' reverse keys" = sframe_key_sort(reverse),
+    "the scales the items name" = sorted(scale_id),
+    "the choice codes of scored items" = sorted(codes),
+    "the attention checks' pass values" = sorted(checks))
+}
+
 # The change between 2 serialisation payloads as amend_sframe() records it:
 # the fields that differ, and those of them that make it design tier.
 sframe_amendment_diff <- function(prev_payload, new_payload) {
@@ -323,6 +361,10 @@ sframe_amendment_diff <- function(prev_payload, new_payload) {
   changed <- as.character(Filter(
     function(k) !identical(prev_payload[[k]], new_payload[[k]]), keys))
   design <- intersect(changed, c("analysis_plan", "models", "designs", "study"))
+  before <- sframe_scoring_inputs(prev_payload)
+  after <- sframe_scoring_inputs(new_payload)
+  inputs <- names(before)[!vapply(names(before), function(k) identical(before[[k]], after[[k]]), logical(1))]
+  design <- c(inputs, design)
   if (!identical(sframe_scale_scoring(prev_payload$scales),
                  sframe_scale_scoring(new_payload$scales))) {
     design <- c("the scales scored", design)
@@ -398,7 +440,10 @@ sframe_amendment_preview <- function(previous, instrument) {
 #' method or model, and why. The tier follows the change itself: an amendment
 #' that changes the analysis plan, a model, a conjoint design or how a scale
 #' is scored (its items, reverse keys, weights, method or minimum answered)
-#' is always design tier, whatever `reason_code` or `tier` says. `second_signoff` is
+#' is always design tier, whatever `reason_code` or `tier` says. So is a
+#' change to an item's own `reverse` or `scale_id`, to the choice codes of an
+#' item a scale scores, or to what an attention check tests and its pass
+#' values, since each moves scale scores or who is flagged. `second_signoff` is
 #' optional. When omitted, the entry records `signoff = "none"`, so the
 #' absence of a named reviewer is visible. The tier, report and signoff are
 #' what the author records. None of them is independent approval.
