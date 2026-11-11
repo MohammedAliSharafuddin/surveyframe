@@ -804,6 +804,13 @@ style.
   24 of the 26 bundled `.sframe` files held a null and have new hashes, and
   only their hash line changed. `tests/testthat/fixtures/canonical/` holds
   the payloads all 3 hash alike, checked through node.
+* **A file holding an escaped U+0000 or a lone surrogate is refused** by
+  `read_sframe()`, SurveyBuilder and the verifier page. jsonlite cut a
+  string at an escaped U+0000 and turned a lone surrogate escape into "?",
+  so in R a text changed after the U+0000 kept its hash, and 2 different
+  files could read as 1. The check reads the raw text before it is parsed,
+  and an escaped backslash before `u0000` is plain text and passes. The
+  shared fixture holds 53 cases with these.
 * **A file hashed before 0.4.3 is recognised in any session** (Fable FR-08
   and FR-11). The old key order followed the collation of the session that
   hashed, so a file hashed in an English session was refused as modified in

@@ -238,6 +238,16 @@ function sframeDuplicateKey(t){
   }
   return null;
 }
+// An escape R cannot hold: jsonlite cuts a string at an escaped NUL and
+// garbles a lone surrogate, so 2 different texts would hash the same in R.
+// Refused in all 3, on the raw text. Returns 'nul', 'surrogate' or null.
+function sframeEscapeProblem(t){
+  var odd='(?<!\\\\)(?:\\\\\\\\)*',hi='\\\\u[dD][89abAB][0-9a-fA-F]{2}',
+    lo='\\\\u[dD][c-fC-F][0-9a-fA-F]{2}';
+  if(new RegExp(odd+'\\\\u0000').test(t))return 'nul';
+  if(new RegExp(odd+hi+'(?!'+lo+')').test(t)||new RegExp(odd+'(?<!'+hi+')'+lo).test(t))return 'surrogate';
+  return null;
+}
 // The form 0.4.3 development builds hashed, kept only to recognise a file saved
 // with it: null as {}, keys sorted, then JSON.stringify().
 function sframeCanonDev(x){
@@ -358,6 +368,12 @@ async function verify(text){
     return;
   }
 
+  var escBad=sframeEscapeProblem(text);
+  if(escBad){
+    resultEl.innerHTML='<p class="err">Not verified. The file holds '+(escBad==='nul'?'the escaped character U+0000':'a lone surrogate escape, U+D800 to U+DFFF without its pair')+
+      ', which surveyframe in R cannot read faithfully.</p>';
+    return;
+  }
   var dupKey=sframeDuplicateKey(text);
   if(dupKey!==null){
     resultEl.innerHTML='<p class="err">Not verified. The key <code>'+esc(dupKey)+
