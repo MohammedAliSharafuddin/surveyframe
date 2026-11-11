@@ -915,6 +915,13 @@ style.
   a pass value outside the item's codes, and choosing a scale for an item
   in its editor adds the item to that scale. A rule on an item asked later
   stays allowed, since on 1 page the answer arrives as it is given.
+* **A field with an empty name is refused at write.** JSON allows an empty
+  key, but `write_sframe()` wrote an R list element with an empty name under
+  its position, so `{"a":1,"":3}` read from a file was written back as
+  `{"a":1,"2":3}`, a changed instrument with no amendment, and `{"":3}`
+  alone became an array. Such a file still reads, and writing it is refused
+  with the field named, such as "The field at $.meta.custom[1] has an empty
+  name".
 * **Messages count in words.** Every message, warning, error and printed
   summary from the R functions says "1 item" and "2 items", "There is 1
   weight" and "There are 3 weights", where 68 places wrote "item(s)" or

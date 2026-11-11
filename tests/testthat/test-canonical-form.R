@@ -211,3 +211,25 @@ test_that("read_sframe() refuses an escaped NUL or a lone surrogate (coordinator
   writeLines(sub("abcXdef", "abc\\\\u0000def", txt, fixed = TRUE), f)
   expect_error(read_sframe(f), "Integrity check failed", class = "sframe_import_error")
 })
+
+test_that("a field with an empty name is refused at write with its path (coordinator, after milestone 4)", {
+  # jsonlite wrote {"":3} beside a named field as {"3":3}, and alone as [3],
+  # so a file read with an empty key changed on writing, with no amendment.
+  f <- tempfile(fileext = ".sframe")
+  write_sframe(canon_instrument(), f)
+  p <- jsonlite::read_json(f, simplifyVector = FALSE)
+  p$meta$custom <- jsonlite::parse_json('{"a":1,"":3}', simplifyVector = FALSE)
+  p$hash$value <- surveyframe:::sframe_hash_payload(p, parsed = TRUE)
+  g <- tempfile(fileext = ".sframe")
+  writeLines(surveyframe:::sframe_jcs(p), g, useBytes = TRUE)
+  x <- read_sframe(g)
+  expect_true(attr(x, "sframe_verified"))
+  expect_identical(sort(names(x$meta$custom)), c("", "a"))
+  expect_error(write_sframe(x, tempfile(fileext = ".sframe")),
+               "The field at \\$\\.meta\\.custom\\[1\\] has an empty name",
+               class = "sframe_canonical_error")
+  y <- canon_instrument()
+  y$meta$custom <- stats::setNames(list(3), "")
+  expect_error(write_sframe(y, tempfile(fileext = ".sframe")),
+               "\\$\\.meta\\.custom\\[1\\] has an empty name", class = "sframe_canonical_error")
+})

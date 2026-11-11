@@ -445,6 +445,17 @@ sframe_duplicate_key <- function(x, path = "$") {
 sframe_json_numbers <- function(x, path = "$") {
   if (is.list(x) && !is.data.frame(x)) {
     nm <- names(x)
+    # JSON allows an empty key, but jsonlite writes an R list element with an
+    # empty name under its position ({"":3} beside a named field becomes
+    # {"3":3}) or, when every name is empty, as an array, so content read from
+    # a file would change on writing with no amendment. Refused with its path,
+    # as an NA is (coordinator 2026-11-11, after CF-A milestone 4).
+    if (length(nm) > 0 && !all(nzchar(nm))) {
+      sframe_abort_canonical(sprintf(paste0(
+        "The field at %s[%d] has an empty name. A .sframe file cannot hold an ",
+        "empty key, since writing it from R would change it into another. Give ",
+        "it a name, or remove it."), path, which(!nzchar(nm))[1]))
+    }
     out <- lapply(seq_along(x), function(i) {
       key <- if (is.null(nm) || !nzchar(nm[i])) paste0("[", i, "]") else paste0(".", nm[i])
       sframe_json_numbers(x[[i]], paste0(path, key))
@@ -1188,7 +1199,10 @@ read_sframe <- function(path = NULL, validate = TRUE, text = NULL, verify = TRUE
   attr(instrument, "sframe_origin") <- list(
     path = path,
     verified = hash_ok,
-    content_hash = sframe_content_hash(instrument),
+    # A field R cannot write, such as an empty key, has no R fingerprint. The
+    # file still reads, and write_sframe() refuses it with the field named.
+    content_hash = tryCatch(sframe_content_hash(instrument),
+                            sframe_canonical_error = function(e) NA_character_),
     # The identity read, so a new instrument written from it must differ.
     title = instrument$meta$title %||% "",
     version = instrument$meta$version %||% "",
