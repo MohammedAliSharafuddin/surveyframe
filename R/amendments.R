@@ -460,6 +460,13 @@ sframe_amendment_preview <- function(previous, instrument) {
 #' before it is written is part of the author's new version, covered by the
 #' file's hash but not by this entry's `new_hash`.
 #'
+#' The check that a change read from a file was recorded here rests on an
+#' attribute, `sframe_origin`, which [read_sframe()] sets and the package's
+#' own functions keep. Base R that builds a new list from the parts, such as
+#' `x[names(x)]`, `c(x)` or [lapply()] over the fields, drops it, and the
+#' result is written as an instrument read from no file, with no amendment
+#' asked for. See the Revisions section of [write_sframe()].
+#'
 #' @section Wording on the participant's screens:
 #' The welcome, consent and thank-you wording lives in `render`, and both
 #' hashes cover `render`, so editing that wording changes the instrument as

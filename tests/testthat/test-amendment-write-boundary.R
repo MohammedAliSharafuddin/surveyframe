@@ -381,3 +381,37 @@ test_that("FR-05: the same read writes as a new instrument with a new log", {
   expect_true(attr(z, "sframe_verified"))
   expect_length(z$amendments, 0)
 })
+
+# Fable sitting 1 FR-16. The write boundary rests on the sframe_origin
+# attribute, which base subsetting drops. No structural change in 0.4.3: the
+# help says which calls keep it and which drop it, and this test holds the
+# help to what the code does.
+
+test_that("FR-16: the help names the calls that keep and drop sframe_origin", {
+  loaded <- read_sframe(written(base_instrument()))
+  kept <- list(
+    validate = as_sframe(validate_sframe(loaded)),
+    modifyList = utils::modifyList(loaded, list()),
+    rds = { f <- tempfile(); saveRDS(loaded, f); readRDS(f) })
+  for (n in names(kept)) {
+    y <- kept[[n]]
+    expect_false(is.null(attr(y, "sframe_origin")), label = n)
+    y$items[[1]]$label <- "Reworded"
+    expect_error(write_sframe(y, tempfile(fileext = ".sframe")), "amend_sframe",
+                 class = "sframe_validation_error", label = n)
+  }
+  dropped <- list(
+    subset = structure(loaded[names(loaded)], class = "sframe"),
+    c = structure(c(loaded), class = "sframe"),
+    lapply = structure(lapply(loaded, identity), class = "sframe"))
+  for (n in names(dropped)) {
+    expect_null(attr(dropped[[n]], "sframe_origin"), label = n)
+  }
+  man <- test_path("..", "..", "man")
+  skip_if_not(dir.exists(man), "the help sources are not in this tree")
+  rd <- function(f) paste(readLines(file.path(man, f), warn = FALSE), collapse = " ")
+  for (f in c("write_sframe.Rd", "amend_sframe.Rd")) {
+    expect_match(rd(f), "sframe_origin", label = f)
+    expect_match(rd(f), "x[names(x)]", fixed = TRUE, label = f)
+  }
+})
