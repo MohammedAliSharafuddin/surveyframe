@@ -261,6 +261,16 @@ function sframeCanonDev(x){
   return x;
 }
 function sframeDevStr(v){return JSON.stringify(sframeCanonDev(v));}
+// The canonical form a file's hash names (hash.canonical, from 0.4.3), as R's
+// sframe_hash_canonical() reads it: 'rfc8785', 'absent' for a file written
+// before the field existed, or the canonical text of any other value, which
+// every reader refuses as needing a newer surveyframe.
+var SFRAME_CANONICAL='rfc8785';
+function sframeHashCanonical(h){
+  if(!h||typeof h!=='object'||Array.isArray(h)||!Object.prototype.hasOwnProperty.call(h,'canonical'))return{form:'absent'};
+  if(h.canonical===SFRAME_CANONICAL)return{form:SFRAME_CANONICAL};
+  return{form:'unknown',value:sframeCanonStr(h.canonical)};
+}
 // sframe-canon:end
 async function sha256hex(str){
   if(window.crypto&&window.crypto.subtle){
@@ -381,6 +391,12 @@ async function verify(text){
     return;
   }
 
+  var hc=sframeHashCanonical(parsed.hash);
+  if(hc.form==='unknown'){
+    resultEl.innerHTML='<p class="err">Not verified. This file names its hash\u2019s canonical form as <code>'+esc(hc.value)+
+      '</code>, which this page does not know. The file needs a newer surveyframe.</p>';
+    return;
+  }
   var storedHash=(parsed.hash&&parsed.hash.value)||'';
   var canon;
   try{
@@ -389,12 +405,17 @@ async function verify(text){
     resultEl.innerHTML='<p class="err">Not verified. '+esc(e.message)+'</p>';
     return;
   }
-  var dev=await devHash(parsed);
-  var legacy=await legacyHash(parsed);
+  // A file naming rfc8785 is checked in that form alone. One naming no form
+  // was written before the field existed and may match an earlier form.
+  var old=hc.form==='absent';
+  var dev=old?await devHash(parsed):null;
+  var legacy=old?await legacyHash(parsed):null;
 
   var status, note;
-  if(storedHash&&storedHash===canon){
+  if(storedHash&&storedHash===canon&&!old){
     status='ok'; note='Integrity verified. The instrument content matches the SHA-256 digest stored in this file.';
+  }else if(storedHash&&storedHash===canon){
+    status='legacy'; note='Integrity verified. This file was written before the hash named its canonical form. Content is unchanged. Save it again to update the hash.';
   }else if(storedHash&&storedHash===dev){
     status='legacy'; note='Integrity verified against the hash form surveyframe used before 0.4.3. Content is unchanged. Save it again to update the hash.';
   }else if(storedHash&&storedHash===legacy){

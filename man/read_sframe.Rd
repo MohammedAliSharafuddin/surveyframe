@@ -35,6 +35,13 @@ ignores whitespace and key order. It is unsigned, so anyone who edits a file
 can also recompute it.
 }
 \details{
+The hash's \code{canonical} field names the form it was taken in. A file naming
+\code{"rfc8785"} is checked in RFC 8785 alone. A file naming no form was written
+before the field existed: it is checked in RFC 8785 and then in the forms
+surveyframe used before 0.4.3, and any match is accepted with a message of
+class \code{sframe_locale_order_hash} asking you to save it again. A file naming
+any other form is refused, since it needs a newer surveyframe.
+
 The instrument remembers the content and amendment log it was read with, so
 \code{\link[=write_sframe]{write_sframe()}} can refuse an undisclosed revision.
 }
