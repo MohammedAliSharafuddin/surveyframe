@@ -804,6 +804,15 @@ style.
   24 of the 26 bundled `.sframe` files held a null and have new hashes, and
   only their hash line changed. `tests/testthat/fixtures/canonical/` holds
   the payloads all 3 hash alike, checked through node.
+* **A file hashed before 0.4.3 is recognised in any session** (Fable FR-08
+  and FR-11). The old key order followed the collation of the session that
+  hashed, so a file hashed in an English session was refused as modified in
+  a C session, such as a container or `R CMD check`. The old form is now
+  tried in the session's, the C and the en_US collation. The legacy hash,
+  for files written before canonical serialisation, is read only and never
+  written. It keeps numbers to 4 decimals, as jsonlite's default did, so 2
+  numbers that agree to 4 decimals hash the same in it. The verifier page
+  hashed such numbers in full and now takes the legacy hash as R does.
 * **The Quarto source of a report, which checks itself.**
   `render_report(format = "qmd")` writes a folder: `report.qmd`, the
   `.sframe`, `responses.csv`, the bibliography and its style, the results
