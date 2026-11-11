@@ -276,6 +276,7 @@ async function canonicalHash(payload){
 async function devHash(payload){
   return sha256hex(sframeDevStr(sframeHashless(payload)));
 }
+// sframe-legacy:begin
 // Legacy hash, read only, as R's sframe_legacy_hash_payload() takes it:
 // jsonlite::toJSON() with its defaults, keys in file order, null as {}, "</"
 // written "<\/", and numbers with 4 decimals, or C's %g from 2^31 up and from
@@ -312,6 +313,7 @@ function sframeLegacyStr(x){
   if(typeof x==='string')return JSON.stringify(x).replace(/<\//g,'<\\/');
   return JSON.stringify(x);
 }
+// sframe-legacy:end
 async function legacyHash(payload){
   return sha256hex(sframeLegacyStr(sframeHashless(payload)));
 }
