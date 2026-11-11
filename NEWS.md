@@ -842,9 +842,9 @@ style.
   record and `manifest.json`, with no `_quarto.yml`. Opened in RStudio or
   Positron, `report.qmd` recomputes every number from the folder's own files
   through the new `sframe_report_source()`, and its Provenance section says
-  "Numbers match the recorded results" or "Numbers differ from the
-  recorded results" with both hashes, and whether `report.qmd` was edited
-  after surveyframe wrote it. Editing stays allowed and is disclosed. The
+  "The analysis plan results match the recorded results" or "differ" with
+  both hashes, whether each file it reads is the one exported, and whether
+  `report.qmd` was edited after surveyframe wrote it. Editing stays allowed and is disclosed. The
   instrument's text reaches the `.qmd` only as its JSON-quoted title and
   authors, so a title holding quotes, a colon or a `---` line leaves the
   front matter whole.
@@ -858,6 +858,23 @@ style.
   last digit. Export now writes the files, reads them back and computes the
   record from those, as the check does. A changed response still turns the
   check `FALSE`.
+* **The report source checks every file it reads** (Codex pass 2 P2-02,
+  Fable FR-04, FR-07, FR-15 and FR-17). The check recomputed the plan
+  results and compared them with the record's hash in the manifest, but
+  never opened `report_results.json`, so an edited or deleted record still
+  passed. The record file is now hashed against the manifest, as its own
+  verdict (`results_file_match`) and its own Provenance line, "Results
+  record". `references.json` and `interpretations.json` join the manifest
+  and the check (`references_match`, `interpretations_match`), with the
+  Provenance lines "Bibliography" and "Interpretations", so an emptied
+  bibliography or an interpretation added after export is reported. The
+  results line now says what it covers: "The analysis plan results match
+  the recorded results". The responses sha256 of a report hashed the data
+  as JSON with 15 significant digits, so NA, NaN and Inf hashed alike, as
+  did 0.3 and 0.1 + 0.2, and a time was written in the session's zone. Each
+  column is now hashed with its name and type, doubles in 17 significant
+  digits with NA, NaN, Inf and -Inf by name, and a POSIXct as its seconds
+  in UTC, so the same instant hashes alike in any time zone.
 * **Messages count in words.** Every message, warning, error and printed
   summary from the R functions says "1 item" and "2 items", "There is 1
   weight" and "There are 3 weights", where 68 places wrote "item(s)" or
