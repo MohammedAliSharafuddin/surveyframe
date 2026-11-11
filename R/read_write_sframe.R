@@ -123,7 +123,7 @@ sframe_serialization_payload <- function(instrument, hash_value = "", box = TRUE
   # an existing file and written back would come out with a
   # different hash from the one it went in with, so the same content
   # would silently change identity. It would also desync from the
-  # builder's JS sframeCanon(). Measured on the tourism demo:
+  # builder's JS sframeJcs(). Measured on the tourism demo:
   # c3df10ec before, febd07c5 after.
   designs <- instrument$designs %||% list()
   if (length(designs) > 0) {
@@ -168,59 +168,279 @@ sframe_json_object <- function() {
   structure(list(), names = character())
 }
 
-# The order hashed keys sort in. Code point order (radix, the C locale
-# whatever LC_COLLATE says) from 0.4.3, as SurveyBuilder's sframeCanon()
-# sorts with JavaScript's sort(). Before 0.4.3 order() followed LC_COLLATE,
-# so a file hashed in an English locale holds a hash of the keys in that
-# order. sframe_with_locale_order() recomputes a hash the old way, only to
-# recognise such a file when its hash does not match. New hashes are always
-# written in code point order.
+# The canonical form a hash is taken over (0.4.3 onwards): RFC 8785, the JSON
+# Canonicalization Scheme. Object keys sorted by UTF-16 code units, numbers in
+# ECMAScript's shortest round-trip form, strings escaped as JSON.stringify()
+# escapes them, null kept as null, and no whitespace. SurveyBuilder and the
+# verifier page build the same string in JavaScript (sframeJcs() in
+# inst/builder/survey_builder.html and pkgdown/extra/verify/index.html), and
+# tests/testthat/test-canonical-form.R hashes a shared set of payloads in all
+# 3 through node.
+#
+# Earlier forms are kept only to recognise a file hashed by them:
+# - "dev", the 0.4.3 development form: sframe_canonical_payload() turned null
+#   into {}, keys sorted by code point, and jsonlite printed the numbers with
+#   15 significant digits and escaped "</" as "<\/".
+# - "locale", the form before 0.4.3: the same, with keys in the order of a
+#   collation (the session's, C or en_US), since order() followed LC_COLLATE.
+# New hashes are always written in the RFC 8785 form.
 .sframe_order_env <- new.env(parent = emptyenv())
 
+sframe_hash_form <- function() .sframe_order_env$form %||% "jcs"
+
 sframe_key_order <- function(x) {
-  if (isTRUE(.sframe_order_env$locale)) order(x) else order(x, method = "radix")
+  if (!identical(sframe_hash_form(), "locale")) return(order(x, method = "radix"))
+  sframe_collate_order(x, .sframe_order_env$collate)
 }
 
 sframe_key_sort <- function(x) x[sframe_key_order(x)]
 
-sframe_with_locale_order <- function(code) {
-  old <- .sframe_order_env$locale
-  .sframe_order_env$locale <- TRUE
-  on.exit(.sframe_order_env$locale <- old, add = TRUE)
-  force(code)
+# order() in a named collation: NULL is the session's, "C" is code point order
+# and "en_US" is American English, whatever the session uses. Where en_US is
+# not installed the session's order is used.
+sframe_collate_order <- function(x, collate = NULL) {
+  if (is.null(collate)) return(order(x))
+  if (identical(collate, "C")) return(order(x, method = "radix"))
+  old <- Sys.getlocale("LC_COLLATE")
+  on.exit(suppressWarnings(Sys.setlocale("LC_COLLATE", old)), add = TRUE)
+  for (loc in c("en_US.UTF-8", "en_US.utf8", "en_US", "English_United States.utf8",
+                "English_United States.1252")) {
+    if (nzchar(suppressWarnings(Sys.setlocale("LC_COLLATE", loc)))) break
+  }
+  order(x)
 }
 
-# Said when a hash matched only in the order used before 0.4.3.
+# Evaluate fun() with hashes taken in an earlier form.
+sframe_in_form <- function(form, fun, collate = NULL) {
+  old_form <- .sframe_order_env$form
+  old_collate <- .sframe_order_env$collate
+  on.exit({
+    .sframe_order_env$form <- old_form
+    .sframe_order_env$collate <- old_collate
+  }, add = TRUE)
+  .sframe_order_env$form <- form
+  .sframe_order_env$collate <- collate
+  fun()
+}
+
+sframe_with_locale_order <- function(code) {
+  sframe_in_form("locale", function() code)
+}
+
+# The values fun() gives in every earlier form: the 0.4.3 development form,
+# then the pre-0.4.3 form in the session's, the C and the en_US collation, so a
+# file hashed in an English session is recognised in a C one (FR-08).
+sframe_old_form_values <- function(fun) {
+  unique(c(
+    sframe_in_form("dev", fun),
+    sframe_in_form("locale", fun),
+    sframe_in_form("locale", fun, collate = "C"),
+    sframe_in_form("locale", fun, collate = "en_US")
+  ))
+}
+
+# Said when a hash matched only in a form used before 0.4.3.
 sframe_inform_locale_order <- function(what) {
   rlang::inform(paste0(
-    what, " was hashed in the key order surveyframe used before 0.4.3, which ",
-    "followed the session's locale. It is accepted. Save it again to update the hash."),
+    what, " was hashed in a form surveyframe used before 0.4.3, whose key order ",
+    "or number format differs. It is accepted. Save it again to update the hash."),
     class = c("sframe_locale_order_hash", "sframe_message"))
 }
 
+sframe_abort_canonical <- function(msg) {
+  rlang::abort(msg, class = c("sframe_canonical_error", "sframe_validation_error",
+                              "sframe_error"))
+}
+
+# The 0.4.3 development and pre-0.4.3 canonical payload, kept to recognise
+# files hashed in those forms. It mapped null to {}, so a null changed to {}
+# kept its hash (P2-01).
 sframe_canonical_payload <- function(x) {
   if (is.null(x)) {
     return(sframe_json_object())
   }
-
   if (is.list(x)) {
-    # Keep this in sync with the SurveyBuilder sframeCanon() implementation:
-    # recurse into arrays/objects and sort object keys alphabetically, by
-    # code point as JavaScript's sort() does (sframe_key_order()). order()
-    # alone followed the locale, so "Scale" and "ceiling_pct" swapped between
-    # a C and an en_US session, and a report source rendered on macOS said its
-    # numbers differ.
     x <- lapply(x, sframe_canonical_payload)
     nm <- names(x)
     if (!is.null(nm)) {
       x <- x[sframe_key_order(nm)]
     }
   }
-
   x
 }
 
-sframe_hash_json <- function(payload, canonical = TRUE) {
+# A number in ECMAScript's Number::toString form: the fewest significant
+# digits, from 1 to 17, that read back to the same double, with the exponent
+# written from 1e21 up and below 1e-6. The read back uses jsonlite's parser,
+# which rounds correctly on every platform.
+sframe_jcs_number <- function(x, path = "$") {
+  if (is.na(x) && !is.nan(x)) return("null")
+  if (!is.finite(x)) {
+    sframe_abort_canonical(sprintf(
+      "The number at %s is %s, which JSON cannot hold.", path, format(x)))
+  }
+  if (x == 0) return("0")
+  if (abs(x) < 1e15 && x == trunc(x)) return(sprintf("%.0f", x))
+  cands <- sprintf("%.*e", 0:16, x)
+  back <- jsonlite::parse_json(paste0("[", paste(cands, collapse = ","), "]"),
+                               simplifyVector = TRUE)
+  hit <- which(back == x)
+  sci <- cands[if (length(hit)) hit[1] else 17L]
+  mant <- sub("e.*$", "", sub("^-", "", sci))
+  n <- as.integer(sub("^.*e", "", sci)) + 1L
+  digits <- sub("0+$", "", sub(".", "", mant, fixed = TRUE))
+  k <- nchar(digits)
+  out <- if (k <= n && n <= 21L) {
+    paste0(digits, strrep("0", n - k))
+  } else if (0L < n && n <= 21L) {
+    paste0(substr(digits, 1L, n), ".", substr(digits, n + 1L, k))
+  } else if (-6L < n && n <= 0L) {
+    paste0("0.", strrep("0", -n), digits)
+  } else {
+    e <- n - 1L
+    paste0(substr(digits, 1L, 1L), if (k > 1L) paste0(".", substr(digits, 2L, k)),
+           "e", if (e >= 0L) "+" else "-", abs(e))
+  }
+  if (x < 0) paste0("-", out) else out
+}
+
+# A string as JSON.stringify() writes it: quote, backslash and the controls
+# below U+0020 escaped, everything else, "/" and U+2028 among them, as is.
+sframe_jcs_string <- function(s) {
+  s <- enc2utf8(s)
+  if (!grepl("[\"\\\\\001-\037]", s, useBytes = TRUE)) return(paste0("\"", s, "\""))
+  cp <- utf8ToInt(s)
+  ch <- intToUtf8(cp, multiple = TRUE)
+  short <- c(`8` = "\\b", `9` = "\\t", `10` = "\\n", `12` = "\\f", `13` = "\\r",
+             `34` = "\\\"", `92` = "\\\\")
+  hit <- cp < 32L | cp == 34L | cp == 92L
+  ch[hit] <- ifelse(as.character(cp[hit]) %in% names(short),
+                    short[as.character(cp[hit])], sprintf("\\u%04x", cp[hit]))
+  paste0("\"", paste(ch, collapse = ""), "\"")
+}
+
+# Key order by UTF-16 code units. Code point order (radix on UTF-8) is the same
+# unless a key holds a character beyond U+FFFF.
+sframe_utf16_order <- function(nm) {
+  if (!any(utf8ToInt(paste(nm, collapse = "")) > 0xFFFF)) return(order(nm, method = "radix"))
+  units <- vapply(nm, function(s) {
+    cp <- utf8ToInt(s)
+    u <- unlist(lapply(cp, function(c) {
+      if (c <= 0xFFFF) return(c)
+      v <- c - 0x10000
+      c(0xD800 + v %/% 1024, 0xDC00 + v %% 1024)
+    }))
+    paste(sprintf("%04x", as.integer(u)), collapse = "")
+  }, character(1), USE.NAMES = FALSE)
+  order(units, method = "radix")
+}
+
+# The RFC 8785 string of a parsed JSON value: a list from
+# jsonlite::parse_json(simplifyVector = FALSE), where an object is a named
+# list and an array an unnamed one.
+sframe_jcs <- function(x, path = "$") {
+  if (is.null(x)) return("null")
+  if (is.list(x)) {
+    nm <- names(x)
+    if (is.null(nm)) {
+      if (length(x) == 0L) return("[]")
+      parts <- vapply(seq_along(x), function(i) {
+        sframe_jcs(x[[i]], paste0(path, "[", i, "]"))
+      }, character(1))
+      return(paste0("[", paste(parts, collapse = ","), "]"))
+    }
+    if (length(x) == 0L) return("{}")
+    nm <- enc2utf8(nm)
+    dup <- anyDuplicated(nm)
+    if (dup) {
+      sframe_abort_canonical(sprintf("The key \"%s\" appears more than once in %s.",
+                                     nm[dup], path))
+    }
+    parts <- vapply(sframe_utf16_order(nm), function(i) {
+      paste0(sframe_jcs_string(nm[i]), ":", sframe_jcs(x[[i]], paste0(path, ".", nm[i])))
+    }, character(1))
+    return(paste0("{", paste(parts, collapse = ","), "}"))
+  }
+  if (length(x) != 1L) {
+    parts <- vapply(seq_along(x), function(i) sframe_jcs(x[i], paste0(path, "[", i, "]")),
+                    character(1))
+    return(paste0("[", paste(parts, collapse = ","), "]"))
+  }
+  if (is.double(x)) return(sframe_jcs_number(x, path))
+  if (is.na(x)) return("null")
+  if (is.character(x)) return(sframe_jcs_string(x))
+  if (is.logical(x)) return(if (x) "true" else "false")
+  if (is.integer(x)) return(as.character(x))
+  sframe_abort_canonical(sprintf("The value at %s is a %s, which JSON cannot hold.",
+                                 path, class(x)[1]))
+}
+
+# The first duplicate key in a parsed file, as c(key, path), or NULL. R keeps both
+# and the JavaScript twins the last, so such a file is refused (FR-12).
+sframe_duplicate_key <- function(x, path = "$") {
+  if (!is.list(x)) return(NULL)
+  nm <- names(x)
+  if (!is.null(nm)) {
+    dup <- anyDuplicated(nm)
+    if (dup) return(c(key = nm[dup], path = path))
+  }
+  for (i in seq_along(x)) {
+    sub <- if (is.null(nm)) paste0(path, "[", i, "]") else paste0(path, ".", nm[i])
+    hit <- sframe_duplicate_key(x[[i]], sub)
+    if (!is.null(hit)) return(hit)
+  }
+  NULL
+}
+
+# Doubles written in the canonical number form, so the file holds the same
+# digits the hash was taken over. jsonlite with digits = NA keeps 15
+# significant digits and C's exponent form (1e-07), which the JavaScript twins
+# read differently (P2-06, FR-03). A number JSON cannot hold is refused with
+# its field named.
+sframe_json_numbers <- function(x, path = "$") {
+  if (is.list(x) && !is.data.frame(x)) {
+    nm <- names(x)
+    out <- lapply(seq_along(x), function(i) {
+      key <- if (is.null(nm) || !nzchar(nm[i])) paste0("[", i, "]") else paste0(".", nm[i])
+      sframe_json_numbers(x[[i]], paste0(path, key))
+    })
+    attributes(out) <- attributes(x)
+    return(out)
+  }
+  cls <- oldClass(x)
+  if (is.double(x) && (is.null(cls) || identical(cls, "AsIs")) &&
+      is.null(dim(x)) && is.null(names(x))) {
+    bad <- is.nan(x) | is.infinite(x)
+    if (any(bad)) {
+      sframe_abort_canonical(sprintf(
+        "The number at %s is %s, which a .sframe file cannot hold.", path,
+        format(x[bad][1])))
+    }
+    txt <- vapply(x, sframe_jcs_number, character(1), path = path)
+    boxed <- inherits(x, "AsIs") || length(x) != 1L
+    return(structure(if (boxed) paste0("[", paste(txt, collapse = ","), "]") else txt,
+                     class = "json"))
+  }
+  x
+}
+
+# The JSON a payload is written as, by write_sframe() and for hashing.
+sframe_payload_json <- function(payload, pretty = FALSE) {
+  jsonlite::toJSON(sframe_json_numbers(payload), auto_unbox = TRUE, pretty = pretty,
+                   null = "null", digits = NA, json_verbatim = TRUE)
+}
+
+# The text a hash is taken over. In the RFC 8785 form an R payload is first
+# written as the file would be and read back, so the hash covers exactly what
+# a reader of the file sees. `parsed = TRUE` says the payload came from
+# jsonlite::parse_json() already.
+sframe_hash_json <- function(payload, canonical = TRUE, parsed = FALSE) {
+  if (identical(sframe_hash_form(), "jcs")) {
+    if (!isTRUE(parsed)) {
+      payload <- jsonlite::parse_json(sframe_payload_json(payload), simplifyVector = FALSE)
+    }
+    return(sframe_jcs(payload))
+  }
   if (isTRUE(canonical)) {
     payload <- sframe_canonical_payload(payload)
   }
@@ -233,12 +453,19 @@ sframe_hash_json <- function(payload, canonical = TRUE) {
   )
 }
 
-sframe_hash_payload <- function(payload) {
-  payload$hash$value <- ""
-  json_for_hash <- sframe_hash_json(payload, canonical = TRUE)
-  as.character(openssl::sha256(json_for_hash))
+sframe_sha256_json <- function(json) {
+  sframe_hex(openssl::sha256(charToRaw(enc2utf8(as.character(json)))))
 }
 
+sframe_hash_payload <- function(payload, parsed = FALSE) {
+  payload$hash$value <- ""
+  sframe_sha256_json(sframe_hash_json(payload, canonical = TRUE, parsed = parsed))
+}
+
+# The hash of files written before canonical serialisation: jsonlite's
+# defaults, keys in file order, null as {}, numbers with 4 decimals. Read only,
+# never written. 4 decimals means 2 numbers that agree to 4 decimals hash the
+# same in this form (FR-11).
 sframe_legacy_hash_payload <- function(payload) {
   payload$hash$value <- ""
   json_for_hash <- jsonlite::toJSON(payload, auto_unbox = TRUE, pretty = FALSE)
@@ -253,9 +480,13 @@ sframe_hash_value <- function(instrument) {
 #'
 #' Serialises an `sframe` instrument object to a UTF-8 JSON file with a
 #' SHA-256 integrity hash. The instrument is always validated before writing,
-#' and an invalid instrument is refused. The hash is computed over a canonical
-#' serialisation of the content with `hash.value` set to an empty string: object
-#' keys are sorted, so it identifies content, not the exact bytes.
+#' and an invalid instrument is refused. The hash is computed over the content
+#' with `hash.value` set to an empty string, in the canonical form of RFC 8785,
+#' the JSON Canonicalization Scheme: keys sorted, numbers in their shortest form
+#' and no whitespace. So it identifies content, not the exact bytes, and
+#' SurveyBuilder and the verifier page on the package website compute the same
+#' hash. An `NA` is written as null. A number JSON cannot hold, such as `Inf`,
+#' is refused with its field named.
 #'
 #' # Revisions and the amendment log
 #'
@@ -325,19 +556,11 @@ write_sframe <- function(instrument, path, pretty = TRUE, overwrite = FALSE,
   # Insert real hash
   payload$hash$value <- sframe_hash_payload(payload)
 
-  # digits = NA is required, matching sframe_hash_json()'s own call exactly:
-  # without it, jsonlite::toJSON()'s default (4 significant digits) rounds
-  # any non-round decimal in the payload -- a scale weight of 1/3, say --
-  # before it reaches disk, while the hash just above was computed over the
-  # full-precision value. The file's own embedded hash would then never
-  # match what read_sframe() (or any other reader) recomputes from the
-  # actually-written, rounded text: every such file would fail its own
-  # integrity check as "modified" despite never having been touched.
-  # Caught by building a standalone browser-based verifier and testing it
-  # against a real instrument with a non-round weight -- read_sframe()
-  # itself reproduced the same false failure once asked to reload that file.
-  json_out <- jsonlite::toJSON(payload, auto_unbox = TRUE, pretty = pretty,
-                               null = "null", digits = NA)
+  # The same writer the hash read back (sframe_payload_json()), so the file
+  # holds every number in the digits the hash covers. jsonlite's default of 4
+  # decimals once rounded a weight of 1/3 on disk after the hash was taken in
+  # full, and the untouched file failed its own check.
+  json_out <- sframe_payload_json(payload, pretty = pretty)
   writeLines(json_out, con = path, useBytes = FALSE)
 
   invisible(path)
@@ -347,6 +570,9 @@ sframe_as_vector <- function(x, mode = NULL) {
   if (is.null(x)) {
     return(NULL)
   }
+
+  # A null in an array, as jsonlite writes NA, reads back as NA in its place.
+  if (is.list(x)) x[vapply(x, is.null, logical(1))] <- list(NA)
 
   out <- unlist(x, recursive = TRUE, use.names = FALSE)
   if (is.null(mode)) {
@@ -711,6 +937,15 @@ read_sframe <- function(path = NULL, validate = TRUE, text = NULL, verify = TRUE
     }
   )
 
+  # A key given twice: R would keep the first and JavaScript the last, so the
+  # file means 2 things (FR-12).
+  dup <- sframe_duplicate_key(parsed)
+  if (!is.null(dup)) {
+    sframe_abort_import(
+      paste0("Invalid .sframe file '", path, "': the key \"", dup[["key"]],
+             "\" in ", dup[["path"]], " appears more than once."), path = path)
+  }
+
   sframe_validate_parsed_payload(parsed, path, require_hash = verify)
 
   # Verify hash
@@ -718,12 +953,17 @@ read_sframe <- function(path = NULL, validate = TRUE, text = NULL, verify = TRUE
   hash_ok <- FALSE
   if (!is.null(stored_hash)) {
     parsed$hash$value <- ""
-    computed_hash <- sframe_hash_payload(parsed)
-    legacy_hash   <- sframe_legacy_hash_payload(parsed)
-    hash_ok <- identical(stored_hash, computed_hash) || identical(stored_hash, legacy_hash)
-    # Hashed before 0.4.3, in the session locale's key order.
-    if (!hash_ok &&
-        identical(stored_hash, sframe_with_locale_order(sframe_hash_payload(parsed)))) {
+    computed_hash <- tryCatch(
+      sframe_hash_payload(parsed, parsed = TRUE),
+      sframe_canonical_error = function(e) {
+        sframe_abort_import(paste0("Integrity check failed for '", path, "'. ",
+                                   conditionMessage(e)), path = path)
+      })
+    hash_ok <- identical(stored_hash, computed_hash) ||
+      identical(stored_hash, sframe_legacy_hash_payload(parsed))
+    # Hashed in the 0.4.3 development form or before 0.4.3.
+    if (!hash_ok && is.character(stored_hash) && length(stored_hash) == 1L &&
+        stored_hash %in% sframe_old_form_values(function() sframe_hash_payload(parsed))) {
       hash_ok <- TRUE
       sframe_inform_locale_order(paste0("'", path, "'"))
     }

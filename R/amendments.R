@@ -57,7 +57,7 @@ sframe_amendment_default_tier <- function(reason_code) {
 sframe_amendment_entry_hash <- function(entry) {
   if (!is.list(entry)) return("")
   entry <- entry[sframe_key_order(names(entry))]
-  as.character(openssl::sha256(sframe_hash_json(entry, canonical = TRUE)))
+  sframe_sha256_json(sframe_hash_json(entry, canonical = TRUE))
 }
 
 sframe_amendment_entry_hashes <- function(amendments) {
@@ -74,7 +74,7 @@ sframe_content_hash <- function(instrument, box = TRUE, empty_render_array = FAL
   # Citing a source is disclosure, not a design change, so a reference added
   # to a published instrument needs no amendment. See R/references.R.
   payload$references <- NULL
-  as.character(openssl::sha256(sframe_hash_json(payload, canonical = TRUE)))
+  sframe_sha256_json(sframe_hash_json(payload, canonical = TRUE))
 }
 
 # The content fingerprints an earlier version could have recorded for the same
@@ -83,7 +83,7 @@ sframe_content_hash <- function(instrument, box = TRUE, empty_render_array = FAL
 # to recognise an existing log, so older files are not refused. Before 0.4.3
 # the keys also sorted in the session locale's order, so each form is also
 # taken in that order.
-sframe_content_hash_candidates <- function(instrument) {
+sframe_content_hash_candidates <- function(instrument, target = NULL) {
   forms <- function() {
     out <- character(0)
     for (box in c(TRUE, FALSE)) {
@@ -97,7 +97,10 @@ sframe_content_hash_candidates <- function(instrument) {
     }
     out
   }
-  unique(c(forms(), sframe_with_locale_order(forms())))
+  now <- unique(forms())
+  # Earlier forms only when the hash sought is not among the current ones.
+  if (!is.null(target) && all(target %in% now)) return(now)
+  unique(c(now, sframe_old_form_values(forms)))
 }
 
 # The amendment checks write_sframe() applies. An amendment log is only worth
@@ -169,7 +172,7 @@ sframe_check_amendment_boundary <- function(instrument, new_instrument = FALSE) 
   current <- sframe_content_hash(instrument)
   if (length(am) > 0) {
     last <- am[[length(am)]]$new_hash %||% ""
-    if (!identical(last, current) && !last %in% sframe_content_hash_candidates(instrument)) {
+    if (!identical(last, current) && !last %in% sframe_content_hash_candidates(instrument, last)) {
       abort(paste0(
         "The instrument has changed since its last recorded amendment. Record ",
         "the change with amend_sframe(), or write it as a new instrument with ",
@@ -230,7 +233,7 @@ sframe_check_amendment_log_read <- function(instrument, path) {
     }
   }
   last <- am[[length(am)]]$new_hash %||% ""
-  if (!last %in% sframe_content_hash_candidates(instrument)) {
+  if (!last %in% sframe_content_hash_candidates(instrument, last)) {
     warn(sprintf(paste0(
       "The amendment log in '%s' does not end at the content the file holds. ",
       "Its last entry records a different state, so the log does not describe ",
@@ -586,7 +589,7 @@ amend_sframe <- function(previous, instrument, reason_code, reason_text,
   }
   origin <- attr(previous, "sframe_origin")
   previous_hash <- if (!is.null(last_new)) {
-    if (!last_new %in% sframe_content_hash_candidates(previous_v)) {
+    if (!last_new %in% sframe_content_hash_candidates(previous_v, last_new)) {
       rlang::abort(paste0(
         "`previous` has changed since its last recorded amendment, so it is ",
         "not the state that amendment produced. Amend from the instrument as ",
@@ -595,7 +598,7 @@ amend_sframe <- function(previous, instrument, reason_code, reason_text,
     }
     last_new
   } else if (!is.null(origin$content_hash)) {
-    if (!origin$content_hash %in% sframe_content_hash_candidates(previous_v)) {
+    if (!origin$content_hash %in% sframe_content_hash_candidates(previous_v, origin$content_hash)) {
       rlang::abort(sprintf(paste0(
         "`previous` has changed since it was read from '%s', so it is not the ",
         "state that file holds. Amend from the instrument as read, and record ",

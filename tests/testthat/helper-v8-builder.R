@@ -76,7 +76,7 @@ builder_open <- function(ctx, instrument, new_instrument = FALSE) {
 # The file the builder's Save .sframe button would write, as a path.
 builder_save <- function(ctx) {
   json <- ctx$eval("(function(){ var p = sframePayload();
-    p.hash.value = window.sha256pure(JSON.stringify(sframeCanon(p)));
+    p.hash.value = window.sha256pure(sframeCanonStr(p));
     return JSON.stringify(p, null, 2); })()")
   path <- tempfile(fileext = ".sframe")
   writeLines(json, path)

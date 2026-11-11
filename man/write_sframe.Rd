@@ -37,9 +37,13 @@ The file path, invisibly.
 \description{
 Serialises an \code{sframe} instrument object to a UTF-8 JSON file with a
 SHA-256 integrity hash. The instrument is always validated before writing,
-and an invalid instrument is refused. The hash is computed over a canonical
-serialisation of the content with \code{hash.value} set to an empty string: object
-keys are sorted, so it identifies content, not the exact bytes.
+and an invalid instrument is refused. The hash is computed over the content
+with \code{hash.value} set to an empty string, in the canonical form of RFC 8785,
+the JSON Canonicalization Scheme: keys sorted, numbers in their shortest form
+and no whitespace. So it identifies content, not the exact bytes, and
+SurveyBuilder and the verifier page on the package website compute the same
+hash. An \code{NA} is written as null. A number JSON cannot hold, such as \code{Inf},
+is refused with its field named.
 }
 \section{Revisions and the amendment log}{
 Writing checks the amendment log recorded by \code{\link[=amend_sframe]{amend_sframe()}}. Each entry must
