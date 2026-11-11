@@ -101,6 +101,13 @@ The amendment is sealed when the file is written: \code{\link[=write_sframe]{wri
 the object as it stands then, so a change made to the returned object
 before it is written is part of the author's new version, covered by the
 file's hash but not by this entry's \code{new_hash}.
+
+The check that a change read from a file was recorded here rests on an
+attribute, \code{sframe_origin}, which \code{\link[=read_sframe]{read_sframe()}} sets and the package's
+own functions keep. Base R that builds a new list from the parts, such as
+\code{x[names(x)]}, \code{c(x)} or \code{\link[=lapply]{lapply()}} over the fields, drops it, and the
+result is written as an instrument read from no file, with no amendment
+asked for. See the Revisions section of \code{\link[=write_sframe]{write_sframe()}}.
 }
 \section{Wording on the participant's screens}{
 

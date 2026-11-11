@@ -890,6 +890,11 @@ style.
   `reverse` or `scale_id`, to the choice codes of an item a scale scores, or
   to the item an attention check tests or its pass values is now design
   tier, and needs a deviation report.
+* **The help says what the write boundary rests on** (Fable FR-16).
+  `?write_sframe` and `?amend_sframe` say that the link to the file read is
+  the attribute `sframe_origin`, which the package's functions keep and base
+  R that rebuilds the list, such as `x[names(x)]`, `c(x)` or `lapply()`,
+  drops, after which a change is written with no amendment asked for.
 * **Messages count in words.** Every message, warning, error and printed
   summary from the R functions says "1 item" and "2 items", "There is 1
   weight" and "There are 3 weights", where 68 places wrote "item(s)" or

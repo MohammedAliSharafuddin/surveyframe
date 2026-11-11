@@ -63,6 +63,17 @@ content as a different instrument, remove its amendment log and set
 These are checks on the content in hand. The hash is unsigned and can be
 recomputed by anyone who edits a file, so it does not establish who wrote an
 instrument or when.
+
+The link between an instrument and the file it was read from is an
+attribute, \code{sframe_origin}, that \code{\link[=read_sframe]{read_sframe()}} sets. These checks rest on
+it. The package's own functions keep it, among them \code{\link[=validate_sframe]{validate_sframe()}},
+\code{\link[=as_sframe]{as_sframe()}}, \code{\link[=sframe_drop_items]{sframe_drop_items()}}, \code{\link[=sframe_add_references]{sframe_add_references()}},
+\verb{sframe_plan<-} and \code{\link[=sframe_add_model]{sframe_add_model()}}, as do \verb{$<-}, \code{\link[=modifyList]{modifyList()}} and
+\code{\link[=saveRDS]{saveRDS()}} with \code{\link[=readRDS]{readRDS()}}. Base R that builds a new list from the parts
+drops it, such as \code{x[names(x)]}, \code{c(x)} or \code{\link[=lapply]{lapply()}} over the fields:
+the result is an instrument read from no file, and its changes are then
+written with no amendment recorded. Change a read instrument's fields in
+place, and record the change with \code{\link[=amend_sframe]{amend_sframe()}}.
 }
 
 \examples{

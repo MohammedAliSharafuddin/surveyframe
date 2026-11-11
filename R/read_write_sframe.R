@@ -616,6 +616,17 @@ sframe_hash_value <- function(instrument) {
 #' recomputed by anyone who edits a file, so it does not establish who wrote an
 #' instrument or when.
 #'
+#' The link between an instrument and the file it was read from is an
+#' attribute, `sframe_origin`, that [read_sframe()] sets. These checks rest on
+#' it. The package's own functions keep it, among them [validate_sframe()],
+#' [as_sframe()], [sframe_drop_items()], [sframe_add_references()],
+#' `sframe_plan<-` and [sframe_add_model()], as do `$<-`, [modifyList()] and
+#' [saveRDS()] with [readRDS()]. Base R that builds a new list from the parts
+#' drops it, such as `x[names(x)]`, `c(x)` or [lapply()] over the fields:
+#' the result is an instrument read from no file, and its changes are then
+#' written with no amendment recorded. Change a read instrument's fields in
+#' place, and record the change with [amend_sframe()].
+#'
 #' @param instrument An `sframe` object created by [sframe_instrument()].
 #' @param path Character. The file path to write to. The `.sframe` extension
 #'   is appended automatically if not already present.
