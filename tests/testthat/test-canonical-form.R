@@ -118,8 +118,7 @@ test_that("a file R writes verifies in both JavaScript twins (FR-01, FR-02, FR-0
     weight_1e15 = function(x) { x$scales[[1]]$weights <- c(1e15, 1, 1, 1); x },
     html_label = function(x) { x$items[[1]]$label <- "Rate the <b>service</b> </script>"; x },
     line_sep = function(x) { x$items[[1]]$label <- paste0("a", intToUtf8(0x2028), "b"); x },
-    na_help = function(x) { x$items[[1]]$help <- NA; x },
-    na_author = function(x) { x$meta$authors <- c("A", NA); x }
+    na_help = function(x) { x$items[[1]]$help <- NA; x }
   )
   texts <- character(0)
   for (v in names(variants)) {
@@ -164,15 +163,17 @@ test_that("read_sframe() refuses a file that gives a key twice (FR-12)", {
                class = "sframe_import_error")
 })
 
-test_that("an NA in a text field writes a file that reads back verified (FR-01)", {
+test_that("an NA where the schema allows null reads back verified, elsewhere it is refused (FR-01)", {
   x <- canon_instrument()
   x$items[[1]]$help <- NA
-  x$meta$authors <- c("A", NA)
+  x$meta$description <- NA_character_
   f <- tempfile(fileext = ".sframe")
   write_sframe(x, f)
-  y <- read_sframe(f)
-  expect_true(attr(y, "sframe_verified"))
-  expect_identical(y$meta$authors, c("A", NA))
+  expect_true(attr(read_sframe(f), "sframe_verified"))
+  # The schema's meta.authors is an array of strings (coordinator ruling).
+  x$meta$authors <- c("A", NA)
+  expect_error(write_sframe(x, tempfile(fileext = ".sframe")),
+               "meta.authors holds NA at position 2", class = "sframe_validation_error")
 })
 
 test_that("a number JSON cannot hold is refused at write with its field named", {

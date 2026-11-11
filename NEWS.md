@@ -798,8 +798,10 @@ style.
   null, and the file holds every number in the digits its hash covers. A
   file that gives a key twice is refused, since R kept the first and
   JavaScript the last. A number JSON cannot hold, such as `Inf`, is refused
-  at write with its field named. An `NA` is written as null, and an `NA` in
-  a list of text such as `meta$authors` reads back as `NA`. A file hashed in
+  at write with its field named. An `NA` is written as null where the
+  published schema allows null for that field, such as an item's `help`, and
+  refused with the field named anywhere else, such as inside
+  `meta$authors`. A file hashed in
   the 0.4.3 development form is accepted with a message to save it again.
   24 of the 26 bundled `.sframe` files held a null and have new hashes, and
   only their hash line changed. `tests/testthat/fixtures/canonical/` holds
