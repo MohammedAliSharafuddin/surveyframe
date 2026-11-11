@@ -52,10 +52,12 @@ it would otherwise rebuild by hand and lose fields doing so. The result
 carries the attribute \code{sframe_verified}, \code{FALSE} (it is \code{TRUE} on every
 verified read), and \code{print()} says so. \code{\link[=write_sframe]{write_sframe()}} refuses to write an
 unverified instrument unless \code{new_instrument = TRUE} declares it new, since
-nothing ties its content to a state anyone wrote. The exception is one
-written back unchanged with the amendment log it was read with. No
-amendment can start from it: \code{\link[=amend_sframe]{amend_sframe()}} refuses it, and the write
-refuses any entry appended to its log.
+nothing ties its content to a state anyone wrote. That holds with the
+amendment log it was read with too, since the log was read unchecked: a
+sign-off, a tier or a timestamp edited as text would otherwise be written
+back and read verified. A new instrument starts a new log, so clear the old
+one first with \code{instrument$amendments <- list()}. No amendment can start
+from it: \code{\link[=amend_sframe]{amend_sframe()}} refuses it.
 }
 
 \examples{
