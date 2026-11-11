@@ -1004,10 +1004,12 @@ sframe_validate_parsed_payload <- function(parsed, path, require_hash = TRUE) {
 #' carries the attribute `sframe_verified`, `FALSE` (it is `TRUE` on every
 #' verified read), and `print()` says so. [write_sframe()] refuses to write an
 #' unverified instrument unless `new_instrument = TRUE` declares it new, since
-#' nothing ties its content to a state anyone wrote. The exception is one
-#' written back unchanged with the amendment log it was read with. No
-#' amendment can start from it: [amend_sframe()] refuses it, and the write
-#' refuses any entry appended to its log.
+#' nothing ties its content to a state anyone wrote. That holds with the
+#' amendment log it was read with too, since the log was read unchecked: a
+#' sign-off, a tier or a timestamp edited as text would otherwise be written
+#' back and read verified. A new instrument starts a new log, so clear the old
+#' one first with `instrument$amendments <- list()`. No amendment can start
+#' from it: [amend_sframe()] refuses it.
 #'
 #' @return An `sframe` object.
 #' @export
@@ -1115,7 +1117,7 @@ read_sframe <- function(path = NULL, validate = TRUE, text = NULL, verify = TRUE
     rlang::warn(
       paste0("'", path, "' was read without a matching integrity hash and is ",
              "marked unverified. write_sframe() writes it only as a new ",
-             "instrument, or when its amendment log names this content."),
+             "instrument, with new_instrument = TRUE and a new amendment log."),
       class = c("sframe_unverified_warning", "sframe_warning"))
   } else if (!hash_ok) {
     sframe_abort_import(

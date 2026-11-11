@@ -129,16 +129,18 @@ sframe_check_amendment_boundary <- function(instrument, new_instrument = FALSE) 
   }
 
   # Content read without a matching hash ties to no state anyone wrote, so
-  # it is written only as a new instrument, or unchanged with the log it was
-  # read with. An entry appended to it would vouch for content no one can
-  # trace, and the new file would read back verified.
-  n_loaded <- length(origin$amendment_entry_hashes %||%
-                       origin$amendment_new_hashes %||% character(0))
-  if (!isTRUE(new_instrument) && isFALSE(origin$verified) &&
-      (length(am) == 0 || length(am) > n_loaded)) {
+  # it is written only as a new instrument, which starts a new log. Its own
+  # log was read unchecked too: written back, an entry edited as text (a
+  # sign-off, a tier, a timestamp, a deleted entry) would read back verified,
+  # since the entry fingerprints compared below were taken from that same
+  # unchecked read (Fable sitting 1 FR-05).
+  if (!isTRUE(new_instrument) && isFALSE(origin$verified)) {
     abort(sprintf(paste0(
-      "This instrument was read from '%s' without a matching integrity hash. ",
-      "Write it as a new instrument with new_instrument = TRUE."), origin$path))
+      "This instrument was read from '%s' without a matching integrity hash, ",
+      "so neither its content nor its amendment log is checked. Write it as a ",
+      "new instrument with new_instrument = TRUE, which starts a new ",
+      "amendment log: clear the old one first with instrument$amendments <- ",
+      "list()."), origin$path))
   }
 
   if (isTRUE(new_instrument)) {

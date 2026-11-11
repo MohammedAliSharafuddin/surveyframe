@@ -875,6 +875,13 @@ style.
   column is now hashed with its name and type, doubles in 17 significant
   digits with NA, NaN, Inf and -Inf by name, and a POSIXct as its seconds
   in UTC, so the same instant hashes alike in any time zone.
+* **An instrument read unverified is written only as a new instrument**
+  (Fable FR-05). `write_sframe()` let one read with `verify = FALSE` be
+  written back unchanged with the amendment log it was read with, but that
+  log was read unchecked too, so a sign-off, a tier or a timestamp edited as
+  text, or an entry deleted, was written back and read verified. It is now
+  refused, and `new_instrument = TRUE` writes it with a new log, once the old
+  one is cleared with `instrument$amendments <- list()`.
 * **Messages count in words.** Every message, warning, error and printed
   summary from the R functions says "1 item" and "2 items", "There is 1
   weight" and "There are 3 weights", where 68 places wrote "item(s)" or

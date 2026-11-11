@@ -324,3 +324,60 @@ test_that("the write boundary refuses entries appended to an unverified read", {
   expect_error(write_sframe(amended, tempfile(fileext = ".sframe")),
                class = "sframe_validation_error", regexp = "integrity hash")
 })
+
+# Fable sitting 1 FR-05. A file with a log, its log edited as text and read
+# with verify = FALSE, was written back with that log, since the entry
+# fingerprints the write compares were taken from the same unchecked read, and
+# the new file read back verified with the rewritten sign-off.
+
+two_entry_file <- function() {
+  path <- tempfile(fileext = ".sframe")
+  first <- amend_label(read_sframe(written(base_instrument())), "First")
+  write_sframe(first, path)
+  second <- amend_label(read_sframe(path), "Second")
+  write_sframe(second, path, overwrite = TRUE)
+  path
+}
+
+log_edited_read <- function(path, edit) {
+  txt <- paste(readLines(path, warn = FALSE, encoding = "UTF-8"), collapse = "\n")
+  out <- edit(txt)
+  expect_false(identical(out, txt))
+  g <- tempfile(fileext = ".sframe")
+  writeLines(out, g, useBytes = TRUE)
+  expect_error(read_sframe(g), "Integrity check failed", class = "sframe_import_error")
+  suppressWarnings(read_sframe(g, verify = FALSE))
+}
+
+test_that("FR-05: a log edited as text and read unverified is not written back", {
+  path <- two_entry_file()
+  edits <- list(
+    signoff = function(t) sub('"signoff": "none"', '"signoff": "Prof. Reviewer, 2026-11-01"', t, fixed = TRUE),
+    tier = function(t) sub('"tier": "design"', '"tier": "pipeline"', t, fixed = TRUE),
+    timestamp = function(t) sub('"timestamp": "20', '"timestamp": "19', t, fixed = TRUE),
+    deleted = function(t) {
+      p <- jsonlite::parse_json(t, simplifyVector = FALSE)
+      p$amendments <- p$amendments[2]
+      as.character(jsonlite::toJSON(p, auto_unbox = TRUE, null = "null", digits = NA, pretty = TRUE))
+    })
+  for (e in names(edits)) {
+    y <- log_edited_read(path, edits[[e]])
+    expect_error(write_sframe(y, tempfile(fileext = ".sframe")),
+                 "without a matching integrity hash.*new_instrument = TRUE",
+                 class = "sframe_validation_error", label = e)
+  }
+})
+
+test_that("FR-05: the same read writes as a new instrument with a new log", {
+  y <- log_edited_read(two_entry_file(), function(t)
+    sub('"signoff": "none"', '"signoff": "Prof. Reviewer, 2026-11-01"', t, fixed = TRUE))
+  expect_error(write_sframe(y, tempfile(fileext = ".sframe"), new_instrument = TRUE),
+               "cannot carry another instrument's amendment log", class = "sframe_validation_error")
+  y$amendments <- list()
+  y$meta$version <- "2.0.0"
+  f <- tempfile(fileext = ".sframe")
+  expect_no_error(write_sframe(y, f, new_instrument = TRUE))
+  z <- read_sframe(f)
+  expect_true(attr(z, "sframe_verified"))
+  expect_length(z$amendments, 0)
+})
