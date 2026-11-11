@@ -5244,7 +5244,14 @@ function updF(id){
     if(v&&v.indexOf('preset:')===0)v=ensurePresetChoiceSet(v.slice(7));
     v=v||null;
   }
-  else if(f==='scale_id')v=v||null;
+  else if(f==='scale_id'){
+    // The scale the item names scores it, so it joins that scale's items, as
+    // the scale editor sets scale_id on the items it lists. Without this the
+    // item named a scale that never scored it (Fable sitting 1 FR-14).
+    v=v||null;
+    var named=v?S.scales.find(function(s){return s.id===v;}):null;
+    if(named){named.items=asArr(named.items);if(!named.items.includes(S.items[idx].id))named.items.push(S.items[idx].id);}
+  }
   else if(f==='help'||f==='placeholder')v=v||null;
   var prevType=S.items[idx].type;
   S.items[idx][f]=v;
@@ -5468,8 +5475,25 @@ function openBranchModal(){
 function saveBranch(){
   var t=gv('br-tgt'),d=gv('br-dep');if(t===d){toast('Choose a different controlling item','err');return;}
   var v=gv('br-val').trim();if(!v){toast('Enter a match value','err');return;}
+  // A rule that closes a cycle leaves each item waiting on an answer that
+  // waits on its own, which validate_sframe() notes (Fable sitting 1 FR-14).
+  var loop=branchPath(d,t);
+  if(loop){toast('This rule would close a cycle: '+[t].concat(loop).join(' depends on ')+'. Choose another controlling item.','err');return;}
   snap();S.branching.push({id:uid(),item_id:t,depends_on:d,operator:gv('br-op'),value:v,action:gv('br-act')});
   closeModal('m-branch');toast('Branching rule added','ok');
+}
+// The chain of controlling items from `from` to `to` through the rules, as a
+// list starting at `from`, or null when the rules do not lead there.
+function branchPath(from,to){
+  var seen={};
+  function walk(id){
+    if(id===to)return[id];
+    if(seen[id])return null;seen[id]=true;
+    var rules=S.branching.filter(function(b){return b.item_id===id;});
+    for(var k=0;k<rules.length;k++){var p=walk(rules[k].depends_on);if(p)return[id].concat(p);}
+    return null;
+  }
+  return walk(from);
 }
 
 // -- Attention checks -------------------------------------------------------
@@ -5481,6 +5505,16 @@ function openCheckModal(){
 function saveCheck(){
   var id=gv('ck-id').trim();if(!id){toast('Check ID required','err');return;}
   var pv=gv('ck-pass').trim();var pvArr=pv?pv.split(',').map(function(x){return x.trim();}).map(function(x){return isNaN(x)?x:Number(x);}):null;
+  // A pass value that is no code of the item's choice set can never be
+  // answered, so the check would flag every respondent (Fable sitting 1
+  // FR-14). Items with no choice set take any value.
+  var ckItem=S.items.find(function(i){return i.id===gv('ck-item');});
+  var ckSet=ckItem&&ckItem.choice_set?S.choices.find(function(c){return c.id===ckItem.choice_set;}):null;
+  if(ckSet&&pvArr){
+    var codes=asArr(ckSet.values).map(String);
+    var stray=pvArr.map(String).filter(function(x){return!codes.includes(x);});
+    if(stray.length){toast('Pass '+(stray.length===1?'value ':'values ')+stray.join(', ')+(stray.length===1?' is no code':' are no codes')+' of '+ckItem.id+"'s choice set "+ckSet.id+', whose codes are '+codes.join(', ')+'.','err');return;}
+  }
   snap();S.checks.push({id:id,item_id:gv('ck-item'),type:gv('ck-type'),pass_values:pvArr,fail_action:gv('ck-fail'),label:gv('ck-lbl')||null,notes:null});
   closeModal('m-check');toast('Attention check added','ok');
 }
