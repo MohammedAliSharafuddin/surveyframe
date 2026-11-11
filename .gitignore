@@ -11,6 +11,10 @@ docs
 # need their own line. Without it all 23 .sframe files were ignored and
 # the library shipped as data with no instruments.
 !inst/extdata/demos/*.sframe
+# The hash.canonical verdict fixtures of test-hash-canonical.R (CF-A). Ignored
+# by the rule above, so the test passed only in the working tree that made
+# them, and failed in a clean checkout (closing suite at bfccb31).
+!tests/testthat/fixtures/canonical/hash_canonical/*.sframe
 *.tar.gz
 *.zip
 *.Rcheck/
