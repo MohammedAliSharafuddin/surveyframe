@@ -82,7 +82,10 @@ bot removal) needs only a reason. A \code{"design"} amendment also requires a
 method or model, and why. The tier follows the change itself: an amendment
 that changes the analysis plan, a model, a conjoint design or how a scale
 is scored (its items, reverse keys, weights, method or minimum answered)
-is always design tier, whatever \code{reason_code} or \code{tier} says. \code{second_signoff} is
+is always design tier, whatever \code{reason_code} or \code{tier} says. So is a
+change to an item's own \code{reverse} or \code{scale_id}, to the choice codes of an
+item a scale scores, or to what an attention check tests and its pass
+values, since each moves scale scores or who is flagged. \code{second_signoff} is
 optional. When omitted, the entry records \code{signoff = "none"}, so the
 absence of a named reviewer is visible. The tier, report and signoff are
 what the author records. None of them is independent approval.

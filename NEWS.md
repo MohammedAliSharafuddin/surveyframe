@@ -882,6 +882,14 @@ style.
   text, or an entry deleted, was written back and read verified. It is now
   refused, and `new_instrument = TRUE` writes it with a new log, once the old
   one is cleared with `instrument$amendments <- list()`.
+* **More changes that move a score are design tier** (Fable FR-06).
+  `amend_sframe()` forced the design tier for a change to how a scale is
+  scored, but not for an item's own `reverse = TRUE`, which
+  `score_scales()` applies all the same, so reverse keying an item passed as
+  a pipeline amendment and moved its scale scores. A change to an item's
+  `reverse` or `scale_id`, to the choice codes of an item a scale scores, or
+  to the item an attention check tests or its pass values is now design
+  tier, and needs a deviation report.
 * **Messages count in words.** Every message, warning, error and printed
   summary from the R functions says "1 item" and "2 items", "There is 1
   weight" and "There are 3 weights", where 68 places wrote "item(s)" or
