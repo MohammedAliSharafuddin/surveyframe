@@ -47,6 +47,14 @@ An `sframe` object.
 
 ## Details
 
+The hash's `canonical` field names the form it was taken in. A file
+naming `"rfc8785"` is checked in RFC 8785 alone. A file naming no form
+was written before the field existed: it is checked in RFC 8785 and then
+in the forms surveyframe used before 0.4.3, and any match is accepted
+with a message of class `sframe_locale_order_hash` asking you to save it
+again. A file naming any other form is refused, since it needs a newer
+surveyframe.
+
 The instrument remembers the content and amendment log it was read with,
 so
 [`write_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/write_sframe.md)
@@ -62,10 +70,13 @@ says so.
 [`write_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/write_sframe.md)
 refuses to write an unverified instrument unless `new_instrument = TRUE`
 declares it new, since nothing ties its content to a state anyone wrote.
-The exception is one written back unchanged with the amendment log it
-was read with. No amendment can start from it:
+That holds with the amendment log it was read with too, since the log
+was read unchecked: a sign-off, a tier or a timestamp edited as text
+would otherwise be written back and read verified. A new instrument
+starts a new log, so clear the old one first with
+`instrument$amendments <- list()`. No amendment can start from it:
 [`amend_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/amend_sframe.md)
-refuses it, and the write refuses any entry appended to its log.
+refuses it.
 
 ## See also
 
@@ -101,6 +112,6 @@ print(instr)
 #>   Version:    0.3.0
 #>   Items:      15
 #>   Scales:     5
-#>   Analysis:   34 block(s)
+#>   Analysis:   34 blocks
 #>   Status:     valid
 ```

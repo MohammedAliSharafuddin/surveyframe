@@ -498,6 +498,7 @@ The APA cell formatter the Quarto report template calls. Exported
 because Quarto renders against the installed package.
 
 - [`sframe_apa_cells()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_apa_cells.md)
+  [`sframe_apa_col_labels()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_apa_cells.md)
   : Format a result table's cells as an APA 7 report prints them
 
 ## Old names (superseded)

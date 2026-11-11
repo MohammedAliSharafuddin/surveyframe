@@ -74,7 +74,7 @@ Other Inspect functions:
 ``` r
 sframe_get_models(sframe_demo("tourism_services")$instrument)
 #> <model list: 3>
-#>  <sf_model: tourism_cfa | type: cfa | 5 construct(s)>
-#>  <sf_model: tourism_sem | type: cb_sem | 5 construct(s)>
-#>  <sf_model: tourism_pls | type: pls_sem | 5 construct(s)>
+#>  <sf_model: tourism_cfa | type: cfa | 5 constructs>
+#>  <sf_model: tourism_sem | type: cb_sem | 5 constructs>
+#>  <sf_model: tourism_pls | type: pls_sem | 5 constructs>
 ```

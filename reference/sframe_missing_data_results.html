@@ -85,7 +85,12 @@ when an instrument is supplied, otherwise all columns.</p></dd>
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>An object of class <code>sframe_missing_data_report</code>.</p>
+    <p>An object of class <code>sframe_missing_data_report</code>. Its
+<code>item_missing</code> and <code>respondent_missing</code> tables give <code>missing_prop</code>, a
+proportion between 0 and 1. Their <code>missing_pct</code> column, the name before
+0.4.3 kept for 1 release, is the same proportion, not a percentage. The
+<code>patterns</code> table gives each pattern's <code>n</code>, its <code>percent</code> from 0 to 100
+and its <code>prop</code> between 0 and 1.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>

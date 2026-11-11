@@ -75,6 +75,19 @@ The following checks are performed:
 
 - Attention checks referencing item IDs not present in the instrument
 
+- A scale `method` other than `"mean"` or `"sum"`, a choice set whose
+  `values` and `labels` differ in length, a branching rule whose
+  operator is unknown or missing or that depends on its own item, and a
+  plan block whose `alpha` or `options$alpha` is not a number between 0
+  and 1
+
+These are reported as notes, which
+[`sframe_notes()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_notes.md)
+returns and which leave the instrument valid, since SurveyBuilder saved
+them before 0.4.3: branching rules that depend on each other in a cycle,
+a check whose pass values are not codes of its item's choice set, and an
+item whose `scale_id` names a scale that does not list it.
+
 - Analysis plan roles referencing missing variables or models
 
 - Model specifications referencing missing indicators or constructs

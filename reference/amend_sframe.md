@@ -106,10 +106,13 @@ research question, method or model, and why. The tier follows the change
 itself: an amendment that changes the analysis plan, a model, a conjoint
 design or how a scale is scored (its items, reverse keys, weights,
 method or minimum answered) is always design tier, whatever
-`reason_code` or `tier` says. `second_signoff` is optional. When
-omitted, the entry records `signoff = "none"`, so the absence of a named
-reviewer is visible. The tier, report and signoff are what the author
-records. None of them is independent approval.
+`reason_code` or `tier` says. So is a change to an item's own `reverse`
+or `scale_id`, to the choice codes of an item a scale scores, or to what
+an attention check tests and its pass values, since each moves scale
+scores or who is flagged. `second_signoff` is optional. When omitted,
+the entry records `signoff = "none"`, so the absence of a named reviewer
+is visible. The tier, report and signoff are what the author records.
+None of them is independent approval.
 
 `previous_hash` and `new_hash` on each entry are a content fingerprint:
 a SHA-256 over a canonical serialisation of the instrument, with the
@@ -119,6 +122,22 @@ from the file's own integrity hash from
 [`write_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/write_sframe.md),
 which also covers the amendment log. Both identify content. Neither is
 byte identity.
+
+The amendment is sealed when the file is written:
+[`write_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/write_sframe.md)
+hashes the object as it stands then, so a change made to the returned
+object before it is written is part of the author's new version, covered
+by the file's hash but not by this entry's `new_hash`.
+
+The check that a change read from a file was recorded here rests on an
+attribute, `sframe_origin`, which
+[`read_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_sframe.md)
+sets and the package's own functions keep. Base R that builds a new list
+from the parts, such as `x[names(x)]`, `c(x)` or
+[`lapply()`](https://rdrr.io/r/base/lapply.html) over the fields, drops
+it, and the result is written as an instrument read from no file, with
+no amendment asked for. See the Revisions section of
+[`write_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/write_sframe.md).
 
 ## Wording on the participant's screens
 

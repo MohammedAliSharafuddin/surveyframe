@@ -608,12 +608,19 @@ serialised by a host.
 
 ### Amendments and versions
 
+- [`?amend_sframe`](https://mohammedalisharafuddin.github.io/surveyframe/reference/amend_sframe.md)
+  says the amendment is sealed when the file is written:
+  [`write_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/write_sframe.md)
+  hashes the object as it stands then, so a change made to it before
+  writing is part of the author’s new version (Codex U-1).
+
 - **`amend_sframe(version = )` sets the version an amendment writes.**
   `NULL`, the default, keeps the version, and when it is unchanged a
   message suggests the next: the minor number for a design amendment
   (1.0.0 to 1.1.0), the patch number for a pipeline amendment (1.0.0 to
   1.0.1), with the reason. The version set is inside the recorded
   content.
+
 - **`sframe_drop_items(instrument, items, from)` drops items from scales
   or models.** It takes them out of the named scales (with their reverse
   keys and weights) or every construct of a named model, and out of any
@@ -622,6 +629,7 @@ serialised by a host.
   nothing is recorded:
   [`amend_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/amend_sframe.md)
   records the drop as a design amendment.
+
 - **`sframe_item_flags(result)` lists the items past the usual
   cut-offs.** For a reliability, item, EFA readiness, EFA or validity
   result, a plan result for one of them, a lavaan CFA or a seminr PLS
@@ -632,6 +640,7 @@ serialised by a host.
   or .90 and keeps the value applied, and PLS keeps .708. Checked
   against psych, lavaan and seminr. A reliability result now carries
   `alpha_if_deleted` for each item.
+
 - **The report gives the instrument version and its amendment list.**
   Under Reproducibility, both engines print the version beside the hash,
   then every recorded amendment, oldest first: date, tier, reason, what
@@ -855,6 +864,66 @@ serialised by a host.
 
 ### Reports
 
+- **The missing-data patterns table gives a percentage under
+  “Percent”.**
+  [`sframe_missing_data_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_missing_data_results.md)
+  stored each pattern’s share as a proportion in `patterns$percent`, so
+  both report engines printed “Complete case \| 60 \| 1” under “Percent”
+  for 60 complete cases. `percent` now runs from 0 to 100 and a new
+  `prop` column holds the proportion. The `missing_pct` columns kept for
+  1 release hold a proportion, as their help now says (Codex P1-01).
+
+- **Descriptives count a categorical item’s answers as valid.**
+  [`sframe_descriptives_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_descriptives_results.md)
+  turned every value into a number before counting, so category codes
+  such as “online” counted as missing and the report gave a choice item
+  60 missing and 0 valid beside a missing-data table that said 0
+  missing. `valid_n` and `missing_n` now count the responses as given.
+  An item whose responses are not all numbers keeps its counts with `NA`
+  in every numeric column, and both report engines print a dash there
+  with a table note. The Quarto report now lists the instrument’s items,
+  as the built-in report does, where it had listed every column that
+  held a number (Codex P1-02).
+
+- **Every report table heading is set as APA 7 sets it, in every
+  format.** The Quarto report printed raw column names (`missing_n`,
+  `ci_low`, `weighted_mean`) and, in HTML, an unlabelled column of row
+  names. 1 label map now gives both engines their headings: words for
+  counts (“Valid *n*”, “Missing proportion”), statistic symbols in
+  italics (*M*, *SD*, *Mdn*, *SE*) and the confidence level in an
+  interval heading (“95% CI lower”). Row names are left out in every
+  format.
+  [`sframe_apa_col_labels()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_apa_cells.md),
+  on the
+  [`sframe_apa_cells()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_apa_cells.md)
+  help page, gives those headings for HTML or Markdown. The `n_items`
+  heading reads “Items” (Codex P1-03).
+
+- Quarto reports in Word, OpenDocument and PDF number tables and figures
+  as APA 7 does: “Table 1” or “Figure 1” in bold on its own line, and
+  the title in italics on the next, both above the table or figure.
+  Tables printed “Table 1: Provenance” on 1 line, and figures had a bold
+  title with no number (Codex P1-04).
+
+- In the Typst and LaTeX PDFs a table’s or figure’s number and title
+  stay on the page of the table or figure, where they could land at a
+  page foot with the float on the next page (Figure 2 in Typst, Table 2
+  in LaTeX). A figure goes with its 2 lines in 1 block that does not
+  break. A table starts a new page in LaTeX when fewer than 5 lines are
+  left, and in Typst its 2 lines stick to it (Typst 0.12 or later; with
+  an older Typst a table of up to 12 rows is kept whole).
+
+- The report’s descriptives come in 2 tables in every format, centre and
+  spread (*n*, valid and missing *n*, *M*, *SD*, *Mdn*, IQR, minimum and
+  maximum), then shape and interval (skewness, kurtosis, *SE*, the CI
+  and, when weights are given, the weighted mean), where 1 table of 17
+  columns ran together in the Typst PDF. In Typst and LaTeX, tables are
+  set single-spaced at 10 points, and each column is at least as wide as
+  its longest word, since item IDs such as `sessions_attended` ran into
+  the next column of the codebook and plan tables. Outside HTML the
+  instrument hash takes a line of its own, which it ran past the LaTeX
+  margin (Codex P1-05).
+
 - **Quarto is the report engine, and
   [`render_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_report.md)
   finds the copy RStudio or Positron bundles.** It looked only for
@@ -913,12 +982,75 @@ serialised by a host.
   order, so a session in an English locale and one in the C locale put
   “Scale” and “ceiling_pct” in opposite orders and hashed the same
   numbers differently. Keys now sort by code point in every locale, as
-  SurveyBuilder does. None of the 22 demo instruments’ hashes change. A
-  file, results record or committed instrument hashed in the old order
-  is still accepted, with a message that it was hashed in the order used
-  before 0.4.3 and should be saved again to update the hash. New hashes
-  are always written in code point order, and a changed file still
-  fails.
+  SurveyBuilder does. A file, results record or committed instrument
+  hashed in the old order is still accepted, with a message that it was
+  hashed in the order used before 0.4.3 and should be saved again to
+  update the hash. New hashes are always written in code point order,
+  and a changed file still fails.
+
+- **R, SurveyBuilder and the verifier page hash 1 canonical form, RFC
+  8785, the JSON Canonicalization Scheme** (Codex pass 2 P2-01 and
+  P2-06, Fable FR-01 to FR-03, FR-09, FR-10 and FR-12). A null was
+  hashed as [`{}`](https://rdrr.io/r/base/Paren.html), so a null changed
+  to [`{}`](https://rdrr.io/r/base/Paren.html) kept its hash, and an
+  `NA` in a text field such as an item’s `help` wrote a file its own
+  check refused. Numbers below 0.0001, from 1e15 up or with 16 or 17
+  digits, and any text holding `</`, hashed differently in R and in
+  JavaScript, so a file one side wrote failed on the other. Keys that
+  are all digits, the empty key and `__proto__` hashed differently in
+  JavaScript. In all 3, keys now sort by UTF-16 code units, numbers take
+  ECMAScript’s shortest form that reads back to the same value, strings
+  are escaped as `JSON.stringify()` escapes them and null stays null,
+  and the file holds every number in the digits its hash covers. A file
+  that gives a key twice is refused, since R kept the first and
+  JavaScript the last. A number JSON cannot hold, such as `Inf`, is
+  refused at write with its field named. An `NA` is written as null
+  where the published schema allows null for that field, such as an
+  item’s `help`, and refused with the field named anywhere else, such as
+  inside `meta$authors`. A file hashed in the 0.4.3 development form is
+  accepted with a message to save it again. The 26 bundled `.sframe`
+  files were written again, and only their hash object changed.
+  `tests/testthat/fixtures/canonical/` holds the payloads all 3 hash
+  alike, checked through node.
+
+- **A file holding an escaped U+0000 or a lone surrogate is refused** by
+  [`read_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_sframe.md),
+  SurveyBuilder and the verifier page. jsonlite cut a string at an
+  escaped U+0000 and turned a lone surrogate escape into “?”, so in R a
+  text changed after the U+0000 kept its hash, and 2 different files
+  could read as 1. The check reads the raw text before it is parsed, and
+  an escaped backslash before `u0000` is plain text and passes. The
+  shared fixture holds 53 cases with these.
+
+- **The hash names its canonical form, `hash$canonical = "rfc8785"`**
+  (owner, 2026-11-11).
+  [`write_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/write_sframe.md)
+  and SurveyBuilder write it inside the hashed content, with only
+  `hash$value` emptied, so changing it breaks the hash.
+  [`read_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_sframe.md),
+  SurveyBuilder and the verifier page apply 1 rule. A file naming
+  `"rfc8785"` is checked in RFC 8785 alone, with no fallback to an
+  earlier form. A file naming no form was written before the field
+  existed, so it is checked in RFC 8785 and then the earlier forms, and
+  any match is accepted with a message to save it again, a legacy match
+  among them, which was accepted silently before. A file naming any
+  other form is refused, since it needs a newer surveyframe. 25 bundled
+  `.sframe` files were written again, and `verification_tampered.sframe`
+  was rebuilt from `verification.sframe` with the same 1-word edit.
+  `tests/testthat/fixtures/canonical/hash_canonical/` holds 8 files that
+  all 3 judge alike: the field present, absent, set to an unknown value
+  or to null, deleted or added after sealing, and content edited.
+
+- **A file hashed before 0.4.3 is recognised in any session** (Fable
+  FR-08 and FR-11). The old key order followed the collation of the
+  session that hashed, so a file hashed in an English session was
+  refused as modified in a C session, such as a container or
+  `R CMD check`. The old form is now tried in the session’s, the C and
+  the en_US collation. The legacy hash, for files written before
+  canonical serialisation, is read only and never written. It keeps
+  numbers to 4 decimals, as jsonlite’s default did, so 2 numbers that
+  agree to 4 decimals hash the same in it. The verifier page hashed such
+  numbers in full and now takes the legacy hash as R does.
 
 - **The Quarto source of a report, which checks itself.**
   `render_report(format = "qmd")` writes a folder: `report.qmd`, the
@@ -927,12 +1059,118 @@ serialised by a host.
   RStudio or Positron, `report.qmd` recomputes every number from the
   folder’s own files through the new
   [`sframe_report_source()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_report_source.md),
-  and its Provenance section says “Numbers match the recorded results”
-  or “Numbers differ from the recorded results” with both hashes, and
-  whether `report.qmd` was edited after surveyframe wrote it. Editing
-  stays allowed and is disclosed. The instrument’s text reaches the
-  `.qmd` only as its JSON-quoted title and authors, so a title holding
-  quotes, a colon or a `---` line leaves the front matter whole.
+  and its Provenance section says “The analysis plan results match the
+  recorded results” or “differ” with both hashes, whether each file it
+  reads is the one exported, and whether `report.qmd` was edited after
+  surveyframe wrote it. Editing stays allowed and is disclosed. The
+  instrument’s text reaches the `.qmd` only as its JSON-quoted title and
+  authors, so a title holding quotes, a colon or a `---` line leaves the
+  front matter whole.
+
+- **An untouched report source says its numbers match.** The source
+  folder of an instrument built in memory and never saved, or of
+  responses given as a plain data frame, said “Numbers differ from the
+  recorded results” before anything was changed. The record was computed
+  from the objects in memory and the check from the folder’s files, and
+  the 2 differ: the written instrument gains its normalised fields, so
+  its hash changes, and `responses.csv` keeps 15 significant digits, so
+  a statistic moves in its last digit. Export now writes the files,
+  reads them back and computes the record from those, as the check does.
+  A changed response still turns the check `FALSE`.
+
+- **The report source checks every file it reads** (Codex pass 2 P2-02,
+  Fable FR-04, FR-07, FR-15 and FR-17). The check recomputed the plan
+  results and compared them with the record’s hash in the manifest, but
+  never opened `report_results.json`, so an edited or deleted record
+  still passed. The record file is now hashed against the manifest, as
+  its own verdict (`results_file_match`) and its own Provenance line,
+  “Results record”. `references.json` and `interpretations.json` join
+  the manifest and the check (`references_match`,
+  `interpretations_match`), with the Provenance lines “Bibliography” and
+  “Interpretations”, so an emptied bibliography or an interpretation
+  added after export is reported. The results line now says what it
+  covers: “The analysis plan results match the recorded results”. The
+  responses sha256 of a report hashed the data as JSON with 15
+  significant digits, so NA, NaN and Inf hashed alike, as did 0.3 and
+  0.1 + 0.2, and a time was written in the session’s zone. Each column
+  is now hashed with its name and type, doubles in 17 significant digits
+  with NA, NaN, Inf and -Inf by name, and a POSIXct as its seconds in
+  UTC, so the same instant hashes alike in any time zone.
+
+- **An instrument read unverified is written only as a new instrument**
+  (Fable FR-05).
+  [`write_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/write_sframe.md)
+  let one read with `verify = FALSE` be written back unchanged with the
+  amendment log it was read with, but that log was read unchecked too,
+  so a sign-off, a tier or a timestamp edited as text, or an entry
+  deleted, was written back and read verified. It is now refused, and
+  `new_instrument = TRUE` writes it with a new log, once the old one is
+  cleared with `instrument$amendments <- list()`.
+
+- **More changes that move a score are design tier** (Fable FR-06).
+  [`amend_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/amend_sframe.md)
+  forced the design tier for a change to how a scale is scored, but not
+  for an item’s own `reverse = TRUE`, which
+  [`score_scales()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/score_scales.md)
+  applies all the same, so reverse keying an item passed as a pipeline
+  amendment and moved its scale scores. A change to an item’s `reverse`
+  or `scale_id`, to the choice codes of an item a scale scores, or to
+  the item an attention check tests or its pass values is now design
+  tier, and needs a deviation report.
+
+- **The help says what the write boundary rests on** (Fable FR-16).
+  [`?write_sframe`](https://mohammedalisharafuddin.github.io/surveyframe/reference/write_sframe.md)
+  and
+  [`?amend_sframe`](https://mohammedalisharafuddin.github.io/surveyframe/reference/amend_sframe.md)
+  say that the link to the file read is the attribute `sframe_origin`,
+  which the package’s functions keep and base R that rebuilds the list,
+  such as `x[names(x)]`, `c(x)` or
+  [`lapply()`](https://rdrr.io/r/base/lapply.html), drops, after which a
+  change is written with no amendment asked for.
+
+- **[`validate_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/validate_sframe.md)
+  reports 4 more malformed fields** (Fable FR-13). An item whose
+  `choice_set` or `scale_id` holds more than 1 id, a branching rule with
+  no `item_id` or `depends_on`, and a check with no `item_id` stopped it
+  with “argument is of length zero”, so `strict = FALSE` returned
+  nothing and
+  [`read_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_sframe.md)
+  failed the same way. Each is now a problem naming the component and
+  the field, such as “Branching rule 1’s item_id is missing”.
+
+- **[`validate_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/validate_sframe.md)
+  checks what scores and shows** (Fable FR-14). A scale `method` other
+  than “mean” or “sum” (it was scored as the mean), a plan `alpha` or
+  `options$alpha` that is not a number between 0 and 1 (it changed
+  nothing), a choice set whose values and labels differ in length, a
+  branching rule with an unknown or no operator, and a rule on its own
+  item are problems. Rules that depend on each other in a cycle, a check
+  pass value that is no code of its item’s choice set, and an item whose
+  `scale_id` names a scale that does not list it are notes, read by
+  [`sframe_notes()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_notes.md),
+  since SurveyBuilder saved them before, so those files still open.
+  SurveyBuilder now refuses a rule that would close a cycle and a pass
+  value outside the item’s codes, and choosing a scale for an item in
+  its editor adds the item to that scale. A rule on an item asked later
+  stays allowed, since on 1 page the answer arrives as it is given.
+
+- **A field with an empty name is refused at write.** JSON allows an
+  empty key, but
+  [`write_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/write_sframe.md)
+  wrote an R list element with an empty name under its position, so
+  `{"a":1,"":3}` read from a file was written back as `{"a":1,"2":3}`, a
+  changed instrument with no amendment, and `{"":3}` alone became an
+  array. Such a file still reads, and writing it is refused with the
+  field named, such as “The field at \$.meta.custom\[1\] has an empty
+  name”.
+
+- **Messages count in words.** Every message, warning, error and printed
+  summary from the R functions says “1 item” and “2 items”, “There is 1
+  weight” and “There are 3 weights”, where 68 places wrote “item(s)” or
+  “criterion/criteria”. A list of ids takes the noun its length needs:
+  “Plan block P1 names objective ‘O1’” and “Plan blocks P1, P2 name
+  objective ‘O1’”. A test walks every string in the package’s functions
+  and fails on a new “(s)”.
 
 - **Every report has a results record and a manifest beside it.**
   [`render_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_report.md)
@@ -1164,6 +1402,17 @@ serialised by a host.
   the codes 1 and 1.0, or 2 and 02, became one option, and
   [`sframe_export_labelled()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md)
   then failed on duplicate labels.
+- **[`print()`](https://rdrr.io/r/base/print.html),
+  [`format()`](https://rdrr.io/r/base/format.html) and
+  [`summary()`](https://rdrr.io/r/base/summary.html) of an instrument
+  check it before they give its status**, as Studio’s Open Instrument
+  does. They read the stored `validated` flag, which an edit after
+  validation can leave stale, so a valid instrument could print “not
+  validated” and a broken one “valid”. The status is now “valid”, or
+  “invalid” with the number of problems and a pointer to
+  `validate_sframe(x, strict = FALSE)`. Counts are in words, “1 block”
+  and “2 analysis blocks”, never “block(s)” (coordinator, UF follow-up
+  1).
 
 ### Documentation
 
@@ -1812,6 +2061,54 @@ serialised by a host.
 - A result card is headed “RQ 4” when its block id only repeats the
   number. It read “RQ 4: RQ4”. A block id that says something more, such
   as “H2a”, still shows beside the number.
+
+- Studio’s page declares its language as English (`lang="en"`), so a
+  screen reader reads it with English pronunciation (WCAG 3.1.1, Codex
+  P1-06).
+
+- The sidebar’s 5 group headings (Build, Collect, Analyse, Report,
+  Record) and every fold, such as Amendments’ “Import an externally
+  revised version”, are at least 24 px tall, the WCAG 2.5.8 target size.
+  The headings were 15.7 px and the import fold 20 px (Codex P1-07).
+
+- Studio and the builder count in words, “1 respondent” and “0
+  respondents”, where Quality printed “0 respondent(s) (0.0%) flagged as
+  too fast” and “0 duplicate response row(s) detected”. The same holds
+  for a role’s maximum on the Plan screens and the builder’s counts of
+  scales, constructs, paths, research questions and report sections
+  (Codex P1-08).
+
+- **Open Instrument’s status comes from
+  [`validate_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/validate_sframe.md)
+  run on the open instrument.** It read the stored `meta$validated`, so
+  the valid `two_group` demo showed “Draft” and “Status: fix in Design”
+  with no reason. The stored flag is a cache that Studio never trusts.
+  The status reads “Schema valid”, or “Fix in Design” with the number of
+  problems and the first one named. With nothing open, the sidebar says
+  “No instrument open”, where it said “Draft needs fixes” (Codex P1-09).
+
+- With no instrument open, the 9 screens from Collect to Amendments
+  offer Open Instrument as the filled primary button and Design as the
+  secondary one beside it, where both were outlined and neither stood
+  out as the next step (Codex P1-10).
+
+- With an instrument open and no responses, Quality, Reliability and the
+  Dashboard offer Collect as the filled primary button and Responses as
+  the secondary one beside it, where both were outlined (UF follow-up
+  2).
+
+- A table wider than its card, such as Analyse’s declared plan at 390
+  px, scrolls inside a region a keyboard can focus and a screen reader
+  names, “Declared plan” or “RQ 1 result table”. The table itself was
+  the scroll box, with nothing in it to focus, so a keyboard could not
+  scroll it (WCAG 2.1.1, Codex P1-12).
+
+- The builder’s question rows are list items in a list, and the question
+  open for editing is marked `aria-current`. Each row was a focusable
+  listbox option holding its own Move, Duplicate and Delete buttons,
+  which an option hides from assistive technology (WCAG 4.1.2, Codex
+  P1-11). Enter, Space, the arrow keys and Alt with an arrow work as
+  before.
 
 ### Demos
 

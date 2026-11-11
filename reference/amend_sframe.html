@@ -163,7 +163,10 @@ bot removal) needs only a reason. A <code>"design"</code> amendment also require
 method or model, and why. The tier follows the change itself: an amendment
 that changes the analysis plan, a model, a conjoint design or how a scale
 is scored (its items, reverse keys, weights, method or minimum answered)
-is always design tier, whatever <code>reason_code</code> or <code>tier</code> says. <code>second_signoff</code> is
+is always design tier, whatever <code>reason_code</code> or <code>tier</code> says. So is a
+change to an item's own <code>reverse</code> or <code>scale_id</code>, to the choice codes of an
+item a scale scores, or to what an attention check tests and its pass
+values, since each moves scale scores or who is flagged. <code>second_signoff</code> is
 optional. When omitted, the entry records <code>signoff = "none"</code>, so the
 absence of a named reviewer is visible. The tier, report and signoff are
 what the author records. None of them is independent approval.</p>
@@ -173,6 +176,16 @@ SHA-256 over a canonical serialisation of the instrument, with the <code>hash</c
 the content that is written. It is distinct from the file's own integrity
 hash from <code><a href="write_sframe.html">write_sframe()</a></code>, which also covers the amendment log. Both
 identify content. Neither is byte identity.</p>
+<p>The amendment is sealed when the file is written: <code><a href="write_sframe.html">write_sframe()</a></code> hashes
+the object as it stands then, so a change made to the returned object
+before it is written is part of the author's new version, covered by the
+file's hash but not by this entry's <code>new_hash</code>.</p>
+<p>The check that a change read from a file was recorded here rests on an
+attribute, <code>sframe_origin</code>, which <code><a href="read_sframe.html">read_sframe()</a></code> sets and the package's
+own functions keep. Base R that builds a new list from the parts, such as
+<code>x[names(x)]</code>, <code>c(x)</code> or <code><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply()</a></code> over the fields, drops it, and the
+result is written as an instrument read from no file, with no amendment
+asked for. See the Revisions section of <code><a href="write_sframe.html">write_sframe()</a></code>.</p>
     </div>
     <div class="section level2">
     <h2 id="wording-on-the-participant-s-screens">Wording on the participant's screens<a class="anchor" aria-label="anchor" href="#wording-on-the-participant-s-screens"></a></h2>

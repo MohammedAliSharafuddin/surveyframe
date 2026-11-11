@@ -128,7 +128,7 @@ responses <- read_responses(
 # \donttest{
 results <- run_analysis_plan(responses, instr)
 print(results)
-#> Analysis Results: 34 research question(s)
+#> Analysis Results: 34 research questions
 #> 
 #> RQ 1: Is perceived digital marketing effectiveness associated with tourist satisfaction?
 #>   Test: correlation_pearson

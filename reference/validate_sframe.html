@@ -110,7 +110,15 @@ number of items, and weights that are not positive finite numbers</p></li>
 <li><p>Branching rules referencing item IDs not present in the instrument</p></li>
 <li><p><code>%in%</code> branching rules whose <code>value</code> no evaluator can consume</p></li>
 <li><p>Attention checks referencing item IDs not present in the instrument</p></li>
-<li><p>Analysis plan roles referencing missing variables or models</p></li>
+<li><p>A scale <code>method</code> other than <code>"mean"</code> or <code>"sum"</code>, a choice set whose
+<code>values</code> and <code>labels</code> differ in length, a branching rule whose operator
+is unknown or missing or that depends on its own item, and a plan block
+whose <code>alpha</code> or <code>options$alpha</code> is not a number between 0 and 1</p></li>
+</ul><p>These are reported as notes, which <code><a href="sframe_notes.html">sframe_notes()</a></code> returns and which leave
+the instrument valid, since SurveyBuilder saved them before 0.4.3: branching
+rules that depend on each other in a cycle, a check whose pass values are
+not codes of its item's choice set, and an item whose <code>scale_id</code> names a
+scale that does not list it.</p><ul><li><p>Analysis plan roles referencing missing variables or models</p></li>
 <li><p>Model specifications referencing missing indicators or constructs</p></li>
 </ul></div>
     <div class="section level2">

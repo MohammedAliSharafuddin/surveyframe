@@ -41,7 +41,11 @@ sframe_descriptives_results(
 
 ## Value
 
-An object of class `sframe_descriptives_report`.
+An object of class `sframe_descriptives_report`. Its `table` has 1 row
+per variable and group. `valid_n` and `missing_n` count the responses as
+given. A variable whose responses are not all numbers, such as a choice
+item's category codes, keeps those counts and has `NA` in every numeric
+column, since a mean or standard deviation does not apply.
 
 ## See also
 

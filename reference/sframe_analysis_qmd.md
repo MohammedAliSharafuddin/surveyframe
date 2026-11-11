@@ -75,7 +75,7 @@ item  <- sframe_item("q1", "How satisfied are you?", type = "text")
 instr <- sframe_instrument("Demo", components = list(item))
 resp  <- data.frame(q1 = c("Great", "Fine"))
 out <- sframe_analysis_qmd(instr, resp, dir = tempdir())
-#> Notebook written to: /tmp/RtmppB03Io/Demo.qmd
+#> Notebook written to: /tmp/RtmppFIGkv/Demo.qmd
 #> Instrument and responses written alongside it: Demo.sframe, Demo_responses.csv
 #> Keep all 3 files together, then open and render the notebook.
 basename(out$qmd)

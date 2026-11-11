@@ -71,8 +71,8 @@ study
 #>   Version:    0.1.0
 #>   Items:      3
 #>   Scales:     0
-#>   Analysis:   0 block(s)
-#>   Status:     not validated
+#>   Analysis:   0 blocks
+#>   Status:     valid
 ```
 
 ## Reading the advisory

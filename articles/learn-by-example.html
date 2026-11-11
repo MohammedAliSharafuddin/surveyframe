@@ -330,7 +330,7 @@ it from a search for something significant.</p>
 <span><span class="co">#&gt;   Version:    1.0.0</span></span>
 <span><span class="co">#&gt;   Items:      6</span></span>
 <span><span class="co">#&gt;   Scales:     0</span></span>
-<span><span class="co">#&gt;   Analysis:   4 block(s)</span></span>
+<span><span class="co">#&gt;   Analysis:   4 blocks</span></span>
 <span><span class="co">#&gt;   Status:     valid</span></span></code></pre></div>
 <p>Four questions, a section break, and a plan with four blocks. This is
 what a respondent sees:</p>
@@ -627,7 +627,7 @@ left alone:</p>
 <span><span class="va">tampered</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/basename.html" class="external-link">dirname</a></span><span class="op">(</span><span class="va">v</span><span class="op">$</span><span class="va">instrument_path</span><span class="op">)</span>, <span class="st">"verification_tampered.sframe"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/read_sframe.html">read_sframe</a></span><span class="op">(</span><span class="va">tampered</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;"> in `sframe_abort_import()`:</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> Integrity check failed for '/home/runner/work/_temp/Library/surveyframe/extdata/demos/verification_tampered.sframe'. The file may have been modified after it was written. Expected hash: cfdca4de693431558469490f62cb609f7c416601cc00151575f8310fa5792f84. Stored hash: a182ec0a9cc574a5fb649f4c47b224dcade895443d32946d27c4a35195c33ecd.</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> Integrity check failed for '/home/runner/work/_temp/Library/surveyframe/extdata/demos/verification_tampered.sframe'. The file may have been modified after it was written. Expected hash: 877b33e87b80d59a41ad05e2cddc248c0e8d5a37758b8cc726d7c230608f1aaa. Stored hash: 1d3995afbed68c4dd487204430f214cb98f9a792822064a5f2833fc2bde54d42.</span></span></code></pre></div>
 <p>The altered file refuses to load because its content no longer
 matches its stored digest. This detects an undisclosed content change
 alone: authorship, research quality, and full amendment disclosure each

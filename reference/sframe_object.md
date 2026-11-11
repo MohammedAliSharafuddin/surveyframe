@@ -80,6 +80,6 @@ sframe_object(v)
 #>   Version:    0.3.0
 #>   Items:      15
 #>   Scales:     5
-#>   Analysis:   34 block(s)
+#>   Analysis:   34 blocks
 #>   Status:     valid
 ```

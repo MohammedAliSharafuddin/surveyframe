@@ -74,7 +74,7 @@ Other Inspect functions:
 ``` r
 sframe_get_choice_sets(sframe_demo("tourism_services")$instrument)
 #> <choice set list: 3>
-#>  <sf_choices: agree5 | 5 option(s)>
-#>  <sf_choices: visit_type | 2 option(s)>
-#>  <sf_choices: yes_no | 2 option(s)>
+#>  <sf_choices: agree5 | 5 options>
+#>  <sf_choices: visit_type | 2 options>
+#>  <sf_choices: yes_no | 2 options>
 ```

@@ -27,7 +27,12 @@ sframe_missing_data_results(data, instrument = NULL, variables = NULL)
 
 ## Value
 
-An object of class `sframe_missing_data_report`.
+An object of class `sframe_missing_data_report`. Its `item_missing` and
+`respondent_missing` tables give `missing_prop`, a proportion between 0
+and 1. Their `missing_pct` column, the name before 0.4.3 kept for 1
+release, is the same proportion, not a percentage. The `patterns` table
+gives each pattern's `n`, its `percent` from 0 to 100 and its `prop`
+between 0 and 1.
 
 ## See also
 

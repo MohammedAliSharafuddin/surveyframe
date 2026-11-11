@@ -114,7 +114,7 @@ demo$instrument
 #>   Version:    1.0.0
 #>   Items:      6
 #>   Scales:     0
-#>   Analysis:   4 block(s)
+#>   Analysis:   4 blocks
 #>   Status:     valid
 ```
 
@@ -455,7 +455,7 @@ v <- sframe_demo("verification")
 tampered <- file.path(dirname(v$instrument_path), "verification_tampered.sframe")
 read_sframe(tampered)
 #> Error in `sframe_abort_import()`:
-#> ! Integrity check failed for '/home/runner/work/_temp/Library/surveyframe/extdata/demos/verification_tampered.sframe'. The file may have been modified after it was written. Expected hash: cfdca4de693431558469490f62cb609f7c416601cc00151575f8310fa5792f84. Stored hash: a182ec0a9cc574a5fb649f4c47b224dcade895443d32946d27c4a35195c33ecd.
+#> ! Integrity check failed for '/home/runner/work/_temp/Library/surveyframe/extdata/demos/verification_tampered.sframe'. The file may have been modified after it was written. Expected hash: 877b33e87b80d59a41ad05e2cddc248c0e8d5a37758b8cc726d7c230608f1aaa. Stored hash: 1d3995afbed68c4dd487204430f214cb98f9a792822064a5f2833fc2bde54d42.
 ```
 
 The altered file refuses to load because its content no longer matches

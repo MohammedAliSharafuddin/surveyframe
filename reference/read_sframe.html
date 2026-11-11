@@ -109,7 +109,13 @@ marked unverified (see the Unverified reads section).</p></dd>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>The instrument remembers the content and amendment log it was read with, so
+    <p>The hash's <code>canonical</code> field names the form it was taken in. A file naming
+<code>"rfc8785"</code> is checked in RFC 8785 alone. A file naming no form was written
+before the field existed: it is checked in RFC 8785 and then in the forms
+surveyframe used before 0.4.3, and any match is accepted with a message of
+class <code>sframe_locale_order_hash</code> asking you to save it again. A file naming
+any other form is refused, since it needs a newer surveyframe.</p>
+<p>The instrument remembers the content and amendment log it was read with, so
 <code><a href="write_sframe.html">write_sframe()</a></code> can refuse an undisclosed revision.</p>
     </div>
     <div class="section level2">
@@ -121,10 +127,12 @@ it would otherwise rebuild by hand and lose fields doing so. The result
 carries the attribute <code>sframe_verified</code>, <code>FALSE</code> (it is <code>TRUE</code> on every
 verified read), and <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code> says so. <code><a href="write_sframe.html">write_sframe()</a></code> refuses to write an
 unverified instrument unless <code>new_instrument = TRUE</code> declares it new, since
-nothing ties its content to a state anyone wrote. The exception is one
-written back unchanged with the amendment log it was read with. No
-amendment can start from it: <code><a href="amend_sframe.html">amend_sframe()</a></code> refuses it, and the write
-refuses any entry appended to its log.</p>
+nothing ties its content to a state anyone wrote. That holds with the
+amendment log it was read with too, since the log was read unchecked: a
+sign-off, a tier or a timestamp edited as text would otherwise be written
+back and read verified. A new instrument starts a new log, so clear the old
+one first with <code>instrument$amendments &lt;- list()</code>. No amendment can start
+from it: <code><a href="amend_sframe.html">amend_sframe()</a></code> refuses it.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
@@ -158,7 +166,7 @@ refuses any entry appended to its log.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Version:    0.3.0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Items:      15</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Scales:     5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Analysis:   34 block(s)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Analysis:   34 blocks</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Status:     valid</span>
 </code></pre></div>
     </div>

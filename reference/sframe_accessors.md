@@ -106,7 +106,7 @@ sframe_get_items(instr)
 #> <item list: 1>
 #>  <sf_item: sat_1 | type: likert>
 sframe_get_scales(instr)[["sat"]]
-#> <sf_scale: sat | 1 item(s)>
+#> <sf_scale: sat | 1 item>
 #>   Label: Satisfaction
 #>   Items: sat_1
 #>   Scoring: mean

@@ -54,7 +54,7 @@ cs <- sframe_choice_set("agree5", 1:5,
                  c("Strongly disagree", "Disagree", "Neutral",
                    "Agree", "Strongly agree"))
 print(cs)
-#> <sf_choices: agree5 | 5 option(s)>
+#> <sf_choices: agree5 | 5 options>
 #>  value             label
 #>      1 Strongly disagree
 #>      2          Disagree

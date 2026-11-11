@@ -4,20 +4,28 @@ writes calls this function. It reads the folder's .sframe and responses,
 recomputes the analysis plan, and compares what it finds with the folder's
 manifest.json. The report's Provenance section then states the
 instrument hash and whether read_sframe() verified it, the amendments,
-whether the responses file is the one exported, whether the numbers match
-the recorded results (&quot;Numbers match the recorded results&quot;, or &quot;Numbers
-differ from the recorded results&quot; with both hashes), whether report.qmd
-was edited after surveyframe wrote it, and which declared plan blocks the
-report includes."><meta property="og:description" content="The first chunk of the report.qmd that render_report(format = &quot;qmd&quot;)
+whether the responses file is the one exported, whether the analysis plan
+results match the recorded results (&quot;The analysis plan results match the
+recorded results&quot;, or &quot;differ&quot; with both hashes), whether
+report_results.json, references.json and interpretations.json are the
+files exported, whether report.qmd was edited after surveyframe wrote it,
+and which declared plan blocks the report includes. The plan results are
+recomputed and compared with the record's hash in the manifest. The record
+file itself is checked apart, so an edited or deleted record is reported
+even though the numbers it held still match."><meta property="og:description" content="The first chunk of the report.qmd that render_report(format = &quot;qmd&quot;)
 writes calls this function. It reads the folder's .sframe and responses,
 recomputes the analysis plan, and compares what it finds with the folder's
 manifest.json. The report's Provenance section then states the
 instrument hash and whether read_sframe() verified it, the amendments,
-whether the responses file is the one exported, whether the numbers match
-the recorded results (&quot;Numbers match the recorded results&quot;, or &quot;Numbers
-differ from the recorded results&quot; with both hashes), whether report.qmd
-was edited after surveyframe wrote it, and which declared plan blocks the
-report includes."><meta property="og:image" content="https://mohammedalisharafuddin.github.io/surveyframe/reference/figures/pkgdown-wordmark-tagline.png"><meta property="og:image:alt" content="surveyframe: From research design to reporting"><script type="application/ld+json">
+whether the responses file is the one exported, whether the analysis plan
+results match the recorded results (&quot;The analysis plan results match the
+recorded results&quot;, or &quot;differ&quot; with both hashes), whether
+report_results.json, references.json and interpretations.json are the
+files exported, whether report.qmd was edited after surveyframe wrote it,
+and which declared plan blocks the report includes. The plan results are
+recomputed and compared with the record's hash in the manifest. The record
+file itself is checked apart, so an edited or deleted record is reported
+even though the numbers it held still match."><meta property="og:image" content="https://mohammedalisharafuddin.github.io/surveyframe/reference/figures/pkgdown-wordmark-tagline.png"><meta property="og:image:alt" content="surveyframe: From research design to reporting"><script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "SoftwareSourceCode",
@@ -75,11 +83,15 @@ writes calls this function. It reads the folder's <code>.sframe</code> and respo
 recomputes the analysis plan, and compares what it finds with the folder's
 <code>manifest.json</code>. The report's Provenance section then states the
 instrument hash and whether <code><a href="read_sframe.html">read_sframe()</a></code> verified it, the amendments,
-whether the responses file is the one exported, whether the numbers match
-the recorded results ("Numbers match the recorded results", or "Numbers
-differ from the recorded results" with both hashes), whether <code>report.qmd</code>
-was edited after surveyframe wrote it, and which declared plan blocks the
-report includes.</p>
+whether the responses file is the one exported, whether the analysis plan
+results match the recorded results ("The analysis plan results match the
+recorded results", or "differ" with both hashes), whether
+<code>report_results.json</code>, <code>references.json</code> and <code>interpretations.json</code> are the
+files exported, whether <code>report.qmd</code> was edited after surveyframe wrote it,
+and which declared plan blocks the report includes. The plan results are
+recomputed and compared with the record's hash in the manifest. The record
+file itself is checked apart, so an edited or deleted record is reported
+even though the numbers it held still match.</p>
     </div>
 
     <div class="section level2">
@@ -109,8 +121,9 @@ plan results.</p></dd>
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>A list the template reads: paths to the inputs it renders from, the
 instrument hash, the analysis seed, and <code>check</code>, a list of the verdicts
-(<code>numbers_match</code>, <code>source_edited</code>, <code>responses_match</code>, with the recorded
-and recomputed hashes).</p>
+(<code>numbers_match</code>, <code>results_file_match</code>, <code>references_match</code>,
+<code>interpretations_match</code>, <code>source_edited</code>, <code>responses_match</code>, with the
+recorded and recomputed hashes).</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
@@ -139,7 +152,7 @@ responses hash and the results record, all checkable without the report.</p>
 <span class="r-in"><span><span class="va">dir</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"report-source-example"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="render_report.html">render_report</a></span><span class="op">(</span><span class="va">d</span><span class="op">$</span><span class="va">instrument</span>, <span class="va">d</span><span class="op">$</span><span class="va">responses</span>, output_file <span class="op">=</span> <span class="va">dir</span>, format <span class="op">=</span> <span class="st">"qmd"</span>,</span></span>
 <span class="r-in"><span>              open <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Report source written to /tmp/RtmppB03Io/report-source-example. Open report.qmd in RStudio or Positron and render it.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Report source written to /tmp/RtmppFIGkv/report-source-example. Open report.qmd in RStudio or Positron and render it.</span>
 <span class="r-in"><span><span class="va">src</span> <span class="op">&lt;-</span> <span class="fu">sframe_report_source</span><span class="op">(</span><span class="va">dir</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">src</span><span class="op">$</span><span class="va">check</span><span class="op">$</span><span class="va">numbers_match</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] TRUE</span>

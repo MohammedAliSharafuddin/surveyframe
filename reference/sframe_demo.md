@@ -55,7 +55,7 @@ demo$instrument
 #>   Version:    1.0.0
 #>   Items:      2
 #>   Scales:     0
-#>   Analysis:   2 block(s)
+#>   Analysis:   2 blocks
 #>   Status:     valid
 head(demo$responses)
 #>   respondent_id           started_at         submitted_at    format

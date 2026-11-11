@@ -46,7 +46,7 @@ Other Demo functions:
 
 ``` r
 out <- sframe_demo_qmd("two_group", dir = tempdir())
-#> Notebook written to: /tmp/RtmppB03Io/two_group.qmd
+#> Notebook written to: /tmp/RtmppFIGkv/two_group.qmd
 basename(out)
 #> [1] "two_group.qmd"
 ```

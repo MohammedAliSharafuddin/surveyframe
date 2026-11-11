@@ -3,9 +3,13 @@
 Serialises an `sframe` instrument object to a UTF-8 JSON file with a
 SHA-256 integrity hash. The instrument is always validated before
 writing, and an invalid instrument is refused. The hash is computed over
-a canonical serialisation of the content with `hash.value` set to an
-empty string: object keys are sorted, so it identifies content, not the
-exact bytes.
+the content with `hash.value` set to an empty string, in the canonical
+form of RFC 8785, the JSON Canonicalization Scheme: keys sorted, numbers
+in their shortest form and no whitespace. So it identifies content, not
+the exact bytes, and SurveyBuilder and the verifier page on the package
+website compute the same hash. An `NA` is written as null where the
+published schema allows null for that field, and refused with the field
+named anywhere else, as is a number JSON cannot hold, such as `Inf`.
 
 ## Usage
 
@@ -53,6 +57,13 @@ write_sframe(
 
 The file path, invisibly.
 
+## Details
+
+The hash object is
+`{"algo": "sha256", "value": ..., "canonical": "rfc8785"}`. `canonical`
+names the canonical form the hash was taken in. It sits inside the
+hashed content, so changing it after writing breaks the hash.
+
 ## Revisions and the amendment log
 
 Writing checks the amendment log recorded by
@@ -69,6 +80,27 @@ amendment log and set `new_instrument = TRUE`.
 These are checks on the content in hand. The hash is unsigned and can be
 recomputed by anyone who edits a file, so it does not establish who
 wrote an instrument or when.
+
+The link between an instrument and the file it was read from is an
+attribute, `sframe_origin`, that
+[`read_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_sframe.md)
+sets. These checks rest on it. The package's own functions keep it,
+among them
+[`validate_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/validate_sframe.md),
+[`as_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/as_sframe.md),
+[`sframe_drop_items()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_drop_items.md),
+[`sframe_add_references()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_add_references.md),
+`sframe_plan<-` and
+[`sframe_add_model()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_add_model.md),
+as do `$<-`, [`modifyList()`](https://rdrr.io/r/utils/modifyList.html)
+and [`saveRDS()`](https://rdrr.io/r/base/readRDS.html) with
+[`readRDS()`](https://rdrr.io/r/base/readRDS.html). Base R that builds a
+new list from the parts drops it, such as `x[names(x)]`, `c(x)` or
+[`lapply()`](https://rdrr.io/r/base/lapply.html) over the fields: the
+result is an instrument read from no file, and its changes are then
+written with no amendment recorded. Change a read instrument's fields in
+place, and record the change with
+[`amend_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/amend_sframe.md).
 
 ## See also
 

@@ -74,9 +74,9 @@ Other Inspect functions:
 ``` r
 sframe_get_scales(sframe_demo("tourism_services")$instrument)
 #> <scale list: 5>
-#>  <sf_scale: digital_marketing | 3 item(s)>
-#>  <sf_scale: service_quality | 3 item(s)>
-#>  <sf_scale: sustainability | 2 item(s)>
-#>  <sf_scale: satisfaction | 2 item(s)>
-#>  <sf_scale: behavioural_intention | 2 item(s)>
+#>  <sf_scale: digital_marketing | 3 items>
+#>  <sf_scale: service_quality | 3 items>
+#>  <sf_scale: sustainability | 2 items>
+#>  <sf_scale: satisfaction | 2 items>
+#>  <sf_scale: behavioural_intention | 2 items>
 ```

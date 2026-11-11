@@ -1,7 +1,10 @@
 # Print an sframe instrument object
 
 Displays a compact summary of an `sframe` instrument object, showing the
-title, version, item count, scale count, and validation status.
+title, version, item count, scale count, and validation status. The
+status comes from
+[`validate_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/validate_sframe.md)
+run on `x`, not from a stored flag.
 
 ## Usage
 
@@ -60,6 +63,6 @@ print(instr)
 #>   Version:    0.1.0
 #>   Items:      1
 #>   Scales:     0
-#>   Analysis:   0 block(s)
-#>   Status:     not validated
+#>   Analysis:   0 blocks
+#>   Status:     invalid, 1 problem. validate_sframe(x, strict = FALSE) lists them
 ```

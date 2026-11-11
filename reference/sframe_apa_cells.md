@@ -14,6 +14,8 @@ is a blank cell.
 
 ``` r
 sframe_apa_cells(x, digits = 2)
+
+sframe_apa_col_labels(names, format = c("html", "markdown"), conf_level = 0.95)
 ```
 
 ## Arguments
@@ -26,6 +28,19 @@ sframe_apa_cells(x, digits = 2)
 
   Decimals for numbers other than p values.
 
+- names:
+
+  Column names.
+
+- format:
+
+  `"html"` for HTML headings, `"markdown"` for the pipe tables of Word,
+  OpenDocument and PDF reports.
+
+- conf_level:
+
+  The confidence level a `ci_low` or `ci_high` heading states.
+
 ## Value
 
 A data frame of character columns with the same names.
@@ -34,6 +49,11 @@ A data frame of character columns with the same names.
 
 This is exported because the Quarto report template runs in a separate R
 session against the installed package.
+
+`sframe_apa_col_labels()` gives the headings both report engines print
+for a table's columns: words for a column such as `valid_n` ("Valid
+*n*"), statistic symbols in italics (*M*, *SD*, *Mdn*, *SE*) and the
+confidence level in an interval heading ("95% CI lower").
 
 ## See also
 

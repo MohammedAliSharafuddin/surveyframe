@@ -167,8 +167,8 @@ print(instr)
 #>   Version:    1.0.0
 #>   Items:      3
 #>   Scales:     1
-#>   Analysis:   1 block(s)
-#>   Status:     not validated
+#>   Analysis:   1 block
+#>   Status:     valid
 length(sframe_plan(instr))
 #> [1] 1
 ```

@@ -7,10 +7,15 @@ the folder's `manifest.json`. The report's Provenance section then
 states the instrument hash and whether
 [`read_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_sframe.md)
 verified it, the amendments, whether the responses file is the one
-exported, whether the numbers match the recorded results ("Numbers match
-the recorded results", or "Numbers differ from the recorded results"
-with both hashes), whether `report.qmd` was edited after surveyframe
-wrote it, and which declared plan blocks the report includes.
+exported, whether the analysis plan results match the recorded results
+("The analysis plan results match the recorded results", or "differ"
+with both hashes), whether `report_results.json`, `references.json` and
+`interpretations.json` are the files exported, whether `report.qmd` was
+edited after surveyframe wrote it, and which declared plan blocks the
+report includes. The plan results are recomputed and compared with the
+record's hash in the manifest. The record file itself is checked apart,
+so an edited or deleted record is reported even though the numbers it
+held still match.
 
 ## Usage
 
@@ -38,8 +43,9 @@ sframe_report_source(dir = ".", include_analysis = TRUE, plot_palette = "web")
 
 A list the template reads: paths to the inputs it renders from, the
 instrument hash, the analysis seed, and `check`, a list of the verdicts
-(`numbers_match`, `source_edited`, `responses_match`, with the recorded
-and recomputed hashes).
+(`numbers_match`, `results_file_match`, `references_match`,
+`interpretations_match`, `source_edited`, `responses_match`, with the
+recorded and recomputed hashes).
 
 ## Details
 
@@ -69,7 +75,7 @@ d <- sframe_demo("likert_scale")
 dir <- file.path(tempdir(), "report-source-example")
 render_report(d$instrument, d$responses, output_file = dir, format = "qmd",
               open = FALSE)
-#> Report source written to /tmp/RtmppB03Io/report-source-example. Open report.qmd in RStudio or Positron and render it.
+#> Report source written to /tmp/RtmppFIGkv/report-source-example. Open report.qmd in RStudio or Positron and render it.
 src <- sframe_report_source(dir)
 src$check$numbers_match
 #> [1] TRUE

@@ -52,7 +52,7 @@ Other print, format and summary methods:
 ``` r
 sc <- sframe_scale("sat", "Satisfaction", items = c("q1", "q2", "q3"))
 print(sc)
-#> <sf_scale: sat | 3 item(s)>
+#> <sf_scale: sat | 3 items>
 #>   Label: Satisfaction
 #>   Items: q1, q2, q3
 #>   Scoring: mean

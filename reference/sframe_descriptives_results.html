@@ -99,7 +99,11 @@ columns are used.</p></dd>
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>An object of class <code>sframe_descriptives_report</code>.</p>
+    <p>An object of class <code>sframe_descriptives_report</code>. Its <code>table</code> has
+1 row per variable and group. <code>valid_n</code> and <code>missing_n</code> count the
+responses as given. A variable whose responses are not all numbers, such
+as a choice item's category codes, keeps those counts and has <code>NA</code> in
+every numeric column, since a mean or standard deviation does not apply.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>

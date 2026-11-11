@@ -68,7 +68,7 @@ summary(instr)
 #> Branches:  0
 #> Checks:    0
 #> 
-#> Analysis plan: 0 block(s)
+#> Analysis plan: 0 blocks
 #> 
-#> Status:    not validated
+#> Status:    invalid, 1 problem. validate_sframe(x, strict = FALSE) lists them
 ```
