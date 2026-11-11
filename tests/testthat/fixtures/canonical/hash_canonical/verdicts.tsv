@@ -1,0 +1,9 @@
+# file	verdict	what
+present.sframe	ok	written with hash.canonical rfc8785
+absent_rfc8785.sframe	legacy	RFC 8785 without the field, as written at 4bd8aba to e86e80e
+absent_dev.sframe	legacy	the 0.4.3 development form, no field
+unknown_value.sframe	refused	the field edited to rfc9999 after sealing
+unknown_null.sframe	refused	the field edited to null after sealing
+edited_removed.sframe	fail	the field deleted after sealing
+edited_added.sframe	fail	the field added to an RFC 8785 file without it
+edited_content.sframe	fail	a label edited after sealing, the field kept

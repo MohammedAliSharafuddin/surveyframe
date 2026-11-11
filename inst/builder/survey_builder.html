@@ -4429,6 +4429,8 @@ function openSframeText(text){
     var dupKey=sframeDuplicateKey(text);
     if(dupKey!==null){toast('Invalid .sframe file: the key "'+dupKey+'" appears more than once','err');return;}
     var p=JSON.parse(text),src=p.meta?p:(p.items?p:null);
+    var hc=sframeHashCanonical(p.hash);
+    if(hc.form==='unknown'){toast('This file names its hash\'s canonical form as '+hc.value+', which this builder does not know. The file needs a newer surveyframe','err');return;}
     if(!src){toast('Invalid .sframe file','err');return;}
     S.meta=src.meta||S.meta;S.choices=src.choices||[];S.items=src.items||[];
     S.scales=src.scales||[];S.branching=src.branching||[];S.checks=src.checks||[];
@@ -4462,11 +4464,11 @@ function openSframeText(text){
       sframeHash(vp).then(function(h){
         // A hash in the form 0.4.3 development builds saved is accepted, and
         // the next save writes the current form.
-        var old=h!==fileHash&&window.sha256pure(sframeDevStr(vp))===fileHash;
+        var old=hc.form==='absent'&&(h===fileHash||window.sha256pure(sframeDevStr(vp))===fileHash);
         // No file vouches for this content, so no amendment can start from it.
         if(h!==fileHash&&!old&&S._origin){S._origin.baseline='';S._origin.anchor='';}
         if(old)toast('Loaded: '+S.meta.title+'. Integrity verified in an earlier hash form. Save it again to update the hash','ok');
-        else if(h===fileHash)toast('Loaded: '+S.meta.title+' — integrity verified (sha256 '+fileHash.slice(0,8)+')','ok');
+        else if(h===fileHash&&hc.form===SFRAME_CANONICAL)toast('Loaded: '+S.meta.title+' — integrity verified (sha256 '+fileHash.slice(0,8)+')','ok');
         else toast('Loaded: '+S.meta.title+' — integrity hash mismatch; the file was changed outside surveyframe','err');
       });
     }else{
@@ -4547,6 +4549,16 @@ function sframeCanonDev(x){
   return x;
 }
 function sframeDevStr(v){return JSON.stringify(sframeCanonDev(v));}
+// The canonical form a file's hash names (hash.canonical, from 0.4.3), as R's
+// sframe_hash_canonical() reads it: 'rfc8785', 'absent' for a file written
+// before the field existed, or the canonical text of any other value, which
+// every reader refuses as needing a newer surveyframe.
+var SFRAME_CANONICAL='rfc8785';
+function sframeHashCanonical(h){
+  if(!h||typeof h!=='object'||Array.isArray(h)||!Object.prototype.hasOwnProperty.call(h,'canonical'))return{form:'absent'};
+  if(h.canonical===SFRAME_CANONICAL)return{form:SFRAME_CANONICAL};
+  return{form:'unknown',value:sframeCanonStr(h.canonical)};
+}
 // sframe-canon:end
 async function sframeHash(payload){
   var src=sframeCanonStr(payload);
@@ -4756,7 +4768,7 @@ var SFRAME_FORMAT='1.0';
 // The file as saved, hash still empty. Carried fields and references go back
 // in, each only when present, as write_sframe() in R writes them.
 function sframePayload(){
-  var payload={sframe_format:SFRAME_FORMAT,hash:{algo:'sha256',value:''},version:S.meta.version,meta:S.meta,items:S.items,choices:S.choices,scales:S.scales,branching:S.branching,checks:S.checks,analysis_plan:S.analysis_plan,models:S.models||[],render:S.render||{}};
+  var payload={sframe_format:SFRAME_FORMAT,hash:{algo:'sha256',value:'',canonical:SFRAME_CANONICAL},version:S.meta.version,meta:S.meta,items:S.items,choices:S.choices,scales:S.scales,branching:S.branching,checks:S.checks,analysis_plan:S.analysis_plan,models:S.models||[],render:S.render||{}};
   var carry=S._carry||{};Object.keys(carry).forEach(function(k){payload[k]=carry[k];});
   // An empty study, objectives or sampling is refused by the sframe-schema
   // profile and by validate_sframe(), and an instrument with no study has no

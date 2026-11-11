@@ -803,8 +803,8 @@ style.
   refused with the field named anywhere else, such as inside
   `meta$authors`. A file hashed in
   the 0.4.3 development form is accepted with a message to save it again.
-  24 of the 26 bundled `.sframe` files held a null and have new hashes, and
-  only their hash line changed. `tests/testthat/fixtures/canonical/` holds
+  The 26 bundled `.sframe` files were written again, and only their hash
+  object changed. `tests/testthat/fixtures/canonical/` holds
   the payloads all 3 hash alike, checked through node.
 * **A file holding an escaped U+0000 or a lone surrogate is refused** by
   `read_sframe()`, SurveyBuilder and the verifier page. jsonlite cut a
@@ -813,6 +813,20 @@ style.
   files could read as 1. The check reads the raw text before it is parsed,
   and an escaped backslash before `u0000` is plain text and passes. The
   shared fixture holds 53 cases with these.
+* **The hash names its canonical form, `hash$canonical = "rfc8785"`**
+  (owner, 2026-11-11). `write_sframe()` and SurveyBuilder write it inside
+  the hashed content, with only `hash$value` emptied, so changing it breaks
+  the hash. `read_sframe()`, SurveyBuilder and the verifier page apply 1
+  rule. A file naming `"rfc8785"` is checked in RFC 8785 alone, with no
+  fallback to an earlier form. A file naming no form was written before the
+  field existed, so it is checked in RFC 8785 and then the earlier forms,
+  and any match is accepted with a message to save it again, a legacy match
+  among them, which was accepted silently before. A file naming any other
+  form is refused, since it needs a newer surveyframe. 25 bundled `.sframe`
+  files were written again, and `verification_tampered.sframe` was rebuilt
+  from `verification.sframe` with the same 1-word edit. `tests/testthat/fixtures/canonical/hash_canonical/` holds 8 files
+  that all 3 judge alike: the field present, absent, set to an unknown value
+  or to null, deleted or added after sealing, and content edited.
 * **A file hashed before 0.4.3 is recognised in any session** (Fable FR-08
   and FR-11). The old key order followed the collation of the session that
   hashed, so a file hashed in an English session was refused as modified in

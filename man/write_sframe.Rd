@@ -46,6 +46,11 @@ hash. An \code{NA} is written as null where the published schema allows null for
 that field, and refused with the field named anywhere else, as is a number
 JSON cannot hold, such as \code{Inf}.
 }
+\details{
+The hash object is \verb{\{"algo": "sha256", "value": ..., "canonical": "rfc8785"\}}.
+\code{canonical} names the canonical form the hash was taken in. It sits inside
+the hashed content, so changing it after writing breaks the hash.
+}
 \section{Revisions and the amendment log}{
 Writing checks the amendment log recorded by \code{\link[=amend_sframe]{amend_sframe()}}. Each entry must
 follow the one before it, the instrument must still match its last recorded

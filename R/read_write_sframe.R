@@ -65,7 +65,7 @@ sframe_serialization_payload <- function(instrument, hash_value = "", box = TRUE
     # a read-then-rewrite changes their hash, which is correct because the
     # content genuinely changed.
     sframe_format = SFRAME_FORMAT_VERSION,
-    hash = list(algo = "sha256", value = hash_value),
+    hash = sframe_hash_object(hash_value),
     version = instrument$meta$version,
     meta = instrument$meta,
     items    = unname(boxer(lapply(instrument$items,
@@ -188,6 +188,30 @@ sframe_json_object <- function() {
 
 sframe_hash_form <- function() .sframe_order_env$form %||% "jcs"
 
+# The canonical form a hash names (hash.canonical, from 0.4.3). It sits inside
+# the hashed payload, with only hash.value emptied, so changing it breaks the
+# hash. A file written before the field existed names none. The "jcs0" form
+# (RFC 8785 without the field, as written at 4bd8aba to e86e80e) recognises
+# such hashes in the records that hold sframe_hash_value().
+SFRAME_CANONICAL <- "rfc8785"
+
+sframe_hash_object <- function(value) {
+  if (identical(sframe_hash_form(), "jcs")) {
+    list(algo = "sha256", value = value, canonical = SFRAME_CANONICAL)
+  } else {
+    list(algo = "sha256", value = value)
+  }
+}
+
+# What a parsed file's hash says of its canonical form: "rfc8785", "absent",
+# or "unknown" with the value's canonical text, which every reader refuses.
+sframe_hash_canonical <- function(hash) {
+  if (!is.list(hash) || !("canonical" %in% names(hash))) return("absent")
+  value <- hash[["canonical"]]
+  if (identical(value, SFRAME_CANONICAL)) return(SFRAME_CANONICAL)
+  structure("unknown", value = sframe_jcs(value))
+}
+
 sframe_key_order <- function(x) {
   if (!identical(sframe_hash_form(), "locale")) return(order(x, method = "radix"))
   sframe_collate_order(x, .sframe_order_env$collate)
@@ -227,11 +251,13 @@ sframe_with_locale_order <- function(code) {
   sframe_in_form("locale", function() code)
 }
 
-# The values fun() gives in every earlier form: the 0.4.3 development form,
+# The values fun() gives in every earlier form: RFC 8785 without
+# hash.canonical, the 0.4.3 development form,
 # then the pre-0.4.3 form in the session's, the C and the en_US collation, so a
 # file hashed in an English session is recognised in a C one (FR-08).
 sframe_old_form_values <- function(fun) {
   unique(c(
+    sframe_in_form("jcs0", fun),
     sframe_in_form("dev", fun),
     sframe_in_form("locale", fun),
     sframe_in_form("locale", fun, collate = "C"),
@@ -242,8 +268,8 @@ sframe_old_form_values <- function(fun) {
 # Said when a hash matched only in a form used before 0.4.3.
 sframe_inform_locale_order <- function(what) {
   rlang::inform(paste0(
-    what, " was hashed in a form surveyframe used before 0.4.3, whose key order ",
-    "or number format differs. It is accepted. Save it again to update the hash."),
+    what, " was hashed in a form surveyframe used before 0.4.3. It is accepted. ",
+    "Save it again to update the hash."),
     class = c("sframe_locale_order_hash", "sframe_message"))
 }
 
@@ -518,7 +544,7 @@ sframe_payload_json <- function(payload, pretty = FALSE) {
 # a reader of the file sees. `parsed = TRUE` says the payload came from
 # jsonlite::parse_json() already.
 sframe_hash_json <- function(payload, canonical = TRUE, parsed = FALSE) {
-  if (identical(sframe_hash_form(), "jcs")) {
+  if (sframe_hash_form() %in% c("jcs", "jcs0")) {
     if (!isTRUE(parsed)) {
       payload <- jsonlite::parse_json(sframe_payload_json(payload), simplifyVector = FALSE)
     }
@@ -571,6 +597,10 @@ sframe_hash_value <- function(instrument) {
 #' hash. An `NA` is written as null where the published schema allows null for
 #' that field, and refused with the field named anywhere else, as is a number
 #' JSON cannot hold, such as `Inf`.
+#'
+#' The hash object is `{"algo": "sha256", "value": ..., "canonical": "rfc8785"}`.
+#' `canonical` names the canonical form the hash was taken in. It sits inside
+#' the hashed content, so changing it after writing breaks the hash.
 #'
 #' # Revisions and the amendment log
 #'
@@ -945,6 +975,13 @@ sframe_validate_parsed_payload <- function(parsed, path, require_hash = TRUE) {
 #' ignores whitespace and key order. It is unsigned, so anyone who edits a file
 #' can also recompute it.
 #'
+#' The hash's `canonical` field names the form it was taken in. A file naming
+#' `"rfc8785"` is checked in RFC 8785 alone. A file naming no form was written
+#' before the field existed: it is checked in RFC 8785 and then in the forms
+#' surveyframe used before 0.4.3, and any match is accepted with a message of
+#' class `sframe_locale_order_hash` asking you to save it again. A file naming
+#' any other form is refused, since it needs a newer surveyframe.
+#'
 #' The instrument remembers the content and amendment log it was read with, so
 #' [write_sframe()] can refuse an undisclosed revision.
 #'
@@ -1040,8 +1077,17 @@ read_sframe <- function(path = NULL, validate = TRUE, text = NULL, verify = TRUE
 
   sframe_validate_parsed_payload(parsed, path, require_hash = verify)
 
-  # Verify hash
+  # Verify hash. A hash naming rfc8785 is checked in that form alone, one
+  # naming no form (written before hash.canonical existed) in RFC 8785 and then
+  # the earlier forms, and one naming any other form is refused.
   stored_hash <- if (is.list(parsed$hash)) parsed$hash$value
+  canonical <- sframe_hash_canonical(parsed$hash)
+  if (identical(as.vector(canonical), "unknown")) {
+    sframe_abort_import(
+      paste0("'", path, "' names its hash's canonical form as ",
+             attr(canonical, "value"), ", which this version of surveyframe does ",
+             "not know. The file needs a newer surveyframe."), path = path)
+  }
   hash_ok <- FALSE
   if (!is.null(stored_hash)) {
     parsed$hash$value <- ""
@@ -1051,13 +1097,17 @@ read_sframe <- function(path = NULL, validate = TRUE, text = NULL, verify = TRUE
         sframe_abort_import(paste0("Integrity check failed for '", path, "'. ",
                                    conditionMessage(e)), path = path)
       })
-    hash_ok <- identical(stored_hash, computed_hash) ||
-      identical(stored_hash, sframe_legacy_hash_payload(parsed))
-    # Hashed in the 0.4.3 development form or before 0.4.3.
-    if (!hash_ok && is.character(stored_hash) && length(stored_hash) == 1L &&
-        stored_hash %in% sframe_old_form_values(function() sframe_hash_payload(parsed))) {
-      hash_ok <- TRUE
-      sframe_inform_locale_order(paste0("'", path, "'"))
+    hash_ok <- identical(stored_hash, computed_hash)
+    # Hashed before hash.canonical existed: RFC 8785 as at 4bd8aba, the 0.4.3
+    # development form, the pre-0.4.3 form or the legacy one.
+    if (identical(canonical, "absent")) {
+      old_ok <- hash_ok || identical(stored_hash, sframe_legacy_hash_payload(parsed)) ||
+        (is.character(stored_hash) && length(stored_hash) == 1L &&
+           stored_hash %in% sframe_old_form_values(function() sframe_hash_payload(parsed)))
+      if (old_ok) {
+        hash_ok <- TRUE
+        sframe_inform_locale_order(paste0("'", path, "'"))
+      }
     }
   }
 
