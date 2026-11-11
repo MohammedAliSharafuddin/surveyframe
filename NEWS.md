@@ -895,6 +895,13 @@ style.
   the attribute `sframe_origin`, which the package's functions keep and base
   R that rebuilds the list, such as `x[names(x)]`, `c(x)` or `lapply()`,
   drops, after which a change is written with no amendment asked for.
+* **`validate_sframe()` reports 4 more malformed fields** (Fable FR-13).
+  An item whose `choice_set` or `scale_id` holds more than 1 id, a
+  branching rule with no `item_id` or `depends_on`, and a check with no
+  `item_id` stopped it with "argument is of length zero", so
+  `strict = FALSE` returned nothing and `read_sframe()` failed the same way.
+  Each is now a problem naming the component and the field, such as
+  "Branching rule 1's item_id is missing".
 * **Messages count in words.** Every message, warning, error and printed
   summary from the R functions says "1 item" and "2 items", "There is 1
   weight" and "There are 3 weights", where 68 places wrote "item(s)" or

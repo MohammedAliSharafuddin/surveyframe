@@ -47,6 +47,12 @@ sframe_field_shape_problems <- function(instrument) {
     keep(sframe_scalar_problem(it$label, paste0("Item ", i, "'s label"),
                                allow_empty = TRUE))
     keep(sframe_scalar_problem(it$type, paste0("Item ", i, "'s type")))
+    # Optional, but read as 1 id where given (Fable sitting 1 FR-13).
+    for (f in c("choice_set", "scale_id")) {
+      if (!is.null(it[[f]])) {
+        keep(sframe_scalar_problem(it[[f]], paste0("Item ", i, "'s ", f)))
+      }
+    }
   }
   for (i in seq_along(instrument$choices)) {
     bad <- component_problem(instrument$choices[[i]],
@@ -67,12 +73,20 @@ sframe_field_shape_problems <- function(instrument) {
     keep(component_problem(instrument$analysis_plan[[i]],
                            paste0("Analysis plan block ", i)))
   }
+  # A rule names the item it shows or hides and the item it reads, and a
+  # check the item it tests: each is read as 1 id (FR-13).
   for (i in seq_along(instrument$branching)) {
-    keep(component_problem(instrument$branching[[i]],
-                           paste0("Branching rule ", i)))
+    rule <- instrument$branching[[i]]
+    bad <- component_problem(rule, paste0("Branching rule ", i))
+    if (!is.null(bad)) { keep(bad); next }
+    keep(sframe_scalar_problem(rule$item_id, paste0("Branching rule ", i, "'s item_id")))
+    keep(sframe_scalar_problem(rule$depends_on, paste0("Branching rule ", i, "'s depends_on")))
   }
   for (i in seq_along(instrument$checks)) {
-    keep(component_problem(instrument$checks[[i]], paste0("Check ", i)))
+    chk <- instrument$checks[[i]]
+    bad <- component_problem(chk, paste0("Check ", i))
+    if (!is.null(bad)) { keep(bad); next }
+    keep(sframe_scalar_problem(chk$item_id, paste0("Check ", i, "'s item_id")))
   }
   for (i in seq_along(instrument$models)) {
     keep(component_problem(instrument$models[[i]], paste0("Model ", i)))
