@@ -21,7 +21,8 @@
 
 sframe_source_files <- c(qmd = "report.qmd", instrument = "instrument.sframe",
                          responses = "responses.csv", interpretations = "interpretations.json",
-                         results = "report_results.json", manifest = "manifest.json")
+                         references = "references.json", results = "report_results.json",
+                         manifest = "manifest.json")
 
 # Set the default of each named parameter in a .qmd's front matter. Values are
 # written as JSON, which is valid YAML, so no value can end the block.
@@ -104,7 +105,7 @@ sframe_write_report_source <- function(dir, instrument, data, front,
   # formats with that copy (owner 2026-11-03).
   style_file <- paste0(style$name, ".csl")
   sframe_bibliography(instrument, extra = bibliography_extra,
-                      file = file.path(dir, "references.json"))
+                      file = path("references"))
   file.copy(style$path, file.path(dir, style_file), overwrite = TRUE)
 
   qmd <- readLines(file.path(template_dir, "report.qmd"), warn = FALSE)
@@ -125,6 +126,15 @@ sframe_write_report_source <- function(dir, instrument, data, front,
   if (!is.null(data)) objects <- c(objects, list(obj("responses", "responses_csv", "responses")))
   objects <- c(objects, list(obj("results", "results_record", "results"),
                              sframe_style_manifest_object(style, style_file)))
+  # The bibliography and the written interpretations are read by the report
+  # too, so an emptied bibliography or an added interpretation is reported
+  # (Fable FR-17).
+  if (file.exists(path("references"))) {
+    objects <- c(objects, list(obj("references", "bibliography_csl_json", "references")))
+  }
+  if (file.exists(path("interpretations"))) {
+    objects <- c(objects, list(obj("interpretations", "interpretations_json", "interpretations")))
+  }
   manifest <- list(
     manifest_version = 1L,
     study_id = as.character(instrument$meta$id %||% instrument$meta$title %||% ""),
@@ -145,11 +155,15 @@ sframe_write_report_source <- function(dir, instrument, data, front,
 #' recomputes the analysis plan, and compares what it finds with the folder's
 #' `manifest.json`. The report's Provenance section then states the
 #' instrument hash and whether [read_sframe()] verified it, the amendments,
-#' whether the responses file is the one exported, whether the numbers match
-#' the recorded results ("Numbers match the recorded results", or "Numbers
-#' differ from the recorded results" with both hashes), whether `report.qmd`
-#' was edited after surveyframe wrote it, and which declared plan blocks the
-#' report includes.
+#' whether the responses file is the one exported, whether the analysis plan
+#' results match the recorded results ("The analysis plan results match the
+#' recorded results", or "differ" with both hashes), whether
+#' `report_results.json`, `references.json` and `interpretations.json` are the
+#' files exported, whether `report.qmd` was edited after surveyframe wrote it,
+#' and which declared plan blocks the report includes. The plan results are
+#' recomputed and compared with the record's hash in the manifest. The record
+#' file itself is checked apart, so an edited or deleted record is reported
+#' even though the numbers it held still match.
 #'
 #' Editing the `.qmd` stays allowed and is disclosed, as an amendment is.
 #' Someone can delete the provenance chunk, as they can edit any document.
@@ -163,8 +177,9 @@ sframe_write_report_source <- function(dir, instrument, data, front,
 #' @param plot_palette `"web"` or `"print"`, as in [render_report()].
 #' @return A list the template reads: paths to the inputs it renders from, the
 #'   instrument hash, the analysis seed, and `check`, a list of the verdicts
-#'   (`numbers_match`, `source_edited`, `responses_match`, with the recorded
-#'   and recomputed hashes).
+#'   (`numbers_match`, `results_file_match`, `references_match`,
+#'   `interpretations_match`, `source_edited`, `responses_match`, with the
+#'   recorded and recomputed hashes).
 #' @seealso [render_report()]
 #' @family Report functions
 #' @export
@@ -217,9 +232,23 @@ sframe_report_source <- function(dir = ".", include_analysis = TRUE, plot_palett
   }
   now_qmd <- sframe_sha256_file(path("qmd"))
   now_resp <- if (file.exists(path("responses"))) sframe_sha256_file(path("responses")) else NA_character_
+  # Each file the report reads as recorded: the results record itself, which
+  # numbers_match never opens (Codex P2-02, Fable FR-04), the bibliography and
+  # the interpretations (FR-17). NA where a file is absent or not recorded.
+  file_state <- function(key) {
+    now <- if (file.exists(path(key))) sframe_sha256_file(path(key)) else NA_character_
+    rec <- recorded[[key]]
+    rec <- if (is.null(rec)) NA_character_ else as.character(rec)
+    list(recorded = rec, now = now, match = identical(now, rec))
+  }
+  files <- list(results = file_state("results"), references = file_state("references"),
+                interpretations = file_state("interpretations"))
   check <- list(
     numbers_match = identical(now_record, rec_results), recorded_results = rec_results,
     now_results = now_record,
+    results_file_match = files$results$match,
+    references_match = files$references$match,
+    interpretations_match = files$interpretations$match,
     source_edited = !identical(now_qmd, recorded$report_source %||% ""),
     responses_match = identical(now_resp, recorded$responses %||% NA_character_),
     exported_on = substr(manifest$created_at %||% "", 1, 10)
@@ -229,9 +258,21 @@ sframe_report_source <- function(dir = ".", include_analysis = TRUE, plot_palett
   block_ids <- vapply(seq_along(plan), function(i) as.character(plan[[i]]$id %||% paste0("block ", i)),
                       character(1))
   reported <- isTRUE(include_analysis) && !is.null(data)
+  # A file the report reads, against the manifest.
+  file_line <- function(key) {
+    st <- files[[key]]
+    name <- sframe_source_files[[key]]
+    if (is.na(st$recorded) && is.na(st$now)) return("none")
+    if (st$match) return(paste0(name, ", the file exported"))
+    if (is.na(st$recorded)) return(sprintf("%s, added since export (now %s)", name, st$now))
+    if (is.na(st$now)) return(sprintf("%s is missing (recorded %s)", name, st$recorded))
+    sprintf("%s, which differs from the file exported (recorded %s, now %s)",
+            name, st$recorded, st$now)
+  }
   provenance <- data.frame(
     Field = c("Instrument hash", "Instrument check", "Amendments disclosed", "Responses sha256",
-              "Results", "Report source", "Citation style", "Declared plan blocks", "surveyframe"),
+              "Results", "Results record", "Report source", "Citation style", "Bibliography",
+              "Interpretations", "Declared plan blocks", "surveyframe"),
     Value = c(
       sframe_hex(sframe_hash_value(instrument)),
       sframe_instrument_verification(instrument),
@@ -241,9 +282,12 @@ sframe_report_source <- function(dir = ".", include_analysis = TRUE, plot_palett
       } else {
         paste0(now_resp, ", which differs from the file exported (", recorded$responses %||% "none", ")")
       },
-      if (check$numbers_match) "Numbers match the recorded results" else {
-        sprintf("Numbers differ from the recorded results (recorded %s, now %s)", rec_results, now_record)
+      # numbers_match recomputes the analysis plan alone (Fable FR-07).
+      if (check$numbers_match) "The analysis plan results match the recorded results" else {
+        sprintf("The analysis plan results differ from the recorded results (recorded %s, now %s)",
+                rec_results, now_record)
       },
+      file_line("results"),
       if (check$source_edited) {
         sprintf("The report source was edited after surveyframe generated it on %s.", check$exported_on)
       } else {
@@ -254,6 +298,8 @@ sframe_report_source <- function(dir = ".", include_analysis = TRUE, plot_palett
       } else {
         paste0(style_rec$name, ", changed since export")
       },
+      file_line("references"),
+      file_line("interpretations"),
       if (length(block_ids)) {
         paste0(block_ids, if (reported) " (reported)" else " (not reported)", collapse = ", ")
       } else "none declared",
@@ -263,7 +309,7 @@ sframe_report_source <- function(dir = ".", include_analysis = TRUE, plot_palett
   )
 
   # Field text may cite any work in the folder's bibliography (8b-R).
-  bib <- file.path(dir, "references.json")
+  bib <- path("references")
   keys <- unique(c(sframe_md_keys(instrument), if (file.exists(bib)) {
     vapply(jsonlite::fromJSON(bib, simplifyVector = FALSE), function(x) as.character(x$id %||% ""), character(1))
   }))

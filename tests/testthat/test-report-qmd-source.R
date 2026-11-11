@@ -61,7 +61,7 @@ test_that("a fresh folder says its numbers match and its source is unchanged", {
   expect_true(p$src$check$numbers_match)
   expect_false(p$src$check$source_edited)
   expect_true(p$src$check$responses_match)
-  expect_identical(p$value[["Results"]], "Numbers match the recorded results")
+  expect_identical(p$value[["Results"]], "The analysis plan results match the recorded results")
   expect_match(p$value[["Report source"]], "^Unchanged since surveyframe generated it on \\d{4}-")
   expect_match(p$value[["Instrument check"]], "verified by read_sframe()", fixed = TRUE)
   expect_match(p$value[["Declared plan blocks"]], "(reported)", fixed = TRUE)
@@ -75,7 +75,7 @@ test_that("an edited report.qmd is disclosed and the numbers still match", {
   expect_true(p$src$check$source_edited)
   expect_match(p$value[["Report source"]],
                "^The report source was edited after surveyframe generated it on \\d{4}-\\d{2}-\\d{2}\\.$")
-  expect_identical(p$value[["Results"]], "Numbers match the recorded results")
+  expect_identical(p$value[["Results"]], "The analysis plan results match the recorded results")
 })
 
 test_that("changed responses give numbers that differ, with both hashes", {
@@ -89,7 +89,7 @@ test_that("changed responses give numbers that differ, with both hashes", {
   expect_false(p$src$check$numbers_match)
   expect_false(p$src$check$responses_match)
   expect_match(p$value[["Results"]],
-               sprintf("Numbers differ from the recorded results (recorded %s, now %s)",
+               sprintf("The analysis plan results differ from the recorded results (recorded %s, now %s)",
                        p$src$check$recorded_results, p$src$check$now_results), fixed = TRUE)
   expect_match(p$value[["Responses sha256"]], "differs from the file exported", fixed = TRUE)
 })
@@ -167,7 +167,71 @@ test_that("the report source renders with Quarto and checks itself", {
     "Quarto's R:", if (file.exists(about)) readLines(about) else "(not written)",
     "This R:", Sys.getlocale(), R.version.string, .libPaths(),
     as.character(utils::packageVersion("surveyframe"))), collapse = "\n")
-  expect_match(doc, "Numbers match the recorded results", fixed = TRUE, info = why)
+  expect_match(doc, "The analysis plan results match the recorded results", fixed = TRUE, info = why)
   expect_match(doc, "Unchanged since surveyframe generated it", fixed = TRUE)
   expect_match(doc, sframe_hash_value(s$d$instrument), fixed = TRUE)
+})
+
+test_that("an edited or deleted results record is reported though the numbers match (P2-02, FR-04)", {
+  s <- write_source()
+  rec <- file.path(s$dir, "report_results.json")
+  p <- prov_of(s$dir)
+  expect_true(p$src$check$results_file_match)
+  expect_identical(p$value[["Results record"]], "report_results.json, the file exported")
+  cat(" ", file = rec, append = TRUE)
+  p <- prov_of(s$dir)
+  expect_true(p$src$check$numbers_match)
+  expect_false(p$src$check$results_file_match)
+  expect_match(p$value[["Results record"]],
+               "^report_results.json, which differs from the file exported \\(recorded [0-9a-f]{64}, now [0-9a-f]{64}\\)$")
+  unlink(rec)
+  p <- prov_of(s$dir)
+  expect_true(p$src$check$numbers_match)
+  expect_false(p$src$check$results_file_match)
+  expect_match(p$value[["Results record"]], "^report_results.json is missing \\(recorded [0-9a-f]{64}\\)$")
+})
+
+test_that("the bibliography and the interpretations are in the manifest and the check (FR-17)", {
+  plan_id <- sframe_demo("likert_scale")$instrument$analysis_plan[[1]]$id
+  s <- write_source(interpretations = stats::setNames(list("As planned."), plan_id))
+  ids <- vapply(jsonlite::read_json(file.path(s$dir, "manifest.json"))$objects,
+                function(o) o$object_id, "")
+  expect_true(all(c("results", "references", "interpretations") %in% ids))
+  p <- prov_of(s$dir)
+  expect_true(p$src$check$references_match)
+  expect_true(p$src$check$interpretations_match)
+  expect_identical(p$value[["Bibliography"]], "references.json, the file exported")
+  expect_identical(p$value[["Interpretations"]], "interpretations.json, the file exported")
+  writeLines("[]", file.path(s$dir, "references.json"))
+  writeLines(sprintf('{"%s": "Not as planned."}', plan_id), file.path(s$dir, "interpretations.json"))
+  p <- prov_of(s$dir)
+  expect_false(p$src$check$references_match)
+  expect_false(p$src$check$interpretations_match)
+  expect_match(p$value[["Bibliography"]], "differs from the file exported", fixed = TRUE)
+  expect_match(p$value[["Interpretations"]], "differs from the file exported", fixed = TRUE)
+  # An interpretation added to a folder exported with none.
+  s2 <- write_source()
+  expect_identical(prov_of(s2$dir)$value[["Interpretations"]], "none")
+  writeLines(sprintf('{"%s": "Added later."}', plan_id), file.path(s2$dir, "interpretations.json"))
+  p2 <- prov_of(s2$dir)
+  expect_false(p2$src$check$interpretations_match)
+  expect_match(p2$value[["Interpretations"]], "^interpretations.json, added since export \\(now [0-9a-f]{64}\\)$")
+})
+
+test_that("the responses sha256 keeps type and full precision, and times in UTC (FR-15)", {
+  h <- function(...) surveyframe:::sframe_responses_sha256(data.frame(..., stringsAsFactors = FALSE))
+  expect_false(identical(h(x = NA_real_), h(x = NaN)))
+  expect_false(identical(h(x = NA_real_), h(x = Inf)))
+  expect_false(identical(h(x = Inf), h(x = -Inf)))
+  expect_false(identical(h(x = 0.3), h(x = 0.1 + 0.2)))
+  expect_false(identical(h(x = 1L), h(x = 1)))
+  expect_false(identical(h(x = "NA"), h(x = NA_character_)))
+  expect_false(identical(h(x = "1"), h(x = 1)))
+  t_utc <- as.POSIXct("2026-11-11 08:00:00", tz = "UTC")
+  t_male <- t_utc
+  attr(t_male, "tzone") <- "Indian/Maldives"
+  # The same instant in 2 zones hashes alike, the same clock time in 2 zones does not.
+  expect_identical(h(t = t_utc), h(t = t_male))
+  expect_false(identical(h(t = t_utc), h(t = as.POSIXct("2026-11-11 08:00:00", tz = "Indian/Maldives"))))
+  expect_identical(h(x = c(1.5, NA)), h(x = c(1.5, NA)))
 })

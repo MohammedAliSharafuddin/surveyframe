@@ -93,15 +93,49 @@ sframe_sha256_file <- function(path) {
   sframe_hex(openssl::sha256(con))
 }
 
-# The sha256 of responses held in memory: the data as JSON by column, in
-# column order, with dates as ISO 8601. A data frame has no file to hash, and
-# this form is the same for the same values whatever file they came from.
+# The sha256 of responses held in memory. A data frame has no file to hash, so
+# each column is written with its name, its type and every value in a form
+# that keeps the type and full precision (Fable FR-15): a double as the 17
+# significant digits that read back to it, NA, NaN, Inf and -Inf by name, a
+# date as ISO 8601, a POSIXct as its seconds since 1970 in UTC, so the same
+# instant hashes alike in any time zone, and a factor with its levels. JSON's
+# 15 digits hashed 0.3 and 0.1 + 0.2 alike, null stood for NA, NaN and Inf,
+# and a time was written in the session's zone.
 sframe_responses_sha256 <- function(data) {
   if (is.null(data)) return(NA_character_)
   df <- as.data.frame(data, stringsAsFactors = FALSE)
-  df[] <- lapply(df, function(col) if (is.factor(col)) as.character(col) else col)
-  json <- jsonlite::toJSON(df, dataframe = "columns", digits = NA, na = "null",
-                           POSIXt = "ISO8601", Date = "ISO8601", null = "null")
+  num <- function(x) {
+    out <- sprintf("%.17g", x)
+    out[is.na(x)] <- "NA"
+    out[is.nan(x)] <- "NaN"
+    out[x %in% Inf] <- "Inf"
+    out[x %in% -Inf] <- "-Inf"
+    out
+  }
+  cols <- lapply(names(df), function(nm) {
+    x <- df[[nm]]
+    if (inherits(x, "POSIXlt")) x <- as.POSIXct(x)
+    type <- class(x)[1]
+    values <- if (inherits(x, "POSIXct")) {
+      num(as.numeric(x))
+    } else if (inherits(x, "Date")) {
+      ifelse(is.na(x), NA_character_, format(x, "%Y-%m-%d"))
+    } else if (is.factor(x)) {
+      as.character(x)
+    } else if (is.double(x)) {
+      num(x)
+    } else if (is.integer(x) || is.logical(x)) {
+      ifelse(is.na(x), "NA", as.character(x))
+    } else if (is.character(x)) {
+      x
+    } else {
+      vapply(x, function(v) paste(format(v), collapse = " "), "")
+    }
+    col <- list(name = nm, type = type, values = I(unname(values)))
+    if (is.factor(x)) col$levels <- I(levels(x))
+    col
+  })
+  json <- jsonlite::toJSON(cols, auto_unbox = TRUE, na = "null", null = "null")
   sframe_sha256_text(as.character(json))
 }
 
@@ -156,7 +190,7 @@ sframe_write_manifest <- function(dest, instrument, data, record_path, extra = l
   if (!is.null(data)) {
     objects <- c(objects, list(obj("responses", "responses", "",
                                    sframe_responses_sha256(data),
-                                   hash_of = "the responses as JSON by column")))
+                                   hash_of = "the responses by column, each with its type and every value in full")))
   }
   objects <- c(objects, list(
     obj("results", "results_record", basename(record_path), sframe_sha256_file(record_path)),

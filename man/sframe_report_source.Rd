@@ -18,8 +18,9 @@ plan results.}
 \value{
 A list the template reads: paths to the inputs it renders from, the
 instrument hash, the analysis seed, and \code{check}, a list of the verdicts
-(\code{numbers_match}, \code{source_edited}, \code{responses_match}, with the recorded
-and recomputed hashes).
+(\code{numbers_match}, \code{results_file_match}, \code{references_match},
+\code{interpretations_match}, \code{source_edited}, \code{responses_match}, with the
+recorded and recomputed hashes).
 }
 \description{
 The first chunk of the \code{report.qmd} that \code{render_report(format = "qmd")}
@@ -27,11 +28,15 @@ writes calls this function. It reads the folder's \code{.sframe} and responses,
 recomputes the analysis plan, and compares what it finds with the folder's
 \code{manifest.json}. The report's Provenance section then states the
 instrument hash and whether \code{\link[=read_sframe]{read_sframe()}} verified it, the amendments,
-whether the responses file is the one exported, whether the numbers match
-the recorded results ("Numbers match the recorded results", or "Numbers
-differ from the recorded results" with both hashes), whether \code{report.qmd}
-was edited after surveyframe wrote it, and which declared plan blocks the
-report includes.
+whether the responses file is the one exported, whether the analysis plan
+results match the recorded results ("The analysis plan results match the
+recorded results", or "differ" with both hashes), whether
+\code{report_results.json}, \code{references.json} and \code{interpretations.json} are the
+files exported, whether \code{report.qmd} was edited after surveyframe wrote it,
+and which declared plan blocks the report includes. The plan results are
+recomputed and compared with the record's hash in the manifest. The record
+file itself is checked apart, so an edited or deleted record is reported
+even though the numbers it held still match.
 }
 \details{
 Editing the \code{.qmd} stays allowed and is disclosed, as an amendment is.
