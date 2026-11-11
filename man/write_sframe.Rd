@@ -42,8 +42,9 @@ with \code{hash.value} set to an empty string, in the canonical form of RFC 8785
 the JSON Canonicalization Scheme: keys sorted, numbers in their shortest form
 and no whitespace. So it identifies content, not the exact bytes, and
 SurveyBuilder and the verifier page on the package website compute the same
-hash. An \code{NA} is written as null. A number JSON cannot hold, such as \code{Inf},
-is refused with its field named.
+hash. An \code{NA} is written as null where the published schema allows null for
+that field, and refused with the field named anywhere else, as is a number
+JSON cannot hold, such as \code{Inf}.
 }
 \section{Revisions and the amendment log}{
 Writing checks the amendment log recorded by \code{\link[=amend_sframe]{amend_sframe()}}. Each entry must

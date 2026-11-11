@@ -443,6 +443,70 @@ sframe_json_numbers <- function(x, path = "$") {
   x
 }
 
+# An NA is written as null only where the bundled schema (the published
+# instrument profile) allows null for that field, and refused with the field
+# named anywhere else (coordinator 2026-11-11, after CF-A milestone 1). A field
+# the schema does not describe takes any value, null among them.
+sframe_bundled_schema <- function() {
+  if (is.null(.sframe_order_env$schema)) {
+    .sframe_order_env$schema <- jsonlite::read_json(
+      system.file("schema", "sframe_schema.json", package = "surveyframe"),
+      simplifyVector = FALSE)
+  }
+  .sframe_order_env$schema
+}
+
+sframe_schema_resolve <- function(node, root) {
+  ref <- if (is.list(node)) node[["$ref"]]
+  if (is.null(ref)) return(node)
+  for (part in strsplit(sub("^#/", "", ref), "/", fixed = TRUE)[[1]]) root <- root[[part]]
+  root
+}
+
+sframe_schema_allows_null <- function(node, root) {
+  node <- sframe_schema_resolve(node, root)
+  if (!is.list(node)) return(TRUE)
+  branches <- c(node$anyOf, node$oneOf)
+  if (length(branches)) {
+    return(any(vapply(branches, sframe_schema_allows_null, logical(1), root = root)))
+  }
+  if (!is.null(node$type)) return("null" %in% unlist(node$type))
+  if ("const" %in% names(node)) return(is.null(node$const))
+  if (!is.null(node$enum)) return(any(vapply(node$enum, is.null, logical(1))))
+  TRUE
+}
+
+sframe_schema_child <- function(node, key, root) {
+  node <- sframe_schema_resolve(node, root)
+  if (!is.list(node)) return(NULL)
+  if (is.null(key)) return(node$items)
+  node$properties[[key]] %||% (if (is.list(node$additionalProperties)) node$additionalProperties)
+}
+
+sframe_check_na_schema <- function(x, node = sframe_bundled_schema(),
+                                   root = sframe_bundled_schema(), path = "") {
+  if (is.list(x) && !is.data.frame(x)) {
+    nm <- names(x)
+    for (i in seq_along(x)) {
+      key <- if (is.null(nm) || !nzchar(nm[i])) NULL else nm[i]
+      sub <- if (is.null(key)) paste0(path, "[", i, "]") else paste0(path, if (nzchar(path)) ".", key)
+      sframe_check_na_schema(x[[i]], sframe_schema_child(node, key, root), root, sub)
+    }
+    return(invisible(TRUE))
+  }
+  if (!is.atomic(x) || !length(x) || !anyNA(x)) return(invisible(TRUE))
+  array <- length(x) != 1L || inherits(x, "AsIs")
+  target <- if (array) sframe_schema_child(node, NULL, root) else node
+  if (!sframe_schema_allows_null(target, root)) {
+    where <- if (array) sprintf(" at position %d", which(is.na(x))[1]) else ""
+    rlang::abort(sprintf(paste0(
+      "The field %s holds NA%s, and the .sframe schema allows no null there. ",
+      "Give it a value or remove it."), path, where),
+      class = c("sframe_validation_error", "sframe_error"))
+  }
+  invisible(TRUE)
+}
+
 # The JSON a payload is written as, by write_sframe() and for hashing.
 sframe_payload_json <- function(payload, pretty = FALSE) {
   jsonlite::toJSON(sframe_json_numbers(payload), auto_unbox = TRUE, pretty = pretty,
@@ -504,8 +568,9 @@ sframe_hash_value <- function(instrument) {
 #' the JSON Canonicalization Scheme: keys sorted, numbers in their shortest form
 #' and no whitespace. So it identifies content, not the exact bytes, and
 #' SurveyBuilder and the verifier page on the package website compute the same
-#' hash. An `NA` is written as null. A number JSON cannot hold, such as `Inf`,
-#' is refused with its field named.
+#' hash. An `NA` is written as null where the published schema allows null for
+#' that field, and refused with the field named anywhere else, as is a number
+#' JSON cannot hold, such as `Inf`.
 #'
 #' # Revisions and the amendment log
 #'
@@ -571,6 +636,7 @@ write_sframe <- function(instrument, path, pretty = TRUE, overwrite = FALSE,
 
   # Build the full JSON payload with an empty hash placeholder
   payload <- sframe_serialization_payload(instrument)
+  sframe_check_na_schema(payload)
 
   # Insert real hash
   payload$hash$value <- sframe_hash_payload(payload)
