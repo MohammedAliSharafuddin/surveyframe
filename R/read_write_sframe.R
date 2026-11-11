@@ -375,6 +375,25 @@ sframe_jcs <- function(x, path = "$") {
                                  path, class(x)[1]))
 }
 
+# An escape R cannot hold: jsonlite cuts a string at an escaped NUL and turns a
+# lone surrogate into "?" or bytes that are not UTF-8, so 2 different texts
+# would read and hash the same in R. Checked on the raw text, and refused in R,
+# SurveyBuilder and the verifier page alike (coordinator 2026-11-11).
+# Returns c(kind, what), or NULL.
+sframe_escape_problem <- function(text) {
+  odd <- "(?<!\\\\)(?:\\\\\\\\)*"
+  hi <- "\\\\u[dD][89abAB][0-9a-fA-F]{2}"
+  lo <- "\\\\u[dD][c-fC-F][0-9a-fA-F]{2}"
+  if (grepl(paste0(odd, "\\\\u0000"), text, perl = TRUE)) {
+    return(c(kind = "nul", what = "the escaped character U+0000"))
+  }
+  if (grepl(paste0(odd, hi, "(?!", lo, ")"), text, perl = TRUE) ||
+      grepl(paste0(odd, "(?<!", hi, ")", lo), text, perl = TRUE)) {
+    return(c(kind = "surrogate", what = "a lone surrogate escape, U+D800 to U+DFFF without its pair"))
+  }
+  NULL
+}
+
 # The first duplicate key in a parsed file, as c(key, path), or NULL. R keeps both
 # and the JavaScript twins the last, so such a file is refused (FR-12).
 sframe_duplicate_key <- function(x, path = "$") {
@@ -926,6 +945,13 @@ read_sframe <- function(path = NULL, validate = TRUE, text = NULL, verify = TRUE
   }
 
   raw_json <- paste(raw_text, collapse = "\n")
+
+  bad <- sframe_escape_problem(raw_json)
+  if (!is.null(bad)) {
+    sframe_abort_import(
+      paste0("Invalid .sframe file '", path, "': it holds ", bad[["what"]],
+             ", which R cannot read faithfully."), path = path)
+  }
 
   parsed <- tryCatch(
     jsonlite::fromJSON(raw_json, simplifyVector = FALSE),

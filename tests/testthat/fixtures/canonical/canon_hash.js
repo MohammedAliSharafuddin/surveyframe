@@ -11,13 +11,16 @@ const [page, mode, input, output] = process.argv.slice(2);
 const html = fs.readFileSync(page, 'utf8');
 const i = html.indexOf('// sframe-canon:begin'), j = html.indexOf('// sframe-canon:end');
 const lib = new Function(html.slice(i, j) +
-  '; return {sframeCanonStr: sframeCanonStr, sframeDuplicateKey: sframeDuplicateKey};')();
+  '; return {sframeCanonStr: sframeCanonStr, sframeDuplicateKey: sframeDuplicateKey,' +
+  ' sframeEscapeProblem: sframeEscapeProblem};')();
 const li = html.indexOf('// sframe-legacy:begin'), lj = html.indexOf('// sframe-legacy:end');
 const legacyStr = li < 0 ? null :
   new Function(html.slice(li, lj) + '; return sframeLegacyStr;')();
 const sha = (s) => crypto.createHash('sha256').update(s, 'utf8').digest('hex');
 const texts = JSON.parse(fs.readFileSync(input, 'utf8'));
 const out = texts.map(function (t) {
+  const bad = lib.sframeEscapeProblem(t);
+  if (bad !== null) return { refused: bad };
   const dup = lib.sframeDuplicateKey(t);
   if (dup !== null) return { dup: dup };
   try {

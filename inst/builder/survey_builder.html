@@ -4424,6 +4424,8 @@ function loadFile(e){
 // Opens a .sframe file's text into the builder.
 function openSframeText(text){
   try{
+    var escBad=sframeEscapeProblem(text);
+    if(escBad){toast(escBad==='nul'?'Invalid .sframe file: it holds the escaped character U+0000, which R cannot read':'Invalid .sframe file: it holds a lone surrogate escape, which R cannot read','err');return;}
     var dupKey=sframeDuplicateKey(text);
     if(dupKey!==null){toast('Invalid .sframe file: the key "'+dupKey+'" appears more than once','err');return;}
     var p=JSON.parse(text),src=p.meta?p:(p.items?p:null);
@@ -4520,6 +4522,16 @@ function sframeDuplicateKey(t){
     else if(c===','){top=st[st.length-1];expectKey=!!(top&&top.obj);}
     i++;
   }
+  return null;
+}
+// An escape R cannot hold: jsonlite cuts a string at an escaped NUL and
+// garbles a lone surrogate, so 2 different texts would hash the same in R.
+// Refused in all 3, on the raw text. Returns 'nul', 'surrogate' or null.
+function sframeEscapeProblem(t){
+  var odd='(?<!\\\\)(?:\\\\\\\\)*',hi='\\\\u[dD][89abAB][0-9a-fA-F]{2}',
+    lo='\\\\u[dD][c-fC-F][0-9a-fA-F]{2}';
+  if(new RegExp(odd+'\\\\u0000').test(t))return 'nul';
+  if(new RegExp(odd+hi+'(?!'+lo+')').test(t)||new RegExp(odd+'(?<!'+hi+')'+lo).test(t))return 'surrogate';
   return null;
 }
 // The form 0.4.3 development builds hashed, kept only to recognise a file saved

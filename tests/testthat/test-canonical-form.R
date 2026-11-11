@@ -27,6 +27,8 @@ canon_unescape <- function(s) {
 }
 
 canon_r <- function(text) {
+  bad <- surveyframe:::sframe_escape_problem(text)
+  if (!is.null(bad)) return(list(refused = bad[["kind"]]))
   p <- jsonlite::parse_json(text, simplifyVector = FALSE)
   dup <- surveyframe:::sframe_duplicate_key(p)
   if (!is.null(dup)) return(list(dup = dup[["key"]]))
@@ -191,4 +193,20 @@ test_that("a file hashed in the 0.4.3 development form reads with the save-again
   g <- tempfile(fileext = ".sframe")
   write_sframe(y, g)
   expect_no_message(read_sframe(g), class = "sframe_locale_order_hash")
+})
+
+test_that("read_sframe() refuses an escaped NUL or a lone surrogate (coordinator, after milestone 1)", {
+  f <- tempfile(fileext = ".sframe")
+  x <- canon_instrument()
+  x$items[[1]]$label <- "abcXdef"
+  write_sframe(x, f)
+  txt <- paste(readLines(f, encoding = "UTF-8"), collapse = "\n")
+  # jsonlite cut "abc\u0000def" to "abc", so a change after the NUL kept the hash.
+  writeLines(sub("abcXdef", "abc\\u0000xyz", txt, fixed = TRUE), f)
+  expect_error(read_sframe(f), "U\\+0000", class = "sframe_import_error")
+  writeLines(sub("abcXdef", "abc\\ud800def", txt, fixed = TRUE), f)
+  expect_error(read_sframe(f), "lone surrogate", class = "sframe_import_error")
+  # An escaped backslash before u0000 is plain text, refused only as an edit.
+  writeLines(sub("abcXdef", "abc\\\\u0000def", txt, fixed = TRUE), f)
+  expect_error(read_sframe(f), "Integrity check failed", class = "sframe_import_error")
 })
