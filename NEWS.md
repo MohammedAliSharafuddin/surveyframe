@@ -902,6 +902,19 @@ style.
   `strict = FALSE` returned nothing and `read_sframe()` failed the same way.
   Each is now a problem naming the component and the field, such as
   "Branching rule 1's item_id is missing".
+* **`validate_sframe()` checks what scores and shows** (Fable FR-14). A
+  scale `method` other than "mean" or "sum" (it was scored as the mean), a
+  plan `alpha` or `options$alpha` that is not a number between 0 and 1 (it
+  changed nothing), a choice set whose values and labels differ in length,
+  a branching rule with an unknown or no operator, and a rule on its own item
+  are problems. Rules that depend on each other in a cycle, a check pass
+  value that is no code of its item's choice set, and an item whose
+  `scale_id` names a scale that does not list it are notes, read by
+  `sframe_notes()`, since SurveyBuilder saved them before, so those files
+  still open. SurveyBuilder now refuses a rule that would close a cycle and
+  a pass value outside the item's codes, and choosing a scale for an item
+  in its editor adds the item to that scale. A rule on an item asked later
+  stays allowed, since on 1 page the answer arrives as it is given.
 * **Messages count in words.** Every message, warning, error and printed
   summary from the R functions says "1 item" and "2 items", "There is 1
   weight" and "There are 3 weights", where 68 places wrote "item(s)" or

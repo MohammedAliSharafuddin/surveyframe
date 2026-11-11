@@ -27,6 +27,41 @@ sframe_scalar_problem <- function(value, what, allow_empty = FALSE,
   NULL
 }
 
+# The operators sframe_branch() accepts, which every evaluator knows.
+sframe_branch_operators <- c("==", "!=", "%in%", ">", ">=", "<", "<=")
+
+# The groups of items whose branching rules depend on each other, directly or
+# through other rules, as character vectors in item order of first mention. A
+# rule on its own item is reported on its own and left out here. Reachability
+# by repeated closure, since an instrument holds tens of rules, not thousands.
+sframe_branch_cycles <- function(rules) {
+  from <- vapply(rules %||% list(), function(r) as.character(r$item_id %||% NA)[1], character(1))
+  to <- vapply(rules %||% list(), function(r) as.character(r$depends_on %||% NA)[1], character(1))
+  keep <- !is.na(from) & !is.na(to) & from != to
+  from <- from[keep]
+  to <- to[keep]
+  nodes <- unique(c(from, to))
+  if (length(nodes) < 2) return(list())
+  n <- length(nodes)
+  reach <- matrix(FALSE, n, n)
+  reach[cbind(match(from, nodes), match(to, nodes))] <- TRUE
+  repeat {
+    nxt <- reach | (reach %*% reach > 0)
+    if (identical(nxt, reach)) break
+    reach <- nxt
+  }
+  on_cycle <- which(diag(reach))
+  out <- list()
+  seen <- integer(0)
+  for (i in on_cycle) {
+    if (i %in% seen) next
+    group <- on_cycle[reach[i, on_cycle] & reach[on_cycle, i]]
+    seen <- c(seen, group)
+    out[[length(out) + 1]] <- nodes[group]
+  }
+  out
+}
+
 sframe_field_shape_problems <- function(instrument) {
   out <- character(0)
   keep <- function(p) if (!is.null(p)) out <<- c(out, p)
@@ -215,6 +250,18 @@ sframe_plan_block_problems <- function(plan, known_methods) {
                     "named null and alternative."))
       }
     }
+    # A significance level outside (0, 1) or not a number gave no error and
+    # no change to the result (Fable sitting 1 FR-14).
+    for (a in c("alpha", "options")) {
+      val <- if (a == "alpha") block$alpha else if (is.list(block$options)) block$options$alpha
+      if (is.null(val)) next
+      ok <- is.numeric(val) && length(val) == 1 && is.finite(val) && val > 0 && val < 1
+      if (!ok) {
+        keep(paste0(where, "'s ", if (a == "alpha") "alpha" else "options$alpha", " is ",
+                    paste(format(val), collapse = ", "),
+                    ". A significance level is 1 number between 0 and 1, such as 0.05."))
+      }
+    }
     roles_ok <- is.list(block$roles) && length(unlist(block$roles)) > 0
     vars_ok <- length(unlist(block$variables)) > 0
     if (!is.null(block$roles) && !is.list(block$roles)) {
@@ -306,6 +353,16 @@ sframe_validation_checks <- c(
 #' - Branching rules referencing item IDs not present in the instrument
 #' - `%in%` branching rules whose `value` no evaluator can consume
 #' - Attention checks referencing item IDs not present in the instrument
+#' - A scale `method` other than `"mean"` or `"sum"`, a choice set whose
+#'   `values` and `labels` differ in length, a branching rule whose operator
+#'   is unknown or missing or that depends on its own item, and a plan block
+#'   whose `alpha` or `options$alpha` is not a number between 0 and 1
+#'
+#' These are reported as notes, which [sframe_notes()] returns and which leave
+#' the instrument valid, since SurveyBuilder saved them before 0.4.3: branching
+#' rules that depend on each other in a cycle, a check whose pass values are
+#' not codes of its item's choice set, and an item whose `scale_id` names a
+#' scale that does not list it.
 #' - Analysis plan roles referencing missing variables or models
 #' - Model specifications referencing missing indicators or constructs
 #'
@@ -451,7 +508,13 @@ validate_sframe <- function(instrument, strict = TRUE) {
 
   # A choice set's contents, which validation used to read past entirely.
   choice_content <- unlist(lapply(instrument$choices %||% list(), function(cs) {
-    p <- c(sframe_choice_content_problems(cs$values, cs$labels),
+    # The constructor refuses this. A set edited or read from a file did not
+    # meet it (FR-14).
+    p <- if (length(cs$values) != length(cs$labels)) {
+      paste0("it has ", sframe_count_noun(length(cs$values), "value"), " and ",
+             sframe_count_noun(length(cs$labels), "label"), ", and each option needs both.")
+    }
+    p <- c(p, sframe_choice_content_problems(cs$values, cs$labels),
            sframe_choice_other_problems(cs$values, cs$allow_other, cs$ordered))
     if (!is.null(cs$ordered) && !(is.logical(cs$ordered) && length(cs$ordered) == 1 &&
                                   !is.na(cs$ordered))) {
@@ -613,6 +676,33 @@ validate_sframe <- function(instrument, strict = TRUE) {
     }
   }
 
+  # A scale method score_scales() does not know was scored as the mean with no
+  # word (FR-14).
+  for (scale in instrument$scales) {
+    m <- scale$method
+    if (!is.null(m) && !(is.character(m) && length(m) == 1 && m %in% c("mean", "sum"))) {
+      add("scale_parameters",
+        paste0("Scale '", scale$id, "' has method '", paste(as.character(m), collapse = ", "),
+               "'. A scale is scored by \"mean\" or \"sum\"."))
+    }
+  }
+  # An item's scale_id names the scale that scores it, so that scale should
+  # list it (FR-14). A missing scale is item_scale_refs above, and a reverse
+  # keyed item reverse_item_membership. Otherwise the scale scores its own
+  # items list and the scale_id changes no score, so this is a note, not a
+  # problem: SurveyBuilder's item editor saved this shape before 0.4.3
+  # (coordinator ruling 2026-11-11).
+  for (item in instrument$items) {
+    if (is.null(item$scale_id) || isTRUE(item$reverse)) next
+    owner <- Filter(function(s) identical(s$id, item$scale_id), instrument$scales)
+    if (length(owner) == 1 && !item$id %in% owner[[1]]$items) {
+      log$notes <- c(log$notes, paste0(
+        "Item '", item$id, "' names scale '", item$scale_id, "' as its scale_id, ",
+        "but the scale does not list it, so the scale does not score it. Add '",
+        item$id, "' to the scale's items, or clear the item's scale_id."))
+    }
+  }
+
   # Branching rule integrity
   for (rule in instrument$branching) {
     if (!rule$item_id %in% item_ids) {
@@ -623,6 +713,19 @@ validate_sframe <- function(instrument, strict = TRUE) {
       add("branching_refs",
         paste0("Branch rule depends_on unknown item '",
                rule$depends_on, "'."))
+    }
+    # A rule on its own item shows or hides the item by its own answer (FR-14).
+    if (identical(rule$depends_on, rule$item_id)) {
+      add("branching_refs",
+        paste0("Branch rule on item '", rule$item_id, "' depends on that item itself."))
+    }
+    op <- rule$operator
+    if (!(is.character(op) && length(op) == 1 && op %in% sframe_branch_operators)) {
+      add("branching_values",
+        paste0("Branch rule on item '", rule$item_id, "' has ",
+               if (is.null(op)) "no operator" else
+                 paste0("the operator '", paste(as.character(op), collapse = ", "), "'"),
+               ". Use one of ", paste(sframe_branch_operators, collapse = ", "), "."))
     }
     # A `%in%` rule whose value no evaluator can consume is a rule that can
     # never fire, and a rule that never fires hides its target for good. That
@@ -643,6 +746,17 @@ validate_sframe <- function(instrument, strict = TRUE) {
       }
     }
   }
+  # Items whose rules depend on each other, directly or through others: each
+  # is shown or hidden by an answer that waits on its own (FR-14). A note, not
+  # a problem, since SurveyBuilder saved cycles before 0.4.3 and now refuses
+  # new ones (coordinator ruling 2026-11-11). A rule on an item asked later is
+  # allowed, since on 1 page the answer arrives live.
+  for (cycle in sframe_branch_cycles(instrument$branching)) {
+    log$notes <- c(log$notes, paste0(
+      "Branch rules on items ", paste0("'", cycle, "'", collapse = ", "),
+      " depend on each other in a cycle, so each waits on an answer that ",
+      "waits on its own. Remove 1 of the rules."))
+  }
 
   # Check item references
   check_item_ids <- vapply(instrument$checks,
@@ -652,6 +766,29 @@ validate_sframe <- function(instrument, strict = TRUE) {
     add("check_refs",
       paste0("Unknown ", sframe_plural(length(missing_check_items), "item"), " in the checks: ",
              paste(missing_check_items, collapse = ", ")))
+  }
+
+  # A pass value that is no code of its item's choice set can never be
+  # answered, so it flags every respondent (FR-14). Items with no choice set
+  # are skipped. A note, not a problem, since SurveyBuilder saved such checks
+  # before 0.4.3 and now refuses new ones (coordinator ruling 2026-11-11).
+  for (chk in instrument$checks) {
+    pv <- as.character(unlist(chk$pass_values %||% list()))
+    target <- Filter(function(i) identical(i$id, chk$item_id), instrument$items)
+    if (length(pv) == 0 || length(target) != 1 || is.null(target[[1]]$choice_set)) next
+    cs <- Filter(function(s) identical(s$id, target[[1]]$choice_set), instrument$choices)
+    if (length(cs) != 1) next
+    stray <- setdiff(pv, as.character(cs[[1]]$values))
+    if (length(stray) > 0) {
+      log$notes <- c(log$notes, paste0(
+        "Check '", chk$id %||% "(unnamed)", "' passes ",
+        sframe_plural(length(stray), "the value", "the values"), " ",
+        paste(stray, collapse = ", "), ", which ",
+        sframe_plural(length(stray), "is no code", "are no codes"), " of item '",
+        chk$item_id, "'s choice set '", target[[1]]$choice_set,
+        "', so no answer can pass it. Set its pass values to codes of that set: ",
+        paste(as.character(cs[[1]]$values), collapse = ", "), "."))
+    }
   }
 
   plan_problems <- sframe_plan_block_problems(
