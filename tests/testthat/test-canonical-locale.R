@@ -5,7 +5,7 @@
 # "ceiling_pct", an en_US one after, so a report source rendered by Quarto's
 # R on macOS (en_US) said its numbers differ from the record written under
 # R CMD check (C). Keys now sort by code point, as SurveyBuilder's
-# sframeCanon() does with JavaScript's sort().
+# sframeJcs() does with JavaScript's sort().
 
 with_collate <- function(locale, code) {
   old <- Sys.getlocale("LC_COLLATE")
@@ -83,6 +83,9 @@ test_that("a results record written in the old locale order still matches, with 
   loc <- natural_locale()
   skip_if(is.na(loc), "no en_US or en_GB locale installed")
   d <- sframe_demo("likert_scale")
+  # Read in the current hash form and written below in the old one, which no
+  # session does, so the read-time origin is dropped.
+  attr(d$instrument, "sframe_origin") <- NULL
   dir <- tempfile("locale-source-")
   with_collate(loc, {
     surveyframe:::sframe_with_locale_order(suppressMessages(

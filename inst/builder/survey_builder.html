@@ -4424,6 +4424,8 @@ function loadFile(e){
 // Opens a .sframe file's text into the builder.
 function openSframeText(text){
   try{
+    var dupKey=sframeDuplicateKey(text);
+    if(dupKey!==null){toast('Invalid .sframe file: the key "'+dupKey+'" appears more than once','err');return;}
     var p=JSON.parse(text),src=p.meta?p:(p.items?p:null);
     if(!src){toast('Invalid .sframe file','err');return;}
     S.meta=src.meta||S.meta;S.choices=src.choices||[];S.items=src.items||[];
@@ -4456,9 +4458,13 @@ function openSframeText(text){
       var vp=JSON.parse(text);
       vp.hash.value='';
       sframeHash(vp).then(function(h){
+        // A hash in the form 0.4.3 development builds saved is accepted, and
+        // the next save writes the current form.
+        var old=h!==fileHash&&window.sha256pure(sframeDevStr(vp))===fileHash;
         // No file vouches for this content, so no amendment can start from it.
-        if(h!==fileHash&&S._origin){S._origin.baseline='';S._origin.anchor='';}
-        if(h===fileHash)toast('Loaded: '+S.meta.title+' — integrity verified (sha256 '+fileHash.slice(0,8)+')','ok');
+        if(h!==fileHash&&!old&&S._origin){S._origin.baseline='';S._origin.anchor='';}
+        if(old)toast('Loaded: '+S.meta.title+'. Integrity verified in an earlier hash form. Save it again to update the hash','ok');
+        else if(h===fileHash)toast('Loaded: '+S.meta.title+' — integrity verified (sha256 '+fileHash.slice(0,8)+')','ok');
         else toast('Loaded: '+S.meta.title+' — integrity hash mismatch; the file was changed outside surveyframe','err');
       });
     }else{
@@ -4468,9 +4474,70 @@ function openSframeText(text){
 }
 
 // -- SHA-256 helper (async, with pure-JS fallback) --------------------------
-function sframeCanon(x){if(x===null)return{};if(Array.isArray(x))return x.map(sframeCanon);if(x&&typeof x==='object'){var o={};Object.keys(x).sort().forEach(function(k){o[k]=sframeCanon(x[k]);});return o;}return x;}
+// sframe-canon:begin
+// The canonical form a .sframe hash is taken over: RFC 8785, the JSON
+// Canonicalization Scheme, as R's sframe_jcs() builds it. Keys sorted by
+// UTF-16 code units, numbers and strings as JSON.stringify() writes them, null
+// kept as null. The string is built here, never through a new object, so digit
+// keys, the empty key and __proto__ keep their place. This block is the same in
+// inst/builder/survey_builder.html and pkgdown/extra/verify/index.html, and
+// tests/testthat/test-canonical-form.R checks both against R through node.
+function sframeJcs(x){
+  if(x===null)return 'null';
+  if(Array.isArray(x))return '['+x.map(sframeJcs).join(',')+']';
+  if(typeof x==='object'){
+    return '{'+Object.keys(x).sort().map(function(k){
+      return JSON.stringify(k)+':'+sframeJcs(x[k]);
+    }).join(',')+'}';
+  }
+  if(typeof x==='number'&&!isFinite(x))throw new Error('A number JSON cannot hold: '+x);
+  return JSON.stringify(x);
+}
+// The canonical string of a value as JSON.stringify() saves it.
+function sframeCanonStr(v){
+  return sframeJcs(JSON.parse(JSON.stringify(v===undefined?null:v)));
+}
+// The first key a JSON text gives twice in 1 object, or null. JSON.parse()
+// keeps the last and R the first, so such a file is refused in all 3.
+function sframeDuplicateKey(t){
+  var st=[],i=0,n=t.length,expectKey=false,c,j,top,k;
+  while(i<n){
+    c=t.charAt(i);
+    if(c==='"'){
+      j=i+1;
+      while(j<n&&t.charAt(j)!=='"'){if(t.charAt(j)==='\\')j++;j++;}
+      top=st[st.length-1];
+      if(top&&top.obj&&expectKey){
+        k=JSON.parse(t.slice(i,j+1));
+        if(top.keys.has(k))return k;
+        top.keys.add(k);expectKey=false;
+      }
+      i=j+1;continue;
+    }
+    if(c==='{'){st.push({obj:true,keys:new Set()});expectKey=true;}
+    else if(c==='['){st.push({obj:false});}
+    else if(c==='}'||c===']'){st.pop();expectKey=false;}
+    else if(c===','){top=st[st.length-1];expectKey=!!(top&&top.obj);}
+    i++;
+  }
+  return null;
+}
+// The form 0.4.3 development builds hashed, kept only to recognise a file saved
+// with it: null as {}, keys sorted, then JSON.stringify().
+function sframeCanonDev(x){
+  if(x===null)return{};
+  if(Array.isArray(x))return x.map(sframeCanonDev);
+  if(x&&typeof x==='object'){
+    var o={};
+    Object.keys(x).sort().forEach(function(k){o[k]=sframeCanonDev(x[k]);});
+    return o;
+  }
+  return x;
+}
+function sframeDevStr(v){return JSON.stringify(sframeCanonDev(v));}
+// sframe-canon:end
 async function sframeHash(payload){
-  var src=JSON.stringify(sframeCanon(payload));
+  var src=sframeCanonStr(payload);
   if(window.crypto&&window.crypto.subtle){
     try{
       var dig=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(src));
@@ -4481,7 +4548,7 @@ async function sframeHash(payload){
   return window.sha256pure(src);
 }
 // The same digest, at once, for the baseline kept when a file opens.
-function sframeHashSync(payload){return window.sha256pure(JSON.stringify(sframeCanon(payload)));}
+function sframeHashSync(payload){return window.sha256pure(sframeCanonStr(payload));}
 // The next version offered for a new instrument: the last number goes up by
 // one, so 1.2.0 becomes 1.2.1.
 function sframeNextVersion(v){
@@ -4505,7 +4572,7 @@ function sframeOriginOf(payload){
   var am=payload.amendments||[],fields={},order=[];
   Object.keys(payload).forEach(function(k){
     if(k==='hash'||k==='amendments')return;
-    order.push(k);fields[k]=JSON.stringify(sframeCanon(payload[k]));
+    order.push(k);fields[k]=sframeCanonStr(payload[k]);
   });
   return {title:S.meta.title,version:S.meta.version,
     baseline:sframeHashSync(payload),
@@ -4517,7 +4584,7 @@ function sframeChangedFields(o,payload){
   var keys=o.order.slice();
   Object.keys(payload).forEach(function(k){if(k!=='hash'&&k!=='amendments'&&keys.indexOf(k)<0)keys.push(k);});
   return keys.filter(function(k){
-    var now=payload[k]===undefined?undefined:JSON.stringify(sframeCanon(payload[k]));
+    var now=payload[k]===undefined?undefined:sframeCanonStr(payload[k]);
     return now!==o.fields[k];
   });
 }
@@ -4531,7 +4598,7 @@ function sframeScaleScoring(scales){
       weights:arr(s.weights).map(Number),method:String(s.method||'mean'),
       min_valid:arr(s.min_valid).map(Number)};
   });
-  return JSON.stringify(sframeCanon(out));
+  return sframeCanonStr(out);
 }
 var SFRAME_REASON_CODES=['data_correction','bot_removal','model_respecification','instrument_revision','other'];
 function sframeDefaultTier(code){return(code==='data_correction'||code==='bot_removal')?'pipeline':'design';}

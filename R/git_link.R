@@ -112,8 +112,9 @@ sframe_link_git_commit <- function(instrument, repo_path = ".", path = NULL) {
   current <- sframe_hash_value(checked)
   if (identical(stored, current)) {
     out$verified <- TRUE
-  } else if (identical(stored, sframe_with_locale_order(sframe_hash_value(checked)))) {
-    # Committed before 0.4.3, hashed in the session locale's key order.
+  } else if (is.character(stored) && length(stored) == 1L &&
+             stored %in% sframe_old_form_values(function() sframe_hash_value(checked))) {
+    # Committed with a hash in the 0.4.3 development form or an earlier one.
     out$verified <- TRUE
     sframe_inform_locale_order(paste0("'", path, "' as committed at HEAD"))
   } else {

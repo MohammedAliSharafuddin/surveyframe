@@ -190,20 +190,68 @@
   };
 })();
 
-// -- Canonical form + hashing, matching R's sframe_canonical_payload() and --
-// sframe_hash_payload() (R/read_write_sframe.R), and the SurveyBuilder's own
-// sframeCanon()/sframeHash(): recursively sort object keys, replace null
-// with an empty object, then hash the compact JSON string.
-function sframeCanon(x){
+// sframe-canon:begin
+// The canonical form a .sframe hash is taken over: RFC 8785, the JSON
+// Canonicalization Scheme, as R's sframe_jcs() builds it. Keys sorted by
+// UTF-16 code units, numbers and strings as JSON.stringify() writes them, null
+// kept as null. The string is built here, never through a new object, so digit
+// keys, the empty key and __proto__ keep their place. This block is the same in
+// inst/builder/survey_builder.html and pkgdown/extra/verify/index.html, and
+// tests/testthat/test-canonical-form.R checks both against R through node.
+function sframeJcs(x){
+  if(x===null)return 'null';
+  if(Array.isArray(x))return '['+x.map(sframeJcs).join(',')+']';
+  if(typeof x==='object'){
+    return '{'+Object.keys(x).sort().map(function(k){
+      return JSON.stringify(k)+':'+sframeJcs(x[k]);
+    }).join(',')+'}';
+  }
+  if(typeof x==='number'&&!isFinite(x))throw new Error('A number JSON cannot hold: '+x);
+  return JSON.stringify(x);
+}
+// The canonical string of a value as JSON.stringify() saves it.
+function sframeCanonStr(v){
+  return sframeJcs(JSON.parse(JSON.stringify(v===undefined?null:v)));
+}
+// The first key a JSON text gives twice in 1 object, or null. JSON.parse()
+// keeps the last and R the first, so such a file is refused in all 3.
+function sframeDuplicateKey(t){
+  var st=[],i=0,n=t.length,expectKey=false,c,j,top,k;
+  while(i<n){
+    c=t.charAt(i);
+    if(c==='"'){
+      j=i+1;
+      while(j<n&&t.charAt(j)!=='"'){if(t.charAt(j)==='\\')j++;j++;}
+      top=st[st.length-1];
+      if(top&&top.obj&&expectKey){
+        k=JSON.parse(t.slice(i,j+1));
+        if(top.keys.has(k))return k;
+        top.keys.add(k);expectKey=false;
+      }
+      i=j+1;continue;
+    }
+    if(c==='{'){st.push({obj:true,keys:new Set()});expectKey=true;}
+    else if(c==='['){st.push({obj:false});}
+    else if(c==='}'||c===']'){st.pop();expectKey=false;}
+    else if(c===','){top=st[st.length-1];expectKey=!!(top&&top.obj);}
+    i++;
+  }
+  return null;
+}
+// The form 0.4.3 development builds hashed, kept only to recognise a file saved
+// with it: null as {}, keys sorted, then JSON.stringify().
+function sframeCanonDev(x){
   if(x===null)return{};
-  if(Array.isArray(x))return x.map(sframeCanon);
+  if(Array.isArray(x))return x.map(sframeCanonDev);
   if(x&&typeof x==='object'){
     var o={};
-    Object.keys(x).sort().forEach(function(k){o[k]=sframeCanon(x[k]);});
+    Object.keys(x).sort().forEach(function(k){o[k]=sframeCanonDev(x[k]);});
     return o;
   }
   return x;
 }
+function sframeDevStr(v){return JSON.stringify(sframeCanonDev(v));}
+// sframe-canon:end
 async function sha256hex(str){
   if(window.crypto&&window.crypto.subtle){
     try{
@@ -213,29 +261,69 @@ async function sha256hex(str){
   }
   return window.sha256pure(str);
 }
-// Canonical hash: matches write_sframe()/read_sframe() since 0.4.0.
-async function canonicalHash(payload){
-  var p=Object.assign({},payload);
-  p.hash=Object.assign({},p.hash,{value:''});
-  return sha256hex(JSON.stringify(sframeCanon(p)));
+// A copy with hash.value emptied. Through JSON, since Object.assign() would
+// treat an own "__proto__" key as the prototype.
+function sframeHashless(payload){
+  var p=JSON.parse(JSON.stringify(payload));
+  if(p.hash&&typeof p.hash==='object')p.hash.value='';
+  return p;
 }
-// Legacy hash: matches files written before canonical serialisation existed
-// (jsonlite::toJSON with no key sorting). Checked as a fallback so an older
-// file reads as "verified (legacy format)" rather than a false FAIL.
+// Canonical hash: matches write_sframe() and read_sframe() from 0.4.3.
+async function canonicalHash(payload){
+  return sha256hex(sframeCanonStr(sframeHashless(payload)));
+}
+// The 0.4.3 development form, accepted with a note to save the file again.
+async function devHash(payload){
+  return sha256hex(sframeDevStr(sframeHashless(payload)));
+}
+// Legacy hash, read only, as R's sframe_legacy_hash_payload() takes it:
+// jsonlite::toJSON() with its defaults, keys in file order, null as {}, "</"
+// written "<\/", and numbers with 4 decimals, or C's %g from 2^31 up and from
+// 1e-5 down.
+function sframeLegacyFixed4(v){
+  var neg=v<0;if(neg)v=-v;
+  var whole=Math.floor(v),tmp=(v-whole)*10000,frac=Math.floor(tmp),diff=tmp-frac;
+  if(diff>0.5||(diff===0.5&&(frac&1))){frac++;if(frac>=10000){frac=0;whole++;}}
+  var s=String(whole);
+  if(frac>0){var f=String(frac);while(f.length<4)f='0'+f;s+='.'+f.replace(/0+$/,'');}
+  return (neg?'-':'')+s;
+}
+function sframeLegacyG(v,d){
+  var m=/^(-?)(\d)(?:\.(\d+))?e([+-]\d+)$/.exec(v.toExponential(d-1)),x=parseInt(m[4],10),s;
+  if(x<-4||x>=d){
+    s=m[2]+(m[3]?('.'+m[3]).replace(/0+$/,'').replace(/\.$/,''):'');
+    return m[1]+s+'e'+(x<0?'-':'+')+(Math.abs(x)<10?'0':'')+Math.abs(x);
+  }
+  s=v.toFixed(d-1-x);
+  return s.indexOf('.')<0?s:s.replace(/0+$/,'').replace(/\.$/,'');
+}
+function sframeLegacyNum(v){
+  if(v===0)return '0';
+  var a=Math.abs(v);
+  if(a<2147483647&&a>1e-5)return sframeLegacyFixed4(v);
+  return sframeLegacyG(v,Math.ceil(Math.min(17,Math.max(1,Math.log10(a))+4)));
+}
+function sframeLegacyStr(x){
+  if(x===null)return '{}';
+  if(Array.isArray(x))return '['+x.map(sframeLegacyStr).join(',')+']';
+  if(typeof x==='object')return '{'+Object.keys(x).map(function(k){
+    return JSON.stringify(k).replace(/<\//g,'<\\/')+':'+sframeLegacyStr(x[k]);}).join(',')+'}';
+  if(typeof x==='number')return sframeLegacyNum(x);
+  if(typeof x==='string')return JSON.stringify(x).replace(/<\//g,'<\\/');
+  return JSON.stringify(x);
+}
 async function legacyHash(payload){
-  var p=Object.assign({},payload);
-  p.hash=Object.assign({},p.hash,{value:''});
-  return sha256hex(JSON.stringify(p));
+  return sha256hex(sframeLegacyStr(sframeHashless(payload)));
 }
 // Content hash for amendment entries: matches sframe_content_hash()
-// (R/amendments.R) -- the same canonical process, but with `hash` and
-// `amendments` themselves excluded, so an entry never has to record the
-// hash of a payload that includes that entry's own hash field.
+// (R/amendments.R), the canonical form without `hash`, `amendments` and
+// `references`, so an entry never records a hash of itself.
 async function contentHash(payload){
-  var p=Object.assign({},payload);
+  var p=JSON.parse(JSON.stringify(payload));
   delete p.hash;
   delete p.amendments;
-  return sha256hex(JSON.stringify(sframeCanon(p)));
+  delete p.references;
+  return sha256hex(sframeCanonStr(p));
 }
 
 function esc(s){
@@ -268,13 +356,29 @@ async function verify(text){
     return;
   }
 
+  var dupKey=sframeDuplicateKey(text);
+  if(dupKey!==null){
+    resultEl.innerHTML='<p class="err">Not verified. The key <code>'+esc(dupKey)+
+      '</code> appears more than once in 1 object, so the file can be read 2 ways.</p>';
+    return;
+  }
+
   var storedHash=(parsed.hash&&parsed.hash.value)||'';
-  var canon=await canonicalHash(parsed);
+  var canon;
+  try{
+    canon=await canonicalHash(parsed);
+  }catch(e){
+    resultEl.innerHTML='<p class="err">Not verified. '+esc(e.message)+'</p>';
+    return;
+  }
+  var dev=await devHash(parsed);
   var legacy=await legacyHash(parsed);
 
   var status, note;
   if(storedHash&&storedHash===canon){
     status='ok'; note='Integrity verified. The instrument content matches the SHA-256 digest stored in this file.';
+  }else if(storedHash&&storedHash===dev){
+    status='legacy'; note='Integrity verified against the hash form surveyframe used before 0.4.3. Content is unchanged. Save it again to update the hash.';
   }else if(storedHash&&storedHash===legacy){
     status='legacy'; note='Integrity verified against the legacy (pre-canonical) hash format. This file predates surveyframe 0.3’s canonical serialisation. Content is unchanged; consider re-saving it with a current package version.';
   }else{

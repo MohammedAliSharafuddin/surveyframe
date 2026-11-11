@@ -779,11 +779,31 @@ style.
   so a session in an English locale and one in the C locale put "Scale"
   and "ceiling_pct" in opposite orders and hashed the same numbers
   differently. Keys now sort by code point in every locale, as
-  SurveyBuilder does. None of the 22 demo instruments' hashes change. A
+  SurveyBuilder does. A
   file, results record or committed instrument hashed in the old order is
   still accepted, with a message that it was hashed in the order used
   before 0.4.3 and should be saved again to update the hash. New hashes
   are always written in code point order, and a changed file still fails.
+* **R, SurveyBuilder and the verifier page hash 1 canonical form, RFC 8785,
+  the JSON Canonicalization Scheme** (Codex pass 2 P2-01 and P2-06, Fable
+  FR-01 to FR-03, FR-09, FR-10 and FR-12). A null was hashed as `{}`, so a
+  null changed to `{}` kept its hash, and an `NA` in a text field such as an
+  item's `help` wrote a file its own check refused. Numbers below 0.0001,
+  from 1e15 up or with 16 or 17 digits, and any text holding `</`, hashed
+  differently in R and in JavaScript, so a file one side wrote failed on the
+  other. Keys that are all digits, the empty key and `__proto__` hashed
+  differently in JavaScript. In all 3, keys now sort by UTF-16 code units,
+  numbers take ECMAScript's shortest form that reads back to the same value,
+  strings are escaped as `JSON.stringify()` escapes them and null stays
+  null, and the file holds every number in the digits its hash covers. A
+  file that gives a key twice is refused, since R kept the first and
+  JavaScript the last. A number JSON cannot hold, such as `Inf`, is refused
+  at write with its field named. An `NA` is written as null, and an `NA` in
+  a list of text such as `meta$authors` reads back as `NA`. A file hashed in
+  the 0.4.3 development form is accepted with a message to save it again.
+  24 of the 26 bundled `.sframe` files held a null and have new hashes, and
+  only their hash line changed. `tests/testthat/fixtures/canonical/` holds
+  the payloads all 3 hash alike, checked through node.
 * **The Quarto source of a report, which checks itself.**
   `render_report(format = "qmd")` writes a folder: `report.qmd`, the
   `.sframe`, `responses.csv`, the bibliography and its style, the results

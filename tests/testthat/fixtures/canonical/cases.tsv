@@ -1,0 +1,51 @@
+# Payloads hashed by R, the builder and the verifier page (test-canonical-form.R).
+# Columns, tab separated: id, JSON text, and where given the RFC 8785 string it must give.
+# Ids: B- from Fable sitting 1 probe p01 part B, C- from Codex pass 2, R- RFC 8785 itself.
+B-01	{"probe":0.1}	{"probe":0.1}
+B-02	{"probe":0.30000000000000004}	{"probe":0.30000000000000004}
+B-03	{"probe":0.3333333333333333}	{"probe":0.3333333333333333}
+B-04	{"probe":0.00001}	{"probe":0.00001}
+B-05	{"probe":0.0000001}	{"probe":1e-7}
+B-06	{"probe":100000}	{"probe":100000}
+B-07	{"probe":1000000000000000}	{"probe":1000000000000000}
+B-08	{"probe":1e21}	{"probe":1e+21}
+B-09	{"probe":1.5e-7}	{"probe":1.5e-7}
+B-10	{"probe":2.5}	{"probe":2.5}
+B-11	{"probe":1234567.125}	{"probe":1234567.125}
+B-12	{"probe":-0}	{"probe":0}
+B-13	{"probe":9007199254740993}	{"probe":9007199254740992}
+B-14	{"probe":1.0}	{"probe":1}
+B-15	{"probe":0.07}	{"probe":0.07}
+B-17	{"probe":0.000001}	{"probe":0.000001}
+B-18	{"probe":123456789012345680000}	{"probe":123456789012345680000}
+B-19	{"probe":-1e-7}	{"probe":-1e-7}
+B-20	{"probe":true}	{"probe":true}
+B-21	{"probe":null}	{"probe":null}
+B-22	{"probe":{}}	{"probe":{}}
+B-23	{"probe":[]}	{"probe":[]}
+B-24	{"probe":""}	{"probe":""}
+B-25	{"probe":["a"]}	{"probe":["a"]}
+B-26	{"probe":[1]}	{"probe":[1]}
+B-27	{"a":[],"b":{},"c":null,"d":[null],"e":[[]],"f":[{}]}	{"a":[],"b":{},"c":null,"d":[null],"e":[[]],"f":[{}]}
+B-30	{"probe":"a </script> b"}	{"probe":"a </script> b"}
+B-31	{"probe":"a\u2028b"}	
+B-33	{"probe":"\ud83d\ude00"}	
+B-34	{"probe":"a\u0007b"}	{"probe":"a\u0007b"}
+B-35	{"probe":"a\u007fb"}	
+B-36	{"probe":"a\t\n\rb"}	{"probe":"a\t\n\rb"}
+B-37	{"probe":"a\/b"}	{"probe":"a/b"}
+B-40	{"probe":"a\f\bb"}	{"probe":"a\f\bb"}
+B-41	{"probe":"\u078b\u07a8"}	
+B-42	{"probe":"\u00e9e\u0301"}	
+B-43	{"probe":"a\u001fb\"c\\d"}	{"probe":"a\u001fb\"c\\d"}
+B-50	{"Zeta":1,"alpha":2,"a_b":3,"ab":4,"_x":5}	{"Zeta":1,"_x":5,"a_b":3,"ab":4,"alpha":2}
+B-51	{"\uff21":1,"\ud83d\ude00":2}	
+B-52	{"10":1,"9":2,"1":3}	{"1":3,"10":1,"9":2}
+B-53	{"\u00e9":1,"z":2,"Z":3,"e":4}	
+B-55	{"":1,"a":2}	{"":1,"a":2}
+B-56	{"__proto__":1,"a":2}	{"__proto__":1,"a":2}
+C-01	{"scales":[{"id":"s","weights":[0.0000001,1]}]}	{"scales":[{"id":"s","weights":[1e-7,1]}]}
+C-02	{"\ue000":1,"\ud83d\ude00":2}	
+C-03	{"2":"b","10":"a"}	{"10":"a","2":"b"}
+R-01	{"numbers":[333333333.33333329,1E30,4.50,2e-3,0.000000000000000000000000001],"string":"\u20ac$\u000F\u000aA'\u0042\u0022\u005c\\\"\/","literals":[null,true,false]}	{"literals":[null,true,false],"numbers":[333333333.3333333,1e+30,4.5,0.002,1e-27],"string":"\u20ac$\u000f\nA'B\"\\\\\"/"}
+B-54	{"a":1,"a":2}	
