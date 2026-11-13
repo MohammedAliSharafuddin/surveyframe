@@ -747,6 +747,16 @@ arithmetic.
   refused with an error and the note says so. See "Codes that are not scores" in
   `?score_scales`. A declared "not a score" code in the schema is planned
   for 0.4.4 (FR-18).
+* **The R code shown beside a result codes answers as the result did.**
+  `sframe_syntax_result()` and the report's code chunks wrote their own
+  coding (`ordered()`, `as.factor()`, `table()` of the 2 McNemar columns,
+  any column of numbers as a number), so after the 4 fixes above they would
+  have fitted a different model from the result. Each runner now records
+  the coding it used (`$outcome_levels`, `$predictor_coding`, `$event`,
+  McNemar's `$category_levels`) and the code writes it out: a choice
+  predictor as `factor(..., levels = )`, the ordinal outcome in declared
+  order, the binary event as `== "Yes"`, and McNemar's 2 items on 1 set of
+  levels. The tests run the code and compare its estimates with the result.
 
 ## Reports
 

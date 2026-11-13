@@ -1438,6 +1438,7 @@ sframe_run_mcnemar <- function(data, roles, options = list()) {
   list(
     test = "mcnemar",
     vars = vars[1:2],
+    category_levels = lev,
     table = as.data.frame.matrix(tbl),
     statistic = unname(mt$statistic),
     df = unname(mt$parameter),
@@ -2021,6 +2022,8 @@ sframe_run_multinomial_logistic <- function(data, roles, options = list()) {
     vars = vars,
     n = nrow(df),
     reference = reference,
+    outcome_levels = levels(df[[outcome]]),
+    predictor_coding = coding,
     coefficients = co,
     std_errors = se,
     z_values = zval,
@@ -2030,7 +2033,6 @@ sframe_run_multinomial_logistic <- function(data, roles, options = list()) {
     AIC = stats::AIC(fit),
     pseudo_r2 = pseudo_r2,
     classification_table = as.data.frame.matrix(class_table),
-    predictor_coding = coding,
     apa = sframe_with_coding(sprintf("Multinomial logistic regression was estimated with %d complete cases, against the reference category %s.", nrow(df), sframe_text_value(outcome, reference)), coding),
     prompt = "Report the reference category, odds ratios, model fit, and classification table where meaningful."
   )
