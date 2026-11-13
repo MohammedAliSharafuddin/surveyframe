@@ -827,6 +827,15 @@ arithmetic.
   Each axis is now labelled from its own item's choice set, in declared
   order, in the counts, the totals, the percentages and the weighted table
   (FR-37).
+* **A frequency table's percentages are of those who answered.** Its
+  Percent column was of every row, missing included, while the weighted
+  table beside it and a descriptives block's counts were of those who
+  answered: North was 28.9% in 1 table and 36.1% in the other with every
+  weight 1, and the sentence gave N = 90 where 72 answered. Percent is now
+  the valid percent everywhere, the missing row keeps its count with no
+  percentage, and the sentence gives the number who answered and the number
+  missing: "Frequency distribution for "Region" (N = 72, 18 missing)."
+  (FR-23).
 
 ## Reports
 
