@@ -46,6 +46,7 @@ number of items, and weights that are not positive finite numbers
 \item Branching rules referencing item IDs not present in the instrument
 \item \code{\%in\%} branching rules whose \code{value} no evaluator can consume
 \item Attention checks referencing item IDs not present in the instrument
+\item A choice code with white space at the start or end, such as \code{" 1"}
 \item A scale \code{method} other than \code{"mean"} or \code{"sum"}, a choice set whose
 \code{values} and \code{labels} differ in length, a branching rule whose operator
 is unknown or missing or that depends on its own item, and a plan block

@@ -779,6 +779,14 @@ arithmetic.
   moved up. Blank lines are now kept as missing answers in a 1-column file,
   except those after the last line that holds anything. No surveyframe
   collector writes such a file (P3-02).
+* **A choice code with white space at either end is refused.** The reader
+  trimmed a set's codes before deciding whether they were numbers, so a set
+  declared as " 1" and "2" read as numeric and the answer " 1" became 1, a
+  code the set does not hold: the frequency table gained an unlabelled
+  category. `validate_sframe()` now reports such a code as a problem, naming
+  the set and the code, and the reader compares codes as declared.
+  SurveyBuilder already trims a code as it is typed, so only a set written
+  in R or edited by hand can hold one (P3-04).
 
 ## Reports
 

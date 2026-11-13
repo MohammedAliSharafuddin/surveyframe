@@ -297,9 +297,11 @@ sframe_numeric_response_columns <- function(instrument, response_items) {
     for (cs in instrument$choices %||% list()) {
       if (identical(cs$id, item$choice_set)) {
         # Codes like "01" read as numbers would lose their leading zero, so
-        # only codes that survive a numeric round trip count as numeric.
+        # only codes that survive a numeric round trip count as numeric. The
+        # codes are compared as declared: trimmed, " 1" counted as numeric and
+        # the answer " 1" became 1, a code the set does not hold (P3-04).
         if (is.numeric(cs$values)) return(TRUE)
-        codes <- trimws(as.character(cs$values))
+        codes <- as.character(cs$values)
         num <- suppressWarnings(as.numeric(codes))
         back <- vapply(num, format, character(1), scientific = FALSE,
                        trim = TRUE, digits = 15)
