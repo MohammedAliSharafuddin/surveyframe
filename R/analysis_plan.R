@@ -554,6 +554,17 @@ sframe_run_crosstab <- function(data, vars, options = list()) {
   }
   dimnames(tbl) <- list(label_axis(rownames(tbl), vars[1]),
                         label_axis(colnames(tbl), vars[2]))
+  # 1 category leaves no association to test. chisq.test() of a 1 by k table
+  # tests the k counts against equal shares, a goodness-of-fit test that was
+  # reported as a test of association (FR-27).
+  constant <- vars[1:2][dim(tbl) < 2]
+  if (length(constant) > 0) {
+    return(list(test = "crosstab", error = paste0(
+      paste(sframe_text_var(constant), collapse = " and "),
+      if (length(constant) == 1) " has" else " have",
+      " only 1 category with answers, so there is no association to test. ",
+      "A chi-square test of association needs at least 2 categories in each variable.")))
+  }
   ct <- tryCatch(
     suppressWarnings(stats::chisq.test(tbl, correct = FALSE)),
     error = function(e) e

@@ -865,6 +865,11 @@ arithmetic.
   weights, the weighted mean times the sum of the weights), 20 here. A
   respondent who answered every item gets the plain sum, as before. The
   help for `min_valid` and `?score_scales` say so (FR-26).
+* **A chi-square block with a constant variable is refused.** A variable
+  with 1 category made a 1 by k table, which `chisq.test()` tests against
+  equal shares: a goodness-of-fit test reported as "chi-square(2, N = 90) =
+  6.67, p = .036, V = NA" and "a significant association". The block now
+  stops, naming the variable with 1 category (FR-27).
 
 ## Reports
 
