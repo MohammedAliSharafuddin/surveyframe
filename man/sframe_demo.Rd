@@ -15,7 +15,10 @@ its \code{render} block. The bundled file on disk is left unchanged, so the
 same branding can be shown on whichever demo matches your own survey.}
 }
 \value{
-A list with \code{instrument}, \code{responses}, and the paths behind them:
+A list of class \code{sframe_demo} with \code{instrument}, \code{responses}, and
+the paths behind them. Printed, it shows a short card: what the demo
+teaches, its size, its files and the commands to try next. The parts are
+\code{instrument}, \code{responses},
 \code{instrument_path}, \code{responses_path}, \code{codebook_path} and \code{results_path}.
 The codebook carries variable and value labels, so the data means
 something outside R. The results table is what surveyframe reports for
@@ -32,7 +35,7 @@ SurveyStudio support in a single instrument.
 }
 \examples{
 demo <- sframe_demo("two_group")
-demo$instrument
+demo
 head(demo$responses)
 }
 \seealso{
