@@ -79,7 +79,9 @@ Every row of a file must have as many fields as its header. When every
 data row has exactly 1 field more and that field is empty in all of them,
 as a trailing separator gives, the field is dropped with a message. Any
 other row of a different width is refused, naming the lines, since reading
-it would move answers into the wrong columns.
+it would move answers into the wrong columns. In a file of 1 column, a
+blank line is a respondent who left the question unanswered, so it is kept
+as a missing answer, except after the last line that holds anything.
 }
 
 \section{Values}{

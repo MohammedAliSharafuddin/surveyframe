@@ -34,3 +34,15 @@ test_that("a short row is refused too, and a quoted field across lines is 1 reco
   out <- read_responses(p, cfb_p3_instrument())
   expect_identical(out$note, c("two\nlines", "B"))
 })
+
+test_that("a 1-column file keeps an unanswered respondent's blank line", {
+  # P3-02 (Codex pass 3): read.csv() skipped the blank line, so the file read
+  # as 2 respondents, first and last.
+  i <- sframe_instrument("P3", components = list(sframe_item("note", "Note", "text")))
+  p <- tempfile(fileext = ".csv")
+  write.csv(data.frame(note = c("first", NA, "last")), p, row.names = FALSE, na = "")
+  expect_identical(read_responses(p, i)$note, c("first", NA, "last"))
+  # Blank lines after the last answer are not respondents.
+  writeLines(c("note", "first", "", "last", "", ""), p)
+  expect_identical(read_responses(p, i)$note, c("first", NA, "last"))
+})
