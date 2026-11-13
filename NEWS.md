@@ -912,6 +912,12 @@ arithmetic.
   that ran, or says none ran and which arguments each check needs, naming
   an `outcome` given without `predictors` or a `group` without `variables`
   (review_040 defect 3).
+* **`render_results()` refuses a citation format it does not write.** Its
+  `citation_format` accepted "apa", "ama" and "vancouver" and never used the
+  argument: all 3 gave the same APA 7 document, so a methods section could
+  name a style the report never applied. "ama" and "vancouver" were never
+  applied in any release. `citation_format` now defaults to "apa" and
+  refuses anything else with a message (review_040 defect 7).
 
 ## Reports
 

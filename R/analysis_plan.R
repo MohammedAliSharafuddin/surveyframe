@@ -2347,8 +2347,9 @@ sframe_md_em <- function(x) {
 #' @param output_file Character or NULL. Path to the output HTML file. When
 #'   NULL, a temporary file is written and its path returned.
 #' @param output_path Character or NULL. Alias for `output_file`.
-#' @param citation_format Character. Reference format. One of `"apa"`,
-#'   `"ama"`, or `"vancouver"`. Defaults to `"apa"`.
+#' @param citation_format Character. The reference format, `"apa"` (APA 7),
+#'   the only one the report writes. `"ama"` and `"vancouver"` were accepted
+#'   before 0.4.3 and never applied, so they are refused with a message.
 #' @param title Character or NULL. Report title. Defaults to the instrument
 #'   title with " -- Results" appended.
 #' @param interpretations Named list or NULL. Written interpretations keyed
@@ -2388,12 +2389,24 @@ render_results <- function(
     instrument,
     output_file     = NULL,
     output_path     = NULL,
-    citation_format = c("apa", "ama", "vancouver"),
+    citation_format = "apa",
     title           = NULL,
     interpretations = NULL
 ) {
   sframe_check_instrument(instrument)
-  citation_format <- rlang::arg_match(citation_format)
+  # The references are written in APA 7 alone. "ama" and "vancouver" passed
+  # arg_match() and were never used, so 3 formats gave 1 document and a
+  # methods section could name a style the report never applied (review_040
+  # defect 7).
+  if (!identical(citation_format, "apa")) {
+    shown <- if (is.character(citation_format)) paste(citation_format, collapse = ", ")
+             else class(citation_format)[1]
+    rlang::abort(
+      c(paste0("`citation_format = \"", shown, "\"` is not supported: render_results() ",
+               "writes its references in APA 7 only."),
+        i = "Use citation_format = \"apa\". \"ama\" and \"vancouver\" were accepted before 0.4.3 and never applied."),
+      class = "sframe_error")
+  }
   interpretations <- sframe_clean_interpretations(interpretations)
 
   dest <- output_file %||% output_path %||% tempfile(fileext = ".html")
