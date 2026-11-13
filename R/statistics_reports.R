@@ -1886,11 +1886,16 @@ sframe_run_ordinal_logistic <- function(data, roles, options = list()) {
       "Check that every outcome level has answers and that the predictors are not constant or perfectly collinear.", fit)))
   }
   co <- as.data.frame(summary(fit)$coefficients)
-  co$odds_ratio <- exp(co[[1]])
-  if ("Std. Error" %in% names(co)) {
-    co$or_ci_low <- exp(co[[1]] - 1.96 * co[["Std. Error"]])
-    co$or_ci_high <- exp(co[[1]] + 1.96 * co[["Std. Error"]])
-  }
+  # p from the Wald z, and an odds ratio with its interval for the slopes
+  # only: the rows after them are thresholds (cut points between outcome
+  # levels), which have no odds ratio. The table printed an "odds ratio" of
+  # 3.10 for low|medium and no p or interval at all (FR-35).
+  threshold <- !rownames(co) %in% names(stats::coef(fit))
+  co$p <- 2 * stats::pnorm(-abs(co[[1]] / co[["Std. Error"]]))
+  co$odds_ratio <- ifelse(threshold, NA_real_, exp(co[[1]]))
+  co$or_ci_low <- ifelse(threshold, NA_real_, exp(co[[1]] - 1.96 * co[["Std. Error"]]))
+  co$or_ci_high <- ifelse(threshold, NA_real_, exp(co[[1]] + 1.96 * co[["Std. Error"]]))
+  co$threshold <- threshold
   null_fit <- tryCatch(MASS::polr(stats::as.formula(paste(outcome, "~ 1")),
                                   data = df, Hess = FALSE),
                        error = function(e) NULL)
