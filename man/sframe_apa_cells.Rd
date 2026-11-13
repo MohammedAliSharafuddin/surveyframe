@@ -30,8 +30,10 @@ The cells of a table from \code{\link[=run_analysis_plan]{run_analysis_plan()}} 
 \code{\link[=sframe_format_result]{sframe_format_result()}} print them, so a table shows the same numbers wherever it
 appears. A p value column shows 3 decimals with no leading zero, or
 \verb{<.001}. A column that cannot exceed 1, such as \code{r}, \code{tau} or \code{alpha}, drops
-its leading zero. Other numbers show 2 decimals, whole numbers none. A
-missing value is a blank cell.
+its leading zero. Other numbers show 2 decimals, and whole numbers in an
+integer column, a column of counts (n, df, Frequency) or a percent column
+none. A p value
+above .999 shows \verb{>.999}. A missing value is a blank cell.
 }
 \details{
 This is exported because the Quarto report template runs in a separate R
