@@ -353,6 +353,7 @@ sframe_validation_checks <- c(
 #' - Branching rules referencing item IDs not present in the instrument
 #' - `%in%` branching rules whose `value` no evaluator can consume
 #' - Attention checks referencing item IDs not present in the instrument
+#' - A choice code with white space at the start or end, such as `" 1"`
 #' - A scale `method` other than `"mean"` or `"sum"`, a choice set whose
 #'   `values` and `labels` differ in length, a branching rule whose operator
 #'   is unknown or missing or that depends on its own item, and a plan block
@@ -518,6 +519,18 @@ validate_sframe <- function(instrument, strict = TRUE) {
     }
     p <- c(p, sframe_choice_content_problems(cs$values, cs$labels),
            sframe_choice_other_problems(cs$values, cs$allow_other, cs$ordered))
+    # A code with white space at either end (" 1") is a typing slip: an
+    # answer of " 1" read as the number 1, a code the set does not declare
+    # (P3-04). SurveyBuilder trims codes as they are typed.
+    vals <- as.character(cs$values %||% character(0))
+    padded <- unique(vals[!is.na(vals) & vals != trimws(vals)])
+    if (length(padded) > 0) {
+      p <- c(p, paste0(
+        sframe_plural(length(padded), "code"), " ",
+        paste0("\"", padded, "\"", collapse = ", "),
+        if (length(padded) == 1) " has" else " have",
+        " white space at the start or end. Remove it, so answers match the code."))
+    }
     if (!is.null(cs$ordered) && !(is.logical(cs$ordered) && length(cs$ordered) == 1 &&
                                   !is.na(cs$ordered))) {
       p <- c(p, "`ordered` has to be TRUE or FALSE.")
