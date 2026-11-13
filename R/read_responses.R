@@ -20,6 +20,14 @@
 #' the code `"other"` when Other is chosen, and `<id>__other` (1 or 0) and
 #' `<id>__other_text` to a multiple choice item.
 #'
+#' # Records
+#'
+#' Every row of a file must have as many fields as its header. When every
+#' data row has exactly 1 field more and that field is empty in all of them,
+#' as a trailing separator gives, the field is dropped with a message. Any
+#' other row of a different width is refused, naming the lines, since reading
+#' it would move answers into the wrong columns.
+#'
 #' # Values
 #'
 #' A CSV file is read as text, so identifiers such as `001`, dates and text
@@ -116,14 +124,7 @@ read_responses <- function(
         "."))
     }
     if (identical(sep, ";")) dec <- ","
-    data <- utils::read.csv(
-      x,
-      sep = sep,
-      stringsAsFactors = FALSE,
-      check.names = FALSE,
-      colClasses = "character",
-      na.strings = character(0)
-    )
+    data <- sframe_read_csv_records(x, sep)
     # A byte order mark stays out of the first name. Re-encoding the file to
     # drop it would stop at the first byte that is not UTF-8, which cut a
     # Windows-1252 export short.
@@ -372,4 +373,52 @@ sframe_convert_declared_columns <- function(data, instrument, response_items,
     }
   }
   data
+}
+
+# Reads a delimited response file as text, every record checked against the
+# header's width first (P3-01). read.csv() took a file whose data rows had 1
+# field more than the header (a trailing separator, as spreadsheets write) and
+# made its first column the row names: every answer and the respondent id
+# moved 1 column left, with no warning. A record of another width is refused,
+# naming the first 3 lines and both counts. The 1 exception is a file where
+# every data row has exactly 1 extra field and it is empty in all of them:
+# that field is dropped with a message.
+sframe_read_csv_records <- function(x, sep) {
+  widths <- utils::count.fields(x, sep = sep, quote = "\"", comment.char = "",
+                                blank.lines.skip = FALSE)
+  header <- widths[1]
+  # NA marks a line inside a quoted field that spans lines, 0 a blank line.
+  line <- seq_along(widths)
+  rows <- !is.na(widths) & widths > 0 & line > 1
+  wrong <- rows & widths != header
+  read_text <- function(...) {
+    utils::read.csv(x, sep = sep, stringsAsFactors = FALSE, check.names = FALSE,
+                    colClasses = "character", na.strings = character(0), ...)
+  }
+  if (!any(wrong)) return(read_text())
+  if (all(widths[rows] == header + 1L)) {
+    raw <- utils::read.table(x, sep = sep, quote = "\"", header = FALSE,
+                             comment.char = "", colClasses = "character",
+                             na.strings = character(0), fill = TRUE,
+                             col.names = paste0("V", seq_len(header + 1L)),
+                             strip.white = FALSE)
+    if (all(raw[-1, header + 1L] == "")) {
+      data <- stats::setNames(raw[-1, seq_len(header), drop = FALSE],
+                              as.character(unlist(raw[1, seq_len(header)])))
+      rownames(data) <- NULL
+      rlang::inform(paste0(
+        "Every data row of '", basename(x), "' ends with an empty field after the last ",
+        "column of its header, as a trailing separator gives. The empty field is dropped."))
+      return(data)
+    }
+  }
+  bad <- line[wrong]
+  sframe_abort_import(paste0(
+    "'", basename(x), "' has rows whose number of fields differs from its header's ",
+    header, ": line", if (length(bad) > 1) "s" else "", " ",
+    paste(utils::head(bad, 3), collapse = ", "),
+    if (length(bad) > 3) paste0(" and ", length(bad) - 3, " more") else "",
+    " (", paste(utils::head(widths[wrong], 3), collapse = ", "), " fields). ",
+    "Reading it would move answers into the wrong columns. Check the separator ",
+    "and quoting, or fix those rows."), path = x)
 }

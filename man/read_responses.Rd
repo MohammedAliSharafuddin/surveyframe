@@ -74,6 +74,14 @@ the code \code{"other"} when Other is chosen, and \verb{<id>__other} (1 or 0) an
 \verb{<id>__other_text} to a multiple choice item.
 }
 
+\section{Records}{
+Every row of a file must have as many fields as its header. When every
+data row has exactly 1 field more and that field is empty in all of them,
+as a trailing separator gives, the field is dropped with a message. Any
+other row of a different width is refused, naming the lines, since reading
+it would move answers into the wrong columns.
+}
+
 \section{Values}{
 A CSV file is read as text, so identifiers such as \code{001}, dates and text
 answers arrive exactly as written, a literal \code{NA} included. Columns of items

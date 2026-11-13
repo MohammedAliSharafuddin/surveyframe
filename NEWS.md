@@ -757,6 +757,14 @@ arithmetic.
   predictor as `factor(..., levels = )`, the ordinal outcome in declared
   order, the binary event as `== "Yes"`, and McNemar's 2 items on 1 set of
   levels. The tests run the code and compare its estimates with the result.
+* **A CSV row wider than its header is refused, not shifted.** A file
+  whose data rows had 1 field more than the header, as a trailing separator
+  gives, was read with its first column as row names: every answer and the
+  respondent id moved 1 column to the left, with no warning. `read_responses()`
+  now counts each record's fields first. When every data row has exactly 1
+  extra field and it is empty in all of them, the field is dropped with a
+  message. Any other row whose width differs from the header's is refused,
+  naming the first 3 lines and their field counts (P3-01).
 
 ## Reports
 
