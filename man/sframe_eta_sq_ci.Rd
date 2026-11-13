@@ -11,12 +11,12 @@ sframe_eta_sq_ci(outcome, group, R = 2000, conf.level = 0.95, seed = NULL)
 
 \item{group}{A grouping vector of the same length.}
 
-\item{R}{Not used since 0.4.3, kept so existing calls still run.}
+\item{R}{Kept so existing calls still run. Unused since 0.4.3.}
 
 \item{conf.level}{Confidence level. Defaults to 0.95.}
 
-\item{seed}{Not used since 0.4.3, since the interval involves no
-resampling.}
+\item{seed}{Kept so existing calls still run. Unused since 0.4.3, as
+the interval uses no resampling.}
 }
 \value{
 A named numeric vector: \code{estimate}, \code{lower}, \code{upper}, with the
@@ -30,8 +30,8 @@ explained by \code{group}, as \code{effectsize::eta_squared(partial = FALSE, alt
 interval for the noncentrality \eqn{\lambda} of the F statistic, each
 bound turned into \eqn{\lambda / (\lambda + df_{error})}. The interval
 reaches 0 when the test is far from significant. Until 0.4.3 this was a
-percentile bootstrap, whose resampled eta squared is never below 0, so of
-40 samples with no group difference none had an interval reaching 0
+percentile bootstrap, whose resampled eta squared is 0 or above, so 40
+samples with equal group means all had an interval above 0
 (FR-24).
 }
 \examples{

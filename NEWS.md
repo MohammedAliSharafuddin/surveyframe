@@ -765,7 +765,7 @@ arithmetic.
   have fitted a different model from the result. Each runner now records
   the coding it used (`$outcome_levels`, `$predictor_coding`, `$event`,
   McNemar's `$category_levels`) and the code writes it out: a choice
-  predictor as `factor(..., levels = )`, the ordinal outcome in declared
+  predictor as `factor(x, levels = c("1", "2", "3"))`, the ordinal outcome in declared
   order, the binary event as `== "Yes"`, and McNemar's 2 items on 1 set of
   levels. The tests run the code and compare its estimates with the result.
 * **A CSV row wider than its header is refused, not shifted.** A file
@@ -873,7 +873,8 @@ arithmetic.
 * A chi-square with `options$simulate_p_value` on a sparse table printed
   "chi-square(NA, N = 4)", since a simulated p value has no degrees of
   freedom. The line now omits them and says how the p value was found:
-  "chi-square(N = 4) = 0.00, p ... (simulated from 2000 tables)" (P2-09).
+  "chi-square(N = 4) = 0.00, p = .52 (simulated from 2000 tables)", for
+  example (P2-09).
 * **`score_scales()` names the answers it cannot score.** A value outside
   the item's choice set was scored: 7 on a 1 to 5 item counted as 7 and a
   reversed 0 became 6. An answer that is not a number, such as "4,5",

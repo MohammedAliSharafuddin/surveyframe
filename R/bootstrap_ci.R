@@ -182,14 +182,14 @@ sframe_cohens_d_ci <- function(x, y, R = 2000, conf.level = 0.95, seed = NULL) {
 #' \eqn{\sqrt{\lambda / (n (k - 1))}}, where k is the smaller of the number
 #' of rows and columns. For a 2 by 2 table V equals phi. The interval reaches
 #' 0 when the test is far from significant. Until 0.4.3 this was a percentile
-#' bootstrap, whose resampled V is never below 0, so an exactly independent
+#' bootstrap, whose resampled V is 0 or above, so an exactly independent
 #' table had the interval \[0.05, 0.50\] beside V = 0 (FR-24).
 #'
 #' @param tab A contingency table (from [table()]) or a matrix of counts.
-#' @param R Not used since 0.4.3, kept so existing calls still run.
+#' @param R Kept so existing calls still run. Unused since 0.4.3.
 #' @param conf.level Confidence level. Defaults to 0.95.
-#' @param seed Not used since 0.4.3, since the interval involves no
-#'   resampling.
+#' @param seed Kept so existing calls still run. Unused since 0.4.3, as
+#'   the interval uses no resampling.
 #'
 #' @return A named numeric vector: `estimate`, `lower`, `upper`, with the
 #'   attributes `level` and `method` (`"noncentral chi-square"`). The bounds
@@ -253,16 +253,16 @@ sframe_cramers_v <- function(tbl) {
 #' interval for the noncentrality \eqn{\lambda} of the F statistic, each
 #' bound turned into \eqn{\lambda / (\lambda + df_{error})}. The interval
 #' reaches 0 when the test is far from significant. Until 0.4.3 this was a
-#' percentile bootstrap, whose resampled eta squared is never below 0, so of
-#' 40 samples with no group difference none had an interval reaching 0
+#' percentile bootstrap, whose resampled eta squared is 0 or above, so 40
+#' samples with equal group means all had an interval above 0
 #' (FR-24).
 #'
 #' @param outcome A numeric vector.
 #' @param group A grouping vector of the same length.
-#' @param R Not used since 0.4.3, kept so existing calls still run.
+#' @param R Kept so existing calls still run. Unused since 0.4.3.
 #' @param conf.level Confidence level. Defaults to 0.95.
-#' @param seed Not used since 0.4.3, since the interval involves no
-#'   resampling.
+#' @param seed Kept so existing calls still run. Unused since 0.4.3, as
+#'   the interval uses no resampling.
 #'
 #' @return A named numeric vector: `estimate`, `lower`, `upper`, with the
 #'   attributes `level` and `method` (`"noncentral F"`). The bounds are `NA`
