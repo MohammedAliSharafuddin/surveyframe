@@ -7,7 +7,8 @@
 sframe_missing_data_results(data, instrument = NULL, variables = NULL)
 }
 \arguments{
-\item{data}{A data.frame of responses.}
+\item{data}{A data.frame of responses. A blank answer (an empty string, or
+only spaces) counts as missing, and a factor's unused levels are dropped.}
 
 \item{instrument}{Optional \code{sframe} object.}
 

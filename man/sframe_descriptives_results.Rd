@@ -13,7 +13,8 @@ sframe_descriptives_results(
 )
 }
 \arguments{
-\item{data}{A data.frame of responses.}
+\item{data}{A data.frame of responses. A blank answer (an empty string, or
+only spaces) counts as missing, and a factor's unused levels are dropped.}
 
 \item{variables}{Character vector of variables. When \code{NULL}, numeric-like
 columns are used.}

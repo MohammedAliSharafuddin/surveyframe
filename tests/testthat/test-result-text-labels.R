@@ -25,7 +25,9 @@ test_that("result text names variables and groups by their labels", {
 test_that("a reference category is named by its choice label", {
   l <- sframe_demo("logistic")
   res <- suppressWarnings(run_analysis_plan(l$responses, l$instrument))
-  expect_match(res$RQ3$apa, "reference category Keynotes", fixed = TRUE)
+  # The first category the choice set declares, workshop (FR-21, CF-B). It
+  # was Keynotes, the first code in alphabetical order, until then.
+  expect_match(res$RQ3$apa, "reference category Workshops", fixed = TRUE)
 })
 
 test_that("an interaction term reads as its labels joined by a times sign", {

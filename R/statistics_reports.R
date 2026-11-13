@@ -1,6 +1,36 @@
 # statistics_reports.R
 # Core survey statistics and structured reporting helpers.
 
+# The 1 cleaning every analysis runner, the descriptives and the missing data
+# report start from (P2-04, P2-05, P2-07, FR-28, FR-29, FR-31): a blank answer
+# (sframe_is_blank(): empty, or only white space) is missing in a text or
+# factor column, and a factor keeps only the levels that have answers.
+# read_responses() already made blanks missing, but data built by hand or
+# passed from a host reached the runners with "" as an answer: valid in the
+# missing data report, a category in Fisher's test, ANOVA, Kruskal-Wallis,
+# McNemar and two-way ANOVA, a third group that stopped the t test, and a
+# numeric column held as text with blanks had no descriptives. An unused
+# factor level gave the chi-square test an empty row and a raw R error.
+sframe_analysis_frame <- function(data) {
+  if (!is.data.frame(data)) return(data)
+  for (col in names(data)) {
+    x <- data[[col]]
+    if (is.factor(x)) {
+      blank <- sframe_is_blank(x)
+      if (any(blank)) x[blank] <- NA
+      x <- droplevels(x)
+      if (!identical(x, data[[col]])) data[[col]] <- x
+    } else if (is.character(x)) {
+      blank <- sframe_is_blank(x)
+      if (any(blank)) {
+        x[blank] <- NA_character_
+        data[[col]] <- x
+      }
+    }
+  }
+  data
+}
+
 # A column as numbers. A factor is read through its labels: as.numeric() on a
 # factor gives level positions, so a factor holding 10 and 20 became 1 and 2.
 # A factor whose labels are not numbers is an error. Character values that are
@@ -308,7 +338,8 @@ sframe_require_columns <- function(data, cols, method) {
 #' including missingness, mean, standard deviation, median, IQR, range,
 #' skewness, kurtosis, standard error, and confidence intervals.
 #'
-#' @param data A data.frame of responses.
+#' @param data A data.frame of responses. A blank answer (an empty string, or
+#'   only spaces) counts as missing, and a factor's unused levels are dropped.
 #' @param variables Character vector of variables. When `NULL`, numeric-like
 #'   columns are used.
 #' @param split_by Optional grouping variable.
@@ -334,6 +365,7 @@ sframe_descriptives_results <- function(
     conf_level = 0.95,
     weights = NULL
 ) {
+  data <- sframe_analysis_frame(data)
   stopifnot(is.data.frame(data))
   if (is.null(variables)) {
     variables <- names(data)[vapply(data, function(x) any(!is.na(sframe_num(x))), logical(1))]
@@ -416,7 +448,8 @@ sframe_descriptives_results <- function(
 #' patterns, listwise and pairwise deletion counts, and scale scoring missing
 #' rules. No imputation is performed.
 #'
-#' @param data A data.frame of responses.
+#' @param data A data.frame of responses. A blank answer (an empty string, or
+#'   only spaces) counts as missing, and a factor's unused levels are dropped.
 #' @param instrument Optional `sframe` object.
 #' @param variables Optional response columns. Defaults to instrument item IDs
 #'   when an instrument is supplied, otherwise all columns.
@@ -434,6 +467,7 @@ sframe_descriptives_results <- function(
 #' mr$item_missing
 #' @family Responses functions
 sframe_missing_data_results <- function(data, instrument = NULL, variables = NULL) {
+  data <- sframe_analysis_frame(data)
   stopifnot(is.data.frame(data))
   if (is.null(variables)) {
     variables <- if (!is.null(instrument) && inherits(instrument, "sframe")) {
@@ -1294,6 +1328,7 @@ sframe_run_missing_result <- function(data, instrument, roles) {
 }
 
 sframe_run_fisher <- function(data, roles, options = list()) {
+  data <- sframe_analysis_frame(data)
   vars <- sframe_role_values(roles, c("row", "column", "variables"))
   err <- sframe_require_columns(data, vars[1:2], "Fisher's exact test")
   if (!is.null(err)) return(list(test = "fisher_exact", error = err))
@@ -1401,6 +1436,7 @@ sframe_event_sentence <- function(column, outcome) {
 # or 2 items whose observed categories differed, gave a test of the wrong
 # cells.
 sframe_run_mcnemar <- function(data, roles, options = list()) {
+  data <- sframe_analysis_frame(data)
   vars <- sframe_role_values(roles, c("before", "after", "variables"))
   err <- sframe_require_columns(data, vars[1:2], "McNemar test")
   if (!is.null(err)) return(list(test = "mcnemar", error = err))
@@ -1450,6 +1486,7 @@ sframe_run_mcnemar <- function(data, roles, options = list()) {
 }
 
 sframe_run_cochran_q <- function(data, roles) {
+  data <- sframe_analysis_frame(data)
   vars <- sframe_role_values(roles, c("measures", "variables"))
   err <- sframe_require_columns(data, vars, "Cochran's Q")
   if (!is.null(err)) return(list(test = "cochran_q", error = err))
@@ -1469,6 +1506,7 @@ sframe_run_cochran_q <- function(data, roles) {
 }
 
 sframe_run_friedman <- function(data, roles) {
+  data <- sframe_analysis_frame(data)
   vars <- sframe_role_values(roles, c("measures", "variables"))
   err <- sframe_require_columns(data, vars, "Friedman test")
   if (!is.null(err)) return(list(test = "friedman", error = err))
@@ -1682,6 +1720,7 @@ sframe_run_correlation_matrix <- function(data, vars, method = "pearson", use = 
 }
 
 sframe_run_anova_two <- function(data, roles) {
+  data <- sframe_analysis_frame(data)
   f1 <- sframe_role_values(roles, c("factor1", "factor_a"))[1]
   f2 <- sframe_role_values(roles, c("factor2", "factor_b"))[1]
   outcome <- sframe_role_values(roles, c("outcome", "dependent"))[1]
@@ -1727,6 +1766,7 @@ sframe_run_anova_two <- function(data, roles) {
 }
 
 sframe_run_ancova <- function(data, roles) {
+  data <- sframe_analysis_frame(data)
   group <- sframe_role_values(roles, c("group", "factor"))[1]
   outcome <- sframe_role_values(roles, c("outcome", "dependent"))[1]
   covariates <- sframe_role_values(roles, c("covariates", "covariate"))
@@ -1813,6 +1853,7 @@ sframe_logistic_fit_table <- function(fit) {
 }
 
 sframe_run_ordinal_logistic <- function(data, roles, options = list()) {
+  data <- sframe_analysis_frame(data)
   outcome <- sframe_role_values(roles, c("dependent", "outcome"))[1]
   predictors <- sframe_role_values(roles, c("predictors", "covariates"))
   vars <- c(outcome, predictors)
@@ -1880,6 +1921,7 @@ sframe_run_ordinal_logistic <- function(data, roles, options = list()) {
 # finite estimates under complete or quasi-complete separation, both of which
 # are common in the small samples surveyframe targets from v0.4 onwards.
 sframe_run_firth_logistic <- function(data, roles, options = list()) {
+  data <- sframe_analysis_frame(data)
   outcome <- sframe_role_values(roles, c("dependent", "outcome"))[1]
   predictors <- sframe_role_values(roles, c("predictors", "covariates"))
   vars <- c(outcome, predictors)
@@ -1967,6 +2009,7 @@ sframe_run_firth_logistic <- function(data, roles, options = list()) {
 }
 
 sframe_run_multinomial_logistic <- function(data, roles, options = list()) {
+  data <- sframe_analysis_frame(data)
   outcome <- sframe_role_values(roles, c("dependent", "outcome"))[1]
   predictors <- sframe_role_values(roles, c("predictors", "covariates"))
   vars <- c(outcome, predictors)
