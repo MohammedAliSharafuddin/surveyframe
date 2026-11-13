@@ -895,6 +895,9 @@ arithmetic.
   seed and its id, so amending the plan leaves every other block's interval
   as it was. Every bootstrap interval in a plan therefore differs from
   0.4.2's for the same seed (FR-33).
+* A chi-square block with a weights role tests the unweighted counts, as
+  before, and now says so in its sentence and note, naming the weight whose
+  counts are in the weighted table beside it (FR-34).
 
 ## Reports
 
