@@ -38,7 +38,9 @@ Defaults to a fixed value so the same instrument and the same data give
 the same answer every time, which is what makes a rendered report usable
 as an audit artefact. Every bootstrap confidence interval in the plan, and
 the parallel analysis behind the EFA family, depend on it. Pass \code{NULL} for
-the unseeded behaviour of releases before 0.4.1. The caller's own random
+the unseeded behaviour of releases before 0.4.1. Each block's stream
+starts from this seed and the block's id, so a block gives the same
+interval whatever blocks come before it. The caller's own random
 stream is restored afterwards, so seeding here does not affect anything
 that runs later.}
 

@@ -247,6 +247,16 @@ sframe_group_order <- function(x, instrument = .sframe_text_label_env$instrument
   c(values[match(first, shown)], rest)
 }
 
+# A block's seed: the plan seed plus a polynomial hash of the block id, both
+# modulo 2^31 - 1, so it is a valid integer seed, the same in every session
+# and for every order of the plan's blocks (FR-33).
+sframe_block_seed <- function(seed, id) {
+  m <- 2147483647
+  h <- 0
+  for (code in utf8ToInt(enc2utf8(as.character(id %||% "")[1]))) h <- (h * 31 + code) %% m
+  as.integer((as.numeric(seed) %% m + h) %% m)
+}
+
 # The significance level a result's sentence compares p with: options$alpha,
 # else the alpha of the block being run, else .05. Only the t test and the
 # one-way ANOVA read the block's alpha, and the other sentences compared p
@@ -2102,7 +2112,9 @@ sframe_run_one_block <- function(block, data, instrument, plots = FALSE,
 #'   the same answer every time, which is what makes a rendered report usable
 #'   as an audit artefact. Every bootstrap confidence interval in the plan, and
 #'   the parallel analysis behind the EFA family, depend on it. Pass `NULL` for
-#'   the unseeded behaviour of releases before 0.4.1. The caller's own random
+#'   the unseeded behaviour of releases before 0.4.1. Each block's stream
+#'   starts from this seed and the block's id, so a block gives the same
+#'   interval whatever blocks come before it. The caller's own random
 #'   stream is restored afterwards, so seeding here does not affect anything
 #'   that runs later.
 #' @param plot_palette One of `"web"` (brand colours, for on-screen use) or
@@ -2186,6 +2198,9 @@ run_analysis_plan <- function(data, instrument, scored = TRUE, plots = FALSE,
   # analysis. sframe_with_seed() restores the caller's RNG state on exit.
   # Pass seed = NULL for the pre-0.4.1 behaviour.
   if (!is.null(seed)) {
+    old_plan_seed <- .sframe_text_label_env$plan_seed
+    .sframe_text_label_env$plan_seed <- seed
+    on.exit(.sframe_text_label_env$plan_seed <- old_plan_seed, add = TRUE)
     out <- sframe_with_seed(seed, run_analysis_plan(
       data, instrument, scored = scored, plots = plots,
       plot_palette = plot_palette, seed = NULL, strict = strict))
@@ -2239,9 +2254,17 @@ run_analysis_plan <- function(data, instrument, scored = TRUE, plots = FALSE,
     )
   }
 
-  results <- lapply(plan, sframe_run_one_block, data = data,
-                    plot_palette = plot_palette,
-                    instrument = instrument, plots = plots)
+  # Each block starts its own random stream from the plan seed and its id, so
+  # adding, removing or moving a block leaves every other block's bootstrap
+  # interval as it was. 1 stream for the whole plan gave a t test's d
+  # interval [0.097, 1.221] alone and [0.079, 1.180] after a Spearman block
+  # (FR-33). The caller's stream is restored by sframe_with_seed() above.
+  plan_seed <- .sframe_text_label_env$plan_seed
+  results <- lapply(plan, function(block) {
+    if (!is.null(plan_seed)) set.seed(sframe_block_seed(plan_seed, block$id))
+    sframe_run_one_block(block, data = data, plot_palette = plot_palette,
+                         instrument = instrument, plots = plots)
+  })
   names(results) <- ids
   failed <- vapply(results, function(r) !is.null(r$error), logical(1))
   status <- list(

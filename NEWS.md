@@ -888,6 +888,13 @@ arithmetic.
   decimals, so a slope of 0.004 with p < .001 no longer prints as 0.00. A
   table column prints whole numbers with no decimals only when it holds
   counts or percentages: F values of 4 and 9 printed "4" and "9" (FR-32).
+* **A block's bootstrap interval no longer depends on the blocks before
+  it.** The plan seed started 1 random stream for the whole plan, so adding
+  a Spearman block before a t test moved its d interval from [0.097, 1.221]
+  to [0.079, 1.180]. Each block now starts its own stream from the plan
+  seed and its id, so amending the plan leaves every other block's interval
+  as it was. Every bootstrap interval in a plan therefore differs from
+  0.4.2's for the same seed (FR-33).
 
 ## Reports
 
