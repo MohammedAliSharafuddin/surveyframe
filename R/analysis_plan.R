@@ -1050,21 +1050,17 @@ sframe_run_regression <- function(data, vars) {
   )
 }
 
-sframe_run_logistic_binary <- function(data, vars) {
+sframe_run_logistic_binary <- function(data, vars, options = list()) {
   outcome_col <- vars[length(vars)]
   predictors <- vars[-length(vars)]
 
-  outcome_raw <- data[[outcome_col]]
-  outcome_fac <- as.factor(outcome_raw)
-
-  if (nlevels(droplevels(outcome_fac[!is.na(outcome_fac)])) != 2L) {
-    return(list(test = "regression_logistic_binary",
-                error = paste0("'", outcome_col,
-                               "' must have exactly two non-missing levels.")))
+  coded <- sframe_binary_outcome(data[[outcome_col]], outcome_col, options$event)
+  if (!is.null(coded$error)) {
+    return(list(test = "regression_logistic_binary", error = coded$error))
   }
 
   pred_data <- sframe_predictor_frame(data, predictors)
-  pred_data[[outcome_col]] <- as.integer(outcome_fac) - 1L
+  pred_data[[outcome_col]] <- coded$y
   complete <- stats::complete.cases(pred_data)
   n <- sum(complete)
 
@@ -1120,11 +1116,13 @@ sframe_run_logistic_binary <- function(data, vars) {
     chi_p = chi_p,
     coefficients = coefficients,
     classification_table = as.data.frame.matrix(class_table),
+    event = coded$event,
+    reference_level = coded$reference,
     predictor_coding = coding,
-    apa = sframe_with_coding(sprintf(
-      "\u03c7\u00b2(%d) = %.2f, p %s, McFadden R\u00b2 = %.3f",
+    apa = sframe_with_coding(paste0(sprintf(
+      "\u03c7\u00b2(%d) = %.2f, p %s, McFadden R\u00b2 = %.3f. ",
       chi_df, chi_val, sframe_p_string(chi_p), mcfadden_r2
-    ), coding),
+    ), sframe_event_sentence(outcome_col, coded)), coding),
     prompt = sprintf(
       "The binary logistic regression model was %s overall, \u03c7\u00b2(%d) = %.2f, p %s, McFadden R\u00b2 = %.3f. Interpret the direction and odds ratio for each significant predictor.",
       if (chi_p < .05) "statistically significant" else "not statistically significant",
@@ -1875,7 +1873,7 @@ sframe_run_one_block <- function(block, data, instrument, plots = FALSE,
       correlation_kendall  = sframe_run_kendall(data, roles),
       partial_correlation  = sframe_run_partial_correlation(data, roles, options),
       regression_linear    = sframe_run_regression(data, vars),
-      regression_logistic_binary = sframe_run_logistic_binary(data, vars),
+      regression_logistic_binary = sframe_run_logistic_binary(data, vars, options),
       regression_logistic_ordinal = sframe_run_ordinal_logistic(data, roles, options),
       regression_logistic_multinomial = sframe_run_multinomial_logistic(data, roles, options),
       firth_logistic     = sframe_run_firth_logistic(data, roles, options),
@@ -2045,6 +2043,11 @@ sframe_run_one_block <- function(block, data, instrument, plots = FALSE,
 #'   category with answers is the reference. The result's
 #'   `$predictor_coding` lists each categorical predictor's levels, and the
 #'   sentence names each reference category.
+#' * A binary or Firth logistic model gives the odds of its event, the last
+#'   category of its outcome in that order (1 of 0 and 1, the last declared
+#'   code of a choice set). `options = list(event = "yes")` names another.
+#'   The result's `$event` and `$reference_level`, and its sentence, name
+#'   both. A multinomial model's reference is the first category.
 #' @export
 #' @seealso [render_results()], [read_sheet_responses()]
 #'

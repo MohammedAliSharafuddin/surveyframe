@@ -132,10 +132,10 @@ sframe_method_option_keys <- list(
   wilcoxon_pair = character(0), correlation_pearson = character(0),
   correlation_spearman = character(0), correlation_kendall = character(0),
   partial_correlation = "method", regression_linear = character(0),
-  regression_logistic_binary = character(0),
+  regression_logistic_binary = "event",
   regression_logistic_ordinal = character(0),
   regression_logistic_multinomial = character(0),
-  firth_logistic = c("conf.level", "conf_level"), moderation = character(0),
+  firth_logistic = c("conf.level", "conf_level", "event"), moderation = character(0),
   mediation = "bootstrap"
 )
 
@@ -1358,6 +1358,40 @@ sframe_category_factor <- function(x, column = NULL, ordered = FALSE,
          ordered = ordered)
 }
 
+# A binary outcome as 0 and 1, with the event (the level coded 1, whose odds
+# the model gives) named. The 2 levels are those with answers, in the order of
+# sframe_category_levels(): the event is the last, which is the last declared
+# code of a choice set, 1 of 0 and 1, and never a level that depends on the
+# session locale (FR-21). `event` names another. as.factor() then
+# as.integer() - 1 modelled the level that sorts last in the locale, so "no"
+# against "Yes" flipped with LC_COLLATE, and a factor with an unused level
+# gave codes 0 and 2 (P2-08).
+sframe_binary_outcome <- function(x, column, event = NULL) {
+  lev <- sframe_category_levels(x, column)
+  if (length(lev) != 2L) {
+    return(list(error = sprintf("'%s' must have exactly two non-missing levels, and has %d%s.",
+                                column, length(lev),
+                                if (length(lev)) paste0(" (", paste(lev, collapse = ", "), ")") else "")))
+  }
+  if (!is.null(event)) {
+    event <- as.character(event)[1]
+    if (!event %in% lev) {
+      return(list(error = sprintf("options$event is '%s', and '%s' holds %s. Name 1 of them.",
+                                  event, column, paste(lev, collapse = " and "))))
+    }
+    lev <- c(setdiff(lev, event), event)
+  }
+  y <- as.character(x)
+  list(y = ifelse(is.na(y), NA_integer_, as.integer(y == lev[2])), levels = lev,
+       event = lev[2], reference = lev[1])
+}
+
+# The sentence naming the level a binary model gives the odds of.
+sframe_event_sentence <- function(column, outcome) {
+  sprintf("The odds are of %s being %s, against %s.", sframe_text_var(column),
+          sframe_text_value(column, outcome$event), sframe_text_value(column, outcome$reference))
+}
+
 # McNemar's test compares 1 question asked twice, so the 2 items must share
 # their categories and the table must pair each category with itself. The
 # table is laid out on 1 order for both items: the declared choice set, then
@@ -1862,13 +1896,9 @@ sframe_run_firth_logistic <- function(data, roles, options = list()) {
   }
 
   df <- data[, vars, drop = FALSE]
-  outcome_fac <- droplevels(as.factor(df[[outcome]]))
-  if (nlevels(outcome_fac) != 2L) {
-    return(list(test = "firth_logistic",
-                error = paste0("'", outcome,
-                               "' must have exactly two non-missing levels.")))
-  }
-  df[[outcome]] <- as.integer(outcome_fac) - 1L
+  coded <- sframe_binary_outcome(df[[outcome]], outcome, options$event)
+  if (!is.null(coded$error)) return(list(test = "firth_logistic", error = coded$error))
+  df[[outcome]] <- coded$y
   df[predictors] <- sframe_predictor_frame(df, predictors)
   df <- droplevels(df[stats::complete.cases(df), , drop = FALSE])
   coding <- sframe_predictor_coding(df, predictors)
@@ -1924,11 +1954,13 @@ sframe_run_firth_logistic <- function(data, roles, options = list()) {
                      upper = as.numeric(fit$ci.upper)),
     p_values = stats::setNames(as.numeric(fit$prob), terms),
     likelihood_ratio = lr,
+    event = coded$event,
+    reference_level = coded$reference,
     predictor_coding = coding,
-    apa = sframe_with_coding(sprintf(
-      "Firth logistic regression (n = %d), likelihood ratio = %.2f",
+    apa = sframe_with_coding(paste0(sprintf(
+      "Firth logistic regression (n = %d), likelihood ratio = %.2f. ",
       nrow(df), lr
-    ), coding),
+    ), sframe_event_sentence(outcome, coded)), coding),
     prompt = "Report penalised odds ratios with their profile-likelihood confidence intervals, and state that Firth penalisation was used because of the small sample or separation."
   )
 }
@@ -1945,7 +1977,9 @@ sframe_run_multinomial_logistic <- function(data, roles, options = list()) {
   }
   sframe_require_nnet("to fit multinomial logistic regression with nnet::multinom()")
   df <- data[, vars, drop = FALSE]
-  df[[outcome]] <- as.factor(df[[outcome]])
+  # The reference is the first declared category, or the first in radix
+  # order with no choice set, never the locale's first (FR-21).
+  df[[outcome]] <- sframe_category_factor(df[[outcome]], outcome)
   df[predictors] <- sframe_predictor_frame(df, predictors)
   df <- droplevels(df[stats::complete.cases(df), , drop = FALSE])
   coding <- sframe_predictor_coding(df, predictors)

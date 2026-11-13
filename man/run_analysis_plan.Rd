@@ -94,6 +94,11 @@ category after the first, whatever its codes look like. The first
 category with answers is the reference. The result's
 \verb{$predictor_coding} lists each categorical predictor's levels, and the
 sentence names each reference category.
+\item A binary or Firth logistic model gives the odds of its event, the last
+category of its outcome in that order (1 of 0 and 1, the last declared
+code of a choice set). \code{options = list(event = "yes")} names another.
+The result's \verb{$event} and \verb{$reference_level}, and its sentence, name
+both. A multinomial model's reference is the first category.
 }
 }
 

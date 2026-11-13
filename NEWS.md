@@ -720,6 +720,20 @@ arithmetic.
   `$predictor_coding`, and the sentence names the reference: ""Region"
   enters as 2 indicator terms against the reference category North." See
   "How answers are coded" in `?run_analysis_plan` (FR-20).
+* **A binary model names the level it models, in every locale.** Binary
+  logistic regression modelled the level that sorted last in the session's
+  collation: an outcome of "Yes" and "no" gave a slope of 1.238 under
+  en_GB.UTF-8 and -1.238 under C, and nothing said which level the odds
+  ratios described. A factor outcome with an unused level stopped with "y
+  values must be 0 <= y <= 1". The modelled level (the event) is now the
+  last declared code of the outcome's choice set with answers, or with no
+  choice set the last in 1 locale-free order (numbers by value, text in
+  code point order), and `options$event` names another. Binary and Firth
+  logistic results carry `$event` and `$reference_level`, and the sentence
+  says "The odds are of "Outcome" being Yes, against No." The multinomial
+  reference category and the order of a t test's or Mann-Whitney test's 2
+  groups with no choice set follow the same locale-free order (FR-21,
+  P2-08).
 
 ## Reports
 
