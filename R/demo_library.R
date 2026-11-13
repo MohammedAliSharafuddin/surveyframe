@@ -166,7 +166,10 @@ sframe_demo_dir <- function() {
 #'   its `render` block. The bundled file on disk is left unchanged, so the
 #'   same branding can be shown on whichever demo matches your own survey.
 #'
-#' @return A list with `instrument`, `responses`, and the paths behind them:
+#' @return A list of class `sframe_demo` with `instrument`, `responses`, and
+#'   the paths behind them. Printed, it shows a short card: what the demo
+#'   teaches, its size, its files and the commands to try next. The parts are
+#'   `instrument`, `responses`,
 #'   `instrument_path`, `responses_path`, `codebook_path` and `results_path`.
 #'   The codebook carries variable and value labels, so the data means
 #'   something outside R. The results table is what surveyframe reports for
@@ -177,7 +180,7 @@ sframe_demo_dir <- function() {
 #' @seealso [sframe_list_demos()], [export_responses()]
 #' @examples
 #' demo <- sframe_demo("two_group")
-#' demo$instrument
+#' demo
 #' head(demo$responses)
 #' @family Demo functions
 sframe_demo <- function(name, branded = FALSE) {
@@ -196,7 +199,7 @@ sframe_demo <- function(name, branded = FALSE) {
     if (isTRUE(branded)) {
       demo$instrument$render <- unclass(sframe_demo_branding())
     }
-    return(demo)
+    return(sframe_demo_object(demo, name))
   }
   if (!isTRUE(name %in% idx$name)) {
     rlang::abort(
@@ -223,10 +226,53 @@ sframe_demo <- function(name, branded = FALSE) {
                          check.names = FALSE)
   responses <- read_responses(raw, instrument, respondent_id = "respondent_id",
                               meta_cols = c("started_at", "submitted_at"))
-  list(instrument = instrument, responses = responses,
-       instrument_path = instrument_path, responses_path = responses_path,
-       codebook_path = file.path(dir, paste0(name, "_codebook.csv")),
-       results_path  = file.path(dir, paste0(name, "_results.csv")))
+  sframe_demo_object(list(
+    instrument = instrument, responses = responses,
+    instrument_path = instrument_path, responses_path = responses_path,
+    codebook_path = file.path(dir, paste0(name, "_codebook.csv")),
+    results_path  = file.path(dir, paste0(name, "_results.csv"))), name)
+}
+
+# A demo is the plain list sframe_demo() has always returned, with the class
+# sframe_demo and its name as an attribute, so printing it shows a short card
+# instead of every response.
+sframe_demo_object <- function(demo, name) {
+  structure(demo, class = c("sframe_demo", "list"), demo_name = name)
+}
+
+#' @export
+print.sframe_demo <- function(x, ...) {
+  name <- attr(x, "demo_name") %||% "demo"
+  idx <- sframe_list_demos()
+  teaches <- idx$teaches[match(name, idx$name)]
+  ins <- x$instrument
+  n_plan <- length(ins$analysis_plan)
+  files <- c(x$instrument_path, x$responses_path, x$codebook_path,
+             x$results_path)
+  files <- basename(files[!is.na(files)])
+  q <- paste0("\"", name, "\"")
+  lines <- c(
+    paste0("<surveyframe demo: ", name, ">"),
+    paste0("Title:      ", ins$meta$title %||% name),
+    if (!is.na(teaches %||% NA)) paste0("Teaches:    ", teaches),
+    paste0("Instrument: ", length(ins$items), " items, ",
+           length(ins$scales), " scales, ", n_plan, " plan blocks"),
+    paste0("Responses:  ", NROW(x$responses), " rows, ",
+           NCOL(x$responses), " columns"),
+    paste0("Files:      ", paste(files, collapse = ", ")),
+    "Demonstration data, not collected from participants.",
+    "Next:"
+  )
+  cmd <- c(paste0("preview_survey(", q, ")"),
+           paste0("launch_studio(demo = ", q, ")"),
+           if (n_plan > 0) "run_analysis_plan(demo$responses, demo$instrument)",
+           "demo$instrument", "demo$responses")
+  note <- c("respondent view", "SurveyStudio, all 5 stages",
+            if (n_plan > 0) "the declared plan",
+            "the instrument", "the data")
+  cmd <- formatC(cmd, width = -max(nchar(cmd)))
+  cat(c(lines, paste0("  ", cmd, "  # ", note)), sep = "\n")
+  invisible(x)
 }
 
 # The welcome, consent and thank-you screens every unbranded demo ships with

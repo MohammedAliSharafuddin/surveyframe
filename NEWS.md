@@ -1934,6 +1934,12 @@ arithmetic.
 
 ## Demos
 
+* **`sframe_demo()` prints a short card.** At the console a demo printed
+  every response, 125 to 1,112 lines. It is now a list of class
+  `sframe_demo`, and printing it shows what the demo teaches, its size, its
+  files, that its data was not collected from participants, and the
+  commands to try next, in 15 lines at most. `demo$instrument`,
+  `demo$responses` and the 4 paths are unchanged.
 * **Every demo has welcome, consent and thank-you screens.** 19 of the 22
   shipped with none, so a respondent met the questions with no consent step.
   They now carry plain screens in the default look, consent required, and
