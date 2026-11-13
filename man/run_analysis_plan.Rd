@@ -76,6 +76,27 @@ report then shows each count with its percentage beside it, and the chart
 draws the percentages.
 }
 
+\section{How answers are coded}{
+
+Categories follow 1 order in every locale: the codes of the item's choice
+set as the instrument declares them, then factor levels, then any other
+value, numbers by value and other text in code point order. A category
+nobody chose is dropped before a model is fitted.
+\itemize{
+\item McNemar's test lays both items out on that order, so each category is
+paired with itself. 2 items with different choice sets are refused.
+\item An ordinal logistic outcome is ordered as its choice set declares. The
+result's \verb{$outcome_levels} and its sentence give the order.
+\item In every model (linear, binary, ordinal, multinomial and Firth logistic
+regression, and the ANCOVA covariates) a \code{single_choice} or
+\code{multiple_choice} item enters as a category, with 1 indicator term per
+category after the first, whatever its codes look like. The first
+category with answers is the reference. The result's
+\verb{$predictor_coding} lists each categorical predictor's levels, and the
+sentence names each reference category.
+}
+}
+
 \examples{
 instr <- read_sframe(
   system.file("extdata", "tourism_services_demo.sframe",

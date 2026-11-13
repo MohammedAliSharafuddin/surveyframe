@@ -707,6 +707,19 @@ arithmetic.
   carries `$outcome_levels`, and the sentence names the order: "Ordinal
   logistic regression of "Rating", ordered Low < Medium < High, was
   estimated with 90 complete cases." (FR-19).
+* **A nominal choice item enters a model as a category.** A
+  `single_choice` item coded 1, 2, 3 for North, South and East entered
+  linear regression as 1 slope, as if East were 3 times North (R squared
+  .09 where the categorical model gives .23). A `single_choice` or
+  `multiple_choice` item now enters every model as a category, whatever its
+  codes look like: linear, binary, ordinal, multinomial and Firth logistic
+  regression, and the ANCOVA covariates. Firth regression had read every
+  predictor as a number, so a text category became missing and its rows
+  were dropped. The first declared category with answers is the reference,
+  unused categories are dropped before fitting, the result carries
+  `$predictor_coding`, and the sentence names the reference: ""Region"
+  enters as 2 indicator terms against the reference category North." See
+  "How answers are coded" in `?run_analysis_plan` (FR-20).
 
 ## Reports
 

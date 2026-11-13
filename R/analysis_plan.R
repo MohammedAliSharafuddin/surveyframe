@@ -1000,10 +1000,12 @@ sframe_run_regression <- function(data, vars) {
   pred_data[[vars[length(vars)]]] <- outcome
   complete <- complete.cases(pred_data)
   n <- sum(complete)
+  model_data <- droplevels(pred_data[complete, , drop = FALSE])
+  coding <- sframe_predictor_coding(model_data, predictors)
   formula_str <- paste(vars[length(vars)], "~",
                        paste(predictors, collapse = " + "))
   fit <- tryCatch(
-    stats::lm(stats::as.formula(formula_str), data = pred_data[complete, ]),
+    stats::lm(stats::as.formula(formula_str), data = model_data),
     error = function(e) e
   )
   if (inherits(fit, "error")) {
@@ -1034,11 +1036,12 @@ sframe_run_regression <- function(data, vars) {
     df2      = unname(f_stat[3]),
     p        = p_val,
     coefficients = as.data.frame(s$coefficients),
+    predictor_coding = coding,
     diagnostics  = diagnostics,
-    apa      = sprintf(
+    apa      = sframe_with_coding(sprintf(
       "R\u00b2 = %.3f, F(%d, %d) = %.2f, p %s",
       s$r.squared, f_stat[2], f_stat[3], f_stat[1], sframe_p_string(p_val)
-    ),
+    ), coding),
     prompt   = sprintf(
       "The regression model %s (R\u00b2 = %.3f, F(%d, %d) = %.2f, p %s). Interpret the direction and significance of each predictor and discuss the variance explained.",
       if (p_val < .05) "was statistically significant" else "was not statistically significant",
@@ -1071,11 +1074,13 @@ sframe_run_logistic_binary <- function(data, vars) {
   }
 
   formula_str <- paste(outcome_col, "~", paste(predictors, collapse = " + "))
+  model_data <- droplevels(pred_data[complete, , drop = FALSE])
+  coding <- sframe_predictor_coding(model_data, predictors)
 
   fit <- tryCatch(
     stats::glm(
       stats::as.formula(formula_str),
-      data = pred_data[complete, ],
+      data = model_data,
       family = stats::binomial(link = "logit")
     ),
     error = function(e) e
@@ -1115,10 +1120,11 @@ sframe_run_logistic_binary <- function(data, vars) {
     chi_p = chi_p,
     coefficients = coefficients,
     classification_table = as.data.frame.matrix(class_table),
-    apa = sprintf(
+    predictor_coding = coding,
+    apa = sframe_with_coding(sprintf(
       "\u03c7\u00b2(%d) = %.2f, p %s, McFadden R\u00b2 = %.3f",
       chi_df, chi_val, sframe_p_string(chi_p), mcfadden_r2
-    ),
+    ), coding),
     prompt = sprintf(
       "The binary logistic regression model was %s overall, \u03c7\u00b2(%d) = %.2f, p %s, McFadden R\u00b2 = %.3f. Interpret the direction and odds ratio for each significant predictor.",
       if (chi_p < .05) "statistically significant" else "not statistically significant",
@@ -2023,6 +2029,22 @@ sframe_run_one_block <- function(block, data, instrument, plots = FALSE,
 #' and the Total column of column percentages is the row distribution. The
 #' report then shows each count with its percentage beside it, and the chart
 #' draws the percentages.
+#' @section How answers are coded:
+#' Categories follow 1 order in every locale: the codes of the item's choice
+#' set as the instrument declares them, then factor levels, then any other
+#' value, numbers by value and other text in code point order. A category
+#' nobody chose is dropped before a model is fitted.
+#' * McNemar's test lays both items out on that order, so each category is
+#'   paired with itself. 2 items with different choice sets are refused.
+#' * An ordinal logistic outcome is ordered as its choice set declares. The
+#'   result's `$outcome_levels` and its sentence give the order.
+#' * In every model (linear, binary, ordinal, multinomial and Firth logistic
+#'   regression, and the ANCOVA covariates) a `single_choice` or
+#'   `multiple_choice` item enters as a category, with 1 indicator term per
+#'   category after the first, whatever its codes look like. The first
+#'   category with answers is the reference. The result's
+#'   `$predictor_coding` lists each categorical predictor's levels, and the
+#'   sentence names each reference category.
 #' @export
 #' @seealso [render_results()], [read_sheet_responses()]
 #'
