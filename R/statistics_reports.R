@@ -759,7 +759,9 @@ sframe_small_sample_advisory <- function(n, test) {
 #' @param table_vars Optional two categorical variables for expected-count
 #'   checks.
 #'
-#' @return An object of class `sframe_assumption_report`.
+#' @return An object of class `sframe_assumption_report`. Its `apa` names the
+#'   checks that ran, or says that none ran and which arguments each check
+#'   needs.
 #' @export
 #' @examples
 #' demo <- sframe_demo("tourism_services")
@@ -889,6 +891,8 @@ sframe_assumption_results <- function(
     nrow(data)
   }
   advisory <- sframe_small_sample_advisory(advisory_n, "these assumption checks")
+  apa <- sframe_assumption_sentence(normality, homogeneity, regression, expected_counts,
+                                    group, outcome, predictors)
 
   structure(
     list(
@@ -898,11 +902,44 @@ sframe_assumption_results <- function(
       regression = regression,
       expected_counts = expected_counts,
       advisory = advisory,
-      apa = "Assumption checks were computed.",
+      apa = apa,
       prompt = "Report assumption checks before interpreting inferential models, especially sparse cells, non-normal residuals, and high VIF values."
     ),
     class = "sframe_assumption_report"
   )
+}
+
+# The sentence of an assumption report: the checks that ran, or that none ran
+# and what each needs. It said "Assumption checks were computed." with empty
+# tables when, for example, an outcome and a group were given and no
+# variables (review_040 defect 3).
+sframe_assumption_sentence <- function(normality, homogeneity, regression,
+                                       expected_counts, group, outcome, predictors) {
+  ran <- character(0)
+  if (nrow(normality) > 0) {
+    ran <- c(ran, sprintf("normality (Shapiro-Wilk, skewness and kurtosis) for %s",
+                          sframe_count_noun(nrow(normality), "variable")))
+  }
+  if (nrow(homogeneity) > 0) {
+    ran <- c(ran, sprintf("homogeneity of variance (Levene and Brown-Forsythe) across %s",
+                          sframe_text_var(group)))
+  }
+  if (!is.null(regression)) {
+    ran <- c(ran, sprintf("regression residuals, VIF and Cook's distance for %s",
+                          sframe_text_var(outcome)))
+  }
+  if (!is.null(expected_counts)) ran <- c(ran, "expected cell counts")
+  if (length(ran) > 0) {
+    return(paste0("Assumption checks: ", paste(ran, collapse = ", "), "."))
+  }
+  paste0(
+    "No assumption checks ran. Normality needs `variables`, homogeneity of ",
+    "variance needs `variables` and `group`, the regression checks need ",
+    "`outcome` and `predictors`, and expected counts need 2 `table_vars`",
+    if (!is.null(outcome) && length(predictors %||% character(0)) == 0)
+      ". `outcome` was given without `predictors`" else "",
+    if (!is.null(group) && nrow(normality) == 0) ". `group` was given without `variables`" else "",
+    ".")
 }
 
 #' @exportS3Method print sframe_assumption_report

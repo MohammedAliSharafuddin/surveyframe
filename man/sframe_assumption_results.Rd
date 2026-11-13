@@ -28,7 +28,9 @@ sframe_assumption_results(
 checks.}
 }
 \value{
-An object of class \code{sframe_assumption_report}.
+An object of class \code{sframe_assumption_report}. Its \code{apa} names the
+checks that ran, or says that none ran and which arguments each check
+needs.
 }
 \description{
 Performs common assumption checks for survey analyses using base R where
