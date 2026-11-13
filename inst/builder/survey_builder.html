@@ -1153,7 +1153,7 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
       <div class="cq">
         <button type="button" onclick="fillL5()">5-pt agree</button>
         <button type="button" onclick="fillL7()">7-pt agree</button>
-        <button type="button" onclick="fillYN()">Yes / No</button>
+        <button type="button" onclick="fillYN()">No / Yes</button>
         <button type="button" onclick="fillFr()">Frequency</button>
         <button type="button" onclick="fillIm()">Importance</button>
       </div>
@@ -5104,8 +5104,10 @@ var PRESET_CHOICE_SETS={
   likelihood5:{label:'Likelihood (5-point)',values:[1,2,3,4,5],labels:['Very unlikely','Unlikely','Neutral','Likely','Very likely']},
   quality5:{label:'Quality (5-point)',values:[1,2,3,4,5],labels:['Very poor','Poor','Fair','Good','Excellent']},
   nps11:{label:'0-10 recommendation (NPS)',values:[0,1,2,3,4,5,6,7,8,9,10],labels:['0','1','2','3','4','5','6','7','8','9','10']},
-  yesno:{label:'Yes / No',values:['yes','no'],labels:['Yes','No']},
-  yesnounsure:{label:'Yes / No / Unsure',values:['yes','no','unsure'],labels:['Yes','No','Unsure']},
+  // No before Yes: a binary model's event is the last declared code (glm's
+  // convention, CF-B FR-21, owner 2026-11-13), so Yes is the modelled level.
+  yesno:{label:'No / Yes',values:['no','yes'],labels:['No','Yes']},
+  yesnounsure:{label:'No / Yes / Unsure',values:['no','yes','unsure'],labels:['No','Yes','Unsure']},
   gender:{label:'Gender',values:['female','male','non_binary','prefer_not_to_say'],labels:['Female','Male','Non-binary','Prefer not to say']},
   age_group:{label:'Age group',values:['18_24','25_34','35_44','45_54','55_64','65_plus'],labels:['18-24','25-34','35-44','45-54','55-64','65 or older']},
   education:{label:'Education level',values:['secondary_or_below','diploma','bachelor','master','doctorate'],labels:['Secondary or below','Diploma or certificate','Bachelor degree','Master degree','Doctorate']},
@@ -5187,7 +5189,7 @@ function renderInspBody(item){
       '<label class="fcheck"><input type="checkbox" id="fi-csord"'+(csOrdered(item.choice_set)?' checked':'')+' onchange="setCsOrdered(this.checked)"><span>Options run in order (ordinal)</span></label></div>'+
       '<span class="fhint">For a frequency, an education level or any ranked categories. It applies to the choice set, so every question using it.</span></div>'):'') +
     (NCS.includes(item.type)?fld('Choice labels','<textarea id="fi-choice-lines" rows="5" placeholder="One option per line, or value = Label" onblur="saveItemChoices()">'+esc(itemChoiceLines(item))+'</textarea>','For single choice, these are the respondent-facing category labels.')+
-      '<div class="fc tpl-chips" role="group" aria-label="Quick-fill choice templates"><button type="button" onclick="applyCsTemplate(\'agree5\')">5-pt agree</button><button type="button" onclick="applyCsTemplate(\'agree7\')">7-pt agree</button><button type="button" onclick="applyCsTemplate(\'yesno\')">Yes / No</button><button type="button" onclick="applyCsTemplate(\'freq\')">Frequency</button><button type="button" onclick="applyCsTemplate(\'importance\')">Importance</button></div>':'') +
+      '<div class="fc tpl-chips" role="group" aria-label="Quick-fill choice templates"><button type="button" onclick="applyCsTemplate(\'agree5\')">5-pt agree</button><button type="button" onclick="applyCsTemplate(\'agree7\')">7-pt agree</button><button type="button" onclick="applyCsTemplate(\'yesno\')">No / Yes</button><button type="button" onclick="applyCsTemplate(\'freq\')">Frequency</button><button type="button" onclick="applyCsTemplate(\'importance\')">Importance</button></div>':'') +
     (item.type==='matrix'?fld('Matrix row labels'+(isSampleList(item)?SAMPLE_TAG:''),ta('fi-mrows',(item.matrix_items||[]).join('\n'),'One label per line'),(isSampleList(item)?SAMPLE_HINT:'')+'One per line.'):'') +
     (['pairwise_comparison','criteria_weight'].includes(item.type)?
       fld((item.type==='criteria_weight'?'Criteria':'Items to compare')+(isSampleList(item)?SAMPLE_TAG:''),
@@ -5335,7 +5337,7 @@ function ensureChoiceSet(kind){
   var id=kind==='binary'?'yes_no':kind==='basic'?'options_3':'agree5';
   if(S.choices.find(function(c){return c.id===id;}))return id;
   var cs;
-  if(id==='yes_no')cs={id:id,values:['yes','no'],labels:['Yes','No'],allow_other:false,randomise:false};
+  if(id==='yes_no')cs={id:id,values:['no','yes'],labels:['No','Yes'],allow_other:false,randomise:false};
   else if(id==='options_3')cs={id:id,values:['option_1','option_2','option_3'],labels:['Option 1','Option 2','Option 3'],allow_other:false,randomise:false};
   else cs={id:id,values:[1,2,3,4,5],labels:['Strongly disagree','Disagree','Neither agree nor disagree','Agree','Strongly agree'],allow_other:false,randomise:false};
   S.choices.push(cs);
@@ -5413,7 +5415,7 @@ function openChoiceModal(){sv('c-id','');document.getElementById('cRows').innerH
 function addCRow(v,l){v=v||'';l=l||'';var d=document.createElement('div');d.className='crow';d.innerHTML='<span class="crow-dh">&#8942;</span><div style="display:flex;gap:4px;flex:1"><input type="text" placeholder="Value" value="'+esc(String(v))+'" style="flex:.35;border:none;font-size:11px;padding:3px 4px"><input type="text" placeholder="Label" value="'+esc(String(l))+'" style="flex:.65;border:none;font-size:11px;padding:3px 4px"></div><button type="button" class="crow-rm" onclick="this.parentElement.remove()">&#215;</button>';document.getElementById('cRows').appendChild(d);}
 function fillL5(){document.getElementById('cRows').innerHTML='';[[1,'Strongly disagree'],[2,'Disagree'],[3,'Neutral'],[4,'Agree'],[5,'Strongly agree']].forEach(function(p){addCRow(p[0],p[1]);});}
 function fillL7(){document.getElementById('cRows').innerHTML='';[[1,'Strongly disagree'],[2,'Disagree'],[3,'Somewhat disagree'],[4,'Neutral'],[5,'Somewhat agree'],[6,'Agree'],[7,'Strongly agree']].forEach(function(p){addCRow(p[0],p[1]);});}
-function fillYN(){document.getElementById('cRows').innerHTML='';[['yes','Yes'],['no','No']].forEach(function(p){addCRow(p[0],p[1]);});}
+function fillYN(){document.getElementById('cRows').innerHTML='';[['no','No'],['yes','Yes']].forEach(function(p){addCRow(p[0],p[1]);});}
 function fillFr(){document.getElementById('cRows').innerHTML='';[[1,'Never'],[2,'Rarely'],[3,'Sometimes'],[4,'Often'],[5,'Always']].forEach(function(p){addCRow(p[0],p[1]);});}
 function fillIm(){document.getElementById('cRows').innerHTML='';[[1,'Not important'],[2,'Slightly'],[3,'Moderately'],[4,'Very'],[5,'Extremely']].forEach(function(p){addCRow(p[0],p[1]);});}
 // "Other" has no place on a scale, and R refuses allow_other on an ordered

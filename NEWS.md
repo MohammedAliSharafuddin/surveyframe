@@ -745,6 +745,13 @@ arithmetic.
   reference category and the order of a t test's or Mann-Whitney test's 2
   groups with no choice set follow the same locale-free order (FR-21,
   P2-08).
+  The event is the last declared code, as `glm()` models the second level,
+  so a file whose choice set declares yes, then no, models No unless
+  `options$event = "yes"` says otherwise. SurveyBuilder's Yes/No presets
+  (the No / Yes template and quick-fill, the No / Yes / Unsure template and
+  the set a new yes/no question gets) now declare No first, so new files
+  model Yes. The 2 bundled files that declare yes, then no keep their order,
+  since changing it would change their hashes.
 * **A "do not know" code in a scale's choice set is not scored.** Every
   numeric code was a score, so a set of 1 to 5 with 99 for "do not know"
   gave the item bounds 1 to 99: a reversed 1 became 99 and a respondent
