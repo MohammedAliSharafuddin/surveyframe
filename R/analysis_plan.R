@@ -513,7 +513,21 @@ sframe_run_crosstab <- function(data, vars, options = list()) {
   c[!is.na(c) & c == ""] <- NA
   complete <- !is.na(r) & !is.na(c)
   r <- r[complete]; c <- c[complete]
+  # Both axes in their declared order and named by their own item's choice
+  # labels (FR-37). The table carried the codes, and the instrument-wide
+  # lookup after the runner relabels only a code with 1 meaning across every
+  # set, so a channel item coded 1 to 3 kept "1", "2", "3" and a 0:1 item
+  # showed "No" and "1". sframe_text_value() reads the item's own set.
+  r <- sframe_category_factor(r, vars[1])
+  c <- sframe_category_factor(c, vars[2])
   tbl <- table(r, c)
+  names(dimnames(tbl)) <- NULL
+  label_axis <- function(codes, item) {
+    labs <- sframe_text_value(item, codes)
+    if (anyDuplicated(labs)) codes else labs
+  }
+  dimnames(tbl) <- list(label_axis(rownames(tbl), vars[1]),
+                        label_axis(colnames(tbl), vars[2]))
   ct <- tryCatch(
     suppressWarnings(stats::chisq.test(tbl, correct = FALSE)),
     error = function(e) e
@@ -540,6 +554,8 @@ sframe_run_crosstab <- function(data, vars, options = list()) {
   if (!is.null(weights) && nzchar(weights) && weights %in% colnames(data)) {
     w <- sframe_num((data[[weights]][complete]))
     weighted_table <- stats::xtabs(w ~ r + c)
+    names(dimnames(weighted_table)) <- NULL
+    dimnames(weighted_table) <- dimnames(tbl)
   }
   out <- list(
     test     = "crosstab",
