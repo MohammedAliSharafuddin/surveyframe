@@ -1302,6 +1302,23 @@ sframe_declared_codes <- function(column, instrument = .sframe_text_label_env$in
   names(sframe_item_value_labels(instrument, column))
 }
 
+# The categories of a column in 1 order no session locale changes: the codes
+# its choice set declares, in that order, then factor levels, then any other
+# value (numbers, also as text, in numeric order, other text in radix order). Only categories
+# present in `x` are returned. As text, for factor() (FR-19, FR-21).
+sframe_category_levels <- function(x, column = NULL,
+                                   instrument = .sframe_text_label_env$instrument) {
+  as.character(sframe_group_order(x, instrument, column))
+}
+
+# A categorical column as a factor on sframe_category_levels(), ordered or
+# not, with no unused level.
+sframe_category_factor <- function(x, column = NULL, ordered = FALSE,
+                                   instrument = .sframe_text_label_env$instrument) {
+  factor(as.character(x), levels = sframe_category_levels(x, column, instrument),
+         ordered = ordered)
+}
+
 # McNemar's test compares 1 question asked twice, so the 2 items must share
 # their categories and the table must pair each category with itself. The
 # table is laid out on 1 order for both items: the declared choice set, then
@@ -1731,9 +1748,12 @@ sframe_run_ordinal_logistic <- function(data, roles, options = list()) {
   }
   sframe_require_MASS("to fit ordinal logistic regression with MASS::polr()")
   df <- data[, vars, drop = FALSE]
-  df[[outcome]] <- ordered(df[[outcome]])
   df[predictors] <- sframe_predictor_frame(df, predictors)
   df <- df[stats::complete.cases(df), , drop = FALSE]
+  # The outcome's order is the one its choice set declares, never the
+  # alphabet: ordered() of low, medium, high gave high < low < medium and
+  # reversed the slope's sign (FR-19).
+  df[[outcome]] <- sframe_category_factor(df[[outcome]], outcome, ordered = TRUE)
   if (nlevels(df[[outcome]]) < 3) {
     return(list(test = "regression_logistic_ordinal",
                 error = "Ordinal logistic regression requires an ordered outcome with at least three levels."))
@@ -1767,7 +1787,11 @@ sframe_run_ordinal_logistic <- function(data, roles, options = list()) {
     coefficients = co,
     AIC = stats::AIC(fit),
     pseudo_r2 = pseudo_r2,
-    apa = sprintf("Ordinal logistic regression was estimated with %d complete cases.", nrow(df)),
+    outcome_levels = levels(df[[outcome]]),
+    apa = sprintf("Ordinal logistic regression of %s, ordered %s, was estimated with %d complete cases.",
+                  sframe_text_var(outcome),
+                  paste(sframe_text_value(outcome, levels(df[[outcome]])), collapse = " < "),
+                  nrow(df)),
     prompt = "Report odds ratios, confidence intervals where available, model fit, and the reference ordering of the outcome."
   )
 }
