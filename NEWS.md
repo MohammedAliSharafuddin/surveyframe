@@ -870,6 +870,10 @@ arithmetic.
   equal shares: a goodness-of-fit test reported as "chi-square(2, N = 90) =
   6.67, p = .036, V = NA" and "a significant association". The block now
   stops, naming the variable with 1 category (FR-27).
+* A chi-square with `options$simulate_p_value` on a sparse table printed
+  "chi-square(NA, N = 4)", since a simulated p value has no degrees of
+  freedom. The line now omits them and says how the p value was found:
+  "chi-square(N = 4) = 0.00, p ... (simulated from 2000 tables)" (P2-09).
 
 ## Reports
 
