@@ -599,15 +599,15 @@ empty field would read as a sign-off.</li>
 <span></span>
 <span><span class="fu"><a href="../reference/sframe_get_amendments.html">sframe_get_amendments</a></span><span class="op">(</span><span class="va">study_amended</span><span class="op">)</span></span>
 <span><span class="co">#&gt;              timestamp         reason_code</span></span>
-<span><span class="co">#&gt; 1 2026-11-11T19:29:57Z instrument_revision</span></span>
+<span><span class="co">#&gt; 1 2026-11-13T20:52:25Z instrument_revision</span></span>
 <span><span class="co">#&gt;                                    reason_text   tier author</span></span>
 <span><span class="co">#&gt; 1 Clarified item wording after pilot feedback. design   &lt;NA&gt;</span></span>
 <span><span class="co">#&gt;                                     deviation_report signoff</span></span>
 <span><span class="co">#&gt; 1 Wording only; the construct measured is unchanged.    none</span></span>
 <span><span class="co">#&gt;                                                      previous_hash</span></span>
-<span><span class="co">#&gt; 1 7fb2517c259435b8c210ed1ebe375afc1ac39e7ebc3b23a94440e30124f2f9df</span></span>
+<span><span class="co">#&gt; 1 603d168a49a71266a4e024917c60d633e226b7d62a67e22b3e83796652b26012</span></span>
 <span><span class="co">#&gt;                                                           new_hash</span></span>
-<span><span class="co">#&gt; 1 ae5caad3ba305ea7bf032be20804aad47fbf76c95a17827ae05ccd58ed3808a3</span></span>
+<span><span class="co">#&gt; 1 425cb67f743644f375d9371fa910187b7675ae95a2c7b643d6c952254b40aecc</span></span>
 <span><span class="co">#&gt;   changed_fields</span></span>
 <span><span class="co">#&gt; 1          items</span></span></code></pre></div>
 <p><code><a href="../reference/sframe_get_amendments.html">sframe_get_amendments()</a></code> returns the full history as a
@@ -685,7 +685,7 @@ shared by email, or opened directly from disk.</p>
 <span>  output_path <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"tourism_services_survey.html"</span><span class="op">)</span>,</span>
 <span>  open        <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; Static survey written to '/tmp/Rtmp1QlBPa/tourism_services_survey.html' (103.3</span></span>
+<span><span class="co">#&gt; Static survey written to '/tmp/RtmpNsy3KP/tourism_services_survey.html' (103.3</span></span>
 <span><span class="co">#&gt; KB).</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/files.html" class="external-link">file.exists</a></span><span class="op">(</span><span class="va">html_path</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
@@ -738,7 +738,7 @@ the splitting already done.</p>
 <span>  sheet_url  <span class="op">=</span> <span class="st">"https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID"</span>,</span>
 <span>  output_dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; Apps Script written to: /tmp/Rtmp1QlBPa/surveyframe_collector.gs</span></span>
+<span><span class="co">#&gt; Apps Script written to: /tmp/RtmpNsy3KP/surveyframe_collector.gs</span></span>
 <span><span class="co">#&gt; Follow the setup instructions inside the file to deploy it.</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/files.html" class="external-link">file.exists</a></span><span class="op">(</span><span class="va">script_path</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
@@ -1652,7 +1652,7 @@ satisfaction?</td>
 satisfaction?</td>
 <td align="left"></td>
 <td align="right">U = 140, z = -4.63, p &lt; .001, r = -.60, 95% CI
-[-.76, -.40], Hodges-Lehmann shift = -0.67, 95% CI [-1.00, -0.67],
+[-.77, -.41], Hodges-Lehmann shift = -0.67, 95% CI [-1.00, -0.67],
 higher in Repeated visitor</td>
 <td align="left">large</td>
 </tr>
@@ -1709,7 +1709,7 @@ and descriptives alongside the analysis results.</p>
 <span>  output_file <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"tourism_results.html"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Results report written:"</span>, <span class="va">results_path</span>, <span class="st">"\n"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Results report written: /tmp/Rtmp1QlBPa/tourism_results.html</span></span>
+<span><span class="co">#&gt; Results report written: /tmp/RtmpNsy3KP/tourism_results.html</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Size:"</span>, <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.info.html" class="external-link">file.size</a></span><span class="op">(</span><span class="va">results_path</span><span class="op">)</span> <span class="op">/</span> <span class="fl">1024</span>, <span class="fl">1</span><span class="op">)</span>, <span class="st">"KB\n"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Size: 13.2 KB</span></span></code></pre></div>
 <p>The results report contains one section per research question, with
@@ -1736,7 +1736,7 @@ leaves it to be inferred.</p>
 <span><span class="co">#&gt; Warning: Scale scoring failed before analysis, so blocks run on unscored data: The responses already hold a column named 'DMRE', 'DMAU', 'DMEU', 'DMPV', 'DSQA', 'DSQT', 'DSUQ', 'TS', 'BI', which is also a scale ID.</span></span>
 <span><span class="co">#&gt; <span style="color: #0000BB;">ℹ</span> score_scales() stores each score in a column named by its scale ID, so scoring would replace that data. Rename the scale, or drop the column first where it holds scores from an earlier run.</span></span>
 <span><span class="co">#&gt; Rendering the report with Quarto. This usually takes under a minute.</span></span>
-<span><span class="co">#&gt; Report rendered with the Quarto engine: /tmp/Rtmp1QlBPa/tourism_report.html</span></span></code></pre></div>
+<span><span class="co">#&gt; Report rendered with the Quarto engine: /tmp/RtmpNsy3KP/tourism_report.html</span></span></code></pre></div>
 <hr>
 </div>
 <div class="section level2">

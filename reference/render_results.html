@@ -71,7 +71,7 @@ and a reference list.</p>
 <span>  <span class="va">instrument</span>,</span>
 <span>  output_file <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  output_path <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  citation_format <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"apa"</span>, <span class="st">"ama"</span>, <span class="st">"vancouver"</span><span class="op">)</span>,</span>
+<span>  citation_format <span class="op">=</span> <span class="st">"apa"</span>,</span>
 <span>  title <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  interpretations <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -99,8 +99,9 @@ NULL, a temporary file is written and its path returned.</p></dd>
 
 
 <dt id="arg-citation-format">citation_format<a class="anchor" aria-label="anchor" href="#arg-citation-format"></a></dt>
-<dd><p>Character. Reference format. One of <code>"apa"</code>,
-<code>"ama"</code>, or <code>"vancouver"</code>. Defaults to <code>"apa"</code>.</p></dd>
+<dd><p>Character. The reference format, <code>"apa"</code> (APA 7),
+the only one the report writes. <code>"ama"</code> and <code>"vancouver"</code> were accepted
+before 0.4.3 and never applied, so they are refused with a message.</p></dd>
 
 
 <dt id="arg-title">title<a class="anchor" aria-label="anchor" href="#arg-title"></a></dt>

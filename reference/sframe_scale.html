@@ -108,7 +108,11 @@ passed to <code><a href="sframe_instrument.html">sframe_instrument()</a></code> 
 required to compute a score for a respondent, a whole number from 1 to
 the number of items. When <code>NULL</code>, every item must be answered. An item
 whose column is absent from the data counts as unanswered. Used by
-<code><a href="score_scales.html">score_scales()</a></code>.</p></dd>
+<code><a href="score_scales.html">score_scales()</a></code>. With <code>method = "sum"</code>, a respondent who answered
+fewer than every item but at least <code>min_valid</code> gets a prorated sum: the
+mean of the answered items times the number of items (weighted, the
+weighted mean times the sum of the weights), so the score stays on the
+full scale's range. Before 0.4.3 an unanswered item counted as 0.</p></dd>
 
 
 <dt id="arg-reverse-items">reverse_items<a class="anchor" aria-label="anchor" href="#arg-reverse-items"></a></dt>

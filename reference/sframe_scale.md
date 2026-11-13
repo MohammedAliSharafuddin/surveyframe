@@ -56,6 +56,11 @@ sframe_scale(
   of items. When `NULL`, every item must be answered. An item whose
   column is absent from the data counts as unanswered. Used by
   [`score_scales()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/score_scales.md).
+  With `method = "sum"`, a respondent who answered fewer than every item
+  but at least `min_valid` gets a prorated sum: the mean of the answered
+  items times the number of items (weighted, the weighted mean times the
+  sum of the weights), so the score stays on the full scale's range.
+  Before 0.4.3 an unanswered item counted as 0.
 
 - reverse_items:
 

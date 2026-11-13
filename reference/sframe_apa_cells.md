@@ -7,8 +7,9 @@ as both report engines and
 print them, so a table shows the same numbers wherever it appears. A p
 value column shows 3 decimals with no leading zero, or `<.001`. A column
 that cannot exceed 1, such as `r`, `tau` or `alpha`, drops its leading
-zero. Other numbers show 2 decimals, whole numbers none. A missing value
-is a blank cell.
+zero. Other numbers show 2 decimals, and whole numbers in an integer
+column, a column of counts (n, df, Frequency) or a percent column none.
+A p value above .999 shows `>.999`. A missing value is a blank cell.
 
 ## Usage
 

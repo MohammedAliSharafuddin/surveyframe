@@ -149,13 +149,26 @@ the code <code>"other"</code> when Other is chosen, and <code>&lt;id&gt;__other<
 <code>&lt;id&gt;__other_text</code> to a multiple choice item.</p>
     </div>
     <div class="section level2">
+    <h2 id="records">Records<a class="anchor" aria-label="anchor" href="#records"></a></h2>
+    <p>Every row of a file must have as many fields as its header. When every
+data row has exactly 1 field more and that field is empty in all of them,
+as a trailing separator gives, the field is dropped with a message. Any
+other row of a different width is refused, naming the lines, since reading
+it would move answers into the wrong columns. In a file of 1 column, a
+blank line is a respondent who left the question unanswered, so it is kept
+as a missing answer, except after the last line that holds anything.</p>
+    </div>
+    <div class="section level2">
     <h2 id="values">Values<a class="anchor" aria-label="anchor" href="#values"></a></h2>
     <p>A CSV file is read as text, so identifiers such as <code>001</code>, dates and text
 answers arrive exactly as written, a literal <code>NA</code> included. Columns of items
 with numeric responses (numeric, slider and rating items, choice items whose
 codes are all numbers, and ranking, multiple-choice and decision expansion
 columns) are then converted to numbers, with an empty cell or <code>NA</code> read as
-missing. A column that does not convert cleanly is kept as text. The column
+missing. A column that does not convert cleanly is kept as text, with a
+warning naming the column and up to 3 of the values. In every column, a
+blank answer (an empty cell, or only spaces) is missing, and a factor
+column of a data frame becomes text. The column
 of a single choice item that allows Other, and every <code>&lt;id&gt;__other_text</code>
 column, stay text. Data frames
 go through the same conversion, so a CSV file and a data frame holding the

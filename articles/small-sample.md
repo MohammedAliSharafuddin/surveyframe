@@ -127,7 +127,7 @@ results_table(mw_results)
 
 | RQ | Research question | Method | Result (APA) |
 |:---|:---|:---|---:|
-| RQ1 | Does the treatment arm score higher than control? |  | U = 34, z = -1.21, p = .226, r = -.27, 95% CI \[-.64, .17\], Hodges-Lehmann shift = -3.99, 95% CI \[-13.75, 4.58\], higher in Treatment |
+| RQ1 | Does the treatment arm score higher than control? |  | U = 34, z = -1.21, p = .226, r = -.27, 95% CI \[-.64, .15\], Hodges-Lehmann shift = -3.99, 95% CI \[-13.75, 4.58\], higher in Treatment |
 
 ``` r
 
@@ -196,7 +196,7 @@ results_table(fe_results)
 
 | RQ | Research question | Method | Result (APA) |
 |:---|:---|:---|---:|
-| RQ3 | Is conversion associated with study arm? |  | Fisher’s exact test, p = 1.000, phi = .12 |
+| RQ3 | Is conversion associated with study arm? |  | Fisher’s exact test, p \> .999, phi = .12 |
 
 ``` r
 
@@ -219,6 +219,8 @@ pilot outcome scores.
 sframe_bootstrap_ci(pilot$outcome, FUN = stats::median, R = 999)
 #> estimate    lower    upper 
 #> 52.82878 47.33676 56.66709 
+#> attr(,"level")
+#> [1] 0.95
 #> attr(,"resamples")
 #> [1] 999
 #> attr(,"valid_resamples")
@@ -249,7 +251,7 @@ results_table(firth_results)
 
 | RQ | Research question | Method | Result (APA) |
 |:---|:---|:---|---:|
-| RQ4 | Does the covariate predict conversion? |  | Firth logistic regression (n = 20), likelihood ratio = 0.10 |
+| RQ4 | Does the covariate predict conversion? |  | Firth logistic regression (n = 20), likelihood ratio = 0.10. The odds are of “Converted (yes/no)” being Yes, against No. |
 
 ``` r
 
@@ -276,6 +278,8 @@ sframe_cohens_d_ci(pilot$outcome[pilot$group == "treatment"],
             pilot$outcome[pilot$group == "control"], R = 999)
 #>   estimate      lower      upper 
 #>  0.5420188 -0.3636638  1.5240611 
+#> attr(,"level")
+#> [1] 0.95
 #> attr(,"resamples")
 #> [1] 999
 #> attr(,"valid_resamples")

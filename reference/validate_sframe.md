@@ -75,6 +75,8 @@ The following checks are performed:
 
 - Attention checks referencing item IDs not present in the instrument
 
+- A choice code with white space at the start or end, such as `" 1"`
+
 - A scale `method` other than `"mean"` or `"sum"`, a choice set whose
   `values` and `labels` differ in length, a branching rule whose
   operator is unknown or missing or that depends on its own item, and a
@@ -85,8 +87,12 @@ These are reported as notes, which
 [`sframe_notes()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_notes.md)
 returns and which leave the instrument valid, since SurveyBuilder saved
 them before 0.4.3: branching rules that depend on each other in a cycle,
-a check whose pass values are not codes of its item's choice set, and an
-item whose `scale_id` names a scale that does not list it.
+a check whose pass values are not codes of its item's choice set, an
+item whose `scale_id` names a scale that does not list it, and a scale
+item's choice set with numeric codes outside 1 evenly spaced run (1 to 5
+and 99 for "do not know"), which
+[`score_scales()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/score_scales.md)
+reads as missing.
 
 - Analysis plan roles referencing missing variables or models
 

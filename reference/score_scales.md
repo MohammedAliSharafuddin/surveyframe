@@ -36,6 +36,28 @@ score_scales(data, instrument, keep_items = TRUE, keep_meta = TRUE)
 A `data.frame` with scored scale columns appended. Scale columns are
 named using the scale `id`.
 
+## Sum scores with unanswered items
+
+With `method = "sum"` and a `min_valid` below the number of items, a
+respondent who answered at least `min_valid` items gets a prorated sum:
+the mean of the answered items times the number of items (with weights,
+the weighted mean times the sum of the weights). 5 and 5 on 2 of 4 items
+on a 1 to 5 scale scores 20. Before 0.4.3 an unanswered item counted as
+0, so the same respondent scored 10.
+
+## Codes that are not scores
+
+An item's scores are the longest run of its choice set's numeric codes
+at 1 even step: 1 to 5, or 0 to 100 in steps of 25. A code outside that
+run, such as 99 for "do not know" after 1 to 5, is read as missing, with
+a message naming it and how many answers held it, and a reversed item is
+reversed on the run's ends (1 + 5 - x). A set with 2 equally long runs,
+such as 1, 2, 4, 5, has no clear run, and its scale is refused with an
+error.
+[`validate_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/validate_sframe.md)
+notes such a choice set. Before 0.4.3 every numeric code was a score, so
+the reversal point moved to 1 + 99 and a 99 entered the mean.
+
 ## See also
 
 [`sframe_scale()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_scale.md),

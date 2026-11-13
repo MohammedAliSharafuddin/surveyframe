@@ -107,7 +107,9 @@ carries an attribute <code>"renamed"</code>, a data frame with the columns <code
 coded with text, such as <code>"a"</code> and <code>"b"</code>, is written as 1, 2, 3 in the
 set's declared order, each carrying its label, so the file reads back in
 Stata with the labels intact. A <code>.sav</code> keeps the text codes, which SPSS
-labels directly.</p>
+labels directly. Codes such as <code>"01"</code> and <code>"02"</code> are text, as
+<code><a href="read_responses.html">read_responses()</a></code> reads them, since as numbers they would lose their
+leading zero and no longer match the instrument.</p>
     </div>
     <div class="section level2">
     <h2 id="names-and-labels-that-do-not-fit-the-format">Names and labels that do not fit the format<a class="anchor" aria-label="anchor" href="#names-and-labels-that-do-not-fit-the-format"></a></h2>

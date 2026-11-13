@@ -121,6 +121,8 @@ are <code>NA</code> when <code>x</code> has fewer than 3 finite values.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">sframe_bootstrap_ci</span><span class="op">(</span><span class="va">mtcars</span><span class="op">$</span><span class="va">mpg</span>, seed <span class="op">=</span> <span class="fl">42</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> estimate    lower    upper </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    19.20    16.85    21.40 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> attr(,"level")</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.95</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> attr(,"resamples")</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 2000</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> attr(,"valid_resamples")</span>
@@ -128,6 +130,8 @@ are <code>NA</code> when <code>x</code> has fewer than 3 finite values.</p>
 <span class="r-in"><span><span class="fu">sframe_bootstrap_ci</span><span class="op">(</span><span class="va">mtcars</span><span class="op">$</span><span class="va">mpg</span>, FUN <span class="op">=</span> <span class="va">mean</span>, conf.level <span class="op">=</span> <span class="fl">0.90</span>, seed <span class="op">=</span> <span class="fl">42</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> estimate    lower    upper </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 20.09062 18.41875 21.80031 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> attr(,"level")</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.9</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> attr(,"resamples")</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 2000</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> attr(,"valid_resamples")</span>

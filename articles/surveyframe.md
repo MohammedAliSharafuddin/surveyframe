@@ -531,15 +531,15 @@ study_amended <- amend_sframe(
 
 sframe_get_amendments(study_amended)
 #>              timestamp         reason_code
-#> 1 2026-11-11T19:29:57Z instrument_revision
+#> 1 2026-11-13T20:52:25Z instrument_revision
 #>                                    reason_text   tier author
 #> 1 Clarified item wording after pilot feedback. design   <NA>
 #>                                     deviation_report signoff
 #> 1 Wording only; the construct measured is unchanged.    none
 #>                                                      previous_hash
-#> 1 7fb2517c259435b8c210ed1ebe375afc1ac39e7ebc3b23a94440e30124f2f9df
+#> 1 603d168a49a71266a4e024917c60d633e226b7d62a67e22b3e83796652b26012
 #>                                                           new_hash
-#> 1 ae5caad3ba305ea7bf032be20804aad47fbf76c95a17827ae05ccd58ed3808a3
+#> 1 425cb67f743644f375d9371fa910187b7675ae95a2c7b643d6c952254b40aecc
 #>   changed_fields
 #> 1          items
 ```
@@ -634,7 +634,7 @@ html_path <- export_survey(
   output_path = file.path(tempdir(), "tourism_services_survey.html"),
   open        = FALSE
 )
-#> Static survey written to '/tmp/Rtmp1QlBPa/tourism_services_survey.html' (103.3
+#> Static survey written to '/tmp/RtmpNsy3KP/tourism_services_survey.html' (103.3
 #> KB).
 file.exists(html_path)
 #> [1] TRUE
@@ -687,7 +687,7 @@ script_path <- export_google_sheet(
   sheet_url  = "https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID",
   output_dir = tempdir()
 )
-#> Apps Script written to: /tmp/Rtmp1QlBPa/surveyframe_collector.gs
+#> Apps Script written to: /tmp/RtmpNsy3KP/surveyframe_collector.gs
 #> Follow the setup instructions inside the file to deploy it.
 file.exists(script_path)
 #> [1] TRUE
@@ -1214,7 +1214,7 @@ results_table(results)
 | RQ1 | Are digital marketing perceptions associated with tourist satisfaction? | pearson | r(58) = .19, 95% CI \[-.07, .42\], p = .153 | small |
 | RQ2 | Is service quality associated with tourist satisfaction? | pearson | r(58) = -.04, 95% CI \[-.29, .22\], p = .778 | negligible |
 | RQ3 | Do service quality and sustainability quality predict satisfaction? |  | R² = .210, F(3, 56) = 4.97, p = .004 |  |
-| RQ4 | Do first-time and repeat visitors differ in satisfaction? |  | U = 140, z = -4.63, p \< .001, r = -.60, 95% CI \[-.76, -.40\], Hodges-Lehmann shift = -0.67, 95% CI \[-1.00, -0.67\], higher in Repeated visitor | large |
+| RQ4 | Do first-time and repeat visitors differ in satisfaction? |  | U = 140, z = -4.63, p \< .001, r = -.60, 95% CI \[-.77, -.41\], Hodges-Lehmann shift = -0.67, 95% CI \[-1.00, -0.67\], higher in Repeated visitor | large |
 | RQ5 | Does satisfaction predict behavioural intention? |  | R² = .291, F(1, 58) = 23.83, p \< .001 |  |
 
 The full writing prompt for each result is available in `r$prompt`. The
@@ -1274,7 +1274,7 @@ results_path <- render_results(
   output_file = file.path(tempdir(), "tourism_results.html")
 )
 cat("Results report written:", results_path, "\n")
-#> Results report written: /tmp/Rtmp1QlBPa/tourism_results.html
+#> Results report written: /tmp/RtmpNsy3KP/tourism_results.html
 cat("Size:", round(file.size(results_path) / 1024, 1), "KB\n")
 #> Size: 13.2 KB
 ```
@@ -1305,7 +1305,7 @@ render_report(
 #> Warning: Scale scoring failed before analysis, so blocks run on unscored data: The responses already hold a column named 'DMRE', 'DMAU', 'DMEU', 'DMPV', 'DSQA', 'DSQT', 'DSUQ', 'TS', 'BI', which is also a scale ID.
 #> ℹ score_scales() stores each score in a column named by its scale ID, so scoring would replace that data. Rename the scale, or drop the column first where it holds scores from an earlier run.
 #> Rendering the report with Quarto. This usually takes under a minute.
-#> Report rendered with the Quarto engine: /tmp/Rtmp1QlBPa/tourism_report.html
+#> Report rendered with the Quarto engine: /tmp/RtmpNsy3KP/tourism_report.html
 ```
 
 ------------------------------------------------------------------------

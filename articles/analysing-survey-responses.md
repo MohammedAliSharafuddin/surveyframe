@@ -214,7 +214,7 @@ results_table(results)
 |:---|:---|:---|---:|:---|
 | RQ1 | Is digital marketing perception associated with satisfaction? | pearson | r(118) = .54, 95% CI \[.40, .65\], p \< .001 | large |
 | RQ2 | Do the three perception scales predict satisfaction? |  | R² = .383, F(3, 116) = 23.95, p \< .001 |  |
-| RQ3 | Do first-time and repeat visitors differ in behavioural intention? |  | U = 1576, z = -0.98, p = .326, r = -.09, 95% CI \[-.27, .09\], Hodges-Lehmann shift = -0.00, 95% CI \[-0.50, 0.00\], higher in Repeat visitor | negligible |
+| RQ3 | Do first-time and repeat visitors differ in behavioural intention? |  | U = 1576, z = -0.98, p = .326, r = -.09, 95% CI \[-.27, .09\], Hodges-Lehmann shift = 0.00, 95% CI \[-0.50, 0.00\], higher in Repeat visitor | negligible |
 
 Pass `plots = TRUE` to attach a brand-styled `ggplot2` chart to each
 result that supports one (descriptive, correlation, chi-square, and

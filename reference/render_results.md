@@ -14,7 +14,7 @@ render_results(
   instrument,
   output_file = NULL,
   output_path = NULL,
-  citation_format = c("apa", "ama", "vancouver"),
+  citation_format = "apa",
   title = NULL,
   interpretations = NULL
 )
@@ -42,8 +42,9 @@ render_results(
 
 - citation_format:
 
-  Character. Reference format. One of `"apa"`, `"ama"`, or
-  `"vancouver"`. Defaults to `"apa"`.
+  Character. The reference format, `"apa"` (APA 7), the only one the
+  report writes. `"ama"` and `"vancouver"` were accepted before 0.4.3
+  and never applied, so they are refused with a message.
 
 - title:
 

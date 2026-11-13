@@ -54,14 +54,14 @@ Other Preview functions:
 ``` r
 # A demo by name
 path <- preview_survey("two_group", open = FALSE)
-#> Static survey written to '/tmp/RtmppFIGkv/surveyframe-preview-two_group.html' (79.4 KB).
+#> Static survey written to '/tmp/RtmpEPGRzn/surveyframe-preview-two_group.html' (79.4 KB).
 file.exists(path)
 #> [1] TRUE
 
 # Your own instrument
 ins <- sframe_demo("first_survey")$instrument
 path <- preview_survey(ins, open = FALSE)
-#> Static survey written to '/tmp/RtmppFIGkv/surveyframe-preview-survey.html' (79.8 KB).
+#> Static survey written to '/tmp/RtmpEPGRzn/surveyframe-preview-survey.html' (79.8 KB).
 file.exists(path)
 #> [1] TRUE
 ```

@@ -42,7 +42,10 @@ Stata attaches value labels to numbers alone. In a `.dta`, a choice set
 coded with text, such as `"a"` and `"b"`, is written as 1, 2, 3 in the
 set's declared order, each carrying its label, so the file reads back in
 Stata with the labels intact. A `.sav` keeps the text codes, which SPSS
-labels directly.
+labels directly. Codes such as `"01"` and `"02"` are text, as
+[`read_responses()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_responses.md)
+reads them, since as numbers they would lose their leading zero and no
+longer match the instrument.
 
 ## Names and labels that do not fit the format
 

@@ -54,6 +54,8 @@ sframe_cohens_d_ci(mtcars$mpg[mtcars$am == 1], mtcars$mpg[mtcars$am == 0],
             seed = 42)
 #>  estimate     lower     upper 
 #> 1.4779471 0.7869318 2.5256596 
+#> attr(,"level")
+#> [1] 0.95
 #> attr(,"resamples")
 #> [1] 2000
 #> attr(,"valid_resamples")

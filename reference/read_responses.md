@@ -87,6 +87,17 @@ A choice set with `allow_other` ("Other, please specify") adds
 the code `"other"` when Other is chosen, and `<id>__other` (1 or 0) and
 `<id>__other_text` to a multiple choice item.
 
+## Records
+
+Every row of a file must have as many fields as its header. When every
+data row has exactly 1 field more and that field is empty in all of
+them, as a trailing separator gives, the field is dropped with a
+message. Any other row of a different width is refused, naming the
+lines, since reading it would move answers into the wrong columns. In a
+file of 1 column, a blank line is a respondent who left the question
+unanswered, so it is kept as a missing answer, except after the last
+line that holds anything.
+
 ## Values
 
 A CSV file is read as text, so identifiers such as `001`, dates and text
@@ -95,10 +106,12 @@ items with numeric responses (numeric, slider and rating items, choice
 items whose codes are all numbers, and ranking, multiple-choice and
 decision expansion columns) are then converted to numbers, with an empty
 cell or `NA` read as missing. A column that does not convert cleanly is
-kept as text. The column of a single choice item that allows Other, and
-every `<id>__other_text` column, stay text. Data frames go through the
-same conversion, so a CSV file and a data frame holding the same
-responses read the same.
+kept as text, with a warning naming the column and up to 3 of the
+values. In every column, a blank answer (an empty cell, or only spaces)
+is missing, and a factor column of a data frame becomes text. The column
+of a single choice item that allows Other, and every `<id>__other_text`
+column, stay text. Data frames go through the same conversion, so a CSV
+file and a data frame holding the same responses read the same.
 
 ## See also
 

@@ -59,9 +59,11 @@ run_analysis_plan(
   same answer every time, which is what makes a rendered report usable
   as an audit artefact. Every bootstrap confidence interval in the plan,
   and the parallel analysis behind the EFA family, depend on it. Pass
-  `NULL` for the unseeded behaviour of releases before 0.4.1. The
-  caller's own random stream is restored afterwards, so seeding here
-  does not affect anything that runs later.
+  `NULL` for the unseeded behaviour of releases before 0.4.1. Each
+  block's stream starts from this seed and the block's id, so a block
+  gives the same interval whatever blocks come before it. The caller's
+  own random stream is restored afterwards, so seeding here does not
+  affect anything that runs later.
 
 - strict:
 
@@ -93,6 +95,33 @@ of row percentages is the column distribution, and the Total column of
 column percentages is the row distribution. The report then shows each
 count with its percentage beside it, and the chart draws the
 percentages.
+
+## How answers are coded
+
+Categories follow 1 order in every locale: the codes of the item's
+choice set as the instrument declares them, then factor levels, then any
+other value, numbers by value and other text in code point order. A
+category nobody chose is dropped before a model is fitted.
+
+- McNemar's test lays both items out on that order, so each category is
+  paired with itself. 2 items with different choice sets are refused.
+
+- An ordinal logistic outcome is ordered as its choice set declares. The
+  result's `$outcome_levels` and its sentence give the order.
+
+- In every model (linear, binary, ordinal, multinomial and Firth
+  logistic regression, and the ANCOVA covariates) a `single_choice` or
+  `multiple_choice` item enters as a category, with 1 indicator term per
+  category after the first, whatever its codes look like. The first
+  category with answers is the reference. The result's
+  `$predictor_coding` lists each categorical predictor's levels, and the
+  sentence names each reference category.
+
+- A binary or Firth logistic model gives the odds of its event, the last
+  category of its outcome in that order (1 of 0 and 1, the last declared
+  code of a choice set). `options = list(event = "yes")` names another.
+  The result's `$event` and `$reference_level`, and its sentence, name
+  both. A multinomial model's reference is the first category.
 
 ## See also
 
@@ -140,7 +169,7 @@ print(results)
 #> 
 #> RQ 3: Do first-time and repeat visitors differ in behavioural intention?
 #>   Test: mann_whitney
-#>   APA:  U = 1576, z = -0.98, p = .326, r = -.09, 95% CI [-.27, .09], Hodges-Lehmann shift = -0.00, 95% CI [-0.50, 0.00], higher in Repeat visitor
+#>   APA:  U = 1576, z = -0.98, p = .326, r = -.09, 95% CI [-.26, .08], Hodges-Lehmann shift = 0.00, 95% CI [-0.50, 0.00], higher in Repeat visitor
 #> 
 #> RQ 4: What is the distribution of first-time and repeat visitors?
 #>   Test: frequency
@@ -196,11 +225,11 @@ print(results)
 #> 
 #> RQ 17: Is visitor type associated with attention check response level?
 #>   Test: crosstab
-#>   APA:  χ²(1, N = 120) = 4.31, p = .038, φ = .19, 95% CI [.03, .33]
+#>   APA:  χ²(1, N = 120) = 4.31, p = .038, φ = .19, 95% CI [.00, .37]
 #> 
 #> RQ 18: Is the distribution of satisfaction ratings different across visitor types?
 #>   Test: crosstab
-#>   APA:  χ²(4, N = 120) = 3.40, p = .494, V = 0.17, 95% CI [0.09, 0.38]
+#>   APA:  χ²(4, N = 120) = 3.40, p = .494, V = .17, 95% CI [.00, .29]
 #> 
 #> RQ 19: Is there an association between visitor type and behavioural intention rating?
 #>   Test: fisher_exact
@@ -208,15 +237,15 @@ print(results)
 #> 
 #> RQ 20: Do first-time and repeat visitors differ in mean satisfaction score?
 #>   Test: t_test_ind
-#>   APA:  t(106.77) = 0.15, p = .878, d = 0.03, 95% CI [-0.33, 0.41], higher in First-time visitor
+#>   APA:  t(106.77) = 0.15, p = .878, d = 0.03, 95% CI [-0.35, 0.40], higher in First-time visitor
 #> 
 #> RQ 21: Do respondents rate the two satisfaction items differently?
 #>   Test: t_test_pair
-#>   APA:  t(119) = 0.82, p = .416, d_z = 0.07, 95% CI [-0.11, 0.26], higher in "Overall, I was satisfied with the tourism experience."
+#>   APA:  t(119) = 0.82, p = .416, d_z = 0.07, 95% CI [-0.11, 0.27], higher in "Overall, I was satisfied with the tourism experience."
 #> 
 #> RQ 22: Is there a significant distributional difference between the first two service quality items?
 #>   Test: wilcoxon_pair
-#>   APA:  V = 967, z = -1.18, p = .239, r = -.14, 95% CI [-.38, .11], pseudomedian = -0.00, 95% CI [-0.00, 0.00], higher in "The service environment was easy to navigate."
+#>   APA:  V = 967, z = -1.18, p = .239, r = -.14, 95% CI [-.37, .11], pseudomedian = 0.00, 95% CI [0.00, 0.00], higher in "The service environment was easy to navigate."
 #> 
 #> RQ 23: Does satisfaction differ across visitor types?
 #>   Test: kruskal_wallis
@@ -224,7 +253,7 @@ print(results)
 #> 
 #> RQ 24: Does mean behavioural intention differ between visitor types?
 #>   Test: anova_one
-#>   APA:  F(1, 118) = 0.74, p = .391, η² = .006, 95% CI [.00, .07]
+#>   APA:  F(1, 118) = 0.74, p = .391, η² = .006, 95% CI [.00, .06]
 #> 
 #> RQ 25: Do visitor types differ in satisfaction after controlling for service quality?
 #>   Test: ancova
@@ -240,7 +269,7 @@ print(results)
 #> 
 #> RQ 28: Are service quality perceptions associated with sustainability perceptions?
 #>   Test: correlation_spearman
-#>   APA:  r_s(118) = .00, 95% CI [-.19, .19], p = .984
+#>   APA:  r_s(118) = .00, 95% CI [-.18, .18], p = .984
 #> 
 #> RQ 29: Is sustainability perception associated with behavioural intention?
 #>   Test: correlation_kendall
@@ -252,11 +281,11 @@ print(results)
 #> 
 #> RQ 31: Do digital marketing and service quality perceptions predict visitor type?
 #>   Test: regression_logistic_binary
-#>   APA:  χ²(2) = 0.28, p = .869, McFadden R² = .002
+#>   APA:  χ²(2) = 0.28, p = .869, McFadden R² = .002. The odds are of "Visitor type" being Repeat visitor, against First-time visitor.
 #> 
 #> RQ 32: Do digital marketing and sustainability perceptions predict ordered satisfaction?
 #>   Test: regression_logistic_ordinal
-#>   APA:  Ordinal logistic regression was estimated with 120 complete cases.
+#>   APA:  Ordinal logistic regression of "Overall, I was satisfied with the tourism experience.", ordered Strongly disagree < Disagree < Neither agree nor disagree < Agree < Strongly agree, was estimated with 120 complete cases.
 #> 
 #> RQ 33: Does visitor type moderate the relationship between digital marketing and satisfaction?
 #>   Test: moderation
@@ -264,7 +293,7 @@ print(results)
 #> 
 #> RQ 34: Does satisfaction mediate the path from digital marketing to behavioural intention?
 #>   Test: mediation
-#>   APA:  Indirect effect = 0.365, 95% bootstrap CI [0.218, 0.538], from 1000 of 1000 resamples.
+#>   APA:  Indirect effect = 0.365, 95% bootstrap CI [0.231, 0.535], from 1000 of 1000 resamples.
 #> 
 # }
 ```

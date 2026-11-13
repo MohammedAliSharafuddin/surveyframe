@@ -14,7 +14,8 @@ sframe_missing_data_results(data, instrument = NULL, variables = NULL)
 
 - data:
 
-  A data.frame of responses.
+  A data.frame of responses. A blank answer (an empty string, or only
+  spaces) counts as missing, and a factor's unused levels are dropped.
 
 - instrument:
 

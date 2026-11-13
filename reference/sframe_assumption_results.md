@@ -46,7 +46,9 @@ sframe_assumption_results(
 
 ## Value
 
-An object of class `sframe_assumption_report`.
+An object of class `sframe_assumption_report`. Its `apa` names the
+checks that ran, or says that none ran and which arguments each check
+needs.
 
 ## See also
 

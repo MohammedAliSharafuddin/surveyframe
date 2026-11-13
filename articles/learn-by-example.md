@@ -162,8 +162,8 @@ The commonest comparison there is: one number, and two groups of people.
 tg <- sframe_demo("two_group")
 res <- run_analysis_plan(tg$responses, tg$instrument)
 for (b in res) cat(b$test, ": ", b$apa, "\n", sep = "")
-#> t_test_ind: t(57.89) = 3.36, p = .001, d = 0.87, 95% CI [0.43, 1.35], higher in In person
-#> mann_whitney: U = 626, z = 2.63, p = .009, r = .34, 95% CI [.10, .54], Hodges-Lehmann shift = 2.00, 95% CI [0.00, 3.00], higher in In person
+#> t_test_ind: t(57.89) = 3.36, p = .001, d = 0.87, 95% CI [0.40, 1.35], higher in In person
+#> mann_whitney: U = 626, z = 2.63, p = .009, r = .34, 95% CI [.11, .54], Hodges-Lehmann shift = 2.00, 95% CI [0.00, 3.00], higher in In person
 ```
 
 Both tests are shown for teaching. In a real study, predeclare the
@@ -183,7 +183,7 @@ for (b in run_analysis_plan(pr$responses, pr$instrument)) {
   cat(b$test, ": ", b$apa, "\n", sep = "")
 }
 #> t_test_pair: t(49) = -5.11, p < .001, d_z = -0.72, 95% CI [-1.00, -0.49], higher in "And now? (0 to 100)"
-#> wilcoxon_pair: V = 156, z = -4.31, p < .001, r = -.63, 95% CI [-.77, -.43], pseudomedian = -7.50, 95% CI [-12.00, -4.00], higher in "And now? (0 to 100)"
+#> wilcoxon_pair: V = 156, z = -4.31, p < .001, r = -.63, 95% CI [-.78, -.43], pseudomedian = -7.50, 95% CI [-12.00, -4.00], higher in "And now? (0 to 100)"
 #> mcnemar: McNemar's chi-square(1) = 11.08, p < .001
 ```
 
@@ -197,8 +197,8 @@ mg <- sframe_demo("multi_group")
 for (b in run_analysis_plan(mg$responses, mg$instrument)[1:2]) {
   cat(b$test, ": ", b$apa, "\n", sep = "")
 }
-#> anova_one: F(2, 72) = 7.27, p = .001, η² = .168, 95% CI [.07, .34]
-#> kruskal_wallis: H(2) = 12.01, p = .002, η² = .139, 95% CI [.02, .33]
+#> anova_one: F(2, 72) = 7.27, p = .001, η² = .168, 95% CI [.03, .31]
+#> kruskal_wallis: H(2) = 12.01, p = .002, η² = .139, 95% CI [.03, .32]
 ```
 
 `repeated` and `categorical` follow the same shape. See

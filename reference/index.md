@@ -426,9 +426,9 @@ inferential runners.
 - [`sframe_cohens_d_ci()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_cohens_d_ci.md)
   : Bootstrap confidence interval for Cohen's d
 - [`sframe_cramers_v_ci()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_cramers_v_ci.md)
-  : Bootstrap confidence interval for Cramer's V
+  : Confidence interval for Cramer's V
 - [`sframe_eta_sq_ci()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_eta_sq_ci.md)
-  : Bootstrap confidence interval for eta squared
+  : Confidence interval for eta squared
 
 ## Demos
 

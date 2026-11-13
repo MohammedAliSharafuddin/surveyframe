@@ -66,6 +66,8 @@ Other Confidence interval functions:
 sframe_bootstrap_ci(mtcars$mpg, seed = 42)
 #> estimate    lower    upper 
 #>    19.20    16.85    21.40 
+#> attr(,"level")
+#> [1] 0.95
 #> attr(,"resamples")
 #> [1] 2000
 #> attr(,"valid_resamples")
@@ -73,6 +75,8 @@ sframe_bootstrap_ci(mtcars$mpg, seed = 42)
 sframe_bootstrap_ci(mtcars$mpg, FUN = mean, conf.level = 0.90, seed = 42)
 #> estimate    lower    upper 
 #> 20.09062 18.41875 21.80031 
+#> attr(,"level")
+#> [1] 0.9
 #> attr(,"resamples")
 #> [1] 2000
 #> attr(,"valid_resamples")

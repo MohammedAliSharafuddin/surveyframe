@@ -65,6 +65,17 @@ serialised by a host.
 - **A descriptives block counts choice items.** See below. Numbers for a
   `single_choice` or `multiple_choice` column move from the mean and SD
   table to a table of counts and percentages.
+- **A plan rerun on 0.4.3 can give different numbers from the same data
+  where categories were ordered or coded differently before.** A
+  multinomial model’s reference category is now the first category its
+  choice set declares, not the first in alphabetical order: the logistic
+  demo’s reference moves from Keynotes to Workshops, and every
+  coefficient and p value of that model changes with it. A binary
+  model’s modelled level, an ordinal outcome’s order, a choice item
+  entering a model as categories, and the McNemar table follow the same
+  declared order. See “Answers coded and ordered as the instrument
+  declares them” under Analysis. Report the 0.4.3 numbers, and say which
+  category is the reference.
 - **Every plan result serialises with
   [`jsonlite::toJSON()`](https://jeroen.r-universe.dev/jsonlite/reference/fromJSON.html).**
   The classed report behind a descriptives, missing-data, quality,
@@ -861,6 +872,290 @@ serialised by a host.
   requires at least two available item columns.” and never named the
   item. It now fails the standard check, as other methods do, naming the
   item.
+
+#### Answers coded and ordered as the instrument declares them
+
+Every statistic in a review of the runners against base R and reference
+packages matched (Fable sitting 2, Codex passes 2 and 3). These are
+defects in how answers were coded, ordered and labelled before and after
+the arithmetic.
+
+- **McNemar’s test pairs each category with itself.** The table was
+  [`table()`](https://rdrr.io/r/base/table.html) of the 2 columns as
+  they came, so the first row level was paired with the first column
+  level whatever they were. 2 factors holding yes and no in opposite
+  level order gave chi-square 0.80 and p = .371 where the test on the
+  aligned table gives 0 and p = 1, and 2 items whose observed categories
+  differed (a and b at the first time, b and c at the second) were
+  tested as a 2 by 2 table pairing a with b. The table is now laid out
+  on 1 order for both items, the declared choice set and then any other
+  value, 2 items with different choice sets are refused with both named,
+  and a pair of categories nobody moved between gives an error in place
+  of a statistic of NaN (FR-22, P2-03).
+- **An ordinal outcome is ordered as its choice set declares.**
+  `regression_logistic_ordinal` ordered a text-coded outcome
+  alphabetically, so low, medium, high became high \< low \< medium and
+  the slope’s sign was reversed (0.85 became -0.60 on Fable’s data). The
+  order is now the declared choice set, then other values, numbers by
+  value (an outcome coded “2”, “9”, “10” in that order, not “10” first).
+  The result carries `$outcome_levels`, and the sentence names the
+  order: “Ordinal logistic regression of”Rating”, ordered Low \< Medium
+  \< High, was estimated with 90 complete cases.” (FR-19).
+- **A nominal choice item enters a model as a category.** A
+  `single_choice` item coded 1, 2, 3 for North, South and East entered
+  linear regression as 1 slope, as if East were 3 times North (R squared
+  .09 where the categorical model gives .23). A `single_choice` or
+  `multiple_choice` item now enters every model as a category, whatever
+  its codes look like: linear, binary, ordinal, multinomial and Firth
+  logistic regression, and the ANCOVA covariates. Firth regression had
+  read every predictor as a number, so a text category became missing
+  and its rows were dropped. The first declared category with answers is
+  the reference, unused categories are dropped before fitting, the
+  result carries `$predictor_coding`, and the sentence names the
+  reference: ““Region” enters as 2 indicator terms against the reference
+  category North.” See “How answers are coded” in
+  [`?run_analysis_plan`](https://mohammedalisharafuddin.github.io/surveyframe/reference/run_analysis_plan.md)
+  (FR-20).
+- **A binary model names the level it models, in every locale.** Binary
+  logistic regression modelled the level that sorted last in the
+  session’s collation: an outcome of “Yes” and “no” gave a slope of
+  1.238 under en_GB.UTF-8 and -1.238 under C, and nothing said which
+  level the odds ratios described. A factor outcome with an unused level
+  stopped with “y values must be 0 \<= y \<= 1”. The modelled level (the
+  event) is now the last declared code of the outcome’s choice set with
+  answers, or with no choice set the last in 1 locale-free order
+  (numbers by value, text in code point order), and `options$event`
+  names another. Binary and Firth logistic results carry `$event` and
+  `$reference_level`, and the sentence says “The odds are of”Outcome”
+  being Yes, against No.” The multinomial reference category and the
+  order of a t test’s or Mann-Whitney test’s 2 groups with no choice set
+  follow the same locale-free order (FR-21, P2-08). The event is the
+  last declared code, as [`glm()`](https://rdrr.io/r/stats/glm.html)
+  models the second level, so a file whose choice set declares yes, then
+  no, models No unless `options$event = "yes"` says otherwise.
+  SurveyBuilder’s Yes/No presets (the No / Yes template and quick-fill,
+  the No / Yes / Unsure template and the set a new yes/no question gets)
+  now declare No first, so new files model Yes. The 2 bundled files that
+  declare yes, then no keep their order, since changing it would change
+  their hashes.
+- **A “do not know” code in a scale’s choice set is not scored.** Every
+  numeric code was a score, so a set of 1 to 5 with 99 for “do not know”
+  gave the item bounds 1 to 99: a reversed 1 became 99 and a respondent
+  answering 4, 4, 2, 1 scored 27.25 where 3.75 is right, with nobody
+  choosing 99. A 99 that was chosen entered the mean, and alpha fell
+  from .78 to .04 on Fable’s data.
+  [`score_scales()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/score_scales.md),
+  the reliability and item results now score the longest run of codes at
+  1 even step and read other codes as missing, with a message (“99 is
+  not scored”), and
+  [`validate_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/validate_sframe.md)
+  notes such a set, naming its codes. A set with 2 equally long runs,
+  such as 1, 2, 4, 5, has no clear run, so its scale is refused with an
+  error and the note says so. See “Codes that are not scores” in
+  [`?score_scales`](https://mohammedalisharafuddin.github.io/surveyframe/reference/score_scales.md).
+  A declared “not a score” code in the schema is planned for 0.4.4
+  (FR-18).
+- **The R code shown beside a result codes answers as the result did.**
+  [`sframe_syntax_result()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_syntax_result.md)
+  and the report’s code chunks wrote their own coding
+  ([`ordered()`](https://rdrr.io/r/base/factor.html),
+  [`as.factor()`](https://rdrr.io/r/base/factor.html),
+  [`table()`](https://rdrr.io/r/base/table.html) of the 2 McNemar
+  columns, any column of numbers as a number), so after the 4 fixes
+  above they would have fitted a different model from the result. Each
+  runner now records the coding it used (`$outcome_levels`,
+  `$predictor_coding`, `$event`, McNemar’s `$category_levels`) and the
+  code writes it out: a choice predictor as
+  `factor(x, levels = c("1", "2", "3"))`, the ordinal outcome in
+  declared order, the binary event as `== "Yes"`, and McNemar’s 2 items
+  on 1 set of levels. The tests run the code and compare its estimates
+  with the result.
+- **A CSV row wider than its header is refused, not shifted.** A file
+  whose data rows had 1 field more than the header, as a trailing
+  separator gives, was read with its first column as row names: every
+  answer and the respondent id moved 1 column to the left, with no
+  warning.
+  [`read_responses()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_responses.md)
+  now counts each record’s fields first. When every data row has exactly
+  1 extra field and it is empty in all of them, the field is dropped
+  with a message. Any other row whose width differs from the header’s is
+  refused, naming the first 3 lines and their field counts (P3-01).
+- **A blank answer is missing in every column
+  [`read_responses()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_responses.md)
+  returns.** Only text columns were cleaned, so a factor column of a
+  data frame kept its “” as an answer, and a declared numeric column
+  with 1 value that did not read as a number stayed text with its “” and
+  no message. Every text or factor column now has its blank answers
+  (empty, or only spaces) made missing first, factors become text, and a
+  declared numeric column that stays text gives a warning naming the
+  column and up to 3 of its values (P3-05).
+- **A file of 1 column keeps an unanswered respondent.** In a CSV file
+  with a single column, a respondent who left the question blank is a
+  blank line, which was skipped, so the respondent was lost and every
+  later row moved up. Blank lines are now kept as missing answers in a
+  1-column file, except those after the last line that holds anything.
+  No surveyframe collector writes such a file (P3-02).
+- **A choice code with white space at either end is refused.** The
+  reader trimmed a set’s codes before deciding whether they were
+  numbers, so a set declared as ” 1” and “2” read as numeric and the
+  answer ” 1” became 1, a code the set does not hold: the frequency
+  table gained an unlabelled category.
+  [`validate_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/validate_sframe.md)
+  now reports such a code as a problem, naming the set and the code, and
+  the reader compares codes as declared. SurveyBuilder already trims a
+  code as it is typed, so only a set written in R or edited by hand can
+  hold one (P3-04).
+- **[`export_responses()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/export_responses.md)
+  keeps codes such as “01” as text.** It decided that a choice set’s
+  codes were numbers with
+  [`as.numeric()`](https://rdrr.io/r/base/numeric.html) alone, so codes
+  “01” and “02” left as 1 and 2 in .sav and .dta files: the labels
+  survived but the codes no longer matched the instrument, and analysis
+  of the re-read file stopped. The export and
+  [`read_responses()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_responses.md)
+  now share 1 test, the numeric round trip, so such codes take the text
+  route already there: labelled text in a .sav, positions 1, 2, 3 with
+  their labels in a .dta (P3-03).
+- **Every analysis treats a blank answer as missing and ignores unused
+  factor levels.**
+  [`read_responses()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_responses.md)
+  made blanks missing, but data built in R or passed from a host
+  application reached the runners with “” as an answer. It was a valid
+  answer in the missing data report (2 valid of ““,”a” and NA), a
+  category in Fisher’s test (N = 6 and a 3 by 2 table where 4 answered a
+  2 by 2), a fourth group in a 3-group ANOVA (df1 = 3) and
+  Kruskal-Wallis, a third group that stopped the t test, and a numeric
+  column held as text with blanks had no descriptives (valid 5, mean
+  NA). A factor with a level nobody chose stopped the cross-tab and
+  chi-square with “missing value where TRUE/FALSE needed”. Every runner,
+  the descriptives and the missing data report now start from 1
+  cleaning, the blank rule
+  [`read_responses()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_responses.md)
+  uses (empty, or only spaces) and only the factor levels that have
+  answers (P2-04, P2-05, P2-07, FR-28, FR-29, FR-31).
+- **A chi-square cross-tab names both axes by their choice labels.** The
+  table carried the codes, and only a code meaning the same in every
+  choice set of the instrument was relabelled, so a channel item coded 1
+  to 3 showed rows “1”, “2”, “3”, and a 0:1 item showed columns “No” and
+  “1”. Each axis is now labelled from its own item’s choice set, in
+  declared order, in the counts, the totals, the percentages and the
+  weighted table (FR-37).
+- **A frequency table’s percentages are of those who answered.** Its
+  Percent column was of every row, missing included, while the weighted
+  table beside it and a descriptives block’s counts were of those who
+  answered: North was 28.9% in 1 table and 36.1% in the other with every
+  weight 1, and the sentence gave N = 90 where 72 answered. Percent is
+  now the valid percent everywhere, the missing row keeps its count with
+  no percentage, and the sentence gives the number who answered and the
+  number missing: “Frequency distribution for”Region” (N = 72, 18
+  missing).” (FR-23).
+- **The intervals for Cramer’s V and eta squared can reach 0.**
+  [`sframe_cramers_v_ci()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_cramers_v_ci.md)
+  and
+  [`sframe_eta_sq_ci()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_eta_sq_ci.md)
+  were percentile bootstraps, and a resampled V or eta squared is never
+  below 0, so the interval sat above the estimate when the effect was
+  small: an exactly independent table read “V = 0.00, 95% CI \[0.05,
+  0.50\]”, and of 40 samples with no group difference the eta squared
+  interval reached 0 in none. Both are now the 2-sided noncentrality
+  intervals effectsize computes
+  (`cramers_v(adjust = FALSE, alternative = "two.sided")` and
+  `eta_squared(partial = FALSE, alternative = "two.sided")`), from the
+  chi-square and the F statistic, and match it to 6 decimals on 7 tables
+  and ANOVAs. They involve no resampling, so `R` and `seed` are kept but
+  not used, and the result carries `method`. The chi-square, phi and
+  one-way ANOVA results change their intervals. The Kruskal-Wallis eta
+  squared keeps its bootstrap interval (FR-24).
+- **Every result sentence uses the block’s alpha.** A block’s `alpha`
+  reached the independent t test and the one-way ANOVA only, and the
+  other sentences compared p with a fixed .05: with alpha .001, a
+  Pearson correlation at p = .014 read “a positive, medium significant
+  correlation”. The chi-square, Mann-Whitney, paired t, Wilcoxon,
+  Kruskal-Wallis, correlation, linear and binary logistic sentences now
+  compare p with the block’s alpha too (FR-25).
+- **A sum score with unanswered items is prorated.** With
+  `method = "sum"` and `min_valid` below the number of items, an
+  unanswered item counted as 0: a respondent answering 5 and 5 on 2 of 4
+  items scored 10, the middle of the 4 to 20 range, where the mean
+  method gave the top. The sum is now the mean of the answered items
+  times the number of items (with weights, the weighted mean times the
+  sum of the weights), 20 here. A respondent who answered every item
+  gets the plain sum, as before. The help for `min_valid` and
+  [`?score_scales`](https://mohammedalisharafuddin.github.io/surveyframe/reference/score_scales.md)
+  say so (FR-26).
+- **A chi-square block with a constant variable is refused.** A variable
+  with 1 category made a 1 by k table, which
+  [`chisq.test()`](https://rdrr.io/r/stats/chisq.test.html) tests
+  against equal shares: a goodness-of-fit test reported as
+  “chi-square(2, N = 90) = 6.67, p = .036, V = NA” and “a significant
+  association”. The block now stops, naming the variable with 1 category
+  (FR-27).
+- A chi-square with `options$simulate_p_value` on a sparse table printed
+  “chi-square(NA, N = 4)”, since a simulated p value has no degrees of
+  freedom. The line now omits them and says how the p value was found:
+  “chi-square(N = 4) = 0.00, p = .52 (simulated from 2000 tables)”, for
+  example (P2-09).
+- **[`score_scales()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/score_scales.md)
+  names the answers it cannot score.** A value outside the item’s choice
+  set was scored: 7 on a 1 to 5 item counted as 7 and a reversed 0
+  became 6. An answer that is not a number, such as “4,5”, became
+  missing without a word and counted as unanswered toward `min_valid`.
+  Both are now missing with a message naming them (FR-30).
+- **APA 7 numbers.** A p value above .999 is written p \> .999 (it was p
+  = 1.000), and one just below the alpha in force keeps the decimals
+  that show it, p = .04996 where “.050” sat beside “significant”.
+  Cramer’s V, written V by the chi-square block, drops its leading zero
+  as phi does (V = .23, 95% CI \[.07, .45\]). A value that rounds to 0
+  prints 0.00, never -0.00. A model coefficient or standard error below
+  .01 in size shows 3 decimals, so a slope of 0.004 with p \< .001 no
+  longer prints as 0.00. A table column prints whole numbers with no
+  decimals only when it holds counts or percentages: F values of 4 and 9
+  printed “4” and “9” (FR-32).
+- **A block’s bootstrap interval no longer depends on the blocks before
+  it.** The plan seed started 1 random stream for the whole plan, so
+  adding a Spearman block before a t test moved its d interval from
+  \[0.097, 1.221\] to \[0.079, 1.180\]. Each block now starts its own
+  stream from the plan seed and its id, so amending the plan leaves
+  every other block’s interval as it was. Every bootstrap interval in a
+  plan therefore differs from 0.4.2’s for the same seed (FR-33).
+- An interval prints its own level. Every bootstrap interval and the
+  Fisher z interval printed “95% CI” whatever their `conf.level`, so a
+  90% interval read as 95%. The level now travels on each interval the
+  package builds (B-04).
+- A chi-square block with a weights role tests the unweighted counts, as
+  before, and now says so in its sentence and note, naming the weight
+  whose counts are in the weighted table beside it (FR-34).
+- The ordinal logistic table gives each slope’s standard error, p value,
+  odds ratio and 95% interval. The thresholds (the cut points between
+  outcome levels, such as low\|medium) keep their estimate and standard
+  error and no longer print an odds ratio. The result’s `$coefficients`
+  gains `p` and `threshold` (FR-35).
+- A Firth logistic block reads `options$conf_level` as well as
+  `options$conf.level`. Both were accepted, and `conf_level` gave a 95%
+  interval and was not listed as ignored (FR-36).
+- **[`sframe_assumption_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_assumption_results.md)
+  says which checks ran.** Its sentence was always “Assumption checks
+  were computed.”, even when no check ran, as with an outcome and a
+  group and no `variables`. It now names the checks that ran, or says
+  none ran and which arguments each check needs, naming an `outcome`
+  given without `predictors` or a `group` without `variables`
+  (review_040 defect 3).
+- **[`render_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_results.md)
+  refuses a citation format it does not write.** Its `citation_format`
+  accepted “apa”, “ama” and “vancouver” and never used the argument: all
+  3 gave the same APA 7 document, so a methods section could name a
+  style the report never applied. “ama” and “vancouver” were never
+  applied in any release. `citation_format` now defaults to “apa” and
+  refuses anything else with a message (review_040 defect 7).
+- **9 demos’ stored results are regenerated** for the fixes above:
+  `categorical` (V’s interval and leading zero, rows in declared order),
+  `correlation_regression`, `paired`, `two_group`, `small_sample` and
+  `sem_pls` (bootstrap intervals from the per-block seed, p \> .999, the
+  Firth event), `logistic` (the binary event, the ordinal order, the
+  multinomial reference Workshops and its p values), `matrix_likert`
+  (V’s interval now reaches 0 beside p = .407) and `multi_group` (eta
+  squared’s noncentrality interval, the Kruskal-Wallis bootstrap
+  interval).
 
 ### Reports
 

@@ -1,8 +1,15 @@
-# Bootstrap confidence interval for Cramer's V
+# Confidence interval for Cramer's V
 
-Percentile bootstrap for the association strength in a contingency
-table. The table is expanded back to individual observations, which are
-resampled jointly. For a 2 by 2 table the statistic equals phi.
+The noncentrality interval for the association strength in a contingency
+table, as
+`effectsize::cramers_v(adjust = FALSE, alternative = "two.sided")`
+computes it: the 2-sided interval for the noncentrality of the
+chi-square statistic, each bound turned into V as \\\sqrt{\lambda / (n
+(k - 1))}\\, where k is the smaller of the number of rows and columns.
+For a 2 by 2 table V equals phi. The interval reaches 0 when the test is
+far from significant. Until 0.4.3 this was a percentile bootstrap, whose
+resampled V is 0 or above, so an exactly independent table had the
+interval \[0.05, 0.50\] beside V = 0 (FR-24).
 
 ## Usage
 
@@ -19,7 +26,7 @@ sframe_cramers_v_ci(tab, R = 2000, conf.level = 0.95, seed = NULL)
 
 - R:
 
-  Integer. Number of bootstrap resamples. Defaults to 2000.
+  Kept so existing calls still run. Unused since 0.4.3.
 
 - conf.level:
 
@@ -27,19 +34,19 @@ sframe_cramers_v_ci(tab, R = 2000, conf.level = 0.95, seed = NULL)
 
 - seed:
 
-  Integer or NULL. When supplied, sets the random seed.
+  Kept so existing calls still run. Unused since 0.4.3, as the interval
+  uses no resampling.
 
 ## Value
 
-A named numeric vector: `estimate`, `lower`, `upper`, with attributes
-`resamples`, `valid_resamples` and, when the interval is withheld,
-`reason`. The bounds are `NA` when fewer than 90% of resamples give a
-value, or when every resample gives the same value, since neither leaves
-a sampling distribution to read. The bounds are `NA` when the table
-holds fewer than 3 observations.
+A named numeric vector: `estimate`, `lower`, `upper`, with the
+attributes `level` and `method` (`"noncentral chi-square"`). The bounds
+are `NA` when the table holds fewer than 3 observations or has fewer
+than 2 rows or columns.
 
 ## See also
 
+[`sframe_eta_sq_ci()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_eta_sq_ci.md),
 [`sframe_bootstrap_ci()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_bootstrap_ci.md)
 
 Other Confidence interval functions:
@@ -50,11 +57,11 @@ Other Confidence interval functions:
 ## Examples
 
 ``` r
-sframe_cramers_v_ci(table(mtcars$am, mtcars$cyl), seed = 42)
+sframe_cramers_v_ci(table(mtcars$am, mtcars$cyl))
 #>  estimate     lower     upper 
-#> 0.5226355 0.2581670 0.8157627 
-#> attr(,"resamples")
-#> [1] 2000
-#> attr(,"valid_resamples")
-#> [1] 1998
+#> 0.5226355 0.1118233 0.8455313 
+#> attr(,"level")
+#> [1] 0.95
+#> attr(,"method")
+#> [1] "noncentral chi-square"
 ```

@@ -305,7 +305,7 @@ out <- tryCatch(
   ),
   finally = options(old)
 )
-#> Report rendered with the built-in HTML engine: /tmp/RtmppFIGkv/file20984a813dd3.html
+#> Report rendered with the built-in HTML engine: /tmp/RtmpEPGRzn/file1fca3998ade9.html
 file.exists(out)
 #> [1] TRUE
 # }
