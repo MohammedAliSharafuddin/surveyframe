@@ -659,8 +659,8 @@ sframe_run_crosstab <- function(data, vars, options = list()) {
         effect_symbol, effect, sframe_ci_string(v_ci))
     },
     prompt   = sprintf(
-      "The chi-square test %s a significant association between %s and %s (%s = %.2f%s, %s effect). Describe the pattern in the cross-tabulation.",
-      if (ct$p.value < sframe_alpha()) "revealed" else "found no",
+      "The chi-square test %s significant association between %s and %s (%s = %.2f%s, %s effect). Describe the pattern in the cross-tabulation.",
+      if (ct$p.value < sframe_alpha()) "revealed a" else "found no",
       sframe_text_var(vars[1]), sframe_text_var(vars[2]), effect_name, effect, sframe_ci_string(v_ci),
       sframe_effect_label(effect, "r")
     ),

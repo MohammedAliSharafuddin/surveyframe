@@ -34,3 +34,10 @@ test_that("a weighted chi-square says it tests the unweighted counts", {
   expect_equal(r$n, 40L)
   expect_false(is.null(r$weighted_table))
 })
+
+test_that("a non-significant chi-square prompt reads found no significant association", {
+  d <- data.frame(x = rep(c("a", "b"), 10), y = rep(c("c", "c", "d", "d"), 5))
+  r <- cfb_block(d, "chi_square", list(row = "x", column = "y"),
+                 sframe_item("x", "x", type = "text"), sframe_item("y", "y", type = "text"))
+  expect_match(r$prompt, "found no significant association", fixed = TRUE)
+})
