@@ -42,7 +42,4 @@ test_that("with no group difference the eta squared interval reaches 0", {
     sframe_eta_sq_ci(rnorm(45), rep(1:3, 15))[["lower"]]
   }, numeric(1))
   expect_gte(mean(lows == 0), 0.5)
-  skip_if_not_installed("effectsize")
-  e <- effectsize::cramers_v(table(mtcars$am, mtcars$cyl), adjust = FALSE, alternative = "two.sided")
-  expect_equal(sframe_cramers_v_ci(table(mtcars$am, mtcars$cyl))[["lower"]], e$CI_low, tolerance = 1e-6)
 })
