@@ -773,6 +773,12 @@ arithmetic.
   missing first, factors become text, and a declared numeric column that
   stays text gives a warning naming the column and up to 3 of its values
   (P3-05).
+* **A file of 1 column keeps an unanswered respondent.** In a CSV file
+  with a single column, a respondent who left the question blank is a blank
+  line, which was skipped, so the respondent was lost and every later row
+  moved up. Blank lines are now kept as missing answers in a 1-column file,
+  except those after the last line that holds anything. No surveyframe
+  collector writes such a file (P3-02).
 
 ## Reports
 

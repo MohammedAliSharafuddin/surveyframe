@@ -26,7 +26,9 @@
 #' data row has exactly 1 field more and that field is empty in all of them,
 #' as a trailing separator gives, the field is dropped with a message. Any
 #' other row of a different width is refused, naming the lines, since reading
-#' it would move answers into the wrong columns.
+#' it would move answers into the wrong columns. In a file of 1 column, a
+#' blank line is a respondent who left the question unanswered, so it is kept
+#' as a missing answer, except after the last line that holds anything.
 #'
 #' # Values
 #'
@@ -431,7 +433,18 @@ sframe_read_csv_records <- function(x, sep) {
     utils::read.csv(x, sep = sep, stringsAsFactors = FALSE, check.names = FALSE,
                     colClasses = "character", na.strings = character(0), ...)
   }
-  if (!any(wrong)) return(read_text())
+  if (!any(wrong)) {
+    if (!identical(header, 1L)) return(read_text())
+    # In a file of 1 column, an unanswered respondent's row is a blank line,
+    # which read.csv() skipped, so the respondent was lost (P3-02). Blank
+    # lines are kept, except those after the last line holding anything.
+    data <- read_text(blank.lines.skip = FALSE)
+    trailing <- length(widths) - max(which(!is.na(widths) & widths > 0))
+    if (trailing > 0 && nrow(data) >= trailing) {
+      data <- data[seq_len(nrow(data) - trailing), , drop = FALSE]
+    }
+    return(data)
+  }
   if (all(widths[rows] == header + 1L)) {
     raw <- utils::read.table(x, sep = sep, quote = "\"", header = FALSE,
                              comment.char = "", colClasses = "character",
