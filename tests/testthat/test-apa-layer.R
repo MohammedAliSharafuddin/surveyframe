@@ -44,7 +44,8 @@ test_that("table cells: p by its rules, bounded values without a zero, blanks fo
                   p = c(.004, .00001, 1), r = c(.53, -.2, NA), n = c(10L, 20L, 30L),
                   stringsAsFactors = FALSE)
   out <- sframe_apa_cells(x)
-  expect_identical(out$p, c(".004", "<.001", "1.000"))
+  # p = 1 is >.999 as APA 7 writes it (FR-32, CF-B), "1.000" until then.
+  expect_identical(out$p, c(".004", "<.001", ">.999"))
   expect_identical(out$r, c(".53", "-.20", ""))
   expect_identical(out$t, c("2.35", "10.00", "1.00"))
   expect_identical(out$n, c("10", "20", "30"))

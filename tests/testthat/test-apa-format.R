@@ -16,8 +16,9 @@ test_that("31: p has no leading zero, and stays bounded", {
   # the small-p guard is unchanged, and the review calls it sound
   expect_equal(sframe_p_string(0.0001), "< .001")
   expect_equal(sframe_p_string(NA_real_), "= NA")
-  # 1 is a legal p, and has no leading zero to drop
-  expect_equal(sframe_p_string(1), "= 1.000")
+  # 1 is a legal p, written > .999 as APA 7 asks (FR-32, CF-B). It was
+  # "= 1.000" until then.
+  expect_equal(sframe_p_string(1), "> .999")
 })
 
 test_that("31: an interval says what level it is", {

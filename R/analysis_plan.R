@@ -295,7 +295,24 @@ sframe_effect_label <- function(d, type = "d") {
 sframe_p_string <- function(p) {
   if (is.na(p)) return("= NA")
   if (p < .001) return("< .001")
-  sprintf("= %s", sub("^0\\.", ".", formatC(p, digits = 3, format = "f")))
+  # APA 7: above .999 is written > .999, since "= 1.000" claims certainty
+  # (FR-32).
+  if (p > .999) return("> .999")
+  sprintf("= %s", sframe_p_digits(p))
+}
+
+# A p value's digits with no leading zero: 3 decimals, or as many as it takes
+# (up to 6) to stay below the alpha in force when 3 would round up to it, so
+# .04996 beside "significant" no longer reads .050 (FR-32).
+sframe_p_digits <- function(p, alpha = sframe_alpha()) {
+  out <- formatC(p, digits = 3, format = "f")
+  if (is.finite(p) && p < alpha && as.numeric(out) >= alpha) {
+    for (d in 4:6) {
+      out <- formatC(p, digits = d, format = "f")
+      if (as.numeric(out) < alpha) break
+    }
+  }
+  sub("^0\\.", ".", out)
 }
 
 # ---------------------------------------------------------------------------
@@ -1526,8 +1543,18 @@ sframe_result_supplement <- function(result) {
 # (frequency, crosstab) keep it.
 sframe_result_table <- function(result) {
   if (!is.null(result$table) || !is.null(result$error)) return(result$table)
+  # A value that rounds to 0 prints as 0.00, not -0.00, and a model
+  # coefficient below .01 in size gets 3 decimals, so a slope of 0.004 with
+  # p < .001 no longer prints as 0.00 (FR-32).
   fmt <- function(x, d = 2) {
-    ifelse(is.na(x), "", formatC(as.numeric(x), digits = d, format = "f"))
+    x <- as.numeric(x)
+    s <- formatC(x, digits = d, format = "f")
+    s <- sub("^-(0\\.0+)$", "\\1", s)
+    ifelse(is.na(x), "", s)
+  }
+  coef_fmt <- function(x) {
+    x <- as.numeric(x)
+    ifelse(!is.na(x) & x != 0 & abs(x) < .01, fmt(x, 3), fmt(x))
   }
   test <- result$test %||% ""
   switch(
@@ -1553,8 +1580,8 @@ sframe_result_table <- function(result) {
       if (!is.data.frame(co)) return(NULL)
       data.frame(
         Term = rownames(co),
-        Estimate = fmt(co[[1]]),
-        `Std. error` = fmt(co[[2]]),
+        Estimate = coef_fmt(co[[1]]),
+        `Std. error` = coef_fmt(co[[2]]),
         t = fmt(co[[3]]),
         p = vapply(co[[4]], sframe_p_string, character(1)),
         check.names = FALSE, stringsAsFactors = FALSE, row.names = NULL
@@ -1622,7 +1649,7 @@ sframe_result_table <- function(result) {
       if (!is.data.frame(co)) return(NULL)
       data.frame(
         Term = rownames(co),
-        Estimate = fmt(co[["Estimate"]]),
+        Estimate = coef_fmt(co[["Estimate"]]),
         `Odds ratio` = fmt(co[["odds_ratio"]]),
         p = vapply(co[["Pr(>|z|)"]], sframe_p_string, character(1)),
         check.names = FALSE, stringsAsFactors = FALSE, row.names = NULL
@@ -1633,7 +1660,7 @@ sframe_result_table <- function(result) {
       if (!is.data.frame(co)) return(NULL)
       data.frame(
         Term = rownames(co),
-        Estimate = fmt(co[["Estimate"]]),
+        Estimate = coef_fmt(co[["Estimate"]]),
         `Odds ratio` = fmt(co[["odds_ratio"]]),
         `CI low` = fmt(co[["or_ci_low"]]),
         `CI high` = fmt(co[["or_ci_high"]]),
@@ -1665,8 +1692,8 @@ sframe_result_table <- function(result) {
       data.frame(
         Outcome = paste(cats[g$i], "vs", ref),
         Term = terms[g$j],
-        b = fmt(b),
-        SE = fmt(s),
+        b = coef_fmt(b),
+        SE = coef_fmt(s),
         z = fmt(b / s),
         # Numeric, so the APA layer prints it as .032 or <.001 (CX-15).
         p = 2 * stats::pnorm(-abs(b / s)),
@@ -1681,8 +1708,8 @@ sframe_result_table <- function(result) {
       if (!is.data.frame(co)) return(NULL)
       data.frame(
         Term = rownames(co),
-        Estimate = fmt(co[[1]]),
-        `Std. error` = fmt(co[[2]]),
+        Estimate = coef_fmt(co[[1]]),
+        `Std. error` = coef_fmt(co[[2]]),
         t = fmt(co[[3]]),
         p = vapply(co[[4]], sframe_p_string, character(1)),
         check.names = FALSE, stringsAsFactors = FALSE, row.names = NULL

@@ -879,6 +879,15 @@ arithmetic.
   reversed 0 became 6. An answer that is not a number, such as "4,5",
   became missing without a word and counted as unanswered toward
   `min_valid`. Both are now missing with a message naming them (FR-30).
+* **APA 7 numbers.** A p value above .999 is written p > .999 (it was p =
+  1.000), and one just below the alpha in force keeps the decimals that
+  show it, p = .04996 where ".050" sat beside "significant". Cramer's V,
+  written V by the chi-square block, drops its leading zero as phi does (V
+  = .23, 95% CI [.07, .45]). A value that rounds to 0 prints 0.00, never
+  -0.00. A model coefficient or standard error below .01 in size shows 3
+  decimals, so a slope of 0.004 with p < .001 no longer prints as 0.00. A
+  table column prints whole numbers with no decimals only when it holds
+  counts or percentages: F values of 4 and 9 printed "4" and "9" (FR-32).
 
 ## Reports
 

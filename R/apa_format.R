@@ -11,7 +11,11 @@
   "p", "r", "r_s", "partial r", "R\u00b2", "McFadden R\u00b2",
   "tau", "\u03c4", "phi", "\u03c6", "Cramer's V", "Cram\u00e9r's V",
   "\u03b7\u00b2", "partial \u03b7\u00b2", "\u03c9\u00b2", "\u03b1", "\u03c9",
-  "Kendall's W"
+  "Kendall's W",
+  # Cramer's V as the chi-square runner writes it (FR-32). The Wilcoxon
+  # signed-rank V is a rank sum printed with no decimals, so it never holds
+  # the "0." this drops.
+  "V"
 )
 
 .sframe_apa_bounded_re <- local({
@@ -32,6 +36,8 @@ sframe_apa_text <- function(x) {
   regmatches(y, m) <- lapply(regmatches(y, m), function(s) {
     gsub("(?<![0-9.])0\\.(?=[0-9])", ".", s, perl = TRUE)
   })
+  # A value that rounds to 0 is 0.00, never -0.00 (FR-32).
+  y <- gsub("(?<![0-9.])-((?:0)?\\.0+|0)(?![0-9.])", "\\1", y, perl = TRUE)
   x[ok] <- y
   x
 }
@@ -53,22 +59,36 @@ sframe_drop_old_share_cols <- function(x) {
   x
 }
 
+# Columns of counts, whose whole values print with no decimals, and percent
+# columns, whose whole values did so before and which Codex P1-01 settled as
+# "100".
+.sframe_apa_count_col_re <- paste0(
+  "^(n|n[ _]?[0-9]|df|df[0-9]|frequency|count|k|items|rank|row|",
+  "respondents|cases|.*_n|n_.*|.*[ _]count|weighted_frequency|",
+  "percent|pct|.*_percent|.*_pct)$")
+
 .sframe_apa_p_col_re <- "^p$|^p\\.value$|^p_value$|^Pr\\(>|^p[._ ]adj"
 
 # A p value for a table cell: 3 decimals with no leading zero, <.001 below
 # that, blank when missing.
 sframe_p_cell <- function(p) {
-  s <- sub("^0\\.", ".", formatC(p, digits = 3, format = "f"))
-  ifelse(is.na(p), "", ifelse(p < .001, "<.001", s))
+  s <- vapply(p, function(v) if (is.na(v)) "" else sframe_p_digits(v), character(1))
+  ifelse(is.na(p), "", ifelse(p < .001, "<.001", ifelse(p > .999, ">.999", s)))
 }
 
 # A numeric column as text: whole numbers as they are, others to `digits`
 # decimals, the leading zero dropped where the column cannot exceed 1, and a
 # missing value left blank.
-sframe_apa_number <- function(v, digits = 2, bounded = FALSE) {
-  whole <- all(is.na(v) | !is.finite(v) | v == round(v))
+sframe_apa_number <- function(v, digits = 2, bounded = FALSE, count = NULL) {
+  # Whole numbers print with no decimals only in a column of counts: an
+  # integer column or one named as a count. F values of 4 and 9 printed as
+  # "4" and "9", and the same column with 1 fractional value as "4.00"
+  # (FR-32).
+  if (is.null(count)) count <- is.integer(v)
+  whole <- count && all(is.na(v) | !is.finite(v) | v == round(v))
   s <- if (whole) format(v, scientific = FALSE, trim = TRUE)
        else formatC(v, digits = digits, format = "f")
+  s <- sub("^-(0\\.0+)$", "\\1", s)
   if (bounded) s <- sub("^(-?)0\\.", "\\1.", s)
   s[is.na(v)] <- ""
   s
@@ -80,8 +100,10 @@ sframe_apa_number <- function(v, digits = 2, bounded = FALSE) {
 #' [sframe_format_result()] print them, so a table shows the same numbers wherever it
 #' appears. A p value column shows 3 decimals with no leading zero, or
 #' `<.001`. A column that cannot exceed 1, such as `r`, `tau` or `alpha`, drops
-#' its leading zero. Other numbers show 2 decimals, whole numbers none. A
-#' missing value is a blank cell.
+#' its leading zero. Other numbers show 2 decimals, and whole numbers in an
+#' integer column, a column of counts (n, df, Frequency) or a percent column
+#' none. A p value
+#' above .999 shows `>.999`. A missing value is a blank cell.
 #'
 #' This is exported because the Quarto report template runs in a separate R
 #' session against the installed package.
@@ -103,10 +125,12 @@ sframe_apa_cells <- function(x, digits = 2) {
   nm <- colnames(x)
   p_col <- grepl(.sframe_apa_p_col_re, nm, ignore.case = TRUE)
   bounded <- tolower(nm) %in% .sframe_apa_bounded_cols | grepl("_prop$", nm)
+  count_col <- grepl(.sframe_apa_count_col_re, nm, ignore.case = TRUE)
   for (j in seq_along(x)) {
     v <- x[[j]]
     x[[j]] <- if (is.numeric(v)) {
-      if (p_col[j]) sframe_p_cell(v) else sframe_apa_number(v, digits, bounded[j])
+      if (p_col[j]) sframe_p_cell(v) else sframe_apa_number(v, digits, bounded[j],
+                                                           count = is.integer(v) || count_col[j])
     } else {
       v <- as.character(v)
       v[is.na(v) | v == "NA"] <- ""
