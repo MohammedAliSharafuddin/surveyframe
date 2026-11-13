@@ -20,19 +20,58 @@ sframe_reads_as_numbers <- function(x) {
   all(is.na(labels) | !is.na(as_num))
 }
 
-# Regression predictors: numeric columns, and text or factor columns whose
-# values all read as numbers, enter as numbers. Any other text or factor column
-# enters as a categorical predictor, where it had been forced to numbers.
-sframe_predictor_frame <- function(data, predictors) {
+# Regression predictors: a single_choice or multiple_choice item enters as a
+# category, whatever its codes look like, since a nominal code has no size
+# (FR-20: region coded 1, 2, 3 entered as 1 slope, as if East were 3 times
+# North). Other numeric columns, and text or factor columns whose values all
+# read as numbers, enter as numbers. Any other text or factor column enters
+# as a category. A category's levels follow sframe_category_levels(), so its
+# reference is the first declared code with answers, in every locale.
+sframe_predictor_frame <- function(data, predictors,
+                                   instrument = .sframe_text_label_env$instrument) {
   out <- lapply(predictors, function(col) {
     x <- data[[col]]
+    if (identical(sframe_choice_column_kind(instrument, col), "single")) {
+      return(sframe_category_factor(x, col, instrument = instrument))
+    }
     if (is.numeric(x)) return(x)
     labels <- as.character(x)
     as_num <- suppressWarnings(as.numeric(labels))
     if (all(is.na(labels) | !is.na(as_num))) return(as_num)
-    factor(labels)
+    sframe_category_factor(x, col, instrument = instrument)
   })
   stats::setNames(as.data.frame(out, stringsAsFactors = FALSE), predictors)
+}
+
+# The levels of each categorical predictor in a model frame, after unused
+# levels are dropped, as list(column = levels). The first level is the
+# reference the other levels' terms are compared with.
+sframe_predictor_coding <- function(df, predictors) {
+  cats <- predictors[vapply(predictors, function(p) is.factor(df[[p]]), logical(1))]
+  stats::setNames(lapply(cats, function(p) levels(df[[p]])), cats)
+}
+
+# 1 sentence per categorical predictor naming its reference category, for a
+# model's result text. Empty when no predictor is categorical.
+sframe_coding_sentence <- function(coding) {
+  if (!length(coding)) return("")
+  parts <- vapply(names(coding), function(p) {
+    lev <- coding[[p]]
+    k <- length(lev) - 1L
+    sprintf("%s enters as %s against the reference category %s.",
+            sframe_text_var(p), sframe_count_noun(k, "indicator term"),
+            sframe_text_value(p, lev[1]))
+  }, character(1))
+  paste(parts, collapse = " ")
+}
+
+# A sentence and the coding note after it, with 1 space between.
+sframe_with_coding <- function(text, coding) {
+  note <- sframe_coding_sentence(coding)
+  if (!nzchar(note)) return(text)
+  text <- sub("\\s+$", "", text)
+  if (!grepl("[.!?]$", text)) text <- paste0(text, ".")
+  paste(text, note)
 }
 
 # The scales a psychometric block selects: scale ids named in its roles, and
@@ -1664,9 +1703,10 @@ sframe_run_ancova <- function(data, roles) {
   }
   df <- data[, vars, drop = FALSE]
   df[[outcome]] <- sframe_num(df[[outcome]])
-  df[[group]] <- as.factor(df[[group]])
+  df[[group]] <- sframe_category_factor(df[[group]], group)
   df[covariates] <- sframe_predictor_frame(df, covariates)
-  df <- df[stats::complete.cases(df), , drop = FALSE]
+  df <- droplevels(df[stats::complete.cases(df), , drop = FALSE])
+  coding <- sframe_predictor_coding(df, covariates)
   formula <- stats::as.formula(paste(outcome, "~", group, "+", paste(covariates, collapse = " + ")))
   fit <- tryCatch(stats::lm(formula, data = df), error = function(e) e)
   if (inherits(fit, "error")) {
@@ -1718,9 +1758,10 @@ sframe_run_ancova <- function(data, roles) {
     ss_type = "adjusted (each term tested after all others)",
     slope_warning = slope_warning,
     slope_model_summary = if (!is.null(slope_fit)) utils::capture.output(summary(slope_fit)) else NULL,
-    apa = sprintf("Adjusted for %s, the group effect was F(%d, %d) = %.2f, p %s.",
+    predictor_coding = coding,
+    apa = sframe_with_coding(sprintf("Adjusted for %s, the group effect was F(%d, %d) = %.2f, p %s.",
                   paste(sframe_text_var(covariates), collapse = " and "), as.integer(g$df), as.integer(res_df),
-                  g$F, sframe_p_string(g$p)),
+                  g$F, sframe_p_string(g$p)), coding),
     prompt = "Report adjusted group effects and state whether homogeneity of regression slopes was checked."
   )
 }
@@ -1754,6 +1795,8 @@ sframe_run_ordinal_logistic <- function(data, roles, options = list()) {
   # alphabet: ordered() of low, medium, high gave high < low < medium and
   # reversed the slope's sign (FR-19).
   df[[outcome]] <- sframe_category_factor(df[[outcome]], outcome, ordered = TRUE)
+  df <- droplevels(df)
+  coding <- sframe_predictor_coding(df, predictors)
   if (nlevels(df[[outcome]]) < 3) {
     return(list(test = "regression_logistic_ordinal",
                 error = "Ordinal logistic regression requires an ordered outcome with at least three levels."))
@@ -1788,10 +1831,11 @@ sframe_run_ordinal_logistic <- function(data, roles, options = list()) {
     AIC = stats::AIC(fit),
     pseudo_r2 = pseudo_r2,
     outcome_levels = levels(df[[outcome]]),
-    apa = sprintf("Ordinal logistic regression of %s, ordered %s, was estimated with %d complete cases.",
+    predictor_coding = coding,
+    apa = sframe_with_coding(sprintf("Ordinal logistic regression of %s, ordered %s, was estimated with %d complete cases.",
                   sframe_text_var(outcome),
                   paste(sframe_text_value(outcome, levels(df[[outcome]])), collapse = " < "),
-                  nrow(df)),
+                  nrow(df)), coding),
     prompt = "Report odds ratios, confidence intervals where available, model fit, and the reference ordering of the outcome."
   )
 }
@@ -1825,8 +1869,9 @@ sframe_run_firth_logistic <- function(data, roles, options = list()) {
                                "' must have exactly two non-missing levels.")))
   }
   df[[outcome]] <- as.integer(outcome_fac) - 1L
-  for (p in predictors) df[[p]] <- sframe_num(df[[p]])
-  df <- df[stats::complete.cases(df), , drop = FALSE]
+  df[predictors] <- sframe_predictor_frame(df, predictors)
+  df <- droplevels(df[stats::complete.cases(df), , drop = FALSE])
+  coding <- sframe_predictor_coding(df, predictors)
   if (nrow(df) < 3) {
     return(list(test = "firth_logistic",
                 error = "Fewer than 3 complete observations available."))
@@ -1879,10 +1924,11 @@ sframe_run_firth_logistic <- function(data, roles, options = list()) {
                      upper = as.numeric(fit$ci.upper)),
     p_values = stats::setNames(as.numeric(fit$prob), terms),
     likelihood_ratio = lr,
-    apa = sprintf(
+    predictor_coding = coding,
+    apa = sframe_with_coding(sprintf(
       "Firth logistic regression (n = %d), likelihood ratio = %.2f",
       nrow(df), lr
-    ),
+    ), coding),
     prompt = "Report penalised odds ratios with their profile-likelihood confidence intervals, and state that Firth penalisation was used because of the small sample or separation."
   )
 }
@@ -1901,7 +1947,8 @@ sframe_run_multinomial_logistic <- function(data, roles, options = list()) {
   df <- data[, vars, drop = FALSE]
   df[[outcome]] <- as.factor(df[[outcome]])
   df[predictors] <- sframe_predictor_frame(df, predictors)
-  df <- df[stats::complete.cases(df), , drop = FALSE]
+  df <- droplevels(df[stats::complete.cases(df), , drop = FALSE])
+  coding <- sframe_predictor_coding(df, predictors)
   if (nlevels(df[[outcome]]) < 3) {
     return(list(test = "regression_logistic_multinomial",
                 error = "Multinomial logistic regression requires an outcome with at least three categories."))
@@ -1949,7 +1996,8 @@ sframe_run_multinomial_logistic <- function(data, roles, options = list()) {
     AIC = stats::AIC(fit),
     pseudo_r2 = pseudo_r2,
     classification_table = as.data.frame.matrix(class_table),
-    apa = sprintf("Multinomial logistic regression was estimated with %d complete cases, against the reference category %s.", nrow(df), sframe_text_value(outcome, reference)),
+    predictor_coding = coding,
+    apa = sframe_with_coding(sprintf("Multinomial logistic regression was estimated with %d complete cases, against the reference category %s.", nrow(df), sframe_text_value(outcome, reference)), coding),
     prompt = "Report the reference category, odds ratios, model fit, and classification table where meaningful."
   )
 }
