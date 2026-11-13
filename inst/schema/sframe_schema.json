@@ -28,10 +28,14 @@
     "hash": {
       "type": "object",
       "required": ["algo", "value"],
-      "description": "SHA-256 over the canonical serialisation with `hash.value` blanked. Canonicalisation sorts object keys alphabetically and recurses. A reference JavaScript implementation is sframeCanon() in surveyframe's survey_builder.html.",
+      "description": "SHA-256, hex-encoded, over the whole file with `hash.value` set to the empty string, serialised in the canonical form that `canonical` names. With `canonical` = \"rfc8785\" (surveyframe 0.4.3 and later) that form is RFC 8785, the JSON Canonicalization Scheme: object keys sorted by UTF-16 code units at every depth, numbers in their shortest round-trip form, strings minimally escaped, no whitespace, and the UTF-8 bytes of that text are hashed. `canonical` sits inside the hashed content, so changing it breaks the hash. A file without `canonical` was written before surveyframe 0.4.3, and its hash was taken with keys sorted in the writing session's locale order, or, before canonical serialisation, over jsonlite's default output in file order. Readers may check such a hash in those forms, and should ask for the file to be saved again. Reference implementations: sframe_hash_value() in surveyframe and sframeCanon() in its survey_builder.html.",
       "properties": {
         "algo": { "const": "sha256" },
-        "value": { "type": "string", "pattern": "^[0-9a-f]{64}$|^$" }
+        "value": { "type": "string", "pattern": "^[0-9a-f]{64}$|^$" },
+        "canonical": {
+          "const": "rfc8785",
+          "description": "The canonical form the hash was taken in. Optional so files written before surveyframe 0.4.3 still conform. A reader refuses any other value, since it cannot check a hash taken in a form it does not know."
+        }
       }
     },
     "version": { "type": ["string", "null"], "description": "The instrument's version, not the format's." },
@@ -137,7 +141,7 @@
     },
     "amendments": {
       "type": "array",
-      "description": "Optional disclosed-revision log (surveyframe 0.4.0), appended by amend_sframe(). Present only when there is at least one entry. previous_hash and new_hash are SHA-256 content hashes over every top-level field except hash, amendments and references.",
+      "description": "Optional disclosed-revision log (surveyframe 0.4.0), appended by amend_sframe(). Present only when there is at least one entry. previous_hash and new_hash are SHA-256 content hashes over every top-level field except hash, amendments and references, taken in the same canonical form as `hash` (RFC 8785 from surveyframe 0.4.3, the locale-sorted form before it).",
       "items": {
         "type": "object",
         "required": ["timestamp", "reason_code", "reason_text", "tier", "signoff", "previous_hash", "new_hash"],
