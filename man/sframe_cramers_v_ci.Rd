@@ -9,12 +9,12 @@ sframe_cramers_v_ci(tab, R = 2000, conf.level = 0.95, seed = NULL)
 \arguments{
 \item{tab}{A contingency table (from \code{\link[=table]{table()}}) or a matrix of counts.}
 
-\item{R}{Not used since 0.4.3, kept so existing calls still run.}
+\item{R}{Kept so existing calls still run. Unused since 0.4.3.}
 
 \item{conf.level}{Confidence level. Defaults to 0.95.}
 
-\item{seed}{Not used since 0.4.3, since the interval involves no
-resampling.}
+\item{seed}{Kept so existing calls still run. Unused since 0.4.3, as
+the interval uses no resampling.}
 }
 \value{
 A named numeric vector: \code{estimate}, \code{lower}, \code{upper}, with the
@@ -29,7 +29,7 @@ the chi-square statistic, each bound turned into V as
 \eqn{\sqrt{\lambda / (n (k - 1))}}, where k is the smaller of the number
 of rows and columns. For a 2 by 2 table V equals phi. The interval reaches
 0 when the test is far from significant. Until 0.4.3 this was a percentile
-bootstrap, whose resampled V is never below 0, so an exactly independent
+bootstrap, whose resampled V is 0 or above, so an exactly independent
 table had the interval [0.05, 0.50] beside V = 0 (FR-24).
 }
 \examples{
