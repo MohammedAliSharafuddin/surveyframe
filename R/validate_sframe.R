@@ -361,8 +361,10 @@ sframe_validation_checks <- c(
 #' These are reported as notes, which [sframe_notes()] returns and which leave
 #' the instrument valid, since SurveyBuilder saved them before 0.4.3: branching
 #' rules that depend on each other in a cycle, a check whose pass values are
-#' not codes of its item's choice set, and an item whose `scale_id` names a
-#' scale that does not list it.
+#' not codes of its item's choice set, an item whose `scale_id` names a
+#' scale that does not list it, and a scale item's choice set with numeric
+#' codes outside 1 evenly spaced run (1 to 5 and 99 for "do not know"), which
+#' [score_scales()] reads as missing.
 #' - Analysis plan roles referencing missing variables or models
 #' - Model specifications referencing missing indicators or constructs
 #'
@@ -700,6 +702,32 @@ validate_sframe <- function(instrument, strict = TRUE) {
         "Item '", item$id, "' names scale '", item$scale_id, "' as its scale_id, ",
         "but the scale does not list it, so the scale does not score it. Add '",
         item$id, "' to the scale's items, or clear the item's scale_id."))
+    }
+  }
+
+  # A scale item's choice set with codes outside 1 evenly spaced run, such as
+  # 1 to 5 and 99 for "do not know" (FR-18). score_scales() scores the run
+  # and reads the other codes as missing, so this is a note: the instrument
+  # is valid, and the author learns which codes do not count.
+  noted_sets <- character(0)
+  for (scale in instrument$scales) {
+    for (item in instrument$items) {
+      if (!item$id %in% scale$items) next
+      cs <- sframe_item_choice_set(instrument, item)
+      if (is.null(cs) || cs$id %in% noted_sets) next
+      declared <- suppressWarnings(as.numeric(as.character(cs$values)))
+      declared <- unique(declared[!is.na(declared)])
+      keep <- sframe_score_codes(cs$values)
+      other <- setdiff(declared, keep)
+      if (!length(other)) next
+      noted_sets <- c(noted_sets, cs$id)
+      log$notes <- c(log$notes, paste0(
+        "Choice set '", cs$id, "', used by scale '", scale$id, "', has ",
+        sframe_count_noun(length(other), "code"), " ", paste(format(other), collapse = ", "),
+        " outside its run of scores ", format(min(keep)), " to ", format(max(keep)),
+        ". score_scales() reads ", if (length(other) == 1) "it" else "them",
+        " as missing and reverses items on ", format(min(keep)), " to ",
+        format(max(keep)), "."))
     }
   }
 

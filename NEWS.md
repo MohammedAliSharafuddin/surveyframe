@@ -734,6 +734,17 @@ arithmetic.
   reference category and the order of a t test's or Mann-Whitney test's 2
   groups with no choice set follow the same locale-free order (FR-21,
   P2-08).
+* **A "do not know" code in a scale's choice set is not scored.** Every
+  numeric code was a score, so a set of 1 to 5 with 99 for "do not know"
+  gave the item bounds 1 to 99: a reversed 1 became 99 and a respondent
+  answering 4, 4, 2, 1 scored 27.25 where 3.75 is right, with nobody
+  choosing 99. A 99 that was chosen entered the mean, and alpha fell from
+  .78 to .04 on Fable's data. `score_scales()`, the reliability and item
+  results now score the longest run of codes at 1 even step and read other
+  codes as missing, with a message, and `validate_sframe()` notes such a
+  set, naming its codes. See "Codes that are not scores" in
+  `?score_scales`. A declared "not a score" code in the schema is planned
+  for 0.4.4 (FR-18).
 
 ## Reports
 
