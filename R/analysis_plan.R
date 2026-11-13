@@ -339,6 +339,7 @@ sframe_apply_weights <- function(data, weights) {
 # label from the item's own choice set and keeps the stored code in `Code`,
 # and a declared choice nobody picked appears with a count of 0.
 sframe_run_frequency <- function(data, vars, weights = NULL, instrument = NULL) {
+  data <- sframe_analysis_frame(data)
   vars <- unique(as.character(vars[!is.na(vars) & nzchar(vars)]))
   if (length(vars) == 0) {
     return(list(test = "frequency",
@@ -491,6 +492,7 @@ sframe_crosstab_margins <- function(tbl, row_var, percent = NULL) {
 }
 
 sframe_run_crosstab <- function(data, vars, options = list()) {
+  data <- sframe_analysis_frame(data)
   weights <- options$weights %||% NULL
   percent <- options$percent %||% NULL
   if (!is.null(percent) && (!is.character(percent) || length(percent) != 1 ||
@@ -585,6 +587,7 @@ sframe_run_crosstab <- function(data, vars, options = list()) {
 }
 
 sframe_run_mann_whitney <- function(data, vars, instrument = NULL) {
+  data <- sframe_analysis_frame(data)
   group_col <- vars[1]
   outcome_col <- vars[2]
   groups <- sframe_group_order(data[[group_col]], instrument, group_col)
@@ -644,6 +647,7 @@ sframe_run_mann_whitney <- function(data, vars, instrument = NULL) {
 }
 
 sframe_run_t_test <- function(data, vars, options = list(), instrument = NULL) {
+  data <- sframe_analysis_frame(data)
   alpha <- options$alpha %||% 0.05
   var_equal <- isTRUE(options$var_equal)
   group_col <- vars[1]
@@ -694,6 +698,7 @@ sframe_run_t_test <- function(data, vars, options = list(), instrument = NULL) {
 }
 
 sframe_run_anova_one <- function(data, vars, options = list()) {
+  data <- sframe_analysis_frame(data)
   alpha <- options$alpha %||% 0.05
   group_col <- vars[1]
   outcome_col <- vars[2]
@@ -902,6 +907,7 @@ sframe_run_wilcoxon_pair <- function(data, vars) {
 }
 
 sframe_run_kruskal <- function(data, vars) {
+  data <- sframe_analysis_frame(data)
   group_col <- vars[1]
   outcome_col <- vars[2]
   outcome <- sframe_num((data[[outcome_col]]))
@@ -994,6 +1000,7 @@ sframe_run_correlation <- function(data, vars, method = "pearson") {
 }
 
 sframe_run_regression <- function(data, vars) {
+  data <- sframe_analysis_frame(data)
   outcome <- sframe_num((data[[vars[length(vars)]]]))
   predictors <- vars[-length(vars)]
   pred_data <- sframe_predictor_frame(data, predictors)
@@ -1051,6 +1058,7 @@ sframe_run_regression <- function(data, vars) {
 }
 
 sframe_run_logistic_binary <- function(data, vars, options = list()) {
+  data <- sframe_analysis_frame(data)
   outcome_col <- vars[length(vars)]
   predictors <- vars[-length(vars)]
 
@@ -1784,6 +1792,7 @@ sframe_condition_error <- function(e, data, roles, vars) {
 
 sframe_run_one_block <- function(block, data, instrument, plots = FALSE,
                                  plot_palette = "web") {
+  data <- sframe_analysis_frame(data)
   test <- sframe_analysis_method(block)
   roles <- sframe_analysis_roles(block)
   vars <- sframe_vars_for_method(test, roles, block)

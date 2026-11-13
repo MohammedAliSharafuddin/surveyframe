@@ -795,6 +795,20 @@ arithmetic.
   the numeric round trip, so such codes take the text route already there:
   labelled text in a .sav, positions 1, 2, 3 with their labels in a .dta
   (P3-03).
+* **Every analysis treats a blank answer as missing and ignores unused
+  factor levels.** `read_responses()` made blanks missing, but data built in
+  R or passed from a host application reached the runners with "" as an
+  answer. It was a valid answer in the missing data report (2 valid of
+  "", "a" and NA), a category in Fisher's test (N = 6 and a 3 by 2 table
+  where 4 answered a 2 by 2), a fourth group in a 3-group ANOVA (df1 = 3)
+  and Kruskal-Wallis, a third group that stopped the t test, and a numeric
+  column held as text with blanks had no descriptives (valid 5, mean NA).
+  A factor with a level nobody chose stopped the cross-tab and chi-square
+  with "missing value where TRUE/FALSE needed". Every runner, the
+  descriptives and the missing data report now start from 1 cleaning, the
+  blank rule `read_responses()` uses (empty, or only spaces) and only the
+  factor levels that have answers (P2-04, P2-05, P2-07, FR-28, FR-29,
+  FR-31).
 
 ## Reports
 
