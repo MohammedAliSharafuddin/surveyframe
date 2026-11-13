@@ -165,7 +165,7 @@ p1_quarto_file <- function(to) {
   skip_on_cran()
   skip_if_not_slow()
   skip_if(!nzchar(Sys.which("quarto")), "Quarto is not installed")
-  if (to %in% c("typst", "latex")) skip_if(!nzchar(Sys.which("pdftotext")), "pdftotext is not installed")
+  if (to %in% c("typst", "latex")) p1_skip_unless_poppler()
   if (to == "latex") skip_if(!surveyframe:::sframe_latex_available(), "LaTeX is not installed")
   if (!is.null(p1_files[[to]])) return(p1_files[[to]])
   old <- options(surveyframe.use_quarto = TRUE,
@@ -187,8 +187,23 @@ p1_quarto_file <- function(to) {
 # on such a path in CI, so both paths are normalised with / and the output
 # goes to a file. A missing pdftotext skips with that reason, and any other
 # failure stops the test with the exit status.
-p1_pdftotext <- function(path, bbox = FALSE) {
+#
+# The PDF checks read poppler's pdftotext: its -bbox word boxes and its
+# reading order. The Windows CI runner's pdftotext is xpdf 4.06, which has
+# no -bbox (exit 99) and orders text differently ("Table 3" read apart from
+# its title), so on any pdftotext that is not poppler's the PDF checks skip
+# with that reason. Poppler prints "Poppler" in its -v output, xpdf does not.
+p1_skip_unless_poppler <- function() {
   skip_if(!nzchar(Sys.which("pdftotext")), "pdftotext is not installed")
+  if (is.null(p1_files$poppler)) {
+    v <- suppressWarnings(system2("pdftotext", "-v", stdout = TRUE, stderr = TRUE))
+    p1_files$poppler <- any(grepl("poppler", v, ignore.case = TRUE))
+  }
+  skip_if(!p1_files$poppler, "pdftotext is not poppler's (xpdf has no -bbox and reads in another order)")
+}
+
+p1_pdftotext <- function(path, bbox = FALSE) {
+  p1_skip_unless_poppler()
   out <- tempfile(fileext = if (bbox) ".html" else ".txt")
   file.create(out)
   args <- c(if (bbox) "-bbox", "-enc", "UTF-8",
