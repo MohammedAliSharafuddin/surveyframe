@@ -21,19 +21,43 @@ sframe_scale_reverse_ids <- function(instrument, scale) {
   unique(c(declared, item_ids[item_level]))
 }
 
+# The codes of a choice set that are scores: the longest run of its numeric
+# codes at 1 even step (the smallest gap between them), the first where 2 are
+# as long. 1 to 5 with 99 for "do not know" scores 1 to 5, 0 to 100 in steps
+# of 25 scores all 5. A code outside the run is not a score: score_scales()
+# reads it as missing and reversal ignores it. Reading every numeric code as a
+# score made the bounds 1 to 99, so a reversed 1 became 99 (FR-18). NULL when
+# the set has no numeric code.
+sframe_score_codes <- function(values) {
+  v <- suppressWarnings(as.numeric(as.character(values)))
+  v <- sort(unique(v[!is.na(v)]))
+  if (length(v) < 3) return(if (length(v)) v else NULL)
+  gaps <- diff(v)
+  step <- min(gaps)
+  breaks <- c(0, which(abs(gaps - step) > 1e-9 * max(1, abs(step))), length(v))
+  runs <- lapply(seq_len(length(breaks) - 1),
+                 function(k) v[(breaks[k] + 1):breaks[k + 1]])
+  runs[[which.max(lengths(runs))]]
+}
+
+# The choice set an item names, or NULL.
+sframe_item_choice_set <- function(instrument, item) {
+  if (is.null(item$choice_set)) return(NULL)
+  for (cs in instrument$choices) if (identical(cs$id, item$choice_set)) return(cs)
+  NULL
+}
+
 # The declared response bounds for an item, or NULL when it declares none:
-# the numeric range of its choice set, its slider limits, or 1 to rating_max.
+# the range of its choice set's scoring codes (sframe_score_codes()), its
+# slider limits, or 1 to rating_max.
 sframe_item_bounds <- function(instrument, item_id) {
   item <- NULL
   for (i in instrument$items) if (identical(i$id, item_id)) item <- i
   if (is.null(item)) return(NULL)
-  if (!is.null(item$choice_set)) {
-    for (cs in instrument$choices) {
-      if (!identical(cs$id, item$choice_set)) next
-      vals <- suppressWarnings(as.numeric(cs$values))
-      vals <- vals[!is.na(vals)]
-      if (length(vals) > 0) return(c(min(vals), max(vals)))
-    }
+  cs <- sframe_item_choice_set(instrument, item)
+  if (!is.null(cs)) {
+    vals <- sframe_score_codes(cs$values)
+    if (length(vals) > 0) return(c(min(vals), max(vals)))
   }
   if (identical(item$type, "slider") && !is.null(item$slider_min) &&
       !is.null(item$slider_max)) {
@@ -79,6 +103,7 @@ sframe_scale_matrix <- function(data, instrument, scale, cols) {
            function(col) sframe_as_measure(data[[col]], col)),
     check.names = FALSE
   )
+  out <- sframe_drop_nonscore_codes(out, instrument, scale)
   for (col in intersect(sframe_scale_reverse_ids(instrument, scale), cols)) {
     rng <- sframe_item_bounds(instrument, col)
     if (is.null(rng)) {
@@ -91,6 +116,38 @@ sframe_scale_matrix <- function(data, instrument, scale, cols) {
       )
     }
     out[[col]] <- (rng[1] + rng[2]) - out[[col]]
+  }
+  out
+}
+
+# A declared code outside its choice set's scoring run (sframe_score_codes()),
+# such as 99 for "do not know", is missing in a scale's items, with 1 message
+# per scale naming the codes and how many answers held them (FR-18).
+sframe_drop_nonscore_codes <- function(out, instrument, scale) {
+  dropped <- character(0)
+  n <- 0L
+  for (col in names(out)) {
+    item <- NULL
+    for (i in instrument$items) if (identical(i$id, col)) item <- i
+    cs <- sframe_item_choice_set(instrument, item)
+    if (is.null(cs)) next
+    declared <- suppressWarnings(as.numeric(as.character(cs$values)))
+    declared <- declared[!is.na(declared)]
+    keep <- sframe_score_codes(cs$values)
+    other <- setdiff(declared, keep)
+    if (!length(other)) next
+    hit <- !is.na(out[[col]]) & out[[col]] %in% other
+    if (any(hit)) {
+      dropped <- union(dropped, format(sort(unique(out[[col]][hit]))))
+      n <- n + sum(hit)
+      out[[col]][hit] <- NA_real_
+    }
+  }
+  if (n > 0) {
+    message(sprintf(
+      "Scale '%s': %s of %s, outside the run of scoring codes, %s read as missing.",
+      scale$id, sframe_count_noun(n, "answer"), paste(dropped, collapse = ", "),
+      if (n == 1) "is" else "are"))
   }
   out
 }
@@ -187,6 +244,14 @@ sframe_composite_score <- function(scale_num, scale, scale_item_ids) {
 #'
 #' @return A `data.frame` with scored scale columns appended. Scale columns are
 #'   named using the scale `id`.
+#' @section Codes that are not scores:
+#' An item's scores are the longest run of its choice set's numeric codes at
+#' 1 even step: 1 to 5, or 0 to 100 in steps of 25. A code outside that run,
+#' such as 99 for "do not know" after 1 to 5, is read as missing, with a
+#' message naming it and how many answers held it, and a reversed item is
+#' reversed on the run's ends (1 + 5 - x). [validate_sframe()] notes such a
+#' choice set. Before 0.4.3 every numeric code was a score, so the reversal
+#' point moved to 1 + 99 and a 99 entered the mean.
 #' @export
 #' @seealso [sframe_scale()], [sframe_reliability_results()]
 #'

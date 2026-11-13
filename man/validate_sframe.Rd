@@ -55,8 +55,10 @@ whose \code{alpha} or \code{options$alpha} is not a number between 0 and 1
 These are reported as notes, which \code{\link[=sframe_notes]{sframe_notes()}} returns and which leave
 the instrument valid, since SurveyBuilder saved them before 0.4.3: branching
 rules that depend on each other in a cycle, a check whose pass values are
-not codes of its item's choice set, and an item whose \code{scale_id} names a
-scale that does not list it.
+not codes of its item's choice set, an item whose \code{scale_id} names a
+scale that does not list it, and a scale item's choice set with numeric
+codes outside 1 evenly spaced run (1 to 5 and 99 for "do not know"), which
+\code{\link[=score_scales]{score_scales()}} reads as missing.
 \itemize{
 \item Analysis plan roles referencing missing variables or models
 \item Model specifications referencing missing indicators or constructs

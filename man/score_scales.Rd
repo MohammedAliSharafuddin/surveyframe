@@ -27,6 +27,17 @@ reverse coding, optional weighted composite score computation, and minimum
 valid item thresholds. Returns a data frame with one scored column per
 scale.
 }
+\section{Codes that are not scores}{
+
+An item's scores are the longest run of its choice set's numeric codes at
+1 even step: 1 to 5, or 0 to 100 in steps of 25. A code outside that run,
+such as 99 for "do not know" after 1 to 5, is read as missing, with a
+message naming it and how many answers held it, and a reversed item is
+reversed on the run's ends (1 + 5 - x). \code{\link[=validate_sframe]{validate_sframe()}} notes such a
+choice set. Before 0.4.3 every numeric code was a score, so the reversal
+point moved to 1 + 99 and a 99 entered the mean.
+}
+
 \examples{
 cs    <- sframe_choice_set("ag5", 1:5,
            c("Strongly disagree", "Disagree", "Neutral",
