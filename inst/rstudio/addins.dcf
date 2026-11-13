@@ -17,3 +17,8 @@ Name: surveyframe: Insert starter instrument
 Description: Insert a valid questionnaire, scale, and reliability-plan template in the active R script.
 Binding: addin_insert_skeleton
 Interactive: false
+
+Name: surveyframe: Try a demo
+Description: Choose one of the bundled demo studies and open it in SurveyStudio on the Design screen, with its responses loaded.
+Binding: addin_try_demo
+Interactive: true

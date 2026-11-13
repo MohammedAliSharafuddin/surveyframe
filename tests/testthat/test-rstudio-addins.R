@@ -18,10 +18,10 @@ test_that("every binding named in addins.dcf exists as a function", {
   entries <- read.dcf(dcf)
   bindings <- as.character(entries[, "Binding"])
 
-  expect_length(bindings, 4)
+  expect_length(bindings, 5)
   expect_setequal(bindings, c("addin_launch_builder", "addin_launch_studio",
                               "addin_launch_dashboard",
-                              "addin_insert_skeleton"))
+                              "addin_insert_skeleton", "addin_try_demo"))
   for (b in bindings) {
     expect_true(is.function(get(b, envir = asNamespace("surveyframe"))),
                 info = b)
@@ -88,7 +88,8 @@ test_that("the add-ins fail soft when rstudioapi is unavailable", {
     .package = "surveyframe"
   )
   for (fn in c("addin_launch_builder", "addin_launch_studio",
-               "addin_launch_dashboard", "addin_insert_skeleton")) {
+               "addin_launch_dashboard", "addin_insert_skeleton",
+               "addin_try_demo")) {
     f <- get(fn, envir = asNamespace("surveyframe"))
     expect_null(f(), info = fn)
   }
@@ -141,7 +142,8 @@ test_that("with rstudioapi installed but RStudio absent, each add-in stops with 
   local_rstudio(available = FALSE)
   calls <- local_launchers()
   for (fn in c("addin_launch_builder", "addin_launch_studio",
-               "addin_launch_dashboard", "addin_insert_skeleton")) {
+               "addin_launch_dashboard", "addin_insert_skeleton",
+               "addin_try_demo")) {
     f <- get(fn, envir = asNamespace("surveyframe"))
     msgs <- testthat::capture_messages(res <- f())
     expect_null(res, info = fn)
@@ -292,4 +294,39 @@ test_that("no file outside R/rstudio_addins.R calls rstudioapi", {
       any(grepl("rstudioapi::", readLines(f, warn = FALSE), fixed = TRUE))
   }, src)
   expect_length(offenders, 0)
+})
+
+test_that("Try a demo opens the chosen demo in Studio on the Design screen", {
+  local_rstudio()
+  calls <- local_launchers()
+  picked <- NULL
+  testthat::local_mocked_bindings(
+    select.list = function(choices, ...) {
+      picked <<- choices
+      grep("^two_group: ", choices, value = TRUE)
+    },
+    .package = "utils"
+  )
+  addin_try_demo()
+  expect_length(picked, nrow(sframe_list_demos()))
+  expect_identical(ls(calls), "studio")
+  expect_identical(calls$studio$demo, "two_group")
+  expect_identical(calls$studio$screen, "design")
+})
+
+test_that("cancelling Try a demo opens nothing and says nothing", {
+  local_rstudio()
+  calls <- local_launchers()
+  testthat::local_mocked_bindings(select.list = function(...) "",
+                                  .package = "utils")
+  expect_silent(res <- addin_try_demo())
+  expect_null(res)
+  expect_length(ls(calls), 0)
+})
+
+test_that("every demo Try a demo offers loads", {
+  for (name in unname(surveyframe:::sframe_addin_demo_choices())) {
+    d <- sframe_demo(name)
+    expect_s3_class(d$instrument, "sframe")
+  }
 })
