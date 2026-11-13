@@ -898,6 +898,11 @@ arithmetic.
 * A chi-square block with a weights role tests the unweighted counts, as
   before, and now says so in its sentence and note, naming the weight whose
   counts are in the weighted table beside it (FR-34).
+* The ordinal logistic table gives each slope's standard error, p value,
+  odds ratio and 95% interval. The thresholds (the cut points between
+  outcome levels, such as low|medium) keep their estimate and standard
+  error and no longer print an odds ratio. The result's `$coefficients`
+  gains `p` and `threshold` (FR-35).
 
 ## Reports
 

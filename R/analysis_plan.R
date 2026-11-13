@@ -1692,8 +1692,12 @@ sframe_result_table <- function(result) {
       if (!is.data.frame(co)) return(NULL)
       data.frame(
         Term = rownames(co),
-        Estimate = fmt(co[["Value"]]),
+        Estimate = coef_fmt(co[["Value"]]),
+        `Std. error` = coef_fmt(co[["Std. Error"]]),
+        p = vapply(co[["p"]] %||% rep(NA_real_, nrow(co)), sframe_p_string, character(1)),
         `Odds ratio` = fmt(co[["odds_ratio"]]),
+        `CI low` = fmt(co[["or_ci_low"]]),
+        `CI high` = fmt(co[["or_ci_high"]]),
         check.names = FALSE, stringsAsFactors = FALSE, row.names = NULL
       )
     },
