@@ -718,6 +718,15 @@ validate_sframe <- function(instrument, strict = TRUE) {
       declared <- suppressWarnings(as.numeric(as.character(cs$values)))
       declared <- unique(declared[!is.na(declared)])
       keep <- sframe_score_codes(cs$values)
+      if (!is.null(attr(keep, "tie"))) {
+        noted_sets <- c(noted_sets, cs$id)
+        log$notes <- c(log$notes, paste0(
+          "Choice set '", cs$id, "', used by scale '", scale$id,
+          "', has 2 or more equally long runs of codes (",
+          sframe_runs_text(attr(keep, "tie")), "), so score_scales() cannot ",
+          "tell which are scores and refuses the scale. Give the set 1 run of scoring codes."))
+        next
+      }
       other <- setdiff(declared, keep)
       if (!length(other)) next
       noted_sets <- c(noted_sets, cs$id)
@@ -725,7 +734,8 @@ validate_sframe <- function(instrument, strict = TRUE) {
         "Choice set '", cs$id, "', used by scale '", scale$id, "', has ",
         sframe_count_noun(length(other), "code"), " ", paste(format(other), collapse = ", "),
         " outside its run of scores ", format(min(keep)), " to ", format(max(keep)),
-        ". score_scales() reads ", if (length(other) == 1) "it" else "them",
+        ": ", paste(format(other), collapse = ", "), if (length(other) == 1) " is" else " are",
+        " not scored. score_scales() reads ", if (length(other) == 1) "it" else "them",
         " as missing and reverses items on ", format(min(keep)), " to ",
         format(max(keep)), "."))
     }
