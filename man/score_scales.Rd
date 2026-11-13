@@ -27,6 +27,16 @@ reverse coding, optional weighted composite score computation, and minimum
 valid item thresholds. Returns a data frame with one scored column per
 scale.
 }
+\section{Sum scores with unanswered items}{
+
+With \code{method = "sum"} and a \code{min_valid} below the number of items, a
+respondent who answered at least \code{min_valid} items gets a prorated sum:
+the mean of the answered items times the number of items (with weights,
+the weighted mean times the sum of the weights). 5 and 5 on 2 of 4 items
+on a 1 to 5 scale scores 20. Before 0.4.3 an unanswered item counted as 0,
+so the same respondent scored 10.
+}
+
 \section{Codes that are not scores}{
 
 An item's scores are the longest run of its choice set's numeric codes at

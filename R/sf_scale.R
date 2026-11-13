@@ -21,7 +21,11 @@
 #'   required to compute a score for a respondent, a whole number from 1 to
 #'   the number of items. When `NULL`, every item must be answered. An item
 #'   whose column is absent from the data counts as unanswered. Used by
-#'   [score_scales()].
+#'   [score_scales()]. With `method = "sum"`, a respondent who answered
+#'   fewer than every item but at least `min_valid` gets a prorated sum: the
+#'   mean of the answered items times the number of items (weighted, the
+#'   weighted mean times the sum of the weights), so the score stays on the
+#'   full scale's range. Before 0.4.3 an unanswered item counted as 0.
 #' @param reverse_items Character vector or NULL. A subset of `items` that
 #'   this scale reverse-codes. Reversal applies within this scale only, so the
 #'   same item can be reversed in one scale and scored as answered in another.
