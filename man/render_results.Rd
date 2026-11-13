@@ -9,7 +9,7 @@ render_results(
   instrument,
   output_file = NULL,
   output_path = NULL,
-  citation_format = c("apa", "ama", "vancouver"),
+  citation_format = "apa",
   title = NULL,
   interpretations = NULL
 )
@@ -24,8 +24,9 @@ NULL, a temporary file is written and its path returned.}
 
 \item{output_path}{Character or NULL. Alias for \code{output_file}.}
 
-\item{citation_format}{Character. Reference format. One of \code{"apa"},
-\code{"ama"}, or \code{"vancouver"}. Defaults to \code{"apa"}.}
+\item{citation_format}{Character. The reference format, \code{"apa"} (APA 7),
+the only one the report writes. \code{"ama"} and \code{"vancouver"} were accepted
+before 0.4.3 and never applied, so they are refused with a message.}
 
 \item{title}{Character or NULL. Report title. Defaults to the instrument
 title with " -- Results" appended.}
