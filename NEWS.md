@@ -1085,7 +1085,12 @@ arithmetic.
   files were written again, and `verification_tampered.sframe` was rebuilt
   from `verification.sframe` with the same 1-word edit. `tests/testthat/fixtures/canonical/hash_canonical/` holds 8 files
   that all 3 judge alike: the field present, absent, set to an unknown value
-  or to null, deleted or added after sealing, and content edited.
+  or to null, deleted or added after sealing, and content edited. The
+  bundled schema, `system.file("schema", "sframe_schema.json", package =
+  "surveyframe")`, is the published instrument profile again: it describes
+  the RFC 8785 hash and declares `canonical` as optional with `"rfc8785"` its
+  only value, so a file naming any other form, or null, fails the profile as
+  it fails `read_sframe()`.
 * **A file hashed before 0.4.3 is recognised in any session** (Fable FR-08
   and FR-11). The old key order followed the collation of the session that
   hashed, so a file hashed in an English session was refused as modified in

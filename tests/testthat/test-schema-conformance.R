@@ -122,3 +122,14 @@ test_that("10: the profile checker here matches the published profile's required
   schema <- jsonlite::fromJSON(profile, simplifyVector = FALSE)
   expect_setequal(unlist(schema$required), c("sframe_format", "hash", "meta", "items"))
 })
+
+test_that("the bundled schema describes the RFC 8785 hash and its canonical field", {
+  path <- system.file("schema", "sframe_schema.json", package = "surveyframe")
+  skip_if(!nzchar(path), "bundled schema not found")
+  hash <- jsonlite::fromJSON(path, simplifyVector = FALSE)$properties$hash
+  expect_match(hash$description, "RFC 8785", fixed = TRUE)
+  expect_identical(hash$properties$canonical$const, SFRAME_CANONICAL)
+  expect_false("canonical" %in% unlist(hash$required))
+  # What the writer puts in the hash object is what the schema declares.
+  expect_setequal(names(sframe_hash_object(strrep("0", 64))), names(hash$properties))
+})
