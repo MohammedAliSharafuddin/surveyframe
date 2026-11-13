@@ -714,7 +714,8 @@ sframe_run_mann_whitney <- function(data, vars, instrument = NULL) {
   r_ci <- sframe_rank_r_ci(g1, g2)
   hl_shift <- unname(wt$estimate)
   hl_conf_int <- as.numeric(wt$conf.int)
-  hl_ci_named <- c(lower = hl_conf_int[1], upper = hl_conf_int[2])
+  hl_ci_named <- structure(c(lower = hl_conf_int[1], upper = hl_conf_int[2]),
+                           level = attr(hl_conf_int, "conf.level") %||% 0.95)
   list(
     test     = "mann_whitney",
     vars     = vars,
@@ -969,7 +970,8 @@ sframe_run_wilcoxon_pair <- function(data, vars) {
   r_ci <- sframe_signed_rank_r_ci(differences)
   pseudomedian <- unname(wt$estimate)
   pseudomedian_conf_int <- as.numeric(wt$conf.int)
-  pm_ci_named <- c(lower = pseudomedian_conf_int[1], upper = pseudomedian_conf_int[2])
+  pm_ci_named <- structure(c(lower = pseudomedian_conf_int[1], upper = pseudomedian_conf_int[2]),
+                           level = attr(pseudomedian_conf_int, "conf.level") %||% 0.95)
 
   list(
     test = "wilcoxon_pair",
