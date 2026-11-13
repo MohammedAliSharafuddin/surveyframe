@@ -616,11 +616,21 @@ sframe_run_crosstab <- function(data, vars, options = list()) {
     cramer_v = if (!identical(effect_name, "phi")) unname(effect) else NA_real_,
     v_ci     = v_ci,
     effect_label = sframe_effect_label(effect, "r"),
-    apa      = sprintf(
-      "\u03c7\u00b2(%d, N = %d) = %.2f, p %s, %s = %.2f%s",
-      ct$parameter, n, ct$statistic, sframe_p_string(ct$p.value),
-      effect_symbol, effect, sframe_ci_string(v_ci)
-    ),
+    # A simulated p value has no degrees of freedom (chisq.test() gives NA),
+    # so the line omits them and says the p value is simulated, where it
+    # printed "chi-square(NA, N = 4)" (P2-09).
+    apa      = if (is.na(ct$parameter)) {
+      sprintf(
+        "\u03c7\u00b2(N = %d) = %.2f, p %s (simulated from %d tables), %s = %.2f%s",
+        n, ct$statistic, sframe_p_string(ct$p.value),
+        as.integer(sub("^.*based on ([0-9]+) replicates.*$", "\\1", ct$method)),
+        effect_symbol, effect, sframe_ci_string(v_ci))
+    } else {
+      sprintf(
+        "\u03c7\u00b2(%d, N = %d) = %.2f, p %s, %s = %.2f%s",
+        ct$parameter, n, ct$statistic, sframe_p_string(ct$p.value),
+        effect_symbol, effect, sframe_ci_string(v_ci))
+    },
     prompt   = sprintf(
       "The chi-square test %s a significant association between %s and %s (%s = %.2f%s, %s effect). Describe the pattern in the cross-tabulation.",
       if (ct$p.value < sframe_alpha()) "revealed" else "found no",
