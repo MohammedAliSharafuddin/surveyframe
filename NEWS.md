@@ -53,6 +53,17 @@ can be written again, and every plan result can be serialised by a host.
 * **A descriptives block counts choice items.** See
   below. Numbers for a `single_choice` or `multiple_choice` column move from
   the mean and SD table to a table of counts and percentages.
+* **A plan rerun on 0.4.3 can give different numbers from the same data
+  where categories were ordered or coded differently before.** A
+  multinomial model's reference category is now the first category its
+  choice set declares, not the first in alphabetical order: the logistic
+  demo's reference moves from Keynotes to Workshops, and every coefficient
+  and p value of that model changes with it. A binary model's modelled
+  level, an ordinal outcome's order, a choice item entering a model as
+  categories, and the McNemar table follow the same declared order. See
+  "Answers coded and ordered as the instrument declares them" under
+  Analysis. Report the 0.4.3 numbers, and say which category is the
+  reference.
 * **Every plan result serialises with `jsonlite::toJSON()`.** The classed
   report behind a descriptives, missing-data, quality, reliability, EFA or
   item-diagnostics result, and a fitted LDA or STM topic model, now sit in an
@@ -809,6 +820,13 @@ arithmetic.
   blank rule `read_responses()` uses (empty, or only spaces) and only the
   factor levels that have answers (P2-04, P2-05, P2-07, FR-28, FR-29,
   FR-31).
+* **A chi-square cross-tab names both axes by their choice labels.** The
+  table carried the codes, and only a code meaning the same in every
+  choice set of the instrument was relabelled, so a channel item coded 1 to
+  3 showed rows "1", "2", "3", and a 0:1 item showed columns "No" and "1".
+  Each axis is now labelled from its own item's choice set, in declared
+  order, in the counts, the totals, the percentages and the weighted table
+  (FR-37).
 
 ## Reports
 
