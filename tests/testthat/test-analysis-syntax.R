@@ -375,3 +375,101 @@ test_that("each covered method's generated code reproduces its own numbers", {
     expect_equal(have, want, tolerance = 1e-6, info = case$m)
   }
 })
+
+# ── Coding the generated code copies (Session CF-B, FR-19 to FR-22) ─────────
+# The runners code categories as the instrument declares them: a choice item
+# as a category on its declared order, an ordinal outcome in declared order, a
+# binary model's named event, McNemar's 2 items on 1 order. The generated code
+# writes out the coding the runner recorded, and each case runs it and
+# compares the estimates with the result.
+
+coding_data <- function(n = 120) {
+  set.seed(31)
+  x <- round(stats::rnorm(n), 2)
+  g3 <- sample(1:3, n, TRUE)
+  y <- 1 + 0.4 * x + 0.8 * (g3 == 2) - 0.6 * (g3 == 3) + stats::rnorm(n)
+  data.frame(
+    x = x, g3 = g3, y = y,
+    out = ifelse(0.9 * x + stats::rlogis(n) > 0, "Yes", "no"),
+    ord = as.character(cut(0.9 * x + stats::rlogis(n), c(-Inf, -0.7, 0.7, Inf),
+                           labels = c("low", "medium", "high"))),
+    grp = rep(c("a", "b"), length.out = n),
+    c1 = sample(c("a", "b"), n, TRUE),
+    c2 = sample(c("b", "c"), n, TRUE),
+    stringsAsFactors = FALSE)
+}
+
+coding_result <- function(method, roles, options = list()) {
+  instr <- sframe_instrument("Coding", components = list(
+    sframe_choice_set("reg", 1:3, c("North", "South", "East")),
+    sframe_choice_set("yn", c("no", "Yes"), c("No", "Yes")),
+    sframe_choice_set("lmh", c("low", "medium", "high"), c("Low", "Medium", "High")),
+    sframe_choice_set("abc", c("a", "b", "c"), c("A", "B", "C")),
+    sframe_item("x", "x", type = "numeric"), sframe_item("y", "y", type = "numeric"),
+    sframe_item("g3", "Region", type = "single_choice", choice_set = "reg"),
+    sframe_item("out", "Outcome", type = "single_choice", choice_set = "yn"),
+    sframe_item("ord", "Rating", type = "single_choice", choice_set = "lmh"),
+    sframe_item("grp", "grp", type = "text"),
+    sframe_item("c1", "c1", type = "single_choice", choice_set = "abc"),
+    sframe_item("c2", "c2", type = "single_choice", choice_set = "abc")))
+  block <- list(id = "RQ1", research_question = "Coded?", family = "inferential",
+                method = method, roles = roles)
+  if (length(options)) block$options <- options
+  sframe_plan(instr) <- list(block)
+  run_analysis_plan(coding_data(), instr)$RQ1
+}
+
+coding_run <- function(res) run_syntax(sframe_syntax_result(res), coding_data())
+
+test_that("a choice predictor coded 1 to 3 enters the generated lm as a category", {
+  res <- coding_result("regression_linear", list(predictors = c("x", "g3"), dependent = "y"))
+  got <- coding_run(res)
+  expect_equal(unname(got$coefficients[, 1]), unname(res$coefficients[["Estimate"]]))
+  expect_equal(got$r.squared, res$r2)
+  expect_equal(nrow(got$coefficients), 4L)
+})
+
+test_that("the generated binary model models the named event", {
+  for (event in c("Yes", "no")) {
+    res <- coding_result("regression_logistic_binary",
+                         list(predictors = c("x", "g3"), dependent = "out"),
+                         options = list(event = event))
+    got <- coding_run(res)
+    expect_identical(res$event, event)
+    expect_equal(unname(got[, 1]), unname(res$coefficients[["odds_ratio"]]))
+  }
+})
+
+test_that("the generated ordinal model orders the outcome as declared", {
+  skip_if_not_installed("MASS")
+  res <- coding_result("regression_logistic_ordinal", list(predictors = "x", dependent = "ord"))
+  got <- coding_run(res)
+  expect_equal(unname(got$coefficients[, 1]), unname(res$coefficients[[1]]), tolerance = 1e-6)
+  expect_identical(rownames(got$coefficients), rownames(res$coefficients))
+  expect_gt(got$coefficients["x", 1], 0)
+})
+
+test_that("the generated multinomial model has the runner's reference and coefficients", {
+  skip_if_not_installed("nnet")
+  res <- coding_result("regression_logistic_multinomial",
+                       list(predictors = c("x", "g3"), dependent = "ord"))
+  got <- coding_run(res)
+  expect_identical(res$reference, "low")
+  expect_equal(unname(got$coefficients), unname(res$coefficients), tolerance = 1e-4)
+})
+
+test_that("the generated ANCOVA codes a choice covariate as a category", {
+  res <- coding_result("ancova", list(group = "grp", covariates = c("x", "g3"), outcome = "y"))
+  got <- coding_run(res)
+  expect_equal(unname(got[["F value"]][rownames(got) == "group"]),
+               res$table$F[res$table$effect == "grp"])
+  expect_equal(unname(got[["Df"]][rownames(got) == "covariate_4"]), 2)
+})
+
+test_that("the generated McNemar table pairs each category with itself", {
+  res <- coding_result("mcnemar", list(before = "c1", after = "c2"))
+  got <- coding_run(res)
+  expect_equal(unname(got$statistic), res$statistic)
+  expect_equal(got$p.value, res$p)
+  expect_equal(unname(got$parameter), 3)
+})

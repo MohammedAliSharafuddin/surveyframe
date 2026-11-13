@@ -61,12 +61,34 @@ sframe_code_predictor_fn <- c(
 )
 
 # A copy of `frame` as model_data with the predictors coded, for the
-# generators that fit from a data frame.
-sframe_code_predictors <- function(frame, predictors) {
+# generators that fit from a data frame. `coding` is the runner's
+# predictor_coding: each categorical predictor with its levels, the first the
+# reference, so a choice item coded 1, 2, 3 enters as a category, as in the
+# runner (FR-20), and the reference is the same in every locale.
+sframe_code_predictors <- function(frame, predictors, coding = list()) {
+  numeric <- setdiff(predictors, names(coding))
   c(sframe_code_predictor_fn,
     sprintf("model_data <- %s", frame),
-    sprintf("for (p in c(%s)) model_data[[p]] <- as_predictor(model_data[[p]])",
-            paste(sprintf("\"%s\"", predictors), collapse = ", ")))
+    if (length(numeric)) {
+      sprintf("for (p in c(%s)) model_data[[p]] <- as_predictor(model_data[[p]])",
+              paste(sprintf("\"%s\"", numeric), collapse = ", "))
+    },
+    if (length(coding)) "# Categories, the first level the reference.",
+    vapply(names(coding), function(p) {
+      sframe_code_factor("model_data", p, coding[[p]])
+    }, character(1), USE.NAMES = FALSE))
+}
+
+# model_data[[col]] as a factor on the levels the runner used.
+sframe_code_factor <- function(frame, col, levels, ordered = FALSE) {
+  sprintf("%s[[\"%s\"]] <- factor(as.character(%s[[\"%s\"]]), levels = %s%s)",
+          frame, col, frame, col, sframe_code_levels(levels),
+          if (ordered) ", ordered = TRUE" else "")
+}
+
+# A character vector literal, always as c(...), even for 1 level.
+sframe_code_levels <- function(levels) {
+  paste0("c(", paste(encodeString(as.character(levels), quote = "\""), collapse = ", "), ")")
 }
 
 # The model formula with backticked names.
@@ -163,8 +185,15 @@ sframe_syntax_call <- function(result, frame = "scored") {
       sframe_code_predictor_fn,
       sprintf("group    <- factor(as.character(%s))", col(1)),
       sprintf("outcome  <- %s", num(2)),
-      sprintf("covariate_%d <- as_predictor(%s)", seq_along(vars)[-(1:2)],
-              vapply(seq_along(vars)[-(1:2)], col, character(1))),
+      vapply(seq_along(vars)[-(1:2)], function(i) {
+        lev <- result$predictor_coding[[vars[i]]]
+        if (is.null(lev)) {
+          sprintf("covariate_%d <- as_predictor(%s)", i, col(i))
+        } else {
+          sprintf("covariate_%d <- factor(as.character(%s), levels = %s)", i, col(i),
+                  sframe_code_levels(lev))
+        }
+      }, character(1)),
       sprintf("fit <- aov(outcome ~ %s + group)",
               paste(sprintf("covariate_%d", seq_along(vars)[-(1:2)]),
                     collapse = " + ")),
@@ -194,7 +223,7 @@ sframe_syntax_call <- function(result, frame = "scored") {
       # last, so reading vars[1] as the outcome fits a different model.
       outcome <- vars[length(vars)]
       predictors <- vars[-length(vars)]
-      c(sframe_code_predictors(frame, predictors),
+      c(sframe_code_predictors(frame, predictors, result$predictor_coding %||% list()),
         sprintf("model_data[[\"%s\"]] <- %s", outcome,
                 sframe_code_num("model_data", outcome)),
         sprintf("fit <- lm(%s, data = model_data)",
@@ -204,10 +233,12 @@ sframe_syntax_call <- function(result, frame = "scored") {
     regression_logistic_binary = {
       outcome <- vars[length(vars)]
       predictors <- vars[-length(vars)]
-      # The runner codes the outcome as as.factor(y), the second level being 1.
-      c(sframe_code_predictors(frame, predictors),
-        sprintf("model_data[[\"%s\"]] <- as.integer(as.factor(model_data[[\"%s\"]])) - 1L",
-                outcome, outcome),
+      # The runner models its named event as 1 and the other level as 0
+      # (FR-21), in every locale.
+      c(sframe_code_predictors(frame, predictors, result$predictor_coding %||% list()),
+        sprintf("# The event: \"%s\" is 1, \"%s\" is 0.", result$event, result$reference_level),
+        sprintf("model_data[[\"%s\"]] <- as.integer(as.character(model_data[[\"%s\"]]) == \"%s\")",
+                outcome, outcome, result$event),
         sprintf("fit <- glm(%s, data = model_data, family = binomial())",
                 sframe_code_formula(outcome, predictors)),
         "summary(fit)",
@@ -217,9 +248,9 @@ sframe_syntax_call <- function(result, frame = "scored") {
     regression_logistic_ordinal = {
       outcome <- vars[1]
       predictors <- vars[-1]
-      c(sframe_code_predictors(frame, predictors),
-        sprintf("model_data[[\"%s\"]] <- ordered(model_data[[\"%s\"]])",
-                outcome, outcome),
+      c(sframe_code_predictors(frame, predictors, result$predictor_coding %||% list()),
+        "# The outcome in the order its choice set declares (FR-19).",
+        sframe_code_factor("model_data", outcome, result$outcome_levels, ordered = TRUE),
         sprintf("fit <- MASS::polr(%s, data = model_data, Hess = TRUE)",
                 sframe_code_formula(outcome, predictors)),
         "summary(fit)")
@@ -227,9 +258,9 @@ sframe_syntax_call <- function(result, frame = "scored") {
     regression_logistic_multinomial = {
       outcome <- vars[1]
       predictors <- vars[-1]
-      c(sframe_code_predictors(frame, predictors),
-        sprintf("model_data[[\"%s\"]] <- as.factor(model_data[[\"%s\"]])",
-                outcome, outcome),
+      c(sframe_code_predictors(frame, predictors, result$predictor_coding %||% list()),
+        "# The first level is the reference category.",
+        sframe_code_factor("model_data", outcome, result$outcome_levels),
         sprintf("fit <- nnet::multinom(%s, data = model_data, trace = FALSE)",
                 sframe_code_formula(outcome, predictors)),
         "summary(fit)")
@@ -250,7 +281,10 @@ sframe_syntax_call <- function(result, frame = "scored") {
       "fisher.test(tab)"
     ),
     mcnemar = c(
-      sprintf("tab <- table(%s, %s)", col(1), col(2)),
+      "# Both items on 1 category order, so each category is paired with itself.",
+      sprintf("lev <- %s", sframe_code_levels(result$category_levels)),
+      sprintf("tab <- table(factor(as.character(%s), lev), factor(as.character(%s), lev))",
+              col(1), col(2)),
       "mcnemar.test(tab)"
     ),
     descriptives = {
