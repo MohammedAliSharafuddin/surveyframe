@@ -918,6 +918,14 @@ arithmetic.
   name a style the report never applied. "ama" and "vancouver" were never
   applied in any release. `citation_format` now defaults to "apa" and
   refuses anything else with a message (review_040 defect 7).
+* **9 demos' stored results are regenerated** for the fixes above:
+  `categorical` (V's interval and leading zero, rows in declared order),
+  `correlation_regression`, `paired`, `two_group`, `small_sample` and
+  `sem_pls` (bootstrap intervals from the per-block seed, p > .999, the
+  Firth event), `logistic` (the binary event, the ordinal order, the
+  multinomial reference Workshops and its p values), `matrix_likert` (V's
+  interval now reaches 0 beside p = .407) and `multi_group` (eta squared's
+  noncentrality interval, the Kruskal-Wallis bootstrap interval).
 
 ## Reports
 

@@ -2,7 +2,7 @@
 "RQ1","correlation_pearson","apa","r(58) = .53, 95% CI [.32, .69], p < .001"
 "RQ1","correlation_pearson","n","60"
 "RQ1","correlation_pearson","df","58"
-"RQ2","correlation_spearman","apa","r_s(58) = .55, 95% CI [.35, .70], p < .001"
+"RQ2","correlation_spearman","apa","r_s(58) = .55, 95% CI [.34, .70], p < .001"
 "RQ2","correlation_spearman","n","60"
 "RQ2","correlation_spearman","df","58"
 "RQ3","correlation_kendall","apa","tau = .39, 95% CI [.25, .52], p < .001, N = 60"
