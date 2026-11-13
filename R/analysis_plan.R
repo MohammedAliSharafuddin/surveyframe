@@ -378,8 +378,7 @@ sframe_run_frequency <- function(data, vars, weights = NULL, instrument = NULL) 
     tables   = parts,
     table    = stacked,
     apa      = paste(vapply(vars, function(col) {
-      sprintf("Frequency distribution for %s (N = %d).", sframe_text_var(col),
-              sum(parts[[col]]$table$Frequency))
+      sframe_frequency_sentence(col, parts[[col]]$n, parts[[col]]$missing)
     }, character(1)), collapse = " "),
     prompt   = "Describe each distribution. Note any dominant category and whether the distribution was expected."
   )
@@ -388,6 +387,14 @@ sframe_run_frequency <- function(data, vars, weights = NULL, instrument = NULL) 
     out$apa <- paste(out$apa, usable$note)
   }
   out
+}
+
+# "Frequency distribution for "Region" (N = 72, 18 missing)." N is the
+# number who answered, the denominator of every percentage.
+sframe_frequency_sentence <- function(col, answered, missing) {
+  sprintf("Frequency distribution for %s (N = %d%s).", sframe_text_var(col),
+          as.integer(answered),
+          if (missing > 0) paste0(", ", missing, " missing") else "")
 }
 
 sframe_frequency_one <- function(data, col, weights = NULL, instrument = NULL) {
@@ -401,7 +408,8 @@ sframe_frequency_one <- function(data, col, weights = NULL, instrument = NULL) {
   if (length(value_labels) > 0) {
     # Declared order, then any code the choice set does not list, then missing
     lev <- c(names(value_labels),
-             sort(setdiff(unique(codes[!is.na(codes)]), names(value_labels))))
+             sort(setdiff(unique(codes[!is.na(codes)]), names(value_labels)),
+                  method = "radix"))
     tbl <- table(factor(codes, levels = lev), useNA = "ifany")
   } else {
     tbl <- sort(table(codes, useNA = "ifany"), decreasing = TRUE)
@@ -409,8 +417,15 @@ sframe_frequency_one <- function(data, col, weights = NULL, instrument = NULL) {
   code_col <- names(tbl)
   shown <- ifelse(!is.na(code_col) & code_col %in% names(value_labels),
                   unname(value_labels[code_col]), code_col)
-  total <- sum(tbl)
-  pct <- if (total > 0) round(as.numeric(tbl) / total * 100, 1) else rep(NA_real_, length(tbl))
+  # Percent of those who answered (valid percent), the denominator of the
+  # weighted table and of a descriptives block's counts. It was of every row,
+  # missing included, so North was 28.9% here and 36.1% beside it with every
+  # weight 1, and the sentence gave N = 90 where 72 answered (FR-23). The
+  # missing row keeps its count and has no percentage.
+  answered <- sum(tbl[!is.na(names(tbl))])
+  missing <- sum(tbl[is.na(names(tbl))])
+  pct <- if (answered > 0) round(as.numeric(tbl) / answered * 100, 1) else rep(NA_real_, length(tbl))
+  pct[is.na(names(tbl))] <- NA_real_
   weighted <- NULL
   if (!is.null(weights) && nzchar(weights) && weights %in% colnames(data)) {
     w <- sframe_num((data[[weights]]))
@@ -445,7 +460,8 @@ sframe_frequency_one <- function(data, col, weights = NULL, instrument = NULL) {
       stringsAsFactors = FALSE
     ),
     weighted_table = weighted,
-    apa       = sprintf("Frequency distribution for %s (N = %d).", sframe_text_var(col), total),
+    missing   = missing,
+    apa       = sframe_frequency_sentence(col, answered, missing),
     prompt    = "Describe the distribution. Note any dominant category and whether the distribution was expected."
   )
 }
