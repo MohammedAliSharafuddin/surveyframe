@@ -2,37 +2,41 @@
 % Please edit documentation in R/bootstrap_ci.R
 \name{sframe_cramers_v_ci}
 \alias{sframe_cramers_v_ci}
-\title{Bootstrap confidence interval for Cramer's V}
+\title{Confidence interval for Cramer's V}
 \usage{
 sframe_cramers_v_ci(tab, R = 2000, conf.level = 0.95, seed = NULL)
 }
 \arguments{
 \item{tab}{A contingency table (from \code{\link[=table]{table()}}) or a matrix of counts.}
 
-\item{R}{Integer. Number of bootstrap resamples. Defaults to 2000.}
+\item{R}{Not used since 0.4.3, kept so existing calls still run.}
 
 \item{conf.level}{Confidence level. Defaults to 0.95.}
 
-\item{seed}{Integer or NULL. When supplied, sets the random seed.}
+\item{seed}{Not used since 0.4.3, since the interval involves no
+resampling.}
 }
 \value{
-A named numeric vector: \code{estimate}, \code{lower}, \code{upper}, with
-attributes \code{resamples}, \code{valid_resamples} and, when the interval is
-withheld, \code{reason}. The bounds are \code{NA} when fewer than 90\% of resamples
-give a value, or when every resample gives the same value, since neither
-leaves a sampling distribution to read. The bounds
-are \code{NA} when the table holds fewer than 3 observations.
+A named numeric vector: \code{estimate}, \code{lower}, \code{upper}, with the
+attributes \code{level} and \code{method} (\code{"noncentral chi-square"}). The bounds
+are \code{NA} when the table holds fewer than 3 observations or has fewer than
+2 rows or columns.
 }
 \description{
-Percentile bootstrap for the association strength in a contingency table.
-The table is expanded back to individual observations, which are resampled
-jointly. For a 2 by 2 table the statistic equals phi.
+The noncentrality interval for the association strength in a contingency
+table, as \code{effectsize::cramers_v(adjust = FALSE, alternative = "two.sided")} computes it: the 2-sided interval for the noncentrality of
+the chi-square statistic, each bound turned into V as
+\eqn{\sqrt{\lambda / (n (k - 1))}}, where k is the smaller of the number
+of rows and columns. For a 2 by 2 table V equals phi. The interval reaches
+0 when the test is far from significant. Until 0.4.3 this was a percentile
+bootstrap, whose resampled V is never below 0, so an exactly independent
+table had the interval [0.05, 0.50] beside V = 0 (FR-24).
 }
 \examples{
-sframe_cramers_v_ci(table(mtcars$am, mtcars$cyl), seed = 42)
+sframe_cramers_v_ci(table(mtcars$am, mtcars$cyl))
 }
 \seealso{
-\code{\link[=sframe_bootstrap_ci]{sframe_bootstrap_ci()}}
+\code{\link[=sframe_eta_sq_ci]{sframe_eta_sq_ci()}}, \code{\link[=sframe_bootstrap_ci]{sframe_bootstrap_ci()}}
 
 Other Confidence interval functions:
 \code{\link[=sframe_bootstrap_ci]{sframe_bootstrap_ci()}},

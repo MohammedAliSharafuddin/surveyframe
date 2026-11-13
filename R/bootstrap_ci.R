@@ -173,58 +173,63 @@ sframe_cohens_d_ci <- function(x, y, R = 2000, conf.level = 0.95, seed = NULL) {
   sframe_percentile_ci(boots, obs, conf.level)
 }
 
-#' Bootstrap confidence interval for Cramer's V
+#' Confidence interval for Cramer's V
 #'
-#' Percentile bootstrap for the association strength in a contingency table.
-#' The table is expanded back to individual observations, which are resampled
-#' jointly. For a 2 by 2 table the statistic equals phi.
+#' The noncentrality interval for the association strength in a contingency
+#' table, as `effectsize::cramers_v(adjust = FALSE, alternative =
+#' "two.sided")` computes it: the 2-sided interval for the noncentrality of
+#' the chi-square statistic, each bound turned into V as
+#' \eqn{\sqrt{\lambda / (n (k - 1))}}, where k is the smaller of the number
+#' of rows and columns. For a 2 by 2 table V equals phi. The interval reaches
+#' 0 when the test is far from significant. Until 0.4.3 this was a percentile
+#' bootstrap, whose resampled V is never below 0, so an exactly independent
+#' table had the interval \[0.05, 0.50\] beside V = 0 (FR-24).
 #'
 #' @param tab A contingency table (from [table()]) or a matrix of counts.
-#' @param R Integer. Number of bootstrap resamples. Defaults to 2000.
+#' @param R Not used since 0.4.3, kept so existing calls still run.
 #' @param conf.level Confidence level. Defaults to 0.95.
-#' @param seed Integer or NULL. When supplied, sets the random seed.
+#' @param seed Not used since 0.4.3, since the interval involves no
+#'   resampling.
 #'
-#' @return A named numeric vector: `estimate`, `lower`, `upper`, with
-#'   attributes `resamples`, `valid_resamples` and, when the interval is
-#'   withheld, `reason`. The bounds are `NA` when fewer than 90% of resamples
-#'   give a value, or when every resample gives the same value, since neither
-#'   leaves a sampling distribution to read. The bounds
-#'   are `NA` when the table holds fewer than 3 observations.
+#' @return A named numeric vector: `estimate`, `lower`, `upper`, with the
+#'   attributes `level` and `method` (`"noncentral chi-square"`). The bounds
+#'   are `NA` when the table holds fewer than 3 observations or has fewer than
+#'   2 rows or columns.
 #' @export
-#' @seealso [sframe_bootstrap_ci()]
+#' @seealso [sframe_eta_sq_ci()], [sframe_bootstrap_ci()]
 #'
 #' @examples
-#' sframe_cramers_v_ci(table(mtcars$am, mtcars$cyl), seed = 42)
+#' sframe_cramers_v_ci(table(mtcars$am, mtcars$cyl))
 #' @family Confidence interval functions
 sframe_cramers_v_ci <- function(tab, R = 2000, conf.level = 0.95, seed = NULL) {
-  if (!is.null(seed)) {
-    # set.seed() mutates the global RNG stream; restore whatever state the
-    # caller had on exit so an opt-in, reproducible seed here does not
-    # silently reset randomness for unrelated code that runs afterwards.
-    has_state <- exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)
-    old_state <- if (has_state) get(".Random.seed", envir = .GlobalEnv) else NULL
-    on.exit({
-      if (has_state) {
-        assign(".Random.seed", old_state, envir = .GlobalEnv)
-      } else if (exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) {
-        rm(".Random.seed", envir = .GlobalEnv)
-      }
-    }, add = TRUE)
-    set.seed(seed)
-  }
   tab <- as.table(as.matrix(tab))
-  cases <- as.data.frame(tab, stringsAsFactors = TRUE)
-  cases <- cases[rep(seq_len(nrow(cases)), cases$Freq), 1:2, drop = FALSE]
-  n <- nrow(cases)
-  obs <- sframe_cramers_v(table(cases[[1]], cases[[2]]))
-  if (n < 3 || is.na(obs)) {
-    return(c(estimate = unname(obs), lower = NA_real_, upper = NA_real_))
+  n <- sum(tab)
+  k <- min(dim(tab)) - 1
+  obs <- sframe_cramers_v(tab)
+  out <- c(estimate = unname(obs), lower = NA_real_, upper = NA_real_)
+  if (n < 3 || k < 1 || is.na(obs)) return(out)
+  chi <- unname(suppressWarnings(stats::chisq.test(tab, correct = FALSE))$statistic)
+  df <- (nrow(tab) - 1) * (ncol(tab) - 1)
+  ncp <- sframe_ncp_ci(chi, function(ncp) stats::pchisq(chi, df, ncp), conf.level)
+  out[c("lower", "upper")] <- pmin(1, sqrt(ncp / (n * k)))
+  attr(out, "level") <- conf.level
+  attr(out, "method") <- "noncentral chi-square"
+  out
+}
+
+# The 2-sided interval for a noncentrality parameter: the values of lambda
+# at which the observed statistic sits at the upper and lower tail. `cdf`
+# gives P(statistic <= observed) at a noncentrality, decreasing in it. A
+# bound is 0 when even lambda = 0 leaves the statistic inside that tail,
+# which is how the interval reaches 0 (FR-24).
+sframe_ncp_ci <- function(stat, cdf, conf.level = 0.95) {
+  a <- (1 - conf.level) / 2
+  bound <- function(p) {
+    if (!is.finite(stat) || cdf(0) <= p) return(0)
+    stats::uniroot(function(l) cdf(l) - p, c(0, max(10, stat * 2)),
+                   extendInt = "downX", tol = 1e-10)$root
   }
-  boots <- replicate(R, {
-    idx <- sample.int(n, replace = TRUE)
-    sframe_cramers_v(table(cases[[1]][idx], cases[[2]][idx]))
-  })
-  sframe_percentile_ci(boots, obs, conf.level)
+  c(bound(1 - a), bound(a))
 }
 
 # Cramer's V (phi for 2 by 2) from a contingency table, NA when degenerate.
@@ -240,60 +245,56 @@ sframe_cramers_v <- function(tbl) {
   sqrt(unname(chi) / (n * k))
 }
 
-#' Bootstrap confidence interval for eta squared
+#' Confidence interval for eta squared
 #'
-#' Percentile bootstrap for the proportion of variance in `outcome`
-#' explained by `group`, resampling observations jointly so the group
-#' structure travels with each resample.
+#' The noncentrality interval for the proportion of variance in `outcome`
+#' explained by `group`, as `effectsize::eta_squared(partial = FALSE,
+#' alternative = "two.sided")` computes it for a one-way ANOVA: the 2-sided
+#' interval for the noncentrality \eqn{\lambda} of the F statistic, each
+#' bound turned into \eqn{\lambda / (\lambda + df_{error})}. The interval
+#' reaches 0 when the test is far from significant. Until 0.4.3 this was a
+#' percentile bootstrap, whose resampled eta squared is never below 0, so of
+#' 40 samples with no group difference none had an interval reaching 0
+#' (FR-24).
 #'
 #' @param outcome A numeric vector.
 #' @param group A grouping vector of the same length.
-#' @param R Integer. Number of bootstrap resamples. Defaults to 2000.
+#' @param R Not used since 0.4.3, kept so existing calls still run.
 #' @param conf.level Confidence level. Defaults to 0.95.
-#' @param seed Integer or NULL. When supplied, sets the random seed.
+#' @param seed Not used since 0.4.3, since the interval involves no
+#'   resampling.
 #'
-#' @return A named numeric vector: `estimate`, `lower`, `upper`, with
-#'   attributes `resamples`, `valid_resamples` and, when the interval is
-#'   withheld, `reason`. The bounds are `NA` when fewer than 90% of resamples
-#'   give a value, or when every resample gives the same value, since neither
-#'   leaves a sampling distribution to read. The bounds
-#'   are `NA` with fewer than 3 complete observations or fewer than 2 groups.
+#' @return A named numeric vector: `estimate`, `lower`, `upper`, with the
+#'   attributes `level` and `method` (`"noncentral F"`). The bounds are `NA`
+#'   with fewer than 3 complete observations, fewer than 2 groups, or no
+#'   variation within the groups.
 #' @export
-#' @seealso [sframe_bootstrap_ci()]
+#' @seealso [sframe_cramers_v_ci()], [sframe_bootstrap_ci()]
 #'
 #' @examples
-#' sframe_eta_sq_ci(mtcars$mpg, mtcars$cyl, seed = 42)
+#' sframe_eta_sq_ci(mtcars$mpg, mtcars$cyl)
 #' @family Confidence interval functions
 sframe_eta_sq_ci <- function(outcome, group, R = 2000, conf.level = 0.95,
                       seed = NULL) {
-  if (!is.null(seed)) {
-    # set.seed() mutates the global RNG stream; restore whatever state the
-    # caller had on exit so an opt-in, reproducible seed here does not
-    # silently reset randomness for unrelated code that runs afterwards.
-    has_state <- exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)
-    old_state <- if (has_state) get(".Random.seed", envir = .GlobalEnv) else NULL
-    on.exit({
-      if (has_state) {
-        assign(".Random.seed", old_state, envir = .GlobalEnv)
-      } else if (exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) {
-        rm(".Random.seed", envir = .GlobalEnv)
-      }
-    }, add = TRUE)
-    set.seed(seed)
-  }
   keep <- is.finite(suppressWarnings(as.numeric(outcome))) & !is.na(group)
   outcome <- as.numeric(outcome)[keep]
-  group <- as.factor(as.vector(group)[keep])
+  group <- droplevels(as.factor(as.vector(group)[keep]))
   n <- length(outcome)
   obs <- sframe_eta_sq(outcome, group)
-  if (n < 3 || nlevels(droplevels(group)) < 2 || is.na(obs)) {
-    return(c(estimate = unname(obs), lower = NA_real_, upper = NA_real_))
-  }
-  boots <- replicate(R, {
-    idx <- sample.int(n, replace = TRUE)
-    sframe_eta_sq(outcome[idx], group[idx])
-  })
-  sframe_percentile_ci(boots, obs, conf.level)
+  out <- c(estimate = unname(obs), lower = NA_real_, upper = NA_real_)
+  k <- nlevels(group)
+  if (n < 3 || k < 2 || n <= k || is.na(obs)) return(out)
+  df1 <- k - 1
+  df2 <- n - k
+  ss_within <- sum((outcome - stats::ave(outcome, group))^2)
+  if (!is.finite(ss_within) || ss_within <= 0) return(out)
+  ss_between <- sum((stats::ave(outcome, group) - mean(outcome))^2)
+  f <- (ss_between / df1) / (ss_within / df2)
+  ncp <- sframe_ncp_ci(f, function(ncp) stats::pf(f, df1, df2, ncp), conf.level)
+  out[c("lower", "upper")] <- ncp / (ncp + df2)
+  attr(out, "level") <- conf.level
+  attr(out, "method") <- "noncentral F"
+  out
 }
 
 # Eta squared as between-group over total sum of squares, NA when degenerate
