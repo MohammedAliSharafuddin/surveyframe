@@ -857,6 +857,14 @@ arithmetic.
   correlation". The chi-square, Mann-Whitney, paired t, Wilcoxon,
   Kruskal-Wallis, correlation, linear and binary logistic sentences now
   compare p with the block's alpha too (FR-25).
+* **A sum score with unanswered items is prorated.** With `method =
+  "sum"` and `min_valid` below the number of items, an unanswered item
+  counted as 0: a respondent answering 5 and 5 on 2 of 4 items scored 10,
+  the middle of the 4 to 20 range, where the mean method gave the top. The
+  sum is now the mean of the answered items times the number of items (with
+  weights, the weighted mean times the sum of the weights), 20 here. A
+  respondent who answered every item gets the plain sum, as before. The
+  help for `min_valid` and `?score_scales` say so (FR-26).
 
 ## Reports
 

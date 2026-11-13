@@ -33,7 +33,11 @@ passed to \code{\link[=sframe_instrument]{sframe_instrument()}} as separate comp
 required to compute a score for a respondent, a whole number from 1 to
 the number of items. When \code{NULL}, every item must be answered. An item
 whose column is absent from the data counts as unanswered. Used by
-\code{\link[=score_scales]{score_scales()}}.}
+\code{\link[=score_scales]{score_scales()}}. With \code{method = "sum"}, a respondent who answered
+fewer than every item but at least \code{min_valid} gets a prorated sum: the
+mean of the answered items times the number of items (weighted, the
+weighted mean times the sum of the weights), so the score stays on the
+full scale's range. Before 0.4.3 an unanswered item counted as 0.}
 
 \item{reverse_items}{Character vector or NULL. A subset of \code{items} that
 this scale reverse-codes. Reversal applies within this scale only, so the

@@ -228,6 +228,9 @@ sframe_scale_weights <- function(scale, scale_item_ids) {
 
 sframe_composite_score <- function(scale_num, scale, scale_item_ids) {
   weights <- sframe_scale_weights(scale, scale_item_ids)
+  # Every declared item's weight, for prorating a sum over the full scale,
+  # absent columns included.
+  all_weights <- if (is.null(scale$weights)) rep(1, length(scale$items)) else scale$weights
 
   if (!is.null(scale$weights) && any(is.na(weights))) {
     sframe_warn_scoring(
@@ -237,14 +240,18 @@ sframe_composite_score <- function(scale_num, scale, scale_item_ids) {
     weights[is.na(weights)] <- 1
   }
 
-  if (scale$method == "sum") {
-    return(rowSums(sweep(scale_num, 2, weights, `*`), na.rm = TRUE))
-  }
-
   weighted_values <- sweep(scale_num, 2, weights, `*`)
   denom <- rowSums(sweep(!is.na(scale_num), 2, weights, `*`), na.rm = TRUE)
   scores <- rowSums(weighted_values, na.rm = TRUE) / denom
   scores[denom == 0] <- NA_real_
+  if (scale$method == "sum") {
+    # A prorated sum: the (weighted) mean of the answered items times the
+    # (weighted) number of items, so an unanswered item is not a 0. 5 and 5
+    # on 2 of 4 items scored 10, the middle of 4 to 20, where the mean method
+    # gave the top (FR-26). A respondent who answered every item gets the
+    # plain sum, as before.
+    scores <- scores * sum(all_weights, na.rm = TRUE)
+  }
   scores
 }
 
@@ -264,6 +271,13 @@ sframe_composite_score <- function(scale_num, scale, scale_item_ids) {
 #'
 #' @return A `data.frame` with scored scale columns appended. Scale columns are
 #'   named using the scale `id`.
+#' @section Sum scores with unanswered items:
+#' With `method = "sum"` and a `min_valid` below the number of items, a
+#' respondent who answered at least `min_valid` items gets a prorated sum:
+#' the mean of the answered items times the number of items (with weights,
+#' the weighted mean times the sum of the weights). 5 and 5 on 2 of 4 items
+#' on a 1 to 5 scale scores 20. Before 0.4.3 an unanswered item counted as 0,
+#' so the same respondent scored 10.
 #' @section Codes that are not scores:
 #' An item's scores are the longest run of its choice set's numeric codes at
 #' 1 even step: 1 to 5, or 0 to 100 in steps of 25. A code outside that run,
