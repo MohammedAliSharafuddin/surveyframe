@@ -2,7 +2,7 @@
 % Please edit documentation in R/bootstrap_ci.R
 \name{sframe_eta_sq_ci}
 \alias{sframe_eta_sq_ci}
-\title{Bootstrap confidence interval for eta squared}
+\title{Confidence interval for eta squared}
 \usage{
 sframe_eta_sq_ci(outcome, group, R = 2000, conf.level = 0.95, seed = NULL)
 }
@@ -11,30 +11,34 @@ sframe_eta_sq_ci(outcome, group, R = 2000, conf.level = 0.95, seed = NULL)
 
 \item{group}{A grouping vector of the same length.}
 
-\item{R}{Integer. Number of bootstrap resamples. Defaults to 2000.}
+\item{R}{Not used since 0.4.3, kept so existing calls still run.}
 
 \item{conf.level}{Confidence level. Defaults to 0.95.}
 
-\item{seed}{Integer or NULL. When supplied, sets the random seed.}
+\item{seed}{Not used since 0.4.3, since the interval involves no
+resampling.}
 }
 \value{
-A named numeric vector: \code{estimate}, \code{lower}, \code{upper}, with
-attributes \code{resamples}, \code{valid_resamples} and, when the interval is
-withheld, \code{reason}. The bounds are \code{NA} when fewer than 90\% of resamples
-give a value, or when every resample gives the same value, since neither
-leaves a sampling distribution to read. The bounds
-are \code{NA} with fewer than 3 complete observations or fewer than 2 groups.
+A named numeric vector: \code{estimate}, \code{lower}, \code{upper}, with the
+attributes \code{level} and \code{method} (\code{"noncentral F"}). The bounds are \code{NA}
+with fewer than 3 complete observations, fewer than 2 groups, or no
+variation within the groups.
 }
 \description{
-Percentile bootstrap for the proportion of variance in \code{outcome}
-explained by \code{group}, resampling observations jointly so the group
-structure travels with each resample.
+The noncentrality interval for the proportion of variance in \code{outcome}
+explained by \code{group}, as \code{effectsize::eta_squared(partial = FALSE, alternative = "two.sided")} computes it for a one-way ANOVA: the 2-sided
+interval for the noncentrality \eqn{\lambda} of the F statistic, each
+bound turned into \eqn{\lambda / (\lambda + df_{error})}. The interval
+reaches 0 when the test is far from significant. Until 0.4.3 this was a
+percentile bootstrap, whose resampled eta squared is never below 0, so of
+40 samples with no group difference none had an interval reaching 0
+(FR-24).
 }
 \examples{
-sframe_eta_sq_ci(mtcars$mpg, mtcars$cyl, seed = 42)
+sframe_eta_sq_ci(mtcars$mpg, mtcars$cyl)
 }
 \seealso{
-\code{\link[=sframe_bootstrap_ci]{sframe_bootstrap_ci()}}
+\code{\link[=sframe_cramers_v_ci]{sframe_cramers_v_ci()}}, \code{\link[=sframe_bootstrap_ci]{sframe_bootstrap_ci()}}
 
 Other Confidence interval functions:
 \code{\link[=sframe_bootstrap_ci]{sframe_bootstrap_ci()}},

@@ -836,6 +836,20 @@ arithmetic.
   percentage, and the sentence gives the number who answered and the number
   missing: "Frequency distribution for "Region" (N = 72, 18 missing)."
   (FR-23).
+* **The intervals for Cramer's V and eta squared can reach 0.**
+  `sframe_cramers_v_ci()` and `sframe_eta_sq_ci()` were percentile
+  bootstraps, and a resampled V or eta squared is never below 0, so the
+  interval sat above the estimate when the effect was small: an exactly
+  independent table read "V = 0.00, 95% CI [0.05, 0.50]", and of 40 samples
+  with no group difference the eta squared interval reached 0 in none.
+  Both are now the 2-sided noncentrality intervals effectsize computes
+  (`cramers_v(adjust = FALSE, alternative = "two.sided")` and
+  `eta_squared(partial = FALSE, alternative = "two.sided")`), from the
+  chi-square and the F statistic, and match it to 6 decimals on 7 tables
+  and ANOVAs. They involve no resampling, so `R` and `seed` are kept but
+  not used, and the result carries `method`. The chi-square, phi and
+  one-way ANOVA results change their intervals. The Kruskal-Wallis eta
+  squared keeps its bootstrap interval (FR-24).
 
 ## Reports
 

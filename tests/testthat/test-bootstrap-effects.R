@@ -55,8 +55,9 @@ test_that("15: the signed-rank r uses the same pairs as its test and interval", 
 })
 
 test_that("16: a collapsed bootstrap distribution gives no interval, with a reason", {
-  tab <- table(c("a", "a", "a", "b", "b", "b"), c("x", "x", "x", "y", "y", "y"))
-  ci <- sframe_cramers_v_ci(tab, R = 500, seed = 1)
+  # Cramer's V took this case until CF-B gave it a noncentrality interval
+  # (FR-24). A constant sample collapses every bootstrap resample the same way.
+  ci <- sframe_bootstrap_ci(rep(3, 12), FUN = mean, R = 500, seed = 1)
   expect_true(is.na(ci[["lower"]]) && is.na(ci[["upper"]]))
   expect_false(is.null(attr(ci, "reason")))
   expect_identical(attr(ci, "resamples"), 500L)
