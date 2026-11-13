@@ -366,7 +366,9 @@ sframe_resolve_delim <- function(path, delim = NULL) {
 sframe_is_blank <- function(x) {
   if (!is.character(x) && !is.factor(x)) return(rep(FALSE, length(x)))
   x <- as.character(x)
-  !is.na(x) & !nzchar(trimws(x))
+  # Byte-wise, so text that is not valid UTF-8 (a Windows-1252 export) is
+  # tested, not refused.
+  !is.na(x) & grepl("^[[:space:]]*$", x, useBytes = TRUE)
 }
 
 # Blank answers as NA. A factor comes back as text, as the reader keeps every
