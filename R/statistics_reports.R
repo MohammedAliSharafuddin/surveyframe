@@ -1294,18 +1294,56 @@ sframe_run_fisher <- function(data, roles, options = list()) {
   )
 }
 
+# The codes of the choice set an item names, in the order the instrument
+# declares them, read from the instrument the plan runner set around the
+# block. character(0) when there is no instrument, no such item, or the item
+# has no choice set.
+sframe_declared_codes <- function(column, instrument = .sframe_text_label_env$instrument) {
+  names(sframe_item_value_labels(instrument, column))
+}
+
+# McNemar's test compares 1 question asked twice, so the 2 items must share
+# their categories and the table must pair each category with itself. The
+# table is laid out on 1 order for both items: the declared choice set, then
+# any other value in radix order (FR-22, P2-03). table() of the 2 columns as
+# they came paired the first row level with the first column level, whatever
+# those were, so 2 factors with the same labels in a different level order,
+# or 2 items whose observed categories differed, gave a test of the wrong
+# cells.
 sframe_run_mcnemar <- function(data, roles, options = list()) {
   vars <- sframe_role_values(roles, c("before", "after", "variables"))
   err <- sframe_require_columns(data, vars[1:2], "McNemar test")
   if (!is.null(err)) return(list(test = "mcnemar", error = err))
-  tbl <- table(data[[vars[1]]], data[[vars[2]]])
+  set_1 <- sframe_declared_codes(vars[1])
+  set_2 <- sframe_declared_codes(vars[2])
+  if (length(set_1) && length(set_2) && !identical(sort(set_1, method = "radix"),
+                                                   sort(set_2, method = "radix"))) {
+    return(list(test = "mcnemar", error = sprintf(
+      "McNemar's test compares 1 question asked twice, and %s and %s have different response options (%s against %s). Give both items the same choice set.",
+      sframe_text_var(vars[1]), sframe_text_var(vars[2]),
+      paste(set_1, collapse = ", "), paste(set_2, collapse = ", "))))
+  }
+  before <- as.character(data[[vars[1]]])
+  after <- as.character(data[[vars[2]]])
+  keep <- !is.na(before) & !is.na(after)
+  before <- before[keep]
+  after <- after[keep]
+  declared <- if (length(set_1)) set_1 else set_2
+  seen <- unique(c(before, after))
+  lev <- c(declared[declared %in% seen],
+           sort(setdiff(seen, declared), method = "radix"))
+  tbl <- table(factor(before, levels = lev), factor(after, levels = lev))
+  names(dimnames(tbl)) <- NULL
   mt <- tryCatch(stats::mcnemar.test(tbl, correct = isTRUE(options$correct %||% TRUE)),
                  error = function(e) e)
+  if (!inherits(mt, "error") && !is.finite(unname(mt$statistic))) {
+    mt <- simpleError("a pair of categories has no change in either direction")
+  }
   if (inherits(mt, "error")) {
     return(list(test = "mcnemar", error = sframe_runner_failure(
-      sprintf("'%s' by '%s' makes a %d x %d table after removing missing values, and McNemar needs a square table with at least two categories.",
+      sprintf("'%s' by '%s' makes a %d x %d table after removing missing values, and McNemar needs at least two categories and a change between every pair of them.",
               vars[1], vars[2], nrow(tbl), ncol(tbl)),
-      "Check that both variables are paired items with the same response options.", mt)))
+      "Check that both variables are paired items with the same response options, or combine categories that nobody moved between.", mt)))
   }
   list(
     test = "mcnemar",
