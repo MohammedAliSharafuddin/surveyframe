@@ -20,3 +20,17 @@ test_that("a simulated chi-square omits df and says the p value is simulated", {
   expect_match(r$apa, "(N = 4) = 0.00, p", fixed = TRUE)
   expect_match(r$apa, "(simulated from 2000 tables)", fixed = TRUE)
 })
+
+test_that("a weighted chi-square says it tests the unweighted counts", {
+  # FR-34: no word at 2a910b0.
+  set.seed(2)
+  d <- data.frame(a = sample(c("x", "y"), 40, TRUE), b = sample(c("u", "v"), 40, TRUE),
+                  w = runif(40, 0.5, 2))
+  r <- cfb_block(d, "chi_square", list(row = "a", column = "b", weights = "w"),
+                 sframe_item("a", "a", type = "text"), sframe_item("b", "b", type = "text"),
+                 sframe_item("w", "Weight", type = "numeric"))
+  expect_match(r$apa, "The test uses the unweighted counts. The counts weighted by \"Weight\"",
+               fixed = TRUE)
+  expect_equal(r$n, 40L)
+  expect_false(is.null(r$weighted_table))
+})

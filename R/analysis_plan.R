@@ -673,6 +673,15 @@ sframe_run_crosstab <- function(data, vars, options = list()) {
     out$note <- usable$note
     out$apa <- paste(out$apa, usable$note)
   }
+  # The test, N, V and its interval are of the unweighted counts, and the
+  # weighted table sits beside them. Neither the sentence nor a note said
+  # which was tested (FR-34).
+  if (!is.null(weighted_table)) {
+    unweighted <- paste0("The test uses the unweighted counts. The counts weighted by ",
+                         sframe_text_var(weights), " are in the weighted table.")
+    out$note <- paste(c(out$note, unweighted), collapse = " ")
+    out$apa <- paste0(sub("\\.?$", ".", out$apa), " ", unweighted)
+  }
   out
 }
 
