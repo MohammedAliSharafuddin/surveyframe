@@ -874,6 +874,11 @@ arithmetic.
   "chi-square(NA, N = 4)", since a simulated p value has no degrees of
   freedom. The line now omits them and says how the p value was found:
   "chi-square(N = 4) = 0.00, p ... (simulated from 2000 tables)" (P2-09).
+* **`score_scales()` names the answers it cannot score.** A value outside
+  the item's choice set was scored: 7 on a 1 to 5 item counted as 7 and a
+  reversed 0 became 6. An answer that is not a number, such as "4,5",
+  became missing without a word and counted as unanswered toward
+  `min_valid`. Both are now missing with a message naming them (FR-30).
 
 ## Reports
 

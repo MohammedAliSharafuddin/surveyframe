@@ -113,6 +113,7 @@ sframe_scale_matrix <- function(data, instrument, scale, cols) {
            function(col) sframe_as_measure(data[[col]], col)),
     check.names = FALSE
   )
+  sframe_note_unreadable(data, out, scale)
   out <- sframe_drop_nonscore_codes(out, instrument, scale)
   for (col in intersect(sframe_scale_reverse_ids(instrument, scale), cols)) {
     rng <- sframe_item_bounds(instrument, col)
@@ -136,6 +137,8 @@ sframe_scale_matrix <- function(data, instrument, scale, cols) {
 sframe_drop_nonscore_codes <- function(out, instrument, scale) {
   dropped <- character(0)
   n <- 0L
+  undeclared <- numeric(0)
+  n_undeclared <- 0L
   for (col in names(out)) {
     item <- NULL
     for (i in instrument$items) if (identical(i$id, col)) item <- i
@@ -144,6 +147,17 @@ sframe_drop_nonscore_codes <- function(out, instrument, scale) {
     declared <- suppressWarnings(as.numeric(as.character(cs$values)))
     declared <- declared[!is.na(declared)]
     keep <- sframe_score_codes(cs$values)
+    # A value the set does not declare, such as 7 on a 1 to 5 item, is
+    # missing, with a message. It was scored as 7, and a reversed 0 became 6
+    # (FR-30).
+    if (length(declared)) {
+      stray <- !is.na(out[[col]]) & !out[[col]] %in% declared
+      if (any(stray)) {
+        undeclared <- union(undeclared, out[[col]][stray])
+        n_undeclared <- n_undeclared + sum(stray)
+        out[[col]][stray] <- NA_real_
+      }
+    }
     tie <- attr(keep, "tie")
     if (!is.null(tie)) {
       rlang::abort(
@@ -162,6 +176,12 @@ sframe_drop_nonscore_codes <- function(out, instrument, scale) {
       out[[col]][hit] <- NA_real_
     }
   }
+  if (n_undeclared > 0) {
+    message(sprintf(
+      "Scale '%s': %s of %s, which no item's choice set declares, %s read as missing.",
+      scale$id, sframe_count_noun(n_undeclared, "answer"), paste(format(sort(undeclared)), collapse = ", "),
+      if (n_undeclared == 1) "is" else "are"))
+  }
   if (n > 0) {
     message(sprintf(
       "Scale '%s': %s is not scored. %s of %s, outside the run of scoring codes, %s read as missing.",
@@ -170,6 +190,30 @@ sframe_drop_nonscore_codes <- function(out, instrument, scale) {
       if (n == 1) "is" else "are"))
   }
   out
+}
+
+# An answer that does not read as a number, such as "4,5", is missing in a
+# scale, with a message naming up to 3 of them. It became NA without a word
+# and counted as unanswered toward min_valid (FR-30).
+sframe_note_unreadable <- function(data, out, scale) {
+  bad <- character(0)
+  for (col in names(out)) {
+    raw <- data[[col]]
+    if (is.numeric(raw) || is.logical(raw)) next
+    raw <- as.character(raw)
+    hit <- !is.na(raw) & nzchar(trimws(raw)) & is.na(out[[col]])
+    bad <- c(bad, raw[hit])
+  }
+  if (length(bad) > 0) {
+    shown <- unique(bad)
+    message(sprintf(
+      "Scale '%s': %s that %s not read as a number (%s) %s read as missing.",
+      scale$id, sframe_count_noun(length(bad), "answer"),
+      if (length(bad) == 1) "does" else "do",
+      paste0("\"", utils::head(shown, 3), "\"", collapse = ", "),
+      if (length(bad) == 1) "is" else "are"))
+  }
+  invisible(NULL)
 }
 
 # Refuses scoring when a scale id names data score_scales() would overwrite: an
