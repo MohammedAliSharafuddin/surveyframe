@@ -27,6 +27,9 @@ sframe_percentile_ci <- function(boots, obs, conf.level) {
     out[["lower"]] <- ci[[1]]
     out[["upper"]] <- ci[[2]]
   }
+  # The level travels on the interval, so sframe_ci_string() prints 90% for
+  # a 90% interval. It printed 95% for every bootstrap interval (B-04).
+  attr(out, "level") <- conf.level
   attr(out, "resamples") <- length(boots)
   attr(out, "valid_resamples") <- length(finite)
   attr(out, "reason") <- reason
@@ -320,7 +323,8 @@ sframe_fisher_z_ci <- function(r, n, conf.level = 0.95) {
   z <- atanh(r)
   se <- 1 / sqrt(n - 3)
   crit <- stats::qnorm(1 - (1 - conf.level) / 2)
-  c(estimate = r, lower = tanh(z - crit * se), upper = tanh(z + crit * se))
+  structure(c(estimate = r, lower = tanh(z - crit * se), upper = tanh(z + crit * se)),
+            level = conf.level)
 }
 
 # " [lower, upper]" for an apa string, or "" when the interval is missing,
@@ -332,7 +336,7 @@ sframe_ci_string <- function(ci) {
   if (is.null(ci) || anyNA(ci[c("lower", "upper")])) return("")
   # A bare bracketed pair says nothing about what it covers, and APA asks for
   # the level. The level travels on the interval where a caller set one.
-  level <- attr(ci, "level") %||% 0.95
+  level <- attr(ci, "level") %||% attr(ci, "conf.level") %||% 0.95
   # ", 95% CI [a, b]" reads as APA writes it: the estimate, a comma, then the
   # labelled interval. A bare bracketed pair said nothing about the level.
   sprintf(", %g%% CI [%.2f, %.2f]", 100 * level, ci[["lower"]], ci[["upper"]])
