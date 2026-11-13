@@ -88,7 +88,10 @@ answers arrive exactly as written, a literal \code{NA} included. Columns of item
 with numeric responses (numeric, slider and rating items, choice items whose
 codes are all numbers, and ranking, multiple-choice and decision expansion
 columns) are then converted to numbers, with an empty cell or \code{NA} read as
-missing. A column that does not convert cleanly is kept as text. The column
+missing. A column that does not convert cleanly is kept as text, with a
+warning naming the column and up to 3 of the values. In every column, a
+blank answer (an empty cell, or only spaces) is missing, and a factor
+column of a data frame becomes text. The column
 of a single choice item that allows Other, and every \verb{<id>__other_text}
 column, stay text. Data frames
 go through the same conversion, so a CSV file and a data frame holding the

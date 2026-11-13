@@ -765,6 +765,14 @@ arithmetic.
   extra field and it is empty in all of them, the field is dropped with a
   message. Any other row whose width differs from the header's is refused,
   naming the first 3 lines and their field counts (P3-01).
+* **A blank answer is missing in every column `read_responses()` returns.**
+  Only text columns were cleaned, so a factor column of a data frame kept
+  its "" as an answer, and a declared numeric column with 1 value that did
+  not read as a number stayed text with its "" and no message. Every text
+  or factor column now has its blank answers (empty, or only spaces) made
+  missing first, factors become text, and a declared numeric column that
+  stays text gives a warning naming the column and up to 3 of its values
+  (P3-05).
 
 ## Reports
 

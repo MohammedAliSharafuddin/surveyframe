@@ -35,7 +35,10 @@
 #' with numeric responses (numeric, slider and rating items, choice items whose
 #' codes are all numbers, and ranking, multiple-choice and decision expansion
 #' columns) are then converted to numbers, with an empty cell or `NA` read as
-#' missing. A column that does not convert cleanly is kept as text. The column
+#' missing. A column that does not convert cleanly is kept as text, with a
+#' warning naming the column and up to 3 of the values. In every column, a
+#' blank answer (an empty cell, or only spaces) is missing, and a factor
+#' column of a data frame becomes text. The column
 #' of a single choice item that allows Other, and every `<id>__other_text`
 #' column, stay text. Data frames
 #' go through the same conversion, so a CSV file and a data frame holding the
@@ -347,8 +350,36 @@ sframe_resolve_delim <- function(path, delim = NULL) {
   names(counts)[which.max(counts)]
 }
 
+# TRUE where a value is a blank answer: an empty string, or only white
+# space. The 1 rule for a blank answer, in the reader and at the top of every
+# analysis runner (P3-05, P2-04).
+sframe_is_blank <- function(x) {
+  if (!is.character(x) && !is.factor(x)) return(rep(FALSE, length(x)))
+  x <- as.character(x)
+  !is.na(x) & !nzchar(trimws(x))
+}
+
+# Blank answers as NA. A factor comes back as text, as the reader keeps every
+# answer as written.
+sframe_blank_to_na <- function(x) {
+  if (is.factor(x)) x <- as.character(x)
+  if (!is.character(x)) return(x)
+  x[sframe_is_blank(x)] <- NA_character_
+  x
+}
+
+# Blank to NA first, for every text or factor column, then the declared
+# numeric columns to numbers. A factor column kept its "" (only text columns
+# were cleaned), and a declared numeric column with 1 value that did not
+# convert stayed text, kept its "", and said nothing (P3-05). It now gives a
+# warning naming the column and up to 3 of the values.
 sframe_convert_declared_columns <- function(data, instrument, response_items,
                                             dec = ".") {
+  for (col in colnames(data)) {
+    if (is.character(data[[col]]) || is.factor(data[[col]])) {
+      data[[col]] <- sframe_blank_to_na(data[[col]])
+    }
+  }
   for (col in intersect(sframe_numeric_response_columns(instrument, response_items),
                         colnames(data))) {
     x <- data[[col]]
@@ -356,20 +387,25 @@ sframe_convert_declared_columns <- function(data, instrument, response_items,
       data[[col]] <- as.numeric(x)
       next
     }
-    if (is.factor(x)) x <- as.character(x)
     if (!is.character(x)) next
     text <- trimws(x)
-    text[!is.na(text) & text %in% c("", "NA")] <- NA_character_
+    text[!is.na(text) & text == "NA"] <- NA_character_
     if (identical(dec, ",")) text <- sub(",", ".", text, fixed = TRUE)
     converted <- suppressWarnings(as.numeric(text))
-    if (all(is.na(text) | !is.na(converted))) data[[col]] <- converted
-  }
-  for (col in setdiff(colnames(data),
-                      sframe_numeric_response_columns(instrument, response_items))) {
-    x <- data[[col]]
-    if (is.character(x)) {
-      x[!is.na(x) & x == ""] <- NA_character_
-      data[[col]] <- x
+    bad <- !is.na(text) & is.na(converted)
+    if (!any(bad)) {
+      data[[col]] <- converted
+    } else {
+      shown <- unique(x[bad])
+      rlang::warn(paste0(
+        "Column '", col, "' holds numeric answers, and ",
+        sframe_count_noun(sum(bad), "value"), " did not read as a number (",
+        paste0("\"", utils::head(shown, 3), "\"", collapse = ", "),
+        if (length(shown) > 3) ", ..." else "",
+        "), so the column stays text. Correct or remove ",
+        if (sum(bad) == 1) "that value" else "those values",
+        " to analyse it as numbers."),
+        class = "sframe_warning")
     }
   }
   data
