@@ -290,23 +290,29 @@ read_responses <- function(
   sframe_convert_declared_columns(out, instrument, response_items, dec)
 }
 
+# TRUE when a choice set's codes are numbers: numeric, or text that survives
+# a numeric round trip. Codes like "01" read as numbers would lose their
+# leading zero, so they are text. The codes are compared as declared:
+# trimmed, " 1" counted as numeric and the answer " 1" became 1, a code the
+# set does not hold (P3-04). The 1 test for the reader and
+# export_responses(), which tested as.numeric() alone and wrote "01", "02"
+# to .sav and .dta as 1 and 2 (P3-03).
+sframe_codes_are_numbers <- function(values) {
+  if (is.numeric(values)) return(TRUE)
+  codes <- as.character(values)
+  if (!length(codes)) return(FALSE)
+  num <- suppressWarnings(as.numeric(codes))
+  back <- vapply(num, format, character(1), scientific = FALSE,
+                 trim = TRUE, digits = 15)
+  all(!is.na(num) & back == codes)
+}
+
 # The response columns whose values are numbers, from the instrument, so only
 # they are converted and identifiers, dates and text stay as written.
 sframe_numeric_response_columns <- function(instrument, response_items) {
   numeric_codes <- function(item) {
     for (cs in instrument$choices %||% list()) {
-      if (identical(cs$id, item$choice_set)) {
-        # Codes like "01" read as numbers would lose their leading zero, so
-        # only codes that survive a numeric round trip count as numeric. The
-        # codes are compared as declared: trimmed, " 1" counted as numeric and
-        # the answer " 1" became 1, a code the set does not hold (P3-04).
-        if (is.numeric(cs$values)) return(TRUE)
-        codes <- as.character(cs$values)
-        num <- suppressWarnings(as.numeric(codes))
-        back <- vapply(num, format, character(1), scientific = FALSE,
-                       trim = TRUE, digits = 15)
-        return(all(!is.na(num) & back == codes))
-      }
+      if (identical(cs$id, item$choice_set)) return(sframe_codes_are_numbers(cs$values))
     }
     FALSE
   }

@@ -34,7 +34,9 @@ Stata attaches value labels to numbers alone. In a \code{.dta}, a choice set
 coded with text, such as \code{"a"} and \code{"b"}, is written as 1, 2, 3 in the
 set's declared order, each carrying its label, so the file reads back in
 Stata with the labels intact. A \code{.sav} keeps the text codes, which SPSS
-labels directly.
+labels directly. Codes such as \code{"01"} and \code{"02"} are text, as
+\code{\link[=read_responses]{read_responses()}} reads them, since as numbers they would lose their
+leading zero and no longer match the instrument.
 }
 
 \section{Names and labels that do not fit the format}{

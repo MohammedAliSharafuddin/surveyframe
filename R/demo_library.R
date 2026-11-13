@@ -332,7 +332,9 @@ print.sframe_branding <- function(x, ...) {
 #' coded with text, such as `"a"` and `"b"`, is written as 1, 2, 3 in the
 #' set's declared order, each carrying its label, so the file reads back in
 #' Stata with the labels intact. A `.sav` keeps the text codes, which SPSS
-#' labels directly.
+#' labels directly. Codes such as `"01"` and `"02"` are text, as
+#' [read_responses()] reads them, since as numbers they would lose their
+#' leading zero and no longer match the instrument.
 #'
 #' @section Names and labels that do not fit the format:
 #' SPSS and Stata refuse column names with spaces or punctuation, names that
@@ -384,11 +386,12 @@ export_responses <- function(data, instrument, path) {
   }
   # A column of choice codes as a labelled vector. Numeric codes held as text,
   # as read from Google Sheets, are read as the numbers the set declares.
+  # Codes such as "01" are text, by the reader's test (P3-03).
   with_value_labels <- function(x, set) {
     vals <- set$values
     labs <- as.character(set$labels)
     v <- suppressWarnings(as.numeric(as.character(vals)))
-    if (!anyNA(v)) {
+    if (sframe_codes_are_numbers(vals)) {
       xn <- suppressWarnings(as.numeric(as.character(x)))
       if (!all(is.na(x) | !is.na(xn))) return(x)
       return(haven::labelled(xn, stats::setNames(v, labs)))
