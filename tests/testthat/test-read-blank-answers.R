@@ -20,3 +20,16 @@ test_that("a declared numeric column that stays text warns, naming column and va
   expect_no_warning(ok <- read_responses(data.frame(n = c("", " 2", "1")), ni))
   expect_equal(ok$n, c(NA, 2, 1))
 })
+
+test_that("a Windows-1252 file is still read, its bytes as written", {
+  # The blank rule tests text byte-wise: trimws() refused text that is not
+  # valid UTF-8 (probe_roundtrip.R windows1252, during CF-B).
+  i <- sframe_instrument("P3", components = list(sframe_item("note", "Note", "text")))
+  p <- tempfile(fileext = ".csv")
+  con <- file(p, "wb")
+  writeBin(c(charToRaw("respondent_id,note\n001,caf"), as.raw(0xe9), charToRaw("\n002,\n")), con)
+  close(con)
+  out <- read_responses(p, i)
+  expect_identical(charToRaw(out$note[1]), as.raw(c(0x63, 0x61, 0x66, 0xe9)))
+  expect_true(is.na(out$note[2]))
+})
