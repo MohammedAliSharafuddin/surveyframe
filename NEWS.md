@@ -698,6 +698,15 @@ arithmetic.
   value, 2 items with different choice sets are refused with both named,
   and a pair of categories nobody moved between gives an error in place of
   a statistic of NaN (FR-22, P2-03).
+* **An ordinal outcome is ordered as its choice set declares.**
+  `regression_logistic_ordinal` ordered a text-coded outcome
+  alphabetically, so low, medium, high became high < low < medium and the
+  slope's sign was reversed (0.85 became -0.60 on Fable's data). The order
+  is now the declared choice set, then other values, numbers by value (an
+  outcome coded "2", "9", "10" in that order, not "10" first). The result
+  carries `$outcome_levels`, and the sentence names the order: "Ordinal
+  logistic regression of "Rating", ordered Low < Medium < High, was
+  estimated with 90 complete cases." (FR-19).
 
 ## Reports
 
