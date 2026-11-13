@@ -903,6 +903,9 @@ arithmetic.
   outcome levels, such as low|medium) keep their estimate and standard
   error and no longer print an odds ratio. The result's `$coefficients`
   gains `p` and `threshold` (FR-35).
+* A Firth logistic block reads `options$conf_level` as well as
+  `options$conf.level`. Both were accepted, and `conf_level` gave a 95%
+  interval and was not listed as ignored (FR-36).
 
 ## Reports
 

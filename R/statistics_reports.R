@@ -1955,7 +1955,9 @@ sframe_run_firth_logistic <- function(data, roles, options = list()) {
                 error = "Fewer than 3 complete observations available."))
   }
 
-  conf_level <- options$conf.level %||% 0.95
+  # Both spellings the option registry accepts. conf_level was accepted and
+  # never read, so it gave a 95% interval with nothing ignored (FR-36).
+  conf_level <- options$conf_level %||% options$conf.level %||% 0.95
   form <- stats::as.formula(
     paste(outcome, "~", paste(predictors, collapse = " + "))
   )
