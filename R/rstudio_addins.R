@@ -1,5 +1,5 @@
 # R/rstudio_addins.R
-# RStudio Addins menu bindings. 3 launchers and one text insert, and nothing
+# RStudio Addins menu bindings. 4 launchers and one text insert, and nothing
 # else.
 #
 # Two rules hold this file apart from the rest of the package. No other file
@@ -170,5 +170,36 @@ addin_insert_skeleton <- function() {
     if (is.null(id)) return(invisible(NULL))
     rstudioapi::insertText(text = sframe_addin_skeleton(), id = id)
     invisible(NULL)
+  })
+}
+
+# The demos offered by "Try a demo", as "name: what it teaches" labels named
+# by demo, in sframe_list_demos() order.
+sframe_addin_demo_choices <- function() {
+  idx <- sframe_list_demos()
+  stats::setNames(idx$name, paste0(idx$name, ": ", idx$teaches))
+}
+
+# Asks which demo to open, and returns its name, or NULL where the list is
+# cancelled. Its own function so a test can drive each answer.
+sframe_addin_choose_demo <- function() {
+  choices <- sframe_addin_demo_choices()
+  picked <- utils::select.list(names(choices), title = "Try a demo",
+                               graphics = TRUE)
+  if (!length(picked) || !nzchar(picked[1])) return(NULL)
+  unname(choices[picked[1]])
+}
+
+# The menu entry "Try a demo". It opens SurveyStudio on the Design screen
+# with the chosen demo's instrument and responses loaded, so each of the 5
+# stages has something to show.
+#' @keywords internal
+#' @noRd
+addin_try_demo <- function() {
+  if (!sframe_addin_ready()) return(invisible(NULL))
+  sframe_run_addin(function() {
+    name <- sframe_addin_choose_demo()
+    if (is.null(name)) return(invisible(NULL))
+    launch_studio(demo = name, screen = "design")
   })
 }

@@ -22,6 +22,7 @@ sframe_startup_message <- function() {
     "  preview_survey(\"two_group\")                    # respondent view\n",
     "  preview_survey(\"two_group\", where = \"studio\")  # in SurveyStudio\n",
     "  demo <- sframe_demo(\"two_group\")               # instrument and data\n",
+    "Or in RStudio: Addins, then surveyframe: Try a demo.\n",
     "Start:  launch_builder() to design, launch_studio() to analyse,\n",
     "        or vignette(\"surveyframe\") for the tour.\n",
     "Cite:   citation(\"surveyframe\")\n",

@@ -1787,6 +1787,11 @@ arithmetic.
   wording, help text or branding edit. When one of those changes, the
   responses are cleared, and a message names what changed.
 
+* **The RStudio Addins menu has "Try a demo".** It lists the 24 bundled
+  demos with what each teaches, and opens the chosen one in SurveyStudio on
+  the Design screen with its responses loaded, so each of the 5 stages has
+  something to show. It is the same as `launch_studio(demo = "two_group",
+  screen = "design")`, and the start-up message names it.
 * **The builder on the Design screen is part of Studio.** It drops its
   SurveyBuilder name, its Preview mode and its Export survey button, which
   Studio's Preview Survey and Collect screens do. Its save state reads
