@@ -906,6 +906,12 @@ arithmetic.
 * A Firth logistic block reads `options$conf_level` as well as
   `options$conf.level`. Both were accepted, and `conf_level` gave a 95%
   interval and was not listed as ignored (FR-36).
+* **`sframe_assumption_results()` says which checks ran.** Its sentence was
+  always "Assumption checks were computed.", even when no check ran, as
+  with an outcome and a group and no `variables`. It now names the checks
+  that ran, or says none ran and which arguments each check needs, naming
+  an `outcome` given without `predictors` or a `group` without `variables`
+  (review_040 defect 3).
 
 ## Reports
 
