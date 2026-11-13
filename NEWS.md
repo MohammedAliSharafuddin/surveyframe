@@ -850,6 +850,13 @@ arithmetic.
   not used, and the result carries `method`. The chi-square, phi and
   one-way ANOVA results change their intervals. The Kruskal-Wallis eta
   squared keeps its bootstrap interval (FR-24).
+* **Every result sentence uses the block's alpha.** A block's `alpha`
+  reached the independent t test and the one-way ANOVA only, and the other
+  sentences compared p with a fixed .05: with alpha .001, a Pearson
+  correlation at p = .014 read "a positive, medium significant
+  correlation". The chi-square, Mann-Whitney, paired t, Wilcoxon,
+  Kruskal-Wallis, correlation, linear and binary logistic sentences now
+  compare p with the block's alpha too (FR-25).
 
 ## Reports
 

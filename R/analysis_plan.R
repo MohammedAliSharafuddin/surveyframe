@@ -247,6 +247,16 @@ sframe_group_order <- function(x, instrument = .sframe_text_label_env$instrument
   c(values[match(first, shown)], rest)
 }
 
+# The significance level a result's sentence compares p with: options$alpha,
+# else the alpha of the block being run, else .05. Only the t test and the
+# one-way ANOVA read the block's alpha, and the other sentences compared p
+# with a fixed .05, so a block declaring alpha .001 called p = .014
+# significant (FR-25).
+sframe_alpha <- function(options = list()) {
+  a <- options$alpha %||% .sframe_text_label_env$alpha %||% 0.05
+  if (!is.numeric(a) || length(a) != 1 || !is.finite(a) || a <= 0 || a >= 1) 0.05 else a
+}
+
 # ", higher in <group>" for a signed two-group effect, empty when the effect
 # is zero or missing.
 sframe_higher_group <- function(effect, groups) {
@@ -602,7 +612,7 @@ sframe_run_crosstab <- function(data, vars, options = list()) {
     ),
     prompt   = sprintf(
       "The chi-square test %s a significant association between %s and %s (%s = %.2f%s, %s effect). Describe the pattern in the cross-tabulation.",
-      if (ct$p.value < .05) "revealed" else "found no",
+      if (ct$p.value < sframe_alpha()) "revealed" else "found no",
       sframe_text_var(vars[1]), sframe_text_var(vars[2]), effect_name, effect, sframe_ci_string(v_ci),
       sframe_effect_label(effect, "r")
     ),
@@ -668,7 +678,7 @@ sframe_run_mann_whitney <- function(data, vars, instrument = NULL) {
     ),
     prompt   = sprintf(
       "The Mann-Whitney test %s a significant difference between %s (Mdn = %.2f) and %s (Mdn = %.2f), U = %.0f, p %s, r = %.2f%s (%s effect%s). Interpret the direction and practical significance.",
-      if (wt$p.value < .05) "revealed" else "did not reveal",
+      if (wt$p.value < sframe_alpha()) "revealed" else "did not reveal",
       shown[1], stats::median(g1),
       shown[2], stats::median(g2),
       wt$statistic, sframe_p_string(wt$p.value),
@@ -680,7 +690,7 @@ sframe_run_mann_whitney <- function(data, vars, instrument = NULL) {
 
 sframe_run_t_test <- function(data, vars, options = list(), instrument = NULL) {
   data <- sframe_analysis_frame(data)
-  alpha <- options$alpha %||% 0.05
+  alpha <- sframe_alpha(options)
   var_equal <- isTRUE(options$var_equal)
   group_col <- vars[1]
   outcome_col <- vars[2]
@@ -731,7 +741,7 @@ sframe_run_t_test <- function(data, vars, options = list(), instrument = NULL) {
 
 sframe_run_anova_one <- function(data, vars, options = list()) {
   data <- sframe_analysis_frame(data)
-  alpha <- options$alpha %||% 0.05
+  alpha <- sframe_alpha(options)
   group_col <- vars[1]
   outcome_col <- vars[2]
   outcome <- sframe_num((data[[outcome_col]]))
@@ -856,7 +866,7 @@ sframe_run_t_test_pair <- function(data, vars) {
     ),
     prompt = sprintf(
       "The paired-samples t-test %s a significant mean difference between %s (M = %.2f) and %s (M = %.2f), t(%d) = %.2f, p %s, d_z = %.2f%s (%s effect%s). Interpret the direction and practical significance of the change.",
-      if (tt$p.value < .05) "revealed" else "did not reveal",
+      if (tt$p.value < sframe_alpha()) "revealed" else "did not reveal",
       sframe_text_var(vars[1]), mean(x), sframe_text_var(vars[2]), mean(y),
       unname(tt$parameter), unname(tt$statistic),
       sframe_p_string(tt$p.value),
@@ -927,7 +937,7 @@ sframe_run_wilcoxon_pair <- function(data, vars) {
     ),
     prompt = sprintf(
       "The Wilcoxon signed-rank test %s a significant difference between %s (Mdn = %.2f) and %s (Mdn = %.2f), V = %.0f, z = %.2f, p %s, r = %.2f%s (%s effect%s). Discuss the direction and practical significance.",
-      if (p < .05) "revealed" else "did not reveal",
+      if (p < sframe_alpha()) "revealed" else "did not reveal",
       sframe_text_var(vars[1]), stats::median(x),
       sframe_text_var(vars[2]), stats::median(y),
       V, z,
@@ -972,7 +982,7 @@ sframe_run_kruskal <- function(data, vars) {
     ),
     prompt   = sprintf(
       "The Kruskal-Wallis test %s a significant difference across groups, H(%d) = %.2f, p %s, \u03b7\u00b2 = %.3f%s (%s effect). If significant, describe which groups differed and in what direction.",
-      if (kt$p.value < .05) "revealed" else "did not reveal",
+      if (kt$p.value < sframe_alpha()) "revealed" else "did not reveal",
       kt$parameter, kt$statistic,
       sframe_p_string(kt$p.value), eta2, sframe_ci_string(eta_ci),
       sframe_effect_label(eta2, "eta2")
@@ -1022,7 +1032,7 @@ sframe_run_correlation <- function(data, vars, method = "pearson") {
       "There was a %s, %s %s correlation between %s and %s, %s = %.2f%s, p %s%s. Explain what this means for your research question.",
       if (r > 0) "positive" else "negative",
       sframe_effect_label(abs(r), "r"),
-      if (ct$p.value < .05) "significant" else "non-significant",
+      if (ct$p.value < sframe_alpha()) "significant" else "non-significant",
       sframe_text_var(vars[1]), sframe_text_var(vars[2]),
       head, r, sframe_ci_string(ci), sframe_p_string(ct$p.value), tail
     )
@@ -1083,7 +1093,7 @@ sframe_run_regression <- function(data, vars) {
     ), coding),
     prompt   = sprintf(
       "The regression model %s (R\u00b2 = %.3f, F(%d, %d) = %.2f, p %s). Interpret the direction and significance of each predictor and discuss the variance explained.",
-      if (p_val < .05) "was statistically significant" else "was not statistically significant",
+      if (p_val < sframe_alpha()) "was statistically significant" else "was not statistically significant",
       s$r.squared, f_stat[2], f_stat[3], f_stat[1], sframe_p_string(p_val)
     )
   )
@@ -1165,7 +1175,7 @@ sframe_run_logistic_binary <- function(data, vars, options = list()) {
     ), sframe_event_sentence(outcome_col, coded)), coding),
     prompt = sprintf(
       "The binary logistic regression model was %s overall, \u03c7\u00b2(%d) = %.2f, p %s, McFadden R\u00b2 = %.3f. Interpret the direction and odds ratio for each significant predictor.",
-      if (chi_p < .05) "statistically significant" else "not statistically significant",
+      if (chi_p < sframe_alpha()) "statistically significant" else "not statistically significant",
       chi_df, chi_val, sframe_p_string(chi_p), mcfadden_r2
     )
   )
@@ -1850,6 +1860,11 @@ sframe_run_one_block <- function(block, data, instrument, plots = FALSE,
   if (!is.null(block$alpha) && sframe_method_uses_alpha(test)) {
     options$alpha <- block$alpha
   }
+  # Every runner's sentence compares p with the block's alpha, read through
+  # sframe_alpha(), including the runners that take no options (FR-25).
+  old_alpha <- .sframe_text_label_env$alpha
+  .sframe_text_label_env$alpha <- options$alpha
+  on.exit(.sframe_text_label_env$alpha <- old_alpha, add = TRUE)
 
   # A block whose roles give its method no variables would compute on
   # nothing and report N = 0 as a result. It reports why, as an error.
