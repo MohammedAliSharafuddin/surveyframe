@@ -27,7 +27,9 @@ sframe_scale_reverse_ids <- function(instrument, scale) {
 # of 25 scores all 5. A code outside the run is not a score: score_scales()
 # reads it as missing and reversal ignores it. Reading every numeric code as a
 # score made the bounds 1 to 99, so a reversed 1 became 99 (FR-18). NULL when
-# the set has no numeric code.
+# the set has no numeric code. When 2 runs are longest (1, 2, 4, 5), which
+# codes are scores is unclear: the result is empty, with the attribute "tie"
+# holding the runs, and scoring refuses the scale.
 sframe_score_codes <- function(values) {
   v <- suppressWarnings(as.numeric(as.character(values)))
   v <- sort(unique(v[!is.na(v)]))
@@ -37,7 +39,15 @@ sframe_score_codes <- function(values) {
   breaks <- c(0, which(abs(gaps - step) > 1e-9 * max(1, abs(step))), length(v))
   runs <- lapply(seq_len(length(breaks) - 1),
                  function(k) v[(breaks[k] + 1):breaks[k + 1]])
-  runs[[which.max(lengths(runs))]]
+  longest <- which(lengths(runs) == max(lengths(runs)))
+  if (length(longest) > 1) return(structure(numeric(0), tie = runs[longest]))
+  runs[[longest]]
+}
+
+# "1 to 2 and 4 to 5" for the tied runs of sframe_score_codes().
+sframe_runs_text <- function(runs) {
+  paste(vapply(runs, function(r) paste(format(min(r)), "to", format(max(r))),
+               character(1)), collapse = " and ")
 }
 
 # The choice set an item names, or NULL.
@@ -134,6 +144,15 @@ sframe_drop_nonscore_codes <- function(out, instrument, scale) {
     declared <- suppressWarnings(as.numeric(as.character(cs$values)))
     declared <- declared[!is.na(declared)]
     keep <- sframe_score_codes(cs$values)
+    tie <- attr(keep, "tie")
+    if (!is.null(tie)) {
+      rlang::abort(
+        c(paste0("Scale '", scale$id, "' cannot be scored: choice set '", cs$id,
+                 "' has 2 or more equally long runs of codes (",
+                 sframe_runs_text(tie), "), so which codes are scores is unclear."),
+          i = "Give the set 1 run of scoring codes, such as 1 to 5, and any other code outside it."),
+        class = "sframe_error")
+    }
     other <- setdiff(declared, keep)
     if (!length(other)) next
     hit <- !is.na(out[[col]]) & out[[col]] %in% other
@@ -145,8 +164,9 @@ sframe_drop_nonscore_codes <- function(out, instrument, scale) {
   }
   if (n > 0) {
     message(sprintf(
-      "Scale '%s': %s of %s, outside the run of scoring codes, %s read as missing.",
-      scale$id, sframe_count_noun(n, "answer"), paste(dropped, collapse = ", "),
+      "Scale '%s': %s is not scored. %s of %s, outside the run of scoring codes, %s read as missing.",
+      scale$id, paste(dropped, collapse = ", "),
+      sframe_count_noun(n, "answer"), paste(dropped, collapse = ", "),
       if (n == 1) "is" else "are"))
   }
   out
@@ -249,8 +269,9 @@ sframe_composite_score <- function(scale_num, scale, scale_item_ids) {
 #' 1 even step: 1 to 5, or 0 to 100 in steps of 25. A code outside that run,
 #' such as 99 for "do not know" after 1 to 5, is read as missing, with a
 #' message naming it and how many answers held it, and a reversed item is
-#' reversed on the run's ends (1 + 5 - x). [validate_sframe()] notes such a
-#' choice set. Before 0.4.3 every numeric code was a score, so the reversal
+#' reversed on the run's ends (1 + 5 - x). A set with 2 equally long runs,
+#' such as 1, 2, 4, 5, has no clear run, and its scale is refused with an
+#' error. [validate_sframe()] notes such a choice set. Before 0.4.3 every numeric code was a score, so the reversal
 #' point moved to 1 + 99 and a 99 entered the mean.
 #' @export
 #' @seealso [sframe_scale()], [sframe_reliability_results()]

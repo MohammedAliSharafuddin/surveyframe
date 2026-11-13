@@ -741,8 +741,10 @@ arithmetic.
   choosing 99. A 99 that was chosen entered the mean, and alpha fell from
   .78 to .04 on Fable's data. `score_scales()`, the reliability and item
   results now score the longest run of codes at 1 even step and read other
-  codes as missing, with a message, and `validate_sframe()` notes such a
-  set, naming its codes. See "Codes that are not scores" in
+  codes as missing, with a message ("99 is not scored"), and
+  `validate_sframe()` notes such a set, naming its codes. A set with 2
+  equally long runs, such as 1, 2, 4, 5, has no clear run, so its scale is
+  refused with an error and the note says so. See "Codes that are not scores" in
   `?score_scales`. A declared "not a score" code in the schema is planned
   for 0.4.4 (FR-18).
 
