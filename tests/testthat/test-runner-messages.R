@@ -23,7 +23,11 @@ expect_full_message <- function(msg, label) {
 }
 
 test_that("McNemar names the block, the data problem, the remedy and R's message", {
-  d <- data.frame(a = c("yes", "yes", "yes", "yes"), b = c("yes", "no", "yes", "no"))
+  # 1 category at both times: no 2 by 2 table can be made. (Until CF-B the
+  # data here were yes, yes, yes, yes against yes, no, yes, no, a 1 by 2
+  # table that failed only because the "no" row was missing. Laid out on 1
+  # order for both items it is a valid 2 by 2 test, FR-22.)
+  d <- data.frame(a = c("yes", "yes", "yes", "yes"), b = c("yes", "yes", "yes", "yes"))
   res <- run_block("mcnemar", list(before = "a", after = "b"), d)
   expect_false(is.null(res$error))
   expect_false(identical(res$error, "McNemar test failed."))

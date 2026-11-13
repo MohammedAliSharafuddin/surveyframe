@@ -226,8 +226,11 @@ sframe_cohens_d <- function(x, y) {
 # codes of the item's choice set as the instrument lists them, then factor
 # levels, then sorted values. Never row order, so re-sorting the responses
 # cannot flip the sign of a test. Values the choice set does not list follow
-# its codes, sorted.
-sframe_group_order <- function(x, instrument = NULL, group_col = NULL) {
+# its codes, sorted in radix (code point) order, which no session locale
+# changes (FR-21). With no instrument given, the one the plan runner set
+# around the block is used.
+sframe_group_order <- function(x, instrument = .sframe_text_label_env$instrument,
+                               group_col = NULL) {
   present <- x[!is.na(x)]
   if (is.factor(present)) present <- as.character(droplevels(present))
   values <- unique(present)
@@ -237,7 +240,7 @@ sframe_group_order <- function(x, instrument = NULL, group_col = NULL) {
   } else character(0)
   if (length(declared) == 0 && is.factor(x)) declared <- levels(x)
   first <- declared[declared %in% shown]
-  rest <- sort(values[!shown %in% declared])
+  rest <- sort(values[!shown %in% declared], method = "radix")
   c(values[match(first, shown)], rest)
 }
 

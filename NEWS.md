@@ -680,6 +680,25 @@ style.
   two available item columns." and never named the item. It now fails the
   standard check, as other methods do, naming the item.
 
+### Answers coded and ordered as the instrument declares them
+
+Every statistic in a review of the runners against base R and reference
+packages matched (Fable sitting 2, Codex passes 2 and 3). These are defects
+in how answers were coded, ordered and labelled before and after the
+arithmetic.
+
+* **McNemar's test pairs each category with itself.** The table was
+  `table()` of the 2 columns as they came, so the first row level was paired
+  with the first column level whatever they were. 2 factors holding yes and
+  no in opposite level order gave chi-square 0.80 and p = .371 where the
+  test on the aligned table gives 0 and p = 1, and 2 items whose observed
+  categories differed (a and b at the first time, b and c at the second)
+  were tested as a 2 by 2 table pairing a with b. The table is now laid out
+  on 1 order for both items, the declared choice set and then any other
+  value, 2 items with different choice sets are refused with both named,
+  and a pair of categories nobody moved between gives an error in place of
+  a statistic of NaN (FR-22, P2-03).
+
 ## Reports
 
 * **The missing-data patterns table gives a percentage under "Percent".**
