@@ -787,6 +787,14 @@ arithmetic.
   the set and the code, and the reader compares codes as declared.
   SurveyBuilder already trims a code as it is typed, so only a set written
   in R or edited by hand can hold one (P3-04).
+* **`export_responses()` keeps codes such as "01" as text.** It decided
+  that a choice set's codes were numbers with `as.numeric()` alone, so codes
+  "01" and "02" left as 1 and 2 in .sav and .dta files: the labels survived
+  but the codes no longer matched the instrument, and analysis of the
+  re-read file stopped. The export and `read_responses()` now share 1 test,
+  the numeric round trip, so such codes take the text route already there:
+  labelled text in a .sav, positions 1, 2, 3 with their labels in a .dta
+  (P3-03).
 
 ## Reports
 
