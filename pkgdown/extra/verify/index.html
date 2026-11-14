@@ -52,11 +52,15 @@
   input[type=file]{display:none}
   .or-paste{margin-top:16px}
   .or-paste summary{cursor:pointer; font-size:.92rem; color:var(--navy); font-weight:600}
+  .paste-label{display:block; margin-top:10px; font-size:.92rem; font-weight:600}
+  #pasteHint{font-size:.88rem; color:var(--sub); margin:6px 0 0}
   textarea#pasteArea{
     width:100%; min-height:140px; margin-top:10px; font-family:JetBrains Mono,monospace;
     font-size:.82rem; padding:10px; border:1px solid var(--line); border-radius:8px;
   }
-  #result{display:none; margin-top:24px}
+  /* Kept in the page while empty, so screen readers register the live region before a result is written into it (Codex WR84). */
+  #result{margin-top:24px}
+  #result:focus{outline:none}
   .banner{
     border-radius:12px; padding:18px 20px; font-weight:700; font-size:1.05rem;
     display:flex; align-items:center; gap:10px; margin-bottom:16px;
@@ -129,7 +133,9 @@
     </div>
     <details class="or-paste">
       <summary>Or paste the file's JSON text instead</summary>
-      <textarea id="pasteArea" placeholder="Paste the contents of a .sframe file here"></textarea>
+      <label for="pasteArea" class="paste-label">The .sframe file's JSON text</label>
+      <textarea id="pasteArea" aria-describedby="pasteHint"></textarea>
+      <p id="pasteHint" class="small">Open the .sframe file in a text editor, copy all of it, and paste it here.</p>
       <div style="margin-top:8px; display:flex; gap:8px">
         <button class="btn btn-primary" id="pasteBtn">Verify pasted text</button>
         <button class="btn btn-outline-primary" id="clearBtn" type="button">Clear</button>
@@ -137,7 +143,7 @@
     </details>
   </div>
 
-  <div id="result"></div>
+  <div id="result" role="status" aria-live="polite" tabindex="-1"></div>
 
   <p class="scope-note">
     <strong>What this proves, and what it does not.</strong> A matching hash
@@ -480,6 +486,7 @@ async function verify(text){
   }
 
   resultEl.innerHTML=html;
+  resultEl.focus();
 }
 
 // -- Wiring ------------------------------------------------------------------

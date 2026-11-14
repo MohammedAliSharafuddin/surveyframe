@@ -1353,6 +1353,8 @@ arithmetic.
   Research Report" whatever the study. The date under the title is labelled
   "Rendered" in place of Quarto's "Published", since a rendered report
   has not been published. The built-in HTML engine shows the authors too.
+* **The Quarto HTML report's captions and margin text are #565c61**, 6.8:1
+  on white, where Quarto's grey was 4.3:1, below WCAG AA (Codex WR197).
 
 ## Validation
 

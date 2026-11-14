@@ -36,6 +36,8 @@ pre.sourceCode a:empty { display: none; }
 # On surveyframe.org (pkgdown sets IN_PKGDOWN) the code shows but its printed
 # results and plots do not: the site shows no numbers from demonstration data
 # (owner rule, Codex WR02 to WR80). Installed copies show everything.
+# A screenshot chunk sets results = "markup", since results = "hide" would
+# drop include_graphics() output and the SurveyStudio screenshots with it.
 if (identical(Sys.getenv("IN_PKGDOWN"), "true")) knitr::opts_chunk$set(results = "hide", fig.show = "hide")
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>", fig.path = "figures/")
 library(surveyframe)
@@ -145,7 +147,7 @@ demo$instrument
 Four questions, a section break, and a plan with four blocks. This is what a
 respondent sees:
 
-```{r first-survey-shot, echo = FALSE, fig.show = "asis", out.width = "100%"}
+```{r first-survey-shot, echo = FALSE, results = "markup", fig.show = "asis", out.width = "100%", fig.alt = "The Event feedback survey as a respondent sees it: a required question on whether they attended before, age, the day attended, then an optional section asking what to do differently next year, and a Submit button."}
 knitr::include_graphics("figures/survey-first-survey.png")
 ```
 
@@ -173,7 +175,7 @@ declare your own plan, and the rest is unchanged.
 
 The commonest comparison there is: one number, and two groups of people.
 
-```{r two-group-shot, echo = FALSE, fig.show = "asis", out.width = "100%"}
+```{r two-group-shot, echo = FALSE, results = "markup", fig.show = "asis", out.width = "100%", fig.alt = "The In person or online survey: a required question on how the respondent attended, with 2 options, and a number field for how many sessions they attended."}
 knitr::include_graphics("figures/survey-two-group.png")
 ```
 
@@ -190,7 +192,7 @@ other as a sensitivity analysis and label it as such when reporting both.
 
 ### The same people, measured twice
 
-```{r paired-shot, echo = FALSE, fig.show = "asis", out.width = "100%"}
+```{r paired-shot, echo = FALSE, results = "markup", fig.show = "asis", out.width = "100%", fig.alt = "The Before and after the workshop survey: 2 sliders from 0 to 100 for confidence before today and now, then 2 yes or no questions on recommending the event before today and now."}
 knitr::include_graphics("figures/survey-paired.png")
 ```
 
@@ -203,7 +205,7 @@ for (b in run_analysis_plan(pr$responses, pr$instrument)) {
 
 ### Three groups, a second factor, and a covariate
 
-```{r multi-group-shot, echo = FALSE, fig.show = "asis", out.width = "100%"}
+```{r multi-group-shot, echo = FALSE, results = "markup", fig.show = "asis", out.width = "100%", fig.alt = "The Who attends the most survey: role with 3 options (student, practitioner, academic), how the respondent attended, age, and number of sessions attended."}
 knitr::include_graphics("figures/survey-multi-group.png")
 ```
 
@@ -221,7 +223,7 @@ for (b in run_analysis_plan(mg$responses, mg$instrument)[1:2]) {
 
 ### A scale, and whether it holds together
 
-```{r likert-shot, echo = FALSE, fig.show = "asis", out.width = "100%"}
+```{r likert-shot, echo = FALSE, results = "markup", fig.show = "asis", out.width = "100%", fig.alt = "The Was the event well organised survey: 4 statements, each rated on 5 labelled buttons from 1, strongly disagree, to 5, strongly agree."}
 knitr::include_graphics("figures/survey-likert-scale.png")
 ```
 
@@ -251,7 +253,7 @@ vapply(sframe_get_models(sem$instrument), function(m) m$type, character(1))
 
 ### A matrix item, and the columns it becomes
 
-```{r matrix-shot, echo = FALSE, fig.show = "asis", out.width = "100%"}
+```{r matrix-shot, echo = FALSE, results = "markup", fig.show = "asis", out.width = "100%", fig.alt = "The Rate each session survey: a grid with 4 sessions as rows and 5 rating columns from poor to excellent, then a question on how the respondent attended."}
 knitr::include_graphics("figures/survey-matrix-likert.png")
 ```
 
@@ -274,7 +276,7 @@ matches the contract the instrument declares. Read with
 
 ### Questions only some people see
 
-```{r branching-shot, echo = FALSE, fig.show = "asis", out.width = "100%"}
+```{r branching-shot, echo = FALSE, results = "markup", fig.show = "asis", out.width = "100%", fig.alt = "The Questions that depend on who you are survey: 1 required question, what brought you here, with 4 options. Later questions appear only for some answers."}
 knitr::include_graphics("figures/survey-branching.png")
 ```
 
@@ -314,15 +316,15 @@ sframe_demo("two_group", branded = TRUE)
 
 Plain, then the welcome page a respondent meets first, then the questions:
 
-```{r plain-shot, echo = FALSE, fig.show = "asis", out.width = "100%"}
+```{r plain-shot, echo = FALSE, results = "markup", fig.show = "asis", out.width = "100%", fig.alt = "The plain Event feedback survey: all 4 questions on 1 page with a Submit button and no branding."}
 knitr::include_graphics("figures/presentation-plain.png")
 ```
 
-```{r welcome-shot, echo = FALSE, fig.show = "asis", out.width = "100%"}
+```{r welcome-shot, echo = FALSE, results = "markup", fig.show = "asis", out.width = "100%", fig.alt = "A welcome page headed Thank you for coming, with the Riverside Conference Centre name, the expected time, a consent checkbox and a Start button."}
 knitr::include_graphics("figures/presentation-welcome.png")
 ```
 
-```{r branded-shot, echo = FALSE, fig.show = "asis", out.width = "100%"}
+```{r branded-shot, echo = FALSE, results = "markup", fig.show = "asis", out.width = "100%", fig.alt = "The same 4 questions in the branded version: the conference centre name above the title and a Send my feedback button."}
 knitr::include_graphics("figures/presentation-branded.png")
 ```
 
@@ -334,7 +336,7 @@ pressing Start without ticking the box refuses to continue.
 `render$mode` takes `"standard"`, which is everything on one page, or
 `"conversational"`, which is one question at a time with a progress bar.
 
-```{r conversational-shot, echo = FALSE, fig.show = "asis", out.width = "100%"}
+```{r conversational-shot, echo = FALSE, results = "markup", fig.show = "asis", out.width = "100%", fig.alt = "Conversational mode: 1 question per screen, here question 1 of 6 with 2 options, a progress bar at the top and a Next button."}
 knitr::include_graphics("figures/presentation-conversational.png")
 ```
 
@@ -342,7 +344,7 @@ Conversational mode works with skip logic, which is the combination most
 likely to surprise: a hidden question is stepped over without leaving the
 respondent on a blank card.
 
-```{r conv-branch-shot, echo = FALSE, fig.show = "asis", out.width = "100%"}
+```{r conv-branch-shot, echo = FALSE, results = "markup", fig.show = "asis", out.width = "100%", fig.alt = "Conversational mode with skip logic: question 1 of 3, what brought you here, with 4 options and a Next button."}
 knitr::include_graphics("figures/presentation-conversational-branching.png")
 ```
 

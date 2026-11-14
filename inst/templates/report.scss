@@ -5,3 +5,15 @@
 // is not used. Left on, pandoc fetched it to embed: every report needed the
 // internet, sent Google a request, and hung when the connection stalled.
 $web-font-path: false;
+
+/*-- scss:rules --*/
+// Captions and margin text at WCAG AA (Codex WR197): Quarto's default grey,
+// about #747a7f, is 4.3:1 on white. #565c61 is 6.8:1. The body prefix keeps
+// these rules ahead of Quarto's own.
+body .panel-caption, body .figure-caption, body .subfigure-caption,
+body .table-caption, body figcaption, body caption,
+body .quarto-layout-cell[data-ref-parent] caption,
+body .column-margin figcaption, body .margin-caption, body div.aside,
+body aside, body .column-margin {
+  color: #565c61;
+}
