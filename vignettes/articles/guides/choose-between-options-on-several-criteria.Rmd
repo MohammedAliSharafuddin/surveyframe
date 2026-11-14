@@ -1,0 +1,43 @@
+---
+title: "How to choose between options on several criteria"
+description: "A decision study choosing next year's venue from candidate venues, weighting the criteria and ranking the venues by 10 methods. surveyframe declares the analysis in advance (Analytic hierarchy process (AHP), Analytic network process (ANP), DEMATEL, TOPSIS, VIKOR, MOORA, SMART, WASPAS, PROMETHEE, ELECTRE) and reports it in APA 7."
+---
+
+A decision study choosing next year's venue from candidate venues, weighting the criteria and ranking the venues by 10 methods. surveyframe declares the analysis in advance (Analytic hierarchy process (AHP), Analytic network process (ANP), DEMATEL, TOPSIS, VIKOR, MOORA, SMART, WASPAS, PROMETHEE, ELECTRE) and reports it in APA 7.
+
+## In SurveyStudio
+
+In RStudio, open the Addins menu, choose **surveyframe: Try a demo** and pick `mcdm_choice`. The study opens on the Design screen. Plan shows each research question with its method and decision rule, Analyse runs them as declared, and Report writes the APA 7 report.
+
+![The Design screen with the mcdm_choice study.](../../studies/mcdm_choice/design.png){width=100%}
+
+## In R
+
+```r
+d <- sframe_demo("mcdm_choice")
+results <- run_analysis_plan(d$responses, d$instrument)
+render_report(d$instrument, d$responses)
+```
+
+## What the report gives
+
+| Research question | Method | What the report gives |
+|---|---|---|
+| What weight does each criterion carry? | Analytic hierarchy process (AHP) | The APA 7 sentence, its table and chart |
+| The same weights with network dependence allowed. | Analytic network process (ANP) | The APA 7 sentence, its table and chart |
+| Which criteria drive the others? | DEMATEL | The APA 7 sentence, its table and chart |
+| Which venue ranks best overall? | TOPSIS | The APA 7 sentence, its table and chart |
+| And by compromise ranking? | VIKOR | The APA 7 sentence, its table and chart |
+| And by ratio analysis? | MOORA | The APA 7 sentence, its table and chart |
+| And by simple multi-attribute rating? | SMART | The APA 7 sentence, its table and chart |
+| And by weighted aggregated sum product? | WASPAS | The APA 7 sentence, its table and chart |
+| And by outranking flows? | PROMETHEE | The APA 7 sentence, its table and chart |
+| And by outranking with thresholds? | ELECTRE | The APA 7 sentence, its table and chart |
+
+The demo's data is simulated, so the site shows no numbers. Run it in SurveyStudio or R to see the results, each marked as demonstration data.
+
+## Related
+
+- [Survey studies to start from](../studies.html)
+- [All method guides](../guides.html)
+

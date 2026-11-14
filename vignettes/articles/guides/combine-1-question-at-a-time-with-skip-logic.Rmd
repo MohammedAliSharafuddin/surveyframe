@@ -1,0 +1,32 @@
+---
+title: "How to combine 1 question at a time with skip logic"
+description: "The skip-logic survey shown one question at a time, so each respondent sees only the questions that apply to them. surveyframe declares the analysis in advance (Frequencies and percentages) and reports it in APA 7."
+---
+
+The skip-logic survey shown one question at a time, so each respondent sees only the questions that apply to them. surveyframe declares the analysis in advance (Frequencies and percentages) and reports it in APA 7.
+
+## In SurveyStudio
+
+In RStudio, open the Addins menu, choose **surveyframe: Try a demo** and pick `conversational_branching`. The study opens on the Design screen. Plan shows each research question with its method and decision rule, Analyse runs them as declared, and Report writes the APA 7 report.
+
+## In R
+
+```r
+d <- sframe_demo("conversational_branching")
+results <- run_analysis_plan(d$responses, d$instrument)
+render_report(d$instrument, d$responses)
+```
+
+## What the report gives
+
+| Research question | Method | What the report gives |
+|---|---|---|
+| Who attended, and in what proportions? | Frequencies and percentages | The APA 7 sentence, its table and chart |
+
+The demo's data is simulated, so the site shows no numbers. Run it in SurveyStudio or R to see the results, each marked as demonstration data.
+
+## Related
+
+- [Survey studies to start from](../studies.html)
+- [All method guides](../guides.html)
+

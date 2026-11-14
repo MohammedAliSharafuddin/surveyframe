@@ -86,7 +86,7 @@ navbar:
         - text: "Two ways to run a study"
           href: articles/two-ways-to-run-a-study.html
         - text: "Method guides"
-          href: articles/learn-by-example.html
+          href: articles/guides.html
         - text: "Frequently asked questions"
           href: articles/learn/faq.html
     rusers:
@@ -120,6 +120,14 @@ articles:
     contents:
       - articles/studies
       - starts_with("articles/studies/")
+  - title: "Method guides"
+    desc: >
+      How to answer a research question with a survey, 1 guide per question,
+      in SurveyStudio and in R. Web only.
+    navbar: ~
+    contents:
+      - articles/guides
+      - starts_with("articles/guides/")
   - title: "Get started and learn"
     desc: >
       Install and open a study with no code, the frequently asked questions,

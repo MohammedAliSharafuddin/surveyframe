@@ -172,7 +172,7 @@ for (st in studies) {
     "",
     sprintf("- [All %s studies](../studies.html#%s)", tolower(hubs[[st$audience]]), st$audience),
     related,
-    "- [Method guides](../learn-by-example.html)",
+    "- [Method guides](../guides.html)",
     ""
   )
   writeLines(rmd, file.path(pages, paste0(st$slug, ".Rmd")))

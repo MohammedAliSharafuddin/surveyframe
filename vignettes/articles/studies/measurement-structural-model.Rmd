@@ -72,5 +72,5 @@ results <- run_analysis_plan(d$responses, d$instrument)
 
 - [All research labs and pre-analysis plans studies](../studies.html#research-labs)
 - [Pre-registered survey study, sealed and amended](preregistered-survey-study.html)
-- [Method guides](../learn-by-example.html)
+- [Method guides](../guides.html)
 

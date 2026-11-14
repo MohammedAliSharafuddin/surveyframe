@@ -1,0 +1,37 @@
+---
+title: "How to check whether a Likert scale holds together"
+description: "A thesis questionnaire measuring how well organised attendees found an event, on a 4-item Likert scale with 1 reverse-worded item. surveyframe declares the analysis in advance (Scale score descriptive statistics, Cronbach's alpha (internal consistency), McDonald's omega (internal consistency), Item diagnostics) and reports it in APA 7."
+---
+
+A thesis questionnaire measuring how well organised attendees found an event, on a 4-item Likert scale with 1 reverse-worded item. surveyframe declares the analysis in advance (Scale score descriptive statistics, Cronbach's alpha (internal consistency), McDonald's omega (internal consistency), Item diagnostics) and reports it in APA 7.
+
+## In SurveyStudio
+
+In RStudio, open the Addins menu, choose **surveyframe: Try a demo** and pick `likert_scale`. The study opens on the Design screen. Plan shows each research question with its method and decision rule, Analyse runs them as declared, and Report writes the APA 7 report.
+
+![The Design screen with the likert_scale study.](../../studies/likert_scale/design.png){width=100%}
+
+## In R
+
+```r
+d <- sframe_demo("likert_scale")
+results <- run_analysis_plan(d$responses, d$instrument)
+render_report(d$instrument, d$responses)
+```
+
+## What the report gives
+
+| Research question | Method | What the report gives |
+|---|---|---|
+| How does the scale score overall? | Descriptive statistics | The APA 7 sentence, its table and chart |
+| Is the scale internally consistent? | Cronbach's alpha (internal consistency) | The APA 7 sentence, its table and chart |
+| Same question, omega rather than alpha. | McDonald's omega (internal consistency) | The APA 7 sentence, its table and chart |
+| Does any item sit poorly with the rest? | Item diagnostics | The APA 7 sentence, its table and chart |
+
+The demo's data is simulated, so the site shows no numbers. Run it in SurveyStudio or R to see the results, each marked as demonstration data.
+
+## Related
+
+- [Survey studies to start from](../studies.html)
+- [All method guides](../guides.html)
+

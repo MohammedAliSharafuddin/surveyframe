@@ -72,5 +72,5 @@ results <- run_analysis_plan(d$responses, d$instrument)
 
 - [All students and thesis supervisors studies](../studies.html#students)
 - [Thesis questionnaire with a Likert scale](thesis-questionnaire-likert-scale.html)
-- [Method guides](../learn-by-example.html)
+- [Method guides](../guides.html)
 

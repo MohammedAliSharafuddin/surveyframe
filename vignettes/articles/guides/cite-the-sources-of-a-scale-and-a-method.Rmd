@@ -1,0 +1,34 @@
+---
+title: "How to cite the sources of a scale and a method"
+description: "A study of trust in a new team leader, measured with items adapted from a published model of trust, with each source cited where it is used. surveyframe declares the analysis in advance (Scale score descriptive statistics, Cronbach's alpha (internal consistency), Independent samples t-test) and reports it in APA 7."
+---
+
+A study of trust in a new team leader, measured with items adapted from a published model of trust, with each source cited where it is used. surveyframe declares the analysis in advance (Scale score descriptive statistics, Cronbach's alpha (internal consistency), Independent samples t-test) and reports it in APA 7.
+
+## In SurveyStudio
+
+In RStudio, open the Addins menu, choose **surveyframe: Try a demo** and pick `citing_sources`. The study opens on the Design screen. Plan shows each research question with its method and decision rule, Analyse runs them as declared, and Report writes the APA 7 report.
+
+## In R
+
+```r
+d <- sframe_demo("citing_sources")
+results <- run_analysis_plan(d$responses, d$instrument)
+render_report(d$instrument, d$responses)
+```
+
+## What the report gives
+
+| Research question | Method | What the report gives |
+|---|---|---|
+| How much do team members trust their new leader? | Descriptive statistics | The APA 7 sentence, its table and chart |
+| Does the trust scale hold together? | Cronbach's alpha (internal consistency) | The APA 7 sentence, its table and chart |
+| Do newer and longer-serving members trust the leader differently? | Independent samples t-test | The APA 7 sentence, its table and chart |
+
+The demo's data is simulated, so the site shows no numbers. Run it in SurveyStudio or R to see the results, each marked as demonstration data.
+
+## Related
+
+- [Survey studies to start from](../studies.html)
+- [All method guides](../guides.html)
+

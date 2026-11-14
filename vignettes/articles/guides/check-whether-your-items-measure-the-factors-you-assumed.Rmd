@@ -1,0 +1,35 @@
+---
+title: "How to check whether your items measure the factors you assumed"
+description: "An employee engagement survey of 8 items, written to measure 2 things employees judge: how their work is organised, and the content of their work. surveyframe declares the analysis in advance (Factorability checks (KMO and Bartlett's test), Exploratory factor analysis) and reports it in APA 7."
+---
+
+An employee engagement survey of 8 items, written to measure 2 things employees judge: how their work is organised, and the content of their work. surveyframe declares the analysis in advance (Factorability checks (KMO and Bartlett's test), Exploratory factor analysis) and reports it in APA 7.
+
+## In SurveyStudio
+
+In RStudio, open the Addins menu, choose **surveyframe: Try a demo** and pick `factor_structure`. The study opens on the Design screen. Plan shows each research question with its method and decision rule, Analyse runs them as declared, and Report writes the APA 7 report.
+
+![The Design screen with the factor_structure study.](../../studies/factor_structure/design.png){width=100%}
+
+## In R
+
+```r
+d <- sframe_demo("factor_structure")
+results <- run_analysis_plan(d$responses, d$instrument)
+render_report(d$instrument, d$responses)
+```
+
+## What the report gives
+
+| Research question | Method | What the report gives |
+|---|---|---|
+| Is this data suitable for factor analysis? | Factorability checks (KMO and Bartlett's test) | The APA 7 sentence, its table and chart |
+| How many factors, and which items load where? | Exploratory factor analysis | The APA 7 sentence, its table and chart |
+
+The demo's data is simulated, so the site shows no numbers. Run it in SurveyStudio or R to see the results, each marked as demonstration data.
+
+## Related
+
+- [Survey studies to start from](../studies.html)
+- [All method guides](../guides.html)
+

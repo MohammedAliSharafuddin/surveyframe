@@ -1,0 +1,34 @@
+---
+title: "How to test whether 2 categorical answers are associated"
+description: "A study of whether attendance format is associated with the session type attendees value most. surveyframe declares the analysis in advance (Cross-tabulation, Chi-square test of association, Fisher's exact test) and reports it in APA 7."
+---
+
+A study of whether attendance format is associated with the session type attendees value most. surveyframe declares the analysis in advance (Cross-tabulation, Chi-square test of association, Fisher's exact test) and reports it in APA 7.
+
+## In SurveyStudio
+
+In RStudio, open the Addins menu, choose **surveyframe: Try a demo** and pick `categorical`. The study opens on the Design screen. Plan shows each research question with its method and decision rule, Analyse runs them as declared, and Report writes the APA 7 report.
+
+## In R
+
+```r
+d <- sframe_demo("categorical")
+results <- run_analysis_plan(d$responses, d$instrument)
+render_report(d$instrument, d$responses)
+```
+
+## What the report gives
+
+| Research question | Method | What the report gives |
+|---|---|---|
+| How do format and preference cross-tabulate? | Cross-tabulation | The APA 7 sentence, its table and chart |
+| Are format and preference associated? | Cross-tabulation | The APA 7 sentence, its table and chart |
+| Are format and preference associated, on an exact test for the small cell? | Fisher's exact test | The APA 7 sentence, its table and chart |
+
+The demo's data is simulated, so the site shows no numbers. Run it in SurveyStudio or R to see the results, each marked as demonstration data.
+
+## Related
+
+- [Survey studies to start from](../studies.html)
+- [All method guides](../guides.html)
+
