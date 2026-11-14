@@ -9,10 +9,10 @@
 #'
 #' # Columns
 #'
-#' A single-answer item has one column named by its ID. A matrix, ranking,
-#' multiple-choice or decision item has one column per row, option, pair or
+#' A single-answer item has 1 column named by its ID. A matrix, ranking,
+#' multiple-choice or decision item has 1 column per row, option, pair or
 #' criterion, named `item__sub`, and each is checked: a battery with some of its
-#' columns absent is reported by name. Two columns with the same name are
+#' columns absent is reported by name. 2 columns with the same name are
 #' refused, since one would otherwise be lost.
 #'
 #' A choice set with `allow_other` ("Other, please specify") adds

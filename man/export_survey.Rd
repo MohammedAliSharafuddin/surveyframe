@@ -82,7 +82,7 @@ recorded, sent but unconfirmed, not sent, or failed. Write
 not state delivery in it. It appears below the status line in every case
 except a failed send, and defaults to "Thank you for participating."
 
-Two settings in the instrument's \code{render} block suit a host too.
+2 settings in the instrument's \code{render} block suit a host too.
 \code{render$thankyou$show_restart = FALSE} hides "Submit another response".
 \code{render$save_draft = TRUE} keeps the answers in the browser's local storage
 as the respondent goes, under a key drawn from the instrument's content, so

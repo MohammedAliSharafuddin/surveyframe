@@ -183,7 +183,7 @@ sframe_clean_text <- function(data, item_id, lowercase = TRUE,
 #' Tokenises `text` (splitting on whitespace, lower-casing, and stripping
 #' punctuation), removes stop words, and counts term frequency. Ships a
 #' small built-in English stop-word list so this works with zero optional
-#' packages; pass `stop_words = character(0)` to disable filtering, or a
+#' packages. Pass `stop_words = character(0)` to disable filtering, or a
 #' custom vector to override it.
 #'
 #' @param text Character vector of responses (raw or already cleaned by
@@ -438,8 +438,8 @@ sframe_run_co_occurrence <- function(data, roles, options, instrument) {
 #'
 #' @param data A data.frame of responses.
 #' @param roles A list with `item`, the text/textarea item id.
-#' @param options A list; `k` (topic count, default `4L` -- a demonstration
-#'   value, not a recommendation; see `vignette("text-analysis")`'s topic-
+#' @param options A list with `k` (topic count, default `4L`, which is a demonstration
+#'   value and not a recommendation: see `vignette("text-analysis")`'s topic-
 #'   modelling section for `topicmodels::perplexity()`-based selection),
 #'   `seed` (default `42L`), `stop_words` (passed through to the tokeniser).
 #' @param instrument Optional `sframe` instrument, passed to
@@ -531,8 +531,7 @@ sframe_run_topic_model_lda <- function(data, roles, options, instrument) {
 #'
 #' Cleans the text item via [sframe_clean_text()], tokenises with
 #' `tidytext::unnest_tokens()` (tidyeval column names via `rlang::sym()` and
-#' `!!`, not bare symbols; see the source comment at the tokenising step for
-#' why), casts to a document-term matrix, converts it to `stm`'s corpus
+#' `!!`, not bare symbols, as the source comment at the tokenising step explains), casts to a document-term matrix, converts it to `stm`'s corpus
 #' format with `stm::readCorpus(type = "slam")` and `stm::prepDocuments()`,
 #' and fits `stm::stm()` after a fixed `set.seed()` (stm's own fit is not
 #' otherwise seed-stable).
@@ -540,7 +539,7 @@ sframe_run_topic_model_lda <- function(data, roles, options, instrument) {
 #' @inheritParams sframe_run_topic_model_lda
 #'
 #' @return A runner-contract result list: `test = "stm_topics"`, `table`
-#'   (topic/proportion/term/beta/rank; proportion is the topic's mean
+#'   (topic/proportion/term/beta/rank, where proportion is the topic's mean
 #'   document weight, beta its per-term probability, both from the fitted
 #'   `stm` object), `fit` (a runtime-only list holding the `stm` model
 #'   object and the document-to-respondent mapping needed by
@@ -666,7 +665,7 @@ sframe_run_stm_topics <- function(data, roles, options, instrument) {
 #'   longer equal original row numbers once any earlier row was dropped.
 #'   Both forms work correctly: when `text` carries the `respondent`
 #'   attribute [sframe_clean_text()] sets, that mapping is used to find
-#'   each quote's real position; otherwise `text` is assumed to be the raw,
+#'   each quote's real position, and otherwise `text` is assumed to be the raw,
 #'   1:1-indexed vector.
 #' @param n_quotes Integer. Quotes to return per topic. Default `3L`.
 #'
@@ -821,7 +820,7 @@ sframe_ngram_frequency <- function(text, n = 2L, stop_words = NULL, top_n = 30L)
 #' frequency count. Matching is on whole words only, so searching for
 #' "room" does not match "roomy". `text` is expected to already have been
 #' run through [sframe_clean_text()] (its `respondent` attribute is used
-#' to cite the original row index for each match; when absent, positions
+#' to cite the original row index for each match, and when absent, positions
 #' `seq_along(text)` are used instead). Tokenisation here is a plain
 #' whitespace split, not the internal stop-word-stripping tokeniser behind
 #' [sframe_term_frequency()]: stop words are part of a match's context and

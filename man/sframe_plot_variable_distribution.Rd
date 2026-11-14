@@ -14,8 +14,8 @@ sframe_plot_variable_distribution(data, variable, palette = c("web", "print"))
 \item{palette}{One of \code{"web"} or \code{"print"}. See \code{sframe_brand()}.}
 }
 \value{
-A named list of three ggplot2 objects (\code{histogram}, \code{boxplot},
-\code{qq}), or \code{NULL} if fewer than two complete values remain.
+A named list of 3 ggplot2 objects (\code{histogram}, \code{boxplot},
+\code{qq}), or \code{NULL} if fewer than 2 complete values remain.
 }
 \description{
 Unlike \code{\link[=sframe_plot_descriptives]{sframe_plot_descriptives()}}, which summarises skewness and

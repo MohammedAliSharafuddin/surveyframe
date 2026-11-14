@@ -17,7 +17,7 @@ A ggplot2 object, or \code{NULL} when the result carries no table.
 \description{
 Top 20 n-grams from an \code{ngram_freq} result as a horizontal bar chart.
 Shares its bar-building logic with \code{\link[=sframe_plot_term_frequency]{sframe_plot_term_frequency()}}'s bar
-path via the internal \code{.sframe_plot_term_bar()} helper; unlike that
+path via the internal \code{.sframe_plot_term_bar()} helper. Unlike that
 function, there is no word-cloud mode and no group faceting for this id.
 }
 \examples{

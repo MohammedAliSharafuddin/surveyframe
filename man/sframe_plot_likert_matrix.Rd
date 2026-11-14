@@ -23,7 +23,7 @@ typically looked up from \code{instrument$choices} by \code{item$choice_set}.}
 A ggplot2 object, or \code{NULL} if no row has response data.
 }
 \description{
-A matrix question asks several rows against one shared response scale
+A matrix question asks 2 or more rows against one shared response scale
 (a "grid" of Likert items). Plotting each row as its own separate
 \code{sframe_draw_likert_diverging()} chart loses the grouping the question
 was designed with, so this draws every row as one diverging bar inside a

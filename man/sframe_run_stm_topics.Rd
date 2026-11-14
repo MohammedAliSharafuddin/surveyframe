@@ -11,8 +11,8 @@ sframe_run_stm_topics(data, roles, options, instrument)
 
 \item{roles}{A list with \code{item}, the text/textarea item id.}
 
-\item{options}{A list; \code{k} (topic count, default \code{4L} -- a demonstration
-value, not a recommendation; see \code{vignette("text-analysis")}'s topic-
+\item{options}{A list with \code{k} (topic count, default \code{4L}, which is a demonstration
+value and not a recommendation: see \code{vignette("text-analysis")}'s topic-
 modelling section for \code{topicmodels::perplexity()}-based selection),
 \code{seed} (default \code{42L}), \code{stop_words} (passed through to the tokeniser).}
 
@@ -21,7 +21,7 @@ modelling section for \code{topicmodels::perplexity()}-based selection),
 }
 \value{
 A runner-contract result list: \code{test = "stm_topics"}, \code{table}
-(topic/proportion/term/beta/rank; proportion is the topic's mean
+(topic/proportion/term/beta/rank, where proportion is the topic's mean
 document weight, beta its per-term probability, both from the fitted
 \code{stm} object), \code{fit} (a runtime-only list holding the \code{stm} model
 object and the document-to-respondent mapping needed by
@@ -31,8 +31,7 @@ object and the document-to-respondent mapping needed by
 \description{
 Cleans the text item via \code{\link[=sframe_clean_text]{sframe_clean_text()}}, tokenises with
 \code{tidytext::unnest_tokens()} (tidyeval column names via \code{rlang::sym()} and
-\verb{!!}, not bare symbols; see the source comment at the tokenising step for
-why), casts to a document-term matrix, converts it to \code{stm}'s corpus
+\verb{!!}, not bare symbols, as the source comment at the tokenising step explains), casts to a document-term matrix, converts it to \code{stm}'s corpus
 format with \code{stm::readCorpus(type = "slam")} and \code{stm::prepDocuments()},
 and fits \code{stm::stm()} after a fixed \code{set.seed()} (stm's own fit is not
 otherwise seed-stable).

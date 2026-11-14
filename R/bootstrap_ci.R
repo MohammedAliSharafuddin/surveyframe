@@ -126,12 +126,12 @@ sframe_bootstrap_ci <- function(x, FUN = stats::median, R = 2000,
 
 #' Bootstrap confidence interval for Cohen's d
 #'
-#' Percentile bootstrap for the standardised mean difference between two
+#' Percentile bootstrap for the standardised mean difference between 2
 #' independent groups. The difference is signed, the mean of `x` minus the
 #' mean of `y`, so the interval can include zero. Each resample draws within
 #' each group, preserving the group sizes.
 #'
-#' @param x,y Numeric vectors, one per group.
+#' @param x,y Numeric vectors, 1 per group.
 #' @param R Integer. Number of bootstrap resamples. Defaults to 2000.
 #' @param conf.level Confidence level. Defaults to 0.95.
 #' @param seed Integer or NULL. When supplied, sets the random seed.

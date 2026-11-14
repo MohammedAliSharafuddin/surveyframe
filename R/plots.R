@@ -558,7 +558,7 @@ sframe_plot_term_frequency <- function(result, palette = c("web", "print")) {
 #'
 #' Top 20 n-grams from an `ngram_freq` result as a horizontal bar chart.
 #' Shares its bar-building logic with [sframe_plot_term_frequency()]'s bar
-#' path via the internal `.sframe_plot_term_bar()` helper; unlike that
+#' path via the internal `.sframe_plot_term_bar()` helper. Unlike that
 #' function, there is no word-cloud mode and no group faceting for this id.
 #'
 #' @param result An `ngram_freq` result list from [run_analysis_plan()].
@@ -992,7 +992,7 @@ sframe_draw_likert_diverging <- function(counts, theme_color = "#16B3B1",
 
 #' Grouped diverging chart for a Likert matrix question
 #'
-#' A matrix question asks several rows against one shared response scale
+#' A matrix question asks 2 or more rows against one shared response scale
 #' (a "grid" of Likert items). Plotting each row as its own separate
 #' `sframe_draw_likert_diverging()` chart loses the grouping the question
 #' was designed with, so this draws every row as one diverging bar inside a
@@ -1043,11 +1043,11 @@ sframe_plot_likert_matrix <- function(item, data, choice_set, palette = c("web",
 
 #' Grouped diverging chart for a scale's Likert items
 #'
-#' Several *separate* Likert items that make up one [sframe_scale()] (unlike a
+#' *Separate* Likert items that make up one [sframe_scale()] (unlike a
 #' `"matrix"` item's rows, which are one question) are, by default, each
 #' reported as their own single-item diverging chart. That scatters a
 #' related batch of items (a satisfaction scale's 2-3 items, say) across
-#' several charts instead of showing them the way a Likert matrix or a
+#' separate charts instead of showing them the way a Likert matrix or a
 #' typical multi-item satisfaction grid is reported: one grouped chart, one
 #' diverging bar per item, sharing an x scale and a legend. Applies only
 #' when every item in the scale shares the same choice set. Scales that mix
@@ -1332,7 +1332,7 @@ sframe_plot_sensitivity <- function(result, palette = c("web", "print")) {
 
 #' Regression diagnostic plots for a regression_linear result
 #'
-#' The four standard diagnostic panels (residuals vs fitted, normal Q-Q,
+#' The 4 standard diagnostic panels (residuals vs fitted, normal Q-Q,
 #' scale-location, residuals vs leverage), built from the plain data frame
 #' [run_analysis_plan()] attaches to a `regression_linear` result rather than
 #' the `lm` object itself, so the result stays JSON-serialisable.
@@ -1340,7 +1340,7 @@ sframe_plot_sensitivity <- function(result, palette = c("web", "print")) {
 #' @param result A `regression_linear` result list containing a `diagnostics`
 #'   data frame (as produced internally by [run_analysis_plan()]).
 #' @param palette One of `"web"` or `"print"`. See `sframe_brand()`.
-#' @return A named list of four ggplot2 objects (`residuals_fitted`, `qq`,
+#' @return A named list of 4 ggplot2 objects (`residuals_fitted`, `qq`,
 #'   `scale_location`, `leverage`), or `NULL` if diagnostics are unavailable.
 #' @export
 #' @seealso [run_analysis_plan()]
@@ -2125,17 +2125,17 @@ plot.sframe_descriptives_report <- function(x, data, ..., palette = c("web", "pr
 #'
 #' Boxplot with jittered points, shared across every runner whose result
 #' carries `vars = c(group_column, outcome_column)`: `t_test_ind`,
-#' `mann_whitney`, `kruskal_wallis`, and `anova_one`. One function instead of
-#' four, since the underlying comparison (an outcome split by a grouping
+#' `mann_whitney`, `kruskal_wallis`, and `anova_one`. 1 function instead of
+#' 4, since the underlying comparison (an outcome split by a grouping
 #' factor) and the data shape needed to plot it are identical across all
-#' four tests, and only the inferential statistic differs.
+#' 4 tests, and only the inferential statistic differs.
 #'
-#' @param result A result list from one of the four runners above, with
+#' @param result A result list from one of the 4 runners above, with
 #'   `vars = c(group_column, outcome_column)`.
 #' @param data The response data frame the result was computed from.
 #' @param palette One of `"web"` or `"print"`. See `sframe_brand()`.
 #' @return A ggplot2 object, or `NULL` if the columns are missing, fewer
-#'   than two groups remain after removing missing values, or ggplot2 is
+#'   than 2 groups remain after removing missing values, or ggplot2 is
 #'   unavailable.
 #' @export
 #' @seealso [run_analysis_plan()]
@@ -2185,7 +2185,7 @@ sframe_plot_group_comparison <- function(result, data, palette = c("web", "print
 
 #' Paired-comparison slope plot
 #'
-#' One line per respondent connecting their two paired values, shared by
+#' One line per respondent connecting their 2 paired values, shared by
 #' `t_test_pair` and `wilcoxon_pair` (both carry `vars = c(x_column,
 #' y_column)` on the same respondents). The standard visual for a paired
 #' design: it shows the direction and consistency of individual change,
@@ -2195,7 +2195,7 @@ sframe_plot_group_comparison <- function(result, data, palette = c("web", "print
 #'   `vars = c(x_column, y_column)`.
 #' @param data The response data frame the result was computed from.
 #' @param palette One of `"web"` or `"print"`. See `sframe_brand()`.
-#' @return A ggplot2 object, or `NULL` if fewer than two complete pairs
+#' @return A ggplot2 object, or `NULL` if fewer than 2 complete pairs
 #'   remain, or ggplot2 is unavailable.
 #' @export
 #' @seealso [run_analysis_plan()]
@@ -2519,8 +2519,8 @@ sframe_plot_item_diagnostics <- function(result, palette = c("web", "print")) {
 #' @param data A data frame of survey responses.
 #' @param variable Character. Column name of the variable to plot.
 #' @param palette One of `"web"` or `"print"`. See `sframe_brand()`.
-#' @return A named list of three ggplot2 objects (`histogram`, `boxplot`,
-#'   `qq`), or `NULL` if fewer than two complete values remain.
+#' @return A named list of 3 ggplot2 objects (`histogram`, `boxplot`,
+#'   `qq`), or `NULL` if fewer than 2 complete values remain.
 #' @export
 #' @seealso [sframe_descriptives_results()], [sframe_plot_descriptives()]
 #' @examples
@@ -2699,12 +2699,12 @@ sframe_plot_topics <- function(result, palette = c("web", "print")) {
 #' line segments underneath, nodes as points sized by term frequency and
 #' coloured by Louvain cluster, with term labels on the larger points only.
 #' Labelling every point on a dense network risks overlap chaos, so only
-#' the top 15 nodes by frequency are labelled; the full term list stays
+#' the top 15 nodes by frequency are labelled, and the full term list stays
 #' available in `result$table`.
 #'
 #' Clusters beyond the first 8 (ranked largest first) are folded into a
 #' single "Other" bucket rather than cycling or interpolating a new hue,
-#' per the dataviz skill's categorical-colour guidance; see
+#' per the dataviz skill's categorical-colour guidance, as
 #' `.sframe_cluster_palette()`.
 #'
 #' @param result A `co_occurrence_network` result list from

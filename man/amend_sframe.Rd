@@ -76,7 +76,7 @@ recomputed. These checks are local and the hashes are unsigned: someone
 who rewrites both a file and its log, and recomputes the hashes, is not
 detected, and nothing here establishes who made a change or when.
 
-Amendments come in two tiers. A \code{"pipeline"} amendment (data corrections,
+Amendments come in 2 tiers. A \code{"pipeline"} amendment (data corrections,
 bot removal) needs only a reason. A \code{"design"} amendment also requires a
 \code{deviation_report} describing what changed in the research question,
 method or model, and why. The tier follows the change itself: an amendment

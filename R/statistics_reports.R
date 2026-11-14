@@ -761,7 +761,7 @@ sframe_small_sample_advisory <- function(n, test) {
 #' @param group Optional grouping variable for Levene/Brown-Forsythe tests.
 #' @param outcome Optional regression outcome.
 #' @param predictors Optional regression predictors.
-#' @param table_vars Optional two categorical variables for expected-count
+#' @param table_vars Optional 2 categorical variables for expected-count
 #'   checks.
 #'
 #' @return An object of class `sframe_assumption_report`. Its `apa` names the
@@ -976,7 +976,7 @@ print.sframe_assumption_report <- function(x, ...) {
 #'   `"chi_square"`, and `"cochran_q"`.
 #' @param outcome Outcome variable for group comparisons.
 #' @param group Grouping variable for group comparisons.
-#' @param table_vars Two categorical variables for chi-square residuals and
+#' @param table_vars 2 categorical variables for chi-square residuals and
 #'   pairwise proportion tests.
 #' @param measures Repeated binary measures for pairwise McNemar tests.
 #' @param correction Multiple-comparison correction.
@@ -2244,7 +2244,7 @@ sframe_run_mediation <- function(data, roles, options = list()) {
 #'   each a data.frame of that construct's item-level responses. When
 #'   supplied, `htmt` is the Henseler heterotrait-monotrait ratio: the mean
 #'   absolute heterotrait-heteromethod correlation over the geometric mean
-#'   of the two constructs' mean absolute monotrait-heteromethod
+#'   of the 2 constructs' mean absolute monotrait-heteromethod
 #'   correlations. Constructs with a single item have no monotrait
 #'   correlations, so their HTMT entries are `NA`. Without this argument,
 #'   `htmt` falls back to the absolute inter-construct correlation matrix

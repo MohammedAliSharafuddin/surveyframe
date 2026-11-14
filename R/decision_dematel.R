@@ -281,11 +281,11 @@ sframe_run_dematel <- function(data, roles, options, instrument) {
 
 #' Prominence-relation scatter for a DEMATEL result
 #'
-#' The dedicated DEMATEL chart: one point per criterion, prominence (D + R)
+#' The dedicated DEMATEL chart: 1 point per criterion, prominence (D + R)
 #' on x and relation (D - R) on y, with a horizontal quadrant line at
 #' relation = 0 separating causes (above) from effects (below). This is
 #' deliberately a different shape from [sframe_plot_decision_ranking()]:
-#' DEMATEL classifies criteria on two axes rather than producing a single
+#' DEMATEL classifies criteria on 2 axes rather than producing a single
 #' ranked score, so a ranking bar chart would misrepresent it.
 #'
 #' @param result A `dematel`-family result list from [run_analysis_plan()] or

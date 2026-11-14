@@ -17,7 +17,7 @@ blank/missing rows and is therefore \emph{shorter}, its positions no
 longer equal original row numbers once any earlier row was dropped.
 Both forms work correctly: when \code{text} carries the \code{respondent}
 attribute \code{\link[=sframe_clean_text]{sframe_clean_text()}} sets, that mapping is used to find
-each quote's real position; otherwise \code{text} is assumed to be the raw,
+each quote's real position, and otherwise \code{text} is assumed to be the raw,
 1:1-indexed vector.}
 
 \item{n_quotes}{Integer. Quotes to return per topic. Default \code{3L}.}

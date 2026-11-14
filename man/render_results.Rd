@@ -29,7 +29,7 @@ the only one the report writes. \code{"ama"} and \code{"vancouver"} were accepte
 before 0.4.3 and never applied, so they are refused with a message.}
 
 \item{title}{Character or NULL. Report title. Defaults to the instrument
-title with " -- Results" appended.}
+title with \code{" -- Results"} appended.}
 
 \item{interpretations}{Named list or NULL. Written interpretations keyed
 by analysis-plan block id, added after the results are known. A block

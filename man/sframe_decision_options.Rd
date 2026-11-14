@@ -28,7 +28,7 @@ A PROMETHEE block takes \code{options$preference_function}, one of \code{"usual"
 them. The default is \code{"usual"}, Brans and Vincke's type I step function,
 which needs no thresholds and so adds no researcher degrees of freedom.
 
-This default differs from several other MCDM implementations, which
+This default differs from other MCDM implementations, which
 default to the linear (V-shape) function and derive its thresholds from
 the range of the supplied data. Deriving thresholds that way makes the
 result depend on choices the researcher never declared, which is what this

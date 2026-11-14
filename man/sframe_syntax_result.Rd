@@ -10,7 +10,7 @@ sframe_syntax_result(x, which = NULL, data_expr = "scored", header = FALSE)
 \item{x}{An \code{sframe_analysis_results} object from \code{\link[=run_analysis_plan]{run_analysis_plan()}}, or
 one block's result from it.}
 
-\item{which}{Character or NULL. One block id, when \code{x} holds several.}
+\item{which}{Character or NULL. One block id, when \code{x} holds more than 1 block.}
 
 \item{data_expr}{Character. The expression the code should read its data
 from. Defaults to \code{"scored"}, the scored frame the header sets up.}
@@ -21,7 +21,7 @@ that runs on its own.}
 }
 \value{
 A character vector of R code lines, or \code{NULL} for a method this does
-not cover. For several blocks, a named list of such vectors.
+not cover. For more than 1 block, a named list of such vectors.
 }
 \description{
 Returns the statistical call that produced a result, as R code a reader can

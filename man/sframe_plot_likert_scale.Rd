@@ -28,11 +28,11 @@ display order.}
 A ggplot2 object, or \code{NULL} if no item has response data.
 }
 \description{
-Several \emph{separate} Likert items that make up one \code{\link[=sframe_scale]{sframe_scale()}} (unlike a
+\emph{Separate} Likert items that make up one \code{\link[=sframe_scale]{sframe_scale()}} (unlike a
 \code{"matrix"} item's rows, which are one question) are, by default, each
 reported as their own single-item diverging chart. That scatters a
 related batch of items (a satisfaction scale's 2-3 items, say) across
-several charts instead of showing them the way a Likert matrix or a
+separate charts instead of showing them the way a Likert matrix or a
 typical multi-item satisfaction grid is reported: one grouped chart, one
 diverging bar per item, sharing an x scale and a legend. Applies only
 when every item in the scale shares the same choice set. Scales that mix

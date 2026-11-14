@@ -34,7 +34,7 @@ Save instruments as \code{.sframe} files from the browser and load them into R
 with \code{\link[=read_sframe]{read_sframe()}}.
 }
 \details{
-The builder includes a three-mode interface.
+The builder includes a 3-mode interface.
 
 \describe{
 \item{Build}{An item editor with a persistent inspector panel,

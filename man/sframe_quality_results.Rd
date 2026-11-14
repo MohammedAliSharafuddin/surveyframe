@@ -45,7 +45,7 @@ respondent who gives the identical response to every item in a 2-item
 scale has done exactly what a genuinely consistent respondent does,
 this is not evidence of inattention on its own, and checking scales
 that short flags a large share of honest respondents (see the worked
-example in \code{vignette("surveyframe")}, where 3 two-item scales alone
+example in \code{vignette("surveyframe")}, where 3 scales of 2 items alone
 drove a 91 percent flag rate before this threshold existed). Set to
 \code{2} to restore the previous, more permissive behaviour.
 Many published scales have 3 items, and the default leaves them

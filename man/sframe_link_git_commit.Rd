@@ -36,8 +36,7 @@ what the commit itself records.
 
 Git is entirely optional. When \code{repo_path} is not inside a Git
 repository, or the \code{git} executable is not on the \code{PATH}, this returns a
-clear, non-error result with \code{linked = FALSE} rather than aborting --
-the rest of surveyframe never requires Git.
+clear, non-error result with \code{linked = FALSE} rather than aborting. The rest of surveyframe never requires Git.
 }
 \examples{
 item  <- sframe_item("q1", "How satisfied are you?", type = "text")
