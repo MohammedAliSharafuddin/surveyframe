@@ -1,25 +1,25 @@
 ---
-title: "Thesis questionnaire with a Likert scale"
+title: "Likert scale questionnaire"
 description: "A short questionnaire that measures 1 idea with a 4-item Likert scale, including a reverse-worded item, and checks that the scale holds together before its score is used. surveyframe gives you the questionnaire, a pre-analysis plan to submit with your proposal, and an APA 7 report."
 ---
 
 ```{=html}
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Thesis questionnaire with a Likert scale","description":"A short questionnaire that measures 1 idea with a 4-item Likert scale, including a reverse-worded item, and checks that the scale holds together before its score is used. surveyframe gives you the questionnaire, a pre-analysis plan to submit with your proposal, and an APA 7 report.","about":{"@type":"SoftwareSourceCode","name":"surveyframe","url":"https://surveyframe.org"},"url":"https://surveyframe.org/articles/studies/thesis-questionnaire-likert-scale.html"}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Likert scale questionnaire","description":"A short questionnaire that measures 1 idea with a 4-item Likert scale, including a reverse-worded item, and checks that the scale holds together before its score is used. surveyframe gives you the questionnaire, a pre-analysis plan to submit with your proposal, and an APA 7 report.","about":{"@type":"SoftwareSourceCode","name":"surveyframe","url":"https://surveyframe.org"},"url":"https://surveyframe.org/articles/templates/likert-scale-questionnaire.html"}</script>
 ```
 
 A short questionnaire that measures 1 idea with a 4-item Likert scale, including a reverse-worded item, and checks that the scale holds together before its score is used. surveyframe gives you the questionnaire, a pre-analysis plan to submit with your proposal, and an APA 7 report.
 
 ## Preview the questionnaire
 
-This is the questionnaire as respondents see it. It is a preview, so answers go nowhere. [Open it in a new tab](../../studies/likert_scale/preview.html).
+This is the questionnaire as respondents see it. It is a preview, so answers go nowhere. [Open it in a new tab](../../templates/likert_scale/preview.html).
 
 ```{=html}
-<iframe src="../../studies/likert_scale/preview.html" title="Preview of the Thesis questionnaire with a Likert scale questionnaire" style="width:100%;height:560px;border:1px solid #d9e2ec;border-radius:6px"></iframe>
+<iframe src="../../templates/likert_scale/preview.html" title="Preview of the Likert scale questionnaire questionnaire" style="width:100%;height:560px;border:1px solid #d9e2ec;border-radius:6px"></iframe>
 ```
 
 ## The analysis plan, ready to preregister
 
-Before any data is collected, surveyframe writes the pre-analysis plan: the study, the questionnaire, each research question with its hypotheses, method and decision rule, and what a preregistration still asks for. [Read the plan](../../studies/likert_scale/plan.html), or [download the instrument (.sframe)](../../studies/likert_scale/likert_scale.sframe) and open it in SurveyStudio.
+Before any data is collected, surveyframe writes the pre-analysis plan: the study, the questionnaire, each research question with its hypotheses, method and decision rule, and what a preregistration still asks for. [Read the plan](../../templates/likert_scale/plan.html), or [download the instrument (.sframe)](../../templates/likert_scale/likert_scale.sframe) and open it in SurveyStudio.
 
 Methods it declares: Scale score descriptive statistics, Cronbach's alpha (internal consistency), McDonald's omega (internal consistency), Item diagnostics.
 
@@ -27,11 +27,11 @@ Methods it declares: Scale score descriptive statistics, Cronbach's alpha (inter
 
 The study in SurveyStudio, stage by stage: design, collect, check, analyse and report.
 
-![Design screen with the questionnaire.](../../studies/likert_scale/design.png){width=100%}
-![Collect screen.](../../studies/likert_scale/collect.png){width=100%}
-![Quality screen.](../../studies/likert_scale/check.png){width=100%}
-![Analyse screen with the declared plan.](../../studies/likert_scale/analyse.png){width=100%}
-![Report screen.](../../studies/likert_scale/report.png){width=100%}
+![Design screen with the questionnaire.](../../templates/likert_scale/design.png){width=100%}
+![Collect screen.](../../templates/likert_scale/collect.png){width=100%}
+![Quality screen.](../../templates/likert_scale/check.png){width=100%}
+![Analyse screen with the declared plan.](../../templates/likert_scale/analyse.png){width=100%}
+![Report screen.](../../templates/likert_scale/report.png){width=100%}
 
 ## Start in 2 steps (no coding)
 
@@ -70,7 +70,7 @@ results <- run_analysis_plan(d$responses, d$instrument)
 
 ## Related
 
-- [All students and thesis supervisors studies](../studies.html#students)
-- [Pilot study with a small sample](pilot-study-small-sample.html)
-- [Method guides](../guides.html)
+- [All psychology and measurement templates](../templates.html#psychology)
+- [Measurement model questionnaire (CFA and SEM)](measurement-model-questionnaire.html)
+- [How-to guides](../guides.html)
 

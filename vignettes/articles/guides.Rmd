@@ -1,5 +1,5 @@
 ---
-title: "Method guides"
+title: "How-to guides"
 description: "How to answer a research question with a survey: compare groups, check a scale, predict an outcome, analyse open answers and more, each in SurveyStudio and in R."
 ---
 

@@ -3,7 +3,7 @@ title: "Compare the same people over time"
 description: "Whether answers change between 2 or more measurements of the same respondents."
 ---
 
-[Docs](../../docs.html) / [Methods](../../docs.html#methods)
+[Documentation](../../docs.html) / [Methods](../../docs.html#methods)
 
 Whether answers change between 2 or more measurements of the same respondents.
 

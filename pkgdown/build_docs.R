@@ -151,7 +151,7 @@ for (tp in names(types)) {
   rmd <- c(
     "---", sprintf("title: \"%s\"", t$h1),
     sprintf("description: \"%s\"", t$how), "---", "",
-    "[Docs](../../docs.html) / [Question types](../../docs.html#question-types)", "",
+    "[Documentation](../../docs.html) / [Question types](../../docs.html#question-types)", "",
     t$how, "",
     sprintf("![The %s question selected in the editor, its settings outlined.](../../../docs/question-types/%s-editor.png){width=100%%}", tolower(sub("^Ask (for |a |an )?", "", t$h1)), t$slug), "",
     "## What the respondent sees", "",
@@ -166,10 +166,10 @@ for (tp in names(types)) {
   writeLines(rmd, file.path(page_dir, paste0(t$slug, ".Rmd")))
 }
 
-landing <- c("---", "title: \"Docs: how to set up surveyframe\"",
+landing <- c("---", "title: \"Documentation: how to set up surveyframe\"",
   "description: \"How to set up each question type and analysis in surveyframe, step by step, with annotated SurveyStudio screenshots.\"",
   "---", "",
-  "Docs answer how to set something up. The [method guides](guides.html) answer how to answer your research question.", "",
+  "Documentation answers how to set something up. The [how-to guides](guides.html) answer how to answer your research question.", "",
   sprintf("## Question types (%d pages) {#question-types}", length(types)), "",
   vapply(types, function(t) sprintf("- [%s](docs/question-types/%s.html)", t$h1, t$slug), character(1)), "")
 writeLines(landing, file.path("vignettes", "articles", "docs.Rmd"))

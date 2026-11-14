@@ -131,7 +131,7 @@ for (fam in names(families)) {
       if (length(refs)) c(paste0("References: ", paste(refs, collapse = " ")), ""))
   }
   rmd <- c("---", sprintf("title: \"%s\"", f$title), sprintf("description: \"%s\"", f$answers), "---", "",
-           "[Docs](../../docs.html) / [Methods](../../docs.html#methods)", "",
+           "[Documentation](../../docs.html) / [Methods](../../docs.html#methods)", "",
            f$answers, "",
            paste0("**Assumptions.** ", f$assumptions), "",
            "In SurveyStudio, open Plan, add a research question, choose the method and assign each variable its role. Declare the hypotheses and the decision rule before the data arrives.", "",

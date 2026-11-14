@@ -3,7 +3,7 @@ title: "Ask respondents to rank options"
 description: "Add a question, choose Ranking, and give the options to put in order."
 ---
 
-[Docs](../../docs.html) / [Question types](../../docs.html#question-types)
+[Documentation](../../docs.html) / [Question types](../../docs.html#question-types)
 
 Add a question, choose Ranking, and give the options to put in order.
 

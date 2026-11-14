@@ -1,7 +1,7 @@
 # data-raw/capture_study_screenshots.R
 # The SurveyStudio screenshots of the 5 stages for each of the 10 study pages
 # (Session 10, plan: demos and website redesign): design, collect, check,
-# analyse and report, into pkgdown/assets/studies/<demo>/. Site only:
+# analyse and report, into pkgdown/assets/templates/<demo>/. Site only:
 # pkgdown/ is in .Rbuildignore, so the tarball does not grow. Generated,
 # never hand-captured, so they show what the package draws today.
 #
@@ -51,7 +51,7 @@ wait_stable <- function(b, secs = 240) {
 
 for (demo in study_demos) {
   cat(demo, "\n")
-  out_dir <- file.path(pkg_root, "pkgdown", "assets", "studies", demo)
+  out_dir <- file.path(pkg_root, "pkgdown", "assets", "templates", demo)
   dir.create(out_dir, recursive = TRUE, showWarnings = FALSE)
   port <- httpuv::randomPort()
   proc <- callr::r_bg(function(root, demo, port) {

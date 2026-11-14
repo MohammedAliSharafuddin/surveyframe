@@ -3,7 +3,7 @@ title: "Ask a grid of rating questions"
 description: "Add a question, choose Matrix, list the rows, and pick the scale every row is rated on."
 ---
 
-[Docs](../../docs.html) / [Question types](../../docs.html#question-types)
+[Documentation](../../docs.html) / [Question types](../../docs.html#question-types)
 
 Add a question, choose Matrix, list the rows, and pick the scale every row is rated on.
 

@@ -3,7 +3,7 @@ title: "Measure how answers go together"
 description: "How strongly 2 numeric or ordered answers move together, and whether that holds with a third held constant."
 ---
 
-[Docs](../../docs.html) / [Methods](../../docs.html#methods)
+[Documentation](../../docs.html) / [Methods](../../docs.html#methods)
 
 How strongly 2 numeric or ordered answers move together, and whether that holds with a third held constant.
 

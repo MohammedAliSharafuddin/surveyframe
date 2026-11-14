@@ -1,0 +1,77 @@
+---
+title: "Supplier and venue selection (decision making)"
+description: "A decision study that weights several criteria from a committee's judgements and ranks the options by 10 methods, to show whether they agree. surveyframe gives you the questionnaire, the analysis plan and the report."
+---
+
+```{=html}
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Supplier and venue selection (decision making)","description":"A decision study that weights several criteria from a committee's judgements and ranks the options by 10 methods, to show whether they agree. surveyframe gives you the questionnaire, the analysis plan and the report.","about":{"@type":"SoftwareSourceCode","name":"surveyframe","url":"https://surveyframe.org"},"url":"https://surveyframe.org/articles/templates/supplier-and-venue-selection.html"}</script>
+```
+
+A decision study that weights several criteria from a committee's judgements and ranks the options by 10 methods, to show whether they agree. surveyframe gives you the questionnaire, the analysis plan and the report.
+
+## Preview the questionnaire
+
+This is the questionnaire as respondents see it. It is a preview, so answers go nowhere. [Open it in a new tab](../../templates/mcdm_choice/preview.html).
+
+```{=html}
+<iframe src="../../templates/mcdm_choice/preview.html" title="Preview of the Supplier and venue selection (decision making) questionnaire" style="width:100%;height:560px;border:1px solid #d9e2ec;border-radius:6px"></iframe>
+```
+
+## The analysis plan, ready to preregister
+
+Before any data is collected, surveyframe writes the pre-analysis plan: the study, the questionnaire, each research question with its hypotheses, method and decision rule, and what a preregistration still asks for. [Read the plan](../../templates/mcdm_choice/plan.html), or [download the instrument (.sframe)](../../templates/mcdm_choice/mcdm_choice.sframe) and open it in SurveyStudio.
+
+Methods it declares: Analytic hierarchy process (AHP), Analytic network process (ANP), DEMATEL, TOPSIS, VIKOR, MOORA, SMART, WASPAS, PROMETHEE, ELECTRE.
+
+## What you get
+
+The study in SurveyStudio, stage by stage: design, collect, check, analyse and report.
+
+![Design screen with the questionnaire.](../../templates/mcdm_choice/design.png){width=100%}
+![Collect screen.](../../templates/mcdm_choice/collect.png){width=100%}
+![Quality screen.](../../templates/mcdm_choice/check.png){width=100%}
+![Analyse screen with the declared plan.](../../templates/mcdm_choice/analyse.png){width=100%}
+![Report screen.](../../templates/mcdm_choice/report.png){width=100%}
+
+## Start in 2 steps (no coding)
+
+1. Install surveyframe in R: `install.packages("surveyframe")`
+2. In RStudio, open the Addins menu, choose **surveyframe: Try a demo**, and pick `mcdm_choice`. The study opens in SurveyStudio.
+
+## Questions
+
+### Which methods rank the options?
+
+AHP and ANP weight the criteria, DEMATEL shows which drive the others, and TOPSIS, VIKOR, MOORA, SMART, WASPAS, PROMETHEE and ELECTRE rank the options.
+
+### Are the judgements consistent?
+
+The plan accepts pairwise judgements when the consistency ratio is below .10.
+
+### Can a committee answer it?
+
+Yes. Each member answers the same questionnaire, and the judgements are combined.
+
+## For R users
+
+```{=html}
+<details><summary>Open this study in R</summary>
+```
+
+```r
+d <- sframe_demo("mcdm_choice")
+render_report(d$instrument)                 # the pre-analysis plan
+results <- run_analysis_plan(d$responses, d$instrument)
+```
+
+```{=html}
+</details>
+```
+
+## Related
+
+- [All business templates](../templates.html#business)
+- [Customer satisfaction survey](customer-satisfaction-survey.html)
+- [Employee engagement survey](employee-engagement-survey.html)
+- [How-to guides](../guides.html)
+

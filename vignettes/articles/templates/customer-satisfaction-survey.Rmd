@@ -1,0 +1,77 @@
+---
+title: "Customer satisfaction survey"
+description: "A customer study of whether using a service more predicts that customers return, how satisfied they are and which offer they prefer. surveyframe gives you the questionnaire, a plan with logistic regressions declared in advance, and the report."
+---
+
+```{=html}
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Customer satisfaction survey","description":"A customer study of whether using a service more predicts that customers return, how satisfied they are and which offer they prefer. surveyframe gives you the questionnaire, a plan with logistic regressions declared in advance, and the report.","about":{"@type":"SoftwareSourceCode","name":"surveyframe","url":"https://surveyframe.org"},"url":"https://surveyframe.org/articles/templates/customer-satisfaction-survey.html"}</script>
+```
+
+A customer study of whether using a service more predicts that customers return, how satisfied they are and which offer they prefer. surveyframe gives you the questionnaire, a plan with logistic regressions declared in advance, and the report.
+
+## Preview the questionnaire
+
+This is the questionnaire as respondents see it. It is a preview, so answers go nowhere. [Open it in a new tab](../../templates/logistic/preview.html).
+
+```{=html}
+<iframe src="../../templates/logistic/preview.html" title="Preview of the Customer satisfaction survey questionnaire" style="width:100%;height:560px;border:1px solid #d9e2ec;border-radius:6px"></iframe>
+```
+
+## The analysis plan, ready to preregister
+
+Before any data is collected, surveyframe writes the pre-analysis plan: the study, the questionnaire, each research question with its hypotheses, method and decision rule, and what a preregistration still asks for. [Read the plan](../../templates/logistic/plan.html), or [download the instrument (.sframe)](../../templates/logistic/logistic.sframe) and open it in SurveyStudio.
+
+Methods it declares: Binary logistic regression, Ordinal logistic regression, Multinomial logistic regression.
+
+## What you get
+
+The study in SurveyStudio, stage by stage: design, collect, check, analyse and report.
+
+![Design screen with the questionnaire.](../../templates/logistic/design.png){width=100%}
+![Collect screen.](../../templates/logistic/collect.png){width=100%}
+![Quality screen.](../../templates/logistic/check.png){width=100%}
+![Analyse screen with the declared plan.](../../templates/logistic/analyse.png){width=100%}
+![Report screen.](../../templates/logistic/report.png){width=100%}
+
+## Start in 2 steps (no coding)
+
+1. Install surveyframe in R: `install.packages("surveyframe")`
+2. In RStudio, open the Addins menu, choose **surveyframe: Try a demo**, and pick `logistic`. The study opens in SurveyStudio.
+
+## Questions
+
+### Which model predicts a yes or no answer?
+
+A binary logistic regression, with the odds ratio of each predictor and its confidence interval.
+
+### Can I predict a rating instead?
+
+Yes. An ordinal logistic regression predicts an ordered rating, and a multinomial model a choice among several options.
+
+### Can my team use it without R?
+
+Yes. SurveyStudio runs the whole study in a browser window, started from RStudio's Addins menu.
+
+## For R users
+
+```{=html}
+<details><summary>Open this study in R</summary>
+```
+
+```r
+d <- sframe_demo("logistic")
+render_report(d$instrument)                 # the pre-analysis plan
+results <- run_analysis_plan(d$responses, d$instrument)
+```
+
+```{=html}
+</details>
+```
+
+## Related
+
+- [All business templates](../templates.html#business)
+- [Employee engagement survey](employee-engagement-survey.html)
+- [Supplier and venue selection (decision making)](supplier-and-venue-selection.html)
+- [How-to guides](../guides.html)
+

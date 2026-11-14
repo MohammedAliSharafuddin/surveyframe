@@ -3,7 +3,7 @@ title: "Choose between options"
 description: "How much each criterion weighs, and which option ranks best."
 ---
 
-[Docs](../../docs.html) / [Methods](../../docs.html#methods)
+[Documentation](../../docs.html) / [Methods](../../docs.html#methods)
 
 How much each criterion weighs, and which option ranks best.
 

@@ -3,7 +3,7 @@ title: "Describe the answers and their quality"
 description: "Who answered what, how complete the answers are, and which responses fail the quality checks."
 ---
 
-[Docs](../../docs.html) / [Methods](../../docs.html#methods)
+[Documentation](../../docs.html) / [Methods](../../docs.html#methods)
 
 Who answered what, how complete the answers are, and which responses fail the quality checks.
 

@@ -3,7 +3,7 @@ title: "Predict an outcome"
 description: "How much predictors explain a numeric outcome, or change the odds of a yes, an ordered rating or a choice."
 ---
 
-[Docs](../../docs.html) / [Methods](../../docs.html#methods)
+[Documentation](../../docs.html) / [Methods](../../docs.html#methods)
 
 How much predictors explain a numeric outcome, or change the odds of a yes, an ordered rating or a choice.
 

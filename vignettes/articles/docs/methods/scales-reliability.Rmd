@@ -3,7 +3,7 @@ title: "Score a scale and check its reliability"
 description: "A scale's score, and whether its items hold together."
 ---
 
-[Docs](../../docs.html) / [Methods](../../docs.html#methods)
+[Documentation](../../docs.html) / [Methods](../../docs.html#methods)
 
 A scale's score, and whether its items hold together.
 

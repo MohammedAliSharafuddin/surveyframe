@@ -3,7 +3,7 @@ title: "Ask for a short text answer"
 description: "Add a question and choose Short text for a word or a line."
 ---
 
-[Docs](../../docs.html) / [Question types](../../docs.html#question-types)
+[Documentation](../../docs.html) / [Question types](../../docs.html#question-types)
 
 Add a question and choose Short text for a word or a line.
 

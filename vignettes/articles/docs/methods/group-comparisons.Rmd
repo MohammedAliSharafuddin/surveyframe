@@ -3,7 +3,7 @@ title: "Compare groups"
 description: "Whether an outcome differs between 2 or more groups of respondents."
 ---
 
-[Docs](../../docs.html) / [Methods](../../docs.html#methods)
+[Documentation](../../docs.html) / [Methods](../../docs.html#methods)
 
 Whether an outcome differs between 2 or more groups of respondents.
 

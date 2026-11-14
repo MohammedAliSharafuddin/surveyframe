@@ -88,7 +88,7 @@ bsr_paper_template.docx
 review_032_functions.R
 tests/testthat/_problems/
 tests/testthat/testthat-problems.rds
-pkgdown/assets/studies/*/preview.html
-pkgdown/assets/studies/*/plan.html
-pkgdown/assets/studies/*/*.sframe
-pkgdown/assets/studies/*/*.json
+pkgdown/assets/templates/*/preview.html
+pkgdown/assets/templates/*/plan.html
+pkgdown/assets/templates/*/*.sframe
+pkgdown/assets/templates/*/*.json
