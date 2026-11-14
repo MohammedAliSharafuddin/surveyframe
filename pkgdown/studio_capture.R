@@ -57,7 +57,7 @@ studio_close <- function(s) {
 }
 
 studio_shrink <- function(path, width = 1000L, colors = 256L) {
-  system2("convert", c(shQuote(path), "-resize", shQuote(paste0(width, "x>")), "-colors", as.character(colors), "-strip", shQuote(path)),
+  system2("convert", c(shQuote(path), "-resize", shQuote(paste0(width, "x>")), "+dither", "-colors", as.character(colors), "-strip", shQuote(path)),
           stdout = FALSE, stderr = FALSE)
   if (nzchar(Sys.which("optipng"))) system2("optipng", c("-quiet", "-o2", shQuote(path)), stdout = FALSE, stderr = FALSE)
 }

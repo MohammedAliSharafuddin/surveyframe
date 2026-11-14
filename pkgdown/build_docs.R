@@ -108,7 +108,7 @@ page_dir <- file.path("vignettes", "articles", "docs", "question-types")
 dir.create(shot_dir, recursive = TRUE, showWarnings = FALSE)
 dir.create(page_dir, recursive = TRUE, showWarnings = FALSE)
 shrink <- function(path, width = 1000) {
-  system2("convert", c(shQuote(path), "-resize", shQuote(paste0(width, "x>")), "-colors", "256", "-strip", shQuote(path)),
+  system2("convert", c(shQuote(path), "-resize", shQuote(paste0(width, "x>")), "+dither", "-colors", "256", "-strip", shQuote(path)),
           stdout = FALSE, stderr = FALSE)
 }
 js <- function(b, code) b$Runtime$evaluate(code, returnByValue = TRUE)$result$value
