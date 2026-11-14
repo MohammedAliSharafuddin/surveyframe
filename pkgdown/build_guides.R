@@ -1,13 +1,17 @@
 # pkgdown/build_guides.R
-# The method guides of surveyframe.org (Session W, plan: method guides): 1
+# The how-to guides of surveyframe.org (Session W, plan: method guides): 1
 # web-only page per teaching demo, vignettes/articles/guides/<slug>.Rmd, with
-# a question-shaped title, a direct-answer lead, the SurveyStudio route, the
-# R code, and a result shell that names what each block reports without a
-# number (the site shows no simulated numbers). Plus the index,
-# vignettes/articles/guides.Rmd. The demos' own names and functions are
-# unchanged. Run from the repository root:  Rscript pkgdown/build_guides.R
+# a task-shaped title, the reader's outcome, the example study in its own
+# sentence, the SurveyStudio steps for that task, the R code for that task
+# (both from pkgdown/guide_specs.R, Codex website review WR609 to WR635), and,
+# for an analysis, a result shell that names what each research question
+# reports without a number (the site shows no simulated numbers). Plus the
+# index, vignettes/articles/guides.Rmd, grouped by the reader's task. The
+# demos' own names and functions are unchanged.
+# Run from the repository root:  Rscript pkgdown/build_guides.R
 
 devtools::load_all(quiet = TRUE)
+source(file.path("pkgdown", "guide_specs.R"))
 
 guides <- c(
   first_survey = "How to run a complete survey, from questionnaire to report, in R",
@@ -24,7 +28,7 @@ guides <- c(
   sem_pls = "How to test a measurement and structural model",
   branching = "How to ask questions only of those they apply to",
   open_text = "How to analyse open-ended answers",
-  mcdm_choice = "How to choose between options on several criteria",
+  mcdm_choice = "How to choose between options on multiple criteria",
   small_sample = "How to analyse a survey with fewer than 30 respondents",
   multi_response = "How to analyse choose-any and ranking questions",
   weighted_survey = "How to weight a survey sample to its population",
@@ -36,8 +40,20 @@ guides <- c(
   verification = "How to prove a questionnaire file is the one you planned",
   citing_sources = "How to cite the sources of a scale and a method"
 )
-groups <- c(analysis = "Analyse", presentation = "Present the survey", provenance = "Keep the record")
+# The index groups the guides by the reader's task (WR568).
+groups <- list(
+  "Run a complete study" = "first_survey",
+  "Design the questionnaire" = c("branching", "branded_survey", "conversational_survey", "conversational_branching"),
+  "Analyse and report" = c("likert_scale", "matrix_likert", "two_group", "paired", "multi_group", "repeated",
+                           "categorical", "correlation_regression", "logistic", "factor_structure", "sem_pls",
+                           "open_text", "mcdm_choice", "small_sample", "multi_response", "weighted_survey",
+                           "mediation_moderation"),
+  "Record your research" = c("instrument_revision", "verification", "citing_sources")
+)
+stopifnot(setequal(unlist(groups), names(guides)), setequal(names(guide_specs), names(guides)))
 
+# Methods that return model syntax to fit elsewhere, not estimates (R/analysis_plan.R).
+syntax_methods <- c("cfa_lavaan_syntax", "sem_lavaan_syntax", "seminr_syntax", "pls_sem")
 idx_df <- sframe_list_demos()
 idx_df <- idx_df[idx_df$focus != "reference", ]
 slug <- function(t) sub("-$", "", gsub("-+", "-", gsub("[^a-z0-9]+", "-", tolower(sub("^How to ", "", t)))))
@@ -48,18 +64,15 @@ q <- function(x) gsub("\"", "\\\\\"", x)
 for (k in seq_len(nrow(idx_df))) {
   nm <- idx_df$name[k]
   title <- guides[[nm]]
+  sp <- guide_specs[[nm]]
   d <- sframe_demo(nm, preview = FALSE)
   ins <- d$instrument
   plan <- ins$analysis_plan %||% list()
-  methods <- unique(vapply(plan, function(b) sframe_method_words(sframe_analysis_method(b)), character(1)))
-  lead <- paste0(sub("\\.$", "", ins$meta$description), ". ",
-                 if (length(methods)) paste0("surveyframe declares the analysis in advance (",
-                                             paste(methods, collapse = ", "),
-                                             ") and reports it in APA 7.") else
-                   "surveyframe writes the questionnaire and its record.")
-  # The result shell: each block and what it reports, no values.
+  example <- sprintf("The example in this guide is *%s*%s %s", ins$meta$title,
+                     if (grepl("[?!.]$", ins$meta$title)) "" else ".", ins$meta$description)
+  # The result shell: each research question and what it reports, no values.
   shell <- NULL
-  if (file.exists(d$results_path %||% "")) {
+  if (identical(idx_df$focus[k], "analysis") && file.exists(d$results_path %||% "")) {
     res <- utils::read.csv(d$results_path, stringsAsFactors = FALSE)
     if (nrow(res)) {
       res <- res[!duplicated(res[, c("block", "method")]), c("block", "method")]
@@ -67,26 +80,23 @@ for (k in seq_len(nrow(idx_df))) {
                  vapply(seq_len(nrow(res)), function(i) {
                    b <- Filter(function(x) identical(x$id, res$block[i]), plan)
                    rq <- if (length(b)) b[[1]]$research_question else res$block[i]
-                   sprintf("| %s | %s | The APA 7 sentence, its table and chart |",
-                           gsub("\\|", "/", rq), sframe_method_words(res$method[i]))
+                   gives <- if (res$method[i] %in% syntax_methods) "The model syntax, ready for you to fit in lavaan or seminr" else
+                     "The APA 7 sentence and a table, with a chart where the method has one"
+                   sprintf("| %s | %s | %s |", gsub("\\|", "/", rq), sframe_method_words(res$method[i]), gives)
                  }, character(1)))
     }
   }
   shot <- file.path("pkgdown", "assets", "templates", nm, "design.png")
   rmd <- c(
-    "---", sprintf("title: \"%s\"", q(title)), sprintf("description: \"%s\"", q(lead)), "---", "",
-    lead, "",
+    "---", sprintf("title: \"%s\"", q(title)), sprintf("description: \"%s\"", q(sp$outcome)), "---", "",
+    sp$outcome, "", example, "",
     "## In SurveyStudio", "",
-    sprintf("In RStudio, open the Addins menu, choose **surveyframe: Try a demo** and pick `%s`. The study opens on the Design screen. Plan shows each research question with its method and decision rule, Analyse runs them as declared, and Report writes the APA 7 report.", nm), "",
-    if (file.exists(shot)) c(sprintf("![The Design screen with the %s study.](../../templates/%s/design.png){width=100%%}", nm, nm), "") ,
+    paste0(seq_along(sp$studio), ". ", sp$studio), "",
+    if (file.exists(shot)) c(sprintf("![The Design screen with the %s study open.](../../templates/%s/design.png){width=100%%}", ins$meta$title, nm), ""),
     "## In R", "",
-    "```r",
-    sprintf("d <- sframe_demo(\"%s\")", nm),
-    if (length(plan)) "results <- run_analysis_plan(d$responses, d$instrument)",
-    if (length(plan)) "render_report(d$instrument, d$responses)",
-    "```", "",
-    if (length(shell)) c("## What the report gives", "", shell, ""),
-    "The demo's data is simulated, so the site shows no numbers. Run it in SurveyStudio or R to see the results, each marked as demonstration data.", "",
+    "```r", sp$r, "```", "",
+    if (length(shell)) c("## The research questions and what the report gives", "", shell, "",
+                         "Run the example in SurveyStudio or R to see the results, each marked as demonstration data.", ""),
     "## Related", "",
     "- [Questionnaire templates](../templates.html)",
     "- [All how-to guides](../guides.html)", ""
@@ -95,11 +105,11 @@ for (k in seq_len(nrow(idx_df))) {
 }
 
 idx <- c("---", "title: \"How-to guides\"",
-         "description: \"How to answer a research question with a survey: compare groups, check a scale, predict an outcome, analyse open answers and more, each in SurveyStudio and in R.\"",
-         "---", "", "Each guide answers 1 research question, with the SurveyStudio route first and the R code after.", "")
+         "description: \"Follow a complete task, from setting up a questionnaire to analysing responses and documenting your study, in SurveyStudio and in R.\"",
+         "---", "", "Follow a complete task, from setting up a questionnaire to analysing responses and documenting your study. Each guide gives the SurveyStudio steps first and the R code after.", "")
 for (g in names(groups)) {
-  idx <- c(idx, paste("##", groups[[g]]), "")
-  for (nm in idx_df$name[idx_df$focus == g]) idx <- c(idx, sprintf("- [%s](guides/%s.html)", guides[[nm]], slug(guides[[nm]])))
+  idx <- c(idx, paste("##", g), "")
+  for (nm in groups[[g]]) idx <- c(idx, sprintf("- [%s](guides/%s.html)", guides[[nm]], slug(guides[[nm]])))
   idx <- c(idx, "")
 }
 writeLines(idx, file.path("vignettes", "articles", "guides.Rmd"))

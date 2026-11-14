@@ -531,3 +531,7 @@ footer:
     package: >
       surveyframe is an open-source R package for survey research.
       MIT License.
+
+# A guide renamed to keep "several" off the site (house style, Codex WR620).
+redirects:
+  - ["articles/guides/choose-between-options-on-several-criteria.html", "articles/guides/choose-between-options-on-multiple-criteria.html"]

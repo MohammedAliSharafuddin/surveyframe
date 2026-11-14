@@ -1,29 +1,25 @@
 ---
 title: "How to combine 1 question at a time with skip logic"
-description: "The skip-logic survey shown one question at a time, so each respondent sees only the questions that apply to them. surveyframe declares the analysis in advance (Frequencies and percentages) and reports it in APA 7."
+description: "Combine a survey shown 1 question at a time with questions that depend on earlier answers."
 ---
 
-The skip-logic survey shown one question at a time, so each respondent sees only the questions that apply to them. surveyframe declares the analysis in advance (Frequencies and percentages) and reports it in APA 7.
+Combine a survey shown 1 question at a time with questions that depend on earlier answers.
+
+The example in this guide is *One question at a time, with skip logic*. The skip-logic survey shown one question at a time, so each respondent sees only the questions that apply to them.
 
 ## In SurveyStudio
 
-In RStudio, open the Addins menu, choose **surveyframe: Try a demo** and pick `conversational_branching`. The study opens on the Design screen. Plan shows each research question with its method and decision rule, Analyse runs them as declared, and Report writes the APA 7 report.
+1. In RStudio, open the **Addins** menu, choose **surveyframe: Try a demo** and pick `conversational_branching`.
+2. Open **Survey settings**. On **General**, **Presentation mode** is Conversational. On **Design**, the dependent question has a branching rule.
+3. On **Preview**, answer the first question in different ways. A question hidden by its rule is stepped over, so the respondent moves straight to the next question that applies.
 
 ## In R
 
 ```r
 d <- sframe_demo("conversational_branching")
-results <- run_analysis_plan(d$responses, d$instrument)
-render_report(d$instrument, d$responses)
+sframe_get_branches(d$instrument)
+export_survey(d$instrument, "survey.html")
 ```
-
-## What the report gives
-
-| Research question | Method | What the report gives |
-|---|---|---|
-| Who attended, and in what proportions? | Frequencies and percentages | The APA 7 sentence, its table and chart |
-
-The demo's data is simulated, so the site shows no numbers. Run it in SurveyStudio or R to see the results, each marked as demonstration data.
 
 ## Related
 
