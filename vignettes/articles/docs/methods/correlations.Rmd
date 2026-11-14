@@ -1,0 +1,73 @@
+---
+title: "Measure how answers go together"
+description: "How strongly 2 numeric or ordered answers move together, and whether that holds with a third held constant."
+---
+
+[Docs](../../docs.html) / [Methods](../../docs.html#methods)
+
+How strongly 2 numeric or ordered answers move together, and whether that holds with a third held constant.
+
+**Assumptions.** Pearson's r assumes a straight-line relation, the rank correlations a steady direction. Correlation is not causation.
+
+In SurveyStudio, open Plan, add a research question, choose the method and assign each variable its role. Declare the hypotheses and the decision rule before the data arrives.
+
+## Pearson correlation
+
+![The Plan card for a Pearson correlation block, from the `correlation_regression` demo.](../../../docs/methods/correlation_pearson.png){width=90%}
+
+In the pre-analysis plan:
+
+> **RQ1.** Do use of the service and perceived value go together?
+> **Null hypothesis (H0):** Use and perceived value are not correlated.
+> **Alternative hypothesis (H1):** Use and perceived value are correlated.
+> **Planned decision rule:** Reject H0 if p < .05, and report the effect size with its 95% confidence interval.
+
+In the report: the APA 7 sentence, a table and a chart, each titled with the research question.
+
+References: Field, A. (2018). *Discovering statistics using IBM SPSS statistics* (5th ed.). SAGE. Cohen, J. (1988). *Statistical power analysis for the behavioral sciences* (2nd ed.). Lawrence Erlbaum.
+
+## Spearman rank correlation
+
+![The Plan card for a Spearman rank correlation block, from the `correlation_regression` demo.](../../../docs/methods/correlation_spearman.png){width=90%}
+
+In the pre-analysis plan:
+
+> **RQ2.** Do use and perceived value go together on ranks?
+> **Null hypothesis (H0):** Use and perceived value are not rank-correlated.
+> **Alternative hypothesis (H1):** Use and perceived value are rank-correlated.
+> **Planned decision rule:** Reject H0 if p < .05 on this rank-based test, and report the effect size with its 95% confidence interval.
+
+In the report: the APA 7 sentence, a table and a chart, each titled with the research question.
+
+References: Cohen, J. (1988). *Statistical power analysis for the behavioral sciences* (2nd ed.). Lawrence Erlbaum. Spearman, C. (1904). The proof and measurement of association between two things. *The American Journal of Psychology*, *15*(1), 72-101.
+
+## Kendall rank correlation
+
+![The Plan card for a Kendall rank correlation block, from the `correlation_regression` demo.](../../../docs/methods/correlation_kendall.png){width=90%}
+
+In the pre-analysis plan:
+
+> **RQ3.** Do use and perceived value go together, by Kendall's tau?
+> **Null hypothesis (H0):** Use and perceived value are not associated by Kendall's tau.
+> **Alternative hypothesis (H1):** Use and perceived value are associated by Kendall's tau.
+> **Planned decision rule:** Reject H0 if p < .05 on this rank-based test, and report the effect size with its 95% confidence interval.
+
+In the report: the APA 7 sentence, a table and a chart, each titled with the research question.
+
+References: Cohen, J. (1988). *Statistical power analysis for the behavioral sciences* (2nd ed.). Lawrence Erlbaum. Kendall, M. G. (1938). A new measure of rank correlation. *Biometrika*, *30*(1/2), 81-93.
+
+## Partial correlation
+
+![The Plan card for a Partial correlation block, from the `correlation_regression` demo.](../../../docs/methods/partial_correlation.png){width=90%}
+
+In the pre-analysis plan:
+
+> **RQ4.** Does the relationship hold once age is held constant?
+> **Null hypothesis (H0):** Holding age constant, use and value are not correlated.
+> **Alternative hypothesis (H1):** Holding age constant, use and value are correlated.
+> **Planned decision rule:** Reject H0 if p < .05, and report the effect size with its 95% confidence interval.
+
+In the report: the APA 7 sentence, a table and a chart, each titled with the research question.
+
+References: Cohen, J. (1988). *Statistical power analysis for the behavioral sciences* (2nd ed.). Lawrence Erlbaum.
+

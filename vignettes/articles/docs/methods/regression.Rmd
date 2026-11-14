@@ -1,0 +1,88 @@
+---
+title: "Predict an outcome"
+description: "How much predictors explain a numeric outcome, or change the odds of a yes, an ordered rating or a choice."
+---
+
+[Docs](../../docs.html) / [Methods](../../docs.html#methods)
+
+How much predictors explain a numeric outcome, or change the odds of a yes, an ordered rating or a choice.
+
+**Assumptions.** Independent respondents, predictors not too closely related to each other, and for linear regression a straight-line relation with roughly normal residuals. Firth's correction suits small samples and rare outcomes.
+
+In SurveyStudio, open Plan, add a research question, choose the method and assign each variable its role. Declare the hypotheses and the decision rule before the data arrives.
+
+## Linear regression
+
+![The Plan card for a Linear regression block, from the `correlation_regression` demo.](../../../docs/methods/regression_linear.png){width=90%}
+
+In the pre-analysis plan:
+
+> **RQ5.** How much value do sessions and networking together explain?
+> **Null hypothesis (H0):** Use and staff time explain none of the variance in value.
+> **Alternative hypothesis (H1):** Use and staff time explain some of the variance in value.
+> **Planned decision rule:** Reject H0 if p < .05, and report the effect size with its 95% confidence interval.
+
+In the report: the APA 7 sentence, a table and a chart, each titled with the research question.
+
+References: Field, A. (2018). *Discovering statistics using IBM SPSS statistics* (5th ed.). SAGE.
+
+## Binary logistic regression
+
+![The Plan card for a Binary logistic regression block, from the `logistic` demo.](../../../docs/methods/regression_logistic_binary.png){width=90%}
+
+In the pre-analysis plan:
+
+> **RQ1.** Does using the service more predict returning?
+> **Null hypothesis (H0):** Use does not change the odds of returning.
+> **Alternative hypothesis (H1):** Use changes the odds of returning.
+> **Planned decision rule:** Reject H0 if p < .05 for the use coefficient, and report its odds ratio with a 95% confidence interval.
+
+In the report: the APA 7 sentence, a table and a chart, each titled with the research question.
+
+References: Hosmer, D. W., Lemeshow, S., & Sturdivant, R. X. (2013). *Applied logistic regression* (3rd ed.). Wiley.
+
+## Ordinal logistic regression
+
+![The Plan card for a Ordinal logistic regression block, from the `logistic` demo.](../../../docs/methods/regression_logistic_ordinal.png){width=90%}
+
+In the pre-analysis plan:
+
+> **RQ2.** And does it predict how satisfied they were?
+> **Null hypothesis (H0):** Use does not change the odds of a higher satisfaction rating.
+> **Alternative hypothesis (H1):** Use changes the odds of a higher satisfaction rating.
+> **Planned decision rule:** Reject H0 if p < .05 for the use coefficient, and report its odds ratio with a 95% confidence interval.
+
+In the report: the APA 7 sentence, a table and a chart, each titled with the research question.
+
+References: Hosmer, D. W., Lemeshow, S., & Sturdivant, R. X. (2013). *Applied logistic regression* (3rd ed.). Wiley.
+
+## Multinomial logistic regression
+
+![The Plan card for a Multinomial logistic regression block, from the `logistic` demo.](../../../docs/methods/regression_logistic_multinomial.png){width=90%}
+
+In the pre-analysis plan:
+
+> **RQ3.** And which session type they prefer?
+> **Null hypothesis (H0):** Use does not change which offer is preferred.
+> **Alternative hypothesis (H1):** Use changes which offer is preferred.
+> **Planned decision rule:** Reject H0 if the likelihood-ratio test of use has p < .05.
+
+In the report: the APA 7 sentence, a table and a chart, each titled with the research question.
+
+References: Hosmer, D. W., Lemeshow, S., & Sturdivant, R. X. (2013). *Applied logistic regression* (3rd ed.). Wiley.
+
+## Firth logistic regression
+
+![The Plan card for a Firth logistic regression block, from the `small_sample` demo.](../../../docs/methods/firth_logistic.png){width=90%}
+
+In the pre-analysis plan:
+
+> **RQ3.** Does attending more sessions predict returning, with a small-sample correction?
+> **Null hypothesis (H0):** Sessions attended do not change the odds of returning.
+> **Alternative hypothesis (H1):** Sessions attended change the odds of returning.
+> **Planned decision rule:** Reject H0 if the penalised likelihood p < .05, and report the odds ratio with its 95% confidence interval.
+
+In the report: the APA 7 sentence, a table and a chart, each titled with the research question.
+
+References: Hosmer, D. W., Lemeshow, S., & Sturdivant, R. X. (2013). *Applied logistic regression* (3rd ed.). Wiley. Firth, D. (1993). Bias reduction of maximum likelihood estimates. *Biometrika*, *80*(1), 27-38. Heinze, G., & Schemper, M. (2002). A solution to the problem of separation in logistic regression. *Statistics in Medicine*, *21*(16), 2409-2419.
+

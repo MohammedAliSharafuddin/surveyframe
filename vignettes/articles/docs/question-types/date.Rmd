@@ -1,0 +1,30 @@
+---
+title: "Ask for a date"
+description: "Add a question and choose Date. The respondent picks it from a calendar."
+---
+
+[Docs](../../docs.html) / [Question types](../../docs.html#question-types)
+
+Add a question and choose Date. The respondent picks it from a calendar.
+
+![The a date question selected in the editor, its settings outlined.](../../../docs/question-types/date-editor.png){width=100%}
+
+## What the respondent sees
+
+![The question as the respondent sees it.](../../../docs/question-types/date-preview.png){width=90%}
+
+## Settings
+
+- **Required.** Asks for a date before the respondent goes on.
+
+## Best practices for research
+
+Ask for a date only when the day matters. For how long ago, a numeric question is quicker to answer.
+
+Reference: Dillman, D. A., Smyth, J. D., & Christian, L. M. (2014). *Internet, phone, mail, and mixed-mode surveys: The tailored design method* (4th ed.). Wiley.
+
+## Related
+
+- [All question types](../../learn/question-types.html)
+- [The analysis plan](../../learn/analysis-plan.html)
+

@@ -1,0 +1,31 @@
+---
+title: "Ask for pairwise comparisons"
+description: "Add a question, choose Pairwise comparison, list the criteria, and pick the scale: Saaty for importance, or influence."
+---
+
+[Docs](../../docs.html) / [Question types](../../docs.html#question-types)
+
+Add a question, choose Pairwise comparison, list the criteria, and pick the scale: Saaty for importance, or influence.
+
+![The pairwise comparisons question selected in the editor, its settings outlined.](../../../docs/question-types/pairwise-comparison-editor.png){width=100%}
+
+## What the respondent sees
+
+![The question as the respondent sees it.](../../../docs/question-types/pairwise-comparison-preview.png){width=90%}
+
+## Settings
+
+- **Criteria.** The things compared. Every pair is asked once.
+- **Scale.** Saaty's 1 to 9 for which matters more and by how much (AHP, ANP), or 0 to 4 for how much 1 influences another (DEMATEL).
+
+## Best practices for research
+
+Keep to 7 criteria or fewer: the pairs grow fast, and the consistency ratio shows when judgements contradict each other.
+
+Reference: Saaty, T. L. (1980). *The analytic hierarchy process*. McGraw-Hill.
+
+## Related
+
+- [All question types](../../learn/question-types.html)
+- [The analysis plan](../../learn/analysis-plan.html)
+

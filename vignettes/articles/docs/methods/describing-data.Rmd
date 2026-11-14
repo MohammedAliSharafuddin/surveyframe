@@ -1,0 +1,55 @@
+---
+title: "Describe the answers and their quality"
+description: "Who answered what, how complete the answers are, and which responses fail the quality checks."
+---
+
+[Docs](../../docs.html) / [Methods](../../docs.html#methods)
+
+Who answered what, how complete the answers are, and which responses fail the quality checks.
+
+**Assumptions.** None beyond the data: these describe, they do not test.
+
+In SurveyStudio, open Plan, add a research question, choose the method and assign each variable its role. Declare the hypotheses and the decision rule before the data arrives.
+
+## Frequencies and percentages
+
+![The Plan card for a Frequencies and percentages block, from the `first_survey` demo.](../../../docs/methods/frequency.png){width=90%}
+
+In the pre-analysis plan:
+
+> **RQ1.** Who came to the event?
+
+In the report: the APA 7 sentence, a table and a chart, each titled with the research question.
+
+## Descriptive statistics
+
+![The Plan card for a Descriptive statistics block, from the `first_survey` demo.](../../../docs/methods/descriptives.png){width=90%}
+
+In the pre-analysis plan:
+
+> **RQ2.** How old are attendees?
+
+In the report: the APA 7 sentence, a table and a chart, each titled with the research question.
+
+## Missing-data summary
+
+![The Plan card for a Missing-data summary block, from the `first_survey` demo.](../../../docs/methods/missing_data.png){width=90%}
+
+In the pre-analysis plan:
+
+> **RQ3.** How complete is the data?
+> **Planned decision rule:** Treat a question with more than 10% missing answers as a problem to report.
+
+In the report: the APA 7 sentence, a table and a chart, each titled with the research question.
+
+## Response quality checks
+
+![The Plan card for a Response quality checks block, from the `first_survey` demo.](../../../docs/methods/quality.png){width=90%}
+
+In the pre-analysis plan:
+
+> **RQ4.** Are there inattentive responses?
+> **Planned decision rule:** Flag a response as inattentive when it fails the quality checks, and report the count.
+
+In the report: the APA 7 sentence, a table and a chart, each titled with the research question.
+

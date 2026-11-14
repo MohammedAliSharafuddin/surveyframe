@@ -1,0 +1,31 @@
+---
+title: "Ask a choose-any question"
+description: "Add a question, choose Multiple choice, and give the options the respondent may tick."
+---
+
+[Docs](../../docs.html) / [Question types](../../docs.html#question-types)
+
+Add a question, choose Multiple choice, and give the options the respondent may tick.
+
+![The choose-any question question selected in the editor, its settings outlined.](../../../docs/question-types/multiple-choice-editor.png){width=100%}
+
+## What the respondent sees
+
+![The question as the respondent sees it.](../../../docs/question-types/multiple-choice-preview.png){width=90%}
+
+## Settings
+
+- **Answer set.** The options. Each becomes its own column in the data, ticked or not.
+- **Required.** Asks for at least 1 tick.
+
+## Best practices for research
+
+Prefer asking yes or no for each option when every option matters: a choose-any list makes an unticked box ambiguous.
+
+Reference: Dillman, D. A., Smyth, J. D., & Christian, L. M. (2014). *Internet, phone, mail, and mixed-mode surveys: The tailored design method* (4th ed.). Wiley.
+
+## Related
+
+- [All question types](../../learn/question-types.html)
+- [The analysis plan](../../learn/analysis-plan.html)
+

@@ -1,0 +1,30 @@
+---
+title: "Ask for a star rating"
+description: "Add a question and choose Rating for a row of stars."
+---
+
+[Docs](../../docs.html) / [Question types](../../docs.html#question-types)
+
+Add a question and choose Rating for a row of stars.
+
+![The a star rating question selected in the editor, its settings outlined.](../../../docs/question-types/star-rating-editor.png){width=100%}
+
+## What the respondent sees
+
+![The question as the respondent sees it.](../../../docs/question-types/star-rating-preview.png){width=90%}
+
+## Settings
+
+- **Number of stars.** The top of the scale. The answer is the number of stars given.
+
+## Best practices for research
+
+Use stars for an overall judgement. For a scale of several items, use Likert questions that share an answer set.
+
+Reference: Dillman, D. A., Smyth, J. D., & Christian, L. M. (2014). *Internet, phone, mail, and mixed-mode surveys: The tailored design method* (4th ed.). Wiley.
+
+## Related
+
+- [All question types](../../learn/question-types.html)
+- [The analysis plan](../../learn/analysis-plan.html)
+

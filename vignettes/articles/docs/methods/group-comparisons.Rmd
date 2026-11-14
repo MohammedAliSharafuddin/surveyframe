@@ -1,0 +1,103 @@
+---
+title: "Compare groups"
+description: "Whether an outcome differs between 2 or more groups of respondents."
+---
+
+[Docs](../../docs.html) / [Methods](../../docs.html#methods)
+
+Whether an outcome differs between 2 or more groups of respondents.
+
+**Assumptions.** Independent respondents. The t-test and ANOVA assume a roughly normal outcome in each group and similar spread, the rank-based tests do not. ANCOVA adds a straight-line relation with the covariate.
+
+In SurveyStudio, open Plan, add a research question, choose the method and assign each variable its role. Declare the hypotheses and the decision rule before the data arrives.
+
+## Independent samples t-test
+
+![The Plan card for a Independent samples t-test block, from the `two_group` demo.](../../../docs/methods/t_test_ind.png){width=90%}
+
+In the pre-analysis plan:
+
+> **RQ1.** Do in-person and online attendees reach a different number of sessions?
+> **Null hypothesis (H0):** Mean sessions attended do not differ between in-person and online attendees.
+> **Alternative hypothesis (H1):** Mean sessions attended differ between in-person and online attendees.
+> **Planned decision rule:** Reject H0 if p < .05, and report the effect size with its 95% confidence interval.
+
+In the report: the APA 7 sentence, a table and a chart, each titled with the research question.
+
+References: Field, A. (2018). *Discovering statistics using IBM SPSS statistics* (5th ed.). SAGE. Cohen, J. (1988). *Statistical power analysis for the behavioral sciences* (2nd ed.). Lawrence Erlbaum.
+
+## Mann-Whitney U test
+
+![The Plan card for a Mann-Whitney U test block, from the `two_group` demo.](../../../docs/methods/mann_whitney.png){width=90%}
+
+In the pre-analysis plan:
+
+> **RQ2.** Do in-person and online attendees differ in sessions attended, without assuming normality?
+> **Null hypothesis (H0):** The distribution of sessions attended is the same for both formats.
+> **Alternative hypothesis (H1):** Sessions attended tend to be higher in one format.
+> **Planned decision rule:** Reject H0 if p < .05 on this rank-based test, and report the effect size with its 95% confidence interval.
+
+In the report: the APA 7 sentence, a table and a chart, each titled with the research question.
+
+References: Cohen, J. (1988). *Statistical power analysis for the behavioral sciences* (2nd ed.). Lawrence Erlbaum. Mann, H. B., & Whitney, D. R. (1947). On a test of whether one of two random variables is stochastically larger than the other. *Annals of Mathematical Statistics*, *18*(1), 50-60.
+
+## One-way ANOVA
+
+![The Plan card for a One-way ANOVA block, from the `multi_group` demo.](../../../docs/methods/anova_one.png){width=90%}
+
+In the pre-analysis plan:
+
+> **RQ1.** Do the 3 attendee roles differ in sessions attended?
+> **Null hypothesis (H0):** Mean sessions attended are equal across the 3 roles.
+> **Alternative hypothesis (H1):** Mean sessions attended differ for at least 1 role.
+> **Planned decision rule:** Reject H0 if p < .05, and report the effect size with its 95% confidence interval.
+
+In the report: the APA 7 sentence, a table and a chart, each titled with the research question.
+
+References: Field, A. (2018). *Discovering statistics using IBM SPSS statistics* (5th ed.). SAGE. Cohen, J. (1988). *Statistical power analysis for the behavioral sciences* (2nd ed.). Lawrence Erlbaum. Fisher, R. A. (1925). *Statistical methods for research workers*. Oliver & Boyd. Shapiro, S. S., & Wilk, M. B. (1965). An analysis of variance test for normality. *Biometrika*, *52*(3-4), 591-611.
+
+## Kruskal-Wallis test
+
+![The Plan card for a Kruskal-Wallis test block, from the `multi_group` demo.](../../../docs/methods/kruskal_wallis.png){width=90%}
+
+In the pre-analysis plan:
+
+> **RQ2.** The same question without assuming normality.
+> **Null hypothesis (H0):** Sessions attended have the same distribution across roles.
+> **Alternative hypothesis (H1):** Sessions attended differ in distribution for at least 1 role.
+> **Planned decision rule:** Reject H0 if p < .05 on this rank-based test, and report the effect size with its 95% confidence interval.
+
+In the report: the APA 7 sentence, a table and a chart, each titled with the research question.
+
+References: Cohen, J. (1988). *Statistical power analysis for the behavioral sciences* (2nd ed.). Lawrence Erlbaum. Kruskal, W. H., & Wallis, W. A. (1952). Use of ranks in one-criterion variance analysis. *Journal of the American Statistical Association*, *47*(260), 583-621.
+
+## Two-way ANOVA
+
+![The Plan card for a Two-way ANOVA block, from the `multi_group` demo.](../../../docs/methods/anova_two.png){width=90%}
+
+In the pre-analysis plan:
+
+> **RQ3.** Do role and format both matter?
+> **Null hypothesis (H0):** Neither role, format nor their interaction affects sessions attended.
+> **Alternative hypothesis (H1):** Role, format or their interaction affects sessions attended.
+> **Planned decision rule:** Reject H0 if p < .05, and report the effect size with its 95% confidence interval.
+
+In the report: the APA 7 sentence, a table and a chart, each titled with the research question.
+
+References: Cohen, J. (1988). *Statistical power analysis for the behavioral sciences* (2nd ed.). Lawrence Erlbaum. Fisher, R. A. (1925). *Statistical methods for research workers*. Oliver & Boyd. Shapiro, S. S., & Wilk, M. B. (1965). An analysis of variance test for normality. *Biometrika*, *52*(3-4), 591-611.
+
+## Analysis of covariance (ANCOVA)
+
+![The Plan card for a Analysis of covariance (ANCOVA) block, from the `multi_group` demo.](../../../docs/methods/ancova.png){width=90%}
+
+In the pre-analysis plan:
+
+> **RQ4.** Does the role difference survive adjusting for age?
+> **Null hypothesis (H0):** Adjusted for age, mean sessions attended are equal across roles.
+> **Alternative hypothesis (H1):** Adjusted for age, mean sessions attended differ for at least 1 role.
+> **Planned decision rule:** Reject H0 if p < .05, and report the effect size with its 95% confidence interval.
+
+In the report: the APA 7 sentence, a table and a chart, each titled with the research question.
+
+References: Cohen, J. (1988). *Statistical power analysis for the behavioral sciences* (2nd ed.). Lawrence Erlbaum. Fisher, R. A. (1925). *Statistical methods for research workers*. Oliver & Boyd. Shapiro, S. S., & Wilk, M. B. (1965). An analysis of variance test for normality. *Biometrika*, *52*(3-4), 591-611.
+

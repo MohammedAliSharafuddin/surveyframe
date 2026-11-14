@@ -1,0 +1,32 @@
+---
+title: "Ask a Likert question"
+description: "Add a question, choose Likert, and pick the agreement scale it answers on."
+---
+
+[Docs](../../docs.html) / [Question types](../../docs.html#question-types)
+
+Add a question, choose Likert, and pick the agreement scale it answers on.
+
+![The likert question question selected in the editor, its settings outlined.](../../../docs/question-types/likert-editor.png){width=100%}
+
+## What the respondent sees
+
+![The question as the respondent sees it.](../../../docs/question-types/likert-preview.png){width=90%}
+
+## Settings
+
+- **Answer set.** The labelled scale, such as Strongly disagree to Strongly agree. Items of 1 scale share it.
+- **Scale.** The scale the item scores into, so its score and reliability are computed together.
+- **Reverse-scored.** For an item worded against the others, so a high answer means the same on every item.
+
+## Best practices for research
+
+Label every point, not only the ends, and keep 1 idea per item: an item that asks 2 things cannot be answered for either.
+
+Reference: Krosnick, J. A., & Presser, S. (2010). Question and questionnaire design. In P. V. Marsden & J. D. Wright (Eds.), *Handbook of survey research* (2nd ed., pp. 263-313). Emerald.
+
+## Related
+
+- [All question types](../../learn/question-types.html)
+- [The analysis plan](../../learn/analysis-plan.html)
+

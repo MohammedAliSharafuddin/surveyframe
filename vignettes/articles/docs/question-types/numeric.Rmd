@@ -1,0 +1,30 @@
+---
+title: "Ask for a number"
+description: "Add a question, choose Numeric, and set the range the answer may take."
+---
+
+[Docs](../../docs.html) / [Question types](../../docs.html#question-types)
+
+Add a question, choose Numeric, and set the range the answer may take.
+
+![The a number question selected in the editor, its settings outlined.](../../../docs/question-types/numeric-editor.png){width=100%}
+
+## What the respondent sees
+
+![The question as the respondent sees it.](../../../docs/question-types/numeric-preview.png){width=90%}
+
+## Settings
+
+- **Minimum and maximum.** Refuses an answer outside the range at entry, so a typing slip does not reach the data.
+
+## Best practices for research
+
+Name the unit in the question, such as nights or years, so every respondent answers on the same scale.
+
+Reference: Dillman, D. A., Smyth, J. D., & Christian, L. M. (2014). *Internet, phone, mail, and mixed-mode surveys: The tailored design method* (4th ed.). Wiley.
+
+## Related
+
+- [All question types](../../learn/question-types.html)
+- [The analysis plan](../../learn/analysis-plan.html)
+
