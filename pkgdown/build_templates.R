@@ -44,7 +44,7 @@ studies <- list(
                "Can I run the whole study in SurveyStudio?" = "Yes. The whole study opens in SurveyStudio from RStudio's Addins menu.")),
   list(slug = "customer-satisfaction-survey", demo = "logistic", audience = "business",
        title = "Customer satisfaction survey",
-       lead = "A customer study of whether using a service more predicts that customers return, how satisfied they are and which offer they prefer. surveyframe gives you the questionnaire, a plan with logistic regressions declared in advance, and the report.",
+       lead = "A customer study of return intention: whether customers who use a service more come back, and how that use relates to their satisfaction and the offer they prefer. surveyframe gives you the questionnaire, a plan with logistic regressions declared in advance, and the report.",
        faq = c("Which model predicts a yes or no answer?" = "A binary logistic regression, with the odds ratio of each predictor and its confidence interval.",
                "Can I predict a rating instead?" = "Yes. An ordinal logistic regression predicts an ordered rating, and a multinomial model a choice among 3 or more options.",
                "Can my team use it without writing code?" = "Yes. SurveyStudio runs the whole study in a window started from RStudio's Addins menu. R and RStudio need to be installed, as Get started shows.")),
