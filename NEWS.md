@@ -2056,6 +2056,13 @@ arithmetic.
 
 ## Demos
 
+* **The `sem_pls` demo's second model is "The same paths, as PLS-SEM
+  syntax"**, where it read "estimated by PLS": surveyframe writes its
+  seminr syntax for the reader to fit. The `input_types` reference dataset
+  is titled "Visitor experience survey", where it carried the builder's
+  placeholder "Surveyframe Demo: Survey Title". Both files have a new hash,
+  and their items, responses and results are unchanged.
+
 * **The `sem_pls` demo's RQ5 asks "And what seminr code would estimate the
   PLS model?"**, where it asked what a PLS estimate gives. Its `pls_sem`
   block returns the seminr syntax for the model, which the reader fits in

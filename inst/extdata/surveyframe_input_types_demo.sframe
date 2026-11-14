@@ -2,12 +2,12 @@
   "sframe_format": "1.0",
   "hash": {
     "algo": "sha256",
-    "value": "e2130477ce1fc98f10c25b71d5867726c7a33d6427ec971f9e44d1a02d949631",
+    "value": "ff78a5524a473dcbd5a2072a2810e56c3681c049d99101f892fd8428e724f90f",
     "canonical": "rfc8785"
   },
   "version": "0.3.0",
   "meta": {
-    "title": "Surveyframe Demo: Survey Title",
+    "title": "Visitor experience survey",
     "version": "0.3.0",
     "description": "A visitor experience study of how online information, service and value relate to overall rating and the intention to recommend or reuse a service, asked with every kind of question a survey can hold.",
     "authors": "Demo author",

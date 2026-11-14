@@ -2,7 +2,7 @@
   "sframe_format": "1.0",
   "hash": {
     "algo": "sha256",
-    "value": "ec4386b8987f9c39910072de752b76955478aa16f9da2ae71121d537dba9925c",
+    "value": "0c35b9e66a2ad4f8898892befea2eb9128a8d7fb72723468894fe6c3186e4631",
     "canonical": "rfc8785"
   },
   "version": "1.0.0",
@@ -321,7 +321,7 @@
     },
     {
       "id": "m2",
-      "label": "The same paths, estimated by PLS",
+      "label": "The same paths, as PLS-SEM syntax",
       "type": "pls_sem",
       "engine": "seminr",
       "measurement": {
