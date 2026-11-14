@@ -1815,6 +1815,26 @@ arithmetic.
   references are kept on the next save. `demo =` and `instrument =` cannot
   be used together. With `launch_studio(instrument, screen = "design")`,
   this gives both routes a way to open an instrument held in R.
+* **`render_report(instrument)` with no data writes a pre-analysis plan**,
+  not a results page, for a student or a lab to submit to OSF, Zenodo or
+  an ethics committee before collecting data. It is titled "Pre-analysis
+  plan: <title>" and holds a title page with the version, the date, the
+  instrument hash and how to verify it at https://surveyframe.org/verify,
+  the study and its objectives, the participant information as written,
+  the questionnaire in order with each branching rule in words, the scales
+  with their reverse keys, scoring and missing-answer rule, each research
+  question with its hypotheses, the method in plain words with its
+  reference, the variables, the significance level and the decision rule,
+  the models, the amendments or "None", the references, and "To complete
+  before submission", a prompt and a blank line for each field a
+  preregistration asks for that the instrument does not hold (exclusion
+  rules, stopping rule, primary and secondary outcomes, multiplicity,
+  contingency decisions and the significance level, printed as declared
+  where a plan block sets alpha). Quarto writes it as HTML, PDF, Word or
+  OpenDocument from its own template, `plan.qmd`, and the built-in engine
+  writes the same content as plain HTML. Results rows (the results record,
+  the responses hash and the analysis seed) are no longer printed with no
+  data. A report source folder (`format = "qmd"`) with no data is as before.
 * **Each stage names the next.** At the console, `write_sframe()`,
   `export_survey()`, `export_google_sheet()`, `read_responses()`,
   `run_analysis_plan()` and `render_report()` end with 1 message saying

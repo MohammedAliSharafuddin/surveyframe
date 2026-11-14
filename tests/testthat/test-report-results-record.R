@@ -83,8 +83,11 @@ test_that("a codebook-only report records no responses and an empty result list"
   man <- jsonlite::fromJSON(p[["manifest"]], simplifyVector = FALSE)
   ids <- vapply(man$objects, `[[`, "", "object_id")
   expect_false("responses" %in% ids)
+  # With no data the page is the pre-analysis plan (Session 10), which
+  # carries no results rows.
   doc <- paste(readLines(out, warn = FALSE), collapse = "\n")
-  expect_match(doc, "Responses sha256</td>\\s*<td[^>]*>no responses supplied", perl = TRUE)
+  expect_false(grepl("Responses sha256", doc, fixed = TRUE))
+  expect_match(doc, "Pre-analysis plan", fixed = TRUE)
 })
 
 test_that("both engines print the provenance table built in R", {

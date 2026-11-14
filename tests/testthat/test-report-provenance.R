@@ -34,12 +34,15 @@ test_that("(e) the amendment table lists every entry, oldest first", {
 })
 
 test_that("(e) the built-in report gives the version and the amendments", {
+  # With no data the page is the pre-analysis plan (Session 10), which
+  # gives the version on its title page and the amendments in their own
+  # section, with no provenance table, whose rows describe results.
   ins <- amended_instr()
   f <- tempfile(fileext = ".html")
   surveyframe:::.render_report_html(ins, NULL, output_path = f, include_analysis = FALSE)
   doc <- paste(readLines(f, warn = FALSE), collapse = "\n")
-  expect_match(doc, "Instrument version</td>\\s*<td[^>]*>1.1.0", perl = TRUE)
-  expect_match(doc, "Amendments (2)", fixed = TRUE)
+  expect_match(doc, "<strong>Version:</strong> 1.1.0", fixed = TRUE)
+  expect_match(doc, "Amendments, in the order they were recorded", fixed = TRUE)
   expect_match(doc, "Dropped org_4.", fixed = TRUE)
   expect_match(doc, "org_4 loaded below .40.", fixed = TRUE)
 
@@ -47,7 +50,7 @@ test_that("(e) the built-in report gives the version and the amendments", {
   f2 <- tempfile(fileext = ".html")
   surveyframe:::.render_report_html(plain, NULL, output_path = f2, include_analysis = FALSE)
   doc2 <- paste(readLines(f2, warn = FALSE), collapse = "\n")
-  expect_match(doc2, "No amendments are recorded.", fixed = TRUE)
+  expect_match(doc2, "None. This is the instrument as first planned.", fixed = TRUE)
 })
 
 test_that("(e) the Quarto template is fed the same table", {

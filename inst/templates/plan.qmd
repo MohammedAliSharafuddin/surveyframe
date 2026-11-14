@@ -1,0 +1,87 @@
+---
+title: "Pre-analysis plan"
+date: "`r format(Sys.Date(), '%B %d, %Y')`"
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    toc-location: left
+    embed-resources: true
+    theme: [cosmo, report.scss]
+    code-fold: true
+    # Equations as MathML: no script, so an offline report shows them (8b-R).
+    html-math-method: mathml
+    grid:
+      sidebar-width: 280px
+      body-width: 900px
+      margin-width: 160px
+  docx:
+    reference-doc: apa-reference.docx
+    toc: true
+  odt:
+    reference-doc: apa-reference.odt
+    toc: true
+  pdf:
+    toc: true
+    # Tables single-spaced in a smaller size, as APA 7 allows, so that 10
+    # columns fit the text width (Codex P1-05).
+    include-in-header:
+      text: |
+        \usepackage{etoolbox}
+        \AtBeginEnvironment{longtable}{\footnotesize\setlength{\tabcolsep}{4pt}\ifdefined\setstretch\setstretch{1}\fi}
+        % A new page when less than #1 is left on this one, so a table's
+        % number and title stay with it (the needspace package's test,
+        % written out so no extra package is needed).
+        \newcommand{\sfneedspace}[1]{\par\penalty-100\begingroup\dimen0=#1\relax\dimen2=\pagegoal\advance\dimen2 by -\pagetotal\ifdim\dimen0>\dimen2\vfill\penalty-10000\fi\endgroup}
+    fontsize: 12pt
+    linestretch: 2
+    geometry: margin=1in
+  typst:
+    toc: true
+    fontsize: 12pt
+    citeproc: true
+params:
+  instrument_path:     ""
+  data_path:           ""
+  include_codebook:    true
+  include_quality:     true
+  include_reliability: true
+  include_analysis:    true
+  include_missing:     true
+  include_descriptives: true
+  include_models:      true
+  show_code:           true
+  plot_palette:        "web"
+  interpretations_path: ""
+  declarations_path: ""
+  content_path:      ""
+  provenance_path:   ""
+  source_dir:        ""
+  instrument_hash:     ""
+  analysis_seed:       ""
+  use_citations:       false
+  fig_width:           ""
+  fig_height:          ""
+  fig_dpi:             ""
+  fig_format:          ""
+  quarto_found:        ""
+execute:
+  echo:    false
+  warning: false
+  message: false
+---
+
+```{r plan}
+#| output: asis
+# The pre-analysis plan render_report() builds when it has no data (Session
+# 10): sframe_plan_blocks() written as Markdown inside the package, so this
+# template needs no surveyframe functions and both engines print the same.
+content <- if (nzchar(params$content_path) && file.exists(params$content_path)) {
+  readRDS(params$content_path)
+}
+if (is.null(content$plan_md)) {
+  cat("The plan could not be read.\n")
+} else {
+  cat(content$plan_md, sep = "\n")
+}
+```

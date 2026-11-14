@@ -279,8 +279,17 @@ print.sframe_codebook <- function(x, ...) {
 #' FALSE)` uses the built-in engine whatever is installed.
 #'
 #' @param instrument An `sframe` object.
-#' @param data A `tibble` or `data.frame` of responses, or NULL to generate a
-#'   codebook-only report.
+#' @param data A `tibble` or `data.frame` of responses, or `NULL` for the
+#'   pre-analysis plan: a document to submit to OSF, Zenodo or an ethics
+#'   committee before collecting data. It holds a title page with the
+#'   instrument's hash and how to verify it, the study, the participant
+#'   information, the questionnaire in order with its branching in words,
+#'   the scales and their scoring, each research question with its
+#'   hypotheses, method in words, reference, variables, significance level
+#'   and decision rule, the models and amendments, the references, and a
+#'   section, "To complete before submission", that prompts for what a
+#'   preregistration asks and the instrument does not hold. Quarto writes it
+#'   in every format, and the built-in engine writes a plain HTML version.
 #' @param output_file Character or NULL. The output file path. When NULL, a
 #'   temporary file is written and its path returned.
 #' @param output_path Character or NULL. Alias for `output_file`. If both are
@@ -470,7 +479,8 @@ render_report <- function(
   on.exit(.sframe_figure_env$settings <- old_figures, add = TRUE)
   # The study's own title and authors, where every report read "Survey
   # Research Report" whatever the study (Ethos request 23).
-  report_title <- as.character(title %||% instrument$meta$title %||% "Survey report")[1]
+  report_title <- as.character(title %||% (if (is.null(data)) sframe_plan_title(instrument)) %||%
+                                 instrument$meta$title %||% "Survey report")[1]
   report_authors <- as.character(authors %||% instrument$meta$authors %||% character(0))
   report_authors <- report_authors[!is.na(report_authors) & nzchar(trimws(report_authors))]
   plot_palette <- rlang::arg_match(plot_palette)
@@ -505,7 +515,9 @@ render_report <- function(
   use_quarto <- isTRUE(getOption("surveyframe.use_quarto", TRUE))
   quarto <- if (use_quarto) sframe_quarto_find() else list(path = NA_character_)
   quarto_bin <- quarto$path
-  template <- system.file("templates", "report.qmd", package = "surveyframe")
+  # With no data the report is the pre-analysis plan, from its own template.
+  template <- system.file("templates", if (is.null(data)) "plan.qmd" else "report.qmd",
+                          package = "surveyframe")
   has_quarto <- use_quarto && !is.na(quarto_bin) && file.exists(template)
   # Word and OpenDocument are written by pandoc inside Quarto, so they need it.
   if (format %in% c("docx", "odt") && !has_quarto) {
@@ -891,7 +903,13 @@ sframe_scale_sources_html <- function(instrument, scale_ids) {
 # The banner at the top of a built-in report (owner 2026-10-31). Quarto is the
 # report engine, and the built-in engine writes a short plain results page
 # with no parity promise, so the page says so and where to get Quarto.
-sframe_builtin_banner <- function() {
+sframe_builtin_banner <- function(plan = FALSE) {
+  if (isTRUE(plan)) {
+    return(paste0("<div class=\"sf-banner\" role=\"note\">This is the plain version of the plan, ",
+                  "written without Quarto. ",
+                  "<a href=\"https://quarto.org/docs/get-started/\" target=\"_blank\" rel=\"noopener\">",
+                  "Install Quarto for the formatted PDF and Word versions</a>.</div>"))
+  }
   paste0("<div class=\"sf-banner\" role=\"note\">This is the short results page ",
          "surveyframe writes without Quarto. ",
          "<a href=\"https://quarto.org/docs/get-started/\" target=\"_blank\" rel=\"noopener\">",
@@ -1033,216 +1051,228 @@ sframe_clean_interpretations <- function(interpretations) {
   sections <- character(0)
 
   # What the report was built from, first (NAMING decision 6).
-  if (!is.null(provenance)) {
-    sections <- c(sections, sprintf("<section><h2>Provenance</h2>%s</section>",
-                                    .render_report_table(provenance, "Provenance")))
-  }
+  # With no data the report is the pre-analysis plan (Session 10), built by
+  # sframe_plan_blocks() as the Quarto template builds it, with no results rows.
+  if (is.null(data)) {
+    ref_index <- sframe_reference_index(instrument, references)
+    sections <- sframe_plan_html(sframe_plan_blocks(instrument, title = title, authors = authors,
+                                                    references = references))
+    if (!is.null(csl) && nzchar(csl) && !identical(basename(csl), "apa.csl")) {
+      rlang::inform("The built-in HTML engine formats references in APA 7 only. Use Quarto for another citation style.",
+                    class = "sframe_report_progress")
+    }
+  } else {
+    if (!is.null(provenance)) {
+      sections <- c(sections, sprintf("<section><h2>Provenance</h2>%s</section>",
+                                      .render_report_table(provenance, "Provenance")))
+    }
 
-  if (isTRUE(include_codebook)) {
-    cb <- sframe_codebook(instrument)
-    codebook_parts <- c(
-      "<h2>Codebook</h2>",
-      .render_report_table(sframe_codebook_items_display(cb), "Survey items",
-        col.names = c("ID", "Label", "Type", "Response options", "Scale",
-                      "Reverse", "Required"))
+    if (isTRUE(include_codebook)) {
+      cb <- sframe_codebook(instrument)
+      codebook_parts <- c(
+        "<h2>Codebook</h2>",
+        .render_report_table(sframe_codebook_items_display(cb), "Survey items",
+          col.names = c("ID", "Label", "Type", "Response options", "Scale",
+                        "Reverse", "Required"))
+      )
+      if (nrow(cb$scales_table) > 0) {
+        codebook_parts <- c(
+          codebook_parts,
+          .render_report_table(cb$scales_table, "Scale definitions",
+            col.names = c("ID", "Label", "Method", "Items (n)", "Item IDs"))
+        )
+      }
+      if (!is.null(cb$plan_table) && nrow(cb$plan_table) > 0) {
+        codebook_parts <- c(
+          codebook_parts,
+          .render_report_table(cb$plan_table, "Pre-declared analysis plan",
+            col.names = c("ID", "Research question", "Method", "Variables",
+                          "Decision rule"))
+        )
+      }
+      if (!is.null(cb$models_table) && nrow(cb$models_table) > 0) {
+        codebook_parts <- c(
+          codebook_parts,
+          .render_report_table(cb$models_table, "Measurement and structural models",
+            col.names = c("ID", "Label", "Type", "Engine", "Constructs", "Paths"))
+        )
+      }
+      # Where each scale and item comes from, cited in text, as the Quarto
+      # report lists them (8b-R).
+      sources <- c(
+        vapply(instrument$scales %||% list(), function(sc) {
+          cite <- sframe_cite_text(sframe_cited_keys(instrument, paste0("scale:", sc$id)))
+          if (nzchar(cite)) sprintf("<li>Scale <em>%s</em>: %s</li>",
+                                    htmltools_escape(sc$label %||% sc$id), cite) else ""
+        }, character(1)),
+        vapply(instrument$items %||% list(), function(it) {
+          cite <- sframe_cite_text(sframe_cited_keys(instrument, paste0("item:", it$id)))
+          if (nzchar(cite)) sprintf("<li>Item <code>%s</code>: %s</li>",
+                                    htmltools_escape(it$id), cite) else ""
+        }, character(1)))
+      sources <- sources[nzchar(sources)]
+      if (length(sources)) {
+        codebook_parts <- c(codebook_parts, "<p><strong>Sources</strong></p>",
+                            paste0("<ul>", paste(sources, collapse = ""), "</ul>"))
+      }
+      sections <- c(sections, sprintf("<section>%s</section>", paste(codebook_parts, collapse = "\n")))
+    }
+
+    if (isTRUE(include_quality)) {
+      qr <- tryCatch(sframe_quality_results(data, instrument), error = function(e) e)
+      quality_html <- if (inherits(qr, "error")) {
+        sprintf("<p>%s</p>", htmltools_escape(conditionMessage(qr)))
+      } else {
+        summary_tbl <- data.frame(
+          Metric = c("Respondents", "Items", "Flagged", "Flag rate"),
+          Value = c(
+            qr$summary$n_respondents,
+            qr$summary$n_items,
+            qr$summary$n_flagged,
+            sprintf("%.1f%%", qr$summary$flag_rate * 100)
+          ),
+          stringsAsFactors = FALSE
+        )
+        # When there is no straight-lining chart, say why rather than leaving a
+        # gap. An absent chart otherwise reads as "nothing was flagged" when it
+        # can equally mean "no scale was long enough to check".
+        note <- sframe_quality_plot_note(qr)
+        paste(
+          "<h2>Data Quality</h2>",
+          .render_report_table(summary_tbl, "Quality summary"),
+          if (!is.null(note)) sprintf("<p class=\"sf-note\">%s</p>",
+                                      htmltools_escape(note)) else NULL,
+          collapse = "\n"
+        )
+      }
+      sections <- c(sections, sprintf("<section>%s</section>", quality_html))
+    }
+
+    if (isTRUE(include_missing)) {
+      mr <- tryCatch(sframe_missing_data_results(data, instrument), error = function(e) e)
+      missing_html <- if (inherits(mr, "error")) {
+        sprintf("<h2>Missing Data</h2><p>%s</p>", htmltools_escape(conditionMessage(mr)))
+      } else {
+        patterns_display <- mr$patterns[, intersect(c("description", "n", "percent"), names(mr$patterns)), drop = FALSE]
+        paste(
+          "<h2>Missing Data</h2>",
+          .render_report_table(mr$item_missing, "Item-wise missingness"),
+          .render_report_table(mr$respondent_missing, "Respondent-wise missingness"),
+          .render_report_table(patterns_display, "Missing-data patterns"),
+          .render_report_table(mr$scale_missing_rules, "Scale missing rules"),
+          collapse = "\n"
+        )
+      }
+      sections <- c(sections, sprintf("<section>%s</section>", missing_html))
+    }
+
+    if (isTRUE(include_descriptives)) {
+      dr <- tryCatch(sframe_report_descriptives(instrument, data),
+                     error = function(e) e)
+      descriptives_html <- if (inherits(dr, "error")) {
+        sprintf("<h2>Descriptives</h2><p>%s</p>", htmltools_escape(conditionMessage(dr)))
+      } else {
+        paste(
+          "<h2>Descriptives</h2>",
+          .render_report_table(dr$centre, sframe_descriptives_titles[["centre"]], note = dr$note),
+          .render_report_table(dr$shape, sframe_descriptives_titles[["shape"]], note = dr$note),
+          collapse = "\n"
+        )
+      }
+      sections <- c(sections, sprintf("<section>%s</section>", descriptives_html))
+
+      dist_html <- tryCatch(
+        .render_report_distributions(instrument, data, plot_palette = plot_palette),
+        error = function(e) ""
+      )
+      if (nzchar(dist_html)) sections <- c(sections, dist_html)
+    }
+
+    if (isTRUE(include_reliability)) {
+      rr <- tryCatch(sframe_reliability_results(data, instrument), error = function(e) e)
+      reliability_html <- if (inherits(rr, "error")) {
+        sprintf(
+          "<h2>Reliability</h2><p>%s</p>",
+          htmltools_escape(conditionMessage(rr))
+        )
+      } else if (length(rr) == 0) {
+        "<h2>Reliability</h2><p>No scales with enough data were available for reliability analysis.</p>"
+      } else {
+        rel_tbl <- do.call(
+          rbind,
+          lapply(rr, function(scale) {
+            data.frame(
+              Scale = paste0(scale$label, " (", scale$scale_id, ")"),
+              Items = scale$n_items,
+              N = scale$n,
+              Alpha = if (!is.null(scale$alpha)) sprintf("%.3f", scale$alpha) else "n/a",
+              Omega_h = if (!is.null(scale$omega_h)) sprintf("%.3f", scale$omega_h) else "n/a",
+              Omega_t = if (!is.null(scale$omega_t)) sprintf("%.3f", scale$omega_t) else "n/a",
+              stringsAsFactors = FALSE
+            )
+          })
+        )
+        paste(
+          "<h2>Reliability</h2>",
+          "<p>Cronbach alpha and McDonald's omega by scale.</p>",
+          .render_report_table(rel_tbl, "Scale reliability"),
+          sframe_scale_sources_html(instrument, vapply(rr, function(s) s$scale_id, character(1))),
+          collapse = "\n"
+        )
+      }
+      sections <- c(sections, sprintf("<section>%s</section>", reliability_html))
+    }
+
+    if (isTRUE(include_analysis) && length(instrument$analysis_plan %||% list()) > 0) {
+      analysis_html <- .render_report_analysis_section(instrument, data,
+                                                       plot_palette = plot_palette,
+                                                       interpretations = interpretations,
+                                                       show_code = show_code,
+                                                       results = plan_results,
+                                                       keys = sframe_md_keys(instrument, references))
+      sections <- c(sections, sprintf("<section>%s</section>", analysis_html))
+    }
+
+    if (isTRUE(include_models) && length(instrument$models %||% list()) > 0) {
+      sections <- c(
+        sections,
+        sprintf("<section>%s</section>", .render_report_model_section(instrument))
+      )
+    }
+
+    # The engine and the analysis seed sit next to the hash deliberately. The
+    # hash says which instrument this report describes. The engine says which of
+    # the 2 renderers produced it, since they produce different documents. The
+    # seed says what would be needed to get the same numbers again, because
+    # every bootstrap interval in the report depends on it.
+    repro_tbl <- data.frame(
+      Field = c("Instrument version", "Instrument hash", "Rendering engine", "Analysis seed", "Generated"),
+      Value = c(
+        instrument$meta$version %||% "",
+        sframe_hash_value(instrument),
+        "built-in HTML",
+        as.character(sframe_report_seed(data, instrument, include_analysis)),
+        format(Sys.time(), "%Y-%m-%d %H:%M %Z")
+      ),
+      stringsAsFactors = FALSE
     )
-    if (nrow(cb$scales_table) > 0) {
-      codebook_parts <- c(
-        codebook_parts,
-        .render_report_table(cb$scales_table, "Scale definitions",
-          col.names = c("ID", "Label", "Method", "Items (n)", "Item IDs"))
-      )
-    }
-    if (!is.null(cb$plan_table) && nrow(cb$plan_table) > 0) {
-      codebook_parts <- c(
-        codebook_parts,
-        .render_report_table(cb$plan_table, "Pre-declared analysis plan",
-          col.names = c("ID", "Research question", "Method", "Variables",
-                        "Decision rule"))
-      )
-    }
-    if (!is.null(cb$models_table) && nrow(cb$models_table) > 0) {
-      codebook_parts <- c(
-        codebook_parts,
-        .render_report_table(cb$models_table, "Measurement and structural models",
-          col.names = c("ID", "Label", "Type", "Engine", "Constructs", "Paths"))
-      )
-    }
-    # Where each scale and item comes from, cited in text, as the Quarto
-    # report lists them (8b-R).
-    sources <- c(
-      vapply(instrument$scales %||% list(), function(sc) {
-        cite <- sframe_cite_text(sframe_cited_keys(instrument, paste0("scale:", sc$id)))
-        if (nzchar(cite)) sprintf("<li>Scale <em>%s</em>: %s</li>",
-                                  htmltools_escape(sc$label %||% sc$id), cite) else ""
-      }, character(1)),
-      vapply(instrument$items %||% list(), function(it) {
-        cite <- sframe_cite_text(sframe_cited_keys(instrument, paste0("item:", it$id)))
-        if (nzchar(cite)) sprintf("<li>Item <code>%s</code>: %s</li>",
-                                  htmltools_escape(it$id), cite) else ""
-      }, character(1)))
-    sources <- sources[nzchar(sources)]
-    if (length(sources)) {
-      codebook_parts <- c(codebook_parts, "<p><strong>Sources</strong></p>",
-                          paste0("<ul>", paste(sources, collapse = ""), "</ul>"))
-    }
-    sections <- c(sections, sprintf("<section>%s</section>", paste(codebook_parts, collapse = "\n")))
-  }
-
-  if (isTRUE(include_quality)) {
-    qr <- tryCatch(sframe_quality_results(data, instrument), error = function(e) e)
-    quality_html <- if (inherits(qr, "error")) {
-      sprintf("<p>%s</p>", htmltools_escape(conditionMessage(qr)))
-    } else {
-      summary_tbl <- data.frame(
-        Metric = c("Respondents", "Items", "Flagged", "Flag rate"),
-        Value = c(
-          qr$summary$n_respondents,
-          qr$summary$n_items,
-          qr$summary$n_flagged,
-          sprintf("%.1f%%", qr$summary$flag_rate * 100)
-        ),
-        stringsAsFactors = FALSE
-      )
-      # When there is no straight-lining chart, say why rather than leaving a
-      # gap. An absent chart otherwise reads as "nothing was flagged" when it
-      # can equally mean "no scale was long enough to check".
-      note <- sframe_quality_plot_note(qr)
-      paste(
-        "<h2>Data Quality</h2>",
-        .render_report_table(summary_tbl, "Quality summary"),
-        if (!is.null(note)) sprintf("<p class=\"sf-note\">%s</p>",
-                                    htmltools_escape(note)) else NULL,
-        collapse = "\n"
-      )
-    }
-    sections <- c(sections, sprintf("<section>%s</section>", quality_html))
-  }
-
-  if (isTRUE(include_missing)) {
-    mr <- tryCatch(sframe_missing_data_results(data, instrument), error = function(e) e)
-    missing_html <- if (inherits(mr, "error")) {
-      sprintf("<h2>Missing Data</h2><p>%s</p>", htmltools_escape(conditionMessage(mr)))
-    } else {
-      patterns_display <- mr$patterns[, intersect(c("description", "n", "percent"), names(mr$patterns)), drop = FALSE]
-      paste(
-        "<h2>Missing Data</h2>",
-        .render_report_table(mr$item_missing, "Item-wise missingness"),
-        .render_report_table(mr$respondent_missing, "Respondent-wise missingness"),
-        .render_report_table(patterns_display, "Missing-data patterns"),
-        .render_report_table(mr$scale_missing_rules, "Scale missing rules"),
-        collapse = "\n"
-      )
-    }
-    sections <- c(sections, sprintf("<section>%s</section>", missing_html))
-  }
-
-  if (isTRUE(include_descriptives)) {
-    dr <- tryCatch(sframe_report_descriptives(instrument, data),
-                   error = function(e) e)
-    descriptives_html <- if (inherits(dr, "error")) {
-      sprintf("<h2>Descriptives</h2><p>%s</p>", htmltools_escape(conditionMessage(dr)))
-    } else {
-      paste(
-        "<h2>Descriptives</h2>",
-        .render_report_table(dr$centre, sframe_descriptives_titles[["centre"]], note = dr$note),
-        .render_report_table(dr$shape, sframe_descriptives_titles[["shape"]], note = dr$note),
-        collapse = "\n"
-      )
-    }
-    sections <- c(sections, sprintf("<section>%s</section>", descriptives_html))
-
-    dist_html <- tryCatch(
-      .render_report_distributions(instrument, data, plot_palette = plot_palette),
-      error = function(e) ""
-    )
-    if (nzchar(dist_html)) sections <- c(sections, dist_html)
-  }
-
-  if (isTRUE(include_reliability)) {
-    rr <- tryCatch(sframe_reliability_results(data, instrument), error = function(e) e)
-    reliability_html <- if (inherits(rr, "error")) {
-      sprintf(
-        "<h2>Reliability</h2><p>%s</p>",
-        htmltools_escape(conditionMessage(rr))
-      )
-    } else if (length(rr) == 0) {
-      "<h2>Reliability</h2><p>No scales with enough data were available for reliability analysis.</p>"
-    } else {
-      rel_tbl <- do.call(
-        rbind,
-        lapply(rr, function(scale) {
-          data.frame(
-            Scale = paste0(scale$label, " (", scale$scale_id, ")"),
-            Items = scale$n_items,
-            N = scale$n,
-            Alpha = if (!is.null(scale$alpha)) sprintf("%.3f", scale$alpha) else "n/a",
-            Omega_h = if (!is.null(scale$omega_h)) sprintf("%.3f", scale$omega_h) else "n/a",
-            Omega_t = if (!is.null(scale$omega_t)) sprintf("%.3f", scale$omega_t) else "n/a",
-            stringsAsFactors = FALSE
-          )
-        })
-      )
-      paste(
-        "<h2>Reliability</h2>",
-        "<p>Cronbach alpha and McDonald's omega by scale.</p>",
-        .render_report_table(rel_tbl, "Scale reliability"),
-        sframe_scale_sources_html(instrument, vapply(rr, function(s) s$scale_id, character(1))),
-        collapse = "\n"
-      )
-    }
-    sections <- c(sections, sprintf("<section>%s</section>", reliability_html))
-  }
-
-  if (isTRUE(include_analysis) && length(instrument$analysis_plan %||% list()) > 0) {
-    analysis_html <- .render_report_analysis_section(instrument, data,
-                                                     plot_palette = plot_palette,
-                                                     interpretations = interpretations,
-                                                     show_code = show_code,
-                                                     results = plan_results,
-                                                     keys = sframe_md_keys(instrument, references))
-    sections <- c(sections, sprintf("<section>%s</section>", analysis_html))
-  }
-
-  if (isTRUE(include_models) && length(instrument$models %||% list()) > 0) {
     sections <- c(
       sections,
-      sprintf("<section>%s</section>", .render_report_model_section(instrument))
+      sprintf(
+        "<section><h2>Reproducibility</h2>%s%s</section>",
+        .render_report_table(repro_tbl, "Reproducibility details"),
+        .render_report_amendments(instrument, sframe_md_keys(instrument, references))
+      )
     )
+
+    # Citations and the References list (D8). The built-in engine has no
+    # citation processor, so [@key] is resolved here and the list is APA 7.
+    ref_index <- sframe_reference_index(instrument, references)
+    body_text <- paste(sections, collapse = "\n")
+    sections <- sframe_resolve_citations_html(body_text, ref_index)
+    refs_html <- sframe_references_section_html(ref_index, body_text)
+    sections <- c(sections, if (nzchar(refs_html)) refs_html)
   }
-
-  # The engine and the analysis seed sit next to the hash deliberately. The
-  # hash says which instrument this report describes. The engine says which of
-  # the 2 renderers produced it, since they produce different documents. The
-  # seed says what would be needed to get the same numbers again, because
-  # every bootstrap interval in the report depends on it.
-  repro_tbl <- data.frame(
-    Field = c("Instrument version", "Instrument hash", "Rendering engine", "Analysis seed", "Generated"),
-    Value = c(
-      instrument$meta$version %||% "",
-      sframe_hash_value(instrument),
-      "built-in HTML",
-      as.character(sframe_report_seed(data, instrument, include_analysis)),
-      format(Sys.time(), "%Y-%m-%d %H:%M %Z")
-    ),
-    stringsAsFactors = FALSE
-  )
-  sections <- c(
-    sections,
-    sprintf(
-      "<section><h2>Reproducibility</h2>%s%s</section>",
-      .render_report_table(repro_tbl, "Reproducibility details"),
-      .render_report_amendments(instrument, sframe_md_keys(instrument, references))
-    )
-  )
-
-  # Citations and the References list (D8). The built-in engine has no
-  # citation processor, so [@key] is resolved here and the list is APA 7.
-  ref_index <- sframe_reference_index(instrument, references)
-  body_text <- paste(sections, collapse = "\n")
-  sections <- sframe_resolve_citations_html(body_text, ref_index)
-  refs_html <- sframe_references_section_html(ref_index, body_text)
-  sections <- c(sections, if (nzchar(refs_html)) refs_html)
   if (!is.null(csl) && nzchar(csl) && !identical(basename(csl), "apa.csl")) {
     rlang::inform("The built-in HTML engine formats references in APA 7 only. Use Quarto for another citation style.",
                   class = "sframe_report_progress")
@@ -1324,7 +1354,7 @@ sframe_clean_interpretations <- function(interpretations) {
     paste0(sframe_resolve_citations(
       sframe_sources_html(instrument, "instrument", "Draws on") |>
         sub(pattern = "^<p>", replacement = "<p class=\"meta\">"), ref_index),
-      sframe_builtin_banner()),
+      sframe_builtin_banner(plan = is.null(data))),
     paste(sections, collapse = "\n")
   )
 
@@ -1694,6 +1724,7 @@ sframe_report_content <- function(instrument, data = NULL, plot_palette = "web",
        amendment_notes_md = sframe_amendment_notes_md(instrument, keys),
        amendments = sframe_report_amendments(instrument),
        quality_note = quality_note,
+       plan_md = if (is.null(data)) sframe_plan_md(sframe_plan_blocks(instrument, references = references)),
        descriptives = if (!is.null(data)) tryCatch(
          sframe_report_descriptives(instrument, data),
          error = function(e) conditionMessage(e)))
