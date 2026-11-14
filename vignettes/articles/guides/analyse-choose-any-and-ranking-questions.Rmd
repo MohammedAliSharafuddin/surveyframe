@@ -29,6 +29,6 @@ The demo's data is simulated, so the site shows no numbers. Run it in SurveyStud
 
 ## Related
 
-- [Survey studies to start from](../studies.html)
-- [All method guides](../guides.html)
+- [Questionnaire templates](../templates.html)
+- [All how-to guides](../guides.html)
 

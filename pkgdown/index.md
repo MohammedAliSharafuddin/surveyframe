@@ -13,27 +13,29 @@ run the planned analyses and write the report, in SurveyStudio or in R.
 APA 7 reports · Pre-analysis plans ready to preregister · Instruments sealed
 with a hash anyone can [verify](https://surveyframe.org/verify/)
 
-## Start from a study
+## Start from a template
 
-**Students and thesis supervisors.**
-[Thesis questionnaire with a Likert scale](articles/studies/thesis-questionnaire-likert-scale.html),
-[Pilot study with a small sample](articles/studies/pilot-study-small-sample.html).
+**Psychology and measurement.**
+[Likert scale questionnaire](articles/templates/likert-scale-questionnaire.html),
+[Measurement model questionnaire (CFA and SEM)](articles/templates/measurement-model-questionnaire.html).
 
-**University and teaching evaluation.**
-[Course evaluation survey](articles/studies/course-evaluation-survey.html),
-[Pre and post training evaluation](articles/studies/pre-post-training-evaluation.html).
+**Education.**
+[Course evaluation survey](articles/templates/course-evaluation-survey.html),
+[Training evaluation before and after](articles/templates/training-evaluation-before-and-after.html).
 
-**Organisations.**
-[Customer satisfaction and return intention](articles/studies/customer-satisfaction-return-intention.html),
-[Employee engagement survey](articles/studies/employee-engagement-survey.html),
-[Choosing between options](articles/studies/choosing-between-options.html),
-[Open-ended feedback](articles/studies/open-ended-feedback.html).
+**Business.**
+[Customer satisfaction survey](articles/templates/customer-satisfaction-survey.html),
+[Employee engagement survey](articles/templates/employee-engagement-survey.html),
+[Supplier and venue selection (decision making)](articles/templates/supplier-and-venue-selection.html).
 
-**Research labs.**
-[Pre-registered survey study](articles/studies/preregistered-survey-study.html),
-[Measurement and structural model study](articles/studies/measurement-structural-model.html).
+**Events and tourism.**
+[Open-ended feedback survey](articles/templates/open-ended-feedback-survey.html).
 
-[All studies](articles/studies.html)
+**Research methods.**
+[Pilot survey with a small sample](articles/templates/pilot-survey-small-sample.html),
+[Pre-registered survey sealed and amended](articles/templates/pre-registered-survey-sealed-and-amended.html).
+
+[All questionnaire templates](articles/templates.html)
 
 ## How it works
 

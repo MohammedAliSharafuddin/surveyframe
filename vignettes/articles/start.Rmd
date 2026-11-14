@@ -22,14 +22,14 @@ pick a study. It opens in SurveyStudio on the Design screen, with its
 questionnaire, analysis plan and demonstration responses loaded, so every
 stage has something to show.
 
-![SurveyStudio's Design screen.](../studies/paired/design.png){width=100%}
+![SurveyStudio's Design screen.](../templates/paired/design.png){width=100%}
 
 To start your own study, choose **surveyframe: Open analysis workspace** from
 the same menu and go to Design.
 
 ## What next
 
-- [Survey studies to start from](studies.html), by audience.
+- [Questionnaire templates](templates.html), by field.
 - [Two ways to run a study](two-ways-to-run-a-study.html): the 5 stages in
   SurveyStudio and in R.
 - [Frequently asked questions](learn/faq.html).

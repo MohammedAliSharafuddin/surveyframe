@@ -5,7 +5,7 @@ description: "Answers about surveyframe: using it for a thesis, preregistering o
 
 ## Can I use surveyframe for my thesis?
 
-Yes. Start from one of the [studies](../studies.html), replace its questions
+Yes. Start from one of the [questionnaire templates](../templates.html), replace its questions
 with yours, and submit the pre-analysis plan to your supervisor or ethics
 committee before you collect data. The report follows APA 7.
 

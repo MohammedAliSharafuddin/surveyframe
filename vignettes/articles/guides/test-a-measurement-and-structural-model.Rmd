@@ -9,7 +9,7 @@ A measurement and structural model study: whether the quality of a programme's c
 
 In RStudio, open the Addins menu, choose **surveyframe: Try a demo** and pick `sem_pls`. The study opens on the Design screen. Plan shows each research question with its method and decision rule, Analyse runs them as declared, and Report writes the APA 7 report.
 
-![The Design screen with the sem_pls study.](../../studies/sem_pls/design.png){width=100%}
+![The Design screen with the sem_pls study.](../../templates/sem_pls/design.png){width=100%}
 
 ## In R
 
@@ -34,6 +34,6 @@ The demo's data is simulated, so the site shows no numbers. Run it in SurveyStud
 
 ## Related
 
-- [Survey studies to start from](../studies.html)
-- [All method guides](../guides.html)
+- [Questionnaire templates](../templates.html)
+- [All how-to guides](../guides.html)
 

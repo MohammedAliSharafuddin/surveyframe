@@ -72,13 +72,13 @@ for (k in seq_len(nrow(idx_df))) {
                  }, character(1)))
     }
   }
-  shot <- file.path("pkgdown", "assets", "studies", nm, "design.png")
+  shot <- file.path("pkgdown", "assets", "templates", nm, "design.png")
   rmd <- c(
     "---", sprintf("title: \"%s\"", q(title)), sprintf("description: \"%s\"", q(lead)), "---", "",
     lead, "",
     "## In SurveyStudio", "",
     sprintf("In RStudio, open the Addins menu, choose **surveyframe: Try a demo** and pick `%s`. The study opens on the Design screen. Plan shows each research question with its method and decision rule, Analyse runs them as declared, and Report writes the APA 7 report.", nm), "",
-    if (file.exists(shot)) c(sprintf("![The Design screen with the %s study.](../../studies/%s/design.png){width=100%%}", nm, nm), "") ,
+    if (file.exists(shot)) c(sprintf("![The Design screen with the %s study.](../../templates/%s/design.png){width=100%%}", nm, nm), "") ,
     "## In R", "",
     "```r",
     sprintf("d <- sframe_demo(\"%s\")", nm),
@@ -88,13 +88,13 @@ for (k in seq_len(nrow(idx_df))) {
     if (length(shell)) c("## What the report gives", "", shell, ""),
     "The demo's data is simulated, so the site shows no numbers. Run it in SurveyStudio or R to see the results, each marked as demonstration data.", "",
     "## Related", "",
-    "- [Survey studies to start from](../studies.html)",
-    "- [All method guides](../guides.html)", ""
+    "- [Questionnaire templates](../templates.html)",
+    "- [All how-to guides](../guides.html)", ""
   )
   writeLines(rmd, file.path(pages, paste0(slug(title), ".Rmd")))
 }
 
-idx <- c("---", "title: \"Method guides\"",
+idx <- c("---", "title: \"How-to guides\"",
          "description: \"How to answer a research question with a survey: compare groups, check a scale, predict an outcome, analyse open answers and more, each in SurveyStudio and in R.\"",
          "---", "", "Each guide answers 1 research question, with the SurveyStudio route first and the R code after.", "")
 for (g in names(groups)) {

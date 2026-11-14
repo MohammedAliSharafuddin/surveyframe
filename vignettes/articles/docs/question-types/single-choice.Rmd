@@ -3,7 +3,7 @@ title: "Ask a single-choice question"
 description: "Add a question, choose Single choice, and give the options the respondent picks 1 from."
 ---
 
-[Docs](../../docs.html) / [Question types](../../docs.html#question-types)
+[Documentation](../../docs.html) / [Question types](../../docs.html#question-types)
 
 Add a question, choose Single choice, and give the options the respondent picks 1 from.
 

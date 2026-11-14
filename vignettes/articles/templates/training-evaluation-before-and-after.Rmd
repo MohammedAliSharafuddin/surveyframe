@@ -1,0 +1,76 @@
+---
+title: "Training evaluation before and after"
+description: "A training evaluation that measures confidence, and willingness to recommend, before and after a workshop in the same participants. surveyframe gives you the questionnaire, a plan with paired tests declared in advance, and the report."
+---
+
+```{=html}
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Training evaluation before and after","description":"A training evaluation that measures confidence, and willingness to recommend, before and after a workshop in the same participants. surveyframe gives you the questionnaire, a plan with paired tests declared in advance, and the report.","about":{"@type":"SoftwareSourceCode","name":"surveyframe","url":"https://surveyframe.org"},"url":"https://surveyframe.org/articles/templates/training-evaluation-before-and-after.html"}</script>
+```
+
+A training evaluation that measures confidence, and willingness to recommend, before and after a workshop in the same participants. surveyframe gives you the questionnaire, a plan with paired tests declared in advance, and the report.
+
+## Preview the questionnaire
+
+This is the questionnaire as respondents see it. It is a preview, so answers go nowhere. [Open it in a new tab](../../templates/paired/preview.html).
+
+```{=html}
+<iframe src="../../templates/paired/preview.html" title="Preview of the Training evaluation before and after questionnaire" style="width:100%;height:560px;border:1px solid #d9e2ec;border-radius:6px"></iframe>
+```
+
+## The analysis plan, ready to preregister
+
+Before any data is collected, surveyframe writes the pre-analysis plan: the study, the questionnaire, each research question with its hypotheses, method and decision rule, and what a preregistration still asks for. [Read the plan](../../templates/paired/plan.html), or [download the instrument (.sframe)](../../templates/paired/paired.sframe) and open it in SurveyStudio.
+
+Methods it declares: Paired samples t-test, Wilcoxon signed-rank test, McNemar test.
+
+## What you get
+
+The study in SurveyStudio, stage by stage: design, collect, check, analyse and report.
+
+![Design screen with the questionnaire.](../../templates/paired/design.png){width=100%}
+![Collect screen.](../../templates/paired/collect.png){width=100%}
+![Quality screen.](../../templates/paired/check.png){width=100%}
+![Analyse screen with the declared plan.](../../templates/paired/analyse.png){width=100%}
+![Report screen.](../../templates/paired/report.png){width=100%}
+
+## Start in 2 steps (no coding)
+
+1. Install surveyframe in R: `install.packages("surveyframe")`
+2. In RStudio, open the Addins menu, choose **surveyframe: Try a demo**, and pick `paired`. The study opens in SurveyStudio.
+
+## Questions
+
+### Why paired tests?
+
+The same people answer before and after, so their answers are compared with themselves: the paired t-test, the Wilcoxon signed-rank test and McNemar's test.
+
+### Can I add a third time point?
+
+Yes. With 3 or more measurements the plan uses a repeated measures ANOVA or the Friedman test.
+
+### Does it work without coding?
+
+Yes. The whole study opens in SurveyStudio from RStudio's Addins menu.
+
+## For R users
+
+```{=html}
+<details><summary>Open this study in R</summary>
+```
+
+```r
+d <- sframe_demo("paired")
+render_report(d$instrument)                 # the pre-analysis plan
+results <- run_analysis_plan(d$responses, d$instrument)
+```
+
+```{=html}
+</details>
+```
+
+## Related
+
+- [All education templates](../templates.html#education)
+- [Course evaluation survey](course-evaluation-survey.html)
+- [How-to guides](../guides.html)
+

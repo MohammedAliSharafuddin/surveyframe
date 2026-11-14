@@ -3,7 +3,7 @@ title: "Check structure and test models"
 description: "Whether items measure the factors assumed, and how constructs relate in a declared model."
 ---
 
-[Docs](../../docs.html) / [Methods](../../docs.html#methods)
+[Documentation](../../docs.html) / [Methods](../../docs.html#methods)
 
 Whether items measure the factors assumed, and how constructs relate in a declared model.
 

@@ -61,22 +61,24 @@ home:
 navbar:
   title: "surveyframe"
   structure:
-    left: [studies, start, learn, rusers]
+    left: [templates, start, learn, rreference]
     right: [verify, cite, github]
   components:
-    studies:
-      text: "Studies"
+    templates:
+      text: "Templates"
       menu:
-        - text: "Students and thesis supervisors"
-          href: articles/studies.html#students
-        - text: "University and teaching evaluation"
-          href: articles/studies.html#teaching
-        - text: "Organisations"
-          href: articles/studies.html#organisations
-        - text: "Research labs"
-          href: articles/studies.html#research-labs
-        - text: "All studies"
-          href: articles/studies.html
+        - text: "Psychology and measurement"
+          href: articles/templates.html#psychology
+        - text: "Education"
+          href: articles/templates.html#education
+        - text: "Business"
+          href: articles/templates.html#business
+        - text: "Events and tourism"
+          href: articles/templates.html#events-tourism
+        - text: "Research methods"
+          href: articles/templates.html#research-methods
+        - text: "All questionnaire templates"
+          href: articles/templates.html
     start:
       text: "Get started"
       href: articles/start.html
@@ -85,9 +87,9 @@ navbar:
       menu:
         - text: "Two ways to run a study"
           href: articles/two-ways-to-run-a-study.html
-        - text: "Method guides"
+        - text: "How-to guides"
           href: articles/guides.html
-        - text: "Docs"
+        - text: "Documentation"
           href: articles/docs.html
         - text: "Question types"
           href: articles/learn/question-types.html
@@ -99,8 +101,8 @@ navbar:
           href: articles/learn/choosing-a-survey-tool.html
         - text: "Frequently asked questions"
           href: articles/learn/faq.html
-    rusers:
-      text: "For R users"
+    rreference:
+      text: "R reference"
       menu:
         - text: "Reference"
           href: reference/index.html
@@ -121,16 +123,16 @@ navbar:
       aria-label: GitHub
 
 articles:
-  - title: "Studies"
+  - title: "Questionnaire templates"
     desc: >
-      10 complete survey studies to start from, each with its questionnaire,
-      a pre-analysis plan ready to preregister, and SurveyStudio screenshots.
-      Web only.
+      10 questionnaire templates, each a complete survey project with its
+      analysis plan ready to preregister and SurveyStudio screenshots,
+      grouped by field. Web only.
     navbar: ~
     contents:
-      - articles/studies
-      - starts_with("articles/studies/")
-  - title: "Method guides"
+      - articles/templates
+      - starts_with("articles/templates/")
+  - title: "How-to guides"
     desc: >
       How to answer a research question with a survey, 1 guide per question,
       in SurveyStudio and in R. Web only.
@@ -138,7 +140,7 @@ articles:
     contents:
       - articles/guides
       - starts_with("articles/guides/")
-  - title: "Docs"
+  - title: "Documentation"
     desc: >
       How to set up each question type, with annotated screenshots. Web only.
     navbar: ~

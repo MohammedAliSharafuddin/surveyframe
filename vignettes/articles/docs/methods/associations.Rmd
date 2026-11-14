@@ -3,7 +3,7 @@ title: "Test an association between categories"
 description: "Whether 2 categorical answers go together."
 ---
 
-[Docs](../../docs.html) / [Methods](../../docs.html#methods)
+[Documentation](../../docs.html) / [Methods](../../docs.html#methods)
 
 Whether 2 categorical answers go together.
 

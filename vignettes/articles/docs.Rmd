@@ -1,9 +1,9 @@
 ---
-title: "Docs: how to set up surveyframe"
+title: "Documentation: how to set up surveyframe"
 description: "How to set up each question type and analysis in surveyframe, step by step, with annotated SurveyStudio screenshots."
 ---
 
-Docs answer how to set something up. The [method guides](guides.html) answer how to answer your research question.
+Documentation answers how to set something up. The [how-to guides](guides.html) answer how to answer your research question.
 
 ## Question types (13 pages) {#question-types}
 

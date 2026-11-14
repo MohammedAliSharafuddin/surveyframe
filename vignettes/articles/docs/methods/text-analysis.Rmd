@@ -3,7 +3,7 @@ title: "Analyse open answers"
 description: "Which words, phrases, contexts, tones and topics open answers hold."
 ---
 
-[Docs](../../docs.html) / [Methods](../../docs.html#methods)
+[Documentation](../../docs.html) / [Methods](../../docs.html#methods)
 
 Which words, phrases, contexts, tones and topics open answers hold.
 

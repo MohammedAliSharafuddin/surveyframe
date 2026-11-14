@@ -19,7 +19,7 @@ Same study, same verifiable file.
 <p align="center">
   <a href="https://surveyframe.org/">Website</a> ·
   <a href="https://surveyframe.org/articles/start.html">Get started</a> ·
-  <a href="https://surveyframe.org/articles/studies.html">Studies</a> ·
+  <a href="https://surveyframe.org/articles/templates.html">Templates</a> ·
   <a href="https://surveyframe.org/articles/docs.html">Docs</a> ·
   <a href="https://surveyframe.org/verify/">Verify a file</a> ·
   <a href="https://surveyframe.org/articles/cite.html">Cite</a>
@@ -111,7 +111,7 @@ citation("surveyframe")
 ## Learn more
 
 - [Quantitative Analysis with Small Samples](https://doi.org/10.5281/zenodo.20221929), a companion textbook on the small-sample methods in surveyframe.
-- [Website](https://surveyframe.org/), [studies](https://surveyframe.org/articles/studies.html), [method guides](https://surveyframe.org/articles/guides.html) and [changelog](https://surveyframe.org/news/index.html).
+- [Website](https://surveyframe.org/), [questionnaire templates](https://surveyframe.org/articles/templates.html), [method guides](https://surveyframe.org/articles/guides.html) and [changelog](https://surveyframe.org/news/index.html).
 
 ## Contributing
 

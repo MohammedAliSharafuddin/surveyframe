@@ -1,0 +1,32 @@
+---
+title: "Questionnaire templates"
+description: "10 questionnaire templates, each with its analysis plan ready to preregister and the report, in psychology, education, business, events and tourism, and research methods."
+---
+
+Each template is a complete survey project you can open in SurveyStudio with no code: the questionnaire, a pre-analysis plan ready to preregister, and the report.
+
+## Psychology and measurement {#psychology}
+
+- [Likert scale questionnaire](templates/likert-scale-questionnaire.html)
+- [Measurement model questionnaire (CFA and SEM)](templates/measurement-model-questionnaire.html)
+
+## Education {#education}
+
+- [Course evaluation survey](templates/course-evaluation-survey.html)
+- [Training evaluation before and after](templates/training-evaluation-before-and-after.html)
+
+## Business {#business}
+
+- [Customer satisfaction survey](templates/customer-satisfaction-survey.html)
+- [Employee engagement survey](templates/employee-engagement-survey.html)
+- [Supplier and venue selection (decision making)](templates/supplier-and-venue-selection.html)
+
+## Events and tourism {#events-tourism}
+
+- [Open-ended feedback survey](templates/open-ended-feedback-survey.html)
+
+## Research methods {#research-methods}
+
+- [Pilot survey with a small sample](templates/pilot-survey-small-sample.html)
+- [Pre-registered survey sealed and amended](templates/pre-registered-survey-sealed-and-amended.html)
+
