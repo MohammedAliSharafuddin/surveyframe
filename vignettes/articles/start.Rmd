@@ -1,36 +1,78 @@
 ---
-title: "Get started with surveyframe, no coding needed"
-description: "Install surveyframe in R, then open a complete survey study in SurveyStudio from RStudio's Addins menu, in about 5 minutes."
+title: "Get started with surveyframe"
+description: "Install R, RStudio and surveyframe, open an example study in SurveyStudio, then turn a downloaded template into your own study. No coding needed."
 ---
 
-surveyframe runs a survey study from the questionnaire to the APA 7 report in
-SurveyStudio, a window that opens from R. You need R and RStudio, both free,
-and 2 steps.
+SurveyStudio is surveyframe's visual workspace. It opens from RStudio, so the
+setup has 3 parts: R, RStudio and the surveyframe package. All 3 are free.
+Setup takes about 15 minutes the first time.
 
-## 1. Install surveyframe
+## What you need
 
-Open RStudio and run this line in the Console:
+- A computer running Windows, macOS or Linux, with permission to install
+  software.
+- An internet connection for the installation.
+
+## 1. Install R
+
+Download R for your system from [CRAN](https://cran.r-project.org/) and run
+the installer with its default settings.
+
+## 2. Install RStudio
+
+Download RStudio Desktop from
+[Posit](https://posit.co/download/rstudio-desktop/) and run the installer.
+Then open RStudio. Its window has a pane named **Console**, usually at the
+bottom left, with a `>` prompt.
+
+## 3. Install surveyframe
+
+Click in the Console beside the `>` prompt, paste this line and press Enter:
 
 ```r
 install.packages("surveyframe")
 ```
 
-## 2. Open a study
+R downloads surveyframe and the packages it uses. This takes a few minutes.
+The installation has finished when the `>` prompt returns. The
+**Addins** menu in RStudio's toolbar now lists the surveyframe commands.
 
-In RStudio, open the **Addins** menu, choose **surveyframe: Try a demo**, and
+## 4. Open an example study
+
+In RStudio, open the **Addins** menu, choose **surveyframe: Try a demo** and
 pick a study. It opens in SurveyStudio on the Design screen, with its
 questionnaire, analysis plan and demonstration responses loaded, so every
 stage has something to show.
 
-![SurveyStudio's Design screen.](../templates/paired/design.png){width=100%}
+![SurveyStudio's Design screen with the training evaluation example open: the questionnaire's questions are listed in the centre and the screens in the left menu.](../templates/paired/design.png){width=100%}
 
-To start your own study, choose **surveyframe: Open analysis workspace** from
-the same menu and go to Design.
+## 5. Start your own study from a template
+
+Each [questionnaire template](templates.html) has a **download the
+instrument (.sframe)** link. To make it your own study:
+
+1. Download the `.sframe` file from the template page and save it in your
+   project folder.
+2. In RStudio, open the **Addins** menu and choose
+   **surveyframe: Open analysis workspace**.
+3. In SurveyStudio's left menu, choose **Open Instrument**, then
+   **Browse .sframe file**, and select the file.
+4. On the Design screen, edit the title, the questions and the answer
+   options for your study. Choose **Plan** to adapt the research questions,
+   then press **Save to Studio**.
+5. On the Report screen, press **Download copy** to save your study as a new
+   `.sframe` file. If SurveyStudio offers **Save as a new instrument**, tick
+   it, since your study starts a new record. This is the file to keep, share
+   with your supervisor and use to collect responses.
+
+The downloaded template has no responses. Your own responses arrive once you
+collect them, as
+[Run a study in SurveyStudio](run-a-study-in-surveystudio.html) shows.
 
 ## What next
 
-- [Questionnaire templates](templates.html), by field.
+- [Questionnaire templates](templates.html), grouped by field.
 - [Run a study in SurveyStudio](run-a-study-in-surveystudio.html): the 5
-  stages with no code.
-- [Run a study in R](run-a-study-in-r.html): the same stages in R.
+  stages with screenshots and no code.
+- [Run a study in R](run-a-study-in-r.html): the same stages in R code.
 - [Frequently asked questions](learn/faq.html).

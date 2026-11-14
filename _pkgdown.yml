@@ -44,16 +44,15 @@ template:
 # Favicons are in pkgdown/favicon/ and picked up by pkgdown >= 2.0.
 
 home:
-  title: "surveyframe: plan, run and report survey research, with or without code"
+  title: "Plan, run and report survey research"
   description: >
-    surveyframe takes a survey study from the questionnaire to the APA 7
-    report: design the instrument and its analysis plan, collect the answers,
-    check them, run the planned analyses and write the report, in
-    SurveyStudio or in R.
+    Design your questionnaire, plan your analysis and prepare an APA 7
+    report. Work visually in SurveyStudio or use R. For people conducting,
+    supervising, reviewing or planning survey research.
   links:
     - text: Verify a .sframe file
       href: verify/
-    - text: Get started, no code
+    - text: Get started
       href: articles/start.html
     - text: Cite surveyframe
       href: articles/cite.html
@@ -89,6 +88,15 @@ navbar:
     learn:
       text: "Learn"
       menu:
+        - text: "Guidance for survey students"
+          href: articles/learn/for-students.html
+        - text: "Guidance for supervisors"
+          href: articles/learn/for-supervisors.html
+        - text: "Guidance for ethics committees"
+          href: articles/learn/for-ethics-committees.html
+        - text: "Guidance for NGOs and research organisations"
+          href: articles/learn/for-research-organisations.html
+        - text: "---"
         - text: "Run a study in SurveyStudio"
           href: articles/run-a-study-in-surveystudio.html
         - text: "Run a study in R"
