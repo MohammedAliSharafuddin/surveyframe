@@ -59,8 +59,8 @@ pre.sourceCode a:empty { display: none; }
 
 ## What this vignette covers
 
-Text and textarea items collect open-ended responses that a Likert scale
-cannot: the reason behind a rating, a complaint a closed question never
+Text and textarea items collect open-ended responses, beyond what a Likert
+scale records: the reason behind a rating, a complaint a closed question never
 anticipated, a suggestion nobody thought to ask for directly. surveyframe
 treats analysing that text the same way it treats every other analysis: a
 research question, a technique, and the roles that fill it, declared in the

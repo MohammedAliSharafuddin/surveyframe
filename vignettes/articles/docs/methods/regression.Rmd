@@ -7,7 +7,7 @@ description: "How much predictors explain a numeric outcome, or change the odds 
 
 How much predictors explain a numeric outcome, or change the odds of a yes, an ordered rating or a choice.
 
-**Assumptions.** Independent respondents, predictors not too closely related to each other, and for linear regression a straight-line relation with roughly normal residuals. Firth's correction suits small samples and rare outcomes.
+**Assumptions.** Independent respondents, predictors only loosely related to each other, and for linear regression a straight-line relation with roughly normal residuals. Firth's correction suits small samples and rare outcomes.
 
 In SurveyStudio, open **Plan** on the Design screen, add a research question and choose the method. Set the outcome and 1 or more predictors. The outcome picks the model: a number for linear regression, a yes or no for binary logistic, an ordered rating for ordinal logistic, and a choice of 3 or more categories for multinomial logistic. Declare the hypotheses and the decision rule before collecting responses.
 

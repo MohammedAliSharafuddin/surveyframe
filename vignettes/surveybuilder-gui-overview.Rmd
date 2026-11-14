@@ -45,7 +45,7 @@ mapping onto a part of the research-design workflow.
 
 * `launch_builder()` opens SurveyBuilder, a standalone questionnaire builder. It
   runs in the browser, saves `.sframe` files, and authors the analysis plan and
-  the model. It does not compute statistics.
+  the model. Its statistics run in SurveyStudio or R.
 * `launch_studio()` opens SurveyStudio, the workflow hub. With R behind it, it
   opens a designed instrument, previews it exactly as deployed, uploads
   responses, runs quality and reliability checks, runs the analysis plan, and

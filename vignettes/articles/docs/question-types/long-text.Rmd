@@ -19,7 +19,7 @@ Add a question and choose Long text for a paragraph.
 
 ## Best practices for research
 
-Ask 1 specific thing, such as what to change, rather than for any comments: specific prompts give answers you can code.
+Ask 1 specific thing, such as what to change. Specific prompts give answers you can code, where a request for any comments gives answers that are hard to compare.
 
 Reference: Krosnick, J. A., & Presser, S. (2010). Question and questionnaire design. In P. V. Marsden & J. D. Wright (Eds.), *Handbook of survey research* (2nd ed., pp. 263-313). Emerald.
 

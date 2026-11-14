@@ -20,8 +20,8 @@ WASPAS, PROMETHEE, ELECTRE, and TOPSIS), and model syntax planning for
 EFA, CFA, CB-SEM, and PLS-SEM.
 \subsection{Start here}{
 
-\code{\link[=launch_studio]{launch_studio()}} opens SurveyStudio, which takes an instrument through
-every stage below with no code. \code{launch_studio(demo = "first_survey")}
+\code{\link[=launch_studio]{launch_studio()}} opens SurveyStudio, where you point and click an
+instrument through every stage below. \code{launch_studio(demo = "first_survey")}
 opens it on a whole survey to try. In code, \code{sframe_demo("first_survey")}
 loads the same survey, and \code{\link[=sframe_list_demos]{sframe_list_demos()}} lists 25 teaching demos,
 each one instrument, its responses and the results surveyframe produced.

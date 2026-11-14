@@ -1,9 +1,9 @@
 ---
 title: "How to weight a survey sample to its population"
-description: "Apply survey weights so your summaries describe the population rather than the sample."
+description: "Apply survey weights so your summaries describe the population the sample was drawn from."
 ---
 
-Apply survey weights so your summaries describe the population rather than the sample.
+Apply survey weights so your summaries describe the population the sample was drawn from.
 
 The example in this guide is *Satisfaction across regions*. A resident satisfaction survey whose sample over-represents 1 region, weighted back to the population's regional shares.
 

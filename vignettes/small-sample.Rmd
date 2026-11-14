@@ -190,10 +190,10 @@ wp_results[[1]]$pseudomedian_conf_int
 
 ## Fisher's exact test with the exact odds-ratio CI
 
-For a 2x2 table, `fisher_exact` now attaches an exact odds-ratio confidence
-interval alongside the test's p-value. The interval is only defined for a
-2x2 table, and is dropped (not approximated) when `simulate_p_value` is
-requested, since base R's `fisher.test()` cannot return both together.
+For a 2x2 table, `fisher_exact` reports an exact odds-ratio confidence
+interval beside the test's p-value. With `simulate_p_value`, it reports the
+simulated p-value alone, as base R's `fisher.test()` gives either the
+simulated p-value or the interval.
 
 ```{r fisher}
 sframe_plan(study) <- list(
