@@ -13,7 +13,7 @@ In SurveyStudio, open **Plan** on the Design screen, add a research question and
 
 ## Pearson correlation
 
-![The Plan card for a Pearson correlation block, from the `correlation_regression` demo.](../../../docs/methods/correlation_pearson.png){width=90%}
+![SurveyStudio's Plan screen with the Edit Analysis Plan dialog for a Pearson correlation research question, from the `correlation_regression` demo.](../../../docs/methods/correlation_pearson.png){width=90%}
 
 In the pre-analysis plan:
 
@@ -28,7 +28,7 @@ References: Field, A. (2018). *Discovering statistics using IBM SPSS statistics*
 
 ## Spearman rank correlation
 
-![The Plan card for a Spearman rank correlation block, from the `correlation_regression` demo.](../../../docs/methods/correlation_spearman.png){width=90%}
+![SurveyStudio's Plan screen with the Edit Analysis Plan dialog for a Spearman rank correlation research question, from the `correlation_regression` demo.](../../../docs/methods/correlation_spearman.png){width=90%}
 
 In the pre-analysis plan:
 
@@ -43,7 +43,7 @@ References: Cohen, J. (1988). *Statistical power analysis for the behavioral sci
 
 ## Kendall rank correlation
 
-![The Plan card for a Kendall rank correlation block, from the `correlation_regression` demo.](../../../docs/methods/correlation_kendall.png){width=90%}
+![SurveyStudio's Plan screen with the Edit Analysis Plan dialog for a Kendall rank correlation research question, from the `correlation_regression` demo.](../../../docs/methods/correlation_kendall.png){width=90%}
 
 In the pre-analysis plan:
 
@@ -58,7 +58,7 @@ References: Cohen, J. (1988). *Statistical power analysis for the behavioral sci
 
 ## Partial correlation
 
-![The Plan card for a Partial correlation block, from the `correlation_regression` demo.](../../../docs/methods/partial_correlation.png){width=90%}
+![SurveyStudio's Plan screen with the Edit Analysis Plan dialog for a Partial correlation research question, from the `correlation_regression` demo.](../../../docs/methods/partial_correlation.png){width=90%}
 
 In the pre-analysis plan:
 

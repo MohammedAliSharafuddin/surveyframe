@@ -7,7 +7,7 @@ description: "Add a question, choose Numeric, and set the range the answer may t
 
 Add a question, choose Numeric, and set the range the answer may take.
 
-![The questionnaire editor with the number question selected and its settings panel outlined.](../../../docs/question-types/numeric-editor.png){width=100%}
+![SurveyStudio's Design screen with the number question selected and its settings panel outlined.](../../../docs/question-types/numeric-editor.png){width=100%}
 
 ## What the respondent sees
 

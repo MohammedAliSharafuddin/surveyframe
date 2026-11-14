@@ -7,7 +7,7 @@ description: "Add a question, choose Single choice, and give the options the res
 
 Add a question, choose Single choice, and give the options the respondent picks 1 from.
 
-![The questionnaire editor with the single-choice question selected and its settings panel outlined.](../../../docs/question-types/single-choice-editor.png){width=100%}
+![SurveyStudio's Design screen with the single-choice question selected and its settings panel outlined.](../../../docs/question-types/single-choice-editor.png){width=100%}
 
 ## What the respondent sees
 

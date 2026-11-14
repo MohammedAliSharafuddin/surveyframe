@@ -13,7 +13,7 @@ In SurveyStudio, open **Plan** on the Design screen, add a research question and
 
 ## Factorability checks (KMO and Bartlett's test)
 
-![The Plan card for a Factorability checks (KMO and Bartlett's test) block, from the `factor_structure` demo.](../../../docs/methods/efa_readiness.png){width=90%}
+![SurveyStudio's Plan screen with the Edit Analysis Plan dialog for a Factorability checks (KMO and Bartlett's test) research question, from the `factor_structure` demo.](../../../docs/methods/efa_readiness.png){width=90%}
 
 In the pre-analysis plan:
 
@@ -24,7 +24,7 @@ In the report: the APA 7 sentence and a table, with a chart where the method has
 
 ## Exploratory factor analysis
 
-![The Plan card for a Exploratory factor analysis block, from the `factor_structure` demo.](../../../docs/methods/efa_solution.png){width=90%}
+![SurveyStudio's Plan screen with the Edit Analysis Plan dialog for a Exploratory factor analysis research question, from the `factor_structure` demo.](../../../docs/methods/efa_solution.png){width=90%}
 
 In the pre-analysis plan:
 
@@ -35,7 +35,7 @@ In the report: the APA 7 sentence and a table, with a chart where the method has
 
 ## Confirmatory factor analysis (lavaan syntax)
 
-![The Plan card for a Confirmatory factor analysis (lavaan syntax) block, from the `sem_pls` demo.](../../../docs/methods/cfa_lavaan_syntax.png){width=90%}
+![SurveyStudio's Plan screen with the Edit Analysis Plan dialog for a Confirmatory factor analysis (lavaan syntax) research question, from the `sem_pls` demo.](../../../docs/methods/cfa_lavaan_syntax.png){width=90%}
 
 In the pre-analysis plan:
 
@@ -45,7 +45,7 @@ In the report: the model syntax, ready for you to fit in lavaan or seminr.
 
 ## Structural equation model (lavaan syntax)
 
-![The Plan card for a Structural equation model (lavaan syntax) block, from the `sem_pls` demo.](../../../docs/methods/sem_lavaan_syntax.png){width=90%}
+![SurveyStudio's Plan screen with the Edit Analysis Plan dialog for a Structural equation model (lavaan syntax) research question, from the `sem_pls` demo.](../../../docs/methods/sem_lavaan_syntax.png){width=90%}
 
 In the pre-analysis plan:
 
@@ -58,7 +58,7 @@ In the report: the model syntax, ready for you to fit in lavaan or seminr.
 
 ## PLS structural equation model (seminr syntax)
 
-![The Plan card for a PLS structural equation model (seminr syntax) block, from the `sem_pls` demo.](../../../docs/methods/seminr_syntax.png){width=90%}
+![SurveyStudio's Plan screen with the Edit Analysis Plan dialog for a PLS structural equation model (seminr syntax) research question, from the `sem_pls` demo.](../../../docs/methods/seminr_syntax.png){width=90%}
 
 In the pre-analysis plan:
 
@@ -68,7 +68,7 @@ In the report: the model syntax, ready for you to fit in lavaan or seminr.
 
 ## PLS structural equation model syntax
 
-![The Plan card for a PLS structural equation model syntax block, from the `sem_pls` demo.](../../../docs/methods/pls_sem.png){width=90%}
+![SurveyStudio's Plan screen with the Edit Analysis Plan dialog for a PLS structural equation model syntax research question, from the `sem_pls` demo.](../../../docs/methods/pls_sem.png){width=90%}
 
 In the pre-analysis plan:
 
@@ -79,7 +79,7 @@ In the report: the model syntax, ready for you to fit in lavaan or seminr.
 
 ## Mediation analysis
 
-![The Plan card for a Mediation analysis block, from the `sem_pls` demo.](../../../docs/methods/mediation.png){width=90%}
+![SurveyStudio's Plan screen with the Edit Analysis Plan dialog for a Mediation analysis research question, from the `sem_pls` demo.](../../../docs/methods/mediation.png){width=90%}
 
 In the pre-analysis plan:
 
@@ -94,7 +94,7 @@ References: MacKinnon, D. P. (2008). *Introduction to statistical mediation anal
 
 ## Moderation analysis
 
-![The Plan card for a Moderation analysis block, from the `sem_pls` demo.](../../../docs/methods/moderation.png){width=90%}
+![SurveyStudio's Plan screen with the Edit Analysis Plan dialog for a Moderation analysis research question, from the `sem_pls` demo.](../../../docs/methods/moderation.png){width=90%}
 
 In the pre-analysis plan:
 

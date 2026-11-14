@@ -7,7 +7,7 @@ description: "Choose the task first. To find which criteria matter most (AHP, AN
 
 Choose the task first. To find which criteria matter most (AHP, ANP), use Saaty's importance scale. To find how criteria influence each other (DEMATEL), use the influence scale. Then add a question, choose Pairwise comparison and list the criteria.
 
-![The questionnaire editor with the pairwise comparisons selected and its settings panel outlined.](../../../docs/question-types/pairwise-comparison-editor.png){width=100%}
+![SurveyStudio's Design screen with the pairwise comparisons selected and its settings panel outlined.](../../../docs/question-types/pairwise-comparison-editor.png){width=100%}
 
 ## What the respondent sees
 

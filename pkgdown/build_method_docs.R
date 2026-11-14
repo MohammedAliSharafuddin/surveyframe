@@ -1,7 +1,7 @@
 # pkgdown/build_method_docs.R
 # The Docs section's method-family pages (Session W, owner 2026-11-14): 1
 # page per family of analysis methods, each method a section with its Plan
-# card from the builder (roles, alpha, hypotheses and decision rule), what it
+# dialog in SurveyStudio (roles, alpha, hypotheses and decision rule), what it
 # answers, the family's assumptions, the plan excerpt, a report shell with no
 # numbers, and its references. Screenshots go to pkgdown/assets/docs/methods/
 # (site only), pages to vignettes/articles/docs/methods/<family>.Rmd, and the
@@ -95,15 +95,22 @@ for (nm in sframe_list_demos()$name) {
   }
 }
 
-sessions <- list()
-open_builder <- function(demo, ins) {
-  if (!is.null(sessions[[demo]])) return(sessions[[demo]])
-  s <- chromote::ChromoteSession$new(width = 1280L, height = 900L)
-  s$Page$navigate(paste0("file://", normalizePath(sframe_builder_instrument_html(ins))))
-  wait_for(s, "typeof openRQModal === 'function' && S.analysis_plan.length > 0")
-  js(s, "var st=document.createElement('style'); st.textContent='#toastR{display:none !important}'; document.head.appendChild(st); setMode('analyse'); true")
-  sessions[[demo]] <<- s
-  s
+# The Plan dialogs are taken in SurveyStudio's Plan screen (owner
+# 2026-11-15), 1280 by 1500 so the whole dialog shows, from the research
+# question to the decision rule, as in the approved sample.
+source(file.path("pkgdown", "studio_capture.R"))
+PLAN_H <- 1500L
+# 1 SurveyStudio at a time, reopened only when the demo changes: each is a
+# background R process, and holding 1 per demo ran out of time and memory.
+current <- NULL
+current_demo <- ""
+open_studio_plan <- function(demo) {
+  if (identical(demo, current_demo)) return(current)
+  if (!is.null(current)) studio_close(current)
+  current <<- studio_open(pkg_root, demo, height = PLAN_H)
+  current_demo <<- demo
+  studio_to_plan(current$b)
+  current
 }
 
 for (fam in names(families)) {
@@ -120,19 +127,16 @@ for (fam in names(families)) {
     shot_md <- character(0)
     excerpt <- character(0)
     if (!is.null(w)) {
-      s <- open_builder(w$demo, w$instrument)
-      js(s, sprintf("try{closeModal('m-rq')}catch(e){}; openRQModal('%s'); true", w$block$id))
-      Sys.sleep(0.8)
-      r <- js(s, "(function(){var m=document.getElementById('m-rq');var c=m&&(m.querySelector('.modal,.mdl,[role=dialog]')||m.firstElementChild);if(!c)return null;var r=c.getBoundingClientRect();return [Math.max(0,r.left),Math.max(0,r.top),Math.min(r.width,1280),Math.min(r.height,900)];})()")
-      if (length(r) == 4) {
-        out <- file.path(shot_dir, paste0(m, ".png"))
-        s$screenshot(filename = out, cliprect = unlist(r))
-        system2("convert", c(shQuote(out), "-resize", "700x>", "-colors", "128", "-strip", shQuote(out)),
-                stdout = FALSE, stderr = FALSE)
-        if (nzchar(Sys.which("optipng"))) system2("optipng", c("-quiet", "-o2", shQuote(out)))
-        shot_md <- c(sprintf("![The Plan card for a %s block, from the `%s` demo.](../../../docs/methods/%s.png){width=90%%}",
-                             words, w$demo, m), "")
-      }
+      s <- open_studio_plan(w$demo)
+      builder_js(s$b, sprintf("try{closeModal('m-rq')}catch(e){}; openRQModal('%s'); true", w$block$id))
+      studio_wait(s$b, "(function(){var m=document.getElementById('m-rq');return !!m&&getComputedStyle(m).display!=='none';})()", secs = 30, frame = TRUE)
+      studio_blur(s$b)
+      Sys.sleep(1)
+      out <- file.path(shot_dir, paste0(m, ".png"))
+      s$b$screenshot(filename = out, cliprect = c(0, 0, STUDIO_W, PLAN_H))
+      studio_shrink(out, colors = 128L)
+      shot_md <- c(sprintf("![SurveyStudio's Plan screen with the Edit Analysis Plan dialog for a %s research question, from the `%s` demo.](../../../docs/methods/%s.png){width=90%%}",
+                           words, w$demo, m), "")
       d <- sframe_plan_declaration(w$block)
       excerpt <- c(sprintf("> **%s.** %s", w$block$id, w$block$research_question),
                    if (length(d)) sprintf("> **%s:** %s", names(d), d), "")
@@ -152,7 +156,7 @@ for (fam in names(families)) {
            sections)
   writeLines(rmd, file.path(page_dir, paste0(fam, ".Rmd")))
 }
-for (s in sessions) try(s$close(), silent = TRUE)
+if (!is.null(current)) studio_close(current)
 
 landing <- file.path("vignettes", "articles", "docs.Rmd")
 lines <- readLines(landing)

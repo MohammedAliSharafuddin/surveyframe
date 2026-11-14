@@ -7,7 +7,7 @@ description: "Add a question, choose Likert, and choose the choice set that hold
 
 Add a question, choose Likert, and choose the choice set that holds its answer options, such as Strongly disagree to Strongly agree.
 
-![The questionnaire editor with the Likert question selected and its settings panel outlined.](../../../docs/question-types/likert-editor.png){width=100%}
+![SurveyStudio's Design screen with the Likert question selected and its settings panel outlined.](../../../docs/question-types/likert-editor.png){width=100%}
 
 ## Questions, response options and scales
 

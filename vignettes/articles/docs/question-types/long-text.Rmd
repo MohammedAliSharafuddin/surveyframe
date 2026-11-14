@@ -7,7 +7,7 @@ description: "Add a question and choose Long text for a paragraph."
 
 Add a question and choose Long text for a paragraph.
 
-![The questionnaire editor with the open-ended question selected and its settings panel outlined.](../../../docs/question-types/long-text-editor.png){width=100%}
+![SurveyStudio's Design screen with the open-ended question selected and its settings panel outlined.](../../../docs/question-types/long-text-editor.png){width=100%}
 
 ## What the respondent sees
 

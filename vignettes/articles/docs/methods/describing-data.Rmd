@@ -13,7 +13,7 @@ In SurveyStudio, open **Plan** on the Design screen, add a research question and
 
 ## Frequencies and percentages
 
-![The Plan card for a Frequencies and percentages block, from the `first_survey` demo.](../../../docs/methods/frequency.png){width=90%}
+![SurveyStudio's Plan screen with the Edit Analysis Plan dialog for a Frequencies and percentages research question, from the `first_survey` demo.](../../../docs/methods/frequency.png){width=90%}
 
 In the pre-analysis plan:
 
@@ -23,7 +23,7 @@ In the report: the APA 7 sentence and a table, with a chart where the method has
 
 ## Descriptive statistics
 
-![The Plan card for a Descriptive statistics block, from the `first_survey` demo.](../../../docs/methods/descriptives.png){width=90%}
+![SurveyStudio's Plan screen with the Edit Analysis Plan dialog for a Descriptive statistics research question, from the `first_survey` demo.](../../../docs/methods/descriptives.png){width=90%}
 
 In the pre-analysis plan:
 
@@ -33,7 +33,7 @@ In the report: the APA 7 sentence and a table, with a chart where the method has
 
 ## Missing-data summary
 
-![The Plan card for a Missing-data summary block, from the `first_survey` demo.](../../../docs/methods/missing_data.png){width=90%}
+![SurveyStudio's Plan screen with the Edit Analysis Plan dialog for a Missing-data summary research question, from the `first_survey` demo.](../../../docs/methods/missing_data.png){width=90%}
 
 In the pre-analysis plan:
 
@@ -44,7 +44,7 @@ In the report: the APA 7 sentence and a table, with a chart where the method has
 
 ## Response quality checks
 
-![The Plan card for a Response quality checks block, from the `first_survey` demo.](../../../docs/methods/quality.png){width=90%}
+![SurveyStudio's Plan screen with the Edit Analysis Plan dialog for a Response quality checks research question, from the `first_survey` demo.](../../../docs/methods/quality.png){width=90%}
 
 In the pre-analysis plan:
 

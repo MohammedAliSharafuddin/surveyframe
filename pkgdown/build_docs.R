@@ -1,7 +1,7 @@
 # pkgdown/build_docs.R
 # The Docs section of surveyframe.org (Session W, owner 2026-11-14, Quill
 # Forms docs as the model): how to set up each of the 13 answerable question
-# types. For each type it captures 2 screenshots, the builder's editor with the
+# types. For each type it captures 2 screenshots, SurveyStudio's Design screen with the
 # question selected and its settings outlined, and the question as the
 # respondent sees it, into pkgdown/assets/docs/question-types/ (site only),
 # and writes the page, vignettes/articles/docs/question-types/<slug>.Rmd, and
@@ -108,7 +108,7 @@ page_dir <- file.path("vignettes", "articles", "docs", "question-types")
 dir.create(shot_dir, recursive = TRUE, showWarnings = FALSE)
 dir.create(page_dir, recursive = TRUE, showWarnings = FALSE)
 shrink <- function(path, width = 1000) {
-  system2("convert", c(shQuote(path), "-resize", paste0(width, "x>"), "-colors", "256", "-strip", shQuote(path)),
+  system2("convert", c(shQuote(path), "-resize", shQuote(paste0(width, "x>")), "-colors", "256", "-strip", shQuote(path)),
           stdout = FALSE, stderr = FALSE)
 }
 js <- function(b, code) b$Runtime$evaluate(code, returnByValue = TRUE)$result$value
@@ -121,21 +121,22 @@ wait_for <- function(b, cond, secs = 30) {
 }
 
 demo <- sframe_demo("input_types", preview = FALSE)$instrument
-builder <- sframe_builder_instrument_html(demo)
-b <- chromote::ChromoteSession$new(width = 1280L, height = 800L)
-b$Page$navigate(paste0("file://", normalizePath(builder)))
-wait_for(b, "typeof openInsp === 'function' && S.items.length > 0")
-# Toasts, such as the integrity message on opening, stay out of the shots.
-js(b, "var st=document.createElement('style'); st.textContent='#toastR{display:none !important}'; document.head.appendChild(st); true")
+# The editor shots are taken in SurveyStudio's Design screen (owner
+# 2026-11-15), with its left menu and screen name in view.
+source(file.path("pkgdown", "studio_capture.R"))
+studio <- studio_open(pkg_root, "input_types")
+b <- studio$b
 for (tp in names(types)) {
   t <- types[[tp]]
   cat(tp, "\n")
   # The editor, with the question's settings outlined as Quill's docs do.
-  js(b, sprintf("openInsp('%s'); var i=document.getElementById('inspector'); if(i){i.style.outline='3px solid #d6336c'; i.style.outlineOffset='-3px';} true", t$id))
-  Sys.sleep(0.8)
+  studio_select(b, t$id)
+  studio_outline_panel(b)
+  studio_blur(b)
+  Sys.sleep(1)
   out <- file.path(shot_dir, paste0(t$slug, "-editor.png"))
-  b$screenshot(filename = out, cliprect = c(0, 0, 1280, 800))
-  shrink(out)
+  b$screenshot(filename = out, cliprect = c(0, 0, STUDIO_W, STUDIO_H))
+  studio_shrink(out)
   # The question as the respondent sees it, from a 1-question copy, so no
   # welcome page stands in front of it.
   item <- Filter(function(it) identical(it$id, t$id), demo$items)[[1]]
@@ -153,7 +154,7 @@ for (tp in names(types)) {
   shrink(out, 900)
   p$close()
 }
-b$close()
+studio_close(studio)
 
 for (tp in names(types)) {
   t <- types[[tp]]
@@ -163,7 +164,7 @@ for (tp in names(types)) {
     sprintf("description: \"%s\"", t$how), "---", "",
     "[Documentation](../../docs.html) / [Question types](../../docs.html#question-types)", "",
     t$how, "",
-    sprintf("![The questionnaire editor with the %s selected and its settings panel outlined.](../../../docs/question-types/%s-editor.png){width=100%%}", sub(" to a scale$", "", sub("^Add (a |an )?", "", t$h1)), t$slug), "",
+    sprintf("![SurveyStudio's Design screen with the %s selected and its settings panel outlined.](../../../docs/question-types/%s-editor.png){width=100%%}", sub(" to a scale$", "", sub("^Add (a |an )?", "", t$h1)), t$slug), "",
     if (!is.null(t$concept)) c("## Questions, response options and scales", "", t$concept, "") else character(0),
     "## What the respondent sees", "",
     sprintf("![The %s as the respondent sees it.](../../../docs/question-types/%s-preview.png){width=90%%}", sub(" to a scale$", "", sub("^Add (a |an )?", "", t$h1)), t$slug), "",
