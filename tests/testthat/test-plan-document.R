@@ -61,14 +61,39 @@ test_that("participant text, study and amendments print as written", {
   expect_match(plan_md("two_group"), "None. This is the instrument as first planned.", fixed = TRUE)
 })
 
-test_that("To complete before submission prompts each field, or prints what is declared", {
+test_that("To complete before submission prompts each field the study leaves empty", {
   md <- plan_md("two_group")
-  for (f in c("Exclusion rules", "Stopping rule", "Primary and secondary outcomes",
+  for (f in c("Exclusion rules", "Stopping rule", "Primary outcomes", "Secondary outcomes",
               "Multiplicity", "Contingency decisions", "Significance level")) {
     expect_match(md, paste0("**", f, ":**"), fixed = TRUE, info = f)
   }
+  expect_false(grepl("## Preregistration", md, fixed = TRUE))
   held <- plan_md("two_group", function(ins) { ins$analysis_plan[[1]]$options$alpha <- 0.01; ins })
-  expect_match(held, "Declared in the instrument: alpha = 0.01", fixed = TRUE)
+  expect_match(held, "## Preregistration\n\n**Significance level:** alpha = 0.01", fixed = TRUE)
+  expect_false(grepl("**Significance level:** the alpha", held, fixed = TRUE))
+})
+
+test_that("declared preregistration fields print in their own section, and only the rest are prompted", {
+  md <- plan_md("two_group", function(ins) {
+    ins$study <- list(preregistration = list(stopping_rule = "At 120 responses.",
+                                             multiplicity = "Holm correction."))
+    ins
+  })
+  pre <- substring(md, regexpr("## Preregistration", md, fixed = TRUE),
+                   regexpr("## To complete before submission", md, fixed = TRUE))
+  expect_match(pre, "**Stopping rule:** At 120 responses.", fixed = TRUE)
+  expect_match(pre, "**Multiplicity:** Holm correction.", fixed = TRUE)
+  todo <- substring(md, regexpr("## To complete before submission", md, fixed = TRUE))
+  expect_false(grepl("Stopping rule", todo, fixed = TRUE))
+  expect_false(grepl("Multiplicity", todo, fixed = TRUE))
+  expect_match(todo, "**Exclusion rules:**", fixed = TRUE)
+  all <- plan_md("two_group", function(ins) {
+    ins$study <- list(preregistration = as.list(stats::setNames(rep("Declared.", 6),
+                                                                surveyframe:::sframe_preregistration_fields)))
+    ins$analysis_plan[[1]]$options$alpha <- 0.05
+    ins
+  })
+  expect_false(grepl("To complete before submission", all, fixed = TRUE))
 })
 
 test_that("instrument text cannot inject Markdown or HTML", {

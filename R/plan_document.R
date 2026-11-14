@@ -231,6 +231,15 @@ sframe_plan_blocks <- function(instrument, title = NULL, authors = NULL,
     }
   }
 
+  # 6b The preregistration fields the study declares.
+  pr <- instrument$study$preregistration %||% list()
+  filled <- Filter(function(f) nzchar(trimws(as.character(pr[[f]] %||% "")[1])), sframe_preregistration_fields)
+  alphas <- unique(unlist(lapply(plan, function(b) b$options$alpha)))
+  if (length(filled) || length(alphas)) {
+    add("h2", text = "Preregistration")
+    for (f in filled) add("kv", label = sframe_prereg_labels[[f]], text = as.character(pr[[f]])[1])
+    if (length(alphas)) add("kv", label = "Significance level", text = paste0("alpha = ", paste(alphas, collapse = ", ")))
+  }
   # 7 Models and amendments
   models <- instrument$models %||% list()
   if (length(models)) {
@@ -266,20 +275,13 @@ sframe_plan_blocks <- function(instrument, title = NULL, authors = NULL,
   add("h2", text = "References")
   add("refs", md = TRUE, items = unname(ref_md[keep][ord]), html = unname(ref_html[keep][ord]))
 
-  # 9 To complete before submission
-  add("h2", text = "To complete before submission")
-  add("p", text = "A preregistration also asks for these. Write each answer on its line before you submit the plan.")
-  alphas <- unique(unlist(lapply(plan, function(b) b$options$alpha)))
-  prompts <- c(
-    "Exclusion rules" = "which responses will be excluded, and why.",
-    "Stopping rule" = "when data collection ends: a date, a sample size or another rule.",
-    "Primary and secondary outcomes" = "which outcomes answer the main question, and which are secondary.",
-    "Multiplicity" = "how the tests are corrected for being run together, if at all.",
-    "Contingency decisions" = "what you will do if an assumption fails or the planned sample is not reached.",
-    "Significance level" = "the alpha each test is judged against.")
-  for (f in names(prompts)) {
-    held <- if (f == "Significance level" && length(alphas)) paste0("alpha = ", paste(alphas, collapse = ", ")) else NULL
-    add("fill", label = f, text = prompts[[f]], value = held)
+  # 9 A prompt and a blank line for each field the study does not declare.
+  todo <- setdiff(sframe_preregistration_fields, filled)
+  if (!length(alphas)) todo <- c(todo, "significance_level")
+  if (length(todo)) {
+    add("h2", text = "To complete before submission")
+    add("p", text = "A preregistration also asks for these. Write each answer on its line before you submit the plan, or add it to the instrument's study.")
+    for (f in todo) add("fill", label = sframe_prereg_labels[[f]], text = sframe_prereg_prompts[[f]])
   }
   out
 }
@@ -306,6 +308,22 @@ sframe_plan_method_keys <- function(instrument) {
     sframe_method_citation_keys(sframe_analysis_method(b))
   })))
 }
+
+# The preregistration fields as the plan names them, and the prompt each
+# gets when the study does not declare it.
+sframe_prereg_labels <- c(
+  exclusion_rules = "Exclusion rules", stopping_rule = "Stopping rule",
+  primary_outcomes = "Primary outcomes", secondary_outcomes = "Secondary outcomes",
+  multiplicity = "Multiplicity", contingency = "Contingency decisions",
+  significance_level = "Significance level")
+sframe_prereg_prompts <- c(
+  exclusion_rules = "which responses will be excluded, and why.",
+  stopping_rule = "when data collection ends: a date, a sample size or another rule.",
+  primary_outcomes = "the outcomes that answer the main question.",
+  secondary_outcomes = "the secondary outcomes.",
+  multiplicity = "how the tests are corrected for being run together, if at all.",
+  contingency = "what you will do if an assumption fails or the planned sample is not reached.",
+  significance_level = "the alpha each test is judged against.")
 
 sframe_plan_title <- function(instrument) {
   paste0("Pre-analysis plan: ", instrument$meta$title %||% "Untitled")
